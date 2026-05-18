@@ -33,6 +33,7 @@ import { isParsedValue } from "../state/variable-resolution";
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { ROUTING_STATE_KEYS } from "../state/routing-state";
+import { isContainerLike } from "../rendering/ContainerUtils";
 
 /**
  * Set to false to disable the computedUses narrowing optimisation entirely.
@@ -98,18 +99,39 @@ const JS_STDLIB_GLOBALS = new Set([
   "AbortController", "AbortSignal",
   "CustomEvent", "Event", "EventTarget",
   "WebSocket",
+  // Browser dialog APIs — browser-only (not Node.js), but XMLUI always runs in a browser.
+  // XMLUI overrides `confirm` with its own dialog; `alert` and `prompt` are also
+  // never XMLUI state variable names.  Filter them so they don't pollute computedUses.
+  "alert", "confirm", "prompt",
 ]);
 
 const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 
 /**
+ * `$`-prefixed names that ARE stored in parent state and must not be filtered.
+ *
+ * These are injected at runtime via component state dispatch (not via the
+ * per-render contextVars mechanism), so they genuinely live in the parent
+ * StateContainer's state map and need to appear in `computedUses` so that
+ * containers re-render when they change.
+ *
+ * - `$context`: set by `ContextMenu.openAt()` via implicit dispatch to the
+ *   parent container.  Without it in `computedUses`, the container is memo-
+ *   blocked when `$context` changes, and `customRender` never picks up the
+ *   new value — all menu items see `$context = undefined`.
+ */
+const PARENT_STATE_DYNAMIC_VARS = new Set(["$context"]);
+
+/**
  * Returns true for framework-injected context variables that are NOT stored
- * in parent state.  All XMLUI runtime-injected names start with `$`; the only
- * `$`-prefixed names that DO live in parent state are the router state keys
- * defined in routing-state.ts.
+ * in parent state.  All XMLUI runtime-injected names start with `$`; the
+ * exceptions are the router state keys (routing-state.ts) and the dynamic
+ * vars listed in PARENT_STATE_DYNAMIC_VARS above.
  */
 const isRuntimeContextVar = (name: string): boolean =>
-  name.startsWith("$") && !ROUTING_STATE_KEYS.has(name);
+  name.startsWith("$") &&
+  !ROUTING_STATE_KEYS.has(name) &&
+  !PARENT_STATE_DYNAMIC_VARS.has(name);
 
 /**
  * Walk a plain-object AST tree collecting Identifier node names.
@@ -249,17 +271,12 @@ function computeUsesInternal(
     ...Object.keys(node.scriptCollected?.functions ?? {}),
   ]);
   // A node is a "known" container regardless of parentDeps (excludes implicit-default).
-  // Require non-empty vars/functions — the StandaloneApp merge produces `vars: {}` and
-  // `functions: {}` (truthy empty objects) for every compound component even when none
-  // are declared. Treating those as containers would falsely narrow their children.
-  const isKnownContainer = !!(
-    (node.vars && Object.keys(node.vars).length > 0) ||
-    (node.loaders && node.loaders.length > 0) ||
-    (node.functions && Object.keys(node.functions).length > 0) ||
-    node.uses !== undefined ||
-    node.contextVars ||
-    node.scriptCollected
-  );
+  // Uses the shared `isContainerLike` predicate in strict mode so that:
+  //   • truthy-but-empty `vars: {}` / `functions: {}` from the StandaloneApp merge
+  //     do NOT count as containers (would otherwise falsely narrow children);
+  //   • `computedUses` is ignored — it is being computed right now, so it would
+  //     create a chicken-and-egg situation on re-runs.
+  const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
   // Children of a container see THIS node's functions; children of a non-container
   // see the same parentFunctionNames inherited from above (scope doesn't change).
   const childFunctionNames = isKnownContainer ? nodeFunctionNames : parentFunctionNames;
@@ -318,16 +335,21 @@ function computeUsesInternal(
   for (const d of usedHere) if (!localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d)) parentDependencies.add(d);
   for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d)) parentDependencies.add(d);
 
-  const isRegularContainer = !!(
-    (node.vars && Object.keys(node.vars).length > 0) ||
-    (node.loaders && node.loaders.length > 0) ||
-    (node.functions && Object.keys(node.functions).length > 0) ||
-    node.uses !== undefined ||
-    node.contextVars ||
-    node.scriptCollected
+  // Deps that are "real" parent-state keys (not runtime-injected dynamic vars).
+  // Used for the isImplicitDefault promotion check: a component should not be
+  // promoted to a container solely because it reads a dynamic var like $context.
+  // If the ONLY deps are dynamic vars, stateFromOutside would be {} initially
+  // (before openAt), which breaks the component.
+  const nonDynamicParentDeps = new Set(
+    [...parentDependencies].filter((d) => !PARENT_STATE_DYNAMIC_VARS.has(d)),
   );
-  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && parentDependencies.size > 0;
-  const isContainer = isRegularContainer || isImplicitDefault;
+
+  // Use nonDynamicParentDeps so that implicit containers are not promoted purely
+  // because of a dynamic var dependency ($context etc.) — that would set
+  // computedUses=["$context"], making stateFromOutside={} and isolating the
+  // component from all other parent state.
+  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicParentDeps.size > 0;
+  const isContainer = isKnownContainer || isImplicitDefault;
 
   if (isContainer) {
     // Both regular containers (vars/loaders/etc.) and explicit-uses containers
@@ -350,7 +372,16 @@ function computeUsesInternal(
     const dependsOnParentFunction = parentFunctionNames.size > 0 &&
       [...parentDependencies].some(d => parentFunctionNames.has(d));
     const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
-    if (node.uses === undefined && parentDependencies.size > 0 && safeToNarrow) {
+    // Guard narrowing on nonDynamicParentDeps (not parentDependencies) so that a container
+    // whose ONLY parent-state dependencies are dynamic vars ($context etc.) does NOT get
+    // computedUses set. Dynamic vars like $context live in the nearest ancestor container's
+    // state (e.g. Theme#root), and component APIs (like ContextMenu's "projectMenu") also
+    // land there. Setting computedUses=["$context"] on a container that has NO real parent
+    // deps would make stateFromOutside={} initially (before openAt sets $context), cutting
+    // the container off from sibling APIs registered in the ancestor. When both real deps
+    // AND dynamic deps exist the dynamic vars are still included so the container re-renders
+    // when $context changes (reactive correctness).
+    if (node.uses === undefined && nonDynamicParentDeps.size > 0 && safeToNarrow) {
       // If any needed dep is a parent-provided function, include ALL parent
       // functions in computedUses so that functions called transitively within
       // those functions are also in scope. Functions are non-reactive, so
@@ -363,7 +394,13 @@ function computeUsesInternal(
     // else: node has own script/code-behind, or calls a parent function while narrowing
     // is disabled — intentionally not narrowed.
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();
-    return [parentDependencies, myEscapingUID];
+    // Do NOT propagate dynamic vars ($context etc.) to the parent container's deps.
+    // They belong in THIS container's own computedUses (so it re-renders when they
+    // change) but must not cascade further — the parent provides them through its
+    // own state dispatch chain, and leaking them into the parent's parentDeps would
+    // cause stateFromOutside={} for the parent.
+    const propagatedDeps = nonDynamicParentDeps;
+    return [propagatedDeps, myEscapingUID];
   }
 
   // Non-container: this node's own UID + all child escaping UIDs propagate

@@ -173,7 +173,10 @@ export function useShallowCompareMemoize<T extends Record<any, any> | undefined>
   const ref = React.useRef<T>(value);
   const signalRef = React.useRef<number>(0);
 
-  if (!shallowCompare(value, ref.current)) {
+  // Reference-identity fast-path: if the input is the same object as the cached
+  // one (very common when the caller already memoises upstream), skip the O(N)
+  // shallow comparison entirely.
+  if (value !== ref.current && !shallowCompare(value, ref.current)) {
     ref.current = value;
     signalRef.current++;
   }

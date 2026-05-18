@@ -3,6 +3,7 @@
  * These functions have zero dependencies on React, component state, or external context.
  */
 
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ArrowExpression } from "../script-runner/ScriptingSourceTree";
 import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
@@ -35,6 +36,92 @@ export function isArrowExpression(
   value: string | ParsedEventValue | ArrowExpression,
 ): value is ArrowExpression {
   return value != null && (value as ArrowExpression).type === T_ARROW_EXPRESSION;
+}
+
+// ============================================================================
+// CONTAINER DETECTION
+// ============================================================================
+
+/**
+ * Options for {@link isContainerLike}.
+ */
+export type IsContainerLikeOptions = {
+  /**
+   * When `true`, treat empty `vars` / `loaders` / `functions` objects as
+   * "not a container". Use this for static analysis (computedUses) where the
+   * StandaloneApp merge produces truthy empty `vars: {}` and `functions: {}`
+   * on every compound component — treating those as containers would falsely
+   * narrow the dependency set.
+   *
+   * When `false` (default — runtime semantics), any truthy `vars` / `loaders` /
+   * `functions` flags the node as a container so the runtime wrapper logic
+   * remains backwards compatible.
+   */
+  strict?: boolean;
+
+  /**
+   * When `true`, ignore `node.computedUses` when deciding container-ness.
+   * Use this from the computedUses analyzer itself (which is in the process
+   * of writing `computedUses`); the runtime should leave it `false` so that
+   * already-computed scoping promotes a node to container.
+   */
+  ignoreComputedUses?: boolean;
+};
+
+/**
+ * Single source of truth for "does this component definition need a state
+ * container at runtime / form a state-scope boundary for static analysis".
+ *
+ * Two callers historically maintained their own predicates:
+ *   • `ContainerWrapper.tsx` (runtime wrapping decision)
+ *   • `computedUses.ts` (static narrowing analysis)
+ *
+ * The static-analysis version had to be stricter to avoid being fooled by
+ * the StandaloneApp merge which assigns truthy empty `vars: {}` to every
+ * compound component. To unify them we expose this single helper with a
+ * `strict` flag.
+ */
+export function isContainerLike(
+  node: Pick<
+    ComponentDef,
+    | "type"
+    | "loaders"
+    | "vars"
+    | "uses"
+    | "computedUses"
+    | "contextVars"
+    | "functions"
+    | "scriptCollected"
+  >,
+  options: IsContainerLikeOptions = {},
+): boolean {
+  if (node.type === "Container") {
+    return true;
+  }
+
+  const { strict = false, ignoreComputedUses = false } = options;
+
+  const hasVars = strict
+    ? !!(node.vars && Object.keys(node.vars).length > 0)
+    : !!node.vars;
+  const hasLoaders = strict
+    ? !!(node.loaders && node.loaders.length > 0)
+    : !!node.loaders;
+  const hasFunctions = strict
+    ? !!(node.functions && Object.keys(node.functions).length > 0)
+    : !!node.functions;
+  const hasUses = strict ? node.uses !== undefined : !!node.uses;
+  const hasComputedUses = !ignoreComputedUses && !!node.computedUses;
+
+  return !!(
+    hasVars ||
+    hasLoaders ||
+    hasFunctions ||
+    hasUses ||
+    hasComputedUses ||
+    node.contextVars ||
+    node.scriptCollected
+  );
 }
 
 // ============================================================================

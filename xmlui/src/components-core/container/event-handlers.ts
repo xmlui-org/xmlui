@@ -65,6 +65,13 @@ export interface EventHandlerConfig {
   handlerLogger: HandlerLoggerContext;
   // Current state reference
   stateRef: React.MutableRefObject<Record<string | symbol, any>>;
+  // Stable ref tracking the latest componentState (updated every render).
+  // Used to refresh stateRef before handler execution when the Container is
+  // memo-blocked by computedUses and the layout effect hasn't re-fired.
+  componentStateRef?: React.MutableRefObject<Record<string, any>>;
+  // Stable ref to the full (un-narrowed) parent state set by ComponentWrapper.
+  // Updated every time the parent renders, even when Container is memo-blocked.
+  fullParentStateRef?: React.MutableRefObject<Record<string, any> | undefined>;
   // Theme variable getter
   getThemeVar: (varName: string) => any;
   // State dispatch function
@@ -99,6 +106,8 @@ export function createEventHandlers(config: EventHandlerConfig) {
     appContext,
     handlerLogger,
     stateRef,
+    componentStateRef,
+    fullParentStateRef,
     getThemeVar,
     dispatch,
     apiInstance,
@@ -112,6 +121,25 @@ export function createEventHandlers(config: EventHandlerConfig) {
     statementPromises,
     parsedStatementsRef,
   } = config;
+
+  // Merge the latest fullParentStateRef.current with componentStateRef.current
+  // into stateRef immediately before each handler execution.
+  //
+  // When computedUses narrows a Container's parentState (e.g. to ['lastAction']),
+  // the Container is memo-blocked on unrelated parent state changes. The layout
+  // effect that normally syncs stateRef doesn't re-fire while memo-blocked. This
+  // means dynamic context vars like $context (stored in parent state via implicit
+  // dispatch) are invisible to event handlers.
+  //
+  // fullParentStateRef.current is always up-to-date (mutated by ComponentWrapper
+  // on every parent render), so refreshing here ensures handlers always see the
+  // full current state regardless of memo-blocking.
+  const refreshStateRef = () => {
+    const fp = fullParentStateRef?.current;
+    if (fp && componentStateRef) {
+      stateRef.current = { ...fp, ...componentStateRef.current };
+    }
+  };
 
   // ========================================================================
   // ASYNC EVENT HANDLER EXECUTION
@@ -128,6 +156,11 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const canSignEventLifecycle = () => {
         return uid.description !== undefined && options?.eventName !== undefined;
       };
+
+      // Ensure stateRef reflects the latest parent state before reading it.
+      // Required when Container is memo-blocked by computedUses — the layout
+      // effect that normally syncs stateRef may not have re-fired.
+      refreshStateRef();
 
       let changes: Array<any> = [];
       // --- W3-6 / plan #06 Step 1.1: per-handler `$cancel` token.
@@ -473,6 +506,8 @@ export function createEventHandlers(config: EventHandlerConfig) {
 
   const runCodeSync = useCallback(
     (arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
+      // Ensure stateRef reflects the latest parent state before reading it.
+      refreshStateRef();
       const evalContext: BindingTreeEvaluationContext = {
         localContext: cloneDeep(stateRef.current),
         appContext,

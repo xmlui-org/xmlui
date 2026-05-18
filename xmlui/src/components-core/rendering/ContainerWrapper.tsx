@@ -13,6 +13,7 @@ import type { ContainerDispatcher } from "../abstractions/ComponentRenderer";
 import type { ProxyAction } from "../rendering/buildProxy";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { StateContainer } from "./StateContainer";
+import { isContainerLike as isContainerLikeShared } from "./ContainerUtils";
 
 /**
  * This type is the internal representation of a container component, which manages the state of its children.
@@ -52,24 +53,17 @@ export type ComponentCleanupFn = (uid: symbol) => void;
  * This function checks if a particular component needs a wrapping container to
  * manage its internal state, which is closed from its external context but
  * available to its children.
+ *
+ * Delegates to the shared {@link isContainerLikeShared} predicate in
+ * `ContainerUtils.ts` (non-strict mode = runtime semantics). The static
+ * analysis in `computedUses.ts` calls the same helper with `strict: true` to
+ * unify the two definitions that used to live in separate files.
+ *
  * @param node The component definition node to check
- * @returns Tru, if the component needs a wrapping container
+ * @returns true, if the component needs a wrapping container
  */
 export function isContainerLike(node: ComponentDef) {
-  if (node.type === "Container") {
-    return true;
-  }
-
-  // --- If any of the following properties have a value, we need a container
-  return !!(
-    node.loaders ||
-    node.vars ||
-    node.uses ||
-    node.computedUses ||
-    node.contextVars ||
-    node.functions ||
-    node.scriptCollected
-  );
+  return isContainerLikeShared(node);
 }
 
 /**

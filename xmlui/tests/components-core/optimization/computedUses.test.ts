@@ -814,13 +814,20 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree + extractScopedState — end
 // ---------------------------------------------------------------------------
 // isRuntimeContextVar filter — Баг 17 regression
 //
-// Runtime context vars ($param, $item, $row, $data, $context, $this, $checked,
-// etc.) are injected by the framework at render time into children.  They do NOT
-// exist as keys in the parent StateContainer's state map.  Including them in
-// computedUses causes extractScopedState to return {}, breaking the component.
+// Most runtime context vars ($param, $item, $row, $data, $this, $checked,
+// etc.) are injected by the framework at render time via the contextVars
+// mechanism.  They do NOT exist as keys in the parent StateContainer's state
+// map.  Including them in computedUses causes extractScopedState to return {},
+// breaking the component.
 //
 // Router state vars ($pathname, $routeParams, $queryParams, $linkInfo) DO live
 // in parent state (Layer 6 — useRoutingParams) and must NOT be filtered.
+//
+// PARENT_STATE_DYNAMIC_VARS ($context, …) are set via component dispatch into
+// the parent container's reducer (e.g. ContextMenu.openAt → updateState →
+// implicit dispatch → App state).  They DO live in parent state and must NOT
+// be filtered — containers need them in computedUses so they re-render when
+// the value changes.
 // ---------------------------------------------------------------------------
 
 describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filter (Баг 17)", () => {
@@ -858,9 +865,9 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
   it.each([
     "$params", "$item", "$itemIndex",
     "$row", "$rowIndex", "$rowKey",
-    "$context", "$data", "$this",
+    "$data", "$this",
     "$checked", "$setChecked",
-  ])("%s is filtered out of computedUses", (runtimeVar) => {
+  ])("%s is filtered out of computedUses (render-time contextVar, not in parent state)", (runtimeVar) => {
     const container = node("Container", {
       vars: { x: "{0}" },
       children: [node("Text", { props: { text: `{${runtimeVar}}` } })],
@@ -868,6 +875,70 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
     computeUsesForTree(container);
     // Only x is a real parent dep; runtimeVar must be excluded.
     expect(container.computedUses ?? []).not.toContain(runtimeVar);
+  });
+
+  it("$context IS kept in computedUses when mixed with real deps (parent-state dynamic var)", () => {
+    // $context lives in parent state (dispatched by ContextMenu.openAt → implicit container →
+    // App reducer). Containers that read BOTH $context AND real parent-state deps must include
+    // $context in computedUses so they re-render when openAt is called.
+    const outer = node("Stack", {
+      vars: { lastAction: "''" },
+      children: [
+        node("Select", {
+          children: [node("Text", { props: { text: "{$context.name} — {lastAction}" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(outer);
+    const select = outer.children![0];
+    // $context is NOT filtered → parentDependencies includes it → computedUses includes $context
+    expect(select.computedUses).toContain("$context");
+    expect(select.computedUses).toContain("lastAction");
+  });
+
+  it("$context alone does NOT make an implicit container (avoids empty stateFromOutside)", () => {
+    // When $context is the ONLY dep (no real parent-state key alongside it), an implicit
+    // container must NOT be promoted from isImplicitDefault — that would produce
+    // computedUses=['$context'] → stateFromOutside={} (initially, before openAt sets $context)
+    // → the component would be completely isolated from parent state.
+    const select = node("Select", {
+      children: [node("Text", { props: { text: "{$context.name}" } })],
+    });
+    computeUsesForTree(select);
+    // No real parent dep beside $context → isImplicitDefault stays false → no computedUses.
+    expect(select.computedUses).toBeUndefined();
+  });
+
+  it("$context does NOT cascade to grandparent (container stops propagation)", () => {
+    // ContextMenu-like pattern: ContextMenu is a container whose children use $context.
+    // $context should be in ContextMenu's computedUses (so it re-renders after openAt).
+    // But $context must NOT propagate to the outer Stack's parentDeps — otherwise
+    // Stack gets computedUses=['$context'] → stateFromOutside={} → Stack loses parent state.
+    //
+    // Note: The real ContextMenu node from the XMLUI parser does NOT have static
+    // contextVars — the parser does not inject metadata contextVars into the node.
+    // So $context is NOT in ContextMenu's localDeclared, which is why it ends up in
+    // ContextMenu's parentDependencies and then in computedUses.
+    const outer = node("Stack", {
+      vars: { lastAction: "''" },
+      children: [
+        node("Select", {
+          // No contextVars — simulates a ContextMenu-like container where $context
+          // is set via implicit dispatch, not via static node.contextVars.
+          vars: { placeholder: "'select'" },
+          children: [
+            node("Text", { props: { text: "{$context.name} — {lastAction}" } }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(outer);
+    const ctxMenuLike = outer.children![0];
+    // Container gets computedUses with $context (has lastAction as other dep)
+    expect(ctxMenuLike.computedUses).toContain("$context");
+    expect(ctxMenuLike.computedUses).toContain("lastAction");
+    // Stack gets NO computedUses — $context must NOT have cascaded to Stack's deps
+    expect(outer.computedUses).toBeUndefined();
   });
 
   it.each([

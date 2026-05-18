@@ -146,10 +146,18 @@ export const Container = memo(
     // fullParentStateRef is a stable MutableRefObject (not a value prop) so that
     // Container.memo is not invalidated on every unrelated parent state change —
     // preserving the computedUses render optimization.
-    const fullParentState = fullParentStateRef?.current;
-    const stateRef = useRef(
-      fullParentState ? { ...fullParentState, ...componentState } : componentState,
-    );
+    //
+    // Initialise cheaply with componentState — the layout effect below performs the
+    // actual merge before the browser paints. Using `useRef({ ...fullParentState, ...componentState })`
+    // would force the JS engine to evaluate the spread on every render even though
+    // React only consumes the initial value once.
+    const stateRef = useRef<Record<string, any>>(componentState);
+
+    // Stable ref tracking the latest componentState value. Updated in render phase
+    // (idempotent assignment) so that event handlers running while Container is
+    // memo-blocked can still read the most recent componentState via this ref.
+    const componentStateRef = useRef<Record<string, any>>(componentState);
+    componentStateRef.current = componentState;
 
     // Sync ref in layout effect to ensure consistency before browser paint.
     // fullParentStateRef is stable (same object reference), so the dep array is
@@ -209,6 +217,8 @@ export const Container = memo(
       appContext,
       handlerLogger,
       stateRef,
+      componentStateRef,
+      fullParentStateRef,
       getThemeVar,
       dispatch,
       apiInstance,

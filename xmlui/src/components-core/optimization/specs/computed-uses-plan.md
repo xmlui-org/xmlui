@@ -580,6 +580,50 @@ useIsomorphicLayoutEffect(() => {
 
 ---
 
+### Баг 19 (виявлений у e2e тестах): `computedUses=["$context"]` на App ізолював компонент від `registerComponentApi` батька
+
+**Симптом:** E2E тести `open-a-context-menu-on-right-click.spec.ts` (6 тестів) падали при `COMPUTED_USES_ENABLED=true`. `ContextMenu.openAt(event, data)` не відкривав меню. Додаток в myworkdrive працював нормально (там `computedUses` на App не встановлювався).
+
+**Причина (виявлена через логи `[registerApi]`):**
+
+Дерево розмітки:
+```xml
+<App>
+  <ContextMenu id="projectMenu">...</ContextMenu>
+  <Items data="{projects}">
+    <Card onContextMenu="(e) => projectMenu.openAt(e, $item)">
+```
+
+Аналізатор `computeUsesInternal` знаходив `$context` у обробниках `MenuItem.onClick`. `ContextMenu` не є контейнером (немає `vars`/`loaders`/`contextVars` в XML-вузлі). Тому `$context` бульбашив через ContextMenu → App. App отримував `parentDependencies = {"$context"}` → `computedUses = ["$context"]`.
+
+При runtime: `extractScopedState(Theme#root_state, ["$context"])` → `{}` (бо `$context` ще немає в стані до першого `openAt`). App отримував `stateFromOutside = {}` замість повного стану Theme#root. ContextMenu реєстрував свій API (`projectMenu`) в Theme#root через `registerComponentApi`. App його не бачив. Card не знаходив `projectMenu` → `TypeError: projectMenu.openAt is not a function`.
+
+Це підтверджено логами:
+```
+[stateFromOutside] App: computedUses=["$context"] parentState.keys=[] kept=[] DROPPED=[]
+[registerApi] key="projectMenu" → storing in container "Theme#root"
+[stateRef] Card: hasProjectMenu=false  ← НІКОЛИ не true
+```
+
+**Виправлення:** guard для встановлення `computedUses` змінено з `parentDependencies.size > 0` на `nonDynamicParentDeps.size > 0`.
+
+```ts
+// Було:
+if (node.uses === undefined && parentDependencies.size > 0 && safeToNarrow) {
+// Стало:
+if (node.uses === undefined && nonDynamicParentDeps.size > 0 && safeToNarrow) {
+```
+
+Тепер `computedUses` встановлюється лише коли є реальні (не-dynamic) залежності від батьківського стану. Якщо єдина залежність — `$context` (або інша `PARENT_STATE_DYNAMIC_VARS`), вузол не звужується і отримує повний стан батька. Якщо є реальні deps + `$context` — `$context` все одно включається до `computedUses` для реактивності (контейнер ре-рендериться при `openAt`).
+
+**Чому в myworkdrive не було цього бага:** у Vite/StandaloneApp режимі `computedUses` для App не встановлювався — іншою причиною (можливо, App мав `functions` через code-behind або `disableNarrowing` спрацьовував).
+
+**Файл:** `xmlui/src/components-core/optimization/computedUses.ts`
+
+**Слід мати на увазі:** `PARENT_STATE_DYNAMIC_VARS` (`$context` тощо) — це не просто "runtime context vars". Вони справді живуть в батьківському стані (ContextMenu.openAt диспетчить `$context` через `statePartChanged`). Але їх початкове значення — `undefined`. Якщо контейнер звужується тільки до `$context`, він ізолює себе від усіх інших ключів батьківського стану включно з компонентними APIs що реєструються через `registerComponentApi`.
+
+---
+
 ## Результати бенчмарку
 
 Тест: `oftenChanges` тікає кожні 100мс → 20 тіків за 2с.
@@ -787,6 +831,33 @@ JSON.stringify(window.__renderCounts, null, 2)
 ### Серіалізація `computedUses` в bundle
 
 Якщо xmlui-app компілюється в bundle, `computedUses` може бути серіалізований разом з деревом і не перераховуватись при завантаженні — лише верифікуватись.
+
+### Відновлення оптимізації для контейнерів з only-dynamic-var залежностями (Баг 19 trade-off)
+
+**Проблема:** Фікс Бага 19 ввів `nonDynamicParentDeps.size > 0` як guard для встановлення `computedUses`. Якщо контейнер залежить ЛИШЕ від `PARENT_STATE_DYNAMIC_VARS` (наприклад, лише від `$context`), `computedUses` взагалі не встановлюється — контейнер отримує повний батьківський стан при кожному ре-рендері. Це коректно, але гірше оптимізовано.
+
+**Приклад втраченої оптимізації:**
+```xml
+<App>
+  <ContextMenu id="projectMenu">...</ContextMenu>
+  <SomeContainer>
+    <!-- читає лише $context, нічого іншого зі стану батька -->
+    <Text value="{$context.name}" />
+  </SomeContainer>
+</App>
+```
+Ідеально: `SomeContainer.computedUses = ["$context", "projectMenu"]` (або хоча б `["$context"]`).
+Реально: `computedUses` не встановлюється → повний стан.
+
+**Чому так складно:**
+1. `$context` живе в батьківському StateContainer (наприклад Theme#root), але його початкове значення — `undefined`. `extractScopedState(state, ["$context"])` повертає `{}` поки `openAt` не викликано. Тому `computedUses = ["$context"]` ізолює контейнер від усіх інших ключів (включно з API сусідів типу `projectMenu`).
+2. Щоб включити `"projectMenu"` до `computedUses` разом із `"$context"`, алгоритм мав би знати, що `projectMenu` — це API що реєструється в тому ж батьківському контейнері. Але статичний аналіз лише бачить що `projectMenu` виходить з піддерева (escapingUID → localDeclared) і вважає його "локально owned". Дізнатись, що в runtime він опиниться у БІЛЬШ далекому предку (Theme#root) неможливо без знання runtime topology.
+
+**Можливі підходи для майбутнього:**
+- **Підхід A — late fixup**: після `computeUsesInternal` зробити ще один pass, що для кожного контейнера з `computedUses` перевіряє, чи є в батьківському дереві UIDs (escapingUIDs), які цей контейнер використовує. Включити їх в `computedUses` явно. Потребує зберігати `escapingUIDs` в `ComponentDef` під час першого pass.
+- **Підхід B — `extractScopedState` fallback**: якщо `extractScopedState(parentState, computedUses)` не містить жодного ключа (тобто все що запитувалось ще не в стані), повернути `parentState` цілком. Але це runtime зміна і може замаскувати інші проблеми.
+- **Підхід C — кеш "previous non-empty"**: `stateFromOutside` зберігає останній непустий результат і використовує його поки новий не з'явиться. Складно при cold-start.
+- **Підхід D — explicit `$context` marker**: замість `PARENT_STATE_DYNAMIC_VARS`-фільтрації використовувати окремий механізм: контейнер що читає `$context` і НІЧОГО іншого отримує `computedUses = ["$context"]` + спеціальний прапор `computedUsesIncludeFullOnEmpty: true`, що в `StateContainer` означає "fallback to full state if scoped is empty".
 
 ---
 
