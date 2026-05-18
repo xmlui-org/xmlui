@@ -40,6 +40,88 @@
           ]
         },
         {
+          "label": "Xmlui Docs Blocks",
+          "to": "/docs/reference/extensions/xmlui-docs-blocks/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/_overview"
+            },
+            {
+              "label": "BasicLayout",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/BasicLayout"
+            },
+            {
+              "label": "Breadcrumbs",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Breadcrumbs"
+            },
+            {
+              "label": "CustomSyntaxHighlighters",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/CustomSyntaxHighlighters"
+            },
+            {
+              "label": "DocumentLinks",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/DocumentLinks"
+            },
+            {
+              "label": "DocumentPage",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/DocumentPage"
+            },
+            {
+              "label": "DocumentPageNoTOC",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/DocumentPageNoTOC"
+            },
+            {
+              "label": "FeaturedWithTabsLayout",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/FeaturedWithTabsLayout"
+            },
+            {
+              "label": "LinkButton",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/LinkButton"
+            },
+            {
+              "label": "Overview",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Overview"
+            },
+            {
+              "label": "OverviewCard",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/OverviewCard"
+            },
+            {
+              "label": "PageNotFound",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/PageNotFound"
+            },
+            {
+              "label": "ReadingTime",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/ReadingTime"
+            },
+            {
+              "label": "ReleaseList",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/ReleaseList"
+            },
+            {
+              "label": "SectionHeader",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/SectionHeader"
+            },
+            {
+              "label": "Separator",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Separator"
+            },
+            {
+              "label": "Share",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Share"
+            },
+            {
+              "label": "TBD",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/TBD"
+            },
+            {
+              "label": "TwoColumnCode",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/TwoColumnCode"
+            }
+          ]
+        },
+        {
           "label": "Xmlui Echart",
           "to": "/docs/reference/extensions/xmlui-echart/_overview",
           "children": [

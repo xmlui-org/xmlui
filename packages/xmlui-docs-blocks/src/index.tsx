@@ -1,4 +1,13 @@
-export { shikiHighlighter, highlight } from "./highlighter";
+export { shikiHighlighter, customLanguageRegistry, docsCodeHighlighter, highlight } from "./highlighter";
+export type {
+  CustomSyntaxDecoration,
+  CustomSyntaxLanguage,
+  CustomSyntaxToken,
+  CustomSyntaxTokenStyle,
+  SyntaxThemeTone,
+} from "./customHighlighter";
+export { createCustomLanguageRegistry } from "./customHighlighter";
+export { z80AssemblyLanguage } from "./demo/z80Highlighter";
 export {
   markdownToPlainText,
   buildContentFromRuntime,

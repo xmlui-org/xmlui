@@ -1,8 +1,13 @@
-import { buildContentFromRuntime, shikiHighlighter, highlight } from "xmlui-docs-blocks";
+import {
+  buildContentFromRuntime,
+  docsCodeHighlighter,
+  shikiHighlighter,
+  highlight,
+} from "xmlui-docs-blocks";
 import { type SearchItemData, SEARCH_CATEGORIES } from "xmlui";
 import componentsSection from "../navSections/components.json";
 import extensionsSection from "../navSections/extensions.json";
-export { componentsSection, extensionsSection, shikiHighlighter, highlight };
+export { componentsSection, extensionsSection, docsCodeHighlighter, shikiHighlighter, highlight };
 
 // --- Load markdown content from the filesystem using Vite's glob import
 

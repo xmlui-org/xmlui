@@ -208,40 +208,6 @@ In the app, type a name longer than four characters in both fields, then leave t
 </App>
 ```
 
-### `matchInvalidMessage` [#matchinvalidmessage]
-
-This optional string property is used to customize the message displayed when the field value does not match `matchValue`.
-
-Use `matchInvalidMessage` to customize the validation message displayed when the field does not match `matchValue`.
-
-### `matchValue` [#matchvalue]
-
-The value this field must match. This is useful for confirmation fields, such as checking a repeated password against the original password.
-
-Use `matchValue` when a field must equal another value, such as a password confirmation field.
-
-```xmlui-pg copy display name="Example: matchValue"
-<App>
-  <Form
-    data="{{ password: '', confirmPassword: '' }}"
-    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
-    <FormItem
-      type="password"
-      label="Password"
-      bindTo="password"
-      required="true" />
-    <FormItem
-      type="password"
-      label="Confirm Password"
-      bindTo="confirmPassword"
-      required="true"
-      noSubmit="true"
-      matchValue="{$data.password}"
-      matchInvalidMessage="Passwords do not match" />
-  </Form>
-</App>
-```
-
 ### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input value. If the value is not set, no maximum length check is done.
