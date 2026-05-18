@@ -7,7 +7,7 @@ description: Implement a new XMLUI component end-to-end
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — it describes the component to build (name, props, events, design notes).
+1. Clarify with the user: the component name, props, events, and design notes if not already specified.
 2. Read `guidelines.md` at the repo root — focus on rules from Topics 4, 5, 7, 9, 23, 24.
 3. Read these reference files (load only what applies):
    - `.ai/xmlui/component-architecture.md` — two-file pattern, metadata, renderer, native (always)
@@ -29,7 +29,7 @@ Create `xmlui/src/components/ComponentName/ComponentName.tsx`:
 - Import `createMetadata` and relevant helpers
 - Import `styles` from the SCSS module (even if it doesn't exist yet — it will by step 5)
 - Export `ComponentNameMd` using `createMetadata`
-- Fill in all props, events, apis, and contextVars from `feature.md`
+- Fill in all props, events, apis, and contextVars from the task requirements
 - Reference `defaultProps.propName` for `defaultValue` fields (the native component defines `defaultProps`)
 
 ### Step 2 — Create the renderer stub
@@ -62,7 +62,7 @@ Verify the project still compiles (check for TypeScript errors in the Problems p
 
 Create `xmlui/src/components/ComponentName/ComponentName.module.scss`:
 - Use the SCSS boilerplate from `.ai/xmlui/component-architecture.md` (SCSS section)
-- Declare all theme variables referenced in `feature.md`
+- Declare all theme variables referenced in the task requirements
 - Add `defaultThemeVars` in the metadata for each variable
 
 ### Step 6 — Complete the implementation

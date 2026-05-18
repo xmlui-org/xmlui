@@ -7,7 +7,7 @@ description: Extend an existing XMLUI component with new props, events, theme va
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — it describes what is being added and why.
+1. Clarify with the user: what is being added and why if not already described.
 2. Read `guidelines.md` at the repo root — focus on rules from Topics 4, 5, 7, 9, 23, 24.
 3. Read the existing component's files:
    - `xmlui/src/components/ComponentName/ComponentName.tsx` — metadata and renderer (source of truth for the API)

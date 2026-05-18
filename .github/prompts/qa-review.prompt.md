@@ -7,9 +7,8 @@ description: Audit an existing component for conventions, accessibility, and tes
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — if it specifies which component to review and any focus areas.
-2. Read `guidelines.md` at the repo root — all topic sections are relevant for a QA review.
-3. Read these reference files:
+1. Read `guidelines.md` at the repo root — all topic sections are relevant for a QA review.
+2. Read these reference files:
    - `.ai/xmlui/qa-checklist.md` — the primary QA checklist (always, this drives the review)
    - `.ai/xmlui/component-architecture.md` — two-file pattern, metadata, renderer, native (always)
    - `.ai/xmlui/wrapcomponent.md` — wrapComponent config API (if component uses wrapComponent)
@@ -20,7 +19,7 @@ description: Audit an existing component for conventions, accessibility, and tes
    - `.ai/xmlui/testing-conventions.md` — E2E and unit test patterns (always)
    - `.ai/xmlui/accessibility.md` — accessibility audit checklist (always)
    - `.ai/xmlui/error-handling.md` — error boundary patterns (always)
-4. Read the component's full source:
+3. Read the component's full source:
    - `ComponentName.tsx` — metadata and renderer
    - `ComponentNameNative.tsx` — React implementation
    - `ComponentName.module.scss` — styles

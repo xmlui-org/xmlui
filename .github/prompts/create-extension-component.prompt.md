@@ -7,7 +7,7 @@ description: Build a new XMLUI component inside an extension package
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — it describes the component to build (name, props, events, target package).
+1. Clarify with the user: the component name, props, events, and target package if not already specified.
 2. Read `guidelines.md` at the repo root — focus on rules from Topics 4, 5, 7, 14, 23, 24.
 3. Read these reference files:
    - `.ai/xmlui/extension-packages.md` — extension interface, registration, build config (always)
