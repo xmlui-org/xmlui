@@ -191,6 +191,18 @@ export type StandaloneAppDescription = {
    *   Requires UDCs to carry explicit `<Prop>`, `<Event>`, `<Method>`,
    *   and `<Slot>` declarations. Flips to `true` in the next major
    *   release. See `dev-docs/plans/14-udc-sandbox.md`.
+   * - `strictVersioning` (boolean, default `false`) — when `true`,
+   *   versioning diagnostics (`removed-prop`, `internal-component-use`)
+   *   escalate from `warn` to `error`; markup using a removed prop is
+   *   blocked at render time. `deprecated-*` diagnostics always stay at
+   *   `warn` (deprecation should nag, not break the app). Flips to
+   *   `true` in the next major release. See
+   *   `dev-docs/plans/12-enforced-versioning.md`.
+   * - `preserveLegacyDefaults` (string[], default `[]`) — opts the
+   *   listed `<Component>.<prop>` entries back to their previous default
+   *   value when the framework rolls a default forward via
+   *   `defaultValueChangedIn`. Emits a `default-value-changed` info
+   *   diagnostic per affected component on use.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

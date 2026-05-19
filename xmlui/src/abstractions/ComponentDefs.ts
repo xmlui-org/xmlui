@@ -341,6 +341,53 @@ export type ComponentPropertyMetadata = {
   deprecationMessage?: string;
 
   /**
+   * Versioning lifecycle metadata (plan #12 `12-enforced-versioning.md`).
+   *
+   * - `deprecatedSince` — semver of the version in which this prop was
+   *   marked deprecated (e.g. `"0.10.0"`).
+   * - `removedIn` — semver of the version in which this prop will be (or
+   *   was) removed. When the current runtime version is ≥ `removedIn`,
+   *   the versioning verifier escalates to a `removed-prop` diagnostic
+   *   (warn in non-strict, error when `App.appGlobals.strictVersioning`
+   *   is truthy).
+   * - `replacement` — free text or `<componentName>.<propName>` pointing
+   *   at the recommended replacement; appended to the diagnostic message
+   *   so apps get a one-line migration hint.
+   *
+   * Backward compatible: existing `deprecationMessage` continues to
+   * fire `deprecated-prop` without the new fields.
+   */
+  deprecatedSince?: string;
+  removedIn?: string;
+  replacement?: string;
+
+  /**
+   * Per-value deprecation aliases. When markup supplies a value matching
+   * `from`, the runtime rewrites it to `to` (transparent coercion) and
+   * emits a `deprecated-value` diagnostic. Used for renames like
+   * `<Modal size="huge">` → `<Modal size="xl">`. See plan #12 §2.2.
+   */
+  valueAliases?: ReadonlyArray<{
+    from: string;
+    to: string;
+    deprecatedSince: string;
+    removedIn?: string;
+  }>;
+
+  /**
+   * Default-value-change history. Each entry records a version in which
+   * the framework changed this prop's default value, plus the previous
+   * default so apps can opt back via `App.appGlobals.preserveLegacyDefaults`.
+   * Triggers a `default-value-changed` diagnostic when the opt-back is
+   * active. See plan #12 §2.3.
+   */
+  defaultValueChangedIn?: ReadonlyArray<{
+    version: string;
+    previousDefault: unknown;
+    note?: string;
+  }>;
+
+  /**
    * Audit / PII classification metadata for this property.
    *
    * The audit pipeline (plan #15 Phase 2) uses this to apply default redaction
@@ -389,6 +436,12 @@ export type ComponentEventMetadata = {
   // This field defines the parameters of the event handler. It is an object where each key
   // is the parameter name, and the value is its description.
   readonly parameters?: Record<string, string>;
+
+  /** Versioning lifecycle metadata (plan #12). See `ComponentPropertyMetadata`. */
+  deprecationMessage?: string;
+  deprecatedSince?: string;
+  removedIn?: string;
+  replacement?: string;
 };
 
 // This type defines the metadata of a component API. It is used to describe the
@@ -404,6 +457,12 @@ export type ComponentApiMetadata = {
   // This field defines the parameters of the API method. It is an object where each key
   // is the parameter name, and the value is its description.
   readonly parameters?: Record<string, string>;
+
+  /** Versioning lifecycle metadata (plan #12). See `ComponentPropertyMetadata`. */
+  deprecationMessage?: string;
+  deprecatedSince?: string;
+  removedIn?: string;
+  replacement?: string;
 };
 
 // This type defines the metadata of a component part. It is used to describe the
@@ -501,6 +560,26 @@ export type ComponentMetadata<
 
   // Optional message to display if the component is deprecated
   deprecationMessage?: string;
+
+  /**
+   * Versioning lifecycle metadata for the component as a whole
+   * (plan #12). Mirrors the per-prop fields on
+   * `ComponentPropertyMetadata`. `removedIn` causes the versioning
+   * verifier to emit a `deprecated-component` warn with the timeline
+   * regardless of runtime version (the framework does not auto-remove
+   * components on version bumps; removal is a manual step).
+   */
+  deprecatedSince?: string;
+  removedIn?: string;
+  replacement?: string;
+
+  /** Prop-rename declarations applied during prop resolution. See plan #12 §2.4. */
+  renamedProps?: ReadonlyArray<{
+    from: string;
+    to: string;
+    deprecatedSince: string;
+    removedIn?: string;
+  }>;
 
   // Default aria-label for screen readers when the app author doesn't provide one.
   // Wrapper authors set this to a human-readable string describing the component's
