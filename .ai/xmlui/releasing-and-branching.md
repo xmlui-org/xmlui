@@ -1,39 +1,77 @@
-# Release process plan
+# Release process
 
 ## Problem description
 
 We want these kinds of releases:
 
-- **support**: How do we support older minor releases with patches? Currently we don't as we can't release such patches, the only release branch is `main`.
-- **latest**: Currently we don't distinguish fixes and features these things. When we release from main with patch and minor changesets, the patch fixes won't apply to the previous minor version, but rather be presen on the next minor version. But that new minor version also has a new feature (or just breaking change), which is more likely to have a bug, so the user is stuck in an endless loop, where we always recommed the latest version to be the most bug-free. In reality, we only know of the least amount of bugs on latest. We should be able to release **latest** patch releases (different to **support** due to npm tagging) and **latest** minor versions.
-- **canary**: We want to release versions tagged with `canary`, which are exploratory, not meant for every day consumption.
+- **latest**: The default `npm install` target. Used for the newest stable release, whether it's a patch or minor bump on `main`. Sets the `latest` npm dist-tag.
+- **support**: Patch releases for older minor versions. Published under the `support` npm dist-tag. Not the default `npm install` target, but resolvable via caret/tilde ranges (e.g. `~0.11.0` → resolves to `0.11.2`). Needed because we can only release from `main` otherwise, and patch fixes wouldn't reach users stuck on an older minor.
+- **canary**: Exploratory pre-releases under the `canary` dist-tag. The version gets a `{tag}-{datetime}-{commit}` suffix, making it a semver pre-release that range resolution ignores. Accessible via `npm install pkg@canary` or by exact version. Does not consume changesets or modify committed package versions.
 
 ## Branching strategy
 
-**support branches**: For any given minor version (eg. 0.11), if we need to fix something, we'll have a `support/0.11.x` branch, where we branch off of its git tag initially. There we commit the patches, and if needed, we manually take those changes and apply them to the mainline as well (eg. via `git cherry-pick -x`).
+**support branches**: For any given minor version (e.g. `0.11`), if we need to patch it, we create a `support/0.11.x` branch from its git tag. Patches are committed there. If the fix also applies to `main` (or other support branches), it is cherry-picked forward with `git cherry-pick -x`.
 
-**main branch**: We keep `main` as the branch we develop new features on.
+**main branch**: New features and breaking changes are developed on `main`. Both result in new minor versions (we are pre v1.0.0 at the moment, so breaking changes are minor bumps).
 
-- New features result in new minor version, never patch
-- Breaking changes also land in minor versions, because we're pre v1.0.0. => we'll have more minor releases, even weekly.
+Patches should land on at least both `main` and the active `support/0.x.y` branch. The developer decides where to commit the fix first. Recomendation: land on the support branch, then cherry-pick forward to `main` (and other support branches if needed) with `git cherry-pick -x`.
 
-Patches need to be applied to at least both `main` and the last `support/0.x.y` branch. The developer shall decide where he lands their fixes initially. Recomendation is to chery-pick the commit into the other branch (or branches if the fix needs to be backported to an older release, due to a user's request) with `git chery-pick -x` (see `git chery-pick --help`).
+## Github workflows
 
-## Release process / github workflows
+### `guard-branches.yml`
 
-PRs for `support/<anything>` branches fail if they have a _minor_ or _major_ changeset. flagging these branches on github as protected would be good, but not essential.
+PRs targeting `support/**` branches fail if any `.changeset/*.md` contains a minor or major bump. This is the first layer of protection — only patch changesets are allowed on support branches.
 
-There'll be 1 github workflow to start a release manually. This may be limiting later, but should be ok for now. Need to change the concurrency rules to allow multiple releases at a time (latest patch release and the patch release backported to the previous minor version)
+### `prepare-versions.yml`
 
-The workflow asks for a branch. `support/<anything>` named branches fail if they have a _minor_ or _major_ changeset in them (2nd layer of protection after PR guard). The workflow will create a changeset PR into the branch that it was started from, with the changelog and package versions updated.
+Manual `workflow_dispatch`. Used **only** for `latest` and `support` releases. It consumes changesets, bumps package versions, and opens a Version PR back into the dispatching branch.
 
-The workflow asks for a release tag:
+| Input | Type   | Values              | Description                               |
+| ----- | ------ | ------------------- | ----------------------------------------- |
+| `tag` | choice | `latest`, `support` | The npm dist-tag this release will target |
 
-- **latest**: same as what we've used so far. Sets the target of `npm install` to this new release. Apply this even for patch releases if they are the latest stable version.
-- **support**: regular release to npm with anything but the **latest** tag. Use when there is a newer minor release already out. Dynamic version range resolution like `~0.12.0` can resolve to it, but the target for `npm install` won't change to it. Could be `support`, Next.js uses `backport`, some use `legacy`.
-- **canary**: releases under the `canary` npm tag and also appends the "-canary-<git-hash-here>" text to the package.json's `version` field, which makes it a pre-release tag, so dynamic version range resolution will ignore it. People can only try it with specifying the exact package version name, or using `npm install xmlui@canary`. Could also be `beta`, `alpha`, `experimental`. Requires changes to the release process, as it should mostly not touch changesets or package version numbers in the github repository, only in the CI machine before release.
+When dispatching on a `support/**` branch, an extra check enforces patch-only changesets (second layer of protection after `guard-branches.yml`).
 
-The workflow create a PR, which uppon merging will trigger the release workflow
+The PR title follows the pattern `"Version Packages for [<tag>] release"`. This title encodes the tag and is used by `release-packages.yml` to determine the npm dist-tag on merge.
+
+### `release-packages.yml`
+
+Two triggers:
+
+1. **`workflow_dispatch`** with a `tag` input (`latest`, `support`, `canary`) — for manual releases. Canary releases use this path directly since they skip changesets.
+2. **`pull_request.closed`** on `main`, `support/**` — auto-triggered when a version PR (created by `prepare-versions.yml`) is merged.
+
+Tag resolution:
+
+- From `workflow_dispatch`: uses the `tag` input directly.
+- From PR merge: parses the PR title for the pattern `"Version Packages for [<tag>] release"`. Errors out if the title doesn't match.
+
+Sets `NPM_DIST_TAG` to the resolved tag value.
+
+Behaviour by tag:
+
+| Tag       | Publishes via                                                                         | Consumes changesets? | GitHub release? |
+| --------- | ------------------------------------------------------------------------------------- | -------------------- | --------------- |
+| `latest`  | `changesets/action@v1`                                                                | Yes                  | Yes             |
+| `support` | `changesets/action@v1`                                                                | Yes                  | Yes             |
+| `canary`  | `changeset version --snapshot canary` + `changeset publish --tag canary --no-git-tag` | No                   | No              |
+
+For canary, the version changes are not reflected in the repository and the changelog won't be modified.
+
+The full test suite runs before every `latest` and `support` publish.
+
+## Release flow
+
+### Stable release (latest or support)
+
+1. Dispatch **`prepare-versions.yml`** on the target branch, choosing the `tag`.
+2. A Version PR is created (e.g. `"Version Packages for [latest] release"`). Review and merge it.
+3. Merging triggers **`release-packages.yml`**, which tests, publishes to npm under the correct dist-tag, and creates a GitHub release with the standalone JS file and VS Code extension.
+
+### Canary release
+
+1. Dispatch **`release-packages.yml`** on the target branch with `tag: canary`.
+2. The workflow snapshots the current state (without consuming changesets), builds, and publishes to npm under the `canary` dist-tag. No version PR, no GitHub release.
 
 ## Examples
 
@@ -57,18 +95,18 @@ support/0.11.x:  o (fix)---(v0.11.1)
           fix-the-bug
 ```
 
-1. `0.11.0` is latest. Bug reported. Branch `support/0.11.x` from tag `xmlui@0.11.0`, push to GitHub.
+1. `0.11.0` is latest. Bug reported. Create `support/0.11.x` from tag `xmlui@0.11.0`, push to GitHub.
 2. Branch `myname/fix-the-bug` from `support/0.11.x`. Fix → open PR → squash & merge.
-3. Backport to `main`:
+3. Cherry-pick the fix to `main`:
    ```bash
    git fetch
    git switch -c myname/backport-bugfix main
    git cherry-pick -x support/0.11.x
    git push
    ```
-   Open PR → rebase & merge (because a single commit shouldn't be squashed).
-4. Run Prepare Versions on `support/0.11.x` with input tag `latest`. Merges changesets, bumps version.
-5. Review & merge the PR → triggers Release. Fix is in `main` and `0.11.1` on npm.
+   Open PR → rebase & merge (single cherry-pick commit shouldn't be squashed).
+4. Dispatch `prepare-versions.yml` on `support/0.11.x` with `tag: latest`. Merges changesets, bumps version, creates a Version PR.
+5. Review & merge the Version PR → triggers `release-packages.yml`. `0.11.1` is now latest on npm, fix is in both branches.
 
 ### Example 2: Bugfix on an older minor version
 
@@ -94,7 +132,7 @@ support/0.11.x:o---(v0.11.1)---o(fix)---(v0.11.2)
                            fix-old-bug
 ```
 
-1. `0.12.0` is latest. A user of `0.11.x` reports a bug. Branch `support/0.11.x` from tag `xmlui@0.11.0` (or use existing branch).
+1. `0.12.0` is latest. A user of `0.11.x` reports a bug. Use existing `support/0.11.x` branch.
 2. Branch `myname/fix-old-bug` from `support/0.11.x`. Fix → open PR → squash & merge.
 3. Cherry-pick forward through active release lines:
    ```bash
@@ -107,8 +145,8 @@ support/0.11.x:o---(v0.11.1)---o(fix)---(v0.11.2)
    git push
    ```
    Open PRs → rebase & merge.
-4. Run Prepare Versions on `support/0.11.x` with tag `support` (not `latest` — `0.12.x` is newer). Merge PR → triggers Release.
-5. Optionally run Prepare Versions on `support/0.12.x` with tag `latest` to release `0.12.1` with the fix too.
+4. Dispatch `prepare-versions.yml` on `support/0.11.x` with `tag: support` (not `latest` — `0.12.x` is the current latest). Merge PR → triggers `release-packages.yml` with the `support` dist-tag.
+5. (Optional) Dispatch `prepare-versions.yml` on `support/0.12.x` with `tag: latest` to release `0.12.1` with the fix too.
 
 ### Example 3: New feature release on `main`
 
@@ -128,5 +166,5 @@ main:  ...---(v0.12.0)---o---o------------------o(squashed into 1 commit)---(v0.
 
 1. `0.12.0` is latest. Branch `myname/new-feature` from `main`. Implement the feature.
 2. Open PR into `main` ← `myname/new-feature`. Squash & merge.
-3. Run Prepare Versions on `main` with tag `latest`. Bumps version to `0.13.0` (minor changeset).
-4. Review & merge the PR → triggers Release. `0.13.0` is now latest on npm.
+3. Dispatch `prepare-versions.yml` on `main` with `tag: latest`. A minor changeset bumps the version to `0.13.0` and creates a Version PR.
+4. Review & merge the Version PR → triggers `release-packages.yml`. `0.13.0` is now latest on npm.
