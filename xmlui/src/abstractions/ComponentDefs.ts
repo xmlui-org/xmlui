@@ -229,6 +229,46 @@ export type PropertyValueType =
   | "icon"
   | "id-ref";
 
+/**
+ * Value-type vocabulary for theme variable declarations (plan #08,
+ * Step 1.1). Default is `"string"` (opt-out: legacy declarations are
+ * not validated until they are explicitly annotated).
+ *
+ * Shares `"color"`, `"length"`, `"integer"`, `"number"` rule semantics
+ * with `PropertyValueType` so the verifier and the theme validator
+ * accept identical inputs by construction.
+ */
+export type ThemeValueType =
+  | "color"
+  | "length"
+  | "integer"
+  | "number"
+  | "duration"
+  | "easing"
+  | "shadow"
+  | "border"
+  | "fontFamily"
+  | "fontWeight"
+  | "lineHeight"
+  | "string";
+
+/**
+ * Per-variable theme metadata (plan #08, Step 1.1). The `themeVars`
+ * block on a component may carry either the legacy `string` shape
+ * (variable name → description) or a `ThemeVarMetadata` for typed
+ * declarations.
+ */
+export interface ThemeVarMetadata {
+  /** Variable name (without leading `--`). */
+  name: string;
+  /** Optional human-readable description. */
+  description?: string;
+  /** Structural type used to validate values at theme-resolution time. */
+  valueType?: ThemeValueType;
+  /** Closed enum of accepted values; takes precedence over `valueType`. */
+  availableValues?: readonly string[];
+}
+
 // A generic validation function that retrieves either a hint (the validation argument
 // has issues) or undefined (the argument is valid).
 export type IsValidFunction<T> = (

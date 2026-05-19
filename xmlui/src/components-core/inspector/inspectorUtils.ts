@@ -262,6 +262,15 @@ export interface XsLogEntry {
    *   `code: I18nDiagnosticCode`, `severity`, optional `locale` / `key`, and `message`.
    * - `"scheduler"` — scheduler/determinism event or diagnostic (plan #16). Contains
    *   `code?: DeterminismDiagCode`, `severity`, optional `traceId`, and `message`.
+   * - `"theming"` — theming-sandbox diagnostic (plan #08) emitted by the
+   *   theme validator or the inline-style validator. Contains
+   *   `code: ThemeDiagnosticCode` (one of `invalid-theme-value`,
+   *   `unknown-theme-variable`, `raw-css-in-prop`, `important-blocked`,
+   *   `url-in-style`, `position-fixed-blocked`),
+   *   `severity: "warn" | "error"`, optional `variableName` / `propName`
+   *   / `componentName` / `expected` / `actual`, and `message`. Severity
+   *   escalates from `warn` to `error` when
+   *   `App.appGlobals.strictTheming` is truthy.
    */
   kind?: string;
   eventName?: string;
