@@ -156,6 +156,20 @@ export interface CompoundComponentDef extends Scriptable {
   debug?: Record<string, any>;
 
   codeBehind?: string;
+
+  /**
+   * Optional declared contract produced by the parser when the UDC defines
+   * explicit `<Prop>`, `<Event>`, `<Method>` or `<Slot>` blocks inside its
+   * `<Component>` definition.  When absent, the existing inference walk
+   * (`collectPropsFromComponentDef`) is used (backwards-compatible default).
+   *
+   * Stored as a structurally-typed `unknown` here to avoid a hard dependency
+   * from the `abstractions` layer onto the `components-core/udc-sandbox`
+   * module.  Consumers should cast to `UdcContract`.
+   *
+   * See `xmlui/dev-docs/plans/14-udc-sandbox.md`.
+   */
+  contract?: unknown;
 }
 
 // Sometimes, components and compound components can both be used

@@ -62,6 +62,7 @@ import {
 } from "./Splitter/Splitter";
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
+import { validateUdcPropReferences } from "../components-core/udc-sandbox";
 import {
   collectUnconditionalRefs,
   findUdcCycles,
@@ -1065,6 +1066,12 @@ export class ComponentRegistry {
     const mergedMetadata = metadata
       ? { ...autoMetadata, ...metadata }
       : autoMetadata;
+
+    // --- UDC sandbox (plan #14): when the UDC carries a declared <Prop>/<Event>/
+    // <Method>/<Slot> contract, validate that every `$props.<name>` reference in
+    // the implementation has a matching declaration.  Strict-mode enforcement
+    // (severity escalation to "error") is plumbed but inactive until W6.
+    validateUdcPropReferences(compoundComponentDef, /* strict */ false);
 
     const component = {
       type: compoundComponentDef.name,

@@ -271,6 +271,16 @@ export interface XsLogEntry {
    *   / `componentName` / `expected` / `actual`, and `message`. Severity
    *   escalates from `warn` to `error` when
    *   `App.appGlobals.strictTheming` is truthy.
+   * - `"udc"` — user-defined-component sandbox diagnostic (plan #14)
+   *   emitted by the UDC contract / scope / capability gates. Contains
+   *   `code: UdcDiagCode` (one of `udc-prop-undeclared`,
+   *   `udc-prop-shape-mismatch`, `udc-event-undeclared`,
+   *   `udc-method-undeclared`, `udc-slot-undeclared`, `udc-scope-leak`,
+   *   `udc-capability-missing`, `udc-capability-undeclared`,
+   *   `udc-manifest-mismatch`, `udc-untrusted-violation`),
+   *   `severity: "info" | "warn" | "error"`, `udc` (the component name),
+   *   optional `file` / `line` / `column`, and `message`. Severity
+   *   escalates to `error` when `App.appGlobals.strictUdcSandbox` is truthy.
    */
   kind?: string;
   eventName?: string;

@@ -183,6 +183,14 @@ export type StandaloneAppDescription = {
    *   layout-prop values. Higher values are clamped with a
    *   `kind:"theming"` warn entry; the clamp applies in both strict
    *   and non-strict modes.
+   * - `strictUdcSandbox` (boolean, default `false`) — when `true`,
+   *   UDC sandboxing diagnostics (`udc-prop-undeclared`,
+   *   `udc-scope-leak`, `udc-capability-missing`, etc.) escalate from
+   *   `info` / `warn` to `error`. In strict mode, undeclared prop
+   *   accesses and capability violations are blocked at runtime.
+   *   Requires UDCs to carry explicit `<Prop>`, `<Event>`, `<Method>`,
+   *   and `<Slot>` declarations. Flips to `true` in the next major
+   *   release. See `dev-docs/plans/14-udc-sandbox.md`.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
