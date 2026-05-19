@@ -10,6 +10,7 @@ on:
     branches:
       - main
       - support
+      - 'support/**'
 
 jobs:
   test:
@@ -47,7 +48,7 @@ jobs:
       - name: run all tests
         run: npm run test
       - name: Enforce patch-only changesets
-        if: github.base_ref == 'support'
+        if: startsWith(github.base_ref, 'support')
         shell: bash
         run: |
           shopt -s nullglob
