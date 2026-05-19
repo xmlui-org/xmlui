@@ -127,8 +127,5 @@ Gets the current gauge value.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Gauge | $color-surface-50 | $color-surface-50 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Gauge | $color-surface-50 | $color-surface-50 |
 | primaryColor-Gauge | $color-primary | $color-primary |
-| primaryColor-Gauge | $color-primary | $color-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Gauge | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Gauge | $textColor-primary | $textColor-primary |

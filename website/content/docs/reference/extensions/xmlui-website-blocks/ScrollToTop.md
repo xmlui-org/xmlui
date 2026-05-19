@@ -22,6 +22,8 @@ This component supports the following behaviors:
 
 Scroll behavior when scrolling to top
 
+Available values: `smooth` **(default)**, `instant`, `auto`
+
 ### `icon`
 
 > [!DEF]  default: **"chevronup"**
@@ -33,6 +35,8 @@ Name of the icon to display in the button
 > [!DEF]  default: **"end"**
 
 Horizontal position of the button at the bottom of the screen
+
+Available values: `start`, `center`, `end` **(default)**
 
 ### `threshold`
 

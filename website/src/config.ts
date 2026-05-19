@@ -6,8 +6,7 @@ import {
   prefetchedContent,
   posts,
   allPosts,
-  shikiHighlighter,
-  highlight,
+  docsCodeHighlighter,
   getLocalIcons,
 } from "../utils";
 import type { StandaloneAppDescription } from "xmlui";
@@ -50,10 +49,7 @@ const App: StandaloneAppDescription = {
     prefetchedContent,
     posts,
     allPosts,
-    codeHighlighter: {
-      availableLangs: shikiHighlighter.getLoadedLanguages(),
-      highlight,
-    },
+    codeHighlighter: docsCodeHighlighter,
     lintSeverity: "skip", // Turn off xmlui linting
     popOutUrl: "https://playground.xmlui.org/#/playground",
   },

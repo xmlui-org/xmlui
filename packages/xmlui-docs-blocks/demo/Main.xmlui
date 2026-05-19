@@ -1,0 +1,28 @@
+<App layout="condensed-sticky">
+  <VStack gap="$space-6" maxWidth="960px">
+    <ToneSwitch />
+    <H1>Custom Syntax Highlighter</H1>
+    <Text>
+      Z80 Assembly is highlighted by the xmlui-docs-blocks custom-language infrastructure.
+    </Text>
+
+    <Markdown>
+      <![CDATA[
+```z80 filename="sprite-copy.z80" copy {4-7} /LDIR/
+        org $8000
+
+sprite_src:
+        db %00111100, %01000010, %10100101, %10000001
+        db %10100101, %10011001, %01000010, %00111100
+
+copy_sprite:
+        ld hl, sprite_src
+        ld de, $9000
+        ld bc, 8
+        ldir
+        ret
+```
+      ]]>
+    </Markdown>
+  </VStack>
+</App>

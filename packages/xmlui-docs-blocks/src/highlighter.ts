@@ -15,6 +15,9 @@ import json from "@shikijs/langs/json";
 import html from "@shikijs/langs/html";
 
 import { xmluiGrammar, xmluiThemeLight, xmluiThemeDark } from "xmlui/syntax/textmate";
+import { createCustomLanguageRegistry } from "./customHighlighter";
+import type { CustomSyntaxDecoration } from "./customHighlighter";
+import { z80AssemblyLanguage } from "./demo/z80Highlighter";
 
 export const shikiHighlighter = createHighlighterCoreSync({
   // @ts-ignore
@@ -23,6 +26,16 @@ export const shikiHighlighter = createHighlighterCoreSync({
   themes: [xmluiThemeLight, xmluiThemeDark],
   engine: createJavaScriptRegexEngine(),
 });
+
+export const customLanguageRegistry = createCustomLanguageRegistry([z80AssemblyLanguage]);
+
+export const docsCodeHighlighter = {
+  availableLangs: [
+    ...shikiHighlighter.getLoadedLanguages(),
+    ...customLanguageRegistry.availableLangs,
+  ],
+  highlight,
+};
 
 export function highlight(
   code: string,
@@ -56,10 +69,44 @@ export function highlight(
       },
     ) ?? [];
 
+  const decorations = [...highlightedRows, ...highlightedSubstrings];
+  const customDecorations = decorations.flatMap(toCustomSyntaxDecoration);
+
   const opts = {
     lang,
     theme: `xmlui-${themeTone}`,
-    decorations: [...highlightedRows, ...highlightedSubstrings],
+    decorations,
   };
+  const customHighlightedCode = customLanguageRegistry.highlight(code, {
+    lang,
+    themeTone,
+    decorations: customDecorations,
+  });
+  if (customHighlightedCode) {
+    return customHighlightedCode;
+  }
+
   return shikiHighlighter.codeToHtml(code, opts);
+}
+
+function toCustomSyntaxDecoration(decoration: DecorationItem): CustomSyntaxDecoration[] {
+  if (typeof decoration.start !== "number" || typeof decoration.end !== "number") {
+    return [];
+  }
+
+  return [
+    {
+      start: decoration.start,
+      end: decoration.end,
+      properties: {
+        class: getStringProperty(decoration.properties, "class"),
+        style: getStringProperty(decoration.properties, "style"),
+      },
+    },
+  ];
+}
+
+function getStringProperty(properties: DecorationItem["properties"], key: string) {
+  const value = properties?.[key];
+  return typeof value === "string" ? value : undefined;
 }
