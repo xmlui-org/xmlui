@@ -2,8 +2,14 @@ import { describe, expect, it } from "vitest";
 import { xmlUiMarkupToComponent } from "../../../src/components-core/xmlui-parser";
 import type { CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import {
+  ALL_UDC_CAPABILITIES,
+  buildScopeGate,
+  compareManifest,
   emptyContract,
+  gateCapability,
+  narrowCapabilities,
   validateUdcPropReferences,
+  type UdcCapability,
   type UdcContract,
 } from "../../../src/components-core/udc-sandbox";
 
@@ -40,7 +46,9 @@ describe("udc-sandbox / contract helpers", () => {
 
 describe("udc-sandbox / parser produces UdcContract", () => {
   it("attaches no contract when the UDC has no declaration blocks", () => {
-    const def = parseCompound(`<Component name="LegacyUdc"><Text>{$props.label}</Text></Component>`);
+    const def = parseCompound(
+      `<Component name="LegacyUdc"><Text>{$props.label}</Text></Component>`,
+    );
     expect(def.contract).toBeUndefined();
   });
 
@@ -85,6 +93,33 @@ describe("udc-sandbox / parser produces UdcContract", () => {
     expect(c.slots.has("footer")).toBe(true);
   });
 
+  it("collects capabilities, trust, and slot provides declarations", () => {
+    const def = parseCompound(`
+      <Component name="ThirdPartyGrid" capabilities="fetch, log" trust="untrusted">
+        <Prop name="rows" />
+        <Slot name="row" provides="item, index" />
+        <Stack />
+      </Component>
+    `);
+    const c = def.contract as UdcContract;
+    expect(Array.from(c.capabilities).sort()).toEqual(["fetch", "log"]);
+    expect(c.capabilitiesDeclared).toBe(true);
+    expect(c.trust).toBe("untrusted");
+    expect(Array.from(c.slotProvides!.get("row")!)).toEqual(["$item", "$index"]);
+  });
+
+  it("grants all capabilities by default when declarations omit capabilities", () => {
+    const def = parseCompound(`
+      <Component name="DefaultCaps">
+        <Prop name="label" />
+        <Text>{$props.label}</Text>
+      </Component>
+    `);
+    const c = def.contract as UdcContract;
+    expect(Array.from(c.capabilities).sort()).toEqual([...ALL_UDC_CAPABILITIES].sort());
+    expect(c.capabilitiesDeclared).toBe(false);
+  });
+
   it("excludes declaration blocks from the nested component tree", () => {
     // Without the exclusion, the parser would treat <Prop> as a second nested
     // component and either wrap with Fragment or fail.  Validate the root
@@ -96,6 +131,78 @@ describe("udc-sandbox / parser produces UdcContract", () => {
       </Component>
     `);
     expect(def.component.type).toBe("Button");
+  });
+});
+
+describe("udc-sandbox / scope gate", () => {
+  it("allows declared UDC roots and rejects parent-scope identifiers", () => {
+    const c = emptyContract("Scoped");
+    const gate = buildScopeGate(c, false, ["$item"]);
+    expect(gate.canRead("$props")).toBe(true);
+    expect(gate.canRead("$item")).toBe(true);
+    expect(gate.canRead("parentSecret")).toBe(false);
+    const diag = gate.createDiagnostic("parentSecret");
+    expect(diag.code).toBe("udc-scope-leak");
+    expect(diag.severity).toBe("info");
+  });
+
+  it("throws on rejected parent-scope identifiers in strict mode", () => {
+    const c = emptyContract("StrictScoped");
+    const gate = buildScopeGate(c, true);
+    expect(() => gate.assertCanRead("parentSecret")).toThrow("parentSecret");
+  });
+});
+
+describe("udc-sandbox / capability gate", () => {
+  it("reports a missing capability and escalates severity under strict mode", () => {
+    const c = { ...emptyContract("Caps"), capabilities: new Set<UdcCapability>(["fetch"]) };
+    const warn = gateCapability("clipboard", c, false);
+    expect(warn.allowed).toBe(false);
+    expect(warn.diagnostic?.code).toBe("udc-capability-missing");
+    expect(warn.diagnostic?.severity).toBe("warn");
+
+    const strict = gateCapability("clipboard", c, true);
+    expect(strict.allowed).toBe(false);
+    expect(strict.diagnostic?.severity).toBe("error");
+  });
+
+  it("narrows call-site capabilities and rejects widening attempts", () => {
+    const c = {
+      ...emptyContract("Narrowed"),
+      capabilities: new Set<UdcCapability>(["fetch", "log"]),
+    };
+    const narrowed = narrowCapabilities(c, new Set<UdcCapability>(["log", "clipboard"]));
+    expect(Array.from(narrowed.contract.capabilities)).toEqual(["log"]);
+    expect(narrowed.diagnostics).toHaveLength(1);
+    expect(narrowed.diagnostics[0].code).toBe("udc-capability-undeclared");
+  });
+});
+
+describe("udc-sandbox / manifest comparison", () => {
+  it("reports drift between manifest and actual contract", () => {
+    const c = {
+      ...emptyContract("Manifested"),
+      capabilities: new Set<UdcCapability>(["log"]),
+    };
+    const diags = compareManifest(
+      {
+        name: "Manifested",
+        version: "1.0.0",
+        contract: {
+          props: [{ name: "amount", type: "number" }],
+          events: [],
+          methods: [],
+          slots: [],
+          capabilities: ["log"],
+          trust: "trusted",
+        },
+      },
+      c,
+      false,
+    );
+    expect(diags).toHaveLength(1);
+    expect(diags[0].code).toBe("udc-manifest-mismatch");
+    expect(diags[0].severity).toBe("warn");
   });
 });
 

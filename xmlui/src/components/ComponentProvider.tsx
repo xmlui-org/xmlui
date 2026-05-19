@@ -63,10 +63,7 @@ import {
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
 import { validateUdcPropReferences } from "../components-core/udc-sandbox";
-import {
-  collectUnconditionalRefs,
-  findUdcCycles,
-} from "../components-core/udcCycleDetection";
+import { collectUnconditionalRefs, findUdcCycles } from "../components-core/udcCycleDetection";
 import { dynamicHeightListComponentRenderer } from "./List/List";
 import { tileGridComponentRenderer } from "./TileGrid/TileGrid";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
@@ -1063,9 +1060,7 @@ export class ComponentRegistry {
     namespace: string,
   ) {
     const autoMetadata = generateUdComponentMetadata(compoundComponentDef);
-    const mergedMetadata = metadata
-      ? { ...autoMetadata, ...metadata }
-      : autoMetadata;
+    const mergedMetadata = metadata ? { ...autoMetadata, ...metadata } : autoMetadata;
 
     // --- UDC sandbox (plan #14): when the UDC carries a declared <Prop>/<Event>/
     // <Method>/<Slot> contract, validate that every `$props.<name>` reference in
@@ -1080,6 +1075,7 @@ export class ComponentRegistry {
           <CompoundComponent
             api={compoundComponentDef.api}
             scriptCollected={compoundComponentDef.component.scriptCollected}
+            contract={compoundComponentDef.contract as any}
             compound={compoundComponentDef.component as ComponentDef}
             {...rendererContext}
           />
@@ -1099,10 +1095,7 @@ export class ComponentRegistry {
 
   // --- Track this UDC's static, unconditional component-type references and
   // re-run cycle detection over the namespace's reference graph.
-  private recordUdcReferences(
-    namespace: string,
-    compoundComponentDef: CompoundComponentDef,
-  ) {
+  private recordUdcReferences(namespace: string, compoundComponentDef: CompoundComponentDef) {
     let graph = this.udcRefGraph.get(namespace);
     if (!graph) {
       graph = new Map();

@@ -9,7 +9,6 @@
 
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectPropsFromComponentDef } from "../ud-metadata";
-import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
 import type { UdcContract } from "./contract";
 import type { UdcDiagnostic } from "./diagnostics";
 
@@ -37,6 +36,7 @@ const VALIDATED_UDCS = new WeakSet<CompoundComponentDef>();
 export function validateUdcPropReferences(
   def: CompoundComponentDef,
   strict: boolean,
+  report?: (diagnostic: UdcDiagnostic) => void,
 ): UdcDiagnostic[] {
   const contract = def.contract as UdcContract | undefined;
   if (!contract) return [];
@@ -58,13 +58,7 @@ export function validateUdcPropReferences(
       data: { propName: name },
     };
     out.push(diag);
-    pushXsLog({
-      ts: Date.now(),
-      perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-      traceId: getCurrentTrace(),
-      kind: "udc",
-      ...diag,
-    });
+    report?.(diag);
   }
 
   return out;

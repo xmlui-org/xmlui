@@ -263,7 +263,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+    return createValueExtractor(
+      state,
+      appContext,
+      referenceTrackedApi,
+      memoedVarsRef,
+      fnDeps,
+      (appContext as any)?.__udcEvalOptions,
+    );
   }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Obtain a function that can execute a script synchronously
@@ -390,7 +397,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- can fire it without changing identity each render.
   const lookupErrorHandlerRef = useRef<((...args: any[]) => any) | null>(null);
   lookupErrorHandlerRef.current = safeNode.events?.error
-    ? (lookupAction(safeNode.events.error, uid, {
+    ? ((lookupAction(safeNode.events.error, uid, {
         eventName: "error",
         componentType: inspectorContextRef.current.componentType,
         componentLabel: inspectorContextRef.current.componentLabel,
@@ -398,7 +405,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         sourceFileId: inspectorContextRef.current.sourceFileId,
         sourceRange: inspectorContextRef.current.sourceRange,
         signError: false,
-      }) as ((...args: any[]) => any) | null) ?? null
+      }) as ((...args: any[]) => any) | null) ?? null)
     : null;
 
   // EXPERIMENTAL: extract bubbleEvents prop to allow selective propagation bypass
@@ -656,14 +663,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
     // --- Mount: fire `onMount`, then dispatch `onError` on throw.
     if (handlers.mount) {
-      const mountStart =
-        typeof performance !== "undefined" ? performance.now() : undefined;
+      const mountStart = typeof performance !== "undefined" ? performance.now() : undefined;
       try {
         const result = handlers.mount();
-        if (
-          result &&
-          typeof (result as PromiseLike<unknown>).then === "function"
-        ) {
+        if (result && typeof (result as PromiseLike<unknown>).then === "function") {
           (result as PromiseLike<unknown>).then(
             () => {
               if (mountStart !== undefined) {
@@ -733,14 +736,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
       const unmountHandler = lifecycleHandlersRef.current.unmount;
       if (!unmountHandler) return;
-      const unmountStart =
-        typeof performance !== "undefined" ? performance.now() : undefined;
+      const unmountStart = typeof performance !== "undefined" ? performance.now() : undefined;
       try {
         const result = unmountHandler();
-        if (
-          result &&
-          typeof (result as PromiseLike<unknown>).then === "function"
-        ) {
+        if (result && typeof (result as PromiseLike<unknown>).then === "function") {
           // Synchronous-only contract for `onUnmount` (see plan #04 Step 0).
           // Do not await — emit a violation and let the unmount commit.
           reportLifecycleViolation(

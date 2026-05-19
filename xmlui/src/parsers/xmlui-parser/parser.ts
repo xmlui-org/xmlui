@@ -770,7 +770,12 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         continue;
       }
 
-      if (attr.name !== "name" && attr.name !== "codeBehind") {
+      if (
+        attr.name !== "name" &&
+        attr.name !== "codeBehind" &&
+        attr.name !== "capabilities" &&
+        attr.name !== "trust"
+      ) {
         errorAt(
           DIAGS_PARSER.invalidReusableCompAttr(attr.name ?? attr.unsegmentedName),
           attr.node.pos,

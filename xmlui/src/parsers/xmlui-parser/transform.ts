@@ -73,6 +73,53 @@ interface UdcPropDecl {
   defaultValue?: unknown;
 }
 
+type UdcTrust = "trusted" | "untrusted";
+type UdcCapability =
+  | "fetch"
+  | "websocket"
+  | "eventsource"
+  | "navigate"
+  | "clipboard"
+  | "randomBytes"
+  | "log"
+  | "mark"
+  | "environment";
+
+const ALL_UDC_CAPABILITIES: readonly UdcCapability[] = [
+  "fetch",
+  "websocket",
+  "eventsource",
+  "navigate",
+  "clipboard",
+  "randomBytes",
+  "log",
+  "mark",
+  "environment",
+];
+
+function parseUdcCapabilities(value: string | undefined): Set<UdcCapability> {
+  if (value === undefined) return new Set(ALL_UDC_CAPABILITIES);
+  const parsed = new Set<UdcCapability>();
+  for (const raw of value.split(",")) {
+    const token = raw.trim();
+    if ((ALL_UDC_CAPABILITIES as readonly string[]).includes(token)) {
+      parsed.add(token as UdcCapability);
+    }
+  }
+  return parsed;
+}
+
+function parseSlotProvides(value: string | undefined): Set<string> {
+  if (!value) return new Set();
+  return new Set(
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => (item.startsWith("$") ? item : `$${item}`)),
+  );
+}
+
 let lastParseId = 0;
 
 export function nodeToComponentDef(
@@ -151,6 +198,9 @@ export function nodeToComponentDef(
     const compoundName = attrs.find((attr) => attr.name === "name")!;
 
     const codeBehind = attrs.find((attr) => attr.name === "codeBehind");
+    const capabilitiesAttr = attrs.find((attr) => attr.name === "capabilities");
+    const trustAttr = attrs.find((attr) => attr.name === "trust");
+    const trust: UdcTrust = trustAttr?.value === "untrusted" ? "untrusted" : "trusted";
 
     // --- Get "method" attributes
     let api: Record<string, any> | undefined;
@@ -196,6 +246,7 @@ export function nodeToComponentDef(
     const declEvents = new Set<string>();
     const declMethods = new Set<string>();
     const declSlots = new Set<string>();
+    const declSlotProvides = new Map<string, Set<string>>();
     let hasNonSlotDeclarations = false;
     for (const child of children) {
       if (child.kind !== SyntaxKind.ElementNode) continue;
@@ -245,6 +296,10 @@ export function nodeToComponentDef(
           break;
         case UDC_DECLARATION_KINDS.Slot:
           declSlots.add(nameAttr.value);
+          declSlotProvides.set(
+            nameAttr.value,
+            parseSlotProvides(declAttrs.find((a) => a.name === "provides")?.value),
+          );
           break;
       }
     }
@@ -318,16 +373,19 @@ export function nodeToComponentDef(
       component.codeBehind = codeBehind.value;
     }
 
-    // --- Attach declared contract when the UDC carried <Prop>/<Event>/<Method>/<Slot> blocks
-    if (hasDeclarations) {
+    // --- Attach declared contract when the UDC carried declaration blocks or
+    // sandbox attributes (`capabilities` / `trust`).
+    if (hasDeclarations || capabilitiesAttr || trustAttr) {
       component.contract = {
         name: compoundName.value,
         props: declProps,
         events: declEvents,
         methods: declMethods,
         slots: declSlots,
-        capabilities: new Set<string>(),
-        trust: "trusted",
+        slotProvides: declSlotProvides,
+        capabilities: parseUdcCapabilities(capabilitiesAttr?.value),
+        capabilitiesDeclared: capabilitiesAttr !== undefined,
+        trust,
       };
     }
 

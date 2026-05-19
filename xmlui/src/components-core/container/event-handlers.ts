@@ -1,13 +1,13 @@
 /**
  * Event Handler Execution Module
- * 
+ *
  * Handles asynchronous and synchronous event handler execution with:
  * - State tracking and lifecycle management
- * - Inspector logging integration  
+ * - Inspector logging integration
  * - React transition management for non-blocking updates
  * - Statement queue processing
  * - Error handling and cleanup
- * 
+ *
  * Part of Container.tsx refactoring - Step 2
  */
 
@@ -15,8 +15,8 @@ import { useCallback } from "react";
 import { cloneDeep } from "lodash-es";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { IApiInterceptor } from "../interception/abstractions";
-import type { 
-  ArrowExpression, 
+import type {
+  ArrowExpression,
   ArrowExpressionStatement,
   Statement,
 } from "../script-runner/ScriptingSourceTree";
@@ -24,10 +24,7 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { buildProxy, type ProxyAction } from "../rendering/buildProxy";
-import { 
-  parseHandlerCode,
-  prepareHandlerStatements,
-} from "../utils/statementUtils";
+import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
@@ -236,6 +233,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           allowConsole: appContext.appGlobals?.allowConsole !== false,
           sandboxWarnLogger: (entry) =>
             pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
+          ...(appContext as any).__udcEvalOptions,
         },
       };
 
@@ -249,8 +247,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const { handlerFileId, handlerSourceRange } = handlerLogger.lookupSourceInfo(options);
 
       // Track handler start time for duration calculation
-      const handlerStartPerfTs =
-        typeof performance !== "undefined" ? performance.now() : undefined;
+      const handlerStartPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
 
       // Capture traceId at handler start so handler:complete uses the same trace
       const handlerTraceId = getCurrentTrace();
@@ -416,8 +413,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         }
 
         // Log handler completion with duration
-        const handlerEndPerfTs =
-          typeof performance !== "undefined" ? performance.now() : undefined;
+        const handlerEndPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
         const handlerDuration =
           handlerStartPerfTs !== undefined && handlerEndPerfTs !== undefined
             ? handlerEndPerfTs - handlerStartPerfTs

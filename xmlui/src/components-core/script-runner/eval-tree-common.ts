@@ -20,6 +20,12 @@ import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { BindingTreeEvaluationContext, EvalTreeOptions } from "./BindingTreeEvaluationContext";
 import { BannedApiError } from "./bannedFunctions";
 import { isBannedMember, type BannedMemberResult } from "./bannedMembers";
+import {
+  assertCapability,
+  capabilityForAppMember,
+  capabilityForRootIdentifier,
+  type UdcCapability,
+} from "../udc-sandbox";
 
 // =============================================================================
 // DOM SANDBOX GUARD
@@ -38,10 +44,7 @@ import { isBannedMember, type BannedMemberResult } from "./bannedMembers";
  * Call this immediately after `isBannedMember()` returns `{ banned: true }`.
  * When `result.banned` is `false`, this function is a no-op.
  */
-function handleMemberBan(
-  result: BannedMemberResult,
-  options?: EvalTreeOptions,
-): void {
+function handleMemberBan(result: BannedMemberResult, options?: EvalTreeOptions): void {
   if (!result.banned) return;
   // console access is allowed unless the caller explicitly opts out.
   if (result.api === "window.console" && options?.allowConsole !== false) return;
@@ -82,6 +85,30 @@ export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThre
 }
 
 type IdentifierScope = "global" | "app" | "localContext" | "block";
+
+function checkUdcCapability(
+  evalContext: BindingTreeEvaluationContext,
+  root: string,
+  member?: string,
+): void {
+  const contract = evalContext.options?.udcContract;
+  if (!contract) return;
+  const mapper = evalContext.options.udcCapabilityMapper;
+  const capability: UdcCapability | undefined = mapper
+    ? mapper(root, member)
+    : root === "App" && member
+      ? capabilityForAppMember(member)
+      : member === undefined
+        ? capabilityForRootIdentifier(root)
+        : undefined;
+  if (!capability) return;
+  assertCapability(
+    capability,
+    contract,
+    evalContext.options?.strictUdcSandbox === true,
+    evalContext.options?.udcDiagnosticLogger,
+  );
+}
 
 // --- Gets the scope of an identifier
 export function getIdentifierScope(
@@ -171,6 +198,8 @@ export function evalIdentifier(
   if (idScope.type === "global") {
     const banResult = isBannedMember(valueScope, valueIndex as string);
     handleMemberBan(banResult, evalContext.options);
+  } else if (idScope.type === "app") {
+    checkUdcCapability(evalContext, expr.name);
   }
   value = valueScope[valueIndex];
   const newValue: ValueResult = {
@@ -211,6 +240,10 @@ export function evalMemberAccessCore(
   thread: LogicalThread,
 ): any {
   const parentObj = getExprValue(expr.obj, thread)?.value;
+  const root = getRootIdScope(expr.obj, evalContext, thread);
+  if (root?.type === "app") {
+    checkUdcCapability(evalContext, root.name, expr.member);
+  }
   // --- Check banned member access (read path).
   const banResult = isBannedMember(parentObj, expr.member);
   handleMemberBan(banResult, evalContext.options);
@@ -548,7 +581,7 @@ export function evalArrow(
   if (expr.async) {
     throw new Error("XMLUI does not support async arrow functions.");
   }
-  
+
   const lazyArrow = {
     ...expr,
     _ARROW_EXPR_: true,

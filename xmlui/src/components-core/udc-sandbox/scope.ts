@@ -12,6 +12,17 @@
  */
 
 import type { UdcContract } from "./contract";
+import type { UdcDiagnostic } from "./diagnostics";
+
+export class UdcScopeError extends Error {
+  readonly diagnostic: UdcDiagnostic;
+
+  constructor(diagnostic: UdcDiagnostic) {
+    super(diagnostic.message);
+    this.name = "UdcScopeError";
+    this.diagnostic = diagnostic;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Interface
@@ -29,6 +40,9 @@ export interface UdcScopeGate {
    * enforcement is active, the gate returns `false`.
    */
   isAllowed(name: string): boolean;
+  canRead(name: string): boolean;
+  createDiagnostic(name: string): UdcDiagnostic;
+  assertCanRead(name: string): void;
 }
 
 // ---------------------------------------------------------------------------
@@ -36,7 +50,18 @@ export interface UdcScopeGate {
 // ---------------------------------------------------------------------------
 
 /** No-op gate — allows all identifiers.  Used when sandboxing is disabled. */
-const PASS_THROUGH_GATE: UdcScopeGate = { isAllowed: () => true };
+const PASS_THROUGH_GATE: UdcScopeGate = {
+  isAllowed: () => true,
+  canRead: () => true,
+  createDiagnostic: (name) => ({
+    code: "udc-scope-leak",
+    severity: "info",
+    udc: "<unknown>",
+    message: `UDC parent-scope read "${name}" is allowed because no sandbox contract is active.`,
+    data: { identifier: name },
+  }),
+  assertCanRead: () => undefined,
+};
 
 /**
  * Builds a scope gate for the given contract.
@@ -45,8 +70,42 @@ const PASS_THROUGH_GATE: UdcScopeGate = { isAllowed: () => true };
  * Phase 2 (W6): will return a restrictive gate when `strictUdcSandbox` is on.
  */
 export function buildScopeGate(
-  _contract: UdcContract,
-  _strict: boolean,
+  contract: UdcContract,
+  strict: boolean,
+  slotContext: Iterable<string> = [],
 ): UdcScopeGate {
-  return PASS_THROUGH_GATE;
+  if (!contract) return PASS_THROUGH_GATE;
+
+  const allowed = new Set<string>([
+    "$props",
+    "emitEvent",
+    "hasEventHandler",
+    "updateState",
+    "App",
+    "Log",
+    "Clipboard",
+    "navigate",
+    ...slotContext,
+  ]);
+
+  return {
+    isAllowed: (name) => allowed.has(name),
+    canRead: (name) => allowed.has(name),
+    createDiagnostic: (name) => ({
+      code: "udc-scope-leak",
+      severity: strict ? "error" : "info",
+      udc: contract.name,
+      message:
+        `UDC "${contract.name}" read "${name}" from its parent scope, but "${name}" ` +
+        `is not part of the declared UDC contract.`,
+      data: { identifier: name },
+    }),
+    assertCanRead(name) {
+      if (allowed.has(name)) return;
+      const diagnostic = this.createDiagnostic(name);
+      if (strict) {
+        throw new UdcScopeError(diagnostic);
+      }
+    },
+  };
 }

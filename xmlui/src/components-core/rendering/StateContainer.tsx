@@ -32,6 +32,7 @@ import { useVars, isParsedValue } from "../state/variable-resolution";
 import { useGlobalVariables } from "../state/global-variables";
 import { useRoutingParams } from "../state/routing-state";
 import { useAppContext } from "../AppContext";
+import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
 import type {
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
@@ -41,6 +42,7 @@ import type { ComponentApi } from "../../abstractions/ApiDefs";
 import { extractScopedState, CodeBehindParseError } from "./ContainerUtils";
 import { FnDepsProvider, useFnDeps } from "../FnDepsContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
+import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -116,6 +118,29 @@ export const StateContainer = memo(
     const memoedVars = useRef<MemoedVars>(new Map());
     const appContext = useAppContext();
     const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+    const udcEvalOptions = useMemo<EvalTreeOptions>(() => {
+      if (!node.udcContract) return EMPTY_OBJECT;
+      return {
+        udcContract: node.udcContract,
+        strictUdcSandbox:
+          appContext.appGlobals?.strictUdcSandbox === true ||
+          (node.udcContract.trust === "untrusted" && appContext.appGlobals?.udcTrust === "strict"),
+        udcDiagnosticLogger: (diagnostic) => {
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: getCurrentTrace(),
+            kind: "udc",
+            trust: node.udcContract?.trust,
+            ...diagnostic,
+          });
+        },
+      };
+    }, [
+      appContext.appGlobals?.strictUdcSandbox,
+      appContext.appGlobals?.udcTrust,
+      node.udcContract,
+    ]);
 
     // ========================================================================
     // STATE COMPOSITION PIPELINE DOCUMENTATION
@@ -259,6 +284,7 @@ export const StateContainer = memo(
       functionDeps,
       localVarsStateContext,
       useRef<MemoedVars>(new Map()), // Temporary cache, discarded after this pass
+      udcEvalOptions,
     );
 
     // Merge pre-resolved variables into context for second pass
@@ -273,6 +299,7 @@ export const StateContainer = memo(
       functionDeps,
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars, // Persistent cache for performance
+      udcEvalOptions,
     );
 
     // ========================================================================
@@ -454,7 +481,15 @@ export const StateContainer = memo(
           }
         }
       },
-      [resolvedLocalVars, stableCurrentGlobalVars, node.uses, node.uid, node.globalVars, appContext, parentStatePartChanged],
+      [
+        resolvedLocalVars,
+        stableCurrentGlobalVars,
+        node.uses,
+        node.uid,
+        node.globalVars,
+        appContext,
+        parentStatePartChanged,
+      ],
     );
 
     // ========================================================================

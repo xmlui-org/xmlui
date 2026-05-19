@@ -7,9 +7,11 @@ import {
   memo,
   useEffect,
   useRef,
+  useMemo,
   useTransition,
 } from "react";
 import { useLocation } from "react-router-dom";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
@@ -32,6 +34,8 @@ import { createActionLookup } from "../container/action-lookup";
 import { createChildRenderer } from "../container/child-rendering";
 import { renderLoaders } from "../container/loader-rendering";
 import { enterRenderPhase, exitRenderPhase } from "../scheduler";
+import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
+import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 
 // Re-export for backward compatibility
 export { getCurrentTrace } from "../inspector/inspectorUtils";
@@ -124,7 +128,38 @@ export const Container = memo(
       ? parentRegisterComponentApi
       : containerRegisterComponentApi;
 
-    const appContext = useAppContext();
+    const baseAppContext = useAppContext();
+    const udcEvalOptions = useMemo<EvalTreeOptions | undefined>(() => {
+      if (!node.udcContract) return undefined;
+      return {
+        udcContract: node.udcContract,
+        strictUdcSandbox:
+          baseAppContext.appGlobals?.strictUdcSandbox === true ||
+          (node.udcContract.trust === "untrusted" &&
+            baseAppContext.appGlobals?.udcTrust === "strict"),
+        udcDiagnosticLogger: (diagnostic) => {
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: getCurrentTrace(),
+            kind: "udc",
+            trust: node.udcContract?.trust,
+            ...diagnostic,
+          });
+        },
+      };
+    }, [
+      baseAppContext.appGlobals?.strictUdcSandbox,
+      baseAppContext.appGlobals?.udcTrust,
+      node.udcContract,
+    ]);
+    const appContext: AppContextObject = useMemo(() => {
+      if (!udcEvalOptions) return baseAppContext;
+      return {
+        ...baseAppContext,
+        __udcEvalOptions: udcEvalOptions,
+      } as AppContextObject;
+    }, [baseAppContext, udcEvalOptions]);
     const { getThemeVar } = useTheme();
     const location = useLocation();
     // Use navigate from appContext to respect willNavigate/didNavigate events

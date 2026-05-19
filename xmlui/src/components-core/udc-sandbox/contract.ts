@@ -29,6 +29,18 @@ export type UdcCapability =
   | "mark"
   | "environment";
 
+export const ALL_UDC_CAPABILITIES: readonly UdcCapability[] = [
+  "fetch",
+  "websocket",
+  "eventsource",
+  "navigate",
+  "clipboard",
+  "randomBytes",
+  "log",
+  "mark",
+  "environment",
+];
+
 // ---------------------------------------------------------------------------
 // Individual declaration types
 // ---------------------------------------------------------------------------
@@ -51,6 +63,7 @@ export interface UdcMethodDecl {
 
 export interface UdcSlotDecl {
   name: string;
+  provides?: ReadonlySet<string>;
 }
 
 // ---------------------------------------------------------------------------
@@ -68,8 +81,12 @@ export interface UdcContract {
   methods: ReadonlySet<string>;
   /** Declared slot names. */
   slots: ReadonlySet<string>;
+  /** Slot context variables provided by each declared slot, keyed by slot name. */
+  slotProvides?: ReadonlyMap<string, ReadonlySet<string>>;
   /** Declared capabilities. */
   capabilities: ReadonlySet<UdcCapability>;
+  /** Whether the `capabilities` attribute was explicitly present. */
+  capabilitiesDeclared?: boolean;
   /**
    * `"trusted"` — the UDC was loaded from a known-trusted source (same origin,
    * first-party package).  `"untrusted"` — loaded from an external or
@@ -90,7 +107,39 @@ export function emptyContract(name: string): UdcContract {
     events: new Set(),
     methods: new Set(),
     slots: new Set(),
+    slotProvides: new Map(),
     capabilities: new Set(),
+    capabilitiesDeclared: false,
     trust: "trusted",
   };
+}
+
+export function isUdcCapability(value: string): value is UdcCapability {
+  return (ALL_UDC_CAPABILITIES as readonly string[]).includes(value);
+}
+
+export function parseCapabilityList(value: string | undefined): Set<UdcCapability> {
+  if (value === undefined) {
+    return new Set(ALL_UDC_CAPABILITIES);
+  }
+  const capabilities = new Set<UdcCapability>();
+  for (const raw of value.split(",")) {
+    const token = raw.trim();
+    if (!token) continue;
+    if (isUdcCapability(token)) {
+      capabilities.add(token);
+    }
+  }
+  return capabilities;
+}
+
+export function parseProvidesList(value: string | undefined): Set<string> {
+  if (!value) return new Set();
+  return new Set(
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => (item.startsWith("$") ? item : `$${item}`)),
+  );
 }
