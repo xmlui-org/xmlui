@@ -1,0 +1,25 @@
+name: Guard certain branches from changes
+
+on:
+  pull_request:
+    branches:
+      - "support/**"
+
+jobs:
+  check:
+    name: Enforce patch-only changesets on "support/**" branches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if minor or major changeset is present
+        shell: bash
+        run: |
+          shopt -s nullglob
+          fail=false
+          for f in .changeset/*.md; do
+            if grep -qE '^"[^"]+": (minor|major)$' "$f"; then
+              >&2 echo "FAIL: $f contains a non-patch bump — only patch releases are allowed on support branches."
+              fail=true
+            fi
+          done
+          $fail && exit 1 || echo "All changesets are patch-level."
