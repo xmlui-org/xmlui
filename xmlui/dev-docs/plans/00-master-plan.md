@@ -685,3 +685,439 @@ so risk is discovered while there is time to remediate.
 escalating to Opus 4.7 for the eight `O*`-tagged items.
 Estimated hit rate: ~95 % first-pass success on `S`-tagged
 items, ~80 % on `O*`-tagged items, ~99 % on `H`-tagged items.
+
+---
+
+## Appendix A — Open Work Inventory (audit dated 2026-05-19)
+
+This appendix is a code-grounded gap analysis comparing every
+plan's declared phase/step list to what is actually present in
+`xmlui/src/` and `xmlui/tests/`. It supersedes any STATUS.md
+row whose "Remaining" note disagrees with the inventory below;
+[`STATUS.md`](./STATUS.md) has been rewritten to match. Read
+this appendix when you need to know *what is left to ship* for
+the Managed-React story, not what was planned.
+
+Conventions used in this inventory:
+
+- ✅ = code present, tests present, working as the plan
+  describes.
+- 🟡 = partial — some code present but a named step is
+  missing or only a stub.
+- ⬜ = not started — no code matching the step.
+
+### A.1 Wave 8 readiness matrix
+
+The master plan's W8-1 row ("All 16 plans | Final phase
+(strict default + migration changeset + guide chapter)")
+presumes every plan reached the *strict-default flip* line.
+The actual readiness as of the audit is:
+
+| Plan | `strict[X]` switch | Code path enforced? | W8 flip-ready? |
+|---|---|---|---|
+| #01 type contracts | `strictTypeContracts` | LSP/Vite/runtime wiring not shipped | ❌ blocked by Phase 3 |
+| #02 themevars | (lint-only) | rule stub registered, body not implemented | ❌ blocked by lint body + migration |
+| #03 reactive cycles | `strictReactiveGraph` | ✅ runtime + LSP + Vite all live | ✅ **flipped W8-1 (2026-05)** |
+| #04 lifecycle | `strictLifecycle` | ✅ dispatcher enforces; only docs pending | ✅ flip ready (docs co-land) |
+| #05 accessibility | `strictAccessibility` | analyzer rules exist but **not wired into LSP/Vite**; no `<SkipLink>` / `<FocusScope>` / `<LiveRegion>` | ❌ blocked by Phase 1 Step 1.3 + Phase 2 |
+| #06 concurrency | `strictConcurrency` | **read site missing** — flag is documented but not consumed anywhere in source | ❌ blocked by missing read site |
+| #07 exception model | `strictErrors` | `signError` + `ErrorBoundary` wrap; `LOADER_ERROR` mapping, `<App onError>`, `<RetryPolicy>`, `<Fallback>` not shipped | ❌ blocked by Phases 1.2 + 2 + 3 + 4 |
+| #08 theming sandbox | `strictTheming` | validators ship; **hot-path wiring in `StyleProvider` / `valueExtractor` not done** | ❌ blocked by Phase 1.2 + Phase 2 |
+| #09 forms | `strictForms` | registry + cross-field + RFC 7807 + submit-policy live; CSRF/idempotency + `$formCancel` + E2E missing | 🟡 flip-ready if Phase 5 is descoped |
+| #10 routing | `strictRouting` | constraints + guards + canonicalisation live; custom-constraint forms-registry bridge + direct-entry/anchor interception + E2E missing | 🟡 flip-ready if Phase 1.2 + Phase 2.1 are descoped |
+| #11 i18n | `strictI18n` | ICU + formatters + RTL live; `<I18n>` component + framework-string extraction + `App.translate` public surface still partial | ❌ blocked by Phase 2.2 + Phase 2.3 |
+| #12 versioning | `strictVersioning` | metadata + api-diff tooling + Inspector tab live; LSP wiring + parse-time hook in `renderChild` + doc badges + `valueAliases`/`preserveLegacyDefaults` rewrite + release-guard workflow not shipped | ❌ blocked by Phase 1 + Phase 2 residuals |
+| #13 build-validation | (analyzer `strict` arg) | full pipeline live (LSP, Vite, CLI, CI scaffold) | ✅ already flippable per-call site |
+| #14 UDC sandbox | `strictUdcSandbox` | scope gate, capability gate, trust-mode + manifest comparison all live; `xmlui udc audit` CLI shipped. Residual: slot-undeclared consumer check, filesystem manifest loader, Inspector panel, docs chapter | 🟡 flip-ready (residuals are non-security) |
+| #15 audit observability | `strictAuditLogging` | correlation + redactor + sampler + OTLP/console sinks + metadata sweep live; search/query UI (Phase 3.3) not shipped | ✅ flip-ready (search UI is non-blocking) |
+| #16 determinism | `strictDeterminism` | scheduler + replay CLI + analyzer rules + happens-before doc live | ✅ **flipped W8-1 (2026-05)** |
+
+**Net Wave-8 picture (updated 2026-05 after Plan #14 W6-1/2/3 ship):**
+
+- **2 of 12 strict switches are flipped today** (#03, #16 —
+  shipped in the W8-1 targeted flip, 2026-05).
+- **5 plans are ready to flip now** (#04, #13 already
+  per-call, #14 (security boundary now closed), #15, plus
+  #03/#16 already done).
+- **2 plans are flip-eligible with descope** (#09, #10).
+- **6 plans cannot flip until non-flip work lands** (#01, #02,
+  #05, #07, #08, #11, #12).
+- **1 strict switch is a no-op** (#06 `strictConcurrency` —
+  documented but unread).
+
+### A.2 Per-plan outstanding work
+
+Plans are listed in plan-number order. Each entry uses the
+phase/step labels from the source plan document.
+
+#### Plan #01 — Verified type contracts
+
+- 🟡 Phase 3 Step 3.1 — LSP integration (emit type-contract
+  diagnostics through the language server).
+- 🟡 Phase 3 Step 3.2 — Vite plugin integration (warn/error
+  through the build).
+- ⬜ Phase 3 Step 3.3 — Runtime warn-mode for expression-valued
+  props (dedup by `(uid, prop, valueHash)`).
+- ⬜ Phase 4 Step 4.1 — TS ↔ metadata drift check
+  (`scripts/check-metadata-drift.ts`).
+- ⬜ Phase 4 Step 4.2 — Default flip to `true`.
+- ⬜ Phase 4 Step 4.3 — Guide chapter + AI doc +
+  `managed-react.md` §0 update.
+
+#### Plan #02 — Themevars namespace
+
+- ⬜ Lint-rule body for `theming-missing-prefix` (currently a
+  registered stub only).
+- ⬜ Migration of existing extension-package theme vars to the
+  canonical prefix.
+- ⬜ Documentation update (`.ai/xmlui/theming-styling.md` +
+  user guide).
+- ⬜ Default flip / "enforce in next major" call.
+
+#### Plan #03 — Reactive cycle detection
+
+- ⬜ Cross-file `buildEnd` aggregation in the Vite plugin
+  (currently per-file).
+- ⬜ Per-node range threading for LSP `relatedInformation`
+  (current ranges are coarse).
+- ⬜ Phase 4 Step 4.1 — Guide chapter
+  (`xmlui/dev-docs/guide/30-reactive-graph.md` or equivalent) +
+  AI doc.
+- ✅ Phase 4 Step 4.2 — Default flip (shipped W8-1).
+
+#### Plan #04 — Managed lifecycle vocabulary
+
+- ⬜ Phase 4 Step 4.1 — Lifecycle chapter
+  (`26-lifecycle.md`) + `.ai/xmlui/lifecycle.md` +
+  `managed-react.md` §5 update.
+- ⬜ Phase 4 Step 4.2 — Default flip of `strictLifecycle`.
+
+#### Plan #05 — Enforced accessibility *(STATUS.md previously overclaimed)*
+
+- 🟡 Phase 1 Step 1.1 — A11y metadata annotations across all
+  built-in components (linter reads metadata but not every
+  component is annotated).
+- ⬜ Phase 1 Step 1.3 — Wire `lintComponentDef()` into the LSP
+  diagnostic provider and the Vite plugin (currently rules run
+  in unit tests only; **end users see no diagnostics**).
+- ⬜ Phase 2 Step 2.1 — `<SkipLink>` component.
+- ⬜ Phase 2 Step 2.2 — `<FocusScope>` primitive (and
+  `<Modal>` / `<Drawer>` refactor onto it).
+- ⬜ Phase 2 Step 2.3 — `<LiveRegion>` component.
+- ⬜ Phase 3 Step 3.1 — Contrast-ratio checker at theme
+  resolution.
+- ⬜ Phase 4 Step 4.1 — `automationId` plumbing in
+  `ComponentAdapter`.
+- ⬜ Phase 4 Step 4.2 — Default flip.
+- ⬜ Phase 4 Step 4.3 — Guide chapter (`28-accessibility.md`).
+
+#### Plan #06 — Cooperative concurrency
+
+- 🟡 Phase 1 Step 1.2 — `App.cancel()` global wiring in
+  `AppContext` (token defined; user-callable wrapper missing).
+- 🟡 Phase 1 Step 1.3 — Verify cancellation-reason propagation
+  from every abort source (`user` / `supersede` / `timeout` /
+  `unmount`).
+- ⬜ Phase 5 Step 5.1 — Concurrency chapter
+  (`29-concurrency.md`) + `.ai/xmlui/concurrency.md`.
+- ⬜ Wire `appGlobals.strictConcurrency` into a real
+  enforcement site (currently the flag has zero readers —
+  flipping its default is a no-op).
+- ⬜ Default flip.
+
+#### Plan #07 — Structured exception model *(STATUS.md previously overclaimed)*
+
+- 🟡 Phase 1 Step 1.2 — Wire `LoaderComponent` to map HTTP
+  status codes to `ErrorCategory`; ensure `LOADER_ERROR`
+  payload is an `AppError`.
+- ⬜ Phase 2 Step 2.1 — `<App onError>` event + `App.errors`
+  stream + Inspector "Errors" tab.
+- ⬜ Phase 3 Step 3.1 — `<RetryPolicy>` component with
+  `executeWithPolicy()`.
+- ⬜ Phase 3 Step 3.2 — `Retry-After` header honouring in
+  `RestApiProxy`.
+- ⬜ Phase 4 Step 4.1 — `<Fallback>` component (error slot +
+  loading slot).
+- ⬜ Docs chapter + default flip.
+
+#### Plan #08 — Sealed theming sandbox
+
+- ⬜ Phase 1 Step 1.2 — Wire `validateTheme()` into
+  `StyleProvider` theme-resolution loop.
+- ⬜ Phase 2 Step 2.1 — Wire `validateInlineStyle()` into
+  `valueExtractor` for layout props
+  (`width`/`padding*`/`margin*`/`gap`/`zIndex`/…).
+- ⬜ Phase 2 Step 2.2 — Wire `validateStyleString()` into
+  `valueExtractor.style` (enforces `position:fixed`/`url()` /
+  `!important` bans).
+- ⬜ Component-metadata annotation sweep
+  (`ThemeVarMetadata.valueType` for every shipped
+  themevar).
+- ⬜ Phase 3 Step 3.1 — Guide chapter
+  (`31-theming-sandbox.md`).
+- ⬜ Phase 3 Step 3.2 — Default flip
+  (`strictTheming: true`, `allowInlineRawCss: false`).
+
+#### Plan #09 — Forms validation discipline
+
+- 🟡 Phase 1 Step 1.4 — `$cancel` thread-through into async
+  validators (registry supports async; cancellation surface
+  inside Form context not verified end-to-end).
+- ⬜ Phase 5 Step 5.1 — `<Form csrfToken>` and
+  `<Form idempotencyKey>` props with `RestApiProxy` binding.
+- ⬜ `$formCancel` plumb-through into `onSubmit` local context.
+- ⬜ E2E test suite under `xmlui/tests-e2e/forms/` (cross-field
+  validators, RFC 7807 round-trip, submit policies).
+- ⬜ Docs chapter + default flip.
+
+#### Plan #10 — Defended routing
+
+- 🟡 Phase 1 Step 1.2 — Custom constraints registered through
+  the forms validator registry (the bridge type exists; the
+  per-name resolution path is not wired).
+- 🟡 Phase 2 Step 2.1 — Guard interception of direct URL entry
+  + anchor clicks + form-submit navigations (currently the
+  `willNavigate` hook only covers programmatic + popstate).
+- ⬜ E2E test suite under `xmlui/tests-e2e/routing/`.
+- ⬜ Docs chapter + default flip.
+
+#### Plan #11 — i18n foundations
+
+- 🟡 Phase 1 Step 1.1 — `App.setLocale()` and `<App locale>`
+  prop wiring through `AppContext` (resolver exists; user-API
+  surface incomplete).
+- 🟡 Phase 2 Step 2.1 — `App.translate(key, vars?)` public-API
+  wiring (translator function exists; not exposed through
+  `AppContext` namespace).
+- ⬜ Phase 2 Step 2.2 — `<I18n>` component.
+- ⬜ Phase 2 Step 2.3 — Audit + extract framework-shipped
+  strings into `xmlui-en.ts` (currently a stub).
+- ⬜ E2E test suite under `xmlui/tests-e2e/i18n/`.
+- ⬜ Docs chapter + default flip.
+
+#### Plan #12 — Enforced versioning
+
+- 🟡 Phase 1 Step 1.1 — LSP diagnostic provider for
+  deprecated/experimental/internal (verifier exists; LSP wire
+  incomplete).
+- 🟡 Phase 1 Step 1.2 — Parse-time hook in `renderChild` so
+  runtime echo dedup keys are populated on every render path
+  (currently only on certain paths).
+- ⬜ Phase 1 Step 1.3 — Doc-generation badges
+  (`MetadataProcessor` integration).
+- ⬜ Phase 2 Step 2.2 — `valueAliases` resolution rewrite in
+  `valueExtractor`.
+- ⬜ Phase 2 Step 2.3 — `preserveLegacyDefaults` resolution in
+  `valueExtractor`.
+- ⬜ Release-guard CI workflow (`.github/workflows/api-diff.yml`).
+- ⬜ Docs chapter (`35-versioning.md`).
+- ⬜ Default flip.
+
+#### Plan #13 — Build-validation analyzers
+
+- ✅ Phases 1–5 complete (identifier + expression + cross-binding
+  rules; LSP + Vite + CLI surfaces; CI scaffold).
+- ⬜ Phase 2+ stretch — scope analysis / AST integration for
+  the deferred rule stubs (non-blocking; master plan tags this
+  "later waves").
+- ⬜ Default flip (per-call, no central switch).
+
+#### Plan #14 — UDC sandbox **(critical-path blocker — now mostly green)**
+
+> **2026-05 update.** Code-level audit of `udc-sandbox/` plus
+> `CompoundComponent.tsx` and `eval-tree-common.ts` confirms
+> that **W6-1, W6-2, and the runtime+manifest half of W6-3 are
+> shipped** — the 2026-05-19 status row was over-pessimistic.
+> The list below reflects the actual residual surface area.
+
+- 🟡 Phase 1 Step 1.2 — `xmlui udc declare` migration CLI for
+  inferring `<Prop>` / `<Event>` blocks from existing UDCs.
+- ✅ Phase 2 Step 2.1 (**W6-1**) — Scope-climb gate shipped.
+  `buildScopeGate()` filters parent globals via
+  `scopedGlobalKeys` in `CompoundComponent.tsx`; out-of-contract
+  reads emit `udc-scope-leak` (warn → error in strict) and
+  throw `UdcScopeError` when `strictUdcSandbox` is on.
+- ⬜ Phase 2 Step 2.2 — Slot context contract
+  (`udc-slot-undeclared` consumer-side check still missing;
+  `slotProvides` is parsed but the slot-consumer reference
+  walker is not wired).
+- ✅ Phase 3 (**W6-2**) — Capability gate shipped.
+  `checkUdcCapability()` invoked from `evalIdentifier` (L202)
+  and `evalMemberAccessCore` (L245); `narrowCapabilities()`
+  rejects widening at call sites with
+  `udc-capability-undeclared`; `udc-capability-missing`
+  emitted at every undeclared use; strict mode throws
+  `UdcCapabilityError`. Proven by
+  `tests/components-core/udc-sandbox/runtime-integration.test.ts`.
+- ✅ Phase 4 Step 4.1 (**W6-3**, trust modes) — `trust="untrusted"`
+  + `appGlobals.udcTrust` (`"open"`/`"review"`/`"strict"`) honoured
+  in `CompoundComponent.tsx`; `udc-untrusted-violation` emits per
+  missing declaration and per implicit-capability set.
+- 🟡 Phase 4 Step 4.2 — `xmlui udc audit` CLI **shipped** at
+  `scripts/cli/udc-audit.ts` (GNU/JSON formats,
+  `--fail-on-untrusted` CI gate). Inspector "UDC permissions"
+  panel still pending (lives in `packages/xmlui-devtools`).
+- 🟡 Phase 5 Step 5.1 — Manifest comparison core shipped
+  (`compareManifest()` emits `udc-manifest-mismatch` with
+  normalised JSON diff); filesystem `loadManifest()` is still
+  a stub returning `null` — discovery integration at component
+  registration time remains.
+- ⬜ Docs chapter (`36-udc-sandbox.md`) + default flip in W8.
+
+
+#### Plan #15 — Audit-grade observability
+
+- 🟡 Phase 1 Step 1.3 — `audit-correlation-missing` diagnostic
+  (correlation context exists; diagnostic emission path not
+  verified).
+- 🟡 Phase 2 Step 2.3 — `audit-redaction-missing` + strict
+  block (heuristics ship; strict-mode block path not
+  verified).
+- ⬜ Phase 3 Step 3.3 — Search / query UI for captured trace
+  entries.
+- ⬜ Docs chapter + default flip.
+
+#### Plan #16 — Concurrent-state determinism
+
+- 🟡 Phase 4 Step 4.2 — Inspector "Replay this trace" UI
+  (lives in `packages/xmlui-devtools`; source-UI components
+  pending).
+- ✅ Default flip (W8-1).
+
+### A.3 Cross-cutting gaps
+
+These do not belong to a single plan but block the
+master-plan's Wave 8 contract.
+
+1. **E2E test coverage** is missing for plans #09, #10, #11,
+   #12, #14 (none of them have entries under
+   `xmlui/tests-e2e/<area>/`). Unit coverage is good. The
+   master plan's Stage 4 of the per-step workflow requires
+   E2E for every observable surface — these plans cannot
+   cleanly close until those suites exist.
+
+2. **`strictConcurrency` has zero readers** in source. The
+   master plan's Convention 1 ("New code reads the switch via
+   the existing `appGlobals` accessor; never inline `true`")
+   was satisfied at the *documentation* level but not the
+   *enforcement* level. Flipping the default in W8-1 is a
+   no-op until at least one site consumes the flag.
+
+3. **`<RetryPolicy>` and `<Fallback>` components are absent.**
+   Plan #07's Phase 3 + 4 promise these as user-facing
+   primitives. Without them, the structured exception model
+   stops at "errors are typed" without the policy / fallback
+   story the plan advertises.
+
+4. **`<SkipLink>`, `<FocusScope>`, `<LiveRegion>` components
+   are absent.** Plan #05's accessibility *primitives* are the
+   thing app authors actually use; the linter is only the
+   *forcing function*. Without the primitives, the lint
+   diagnostics have no canonical fix to point at.
+
+5. **`<I18n>` component is absent.** Plan #11's user-facing
+   markup surface is missing. `App.translate()` exists as a
+   helper but is not exposed through `AppContext`.
+
+6. **Doc-chapters** are missing for every plan in
+   `xmlui/dev-docs/guide/`:
+   - `26-lifecycle.md` (plan #04)
+   - `27-type-contracts.md` (plan #01)
+   - `28-accessibility.md` (plan #05)
+   - `29-concurrency.md` (plan #06)
+   - `30-reactive-graph.md` (plan #03)
+   - `31-theming-sandbox.md` (plan #08)
+   - `32-forms.md` extension (plan #09)
+   - `33-routing.md` extension (plan #10)
+   - `34-i18n.md` (plan #11)
+   - `35-versioning.md` (plan #12)
+   - `36-udc-sandbox.md` (plan #14)
+   - `37-audit.md` (plan #15)
+   - `38-build-validation.md` (plan #13)
+   - `39-determinism.md` (plan #16) — referenced in code
+     comments; existence not verified.
+
+   These chapters were assumed by W8-1's "guide chapter"
+   clause. None of them have shipped beyond what is
+   embedded in code comments.
+
+7. **The W8-1 row in the master backlog ("All 16 plans | Final
+   phase") is therefore not executable as a single PR.** It
+   must be broken into one ticket per plan, gated on each
+   plan's outstanding non-flip work. The honest sequencing is:
+
+   - **W8-1a (shipped 2026-05):** Targeted flip for plans #03
+     and #16 — the two whose only outstanding work is docs /
+     Inspector UI.
+   - **W8-1b (next):** Plans #04, #13 (per-call), #15 — the
+     three other flip-ready plans. Pair each flip with the
+     missing guide chapter.
+   - **W8-1c (after Wave 6 remediation):** Plans #09, #10
+     with descoped Phase 5 / Phase 2.1 residuals.
+   - **W8-1d (after major non-flip work):** Plans #01, #02,
+     #05, #06, #07, #08, #11, #12, #14. Each unblocks only
+     after its named outstanding steps land.
+
+8. **W8-2 ("mark every row sealed in STATUS.md") cannot
+   execute** until W8-1d clears. The honest STATUS.md update
+   (this audit) leaves every open row open and adds the
+   per-plan outstanding lists above.
+
+9. **W8-3 ("run replay harness against the docs site under
+   all strict modes") cannot execute** until every strict
+   switch actually toggles a code path. Today
+   `strictConcurrency`, `strictTheming` (validators not in
+   hot path), `strictTypeContracts` (LSP/Vite/runtime
+   unshipped), `strictAccessibility` (rules not in
+   LSP/Vite), `strictI18n` (no enforcement site beyond
+   formatters) and `strictUdcSandbox` (no scope/capability
+   gate) cannot meaningfully be "on".
+
+### A.4 Recommended sequencing to close the Managed-React story
+
+The honest critical path from today's state to the
+"Managed-React shipped" milestone, in dependency order:
+
+1. **Plan #14 W6-1 + W6-2 + W6-3** — **shipped (2026-05).** Scope
+   gate, capability gate, trust-mode enforcement, manifest
+   comparison, and `xmlui udc audit` CLI are all live. Residual
+   surface (slot-undeclared consumer check, filesystem manifest
+   loader, Inspector permissions panel, docs chapter) tracked
+   under A.2 plan #14 and is no longer a Wave-8 blocker.
+2. **Plan #05 Phase 1 Step 1.3** — Wire a11y linter into LSP +
+   Vite so end users actually see the rules that already exist.
+3. **Plan #07 Phase 1 Step 1.2 + Phase 2 + Phase 3 + Phase 4**
+   — `LOADER_ERROR` mapping, `<App onError>`, `<RetryPolicy>`,
+   `<Fallback>`. Bigger user-visible surface than any other
+   missing item.
+4. **Plan #08 Phase 1 Step 1.2 + Phase 2** — Hot-path wiring of
+   theming validators into `StyleProvider` and `valueExtractor`.
+   Otherwise the whole 72-test validator surface is dead code.
+5. **Plan #11 Phase 2.2 + Phase 2.3** — `<I18n>` component +
+   framework-string extraction. Without these the i18n surface
+   is "formatters + RTL", not "i18n".
+6. **Plan #01 Phase 3** — LSP/Vite/runtime surfaces. The
+   verifier exists; nothing consumes it.
+7. **Plan #12 Phase 1 + Phase 2 residuals** — LSP wiring,
+   parse-time hook, doc badges, `valueAliases`,
+   `preserveLegacyDefaults`, release-guard workflow.
+8. **Plan #06 `strictConcurrency` reader site** — pick the one
+   place that should fail when the flag is on (probably
+   "policy validation at handler-coordinator registration").
+9. **Plan #05 Phase 2 components** — `<SkipLink>`,
+   `<FocusScope>`, `<LiveRegion>`.
+10. **Plan #07 Phase 3.2** — `Retry-After` header in
+    `RestApiProxy`.
+11. **Plan #02 lint-rule body + migration.**
+12. **Plan #10 Phase 1.2 + Phase 2.1 residuals.**
+13. **E2E suites** for plans #09, #10, #11, #12, #14.
+14. **Doc chapters** for every plan (16 files).
+15. **W8-1d flips** for the remaining plans.
+16. **W8-2** STATUS sweep.
+17. **W8-3** replay-harness regression sweep.
+
+Items 1–8 are the load-bearing engineering work; items 9–17
+are visibility / documentation / final-mile work. A
+single-thread agent following Section 2's workflow would clear
+items 1–8 first, then parallelise 9–14 across plans.
+
