@@ -1,22 +1,14 @@
 /**
  * Handler-policy public API (Plan #6 Step 0 / Step 2.1 contract surface).
  *
- * W3-6 risk-probe scope: this file ships only the *types* and a
- * pass-through `createHandlerCoordinator()` stub that always returns
- * `{ proceed: true, token }`. The real coordinator (cancel-and-restart,
- * FIFO queue, drop-while-running) lands in W7-1 (Phase 2). Shipping the
- * type surface now lets:
+ * Defines the types and factory that the dispatcher (`event-handlers.ts`)
+ * uses to coordinate handler invocations under one of four policies
+ * (`parallel`, `single-flight`, `queue`, `drop-while-running`).
  *
- * - Component metadata declare `handlerPolicy` as a base prop in W3-6.
- * - Handler authors adopt `handlerPolicy="single-flight"` in markup
- *   knowing the contract is settled.
- * - Forms (W5-1, W5-4) and Determinism (W7-2) build on a stable name.
- *
- * Default is always `parallel` — today's behaviour. Setting any other
- * policy is currently a no-op (the coordinator stub returns
- * `proceed: true` regardless), but emits a `kind:"concurrency"` info
- * trace so handler authors can verify their markup reaches the
- * coordinator surface.
+ * W7-1 update: `createHandlerCoordinator()` now returns the real
+ * implementation from `coordinator.ts` instead of the W3-6 pass-through
+ * stub. Default behaviour is unchanged because `parallel` (the implicit
+ * default for every component) is still a fast-path no-op.
  */
 
 import {
@@ -24,6 +16,10 @@ import {
   type CancellationToken,
   type CancellationReason,
 } from "./token";
+import {
+  createRealHandlerCoordinator,
+  type CoordinatorDiagnosticSink,
+} from "./coordinator";
 
 /** The four handler-invocation policies declared in plan #6 Phase 2. */
 export type HandlerPolicy =
@@ -47,18 +43,26 @@ export interface HandlerEntryDecision {
   proceed: boolean;
   /** Cancellation token to inject into the handler's `$cancel` slot. */
   token: CancellationToken;
+  /**
+   * W7-1: lets the dispatcher abort the token on handler completion
+   * (e.g. to fire `$cancel.onAbort` cleanup callbacks for in-flight
+   * fetches). Optional for backward compatibility with the W3-6
+   * pass-through stub, which omits it.
+   */
+  abort?: (reason: CancellationReason) => void;
 }
 
 /**
  * Coordinator interface — managed by the per-app dispatcher.
  *
- * W3-6 pass-through stub: `enter` always returns `proceed: true` with a
- * fresh token; `exit` is a no-op. The full implementation in W7-1 will
- * track running invocations per `(componentUid, eventName)` and apply
- * the four policies.
+ * The real W7-1 coordinator may return a Promise from `enter()` (the
+ * `queue` policy awaits the current invocation), so callers must
+ * `await` the result. The W3-6 pass-through stub returns synchronously;
+ * `await` of a non-thenable is a no-op so both shapes are
+ * interchangeable.
  */
 export interface HandlerCoordinator {
-  enter(inv: HandlerInvocation): HandlerEntryDecision;
+  enter(inv: HandlerInvocation): HandlerEntryDecision | Promise<HandlerEntryDecision>;
   exit(inv: HandlerInvocation): void;
   /**
    * Abort any running handlers matching `(componentUid?, eventName?)`.
@@ -69,24 +73,41 @@ export interface HandlerCoordinator {
 }
 
 /**
- * Create the W3-6 pass-through coordinator stub.
+ * Create a HandlerCoordinator.
  *
- * The full implementation in W7-1 will track running invocations and
- * apply the four policies. Until then, every invocation proceeds with
- * a fresh token regardless of policy — handler authors can still
- * adopt the markup without waiting for the runtime.
+ * W7-1 ships the real coordinator that tracks running invocations and
+ * applies the four policies. Pass a `sink` to receive `onSuperseded` /
+ * `onDropped` notifications (used by the dispatcher to emit
+ * `concurrency-handler-superseded` / `concurrency-handler-dropped`
+ * traces). The default behaviour for `parallel` (the implicit default)
+ * remains a pass-through fast path — existing apps observe no change.
+ *
+ * The legacy pass-through stub is still available via
+ * `createPassThroughHandlerCoordinator()` for tests that want to verify
+ * the W3-6 surface shape independent of the runtime.
  */
-export function createHandlerCoordinator(): HandlerCoordinator {
+export function createHandlerCoordinator(
+  sink: CoordinatorDiagnosticSink = {},
+): HandlerCoordinator {
+  return createRealHandlerCoordinator(sink);
+}
+
+/**
+ * The W3-6 pass-through stub — every invocation proceeds with a fresh
+ * token regardless of policy. Retained for tests that pin the public
+ * surface shape; not used by the dispatcher.
+ */
+export function createPassThroughHandlerCoordinator(): HandlerCoordinator {
   return {
     enter(_inv) {
       const { token } = createCancellationToken();
       return { proceed: true, token };
     },
     exit(_inv) {
-      /* no-op — running set lands in W7-1 */
+      /* no-op */
     },
     abortRunning(_componentUid, _eventName, _reason) {
-      /* no-op — running set lands in W7-1 */
+      /* no-op */
     },
   };
 }

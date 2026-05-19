@@ -37,3 +37,6 @@ import "./rules/id-undefined-component-ref";
 import "./rules/id-undefined-form-ref";
 // W1-5: Theming rules
 import "./rules/theming-missing-prefix";
+// W7-3: Determinism rules (plan #16 Phase 3)
+import "./rules/determinism-floating-point-token";
+import "./rules/determinism-iteration-order-symbol";
