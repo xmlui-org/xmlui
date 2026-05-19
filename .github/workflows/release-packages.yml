@@ -17,7 +17,6 @@ on:
       - closed
     branches:
       - main
-      - support
       - "support/**"
 
 permissions:

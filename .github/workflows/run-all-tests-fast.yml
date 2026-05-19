@@ -9,8 +9,7 @@ on:
   pull_request:
     branches:
       - main
-      - support
-      - 'support/**'
+      - "support/**"
 
 jobs:
   test:
