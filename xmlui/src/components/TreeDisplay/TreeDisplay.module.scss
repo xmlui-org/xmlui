@@ -27,7 +27,7 @@ $color-connect-TreeDisplay: createThemeVar("color-connect-#{$component}");
     @include t.borderVars($themeVars, $component);
     background-color: $backgroundColor-TreeDisplay;
     padding: $padding-TreeDisplay;
-    padding-left: $paddingLeft-TreeDisplay;
+    padding-inline-start: $paddingLeft-TreeDisplay;
     box-shadow: $boxShadow-TreeDisplay;
   }
 
@@ -61,7 +61,7 @@ $color-connect-TreeDisplay: createThemeVar("color-connect-#{$component}");
   .connector {
     position: absolute;
     top: 0;
-    left: 0;
+    inset-inline-start: 0;
   }
 
   .connectorLine {

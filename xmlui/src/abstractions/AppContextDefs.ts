@@ -355,6 +355,8 @@ export type AppContextObject = {
     translate: (key: string, vars?: Record<string, unknown>) => string;
     t: (key: string, vars?: Record<string, unknown>) => string;
     isRtlLocale: (locale?: string) => boolean;
+    /** Resolved text direction for the active locale (`"ltr"` or `"rtl"`). */
+    direction: "ltr" | "rtl";
     formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
     formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string;
     formatList: (values: readonly string[], options?: Intl.ListFormatOptions) => string;

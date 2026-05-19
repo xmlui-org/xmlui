@@ -115,12 +115,12 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
       }
 
       .requiredMark {
-        margin-left: 0.2em;
+        margin-inline-start: 0.2em;
         color: $textColor-requiredMark-formItem;
       }
 
       .optionalTag {
-        margin-left: 0.2em;
+        margin-inline-start: 0.2em;
         color: $textColor-optionalTag-formItem;
       }
     }
@@ -175,7 +175,7 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
   .validationMessageAbsolute {
     position: static;
     top: auto;
-    left: auto;
+    inset-inline-start: auto;
     white-space: normal;
     z-index: auto;
   }

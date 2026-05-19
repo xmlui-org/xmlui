@@ -212,7 +212,7 @@ $borderColor-TextArea--disabled: createThemeVar("Input:borderColor-#{$componentN
   .floatingFeedback {
     position: absolute;
     top: 0.5rem;
-    right: 0.5rem;
+    inset-inline-end: 0.5rem;
     z-index: 1;
   }
 }

@@ -185,8 +185,8 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
   .passwordToggle {
     cursor: pointer;
     color: createThemeVar("Input:color-passwordToggle-#{$componentName}");
-    padding-left: createThemeVar("Input:paddingLeft-passwordToggle-#{$componentName}");
-    padding-right: createThemeVar("Input:paddingRight-passwordToggle-#{$componentName}");
+    padding-inline-start: createThemeVar("Input:paddingLeft-passwordToggle-#{$componentName}");
+    padding-inline-end: createThemeVar("Input:paddingRight-passwordToggle-#{$componentName}");
 
     &:hover {
       color: createThemeVar("Input:color-passwordToggle-#{$componentName}--hover");

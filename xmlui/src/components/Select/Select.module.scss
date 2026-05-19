@@ -592,7 +592,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
   .selectOptionIndicator {
     display: flex;
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
     flex-shrink: 0;
     height: 0.875rem;
     width: 0.875rem;

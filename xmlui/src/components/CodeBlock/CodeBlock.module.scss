@@ -49,7 +49,7 @@ $fontSize-CodeBlock: createThemeVar("fontSize-CodeBlock");
 
   .codeBlockHeader {
     padding: t.$space-1;
-    padding-left: t.$space-3;
+    padding-inline-start: t.$space-3;
     background-color: $backgroundColor-CodeBlock-header;
     border-bottom: $color-CodeBlock-headerSeparator solid 2px;
     font-size: t.$fontSize-code;
@@ -70,7 +70,7 @@ $fontSize-CodeBlock: createThemeVar("fontSize-CodeBlock");
     .codeBlockCopyButton {
       position: absolute;
       top: t.$space-1_5;
-      right: t.$space-1_5;
+      inset-inline-end: t.$space-1_5;
       z-index: 1;
       display: none;
       background-color: $backgroundColor-CodeBlock;

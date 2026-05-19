@@ -1438,6 +1438,7 @@ export function AppContent({
         translate,
         t: translate,
         isRtlLocale,
+        direction: isRtlLocale(activeLocale.locale) ? "rtl" : "ltr",
         formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
           formatNumber(value, activeLocale.locale, options),
         formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>

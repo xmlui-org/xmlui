@@ -260,7 +260,7 @@ $listStyleType-HtmlLi: createThemeVarList("listStyleType-HtmlLi");
     margin-top: $marginTop-HtmlLi;
     margin-bottom: $marginBottom-HtmlLi;
     list-style-type: $listStyleType-HtmlLi;
-    margin-left: $marginLeft-HtmlLi;
+    margin-inline-start: $marginLeft-HtmlLi;
     @include t.borderVars($themeVarsList, "HtmlLi");
     @include t.paddingVars($themeVarsList, "HtmlLi");
   }

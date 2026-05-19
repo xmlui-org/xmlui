@@ -211,7 +211,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           content: "";
           position: absolute;
           top: 0;
-          right: 0;
+          inset-inline-end: 0;
           bottom: 0;
           width: 50vw;
           z-index: -1;
@@ -493,8 +493,8 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
 
     &.withDefaultContentPadding {
-      padding-left: t.$space-4;
-      padding-right: t.$space-4;
+      padding-inline-start: t.$space-4;
+      padding-inline-end: t.$space-4;
       padding-top: t.$space-5;
       padding-bottom: t.$space-5;
       gap: t.$space-5;

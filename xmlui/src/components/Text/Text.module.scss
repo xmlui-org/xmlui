@@ -144,8 +144,8 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   @include t.textVars($themeVars, $variantName);
   margin-top: createThemeVar("marginTop-#{$variantName}");
   margin-bottom: createThemeVar("marginBottom-#{$variantName}");
-  margin-left: createThemeVar("marginLeft-#{$variantName}");
-  margin-right: createThemeVar("marginRight-#{$variantName}");
+  margin-inline-start: createThemeVar("marginLeft-#{$variantName}");
+  margin-inline-end: createThemeVar("marginRight-#{$variantName}");
   vertical-align: createThemeVar("verticalAlignment-#{$variantName}");
 
   &:hover {
@@ -243,8 +243,8 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
       border-color: $borderColor-Text-keyboard;
       border-style: $borderStyle-Text-keyboard;
       border-radius: $borderRadius-Text-keyboard;
-      padding-left: $paddingHorizontal-Text-keyboard;
-      padding-right: $paddingHorizontal-Text-keyboard;
+      padding-inline-start: $paddingHorizontal-Text-keyboard;
+      padding-inline-end: $paddingHorizontal-Text-keyboard;
     }
 
     &.marked {
@@ -253,8 +253,8 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
       font-weight: $fontWeight-Text-marked;
       font-style: $fontStyle-Text-marked;
       line-height: $lineHeight-Text-marked;
-      padding-left: $paddingHorizontal-Text-marked;
-      padding-right: $paddingHorizontal-Text-marked;
+      padding-inline-start: $paddingHorizontal-Text-marked;
+      padding-inline-end: $paddingHorizontal-Text-marked;
 
       // Based on accessibility concerns
       // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark
@@ -348,8 +348,8 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     &.tableheading {
       margin-top: $marginTop-Text-tableheading;
       margin-bottom: $marginBottom-Text-tableheading;
-      padding-left: $paddingHorizontal-Text-tableheading;
-      padding-right: $paddingHorizontal-Text-tableheading;
+      padding-inline-start: $paddingHorizontal-Text-tableheading;
+      padding-inline-end: $paddingHorizontal-Text-tableheading;
       font-size: $fontSize-Text-tableheading;
       font-weight: $fontWeight-Text-tableheading;
     }
@@ -424,8 +424,8 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
       content: '';
       position: absolute;
       bottom: 0;
-      left: 0;
-      right: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
       height: 2px;
       background: inherit;
       pointer-events: none;

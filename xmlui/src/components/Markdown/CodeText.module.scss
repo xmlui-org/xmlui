@@ -18,8 +18,8 @@ $component: "Text";
   @include t.textVars($themeVars, $variantName);
   margin-top: createThemeVar("marginTop-#{$variantName}");
   margin-bottom: createThemeVar("marginBottom-#{$variantName}");
-  margin-left: createThemeVar("marginLeft-#{$variantName}");
-  margin-right: createThemeVar("marginRight-#{$variantName}");
+  margin-inline-start: createThemeVar("marginLeft-#{$variantName}");
+  margin-inline-end: createThemeVar("marginRight-#{$variantName}");
   vertical-align: createThemeVar("verticalAlignment-#{$variantName}");
 }
 
@@ -44,16 +44,16 @@ $component: "Text";
 
     // TEMP: experimental - may be removed
     &:has(> code > span) {
-      padding-left: 0;
-      padding-right: 0;
+      padding-inline-start: 0;
+      padding-inline-end: 0;
     }
     & > code > span:not([class*="numbered"]) {
-      padding-left: t.$space-5;
+      padding-inline-start: t.$space-5;
     }
 
     & > code {
       font-family: createThemeVar("fontFamily-#{$component}-codefence");
-      padding-left: 0;
+      padding-inline-start: 0;
       display: inline-block;
       min-width: 100%;
       box-sizing: border-box;
@@ -77,10 +77,10 @@ $component: "Text";
       content: counter(listing);
       display: inline-block;
       width: t.$space-12;
-      padding-left: auto;
-      padding-right: t.$space-5;
-      margin-left: auto;
-      text-align: right;
+      padding-inline-start: auto;
+      padding-inline-end: t.$space-5;
+      margin-inline-start: auto;
+      text-align: end;
       color: t.$textColor-secondary;
     }
   }
