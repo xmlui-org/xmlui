@@ -124,6 +124,27 @@ export function createEventHandlers(config: EventHandlerConfig) {
       options: LookupActionOptions | undefined,
       ...eventArgs: any[]
     ) => {
+      if (!options?.schedulerBypass && appContext.App?.scheduleHandler) {
+        const eventName = options?.eventName?.toString() ?? "handler";
+        const traceId = getCurrentTrace() ?? `h-${generatedId()}`;
+        const spanId = generatedId();
+        let returnValue: any;
+        await appContext.App.scheduleHandler({
+          traceId,
+          spanId,
+          label: `${uid.description ?? "anonymous"}.${eventName}`,
+          handler: async () => {
+            returnValue = await runCodeAsync(
+              source,
+              uid,
+              { ...options, schedulerBypass: true },
+              ...eventArgs,
+            );
+          },
+        });
+        return returnValue;
+      }
+
       // --- Check if the event handler can sign its lifecycle state
       const canSignEventLifecycle = () => {
         return uid.description !== undefined && options?.eventName !== undefined;

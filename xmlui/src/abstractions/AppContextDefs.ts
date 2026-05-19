@@ -366,6 +366,14 @@ export type AppContextObject = {
     compare: (a: string, b: string, options?: Intl.CollatorOptions) => number;
     pluralRules: (value: number, options?: Intl.PluralRulesOptions) => Intl.LDMLPluralRule;
     scheduler: "concurrent" | "fifo";
+    maxQueuedPerTrace: number;
+    setScheduler: (mode: "concurrent" | "fifo", options?: { maxQueuedPerTrace?: number }) => void;
+    scheduleHandler: (task: {
+      traceId: string;
+      spanId: string;
+      label: string;
+      handler: () => Promise<void>;
+    }) => Promise<void>;
   };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the

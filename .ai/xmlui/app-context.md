@@ -84,7 +84,8 @@ Usage: `<HStack visible="{mediaSize.desktop}">` or `<Text>{mediaSize.size}</Text
 
 ### Date Utilities
 
-All functions are wrappers over **date-fns**. Locale follows the machine's system locale.
+All legacy date functions are wrappers over **date-fns**. The active managed locale is exposed
+through `App.locale`; use the `App.format*` helpers for `Intl.*` formatting.
 
 | Function | Signature | Returns | Example Output |
 |---|---|---|---|
@@ -138,6 +139,32 @@ Note: `min` and `max` are NOT in AppContext. Use JavaScript's `Math.min(...arr)`
 | `setNavigationHandlers` | `(onWillNavigate?, onDidNavigate?) => void` | Register navigation lifecycle hooks (used by `App` component). |
 
 ---
+
+### App Namespace (Managed React APIs)
+
+`App` is the managed namespace for APIs that replace direct browser/global access and carry
+diagnostics. Wave 4 adds i18n and scheduler APIs here.
+
+| Name | Type | Description |
+|---|---|---|
+| `App.locale` | `string` | Active BCP-47 locale. |
+| `App.localeSource` | `string` | Winning source: `app`, `user`, `persisted`, `navigator`, or `fallback`. |
+| `App.availableLocales` | `readonly string[]` | Registered bundle locales plus configured locales. |
+| `App.setLocale(locale, options?)` | `void` | Sets app/user locale override and persists user changes when enabled. |
+| `App.registerLocaleBundle(bundle)` | `void` | Registers one `{ locale, messages }` bundle. |
+| `App.registerLocaleBundles(input)` | `Promise<void>` | Registers inline bundles, locale maps, URL strings, or arrays. |
+| `App.reloadLocale(locale)` | `Promise<boolean>` | Reloads a URL-backed bundle when its source is known. |
+| `App.translate(key, vars?)` / `App.t` | `string` | Resolves a bundle key and formats ICU-style variables/plural/select. |
+| `App.isRtlLocale(locale?)` | `boolean` | RTL locale heuristic used by `<App direction="auto">`. |
+| `App.formatNumber` / `formatCurrency` / `formatList` / `formatRelativeTime` | `string` | `Intl.*` format helpers using `App.locale`. |
+| `App.compare` | `number` | `Intl.Collator` comparison using `App.locale`. |
+| `App.pluralRules` | `Intl.LDMLPluralRule` | Plural category for a number. |
+| `App.scheduler` | `"concurrent" \| "fifo"` | Current handler scheduler mode. |
+| `App.maxQueuedPerTrace` | `number` | FIFO queue budget. |
+| `App.setScheduler(mode, options?)` | `void` | Runtime scheduler override. |
+| `App.scheduleHandler(task)` | `Promise<void>` | Internal deterministic handler scheduling hook. |
+
+See `.ai/xmlui/i18n.md` and `.ai/xmlui/determinism.md` for the detailed subsystem notes.
 
 ### Notifications & Dialogs
 
@@ -270,6 +297,7 @@ When the DOM sandbox blocks a raw browser API (see `expression-eval.md` § 2a), 
 | `Clipboard.copy(text)` | `navigator.clipboard.writeText` | `clipboard:copy` |
 | `<WebSocket>` component | `WebSocket` constructor | `ws:connect` / `ws:message` / `ws:error` / `ws:close` |
 | `<EventSource>` component | `EventSource` constructor | `eventsource:connect` / `eventsource:message` / `eventsource:error` / `eventsource:close` |
+| `navigate(to, { target: "_blank" })` | `window.open(url, "_blank")` | `navigate` |
 
 **App-level configuration (in `App.appGlobals` or `config.json`):**
 - `allowedOrigins: string[]` — origin allowlist for `App.fetch` (same-origin always allowed).
@@ -277,13 +305,20 @@ When the DOM sandbox blocks a raw browser API (see `expression-eval.md` § 2a), 
 - `strictDomSandbox: boolean` — `false` (default) emits `sandbox:warn` traces; `true` throws `BannedApiError`.
 - `silentConsole: boolean` — when `true`, `Log.*` skips the underlying `console.*` mirror.
 
-**Wave 0/1 strict-mode toggles** (rolled out behind feature flags; flip to `true` in the next major release):
+**Managed React strict-mode toggles** (rolled out behind feature flags; strict defaults flip in a future major release):
 
 - `strictBuildValidation: boolean` (default `false`) — escalates analyzer diagnostics one severity step (info → warn → error); `xmlui check` exits non-zero on any `error`-severity finding. See plan #13.
 - `strictAccessibility: boolean` (default `false`) — escalates `warn`-level a11y linter findings (`icon-only-button-no-label`, `modal-no-title`, `missing-accessible-name`, `form-input-no-label`, …) to `error`, failing the Vite build. See plan #05.
 - `strictErrors: boolean` (default `false`) — when `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint to use `AppError`. See plan #07.
 - `errorCorrelationIdHeader: string` (default `"X-Correlation-Id"`) — HTTP response header from which `AppError.correlationId` is read on fetch failures.
 - `strictAuditLogging: boolean` (default `false`) — when `true`, the default redaction policy blocks on un-redacted PII fields and the sink behaviour changes from "drop on backpressure" to "bounded buffer then drop with `audit-loss` diagnostic". See plan #15.
+- `strictRouting: boolean` (default `false`) — escalates defended-routing diagnostics from warn to error. See plan #10.
+- `strictI18n: boolean` (default `false`) — escalates missing bundle/key and ICU diagnostics. See plan #11.
+- `defaultLocale: string` (default `"en"`) — fallback locale for `App.locale`.
+- `localePersistKey: string | null` (default `"xmlui.locale"`) — localStorage key for user locale persistence; `null` disables persistence.
+- `strictDeterminism: boolean` (default `false`) — selects FIFO scheduling by default and escalates determinism diagnostics. See plan #16.
+- `scheduler: "concurrent" | "fifo"` (default `"concurrent"`) — handler scheduler mode when strict determinism is off.
+- `maxQueuedPerTrace: number` (default `64`) — per-trace FIFO queue budget.
 
 ---
 

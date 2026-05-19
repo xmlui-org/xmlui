@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode, useMemo } from "react";
 import { isPlainObject } from "lodash-es";
+import { orderedKeys } from "../../components-core/utils/orderedKeys";
 
 // =====================================================================================================================
 // React Items component implementation
@@ -21,7 +22,7 @@ export function Items({ items, renderItem, reverse = defaultProps.reverse }: Pro
     }
     let normalizedItems = items;
     if (isPlainObject(items)) {
-      normalizedItems = Object.values(items);
+      normalizedItems = orderedKeys(items).map((key) => items[key as keyof typeof items]);
     }
     return reverse ? [...normalizedItems].reverse() : normalizedItems;
   }, [items, reverse]);

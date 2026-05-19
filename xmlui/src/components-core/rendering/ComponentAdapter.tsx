@@ -58,6 +58,7 @@ import {
 } from "../theming/responsive-layout";
 import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
+import { enterRenderPhase, exitRenderPhase } from "../scheduler";
 
 /**
  * Invoke the per-component `onError` handler for a lifecycle phase failure.
@@ -79,6 +80,7 @@ function fireOnError(
       stack: error instanceof Error ? error.stack : undefined,
     },
   };
+  enterRenderPhase();
   try {
     const result = handler(payload);
     if (result && typeof (result as PromiseLike<unknown>).then === "function") {
@@ -956,6 +958,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- Mark the potential rendering error and display it
     renderingError = (e as Error)?.message || "Internal error";
     console.error(e);
+  } finally {
+    exitRenderPhase();
   }
 
   // --- The rendering process may result in errors. If so, we render an error message.

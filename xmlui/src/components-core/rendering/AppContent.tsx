@@ -47,6 +47,7 @@ import {
   xmluiEnglishBundle,
   type LocaleBundle,
 } from "../i18n";
+import { createScheduler, type ScheduledTask, type Scheduler } from "../scheduler";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -159,6 +160,8 @@ export function AppContent({
   const programmaticNavigationRef = useRef<string | undefined>();
   const [appLocaleOverride, setAppLocaleOverride] = useState<string | undefined>();
   const [userLocaleOverride, setUserLocaleOverride] = useState<string | undefined>();
+  const [schedulerOverride, setSchedulerOverride] = useState<"concurrent" | "fifo" | undefined>();
+  const [maxQueuedPerTraceOverride, setMaxQueuedPerTraceOverride] = useState<number | undefined>();
   const bundleStoreRef = useRef(createBundleStore([xmluiEnglishBundle]));
   const [bundleVersion, setBundleVersion] = useState(0);
   const bundleSourcesRef = useRef(new Map<string, string>());
@@ -167,6 +170,48 @@ export function AppContent({
   const appGlobals = useMemo(() => {
     return (globalProps ?? EMPTY_OBJECT) as Record<string, any>;
   }, [globalProps]);
+
+  const schedulerMode: "concurrent" | "fifo" =
+    appGlobals?.strictDeterminism === true
+      ? "fifo"
+      : (schedulerOverride ?? appGlobals?.scheduler ?? "concurrent");
+  const maxQueuedPerTrace =
+    maxQueuedPerTraceOverride ??
+    (typeof appGlobals?.maxQueuedPerTrace === "number" ? appGlobals.maxQueuedPerTrace : 64);
+  const schedulerRef = useRef<Scheduler | undefined>();
+  const schedulerConfigRef = useRef<string>("");
+  const schedulerConfigKey = `${schedulerMode}:${maxQueuedPerTrace}:${appGlobals?.strictDeterminism === true}`;
+  if (!schedulerRef.current || schedulerConfigRef.current !== schedulerConfigKey) {
+    schedulerConfigRef.current = schedulerConfigKey;
+    schedulerRef.current = createScheduler(schedulerMode, {
+      maxQueuedPerTrace,
+      strict: appGlobals?.strictDeterminism === true,
+      onDiagnostic: (diagnostic) => {
+        pushXsLog({
+          kind: "scheduler",
+          ts: Date.now(),
+          ...diagnostic,
+        });
+      },
+    });
+  }
+
+  const setScheduler = useCallback((mode: "concurrent" | "fifo", options?: { maxQueuedPerTrace?: number }) => {
+    setSchedulerOverride(mode);
+    if (options?.maxQueuedPerTrace !== undefined) {
+      setMaxQueuedPerTraceOverride(options.maxQueuedPerTrace);
+    }
+  }, []);
+
+  const scheduleHandler = useCallback(
+    (task: Omit<ScheduledTask, "enqueuedAt">) => {
+      return schedulerRef.current!.enqueue({
+        ...task,
+        enqueuedAt: Date.now(),
+      });
+    },
+    [],
+  );
 
   // --- Wrapped navigate function that respects willNavigate/didNavigate events
   // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
@@ -1391,7 +1436,10 @@ export function AppContent({
           compare(a, b, activeLocale.locale, options),
         pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
           pluralRules(value, activeLocale.locale, options),
-        scheduler: appGlobals?.strictDeterminism === true ? "fifo" : (appGlobals?.scheduler ?? "concurrent"),
+        scheduler: schedulerMode,
+        maxQueuedPerTrace,
+        setScheduler,
+        scheduleHandler,
       },
       Clipboard: ClipboardNamespace,
 
@@ -1437,6 +1485,10 @@ export function AppContent({
     reloadLocale,
     translate,
     isRtlLocale,
+    schedulerMode,
+    maxQueuedPerTrace,
+    setScheduler,
+    scheduleHandler,
   ]);
 
   return (

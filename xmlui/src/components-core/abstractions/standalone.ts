@@ -151,8 +151,11 @@ export type StandaloneAppDescription = {
    * - `localePersistKey` (string | null, default `"xmlui.locale"`) — localStorage
    *   key for user-selected locales; `null` disables persistence.
    * - `strictDeterminism` (boolean, default `false`) — when `true`, determinism
-   *   diagnostics escalate and later waves default the scheduler to FIFO. Wave 4
-   *   ships the contract and diagnostics while leaving execution concurrent.
+   *   diagnostics escalate and the handler scheduler defaults to FIFO.
+   * - `scheduler` (`"concurrent" | "fifo"`, default `"concurrent"`) — selects
+   *   immediate handler execution or deterministic per-trace FIFO ordering.
+   * - `maxQueuedPerTrace` (number, default `64`) — bounds deterministic handler
+   *   queues before `determinism-convergence-failed` is emitted.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

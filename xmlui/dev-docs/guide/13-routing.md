@@ -141,6 +141,8 @@ Each `Page` defines one URL route. The `url` prop accepts any react-router v6 pa
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `url` | `string` | — | React Router v6 path pattern. Required. |
+| `queryParams` | `string` | — | Optional query parameter constraints, e.g. `page:int(min=1)?,sort:enum(asc,desc)?`. |
+| `guard` | `function` | — | Optional page-level navigation guard. Return `false` to reject or a redirect string/object to redirect. |
 | `navLabel` | `string` | — | Navigation display label (used internally by NavPanel). |
 
 ### RouteWrapper: Injecting Route Context
@@ -158,17 +160,89 @@ Each Page also wraps its content in a `TableOfContentsProvider` for on-page head
 
 ---
 
+## Defended Routing
+
+Wave 4 adds defended routing on top of React Router. The feature is additive: existing
+unconstrained `Page url` values keep their old string-based behavior.
+
+### Route Constraints
+
+Attach a constraint after a dynamic segment:
+
+```xml
+<Page url="/users/:id:int(min=1)">
+  <Text>User id is a number: {$routeParams.id}</Text>
+</Page>
+
+<Page url="/settings/:tab:enum(profile,billing,security)">
+  <Text>Current tab: {$routeParams.tab}</Text>
+</Page>
+```
+
+Supported constraints are `string`, `int`, `number`, and `enum(...)`. Numeric constraints accept
+optional `min` and `max` parameters. Validated values are coerced before they are exposed through
+`$routeParams`.
+
+### Query Constraints
+
+Use `Page queryParams` to validate query strings:
+
+```xml
+<Page
+  url="/search"
+  queryParams="q:string,page:int(min=1)?,sort:enum(asc,desc)?">
+  <Text>Page {$queryParams.page ?? 1}</Text>
+</Page>
+```
+
+`?` marks a query parameter optional. Required query parameters must be present. Coerced values are
+available through `$queryParams`; `$queryString` exposes the raw URL search string.
+
+Rejected constraints emit `kind:"navigate"` diagnostics with `code:"constraint-rejected"`.
+
+### Page Guards
+
+`Page guard` runs after constraints pass and before the page renders. It receives `to` and `from`
+navigation snapshots. Return values:
+
+| Return | Effect |
+|---|---|
+| `true`, `undefined`, `null` | Allow navigation |
+| `false` | Reject and redirect to `fallbackPath` or `/` |
+| `"/path"` | Redirect |
+| `{ redirect: "/path" }` | Redirect |
+
+Rejected guards emit `code:"guard-bypass-attempt"`.
+
+### URL Canonicalisation
+
+`App` exposes internal canonicalisation props:
+
+```xml
+<App
+  urlCase="lower"
+  urlTrailingSlash="never"
+  urlQueryParamOrder="alphabetical"
+  nonCanonicalUrl="rewrite">
+```
+
+`nonCanonicalUrl="warn"` only logs. `rewrite` and `redirect` currently replace the visible URL with
+the canonical form. Diagnostics use `code:"non-canonical-url"`.
+
+---
+
 ## Routing State Variables
 
-The routing system injects four reactive variables into every component's expression context.
+The routing system injects five reactive variables into every component's expression context.
 These are part of Layer 6 in XMLUI's state composition pipeline and automatically re-evaluate
 when the URL changes.
 
 | Variable | Type | Example Value | Description |
 |---|---|---|---|
 | `$pathname` | `string` | `"/users/123"` | Current URL pathname |
-| `$routeParams` | `object` | `{ id: "123" }` | Dynamic URL segment values |
-| `$queryParams` | `object` | `{ page: "2", sort: "name" }` | Query string parameters |
+| `$routeParams` | `object` | `{ id: 123 }` | Dynamic URL segment values, coerced when constrained |
+| `$queryParams` | `object` | `{ page: 2, sort: "name" }` | Query string parameters, coerced when constrained |
+| `$queryString` | `string` | `"page=2&sort=name"` | Raw query string |
 | `$linkInfo` | `NavHierarchyNode` | `{ label: "Users", to: "/users", ... }` | Navigation metadata for active page |
 
 ### Accessing Route Parameters
@@ -488,7 +562,10 @@ startXmlui({
 | File | Purpose |
 |---|---|
 | [xmlui/src/components/Pages/Pages.tsx](../../xmlui/src/components/Pages/Pages.tsx) | `Pages` + `Page` metadata and renderers |
-| [xmlui/src/components/Pages/PagesNative.tsx](../../xmlui/src/components/Pages/PagesNative.tsx) | `Pages` render logic; `RouteWrapper` |
+| [xmlui/src/components/Pages/PagesReact.tsx](../../xmlui/src/components/Pages/PagesReact.tsx) | `Pages` render logic; `RouteWrapper`; defended-routing checks |
+| [xmlui/src/components-core/routing/constraint-compiler.ts](../../xmlui/src/components-core/routing/constraint-compiler.ts) | Route/query constraint parsing, validation, and coercion |
+| [xmlui/src/components-core/routing/canonicalise.ts](../../xmlui/src/components-core/routing/canonicalise.ts) | URL canonicalisation policy |
+| [xmlui/src/components-core/routing/guard-dispatcher.ts](../../xmlui/src/components-core/routing/guard-dispatcher.ts) | Page guard result handling |
 | [xmlui/src/components-core/rendering/AppWrapper.tsx](../../xmlui/src/components-core/rendering/AppWrapper.tsx) | Router type selection |
 | [xmlui/src/components-core/rendering/AppContent.tsx](../../xmlui/src/components-core/rendering/AppContent.tsx) | `navigate()` and navigation event wiring |
 | [xmlui/src/components-core/state/routing-state.ts](../../xmlui/src/components-core/state/routing-state.ts) | `useRoutingParams()` — injects `$pathname`, `$routeParams`, etc. |
@@ -516,6 +593,10 @@ Without a fallback rule, it returns 404. HashRouter avoids this entirely.
 `new URLSearchParams(window.location.search)` is not reactive — it captures a snapshot and doesn't
 update when the URL changes. Use `$queryParams` instead.
 
+**Expecting constrained params to remain strings:**
+Route/query constraints coerce values. `:id:int` and `page:int` expose numbers through
+`$routeParams` / `$queryParams`.
+
 **Confusing TableOfContentsContext with routing:**
 `TableOfContentsProvider` manages headings within a page; it doesn't affect URL-based navigation.
 These two systems are completely independent.
@@ -531,6 +612,8 @@ because `"/admin"` is an exact path. Use `url="/admin/*"` to allow sub-routes.
 - XMLUI routing wraps **react-router-dom v6** — `Pages` maps to `<Routes>`, `Page` maps to `<Route>`.
 - **HashRouter is the default** and works on any static host. Switch to BrowserRouter for clean URLs, but configure your server accordingly.
 - **`$routeParams`**, **`$queryParams`**, and **`$pathname`** are reactive state variables injected into every expression automatically — no manual hook wiring needed.
+- Defended routing constraints validate and coerce params before page content renders. Failed constraints emit navigation diagnostics.
+- Page `guard` can reject or redirect after validation, before rendering.
 - **`navigate()`** is the programmatic navigation function. Use `navigate(-1)` for back, `navigate(path, { replace: true })` to avoid history entries, and `navigate(path, { queryParams: {...} })` for query strings.
 - The **`willNavigate`** event can cancel navigation, but only fires for `navigate()` calls — not `<Link>` clicks or browser buttons.
 - **`$linkInfo`** from `LinkInfoContext` gives the active page's nav hierarchy node — use it for breadcrumbs, prev/next links, and page titles.

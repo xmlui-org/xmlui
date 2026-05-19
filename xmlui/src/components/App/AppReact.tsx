@@ -111,6 +111,7 @@ type Props = {
   localeBundles?: unknown;
   direction?: "ltr" | "rtl" | "auto";
   scheduler?: "concurrent" | "fifo";
+  maxQueuedPerTrace?: number;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   footerSticky?: boolean;
@@ -182,6 +183,7 @@ export const App = memo(function App({
   localeBundles,
   direction = "auto",
   scheduler,
+  maxQueuedPerTrace,
   renderChild,
   name,
   className,
@@ -248,7 +250,8 @@ export const App = memo(function App({
   useEffect(() => {
     if (typeof document === "undefined" || !scheduler) return;
     document.documentElement.dataset.xmluiScheduler = scheduler;
-  }, [scheduler]);
+    appContext.App?.setScheduler?.(scheduler, { maxQueuedPerTrace });
+  }, [appContext.App, maxQueuedPerTrace, scheduler]);
 
   // Set navigation event handlers
   useEffect(() => {

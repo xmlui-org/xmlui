@@ -145,6 +145,12 @@ export const AppMd = createMetadata({
       defaultValue: "concurrent",
       isInternal: true,
     },
+    maxQueuedPerTrace: {
+      description: "Maximum number of queued handlers allowed per scheduler trace.",
+      valueType: "integer",
+      defaultValue: 64,
+      isInternal: true,
+    },
     urlCase: {
       description: "URL canonicalisation case policy.",
       valueType: "string",
@@ -344,6 +350,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       localeBundles={extractValue(node.props.localeBundles)}
       direction={extractValue.asOptionalString(node.props.direction, "auto")}
       scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
+      maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}
 
       applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader)}

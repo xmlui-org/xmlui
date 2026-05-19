@@ -41,6 +41,10 @@ export type LookupActionOptions = {
 
   // Source character range for inspector logging
   sourceRange?: { start: number; end: number };
+
+  // Internal: prevents the deterministic scheduler wrapper from re-enqueuing
+  // the handler body while it is already being executed by the scheduler.
+  schedulerBypass?: boolean;
 };
 
 // This function resolves an action by its name (within the component node that

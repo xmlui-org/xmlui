@@ -51,8 +51,32 @@ ComponentAdapter.memoedLookupEventHandler(eventName)
   → calls lookupAction(action, uid, options)  [container/action-lookup.ts]
   → getOrCreateEventHandlerFn(src, uid, options)  [event-handler-cache.ts]
   → wraps in: (...args) => runCodeAsync(src, uid, options, ...cloneDeep(args))
+  → runCodeAsync schedules through App.scheduleHandler() unless schedulerBypass is set
   → cached by `eventName;source` key (unless ephemeral or context)
 ```
+
+### Deterministic scheduler integration (Wave 4)
+
+`runCodeAsync()` now routes handler invocation through `App.scheduleHandler()` before executing the
+handler body. The scheduler mode is controlled by `<App scheduler="concurrent | fifo">` and
+`appGlobals.strictDeterminism`.
+
+- `concurrent` preserves legacy behavior: handlers start immediately.
+- `fifo` serializes handlers with the same trace ID in enqueue order.
+- Different trace IDs drain independently.
+- `LookupActionOptions.schedulerBypass` is internal and prevents recursive enqueueing when the
+  scheduler calls back into `runCodeAsync()`.
+
+The handler function returned by `lookupEventHandler` still returns a promise, but mouse/hover event
+wrappers remain fire-and-forget at the DOM boundary. Form and other components that explicitly
+`await` handlers continue to observe completion.
+
+Diagnostics emitted as `kind:"scheduler"`:
+
+| Code | Meaning |
+|---|---|
+| `determinism-handler-reordered` | Concurrent completion order differed from enqueue order. |
+| `determinism-convergence-failed` | FIFO queue exceeded `maxQueuedPerTrace`; new task rejected. |
 
 ### Event lifecycle signals
 

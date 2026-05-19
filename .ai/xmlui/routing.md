@@ -44,7 +44,7 @@ AppWrapper                    → selects Router type (Hash / Browser / Memory)
 
 ## Pages Component
 
-**File:** `xmlui/src/components/Pages/Pages.tsx` + `PagesNative.tsx`
+**File:** `xmlui/src/components/Pages/Pages.tsx` + `PagesReact.tsx`
 
 ### Props
 
@@ -72,6 +72,8 @@ AppWrapper                    → selects Router type (Hash / Browser / Memory)
 | Prop | Type | Default | Notes |
 |---|---|---|---|
 | `url` | `string` | — | React Router v6 path pattern. Required for routing. |
+| `queryParams` | `string` | — | Optional defended-routing query constraint declaration, e.g. `page:int(min=1)?,sort:enum(asc,desc)?`. |
+| `guard` | `function` | — | Optional page-level navigation guard. Return `false` to reject, or `{ redirect: "/path" }` / `"/path"` to redirect. |
 | `navLabel` | `string` | — | Internal. Navigation display label. Used by NavPanel. |
 | `searchIndexable` | `boolean` | `true` | Internal. Whether page content is indexed for search. |
 
@@ -93,12 +95,72 @@ pageRenderer (customRender)
 |---|---|---|
 | Static | `/about` | Exact match |
 | Dynamic segment | `/users/:id` | Captured as `$routeParams.id` |
+| Constrained segment | `/users/:id:int(min=1)` | Validates and coerces `$routeParams.id` to a number. |
 | Multiple segments | `/posts/:postId/comments/:commentId` | Multiple params |
 | Optional segment | `/users/:id?` | Param may be absent |
 | Wildcard | `/files/*` | Matches any suffix |
 | Index (empty) | ` ` / `""` | Matches parent path with no extra segment |
 
 ---
+
+## Defended Routing (Wave 4)
+
+**Files:** `xmlui/src/components-core/routing/*`, `PagesReact.tsx`, `routing-state.ts`
+
+Wave 4 adds a managed validation layer above React Router. It is additive: unconstrained routes
+keep their previous behavior.
+
+### Route and query constraints
+
+Supported constraint forms:
+
+| Constraint | Example | Result |
+|---|---|---|
+| `string` | `:slug:string` | String value |
+| `int` | `:id:int`, `:id:int(min=1,max=999)` | Number value |
+| `number` | `:amount:number(min=0)` | Number value |
+| `enum` | `:tab:enum(profile,billing)` | String limited to allowed values |
+
+Query params use the `Page queryParams` prop:
+
+```xml
+<Page
+  url="/search"
+  queryParams="q:string,page:int(min=1)?,sort:enum(asc,desc)?">
+  <Text>Page {$queryParams.page ?? 1}</Text>
+</Page>
+```
+
+`?` marks a query parameter optional. Required query parameters must be present and pass validation.
+Validated route/query values are injected through `CoercedRouteParamsContext` and
+`CoercedQueryParamsContext`, so `$routeParams` and `$queryParams` expose coerced values where
+constraints exist.
+
+### Page guards
+
+`Page guard` runs after route/query validation and before rendering. It receives the target and
+source navigation snapshots, including coerced `routeParams` and `queryParams`.
+
+Accepted guard results:
+- `false` rejects navigation.
+- `null`, `undefined`, or `true` allows navigation.
+- A string redirects to that path.
+- An object with `redirect` redirects to that path.
+
+Rejected guards emit a `kind: "navigate"` trace with a `guard-bypass-attempt` routing diagnostic.
+
+### URL canonicalisation
+
+`App` exposes internal URL policy props:
+
+| Prop | Values | Effect |
+|---|---|---|
+| `urlCase` | `preserve`, `lower` | Lowercase path when configured. |
+| `urlTrailingSlash` | `preserve`, `always`, `never` | Normalize trailing slash. |
+| `urlQueryParamOrder` | `preserve`, `alphabetical` | Normalize query parameter order. |
+| `nonCanonicalUrl` | `warn`, `rewrite`, `redirect` | Emit diagnostic, then optionally replace URL. |
+
+Non-canonical URLs emit `routingDiagnostic.code === "non-canonical-url"`.
 
 ## Routing State Variables (Layer 6)
 
@@ -109,8 +171,9 @@ Injected as `useRoutingParams()` — available in every component expression aut
 | Variable | Type | Source | Description |
 |---|---|---|---|
 | `$pathname` | `string` | `useLocation().pathname` | Current URL path (e.g., `"/users/123"`) |
-| `$routeParams` | `Record<string, string>` | `useParams()` | Dynamic segment values (e.g., `{ id: "123" }`) |
-| `$queryParams` | `Record<string, string>` | `useSearchParams()` | Query string values (e.g., `{ page: "1" }`) |
+| `$routeParams` | `Record<string, unknown>` | `useParams()` + coerced route constraints | Dynamic segment values (e.g., `{ id: 123 }` when constrained as `int`) |
+| `$queryParams` | `Record<string, unknown>` | `useSearchParams()` + coerced query constraints | Query string values (e.g., `{ page: 1 }` when constrained as `int`) |
+| `$queryString` | `string` | `useLocation().search` | Raw query string without parsing. |
 | `$linkInfo` | `NavHierarchyNode \| {}` | `LinkInfoContext` | Nav metadata for the current page |
 
 All four variables are memoized — expressions re-evaluate only when routing state actually changes.
@@ -276,7 +339,10 @@ When `<Pages defaultScrollRestoration={true}>`:
 | File | Role |
 |---|---|
 | `xmlui/src/components/Pages/Pages.tsx` | `Pages` + `Page` metadata (props, descriptions) |
-| `xmlui/src/components/Pages/PagesNative.tsx` | `Pages` render logic; `RouteWrapper` component |
+| `xmlui/src/components/Pages/PagesReact.tsx` | `Pages` render logic; `RouteWrapper` component |
+| `xmlui/src/components-core/routing/constraint-compiler.ts` | Route/query constraint parser, validator, coercer |
+| `xmlui/src/components-core/routing/canonicalise.ts` | URL canonicalisation policy |
+| `xmlui/src/components-core/routing/guard-dispatcher.ts` | Page guard result normalization |
 | `xmlui/src/components-core/rendering/AppWrapper.tsx` | Router selection (Hash/Browser/Memory) |
 | `xmlui/src/components-core/rendering/AppContent.tsx` | `navigate()` implementation, navigation events |
 | `xmlui/src/components-core/state/routing-state.ts` | `useRoutingParams()` — routing state Layer 6 |
