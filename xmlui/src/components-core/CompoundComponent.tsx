@@ -20,6 +20,14 @@ import {
   extractMinimalCycle,
   useCompoundDepth,
 } from "./CompoundComponentDepthContext";
+import {
+  buildScopeGate,
+  narrowCapabilities,
+  parseCapabilityList,
+  validateUdcPropReferences,
+  type UdcContract,
+  type UdcDiagnostic,
+} from "./udc-sandbox";
 
 // Tracks component types that have already emitted the layout-forward warning
 // so the warning fires only once per type (development builds only).
@@ -31,6 +39,7 @@ type CompoundComponentProps = {
   // The API of the compound component
   api?: Record<string, any>;
   scriptCollected?: CollectedDeclarations;
+  contract?: UdcContract;
 } & RendererContext;
 
 // Acts as a bridge between a compound component definition and its renderer.
@@ -43,6 +52,7 @@ export const CompoundComponent = forwardRef(
       compound,
       api,
       scriptCollected,
+      contract,
       renderChild,
       extractValue,
       layoutContext,
@@ -104,32 +114,77 @@ export const CompoundComponent = forwardRef(
 
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
 
-    // --- Wrap the `component` part with a container that manages the
-    const containerNode: ContainerWrapperDef = useMemo(() => {
-      const { loaders, vars, functions, scriptError, ...rest } = compound;
+    const udcContract = contract ?? ((compound as any).contract as UdcContract | undefined);
+    const strictUdcSandbox =
+      appContext?.appGlobals?.strictUdcSandbox === true ||
+      (udcContract?.trust === "untrusted" && appContext?.appGlobals?.udcTrust === "strict");
 
-      // Extract global variable keys from globalVars to set as 'uses'
-      // This ensures the compound component only inherits globals, not parent's local vars
-      const globalKeys = globalVars
-        ? Object.keys(globalVars).filter((k) => !k.startsWith("__"))
-        : undefined;
+    const emitUdcDiagnostic = useEvent((diagnostic: UdcDiagnostic) => {
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: getCurrentTrace(),
+        kind: "udc",
+        trust: udcContract?.trust,
+        ...diagnostic,
+      });
+      if (diagnostic.severity === "error") {
+        console.error(`[XMLUI UDC] ${diagnostic.message}`);
+      } else if (diagnostic.severity === "warn") {
+        console.warn(`[XMLUI UDC] ${diagnostic.message}`);
+      }
+    });
 
-      return {
-        type: "Container",
-        api,
-        scriptCollected,
-        loaders: loaders,
-        vars,
-        functions: functions,
-        scriptError: scriptError,
-        containerUid: uid,
-        uses: globalKeys, // Only inherit global variables, not local parent vars
-        props: {
-          debug: (compound as any).debug || (compound.props as any)?.debug,
-        },
-        children: [rest],
-      };
-    }, [api, compound, scriptCollected, uid, globalVars]);
+    const effectiveContract = useMemo(() => {
+      if (!udcContract) return undefined;
+      const requestedCapabilities = node.props?.capabilities;
+      if (typeof requestedCapabilities !== "string") {
+        return udcContract;
+      }
+      const narrowed = narrowCapabilities(
+        udcContract,
+        parseCapabilityList(requestedCapabilities),
+        strictUdcSandbox,
+      );
+      narrowed.diagnostics.forEach(emitUdcDiagnostic);
+      return narrowed.contract;
+    }, [udcContract, emitUdcDiagnostic, node.props?.capabilities, strictUdcSandbox]);
+
+    if (effectiveContract) {
+      validateUdcPropReferences(compound as any, strictUdcSandbox, emitUdcDiagnostic);
+      if (effectiveContract.trust === "untrusted") {
+        const trustMode = appContext?.appGlobals?.udcTrust;
+        const missingDeclarations =
+          effectiveContract.props.size === 0 &&
+          effectiveContract.events.size === 0 &&
+          effectiveContract.methods.size === 0 &&
+          effectiveContract.slots.size === 0;
+        if (
+          trustMode === "review" ||
+          trustMode === "strict" ||
+          missingDeclarations ||
+          !effectiveContract.capabilitiesDeclared
+        ) {
+          emitUdcDiagnostic({
+            code: "udc-untrusted-violation",
+            severity:
+              trustMode === "strict" ||
+              missingDeclarations ||
+              !effectiveContract.capabilitiesDeclared
+                ? "error"
+                : "warn",
+            udc: effectiveContract.name,
+            message: `UDC "${effectiveContract.name}" is untrusted and requires review before use.`,
+            data: {
+              trust: effectiveContract.trust,
+              capabilities: Array.from(effectiveContract.capabilities),
+              missingDeclarations,
+              capabilitiesDeclared: effectiveContract.capabilitiesDeclared === true,
+            },
+          });
+        }
+      }
+    }
 
     const emitEvent = useEvent((eventName, ...args) => {
       const handler = lookupEventHandler(eventName);
@@ -173,6 +228,62 @@ export const CompoundComponent = forwardRef(
       return hasAny ? result : undefined;
     }, [contextVars]);
 
+    // --- Wrap the `component` part with a container that manages the
+    const containerNode: ContainerWrapperDef = useMemo(() => {
+      const { loaders, vars, functions, scriptError, ...rest } = compound;
+
+      // Extract global variable keys from globalVars to set as 'uses'
+      // This ensures the compound component only inherits globals, not parent's local vars
+      const globalKeys = globalVars
+        ? Object.keys(globalVars).filter((k) => !k.startsWith("__"))
+        : undefined;
+
+      const gate = effectiveContract
+        ? buildScopeGate(
+            effectiveContract,
+            strictUdcSandbox,
+            Object.keys(propagatedContextVars ?? {}),
+          )
+        : undefined;
+      const scopeDiagnostics: UdcDiagnostic[] = [];
+      const scopedGlobalKeys = globalKeys?.filter((key) => {
+        if (!gate || gate.canRead(key)) return true;
+        const diagnostic = gate.createDiagnostic(key);
+        scopeDiagnostics.push(diagnostic);
+        if (diagnostic.severity !== "error") return false;
+        gate.assertCanRead(key);
+        return false;
+      });
+      scopeDiagnostics.forEach(emitUdcDiagnostic);
+
+      return {
+        type: "Container",
+        api,
+        scriptCollected,
+        loaders: loaders,
+        vars,
+        functions: functions,
+        scriptError: scriptError,
+        containerUid: uid,
+        uses: scopedGlobalKeys, // Only inherit permitted globals, not local parent vars
+        udcContract: effectiveContract,
+        props: {
+          debug: (compound as any).debug || (compound.props as any)?.debug,
+        },
+        children: [rest],
+      };
+    }, [
+      api,
+      compound,
+      effectiveContract,
+      emitUdcDiagnostic,
+      propagatedContextVars,
+      scriptCollected,
+      strictUdcSandbox,
+      uid,
+      globalVars,
+    ]);
+
     const vars = useMemo(() => {
       return {
         $props: resolvedProps,
@@ -182,7 +293,14 @@ export const CompoundComponent = forwardRef(
         hasEventHandler,
         updateState,
       };
-    }, [containerNode.vars, emitEvent, hasEventHandler, propagatedContextVars, resolvedProps, updateState]);
+    }, [
+      containerNode.vars,
+      emitEvent,
+      hasEventHandler,
+      propagatedContextVars,
+      resolvedProps,
+      updateState,
+    ]);
     const stableVars = useShallowCompareMemoize(vars);
 
     // --- Inject implicit variable into the container of the compound component

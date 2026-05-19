@@ -4,6 +4,8 @@ import type { ParseResult } from "../../parsers/xmlui-parser/parser";
 import type { Project } from "../base/project";
 import type { DocumentUri, DocumentCursor } from "../base/text-document";
 import { analyze } from "../../components-core/analyzer/walker";
+import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
+import { getReactiveCycleDiagnostics } from "./reactive-cycle-diagnostic";
 
 export type DiagnosticsContext = {
   cursor: DocumentCursor;
@@ -47,7 +49,24 @@ function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
     }
   }
 
-  return [...parserDiags, ...analyzerDiags];
+  return [...parserDiags, ...analyzerDiags, ...reactiveCycleDiags(ctx)];
+}
+
+/**
+ * Reactive cycle detection — Plan #03 Step 3.3 (W6-7).
+ *
+ * Re-parses the document into a `ComponentDef` (cheap; cached parsers are
+ * not threaded through this code path yet) and runs the cycle detector.
+ * Failures are swallowed inside `getReactiveCycleDiagnostics`.
+ */
+function reactiveCycleDiags(ctx: DiagnosticsContext): Diagnostic[] {
+  if (!ctx.source) return [];
+  try {
+    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
+    return getReactiveCycleDiagnostics(component);
+  } catch {
+    return [];
+  }
 }
 
 export function errorToLspDiag(e: ParserDiag, cursor: DocumentCursor): Diagnostic {

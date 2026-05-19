@@ -74,7 +74,14 @@ export function LoaderComponent({
 
   // --- Memoizes the value extractor object
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+    return createValueExtractor(
+      state,
+      appContext,
+      referenceTrackedApi,
+      memoedVarsRef,
+      fnDeps,
+      (appContext as any)?.__udcEvalOptions,
+    );
   }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Memoizes the action resolution by action definition value
@@ -162,7 +169,12 @@ function loaderIsRefetchingChanged(uid: symbol, isRefetching: boolean) {
 }
 
 // Signs that a particular loader (`uid`) has just fetched its data (`pageInfo`) successfully.
-function loaderLoaded(uid: symbol, data: any, pageInfo?: any, responseHeaders?: Record<string, string>) {
+function loaderLoaded(
+  uid: symbol,
+  data: any,
+  pageInfo?: any,
+  responseHeaders?: Record<string, string>,
+) {
   return {
     type: ContainerActionKind.LOADER_LOADED,
     payload: {

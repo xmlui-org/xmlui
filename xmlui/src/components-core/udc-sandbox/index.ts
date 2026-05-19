@@ -15,10 +15,23 @@ export type {
   UdcSlotDecl,
 } from "./contract";
 export { emptyContract } from "./contract";
+export {
+  ALL_UDC_CAPABILITIES,
+  isUdcCapability,
+  parseCapabilityList,
+  parseProvidesList,
+} from "./contract";
 export type { UdcScopeGate } from "./scope";
-export { buildScopeGate } from "./scope";
+export { UdcScopeError, buildScopeGate } from "./scope";
 export type { CapabilityGateResult } from "./capability";
-export { gateCapability } from "./capability";
+export {
+  UdcCapabilityError,
+  assertCapability,
+  capabilityForAppMember,
+  capabilityForRootIdentifier,
+  gateCapability,
+  narrowCapabilities,
+} from "./capability";
 export type { SerializedUdcContract, UdcManifest } from "./manifest";
-export { loadManifest } from "./manifest";
+export { compareManifest, loadManifest, serializeContract } from "./manifest";
 export { validateUdcPropReferences } from "./validators";

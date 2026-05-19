@@ -7,6 +7,7 @@ import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
+import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { layoutOptionKeys } from "../descriptorHelper";
@@ -27,6 +28,7 @@ export function extractParam(
   appContext: AppContextObject | undefined = undefined,
   strict: boolean = false, // --- In this case we only allow string binding expression
   extractContext: { didResolve: boolean } = { didResolve: false },
+  evalOptions: EvalTreeOptions = {},
 ): any {
   if (typeof param === "string") {
     const paramSegments = parseParameterString(param);
@@ -67,6 +69,7 @@ export function extractParam(
           appContext,
           options: {
             defaultToOptionalMemberAccess: true,
+            ...evalOptions,
           },
         });
       }
@@ -83,6 +86,7 @@ export function extractParam(
           appContext,
           options: {
             defaultToOptionalMemberAccess: true,
+            ...evalOptions,
           },
         });
         if (exprValue?.toString) {
@@ -103,7 +107,7 @@ export function extractParam(
   if (Array.isArray(param)) {
     const arrayExtractContext = { didResolve: false };
     let resolvedChildren = param.map((childParam) =>
-      extractParam(state, childParam, appContext, false, arrayExtractContext),
+      extractParam(state, childParam, appContext, false, arrayExtractContext, evalOptions),
     );
     if (arrayExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -117,7 +121,14 @@ export function extractParam(
     const objectExtractContext = { didResolve: false };
     const substitutedObject: Record<string, any> = {};
     Object.entries(param).forEach(([key, value]) => {
-      substitutedObject[key] = extractParam(state, value, appContext, false, objectExtractContext);
+      substitutedObject[key] = extractParam(
+        state,
+        value,
+        appContext,
+        false,
+        objectExtractContext,
+        evalOptions,
+      );
     });
     if (objectExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -213,7 +224,10 @@ export function resolveResponsiveWhen(
       // This ensures SSR output includes the component for crawlers and initial HTML.
       const isVisibleAtAnyBreakpoint = MediaBreakpointKeys.some((bp) => {
         if (responsiveWhen[bp] === undefined) return false;
-        return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+        return (
+          asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ??
+          true
+        );
       });
       if (isVisibleAtAnyBreakpoint) {
         // TODO (Point 2): Generate a responsive CSS class (e.g. via a media-query stylesheet)
@@ -234,7 +248,10 @@ export function resolveResponsiveWhen(
   for (let i = sizeIndex; i >= 0; i--) {
     const bp = MediaBreakpointKeys[i];
     if (responsiveWhen[bp] !== undefined) {
-      return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+      return (
+        asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ??
+        true
+      );
     }
   }
 
@@ -252,7 +269,8 @@ export function resolveResponsiveWhen(
   for (const bp of MediaBreakpointKeys) {
     if (responsiveWhen![bp] !== undefined) {
       const lowestValue =
-        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ?? true;
+        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ??
+        true;
       return !lowestValue;
     }
   }
@@ -314,9 +332,7 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
  * @param nodeProps properties to clean
  * @returns only component-specific properties
  */
-export function removeStylesFromProps(
-  nodeProps: Record<string, any>,
-) {
+export function removeStylesFromProps(nodeProps: Record<string, any>) {
   if (nodeProps.hasOwnProperty("style")) {
     delete nodeProps["style"];
   }
@@ -358,11 +374,7 @@ export class PropsTrasform<T extends NodeProps> {
 
   private usedKeys: (keyof T)[] = [];
 
-  constructor(
-    extractValue: ValueExtractor,
-    extractResourceUrl: ResourceUrlExtractor,
-    props: T,
-  ) {
+  constructor(extractValue: ValueExtractor, extractResourceUrl: ResourceUrlExtractor, props: T) {
     this.extractValue = extractValue;
     this.extractResourceUrl = extractResourceUrl;
     this.nodeProps = removeStylesFromProps(props) as T;

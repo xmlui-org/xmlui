@@ -14,6 +14,7 @@ import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { coerceValue, verifyValue } from "../type-contracts/rules/coerce";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 import type { FnDeps } from "../FnDepsContext";
+import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -94,6 +95,7 @@ export function createValueExtractor(
   referenceTrackedApi: Record<string, ComponentApi>,
   memoedVarsRef: MutableRefObject<MemoedVars>,
   fnDeps: FnDeps = {},
+  evalOptions: EvalTreeOptions = {},
 ): ValueExtractor {
   // --- Extract the parameter and retrieve as is is
   const extractor = (expression?: any, strict?: boolean): any => {
@@ -130,7 +132,7 @@ export function createValueExtractor(
         obtainValue: memoizeOne(
           (expression, state, appContext, strict, deps, appContextDeps) => {
             // console.log("COMP, BUST, obtain value called with", expression, state, appContext, deps,  appContextDeps);
-            return extractParam(state, expression, appContext, strict);
+            return extractParam(state, expression, appContext, strict, undefined, evalOptions);
           },
           (
             [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],

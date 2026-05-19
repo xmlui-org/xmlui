@@ -512,13 +512,18 @@ export function AppContent({
     onInit?.();
   }, [onInit]);
 
-  // --- Reactive cycle detection — Plan #03 Phase 1 (warn-only probe).
-  // --- Runs once per AppContent mount, after children have been mounted.
-  // --- Detects cycles in the var/function/loader dependency graph and emits
-  // --- one `kind: "reactive-cycle"` trace entry per unique cycle. In strict
-  // --- mode (`appGlobals.strictReactiveGraph === true`), the entry is logged
-  // --- as a console.error in addition to the trace. Strict-mode toast and
-  // --- LSP/Vite enforcement land in W6.
+  // --- Reactive cycle detection — Plan #03.
+  // --- Phase 1 (W2-7) probe: runs once per AppContent mount, after children
+  // --- have been mounted; detects cycles in the var/function/loader
+  // --- dependency graph and emits one `kind:"reactive-cycle"` trace entry
+  // --- per unique cycle.
+  // --- Phase 2 (W6-7) enforcement: when
+  // --- `appGlobals.strictReactiveGraph === true`, `warn`-severity hits
+  // --- escalate to `severity:"error"`, fire a `console.error`, and surface
+  // --- a single dismissable `toast.error()` per cycle so authors see the
+  // --- failure even with the inspector closed. `info`-severity
+  // --- (pure-conditional) cycles never toast and never escalate; they
+  // --- continue to log at info level only.
   const reportedCyclesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!rootContainer) return;
@@ -544,7 +549,12 @@ export function AppContent({
       seen.add(id);
 
       const message = formatCycle(hit);
-      const severity = strict ? "error" : (hit.severity ?? "warn");
+      const hitSeverity = hit.severity ?? "warn";
+      // Strict mode escalates `warn` (true cycles) to `error`; `info`
+      // (pure-conditional) hits keep their original severity so they
+      // never block a build / pop a toast.
+      const severity =
+        strict && hitSeverity === "warn" ? "error" : hitSeverity;
 
       // Always make the cycle visible in the dev console so it shows up
       // even when xsVerbose is off (this is the warn-mode probe).
@@ -553,6 +563,19 @@ export function AppContent({
           console.error(`[xmlui]\n${message}`);
         } else if (console.warn) {
           console.warn(`[xmlui]\n${message}`);
+        }
+      }
+
+      // Phase 2 (W6-7): strict-mode one-shot toast so the author sees
+      // the failure even with the inspector closed. Dedup is by `cycleId`
+      // (already enforced by `seen` above — each cycle toasts at most once
+      // per session).
+      if (severity === "error") {
+        try {
+          toast.error(message, { id: `reactive-cycle:${id}`, duration: 8000 });
+        } catch {
+          // Toast container may not be mounted yet — silent fallback;
+          // the console.error and trace entry above are authoritative.
         }
       }
 

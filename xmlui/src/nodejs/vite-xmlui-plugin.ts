@@ -17,6 +17,12 @@ import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import { analyze } from "../components-core/analyzer/walker";
+import {
+  collectComponentDefGraph,
+  findCycles,
+  formatCycle,
+  cycleHash,
+} from "../components-core/reactive-graph";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -31,6 +37,22 @@ export type PluginOptions = {
    *   diagnostics cause the build to fail.
    */
   analyze?: AnalyzeMode;
+  /**
+   * Control reactive-cycle detection at build time — Plan #03 Step 3.4
+   * (W6-7). When omitted, defaults to `"warn"` (or `"strict"` when
+   * `analyze === "strict"`).
+   *
+   * - `"off"` — cycle detector disabled.
+   * - `"warn"` — cycles produce `this.warn(...)`; the build succeeds.
+   * - `"strict"` — `severity:"warn"` cycles call `this.error(...)`,
+   *   failing the build. `severity:"info"` (pure-conditional) cycles
+   *   always remain warnings.
+   *
+   * Per-file analysis only at present: each XMLUI file is analysed
+   * independently inside `transform`. Cross-file cycles (cycles that
+   * span compound-component boundaries) are not yet detected here.
+   */
+  reactiveCycles?: AnalyzeMode;
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -43,6 +65,11 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
   let projectRoot = "";
   const analyzeMode: AnalyzeMode = pluginOptions.analyze ?? "warn";
+  const cyclesMode: AnalyzeMode =
+    pluginOptions.reactiveCycles ?? (analyzeMode === "strict" ? "strict" : "warn");
+  // Dedupe cycle reports across multiple transform calls / HMR within a
+  // single dev-server lifetime, so the same cycle is not warned twice.
+  const reportedCycles = new Set<string>();
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
@@ -131,6 +158,46 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             }
           } catch (_analyzerErr) {
             // Analyzer errors must never break the build
+          }
+        }
+
+        // --- Reactive cycle detection — Plan #03 Step 3.4 (W6-7).
+        // Per-file pass: build the graph from this file's `ComponentDef`
+        // and report any cycles found. Cross-file cycles (cycles that
+        // close through a compound component imported from another file)
+        // are intentionally left for a future `buildEnd` pass; the per-
+        // file pass already catches the common cases.
+        if (cyclesMode !== "off" && component) {
+          let cycleHits: ReturnType<typeof findCycles> | null = null;
+          try {
+            const root =
+              (component as any).component &&
+              typeof (component as any).component === "object"
+                ? (component as any).component
+                : (component as any);
+            const graph = collectComponentDefGraph(root);
+            cycleHits = findCycles(graph);
+          } catch (_cyclesErr) {
+            // Analyzer failure must never break the build.
+            cycleHits = null;
+          }
+          // Reporting is outside the try/catch so an explicit `this.error`
+          // (strict mode) is not swallowed.
+          if (cycleHits && cycleHits.length > 0) {
+            const strictCycles = cyclesMode === "strict";
+            for (const hit of cycleHits) {
+              const id = cycleHash(hit);
+              if (reportedCycles.has(id)) continue;
+              reportedCycles.add(id);
+              const message = `[xmlui:reactive-cycle] ${fileId}\n${formatCycle(hit)}`;
+              // `severity:"info"` (pure-conditional) cycles never fail
+              // the build — they are advisory only.
+              if (strictCycles && (hit.severity ?? "warn") === "warn") {
+                this.error(message);
+              } else {
+                this.warn(message);
+              }
+            }
           }
         }
         const file = {

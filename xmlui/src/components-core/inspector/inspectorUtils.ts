@@ -281,6 +281,21 @@ export interface XsLogEntry {
    *   `severity: "info" | "warn" | "error"`, `udc` (the component name),
    *   optional `file` / `line` / `column`, and `message`. Severity
    *   escalates to `error` when `App.appGlobals.strictUdcSandbox` is truthy.
+   * - `"versioning"` — versioning diagnostic (plan #12) emitted by the
+   *   versioning verifier at parse / runtime when markup references
+   *   deprecated, removed, renamed, experimental, or internal API
+   *   elements. Contains `code: VersioningDiagnosticCode` (one of
+   *   `deprecated-component`, `deprecated-prop`, `deprecated-event`,
+   *   `deprecated-method`, `deprecated-value`, `removed-prop`,
+   *   `renamed-prop`, `experimental-use`, `default-value-changed`,
+   *   `internal-component-use`), `severity: "info" | "warn" | "error"`,
+   *   optional `componentName` / `propName` / `eventName` /
+   *   `methodName` / `deprecatedSince` / `removedIn` / `replacement`,
+   *   and `message`. Severity escalates from `warn` to `error` for
+   *   `removed-prop` and `internal-component-use` when
+   *   `App.appGlobals.strictVersioning` is truthy. Per-session
+   *   deduplication by `(componentName, propName, code)` keeps the
+   *   trace bounded.
    */
   kind?: string;
   eventName?: string;

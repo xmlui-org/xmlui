@@ -2,6 +2,7 @@ import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import type { ArrowExpression, Statement } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
+import type { UdcCapability, UdcContract, UdcDiagnostic } from "../udc-sandbox";
 
 /**
  * A function that resolves a module name to the text of the module
@@ -38,7 +39,7 @@ export type BindingTreeEvaluationContext = {
   eventArgs?: any[];
 
   // --- Cached closure contexts for arrow expressions
-  closureContexts?: Map<ArrowExpression, BlockScope[]>
+  closureContexts?: Map<ArrowExpression, BlockScope[]>;
 
   // --- Use this context wrapper with function that support implicit context
   implicitContextGetter?: ImplicitContextGetter;
@@ -50,16 +51,30 @@ export type BindingTreeEvaluationContext = {
   onWillAccess?: (scope: any, index: string | number) => void | Promise<void>;
 
   // --- Call this method when a non-local variable is updated
-  onWillUpdate?: (scope: any, index: string | number, updateType: UpdateType) => void | Promise<void>;
+  onWillUpdate?: (
+    scope: any,
+    index: string | number,
+    updateType: UpdateType,
+  ) => void | Promise<void>;
 
   // --- Call this method after a non-local variable has been updated
-  onDidUpdate?: (scope: any, index: string | number, updateType: UpdateType) => void | Promise<void>;
+  onDidUpdate?: (
+    scope: any,
+    index: string | number,
+    updateType: UpdateType,
+  ) => void | Promise<void>;
 
   // --- Sign that a particular statement has started
-  onStatementStarted?(evalContext: BindingTreeEvaluationContext, stmt: Statement): void | Promise<void>;
+  onStatementStarted?(
+    evalContext: BindingTreeEvaluationContext,
+    stmt: Statement,
+  ): void | Promise<void>;
 
   // --- Sign that a particular statement has completed
-  onStatementCompleted?(evalContext: BindingTreeEvaluationContext, stmt: Statement): void | Promise<void>;
+  onStatementCompleted?(
+    evalContext: BindingTreeEvaluationContext,
+    stmt: Statement,
+  ): void | Promise<void>;
 };
 
 // --- The type of non-local variable update
@@ -71,11 +86,11 @@ type UpdateType = "assignment" | "pre-post" | "function-call";
 class CancellationToken {
   private _cancelled = false;
 
-  public get cancelled (): boolean {
+  public get cancelled(): boolean {
     return this._cancelled;
   }
 
-  public cancel (): void {
+  public cancel(): void {
     this._cancelled = true;
   }
 }
@@ -111,6 +126,15 @@ export type EvalTreeOptions = {
    * Set via `App.appGlobals.allowConsole` in config.json or the App component.
    */
   allowConsole?: boolean;
+  /**
+   * Optional UDC sandbox contract active for this evaluation. When present,
+   * managed primitive reads (`App.fetch`, `Clipboard.copy`, `Log.*`,
+   * `navigate`, etc.) are checked against the contract capability set.
+   */
+  udcContract?: UdcContract;
+  strictUdcSandbox?: boolean;
+  udcDiagnosticLogger?: (diagnostic: UdcDiagnostic) => void;
+  udcCapabilityMapper?: (root: string, member?: string) => UdcCapability | undefined;
 };
 
 // This function gets an object to pass as an implicit context when invoking a function on "objectWithFunction"
@@ -121,17 +145,19 @@ type ImplicitContextGetter = (objectWithFunction: any) => ActionExecutionContext
  * @param parts Parts of the evaluation context
  * @returns New evaluation context
  */
-export function createEvalContext (parts: Partial<BindingTreeEvaluationContext>): BindingTreeEvaluationContext {
+export function createEvalContext(
+  parts: Partial<BindingTreeEvaluationContext>,
+): BindingTreeEvaluationContext {
   return {
     ...{
       mainThread: {
         childThreads: [],
         blocks: [{ vars: {} }],
         loops: [],
-        breakLabelValue: -1
+        breakLabelValue: -1,
       },
-      localContext: {}
+      localContext: {},
     },
-    ...parts
+    ...parts,
   };
 }

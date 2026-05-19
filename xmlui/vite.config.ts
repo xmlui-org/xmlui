@@ -233,11 +233,17 @@ export default ({ mode = "lib" }) => {
     }
   }
 
+  const dtsPlugin = () =>
+    dts({
+      rollupTypes: true,
+      exclude: ["tests/**", "tests-e2e/**"],
+    });
+
   let plugins: PluginOption[] = [];
   if (mode === "metadata") {
     plugins = [ViteXmlui()];
   } else if (mode === "inspector-parser") {
-    plugins = [dts({ rollupTypes: true }) as Plugin];
+    plugins = [dtsPlugin() as Plugin];
   } else if (mode === "standalone") {
     plugins = [
       react(),
@@ -245,7 +251,7 @@ export default ({ mode = "lib" }) => {
       ViteYaml(),
       ViteXmlui({}),
       cssInjectedByJsPlugin(),
-      dts({ rollupTypes: true }),
+      dtsPlugin(),
     ] as Plugin[];
   } else {
     plugins = [
@@ -254,7 +260,7 @@ export default ({ mode = "lib" }) => {
       ViteYaml(),
       ViteXmlui({}),
       libInjectCss(),
-      dts({ rollupTypes: true }),
+      dtsPlugin(),
     ] as Plugin[];
   }
 
