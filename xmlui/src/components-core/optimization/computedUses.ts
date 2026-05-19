@@ -169,34 +169,62 @@ function rootIdentifier(dep: string): string {
   return dep.slice(0, Math.min(dot, bracket));
 }
 
-function depsOfValue(value: unknown): string[] {
+/**
+ * Returns dependencies for a value. The `all` set includes every identifier
+ * that must be present in scope at runtime — reads AND assignment targets.
+ * The `reads` set only includes identifiers whose VALUES are actually consumed
+ * (RHS reads, member-access roots, etc.). The difference between the two is
+ * the "write-only targets" — identifiers that appear only as the LHS of an
+ * assignment and whose value is never read by this expression.
+ *
+ * Why two sets?
+ *   • `all` decides what `computedUses` lists, because the script engine
+ *     throws "Left value variable not found in the scope" if an assignment
+ *     target is missing from scope.
+ *   • `reads` decides whether to promote a component to an implicit container
+ *     (Select/List/Table/DataGrid). An implicit container exists to enable
+ *     re-renders when its parent state changes — and write-only targets do
+ *     not need to trigger re-renders (the handler writes them, it does not
+ *     read them). Promoting a component to a container based on write-only
+ *     deps adds an unnecessary StateContainer wrapper that can break the
+ *     component's internal lifecycle (e.g. Select's clearable state).
+ */
+function depsOfValue(value: unknown): { all: string[]; reads: string[] } {
   try {
-    if (value === null || value === undefined) return [];
+    if (value === null || value === undefined) return { all: [], reads: [] };
     if (isParsedValue(value)) {
-      return (collectVariableDependencies((value as CodeDeclaration).tree) ?? []).map(rootIdentifier);
+      const tree = (value as CodeDeclaration).tree;
+      const all = (
+        collectVariableDependencies(tree, {}, { includeAssignmentTargets: true }) ?? []
+      ).map(rootIdentifier);
+      const reads = (collectVariableDependencies(tree) ?? []).map(rootIdentifier);
+      return { all, reads };
     }
     if (typeof value === "object") {
       const obj = value as Record<string, unknown>;
-      // Raw event handler AST: has a `statements` array.
-      // Try the fast path first; fall back to structural walk for string-discriminator ASTs.
       if (obj.statements && Array.isArray(obj.statements)) {
-        // Detect string-discriminator ASTs (e.g. from tests or JSON-serialised event handlers).
-        // collectVariableDependencies only handles numeric-discriminator ASTs; for string-
-        // discriminator ASTs it silently returns [] without throwing, so we must check the
-        // format explicitly before deciding which path to take.
         const hasStringDiscriminators =
           obj.statements.length > 0 &&
           typeof (obj.statements[0] as any)?.type === "string";
         if (hasStringDiscriminators) {
-          return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+          // gatherIdentifiers collects every Identifier node regardless of position
+          // (RHS, LHS, member-access root) — string-discriminator ASTs use it for
+          // both sets, because we lack the structured visitor for that format.
+          const ids = Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+          return { all: ids, reads: ids };
         }
         try {
-          return (collectVariableDependencies(obj.statements) ?? []).map(rootIdentifier);
+          const all = (
+            collectVariableDependencies(obj.statements, {}, { includeAssignmentTargets: true }) ?? []
+          ).map(rootIdentifier);
+          const reads = (collectVariableDependencies(obj.statements) ?? []).map(rootIdentifier);
+          return { all, reads };
         } catch {
-          return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+          const ids = Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+          return { all: ids, reads: ids };
         }
       }
-      return [];
+      return { all: [], reads: [] };
     }
     if (typeof value === "string") {
       const params = parseParameterString(value);
@@ -207,42 +235,54 @@ function depsOfValue(value: unknown): string[] {
           acc.add(rootIdentifier(id));
         }
       }
-      return Array.from(acc);
+      // String-templated values can only contain reactive expressions
+      // (no statements/assignments) — reads == all.
+      const ids = Array.from(acc);
+      return { all: ids, reads: ids };
     }
-    return [];
+    return { all: [], reads: [] };
   } catch {
-    return [];
+    return { all: [], reads: [] };
   }
 }
 
-function depsOfRecord(record: Record<string, unknown> | undefined): Set<string> {
-  const result = new Set<string>();
-  if (!record) return result;
+function depsOfRecord(
+  record: Record<string, unknown> | undefined,
+): { all: Set<string>; reads: Set<string> } {
+  const all = new Set<string>();
+  const reads = new Set<string>();
+  if (!record) return { all, reads };
   for (const value of Object.values(record)) {
-    for (const dep of depsOfValue(value)) {
-      result.add(dep);
-    }
+    const { all: a, reads: r } = depsOfValue(value);
+    for (const dep of a) all.add(dep);
+    for (const dep of r) reads.add(dep);
   }
-  return result;
+  return { all, reads };
 }
 
 /**
  * Core recursive worker.
  *
  * Returns a tuple:
- *   [0] freeVars    – identifiers referenced in this subtree that must come
- *                     from the *parent* container's scope.
+ *   [0] freeVars     – identifiers referenced in this subtree that must come
+ *                      from the *parent* container's scope (reads + assignment
+ *                      targets).
  *   [1] escapingUIDs – UIDs that will call `registerComponentApi` into the
- *                     *parent* container at runtime (i.e. they are not
- *                     captured by any intermediate container inside this
- *                     subtree). The caller adds these to its own
- *                     `localDeclared` so they don't pollute `computedUses`.
+ *                      *parent* container at runtime (i.e. they are not
+ *                      captured by any intermediate container inside this
+ *                      subtree). The caller adds these to its own
+ *                      `localDeclared` so they don't pollute `computedUses`.
+ *   [2] freeReads    – subset of [0] that contains only read references
+ *                      (no assignment-only targets). Used to decide whether
+ *                      a parent should be promoted to an implicit container:
+ *                      write-only targets do not need re-render tracking, so
+ *                      they should not by themselves trigger promotion.
  */
 function computeUsesInternal(
   node: ComponentDef,
   parentFunctionNames: Set<string> = new Set(),
   disableNarrowing: boolean = false
-): [Set<string>, Set<string>] {
+): [Set<string>, Set<string>, Set<string>] {
   const localDeclared = new Set<string>();
   if (node.vars) for (const k of Object.keys(node.vars)) localDeclared.add(k);
   if (node.functions) for (const k of Object.keys(node.functions)) localDeclared.add(k);
@@ -282,19 +322,31 @@ function computeUsesInternal(
   const childFunctionNames = isKnownContainer ? nodeFunctionNames : parentFunctionNames;
 
   const usedHere = new Set<string>();
+  const usedHereReads = new Set<string>();
 
-  for (const d of depsOfRecord(node.props as Record<string, unknown> | undefined)) usedHere.add(d);
-  for (const d of depsOfRecord(node.vars)) usedHere.add(d);
-  for (const d of depsOfRecord(node.events as Record<string, unknown> | undefined)) usedHere.add(d);
-  for (const d of depsOfRecord(node.api as Record<string, unknown> | undefined)) usedHere.add(d);
+  const addRecord = (rec: Record<string, unknown> | undefined) => {
+    const { all, reads } = depsOfRecord(rec);
+    for (const d of all) usedHere.add(d);
+    for (const d of reads) usedHereReads.add(d);
+  };
+  const addValue = (v: unknown) => {
+    const { all, reads } = depsOfValue(v);
+    for (const d of all) usedHere.add(d);
+    for (const d of reads) usedHereReads.add(d);
+  };
+
+  addRecord(node.props as Record<string, unknown> | undefined);
+  addRecord(node.vars);
+  addRecord(node.events as Record<string, unknown> | undefined);
+  addRecord(node.api as Record<string, unknown> | undefined);
 
   if (node.when !== undefined && node.when !== null && typeof node.when !== "boolean") {
-    for (const d of depsOfValue(node.when)) usedHere.add(d);
+    addValue(node.when);
   }
   if (node.responsiveWhen) {
     for (const v of Object.values(node.responsiveWhen)) {
       if (v !== undefined && v !== null && typeof v !== "boolean") {
-        for (const d of depsOfValue(v)) usedHere.add(d);
+        addValue(v);
       }
     }
   }
@@ -306,14 +358,16 @@ function computeUsesInternal(
   const ownHasScript = !!node.scriptCollected || hasCodeBehind;
   const nextDisableNarrowing = disableNarrowing || ownHasScript;
   const childDeps = new Set<string>();
+  const childDepsReads = new Set<string>();
   // UIDs from the subtree that will register into THIS node's StateContainer
   // at runtime (because they pass through non-container intermediaries).
   const childEscapingUIDs = new Set<string>();
 
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing);
+      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing);
       for (const d of deps) childDeps.add(d);
+      for (const d of depsReads) childDepsReads.add(d);
       for (const uid of escapingUIDs) {
         childEscapingUIDs.add(uid);
         // These UIDs will register in this container at runtime — treat them
@@ -331,9 +385,14 @@ function computeUsesInternal(
     }
   }
 
+  const keepDep = (d: string) =>
+    !localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d);
   const parentDependencies = new Set<string>();
-  for (const d of usedHere) if (!localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d)) parentDependencies.add(d);
-  for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d)) parentDependencies.add(d);
+  const parentDependenciesReads = new Set<string>();
+  for (const d of usedHere) if (keepDep(d)) parentDependencies.add(d);
+  for (const d of childDeps) if (keepDep(d)) parentDependencies.add(d);
+  for (const d of usedHereReads) if (keepDep(d)) parentDependenciesReads.add(d);
+  for (const d of childDepsReads) if (keepDep(d)) parentDependenciesReads.add(d);
 
   // Deps that are "real" parent-state keys (not runtime-injected dynamic vars).
   // Used for the isImplicitDefault promotion check: a component should not be
@@ -343,12 +402,22 @@ function computeUsesInternal(
   const nonDynamicParentDeps = new Set(
     [...parentDependencies].filter((d) => !PARENT_STATE_DYNAMIC_VARS.has(d)),
   );
+  // Reads-only variant: drives the implicit-container promotion check below.
+  // Promotion based on reads avoids wrapping a component in an unnecessary
+  // StateContainer when its only "deps" are write-only assignment targets in
+  // event handlers (which the handler resolves through the existing scope
+  // pass-through; no narrowing/re-render tracking is needed for them).
+  const nonDynamicReadDeps = new Set(
+    [...parentDependenciesReads].filter((d) => !PARENT_STATE_DYNAMIC_VARS.has(d)),
+  );
 
-  // Use nonDynamicParentDeps so that implicit containers are not promoted purely
+  // Use nonDynamicReadDeps so that implicit containers are not promoted purely
   // because of a dynamic var dependency ($context etc.) — that would set
   // computedUses=["$context"], making stateFromOutside={} and isolating the
-  // component from all other parent state.
-  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicParentDeps.size > 0;
+  // component from all other parent state — AND so that write-only assignment
+  // targets in event handlers don't promote (write-only targets must be in
+  // scope but do not need a re-render trigger).
+  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicReadDeps.size > 0;
   const isContainer = isKnownContainer || isImplicitDefault;
 
   if (isContainer) {
@@ -381,7 +450,11 @@ function computeUsesInternal(
     // the container off from sibling APIs registered in the ancestor. When both real deps
     // AND dynamic deps exist the dynamic vars are still included so the container re-renders
     // when $context changes (reactive correctness).
-    if (node.uses === undefined && nonDynamicParentDeps.size > 0 && safeToNarrow) {
+    // Narrow only when there are real READ deps. Write-only targets still
+    // appear in `parentDependencies` (and therefore in the value we set for
+    // `computedUses` below), but they cannot by themselves require narrowing —
+    // re-renders are triggered by reads, not writes.
+    if (node.uses === undefined && nonDynamicReadDeps.size > 0 && safeToNarrow) {
       // If any needed dep is a parent-provided function, include ALL parent
       // functions in computedUses so that functions called transitively within
       // those functions are also in scope. Functions are non-reactive, so
@@ -400,7 +473,8 @@ function computeUsesInternal(
     // own state dispatch chain, and leaking them into the parent's parentDeps would
     // cause stateFromOutside={} for the parent.
     const propagatedDeps = nonDynamicParentDeps;
-    return [propagatedDeps, myEscapingUID];
+    const propagatedReadDeps = nonDynamicReadDeps;
+    return [propagatedDeps, myEscapingUID, propagatedReadDeps];
   }
 
   // Non-container: this node's own UID + all child escaping UIDs propagate
@@ -409,7 +483,7 @@ function computeUsesInternal(
   if (node.uid) escapingUIDs.add(node.uid);
   for (const uid of childEscapingUIDs) escapingUIDs.add(uid);
 
-  return [parentDependencies, escapingUIDs];
+  return [parentDependencies, escapingUIDs, parentDependenciesReads];
 }
 
 /**
@@ -424,5 +498,18 @@ export function computeUsesForSubtree(node: ComponentDef): Set<string> {
 
 export function computeUsesForTree(root: ComponentDef): void {
   if (!COMPUTED_USES_ENABLED) return;
-  computeUsesInternal(root);
+  // StandaloneApp may call this with a CompoundComponentDef wrapper whose actual
+  // ComponentDef (with type/children) lives one or two levels deeper.
+  // Drill down until we find a node that has type or children.
+  let actualRoot: ComponentDef = root;
+  for (let i = 0; i < 3; i++) {
+    const next = (actualRoot as any).component;
+    if (!next) break;
+    if ((next as any).type || Array.isArray((next as any).children)) {
+      actualRoot = next;
+      break;
+    }
+    actualRoot = next;
+  }
+  computeUsesInternal(actualRoot);
 }

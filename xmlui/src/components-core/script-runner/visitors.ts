@@ -55,10 +55,18 @@ import { isParsedValue } from "../state/variable-resolution";
  * Collects the name of local context variables the specified program depends on
  * @param program Program to visit
  * @param referenceTrackedApis
+ * @param options.includeAssignmentTargets When true, the LHS of an assignment
+ *   expression is also walked. The engine requires assignment targets to
+ *   already exist in scope (otherwise `evalAssignmentCore` throws "Left value
+ *   variable not found in the scope"). Reactive dependency tracking should
+ *   leave this false to avoid re-running an expression that writes to its own
+ *   trigger. The `computedUses` analyzer must pass true so the parent scope
+ *   provides write targets at runtime.
  */
 export function collectVariableDependencies(
   program: Expression | Statement[],
   referenceTrackedApis: Record<string, any> = {},
+  options: { includeAssignmentTargets?: boolean } = {},
 ): string[] {
   // --- We use these variables to keep track of local variable scopes
   const evalContext: BindingTreeEvaluationContext = {};
@@ -361,7 +369,11 @@ export function collectVariableDependencies(
           );
 
         case T_ASSIGNMENT_EXPRESSION:
-          return collectDependencies(program.expr, program, "right");
+          return options.includeAssignmentTargets
+            ? collectDependencies(program.leftValue, program, "left").concat(
+                collectDependencies(program.expr, program, "right"),
+              )
+            : collectDependencies(program.expr, program, "right");
 
         case T_CONDITIONAL_EXPRESSION:
           return collectDependencies(program.cond, program, "condition").concat(

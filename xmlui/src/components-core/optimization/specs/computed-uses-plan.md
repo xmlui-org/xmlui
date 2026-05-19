@@ -624,6 +624,102 @@ if (node.uses === undefined && nonDynamicParentDeps.size > 0 && safeToNarrow) {
 
 ---
 
+### Баг 20 (виявлений у Group B, `Table.spec.ts` "refreshOn Property"): LHS присвоєнь у event handlers не враховувалися в `computedUses`
+
+**Симптом:** Тести `Table.spec.ts › refreshOn Property` (3 тести) падали з `Expected: "1", Received: null`. У браузерних логах:
+
+```
+[xmlui] Left value variable (testState) not found in the scope.
+```
+
+XML тестового кейсу:
+```xml
+<VStack var.parentValue="1">
+  <Table data="{[{id: 1, name: 'Row A' }]}" refreshOn="{parentValue}">
+    <Column header="Name">
+      <Text onClick="testState = parentValue">{$item.name}</Text>
+    </Column>
+  </Table>
+</VStack>
+```
+
+`testState` живе в кореневому Fragment'і test bed'а як `var.testState="{null}"`. Очікувано: обробник `Text.onClick` пише в нього з cell-области Table.
+
+**Корінь:** `collectVariableDependencies` (у [visitors.ts](../../script-runner/visitors.ts)) при відвідуванні `T_ASSIGNMENT_EXPRESSION` повертав залежності тільки правої частини (`program.expr`), повністю ігноруючи ліву (`program.leftValue`):
+
+```ts
+case T_ASSIGNMENT_EXPRESSION:
+  return collectDependencies(program.expr, program, "right");
+```
+
+Тому для `testState = parentValue` аналіз бачив лише `parentValue` — як RHS-вираз. `testState` ніколи не потрапляв у вільні змінні Text → Column → Table.
+
+Table як implicit container отримував `computedUses = ["parentValue"]`. Runtime narrowing у `ComponentWrapper`:
+```
+extractScopedState(state, ["parentValue"]) → {parentValue: 1}
+```
+
+Cell handler виконувався у scope, де `testState` був відсутній. `evalAssignmentCore` ([eval-tree-common.ts](../../script-runner/eval-tree-common.ts):438):
+```ts
+if (leftScope === globalThis && !(leftIndex in leftScope)) {
+  throw new Error(`Left value variable (${leftIndex}) not found in the scope.`);
+}
+```
+
+**Виправлення (двоетапне):**
+
+**Етап 1 — opt-in параметр у `collectVariableDependencies`:**
+
+Додано опціональний параметр `options.includeAssignmentTargets`. Коли `true` — `T_ASSIGNMENT_EXPRESSION` обходить **обидві** сторони присвоєння. За замовчуванням `false`, щоб не зламати reactive dependency tracking (якщо `x = expr` додає `x` до своїх deps, то запис у `x` тригерить повторне виконання → нескінченний цикл).
+
+```ts
+case T_ASSIGNMENT_EXPRESSION:
+  return options.includeAssignmentTargets
+    ? collectDependencies(program.leftValue, program, "left").concat(
+        collectDependencies(program.expr, program, "right"),
+      )
+    : collectDependencies(program.expr, program, "right");
+```
+
+`computedUses` аналізатор передає `includeAssignmentTargets: true`, бо движок вимагає LHS у scope.
+
+**Етап 2 — розділення `reads` vs `all` deps у `computedUses`:**
+
+Перша спроба (просто `includeAssignmentTargets: true`) ламала тест `Select › clear button triggers didChange event` (`<Select onDidChange="testState = 'changed'">`). LHS `testState` потрапляв у `parentDependencies` Select → `isImplicitDefault` тригерився → Select обгортався зайвим `StateContainer`. Це ламало внутрішню логіку clearable Select.
+
+Тому `depsOfValue` і `depsOfRecord` тепер повертають **дві множини**:
+- `all` = reads + assignment targets → у `node.computedUses` (для resolve scope)
+- `reads` = тільки праві сторони і member-access roots → у `nonDynamicReadDeps`, що керує:
+  - `isImplicitDefault` (промоція до implicit container)
+  - умова `if (... nonDynamicReadDeps.size > 0 ...)` для встановлення `computedUses`
+
+```ts
+const isImplicitDefault =
+  IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicReadDeps.size > 0;
+```
+
+`parentDependencies` далі містить і записи, і читання — щоб коли контейнер таки створюється (через `isKnownContainer` або через `isImplicitDefault` від справжніх читань), `computedUses` включав ВСІ ідентифікатори, потрібні в scope.
+
+**Чому розділення коректне:**
+
+- Write-only target має бути **у scope** (інакше `evalAssignmentCore` кине помилку).
+- Але write-only target **НЕ потребує** re-render trigger: коли значення змінюється — лише сам handler його змінив; це не реактивне читання, на яке треба перерендерити контейнер.
+
+Таким чином:
+- Table з `onClick="testState = parentValue"`: `reads = {parentValue}` (з refreshOn та з RHS), `all = {parentValue, testState}`. `isImplicitDefault = true` (через `parentValue`). `computedUses = ["parentValue", "testState"]`. ✓
+- Select з `onDidChange="testState = 'changed'"`: `reads = {}`, `all = {testState}`. `isImplicitDefault = false` → Select **НЕ** обгортається StateContainer'ом, обробник виконується в parent scope, де `testState` природно доступний. ✓
+
+**Файли:**
+- `xmlui/src/components-core/script-runner/visitors.ts` — параметр `includeAssignmentTargets`
+- `xmlui/src/components-core/optimization/computedUses.ts` — `depsOfValue`/`depsOfRecord` повертають `{all, reads}`; `computeUsesInternal` тримає паралельні множини `parentDependencies`/`parentDependenciesReads`; повертає tuple `[allDeps, escapingUIDs, readDeps]`.
+
+**Слід мати на увазі:**
+1. Інші виклики `collectVariableDependencies` (reactive deps у `useVars`, `valueExtractor` тощо) і далі НЕ передають `includeAssignmentTargets`. Це навмисно — реактивна підписка не повинна реагувати на власні записи.
+2. Compound assignment (`+=`, `*=` тощо) автоматично коректний: і LHS, і RHS враховуються в `all` (LHS-як-вираз все одно зчитується для compound операції).
+3. Member-access присвоєння (`obj.field = val`) працює: `traverseMemberAccessChain` витягає root `obj`, який має бути в scope для зчитування. Це покривалося і RHS-only обходом раніше у частині кейсів, тепер послідовно з обома сторонами.
+
+---
+
 ## Результати бенчмарку
 
 Тест: `oftenChanges` тікає кожні 100мс → 20 тіків за 2с.
