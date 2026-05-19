@@ -8,6 +8,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.creditCard";
 const DEFAULT_MESSAGE = "Not a valid credit card number";
 
 export function isValidCreditCard(value: unknown): boolean {
@@ -31,6 +32,6 @@ export function isValidCreditCard(value: unknown): boolean {
 
 export const creditCardValidator: ValidatorEntry = {
   name: "creditCard",
-  fn: (value) => (isValidCreditCard(value) ? null : DEFAULT_MESSAGE),
+  fn: (value) => (isValidCreditCard(value) ? null : MESSAGE_KEY),
   defaultMessage: DEFAULT_MESSAGE,
 };

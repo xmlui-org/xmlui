@@ -11,6 +11,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.email";
 const DEFAULT_MESSAGE = "Not a valid email address";
 
 const EMAIL_RE = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -23,6 +24,6 @@ export function isValidEmail(value: unknown): boolean {
 
 export const emailValidator: ValidatorEntry = {
   name: "email",
-  fn: (value) => (isValidEmail(value) ? null : DEFAULT_MESSAGE),
+  fn: (value) => (isValidEmail(value) ? null : MESSAGE_KEY),
   defaultMessage: DEFAULT_MESSAGE,
 };

@@ -725,7 +725,7 @@ The actual readiness as of the audit is:
 | #08 theming sandbox | `strictTheming` | validators ship; **hot-path wiring in `StyleProvider` / `valueExtractor` not done** | ❌ blocked by Phase 1.2 + Phase 2 |
 | #09 forms | `strictForms` | registry + cross-field + RFC 7807 + submit-policy live; CSRF/idempotency + `$formCancel` + E2E missing | 🟡 flip-ready if Phase 5 is descoped |
 | #10 routing | `strictRouting` | constraints + guards + canonicalisation live; custom-constraint forms-registry bridge + direct-entry/anchor interception + E2E missing | 🟡 flip-ready if Phase 1.2 + Phase 2.1 are descoped |
-| #11 i18n | `strictI18n` | ICU + formatters + RTL live; `<I18n>` component + framework-string extraction + `App.translate` public surface still partial | ❌ blocked by Phase 2.2 + Phase 2.3 |
+| #11 i18n | `strictI18n` | ICU + formatters + RTL live; `<I18n>` component ✅ + framework-string extraction ✅; `App.translate` public surface still partial (Phase 2.1) | ❌ blocked by Phase 2.1 |
 | #12 versioning | `strictVersioning` | metadata + api-diff tooling + Inspector tab live; LSP wiring + parse-time hook in `renderChild` + doc badges + `valueAliases`/`preserveLegacyDefaults` rewrite + release-guard workflow not shipped | ❌ blocked by Phase 1 + Phase 2 residuals |
 | #13 build-validation | (analyzer `strict` arg) | full pipeline live (LSP, Vite, CLI, CI scaffold) | ✅ already flippable per-call site |
 | #14 UDC sandbox | `strictUdcSandbox` | scope gate, capability gate, trust-mode + manifest comparison all live; `xmlui udc audit` CLI shipped. Residual: slot-undeclared consumer check, filesystem manifest loader, Inspector panel, docs chapter | 🟡 flip-ready (residuals are non-security) |
@@ -892,9 +892,9 @@ phase/step labels from the source plan document.
 - 🟡 Phase 2 Step 2.1 — `App.translate(key, vars?)` public-API
   wiring (translator function exists; not exposed through
   `AppContext` namespace).
-- ⬜ Phase 2 Step 2.2 — `<I18n>` component.
+- ⬜ Phase 2 Step 2.2 — `<I18n>` component. ✅ DONE (2026-05)
 - ⬜ Phase 2 Step 2.3 — Audit + extract framework-shipped
-  strings into `xmlui-en.ts` (currently a stub).
+  strings into `xmlui-en.ts` (currently a stub). ✅ DONE (2026-05)
 - ⬜ E2E test suite under `xmlui/tests-e2e/i18n/`.
 - ⬜ Docs chapter + default flip.
 

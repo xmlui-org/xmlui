@@ -15,6 +15,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.iban";
 const DEFAULT_MESSAGE = "Not a valid IBAN";
 
 export function isValidIban(value: unknown): boolean {
@@ -46,6 +47,6 @@ export function isValidIban(value: unknown): boolean {
 
 export const ibanValidator: ValidatorEntry = {
   name: "iban",
-  fn: (value) => (isValidIban(value) ? null : DEFAULT_MESSAGE),
+  fn: (value) => (isValidIban(value) ? null : MESSAGE_KEY),
   defaultMessage: DEFAULT_MESSAGE,
 };

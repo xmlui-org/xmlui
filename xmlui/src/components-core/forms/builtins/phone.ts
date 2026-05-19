@@ -9,6 +9,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.phone";
 const DEFAULT_MESSAGE = "Not a valid phone number";
 
 const PHONE_ALLOWED = /^[a-zA-Z0-9#*)(+.\-_&']+$/;
@@ -22,6 +23,6 @@ export function isValidPhone(value: unknown): boolean {
 
 export const phoneValidator: ValidatorEntry = {
   name: "phone",
-  fn: (value) => (isValidPhone(value) ? null : DEFAULT_MESSAGE),
+  fn: (value) => (isValidPhone(value) ? null : MESSAGE_KEY),
   defaultMessage: DEFAULT_MESSAGE,
 };

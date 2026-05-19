@@ -340,7 +340,7 @@ Step 1.1.
 
 ---
 
-### Step 2.2 — `<I18n>` Component for Slot-Based Markup
+### Step 2.2 — `<I18n>` Component for Slot-Based Markup ✅ DONE (2026-05)
 
 **Priority:** 3
 
@@ -394,7 +394,7 @@ Step 2.1; Step 3.1 (the ICU runtime is needed for slotted markup).
 
 ---
 
-### Step 2.3 — Extract Built-in Framework Strings
+### Step 2.3 — Extract Built-in Framework Strings ✅ DONE (2026-05)
 
 **Priority:** 4
 
