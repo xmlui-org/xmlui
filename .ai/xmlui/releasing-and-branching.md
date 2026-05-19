@@ -35,27 +35,51 @@ The workflow asks for a release tag:
 
 The workflow create a PR, which uppon merging will trigger the release workflow
 
-## Example
+## Examples
 
-we have just released 0.11.0 as the latest stable version. On `main`, we start implementing a new feature. We get a bug report on latest. We branch off of tag `xmlui@0.11.1` to a branch named `support/0.11.x`. We push that branch to github.
+### Example 1: Bugfix on the latest stable release
 
-We branch off of `support/0.11.x` to a temporary branch named `myname/fix-the-bug`.
-We implement a fix. Open a PR into `support/0.11.x` <- `myname/fix-the-bug`.
-Squash & merge on github.
-
-```bash
-git fetch
-git switch -c myname/backport-bugfix main
-git chery-pick -x support/0.11.x # chery-picks the last commit from that branch
-git push ...
+```
+main:       o---0.11.0---o---(cherry-pick)---o
+                          \
+support/0.11.x:            o---fix---0.11.1
 ```
 
-Open a PR for main with the fix ported over. In this case, becaues there's 1 commit, you'd rebase and merge.
+1. `0.11.0` is latest. Bug reported. Branch `support/0.11.x` from tag `xmlui@0.11.0`, push to GitHub.
+2. Branch `myname/fix-the-bug` from `support/0.11.x`. Fix → open PR → squash & merge.
+3. Backport to `main`:
+   ```bash
+   git fetch
+   git switch -c myname/backport-bugfix main
+   git cherry-pick -x support/0.11.x
+   git push
+   ```
+   Open PR → rebase & merge (because a single commit shouldn't be squashed).
+4. Run Prepare Versions on `support/0.11.x` with input tag `latest`. Merges changesets, bumps version.
+5. Review & merge the PR → triggers Release. Fix is in `main` and `0.11.1` on npm.
 
-Start a Prepare Versions for Release workflow on `support/0.11.x` with the `tag` select input being `latest`. This merges the changesets into the changelog and bumps the version number.
+### Example 2: Bugfix on an older minor version
 
-Review the PR created by the workflow.
+```
+main:       o---0.11.0---o---0.12.0---(cherry-pick)---o
+                          \             \
+support/0.11.x:            o---o---fix---0.11.1
+                                         \
+support/0.12.x:                           o---(cherry-pick)---0.12.1
+```
 
-If all looks ok, allow the merge of the PR into `support/0.11.x`. This will kick off the Release Packages workflow, with the tag information needed for the release embedded in the PR name.
-
-You are done with the fix, you can continue working on features on `main` while the fix is present there and in the release.
+1. `0.12.0` is latest. A user of `0.11.x` reports a bug. Branch `support/0.11.x` from tag `xmlui@0.11.0` (or use existing branch).
+2. Branch `myname/fix-old-bug` from `support/0.11.x`. Fix → open PR → squash & merge.
+3. Cherry-pick forward through active release lines:
+   ```bash
+   git fetch
+   git switch -c myname/cherry-fix-12x support/0.12.x
+   git cherry-pick -x support/0.11.x
+   git push
+   git switch -c myname/cherry-fix-main main
+   git cherry-pick -x support/0.11.x
+   git push
+   ```
+   Open PRs → rebase & merge.
+4. Run Prepare Versions on `support/0.11.x` with tag `support` (not `latest` — `0.12.x` is newer). Merge PR → triggers Release.
+5. Optionally run Prepare Versions on `support/0.12.x` with tag `latest` to release `0.12.1` with the fix too.
