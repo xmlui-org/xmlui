@@ -72,6 +72,7 @@ import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
 import { formComponentRenderer } from "./Form/Form";
+import { formValidatorComponentRenderer } from "./Form/FormValidator";
 import { formSegmentComponentRenderer } from "./FormSegment/FormSegment";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
 import { appRenderer } from "./App/App";
@@ -430,6 +431,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(formComponentRenderer);
       this.registerCoreComponent(formItemComponentRenderer);
       this.registerCoreComponent(formSegmentComponentRenderer);
+      this.registerCoreComponent(formValidatorComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Tree !== "false") {
       this.registerCoreComponent(treeComponentRenderer);

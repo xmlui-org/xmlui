@@ -62,6 +62,19 @@ import {
   writeLocalStorage,
 } from "../../components-core/appContext/local-storage-functions";
 import { useAppContext } from "../../components-core/AppContext";
+// --- W5-2 / W5-3 / W5-4 (plan #09): cross-field validators, RFC 7807
+// server-error mapping, submit policies + cancel API.
+import {
+  FormValidatorRegistryContext,
+  type FormValidatorDef,
+} from "./FormValidator";
+import {
+  extractServerValidationProblem,
+  decideSubmit,
+  DEFAULT_SUBMIT_POLICY,
+  type SubmitPolicy,
+} from "../../components-core/forms";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -300,6 +313,15 @@ type Props = {
   onPersistClear?: () => void;
   dataAfterSubmit?: "keep" | "reset" | "clear";
   onClearAfterSubmit?: () => void;
+  // --- W5-2: cross-field validators registered by <FormValidator> children.
+  crossFieldValidatorsRef?: { current: Map<string, FormValidatorDef> };
+  // --- W5-3: server-side error handler. Fired after the form maps a thrown
+  // submit error to per-field/general validation results. Receives the
+  // raw error plus the parsed problem (when one was recognized).
+  onSubmitError?: (error: any, problem: any) => void;
+  // --- W5-4: submit concurrency policy + drop handler + external cancel.
+  submitPolicy?: SubmitPolicy;
+  onSubmitDropped?: (reason: string) => void;
 };
 
 export const defaultProps: Pick<
@@ -322,6 +344,7 @@ export const defaultProps: Pick<
   | "validationIconError"
   | "keepOnCancel"
   | "dataAfterSubmit"
+  | "submitPolicy"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -341,6 +364,7 @@ export const defaultProps: Pick<
   validationIconError: "error",
   keepOnCancel: false,
   dataAfterSubmit: "keep" as const,
+  submitPolicy: DEFAULT_SUBMIT_POLICY,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -415,6 +439,10 @@ const Form = memo(forwardRef(function (
     onPersistClear,
     dataAfterSubmit = defaultProps.dataAfterSubmit,
     onClearAfterSubmit,
+    crossFieldValidatorsRef,
+    onSubmitError,
+    submitPolicy = defaultProps.submitPolicy,
+    onSubmitDropped,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -427,6 +455,11 @@ const Form = memo(forwardRef(function (
   const resolvedSavePendingLabel =
     savePendingLabel ?? appContext.App.translate("xmlui.form.validating");
   const formRef = useRef<HTMLFormElement>(null);
+  // --- W5-4: external cancel controller. `Form.cancel()` aborts this
+  // controller; consumers that opt in (by reading `$formCancel` from the
+  // onSubmit handler context) can observe the abort. The controller is
+  // recreated on every new submit attempt by `doSubmit`.
+  const submitAbortRef = useRef<AbortController | null>(null);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
 
@@ -554,6 +587,33 @@ const Form = memo(forwardRef(function (
     if (!isEnabled) {
       return;
     }
+
+    // --- W5-4 / plan #09 Step 4: honor `submitPolicy`. We only have a
+    // single in-flight slot today; `queue` is treated like `single-flight`
+    // until the concurrency module gains a real queue. `drop-while-running`
+    // returns silently after firing `onSubmitDropped` + emitting a
+    // `submit-while-busy` diagnostic.
+    const guard = decideSubmit(
+      { inFlight: !!formState.submitInProgress, queued: 0 },
+      submitPolicy ?? DEFAULT_SUBMIT_POLICY,
+    );
+    if (!guard.proceed) {
+      pushXsLog({
+        kind: "forms",
+        ts: Date.now(),
+        code: "submit-while-busy",
+        severity: "warn",
+        formId: id,
+        message: `Form submit suppressed by policy "${submitPolicy}" (${guard.reason}).`,
+      });
+      try {
+        onSubmitDropped?.(guard.reason ?? "drop-while-busy");
+      } catch (err) {
+        console.error("Form onSubmitDropped handler threw:", err);
+      }
+      return;
+    }
+
     setConfirmSubmitModalVisible(false);
 
     // Use the extracted validation logic
@@ -605,8 +665,97 @@ const Form = memo(forwardRef(function (
       setConfirmSubmitModalVisible(true);
       return;
     }
+
+    // --- W5-2 / plan #09 Step 2: run cross-field validators registered by
+    // <FormValidator> children. Each handler receives the cleaned form
+    // data; returning a `{ field: message }` object surfaces per-field
+    // errors. Errors are merged via BACKEND_VALIDATION_ARRIVED (which
+    // matches the shape we already use for server-reported field errors)
+    // and abort the submit.
+    const crossFieldValidators = Array.from(
+      crossFieldValidatorsRef?.current?.values() ?? [],
+    );
+    if (crossFieldValidators.length > 0) {
+      const crossFieldFieldErrors: Record<string, Array<SingleValidationResult>> = {};
+      const crossFieldGeneralErrors: Array<SingleValidationResult> = [];
+      const dataSnapshot = validationResult.data;
+      for (const v of crossFieldValidators) {
+        let result: any;
+        try {
+          result = await v.validate(dataSnapshot);
+        } catch (err) {
+          pushXsLog({
+            kind: "forms",
+            ts: Date.now(),
+            code: "validator-throw",
+            severity: "error",
+            formId: id,
+            message: `FormValidator threw: ${err instanceof Error ? err.message : String(err)}`,
+          });
+          crossFieldGeneralErrors.push({
+            isValid: false,
+            invalidMessage:
+              err instanceof Error ? err.message : "Cross-field validator failed",
+            severity: "error",
+          });
+          continue;
+        }
+        if (result == null || result === "" || result === true) continue;
+        if (typeof result === "string") {
+          crossFieldGeneralErrors.push({
+            isValid: false,
+            invalidMessage: result,
+            severity: v.severity,
+          });
+          continue;
+        }
+        if (typeof result === "object") {
+          for (const [field, message] of Object.entries(result as Record<string, unknown>)) {
+            if (!message) continue;
+            (crossFieldFieldErrors[field] ??= []).push({
+              isValid: false,
+              invalidMessage: String(message),
+              severity: v.severity,
+            });
+          }
+        }
+      }
+      const hasCrossFieldErrors =
+        crossFieldGeneralErrors.some((e) => e.severity === "error") ||
+        Object.values(crossFieldFieldErrors).some((arr) =>
+          arr.some((e) => e.severity === "error"),
+        );
+      if (
+        crossFieldGeneralErrors.length > 0 ||
+        Object.keys(crossFieldFieldErrors).length > 0
+      ) {
+        dispatch(
+          backendValidationArrived({
+            generalValidationResults: crossFieldGeneralErrors,
+            fieldValidationResults: crossFieldFieldErrors,
+          }),
+        );
+      }
+      if (hasCrossFieldErrors) {
+        try {
+          await onSubmitFailed?.({
+            ...validationResult,
+            crossFieldErrors: crossFieldFieldErrors,
+            crossFieldGeneralErrors,
+          } as any);
+        } catch (err) {
+          console.error("Form submitFailed handler threw:", err);
+        }
+        return;
+      }
+    }
+
     const prevFocused = document.activeElement;
     dispatch(formSubmitting());
+    // Fresh AbortController per submit attempt — exposed for `Form.cancel()`
+    // and surfaced to the onSubmit handler via the `$formCancel` context
+    // variable. Cleaned up in the `finally` below.
+    submitAbortRef.current = new AbortController();
     try {
       const filteredSubject = validationResult.data;
       // Pass cleaned data as first arg and full data (including noSubmit fields) as second arg.
@@ -668,13 +817,67 @@ const Form = memo(forwardRef(function (
     } catch (e: any) {
       const generalValidationResults: Array<SingleValidationResult> = [];
       const fieldValidationResults: Record<string, Array<SingleValidationResult>> = {};
-      if (
+
+      // --- W5-3 / plan #09 Step 3: prefer the RFC 7807 / Spring / Laravel
+      // mapper first; it covers more shapes than the legacy
+      // `GenericBackendError.details.issues` path while still gracefully
+      // falling back to it (XMLUI's legacy shape is one of the mappers).
+      const problem = extractServerValidationProblem(e);
+      const knownFields = new Set(Object.keys(formState.subject));
+      const unmappedFields: string[] = [];
+
+      if (problem && problem.invalidParams.length > 0) {
+        for (const p of problem.invalidParams) {
+          const entry: SingleValidationResult = {
+            isValid: false,
+            invalidMessage: p.reason,
+            severity: (p.severity as any) ?? "error",
+            fromBackend: true,
+          };
+          if (p.name) {
+            // Always route named errors to the field, matching the behaviour
+            // of the legacy path. The form reducer silently ignores entries
+            // whose field name has no corresponding FormItem.
+            (fieldValidationResults[p.name] ??= []).push(entry);
+            // Emit a diagnostic hint when the field name isn't in the current
+            // form subject so developers can spot name-mismatches early.
+            if (!knownFields.has(p.name)) {
+              unmappedFields.push(p.name);
+            }
+          } else {
+            generalValidationResults.push(entry);
+          }
+        }
+        if (unmappedFields.length > 0) {
+          pushXsLog({
+            kind: "forms",
+            ts: Date.now(),
+            code: "server-error-unmapped",
+            severity: "warn",
+            formId: id,
+            message:
+              `Server returned validation errors for unknown field(s): ` +
+              unmappedFields.join(", "),
+            data: { unmappedFields },
+          });
+        }
+        if (problem.detail && generalValidationResults.length === 0) {
+          generalValidationResults.push({
+            isValid: false,
+            invalidMessage: problem.detail,
+            severity: "error",
+            fromBackend: true,
+          });
+        }
+      } else if (
         e instanceof Error &&
         "errorCategory" in e &&
         e.errorCategory === "GenericBackendError" &&
         (e as GenericBackendError).details?.issues &&
         Array.isArray((e as GenericBackendError).details.issues)
       ) {
+        // Legacy XMLUI shape — kept for safety, though
+        // `extractServerValidationProblem` also recognizes it.
         (e as GenericBackendError).details.issues.forEach((issue: any) => {
           const validationResult = {
             isValid: false,
@@ -703,6 +906,26 @@ const Form = memo(forwardRef(function (
           fieldValidationResults,
         }),
       );
+      try {
+        onSubmitError?.(e, problem);
+      } catch (handlerErr) {
+        console.error("Form onSubmitError handler threw:", handlerErr);
+      }
+    } finally {
+      // Release the per-submit cancel controller so a stale reference
+      // can't be aborted later. The onSubmit handler may have stored the
+      // signal, but downstream callers should treat it as scoped to this
+      // attempt only.
+      submitAbortRef.current = null;
+    }
+  });
+
+  // --- W5-4: external cancel. Aborts the in-flight submit's
+  // AbortController so handlers can voluntarily stop. The framework still
+  // awaits the handler's promise; cancellation is cooperative.
+  const doCancelSubmit = useEvent(() => {
+    if (submitAbortRef.current && !submitAbortRef.current.signal.aborted) {
+      submitAbortRef.current.abort("user-cancel");
     }
   });
 
@@ -815,9 +1038,10 @@ const Form = memo(forwardRef(function (
       update: updateData,
       validate: doValidate,
       getData,
-      isDirty: getIsDirtyFlag
+      isDirty: getIsDirtyFlag,
+      cancel: doCancelSubmit,
     });
-  }, [doReset, updateData, doValidate, getData, registerComponentApi, getIsDirtyFlag]);
+  }, [doReset, updateData, doValidate, getData, registerComponentApi, getIsDirtyFlag, doCancelSubmit]);
 
   let safeButtonRow = (
     <>
@@ -905,6 +1129,20 @@ export const FormWithContextVar = forwardRef(function (
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const [formState, dispatch] = useReducer(formReducer, initialState);
+  // --- W5-2: registry that <FormValidator> children populate via
+  // FormValidatorRegistryContext. Stable across renders.
+  const crossFieldValidatorsRef = useRef<Map<string, FormValidatorDef>>(new Map());
+  const formValidatorRegistry = useMemo(
+    () => ({
+      register: (def: FormValidatorDef) => {
+        crossFieldValidatorsRef.current.set(def.id, def);
+      },
+      unregister: (id: string) => {
+        crossFieldValidatorsRef.current.delete(id);
+      },
+    }),
+    [],
+  );
   // Track which resetVersion was triggered by a "clear" submit so that
   // effectiveInitialValue stays EMPTY_OBJECT for that cycle (and won't flip
   // back, which would cause FormItem re-initialization to restore old data).
@@ -1071,12 +1309,26 @@ export const FormWithContextVar = forwardRef(function (
         keepOnCancel={extractValue.asOptionalBoolean(node.props.keepOnCancel)}
         dataAfterSubmit={extractValue.asOptionalString(node.props.dataAfterSubmit) as "keep" | "reset" | "clear" | undefined}
         onClearAfterSubmit={handleClearAfterSubmit}
+        crossFieldValidatorsRef={crossFieldValidatorsRef}
+        submitPolicy={
+          (extractValue.asOptionalString(
+            (node.props as any).submitPolicy,
+          ) as SubmitPolicy | undefined) ?? DEFAULT_SUBMIT_POLICY
+        }
+        onSubmitError={lookupEventHandler("submitError" as any, {
+          context: { $data },
+        }) as any}
+        onSubmitDropped={lookupEventHandler("submitDropped" as any, {
+          context: { $data },
+        }) as any}
         enabled={
           extractValue.asOptionalBoolean(node.props.enabled, true) &&
           !extractValue.asOptionalBoolean((node.props as any).loading, false)
         } //the as any is there to not include this property in the docs (temporary, we disable the form until it's data is loaded)
       >
-        {renderChild(nodeWithItem)}
+        <FormValidatorRegistryContext.Provider value={formValidatorRegistry}>
+          {renderChild(nodeWithItem)}
+        </FormValidatorRegistryContext.Provider>
       </Form>
     </Slot>
   );

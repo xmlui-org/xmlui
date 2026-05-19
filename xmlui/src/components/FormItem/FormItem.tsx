@@ -163,18 +163,48 @@ export const FormItemMd = createMetadata({
     },
     pattern: {
       description:
-        "This value specifies a predefined regular expression to test the input value. " +
-        "If this value is not set, no pattern check is done.",
+        "**Deprecated** alias of `validator`. " +
+        "This value specifies a predefined validator name (or regex placeholder) to test the input value. " +
+        "If this value is not set, no validator check is done. Use `validator` instead.",
       valueType: "string",
     },
     patternInvalidMessage: {
       description:
-        `This optional string property is used to customize the message that is displayed on a ` +
-        `failed pattern test.`,
+        `**Deprecated** alias of \`validatorInvalidMessage\`. This optional string property is used to customize ` +
+        `the message that is displayed on a failed pattern test.`,
       valueType: "string",
     },
     patternInvalidSeverity: {
-      description: `This property sets the severity level of the pattern validation.`,
+      description:
+        `**Deprecated** alias of \`validatorInvalidSeverity\`. This property sets the severity level of ` +
+        `the pattern validation.`,
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
+    validator: {
+      description:
+        "Name of a registered validator (or an array of names) to run against the input value. " +
+        "Built-in validators include `email`, `phone`, `url`, `creditCard`, `iban`, `isoDate`, " +
+        "`strongPassword`, `noLeadingTrailingWhitespace`, and `length`. Register additional " +
+        "validators via `App.registerValidator`. When both `validator` and `pattern` are set, " +
+        "`validator` wins.",
+      valueType: "string",
+    },
+    validatorParams: {
+      description:
+        "Optional parameters object forwarded to the validator function (e.g. " +
+        "`{ minLength: 16 }` for `strongPassword`).",
+      valueType: "any",
+    },
+    validatorInvalidMessage: {
+      description:
+        "Optional message displayed when the configured validator reports the value as invalid. " +
+        "Overrides the validator's default message.",
+      valueType: "string",
+    },
+    validatorInvalidSeverity: {
+      description: "Severity level applied to a validator failure.",
       valueType: "string",
       availableValues: filteredValidationSeverityValues,
       defaultValue: "error",
@@ -308,6 +338,10 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
       pattern,
       patternInvalidMessage,
       patternInvalidSeverity,
+      validator,
+      validatorParams,
+      validatorInvalidMessage,
+      validatorInvalidSeverity,
       regex,
       regexInvalidMessage,
       regexInvalidSeverity,
@@ -371,6 +405,12 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
         patternInvalidMessage={extractValue.asOptionalString(patternInvalidMessage)}
         patternInvalidSeverity={parseSeverity(
           extractValue.asOptionalString(patternInvalidSeverity),
+        )}
+        validator={extractValue(validator)}
+        validatorParams={extractValue(validatorParams)}
+        validatorInvalidMessage={extractValue.asOptionalString(validatorInvalidMessage)}
+        validatorInvalidSeverity={parseSeverity(
+          extractValue.asOptionalString(validatorInvalidSeverity),
         )}
         regex={extractValue(regex)}
         regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}

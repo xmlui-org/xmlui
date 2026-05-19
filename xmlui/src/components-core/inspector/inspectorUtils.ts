@@ -249,6 +249,15 @@ export interface XsLogEntry {
    *   `eventName`, and `message`. W3-6 ships only the API surface (token
    *   types + coordinator stub); the dispatcher wiring that emits these
    *   entries lands in W7-1.
+   * - `"forms"` — forms-validation diagnostic emitted by the validator
+   *   registry, cross-field `<FormValidator>`, server-error mapping, or
+   *   submission guard (plan #09). Contains `code: FormDiagnosticCode`
+   *   (one of `unknown-validator`, `duplicate-validator`,
+   *   `server-error-unmapped`, `submit-while-busy`, `csrf-token-missing`,
+   *   `validator-throw`, `deprecated-alias`), `severity: "info" | "warn"
+   *   | "error"`, optional `formId` / `fieldName` / `validatorName`, and
+   *   `message`. Severity escalates from `warn` to `error` when
+   *   `App.appGlobals.strictForms` is truthy.
    * - `"i18n"` — internationalisation diagnostic (plan #11). Contains
    *   `code: I18nDiagnosticCode`, `severity`, optional `locale` / `key`, and `message`.
    * - `"scheduler"` — scheduler/determinism event or diagnostic (plan #16). Contains

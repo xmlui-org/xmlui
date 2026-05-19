@@ -74,6 +74,10 @@ import {
   formatCycle,
   cycleHash,
 } from "../reactive-graph";
+import {
+  configureValidatorRegistry,
+  registerValidator as registerValidatorImpl,
+} from "../forms";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -170,6 +174,19 @@ export function AppContent({
   const appGlobals = useMemo(() => {
     return (globalProps ?? EMPTY_OBJECT) as Record<string, any>;
   }, [globalProps]);
+
+  // --- W5-1 / plan #09 Step 0: wire the forms validator registry to this app's
+  // strict-mode flag and trace sink. Re-runs whenever `appGlobals` identity
+  // changes so `strictForms` toggling is observed without re-importing the
+  // registry module.
+  useMemo(() => {
+    configureValidatorRegistry({
+      isStrict: () => (appGlobals as any)?.strictForms === true,
+      emit: (d) => {
+        pushXsLog({ kind: "forms", ts: Date.now(), ...d });
+      },
+    });
+  }, [appGlobals]);
 
   const schedulerMode: "concurrent" | "fifo" =
     appGlobals?.strictDeterminism === true
@@ -1440,6 +1457,8 @@ export function AppContent({
         maxQueuedPerTrace,
         setScheduler,
         scheduleHandler,
+        // --- W5-1 / plan #09 Step 1.2: register a named validator from markup.
+        registerValidator: registerValidatorImpl,
       },
       Clipboard: ClipboardNamespace,
 

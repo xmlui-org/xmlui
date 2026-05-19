@@ -140,6 +140,16 @@ export type StandaloneAppDescription = {
    *   entry. Per-invocation `timeoutMs` overrides this default. The W3-6
    *   risk-probe ships the configuration surface only; the dispatcher
    *   wiring that enforces the budget lands in W7-1.
+   * - `strictForms` (boolean, default `false`) — when `true`, forms
+   *   diagnostics (`unknown-validator`, `duplicate-validator`,
+   *   `validator-throw`, `server-error-unmapped`, `submit-while-busy`,
+   *   `csrf-token-missing`) escalate from `warn` to `error` and the
+   *   validator registry refuses registrations whose `name` is already
+   *   taken. When `false` (the W5-1..W5-4 rollout default — risk-probe
+   *   phase) the new surface is fully functional but only emits
+   *   warn-level diagnostics so apps can audit before the strict
+   *   default flips. Flips to `true` in the next major. See
+   *   `dev-docs/plans/09-forms-validation-discipline.md`.
    * - `strictRouting` (boolean, default `false`) — when `true`, defended-routing
    *   diagnostics such as rejected constraints and non-canonical URLs escalate to
    *   errors. Wave 4 keeps the default warn/additive.

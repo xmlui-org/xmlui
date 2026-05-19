@@ -60,8 +60,19 @@ export interface FormItemValidations {
   maxValue?: number;
   rangeInvalidMessage?: string;
   rangeInvalidSeverity?: ValidationSeverity;
+  // --- W5-1 / plan #09 Step 1.2: `pattern` is the deprecated alias for
+  // `validator`. Both forms are accepted; `validator` (a registered name or
+  // an array of registered names) wins when both are present and emits a
+  // one-shot `deprecated-alias` diagnostic.
+  validator?: string | string[];
+  validatorParams?: unknown;
+  validatorInvalidMessage?: string;
+  validatorInvalidSeverity?: ValidationSeverity;
+  /** @deprecated since W5-1 — use `validator` instead. */
   pattern?: string;
+  /** @deprecated since W5-1 — use `validatorInvalidMessage` instead. */
   patternInvalidMessage?: string;
+  /** @deprecated since W5-1 — use `validatorInvalidSeverity` instead. */
   patternInvalidSeverity?: ValidationSeverity;
   regex?: string;
   regexInvalidMessage?: string;
