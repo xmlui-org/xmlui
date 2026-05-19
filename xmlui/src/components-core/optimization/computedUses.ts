@@ -31,10 +31,20 @@ import { collectVariableDependencies } from "../script-runner/visitors";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { Parser } from "../../parsers/scripting/Parser";
 import { isParsedValue } from "../state/variable-resolution";
+import type { Statement } from "../script-runner/ScriptingSourceTree";
 
-function parse(source: string) {
+// Cache for parsed raw strings (like event handlers) to avoid redundant AST
+// generation during boot-time traversal.
+const astCache = new Map<string, Statement[]>();
+
+function parse(source: string): Statement[] {
+  if (astCache.has(source)) {
+    return astCache.get(source)!;
+  }
   const parser = new Parser(source);
-  return parser.parseStatements();
+  const statements = parser.parseStatements();
+  astCache.set(source, statements);
+  return statements;
 }
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
