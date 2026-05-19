@@ -37,12 +37,24 @@ The workflow create a PR, which uppon merging will trigger the release workflow
 
 ## Examples
 
+(Notation: `o` = commit, `(vX.Y.Z)` = tag, lines = parent relations)
+
 ### Example 1: Bugfix on the latest stable release
 
+Starting state (`0.11.0` is latest, there are other commits on `main`):
+
 ```
-main:       o---0.11.0---o---(cherry-pick)---o
-                          \
-support/0.11.x:            o---fix---0.11.1
+main:  ...---(v0.11.0)---o(some feature)---o(breaking change)
+```
+
+Final state (fix committed, cherry-picked, released):
+
+```
+main:  ...---(v0.11.0)---o(some feature)---o(breaking change)---o(same fix commit cherry-picked)
+                 |
+support/0.11.x:  o (fix)---(v0.11.1)
+                 ↑
+          fix-the-bug
 ```
 
 1. `0.11.0` is latest. Bug reported. Branch `support/0.11.x` from tag `xmlui@0.11.0`, push to GitHub.
@@ -60,12 +72,26 @@ support/0.11.x:            o---fix---0.11.1
 
 ### Example 2: Bugfix on an older minor version
 
+Starting state (`0.12.0` is latest, `support/0.11.x` exists with previous patches):
+
 ```
-main:       o---0.11.0---o---0.12.0---(cherry-pick)---o
-                          \             \
-support/0.11.x:            o---o---fix---0.11.1
-                                         \
-support/0.12.x:                           o---(cherry-pick)---0.12.1
+main:            ...---(v0.11.0)---...---(v0.12.0)---o
+                         |
+support/0.11.x:           o---(v0.11.1)
+```
+
+Final state (fix committed to `0.11.x`, cherry-picked forward to `0.12.x` and `main`):
+
+```
+main:  ...---(v0.11.0)---...---(v0.12.0)---o---o(fix cherry-picked)
+               |                  |
+               |  support/0.12.x: o(fix cherry-picked)---(v0.12.1)
+               |
+               |
+               |
+support/0.11.x:o---(v0.11.1)---o(fix)---(v0.11.2)
+                                 ↑
+                           fix-old-bug
 ```
 
 1. `0.12.0` is latest. A user of `0.11.x` reports a bug. Branch `support/0.11.x` from tag `xmlui@0.11.0` (or use existing branch).
@@ -83,3 +109,24 @@ support/0.12.x:                           o---(cherry-pick)---0.12.1
    Open PRs → rebase & merge.
 4. Run Prepare Versions on `support/0.11.x` with tag `support` (not `latest` — `0.12.x` is newer). Merge PR → triggers Release.
 5. Optionally run Prepare Versions on `support/0.12.x` with tag `latest` to release `0.12.1` with the fix too.
+
+### Example 3: New feature release on `main`
+
+Starting state (`0.12.0` is latest, feature work about to begin):
+
+```
+main:  ...---(v0.12.0)---o---o
+```
+
+Final state (feature merged, released as minor bump):
+
+```
+new-feature:  o(work in progress)---o(wip2)---o(feature)
+               \                               \
+main:  ...---(v0.12.0)---o---o------------------o(squashed into 1 commit)---(v0.13.0)
+```
+
+1. `0.12.0` is latest. Branch `myname/new-feature` from `main`. Implement the feature.
+2. Open PR into `main` ← `myname/new-feature`. Squash & merge.
+3. Run Prepare Versions on `main` with tag `latest`. Bumps version to `0.13.0` (minor changeset).
+4. Review & merge the PR → triggers Release. `0.13.0` is now latest on npm.
