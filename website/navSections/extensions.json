@@ -56,10 +56,6 @@
               "to": "/docs/reference/extensions/xmlui-docs-blocks/Breadcrumbs"
             },
             {
-              "label": "CustomSyntaxHighlighters",
-              "to": "/docs/reference/extensions/xmlui-docs-blocks/CustomSyntaxHighlighters"
-            },
-            {
               "label": "DocumentLinks",
               "to": "/docs/reference/extensions/xmlui-docs-blocks/DocumentLinks"
             },
@@ -118,6 +114,10 @@
             {
               "label": "TwoColumnCode",
               "to": "/docs/reference/extensions/xmlui-docs-blocks/TwoColumnCode"
+            },
+            {
+              "label": "CustomSyntaxHighlighters",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/CustomSyntaxHighlighters"
             }
           ]
         },
