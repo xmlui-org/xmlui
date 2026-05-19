@@ -188,8 +188,11 @@ export function AppContent({
     });
   }, [appGlobals]);
 
+  // W8-1: `strictDeterminism` default flipped from `false` to `true`.
+  // Reads use `!== false` so undefined / missing keys resolve to strict.
+  const strictDeterminism = appGlobals?.strictDeterminism !== false;
   const schedulerMode: "concurrent" | "fifo" =
-    appGlobals?.strictDeterminism === true
+    strictDeterminism
       ? "fifo"
       : (schedulerOverride ?? appGlobals?.scheduler ?? "concurrent");
   const maxQueuedPerTrace =
@@ -197,12 +200,12 @@ export function AppContent({
     (typeof appGlobals?.maxQueuedPerTrace === "number" ? appGlobals.maxQueuedPerTrace : 64);
   const schedulerRef = useRef<Scheduler | undefined>();
   const schedulerConfigRef = useRef<string>("");
-  const schedulerConfigKey = `${schedulerMode}:${maxQueuedPerTrace}:${appGlobals?.strictDeterminism === true}`;
+  const schedulerConfigKey = `${schedulerMode}:${maxQueuedPerTrace}:${strictDeterminism}`;
   if (!schedulerRef.current || schedulerConfigRef.current !== schedulerConfigKey) {
     schedulerConfigRef.current = schedulerConfigKey;
     schedulerRef.current = createScheduler(schedulerMode, {
       maxQueuedPerTrace,
-      strict: appGlobals?.strictDeterminism === true,
+      strict: strictDeterminism,
       onDiagnostic: (diagnostic) => {
         pushXsLog({
           kind: "scheduler",
@@ -540,7 +543,8 @@ export function AppContent({
     }
     if (!hits || hits.length === 0) return;
 
-    const strict = (appGlobals as any)?.strictReactiveGraph === true;
+    // W8-1: `strictReactiveGraph` default flipped from `false` to `true`.
+    const strict = (appGlobals as any)?.strictReactiveGraph !== false;
     const seen = reportedCyclesRef.current;
 
     for (const hit of hits) {
