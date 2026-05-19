@@ -61,6 +61,43 @@ import { is } from "immer/dist/internal.js";
 import { enterRenderPhase, exitRenderPhase } from "../scheduler";
 
 /**
+ * Plan #6 W7-1 — surface the per-component / per-event concurrency knobs
+ * from a node's `props` to `LookupActionOptions`. Per-event overrides
+ * (`handlerPolicy:onClick`) win over component-level defaults
+ * (`handlerPolicy`). Returns an empty object when nothing is declared so
+ * the spread call site stays a no-op for the default case.
+ */
+function resolveConcurrencyOptions(
+  props: Record<string, any> | undefined,
+  eventName: string,
+): {
+  handlerPolicy?: "parallel" | "single-flight" | "queue" | "drop-while-running";
+  handlerTimeoutMs?: number;
+  transactional?: boolean;
+} {
+  if (!props) return {};
+  const out: {
+    handlerPolicy?: "parallel" | "single-flight" | "queue" | "drop-while-running";
+    handlerTimeoutMs?: number;
+    transactional?: boolean;
+  } = {};
+  const perEventPolicy = props[`handlerPolicy:${eventName}`] ?? props.handlerPolicy;
+  if (typeof perEventPolicy === "string") {
+    out.handlerPolicy = perEventPolicy as typeof out.handlerPolicy;
+  }
+  const perEventTimeout = props[`handlerTimeoutMs:${eventName}`] ?? props.handlerTimeoutMs;
+  if (perEventTimeout !== undefined && perEventTimeout !== null) {
+    const n = Number(perEventTimeout);
+    if (Number.isFinite(n)) out.handlerTimeoutMs = n;
+  }
+  const perEventTx = props[`transactional:${eventName}`] ?? props.transactional;
+  if (perEventTx === true || perEventTx === "true") {
+    out.transactional = true;
+  }
+  return out;
+}
+
+/**
  * Invoke the per-component `onError` handler for a lifecycle phase failure.
  * The handler receives `{ source, error: { message, stack? } }`. Errors
  * thrown by the `onError` handler itself are reported as warn-level
@@ -370,6 +407,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         // --- Suppress the global toast when the user opted into `onError`;
         // --- the wrapper below dispatches the error event itself.
         ...(wrapForOnError ? { signError: false } : {}),
+        // --- Plan #6 W7-1: surface per-component / per-event policy +
+        // --- timeout + transactional flags from `node.props`. The
+        // --- dispatcher applies them in `event-handlers.ts`. Keys follow
+        // --- `handlerPolicy` / `handlerPolicy:<eventName>` convention
+        // --- (per-event override wins).
+        ...resolveConcurrencyOptions(safeNode.props, eventNameStr),
         ...actionOptions,
       });
       if (!handler || !wrapForOnError) return handler;
