@@ -797,9 +797,11 @@ phase/step labels from the source plan document.
 - 🟡 Phase 1 Step 1.1 — A11y metadata annotations across all
   built-in components (linter reads metadata but not every
   component is annotated).
-- ⬜ Phase 1 Step 1.3 — Wire `lintComponentDef()` into the LSP
-  diagnostic provider and the Vite plugin (currently rules run
-  in unit tests only; **end users see no diagnostics**).
+- ✅ Phase 1 Step 1.3 — Wire `lintComponentDef()` into the LSP
+  diagnostic provider and the Vite plugin. LSP emits `xmlui-a11y`
+  diagnostics with quick-fix data; Vite plugin emits per-file
+  warnings (errors in strict mode) and a `buildEnd` summary.
+  New `accessibility` + `a11yRegistry` options on `PluginOptions`.
 - ⬜ Phase 2 Step 2.1 — `<SkipLink>` component.
 - ⬜ Phase 2 Step 2.2 — `<FocusScope>` primitive (and
   `<Modal>` / `<Drawer>` refactor onto it).
@@ -1084,7 +1086,7 @@ The honest critical path from today's state to the
    surface (slot-undeclared consumer check, filesystem manifest
    loader, Inspector permissions panel, docs chapter) tracked
    under A.2 plan #14 and is no longer a Wave-8 blocker.
-2. **Plan #05 Phase 1 Step 1.3** — Wire a11y linter into LSP +
+2. **Plan #05 Phase 1 Step 1.3** — ✅ Wire a11y linter into LSP +
    Vite so end users actually see the rules that already exist.
 3. **Plan #07 Phase 1 Step 1.2 + Phase 2 + Phase 3 + Phase 4**
    — `LOADER_ERROR` mapping, `<App onError>`, `<RetryPolicy>`,

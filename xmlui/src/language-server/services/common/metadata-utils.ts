@@ -5,6 +5,7 @@ import type {
 import { layoutOptionKeys } from "../../../components-core/descriptorHelper";
 import { onPrefixRegex, stripOnPrefix } from "../../../parsers/xmlui-parser";
 import { viewportSizeMd } from "../../../components/abstractions";
+import type { A11yRegistry } from "../../../components-core/accessibility";
 
 type RestrictedComponentMetadata = Pick<
   ComponentMetadata,
@@ -17,6 +18,7 @@ type RestrictedComponentMetadata = Pick<
   | "allowArbitraryProps"
   | "shortDescription"
   | "nonVisual"
+  | "a11y"
 >;
 
 export type ComponentMetadataCollection = Record<string, RestrictedComponentMetadata>;
@@ -35,6 +37,20 @@ export class MetadataProvider {
     }
 
     return new ComponentMetadataProvider(providerData);
+  }
+
+  /**
+   * Returns a map of component name → a11y metadata slice for use by the
+   * accessibility linter (`lintComponentDef`).  Only the `a11y` field is
+   * included so callers are not exposed to the full restricted metadata type.
+   */
+  a11yMetadataMap(): A11yRegistry {
+    return new Map(
+      Object.entries(this.metadataCollection).map(([name, meta]) => [
+        name,
+        { a11y: meta.a11y },
+      ]),
+    );
   }
 }
 

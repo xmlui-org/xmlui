@@ -307,7 +307,7 @@ Step 1.1.
 
 ---
 
-### Step 1.3 — LSP and Vite Plugin Integration
+### Step 1.3 — LSP and Vite Plugin Integration ✅ DONE (2026-05)
 
 **Priority:** 3
 
@@ -325,11 +325,25 @@ Step 1.1.
 - Document the new diagnostics in the
   [VS Code extension README](../../../tools/vscode/README.md).
 
-#### Files
+#### Files changed
 
+- `xmlui/src/language-server/services/a11y-diagnostic.ts` (new)
 - `xmlui/src/language-server/services/diagnostic.ts`
+- `xmlui/src/language-server/services/common/metadata-utils.ts`
+- `xmlui/src/components-core/accessibility/linter.ts`
+- `xmlui/src/components-core/accessibility/index.ts`
 - `xmlui/src/nodejs/vite-xmlui-plugin.ts`
 - `tools/vscode/README.md`
+
+#### Implementation notes
+
+- `DiagnosticsContext` extended with optional `metadataProvider`; `getDiagnostics`
+  threads the project's `MetadataProvider` through so a11y linting uses real metadata.
+- `MetadataProvider.a11yMetadataMap()` returns `A11yRegistry` (the `a11y` slice only).
+- `lintComponentDef` registry parameter widened to `A11yRegistry` (only `a11y` is read).
+- Vite plugin: new `accessibility` + `a11yRegistry` options on `PluginOptions`; `buildEnd`
+  emits an aggregate summary when violations were found.
+- `fix` suggestions embedded in `diagnostic.data` for code-action consumers.
 
 #### Tests
 
