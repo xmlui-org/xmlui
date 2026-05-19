@@ -29,7 +29,13 @@
  */
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { parseParameterString } from "../script-runner/ParameterParser";
+import { Parser } from "../../parsers/scripting/Parser";
 import { isParsedValue } from "../state/variable-resolution";
+
+function parse(source: string) {
+  const parser = new Parser(source);
+  return parser.parseStatements();
+}
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { ROUTING_STATE_KEYS } from "../state/routing-state";
@@ -352,29 +358,41 @@ function computeUsesInternal(
 
   addRecord(node.props as Record<string, unknown> | undefined);
   addRecord(node.vars);
-  
+
   const isDataLoader = node.type === "DataLoader" || node.type === "DataSource";
   const events = node.events as Record<string, unknown> | undefined;
-  
-  if (isDataLoader && events?.fetch != null) {
-    // We must process 'fetch' separately. If we just add it and then 'delete(d)', we might
-    // accidentally delete a valid dependency that came from props (e.g. url="{$queryParams.q}").
-    const eventsWithoutFetch = { ...events };
-    delete eventsWithoutFetch.fetch;
-    addRecord(eventsWithoutFetch);
 
-    const fetchSrc = events.fetch;
-    const { all: fetchAll, reads: fetchReads } = depsOfValue(fetchSrc);
-    for (const raw of fetchAll) {
-      const d = rootIdentifier(raw);
-      if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHere.add(d);
+  const addEvent = (raw: unknown) => {
+    if (typeof raw === "string" && !raw.includes("{")) {
+      try {
+        const statements = parse(raw);
+        const { all, reads } = depsOfValue({ statements });
+        for (const d of all) usedHere.add(d);
+        for (const d of reads) usedHereReads.add(d);
+        return;
+      } catch {
+        // Fall back to regular processing if not a valid script
+      }
     }
-    for (const raw of fetchReads) {
-      const d = rootIdentifier(raw);
-      if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHereReads.add(d);
+    addValue(raw);
+  };
+
+  if (events) {
+    for (const [key, raw] of Object.entries(events)) {
+      if (isDataLoader && key === "fetch" && raw != null) {
+        const { all: fetchAll, reads: fetchReads } = depsOfValue(raw);
+        for (const r of fetchAll) {
+          const d = rootIdentifier(r);
+          if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHere.add(d);
+        }
+        for (const r of fetchReads) {
+          const d = rootIdentifier(r);
+          if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHereReads.add(d);
+        }
+      } else {
+        addEvent(raw);
+      }
     }
-  } else {
-    addRecord(events);
   }
 
   addRecord(node.api as Record<string, unknown> | undefined);

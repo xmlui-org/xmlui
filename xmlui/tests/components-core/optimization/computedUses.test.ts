@@ -302,6 +302,49 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — loaders", () => {
 });
 
 describe.skipIf(skipIfDisabled)("computeUsesForTree — events", () => {
+  it("assignment targets (LHS) are included in computedUses (Bug 20)", () => {
+    // When an event handler writes to a variable (flag = true), that variable
+    // must be in computedUses so it's included in the evaluation scope.
+    // We also need a read (counter) to trigger computedUses calculation.
+    const root = node("Stack", {
+      vars: { flag: "{false}", counter: "{0}" },
+      children: [
+        node("Fragment", {
+          vars: { x: "{1}" },
+          children: [
+            node("Text", { props: { text: "{counter}" } }),
+            node("Button", {
+              events: { onClick: "flag = true" },
+            }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const fragment = root.children![0];
+    expect(fragment.computedUses).toContain("flag");
+    expect(fragment.computedUses).toContain("counter");
+  });
+
+  it("write-only assignment does NOT promote implicit containers (Bug 20 optimization)", () => {
+    // A Select with onDidChange="testState = 'changed'" should NOT become an
+    // implicit container if it doesn't read any external state. Promoting it
+    // to an implicit container would wrap it in an unnecessary StateContainer.
+    const root = node("Stack", {
+      vars: { testState: "{null}" },
+      children: [
+        node("Select", {
+          events: { onDidChange: "testState = 'changed'" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const select = root.children![0];
+    // Select is in IMPLICIT_CONTAINER_COMPONENT_NAMES, but since it only WRITES
+    // to testState, it shouldn't be promoted to an implicit container.
+    expect(select.computedUses).toBeUndefined();
+  });
+
   it("identifiers in parsed event handlers are included", () => {
     const buttonWithEvent = node("Button", {
       events: {
