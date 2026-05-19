@@ -1,13 +1,13 @@
 /**
  * Event Handler Execution Module
- * 
+ *
  * Handles asynchronous and synchronous event handler execution with:
  * - State tracking and lifecycle management
- * - Inspector logging integration  
+ * - Inspector logging integration
  * - React transition management for non-blocking updates
  * - Statement queue processing
  * - Error handling and cleanup
- * 
+ *
  * Part of Container.tsx refactoring - Step 2
  */
 
@@ -15,8 +15,8 @@ import { useCallback } from "react";
 import { cloneDeep } from "lodash-es";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { IApiInterceptor } from "../interception/abstractions";
-import type { 
-  ArrowExpression, 
+import type {
+  ArrowExpression,
   ArrowExpressionStatement,
   Statement,
 } from "../script-runner/ScriptingSourceTree";
@@ -24,7 +24,7 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { buildProxy, type ProxyAction } from "../rendering/buildProxy";
-import { 
+import {
   parseHandlerCode,
   prepareHandlerStatements,
 } from "../utils/statementUtils";
@@ -122,6 +122,9 @@ export function createEventHandlers(config: EventHandlerConfig) {
     parsedStatementsRef,
   } = config;
 
+  let lastFp: Record<string, any> | undefined = undefined;
+  let lastCompState: Record<string, any> | undefined = undefined;
+
   // Merge the latest fullParentStateRef.current with componentStateRef.current
   // into stateRef immediately before each handler execution.
   //
@@ -136,14 +139,30 @@ export function createEventHandlers(config: EventHandlerConfig) {
   // full current state regardless of memo-blocking.
   const refreshStateRef = () => {
     const fp = fullParentStateRef?.current;
-    if (fp && componentStateRef) {
-      stateRef.current = { ...fp, ...componentStateRef.current };
+    const compState = componentStateRef?.current;
+    if (!componentStateRef) {
+      return;
     }
+    // Only update stateRef if one of the inputs changed identity.
+    if (fp === lastFp && compState === lastCompState) {
+      return;
+    }
+    lastFp = fp;
+    lastCompState = compState;
+    // Always mirror the latest componentState into stateRef. When fullParentStateRef
+    // is absent (no uses/computedUses on this node), the previous guard skipped this
+    // entirely, leaving stateRef stale across handler invocations — e.g. DataSource
+    // onFetch with computedUses-enabled ancestors could run with an empty stateRef so
+    // handler context merge lost injected $url / $method / $queryParams.
+    stateRef.current = fp ? { ...fp, ...compState } : compState;
   };
 
   // ========================================================================
   // ASYNC EVENT HANDLER EXECUTION
   // ========================================================================
+
+  let lastClonedState: any = undefined;
+  let lastClonedResult: any = undefined;
 
   const runCodeAsync = useEvent(
     async (
@@ -173,9 +192,23 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const getComponentStateClone = () => {
         changes.length = 0;
         const originalState = stateRef.current;
-        const poj = cloneDeep({ ...originalState, ...(options?.context || {}) });
-        poj["$this"] = originalState[uid];
-        // --- W3-6: expose `$cancel` as a read-only handler-scope variable.
+        // Deep-clone container state, then shallow-assign handler-injected context on top.
+        // A single cloneDeep({ ...state, ...context }) can mis-handle collisions between
+        // router `$queryParams` (Layer 6) and fetch-handler `$queryParams` when routing
+        // values are deep-cloned structures under computedUses narrowing.
+        //
+        // PERFORMANCE: Cache the clone results if originalState hasn't changed identity.
+        // refreshStateRef() now ensures stateRef.current is stable when inputs don't change.
+        if (originalState !== lastClonedState) {
+          lastClonedState = originalState;
+          lastClonedResult = cloneDeep(originalState);
+        }
+        const poj = { ...lastClonedResult };
+
+        if (options?.context) {
+          Object.assign(poj, options.context);
+        }
+        poj["$this"] = originalState[uid];        // --- W3-6: expose `$cancel` as a read-only handler-scope variable.
         poj["$cancel"] = cancelToken;
 
         // Tag component API objects with their key for reference tracking.

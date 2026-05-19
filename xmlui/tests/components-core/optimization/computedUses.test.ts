@@ -80,6 +80,42 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — basic cases", () => {
   });
 });
 
+describe.skipIf(skipIfDisabled)("computeUsesForTree — DataLoader onFetch context", () => {
+  it("does not bubble fetch-injected $url / $method / $queryParams as parent deps", () => {
+    const root = node("Fragment", {
+      vars: { x: "{0}" },
+      loaders: [
+        node("DataLoader", {
+          uid: "ds",
+          props: { id: "ds", url: "/api/x" },
+          events: { fetch: "() => $url + '|' + $method + '|' + $queryParams.q" },
+        }),
+      ],
+      children: [node("Text", { props: { value: "{x}" } })],
+    });
+    computeUsesForTree(root);
+    // Fetch-handler identifiers must not force narrowing on `$queryParams` (router key).
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("keeps $queryParams as parent dependency if it is used in a regular property alongside fetch", () => {
+    const root = node("Fragment", {
+      vars: { x: "{0}" },
+      loaders: [
+        node("DataLoader", {
+          uid: "ds",
+          props: { id: "ds", url: "{$queryParams.q}" },
+          events: { fetch: "() => $url + '|' + $method + '|' + $queryParams.q" },
+        }),
+      ],
+      children: [node("Text", { props: { value: "{x}" } })],
+    });
+    computeUsesForTree(root);
+    // Because url="{$queryParams.q}", the component genuinely depends on the router state.
+    expect(root.computedUses).toContain("$queryParams");
+  });
+});
+
 describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDefault", () => {
   it("Select with children that have dependencies becomes container", () => {
     const select = node("Select", {

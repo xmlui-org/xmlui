@@ -123,6 +123,21 @@ const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 const PARENT_STATE_DYNAMIC_VARS = new Set(["$context"]);
 
 /**
+ * Identifiers injected at runtime into DataSource/DataLoader `fetch` handlers only.
+ * They must NOT be treated as parent-scope dependencies: especially `$queryParams`
+ * collides with {@link ROUTING_STATE_KEYS} router state, which would narrow ancestors
+ * to URL query params and break handler context merge (DataSource onFetch tests).
+ */
+const DATA_FETCH_HANDLER_INJECTED_KEYS = new Set([
+  "$url",
+  "$method",
+  "$queryParams",
+  "$requestBody",
+  "$requestHeaders",
+  "$pageParams",
+]);
+
+/**
  * Returns true for framework-injected context variables that are NOT stored
  * in parent state.  All XMLUI runtime-injected names start with `$`; the
  * exceptions are the router state keys (routing-state.ts) and the dynamic
@@ -337,7 +352,31 @@ function computeUsesInternal(
 
   addRecord(node.props as Record<string, unknown> | undefined);
   addRecord(node.vars);
-  addRecord(node.events as Record<string, unknown> | undefined);
+  
+  const isDataLoader = node.type === "DataLoader" || node.type === "DataSource";
+  const events = node.events as Record<string, unknown> | undefined;
+  
+  if (isDataLoader && events?.fetch != null) {
+    // We must process 'fetch' separately. If we just add it and then 'delete(d)', we might
+    // accidentally delete a valid dependency that came from props (e.g. url="{$queryParams.q}").
+    const eventsWithoutFetch = { ...events };
+    delete eventsWithoutFetch.fetch;
+    addRecord(eventsWithoutFetch);
+
+    const fetchSrc = events.fetch;
+    const { all: fetchAll, reads: fetchReads } = depsOfValue(fetchSrc);
+    for (const raw of fetchAll) {
+      const d = rootIdentifier(raw);
+      if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHere.add(d);
+    }
+    for (const raw of fetchReads) {
+      const d = rootIdentifier(raw);
+      if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHereReads.add(d);
+    }
+  } else {
+    addRecord(events);
+  }
+
   addRecord(node.api as Record<string, unknown> | undefined);
 
   if (node.when !== undefined && node.when !== null && typeof node.when !== "boolean") {

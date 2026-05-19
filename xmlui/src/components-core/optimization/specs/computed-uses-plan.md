@@ -720,6 +720,24 @@ const isImplicitDefault =
 
 ---
 
+### Баг 21 (виявлений у Group C, `DataSource.spec.ts` onFetch): `$queryParams` у `onFetch` конфліктував з роутерним `$queryParams` у `computedUses`
+
+**Симптом:** E2E `handler can use $url, $method and $queryParams context vars` — `ds.value` порожній при `COMPUTED_USES_ENABLED=true`.
+
+**Причина:** 
+1. `$url` / `$method` вже фільтруються як `isRuntimeContextVar`, але `$queryParams` входить до `ROUTING_STATE_KEYS` → не фільтрується → `onFetch` додає `$queryParams` до `parentDependencies` вузла → предок (наприклад, тестовий `Fragment`) отримує `computedUses` з роутерним ключем → звуження стану / merge з handler `context` ламає інжектовані fetch-параметри.
+2. Під час побудови дерева (до рендерингу) вузол все ще має тип `"DataSource"`, а не `"DataLoader"`, тому перевірка `node.type === "DataLoader"` ігнорувала такі вузли.
+3. Просто робити `usedHere.delete(d)` було небезпечно, оскільки це могло видалити справжню залежність `$queryParams` (якщо вона використовувалася, наприклад, у `url="{$queryParams.q}"`), що ламало б реактивність лоадера.
+
+**Виправлення:** 
+1. Змінено перевірку типу: `node.type === "DataLoader" || node.type === "DataSource"`.
+2. Вдосконалено збір залежностей: подія `fetch` вилучається з `events` перед викликом `addRecord(eventsWithoutFetch)`. Потім її залежності аналізуються окремо і додаються до `usedHere` ТІЛЬКИ якщо вони НЕ входять до `DATA_FETCH_HANDLER_INJECTED_KEYS`. Це зберігає справжні залежності, якщо вони з'явилися з інших пропертій (наприклад, `url`).
+3. У `event-handlers.ts`: `refreshStateRef` завжди оновлює `stateRef` з `componentStateRef` коли немає `fullParentStateRef`; `getComponentStateClone` робить `Object.assign(poj, context)` після `cloneDeep(originalState)`.
+
+**Файли:** `computedUses.ts`, `event-handlers.ts`, `tests/components-core/optimization/computedUses.test.ts`.
+
+---
+
 ## Результати бенчмарку
 
 Тест: `oftenChanges` тікає кожні 100мс → 20 тіків за 2с.
