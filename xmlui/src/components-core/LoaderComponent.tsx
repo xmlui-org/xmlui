@@ -13,6 +13,7 @@ import type {
 
 import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ContainerActionKind } from "./rendering/containers";
+import { AppError } from "./errors";
 import { createValueExtractor } from "./rendering/valueExtractor";
 import { useFnDeps } from "./FnDepsContext";
 import { useReferenceTrackedApi } from "./utils/hooks";
@@ -187,12 +188,15 @@ function loaderLoaded(
 }
 
 // Signs that a particular loader (`uid`) has has an `error` during its operation.
+// The raw error is normalised to an `AppError` (plan #07 Step 1.2) so consumers
+// reading `$error.*` get a structured shape (`code`, `category`, `retryable`,
+// `correlationId`, `data`). Existing `$error.message` reads continue to work.
 function loaderError(uid: symbol, error: any) {
   return {
     type: ContainerActionKind.LOADER_ERROR,
     payload: {
       uid,
-      error,
+      error: AppError.from(error),
     },
   };
 }

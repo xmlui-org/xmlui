@@ -26,6 +26,13 @@ export class GenericBackendError extends EngineError {
   statusCode: number | undefined;
   message: string;
   response: any;
+  /**
+   * Plan #07 Step 3.2 — when the upstream response carries an HTTP
+   * `Retry-After` header, this value is the parsed delay in milliseconds
+   * (clamped to a hard 60 s ceiling). Surfaces through
+   * `AppError.data.retryAfterMs` so `<RetryPolicy>` can honour it.
+   */
+  retryAfterMs: number | undefined;
 
   constructor(public readonly info: any, errorCode: number | undefined) {
     // Extract the main message (various field names across API formats)

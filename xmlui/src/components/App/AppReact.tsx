@@ -94,6 +94,10 @@ type Props = {
   onKeyUp?: (event: KeyboardEvent) => void;
   onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
   onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
+  onError?: (
+    error: unknown,
+    event: { preventDefault(): void; defaultPrevented: boolean },
+  ) => void | boolean | Promise<void | boolean>;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
@@ -165,6 +169,7 @@ export const App = memo(function App({
   onKeyUp = noop,
   onWillNavigate,
   onDidNavigate,
+  onError,
   header,
   navPanel,
   footer,
@@ -259,6 +264,18 @@ export const App = memo(function App({
       setNavigationHandlers(onWillNavigate, onDidNavigate);
     }
   }, [onWillNavigate, onDidNavigate, setNavigationHandlers]);
+
+  // Plan #07 Step 2.1 — register a markup `<App onError>` handler with the
+  // app-level error sink. Passing `undefined` clears the registration.
+  const setErrorHandler = (appContext as any)?.App?.setErrorHandler as
+    | ((handler?: typeof onError) => void)
+    | undefined;
+  useEffect(() => {
+    if (typeof setErrorHandler === "function") {
+      setErrorHandler(onError);
+      return () => setErrorHandler(undefined);
+    }
+  }, [onError, setErrorHandler]);
 
   // Initialize theme and tone settings
   useThemeInitialization({

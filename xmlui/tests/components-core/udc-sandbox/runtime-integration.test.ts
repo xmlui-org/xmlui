@@ -57,7 +57,7 @@ describe("UDC sandbox — runtime capability gate (W6-2)", () => {
     evalBindingExpression("App.fetch", ctx);
     const cap = diags.find((d) => d.code === "udc-capability-missing");
     expect(cap).toBeDefined();
-    expect(cap?.data?.capability).toBe("fetch");
+    expect((cap?.data as any)?.capability).toBe("fetch");
     expect(cap?.severity).toBe("warn");
   });
 
@@ -85,7 +85,7 @@ describe("UDC sandbox — runtime capability gate (W6-2)", () => {
     const { ctx, diags } = makeContext({ udcContract: contract });
     evalBindingExpression("navigate", ctx);
     const cap = diags.find((d) => d.code === "udc-capability-missing");
-    expect(cap?.data?.capability).toBe("navigate");
+    expect((cap?.data as any)?.capability).toBe("navigate");
   });
 
   it("gates Clipboard against the clipboard capability", () => {
@@ -95,7 +95,7 @@ describe("UDC sandbox — runtime capability gate (W6-2)", () => {
     const { ctx, diags } = makeContext({ udcContract: contract });
     evalBindingExpression("Clipboard", ctx);
     const cap = diags.find((d) => d.code === "udc-capability-missing");
-    expect(cap?.data?.capability).toBe("clipboard");
+    expect((cap?.data as any)?.capability).toBe("clipboard");
   });
 });
 
@@ -111,6 +111,6 @@ describe("UDC sandbox — capability mapper override", () => {
     });
     evalBindingExpression("App.doStuff", ctx, undefined as any);
     const cap = diags.find((d) => d.code === "udc-capability-missing");
-    expect(cap?.data?.capability).toBe("fetch");
+    expect((cap?.data as any)?.capability).toBe("fetch");
   });
 });

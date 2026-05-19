@@ -6,9 +6,12 @@
  */
 
 export type { ErrorCategory, AppErrorInit } from "./app-error";
-export { AppError } from "./app-error";
+export { AppError, categorizeHttpStatus } from "./app-error";
 
-export type { RetryPolicySpec, CircuitBreakerSpec } from "./policy";
-export { executeWithPolicy } from "./policy";
+export type { RetryPolicySpec, CircuitBreakerSpec, ExecuteOptions, CircuitBreakerState } from "./policy";
+export { executeWithPolicy, parseRetryAfter, createCircuitState, MAX_RETRY_AFTER_MS } from "./policy";
 
 export type { ErrorDiagnosticCode, ErrorSource, ErrorDiagnostic } from "./diagnostics";
+
+export type { RetryPolicyContextValue } from "./RetryPolicyContext";
+export { RetryPolicyContext, useRetryPolicy } from "./RetryPolicyContext";

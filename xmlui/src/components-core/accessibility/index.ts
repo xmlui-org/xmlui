@@ -9,4 +9,3 @@
 export type { A11yCode, A11yDiagnostic } from "./diagnostics";
 export type { LintOptions, A11yRegistry } from "./linter";
 export { lintComponentDef } from "./linter";
-export { lintComponentDef } from "./linter";

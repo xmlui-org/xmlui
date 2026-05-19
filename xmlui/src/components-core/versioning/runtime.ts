@@ -21,15 +21,14 @@ export function _resetVersioningDedup(): void {
   SESSION_DEDUP.clear();
 }
 
-export function emitVersioningDiagnostics(
-  diagnostics: readonly VersioningDiagnostic[],
-): number {
+export function emitVersioningDiagnostics(diagnostics: readonly VersioningDiagnostic[]): number {
   let emitted = 0;
   for (const d of diagnostics) {
     const key = `${d.componentName ?? "?"}|${d.propName ?? d.eventName ?? d.methodName ?? "*"}|${d.code}`;
     if (SESSION_DEDUP.has(key)) continue;
     SESSION_DEDUP.add(key);
     pushXsLog({
+      ts: Date.now(),
       kind: "versioning",
       code: d.code,
       severity: d.severity,

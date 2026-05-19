@@ -153,6 +153,23 @@ export function AppContent({
     [],
   );
 
+  // --- App.onError handler state (plan #07 Step 2.1).
+  // The handler is registered by `<App onError="...">` via setErrorHandler.
+  // signError invokes it after toasting, passing an `AppError` and a
+  // `preventDefault` shaped event payload. The handler may return `false` or
+  // call `event.preventDefault()` to suppress the toast.
+  const errorHandlerRef = useRef<((err: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>) | undefined>(undefined);
+  const setErrorHandler = useCallback(
+    (handler?: (err: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>) => {
+      errorHandlerRef.current = handler;
+    },
+    [],
+  );
+
+  // --- App.errors reactive stream (FIFO buffer of recent AppErrors).
+  // The buffer size is read from appGlobals.errorBufferSize (default 50).
+  const [errors, setErrors] = useState<ReadonlyArray<AppError>>(() => Object.freeze([]) as ReadonlyArray<AppError>);
+
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
   const navigateRouter = useNavigate();
@@ -1375,6 +1392,72 @@ export function AppContent({
     return wrapper;
   }, []);
 
+  // --- Plan #07 Step 2.1: structured `signError` that maintains the
+  // `App.errors` buffer and invokes a markup `<App onError>` handler.
+  const signErrorWithHandler = useCallback(
+    (error: Error | AppError | string | unknown) => {
+      const appError = AppError.from(error);
+
+      // Build event payload with preventDefault — handler can suppress toast.
+      let defaultPrevented = false;
+      const event = {
+        preventDefault() { defaultPrevented = true; },
+        get defaultPrevented() { return defaultPrevented; },
+      };
+
+      // Append to App.errors buffer (FIFO, capped).
+      const bufferSize = Math.max(
+        0,
+        typeof (appGlobals as any)?.errorBufferSize === "number"
+          ? (appGlobals as any).errorBufferSize
+          : 50,
+      );
+      if (bufferSize > 0) {
+        setErrors((prev) => {
+          const next = prev.concat(appError);
+          return Object.freeze(
+            next.length > bufferSize ? next.slice(next.length - bufferSize) : next,
+          ) as ReadonlyArray<AppError>;
+        });
+      }
+
+      // Invoke registered onError handler (may run async). Errors thrown by
+      // the handler are swallowed to avoid feedback loops.
+      const handler = errorHandlerRef.current;
+      let handlerResult: void | boolean | Promise<void | boolean> | undefined;
+      if (handler) {
+        try {
+          handlerResult = handler(appError, event);
+        } catch (e) {
+          console.error("[xmlui] onError handler threw:", e);
+        }
+      }
+
+      const showToast = () => {
+        if (defaultPrevented || handlerResult === false) return;
+        signError(appError);
+      };
+
+      // Async handlers can still call preventDefault before settling.
+      if (handlerResult && typeof (handlerResult as any).then === "function") {
+        (handlerResult as Promise<void | boolean>).then(
+          (result) => {
+            if (result === false) return;
+            // If the handler hasn't called preventDefault yet, still show toast.
+            if (!defaultPrevented) signError(appError);
+          },
+          () => {
+            // Handler rejected — still show toast.
+            if (!defaultPrevented) signError(appError);
+          },
+        );
+      } else {
+        showToast();
+      }
+    },
+    [appGlobals],
+  );
+
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
@@ -1419,7 +1502,7 @@ export function AppContent({
 
       // --- Notifications and dialogs
       confirm,
-      signError,
+      signError: signErrorWithHandler,
       toast: tracedToast,
 
       // --- Theme-related
@@ -1487,6 +1570,14 @@ export function AppContent({
         scheduleHandler,
         // --- W5-1 / plan #09 Step 1.2: register a named validator from markup.
         registerValidator: registerValidatorImpl,
+        // --- Plan #07 Step 2.1: structured error sink.
+        // `App.errors` is a FIFO buffer of recent `AppError`s (default 50, see
+        // `appGlobals.errorBufferSize`).  `setErrorHandler` is used by
+        // `<App onError>` to register a markup handler that runs after the
+        // default toast; the handler may call `event.preventDefault()` to
+        // suppress the toast.
+        errors,
+        setErrorHandler,
       },
       Clipboard: ClipboardNamespace,
 
@@ -1507,6 +1598,9 @@ export function AppContent({
     routerBaseName,
     setNavigationHandlers,
     confirm,
+    signErrorWithHandler,
+    errors,
+    setErrorHandler,
     activeThemeId,
     activeThemeTone,
     availableThemeIds,
@@ -1576,6 +1670,9 @@ function inferLocaleFromBundleUrl(url: string): string | undefined {
 }
 
 // --- We pass this funtion to the global app context
+// Step 1.1 normalises any thrown value into an `AppError`; Step 2.1 (`<App
+// onError>`) wraps this base behaviour with handler invocation and the
+// `App.errors` buffer inside the component closure (see `signErrorWithHandler`).
 function signError(error: Error | AppError | string | unknown) {
   const appError = AppError.from(error);
   const message = appError.message || "Something went wrong";

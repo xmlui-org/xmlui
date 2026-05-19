@@ -829,28 +829,29 @@ phase/step labels from the source plan document.
 
 #### Plan #07 — Structured exception model *(STATUS.md previously overclaimed)*
 
-- 🟡 Phase 1 Step 1.2 — Wire `LoaderComponent` to map HTTP
+- ✅ Phase 1 Step 1.2 — Wire `LoaderComponent` to map HTTP
   status codes to `ErrorCategory`; ensure `LOADER_ERROR`
   payload is an `AppError`.
-- ⬜ Phase 2 Step 2.1 — `<App onError>` event + `App.errors`
-  stream + Inspector "Errors" tab.
-- ⬜ Phase 3 Step 3.1 — `<RetryPolicy>` component with
-  `executeWithPolicy()`.
-- ⬜ Phase 3 Step 3.2 — `Retry-After` header honouring in
-  `RestApiProxy`.
-- ⬜ Phase 4 Step 4.1 — `<Fallback>` component (error slot +
+- ✅ Phase 2 Step 2.1 — `<App onError>` event + `App.errors`
+  stream + `App.setErrorHandler` API (Inspector "Errors"
+  tab deferred — no Inspector UI surface exists yet).
+- ✅ Phase 3 Step 3.1 — `<RetryPolicy>` component with
+  `executeWithPolicy()` (full retry-loop + circuit-breaker).
+- ✅ Phase 3 Step 3.2 — `Retry-After` header honouring in
+  `RestApiProxy` (surfaces as `AppError.data.retryAfterMs`).
+- ✅ Phase 4 Step 4.1 — `<Fallback>` component (error slot +
   loading slot).
 - ⬜ Docs chapter + default flip.
 
 #### Plan #08 — Sealed theming sandbox
 
-- ⬜ Phase 1 Step 1.2 — Wire `validateTheme()` into
-  `StyleProvider` theme-resolution loop.
-- ⬜ Phase 2 Step 2.1 — Wire `validateInlineStyle()` into
+- ✅ Phase 1 Step 1.2 — Wire `validateTheme()` into
+  `ThemeProvider` theme-resolution loop.
+- ✅ Phase 2 Step 2.1 — Wire `validateInlineStyle()` into
   `valueExtractor` for layout props
   (`width`/`padding*`/`margin*`/`gap`/`zIndex`/…).
-- ⬜ Phase 2 Step 2.2 — Wire `validateStyleString()` into
-  `valueExtractor.style` (enforces `position:fixed`/`url()` /
+- ✅ Phase 2 Step 2.2 — Wire `validateStyleString()` into
+  `valueExtractor.asStyleProp` (enforces `position:fixed`/`url()` /
   `!important` bans).
 - ⬜ Component-metadata annotation sweep
   (`ThemeVarMetadata.valueType` for every shipped
@@ -1089,9 +1090,9 @@ The honest critical path from today's state to the
 2. **Plan #05 Phase 1 Step 1.3** — ✅ Wire a11y linter into LSP +
    Vite so end users actually see the rules that already exist.
 3. **Plan #07 Phase 1 Step 1.2 + Phase 2 + Phase 3 + Phase 4**
-   — `LOADER_ERROR` mapping, `<App onError>`, `<RetryPolicy>`,
-   `<Fallback>`. Bigger user-visible surface than any other
-   missing item.
+   — ✅ `LOADER_ERROR` mapping, `<App onError>`,
+   `<RetryPolicy>`, `<Fallback>`. Inspector "Errors" tab and
+   docs chapter remain open.
 4. **Plan #08 Phase 1 Step 1.2 + Phase 2** — Hot-path wiring of
    theming validators into `StyleProvider` and `valueExtractor`.
    Otherwise the whole 72-test validator surface is dead code.
@@ -1108,7 +1109,7 @@ The honest critical path from today's state to the
    "policy validation at handler-coordinator registration").
 9. **Plan #05 Phase 2 components** — `<SkipLink>`,
    `<FocusScope>`, `<LiveRegion>`.
-10. **Plan #07 Phase 3.2** — `Retry-After` header in
+10. **Plan #07 Phase 3.2** — ✅ `Retry-After` header in
     `RestApiProxy`.
 11. **Plan #02 lint-rule body + migration.**
 12. **Plan #10 Phase 1.2 + Phase 2.1 residuals.**

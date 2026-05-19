@@ -53,7 +53,7 @@ export const labelBehavior: Behavior = {
       type: "and",
       conditions: [
         {
-          type: "visual"
+          type: "visual",
         },
         {
           type: "hasNoProp",
@@ -103,9 +103,12 @@ export const labelBehavior: Behavior = {
     const required = extractValue.asOptionalBoolean(componentNode.props.required);
     const enabled = extractValue.asOptionalBoolean(componentNode.props.enabled, true);
     const shrinkToLabel = extractValue.asOptionalBoolean(componentNode.props.shrinkToLabel);
-    const style = extractValue(componentNode.props.style);
+    const style = extractValue.asStyleProp(componentNode.props.style, componentNode.type);
     const readOnly = extractValue.asOptionalBoolean(componentNode.props.readOnly);
-    const direction = extractValue.asOptionalString(componentNode.props.direction) as "rtl" | "ltr" | undefined;
+    const direction = extractValue.asOptionalString(componentNode.props.direction) as
+      | "rtl"
+      | "ltr"
+      | undefined;
 
     return (
       <ItemWithLabel
@@ -115,7 +118,7 @@ export const labelBehavior: Behavior = {
         labelBreak={labelBreak}
         required={required}
         enabled={enabled}
-        style={style}
+        style={style as any}
         cloneStyle={true}
         shrinkToLabel={shrinkToLabel}
         labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
@@ -129,4 +132,3 @@ export const labelBehavior: Behavior = {
     );
   },
 };
-

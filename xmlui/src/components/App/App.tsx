@@ -234,6 +234,21 @@ export const AppMd = createMetadata({
         queryParams: "Query parameters (only available for programmatic navigation).",
       },
     },
+    error: {
+      description:
+        `This event fires whenever the framework signals an unhandled error (loader failure, ` +
+        `handler exception, or render-time throw). The handler receives the structured ` +
+        `\`AppError\` and an event-like object whose \`preventDefault()\` suppresses the ` +
+        `default toast. By default the toast is shown first; the handler can also return ` +
+        `\`false\` to suppress the toast. Use this hook for centralised telemetry or custom ` +
+        `error UI.`,
+      signature:
+        "(error: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>",
+      parameters: {
+        error: "The structured `AppError` (code, category, retryable, correlationId, data).",
+        event: "Cancellable event payload. Call `event.preventDefault()` to suppress the toast.",
+      },
+    },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
@@ -336,6 +351,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       onKeyUp={lookupEventHandler("keyUp")}
       onWillNavigate={lookupEventHandler("willNavigate")}
       onDidNavigate={lookupEventHandler("didNavigate")}
+      onError={lookupEventHandler("error")}
       name={extractValue(node.props.name)}
       logo={extractValue(node.props.logo)}
       logoDark={extractValue(node.props["logo-dark"])}

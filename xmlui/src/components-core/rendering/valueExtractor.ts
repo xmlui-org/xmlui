@@ -15,6 +15,9 @@ import { coerceValue, verifyValue } from "../type-contracts/rules/coerce";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 import type { FnDeps } from "../FnDepsContext";
 import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
+import { validateInlineStyle, validateStyleString } from "../theming/validator";
+import type { ThemeValueType } from "../../abstractions/ComponentDefs";
+import { pushXsLog } from "../inspector/inspectorUtils";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -307,6 +310,58 @@ export function createValueExtractor(
     const failure = verifyValue("icon", value);
     if (failure) return undefined;
     return coerceValue("icon", value) as string;
+  };
+
+  extractor.asLayoutProp = (propName: string, expression?: any, valueType?: ThemeValueType) => {
+    const raw = extractor(expression);
+    if (raw === undefined || raw === null) return undefined;
+    const opts = {
+      strict: !!(appContext?.appGlobals?.strictTheming),
+      allowRawCss: appContext?.appGlobals?.allowInlineRawCss !== false,
+      maxZIndex: appContext?.appGlobals?.maxZIndex ?? 9999,
+    };
+    const { value, diagnostics } = validateInlineStyle(
+      { propName, rawValue: raw, valueType },
+      opts,
+    );
+    for (const d of diagnostics) {
+      pushXsLog({
+        kind: "theming",
+        ts: Date.now(),
+        severity: d.severity,
+        code: d.code,
+        propName: d.propName,
+        expected: d.expected,
+        actual: d.actual,
+        message: d.message,
+      });
+    }
+    return value;
+  };
+
+  extractor.asStyleProp = (expression?: any, componentName?: string) => {
+    const raw = extractor(expression);
+    if (raw === undefined || raw === null || raw === "") return raw;
+    const rawStr = typeof raw === "string" ? raw : String(raw);
+    const opts = {
+      strict: !!(appContext?.appGlobals?.strictTheming),
+      allowRawCss: appContext?.appGlobals?.allowInlineRawCss !== false,
+      maxZIndex: appContext?.appGlobals?.maxZIndex ?? 9999,
+    };
+    const { value, diagnostics } = validateStyleString(rawStr, { componentName }, opts);
+    for (const d of diagnostics) {
+      pushXsLog({
+        kind: "theming",
+        ts: Date.now(),
+        severity: d.severity,
+        code: d.code,
+        propName: d.propName,
+        expected: d.expected,
+        actual: d.actual,
+        message: d.message,
+      });
+    }
+    return value;
   };
 
   // --- Done.
