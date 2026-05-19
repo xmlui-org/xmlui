@@ -1,149 +1,170 @@
-**Overall Philosophy:**
+# Release process and branching
 
-*   **`main` branch:** The source of truth for all development.
-*   **Changesets:** Used for managing versioning and changelogs.
-    *   Can be added manually (`npx changeset add`).
-    *   Or, ideally, auto-generated from Conventional Commits on PRs (see `add-changeset.yml` below).
-*   **Beta Releases:** Fully automated on every merge to `main` that includes new changesets. Published to npm with a `beta` tag.
-*   **Stable Releases:** A manually triggered process that:
-    1.  Creates a "Version Packages" Pull Request for review.
-    2.  Upon merging this PR, publishes packages to npm (with the `latest` tag) and creates GitHub Releases.
-*   **Handling Race Conditions for Stable Release:** If `main` changes significantly after the "Version Packages" PR is created, the safest approach is to close that PR and re-trigger the stable release process to generate a new, up-to-date "Version Packages" PR.
+## Release types
 
----
+We want these kinds of releases:
 
-**The Process Steps:**
+- **latest**: The default `npm install` target. Used for the newest stable release, whether it's a patch or minor bump on `main`. Sets the `latest` npm dist-tag.
+- **support**: Patch releases for older minor versions. Published under the `support` npm dist-tag. Not the default `npm install` target, but resolvable via caret/tilde ranges (e.g. `~0.11.0` → resolves to `0.11.2`). Needed because we can only release from `main` otherwise, and patch fixes wouldn't reach users stuck on an older minor.
+- **canary**: Exploratory pre-releases under the `canary` dist-tag. The version gets a `{tag}-{datetime}-{commit}` suffix, making it a semver pre-release that range resolution ignores. Accessible via `npm install pkg@canary` or by exact version. Does not consume changesets or modify committed package versions.
 
-1.  **Development:**
-    *   Developers create feature branches from `main`.
-    *   They make code changes and write **Conventional Commit messages**.
-    *   **(Automation Option):** When a PR is opened/updated, the `add-changeset.yml` workflow runs, analyzes conventional commits, and automatically adds/updates `.changeset/*.md` files to the PR branch.
-    *   **(Manual Option):** Developer runs `npx changeset add` before committing changes that require a version bump, and commits the generated changeset file.
-    *   Developer opens/updates a Pull Request to `main`.
+## Branching strategy
 
-2.  **Pull Request Merged to `main`:**
-    *   The `beta-release.yml` workflow triggers.
-    *   It consumes any `.changeset` files merged from the PR.
-    *   It versions affected packages with a beta suffix (e.g., `1.0.1-beta.shortsha`).
-    *   It publishes these beta versions to npm under the `beta` dist-tag.
-    *   It commits and pushes these snapshot version changes back to `main`.
+**support branches**: For any given minor version (e.g. `0.11`), if we need to patch it, we create a `support/0.11.x` branch from its git tag. Patches are committed there. If the fix also applies to `main` (or other support branches), it is cherry-picked forward with `git cherry-pick -x`.
 
-3.  **Preparing for a Stable Release (Manual Trigger):**
-    *   A designated person (release manager) decides it's time for a stable release.
-    *   **Pre-check:** Briefly check if `main` is relatively stable or communicate a short "quiet period" for merges to `main` to minimize conflicts with the version PR.
-    *   Go to GitHub Actions -> "Stable Release Process" workflow -> Run workflow.
-    *   The `stable-release.yml` workflow's `create_version_pr` job runs:
-        *   It uses `changesets/action` to consume all current `.changeset` files on `main`.
-        *   It generates version bumps, updates `CHANGELOG.md` files.
-        *   It commits these changes to a new branch (e.g., `changeset-release/main`).
-        *   It opens a "Version Packages for Release" Pull Request to `main`.
+**main branch**: New features and breaking changes are developed on `main`. Both result in new minor versions (we are pre v1.0.0 at the moment, so breaking changes are minor bumps).
 
-4.  **Reviewing and Merging the "Version Packages" PR:**
-    *   The team reviews this PR. It shows exactly which packages will be versioned and what their changelogs will contain for the stable release.
-    *   **Critical Check:** Before merging, verify if `main` has received significant new changes (especially new changesets that have triggered new beta releases) *since this "Version Packages" PR was created*.
-        *   **If `main` has changed significantly:** Close the current "Version Packages" PR and its branch. Go back to Step 3 and re-trigger the "Stable Release Process" workflow to generate a fresh "Version Packages" PR based on the latest `main`.
-        *   **If `main` is stable or changes are minor/unrelated:** Proceed to merge the "Version Packages" PR.
+Patches should land on at least both `main` and the active `support/0.x.y` branch. The developer decides where to commit the fix first. Recomendation: land on the support branch, then cherry-pick forward to `main` (and other support branches if needed) with `git cherry-pick -x`.
 
-5.  **"Version Packages" PR is Merged to `main`:**
-    *   The `stable-release.yml` workflow's `publish_and_release` job triggers.
-    *   It uses `changesets/action` to:
-        *   Publish the versioned packages (now merged into `main`) to npm, this time to the `latest` dist-tag.
-        *   Create Git tags for each published package version.
-        *   Create corresponding GitHub Releases, populating them with content from the `CHANGELOG.md` files.
+## Github workflows
 
---- 
+### `guard-branches.yml`
 
+PRs targeting `support/**` branches fail if any `.changeset/*.md` contains a minor or major bump. This is the first layer of protection — only patch changesets are allowed on support branches.
 
-**1. `.github/workflows/add-changeset.yml`**
-*Automates creation of changeset files from Conventional Commits in PRs.*
+### `prepare-versions.yml`
 
-```yaml
-name: Add Changeset from Conventional Commits (NPM)
+Manual `workflow_dispatch`. Used **only** for `latest` and `support` releases. It consumes changesets, bumps package versions, and opens a Version PR back into the dispatching branch.
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+| Input | Type   | Values              | Description                               |
+| ----- | ------ | ------------------- | ----------------------------------------- |
+| `tag` | choice | `latest`, `support` | The npm dist-tag this release will target |
 
-permissions:
-  contents: write
-  pull-requests: read
+When dispatching on a `support/**` branch, an extra check enforces patch-only changesets (second layer of protection after `guard-branches.yml`).
 
-jobs:
-  add_changeset:
-    if: github.event.pull_request.draft == false && github.actor != 'dependabot[bot]' && github.actor != 'renovate[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+The PR title follows the pattern `"Version Packages for [<tag>] release"`. This title encodes the tag and is used by `release-packages.yml` to determine the npm dist-tag on merge.
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18' # Or your Node.js version
-          cache: 'npm' # Use npm cache
+### `release-packages.yml`
 
-      - name: Install Dependencies
-        run: npm ci # Uses package-lock.json
+Two triggers:
 
-      - name: Create Changeset File
-        uses: tripsit/conventional-changesets-action@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: add generated changeset(s) [skip ci]"
-          skip-ci: "true"
-          # Configure type mappings if needed
+1. **`workflow_dispatch`** with a `tag` input (`latest`, `support`, `canary`) — for manual releases. Canary releases use this path directly since they skip changesets.
+2. **`pull_request.closed`** on `main`, `support/**` — auto-triggered when a version PR (created by `prepare-versions.yml`) is merged.
+
+Tag resolution:
+
+- From `workflow_dispatch`: uses the `tag` input directly.
+- From PR merge: parses the PR title for the pattern `"Version Packages for [<tag>] release"`. Errors out if the title doesn't match.
+
+Sets `NPM_DIST_TAG` to the resolved tag value.
+
+Behaviour by tag:
+
+| Tag       | Publishes via                                                                         | Consumes changesets? | GitHub release? |
+| --------- | ------------------------------------------------------------------------------------- | -------------------- | --------------- |
+| `latest`  | `changesets/action@v1`                                                                | Yes                  | Yes             |
+| `support` | `changesets/action@v1`                                                                | Yes                  | Yes             |
+| `canary`  | `changeset version --snapshot canary` + `changeset publish --tag canary --no-git-tag` | No                   | No              |
+
+For canary, the version changes are not reflected in the repository and the changelog won't be modified.
+
+The full test suite runs before every `latest` and `support` publish.
+
+## Release flow
+
+### Stable release (latest or support)
+
+1. Dispatch **`prepare-versions.yml`** on the target branch, choosing the `tag`.
+2. A Version PR is created (e.g. `"Version Packages for [latest] release"`). Review and merge it.
+3. Merging triggers **`release-packages.yml`**, which tests, publishes to npm under the correct dist-tag, and creates a GitHub release with the standalone JS file and VS Code extension.
+
+### Canary release
+
+1. Dispatch **`release-packages.yml`** on the target branch with `tag: canary`.
+2. The workflow snapshots the current state (without consuming changesets), builds, and publishes to npm under the `canary` dist-tag. No version PR, no GitHub release.
+
+## Examples
+
+(Notation: `o` = commit, `(vX.Y.Z)` = tag, lines = parent relations)
+
+### Example 1: Bugfix on the latest stable release
+
+Starting state (`0.11.0` is latest, there are other commits on `main`):
+
+```
+main:  ...---(v0.11.0)---o(some feature)---o(breaking change)
 ```
 
----
+Final state (fix committed, cherry-picked, released):
 
-## Support branch strategy (`support` → patch releases)
+```
+main:  ...---(v0.11.0)---o(some feature)---o(breaking change)---o(same fix commit cherry-picked)
+                 |
+support/0.11.x:  o (fix)---(v0.11.1)
+                 ↑
+          fix-the-bug
+```
 
-### Branch model
+1. `0.11.0` is latest. Bug reported. Create `support/0.11.x` from tag `xmlui@0.11.0`, push to GitHub.
+2. Branch `myname/fix-the-bug` from `support/0.11.x`. Fix → open PR → squash & merge.
+3. Cherry-pick the fix to `main`:
+   ```bash
+   git fetch
+   git switch -c myname/backport-bugfix main
+   git cherry-pick -x support/0.11.x
+   git push
+   ```
+   Open PR → rebase & merge (single cherry-pick commit shouldn't be squashed).
+4. Dispatch `prepare-versions.yml` on `support/0.11.x` with `tag: latest`. Merges changesets, bumps version, creates a Version PR.
+5. Review & merge the Version PR → triggers `release-packages.yml`. `0.11.1` is now latest on npm, fix is in both branches.
 
-The `support` branch tracks the current stable patch line (e.g. `0.12.x`). Bug fixes should land on `main` first (trunk-first), then be backported to `support` via the label-triggered bot. This guarantees `main` always has every fix.
+### Example 2: Bugfix on an older minor version
 
-Exception: fixes specific to `support` (e.g. reverting a `0.12.x` regression that was refactored away in `main`) go directly to `support` with no backport needed.
+Starting state (`0.12.0` is latest, `support/0.11.x` exists with previous patches):
 
-### Day-to-day workflow
+```
+main:            ...---(v0.11.0)---...---(v0.12.0)---o
+                         |
+support/0.11.x:           o---(v0.11.1)
+```
 
-**Standard bug fix (exists in both branches):**
-1. Open PR to `main` with a `fix:` title — the reminder bot posts a comment asking if a backport is needed.
-2. Reviewer adds the `backport` label if yes; merges (squash).
-3. Bot opens a cherry-pick PR to `support` — review and merge.
-4. When ready to release the patch, trigger `prepare-versions.yml` → branch: support.
-5. Review and merge the patch version PR → publishes to the `backport` npm tag automatically.
+Final state (fix committed to `0.11.x`, cherry-picked forward to `0.12.x` and `main`):
 
-**Support-only fix:**
-1. PR directly to `support`, no label needed.
-2. CI Level 1 enforcement runs; reviewer approves; merge.
-3. Same release path as above (step 4–5).
+```
+main:  ...---(v0.11.0)---...---(v0.12.0)---o---o(fix cherry-picked)
+               |                  |
+               |  support/0.12.x: o(fix cherry-picked)---(v0.12.1)
+               |
+               |
+               |
+support/0.11.x:o---(v0.11.1)---o(fix)---(v0.11.2)
+                                 ↑
+                           fix-old-bug
+```
 
-### Enforcement
+1. `0.12.0` is latest. A user of `0.11.x` reports a bug. Use existing `support/0.11.x` branch.
+2. Branch `myname/fix-old-bug` from `support/0.11.x`. Fix → open PR → squash & merge.
+3. Cherry-pick forward through active release lines:
+   ```bash
+   git fetch
+   git switch -c myname/cherry-fix-12x support/0.12.x
+   git cherry-pick -x support/0.11.x
+   git push
+   git switch -c myname/cherry-fix-main main
+   git cherry-pick -x support/0.11.x
+   git push
+   ```
+   Open PRs → rebase & merge.
+4. Dispatch `prepare-versions.yml` on `support/0.11.x` with `tag: support` (not `latest` — `0.12.x` is the current latest). Merge PR → triggers `release-packages.yml` with the `support` dist-tag.
+5. (Optional) Dispatch `prepare-versions.yml` on `support/0.12.x` with `tag: latest` to release `0.12.1` with the fix too.
 
-**Level 1 — PR CI (`run-all-tests-fast.yml`):** Runs on every PR to `support`. Rejects any changeset that is not a patch bump before the PR merges.
+### Example 3: New feature release on `main`
 
-**Level 2 — `prepare-versions.yml`:** When `branch: support` is selected, validates changesets a second time before creating the version PR. Stops the release if a non-patch changeset slipped through review.
+Starting state (`0.12.0` is latest, feature work about to begin):
 
-### npm dist-tags
+```
+main:  ...---(v0.12.0)---o---o
+```
 
-When `release-packages.yml` runs after a `support` version PR merges, it publishes to the `backport` dist-tag instead of `latest`:
+Final state (feature merged, released as minor bump):
 
-- `npm install xmlui` → latest stable (e.g. `0.13.x`)
-- `npm install xmlui@backport` → latest patch release from `support` (e.g. `0.12.28`)
+```
+new-feature:  o(work in progress)---o(wip2)---o(feature)
+               \                               \
+main:  ...---(v0.12.0)---o---o------------------o(squashed into 1 commit)---(v0.13.0)
+```
 
-This is controlled by `NPM_DIST_TAG` set in `release-packages.yml` based on `github.base_ref`, and consumed by `changeset publish --tag ${NPM_DIST_TAG:-latest}` in the root `package.json`.
-
-**Why this is urgent:** Without the dist-tag fix, publishing a `0.12.x` patch after `0.13.0` ships would overwrite `latest` with the older version, regressing all users who rely on `npm install xmlui`.
-
-### Files involved
-
-| File | Role |
-|------|------|
-| `.github/workflows/remind-backport.yml` | Comments on `fix:` PRs to `main` that lack the `backport` label |
-| `.github/workflows/backport.yml` | Cherry-picks merged `main` PRs with `backport` label to `support` |
-| `.github/workflows/prepare-versions.yml` | Extended with `branch` input; Level 2 enforcement when `branch: support` |
-| `.github/workflows/release-packages.yml` | Triggers on `support` PRs; sets `NPM_DIST_TAG=backport` for support releases |
-| `.github/workflows/run-all-tests-fast.yml` | Level 1 enforcement: rejects non-patch changesets on PRs to `support` |
-| `package.json` | `changeset:publish` uses `--tag ${NPM_DIST_TAG:-latest}` |
+1. `0.12.0` is latest. Branch `myname/new-feature` from `main`. Implement the feature.
+2. Open PR into `main` ← `myname/new-feature`. Squash & merge.
+3. Dispatch `prepare-versions.yml` on `main` with `tag: latest`. A minor changeset bumps the version to `0.13.0` and creates a Version PR.
+4. Review & merge the Version PR → triggers `release-packages.yml`. `0.13.0` is now latest on npm.
