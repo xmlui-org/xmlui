@@ -355,6 +355,8 @@ export type AppContextObject = {
     translate: (key: string, vars?: Record<string, unknown>) => string;
     t: (key: string, vars?: Record<string, unknown>) => string;
     isRtlLocale: (locale?: string) => boolean;
+    /** Resolved text direction for the active locale (`"ltr"` or `"rtl"`). */
+    direction: "ltr" | "rtl";
     formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
     formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string;
     formatList: (values: readonly string[], options?: Intl.ListFormatOptions) => string;
@@ -374,6 +376,17 @@ export type AppContextObject = {
       label: string;
       handler: () => Promise<void>;
     }) => Promise<void>;
+    // --- Plan #09 Step 1.2: register a named validator from markup.
+    registerValidator: (entry: {
+      name: string;
+      fn: (
+        value: unknown,
+        ctx: { fieldName: string; formData: Record<string, unknown>; signal?: AbortSignal },
+        params?: unknown,
+      ) => string | null | undefined | Promise<string | null | undefined>;
+      defaultMessage: string;
+      severity?: "error" | "warning";
+    }) => void;
   };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the

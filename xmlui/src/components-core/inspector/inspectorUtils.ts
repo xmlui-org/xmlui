@@ -249,10 +249,38 @@ export interface XsLogEntry {
    *   `eventName`, and `message`. W3-6 ships only the API surface (token
    *   types + coordinator stub); the dispatcher wiring that emits these
    *   entries lands in W7-1.
+   * - `"forms"` — forms-validation diagnostic emitted by the validator
+   *   registry, cross-field `<FormValidator>`, server-error mapping, or
+   *   submission guard (plan #09). Contains `code: FormDiagnosticCode`
+   *   (one of `unknown-validator`, `duplicate-validator`,
+   *   `server-error-unmapped`, `submit-while-busy`, `csrf-token-missing`,
+   *   `validator-throw`, `deprecated-alias`), `severity: "info" | "warn"
+   *   | "error"`, optional `formId` / `fieldName` / `validatorName`, and
+   *   `message`. Severity escalates from `warn` to `error` when
+   *   `App.appGlobals.strictForms` is truthy.
    * - `"i18n"` — internationalisation diagnostic (plan #11). Contains
    *   `code: I18nDiagnosticCode`, `severity`, optional `locale` / `key`, and `message`.
    * - `"scheduler"` — scheduler/determinism event or diagnostic (plan #16). Contains
    *   `code?: DeterminismDiagCode`, `severity`, optional `traceId`, and `message`.
+   * - `"theming"` — theming-sandbox diagnostic (plan #08) emitted by the
+   *   theme validator or the inline-style validator. Contains
+   *   `code: ThemeDiagnosticCode` (one of `invalid-theme-value`,
+   *   `unknown-theme-variable`, `raw-css-in-prop`, `important-blocked`,
+   *   `url-in-style`, `position-fixed-blocked`),
+   *   `severity: "warn" | "error"`, optional `variableName` / `propName`
+   *   / `componentName` / `expected` / `actual`, and `message`. Severity
+   *   escalates from `warn` to `error` when
+   *   `App.appGlobals.strictTheming` is truthy.
+   * - `"udc"` — user-defined-component sandbox diagnostic (plan #14)
+   *   emitted by the UDC contract / scope / capability gates. Contains
+   *   `code: UdcDiagCode` (one of `udc-prop-undeclared`,
+   *   `udc-prop-shape-mismatch`, `udc-event-undeclared`,
+   *   `udc-method-undeclared`, `udc-slot-undeclared`, `udc-scope-leak`,
+   *   `udc-capability-missing`, `udc-capability-undeclared`,
+   *   `udc-manifest-mismatch`, `udc-untrusted-violation`),
+   *   `severity: "info" | "warn" | "error"`, `udc` (the component name),
+   *   optional `file` / `line` / `column`, and `message`. Severity
+   *   escalates to `error` when `App.appGlobals.strictUdcSandbox` is truthy.
    */
   kind?: string;
   eventName?: string;

@@ -218,7 +218,7 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
   .ghostMeasurer {
     position: absolute;
-    left: -9999px;
+    left: -9999px; // @rtl-intentional: off-screen ghost element for measurement, not directional
     top: -9999px;
     visibility: hidden;
     pointer-events: none;
@@ -345,8 +345,8 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
   .groupHeader {
     padding-top: createThemeVar("paddingTop-groupHeader-#{$component}");
     padding-bottom: createThemeVar("paddingBottom-groupHeader-#{$component}");
-    padding-left: createThemeVar("paddingHorizontal-groupHeader-#{$component}");
-    padding-right: createThemeVar("paddingHorizontal-groupHeader-#{$component}");
+    padding-inline-start: createThemeVar("paddingHorizontal-groupHeader-#{$component}");
+    padding-inline-end: createThemeVar("paddingHorizontal-groupHeader-#{$component}");
     font-size: createThemeVar("fontSize-groupHeader-#{$component}");
     font-weight: createThemeVar("fontWeight-groupHeader-#{$component}");
     letter-spacing: createThemeVar("letterSpacing-groupHeader-#{$component}");

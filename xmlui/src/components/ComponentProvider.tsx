@@ -62,6 +62,7 @@ import {
 } from "./Splitter/Splitter";
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
+import { validateUdcPropReferences } from "../components-core/udc-sandbox";
 import {
   collectUnconditionalRefs,
   findUdcCycles,
@@ -72,6 +73,7 @@ import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
 import { formComponentRenderer } from "./Form/Form";
+import { formValidatorComponentRenderer } from "./Form/FormValidator";
 import { formSegmentComponentRenderer } from "./FormSegment/FormSegment";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
 import { appRenderer } from "./App/App";
@@ -430,6 +432,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(formComponentRenderer);
       this.registerCoreComponent(formItemComponentRenderer);
       this.registerCoreComponent(formSegmentComponentRenderer);
+      this.registerCoreComponent(formValidatorComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Tree !== "false") {
       this.registerCoreComponent(treeComponentRenderer);
@@ -1063,6 +1066,12 @@ export class ComponentRegistry {
     const mergedMetadata = metadata
       ? { ...autoMetadata, ...metadata }
       : autoMetadata;
+
+    // --- UDC sandbox (plan #14): when the UDC carries a declared <Prop>/<Event>/
+    // <Method>/<Slot> contract, validate that every `$props.<name>` reference in
+    // the implementation has a matching declaration.  Strict-mode enforcement
+    // (severity escalation to "error") is plumbed but inactive until W6.
+    validateUdcPropReferences(compoundComponentDef, /* strict */ false);
 
     const component = {
       type: compoundComponentDef.name,

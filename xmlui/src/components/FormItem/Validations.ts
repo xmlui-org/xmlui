@@ -15,6 +15,16 @@ import {
   type ValidationSeverity,
 } from "../Form/FormContext";
 import { fieldValidated, type FormAction } from "../Form/formActions";
+// --- W5-1 / plan #09: registry-backed named validators. The forms barrel
+// ensures the standard-library validators are registered before lookup/run
+// calls, which keeps the production test-bed bundle from dropping them as
+// side-effect-only imports.
+import {
+  hasValidator,
+  lookupValidator,
+  runValidator,
+} from "../../components-core/forms";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 function isInputEmpty(value: any) {
   if (value === undefined || value === null || value === "") return true;
@@ -69,12 +79,36 @@ function isRegexValid(value: any = "", regex: string) {
   }
 }
 
+// --- W5-1 / plan #09 Step 1.2: one-shot deprecation warning per `pattern`
+// name. Emits a `kind:"forms"` `deprecated-alias` trace entry so apps can
+// migrate `pattern="email"` → `validator="email"` deliberately without
+// pre-emptive noise.
+const _seenDeprecatedPatterns = new Set<string>();
+function warnPatternDeprecationOnce(patternName: string): void {
+  if (_seenDeprecatedPatterns.has(patternName)) return;
+  _seenDeprecatedPatterns.add(patternName);
+  pushXsLog({
+    kind: "forms",
+    ts: Date.now(),
+    code: "deprecated-alias",
+    severity: "warn",
+    validatorName: patternName,
+    message:
+      `\`FormItem.pattern="${patternName}"\` is deprecated; ` +
+      `use \`validator="${patternName}"\` instead.`,
+  });
+}
+
 class FormItemValidator {
+  /** Names of validators whose `fn` returned a Promise in the sync phase. */
+  private _asyncValidatorNames: string[] = [];
+
   constructor(
     private validations: FormItemValidations,
     private onValidate: ValidateEventHandler,
     private value: any,
     private abortSignal?: AbortSignal,
+    private formItemId: string = "",
   ) {}
 
   preValidate = () => {
@@ -96,16 +130,32 @@ class FormItemValidator {
     return {
       isValid: validationResults.find((result) => !result.isValid) === undefined,
       validatedValue: this.value,
-      partial: this.onValidate !== undefined,
+      partial: this.onValidate !== undefined || this.hasAsyncValidator(),
       validations: validationResults,
     } as ValidationResult;
   };
 
+  /**
+   * Returns `true` when `validatePattern()` encountered at least one
+   * validator whose `fn` returned a `Promise` (i.e. a truly async
+   * validator). Purely synchronous built-ins (email, phone, etc.) return
+   * a string directly and therefore do NOT mark the result as partial.
+   *
+   * Must be called AFTER `validatePattern()` (which populates
+   * `_asyncValidatorNames`) — the ordering in `preValidate()` guarantees
+   * this.
+   */
+  private hasAsyncValidator(): boolean {
+    return this._asyncValidatorNames.length > 0;
+  }
+
   validate = async () => {
     const preValidateResult = this.preValidate();
     const constValidationResult = (await this.validateCustom()) || [];
+    const asyncValidatorResults = (await this.validateValidatorAsync()) || [];
     preValidateResult.validations.push(
       ...constValidationResult.map((res) => ({ ...res, async: true })),
+      ...asyncValidatorResults.map((res) => ({ ...res, async: true })),
     );
 
     return {
@@ -115,6 +165,72 @@ class FormItemValidator {
       validations: preValidateResult.validations,
     } as ValidationResult;
   };
+
+  /**
+   * Run *async* registry validators (those whose `fn` returned a Promise
+   * in the sync pre-validate phase). First failure wins. Returns the
+   * single failing result, or `undefined` when none failed / no async
+   * validators are present.
+   *
+   * Uses `_asyncValidatorNames` populated by `validatePattern()` so that
+   * only genuinely async validators are re-invoked here.
+   */
+  private async validateValidatorAsync(): Promise<Array<SingleValidationResult> | undefined> {
+    if (this._asyncValidatorNames.length === 0) return undefined;
+    const {
+      validator,
+      validatorParams,
+      validatorInvalidMessage,
+      validatorInvalidSeverity = "error",
+      pattern,
+      patternInvalidMessage,
+      patternInvalidSeverity = "error",
+    } = this.validations;
+    const names = this._asyncValidatorNames;
+    if (this.value === undefined || this.value === null || this.value === "") return undefined;
+    const messageOverride = validator != null ? validatorInvalidMessage : patternInvalidMessage;
+    const severityOverride =
+      validator != null ? validatorInvalidSeverity : patternInvalidSeverity;
+    for (const name of names) {
+      const entry = lookupValidator(name);
+      if (!entry) continue;
+      let raw: unknown;
+      try {
+        raw = entry.fn(this.value, {
+          fieldName: this.formItemId,
+          formData: {},
+          signal: this.abortSignal,
+        }, validatorParams);
+      } catch {
+        continue; // sync path already reported the throw
+      }
+      if (!raw || typeof (raw as Promise<unknown>).then !== "function") continue;
+      try {
+        const result = (await raw) as string | null | undefined;
+        if (this.abortSignal?.aborted) return undefined;
+        if (result != null && result !== "") {
+          return [
+            {
+              isValid: false,
+              invalidMessage: messageOverride || result,
+              severity: severityOverride,
+            },
+          ];
+        }
+      } catch (err) {
+        if (this.abortSignal?.aborted) return undefined;
+        const msg = err instanceof Error ? err.message : String(err);
+        return [
+          {
+            isValid: false,
+            invalidMessage: messageOverride || entry.defaultMessage || msg,
+            severity: severityOverride,
+          },
+        ];
+      }
+    }
+    return undefined;
+  }
 
   private validateRequired(): SingleValidationResult | undefined {
     const { required, requiredInvalidMessage } = this.validations;
@@ -214,71 +330,98 @@ class FormItemValidator {
   }
 
   private validatePattern(): SingleValidationResult | undefined {
-    const { pattern, patternInvalidMessage, patternInvalidSeverity = "error" } = this.validations;
-    if (!pattern) {
-      return undefined;
+    // --- W5-1 / plan #09 Step 1.2: `validator` is the new prop; `pattern`
+    // is the deprecated alias kept for backward compatibility. Both
+    // forms route through the validator registry. When both are set,
+    // `validator` wins (so a migration can be done one prop at a time).
+    const {
+      validator,
+      validatorParams,
+      validatorInvalidMessage,
+      validatorInvalidSeverity = "error",
+      pattern,
+      patternInvalidMessage,
+      patternInvalidSeverity = "error",
+    } = this.validations;
+
+    const names: string[] = (() => {
+      if (validator != null) {
+        return Array.isArray(validator)
+          ? (validator.filter((n) => typeof n === "string") as string[])
+          : typeof validator === "string"
+            ? [validator]
+            : [];
+      }
+      if (typeof pattern === "string" && pattern.length > 0) {
+        warnPatternDeprecationOnce(pattern);
+        return [pattern];
+      }
+      return [];
+    })();
+
+    if (names.length === 0) return undefined;
+
+    const messageOverride = validator != null ? validatorInvalidMessage : patternInvalidMessage;
+    const severityOverride =
+      validator != null ? validatorInvalidSeverity : patternInvalidSeverity;
+
+    // Empty values pass through — builtins already special-case empty, but
+    // keep this guard so unknown registry entries behave consistently.
+    if (this.value === undefined || this.value === null || this.value === "") {
+      return { isValid: true, severity: "valid" };
     }
-    switch (pattern.toLowerCase()) {
-      case "email": {
-        if (this.value === undefined || this.value === null || this.value === "") {
-          return {
-            isValid: true,
-            severity: "valid",
-          };
+
+    // Run validators in order; first sync failure wins. Async validators are
+    // skipped here and re-run in `validateCustom`'s async phase.
+    for (const name of names) {
+      const entry = lookupValidator(name);
+      if (!entry) {
+        if (!hasValidator(name)) {
+          // Surface `unknown-validator` via the central runner so the
+          // diagnostic is emitted with consistent shape.
+          // The result is treated as "valid" (no field error) under
+          // non-strict mode because the user's markup is the source of
+          // the typo, not the field's value.
+          // Fire-and-forget the async runner just to emit the diagnostic.
+          void runValidator(name, this.value, {
+            fieldName: this.formItemId,
+            formData: {},
+            signal: this.abortSignal,
+          }, validatorParams);
         }
+        continue;
+      }
+      let raw: unknown;
+      try {
+        raw = entry.fn(this.value, {
+          fieldName: this.formItemId,
+          formData: {},
+          signal: this.abortSignal,
+        }, validatorParams);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
         return {
-          isValid: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
-            this.value,
-          ),
-          invalidMessage: patternInvalidMessage || "Not a valid email address",
-          severity: patternInvalidSeverity,
+          isValid: false,
+          invalidMessage: messageOverride || entry.defaultMessage || msg,
+          severity: severityOverride,
         };
       }
-      case "phone": {
-        if (this.value === undefined || this.value === null || this.value === "") {
-          return {
-            isValid: true,
-            severity: "valid",
-          };
-        }
-        return {
-          // Phone must contain at least one digit and only allowed characters
-          isValid: /^[a-zA-Z0-9#*)(+.\-_&']+$/.test(this.value) && /[0-9]/.test(this.value),
-          invalidMessage: patternInvalidMessage || "Not a valid phone number",
-          severity: patternInvalidSeverity,
-        };
+      // Skip async results in the sync phase; the async path below picks them up.
+      if (raw && typeof (raw as Promise<unknown>).then === "function") {
+        // Record this validator as needing an async pass.
+        this._asyncValidatorNames.push(name);
+        continue;
       }
-      case "url": {
-        if (this.value === undefined || this.value === null || this.value === "") {
-          return {
-            isValid: true,
-            severity: "valid",
-          };
-        }
-        let url;
-        try {
-          url = new URL(this.value);
-        } catch (e) {}
-        if (!url || (url.protocol && !["http:", "https:"].includes(url.protocol))) {
-          return {
-            isValid: false,
-            invalidMessage: "Not a valid URL",
-            severity: patternInvalidSeverity,
-          };
-        }
+      const message = raw as string | null | undefined;
+      if (message != null && message !== "") {
         return {
-          isValid: true,
-          severity: "valid",
-        };
-      }
-      default: {
-        console.warn("Unknown pattern provided");
-        return {
-          isValid: true,
-          severity: "valid",
+          isValid: false,
+          invalidMessage: messageOverride || message,
+          severity: severityOverride,
         };
       }
     }
+    return { isValid: true, severity: "valid" };
   }
 
   private validateRegex(): SingleValidationResult | undefined {
@@ -376,8 +519,15 @@ async function asyncValidate(
   onValidate: ValidateEventHandler,
   deferredValue: any,
   abortSignal?: AbortSignal,
+  bindTo: string = "",
 ) {
-  const validator = new FormItemValidator(validations, onValidate, deferredValue, abortSignal);
+  const validator = new FormItemValidator(
+    validations,
+    onValidate,
+    deferredValue,
+    abortSignal,
+    bindTo,
+  );
   // console.log("calling async validate with ", deferredValue);
   return await validator.validate();
 }
@@ -405,14 +555,26 @@ export function useValidation(
   useEffect(
     function runAllValidations() {
       const abortController = new AbortController();
-      const validator = new FormItemValidator(validations, onValidate, deferredValue, abortController.signal);
+      const validator = new FormItemValidator(
+        validations,
+        onValidate,
+        deferredValue,
+        abortController.signal,
+        bindTo,
+      );
       let ignore = false;
       const partialResult = validator.preValidate();
       if (!ignore) {
         dispatch(fieldValidated(bindTo, partialResult));
         if (partialResult.partial) {
           void (async () => {
-            const result = await throttledAsyncValidate(validations, onValidate, deferredValue, abortController.signal);
+            const result = await throttledAsyncValidate(
+              validations,
+              onValidate,
+              deferredValue,
+              abortController.signal,
+              bindTo,
+            );
             if (!ignore) {
               // console.log(`async validation result for ${bindTo}`, result);
               dispatch(fieldValidated(bindTo, result));

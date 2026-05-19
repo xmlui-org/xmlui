@@ -300,8 +300,8 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   .mobileSheet {
     position: fixed;
     z-index: 51;
-    left: 0;
-    right: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: 100% !important;
     max-width: 100vw;
@@ -516,8 +516,8 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     position: relative;
     display: inline-flex;
     align-items: center;
-    padding-left: t.$space-2;
-    padding-right: t.$space-2;
+    padding-inline-start: t.$space-2;
+    padding-inline-end: t.$space-2;
     white-space: nowrap;
     border: 0;
   }

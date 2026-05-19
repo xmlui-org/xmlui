@@ -140,6 +140,16 @@ export type StandaloneAppDescription = {
    *   entry. Per-invocation `timeoutMs` overrides this default. The W3-6
    *   risk-probe ships the configuration surface only; the dispatcher
    *   wiring that enforces the budget lands in W7-1.
+   * - `strictForms` (boolean, default `false`) — when `true`, forms
+   *   diagnostics (`unknown-validator`, `duplicate-validator`,
+   *   `validator-throw`, `server-error-unmapped`, `submit-while-busy`,
+   *   `csrf-token-missing`) escalate from `warn` to `error` and the
+   *   validator registry refuses registrations whose `name` is already
+   *   taken. When `false` (the W5-1..W5-4 rollout default — risk-probe
+   *   phase) the new surface is fully functional but only emits
+   *   warn-level diagnostics so apps can audit before the strict
+   *   default flips. Flips to `true` in the next major. See
+   *   `dev-docs/plans/09-forms-validation-discipline.md`.
    * - `strictRouting` (boolean, default `false`) — when `true`, defended-routing
    *   diagnostics such as rejected constraints and non-canonical URLs escalate to
    *   errors. Wave 4 keeps the default warn/additive.
@@ -156,6 +166,31 @@ export type StandaloneAppDescription = {
    *   immediate handler execution or deterministic per-trace FIFO ordering.
    * - `maxQueuedPerTrace` (number, default `64`) — bounds deterministic handler
    *   queues before `determinism-convergence-failed` is emitted.
+   * - `strictTheming` (boolean, default `false`) — when `true`, theming
+   *   diagnostics (`invalid-theme-value`, `unknown-theme-variable`,
+   *   `raw-css-in-prop`, `important-blocked`, `url-in-style`,
+   *   `position-fixed-blocked`) escalate from `warn` to `error`. In
+   *   strict mode, blocked declarations are dropped before they reach
+   *   the DOM; in non-strict mode they pass through with a warn-level
+   *   `kind:"theming"` trace entry so apps can audit before the strict
+   *   default flips. Flips to `true` in the next major release. See
+   *   `dev-docs/plans/08-sealed-theming-sandbox.md`.
+   * - `allowInlineRawCss` (boolean, default `true`) — when `false`,
+   *   the `style` prop refuses `url(...)` values and `!important`
+   *   flags. Flips to `false` together with `strictTheming` in the
+   *   next major release.
+   * - `maxZIndex` (number, default `9999`) — ceiling for `zIndex`
+   *   layout-prop values. Higher values are clamped with a
+   *   `kind:"theming"` warn entry; the clamp applies in both strict
+   *   and non-strict modes.
+   * - `strictUdcSandbox` (boolean, default `false`) — when `true`,
+   *   UDC sandboxing diagnostics (`udc-prop-undeclared`,
+   *   `udc-scope-leak`, `udc-capability-missing`, etc.) escalate from
+   *   `info` / `warn` to `error`. In strict mode, undeclared prop
+   *   accesses and capability violations are blocked at runtime.
+   *   Requires UDCs to carry explicit `<Prop>`, `<Event>`, `<Method>`,
+   *   and `<Slot>` declarations. Flips to `true` in the next major
+   *   release. See `dev-docs/plans/14-udc-sandbox.md`.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

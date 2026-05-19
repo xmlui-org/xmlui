@@ -98,7 +98,7 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     font: inherit;
     cursor: default;
     color: inherit;
-    text-align: left;
+    text-align: start;
   }
 
   .headerItemInner.clickable {
@@ -247,7 +247,7 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     font: inherit;
     cursor: default;
     color: inherit;
-    text-align: left;
+    text-align: start;
     align-self: flex-start;
   }
 
@@ -289,8 +289,8 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
   }
 
   .vertical .verticalBody {
-    margin-left: calc($size-icon-Stepper / 2);
-    padding-left: calc($size-icon-Stepper / 2 + 12px);
+    margin-inline-start: calc($size-icon-Stepper / 2);
+    padding-inline-start: calc($size-icon-Stepper / 2 + 12px);
     border-left-width: $borderWidth-connector-Stepper;
     border-left-style: $borderStyle-connector-Stepper;
     border-left-color: $borderColor-connector-Stepper;

@@ -156,6 +156,20 @@ export interface CompoundComponentDef extends Scriptable {
   debug?: Record<string, any>;
 
   codeBehind?: string;
+
+  /**
+   * Optional declared contract produced by the parser when the UDC defines
+   * explicit `<Prop>`, `<Event>`, `<Method>` or `<Slot>` blocks inside its
+   * `<Component>` definition.  When absent, the existing inference walk
+   * (`collectPropsFromComponentDef`) is used (backwards-compatible default).
+   *
+   * Stored as a structurally-typed `unknown` here to avoid a hard dependency
+   * from the `abstractions` layer onto the `components-core/udc-sandbox`
+   * module.  Consumers should cast to `UdcContract`.
+   *
+   * See `xmlui/dev-docs/plans/14-udc-sandbox.md`.
+   */
+  contract?: unknown;
 }
 
 // Sometimes, components and compound components can both be used
@@ -228,6 +242,46 @@ export type PropertyValueType =
   | "url"
   | "icon"
   | "id-ref";
+
+/**
+ * Value-type vocabulary for theme variable declarations (plan #08,
+ * Step 1.1). Default is `"string"` (opt-out: legacy declarations are
+ * not validated until they are explicitly annotated).
+ *
+ * Shares `"color"`, `"length"`, `"integer"`, `"number"` rule semantics
+ * with `PropertyValueType` so the verifier and the theme validator
+ * accept identical inputs by construction.
+ */
+export type ThemeValueType =
+  | "color"
+  | "length"
+  | "integer"
+  | "number"
+  | "duration"
+  | "easing"
+  | "shadow"
+  | "border"
+  | "fontFamily"
+  | "fontWeight"
+  | "lineHeight"
+  | "string";
+
+/**
+ * Per-variable theme metadata (plan #08, Step 1.1). The `themeVars`
+ * block on a component may carry either the legacy `string` shape
+ * (variable name → description) or a `ThemeVarMetadata` for typed
+ * declarations.
+ */
+export interface ThemeVarMetadata {
+  /** Variable name (without leading `--`). */
+  name: string;
+  /** Optional human-readable description. */
+  description?: string;
+  /** Structural type used to validate values at theme-resolution time. */
+  valueType?: ThemeValueType;
+  /** Closed enum of accepted values; takes precedence over `valueType`. */
+  availableValues?: readonly string[];
+}
 
 // A generic validation function that retrieves either a hint (the validation argument
 // has issues) or undefined (the argument is valid).

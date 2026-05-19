@@ -153,14 +153,14 @@ $textUnderlineOffset-H6: createThemeVar("Heading:textUnderlineOffset-H6");
 
     a {
       opacity: 0; // Hide the <a> element by default
-      margin-left: $gap-anchor-Heading;
+      margin-inline-start: $gap-anchor-Heading;
       color: $color-anchor-Heading;
       transition: opacity 0.2s ease-in-out; // Smooth transition for visibility
     }
 
     .customAnchor {
       opacity: 0; // Hide the custom anchor template by default
-      margin-left: $gap-anchor-Heading;
+      margin-inline-start: $gap-anchor-Heading;
       transition: opacity 0.2s ease-in-out; // Smooth transition for visibility
     }
 

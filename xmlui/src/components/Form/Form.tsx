@@ -202,6 +202,16 @@ export const FormMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.dataAfterSubmit,
     },
+    submitPolicy: {
+      description:
+        "Concurrency policy applied when the user triggers a submit while a previous " +
+        "submit is still running. `single-flight` (default) ignores extra clicks. " +
+        "`drop-while-running` fires the `submitDropped` event without queuing. " +
+        "`queue` is reserved for a future scheduler — currently behaves like `single-flight`.",
+      availableValues: ["single-flight", "queue", "drop-while-running"],
+      valueType: "string",
+      defaultValue: defaultProps.submitPolicy,
+    },
   },
   events: {
     willSubmit: {
@@ -255,6 +265,28 @@ export const FormMd = createMetadata({
       signature: "reset(): void",
       parameters: {},
     },
+    submitError: {
+      description:
+        "Fires when the submit handler throws. The event receives the raw error and, " +
+        "when the framework was able to extract a structured validation problem (RFC 7807, " +
+        "Spring, Laravel, or the XMLUI legacy shape), the parsed problem object. The form " +
+        "has already merged per-field errors into the validation results when this fires.",
+      signature: "submitError(error: any, problem: any): void",
+      parameters: {
+        error: "The raw error thrown by the submit handler.",
+        problem:
+          "The parsed RFC 7807-style validation problem, or `undefined` if none could be extracted.",
+      },
+    },
+    submitDropped: {
+      description:
+        "Fires when a submit attempt is suppressed because the configured `submitPolicy` " +
+        "rejected it (for example `drop-while-running`).",
+      signature: "submitDropped(reason: string): void",
+      parameters: {
+        reason: "Why the submit was dropped (e.g. `drop-while-running`).",
+      },
+    },
   },
   contextVars: {
     $data: d(
@@ -288,6 +320,13 @@ export const FormMd = createMetadata({
       description: "This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.",
       signature: "getData(): Record<string, any>",
       returns: "A deep clone of the current form data object.",
+    },
+    cancel: {
+      description:
+        "Aborts the AbortController associated with the in-flight submit. The framework " +
+        "still awaits the submit handler's promise — cancellation is cooperative; handlers " +
+        "that wish to bail out early should observe the `$cancel` token / abort signal.",
+      signature: "cancel(): void",
     },
   },
   themeVars: parseScssVar(styles.themeVars),

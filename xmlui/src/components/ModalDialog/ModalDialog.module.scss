@@ -130,7 +130,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
 
   .closeButton {
     position: absolute;
-    right: 0.5rem;
+    inset-inline-end: 0.5rem;
     top: 0.4rem;
   }
 
