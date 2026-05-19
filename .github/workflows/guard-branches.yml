@@ -1,13 +1,13 @@
-name: Guard support branch changesets
+name: Guard certain branches from changes
 
 on:
   pull_request:
     branches:
-      - 'support/**'
+      - "support/**"
 
 jobs:
   check:
-    name: Enforce patch-only changesets
+    name: Enforce patch-only changesets on "support/**" branches
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
