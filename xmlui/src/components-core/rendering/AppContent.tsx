@@ -32,6 +32,22 @@ import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
 import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import {
+  compare,
+  formatCurrency,
+  formatList,
+  formatNumber,
+  formatRelativeTime,
+  pluralRules,
+  resolveLocale,
+  isValidLocale,
+  createBundleStore,
+  normalizeLocaleBundle,
+  translateMessage,
+  xmluiEnglishBundle,
+  type LocaleBundle,
+} from "../i18n";
+import { createScheduler, type ScheduledTask, type Scheduler } from "../scheduler";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -141,6 +157,61 @@ export function AppContent({
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname + location.search + location.hash);
   const isInitialRenderRef = useRef(true);
+  const programmaticNavigationRef = useRef<string | undefined>();
+  const [appLocaleOverride, setAppLocaleOverride] = useState<string | undefined>();
+  const [userLocaleOverride, setUserLocaleOverride] = useState<string | undefined>();
+  const [schedulerOverride, setSchedulerOverride] = useState<"concurrent" | "fifo" | undefined>();
+  const [maxQueuedPerTraceOverride, setMaxQueuedPerTraceOverride] = useState<number | undefined>();
+  const bundleStoreRef = useRef(createBundleStore([xmluiEnglishBundle]));
+  const [bundleVersion, setBundleVersion] = useState(0);
+  const bundleSourcesRef = useRef(new Map<string, string>());
+
+  // --- We extract the global properties from the app configuration and pass them to the app context.
+  const appGlobals = useMemo(() => {
+    return (globalProps ?? EMPTY_OBJECT) as Record<string, any>;
+  }, [globalProps]);
+
+  const schedulerMode: "concurrent" | "fifo" =
+    appGlobals?.strictDeterminism === true
+      ? "fifo"
+      : (schedulerOverride ?? appGlobals?.scheduler ?? "concurrent");
+  const maxQueuedPerTrace =
+    maxQueuedPerTraceOverride ??
+    (typeof appGlobals?.maxQueuedPerTrace === "number" ? appGlobals.maxQueuedPerTrace : 64);
+  const schedulerRef = useRef<Scheduler | undefined>();
+  const schedulerConfigRef = useRef<string>("");
+  const schedulerConfigKey = `${schedulerMode}:${maxQueuedPerTrace}:${appGlobals?.strictDeterminism === true}`;
+  if (!schedulerRef.current || schedulerConfigRef.current !== schedulerConfigKey) {
+    schedulerConfigRef.current = schedulerConfigKey;
+    schedulerRef.current = createScheduler(schedulerMode, {
+      maxQueuedPerTrace,
+      strict: appGlobals?.strictDeterminism === true,
+      onDiagnostic: (diagnostic) => {
+        pushXsLog({
+          kind: "scheduler",
+          ts: Date.now(),
+          ...diagnostic,
+        });
+      },
+    });
+  }
+
+  const setScheduler = useCallback((mode: "concurrent" | "fifo", options?: { maxQueuedPerTrace?: number }) => {
+    setSchedulerOverride(mode);
+    if (options?.maxQueuedPerTrace !== undefined) {
+      setMaxQueuedPerTraceOverride(options.maxQueuedPerTrace);
+    }
+  }, []);
+
+  const scheduleHandler = useCallback(
+    (task: Omit<ScheduledTask, "enqueuedAt">) => {
+      return schedulerRef.current!.enqueue({
+        ...task,
+        enqueuedAt: Date.now(),
+      });
+    },
+    [],
+  );
 
   // --- Wrapped navigate function that respects willNavigate/didNavigate events
   // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
@@ -196,6 +267,7 @@ export function AppContent({
       });
 
       // Perform the actual navigation
+      programmaticNavigationRef.current = typeof to === "string" ? to : (to?.pathname ?? "");
       navigateRouter(to, navigateOptions);
 
       // didNavigate will be fired by the useEffect that watches location changes
@@ -215,6 +287,33 @@ export function AppContent({
     const previousPath = previousLocationRef.current;
 
     if (currentPath !== previousPath) {
+      const { onWillNavigate } = navigationHandlers;
+      const isProgrammatic = programmaticNavigationRef.current === currentPath || programmaticNavigationRef.current === location.pathname;
+      programmaticNavigationRef.current = undefined;
+
+      if (
+        onWillNavigate &&
+        !isProgrammatic &&
+        appGlobals?.guardOnPopState !== false
+      ) {
+        void Promise.resolve(onWillNavigate(currentPath, undefined)).then((result) => {
+          if (result === false) {
+            pushXsLog({
+              kind: "navigate",
+              ts: Date.now(),
+              from: previousPath,
+              to: currentPath,
+              routingDiagnostic: {
+                code: "guard-bypass-attempt",
+                severity: appGlobals?.strictRouting === true ? "error" : "warn",
+                message: "Navigation was rejected by willNavigate after a browser-driven route change.",
+              },
+            });
+            navigateRouter(previousPath, { replace: true });
+          }
+        });
+      }
+
       previousLocationRef.current = currentPath;
 
       const { onDidNavigate } = navigationHandlers;
@@ -222,7 +321,7 @@ export function AppContent({
         void onDidNavigate(currentPath, undefined);
       }
     }
-  }, [location, navigationHandlers]);
+  }, [appGlobals?.guardOnPopState, appGlobals?.strictRouting, location, navigateRouter, navigationHandlers]);
 
   // --- Create PubSubService with stable reference across renders
   const pubSubServiceRef = useRef(createPubSubService());
@@ -614,10 +713,147 @@ export function AppContent({
     vpSizeIndex,
   ]);
 
-  // --- We extract the global properties from the app configuration and pass them to the app context
-  const appGlobals = useMemo(() => {
-    return globalProps ?? EMPTY_OBJECT;
-  }, [globalProps]);
+  const localePersistKey =
+    appGlobals?.localePersistKey === null ? null : (appGlobals?.localePersistKey ?? "xmlui.locale");
+  const persistedLocale = useMemo(() => {
+    if (!localePersistKey || typeof window === "undefined") return undefined;
+    return window.localStorage.getItem(localePersistKey) ?? undefined;
+  }, [localePersistKey, storageTimestamp]);
+  const availableLocales = useMemo(() => {
+    const configured = appGlobals?.availableLocales;
+    const configuredLocales = Array.isArray(configured)
+      ? configured.filter((v) => typeof v === "string")
+      : [];
+    return [...new Set([...bundleStoreRef.current.available(), ...configuredLocales])];
+  }, [appGlobals?.availableLocales, bundleVersion]);
+  const activeLocale = useMemo(
+    () =>
+      resolveLocale({
+        appProp: appLocaleOverride,
+        userOverride: userLocaleOverride,
+        persisted: persistedLocale,
+        navigatorLanguages:
+          typeof navigator !== "undefined" && Array.isArray(navigator.languages)
+            ? navigator.languages
+            : ["en"],
+        available: availableLocales,
+        fallback: appGlobals?.defaultLocale ?? "en",
+      }),
+    [appGlobals?.defaultLocale, appLocaleOverride, availableLocales, persistedLocale, userLocaleOverride],
+  );
+
+  const setLocale = useCallback(
+    (locale: string, options?: { source?: "app" | "user" }) => {
+      if (!isValidLocale(locale)) {
+        pushXsLog({
+          kind: "i18n",
+          ts: Date.now(),
+          code: "missing-bundle",
+          severity: appGlobals?.strictI18n === true ? "error" : "warn",
+          locale,
+          message: `Invalid locale "${locale}".`,
+        });
+        return;
+      }
+      if (options?.source === "app") {
+        setAppLocaleOverride(locale);
+      } else {
+        setUserLocaleOverride(locale);
+        if (localePersistKey && typeof window !== "undefined") {
+          window.localStorage.setItem(localePersistKey, locale);
+          setStorageTimestamp(Date.now());
+        }
+      }
+    },
+    [appGlobals?.strictI18n, localePersistKey],
+  );
+
+  const registerLocaleBundle = useCallback(
+    (bundle: LocaleBundle) => {
+      bundleStoreRef.current.register(bundle);
+      setBundleVersion((version) => version + 1);
+    },
+    [],
+  );
+
+  const reportI18nDiagnostic = useCallback(
+    (diagnostic: Record<string, unknown>) => {
+      pushXsLog({
+        kind: "i18n",
+        ts: Date.now(),
+        ...diagnostic,
+      });
+    },
+    [],
+  );
+
+  const registerLocaleBundles = useCallback(
+    async (input: unknown) => {
+      const loadedSourceByLocale = new Map<string, string>();
+      const bundles = await resolveLocaleBundleInput(input, async (url) => {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to load locale bundle "${url}": ${response.status} ${response.statusText}`);
+        }
+        const json = await response.json();
+        const locale = inferLocaleFromBundleUrl(url);
+        const loadedLocale = typeof (json as any)?.locale === "string" ? (json as any).locale : locale;
+        if (loadedLocale) {
+          bundleSourcesRef.current.set(loadedLocale, url);
+          loadedSourceByLocale.set(loadedLocale, url);
+        }
+        if (locale && json && typeof json === "object" && !(json as any).locale) {
+          return { locale, messages: json };
+        }
+        return json;
+      });
+      for (const bundle of bundles) {
+        registerLocaleBundle(bundle);
+        const source = loadedSourceByLocale.get(bundle.locale);
+        if (source) {
+          bundleSourcesRef.current.set(bundle.locale, source);
+        }
+      }
+    },
+    [registerLocaleBundle],
+  );
+
+  const reloadLocale = useCallback(
+    async (locale: string) => {
+      const source = bundleSourcesRef.current.get(locale);
+      if (!source) return false;
+      await registerLocaleBundles(source);
+      return true;
+    },
+    [registerLocaleBundles],
+  );
+
+  useEffect(() => {
+    if (appGlobals?.localeBundles === undefined) return;
+    void registerLocaleBundles(appGlobals.localeBundles).catch((error) => {
+      reportI18nDiagnostic({
+        code: "missing-bundle",
+        severity: appGlobals?.strictI18n === true ? "error" : "warn",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    });
+  }, [appGlobals?.localeBundles, appGlobals?.strictI18n, registerLocaleBundles, reportI18nDiagnostic]);
+
+  const translate = useCallback(
+    (key: string, vars?: Record<string, unknown>) => {
+      return translateMessage(key, vars, {
+        store: bundleStoreRef.current,
+        locale: activeLocale.locale,
+        strict: appGlobals?.strictI18n === true,
+        onDiagnostic: (diagnostic) => {
+          reportI18nDiagnostic(diagnostic as any);
+        },
+      });
+    },
+    [activeLocale.locale, appGlobals?.strictI18n, bundleVersion, reportI18nDiagnostic],
+  );
+
+  const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
   // --- app-wide state using buckets (state sections).
@@ -1175,6 +1411,35 @@ export function AppContent({
         ...AppUtilsNamespace,
         fetch: createAppFetch(appGlobals),
         environment: getAppEnvironment(),
+        locale: activeLocale.locale,
+        localeSource: activeLocale.source,
+        availableLocales,
+        setLocale,
+        registerLocaleBundle,
+        registerLocaleBundles,
+        reloadLocale,
+        translate,
+        t: translate,
+        isRtlLocale,
+        formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
+          formatNumber(value, activeLocale.locale, options),
+        formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
+          formatCurrency(value, currency, activeLocale.locale, options),
+        formatList: (values: readonly string[], options?: Intl.ListFormatOptions) =>
+          formatList(values, activeLocale.locale, options),
+        formatRelativeTime: (
+          value: number,
+          unit: Intl.RelativeTimeFormatUnit,
+          options?: Intl.RelativeTimeFormatOptions,
+        ) => formatRelativeTime(value, unit, activeLocale.locale, options),
+        compare: (a: string, b: string, options?: Intl.CollatorOptions) =>
+          compare(a, b, activeLocale.locale, options),
+        pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
+          pluralRules(value, activeLocale.locale, options),
+        scheduler: schedulerMode,
+        maxQueuedPerTrace,
+        setScheduler,
+        scheduleHandler,
       },
       Clipboard: ClipboardNamespace,
 
@@ -1212,6 +1477,18 @@ export function AppContent({
     Log,
     pubSubService,
     storageTimestamp,
+    activeLocale,
+    availableLocales,
+    setLocale,
+    registerLocaleBundle,
+    registerLocaleBundles,
+    reloadLocale,
+    translate,
+    isRtlLocale,
+    schedulerMode,
+    maxQueuedPerTrace,
+    setScheduler,
+    scheduleHandler,
   ]);
 
   return (
@@ -1221,6 +1498,34 @@ export function AppContent({
       </AppStateContext.Provider>
     </AppContext.Provider>
   );
+}
+
+async function resolveLocaleBundleInput(
+  input: unknown,
+  loadUrl: (url: string) => Promise<unknown>,
+): Promise<LocaleBundle[]> {
+  if (input === undefined || input === null) return [];
+  if (typeof input === "string") {
+    return resolveLocaleBundleInput(await loadUrl(input), loadUrl);
+  }
+  if (Array.isArray(input)) {
+    const resolved = await Promise.all(input.map((entry) => resolveLocaleBundleInput(entry, loadUrl)));
+    return resolved.flat();
+  }
+  const direct = normalizeLocaleBundle(input);
+  if (direct) return [direct];
+  if (typeof input === "object") {
+    return Object.entries(input as Record<string, unknown>)
+      .filter(([, messages]) => messages && typeof messages === "object")
+      .map(([locale, messages]) => ({ locale, messages: messages as Record<string, string> }));
+  }
+  return [];
+}
+
+function inferLocaleFromBundleUrl(url: string): string | undefined {
+  const filename = url.split(/[/?#]/).filter(Boolean).at(-1) ?? "";
+  const match = filename.match(/(?:^|\.)([a-z]{2,3}(?:-[a-z0-9]{2,8})*)\.json$/i);
+  return match?.[1];
 }
 
 // --- We pass this funtion to the global app context

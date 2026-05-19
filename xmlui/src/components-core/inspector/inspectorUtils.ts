@@ -249,6 +249,10 @@ export interface XsLogEntry {
    *   `eventName`, and `message`. W3-6 ships only the API surface (token
    *   types + coordinator stub); the dispatcher wiring that emits these
    *   entries lands in W7-1.
+   * - `"i18n"` — internationalisation diagnostic (plan #11). Contains
+   *   `code: I18nDiagnosticCode`, `severity`, optional `locale` / `key`, and `message`.
+   * - `"scheduler"` — scheduler/determinism event or diagnostic (plan #16). Contains
+   *   `code?: DeterminismDiagCode`, `severity`, optional `traceId`, and `message`.
    */
   kind?: string;
   eventName?: string;

@@ -32,6 +32,7 @@ import {
   headingComponentRenderer,
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
+import { i18nComponentRenderer } from "./I18n/I18n";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
 import { messageListenerComponentRenderer } from "./MessageListener/MessageListener";
 import { webSocketComponentRenderer } from "./WebSocket/WebSocket";
@@ -459,6 +460,9 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Text !== "false") {
       this.registerCoreComponent(textComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_I18n !== "false") {
+      this.registerCoreComponent(i18nComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Fragment !== "false") {
       this.registerCoreComponent(fragmentComponentRenderer);

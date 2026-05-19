@@ -31,6 +31,7 @@ import { createEventHandlerCache } from "../container/event-handler-cache";
 import { createActionLookup } from "../container/action-lookup";
 import { createChildRenderer } from "../container/child-rendering";
 import { renderLoaders } from "../container/loader-rendering";
+import { enterRenderPhase, exitRenderPhase } from "../scheduler";
 
 // Re-export for backward compatibility
 export { getCurrentTrace } from "../inspector/inspectorUtils";
@@ -296,31 +297,38 @@ export const Container = memo(
     const thisUidInfoRef = useRef({});
     const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
 
-    const renderedChildren = stableRenderChild(
-      node.children,
-      layoutContextRef?.current,
-      parentRenderContext,
-      uidInfoRef,
-      ref,
-      rest,
-    );
+    enterRenderPhase();
+    let renderedChildren: ReactNode | ReactNode[];
+    let renderedLoaders: ReactNode;
+    try {
+      renderedChildren = stableRenderChild(
+        node.children,
+        layoutContextRef?.current,
+        parentRenderContext,
+        uidInfoRef,
+        ref,
+        rest,
+      );
 
-    const renderedLoaders = renderLoaders({
-      uidInfo,
-      uidInfoRef,
-      loaders: node.loaders,
-      componentState,
-      memoedVarsRef,
-      //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
-      dispatch: apiBoundContainer ? containerDispatch : dispatch,
-      registerComponentApi: apiBoundContainer
-        ? containerRegisterComponentApi
-        : registerComponentApi,
-      appContext,
-      lookupAction,
-      lookupSyncCallback,
-      cleanup,
-    });
+      renderedLoaders = renderLoaders({
+        uidInfo,
+        uidInfoRef,
+        loaders: node.loaders,
+        componentState,
+        memoedVarsRef,
+        //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
+        dispatch: apiBoundContainer ? containerDispatch : dispatch,
+        registerComponentApi: apiBoundContainer
+          ? containerRegisterComponentApi
+          : registerComponentApi,
+        appContext,
+        lookupAction,
+        lookupSyncCallback,
+        cleanup,
+      });
+    } finally {
+      exitRenderPhase();
+    }
     //TODO illesg
     const containerContent = (
       <>

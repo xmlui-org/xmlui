@@ -345,6 +345,35 @@ export type AppContextObject = {
   App: typeof AppUtilsNamespace & {
     fetch: (input: string | URL, init?: RequestInit) => Promise<Response>;
     environment: AppEnvironment;
+    locale: string;
+    localeSource: string;
+    availableLocales: readonly string[];
+    setLocale: (locale: string, options?: { source?: "app" | "user" }) => void;
+    registerLocaleBundle: (bundle: { locale: string; messages: ReadonlyMap<string, string> | Record<string, string> }) => void;
+    registerLocaleBundles: (bundles: unknown) => Promise<void>;
+    reloadLocale: (locale: string) => Promise<boolean>;
+    translate: (key: string, vars?: Record<string, unknown>) => string;
+    t: (key: string, vars?: Record<string, unknown>) => string;
+    isRtlLocale: (locale?: string) => boolean;
+    formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
+    formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string;
+    formatList: (values: readonly string[], options?: Intl.ListFormatOptions) => string;
+    formatRelativeTime: (
+      value: number,
+      unit: Intl.RelativeTimeFormatUnit,
+      options?: Intl.RelativeTimeFormatOptions,
+    ) => string;
+    compare: (a: string, b: string, options?: Intl.CollatorOptions) => number;
+    pluralRules: (value: number, options?: Intl.PluralRulesOptions) => Intl.LDMLPluralRule;
+    scheduler: "concurrent" | "fifo";
+    maxQueuedPerTrace: number;
+    setScheduler: (mode: "concurrent" | "fifo", options?: { maxQueuedPerTrace?: number }) => void;
+    scheduleHandler: (task: {
+      traceId: string;
+      spanId: string;
+      label: string;
+      handler: () => Promise<void>;
+    }) => Promise<void>;
   };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the

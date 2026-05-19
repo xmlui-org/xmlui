@@ -59,6 +59,37 @@ The string `"navigate('/')"` goes through this pipeline:
 
 The function returned by `lookupEventHandler` is always `async`: it returns a `Promise<any>`. This is true even for simple one-liners like `navigate('/')`.
 
+### Deterministic scheduler integration
+
+Wave 4 routes async handler execution through the managed scheduler before the handler body runs.
+The hook point is `runCodeAsync()` in `components-core/container/event-handlers.ts`.
+
+```mermaid
+sequenceDiagram
+  participant DOM as React event prop
+  participant Cache as event-handler-cache
+  participant Runner as runCodeAsync
+  participant Scheduler as App.scheduleHandler
+  participant Script as processStatementQueueAsync
+
+  DOM->>Cache: handler(...args)
+  Cache->>Runner: runCodeAsync(source, uid, options, ...args)
+  Runner->>Scheduler: enqueue(traceId, spanId, label, handler)
+  Scheduler->>Runner: execute with schedulerBypass
+  Runner->>Script: process statements
+```
+
+`<App scheduler="concurrent">` preserves legacy behavior: handlers start immediately. The scheduler
+still records completion order and emits `determinism-handler-reordered` when concurrent handlers in
+the same trace complete out of enqueue order.
+
+`<App scheduler="fifo">` serializes handlers within a trace while allowing different traces to drain
+independently. `maxQueuedPerTrace` bounds runaway chains and emits
+`determinism-convergence-failed` when exceeded.
+
+Mouse and hover DOM wrappers remain fire-and-forget: they call the async handler but do not await its
+promise. Components such as `Form` that explicitly await handlers continue to observe completion.
+
 ### Mouse events: synchronous lockdown, then async fire-and-forget
 
 When the user clicks a button, the React `onClick` fires. XMLUI's `useMouseEventHandlers` hook intercepts it:
