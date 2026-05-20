@@ -227,9 +227,11 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — child UIDs", () => {
     expect(root.computedUses).toBeUndefined();
   });
 
-  it("grandchild uid captured by intermediate container does NOT become local in ancestor", () => {
-    // innerStack has vars → IS a container → captures mySelect, does not let it escape
+  it("grandchild uid captured by intermediate EXPLICIT container does NOT escape to ancestor", () => {
+    // innerStack has explicit `uses` → IS an explicit-owner container → captures mySelect
+    // (registerComponentApi writes into innerStack's state, not the parent's).
     const innerStack = node("Stack", {
+      uses: ["x"],
       vars: { x: "{0}" },
       children: [node("Select", { uid: "mySelect" })],
     });
@@ -243,6 +245,29 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — child UIDs", () => {
     computeUsesForTree(root);
     // mySelect is captured by innerStack, so root must request it from parent
     expect(root.computedUses).toContain("mySelect");
+  });
+
+  it("grandchild uid propagates through IMPLICIT intermediate container to nearest explicit owner", () => {
+    // innerStack has vars but NO `uses` → IMPLICIT container at runtime: its child
+    // registerComponentApi calls bubble up to the parent. So mySelect actually lives
+    // in the ancestor (root) container's parent state, not in innerStack.
+    const innerStack = node("Stack", {
+      vars: { x: "{0}" },
+      children: [node("Select", { uid: "mySelect" })],
+    });
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        innerStack,
+        node("Text", { props: { text: "{mySelect.value}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    // root is ALSO implicit, so mySelect would bubble further; root's own
+    // parentDependencies excludes it (treated as local by processChildList).
+    // No additional deps trigger narrowing → computedUses stays undefined,
+    // which means stateFromOutside = full parent state (mySelect visible).
+    expect(root.computedUses).toBeUndefined();
   });
 
   it("grandchild uid captured by uses-container does NOT escape to ancestor", () => {
@@ -462,7 +487,11 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — empty parentDependencies
   });
 
   it("only when parentDependencies has entries does computedUses get set", () => {
-    // Contrast: same shape but text also reads an EXTERNAL var → computedUses set
+    // Contrast: same shape but text also reads an EXTERNAL var → computedUses set.
+    // Once narrowing IS triggered, child escaping UIDs of an IMPLICIT container must
+    // also be included in computedUses — at runtime those UIDs live in the parent's
+    // state (registerComponentApi bubbles up through implicit containers), and a
+    // narrowed parentState that omits them would isolate descendants from sibling APIs.
     const root = node("Stack", {
       vars: { x: "{0}" },
       children: [
@@ -474,7 +503,10 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — empty parentDependencies
     // externalVar is not declared locally → must appear in computedUses
     expect(root.computedUses).toBeDefined();
     expect(root.computedUses).toContain("externalVar");
-    expect(root.computedUses).not.toContain("mySelect");
+    // mySelect was registered into THIS implicit container's parent state via the
+    // bubbled registerComponentApi, so it must also be in computedUses to survive
+    // the narrowing imposed by `externalVar`.
+    expect(root.computedUses).toContain("mySelect");
   });
 });
 
@@ -763,8 +795,9 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — expression sources (api,
     computeUsesForTree(root);
     // apiEndpoint is used in loader — must appear in computedUses
     expect(root.computedUses).toContain("apiEndpoint");
-    // ds uid is locally declared via loader processing
-    expect(root.computedUses).not.toContain("ds");
+    // root is implicit (vars but no `uses`) → ds registers into root's PARENT state
+    // at runtime, so once narrowing is triggered ds must also be in computedUses.
+    expect(root.computedUses).toContain("ds");
   });
 });
 
@@ -1153,5 +1186,39 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Бaг 22: arrow-fn param
     // bubbles up. The Bug 22 fix ensures `arr` (receiver of `.filter(...)`) is filtered.
     expect(root.computedUses).not.toContain("arr");
     expect(root.computedUses).toContain("external");
+  });
+
+  it("implicit container with other deps does NOT exclude child UIDs from computedUses (Implicit UID Propagation Bug)", () => {
+    // Fragment has vars but no `uses` → implicit container at runtime.
+    // It has an external dependency on `toast`, which triggers computedUses calculation.
+    // It also contains `mySelect` which registers its API in the parent's state
+    // (bubbles through the implicit Fragment).
+    //
+    // Before the fix: child escaping UIDs were incorrectly seen as "locally owned"
+    // by ANY container, so they were filtered out of computedUses.
+    // Result: computedUses=["toast"] → extractScopedState(parentState, ["toast"])
+    // removed `mySelect` from the scoped state → Button crashed.
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Fragment", {
+          vars: { testState: "{null}" },
+          children: [
+            node("Select", { uid: "mySelect" }),
+            node("Button", {
+              events: { onClick: "toast.error(mySelect.value)" },
+            }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const fragment = root.children![0];
+    expect(fragment.computedUses).toBeDefined();
+    expect(fragment.computedUses).toContain("toast");
+    // mySelect must be included in computedUses even though it's not "external"
+    // (it registers in the parent), otherwise the narrowed parent state for
+    // Fragment would exclude it.
+    expect(fragment.computedUses).toContain("mySelect");
   });
 });

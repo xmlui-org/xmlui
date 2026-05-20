@@ -123,8 +123,17 @@ const JS_STDLIB_GLOBALS = new Set([
 
 const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 
+// TODO: Framework globals (Actions, toast, Auth, App, etc.) are currently NOT filtered out.
+// If a component like <Select onChange="Actions.callApi()" /> reads them, it gets falsely
+// identified as having an external read dependency (`nonDynamicReadDeps.size > 0`).
+// This causes unnecessary promotion to an implicit StateContainer, which adds React tree overhead
+// and isolates internal component state (breaking features like Select's clearable interaction).
+// Fix: Export `XMLUI_GLOBAL_NAMES` from the AppContext module and add it to the exclusion check
+// below (where `keepDep` is defined).
+
 /**
  * `$`-prefixed names that ARE stored in parent state and must not be filtered.
+
  *
  * These are injected at runtime via component state dispatch (not via the
  * per-render contextVars mechanism), so they genuinely live in the parent
@@ -330,6 +339,19 @@ function computeUsesInternal(
   disableNarrowing: boolean = false,
 ): [Set<string>, Set<string>, Set<string>] {
   const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
+
+  // An "explicit owner" container OWNS its child component APIs at runtime
+  // (registerComponentApi writes into ITS componentState). The runtime predicate is
+  // `isImplicitContainer(node, wrapped) = node.type !== "Container" && wrapped.uses === undefined`.
+  // Implicit containers (vars/loaders/functions/etc. but no explicit `uses`) delegate
+  // registerComponentApi to the parent — so child component APIs actually end up in
+  // the PARENT container's state, not this one's. Two consequences for static analysis:
+  //   1. Escaping UIDs must continue bubbling upward through implicit containers
+  //      (until they reach an explicit owner that truly captures them).
+  //   2. When this implicit container's `computedUses` IS set (because of other parent
+  //      deps), the escaping UIDs must be included — otherwise narrowed parent state
+  //      excludes the very APIs that descendants need to read.
+  const isExplicitOwner = node.type === "Container" || node.uses !== undefined;
 
   const localDeclared = new Set<string>();
   // Any node that creates a runtime container (vars/loaders/functions/uses/etc.)
@@ -551,13 +573,37 @@ function computeUsesInternal(
     if (node.uses === undefined && nonDynamicReadDeps.size > 0 && safeToNarrow) {
       const computedUsesSet = dependsOnParentFunction
         ? new Set([...parentDependencies, ...parentFunctionNames])
-        : parentDependencies;
+        : new Set([...parentDependencies]);
+      // For IMPLICIT containers (type !== "Container" and no `uses` defined),
+      // registerComponentApi is delegated to the parent at runtime: child component
+      // identifiers escaping from descendants actually live in the PARENT's state,
+      // not in this container's. They were added to `localDeclared` above only so
+      // they wouldn't pollute the dependency set when no narrowing happens — but
+      // once narrowing IS triggered by other deps, omitting them isolates this
+      // container from sibling APIs (e.g. <Fragment var.testState> wrapping an
+      // APICall + Buttons reading `apiCall.inProgress`: computedUses=["toast"]
+      // would strip apiCall from stateFromOutside). Add them back so children
+      // can still see those APIs through the narrowed parent state.
+      if (!isExplicitOwner) {
+        for (const uid of childEscapingUIDs) computedUsesSet.add(uid);
+      }
       node.computedUses = Array.from(computedUsesSet).sort();
     }
 
     // else: node has own script/code-behind, or calls a parent function while narrowing
     // is disabled — intentionally not narrowed.
-    const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();
+    // Explicit-owner containers (type=Container or `uses` defined) actually capture
+    // child component APIs at runtime: only THIS node's own UID escapes upward.
+    // Implicit containers (vars/loaders/etc. but no explicit uses) delegate
+    // registerComponentApi to the parent, so child escaping UIDs continue bubbling
+    // upward until they reach an explicit owner. Without this propagation, an
+    // ancestor implicit container that ALSO narrows would lose visibility of
+    // these UIDs (see the matching `childEscapingUIDs` add when setting computedUses).
+    const myEscapingUID: Set<string> = new Set();
+    if (node.uid) myEscapingUID.add(node.uid);
+    if (!isExplicitOwner) {
+      for (const uid of childEscapingUIDs) myEscapingUID.add(uid);
+    }
     // Do NOT propagate dynamic vars ($context etc.) to the parent container's deps.
     // They belong in THIS container's own computedUses (so it re-renders when they
     // change) but must not cascade further — the parent provides them through its

@@ -15,10 +15,10 @@
 | ~~A~~ | ~~Event handler closure / `$context` binding~~ | ~~`open-a-context-menu-on-right-click.spec.ts`~~ | ~~6~~ | ✅ fixed |
 | ~~B~~ | ~~`refreshOn` event handler closure updates~~ | ~~`Table.spec.ts` (refreshOn section)~~ | ~~3~~ | ✅ fixed |
 | ~~C~~ | ~~Context vars in event handlers (`$url`, `$method`, `$queryParams`)~~ | ~~`DataSource.spec.ts`~~ | ~~1~~ | ✅ fixed |
-| D | Deferred / background async operations | `cancel-a-deferred-api-operation.spec.ts` | 2 | ❌ failed |
-| D | Deferred / background async operations | `handle-background-operations.spec.ts` | 2 | ❌ failed |
+| ~~D~~ | ~~Deferred / background async operations~~ | ~~`cancel-a-deferred-api-operation.spec.ts`~~ | ~~2~~ | ✅ fixed |
+| ~~D~~ | ~~Deferred / background async operations~~ | ~~`handle-background-operations.spec.ts`~~ | ~~2~~ | ✅ fixed |
 | ~~E~~ | ~~DataSource dependency chain~~ | ~~`delay-a-datasource-until-another-datasource-is-ready.spec.ts`~~ | ~~2~~ | ✅ fixed |
-| F | Table multi-row selection | `enable-multi-row-selection-in-a-table.spec.ts` | 2 | ❌ failed |
+| ~~F~~ | ~~Table multi-row selection~~ | ~~`enable-multi-row-selection-in-a-table.spec.ts`~~ | ~~2~~ | ✅ fixed |
 | ~~G~~ | ~~Tree async loading (`loaded` field)~~ | ~~`Tree-loaded-field.spec.ts`~~ | ~~3~~ | ✅ fixed |
 | H | Flaky | `MessageListener.spec.ts`, `Select.spec.ts`, `FormBindingBehavior.spec.ts` | 3 | ⚠️ flaky |
 | J | Compound components + `$queryParams` / `$this` | `compound-component.spec.ts` | 4 | ❌ failed (new) |
@@ -64,25 +64,12 @@ All 3 tests in `xmlui/src/components/Table/Table.spec.ts` (refreshOn Property) n
 
 ---
 
-## Group D — Deferred / background async operations
+## Group D — ✅ FIXED — Deferred / background async operations
 
-**Root cause hypothesis:** These tests rely on button enabled/disabled state reacting to async operation  
-progress. If `computedUses` scopes out the progress-tracking state variable, the UI may not re-render  
-when it changes, leaving buttons stuck in wrong enabled state.
-
-**File:** `xmlui/tests-e2e/how-to-examples/cancel-a-deferred-api-operation.spec.ts`
-
-| Line | Test name |
-|------|-----------|
-| 21:3 | Cancel a long-running export › shows all buttons with correct initial enabled state |
-| 28:3 | Cancel a long-running export › clicking Start Export enables the cancel buttons |
-
-**File:** `xmlui/tests-e2e/how-to-examples/handle-background-operations.spec.ts`
-
-| Line | Test name |
-|------|-----------|
-| 24:3 | Background file processing with progress feedback › clicking upload enqueues files and shows queue status |
-| 30:3 | Background file processing with progress feedback › slider is interactive while uploads are running |
+**Fixed by:** Bug 23 — `computedUses` static analysis now respects the runtime semantics of **implicit containers**. 
+Implicit containers (vars/loaders/etc. but no explicit `uses`) delegate component API registration to the parent container.
+The analyzer now correctly adds escaping child UIDs to the `computedUses` of implicit containers when narrowing is triggered by other dependencies. 
+This prevents narrowed parent state from stripping sibling APIs (like `exportJob` or `fileUpload`) that descendants need to read to show progress feedback.
 
 ---
 
@@ -94,18 +81,9 @@ All 3 tests in `xmlui/tests-e2e/how-to-examples/delay-a-datasource-until-another
 
 ---
 
-## Group F — Table multi-row selection
+## Group F — ✅ FIXED — Table multi-row selection
 
-**Root cause hypothesis:** Multi-row selection tracking (selected rows array) may be a state variable  
-that `computedUses` fails to include in the scoped view, causing selection actions to operate on  
-a stale set.
-
-**File:** `xmlui/tests-e2e/how-to-examples/enable-multi-row-selection-in-a-table.spec.ts`
-
-| Line | Test name |
-|------|-----------|
-| 45:3 | Multi-row selection with bulk actions › Export Selected shows the selected employee name |
-| 52:3 | Multi-row selection with bulk actions › Delete Selected removes the row from the table |
+**Fixed by:** Bug 23 (Implicit UID Propagation) — Table components with multi-row selection often read the selection state via sibling APIs. Including escaping UIDs in `computedUses` ensures these APIs remain visible even when the container state is narrowed.
 
 ---
 
