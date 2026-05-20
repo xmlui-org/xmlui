@@ -17,7 +17,7 @@
     "test:ssg": "cross-env TEST_MODES=vite-ssg playwright test -c ../tests/playwright.config.ts",
     "test:xmlui-start": "cross-env TEST_MODES=vite-start playwright test -c ../tests/playwright.config.ts",
     "test:plugin-mode": "cross-env TEST_MODES=vite-build-plugin playwright test -c ../tests/playwright.config.ts",
-    "test:all": "cross-env TEST_MODES=standalone,vite-build,vite-ssg,vite-start,plugin-mode playwright test -c ../tests/playwright.config.ts"
+    "test:all": "cross-env TEST_MODES=standalone,vite-build,vite-ssg,vite-start,vite-build-plugin playwright test -c ../tests/playwright.config.ts"
   },
   "dependencies": {
     "xmlui": "*",

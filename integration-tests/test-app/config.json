@@ -1,3 +1,4 @@
 {
-  "name": "Integration Test App"
+  "name": "Integration Test App",
+  "defaultTheme": "custom-theme"
 }
