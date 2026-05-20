@@ -20,6 +20,8 @@ async function main() {
   await run("turbo", ["run", "//#test:integration"]);
 
   // 2. Run integration tests — capture exit code
+  // All 5 modes: standalone + 3 pre-built vite modes + vite-start dev server
+  process.env.TEST_MODES = "standalone,vite-build,vite-ssg,vite-start,vite-build-plugin";
   let testExitCode = 0;
   try {
     await run("npx", [
