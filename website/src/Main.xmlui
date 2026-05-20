@@ -281,6 +281,10 @@
                             to="/docs/managed-react/managed-lifecycle-vocabulary"
                         />
                         <NavLink
+                            label="Structured Exception Model"
+                            to="/docs/managed-react/structured-exception-model"
+                        />
+                        <NavLink
                             label="Code Injection Prevention"
                             to="/docs/managed-react/code-injection-prevention"
                         />
@@ -2560,6 +2564,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/managed-lifecycle-vocabulary.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/structured-exception-model"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/structured-exception-model.md']}"
                 />
             </Page>
             <Page

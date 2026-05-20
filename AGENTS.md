@@ -144,6 +144,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `app-context.md` | Global functions, Actions namespace, utilities | Adding global functions |
 | `option-components.md` | Option/OptionContext, search, filtering | Select, AutoComplete, RadioGroup |
 | `error-handling.md` | ErrorBoundary, error propagation, loader errors | Error-related bugs |
+| `errors.md` | `AppError`, `<RetryPolicy>`, `<Fallback>`, `<App onError>`, `App.errors` | Structured exception model, retry/fallback, error telemetry |
 | `parsers.md` | XML, scripting, style, keybinding parsers | Parser modifications |
 | `inspector-debugging.md` | Trace system, `pushXsLog`, verbose mode | Debugging, inspector |
 | `lifecycle.md` | `onMount`/`onUnmount`/`onError`, `<Lifecycle>`, `onBeforeDispose`, `strictLifecycle` | Lifecycle hooks, cleanup, effect primitives |

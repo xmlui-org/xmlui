@@ -516,7 +516,7 @@ Combining the original report with the new dimensions:
 | **Accessibility** | **Documented only** | Parse-time linter; framework focus / live-region primitives; theme contrast checker |
 | **Type contracts** | ✅ **Verified** | LSP, Vite, and runtime expression diagnostics against metadata; `check:metadata` guards TS↔metadata drift; `strictTypeContracts` is default-on |
 | **Resource lifecycle** | ✅ **Symmetric** | Universal `onMount`/`onUnmount`/`onError` events on every component; `<Lifecycle>` declarative effect primitive; container `onBeforeDispose` async-flush hook; `strictLifecycle` default-on (plan #04, W8-1) |
-| **Exception model** | **Contained, not structured** | Structured error type; retry/fallback policies |
+| **Exception model** | ✅ **Structured** | `AppError` with `code`/`category`/`retryable`/`correlationId`; `<RetryPolicy>` with backoff + `Retry-After` honouring + circuit breaker; `<Fallback>` declarative recovery UI; `<App onError>` global sink + `App.errors` buffer + Inspector "Errors" tab; `strictErrors` default-on (plan #07, W8-1) |
 | **Concurrency / cancellation** | **Predictable, uncoordinated** | Cooperative cancellation token; in-flight guard primitive |
 | **Theming sandbox** | **Mostly scoped** | Typed theme variables; restrict inline-style escape hatch |
 | **Forms validation** | **State strong, validators absent** | Built-in validators, server-error mapping, submit guard |

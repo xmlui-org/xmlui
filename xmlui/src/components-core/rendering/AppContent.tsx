@@ -1398,6 +1398,26 @@ export function AppContent({
     (error: Error | AppError | string | unknown) => {
       const appError = AppError.from(error);
 
+      // Plan #07 Step 5.2 (W8-1): when strictErrors is on (default true), warn
+      // whenever a non-AppError value reaches the pipeline so authors are
+      // nudged toward `throw new AppError({ code, category, message })`.
+      const strictErrors = (appGlobals as any)?.strictErrors !== false;
+      if (strictErrors && !(error instanceof AppError)) {
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+          kind: "errors",
+          severity: "warn",
+          code: "unhandled-error",
+          source: "handler",
+          message:
+            `[strictErrors] A non-AppError was thrown: ` +
+            `${String((error as any)?.message ?? error)}. ` +
+            `Use \`throw new AppError({ code, category, message })\` for structured error handling.`,
+        });
+      }
+
       // Build event payload with preventDefault — handler can suppress toast.
       let defaultPrevented = false;
       const event = {

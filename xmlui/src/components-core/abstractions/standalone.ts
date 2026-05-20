@@ -75,10 +75,10 @@ export type StandaloneAppDescription = {
    *   validation diagnostics escalate one severity step (info → warn → error) and the
    *   `xmlui check` CLI exits non-zero on any `error`-severity finding. Flips to `true`
    *   in the next major release. See `dev-docs/plans/13-build-validation-analyzers.md`.
-   * - `strictErrors` (boolean, default `false`) — when `true`, throwing a plain `Error`
-   *   from script logs a `kind:"errors"` warn diagnostic with a migration hint to use
-   *   `AppError`. Flips to `true` in the next major release. See
-   *   `dev-docs/plans/07-structured-exception-model.md`.
+   * - `strictErrors` (boolean, default `true`) — when `true`, throwing a plain `Error`
+   *   or non-`AppError` value from script logs a `kind:"errors"` warn diagnostic with a
+   *   migration hint to use `AppError`. Set to `false` for warn-only (migration) mode.
+   *   See `dev-docs/plans/07-structured-exception-model.md`.
    * - `errorCorrelationIdHeader` (string, default `"X-Correlation-Id"`) — the HTTP
    *   response header from which `AppError.correlationId` is read when a fetch fails.
    *   See `dev-docs/plans/07-structured-exception-model.md`.
