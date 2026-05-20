@@ -15,7 +15,7 @@ const markdown = getExampleSource(
 test.describe("FormItem regex validation with severity", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
-    "FormItem regex validation with severity",
+    "formitem-regex-validation-with-severity",
   );
 
   test("initial state shows fields with example placeholders", async ({ initTestBed, page }) => {
@@ -55,6 +55,7 @@ test.describe("FormItem regex validation with severity", { tag: "@website" }, ()
 
     await expect(page.getByText("Expected a 5-digit ZIP code").first()).toBeVisible();
     await page.getByRole("button", { name: "Submit" }).click();
+    await page.getByRole("button", { name: "Yes, proceed" }).click();
 
     await expect(page.getByText("Submitted!")).toBeVisible();
   });
