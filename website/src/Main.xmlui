@@ -268,6 +268,10 @@
                             label="Verified Type Contracts"
                             to="/docs/managed-react/verified-type-contracts"
                         />
+                        <NavLink
+                            label="Reactive Cycle Detection"
+                            to="/docs/managed-react/reactive-cycle-detection"
+                        />
                     </NavGroup>
                     <NavGroup
                         icon="braces"
@@ -2503,6 +2507,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/verified-type-contracts.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/reactive-cycle-detection"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/reactive-cycle-detection.md']}"
                 />
             </Page>
 

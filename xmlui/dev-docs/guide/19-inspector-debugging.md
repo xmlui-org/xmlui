@@ -102,6 +102,7 @@ The `kind` field is the key to understanding what an entry represents.
 | `"clipboard:copy"` | A `Clipboard.copy(text)` call. |
 | `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | Lifecycle event from a managed `<WebSocket>` component. |
 | `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | Lifecycle event from a managed `<EventSource>` component. |
+| `"reactive-cycle"` | Reactive dependency cycle found by the graph analyzer. Payload includes the stable cycle hash, severity, and formatted node list. |
 | `"build"` | Build-time validation diagnostic echoed at runtime by the analyzer pipeline (plan #13). Payload: `code, severity, file, line, column, message`, optional `data`, `suggestions`. |
 | `"errors"` | Structured error event from the exception pipeline (plan #07). Payload: `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId`. |
 | `"audit"` | Audit-pipeline self-diagnostic emitted when the audit subsystem encounters a structural problem — redaction gap, sink failure, buffer overflow (plan #15). Payload: `code: AuditDiagCode`, `severity`, `message`, optional `data`. |

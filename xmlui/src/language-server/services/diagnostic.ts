@@ -78,7 +78,7 @@ function reactiveCycleDiags(ctx: DiagnosticsContext): Diagnostic[] {
   if (!ctx.source) return [];
   try {
     const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
-    return getReactiveCycleDiagnostics(component);
+    return getReactiveCycleDiagnostics(component, { uri: ctx.uri });
   } catch {
     return [];
   }

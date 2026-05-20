@@ -26,7 +26,7 @@ import {
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
 import { verifyComponentDef } from "../components-core/type-contracts";
-import type { ComponentMetadata } from "../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
 import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
@@ -53,9 +53,9 @@ export type PluginOptions = {
    *   failing the build. `severity:"info"` (pure-conditional) cycles
    *   always remain warnings.
    *
-   * Per-file analysis only at present: each XMLUI file is analysed
-   * independently inside `transform`. Cross-file cycles (cycles that
-   * span compound-component boundaries) are not yet detected here.
+   * XMLUI files are analysed independently inside `transform`, then all parsed
+   * roots are scanned once more during `buildEnd` so build logs include cycles
+   * that only become visible when multiple files participate in the app graph.
    */
   reactiveCycles?: AnalyzeMode;
   /**
@@ -118,6 +118,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   // Dedupe cycle reports across multiple transform calls / HMR within a
   // single dev-server lifetime, so the same cycle is not warned twice.
   const reportedCycles = new Set<string>();
+  const reactiveCycleRoots = new Map<string, ComponentDef>();
   // Aggregate a11y diagnostic counts across all files for the buildEnd summary.
   let a11yWarnCount = 0;
   let a11yErrorCount = 0;
@@ -217,18 +218,17 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         // --- Reactive cycle detection — Plan #03 Step 3.4 (W6-7).
         // Per-file pass: build the graph from this file's `ComponentDef`
-        // and report any cycles found. Cross-file cycles (cycles that
-        // close through a compound component imported from another file)
-        // are intentionally left for a future `buildEnd` pass; the per-
-        // file pass already catches the common cases.
+        // and report any cycles found. The same root is retained for the
+        // aggregate buildEnd scan below.
         if (cyclesMode !== "off" && component) {
+          const root =
+            (component as any).component &&
+            typeof (component as any).component === "object"
+              ? (component as any).component
+              : (component as any);
+          reactiveCycleRoots.set(fileId, root);
           let cycleHits: ReturnType<typeof findCycles> | null = null;
           try {
-            const root =
-              (component as any).component &&
-              typeof (component as any).component === "object"
-                ? (component as any).component
-                : (component as any);
             const graph = collectComponentDefGraph(root);
             cycleHits = findCycles(graph);
           } catch (_cyclesErr) {
@@ -415,6 +415,36 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     },
 
     buildEnd() {
+      if (cyclesMode !== "off" && reactiveCycleRoots.size > 0) {
+        let cycleHits: ReturnType<typeof findCycles> | null = null;
+        try {
+          const root: ComponentDef = {
+            type: "Fragment",
+            uid: "__xmlui_build__",
+            children: Array.from(reactiveCycleRoots.values()),
+          };
+          const graph = collectComponentDefGraph(root);
+          cycleHits = findCycles(graph);
+        } catch (_cyclesErr) {
+          cycleHits = null;
+        }
+
+        if (cycleHits && cycleHits.length > 0) {
+          const strictCycles = cyclesMode === "strict";
+          for (const hit of cycleHits) {
+            const id = cycleHash(hit);
+            if (reportedCycles.has(id)) continue;
+            reportedCycles.add(id);
+            const message = `[xmlui:reactive-cycle] buildEnd\n${formatCycle(hit)}`;
+            if (strictCycles && (hit.severity ?? "warn") === "warn") {
+              this.error(message);
+            } else {
+              this.warn(message);
+            }
+          }
+        }
+      }
+
       // Emit an accessibility summary when the linter found any issues.
       // This surfaces the totals even after individual per-file warnings
       // have scrolled past in the build log.

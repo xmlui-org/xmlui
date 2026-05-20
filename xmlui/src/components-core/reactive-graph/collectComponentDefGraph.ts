@@ -50,20 +50,32 @@ export function collectComponentDefGraph(root: ComponentDef): ReactiveGraph {
 
     if (node.vars && typeof node.vars === "object") {
       for (const name of Object.keys(node.vars)) {
-        graph.add({ id: makeId(ownerUid, name), kind: "var" });
+        graph.add({
+          id: makeId(ownerUid, name),
+          kind: "var",
+          ...sourceInfoFor(node, "var", name),
+        });
       }
     }
 
     if (node.functions && typeof node.functions === "object") {
       for (const name of Object.keys(node.functions)) {
-        graph.add({ id: makeId(ownerUid, name), kind: "function" });
+        graph.add({
+          id: makeId(ownerUid, name),
+          kind: "function",
+          ...sourceInfoFor(node, "function", name),
+        });
       }
     }
 
     if (Array.isArray(node.loaders)) {
       for (const loader of node.loaders) {
         if (loader && typeof loader === "object" && loader.uid) {
-          graph.add({ id: makeId(ownerUid, loader.uid), kind: "loader" });
+          graph.add({
+            id: makeId(ownerUid, loader.uid),
+            kind: "loader",
+            ...sourceInfoFor(loader, "loader", loader.uid),
+          });
         }
       }
     }
@@ -181,4 +193,26 @@ function depsOfValue(value: unknown): string[] {
 
 function makeId(ownerUid: string, name: string): string {
   return `${ownerUid}.${name}`;
+}
+
+function sourceInfoFor(
+  node: ComponentDef,
+  kind: ReactiveNodeKind,
+  name: string,
+): Pick<ReturnType<ReactiveGraph["add"]>, "uri" | "range"> {
+  const debug = node.debug as
+    | {
+        source?: { fileId?: string | number; line?: number; col?: number };
+        reactiveNodes?: Record<string, { fileId?: string | number; line?: number; col?: number }>;
+      }
+    | undefined;
+  const source = debug?.reactiveNodes?.[`${kind}.${name}`] ?? debug?.source;
+  if (!source) return {};
+  const uri = source.fileId === undefined ? undefined : String(source.fileId);
+  const line = typeof source.line === "number" ? source.line : undefined;
+  const col = typeof source.col === "number" ? source.col : undefined;
+  return {
+    ...(uri !== undefined ? { uri } : {}),
+    ...(line !== undefined && col !== undefined ? { range: { line, col } } : {}),
+  };
 }
