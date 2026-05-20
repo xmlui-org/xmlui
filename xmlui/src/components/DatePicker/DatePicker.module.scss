@@ -105,10 +105,16 @@ $backgroundColor-overlay-DatePicker: createThemeVar("Input:backgroundColor-overl
 // --- Day-cell modifier colors
 $backgroundColor-day-DatePicker--today: createThemeVar("Input:backgroundColor-day-DatePicker--today");
 $textColor-day-DatePicker--today: createThemeVar("Input:textColor-day-DatePicker--today");
+$borderColor-day-DatePicker--today: createThemeVar("Input:borderColor-day-DatePicker--today");
+$borderWidth-day-DatePicker--today: createThemeVar("Input:borderWidth-day-DatePicker--today");
+$borderStyle-day-DatePicker--today: createThemeVar("Input:borderStyle-day-DatePicker--today");
 $backgroundColor-day-DatePicker--disabled: createThemeVar("Input:backgroundColor-day-DatePicker--disabled");
 $textColor-day-DatePicker--disabled: createThemeVar("Input:textColor-day-DatePicker--disabled");
 $backgroundColor-day-DatePicker--selected: createThemeVar("Input:backgroundColor-day-DatePicker--selected");
 $textColor-day-DatePicker--selected: createThemeVar("Input:textColor-day-DatePicker--selected");
+$backgroundColor-day-DatePicker--rangeMiddle: createThemeVar("Input:backgroundColor-day-DatePicker--rangeMiddle");
+$textColor-day-DatePicker--rangeMiddle: createThemeVar("Input:textColor-day-DatePicker--rangeMiddle");
+$textColor-weekday-DatePicker: createThemeVar("Input:textColor-weekday-DatePicker");
 
 // --- Variant mixin
 @mixin variant($variantName) {
@@ -420,10 +426,19 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   .month_caption {
     display: flex;
     align-content: center;
-    padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
+    padding: t.$space-3 t.$space-3 t.$space-3 0;
     height: var(--rdp-nav-height);
     font-weight: t.$fontWeight-bold;
     font-size: t.$fontSize-lg;
+  }
+
+  // Range mode renders a custom MonthCaption that carries its own
+  // prev/next chevron pair per calendar. The caption becomes the positioning
+  // context so the nav sits absolutely against this calendar's right edge
+  // instead of the calendar root's.
+  .month_caption_with_nav {
+    position: relative;
+    width: 100%;
   }
 
   // ===== NAVIGATION =====
@@ -431,7 +446,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   .nav {
     position: absolute;
     inset-block-start: 0;
-    inset-inline-end: 0;
+    inset-inline-end: calc(-0.2 * #{t.$space-2});
     display: flex;
     align-items: center;
     height: var(--rdp-nav-height);
@@ -533,6 +548,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     justify-content: flex-end;
     align-items: center;
     gap: 0;
+    // Pull the dropdowns container leftward to compensate for the
+    // .dropdown_root's internal left padding, so the visible label text
+    // (e.g. "2026") aligns with the leftmost day column ("Su") below.
+    // Wrapped in calc() because CSS does not accept `-var(...)`.
+    margin-inline-start: calc(-1 * #{t.$space-1});
   }
 
   .dropdown {
@@ -555,7 +575,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     position: relative;
     display: inline-flex;
     align-items: center;
-    padding: t.$space-1_5;
+    padding: t.$space-0_5;
 
     &:hover {
       background-color: $backgroundColor-item-DatePicker--hover;
@@ -574,7 +594,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     padding: var(--rdp-weekday-padding);
     font-weight: t.$fontWeight-medium;
     font-size: t.$fontSize-sm;
-    color: t.$textColor-secondary;
+    color: $textColor-weekday-DatePicker;
     text-align: var(--rdp-weekday-text-align);
     text-transform: var(--rdp-weekday-text-transform);
   }
@@ -631,6 +651,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
       background-color: $backgroundColor-day-DatePicker--today;
       color: $textColor-day-DatePicker--today;
       font-weight: t.$fontWeight-bold;
+      border: $borderWidth-day-DatePicker--today $borderStyle-day-DatePicker--today $borderColor-day-DatePicker--today;
     }
   }
 
@@ -647,15 +668,20 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     opacity: var(--rdp-outside-opacity);
   }
 
-  // Disabled days render as a red filled circle that cannot be activated.
+  // Disabled days look faded with no background and no interaction affordance.
   .disabled .day_button {
     background-color: $backgroundColor-day-DatePicker--disabled;
     color: $textColor-day-DatePicker--disabled;
     cursor: not-allowed;
     opacity: 1;
 
-    &:hover {
+    &:hover,
+    &:focus,
+    &:focus-visible {
       background-color: $backgroundColor-day-DatePicker--disabled;
+      color: $textColor-day-DatePicker--disabled;
+      outline: none;
+      box-shadow: none;
     }
   }
 
@@ -706,21 +732,21 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .range_middle {
-    background-color: $backgroundColor-item-DatePicker--hover;
+    background-color: $backgroundColor-day-DatePicker--rangeMiddle;
     box-shadow:
-      1px 0 0 0 $backgroundColor-item-DatePicker--hover,
-      -1px 0 0 0 $backgroundColor-item-DatePicker--hover;
+      1px 0 0 0 $backgroundColor-day-DatePicker--rangeMiddle,
+      -1px 0 0 0 $backgroundColor-day-DatePicker--rangeMiddle;
 
     .day_button {
       border-color: transparent;
       border: unset;
       border-radius: unset;
-      color: var(--rdp-range_middle-color);
-      background-color: $backgroundColor-item-DatePicker--hover;
+      color: $textColor-day-DatePicker--rangeMiddle;
+      background-color: $backgroundColor-day-DatePicker--rangeMiddle;
     }
 
     .day_button:not(:disabled):hover {
-      background-color: $backgroundColor-item-DatePicker--hover;
+      background-color: $backgroundColor-day-DatePicker--rangeMiddle;
     }
   }
 
@@ -745,12 +771,16 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   // Pending single-click state (react-day-picker sets {from, to} to the same
-  // day after the first click). Render as a plain selected circle — no pill
-  // backdrop — to distinguish it from a confirmed multi-day range.
+  // day after the first click). Render as a left-cap (start-of-range
+  // preview) — never a circle — so the user sees that a range is being
+  // composed and can pick the closing date next.
   .range_start.range_end {
-    background: transparent;
+    background-color: $backgroundColor-day-DatePicker--selected;
     box-shadow: none;
-    border-radius: 0;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   // --- Range preview on hover (first date selected, hovering over another date)

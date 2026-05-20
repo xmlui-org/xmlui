@@ -143,6 +143,14 @@ export const DatePickerMd = createMetadata({
       description: "The invalid messages to display for the input component.",
       valueType: "any",
     },
+    confirmRangeSelection: {
+      description:
+        "In `range` mode, show a Cancel/Proceed footer so the user must explicitly " +
+        "confirm the selected range before it is committed. When `false` (default), " +
+        "the range auto-commits on the second click and the popup closes.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -182,10 +190,16 @@ export const DatePickerMd = createMetadata({
     // a distinct filled-circle look.
     [`backgroundColor-day-${COMP}--selected`]: "$color-primary-500",
     [`textColor-day-${COMP}--selected`]: "$color-surface-0",
-    [`backgroundColor-day-${COMP}--today`]: "$color-surface-200",
+    [`backgroundColor-day-${COMP}--rangeMiddle`]: "$color-primary-100",
+    [`textColor-day-${COMP}--rangeMiddle`]: "$textColor-primary",
+    [`backgroundColor-day-${COMP}--today`]: "transparent",
     [`textColor-day-${COMP}--today`]: "$textColor-primary",
-    [`backgroundColor-day-${COMP}--disabled`]: "$color-danger-500",
-    [`textColor-day-${COMP}--disabled`]: "$color-surface-0",
+    [`borderColor-day-${COMP}--today`]: "$color-secondary-300",
+    [`borderWidth-day-${COMP}--today`]: "1px",
+    [`borderStyle-day-${COMP}--today`]: "solid",
+    [`backgroundColor-day-${COMP}--disabled`]: "transparent",
+    [`textColor-day-${COMP}--disabled`]: "$color-secondary-300",
+    [`textColor-weekday-${COMP}`]: "$color-secondary-300",
     [`paddingVertical-${COMP}`]: "$space-2",
     [`paddingHorizontal-${COMP}`]: "$space-2",
   },
@@ -214,7 +228,7 @@ export const datePickerComponentRenderer = wrapComponent(
   DatePickerMd,
   {
     events: { didChange: "onDidChange", gotFocus: "onFocus", lostFocus: "onBlur" },
-    booleans: ["verboseValidationFeedback"],
+    booleans: ["verboseValidationFeedback", "confirmRangeSelection"],
     strings: ["validationIconSuccess", "validationIconError"],
     exclude: ["invalidMessages"],
     contentClassName: true,

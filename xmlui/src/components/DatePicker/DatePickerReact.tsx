@@ -1,7 +1,7 @@
 import { type CSSProperties, type ForwardedRef, useRef } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange, Matcher } from "react-day-picker";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, useDayPicker } from "react-day-picker";
 import { format, parse, isValid, parseISO } from "date-fns";
 import classnames from "classnames";
 import styles from "./DatePicker.module.scss";
@@ -109,6 +109,7 @@ type Props = {
   validationIconError?: string;
   invalidMessages?: string[];
   contentClassName?: string;
+  confirmRangeSelection?: boolean;
 };
 
 export const enum WeekDays {
@@ -157,15 +158,58 @@ export const defaultProps: Pick<
 const Chevron = ({ ...props }) => {
   const { orientation = "left" } = props;
   if (orientation === "up") {
-    return <ThemedIcon name={"chevronup"} size={"sm"} />;
+    return <ThemedIcon name={"chevronup"} size={"md"} />;
   } else if (orientation === "down") {
-    return <ThemedIcon name={"chevrondown"} size={"sm"} />;
+    return <ThemedIcon name={"chevrondown"} size={"md"} />;
   } else if (orientation === "left") {
-    return <ThemedIcon name={"chevronleft"} size={"lg"} />;
+    return <ThemedIcon name={"chevronleft"} size={"md"} />;
   } else if (orientation === "right") {
-    return <ThemedIcon name={"chevronright"} size={"lg"} />;
+    return <ThemedIcon name={"chevronright"} size={"md"} />;
   }
 };
+
+// Custom MonthCaption used in range mode so each calendar carries its own
+// prev/next chevron pair. With pagedNavigation, both nav blocks operate on
+// the same goToMonth/previousMonth/nextMonth — visually each calendar gets
+// its own buttons, but they navigate the pair together.
+type MonthCaptionProps = {
+  calendarMonth: any;
+  displayIndex: number;
+  children?: React.ReactNode;
+  className?: string;
+} & Record<string, any>;
+
+function RangeMonthCaption(props: MonthCaptionProps) {
+  const { calendarMonth, displayIndex, children, className, ...divProps } = props;
+  const { goToMonth, previousMonth, nextMonth, labels } = useDayPicker();
+  return (
+    <div {...divProps} className={classnames(className, styles.month_caption_with_nav)}>
+      {children}
+      <span className={styles.nav} aria-label={labels.labelNav?.()}>
+        <button
+          type="button"
+          className={styles.button_previous}
+          tabIndex={previousMonth ? undefined : -1}
+          aria-disabled={previousMonth ? undefined : true}
+          aria-label={labels.labelPrevious?.(previousMonth)}
+          onClick={() => previousMonth && goToMonth(previousMonth)}
+        >
+          <Chevron orientation="left" />
+        </button>
+        <button
+          type="button"
+          className={styles.button_next}
+          tabIndex={nextMonth ? undefined : -1}
+          aria-disabled={nextMonth ? undefined : true}
+          aria-label={labels.labelNext?.(nextMonth)}
+          onClick={() => nextMonth && goToMonth(nextMonth)}
+        >
+          <Chevron orientation="right" />
+        </button>
+      </span>
+    </div>
+  );
+}
 
 export const DatePicker = forwardRef(function DatePicker(
   {
@@ -207,6 +251,7 @@ export const DatePicker = forwardRef(function DatePicker(
     validationIconError,
     invalidMessages,
     contentClassName,
+    confirmRangeSelection = false,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -407,9 +452,12 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [open, mode, inline, selected]);
 
   // What the calendar should highlight. In range mode while the dropdown is
-  // open, we show the pending in-flight range; otherwise the committed value.
+  // open AND confirmation is enabled, we show the pending in-flight range.
+  // Otherwise the committed value drives the highlight.
   const displayedSelected =
-    mode === "range" && !inline && open ? pendingRange : (selected as any);
+    mode === "range" && !inline && open && confirmRangeSelection
+      ? pendingRange
+      : (selected as any);
 
   const handleOnMenuFocus = () => {
     setIsMenuFocused(true);
@@ -495,17 +543,28 @@ export const DatePicker = forwardRef(function DatePicker(
           onDidChange(formattedDate);
         }
         setOpen(false);
-      } else if (inline) {
-        // Inline range mode keeps auto-commit semantics — there is no Proceed
-        // button to confirm against.
-        commitRange(dateOrRange as DateRange | undefined);
+      } else if (inline || !confirmRangeSelection) {
+        // Auto-commit semantics — fired on every click. Close the popup once
+        // the user has completed a {from, to} range. react-day-picker fills
+        // both from and to with the clicked date on the first click (1-day
+        // pending range), so we only close when the two ends are different.
+        const range = dateOrRange as DateRange | undefined;
+        commitRange(range);
+        if (
+          !inline &&
+          range?.from &&
+          range?.to &&
+          range.from.getTime() !== range.to.getTime()
+        ) {
+          setOpen(false);
+        }
       } else {
-        // Popup range mode defers commit until the user clicks Proceed.
+        // Popup range mode with confirmation defers commit until Proceed.
         setPendingRange(dateOrRange as DateRange | undefined);
       }
       setHoveredDate(undefined);
     },
-    [onDidChange, updateState, mode, dateFormat, readOnly, inline, commitRange],
+    [onDidChange, updateState, mode, dateFormat, readOnly, inline, commitRange, confirmRangeSelection],
   );
 
   // User confirmed the pending range — commit it and close.
@@ -626,20 +685,24 @@ export const DatePicker = forwardRef(function DatePicker(
       onSelect={handleSelect}
       numberOfMonths={mode === "range" ? 2 : 1}
       pagedNavigation={mode === "range"}
+      hideNavigation={mode === "range"}
       modifiers={modifiers}
       modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
       onDayMouseEnter={handleDayMouseEnter}
       onDayMouseLeave={handleDayMouseLeave}
       components={{
         Chevron,
+        ...(mode === "range" ? { MonthCaption: RangeMonthCaption } : {}),
       }}
     />
   );
 
   // Range mode shows a Cancel/Proceed footer so the user can confirm the
-  // selection before it is committed (matches the shadcn pattern).
+  // selection before it is committed (matches the shadcn pattern). The
+  // footer is opt-in via `confirmRangeSelection` — by default the range
+  // auto-commits on the second click.
   const popupFooter =
-    mode === "range" ? (
+    mode === "range" && confirmRangeSelection ? (
       <div className={styles.popupFooter}>
         <button
           type="button"
@@ -687,12 +750,14 @@ export const DatePicker = forwardRef(function DatePicker(
           autoFocus={autoFocus}
           numberOfMonths={mode === "range" ? 2 : 1}
           pagedNavigation={mode === "range"}
+          hideNavigation={mode === "range"}
           modifiers={modifiers}
           modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
           onDayMouseEnter={handleDayMouseEnter}
           onDayMouseLeave={handleDayMouseLeave}
           components={{
             Chevron,
+            ...(mode === "range" ? { MonthCaption: RangeMonthCaption } : {}),
           }}
         />
       </div>
