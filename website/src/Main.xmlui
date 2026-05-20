@@ -272,6 +272,34 @@
                             label="Reactive Cycle Detection"
                             to="/docs/managed-react/reactive-cycle-detection"
                         />
+                        <NavLink
+                            label="Themevars Namespace"
+                            to="/docs/managed-react/themevars-namespace"
+                        />
+                        <NavLink
+                            label="Code Injection Prevention"
+                            to="/docs/managed-react/code-injection-prevention"
+                        />
+                        <NavLink
+                            label="XSS Protection"
+                            to="/docs/managed-react/xss-protection"
+                        />
+                        <NavLink
+                            label="DOM API Isolation"
+                            to="/docs/managed-react/dom-api-isolation"
+                        />
+                        <NavLink
+                            label="Centralized HTTP"
+                            to="/docs/managed-react/http-centralization"
+                        />
+                        <NavLink
+                            label="Fetch Lifecycle"
+                            to="/docs/managed-react/fetch-lifecycle"
+                        />
+                        <NavLink
+                            label="Observability Substrate"
+                            to="/docs/managed-react/observability-substrate"
+                        />
                     </NavGroup>
                     <NavGroup
                         icon="braces"
@@ -2514,6 +2542,55 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/reactive-cycle-detection.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/themevars-namespace"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/themevars-namespace.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/code-injection-prevention"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/code-injection-prevention.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/xss-protection"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/xss-protection.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/dom-api-isolation"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/dom-api-isolation.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/http-centralization"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/http-centralization.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/fetch-lifecycle"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/fetch-lifecycle.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/observability-substrate"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/observability-substrate.md']}"
                 />
             </Page>
 
