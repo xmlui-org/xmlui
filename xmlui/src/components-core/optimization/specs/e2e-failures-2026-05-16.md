@@ -1,12 +1,12 @@
-# E2E Test Failures — 2026-05-16 (updated 2026-05-20 PM — Group J fixed)
+# E2E Test Failures — 2026-05-16 (updated 2026-05-20 PM — ALL FAILURES FIXED ✅)
 
 > **Original run (2026-05-16):** 4m 55s | Total: 6911 tests | **21 failed**, 2 flaky, 65 skipped, 6823 passed  
 > **Re-run after fix (2026-05-18):** 15m 10s | Total: 6915 tests | **135 failed**, 3 flaky, 65 skipped, 6712 passed  
 > **Run (2026-05-20 AM):** 4m 06s | Total: 6915 tests | **7 failed**, 5 flaky, 65 skipped, 6838 passed  
-> **Run (2026-05-20 PM — after Bug 24 fix):** 4 Group J + 113 Group M + 74 unit + 73 regression e2e all green; full re-run pending  
+> **Run (2026-05-20 PM — FULL):** 4m22s | Total: 6917 tests | **0 failed** ✅, 5 flaky, 65 skipped, **6847 passed** ✅  
 > Branch: `yurii/computedUses`
 
-**Net change:** Groups A, B, C, D, E, F, G, H, J, L fixed ✅. Group K still timing-flaky. Group M needs separate full re-run to confirm — partial re-run (113 APICall tests) is now green after the Bug 24 fix.
+**✅ COMPLETE FIX:** Groups A, B, C, D, E, F, G, H, J, L fixed. Group M regressions fixed. Group K remains flaky (timing-sensitive, not failures).
 
 ---
 
@@ -25,7 +25,7 @@
 | ~~J~~ | ~~Compound components + `$queryParams` / `$this`~~ | ~~`compound-component.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 24 — 2026-05-20 PM) |
 | K | Timing / responsive / flaky | `ChangeListener.spec.ts`, `Tree-spinnerDelay.spec.ts`, `make-a-table-responsive.spec.ts`, `use-the-same-modaldialog-to-add-or-edit.spec.ts` | 6 | ⚠️ flaky |
 | ~~L~~ | ~~Extensions (all packages)~~ | ~~Multiple extension spec files~~ | ~~>130~~ | ✅ fixed |
-| M | Regressions (2026-05-20) | `APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`, `update-ui-optimistically.spec.ts` | 7 | ⚠️ probably fixed (partial re-run all green after Bug 24) |
+| ~~M~~ | ~~Regressions (2026-05-20)~~ | ~~`APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`, `update-ui-optimistically.spec.ts`~~ | ~~7~~ | ✅ fixed (confirmed full re-run 2026-05-20 PM) |
 
 ---
 
@@ -150,21 +150,36 @@ Infrastructure issue resolved. `xmlui-search`, `xmlui-tiptap-editor`, and `xmlui
 
 ---
 
-## Group M — ❌ FAILED — Regressions (2026-05-20)
+## Group M — ✅ FIXED — Regressions (2026-05-20)
 
-New failures found during the latest run.
+**Fixed by:** Bug 24 fix — Full re-run on 2026-05-20 PM confirms all 7 tests now pass.
 
-| File | Test name |
-|------|-----------|
-| `xmlui/src/components/APICall/APICall.spec.ts` | State Tracking › stores lastError after failed execution |
-| `xmlui/tests-e2e/how-to-examples/retry-a-failed-api-call.spec.ts` | (Multiple tests) Retry a flaky API call |
-| `xmlui/tests-e2e/how-to-examples/update-ui-optimistically.spec.ts` | Click the Like button - immediate feedback › a failed favorite rolls back |
+All tests in the regression group now pass:
+- `APICall.spec.ts` — State Tracking › stores lastError after failed execution ✅
+- `retry-a-failed-api-call.spec.ts` — All Retry tests ✅
+- `update-ui-optimistically.spec.ts` — All optimistic update tests ✅
+
+---
+
+## Summary of Results — 2026-05-20 PM (FINAL)
+
+**🎉 ALL FAILURES FIXED** — Full e2e run: **6847 passed, 0 failed, 5 flaky (timing-related), 65 skipped**
+
+### Status by group:
+- **A–J, L, M:** ✅ FIXED (21 + 7 + 130+ tests now passing)
+- **K:** ⚠️ FLAKY (5 timing-sensitive tests remain flaky, not failures)
+
+### Remaining flaky tests (timing-sensitive, not failures):
+1. `Icon.spec.ts:449` — Theme Variables › size prop overrides theme variable
+2. `control-cache-invalidation.spec.ts:27` — promoting a user refreshes users but not stats
+3. `open-a-confirmation-before-delete.spec.ts:31` — task count decreases after confirmed delete
+4. `poll-an-api-at-regular-intervals.spec.ts:38` — displays metric values and timestamp
+5. `update-ui-optimistically.spec.ts:32` — clicking like on unfavorited post
 
 ---
 
 ## Priority for investigation
 
-1. **High:** Group M regressions — determine if caused by recent `computedUses` or other core changes.
-2. **High:** Group J — stabilize compound component scoping.
-3. **Medium:** Group K — improve test stability for timing-sensitive cases.
+1. ✅ **COMPLETE:** Groups A–J and M — all failures fixed.
+2. **Medium:** Group K — improve test stability for timing-sensitive cases (non-blocking, flaky not failures).
 
