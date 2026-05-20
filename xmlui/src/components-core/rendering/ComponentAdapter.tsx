@@ -707,7 +707,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       : null,
   };
 
-  const strictLifecycle = appContext.appGlobals?.strictLifecycle === true;
+  const strictLifecycle = appContext.appGlobals?.strictLifecycle !== false;
   const disposeTimeoutMs: number = appContext.appGlobals?.disposeTimeoutMs ?? 250;
   useEffect(() => {
     const handlers = lifecycleHandlersRef.current;

@@ -146,6 +146,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `error-handling.md` | ErrorBoundary, error propagation, loader errors | Error-related bugs |
 | `parsers.md` | XML, scripting, style, keybinding parsers | Parser modifications |
 | `inspector-debugging.md` | Trace system, `pushXsLog`, verbose mode | Debugging, inspector |
+| `lifecycle.md` | `onMount`/`onUnmount`/`onError`, `<Lifecycle>`, `onBeforeDispose`, `strictLifecycle` | Lifecycle hooks, cleanup, effect primitives |
 | `language-server.md` | LSP, MetadataProvider, completions, diagnostics | VS Code extension |
 | `build-system.md` | CLI commands, Vite plugin, framework builds | Build configuration |
 | `monorepo-structure.md` | Workspaces, Turborepo, changesets, releases | Repo structure, CI/CD |

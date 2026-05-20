@@ -108,16 +108,12 @@ export type StandaloneAppDescription = {
    *   `kind:"type-contract"` error trace entry. Set to `false` to keep the
    *   Wave 3 rollout behaviour where the verifier emits warn-level diagnostics. See
    *   `dev-docs/plans/01-verified-type-contracts.md`.
-   * - `strictLifecycle` (boolean, default `false`) — when `true`, lifecycle
+   * - `strictLifecycle` (boolean, default `true`) — when `true`, lifecycle
    *   violations (async `onUnmount` handler, throw inside a lifecycle handler,
-   *   exceeded `disposeTimeoutMs`) escalate from `warn` (default rollout phase
-   *   — W3-3) to `error`: a `kind:"lifecycle"` error trace entry plus a
-   *   `console.error` and, in strict mode, a one-shot toast. When `false` the
-   *   universal `onMount`/`onUnmount`/`onError` events still fire and
-   *   violations are still reported, but only as warn-level entries so apps
-   *   can audit existing handlers before the strict default flips. Flips to
-   *   `true` in the next major release. See
-   *   `dev-docs/plans/04-managed-lifecycle-vocabulary.md`.
+   *   exceeded `disposeTimeoutMs`) escalate to `error`: a `kind:"lifecycle"`
+   *   error trace entry plus a `console.error` and a one-shot toast. Set to
+   *   `false` to revert to warn-only mode for apps that need an audit window.
+   *   See `dev-docs/plans/04-managed-lifecycle-vocabulary.md`.
    * - `disposeTimeoutMs` (number, default `250`) — millisecond budget for
    *   container `onBeforeDispose` handlers (Phase 3 of plan #04). Exceeding
    *   the budget emits a `kind:"lifecycle"` violation with
