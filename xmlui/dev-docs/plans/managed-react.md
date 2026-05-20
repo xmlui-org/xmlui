@@ -513,7 +513,7 @@ Combining the original report with the new dimensions:
 | Observability | **Strong** | Add server sink + redaction; **trace kind union extended with sandbox/log/app/clipboard/navigate/ws/eventsource kinds (2026-04)** |
 | DOM API isolation | **Strong** *(was Weak)* | Property-access guard + 99-entry denylist + sanctioned replacement globals + `App.fetch` Gate + `<WebSocket>`/`<EventSource>` components + `App.environment` shipped 2026-04. **Phase 1, 2, and 3 of the hardening plan are all complete.** |
 | **Accessibility** | **Documented only** | Parse-time linter; framework focus / live-region primitives; theme contrast checker |
-| **Type contracts** | **Metadata, not verified** | Parse-time prop validation against metadata |
+| **Type contracts** | ✅ **Verified** | LSP, Vite, and runtime expression diagnostics against metadata; `check:metadata` guards TS↔metadata drift; `strictTypeContracts` is default-on |
 | **Resource lifecycle** | **Strong for framework, asymmetric for user code** | Sandbox-safe lifecycle vocabulary for UDCs |
 | **Exception model** | **Contained, not structured** | Structured error type; retry/fallback policies |
 | **Concurrency / cancellation** | **Predictable, uncoordinated** | Cooperative cancellation token; in-flight guard primitive |

@@ -25,6 +25,9 @@ import {
 } from "../components-core/reactive-graph";
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
+import { verifyComponentDef } from "../components-core/type-contracts";
+import type { ComponentMetadata } from "../abstractions/ComponentDefs";
+import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -79,6 +82,19 @@ export type PluginOptions = {
    * `Map<string, { a11y?: ... }>` keyed by component type name.
    */
   a11yRegistry?: A11yRegistry;
+  /**
+   * Control verified type-contract diagnostics at build time — Plan #01 Step 3.2.
+   *
+   * - `"off"` — type-contract verifier disabled.
+   * - `"warn"` (default) — diagnostics are emitted as Vite warnings.
+   * - `"strict"` — error-capable diagnostics fail the build.
+   */
+  typeContracts?: AnalyzeMode;
+  /**
+   * Optional component metadata registry used by the type-contract verifier.
+   * Defaults to the built-in component metadata.
+   */
+  typeContractRegistry?: ReadonlyMap<string, ComponentMetadata>;
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -95,12 +111,19 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     pluginOptions.reactiveCycles ?? (analyzeMode === "strict" ? "strict" : "warn");
   const a11yMode: AnalyzeMode = pluginOptions.accessibility ?? "warn";
   const a11yRegistry: A11yRegistry = pluginOptions.a11yRegistry ?? new Map();
+  const typeContractMode: AnalyzeMode = pluginOptions.typeContracts ?? "warn";
+  const typeContractRegistry =
+    pluginOptions.typeContractRegistry ??
+    new Map(Object.entries(collectedComponentMetadata) as [string, ComponentMetadata][]);
   // Dedupe cycle reports across multiple transform calls / HMR within a
   // single dev-server lifetime, so the same cycle is not warned twice.
   const reportedCycles = new Set<string>();
   // Aggregate a11y diagnostic counts across all files for the buildEnd summary.
   let a11yWarnCount = 0;
   let a11yErrorCount = 0;
+  const typeContractCounts = new Map<string, number>();
+  let typeContractWarnCount = 0;
+  let typeContractErrorCount = 0;
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
@@ -264,6 +287,40 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           }
         }
 
+        // --- Verified type contracts — Plan #01 Step 3.2.
+        // Run after XMLUI parsing so literal props/events can be checked against
+        // component metadata. Expression-valued props are intentionally left for
+        // runtime warn-mode.
+        if (typeContractMode !== "off" && component) {
+          let hits: ReturnType<typeof verifyComponentDef> = [];
+          try {
+            const root: any =
+              (component as any).component &&
+              typeof (component as any).component === "object"
+                ? (component as any).component
+                : component;
+            const strictTypes = typeContractMode === "strict";
+            hits = verifyComponentDef(root, typeContractRegistry, {
+              strict: strictTypes,
+              skipUnknown: true,
+            });
+          } catch (_typeContractErr) {
+            // Type-contract verifier failure must never break the build.
+          }
+          const strictTypes = typeContractMode === "strict";
+          for (const hit of hits) {
+            const message = `[xmlui:type-contract] ${fileId}: [${hit.code}] ${hit.message}${hit.suggestion ? ` Did you mean "${hit.suggestion}"?` : ""}`;
+            typeContractCounts.set(hit.code, (typeContractCounts.get(hit.code) ?? 0) + 1);
+            if (strictTypes && hit.severity === "error") {
+              typeContractErrorCount++;
+              this.error(message);
+            } else {
+              typeContractWarnCount++;
+              this.warn(message);
+            }
+          }
+        }
+
         const file = {
           component,
           src: code,
@@ -367,6 +424,27 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           a11yErrorCount > 0 ? `  ${a11yErrorCount} error(s)` : null,
           a11yWarnCount > 0 ? `  ${a11yWarnCount} warning(s)` : null,
           `  Run with accessibility="strict" to fail the build on must-have violations.`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+        this.warn(summary);
+      }
+
+      if (
+        typeContractMode !== "off" &&
+        (typeContractWarnCount > 0 || typeContractErrorCount > 0)
+      ) {
+        const byCode = Array.from(typeContractCounts.entries())
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([code, count]) => `  ${code}: ${count}`)
+          .join("\n");
+        const total = typeContractWarnCount + typeContractErrorCount;
+        const summary = [
+          `[xmlui:type-contract] Build complete — ${total} type-contract diagnostic(s):`,
+          typeContractErrorCount > 0 ? `  ${typeContractErrorCount} error(s)` : null,
+          typeContractWarnCount > 0 ? `  ${typeContractWarnCount} warning(s)` : null,
+          byCode || null,
+          `  Run with typeContracts="strict" to fail the build on contract violations.`,
         ]
           .filter(Boolean)
           .join("\n");

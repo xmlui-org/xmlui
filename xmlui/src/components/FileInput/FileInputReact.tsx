@@ -82,6 +82,7 @@ type Props = {
   multiple?: boolean;
   directory?: boolean;
   required?: boolean;
+  readOnly?: boolean;
   placeholder?: string;
   buttonPosition?: "start" | "end";
   // Parsing props

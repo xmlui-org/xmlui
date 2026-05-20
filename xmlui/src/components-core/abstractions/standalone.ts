@@ -100,14 +100,13 @@ export type StandaloneAppDescription = {
    *   detector still runs at startup and emits a single `kind:"reactive-cycle"`
    *   warn entry per unique cycle so teams can audit existing apps before the
    *   strict default flips. See `dev-docs/plans/03-reactive-cycle-detection.md`.
-   * - `strictTypeContracts` (boolean, default `false`) — when `true`, parse-time
+   * - `strictTypeContracts` (boolean, default `true`) — when `true`, parse-time
    *   prop / event / value-type violations surfaced by the type-contract verifier
    *   escalate from `warn` to `error`: the LSP reports `DiagnosticSeverity.Error`,
    *   the Vite plugin fails the build on `unknown-prop`, `wrong-type`,
    *   `missing-required`, and `value-not-in-enum`, and the runtime emits a
-   *   `kind:"type-contract"` error trace entry. When `false` (the rollout warn
-   *   phase default — Wave 3), the verifier still runs but only emits warn-level
-   *   diagnostics. Flips to `true` in the next major release. See
+   *   `kind:"type-contract"` error trace entry. Set to `false` to keep the
+   *   Wave 3 rollout behaviour where the verifier emits warn-level diagnostics. See
    *   `dev-docs/plans/01-verified-type-contracts.md`.
    * - `strictLifecycle` (boolean, default `false`) — when `true`, lifecycle
    *   violations (async `onUnmount` handler, throw inside a lifecycle handler,

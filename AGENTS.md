@@ -113,6 +113,7 @@ Use the prompt files in `.github/prompts/` for step-by-step workflows. Invoke wi
 | Refactor core code | `#refactor-core` | Restructuring framework internals in `components-core/` |
 | Improve code readability | `#improve-readability` | Renaming, comments, structure, and guard clauses — logic-neutral refactoring |
 | Write component documentation | `#write-component-docs` | Writing or updating hand-written description files for doc generation |
+| Complete a Managed React plan | `#complete-managed-react-plan` | Checking and completing a specific Managed React feature plan, then documenting it on the website |
 | Add a new stereotype task | `#add-stereotype` | Creating a new prompt file for a repeatable task pattern |
 
 If no prompt is invoked, use the documentation map below to find the right reference material for your task.
@@ -131,6 +132,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `component-architecture.md` | Two-file pattern, metadata, renderer, native | Any component work |
 | `wrapcomponent.md` | `wrapComponent` config API, events, templates, state | Components using `wrapComponent` |
 | `expression-eval.md` | Parser pipeline, AST, sync/async eval, dependency tracking | Expression bugs, scripting issues |
+| `type-contracts.md` | Verified component metadata contracts, diagnostics, strict mode | Type-contract verifier or diagnostic surface work |
 | `theming-styling.md` | CSS variables, SCSS modules, tone management | Visual components, theme customization |
 | `data-operations.md` | DataSource, APICall, loaders, React Query | Data-fetching components |
 | `behaviors.md` | The 9 auto-attached behaviors, application order | Behavior interactions, form components |

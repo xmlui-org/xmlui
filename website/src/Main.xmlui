@@ -260,6 +260,16 @@
                         to="/docs/guides/hosted-deployment"
                     />
                     <NavGroup
+                        icon="atom"
+                        label="Managed React"
+                        to="/docs/managed-react/overview"
+                    >
+                        <NavLink
+                            label="Verified Type Contracts"
+                            to="/docs/managed-react/verified-type-contracts"
+                        />
+                    </NavGroup>
+                    <NavGroup
                         icon="braces"
                         label="Wrapping and Theming"
                         to="/docs/guides/wrap-component"
@@ -2480,6 +2490,22 @@
                     content="{appGlobals.docsContent['pages/hosted-deployment.md']}"
                 />
             </Page>
+
+            <Page
+                url="/docs/managed-react/overview"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/overview.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/verified-type-contracts"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/verified-type-contracts.md']}"
+                />
+            </Page>
+
             <Page url="/docs/change-log">
                 <ChangeLog />
             </Page>

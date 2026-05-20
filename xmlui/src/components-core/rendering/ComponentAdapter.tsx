@@ -59,6 +59,7 @@ import {
 import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
 import { enterRenderPhase, exitRenderPhase } from "../scheduler";
+import { emitRuntimeTypeContractDiagnostics } from "../type-contracts";
 
 /**
  * Plan #6 W7-1 — surface the per-component / per-event concurrency knobs
@@ -362,6 +363,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const componentRegistry = useComponentRegistry();
   const { renderer, descriptor, isCompoundComponent } =
     componentRegistry.lookupComponentRenderer(safeNode.type) || {};
+
+  useEffect(() => {
+    emitRuntimeTypeContractDiagnostics(
+      safeNode,
+      descriptor,
+      valueExtractor,
+      appContext,
+      uid.description ?? String(safeNode.uid ?? safeNode.type),
+    );
+  }, [appContext, descriptor, safeNode, uid, valueExtractor]);
 
   // --- Extract context variables (keys starting with "$") from state
   const contextVars = useMemo(() => {

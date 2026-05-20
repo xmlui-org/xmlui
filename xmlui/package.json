@@ -18,6 +18,7 @@
     "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "test:e2e-website-examples": "playwright test -c .. --grep \"@website\"",
     "check:metadata-purity": "node scripts/check-metadata-purity.mjs",
+    "check:metadata": "tsx scripts/check-metadata-drift.ts",
     "check:css-chunks": "node scripts/inspect-css-chunks.mjs",
     "check:example-tests": "node scripts/check-example-tests.mjs",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",

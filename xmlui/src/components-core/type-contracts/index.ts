@@ -20,3 +20,7 @@ export {
 export type { CoercionRule, VerifyContext, VerifyFailure } from "./rules/types";
 export { verifyEnum } from "./rules/enum";
 export { findSuggestion, levenshtein } from "./suggestions";
+export {
+  emitRuntimeTypeContractDiagnostics,
+  resetRuntimeTypeContractDiagnostics,
+} from "./runtime";

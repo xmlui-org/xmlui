@@ -44,6 +44,8 @@ jobs:
         run: npx playwright install --with-deps
       - name: ensure we can build xmlui and the extensions
         run: npm run build-xmlui
+      - name: check XMLUI metadata drift
+        run: npm --prefix xmlui run check:metadata
       - name: run all tests
         run: npm run test
       - name: Enforce patch-only changesets

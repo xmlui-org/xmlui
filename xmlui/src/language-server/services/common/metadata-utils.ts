@@ -52,6 +52,15 @@ export class MetadataProvider {
       ]),
     );
   }
+
+  componentMetadataMap(): ReadonlyMap<string, ComponentMetadata> {
+    return new Map(
+      Object.entries(this.metadataCollection).map(([name, meta]) => [
+        name,
+        meta as ComponentMetadata,
+      ]),
+    );
+  }
 }
 
 export type AttributeKind = "prop" | "event" | "api" | "implicit" | "layout";
