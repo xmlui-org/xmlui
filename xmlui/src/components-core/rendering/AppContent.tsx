@@ -181,6 +181,7 @@ export function AppContent({
   const programmaticNavigationRef = useRef<string | undefined>();
   const [appLocaleOverride, setAppLocaleOverride] = useState<string | undefined>();
   const [userLocaleOverride, setUserLocaleOverride] = useState<string | undefined>();
+  const [directionOverride, setDirectionOverride] = useState<"ltr" | "rtl" | "auto">("auto");
   const [schedulerOverride, setSchedulerOverride] = useState<"concurrent" | "fifo" | undefined>();
   const [maxQueuedPerTraceOverride, setMaxQueuedPerTraceOverride] = useState<number | undefined>();
   const bundleStoreRef = useRef(createBundleStore([xmluiEnglishBundle]));
@@ -985,6 +986,11 @@ export function AppContent({
 
   const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
 
+  const resolvedDirection = useMemo(() => {
+    if (directionOverride === "ltr" || directionOverride === "rtl") return directionOverride;
+    return isRtlLocale(activeLocale.locale) ? "rtl" : "ltr";
+  }, [directionOverride, isRtlLocale, activeLocale.locale]);
+
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
   // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
@@ -1631,13 +1637,14 @@ export function AppContent({
         localeSource: activeLocale.source,
         availableLocales,
         setLocale,
+        setAppDirection: (dir: "ltr" | "rtl" | "auto") => setDirectionOverride(dir),
         registerLocaleBundle,
         registerLocaleBundles,
         reloadLocale,
         translate,
         t: translate,
         isRtlLocale,
-        direction: isRtlLocale(activeLocale.locale) ? "rtl" : "ltr",
+        direction: resolvedDirection,
         formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
           formatNumber(value, activeLocale.locale, options),
         formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
@@ -1715,6 +1722,7 @@ export function AppContent({
     reloadLocale,
     translate,
     isRtlLocale,
+    resolvedDirection,
     schedulerMode,
     maxQueuedPerTrace,
     setScheduler,

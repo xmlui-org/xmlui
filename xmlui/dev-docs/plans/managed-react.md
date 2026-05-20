@@ -357,21 +357,27 @@ gender across the JVM and CLR.
 [`formatDatetimeToUserFriendly()`](../src/components-core/utils/misc.ts)).
 TimeInput honours locale-specific separators.
 
-**What is missing.**
+**What is missing.** *(All resolved — 2026-06 / plan #11)*
 
-- **No string externalization.** All component-emitted UI strings (validation
-  messages, default placeholders, button labels in built-ins) are English
-  literals.
-- **No pluralization or gender support.**
-- **No locale-aware sorting or collation helpers in expressions.**
-- **No RTL support contract.** Components rely on CSS logical properties
-  *if the author remembered*; there is no framework guarantee.
-- **No currency formatting beyond decimal-place control.**
+- ~~**No string externalization.**~~ ✅ All framework-emitted strings are now
+  keyed under `xmlui.*` and flow through `App.translate()`; app strings use
+  `App.translate(key, vars)` / `<I18n key>` with flat JSON bundles.
+- ~~**No pluralization or gender support.**~~ ✅ `@formatjs/intl-messageformat`
+  ICU runtime ships in `i18n/icu.ts`; plural/select/ordinal honoured for every
+  registered locale including Arabic (6 categories) and Polish (4).
+- ~~**No locale-aware sorting or collation helpers in expressions.**~~ ✅
+  `App.compare(a, b, opts?)` wraps `Intl.Collator`; `App.pluralRules(n)` wraps
+  `Intl.PluralRules`.
+- ~~**No RTL support contract.**~~ ✅ `<App direction="auto">` derives direction
+  from the active locale via the CLDR table; all built-in SCSS modules use CSS
+  logical properties; `scripts/lint-physical-css.ts` guards new additions.
+- ~~**No currency formatting beyond decimal-place control.**~~ ✅
+  `App.formatCurrency(value, currency, opts?)` wraps `Intl.NumberFormat` with
+  `style: "currency"`; `App.formatNumber`, `App.formatList`, and
+  `App.formatRelativeTime` are also on the expression surface.
 
-**Verdict.** XMLUI is effectively monolingual. Anything beyond date display
-requires the developer to roll their own i18n layer. This is a substantial
-gap for any framework that wants to be considered "managed" in the .NET / JVM
-sense.
+**Verdict.** ✅ Resolved. The i18n layer is fully managed: bundles, ICU plurals,
+Intl-backed formatters, and RTL guarantee are all in place (plan #11, 2026-06).
 
 ---
 
@@ -527,7 +533,7 @@ Combining the original report with the new dimensions:
 | **Theming sandbox** | **Mostly scoped** | Typed theme variables; restrict inline-style escape hatch |
 | **Forms validation** | **State strong, validators absent** | Built-in validators, server-error mapping, submit guard |
 | **Routing input** | ✅ **Defended (strict by default)** | Typed/custom constraints, all-trigger guards (pop-state + opt-in anchor/form interception), URL canonicalisation, `strictRouting` default-on — plan #10 |
-| **i18n** | **Dates only** | String externalisation, ICU plurals, RTL guarantees |
+| **i18n** | ✅ **Sealed — bundles, ICU plurals, Intl-backed formatters, RTL guarantee** | `<App locale\|localeBundles\|direction>`, reactive `App.locale` / `App.setLocale` / `App.translate` / `<I18n>`; `@formatjs/intl-messageformat` ICU runtime; `App.formatNumber\|Currency\|List\|RelativeTime\|compare\|pluralRules`; full SCSS logical-properties + `scripts/lint-physical-css.ts`; framework strings extracted to `xmlui.*` namespace. 33 unit + 5 E2E tests. User docs at `/docs/managed-react/i18n-foundations`. `strictI18n` default flip reserved for next major (plan #11) |
 | **Versioning** | **Mechanism present, unenforced** | LSP deprecation diagnostics, prop-level deprecation |
 | **Build-time validation** | ✅ **Sealed — identifier, expression, and cross-binding analyzers across LSP / Vite / CLI** | Rule registry + walker (auto-parses markup) + suppression; one `analyze()` pipeline drives LSP `diagnostic.ts`, Vite plugin (`analyze: "off"\|"warn"\|"strict"`), and `xmlui check [dir]` CLI; create-app templates ship `check` script + `xmlui.config.json` + GitHub workflow. Rules: identifier (`id-unknown-component\|prop\|event\|method`, `id-undefined-component-ref\|form-ref`), expression (`expr-dead-conditional`, `expr-handler-no-value`, `expr-unbound-identifier`, `expr-unused-var`), determinism rules. `id-unknown-slot` is a registered no-op pending `ComponentMetadata.slots` metadata (out of scope). Shared infra: `_ast-utils.ts` (lazy expression parsing, identifier-ref / rooted-chain collectors, uid map) + `_reserved-identifiers.ts`. 102 unit tests. User docs at `/docs/managed-react/build-validation-analyzers`. |
 | **UDC sandboxing** | **Absent** | Explicit prop/event contract for UDCs; capability scoping |

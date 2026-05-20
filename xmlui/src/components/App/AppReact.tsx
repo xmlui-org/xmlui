@@ -246,6 +246,12 @@ export const App = memo(function App({
   }, [appContext.App, localeBundles]);
 
   useEffect(() => {
+    // Push the direction prop into AppContext so App.direction stays consistent
+    // with document.documentElement.dir.
+    appContext.App?.setAppDirection?.(direction ?? "auto");
+  }, [appContext.App, direction]);
+
+  useEffect(() => {
     if (typeof document === "undefined") return;
     const resolvedDirection =
       direction === "auto" ? (appContext.App?.isRtlLocale?.(appContext.App?.locale) ? "rtl" : "ltr") : direction;
