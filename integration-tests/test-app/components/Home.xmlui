@@ -5,7 +5,7 @@
         <TestComponent label="hello from home" />
 
         <Theme fontSize="18px" textColor="blue">
-            <Text value="This is the about page." />
+            <Text value="This is the home page." />
         </Theme>
     </Stack>
 </Component>

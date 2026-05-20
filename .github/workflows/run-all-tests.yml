@@ -75,8 +75,10 @@ jobs:
         run: npm run build-xmlui
       - name: check XMLUI metadata drift
         run: npm --prefix xmlui run check:metadata
-      - name: run all tests
+      - name: run tests
         run: npm run test
+      - name: run integration tests
+        run: npm run test-integration
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-report

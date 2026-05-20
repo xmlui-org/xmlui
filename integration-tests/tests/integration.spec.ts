@@ -27,7 +27,7 @@ test("direct navigation to /about works", async ({ page }) => {
 
 test("styles work", async ({ page }) => {
   await page.gotoWithMode("/");
-  const text = page.getByText("This is the about page.", { exact: true });
+  const text = page.getByText("This is the home page.", { exact: true });
   await expect(text).toBeVisible();
   await expect(text).toHaveCSS("color", "rgb(0, 0, 255)");
   await expect(text).toHaveCSS("font-size", "18px");
