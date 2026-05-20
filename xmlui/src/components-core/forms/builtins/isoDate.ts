@@ -12,6 +12,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.isoDate";
 const DEFAULT_MESSAGE = "Not a valid ISO 8601 date";
 
 // Date only: 1900-2999. Time portion optional.
@@ -34,6 +35,6 @@ export function isValidIsoDate(value: unknown): boolean {
 
 export const isoDateValidator: ValidatorEntry = {
   name: "isoDate",
-  fn: (value) => (isValidIsoDate(value) ? null : DEFAULT_MESSAGE),
+  fn: (value) => (isValidIsoDate(value) ? null : MESSAGE_KEY),
   defaultMessage: DEFAULT_MESSAGE,
 };

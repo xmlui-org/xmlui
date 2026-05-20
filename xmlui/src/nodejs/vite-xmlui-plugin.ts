@@ -23,6 +23,8 @@ import {
   formatCycle,
   cycleHash,
 } from "../components-core/reactive-graph";
+import { lintComponentDef } from "../components-core/accessibility/linter";
+import type { A11yRegistry } from "../components-core/accessibility";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -53,6 +55,30 @@ export type PluginOptions = {
    * span compound-component boundaries) are not yet detected here.
    */
   reactiveCycles?: AnalyzeMode;
+  /**
+   * Control accessibility linting at build time — Plan #05 Phase 1 Step 1.3.
+   *
+   * - `"off"` — accessibility linter disabled.
+   * - `"warn"` (default) — linter runs; diagnostics are emitted as Vite
+   *   warnings; the build always succeeds.
+   * - `"strict"` — must-have violations (`icon-only-button-no-label`,
+   *   `modal-no-title`, etc.) call `this.error(...)`, failing the build.
+   *
+   * @see a11yRegistry to supply component metadata for the full rule set.
+   */
+  accessibility?: AnalyzeMode;
+  /**
+   * Optional component a11y metadata map used by the accessibility linter.
+   *
+   * When omitted the linter still runs component-name-based rules
+   * (`icon-only-button-no-label`, `modal-no-title`).  Metadata-dependent
+   * rules (`missing-accessible-name`, `form-input-no-label`) require this
+   * registry to fire.
+   *
+   * Callers may build this from the generated LSP metadata or from any
+   * `Map<string, { a11y?: ... }>` keyed by component type name.
+   */
+  a11yRegistry?: A11yRegistry;
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -67,9 +93,14 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   const analyzeMode: AnalyzeMode = pluginOptions.analyze ?? "warn";
   const cyclesMode: AnalyzeMode =
     pluginOptions.reactiveCycles ?? (analyzeMode === "strict" ? "strict" : "warn");
+  const a11yMode: AnalyzeMode = pluginOptions.accessibility ?? "warn";
+  const a11yRegistry: A11yRegistry = pluginOptions.a11yRegistry ?? new Map();
   // Dedupe cycle reports across multiple transform calls / HMR within a
   // single dev-server lifetime, so the same cycle is not warned twice.
   const reportedCycles = new Set<string>();
+  // Aggregate a11y diagnostic counts across all files for the buildEnd summary.
+  let a11yWarnCount = 0;
+  let a11yErrorCount = 0;
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
@@ -200,6 +231,39 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             }
           }
         }
+
+        // --- Accessibility linting — Plan #05 Phase 1 Step 1.3.
+        // Run lintComponentDef on the parsed component tree to surface
+        // accessibility violations (icon-only-button, modal-no-title, and
+        // others when a11yRegistry is supplied). In non-strict mode violations
+        // are warnings; in strict mode must-have codes call this.error().
+        if (a11yMode !== "off" && component) {
+          try {
+            const root: any =
+              (component as any).component &&
+              typeof (component as any).component === "object"
+                ? (component as any).component
+                : component;
+            const strictA11y = a11yMode === "strict";
+            const a11yHits = lintComponentDef(root, a11yRegistry, {
+              strict: strictA11y,
+              skipUnknown: true,
+            });
+            for (const hit of a11yHits) {
+              const message = `[xmlui:a11y] ${fileId}: [${hit.code}] ${hit.message}${hit.fix ? ` Suggestion: ${hit.fix}` : ""}`;
+              if (strictA11y && hit.severity === "error") {
+                a11yErrorCount++;
+                this.error(message);
+              } else {
+                a11yWarnCount++;
+                this.warn(message);
+              }
+            }
+          } catch (_a11yErr) {
+            // A11y linter failure must never break the build.
+          }
+        }
+
         const file = {
           component,
           src: code,
@@ -291,6 +355,23 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
     configResolved(config) {
       projectRoot = normalizePath(config.root);
+    },
+
+    buildEnd() {
+      // Emit an accessibility summary when the linter found any issues.
+      // This surfaces the totals even after individual per-file warnings
+      // have scrolled past in the build log.
+      if (a11yMode !== "off" && (a11yWarnCount > 0 || a11yErrorCount > 0)) {
+        const summary = [
+          `[xmlui:a11y] Build complete — accessibility diagnostics:`,
+          a11yErrorCount > 0 ? `  ${a11yErrorCount} error(s)` : null,
+          a11yWarnCount > 0 ? `  ${a11yWarnCount} warning(s)` : null,
+          `  Run with accessibility="strict" to fail the build on must-have violations.`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+        this.warn(summary);
+      }
     },
 
     handleHotUpdate({ file, server }) {

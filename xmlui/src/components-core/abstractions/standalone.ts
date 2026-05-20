@@ -92,7 +92,8 @@ export type StandaloneAppDescription = {
    *   `missing-accessible-name`, `form-input-no-label`) escalate from `warn` to
    *   `error`, causing the Vite build to fail if any are present. In non-strict mode
    *   they are warnings only. See `dev-docs/plans/05-enforced-accessibility.md`.
-   * - `strictReactiveGraph` (boolean, default `false`) — when `true`, every
+   * - `strictReactiveGraph` (boolean, default `true` — flipped from `false` in W8-1)
+   *   — when `true`, every
    *   detected reactive cycle (var ↔ var, var ↔ DataSource, function-mediated)
    *   produces a `kind:"reactive-cycle"` error trace entry plus a one-shot toast
    *   (planned for W6). When `false` (the rollout warn phase default — W2-7), the
@@ -160,7 +161,8 @@ export type StandaloneAppDescription = {
    *   `App.locale` resolution.
    * - `localePersistKey` (string | null, default `"xmlui.locale"`) — localStorage
    *   key for user-selected locales; `null` disables persistence.
-   * - `strictDeterminism` (boolean, default `false`) — when `true`, determinism
+   * - `strictDeterminism` (boolean, default `true` — flipped from `false` in W8-1)
+   *   — when `true`, determinism
    *   diagnostics escalate and the handler scheduler defaults to FIFO.
    * - `scheduler` (`"concurrent" | "fifo"`, default `"concurrent"`) — selects
    *   immediate handler execution or deterministic per-trace FIFO ordering.

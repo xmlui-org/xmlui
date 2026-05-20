@@ -15,6 +15,10 @@ import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
+import { executeWithPolicy } from "../errors/policy";
+import { useRetryPolicy } from "../errors/RetryPolicyContext";
+import { AppError } from "../errors/app-error";
+import { useFallback } from "../../components/Fallback/FallbackReact";
 
 // Shared state and callback contract for non-visual data loaders.
 type LoaderProps = {
@@ -54,6 +58,13 @@ export function Loader({
   const { uid } = loader;
   const appContext = useAppContext();
   const { initialized } = useApiInterceptorContext();
+  // Plan #07 Step 3.1 — when an ancestor `<RetryPolicy>` is present, wrap the
+  // fetcher in `executeWithPolicy` so failures are retried before reaching
+  // the reducer / `$error` channel.
+  const retryPolicy = useRetryPolicy();
+  // Plan #07 Step 4.1 — when an ancestor `<Fallback>` is present, report
+  // success / error so it can switch to its error template.
+  const fallback = useFallback();
 
   // React Query owns cache reuse, background refetches, and request state.
   const { data, status, isFetching, isLoading, error, refetch, isRefetching } = useQuery({
@@ -67,7 +78,12 @@ export function Loader({
     queryFn: useCallback<QueryFunction>(
       async ({ signal }) => {
         try {
-          const loadedValue: any = await loaderFn(signal);
+          const fetcher = (innerSignal: AbortSignal) => loaderFn(innerSignal);
+          const loadedValue: any = retryPolicy
+            ? await executeWithPolicy(fetcher, retryPolicy.spec, signal ?? new AbortController().signal, {
+                circuitState: retryPolicy.circuitState,
+              })
+            : await loaderFn(signal);
           if (loadedValue === undefined) {
             return null;
           }
@@ -76,7 +92,7 @@ export function Loader({
           throw error;
         }
       },
-      [loaderFn],
+      [loaderFn, retryPolicy],
     ),
     select: useCallback(
       (data: any) => {
@@ -147,6 +163,8 @@ export function Loader({
 
     if (hasNewData) {
       loaderLoaded(data);
+      // Clear any previously reported error for this loader.
+      fallback?.clearError(uid);
 
       // Run after layout effects so markup handlers can read the updated loader state.
       setTimeout(() => {
@@ -154,8 +172,10 @@ export function Loader({
       }, 0);
     } else if (hasNewCompletedError) {
       loaderError(error);
+      // Bubble the structured error to the nearest <Fallback>, if any.
+      fallback?.reportError(uid, AppError.from(error));
     }
-  }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, isRefetching]);
+  }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, isRefetching, fallback, uid]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {

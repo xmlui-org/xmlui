@@ -123,6 +123,29 @@ export class AppError extends Error {
   static from(unknown: unknown): AppError {
     if (unknown instanceof AppError) return unknown;
     if (unknown instanceof Error) {
+      // Detect a wrapped GenericBackendError (HTTP failure) via duck-typing so
+      // we do not introduce a circular import from EngineError → errors.
+      const statusCode = (unknown as any).statusCode;
+      if (typeof statusCode === "number") {
+        const category = categorizeHttpStatus(statusCode);
+        const data: Record<string, unknown> = { statusCode };
+        const details = (unknown as any).details;
+        if (details != null) data.details = details;
+        const response = (unknown as any).response;
+        if (response != null) data.response = response;
+        // Plan #07 Step 3.2 — RestApiProxy attaches the parsed `Retry-After`
+        // delay as `retryAfterMs` on the source error.  Promote it onto
+        // `AppError.data` so `<RetryPolicy>` can override the backoff.
+        const retryAfterMs = (unknown as any).retryAfterMs;
+        if (typeof retryAfterMs === "number") data.retryAfterMs = retryAfterMs;
+        return new AppError({
+          code: `http-${statusCode}`,
+          category,
+          message: unknown.message,
+          cause: unknown,
+          data,
+        });
+      }
       return new AppError({
         code: "unknown",
         category: "internal",
@@ -137,4 +160,31 @@ export class AppError extends Error {
       cause: unknown,
     });
   }
+}
+
+// ---------------------------------------------------------------------------
+// HTTP status → ErrorCategory mapping
+// ---------------------------------------------------------------------------
+
+/**
+ * Map an HTTP status code to a semantic `ErrorCategory`.
+ *
+ * The mapping follows the table in plan #07 Phase 1 Step 1.2:
+ *   400, 422        → "validation"
+ *   401, 403        → "authorization"
+ *   404             → "not-found"
+ *   409             → "conflict"
+ *   429             → "rate-limit"
+ *   5xx             → "server"
+ *   network/timeout → caller maps to "network" before calling this
+ *   anything else   → "internal"
+ */
+export function categorizeHttpStatus(status: number): ErrorCategory {
+  if (status === 400 || status === 422) return "validation";
+  if (status === 401 || status === 403) return "authorization";
+  if (status === 404) return "not-found";
+  if (status === 409) return "conflict";
+  if (status === 429) return "rate-limit";
+  if (status >= 500 && status <= 599) return "server";
+  return "internal";
 }

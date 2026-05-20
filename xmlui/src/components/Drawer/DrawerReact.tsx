@@ -20,6 +20,7 @@ import { ThemeContext } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useAppContext } from "../../components-core/AppContext";
 
 // =============================================================================
 // Types
@@ -109,6 +110,7 @@ export const DrawerNative = memo(forwardRef<HTMLDivElement, DrawerProps>(functio
 ) {
   const theme = useTheme();
   const { root } = theme;
+  const appContext = useAppContext();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // --- Create a scoped portal container appended to root. It uses
@@ -217,7 +219,7 @@ export const DrawerNative = memo(forwardRef<HTMLDivElement, DrawerProps>(functio
             [styles.bottom]: position === "bottom",
           }, classes?.[COMPONENT_PART_KEY], className)}
           style={style}
-          aria-label="Drawer"
+          aria-label={appContext.App.translate("xmlui.drawer.ariaLabel")}
           onAnimationEnd={handlePanelAnimationEnd}
           onPointerDownOutside={(e) => { if (closeOnClickAway) doClose(); else e.preventDefault(); }}
           onEscapeKeyDown={() => doClose()}
@@ -226,7 +228,7 @@ export const DrawerNative = memo(forwardRef<HTMLDivElement, DrawerProps>(functio
           {/* Close button - floats at top-right */}
           {closeButtonVisible && (
             <Dialog.Close asChild>
-              <button className={styles.closeButton} aria-label="Close">
+              <button className={styles.closeButton} aria-label={appContext.App.translate("xmlui.drawer.closeAriaLabel")}>
                 <Icon name="close" size="sm" />
               </button>
             </Dialog.Close>

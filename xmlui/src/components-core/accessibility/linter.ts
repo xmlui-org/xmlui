@@ -21,6 +21,14 @@
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
 import type { A11yDiagnostic } from "./diagnostics";
 
+/**
+ * Minimal registry interface required by the linter.
+ * Callers need only supply the `a11y` slice of the full `ComponentMetadata`.
+ * This keeps the LSP, Vite plugin, and unit tests decoupled from the full
+ * metadata shape.
+ */
+export type A11yRegistry = ReadonlyMap<string, { readonly a11y?: ComponentMetadata["a11y"] }>;
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -42,13 +50,15 @@ export interface LintOptions {
  * Lint a component-def tree for accessibility violations.
  *
  * @param def       Root `ComponentDef` to walk (typically the page/app root).
- * @param registry  Map from component type name to `ComponentMetadata`.
+ * @param registry  Map from component type name to `{ a11y? }` metadata slice.
+ *                  Only the `a11y` field is read; callers may pass any registry
+ *                  that provides it (LSP metadata, a static map, or `new Map()`).
  * @param opts      Optional lint configuration.
  * @returns         Flat array of diagnostics, sorted by line then column.
  */
 export function lintComponentDef(
   def: ComponentDef,
-  registry: ReadonlyMap<string, ComponentMetadata>,
+  registry: A11yRegistry,
   opts?: LintOptions,
 ): A11yDiagnostic[] {
   const { strict = false, skipUnknown = false } = opts ?? {};

@@ -8,6 +8,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.url";
 const DEFAULT_MESSAGE = "Not a valid URL";
 
 export function isValidUrl(value: unknown): boolean {
@@ -23,6 +24,6 @@ export function isValidUrl(value: unknown): boolean {
 
 export const urlValidator: ValidatorEntry = {
   name: "url",
-  fn: (value) => (isValidUrl(value) ? null : DEFAULT_MESSAGE),
+  fn: (value) => (isValidUrl(value) ? null : MESSAGE_KEY),
   defaultMessage: DEFAULT_MESSAGE,
 };

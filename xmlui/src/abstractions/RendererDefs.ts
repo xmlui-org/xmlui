@@ -7,6 +7,7 @@ import type {
   CompoundComponentDef,
   DynamicChildComponentDef,
   ParentRenderContext,
+  ThemeValueType,
 } from "./ComponentDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
@@ -110,6 +111,20 @@ export type ValueExtractor = {
 
   /** Get a registered icon name (returns `undefined` on invalid literals). */
   asIcon(expression?: any): string | undefined;
+
+  /**
+   * Get a validated layout-prop value (plan #08 Step 2.1).
+   * Runs `validateInlineStyle`, emits diagnostics, and returns the
+   * clamped/allowed value (or `undefined` when strictly invalid).
+   */
+  asLayoutProp(propName: string, expression?: any, valueType?: ThemeValueType): any;
+
+  /**
+   * Get a validated style-string value (plan #08 Step 2.2).
+   * Runs `validateStyleString`, emits diagnostics, and returns the
+   * filtered string (declarations that failed are stripped in strict mode).
+   */
+  asStyleProp(expression?: any, componentName?: string): string | undefined;
 };
 
 // This function retrieves an async function for a particular component's specified

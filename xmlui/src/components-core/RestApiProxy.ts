@@ -12,6 +12,7 @@ import { extractParam } from "./utils/extractParam";
 import { normalizeUrlAndParams } from "./utils/DataLoaderQueryKeyGenerator";
 import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
+import { parseRetryAfter } from "./errors/policy";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
 import type { IApiInterceptor } from "./interception/abstractions";
 import { injectTraceparent } from "./audit/correlation";
@@ -738,6 +739,10 @@ export default class RestApiProxy {
   }
 
   private raiseError = async (response: Response) => {
+    // Plan #07 Step 3.2 — parse the HTTP `Retry-After` header once and
+    // attach the resulting delay (in ms) to whichever error we surface.
+    const retryAfterHeader = response?.headers?.get?.("retry-after") ?? null;
+    const retryAfterMs = parseRetryAfter(retryAfterHeader);
     try {
       const parsedResponse = await parseResponseBody(response.clone());
       const hasParsedBody =
@@ -746,7 +751,7 @@ export default class RestApiProxy {
         !(typeof parsedResponse === "string" && parsedResponse.trim().length === 0);
 
       if (hasParsedBody) {
-        return new GenericBackendError(
+        const err = new GenericBackendError(
           this.config.errorResponseTransform
             ? this.extractParam(true, this.config.errorResponseTransform, {
                 $response: parsedResponse,
@@ -754,11 +759,15 @@ export default class RestApiProxy {
             : parsedResponse,
           response.status,
         );
+        if (retryAfterMs !== undefined) err.retryAfterMs = retryAfterMs;
+        return err;
       }
     } catch {}
 
     if (response?.statusText || response?.status) {
-      return new GenericBackendError(response.statusText, response.status);
+      const err = new GenericBackendError(response.statusText, response.status);
+      if (retryAfterMs !== undefined) err.retryAfterMs = retryAfterMs;
+      return err;
     }
 
     return new Error(`[!] Server responded with an error: ${response}`);

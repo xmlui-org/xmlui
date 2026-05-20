@@ -31,6 +31,7 @@ import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { useAppContext } from "../../components-core/AppContext";
 
 import {
   PART_LIST_WRAPPER,
@@ -330,6 +331,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   forwardedRef,
 ) {
   const id = useFormItemInputId(idProp);
+  const appContext = useAppContext();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const composedTriggerRef = useComposedRefs(
     setReferenceElement as React.RefCallback<HTMLElement>,
@@ -939,7 +941,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
                         <input
                           role="searchbox"
                           className={classnames(styles.commandInput)}
-                          placeholder="Search..."
+                          placeholder={appContext.App.translate("xmlui.select.searchPlaceholder")}
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />

@@ -39,6 +39,8 @@ import type {
 import { omit } from "lodash-es";
 import { ThemeToneKeys } from "./utils";
 import { useDomRoot } from "./StyleContext";
+import { validateTheme } from "./validator";
+import { pushXsLog } from "../inspector/inspectorUtils";
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,
@@ -46,9 +48,10 @@ export function useCompiledTheme(
   themes: ThemeDefinition[] = EMPTY_ARRAY,
   resources: Record<string, string> = EMPTY_OBJECT,
   resourceMap: Record<string, string> = EMPTY_OBJECT,
+  strictTheming?: boolean,
 ) {
   const componentRegistry = useComponentRegistry();
-  const { componentThemeVars, componentDefaultThemeVars } = componentRegistry;
+  const { componentThemeVars, componentDefaultThemeVars, componentThemeVarDeclarations } = componentRegistry;
 
   const themeDefChain = useMemo(() => {
     if (activeTheme) {
@@ -183,8 +186,52 @@ export function useCompiledTheme(
       ...resolvedThemeVarsFromChains,
     };
 
+    if (import.meta.env.DEV || strictTheming) {
+      const resolvedForValidation = new Map<string, string>();
+      Object.keys(rawVars).forEach((key) => {
+        resolvedForValidation.set(key, resolveThemeVar(key, rawVars));
+      });
+      const diags = validateTheme(
+        resolvedForValidation,
+        componentThemeVarDeclarations,
+        { strict: !!strictTheming },
+      );
+      for (const d of diags) {
+        pushXsLog({
+          kind: "theming",
+          ts: Date.now(),
+          severity: d.severity,
+          code: d.code,
+          variableName: d.variableName,
+          propName: d.propName,
+          expected: d.expected,
+          actual: d.actual,
+          message: d.message,
+        });
+        if (d.severity === "error") {
+          console.error(`[XMLUI Theme] ${d.message}`);
+        } else {
+          console.warn(`[XMLUI Theme] ${d.message}`);
+        }
+      }
+      if (strictTheming) {
+        const errorVarNames = new Set(
+          diags
+            .filter((d) => d.severity === "error" && d.code !== "unknown-theme-variable")
+            .map((d) => d.variableName!)
+            .filter(Boolean),
+        );
+        if (errorVarNames.size > 0) {
+          const filteredRawVars = Object.fromEntries(
+            Object.entries(rawVars).filter(([k]) => !errorVarNames.has(k)),
+          );
+          return [resolveThemeVarsWithCssVars(filteredRawVars), rawVars];
+        }
+      }
+    }
+
     return [resolveThemeVarsWithCssVars(rawVars), rawVars];
-  }, [componentThemeVars, themeDefChainVars]);
+  }, [componentThemeVarDeclarations, componentThemeVars, strictTheming, themeDefChainVars]);
 
   const themeCssVars = useMemo(() => {
     const ret: Record<string, string> = {};
@@ -257,6 +304,7 @@ type ThemeProviderProps = {
   resources?: Record<string, string>;
   resourceMap?: Record<string, string>;
   localThemes?: Record<string, string>;
+  strictTheming?: boolean;
 };
 
 // theme-overriding properties change.
@@ -268,6 +316,7 @@ function ThemeProvider({
   resources = EMPTY_OBJECT,
   resourceMap = EMPTY_OBJECT,
   localThemes = EMPTY_OBJECT,
+  strictTheming,
 }: ThemeProviderProps) {
   const [activeThemeTone, setActiveThemeTone] = useState<ThemeTone>(() => {
     if (!defaultTone) {
@@ -354,7 +403,7 @@ function ThemeProvider({
   }, [activeThemeId, availableThemeIds, themes]);
 
   const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } =
-    useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap);
+    useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap, strictTheming);
 
   const domRoot = useDomRoot();
   const [root, setRoot] = useState(null);

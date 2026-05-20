@@ -14,6 +14,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.strongPassword";
 const DEFAULT_MESSAGE =
   "Password must be at least 12 characters and include upper, lower, digit, and symbol";
 
@@ -44,6 +45,6 @@ export const strongPasswordValidator: ValidatorEntry = {
   fn: (value, _ctx, params) =>
     isValidStrongPassword(value, params as StrongPasswordParams | undefined)
       ? null
-      : DEFAULT_MESSAGE,
+      : MESSAGE_KEY,
   defaultMessage: DEFAULT_MESSAGE,
 };

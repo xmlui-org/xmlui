@@ -13,6 +13,7 @@ import type { SetupWorker } from "msw/browser";
 import type { IApiInterceptor } from "../components-core/interception/abstractions";
 import type { AppState } from "../components-core/rendering/appState";
 import type { PubSubService } from "../components-core/pubsub/PubSubService";
+import type { AppError } from "../components-core/errors/app-error";
 import type { ButtonThemeColor } from "../components/abstractions";
 import type { LogNamespace } from "../components-core/appContext/log";
 import type {
@@ -186,7 +187,10 @@ export type AppContextObject = {
   // This function sets navigation event handlers (willNavigate and didNavigate).
   // Used by the App component to register navigation events.
   setNavigationHandlers?: (
-    onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined,
+    onWillNavigate?: (
+      to: string | number,
+      queryParams?: Record<string, any>,
+    ) => false | void | null | undefined,
     onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void,
   ) => void;
 
@@ -212,7 +216,7 @@ export type AppContextObject = {
   };
 
   // This method displays the specified `error` (error message) on the UI.
-  signError(error: Error | string): void;
+  signError(error: Error | string | unknown): void;
 
   // The toast service that displays messages in the UI.
   toast: {
@@ -349,7 +353,10 @@ export type AppContextObject = {
     localeSource: string;
     availableLocales: readonly string[];
     setLocale: (locale: string, options?: { source?: "app" | "user" }) => void;
-    registerLocaleBundle: (bundle: { locale: string; messages: ReadonlyMap<string, string> | Record<string, string> }) => void;
+    registerLocaleBundle: (bundle: {
+      locale: string;
+      messages: ReadonlyMap<string, string> | Record<string, string>;
+    }) => void;
     registerLocaleBundles: (bundles: unknown) => Promise<void>;
     reloadLocale: (locale: string) => Promise<boolean>;
     translate: (key: string, vars?: Record<string, unknown>) => string;
@@ -387,6 +394,13 @@ export type AppContextObject = {
       defaultMessage: string;
       severity?: "error" | "warning";
     }) => void;
+    errors: ReadonlyArray<AppError>;
+    setErrorHandler: (
+      handler?: (
+        err: AppError,
+        event: { preventDefault(): void; defaultPrevented: boolean },
+      ) => void | boolean | Promise<void | boolean>,
+    ) => void;
   };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the

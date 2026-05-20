@@ -52,6 +52,8 @@ import { iconComponentRenderer } from "./Icon/Icon";
 import { iframeComponentRenderer } from "./IFrame/IFrame";
 import { itemsComponentRenderer } from "./Items/Items";
 import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
+import { retryPolicyComponentRenderer } from "./RetryPolicy/RetryPolicy";
+import { fallbackComponentRenderer } from "./Fallback/Fallback";
 import { imageComponentRenderer } from "./Image/Image";
 import { pageMetaTitleComponentRenderer } from "./PageMetaTitle/PageMetaTitle";
 import { progressBarComponentRenderer } from "./ProgressBar/ProgressBar";
@@ -80,6 +82,7 @@ import type {
   ComponentDef,
   ComponentMetadata,
   CompoundComponentDef,
+  ThemeVarMetadata,
 } from "../abstractions/ComponentDefs";
 import { footerRenderer } from "./Footer/Footer";
 import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
@@ -339,6 +342,9 @@ export class ComponentRegistry {
   // --- The pool of available theme variable names
   private themeVars = new Set<string>();
 
+  // --- Typed declarations for theme variables (plan #08)
+  private themeVarDeclarations = new Map<string, ThemeVarMetadata>();
+
   // --- Default theme variable values collected from the registered components
   private defaultThemeVars = {};
 
@@ -559,6 +565,12 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_SelectionStore !== "false") {
       this.registerCoreComponent(selectionStoreComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_RetryPolicy !== "false") {
+      this.registerCoreComponent(retryPolicyComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_Fallback !== "false") {
+      this.registerCoreComponent(fallbackComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Image !== "false") {
       this.registerCoreComponent(imageComponentRenderer);
@@ -879,6 +891,13 @@ export class ComponentRegistry {
   }
 
   /**
+   * Typed declarations for all registered theme variables (plan #08).
+   */
+  get componentThemeVarDeclarations(): ReadonlyMap<string, ThemeVarMetadata> {
+    return this.themeVarDeclarations;
+  }
+
+  /**
    * The default values of theme variables used by the registered components.
    */
   get componentDefaultThemeVars() {
@@ -1047,7 +1066,12 @@ export class ComponentRegistry {
     this.pool.get(namespace).set(type, component);
     this.namePool.set(fullName, { name: type, namespace });
     if (metadata?.themeVars) {
-      Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
+      Object.entries(metadata.themeVars).forEach(([key, desc]) => {
+        this.themeVars.add(key);
+        if (!this.themeVarDeclarations.has(key)) {
+          this.themeVarDeclarations.set(key, { name: key, description: desc });
+        }
+      });
     }
     if (metadata?.defaultThemeVars) {
       merge(this.defaultThemeVars, metadata?.defaultThemeVars);

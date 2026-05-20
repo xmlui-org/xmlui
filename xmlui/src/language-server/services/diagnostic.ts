@@ -6,12 +6,20 @@ import type { DocumentUri, DocumentCursor } from "../base/text-document";
 import { analyze } from "../../components-core/analyzer/walker";
 import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { getReactiveCycleDiagnostics } from "./reactive-cycle-diagnostic";
+import { getA11yDiagnostics } from "./a11y-diagnostic";
+import type { MetadataProvider } from "./common/metadata-utils";
 
 export type DiagnosticsContext = {
   cursor: DocumentCursor;
   parseResult: ParseResult;
   source?: string;
   uri?: string;
+  /**
+   * When supplied, the accessibility linter runs against the parsed tree using
+   * the a11y metadata slice from the provider.  Omit to skip a11y diagnostics
+   * (e.g., in lightweight callers that don't have a project).
+   */
+  metadataProvider?: MetadataProvider;
 };
 
 function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
@@ -49,7 +57,7 @@ function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
     }
   }
 
-  return [...parserDiags, ...analyzerDiags, ...reactiveCycleDiags(ctx)];
+  return [...parserDiags, ...analyzerDiags, ...reactiveCycleDiags(ctx), ...a11yDiags(ctx)];
 }
 
 /**
@@ -64,6 +72,23 @@ function reactiveCycleDiags(ctx: DiagnosticsContext): Diagnostic[] {
   try {
     const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
     return getReactiveCycleDiagnostics(component);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Accessibility linting — Plan #05 Phase 1 Step 1.3.
+ *
+ * Re-parses the document (shares the same parse as reactive-cycle above; a
+ * future refactor can cache it) and runs `lintComponentDef()`. Returns empty
+ * when `metadataProvider` is absent or the source is missing.
+ */
+function a11yDiags(ctx: DiagnosticsContext): Diagnostic[] {
+  if (!ctx.source || !ctx.metadataProvider) return [];
+  try {
+    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
+    return getA11yDiagnostics(component, ctx.metadataProvider, /* strict */ false);
   } catch {
     return [];
   }
@@ -90,6 +115,7 @@ export function getDiagnostics(project: Project, uri: DocumentUri): Diagnostic[]
     cursor: document.cursor,
     source,
     uri,
+    metadataProvider: project.metadataProvider,
   };
   return getDiagnosticsInternal(ctx);
 }

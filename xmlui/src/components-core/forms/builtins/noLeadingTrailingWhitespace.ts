@@ -8,6 +8,7 @@
 
 import type { ValidatorEntry } from "../validator-registry";
 
+const MESSAGE_KEY = "xmlui.validation.noLeadingTrailingWhitespace";
 const DEFAULT_MESSAGE = "Value must not start or end with whitespace";
 
 export function hasNoLeadingTrailingWhitespace(value: unknown): boolean {
@@ -18,6 +19,6 @@ export function hasNoLeadingTrailingWhitespace(value: unknown): boolean {
 
 export const noLeadingTrailingWhitespaceValidator: ValidatorEntry = {
   name: "noLeadingTrailingWhitespace",
-  fn: (value) => (hasNoLeadingTrailingWhitespace(value) ? null : DEFAULT_MESSAGE),
+  fn: (value) => (hasNoLeadingTrailingWhitespace(value) ? null : MESSAGE_KEY),
   defaultMessage: DEFAULT_MESSAGE,
 };

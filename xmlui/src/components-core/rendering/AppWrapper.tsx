@@ -240,6 +240,7 @@ export const AppWrapper = ({
             defaultTheme={resolvedDefaultTheme}
             defaultTone={resolvedDefaultTone}
             resources={resources}
+            strictTheming={globalProps?.strictTheming === true}
           >
             <InspectorProvider
               sources={sources}
