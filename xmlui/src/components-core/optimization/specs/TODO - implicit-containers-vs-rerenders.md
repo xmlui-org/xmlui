@@ -111,3 +111,37 @@ if (isContainer) {
 
 ### Conclusion
 We successfully fixed state-shadowing bugs via AST filtering, but we must patch the promotion logic so those filters do not strip the performance barriers off heavy UI components. Adding `childEscapingUIDs` ensures that this mandatory shielding does not accidentally isolate child APIs.
+
+---
+
+## 5. Related context: the "static analysis vs runtime reality" family
+
+This problem is one instance of a broader pattern in the `computedUses` machinery. There is now a sibling instance documented as **Бaг 24** in `computed-uses-specification.md`, with the general rule captured as architectural invariant **#22** ("runtime restructure invalidates static `computedUses`"). The two problems are NOT the same, but they sit on the same axis and any future refactor that touches one should sanity-check the other.
+
+### Comparison
+
+| Aspect | This TODO ("Filtered Shield") | Бaг 24 / Invariant #22 |
+|---|---|---|
+| Trigger | AST filters (write-only, `$context`, fetch-injected, JS globals, fully static) strip read-deps to 0 | `CompoundComponent` moves `vars`/`loaders`/`functions` out of the compound body into a freshly created outer Container at runtime |
+| Effect | Heavy component is not promoted to a container → no `React.memo` shield → over-rendering | Compound body keeps a pre-computed `computedUses` that excluded its now-hoisted vars → `extractScopedState` filters those vars OUT of `parentState` → inner reads return `undefined` |
+| Class | Performance correctness | State / scoping correctness |
+| Fix shape | Decouple shielding from scoping: heavy nodes must always get `computedUses` (even `[]`) | Strip stale `computedUses` from any subtree the runtime moves into a new parent (currently the `rest` spread in `CompoundComponent.tsx`) |
+| Status | Open (proposal in this TODO) | Fixed in `CompoundComponent.tsx`; regression unit + e2e tests in place |
+
+### Will "Mandatory Shielding" interact with Бaг 24?
+
+Short answer: **no, but verify on implementation.**
+
+- The proposal forces heavy nodes (`Select`, `List`, `Table`, `DataGrid`) into `isImplicitDefault = true` regardless of `nonDynamicReadDeps`. That means more nodes will carry `node.computedUses`.
+- Bug 24's invariant says: any node whose `computedUses` survives a runtime tree restructure must have it stripped (or recomputed).
+- Today the only runtime restructure point is `CompoundComponent.tsx`, which already strips `computedUses` from `rest` via the destructure. So a heavy component that happens to live INSIDE a compound body stays correct: the compound body's `rest` has its stale `computedUses` removed, and the heavy descendant's own `computedUses` was computed against its real ancestors (which do not move) — those reads still resolve through the parent state chain after the move.
+- **Pitfall to avoid:** if a future change makes `CompoundComponent` (or any new runtime helper) selectively keep `computedUses` on `rest`, or starts moving heavy components themselves between parents, the interaction must be re-examined. Add a regression test analogous to section 7 of `tests-e2e/computed-uses.spec.ts` whenever introducing a new restructure site.
+
+### Shared design rule (worth promoting both problems against)
+
+`computedUses` is a snapshot of a node's relationship to its position in the tree at the moment of analysis. Any mechanism that:
+1. Decides whether a node is a container (this TODO's concern), or
+2. Moves a node between parents (Бaг 24's concern), or
+3. Adds/removes `localDeclared` names of an ancestor at runtime (potential future concern),
+
+must either invalidate the affected snapshots or recompute them. Hardcoding either decision (shield-or-not, position-in-tree) into a static array that the runtime treats as authoritative is fragile by construction — the cure is explicit invalidation points, not implicit trust.

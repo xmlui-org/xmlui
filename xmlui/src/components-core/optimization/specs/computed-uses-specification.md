@@ -825,6 +825,54 @@ if (caller.obj.type === T_IDENTIFIER) {
 
 ---
 
+### Баг 24 (виявлений у Group J, `compound-component.spec.ts` "var initialized with `$queryParams` ..."): тіло compound компонента залишалось зі **застарілим** `computedUses` після runtime-розпакування у `CompoundComponent`
+
+**Симптом:** Усередині user-defined компонента (`<Component name="FilteredView" var.selectedFilter="{$queryParams.filter ? $queryParams.filter : 'all'}">  <Text>{selectedFilter}</Text></Component>`) `Text` показував порожнечу/`null` після SPA-навігації або прямого URL-завантаження `/#/?filter=hello`. Очікувалось — `"hello"`. Знімок DOM (Playwright `error-context`) показував літерал `"null"`. З вимкненим `COMPUTED_USES_ENABLED` обидва тести проходили.
+
+**Причина (повний ланцюг):**
+1. **Boot phase** (`StandaloneApp.tsx:753`) викликає `computeUsesForTree(compDef.component)` для тіла кожного compound-визначення. На цей момент `vars` (включно з `selectedFilter`) ще ВСЕРЕДИНІ `compDef.component`. Алгоритм коректно додає `selectedFilter` до `localDeclared` і будує `compDef.component.computedUses = ["$queryParams"]` (тільки зовнішні залежності, без власних vars — це задумано).
+2. **Runtime** `CompoundComponent.tsx` для кожного `<FilteredView />` створює новий обгортковий `Container`:
+   ```ts
+   const { loaders, vars, functions, scriptError, ...rest } = compound;
+   return {
+     type: "Container",
+     vars,                  // ← vars переїжджають на ОБГОРТКУ
+     uses: globalKeys,
+     children: [rest],      // ← тіло без vars стає дитиною
+   };
+   ```
+   Але `rest` через spread зберігає `compound.computedUses = ["$queryParams"]`.
+3. Тепер `rest` за `isContainerLike` визнається контейнером (`hasComputedUses === true`), тому `ComponentWrapper`/`StateContainer` для нього викликає `extractScopedState(parentState, rest.computedUses)`.
+4. `parentState` для `rest` — це `combinedState` обгорткового `Container` (включає `selectedFilter: "hello"` з резолвлених `vars` + `$queryParams` з `routingParams`).
+5. `extractScopedState(combinedState, ["$queryParams"])` повертає `{ $queryParams: ... }` — **`selectedFilter` ВТРАЧЕНО**, бо його немає в `uses`.
+6. `Text` бачить `selectedFilter = undefined` → рендерить порожнечу/`null`.
+
+**Чому з вимкненим `COMPUTED_USES_ENABLED` все працювало:** `computeUsesForTree` достроково виходить, `compound.computedUses` не встановлюється, `rest.computedUses === undefined` → `extractScopedState` повертає повний `parentState`, `selectedFilter` залишається видимим.
+
+**Чому статичний результат правильний в ізоляції, але неправильний після runtime-розпакування:** `computedUses` рахується ВІДНОСНО ієрархії, що існує під час аналізу. Коли `CompoundComponent` міняє ієрархію в рантаймі (переносить vars з тіла на обгортку), `computedUses` тіла стає семантично застарілим: те, що було `localDeclared` тоді, тепер є зовнішньою залежністю.
+
+**Виправлення:** У destructure в `CompoundComponent.tsx` додати `computedUses: _staleComputedUses` — щоб `...rest` НЕ ніс цей застарілий список. Без `computedUses` і без `uses` тіло `rest` стає stateless (`isContainerLike → false`), не створює свій `StateContainer`, і `Text` читає `selectedFilter` напряму зі state обгорткового `Container` через `ComponentAdapter`.
+
+```ts
+// xmlui/src/components-core/CompoundComponent.tsx
+const {
+  loaders, vars, functions, scriptError,
+  computedUses: _staleComputedUses,  // ← новий destructure
+  ...rest
+} = compound;
+```
+
+**Альтернативи розглянуті і відкинуті:**
+- *Перерахувати computedUses на новій ієрархії в рантаймі* — складніше, повторює статичний аналіз, не дає виграшу: rest після зняття vars не має власних залежностей, які б потребували окремого StateContainer.
+- *Не запускати computeUsesForTree для `compDef.component`* — втрачаємо оптимізацію для вкладених контейнерів усередині compound body (наприклад `<Select>` всередині).
+- *Завжди включати vars-keys у computedUses тіла* — порушує семантику: ці vars є локальними з точки зору самого аналізу, не повинні бути в `computedUses`.
+
+**Файли:** `xmlui/src/components-core/CompoundComponent.tsx`, `xmlui/tests/components-core/optimization/computedUses.test.ts` (inline describe `"Бaг 24 — stale computedUses after CompoundComponent restructure"`, 4 кейси), `xmlui/tests-e2e/computed-uses.spec.ts` (секція 7 — мінімальні e2e репро без залежності від роутингу), `xmlui/tests-e2e/compound-component.spec.ts:722,759` (e2e регресія на оригінальному $queryParams-сценарії).
+
+**Загальний урок (для майбутніх рефакторів):** Будь-який код, який РЕСТРУКТУРУЄ дерево компонентів між boot-time аналізом і runtime рендерингом, мусить ВРАХОВУВАТИ всі похідні від цього дерева властивості (`computedUses`, можливо в майбутньому інші статичні анотації). Spread (`...rest`) безпечний для незмінених піддерев, але небезпечний для метаданих, які залежали від попередньої структури. Сформульовано як інваріант — див. розділ «Неочевидні архітектурні рішення → 22. Інваріант: runtime restructure інвалідовує статичний `computedUses`».
+
+---
+
 ## Результати бенчмарку
 
 Тест: `oftenChanges` тікає кожні 100мс → 20 тіків за 2с.
@@ -949,6 +997,25 @@ User-defined компоненти з `<script>` тегом (`node.scriptCollecte
 
 Аналогічно до `useEvent` RFC, колбеки (наприклад, `statePartChanged`), що передаються вниз, запам'ятовують мутабельні залежності (`resolvedLocalVars`, `stableCurrentGlobalVars`) у `useRef`, а сам колбек має стабільну ідентичність `[dispatch, node.uid]`. Це запобігає каскадному ре-рендерингу.
 
+### 22. Інваріант: runtime restructure інвалідовує статичний `computedUses` (узагальнення Бaг 24)
+
+**Інваріант:** `computedUses` обчислюється статично проти ієрархії компонентів, що ІСНУВАЛА під час `computeUsesForTree`. Якщо runtime пізніше **реструктурує** дерево — переміщує `vars`/`loaders`/`functions`/`scriptCollected` між контейнерами, додає обгортковий контейнер, виносить піддерево в іншого батька — пов'язані `computedUses` стають **семантично застарілими** і мусять бути або (a) видалені з зачеплених вузлів, або (b) перерахувані на новій структурі.
+
+**Чому це не «частковий випадок»:** статичний аналіз класифікує імена на `localDeclared` vs `freeRead` відносно конкретної позиції вузла в дереві. Будь-яка операція, що змінює цю позицію (або переміщує declarations всередину/назовні вузла), змінює правильну відповідь — а `computedUses` запам'ятовує стару.
+
+**Поточні точки реструктуризації в кодовій базі:**
+- `CompoundComponent.tsx` — обгортає тіло compound у новий `Container`, переносить `vars`/`loaders`/`functions`/`scriptCollected` на обгортку. → Бaг 24, виправлено strip-ом `computedUses` з destructure.
+- (потенційно інші у майбутньому) — будь-який runtime helper, що формує новий `ComponentDef` з частин існуючого, мусить дотримуватись цього інваріанта.
+
+**Як перевіряти при додаванні нового коду:** якщо ви робите `{ ...node, vars: newVars, children: [...] }` або deconstructure `compound` з spread, спитайте себе:
+1. Чи переміщую я `vars`/`loaders`/`functions`/`scriptCollected` між батьком і дитиною?
+2. Чи додаю/прибираю проміжний контейнер?
+3. Чи переходить власність UID (`uid:`) до іншого власника?
+
+Якщо так до будь-якого з пунктів — статичні `computedUses` зачеплених піддерев треба видалити (`delete node.computedUses` або через destructure `computedUses: _, ...rest`) АБО викликати `computeUsesForTree` повторно на новій структурі. Перший варіант простіший і безпечний (fallback на «повний parent state», без оптимізації); другий точніший але дорожчий.
+
+**Пов'язані відкриті проблеми:** TODO-файл `TODO - implicit-containers-vs-rerenders.md` описує іншу форму «статичний аналіз vs runtime реальність» — там runtime-вибір про промоушн heavy-компонента в контейнер залежить від набору read-deps, який щойно був відфільтрований bug-fix фільтрами. Хоч причина інша, тема та сама: будь-яка взаємодія між статичним аналізом і runtime поведінкою має бути явним інваріантом, не неявним припущенням.
+
 ## Покриття файлів
 
 | Файл | Дія | Зміст |
@@ -962,7 +1029,7 @@ User-defined компоненти з `<script>` тегом (`node.scriptCollecte
 | `xmlui/src/components-core/rendering/ComponentWrapper.tsx` | Modify | `scopedParentState` через `useShallowCompareMemoize + extractScopedState` перед `ContainerWrapper`; `fullParentStateRef = useRef()` оновлюється під час render, передається як стабільний ref (не value-prop) |
 | `xmlui/src/components-core/rendering/Container.tsx` | Modify | Prop `fullParentStateRef?: MutableRefObject`; `stateRef` мержить `{...fullParentStateRef.current, ...componentState}` лише коли `componentState` змінюється — ref стабільний, memo не інвалідується |
 | `xmlui/src/components-core/xmlui-parser.ts` | Modify | Виклик `computeUsesForTree` після `nodeToComponentDef` |
-| `xmlui/tests-e2e/computed-uses.spec.ts` | Create | E2E: 5 секцій — regression (var. declarations, event handler write to non-computedUses var), optimization (Select ≤ 5 renders, wrapper, function-free Select with script) |
+| `xmlui/tests-e2e/computed-uses.spec.ts` | Create | E2E: 7 секцій — regression (var. declarations, event handler write to non-computedUses var), optimization (Select ≤ 5 renders, wrapper, function-free Select with script), секція 6 — Бaг 19 ($context-only deps), секція 7 — Бaг 24 (stale computedUses after CompoundComponent restructure) |
 
 ---
 

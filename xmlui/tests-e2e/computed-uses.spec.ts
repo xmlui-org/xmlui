@@ -32,6 +32,20 @@
  *    the parent has <script> (nextDisableNarrowing inherited but overridden
  *    by safeToNarrow=true for function-free nodes).
  *
+ * 6. Regression: $context-only deps must NOT narrow parent container
+ *    A container whose only computed deps come from `$context` (a runtime-only
+ *    dynamic var) must not be promoted to a narrowed container — otherwise it
+ *    isolates itself from sibling APIs registered in the parent.
+ *
+ * 7. Regression: stale computedUses after CompoundComponent restructure
+ *    A compound's body has its computedUses computed BEFORE the runtime hoists
+ *    `vars`/`loaders`/`functions` out to a freshly created outer Container.
+ *    The body's pre-computed computedUses correctly excluded the now-hoisted
+ *    vars as `localDeclared`, but after the move those vars live in the outer
+ *    Container — passing the stale array to extractScopedState would filter
+ *    them OUT of parentState and the body's inner nodes would read `undefined`.
+ *    CompoundComponent's destructure now strips `computedUses` from `rest`.
+ *
  * Button-vs-timer rationale
  * ─────────────────────────
  * Each Playwright click() dispatches a real browser event processed by React
@@ -498,4 +512,104 @@ test.describe("computedUses regression: $context-only deps must not isolate cont
     await page.getByRole("menuitem", { name: "Action" }).click();
     await expect(page.getByTestId("action-text")).toHaveText("Action: done");
   });
+});
+
+// ─── 7. Regression: stale computedUses after CompoundComponent restructure  ─
+//
+// computeUsesForTree runs on the compound body BEFORE CompoundComponent's runtime
+// destructure moves `vars`/`loaders`/`functions`/`scriptCollected` out to a newly
+// created outer Container. While vars live inside the body they are `localDeclared`
+// and correctly EXCLUDED from `computedUses`. Once the runtime hoists them to the
+// outer Container, the body's pre-computed `computedUses` becomes semantically stale:
+// it filters those just-hoisted vars OUT of `parentState` via `extractScopedState`,
+// so the body's inner nodes read `undefined`.
+//
+// The fix lives in xmlui/src/components-core/CompoundComponent.tsx — the destructure
+// that produces `rest` (which becomes the outer Container's child) strips the stale
+// `computedUses` field so narrowing is decided fresh against the outer Container's
+// combined state.
+//
+// The unit-level regression is in
+//   xmlui/tests/components-core/optimization/computedUses.test.ts (describe block).
+// The user-facing e2e regression also lives in tests-e2e/compound-component.spec.ts
+// ("var initialized with $queryParams ..." and friends).
+//
+// The two cases below cover the minimal repro patterns directly, isolated from
+// routing infrastructure: any compound whose body has at least one external read
+// AND a hoisted local var consumed by an inner node is enough to trigger the bug.
+
+test.describe("computedUses regression: stale computedUses after CompoundComponent restructure", () => {
+  // Note: we MUST use `$queryParams` (or another routing-state var) here.
+  // `$props` looks similar on paper but does not actually fail without the fix —
+  // CompoundComponent treats `$props` as a directly resolved local on the outer
+  // Container before the `rest` child reads parent state, so the stale-uses path
+  // is bypassed. Routing-state names go through the standard parent-state
+  // composition pipeline, which is where the stale `computedUses` actually
+  // filters them out (and incidentally filters the hoisted `vars` out too,
+  // because they share that same parentState surface).
+  //
+  // The bigger SPA-navigation and direct-URL-load variants of this case are in
+  // `tests-e2e/compound-component.spec.ts` ("var initialized with $queryParams …"
+  // at lines 722 and 759). The two tests below are the minimal, fast smoke
+  // regressions intentionally co-located with the canonical computedUses e2e
+  // suite so this file is self-contained.
+
+  test(
+    "fallback path: compound var with $queryParams fallback renders correctly when no query param is set",
+    async ({ initTestBed, page }) => {
+      // Repro recipe:
+      //   - compound body's vars: { computed: "{$queryParams.filter ? $queryParams.filter : 'all'}" }
+      //   - compound body's reads: $queryParams (free), computed (locally declared)
+      //   - computedUses on the body BEFORE the runtime move: ["$queryParams"]
+      //   - After CompoundComponent hoists `computed` to a fresh outer Container,
+      //     that outer state contains BOTH `computed: 'all'` AND `$queryParams`.
+      //   - Without the strip of `computedUses` from `rest`, extractScopedState
+      //     filters `computed` OUT of the body's parentState → Text reads "" /
+      //     "null" → test would fail with `Expected: "all"` / `Received: ""`.
+      await initTestBed(
+        `<App>
+           <FilteredView />
+         </App>`,
+        {
+          noFragmentWrapper: true,
+          components: [
+            `<Component name="FilteredView" var.computed="{$queryParams.filter ? $queryParams.filter : 'all'}">
+               <Text testId="computed-text">{computed}</Text>
+             </Component>`,
+          ],
+        },
+      );
+
+      await expect(page.getByTestId("computed-text")).toHaveText("all");
+    },
+  );
+
+  test(
+    "live path: compound var with $queryParams updates when the URL query param changes",
+    async ({ initTestBed, page }) => {
+      // Same repro, but also asserts reactivity through the hoisted-var path
+      // when $queryParams.filter actually changes via SPA navigation.
+      await initTestBed(
+        `<App>
+           <Button testId="set-filter" onClick="Actions.navigate('/?filter=apples')">Set apples</Button>
+           <Button testId="clear-filter" onClick="Actions.navigate('/')">Clear</Button>
+           <FilteredView />
+         </App>`,
+        {
+          noFragmentWrapper: true,
+          components: [
+            `<Component name="FilteredView" var.computed="{$queryParams.filter ? $queryParams.filter : 'all'}">
+               <Text testId="computed-text">{computed}</Text>
+             </Component>`,
+          ],
+        },
+      );
+
+      await expect(page.getByTestId("computed-text")).toHaveText("all");
+      await page.getByTestId("set-filter").click();
+      await expect(page.getByTestId("computed-text")).toHaveText("apples");
+      await page.getByTestId("clear-filter").click();
+      await expect(page.getByTestId("computed-text")).toHaveText("all");
+    },
+  );
 });

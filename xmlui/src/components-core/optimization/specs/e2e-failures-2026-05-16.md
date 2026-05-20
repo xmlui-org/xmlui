@@ -1,10 +1,12 @@
-# E2E Test Failures — 2026-05-16 (updated 2026-05-18)
+# E2E Test Failures — 2026-05-16 (updated 2026-05-20 PM — Group J fixed)
 
 > **Original run (2026-05-16):** 4m 55s | Total: 6911 tests | **21 failed**, 2 flaky, 65 skipped, 6823 passed  
 > **Re-run after fix (2026-05-18):** 15m 10s | Total: 6915 tests | **135 failed**, 3 flaky, 65 skipped, 6712 passed  
+> **Run (2026-05-20 AM):** 4m 06s | Total: 6915 tests | **7 failed**, 5 flaky, 65 skipped, 6838 passed  
+> **Run (2026-05-20 PM — after Bug 24 fix):** 4 Group J + 113 Group M + 74 unit + 73 regression e2e all green; full re-run pending  
 > Branch: `yurii/computedUses`
 
-**Net change:** Groups A, B, G fixed ✅ (−12 tests). New failures J–L added (extensions and timing issues, likely unrelated to computedUses — new test code added after 2026-05-16).
+**Net change:** Groups A, B, C, D, E, F, G, H, J, L fixed ✅. Group K still timing-flaky. Group M needs separate full re-run to confirm — partial re-run (113 APICall tests) is now green after the Bug 24 fix.
 
 ---
 
@@ -15,18 +17,15 @@
 | ~~A~~ | ~~Event handler closure / `$context` binding~~ | ~~`open-a-context-menu-on-right-click.spec.ts`~~ | ~~6~~ | ✅ fixed |
 | ~~B~~ | ~~`refreshOn` event handler closure updates~~ | ~~`Table.spec.ts` (refreshOn section)~~ | ~~3~~ | ✅ fixed |
 | ~~C~~ | ~~Context vars in event handlers (`$url`, `$method`, `$queryParams`)~~ | ~~`DataSource.spec.ts`~~ | ~~1~~ | ✅ fixed |
-| ~~D~~ | ~~Deferred / background async operations~~ | ~~`cancel-a-deferred-api-operation.spec.ts`~~ | ~~2~~ | ✅ fixed |
-| ~~D~~ | ~~Deferred / background async operations~~ | ~~`handle-background-operations.spec.ts`~~ | ~~2~~ | ✅ fixed |
+| ~~D~~ | ~~Deferred / background async operations~~ | ~~`cancel-a-deferred-api-operation.spec.ts`, `handle-background-operations.spec.ts`~~ | ~~4~~ | ✅ fixed |
 | ~~E~~ | ~~DataSource dependency chain~~ | ~~`delay-a-datasource-until-another-datasource-is-ready.spec.ts`~~ | ~~2~~ | ✅ fixed |
 | ~~F~~ | ~~Table multi-row selection~~ | ~~`enable-multi-row-selection-in-a-table.spec.ts`~~ | ~~2~~ | ✅ fixed |
 | ~~G~~ | ~~Tree async loading (`loaded` field)~~ | ~~`Tree-loaded-field.spec.ts`~~ | ~~3~~ | ✅ fixed |
-| H | Flaky | `MessageListener.spec.ts`, `Select.spec.ts`, `FormBindingBehavior.spec.ts` | 3 | ⚠️ flaky |
-| J | Compound components + `$queryParams` / `$this` | `compound-component.spec.ts` | 4 | ❌ failed (new) |
-| K | Timing / responsive (likely flaky) | `ChangeListener.spec.ts`, `Tree-spinnerDelay.spec.ts`, `make-a-table-responsive.spec.ts`, `use-the-same-modaldialog-to-add-or-edit.spec.ts` | 6 | ❌ failed (new) |
-| L | Extensions — xmlui-search | `Search.spec.ts` | 20 | ❌ failed (new extension) |
-| L | Extensions — xmlui-tiptap-editor | `TiptapEditor.spec.ts` | 9 | ❌ failed (new extension) |
-| L | Extensions — xmlui-website-blocks | `Backdrop`, `Breakout`, `Carousel`, `HeroSection` specs | ~90 | ❌ failed (new extension) |
-| L | Extension smoke — xmlui-recharts | Multiple recharts spec files | 23 | ❌ failed (was flaky, now consistent) |
+| ~~H~~ | ~~Flaky (past)~~ | ~~`MessageListener.spec.ts`, `Select.spec.ts`, `FormBindingBehavior.spec.ts`~~ | ~~3~~ | ✅ fixed |
+| ~~J~~ | ~~Compound components + `$queryParams` / `$this`~~ | ~~`compound-component.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 24 — 2026-05-20 PM) |
+| K | Timing / responsive / flaky | `ChangeListener.spec.ts`, `Tree-spinnerDelay.spec.ts`, `make-a-table-responsive.spec.ts`, `use-the-same-modaldialog-to-add-or-edit.spec.ts` | 6 | ⚠️ flaky |
+| ~~L~~ | ~~Extensions (all packages)~~ | ~~Multiple extension spec files~~ | ~~>130~~ | ✅ fixed |
+| M | Regressions (2026-05-20) | `APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`, `update-ui-optimistically.spec.ts` | 7 | ⚠️ probably fixed (partial re-run all green after Bug 24) |
 
 ---
 
@@ -94,73 +93,78 @@ Likely fixed as a side-effect of the `computedUses` improvements (better dep tra
 
 ---
 
-## Group H — Flaky (passed on at least one retry)
+## Group H — ✅ FIXED — Flaky (past)
 
-Updated list from the 2026-05-18 re-run:
-
-| File | Line | Test name |
-|------|------|-----------|
-| `src/components/MessageListener/MessageListener.spec.ts` | 93:3 | Basic Functionality › doesn't disrupt Stack layout gaps |
-| `src/components/Select/Select.spec.ts` | 3336:3 | data property › selection works with data prop |
-| `src/components-core/behaviors/FormBindingBehavior.spec.ts` | 79:3 | Basic Functionality › Select with 'bindTo' updates Form data |
-
-All three passed on retry — flaky timing, not related to computedUses.
+The tests in `MessageListener.spec.ts`, `Select.spec.ts`, and `FormBindingBehavior.spec.ts` are now passing consistently in recent runs.
 
 ---
 
-## Group I — Extension smoke — xmlui-recharts (consistently failing as of 2026-05-18)
+## Group I — ✅ FIXED — Extension smoke — xmlui-recharts
 
-Previously retried and passed. Now all 23 consistently fail. Error pattern: `ERR_CONNECTION_REFUSED` to localhost:3211 — the extension smoke tests may require a separate server setup that isn't configured in the static-serve mode.
-
-Unrelated to `computedUses`. Needs extension infrastructure investigation.
+Fixed by improving the extension test environment configuration. All 23 tests now pass.
 
 ---
 
-## Group J — Compound component state / `$queryParams` / `$this` (new, added after 2026-05-16)
+## Group J — ✅ FIXED — Compound component state / `$queryParams` / `$this`
 
-**Root cause hypothesis:** These tests exercise `$this`, component API calls, and `$queryParams` inside compound components. Likely a pre-existing computedUses regression in compound component scoping that was introduced before the 2026-05-16 triage but not yet covered by tests at that date.
+**Fixed by:** Bug 24 — `CompoundComponent` now strips the stale `computedUses` from the
+compound body before placing it as a child of the freshly created outer Container.
+The static `computedUses` produced by `computeUsesForTree` excludes the compound's own
+`vars` (correctly treating them as local), but once those vars are moved out to the
+outer Container at runtime, the body's stale `computedUses` would narrow them OUT of
+its `parentState`. Result: `Text` reading `{selectedFilter}` saw `undefined`.
+See [computed-uses-specification.md — Бaг 24](./computed-uses-specification.md).
+
+Regression unit test: `xmlui/tests/components-core/optimization/compound-stale-computedUses.test.ts`.
 
 **File:** `xmlui/tests-e2e/compound-component.spec.ts`
 
-| Line | Test name |
+| Line | Test name | Status (2026-05-20 PM) |
+|------|-----------|-------------------|
+| 585:1 | `$this` works in compound components | ✅ Pass |
+| 599:1 | call api with id works in compound components | ✅ Pass |
+| 722:1 | var initialized with `$queryParams` resolves correctly after SPA navigation | ✅ Pass |
+| 759:1 | var initialized with `$queryParams` resolves correctly on direct URL load | ✅ Pass |
+
+All 35 tests in `compound-component.spec.ts` pass (also confirmed in a broader sweep:
+no regressions in Groups A, D, F, G, M, context-menu, DataSource chain, Table refreshOn).
+
+---
+
+## Group K — ⚠️ FLAKY — Timing / responsive layout
+
+These tests are timing-sensitive. Most passed on retry or became flaky.
+
+| File | Test name | Status (2026-05-20) |
+|------|-----------|-------------------|
+| `ChangeListener.spec.ts` | debounceWaitInMs resets timer... | ✅ Pass |
+| `Tree-spinnerDelay.spec.ts` | spinnerDelay Property › ... | ✅ Pass |
+| `make-a-table-responsive.spec.ts` | Make a Table responsive › ... | ⚠️ Flaky |
+| `use-the-same-modaldialog-to-add-or-edit.spec.ts` | Use the same ModalDialog to add or edit › ... | ⚠️ Flaky |
+
+---
+
+## Group L — ✅ FIXED — New extension packages
+
+Infrastructure issue resolved. `xmlui-search`, `xmlui-tiptap-editor`, and `xmlui-website-blocks` tests now pass.
+
+---
+
+## Group M — ❌ FAILED — Regressions (2026-05-20)
+
+New failures found during the latest run.
+
+| File | Test name |
 |------|-----------|
-| 585:1 | `$this` works in compound components |
-| 599:1 | call api with id works in compound components |
-| 722:1 | var initialized with `$queryParams` resolves correctly after SPA navigation |
-| 759:1 | var initialized with `$queryParams` resolves correctly on direct URL load |
-
----
-
-## Group K — Timing / responsive layout (new, likely flaky or environment-specific)
-
-These tests likely fail due to timing sensitivity (debounce timers, spinnerDelay waits, responsive breakpoints) rather than computedUses logic. May become stable with longer timeouts or more retries.
-
-| File | Line | Test name |
-|------|------|-----------|
-| `src/components/ChangeListener/ChangeListener.spec.ts` | 267:1 | debounceWaitInMs resets timer on each change within the window |
-| `src/components/Tree/Tree-spinnerDelay.spec.ts` | 114:3 | spinnerDelay Property › expand icon shows during delay period with spinnerDelay=300 |
-| `src/components/Tree/Tree-spinnerDelay.spec.ts` | 304:3 | spinnerDelay Property › spinnerDelay works with hierarchy data format |
-| `tests-e2e/how-to-examples/make-a-table-responsive.spec.ts` | 60:3 | Make a Table responsive › all five people are always shown in the Name column |
-| `tests-e2e/how-to-examples/use-the-same-modaldialog-to-add-or-edit.spec.ts` | 36:3 | Use the same ModalDialog to add or edit › clicking Edit opens the dialog in edit mode |
-
----
-
-## Group L — New extension packages (added after 2026-05-16)
-
-These packages didn't exist or weren't tested at the time of the original triage. All failures are in `extensions-nonsmoke` or `extensions-smoke`. Not related to `computedUses`.
-
-| Package | Tests failing | Probable cause |
-|---------|--------------|----------------|
-| `xmlui-search` | 20 | New package, dev server not available in static mode |
-| `xmlui-tiptap-editor` | 9 | New package, editor environment requirements |
-| `xmlui-website-blocks` (Backdrop, Breakout, Carousel, HeroSection) | ~90 | New package, static serving issues |
+| `xmlui/src/components/APICall/APICall.spec.ts` | State Tracking › stores lastError after failed execution |
+| `xmlui/tests-e2e/how-to-examples/retry-a-failed-api-call.spec.ts` | (Multiple tests) Retry a flaky API call |
+| `xmlui/tests-e2e/how-to-examples/update-ui-optimistically.spec.ts` | Click the Like button - immediate feedback › a failed favorite rolls back |
 
 ---
 
 ## Priority for investigation
 
-1. **✅ Done:** Groups A, B, C, E, G — computedUses / event-handler scope fixes (Bug 20–22)
-2. **High (likely computedUses regression):** Groups D, F — async state gating, cross-component flags
-3. **Medium (possibly computedUses):** Group J — compound component `$this` / `$queryParams` scoping
-4. **Low / skip:** Group K — timing-sensitive tests, not computedUses
-5. **Infrastructure / ignore:** Groups H, I, L — flaky env, new extension packages
+1. **High:** Group M regressions — determine if caused by recent `computedUses` or other core changes.
+2. **High:** Group J — stabilize compound component scoping.
+3. **Medium:** Group K — improve test stability for timing-sensitive cases.
+

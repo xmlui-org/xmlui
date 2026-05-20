@@ -106,7 +106,7 @@ export const CompoundComponent = forwardRef(
 
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
-      const { loaders, vars, functions, scriptError, ...rest } = compound;
+      const { loaders, vars, functions, scriptError, computedUses: _staleComputedUses, ...rest } = compound;
 
       // Extract global variable keys from globalVars to set as 'uses'
       // This ensures the compound component only inherits globals, not parent's local vars

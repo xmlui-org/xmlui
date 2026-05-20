@@ -1222,3 +1222,149 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Бaг 22: arrow-fn param
     expect(fragment.computedUses).toContain("mySelect");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Regression tests for Бaг 24: CompoundComponent runtime restructure must
+// invalidate the compound body's stale `computedUses`.
+//
+// Static analysis runs on the compound body BEFORE CompoundComponent
+// moves `vars`/`loaders`/`functions`/`scriptCollected` out to a freshly
+// created outer Container. While vars live inside the body they are
+// `localDeclared` and correctly EXCLUDED from `computedUses`. After the
+// runtime move, those vars are EXTERNAL to the body (they live in the new
+// outer Container), so the body's pre-computed `computedUses` is now
+// semantically stale: it filters those vars out of `parentState` when
+// `extractScopedState` narrows.
+//
+// The fix: CompoundComponent's destructure strips `computedUses` from
+// `rest` (the rest spread that becomes the outer Container's child). See
+// the destructure block in xmlui/src/components-core/CompoundComponent.tsx.
+//
+// Full chain documented in specs/computed-uses-specification.md (Бaг 24).
+// The exposing e2e regression lives in tests-e2e/compound-component.spec.ts
+// ("var initialized with $queryParams ..."), and the broad e2e regression
+// for the computedUses feature is section 7 of
+// tests-e2e/computed-uses.spec.ts.
+// ---------------------------------------------------------------------------
+
+describe.skipIf(skipIfDisabled)("computeUsesForTree — Бaг 24: stale computedUses after CompoundComponent restructure", () => {
+  it("static analysis: compound body's computedUses excludes its own vars (correct in isolation)", () => {
+    // The compound body as the parser/builder produces it,
+    // BEFORE CompoundComponent runtime restructures it.
+    const compoundBody = node("Fragment", {
+      vars: {
+        selectedFilter:
+          "{$queryParams.filter ? $queryParams.filter : 'all'}",
+      },
+      children: [
+        node("Text", { props: { value: "{selectedFilter}" } as any }),
+      ],
+    });
+
+    computeUsesForTree(compoundBody);
+
+    // The container declares selectedFilter locally, so it MUST NOT appear in
+    // computedUses (computedUses lists names that must come from the parent).
+    // $queryParams comes from outside (routing state), so it MUST appear.
+    expect(compoundBody.computedUses).toBeDefined();
+    expect(compoundBody.computedUses).toContain("$queryParams");
+    expect(compoundBody.computedUses).not.toContain("selectedFilter");
+  });
+
+  it("OLD broken destructure (no strip) leaks stale computedUses into `rest` — documents the bug shape", () => {
+    // This test pins the PRE-FIX behavior: if CompoundComponent destructured
+    // WITHOUT stripping `computedUses`, the spread carries the now-stale array
+    // into `rest`. That stale array later drives `extractScopedState` and
+    // filters out the just-hoisted vars (see test 4 below).
+    //
+    // The current fix lives in xmlui/src/components-core/CompoundComponent.tsx
+    // and is verified end-to-end by tests-e2e/computed-uses.spec.ts section 7
+    // and tests-e2e/compound-component.spec.ts:722,759.
+    const compoundBody: any = node("Fragment", {
+      vars: {
+        selectedFilter:
+          "{$queryParams.filter ? $queryParams.filter : 'all'}",
+      },
+      children: [
+        node("Text", { props: { value: "{selectedFilter}" } as any }),
+      ],
+    });
+    computeUsesForTree(compoundBody);
+
+    // OLD shape: destructure WITHOUT pulling `computedUses` out — what
+    // CompoundComponent used to do before the fix.
+    const {
+      loaders: _loaders,
+      vars: _vars,
+      functions: _functions,
+      scriptError: _scriptError,
+      ...restOldShape
+    } = compoundBody;
+
+    // The stale array survives the spread and ends up on `rest`. This is the
+    // mechanism behind Бaг 24.
+    expect((restOldShape as any).computedUses).toEqual(["$queryParams"]);
+    expect((restOldShape as any).computedUses).not.toContain("selectedFilter");
+
+    // FIXED shape: destructure DOES pull `computedUses` out — `rest` no longer
+    // carries the stale array, so downstream narrowing falls back to the outer
+    // Container's full state.
+    const {
+      loaders: _l2,
+      vars: _v2,
+      functions: _f2,
+      scriptError: _s2,
+      computedUses: _staleComputedUses,
+      ...restFixedShape
+    } = compoundBody;
+    expect((restFixedShape as any).computedUses).toBeUndefined();
+  });
+
+  it("integration: with the fix, `rest` sees selectedFilter from the outer Container's state", () => {
+    // The outer Container's combinedState that runtime passes to `rest` as
+    // parentState contains selectedFilter (resolved from vars), routing state,
+    // and any narrowed parent slice CompoundComponent decided to expose.
+    const outerCombinedState = {
+      selectedFilter: "hello",
+      $queryParams: { filter: "hello" },
+      $pathname: "/filtered",
+    };
+
+    // Simulate the post-fix `rest`: no `uses`, no `computedUses` →
+    // extractScopedState returns full parent state.
+    const rest: any = { type: "Fragment" };
+    const scoped = extractScopedState(
+      outerCombinedState,
+      rest.uses ?? rest.computedUses,
+    );
+
+    expect(scoped).toBeDefined();
+    expect(scoped).toEqual(outerCombinedState);
+    expect((scoped as any).selectedFilter).toBe("hello");
+  });
+
+  it("regression guard: simulating the OLD broken behaviour (stale computedUses present) drops selectedFilter", () => {
+    // Locks in why stripping `computedUses` from the destructure is required.
+    // Without the strip, the stale array filters out the var that the outer
+    // Container has just hoisted, and the inner Text reads `undefined`.
+    const outerCombinedState = {
+      selectedFilter: "hello",
+      $queryParams: { filter: "hello" },
+    };
+
+    const restWithStaleComputedUses: any = {
+      type: "Fragment",
+      computedUses: ["$queryParams"], // ← stale: excludes selectedFilter
+    };
+
+    const scoped = extractScopedState(
+      outerCombinedState,
+      restWithStaleComputedUses.uses ?? restWithStaleComputedUses.computedUses,
+    );
+
+    expect(scoped).toBeDefined();
+    expect((scoped as any).$queryParams).toEqual({ filter: "hello" });
+    // selectedFilter is dropped — this is the bug we fixed.
+    expect((scoped as any).selectedFilter).toBeUndefined();
+  });
+});
