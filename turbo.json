@@ -152,17 +152,17 @@
     "xmlui-integration-test-app#setup:standalone": {
       "dependsOn": ["xmlui#build:xmlui-standalone", "xmlui-test-extension#build:extension"],
       "outputs": [
-        "integration-tests/test-app/public/js/xmlui-standalone.umd.js",
-        "integration-tests/test-app/public/js/xmlui-test-extension.js"
+        "public/js/xmlui-standalone.umd.js",
+        "public/js/xmlui-test-extension.js"
       ]
     },
     "xmlui-integration-test-app#build": {
       "dependsOn": ["^prepublishOnly", "xmlui-test-extension#build:extension"],
-      "outputs": ["integration-tests/test-app/dist/**"]
+      "outputs": ["dist/**"]
     },
     "xmlui-integration-test-app#ssg": {
       "dependsOn": ["^prepublishOnly", "xmlui-test-extension#build:extension"],
-      "outputs": ["integration-tests/test-app/dist-ssg/**"]
+      "outputs": ["dist-ssg/**"]
     },
     "xmlui-integration-test-app#build:plugin-mode": {
       "dependsOn": [
@@ -170,7 +170,7 @@
         "xmlui#build:for-node",
         "xmlui-test-extension#build:extension"
       ],
-      "outputs": ["integration-tests/test-app/dist-vite-plugin/**"]
+      "outputs": ["dist-vite-plugin/**"]
     },
     "//#test:integration": {
       "cache": false,
