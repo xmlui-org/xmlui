@@ -11,7 +11,13 @@
     "ssg": "xmlui ssg",
     "serve": "serve . -s",
     "setup:standalone": "node scripts/setup-standalone.mjs",
-    "build:plugin-mode": "vite build --config vite.plugin-mode.config.ts"
+    "build:plugin-mode": "vite build --config vite.plugin-mode.config.ts",
+    "test:standalone": "cross-env TEST_MODES=standalone playwright test -c ../tests/playwright.config.ts",
+    "test:vite-build": "cross-env TEST_MODES=vite-build playwright test -c ../tests/playwright.config.ts",
+    "test:ssg": "cross-env TEST_MODES=vite-ssg playwright test -c ../tests/playwright.config.ts",
+    "test:xmlui-start": "cross-env TEST_MODES=vite-start playwright test -c ../tests/playwright.config.ts",
+    "test:plugin-mode": "cross-env TEST_MODES=vite-build-plugin playwright test -c ../tests/playwright.config.ts",
+    "test:all": "cross-env TEST_MODES=standalone,vite-build,vite-ssg,vite-start,vite-build-plugin playwright test -c ../tests/playwright.config.ts"
   },
   "dependencies": {
     "xmlui": "*",
