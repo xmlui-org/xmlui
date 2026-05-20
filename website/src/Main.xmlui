@@ -277,6 +277,10 @@
                             to="/docs/managed-react/themevars-namespace"
                         />
                         <NavLink
+                            label="Managed Lifecycle Vocabulary"
+                            to="/docs/managed-react/managed-lifecycle-vocabulary"
+                        />
+                        <NavLink
                             label="Code Injection Prevention"
                             to="/docs/managed-react/code-injection-prevention"
                         />
@@ -2549,6 +2553,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/themevars-namespace.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/managed-lifecycle-vocabulary"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/managed-lifecycle-vocabulary.md']}"
                 />
             </Page>
             <Page
