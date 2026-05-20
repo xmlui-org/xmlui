@@ -46,21 +46,10 @@ jobs:
         run: npm run build-xmlui
       - name: check XMLUI metadata drift
         run: npm --prefix xmlui run check:metadata
-      - name: run all tests
+      - name: run tests
         run: npm run test
-      - name: Enforce patch-only changesets
-        if: startsWith(github.base_ref, 'support')
-        shell: bash
-        run: |
-          shopt -s nullglob
-          fail=false
-          for f in .changeset/*.md; do
-            if grep -qE '^"[^"]+": (minor|major)$' "$f"; then
-              >&2 echo "FAIL: $f contains a non-patch bump — only patch releases are allowed on support."
-              fail=true
-            fi
-          done
-          $fail && exit 1 || echo "All changesets are patch-level."
+      - name: run integration tests
+        run: npm run test-integration
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-report

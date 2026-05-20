@@ -101,6 +101,9 @@ jobs:
       - name: run all tests
         run: npm run test
 
+      - name: run integration tests
+        run: npm run test-integration
+
       - name: Publish canary snapshot
         if: env.RELEASE_TAG == 'canary'
         shell: bash

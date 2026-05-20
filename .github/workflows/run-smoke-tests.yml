@@ -50,6 +50,8 @@ jobs:
         run: npm run build-xmlui
       - name: run the smoke tests
         run: npm run test-smoke
+      - name: run integration tests
+        run: npm run test-integration
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-report
