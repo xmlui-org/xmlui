@@ -1,4 +1,4 @@
-import { type Dispatch, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { type Dispatch, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { isArray, isEmpty, isNumber } from "lodash-es";
 
 import { asyncThrottle } from "../../components-core/utils/misc";
@@ -540,8 +540,6 @@ export function useValidation(
   bindTo: string,
   throttleWaitInMs: number = 0,
 ) {
-  const deferredValue = useDeferredValue(value);
-
   const throttledAsyncValidate = useMemo(() => {
     if (throttleWaitInMs !== 0) {
       return asyncThrottle(asyncValidate, throttleWaitInMs, {
@@ -552,42 +550,63 @@ export function useValidation(
     return asyncValidate;
   }, [throttleWaitInMs]);
 
-  useEffect(
-    function runAllValidations() {
+  // Use useLayoutEffect for the synchronous preValidate dispatch so that
+  // formState.validationResults is always current before the browser paints.
+  // This prevents a race condition where doValidate() reads stale results when
+  // the user fills a field and immediately clicks Submit (effects would otherwise
+  // run after Playwright's click action fires).
+  useLayoutEffect(
+    function runSyncValidation() {
       const abortController = new AbortController();
       const validator = new FormItemValidator(
         validations,
         onValidate,
-        deferredValue,
+        value,
         abortController.signal,
         bindTo,
       );
-      let ignore = false;
       const partialResult = validator.preValidate();
-      if (!ignore) {
-        dispatch(fieldValidated(bindTo, partialResult));
-        if (partialResult.partial) {
-          void (async () => {
-            const result = await throttledAsyncValidate(
-              validations,
-              onValidate,
-              deferredValue,
-              abortController.signal,
-              bindTo,
-            );
-            if (!ignore) {
-              // console.log(`async validation result for ${bindTo}`, result);
-              dispatch(fieldValidated(bindTo, result));
-            }
-          })();
-        }
+      dispatch(fieldValidated(bindTo, partialResult));
+      return () => {
+        abortController.abort();
+      };
+    },
+    [bindTo, value, dispatch, onValidate, validations],
+  );
+
+  useEffect(
+    function runAsyncValidation() {
+      const abortController = new AbortController();
+      const validator = new FormItemValidator(
+        validations,
+        onValidate,
+        value,
+        abortController.signal,
+        bindTo,
+      );
+      const partialResult = validator.preValidate();
+      if (!partialResult.partial) {
+        return () => abortController.abort();
       }
+      let ignore = false;
+      void (async () => {
+        const result = await throttledAsyncValidate(
+          validations,
+          onValidate,
+          value,
+          abortController.signal,
+          bindTo,
+        );
+        if (!ignore) {
+          dispatch(fieldValidated(bindTo, result));
+        }
+      })();
       return () => {
         ignore = true;
         abortController.abort();
       };
     },
-    [bindTo, deferredValue, dispatch, onValidate, throttledAsyncValidate, validations],
+    [bindTo, value, dispatch, onValidate, throttledAsyncValidate, validations],
   );
 }
 

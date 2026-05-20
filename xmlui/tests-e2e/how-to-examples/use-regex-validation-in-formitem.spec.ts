@@ -54,7 +54,7 @@ test.describe("FormItem regex validation with severity", { tag: "@website" }, ()
     await page.getByRole("button", { name: "Submit" }).click();
 
     await expect(page.getByText("Expected a 5-digit ZIP code").first()).toBeVisible();
-    await page.getByRole("button", { name: "Yes, proceed" }).click();
+    await page.getByRole("button", { name: "Submit" }).click();
 
     await expect(page.getByText("Submitted!")).toBeVisible();
   });
