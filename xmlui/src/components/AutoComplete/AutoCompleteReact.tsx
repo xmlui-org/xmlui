@@ -42,6 +42,7 @@ type AutoCompleteProps = {
   value?: string | string[];
   enabled?: boolean;
   placeholder?: string;
+  maxLength?: number;
   updateState?: UpdateStateFn;
   optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
   emptyListTemplate?: ReactNode;

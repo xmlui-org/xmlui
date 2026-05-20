@@ -75,10 +75,10 @@ export type StandaloneAppDescription = {
    *   validation diagnostics escalate one severity step (info → warn → error) and the
    *   `xmlui check` CLI exits non-zero on any `error`-severity finding. Flips to `true`
    *   in the next major release. See `dev-docs/plans/13-build-validation-analyzers.md`.
-   * - `strictErrors` (boolean, default `false`) — when `true`, throwing a plain `Error`
-   *   from script logs a `kind:"errors"` warn diagnostic with a migration hint to use
-   *   `AppError`. Flips to `true` in the next major release. See
-   *   `dev-docs/plans/07-structured-exception-model.md`.
+   * - `strictErrors` (boolean, default `true`) — when `true`, throwing a plain `Error`
+   *   or non-`AppError` value from script logs a `kind:"errors"` warn diagnostic with a
+   *   migration hint to use `AppError`. Set to `false` for warn-only (migration) mode.
+   *   See `dev-docs/plans/07-structured-exception-model.md`.
    * - `errorCorrelationIdHeader` (string, default `"X-Correlation-Id"`) — the HTTP
    *   response header from which `AppError.correlationId` is read when a fetch fails.
    *   See `dev-docs/plans/07-structured-exception-model.md`.
@@ -100,25 +100,20 @@ export type StandaloneAppDescription = {
    *   detector still runs at startup and emits a single `kind:"reactive-cycle"`
    *   warn entry per unique cycle so teams can audit existing apps before the
    *   strict default flips. See `dev-docs/plans/03-reactive-cycle-detection.md`.
-   * - `strictTypeContracts` (boolean, default `false`) — when `true`, parse-time
+   * - `strictTypeContracts` (boolean, default `true`) — when `true`, parse-time
    *   prop / event / value-type violations surfaced by the type-contract verifier
    *   escalate from `warn` to `error`: the LSP reports `DiagnosticSeverity.Error`,
    *   the Vite plugin fails the build on `unknown-prop`, `wrong-type`,
    *   `missing-required`, and `value-not-in-enum`, and the runtime emits a
-   *   `kind:"type-contract"` error trace entry. When `false` (the rollout warn
-   *   phase default — Wave 3), the verifier still runs but only emits warn-level
-   *   diagnostics. Flips to `true` in the next major release. See
+   *   `kind:"type-contract"` error trace entry. Set to `false` to keep the
+   *   Wave 3 rollout behaviour where the verifier emits warn-level diagnostics. See
    *   `dev-docs/plans/01-verified-type-contracts.md`.
-   * - `strictLifecycle` (boolean, default `false`) — when `true`, lifecycle
+   * - `strictLifecycle` (boolean, default `true`) — when `true`, lifecycle
    *   violations (async `onUnmount` handler, throw inside a lifecycle handler,
-   *   exceeded `disposeTimeoutMs`) escalate from `warn` (default rollout phase
-   *   — W3-3) to `error`: a `kind:"lifecycle"` error trace entry plus a
-   *   `console.error` and, in strict mode, a one-shot toast. When `false` the
-   *   universal `onMount`/`onUnmount`/`onError` events still fire and
-   *   violations are still reported, but only as warn-level entries so apps
-   *   can audit existing handlers before the strict default flips. Flips to
-   *   `true` in the next major release. See
-   *   `dev-docs/plans/04-managed-lifecycle-vocabulary.md`.
+   *   exceeded `disposeTimeoutMs`) escalate to `error`: a `kind:"lifecycle"`
+   *   error trace entry plus a `console.error` and a one-shot toast. Set to
+   *   `false` to revert to warn-only mode for apps that need an audit window.
+   *   See `dev-docs/plans/04-managed-lifecycle-vocabulary.md`.
    * - `disposeTimeoutMs` (number, default `250`) — millisecond budget for
    *   container `onBeforeDispose` handlers (Phase 3 of plan #04). Exceeding
    *   the budget emits a `kind:"lifecycle"` violation with
@@ -151,9 +146,32 @@ export type StandaloneAppDescription = {
    *   warn-level diagnostics so apps can audit before the strict
    *   default flips. Flips to `true` in the next major. See
    *   `dev-docs/plans/09-forms-validation-discipline.md`.
-   * - `strictRouting` (boolean, default `false`) — when `true`, defended-routing
-   *   diagnostics such as rejected constraints and non-canonical URLs escalate to
-   *   errors. Wave 4 keeps the default warn/additive.
+   * - `strictRouting` (boolean, default `true`) — when `true` (the default),
+   *   defended-routing diagnostics such as rejected constraints and
+   *   non-canonical URLs escalate to errors and `nonCanonicalUrl` defaults to
+   *   `"redirect"`. Set to `false` to revert to the pre-1.0 lax behaviour
+   *   (warn-only, no automatic redirect). See `dev-docs/plans/10-defended-routing.md`.
+   * - `guardOnPopState` (boolean, default `true`) — when `true`, browser-driven
+   *   navigations (back/forward, direct URL entry) that the global
+   *   `willNavigate` handler rejects are reverted and emit a
+   *   `kind:"navigate"` `guard-bypass-attempt` diagnostic. Set to `false`
+   *   to opt out (only the programmatic `navigate()` path is guarded).
+   * - `interceptExternalNavigation` (boolean, default `false`) — when `true`,
+   *   same-origin anchor clicks and GET form submissions are routed through
+   *   `appContext.navigate` so that the `willNavigate` guard, per-page guards,
+   *   and the `kind:"navigate"` trace pipeline observe them. Cross-origin links,
+   *   modifier-key clicks, `target` other than `_self`, `download` anchors, and
+   *   elements with `data-xmlui-bypass-router` are passed through unchanged.
+   * - `urlCase` (`"preserve" | "lower"`, default `"preserve"`) — URL path
+   *   canonicalisation policy. When `"lower"`, paths are lower-cased before
+   *   matching.
+   * - `urlTrailingSlash` (`"preserve" | "always" | "never"`, default `"preserve"`)
+   *   — trailing-slash canonicalisation policy.
+   * - `urlQueryParamOrder` (`"preserve" | "alphabetical"`, default `"preserve"`)
+   *   — query-parameter ordering canonicalisation policy.
+   * - `nonCanonicalUrl` (`"warn" | "rewrite" | "redirect"`, default `"warn"` in
+   *   non-strict, `"redirect"` in strict) — what to do when the incoming URL
+   *   differs from the canonical form.
    * - `strictI18n` (boolean, default `false`) — when `true`, missing locale
    *   bundles/keys and invalid ICU patterns escalate to errors. Wave 4 keeps
    *   fallback rendering in non-strict mode.

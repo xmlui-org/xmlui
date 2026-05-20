@@ -40,6 +40,13 @@ async function runTransform(
   return await fn.call(ctx, code, id, {});
 }
 
+function runBuildEnd(plugin: any, ctx: ReturnType<typeof makeCtx>) {
+  const hook = plugin.buildEnd;
+  if (!hook) return;
+  const fn = typeof hook === "function" ? hook : hook.handler;
+  return fn.call(ctx);
+}
+
 const cycleMarkup = `
 <Stack var.a="{b + 1}" var.b="{a + 1}" />
 `;
@@ -82,6 +89,15 @@ describe("vite-xmlui-plugin reactive cycle detection", () => {
     const ctx = makeCtx();
     await runTransform(plugin, cycleMarkup, "/x/Main.xmlui", ctx);
     await runTransform(plugin, cycleMarkup, "/x/Main.xmlui", ctx);
+    const cycleWarns = ctx.warns.filter((w) => /reactive-cycle/.test(w));
+    expect(cycleWarns).toHaveLength(1);
+  });
+
+  it("runs the aggregate buildEnd pass without re-reporting per-file cycles", async () => {
+    const plugin = viteXmluiPlugin({ analyze: "off", reactiveCycles: "warn" });
+    const ctx = makeCtx();
+    await runTransform(plugin, cycleMarkup, "/x/Main.xmlui", ctx);
+    runBuildEnd(plugin, ctx);
     const cycleWarns = ctx.warns.filter((w) => /reactive-cycle/.test(w));
     expect(cycleWarns).toHaveLength(1);
   });

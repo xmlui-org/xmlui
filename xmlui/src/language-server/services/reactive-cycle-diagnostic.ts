@@ -10,12 +10,10 @@
  *   - `CycleHit.severity === "info"` → `DiagnosticSeverity.Information`
  *     (pure-conditional cycles inside `when` / `displayWhen`)
  *
- * The reactive-graph nodes do not currently carry per-node source ranges
- * (the `ComponentDef` walk in `collectComponentDefGraph` does not thread
- * positions yet). As a pragmatic first pass we emit one document-scoped
- * diagnostic at the start of the file with the cycle text in the message.
- * `relatedInformation` pointing at each node's range can be added once
- * `collectComponentDefGraph` is taught to propagate ranges.
+ * Reactive-graph nodes carry parser-derived source positions when available.
+ * The primary diagnostic is anchored to the first node in the cycle, and
+ * `relatedInformation` points at each cycle member so editors can navigate the
+ * full loop.
  *
  * The analyzer must never crash the LSP server; any error from the graph
  * builder or cycle finder is swallowed and yields zero diagnostics.
@@ -23,13 +21,17 @@
 import {
   DiagnosticSeverity,
   type Diagnostic,
+  type DiagnosticRelatedInformation,
+  type Range,
 } from "vscode-languageserver";
 import {
   collectComponentDefGraph,
   findCycles,
   formatCycle,
   cycleHash,
+  describeNode,
 } from "../../components-core/reactive-graph";
+import type { ReactiveNode } from "../../components-core/reactive-graph";
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 
 /**
@@ -41,6 +43,7 @@ import type { ComponentDef, CompoundComponentDef } from "../../abstractions/Comp
  */
 export function getReactiveCycleDiagnostics(
   component: ComponentDef | CompoundComponentDef | null | undefined,
+  options: { uri?: string } = {},
 ): Diagnostic[] {
   if (!component) return [];
 
@@ -57,16 +60,14 @@ export function getReactiveCycleDiagnostics(
         hit.severity === "info"
           ? DiagnosticSeverity.Information
           : DiagnosticSeverity.Warning;
+      const relatedInformation = relatedInformationFor(hit.nodes, options.uri);
       return {
         severity,
-        // Whole-document placeholder until per-node ranges are threaded.
-        range: {
-          start: { line: 0, character: 0 },
-          end: { line: 0, character: 0 },
-        },
+        range: rangeForNode(hit.nodes[0]) ?? zeroRange(),
         message: formatCycle(hit),
         code: "reactive-cycle",
         source: "xmlui-reactive-graph",
+        ...(relatedInformation.length > 0 ? { relatedInformation } : {}),
         // Use the cycle hash as an opaque data payload so editors can
         // dedupe across re-parses if they choose.
         data: { cycleId: cycleHash(hit) },
@@ -76,6 +77,40 @@ export function getReactiveCycleDiagnostics(
     // Analyzer must never crash the LSP server.
     return [];
   }
+}
+
+function relatedInformationFor(
+  nodes: ReactiveNode[],
+  fallbackUri?: string,
+): DiagnosticRelatedInformation[] {
+  return nodes
+    .map((node) => {
+      const range = rangeForNode(node);
+      const uri = node.uri ?? fallbackUri;
+      if (!range || !uri) return null;
+      return {
+        location: { uri, range },
+        message: describeNode(node),
+      } satisfies DiagnosticRelatedInformation;
+    })
+    .filter((item): item is DiagnosticRelatedInformation => item !== null);
+}
+
+function rangeForNode(node: ReactiveNode | undefined): Range | null {
+  if (!node?.range) return null;
+  const line = Math.max(0, node.range.line - 1);
+  const character = Math.max(0, node.range.col - 1);
+  return {
+    start: { line, character },
+    end: { line, character: character + 1 },
+  };
+}
+
+function zeroRange(): Range {
+  return {
+    start: { line: 0, character: 0 },
+    end: { line: 0, character: 0 },
+  };
 }
 
 /**

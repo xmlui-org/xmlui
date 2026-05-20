@@ -154,11 +154,7 @@ export function nodeToComponentDef(
     let component: ComponentDef = {
       type: name,
       debug: {
-        source: {
-          start: node.start,
-          end: node.end,
-          fileId,
-        },
+        source: sourceLocationFor(node),
       },
     };
 
@@ -178,11 +174,7 @@ export function nodeToComponentDef(
     let component: ComponentDef = {
       type: name,
       debug: {
-        source: {
-          start: node.start,
-          end: node.end,
-          fileId,
-        },
+        source: sourceLocationFor(node),
       },
     };
 
@@ -355,11 +347,7 @@ export function nodeToComponentDef(
       name: compoundName.value,
       component: nestedComponent,
       debug: {
-        source: {
-          start: node.start,
-          end: node.end,
-          fileId,
-        },
+        source: sourceLocationFor(node),
       },
     };
 
@@ -390,11 +378,7 @@ export function nodeToComponentDef(
     }
 
     nestedComponent.debug = {
-      source: {
-        start: element.start,
-        end: element.end,
-        fileId,
-      },
+      source: sourceLocationFor(element),
     };
 
     const nodeClone: Node = withNewChildNodes(node, nonVarHelperNodes);
@@ -655,6 +639,7 @@ export function nodeToComponentDef(
           }
           comp.vars ??= {};
           comp.vars[name] = value;
+          setReactiveNodeLocation(comp, "var", name, attr);
         } else if (startSegment === "global") {
           if (!allowGlobalVars) {
             reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
@@ -889,6 +874,9 @@ export function nodeToComponentDef(
     const value = valueInfo.value;
     if (valueInfo?.value !== undefined) {
       setter(name, mergeValue(getter(name), value), valueInfo.valueContentNode);
+      if (getComponentName(child, getText) === HelperNode.variable) {
+        setReactiveNodeLocation(comp, "var", name, valueInfo.valueContentNode ?? child);
+      }
     } else {
       // --- Consider the value to be null; check optional child items
       const children = getChildNodes(child);
@@ -896,6 +884,9 @@ export function nodeToComponentDef(
       let updatedValue = getter(name);
       updatedValue = mergeValue(updatedValue, itemValue);
       setter(name, updatedValue);
+      if (getComponentName(child, getText) === HelperNode.variable) {
+        setReactiveNodeLocation(comp, "var", name, child);
+      }
     }
   }
 
@@ -951,6 +942,44 @@ export function nodeToComponentDef(
     const valueText = getText(attr.children![2]);
     const value = valueText.substring(1, valueText.length - 1);
     return { namespace, startSegment, name, value, unsegmentedName };
+  }
+
+  function sourceLocationFor(node: Node): {
+    start: number;
+    end: number;
+    fileId: string | number;
+    line?: number;
+    col?: number;
+  } {
+    const loc: {
+      start: number;
+      end: number;
+      fileId: string | number;
+      line?: number;
+      col?: number;
+    } = {
+      start: node.start ?? node.pos ?? 0,
+      end: node.end ?? node.start ?? node.pos ?? 0,
+      fileId,
+    };
+    if (cursor) {
+      const { line, character } = cursor.positionAt(node.pos ?? node.start ?? 0);
+      loc.line = line + 1;
+      loc.col = character + 1;
+    }
+    return loc;
+  }
+
+  function setReactiveNodeLocation(
+    comp: ComponentDef | CompoundComponentDef,
+    kind: "var" | "loader" | "function",
+    name: string | undefined,
+    node: Node,
+  ): void {
+    if (!name) return;
+    const debug = (comp.debug ??= {});
+    const reactiveNodes = ((debug as any).reactiveNodes ??= {});
+    reactiveNodes[`${kind}.${name}`] = sourceLocationFor(node);
   }
 
   function parseEscapeCharactersInAttrValues(attrs: Node[]) {

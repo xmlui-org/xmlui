@@ -120,6 +120,19 @@ Supported constraint forms:
 | `int` | `:id:int`, `:id:int(min=1,max=999)` | Number value |
 | `number` | `:amount:number(min=0)` | Number value |
 | `enum` | `:tab:enum(profile,billing)` | String limited to allowed values |
+| *custom* | `:colour:hex6` | Any name registered via `App.registerValidator()` (see below) |
+
+### Custom constraints
+
+Unknown constraint names fall back to the **forms validator registry**
+(`xmlui/src/components-core/forms/index.ts`). Use `App.registerValidator(name, fn)`
+to add new ones; the same validator becomes available to `<Field validation>`.
+Validators are invoked synchronously by the constraint compiler — a `Promise`
+return or thrown exception is treated as a rejection. Parameters between
+parentheses are parsed (`bool`/`number`/`string`) and forwarded as
+`params.args`. When no registry entry exists, the segment is treated as
+unconstrained `string` and a `kind: "navigate"` trace with
+`code: "unknown-constraint"` is emitted.
 
 Query params use the `Page queryParams` prop:
 
@@ -161,6 +174,40 @@ Rejected guards emit a `kind: "navigate"` trace with a `guard-bypass-attempt` ro
 | `nonCanonicalUrl` | `warn`, `rewrite`, `redirect` | Emit diagnostic, then optionally replace URL. |
 
 Non-canonical URLs emit `routingDiagnostic.code === "non-canonical-url"`.
+
+### External navigation interception
+
+Programmatic `navigate()` and React-Router `<Link>` flow through the defended-routing
+pipeline automatically. Raw `<a href>` clicks and form submissions bypass it unless
+`appGlobals.interceptExternalNavigation: true` is set. When enabled, a delegated
+`click`/`submit` listener in `AppContent` routes same-origin anchors and GET-method
+form submissions through `appContext.navigate`. The interceptor ignores:
+
+- cross-origin URLs
+- modifier-key clicks (cmd/ctrl/shift/alt) and middle-click
+- anchors with `target` other than `_self`, `download`, or `rel="external"`
+- non-GET forms
+- any element carrying `data-xmlui-bypass-router`
+
+### Diagnostic codes
+
+All defended-routing diagnostics surface through `pushXsLog({ kind: "navigate", code, ... })`
+and are available to Inspector and the `<App onError>` telemetry hook.
+
+| Code | Source | Meaning |
+|---|---|---|
+| `constraint-rejected` | `constraint-compiler.ts` | A route or query constraint refused the incoming value. |
+| `unknown-constraint` | `constraint-compiler.ts` | Constraint name is neither built-in nor registered. Falls back to unconstrained `string`. |
+| `duplicate-constraint` | `constraint-compiler.ts` | Two route constraints disagree on the same segment name. |
+| `non-canonical-url` | `canonicalise.ts` | Incoming URL differs from canonical form. Effect depends on `nonCanonicalUrl`. |
+| `guard-bypass-attempt` | `guard-dispatcher.ts` | Global `willNavigate` or `Page guard` rejected a navigation; user-agent state was reverted. |
+
+### Strict mode
+
+`appGlobals.strictRouting` defaults to `true`: the above diagnostics escalate
+from warnings to errors and `nonCanonicalUrl` defaults to `"redirect"`. Set
+`appGlobals.strictRouting: false` to opt out for legacy apps that need the
+pre-1.0 warn-only behaviour. The default was flipped in plan #10, Step 4.2.
 
 ## Routing State Variables (Layer 6)
 

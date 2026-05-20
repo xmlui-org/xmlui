@@ -113,6 +113,7 @@ Use the prompt files in `.github/prompts/` for step-by-step workflows. Invoke wi
 | Refactor core code | `#refactor-core` | Restructuring framework internals in `components-core/` |
 | Improve code readability | `#improve-readability` | Renaming, comments, structure, and guard clauses — logic-neutral refactoring |
 | Write component documentation | `#write-component-docs` | Writing or updating hand-written description files for doc generation |
+| Complete a Managed React plan | `#complete-managed-react-plan` | Checking and completing a specific Managed React feature plan, then documenting it on the website |
 | Add a new stereotype task | `#add-stereotype` | Creating a new prompt file for a repeatable task pattern |
 
 If no prompt is invoked, use the documentation map below to find the right reference material for your task.
@@ -131,19 +132,22 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `component-architecture.md` | Two-file pattern, metadata, renderer, native | Any component work |
 | `wrapcomponent.md` | `wrapComponent` config API, events, templates, state | Components using `wrapComponent` |
 | `expression-eval.md` | Parser pipeline, AST, sync/async eval, dependency tracking | Expression bugs, scripting issues |
+| `type-contracts.md` | Verified component metadata contracts, diagnostics, strict mode | Type-contract verifier or diagnostic surface work |
 | `theming-styling.md` | CSS variables, SCSS modules, tone management | Visual components, theme customization |
 | `data-operations.md` | DataSource, APICall, loaders, React Query | Data-fetching components |
 | `behaviors.md` | The 9 auto-attached behaviors, application order | Behavior interactions, form components |
 | `action-execution.md` | Action model, ApiBoundComponent, nested actions | Event handling, API calls |
 | `user-defined-components.md` | UDCs, slots, template composition | User-facing extensibility |
 | `form-infrastructure.md` | Form/FormItem, validation, dirty/touched state | Form components |
-| `routing.md` | Pages/Page, react-router integration, navigation | Routing changes |
+| `routing.md` | Pages/Page, react-router integration, navigation, defended-routing constraints/guards/canonicalisation, diagnostic codes | Routing changes, constraint authoring, navigation guards |
 | `extension-packages.md` | Extension interface, registration, build config | Extension package work |
 | `app-context.md` | Global functions, Actions namespace, utilities | Adding global functions |
 | `option-components.md` | Option/OptionContext, search, filtering | Select, AutoComplete, RadioGroup |
 | `error-handling.md` | ErrorBoundary, error propagation, loader errors | Error-related bugs |
+| `errors.md` | `AppError`, `<RetryPolicy>`, `<Fallback>`, `<App onError>`, `App.errors` | Structured exception model, retry/fallback, error telemetry |
 | `parsers.md` | XML, scripting, style, keybinding parsers | Parser modifications |
 | `inspector-debugging.md` | Trace system, `pushXsLog`, verbose mode | Debugging, inspector |
+| `lifecycle.md` | `onMount`/`onUnmount`/`onError`, `<Lifecycle>`, `onBeforeDispose`, `strictLifecycle` | Lifecycle hooks, cleanup, effect primitives |
 | `language-server.md` | LSP, MetadataProvider, completions, diagnostics | VS Code extension |
 | `build-system.md` | CLI commands, Vite plugin, framework builds | Build configuration |
 | `monorepo-structure.md` | Workspaces, Turborepo, changesets, releases | Repo structure, CI/CD |

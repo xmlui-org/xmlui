@@ -40,6 +40,19 @@ describe("reactive-cycle-diagnostic (LSP provider)", () => {
     expect(d.message).toMatch(/\bb\b/);
   });
 
+  it("anchors diagnostics and related information to cycle members", () => {
+    const diags = diagnosticsForMarkup(`
+      <Stack var.a="{b + 1}" var.b="{a + 1}" />
+    `);
+    expect(diags).toHaveLength(1);
+    const [d] = diags;
+    expect(d.range.start.line).toBeGreaterThan(0);
+    expect(d.relatedInformation).toHaveLength(2);
+    expect(d.relatedInformation?.map((info) => info.location.uri)).toEqual(["0", "0"]);
+    expect(d.relatedInformation?.map((info) => info.message).join("\n")).toMatch(/\ba\b/);
+    expect(d.relatedInformation?.map((info) => info.message).join("\n")).toMatch(/\bb\b/);
+  });
+
   it("returns no diagnostics for null component", () => {
     expect(getReactiveCycleDiagnostics(null)).toEqual([]);
     expect(getReactiveCycleDiagnostics(undefined)).toEqual([]);

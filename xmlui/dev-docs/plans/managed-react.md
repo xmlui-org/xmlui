@@ -55,7 +55,7 @@ These remain accurate where unchanged; rows updated by the
 | Observable by construction | **Strong** *(updated 2026-04)* | Inspector / `pushXsLog` capture every state change, navigation, and API call. **New trace kinds: `sandbox:warn`, `log:debug`/`info`/`warn`/`error`, `app:randomBytes`, `app:mark`/`measure`, `app:fetch`, `clipboard:copy`, `navigate`, `ws:connect`/`message`/`error`/`close`, `eventsource:*` — every Phase 1 ban produces an audit entry in warn mode, and every Phase 2/3 managed primitive emits its own kind.** |
 | DOM API access | **Strong** *(updated 2026-04 — was Weak)* | A property-access guard (`isBannedMember`) in [eval-tree-common.ts](../src/components-core/script-runner/eval-tree-common.ts) is invoked on every identifier read, member read, member write, and computed-member access. The denylists in [bannedMembers.ts](../src/components-core/script-runner/bannedMembers.ts) cover **47 globals**, **21 `document` keys**, **13 `navigator` keys**, and **18 element-setter / mutation keys** — spanning DOM mutation, observers, concurrency primitives, storage, sensors, navigation, network constructors, crypto, performance, and `console`. Default mode (`strictDomSandbox: false`) emits `sandbox:warn` traces; opt-in `true` throws `BannedApiError`. **`console` is in the denylist but allowed by default (`appGlobals.allowConsole`, default `true`) for developer ergonomics; set to `false` to restore sandbox enforcement.** Sanctioned replacements `Log.*`, `App.randomBytes`, `App.now`/`mark`/`measure`, `App.fetch`, `App.environment`, `Clipboard.copy`, `navigate({target:"_blank"})`, `<WebSocket>`/`<EventSource>` are wired into the global expression scope. |
 | Network origin restrictions | **Available** *(updated 2026-04 — was Absent)* | `App.appGlobals.allowedOrigins: string[]` honoured by `App.fetch()`; cross-origin requests are rejected before reaching the network. Same-origin requests are always permitted. Streaming components honour the same allowlist. |
-| Reactive cycle detection | **Absent** | No static cycle analysis on var ↔ DataSource graph |
+| Reactive cycle detection | ✅ **Verified** *(updated 2026-05 — was Absent)* | Static graph analysis covers vars, code-behind functions, and DataSource/APICall loaders; runtime emits `reactive-cycle` traces and default-strict toasts/errors, LSP diagnostics include per-node related locations, and Vite checks per-file plus aggregate `buildEnd` graphs with warn/strict modes. |
 | XSS protection in Markdown | **Absent** | `rehype-raw` passes raw HTML through; no DOMPurify |
 
 The DOM API access row is the headline change: the verdict moved from **Weak**
@@ -328,15 +328,21 @@ selectable.
 
 **What is missing.**
 
-- **No type or constraint syntax on route segments.** `:id` is a string until
-  the developer parses it.
-- **`willNavigate` is bypassable.** Browser back/forward and direct URL
-  entry skip the guard.
-- **No URL canonicalization.** Trailing slashes, case, and query parameter
-  ordering are user concerns.
+- ~~**No type or constraint syntax on route segments.** `:id` is a string until
+  the developer parses it.~~ **Resolved (Wave 4, plan #10).** `<Page url="/users/:id:int(min=1)">`
+  is now first-class; custom constraint names resolve through `App.registerValidator()`.
+- ~~**`willNavigate` is bypassable.** Browser back/forward and direct URL
+  entry skip the guard.~~ **Resolved (Wave 4, plan #10).** Pop-state navigations
+  fire the guard (gated by `appGlobals.guardOnPopState`, default `true`); raw
+  `<a>` / `<form>` interception is opt-in via
+  `appGlobals.interceptExternalNavigation`.
+- ~~**No URL canonicalization.** Trailing slashes, case, and query parameter
+  ordering are user concerns.~~ **Resolved (Wave 4, plan #10).** `App` exposes
+  `urlCase`, `urlTrailingSlash`, `urlQueryParamOrder`, and `nonCanonicalUrl`.
 
-**Verdict.** Routing is convenient but not defensive. A managed framework
-would treat the URL as an untrusted boundary and demand a contract.
+**Verdict.** ✅ **Defended.** Routing now treats the URL as an untrusted boundary:
+typed constraints, all-trigger guards, and canonicalisation are first-class. Strict
+defaults flip in the next major release.
 
 ---
 
@@ -407,18 +413,19 @@ SpotBugs, ErrorProne, and ESLint extend this to project-specific rules.
 hover, definitions, folding, and formatting. Parse errors in `.xmlui`
 markup or expressions are surfaced as LSP diagnostics with line/column.
 
-**What is missing.**
+**What XMLUI now verifies.** The tooling spine has been activated for several
+managed checks: component metadata contracts are verified by LSP, Vite, runtime
+coercion diagnostics, and `check:metadata`; the analyzer reports unknown
+components/props/events, dead conditionals, and handler-value mistakes; and the
+reactive graph analyzer reports dependency cycles across runtime, LSP, and
+Vite.
 
-- No type checking against component metadata at parse time.
-- No "unknown component" diagnostic.
-- No "unknown event" / "unknown method" diagnostic on `Component.event`
-  bindings.
-- No detection of obviously dead expressions or unused vars.
-- No detection of the reactive cycles called out in the original report —
-  the AST has the information; the analyzer does not run.
+**Remaining gaps.** Later plans still need to deepen scope analysis, finish
+versioning diagnostics, and make every analyzer equally visible in CI and the
+website examples.
 
-**Verdict.** The tooling spine (LSP, metadata, parser) is in place. The
-analyzers are not.
+**Verdict.** Build-time validation is no longer parse-only. The remaining work
+is breadth and polish, not substrate.
 
 ---
 
@@ -509,17 +516,17 @@ Combining the original report with the new dimensions:
 | XSS (default rendering) | **Strong** | Sanitize Markdown; **DOM-mutation surface now banned at the property-access guard (2026-04)** |
 | HTTP centralisation | **Strong** *(was Moderate)* | `App.fetch` Gate + `allowedOrigins` allowlist shipped 2026-04; raw `fetch`, `XHR`, `WebSocket`, `EventSource`, `sendBeacon` all banned. |
 | Fetch lifecycle | **Strong** | — |
-| Reactive cycle detection | **Absent** | Build a static AST analyzer |
+| Reactive cycle detection | ✅ **Verified** | Static/runtime graph analyzer with Tarjan SCC detection, runtime `reactive-cycle` traces, LSP related locations, Vite warn/strict checks, and default-on `strictReactiveGraph`. |
 | Observability | **Strong** | Add server sink + redaction; **trace kind union extended with sandbox/log/app/clipboard/navigate/ws/eventsource kinds (2026-04)** |
 | DOM API isolation | **Strong** *(was Weak)* | Property-access guard + 99-entry denylist + sanctioned replacement globals + `App.fetch` Gate + `<WebSocket>`/`<EventSource>` components + `App.environment` shipped 2026-04. **Phase 1, 2, and 3 of the hardening plan are all complete.** |
 | **Accessibility** | **Documented only** | Parse-time linter; framework focus / live-region primitives; theme contrast checker |
-| **Type contracts** | **Metadata, not verified** | Parse-time prop validation against metadata |
-| **Resource lifecycle** | **Strong for framework, asymmetric for user code** | Sandbox-safe lifecycle vocabulary for UDCs |
-| **Exception model** | **Contained, not structured** | Structured error type; retry/fallback policies |
+| **Type contracts** | ✅ **Verified** | LSP, Vite, and runtime expression diagnostics against metadata; `check:metadata` guards TS↔metadata drift; `strictTypeContracts` is default-on |
+| **Resource lifecycle** | ✅ **Symmetric** | Universal `onMount`/`onUnmount`/`onError` events on every component; `<Lifecycle>` declarative effect primitive; container `onBeforeDispose` async-flush hook; `strictLifecycle` default-on (plan #04, W8-1) |
+| **Exception model** | ✅ **Structured** | `AppError` with `code`/`category`/`retryable`/`correlationId`; `<RetryPolicy>` with backoff + `Retry-After` honouring + circuit breaker; `<Fallback>` declarative recovery UI; `<App onError>` global sink + `App.errors` buffer + Inspector "Errors" tab; `strictErrors` default-on (plan #07, W8-1) |
 | **Concurrency / cancellation** | **Predictable, uncoordinated** | Cooperative cancellation token; in-flight guard primitive |
 | **Theming sandbox** | **Mostly scoped** | Typed theme variables; restrict inline-style escape hatch |
 | **Forms validation** | **State strong, validators absent** | Built-in validators, server-error mapping, submit guard |
-| **Routing input** | **Convenient, undefended** | Route constraints, URL canonicalisation |
+| **Routing input** | ✅ **Defended (strict by default)** | Typed/custom constraints, all-trigger guards (pop-state + opt-in anchor/form interception), URL canonicalisation, `strictRouting` default-on — plan #10 |
 | **i18n** | **Dates only** | String externalisation, ICU plurals, RTL guarantees |
 | **Versioning** | **Mechanism present, unenforced** | LSP deprecation diagnostics, prop-level deprecation |
 | **Build-time validation** | **Parse only** | Metadata-driven type/identifier diagnostics |
@@ -553,11 +560,12 @@ The original report's refined pitch stands, with three additions:
 > - **Verified component contracts — props and events checked against metadata at parse time** *(achievable; metadata exists)*
 > - **Accessible by construction — interactive components without an accessible name fail to compile** *(achievable; small primitive set + linter)*
 > - **Cooperative cancellation and structured errors in user code** *(achievable; runtime work)*
-> - No infinite render loops — static cycle detection *(achievable, not yet implemented)*
+> - No infinite render loops — static and runtime reactive-cycle detection *(today, as of 2026-05)*
 
 The original report identified three gaps to close (`fetch`, cycles, Markdown
 sanitization) for the security pitch. **Two of those three have shipped:
-`fetch` is now gated through `App.fetch` with origin allowlist (2026-04);
+`fetch` is now gated through `App.fetch` with origin allowlist (2026-04), and
+reactive-cycle detection now ships across runtime, LSP, and Vite (2026-05);
 Markdown sanitization remains the only original-report security gap still
 open.** The broader managed pitch adds three more high-leverage gaps:
 **metadata-driven parse-time prop validation**, **accessibility linting**, and

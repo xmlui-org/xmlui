@@ -8,10 +8,9 @@
  *
  * ## Rollout note
  *
- * During the `strictErrors === false` rollout phase (the default), all three
- * containment sites (`ErrorBoundary`, `event-handlers`, `LOADER_ERROR`) still
- * accept plain `Error` and normalise it via `AppError.from()`.  When
- * `strictErrors === true`, passing a plain `Error` from script logs a
+ * During the rollout phase `strictErrors` can be set to `false` in `appGlobals` to
+ * revert to warn-only mode. The default is `true` (plan #07 W8-1 flip).
+ * When `strictErrors === true`, passing a plain `Error` from script logs a
  * `kind:"errors"` warn diagnostic with a migration hint.
  */
 

@@ -25,6 +25,9 @@ import {
 } from "../components-core/reactive-graph";
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
+import { verifyComponentDef } from "../components-core/type-contracts";
+import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
+import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -50,9 +53,9 @@ export type PluginOptions = {
    *   failing the build. `severity:"info"` (pure-conditional) cycles
    *   always remain warnings.
    *
-   * Per-file analysis only at present: each XMLUI file is analysed
-   * independently inside `transform`. Cross-file cycles (cycles that
-   * span compound-component boundaries) are not yet detected here.
+   * XMLUI files are analysed independently inside `transform`, then all parsed
+   * roots are scanned once more during `buildEnd` so build logs include cycles
+   * that only become visible when multiple files participate in the app graph.
    */
   reactiveCycles?: AnalyzeMode;
   /**
@@ -79,6 +82,19 @@ export type PluginOptions = {
    * `Map<string, { a11y?: ... }>` keyed by component type name.
    */
   a11yRegistry?: A11yRegistry;
+  /**
+   * Control verified type-contract diagnostics at build time — Plan #01 Step 3.2.
+   *
+   * - `"off"` — type-contract verifier disabled.
+   * - `"warn"` (default) — diagnostics are emitted as Vite warnings.
+   * - `"strict"` — error-capable diagnostics fail the build.
+   */
+  typeContracts?: AnalyzeMode;
+  /**
+   * Optional component metadata registry used by the type-contract verifier.
+   * Defaults to the built-in component metadata.
+   */
+  typeContractRegistry?: ReadonlyMap<string, ComponentMetadata>;
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -95,12 +111,20 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     pluginOptions.reactiveCycles ?? (analyzeMode === "strict" ? "strict" : "warn");
   const a11yMode: AnalyzeMode = pluginOptions.accessibility ?? "warn";
   const a11yRegistry: A11yRegistry = pluginOptions.a11yRegistry ?? new Map();
+  const typeContractMode: AnalyzeMode = pluginOptions.typeContracts ?? "warn";
+  const typeContractRegistry =
+    pluginOptions.typeContractRegistry ??
+    new Map(Object.entries(collectedComponentMetadata) as [string, ComponentMetadata][]);
   // Dedupe cycle reports across multiple transform calls / HMR within a
   // single dev-server lifetime, so the same cycle is not warned twice.
   const reportedCycles = new Set<string>();
+  const reactiveCycleRoots = new Map<string, ComponentDef>();
   // Aggregate a11y diagnostic counts across all files for the buildEnd summary.
   let a11yWarnCount = 0;
   let a11yErrorCount = 0;
+  const typeContractCounts = new Map<string, number>();
+  let typeContractWarnCount = 0;
+  let typeContractErrorCount = 0;
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
@@ -194,18 +218,17 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         // --- Reactive cycle detection — Plan #03 Step 3.4 (W6-7).
         // Per-file pass: build the graph from this file's `ComponentDef`
-        // and report any cycles found. Cross-file cycles (cycles that
-        // close through a compound component imported from another file)
-        // are intentionally left for a future `buildEnd` pass; the per-
-        // file pass already catches the common cases.
+        // and report any cycles found. The same root is retained for the
+        // aggregate buildEnd scan below.
         if (cyclesMode !== "off" && component) {
+          const root =
+            (component as any).component &&
+            typeof (component as any).component === "object"
+              ? (component as any).component
+              : (component as any);
+          reactiveCycleRoots.set(fileId, root);
           let cycleHits: ReturnType<typeof findCycles> | null = null;
           try {
-            const root =
-              (component as any).component &&
-              typeof (component as any).component === "object"
-                ? (component as any).component
-                : (component as any);
             const graph = collectComponentDefGraph(root);
             cycleHits = findCycles(graph);
           } catch (_cyclesErr) {
@@ -261,6 +284,40 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             }
           } catch (_a11yErr) {
             // A11y linter failure must never break the build.
+          }
+        }
+
+        // --- Verified type contracts — Plan #01 Step 3.2.
+        // Run after XMLUI parsing so literal props/events can be checked against
+        // component metadata. Expression-valued props are intentionally left for
+        // runtime warn-mode.
+        if (typeContractMode !== "off" && component) {
+          let hits: ReturnType<typeof verifyComponentDef> = [];
+          try {
+            const root: any =
+              (component as any).component &&
+              typeof (component as any).component === "object"
+                ? (component as any).component
+                : component;
+            const strictTypes = typeContractMode === "strict";
+            hits = verifyComponentDef(root, typeContractRegistry, {
+              strict: strictTypes,
+              skipUnknown: true,
+            });
+          } catch (_typeContractErr) {
+            // Type-contract verifier failure must never break the build.
+          }
+          const strictTypes = typeContractMode === "strict";
+          for (const hit of hits) {
+            const message = `[xmlui:type-contract] ${fileId}: [${hit.code}] ${hit.message}${hit.suggestion ? ` Did you mean "${hit.suggestion}"?` : ""}`;
+            typeContractCounts.set(hit.code, (typeContractCounts.get(hit.code) ?? 0) + 1);
+            if (strictTypes && hit.severity === "error") {
+              typeContractErrorCount++;
+              this.error(message);
+            } else {
+              typeContractWarnCount++;
+              this.warn(message);
+            }
           }
         }
 
@@ -358,6 +415,36 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     },
 
     buildEnd() {
+      if (cyclesMode !== "off" && reactiveCycleRoots.size > 0) {
+        let cycleHits: ReturnType<typeof findCycles> | null = null;
+        try {
+          const root: ComponentDef = {
+            type: "Fragment",
+            uid: "__xmlui_build__",
+            children: Array.from(reactiveCycleRoots.values()),
+          };
+          const graph = collectComponentDefGraph(root);
+          cycleHits = findCycles(graph);
+        } catch (_cyclesErr) {
+          cycleHits = null;
+        }
+
+        if (cycleHits && cycleHits.length > 0) {
+          const strictCycles = cyclesMode === "strict";
+          for (const hit of cycleHits) {
+            const id = cycleHash(hit);
+            if (reportedCycles.has(id)) continue;
+            reportedCycles.add(id);
+            const message = `[xmlui:reactive-cycle] buildEnd\n${formatCycle(hit)}`;
+            if (strictCycles && (hit.severity ?? "warn") === "warn") {
+              this.error(message);
+            } else {
+              this.warn(message);
+            }
+          }
+        }
+      }
+
       // Emit an accessibility summary when the linter found any issues.
       // This surfaces the totals even after individual per-file warnings
       // have scrolled past in the build log.
@@ -367,6 +454,27 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           a11yErrorCount > 0 ? `  ${a11yErrorCount} error(s)` : null,
           a11yWarnCount > 0 ? `  ${a11yWarnCount} warning(s)` : null,
           `  Run with accessibility="strict" to fail the build on must-have violations.`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+        this.warn(summary);
+      }
+
+      if (
+        typeContractMode !== "off" &&
+        (typeContractWarnCount > 0 || typeContractErrorCount > 0)
+      ) {
+        const byCode = Array.from(typeContractCounts.entries())
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([code, count]) => `  ${code}: ${count}`)
+          .join("\n");
+        const total = typeContractWarnCount + typeContractErrorCount;
+        const summary = [
+          `[xmlui:type-contract] Build complete — ${total} type-contract diagnostic(s):`,
+          typeContractErrorCount > 0 ? `  ${typeContractErrorCount} error(s)` : null,
+          typeContractWarnCount > 0 ? `  ${typeContractWarnCount} warning(s)` : null,
+          byCode || null,
+          `  Run with typeContracts="strict" to fail the build on contract violations.`,
         ]
           .filter(Boolean)
           .join("\n");

@@ -20,8 +20,13 @@ The extension surfaces several categories of diagnostics in the **Problems** pan
 |---|---|---|
 | `xmlui` | Parse errors | XML syntax errors and unknown component/prop names |
 | `xmlui-check` | Build validation | Unknown components, misspelled props, dead expressions |
+| `xmlui-type-contract` | Type contracts | Prop, event, enum, and value-type mismatches against component metadata |
 | `xmlui-reactive-graph` | Reactive cycles | Circular data-binding chains that would cause infinite updates |
 | `xmlui-a11y` | Accessibility | Accessibility violations — see below |
+
+### Type-contract diagnostics (`xmlui-type-contract`)
+
+The type-contract verifier checks literal props and events against the component metadata used by XMLUI itself. Typos such as `labe`, missing required props, invalid enum values, deprecated props, and wrong literal value types are reported as warnings by default. Error-capable diagnostics escalate when `App.appGlobals.strictTypeContracts` is enabled.
 
 ### Accessibility diagnostics (`xmlui-a11y`)
 
@@ -39,4 +44,3 @@ The accessibility linter runs automatically on every `.xmlui` file and reports v
 Violations marked **warn/error** are warnings by default; they escalate to errors when `App.appGlobals.strictAccessibility` is `true`.
 
 Quick-fix actions are available for violations that have a single concrete suggested fix.
-

@@ -68,7 +68,7 @@ export const RouteWrapper = memo(function RouteWrapper({
   const params = useParams();
   const location = useLocation();
   const appContext = useAppContext();
-  const strictRouting = appContext.appGlobals?.strictRouting === true;
+  const strictRouting = appContext.appGlobals?.strictRouting !== false;
   const [guardState, setGuardState] = useState<"pending" | "allowed">(() => guard ? "pending" : "allowed");
 
   const validated = useMemo(() => {
@@ -216,7 +216,7 @@ export const Pages = memo(function Pages({
 }: PagesProps) {
   const context = useAppLayoutContext();
   const appContext = useAppContext();
-  const strictRouting = appContext.appGlobals?.strictRouting === true;
+  const strictRouting = appContext.appGlobals?.strictRouting !== false;
   const canonicalPolicy: CanonicalPolicy = useMemo(
     () => ({
       case: appContext.appGlobals?.urlCase === "lower" ? "lower" : "preserve",

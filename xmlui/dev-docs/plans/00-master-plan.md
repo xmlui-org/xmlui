@@ -724,7 +724,7 @@ The actual readiness as of the audit is:
 | #07 exception model | `strictErrors` | `signError` + `ErrorBoundary` wrap; `LOADER_ERROR` mapping, `<App onError>`, `<RetryPolicy>`, `<Fallback>` not shipped | ❌ blocked by Phases 1.2 + 2 + 3 + 4 |
 | #08 theming sandbox | `strictTheming` | validators ship; **hot-path wiring in `StyleProvider` / `valueExtractor` not done** | ❌ blocked by Phase 1.2 + Phase 2 |
 | #09 forms | `strictForms` | registry + cross-field + RFC 7807 + submit-policy live; CSRF/idempotency + `$formCancel` + E2E missing | 🟡 flip-ready if Phase 5 is descoped |
-| #10 routing | `strictRouting` | constraints + guards + canonicalisation live; custom-constraint forms-registry bridge + direct-entry/anchor interception + E2E missing | 🟡 flip-ready if Phase 1.2 + Phase 2.1 are descoped |
+| #10 routing | `strictRouting` | constraints + guards + canonicalisation + custom-constraint forms-registry bridge + opt-in anchor/form interception all live | ✅ **flipped 2026-05** (plan #10 Step 4.2) |
 | #11 i18n | `strictI18n` | ICU + formatters + RTL live; `<I18n>` component ✅ + framework-string extraction ✅; `App.translate` public surface still partial (Phase 2.1) | ❌ blocked by Phase 2.1 |
 | #12 versioning | `strictVersioning` | metadata + api-diff tooling + Inspector tab live; LSP wiring + parse-time hook in `renderChild` + doc badges + `valueAliases`/`preserveLegacyDefaults` rewrite + release-guard workflow not shipped | ❌ blocked by Phase 1 + Phase 2 residuals |
 | #13 build-validation | (analyzer `strict` arg) | full pipeline live (LSP, Vite, CLI, CI scaffold) | ✅ already flippable per-call site |

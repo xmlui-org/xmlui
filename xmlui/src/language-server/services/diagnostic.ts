@@ -7,6 +7,7 @@ import { analyze } from "../../components-core/analyzer/walker";
 import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { getReactiveCycleDiagnostics } from "./reactive-cycle-diagnostic";
 import { getA11yDiagnostics } from "./a11y-diagnostic";
+import { getTypeContractDiagnostics } from "./type-contract-diagnostic";
 import type { MetadataProvider } from "./common/metadata-utils";
 
 export type DiagnosticsContext = {
@@ -57,7 +58,13 @@ function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
     }
   }
 
-  return [...parserDiags, ...analyzerDiags, ...reactiveCycleDiags(ctx), ...a11yDiags(ctx)];
+  return [
+    ...parserDiags,
+    ...analyzerDiags,
+    ...reactiveCycleDiags(ctx),
+    ...typeContractDiags(ctx),
+    ...a11yDiags(ctx),
+  ];
 }
 
 /**
@@ -71,7 +78,7 @@ function reactiveCycleDiags(ctx: DiagnosticsContext): Diagnostic[] {
   if (!ctx.source) return [];
   try {
     const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
-    return getReactiveCycleDiagnostics(component);
+    return getReactiveCycleDiagnostics(component, { uri: ctx.uri });
   } catch {
     return [];
   }
@@ -89,6 +96,19 @@ function a11yDiags(ctx: DiagnosticsContext): Diagnostic[] {
   try {
     const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
     return getA11yDiagnostics(component, ctx.metadataProvider, /* strict */ false);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Verified type contracts — Plan #01 Step 3.1.
+ */
+function typeContractDiags(ctx: DiagnosticsContext): Diagnostic[] {
+  if (!ctx.source || !ctx.metadataProvider) return [];
+  try {
+    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
+    return getTypeContractDiagnostics(component, ctx.metadataProvider, /* strict */ false);
   } catch {
     return [];
   }
@@ -119,4 +139,3 @@ export function getDiagnostics(project: Project, uri: DocumentUri): Diagnostic[]
   };
   return getDiagnosticsInternal(ctx);
 }
-
