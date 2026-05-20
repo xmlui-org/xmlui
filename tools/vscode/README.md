@@ -38,8 +38,10 @@ The accessibility linter runs automatically on every `.xmlui` file and reports v
 | `modal-no-title` | warn/error | `<Modal>` with no `title` prop or `<ModalTitle>` slot | Add `title="..."` |
 | `missing-accessible-name` | warn/error | Interactive element with no accessible name prop | Add the suggested name prop |
 | `form-input-no-label` | warn/error | Form input outside `<FormItem>` and without a `label` prop | Wrap in `<FormItem label="...">` |
-| `duplicate-landmark` | warn | More than one component with the same landmark role on a page | Remove duplicate landmark |
-| `redundant-aria-role` | warn | Explicit ARIA role duplicates the element's implicit role | Remove the redundant `role` prop |
+| `duplicate-landmark` | warn/error | More than one component with the same landmark role on a page | Remove duplicate landmark |
+| `redundant-aria-role` | warn/error | Explicit ARIA role duplicates the element's implicit role | Remove the redundant `role` prop |
+| `missing-skip-link` | warn/error | Navigation is present without a skip link to main content | Add `<SkipLink target="main" />` or enable `autoSkipLink` |
+| `color-contrast-low` | warn/error | Theme foreground/background colors fall below WCAG AA contrast | Adjust the theme colors to at least 4.5:1 contrast |
 
 Violations marked **warn/error** are warnings by default; they escalate to errors when `App.appGlobals.strictAccessibility` is `true`.
 

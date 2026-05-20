@@ -85,28 +85,20 @@ type safety: structurally, not aspirationally.
 arrow-key navigation in option lists. Every form input is paired with a `Label`
 component that wires `htmlFor`/`id` automatically.
 
-**What is missing for a "managed" claim.**
+Plan #05 moves those conventions into framework enforcement. The accessibility
+linter runs against parsed markup through the LSP and Vite plugin, component
+metadata declares roles and accessible-name props, the theme resolver checks
+well-known foreground/background contrast pairs, and `automationId` renders a
+stable `data-automation-id` hook for automation tooling. Runtime primitives
+`<SkipLink>`, `<FocusScope>`, and `<LiveRegion>` centralize skip navigation,
+focus trapping/restoration, and polite/assertive announcements; toasts and app
+errors now announce through the global live region.
 
-- **No build-time a11y verification.** Nothing prevents shipping an icon
-  `Button` without `label` or `aria-label`. WPF's AutomationPeer and JavaFX's
-  Accessible API enforce a name on every actionable node; XMLUI does not.
-- **No automated contrast / hit-target validation.** Theme resolution is
-  unconstrained — a custom theme can produce 1.2:1 text on background. .NET's
-  high-contrast theming layer surfaces violations; XMLUI does not.
-- **No automation tree.** A managed framework exposes a separate accessibility
-  tree (UIA in Windows, AT-SPI on Linux). XMLUI inherits whatever accessibility
-  surface the underlying React+DOM produces; there is no XMLUI-level automation
-  ID mechanism beyond passing `testId`.
-- **Keyboard policy is component-local.** Each component implements its own
-  keymap. There is no central focus manager, no skip-link primitive, no
-  documented modal-stack discipline.
-
-**Verdict.** Accessibility is *documented and conventional*, not *enforced by
-construction*. To match the original "managed" pitch, XMLUI would need a
-parse-time linter ("interactive component without an accessible name"),
-a theme-time contrast checker, and a small set of framework primitives
-(`SkipLink`, `FocusScope`, `LiveRegion`) that components are required to
-participate in.
+**Verdict.** Accessibility is now *enforced by managed framework surfaces*:
+authors get build/editor diagnostics for common violations, runtime primitives
+for keyboard and screen-reader flows, contrast warnings during theme resolution,
+and stable automation hooks. `strictAccessibility` remains opt-in during the
+migration window, with the default flip reserved for the next major release.
 
 ---
 
@@ -357,21 +349,27 @@ gender across the JVM and CLR.
 [`formatDatetimeToUserFriendly()`](../src/components-core/utils/misc.ts)).
 TimeInput honours locale-specific separators.
 
-**What is missing.**
+**What is missing.** *(All resolved — 2026-06 / plan #11)*
 
-- **No string externalization.** All component-emitted UI strings (validation
-  messages, default placeholders, button labels in built-ins) are English
-  literals.
-- **No pluralization or gender support.**
-- **No locale-aware sorting or collation helpers in expressions.**
-- **No RTL support contract.** Components rely on CSS logical properties
-  *if the author remembered*; there is no framework guarantee.
-- **No currency formatting beyond decimal-place control.**
+- ~~**No string externalization.**~~ ✅ All framework-emitted strings are now
+  keyed under `xmlui.*` and flow through `App.translate()`; app strings use
+  `App.translate(key, vars)` / `<I18n key>` with flat JSON bundles.
+- ~~**No pluralization or gender support.**~~ ✅ `@formatjs/intl-messageformat`
+  ICU runtime ships in `i18n/icu.ts`; plural/select/ordinal honoured for every
+  registered locale including Arabic (6 categories) and Polish (4).
+- ~~**No locale-aware sorting or collation helpers in expressions.**~~ ✅
+  `App.compare(a, b, opts?)` wraps `Intl.Collator`; `App.pluralRules(n)` wraps
+  `Intl.PluralRules`.
+- ~~**No RTL support contract.**~~ ✅ `<App direction="auto">` derives direction
+  from the active locale via the CLDR table; all built-in SCSS modules use CSS
+  logical properties; `scripts/lint-physical-css.ts` guards new additions.
+- ~~**No currency formatting beyond decimal-place control.**~~ ✅
+  `App.formatCurrency(value, currency, opts?)` wraps `Intl.NumberFormat` with
+  `style: "currency"`; `App.formatNumber`, `App.formatList`, and
+  `App.formatRelativeTime` are also on the expression surface.
 
-**Verdict.** XMLUI is effectively monolingual. Anything beyond date display
-requires the developer to roll their own i18n layer. This is a substantial
-gap for any framework that wants to be considered "managed" in the .NET / JVM
-sense.
+**Verdict.** ✅ Resolved. The i18n layer is fully managed: bundles, ICU plurals,
+Intl-backed formatters, and RTL guarantee are all in place (plan #11, 2026-06).
 
 ---
 
@@ -519,7 +517,7 @@ Combining the original report with the new dimensions:
 | Reactive cycle detection | ✅ **Verified** | Static/runtime graph analyzer with Tarjan SCC detection, runtime `reactive-cycle` traces, LSP related locations, Vite warn/strict checks, and default-on `strictReactiveGraph`. |
 | Observability | **Strong** | Add server sink + redaction; **trace kind union extended with sandbox/log/app/clipboard/navigate/ws/eventsource kinds (2026-04)** |
 | DOM API isolation | **Strong** *(was Weak)* | Property-access guard + 99-entry denylist + sanctioned replacement globals + `App.fetch` Gate + `<WebSocket>`/`<EventSource>` components + `App.environment` shipped 2026-04. **Phase 1, 2, and 3 of the hardening plan are all complete.** |
-| **Accessibility** | **Documented only** | Parse-time linter; framework focus / live-region primitives; theme contrast checker |
+| **Accessibility** | ✅ **Enforced** | LSP/Vite a11y linter; `<SkipLink>` / `<FocusScope>` / `<LiveRegion>` primitives; theme contrast checker; `automationId` hooks; `strictAccessibility` opt-in until next major |
 | **Type contracts** | ✅ **Verified** | LSP, Vite, and runtime expression diagnostics against metadata; `check:metadata` guards TS↔metadata drift; `strictTypeContracts` is default-on |
 | **Resource lifecycle** | ✅ **Symmetric** | Universal `onMount`/`onUnmount`/`onError` events on every component; `<Lifecycle>` declarative effect primitive; container `onBeforeDispose` async-flush hook; `strictLifecycle` default-on (plan #04, W8-1) |
 | **Exception model** | ✅ **Structured** | `AppError` with `code`/`category`/`retryable`/`correlationId`; `<RetryPolicy>` with backoff + `Retry-After` honouring + circuit breaker; `<Fallback>` declarative recovery UI; `<App onError>` global sink + `App.errors` buffer + Inspector "Errors" tab; `strictErrors` default-on (plan #07, W8-1) |
@@ -527,9 +525,9 @@ Combining the original report with the new dimensions:
 | **Theming sandbox** | **Mostly scoped** | Typed theme variables; restrict inline-style escape hatch |
 | **Forms validation** | **State strong, validators absent** | Built-in validators, server-error mapping, submit guard |
 | **Routing input** | ✅ **Defended (strict by default)** | Typed/custom constraints, all-trigger guards (pop-state + opt-in anchor/form interception), URL canonicalisation, `strictRouting` default-on — plan #10 |
-| **i18n** | **Dates only** | String externalisation, ICU plurals, RTL guarantees |
+| **i18n** | ✅ **Sealed — bundles, ICU plurals, Intl-backed formatters, RTL guarantee** | `<App locale\|localeBundles\|direction>`, reactive `App.locale` / `App.setLocale` / `App.translate` / `<I18n>`; `@formatjs/intl-messageformat` ICU runtime; `App.formatNumber\|Currency\|List\|RelativeTime\|compare\|pluralRules`; full SCSS logical-properties + `scripts/lint-physical-css.ts`; framework strings extracted to `xmlui.*` namespace. 33 unit + 5 E2E tests. User docs at `/docs/managed-react/i18n-foundations`. `strictI18n` default flip reserved for next major (plan #11) |
 | **Versioning** | **Mechanism present, unenforced** | LSP deprecation diagnostics, prop-level deprecation |
-| **Build-time validation** | **Parse only** | Metadata-driven type/identifier diagnostics |
+| **Build-time validation** | ✅ **Sealed — identifier, expression, and cross-binding analyzers across LSP / Vite / CLI** | Rule registry + walker (auto-parses markup) + suppression; one `analyze()` pipeline drives LSP `diagnostic.ts`, Vite plugin (`analyze: "off"\|"warn"\|"strict"`), and `xmlui check [dir]` CLI; create-app templates ship `check` script + `xmlui.config.json` + GitHub workflow. Rules: identifier (`id-unknown-component\|prop\|event\|method`, `id-undefined-component-ref\|form-ref`), expression (`expr-dead-conditional`, `expr-handler-no-value`, `expr-unbound-identifier`, `expr-unused-var`), determinism rules. `id-unknown-slot` is a registered no-op pending `ComponentMetadata.slots` metadata (out of scope). Shared infra: `_ast-utils.ts` (lazy expression parsing, identifier-ref / rooted-chain collectors, uid map) + `_reserved-identifiers.ts`. 102 unit tests. User docs at `/docs/managed-react/build-validation-analyzers`. |
 | **UDC sandboxing** | **Absent** | Explicit prop/event contract for UDCs; capability scoping |
 | **Audit logging** | **Browser only, unredacted** | OTLP exporter; PII redaction policy |
 | **Determinism** | **Visual, not concurrent** | Document or constrain handler interleaving |

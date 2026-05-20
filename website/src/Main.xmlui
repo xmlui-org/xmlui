@@ -277,6 +277,10 @@
                             to="/docs/managed-react/themevars-namespace"
                         />
                         <NavLink
+                            label="Enforced Accessibility"
+                            to="/docs/managed-react/enforced-accessibility"
+                        />
+                        <NavLink
                             label="Managed Lifecycle Vocabulary"
                             to="/docs/managed-react/managed-lifecycle-vocabulary"
                         />
@@ -287,6 +291,14 @@
                         <NavLink
                             label="Defended Routing"
                             to="/docs/managed-react/defended-routing"
+                        />
+                        <NavLink
+                            label="Build-Validation Analyzers"
+                            to="/docs/managed-react/build-validation-analyzers"
+                        />
+                        <NavLink
+                            label="Internationalisation Foundations"
+                            to="/docs/managed-react/i18n-foundations"
                         />
                         <NavLink
                             label="Code Injection Prevention"
@@ -2564,6 +2576,13 @@
                 />
             </Page>
             <Page
+                url="/docs/managed-react/enforced-accessibility"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/enforced-accessibility.md']}"
+                />
+            </Page>
+            <Page
                 url="/docs/managed-react/managed-lifecycle-vocabulary"
             >
                 <DocumentPage
@@ -2582,6 +2601,20 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/defended-routing.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/build-validation-analyzers"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/build-validation-analyzers.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/i18n-foundations"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/i18n-foundations.md']}"
                 />
             </Page>
             <Page

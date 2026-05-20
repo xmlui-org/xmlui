@@ -140,6 +140,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `user-defined-components.md` | UDCs, slots, template composition | User-facing extensibility |
 | `form-infrastructure.md` | Form/FormItem, validation, dirty/touched state | Form components |
 | `routing.md` | Pages/Page, react-router integration, navigation, defended-routing constraints/guards/canonicalisation, diagnostic codes | Routing changes, constraint authoring, navigation guards |
+| `i18n.md` | Locale resolution priority, bundle JSON format, ICU pattern reference, formatter API, RTL contract | i18n, locale switching, RTL layout, translation bundles |
 | `extension-packages.md` | Extension interface, registration, build config | Extension package work |
 | `app-context.md` | Global functions, Actions namespace, utilities | Adding global functions |
 | `option-components.md` | Option/OptionContext, search, filtering | Select, AutoComplete, RadioGroup |
@@ -152,7 +153,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `build-system.md` | CLI commands, Vite plugin, framework builds | Build configuration |
 | `monorepo-structure.md` | Workspaces, Turborepo, changesets, releases | Repo structure, CI/CD |
 | `testing-conventions.md` | E2E + unit patterns, `initTestBed`, locators | Any testing work |
-| `accessibility.md` | ARIA, keyboard nav, per-component audit | Accessibility fixes |
+| `accessibility.md` | ARIA, keyboard nav, enforced a11y linter, primitives, contrast checks, automation IDs | Accessibility fixes |
 | `doc-generation.md` | Generate-docs pipeline, MetadataProcessor | Documentation generation |
 
 | `qa-checklist.md` | QA audit checklist — actionable per-section checklist for component reviews |

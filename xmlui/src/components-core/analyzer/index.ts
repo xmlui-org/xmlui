@@ -26,6 +26,7 @@ export { buildSuppressionMap, isSuppressed } from "./suppression";
 import "./rules/id-unknown-component";
 import "./rules/id-unknown-prop";
 import "./rules/id-unknown-event";
+import "./rules/id-unknown-method";
 import "./rules/id-unknown-slot";
 // Phase 2: Expression rules
 import "./rules/expr-unused-var";

@@ -92,6 +92,9 @@ export type StandaloneAppDescription = {
    *   `missing-accessible-name`, `form-input-no-label`) escalate from `warn` to
    *   `error`, causing the Vite build to fail if any are present. In non-strict mode
    *   they are warnings only. See `dev-docs/plans/05-enforced-accessibility.md`.
+   * - `autoSkipLink` (boolean, default `false`) — when `true`, XMLUI inserts a
+   *   default `<SkipLink>` before the app content so keyboard users can jump to
+   *   the main region.
    * - `strictReactiveGraph` (boolean, default `true` — flipped from `false` in W8-1)
    *   — when `true`, every
    *   detected reactive cycle (var ↔ var, var ↔ DataSource, function-mediated)

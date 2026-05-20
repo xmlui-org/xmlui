@@ -24,6 +24,12 @@ export interface ComponentDefCore {
   testId?: string;
 
   /**
+   * Stable automation identifier for assistive-technology-aware tooling.
+   * Rendered as `data-automation-id` on visual components.
+   */
+  automationId?: string;
+
+  /**
    * Though components manage their state internally, the app logic may require user
    * state management. Components may have user *variables*, which the UI logic uses to
    * manage the application state. This property holds the variables (name and value

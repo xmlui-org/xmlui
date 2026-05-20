@@ -32,6 +32,8 @@ import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
 import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import { announceLiveRegion, GlobalLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
+import { SkipLink } from "../../components/SkipLink/SkipLinkReact";
 import {
   compare,
   formatCurrency,
@@ -181,6 +183,7 @@ export function AppContent({
   const programmaticNavigationRef = useRef<string | undefined>();
   const [appLocaleOverride, setAppLocaleOverride] = useState<string | undefined>();
   const [userLocaleOverride, setUserLocaleOverride] = useState<string | undefined>();
+  const [directionOverride, setDirectionOverride] = useState<"ltr" | "rtl" | "auto">("auto");
   const [schedulerOverride, setSchedulerOverride] = useState<"concurrent" | "fifo" | undefined>();
   const [maxQueuedPerTraceOverride, setMaxQueuedPerTraceOverride] = useState<number | undefined>();
   const bundleStoreRef = useRef(createBundleStore([xmluiEnglishBundle]));
@@ -985,6 +988,11 @@ export function AppContent({
 
   const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
 
+  const resolvedDirection = useMemo(() => {
+    if (directionOverride === "ltr" || directionOverride === "rtl") return directionOverride;
+    return isRtlLocale(activeLocale.locale) ? "rtl" : "ltr";
+  }, [directionOverride, isRtlLocale, activeLocale.locale]);
+
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
   // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
@@ -1437,18 +1445,22 @@ export function AppContent({
     }
     const wrapper: any = (message: unknown, opts?: any) => {
       logToast("default", message);
+      announceLiveRegion(message);
       return toast(message as any, opts);
     };
     wrapper.success = (message: unknown, opts?: any) => {
       logToast("success", message);
+      announceLiveRegion(message);
       return toast.success(message as any, opts);
     };
     wrapper.error = (message: unknown, opts?: any) => {
       logToast("error", message);
+      announceLiveRegion(message, "assertive");
       return toast.error(message as any, opts);
     };
     wrapper.loading = (message: unknown, opts?: any) => {
       logToast("loading", message);
+      announceLiveRegion(message);
       return toast.loading(message as any, opts);
     };
     wrapper.custom = (message: unknown, opts?: any) => {
@@ -1631,13 +1643,14 @@ export function AppContent({
         localeSource: activeLocale.source,
         availableLocales,
         setLocale,
+        setAppDirection: (dir: "ltr" | "rtl" | "auto") => setDirectionOverride(dir),
         registerLocaleBundle,
         registerLocaleBundles,
         reloadLocale,
         translate,
         t: translate,
         isRtlLocale,
-        direction: isRtlLocale(activeLocale.locale) ? "rtl" : "ltr",
+        direction: resolvedDirection,
         formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
           formatNumber(value, activeLocale.locale, options),
         formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
@@ -1715,6 +1728,7 @@ export function AppContent({
     reloadLocale,
     translate,
     isRtlLocale,
+    resolvedDirection,
     schedulerMode,
     maxQueuedPerTrace,
     setScheduler,
@@ -1724,6 +1738,8 @@ export function AppContent({
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
+        <GlobalLiveRegion />
+        {(appGlobals as any)?.autoSkipLink === true && <SkipLink />}
         <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
       </AppStateContext.Provider>
     </AppContext.Provider>
@@ -1765,6 +1781,7 @@ function inferLocaleFromBundleUrl(url: string): string | undefined {
 function signError(error: Error | AppError | string | unknown) {
   const appError = AppError.from(error);
   const message = appError.message || "Something went wrong";
+  announceLiveRegion(message, "assertive");
   toast.error(message);
   // Always log to console so Playwright page.on('console') can capture it
   console.error("[xmlui]", message);

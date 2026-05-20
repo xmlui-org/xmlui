@@ -353,6 +353,8 @@ export type AppContextObject = {
     localeSource: string;
     availableLocales: readonly string[];
     setLocale: (locale: string, options?: { source?: "app" | "user" }) => void;
+    /** Internal: used by AppReact to push the `direction` prop into AppContext. */
+    setAppDirection: (dir: "ltr" | "rtl" | "auto") => void;
     registerLocaleBundle: (bundle: {
       locale: string;
       messages: ReadonlyMap<string, string> | Record<string, string>;
