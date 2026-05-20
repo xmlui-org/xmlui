@@ -157,16 +157,16 @@
       ]
     },
     "xmlui-integration-test-app#build": {
-      "dependsOn": ["xmlui#prepublishOnly", "xmlui-test-extension#build:extension"],
+      "dependsOn": ["^prepublishOnly", "xmlui-test-extension#build:extension"],
       "outputs": ["integration-tests/test-app/dist/**"]
     },
     "xmlui-integration-test-app#ssg": {
-      "dependsOn": ["xmlui#prepublishOnly", "xmlui-test-extension#build:extension"],
+      "dependsOn": ["^prepublishOnly", "xmlui-test-extension#build:extension"],
       "outputs": ["integration-tests/test-app/dist-ssg/**"]
     },
     "xmlui-integration-test-app#build:plugin-mode": {
       "dependsOn": [
-        "xmlui#prepublishOnly",
+        "^prepublishOnly",
         "xmlui#build:for-node",
         "xmlui-test-extension#build:extension"
       ],

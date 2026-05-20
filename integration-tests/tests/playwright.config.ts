@@ -1,5 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 import path from "path";
+import { projectNames } from "./fixtures";
 
 const testAppDir = path.resolve(__dirname, "../test-app");
 
@@ -8,16 +9,6 @@ const portViteStart = 3213;
 const portViteBuild = 3214;
 const portViteSSG = 3215;
 const portViteBuildPlugin = 3216;
-
-// Parse from env: TEST_MODES=standalone,vite-build or default to all
-const activeModes = new Set(
-  process.env.TEST_MODES?.split(",").map((s) => s.trim()) ?? [
-    "standalone",
-    "vite-build",
-    "vite-ssg",
-    "vite-start",
-  ],
-);
 
 const allServers = [
   {
@@ -67,13 +58,28 @@ const allProjects = [
 
 export default defineConfig({
   use: { ...devices["Desktop Chrome"], channel: "chromium" },
-  webServer: allServers.filter((s) => activeModes.has(s.name)).map(({ name, ...rest }) => rest),
-
-  projects: allProjects
-    .filter((p) => activeModes.has(p.name))
-    .map(({ name, baseURL, timeout }) => ({
-      name,
-      ...(timeout ? { expect: { timeout } } : {}),
-      use: { baseURL },
-    })),
+  webServer: allServers,
+  projects: [
+    {
+      name: projectNames.STANDALONE,
+      use: { baseURL: `http://localhost:${portStandalone}` },
+    },
+    {
+      name: projectNames.VITE_BUILD,
+      use: { baseURL: `http://localhost:${portViteBuild}` },
+    },
+    {
+      name: projectNames.VITE_SSG,
+      use: { baseURL: `http://localhost:${portViteSSG}` },
+    },
+    {
+      name: projectNames.VITE_START,
+      expect: { timeout: 15_000 },
+      use: { baseURL: `http://localhost:${portViteStart}` },
+    },
+    {
+      name: projectNames.VITE_BUILD_PLUGIN,
+      use: { baseURL: `http://localhost:${portViteBuildPlugin}` },
+    },
+  ],
 });
