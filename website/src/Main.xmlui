@@ -289,6 +289,10 @@
                             to="/docs/managed-react/defended-routing"
                         />
                         <NavLink
+                            label="Build-Validation Analyzers"
+                            to="/docs/managed-react/build-validation-analyzers"
+                        />
+                        <NavLink
                             label="Code Injection Prevention"
                             to="/docs/managed-react/code-injection-prevention"
                         />
@@ -2582,6 +2586,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/defended-routing.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/build-validation-analyzers"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/build-validation-analyzers.md']}"
                 />
             </Page>
             <Page
