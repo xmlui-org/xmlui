@@ -738,6 +738,68 @@ const isImplicitDefault =
 
 ---
 
+### Баг 22 (виявлений у Group E, `delay-a-datasource-until-another-datasource-is-ready.spec.ts`): локальні параметри arrow-функцій витікали в `computedUses` через гілку `T_FUNCTION_INVOCATION_EXPRESSION`
+
+**Симптом:** E2E тести Group E падали — Select з `when="{userOptions.length > 0}"` ніколи не ставав видимим. Перший DataSource робив запит, отримував 200 OK, але `users_for_ds_dependency.loaded` ніколи не передавалось у стан App: state, що бачили діти App, було звужено до `["departments"]`, де `departments` — це **параметр arrow-функції** у `onLoaded`, а не змінна батьківського стану.
+
+XML тестового кейсу (фрагмент):
+```xml
+<DataSource id="departments_with_ds_dependency"
+  onLoaded="(departments) => {
+    userOptions = users_for_ds_dependency.value.map(user => {
+      const department = departments.find(d => d.id === user.departmentId);
+      return { id: user.id, label: user.name + ' (' + department.name + ')' };
+    });
+  }" />
+```
+
+`departments` — параметр arrow-функції. Скоуп-аналіз у `visitors.ts` коректно обробляє `T_ARROW_EXPRESSION` (заштовхує блок, декларує args, обробляє тіло, попує блок). Лookup через `T_IDENTIFIER` і `traverseMemberAccessChain` дивиться `getIdentifierScope` і фільтрує block-локальні імена. Але гілка `T_FUNCTION_INVOCATION_EXPRESSION` (для `caller.member(...)` де `caller.obj` — це `T_IDENTIFIER`) ОБХОДИЛА цю перевірку — і прямо штовхала `caller.obj.name` у `uncDeps` без `getIdentifierScope`:
+
+```ts
+// xmlui/src/components-core/script-runner/visitors.ts
+if (caller.obj.type === T_IDENTIFIER) {
+  if (typeof get(referenceTrackedApis, `${caller.obj.name}.${caller.member}`) === "function") {
+    uncDeps.push(`${caller.obj.name}.${caller.member}`);
+  } else {
+    uncDeps.push(`${caller.obj.name}`); // ← block-локальний `departments` витікав сюди
+  }
+}
+```
+
+Для `departments.find(d => ...)` це означало: `departments` (LOCAL block param) → бульбашка вгору як free var → `App.computedUses = ["departments"]` → `extractScopedState(parentState, ["departments"])` повертав `{}` (немає такого ключа) → App втрачав ВЕСЬ свій стан, включно з API дочірнього `<DataSource id="users_for_ds_dependency">` → `users_for_ds_dependency.loaded` завжди `undefined` → другий DataSource ніколи не запускався.
+
+**Виправлення:** додано `getIdentifierScope` лookup перед push:
+
+```ts
+// xmlui/src/components-core/script-runner/visitors.ts
+if (caller.obj.type === T_IDENTIFIER) {
+  // Respect block scope: a function call like `param.method(...)` where
+  // `param` is a locally declared identifier (arrow-fn parameter,
+  // const/let in the current scope, etc.) is NOT a parent-state
+  // dependency. Skip it to avoid polluting computedUses with names
+  // that don't live in the parent container.
+  const callerScope = getIdentifierScope(caller.obj, evalContext, thread);
+  if (callerScope.type !== "block") {
+    if (typeof get(referenceTrackedApis, `${caller.obj.name}.${caller.member}`) === "function") {
+      uncDeps.push(`${caller.obj.name}.${caller.member}`);
+    } else {
+      uncDeps.push(`${caller.obj.name}`);
+    }
+  }
+}
+```
+
+**Чому це безпечно:**
+1. Тільки одна гілка коду `T_FUNCTION_INVOCATION_EXPRESSION` для `T_IDENTIFIER`-caller тепер симетрично використовує scope-чек, як і сусідні гілки `T_MEMBER_ACCESS_EXPRESSION` (через `traverseMemberAccessChain`) і `T_IDENTIFIER` (інший switch case).
+2. `getIdentifierScope` уже інстанціюється — оверхеду немає; ми лише читаємо результат.
+3. Reactive dependency tracking (інший виклик `collectVariableDependencies` без `includeAssignmentTargets`) також виграє: метод-виклик на локальному ідентифікаторі не повинен викликати реактивний ре-рендер.
+
+**Слід мати на увазі:** інші місця, що вручну штовхають імена в deps, мають бути перевірені на той же шаблон. Наразі це єдина гілка, що обходила scope-aware lookup. Симетричний випадок з `T_CALCULATED_MEMBER_ACCESS_EXPRESSION` (`arr[expr]`) у функції-виклику передає об'єкт у рекурсивний `collectDependencies`, який вже коректно фільтрує локальні.
+
+**Файли:** `xmlui/src/components-core/script-runner/visitors.ts` (1 hunk: scope-guard before push у `T_FUNCTION_INVOCATION_EXPRESSION`).
+
+---
+
 ## Результати бенчмарку
 
 Тест: `oftenChanges` тікає кожні 100мс → 20 тіків за 2с.

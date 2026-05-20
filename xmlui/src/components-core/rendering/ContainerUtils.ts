@@ -157,11 +157,24 @@ export function extractScopedState<T extends Record<string, any>>(
     // Empty uses array creates a state boundary with no parent state
     return {} as T;
   }
-  // Use lodash pick to extract only specified properties
   const picked: any = {};
+  const usesSet = new Set(uses);
   for (const key of uses) {
     if (key in parentState) {
       picked[key] = parentState[key];
+    }
+
+  }
+  // Also pick Symbol-keyed entries whose description matches a name in `uses`.
+  // Component APIs registered via `registerComponentApi` are stored under
+  // `Symbol(uid)` AND under the string `uid` (see `mergeComponentApis`). The
+  // string copy is what templates read (`{mySelect.value}`); the Symbol copy
+  // is what the wrapped component renderer reads from `rendererContext.state`.
+  // Narrowing must keep both copies so the wrapped component still sees its
+  // own state slice when its container is scoped.
+  for (const sym of Object.getOwnPropertySymbols(parentState)) {
+    if (sym.description && usesSet.has(sym.description)) {
+      picked[sym] = (parentState as any)[sym];
     }
   }
   return picked;

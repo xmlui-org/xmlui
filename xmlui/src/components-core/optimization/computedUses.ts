@@ -167,6 +167,9 @@ const isRuntimeContextVar = (name: string): boolean =>
 /**
  * Walk a plain-object AST tree collecting Identifier node names.
  *
+ * It avoids collecting property names of member access expressions
+ * (e.g. in `foo.bar`, `foo` is collected but `bar` is not).
+ *
  * This fallback is needed for event handler ASTs that arrive with string-typed
  * `type` discriminators (e.g. `"Identifier"`, `"ExpressionStatement"`) rather
  * than the numeric constants the real scripting parser emits. This format
@@ -185,9 +188,13 @@ function gatherIdentifiers(node: unknown, acc: Set<string> = new Set()): Set<str
   const obj = node as Record<string, unknown>;
   if (obj.type === "Identifier" && typeof obj.name === "string") {
     acc.add(obj.name);
-  } else {
-    for (const val of Object.values(obj)) gatherIdentifiers(val, acc);
   }
+  if (obj.type === "MemberAccessExpression") {
+    // Only collect the object, not the member
+    gatherIdentifiers(obj.obj, acc);
+    return acc;
+  }
+  for (const val of Object.values(obj)) gatherIdentifiers(val, acc);
   return acc;
 }
 
@@ -238,9 +245,11 @@ function depsOfValue(value: unknown): { all: string[]; reads: string[] } {
           obj.statements.length > 0 &&
           typeof (obj.statements[0] as any)?.type === "string";
         if (hasStringDiscriminators) {
-          // gatherIdentifiers collects every Identifier node regardless of position
-          // (RHS, LHS, member-access root) — string-discriminator ASTs use it for
-          // both sets, because we lack the structured visitor for that format.
+          // String-discriminator ASTs (e.g. "Identifier", "ExpressionStatement")
+          // are not handled by the structured visitor. Fall back to a flat name
+          // gather; this loses scope tracking but is conservative — it never
+          // misses a reference, at worst it includes locals that runtime
+          // narrowing will simply not find in the parent state.
           const ids = Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
           return { all: ids, reads: ids };
         }
@@ -258,6 +267,14 @@ function depsOfValue(value: unknown): { all: string[]; reads: string[] } {
       return { all: [], reads: [] };
     }
     if (typeof value === "string") {
+      // String props in XMLUI carry templated expressions through `{...}`
+      // interpolation. `parseParameterString` splits the string on top-level
+      // `{...}` segments and yields each interpolated expression separately.
+      // Plain text segments are ignored — so label="Run", classnames, testIds,
+      // etc. yield NO deps (they have no `{...}` segments). Event handlers and
+      // other rich values arrive here as pre-parsed CodeDeclaration / object
+      // trees and are handled by the branches above; strings that fall through
+      // are template strings only.
       const params = parseParameterString(value);
       const acc = new Set<string>();
       for (const part of params) {
@@ -266,8 +283,6 @@ function depsOfValue(value: unknown): { all: string[]; reads: string[] } {
           acc.add(rootIdentifier(id));
         }
       }
-      // String-templated values can only contain reactive expressions
-      // (no statements/assignments) — reads == all.
       const ids = Array.from(acc);
       return { all: ids, reads: ids };
     }
@@ -312,16 +327,25 @@ function depsOfRecord(
 function computeUsesInternal(
   node: ComponentDef,
   parentFunctionNames: Set<string> = new Set(),
-  disableNarrowing: boolean = false
+  disableNarrowing: boolean = false,
 ): [Set<string>, Set<string>, Set<string>] {
+  const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
+
   const localDeclared = new Set<string>();
+  // Any node that creates a runtime container (vars/loaders/functions/uses/etc.)
+  // declares those names locally so they don't bubble to the parent's deps.
+  // This is the original architecture: regular containers + implicit containers
+  // both run inside a StateContainer at runtime; their `vars` and `functions`
+  // are the StateContainer's local state, NOT the parent's.
   if (node.vars) for (const k of Object.keys(node.vars)) localDeclared.add(k);
   if (node.functions) for (const k of Object.keys(node.functions)) localDeclared.add(k);
   if (node.scriptCollected) {
     for (const k of Object.keys(node.scriptCollected.functions ?? {})) localDeclared.add(k);
     for (const k of Object.keys(node.scriptCollected.vars ?? {})) localDeclared.add(k);
   }
-  if (node.uid) localDeclared.add(node.uid);
+  // node.uid NEVER registers in itself; it always registers in the parent container.
+  // So it must never be in localDeclared.
+
   // Context variables ($item, $itemIndex, etc.) are injected by the framework
   // at runtime into the children of this node — they are locally provided, not
   // external dependencies, so they must be in localDeclared.
@@ -341,13 +365,7 @@ function computeUsesInternal(
     ...Object.keys(node.functions ?? {}),
     ...Object.keys(node.scriptCollected?.functions ?? {}),
   ]);
-  // A node is a "known" container regardless of parentDeps (excludes implicit-default).
-  // Uses the shared `isContainerLike` predicate in strict mode so that:
-  //   • truthy-but-empty `vars: {}` / `functions: {}` from the StandaloneApp merge
-  //     do NOT count as containers (would otherwise falsely narrow children);
-  //   • `computedUses` is ignored — it is being computed right now, so it would
-  //     create a chicken-and-egg situation on re-runs.
-  const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
+
   // Children of a container see THIS node's functions; children of a non-container
   // see the same parentFunctionNames inherited from above (scope doesn't change).
   const childFunctionNames = isKnownContainer ? nodeFunctionNames : parentFunctionNames;
@@ -461,6 +479,15 @@ function computeUsesInternal(
   for (const d of usedHereReads) if (keepDep(d)) parentDependenciesReads.add(d);
   for (const d of childDepsReads) if (keepDep(d)) parentDependenciesReads.add(d);
 
+  // If this node is an implicit stateful component (Select, List, Table, DataGrid)
+  // with a UID, include its own UID in parentDependencies so the narrowed state
+  // from the parent still contains its bubbled state (e.g. {mySelect.value} from a
+  // sibling reads against App.state["mySelect"]).
+  if (!isKnownContainer && IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && node.uid) {
+    parentDependencies.add(node.uid);
+    parentDependenciesReads.add(node.uid);
+  }
+
   // Deps that are "real" parent-state keys (not runtime-injected dynamic vars).
   // Used for the isImplicitDefault promotion check: a component should not be
   // promoted to a container solely because it reads a dynamic var like $context.
@@ -522,15 +549,12 @@ function computeUsesInternal(
     // `computedUses` below), but they cannot by themselves require narrowing —
     // re-renders are triggered by reads, not writes.
     if (node.uses === undefined && nonDynamicReadDeps.size > 0 && safeToNarrow) {
-      // If any needed dep is a parent-provided function, include ALL parent
-      // functions in computedUses so that functions called transitively within
-      // those functions are also in scope. Functions are non-reactive, so
-      // including extras never triggers unnecessary rerenders.
       const computedUsesSet = dependsOnParentFunction
         ? new Set([...parentDependencies, ...parentFunctionNames])
         : parentDependencies;
-      node.computedUses = Array.from(computedUsesSet);
+      node.computedUses = Array.from(computedUsesSet).sort();
     }
+
     // else: node has own script/code-behind, or calls a parent function while narrowing
     // is disabled — intentionally not narrowed.
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();

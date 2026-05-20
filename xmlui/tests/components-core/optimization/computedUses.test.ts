@@ -5,12 +5,23 @@ import { computeUsesForTree, COMPUTED_USES_ENABLED, IMPLICIT_CONTAINER_COMPONENT
 const skipIfDisabled = !COMPUTED_USES_ENABLED;
 import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 function node(
   type: string,
   overrides: Partial<ComponentDef> = {},
 ): ComponentDef {
   return { type, ...overrides } as ComponentDef;
+}
+
+/**
+ * Build an event handler value that mimics what the production transform
+ * pipeline produces: a pre-parsed object with a `statements` array of
+ * numeric-discriminator AST nodes. Use this for tests that care about
+ * scope tracking (arrow-fn params, const/let declarations, etc.).
+ */
+function parsedEvent(source: string) {
+  return { statements: new Parser(source).parseStatements() } as any;
 }
 
 describe("IMPLICIT_CONTAINER_COMPONENT_NAMES", () => {
@@ -1051,5 +1062,96 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
     // $param excluded → parentDependencies has only 'items' (from Items.data) which
     // belongs to Items, not Select. Select itself has no free vars after filtering.
     expect(select.computedUses ?? []).not.toContain("$param");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Regression tests for Bug 22: arrow-function parameters used as the object of
+// a method call (`param.method(...)`) must NOT leak into computedUses.
+//
+// Before fix: T_FUNCTION_INVOCATION_EXPRESSION pushed `caller.obj.name` without
+// consulting `getIdentifierScope`. Block-local identifiers like arrow-fn
+// parameters bubbled up as free vars, causing wrong narrowing on ancestors.
+// ---------------------------------------------------------------------------
+
+describe.skipIf(skipIfDisabled)("computeUsesForTree — Бaг 22: arrow-fn parameter scope in method calls", () => {
+  it("arrow-fn parameter used as method-call receiver does NOT leak as dep", () => {
+    // <Stack var.userOptions><DataSource onLoaded="(departments) => userOptions = departments.map(...)" />
+    // `departments` is the arrow parameter; `userOptions` is local to Stack.
+    // Before fix: T_FUNCTION_INVOCATION_EXPRESSION pushed `departments` (the caller of
+    // `.map(...)`) without scope check → `departments` bubbled to Stack.computedUses.
+    const root = node("Stack", {
+      vars: { userOptions: "{[]}" },
+      children: [
+        node("DataSource", {
+          events: {
+            loaded: parsedEvent(
+              "(departments) => { userOptions = departments.map(d => ({ id: d.id })); }",
+            ),
+          },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("non-arrow function invocation on a parent identifier still bubbles up", () => {
+    // Sanity check for the symmetric case: when the caller is NOT block-local,
+    // the dep MUST still be tracked.
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Button", {
+          events: { click: parsedEvent("userOptions.push(1)") },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toContain("userOptions");
+  });
+
+  it("nested arrow parameters do not leak through chained method calls", () => {
+    // Mirrors the actual Group E case:
+    //   (departments) => { users.map(user => { const d = departments.find(x => x.id === user.id); }); }
+    // `departments`, `user`, `d`, `x` are all block-local — only `users` should bubble up.
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("DataSource", {
+          events: {
+            loaded: parsedEvent(
+              "(departments) => { users.map(user => { const d = departments.find(x => x.id === user.id); return d; }); }",
+            ),
+          },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toEqual(["users"]);
+  });
+
+  it("const/let-declared identifier used as method-call receiver does NOT leak", () => {
+    // Same scope-respect rule for block-scoped const/let, not just arrow params.
+    // The handler also reads parent-state `external` so we exercise the read path
+    // (which is what drives container narrowing — write-only targets are excluded
+    // by design, see Bug 20).
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("Button", {
+          events: {
+            click: parsedEvent(
+              "const arr = [1, 2, 3]; const filtered = arr.filter(n => n > external);",
+            ),
+          },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    // `arr`, `filtered`, `n` are local; only `external` (a free read from parent state)
+    // bubbles up. The Bug 22 fix ensures `arr` (receiver of `.filter(...)`) is filtered.
+    expect(root.computedUses).not.toContain("arr");
+    expect(root.computedUses).toContain("external");
   });
 });

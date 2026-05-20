@@ -252,13 +252,21 @@ export function collectVariableDependencies(
           if (program.obj.type === T_MEMBER_ACCESS_EXPRESSION) {
             const caller = program.obj;
             if (caller.obj.type === T_IDENTIFIER) {
-              if (
-                typeof get(referenceTrackedApis, `${caller.obj.name}.${caller.member}`) ===
-                "function"
-              ) {
-                uncDeps.push(`${caller.obj.name}.${caller.member}`);
-              } else {
-                uncDeps.push(`${caller.obj.name}`);
+              // Respect block scope: a function call like `param.method(...)` where
+              // `param` is a locally declared identifier (arrow-fn parameter,
+              // const/let in the current scope, etc.) is NOT a parent-state
+              // dependency. Skip it to avoid polluting computedUses with names
+              // that don't live in the parent container.
+              const callerScope = getIdentifierScope(caller.obj, evalContext, thread);
+              if (callerScope.type !== "block") {
+                if (
+                  typeof get(referenceTrackedApis, `${caller.obj.name}.${caller.member}`) ===
+                  "function"
+                ) {
+                  uncDeps.push(`${caller.obj.name}.${caller.member}`);
+                } else {
+                  uncDeps.push(`${caller.obj.name}`);
+                }
               }
             } else if (
               caller.obj.type === T_MEMBER_ACCESS_EXPRESSION ||

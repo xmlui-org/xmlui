@@ -17,7 +17,7 @@
 | ~~C~~ | ~~Context vars in event handlers (`$url`, `$method`, `$queryParams`)~~ | ~~`DataSource.spec.ts`~~ | ~~1~~ | ✅ fixed |
 | D | Deferred / background async operations | `cancel-a-deferred-api-operation.spec.ts` | 2 | ❌ failed |
 | D | Deferred / background async operations | `handle-background-operations.spec.ts` | 2 | ❌ failed |
-| E | DataSource dependency chain | `delay-a-datasource-until-another-datasource-is-ready.spec.ts` | 2 | ❌ failed |
+| ~~E~~ | ~~DataSource dependency chain~~ | ~~`delay-a-datasource-until-another-datasource-is-ready.spec.ts`~~ | ~~2~~ | ✅ fixed |
 | F | Table multi-row selection | `enable-multi-row-selection-in-a-table.spec.ts` | 2 | ❌ failed |
 | ~~G~~ | ~~Tree async loading (`loaded` field)~~ | ~~`Tree-loaded-field.spec.ts`~~ | ~~3~~ | ✅ fixed |
 | H | Flaky | `MessageListener.spec.ts`, `Select.spec.ts`, `FormBindingBehavior.spec.ts` | 3 | ⚠️ flaky |
@@ -86,18 +86,11 @@ when it changes, leaving buttons stuck in wrong enabled state.
 
 ---
 
-## Group E — DataSource dependency chain
+## Group E — ✅ FIXED — DataSource dependency chain
 
-**Root cause hypothesis:** Sequential DataSource loading relies on `isReady`/`isLoading` state of the first  
-source gating the second. If `computedUses` scopes out those cross-component state flags, the second  
-DataSource may fire before the first is ready, or the Select may not receive updated options.
+**Fixed by:** Bug 22 — `collectVariableDependencies` тепер поважає block scope у гілці `T_FUNCTION_INVOCATION_EXPRESSION`. Параметри arrow-функцій (`departments` у `onLoaded`) більше не витікають у `computedUses` через виклики `param.method(...)`. Це звільняє App від хибного звуження до `["departments"]` і дозволяє DataSource APIs (`users_for_ds_dependency`) бути видимими сусіднім компонентам.
 
-**File:** `xmlui/tests-e2e/how-to-examples/delay-a-datasource-until-another-datasource-is-ready.spec.ts`
-
-| Line | Test name |
-|------|-----------|
-| 29:3 | Load departments only after users are ready › Run loads users then departments and renders resolved Select options |
-| 46:3 | Load departments only after users are ready › selecting a loaded user updates the Select value |
+All 3 tests in `xmlui/tests-e2e/how-to-examples/delay-a-datasource-until-another-datasource-is-ready.spec.ts` тепер проходять.
 
 ---
 
@@ -188,8 +181,8 @@ These packages didn't exist or weren't tested at the time of the original triage
 
 ## Priority for investigation
 
-1. **✅ Done:** Groups A, B, C, G — computedUses / event-handler scope fixes (Bug 20–21)
-2. **High (likely computedUses regression):** Groups D, E, F — async state gating, cross-component flags
+1. **✅ Done:** Groups A, B, C, E, G — computedUses / event-handler scope fixes (Bug 20–22)
+2. **High (likely computedUses regression):** Groups D, F — async state gating, cross-component flags
 3. **Medium (possibly computedUses):** Group J — compound component `$this` / `$queryParams` scoping
 4. **Low / skip:** Group K — timing-sensitive tests, not computedUses
 5. **Infrastructure / ignore:** Groups H, I, L — flaky env, new extension packages
