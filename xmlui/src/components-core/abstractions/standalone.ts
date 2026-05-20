@@ -146,9 +146,32 @@ export type StandaloneAppDescription = {
    *   warn-level diagnostics so apps can audit before the strict
    *   default flips. Flips to `true` in the next major. See
    *   `dev-docs/plans/09-forms-validation-discipline.md`.
-   * - `strictRouting` (boolean, default `false`) — when `true`, defended-routing
-   *   diagnostics such as rejected constraints and non-canonical URLs escalate to
-   *   errors. Wave 4 keeps the default warn/additive.
+   * - `strictRouting` (boolean, default `true`) — when `true` (the default),
+   *   defended-routing diagnostics such as rejected constraints and
+   *   non-canonical URLs escalate to errors and `nonCanonicalUrl` defaults to
+   *   `"redirect"`. Set to `false` to revert to the pre-1.0 lax behaviour
+   *   (warn-only, no automatic redirect). See `dev-docs/plans/10-defended-routing.md`.
+   * - `guardOnPopState` (boolean, default `true`) — when `true`, browser-driven
+   *   navigations (back/forward, direct URL entry) that the global
+   *   `willNavigate` handler rejects are reverted and emit a
+   *   `kind:"navigate"` `guard-bypass-attempt` diagnostic. Set to `false`
+   *   to opt out (only the programmatic `navigate()` path is guarded).
+   * - `interceptExternalNavigation` (boolean, default `false`) — when `true`,
+   *   same-origin anchor clicks and GET form submissions are routed through
+   *   `appContext.navigate` so that the `willNavigate` guard, per-page guards,
+   *   and the `kind:"navigate"` trace pipeline observe them. Cross-origin links,
+   *   modifier-key clicks, `target` other than `_self`, `download` anchors, and
+   *   elements with `data-xmlui-bypass-router` are passed through unchanged.
+   * - `urlCase` (`"preserve" | "lower"`, default `"preserve"`) — URL path
+   *   canonicalisation policy. When `"lower"`, paths are lower-cased before
+   *   matching.
+   * - `urlTrailingSlash` (`"preserve" | "always" | "never"`, default `"preserve"`)
+   *   — trailing-slash canonicalisation policy.
+   * - `urlQueryParamOrder` (`"preserve" | "alphabetical"`, default `"preserve"`)
+   *   — query-parameter ordering canonicalisation policy.
+   * - `nonCanonicalUrl` (`"warn" | "rewrite" | "redirect"`, default `"warn"` in
+   *   non-strict, `"redirect"` in strict) — what to do when the incoming URL
+   *   differs from the canonical form.
    * - `strictI18n` (boolean, default `false`) — when `true`, missing locale
    *   bundles/keys and invalid ICU patterns escalate to errors. Wave 4 keeps
    *   fallback rendering in non-strict mode.

@@ -139,7 +139,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `action-execution.md` | Action model, ApiBoundComponent, nested actions | Event handling, API calls |
 | `user-defined-components.md` | UDCs, slots, template composition | User-facing extensibility |
 | `form-infrastructure.md` | Form/FormItem, validation, dirty/touched state | Form components |
-| `routing.md` | Pages/Page, react-router integration, navigation | Routing changes |
+| `routing.md` | Pages/Page, react-router integration, navigation, defended-routing constraints/guards/canonicalisation, diagnostic codes | Routing changes, constraint authoring, navigation guards |
 | `extension-packages.md` | Extension interface, registration, build config | Extension package work |
 | `app-context.md` | Global functions, Actions namespace, utilities | Adding global functions |
 | `option-components.md` | Option/OptionContext, search, filtering | Select, AutoComplete, RadioGroup |

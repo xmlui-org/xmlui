@@ -285,6 +285,10 @@
                             to="/docs/managed-react/structured-exception-model"
                         />
                         <NavLink
+                            label="Defended Routing"
+                            to="/docs/managed-react/defended-routing"
+                        />
+                        <NavLink
                             label="Code Injection Prevention"
                             to="/docs/managed-react/code-injection-prevention"
                         />
@@ -2571,6 +2575,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/structured-exception-model.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/defended-routing"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/defended-routing.md']}"
                 />
             </Page>
             <Page

@@ -313,7 +313,7 @@ When the DOM sandbox blocks a raw browser API (see `expression-eval.md` § 2a), 
 - `errorCorrelationIdHeader: string` (default `"X-Correlation-Id"`) — HTTP response header from which `AppError.correlationId` is read on fetch failures.
 - `strictTypeContracts: boolean` (default `true`) — escalates type-contract diagnostics for unknown props, wrong literal types, missing required props, invalid enum values, unknown events, and runtime expression-value mismatches. Set to `false` for warn-only migration mode. See plan #01.
 - `strictAuditLogging: boolean` (default `false`) — when `true`, the default redaction policy blocks on un-redacted PII fields and the sink behaviour changes from "drop on backpressure" to "bounded buffer then drop with `audit-loss` diagnostic". See plan #15.
-- `strictRouting: boolean` (default `false`) — escalates defended-routing diagnostics from warn to error. See plan #10.
+- `strictRouting: boolean` (default `true`) — escalates defended-routing diagnostics from warn to error and flips `nonCanonicalUrl` defaults to `"redirect"`. Set `false` to opt out. See plan #10.
 - `strictI18n: boolean` (default `false`) — escalates missing bundle/key and ICU diagnostics. See plan #11.
 - `defaultLocale: string` (default `"en"`) — fallback locale for `App.locale`.
 - `localePersistKey: string | null` (default `"xmlui.locale"`) — localStorage key for user locale persistence; `null` disables persistence.

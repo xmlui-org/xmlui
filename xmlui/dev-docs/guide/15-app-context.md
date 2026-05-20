@@ -478,7 +478,7 @@ These `appGlobals` keys gate the rollout of the long-running Managed React plans
 | `errorCorrelationIdHeader` | `string` | `"X-Correlation-Id"` | HTTP response header from which `AppError.correlationId` is read on fetch failures. | [#07](../plans/07-structured-exception-model.md) |
 | `strictTypeContracts` | `boolean` | `true` | Escalates type-contract diagnostics for unknown props, wrong literal types, missing required props, invalid enum values, unknown events, and runtime expression-value mismatches. Set to `false` for warn-only migration mode. | [#01](../plans/01-verified-type-contracts.md) |
 | `strictAuditLogging` | `boolean` | `false` | When `true`, the default redaction policy blocks on un-redacted PII fields and the sink behaviour changes from "drop on backpressure" to "bounded buffer then drop with `audit-loss` diagnostic". | [#15](../plans/15-audit-grade-observability.md) |
-| `strictRouting` | `boolean` | `false` | Escalates defended-routing diagnostics such as rejected constraints and non-canonical URLs. | [#10](../plans/10-defended-routing.md) |
+| `strictRouting` | `boolean` | `true` | Escalates defended-routing diagnostics such as rejected constraints and non-canonical URLs (and flips `nonCanonicalUrl` defaults to `"redirect"`). Set `false` to opt out. | [#10](../plans/10-defended-routing.md) |
 | `strictI18n` | `boolean` | `false` | Escalates missing bundle/key and ICU diagnostics. | [#11](../plans/11-i18n-foundations.md) |
 | `defaultLocale` | `string` | `"en"` | Fallback locale for `App.locale`. | [#11](../plans/11-i18n-foundations.md) |
 | `localePersistKey` | `string \| null` | `"xmlui.locale"` | localStorage key for user locale persistence; `null` disables persistence. | [#11](../plans/11-i18n-foundations.md) |

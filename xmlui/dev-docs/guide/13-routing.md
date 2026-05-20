@@ -181,7 +181,30 @@ Attach a constraint after a dynamic segment:
 
 Supported constraints are `string`, `int`, `number`, and `enum(...)`. Numeric constraints accept
 optional `min` and `max` parameters. Validated values are coerced before they are exposed through
-`$routeParams`.
+`$routeParams`. Any name not in the built-in set is resolved against the **forms validator
+registry** (`App.registerValidator`); see *Custom Constraints* below.
+
+### Custom Constraints
+
+Route constraints fall back to the same validator registry that powers form
+validators. Register a validator and use its name directly in a `Page url`:
+
+```xml
+<App>
+  <script>
+    App.registerValidator("hex6", (value) => /^[0-9a-f]{6}$/i.test(String(value)));
+  </script>
+  <Page url="/swatch/:colour:hex6">
+    <Text>Swatch: #{$routeParams.colour}</Text>
+  </Page>
+</App>
+```
+
+Custom validators must be **synchronous**. The constraint compiler treats a
+returned `Promise` as a rejection (with diagnostic `code:"constraint-rejected"`)
+because URL validation runs on the render path. Throwing inside a validator also
+counts as a rejection. Parameters in `:name(arg1,arg2)` are forwarded as the
+validator's `params.args` array.
 
 ### Query Constraints
 
@@ -228,6 +251,53 @@ Rejected guards emit `code:"guard-bypass-attempt"`.
 
 `nonCanonicalUrl="warn"` only logs. `rewrite` and `redirect` currently replace the visible URL with
 the canonical form. Diagnostics use `code:"non-canonical-url"`.
+
+### External Navigation Interception
+
+Programmatic `navigate()` and React-Router `<Link>` always pass through the
+defended-routing pipeline. Raw `<a href>` clicks and `<form>` submissions
+bypass it by default — they hit the browser directly. Opt in with
+`appGlobals.interceptExternalNavigation: true`:
+
+```jsonc
+// config.json
+{
+  "appGlobals": { "interceptExternalNavigation": true }
+}
+```
+
+When enabled, a delegated `click`/`submit` listener routes same-origin
+anchor navigations and GET form submissions through `appContext.navigate`,
+so `willNavigate`, `Page guard`, and the `kind:"navigate"` trace pipeline
+all observe them. The interceptor deliberately ignores cross-origin links,
+modifier-key clicks (cmd/ctrl/shift/alt), `target` other than `_self`,
+`download` anchors, `rel="external"`, non-GET forms, and any element
+carrying `data-xmlui-bypass-router`.
+
+### Strict Mode
+
+Strict routing is **on by default** (`appGlobals.strictRouting` defaults
+to `true`). Defended-routing diagnostics escalate to errors and
+`nonCanonicalUrl` defaults to `"redirect"`. Opt out only for legacy apps
+that need pre-1.0 warn-only behaviour:
+
+```jsonc
+{ "appGlobals": { "strictRouting": false } }
+```
+
+### Diagnostic Codes
+
+The trace pipeline emits `pushXsLog({ kind: "navigate", code, … })` for
+every defended-routing event. Inspector surfaces them in the navigation
+timeline:
+
+| Code | Meaning |
+|---|---|
+| `constraint-rejected` | A route or query constraint rejected the incoming value. |
+| `unknown-constraint` | The constraint name is neither built-in nor registered. The segment falls back to unconstrained `string`. |
+| `duplicate-constraint` | Two route constraints disagree on the same segment name. |
+| `non-canonical-url` | The incoming URL differs from the canonical form; the action depends on `nonCanonicalUrl`. |
+| `guard-bypass-attempt` | The global `willNavigate` or a `Page guard` rejected a navigation; the user-agent state was reverted. |
 
 ---
 

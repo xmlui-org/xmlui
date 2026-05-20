@@ -328,15 +328,21 @@ selectable.
 
 **What is missing.**
 
-- **No type or constraint syntax on route segments.** `:id` is a string until
-  the developer parses it.
-- **`willNavigate` is bypassable.** Browser back/forward and direct URL
-  entry skip the guard.
-- **No URL canonicalization.** Trailing slashes, case, and query parameter
-  ordering are user concerns.
+- ~~**No type or constraint syntax on route segments.** `:id` is a string until
+  the developer parses it.~~ **Resolved (Wave 4, plan #10).** `<Page url="/users/:id:int(min=1)">`
+  is now first-class; custom constraint names resolve through `App.registerValidator()`.
+- ~~**`willNavigate` is bypassable.** Browser back/forward and direct URL
+  entry skip the guard.~~ **Resolved (Wave 4, plan #10).** Pop-state navigations
+  fire the guard (gated by `appGlobals.guardOnPopState`, default `true`); raw
+  `<a>` / `<form>` interception is opt-in via
+  `appGlobals.interceptExternalNavigation`.
+- ~~**No URL canonicalization.** Trailing slashes, case, and query parameter
+  ordering are user concerns.~~ **Resolved (Wave 4, plan #10).** `App` exposes
+  `urlCase`, `urlTrailingSlash`, `urlQueryParamOrder`, and `nonCanonicalUrl`.
 
-**Verdict.** Routing is convenient but not defensive. A managed framework
-would treat the URL as an untrusted boundary and demand a contract.
+**Verdict.** ✅ **Defended.** Routing now treats the URL as an untrusted boundary:
+typed constraints, all-trigger guards, and canonicalisation are first-class. Strict
+defaults flip in the next major release.
 
 ---
 
@@ -520,7 +526,7 @@ Combining the original report with the new dimensions:
 | **Concurrency / cancellation** | **Predictable, uncoordinated** | Cooperative cancellation token; in-flight guard primitive |
 | **Theming sandbox** | **Mostly scoped** | Typed theme variables; restrict inline-style escape hatch |
 | **Forms validation** | **State strong, validators absent** | Built-in validators, server-error mapping, submit guard |
-| **Routing input** | **Convenient, undefended** | Route constraints, URL canonicalisation |
+| **Routing input** | ✅ **Defended (strict by default)** | Typed/custom constraints, all-trigger guards (pop-state + opt-in anchor/form interception), URL canonicalisation, `strictRouting` default-on — plan #10 |
 | **i18n** | **Dates only** | String externalisation, ICU plurals, RTL guarantees |
 | **Versioning** | **Mechanism present, unenforced** | LSP deprecation diagnostics, prop-level deprecation |
 | **Build-time validation** | **Parse only** | Metadata-driven type/identifier diagnostics |

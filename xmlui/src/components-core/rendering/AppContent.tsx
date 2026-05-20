@@ -342,7 +342,7 @@ export function AppContent({
               to: currentPath,
               routingDiagnostic: {
                 code: "guard-bypass-attempt",
-                severity: appGlobals?.strictRouting === true ? "error" : "warn",
+                severity: appGlobals?.strictRouting !== false ? "error" : "warn",
                 message: "Navigation was rejected by willNavigate after a browser-driven route change.",
               },
             });
@@ -359,6 +359,75 @@ export function AppContent({
       }
     }
   }, [appGlobals?.guardOnPopState, appGlobals?.strictRouting, location, navigateRouter, navigationHandlers]);
+
+  // --- Plan #10 Step 2.1 — Anchor + form interception (opt-in).
+  // When `appGlobals.interceptExternalNavigation === true`, same-origin
+  // anchor clicks and same-origin form submissions are routed through
+  // `appContext.navigate` so the `willNavigate` guard, per-page guards,
+  // and the `kind:"navigate"` trace pipeline observe them. Cross-origin
+  // links, modifier-key clicks, `target="_blank"`, and explicit
+  // `data-xmlui-bypass-router` opt-outs are passed through unchanged.
+  useEffect(() => {
+    if (appGlobals?.interceptExternalNavigation !== true) return;
+    if (typeof document === "undefined") return;
+
+    const sameOrigin = (href: string): string | null => {
+      try {
+        const url = new URL(href, window.location.href);
+        if (url.origin !== window.location.origin) return null;
+        return url.pathname + url.search + url.hash;
+      } catch {
+        return null;
+      }
+    };
+
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented) return;
+      if (event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target as Element | null;
+      const anchor = target?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!anchor) return;
+      if (anchor.dataset.xmluiBypassRouter !== undefined) return;
+      const targetAttr = anchor.getAttribute("target");
+      if (targetAttr && targetAttr !== "_self") return;
+      if (anchor.hasAttribute("download")) return;
+      if (anchor.getAttribute("rel")?.includes("external")) return;
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+        return;
+      }
+      const path = sameOrigin(href);
+      if (!path) return;
+      event.preventDefault();
+      void navigate(path);
+    };
+
+    const onSubmit = (event: SubmitEvent) => {
+      if (event.defaultPrevented) return;
+      const form = event.target as HTMLFormElement | null;
+      if (!form || form.tagName !== "FORM") return;
+      if (form.dataset.xmluiBypassRouter !== undefined) return;
+      const method = (form.method || "get").toLowerCase();
+      if (method !== "get") return;
+      if (form.target && form.target !== "_self") return;
+      const action = form.getAttribute("action") || window.location.pathname;
+      const path = sameOrigin(action);
+      if (!path) return;
+      const params = new URLSearchParams(new FormData(form) as any);
+      const query = params.toString();
+      const url = path.split("?")[0] + (query ? `?${query}` : "");
+      event.preventDefault();
+      void navigate(url);
+    };
+
+    document.addEventListener("click", onClick, true);
+    document.addEventListener("submit", onSubmit, true);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      document.removeEventListener("submit", onSubmit, true);
+    };
+  }, [appGlobals?.interceptExternalNavigation, navigate]);
 
   // --- Create PubSubService with stable reference across renders
   const pubSubServiceRef = useRef(createPubSubService());

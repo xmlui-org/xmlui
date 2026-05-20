@@ -1,3 +1,4 @@
+import { lookupValidator } from "../forms";
 import type { RoutingDiagnostic } from "./diagnostics";
 
 export interface CompiledConstraint {
@@ -232,8 +233,54 @@ function createConstraint(name: string, rawParams?: string): CompiledConstraint 
       };
     }
     default:
-      return undefined;
+      return createRegistryConstraint(name, rawParams);
   }
+}
+
+/**
+ * Step 1.2 — Custom constraints via the forms validator registry.
+ *
+ * If the constraint name is not a built-in, look it up in the shared
+ * `App.registerValidator()` registry. The validator's `fn` is reused
+ * synchronously: a `null` / `undefined` / `""` return means valid,
+ * any string means invalid. Async (Promise-returning) validators are
+ * rejected — route validation runs on the render path and cannot
+ * await. Constraint parameters parse as a comma-separated list and
+ * are forwarded as `{ args: [...] }`.
+ */
+function createRegistryConstraint(name: string, rawParams?: string): CompiledConstraint | undefined {
+  const entry = lookupValidator(name);
+  if (!entry) return undefined;
+  const args = rawParams === undefined
+    ? undefined
+    : rawParams.split(",").map((part) => coerceParamValue(part.trim()));
+  const params = args ? { args } : undefined;
+  const ctx = { fieldName: "", formData: {} as Record<string, unknown> };
+  return {
+    name,
+    params,
+    validate: (raw) => {
+      try {
+        const result = entry.fn(raw, ctx, params);
+        if (result && typeof (result as Promise<unknown>).then === "function") {
+          return false;
+        }
+        return result == null || result === "";
+      } catch {
+        return false;
+      }
+    },
+    coerce: String,
+  };
+}
+
+function coerceParamValue(raw: string): unknown {
+  if (raw === "") return raw;
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  const n = Number(raw);
+  if (raw.trim() !== "" && Number.isFinite(n)) return n;
+  return raw;
 }
 
 function parseQueryConstraints(
