@@ -188,7 +188,7 @@ export function useCompiledTheme(
       ...resolvedThemeVarsFromChains,
     };
 
-    if (import.meta.env.DEV || strictTheming) {
+    if (strictTheming) {
       const resolvedForValidation = new Map<string, string>();
       Object.keys(rawVars).forEach((key) => {
         resolvedForValidation.set(key, resolveThemeVar(key, rawVars));
@@ -216,19 +216,17 @@ export function useCompiledTheme(
           console.warn(`[XMLUI Theme] ${d.message}`);
         }
       }
-      if (strictTheming) {
-        const errorVarNames = new Set(
-          diags
-            .filter((d) => d.severity === "error" && d.code !== "unknown-theme-variable")
-            .map((d) => d.variableName!)
-            .filter(Boolean),
+      const errorVarNames = new Set(
+        diags
+          .filter((d) => d.severity === "error" && d.code !== "unknown-theme-variable")
+          .map((d) => d.variableName!)
+          .filter(Boolean),
+      );
+      if (errorVarNames.size > 0) {
+        const filteredRawVars = Object.fromEntries(
+          Object.entries(rawVars).filter(([k]) => !errorVarNames.has(k)),
         );
-        if (errorVarNames.size > 0) {
-          const filteredRawVars = Object.fromEntries(
-            Object.entries(rawVars).filter(([k]) => !errorVarNames.has(k)),
-          );
-          return [resolveThemeVarsWithCssVars(filteredRawVars), rawVars];
-        }
+        return [resolveThemeVarsWithCssVars(filteredRawVars), rawVars];
       }
     }
 
@@ -250,8 +248,6 @@ export function useCompiledTheme(
         });
         if (strictAccessibility) {
           console.error(`[XMLUI Accessibility] ${d.message}`);
-        } else {
-          console.warn(`[XMLUI Accessibility] ${d.message}`);
         }
       }
     }
