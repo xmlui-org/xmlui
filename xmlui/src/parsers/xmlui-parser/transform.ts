@@ -615,6 +615,9 @@ export function nodeToComponentDef(
       case "testId":
         comp.testId = value;
         return;
+      case "automationId":
+        comp.automationId = value;
+        return;
       case "when":
         comp.when = value;
         return;

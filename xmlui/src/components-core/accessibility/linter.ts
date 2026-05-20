@@ -8,14 +8,14 @@
  * console output. The caller (LSP server, Vite plugin, or test) decides what
  * to do with the results.
  *
- * Phase 1 rules implemented here:
+ * Accessibility rules implemented here:
  *   1. `missing-accessible-name`      (must-have; strict-escalated to error)
  *   2. `icon-only-button-no-label`    (must-have; strict-escalated to error)
  *   3. `modal-no-title`               (must-have; strict-escalated to error)
  *   4. `form-input-no-label`          (must-have; strict-escalated to error)
  *   5. `duplicate-landmark`           (warn only)
  *   6. `redundant-aria-role`          (warn only)
- *   7. `missing-skip-link`            (warn only; stub — requires SkipLink component)
+ *   7. `missing-skip-link`            (warn only)
  */
 
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
@@ -67,6 +67,7 @@ export function lintComponentDef(
 
   const diagnostics: A11yDiagnostic[] = [];
   const landmarksSeen = new Map<string, number>(); // landmark role → count
+  const skipLinkCandidates: ComponentDef[] = [];
 
   walkTree(def, (node, _parent) => {
     const metadata = registry.get(node.type);
@@ -84,6 +85,22 @@ export function lintComponentDef(
     // Rule 4: form-input-no-label
     if (metadata?.a11y?.role === "form-input") {
       checkFormInputNoLabel(node, _parent, registry, diagnostics, mustHaveSeverity);
+    }
+
+    // Rule 6: redundant-aria-role
+    const implicitRole = IMPLICIT_ROLE_BY_TYPE[node.type];
+    if (implicitRole && node.props?.role === implicitRole) {
+      diagnostics.push({
+        code: "redundant-aria-role",
+        severity: "warn",
+        componentName: node.type,
+        message: `<${node.type}> already has implicit role="${implicitRole}". Remove the redundant role prop.`,
+        fix: `Remove \`role="${implicitRole}"\` from <${node.type}>.`,
+      });
+    }
+
+    if (node.type === "App" || node.type === "Page") {
+      skipLinkCandidates.push(node);
     }
 
     if (!metadata) {
@@ -135,10 +152,32 @@ export function lintComponentDef(
         });
       }
     }
+
   });
+
+  for (const candidate of skipLinkCandidates) {
+    if (hasDescendant(candidate, "NavPanel") && !hasDescendant(candidate, "SkipLink")) {
+      diagnostics.push({
+        code: "missing-skip-link",
+        severity: "warn",
+        componentName: candidate.type,
+        message: `<${candidate.type}> contains navigation but no <SkipLink>. Keyboard users need a fast path to main content.`,
+        fix: `Add \`<SkipLink target="main" />\` before the navigation region.`,
+      });
+    }
+  }
 
   return sortDiagnostics(diagnostics);
 }
+
+const IMPLICIT_ROLE_BY_TYPE: Record<string, string> = {
+  nav: "navigation",
+  main: "main",
+  header: "banner",
+  footer: "contentinfo",
+  aside: "complementary",
+  button: "button",
+};
 
 // ---------------------------------------------------------------------------
 // Individual rule implementations
@@ -264,6 +303,14 @@ function walkTree(
       }
     }
   }
+}
+
+function hasDescendant(node: ComponentDef, type: string): boolean {
+  let found = false;
+  walkTree(node, (child) => {
+    if (child !== node && child.type === type) found = true;
+  });
+  return found;
 }
 
 // ---------------------------------------------------------------------------

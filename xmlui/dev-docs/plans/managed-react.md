@@ -85,28 +85,20 @@ type safety: structurally, not aspirationally.
 arrow-key navigation in option lists. Every form input is paired with a `Label`
 component that wires `htmlFor`/`id` automatically.
 
-**What is missing for a "managed" claim.**
+Plan #05 moves those conventions into framework enforcement. The accessibility
+linter runs against parsed markup through the LSP and Vite plugin, component
+metadata declares roles and accessible-name props, the theme resolver checks
+well-known foreground/background contrast pairs, and `automationId` renders a
+stable `data-automation-id` hook for automation tooling. Runtime primitives
+`<SkipLink>`, `<FocusScope>`, and `<LiveRegion>` centralize skip navigation,
+focus trapping/restoration, and polite/assertive announcements; toasts and app
+errors now announce through the global live region.
 
-- **No build-time a11y verification.** Nothing prevents shipping an icon
-  `Button` without `label` or `aria-label`. WPF's AutomationPeer and JavaFX's
-  Accessible API enforce a name on every actionable node; XMLUI does not.
-- **No automated contrast / hit-target validation.** Theme resolution is
-  unconstrained — a custom theme can produce 1.2:1 text on background. .NET's
-  high-contrast theming layer surfaces violations; XMLUI does not.
-- **No automation tree.** A managed framework exposes a separate accessibility
-  tree (UIA in Windows, AT-SPI on Linux). XMLUI inherits whatever accessibility
-  surface the underlying React+DOM produces; there is no XMLUI-level automation
-  ID mechanism beyond passing `testId`.
-- **Keyboard policy is component-local.** Each component implements its own
-  keymap. There is no central focus manager, no skip-link primitive, no
-  documented modal-stack discipline.
-
-**Verdict.** Accessibility is *documented and conventional*, not *enforced by
-construction*. To match the original "managed" pitch, XMLUI would need a
-parse-time linter ("interactive component without an accessible name"),
-a theme-time contrast checker, and a small set of framework primitives
-(`SkipLink`, `FocusScope`, `LiveRegion`) that components are required to
-participate in.
+**Verdict.** Accessibility is now *enforced by managed framework surfaces*:
+authors get build/editor diagnostics for common violations, runtime primitives
+for keyboard and screen-reader flows, contrast warnings during theme resolution,
+and stable automation hooks. `strictAccessibility` remains opt-in during the
+migration window, with the default flip reserved for the next major release.
 
 ---
 
@@ -525,7 +517,7 @@ Combining the original report with the new dimensions:
 | Reactive cycle detection | ✅ **Verified** | Static/runtime graph analyzer with Tarjan SCC detection, runtime `reactive-cycle` traces, LSP related locations, Vite warn/strict checks, and default-on `strictReactiveGraph`. |
 | Observability | **Strong** | Add server sink + redaction; **trace kind union extended with sandbox/log/app/clipboard/navigate/ws/eventsource kinds (2026-04)** |
 | DOM API isolation | **Strong** *(was Weak)* | Property-access guard + 99-entry denylist + sanctioned replacement globals + `App.fetch` Gate + `<WebSocket>`/`<EventSource>` components + `App.environment` shipped 2026-04. **Phase 1, 2, and 3 of the hardening plan are all complete.** |
-| **Accessibility** | **Documented only** | Parse-time linter; framework focus / live-region primitives; theme contrast checker |
+| **Accessibility** | ✅ **Enforced** | LSP/Vite a11y linter; `<SkipLink>` / `<FocusScope>` / `<LiveRegion>` primitives; theme contrast checker; `automationId` hooks; `strictAccessibility` opt-in until next major |
 | **Type contracts** | ✅ **Verified** | LSP, Vite, and runtime expression diagnostics against metadata; `check:metadata` guards TS↔metadata drift; `strictTypeContracts` is default-on |
 | **Resource lifecycle** | ✅ **Symmetric** | Universal `onMount`/`onUnmount`/`onError` events on every component; `<Lifecycle>` declarative effect primitive; container `onBeforeDispose` async-flush hook; `strictLifecycle` default-on (plan #04, W8-1) |
 | **Exception model** | ✅ **Structured** | `AppError` with `code`/`category`/`retryable`/`correlationId`; `<RetryPolicy>` with backoff + `Retry-After` honouring + circuit breaker; `<Fallback>` declarative recovery UI; `<App onError>` global sink + `App.errors` buffer + Inspector "Errors" tab; `strictErrors` default-on (plan #07, W8-1) |

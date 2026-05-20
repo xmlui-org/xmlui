@@ -137,6 +137,9 @@ import { dateInputComponentRenderer } from "./DateInput/DateInput";
 import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
 import { timerComponentRenderer } from "./Timer/Timer";
 import { lifecycleComponentRenderer } from "./Lifecycle/Lifecycle";
+import { skipLinkComponentRenderer } from "./SkipLink/SkipLink";
+import { focusScopeComponentRenderer } from "./FocusScope/FocusScope";
+import { liveRegionComponentRenderer } from "./LiveRegion/LiveRegion";
 import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
@@ -484,6 +487,15 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Lifecycle !== "false") {
       this.registerCoreComponent(lifecycleComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_SkipLink !== "false") {
+      this.registerCoreComponent(skipLinkComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_FocusScope !== "false") {
+      this.registerCoreComponent(focusScopeComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_LiveRegion !== "false") {
+      this.registerCoreComponent(liveRegionComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);

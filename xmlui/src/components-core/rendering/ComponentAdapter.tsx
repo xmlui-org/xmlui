@@ -952,6 +952,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- The component has its "id" (internally, "uid") or "testId" property defined
       ((appContext?.decorateComponentsWithTestId &&
         (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
+        safeNode.automationId !== undefined ||
         // --- The component has its "inspectId" property defined
         inspectId !== undefined) &&
       // --- The component is visual
@@ -962,10 +963,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
       const testId = safeNode.testId || safeNode.uid;
       const resolvedUid = extractParam(state, testId, appContext, true);
+      const automationId = extractParam(state, safeNode.automationId, appContext, true);
       renderedNode = (
         <ComponentDecorator
           attr={{
             "data-testid": resolvedUid,
+            "data-automation-id": automationId,
             "data-inspectId": inspectId,
             "data-component-type": safeNode.type,
           }}

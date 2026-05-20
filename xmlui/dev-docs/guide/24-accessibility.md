@@ -338,9 +338,9 @@ Before marking a component as complete, verify:
 
 ---
 
-## Accessibility Linter (plan #05, Wave 1)
+## Enforced Accessibility (plan #05)
 
-XMLUI ships a build-time accessibility linter at [xmlui/src/components-core/accessibility/](../../src/components-core/accessibility/index.ts). It is the runtime/CLI surface for the long-running accessibility plan (plan #05). Phase 1 implements seven rules; runtime ARIA injection and full enforcement land in later waves.
+XMLUI ships an accessibility enforcement layer at [xmlui/src/components-core/accessibility/](../../src/components-core/accessibility/index.ts). It is the runtime/CLI surface for plan #05: parsed-markup linting, framework focus and announcement primitives, theme contrast checks, and stable automation IDs.
 
 ### Public API
 
@@ -359,19 +359,20 @@ const diagnostics: A11yDiagnostic[] = lintComponentDef(componentDef, options);
 
 Each `A11yDiagnostic` carries `code`, `severity` (`"error" | "warn"`), `componentName`, optional source `range` and `uri`, a human-readable `message`, and an optional `fix` quick-fix hint.
 
-### Phase 1 rules
+### Rules and diagnostics
 
-| Code | Default severity | Detects |
-|---|---|---|
-| `missing-accessible-name` | warn | Interactive element with no accessible name |
-| `icon-only-button-no-label` | warn | `<Button icon="...">` without `label` or `aria-label` |
-| `modal-no-title` | warn | `<Modal>` without a `title` prop or `<ModalTitle>` slot |
-| `form-input-no-label` | warn | Form input outside `<FormItem>` and without a `<Label>` |
-| `duplicate-landmark` | warn | More than one component with the same landmark role on a page |
-| `redundant-aria-role` | info | Explicit ARIA role duplicates the element's implicit role |
-| `missing-skip-link` | info (stub) | App/Page with NavPanel but no SkipLink sibling |
+| Code | Non-strict | Strict | Cause | Example fix |
+|---|---|---|---|---|
+| `missing-accessible-name` | warn | error | Interactive component metadata requires an accessible name, but the element has no name prop or named child. | Add `label`, `aria-label`, `title`, or an equivalent named child. |
+| `icon-only-button-no-label` | warn | error | `<Button icon="...">` has no `label`, `aria-label`, or `title`. | Add `aria-label="Save"` or a visible `label`. |
+| `modal-no-title` | warn | error | `<Modal>` has no `title` prop and no `<ModalTitle>` child. | Add `title="Confirm delete"` or a `<ModalTitle>`. |
+| `form-input-no-label` | warn | error | Form input is outside `<FormItem>` and has no `label` prop. | Wrap it in `<FormItem label="Email">` or add a component-level label. |
+| `duplicate-landmark` | warn | error | More than one component declares the same page landmark role. | Keep one landmark of that role or use a non-landmark wrapper. |
+| `redundant-aria-role` | warn | error | Explicit `role` duplicates the element's implicit ARIA role. | Remove the redundant `role` prop. |
+| `missing-skip-link` | warn | error | App/Page contains navigation but no `<SkipLink>` target path to main content. | Add `<SkipLink target="main" />` or enable `autoSkipLink`. |
+| `color-contrast-low` | warn | error | Theme foreground/background token pair falls below WCAG AA contrast. | Adjust the theme pair to reach at least 4.5:1 contrast. |
 
-The remaining `A11yCode` values (`color-contrast-low`, `interactive-not-keyboard-reachable`, `live-region-missing`) are reserved for later phases.
+The remaining `A11yCode` values (`interactive-not-keyboard-reachable`, `live-region-missing`) are reserved for future targeted lint rules. The framework primitives below cover the runtime side of those concerns today.
 
 ### Strict mode toggle
 
@@ -381,6 +382,15 @@ The linter is gated by `App.appGlobals.strictAccessibility: boolean` (default `f
 - **`true`**: warn-level findings escalate to `error`, causing the Vite build to fail. The flag flips to `true` in the next major release.
 
 When `strictAccessibility` is truthy at runtime, findings also emit `kind:"a11y"` entries into the Inspector trace (see [19-inspector-debugging.md](19-inspector-debugging.md)).
+
+### Framework primitives
+
+Plan #05 adds built-in primitives so app authors and framework components share one accessibility vocabulary:
+
+- `<SkipLink target="main" label="Skip to main content" />` renders a focus-visible skip link. `App.appGlobals.autoSkipLink: true` inserts the default skip link before app content.
+- `<FocusScope trap restore autoFocus />` centralizes focus trapping, initial focus, and focus restoration for overlays.
+- `<LiveRegion politeness="polite|assertive">` provides screen-reader announcements. Toasts and runtime errors also announce through the global live region.
+- `automationId="save-order"` renders `data-automation-id="save-order"` on the component decorator for stable E2E and automation hooks.
 
 ### Component `a11y` metadata block
 

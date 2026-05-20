@@ -32,6 +32,8 @@ import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
 import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import { announceLiveRegion, GlobalLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
+import { SkipLink } from "../../components/SkipLink/SkipLinkReact";
 import {
   compare,
   formatCurrency,
@@ -1443,18 +1445,22 @@ export function AppContent({
     }
     const wrapper: any = (message: unknown, opts?: any) => {
       logToast("default", message);
+      announceLiveRegion(message);
       return toast(message as any, opts);
     };
     wrapper.success = (message: unknown, opts?: any) => {
       logToast("success", message);
+      announceLiveRegion(message);
       return toast.success(message as any, opts);
     };
     wrapper.error = (message: unknown, opts?: any) => {
       logToast("error", message);
+      announceLiveRegion(message, "assertive");
       return toast.error(message as any, opts);
     };
     wrapper.loading = (message: unknown, opts?: any) => {
       logToast("loading", message);
+      announceLiveRegion(message);
       return toast.loading(message as any, opts);
     };
     wrapper.custom = (message: unknown, opts?: any) => {
@@ -1732,6 +1738,8 @@ export function AppContent({
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
+        <GlobalLiveRegion />
+        {(appGlobals as any)?.autoSkipLink === true && <SkipLink />}
         <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
       </AppStateContext.Provider>
     </AppContext.Provider>
@@ -1773,6 +1781,7 @@ function inferLocaleFromBundleUrl(url: string): string | undefined {
 function signError(error: Error | AppError | string | unknown) {
   const appError = AppError.from(error);
   const message = appError.message || "Something went wrong";
+  announceLiveRegion(message, "assertive");
   toast.error(message);
   // Always log to console so Playwright page.on('console') can capture it
   console.error("[xmlui]", message);

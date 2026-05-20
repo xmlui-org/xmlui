@@ -153,7 +153,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `build-system.md` | CLI commands, Vite plugin, framework builds | Build configuration |
 | `monorepo-structure.md` | Workspaces, Turborepo, changesets, releases | Repo structure, CI/CD |
 | `testing-conventions.md` | E2E + unit patterns, `initTestBed`, locators | Any testing work |
-| `accessibility.md` | ARIA, keyboard nav, per-component audit | Accessibility fixes |
+| `accessibility.md` | ARIA, keyboard nav, enforced a11y linter, primitives, contrast checks, automation IDs | Accessibility fixes |
 | `doc-generation.md` | Generate-docs pipeline, MetadataProcessor | Documentation generation |
 
 | `qa-checklist.md` | QA audit checklist — actionable per-section checklist for component reviews |

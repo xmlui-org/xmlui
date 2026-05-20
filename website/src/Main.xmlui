@@ -277,6 +277,10 @@
                             to="/docs/managed-react/themevars-namespace"
                         />
                         <NavLink
+                            label="Enforced Accessibility"
+                            to="/docs/managed-react/enforced-accessibility"
+                        />
+                        <NavLink
                             label="Managed Lifecycle Vocabulary"
                             to="/docs/managed-react/managed-lifecycle-vocabulary"
                         />
@@ -2569,6 +2573,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/themevars-namespace.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/enforced-accessibility"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/enforced-accessibility.md']}"
                 />
             </Page>
             <Page

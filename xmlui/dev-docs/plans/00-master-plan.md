@@ -97,7 +97,7 @@ Risk tier (A/B/C) matches Section 1. Wave column shows the
 | 8 | Theming sandbox | **Mostly scoped** | Typed theme variables (`Color`/`Length`/`Number`); inline-style boundary still porous; namespaced extension mechanism | C | W5 | [#08](./08-sealed-theming-sandbox.md) |
 | 2 | Themevars namespace | **Ad-hoc naming** | Canonical `--xmlui-<component>-<role>-<property>` namespace; lint rule for unknown/misspelled theme variables | A | W0 | [#02](./02-themevars-namespace.md) |
 | 9 | Forms validation | **State strong, validators absent** | Built-in validators (`email`/`url`/`length`/`range`/`pattern`); 422 → per-field server-error mapping; submit-spam guard; CSRF binding on Form | C | W5 | [#09](./09-forms-validation-discipline.md) |
-| 5 | Accessibility | **Documented only** | Parse-time a11y linter (actionable component without accessible name); contrast checker; `SkipLink`/`FocusScope`/`LiveRegion` primitives | A | W1 | [#05](./05-enforced-accessibility.md) |
+| 5 | Accessibility | **Enforced** | Parse-time a11y linter; LSP/Vite diagnostics; contrast checker; `SkipLink`/`FocusScope`/`LiveRegion`; `automationId` selectors | A | W1 | [#05](./05-enforced-accessibility.md) |
 | 10 | Routing input | **Convenient, undefended** | Route segment constraints (`{id:int:min(1)}` analogue); guards that survive back/forward; URL canonicalisation | B | W4 | [#10](./10-defended-routing.md) |
 | 11 | Internationalisation | **Dates only** | String externalisation; ICU plurals/select; locale collation helpers; RTL contract; currency formatting | B | W4 | [#11](./11-i18n-foundations.md) |
 | 15 | Audit-grade observability | **Browser only, unredacted** | OTLP/server sink; PII redaction policy; sampling; retention; search; correlation IDs across navigations and DataSources | B | W2 | [#15](./15-audit-grade-observability.md) |
@@ -719,7 +719,7 @@ The actual readiness as of the audit is:
 | #02 themevars | (lint-only) | rule stub registered, body not implemented | ❌ blocked by lint body + migration |
 | #03 reactive cycles | `strictReactiveGraph` | ✅ runtime + LSP + Vite all live | ✅ **flipped W8-1 (2026-05)** |
 | #04 lifecycle | `strictLifecycle` | ✅ dispatcher enforces; only docs pending | ✅ flip ready (docs co-land) |
-| #05 accessibility | `strictAccessibility` | analyzer rules exist but **not wired into LSP/Vite**; no `<SkipLink>` / `<FocusScope>` / `<LiveRegion>` | ❌ blocked by Phase 1 Step 1.3 + Phase 2 |
+| #05 accessibility | `strictAccessibility` | ✅ LSP/Vite analyzer rules, runtime trace kind, contrast checker, primitives, and `automationId` selectors all live | ✅ flip-ready (default flip remains next major) |
 | #06 concurrency | `strictConcurrency` | **read site missing** — flag is documented but not consumed anywhere in source | ❌ blocked by missing read site |
 | #07 exception model | `strictErrors` | `signError` + `ErrorBoundary` wrap; `LOADER_ERROR` mapping, `<App onError>`, `<RetryPolicy>`, `<Fallback>` not shipped | ❌ blocked by Phases 1.2 + 2 + 3 + 4 |
 | #08 theming sandbox | `strictTheming` | validators ship; **hot-path wiring in `StyleProvider` / `valueExtractor` not done** | ❌ blocked by Phase 1.2 + Phase 2 |
@@ -741,7 +741,7 @@ The actual readiness as of the audit is:
   #03/#16 already done).
 - **2 plans are flip-eligible with descope** (#09, #10).
 - **6 plans cannot flip until non-flip work lands** (#01, #02,
-  #05, #07, #08, #11, #12).
+  #07, #08, #11, #12).
 - **1 strict switch is a no-op** (#06 `strictConcurrency` —
   documented but unread).
 
@@ -792,26 +792,20 @@ phase/step labels from the source plan document.
   `managed-react.md` §5 update.
 - ⬜ Phase 4 Step 4.2 — Default flip of `strictLifecycle`.
 
-#### Plan #05 — Enforced accessibility *(STATUS.md previously overclaimed)*
+#### Plan #05 — Enforced accessibility
 
-- 🟡 Phase 1 Step 1.1 — A11y metadata annotations across all
-  built-in components (linter reads metadata but not every
-  component is annotated).
-- ✅ Phase 1 Step 1.3 — Wire `lintComponentDef()` into the LSP
-  diagnostic provider and the Vite plugin. LSP emits `xmlui-a11y`
-  diagnostics with quick-fix data; Vite plugin emits per-file
-  warnings (errors in strict mode) and a `buildEnd` summary.
-  New `accessibility` + `a11yRegistry` options on `PluginOptions`.
-- ⬜ Phase 2 Step 2.1 — `<SkipLink>` component.
-- ⬜ Phase 2 Step 2.2 — `<FocusScope>` primitive (and
-  `<Modal>` / `<Drawer>` refactor onto it).
-- ⬜ Phase 2 Step 2.3 — `<LiveRegion>` component.
-- ⬜ Phase 3 Step 3.1 — Contrast-ratio checker at theme
-  resolution.
-- ⬜ Phase 4 Step 4.1 — `automationId` plumbing in
-  `ComponentAdapter`.
-- ⬜ Phase 4 Step 4.2 — Default flip.
-- ⬜ Phase 4 Step 4.3 — Guide chapter (`28-accessibility.md`).
+- ✅ Phase 1 — Accessibility metadata and lint diagnostics.
+  `lintComponentDef()` is wired through the LSP diagnostic provider
+  and the Vite plugin as `xmlui-a11y` diagnostics with strict-mode
+  escalation.
+- ✅ Phase 2 — `<SkipLink>`, `<FocusScope>`, and `<LiveRegion>` are
+  built-in framework primitives. Toasts and runtime errors announce
+  through the global live region; apps can enable `autoSkipLink`.
+- ✅ Phase 3 — Theme contrast checks run at theme resolution in
+  development and strict accessibility mode.
+- ✅ Phase 4 — `automationId` renders stable `data-automation-id`
+  selectors, user guide and AI docs are updated, and strict mode
+  remains opt-in until the next major release.
 
 #### Plan #06 — Cooperative concurrency
 
@@ -1087,8 +1081,9 @@ The honest critical path from today's state to the
    surface (slot-undeclared consumer check, filesystem manifest
    loader, Inspector permissions panel, docs chapter) tracked
    under A.2 plan #14 and is no longer a Wave-8 blocker.
-2. **Plan #05 Phase 1 Step 1.3** — ✅ Wire a11y linter into LSP +
-   Vite so end users actually see the rules that already exist.
+2. **Plan #05 completion pass** — **shipped (2026-05).** LSP/Vite
+   diagnostics, framework primitives, theme contrast checks,
+   `automationId`, E2E coverage, and user-facing docs are all live.
 3. **Plan #07 Phase 1 Step 1.2 + Phase 2 + Phase 3 + Phase 4**
    — ✅ `LOADER_ERROR` mapping, `<App onError>`,
    `<RetryPolicy>`, `<Fallback>`. Inspector "Errors" tab and
@@ -1107,8 +1102,8 @@ The honest critical path from today's state to the
 8. **Plan #06 `strictConcurrency` reader site** — pick the one
    place that should fail when the flag is on (probably
    "policy validation at handler-coordinator registration").
-9. **Plan #05 Phase 2 components** — `<SkipLink>`,
-   `<FocusScope>`, `<LiveRegion>`.
+9. **Plan #05 Phase 2 components** — ✅ `<SkipLink>`,
+   `<FocusScope>`, and `<LiveRegion>` shipped with E2E coverage.
 10. **Plan #07 Phase 3.2** — ✅ `Retry-After` header in
     `RestApiProxy`.
 11. **Plan #02 lint-rule body + migration.**
@@ -1123,4 +1118,3 @@ Items 1–8 are the load-bearing engineering work; items 9–17
 are visibility / documentation / final-mile work. A
 single-thread agent following Section 2's workflow would clear
 items 1–8 first, then parallelise 9–14 across plans.
-
