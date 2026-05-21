@@ -47,7 +47,7 @@ function parse(source: string): Statement[] {
   return statements;
 }
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
-import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
 import { ROUTING_STATE_KEYS } from "../state/routing-state";
 import { isContainerLike } from "../rendering/ContainerUtils";
 
@@ -130,35 +130,6 @@ const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 // and isolates internal component state (breaking features like Select's clearable interaction).
 // Fix: Export `XMLUI_GLOBAL_NAMES` from the AppContext module and add it to the exclusion check
 // below (where `keepDep` is defined).
-
-/**
- * `$`-prefixed names that ARE stored in parent state and must not be filtered.
-
- *
- * These are injected at runtime via component state dispatch (not via the
- * per-render contextVars mechanism), so they genuinely live in the parent
- * StateContainer's state map and need to appear in `computedUses` so that
- * containers re-render when they change.
- *
- * - `$context`: set by `ContextMenu.openAt()` via implicit dispatch to the
- *   parent container.  Without it in `computedUses`, the container is memo-
- *   blocked when `$context` changes, and `customRender` never picks up the
- *   new value — all menu items see `$context = undefined`.
- */
-const PARENT_STATE_DYNAMIC_VARS = new Set(["$context"]);
-
-
-
-/**
- * Returns true for framework-injected context variables that are NOT stored
- * in parent state.  All XMLUI runtime-injected names start with `$`; the
- * exceptions are the router state keys (routing-state.ts) and the dynamic
- * vars listed in PARENT_STATE_DYNAMIC_VARS above.
- */
-const isRuntimeContextVar = (name: string): boolean =>
-  name.startsWith("$") &&
-  !ROUTING_STATE_KEYS.has(name) &&
-  !PARENT_STATE_DYNAMIC_VARS.has(name);
 
 /**
  * Walk a plain-object AST tree collecting Identifier node names.
@@ -327,7 +298,7 @@ function computeUsesInternal(
   parentFunctionNames: Set<string> = new Set(),
   disableNarrowing: boolean = false,
   injectedVarsScope: ReadonlySet<string> = EMPTY_SET,
-  metadataLookup?: (type: string) => any,
+  metadataLookup?: (type: string) => ComponentMetadata | undefined,
 ): [Set<string>, Set<string>, Set<string>] {
   const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
 
@@ -465,9 +436,14 @@ function computeUsesInternal(
   // at runtime (because they pass through non-container intermediaries).
   const childEscapingUIDs = new Set<string>();
 
+  const childInjected = metadata?.childInjectedVars ?? [];
+  const childScope = childInjected.length > 0
+    ? new Set([...injectedVarsScope, ...childInjected])
+    : injectedVarsScope;
+
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, injectedVarsScope, metadataLookup);
+      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, childScope, metadataLookup);
       for (const d of deps) childDeps.add(d);
       for (const d of depsReads) childDepsReads.add(d);
       for (const uid of escapingUIDs) {
@@ -488,7 +464,7 @@ function computeUsesInternal(
   }
 
   const keepDep = (d: string) =>
-    !localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d);
+    !localDeclared.has(d) && !isBuiltinGlobal(d) && !injectedVarsScope.has(d);
   const parentDependencies = new Set<string>();
   const parentDependenciesReads = new Set<string>();
   for (const d of usedHere) if (keepDep(d)) parentDependencies.add(d);
@@ -505,38 +481,16 @@ function computeUsesInternal(
     parentDependenciesReads.add(node.uid);
   }
 
-  // Deps that are "real" parent-state keys (not runtime-injected dynamic vars).
-  // Used for the isImplicitDefault promotion check: a component should not be
-  // promoted to a container solely because it reads a dynamic var like $context.
-  // If the ONLY deps are dynamic vars, stateFromOutside would be {} initially
-  // (before openAt), which breaks the component.
-  const nonDynamicParentDeps = new Set(
-    [...parentDependencies].filter((d) => !PARENT_STATE_DYNAMIC_VARS.has(d)),
-  );
+  // Deps that are "real" parent-state keys (not locally injected vars).
+  // Used for the isImplicitDefault promotion check.
+  const nonDynamicParentDeps = parentDependencies;
   // Reads-only variant: drives the implicit-container promotion check below.
-  // Promotion based on reads avoids wrapping a component in an unnecessary
-  // StateContainer when its only "deps" are write-only assignment targets in
-  // event handlers (which the handler resolves through the existing scope
-  // pass-through; no narrowing/re-render tracking is needed for them).
-  const nonDynamicReadDeps = new Set(
-    [...parentDependenciesReads].filter((d) => !PARENT_STATE_DYNAMIC_VARS.has(d)),
-  );
+  const nonDynamicReadDeps = parentDependenciesReads;
 
   // Use nonDynamicReadDeps so that implicit containers are not promoted purely
-  // because of a dynamic var dependency ($context etc.) — that would set
-  // computedUses=["$context"], making stateFromOutside={} and isolating the
-  // component from all other parent state — AND so that write-only assignment
-  // targets in event handlers don't promote (write-only targets must be in
-  // scope but do not need a re-render trigger).
-  //
-  // Mandatory Shielding (unconditional promotion of Select/List/Table/DataGrid)
-  // was attempted but reverted: it forced these components into a StateContainer
-  // with computedUses=[] even when they had no read deps. The narrowed scope
-  // hides parent vars from props/render-time `extractValue` calls — e.g. Table's
-  // `syncWithVar="syncState"` could not resolve `syncState` and Select's internal
-  // clearable/multiSelect logic broke (re-introducing the regression Bug 20 fixed).
-  // Promotion is again conditional on real read deps; static heavy components
-  // operate naked inside the parent container exactly as before.
+  // because of a write-only assignment target in an event handler (which
+  // the handler resolves through the existing scope pass-through; no
+  // narrowing/re-render tracking is needed for them).
   const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicReadDeps.size > 0;
   const isContainer = isKnownContainer || isImplicitDefault;
 
@@ -635,13 +589,13 @@ function computeUsesInternal(
  * Public API — same contract as before (returns free vars set).
  * Prefer `computeUsesForTree` for whole-tree traversal.
  */
-export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type: string) => any): Set<string> {
+export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type: string) => ComponentMetadata | undefined): Set<string> {
   if (!COMPUTED_USES_ENABLED) return new Set();
   const [freeVars] = computeUsesInternal(node, new Set(), false, EMPTY_SET, metadataLookup);
   return freeVars;
 }
 
-export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => any): void {
+export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => ComponentMetadata | undefined): void {
   if (!COMPUTED_USES_ENABLED) return;
   // StandaloneApp may call this with a CompoundComponentDef wrapper whose actual
   // ComponentDef (with type/children) lives one or two levels deeper.

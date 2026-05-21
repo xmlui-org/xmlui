@@ -60,6 +60,7 @@ import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree"
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
 import { computeUsesForTree } from "./optimization/computedUses";
+import { DataLoaderMd } from "./loader/DataLoader";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -68,6 +69,16 @@ const GLOBALS_XS_BUILT_RESOURCE = "/src/Globals.xs";
 const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
+
+/**
+ * Resolves component metadata for the computedUses optimizer at runtime.
+ * DataLoader is internal and not in collectedComponentMetadata, so it is
+ * handled explicitly. All other components are looked up via the registry.
+ */
+function resolveOptimizerMetadata(type: string) {
+  if (type === "DataLoader") return DataLoaderMd;
+  return (collectedComponentMetadata as Record<string, unknown>)[type];
+}
 
 // ---------------------------------------------------------------------------
 // Storage escape hatch — runs at module-init time, BEFORE React or the router
@@ -719,7 +730,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     );
   }
 
-  computeUsesForTree(entryPointWithCodeBehind);
+  computeUsesForTree(entryPointWithCodeBehind, resolveOptimizerMetadata);
 
   // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];
@@ -750,7 +761,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   // --- Process computedUses for each compound component's tree
   for (const compDef of components) {
     if (compDef.component) {
-      computeUsesForTree(compDef.component);
+      computeUsesForTree(compDef.component, resolveOptimizerMetadata);
     }
   }
 

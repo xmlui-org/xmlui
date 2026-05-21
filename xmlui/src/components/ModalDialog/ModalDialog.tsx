@@ -86,6 +86,7 @@ export const ModalDialogMd = createMetadata({
       "Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)",
     ),
   },
+  childInjectedVars: ["$param", "$params"],
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     ...paddingSubject(COMP, { all: "$space-7" }),

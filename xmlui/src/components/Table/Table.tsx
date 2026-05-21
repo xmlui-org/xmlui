@@ -366,6 +366,7 @@ export const TableMd = createMetadata({
       defaultValue: defaultProps.striped,
     },
   },
+  childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex", "$isSelected"],
   events: {
     contextMenu: dContextMenu(COMP),
     sortingDidChange: {

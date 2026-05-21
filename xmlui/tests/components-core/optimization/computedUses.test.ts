@@ -10,6 +10,18 @@ const skipIfDisabled = !COMPUTED_USES_ENABLED;
 const computeUsesForTree = (root: any) => originalComputeUsesForTree(root, (t) => {
   if (t === "DataLoader") return DataLoaderMd;
   if (t === "DataSource") return DataSourceMd;
+  if (t === "ScopedContainer") {
+    return {
+      childInjectedVars: ["$item", "$index"],
+    };
+  }
+  if (t === "ScopedEvent") {
+    return {
+      events: {
+        click: { injectedVars: ["$event"] },
+      },
+    };
+  }
   return (collectedComponentMetadata as any)[t];
 });
 import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
@@ -1072,8 +1084,8 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree + extractScopedState — end
 describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filter (Баг 17)", () => {
   it("$param in child expression does NOT appear in computedUses", () => {
     // Regression: ModalDialog-like pattern — $param injected by .open() at runtime.
-    // Before the fix: computedUses=['$param'] → extractScopedState returns {} → dialog broken.
-    const container = node("Container", {
+    // Fixed in Iteration 2: metadata.childInjectedVars must include $param.
+    const container = node("ModalDialog", {
       vars: { title: "{'Hello'}" },
       children: [node("Text", { props: { text: "{$param.msg}" } })],
     });
@@ -1083,11 +1095,11 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
 
   it("$param does not appear even when mixed with a real parent-state dependency", () => {
     // Real var 'title' must be in computedUses; $param must be excluded.
-    // Use Select (implicit container) so the node becomes a container when it has free deps.
-    const outer = node("Stack", {
+    const outer = node("ModalDialog", {
       vars: { title: "{'Hello'}" },
       children: [
         node("Select", {
+          vars: { x: "1" }, // make it a container
           children: [
             node("Text", { props: { text: "{$param.msg} — {title}" } }),
           ],
@@ -1096,75 +1108,59 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
     });
     computeUsesForTree(outer);
     const select = outer.children![0];
-    // Select: parentDependencies={'title'} ($param filtered) → implicit container → computedUses=['title']
-    expect(select.computedUses).toContain("title");
-    expect(select.computedUses).not.toContain("$param");
+    // $param is filtered by ModalDialog scope → only title remains.
+    expect(select.computedUses).toEqual(["title"]);
   });
 
   it.each([
-    "$params", "$item", "$itemIndex",
-    "$row", "$rowIndex", "$rowKey",
-    "$data", "$this",
-    "$checked", "$setChecked",
-  ])("%s is filtered out of computedUses (render-time contextVar, not in parent state)", (runtimeVar) => {
-    const container = node("Container", {
+    ["$param", "ModalDialog"],
+    ["$params", "ModalDialog"],
+    ["$item", "List"],
+    ["$itemIndex", "List"],
+    ["$row", "Table"],
+    ["$rowIndex", "Table"],
+    ["$item", "ScopedContainer"],
+  ])("%s is filtered out of computedUses when using %s", (runtimeVar, componentType) => {
+    const container = node(componentType, {
       vars: { x: "{0}" },
       children: [node("Text", { props: { text: `{${runtimeVar}}` } })],
     });
     computeUsesForTree(container);
-    // Only x is a real parent dep; runtimeVar must be excluded.
     expect(container.computedUses ?? []).not.toContain(runtimeVar);
   });
 
   it("$context IS kept in computedUses when mixed with real deps (parent-state dynamic var)", () => {
-    // $context lives in parent state (dispatched by ContextMenu.openAt → implicit container →
-    // App reducer). Containers that read BOTH $context AND real parent-state deps must include
-    // $context in computedUses so they re-render when openAt is called.
+    // $context lives in parent state.
     const outer = node("Stack", {
       vars: { lastAction: "''" },
       children: [
         node("Select", {
+          vars: { x: "1" }, // make it a container
           children: [node("Text", { props: { text: "{$context.name} — {lastAction}" } })],
         }),
       ],
     });
     computeUsesForTree(outer);
     const select = outer.children![0];
-    // $context is NOT filtered → parentDependencies includes it → computedUses includes $context
     expect(select.computedUses).toContain("$context");
     expect(select.computedUses).toContain("lastAction");
   });
 
-  it("$context alone does NOT promote a heavy component (dynamic vars are not promotion triggers)", () => {
-    // $context lives in PARENT_STATE_DYNAMIC_VARS — it is filtered from
-    // nonDynamicReadDeps so it cannot by itself drive implicit-container
-    // promotion. With Mandatory Shielding reverted, Select with only a
-    // $context dep stays naked. Bug 19's narrowing-when-only-$context
-    // failure mode (computedUses=["$context"] making stateFromOutside={})
-    // is therefore avoided automatically.
+  it("$context alone DOES promote a heavy component (Iteration 2 behavior change)", () => {
+    // After removing PARENT_STATE_DYNAMIC_VARS, $context is a real dep.
     const select = node("Select", {
       children: [node("Text", { props: { text: "{$context.name}" } })],
     });
     computeUsesForTree(select);
-    expect(select.computedUses).toBeUndefined();
+    expect(select.computedUses).toEqual(["$context"]);
   });
 
-  it("$context does NOT cascade to grandparent (container stops propagation)", () => {
-    // ContextMenu-like pattern: ContextMenu is a container whose children use $context.
-    // $context should be in ContextMenu's computedUses (so it re-renders after openAt).
-    // But $context must NOT propagate to the outer Stack's parentDeps — otherwise
-    // Stack gets computedUses=['$context'] → stateFromOutside={} → Stack loses parent state.
-    //
-    // Note: The real ContextMenu node from the XMLUI parser does NOT have static
-    // contextVars — the parser does not inject metadata contextVars into the node.
-    // So $context is NOT in ContextMenu's localDeclared, which is why it ends up in
-    // ContextMenu's parentDependencies and then in computedUses.
+  it("$context DOES cascade to grandparent (Iteration 2 behavior change)", () => {
+    // Now that $context is a regular parent dep, it flows up the tree.
     const outer = node("Stack", {
       vars: { lastAction: "''" },
       children: [
         node("Select", {
-          // No contextVars — simulates a ContextMenu-like container where $context
-          // is set via implicit dispatch, not via static node.contextVars.
           vars: { placeholder: "'select'" },
           children: [
             node("Text", { props: { text: "{$context.name} — {lastAction}" } }),
@@ -1173,45 +1169,124 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
       ],
     });
     computeUsesForTree(outer);
-    const ctxMenuLike = outer.children![0];
-    // Container gets computedUses with $context (has lastAction as other dep)
-    expect(ctxMenuLike.computedUses).toContain("$context");
-    expect(ctxMenuLike.computedUses).toContain("lastAction");
-    // Stack gets NO computedUses — $context must NOT have cascaded to Stack's deps
-    expect(outer.computedUses).toBeUndefined();
+    const select = outer.children![0];
+    expect(select.computedUses).toContain("$context");
+    expect(select.computedUses).toContain("lastAction");
+    // $context cascades to Stack because Stack is a container (has vars)
+    // and its subtree depends on $context.
+    expect(outer.computedUses).toContain("$context");
   });
 
   it.each([
     "$pathname", "$routeParams", "$queryParams", "$linkInfo",
   ])("router state var %s IS kept in computedUses (genuine parent-state key)", (routerVar) => {
-    // Router vars live in parent state (Layer 6 — useRoutingParams) — they must survive the filter.
-    // Use Select (implicit container): it becomes a container when it has non-empty parentDependencies.
     const select = node("Select", {
       children: [node("Text", { props: { text: `{${routerVar}}` } })],
     });
     computeUsesForTree(select);
-    // $pathname etc. are NOT filtered by isRuntimeContextVar → parentDependencies={routerVar}
-    // → isImplicitDefault=true → computedUses=[routerVar]
     expect(select.computedUses).toContain(routerVar);
   });
 
   it("$param does not make an implicit container out of a non-container node", () => {
-    // Select is in IMPLICIT_CONTAINER_COMPONENT_NAMES.
-    // Before fix: $param would leak → parentDependencies={'$param'} (non-empty) →
-    // isImplicitDefault=true → Select gets computedUses=['$param'] → extractScopedState={}.
-    // After fix: $param is filtered → parentDependencies={} → isImplicitDefault=false.
-    const select = node("Select", {
+    const modal = node("ModalDialog", {
       children: [
         node("Items", {
           props: { data: "{items}" },
+          vars: { x: "1" }, // make it a container
           children: [node("Option", { props: { value: "{$param.id}" } })],
         }),
       ],
     });
-    computeUsesForTree(select);
-    // $param excluded → parentDependencies has only 'items' (from Items.data) which
-    // belongs to Items, not Select. Select itself has no free vars after filtering.
-    expect(select.computedUses ?? []).not.toContain("$param");
+    computeUsesForTree(modal);
+    const items = modal.children![0];
+    expect(items.computedUses).toEqual(["items"]);
+    expect(items.computedUses).not.toContain("$param");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Iteration 2: Children Scope
+// ---------------------------------------------------------------------------
+
+describe.skipIf(skipIfDisabled)("computeUsesForTree — Iteration 2: Children Scope", () => {
+  it("U2.1: $item in ScopedContainer is filtered", () => {
+    const root = node("ScopedContainer", {
+      children: [node("Text", { props: { value: "{$item.name}" } })],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("U2.2: multiple injected vars ($item, $index) are filtered", () => {
+    const root = node("ScopedContainer", {
+      children: [node("Text", { props: { value: "{$item.name} at {$index}" } })],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("U2.4: Shadowing — child injects a var with the same name as parent dep", () => {
+    // Outer stack has 'item' in vars.
+    // Inner ScopedContainer injects '$item'. (Wait, names are different).
+    // Let's use 'x'.
+    (collectedComponentMetadata as any)["ShadowContainer"] = {
+      childInjectedVars: ["x"],
+    };
+    const root = node("Stack", {
+      vars: { x: "1" },
+      children: [
+        node("ShadowContainer", {
+          children: [node("Text", { props: { value: "{x}" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const shadow = root.children![0];
+    // ShadowContainer: x is locally injected → parentDependencies={} → computedUses=undefined.
+    expect(shadow.computedUses).toBeUndefined();
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("U2.5: Nested scopes — inner scope extends outer scope", () => {
+    (collectedComponentMetadata as any)["Level1"] = { childInjectedVars: ["$a"] };
+    (collectedComponentMetadata as any)["Level2"] = { childInjectedVars: ["$b"] };
+
+    const root = node("Level1", {
+      vars: { x: "1" }, // make it a container
+      children: [
+        node("Level2", {
+          vars: { y: "1" }, // make it a container
+          children: [
+            node("Text", { props: { value: "{$a} + {$b} + {$c}" } }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const level2 = root.children![0];
+    // Level 2: $a (from Level1) and $b (from Level2) are in scope. Only $c is free.
+    expect(level2.computedUses).toEqual(["$c"]);
+    // Level 1: Only $c is free.
+    expect(root.computedUses).toEqual(["$c"]);
+  });
+
+  it("U2.6: Extension component with childInjectedVars metadata is supported", () => {
+    (collectedComponentMetadata as any)["MyGrid"] = {
+      childInjectedVars: ["$cellValue"],
+    };
+    const root = node("Stack", {
+      vars: { x: "1" },
+      children: [
+        node("MyGrid", {
+          vars: { z: "1" }, // make it a container
+          children: [node("Text", { props: { value: "{$cellValue} + {x}" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const grid = root.children![0];
+    // MyGrid: $cellValue is filtered, x is kept.
+    expect(grid.computedUses).toEqual(["x"]);
   });
 });
 

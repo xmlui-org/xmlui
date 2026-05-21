@@ -33,6 +33,7 @@ export const ItemsMd = createMetadata({
     $isFirst: dComponent("Boolean indicating if this is the first item"),
     $isLast: dComponent("Boolean indicating if this is the last item"),
   },
+  childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast"],
   opaque: true,
 });
 

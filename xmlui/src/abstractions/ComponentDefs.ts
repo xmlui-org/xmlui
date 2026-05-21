@@ -445,6 +445,19 @@ export type ComponentMetadata<
   // Describes the individual parts that make up the component
   parts?: Record<string, ComponentPartMetadata>;
 
+  /**
+   * Names of variables that this component injects into the SCOPE OF ITS
+   * CHILDREN at render time (via per-render contextVars, not parent state).
+   *
+   * The computedUses optimizer adds these to the child scope so children
+   * don't treat them as parent-state dependencies.
+   *
+   * Example: `List` injects `$item`, `$itemIndex`, `$isFirst`, `$isLast`,
+   * so a template like `<Text value="{$item.name}" />` doesn't register
+   * `$item` as a parent dependency.
+   */
+  childInjectedVars?: readonly string[];
+
   // The name of the default part. Layout properties will be applied to this part by default.
   defaultPart?: string;
 

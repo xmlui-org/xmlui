@@ -460,6 +460,7 @@ export const TreeMd = createMetadata({
       },
     },
   },
+  childInjectedVars: ["$item"],
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}-row--selected`]: "$color-primary-50",

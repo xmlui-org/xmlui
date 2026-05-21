@@ -225,6 +225,7 @@ export const SelectMd = createMetadata({
     $itemContext: d("Provides the `removeItem()` method for multi-select scenarios"),
     $group: d("Group name when using `groupBy` (available in group header templates)"),
   },
+  childInjectedVars: ["$item", "$itemContext", "$group", "$selectedValue", "$inTrigger"],
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",

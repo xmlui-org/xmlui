@@ -169,7 +169,7 @@ export const TileGridMd = createMetadata({
     $isLast: d("`true` when this is the last item in the `data` array."),
     $selected: d("`true` when this tile is currently selected."),
   },
-
+  childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$selected"],
   childrenAsTemplate: "itemTemplate",
 
   themeVars: parseScssVar(styles.themeVars),

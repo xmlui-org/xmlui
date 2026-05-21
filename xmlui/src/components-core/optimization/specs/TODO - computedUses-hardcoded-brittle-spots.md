@@ -3,7 +3,7 @@
 A catalog of places where the optimizer (`xmlui/src/components-core/optimization/computedUses.ts`) is currently coupled to specific string names. Each spot is a maintenance risk: adding a new component or renaming an existing concept can silently break the optimization without any compile-time error.
 
 **Status after 2026-05-20 refactoring:**
-Currently, there are **3** remaining hardcoded spots in `computedUses.ts`.
+Currently, there are **1** remaining hardcoded spots in `computedUses.ts`.
 
 ---
 
@@ -30,7 +30,7 @@ this flag from the component registry instead of checking a hardcoded Set. The c
 
 ---
 
-## 2. `PARENT_STATE_DYNAMIC_VARS` / `$context`
+## 2. `PARENT_STATE_DYNAMIC_VARS` / `$context` ✅ **RESOLVED**
 
 ```typescript
 // computedUses.ts ~L164
@@ -61,7 +61,7 @@ and the UI stops reacting to those state updates (the exact bug `$context` was a
 
 ---
 
-## 3. Loader type checks + `DATA_FETCH_HANDLER_INJECTED_KEYS`
+## 3. Loader type checks + `DATA_FETCH_HANDLER_INJECTED_KEYS` ✅ **RESOLVED**
 
 ```typescript
 // computedUses.ts ~L292 & ~L315
@@ -106,4 +106,20 @@ to apply special filtering for locally injected variables that collide with glob
 | 1 | `IMPLICIT_CONTAINER_COMPONENT_NAMES` | New list-like component silently skips optimization | `isImplicitContainerByDefault` metadata flag |
 | 2 | `PARENT_STATE_DYNAMIC_VARS` (`$context`) | New dispatch var stops triggering re-renders | Lexical Scoping stack in AST traversal |
 | 3 | `isDataLoader` + `"fetch"` + injected keys | New loader gets no `$queryParams` protection | Lexical Scoping stack + `EventDescriptor.injectedVars` |
+
+---
+
+## Testing Strategy for Lexical Scoping Refactoring
+
+To ensure the iterative implementation of Lexical Scoping remains regression-free, the testing plan must prioritize the following:
+
+### 1. Critical Test Types
+- **Unit Tests (`computedUses.test.ts`):** *Highest Priority.* Since `computedUses` is a pure static analyzer, we can construct virtual component metadata (`injectedVars: ['$queryParams']`) and verify the output arrays match expected dependencies without spinning up React.
+- **E2E Tests:** *Second Priority.* Verifying the exact "Bug 21" scenario (a `DataLoader` that reads `$queryParams` inside `onFetch`) to ensure it does not re-render when global route params change, but **does** re-render if it references a valid parent state variable.
+- **Extension Simulation:** Adding a mock standalone component in the unit tests that declares `injectedVars: ["$customToken"]` to prove the optimization works mechanically without hardcoded lists.
+
+### 2. Highest Risk Scenarios (Regression Hotspots)
+- **Scope Leakage (Missing Pops):** If the traversal does not properly `pop()` the stack after exiting an `onFetch` handler or a `List`, subsequent siblings will incorrectly inherit that local scope, hiding their legitimate global dependencies. Sibling separation is the #1 risk.
+- **Deep Nesting & Shadowing:** A `DataLoader` nested inside a `List` nested inside another `List`. The stack must accurately handle multiple layers of `injectedVars` and shadow them cleanly over global scope.
+- **Event Handler Context vs Parent Context:** Ensuring that `$context` (global) mixed with `$queryParams` (local to `onFetch`) inside the same event handler correctly ignores the latter but includes the former in `computedUses`.
 
