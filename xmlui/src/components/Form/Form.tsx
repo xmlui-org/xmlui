@@ -256,6 +256,7 @@ export const FormMd = createMetadata({
       parameters: {},
     },
   },
+  childInjectedVars: ["$data"],
   contextVars: {
     $data: d(
       `This property represents the value of the form data. You can access the fields of the form ` +

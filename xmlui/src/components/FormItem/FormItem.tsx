@@ -242,6 +242,7 @@ export const FormItemMd = createMetadata({
       },
     },
   },
+  childInjectedVars: ["$value", "$setValue", "$validationResult"],
   contextVars: {
     $value: d("Current value of the FormItem, accessible in expressions and code snippets"),
     $setValue: d("Function to set the FormItem's value programmatically"),

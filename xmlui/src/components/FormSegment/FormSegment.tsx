@@ -37,6 +37,7 @@ export const FormSegmentMd = createMetadata({
         "field names by inspecting its direct and nested children for `bindTo` attributes.",
     ),
   },
+  childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"],
   contextVars: {
     $segmentData: d(
       "An object containing the current form values of the fields that belong to this segment, " +

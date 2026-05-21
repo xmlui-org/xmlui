@@ -26,6 +26,7 @@ export const TabItemMd = createMetadata({
       parameters: {},
     },
   },
+  childInjectedVars: ["$header"],
   contextVars: {
     $header: d(
       "This context value represents the header context with props: id (optional), index, label, isActive.",

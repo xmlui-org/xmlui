@@ -12,6 +12,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 const COMP = "Tabs";
 
 export const TabsMd = createMetadata({
+  childInjectedVars: ["$header"],
   status: "experimental",
   description:
     "`Tabs` enables users to switch among content panels using clickable tab headers. " +

@@ -71,6 +71,7 @@ export const ColumnMd = createMetadata({
       defaultValue: defaultProps.canResize,
     },
   },
+  childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex"],
   contextVars: {
     $item: {
       description: "The complete data row object being rendered",
