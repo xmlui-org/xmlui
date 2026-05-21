@@ -143,26 +143,26 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDef
     expect(select.computedUses).toContain("rarelyChanges");
   });
 
-  it("Select WITHOUT external dependencies: computedUses set to [] (Mandatory Shielding)", () => {
-    // Heavy components (Select, List, Table, DataGrid) are ALWAYS promoted
-    // to implicit containers to ensure they have a React.memo shield.
+  it("Select WITHOUT external dependencies: computedUses NOT set (no mandatory shield)", () => {
+    // Mandatory Shielding was reverted because forcing a StateContainer around
+    // Select with computedUses=[] hid parent vars from `extractValue` during
+    // render and re-introduced the Bug 20 regression in clearable/multiSelect
+    // internals. Static heavy components stay naked inside the parent.
     const select = node("Select", {
       children: [node("Option", { props: { value: "static" } })],
     });
     computeUsesForTree(select);
-    // Before Mandatory Shielding: toBeUndefined()
-    // After: toBeDefined() (shield created)
-    expect(select.computedUses).toEqual([]);
+    expect(select.computedUses).toBeUndefined();
   });
 
-  it("Select with child UIDs but no other deps: includes UIDs in computedUses", () => {
-    // If a heavy component is shielded, it must include any escaping child UIDs
-    // in its computedUses array so that extractScopedState doesn't filter them out.
+  it("Select with child UIDs but no other read deps: NOT promoted, computedUses undefined", () => {
+    // Without real read deps, the heavy component is not wrapped at all.
+    // The child UID escapes naturally to the enclosing real container.
     const select = node("Select", {
       children: [node("Option", { uid: "opt1", props: { value: "1" } })],
     });
     computeUsesForTree(select);
-    expect(select.computedUses).toEqual(["opt1"]);
+    expect(select.computedUses).toBeUndefined();
   });
 
   it("HStack with dependencies: NOT promoted to container (Prevention of Accidental Promotion)", () => {
@@ -184,7 +184,7 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDef
     expect(hstack.computedUses).toBeUndefined();
   });
 
-  it("contextVar keys are locally declared — Select still promoted (Mandatory Shielding)", () => {
+  it("contextVar keys are locally declared — Select promoted by real read dep", () => {
     const select = node("Select", {
       children: [
         node("Items", {
@@ -195,8 +195,8 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDef
       ],
     });
     computeUsesForTree(select);
-    // Select IS an implicit container due to Mandatory Shielding.
-    // computedUses=["someData"] (external dep), no $item leak.
+    // Select is promoted because `someData` is a real read dep bubbled up
+    // from Items. computedUses=["someData"], no $item leak.
     expect(select.computedUses).not.toContain("$item");
     expect(select.computedUses).toContain("someData");
   });
@@ -209,6 +209,62 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDef
     computeUsesForTree(root);
     expect(root.computedUses).toBeUndefined();
     expect(root.uses).toEqual(["count"]);
+  });
+
+  it("Table with syncWithVar string prop stays naked — string props are opaque to static analysis (Bug 26)", () => {
+    // syncWithVar="syncState" is a plain string literal, not an expression.
+    // The static analyzer cannot see it as a variable reference, so Table gets
+    // no read deps → NOT promoted → parent's syncState remains accessible at runtime.
+    // (Mandatory Shielding would have set computedUses=[], hiding syncState.)
+    const root = node("Fragment", {
+      vars: { syncState: "{{}}" },
+      children: [
+        node("Table", {
+          props: { syncWithVar: "syncState", rowsSelectable: "true" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const table = root.children![0];
+    expect(table.computedUses).toBeUndefined();
+  });
+
+  it("Table WITH a real read dep IS promoted even alongside syncWithVar (Bug 26 baseline)", () => {
+    // When Table has a genuine read dep (data="{rows}"), it is promoted as before.
+    // computedUses includes the read dep, not syncWithVar (which is opaque).
+    const root = node("Fragment", {
+      vars: { rows: "{[]}", syncState: "{{}}" },
+      children: [
+        node("Table", {
+          props: { data: "{rows}", syncWithVar: "syncState" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const table = root.children![0];
+    expect(table.computedUses).toBeDefined();
+    expect(table.computedUses).toContain("rows");
+  });
+
+  it("Select with no read deps stays naked — clearable/multiSelect internal logic is unaffected (Bug 26)", () => {
+    // Mirrors the failing test-case from Select.spec.ts that broke under Mandatory
+    // Shielding: <Select clearable onDidChange="testState='changed'"> with static
+    // Options. No external reads → no container → internal logic works correctly.
+    const root = node("Fragment", {
+      vars: { testState: "{null}" },
+      children: [
+        node("Select", {
+          props: { clearable: "true" },
+          events: { onDidChange: "testState = 'changed'" },
+          children: [
+            node("Option", { props: { value: "opt1", label: "first" } }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const select = root.children![0];
+    expect(select.computedUses).toBeUndefined();
   });
 });
 
@@ -388,9 +444,13 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — events", () => {
     expect(fragment.computedUses).toContain("counter");
   });
 
-  it("write-only assignment STILL promotes implicit containers (Mandatory Shielding)", () => {
-    // Select is in IMPLICIT_CONTAINER_COMPONENT_NAMES, so it is promoted
-    // even if it only WRITES to testState. This ensures it has a performance shield.
+  it("write-only assignment does NOT promote implicit containers (Bug 20 regression fix)", () => {
+    // Select is in IMPLICIT_CONTAINER_COMPONENT_NAMES, but it has only a
+    // write-only target (testState) — no read deps. Promotion would wrap
+    // Select in an unnecessary StateContainer that breaks its internal
+    // clearable/multiSelect logic (see bugs-history.md, Bug 20).
+    // Net effect: Select stays naked, the handler runs in parent scope
+    // where testState is naturally accessible.
     const root = node("Stack", {
       vars: { testState: "{null}" },
       children: [
@@ -401,7 +461,7 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — events", () => {
     });
     computeUsesForTree(root);
     const select = root.children![0];
-    expect(select.computedUses).toEqual(["testState"]);
+    expect(select.computedUses).toBeUndefined();
   });
 
   it("identifiers in parsed event handlers are included", () => {
@@ -1066,14 +1126,18 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
     expect(select.computedUses).toContain("lastAction");
   });
 
-  it("$context alone STILL makes an implicit container for heavy components (Mandatory Shielding)", () => {
-    // Select is a heavy component, so it gets promoted even if it only uses $context.
-    // This ensures it has a performance shield.
+  it("$context alone does NOT promote a heavy component (dynamic vars are not promotion triggers)", () => {
+    // $context lives in PARENT_STATE_DYNAMIC_VARS — it is filtered from
+    // nonDynamicReadDeps so it cannot by itself drive implicit-container
+    // promotion. With Mandatory Shielding reverted, Select with only a
+    // $context dep stays naked. Bug 19's narrowing-when-only-$context
+    // failure mode (computedUses=["$context"] making stateFromOutside={})
+    // is therefore avoided automatically.
     const select = node("Select", {
       children: [node("Text", { props: { text: "{$context.name}" } })],
     });
     computeUsesForTree(select);
-    expect(select.computedUses).toEqual(["$context"]);
+    expect(select.computedUses).toBeUndefined();
   });
 
   it("$context does NOT cascade to grandparent (container stops propagation)", () => {

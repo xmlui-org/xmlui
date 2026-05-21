@@ -1,12 +1,13 @@
-# E2E Test Failures — 2026-05-16 (updated 2026-05-20 PM — ALL FAILURES FIXED ✅)
+# E2E Test Failures — 2026-05-16 (updated with NEW FAILURES)
 
 > **Original run (2026-05-16):** 4m 55s | Total: 6911 tests | **21 failed**, 2 flaky, 65 skipped, 6823 passed  
 > **Re-run after fix (2026-05-18):** 15m 10s | Total: 6915 tests | **135 failed**, 3 flaky, 65 skipped, 6712 passed  
 > **Run (2026-05-20 AM):** 4m 06s | Total: 6915 tests | **7 failed**, 5 flaky, 65 skipped, 6838 passed  
 > **Run (2026-05-20 PM — FULL):** 4m22s | Total: 6917 tests | **0 failed** ✅, 5 flaky, 65 skipped, **6847 passed** ✅  
+> **Run (2026-05-21 — Post Bug 26 Revert):** 4.0m | Total: 6921 tests | **0 failed** ✅, 3 flaky, 66 skipped, **6852 passed** ✅  
 > Branch: `yurii/computedUses`
 
-**✅ COMPLETE FIX:** Groups A, B, C, D, E, F, G, H, J, L fixed. Group M regressions fixed. Group K remains flaky (timing-sensitive, not failures).
+**ALL FIXED:** 0 failed tests.
 
 ---
 
@@ -22,10 +23,12 @@
 | ~~F~~ | ~~Table multi-row selection~~ | ~~`enable-multi-row-selection-in-a-table.spec.ts`~~ | ~~2~~ | ✅ fixed |
 | ~~G~~ | ~~Tree async loading (`loaded` field)~~ | ~~`Tree-loaded-field.spec.ts`~~ | ~~3~~ | ✅ fixed |
 | ~~H~~ | ~~Flaky (past)~~ | ~~`MessageListener.spec.ts`, `Select.spec.ts`, `FormBindingBehavior.spec.ts`~~ | ~~3~~ | ✅ fixed |
-| ~~J~~ | ~~Compound components + `$queryParams` / `$this`~~ | ~~`compound-component.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 24 — 2026-05-20 PM) |
+| ~~J~~ | ~~Compound components + `$queryParams` / `$this`~~ | ~~`compound-component.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 24) |
 | K | Timing / responsive / flaky | `ChangeListener.spec.ts`, `Tree-spinnerDelay.spec.ts`, `make-a-table-responsive.spec.ts`, `use-the-same-modaldialog-to-add-or-edit.spec.ts` | 6 | ⚠️ flaky |
 | ~~L~~ | ~~Extensions (all packages)~~ | ~~Multiple extension spec files~~ | ~~>130~~ | ✅ fixed |
-| ~~M~~ | ~~Regressions (2026-05-20)~~ | ~~`APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`, `update-ui-optimistically.spec.ts`~~ | ~~7~~ | ✅ fixed (confirmed full re-run 2026-05-20 PM) |
+| ~~M~~ | ~~Regressions (2026-05-20)~~ | ~~`APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`, `update-ui-optimistically.spec.ts`~~ | ~~7~~ | ✅ fixed |
+| ~~N~~ | ~~Select basic, grouping & multiselect~~ | ~~`Select.spec.ts`~~ | ~~15~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
+| ~~O~~ | ~~Table `syncWithVar`~~ | ~~`Table.spec.ts`~~ | ~~6~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
 
 ---
 
@@ -135,7 +138,7 @@ no regressions in Groups A, D, F, G, M, context-menu, DataSource chain, Table re
 
 These tests are timing-sensitive. Most passed on retry or became flaky.
 
-| File | Test name | Status (2026-05-20) |
+| File | Test name | Status (2026-05-21) |
 |------|-----------|-------------------|
 | `ChangeListener.spec.ts` | debounceWaitInMs resets timer... | ✅ Pass |
 | `Tree-spinnerDelay.spec.ts` | spinnerDelay Property › ... | ✅ Pass |
@@ -161,25 +164,33 @@ All tests in the regression group now pass:
 
 ---
 
-## Summary of Results — 2026-05-20 PM (FINAL)
+## Group N — ✅ FIXED — Select basic, grouping & multiselect
 
-**🎉 ALL FAILURES FIXED** — Full e2e run: **6847 passed, 0 failed, 5 flaky (timing-related), 65 skipped**
+**Fixed by:** Bug 26 (Mandatory Shielding revert). All 15 tests in `Select.spec.ts` now pass.
+
+---
+
+## Group O — ✅ FIXED — Table `syncWithVar`
+
+**Fixed by:** Bug 26 (Mandatory Shielding revert). All 6 tests in `Table.spec.ts` now pass.
+
+---
+
+## Summary of Results — Post Bug 26 Revert
+
+**FAILURES:** 0 failed tests! ✅
 
 ### Status by group:
-- **A–J, L, M:** ✅ FIXED (21 + 7 + 130+ tests now passing)
-- **K:** ⚠️ FLAKY (5 timing-sensitive tests remain flaky, not failures)
+- **A–O:** ✅ FIXED
+- **Flaky:** ⚠️ FLAKY (3 tests)
 
-### Remaining flaky tests (timing-sensitive, not failures):
-1. `Icon.spec.ts:449` — Theme Variables › size prop overrides theme variable
-2. `control-cache-invalidation.spec.ts:27` — promoting a user refreshes users but not stats
-3. `open-a-confirmation-before-delete.spec.ts:31` — task count decreases after confirmed delete
-4. `poll-an-api-at-regular-intervals.spec.ts:38` — displays metric values and timestamp
-5. `update-ui-optimistically.spec.ts:32` — clicking like on unfavorited post
+### Flaky tests in the new run:
+1. `AutoComplete.spec.ts:1235:3` — Validation Feedback › shows valid icon in concise mode when valid
+2. `Form.spec.ts:3439:1` — regression: data url through modal context
+3. `run-a-one-time-action-on-page-load.spec.ts:26:3` — One-time page load action › onInit fires on mount and the initialized card appears @website
 
 ---
 
 ## Priority for investigation
 
-1. ✅ **COMPLETE:** Groups A–J and M — all failures fixed.
-2. **Medium:** Group K — improve test stability for timing-sensitive cases (non-blocking, flaky not failures).
-
+1. **Medium:** Flaky tests — improve test stability for timing-sensitive cases.

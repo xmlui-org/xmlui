@@ -241,10 +241,16 @@ test.describe("computedUses optimization: Select inside user-defined component",
     },
   );
 
-  test(
-    "static Select (no external dependencies) still renders ≤5 times after updates (Mandatory Shielding)",
+  test.skip(
+    "static Select (no external dependencies) still renders ≤5 times after updates (Mandatory Shielding — REVERTED)",
     async ({ initTestBed, page }) => {
-      // Verifies that heavy components are ALWAYS shielded, even with 0 deps.
+      // SKIPPED: Mandatory Shielding was reverted (see computedUses.ts) because
+      // unconditional promotion of heavy components hid parent vars from
+      // render-time `extractValue` calls (Table syncWithVar regression) and
+      // re-introduced the Bug 20 "clearable Select internals broken" regression.
+      // Static heavy components are no longer shielded; they re-render on parent
+      // ticks just like before this optimization was attempted. Re-enable this
+      // test only if a non-narrowing shield mechanism is introduced.
       const appStatic = `
 <App var.oftenChanges="{0}">
   <Button testId="tick-btn" onClick="oftenChanges++">Tick</Button>
@@ -268,7 +274,6 @@ test.describe("computedUses optimization: Select inside user-defined component",
         return;
       }
 
-      // Mandatory Shielding: Select.computedUses=[] → zero click-induced re-renders.
       expect(renderCount).toBeLessThanOrEqual(5);
     },
   );
@@ -664,6 +669,72 @@ test.describe("computedUses regression: stale computedUses after CompoundCompone
       await expect(page.getByTestId("computed-text")).toHaveText("apples");
       await page.getByTestId("clear-filter").click();
       await expect(page.getByTestId("computed-text")).toHaveText("all");
+    },
+  );
+});
+
+// ─── 8. Regression: static heavy components with string-prop var references (Bug 26) ──────
+//
+// Mandatory Shielding (reverted) forced Select/Table into a StateContainer with
+// computedUses=[] when they had no read deps. This hid parent vars from render-time
+// extractValue calls. Two symptoms:
+//   a) Table syncWithVar: extractValue("{syncState}") returned undefined → adapter never
+//      created → writing selectedIds to the parent var silently failed.
+//   b) Select clearable/multiSelect internals broke when wrapped without read deps
+//      (re-introducing the Bug 20 regression).
+//
+// Both are fixed by reverting unconditional promotion. These tests are the minimal
+// fast regressions to catch any future re-introduction of the Mandatory Shielding
+// pattern for the static case.
+
+test.describe("computedUses regression: static heavy components with string-prop var references (Bug 26)", () => {
+  test(
+    "Table syncWithVar: selecting a row updates the shared variable (no computedUses narrowing on static Table)",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Fragment var.syncState="{{}}">
+          <Table syncWithVar="syncState" rowsSelectable="true" testId="tbl"
+                 data='{[{"id":1,"name":"Alpha"},{"id":2,"name":"Beta"}]}'>
+            <Column bindTo="name"/>
+          </Table>
+          <Text testId="sync-out">{JSON.stringify(syncState)}</Text>
+        </Fragment>
+      `);
+
+      const table = page.getByTestId("tbl");
+      await expect(table).toBeVisible();
+
+      await table.locator("input[type='checkbox']").nth(1).click({ force: true });
+
+      await expect(page.getByTestId("sync-out")).toContainText('"selectedIds"');
+      await expect(page.getByTestId("sync-out")).toContainText("1");
+    },
+  );
+
+  test(
+    "Select clearable with onDidChange: clear button works and event fires (no wrapping for write-only dep)",
+    async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Select clearable="true" onDidChange="testState = 'changed'">
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+        </Select>
+      `);
+
+      const driver = page.getByTestId("test-id-component");
+      await expect(driver).toBeVisible();
+
+      // open dropdown and pick first option
+      await driver.click();
+      await page.getByRole("option", { name: "first" }).click();
+
+      // clear button should appear
+      const clearBtn = driver.locator('[data-part-id="clearButton"]').first();
+      await expect(clearBtn).toBeVisible();
+
+      // click clear — page must NOT crash, event must fire
+      await clearBtn.click();
+      await expect.poll(testStateDriver.testState).toEqual("changed");
     },
   );
 });

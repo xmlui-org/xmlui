@@ -1,5 +1,11 @@
 # Analysis of XMLUI Components for `computedUses` Shielding
 
+> **Status (2026-05-21):** Unconditional ("Mandatory") Shielding was reverted — see Bug 26 in
+> `bugs-history.md`. The `IMPLICIT_CONTAINER_COMPONENT_NAMES` list still controls *conditional*
+> promotion (triggered only when the component has actual read deps). This document remains useful
+> for deciding which components should be in that list, but the "unconditional React.memo shield
+> for fully static components" goal is deferred until a non-narrowing mechanism is available.
+
 ## 1. Context & Criteria
 
 According to the `computedUses` design, "heavy" components are those that render large amounts of data or complex DOM structures. Without a `React.memo` shield (provided by an implicit `StateContainer`), these components would re-render every time *any* parent state variable changes. This causes severe performance degradation (e.g., 50+ renders per second). 

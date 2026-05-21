@@ -739,3 +739,51 @@ const {
 **Файли:** `xmlui/src/components-core/CompoundComponent.tsx`, `xmlui/tests/components-core/optimization/computedUses.test.ts` (inline describe `"Бaг 24 — stale computedUses after CompoundComponent restructure"`, 4 кейси), `xmlui/tests-e2e/computed-uses.spec.ts` (секція 7 — мінімальні e2e репро без залежності від роутингу), `xmlui/tests-e2e/compound-component.spec.ts:722,759` (e2e регресія на оригінальному $queryParams-сценарії).
 
 **Загальний урок (для майбутніх рефакторів):** Будь-який код, який РЕСТРУКТУРУЄ дерево компонентів між boot-time аналізом і runtime рендерингом, мусить ВРАХОВУВАТИ всі похідні від цього дерева властивості (`computedUses`, можливо в майбутньому інші статичні анотації). Spread (`...rest`) безпечний для незмінених піддерев, але небезпечний для метаданих, які залежали від попередньої структури. Сформульовано як інваріант — див. розділ «Неочевидні архітектурні рішення → 22. Інваріант: runtime restructure інвалідовує статичний `computedUses`».
+
+---
+
+### Баг 26 (виявлений у Group N + Group O, `Select.spec.ts` + `Table.spec.ts`): Mandatory Shielding ламав `syncWithVar` і clearable/multiSelect Select
+
+**Симптом:** Після впровадження Mandatory Shielding (комміт `e50613830`) e2e regress: 21 тест (15 у `Select.spec.ts`, 6 у `Table.spec.ts`).
+
+- **Group O (Table `syncWithVar`):** `Table syncWithVar="syncState"` усередині `<Fragment var.syncState="{{}}">`. Очікувано — клік чекбоксом записує `{selectedIds:[1]}` у `syncState`, відображення `JSON.stringify(syncState)` оновлюється. Реально — display залишався `"{}"`.
+- **Group N (Select):** 15 тестів `Select.spec.ts` (multiSelect, groupBy, clearable, valueTemplate, ungrouped headers). Після вибору опції тригер не показував badge з обраним label. Деякі тести (`clear button triggers didChange event`) падали з `Target page, context or browser has been closed` — браузер падав, бо internal state Select виявлявся неконсистентним.
+
+**Корінь:** Mandatory Shielding безумовно загортав heavy-компоненти у власний `StateContainer` навіть без read-deps, ставлячи `computedUses = []`:
+
+1. **Table:** Render-time код `Table.tsx:723` робить `extractValue(`{${syncVarName}}`)`. Через `computedUses=[]` звужений parent state — `{}`, тому `extractValue("{syncState}")` повертає `undefined`. Перевірка `if (currentSyncVarValue != null)` обриває створення `syncAdapter`. Запис у `syncState` не відбувається.
+2. **Select:** Той же фіх Бaг 20 явно фіксує: загортання Select у `StateContainer` (коли немає read-deps) ламає внутрішню логіку clearable/multiSelect. Mandatory Shielding скасовує цей фікс — додає `StateContainer`-щит до Select зі статичним вмістом, відновлюючи Бaг 20 у новій формі.
+
+**Чому з вимкненим `COMPUTED_USES_ENABLED` все працювало:** алгоритм рано виходить, `computedUses` не встановлюється на Select/Table, обидва компоненти лишаються "голими" в межах батьківського `Fragment`. `extractValue("{syncState}")` бачить повний `combinedState` Fragment, Table-adapter створюється і пише в `syncState`. Select-internals працюють без додаткового щита.
+
+**Виправлення:** Відкат Mandatory Shielding у `computedUses.ts`:
+
+```ts
+// Було (Mandatory Shielding):
+const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type);
+const isContainer = isKnownContainer || (isImplicitDefault && (nonDynamicReadDeps.size > 0 || isImplicitDefault));
+// ...
+if (node.uses === undefined && (nonDynamicReadDeps.size > 0 || isImplicitDefault) && safeToNarrow) { ... }
+
+// Стало (доjon-state, повернуто до Бaг 20-eri):
+const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicReadDeps.size > 0;
+const isContainer = isKnownContainer || isImplicitDefault;
+// ...
+if (node.uses === undefined && nonDynamicReadDeps.size > 0 && safeToNarrow) { ... }
+```
+
+Bug 25 (Symbol UID-фільтр) залишено — це не залежить від Mandatory Shielding.
+
+**Альтернативи розглянуті і відкинуті:**
+- *Додати `syncWithVar` як спеціальну залежність у `computedUses`:* фіксує лише Group O. Group N (Select) ламається з іншої причини — внутрішня логіка clearable/multiSelect не сумісна із загортанням у `StateContainer` без read-deps.
+- *Виправити Select internals для роботи з `computedUses=[]`:* потребує глибокого реінжинірінгу `useSelectionContext`/popover-механізму. Бaг 20 показав, що це не тривіальна задача, і без runtime-діагностики ризик нових регресій високий.
+- *Залишити Mandatory Shielding лише для Table:* нелогічно — той самий механізм ламає різні речі в обох компонентах. Чистіший підхід — повернутися на доjon-Mandatory логіку.
+
+**Наслідки:** Повністю статичні Select/List/Table/DataGrid знову ре-рендеряться при кожному тіку батьківського state. Це відповідає поведінці до 2026-05-21 PM run (0 failed) і не блокує користувацькі сценарії — реальні застосунки майже завжди мають `data={...}` як read-dep, який природно тригерить promotion.
+
+**Файли:**
+- `xmlui/src/components-core/optimization/computedUses.ts` — revert isImplicitDefault/narrowing-guard
+- `xmlui/tests/components-core/optimization/computedUses.test.ts` — оновлено 4 unit-тести "(Mandatory Shielding)"
+- `xmlui/tests-e2e/computed-uses.spec.ts` — `test.skip` для render-count тесту static Select
+
+**Слід мати на увазі (TODO):** Майбутній не-narrowing щит для статичних heavy-компонентів (наприклад, `React.memo`-обгортка без `StateContainer`) має бути ортогональним до `extractScopedState`, щоб уникнути повторення цього конфлікту.
