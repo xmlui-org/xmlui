@@ -342,6 +342,11 @@ export type ComponentEventMetadata = {
   // This field defines the parameters of the event handler. It is an object where each key
   // is the parameter name, and the value is its description.
   readonly parameters?: Record<string, string>;
+
+  /**
+   * Names of variables that XMLUI runtime injects into THIS event's handler scope.
+   */
+  readonly injectedVars?: readonly string[];
 };
 
 // This type defines the metadata of a component API. It is used to describe the
