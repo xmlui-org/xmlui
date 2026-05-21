@@ -234,10 +234,28 @@ function StandaloneApp({
   } = standaloneApp || {};
 
   const globalProps = useMemo(() => {
+    // Allow per-browser-session opt-in to xsVerbose via localStorage, so an
+    // in-app diagnostic toggle can flip tracing without editing config.json.
+    // Key namespace `xmlui:*` keeps the surface bounded and discoverable.
+    const lsOverrides: Record<string, any> = {};
+    if (typeof localStorage !== "undefined") {
+      try {
+        if (localStorage.getItem("xmlui:xsVerbose") === "true") {
+          lsOverrides.xsVerbose = true;
+        }
+        const lsLogMax = localStorage.getItem("xmlui:xsVerboseLogMax");
+        if (lsLogMax !== null && !Number.isNaN(Number(lsLogMax))) {
+          lsOverrides.xsVerboseLogMax = Number(lsLogMax);
+        }
+      } catch {
+        // localStorage may throw in sandboxed/private contexts; ignore.
+      }
+    }
     return {
       name: name,
       ...(appGlobals || {}),
       ...(globals || {}),
+      ...lsOverrides,
     };
   }, [appGlobals, globals, name]);
 
