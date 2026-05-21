@@ -1476,3 +1476,20 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Бaг 24: stale computed
     expect((scoped as any).selectedFilter).toBeUndefined();
   });
 });
+
+describe.skipIf(skipIfDisabled)("lexical scoping — Iteration 1 fallback", () => {
+  it("U1.6: node without injectedVars metadata keeps $queryParams as a parent dep", () => {
+    const root = node("Fragment", {
+      vars: { x: "{0}" },
+      children: [
+        node("CustomLoader", {
+          events: { fetch: "() => $queryParams.q" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    // Since CustomLoader has no metadata (and isn't DataLoader/DataSource),
+    // $queryParams is NOT filtered and bubbles up to Fragment.
+    expect(root.computedUses).toContain("$queryParams");
+  });
+});
