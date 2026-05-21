@@ -127,7 +127,7 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — DataLoader onFetch conte
   });
 });
 
-describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDefault", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDefault (Mandatory Shielding)", () => {
   it("Select with children that have dependencies becomes container", () => {
     const select = node("Select", {
       children: [
@@ -143,21 +143,48 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDef
     expect(select.computedUses).toContain("rarelyChanges");
   });
 
-  it("Select without external dependencies: computedUses not set", () => {
+  it("Select WITHOUT external dependencies: computedUses set to [] (Mandatory Shielding)", () => {
+    // Heavy components (Select, List, Table, DataGrid) are ALWAYS promoted
+    // to implicit containers to ensure they have a React.memo shield.
     const select = node("Select", {
       children: [node("Option", { props: { value: "static" } })],
     });
     computeUsesForTree(select);
-    expect(select.computedUses).toBeUndefined();
+    // Before Mandatory Shielding: toBeUndefined()
+    // After: toBeDefined() (shield created)
+    expect(select.computedUses).toEqual([]);
   });
 
-  it("contextVar keys are locally declared — do NOT make Select an implicit container", () => {
-    // Typical pattern: <Select><Items contextVar="$item" data="{...}"><Option value="{$item.value}"/></Items></Select>
-    // $item is a contextVar of Items — locally provided, not from parent scope.
-    // Without this fix, $item leaks out of Items → Select has parentDependencies={"$item"} → becomes
-    // implicit container → gets wrapped in outer Container with computedUses=["$item"] →
-    // extractScopedState(parentState, ["$item"]) = {} → value updates get isolated inside
-    // the outer Container and never propagate to Fragment → {mySelect.value} stays empty.
+  it("Select with child UIDs but no other deps: includes UIDs in computedUses", () => {
+    // If a heavy component is shielded, it must include any escaping child UIDs
+    // in its computedUses array so that extractScopedState doesn't filter them out.
+    const select = node("Select", {
+      children: [node("Option", { uid: "opt1", props: { value: "1" } })],
+    });
+    computeUsesForTree(select);
+    expect(select.computedUses).toEqual(["opt1"]);
+  });
+
+  it("HStack with dependencies: NOT promoted to container (Prevention of Accidental Promotion)", () => {
+    // Non-heavy components must NOT be promoted to containers just because they
+    // have dependencies. Promoting them would unnecessarily narrow their state
+    // and isolate descendants from sibling APIs.
+    const root = node("App", {
+      vars: { x: "{0}" },
+      children: [
+        node("HStack", {
+          props: { gap: "{x}" },
+          children: [node("Text", { props: { value: "Hello" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const hstack = root.children![0];
+    // HStack is not heavy, has no vars/loaders → not a container
+    expect(hstack.computedUses).toBeUndefined();
+  });
+
+  it("contextVar keys are locally declared — Select still promoted (Mandatory Shielding)", () => {
     const select = node("Select", {
       children: [
         node("Items", {
@@ -168,9 +195,8 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDef
       ],
     });
     computeUsesForTree(select);
-    // Items absorbs $item (contextVar) and someData (external dep).
-    // Select has parentDependencies={"someData"} — no $item leak.
-    // Select IS an implicit container (has free vars), but computedUses=["someData"] only.
+    // Select IS an implicit container due to Mandatory Shielding.
+    // computedUses=["someData"] (external dep), no $item leak.
     expect(select.computedUses).not.toContain("$item");
     expect(select.computedUses).toContain("someData");
   });
@@ -362,10 +388,9 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — events", () => {
     expect(fragment.computedUses).toContain("counter");
   });
 
-  it("write-only assignment does NOT promote implicit containers (Bug 20 optimization)", () => {
-    // A Select with onDidChange="testState = 'changed'" should NOT become an
-    // implicit container if it doesn't read any external state. Promoting it
-    // to an implicit container would wrap it in an unnecessary StateContainer.
+  it("write-only assignment STILL promotes implicit containers (Mandatory Shielding)", () => {
+    // Select is in IMPLICIT_CONTAINER_COMPONENT_NAMES, so it is promoted
+    // even if it only WRITES to testState. This ensures it has a performance shield.
     const root = node("Stack", {
       vars: { testState: "{null}" },
       children: [
@@ -376,9 +401,7 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — events", () => {
     });
     computeUsesForTree(root);
     const select = root.children![0];
-    // Select is in IMPLICIT_CONTAINER_COMPONENT_NAMES, but since it only WRITES
-    // to testState, it shouldn't be promoted to an implicit container.
-    expect(select.computedUses).toBeUndefined();
+    expect(select.computedUses).toEqual(["testState"]);
   });
 
   it("identifiers in parsed event handlers are included", () => {
@@ -507,6 +530,30 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — empty parentDependencies
     // bubbled registerComponentApi, so it must also be in computedUses to survive
     // the narrowing imposed by `externalVar`.
     expect(root.computedUses).toContain("mySelect");
+  });
+
+  it("handles Symbol UIDs gracefully (does not fail on sort, excludes from final array)", () => {
+    // Regression test: if a UID is a Symbol, sorting Array.from(computedUsesSet)
+    // used to throw "TypeError: Cannot convert a Symbol value to a string".
+    const root = node("Stack", {
+      uid: Symbol("stack-uid") as any,
+      vars: { x: "{0}" },
+      children: [
+        node("Select", {
+          uid: Symbol("select-uid") as any,
+          children: [
+            node("Text", { props: { text: "{externalVar}" } }),
+          ],
+        }),
+      ],
+    });
+    // This must not throw
+    computeUsesForTree(root);
+    // Select (implicit container) should have externalVar in computedUses
+    const select = root.children![0];
+    expect(select.computedUses).toEqual(["externalVar"]);
+    // The symbol UIDs should NOT be in the computedUses array
+    expect(select.computedUses).not.toContain(Symbol("select-uid"));
   });
 });
 
@@ -1019,17 +1066,14 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
     expect(select.computedUses).toContain("lastAction");
   });
 
-  it("$context alone does NOT make an implicit container (avoids empty stateFromOutside)", () => {
-    // When $context is the ONLY dep (no real parent-state key alongside it), an implicit
-    // container must NOT be promoted from isImplicitDefault — that would produce
-    // computedUses=['$context'] → stateFromOutside={} (initially, before openAt sets $context)
-    // → the component would be completely isolated from parent state.
+  it("$context alone STILL makes an implicit container for heavy components (Mandatory Shielding)", () => {
+    // Select is a heavy component, so it gets promoted even if it only uses $context.
+    // This ensures it has a performance shield.
     const select = node("Select", {
       children: [node("Text", { props: { text: "{$context.name}" } })],
     });
     computeUsesForTree(select);
-    // No real parent dep beside $context → isImplicitDefault stays false → no computedUses.
-    expect(select.computedUses).toBeUndefined();
+    expect(select.computedUses).toEqual(["$context"]);
   });
 
   it("$context does NOT cascade to grandparent (container stops propagation)", () => {

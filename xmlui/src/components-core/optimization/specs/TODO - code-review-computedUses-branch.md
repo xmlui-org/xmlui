@@ -51,19 +51,17 @@ if (process.env.NODE_ENV === "development") {
 
 ## 🟥 Потенційні баги
 
-### B1 (⚠️ subtle): стале значення `stateRef.current` у Container, якщо memo заблокував рендер
+### B1 (✅ FIXED): стале значення `stateRef.current` у Container, якщо memo заблокував рендер
 
-`stateRef.current` оновлюється в layout effect (`Container.tsx:165-168`) тільки коли `Container` ре-рендериться (змінюється identity `componentState`). Якщо `computedUses` працює (Container memo'd і **не** ре-рендериться при тіку `oftenChanges`), то `stateRef.current` лишається старим об'єктом, хоча `fullParentStateRef.current` може мати нові дані.
+**Статус:** ВИРІШЕНО (2026-05-21). Додано `refreshStateRef()` у `createEventHandlers` (`event-handlers.ts`), який оновлює `stateRef.current` з `fullParentStateRef.current` безпосередньо перед виконанням будь-якого коду.
 
-**Сценарій:** event handler у Select (який всередині Container) **читає** `oftenChanges` через `stateRef.current` → бачить старе значення.
+`stateRef.current` оновлювався в layout effect (`Container.tsx:165-168`) тільки коли `Container` ре-рендериться (змінюється identity `componentState`). Якщо `computedUses` працював (Container memo'd і **не** ре-рендерився при тіку `oftenChanges`), то `stateRef.current` лишався старим об'єктом, хоча `fullParentStateRef.current` міг мати нові дані.
 
-Це коректно **тільки якщо** статичний аналіз гарантовано вловлює всі READ-доступи. Але є випадки, де static analysis **пропустить**: динамічний доступ (`state[key]`), computed property names, eval-подібні конструкції. У таких випадках handler читатиме застаріле значення — **silent staleness bug**.
+**Сценарій:** event handler у Select (який всередині Container) **читав** `oftenChanges` через `stateRef.current` → бачив старе значення.
 
-**Рекомендація:** додати invalidation: прямо перед eval оновлювати `stateRef.current` з найсвіжіших рефів:
-```tsx
-// у createEventHandlers або перед виконанням коду:
-stateRef.current = fpRef.current ? { ...fpRef.current, ...compStateRef.current } : compStateRef.current;
-```
+Це було коректно **тільки якщо** статичний аналіз гарантовано вловлював всі READ-доступи. Але були випадки, де static analysis міг **пропустити** (динамічний доступ `state[key]`, computed property names, eval-подібні конструкції). У таких випадках handler читав би застаріле значення — **silent staleness bug**.
+
+**Виправлення:** додано invalidation: прямо перед eval оновлюється `stateRef.current` з найсвіжіших рефів через `refreshStateRef()`.
 
 ---
 

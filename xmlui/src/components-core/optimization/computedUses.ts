@@ -533,8 +533,12 @@ function computeUsesInternal(
   // component from all other parent state — AND so that write-only assignment
   // targets in event handlers don't promote (write-only targets must be in
   // scope but do not need a re-render trigger).
-  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicReadDeps.size > 0;
-  const isContainer = isKnownContainer || isImplicitDefault;
+  //
+  // EXCEPTION: Mandatory Shielding. Heavy components (Select, List, etc.)
+  // are ALWAYS promoted to containers even if they have no read dependencies,
+  // ensuring they are wrapped in React.memo and protected from parent re-renders.
+  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type);
+  const isContainer = isKnownContainer || (isImplicitDefault && (nonDynamicReadDeps.size > 0 || isImplicitDefault));
 
   if (isContainer) {
     // Both regular containers (vars/loaders/etc.) and explicit-uses containers
@@ -566,11 +570,12 @@ function computeUsesInternal(
     // the container off from sibling APIs registered in the ancestor. When both real deps
     // AND dynamic deps exist the dynamic vars are still included so the container re-renders
     // when $context changes (reactive correctness).
-    // Narrow only when there are real READ deps. Write-only targets still
-    // appear in `parentDependencies` (and therefore in the value we set for
-    // `computedUses` below), but they cannot by themselves require narrowing —
+    //
+    // Narrow only when there are real READ deps OR if this is a mandatory shield.
+    // Write-only targets still appear in `parentDependencies` (and therefore in the value
+    // we set for `computedUses` below), but they cannot by themselves require narrowing —
     // re-renders are triggered by reads, not writes.
-    if (node.uses === undefined && nonDynamicReadDeps.size > 0 && safeToNarrow) {
+    if (node.uses === undefined && (nonDynamicReadDeps.size > 0 || isImplicitDefault) && safeToNarrow) {
       const computedUsesSet = dependsOnParentFunction
         ? new Set([...parentDependencies, ...parentFunctionNames])
         : new Set([...parentDependencies]);
@@ -587,7 +592,10 @@ function computeUsesInternal(
       if (!isExplicitOwner) {
         for (const uid of childEscapingUIDs) computedUsesSet.add(uid);
       }
-      node.computedUses = Array.from(computedUsesSet).sort();
+      // Bug 23 fix: filter out Symbols before sorting to avoid TypeError
+      node.computedUses = Array.from(computedUsesSet)
+        .filter((d): d is string => typeof d === "string")
+        .sort();
     }
 
     // else: node has own script/code-behind, or calls a parent function while narrowing

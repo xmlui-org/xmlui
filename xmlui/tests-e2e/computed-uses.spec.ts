@@ -240,6 +240,39 @@ test.describe("computedUses optimization: Select inside user-defined component",
       expect(renderCount).toBeLessThanOrEqual(5);
     },
   );
+
+  test(
+    "static Select (no external dependencies) still renders ≤5 times after updates (Mandatory Shielding)",
+    async ({ initTestBed, page }) => {
+      // Verifies that heavy components are ALWAYS shielded, even with 0 deps.
+      const appStatic = `
+<App var.oftenChanges="{0}">
+  <Button testId="tick-btn" onClick="oftenChanges++">Tick</Button>
+  <Text testId="often-changes-text">Often changes: {oftenChanges}</Text>
+  <Select testId="select-component">
+    <Option value="1" label="Static 1" />
+    <Option value="2" label="Static 2" />
+  </Select>
+</App>
+`;
+      await initTestBed(appStatic, { noFragmentWrapper: true });
+
+      await triggerStateUpdates(page, TICK_COUNT);
+      await expect(page.getByTestId("often-changes-text")).toHaveText(
+        `Often changes: ${TICK_COUNT}`,
+      );
+
+      const renderCount = await readSelectRenderCount(page);
+      if (renderCount === null) {
+        test.skip(true, "__renderCounts not available (not running in development mode)");
+        return;
+      }
+
+      // Mandatory Shielding: Select.computedUses=[] → zero click-induced re-renders.
+      expect(renderCount).toBeLessThanOrEqual(5);
+    },
+  );
+
   // NOTE: the negative case (WITH <script> → optimization disabled → >5 renders) is NOT
   // tested here via render counts because when SelectWrapper has a <script> it becomes a
   // full StateContainer whose internal hierarchy gives Select a different __renderCounts key,
@@ -512,6 +545,27 @@ test.describe("computedUses regression: $context-only deps must not isolate cont
     await page.getByRole("menuitem", { name: "Action" }).click();
     await expect(page.getByTestId("action-text")).toHaveText("Action: done");
   });
+
+  test(
+    "non-heavy component (HStack) with dependencies is NOT promoted to container (Accidental Promotion Prevention)",
+    async ({ initTestBed, page }) => {
+      // HStack has a dependency on `oftenChanges`.
+      // If it were promoted to a container, it would isolate Select and Button.
+      // Button onClick="toast(s1.value)" would fail because s1 is invisible.
+      const appHStack = `
+<App var.oftenChanges="{0}">
+  <HStack gap="{oftenChanges}">
+    <Select id="s1" initialValue="Target" />
+    <Button testId="toast-btn" onClick="toast(s1.value)" />
+  </HStack>
+</App>
+`;
+      await initTestBed(appHStack, { noFragmentWrapper: true });
+
+      await page.getByTestId("toast-btn").click();
+      await expect(page.getByText("Target")).toBeVisible(); // Toast appeared with Select value
+    },
+  );
 });
 
 // ─── 7. Regression: stale computedUses after CompoundComponent restructure  ─
