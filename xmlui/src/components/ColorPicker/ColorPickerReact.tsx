@@ -1,5 +1,5 @@
 import type { ChangeEvent, CSSProperties, ForwardedRef } from "react";
-import { memo, useEffect, useTransition } from "react";
+import { memo, useEffect } from "react";
 import { forwardRef, useCallback, useRef } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -68,7 +68,6 @@ export const ColorPicker = memo(forwardRef(
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
     const id = useFormItemInputId(idProp);
-    const [isPending, startTransition] = useTransition();
     const inputRef = useRef<HTMLInputElement>(null);
     const composedRef = useComposedRefs(forwardedRef, inputRef);
 
@@ -80,24 +79,14 @@ export const ColorPicker = memo(forwardRef(
       [onDidChange, updateState],
     );
 
-    const updateValueWithTransition = useCallback(
-      (value: string, immediate = false) => {
-        if (immediate) {
-          updateValue(value);
-        } else {
-          startTransition(() => {
-            updateValue(value);
-          });
-        }
-      },
-      [updateValue, startTransition],
-    );
-
     const onInputChange = useCallback(
       (event: ChangeEvent<HTMLInputElement>) => {
-        updateValueWithTransition(event.target.value);
+        // Controlled input: must update synchronously, otherwise the displayed
+        // swatch lags one selection behind. See React useTransition caveats —
+        // calls that update inputs should not be inside startTransition.
+        updateValue(event.target.value);
       },
-      [updateValueWithTransition],
+      [updateValue],
     );
 
     useEffect(() => {
@@ -118,7 +107,7 @@ export const ColorPicker = memo(forwardRef(
     }, []);
 
     const setValue = useEvent((newValue) => {
-      updateValueWithTransition(newValue, true); // Immediate update for programmatic changes
+      updateValue(newValue);
     });
 
     useEffect(() => {

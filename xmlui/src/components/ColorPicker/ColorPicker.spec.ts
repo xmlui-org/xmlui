@@ -53,6 +53,37 @@ test("component handles enabled state correctly", async ({ page, initTestBed }) 
   await expect(colorInput).toBeEnabled();
 });
 
+// Regression: a single user-driven change must update both the controlled DOM
+// value AND any state bound to `cp.value` on the next render — not lag one
+// interaction behind. Previously the user-driven onChange path was wrapped in
+// `startTransition`, deferring the controlled `value` commit so the native
+// swatch showed the previous color until the user opened the picker again.
+test("component reflects selection on first change (no lag)", async ({ page, initTestBed }) => {
+  const INITIAL = "#000000";
+  const SELECTED = "#ff0000";
+
+  const { testStateDriver } = await initTestBed(`
+    <Fragment>
+      <ColorPicker id="cp" initialValue="${INITIAL}" onDidChange="(v) => testState = v" />
+      <Text testId="bound">{cp.value}</Text>
+    </Fragment>
+  `);
+
+  const colorInput = page.locator("input[type='color']");
+  await expect(colorInput).toHaveValue(INITIAL);
+  await expect(page.getByTestId("bound")).toHaveText(INITIAL);
+
+  // .fill() engages React's value tracker so the synthetic onChange fires the
+  // same way it does for a real user selection in the native picker.
+  await colorInput.fill(SELECTED);
+
+  // Controlled DOM value, bound interpolation of cp.value, and onDidChange must
+  // all reflect the new color after a single interaction.
+  await expect(colorInput).toHaveValue(SELECTED);
+  await expect(page.getByTestId("bound")).toHaveText(SELECTED);
+  await expect.poll(() => testStateDriver.testState()).toEqual(SELECTED);
+});
+
 test("component fires didChange event when color is selected", async ({ page, initTestBed }) => {
   const COLOR_1 = "#ff0000"; // Red
   const COLOR_2 = "#00ff00"; // Green
