@@ -1,9 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { computeUsesForTree, COMPUTED_USES_ENABLED, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
+import { computeUsesForTree as originalComputeUsesForTree, COMPUTED_USES_ENABLED, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
   "../../../src/components-core/optimization/computedUses";
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
+import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
+import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
 
 const skipIfDisabled = !COMPUTED_USES_ENABLED;
+
+const computeUsesForTree = (root: any) => originalComputeUsesForTree(root, (t) => {
+  if (t === "DataLoader") return DataLoaderMd;
+  if (t === "DataSource") return DataSourceMd;
+  return (collectedComponentMetadata as any)[t];
+});
 import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { Parser } from "../../../src/parsers/scripting/Parser";
@@ -1511,7 +1519,7 @@ describe.skipIf(skipIfDisabled)("lexical scoping — Iteration 1 events", () => 
     };
 
     const root = node("Fragment", {
-      vars: { tableQ: "{'x'}" },
+      vars: { someVar: "1" },
       children: [
         node("ExtensionLoader", {
           events: { fetch: "() => $queryParams.q + tableQ" },
@@ -1521,6 +1529,7 @@ describe.skipIf(skipIfDisabled)("lexical scoping — Iteration 1 events", () => 
 
     computeUsesForTree(root);
 
+    expect(root.computedUses).toBeDefined();
     expect(root.computedUses).not.toContain("$queryParams");
     expect(root.computedUses).toContain("tableQ");
   });

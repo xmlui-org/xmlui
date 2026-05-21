@@ -147,20 +147,7 @@ const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
  */
 const PARENT_STATE_DYNAMIC_VARS = new Set(["$context"]);
 
-/**
- * Identifiers injected at runtime into DataSource/DataLoader `fetch` handlers only.
- * They must NOT be treated as parent-scope dependencies: especially `$queryParams`
- * collides with {@link ROUTING_STATE_KEYS} router state, which would narrow ancestors
- * to URL query params and break handler context merge (DataSource onFetch tests).
- */
-const DATA_FETCH_HANDLER_INJECTED_KEYS = new Set([
-  "$url",
-  "$method",
-  "$queryParams",
-  "$requestBody",
-  "$requestHeaders",
-  "$pageParams",
-]);
+
 
 /**
  * Returns true for framework-injected context variables that are NOT stored
@@ -333,10 +320,14 @@ function depsOfRecord(
  *                      write-only targets do not need re-render tracking, so
  *                      they should not by themselves trigger promotion.
  */
+const EMPTY_SET: ReadonlySet<string> = Object.freeze(new Set<string>());
+
 function computeUsesInternal(
   node: ComponentDef,
   parentFunctionNames: Set<string> = new Set(),
   disableNarrowing: boolean = false,
+  injectedVarsScope: ReadonlySet<string> = EMPTY_SET,
+  metadataLookup?: (type: string) => any,
 ): [Set<string>, Set<string>, Set<string>] {
   const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
 
@@ -409,39 +400,43 @@ function computeUsesInternal(
   addRecord(node.props as Record<string, unknown> | undefined);
   addRecord(node.vars);
 
-  const isDataLoader = node.type === "DataLoader" || node.type === "DataSource";
   const events = node.events as Record<string, unknown> | undefined;
+  const metadata = metadataLookup?.(node.type);
 
-  const addEvent = (raw: unknown) => {
+  const addEvent = (raw: unknown, eventScope: ReadonlySet<string>) => {
     if (typeof raw === "string" && !raw.includes("{")) {
       try {
         const statements = parse(raw);
         const { all, reads } = depsOfValue({ statements });
-        for (const d of all) usedHere.add(d);
-        for (const d of reads) usedHereReads.add(d);
+        for (const d of all) {
+          if (!eventScope.has(d)) usedHere.add(d);
+        }
+        for (const d of reads) {
+          if (!eventScope.has(d)) usedHereReads.add(d);
+        }
         return;
       } catch {
         // Fall back to regular processing if not a valid script
       }
     }
-    addValue(raw);
+    const { all, reads } = depsOfValue(raw);
+    for (const d of all) {
+      if (!eventScope.has(d)) usedHere.add(d);
+    }
+    for (const d of reads) {
+      if (!eventScope.has(d)) usedHereReads.add(d);
+    }
   };
 
   if (events) {
-    for (const [key, raw] of Object.entries(events)) {
-      if (isDataLoader && key === "fetch" && raw != null) {
-        const { all: fetchAll, reads: fetchReads } = depsOfValue(raw);
-        for (const r of fetchAll) {
-          const d = rootIdentifier(r);
-          if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHere.add(d);
-        }
-        for (const r of fetchReads) {
-          const d = rootIdentifier(r);
-          if (!DATA_FETCH_HANDLER_INJECTED_KEYS.has(d)) usedHereReads.add(d);
-        }
-      } else {
-        addEvent(raw);
-      }
+    for (const [eventName, raw] of Object.entries(events)) {
+      const eventMeta = metadata?.events?.[eventName];
+      const eventInjected = eventMeta?.injectedVars ?? [];
+      const eventScope = eventInjected.length > 0
+        ? new Set([...injectedVarsScope, ...eventInjected])
+        : injectedVarsScope;
+
+      addEvent(raw, eventScope);
     }
   }
 
@@ -472,7 +467,7 @@ function computeUsesInternal(
 
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing);
+      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, injectedVarsScope, metadataLookup);
       for (const d of deps) childDeps.add(d);
       for (const d of depsReads) childDepsReads.add(d);
       for (const uid of escapingUIDs) {
@@ -640,13 +635,13 @@ function computeUsesInternal(
  * Public API — same contract as before (returns free vars set).
  * Prefer `computeUsesForTree` for whole-tree traversal.
  */
-export function computeUsesForSubtree(node: ComponentDef): Set<string> {
+export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type: string) => any): Set<string> {
   if (!COMPUTED_USES_ENABLED) return new Set();
-  const [freeVars] = computeUsesInternal(node);
+  const [freeVars] = computeUsesInternal(node, new Set(), false, EMPTY_SET, metadataLookup);
   return freeVars;
 }
 
-export function computeUsesForTree(root: ComponentDef): void {
+export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => any): void {
   if (!COMPUTED_USES_ENABLED) return;
   // StandaloneApp may call this with a CompoundComponentDef wrapper whose actual
   // ComponentDef (with type/children) lives one or two levels deeper.
@@ -661,5 +656,5 @@ export function computeUsesForTree(root: ComponentDef): void {
     }
     actualRoot = next;
   }
-  computeUsesInternal(actualRoot);
+  computeUsesInternal(actualRoot, new Set(), false, EMPTY_SET, metadataLookup);
 }
