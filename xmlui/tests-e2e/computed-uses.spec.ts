@@ -738,3 +738,37 @@ test.describe("computedUses regression: static heavy components with string-prop
     },
   );
 });
+
+test.describe("E1: Bug 21 regression — DataSource with $queryParams in fetch", () => {
+  test("changing router query params does NOT cause infinite re-fetch", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<App var.counter="{0}">
+        <DataSource id="ds" url="/fake"
+          onFetch="() => { counter = counter + 1; return 'q=' + $queryParams.q; }" />
+        <Text testId="counter" value="{counter}" />
+        <Button testId="nav" onClick="Actions.navigate('?q=abc')" />
+      </App>`,
+      { noFragmentWrapper: true }
+    );
+
+    // Initial mount fires fetch once.
+    await page.waitForFunction(() => {
+      const t = document.querySelector('[data-testid="counter"]');
+      return t && t.textContent === "1";
+    });
+
+    // Navigate to a new query string.
+    await page.getByTestId("nav").click();
+    
+    // Wait to ensure no stray re-fetches.
+    await page.waitForTimeout(500);
+    const final = await page.locator('[data-testid="counter"]').textContent();
+
+    // Hard assertion: NO additional re-fetches occurred, counter remains 1
+    // because $queryParams is correctly isolated to the event scope.
+    expect(final).toBe("1");
+  });
+});
