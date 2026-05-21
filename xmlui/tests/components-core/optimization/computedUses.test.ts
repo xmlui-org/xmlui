@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { computeUsesForTree, COMPUTED_USES_ENABLED, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
   "../../../src/components-core/optimization/computedUses";
+import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
 
 const skipIfDisabled = !COMPUTED_USES_ENABLED;
 import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
@@ -1491,5 +1492,36 @@ describe.skipIf(skipIfDisabled)("lexical scoping — Iteration 1 fallback", () =
     // Since CustomLoader has no metadata (and isn't DataLoader/DataSource),
     // $queryParams is NOT filtered and bubbles up to Fragment.
     expect(root.computedUses).toContain("$queryParams");
+  });
+});
+
+describe.skipIf(skipIfDisabled)("lexical scoping — Iteration 1 events", () => {
+  afterEach(() => {
+    delete (collectedComponentMetadata as any)["ExtensionLoader"];
+  });
+
+  it("U1.2: a custom extension loader with metadata.events.fetch.injectedVars filters $queryParams", () => {
+    (collectedComponentMetadata as any)["ExtensionLoader"] = {
+      events: {
+        fetch: {
+          description: "test",
+          injectedVars: ["$queryParams"],
+        },
+      },
+    };
+
+    const root = node("Fragment", {
+      vars: { tableQ: "{'x'}" },
+      children: [
+        node("ExtensionLoader", {
+          events: { fetch: "() => $queryParams.q + tableQ" },
+        }),
+      ],
+    });
+
+    computeUsesForTree(root);
+
+    expect(root.computedUses).not.toContain("$queryParams");
+    expect(root.computedUses).toContain("tableQ");
   });
 });
