@@ -7,7 +7,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ArrowExpression } from "../script-runner/ScriptingSourceTree";
 import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import { ROUTING_STATE_KEYS } from "../state/routing-state";
+import { UNSTABLE_GLOBAL_VARS } from "../state/FrameworkGlobals";
 
 // ============================================================================
 // TYPE GUARDS
@@ -195,9 +195,9 @@ export function extractScopedState<T extends Record<string, any>>(
   // lexically-scoped $item) would otherwise strip $item from stateFromOutside,
   // leaving the inner Text with $item=undefined.
   //
-  // We deliberately EXCLUDE routing-state keys (ROUTING_STATE_KEYS) because
-  // they are re-added at every StateContainer (Layer 6 of combinedState) and
-  // their value objects (especially `$routeParams` from useParams) are not
+  // We deliberately EXCLUDE unstable global variables (UNSTABLE_GLOBAL_VARS)
+  // because they are re-added at every StateContainer (Layer 6 of combinedState)
+  // and their value objects (especially `$routeParams` from useParams) are not
   // reference-stable, so preserving them here makes `useShallowCompareMemoize`
   // miss every render — defeating the computedUses optimisation
   // (see `tests-e2e/computed-uses.spec.ts`: "Select renders ≤5 times after N
@@ -206,7 +206,7 @@ export function extractScopedState<T extends Record<string, any>>(
     if (
       typeof key === "string" &&
       key.startsWith("$") &&
-      !ROUTING_STATE_KEYS.has(key) &&
+      !UNSTABLE_GLOBAL_VARS.has(key) &&
       !(key in picked)
     ) {
       picked[key] = (parentState as any)[key];

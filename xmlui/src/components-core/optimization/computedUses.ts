@@ -48,7 +48,6 @@ function parse(source: string): Statement[] {
 }
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
-import { ROUTING_STATE_KEYS } from "../state/routing-state";
 import { isContainerLike } from "../rendering/ContainerUtils";
 
 /**
@@ -434,7 +433,10 @@ function computeUsesInternal(
   // at runtime (because they pass through non-container intermediaries).
   const childEscapingUIDs = new Set<string>();
 
-  const childInjected = metadata?.childInjectedVars ?? [];
+  const childInjected = [
+    ...(metadata?.childInjectedVars ?? []),
+    ...(metadata?.unstableChildInjectedVars ?? []),
+  ];
   const childScope = childInjected.length > 0
     ? new Set([...injectedVarsScope, ...childInjected])
     : injectedVarsScope;

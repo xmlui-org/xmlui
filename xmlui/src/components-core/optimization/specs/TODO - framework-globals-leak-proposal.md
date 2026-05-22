@@ -15,7 +15,7 @@ The AST scanner finds the identifier `Actions` and, because it is neither locall
 
 While the eval engine safely resolves `Actions` via `localContext` (avoiding crash), the presence of `"Actions"` in the component's read dependencies (`nonDynamicReadDeps`) causes a severe architectural side effect: **False Promotion**.
 
-Components in the `IMPLICIT_CONTAINER_COMPONENT_NAMES` list (like `Select`, `List`, `Table`) are automatically upgraded to full `StateContainer` instances if they have any read dependencies on external state. Because `Actions` is counted as an external read dependency, the `Select` is unnecessarily wrapped in a `StateContainer`.
+Heavy components (marked with `isImplicitContainerByDefault: true` in metadata, like `Select`, `List`, `Table`) are automatically upgraded to full `StateContainer` instances if they have any read dependencies on external state. Because `Actions` is counted as an external read dependency, the `Select` is unnecessarily wrapped in a `StateContainer`.
 
 ## Negative Impact
 1. **Structural Overhead**: Creates unnecessary `StateContainer` contexts, own reducer queues, and context intercepts for simple leaf components, increasing React tree depth and slowing down initialization.

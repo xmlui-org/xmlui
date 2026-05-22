@@ -1,12 +1,12 @@
-# computedUses — Архітектурна специфікація
+# computedUses — Architectural Specification
 
-> Цей документ описує фічу `computedUses`: як вона працює, як реалізована архітектурно, які має підводні камені та напрямки для покращень. Для повної хронології виявлених та виправлених багів у процесі реалізації — див. [bugs-history.md](./bugs-history.md).
+> This document describes the `computedUses` feature: how it works, its architectural implementation, potential pitfalls, and future directions for improvement. For a full chronology of identified and fixed bugs during implementation, see [bugs-history.md](./bugs-history.md).
 
 ---
 
-## 1. Проблема та концепція
+## 1. Problem and Concept
 
-Розглянемо додаток:
+Consider an application:
 ```xml
 <App
   var.oftenChanges="{0}"
@@ -23,145 +23,91 @@
 </App>
 ```
 
-**До оптимізації:** `Select` (і всі його діти) ре-рендериться при **кожній** зміні `oftenChanges` (10+ разів на секунду), оскільки він отримує від `App` весь стан: `parentState = { oftenChanges, rarelyChanges }`.
+**Before optimization:** `Select` (and all its children) re-renders on **every** change of `oftenChanges` (10+ times per second) because it receives the full state from `App`: `parentState = { oftenChanges, rarelyChanges }`.
 
-**Рішення (`computedUses`):** Автоматичний статичний аналіз AST (Abstract Syntax Tree) розраховує мінімальний список зовнішніх залежностей для кожного контейнера. `Select` отримує `computedUses = ["rarelyChanges"]`. Під час рендерингу створюється проекція стану (`scopedParentState`), яка змінюється ЛИШЕ коли змінюється `rarelyChanges`, ізолюючи компонент через `React.memo`.
-
----
-
-## 2. Алгоритм та життєвий цикл (Runtime)
-
-### Статичний Аналіз: `computeUsesForTree`
-Алгоритм працює знизу-вгору (bottom-up), обходячи дерево `ComponentDef` перед підключенням реактивного графа:
-1. Збирає всі використані у вузлі ідентифікатори (`usedHere`).
-2. Отримує ідентифікатори, які "просочуються" від дітей (`childDeps`).
-3. Вилучає **локально оголошені** змінні (`vars`, `loaders`, `contextVars` типу `$item`, функції).
-4. Вилучає **Built-in Globals** (`JS_STDLIB_GLOBALS` типу `Math`, `JSON_STDLIB_GLOBALS`).
-5. Вилучає **Lexical Scoped Vars**. Це змінні, які впроваджуються безпосередньо у дочірній контекст на етапі рендерингу (наприклад `$item` у `List` або `$queryParams` у `onFetch`). Вони декларуються у метаданих компонентів (`childInjectedVars`) та подій (`injectedVars`), що дозволяє аналізатору ігнорувати їх як зовнішні залежності.
-6. Формує список `computedUses` — мінімальний набір батьківських ключів стану (включно із необхідними UID-ами дочірніх компонентів, що зареєструють свій API вище по дереву).
-
-### Runtime Захист (Defense-in-depth)
-- **`ComponentWrapper`:** Використовує `extractScopedState(state, computedUses)` та мемоїзує результат через `useShallowCompareMemoize`. Оновлення `state` обривається тут, якщо залежності не змінилися, і нижчі обгортки навіть не виконуються.
-- **`ContainerWrapper`:** Отримує звужений стан `parentState={scopedParentState}` та відповідає за розгортання `StateContainer`. Перевіряє чи вузол взагалі є контейнером (через `isContainerLike`, що враховує наявність `computedUses`).
-- **`StateContainer`:** Реєструє реактивні зміни. Стан для дітей стає повністю ізольованим.
+**Solution (`computedUses`):** Automatic static analysis of the AST (Abstract Syntax Tree) calculates the minimum list of external dependencies for each container. `Select` receives `computedUses = ["rarelyChanges"]`. During rendering, a state projection (`scopedParentState`) is created, which changes ONLY when `rarelyChanges` changes, isolating the component via `React.memo`.
 
 ---
 
-## 3. Implicit-Container Promotion для Важких Компонентів
+## 2. Algorithm and Lifecycle (Runtime)
 
-Важкі компоненти, позначені флажком `isImplicitContainerByDefault: true` у метаданих (такі як `Select`, `List`, `Table`, `DataGrid`, `Tree`, `TileGrid`, `AutoComplete`, `Markdown`), автоматично підвищуються до неявних контейнерів, але **тільки за наявності справжніх read-залежностей** від батьківського стану (`nonDynamicReadDeps.size > 0`).
+### Static Analysis: `computeUsesForTree`
+The algorithm works bottom-up, traversing the `ComponentDef` tree before connecting the reactive graph:
+1. Collects all identifiers used in the node (`usedHere`).
+2. Retrieves identifiers "leaking" from children (`childDeps`).
+3. Excludes **locally declared** variables (`vars`, `loaders`, `contextVars` like `$item`, functions).
+4. Excludes **Built-in Globals** (`JS_STDLIB_GLOBALS` like `Math`, `JSON_STDLIB_GLOBALS`).
+5. Excludes **Lexical Scoped Vars**. These are variables injected directly into the child context at render time (e.g., `$item` in `List` or `$queryParams` in `onFetch`). They are declared in component metadata (`childInjectedVars`) and event metadata (`injectedVars`), allowing the analyzer to ignore them as external dependencies.
+6. Excludes **Unstable Global Variables** (`UNSTABLE_GLOBAL_VARS`). These are navigation keys (like `$pathname`) declared in root metadata (`unstableChildInjectedVars`).
+7. Forms the `computedUses` list — a minimum set of parent state keys (including necessary child component UIDs that will register their API higher up the tree).
 
-**Логіка:**
-1. Якщо важкий компонент читає батьківські змінні (наприклад `<Select data="{items}" />`), він отримує контейнер і `computedUses` для вузькування стану.
-2. Якщо важкий компонент цілком статичний (немає read-deps, наприклад `<Select />`), він залишається "голим" у межах батьківського контейнера.
-
-**Чому так:** Обов'язкове обгортання (без read-deps) створює порожні `computedUses=[]`, що звужує батьківський стан до `{}` (пусто). Це ламає render-time функції типу `extractValue()`, яка потребує доступу до змінних під час рендера (наприклад `syncWithVar` адаптери в Table).
-
-**Майбутній напрямок:** Щит для повністю статичних heavy-компонентів має бути ортогональним до звуження state — наприклад окремий `React.memo` без `StateContainer`. Див. [todo-smart-containers.md](./todo-smart-containers.md) щодо стратегії уникнення "матрьошок".
-
-### П'ять Випадків Коли Важкі Компоненти Залишаються Без Обгортки
-
-Навіть для компонента з `isImplicitContainerByDefault: true`, просування пропускається коли `nonDynamicReadDeps` залишається порожнім після фільтрації:
-
-- **Випадок A — Write-Only Target:** Компонент використовує змінні лише в лівій частині присвоєння (`onClick="count = 0"`), ніколи не читає їх. Цілі присвоєння відфільтровуються з read-deps → нема read-deps → нема просування.
-- **Випадок B — Dynamic Variables Only:** Компонент посилається лише на runtime-ін'єктовані змінні (`$item`, `$context`). Динамічні змінні відфільтровуються з `nonDynamicReadDeps` → нема статичних read-deps → нема просування.
-- **Випадок C — Data Fetch Injections:** Обробник `onFetch` отримує ін'єктовані змінні (`$queryParams`, `$response`), які не беруться з батьківського стану. Ін'єктовані fetch-змінні відфільтровуються → нема parent-read-deps → нема просування.
-- **Випадок D — Built-in Globals Only:** Компонент використовує лише функції стандартної бібліотеки JS (`Math`, `JSON`). JS-глобали відфільтровуються → нема read-deps → нема просування.
-- **Випадок E — Completely Static:** Компонент не має прив'язок властивостей (`<Select />`). Жодних ідентифікаторів не використано → `nonDynamicReadDeps.size === 0` → нема просування.
-
-### Два Окремих Концерни: State Scoping vs Performance Shielding
-
-| Концерн | Тригер | Ефект |
-|---------|--------|-------|
-| **State Scoping** | `nonDynamicReadDeps.size > 0` | Створює `computedUses` масив і звужує батьківський стан для дітей |
-| **Performance Shielding** | Метадані `isImplicitContainerByDefault: true` (тільки коли є scoping) | Обгортає компонент у `StateContainer` для `React.memo` межі |
-
-Ці концерни **зв'язані для важких компонентів:** якщо компонент має read-deps і отримує scoping, він автоматично отримує і shield. Якщо read-deps нема — scoping не відбувається → shield теж відсутній. Це свідоме рішення: обгортка без read-deps означала б `computedUses=[]`, звуження стану до `{}` і сліпоту до батьківського стану при render-time операціях.
+### Runtime Protection (Defense-in-depth)
+- **`ComponentWrapper`:** Uses `extractScopedState(state, computedUses)` and memoizes the result via `useShallowCompareMemoize`. State updates are terminated here if dependencies haven't changed, and lower wrappers aren't even executed.
+- **`ContainerWrapper`:** Receives the narrowed state `parentState={scopedParentState}` and is responsible for deploying the `StateContainer`. It checks if the node is a container (via `isContainerLike`, which considers the presence of `computedUses`).
+- **`StateContainer`:** Registers reactive changes. State for children becomes fully isolated.
 
 ---
 
-## 4. Неочевидні Архітектурні Рішення та Інваріанти
+## 3. Implicit-Container Promotion for Heavy Components
 
-### Explicit vs Implicit Owners (Механізм UID-escaping)
-Коли компонент (наприклад `<Select id="mySelect">`) викликає `registerComponentApi`, де опиниться `mySelect`?
-- **Explicit Owner** (`type="Container"` або визначено `uses`): Створює повноцінну межу — дитячий API реєструється у цього вузла.
-- **Implicit Container** (контейнер, породжений заради `vars`, або через Mandatory Shielding без явного `uses`): Делегує `registerComponentApi` своєму батьку. 
-Алгоритм `computedUses` гарантує, що дитячі UID "спливають" назовні (яку `childEscapingUIDs`), аж доки не зустрінуть Explicit Owner. Якщо Implicit Container обмежує свій зовнішній стан (`parentDependencies`), то йому примусово **повертаються** ті UID, які він сам пропустив угору. Інакше він би "осліп" стосовно API своїх власних нащадків.
+Heavy components marked with the `isImplicitContainerByDefault: true` flag in metadata (such as `Select`, `List`, `Table`, `DataGrid`, `Tree`, `TileGrid`, `AutoComplete`, `Markdown`) are automatically promoted to implicit containers, but **only if they have genuine read-dependencies** on parent state (`nonDynamicReadDeps.size > 0`).
 
-### Реф для об’єкту стану: `fullParentStateRef` у Event Handlers
-Хоча для *рендеру* стан звужується, *обробники подій* часто повинні записувати у змінні, які вони свідомо не відображають (`onChange="val = 5"`).
-Щоб уникнути помилки `Variable not found in scope`, **повний батьківський стан** прокидається вниз через обгортки у вигляді стабільного `MutableRefObject` (`fullParentStateRef`). Обробник звертається до нього при настанні події, але оскільки це реф, React не ініціює каскадних ре-рендерів (патерн *useEvent*).
+**Logic:**
+1. If a heavy component reads parent variables (e.g., `<Select data="{items}" />`), it receives a container and `computedUses` for state narrowing.
+2. If a heavy component is completely static (no read-deps, e.g., `<Select />`), it remains "bare" within the parent container.
 
-### Lexical Scoping (Механізм Immutable Scope Propagation)
-Замість хардкод-списків "особливих" змінних, оптимізатор використовує метадані для побудови лексичного скопу під час обходу дерева AST:
-- **Component Scope:** Компоненти-контейнери (як `List`, `Table`, `ModalDialog`) декларують `childInjectedVars`. Всі вирази у дітей цих компонентів автоматично фільтрують ці змінні.
-- **Event Scope:** Обробники подій (як `onFetch` у `DataLoader`) декларують `injectedVars`. Вирази всередині конкретного обробника фільтрують ці змінні.
-- **$context та реактивність:** Змінна `$context` (що встановлюється через `ContextMenu.openAt`) тепер трактується як звичайна батьківська залежність. Оскільки вона не входить до жодного `childInjectedVars`, вона природно потрапляє до `computedUses`. Це гарантує, що контейнери правильно ре-рендеряться при зміні контекстного меню.
-- **Assignment (LHS):** Щоб уникнути інвалідації при мутаціях, цілі присвоєння (Left-Hand Side) не вважаються `reads`. Запис не тригерить контейнеризацію. 
+**Why:** Mandatory wrapping (without read-deps) would create empty `computedUses=[]`, narrowing the parent state to `{}` (empty). This breaks render-time functions like `extractValue()`, which requires access to variables during render (e.g., `syncWithVar` adapters in Table).
 
-### Виключення Code-Behind (`scriptCollected` і `.xs` файли)
-Оптимізатор перевіряє тільки шаблон (`.xmlui`). Якщо користувач надав до компонента файл з розширенням `.xs` або використав `<script>`, функції всередині можуть звертатися до будь-чого у батьківському стані. Транзитивний AST-аналіз код-біхайндів наразі не ведеться, тому звуження для таких вузлів (і їхніх дітей: `nextDisableNarrowing`) відключається. Вони завжди отримують повний `parentState`.
+**Future Direction:** The shield for completely static heavy components should be orthogonal to state narrowing — e.g., a separate `React.memo` without a `StateContainer`. See [todo-smart-containers.md](./todo-smart-containers.md) regarding the strategy to avoid "matryoshka" nesting.
 
-### Символи та типи UIDs: Розділення Internal State від Subscribable Names
+---
 
-У статичному аналізі UID-змінні трактуються як `string`. Однак під час виконання (runtime) фреймворк зберігає **внутрішній стан компонента** під `Symbol(uid)` ключами. Це розділення критичне для правильної роботи звуження стану.
+## 4. Non-obvious Architectural Decisions and Invariants
 
-**Контекст (ContainerUtils.ts:extractScopedState):**
+### Explicit vs Implicit Owners (UID-escaping mechanism)
+When a component (e.g., `<Select id="mySelect">`) calls `registerComponentApi`, where will `mySelect` end up?
+- **Explicit Owner** (`type="Container"` or `uses` defined): Creates a full boundary — child API registers with this node.
+- **Implicit Container** (container created for `vars`, or via Mandatory Shielding without explicit `uses`): Delegates `registerComponentApi` to its parent.
+The `computedUses` algorithm ensures that child UIDs "bubble up" (as `childEscapingUIDs`) until they meet an Explicit Owner. If an Implicit Container limits its external state (`parentDependencies`), those UIDs it passed upward are forcibly **returned** to it. Otherwise, it would be "blind" to the API of its own descendants.
 
-Під час рендеру `extractScopedState(parentState, computedUses)` звужує батьківський стан, залишаючи лише ключі, що входять до `computedUses`:
+### State Object Ref: `fullParentStateRef` in Event Handlers
+While state is narrowed for *rendering*, *event handlers* often need to write to variables they don't explicitly display (`onChange="val = 5"`).
+To avoid "Variable not found in scope" errors, the **full parent state** is passed down through wrappers as a stable `MutableRefObject` (`fullParentStateRef`). The handler accesses it when the event occurs, but since it's a ref, React doesn't initiate cascading re-renders (the *useEvent* pattern).
+
+### Lexical Scoping (Immutable Scope Propagation Mechanism)
+Instead of hardcoded lists of "special" variables, the optimizer uses metadata to build the lexical scope during AST traversal:
+- **Component Scope:** Container components (like `List`, `Table`, `ModalDialog`) declare `childInjectedVars`. All expressions in children of these components automatically filter these variables.
+- **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars`. Expressions inside a specific handler filter these variables.
+- **Shadowing:** Metadata-driven scoping allows local variables (like `$queryParams` in `onFetch`) to naturally shadow global ones (like router `$queryParams`), preventing false parent dependencies.
+
+### Code-Behind Exclusion (`scriptCollected` and `.xs` files)
+The optimizer only checks the template (`.xmlui`). If a component has an `.xmlui.xs` file or uses `<script>`, functions inside may access anything in the parent state. Transitive AST analysis of code-behind is not currently performed, so state narrowing for such nodes (and their children: `nextDisableNarrowing`) is disabled. They always receive the full `parentState`.
+
+**Function-Free Child Narrowing:** Built-in components (like `Select`) inside a user component with code-behind can still be narrowed IF they don't call any parent functions. This is determined via `dependsOnParentFunction` check during analysis.
+
+### Symbols and UID types: Separating Internal State from Subscribable Names
+In static analysis, UID variables are treated as `string`. However, at runtime, the framework stores **internal component state** under `Symbol(uid)` keys. This separation is critical for state narrowing.
+
+**Context (`ContainerUtils.ts:extractScopedState`):**
+During render, `extractScopedState(parentState, computedUses)` narrows parent state, keeping only string keys in `computedUses`, but **unconditionally preserves ALL Symbol-keyed entries**. Symbols are internal instance state, not external subscribable names; reactive narrowing applies only to string keys.
+
+---
+
+### Lexical Variables and UNSTABLE_GLOBAL_VARS Exclusion
+
+In addition to Symbols, lexical context variables (prefixed with `$`) injected by the framework (e.g., `$item` from Column, `$param` from ModalDialog.open) must be preserved.
+
+**Problem:** `computedUses` is calculated as *parent external dependencies*. It doesn't include lexical variables (e.g., `$item`) that live in the parent state but which the parent doesn't "own"—they are injected higher in the tree. Narrowing would otherwise strip them.
+
+**Solution:** Preserve ALL `$`-prefixed keys EXCEPT `UNSTABLE_GLOBAL_VARS` (defined via `unstableChildInjectedVars` in metadata for `App` and other providers):
 
 ```ts
-const picked = {};
-for (const key of computedUses) {                    // ← string-ключі
-  if (key in parentState) {
-    picked[key] = parentState[key];
-  }
-}
-for (const sym of Object.getOwnPropertySymbols(parentState)) {  // ← Symbol-ключі
-  picked[sym] = (parentState as any)[sym];           // ← ЗАВЖДИ збірігати
-}
-return picked;
-```
-
-**Чому розділення потрібне:**
-
-1. **String-ключі** — це *зовнішні subscribable імена* (батьківські `vars`, `loaders`, router state). Вони перехоплюються в `computedUses` для *реактивності* — коли такий ключ змінюється, контейнер перерендериться.
-
-2. **Symbol-ключі** — це *внутрішній компонентний стан*. API кожного wrapped компонента (Toggle, Input, Select) реєструється під `Symbol(uid)` через `registerComponentApi`. Наприклад:
-   ```ts
-   // Checkbox при mount:
-   registerComponentApi({ focus, setValue })
-   // У StateContainer стає:
-   state[Symbol(checkbox-uid)] = { value: ..., focus, setValue, ... }
-   ```
-
-3. **Критична помилка:** Якщо при звуженні ми **фільтруємо** Symbol-ключі за `sym.description in computedUses`, то при `computedUses=["$checked"]` (список яка не містить checkbox-uid), весь Symbol-слайс компонента видаляється. `ComponentAdapter` отримує `state[uid] = undefined` → `props.value = undefined` → Toggle отримує `value={undefined}` → `transformToLegitValue(undefined) = false` → залипає у false.
-
-**Рішення:** Preserve ALL Symbol-ключи без фільтрування. Вони ніколи не беруться з `computedUses` — це не зовнішні залежності, які можна "забути" при звуженні. Це внутрішні слайси, що належать компонентам і мають завжди бути доступні під час рендера.
-
-**Архітектурна імплікація:** 
-- String-based narrowing ("звужуємо до потрібних батьківських змінних") — це оптимізація реактивності.
-- Symbol-based pass-through (Symbols ЗАВЖДИ присутні) — це гарантія корректності. Без неї компоненти, на які посилаються батьківські вирази, втрачають внутрішній стан.
-
-Див. [Баг 27 у bugs-history.md](./bugs-history.md) для повної відтворення та регресійного тесту.
-
----
-
-### Лексичні Змінні та Виключення ROUTING_STATE_KEYS
-
-Окрім Symbols, під час звуження стану у `extractScopedState` потрібно зберігати **лексичні змінні контексту** (prefixed з `$`), які вповнюються фреймворком (наприклад, `$item` від Column, `$param` від ModalDialog.open).
-
-**Проблема:** `computedUses` розраховується як *батьківські зовнішні залежності*. Він не включає лексичні змінні (наприклад, `$item`), які живуть у батьківському стані але які батько "не "має"—вони вповнюються вище у tree (Column при рендері rows). При звуженні `extractScopedState(parentState, computedUses)` залежності, що не входять до `computedUses`, видаляються. Якщо дочірній компонент (наприклад, Text всередину ModalDialog, яке відкривалось з Table.Column) посилається на `$item`, він отримує `undefined`.
-
-**Рішення:** Зберегти ВСІ `$`-prefixed ключі (окрім `ROUTING_STATE_KEYS`):
-
-```ts
-// ContainerUtils.ts:extractScopedState, lines 205-214
+// ContainerUtils.ts:extractScopedState
 for (const key of Object.keys(parentState)) {
   if (
     typeof key === "string" &&
     key.startsWith("$") &&
-    !ROUTING_STATE_KEYS.has(key) &&
+    !UNSTABLE_GLOBAL_VARS.has(key) &&
     !(key in picked)
   ) {
     picked[key] = (parentState as any)[key];
@@ -169,57 +115,41 @@ for (const key of Object.keys(parentState)) {
 }
 ```
 
-**Чому виключати ROUTING_STATE_KEYS:** Навігаційні ключі (`$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`) переобчислюються на кожному StateContainer (Layer 6 у `combinedState`). Їхні об'єкти мають нестійке reference — нові об'єкти при кожній навігації. Якщо їх зберігати у narrowed стані, `useShallowCompareMemoize` бачить нову reference → ре-рендер контейнера. Це руйнує оптимізацію (нашкодить tesту "Select renders ≤5 times after N oftenChanges updates"). Routing-state перепідставляється вище в `combinedState`, тому нема смислу зберігати нестійку reference тут.
-
-**Трьохарівнева ієрархія зберігання в `extractScopedState`:**
-
-1. **String-ключи з `computedUses`** (батьківські реактивні залежності)
-2. **Всі Symbol-ключі** (внутрішній стан компонентів)
-3. **Всі `$`-ключі КРІМ ROUTING_STATE_KEYS** (лексичні змінні від предків)
-
-```ts
-return {
-  ...(selected from parentState by computedUses),
-  ...(all Symbols from parentState),
-  ...(all $ lexical from parentState EXCEPT routing-state),
-};
-```
-
-Див. [Баг 13 у bugs-history.md](./bugs-history.md) для прикладу (Group Q: ModalDialog context propagation) та регресійних тестів.
+**Why exclude UNSTABLE_GLOBAL_VARS:** Navigation keys (like `$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`) are recomputed at every StateContainer. Their value objects have unstable references. Preserving them in narrowed state would cause `useShallowCompareMemoize` to trigger re-renders on every navigation, defeating the optimization. These keys are defined in `App` metadata.
 
 ---
 
-## 5. Інваріант: "Runtime Restructure"
+## 5. Invariant: "Runtime Restructure"
 
-**КРИТИЧНО:** Статичний масив `computedUses` розрахований під конкретну топологію дерева. Будь-який процес (як `CompoundComponent.tsx`), що переструктуровує дерево в runtime (наприклад, переносячи `vars` або викреслюючи обгортку), залишає існуючий `computedUses` **невалідним**, що призводить до втрати стейту дітьми.
-**Правило:** Завжди відкидати `computedUses` (`delete node.computedUses` або викреслення деструктуризацією), якщо код-генератор створює або видаляє обгорткові контейнери.
-
-### Узагальнене Правило: Snapshot Повинен Залишатися Валідним
-
-`computedUses` — це **snapshot** залежностей вузла на момент статичного аналізу. Snapshot стає невалідним у чотирьох сценаріях:
-
-1. **Переструктурування дерева в runtime** (переміщення `vars`, прибирання обгорток) — явно відкидати `computedUses` у коді-трансформері.
-2. **Зміна оголошень предків** (нові джерела скопу, Lexical Scoping) — оновлювати аналізатор одночасно з runtime-ін'єкцією.
-3. **Ін'єкція ідентифікаторів з невідповідними типами** (`Symbol` замість `string`) — фільтрувати типи у масивних операціях.
-4. **Нові behaviors або провайдери** що вводять ідентифікатори поза AST — декларувати їх у метаданих компонента щоб аналізатор міг їх врахувати.
-
-**Запобіжний захід:** Будь-який код що мутує топологію дерева або вводить нові ідентифікатори в runtime, зобов'язаний або (a) перерахувати `computedUses`, або (b) явно видалити `computedUses` — щоб не допустити роботи на застарілих даних.
+**CRITICAL:** The static `computedUses` array is calculated for a specific tree topology. Any process (like `CompoundComponent.tsx`) that restructures the tree at runtime (e.g., moving `vars` or removing a wrapper) leaves the existing `computedUses` **invalid**, leading to state loss for children.
+**Rule:** Always discard `computedUses` (`delete node.computedUses`) if the code generator creates or removes wrapper containers.
 
 ---
 
-## 6. TODO (Напрямки майбутньої роботи)
+## 6. Optimization Guards (Validation)
 
-1. **Фільтрація Framework Globals (False Promotion):**
-   Використання глобальних функцій типу `toast` або `Actions.callApi` зараз трактується як залежність від зовнішнього `parentState`. Для "легких" компонентів це призводить до помилкової ідентифікації їх як "зовнішньо залежних" (False Promotion) і надмірної побудови обгорток. Список `XMLUI_GLOBAL_NAMES` повинен стати частиною фільтра так само як і JS Standard Globals (докладно у `TODO - framework-globals-leak-proposal.md`).
-2. **Ліниве клонування стейту в Event Handlers (Proxy):**
-   Сучасна імплементація використовує `cloneDeep` для створення контейнерного стану при події. На важких сторінках (тисячі `Items`) це спричиняє затримки в обробниках типу scroll чи drag. Кращий підхід: `Proxy` зі стратегією *Copy-on-Write* замість повного копіювання.
-3. **AST-аналіз функцій з `.xs` файлів:**
-   Для звуження стейту в Compound-компонентах із Code-behind потрібен транзитивний AST-аналіз `scriptCollected` та тіл функцій з файлів `.xs`.
-4. **Консолідація метаданих (DRY):**
-   Розглянути можливість об'єднання `childInjectedVars` та `contextVars` у майбутньому рефакторингу. Зараз вони розділені для надійності оптимізатора та гнучкості документації, але це призводить до дублювання назв змінних у метаданих компонентів.
-5. **Автоматична валідація ін'єктованих змінних:**
-   Реалізувати Runtime-валідацію у `__DEV__` режимі, яка попереджатиме розробника, якщо компонент ін'єктує змінну (через `context.set` або `dispatch`), яка не була оголошена в метаданих (`childInjectedVars` або `injectedVars`). Див. [TODO-metadata-validation.md](./TODO-metadata-validation.md).
-
+### Runtime Validation (`validateInjectedVars`)
+To protect against developer error (forgetting to update metadata when adding new injected variables), a runtime check exists in `__DEV__` mode.
+- Whenever `ComponentAdapter` or `wrapComponent` injects context variables, it compares them against `injectedVars` / `childInjectedVars` metadata.
+- If a mismatch is found (a variable starts with `$` but is not declared), a console error is issued.
+- **Future:** This will be converted to a hard-fail (`throw`) in development to ensure metadata compliance.
 
 ---
-*Примітка: для перегляду статистики рендерів у браузері під час розробки використовуйте об'єкт `window.__renderCounts`.*
+
+## 7. TODO (Future Work)
+
+1. **Filtering Framework Globals (False Promotion):**
+   Using global functions like `toast` or `Actions.callApi` is currently treated as a dependency on external `parentState`. This causes "False Promotion" of light components. `XMLUI_GLOBAL_NAMES` should be added to the filter list (see `TODO - framework-globals-leak-proposal.md`).
+2. **Lazy State Cloning in Event Handlers (Proxy):**
+   Current implementation uses `cloneDeep` for state creation during events. On heavy pages, this causes delays. A `Proxy` with *Copy-on-Write* strategy would be more efficient.
+3. **AST Analysis of `.xs` File Functions:**
+   Enable state narrowing for components with code-behind by performing transitive AST analysis of function bodies in `.xs` files.
+4. **Metadata Consolidation (DRY):**
+   Merge `childInjectedVars` and `contextVars` in future refactorings to reduce duplication.
+5. **Static AST Audit Test:**
+   Implement a CI-enforced test that statically analyzes component source files to ensure metadata matches actual injections (see `TODO-metadata-protection-layers-2-and-4.md`).
+6. **Pure Static Tracking:**
+   Eliminate the `$`-prefix fallback in `extractScopedState` entirely once the analyzer is 100% accurate in tracking lexical scope, relying only on explicit `computedUses` lists.
+
+---
+*Note: To view render statistics in the browser during development, use the `window.__renderCounts` object.*

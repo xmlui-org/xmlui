@@ -166,7 +166,7 @@ describe("ContainerUtils", () => {
       expect(result.$param).toBe("param_value");
     });
 
-    it("should exclude routing state keys from $-prefixed preservation", () => {
+    it("should exclude unstable global variables from $-prefixed preservation", () => {
       const parentState = {
         user: { id: 1 },
         $item: { name: "Item1" },

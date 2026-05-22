@@ -458,6 +458,15 @@ export type ComponentMetadata<
    */
   childInjectedVars?: readonly string[];
 
+  /**
+   * Names of variables that are injected, but whose values are unstable
+   * across re-renders (re-created objects, etc.). This acts like
+   * `childInjectedVars` for static analysis locally (ignoring them),
+   * but flags them to be EXCLUDED from implicit pass-through into deep
+   * container scopes to maintain `React.memo` stability.
+   */
+  unstableChildInjectedVars?: readonly string[];
+
   // The name of the default part. Layout properties will be applied to this part by default.
   defaultPart?: string;
 

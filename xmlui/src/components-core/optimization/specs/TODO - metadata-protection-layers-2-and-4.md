@@ -1,6 +1,7 @@
 # TODO: Metadata Protection — Layer 2 (Static AST Audit) + Layer 4 (Runtime Hard-Fail)
 
-**Status:** Planned / Not started
+**Status:** Planned / Not started (TODO)
+**Overall:** Ні Layer 2, ні Layer 4 наразі не реалізовані.
 **Created:** 2026-05-21
 **Related specs:**
 - [2026-05-21-lexical-scoping-code-review.md](./2026-05-21-lexical-scoping-code-review.md)
@@ -98,12 +99,12 @@ If a component doesn't fit the convention, an explicit override file or annotati
 - Parsing 18 component files synchronously in one test: target < 200ms total.
 - Avoid heavy `ts-morph` if `typescript` standalone parser suffices.
 
-### Acceptance criteria
+### Acceptance criteria (TODO)
 
-- [ ] All current components in `OPTIMIZER_METADATA` pass the audit out of the box (no false positives).
-- [ ] Intentionally adding `$bogus` to `OPTIMIZER_METADATA.List.childInjectedVars` causes the test to fail with a clear message.
-- [ ] Intentionally removing `$item` from `List.tsx` renderer (without updating registry) causes the test to fail.
-- [ ] Test runs in < 1s as part of the standard test suite.
+- [ ] (TODO) All current components in `OPTIMIZER_METADATA` pass the audit out of the box (no false positives).
+- [ ] (TODO) Intentionally adding `$bogus` to `OPTIMIZER_METADATA.List.childInjectedVars` causes the test to fail with a clear message.
+- [ ] (TODO) Intentionally removing `$item` from `List.tsx` renderer (without updating registry) causes the test to fail.
+- [ ] (TODO) Test runs in < 1s as part of the standard test suite.
 
 ---
 
@@ -139,11 +140,11 @@ Fix: update OPTIMIZER_METADATA.<ComponentType>.<location> in
 - A thrown error in DEV mode surfaces immediately via React error boundary → impossible to ignore.
 - Cost: developer must fix before continuing, which is the whole point.
 
-### Acceptance criteria
+### Acceptance criteria (TODO)
 
-- [ ] Removing `$item` from `OPTIMIZER_METADATA.List.childInjectedVars` while `List.tsx` still injects it → app throws on first render of a `List`.
-- [ ] Production builds (`import.meta.env.DEV === false`) skip validation entirely (zero runtime cost).
-- [ ] Error message names the component, the location (`childInjectedVars` vs `events.<name>.injectedVars`), and the exact diff.
+- [ ] (TODO) Removing `$item` from `OPTIMIZER_METADATA.List.childInjectedVars` while `List.tsx` still injects it → app throws on first render of a `List`.
+- [ ] (TODO) Production builds (`import.meta.env.DEV === false`) skip validation entirely (zero runtime cost).
+- [ ] (TODO) Error message names the component, the location (`childInjectedVars` vs `events.<name>.injectedVars`), and the exact diff.
 
 ---
 

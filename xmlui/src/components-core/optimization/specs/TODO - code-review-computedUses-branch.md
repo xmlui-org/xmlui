@@ -1,28 +1,28 @@
-# Code Review: гілка `yurii/computedUses` vs `main`
+# Code Review: `yurii/computedUses` branch vs `main`
 
-> Дата аналізу: 2026-05-15  
-> Дата оновлення: 2026-05-20 (очищено від повністю вирішених завдань)  
-> Порівняння: `0c42b6f3a5d7e86aff7b8119699bbadc2e7bdd31` (merge-base) → HEAD  
-> Фокус: performance regressions, reference-identity issues, критичні баги, дублювання
+> Analysis Date: 2026-05-15  
+> Last Update: 2026-05-22 (Updated status of resolved tasks)  
+> Comparison: `0c42b6f3a5d7e86aff7b8119699bbadc2e7bdd31` (merge-base) → HEAD  
+> Focus: performance regressions, reference-identity issues, critical bugs, duplication
 
 ---
 
 ## 🔴 Performance regressions
 
-### P3 (LOW): подвійна робота `extractScopedState`
+### P3 (LOW): Double work in `extractScopedState`
 
-`ComponentWrapper` обрізає state до `scopedParentState`, передає його як `parentState` у `StateContainer`, який **знову** запускає `extractScopedState(parentState, node.uses ?? node.computedUses)` на вже обрізаному стейті:
+`ComponentWrapper` narrows the state to `scopedParentState`, passes it as `parentState` to `StateContainer`, which **again** runs `extractScopedState(parentState, node.uses ?? node.computedUses)` on the already narrowed state:
 
 `xmlui/src/components-core/rendering/StateContainer.tsx:166-170`
 `xmlui/src/components-core/rendering/ComponentWrapper.tsx:93-98`
 
-Через мемоізацію в типовому циклі (де `parentState` стабільний) ця подвійна робота не виконується — memo повертає попередній ref. Але при кожній справжній зміні скоупленого зрізу — обидва виклики запускаються. Дріб'язок, але архітектурно надлишково.
+Due to memoization in the typical cycle (where `parentState` is stable), this double work is not performed—memo returns the previous ref. But with every true change of the scoped slice, both calls run. Minor, but architecturally redundant.
 
 ---
 
 ## 🟠 Reference-identity / props vs refs
 
-### R2 (⚠️ note): render-phase мутація рефа
+### R2 (⚠️ note): Render-phase ref mutation
 
 `xmlui/src/components-core/rendering/ComponentWrapper.tsx:106`
 
@@ -30,13 +30,13 @@
 fullParentStateRef.current = (nodeUses || nodeComputedUses) ? state : undefined;
 ```
 
-Side-effect під час рендеру. React 18 strict mode подвоює рендер — присвоєння ідемпотентне, ОК. Concurrent rendering може перервати рендер — на retry присвоюється те саме (бо `state` приходить такий самий). Для поточного React 18 — безпечно. Але React документація позначає render-phase side effects як "avoid", бо може несподівано поводитись у майбутньому з React Cache / Server Components.
+Side-effect during render. React 18 strict mode doubles the render—assignment is idempotent, OK. Concurrent rendering might interrupt render—on retry, the same is assigned (because `state` comes the same). Safe for current React 18. But React documentation labels render-phase side effects as "avoid" as it may behave unexpectedly in the future with React Cache / Server Components.
 
 ---
 
-### R3 (📝 minor): dev-only лічильник рендерів мутує `globalThis` в рендері
+### R3 (📝 minor): dev-only render counter mutates `globalThis` in render
 
-`xmlui/src/components-core/rendering/StateContainer.tsx` — секція DEV-ONLY RENDER-COUNT PROFILER:
+`xmlui/src/components-core/rendering/StateContainer.tsx` — DEV-ONLY RENDER-COUNT PROFILER section:
 
 ```tsx
 if (process.env.NODE_ENV === "development") {
@@ -45,75 +45,74 @@ if (process.env.NODE_ENV === "development") {
 }
 ```
 
-У strict mode React подвоює кількість рендерів → лічильник у 2× завищений. Прод не зачіпає (`process.env.NODE_ENV === "development"` — мертвий код у prod build).
+In strict mode, React doubles the number of renders → counter is 2× inflated. Does not affect prod (`process.env.NODE_ENV === "development"` is dead code in prod build).
 
 ---
 
-## 🟥 Потенційні баги
+## 🟥 Potential Bugs
 
-### B1 (✅ FIXED): стале значення `stateRef.current` у Container, якщо memo заблокував рендер
+### B1 (✅ DONE): Stale `stateRef.current` value in Container if memo blocked render
 
-**Статус:** ВИРІШЕНО (2026-05-21). Додано `refreshStateRef()` у `createEventHandlers` (`event-handlers.ts`), який оновлює `stateRef.current` з `fullParentStateRef.current` безпосередньо перед виконанням будь-якого коду.
+**Status:** RESOLVED (2026-05-21). Added `refreshStateRef()` in `createEventHandlers` (`event-handlers.ts`), which updates `stateRef.current` from `fullParentStateRef.current` directly before executing any code.
 
-`stateRef.current` оновлювався в layout effect (`Container.tsx:165-168`) тільки коли `Container` ре-рендериться (змінюється identity `componentState`). Якщо `computedUses` працював (Container memo'd і **не** ре-рендерився при тіку `oftenChanges`), то `stateRef.current` лишався старим об'єктом, хоча `fullParentStateRef.current` міг мати нові дані.
+`stateRef.current` was updated in layout effect (`Container.tsx:165-168`) only when `Container` re-renders (identity of `componentState` changes). If `computedUses` worked (Container memo'd and **not** re-rendered during `oftenChanges` tick), `stateRef.current` remained the old object, even though `fullParentStateRef.current` could have new data.
 
-**Сценарій:** event handler у Select (який всередині Container) **читав** `oftenChanges` через `stateRef.current` → бачив старе значення.
+**Scenario:** event handler in Select (which is inside Container) **read** `oftenChanges` via `stateRef.current` → saw the old value.
 
-Це було коректно **тільки якщо** статичний аналіз гарантовано вловлював всі READ-доступи. Але були випадки, де static analysis міг **пропустити** (динамічний доступ `state[key]`, computed property names, eval-подібні конструкції). У таких випадках handler читав би застаріле значення — **silent staleness bug**.
+This was correct **only if** static analysis guaranteed catching all READ accesses. But there were cases where static analysis could **miss** (dynamic access `state[key]`, computed property names, eval-like constructs). In such cases, the handler would read a stale value—**silent staleness bug**.
 
-**Виправлення:** додано invalidation: прямо перед eval оновлюється `stateRef.current` з найсвіжіших рефів через `refreshStateRef()`.
-
----
-
-### B3 (📝): in-place мутація `computedUses` — питання shared ComponentDef
-
-`computeUsesForTree` мутує `node.computedUses` в дереві in-place. Викликається в `xmlui-parser.ts:58` та `StandaloneApp.tsx`. Якщо десь зберігається ref на старий `ComponentDef` і він повторно проходить через обробку, старий `computedUses` перезаписується. Конкретного бага зараз немає, але in-place мутація імпортованого об'єкта — pattern, який може створити проблеми в майбутньому.
+**Fix:** added invalidation: `stateRef.current` is updated from the freshest refs via `refreshStateRef()` right before eval.
 
 ---
 
-## 🧹 Брудний код / дублювання
+### B3 (📝): In-place mutation of `computedUses` — shared ComponentDef question
 
-### D3 (📝): `_savedVarDefs` / `_savedFunctionDefs` — implicit coupling через нетиповані поля
-
-`ContainerWrapper.tsx:234-235` пише, а `ModalDialog.tsx:158-159` читає через `as any` cast. Прив'язка через underscore-convention + `as any` cast без типізації. Працює, але крихка. Краще — окремий інтерфейс або weak map.
+`computeUsesForTree` mutates `node.computedUses` in the tree in-place. Called in `xmlui-parser.ts:58` and `StandaloneApp.tsx`. If a ref to an old `ComponentDef` is stored somewhere and it repeatedly passes through processing, the old `computedUses` is overwritten. There is no specific bug now, but in-place mutation of an imported object is a pattern that may create problems in the future.
 
 ---
 
-### D4 (📝): `ROUTING_STATE_KEYS` — ручний hardcode без compile-time enforcement
+## 🧹 Dirty code / duplication
 
-`xmlui/src/components-core/state/routing-state.ts:43-48`. Якщо `useRoutingParams` додасть новий ключ — цей Set треба оновити вручну.
+### D3 (📝): `_savedVarDefs` / `_savedFunctionDefs` — implicit coupling via untyped fields
 
----
-
-### D5 (📝): `JS_STDLIB_GLOBALS` — ручний список ECMAScript-глобалів
-
-50+ імен вручну у `computedUses.ts`. Стабільний список, але не ідеал.
+`ContainerWrapper.tsx:234-235` writes, and `ModalDialog.tsx:158-159` reads via `as any` cast. Binding via underscore-convention + `as any` cast without typing. Works, but fragile. Better—separate interface or weak map.
 
 ---
 
-### D6 (📝): `gatherIdentifiers` fallback без scope tracking
+### D4 (✅ DONE): `ROUTING_STATE_KEYS` — manual hardcode without compile-time enforcement
 
-`xmlui/src/components-core/script-runner/visitors.ts:425-440`. Fallback walk колектить **всі** Identifier-ноди без відстеження scope. Не помилка коректності, але **тиха деоптимізація**.
+**Status:** RESOLVED (2026-05-22). Refactored to `UNSTABLE_GLOBAL_VARS` and moved to metadata-driven configuration in `ComponentMetadata.unstableChildInjectedVars`. Routing keys are now declared on the `App` component metadata.
 
 ---
 
-## 📊 Підсумок (Залишок завдань)
+### D5 (📝): `JS_STDLIB_GLOBALS` — manual list of ECMAScript globals
 
-| # | Місце | Проблема | Статус |
+50+ names manually in `computedUses.ts`. Stable list, but not ideal.
+
+---
+
+### D6 (📝): `gatherIdentifiers` fallback without scope tracking
+
+`xmlui/src/components-core/script-runner/visitors.ts:425-440`. Fallback walk collects **all** Identifier nodes without scope tracking. Not a correctness error, but **silent deoptimization**.
+
+---
+
+## 📊 Summary (Remaining Tasks)
+
+| # | Location | Problem | Status |
 |---|---|---|---|
-| P3 | `ComponentWrapper` + `StateContainer` | Подвійний `extractScopedState` | 🔵 Низький пріоритет |
+| P3 | `ComponentWrapper` + `StateContainer` | Double `extractScopedState` | 🔵 Low priority |
 | R2 | `ComponentWrapper.tsx` | Render-phase ref mutation | 📝 Note (React 18 OK) |
-| R3 | `StateContainer.tsx` dev profiler | Strict mode подвоює лічильник | 📝 Note (dev only) |
-| B1 | `Container.tsx:167` | Stale `stateRef` у memo'd Container | ⚠️ Потребує виправлення (invalidation) |
-| B3 | `computedUses.ts` | In-place мутація `computedUses` | 📝 Note |
-| D3 | `ContainerWrapper.tsx` ↔ `ModalDialog.tsx` | `_savedVarDefs` без типізації | 🔵 Minor |
-| D4 | `routing-state.ts:43` | `ROUTING_STATE_KEYS` hardcode | 🔵 Minor |
-| D5 | `computedUses.ts` | `JS_STDLIB_GLOBALS` ручний список | 🔵 Minor |
-| D6 | `visitors.ts:425` | `gatherIdentifiers` fallback без scope | 🔵 Minor |
+| R3 | `StateContainer.tsx` dev profiler | Strict mode doubles counter | 📝 Note (dev only) |
+| ~~B1~~ | ~~`Container.tsx:167`~~ | ~~Stale `stateRef` in memo'd Container~~ | ✅ DONE |
+| B3 | `computedUses.ts` | In-place mutation of `computedUses` | 📝 Note |
+| D3 | `ContainerWrapper.tsx` ↔ `ModalDialog.tsx` | `_savedVarDefs` untyped | 🔵 Minor |
+| ~~D4~~ | ~~`routing-state.ts:43`~~ | ~~`ROUTING_STATE_KEYS` hardcode~~ | ✅ DONE |
+| D5 | `computedUses.ts` | `JS_STDLIB_GLOBALS` manual list | 🔵 Minor |
+| D6 | `visitors.ts:425` | `gatherIdentifiers` fallback | 🔵 Minor |
 
 ---
 
-## Пріоритет дій
+## Priority of Actions
 
-1. ⚠️ **Важливо:** B1 — додати invalidation `stateRef.current` перед виконанням коду в обробниках подій, щоб уникнути читання застарілих даних у мемоізованих контейнерах.
-2. 🔵 **Решта:** Рефакторинг P3, D3-D6 за можливості.
+1. 🔵 **Refactoring:** P3, D3, D5-D6 if possible. Others are notes/low priority.

@@ -31,6 +31,11 @@
 import type { ComponentMetadata } from "../../abstractions/ComponentDefs";
 
 export const OPTIMIZER_METADATA = {
+  // --- Global / Root components providing unstable state
+  App: {
+    unstableChildInjectedVars: ["$pathname", "$routeParams", "$queryParams", "$linkInfo"],
+  },
+
   // --- Data-fetching components: per-event injected variables (Iteration 1)
   DataLoader: {
     events: {
