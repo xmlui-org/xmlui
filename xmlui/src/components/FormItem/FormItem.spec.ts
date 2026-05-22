@@ -279,6 +279,41 @@ test.describe("Basic Functionality", () => {
 
     expect(val1).toBeGreaterThan(val2);
   });
+
+  // Regression: toggle-style inputs (checkbox, switch) declare
+  // compactInlineLabel:true in their metadata, but FormItem used to render
+  // its own ItemWithLabel without propagating that flag — so labelPosition
+  // "end" stayed in stretched-row mode and pushed the label to the form's
+  // right edge instead of mapping to "after" (snug, fit-content).
+  test("type=checkbox with labelPosition=end keeps label adjacent to the input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="cb" type="checkbox" label="Compact label" labelPosition="end" />
+      </Form>
+    `);
+    const { right: inputRight } = await getBounds(page.getByLabel("Compact label"));
+    const { left: labelLeft } = await getBounds(page.getByText("Compact label"));
+    // With the snug "after" layout the gap is just the container gap (~8px).
+    // Without compactInlineLabel propagation it would be hundreds of pixels.
+    expect(labelLeft - inputRight).toBeLessThan(20);
+  });
+
+  test("type=switch with labelPosition=end keeps label adjacent to the input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="sw" type="switch" label="Toggle" labelPosition="end" />
+      </Form>
+    `);
+    const { right: inputRight } = await getBounds(page.getByLabel("Toggle"));
+    const { left: labelLeft } = await getBounds(page.getByText("Toggle"));
+    expect(labelLeft - inputRight).toBeLessThan(20);
+  });
 });
 
 test.describe("Type Property", () => {

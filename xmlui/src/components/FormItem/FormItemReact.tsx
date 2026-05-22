@@ -558,6 +558,7 @@ export const FormItem = memo(forwardRef(function FormItem({
         className={classnames(classes?.[COMPONENT_PART_KEY], className)}
         validationResult={validationResult}
         layoutContext={layoutContext}
+        compactInlineLabel={type === "checkbox" || type === "switch"}
       >
         {formControl}
       </ItemWithLabel>
