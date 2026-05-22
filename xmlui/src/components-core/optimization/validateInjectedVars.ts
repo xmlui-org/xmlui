@@ -36,11 +36,16 @@ export function validateInjectedVars(
   const missing = injectedKeys.filter(k => !declaredVars.has(k));
   if (missing.length > 0) {
     const target = eventName ? `events["${eventName}"].injectedVars` : "childInjectedVars";
-    console.error(
-      `[XMLUI Lexical Scoping] Component ${componentType} injected variables (${missing.join(
-        ", "
-      )}) into its ${eventName ? "event" : "template"}, but they are NOT declared in its ${target} metadata. ` +
-      `This will cause the variables to be stripped during AST optimization. Please add them to the component's metadata.`
-    );
+    
+    const message = `[XMLUI Lexical Scoping] Component ${componentType} injected variables (${missing.join(
+      ", "
+    )}) into its ${eventName ? "event" : "template"}, but they are NOT declared in its ${target} metadata. ` +
+    `This will cause the variables to be stripped during AST optimization. Please update OPTIMIZER_METADATA.${componentType} in xmlui/src/components-core/optimization/optimizer-metadata.ts.`;
+
+    if (import.meta.env?.DEV) {
+      throw new Error(message);
+    } else {
+      console.error(message);
+    }
   }
 }

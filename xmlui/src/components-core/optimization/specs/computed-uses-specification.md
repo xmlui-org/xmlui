@@ -131,8 +131,8 @@ for (const key of Object.keys(parentState)) {
 ### Runtime Validation (`validateInjectedVars`)
 To protect against developer error (forgetting to update metadata when adding new injected variables), a runtime check exists in `__DEV__` mode.
 - Whenever `ComponentAdapter` or `wrapComponent` injects context variables, it compares them against `injectedVars` / `childInjectedVars` metadata.
-- If a mismatch is found (a variable starts with `$` but is not declared), a console error is issued.
-- **Future:** This will be converted to a hard-fail (`throw`) in development to ensure metadata compliance.
+- If a mismatch is found (a variable starts with `$` but is not declared), a **hard-fail `throw`** is raised in development (gated by `import.meta.env?.DEV`). In production builds the same condition logs a `console.error` instead, so misconfigured extension components keep working with graceful degradation.
+- The thrown error message names the offending `OPTIMIZER_METADATA.<Component>` entry, so the fix is immediate.
 
 ---
 
@@ -152,4 +152,4 @@ To protect against developer error (forgetting to update metadata when adding ne
    Eliminate the `$`-prefix fallback in `extractScopedState` entirely once the analyzer is 100% accurate in tracking lexical scope, relying only on explicit `computedUses` lists.
 
 ---
-*Note: To view render statistics in the browser during development, use the `window.__renderCounts` object.*
+*Note: To view render statistics in the browser during development, use `window.__renderCounts` (per-label counters), `window.__topRenderCounts(n=10)` (top N most-rendered labels), and `window.__resetRenderCounts()` (zero all counters).*

@@ -406,13 +406,11 @@ export const StateContainer = memo(
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
         produce((draft) => {
-          // console.log("-----BUST----setComponentApis");
           if (!draft[uid]) {
             draft[uid] = {};
           }
           Object.entries(api).forEach(([key, value]) => {
             if (draft[uid][key] !== value) {
-              // console.log(`-----BUST------new api for ${uid}`, draft[uid][key], value)
               draft[uid][key] = value;
             }
           });

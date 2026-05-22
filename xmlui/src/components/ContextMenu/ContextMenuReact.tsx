@@ -82,7 +82,6 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
   }, []);
 
   const openAt = useCallback((event: MouseEvent | React.MouseEvent, context?: any) => {
-    console.log("[ContextMenu.openAt] called, context=", JSON.stringify(context), "updateState=", typeof updateState);
     // Prevent the browser's default context menu
     event.preventDefault();
     // Stop event propagation to prevent any parent handlers from firing
