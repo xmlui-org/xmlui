@@ -94,7 +94,18 @@ export const OPTIMIZER_METADATA = {
   },
   ModalDialog: { isImplicitContainerByDefault: true, childInjectedVars: ["$param", "$params"] },
   Column:      { childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex", "$value", "$setValue"] },
-  Form:        { isImplicitContainerByDefault: true, childInjectedVars: ["$data"] },
+  Form:        { 
+    isImplicitContainerByDefault: true, 
+    childInjectedVars: ["$data"], 
+    events: { 
+      willSubmit: { injectedVars: ["$data"] },
+      submit: { injectedVars: ["$data"] },
+      submitFailed: { injectedVars: ["$data"] },
+      cancel: { injectedVars: ["$data"] },
+      reset: { injectedVars: ["$data"] },
+      success: { injectedVars: ["$data"] } 
+    } 
+  },
   FormItem:    { childInjectedVars: ["$value", "$setValue", "$validationResult"] },
   FormSegment: { childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"] },
   Tabs:        { isImplicitContainerByDefault: true, childInjectedVars: ["$header"] },
