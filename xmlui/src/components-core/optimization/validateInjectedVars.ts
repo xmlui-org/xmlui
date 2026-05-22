@@ -36,7 +36,7 @@ export function validateInjectedVars(
   const missing = injectedKeys.filter(k => !declaredVars.has(k));
   if (missing.length > 0) {
     const target = eventName ? `events["${eventName}"].injectedVars` : "childInjectedVars";
-    
+
     const message = `[XMLUI Lexical Scoping] Component ${componentType} injected variables (${missing.join(
       ", "
     )}) into its ${eventName ? "event" : "template"}, but they are NOT declared in its ${target} metadata. ` +
