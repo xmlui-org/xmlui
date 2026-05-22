@@ -866,3 +866,118 @@ it("Symbols are kept even when their description is NOT in `uses`", () => {
 **Слід мати на увазі:** `Symbol(uid)` запис добавляється в стан через `mergeComponentApis` (див. [rendering/ComponentAdapter.tsx](../../src/components-core/rendering/ComponentAdapter.tsx)). Компонент реєструє свій API раз на mount через `registerComponentApi({focus, setValue, ...})`, батьківський StateContainer це зберігає під обома `{stringKey: api, [Symbol(uid)]: api}`. Динамічне фільтрування Symbols за description порушує це дублювання та ламає Proxy-доступ до компонентного слайса у `state[uid]`. Це особливо критично для wrapped компонентів (Toggle, Input, Select-렌더러) що динамічно оновлюють `value` через `updateState`.
 
 **Файли:** `xmlui/src/components-core/rendering/ContainerUtils.ts`, `xmlui/tests/components-core/optimization/computedUses.test.ts`.
+
+---
+
+### Баг 13 (Group Q): ModalDialog теряє лексичні змінні контексту при `computedUses`
+
+**Симптом:** Тест `ModalDialog.spec.ts` "Preserves $item context variable from Table Column" впав з помилкою:
+```
+Expected: "Acme Corp" (значення $item.name)
+Received: "close" (текст кнопки закриття)
+```
+Коли ModalDialog відкривалась всередину Table → Column → MemoizedItem з `$item`, контекстна змінна втрачалась.
+
+**Причина:** Архітектурна проблема в `extractScopedState(parentState, uses)`:
+
+1. **ModalDialog як implicit container:** ModalDialog мав `isImplicitContainerByDefault: true` (не вказано в metadata).
+2. **computedUses обчислював:** ModalDialog не використовував жодних батьківських змінних → `computedUses = ["dialog"]` (лише свій UID).
+3. **Фільтрування стану:** `extractScopedState(parentState, ["dialog"])` обирав лише `{dialog: ...}`.
+4. **Втрата лексичних змінних:** `$item` (вповнена MemoizedItem з Column) не потрапляла у `uses` → видалялась із narrowed стану → дочірній Text отримував `{dialog: ..., $item: undefined}`.
+
+```
+Table → Column → MemoizedItem(contextVars={$item, ...})
+  ↓
+ModalDialog (computedUses=["dialog"])
+  ↓
+Fragment (дочірній)
+  ↓
+Text({$item}) ← $item = undefined!
+```
+
+**Взаємодія з Багом 10 (Symbol-ключі):** Баг 10 зберігав ВСІ Symbols, але не торкався `$`-префіксованих рядків. Лексичні змінні (`$item`, `$param`, etc.) — це рядки, не Symbols. Вони вхідні у `parentState` як string-ключі, позначені з префіксом `$` як «фреймворк-вовжені, не consumable». `extractScopedState` видаляла їх при вузькому `uses`.
+
+**Виправлення:** [ContainerUtils.ts:extractScopedState](../../src/components-core/rendering/ContainerUtils.ts) (lines 188-213) — три шари збереження:
+
+1. **Всі Symbols** (як у Багу 10):
+   ```ts
+   for (const sym of Object.getOwnPropertySymbols(parentState)) {
+     picked[sym] = (parentState as any)[sym];
+   }
+   ```
+
+2. **Всі $-префіксовані змінні КРІМ routing-state-ключів:**
+   ```ts
+   for (const key of Object.keys(parentState)) {
+     if (
+       typeof key === "string" &&
+       key.startsWith("$") &&
+       !ROUTING_STATE_KEYS.has(key) &&
+       !(key in picked)
+     ) {
+       picked[key] = (parentState as any)[key];
+     }
+   }
+   ```
+   
+   **Чому ROUTING_STATE_KEYS виключаються:** `$pathname`, `$routeParams`, `$queryParams`, `$linkInfo` — це навігаційні ключі що переобчислюються на кожному StateContainer (Layer 6 в `combinedState`). Їхні об'єкти `{...}` не reference-stable (нові об'єкти при кожній навігації). Якщо зберігати їх у narrowed стані, `useShallowCompareMemoize` бачить нову reference → ре-рендер. Це порушує оптимізацію (див. E2E тест "Select renders ≤5 times after N oftenChanges updates"). Routing-state перепідставляється вище в `combinedState`, тому збереження їх тут — зайве.
+
+3. **Вибрані string-ключі з `uses`** (як раніше).
+
+**Вірна ієрархія стану:** Лексичні `$item`, `$param` — це FRAMEWORK-SCOPE, не PARENT-SCOPE. Батько їх не "має", вони вестями через lexical closure компонентом що їх вовжує (Column, ModalDialog.open). `uses` стосується PARENT-SCOPE (user-declared vars). Отже:
+
+```
+extractScopedState(parentState, uses) = 
+  {
+    ...(picked from parentState by uses),
+    ...(all Symbols from parentState),
+    ...(all $ lexical from parentState EXCEPT routing-state)
+  }
+```
+
+**Регресійний тест:** [tests/components-core/rendering/ContainerUtils.test.ts](../../tests/components-core/rendering/ContainerUtils.test.ts):
+
+```ts
+it("should preserve lexical-scope $-prefixed variables", () => {
+  const parentState = {
+    user: { id: 1 },
+    $item: { name: "Item1" },
+    $itemIndex: 0,
+    $param: "param_value",
+    count: 5,
+  };
+  const result = extractScopedState(parentState, ["user", "count"]) as any;
+  expect(result.$item).toEqual({ name: "Item1" });
+  expect(result.$itemIndex).toBe(0);
+  expect(result.$param).toBe("param_value");
+});
+
+it("should exclude routing state keys from $-prefixed preservation", () => {
+  const parentState = {
+    user: { id: 1 },
+    $item: { name: "Item1" },
+    $pathname: "/some/path",
+    $routeParams: { id: "123" },
+    $queryParams: { search: "test" },
+    $linkInfo: { href: "/" },
+  };
+  const result = extractScopedState(parentState, ["user"]) as any;
+  expect(result.$item).toEqual({ name: "Item1" });
+  expect(result).not.toHaveProperty("$pathname");
+  expect(result).not.toHaveProperty("$routeParams");
+});
+```
+
+**Регресійні перевірки:** 
+- `ModalDialog.spec.ts`: 151/151 pass (включно з "Preserves $item context variable from Table Column")
+- `computedUses.test.ts`: 95/95 pass
+- E2E suite (Table, List, Select, Form, RadioGroup, Tabs): 796/796 pass
+- **Нема нових регресій** у мемоізації (Select все ще ≤5 рендерів завдяки виключенню ROUTING_STATE_KEYS)
+
+**Слід мати на увазі:** 
+- Фреймворк вовжує `$item`, `$itemIndex`, `$param`, `$params` через `MemoizedItem.contextVars` при Column-rows та `ModalDialog.open()`.
+- Ці змінні живуть у батьківському стані але це не означає що вони відстежуються consumer'ом через `uses`.
+- Динамічна компіляція `computedUses` має бачити батьківські vars (user-declared) але НЕ лексичні (framework-injected).
+- Лексичні vars зберігаються як fallback для вправних компонентів (Column children, ModalDialog children) що на них посилаються.
+
+**Файли:** `xmlui/src/components-core/rendering/ContainerUtils.ts`, `xmlui/tests/components-core/rendering/ContainerUtils.test.ts`, `xmlui/src/components/ModalDialog/ModalDialog.tsx` (metadata), `xmlui/src/components-core/optimization/optimizer-metadata.ts`.

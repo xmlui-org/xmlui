@@ -257,6 +257,7 @@ export const FormMd = createMetadata({
       parameters: {},
     },
   },
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.Form.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.Form.childInjectedVars,
   contextVars: {
     $data: d(

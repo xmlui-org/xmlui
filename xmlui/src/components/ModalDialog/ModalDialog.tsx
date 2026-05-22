@@ -87,6 +87,7 @@ export const ModalDialogMd = createMetadata({
       "Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)",
     ),
   },
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.ModalDialog.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.ModalDialog.childInjectedVars,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

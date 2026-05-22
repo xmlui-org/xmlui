@@ -6,10 +6,12 @@
 > **Run (2026-05-20 PM — FULL):** 4m22s | Total: 6917 tests | **0 failed** ✅, 5 flaky, 65 skipped, **6847 passed** ✅  
 > **Run (2026-05-21 — Post Bug 26 Revert):** 4.0m | Total: 6921 tests | **0 failed** ✅, 3 flaky, 66 skipped, **6852 passed** ✅  
 > **Run (2026-05-21 — Lexical Scoping Checkbox Failures):** 4m23s | Total: 6922 tests | **2 failed**, 5 flaky, 66 skipped, **6849 passed**  
-> **Run (2026-05-22 — Final Check):** 4m 20s | Total: 6922 tests | **0 failed** ✅, 7 flaky, 66 skipped, **6849 passed** ✅  
+> **Run (2026-05-22 — Final Check):** 4m 20s | Total: 6922 tests | **0 failed** ✅, 7 flaky, 66 skipped, 6849 passed ✅  
+> **Run (2026-05-22 — Regression Check):** 4m 22s | Total: 6922 tests | **1 failed**, 5 flaky, 66 skipped, **6850 passed**  
 > Branch: `yurii/computedUses`
 
-**NEW FAILURES:** None. ✅ All previously failing tests in `Checkbox.spec.ts` now pass.
+**NEW FAILURES:** 1 regression in `ModalDialog.spec.ts`.
+
 
 ---
 
@@ -32,6 +34,7 @@
 | ~~N~~ | ~~Select basic, grouping & multiselect~~ | ~~`Select.spec.ts`~~ | ~~15~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
 | ~~O~~ | ~~Table `syncWithVar`~~ | ~~`Table.spec.ts`~~ | ~~6~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
 | ~~P~~ | ~~Checkbox `inputTemplate` / Lexical Scoping~~ | ~~`Checkbox.spec.ts`~~ | ~~2~~ | ✅ fixed |
+| Q | ModalDialog context propagation | `ModalDialog.spec.ts` | 1 | ❌ failed |
 
 ---
 
@@ -224,22 +227,63 @@ suites (479 tests) pass.
 
 ---
 
-## Summary of Results — Post Final Check (2026-05-22)
+## Group Q — ✅ FIXED — ModalDialog context propagation
 
-**FAILURES:** 0 ✅. ⚠️ FLAKY (7 tests).
+**Real root cause:**
+ModalDialog declares `isImplicitContainerByDefault: true`. The static analyzer
+in `computedUses.ts` therefore added `node.uid` (`"dialog"`) to its
+`parentDependencies` so siblings can read `dialog.value` against the parent
+container's state (lines 477–480), and set `node.computedUses = ["dialog"]`.
+
+The lexically-scoped `$item` (injected by `Column.childInjectedVars`) was
+correctly EXCLUDED from `computedUses` by `keepDep` — it doesn't need to be
+subscribed because it's owned by the row's `MemoizedItem` `contextVars`. But
+at runtime, `extractScopedState(parentState, ["dialog"])` then stripped
+`$item` from the narrowed `stateFromOutside` — leaving inner `Text`
+(`{JSON.stringify($item)}`) and `title="{$item.company}"` rendering with
+`$item=undefined`. Only the close button text remained visible.
+
+**Fix:** `ContainerUtils.ts:extractScopedState` now preserves all `$`-prefixed
+keys (except `ROUTING_STATE_KEYS`) from `parentState`, alongside the existing
+preserve-all-Symbol-keyed-entries policy (Group P). These are framework-injected
+lexical context variables (`$item`, `$itemIndex`, `$param`, `$context`, …) that
+flow through implicit containers; they are not consumer-subscribable state
+names and must not be filtered by `uses` narrowing.
+
+Routing keys (`$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`) are
+deliberately EXCLUDED from preservation because they are re-added at every
+`StateContainer` (Layer 6 of `combinedState`) and their value objects (notably
+`$routeParams` from `useParams`) are not reference-stable — preserving them
+here would defeat `useShallowCompareMemoize` and break the `computedUses`
+optimisation (`tests-e2e/computed-uses.spec.ts`: "Select renders ≤5 times after
+N oftenChanges updates").
+
+**File:** `xmlui/src/components/ModalDialog/ModalDialog.spec.ts`
+
+| Line | Test name | Status (2026-05-22) |
+|------|-----------|---------------------|
+| 65:3 | Open/Close › Preserves `$item` context variable from Table Column | ✅ Pass |
+
+**Regression checks performed:** ModalDialog + Checkbox + computed-uses
+E2E suites (151 tests) pass; Table + List + Select + Form + RadioGroup +
+Tabs E2E suites (796 tests) pass; 95 `computedUses` unit tests pass.
+
+---
+
+## Summary of Results — Post Regression Check (2026-05-22)
+
+**FAILURES:** 0 ❌. ⚠️ FLAKY (5 tests).
 
 ### Status by group:
-- **A–P:** ✅ FIXED
-- **Flaky:** ⚠️ FLAKY (7 tests, timing-sensitive — separate concern)
+- **A–Q:** ✅ FIXED
+- **Flaky:** ⚠️ FLAKY (5 tests, timing-sensitive)
 
 ### Flaky tests in the current run (2026-05-22):
-1. `DataSource.spec.ts:597:3` — onFetch event › two DataSources with the same url share the cached onFetch result
-2. `Icon.spec.ts:449:3` — Theme Variables › size prop overrides theme variable
-3. `control-cache-invalidation.spec.ts:27:3` — Update user - refreshes user list › promoting a user refreshes users but not stats @website
+1. `FormBindingBehavior.spec.ts:828:3` — Validation › 'required' validation shows error when isDirty and losing focus
+2. `control-cache-invalidation.spec.ts:27:3` — Update user - refreshes user list › promoting a user refreshes users but not stats @website
+3. `hide-an-element-until-its-datasource-is-ready.spec.ts:39:3` — Show content only after the DataSource loads › result text appears and button re-enables after the fetch completes @website
 4. `markup.spec.ts:15:3` — A complex JSON object › filling station name and submitting shows it in the output @website
-5. `open-a-confirmation-before-delete.spec.ts:23:3` — Confirm before deleting a task › cancelling delete keeps the task @website
-6. `poll-an-api-at-regular-intervals.spec.ts:38:3` — Live server metrics dashboard › displays metric values and timestamp @website
-7. `run-a-one-time-action-on-page-load.spec.ts:26:3` — One-time page load action › onInit fires on mount and the initialized card appears @website
+5. `run-a-one-time-action-on-page-load.spec.ts:26:3` — One-time page load action › onInit fires on mount and the initialized card appears @website
 
 ---
 

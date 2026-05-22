@@ -7,6 +7,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ArrowExpression } from "../script-runner/ScriptingSourceTree";
 import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import { ROUTING_STATE_KEYS } from "../state/routing-state";
 
 // ============================================================================
 // TYPE GUARDS
@@ -183,6 +184,33 @@ export function extractScopedState<T extends Record<string, any>>(
   // names while leaving component-instance state intact.
   for (const sym of Object.getOwnPropertySymbols(parentState)) {
     picked[sym] = (parentState as any)[sym];
+  }
+  // Always preserve $-prefixed keys that came from a lexical-scope ancestor
+  // (e.g. `$item` injected by Column row, `$param` set by ModalDialog.open).
+  // These are framework-injected via ancestor MemoizedItem `contextVars`; they
+  // live in parent state but are NOT subscribable consumer state. Filtering
+  // them by `uses` breaks lexical scope through implicit containers. Example:
+  // <Column><ModalDialog>{$item}</ModalDialog></Column> — ModalDialog's
+  // computedUses=["dialog"] (own UID only, since the static analyzer excludes
+  // lexically-scoped $item) would otherwise strip $item from stateFromOutside,
+  // leaving the inner Text with $item=undefined.
+  //
+  // We deliberately EXCLUDE routing-state keys (ROUTING_STATE_KEYS) because
+  // they are re-added at every StateContainer (Layer 6 of combinedState) and
+  // their value objects (especially `$routeParams` from useParams) are not
+  // reference-stable, so preserving them here makes `useShallowCompareMemoize`
+  // miss every render — defeating the computedUses optimisation
+  // (see `tests-e2e/computed-uses.spec.ts`: "Select renders ≤5 times after N
+  // oftenChanges updates").
+  for (const key of Object.keys(parentState)) {
+    if (
+      typeof key === "string" &&
+      key.startsWith("$") &&
+      !ROUTING_STATE_KEYS.has(key) &&
+      !(key in picked)
+    ) {
+      picked[key] = (parentState as any)[key];
+    }
   }
   return picked;
 }

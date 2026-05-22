@@ -49,7 +49,7 @@
 
 ## 3. Implicit-Container Promotion для Важких Компонентів
 
-Компоненти зі списку `IMPLICIT_CONTAINER_COMPONENT_NAMES` (`Select`, `List`, `Table`, `DataGrid`, `Tree`, `TileGrid`, `AutoComplete`, `Markdown`) автоматично підвищуються до неявних контейнерів, але **тільки за наявності справжніх read-залежностей** від батьківського стану (`nonDynamicReadDeps.size > 0`).
+Важкі компоненти, позначені флажком `isImplicitContainerByDefault: true` у метаданих (такі як `Select`, `List`, `Table`, `DataGrid`, `Tree`, `TileGrid`, `AutoComplete`, `Markdown`), автоматично підвищуються до неявних контейнерів, але **тільки за наявності справжніх read-залежностей** від батьківського стану (`nonDynamicReadDeps.size > 0`).
 
 **Логіка:**
 1. Якщо важкий компонент читає батьківські змінні (наприклад `<Select data="{items}" />`), він отримує контейнер і `computedUses` для вузькування стану.
@@ -57,11 +57,11 @@
 
 **Чому так:** Обов'язкове обгортання (без read-deps) створює порожні `computedUses=[]`, що звужує батьківський стан до `{}` (пусто). Це ламає render-time функції типу `extractValue()`, яка потребує доступу до змінних під час рендера (наприклад `syncWithVar` адаптери в Table).
 
-**Майбутній напрямок:** Щит для повністю статичних heavy-компонентів має бути ортогональним до звуження state — наприклад окремий `React.memo` без `StateContainer`.
+**Майбутній напрямок:** Щит для повністю статичних heavy-компонентів має бути ортогональним до звуження state — наприклад окремий `React.memo` без `StateContainer`. Див. [todo-smart-containers.md](./todo-smart-containers.md) щодо стратегії уникнення "матрьошок".
 
 ### П'ять Випадків Коли Важкі Компоненти Залишаються Без Обгортки
 
-Навіть для компонента зі списку `IMPLICIT_CONTAINER_COMPONENT_NAMES`, просування пропускається коли `nonDynamicReadDeps` залишається порожнім після фільтрації:
+Навіть для компонента з `isImplicitContainerByDefault: true`, просування пропускається коли `nonDynamicReadDeps` залишається порожнім після фільтрації:
 
 - **Випадок A — Write-Only Target:** Компонент використовує змінні лише в лівій частині присвоєння (`onClick="count = 0"`), ніколи не читає їх. Цілі присвоєння відфільтровуються з read-deps → нема read-deps → нема просування.
 - **Випадок B — Dynamic Variables Only:** Компонент посилається лише на runtime-ін'єктовані змінні (`$item`, `$context`). Динамічні змінні відфільтровуються з `nonDynamicReadDeps` → нема статичних read-deps → нема просування.
@@ -74,7 +74,7 @@
 | Концерн | Тригер | Ефект |
 |---------|--------|-------|
 | **State Scoping** | `nonDynamicReadDeps.size > 0` | Створює `computedUses` масив і звужує батьківський стан для дітей |
-| **Performance Shielding** | Тип компонента в `IMPLICIT_CONTAINER_COMPONENT_NAMES` (тільки коли є scoping) | Обгортає компонент у `StateContainer` для `React.memo` межі |
+| **Performance Shielding** | Метадані `isImplicitContainerByDefault: true` (тільки коли є scoping) | Обгортає компонент у `StateContainer` для `React.memo` межі |
 
 Ці концерни **зв'язані для важких компонентів:** якщо компонент має read-deps і отримує scoping, він автоматично отримує і shield. Якщо read-deps нема — scoping не відбувається → shield теж відсутній. Це свідоме рішення: обгортка без read-deps означала б `computedUses=[]`, звуження стану до `{}` і сліпоту до батьківського стану при render-time операціях.
 
@@ -147,6 +147,48 @@ return picked;
 
 ---
 
+### Лексичні Змінні та Виключення ROUTING_STATE_KEYS
+
+Окрім Symbols, під час звуження стану у `extractScopedState` потрібно зберігати **лексичні змінні контексту** (prefixed з `$`), які вповнюються фреймворком (наприклад, `$item` від Column, `$param` від ModalDialog.open).
+
+**Проблема:** `computedUses` розраховується як *батьківські зовнішні залежності*. Він не включає лексичні змінні (наприклад, `$item`), які живуть у батьківському стані але які батько "не "має"—вони вповнюються вище у tree (Column при рендері rows). При звуженні `extractScopedState(parentState, computedUses)` залежності, що не входять до `computedUses`, видаляються. Якщо дочірній компонент (наприклад, Text всередину ModalDialog, яке відкривалось з Table.Column) посилається на `$item`, він отримує `undefined`.
+
+**Рішення:** Зберегти ВСІ `$`-prefixed ключі (окрім `ROUTING_STATE_KEYS`):
+
+```ts
+// ContainerUtils.ts:extractScopedState, lines 205-214
+for (const key of Object.keys(parentState)) {
+  if (
+    typeof key === "string" &&
+    key.startsWith("$") &&
+    !ROUTING_STATE_KEYS.has(key) &&
+    !(key in picked)
+  ) {
+    picked[key] = (parentState as any)[key];
+  }
+}
+```
+
+**Чому виключати ROUTING_STATE_KEYS:** Навігаційні ключі (`$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`) переобчислюються на кожному StateContainer (Layer 6 у `combinedState`). Їхні об'єкти мають нестійке reference — нові об'єкти при кожній навігації. Якщо їх зберігати у narrowed стані, `useShallowCompareMemoize` бачить нову reference → ре-рендер контейнера. Це руйнує оптимізацію (нашкодить tesту "Select renders ≤5 times after N oftenChanges updates"). Routing-state перепідставляється вище в `combinedState`, тому нема смислу зберігати нестійку reference тут.
+
+**Трьохарівнева ієрархія зберігання в `extractScopedState`:**
+
+1. **String-ключи з `computedUses`** (батьківські реактивні залежності)
+2. **Всі Symbol-ключі** (внутрішній стан компонентів)
+3. **Всі `$`-ключі КРІМ ROUTING_STATE_KEYS** (лексичні змінні від предків)
+
+```ts
+return {
+  ...(selected from parentState by computedUses),
+  ...(all Symbols from parentState),
+  ...(all $ lexical from parentState EXCEPT routing-state),
+};
+```
+
+Див. [Баг 13 у bugs-history.md](./bugs-history.md) для прикладу (Group Q: ModalDialog context propagation) та регресійних тестів.
+
+---
+
 ## 5. Інваріант: "Runtime Restructure"
 
 **КРИТИЧНО:** Статичний масив `computedUses` розрахований під конкретну топологію дерева. Будь-який процес (як `CompoundComponent.tsx`), що переструктуровує дерево в runtime (наприклад, переносячи `vars` або викреслюючи обгортку), залишає існуючий `computedUses` **невалідним**, що призводить до втрати стейту дітьми.
@@ -173,11 +215,9 @@ return picked;
    Сучасна імплементація використовує `cloneDeep` для створення контейнерного стану при події. На важких сторінках (тисячі `Items`) це спричиняє затримки в обробниках типу scroll чи drag. Кращий підхід: `Proxy` зі стратегією *Copy-on-Write* замість повного копіювання.
 3. **AST-аналіз функцій з `.xs` файлів:**
    Для звуження стейту в Compound-компонентах із Code-behind потрібен транзитивний AST-аналіз `scriptCollected` та тіл функцій з файлів `.xs`.
-4. **Мета-дескриптори для Explicit Heaviness:**
-   Значення `IMPLICIT_CONTAINER_COMPONENT_NAMES` наразі захардкоджено. Більш надійний шлях — конфігурувати `isImplicitContainer: true` у `metadata.json` самих компонентів, щоб розширення могли застосовувати Mandatory Shielding до своїх великих віджетів.
-6. **Консолідація метаданих (DRY):**
+4. **Консолідація метаданих (DRY):**
    Розглянути можливість об'єднання `childInjectedVars` та `contextVars` у майбутньому рефакторингу. Зараз вони розділені для надійності оптимізатора та гнучкості документації, але це призводить до дублювання назв змінних у метаданих компонентів.
-7. **Автоматична валідація ін'єктованих змінних:**
+5. **Автоматична валідація ін'єктованих змінних:**
    Реалізувати Runtime-валідацію у `__DEV__` режимі, яка попереджатиме розробника, якщо компонент ін'єктує змінну (через `context.set` або `dispatch`), яка не була оголошена в метаданих (`childInjectedVars` або `injectedVars`). Див. [TODO-metadata-validation.md](./TODO-metadata-validation.md).
 
 

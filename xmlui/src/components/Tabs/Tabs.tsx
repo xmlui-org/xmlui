@@ -13,6 +13,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 const COMP = "Tabs";
 
 export const TabsMd = createMetadata({
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.Tabs.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.Tabs.childInjectedVars,
   status: "experimental",
   description:

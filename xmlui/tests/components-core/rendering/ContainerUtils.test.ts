@@ -135,6 +135,67 @@ describe("ContainerUtils", () => {
       const result = extractScopedState({}, ["user", "count"]);
       expect(result).toEqual({});
     });
+
+    it("should preserve all Symbol-keyed properties", () => {
+      const sym1 = Symbol("component1");
+      const sym2 = Symbol("component2");
+      const parentState = {
+        user: { id: 1 },
+        [sym1]: { value: "comp1" },
+        [sym2]: { value: "comp2" },
+      };
+      const result = extractScopedState(parentState, ["user"]) as any;
+      expect(result.user).toEqual({ id: 1 });
+      expect(result[sym1]).toEqual({ value: "comp1" });
+      expect(result[sym2]).toEqual({ value: "comp2" });
+    });
+
+    it("should preserve lexical-scope $-prefixed variables", () => {
+      const parentState = {
+        user: { id: 1 },
+        $item: { name: "Item1" },
+        $itemIndex: 0,
+        $param: "param_value",
+        count: 5,
+      };
+      const result = extractScopedState(parentState, ["user", "count"]) as any;
+      expect(result.user).toEqual({ id: 1 });
+      expect(result.count).toBe(5);
+      expect(result.$item).toEqual({ name: "Item1" });
+      expect(result.$itemIndex).toBe(0);
+      expect(result.$param).toBe("param_value");
+    });
+
+    it("should exclude routing state keys from $-prefixed preservation", () => {
+      const parentState = {
+        user: { id: 1 },
+        $item: { name: "Item1" },
+        $pathname: "/some/path",
+        $routeParams: { id: "123" },
+        $queryParams: { search: "test" },
+        $linkInfo: { href: "/" },
+      };
+      const result = extractScopedState(parentState, ["user"]) as any;
+      expect(result.user).toEqual({ id: 1 });
+      expect(result.$item).toEqual({ name: "Item1" });
+      expect(result).not.toHaveProperty("$pathname");
+      expect(result).not.toHaveProperty("$routeParams");
+      expect(result).not.toHaveProperty("$queryParams");
+      expect(result).not.toHaveProperty("$linkInfo");
+    });
+
+    it("should preserve both Symbols and $-prefixed variables together", () => {
+      const sym = Symbol("myComponent");
+      const parentState = {
+        user: { id: 1 },
+        [sym]: { internal: "state" },
+        $item: { name: "Item1" },
+      };
+      const result = extractScopedState(parentState, ["user"]) as any;
+      expect(result.user).toEqual({ id: 1 });
+      expect(result[sym]).toEqual({ internal: "state" });
+      expect(result.$item).toEqual({ name: "Item1" });
+    });
   });
 
   describe("CodeBehindParseError", () => {

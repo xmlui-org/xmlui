@@ -87,13 +87,15 @@ export const OPTIMIZER_METADATA = {
   DataGrid: {
     isImplicitContainerByDefault: true,
   },
-  ModalDialog: { childInjectedVars: ["$param", "$params"] },
+  ModalDialog: { isImplicitContainerByDefault: true, childInjectedVars: ["$param", "$params"] },
   Column:      { childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex", "$value", "$setValue"] },
-  Form:        { childInjectedVars: ["$data"] },
+  Form:        { isImplicitContainerByDefault: true, childInjectedVars: ["$data"] },
   FormItem:    { childInjectedVars: ["$value", "$setValue", "$validationResult"] },
   FormSegment: { childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"] },
-  Tabs:        { childInjectedVars: ["$header"] },
+  Tabs:        { isImplicitContainerByDefault: true, childInjectedVars: ["$header"] },
   TabItem:     { childInjectedVars: ["$header"] },
+  Stepper:     { isImplicitContainerByDefault: true },
+  Drawer:      { isImplicitContainerByDefault: true },
   RadioGroup:  { childInjectedVars: ["$checked", "$setChecked"] },
   Checkbox:    { childInjectedVars: ["$checked", "$setChecked"] },
 } as const satisfies Record<string, Partial<ComponentMetadata>>;
