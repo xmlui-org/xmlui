@@ -346,6 +346,7 @@ export const ListMd = createMetadata({
     $isSelected: dComponent("Boolean indicating if this item is currently selected"),
     $group: dComponent("Group information when using `groupBy` (available in group templates)"),
   },
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.List.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.List.childInjectedVars,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

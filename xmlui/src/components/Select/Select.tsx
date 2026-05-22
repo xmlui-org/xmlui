@@ -226,6 +226,7 @@ export const SelectMd = createMetadata({
     $itemContext: d("Provides the `removeItem()` method for multi-select scenarios"),
     $group: d("Group name when using `groupBy` (available in group header templates)"),
   },
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.Select.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.Select.childInjectedVars,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

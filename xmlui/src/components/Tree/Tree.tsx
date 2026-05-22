@@ -461,6 +461,7 @@ export const TreeMd = createMetadata({
       },
     },
   },
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.Tree.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.Tree.childInjectedVars,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

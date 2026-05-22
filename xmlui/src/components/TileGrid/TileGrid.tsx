@@ -170,6 +170,7 @@ export const TileGridMd = createMetadata({
     $isLast: d("`true` when this is the last item in the `data` array."),
     $selected: d("`true` when this tile is currently selected."),
   },
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.TileGrid.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.TileGrid.childInjectedVars,
   childrenAsTemplate: "itemTemplate",
 

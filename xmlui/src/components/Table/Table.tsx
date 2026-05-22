@@ -367,6 +367,7 @@ export const TableMd = createMetadata({
       defaultValue: defaultProps.striped,
     },
   },
+  isImplicitContainerByDefault: OPTIMIZER_METADATA.Table.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.Table.childInjectedVars,
   events: {
     contextMenu: dContextMenu(COMP),

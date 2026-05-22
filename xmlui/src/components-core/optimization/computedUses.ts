@@ -61,8 +61,6 @@ import { isContainerLike } from "../rendering/ContainerUtils";
  */
 export const COMPUTED_USES_ENABLED = true;
 
-export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", "Table", "DataGrid"]);
-
 /**
  * ECMAScript standard globals and universally-available platform globals
  * that will NEVER be stored in XMLUI app state.
@@ -472,11 +470,11 @@ function computeUsesInternal(
   for (const d of usedHereReads) if (keepDep(d)) parentDependenciesReads.add(d);
   for (const d of childDepsReads) if (keepDep(d)) parentDependenciesReads.add(d);
 
-  // If this node is an implicit stateful component (Select, List, Table, DataGrid)
+  // If this node is an implicit stateful component (Select, List, Table, etc.)
   // with a UID, include its own UID in parentDependencies so the narrowed state
   // from the parent still contains its bubbled state (e.g. {mySelect.value} from a
   // sibling reads against App.state["mySelect"]).
-  if (!isKnownContainer && IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && node.uid) {
+  if (!isKnownContainer && metadata?.isImplicitContainerByDefault && node.uid) {
     parentDependencies.add(node.uid);
     parentDependenciesReads.add(node.uid);
   }
@@ -491,7 +489,7 @@ function computeUsesInternal(
   // because of a write-only assignment target in an event handler (which
   // the handler resolves through the existing scope pass-through; no
   // narrowing/re-render tracking is needed for them).
-  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && nonDynamicReadDeps.size > 0;
+  const isImplicitDefault = !!metadata?.isImplicitContainerByDefault && nonDynamicReadDeps.size > 0;
   const isContainer = isKnownContainer || isImplicitDefault;
 
   if (isContainer) {

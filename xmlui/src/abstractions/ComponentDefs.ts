@@ -473,6 +473,14 @@ export type ComponentMetadata<
   // Optional message to display if the component is deprecated
   deprecationMessage?: string;
 
+  /**
+   * Indicates that the component should be treated as an implicit container
+   * by the computedUses optimizer even if it doesn't have vars/loaders.
+   * Typically used for "heavy" components (List, Table, Select) to provide
+   * a React.memo shield against unrelated parent state changes.
+   */
+  isImplicitContainerByDefault?: boolean;
+
   // Default aria-label for screen readers when the app author doesn't provide one.
   // Wrapper authors set this to a human-readable string describing the component's
   // purpose (e.g., "Loading" for Spinner, "Toggle color mode" for ToneChangerButton).

@@ -55,12 +55,38 @@ export const OPTIMIZER_METADATA = {
   },
 
   // --- Containers / iterators: child-scope injected variables (Iteration 2)
-  List:        { childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$isSelected", "$group"] },
-  Items:       { childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast"] },
-  Table:       { childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex", "$isSelected"] },
-  TileGrid:    { childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$selected"] },
-  Tree:        { childInjectedVars: ["$item"] },
-  Select:      { childInjectedVars: ["$item", "$itemContext", "$group", "$selectedValue", "$inTrigger"] },
+  List: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$isSelected", "$group"],
+  },
+  Items: { childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast"] },
+  Table: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex", "$isSelected"],
+  },
+  TileGrid: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$selected"],
+  },
+  Tree: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item"],
+  },
+  Select: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item", "$itemContext", "$group", "$selectedValue", "$inTrigger"],
+  },
+  AutoComplete: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item"],
+  },
+  Markdown: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$anchorId", "$anchorHref"],
+  },
+  DataGrid: {
+    isImplicitContainerByDefault: true,
+  },
   ModalDialog: { childInjectedVars: ["$param", "$params"] },
   Column:      { childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex", "$value", "$setValue"] },
   Form:        { childInjectedVars: ["$data"] },

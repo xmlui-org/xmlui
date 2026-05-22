@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { computeUsesForTree as originalComputeUsesForTree, COMPUTED_USES_ENABLED, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
+import { computeUsesForTree as originalComputeUsesForTree, COMPUTED_USES_ENABLED } from
   "../../../src/components-core/optimization/computedUses";
+import { OPTIMIZER_METADATA } from "../../../src/components-core/optimization/optimizer-metadata";
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
 import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
 import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
@@ -47,10 +48,10 @@ function parsedEvent(source: string) {
 
 describe("IMPLICIT_CONTAINER_COMPONENT_NAMES", () => {
   it("contains Select, List, Table, DataGrid", () => {
-    expect(IMPLICIT_CONTAINER_COMPONENT_NAMES.has("Select")).toBe(true);
-    expect(IMPLICIT_CONTAINER_COMPONENT_NAMES.has("List")).toBe(true);
-    expect(IMPLICIT_CONTAINER_COMPONENT_NAMES.has("Table")).toBe(true);
-    expect(IMPLICIT_CONTAINER_COMPONENT_NAMES.has("DataGrid")).toBe(true);
+    expect(OPTIMIZER_METADATA.Select.isImplicitContainerByDefault).toBe(true);
+    expect(OPTIMIZER_METADATA.List.isImplicitContainerByDefault).toBe(true);
+    expect(OPTIMIZER_METADATA.Table.isImplicitContainerByDefault).toBe(true);
+    expect(OPTIMIZER_METADATA.DataGrid.isImplicitContainerByDefault).toBe(true);
   });
 });
 
