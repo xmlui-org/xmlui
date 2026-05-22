@@ -2505,6 +2505,32 @@ test.describe("Theme Variables and Styling", () => {
     const checkboxWrapper = page.locator('[aria-label="Select all rows"]').first();
     await expect(checkboxWrapper).toHaveCSS("font-size", "24px");
   });
+
+  // Regression: the row separator used to live on each .cell, so resizing the
+  // last column narrower than the row width left a gap on the right where no
+  // cell could draw the border. The divider must live on the row so it spans
+  // the entire row regardless of the last column's width.
+  test("row separator spans the full row when the last column is narrower than the row", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' testId="table" width="600px">
+        <Column bindTo="name" header="Name" width="*" />
+        <Column bindTo="quantity" header="Qty" width="50px" />
+      </Table>
+    `);
+
+    const firstRow = page.locator("tbody tr").first();
+    // Divider now lives on the row itself.
+    await expect(firstRow).toHaveCSS("border-bottom-style", "solid");
+    await expect(firstRow).not.toHaveCSS("border-bottom-width", "0px");
+
+    // Cells should not carry the divider any more — otherwise the line would
+    // stop at the last column's right edge when it is narrower than the row.
+    const firstCell = firstRow.locator("td").first();
+    await expect(firstCell).toHaveCSS("border-bottom-width", "0px");
+  });
 });
 
 // =============================================================================
