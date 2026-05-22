@@ -3141,6 +3141,48 @@ test.describe("Custom Height", () => {
     // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
     expect(triggerBox.height).toBeLessThan(100);
   });
+
+  // Regression: dropdownHeight="fit-content" (and other intrinsic CSS keywords)
+  // used to be applied as max-height, which collapses to 0 inside the fixed-position
+  // Radix Portal flex container — the dropdown opened to ~7px and was effectively
+  // invisible. Intrinsic keywords must size the popover via `height` instead.
+  test("dropdownHeight=fit-content opens with visible options in simple select", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="fit-content">
+        <Option value="a" label="Alpha" />
+        <Option value="b" label="Beta" />
+        <Option value="c" label="Gamma" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Beta" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Gamma" })).toBeVisible();
+  });
+
+  test("dropdownHeight=fit-content opens with visible options in searchable select", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="fit-content" searchable>
+        <Option value="a" label="Alpha" />
+        <Option value="b" label="Beta" />
+        <Option value="c" label="Gamma" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.click();
+    await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Beta" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Gamma" })).toBeVisible();
+  });
 });
 
 // =============================================================================
