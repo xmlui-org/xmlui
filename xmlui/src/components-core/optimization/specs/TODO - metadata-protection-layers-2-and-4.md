@@ -1,7 +1,7 @@
 # TODO: Metadata Protection — Layer 2 (Static AST Audit) + Layer 4 (Runtime Hard-Fail)
 
 **Status:** Planned / Not started (TODO)
-**Overall:** Ні Layer 2, ні Layer 4 наразі не реалізовані.
+**Overall:** Layer 4 (Runtime Hard-Fail) повністю реалізовано (validateInjectedVars кидає помилку). Layer 2 (Static AST Audit) ще TODO.
 **Created:** 2026-05-21
 **Related specs:**
 - [2026-05-21-lexical-scoping-code-review.md](./2026-05-21-lexical-scoping-code-review.md)
