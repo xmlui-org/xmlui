@@ -19,32 +19,28 @@ describe("validateInjectedVars — mismatch detection", () => {
   });
 
   it("U-val.1: emits console.error when a $-var is dispatched but not declared in childInjectedVars", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    validateInjectedVars(
-      "CustomList",
-      { childInjectedVars: [] } as any,
-      { $secret: "value" },
-    );
-    expect(spy).toHaveBeenCalledOnce();
-    expect(spy.mock.calls[0][0]).toContain("$secret");
-    expect(spy.mock.calls[0][0]).toContain("childInjectedVars");
+    expect(() => {
+      validateInjectedVars(
+        "CustomList",
+        { childInjectedVars: [] } as any,
+        { $secret: "value" },
+      );
+    }).toThrowError(/Lexical Scoping.*\$secret.*childInjectedVars/);
   });
 
   it("U-val.1b: emits console.error when event $-var is dispatched but not in injectedVars", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    validateInjectedVars(
-      "CustomLoader",
-      {
-        events: {
-          fetch: { description: "", injectedVars: [] },
-        },
-      } as any,
-      { $queryParams: {} },
-      "fetch",
-    );
-    expect(spy).toHaveBeenCalledOnce();
-    expect(spy.mock.calls[0][0]).toContain("$queryParams");
-    expect(spy.mock.calls[0][0]).toContain('events["fetch"].injectedVars');
+    expect(() => {
+      validateInjectedVars(
+        "CustomLoader",
+        {
+          events: {
+            fetch: { description: "", injectedVars: [] },
+          },
+        } as any,
+        { $queryParams: {} },
+        "fetch",
+      );
+    }).toThrowError(/Lexical Scoping.*\$queryParams.*events\["fetch"\]\.injectedVars/);
   });
 
   it("does NOT report when $-var IS declared in childInjectedVars", () => {
