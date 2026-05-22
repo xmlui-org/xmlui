@@ -2,6 +2,7 @@ import styles from "./Tabs.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 
 import { MemoizedItem } from "../container-helpers";
 import { Tabs, defaultProps } from "./TabsReact";
@@ -12,7 +13,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 const COMP = "Tabs";
 
 export const TabsMd = createMetadata({
-  childInjectedVars: ["$header"],
+  childInjectedVars: OPTIMIZER_METADATA.Tabs.childInjectedVars,
   status: "experimental",
   description:
     "`Tabs` enables users to switch among content panels using clickable tab headers. " +

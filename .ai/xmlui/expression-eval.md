@@ -8,6 +8,31 @@ XMLUI has its own scripting language — a **restricted JavaScript subset** with
 2. **Evaluate** — AST → `eval-tree-sync` (binding expressions) or `eval-tree-async` (event handlers/code-behind) → result
 3. **Track** — `visitors.ts` → `collectVariableDependencies()` → dependency list for reactive re-evaluation
 
+
+## Lexical Scoping and Dependency Optimization
+
+The framework tracks dependencies in binding expressions using an AST crawler (`collectVariableDependencies()`).
+
+To optimize performance and prevent redundant re-renders (where changing irrelevant parent context variables triggers a re-eval), the framework employs a **Lexical Scoping Optimizer** (`xmlui/src/components-core/optimization/computedUses.ts`).
+
+1. **Strict Dependency Tracking**: 
+   - During AST parsing, the optimizer scans all `$`-prefixed variables (e.g. `$checked`, `$itemIndex`, `$newValue`).
+   - If a variable is **not** explicitly declared by the component exposing the template or event handler, it is aggressively stripped from the component's `uses` (dependencies list).
+   - This ensures that a component re-renders *only* when variables relevant to its own scope change, ignoring noise from higher up the component tree.
+   
+2. **Metadata Contract**:
+   - The engine relies entirely on component metadata to know what is legitimately injected. 
+   - A component declares variables exposed to its templates via `childInjectedVars: ["$var1"]` at the root level of its `createMetadata()` definition.
+   - It declares variables exposed to specific event handlers via `injectedVars: ["$var2"]` inside the event's descriptor (`events: { click: { injectedVars: [...] } }`).
+
+3. **Runtime Validation (Approach 1)**:
+   - Because React prop-delegation can mask static analysis (e.g. `Checkbox` delegating to `Toggle`), the optimizer uses **Runtime Validation**.
+   - In `(import.meta.env.DEV)` mode ONLY, whenever `wrapComponent` or `ComponentAdapter` injects `contextVars` for a template or action, it intercepts them via `validateInjectedVars.ts`.
+   - If a script injects a `$` variable into the runtime scope that is NOT listed in the metadata, a console warning (`[XMLUI Lexical Scoping]`) is thrown. This protects developers from accidental non-reactive holes when creating new components.
+
+4. **The Exception**:
+   - `$context` is globally available and bypasses the lexical scoping optimizer entirely.
+
 ## Two Evaluation Tracks
 
 | Track | Entry point | Used for | Promise handling |

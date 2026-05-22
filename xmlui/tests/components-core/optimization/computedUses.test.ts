@@ -1,9 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { computeUsesForTree as originalComputeUsesForTree, COMPUTED_USES_ENABLED, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
   "../../../src/components-core/optimization/computedUses";
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
 import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
 import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
+import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
+import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 const skipIfDisabled = !COMPUTED_USES_ENABLED;
 
@@ -24,9 +27,6 @@ const computeUsesForTree = (root: any) => originalComputeUsesForTree(root, (t) =
   }
   return (collectedComponentMetadata as any)[t];
 });
-import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
-import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
-import { Parser } from "../../../src/parsers/scripting/Parser";
 
 function node(
   type: string,
@@ -1063,25 +1063,25 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree + extractScopedState — end
 });
 
 // ---------------------------------------------------------------------------
-// isRuntimeContextVar filter — Баг 17 regression
+// Lexical scoping — runtime context vars in child scope (Bug 17 regression)
 //
 // Most runtime context vars ($param, $item, $row, $data, $this, $checked,
-// etc.) are injected by the framework at render time via the contextVars
-// mechanism.  They do NOT exist as keys in the parent StateContainer's state
-// map.  Including them in computedUses causes extractScopedState to return {},
-// breaking the component.
+// etc.) are injected by the framework into child templates via the
+// childInjectedVars metadata field.  Because they are declared in
+// injectedVarsScope they are excluded from computedUses — they are NOT keys
+// in the parent StateContainer's state map.
 //
 // Router state vars ($pathname, $routeParams, $queryParams, $linkInfo) DO live
 // in parent state (Layer 6 — useRoutingParams) and must NOT be filtered.
 //
-// PARENT_STATE_DYNAMIC_VARS ($context, …) are set via component dispatch into
-// the parent container's reducer (e.g. ContextMenu.openAt → updateState →
-// implicit dispatch → App state).  They DO live in parent state and must NOT
-// be filtered — containers need them in computedUses so they re-render when
-// the value changes.
+// $context is set via component dispatch into the parent container's reducer
+// (e.g. ContextMenu.openAt → updateState → implicit dispatch → App state).
+// It IS a genuine parent-state key and must appear in computedUses when read.
+// It is NOT listed in any built-in component's childInjectedVars, so it flows
+// through the optimizer as a regular parent dependency.
 // ---------------------------------------------------------------------------
 
-describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filter (Баг 17)", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — lexical scoping: runtime context vars in child scope (Bug 17 regression)", () => {
   it("$param in child expression does NOT appear in computedUses", () => {
     // Regression: ModalDialog-like pattern — $param injected by .open() at runtime.
     // Fixed in Iteration 2: metadata.childInjectedVars must include $param.
@@ -1147,7 +1147,8 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filt
   });
 
   it("$context alone DOES promote a heavy component (Iteration 2 behavior change)", () => {
-    // After removing PARENT_STATE_DYNAMIC_VARS, $context is a real dep.
+    // $context is NOT in any component's childInjectedVars, so the optimizer
+    // treats it as a genuine parent-state dep (correct — it lives in App state).
     const select = node("Select", {
       children: [node("Text", { props: { text: "{$context.name}" } })],
     });
@@ -1287,6 +1288,112 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Iteration 2: Children Sc
     const grid = root.children![0];
     // MyGrid: $cellValue is filtered, x is kept.
     expect(grid.computedUses).toEqual(["x"]);
+  });
+
+  it("U2.3: sibling isolation — $item in List template does NOT leak into sibling Stack", () => {
+    // Hot-spot A from the design spec. Two siblings share the same parent App.
+    // The List's $item must NOT appear in Stack's computedUses.
+    const root = node("App", {
+      vars: { items: "{[]}", title: "'hello'" },
+      children: [
+        node("List", {
+          props: { data: "{items}" },
+          children: [node("Text", { props: { value: "{$item.name}" } })],
+        }),
+        node("Stack", {
+          vars: { x: "1" },
+          children: [node("Text", { props: { value: "{title}" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const list = root.children![0];
+    const stack = root.children![1];
+    // List sees $item — filtered. Items is a child-injected var, not a parent dep.
+    expect(list.computedUses).not.toContain("$item");
+    expect(list.computedUses).toContain("items");
+    // Stack has no awareness of $item at all.
+    expect(stack.computedUses).not.toContain("$item");
+    expect(stack.computedUses).toEqual(["title"]);
+  });
+
+  it("U2.7: childInjectedVars scopes only children, NOT the component's own props", () => {
+    // List.data="{items}" must still see `items` as a parent dep even though
+    // $item is in List's childInjectedVars. The childInjectedVars only extend
+    // the scope passed DOWN to children, not the scope used for the host node's props.
+    const root = node("Stack", {
+      vars: { items: "{[]}" },
+      children: [
+        node("List", {
+          vars: { x: "1" },
+          props: { data: "{items}" },
+          children: [node("Text", { props: { value: "{$item.name}" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const list = root.children![0];
+    // List reads `items` in its own prop — must appear in its computedUses.
+    expect(list.computedUses).toContain("items");
+    // $item is child-injected — must NOT appear.
+    expect(list.computedUses).not.toContain("$item");
+  });
+
+  it("U2.9: deep shadowing — nested Items scopes, inner $item shadows outer $item", () => {
+    // Outer Items injects $item (outer element). Inner Items also injects $item
+    // (inner element). The inner reference to $item refers to the innermost scope
+    // and should be filtered; it must NOT bubble up as a parent dep.
+    const root = node("Stack", {
+      vars: { outerData: "{[]}" },
+      children: [
+        node("Items", {
+          vars: { x: "1" },
+          props: { data: "{outerData}" },
+          children: [
+            node("Items", {
+              vars: { y: "1" },
+              props: { data: "{$item.children}" },
+              children: [node("Text", { props: { value: "{$item.name}" } })],
+            }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const outerItems = root.children![0];
+    const innerItems = outerItems.children![0];
+    // $item is injected by both scopes — must NOT appear in any computedUses.
+    expect(outerItems.computedUses).not.toContain("$item");
+    expect(innerItems.computedUses ?? []).not.toContain("$item");
+    // outerData is a genuine parent dep of outerItems.
+    expect(outerItems.computedUses).toContain("outerData");
+  });
+
+  it("U2.10: mixed global/local/scoped in one expression — only real parent dep kept", () => {
+    // Hot-spot C. Expression: "{$item.name + parentVar + JSON.stringify(otherVar)}"
+    // $item  → filtered (child-injected by List)
+    // JSON   → filtered (JS built-in)
+    // parentVar, otherVar → kept
+    const root = node("Stack", {
+      vars: { parentVar: "1", otherVar: "2" },
+      children: [
+        node("List", {
+          vars: { z: "1" },
+          props: { data: "{[]}" },
+          children: [
+            node("Text", {
+              props: { value: "{$item.name + parentVar + JSON.stringify(otherVar)}" },
+            }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    const list = root.children![0];
+    expect(list.computedUses).not.toContain("$item");
+    expect(list.computedUses).not.toContain("JSON");
+    expect(list.computedUses).toContain("parentVar");
+    expect(list.computedUses).toContain("otherVar");
   });
 });
 
@@ -1609,3 +1716,87 @@ describe.skipIf(skipIfDisabled)("lexical scoping — Iteration 1 events", () => 
     expect(root.computedUses).toContain("tableQ");
   });
 });
+
+describe.skipIf(skipIfDisabled)("lexical scoping — Iteration 1 per-event isolation", () => {
+  it("U1.3: event WITHOUT injectedVars metadata does not strip its free vars", () => {
+    // DataSource.onLoaded has no injectedVars — names used there are regular parent deps.
+    // Note: handlers that contain "{" are processed as XMLUI template strings; use
+    // expression-lambda form (no braces) so the script parser handles them correctly.
+    const root = node("Fragment", {
+      vars: { x: "{0}" },
+      loaders: [
+        node("DataSource", {
+          uid: "ds",
+          props: { id: "ds", url: "/api/x" },
+          events: { onLoaded: "() => externalVar" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    // externalVar must NOT be stripped because onLoaded has no injectedVars.
+    expect(root.computedUses).toContain("externalVar");
+  });
+
+  it("U1.4: two events on one component — injected scope is per-event, not shared", () => {
+    // DataSource: fetch gets $queryParams injected (filtered from that handler);
+    // onLoaded does not — names used there are regular parent deps.
+    const root = node("Fragment", {
+      vars: { x: "{0}" },
+      loaders: [
+        node("DataSource", {
+          uid: "ds",
+          props: { id: "ds", url: "{$queryParams.q}" },
+          events: {
+            fetch: "() => $queryParams.q",
+            onLoaded: "() => sharedCounter",
+          },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    // $queryParams appears in url prop (genuine dep) — still in computedUses.
+    expect(root.computedUses).toContain("$queryParams");
+    // sharedCounter is from onLoaded which has no injectedVars → must appear.
+    expect(root.computedUses).toContain("sharedCounter");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Regression test for Group P (Checkbox.spec.ts:885,900 "$checked/$setChecked
+// has no meaning outside component"): when a sibling references a Checkbox-
+// scoped name like `$checked`, the host container's computedUses=["$checked"]
+// previously caused `extractScopedState` to strip ALL Symbol-keyed component-
+// state entries from the narrowed parentState — including the Checkbox's own
+// `value` slice — so Toggle's value was permanently undefined and the inner
+// template rendered "false" instead of the actual initialValue.
+// Root cause: ContainerUtils.ts extractScopedState filtered Symbols by
+// `description ∈ usesSet`, which only kept Symbols whose uid was itself in
+// `uses`. The fix preserves ALL Symbol-keyed entries because they represent
+// internal component-instance state, not external subscribable names.
+// ---------------------------------------------------------------------------
+describe.skipIf(skipIfDisabled)(
+  "extractScopedState preserves Symbol-keyed component state across narrowing",
+  () => {
+    it(
+      "Symbols are kept even when their description is NOT in `uses`",
+      () => {
+        const childA = Symbol("childA");
+        const childB = Symbol("");
+        const childC = Symbol(undefined);
+        const parentState: any = {
+          known: 1,
+          ignored: 2,
+          [childA]: { value: true },
+          [childB]: { value: true },
+          [childC]: { value: true },
+        };
+        const picked = extractScopedState(parentState, ["known"]) as any;
+        expect(Object.keys(picked)).toEqual(["known"]);
+        expect(childA in picked).toBe(true);
+        expect(childB in picked).toBe(true);
+        expect(childC in picked).toBe(true);
+        expect(picked[childA]).toEqual({ value: true });
+      },
+    );
+  },
+);

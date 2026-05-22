@@ -182,7 +182,7 @@ When a node routes through `StateContainer`, the framework composes its state fr
 | 1. Parent state | State inherited from the parent container, scoped by the `uses` prop | A parent's `userData` variable inherited by a child (when `uses="userData"` or `uses` is not set) |
 | 2. Component reducer | Loader results, event progress flags, component state from `updateState` | `DataSource` results, `submitInProgress` flag |
 | 3. Component APIs | Methods registered via `registerComponentApi()` | A TextBox's `value`, `focus()`, `clear()` |
-| 4. Context variables | Iteration variables, routing params, slot properties | `$item`, `$itemIndex` inside an `<Items>` loop; `$pathname`, `$routeParams` in any component |
+| 4. Context variables | Component-injected `$xxx` context properties | `$item`, `$itemIndex` injected dynamically by `<Items>`; must be declared in metadata |
 | 5. Local variables | Variables declared with `var.` or `<variable>` tags — resolved in two passes to handle forward references | `var.total="{price * quantity}"` |
 | 6. Global variables | App-wide state owned by the root container and passed down | Variables declared at the `<App>` level that are accessible everywhere |
 
@@ -209,7 +209,7 @@ graph BT
   L1["Layer 1 — Parent state<br>inherited via uses prop<br>e.g. userData from parent container"]
   L2["Layer 2 — Component reducer state<br>loader results, event flags<br>e.g. DataSource value, submitInProgress"]
   L3["Layer 3 — Component APIs<br>methods from id-registered children<br>e.g. myInput.focus(), myInput.setValue()"]
-  L4["Layer 4 — Context variables<br>iteration and routing vars<br>e.g. $item, $itemIndex, $routeParams"]
+  L4["Layer 4 — Context variables<br>metadata-injected vars<br>e.g. $item, $newValue, $data"]
   L5["Layer 5 — Local variables<br>declared with var.*<br>e.g. var.total = price * quantity"]
   L6["Layer 6 — Global variables<br>owned by root container<br>e.g. var.global.theme = 'dark'"]
   Combined(["combined state object<br>higher layers shadow lower layers"])

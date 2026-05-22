@@ -3,6 +3,7 @@ import { memo, useMemo, useRef, startTransition } from "react";
 import styles from "./List.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
@@ -345,7 +346,7 @@ export const ListMd = createMetadata({
     $isSelected: dComponent("Boolean indicating if this item is currently selected"),
     $group: dComponent("Group information when using `groupBy` (available in group templates)"),
   },
-  childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$isSelected", "$group"],
+  childInjectedVars: OPTIMIZER_METADATA.List.childInjectedVars,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor",

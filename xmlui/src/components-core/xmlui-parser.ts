@@ -2,6 +2,7 @@ import type { ComponentDef, CompoundComponentDef } from "../abstractions/Compone
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { computeUsesForTree } from "./optimization/computedUses";
+import { lookupOptimizerMetadata } from "./optimization/optimizer-metadata";
 import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText } from "../parsers/xmlui-parser/parser";
 import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";
@@ -56,7 +57,7 @@ export function xmlUiMarkupToComponent(
     const warnings: string[] = [];
     const component = nodeToComponentDef(node, getText, fileId, preResolvedImports, warnings, cursor);
     if (component) {
-      computeUsesForTree(component as ComponentDef);
+      computeUsesForTree(component as ComponentDef, lookupOptimizerMetadata);
     }
     const transformResult = { component, errors: [], warnings };
     return transformResult;

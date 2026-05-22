@@ -27,6 +27,7 @@ import { useStyles } from "../theming/StyleContext";
 import type { StyleObjectType } from "../theming/StyleRegistry";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
+import { validateInjectedVars } from "../optimization/validateInjectedVars";
 import ComponentDecorator from "../ComponentDecorator";
 import { createValueExtractor } from "../rendering/valueExtractor";
 import { useFnDeps } from "../FnDepsContext";
@@ -332,6 +333,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- particular event of this component instance
   const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
     (eventName, actionOptions) => {
+      if (import.meta.env.DEV) {
+        if (actionOptions?.context) {
+          validateInjectedVars(safeNode.type, descriptor, actionOptions.context, eventName as string);
+        }
+      }
+
       const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
       // Read inspector context from ref to avoid changing callback identity
       // when label/type/etc change (which would trigger init/cleanup re-runs)

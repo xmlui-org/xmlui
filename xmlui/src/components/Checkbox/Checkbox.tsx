@@ -2,6 +2,7 @@ import styles from "../Toggle/Toggle.module.scss";
 
 import React from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -56,6 +57,7 @@ export const CheckboxMd = createMetadata({
     ),
     inputTemplate: dComponent("This property is used to define a custom checkbox input template"),
   },
+  childInjectedVars: ["$checked", "$setChecked"],
   childrenAsTemplate: "inputTemplate",
   events: {
     click: dClick(COMP),

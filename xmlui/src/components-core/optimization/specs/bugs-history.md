@@ -787,3 +787,82 @@ Bug 25 (Symbol UID-фільтр) залишено — це не залежить
 - `xmlui/tests-e2e/computed-uses.spec.ts` — `test.skip` для render-count тесту static Select
 
 **Слід мати на увазі (TODO):** Майбутній не-narrowing щит для статичних heavy-компонентів (наприклад, `React.memo`-обгортка без `StateContainer`) має бути ортогональним до `extractScopedState`, щоб уникнути повторення цього конфлікту.
+
+---
+
+### Баг 27 (виявлений у Group P, `Checkbox.spec.ts` "Custom inputTemplate"): `extractScopedState` фільтрував Symbol-ключові записи при наявності `computedUses`
+
+**Симптом:** `Checkbox` з `inputTemplate` та зовнішнім сусідом, що посилається на `$checked` (наприклад `<Button label="{$checked}"/>` поряд з `<Checkbox>`), — Toggle невпинно залишався в стані `false` незалежно від користувацької взаємодії. useEffect на Toggle правильно викликав `updateState({value: true})`, але наступна фаза narrowing дискардувала це оновлення.
+
+Коректна поведінка: Toggle отримує та зберігає новий `value=true`, `$checked` обчислюється як `true`, `inputRenderer({$checked: true})` рендерить правильно.
+
+**Причина (повний ланцюг):**
+
+1. Button (сусід Checkbox) містить `label="{$checked}"`. Оптимізатор бачить `$checked` як вільну змінну на рівні батьківського контейнера (Fragment) і додає `$checked` до `parentDependencies` Fragment → `computedUses=["$checked"]`. (Це коректно — `$checked` це ім'я впроваджене Checkbox, не сусідом.)
+
+2. `extractScopedState(parentState, ["$checked"])` у `ComponentWrapper` для Fragment звужує батьківський стан. String-branch `if (key in parentState)` — нічого не додає (бо `parentState` ніколи не має `$checked` як string-ключ). Symbol-branch міст:
+   ```ts
+   for (const sym of Object.getOwnPropertySymbols(parentState)) {
+     if (sym.description && usesSet.has(sym.description)) {  // ← помилка тут
+       picked[sym] = (parentState as any)[sym];
+     }
+   }
+   ```
+   Checkbox-ін стан зберігається під `Symbol(checkbox-uid)`. Символ має `description = "checkbox-uid"` (або порожній/undefined, якщо uid не встановлений). `usesSet = {"$checked"}`, тому `usesSet.has("checkbox-uid") = false`. Symbol **відкидається**.
+
+3. `ComponentAdapter` для Checkbox: `state: state[uid] || EMPTY_OBJECT`. Без Checkbox-слайса в state — `state[uid] = EMPTY_OBJECT`.
+
+4. `wrapComponent` у Checkbox-렌더러: `props.value = state.value` → `undefined`.
+
+5. Toggle отримує `value={undefined}`, викликає `transformToLegitValue(undefined) = false`, рендерить `"false"` у innerTemplate. Initial `useEffect` записує `updateState({value: true})` → зміна стану → Checkbox перерендериться.
+
+6. **Но́:** ComponentAdapter перерендериться з тим самим звуженим `state={...}` (без Checkbox-слайса), `props.value = undefined` знову, Toggle знову рендериться як `"false"` → нескінченний цикл без convergence.
+
+**Чому простіші тести (846/857/870) вже проходили:** Без зовнішнього посилання на `$checked`, жоден батьківський контейнер ніколи не отримував `computedUses` зі `$checked`. Fragment мав `computedUses = undefined` → `extractScopedState` повертав повний `parentState` (line 153: `if (!uses) return parentState`) → Symbol-фільтр ніколи не активувався.
+
+**Виправлення:** [ContainerUtils.ts:extractScopedState](../../src/components-core/rendering/ContainerUtils.ts) — зберігати ВСІ Symbol-ключі без фільтрування:
+
+```ts
+// Було:
+for (const sym of Object.getOwnPropertySymbols(parentState)) {
+  if (sym.description && usesSet.has(sym.description)) {
+    picked[sym] = (parentState as any)[sym];
+  }
+}
+
+// Стало:
+for (const sym of Object.getOwnPropertySymbols(parentState)) {
+  picked[sym] = (parentState as any)[sym];
+}
+```
+
+Symbols — це внутрішній стан компонента (зареєстровані через `registerComponentApi`), не зовнішні subscribable імена. Реактивне звуження string-ключів залишається без змін. Symbols завжди зберігаються, тому що вони ніколи не є частиною consumer-facing `uses`.
+
+**Регресійний тест:** [tests/components-core/optimization/computedUses.test.ts](../../tests/components-core/optimization/computedUses.test.ts) → describe block `"extractScopedState preserves Symbol-keyed component state across narrowing"`:
+
+```ts
+it("Symbols are kept even when their description is NOT in `uses`", () => {
+  const childA = Symbol("childA");
+  const childB = Symbol("");
+  const childC = Symbol(undefined);
+  const parentState: any = {
+    known: 1,
+    ignored: 2,
+    [childA]: { value: true },
+    [childB]: { value: true },
+    [childC]: { value: true },
+  };
+  const picked = extractScopedState(parentState, ["known"]) as any;
+  expect(Object.keys(picked)).toEqual(["known"]);
+  expect(childA in picked).toBe(true);
+  expect(childB in picked).toBe(true);
+  expect(childC in picked).toBe(true);
+  expect(picked[childA]).toEqual({ value: true });
+});
+```
+
+**Регресійні перевірки:** 114/114 `Checkbox.spec.ts`; 95/95 `computedUses` unit tests; 479/479 більша E2E suite (RadioGroup, Form, Tabs, List) — усі pass.
+
+**Слід мати на увазі:** `Symbol(uid)` запис добавляється в стан через `mergeComponentApis` (див. [rendering/ComponentAdapter.tsx](../../src/components-core/rendering/ComponentAdapter.tsx)). Компонент реєструє свій API раз на mount через `registerComponentApi({focus, setValue, ...})`, батьківський StateContainer це зберігає під обома `{stringKey: api, [Symbol(uid)]: api}`. Динамічне фільтрування Symbols за description порушує це дублювання та ламає Proxy-доступ до компонентного слайса у `state[uid]`. Це особливо критично для wrapped компонентів (Toggle, Input, Select-렌더러) що динамічно оновлюють `value` через `updateState`.
+
+**Файли:** `xmlui/src/components-core/rendering/ContainerUtils.ts`, `xmlui/tests/components-core/optimization/computedUses.test.ts`.

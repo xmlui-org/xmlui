@@ -158,24 +158,31 @@ export function extractScopedState<T extends Record<string, any>>(
     return {} as T;
   }
   const picked: any = {};
-  const usesSet = new Set(uses);
   for (const key of uses) {
     if (key in parentState) {
       picked[key] = parentState[key];
     }
-
   }
-  // Also pick Symbol-keyed entries whose description matches a name in `uses`.
+  // Always preserve ALL Symbol-keyed entries.
   // Component APIs registered via `registerComponentApi` are stored under
-  // `Symbol(uid)` AND under the string `uid` (see `mergeComponentApis`). The
-  // string copy is what templates read (`{mySelect.value}`); the Symbol copy
-  // is what the wrapped component renderer reads from `rendererContext.state`.
-  // Narrowing must keep both copies so the wrapped component still sees its
-  // own state slice when its container is scoped.
+  // `Symbol(uid)` AND the string `uid` (see `mergeComponentApis`). The string
+  // copy is what templates read (`{mySelect.value}`); the Symbol copy is what
+  // the wrapped component renderer reads via `rendererContext.state`
+  // (ComponentAdapter.tsx: `state: state[uid] || EMPTY_OBJECT`).
+  //
+  // Each component instance owns its own slice (e.g. Checkbox's `value`) under
+  // its Symbol. These are internal component-state slots, not external names
+  // consumers subscribe to via `uses`. Filtering them by `sym.description`
+  // strips the wrapped component's own slice whenever its uid is NOT in
+  // `uses` (or its uid is empty/undefined) — `state.value` then resolves to
+  // undefined and `updateState` updates are invisible. See Group P regression
+  // in `Checkbox.spec.ts` "$checked/$setChecked has no meaning outside
+  // component": Fragment.computedUses=["$checked"] stripped the Checkbox's
+  // value Symbol, so Toggle's value stayed false even after the initial
+  // updateState. Preserving all Symbols keeps reactive narrowing for string
+  // names while leaving component-instance state intact.
   for (const sym of Object.getOwnPropertySymbols(parentState)) {
-    if (sym.description && usesSet.has(sym.description)) {
-      picked[sym] = (parentState as any)[sym];
-    }
+    picked[sym] = (parentState as any)[sym];
   }
   return picked;
 }

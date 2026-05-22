@@ -1,6 +1,7 @@
 import styles from "./ModalDialog.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject, textSubject } from "../../components-core/theming/themes/base-utils";
 import { MemoizedItem } from "../container-helpers";
@@ -86,7 +87,7 @@ export const ModalDialogMd = createMetadata({
       "Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)",
     ),
   },
-  childInjectedVars: ["$param", "$params"],
+  childInjectedVars: OPTIMIZER_METADATA.ModalDialog.childInjectedVars,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     ...paddingSubject(COMP, { all: "$space-7" }),

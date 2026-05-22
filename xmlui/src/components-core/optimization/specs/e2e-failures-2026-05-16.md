@@ -5,9 +5,10 @@
 > **Run (2026-05-20 AM):** 4m 06s | Total: 6915 tests | **7 failed**, 5 flaky, 65 skipped, 6838 passed  
 > **Run (2026-05-20 PM — FULL):** 4m22s | Total: 6917 tests | **0 failed** ✅, 5 flaky, 65 skipped, **6847 passed** ✅  
 > **Run (2026-05-21 — Post Bug 26 Revert):** 4.0m | Total: 6921 tests | **0 failed** ✅, 3 flaky, 66 skipped, **6852 passed** ✅  
+> **Run (2026-05-21 — Lexical Scoping Checkbox Failures):** 4m23s | Total: 6922 tests | **2 failed**, 5 flaky, 66 skipped, **6849 passed**  
 > Branch: `yurii/computedUses`
 
-**ALL FIXED:** 0 failed tests.
+**NEW FAILURES:** 2 failed tests in `Checkbox.spec.ts`.
 
 ---
 
@@ -29,6 +30,7 @@
 | ~~M~~ | ~~Regressions (2026-05-20)~~ | ~~`APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`, `update-ui-optimistically.spec.ts`~~ | ~~7~~ | ✅ fixed |
 | ~~N~~ | ~~Select basic, grouping & multiselect~~ | ~~`Select.spec.ts`~~ | ~~15~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
 | ~~O~~ | ~~Table `syncWithVar`~~ | ~~`Table.spec.ts`~~ | ~~6~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
+| P | Checkbox `inputTemplate` / Lexical Scoping | `Checkbox.spec.ts` | 2 | ❌ failed |
 
 ---
 
@@ -176,18 +178,65 @@ All tests in the regression group now pass:
 
 ---
 
-## Summary of Results — Post Bug 26 Revert
+## Group P — ✅ FIXED — Checkbox `inputTemplate` / Lexical Scoping
 
-**FAILURES:** 0 failed tests! ✅
+**Real root cause** (the original "missing childInjectedVars" hypothesis was
+wrong — the metadata was already correct; both `OPTIMIZER_METADATA.Checkbox`
+and `CheckboxMd` already declared `childInjectedVars: ["$checked", "$setChecked"]`):
+
+`extractScopedState` in `ContainerUtils.ts` filtered Symbol-keyed
+component-state entries by `sym.description ∈ usesSet`. When an outer sibling
+referenced `$checked` (e.g. `<Button label="{$checked}"/>` next to a Checkbox),
+the host container received `computedUses=["$checked"]` — and the Symbol filter
+then stripped ALL Symbol-keyed entries whose uid was not in `uses`, including
+the Checkbox's own `value` slice (stored under `Symbol(checkbox-uid)`).
+
+Consequence: `ComponentAdapter`'s `state[uid]` lookup returned `EMPTY_OBJECT`,
+so `props.value = state.value` resolved to `undefined`, `transformToLegitValue`
+coerced it to `false`, and Toggle's `inputRenderer({$checked: false})` made the
+inner template render `"false"` — no matter how many times `useEffect` called
+`updateState({value: true})`, the next narrowing pass discarded the update.
+
+**Why the simpler tests (846/857/870) already passed:** Without an outer
+sibling referencing `$checked`, no host container ever had `computedUses` set
+on `$checked`, so the Symbol filter was a no-op (default branch
+`if (!uses) return parentState`).
+
+**Fix:** `ContainerUtils.ts:extractScopedState` now preserves ALL Symbol-keyed
+entries unconditionally. Symbols are internal component-instance state, not
+external subscribable names; reactive narrowing for string keys is unchanged.
+
+**File:** `xmlui/src/components/Checkbox/Checkbox.spec.ts`
+
+| Line | Test name | Status (2026-05-22) |
+|------|-----------|---------------------|
+| 885:3 | Custom inputTemplate › `$checked` has no meaning outside component | ✅ Pass |
+| 900:3 | Custom inputTemplate › `$setChecked` has no meaning outside component | ✅ Pass |
+
+**Regression test:** `tests/components-core/optimization/computedUses.test.ts`
+→ describe "extractScopedState preserves Symbol-keyed component state across
+narrowing".
+
+**Regression checks performed:** all 114 `Checkbox.spec.ts` tests pass; all 95
+`computedUses` unit tests pass; `RadioGroup` + `Form` + `Tabs` + `List` E2E
+suites (479 tests) pass.
+
+---
+
+## Summary of Results — Post Group P Fix (2026-05-22)
+
+**FAILURES:** 0 in Group P. ⚠️ FLAKY (5 tests, unchanged).
 
 ### Status by group:
-- **A–O:** ✅ FIXED
-- **Flaky:** ⚠️ FLAKY (3 tests)
+- **A–P:** ✅ FIXED
+- **Flaky:** ⚠️ FLAKY (5 tests, timing-sensitive — separate concern)
 
 ### Flaky tests in the new run:
 1. `AutoComplete.spec.ts:1235:3` — Validation Feedback › shows valid icon in concise mode when valid
-2. `Form.spec.ts:3439:1` — regression: data url through modal context
-3. `run-a-one-time-action-on-page-load.spec.ts:26:3` — One-time page load action › onInit fires on mount and the initialized card appears @website
+2. `IncludeMarkup.spec.ts:12:3` — Basic Functionality › renders a Fragment fetched from a URL
+3. `Table.spec.ts:4181:3` — Column width theme variables › column width is consistent whether specified as px or equivalent em theme var
+4. `FormBindingBehavior.spec.ts:828:3` — Validation › 'required' validation shows error when isDirty and losing focus
+5. `poll-an-api-at-regular-intervals.spec.ts:38:3` — Live server metrics dashboard › displays metric values and timestamp @website
 
 ---
 

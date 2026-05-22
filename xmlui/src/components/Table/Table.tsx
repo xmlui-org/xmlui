@@ -5,6 +5,7 @@ import styles from "./Table.module.scss";
 
 import "./react-table-config.d.ts";
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import {
@@ -366,7 +367,7 @@ export const TableMd = createMetadata({
       defaultValue: defaultProps.striped,
     },
   },
-  childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex", "$isSelected"],
+  childInjectedVars: OPTIMIZER_METADATA.Table.childInjectedVars,
   events: {
     contextMenu: dContextMenu(COMP),
     sortingDidChange: {

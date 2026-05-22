@@ -102,8 +102,48 @@
 ### Виключення Code-Behind (`scriptCollected` і `.xs` файли)
 Оптимізатор перевіряє тільки шаблон (`.xmlui`). Якщо користувач надав до компонента файл з розширенням `.xs` або використав `<script>`, функції всередині можуть звертатися до будь-чого у батьківському стані. Транзитивний AST-аналіз код-біхайндів наразі не ведеться, тому звуження для таких вузлів (і їхніх дітей: `nextDisableNarrowing`) відключається. Вони завжди отримують повний `parentState`.
 
-### Символи та типи UIDs
-У статичному аналізі UID-змінні трактуються як `string`. Однак під час виконання (runtime) фреймворк може ін'єктувати `Symbol` ідентифікатори. Після низки багів алгоритм захищається від `Symbol` при спробах маніпулювання масивами (наприклад `.sort()` або `.filter(d => typeof d === "string")`).
+### Символи та типи UIDs: Розділення Internal State від Subscribable Names
+
+У статичному аналізі UID-змінні трактуються як `string`. Однак під час виконання (runtime) фреймворк зберігає **внутрішній стан компонента** під `Symbol(uid)` ключами. Це розділення критичне для правильної роботи звуження стану.
+
+**Контекст (ContainerUtils.ts:extractScopedState):**
+
+Під час рендеру `extractScopedState(parentState, computedUses)` звужує батьківський стан, залишаючи лише ключі, що входять до `computedUses`:
+
+```ts
+const picked = {};
+for (const key of computedUses) {                    // ← string-ключі
+  if (key in parentState) {
+    picked[key] = parentState[key];
+  }
+}
+for (const sym of Object.getOwnPropertySymbols(parentState)) {  // ← Symbol-ключі
+  picked[sym] = (parentState as any)[sym];           // ← ЗАВЖДИ збірігати
+}
+return picked;
+```
+
+**Чому розділення потрібне:**
+
+1. **String-ключі** — це *зовнішні subscribable імена* (батьківські `vars`, `loaders`, router state). Вони перехоплюються в `computedUses` для *реактивності* — коли такий ключ змінюється, контейнер перерендериться.
+
+2. **Symbol-ключі** — це *внутрішній компонентний стан*. API кожного wrapped компонента (Toggle, Input, Select) реєструється під `Symbol(uid)` через `registerComponentApi`. Наприклад:
+   ```ts
+   // Checkbox при mount:
+   registerComponentApi({ focus, setValue })
+   // У StateContainer стає:
+   state[Symbol(checkbox-uid)] = { value: ..., focus, setValue, ... }
+   ```
+
+3. **Критична помилка:** Якщо при звуженні ми **фільтруємо** Symbol-ключі за `sym.description in computedUses`, то при `computedUses=["$checked"]` (список яка не містить checkbox-uid), весь Symbol-слайс компонента видаляється. `ComponentAdapter` отримує `state[uid] = undefined` → `props.value = undefined` → Toggle отримує `value={undefined}` → `transformToLegitValue(undefined) = false` → залипає у false.
+
+**Рішення:** Preserve ALL Symbol-ключи без фільтрування. Вони ніколи не беруться з `computedUses` — це не зовнішні залежності, які можна "забути" при звуженні. Це внутрішні слайси, що належать компонентам і мають завжди бути доступні під час рендера.
+
+**Архітектурна імплікація:** 
+- String-based narrowing ("звужуємо до потрібних батьківських змінних") — це оптимізація реактивності.
+- Symbol-based pass-through (Symbols ЗАВЖДИ присутні) — це гарантія корректності. Без неї компоненти, на які посилаються батьківські вирази, втрачають внутрішній стан.
+
+Див. [Баг 27 у bugs-history.md](./bugs-history.md) для повної відтворення та регресійного тесту.
 
 ---
 
@@ -135,8 +175,11 @@
    Для звуження стейту в Compound-компонентах із Code-behind потрібен транзитивний AST-аналіз `scriptCollected` та тіл функцій з файлів `.xs`.
 4. **Мета-дескриптори для Explicit Heaviness:**
    Значення `IMPLICIT_CONTAINER_COMPONENT_NAMES` наразі захардкоджено. Більш надійний шлях — конфігурувати `isImplicitContainer: true` у `metadata.json` самих компонентів, щоб розширення могли застосовувати Mandatory Shielding до своїх великих віджетів.
-5. **Loop-оптимізація для Items/List рядків:**
-   Звуження `computedUses` на рівні кожного рядку ітерації списку (`$item`), а не тільки списка цілком, для уникнення O(N) рендерів.
+6. **Консолідація метаданих (DRY):**
+   Розглянути можливість об'єднання `childInjectedVars` та `contextVars` у майбутньому рефакторингу. Зараз вони розділені для надійності оптимізатора та гнучкості документації, але це призводить до дублювання назв змінних у метаданих компонентів.
+7. **Автоматична валідація ін'єктованих змінних:**
+   Реалізувати Runtime-валідацію у `__DEV__` режимі, яка попереджатиме розробника, якщо компонент ін'єктує змінну (через `context.set` або `dispatch`), яка не була оголошена в метаданих (`childInjectedVars` або `injectedVars`). Див. [TODO-metadata-validation.md](./TODO-metadata-validation.md).
+
 
 ---
 *Примітка: для перегляду статистики рендерів у браузері під час розробки використовуйте об'єкт `window.__renderCounts`.*

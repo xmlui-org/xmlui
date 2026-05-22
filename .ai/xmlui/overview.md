@@ -92,18 +92,12 @@ When `lines.value` changes, the DataSource automatically refetches, and the Tabl
 
 XMLUI provides several context variables for different scopes:
 
-| Variable | Scope | Description |
+| Variable Type | Source | Description |
 |----------|-------|-------------|
-| `myComponentId` | General | Reference to component instance |
-| `var.myVar` | General | Scoped variables |
-| `$item` | Iterators | Current item in loops |
-| `$itemIndex` | Iterators | Current index in loops |
-| `$param` | Event handlers | Event payload data |
-| `$data` | Forms | Complete form data object |
-| `$value` | FormItem | Current field value |
-| `$pathname` | Page | Current route path |
-| `$routeParams` | Page | Route parameter values |
-| `$queryParams` | Page | Query string parameters |
+| `myComponentId` | General | Reference to component's state/API |
+| `var.myVar` | General | User-defined scoped variables |
+| `global.myVar` | Globals | Globally defined variables |
+| `$xxx` Context Vars | Scope | Injected dynamically by wrapping components (e.g. `$item` from List, `$data` from Form). Required to be declared in component metadata. |
 
 ### 4. Variables and Expressions
 

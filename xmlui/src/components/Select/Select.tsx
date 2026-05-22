@@ -2,6 +2,7 @@ import styles from "./Select.module.scss";
 
 import React from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -225,7 +226,7 @@ export const SelectMd = createMetadata({
     $itemContext: d("Provides the `removeItem()` method for multi-select scenarios"),
     $group: d("Group name when using `groupBy` (available in group header templates)"),
   },
-  childInjectedVars: ["$item", "$itemContext", "$group", "$selectedValue", "$inTrigger"],
+  childInjectedVars: OPTIMIZER_METADATA.Select.childInjectedVars,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
