@@ -370,7 +370,10 @@ export const TableMd = createMetadata({
   isImplicitContainerByDefault: OPTIMIZER_METADATA.Table.isImplicitContainerByDefault,
   childInjectedVars: OPTIMIZER_METADATA.Table.childInjectedVars,
   events: {
-    contextMenu: dContextMenu(COMP),
+    contextMenu: {
+      ...dContextMenu(COMP),
+      injectedVars: OPTIMIZER_METADATA.Table.events.contextMenu.injectedVars,
+    },
     sortingDidChange: {
       description:
         `This event is fired when the table data sorting has changed. It has two arguments: ` +

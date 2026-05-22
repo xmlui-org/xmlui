@@ -1,4 +1,4 @@
-import { describe, expect, it, assert } from "vitest";
+import { describe, expect, it, assert, vi } from "vitest";
 
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
@@ -30,6 +30,7 @@ describe("Process statements - assignments", () => {
       const source = `dummy ${c} "do not allow this";`;
       const evalContext = createEvalContext({ localContext: {} });
       const statements = parseStatements(source);
+      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       // --- Act/Assert
       try {
@@ -37,6 +38,8 @@ describe("Process statements - assignments", () => {
       } catch (err: any) {
         expect(err.toString()).toContain("not found");
         return;
+      } finally {
+        spy.mockRestore();
       }
       assert.fail("Exception expected");
     });
@@ -48,6 +51,7 @@ describe("Process statements - assignments", () => {
       const source = `dummy ${c} "do not allow this";`;
       const evalContext = createEvalContext({ localContext: {} });
       const statements = parseStatements(source);
+      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       // --- Act/Assert
       try {
@@ -55,6 +59,8 @@ describe("Process statements - assignments", () => {
       } catch (err: any) {
         expect(err.toString()).toContain("not found");
         return;
+      } finally {
+        spy.mockRestore();
       }
       assert.fail("Exception expected");
     });

@@ -425,7 +425,16 @@ export function collectVariableDependencies(
   }
 }
 
-function rootIdentifier(dep: string): string {
+/**
+ * Strips a dotted/bracketed access chain down to its leading identifier.
+ *
+ * Examples:
+ *   "foo"            -> "foo"
+ *   "foo.bar"        -> "foo"
+ *   "foo[0].bar"     -> "foo"
+ *   "foo['x'].bar"   -> "foo"
+ */
+export function rootIdentifier(dep: string): string {
   const dot = dep.indexOf(".");
   const bracket = dep.indexOf("[");
   if (dot === -1 && bracket === -1) return dep;
@@ -436,8 +445,23 @@ function rootIdentifier(dep: string): string {
 
 /**
  * Walk a plain-object AST tree collecting Identifier node names.
+ *
+ * It avoids collecting property names of member access expressions
+ * (e.g. in `foo.bar`, `foo` is collected but `bar` is not).
+ *
+ * This fallback is needed for event handler ASTs that arrive with string-typed
+ * `type` discriminators (e.g. `"Identifier"`, `"ExpressionStatement"`) rather
+ * than the numeric constants the real scripting parser emits. This format
+ * appears when event handler objects are constructed directly (e.g. in tests
+ * or via JSON-serialised ASTs) instead of being produced by the scripting
+ * parser. `collectVariableDependencies` only handles the numeric-discriminator
+ * format, so we fall back to a structural walk for the string-discriminator
+ * case.
  */
-function gatherIdentifiers(node: unknown, acc: Set<string> = new Set()): Set<string> {
+export function gatherIdentifiers(
+  node: unknown,
+  acc: Set<string> = new Set(),
+): Set<string> {
   if (node === null || node === undefined || typeof node !== "object") return acc;
   if (Array.isArray(node)) {
     for (const item of node) gatherIdentifiers(item, acc);
@@ -446,14 +470,27 @@ function gatherIdentifiers(node: unknown, acc: Set<string> = new Set()): Set<str
   const obj = node as Record<string, unknown>;
   if (obj.type === "Identifier" && typeof obj.name === "string") {
     acc.add(obj.name);
-  } else {
-    for (const val of Object.values(obj)) gatherIdentifiers(val, acc);
   }
+  if (obj.type === "MemberAccessExpression") {
+    // Only collect the object, not the member.
+    gatherIdentifiers(obj.obj, acc);
+    return acc;
+  }
+  for (const val of Object.values(obj)) gatherIdentifiers(val, acc);
   return acc;
 }
 
 /**
- * Collects component/state dependencies for a given value (expression, parsed AST, etc.)
+ * Collects component/state dependencies for a given value (expression,
+ * parsed AST, or raw template string with `{...}` interpolations).
+ *
+ * Returns the **reads-only** subset — assignment-only targets (LHS of `=`
+ * that is never read on the RHS) are excluded. This matches the historical
+ * behaviour and is what reactive-graph consumers need: a write-only reference
+ * should not become an inbound edge.
+ *
+ * For the richer "all references including write targets" variant used by the
+ * `computedUses` optimiser, see `depsOfValueWithReads`.
  */
 export function depsOfValue(value: unknown, stripRoot = true): string[] {
   const process = (id: string) => (stripRoot ? rootIdentifier(id) : id);
@@ -495,6 +532,98 @@ export function depsOfValue(value: unknown, stripRoot = true): string[] {
     return [];
   } catch {
     return [];
+  }
+}
+
+/**
+ * Returns dependencies for a value as two distinct sets — the richer
+ * companion to `depsOfValue`.
+ *
+ *   - `all`   — every identifier that must be present in scope at runtime,
+ *               i.e. reads **plus** assignment-only targets. This is what
+ *               `computedUses` lists, because the script engine throws
+ *               "Left value variable not found in the scope" if an
+ *               assignment target is missing from scope.
+ *
+ *   - `reads` — only identifiers whose VALUES are actually consumed
+ *               (RHS reads, member-access roots, etc.). This is what decides
+ *               whether to promote a component to an implicit container
+ *               (Select/List/Table/DataGrid). Write-only targets do not need
+ *               to trigger re-renders, so promoting on them adds an
+ *               unnecessary StateContainer that can break a component's
+ *               internal lifecycle (e.g. Select's clearable state).
+ *
+ * Always applies `rootIdentifier` to collected names — that matches every
+ * existing consumer in the optimiser and keeps the public shape predictable.
+ */
+export function depsOfValueWithReads(
+  value: unknown,
+): { all: string[]; reads: string[] } {
+  try {
+    if (value === null || value === undefined) return { all: [], reads: [] };
+    if (isParsedValue(value)) {
+      const tree = (value as CodeDeclaration).tree;
+      const all = (
+        collectVariableDependencies(tree, {}, { includeAssignmentTargets: true }) ?? []
+      ).map(rootIdentifier);
+      const reads = (collectVariableDependencies(tree) ?? []).map(rootIdentifier);
+      return { all, reads };
+    }
+    if (typeof value === "object") {
+      const obj = value as Record<string, unknown>;
+      if (obj.statements && Array.isArray(obj.statements)) {
+        const hasStringDiscriminators =
+          obj.statements.length > 0 &&
+          typeof (obj.statements[0] as any)?.type === "string";
+        if (hasStringDiscriminators) {
+          // String-discriminator ASTs (e.g. "Identifier", "ExpressionStatement")
+          // are not handled by the structured visitor. Fall back to a flat name
+          // gather; this loses scope tracking but is conservative — it never
+          // misses a reference, at worst it includes locals that runtime
+          // narrowing will simply not find in the parent state. Without scope
+          // tracking we cannot tell reads from write-only targets, so the same
+          // set is reported under both keys.
+          const ids = Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+          return { all: ids, reads: ids };
+        }
+        try {
+          const all = (
+            collectVariableDependencies(obj.statements, {}, {
+              includeAssignmentTargets: true,
+            }) ?? []
+          ).map(rootIdentifier);
+          const reads = (collectVariableDependencies(obj.statements) ?? []).map(rootIdentifier);
+          return { all, reads };
+        } catch {
+          const ids = Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+          return { all: ids, reads: ids };
+        }
+      }
+      return { all: [], reads: [] };
+    }
+    if (typeof value === "string") {
+      // String props in XMLUI carry templated expressions through `{...}`
+      // interpolation. `parseParameterString` splits the string on top-level
+      // `{...}` segments and yields each interpolated expression separately.
+      // Plain text segments are ignored — so label="Run", classnames, testIds,
+      // etc. yield NO deps (they have no `{...}` segments). Event handlers and
+      // other rich values arrive here as pre-parsed CodeDeclaration / object
+      // trees and are handled by the branches above; strings that fall through
+      // are template strings only.
+      const params = parseParameterString(value);
+      const acc = new Set<string>();
+      for (const part of params) {
+        if (part.type !== "expression") continue;
+        for (const id of collectVariableDependencies(part.value) ?? []) {
+          acc.add(rootIdentifier(id));
+        }
+      }
+      const ids = Array.from(acc);
+      return { all: ids, reads: ids };
+    }
+    return { all: [], reads: [] };
+  } catch {
+    return { all: [], reads: [] };
   }
 }
 

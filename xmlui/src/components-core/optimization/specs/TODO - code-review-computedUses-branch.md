@@ -1,26 +1,13 @@
 # Code Review: `yurii/computedUses` branch vs `main` — Outstanding Items
 
 > Analysis Date: 2026-05-15
-> Last Update: 2026-05-22 (Trivial fixes applied — only unresolved items remain)
+> Last Update: 2026-05-22 (N2 + D6 consolidated — `gatherIdentifiers` / `rootIdentifier` / `depsOfValueWithReads` now live in `visitors.ts`)
 > Comparison: `0c42b6f3a5d7e86aff7b8119699bbadc2e7bdd31` (merge-base) → HEAD
-> Resolved items (B1, D4, N1, N5, D8, C4) have been removed from this file.
+> Resolved items (B1, D4, N1, N5, D8, C4, N2, D6) have been removed from this file.
 
 ---
 
 ## 🟠 Reference-identity / fragile patterns
-
-### N2: Two divergent `depsOfValue` implementations
-
-The static-analysis "dependency walker" exists in two places with **different signatures and behaviour**:
-
-1. [computedUses.ts:177-230](xmlui/src/components-core/optimization/computedUses.ts#L177-L230) — returns `{ all: string[]; reads: string[] }`. Distinguishes assignment-targets from real reads (so write-only deps don't trigger implicit-container promotion). Handles `string`/`object.statements`/`isParsedValue` cases.
-2. [visitors.ts:455-498](xmlui/src/components-core/script-runner/visitors.ts#L455-L498) — returns a flat `string[]` (the older variant). Imported by `collectComponentDefGraph.ts`.
-
-**Risk:** The two functions are conceptually the same but emit different shapes; bug-fixes applied to one (e.g. the reads-vs-writes distinction) are silently absent from the other. The reactive-graph collector will continue using the coarser analysis indefinitely.
-
-**Action:** Consolidate into a single utility (likely the richer `{ all, reads }` variant) and have both call sites depend on it. If full-shape unification is too invasive, at minimum cross-link the two with a doc comment so the duplication is visible.
-
----
 
 ### N3: Unbounded module-level `astCache` in `computedUses.ts`
 
@@ -181,18 +168,6 @@ The coupling is via underscore-convention property names + `(node as any)` cast.
 
 ---
 
-### D6: `gatherIdentifiers` fallback duplicated without scope tracking
-
-The fallback walker now exists in **two places**:
-- [visitors.ts:432-444](xmlui/src/components-core/script-runner/visitors.ts#L432-L444) (string-discriminator AST fallback for `depsOfValue` consumed by `collectComponentDefGraph`)
-- [computedUses.ts:147-164](xmlui/src/components-core/optimization/computedUses.ts#L147-L164) (slightly more sophisticated — also skips the `member` of `MemberAccessExpression`)
-
-This is the same kind of duplication as N2 above. The `computedUses.ts` version is strictly better (member-access aware) but isn't exported, so `collectComponentDefGraph` gets the coarser variant.
-
-**Action:** Same as N2 — consolidate.
-
----
-
 ### D7: `OPTIMIZER_METADATA` re-export pattern across 20+ `.tsx` files
 
 Examples:
@@ -212,7 +187,6 @@ Not blocking; it just means a new component author has to remember two edits.
 
 | #   | Location                                                        | Problem                                                                       | Severity        |
 |-----|-----------------------------------------------------------------|-------------------------------------------------------------------------------|-----------------|
-| N2  | `computedUses.ts` ↔ `visitors.ts`                               | Two divergent `depsOfValue` implementations                                   | 🟠 Duplication   |
 | N3  | `computedUses.ts:39-49`                                         | Unbounded module-level `astCache`                                             | 🟠 Fragile      |
 | N4  | `computedUses.ts:598-613`                                       | `for (let i=0; i<3; i++)` drill-down with `as any`                            | 🟠 Fragile      |
 | N6  | `Container.tsx:159-160`                                         | Same render-phase ref mutation as R2                                          | 📝 Note         |
@@ -223,14 +197,13 @@ Not blocking; it just means a new component author has to remember two edits.
 | B3  | `computedUses.ts`                                               | In-place mutation of `computedUses`                                           | 📝 Note         |
 | D3  | `ContainerWrapper.tsx` ↔ `ModalDialog.tsx`                      | `_savedVarDefs` untyped                                                       | 🔵 Minor        |
 | D5  | `computedUses.ts:85-119`                                        | `JS_STDLIB_GLOBALS` manual list                                               | 🔵 Minor        |
-| D6  | `visitors.ts:432-444` + `computedUses.ts:147-164`               | `gatherIdentifiers` duplicated                                                | 🔵 Minor        |
 | D7  | `optimizer-metadata.ts` + 20 `.tsx` re-exports                  | Manual projection of metadata into `.tsx` files                               | 🔵 Minor        |
 
 ---
 
 ## Priority of Actions
 
-1. 🟠 **Recommended next:** N2 + D6 (consolidate duplicated walkers); N3 (bound `astCache`); N4 (eliminate the 3-deep magic loop).
+1. 🟠 **Recommended next:** N3 (bound `astCache`); N4 (eliminate the 3-deep magic loop).
 2. 🔵 **Hygiene:** D3, D7.
 3. 📝 **Defer:** P3, P4, R2, R3, N6, B3, D5 — already adequately mitigated, low-cost low-frequency, or React-version-specific.
 

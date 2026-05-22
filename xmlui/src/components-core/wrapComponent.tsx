@@ -4,11 +4,46 @@ import type { ComponentRendererDef, LayoutContext } from "../abstractions/Render
 import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
 import { validateInjectedVars } from "./optimization/validateInjectedVars";
+import { lookupOptimizerMetadata } from "./optimization/optimizer-metadata";
 import { pushXsLog, createLogEntry, pushTrace, popTrace, getCurrentTrace } from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
 import { MemoizedItem } from "../components/container-helpers";
 import { COMPONENT_PART_KEY } from "./theming/responsive-layout";
+
+/**
+ * Populate a component descriptor's metadata with injected-variable
+ * declarations sourced from OPTIMIZER_METADATA. The optimizer is the single
+ * source of truth for which variables it keeps alive in container/event
+ * scopes; this helper mirrors that information into the runtime descriptor
+ * so `validateInjectedVars` (and IDE/docs consumers) see the same set and
+ * don't report bogus mismatches.
+ *
+ * Mutates `metadata` in place. Only fills gaps — never overwrites a value
+ * the component has already declared explicitly.
+ */
+function mergeOptimizerInjectedVars(type: string, metadata: ComponentMetadata): void {
+  const opt = lookupOptimizerMetadata(type);
+  if (!opt) return;
+
+  if (opt.childInjectedVars && !metadata.childInjectedVars) {
+    (metadata as any).childInjectedVars = opt.childInjectedVars;
+  }
+
+  if (opt.events) {
+    for (const eventName of Object.keys(opt.events)) {
+      const injected = opt.events[eventName]?.injectedVars;
+      if (!injected) continue;
+      // Only enrich events the component already advertises. If the
+      // optimizer declares an event the component doesn't expose, leave it
+      // alone — that's an OPTIMIZER_METADATA mistake, not a runtime concern.
+      const target = metadata.events?.[eventName];
+      if (target && !target.injectedVars) {
+        (target as any).injectedVars = injected;
+      }
+    }
+  }
+}
 
 /**
  * Generic hover capture for canvas-rendered components.
@@ -522,6 +557,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapComponentConfig = {},
 ): ComponentRendererDef {
+  mergeOptimizerInjectedVars(type, metadata);
+
   const {
     booleanSet,
     numberSet,
@@ -1064,6 +1101,8 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapCompoundConfig = {},
 ): ComponentRendererDef {
+  mergeOptimizerInjectedVars(type, metadata);
+
   const {
     booleanSet,
     numberSet,

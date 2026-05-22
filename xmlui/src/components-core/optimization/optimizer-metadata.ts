@@ -68,14 +68,29 @@ export const OPTIMIZER_METADATA = {
   Table: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex", "$isSelected"],
+    events: {
+      contextMenu: {
+        injectedVars: ["$item", "$row", "$rowIndex", "$itemIndex"],
+      },
+    },
   },
   TileGrid: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$selected"],
+    events: {
+      contextMenu: {
+        injectedVars: ["$item", "$itemIndex"],
+      },
+    },
   },
   Tree: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$item"],
+    events: {
+      contextMenu: {
+        injectedVars: ["$item"],
+      },
+    },
   },
   Select: {
     isImplicitContainerByDefault: true,
@@ -93,18 +108,29 @@ export const OPTIMIZER_METADATA = {
     isImplicitContainerByDefault: true,
   },
   ModalDialog: { isImplicitContainerByDefault: true, childInjectedVars: ["$param", "$params"] },
+  ContextMenu: { childInjectedVars: ["$context"] },
+  Queue: {
+    childInjectedVars: ["$completedItems", "$queuedItems"],
+    events: {
+      willProcess: { injectedVars: ["$completedItems", "$queuedItems"] },
+      process: { injectedVars: ["$completedItems", "$queuedItems"] },
+      didProcess: { injectedVars: ["$completedItems", "$queuedItems"] },
+      processError: { injectedVars: ["$completedItems", "$queuedItems"] },
+      complete: { injectedVars: ["$completedItems", "$queuedItems"] },
+    },
+  },
   Column:      { childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex", "$value", "$setValue"] },
-  Form:        { 
-    isImplicitContainerByDefault: true, 
-    childInjectedVars: ["$data"], 
-    events: { 
+  Form:        {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$data"],
+    events: {
       willSubmit: { injectedVars: ["$data"] },
       submit: { injectedVars: ["$data"] },
       submitFailed: { injectedVars: ["$data"] },
       cancel: { injectedVars: ["$data"] },
       reset: { injectedVars: ["$data"] },
-      success: { injectedVars: ["$data"] } 
-    } 
+      success: { injectedVars: ["$data"] }
+    }
   },
   FormItem:    { childInjectedVars: ["$value", "$setValue", "$validationResult"] },
   FormSegment: { childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"] },

@@ -27,11 +27,11 @@
  * call can both (a) communicate free-variable deps upward and (b) tell the
  * parent which UIDs will register locally at runtime.
  */
-import { collectVariableDependencies } from "../script-runner/visitors";
-import { parseParameterString } from "../script-runner/ParameterParser";
+import { depsOfValueWithReads } from "../script-runner/visitors";
 import { Parser } from "../../parsers/scripting/Parser";
-import { isParsedValue } from "../state/variable-resolution";
 import type { Statement } from "../script-runner/ScriptingSourceTree";
+import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
+import { isContainerLike } from "../rendering/ContainerUtils";
 
 // Cache for parsed raw strings (like event handlers) to avoid redundant AST
 // generation during boot-time traversal.
@@ -46,9 +46,6 @@ function parse(source: string): Statement[] {
   astCache.set(source, statements);
   return statements;
 }
-import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
-import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
-import { isContainerLike } from "../rendering/ContainerUtils";
 
 /**
  * Set to false to disable the computedUses narrowing optimisation entirely.
@@ -128,134 +125,6 @@ const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 // Fix: Export `XMLUI_GLOBAL_NAMES` from the AppContext module and add it to the exclusion check
 // below (where `keepDep` is defined).
 
-/**
- * Walk a plain-object AST tree collecting Identifier node names.
- *
- * It avoids collecting property names of member access expressions
- * (e.g. in `foo.bar`, `foo` is collected but `bar` is not).
- *
- * This fallback is needed for event handler ASTs that arrive with string-typed
- * `type` discriminators (e.g. `"Identifier"`, `"ExpressionStatement"`) rather
- * than the numeric constants the real scripting parser emits. This format
- * appears when event handler objects are constructed directly (e.g. in tests
- * or via JSON-serialised ASTs) instead of being produced by the scripting
- * parser. `collectVariableDependencies` only handles the numeric-discriminator
- * format, so we fall back to a structural walk for the string-discriminator
- * case.
- */
-function gatherIdentifiers(node: unknown, acc: Set<string> = new Set()): Set<string> {
-  if (node === null || node === undefined || typeof node !== "object") return acc;
-  if (Array.isArray(node)) {
-    for (const item of node) gatherIdentifiers(item, acc);
-    return acc;
-  }
-  const obj = node as Record<string, unknown>;
-  if (obj.type === "Identifier" && typeof obj.name === "string") {
-    acc.add(obj.name);
-  }
-  if (obj.type === "MemberAccessExpression") {
-    // Only collect the object, not the member
-    gatherIdentifiers(obj.obj, acc);
-    return acc;
-  }
-  for (const val of Object.values(obj)) gatherIdentifiers(val, acc);
-  return acc;
-}
-
-function rootIdentifier(dep: string): string {
-  const dot = dep.indexOf(".");
-  const bracket = dep.indexOf("[");
-  if (dot === -1 && bracket === -1) return dep;
-  if (dot === -1) return dep.slice(0, bracket);
-  if (bracket === -1) return dep.slice(0, dot);
-  return dep.slice(0, Math.min(dot, bracket));
-}
-
-/**
- * Returns dependencies for a value. The `all` set includes every identifier
- * that must be present in scope at runtime — reads AND assignment targets.
- * The `reads` set only includes identifiers whose VALUES are actually consumed
- * (RHS reads, member-access roots, etc.). The difference between the two is
- * the "write-only targets" — identifiers that appear only as the LHS of an
- * assignment and whose value is never read by this expression.
- *
- * Why two sets?
- *   • `all` decides what `computedUses` lists, because the script engine
- *     throws "Left value variable not found in the scope" if an assignment
- *     target is missing from scope.
- *   • `reads` decides whether to promote a component to an implicit container
- *     (Select/List/Table/DataGrid). An implicit container exists to enable
- *     re-renders when its parent state changes — and write-only targets do
- *     not need to trigger re-renders (the handler writes them, it does not
- *     read them). Promoting a component to a container based on write-only
- *     deps adds an unnecessary StateContainer wrapper that can break the
- *     component's internal lifecycle (e.g. Select's clearable state).
- */
-function depsOfValue(value: unknown): { all: string[]; reads: string[] } {
-  try {
-    if (value === null || value === undefined) return { all: [], reads: [] };
-    if (isParsedValue(value)) {
-      const tree = (value as CodeDeclaration).tree;
-      const all = (
-        collectVariableDependencies(tree, {}, { includeAssignmentTargets: true }) ?? []
-      ).map(rootIdentifier);
-      const reads = (collectVariableDependencies(tree) ?? []).map(rootIdentifier);
-      return { all, reads };
-    }
-    if (typeof value === "object") {
-      const obj = value as Record<string, unknown>;
-      if (obj.statements && Array.isArray(obj.statements)) {
-        const hasStringDiscriminators =
-          obj.statements.length > 0 &&
-          typeof (obj.statements[0] as any)?.type === "string";
-        if (hasStringDiscriminators) {
-          // String-discriminator ASTs (e.g. "Identifier", "ExpressionStatement")
-          // are not handled by the structured visitor. Fall back to a flat name
-          // gather; this loses scope tracking but is conservative — it never
-          // misses a reference, at worst it includes locals that runtime
-          // narrowing will simply not find in the parent state.
-          const ids = Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
-          return { all: ids, reads: ids };
-        }
-        try {
-          const all = (
-            collectVariableDependencies(obj.statements, {}, { includeAssignmentTargets: true }) ?? []
-          ).map(rootIdentifier);
-          const reads = (collectVariableDependencies(obj.statements) ?? []).map(rootIdentifier);
-          return { all, reads };
-        } catch {
-          const ids = Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
-          return { all: ids, reads: ids };
-        }
-      }
-      return { all: [], reads: [] };
-    }
-    if (typeof value === "string") {
-      // String props in XMLUI carry templated expressions through `{...}`
-      // interpolation. `parseParameterString` splits the string on top-level
-      // `{...}` segments and yields each interpolated expression separately.
-      // Plain text segments are ignored — so label="Run", classnames, testIds,
-      // etc. yield NO deps (they have no `{...}` segments). Event handlers and
-      // other rich values arrive here as pre-parsed CodeDeclaration / object
-      // trees and are handled by the branches above; strings that fall through
-      // are template strings only.
-      const params = parseParameterString(value);
-      const acc = new Set<string>();
-      for (const part of params) {
-        if (part.type !== "expression") continue;
-        for (const id of collectVariableDependencies(part.value) ?? []) {
-          acc.add(rootIdentifier(id));
-        }
-      }
-      const ids = Array.from(acc);
-      return { all: ids, reads: ids };
-    }
-    return { all: [], reads: [] };
-  } catch {
-    return { all: [], reads: [] };
-  }
-}
-
 function depsOfRecord(
   record: Record<string, unknown> | undefined,
 ): { all: Set<string>; reads: Set<string> } {
@@ -263,7 +132,7 @@ function depsOfRecord(
   const reads = new Set<string>();
   if (!record) return { all, reads };
   for (const value of Object.values(record)) {
-    const { all: a, reads: r } = depsOfValue(value);
+    const { all: a, reads: r } = depsOfValueWithReads(value);
     for (const dep of a) all.add(dep);
     for (const dep of r) reads.add(dep);
   }
@@ -360,7 +229,7 @@ function computeUsesInternal(
     for (const d of reads) usedHereReads.add(d);
   };
   const addValue = (v: unknown) => {
-    const { all, reads } = depsOfValue(v);
+    const { all, reads } = depsOfValueWithReads(v);
     for (const d of all) usedHere.add(d);
     for (const d of reads) usedHereReads.add(d);
   };
@@ -375,7 +244,7 @@ function computeUsesInternal(
     if (typeof raw === "string" && !raw.includes("{")) {
       try {
         const statements = parse(raw);
-        const { all, reads } = depsOfValue({ statements });
+        const { all, reads } = depsOfValueWithReads({ statements });
         for (const d of all) {
           if (!eventScope.has(d)) usedHere.add(d);
         }
@@ -387,7 +256,7 @@ function computeUsesInternal(
         // Fall back to regular processing if not a valid script
       }
     }
-    const { all, reads } = depsOfValue(raw);
+    const { all, reads } = depsOfValueWithReads(raw);
     for (const d of all) {
       if (!eventScope.has(d)) usedHere.add(d);
     }

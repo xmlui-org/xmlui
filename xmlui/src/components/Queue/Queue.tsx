@@ -1,4 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
 import { QueueWithContextVar, defaultProps } from "./QueueReact";
@@ -41,6 +42,7 @@ export const QueueMd = createMetadata({
       parameters: {
         item: "The item about to be processed.",
       },
+      injectedVars: OPTIMIZER_METADATA.Queue.events.willProcess.injectedVars,
     },
     process: {
       description:
@@ -50,6 +52,7 @@ export const QueueMd = createMetadata({
       parameters: {
         item: "The item to process.",
       },
+      injectedVars: OPTIMIZER_METADATA.Queue.events.process.injectedVars,
     },
     didProcess: {
       description:
@@ -59,6 +62,7 @@ export const QueueMd = createMetadata({
         item: "The item that was processed.",
         result: "The result of the processing operation.",
       },
+      injectedVars: OPTIMIZER_METADATA.Queue.events.didProcess.injectedVars,
     },
     processError: {
       description:
@@ -70,6 +74,7 @@ export const QueueMd = createMetadata({
         error: "The error that occurred during processing.",
         context: "An object containing the item and itemId that failed processing.",
       },
+      injectedVars: OPTIMIZER_METADATA.Queue.events.processError.injectedVars,
     },
     complete: {
       description:
@@ -77,6 +82,7 @@ export const QueueMd = createMetadata({
         `The event handler has no arguments.`,
       signature: "complete(): void",
       parameters: {},
+      injectedVars: OPTIMIZER_METADATA.Queue.events.complete.injectedVars,
     },
   },
   apis: {
@@ -127,6 +133,7 @@ export const QueueMd = createMetadata({
       `A list containing the items waiting in the queue, icluding the completed items.`,
     ),
   },
+  childInjectedVars: OPTIMIZER_METADATA.Queue.childInjectedVars,
 });
 
 export const queueComponentRenderer = wrapComponent(COMP, QueueWithContextVar, QueueMd, {
