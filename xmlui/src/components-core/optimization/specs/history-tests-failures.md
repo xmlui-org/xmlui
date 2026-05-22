@@ -8,9 +8,20 @@
 > **Run (2026-05-21 — Lexical Scoping Checkbox Failures):** 4m23s | Total: 6922 tests | **2 failed**, 5 flaky, 66 skipped, **6849 passed**  
 > **Run (2026-05-22 — Final Check):** 4m 20s | Total: 6922 tests | **0 failed** ✅, 7 flaky, 66 skipped, 6849 passed ✅  
 > **Run (2026-05-22 — Regression Check):** 4m 22s | Total: 6922 tests | **1 failed**, 5 flaky, 66 skipped, **6850 passed**  
+> **Run (2026-05-22 PM — Post-Lexical-Scoping):** **5 failed**, 4 flaky — reactive-derived-var regression confirmed via `COMPUTED_USES_ENABLED = false` workaround (full run not recaptured).  
+> **Run (2026-05-22 PM — Post Group R fix):** Targeted suites: 43/43 E2E pass (5 originally-failing tests + 28 ContextMenu Bug 29 + ContextMenu Bug 29 regression tests), 95/95 computedUses unit pass; broad E2E (Form/List/Table/ModalDialog/Checkbox/Select/Tree/Queue/Tabs) **1410 passed**, 0 failed; how-to-examples **463 passed** + 1 flaky hover test (passes on isolated rerun).  
 > Branch: `yurii/computedUses`
 
-**NEW FAILURES:** 1 regression in `ModalDialog.spec.ts`.
+**NEW FAILURES (2026-05-22 PM) — ✅ FIXED:** 5 reactive-derived-variable regressions
+across `communicate-between-sibling-components.spec.ts`, `markup.spec.ts`, and
+`var-destructuring.spec.ts` (see Group R). Root cause was NOT inside the
+`computedUses` optimisation pass itself — the bisection signal
+(`COMPUTED_USES_ENABLED = false` made them pass) was misleading. Real cause: the
+Bug 29 lexical-scoping fix in commit `3408e8c35` flipped
+`variable-resolution.ts`'s spread order for **all** vars, breaking reactivity
+of user-defined derived vars that reference sibling `var.`s on the same
+container. Fixed by restoring the original order and explicitly preserving
+$-prefixed framework keys from the local `ret` table.
 
 
 ---
@@ -34,7 +45,8 @@
 | ~~N~~ | ~~Select basic, grouping & multiselect~~ | ~~`Select.spec.ts`~~ | ~~15~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
 | ~~O~~ | ~~Table `syncWithVar`~~ | ~~`Table.spec.ts`~~ | ~~6~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
 | ~~P~~ | ~~Checkbox `inputTemplate` / Lexical Scoping~~ | ~~`Checkbox.spec.ts`~~ | ~~2~~ | ✅ fixed |
-| Q | ModalDialog context propagation | `ModalDialog.spec.ts` | 1 | ❌ failed |
+| ~~Q~~ | ~~ModalDialog context propagation~~ | ~~`ModalDialog.spec.ts`~~ | ~~1~~ | ✅ fixed |
+| ~~R~~ | ~~Reactive derived variables (`var.X="{expr}"` / `var {a} = source`)~~ | ~~`communicate-between-sibling-components.spec.ts`, `markup.spec.ts`, `var-destructuring.spec.ts`~~ | ~~5~~ | ✅ fixed (Bug 30) |
 
 ---
 
@@ -270,6 +282,104 @@ Tabs E2E suites (796 tests) pass; 95 `computedUses` unit tests pass.
 
 ---
 
+## Group R — ✅ FIXED — Reactive derived variables (Bug 30, regression from Bug 29 fix)
+
+**Symptom:** A `var.derived="{expr}"` declared on the same container as its
+source `var.source`, or a `var {a, b} = source;` destructuring, did not
+re-evaluate when `source` mutated from an event handler. Built-in components
+reading the derived name (or the destructured aliases) kept showing the
+initial value.
+
+**Reproductions (failing 2026-05-22 PM):**
+
+| File | Line | Test name |
+|------|------|-----------|
+| `tests-e2e/how-to-examples/communicate-between-sibling-components.spec.ts` | 28:3 | Shared filter state between siblings › selecting UI filter shows only UI articles @website |
+| same | 37:3 | Shared filter state between siblings › selecting Data filter shows only Data articles @website |
+| same | 45:3 | Shared filter state between siblings › switching back to All restores all articles @website |
+| `tests-e2e/how-to-examples/markup.spec.ts` | 42:3 | Defining and using reactive variables › clicking increment updates count directly and indirectly @website |
+| `tests-e2e/var-destructuring.spec.ts` | 87:1 | var destructuring is reactive |
+
+**Common pattern — all three reproductions involve a *derived* var whose sole
+dependency is another `var` on the same container:**
+
+- **Siblings example** — `<App var.selectedTag="all" var.allSelected="{selectedTag === 'all'}">`.
+  Sibling `<Text when="{allSelected || selectedTag === 'ui'}">` rows never
+  re-rendered after `RadioGroup`'s `onDidChange="(v) => selectedTag = v"` fired.
+- **Reactive vars example** — `<App var.count="{0}" var.countTimes3="{3 * count}">`.
+  `<Text>{countTimes3}</Text>` stayed at the initial value after `count++`.
+- **Destructured example** — `var source = {count: 0, label: "clicks"}; var {count, label} = source;`
+  with `onClick="source = {count: source.count + 1, label: source.label}"`.
+  `<Text>{count}</Text>` did not update after the assignment.
+
+**False-positive bisection signal:** disabling the optimisation
+(`COMPUTED_USES_ENABLED = false` in `computedUses.ts`) made every failing
+scenario pass — which made `computedUses` look like the culprit. It wasn't.
+Disabling the narrowing optimisation also disabled `extractScopedState` →
+`stateFromOutside` reverted to the full parent state, which happened to
+include the parent's `componentState` updates for the source var, *masking*
+the real shadowing bug below.
+
+**Real root cause:** the Bug 29 fix in commit `3408e8c35`
+([variable-resolution.ts:155](../../state/variable-resolution.ts#L155))
+flipped the spread order of `stateContext` for **all** vars:
+
+```ts
+// Before Bug 29 fix
+const stateContext: ContainerState = { ...ret, ...componentState };
+// After Bug 29 fix (this regression)
+const stateContext: ContainerState = { ...componentState, ...ret };
+```
+
+The flip was correct for `$props` (and other `$`-prefixed framework vars
+preserved by `extractScopedState`'s FRAMEWORK_VARS list): in a UDC, the
+locally-resolved `$props` from `CompoundComponent`'s `resolvedProps` must
+shadow an outer `$props` that leaked through narrowing.
+
+The flip was **wrong for user-defined vars** like `count`, `selectedTag`,
+`source`: `ret[count]` always re-evaluates the initial expression (`{0}` → 0),
+while `componentState.count` carries the latest imperative dispatch (`1` after
+`count++`). With `ret` winning, every derived var that referenced `count`
+read the initial value forever. `mergedWithVars` at the next step (which
+spreads `componentState` *over* `resolvedLocalVars`) hid this for the
+source var itself — but the *derived* var was already computed from the
+stale source value, so its slot showed `3 * 0 = 0`.
+
+**Fix:** [variable-resolution.ts:155-172](../../state/variable-resolution.ts#L155-L172)
+— restore the original spread order, then explicitly preserve `$`-prefixed
+keys from `ret` so the Bug 29 lexical-scoping invariant still holds:
+
+```ts
+const stateContext: ContainerState = { ...ret, ...componentState };
+for (const k in ret) {
+  if (k.charCodeAt(0) === 36 /* '$' */) {
+    stateContext[k] = ret[k];
+  }
+}
+```
+
+User-defined vars now correctly take their latest dispatched value from
+`componentState`, while `$props`/`$context`/`$item`/`$value`/… stay
+locally-scoped to the resolving container.
+
+**Files:** `xmlui/src/components-core/state/variable-resolution.ts`.
+
+**Regression checks performed (2026-05-22 PM):**
+
+- All 5 originally-failing tests pass.
+- Bug 29 ContextMenu regression suite (28 tests including the two new
+  `Bug 29 regression` tests) — pass.
+- `computedUses.test.ts` 95/95 unit tests — pass.
+- Broad component suites (Form/List/Table/ModalDialog/Checkbox/Select/Tree/
+  Queue/Tabs) — **1410 passed, 0 failed.**
+- Full how-to-examples suite — **463 passed**, 2 skipped, 1 flaky hover-timing
+  test (`create-a-multi-level-submenu.spec.ts:64`) that passes on isolated
+  re-run (7/8 pass, 1 intentionally skipped).
+
+**Flaky (4) — not investigated yet.**
+
+---
+
 ## Summary of Results — Post Regression Check (2026-05-22)
 
 **FAILURES:** 0 ❌. ⚠️ FLAKY (5 tests).
@@ -284,6 +394,34 @@ Tabs E2E suites (796 tests) pass; 95 `computedUses` unit tests pass.
 3. `hide-an-element-until-its-datasource-is-ready.spec.ts:39:3` — Show content only after the DataSource loads › result text appears and button re-enables after the fetch completes @website
 4. `markup.spec.ts:15:3` — A complex JSON object › filling station name and submitting shows it in the output @website
 5. `run-a-one-time-action-on-page-load.spec.ts:26:3` — One-time page load action › onInit fires on mount and the initialized card appears @website
+
+---
+
+## Summary of Results — Post Group R Fix (2026-05-22 PM)
+
+**FAILURES:** 0 ❌. ⚠️ FLAKY (4 tests — list not recaptured; includes the
+known timing-sensitive hover test `create-a-multi-level-submenu.spec.ts:64`
+which passes on isolated re-run).
+
+### Status by group:
+- **A–R:** ✅ FIXED
+- **Flaky:** ⚠️ FLAKY (4 tests, timing-sensitive).
+
+### Verification suites:
+- 43/43 targeted E2E pass (5 originally-failing + 28 ContextMenu including
+  Bug 29 regression).
+- 95/95 `computedUses.test.ts` unit pass.
+- 1410/1410 broad component E2E pass (Form/List/Table/ModalDialog/Checkbox/
+  Select/Tree/Queue/Tabs).
+- 463/463 how-to-examples E2E pass (with 1 known-flaky hover test).
+
+### Lesson learned (false-positive bisection):
+The `COMPUTED_USES_ENABLED = false` workaround initially pointed at the
+`computedUses` pass, but the real cause was in `variable-resolution.ts`.
+Disabling `computedUses` widened `stateFromOutside` to the full parent
+state, which happened to mask the spread-order shadowing in `useVars`.
+Always verify a bisection signal by tracing data flow, not just by
+toggling the suspected feature flag.
 
 ---
 
