@@ -885,3 +885,86 @@ When ModalDialog opened inside Table → Column → MemoizedItem with `$item`, t
 3. **Selected string-keys from `uses`** (as before).
 
 **Files:** `xmlui/src/components-core/rendering/ContainerUtils.ts`, `xmlui/tests/components-core/rendering/ContainerUtils.test.ts`, `xmlui/src/components-core/optimization/optimizer-metadata.ts`.
+
+---
+
+### Bug 29 (Group R): `useVars` Local Scope Shadowed by Outer Scope — Nested UDC Receives Wrong `$props`
+
+**Symptom:** In real-world `myworkdrive` app, right-click on a file row in `<Table>` opened the context menu, but **only the "Refresh" item appeared** — every conditional `<MenuItem when="{isAnythingSelected && ...}">` evaluated `false` and was hidden. Console had no errors (after fixing the related Bug 28 throw in `validateInjectedVars`). Setting `COMPUTED_USES_ENABLED = false` did NOT help — proving the cause was not the computedUses narrowing itself.
+
+The markup pattern:
+```xml
+<ContextMenu id="contextMenu">
+  <FilesContextMenu context="{$context}" />   <!-- a UDC -->
+</ContextMenu>
+
+<!-- FilesContextMenu.xmlui (compound component) -->
+<Component
+  name="FilesContextMenu"
+  var.selectedItems="{$props.context?.selectedItems || []}"
+  var.isAnythingSelected="{selectedItems.length > 0}"
+>
+  <MenuItem when="{isAnythingSelected}" onClick="...">Delete</MenuItem>
+  ...
+</Component>
+```
+
+A diagnostic log inside `useVars` showed the smoking gun on right-click (with `context.selectedItems.length === 1` set by `openAt`):
+```
+key: "selectedItems"
+dependencies: ["$props.context.selectedItems"]
+stateDepValuesKeys: []                         ← pickFromObject found nothing
+stateDepValues_$props_present: false
+stateContext_props_selectedItems_len: null     ← stateContext.$props.context.selectedItems = undefined
+ret_props_selectedItems_len: 1                 ← BUT ret.$props.context.selectedItems = [item]
+componentState_props_selectedItems_len: null
+resolved_value: "Array(len=0)"
+```
+
+`ret` (the in-progress locally-resolved vars table) DID have the correct `$props` set by the prior iteration — key `$props` is handled specially in [variable-resolution.ts:86-88](../../src/components-core/state/variable-resolution.ts#L86-L88) and its value comes directly from `CompoundComponent`'s `resolvedProps`. But the `stateContext` actually passed to `evalBinding` for evaluating `selectedItems` did NOT have it.
+
+**Root cause:** [variable-resolution.ts:155](../../src/components-core/state/variable-resolution.ts#L155) built `stateContext` as
+```ts
+const stateContext: ContainerState = { ...ret, ...componentState };
+```
+
+The spread order let `componentState` override `ret`. This violates lexical scoping: a value resolved **locally** in this very container (and present in `ret`) must shadow any same-named value coming from the **outer** scope (`componentState`), not the other way around.
+
+The bug surfaced only after the Bug 28 fix added `"$props"` (and other framework names) to `FRAMEWORK_VARS` preserved in `extractScopedState` ([ContainerUtils.ts](../../src/components-core/rendering/ContainerUtils.ts)). Before that change, parent state never contained `$props`, so the spread bug was masked. After the change, the parent's `$props` (often `undefined`, or pointing to a different UDC's resolvedProps) leaked through narrowing into `componentState`, then through the spread shadowed `ret.$props`.
+
+Secondary consequence: dependencies for the `selectedItems` expression were collected as a dotted path `["$props.context.selectedItems"]` and `pickFromObject(stateContext, paths)` uses `lodash.get` to traverse it. When `stateContext.$props` was `undefined` the picked deps were `{}`. The `obtainValue` memoize then compared `shallowCompare({}, {}) === true` → **cache hit forever** → the first cached `[]` was returned on every subsequent right-click, even after `$props` was repaired in later renders.
+
+**Fix:** [variable-resolution.ts:155-159](../../src/components-core/state/variable-resolution.ts#L155-L159) — flip the spread:
+```ts
+// Before
+const stateContext: ContainerState = { ...ret, ...componentState };
+
+// After
+// Lexical scoping: locally-resolved vars (ret) MUST win over outer
+// componentState. Otherwise an outer `$props` (e.g. leaked through
+// narrowing) shadows the CompoundComponent's resolved $props that
+// we just set in ret a few iterations ago.
+const stateContext: ContainerState = { ...componentState, ...ret };
+```
+
+One-line change. Restores the lexical-scoping invariant the surrounding code already assumes (the `if (key === "$props")` branch at L86-88 has the comment "We already resolved props in a compound component" — meaning the locally-set value was always supposed to win).
+
+**Why this is systemic, not just a ContextMenu bug**
+
+Any nested user-defined component (UDC) where the inner UDC has a `var.x` expression that references `$props` — or any other `$`-prefixed key that the framework also propagates through narrowing — was vulnerable. At-risk patterns:
+
+| Pattern | Local var defined by | Same `$`-key leaks from outer? |
+|---|---|---|
+| UDC nested inside UDC reading `$props.X` | `CompoundComponent` sets `$props: resolvedProps` in `node.vars` | YES — `$props` is in FRAMEWORK_VARS |
+| UDC reading `$context` after enclosing `<ContextMenu>` | runtime `Container.contextVars: { $context }` in ContextMenu customRender | YES — `$context` in FRAMEWORK_VARS |
+| Inner `<List>`/`<Table>` whose item template references `$item` of the inner iteration | `MemoizedItem` per-row contextVars | YES — `$item` in FRAMEWORK_VARS |
+| `<FormItem>` inside another `<FormItem>` redefining `$value`/`$setValue` | FormItem's contextVars | YES — both in FRAMEWORK_VARS |
+| `<Queue>` nested with parent that also exposes `$completedItems` | Queue's contextVars | YES — in FRAMEWORK_VARS |
+
+myworkdrive's context menu was the **first real app pattern** to nest a UDC under `<ContextMenu>` and rely on `$props.context.X`. That is why this bug surfaced specifically there. The framework was silently corrupting local var resolution in every analogous case, but no existing test covered the shape.
+
+**Tests added:**
+- Unit: [tests/components-core/state/variable-resolution.test.ts](../../tests/components-core/state/variable-resolution.test.ts) → describe `"useVars: lexical shadowing (local ret wins over componentState)"` — three cases: (1) `$props` from `ret` wins over `$props` from outer `componentState`, (2) local `var.x` expression referencing `$props.y` resolves to the local-iteration `$props`, (3) repeated invocation with changing outer `componentState.$props` does not stale-cache the result.
+- Playwright: [src/components/ContextMenu/ContextMenu.spec.ts](../../src/components/ContextMenu/ContextMenu.spec.ts) → tests `"compound component child reads $context via $props"` and `"second openAt with new $context refreshes child UDC var resolution"` — reproduces myworkdrive shape (`<ContextMenu><MyMenu context="{$context}"/></ContextMenu>` where `MyMenu` is a UDC reading `$props.context`).
+
+**Files:** `xmlui/src/components-core/state/variable-resolution.ts`, `xmlui/tests/components-core/state/variable-resolution.test.ts`, `xmlui/src/components/ContextMenu/ContextMenu.spec.ts`, `xmlui/src/components-core/optimization/specs/computed-uses-specification.md`.

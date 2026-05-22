@@ -372,7 +372,6 @@ export const TableMd = createMetadata({
   events: {
     contextMenu: {
       ...dContextMenu(COMP),
-      injectedVars: OPTIMIZER_METADATA.Table.events.contextMenu.injectedVars,
     },
     sortingDidChange: {
       description:

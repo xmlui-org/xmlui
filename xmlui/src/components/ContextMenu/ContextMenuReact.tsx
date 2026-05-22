@@ -86,14 +86,14 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
     event.preventDefault();
     // Stop event propagation to prevent any parent handlers from firing
     event.stopPropagation();
-    
+
     // Calculate coordinates - use clientX/clientY which are viewport-relative
     // These coordinates will be adjusted relative to the portal container below
     setPosition({
       x: event.clientX,
       y: event.clientY,
     });
-    
+
     // Store the context data in state
     updateState?.({ $context: context });
     

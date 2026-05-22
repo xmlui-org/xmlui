@@ -104,6 +104,12 @@ export const CompoundComponent = forwardRef(
 
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
 
+    // Items-loop and context variables that must propagate through the UDC boundary.
+    // The UDC container uses narrowing which blocks local context vars,
+    // so $item/$itemIndex/$isFirst/$isLast/$context would otherwise be invisible inside the
+    // UDC template and break logic (e.g. form bindings or context menus).
+    const PROPAGATED_CONTEXT_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast", "$context"] as const;
+
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, computedUses: _staleComputedUses, ...rest } = compound;
@@ -123,7 +129,9 @@ export const CompoundComponent = forwardRef(
         functions: functions,
         scriptError: scriptError,
         containerUid: uid,
-        uses: globalKeys, // Only inherit global variables, not local parent vars
+        // When narrowing to globals, we MUST also allow propagated context variables AND $props
+        // so they are not stripped by StateContainer's Layer 1.
+        uses: globalKeys ? [...globalKeys, ...PROPAGATED_CONTEXT_VARS, "$props"] : undefined,
         props: {
           debug: (compound as any).debug || (compound.props as any)?.debug,
         },
@@ -155,11 +163,6 @@ export const CompoundComponent = forwardRef(
 
     const hasEventHandler = useEvent((eventName) => !!lookupEventHandler(eventName));
 
-    // Items-loop context variables that must propagate through the UDC boundary.
-    // The UDC container uses `uses: globalKeys` which blocks local context vars,
-    // so $item/$itemIndex/$isFirst/$isLast would otherwise be invisible inside the
-    // UDC template and break FormBindingBehavior path resolution (bindTo inside UDC).
-    const PROPAGATED_CONTEXT_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast"] as const;
     const propagatedContextVars = useMemo(() => {
       if (!contextVars) return undefined;
       const result: Record<string, any> = {};

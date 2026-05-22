@@ -27,10 +27,15 @@ export function validateInjectedVars(
     if (metadata.events?.[eventName]?.injectedVars) {
       metadata.events[eventName].injectedVars!.forEach(v => declaredVars.add(v));
     }
-  } else {
-    if (metadata.childInjectedVars) {
-      metadata.childInjectedVars.forEach(v => declaredVars.add(v));
-    }
+  }
+
+  // Also universally include childInjectedVars and contextVars metadata since
+  // our optimizer merges them for both events and templates.
+  if (metadata.childInjectedVars) {
+    metadata.childInjectedVars.forEach(v => declaredVars.add(v));
+  }
+  if (metadata.contextVars) {
+    Object.keys(metadata.contextVars).forEach(v => declaredVars.add(v));
   }
 
   const missing = injectedKeys.filter(k => !declaredVars.has(k));

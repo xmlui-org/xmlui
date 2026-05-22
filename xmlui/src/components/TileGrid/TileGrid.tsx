@@ -162,7 +162,6 @@ export const TileGridMd = createMetadata({
       ...d(
         "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.",
       ),
-      injectedVars: OPTIMIZER_METADATA.TileGrid.events.contextMenu.injectedVars,
     },
   },
 

@@ -168,7 +168,7 @@ export const StateContainer = memo(
 
     const stateFromOutside = useShallowCompareMemoize(
       useMemo(
-        () => extractScopedState(parentState, node.uses ?? node.computedUses),
+        () => extractScopedState(parentState, node.uses ?? node.computedUses) ?? parentState,
         [node.uses, node.computedUses, parentState],
       ),
     );
@@ -505,7 +505,11 @@ export const StateContainer = memo(
         } else {
           // Not global, not local - bubble up if allowed by uses
           const uses = nodeUsesRef.current;
-          if (!uses || uses.includes(key)) {
+          // Systemic Fix №7: Always allow framework-level context variables (starting with $)
+          // to bubble up to the app state, even if they are not in the 'uses' list.
+          // This ensures that components like ContextMenu can update $context successfully.
+          const isFrameworkVar = typeof key === 'string' && key.startsWith("$");
+          if (isFrameworkVar || !uses || uses.includes(key)) {
             parentStatePartChangedRef.current(pathArray, newValue, target, action);
           }
         }

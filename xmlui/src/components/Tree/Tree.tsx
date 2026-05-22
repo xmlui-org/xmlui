@@ -206,7 +206,6 @@ export const TreeMd = createMetadata({
   events: {
     contextMenu: {
       ...dContextMenu(COMP),
-      injectedVars: OPTIMIZER_METADATA.Tree.events.contextMenu.injectedVars,
     },
     selectionDidChange: {
       description: `Fired when the tree selection changes.`,

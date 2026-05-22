@@ -70,10 +70,14 @@ export const contextMenuComponentRenderer = wrapComponent(CMCOMP, ContextMenu, C
     // and `when` conditions on menu items so hidden items don't leave orphaned separators.
     const filteredChildren = filterSeparators(node.children, extractValue);
 
-    // Wrap filtered children with $context variable
+    // Wrap filtered children with $context variable.
+    // Try to get $context from local state first (set via updateState in openAt),
+    // but fall back to extractValue to find it in parent scopes if needed.
     const nodeWithContextVars: ContainerWrapperDef = {
       type: "Container",
-      contextVars: { $context: state.$context },
+      contextVars: {
+        $context: state?.$context ?? extractValue("$context"),
+      },
       children: filteredChildren,
     };
 
@@ -82,7 +86,7 @@ export const contextMenuComponentRenderer = wrapComponent(CMCOMP, ContextMenu, C
         registerComponentApi={registerComponentApi}
         updateState={updateState}
         classes={classes}
-        menuWidth={extractValue(node.props.menuWidth)}
+        {..._props}
       >
         {renderChild(nodeWithContextVars)}
       </ContextMenu>

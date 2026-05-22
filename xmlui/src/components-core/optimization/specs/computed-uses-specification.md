@@ -80,6 +80,28 @@ Instead of hardcoded lists of "special" variables, the optimizer uses metadata t
 - **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars`. Expressions inside a specific handler filter these variables.
 - **Shadowing:** Metadata-driven scoping allows local variables (like `$queryParams` in `onFetch`) to naturally shadow global ones (like router `$queryParams`), preventing false parent dependencies.
 
+### Lexical Scoping at Runtime: Local Vars Win over Outer Scope (`useVars`)
+
+The static analysis above decides **which** parent-scope names a container subscribes to. At render time, the actual values are merged in [`useVars`](../../src/components-core/state/variable-resolution.ts). When `useVars` iterates over `vars` (an ordered map of `{...node.functions, ...node.vars, ...parsedScriptPart.vars}`) it builds `ret` incrementally — each iteration resolves one var and stores it in `ret`. To evaluate the next var's expression, it constructs a `stateContext`:
+
+```ts
+const stateContext: ContainerState = { ...componentState, ...ret };
+```
+
+**Invariant:** the spread order is `componentState` first, then `ret`. Vars resolved locally in this container (in `ret`) **shadow** any same-named keys arriving from the outer `componentState`. Without this, a parent's `$props`/`$context`/`$item` leaking through narrowing would silently override what `CompoundComponent` (or `MemoizedItem`, or `Container.contextVars`) just placed into `ret` for this very container. The result was Bug 29 in `history-bugs.md`: a nested UDC's `var.x = "{$props.y}"` read the **outer** UDC's `$props` instead of its own.
+
+**Why this matters across the framework, not only for UDCs:**
+- `CompoundComponent` writes `$props: resolvedProps` into the inner Container's `node.vars`. Every nested UDC depends on `ret.$props` shadowing any outer `$props`.
+- `<ContextMenu>` customRender creates a runtime Container with `contextVars: { $context }`. The inner template depends on this local `$context` shadowing any outer one.
+- `<MemoizedItem>` per-row contextVars (`$item`, `$itemIndex`, `$row`, `$cell`, ...) must shadow the same names from an enclosing iterator.
+- Form/FormItem/Queue similarly inject names (`$data`, `$value`, `$setValue`, `$completedItems`) into their own scope that must shadow upstream values.
+
+**Interaction with `extractScopedState` preservation:** the Bug 28 fix preserves `$`-prefixed keys across narrowing so lexical names (e.g. `$item` from a parent `<Column>`) survive when an implicit container narrows state. That preservation is correct, but it means `componentState` will routinely carry names that *also* appear in `ret` for nested writers. The `{...componentState, ...ret}` spread order is therefore load-bearing: it's the only thing preventing parent-side framework names from corrupting locally-injected values.
+
+**Why the order is safe:** `ret` only ever contains keys this container's own metadata defines (script `vars`, code-behind `functions`, `node.vars` written by the renderer). It cannot pollute `componentState` for *other* containers — each container has its own `ret`. Outer-scope keys this container does NOT redefine pass through unchanged from `componentState`.
+
+**Cache implication:** [`obtainValue`](../../src/components-core/state/variable-resolution.ts) memoizes per-expression with `shallowCompare(newDeps, lastDeps)` where deps come from `pickFromObject(stateContext, dependencies)`. If `stateContext` ever lacks a needed `$`-key, `pickFromObject` returns `{}` (the dotted path resolves to `undefined`), `shallowCompare({}, {}) === true`, and the cache locks in the **first** computed value forever. The spread-order rule prevents this latent cache failure as a side benefit — once `ret.$props` reliably wins, the picked deps reflect the real value and cache invalidation works.
+
 ### Code-Behind Exclusion (`scriptCollected` and `.xs` files)
 The optimizer only checks the template (`.xmlui`). If a component has an `.xmlui.xs` file or uses `<script>`, functions inside may access anything in the parent state. Transitive AST analysis of code-behind is not currently performed, so state narrowing for such nodes (and their children: `nextDisableNarrowing`) is disabled. They always receive the full `parentState`.
 

@@ -189,19 +189,18 @@ export function extractScopedState<T extends Record<string, any>>(
   // (e.g. `$item` injected by Column row, `$param` set by ModalDialog.open).
   // These are framework-injected via ancestor MemoizedItem `contextVars`; they
   // live in parent state but are NOT subscribable consumer state. Filtering
-  // them by `uses` breaks lexical scope through implicit containers. Example:
-  // <Column><ModalDialog>{$item}</ModalDialog></Column> — ModalDialog's
-  // computedUses=["dialog"] (own UID only, since the static analyzer excludes
-  // lexically-scoped $item) would otherwise strip $item from stateFromOutside,
-  // leaving the inner Text with $item=undefined.
+  // them by `uses` breaks lexical scope through implicit containers.
   //
-  // We deliberately EXCLUDE unstable global variables (UNSTABLE_GLOBAL_VARS)
-  // because they are re-added at every StateContainer (Layer 6 of combinedState)
-  // and their value objects (especially `$routeParams` from useParams) are not
-  // reference-stable, so preserving them here makes `useShallowCompareMemoize`
-  // miss every render — defeating the computedUses optimisation
-  // (see `tests-e2e/computed-uses.spec.ts`: "Select renders ≤5 times after N
-  // oftenChanges updates").
+  // We explicitly check for common framework variables using 'in' to ensure
+  // they are picked up even if not enumerable (e.g. from a Proxy prototype).
+  const FRAMEWORK_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast", "$context", "$props", "$cell", "$row", "$rowIndex", "$isSelected", "$value", "$setValue", "$data", "$completedItems", "$queuedItems"];
+  for (const key of FRAMEWORK_VARS) {
+    if (key in parentState && !(key in picked)) {
+      picked[key] = (parentState as any)[key];
+    }
+  }
+
+  // Also preserve any other $-prefixed keys that are enumerable
   for (const key of Object.keys(parentState)) {
     if (
       typeof key === "string" &&

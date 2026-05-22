@@ -152,7 +152,11 @@ export function useVars(
               ),
             });
           }
-          const stateContext: ContainerState = { ...ret, ...componentState };
+          // Lexical scoping: locally-resolved vars (ret) MUST win over outer
+          // componentState. Otherwise an outer `$props` (e.g. leaked through
+          // narrowing) shadows the CompoundComponent's resolved $props that
+          // we just set in ret a few iterations ago.
+          const stateContext: ContainerState = { ...componentState, ...ret };
 
           let dependencies: Array<string> = [];
           if (fnDeps[key]) {
