@@ -1,13 +1,13 @@
 /**
  * Event Handler Execution Module
- * 
+ *
  * Handles asynchronous and synchronous event handler execution with:
  * - State tracking and lifecycle management
- * - Inspector logging integration  
+ * - Inspector logging integration
  * - React transition management for non-blocking updates
  * - Statement queue processing
  * - Error handling and cleanup
- * 
+ *
  * Part of Container.tsx refactoring - Step 2
  */
 
@@ -15,8 +15,8 @@ import { useCallback } from "react";
 import { cloneDeep } from "lodash-es";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { IApiInterceptor } from "../interception/abstractions";
-import type { 
-  ArrowExpression, 
+import type {
+  ArrowExpression,
   ArrowExpressionStatement,
   Statement,
 } from "../script-runner/ScriptingSourceTree";
@@ -24,16 +24,23 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { buildProxy, type ProxyAction } from "../rendering/buildProxy";
-import { 
-  parseHandlerCode,
-  prepareHandlerStatements,
-} from "../utils/statementUtils";
+import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
-import { createCancellationToken } from "../concurrency";
+import {
+  createCancellationToken,
+  getDefaultHandlerCoordinator,
+  runWithTimeout,
+  createTransactionalBuffer,
+  setDefaultCoordinatorSink,
+  type HandlerInvocation,
+  type HandlerPolicy,
+  type BufferedWrite,
+} from "../concurrency";
+import { HandlerCancelledError } from "../concurrency/token";
 import type { HandlerLoggerContext } from "../inspector/handler-logging";
 import { ContainerActionKind } from "../rendering/containers";
 import { delay, generatedId, useEvent } from "../utils/misc";
@@ -91,6 +98,36 @@ export interface EventHandlerConfig {
   parsedStatementsRef: React.MutableRefObject<ParsedStatementsCache>;
 }
 
+// --- Install the default coordinator diagnostic sink exactly once so
+// --- `single-flight` supersessions and `drop-while-running` refusals
+// --- surface as `kind:"concurrency"` Inspector traces. The sink is
+// --- replaced on every module load, which is harmless because the
+// --- replacement is idempotent (same logic).
+setDefaultCoordinatorSink({
+  onSuperseded: (inv) => {
+    pushXsLog({
+      kind: "concurrency",
+      ts: Date.now(),
+      code: "concurrency-handler-superseded",
+      severity: "info",
+      componentUid: inv.componentUid,
+      eventName: inv.eventName,
+      message: `Handler superseded (policy=${inv.policy})`,
+    } as any);
+  },
+  onDropped: (inv) => {
+    pushXsLog({
+      kind: "concurrency",
+      ts: Date.now(),
+      code: "concurrency-handler-dropped",
+      severity: "info",
+      componentUid: inv.componentUid,
+      eventName: inv.eventName,
+      message: `Handler dropped (policy=${inv.policy})`,
+    } as any);
+  },
+});
+
 /**
  * Creates event handler executors with the given configuration
  */
@@ -124,19 +161,84 @@ export function createEventHandlers(config: EventHandlerConfig) {
       options: LookupActionOptions | undefined,
       ...eventArgs: any[]
     ) => {
+      if (!options?.schedulerBypass && appContext.App?.scheduleHandler) {
+        const eventName = options?.eventName?.toString() ?? "handler";
+        const traceId = getCurrentTrace() ?? `h-${generatedId()}`;
+        const spanId = generatedId();
+        let returnValue: any;
+        await appContext.App.scheduleHandler({
+          traceId,
+          spanId,
+          label: `${uid.description ?? "anonymous"}.${eventName}`,
+          handler: async () => {
+            returnValue = await runCodeAsync(
+              source,
+              uid,
+              { ...options, schedulerBypass: true },
+              ...eventArgs,
+            );
+          },
+        });
+        return returnValue;
+      }
+
       // --- Check if the event handler can sign its lifecycle state
       const canSignEventLifecycle = () => {
         return uid.description !== undefined && options?.eventName !== undefined;
       };
 
+      // ---------------------------------------------------------------
+      // Plan #06 W7-1 — HandlerCoordinator integration.
+      //
+      // For every async handler we ask the coordinator whether to
+      // proceed under the requested policy. `parallel` (the default)
+      // is a fast-path: the coordinator does not track running
+      // invocations and behaviour is unchanged from W3-6. The other
+      // three policies (`single-flight`, `queue`, `drop-while-running`)
+      // use a per-`(componentUid, eventName)` running slot.
+      //
+      // The coordinator issues the `$cancel` token for this invocation;
+      // a `single-flight` supersession will abort the *previous*
+      // invocation's token with reason `"supersede"`, letting any
+      // in-flight fetches tear down cleanly via `$cancel.onAbort`.
+      // ---------------------------------------------------------------
+      const handlerPolicy = (options?.handlerPolicy ?? "parallel") as HandlerPolicy;
+      const eventNameForCoord = options?.eventName?.toString() ?? "handler";
+      const componentUidForCoord = uid.description ?? "anonymous";
+      const coordinator = getDefaultHandlerCoordinator();
+      const invocation: HandlerInvocation = {
+        componentUid: componentUidForCoord,
+        eventName: eventNameForCoord,
+        policy: handlerPolicy,
+        timeoutMs: options?.handlerTimeoutMs,
+      };
+
+      const decision = await coordinator.enter(invocation);
+      if (!decision.proceed) {
+        // `drop-while-running` (or `abortRunning` cancelling a queued
+        // waiter) — short-circuit silently. The coordinator already
+        // emitted a `concurrency-handler-dropped` trace via the sink.
+        return;
+      }
+
       let changes: Array<any> = [];
-      // --- W3-6 / plan #06 Step 1.1: per-handler `$cancel` token.
-      // Created fresh per invocation, exposed read-only as `$cancel` in the
-      // handler's evaluation context, and aborted in the `finally` below
-      // when the handler completes (success / error / unmount). The W3-6
-      // risk-probe ships only the read surface — the dispatcher-side
-      // triggers (supersede, queue, drop, timeout) land in W7-1.
-      const { token: cancelToken, abort: abortCancelToken } = createCancellationToken();
+      // --- W3-6 surface preserved: token from the coordinator. The
+      // dispatcher still aborts it in the `finally` so `$cancel.onAbort`
+      // callbacks fire on normal completion as well as supersession.
+      const cancelToken = decision.token;
+      const abortCancelToken = (reason: import("../concurrency").CancellationToken["reason"]) => {
+        if (!cancelToken.aborted && decision.abort) {
+          decision.abort(reason ?? "user");
+        }
+      };
+
+      // Transactional state-write buffer (plan #6 Phase 4). When the
+      // handler is declared `transactional`, every accumulated change
+      // is replayed in a single dispatch after the handler resolves.
+      // On cancellation / timeout / error the buffer is discarded.
+      const isTransactional = options?.transactional === true;
+      const txBuffer = isTransactional ? createTransactionalBuffer() : null;
+
       const getComponentStateClone = () => {
         changes.length = 0;
         const originalState = stateRef.current;
@@ -215,6 +317,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           allowConsole: appContext.appGlobals?.allowConsole !== false,
           sandboxWarnLogger: (entry) =>
             pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
+          ...(appContext as any).__udcEvalOptions,
         },
       };
 
@@ -228,8 +331,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const { handlerFileId, handlerSourceRange } = handlerLogger.lookupSourceInfo(options);
 
       // Track handler start time for duration calculation
-      const handlerStartPerfTs =
-        typeof performance !== "undefined" ? performance.now() : undefined;
+      const handlerStartPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
 
       // Capture traceId at handler start so handler:complete uses the same trace
       const handlerTraceId = getCurrentTrace();
@@ -323,12 +425,26 @@ export function createEventHandlers(config: EventHandlerConfig) {
                 }
               }
 
-              statePartChanged(
-                change.pathArray,
-                apiKey ? { __liveApiRef__: apiKey } : cloneDeep(change.newValue),
-                change.target,
-                change.action,
-              );
+              const finalValue = apiKey
+                ? { __liveApiRef__: apiKey }
+                : cloneDeep(change.newValue);
+              if (txBuffer) {
+                // --- Plan #6 W7-1 Phase 4: defer writes until the
+                // --- transactional handler completes successfully.
+                txBuffer.push({
+                  pathArray: change.pathArray,
+                  newValue: finalValue,
+                  target: change.target,
+                  action: change.action,
+                });
+              } else {
+                statePartChanged(
+                  change.pathArray,
+                  finalValue,
+                  change.target,
+                  change.action,
+                );
+              }
             });
 
             let resolve: StatementPromiseResolver | null = null;
@@ -381,7 +497,42 @@ export function createEventHandlers(config: EventHandlerConfig) {
           evalContext.localContext = getComponentStateClone();
         };
 
-        await processStatementQueueAsync(statements, evalContext);
+        // --- Plan #6 W7-1: bound handler lifetime by `handlerTimeoutMs`
+        // --- (per-invocation override) or the ambient
+        // --- `defaultHandlerTimeoutMs` from `appGlobals`. `<= 0` disables
+        // --- the timeout (long-poll opt-out).
+        const ambientTimeout = Number(
+          (appContext as any)?.appGlobals?.defaultHandlerTimeoutMs ?? 30000,
+        );
+        const effectiveTimeoutMs =
+          options?.handlerTimeoutMs !== undefined ? options.handlerTimeoutMs : ambientTimeout;
+        await runWithTimeout(processStatementQueueAsync(statements, evalContext), {
+          timeoutMs: effectiveTimeoutMs,
+          abort: (reason) => abortCancelToken(reason),
+          onTimeout: () => {
+            pushXsLog({
+              kind: "concurrency",
+              ts: Date.now(),
+              code: "concurrency-handler-timeout",
+              severity: "warn",
+              componentUid: componentUidForCoord,
+              eventName: eventNameForCoord,
+              message: `Handler timed out after ${effectiveTimeoutMs}ms`,
+            } as any);
+          },
+        });
+
+        // --- Plan #6 W7-1 Phase 4: transactional commit. If the
+        // --- handler is marked transactional, replay all buffered
+        // --- writes in a single batch now that the handler finished
+        // --- successfully. The buffer was populated by
+        // --- `onStatementCompleted` instead of dispatching writes live.
+        if (txBuffer && txBuffer.size > 0) {
+          const writes = txBuffer.drain();
+          for (const w of writes) {
+            statePartChanged(w.pathArray, w.newValue, w.target, w.action);
+          }
+        }
 
         if (canSignEventLifecycle()) {
           // --- Sign the event handler has successfully completed
@@ -395,8 +546,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         }
 
         // Log handler completion with duration
-        const handlerEndPerfTs =
-          typeof performance !== "undefined" ? performance.now() : undefined;
+        const handlerEndPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
         const handlerDuration =
           handlerStartPerfTs !== undefined && handlerEndPerfTs !== undefined
             ? handlerEndPerfTs - handlerStartPerfTs
@@ -424,6 +574,21 @@ export function createEventHandlers(config: EventHandlerConfig) {
             .returnValue;
         }
       } catch (e) {
+        // --- Plan #6 W7-1 Phase 4: discard any buffered transactional
+        // --- writes on error / cancellation.
+        if (txBuffer) txBuffer.discard();
+
+        // --- Plan #6 W7-1: cancellation is the contract — a handler
+        // --- aborted by supersession / timeout / unmount throws
+        // --- `HandlerCancelledError`. Swallow it instead of treating
+        // --- as a user-visible error: the cancellation itself is
+        // --- traced via `concurrency-handler-superseded` /
+        // --- `concurrency-handler-timeout` and the `onError` channel
+        // --- is reserved for genuine handler bugs.
+        if (e instanceof HandlerCancelledError) {
+          handlerLogger.cleanupTrace(traceId);
+          return;
+        }
         // Log handler error
         handlerLogger.logHandlerError({
           uid: uidName,
@@ -463,6 +628,10 @@ export function createEventHandlers(config: EventHandlerConfig) {
         if (!cancelToken.aborted) {
           abortCancelToken(mountedRef.current ? "user" : "unmount");
         }
+        // --- Plan #6 W7-1: release the coordinator slot so the next
+        // --- queued invocation can proceed (or the slot becomes free
+        // --- for a fresh `single-flight` / `drop-while-running` entry).
+        coordinator.exit(invocation);
       }
     },
   );

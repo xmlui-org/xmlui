@@ -247,9 +247,9 @@ await expect(page.getByRole("tooltip")).toHaveText("Tip text");
 
 ---
 
-## Accessibility Linter (plan #05, Wave 1)
+## Enforced Accessibility (plan #05)
 
-XMLUI ships a build-time accessibility linter at `xmlui/src/components-core/accessibility/`. Phase 1 implements seven rules; runtime enforcement and ARIA attribute injection land in later waves.
+XMLUI ships an accessibility enforcement layer at `xmlui/src/components-core/accessibility/`. It includes a parsed-markup linter, framework primitives for focus and announcements, a theme contrast checker, and the `automationId` component contract.
 
 **Public API** (barrel: `components-core/accessibility/index.ts`):
 
@@ -261,19 +261,29 @@ const diagnostics: A11yDiagnostic[] = lintComponentDef(componentDef, options);
 
 **Rule codes** (`A11yCode` union):
 
-| Code | Severity | Detects |
-|---|---|---|
-| `missing-accessible-name` | warn | Interactive element with no accessible name |
-| `icon-only-button-no-label` | warn | `<Button icon="...">` without `label` or `aria-label` |
-| `modal-no-title` | warn | `<Modal>` without a `title` prop or `<ModalTitle>` slot |
-| `form-input-no-label` | warn | Form input outside `<FormItem>` and without a `<Label>` |
-| `duplicate-landmark` | warn | More than one component with the same landmark role on a page |
-| `redundant-aria-role` | info | Explicit ARIA role duplicates the element's implicit role |
-| `missing-skip-link` | info (stub) | App/Page with NavPanel but no SkipLink sibling |
+| Code | Non-strict | Strict | Cause | Example fix |
+|---|---|---|---|---|
+| `missing-accessible-name` | warn | error | Interactive component metadata requires an accessible name, but the element has no name prop or named child. | Add `label`, `aria-label`, `title`, or an equivalent named child. |
+| `icon-only-button-no-label` | warn | error | `<Button icon="...">` has no `label`, `aria-label`, or `title`. | Add `aria-label="Save"` or a visible `label`. |
+| `modal-no-title` | warn | error | `<Modal>` has no `title` prop and no `<ModalTitle>` child. | Add `title="Confirm delete"` or a `<ModalTitle>`. |
+| `form-input-no-label` | warn | error | Form input is outside `<FormItem>` and has no `label` prop. | Wrap it in `<FormItem label="Email">` or add a component-level label. |
+| `duplicate-landmark` | warn | error | More than one component declares the same page landmark role. | Keep one landmark of that role or use a non-landmark wrapper. |
+| `redundant-aria-role` | warn | error | Explicit `role` duplicates the element's implicit ARIA role. | Remove the redundant `role` prop. |
+| `missing-skip-link` | warn | error | App/Page contains navigation but no `<SkipLink>` target path to main content. | Add `<SkipLink target="main" />` or enable `autoSkipLink`. |
+| `color-contrast-low` | warn | error | Theme foreground/background token pair falls below WCAG AA contrast. | Adjust the theme pair to reach at least 4.5:1 contrast. |
 
 **Strict mode**: `App.appGlobals.strictAccessibility: boolean` (default `false`) escalates warn-severity findings to `error`, failing the Vite build. Flips to `true` in the next major release.
 
-**Runtime trace**: when `strictAccessibility` is truthy, findings emit `kind:"a11y"` entries to `_xsLogs` (see `inspector-debugging.md`).
+**Runtime trace**: when `strictAccessibility` is truthy, findings emit `kind:"a11y"` entries to `_xsLogs` (see `inspector-debugging.md`). Theme contrast findings also emit in development mode.
+
+**Reserved codes**: `interactive-not-keyboard-reachable` and `live-region-missing` remain reserved for future targeted lint rules. The runtime primitives below cover the framework side of those concerns today.
+
+### Framework primitives
+
+- `<SkipLink target="main" label="Skip to main content" />` renders a focus-visible skip link and can be inserted automatically with `App.appGlobals.autoSkipLink: true`.
+- `<FocusScope trap restore autoFocus />` centralizes focus trapping, initial focus, and focus restoration for overlays and nested modal-like surfaces.
+- `<LiveRegion politeness="polite|assertive">` exposes screen-reader announcements. Toasts and runtime errors announce through the global live region.
+- `automationId="save-order"` is parsed as a framework field and rendered as `data-automation-id="save-order"` on the component decorator.
 
 ### Component a11y metadata
 

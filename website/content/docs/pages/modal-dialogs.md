@@ -4,7 +4,7 @@ A `ModalDialog` can be invoked **declaratively** in markup or **imperatively** f
 
 This is the declarative method. You don't need to invoke the `ModalDialog`'s `open()` and `close()` functions directly. The `when` attribute controls opening and closing.
 
-```xmlui-pg display {2, 3, 19}
+```xmlui-pg display {2, 3, 19} id="modal-dialogs-b6ec"
 <App>
   <variable name="isDialogShown" value="{false}"/>
   <ModalDialog
@@ -32,7 +32,7 @@ This is the declarative method. You don't need to invoke the `ModalDialog`'s `op
 
 This is the imperative method. You invoke `ModalDialog`'s `open()` and `close()` functions explicitly via its ID.
 
-```xmlui-pg display {3, 7, 19}
+```xmlui-pg display {3, 7, 19} id="modal-dialogs-b758"
 <App>
   <ModalDialog
     id="dialog"
@@ -61,7 +61,7 @@ This is the imperative method. You invoke `ModalDialog`'s `open()` and `close()`
 When embedding a form in a dialog, the form's cancel and successful submit actions automatically close the dialog hosting the form (unless you change this logic). Note that you can pass data via `dialog.open()`, `ModalDialog` receives it as `$param`.
 
 
-```xmlui-pg display {3, 23} height="400px"
+```xmlui-pg display {3, 23} height="400px" id="modal-dialogs-b7dc"
 <App>
   <ModalDialog id="dialog">
     <Text> ID: { $param } </Text>
@@ -94,7 +94,7 @@ When embedding a form in a dialog, the form's cancel and successful submit actio
 
 `ModalDialog` supports a few kinds of customization. For example, you can hide the close button displayed in the top-right dialog corner and add a restyled title to dialogs.
 
-```xmlui-pg display height="220px"
+```xmlui-pg display height="220px" id="when-to-use-declarative-vs-imperative-modals-b851"
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="false">

@@ -30,12 +30,12 @@ $paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSe
     background-clip: content-box;
     margin-top: t.createVarWithDefault("marginTop-ContentSeparator", #{$marginVertical-ContentSeparator});
     margin-bottom: t.createVarWithDefault("marginBottom-ContentSeparator", #{$marginVertical-ContentSeparator});
-    margin-left: t.createVarWithDefault("marginLeft-ContentSeparator", #{$marginHorizontal-ContentSeparator});
-    margin-right: t.createVarWithDefault("marginRight-ContentSeparator", #{$marginHorizontal-ContentSeparator});
+    margin-inline-start: t.createVarWithDefault("marginLeft-ContentSeparator", #{$marginHorizontal-ContentSeparator});
+    margin-inline-end: t.createVarWithDefault("marginRight-ContentSeparator", #{$marginHorizontal-ContentSeparator});
     padding-top: t.createVarWithDefault("paddingTop-ContentSeparator", #{$paddingVertical-ContentSeparator});
     padding-bottom: t.createVarWithDefault("paddingBottom-ContentSeparator", #{$paddingVertical-ContentSeparator});
-    padding-left: t.createVarWithDefault("paddingLeft-ContentSeparator", #{$paddingHorizontal-ContentSeparator});
-    padding-right: t.createVarWithDefault("paddingRight-ContentSeparator", #{$paddingHorizontal-ContentSeparator});
+    padding-inline-start: t.createVarWithDefault("paddingLeft-ContentSeparator", #{$paddingHorizontal-ContentSeparator});
+    padding-inline-end: t.createVarWithDefault("paddingRight-ContentSeparator", #{$paddingHorizontal-ContentSeparator});
 
     &.horizontal {
       height: $thickness-ContentSeparator;

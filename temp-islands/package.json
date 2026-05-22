@@ -1,0 +1,13 @@
+{
+  "name": "temp-islands",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "setup": "cd ../xmlui && npm run build:xmlui-standalone && cp dist/standalone/xmlui-standalone.umd.js ../temp-islands/ && cp dist/standalone/xmlui-standalone.umd.js.map ../temp-islands/ && cd ../temp-islands",
+    "serve": "serve .",
+    "build-prod": "npm run build -- --prod"
+  },
+  "dependencies": {
+    "xmlui": "*"
+  }
+}

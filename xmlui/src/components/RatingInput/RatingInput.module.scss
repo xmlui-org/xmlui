@@ -53,7 +53,7 @@ $opacity-RatingInput--readOnly: createThemeVar("Input:opacity-#{$componentName}-
   .placeholder {
     color: $textColor-placeholder-RatingInput;
     font-size: $fontSize-placeholder-RatingInput;
-    margin-right: 4px;
+    margin-inline-end: 4px;
   }
 
   .star {

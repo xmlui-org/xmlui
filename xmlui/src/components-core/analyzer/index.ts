@@ -26,6 +26,7 @@ export { buildSuppressionMap, isSuppressed } from "./suppression";
 import "./rules/id-unknown-component";
 import "./rules/id-unknown-prop";
 import "./rules/id-unknown-event";
+import "./rules/id-unknown-method";
 import "./rules/id-unknown-slot";
 // Phase 2: Expression rules
 import "./rules/expr-unused-var";
@@ -37,3 +38,6 @@ import "./rules/id-undefined-component-ref";
 import "./rules/id-undefined-form-ref";
 // W1-5: Theming rules
 import "./rules/theming-missing-prefix";
+// W7-3: Determinism rules (plan #16 Phase 3)
+import "./rules/determinism-floating-point-token";
+import "./rules/determinism-iteration-order-symbol";

@@ -14,9 +14,7 @@ import { useAppContext } from "../AppContext";
 import { Loader } from "./Loader";
 import { createMetadata, d } from "../../components/metadata-helpers";
 
-/**
- * Properties of the API loader component
- */
+// Wires an XMLUI ApiLoader definition to the shared Loader lifecycle.
 type ApiLoaderProps = {
   loader: ApiLoaderDef;
   loaderInProgressChanged: LoaderInProgressChangedFn;
@@ -28,9 +26,7 @@ type ApiLoaderProps = {
   structuralSharing?: boolean;
 };
 
-/**
- * Represents a non-displayed React component, which handles the specified API loader
- */
+// Non-visual loader that resolves its URL and fetches either JSON or raw text.
 function ApiLoader({
   loader,
   loaderInProgressChanged,
@@ -44,22 +40,24 @@ function ApiLoader({
   const appContext = useAppContext();
 
   const url = extractParam(state, loader.props.url, appContext);
-  const loadable = !!url;
+  const hasResolvedUrl = !!url;
 
-  const doLoad = useCallback(async () => {
-    if (!loadable) {
+  const loadFromApi = useCallback(async () => {
+    if (!hasResolvedUrl) {
       return;
     }
+
     const response = await fetch(url);
     if (loader.props.raw) {
       return await response.text();
     }
-    const responseObj = await response.json();
+
+    const responseData = await response.json();
     if (!doNotRemoveNulls) {
-      removeNullProperties(responseObj);
+      removeNullProperties(responseData);
     }
-    return responseObj;
-  }, [doNotRemoveNulls, loadable, loader.props.raw, url]);
+    return responseData;
+  }, [doNotRemoveNulls, hasResolvedUrl, loader.props.raw, url]);
 
   return (
     <Loader
@@ -69,7 +67,7 @@ function ApiLoader({
       loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={loaderLoaded}
       loaderError={loaderError}
-      loaderFn={doLoad}
+      loaderFn={loadFromApi}
       structuralSharing={structuralSharing}
     />
   );
@@ -88,7 +86,14 @@ type ApiLoaderDef = ComponentDef<typeof ApiLoaderMd>;
 
 export const apiLoaderRenderer = createLoaderRenderer(
   "ApiLoader",
-  ({ loader, state, loaderInProgressChanged, loaderIsRefetchingChanged, loaderLoaded, loaderError }) => {
+  ({
+    loader,
+    state,
+    loaderInProgressChanged,
+    loaderIsRefetchingChanged,
+    loaderLoaded,
+    loaderError,
+  }) => {
     return (
       <ApiLoader
         loader={loader}

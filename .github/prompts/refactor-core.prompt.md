@@ -12,7 +12,7 @@ Refactor $subject$ so the result:
 
 ## Before starting
 
-Read `feature.md` at the repo root — it describes the subject, goals, files in scope, and any decisions already made.
+Clarify with the user: the subject, goals, files in scope, and any decisions already made if not already specified.
 
 ## Reference docs by subsystem
 
@@ -37,7 +37,7 @@ Always read the testing conventions: `.ai/xmlui/testing-conventions.md`
 
 Analyze the current source code. Collect findings into a concise report sufficient for a human or AI to carry out the refactoring. Break the work into sequential steps, each small enough to verify with tests.
 
-Record findings and the step-by-step plan in `feature.md` at the repo root (under a "Refactor Plan" section). Keep it concise — no executive summaries, no estimates.
+Record findings and the step-by-step plan in session memory (under a "Refactor Plan" section). Keep it concise — no executive summaries, no estimates.
 
 ## Refactor Flow
 
@@ -49,7 +49,7 @@ For each step:
 3. Add or update unit/E2E tests that cover the change.
 4. Confirm new tests pass.
 5. If applicable, run the full test suite for the affected component.
-6. Update the step's status in `feature.md`.
+6. Update the step's status in session memory.
 7. Ask for approval before proceeding to the next step.
 
 ## Commands

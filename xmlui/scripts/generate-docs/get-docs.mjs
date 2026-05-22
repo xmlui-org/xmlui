@@ -1,6 +1,6 @@
 import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
-import { unlink, readdir, mkdir, writeFile, rm, readFile } from "fs/promises";
+import { unlink, readdir, mkdir, writeFile, rm, readFile, copyFile } from "fs/promises";
 import { ErrorWithSeverity, LOGGER_LEVELS, logger } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable, createTable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
@@ -233,6 +233,15 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
       indexFile,
     );
 
+    const packageDocFileNames = await copyExtensionPackageDocs(
+      metadata[packageName].sourceFolder,
+      packageFolder,
+    );
+    componentsAndFileNames = {
+      ...componentsAndFileNames,
+      ...Object.fromEntries(packageDocFileNames.map((fileName) => [fileName, fileName])),
+    };
+
     extensionNamesAndCompNames.push({
       packageName,
       fileNames: Object.keys(componentsAndFileNames).filter(
@@ -280,6 +289,23 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
 
   // Write to extensions.json file
   await writeExtensionsJson(extensionsJson);
+}
+
+async function copyExtensionPackageDocs(sourceFolder, outFolder) {
+  const docsFolder = join(sourceFolder, "docs");
+  if (!existsSync(docsFolder)) {
+    return [];
+  }
+
+  const docFiles = (await readdir(docsFolder)).filter((file) =>
+    FILE_EXTENSIONS.MARKDOWN.includes(extname(file)),
+  );
+
+  for (const file of docFiles) {
+    await copyFile(join(docsFolder, file), join(outFolder, file));
+  }
+
+  return docFiles.map((file) => basename(file, extname(file)));
 }
 
 async function cleanupLegacyGeneratedDocsFolders() {

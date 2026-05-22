@@ -44,6 +44,82 @@ const HelperNode = {
   field: "field",
 } as const;
 
+/**
+ * Reserved declaration tag names that may appear as direct children of a
+ * `<Component>` (compound-component definition).  Used by the UDC sandbox
+ * (plan #14) to describe the public contract of a UDC.
+ *
+ * These names are intentionally PascalCase so that they do not collide with
+ * the lowercase `HelperNode` tags (`event`, `method`, `property`, …).
+ */
+const UDC_DECLARATION_KINDS = {
+  Prop: "Prop",
+  Event: "Event",
+  Method: "Method",
+  Slot: "Slot",
+} as const;
+
+/**
+ * Locally-typed shape used by the parser when building a UDC contract.
+ * Kept here (rather than imported from `components-core/udc-sandbox`) to
+ * preserve the parser's layering: `parsers/*` must not depend on
+ * `components-core/*`.  Consumers should cast to the canonical
+ * `UdcPropDecl` from `components-core/udc-sandbox`.
+ */
+interface UdcPropDecl {
+  name: string;
+  type?: string;
+  required?: boolean;
+  defaultValue?: unknown;
+}
+
+type UdcTrust = "trusted" | "untrusted";
+type UdcCapability =
+  | "fetch"
+  | "websocket"
+  | "eventsource"
+  | "navigate"
+  | "clipboard"
+  | "randomBytes"
+  | "log"
+  | "mark"
+  | "environment";
+
+const ALL_UDC_CAPABILITIES: readonly UdcCapability[] = [
+  "fetch",
+  "websocket",
+  "eventsource",
+  "navigate",
+  "clipboard",
+  "randomBytes",
+  "log",
+  "mark",
+  "environment",
+];
+
+function parseUdcCapabilities(value: string | undefined): Set<UdcCapability> {
+  if (value === undefined) return new Set(ALL_UDC_CAPABILITIES);
+  const parsed = new Set<UdcCapability>();
+  for (const raw of value.split(",")) {
+    const token = raw.trim();
+    if ((ALL_UDC_CAPABILITIES as readonly string[]).includes(token)) {
+      parsed.add(token as UdcCapability);
+    }
+  }
+  return parsed;
+}
+
+function parseSlotProvides(value: string | undefined): Set<string> {
+  if (!value) return new Set();
+  return new Set(
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => (item.startsWith("$") ? item : `$${item}`)),
+  );
+}
+
 let lastParseId = 0;
 
 export function nodeToComponentDef(
@@ -78,11 +154,7 @@ export function nodeToComponentDef(
     let component: ComponentDef = {
       type: name,
       debug: {
-        source: {
-          start: node.start,
-          end: node.end,
-          fileId,
-        },
+        source: sourceLocationFor(node),
       },
     };
 
@@ -102,11 +174,7 @@ export function nodeToComponentDef(
     let component: ComponentDef = {
       type: name,
       debug: {
-        source: {
-          start: node.start,
-          end: node.end,
-          fileId,
-        },
+        source: sourceLocationFor(node),
       },
     };
 
@@ -122,6 +190,9 @@ export function nodeToComponentDef(
     const compoundName = attrs.find((attr) => attr.name === "name")!;
 
     const codeBehind = attrs.find((attr) => attr.name === "codeBehind");
+    const capabilitiesAttr = attrs.find((attr) => attr.name === "capabilities");
+    const trustAttr = attrs.find((attr) => attr.name === "trust");
+    const trust: UdcTrust = trustAttr?.value === "untrusted" ? "untrusted" : "trusted";
 
     // --- Get "method" attributes
     let api: Record<string, any> | undefined;
@@ -153,10 +224,84 @@ export function nodeToComponentDef(
 
     const children = getChildNodes(node);
 
+    // --- Extract declared UDC contract blocks (<Prop>, <Event>, <Method>, <Slot>)
+    // These are direct-child element nodes whose tag name is one of the reserved
+    // declaration kinds.  See `xmlui/dev-docs/plans/14-udc-sandbox.md`.
+    //
+    // Ambiguity: `<Slot>` is also the runtime template tag used inside compound
+    // component templates (e.g. `<Component><Slot/></Component>`).  To avoid
+    // breaking existing compound components, `<Slot>` is only treated as a
+    // declaration when at least one other declaration kind (`<Prop>`, `<Event>`,
+    // or `<Method>`) is also present as a direct child — that combination is the
+    // explicit opt-in to the UDC declarative contract syntax.
+    const declProps = new Map<string, UdcPropDecl>();
+    const declEvents = new Set<string>();
+    const declMethods = new Set<string>();
+    const declSlots = new Set<string>();
+    const declSlotProvides = new Map<string, Set<string>>();
+    let hasNonSlotDeclarations = false;
+    for (const child of children) {
+      if (child.kind !== SyntaxKind.ElementNode) continue;
+      const childName = getComponentName(child, getText);
+      if (
+        childName === UDC_DECLARATION_KINDS.Prop ||
+        childName === UDC_DECLARATION_KINDS.Event ||
+        childName === UDC_DECLARATION_KINDS.Method
+      ) {
+        hasNonSlotDeclarations = true;
+        break;
+      }
+    }
+    const isDeclarationKind = (name: string) =>
+      name === UDC_DECLARATION_KINDS.Prop ||
+      name === UDC_DECLARATION_KINDS.Event ||
+      name === UDC_DECLARATION_KINDS.Method ||
+      (hasNonSlotDeclarations && name === UDC_DECLARATION_KINDS.Slot);
+    let hasDeclarations = false;
+
+    for (const child of children) {
+      if (child.kind !== SyntaxKind.ElementNode) continue;
+      const childName = getComponentName(child, getText);
+      if (!isDeclarationKind(childName)) continue;
+      hasDeclarations = true;
+      const declAttrs = getAttributes(child).map(segmentAttr);
+      const nameAttr = declAttrs.find((a) => a.name === "name");
+      if (!nameAttr || !nameAttr.value) continue;
+      switch (childName) {
+        case UDC_DECLARATION_KINDS.Prop: {
+          const typeAttr = declAttrs.find((a) => a.name === "type");
+          const requiredAttr = declAttrs.find((a) => a.name === "required");
+          const defaultAttr = declAttrs.find((a) => a.name === "defaultValue");
+          declProps.set(nameAttr.value, {
+            name: nameAttr.value,
+            ...(typeAttr ? { type: typeAttr.value } : {}),
+            ...(requiredAttr ? { required: requiredAttr.value === "true" } : {}),
+            ...(defaultAttr ? { defaultValue: defaultAttr.value } : {}),
+          });
+          break;
+        }
+        case UDC_DECLARATION_KINDS.Event:
+          declEvents.add(nameAttr.value);
+          break;
+        case UDC_DECLARATION_KINDS.Method:
+          declMethods.add(nameAttr.value);
+          break;
+        case UDC_DECLARATION_KINDS.Slot:
+          declSlots.add(nameAttr.value);
+          declSlotProvides.set(
+            nameAttr.value,
+            parseSlotProvides(declAttrs.find((a) => a.name === "provides")?.value),
+          );
+          break;
+      }
+    }
+
     // --- Get the single component definition
     const nestedComponents = children.filter(
       (child) =>
-        child.kind === SyntaxKind.ElementNode && !(getComponentName(child, getText) in HelperNode),
+        child.kind === SyntaxKind.ElementNode &&
+        !(getComponentName(child, getText) in HelperNode) &&
+        !isDeclarationKind(getComponentName(child, getText)),
     );
     // If nestedComponents is empty the parser will have already emitted compDefNesedElem.
 
@@ -202,11 +347,7 @@ export function nodeToComponentDef(
       name: compoundName.value,
       component: nestedComponent,
       debug: {
-        source: {
-          start: node.start,
-          end: node.end,
-          fileId,
-        },
+        source: sourceLocationFor(node),
       },
     };
 
@@ -220,12 +361,24 @@ export function nodeToComponentDef(
       component.codeBehind = codeBehind.value;
     }
 
+    // --- Attach declared contract when the UDC carried declaration blocks or
+    // sandbox attributes (`capabilities` / `trust`).
+    if (hasDeclarations || capabilitiesAttr || trustAttr) {
+      component.contract = {
+        name: compoundName.value,
+        props: declProps,
+        events: declEvents,
+        methods: declMethods,
+        slots: declSlots,
+        slotProvides: declSlotProvides,
+        capabilities: parseUdcCapabilities(capabilitiesAttr?.value),
+        capabilitiesDeclared: capabilitiesAttr !== undefined,
+        trust,
+      };
+    }
+
     nestedComponent.debug = {
-      source: {
-        start: element.start,
-        end: element.end,
-        fileId,
-      },
+      source: sourceLocationFor(element),
     };
 
     const nodeClone: Node = withNewChildNodes(node, nonVarHelperNodes);
@@ -462,6 +615,9 @@ export function nodeToComponentDef(
       case "testId":
         comp.testId = value;
         return;
+      case "automationId":
+        comp.automationId = value;
+        return;
       case "when":
         comp.when = value;
         return;
@@ -486,6 +642,7 @@ export function nodeToComponentDef(
           }
           comp.vars ??= {};
           comp.vars[name] = value;
+          setReactiveNodeLocation(comp, "var", name, attr);
         } else if (startSegment === "global") {
           if (!allowGlobalVars) {
             reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
@@ -720,6 +877,9 @@ export function nodeToComponentDef(
     const value = valueInfo.value;
     if (valueInfo?.value !== undefined) {
       setter(name, mergeValue(getter(name), value), valueInfo.valueContentNode);
+      if (getComponentName(child, getText) === HelperNode.variable) {
+        setReactiveNodeLocation(comp, "var", name, valueInfo.valueContentNode ?? child);
+      }
     } else {
       // --- Consider the value to be null; check optional child items
       const children = getChildNodes(child);
@@ -727,6 +887,9 @@ export function nodeToComponentDef(
       let updatedValue = getter(name);
       updatedValue = mergeValue(updatedValue, itemValue);
       setter(name, updatedValue);
+      if (getComponentName(child, getText) === HelperNode.variable) {
+        setReactiveNodeLocation(comp, "var", name, child);
+      }
     }
   }
 
@@ -782,6 +945,44 @@ export function nodeToComponentDef(
     const valueText = getText(attr.children![2]);
     const value = valueText.substring(1, valueText.length - 1);
     return { namespace, startSegment, name, value, unsegmentedName };
+  }
+
+  function sourceLocationFor(node: Node): {
+    start: number;
+    end: number;
+    fileId: string | number;
+    line?: number;
+    col?: number;
+  } {
+    const loc: {
+      start: number;
+      end: number;
+      fileId: string | number;
+      line?: number;
+      col?: number;
+    } = {
+      start: node.start ?? node.pos ?? 0,
+      end: node.end ?? node.start ?? node.pos ?? 0,
+      fileId,
+    };
+    if (cursor) {
+      const { line, character } = cursor.positionAt(node.pos ?? node.start ?? 0);
+      loc.line = line + 1;
+      loc.col = character + 1;
+    }
+    return loc;
+  }
+
+  function setReactiveNodeLocation(
+    comp: ComponentDef | CompoundComponentDef,
+    kind: "var" | "loader" | "function",
+    name: string | undefined,
+    node: Node,
+  ): void {
+    if (!name) return;
+    const debug = (comp.debug ??= {});
+    const reactiveNodes = ((debug as any).reactiveNodes ??= {});
+    reactiveNodes[`${kind}.${name}`] = sourceLocationFor(node);
   }
 
   function parseEscapeCharactersInAttrValues(attrs: Node[]) {

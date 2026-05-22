@@ -7,13 +7,12 @@ description: Write or update hand-written component documentation for the docs w
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — if it specifies which component to document and any focus areas.
-2. Read these reference files:
+1. Read these reference files:
    - `.ai/xmlui/doc-generation.md` — how the doc pipeline works (always)
    - `.ai/xmlui/component-architecture.md` — understand the component's API structure (always)
-3. Read the component's metadata:
+2. Read the component's metadata:
    - `xmlui/src/components/ComponentName/ComponentName.tsx` — props, events, APIs, context vars
-4. Check existing docs:
+3. Check existing docs:
    - `website/content/docs/components/ComponentName/ComponentName.md` — may already exist
    - `website/content/docs/pages/components/ComponentName.mdx` — generated output (do NOT edit this)
 

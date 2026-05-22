@@ -85,6 +85,16 @@ export const validationBehavior: Behavior = {
         description:
           "Severity level for regex validation errors (e.g., 'error', 'warning', 'info').",
       },
+      matchValue: {
+        valueType: "any",
+        description:
+          "A value that the field must match. Useful for confirmation fields such as password confirmation.",
+      },
+      matchInvalidMessage: {
+        valueType: "string",
+        description:
+          "Custom error message to display when the field value does not match matchValue.",
+      },
       validationMode: {
         valueType: "string",
         description:
@@ -196,6 +206,10 @@ export const validationBehavior: Behavior = {
     const regexInvalidSeverity = extractValue.asOptionalString(
       componentNode.props?.regexInvalidSeverity,
     );
+    const matchValue = extractValue(componentNode.props?.matchValue);
+    const matchInvalidMessage = extractValue.asOptionalString(
+      componentNode.props?.matchInvalidMessage,
+    );
     const customValidationsDebounce = extractValue.asOptionalNumber(
       componentNode.props?.customValidationsDebounce,
       0,
@@ -239,6 +253,8 @@ export const validationBehavior: Behavior = {
       regex,
       regexInvalidMessage,
       regexInvalidSeverity: regexInvalidSeverity as any,
+      matchValue,
+      matchInvalidMessage,
     };
 
     const isFormItem = componentNode.type === "FormItem";

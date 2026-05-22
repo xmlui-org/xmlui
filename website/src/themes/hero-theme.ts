@@ -14,9 +14,9 @@ export const XmluiHeroTheme: ThemeDefinition = {
     // around CodeBlock so the playground sits flush.
     "marginTop-CodeBlock": "0",
     "marginBottom-CodeBlock": "0",
-    // The playground frame around the Hero app has a rounded corner that
-    // becomes visible in dark mode — flatten it to match the surrounding hero.
-    "borderRadius-NestedApp": "0",
+    "backgroundColor-CodeBlock": "$color-surface-100",
+    "borderRadius-CodeBlock": "0",
+    "border-CodeBlock": "0",
   },
   resources: {},
 };

@@ -12,6 +12,7 @@ import {
   createCancellationToken,
   HandlerCancelledError,
   createHandlerCoordinator,
+  createPassThroughHandlerCoordinator,
   type CancellationReason,
   type HandlerPolicy,
 } from "../../../src/components-core/concurrency";
@@ -120,12 +121,12 @@ describe("createCancellationToken", () => {
   });
 });
 
-describe("createHandlerCoordinator (W3-6 stub)", () => {
+describe("createPassThroughHandlerCoordinator (W3-6 stub shape)", () => {
   it("enter always returns proceed:true with a fresh token", () => {
-    const c = createHandlerCoordinator();
+    const c = createPassThroughHandlerCoordinator();
     const inv = { componentUid: "u1", eventName: "click", policy: "parallel" as HandlerPolicy };
-    const r1 = c.enter(inv);
-    const r2 = c.enter(inv);
+    const r1 = c.enter(inv) as { proceed: boolean; token: any };
+    const r2 = c.enter(inv) as { proceed: boolean; token: any };
     expect(r1.proceed).toBe(true);
     expect(r2.proceed).toBe(true);
     expect(r1.token).not.toBe(r2.token);
@@ -133,7 +134,7 @@ describe("createHandlerCoordinator (W3-6 stub)", () => {
   });
 
   it("enter respects the policy field shape for all four values", () => {
-    const c = createHandlerCoordinator();
+    const c = createPassThroughHandlerCoordinator();
     const policies: HandlerPolicy[] = [
       "parallel",
       "single-flight",
@@ -141,17 +142,32 @@ describe("createHandlerCoordinator (W3-6 stub)", () => {
       "drop-while-running",
     ];
     for (const policy of policies) {
-      const r = c.enter({ componentUid: "u", eventName: "e", policy });
+      const r = c.enter({ componentUid: "u", eventName: "e", policy }) as {
+        proceed: boolean;
+        token: any;
+      };
       expect(r.proceed).toBe(true);
       expect(r.token.aborted).toBe(false);
     }
   });
 
-  it("exit and abortRunning are no-op stubs (W7-1 lands the runtime)", () => {
-    const c = createHandlerCoordinator();
+  it("exit and abortRunning are no-op stubs", () => {
+    const c = createPassThroughHandlerCoordinator();
     expect(() => c.exit({ componentUid: "u", eventName: "e", policy: "parallel" })).not.toThrow();
     expect(() => c.abortRunning()).not.toThrow();
     expect(() => c.abortRunning("u")).not.toThrow();
     expect(() => c.abortRunning("u", "e", "user")).not.toThrow();
+  });
+});
+
+describe("createHandlerCoordinator (W7-1 default factory)", () => {
+  it("returns the real coordinator (parallel is still a pass-through fast path)", async () => {
+    const c = createHandlerCoordinator();
+    const inv = { componentUid: "u1", eventName: "click", policy: "parallel" as HandlerPolicy };
+    const r1 = await c.enter(inv);
+    const r2 = await c.enter(inv);
+    expect(r1.proceed).toBe(true);
+    expect(r2.proceed).toBe(true);
+    expect(r1.token).not.toBe(r2.token);
   });
 });

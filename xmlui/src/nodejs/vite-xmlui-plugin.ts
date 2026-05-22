@@ -17,6 +17,17 @@ import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import { analyze } from "../components-core/analyzer/walker";
+import {
+  collectComponentDefGraph,
+  findCycles,
+  formatCycle,
+  cycleHash,
+} from "../components-core/reactive-graph";
+import { lintComponentDef } from "../components-core/accessibility/linter";
+import type { A11yRegistry } from "../components-core/accessibility";
+import { verifyComponentDef } from "../components-core/type-contracts";
+import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
+import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -31,6 +42,59 @@ export type PluginOptions = {
    *   diagnostics cause the build to fail.
    */
   analyze?: AnalyzeMode;
+  /**
+   * Control reactive-cycle detection at build time — Plan #03 Step 3.4
+   * (W6-7). When omitted, defaults to `"warn"` (or `"strict"` when
+   * `analyze === "strict"`).
+   *
+   * - `"off"` — cycle detector disabled.
+   * - `"warn"` — cycles produce `this.warn(...)`; the build succeeds.
+   * - `"strict"` — `severity:"warn"` cycles call `this.error(...)`,
+   *   failing the build. `severity:"info"` (pure-conditional) cycles
+   *   always remain warnings.
+   *
+   * XMLUI files are analysed independently inside `transform`, then all parsed
+   * roots are scanned once more during `buildEnd` so build logs include cycles
+   * that only become visible when multiple files participate in the app graph.
+   */
+  reactiveCycles?: AnalyzeMode;
+  /**
+   * Control accessibility linting at build time — Plan #05 Phase 1 Step 1.3.
+   *
+   * - `"off"` — accessibility linter disabled.
+   * - `"warn"` (default) — linter runs; diagnostics are emitted as Vite
+   *   warnings; the build always succeeds.
+   * - `"strict"` — must-have violations (`icon-only-button-no-label`,
+   *   `modal-no-title`, etc.) call `this.error(...)`, failing the build.
+   *
+   * @see a11yRegistry to supply component metadata for the full rule set.
+   */
+  accessibility?: AnalyzeMode;
+  /**
+   * Optional component a11y metadata map used by the accessibility linter.
+   *
+   * When omitted the linter still runs component-name-based rules
+   * (`icon-only-button-no-label`, `modal-no-title`).  Metadata-dependent
+   * rules (`missing-accessible-name`, `form-input-no-label`) require this
+   * registry to fire.
+   *
+   * Callers may build this from the generated LSP metadata or from any
+   * `Map<string, { a11y?: ... }>` keyed by component type name.
+   */
+  a11yRegistry?: A11yRegistry;
+  /**
+   * Control verified type-contract diagnostics at build time — Plan #01 Step 3.2.
+   *
+   * - `"off"` — type-contract verifier disabled.
+   * - `"warn"` (default) — diagnostics are emitted as Vite warnings.
+   * - `"strict"` — error-capable diagnostics fail the build.
+   */
+  typeContracts?: AnalyzeMode;
+  /**
+   * Optional component metadata registry used by the type-contract verifier.
+   * Defaults to the built-in component metadata.
+   */
+  typeContractRegistry?: ReadonlyMap<string, ComponentMetadata>;
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -43,6 +107,24 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
   let projectRoot = "";
   const analyzeMode: AnalyzeMode = pluginOptions.analyze ?? "warn";
+  const cyclesMode: AnalyzeMode =
+    pluginOptions.reactiveCycles ?? (analyzeMode === "strict" ? "strict" : "warn");
+  const a11yMode: AnalyzeMode = pluginOptions.accessibility ?? "warn";
+  const a11yRegistry: A11yRegistry = pluginOptions.a11yRegistry ?? new Map();
+  const typeContractMode: AnalyzeMode = pluginOptions.typeContracts ?? "warn";
+  const typeContractRegistry =
+    pluginOptions.typeContractRegistry ??
+    new Map(Object.entries(collectedComponentMetadata) as [string, ComponentMetadata][]);
+  // Dedupe cycle reports across multiple transform calls / HMR within a
+  // single dev-server lifetime, so the same cycle is not warned twice.
+  const reportedCycles = new Set<string>();
+  const reactiveCycleRoots = new Map<string, ComponentDef>();
+  // Aggregate a11y diagnostic counts across all files for the buildEnd summary.
+  let a11yWarnCount = 0;
+  let a11yErrorCount = 0;
+  const typeContractCounts = new Map<string, number>();
+  let typeContractWarnCount = 0;
+  let typeContractErrorCount = 0;
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
@@ -133,6 +215,112 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             // Analyzer errors must never break the build
           }
         }
+
+        // --- Reactive cycle detection — Plan #03 Step 3.4 (W6-7).
+        // Per-file pass: build the graph from this file's `ComponentDef`
+        // and report any cycles found. The same root is retained for the
+        // aggregate buildEnd scan below.
+        if (cyclesMode !== "off" && component) {
+          const root =
+            (component as any).component &&
+            typeof (component as any).component === "object"
+              ? (component as any).component
+              : (component as any);
+          reactiveCycleRoots.set(fileId, root);
+          let cycleHits: ReturnType<typeof findCycles> | null = null;
+          try {
+            const graph = collectComponentDefGraph(root);
+            cycleHits = findCycles(graph);
+          } catch (_cyclesErr) {
+            // Analyzer failure must never break the build.
+            cycleHits = null;
+          }
+          // Reporting is outside the try/catch so an explicit `this.error`
+          // (strict mode) is not swallowed.
+          if (cycleHits && cycleHits.length > 0) {
+            const strictCycles = cyclesMode === "strict";
+            for (const hit of cycleHits) {
+              const id = cycleHash(hit);
+              if (reportedCycles.has(id)) continue;
+              reportedCycles.add(id);
+              const message = `[xmlui:reactive-cycle] ${fileId}\n${formatCycle(hit)}`;
+              // `severity:"info"` (pure-conditional) cycles never fail
+              // the build — they are advisory only.
+              if (strictCycles && (hit.severity ?? "warn") === "warn") {
+                this.error(message);
+              } else {
+                this.warn(message);
+              }
+            }
+          }
+        }
+
+        // --- Accessibility linting — Plan #05 Phase 1 Step 1.3.
+        // Run lintComponentDef on the parsed component tree to surface
+        // accessibility violations (icon-only-button, modal-no-title, and
+        // others when a11yRegistry is supplied). In non-strict mode violations
+        // are warnings; in strict mode must-have codes call this.error().
+        if (a11yMode !== "off" && component) {
+          try {
+            const root: any =
+              (component as any).component &&
+              typeof (component as any).component === "object"
+                ? (component as any).component
+                : component;
+            const strictA11y = a11yMode === "strict";
+            const a11yHits = lintComponentDef(root, a11yRegistry, {
+              strict: strictA11y,
+              skipUnknown: true,
+            });
+            for (const hit of a11yHits) {
+              const message = `[xmlui:a11y] ${fileId}: [${hit.code}] ${hit.message}${hit.fix ? ` Suggestion: ${hit.fix}` : ""}`;
+              if (strictA11y && hit.severity === "error") {
+                a11yErrorCount++;
+                this.error(message);
+              } else {
+                a11yWarnCount++;
+                this.warn(message);
+              }
+            }
+          } catch (_a11yErr) {
+            // A11y linter failure must never break the build.
+          }
+        }
+
+        // --- Verified type contracts — Plan #01 Step 3.2.
+        // Run after XMLUI parsing so literal props/events can be checked against
+        // component metadata. Expression-valued props are intentionally left for
+        // runtime warn-mode.
+        if (typeContractMode !== "off" && component) {
+          let hits: ReturnType<typeof verifyComponentDef> = [];
+          try {
+            const root: any =
+              (component as any).component &&
+              typeof (component as any).component === "object"
+                ? (component as any).component
+                : component;
+            const strictTypes = typeContractMode === "strict";
+            hits = verifyComponentDef(root, typeContractRegistry, {
+              strict: strictTypes,
+              skipUnknown: true,
+            });
+          } catch (_typeContractErr) {
+            // Type-contract verifier failure must never break the build.
+          }
+          const strictTypes = typeContractMode === "strict";
+          for (const hit of hits) {
+            const message = `[xmlui:type-contract] ${fileId}: [${hit.code}] ${hit.message}${hit.suggestion ? ` Did you mean "${hit.suggestion}"?` : ""}`;
+            typeContractCounts.set(hit.code, (typeContractCounts.get(hit.code) ?? 0) + 1);
+            if (strictTypes && hit.severity === "error") {
+              typeContractErrorCount++;
+              this.error(message);
+            } else {
+              typeContractWarnCount++;
+              this.warn(message);
+            }
+          }
+        }
+
         const file = {
           component,
           src: code,
@@ -224,6 +412,74 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
     configResolved(config) {
       projectRoot = normalizePath(config.root);
+    },
+
+    buildEnd() {
+      if (cyclesMode !== "off" && reactiveCycleRoots.size > 0) {
+        let cycleHits: ReturnType<typeof findCycles> | null = null;
+        try {
+          const root: ComponentDef = {
+            type: "Fragment",
+            uid: "__xmlui_build__",
+            children: Array.from(reactiveCycleRoots.values()),
+          };
+          const graph = collectComponentDefGraph(root);
+          cycleHits = findCycles(graph);
+        } catch (_cyclesErr) {
+          cycleHits = null;
+        }
+
+        if (cycleHits && cycleHits.length > 0) {
+          const strictCycles = cyclesMode === "strict";
+          for (const hit of cycleHits) {
+            const id = cycleHash(hit);
+            if (reportedCycles.has(id)) continue;
+            reportedCycles.add(id);
+            const message = `[xmlui:reactive-cycle] buildEnd\n${formatCycle(hit)}`;
+            if (strictCycles && (hit.severity ?? "warn") === "warn") {
+              this.error(message);
+            } else {
+              this.warn(message);
+            }
+          }
+        }
+      }
+
+      // Emit an accessibility summary when the linter found any issues.
+      // This surfaces the totals even after individual per-file warnings
+      // have scrolled past in the build log.
+      if (a11yMode !== "off" && (a11yWarnCount > 0 || a11yErrorCount > 0)) {
+        const summary = [
+          `[xmlui:a11y] Build complete — accessibility diagnostics:`,
+          a11yErrorCount > 0 ? `  ${a11yErrorCount} error(s)` : null,
+          a11yWarnCount > 0 ? `  ${a11yWarnCount} warning(s)` : null,
+          `  Run with accessibility="strict" to fail the build on must-have violations.`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+        this.warn(summary);
+      }
+
+      if (
+        typeContractMode !== "off" &&
+        (typeContractWarnCount > 0 || typeContractErrorCount > 0)
+      ) {
+        const byCode = Array.from(typeContractCounts.entries())
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([code, count]) => `  ${code}: ${count}`)
+          .join("\n");
+        const total = typeContractWarnCount + typeContractErrorCount;
+        const summary = [
+          `[xmlui:type-contract] Build complete — ${total} type-contract diagnostic(s):`,
+          typeContractErrorCount > 0 ? `  ${typeContractErrorCount} error(s)` : null,
+          typeContractWarnCount > 0 ? `  ${typeContractWarnCount} warning(s)` : null,
+          byCode || null,
+          `  Run with typeContracts="strict" to fail the build on contract violations.`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+        this.warn(summary);
+      }
     },
 
     handleHotUpdate({ file, server }) {

@@ -6,10 +6,15 @@ A username field runs a server call to check whether the chosen name is taken. F
 
 ```xmlui-pg copy display name="Debounced username availability check"
 ---api
-POST /check-username
----
 {
-  "taken": true
+  "apiUrl": "/api",
+  "operations": {
+    "check-username": {
+      "url": "/check-username",
+      "method": "post",
+      "handler": "return { taken: true }"
+    }
+  }
 }
 ---app display
 <App>
@@ -26,7 +31,7 @@ POST /check-username
       customValidationsDebounce="500"
       onValidate="async (value) => {
         if (!value || value.length < 3) return null;
-        const res = await fetch('/check-username', {
+        const res = await fetch('/api/check-username', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: value })

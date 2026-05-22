@@ -19,7 +19,7 @@ This component supports the following behaviors:
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
-| Validation | `bindTo`, `required`, `requiredInvalidMessage`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `customValidationsDebounce`, `validationDisplayDelay`, `verboseValidationFeedback`, `validate` |
+| Validation | `bindTo`, `required`, `requiredInvalidMessage`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `matchValue`, `matchInvalidMessage`, `validationMode`, `customValidationsDebounce`, `validationDisplayDelay`, `verboseValidationFeedback`, `validate` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
@@ -420,12 +420,20 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-danger-500 | $color-danger-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-danger-500 | $color-danger-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-50 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-50 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-overlay-DatePicker | $backgroundColor-overlay | $backgroundColor-overlay |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-overlay-DatePicker | $backgroundColor-overlay | $backgroundColor-overlay |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error | *none* | *none* |
@@ -503,6 +511,12 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-surface-0 | $color-surface-0 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-surface-0 | $color-surface-0 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-surface-0 | $color-surface-0 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-surface-0 | $color-surface-0 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $textColor-primary | $textColor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-DatePicker | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-DatePicker--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-DatePicker--success | *none* | *none* |

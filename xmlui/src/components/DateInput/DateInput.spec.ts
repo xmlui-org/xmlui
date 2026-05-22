@@ -1602,13 +1602,13 @@ test.describe("Validation Feedback", () => {
 // =============================================================================
 
 test.describe("Keyboard behavior: cursor position", () => {
-  test("inputs use left text alignment", async ({ initTestBed, createDateInputDriver }) => {
+  test("inputs use start text alignment", async ({ initTestBed, createDateInputDriver }) => {
     await initTestBed(`<DateInput testId="dateInput" initialValue="05/25/2024" />`);
     const driver = await createDateInputDriver("dateInput");
     await expect(driver.monthInput).toBeVisible();
-    await expect(driver.monthInput).toHaveCSS("text-align", "left");
-    await expect(driver.dayInput).toHaveCSS("text-align", "left");
-    await expect(driver.yearInput).toHaveCSS("text-align", "left");
+    await expect(driver.monthInput).toHaveCSS("text-align", "start");
+    await expect(driver.dayInput).toHaveCSS("text-align", "start");
+    await expect(driver.yearInput).toHaveCSS("text-align", "start");
   });
 });
 

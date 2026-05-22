@@ -244,3 +244,37 @@ describe("rule: duplicate-landmark", () => {
     expect(result.filter((d) => d.code === "duplicate-landmark")).toHaveLength(0);
   });
 });
+
+describe("rule: redundant-aria-role", () => {
+  it("warns when an HTML tag repeats its implicit role", () => {
+    const def: ComponentDef = { type: "nav", props: { role: "navigation" } };
+    const result = lintComponentDef(def, makeRegistry());
+    expect(result.some((d) => d.code === "redundant-aria-role")).toBe(true);
+  });
+
+  it("does not warn when the role is not redundant", () => {
+    const def: ComponentDef = { type: "nav", props: { role: "menubar" } };
+    const result = lintComponentDef(def, makeRegistry());
+    expect(result.filter((d) => d.code === "redundant-aria-role")).toHaveLength(0);
+  });
+});
+
+describe("rule: missing-skip-link", () => {
+  it("warns when an App contains NavPanel without SkipLink", () => {
+    const def: ComponentDef = {
+      type: "App",
+      children: [{ type: "NavPanel" }, { type: "Text", props: { value: "Main" } }],
+    };
+    const result = lintComponentDef(def, makeRegistry());
+    expect(result.some((d) => d.code === "missing-skip-link")).toBe(true);
+  });
+
+  it("does not warn when SkipLink is present", () => {
+    const def: ComponentDef = {
+      type: "App",
+      children: [{ type: "SkipLink" }, { type: "NavPanel" }],
+    };
+    const result = lintComponentDef(def, makeRegistry());
+    expect(result.filter((d) => d.code === "missing-skip-link")).toHaveLength(0);
+  });
+});

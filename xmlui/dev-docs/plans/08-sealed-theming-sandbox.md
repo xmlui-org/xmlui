@@ -279,7 +279,7 @@ Step 0; verified-type-contracts plan Step 1.2 (coercion rule table).
 
 ---
 
-### Step 1.2 — Validate Theme at Resolution Time
+### Step 1.2 — Validate Theme at Resolution Time ✅ DONE (2026-05)
 
 **Priority:** 2
 
@@ -336,7 +336,7 @@ shorthand props (`width`, `paddingHorizontal`, etc.) accept arbitrary
 CSS-length strings including units like `1in` or unknown
 calc-expressions.
 
-### Step 2.1 — Token Allowlist for Layout Props
+### Step 2.1 — Token Allowlist for Layout Props ✅ DONE (2026-05)
 
 **Priority:** 3
 
@@ -388,7 +388,7 @@ Step 0; verified-type-contracts plan Step 1.1 (`length` rule).
 
 ---
 
-### Step 2.2 — `style` Prop Token Funnel
+### Step 2.2 — `style` Prop Token Funnel ✅ DONE (2026-05)
 
 **Priority:** 4
 

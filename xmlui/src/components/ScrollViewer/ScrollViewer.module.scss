@@ -104,8 +104,8 @@ $transition-fade-Scroller: createThemeVar('transition-fade-Scroller');
 
 .fadeOverlay {
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   height: #{$height-fade-Scroller};
   pointer-events: none;
   opacity: 0;

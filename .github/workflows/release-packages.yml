@@ -2,11 +2,22 @@ name: Release Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "npm dist-tag for the release. 'support' is only for patch releases for older minor versions. 'latest' sets the default target for npm."
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - support
+          - canary
   pull_request:
     types:
       - closed
     branches:
       - main
+      - "support/**"
 
 permissions:
   contents: write
@@ -15,19 +26,17 @@ permissions:
 
 jobs:
   publish_and_github_release:
-    name: Publish Stable and Create GitHub Release
+    name: Publish and Create GitHub Release
     if: >
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'pull_request' &&
-      github.event.action == 'closed' &&
-      github.event.pull_request.merged == true &&
-      (startsWith(github.event.pull_request.title, 'Version Packages for Stable Release') || contains(github.event.pull_request.labels.*.name, 'changeset-release')))
+      (github.event.pull_request.merged == true &&
+       (github.event.pull_request.title == 'Version Packages for [stable] release' ||
+       github.event.pull_request.title == 'Version Packages for [support] release'))
     runs-on: ubuntu-latest-8-core
     timeout-minutes: 60
     env:
       TURBO_UI: "false"
       NODE_OPTIONS: "--max-old-space-size=8192"
-    # needs: [create_version_pr] # This is implied by the trigger conditions
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -43,6 +52,31 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline
+
+      - name: Run allowed install scripts
+        run: npm run allow-scripts
+
+      - name: Resolve release tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            title="${{ github.event.pull_request.title }}"
+
+            if echo "$title" | grep -qE 'Version Packages for \[support\] release'; then
+              tag="support"
+            elif echo "$title" | grep -qE 'Version Packages for \[latest\] release'; then
+              tag="latest"
+            else
+              >&2 echo "ERROR: could not determine release tag from PR title: ${title}"
+              exit 1
+            fi
+          fi
+
+          echo "Resolved release tag: ${tag}"
+          echo "RELEASE_TAG=${tag}" >> "$GITHUB_ENV"
+          echo "NPM_DIST_TAG=${tag}" >> "$GITHUB_ENV"
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.1
@@ -70,15 +104,34 @@ jobs:
       - name: run all tests
         run: npm run test
 
-      - name: Create Version PR or Publish to NPM and Create GitHub Releases
+      - name: run integration tests
+        run: npm run test-integration
+
+      - name: Publish canary snapshot
+        if: env.RELEASE_TAG == 'canary'
+        shell: bash
+        run: |
+          echo "Creating canary snapshot"
+          npx changeset version --snapshot canary --snapshot-prerelease-template "{tag}-{datetime}-{commit}"
+
+          echo "Building packages with snapshot versions"
+          npm run build-xmlui
+
+          echo "Publishing canary packages"
+          npx changeset publish --tag canary --no-git-tag
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PUBLISH_NPM_TOKEN }}
+
+      - name: Publish to NPM and Create GitHub Releases
         id: changesets_publish
+        if: env.RELEASE_TAG != 'canary'
         uses: changesets/action@v1
         with:
-          title: "Version Packages for Stable Release"
+          title: "Version Packages for [${{ env.RELEASE_TAG }}] release"
           publish: npm run changeset:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.PUBLISH_NPM_TOKEN }}
 
       - name: Output Published Packages Info
         if: steps.changesets_publish.outputs.published == 'true'

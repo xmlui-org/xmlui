@@ -13,6 +13,7 @@ import type { SetupWorker } from "msw/browser";
 import type { IApiInterceptor } from "../components-core/interception/abstractions";
 import type { AppState } from "../components-core/rendering/appState";
 import type { PubSubService } from "../components-core/pubsub/PubSubService";
+import type { AppError } from "../components-core/errors/app-error";
 import type { ButtonThemeColor } from "../components/abstractions";
 import type { LogNamespace } from "../components-core/appContext/log";
 import type {
@@ -186,7 +187,10 @@ export type AppContextObject = {
   // This function sets navigation event handlers (willNavigate and didNavigate).
   // Used by the App component to register navigation events.
   setNavigationHandlers?: (
-    onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined,
+    onWillNavigate?: (
+      to: string | number,
+      queryParams?: Record<string, any>,
+    ) => false | void | null | undefined,
     onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void,
   ) => void;
 
@@ -212,7 +216,7 @@ export type AppContextObject = {
   };
 
   // This method displays the specified `error` (error message) on the UI.
-  signError(error: Error | string): void;
+  signError(error: Error | string | unknown): void;
 
   // The toast service that displays messages in the UI.
   toast: {
@@ -345,6 +349,60 @@ export type AppContextObject = {
   App: typeof AppUtilsNamespace & {
     fetch: (input: string | URL, init?: RequestInit) => Promise<Response>;
     environment: AppEnvironment;
+    locale: string;
+    localeSource: string;
+    availableLocales: readonly string[];
+    setLocale: (locale: string, options?: { source?: "app" | "user" }) => void;
+    /** Internal: used by AppReact to push the `direction` prop into AppContext. */
+    setAppDirection: (dir: "ltr" | "rtl" | "auto") => void;
+    registerLocaleBundle: (bundle: {
+      locale: string;
+      messages: ReadonlyMap<string, string> | Record<string, string>;
+    }) => void;
+    registerLocaleBundles: (bundles: unknown) => Promise<void>;
+    reloadLocale: (locale: string) => Promise<boolean>;
+    translate: (key: string, vars?: Record<string, unknown>) => string;
+    t: (key: string, vars?: Record<string, unknown>) => string;
+    isRtlLocale: (locale?: string) => boolean;
+    /** Resolved text direction for the active locale (`"ltr"` or `"rtl"`). */
+    direction: "ltr" | "rtl";
+    formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
+    formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string;
+    formatList: (values: readonly string[], options?: Intl.ListFormatOptions) => string;
+    formatRelativeTime: (
+      value: number,
+      unit: Intl.RelativeTimeFormatUnit,
+      options?: Intl.RelativeTimeFormatOptions,
+    ) => string;
+    compare: (a: string, b: string, options?: Intl.CollatorOptions) => number;
+    pluralRules: (value: number, options?: Intl.PluralRulesOptions) => Intl.LDMLPluralRule;
+    scheduler: "concurrent" | "fifo";
+    maxQueuedPerTrace: number;
+    setScheduler: (mode: "concurrent" | "fifo", options?: { maxQueuedPerTrace?: number }) => void;
+    scheduleHandler: (task: {
+      traceId: string;
+      spanId: string;
+      label: string;
+      handler: () => Promise<void>;
+    }) => Promise<void>;
+    // --- Plan #09 Step 1.2: register a named validator from markup.
+    registerValidator: (entry: {
+      name: string;
+      fn: (
+        value: unknown,
+        ctx: { fieldName: string; formData: Record<string, unknown>; signal?: AbortSignal },
+        params?: unknown,
+      ) => string | null | undefined | Promise<string | null | undefined>;
+      defaultMessage: string;
+      severity?: "error" | "warning";
+    }) => void;
+    errors: ReadonlyArray<AppError>;
+    setErrorHandler: (
+      handler?: (
+        err: AppError,
+        event: { preventDefault(): void; defaultPrevented: boolean },
+      ) => void | boolean | Promise<void | boolean>,
+    ) => void;
   };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the

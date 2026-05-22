@@ -633,3 +633,61 @@ test.describe("onFetch event", () => {
     await expect(page.getByTestId("output")).toHaveText('["a","b","c"]');
   });
 });
+
+// =============================================================================
+// DATA TYPE TESTS
+// =============================================================================
+
+test.describe("dataType property", () => {
+  // Regression test for: https://github.com/xmlui-org/xmlui/issues/3480
+  // Issue: queryParams silently dropped when dataType="text"
+  test("queryParams are appended to URL when dataType is text", async ({ initTestBed, page }) => {
+    const interceptor: ApiInterceptorDefinition = {
+      operations: {
+        "text-with-params": {
+          url: "/api/text",
+          method: "get",
+          queryParamTypes: { lines: "string" },
+          handler: `return $queryParams.lines;`,
+        },
+      },
+    };
+
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource id="ds" url="/api/text" queryParams="{{ lines: '200' }}" dataType="text" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+      `,
+      { apiInterceptor: interceptor },
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("200");
+  });
+
+  test("queryParams are appended to URL when dataType is csv", async ({ initTestBed, page }) => {
+    const interceptor: ApiInterceptorDefinition = {
+      operations: {
+        "csv-with-params": {
+          url: "/api/csv",
+          method: "get",
+          queryParamTypes: { filter: "string" },
+          handler: `return $queryParams.filter ? "name,value\\nalice,1" : "name,value\\n";`,
+        },
+      },
+    };
+
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource id="ds" url="/api/csv" queryParams="{{ filter: 'active' }}" dataType="csv" />
+        <Text testId="output" value="{ds.value && ds.value.length > 0 ? ds.value[0].name : 'no-data'}" />
+      </Fragment>
+      `,
+      { apiInterceptor: interceptor },
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("alice");
+  });
+});

@@ -198,7 +198,7 @@ $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$com
 
     .indicator {
       position: absolute;
-      left: 0;
+      inset-inline-start: 0;
       width: 2px;
       background-color: $color-indicator-TableOfContents--active;
       transition: top 0.3s ease, height 0.3s ease;

@@ -9,15 +9,30 @@ export function getExampleSource(absoluteFilePath: string) {
   }
 }
 
-export function extractXmluiExample(markdown: string, name: string): ExtractedExample {
-  // Matches ```xmlui-pg ... name="NAME" ... \n<content>\n```
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp(
-    '```xmlui-pg[^\\n]*\\bname="' + escaped + '"[^\\n]*\\n([\\s\\S]*?)```',
+export function extractXmluiExample(markdown: string, nameOrId: string): ExtractedExample {
+  // Try to match by id first, then fall back to name for backward compatibility.
+  // The 'nameOrId' parameter can be either an id="..." or name="..." value from the codefence.
+  // Matches ```xmlui-pg ... id="IDENTIFIER" ... \n<content>\n```
+  // or ```xmlui-pg ... name="IDENTIFIER" ... \n<content>\n```
+  const escaped = nameOrId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  
+  // Try id first
+  let pattern = new RegExp(
+    '```xmlui-pg[^\\n]*\\bid="' + escaped + '"[^\\n]*\\n([\\s\\S]*?)```',
     "m",
   );
-  const match = markdown.match(pattern);
-  if (!match) throw new Error(`No xmlui-pg example named "${name}" found`);
+  let match = markdown.match(pattern);
+  
+  // Fall back to name if id not found
+  if (!match) {
+    pattern = new RegExp(
+      '```xmlui-pg[^\\n]*\\bname="' + escaped + '"[^\\n]*\\n([\\s\\S]*?)```',
+      "m",
+    );
+    match = markdown.match(pattern);
+  }
+  
+  if (!match) throw new Error(`No xmlui-pg example with id or name "${nameOrId}" found`);
   return parseXmluiExampleContent(match[1]);
 }
 

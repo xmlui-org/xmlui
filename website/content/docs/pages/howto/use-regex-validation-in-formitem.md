@@ -7,7 +7,7 @@ Write regex patterns with curly-brace quantifiers safely in XML attributes and c
 
 `FormItem` accepts a `regex` prop for custom pattern validation. The key challenge is that XMLUI treats `{` and `}` in attribute values as expression delimiters — so a regex quantifier like `\d{2,4}` must be escaped or moved into a script variable to avoid a parse error. Each validation type also has an independent `*InvalidSeverity` prop to control whether a rule blocks submission or just shows a warning.
 
-```xmlui-pg copy display name="FormItem regex validation with severity"
+```xmlui-pg copy display name="FormItem regex validation with severity" id="formitem-regex-validation-with-severity"
 ---app display
 <App
   var.phoneRegex="{'^[+]?[0-9]{7,15}$'}"

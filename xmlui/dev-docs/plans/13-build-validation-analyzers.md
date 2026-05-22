@@ -1,8 +1,42 @@
 # Build-Time Validation Analyzers — Implementation Plan
 
 **Date:** 2026-04-30
-**Status:** Proposal
+**Status:** ✅ Sealed (2026-06)
 **Source:** [`managed-react.md` §13 "Build-Time Validation and Tooling"](./managed-react.md) and the §17 scorecard row **"Build-time validation — Parse only."**
+
+---
+
+## Completion summary (2026-06)
+
+All identifier, expression, and cross-binding rules from Phases 1–3 are
+implemented and wired into the LSP / Vite / CLI surfaces:
+
+- **Identifier rules:** `id-unknown-component`, `id-unknown-prop`,
+  `id-unknown-event`, `id-unknown-method`, `id-undefined-component-ref`,
+  `id-undefined-form-ref`.
+- **Expression rules:** `expr-dead-conditional`, `expr-handler-no-value`,
+  `expr-unbound-identifier`, `expr-unused-var`.
+- **`id-unknown-slot`** is registered as a documented no-op — full slot
+  validation requires a `slots` field on `ComponentMetadata`, which is a
+  separate framework-wide effort (audit of ≈104 components) and is out of
+  scope for this plan. The rule code, severity, and registration are in
+  place so suppression directives and configuration keys can be written
+  against it now.
+
+The walker was upgraded to lazy-parse markup via
+`xmlUiMarkupToComponent` when callers don't supply a pre-built
+`markupAst`, which is the case for all three production surfaces (CLI,
+Vite plugin, LSP). Shared AST infrastructure lives in
+`rules/_ast-utils.ts` (identifier-ref / rooted-chain collectors,
+lazy expression parsing, uid-map collection) and
+`rules/_reserved-identifiers.ts` (framework context vars / global
+namespaces). The original plan deferred Phase 2+ behind
+"verified-type-contracts ref + scope tracking"; the in-place
+`script-runner/ScriptingSourceTree.ts` AST proved sufficient.
+
+User-facing docs page lives at
+`/docs/managed-react/build-validation-analyzers`. 102 analyzer unit
+tests pass under `tests/components-core/analyzer/`.
 
 ---
 

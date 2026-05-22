@@ -58,6 +58,45 @@ import {
 } from "../theming/responsive-layout";
 import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
+import { enterRenderPhase, exitRenderPhase } from "../scheduler";
+import { emitRuntimeTypeContractDiagnostics } from "../type-contracts";
+
+/**
+ * Plan #6 W7-1 — surface the per-component / per-event concurrency knobs
+ * from a node's `props` to `LookupActionOptions`. Per-event overrides
+ * (`handlerPolicy:onClick`) win over component-level defaults
+ * (`handlerPolicy`). Returns an empty object when nothing is declared so
+ * the spread call site stays a no-op for the default case.
+ */
+function resolveConcurrencyOptions(
+  props: Record<string, any> | undefined,
+  eventName: string,
+): {
+  handlerPolicy?: "parallel" | "single-flight" | "queue" | "drop-while-running";
+  handlerTimeoutMs?: number;
+  transactional?: boolean;
+} {
+  if (!props) return {};
+  const out: {
+    handlerPolicy?: "parallel" | "single-flight" | "queue" | "drop-while-running";
+    handlerTimeoutMs?: number;
+    transactional?: boolean;
+  } = {};
+  const perEventPolicy = props[`handlerPolicy:${eventName}`] ?? props.handlerPolicy;
+  if (typeof perEventPolicy === "string") {
+    out.handlerPolicy = perEventPolicy as typeof out.handlerPolicy;
+  }
+  const perEventTimeout = props[`handlerTimeoutMs:${eventName}`] ?? props.handlerTimeoutMs;
+  if (perEventTimeout !== undefined && perEventTimeout !== null) {
+    const n = Number(perEventTimeout);
+    if (Number.isFinite(n)) out.handlerTimeoutMs = n;
+  }
+  const perEventTx = props[`transactional:${eventName}`] ?? props.transactional;
+  if (perEventTx === true || perEventTx === "true") {
+    out.transactional = true;
+  }
+  return out;
+}
 
 /**
  * Invoke the per-component `onError` handler for a lifecycle phase failure.
@@ -79,6 +118,7 @@ function fireOnError(
       stack: error instanceof Error ? error.stack : undefined,
     },
   };
+  enterRenderPhase();
   try {
     const result = handler(payload);
     if (result && typeof (result as PromiseLike<unknown>).then === "function") {
@@ -261,7 +301,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+    return createValueExtractor(
+      state,
+      appContext,
+      referenceTrackedApi,
+      memoedVarsRef,
+      fnDeps,
+      (appContext as any)?.__udcEvalOptions,
+    );
   }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Obtain a function that can execute a script synchronously
@@ -317,6 +364,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const { renderer, descriptor, isCompoundComponent } =
     componentRegistry.lookupComponentRenderer(safeNode.type) || {};
 
+  useEffect(() => {
+    emitRuntimeTypeContractDiagnostics(
+      safeNode,
+      descriptor,
+      valueExtractor,
+      appContext,
+      uid.description ?? String(safeNode.uid ?? safeNode.type),
+    );
+  }, [appContext, descriptor, safeNode, uid, valueExtractor]);
+
   // --- Extract context variables (keys starting with "$") from state
   const contextVars = useMemo(() => {
     const vars: Record<string, any> = {};
@@ -361,6 +418,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         // --- Suppress the global toast when the user opted into `onError`;
         // --- the wrapper below dispatches the error event itself.
         ...(wrapForOnError ? { signError: false } : {}),
+        // --- Plan #6 W7-1: surface per-component / per-event policy +
+        // --- timeout + transactional flags from `node.props`. The
+        // --- dispatcher applies them in `event-handlers.ts`. Keys follow
+        // --- `handlerPolicy` / `handlerPolicy:<eventName>` convention
+        // --- (per-event override wins).
+        ...resolveConcurrencyOptions(safeNode.props, eventNameStr),
         ...actionOptions,
       });
       if (!handler || !wrapForOnError) return handler;
@@ -388,7 +451,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- can fire it without changing identity each render.
   const lookupErrorHandlerRef = useRef<((...args: any[]) => any) | null>(null);
   lookupErrorHandlerRef.current = safeNode.events?.error
-    ? (lookupAction(safeNode.events.error, uid, {
+    ? ((lookupAction(safeNode.events.error, uid, {
         eventName: "error",
         componentType: inspectorContextRef.current.componentType,
         componentLabel: inspectorContextRef.current.componentLabel,
@@ -396,7 +459,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         sourceFileId: inspectorContextRef.current.sourceFileId,
         sourceRange: inspectorContextRef.current.sourceRange,
         signError: false,
-      }) as ((...args: any[]) => any) | null) ?? null
+      }) as ((...args: any[]) => any) | null) ?? null)
     : null;
 
   // EXPERIMENTAL: extract bubbleEvents prop to allow selective propagation bypass
@@ -644,7 +707,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       : null,
   };
 
-  const strictLifecycle = appContext.appGlobals?.strictLifecycle === true;
+  const strictLifecycle = appContext.appGlobals?.strictLifecycle !== false;
   const disposeTimeoutMs: number = appContext.appGlobals?.disposeTimeoutMs ?? 250;
   useEffect(() => {
     const handlers = lifecycleHandlersRef.current;
@@ -654,14 +717,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
     // --- Mount: fire `onMount`, then dispatch `onError` on throw.
     if (handlers.mount) {
-      const mountStart =
-        typeof performance !== "undefined" ? performance.now() : undefined;
+      const mountStart = typeof performance !== "undefined" ? performance.now() : undefined;
       try {
         const result = handlers.mount();
-        if (
-          result &&
-          typeof (result as PromiseLike<unknown>).then === "function"
-        ) {
+        if (result && typeof (result as PromiseLike<unknown>).then === "function") {
           (result as PromiseLike<unknown>).then(
             () => {
               if (mountStart !== undefined) {
@@ -731,14 +790,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
       const unmountHandler = lifecycleHandlersRef.current.unmount;
       if (!unmountHandler) return;
-      const unmountStart =
-        typeof performance !== "undefined" ? performance.now() : undefined;
+      const unmountStart = typeof performance !== "undefined" ? performance.now() : undefined;
       try {
         const result = unmountHandler();
-        if (
-          result &&
-          typeof (result as PromiseLike<unknown>).then === "function"
-        ) {
+        if (result && typeof (result as PromiseLike<unknown>).then === "function") {
           // Synchronous-only contract for `onUnmount` (see plan #04 Step 0).
           // Do not await — emit a violation and let the unmount commit.
           reportLifecycleViolation(
@@ -897,6 +952,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- The component has its "id" (internally, "uid") or "testId" property defined
       ((appContext?.decorateComponentsWithTestId &&
         (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
+        safeNode.automationId !== undefined ||
         // --- The component has its "inspectId" property defined
         inspectId !== undefined) &&
       // --- The component is visual
@@ -907,10 +963,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
       const testId = safeNode.testId || safeNode.uid;
       const resolvedUid = extractParam(state, testId, appContext, true);
+      const automationId = extractParam(state, safeNode.automationId, appContext, true);
       renderedNode = (
         <ComponentDecorator
           attr={{
             "data-testid": resolvedUid,
+            "data-automation-id": automationId,
             "data-inspectId": inspectId,
             "data-component-type": safeNode.type,
           }}
@@ -956,6 +1014,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- Mark the potential rendering error and display it
     renderingError = (e as Error)?.message || "Internal error";
     console.error(e);
+  } finally {
+    exitRenderPhase();
   }
 
   // --- The rendering process may result in errors. If so, we render an error message.

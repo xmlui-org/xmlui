@@ -6,7 +6,7 @@ description: Create a Playwright test file for a website documentation markdown 
 # Add Website Example Tests
 
 Given a markdown filename (e.g. `generate-a-qr-code-from-user-input.md`), create a `@website`-tagged
-test file in `xmlui/tests-e2e/` that covers every named `xmlui-pg` codefence in that file.
+test file in `xmlui/tests-e2e/` that covers every named eligible `xmlui-pg` codefence in that file.
 
 ## Before starting
 
@@ -25,13 +25,16 @@ website/content/docs/pages/
 
 Resolve the full path from the provided filename and read the file.
 
-## Step 2 — Discover all xmlui-pg codefences
+## Step 2 — Discover eligible xmlui-pg codefences
 
 Scan the markdown for every codefence whose opening line starts with ` ```xmlui-pg `.
 
+Ignore any `xmlui-pg` codefence whose opening fence appears between a `<pre>` tag and its matching
+`</pre>` tag. Those are documentation literals and must not generate tests.
+
 For each codefence, record:
-- Whether it has a `name="..."` attribute
-- Its name value if present
+- Whether it has a `name="..."` attribute and its value if present
+- Whether it has an `id="..."` attribute and its value if present
 
 **If any codefences have no `name` attribute**, stop and report them to the user:
 
@@ -46,7 +49,83 @@ Add a name="..." attribute to each before continuing.
 
 Do NOT generate fallback names like `"example-1"`. The name must come from the markdown file itself.
 
-Only proceed once every codefence that should be tested has a name.
+**If any codefences have a `name` but no `id` attribute**, you must add an `id` attribute to each codefence before writing tests. The `id` should be a slug derived from the `name` using these rules:
+- Convert to lowercase
+- Replace spaces with hyphens
+- Remove or replace any characters not in `[a-z0-9-]`
+- Collapse multiple consecutive hyphens into a single hyphen
+
+Examples: `"A literal property"` → `id="a-literal-property"`, `"Declaring a variable with <variable>"` → `id="declaring-a-variable-with-variable"`
+
+Only proceed once every eligible codefence has both a `name` and an `id` attribute.
+
+## Step 2b — Validate all `---api` sections
+
+For every eligible codefence that contains a `---api` section, extract the text between `---api` and the next `---` (or end of codefence) and attempt to parse it as JSON.
+
+If parsing fails because of multiline JSON string literals (most commonly the `initialize` field containing raw newlines), normalize that markdown `---api` JSON first by rewriting those string values to a single-line JSON string. Then parse again.
+
+Example normalization:
+
+Before (invalid JSON):
+```json
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [
+    { id: 1, name: 'Anna', active: true }
+  ]",
+  "operations": {}
+}
+```
+
+After (valid JSON):
+```json
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [{ id: 1, name: 'Anna', active: true }]",
+  "operations": {}
+}
+```
+
+A valid `---api` section is a single JSON object matching the `ApiInterceptorDefinition` shape:
+```json
+{
+  "apiUrl": "...",
+  "initialize": "...",
+  "operations": { ... }
+}
+```
+
+**Invalid forms include (but are not limited to):**
+- Strings with embedded literal newlines (e.g. `"initialize": "$state.x = [\n  ...\n]"`) — `JSON.parse` rejects bare newlines inside string values
+- Non-JSON preamble lines such as `POST /route\n---\n{body}`
+- Any other content that causes `JSON.parse` to throw
+
+Do NOT work around invalid JSON by duplicating the source example inside the spec file (for example, hardcoding app markup or manually constructing `apiInterceptor`). Tests must use `extractXmluiExample`.
+
+**If any `---api` section is still not valid JSON after normalization**, do not duplicate source code. Instead, create a placeholder failing test for each affected example so the gap is visible in CI:
+
+```
+test("TODO: fix invalid ---api JSON for <example name>", async () => {
+  expect(
+    "Invalid ---api JSON in <filename> for <example name>; fix markdown before enabling this test"
+  ).toBe("");
+});
+```
+
+Also report every affected example to the user:
+
+```
+The following examples in <filename> still have a `---api` section that `extractXmluiExample`
+cannot parse after JSON normalization:
+
+  - "<example name>" (line <N>): <reason, e.g. "multiline string literal in JSON" or
+    "---api content is not a JSON object">
+  - ...
+
+Please fix the `---api` section(s) in the markdown file so they contain valid JSON
+and then replace the placeholder failing test(s).
+```
 
 ## Step 3 — Determine the spec file path
 
@@ -74,7 +153,7 @@ const markdown = getExampleSource(
 );
 
 test.describe("<example name>", { tag: "@website" }, () => {
-  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example name>");
+  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example id>");
 
   test("<describe what the initial state looks like>", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
@@ -93,9 +172,11 @@ Import path depth depends on spec location:
 - `tests-e2e/pages/<subdir>/` → `../../../src/testing/...` and `../../../../website/...`
 
 Rules:
-- One `test.describe` per named codefence. The describe title = the codefence's `name` value exactly.
+- One `test.describe` per named eligible codefence. The describe title = the codefence's `name` value exactly (for human readability).
+- The `extractXmluiExample` second argument = the codefence's `id` value (for stable lookup, resilient to name changes).
 - Every `test.describe` must include `{ tag: "@website" }`.
 - Read the markdown file once at module level with `getExampleSource`; call `extractXmluiExample` inside each describe block.
+- Never copy-paste the original example markup or API JSON into the spec file.
 
 ## Step 4 — Write meaningful tests
 
@@ -104,8 +185,9 @@ For each `test.describe` block, write tests that exercise the example's interact
 **Classify each example first:**
 
 - **Interactive** — the codefence body contains an event handler attribute (`onClick`, `onChange`,
-  `onSubmit`, etc.) or a `---api` section. Write a full test suite.
-- **Display-only** — no event handlers, no `---api`. Write only an initial-state test and add a
+  `onSubmit`, etc.), a `---api` section, or any of these interactive components: `NavLink`,
+  `Select`, `ToneSwitch`. Write a full test suite.
+- **Display-only** — none of the above. Write only an initial-state test and add a
   comment `// display-only example — no interaction to test` above the describe block.
 
 **For interactive examples, always include:**
@@ -119,20 +201,34 @@ For each `test.describe` block, write tests that exercise the example's interact
 - Assert `toBeFocused()` before keyboard interactions
 - For API-backed examples, the `apiInterceptor` from `extractXmluiExample` wires the mock automatically — just pass it to `initTestBed`
 
-If you cannot determine what meaningful assertions to write for a given example from reading its source alone, output a `test.todo` placeholder and note what information is needed.
+If you cannot determine what meaningful assertions to write for a given eligible example from reading its source alone, output a `test.todo` placeholder and note what information is needed.
 
 ## Step 5 — Verify
 
 Check for TypeScript errors in the new file. Confirm:
 - `getExampleSource` is called once at the top level, not inside a describe/test callback
 - Every describe block has `{ tag: "@website" }`
-- Example names in `extractXmluiExample` match the markdown exactly (copy-paste, do not paraphrase)
+- The first argument to `extractXmluiExample` is the `id` value from the markdown codefence (not the `name` string) — copy-paste the exact id value
+- Example names in describe titles match the markdown exactly (copy-paste, do not paraphrase)
 - Import paths use the correct depth for the spec file's location (see Step 3 path table)
 - Display-only examples have the `// display-only example — no interaction to test` comment
 
 ## Step 6 — Run and fix the tests
 
-Run the newly created spec file and fix any failures before finishing.
+Run the newly created spec file from the `xmlui/` directory and fix any failures before finishing.
+
+```bash
+# Single worker for easy debugging (run from xmlui/)
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=1 --reporter=line
+
+# Parallel stability check before committing
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=10
+```
+
+For specs under `how-to-examples/`, replace the path accordingly:
+```bash
+npm run test:e2e-website-examples -- tests-e2e/how-to-examples/<name>.spec.ts --workers=1 --reporter=line
+```
 
 **Common failures to watch for:**
 - **Strict-mode violations** (`resolved to N elements`): `getByText('X')` matches a substring in other visible text. Use `{ exact: true }` or a more specific locator such as `page.getByText('X', { exact: true })` or `page.locator('…').getByText('X')`.

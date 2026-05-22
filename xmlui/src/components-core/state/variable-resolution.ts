@@ -44,6 +44,7 @@ import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
+import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 import { extractParam } from "../utils/extractParam";
 import { ParseVarError } from "../rendering/ContainerUtils";
 import { pickFromObject, shallowCompare } from "../utils/misc";
@@ -75,6 +76,7 @@ export function useVars(
   fnDeps: Record<string, Array<string>> = EMPTY_OBJECT,
   componentState: ContainerState,
   memoedVars: MutableRefObject<MemoedVars>,
+  evalOptions: EvalTreeOptions = EMPTY_OBJECT,
 ): ContainerState {
   const appContext = useAppContext();
   const referenceTrackedApi = useReferenceTrackedApi(componentState);
@@ -118,9 +120,10 @@ export function useVars(
                           appContext,
                           options: {
                             defaultToOptionalMemberAccess: true,
+                            ...evalOptions,
                           },
                         })
-                      : extractParam(state, value, appContext, strict);
+                      : extractParam(state, value, appContext, strict, undefined, evalOptions);
                   } catch (e) {
                     console.log(state);
                     throw new ParseVarError(value, e);
@@ -187,7 +190,7 @@ export function useVars(
       }
     });
     return ret;
-  }, [appContext, componentState, fnDeps, memoedVars, referenceTrackedApi, vars]);
+  }, [appContext, componentState, evalOptions, fnDeps, memoedVars, referenceTrackedApi, vars]);
 
   return useShallowCompareMemoize(resolvedVars);
 }

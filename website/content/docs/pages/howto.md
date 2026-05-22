@@ -599,11 +599,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.team_members = [
-    { id: 1, name: 'Sarah Chen', role: 'Product Manager', email: 'sarah@company.com', avatar: 'https://i.pravatar.cc/100?u=sarah', department: 'Product', startDate: '2022-03-15' },
-    { id: 2, name: 'Marcus Johnson', role: 'Senior Developer', email: 'marcus@company.com', avatar: 'https://i.pravatar.cc/100?u=marcus', department: 'Engineering', startDate: '2021-08-20' },
-    { id: 3, name: 'Elena Rodriguez', role: 'UX Designer', email: 'elena@company.com', avatar: 'https://i.pravatar.cc/100?u=elena', department: 'Design', startDate: '2023-01-10' }
-  ]",
+  "initialize": "$state.team_members = [{ id: 1, name: 'Sarah Chen', role: 'Product Manager', email: 'sarah@company.com', avatar: 'https://i.pravatar.cc/100?u=sarah', department: 'Product', startDate: '2022-03-15' }, { id: 2, name: 'Marcus Johnson', role: 'Senior Developer', email: 'marcus@company.com', avatar: 'https://i.pravatar.cc/100?u=marcus', department: 'Engineering', startDate: '2021-08-20' }, { id: 3, name: 'Elena Rodriguez', role: 'UX Designer', email: 'elena@company.com', avatar: 'https://i.pravatar.cc/100?u=elena', department: 'Design', startDate: '2023-01-10' }]",
   "operations": {
     "get_team_members": {
       "url": "/team_members",
@@ -1076,28 +1072,7 @@ In this case the `DataSource` component does the heavy lifting by querying the p
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.pagination_items = [
-    { id: 1, name: 'Laptop Pro', price: 1299 },
-    { id: 2, name: 'Wireless Mouse', price: 29 },
-    { id: 3, name: 'Mechanical Keyboard', price: 149 },
-    { id: 4, name: '4K Monitor', price: 399 },
-    { id: 5, name: 'USB-C Hub', price: 79 },
-    { id: 6, name: 'Bluetooth Headphones', price: 199 },
-    { id: 7, name: 'Webcam HD', price: 89 },
-    { id: 8, name: 'Standing Desk', price: 299 },
-    { id: 9, name: 'Ergonomic Chair', price: 249 },
-    { id: 10, name: 'Desk Lamp', price: 45 },
-    { id: 11, name: 'Cable Organizer', price: 15 },
-    { id: 12, name: 'Mouse Pad', price: 12 },
-    { id: 13, name: 'Laptop Stand', price: 35 },
-    { id: 14, name: 'External SSD', price: 129 },
-    { id: 15, name: 'Wireless Charger', price: 59 },
-    { id: 16, name: 'Smart Speaker', price: 99 },
-    { id: 17, name: 'Fitness Tracker', price: 199 },
-    { id: 18, name: 'Tablet Pro', price: 799 },
-    { id: 19, name: 'Gaming Mouse', price: 89 },
-    { id: 20, name: 'Noise Cancelling Headphones', price: 349 }
-  ]",
+  "initialize": "$state.pagination_items = [{ id: 1, name: 'Laptop Pro', price: 1299 },{ id: 2, name: 'Wireless Mouse', price: 29 },{ id: 3, name: 'Mechanical Keyboard', price: 149 },{ id: 4, name: '4K Monitor', price: 399 },{ id: 5, name: 'USB-C Hub', price: 79 },{ id: 6, name: 'Bluetooth Headphones', price: 199 },{ id: 7, name: 'Webcam HD', price: 89 },{ id: 8, name: 'Standing Desk', price: 299 },{ id: 9, name: 'Ergonomic Chair', price: 249 },{ id: 10, name: 'Desk Lamp', price: 45 },{ id: 11, name: 'Cable Organizer', price: 15 },{ id: 12, name: 'Mouse Pad', price: 12 },{ id: 13, name: 'Laptop Stand', price: 35 },{ id: 14, name: 'External SSD', price: 129 },{ id: 15, name: 'Wireless Charger', price: 59 },{ id: 16, name: 'Smart Speaker', price: 99 },{ id: 17, name: 'Fitness Tracker', price: 199 },{ id: 18, name: 'Tablet Pro', price: 799 },{ id: 19, name: 'Gaming Mouse', price: 89 },{ id: 20, name: 'Noise Cancelling Headphones', price: 349 }]",
   "operations": {
     "get-pagination-items": {
       "url": "/pagination_items/:from/:to",

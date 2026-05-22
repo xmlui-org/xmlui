@@ -4,7 +4,7 @@ XMLUI enables to create forms without the hassle of managing, editing, validatin
 
 This example demonstrates the core pattern: a [Form](/docs/reference/components/Form) with input components placed directly inside it.
 
-```xmlui-pg display
+```xmlui-pg display id="forms-b6ec"
 <App>
   <Form data="{{ name: 'Joe', age: 43 }}">
     <FlowLayout>
@@ -34,7 +34,7 @@ This example demonstrates the core pattern: a [Form](/docs/reference/components/
 
 You can use any of XMLUI's layout mechanisms with a `Form`. Here is a single-column format using `FlowLayout`.
 
-```xmlui-pg display
+```xmlui-pg display id="form-layouts-ea4e"
 <App>
   <Form data="{{
       firstname: 'Jake',
@@ -54,7 +54,7 @@ You can use any of XMLUI's layout mechanisms with a `Form`. Here is a single-col
 
 Set each item's width to `50%` to create a two-column layout.
 
-```xmlui-pg display
+```xmlui-pg display id="form-layouts-eab2"
 <App>
   <Form
     data="{{
@@ -75,7 +75,7 @@ Set each item's width to `50%` to create a two-column layout.
 
 Use star sizing to allocate widths flexibly. Here `Firstname` and `Lastname` equally share the space remaining after the 100-px-wide `Title`.
 
-```xmlui-pg display
+```xmlui-pg display id="form-layouts-eab0"
 <App>
   <Form
     data="{{
@@ -105,7 +105,7 @@ Use XMLUI input components directly inside a `Form`. Each component has a `bindT
 
 ### Checkbox
 
-```xmlui-pg display
+```xmlui-pg display id="checkbox-163e"
 <App>
   <Form data="{{ option1: true, option2: false, option3: true }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
@@ -120,7 +120,7 @@ Use XMLUI input components directly inside a `Form`. Each component has a `bindT
 
 ### DatePicker
 
-```xmlui-pg display
+```xmlui-pg display id="datepicker-1662"
 <App>
   <Form
     data="{{ birthDate: '2021-04-08' }}"
@@ -136,7 +136,7 @@ Use XMLUI input components directly inside a `Form`. Each component has a `bindT
 
 Use `FileInput` to select one or multiple files.
 
-```xmlui-pg display
+```xmlui-pg display id="fileinput-16a0"
 <App>
   <Form
     data="{{ articles: null }}"
@@ -152,7 +152,7 @@ Use `FileInput` to select one or multiple files.
 
 Use `integersOnly` to restrict input to whole numbers.
 
-```xmlui-pg display
+```xmlui-pg display id="numberbox-integers-16e2"
 <App>
   <Form
     data="{{ age: 30 }}"
@@ -166,7 +166,7 @@ Use `integersOnly` to restrict input to whole numbers.
 
 ### NumberBox (floating-point)
 
-```xmlui-pg display
+```xmlui-pg display id="numberbox-floating-point-1716"
 <App>
   <Form
     data="{{ distance: 192.5 }}"
@@ -180,7 +180,7 @@ Use `integersOnly` to restrict input to whole numbers.
 
 ### RadioGroup
 
-```xmlui-pg display
+```xmlui-pg display id="radiogroup-1744"
 <App>
   <Form
     data="{{ title: 'Mr.' }}"
@@ -199,7 +199,7 @@ Use `integersOnly` to restrict input to whole numbers.
 
 ### Select
 
-```xmlui-pg display
+```xmlui-pg display id="select-1792"
 <App>
   <Form
     data="{{ size: 'xs' }}"
@@ -218,7 +218,7 @@ Use `integersOnly` to restrict input to whole numbers.
 
 ### Switch
 
-```xmlui-pg display
+```xmlui-pg display id="switch-17d0"
 <App>
   <Form
     data="{{ showBorder: true, showText: false, hideShadow: true }}"
@@ -234,7 +234,7 @@ Use `integersOnly` to restrict input to whole numbers.
 
 ### TextBox
 
-```xmlui-pg display
+```xmlui-pg display id="textbox-17fe"
 <App>
   <Form
     data="{{ name: 'Joe' }}"
@@ -248,7 +248,7 @@ Use `integersOnly` to restrict input to whole numbers.
 
 ### TextArea
 
-```xmlui-pg display
+```xmlui-pg display id="textarea-182c"
 <App>
   <Form
     data="{{ description: 'This is a description' }}"
@@ -286,7 +286,7 @@ Use the `bindTo` property to access fields in the structure.
 
 The `$data` variable holds all the form's data. You can use values in `$data` to control input component properties. Here the `Switch`s value sets the `enabled` property of a `TextBox`.
 
-```xmlui-pg display
+```xmlui-pg display id="refer-to-data-1944"
 <App>
   <Form data="{{ isEnabled: true, name: 'Joe' }}">
     <Switch label="Enable name" bindTo="isEnabled" />
@@ -297,7 +297,7 @@ The `$data` variable holds all the form's data. You can use values in `$data` to
 
 Other components in the form can reference the form's data too. Here the `Text` updates reactively when input values change.
 
-```xmlui-pg display
+```xmlui-pg display id="refer-to-data-1972"
 <App>
   <Form data="{{ firstname: 'John', lastname: 'Doe' }}">
     <TextBox label="Firstname" bindTo="firstname" />
@@ -309,7 +309,7 @@ Other components in the form can reference the form's data too. Here the `Text` 
 
 You can drill into `$data` to reference nested fields.
 
-```xmlui-pg display {9}
+```xmlui-pg display {9} id="refer-to-data-19a0"
 <App>
   <Form
     data="{{
@@ -331,7 +331,7 @@ Validation properties are set directly on the input component.
 
 ### `minLength`
 
-```xmlui-pg display
+```xmlui-pg display id="validate-data-19ee"
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <TextBox bindTo="name" minLength="10" label="minLength" />
@@ -343,7 +343,7 @@ Try submitting with fewer than 10 characters.
 
 ### `maxLength`
 
-```xmlui-pg display
+```xmlui-pg display id="validate-data-1a1c"
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <TextBox bindTo="name" maxLength="11" label="maxLength" />
@@ -355,7 +355,7 @@ Try entering more than 11 characters.
 
 ### `minValue`
 
-```xmlui-pg display
+```xmlui-pg display id="validate-data-1a4a"
 <App>
   <Form data="{{ age: 30 }}">
     <NumberBox bindTo="age" minValue="32" label="minValue" />
@@ -367,7 +367,7 @@ Try entering a number smaller than 32.
 
 ### `maxValue`
 
-```xmlui-pg display
+```xmlui-pg display id="validate-data-1a78"
 <App>
   <Form data="{{ age: 30 }}" >
     <NumberBox bindTo="age" maxValue="29" label="maxValue" />
@@ -381,7 +381,7 @@ Try entering a number larger than 29.
 
 Evaluate predefined regex patterns: "email", "url", or "phone".
 
-```xmlui-pg
+```xmlui-pg id="compound-validation-1aa6"
 <App>
   <Form data="{{
       mobile: '+13456123456',
@@ -401,7 +401,7 @@ See the [pattern property](/docs/reference/components/TextBox#pattern) of `TextB
 
 Evaluate a custom regex pattern.
 
-```xmlui-pg display
+```xmlui-pg display id="validation-specific-severity-1af4"
 <App>
   <Form data="{{ password: 'hello' }}">
     <!-- Only all uppercase letters are accepted -->
@@ -414,7 +414,7 @@ Evaluate a custom regex pattern.
 
 You can use multiple validations.
 
-```xmlui-pg display
+```xmlui-pg display id="validation-specific-messages-1b22"
 <App>
   <Form data="{{ site: 'http://www.example.com' }}">
     <TextBox bindTo="site" minLength="10" maxLength="30"
@@ -427,7 +427,7 @@ You can use multiple validations.
 
 By default, all validations have a severity level of **"error"**. You can set whether a validation should have a level of **"warning"** or **"error"**.
 
-```xmlui-pg display
+```xmlui-pg display id="server-side-validation-1b50"
 <App>
   <Form data="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}" >
     <TextBox
@@ -448,7 +448,7 @@ By default, all validations have a severity level of **"error"**. You can set wh
 
 Predefined validations have built-in messages that you can change.
 
-```xmlui-pg display
+```xmlui-pg display id="submit-data-1b9e"
 <App>
   <Form data="{{ age: 20 }}" >
     <NumberBox
@@ -471,7 +471,7 @@ The `Form` component can receive and display a server-side validation response. 
 
 By default the `Form` component provides a submit button to save the modified data.
 
-```xmlui-pg display
+```xmlui-pg display id="submit-data-1bec"
 <App>
   <Form onSubmit="toast('Saved!')" />
 </App>
@@ -479,7 +479,7 @@ By default the `Form` component provides a submit button to save the modified da
 
 The `onSubmit` accepts either a block of code or function. When you use a function it receives data in a parameter; in this example it's called `toSave` but you can use any name. The function can be defined inline, in a code-behind file, or in `index.html` attached to the global `window` variable. See the [Code](/code) chapter for details.
 
-```xmlui-pg display
+```xmlui-pg display id="submit-data-1c1a"
 <App>
   <Form
     data="{{ name: 'Joe', age: 43 }}"
@@ -493,7 +493,7 @@ The `onSubmit` accepts either a block of code or function. When you use a functi
 
 To submit via an `APICall`, use the `event` helper tag to bridge between the form and the API. The `Form`s `data` attribute maps to the `APICall`'s `$param` [context variable](/context-variables). A `Toast` popup reports success or error.
 
-```xmlui
+```xmlui id="submit-data-1cc6"
 <App>
   <Form data="{{ name: 'Joe', age: 43 }}">
     <event name="submit">
@@ -516,7 +516,7 @@ To submit via an `APICall`, use the `event` helper tag to bridge between the for
 
 For cases where no built-in input component fits your needs, use [FormItem](/docs/reference/components/FormItem) to wrap a custom input. `FormItem` exposes `$value` (the current value) and `$setValue` (a function to update it) to its children.
 
-```xmlui-pg display
+```xmlui-pg display id="custom-inputs-with-formitem-1d7a"
 <App>
   <Form
     data="{{ userAvailable: false }}"

@@ -33,6 +33,16 @@ export const PageMd = createMetadata({
       "The label of the page that is displayed in the navigation panel. If provided, the " +
         "a new entry will be added to the navigation panel.",
     ),
+    queryParams: {
+      description: "Optional query-string constraint declaration, for example `page:int(min=1)?,sort:enum(asc,desc)?`.",
+      valueType: "string",
+      isInternal: true,
+    },
+    guard: {
+      description: "Optional page-level navigation guard. Wave 4 reserves this prop for defended routing.",
+      valueType: "any",
+      isInternal: true,
+    },
   },
 });
 
@@ -44,6 +54,10 @@ export const pageRenderer = wrapComponent(PAGE, RouteWrapper, PageMd, {
         <RouteWrapper
           childRoute={node.children}
           uid={node.uid}
+          compiledRoute={(node.props as any).__compiledRoute}
+          pageUrl={(node.props as any).__pageUrl}
+          fallbackPath={(node.props as any).__fallbackPath}
+          guard={(node.props as any).__guard}
           renderChild={renderChild}
           key={extractValue(node.props.url)}
           classes={classes}

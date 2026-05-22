@@ -13,7 +13,11 @@ import { buildSuppressionMap, isSuppressed } from "../../../src/components-core/
  * importing the full React-based ComponentProvider.
  */
 function mockRegistry() {
-  return {} as any;
+  return {
+    hasComponent: () => true,
+    getComponentNames: () => [],
+    lookupComponentRenderer: () => undefined,
+  } as any;
 }
 
 // ---------------------------------------------------------------------------

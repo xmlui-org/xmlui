@@ -92,14 +92,17 @@ describe("rule: id-unknown-component", () => {
     expect(ruleResults).toHaveLength(0);
   });
 
-  it("emits no diagnostic when markupAst is not provided", () => {
+  it("auto-parses markup when markupAst is not provided", () => {
+    // Walker now lazy-parses the source if no markupAst is supplied, so the
+    // rule fires against the parsed tree. With an empty registry, the App
+    // root component itself is reported as unknown.
     const results = analyze({
       files: [{ file: "Test.xmlui", source: "<App />" }],
       componentRegistry: mockRegistry(),
       strict: false,
     });
     const ruleResults = results.filter((d) => d.code === "id-unknown-component");
-    expect(ruleResults).toHaveLength(0);
+    expect(ruleResults.length).toBeGreaterThan(0);
   });
 
   it("walks nested children and reports each unknown", () => {

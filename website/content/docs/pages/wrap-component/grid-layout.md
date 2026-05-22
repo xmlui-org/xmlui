@@ -14,7 +14,7 @@ Drag items to reposition. Drag the bottom-right handle to resize.
 
 ## Dashboard demo
 
-```xmlui-pg
+```xmlui-pg id="dashboard-demo-b6cf"
 ---app display
 <App>
   <GridLayout

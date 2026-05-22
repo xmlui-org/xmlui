@@ -895,6 +895,61 @@ test.describe("Event Handling", () => {
 // =============================================================================
 
 test.describe("Validation Behavior", () => {
+  test("matchValue validates FormItem confirmation fields", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form data="{{ password: '', confirmPassword: '' }}">
+        <FormItem
+          label="Password"
+          bindTo="password"
+          type="password"
+        />
+        <FormItem
+          label="Confirm Password"
+          bindTo="confirmPassword"
+          type="password"
+          validationMode="onChanged"
+          matchValue="{$data.password}"
+          matchInvalidMessage="Passwords do not match"
+        />
+      </Form>
+    `);
+
+    await page.getByRole("textbox", { name: "Password", exact: true }).fill("correct horse");
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("battery staple");
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
+
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("correct horse");
+    await expect(page.getByText("Passwords do not match")).not.toBeVisible();
+  });
+
+  test("matchValue validates directly bound input confirmation fields", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form data="{{ password: '', confirmPassword: '' }}">
+        <PasswordInput
+          label="Password"
+          bindTo="password"
+        />
+        <PasswordInput
+          label="Confirm Password"
+          bindTo="confirmPassword"
+          validationMode="onChanged"
+          matchValue="{$data.password}"
+          matchInvalidMessage="Passwords do not match"
+        />
+      </Form>
+    `);
+
+    await page.getByRole("textbox", { name: "Password", exact: true }).fill("correct horse");
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("battery staple");
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
+
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("correct horse");
+    await expect(page.getByText("Passwords do not match")).not.toBeVisible();
+  });
+
   test("checkbox forces verbose feedback when form is concise", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
@@ -2112,6 +2167,8 @@ test.describe("Regex Validation", () => {
     await fieldInput.field.fill("abc");
     await fieldInput.field.blur();
     await page.getByTestId("validateBtn").click();
-    await expect(page.getByTestId("field")).not.toContainText("Must be exactly 3 lowercase letters");
+    await expect(page.getByTestId("field")).not.toContainText(
+      "Must be exactly 3 lowercase letters",
+    );
   });
 });

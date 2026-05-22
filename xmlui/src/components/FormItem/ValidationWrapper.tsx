@@ -14,6 +14,7 @@ import { HelperText } from "./HelperText";
 import { FormItemContext } from "./FormItemContext";
 import { resolveFormItemId } from "./FormItemUtils";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
+import { useAppContext } from "../../components-core/AppContext";
 import styles from "./FormItem.module.scss";
 
 // data-* attributes that ComponentDecorator may have placed on the wrapper
@@ -81,6 +82,7 @@ export const ValidationWrapper = forwardRef<HTMLElement, ValidationWrapperProps>
 }, ref) {
   const validations = useShallowCompareMemoize(validationsInput);
   const isInsideForm = useIsInsideForm();
+  const appContext = useAppContext();
   const defaultId = useId();
   const { parentFormItemId } = useContext(FormItemContext);
 
@@ -165,7 +167,10 @@ export const ValidationWrapper = forwardRef<HTMLElement, ValidationWrapperProps>
   const invalidMessages =
     validationResult?.validations
       .filter((validation) => !validation.isValid && validation.invalidMessage)
-      .map((validation) => validation.invalidMessage!) ?? [];
+      .map((validation) => {
+        const msg = validation.invalidMessage!;
+        return msg.startsWith("xmlui.") ? appContext.App.translate(msg) : msg;
+      }) ?? [];
 
   const validationResultDisplay =
     effectiveVerboseValidationFeedback === false ? null : (
@@ -182,7 +187,11 @@ export const ValidationWrapper = forwardRef<HTMLElement, ValidationWrapperProps>
               )}
               {!singleValidation.isValid && !!singleValidation.invalidMessage && (
                 <HelperText
-                  text={singleValidation.invalidMessage}
+                  text={
+                    singleValidation.invalidMessage.startsWith("xmlui.")
+                      ? appContext.App.translate(singleValidation.invalidMessage)
+                      : singleValidation.invalidMessage
+                  }
                   status={singleValidation.severity}
                   style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
                 />

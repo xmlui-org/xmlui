@@ -67,6 +67,12 @@ When an event handler assigns `myVar = ds` (a component API reference), the redu
 
 Created via `createContainerReducer(debugView)` using Immer `produce()`.
 
+Wave 4 determinism note: `Container` and `ComponentAdapter` mark render phases with
+`enterRenderPhase()` / `exitRenderPhase()`. If `createContainerReducer()` observes a state write
+while that marker is active, it emits a `kind:"scheduler"` trace with
+`code:"determinism-state-write-after-render"`. The reducer still applies the action; the diagnostic
+is a Managed React warning/error surface for render-time writes.
+
 ### ContainerActionKind Enum (9 actions)
 
 | Action | Trigger | State effect |

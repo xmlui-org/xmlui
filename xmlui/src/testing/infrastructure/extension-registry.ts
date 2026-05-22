@@ -15,6 +15,8 @@ export const extensionRegistry: Record<string, () => Promise<any>> = {
   "xmlui-masonry": () => import("xmlui-masonry"),
   "xmlui-tiptap-editor": () => import("xmlui-tiptap-editor"),
   "xmlui-crm-blocks": () => import("xmlui-crm-blocks"),
+  "xmlui-calendar": () => import("xmlui-calendar"),
+  "xmlui-grid-layout": () => import("xmlui-grid-layout"),
   // Add more extensions here as needed:
   // "xmlui-spreadsheet": () => import("xmlui-spreadsheet"),
 };

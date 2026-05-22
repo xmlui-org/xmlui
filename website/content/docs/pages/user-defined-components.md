@@ -6,7 +6,7 @@ Such refactoring requires you to create and name new `.xmlui` files, identify in
 
 Here's a simple component to package a name/value pair.
 
-```xmlui-pg display noHeader
+```xmlui-pg display noHeader id="user-defined-components-b6c8"
 ---app display
 <App>
   <NameValue name="Mary" value="123" />

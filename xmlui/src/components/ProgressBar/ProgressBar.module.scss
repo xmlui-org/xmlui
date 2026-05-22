@@ -28,7 +28,7 @@ $thickness-ProgressBar: createThemeVar("thickness-ProgressBar");
     position: absolute;
     background-color: $color-indicator-ProgressBar;
     border-radius: $borderRadius-indicator-ProgressBar;
-    left: 0;
+    inset-inline-start: 0;
     top: 0;
     bottom: 0;
 

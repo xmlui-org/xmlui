@@ -118,7 +118,8 @@ dependencies.
 
 ### Scope
 
-- Add `App.appGlobals.strictRouting: boolean` (default `false`;
+- Add `App.appGlobals.strictRouting: boolean` (default `true` since
+  2026-05;
   flips to `true` in the next major).
 - Create `xmlui/src/components-core/routing/` with stubs:
 
@@ -639,7 +640,7 @@ Steps 1–3.
 
 ---
 
-### Step 4.2 — Default `strictRouting: true` in Next Major
+### Step 4.2 — Default `strictRouting: true` (✅ Shipped 2026-05)
 
 **Priority:** 9 (post-feedback)
 
@@ -786,10 +787,10 @@ alternative noted for future revisitation.
    considered: sync-only — rejected because the realistic uses
    are async.
 
-10. **`strictRouting` default flip waits for a major.** Same
-    rationale as the other plans — the warn-mode telemetry window
-    is needed before failing on unknown constraints and on
-    non-canonical bookmarks.
+10. ~~**`strictRouting` default flip waits for a major.**~~ **Resolved
+    2026-05:** flipped in plan #10 Step 4.2 — the warn-mode telemetry
+    window proved out and the default is now `true`. Apps that need
+    the old behaviour set `strictRouting: false`.
 
 ---
 

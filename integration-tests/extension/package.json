@@ -2,22 +2,29 @@
   "name": "xmlui-test-extension",
   "type": "module",
   "version": "0.1.1",
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-test-extension.mjs",
-      "require": "./dist/xmlui-test-extension.js"
-    }
-  },
   "scripts": {
-    "build:extension": "xmlui build-lib"
+    "build:extension": "xmlui build-lib",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "devDependencies": {
     "xmlui": "*"
   },
   "files": [
     "dist"
-  ]
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-test-extension.mjs",
+          "require": "./dist/xmlui-test-extension.js"
+        }
+      }
+    }
+  }
 }

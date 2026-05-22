@@ -585,6 +585,70 @@ test.describe("Basic Functionality", () => {
     // Event should have fired
     await expect.poll(testStateDriver.testState).toEqual("changed");
   });
+
+  test("clear button hidden when initialValue is null", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" initialValue="{null}" placeholder="Pick one">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await expect(driver.component).toBeVisible();
+
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button hidden when initialValue is undefined", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" initialValue="{undefined}" placeholder="Pick one">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await expect(driver.component).toBeVisible();
+
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button hidden after setValue(null)", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select id="sel" clearable="true" placeholder="Pick one">
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+        </Select>
+        <Button testId="resetBtn" onClick="sel.setValue(null)" label="Reset" />
+      </Fragment>
+    `);
+    const driver = await createSelectDriver("sel");
+    const resetBtn = page.getByTestId("resetBtn");
+    await expect(driver.component).toBeVisible();
+    await expect(resetBtn).toBeVisible();
+
+    // Initially no value — clear button absent.
+    await expect(driver.clearButton).not.toBeVisible();
+
+    // Pick a value so the clear button appears.
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+    await expect(driver.clearButton).toBeVisible();
+
+    // Programmatically reset to null via setValue — clear button hides again.
+    await resetBtn.click();
+    await expect(driver.clearButton).not.toBeVisible();
+  });
 });
 
 // =============================================================================
