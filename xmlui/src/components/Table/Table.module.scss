@@ -148,7 +148,6 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    border-bottom: $borderBottom-cell-Table;
 
     &.alignTop {
       align-items: flex-start;
@@ -166,6 +165,13 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
     &[data-column-id="select"] {
       overflow: visible;
     }
+  }
+
+  // Header divider stays on the header cells. Row dividers move to the row
+  // itself (see .row below) so the line spans the full row width even when the
+  // last column is resized narrower than the table.
+  .columnCell {
+    border-bottom: $borderBottom-cell-Table;
   }
 
   .table {
@@ -253,6 +259,9 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
       font-size: $fontSize-row-Table;
       font-weight: $fontWeight-row-Table;
       background-color: $backgroundColor-row-Table;
+      // Row divider lives on the row, not the cells, so it spans the full row
+      // width even when the last column is resized narrower than the table.
+      border-bottom: $borderBottom-cell-Table;
       --pinned-cell-bg: #{$backgroundColor-row-Table};
       --checkbox-cell-bg: #{$backgroundColor-selectionCell-Table};
 
@@ -312,16 +321,12 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
         opacity: 0.6;
       }
 
-      &:last-child{
-        .cell {
-          border-bottom: $borderBottom-last-row-Table;
-        }
+      &:last-child {
+        border-bottom: $borderBottom-last-row-Table;
       }
 
       &.noBottomBorder:last-child {
-        .cell {
-          border-bottom: none;
-        }
+        border-bottom: none;
       }
     }
   }
