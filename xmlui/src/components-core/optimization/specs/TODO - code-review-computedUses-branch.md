@@ -1,57 +1,13 @@
 # Code Review: `yurii/computedUses` branch vs `main` — Outstanding Items
 
 > Analysis Date: 2026-05-15
-> Last Update: 2026-05-22 (N2 + D6 consolidated — `gatherIdentifiers` / `rootIdentifier` / `depsOfValueWithReads` now live in `visitors.ts`)
+> Last Update: 2026-05-25 (N3 + N4 resolved — LRU-bounded `astCache`; `unwrapToComponentDef()` replaces magic-constant drill-down loop)
 > Comparison: `0c42b6f3a5d7e86aff7b8119699bbadc2e7bdd31` (merge-base) → HEAD
-> Resolved items (B1, D4, N1, N5, D8, C4, N2, D6) have been removed from this file.
+> Resolved items (B1, D4, N1, N5, D8, C4, N2, D6, N3, N4) have been removed from this file.
 
 ---
 
 ## 🟠 Reference-identity / fragile patterns
-
-### N3: Unbounded module-level `astCache` in `computedUses.ts`
-
-[computedUses.ts:39-49](xmlui/src/components-core/optimization/computedUses.ts#L39-L49):
-
-```ts
-const astCache = new Map<string, Statement[]>();
-function parse(source: string): Statement[] {
-  if (astCache.has(source)) return astCache.get(source)!;
-  ...
-  astCache.set(source, statements);
-  return statements;
-}
-```
-
-- The cache is never evicted (no LRU, no size cap). Long-running studio/devserver sessions with hot-module reload can accumulate AST entries for source strings that are no longer referenced by any component.
-- Cache key is the raw event-handler string — typical event handlers are short and repeated, so most of the time the cache stays bounded. But generated XMLUI (e.g. from a low-code editor) could push thousands of unique strings.
-
-**Action:** Add a soft cap (e.g. 1000 entries, LRU) — or document the intended boot-time-only usage and ensure the cache is reset between app boots.
-
----
-
-### N4: `computeUsesForTree` "drill-down" walks via `(actualRoot as any).component`
-
-[computedUses.ts:598-613](xmlui/src/components-core/optimization/computedUses.ts#L598-L613):
-
-```ts
-let actualRoot: ComponentDef = root;
-for (let i = 0; i < 3; i++) {
-  const next = (actualRoot as any).component;
-  if (!next) break;
-  if ((next as any).type || Array.isArray((next as any).children)) {
-    actualRoot = next;
-    break;
-  }
-  actualRoot = next;
-}
-```
-
-The hard-coded "loop 3 times" is a fragile attempt to handle both `CompoundComponentDef` (which has a `.component` field) and bare `ComponentDef` trees. Magic constants + `as any` casts encode an undocumented invariant ("CompoundComponent wrappers are nested at most 3 deep"). If the wrapping layout ever grows by one level, computedUses silently stops analyzing the inner tree.
-
-**Action:** Replace with a type-guarded `unwrapToComponentDef(node)` helper that follows `.component` until it lands on a node with `type` or `children`, with no arbitrary depth cap. Or use a discriminated union and exhaustive narrowing.
-
----
 
 ### N6: Render-phase ref mutation also lives in `Container.tsx`
 
@@ -134,15 +90,17 @@ In strict mode React doubles the number of renders → counter is 2× inflated. 
 
 ## 🟥 Potential Bugs
 
-### B3: In-place mutation of `computedUses` — partly addressed
+### ✅ B3: In-place mutation of `computedUses` — RESOLVED (2026-05-25)
 
-`computeUsesForTree` still mutates `node.computedUses` in-place. Called in [xmlui-parser.ts:59](xmlui/src/components-core/xmlui-parser.ts#L59), [StandaloneApp.tsx:733](xmlui/src/components-core/StandaloneApp.tsx#L733), and again for each compound component at [StandaloneApp.tsx:762-764](xmlui/src/components-core/StandaloneApp.tsx#L762-L764).
+`computeUsesForTree` mutates `node.computedUses` in-place. Called in [xmlui-parser.ts:59](xmlui/src/components-core/xmlui-parser.ts#L59), [StandaloneApp.tsx:733](xmlui/src/components-core/StandaloneApp.tsx#L733), and again for each compound component at [StandaloneApp.tsx:762-764](xmlui/src/components-core/StandaloneApp.tsx#L762-L764).
 
-**Mitigation present:** `CompoundComponent.tsx:108` explicitly strips a stale `computedUses` from the cloned compound (`computedUses: _staleComputedUses, ...rest`). This is necessary because the compound's `vars`/`functions` get re-shaped before re-wrapping, and any pre-computed `computedUses` referenced the *old* topology — see `Invariant: "Runtime Restructure"` in the spec.
+**Mitigations:**
+1. **Mechanical guard at start of `computeUsesInternal`:** Line 185 clears `node.computedUses = undefined` before any analysis. This ensures each traversal's result is the single source of truth. Stale values from prior passes are always cleared — no risk of survival between parse-time (before `.xs` merge) and runtime-time (after `.xs` merge) passes.
+2. **Tree restructuring:** `CompoundComponent.tsx:108` explicitly strips stale `computedUses` from cloned compounds (`computedUses: _staleComputedUses, ...rest`), protecting against the "Runtime Restructure" invariant violation.
 
-**Remaining risk:** No general invariant prevents other future code paths from restructuring a tree without dropping `computedUses`. The spec calls this out (§5) but it's a manual rule rather than a mechanical guard.
+**Real-world bug (Bug 30):** FileVersionsDrawer component — when clicking Restore button inside Table, the handler threw `"Cannot read properties of undefined (reading 'close')"`. Root cause: pass 1 (parse-time, no `.xs`) set `Table.computedUses = ["handleRestore"]` narrowing parent state; pass 2 (runtime-time, with `.xs`) should have cleared it but couldn't without the mechanical guard — resulting in `versionsDrawer` being filtered from the Table's scoped state.
 
-**Possible hardening:** Add a build-time assertion that nodes returned from any topology-rewrite helper do not carry `computedUses`. Or move `computedUses` off the node object entirely (e.g. WeakMap keyed by node).
+**Impact of fix:** Regression test added (`computedUses.test.ts` — "Bug 30: Stale computedUses..."). Verify: test passes (both pass 1 and pass 2 assertions correct).
 
 ---
 
@@ -187,14 +145,11 @@ Not blocking; it just means a new component author has to remember two edits.
 
 | #   | Location                                                        | Problem                                                                       | Severity        |
 |-----|-----------------------------------------------------------------|-------------------------------------------------------------------------------|-----------------|
-| N3  | `computedUses.ts:39-49`                                         | Unbounded module-level `astCache`                                             | 🟠 Fragile      |
-| N4  | `computedUses.ts:598-613`                                       | `for (let i=0; i<3; i++)` drill-down with `as any`                            | 🟠 Fragile      |
 | N6  | `Container.tsx:159-160`                                         | Same render-phase ref mutation as R2                                          | 📝 Note         |
 | P3  | `ComponentWrapper` + `StateContainer`                           | Double `extractScopedState`                                                   | 🔵 Low priority |
 | P4  | `ContainerWrapper.tsx:184`                                      | `getWrappedWithContainer` runs on every `node` identity flip                  | 🔵 Low priority |
 | R2  | `ComponentWrapper.tsx:106`                                      | Render-phase ref mutation                                                     | 📝 Note         |
 | R3  | `StateContainer.tsx:176-187`                                    | Dev profiler render counter strict-mode-doubled                               | 📝 Note         |
-| B3  | `computedUses.ts`                                               | In-place mutation of `computedUses`                                           | 📝 Note         |
 | D3  | `ContainerWrapper.tsx` ↔ `ModalDialog.tsx`                      | `_savedVarDefs` untyped                                                       | 🔵 Minor        |
 | D5  | `computedUses.ts:85-119`                                        | `JS_STDLIB_GLOBALS` manual list                                               | 🔵 Minor        |
 | D7  | `optimizer-metadata.ts` + 20 `.tsx` re-exports                  | Manual projection of metadata into `.tsx` files                               | 🔵 Minor        |
@@ -203,8 +158,10 @@ Not blocking; it just means a new component author has to remember two edits.
 
 ## Priority of Actions
 
-1. 🟠 **Recommended next:** N3 (bound `astCache`); N4 (eliminate the 3-deep magic loop).
-2. 🔵 **Hygiene:** D3, D7.
-3. 📝 **Defer:** P3, P4, R2, R3, N6, B3, D5 — already adequately mitigated, low-cost low-frequency, or React-version-specific.
+1. 🔵 **Hygiene:** D3, D7.
+2. 📝 **Defer:** P3, P4, R2, R3, N6, D5 — already adequately mitigated, low-cost low-frequency, or React-version-specific.
 
 The remaining items are all cleanup-grade — none should block merging.
+
+**Resolved (2026-05-25):**
+- ✅ **B3** — Mechanical guard (clear `node.computedUses` at start of `computeUsesInternal`) ensures each pass is independent. Addresses "State Cleanliness Between Multi-Pass Analysis" invariant in the specification.

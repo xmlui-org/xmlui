@@ -1801,3 +1801,129 @@ describe.skipIf(skipIfDisabled)(
     );
   },
 );
+
+// ---------------------------------------------------------------------------
+// regression guard: computeUsesForTree must correctly analyze the inner
+// ComponentDef even when called with a CompoundComponentDef wrapper.
+//
+// Before the fix, a hard-coded "for i<3" loop with `as any` drilled into
+// `.component`.  After the fix, `unwrapToComponentDef()` follows the chain
+// without a magic depth cap, and a plain ComponentDef (no `.component` field)
+// is returned as-is.
+// ---------------------------------------------------------------------------
+describe.skipIf(skipIfDisabled)(
+  "computeUsesForTree — N4: unwrapToComponentDef handles CompoundComponentDef wrappers",
+  () => {
+    it("plain ComponentDef (no .component field) is analyzed directly", () => {
+      const root = node("Stack", {
+        vars: { a: "{0}" },
+        children: [node("Text", { props: { text: "{externalVar}" } })],
+      });
+      computeUsesForTree(root);
+      expect(root.computedUses).toContain("externalVar");
+    });
+
+    it("one-level CompoundComponentDef wrapper: inner ComponentDef is analyzed", () => {
+      // Simulate the shape StandaloneApp passes for a compound component:
+      // { name: "MyComp", component: { type: "Stack", ... } }
+      const innerComponent = node("Stack", {
+        vars: { x: "{0}" },
+        children: [node("Text", { props: { text: "{outerDep}" } })],
+      });
+      const compoundWrapper: any = {
+        name: "MyComp",
+        component: innerComponent,
+      };
+      computeUsesForTree(compoundWrapper);
+      // computedUses is set on the inner node, not the wrapper
+      expect(innerComponent.computedUses).toContain("outerDep");
+    });
+
+    it("two-level wrapper chain: innermost ComponentDef is still analyzed", () => {
+      // A wrapper whose .component is itself another wrapper-like object.
+      const realComponent = node("Stack", {
+        vars: { y: "{0}" },
+        children: [node("Text", { props: { text: "{deepDep}" } })],
+      });
+      const middleWrapper: any = { component: realComponent };
+      const outerWrapper: any = { component: middleWrapper };
+      computeUsesForTree(outerWrapper);
+      expect(realComponent.computedUses).toContain("deepDep");
+    });
+  },
+);
+
+// ---------------------------------------------------------------------------
+// Bug 30: Stale computedUses Survives Between Two Passes (Parse-time and Runtime-time)
+//
+// Symptom: ComponentDef trees are analyzed twice:
+//   1) In xmlui-parser.ts after parsing .xmlui, BEFORE .xs code-behind is merged
+//   2) In StandaloneApp.tsx after merging .xs — node.functions now present
+//
+// Between passes, nodes are NOT cloned—the same object references are reused.
+// If pass 1 sets node.computedUses but pass 2 determines safeToNarrow=false
+// (because functions are now known), the old computedUses from pass 1 survives.
+// This causes stale narrowing at runtime: component references become undefined.
+//
+// Root cause: node.computedUses was set in-place by computeUsesInternal and
+// never cleared when re-analyzing would mark safeToNarrow=false. The fix is
+// mechanical: clear node.computedUses = undefined at the start of each traversal
+// to ensure the current pass is the single source of truth.
+// ---------------------------------------------------------------------------
+describe.skipIf(skipIfDisabled)(
+  "Bug 30: Stale computedUses Survives Between Two Passes (Parse-time and Runtime-time)",
+  () => {
+    it("REGRESSION: stale computedUses from parse-time pass survives into runtime-time pass once .xs functions are merged", () => {
+      const button = node("Button", {
+        props: { when: "{!$item.isCurrent}" },
+        events: { click: parsedEvent("() => handleRestore($item)") },
+      });
+      const column = node("Column", {
+        props: { header: "", width: "40px" },
+        children: [button],
+      });
+      const table = node("Table", {
+        props: { items: "{items}" },
+        children: [column],
+      });
+      const drawer = node("Drawer", {
+        uid: "versionsDrawer",
+        props: { position: "right" },
+        children: [table],
+      });
+
+      // ── PASS 1: parser-level call, BEFORE .xs merge ──
+      // The root has vars (so it's a container) but NO functions yet, because
+      // the .xs file hasn't been read in. This mirrors xmlui-parser.ts:60.
+      const root: ComponentDef = {
+        type: "Fragment",
+        vars: { item: "{null}" },
+        // functions: undefined  ← .xs not merged yet
+        children: [drawer],
+      };
+      computeUsesForTree(root);
+      const passOneTable = table.computedUses;
+      // Pass 1 narrows the Table because handleRestore looks like a free
+      // var coming from parent state (no .xs functions known yet).
+      expect(passOneTable).toContain("handleRestore");
+      expect(passOneTable).not.toContain("versionsDrawer");
+
+      // ── PASS 2: StandaloneApp call, AFTER .xs merge ──
+      // Now the root has functions from .xs. We do NOT clone the children —
+      // they are the SAME object references, exactly as in production
+      // StandaloneApp.tsx:744-757 (which spreads `compound.component` but
+      // keeps `children` by reference).
+      (root as any).functions = {
+        handleRestore: "(version) => { versionsDrawer.close(); }" as any,
+      };
+      computeUsesForTree(root);
+      const passTwoTable = table.computedUses;
+
+      // EXPECTED: Pass 2 should recognise handleRestore as a parent function
+      // and CLEAR the stale narrowing → table.computedUses should be undefined.
+      // The mechanical guard at the start of computeUsesInternal (node.computedUses = undefined)
+      // ensures stale values from pass 1 don't survive into pass 2.
+      expect(passTwoTable, "Pass 2 should clear stale computedUses set by pass 1 once handleRestore is recognised as a parent function").toBeUndefined();
+    });
+  },
+);

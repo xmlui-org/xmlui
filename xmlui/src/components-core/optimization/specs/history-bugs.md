@@ -968,3 +968,58 @@ myworkdrive's context menu was the **first real app pattern** to nest a UDC unde
 - Playwright: [src/components/ContextMenu/ContextMenu.spec.ts](../../src/components/ContextMenu/ContextMenu.spec.ts) → tests `"compound component child reads $context via $props"` and `"second openAt with new $context refreshes child UDC var resolution"` — reproduces myworkdrive shape (`<ContextMenu><MyMenu context="{$context}"/></ContextMenu>` where `MyMenu` is a UDC reading `$props.context`).
 
 **Files:** `xmlui/src/components-core/state/variable-resolution.ts`, `xmlui/tests/components-core/state/variable-resolution.test.ts`, `xmlui/src/components/ContextMenu/ContextMenu.spec.ts`, `xmlui/src/components-core/optimization/specs/computed-uses-specification.md`.
+
+---
+
+### Bug 30: Stale `computedUses` Survives Between Parse-Time and Runtime-Time Passes
+
+**Symptom:** In `myworkdrive` application, when clicking the Restore button on a file version in `FileVersionsDrawer`, the handler threw:
+```
+TypeError: Cannot read properties of undefined (reading 'close')
+```
+The handler code (`handleRestore`) called `versionsDrawer.close()`, but `versionsDrawer` (the Drawer UID) was `undefined` at runtime.
+
+**Cause (full chain):**
+
+1. **Two-pass execution model:** `computeUsesForTree` is called on overlapping node objects at different points:
+   - **Pass 1 (parse-time, `xmlui-parser.ts:59`):** After parsing `.xmlui` file, before `.xs` code-behind merge. At this point, `node.functions = undefined`.
+   - **Pass 2 (runtime-time, `StandaloneApp.tsx:733`):** After merging `.xs` code-behind. Now `node.functions` contains parent-scope functions.
+
+2. **Node object reuse:** Between passes, node objects are NOT cloned. The same `ComponentDef` references are reused (e.g., `compound.component.children[i]` passed to both passes). This is by design for memory efficiency.
+
+3. **Stale narrowing survival:**
+   - Pass 1: No parent functions known → `Table` has `parentDependencies = {handleRestore, items}` → `computedUses = ["handleRestore", "items"]` set on Table.
+   - Pass 2: Now parent has `functions = {handleRestore, ...}` → analyzer recognizes `handleRestore` as parent function → `dependsOnParentFunction = false` for Table → **`safeToNarrow = false`** → algorithm skips the narrowing block.
+   - **Problem:** The `if (safeToNarrow)` block is skipped, but `node.computedUses` from pass 1 is never cleared. Stale narrowing survives.
+
+4. **Runtime consequence:** `ComponentWrapper` calls `extractScopedState(parentState, node.computedUses)` with the stale `["handleRestore", "items"]`. The Drawer UID `versionsDrawer` is not in this list → filtered out → `stateFromOutside = {handleRestore, items}` (no drawer). Inside the event handler, `versionsDrawer` resolves to `undefined` → `versionsDrawer.close()` throws.
+
+**Why single-pass analysis doesn't catch this:** Components with only template analysis (no code-behind) never trigger multi-pass re-analysis. The bug only surfaces when:
+1. Component is parsed first (no functions known)
+2. Then `.xs` code-behind is merged (functions now present)
+3. Child nodes reference parent functions (triggers `dependsOnParentFunction` check)
+
+**Fix:** Mechanical guard at the **start of `computeUsesInternal`**:
+```ts
+node.computedUses = undefined;  // ← line 185
+```
+
+**Why mechanical (unconditional) is correct:**
+- Each traversal recalculates `computedUses` immediately after clearing, so no information is lost.
+- Ensures **each pass is independent** — prior results don't influence new analysis.
+- Future-proof: protects against any code path that calls `computeUsesForTree` on reused nodes.
+- Simple and obvious: no conditional logic to maintain.
+
+**Why not conditional?** A conditional approach (clear only if `safeToNarrow === false`) would add complexity and implicit rules. The invariant becomes: "clear when narrowing is NOT safe, but set when it IS safe" — requiring readers to understand the interaction. A mechanical guard is simpler: "always clear first, then recalculate."
+
+**Regression test:** [tests/components-core/optimization/computedUses.test.ts](../../tests/components-core/optimization/computedUses.test.ts) — describe block `"Bug 30: Stale computedUses Survives Between Two Passes"`. Simulates:
+1. Pass 1: root has `vars` but no `functions` → Table narrowed to `["handleRestore", ...]`.
+2. Pass 2: root gains `functions: {handleRestore}` (same node objects) → Table.computedUses cleared → becomes `undefined` (as expected).
+
+**Files:** 
+- `xmlui/src/components-core/optimization/computedUses.ts` (line 185)
+- `xmlui/tests/components-core/optimization/computedUses.test.ts` (regression test)
+- `xmlui/src/components-core/optimization/specs/computed-uses-specification.md` (new invariant § 5.5)
+- `xmlui/src/components-core/optimization/specs/TODO - code-review-computedUses-branch.md` (B3 marked resolved)
+
+**Keep in mind:** This bug demonstrates why node objects **must** be cleared of analysis results before re-analysis. The same pattern applies to any future static metadata (e.g., `computedWrites`, `computedClosure`) — always clear before recalculating.

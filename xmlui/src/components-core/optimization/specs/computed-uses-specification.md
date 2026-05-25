@@ -41,6 +41,12 @@ The algorithm works bottom-up, traversing the `ComponentDef` tree before connect
 6. Excludes **Unstable Global Variables** (`UNSTABLE_GLOBAL_VARS`). These are navigation keys (like `$pathname`) declared in root metadata (`unstableChildInjectedVars`).
 7. Forms the `computedUses` list — a minimum set of parent state keys (including necessary child component UIDs that will register their API higher up the tree).
 
+#### Entry-point: `unwrapToComponentDef`
+`computeUsesForTree` may be called with a `CompoundComponentDef` wrapper (e.g., from `StandaloneApp`) whose actual template lives in a `.component` chain. `unwrapToComponentDef()` follows the chain — without a hard depth cap — until it reaches a node that has a `type` string or a `children` array. 
+
+#### AST parse cache (`astCache`)
+Event-handler strings are parsed once and cached to avoid redundant AST work during boot-time traversal. The cache is an **LRU with a cap of 1 000 entries**, implemented cheaply via JavaScript `Map`'s insertion-order guarantee (delete + re-insert on hit; evict the first/oldest key at capacity). This bounds memory in long-running devserver/studio sessions where generated XMLUI could otherwise accumulate thousands of unique event strings.
+
 ### Runtime Protection (Defense-in-depth)
 - **`ComponentWrapper`:** Uses `extractScopedState(state, computedUses)` and memoizes the result via `useShallowCompareMemoize`. State updates are terminated here if dependencies haven't changed, and lower wrappers aren't even executed.
 - **`ContainerWrapper`:** Receives the narrowed state `parentState={scopedParentState}` and is responsible for deploying the `StateContainer`. It checks if the node is a container (via `isContainerLike`, which considers the presence of `computedUses`).
@@ -145,6 +151,30 @@ for (const key of Object.keys(parentState)) {
 
 **CRITICAL:** The static `computedUses` array is calculated for a specific tree topology. Any process (like `CompoundComponent.tsx`) that restructures the tree at runtime (e.g., moving `vars` or removing a wrapper) leaves the existing `computedUses` **invalid**, leading to state loss for children.
 **Rule:** Always discard `computedUses` (`delete node.computedUses`) if the code generator creates or removes wrapper containers.
+
+---
+
+## 5.5. Invariant: "State Cleanliness Between Multi-Pass Analysis"
+
+**CRITICAL:** The `computeUsesForTree` algorithm is called **multiple times** on overlapping or reused node objects:
+1. In `xmlui-parser.ts:59` after parsing each `.xmlui` file (before `.xs` code-behind is merged)
+2. In `StandaloneApp.tsx:733` for compound components (after `.xs` functions are attached)
+3. Per-instance in `StandaloneApp.tsx:762-764` for each compound node reference
+
+Between passes, node objects are **NOT cloned** — the same `ComponentDef` references are reused (e.g., `compound.component.children[i]`).
+
+**Problem:** If pass 1 sets `node.computedUses` but later passes determine a different narrowing is needed (e.g., because `node.functions` was populated), the stale value from pass 1 survives. This causes incorrect narrowing at runtime.
+
+**Mechanical Guard:** At the **start of `computeUsesInternal`** (before any analysis):
+```ts
+node.computedUses = undefined;
+```
+
+This ensures each traversal starts with clean state. The current pass becomes the single source of truth for `computedUses`. Stale values from previous passes are always cleared.
+
+**Why mechanical (not conditional):** A conditional clear-only-if-needed approach would add control-flow complexity. Clearing unconditionally is safe (we recalculate immediately) and guarantees correctness regardless of code path or future refactoring.
+
+**Real-world impact:** Without this guard, FileVersionsDrawer's Restore button threw `"Cannot read properties of undefined (reading 'close')"` because pass 1 (no `.xs`) narrowed the Table container to `computedUses=["handleRestore"]`, and pass 2 (with `.xs`) couldn't override it — the component reference `versionsDrawer` was filtered during state narrowing at runtime (Bug 30).
 
 ---
 

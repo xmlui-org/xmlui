@@ -33,16 +33,32 @@ import type { Statement } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
 import { isContainerLike } from "../rendering/ContainerUtils";
 
-// Cache for parsed raw strings (like event handlers) to avoid redundant AST
-// generation during boot-time traversal.
+// LRU cache for parsed raw strings — bounded to avoid unbounded memory growth in
+// long-running devserver / studio sessions. AST_CACHE_MAX_SIZE entries cover
+// virtually all real XMLUI apps (typical event handlers are short and repeated);
+// the cap guards against generated XMLUI with thousands of unique strings.
+//
+// LRU eviction is implemented cheaply using the insertion-order guarantee of
+// JavaScript's Map: delete + re-insert on a cache hit moves the entry to the
+// "most recently used" end; eviction always removes the first (oldest) entry.
+const AST_CACHE_MAX_SIZE = 1_000;
 const astCache = new Map<string, Statement[]>();
 
 function parse(source: string): Statement[] {
-  if (astCache.has(source)) {
-    return astCache.get(source)!;
+  const cached = astCache.get(source);
+  if (cached !== undefined) {
+    // LRU: re-insert to promote this entry to most-recently-used position.
+    astCache.delete(source);
+    astCache.set(source, cached);
+    return cached;
   }
   const parser = new Parser(source);
   const statements = parser.parseStatements();
+  // Evict the oldest entry when at capacity (Map iteration order = insertion order).
+  if (astCache.size >= AST_CACHE_MAX_SIZE) {
+    const oldestKey = astCache.keys().next().value!;
+    astCache.delete(oldestKey);
+  }
   astCache.set(source, statements);
   return statements;
 }
@@ -166,6 +182,18 @@ function computeUsesInternal(
   injectedVarsScope: ReadonlySet<string> = EMPTY_SET,
   metadataLookup?: (type: string) => ComponentMetadata | undefined,
 ): [Set<string>, Set<string>, Set<string>] {
+  // Clear any stale `computedUses` from a prior traversal so this pass is
+  // the single source of truth for the field. Two traversals over the same
+  // tree are routine: the parser sets it once before `.xs` code-behind is
+  // merged (no `node.functions` known → some containers get narrowed), and
+  // StandaloneApp re-runs the analysis after the merge (functions now visible
+  // → `dependsOnParentFunction` flips `safeToNarrow` to false). The narrow-
+  // setting branch below is gated by `if (... && safeToNarrow)`, so without
+  // this reset the stale value from pass 1 would survive, isolating a
+  // container from sibling APIs registered in the parent (see B3 in the
+  // code review TODO and the `Runtime Restructure` invariant in the spec).
+  node.computedUses = undefined;
+
   const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
 
   // An "explicit owner" container OWNS its child component APIs at runtime
@@ -464,20 +492,42 @@ export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type
   return freeVars;
 }
 
+/**
+ * Drills through CompoundComponentDef wrappers to reach the inner ComponentDef.
+ *
+ * A CompoundComponentDef carries its template in a `.component` field; this
+ * function follows that chain until it reaches a node that looks like a
+ * ComponentDef (has a `type` string or a `children` array).
+ *
+ * There is no depth cap — the loop follows the chain however deep it goes.
+ * This is safe because the chain always terminates: a CompoundComponentDef
+ * stores exactly one ComponentDef in `.component`, and a ComponentDef never
+ * has a `.component` field.
+ */
+function unwrapToComponentDef(node: ComponentDef): ComponentDef {
+  let current: unknown = node;
+  while (current !== null && typeof current === "object") {
+    const obj = current as Record<string, unknown>;
+    // A real ComponentDef has `type` (string) or `children` (array).
+    if (obj["type"] !== undefined || Array.isArray(obj["children"])) {
+      return current as ComponentDef;
+    }
+    // CompoundComponentDef keeps its template in `.component`.
+    if (obj["component"] !== undefined) {
+      current = obj["component"];
+      continue;
+    }
+    // No further unwrapping possible — return what we have.
+    break;
+  }
+  return node;
+}
+
 export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => ComponentMetadata | undefined): void {
   if (!COMPUTED_USES_ENABLED) return;
   // StandaloneApp may call this with a CompoundComponentDef wrapper whose actual
-  // ComponentDef (with type/children) lives one or two levels deeper.
-  // Drill down until we find a node that has type or children.
-  let actualRoot: ComponentDef = root;
-  for (let i = 0; i < 3; i++) {
-    const next = (actualRoot as any).component;
-    if (!next) break;
-    if ((next as any).type || Array.isArray((next as any).children)) {
-      actualRoot = next;
-      break;
-    }
-    actualRoot = next;
-  }
+  // ComponentDef lives one or more levels deeper in the `.component` chain.
+  // unwrapToComponentDef() follows the chain without a hard depth cap.
+  const actualRoot = unwrapToComponentDef(root);
   computeUsesInternal(actualRoot, new Set(), false, EMPTY_SET, metadataLookup);
 }
