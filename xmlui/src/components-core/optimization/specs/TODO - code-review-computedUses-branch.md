@@ -86,8 +86,4 @@ Side-effect during render. React 18 strict mode doubles renders — assignment i
 
 All remaining items are defer-grade — none should block merging.
 
-## Resolved Items (This Session)
-
-- **P3**: Removed redundant `extractScopedState` call in `StateContainer.tsx`. State is already scoped by `ComponentWrapper`, so the double extraction was unnecessary work. [StateContainer.tsx:169-174](xmlui/src/components-core/rendering/StateContainer.tsx#L169-L174)
-- **R3**: Moved render-counter from render-phase mutation to `useLayoutEffect`, counting after commit instead of during render. Reduces confusion about side effects in render phase. [StateContainer.tsx:176-187](xmlui/src/components-core/rendering/StateContainer.tsx#L176-L187)
 

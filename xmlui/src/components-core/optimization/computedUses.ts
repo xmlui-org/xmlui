@@ -95,6 +95,19 @@ export const COMPUTED_USES_ENABLED = true;
  * window.status, window.frames, …) or Node.js–only properties (process,
  * require, __dirname, …) that could plausibly be XMLUI variable names.
  */
+/**
+ * MAINTENANCE NOTE: Review this list whenever a new ECMAScript version is finalized
+ * (typically every June) and add any newly-shipped intrinsics before they show up
+ * in user code. Omitting a built-in causes the optimizer to treat it as a
+ * parent-state read, which can silently promote a component to an implicit container
+ * and break state narrowing.
+ *
+ * Checklist when updating:
+ *  1. Check the TC39 "Finished Proposals" table for new stage-4 names.
+ *  2. Verify the name is NOT a plausible XMLUI variable name (if it is, leave it out).
+ *  3. Add it to the appropriate section below with a short comment.
+ *  4. Run the computedUses unit-test suite to confirm no regressions.
+ */
 const JS_STDLIB_GLOBALS = new Set([
   // ECMAScript value properties
   "undefined", "NaN", "Infinity", "globalThis",
@@ -102,7 +115,7 @@ const JS_STDLIB_GLOBALS = new Set([
   "eval", "isFinite", "isNaN", "parseFloat", "parseInt",
   "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent",
   "escape", "unescape",
-  // ECMAScript intrinsic objects / namespaces
+  // ECMAScript intrinsic objects / namespaces (ES2024 and earlier)
   "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array", "BigUint64Array",
   "Boolean", "DataView", "Date", "Error", "EvalError", "FinalizationRegistry",
   "Float32Array", "Float64Array", "Function",
@@ -112,7 +125,9 @@ const JS_STDLIB_GLOBALS = new Set([
   "Symbol", "SyntaxError", "TypeError", "URIError",
   "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
   "WeakMap", "WeakRef", "WeakSet",
-  // Upcoming ECMAScript (stage 3+ / shipping)
+  // ES2025: Float16Array — 16-bit floating-point typed array (V8 ≥ 12.7, FF ≥ 129, Safari ≥ 18.2)
+  "Float16Array",
+  // Shipping stage-3/4 proposals (Temporal: TC39 stage 3; Iterator: ES2025 stage 4)
   "Temporal", "Iterator",
   // Universally available (browser + Node.js 18+)
   "console", "structuredClone", "queueMicrotask",

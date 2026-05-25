@@ -13,6 +13,7 @@ import type { ContainerDispatcher } from "../abstractions/ComponentRenderer";
 import type { ProxyAction } from "../rendering/buildProxy";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { StateContainer } from "./StateContainer";
+import { useShallowCompareMemoize } from "../utils/hooks";
 import { isContainerLike as isContainerLikeShared } from "./ContainerUtils";
 
 /**
@@ -180,8 +181,16 @@ export const ContainerWrapper = memo(
     }: Props,
     ref,
   ) {
+    // Stabilise the node reference before wrapping. ComponentWrapper may produce a
+    // new object identity for nodeWithTransformedDatasourceProp (e.g. when
+    // transformNodeWithDataProp or transformNodeWithRawDataProp re-runs) even though
+    // all top-level fields are the same values. Without stabilisation,
+    // getWrappedWithContainer runs again and StateContainer.memo sees a new `node`
+    // prop — triggering an unnecessary full re-render of the container subtree.
+    const stableNode = useShallowCompareMemoize(node);
+
     // --- Make sure the component node is wrapped with a container
-    const containerizedNode = useMemo(() => getWrappedWithContainer(node), [node]);
+    const containerizedNode = useMemo(() => getWrappedWithContainer(stableNode), [stableNode]);
 
     return (
       <ErrorBoundary node={node} location={"container"}>
@@ -197,7 +206,7 @@ export const ContainerWrapper = memo(
           parentRenderContext={parentRenderContext}
           layoutContextRef={layoutContextRef}
           uidInfoRef={uidInfoRef}
-          isImplicit={isImplicitContainer(node, containerizedNode)}
+          isImplicit={isImplicitContainer(stableNode, containerizedNode)}
           ref={ref}
           {...rest}
         >
