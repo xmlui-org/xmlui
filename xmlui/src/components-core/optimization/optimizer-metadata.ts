@@ -20,9 +20,11 @@
  *
  * **Adding a new built-in component that injects $-prefixed vars:**
  *   1. Add an entry here.
- *   2. In the component's `.tsx`, do
- *      `childInjectedVars: OPTIMIZER_METADATA.YourComp.childInjectedVars`
- *      (or the events.X.injectedVars equivalent).
+ *   2. In the component's `.tsx` metadata, spread `fromOptimizerMetadata("YourComp")`
+ *      (it projects the relevant top-level scalar fields: `isImplicitContainerByDefault`,
+ *      `childInjectedVars`, `unstableChildInjectedVars`).
+ *      For event-level `injectedVars`, reference `OPTIMIZER_METADATA.YourComp.events.X.injectedVars`
+ *      directly inside the corresponding event metadata.
  *
  * **Extension Packages:** see §11.5 of the code-review doc — a runtime
  * registration API may be added later; until then extension components
@@ -150,4 +152,42 @@ export const OPTIMIZER_METADATA = {
  */
 export function lookupOptimizerMetadata(type: string): ComponentMetadata | undefined {
   return (OPTIMIZER_METADATA as Record<string, ComponentMetadata>)[type];
+}
+
+/**
+ * Top-level optimizer fields that `.tsx` component metadata blocks need to
+ * re-export so the runtime/optimizer can read them via `ComponentMetadata`.
+ * `events` is intentionally excluded — event-level `injectedVars` are spliced
+ * into the component's own `events` block in `.tsx` directly.
+ */
+const OPTIMIZER_PROJECTED_KEYS = [
+  "isImplicitContainerByDefault",
+  "childInjectedVars",
+  "unstableChildInjectedVars",
+] as const;
+
+type OptimizerProjectionKey = (typeof OPTIMIZER_PROJECTED_KEYS)[number];
+
+type OptimizerProjection<K extends keyof typeof OPTIMIZER_METADATA> = Pick<
+  (typeof OPTIMIZER_METADATA)[K],
+  Extract<keyof (typeof OPTIMIZER_METADATA)[K], OptimizerProjectionKey>
+>;
+
+/**
+ * Returns the top-level optimizer fields for a component, ready to be spread
+ * into the component's metadata object. Replaces the manual two-line
+ * projection (`isImplicitContainerByDefault: OPTIMIZER_METADATA.X...,
+ * childInjectedVars: OPTIMIZER_METADATA.X...`) that used to live in every
+ * built-in `.tsx`. The type parameter ensures the component name is a known
+ * key in `OPTIMIZER_METADATA`.
+ */
+export function fromOptimizerMetadata<K extends keyof typeof OPTIMIZER_METADATA>(
+  type: K,
+): OptimizerProjection<K> {
+  const entry = OPTIMIZER_METADATA[type] as Record<string, unknown>;
+  const projection: Record<string, unknown> = {};
+  for (const key of OPTIMIZER_PROJECTED_KEYS) {
+    if (key in entry) projection[key] = entry[key];
+  }
+  return projection as OptimizerProjection<K>;
 }

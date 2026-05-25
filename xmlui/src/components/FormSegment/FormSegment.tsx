@@ -1,5 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { defaultProps } from "../DateInput/DateInputReact";
 import { createMetadata, d } from "../metadata-helpers";
 import { FormSegmentNative } from "./FormSegmentReact";
@@ -38,7 +38,7 @@ export const FormSegmentMd = createMetadata({
         "field names by inspecting its direct and nested children for `bindTo` attributes.",
     ),
   },
-  childInjectedVars: OPTIMIZER_METADATA.FormSegment.childInjectedVars,
+  ...fromOptimizerMetadata("FormSegment"),
   contextVars: {
     $segmentData: d(
       "An object containing the current form values of the fields that belong to this segment, " +

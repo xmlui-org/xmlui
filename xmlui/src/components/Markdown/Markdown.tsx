@@ -1,7 +1,7 @@
 import styles from "./Markdown.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
 import React from "react";
@@ -140,8 +140,7 @@ export const MarkdownMd = createMetadata({
       ],
     },
   },
-  isImplicitContainerByDefault: OPTIMIZER_METADATA.Markdown.isImplicitContainerByDefault,
-  childInjectedVars: OPTIMIZER_METADATA.Markdown.childInjectedVars,
+  ...fromOptimizerMetadata("Markdown"),
   defaultThemeVars: {
     "marginTop-H1-markdown": "$space-4",
     "marginBottom-H1-markdown": "$space-6",

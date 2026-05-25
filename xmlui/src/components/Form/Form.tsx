@@ -1,7 +1,7 @@
 import styles from "./Form.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
@@ -257,8 +257,7 @@ export const FormMd = createMetadata({
       parameters: {},
     },
   },
-  isImplicitContainerByDefault: OPTIMIZER_METADATA.Form.isImplicitContainerByDefault,
-  childInjectedVars: OPTIMIZER_METADATA.Form.childInjectedVars,
+  ...fromOptimizerMetadata("Form"),
   contextVars: {
     $data: d(
       `This property represents the value of the form data. You can access the fields of the form ` +

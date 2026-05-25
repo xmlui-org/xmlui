@@ -108,6 +108,29 @@ export interface ComponentDefCore {
    *   positions of the source belonging to the particular component definition.
    */
   debug?: Record<string, any>;
+
+  /**
+   * Internal: snapshot of `vars` preserved when a component is wrapped in a
+   * Container by `getWrappedWithContainer` in `ContainerWrapper.tsx`. Wrapping
+   * moves `vars` onto the Container, but components doing two-pass rendering
+   * (currently `ModalDialog`) need the original definitions so they can
+   * re-resolve them in a child scope where dynamic context variables (e.g.
+   * `$param`) are visible.
+   *
+   * Producer: `ContainerWrapper.getWrappedWithContainer`.
+   * Consumer: `ModalDialog`'s custom renderer.
+   */
+  _savedVarDefs?: Record<string, any>;
+
+  /**
+   * Internal: snapshot of `functions` preserved when a component is wrapped
+   * in a Container by `getWrappedWithContainer`. See `_savedVarDefs` for the
+   * full rationale.
+   *
+   * Producer: `ContainerWrapper.getWrappedWithContainer`.
+   * Consumer: `ModalDialog`'s custom renderer.
+   */
+  _savedFunctionDefs?: Record<string, any>;
 }
 // This interface represents the properties of a component definition.
 export interface ComponentDef<TMd extends ComponentMetadata = ComponentMetadata>

@@ -1,7 +1,7 @@
 import styles from "./FormItem.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useMemo } from "react";
 import {
@@ -243,7 +243,7 @@ export const FormItemMd = createMetadata({
       },
     },
   },
-  childInjectedVars: OPTIMIZER_METADATA.FormItem.childInjectedVars,
+  ...fromOptimizerMetadata("FormItem"),
   contextVars: {
     $value: d("Current value of the FormItem, accessible in expressions and code snippets"),
     $setValue: d("Function to set the FormItem's value programmatically"),

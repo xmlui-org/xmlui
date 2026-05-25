@@ -1,7 +1,7 @@
 # Code Review: `yurii/computedUses` branch vs `main` — Outstanding Items
 
 > Analysis Date: 2026-05-15
-> Last Update: 2026-05-25 (N3 + N4 resolved — LRU-bounded `astCache`; `unwrapToComponentDef()` replaces magic-constant drill-down loop)
+> Last Update: 2026-05-25 (D3 + D7 resolved — `ComponentDefCore` now declares `_savedVarDefs`/`_savedFunctionDefs`; `fromOptimizerMetadata()` helper replaces 20+ manual projection sites)
 > Comparison: `0c42b6f3a5d7e86aff7b8119699bbadc2e7bdd31` (merge-base) → HEAD
 > Resolved items (B1, D4, N1, N5, D8, C4, N2, D6, N3, N4) have been removed from this file.
 
@@ -106,15 +106,6 @@ In strict mode React doubles the number of renders → counter is 2× inflated. 
 
 ## 🧹 Dirty code / duplication
 
-### D3: `_savedVarDefs` / `_savedFunctionDefs` — implicit coupling via untyped fields
-
-Confirmed live:
-- write side: [ContainerWrapper.tsx:228-229](xmlui/src/components-core/rendering/ContainerWrapper.tsx#L228-L229)
-- read side: [ModalDialog.tsx:160-161](xmlui/src/components/ModalDialog/ModalDialog.tsx#L160-L161)
-
-The coupling is via underscore-convention property names + `(node as any)` cast. The comment on the write side ("two-pass rendering") is informative; the read side has no symmetric comment. Functionally works; future readers can easily delete or rename one side without realising the dependency.
-
-**Action:** Either (a) declare the two fields on `ContainerWrapperDef` / `ComponentDef` so the cast can go, or (b) move them off the node into a side channel (per-render context or `MemoizedItem` prop).
 
 ---
 
@@ -126,18 +117,13 @@ The coupling is via underscore-convention property names + `(node as any)` cast.
 
 ---
 
-### D7: `OPTIMIZER_METADATA` re-export pattern across 20+ `.tsx` files
+### ✅ D7: `OPTIMIZER_METADATA` re-export pattern — RESOLVED (2026-05-25)
 
-Examples:
-- [List.tsx:349-350](xmlui/src/components/List/List.tsx#L349-L350): `isImplicitContainerByDefault: OPTIMIZER_METADATA.List.isImplicitContainerByDefault, childInjectedVars: OPTIMIZER_METADATA.List.childInjectedVars,`
-- Same pattern repeats for Table, Select, Tree, TileGrid, AutoComplete, Markdown, Tabs, TabItem, Drawer, Stepper, Form, FormItem, FormSegment, ModalDialog, Items, Column, Checkbox, RadioGroup, APICall, DataSource, DataLoader.
 
-This is a mechanical projection: 20+ call sites, all identical shape. The doc comment in `optimizer-metadata.ts` (lines 12-29) explains the architecture (`.tsx` imports SCSS → can't be loaded from the Vite plugin), so the projection is necessary today. Two minor improvements possible:
 
-1. Codegen the `.tsx` field assignments from `OPTIMIZER_METADATA` so the mapping cannot drift.
-2. Provide a typed helper `applyOptimizerMetadata("List", ...)` that the `.tsx` calls — the helper validates the type key against `OPTIMIZER_METADATA` and forwards the fields.
 
-Not blocking; it just means a new component author has to remember two edits.
+
+
 
 ---
 
@@ -150,18 +136,17 @@ Not blocking; it just means a new component author has to remember two edits.
 | P4  | `ContainerWrapper.tsx:184`                                      | `getWrappedWithContainer` runs on every `node` identity flip                  | 🔵 Low priority |
 | R2  | `ComponentWrapper.tsx:106`                                      | Render-phase ref mutation                                                     | 📝 Note         |
 | R3  | `StateContainer.tsx:176-187`                                    | Dev profiler render counter strict-mode-doubled                               | 📝 Note         |
-| D3  | `ContainerWrapper.tsx` ↔ `ModalDialog.tsx`                      | `_savedVarDefs` untyped                                                       | 🔵 Minor        |
 | D5  | `computedUses.ts:85-119`                                        | `JS_STDLIB_GLOBALS` manual list                                               | 🔵 Minor        |
-| D7  | `optimizer-metadata.ts` + 20 `.tsx` re-exports                  | Manual projection of metadata into `.tsx` files                               | 🔵 Minor        |
 
 ---
 
 ## Priority of Actions
 
-1. 🔵 **Hygiene:** D3, D7.
-2. 📝 **Defer:** P3, P4, R2, R3, N6, D5 — already adequately mitigated, low-cost low-frequency, or React-version-specific.
+1. 📝 **Defer:** P3, P4, R2, R3, N6, D5 — already adequately mitigated, low-cost low-frequency, or React-version-specific.
 
 The remaining items are all cleanup-grade — none should block merging.
 
 **Resolved (2026-05-25):**
 - ✅ **B3** — Mechanical guard (clear `node.computedUses` at start of `computeUsesInternal`) ensures each pass is independent. Addresses "State Cleanliness Between Multi-Pass Analysis" invariant in the specification.
+- ✅ **D3** — `_savedVarDefs` / `_savedFunctionDefs` declared on `ComponentDefCore`; `(node as any)` casts removed from ModalDialog read site.
+- ✅ **D7** — `fromOptimizerMetadata("X")` typed helper introduced; 18 projection sites collapsed from 2 lines to 1 spread; orphan `OPTIMIZER_METADATA` import removed from `Checkbox.tsx`.

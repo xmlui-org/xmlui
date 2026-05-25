@@ -1,7 +1,7 @@
 import { useMemo, useRef } from "react";
 import type { ComponentDef } from "../..";
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
@@ -463,8 +463,7 @@ export const TreeMd = createMetadata({
       },
     },
   },
-  isImplicitContainerByDefault: OPTIMIZER_METADATA.Tree.isImplicitContainerByDefault,
-  childInjectedVars: OPTIMIZER_METADATA.Tree.childInjectedVars,
+  ...fromOptimizerMetadata("Tree"),
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}-row--selected`]: "$color-primary-50",

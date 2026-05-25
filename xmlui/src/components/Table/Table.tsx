@@ -5,7 +5,7 @@ import styles from "./Table.module.scss";
 
 import "./react-table-config.d.ts";
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import {
@@ -367,8 +367,7 @@ export const TableMd = createMetadata({
       defaultValue: defaultProps.striped,
     },
   },
-  isImplicitContainerByDefault: OPTIMIZER_METADATA.Table.isImplicitContainerByDefault,
-  childInjectedVars: OPTIMIZER_METADATA.Table.childInjectedVars,
+  ...fromOptimizerMetadata("Table"),
   events: {
     contextMenu: {
       ...dContextMenu(COMP),

@@ -1,7 +1,7 @@
 import styles from "./AutoComplete.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import {
   dPlaceholder,
   dInitialValue,
@@ -144,8 +144,7 @@ export const AutoCompleteMd = createMetadata({
         "particular option.",
     ),
   },
-  isImplicitContainerByDefault: OPTIMIZER_METADATA.AutoComplete.isImplicitContainerByDefault,
-  childInjectedVars: OPTIMIZER_METADATA.AutoComplete.childInjectedVars,
+  ...fromOptimizerMetadata("AutoComplete"),
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",
