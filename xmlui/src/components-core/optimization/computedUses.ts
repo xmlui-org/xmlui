@@ -1,31 +1,21 @@
 /**
- * Computes the minimal set of parent-scope state names that each implicit
- * container actually reads, storing the result in `node.computedUses`.
+ * This module computes the minimal set of parent-scope state names that each
+ * implicit container actually reads, storing the result in `node.computedUses`.
  *
- * Side effects: mutates `node.computedUses` in-place for every node that
- * acts as a container (has vars/loaders/functions/etc.) and does not already
- * carry an explicit `uses` list.
+ * This happens once at transform/boot time, after the full `ComponentDef`
+ * tree is built but before the reactive graph is wired up.
  *
- * When called: once at transform/boot time, after the full `ComponentDef`
- * tree has been built and before the reactive graph is wired up.
+ * UID scoping rule:
+ * - A child component with `id="foo"` registers its API in the nearest ancestor
+ *   `StateContainer`. This means "foo" is *locally owned* by that container.
+ * - Locally owned IDs must NOT appear in the container's `computedUses`.
+ * - To model this, we track "escaping UIDs": IDs that will register into the
+ *   *parent* container when the current subtree is rendered.
+ * - Non-container nodes bubble up their own UID and all escaping UIDs from children.
+ * - Container nodes capture everything—only their own UID escapes further.
  *
- * UID scoping rule
- * ----------------
- * At runtime, a child component with `id="foo"` calls `registerComponentApi`
- * which stores the API object in the nearest ancestor StateContainer. This
- * means "foo" is *locally owned* by that container — it must NOT appear in
- * the container's `computedUses` (which lists names that must come from the
- * *parent* scope).
- *
- * To model this at parse-time we track "escaping UIDs": UIDs that will
- * register into the *parent* container when the current subtree is rendered.
- * For a non-container node its own UID (and all escaping UIDs from its
- * non-container children) bubble up. A container node captures everything —
- * only its own UID escapes further.
- *
- * `computeUsesInternal` returns a tuple [freeVars, escapingUIDs] so each
- * call can both (a) communicate free-variable deps upward and (b) tell the
- * parent which UIDs will register locally at runtime.
+ * `computeUsesInternal` returns `[freeVars, escapingUIDs, freeReads]` to communicate
+ * dependencies and registration targets upward.
  */
 import { depsOfValueWithReads } from "../script-runner/visitors";
 import { Parser } from "../../parsers/scripting/Parser";
@@ -33,14 +23,8 @@ import type { Statement } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
 import { isContainerLike } from "../rendering/ContainerUtils";
 
-// LRU cache for parsed raw strings — bounded to avoid unbounded memory growth in
-// long-running devserver / studio sessions. AST_CACHE_MAX_SIZE entries cover
-// virtually all real XMLUI apps (typical event handlers are short and repeated);
-// the cap guards against generated XMLUI with thousands of unique strings.
-//
-// LRU eviction is implemented cheaply using the insertion-order guarantee of
-// JavaScript's Map: delete + re-insert on a cache hit moves the entry to the
-// "most recently used" end; eviction always removes the first (oldest) entry.
+// LRU cache for parsed raw strings to avoid unbounded memory growth.
+// AST_CACHE_MAX_SIZE covers typical apps while guarding against generated code.
 const AST_CACHE_MAX_SIZE = 1_000;
 const astCache = new Map<string, Statement[]>();
 
@@ -74,39 +58,16 @@ function parse(source: string): Statement[] {
 export const COMPUTED_USES_ENABLED = true;
 
 /**
- * ECMAScript standard globals and universally-available platform globals
- * that will NEVER be stored in XMLUI app state.
+ * ECMAScript and platform globals that are NEVER stored in XMLUI app state.
  *
- * We deliberately use a curated set rather than a bare `name in globalThis`
- * check.  The reason: `globalThis` (= `window` in browsers) contains hundreds
- * of legacy / browser-specific properties such as `external`, `screen`,
- * `history`, `status`, `frames`, etc.  An XMLUI developer may legitimately
- * name a component state variable any of those names, so filtering them would
- * silently suppress valid dependency tracking.
+ * Filtering these avoids unnecessary dependency tracking for built-ins.
+ * We use a curated list to avoid filtering browser-specific legacy properties
+ * that a developer might legitimately use as a state variable name.
  *
- * The set below covers:
- *  – ECMAScript value properties  (undefined, NaN, Infinity, globalThis)
- *  – ECMAScript function properties (eval, parseInt, encodeURI, …)
- *  – ECMAScript intrinsic constructors/namespaces (Array, JSON, Math, …)
- *  – Universally available globals present in both browsers and Node.js
- *    (console, setTimeout, fetch, URL, crypto, structuredClone, …)
- *
- * It does NOT include browser-only legacy properties (window.external,
- * window.status, window.frames, …) or Node.js–only properties (process,
- * require, __dirname, …) that could plausibly be XMLUI variable names.
- */
-/**
- * MAINTENANCE NOTE: Review this list whenever a new ECMAScript version is finalized
- * (typically every June) and add any newly-shipped intrinsics before they show up
- * in user code. Omitting a built-in causes the optimizer to treat it as a
- * parent-state read, which can silently promote a component to an implicit container
- * and break state narrowing.
- *
- * Checklist when updating:
- *  1. Check the TC39 "Finished Proposals" table for new stage-4 names.
- *  2. Verify the name is NOT a plausible XMLUI variable name (if it is, leave it out).
- *  3. Add it to the appropriate section below with a short comment.
- *  4. Run the computedUses unit-test suite to confirm no regressions.
+ * MAINTENANCE: Review this list when new ECMAScript versions are finalized (June).
+ * 1. Check TC39 "Finished Proposals" for new stage-4 names.
+ * 2. Ensure the name is not a plausible XMLUI variable name.
+ * 3. Add to the appropriate section and run tests.
  */
 const JS_STDLIB_GLOBALS = new Set([
   // ECMAScript value properties
@@ -140,9 +101,7 @@ const JS_STDLIB_GLOBALS = new Set([
   "AbortController", "AbortSignal",
   "CustomEvent", "Event", "EventTarget",
   "WebSocket",
-  // Browser dialog APIs — browser-only (not Node.js), but XMLUI always runs in a browser.
-  // XMLUI overrides `confirm` with its own dialog; `alert` and `prompt` are also
-  // never XMLUI state variable names.  Filter them so they don't pollute computedUses.
+  // Browser dialog APIs — never XMLUI state variable names.
   "alert", "confirm", "prompt",
 ]);
 
@@ -172,21 +131,10 @@ function depsOfRecord(
 
 /**
  * Core recursive worker.
- *
  * Returns a tuple:
- *   [0] freeVars     – identifiers referenced in this subtree that must come
- *                      from the *parent* container's scope (reads + assignment
- *                      targets).
- *   [1] escapingUIDs – UIDs that will call `registerComponentApi` into the
- *                      *parent* container at runtime (i.e. they are not
- *                      captured by any intermediate container inside this
- *                      subtree). The caller adds these to its own
- *                      `localDeclared` so they don't pollute `computedUses`.
- *   [2] freeReads    – subset of [0] that contains only read references
- *                      (no assignment-only targets). Used to decide whether
- *                      a parent should be promoted to an implicit container:
- *                      write-only targets do not need re-render tracking, so
- *                      they should not by themselves trigger promotion.
+ * - [0] freeVars: Identifiers referenced in this subtree that must come from the parent scope.
+ * - [1] escapingUIDs: UIDs that will register into the parent container at runtime.
+ * - [2] freeReads: Subset of freeVars containing only read references.
  */
 const EMPTY_SET: ReadonlySet<string> = Object.freeze(new Set<string>());
 
@@ -197,31 +145,15 @@ function computeUsesInternal(
   injectedVarsScope: ReadonlySet<string> = EMPTY_SET,
   metadataLookup?: (type: string) => ComponentMetadata | undefined,
 ): [Set<string>, Set<string>, Set<string>] {
-  // Clear any stale `computedUses` from a prior traversal so this pass is
-  // the single source of truth for the field. Two traversals over the same
-  // tree are routine: the parser sets it once before `.xs` code-behind is
-  // merged (no `node.functions` known → some containers get narrowed), and
-  // StandaloneApp re-runs the analysis after the merge (functions now visible
-  // → `dependsOnParentFunction` flips `safeToNarrow` to false). The narrow-
-  // setting branch below is gated by `if (... && safeToNarrow)`, so without
-  // this reset the stale value from pass 1 would survive, isolating a
-  // container from sibling APIs registered in the parent (see B3 in the
-  // code review TODO and the `Runtime Restructure` invariant in the spec).
+  // Clear stale `computedUses` from prior traversals.
+  // Re-running analysis is routine (e.g., after merging code-behind functions).
   node.computedUses = undefined;
 
   const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
 
-  // An "explicit owner" container OWNS its child component APIs at runtime
-  // (registerComponentApi writes into ITS componentState). The runtime predicate is
-  // `isImplicitContainer(node, wrapped) = node.type !== "Container" && wrapped.uses === undefined`.
-  // Implicit containers (vars/loaders/functions/etc. but no explicit `uses`) delegate
-  // registerComponentApi to the parent — so child component APIs actually end up in
-  // the PARENT container's state, not this one's. Two consequences for static analysis:
-  //   1. Escaping UIDs must continue bubbling upward through implicit containers
-  //      (until they reach an explicit owner that truly captures them).
-  //   2. When this implicit container's `computedUses` IS set (because of other parent
-  //      deps), the escaping UIDs must be included — otherwise narrowed parent state
-  //      excludes the very APIs that descendants need to read.
+  // Explicit containers (Container type or explicit `uses`) OWN their child APIs.
+  // Implicit containers (vars/loaders/etc. but no `uses`) delegate registration to the parent.
+  // CONTEXT: Escaping UIDs bubble up through implicit containers.
   const isExplicitOwner = node.type === "Container" || node.uses !== undefined;
 
   const localDeclared = new Set<string>();
@@ -407,82 +339,39 @@ function computeUsesInternal(
   const isContainer = isKnownContainer || isImplicitDefault;
 
   if (isContainer) {
-    // Both regular containers (vars/loaders/etc.) and explicit-uses containers
-    // create a StateContainer at runtime. Either way, child component APIs
-    // register HERE via registerComponentApi — UIDs do not escape further.
-    // Only this node's own UID (if any) is visible to the parent container.
-    // Only set computedUses when there are actual free vars to scope.
-    // Setting computedUses=[] (empty) is NOT equivalent to not setting it:
-    // extractScopedState(state, []) returns {} (empty), which breaks implicit
-    // containers that must receive full parent state to function correctly.
-    // Example: <Fragment var.testState="{null}"> wrapping <Select id="x"> —
-    // with computedUses=[] the Fragment isolates all parent state, making
-    // {x.value} invisible to siblings even after updateState() dispatches.
     // Narrowing safety rules:
-    // 1. A node with its OWN <script>/code-behind must NOT be narrowed — its function bodies
-    //    may read parent state vars that are invisible to template-expression analysis.
-    // 2. A child node that INHERITS nextDisableNarrowing=true from an ancestor is safe to
-    //    narrow if it has no own script and does NOT call any parent-scope function.
-    //    In that case function bodies are irrelevant — none are called by this container.
+    // 1. Nodes with own <script>/code-behind are NOT narrowed (analysis is incomplete).
+    // 2. Nodes calling parent-scope functions while narrowing is disabled are NOT narrowed.
     const dependsOnParentFunction = parentFunctionNames.size > 0 &&
       [...parentDependencies].some(d => parentFunctionNames.has(d));
     const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
-    // Guard narrowing on nonDynamicParentDeps (not parentDependencies) so that a container
-    // whose ONLY parent-state dependencies are dynamic vars ($context etc.) does NOT get
-    // computedUses set. Dynamic vars like $context live in the nearest ancestor container's
-    // state (e.g. Theme#root), and component APIs (like ContextMenu's "projectMenu") also
-    // land there. Setting computedUses=["$context"] on a container that has NO real parent
-    // deps would make stateFromOutside={} initially (before openAt sets $context), cutting
-    // the container off from sibling APIs registered in the ancestor. When both real deps
-    // AND dynamic deps exist the dynamic vars are still included so the container re-renders
-    // when $context changes (reactive correctness).
-    //
-    // Narrow only when there are real READ deps. Write-only targets still
-    // appear in `parentDependencies` (and therefore in the value we set for
-    // `computedUses` below), but they cannot by themselves require narrowing —
-    // re-renders are triggered by reads, not writes.
+
+    // Narrow only if there are real READ deps (writes don't need re-render tracking).
+    // Dynamic vars ($context) are excluded from the initial check to avoid isolation bugs
+    // where empty computedUses={} cuts off the container from sibling APIs.
     if (node.uses === undefined && nonDynamicReadDeps.size > 0 && safeToNarrow) {
       const computedUsesSet = dependsOnParentFunction
         ? new Set([...parentDependencies, ...parentFunctionNames])
         : new Set([...parentDependencies]);
-      // For IMPLICIT containers (type !== "Container" and no `uses` defined),
-      // registerComponentApi is delegated to the parent at runtime: child component
-      // identifiers escaping from descendants actually live in the PARENT's state,
-      // not in this container's. They were added to `localDeclared` above only so
-      // they wouldn't pollute the dependency set when no narrowing happens — but
-      // once narrowing IS triggered by other deps, omitting them isolates this
-      // container from sibling APIs (e.g. <Fragment var.testState> wrapping an
-      // APICall + Buttons reading `apiCall.inProgress`: computedUses=["toast"]
-      // would strip apiCall from stateFromOutside). Add them back so children
-      // can still see those APIs through the narrowed parent state.
+
+      // Implicit containers delegate API registration to the parent.
+      // We must include escaping UIDs in computedUses to avoid isolating children from sibling APIs.
       if (!isExplicitOwner) {
         for (const uid of childEscapingUIDs) computedUsesSet.add(uid);
       }
-      // Bug 23 fix: filter out Symbols before sorting to avoid TypeError
       node.computedUses = Array.from(computedUsesSet)
         .filter((d): d is string => typeof d === "string")
         .sort();
     }
 
-    // else: node has own script/code-behind, or calls a parent function while narrowing
-    // is disabled — intentionally not narrowed.
-    // Explicit-owner containers (type=Container or `uses` defined) actually capture
-    // child component APIs at runtime: only THIS node's own UID escapes upward.
-    // Implicit containers (vars/loaders/etc. but no explicit uses) delegate
-    // registerComponentApi to the parent, so child escaping UIDs continue bubbling
-    // upward until they reach an explicit owner. Without this propagation, an
-    // ancestor implicit container that ALSO narrows would lose visibility of
-    // these UIDs (see the matching `childEscapingUIDs` add when setting computedUses).
+    // Capture child APIs for explicit owners; bubble them up for implicit containers.
     const myEscapingUID: Set<string> = new Set();
     if (node.uid) myEscapingUID.add(node.uid);
     if (!isExplicitOwner) {
       for (const uid of childEscapingUIDs) myEscapingUID.add(uid);
     }
-    // Do NOT propagate dynamic vars ($context etc.) to the parent container's deps.
-    // They belong in THIS container's own computedUses (so it re-renders when they
-    // change) but must not cascade further — the parent provides them through its
-    // own state dispatch chain, and leaking them into the parent's parentDeps would
-    // cause stateFromOutside={} for the parent.
+    
+    // Dynamic vars ($context) belong to this container's computedUses but don't cascade up.
     const propagatedDeps = nonDynamicParentDeps;
     const propagatedReadDeps = nonDynamicReadDeps;
     return [propagatedDeps, myEscapingUID, propagatedReadDeps];
@@ -509,15 +398,7 @@ export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type
 
 /**
  * Drills through CompoundComponentDef wrappers to reach the inner ComponentDef.
- *
- * A CompoundComponentDef carries its template in a `.component` field; this
- * function follows that chain until it reaches a node that looks like a
- * ComponentDef (has a `type` string or a `children` array).
- *
- * There is no depth cap — the loop follows the chain however deep it goes.
- * This is safe because the chain always terminates: a CompoundComponentDef
- * stores exactly one ComponentDef in `.component`, and a ComponentDef never
- * has a `.component` field.
+ * A CompoundComponentDef carries its template in a `.component` field.
  */
 function unwrapToComponentDef(node: ComponentDef): ComponentDef {
   let current: unknown = node;
@@ -532,7 +413,6 @@ function unwrapToComponentDef(node: ComponentDef): ComponentDef {
       current = obj["component"];
       continue;
     }
-    // No further unwrapping possible — return what we have.
     break;
   }
   return node;
@@ -540,9 +420,7 @@ function unwrapToComponentDef(node: ComponentDef): ComponentDef {
 
 export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => ComponentMetadata | undefined): void {
   if (!COMPUTED_USES_ENABLED) return;
-  // StandaloneApp may call this with a CompoundComponentDef wrapper whose actual
-  // ComponentDef lives one or more levels deeper in the `.component` chain.
-  // unwrapToComponentDef() follows the chain without a hard depth cap.
+  // Unwrap potential CompoundComponentDef wrappers before analysis.
   const actualRoot = unwrapToComponentDef(root);
   computeUsesInternal(actualRoot, new Set(), false, EMPTY_SET, metadataLookup);
 }

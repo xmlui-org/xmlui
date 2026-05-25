@@ -57,9 +57,3 @@ Side-effect during render. React 18 strict mode doubles renders — assignment i
 
 All remaining items are defer-grade — none should block merging.
 
-## Resolved Items (This Session)
-
-- **P3**: Removed redundant `extractScopedState` in `StateContainer.tsx` — state already scoped by `ComponentWrapper`.
-- **R3**: Moved render-counter to `useLayoutEffect` (Rules of Hooks fix included in follow-up commit).
-- **P4**: Added `useShallowCompareMemoize(node)` in `ContainerWrapper` before `getWrappedWithContainer` — prevents unnecessary re-wrapping when node gets new object identity with same field values.
-- **D5**: Added `Float16Array` (ES2025) to `JS_STDLIB_GLOBALS` + four-step MAINTENANCE NOTE checklist for future ES-version reviews.
