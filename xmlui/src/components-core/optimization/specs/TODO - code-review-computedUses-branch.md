@@ -3,7 +3,7 @@
 > Analysis Date: 2026-05-15
 > Last Update: 2026-05-25
 > Comparison: `0c42b6f3a5d7e86aff7b8119699bbadc2e7bdd31` (merge-base) → HEAD
-> Resolved items (B1, D3, D4, D7, N1, N2, N3, N4, N5, D6, D8, C4, P3, R3) have been removed from this file.
+> Resolved items (B1, D3, D4, D7, N1, N2, N3, N4, N5, D6, D8, C4, P3, R3, P4, D5) have been removed from this file.
 
 ---
 
@@ -19,24 +19,6 @@ componentStateRef.current = componentState;
 ```
 
 Same idempotent-write-during-render pattern as **R2**. Inline comment explains the intent ("Updated in render phase (idempotent assignment)"). Safe under React 18; same caveat about future React Cache / Server Components compatibility.
-
----
-
-## 🔴 Performance regressions
-
-### P4: `getWrappedWithContainer` re-evaluates `delete`/spread on every node identity change
-
-[ContainerWrapper.tsx:184](xmlui/src/components-core/rendering/ContainerWrapper.tsx#L184):
-
-```tsx
-const containerizedNode = useMemo(() => getWrappedWithContainer(node), [node]);
-```
-
-This is correctly memoized on `node`. But `node` identity changes whenever `ComponentWrapper` recomputes `nodeWithTransformedDatasourceProp` (which depends on `nodeWithTransformedLoaders`, `resolvedDataPropIsString`, `uidInfoRef`). For DataSource-bearing or `raw_data`-bearing nodes this can flip on every parent render — the `delete` loop + spread inside `getWrappedWithContainer` then runs anew.
-
-In a static tree this is harmless (the `node` reference comes from the parser and is stable). For trees that pass through `transformNodeWithDataSourceRefProp` / `transformNodeWithRawDataProp` it's not free.
-
-**Action:** Watch in a profiler with a wide table; if it shows up, memoise the transformations more carefully.
 
 ---
 
@@ -57,15 +39,6 @@ Side-effect during render. React 18 strict mode doubles renders — assignment i
 
 ---
 
-## 🧹 Dirty code / duplication
-
-### D5: `JS_STDLIB_GLOBALS` — manual list of ECMAScript globals
-
-[computedUses.ts:85-119](xmlui/src/components-core/optimization/computedUses.ts#L85-L119). 50+ names hard-coded. The comment block (lines 64-84) explains *why* a curated list is preferred over `name in globalThis`. Stable list, but if a new ECMAScript intrinsic ships (e.g. Temporal v2) and an XMLUI app starts using it, the optimizer will treat it as a parent-state read and (worse) potentially promote a component to an implicit container.
-
-**Optional:** Codegen this list from a known intrinsics table. Or accept the maintenance burden and add a brief "review on every ES update" reminder.
-
----
 
 
 
@@ -80,10 +53,13 @@ Side-effect during render. React 18 strict mode doubles renders — assignment i
 | #   | Location                                                        | Problem                                                                       | Severity        |
 |-----|-----------------------------------------------------------------|-------------------------------------------------------------------------------|-----------------|
 | N6  | `Container.tsx:159-160`                                         | Same render-phase ref mutation as R2                                          | 📝 Note         |
-| P4  | `ContainerWrapper.tsx:184`                                      | `getWrappedWithContainer` runs on every `node` identity flip                  | 🔵 Low priority |
 | R2  | `ComponentWrapper.tsx:106`                                      | Render-phase ref mutation                                                     | 📝 Note         |
-| D5  | `computedUses.ts:85-119`                                        | `JS_STDLIB_GLOBALS` manual list                                               | 🔵 Minor        |
 
 All remaining items are defer-grade — none should block merging.
 
+## Resolved Items (This Session)
 
+- **P3**: Removed redundant `extractScopedState` in `StateContainer.tsx` — state already scoped by `ComponentWrapper`.
+- **R3**: Moved render-counter to `useLayoutEffect` (Rules of Hooks fix included in follow-up commit).
+- **P4**: Added `useShallowCompareMemoize(node)` in `ContainerWrapper` before `getWrappedWithContainer` — prevents unnecessary re-wrapping when node gets new object identity with same field values.
+- **D5**: Added `Float16Array` (ES2025) to `JS_STDLIB_GLOBALS` + four-step MAINTENANCE NOTE checklist for future ES-version reviews.
