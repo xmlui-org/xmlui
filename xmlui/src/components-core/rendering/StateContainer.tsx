@@ -4,6 +4,7 @@ import {
   memo,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -38,7 +39,7 @@ import type {
   StatePartChangedFn,
 } from "./ContainerWrapper";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
-import { extractScopedState, CodeBehindParseError } from "./ContainerUtils";
+import { CodeBehindParseError } from "./ContainerUtils";
 import { FnDepsProvider, useFnDeps } from "../FnDepsContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 
@@ -166,24 +167,21 @@ export const StateContainer = memo(
     // LAYER 1: PARENT STATE SCOPING
     // ========================================================================
 
-    const stateFromOutside = useShallowCompareMemoize(
-      useMemo(
-        () => extractScopedState(parentState, node.uses ?? node.computedUses) ?? parentState,
-        [node.uses, node.computedUses, parentState],
-      ),
-    );
+    const stateFromOutside = useShallowCompareMemoize(parentState);
 
     const renderCountRef = useRef(0);
     if (process.env.NODE_ENV === "development") {
-      renderCountRef.current += 1;
-      // Use the wrapped component's type (first child) for containers — avoids all containers
-      // colliding on the "Container" label when they have no uid.
-      const innerType = (node as any).children?.[0]?.type;
-      const baseLabel = innerType ?? node.type ?? "anon";
-      const label = node.uid ? `${baseLabel}#${node.uid}` : baseLabel;
-      // accumulate per-label counts silently; read window.__renderCounts in DevTools to inspect
-      (globalThis as any).__renderCounts ??= {};
-      (globalThis as any).__renderCounts[label] = renderCountRef.current;
+      useLayoutEffect(() => {
+        renderCountRef.current += 1;
+        // Use the wrapped component's type (first child) for containers — avoids all containers
+        // colliding on the "Container" label when they have no uid.
+        const innerType = (node as any).children?.[0]?.type;
+        const baseLabel = innerType ?? node.type ?? "anon";
+        const label = node.uid ? `${baseLabel}#${node.uid}` : baseLabel;
+        // accumulate per-label counts silently; read window.__renderCounts in DevTools to inspect
+        (globalThis as any).__renderCounts ??= {};
+        (globalThis as any).__renderCounts[label] = renderCountRef.current;
+      });
     }
 
     // ========================================================================
