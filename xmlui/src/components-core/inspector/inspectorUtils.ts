@@ -29,7 +29,6 @@
  * - `window._xsLastApiStatus` - Map of transactionId -> HTTP status code
  */
 
-import { loggerService } from "../../logging/LoggerService";
 import { currentContext, BOOT_TRACE_ID } from "../audit/correlation";
 
 // =============================================================================
@@ -418,13 +417,10 @@ export function createLogEntry(
 }
 
 /**
- * Log to console and loggerService with [xs] prefix.
+ * No-op. Inspector data is captured via pushXsLog; this previously also
+ * mirrored every trace to the browser console, which flooded devtools.
  */
-export function xsConsoleLog(...args: any[]): void {
-  const payload = ["[xs]", ...args];
-  loggerService.log(payload);
-  // console.log(...payload);
-}
+export function xsConsoleLog(..._args: any[]): void {}
 
 // =============================================================================
 // TRACE ID MANAGEMENT
