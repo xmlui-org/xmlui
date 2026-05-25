@@ -170,19 +170,21 @@ export const StateContainer = memo(
     const stateFromOutside = useShallowCompareMemoize(parentState);
 
     const renderCountRef = useRef(0);
-    if (process.env.NODE_ENV === "development") {
-      useLayoutEffect(() => {
-        renderCountRef.current += 1;
-        // Use the wrapped component's type (first child) for containers — avoids all containers
-        // colliding on the "Container" label when they have no uid.
-        const innerType = (node as any).children?.[0]?.type;
-        const baseLabel = innerType ?? node.type ?? "anon";
-        const label = node.uid ? `${baseLabel}#${node.uid}` : baseLabel;
-        // accumulate per-label counts silently; read window.__renderCounts in DevTools to inspect
-        (globalThis as any).__renderCounts ??= {};
-        (globalThis as any).__renderCounts[label] = renderCountRef.current;
-      });
-    }
+    // Render counter for dev profiling. The useLayoutEffect must be called unconditionally
+    // (Rules of Hooks). The process.env check is placed INSIDE the callback so the bundler
+    // can dead-code-eliminate the body in production while the hook call site stays stable.
+    useLayoutEffect(() => {
+      if (process.env.NODE_ENV !== "development") return;
+      renderCountRef.current += 1;
+      // Use the wrapped component's type (first child) for containers — avoids all containers
+      // colliding on the "Container" label when they have no uid.
+      const innerType = (node as any).children?.[0]?.type;
+      const baseLabel = innerType ?? node.type ?? "anon";
+      const label = node.uid ? `${baseLabel}#${node.uid}` : baseLabel;
+      // accumulate per-label counts silently; read window.__renderCounts in DevTools to inspect
+      (globalThis as any).__renderCounts ??= {};
+      (globalThis as any).__renderCounts[label] = renderCountRef.current;
+    });
 
     // ========================================================================
     // LAYER 2: COMPONENT REDUCER STATE
