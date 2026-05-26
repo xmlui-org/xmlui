@@ -858,8 +858,10 @@ function completePromise(input: any): Promise<any> {
       for (const key of Object.keys(input)) {
         let completedPromise = await completePromiseInternal(input[key]);
         if (input[key] !== completedPromise) {
-          //prevent write if it's the same reference (can cause problems in frozen objects)
-          input[key] = completedPromise;
+          const descriptor = Object.getOwnPropertyDescriptor(input, key);
+          if (descriptor?.writable || descriptor?.set) {
+            input[key] = completedPromise;
+          }
         }
       }
       return input;

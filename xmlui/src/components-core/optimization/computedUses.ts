@@ -22,6 +22,7 @@ import { Parser } from "../../parsers/scripting/Parser";
 import type { Statement } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
 import { isContainerLike } from "../rendering/ContainerUtils";
+import { XMLUI_GLOBAL_NAMES } from "../state/FrameworkGlobals";
 
 // LRU cache for parsed raw strings to avoid unbounded memory growth.
 // AST_CACHE_MAX_SIZE covers typical apps while guarding against generated code.
@@ -107,13 +108,20 @@ const JS_STDLIB_GLOBALS = new Set([
 
 const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 
-// TODO: Framework globals (Actions, toast, Auth, App, etc.) are currently NOT filtered out.
-// If a component like <Select onChange="Actions.callApi()" /> reads them, it gets falsely
-// identified as having an external read dependency (`nonDynamicReadDeps.size > 0`).
-// This causes unnecessary promotion to an implicit StateContainer, which adds React tree overhead
-// and isolates internal component state (breaking features like Select's clearable interaction).
-// Fix: Export `XMLUI_GLOBAL_NAMES` from the AppContext module and add it to the exclusion check
-// below (where `keepDep` is defined).
+/**
+ * XMLUI framework globals (Actions, navigate, toast, App, Log, theme helpers,
+ * date/math/storage utilities, ...). These are wired into every expression
+ * scope by AppContent's `appContextValue` and are NEVER stored in parent UI
+ * state, so they must not contribute to `parentDependencies`.
+ *
+ * Without this filter, any component reading e.g. `Actions.foo()` ends up
+ * with a non-empty `nonDynamicReadDeps`, which falsely promotes
+ * `isImplicitContainerByDefault` components (Select, List, Table) to a full
+ * StateContainer — adding tree depth and isolating their state lifecycle.
+ *
+ * See proposal: `optimization/specs/TODO - framework-globals-leak-proposal.md`.
+ */
+const isXmluiFrameworkGlobal = (name: string): boolean => XMLUI_GLOBAL_NAMES.has(name);
 
 function depsOfRecord(
   record: Record<string, unknown> | undefined,
@@ -308,7 +316,7 @@ function computeUsesInternal(
   }
 
   const keepDep = (d: string) =>
-    !localDeclared.has(d) && !isBuiltinGlobal(d) && !injectedVarsScope.has(d);
+    !localDeclared.has(d) && !isBuiltinGlobal(d) && !isXmluiFrameworkGlobal(d) && !injectedVarsScope.has(d);
   const parentDependencies = new Set<string>();
   const parentDependenciesReads = new Set<string>();
   for (const d of usedHere) if (keepDep(d)) parentDependencies.add(d);
@@ -370,7 +378,7 @@ function computeUsesInternal(
     if (!isExplicitOwner) {
       for (const uid of childEscapingUIDs) myEscapingUID.add(uid);
     }
-    
+
     // Dynamic vars ($context) belong to this container's computedUses but don't cascade up.
     const propagatedDeps = nonDynamicParentDeps;
     const propagatedReadDeps = nonDynamicReadDeps;

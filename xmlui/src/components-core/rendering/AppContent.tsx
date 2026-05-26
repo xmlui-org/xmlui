@@ -1,12 +1,7 @@
 import type { ReactNode } from "react";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { get } from "lodash-es";
 import toast from "react-hot-toast";
-
-import { version } from "../../../package.json";
 import { AppError } from "../errors/app-error";
-
-import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { createPubSubService } from "../pubsub/PubSubService";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
@@ -24,14 +19,10 @@ import { EMPTY_OBJECT } from "../constants";
 import type { IAppStateContext } from "../../components/App/AppStateContext";
 import { AppStateContext } from "../../components/App/AppStateContext";
 import { createAppState, type AppState } from "./appState";
-import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 import { useDebugView } from "../DebugViewProvider";
-import { miscellaneousUtils } from "../appContext/misc-utils";
-import { dateFunctions } from "../appContext/date-functions";
-import { mathFunctions } from "../appContext/math-function";
-import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
+import { setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
-import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import { buildAppContextValue, type AppContextDeps } from "../state/appContextFactory";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -1095,124 +1086,54 @@ export function AppContent({
     return wrapper;
   }, []);
 
-  // --- We assemble the app context object form the collected information
-  const appContextValue = useMemo(() => {
-    const ret: AppContextObject = {
-      // --- Engine-related
-      version,
-
-      // --- Actions namespace
-      Actions,
-
-      // --- App-specific
-      appGlobals,
-      debugEnabled,
-      decorateComponentsWithTestId,
-      environment,
-      mediaSize,
-      queryClient,
-      standalone,
-      // String-based type checking: Use constructor.name to identify ShadowRoot
-      // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
-      appIsInShadowDom:
-        typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot,
-
-      // --- Date-related
-      ...dateFunctions,
-
-      // --- Math-related
-      ...mathFunctions,
-
-      // --- Local storage utilities
-      ...localStorageFunctions,
-      storageTimestamp,
-
-      // --- File Utilities
-      formatFileSizeInBytes,
-      getFileExtension,
-
-      // --- Navigation-related
-      navigate,
-      routerBaseName,
-      get pathname() { return globalThis?.location?.pathname; },
-      setNavigationHandlers,
-
-      // --- Notifications and dialogs
-      confirm,
-      signError,
-      toast: tracedToast,
-
-      // --- Theme-related
-      activeThemeId,
-      activeThemeTone,
-      availableThemeIds,
-      setTheme: setActiveThemeId,
-      setThemeTone: setActiveThemeTone,
-      toggleThemeTone,
-      getThemeVar: themeGetThemeVar,
-
-      // --- User-related
-      loggedInUser,
-      setLoggedInUser,
-
-      delay,
-      embed,
-      apiInterceptorContext,
-      getPropertyByPath: get,
-
-      // --- Various utils
-      ...miscellaneousUtils,
-
-      forceRefreshAnchorScroll,
-      scrollBookmarkIntoView,
-
-      // --- AppState global state management
-      AppState,
-
-      // --- Phase 2 managed replacement globals
-      Log,
-      App: {
-        ...AppUtilsNamespace,
-        fetch: createAppFetch(appGlobals),
-        environment: getAppEnvironment(),
-      },
-      Clipboard: ClipboardNamespace,
-
-      // --- PubSub messaging
-      pubSubService,
-      publishTopic: pubSubService.publishTopic,
-    };
-    return ret;
-  }, [
+  // --- We assemble the app context object from the collected information.
+  // Single declaration: factoryDeps is both the factory's input and the source
+  // of the useMemo deps array (via Object.values). Stable values (module-level
+  // imports, useState setters, memoized callbacks) compare via Object.is and
+  // don't trigger spurious re-memos.
+  const factoryDeps: AppContextDeps = {
     Actions,
     appGlobals,
     debugEnabled,
     decorateComponentsWithTestId,
     environment,
     mediaSize,
+    queryClient,
     standalone,
+    // String-based type checking: Use constructor.name to identify ShadowRoot
+    // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
+    appIsInShadowDom:
+      typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot,
+    storageTimestamp,
     navigate,
     routerBaseName,
     setNavigationHandlers,
     confirm,
+    signError,
+    toast: tracedToast,
     activeThemeId,
     activeThemeTone,
     availableThemeIds,
-    setActiveThemeId,
-    setActiveThemeTone,
+    setTheme: setActiveThemeId,
+    setThemeTone: setActiveThemeTone,
     toggleThemeTone,
-    themeGetThemeVar,
+    getThemeVar: themeGetThemeVar,
     loggedInUser,
+    setLoggedInUser,
     embed,
     apiInterceptorContext,
     forceRefreshAnchorScroll,
     scrollBookmarkIntoView,
-    root,
     AppState,
     Log,
     pubSubService,
-    storageTimestamp,
-  ]);
+    publishTopic: pubSubService.publishTopic,
+  };
+  const appContextValue = useMemo(
+    () => buildAppContextValue(factoryDeps),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Object.values(factoryDeps),
+  );
 
   return (
     <AppContext.Provider value={appContextValue}>

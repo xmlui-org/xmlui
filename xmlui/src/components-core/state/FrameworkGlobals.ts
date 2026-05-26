@@ -1,5 +1,10 @@
 import { OPTIMIZER_METADATA } from "../optimization/optimizer-metadata";
 
+// XMLUI_GLOBAL_NAMES lives in the factory — the single source of truth.
+// Re-exported here so the optimizer (computedUses) has a stable import path
+// alongside UNSTABLE_GLOBAL_VARS.
+export { XMLUI_GLOBAL_NAMES } from "./appContextFactory";
+
 /**
  * A set of global state variables that are reference-unstable.
  * These variables are recreated frequently (e.g., new objects on every navigation).

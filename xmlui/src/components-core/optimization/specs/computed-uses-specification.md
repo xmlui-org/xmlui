@@ -205,19 +205,43 @@ statically and are skipped; their contract is enforced only by the runtime
 check.
 
 
+### Framework Globals Filtering
+
+The optimizer must distinguish between **parent UI state** and **framework globals** — values wired into every expression scope via React context (see `appContextFactory.ts`). Framework globals include utility functions, theme helpers, navigation APIs, etc.
+
+**Without filtering:** A simple `onChange="Actions.callApi('save')"` would register `Actions` as an external read dependency, causing light components marked `isImplicitContainerByDefault` (Select, List, Table, etc.) to be unnecessarily promoted to full `StateContainer` wrappers. This creates overhead: context overhead, reducer queue setup, and state isolation that breaks sibling communication (e.g., `updateState` calls from outside the promoted container are blocked).
+
+**Solution:** The `XMLUI_GLOBAL_NAMES` set (built once at module load in `appContextFactory.ts`) lists all framework globals:
+- **Explicitly named** (40 keys): `Actions`, `toast`, `navigate`, `App`, `Log`, `confirm`, `delay`, theme setters, etc.
+- **Derived via spreads** (auto-discovered): `dateFunctions` (e.g., `formatDate`, `now`), `mathFunctions` (e.g., `avg`, `sum`), `localStorageFunctions`, `miscellaneousUtils` (e.g., `capitalize`).
+
+**Architecture:** Single source of truth is `buildAppContextValue(deps)` in `appContextFactory.ts`. The factory function defines the shape of the injected object. `XMLUI_GLOBAL_NAMES = Object.keys(buildAppContextValue(stub))` is computed once at module load and re-exported by `FrameworkGlobals.ts` for use by the `computedUses` optimizer.
+
+**Filter implementation in `computedUses.ts`:**
+```ts
+const keepDep = (d: string) =>
+  !localDeclared.has(d) &&
+  !isBuiltinGlobal(d) &&
+  !XMLUI_GLOBAL_NAMES.has(d) &&  // ← Framework globals filtered here
+  !injectedVarsScope.has(d);
+```
+
+**Invariant:** If a new framework global is added to `appContextValue`, it must:
+1. Be added to `AppContextDeps` interface in `appContextFactory.ts` (strict type-checking).
+2. Be passed from `AppContent.tsx` when calling `buildAppContextValue()` (TypeScript will error if forgotten).
+3. Automatically propagate to `XMLUI_GLOBAL_NAMES` (no manual list to maintain).
+
 ---
 
 ## 7. TODO (Future Work)
 
-1. **Filtering Framework Globals (False Promotion):**
-   Using global functions like `toast` or `Actions.callApi` is currently treated as a dependency on external `parentState`. This causes "False Promotion" of light components. `XMLUI_GLOBAL_NAMES` should be added to the filter list (see `TODO - framework-globals-leak-proposal.md`).
-2. **Lazy State Cloning in Event Handlers (Proxy):**
+1. **Lazy State Cloning in Event Handlers (Proxy):**
    Current implementation uses `cloneDeep` for state creation during events. On heavy pages, this causes delays. A `Proxy` with *Copy-on-Write* strategy would be more efficient.
-3. **AST Analysis of `.xs` File Functions:**
+2. **AST Analysis of `.xs` File Functions:**
    Enable state narrowing for components with code-behind by performing transitive AST analysis of function bodies in `.xs` files.
-4. **Metadata Consolidation (DRY):**
+3. **Metadata Consolidation (DRY):**
    Merge `childInjectedVars` and `contextVars` in future refactorings to reduce duplication.
-5. **Pure Static Tracking:**
+4. **Pure Static Tracking:**
    Eliminate the `$`-prefix fallback in `extractScopedState` entirely once the analyzer is 100% accurate in tracking lexical scope, relying only on explicit `computedUses` lists.
 
 ---

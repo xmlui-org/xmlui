@@ -671,12 +671,11 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — JS_STDLIB_GLOBALS filter
     expect(root.computedUses).not.toContain("JSON");
   });
 
-  it("framework-like identifier (toast) is NOT filtered — appears in computedUses", () => {
-    // Framework globals like 'toast' are resolved from localContext at runtime,
-    // not from globalThis. They are NOT in JS_STDLIB_GLOBALS, so they correctly
-    // appear in computedUses. This is harmless: toast is stable (never changes),
-    // and since it's not in parentState, extractScopedState simply omits it without
-    // breaking the scoped state for other dependencies.
+  it("framework global (toast) IS filtered — does NOT appear in computedUses", () => {
+    // toast is wired into every expression scope by appContextValue (see AppContent.tsx).
+    // It is resolved from localContext at runtime and is NEVER stored in parent UI state,
+    // so it must not contribute to parentDependencies.
+    // After the XMLUI_GLOBAL_NAMES filter, toast is excluded; only rarelyChanges remains.
     const root = node("Stack", {
       vars: { x: "{0}" },
       children: [
@@ -687,8 +686,8 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — JS_STDLIB_GLOBALS filter
       ],
     });
     computeUsesForTree(root);
-    // toast passes through (not a JS_STDLIB_GLOBAL), rarelyChanges also passes
-    expect(root.computedUses).toContain("toast");
+    // toast is filtered by XMLUI_GLOBAL_NAMES; rarelyChanges stays
+    expect(root.computedUses).not.toContain("toast");
     expect(root.computedUses).toContain("rarelyChanges");
   });
 
@@ -704,6 +703,133 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — JS_STDLIB_GLOBALS filter
     expect(root.computedUses).toContain("screen");
   });
 });
+
+// ---------------------------------------------------------------------------
+// XMLUI_GLOBAL_NAMES filter (framework globals leak proposal)
+// Framework globals (Actions, toast, navigate, App, Log, ...) are wired into
+// every expression scope via appContextValue and must not be treated as
+// external parent-state dependencies.
+// ---------------------------------------------------------------------------
+
+describe.skipIf(skipIfDisabled)(
+  "computeUsesForTree — XMLUI_GLOBAL_NAMES filter (framework globals leak proposal)",
+  () => {
+    it("Actions.* in onChange does NOT appear in computedUses for Select", () => {
+      // Proposal headline scenario: <Select onChange="Actions.callApi('save')" />
+      // `Actions` is a framework global — filtered. It must NOT appear in computedUses.
+      // Note: Select's own uid still appears because it must register its API in the
+      // parent container (needed for sibling refs like {mySelect.value}).
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Select", {
+            uid: "mySelect",
+            events: { onChange: "Actions.callApi('save')" },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      const select = root.children![0];
+      // Actions is a framework global — must be absent from computedUses.
+      expect(select.computedUses ?? []).not.toContain("Actions");
+    });
+
+    it("Actions.* in onChange on uid-less Select does NOT promote it to a StateContainer", () => {
+      // Without a uid, Select has no reason to become a container — its only
+      // identifier (Actions) is a framework global and is filtered out.
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Select", {
+            // no uid
+            events: { onChange: "Actions.callApi('save')" },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      const select = root.children![0];
+      // No real parent deps, no uid → no computedUses assigned.
+      expect(select.computedUses).toBeUndefined();
+    });
+
+    it("toast in onClick does NOT appear in computedUses alongside real var", () => {
+      // toast is a framework global injected via localContext (see XMLUI_GLOBAL_NAMES).
+      // It is resolved from localContext at runtime and is NEVER stored in parent UI
+      // state, so it must NOT appear in `parentDependencies`.
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Button", {
+            events: { onClick: "{toast('hello')}" },
+            props: { label: "{rarelyChanges}" },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      const button = root.children![0];
+      // toast is filtered, rarelyChanges remains
+      expect(button.computedUses ?? []).not.toContain("toast");
+    });
+
+    it("toast filtered but real var still drives implicit-container promotion for Select", () => {
+      // Select is isImplicitContainerByDefault. After filtering toast, only the real
+      // var `rarelyChanges` remains — it is still enough to produce computedUses.
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Select", {
+            uid: "selWithToast",
+            events: { onClick: "{toast('hi')}" },
+            props: { initialValue: "{rarelyChanges}" },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      const sel = root.children![0];
+      expect(sel.computedUses).toContain("rarelyChanges");
+      expect(sel.computedUses).not.toContain("toast");
+    });
+
+    it("navigate in prop does NOT appear in computedUses", () => {
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Button", {
+            events: { onClick: "{navigate('/home')}" },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      expect(root.computedUses ?? []).not.toContain("navigate");
+    });
+
+    it("App.fetch in expression does NOT appear in computedUses", () => {
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Button", {
+            events: { onClick: "{App.fetch('/api')}" },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      expect(root.computedUses ?? []).not.toContain("App");
+    });
+
+    it("Log in expression does NOT appear in computedUses", () => {
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Text", {
+            props: { text: "{Log.info('test')}" },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      expect(root.computedUses ?? []).not.toContain("Log");
+    });
+  },
+);
 
 // ---------------------------------------------------------------------------
 // function-free child narrowing
@@ -1489,24 +1615,27 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Бaг 22: arrow-fn param
   });
 
   it("implicit container with other deps does NOT exclude child UIDs from computedUses (Implicit UID Propagation Bug)", () => {
-    // Fragment has vars but no `uses` → implicit container at runtime.
-    // It has an external dependency on `toast`, which triggers computedUses calculation.
-    // It also contains `mySelect` which registers its API in the parent's state
-    // (bubbles through the implicit Fragment).
+    // Fragment has vars but no `uses` → explicit container at runtime.
+    // It has an external dependency on a real parent var (`externalVar`), which
+    // triggers computedUses narrowing. It also contains `mySelect` which registers
+    // its API in the parent's state (bubbles through the Fragment).
     //
-    // Before the fix: child escaping UIDs were incorrectly seen as "locally owned"
-    // by ANY container, so they were filtered out of computedUses.
-    // Result: computedUses=["toast"] → extractScopedState(parentState, ["toast"])
+    // Before the Bug 22 fix: child escaping UIDs were incorrectly seen as "locally
+    // owned" by ANY container, so they were filtered out of computedUses.
+    // Result: computedUses=["externalVar"] → extractScopedState(parentState, ["externalVar"])
     // removed `mySelect` from the scoped state → Button crashed.
+    //
+    // Note: the original version used `toast` as the external dep. `toast` is now
+    // filtered by XMLUI_GLOBAL_NAMES, so a real parent-state var is used instead.
     const root = node("Stack", {
-      vars: { x: "{0}" },
+      vars: { x: "{0}", externalVar: "{42}" },
       children: [
         node("Fragment", {
           vars: { testState: "{null}" },
           children: [
             node("Select", { uid: "mySelect" }),
             node("Button", {
-              events: { onClick: "toast.error(mySelect.value)" },
+              events: { onClick: "doSomething(externalVar, mySelect.value)" },
             }),
           ],
         }),
@@ -1515,7 +1644,7 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Бaг 22: arrow-fn param
     computeUsesForTree(root);
     const fragment = root.children![0];
     expect(fragment.computedUses).toBeDefined();
-    expect(fragment.computedUses).toContain("toast");
+    expect(fragment.computedUses).toContain("externalVar");
     // mySelect must be included in computedUses even though it's not "external"
     // (it registers in the parent), otherwise the narrowed parent state for
     // Fragment would exclude it.
