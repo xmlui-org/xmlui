@@ -121,6 +121,64 @@ export const AppMd = createMetadata({
       defaultValue: defaultProps.toneStorageKey,
       isInternal: true,
     },
+    locale: {
+      description: "BCP-47 locale override for the app.",
+      valueType: "string",
+      isInternal: true,
+    },
+    localeBundles: {
+      description: "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map.",
+      valueType: "any",
+      isInternal: true,
+    },
+    direction: {
+      description: "Text direction for the app.",
+      valueType: "string",
+      availableValues: ["ltr", "rtl", "auto"],
+      defaultValue: "auto",
+      isInternal: true,
+    },
+    scheduler: {
+      description: "Handler scheduler mode.",
+      valueType: "string",
+      availableValues: ["concurrent", "fifo"],
+      defaultValue: "concurrent",
+      isInternal: true,
+    },
+    maxQueuedPerTrace: {
+      description: "Maximum number of queued handlers allowed per scheduler trace.",
+      valueType: "integer",
+      defaultValue: 64,
+      isInternal: true,
+    },
+    urlCase: {
+      description: "URL canonicalisation case policy.",
+      valueType: "string",
+      availableValues: ["preserve", "lower"],
+      defaultValue: "preserve",
+      isInternal: true,
+    },
+    urlTrailingSlash: {
+      description: "URL canonicalisation trailing-slash policy.",
+      valueType: "string",
+      availableValues: ["preserve", "always", "never"],
+      defaultValue: "preserve",
+      isInternal: true,
+    },
+    urlQueryParamOrder: {
+      description: "URL canonicalisation query-parameter ordering policy.",
+      valueType: "string",
+      availableValues: ["preserve", "alphabetical"],
+      defaultValue: "preserve",
+      isInternal: true,
+    },
+    nonCanonicalUrl: {
+      description: "Action taken when the current URL is not canonical.",
+      valueType: "string",
+      availableValues: ["warn", "rewrite", "redirect"],
+      defaultValue: "warn",
+      isInternal: true,
+    },
   },
   events: {
     ready: {
@@ -174,6 +232,21 @@ export const AppMd = createMetadata({
       parameters: {
         to: "The path that was navigated to.",
         queryParams: "Query parameters (only available for programmatic navigation).",
+      },
+    },
+    error: {
+      description:
+        `This event fires whenever the framework signals an unhandled error (loader failure, ` +
+        `handler exception, or render-time throw). The handler receives the structured ` +
+        `\`AppError\` and an event-like object whose \`preventDefault()\` suppresses the ` +
+        `default toast. By default the toast is shown first; the handler can also return ` +
+        `\`false\` to suppress the toast. Use this hook for centralised telemetry or custom ` +
+        `error UI.`,
+      signature:
+        "(error: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>",
+      parameters: {
+        error: "The structured `AppError` (code, category, retryable, correlationId, data).",
+        event: "Cancellable event payload. Call `event.preventDefault()` to suppress the toast.",
       },
     },
   },
@@ -278,6 +351,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       onKeyUp={lookupEventHandler("keyUp")}
       onWillNavigate={lookupEventHandler("willNavigate")}
       onDidNavigate={lookupEventHandler("didNavigate")}
+      onError={lookupEventHandler("error")}
       name={extractValue(node.props.name)}
       logo={extractValue(node.props.logo)}
       logoDark={extractValue(node.props["logo-dark"])}
@@ -288,6 +362,11 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       persistTheme={extractValue.asOptionalBoolean(node.props.persistTheme, false)}
       themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
       toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
+      locale={extractValue(node.props.locale)}
+      localeBundles={extractValue(node.props.localeBundles)}
+      direction={extractValue.asOptionalString(node.props.direction, "auto")}
+      scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
+      maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}
 
       applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader)}

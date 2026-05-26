@@ -18,7 +18,7 @@ That means a single interaction can serve several audiences at once: a developer
 
 Drag the thumb, tab into the slider, and shift focus away. Then open the Inspector to see the semantic trace entries.
 
-```xmlui-pg
+```xmlui-pg id="slider-interact-then-inspect-b6d7"
 ---app display
 <App>
   <Card var.swVal="">

@@ -1,8 +1,23 @@
 # Internationalisation Foundations — Implementation Plan
 
 **Date:** 2026-04-30
-**Status:** Proposal
+**Status:** ✅ Sealed (2026-06) — Phases 1–5 shipped; Phase 6.2 (default `strictI18n: true` flip) reserved for next major.
 **Source:** [`managed-react.md` §11 "Internationalization and Localization"](./managed-react.md) and the §17 scorecard row **"i18n — Dates only."**
+
+---
+
+## Completion summary (2026-06)
+
+- **Phase 1.1 ✅** `<App locale>`, `<App localeBundles>`, `<App direction>` props wired in `components-core/rendering/AppContent.tsx`; `resolveLocale()` honours app-prop > user-override > persisted (`localePersistKey`, default `"xmlui.locale"`) > `navigator.languages[]` > `defaultLocale` (default `"en"`); `appGlobals.strictI18n` documented (default `false`).
+- **Phase 2.1 ✅** `App.translate(key, vars?)`, `App.t` alias, `App.setLocale`, `App.locale`, `App.localeSource`, `App.availableLocales`, `App.registerLocaleBundle(s)`, `App.reloadLocale`, `App.isRtlLocale`, `App.direction` all exposed on the public `AppContext.App` namespace.
+- **Phase 2.2 ✅** `<I18n key>` component (`components/I18n/I18n.tsx` + `I18n.md`) with prop variables and named slots for inline markup.
+- **Phase 2.3 ✅** Framework strings extracted to `xmlui-en.ts` (`xmlui.form.*`, `xmlui.select.*`, `xmlui.drawer.*`, `xmlui.modal.*`, `xmlui.validation.*`); `SelectReact`, `DrawerReact`, and the validator registry route through `App.translate`.
+- **Phase 3 ✅** `@formatjs/intl-messageformat` adapter in `i18n/icu.ts`; plural/select honoured across locales; ICU parse errors emit `icu-parse-error`.
+- **Phase 4 ✅** `App.formatNumber` / `formatCurrency` / `formatList` / `formatRelativeTime` / `compare` / `pluralRules` backed by `Intl.*` and the active locale.
+- **Phase 5 ✅** `App.direction` reactive accessor, full SCSS logical-properties migration, `scripts/lint-physical-css.ts` linter, 23 logical-property unit tests.
+- **Tests** 33 unit tests under `tests/components-core/i18n/` + 18 E2E tests: 5 in `tests-e2e/i18n/locale-switch.spec.ts` (translate, `setLocale` reactivity, missing-key fallback, `<I18n>` ICU plural switch, RTL auto-direction) + 13 in `tests-e2e/i18n/rtl-layout.spec.ts` (direction prop wiring, `document.documentElement.dir`, HStack mirror, TextBox alignment, Button/Checkbox RTL, explicit override).
+- **Docs** End-user page `/docs/managed-react/i18n-foundations`; `managed-react.md` §11 "What is missing" bullets all marked resolved; §17 scorecard row updated to ✅ Sealed; `AGENTS.md` doc-map row for `i18n.md` added; `STATUS.md` row #11 moved to Closed.
+- **Reserved for W8 / next major** Phase 6.2: flip `appGlobals.strictI18n` default from `false` to `true`. Tracked on the master plan Wave 8 strict-default sweep.
 
 ---
 
@@ -340,7 +355,7 @@ Step 1.1.
 
 ---
 
-### Step 2.2 — `<I18n>` Component for Slot-Based Markup
+### Step 2.2 — `<I18n>` Component for Slot-Based Markup ✅ DONE (2026-05)
 
 **Priority:** 3
 
@@ -394,7 +409,7 @@ Step 2.1; Step 3.1 (the ICU runtime is needed for slotted markup).
 
 ---
 
-### Step 2.3 — Extract Built-in Framework Strings
+### Step 2.3 — Extract Built-in Framework Strings ✅ DONE (2026-05)
 
 **Priority:** 4
 

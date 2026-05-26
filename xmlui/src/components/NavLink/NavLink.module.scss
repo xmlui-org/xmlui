@@ -123,8 +123,8 @@ $transition: color 0.1s, background-color 0.1s;
         &:after {
           transition: $transition;
           position: absolute;
-          left: 0.1em;
-          right: 0.1em;
+          inset-inline-start: 0.1em;
+          inset-inline-end: 0.1em;
           bottom: 0;
           height: $thickness-indicator-NavLink;
           border-radius: $borderRadius-indicator-NavLink;
@@ -221,8 +221,8 @@ $transition: color 0.1s, background-color 0.1s;
         &:after {
           top: 0;
           bottom: 0;
-          left: 0;
-          right: auto;
+          inset-inline-start: 0;
+          inset-inline-end: auto;
           width: $thickness-indicator-NavLink;
           height: auto;
           border-radius: $borderRadius-indicator-NavLink;
@@ -230,7 +230,7 @@ $transition: color 0.1s, background-color 0.1s;
       }
 
       &.indented {
-        padding-left: 2.4em;
+        padding-inline-start: 2.4em;
         flex-shrink: 0;
       }
     }
@@ -238,32 +238,32 @@ $transition: color 0.1s, background-color 0.1s;
 
   .level1 {
     padding: t.getThemeVar($themeVars, "padding-level1-#{$component}") !important;
-    padding-left: t.getThemeVar($themeVars, "paddingLeft-level1-#{$component}") !important;
-    padding-right: t.getThemeVar($themeVars, "paddingRight-level1-#{$component}") !important;
+    padding-inline-start: t.getThemeVar($themeVars, "paddingLeft-level1-#{$component}") !important;
+    padding-inline-end: t.getThemeVar($themeVars, "paddingRight-level1-#{$component}") !important;
     padding-top: t.getThemeVar($themeVars, "paddingTop-level1-#{$component}") !important;
     padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level1-#{$component}") !important;
   }
 
   .level2 {
     padding: t.getThemeVar($themeVars, "padding-level2-#{$component}") !important;
-    padding-left: t.getThemeVar($themeVars, "paddingLeft-level2-#{$component}") !important;
-    padding-right: t.getThemeVar($themeVars, "paddingRight-level2-#{$component}") !important;
+    padding-inline-start: t.getThemeVar($themeVars, "paddingLeft-level2-#{$component}") !important;
+    padding-inline-end: t.getThemeVar($themeVars, "paddingRight-level2-#{$component}") !important;
     padding-top: t.getThemeVar($themeVars, "paddingTop-level2-#{$component}") !important;
     padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level2-#{$component}") !important;
   }
 
   .level3 {
     padding: t.getThemeVar($themeVars, "padding-level3-#{$component}") !important;
-    padding-left: t.getThemeVar($themeVars, "paddingLeft-level3-#{$component}") !important;
-    padding-right: t.getThemeVar($themeVars, "paddingRight-level3-#{$component}") !important;
+    padding-inline-start: t.getThemeVar($themeVars, "paddingLeft-level3-#{$component}") !important;
+    padding-inline-end: t.getThemeVar($themeVars, "paddingRight-level3-#{$component}") !important;
     padding-top: t.getThemeVar($themeVars, "paddingTop-level3-#{$component}") !important;
     padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level3-#{$component}") !important;
   }
 
   .level4 {
     padding: t.getThemeVar($themeVars, "padding-level4-#{$component}") !important;
-    padding-left: t.getThemeVar($themeVars, "paddingLeft-level4-#{$component}") !important;
-    padding-right: t.getThemeVar($themeVars, "paddingRight-level4-#{$component}") !important;
+    padding-inline-start: t.getThemeVar($themeVars, "paddingLeft-level4-#{$component}") !important;
+    padding-inline-end: t.getThemeVar($themeVars, "paddingRight-level4-#{$component}") !important;
     padding-top: t.getThemeVar($themeVars, "paddingTop-level4-#{$component}") !important;
     padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level4-#{$component}") !important;
   }

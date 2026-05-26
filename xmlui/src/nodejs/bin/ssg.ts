@@ -685,7 +685,18 @@ export const ssg = async ({
   log(`copying dist to ${outPath}`);
   await cp(distPath, outPath, { recursive: true });
 
-  const shellHtml = await readFile(builtIndexPath, "utf-8");
+  let shellHtml = await readFile(builtIndexPath, "utf-8");
+
+  // Vite/rolldown extracts CSS to separate files but does not emit a <link> tag for
+  // them in the HTML. Without a static link the CSS only loads via JS injection, so
+  // prerendered pages appear unstyled when JavaScript is disabled. Inject <link>
+  // tags here so every generated page carries the full stylesheet.
+  const cssFilePaths = await collectCssFiles(outPath);
+  if (cssFilePaths.length > 0) {
+    log(`injecting ${cssFilePaths.length} CSS link(s) into shell HTML`);
+    const cssLinks = cssFilePaths.map((p) => `<link rel="stylesheet" href="${p}">`).join("\n    ");
+    shellHtml = shellHtml.replace(/<\/head>/i, `    ${cssLinks}\n  </head>`);
+  }
   const routeStore = await discoverRoutes({ contentDir });
   const pathsToRender = routeStore.staticRoutes();
   // Collision detection: a discovered page route must not share the base name of the fallback file.
@@ -836,6 +847,20 @@ export const ssg = async ({
 
   log(`completed. static files are in ${outPath}`);
 };
+
+async function collectCssFiles(dir: string, base = dir): Promise<string[]> {
+  const paths: string[] = [];
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      paths.push(...(await collectCssFiles(fullPath, base)));
+    } else if (entry.name.endsWith(".css")) {
+      paths.push("/" + path.relative(base, fullPath).replace(/\\/g, "/"));
+    }
+  }
+  return paths;
+}
 
 async function pathExists(targetPath: string): Promise<boolean> {
   try {

@@ -5,6 +5,8 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { ContainerAction } from "./containers";
 import { ContainerActionKind } from "./containers";
 import type { IDebugViewContext } from "../DebugViewProvider";
+import { pushXsLog } from "../inspector/inspectorUtils";
+import { isRenderInProgress } from "../scheduler";
 
 const MAX_STATE_TRANSITION_LENGTH = 100;
 
@@ -20,6 +22,16 @@ export function createContainerReducer(debugView: IDebugViewContext) {
 
   // --- The reducer function
   return produce((state: ContainerState, action: ContainerAction) => {
+    if (isRenderInProgress()) {
+      pushXsLog({
+        kind: "scheduler",
+        ts: Date.now(),
+        code: "determinism-state-write-after-render",
+        severity: "warn",
+        message: "State was written while a render phase was in progress.",
+        data: { action: action.type, uid: action.payload?.uid },
+      });
+    }
     // --- Check if the action has an appropriate uid
     const { uid } = action.payload;
     if (uid === undefined && action.type !== ContainerActionKind.STATE_PART_CHANGED) {

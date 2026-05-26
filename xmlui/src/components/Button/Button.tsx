@@ -114,6 +114,15 @@ export const ButtonMd = createMetadata({
       description: `This optional value is used to provide an accessible name for the ${COMP} in the context of its usage.`,
       valueType: "string",
     },
+    busyOnClick: {
+      description:
+        `When \`true\`, the ${COMP} auto-disables itself while its \`onClick\` ` +
+        `handler is running, preventing accidental double-submits. ` +
+        `Combine with \`handlerPolicy:click="single-flight"\` for full ` +
+        `dispatcher-level deduplication of rapid repeated clicks.`,
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   events: {
     click: dClick(COMP),
@@ -205,21 +214,41 @@ export const buttonComponentRenderer = wrapComponent(
   Button,
   ButtonMd,
   {
-    booleans: ["autoFocus"],
+    booleans: ["autoFocus", "busyOnClick"],
     strings: ["variant", "themeColor", "size", "iconPosition", "orientation", "contentPosition", "contextualLabel"],
     events: { click: "onClick", contextMenu: "onContextMenu", gotFocus: "onFocus", lostFocus: "onBlur" },
-    exclude: ["icon", "label", "enabled"],
+    exclude: ["icon", "label", "enabled", "busyOnClick"],
     customRender: (props, { node, extractValue, renderChild }) => {
       const iconName = extractValue.asString(node.props.icon);
       const label = extractValue.asDisplayText(node.props.label);
       const renderedChildren = hasRenderableChildren(node.children)
         ? renderChild(node.children, { type: "Stack", orientation: "horizontal" })
         : label;
+      const enabled = extractValue.asOptionalBoolean(node.props.enabled, defaultProps.enabled);
+      const busyOnClick = extractValue.asOptionalBoolean(node.props.busyOnClick, false);
+      if (busyOnClick) {
+        // --- Plan #6 W7-1: `busyOnClick` is a UX convenience that
+        // --- auto-disables the button while its `onClick` handler is
+        // --- in flight. Combined with `handlerPolicy:click =
+        // --- "single-flight"` it gives the most common “prevent
+        // --- double-submit” behaviour with one prop. The dispatcher
+        // --- already implements single-flight semantics; this shell
+        // --- only manages the local visual `disabled` state.
+        return (
+          <BusyButtonShell
+            buttonProps={props}
+            icon={iconName && <ThemedIcon name={iconName} aria-hidden />}
+            enabled={enabled}
+          >
+            {renderedChildren}
+          </BusyButtonShell>
+        );
+      }
       return (
         <Button
           {...props}
           icon={iconName && <ThemedIcon name={iconName} aria-hidden />}
-          disabled={!extractValue.asOptionalBoolean(node.props.enabled, defaultProps.enabled)}
+          disabled={!enabled}
         >
           {renderedChildren}
         </Button>
@@ -227,3 +256,42 @@ export const buttonComponentRenderer = wrapComponent(
     },
   },
 );
+
+/**
+ * Local shell that tracks whether the wrapped Button's `onClick`
+ * handler is still running, so the button can be auto-disabled
+ * ("busy") for the duration. Implements the visible half of the
+ * `busyOnClick` convenience; the dispatcher's single-flight policy
+ * handles handler-level deduplication.
+ */
+type BusyButtonShellProps = {
+  buttonProps: any;
+  icon: React.ReactNode;
+  enabled: boolean;
+  children: React.ReactNode;
+};
+function BusyButtonShell({ buttonProps, icon, enabled, children }: BusyButtonShellProps) {
+  const [busy, setBusy] = React.useState(false);
+  const originalOnClick = buttonProps.onClick;
+  const onClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (busy) return;
+      const result = originalOnClick?.(e);
+      if (result && typeof (result as any).then === "function") {
+        setBusy(true);
+        (result as Promise<unknown>).finally(() => setBusy(false));
+      }
+    },
+    [busy, originalOnClick],
+  );
+  return (
+    <Button
+      {...buttonProps}
+      icon={icon}
+      disabled={!enabled || busy}
+      onClick={onClick}
+    >
+      {children}
+    </Button>
+  );
+}

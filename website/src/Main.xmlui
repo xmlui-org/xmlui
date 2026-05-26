@@ -260,6 +260,72 @@
                         to="/docs/guides/hosted-deployment"
                     />
                     <NavGroup
+                        icon="atom"
+                        label="Managed React"
+                        to="/docs/managed-react/overview"
+                    >
+                        <NavLink
+                            label="Verified Type Contracts"
+                            to="/docs/managed-react/verified-type-contracts"
+                        />
+                        <NavLink
+                            label="Reactive Cycle Detection"
+                            to="/docs/managed-react/reactive-cycle-detection"
+                        />
+                        <NavLink
+                            label="Themevars Namespace"
+                            to="/docs/managed-react/themevars-namespace"
+                        />
+                        <NavLink
+                            label="Enforced Accessibility"
+                            to="/docs/managed-react/enforced-accessibility"
+                        />
+                        <NavLink
+                            label="Managed Lifecycle Vocabulary"
+                            to="/docs/managed-react/managed-lifecycle-vocabulary"
+                        />
+                        <NavLink
+                            label="Structured Exception Model"
+                            to="/docs/managed-react/structured-exception-model"
+                        />
+                        <NavLink
+                            label="Defended Routing"
+                            to="/docs/managed-react/defended-routing"
+                        />
+                        <NavLink
+                            label="Build-Validation Analyzers"
+                            to="/docs/managed-react/build-validation-analyzers"
+                        />
+                        <NavLink
+                            label="Internationalisation Foundations"
+                            to="/docs/managed-react/i18n-foundations"
+                        />
+                        <NavLink
+                            label="Code Injection Prevention"
+                            to="/docs/managed-react/code-injection-prevention"
+                        />
+                        <NavLink
+                            label="XSS Protection"
+                            to="/docs/managed-react/xss-protection"
+                        />
+                        <NavLink
+                            label="DOM API Isolation"
+                            to="/docs/managed-react/dom-api-isolation"
+                        />
+                        <NavLink
+                            label="Centralized HTTP"
+                            to="/docs/managed-react/http-centralization"
+                        />
+                        <NavLink
+                            label="Fetch Lifecycle"
+                            to="/docs/managed-react/fetch-lifecycle"
+                        />
+                        <NavLink
+                            label="Observability Substrate"
+                            to="/docs/managed-react/observability-substrate"
+                        />
+                    </NavGroup>
+                    <NavGroup
                         icon="braces"
                         label="Wrapping and Theming"
                         to="/docs/guides/wrap-component"
@@ -2480,6 +2546,120 @@
                     content="{appGlobals.docsContent['pages/hosted-deployment.md']}"
                 />
             </Page>
+
+            <Page
+                url="/docs/managed-react/overview"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/overview.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/verified-type-contracts"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/verified-type-contracts.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/reactive-cycle-detection"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/reactive-cycle-detection.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/themevars-namespace"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/themevars-namespace.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/enforced-accessibility"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/enforced-accessibility.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/managed-lifecycle-vocabulary"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/managed-lifecycle-vocabulary.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/structured-exception-model"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/structured-exception-model.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/defended-routing"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/defended-routing.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/build-validation-analyzers"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/build-validation-analyzers.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/i18n-foundations"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/i18n-foundations.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/code-injection-prevention"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/code-injection-prevention.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/xss-protection"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/xss-protection.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/dom-api-isolation"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/dom-api-isolation.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/http-centralization"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/http-centralization.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/fetch-lifecycle"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/fetch-lifecycle.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/observability-substrate"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/observability-substrate.md']}"
+                />
+            </Page>
+
             <Page url="/docs/change-log">
                 <ChangeLog />
             </Page>

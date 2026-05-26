@@ -29,7 +29,7 @@ We've seen that the `Invoices` [Table](/docs/reference/components/Table) include
 
 The `ModalDialog` wraps an `InvoiceDetails` component which displays an invoice and enables editing. Click the `Details` icon to open the viewer/editor.
 
-```xmlui-pg noHeader height="500px"
+```xmlui-pg noHeader height="500px" id="tutorial-09-b744"
 ---app
 <App>
   <Table gap="0" data="{[window.sampleInvoice]}">

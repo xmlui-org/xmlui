@@ -19,21 +19,21 @@
 
   .valid {
     .helperText {
-      margin-left: 0.25em;
+      margin-inline-start: 0.25em;
       color: t.$color-valid;
     }
   }
 
   .error {
     .helperText {
-      margin-left: 0.25em;
+      margin-inline-start: 0.25em;
       color: t.$color-error;
     }
   }
 
   .warning {
     .helperText {
-      margin-left: 0.25em;
+      margin-inline-start: 0.25em;
       color: t.$color-warning;
     }
   }

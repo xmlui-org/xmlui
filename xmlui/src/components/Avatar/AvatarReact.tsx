@@ -69,9 +69,15 @@ export const Avatar = memo(forwardRef(function Avatar(
 
   const mergedStyle = useMemo(
     () =>
+      // flexShrink: 0 keeps the avatar at its declared 1:1 aspect ratio when it
+      // lives inside a horizontally constrained flex parent (e.g. a Table cell
+      // or a Link). Without it, runtime layout behaviors can apply
+      // `flex-shrink: 1` to the Avatar via emotion classes that override the
+      // SCSS rule, collapsing the avatar to a sliver while leaving its height
+      // intact.
       isCustomSize
-        ? { ...style, width: size, height: size, fontSize: calculateFontSize(size!) }
-        : style,
+        ? { ...style, width: size, height: size, fontSize: calculateFontSize(size!), flexShrink: 0 }
+        : { ...style, flexShrink: 0 },
     [isCustomSize, size, style],
   );
 

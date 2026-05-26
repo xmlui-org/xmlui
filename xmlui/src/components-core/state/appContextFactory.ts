@@ -23,12 +23,7 @@ import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions } from "../appContext/local-storage-functions";
 import { miscellaneousUtils } from "../appContext/misc-utils";
-import {
-  AppUtilsNamespace,
-  ClipboardNamespace,
-  createAppFetch,
-  getAppEnvironment,
-} from "../appContext/app-utils";
+import { ClipboardNamespace } from "../appContext/app-utils";
 import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 
 // ---------------------------------------------------------------------------
@@ -67,6 +62,13 @@ export interface AppContextDeps {
   scrollBookmarkIntoView: AppContextObject["scrollBookmarkIntoView"];
   AppState: AppContextObject["AppState"];
   Log: AppContextObject["Log"];
+  /**
+   * The `App` global namespace — built in `AppContent.tsx` from `AppUtilsNamespace`
+   * extended with locale/translate/scheduler/error-handler hooks. Passed as a dep
+   * so the factory stays the single source of TOP-LEVEL keys without owning the
+   * complete `App.*` shape.
+   */
+  App: AppContextObject["App"];
   pubSubService: AppContextObject["pubSubService"];
   publishTopic: AppContextObject["publishTopic"];
 }
@@ -154,17 +156,7 @@ export function buildAppContextValue(d: AppContextDeps): AppContextObject {
 
     // --- Phase 2 managed replacement globals
     Log: d.Log,
-    App: {
-      ...AppUtilsNamespace,
-      // Lazy getters: keeps Object.keys happy while avoiding calls at stub time
-      // (createAppFetch and getAppEnvironment may not tolerate undefined input).
-      get fetch() {
-        return createAppFetch(d.appGlobals);
-      },
-      get environment() {
-        return getAppEnvironment();
-      },
-    },
+    App: d.App,
     Clipboard: ClipboardNamespace,
 
     // --- PubSub messaging

@@ -188,6 +188,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               className={styles.labelWrapper}
               style={{
                 height: labelWrapperHeight,
+                width: resolvedLabelWidth,
+                flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
+                justifyContent: resolvedLabelWidthProp !== undefined ? "flex-start" : undefined,
               }}
             >
               <Part partId={PART_LABEL}>
@@ -205,7 +208,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   }
                   style={{
                     ...labelStyle,
-                    width: resolvedLabelWidth,
+                    width: resolvedLabelWidthProp !== undefined ? "100%" : undefined,
                     flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                   }}
                   className={classnames(styles.inputLabel, {
@@ -275,6 +278,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             className={styles.labelWrapper}
             style={{
               height: labelWrapperHeight,
+              width: resolvedLabelWidth,
+              flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
+              justifyContent: resolvedLabelWidthProp !== undefined ? "flex-start" : undefined,
             }}
           >
             <Part partId={PART_LABEL}>
@@ -283,7 +289,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
                 style={{
                   ...labelStyle,
-                  width: resolvedLabelWidth,
+                  width: resolvedLabelWidthProp !== undefined ? "100%" : undefined,
                   flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                 }}
                 className={classnames(styles.inputLabel, {

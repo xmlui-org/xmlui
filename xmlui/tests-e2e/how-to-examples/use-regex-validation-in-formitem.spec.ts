@@ -15,7 +15,7 @@ const markdown = getExampleSource(
 test.describe("FormItem regex validation with severity", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
-    "FormItem regex validation with severity",
+    "formitem-regex-validation-with-severity",
   );
 
   test("initial state shows fields with example placeholders", async ({ initTestBed, page }) => {

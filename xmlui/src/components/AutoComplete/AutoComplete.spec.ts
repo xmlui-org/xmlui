@@ -147,9 +147,48 @@ test("multi mode allows selecting multiple options", async ({
 
   await driver.click();
 
-  // Both selected options should be visible as badges
-  await expect(page.getByText("Bruce Wayne")).toBeVisible();
-  await expect(page.getByText("Diana Prince")).toBeVisible();
+  // Both selected options should be visible as badges.
+  // `filter({ visible: true })` excludes the off-screen ghost measurer that
+  // mirrors every badge for width calculations.
+  await expect(page.getByText("Bruce Wayne").filter({ visible: true })).toBeVisible();
+  await expect(page.getByText("Diana Prince").filter({ visible: true })).toBeVisible();
+});
+
+// Regression: the ghost measurer (used to compute badge widths for the "+N more"
+// overflow logic) must stay hidden from users. If it ever becomes visible, this
+// test catches the duplication immediately with an exact-count check.
+test("multi mode keeps badge measurer hidden from users", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
+  await initTestBed(`
+    <Fragment>
+      <AutoComplete id="autoComplete" multi="true">
+        <Option value="1" label="Bruce Wayne" />
+        <Option value="2" label="Clark Kent" />
+        <Option value="3" label="Diana Prince" />
+      </AutoComplete>
+    </Fragment>
+  `);
+
+  const driver = await createAutoCompleteDriver("autoComplete");
+  await driver.click();
+  await driver.selectLabel("Bruce Wayne");
+  await driver.selectLabel("Diana Prince");
+
+  // Exactly one real badge per selected label (ghost spans are tagged
+  // [data-ghost="badge"] and excluded here).
+  const realBadges = page.locator('span:not([data-ghost])');
+  await expect(realBadges.filter({ hasText: "Bruce Wayne" })).toHaveCount(1);
+  await expect(realBadges.filter({ hasText: "Diana Prince" })).toHaveCount(1);
+
+  // Ghost measurer exists but is hidden from users.
+  const ghostBadges = page.locator('[data-ghost="badge"]');
+  await expect(ghostBadges).toHaveCount(2);
+  for (let i = 0; i < 2; i++) {
+    await expect(ghostBadges.nth(i)).toBeHidden();
+  }
 });
 
 test("searching filters options", async ({ initTestBed, page, createAutoCompleteDriver }) => {
@@ -549,6 +588,297 @@ test("supports keyboard navigation with arrow keys", async ({ initTestBed, page 
   // Verify selection
   await expect(combobox).toHaveValue("Clark Kent");
 });
+
+test(
+  "custom Option children are preserved while filtering",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete>
+        <Option value="1" label="Bruce Wayne">
+          <Text>CUSTOM Bruce</Text>
+        </Option>
+        <Option value="2" label="Clark Kent">
+          <Text>CUSTOM Clark</Text>
+        </Option>
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+
+    // Type to filter — only "Clark" should remain. The custom template for
+    // that option must still be rendered. Scope the assertion to the dropdown
+    // so we don't also match the hidden registration span that HiddenOption
+    // emits for data collection.
+    await page.keyboard.type("Clark");
+    await expect(listbox.getByText("CUSTOM Clark")).toBeVisible();
+    await expect(listbox.getByText("CUSTOM Bruce")).toHaveCount(0);
+  },
+);
+
+// Regression: with `groupBy` set on AutoComplete, group headers must be
+// derived from the *visible* (filtered) options — not from the static input
+// order. If the first option of a group gets filtered out, the next visible
+// option in that group should now render its group's header.
+test(
+  "group header shifts to next visible option when filtering",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete multi="true" groupBy="clientName">
+        <property name="groupHeaderTemplate">
+          <Text>{($group || '').toUpperCase()}</Text>
+        </property>
+        <Option value="a1" label="Analytics Dashboard"
+                clientName="Verge" keywords="{['Verge']}" />
+        <Option value="a2" label="Data Pipeline"
+                clientName="Verge" keywords="{['Verge']}" />
+        <Option value="b1" label="Compliance Audit"
+                clientName="Aurora" keywords="{['Aurora']}" />
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("listbox")).toBeVisible();
+
+    // Initially both VERGE and AURORA headers render once each.
+    await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("AURORA", { exact: true })).toHaveCount(1);
+
+    // Filter out the original first VERGE option ("Analytics Dashboard").
+    // "Data Pipeline" remains and should now carry the VERGE header.
+    await page.keyboard.type("Pipeline");
+    await expect(page.getByText("Data Pipeline")).toBeVisible();
+    await expect(page.getByText("Analytics Dashboard")).toHaveCount(0);
+    await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("AURORA", { exact: true })).toHaveCount(0);
+  },
+);
+
+// Regression: when no `groupHeaderTemplate` is provided, the group key string
+// itself renders as the header. Verifies the fallback path.
+test(
+  "groupBy without groupHeaderTemplate renders plain group name",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete groupBy="category">
+        <Option value="apple" label="Apple" category="Fruit" />
+        <Option value="carrot" label="Carrot" category="Vegetable" />
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("listbox")).toBeVisible();
+    await expect(page.getByText("Fruit", { exact: true })).toBeVisible();
+    await expect(page.getByText("Vegetable", { exact: true })).toBeVisible();
+  },
+);
+
+// Regression: in multi mode the trigger used to wrap selected badges to new
+// rows (flex-wrap: wrap + height: max-content), which pushed the rest of the
+// page down. Selected items now stay on a single row; when they run out of
+// horizontal space, the overflow collapses into a "+N more" chip and the
+// trigger height stays constant. Below-the-AutoComplete content must not move.
+// Regression: the truncation reserved the *rendered* input width, which (due
+// to `flex: 1`) inflates to fill the leftover space — so even a single badge
+// could push the measurement over budget and end up in "+N more". The
+// reservation now reads the CSS `min-width: 100px` instead, so badges go
+// into the overflow chip ONLY when they truly don't fit.
+test(
+  "all badges stay visible when they fit in the trigger",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete multi="true" width="600px">
+        <Option value="1" label="Alpha" />
+        <Option value="2" label="Beta" />
+        <Option value="3" label="Gamma" />
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+    for (const label of ["Alpha", "Beta", "Gamma"]) {
+      await listbox.getByRole("option", { name: label }).click();
+    }
+
+    await page.keyboard.press("Escape");
+    await expect(listbox).toBeHidden();
+
+    // With 600px, three short labels + the search input + actions clearly fit.
+    // No "+N more" chip must appear.
+    await expect(page.getByRole("button", { name: /more selected/ })).toHaveCount(0);
+  },
+);
+
+test(
+  "multi-select truncates with +N more chip when badges overflow trigger width",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <AutoComplete multi="true" width="320px">
+          <Option value="1" label="Alpha" />
+          <Option value="2" label="Beta" />
+          <Option value="3" label="Gamma" />
+          <Option value="4" label="Delta" />
+          <Option value="5" label="Epsilon" />
+        </AutoComplete>
+        <Text testId="below">below the autocomplete</Text>
+      </Fragment>
+    `);
+
+    const below = page.getByTestId("below");
+    await expect(below).toBeVisible();
+    const before = await below.boundingBox();
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await expect(combobox).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+
+    for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
+      await listbox.getByRole("option", { name: label }).click();
+    }
+
+    // Close the dropdown without colliding with the popover.
+    await page.keyboard.press("Escape");
+    await expect(listbox).toBeHidden();
+
+    // The "+N more" chip must appear because not every label fits at 320px.
+    const moreChip = page.getByRole("button", { name: /more selected/ });
+    await expect(moreChip).toBeVisible();
+
+    // Below-element must not have shifted vertically.
+    const after = await below.boundingBox();
+    expect(Math.abs((after!.y) - (before!.y))).toBeLessThanOrEqual(4);
+  },
+);
+
+// Regression: clicking the body of the "+N more" chip opens the dropdown so
+// the user can review and refine the full selection.
+test(
+  "+N more chip opens the dropdown on click",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete multi="true" width="320px">
+        <Option value="1" label="Alpha" />
+        <Option value="2" label="Beta" />
+        <Option value="3" label="Gamma" />
+        <Option value="4" label="Delta" />
+        <Option value="5" label="Epsilon" />
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+    for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
+      await listbox.getByRole("option", { name: label }).click();
+    }
+
+    await page.keyboard.press("Escape");
+    await expect(listbox).toBeHidden();
+
+    const moreChip = page.getByRole("button", { name: /more selected/ });
+    await expect(moreChip).toBeVisible();
+    await moreChip.click();
+    await expect(listbox).toBeVisible();
+  },
+);
+
+// Regression: clicking the close icon inside the "+N more" chip removes
+// exactly the overflow values, leaving the visible badges intact.
+test(
+  "+N more chip close icon deselects only the overflow items",
+  async ({ initTestBed, page }) => {
+    // Use a width that guarantees at least one visible badge plus overflow.
+    await initTestBed(`
+      <Fragment var.picked="{[]}">
+        <AutoComplete multi="true" width="450px"
+                      onDidChange="(v) => picked = v || []">
+          <Option value="1" label="Alpha" />
+          <Option value="2" label="Beta" />
+          <Option value="3" label="Gamma" />
+          <Option value="4" label="Delta" />
+          <Option value="5" label="Epsilon" />
+        </AutoComplete>
+        <Text testId="picked">{(picked || []).join(',')}</Text>
+      </Fragment>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+    for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
+      await listbox.getByRole("option", { name: label }).click();
+    }
+    // All five are selected now.
+    await expect(page.getByTestId("picked")).toHaveText("1,2,3,4,5");
+
+    await page.keyboard.press("Escape");
+    await expect(listbox).toBeHidden();
+
+    // Find the close icon embedded in the "+N more" chip.
+    const moreChip = page.getByRole("button", { name: /more selected/ });
+    await expect(moreChip).toBeVisible();
+    // The chip contains the "+N more" label and a trailing close icon span.
+    await moreChip.locator("svg").last().click();
+
+    // Only the visible prefix may remain; overflow values must be gone. We
+    // don't pin the exact count (depends on rounding/viewport), but the kept
+    // list must be an ordered prefix of "1,2,3,4,5" — when every badge sits
+    // in overflow the prefix is the empty string, which is still valid.
+    const kept = (await page.getByTestId("picked").textContent()) || "";
+    expect(kept).not.toEqual("1,2,3,4,5");
+    expect("1,2,3,4,5".startsWith(kept)).toBeTruthy();
+  },
+);
+
+test(
+  "multi-select supports arrow-key navigation when search term is empty",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.picked="{[]}">
+        <AutoComplete multi="true" onDidChange="(v) => picked = v || []">
+          <Option value="1" label="Bruce Wayne" />
+          <Option value="2" label="Clark Kent" />
+          <Option value="3" label="Diana Prince" />
+        </AutoComplete>
+        <Text testId="picked">{(picked || []).join(',')}</Text>
+      </Fragment>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await expect(combobox).toBeFocused();
+
+    // Open dropdown (no typing → OptionTypeProvider render branch).
+    await page.keyboard.press("ArrowDown");
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+
+    // Navigate to the second option without typing anything.
+    await page.keyboard.press("ArrowDown"); // first
+    await page.keyboard.press("ArrowDown"); // second
+    await page.keyboard.press("Enter");
+
+    await expect(page.getByTestId("picked")).toHaveText("2");
+  },
+);
 
 // =============================================================================
 // VISUAL STATE TESTS

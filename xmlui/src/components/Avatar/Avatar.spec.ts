@@ -142,6 +142,31 @@ test("custom size maintains aspect ratio", async ({ initTestBed, page }) => {
   expect(width).toBeCloseTo(height, 1);
 });
 
+// Regression: runtime layout behaviors can apply `flex-shrink: 1` to an Avatar
+// via an emotion class that overrides the SCSS `flex-shrink: 0`. Inside a
+// space-constrained flex parent (e.g. a Table cell or a Link with sibling
+// text), this collapses the avatar's width while keeping its height intact,
+// rendering an oval instead of a circle. Inline `flex-shrink: 0` on the
+// Avatar's mergedStyle protects the declared size.
+test("custom size keeps its width inside a constrained flex parent", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(
+    `
+      <HStack width="60px">
+        <Avatar name="JS" size="40px" testId="avatar"/>
+        <Text>Long sibling label that pressures the flex row</Text>
+      </HStack>
+    `,
+    {},
+  );
+
+  const { width, height } = await getBounds(page.getByTestId("avatar"));
+  expect(width).toBeCloseTo(40, 1);
+  expect(height).toBeCloseTo(40, 1);
+});
+
 test("custom size with url property applies to image", async ({ initTestBed, page }) => {
   const TEST_URL = "https://example.com/avatar.jpg";
   await initTestBed(`<Avatar url="${TEST_URL}" size="100px" testId="custom-avatar"/>`, {});

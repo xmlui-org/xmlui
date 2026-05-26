@@ -42,6 +42,29 @@ To optimize performance and prevent redundant re-renders (where changing irrelev
 
 Both tracks set `defaultToOptionalMemberAccess: true` by default.
 
+## Reactive Cycle Detection
+
+Reactive bindings are also inspected as a graph. `collectComponentDefGraph()`
+registers one node for each user `var`, code-behind function, and
+DataSource/APICall loader, then uses `collectVariableDependencies()` to add
+edges for identifiers that resolve in the same component scope. `findCycles()`
+runs Tarjan strongly-connected-components detection and formats each cycle with
+`formatCycle()`.
+
+The detector is visible in three places:
+
+- Runtime: `AppContent` runs the analyzer once after mount, emits
+  `kind:"reactive-cycle"` trace entries, and dedupes with `cycleHash()`.
+  `App.appGlobals.strictReactiveGraph` defaults to `true`; set it to `false`
+  for warn-only migration mode.
+- Language server: `reactive-cycle-diagnostic.ts` emits `Warning` or
+  `Information` diagnostics with `code:"reactive-cycle"`, stable
+  `data.cycleId`, and `relatedInformation` for every cycle member whose parser
+  range is known.
+- Vite: `reactiveCycles: "off" | "warn" | "strict"` checks each XMLUI file
+  during `transform` and runs an aggregate `buildEnd` pass over all parsed
+  roots.
+
 ## Differences from JavaScript
 
 ### 1. Optional Chaining Is Default

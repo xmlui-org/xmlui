@@ -32,6 +32,7 @@ import {
   headingComponentRenderer,
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
+import { i18nComponentRenderer } from "./I18n/I18n";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
 import { messageListenerComponentRenderer } from "./MessageListener/MessageListener";
 import { webSocketComponentRenderer } from "./WebSocket/WebSocket";
@@ -51,6 +52,8 @@ import { iconComponentRenderer } from "./Icon/Icon";
 import { iframeComponentRenderer } from "./IFrame/IFrame";
 import { itemsComponentRenderer } from "./Items/Items";
 import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
+import { retryPolicyComponentRenderer } from "./RetryPolicy/RetryPolicy";
+import { fallbackComponentRenderer } from "./Fallback/Fallback";
 import { imageComponentRenderer } from "./Image/Image";
 import { pageMetaTitleComponentRenderer } from "./PageMetaTitle/PageMetaTitle";
 import { progressBarComponentRenderer } from "./ProgressBar/ProgressBar";
@@ -61,16 +64,15 @@ import {
 } from "./Splitter/Splitter";
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
-import {
-  collectUnconditionalRefs,
-  findUdcCycles,
-} from "../components-core/udcCycleDetection";
+import { validateUdcPropReferences } from "../components-core/udc-sandbox";
+import { collectUnconditionalRefs, findUdcCycles } from "../components-core/udcCycleDetection";
 import { dynamicHeightListComponentRenderer } from "./List/List";
 import { tileGridComponentRenderer } from "./TileGrid/TileGrid";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
 import { formComponentRenderer } from "./Form/Form";
+import { formValidatorComponentRenderer } from "./Form/FormValidator";
 import { formSegmentComponentRenderer } from "./FormSegment/FormSegment";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
 import { appRenderer } from "./App/App";
@@ -80,6 +82,7 @@ import type {
   ComponentDef,
   ComponentMetadata,
   CompoundComponentDef,
+  ThemeVarMetadata,
 } from "../abstractions/ComponentDefs";
 import { footerRenderer } from "./Footer/Footer";
 import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
@@ -134,6 +137,9 @@ import { dateInputComponentRenderer } from "./DateInput/DateInput";
 import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
 import { timerComponentRenderer } from "./Timer/Timer";
 import { lifecycleComponentRenderer } from "./Lifecycle/Lifecycle";
+import { skipLinkComponentRenderer } from "./SkipLink/SkipLink";
+import { focusScopeComponentRenderer } from "./FocusScope/FocusScope";
+import { liveRegionComponentRenderer } from "./LiveRegion/LiveRegion";
 import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
@@ -339,6 +345,9 @@ export class ComponentRegistry {
   // --- The pool of available theme variable names
   private themeVars = new Set<string>();
 
+  // --- Typed declarations for theme variables (plan #08)
+  private themeVarDeclarations = new Map<string, ThemeVarMetadata>();
+
   // --- Default theme variable values collected from the registered components
   private defaultThemeVars = {};
 
@@ -429,6 +438,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(formComponentRenderer);
       this.registerCoreComponent(formItemComponentRenderer);
       this.registerCoreComponent(formSegmentComponentRenderer);
+      this.registerCoreComponent(formValidatorComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Tree !== "false") {
       this.registerCoreComponent(treeComponentRenderer);
@@ -460,6 +470,9 @@ export class ComponentRegistry {
     if (import.meta.env.VITE_USED_COMPONENTS_Text !== "false") {
       this.registerCoreComponent(textComponentRenderer);
     }
+    if (import.meta.env.VITE_USED_COMPONENTS_I18n !== "false") {
+      this.registerCoreComponent(i18nComponentRenderer);
+    }
     if (import.meta.env.VITE_USED_COMPONENTS_Fragment !== "false") {
       this.registerCoreComponent(fragmentComponentRenderer);
     }
@@ -474,6 +487,15 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Lifecycle !== "false") {
       this.registerCoreComponent(lifecycleComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_SkipLink !== "false") {
+      this.registerCoreComponent(skipLinkComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_FocusScope !== "false") {
+      this.registerCoreComponent(focusScopeComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_LiveRegion !== "false") {
+      this.registerCoreComponent(liveRegionComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);
@@ -555,6 +577,12 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_SelectionStore !== "false") {
       this.registerCoreComponent(selectionStoreComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_RetryPolicy !== "false") {
+      this.registerCoreComponent(retryPolicyComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_Fallback !== "false") {
+      this.registerCoreComponent(fallbackComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Image !== "false") {
       this.registerCoreComponent(imageComponentRenderer);
@@ -875,6 +903,13 @@ export class ComponentRegistry {
   }
 
   /**
+   * Typed declarations for all registered theme variables (plan #08).
+   */
+  get componentThemeVarDeclarations(): ReadonlyMap<string, ThemeVarMetadata> {
+    return this.themeVarDeclarations;
+  }
+
+  /**
    * The default values of theme variables used by the registered components.
    */
   get componentDefaultThemeVars() {
@@ -1043,7 +1078,12 @@ export class ComponentRegistry {
     this.pool.get(namespace).set(type, component);
     this.namePool.set(fullName, { name: type, namespace });
     if (metadata?.themeVars) {
-      Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
+      Object.entries(metadata.themeVars).forEach(([key, desc]) => {
+        this.themeVars.add(key);
+        if (!this.themeVarDeclarations.has(key)) {
+          this.themeVarDeclarations.set(key, { name: key, description: desc });
+        }
+      });
     }
     if (metadata?.defaultThemeVars) {
       merge(this.defaultThemeVars, metadata?.defaultThemeVars);
@@ -1056,9 +1096,13 @@ export class ComponentRegistry {
     namespace: string,
   ) {
     const autoMetadata = generateUdComponentMetadata(compoundComponentDef);
-    const mergedMetadata = metadata
-      ? { ...autoMetadata, ...metadata }
-      : autoMetadata;
+    const mergedMetadata = metadata ? { ...autoMetadata, ...metadata } : autoMetadata;
+
+    // --- UDC sandbox (plan #14): when the UDC carries a declared <Prop>/<Event>/
+    // <Method>/<Slot> contract, validate that every `$props.<name>` reference in
+    // the implementation has a matching declaration.  Strict-mode enforcement
+    // (severity escalation to "error") is plumbed but inactive until W6.
+    validateUdcPropReferences(compoundComponentDef, /* strict */ false);
 
     const component = {
       type: compoundComponentDef.name,
@@ -1067,6 +1111,7 @@ export class ComponentRegistry {
           <CompoundComponent
             api={compoundComponentDef.api}
             scriptCollected={compoundComponentDef.component.scriptCollected}
+            contract={compoundComponentDef.contract as any}
             compound={compoundComponentDef.component as ComponentDef}
             {...rendererContext}
           />
@@ -1086,10 +1131,7 @@ export class ComponentRegistry {
 
   // --- Track this UDC's static, unconditional component-type references and
   // re-run cycle detection over the namespace's reference graph.
-  private recordUdcReferences(
-    namespace: string,
-    compoundComponentDef: CompoundComponentDef,
-  ) {
+  private recordUdcReferences(namespace: string, compoundComponentDef: CompoundComponentDef) {
     let graph = this.udcRefGraph.get(namespace);
     if (!graph) {
       graph = new Map();

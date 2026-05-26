@@ -1,0 +1,135 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "AiConversation";
+
+$backgroundColor: createThemeVar("backgroundColor-#{$component}");
+$borderColor: createThemeVar("borderColor-#{$component}");
+$borderRadius: createThemeVar("borderRadius-#{$component}");
+$boxShadow: createThemeVar("boxShadow-#{$component}");
+$textColor: createThemeVar("textColor-#{$component}");
+$subtitleTextColor: createThemeVar("textColor-subtitle-#{$component}");
+$headerBackgroundColor: createThemeVar("backgroundColor-#{$component}-header");
+$bodyBackgroundColor: createThemeVar("backgroundColor-#{$component}-body");
+$composerBackgroundColor: createThemeVar("backgroundColor-#{$component}-composer");
+$pillBackgroundColor: createThemeVar("backgroundColor-#{$component}-pill");
+$pillTextColor: createThemeVar("textColor-#{$component}-pill");
+
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+  width: 100%;
+  overflow: hidden;
+  color: $textColor;
+  background: $backgroundColor;
+  border: 1px solid $borderColor;
+  border-radius: $borderRadius;
+  box-shadow: $boxShadow;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  background: $headerBackgroundColor;
+  border-bottom: 1px solid $borderColor;
+}
+
+.headingGroup {
+  min-width: 0;
+}
+
+.title {
+  overflow: hidden;
+  font-weight: 600;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: $subtitleTextColor;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.separator {
+  width: 4px;
+  height: 4px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.status {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  color: $pillTextColor;
+  background: $pillBackgroundColor;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.body {
+  display: grid;
+  flex: 1 1 auto;
+  place-items: center;
+  min-height: 220px;
+  padding: 24px;
+  background: $bodyBackgroundColor;
+}
+
+.emptyState {
+  max-width: 34rem;
+  color: $subtitleTextColor;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: $composerBackgroundColor;
+  border-top: 1px solid $borderColor;
+}
+
+.composerInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 12px;
+  color: $subtitleTextColor;
+  border: 1px dashed $borderColor;
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+.sendButton {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  color: $subtitleTextColor;
+  background: transparent;
+  border: 1px solid $borderColor;
+  border-radius: 6px;
+  cursor: not-allowed;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

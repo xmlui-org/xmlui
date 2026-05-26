@@ -55,9 +55,9 @@ $reveal-anim-duration: 300ms;
 .overlay{
   position: absolute;
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
-  left: 0;
+  inset-inline-start: 0;
   backdrop-filter: blur(4px);
   background-color: #{rgb}(from t.useVar(t.$backgroundColor-primary) r g b / 70%);
   
@@ -88,15 +88,15 @@ $reveal-anim-duration: 300ms;
   }
   
   &.top{
-    right: 0;
-    left: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     top: 0;
     border-bottom-width: 1px;
   }
   
   &.bottom{
-    right: 0;
-    left: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     bottom: 0;
     border-top-width: 1px;
   }
@@ -104,7 +104,7 @@ $reveal-anim-duration: 300ms;
   &.left{
     top: 0;
     bottom: 0;
-    left: 0;
+    left: 0; // @rtl-intentional: side="left" always anchors to physical left
     border-right-width: 1px;
     width: 100%;
     height: 100%;
@@ -114,7 +114,7 @@ $reveal-anim-duration: 300ms;
   &.right{
     top: 0;
     bottom: 0;
-    right: 0;
+    right: 0; // @rtl-intentional: side="right" always anchors to physical right
     border-left-width: 1px;
     width: 100%;
     height: 100%;
@@ -126,7 +126,7 @@ $reveal-anim-duration: 300ms;
   color: inherit;
   position: absolute;
   top: $top-closeButton-App;
-  right: $right-closeButton-App;
+  inset-inline-end: $right-closeButton-App;
   display: flex;
   align-items: center;
   justify-content: center;

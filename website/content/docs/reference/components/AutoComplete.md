@@ -22,6 +22,7 @@
 
 **Context variables available during execution:**
 
+- `$group`: Group name available inside `groupHeaderTemplate` when `groupBy` is set.
 - `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
 
 ## Behaviors [#behaviors]
@@ -35,7 +36,7 @@ This component supports the following behaviors:
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
-| Validation | `bindTo`, `required`, `requiredInvalidMessage`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `customValidationsDebounce`, `validationDisplayDelay`, `verboseValidationFeedback`, `validate` |
+| Validation | `bindTo`, `required`, `requiredInvalidMessage`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `matchValue`, `matchInvalidMessage`, `validationMode`, `customValidationsDebounce`, `validationDisplayDelay`, `verboseValidationFeedback`, `validate` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
@@ -75,6 +76,14 @@ This property defines the template to display when the list of options is empty.
 > [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+### `groupBy` [#groupby]
+
+Field name on each Option to group by. When set, the dropdown shows a section header above each group of options sharing the same value of `option[groupBy]`. Headers are computed against the currently visible (filtered) options, so searching automatically updates which option carries its group's header. Use it together with an extra attribute on `<Option>` (e.g. `clientName="{$item.clientName}"`). Mirrors `Select`'s `groupBy`.
+
+### `groupHeaderTemplate` [#groupheadertemplate]
+
+Customizes the section header rendered above each group when `groupBy` is set. Use the `$group` context variable to access the group name. When omitted, the group name is rendered as plain text.
 
 ### `initiallyOpen` [#initiallyopen]
 
@@ -140,6 +149,10 @@ Set this property to `true` to disallow changing the component value.
 > [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `ungroupedHeaderTemplate` [#ungroupedheadertemplate]
+
+Customizes the section header for the "Ungrouped" bucket (options that do not declare a value for the `groupBy` field). When omitted, the Ungrouped bucket has no header.
 
 ### `validationStatus` [#validationstatus]
 
@@ -328,11 +341,14 @@ This API allows you to get or set the value of the component. If no value is set
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--warning | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-groupHeader-AutoComplete | $fontSize-tiny | $fontSize-tiny |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--warning | *none* | *none* |
+| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-groupHeader-AutoComplete | 700 | 700 |
 | [gap](/docs/styles-and-themes/common-units/#size)-adornment-AutoComplete | *none* | *none* |
+| [letterSpacing](/docs/styles-and-themes/common-units/#size-values)-groupHeader-AutoComplete | 0.05em | 0.05em |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--focus | *none* | *none* |
@@ -341,15 +357,18 @@ This API allows you to get or set the value of the component. If no value is set
 | [padding](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
 | [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-groupHeader-AutoComplete | $space-1 | $space-1 |
 | [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
 | [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | $space-2 | $space-2 |
 | [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $space-2_5 | $space-2_5 |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-groupHeader-AutoComplete | $space-3 | $space-3 |
 | [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | $space-2 | $space-2 |
 | [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-groupHeader-AutoComplete | $space-3 | $space-3 |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | $space-2 | $space-2 |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $space-0_5 | $space-0_5 |
@@ -368,8 +387,10 @@ This API allows you to get or set the value of the component. If no value is set
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--active | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-groupHeader-AutoComplete | $textColor-subtitle | $textColor-subtitle |
 | [textColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete--disabled | $color-surface-300 | $color-surface-300 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete--success | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete--warning | *none* | *none* |
+| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-groupHeader-AutoComplete | uppercase | uppercase |

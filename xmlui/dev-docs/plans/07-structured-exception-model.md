@@ -286,7 +286,7 @@ Step 0.
 
 ---
 
-### Step 1.2 — `LOADER_ERROR` Carries `AppError`
+### Step 1.2 — `LOADER_ERROR` Carries `AppError` ✅ DONE (2026-05)
 
 **Priority:** 2
 
@@ -383,7 +383,7 @@ Step 1.1.
 This phase adds it as a markup-level event on `<App>` that fires for
 every error normalised by `signError`.
 
-### Step 2.1 — `<App onError>` and `App.errors` Stream
+### Step 2.1 — `<App onError>` and `App.errors` Stream ✅ DONE (2026-05)
 
 **Priority:** 4
 
@@ -437,7 +437,7 @@ deliverable. This phase ships a single declarative wrapper component
 that composes with `DataSource`, `APICall`, `<WebSocket>`, and
 `<EventSource>`.
 
-### Step 3.1 — `<RetryPolicy>` Component
+### Step 3.1 — `<RetryPolicy>` Component ✅ DONE (2026-05)
 
 **Priority:** 5
 
@@ -507,7 +507,7 @@ Step 1.2 (loader categorisation),
 
 ---
 
-### Step 3.2 — `Retry-After` Header Honouring
+### Step 3.2 — `Retry-After` Header Honouring ✅ DONE (2026-05)
 
 **Priority:** 6
 
@@ -548,7 +548,7 @@ Step 3.1.
 want a structured fallback for whole subtrees. `<Fallback>` is the
 declarative counterpart to React's `<ErrorBoundary fallback>`.
 
-### Step 4.1 — `<Fallback>` Component
+### Step 4.1 — `<Fallback>` Component ✅ DONE (2026-05)
 
 **Priority:** 7
 

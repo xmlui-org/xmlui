@@ -325,8 +325,8 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       @include t.textVars($themeVars, $variantName);
       margin-top: $marginTop-Text-markdown;
       margin-bottom: $marginBottom-Text-markdown;
-      margin-left: $marginLeft-Text-markdown;
-      margin-right: $marginRight-Text-markdown;
+      margin-inline-start: $marginLeft-Text-markdown;
+      margin-inline-end: $marginRight-Text-markdown;
       overflow: visible;
       display: block;
     }
@@ -372,8 +372,8 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     .image {
       margin-top: $marginTop-Image-markdown;
       margin-bottom: $marginBottom-Image-markdown;
-      margin-left: $marginLeft-Image-markdown;
-      margin-right: $marginRight-Image-markdown;
+      margin-inline-start: $marginLeft-Image-markdown;
+      margin-inline-end: $marginRight-Image-markdown;
     }
 
     // --- Blockquote
@@ -388,7 +388,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
         background-color: $color-accent-Blockquote-markdown;
         position: absolute;
         top: 0;
-        left: 0;
+        inset-inline-start: 0;
         display: block;
         content: "";
         height: 100%;
@@ -480,7 +480,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     }
 
     .admonitionContent {
-      margin-left: $marginLeft-content-Admonition-markdown;
+      margin-inline-start: $marginLeft-content-Admonition-markdown;
       flex: 1;
       min-width: 0;
     }
@@ -508,7 +508,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       align-items: flex-start;
 
       > input[type="checkbox"] {
-        margin-right: 8px;
+        margin-inline-end: 8px;
         margin-top: 4px;
         flex-shrink: 0;
       }
@@ -655,8 +655,8 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     .htmlUl {
       margin-top: $marginTop-Ul-markdown;
       margin-bottom: $marginBottom-Ul-markdown;
-      margin-left: $marginLeft-Ul-markdown;
-      margin-right: $marginRight-Ul-markdown;
+      margin-inline-start: $marginLeft-Ul-markdown;
+      margin-inline-end: $marginRight-Ul-markdown;
       @include t.borderVars($themeVars, "Ul-markdown");
       @include t.paddingVars($themeVars, "Ul-markdown");
     }
@@ -664,8 +664,8 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     .htmlOl {
       margin-top: $marginTop-Ol-markdown;
       margin-bottom: $marginBottom-Ol-markdown;
-      margin-left: $marginLeft-Ol-markdown;
-      margin-right: $marginRight-Ol-markdown;
+      margin-inline-start: $marginLeft-Ol-markdown;
+      margin-inline-end: $marginRight-Ol-markdown;
       @include t.borderVars($themeVars, "Ol-markdown");
       @include t.paddingVars($themeVars, "Ol-markdown");
     }
@@ -674,7 +674,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       margin-top: $marginTop-Li-markdown;
       margin-bottom: $marginBottom-Li-markdown;
       list-style-type: $listStyleType-Li-markdown;
-      margin-left: $marginLeft-Li-markdown;
+      margin-inline-start: $marginLeft-Li-markdown;
       @include t.borderVars($themeVars, "Li-markdown");
       @include t.paddingVars($themeVars, "Li-markdown");
     }
@@ -703,7 +703,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
   .unorderedList {
     list-style-type: revert;
     list-style-position: outside;
-    padding-left: $paddingLeft-UnorderedList;
+    padding-inline-start: $paddingLeft-UnorderedList;
   }
 
   // --- OrderedList
@@ -713,7 +713,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
   .orderedList {
     list-style-type: revert;
     list-style-position: outside;
-    padding-left: $paddingLeft-OrderedList;
+    padding-inline-start: $paddingLeft-OrderedList;
   }
 
   // --- ListItem
@@ -722,7 +722,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
   $color-marker-ListItem: createThemeVar("color-marker-ListItem");
 
   .listItem {
-    padding-left: $paddingLeft-ListItem;
+    padding-inline-start: $paddingLeft-ListItem;
   }
 
   .listItem::marker {

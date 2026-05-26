@@ -4,7 +4,10 @@ import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
 import { default as ViteXmlui } from "../vite-xmlui-plugin";
+import type { PluginOptions } from "../vite-xmlui-plugin";
 import * as path from "path";
+import { readFile } from "fs/promises";
+import { CSS_LAYER_ORDER } from "../../components-core/cssLayers";
 
 type ViteConfigData = {
   flatDist?: boolean;
@@ -21,7 +24,20 @@ logger.warn = (msg, options) => {
   loggerWarn(msg, options);
 };
 
-const CSS_LAYER_ORDER = "@layer reset, base, components, themes, dynamic;";
+async function loadXmluiPluginOptions(): Promise<PluginOptions> {
+  try {
+    const rawConfig = await readFile(path.join(process.cwd(), "xmlui.config.json"), "utf-8");
+    const config = JSON.parse(rawConfig);
+    return {
+      analyze: config.analyze,
+      reactiveCycles: config.reactiveCycles,
+      accessibility: config.accessibility,
+      typeContracts: config.typeContracts,
+    };
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Defence-in-depth: ensures the canonical CSS `@layer` cascade order is
@@ -87,12 +103,14 @@ export async function getViteConfig({
     // console.error(e);
   }
 
+  const xmluiPluginOptions = await loadXmluiPluginOptions();
+
   // Single instance shared by the main pipeline and the dep-scanner pipeline.
   // The dep scanner runs a separate Rolldown build that only sees plugins
   // listed under `optimizeDeps.rolldownOptions.plugins`. Without this, .xmlui
   // files reached via `import.meta.glob('/src/**')` are not transformed by the
   // xmlui plugin during scanning and Rolldown's parser fails on the XML markup.
-  const xmluiPlugin = ViteXmlui({}) as Plugin;
+  const xmluiPlugin = ViteXmlui(xmluiPluginOptions) as Plugin;
 
   return defineConfig({
     plugins: [

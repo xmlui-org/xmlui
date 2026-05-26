@@ -31,12 +31,25 @@ import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { useAppContext } from "../../components-core/AppContext";
 
 import {
   PART_LIST_WRAPPER,
   PART_CLEAR_BUTTON,
   PART_CONCISE_VALIDATION_FEEDBACK,
 } from "../../components-core/parts";
+
+const INTRINSIC_HEIGHT_KEYWORDS = new Set([
+  "fit-content",
+  "auto",
+  "min-content",
+  "max-content",
+  "none",
+]);
+
+export function isIntrinsicHeightKeyword(value?: CSSProperties["height"]): boolean {
+  return typeof value === "string" && INTRINSIC_HEIGHT_KEYWORDS.has(value);
+}
 
 export const defaultProps = {
   enabled: true,
@@ -330,6 +343,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   forwardedRef,
 ) {
   const id = useFormItemInputId(idProp);
+  const appContext = useAppContext();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const composedTriggerRef = useComposedRefs(
     setReferenceElement as React.RefCallback<HTMLElement>,
@@ -398,7 +412,12 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   }, [multiSelect, effectiveOptions, value]);
 
   const popoverContentStyle = useMemo(
-    () => ({ minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" as const }),
+    // Intrinsic keywords like "fit-content" / "auto" / "min-content" / "max-content"
+    // collapse to 0 inside a fixed-position flex Portal when applied as max-height.
+    // Apply them to `height` instead so the popover sizes to its content.
+    () => isIntrinsicHeightKeyword(dropdownHeight)
+      ? { minWidth: panelWidth, height: dropdownHeight }
+      : { minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" as const },
     [panelWidth, dropdownHeight],
   );
 
@@ -939,7 +958,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
                         <input
                           role="searchbox"
                           className={classnames(styles.commandInput)}
-                          placeholder="Search..."
+                          placeholder={appContext.App.translate("xmlui.select.searchPlaceholder")}
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />

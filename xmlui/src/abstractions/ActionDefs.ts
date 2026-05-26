@@ -41,6 +41,19 @@ export type LookupActionOptions = {
 
   // Source character range for inspector logging
   sourceRange?: { start: number; end: number };
+
+  // Internal: prevents the deterministic scheduler wrapper from re-enqueuing
+  // the handler body while it is already being executed by the scheduler.
+  schedulerBypass?: boolean;
+
+  // --- Plan #6 W7-1: handler-policy + timeout + transactional opt-ins.
+  // Threaded from the component's `node.props` by the event-handler
+  // lookup site (ComponentAdapter). All three default to `undefined`,
+  // in which case the dispatcher applies `parallel` semantics and the
+  // ambient `defaultHandlerTimeoutMs` budget.
+  handlerPolicy?: "parallel" | "single-flight" | "queue" | "drop-while-running";
+  handlerTimeoutMs?: number;
+  transactional?: boolean;
 };
 
 // This function resolves an action by its name (within the component node that

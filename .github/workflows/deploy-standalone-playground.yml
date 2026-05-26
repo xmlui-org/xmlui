@@ -20,6 +20,9 @@ jobs:
 
       - run: npm ci --prefer-offline
 
+      - name: Run allowed install scripts
+        run: npm run allow-scripts
+
       - name: build xmlui-standalone-playground
         run: npm run build-playground
 

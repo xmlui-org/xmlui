@@ -279,6 +279,41 @@ test.describe("Basic Functionality", () => {
 
     expect(val1).toBeGreaterThan(val2);
   });
+
+  // Regression: toggle-style inputs (checkbox, switch) declare
+  // compactInlineLabel:true in their metadata, but FormItem used to render
+  // its own ItemWithLabel without propagating that flag — so labelPosition
+  // "end" stayed in stretched-row mode and pushed the label to the form's
+  // right edge instead of mapping to "after" (snug, fit-content).
+  test("type=checkbox with labelPosition=end keeps label adjacent to the input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="cb" type="checkbox" label="Compact label" labelPosition="end" />
+      </Form>
+    `);
+    const { right: inputRight } = await getBounds(page.getByLabel("Compact label"));
+    const { left: labelLeft } = await getBounds(page.getByText("Compact label"));
+    // With the snug "after" layout the gap is just the container gap (~8px).
+    // Without compactInlineLabel propagation it would be hundreds of pixels.
+    expect(labelLeft - inputRight).toBeLessThan(20);
+  });
+
+  test("type=switch with labelPosition=end keeps label adjacent to the input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="sw" type="switch" label="Toggle" labelPosition="end" />
+      </Form>
+    `);
+    const { right: inputRight } = await getBounds(page.getByLabel("Toggle"));
+    const { left: labelLeft } = await getBounds(page.getByText("Toggle"));
+    expect(labelLeft - inputRight).toBeLessThan(20);
+  });
 });
 
 test.describe("Type Property", () => {
@@ -895,6 +930,61 @@ test.describe("Event Handling", () => {
 // =============================================================================
 
 test.describe("Validation Behavior", () => {
+  test("matchValue validates FormItem confirmation fields", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form data="{{ password: '', confirmPassword: '' }}">
+        <FormItem
+          label="Password"
+          bindTo="password"
+          type="password"
+        />
+        <FormItem
+          label="Confirm Password"
+          bindTo="confirmPassword"
+          type="password"
+          validationMode="onChanged"
+          matchValue="{$data.password}"
+          matchInvalidMessage="Passwords do not match"
+        />
+      </Form>
+    `);
+
+    await page.getByRole("textbox", { name: "Password", exact: true }).fill("correct horse");
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("battery staple");
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
+
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("correct horse");
+    await expect(page.getByText("Passwords do not match")).not.toBeVisible();
+  });
+
+  test("matchValue validates directly bound input confirmation fields", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form data="{{ password: '', confirmPassword: '' }}">
+        <PasswordInput
+          label="Password"
+          bindTo="password"
+        />
+        <PasswordInput
+          label="Confirm Password"
+          bindTo="confirmPassword"
+          validationMode="onChanged"
+          matchValue="{$data.password}"
+          matchInvalidMessage="Passwords do not match"
+        />
+      </Form>
+    `);
+
+    await page.getByRole("textbox", { name: "Password", exact: true }).fill("correct horse");
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("battery staple");
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
+
+    await page.getByRole("textbox", { name: "Confirm Password" }).fill("correct horse");
+    await expect(page.getByText("Passwords do not match")).not.toBeVisible();
+  });
+
   test("checkbox forces verbose feedback when form is concise", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
@@ -2112,6 +2202,8 @@ test.describe("Regex Validation", () => {
     await fieldInput.field.fill("abc");
     await fieldInput.field.blur();
     await page.getByTestId("validateBtn").click();
-    await expect(page.getByTestId("field")).not.toContainText("Must be exactly 3 lowercase letters");
+    await expect(page.getByTestId("field")).not.toContainText(
+      "Must be exactly 3 lowercase letters",
+    );
   });
 });

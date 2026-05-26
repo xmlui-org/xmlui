@@ -3,6 +3,7 @@
 `FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically. **Note:** `FormItem` must be used inside a `Form` component.
 
 **Key features:**
+
 - **Data binding**: Automatically syncs control values with form data using the `bindTo` property
 - **Validation**: Displays validation states and error messages for the associated input
 - **Flexible labeling**: Supports labels, helper text, and various label positioning options
@@ -68,9 +69,9 @@ Note how changing the input in the demo below will result in a slight delay of i
     onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem
       customValidationsDebounce="3000"
-      onValidate="(value) => { 
-        validations += '| '; 
-        return value === value.toUpperCase(); 
+      onValidate="(value) => {
+        validations += '| ';
+        return value === value.toUpperCase();
       }"
       bindTo="name" />
     <Text value="{validations}" />
@@ -207,6 +208,40 @@ In the app, type a name longer than four characters in both fields, then leave t
 </App>
 ```
 
+### `matchInvalidMessage` [#matchinvalidmessage]
+
+This optional string property is used to customize the message displayed when the field value does not match `matchValue`.
+
+Use `matchInvalidMessage` to customize the validation message displayed when the field does not match `matchValue`.
+
+### `matchValue` [#matchvalue]
+
+The value this field must match. This is useful for confirmation fields, such as checking a repeated password against the original password.
+
+Use `matchValue` when a field must equal another value, such as a password confirmation field.
+
+```xmlui-pg copy display name="Example: matchValue"
+<App>
+  <Form
+    data="{{ password: '', confirmPassword: '' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem
+      type="password"
+      label="Password"
+      bindTo="password"
+      required="true" />
+    <FormItem
+      type="password"
+      label="Confirm Password"
+      bindTo="confirmPassword"
+      required="true"
+      noSubmit="true"
+      matchValue="{$data.password}"
+      matchInvalidMessage="Passwords do not match" />
+  </Form>
+</App>
+```
+
 ### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input value. If the value is not set, no maximum length check is done.
@@ -294,11 +329,11 @@ When set to `true`, the field will not be included in the form's submitted data.
 
 This value specifies a predefined regular expression to test the input value. If this value is not set, no pattern check is done.
 
-| Value   | Description                                                                                                                                                |
-| :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `email` | Accepts the `[username]@[second level domain].[top level domain]` format                                                                                     |
+| Value   | Description                                                                                                                                                     |
+| :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `email` | Accepts the `[username]@[second level domain].[top level domain]` format                                                                                        |
 | `phone` | Requires at least one digit and accepts: numbers, upper- and lowercase letters and the following symbols: `#`, `*`, `)`, `(`, `+`, `.`, `\`, `-`, `_`, `&`, `'` |
-| `url`   | Accepts URLs and URIs starting with either `http` or `https`                                                                                               |
+| `url`   | Accepts URLs and URIs starting with either `http` or `https`                                                                                                    |
 
 > **Note:** To define custom patterns and regular expressions, see the [regex section](#regex).
 
@@ -546,7 +581,7 @@ Available values:
 | `items` | Renders Items |
 | `custom` | A custom control specified in children. If `type` is not specified but the `FormItem` has children, it considers the control a custom one. |
 
->[!INFO]
+> [!INFO]
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
 > Omitting the type and providing child components implicitly sets it to custom.
 

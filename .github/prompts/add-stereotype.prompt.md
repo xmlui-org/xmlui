@@ -27,12 +27,11 @@ description: One-line purpose of the task
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — [what it should contain for this task].
-2. Read `guidelines.md` at the repo root — focus on rules from Topics [N, M, ...].
-3. Read these reference files:
+1. Read `guidelines.md` at the repo root — focus on rules from Topics [N, M, ...].
+2. Read these reference files:
    - `.ai/xmlui/<doc>.md` — [why this doc is needed] (always | conditional)
    - [list only the docs relevant to this task]
-4. [Any other preparation: read existing code, find examples, etc.]
+3. [Any other preparation: read existing code, find examples, etc.]
 
 ## Implementation steps
 

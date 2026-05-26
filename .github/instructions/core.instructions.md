@@ -25,7 +25,7 @@ Verified rules: `guidelines.md` at the repo root.
 
 ## Refactoring
 
-Use `.github/prompts/refactor-core.prompt.md` to plan and execute refactors. Record the plan in `feature.md` at the repo root.
+Use `.github/prompts/refactor-core.prompt.md` to plan and execute refactors.
 
 ## Testing
 

@@ -18,6 +18,7 @@ export type {
 
 export {
   createHandlerCoordinator,
+  createPassThroughHandlerCoordinator,
 } from "./policy";
 export type {
   HandlerPolicy,
@@ -25,6 +26,26 @@ export type {
   HandlerEntryDecision,
   HandlerCoordinator,
 } from "./policy";
+
+export {
+  createRealHandlerCoordinator,
+  getDefaultHandlerCoordinator,
+  setDefaultCoordinatorSink,
+  __resetDefaultCoordinatorForTests,
+} from "./coordinator";
+export type { CoordinatorDiagnosticSink } from "./coordinator";
+
+export { runWithTimeout } from "./timeout";
+export type { RunWithTimeoutOptions } from "./timeout";
+
+export {
+  createTransactionalBuffer,
+  detectSnapshotConflict,
+} from "./transactional";
+export type {
+  BufferedWrite,
+  TransactionalBuffer,
+} from "./transactional";
 
 export type {
   ConcurrencyCode,

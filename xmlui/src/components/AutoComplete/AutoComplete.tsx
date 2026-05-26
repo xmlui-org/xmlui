@@ -81,6 +81,26 @@ export const AutoCompleteMd = createMetadata({
     emptyListTemplate: dComponent(
       "This property defines the template to display when the list of options is empty.",
     ),
+    groupBy: {
+      description:
+        "Field name on each Option to group by. When set, the dropdown shows a " +
+        "section header above each group of options sharing the same value of " +
+        "`option[groupBy]`. Headers are computed against the currently visible " +
+        "(filtered) options, so searching automatically updates which option carries " +
+        "its group's header. Use it together with an extra attribute on `<Option>` " +
+        "(e.g. `clientName=\"{$item.clientName}\"`). Mirrors `Select`'s `groupBy`.",
+      valueType: "string" as const,
+    },
+    groupHeaderTemplate: dComponent(
+      "Customizes the section header rendered above each group when `groupBy` " +
+        "is set. Use the `$group` context variable to access the group name. " +
+        "When omitted, the group name is rendered as plain text.",
+    ),
+    ungroupedHeaderTemplate: dComponent(
+      "Customizes the section header for the \"Ungrouped\" bucket (options that " +
+        "do not declare a value for the `groupBy` field). When omitted, the " +
+        "Ungrouped bucket has no header.",
+    ),
     modal: {
       isInternal: true,
       description: "internal radix modal prop",
@@ -143,6 +163,9 @@ export const AutoCompleteMd = createMetadata({
         "Use `$item.value` and `$item.label` to refer to the value and label of the " +
         "particular option.",
     ),
+    $group: d(
+      "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
+    ),
   },
   ...fromOptimizerMetadata("AutoComplete"),
   themeVars: parseScssVar(styles.themeVars),
@@ -171,6 +194,15 @@ export const AutoCompleteMd = createMetadata({
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
     [`borderColor-${COMP}--disabled`]: "$borderColor--disabled",
     [`textColor-${COMP}--disabled`]: "$textColor--disabled",
+    // Group header styling (used when `groupBy` is set on AutoComplete).
+    [`paddingHorizontal-groupHeader-${COMP}`]: "$space-3",
+    [`paddingTop-groupHeader-${COMP}`]: "$space-3",
+    [`paddingBottom-groupHeader-${COMP}`]: "$space-1",
+    [`fontSize-groupHeader-${COMP}`]: "$fontSize-tiny",
+    [`fontWeight-groupHeader-${COMP}`]: "700",
+    [`letterSpacing-groupHeader-${COMP}`]: "0.05em",
+    [`textTransform-groupHeader-${COMP}`]: "uppercase",
+    [`textColor-groupHeader-${COMP}`]: "$textColor-subtitle",
   },
 });
 
@@ -207,6 +239,12 @@ export const autoCompleteComponentRenderer = wrapComponent(
     renderers: {
       optionTemplate: {
         contextVars: ["$item", "$selectedValue", "$inTrigger"],
+      },
+      groupHeaderTemplate: {
+        contextVars: ["$group"],
+      },
+      ungroupedHeaderTemplate: {
+        contextVars: [],
       },
     },
   },

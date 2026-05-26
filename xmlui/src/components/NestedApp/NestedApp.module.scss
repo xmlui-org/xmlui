@@ -20,6 +20,7 @@ $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
 $backgroundColor-viewControls-NestedApp: createThemeVar(
   "backgroundColor-viewControls-#{$component}"
 );
+$border-viewControls-NestedApp: createThemeVar("border-viewControls-#{$component}");
 $borderRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
 $padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
 $paddingVertical-viewControls-button-NestedApp: createThemeVar(
@@ -64,12 +65,11 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     height: 100%;
     background-color: t.$backgroundColor;
     position: relative;
-    border-radius: $borderRadius-NestedApp;
   }
 
   .loadingContainer {
     position: absolute;
-    left: 50%;
+    inset-inline-start: 50%;
     top: calc(50% - 25px);
     transform: translateX(-50%);
     /* Center perfectly on the X axis */
@@ -98,14 +98,14 @@ $border-NestedApp: createThemeVar("border-#{$component}");
   }
 
   .loadingText {
-    margin-right: 12px;
+    margin-inline-end: 12px;
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: t.$fontSize-sm;
     /* Increased by 20% from 16px */
     font-weight: 500;
     color: $color-loadingText-NestedApp;
-    text-align: right;
+    text-align: end;
   }
 
   /* Defines the animation steps */
@@ -132,7 +132,6 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     position: relative;
     isolation: isolate;
     background-color: t.$backgroundColor;
-    border-radius: 0 0 $borderRadius-NestedApp $borderRadius-NestedApp;
 
     &.shouldAnimate {
       transition:
@@ -150,8 +149,6 @@ $border-NestedApp: createThemeVar("border-#{$component}");
       }
     }
   }
-
-  // --- End of theme variables collection
 
   .nestedAppContainer {
     @include t.paddingVars($themeVars, $component);
@@ -210,6 +207,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     align-items: center;
     padding: $padding-viewControls-NestedApp;
     background-color: $backgroundColor-viewControls-NestedApp;
+    border: $border-viewControls-NestedApp;
     border-radius: $borderRadius-viewControls-NestedApp;
   }
 
@@ -255,8 +253,8 @@ $border-NestedApp: createThemeVar("border-#{$component}");
 
     .headerText {
       @include t.textVars($themeVars, "header-#{$component}");
-      padding-left: t.$space-2;
-      margin-right: auto;
+      padding-inline-start: t.$space-2;
+      margin-inline-end: auto;
     }
 
     .headerButton {
@@ -287,14 +285,12 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     position: relative;
     isolation: isolate;
     background-color: transparent;
-    border-radius: $borderRadius-NestedApp;
   }
 
   .content {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border-radius: $borderRadius-NestedApp;
   }
 }
 

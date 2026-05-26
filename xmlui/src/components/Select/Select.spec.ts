@@ -585,6 +585,70 @@ test.describe("Basic Functionality", () => {
     // Event should have fired
     await expect.poll(testStateDriver.testState).toEqual("changed");
   });
+
+  test("clear button hidden when initialValue is null", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" initialValue="{null}" placeholder="Pick one">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await expect(driver.component).toBeVisible();
+
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button hidden when initialValue is undefined", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" initialValue="{undefined}" placeholder="Pick one">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await expect(driver.component).toBeVisible();
+
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button hidden after setValue(null)", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select id="sel" clearable="true" placeholder="Pick one">
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+        </Select>
+        <Button testId="resetBtn" onClick="sel.setValue(null)" label="Reset" />
+      </Fragment>
+    `);
+    const driver = await createSelectDriver("sel");
+    const resetBtn = page.getByTestId("resetBtn");
+    await expect(driver.component).toBeVisible();
+    await expect(resetBtn).toBeVisible();
+
+    // Initially no value — clear button absent.
+    await expect(driver.clearButton).not.toBeVisible();
+
+    // Pick a value so the clear button appears.
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+    await expect(driver.clearButton).toBeVisible();
+
+    // Programmatically reset to null via setValue — clear button hides again.
+    await resetBtn.click();
+    await expect(driver.clearButton).not.toBeVisible();
+  });
 });
 
 // =============================================================================
@@ -3076,6 +3140,48 @@ test.describe("Custom Height", () => {
 
     // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
     expect(triggerBox.height).toBeLessThan(100);
+  });
+
+  // Regression: dropdownHeight="fit-content" (and other intrinsic CSS keywords)
+  // used to be applied as max-height, which collapses to 0 inside the fixed-position
+  // Radix Portal flex container — the dropdown opened to ~7px and was effectively
+  // invisible. Intrinsic keywords must size the popover via `height` instead.
+  test("dropdownHeight=fit-content opens with visible options in simple select", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="fit-content">
+        <Option value="a" label="Alpha" />
+        <Option value="b" label="Beta" />
+        <Option value="c" label="Gamma" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Beta" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Gamma" })).toBeVisible();
+  });
+
+  test("dropdownHeight=fit-content opens with visible options in searchable select", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="fit-content" searchable>
+        <Option value="a" label="Alpha" />
+        <Option value="b" label="Beta" />
+        <Option value="c" label="Gamma" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.click();
+    await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Beta" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Gamma" })).toBeVisible();
   });
 });
 

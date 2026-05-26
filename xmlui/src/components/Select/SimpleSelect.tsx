@@ -5,7 +5,7 @@ import styles from "./Select.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import type { SingleValueType } from "./SelectReact";
+import { isIntrinsicHeightKeyword, type SingleValueType } from "./SelectReact";
 import type { Option, ValidationStatus } from "../abstractions";
 import {
   Root,
@@ -289,7 +289,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
               />
             </Part>
           )}
-          {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
+          {clearable && value !== undefined && value !== null && value !== "" && !readOnly && enabled && (
             <Part partId="clearButton">
               <button
                 type="button"
@@ -316,7 +316,14 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             className={classnames(contentClassName, styles.selectDropdownContent)}
             position="popper"
             align="start"
-            style={{ height: "auto", maxHeight: height, minWidth: panelWidth }}
+            style={
+              // Intrinsic keywords ("fit-content" / "auto" / "min-content" / "max-content")
+              // collapse to 0 inside a fixed-position flex Portal when applied as max-height.
+              // Apply them to `height` instead so the popover sizes to its content.
+              isIntrinsicHeightKeyword(height)
+                ? { height, minWidth: panelWidth }
+                : { height: "auto", maxHeight: height, minWidth: panelWidth }
+            }
           >
             {scrollIndicators && (
               <ScrollUpButton className={styles.selectScrollUpButton}>

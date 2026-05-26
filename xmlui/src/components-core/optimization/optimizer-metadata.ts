@@ -178,6 +178,7 @@ export const OPTIMIZER_METADATA = {
   Drawer: withInjectedContext({ isImplicitContainerByDefault: true }),
   RadioGroup: withInjectedContext({ childInjectedVars: ["$checked", "$setChecked"] }),
   Checkbox: withInjectedContext({ childInjectedVars: ["$checked", "$setChecked"] }),
+  Fallback: withInjectedContext({ childInjectedVars: ["$error"] }),
 } as const satisfies Record<string, Partial<ComponentMetadata>>;
 
 /**

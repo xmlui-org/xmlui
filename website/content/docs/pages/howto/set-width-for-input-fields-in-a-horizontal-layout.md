@@ -4,7 +4,7 @@ When placing items, particularly input fields, in an `HStack` or a `Stack` with 
 
 Without the `width` property set:
 
-```xmlui-pg copy display
+```xmlui-pg copy display id="set-the-width-of-an-input-field-in-an-hstack-b6ec"
 <App>
   <HStack>
     <TextBox initialValue="First" />

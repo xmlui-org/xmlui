@@ -52,7 +52,7 @@ Notice that the trace also includes the `aria-label` from the XMLUI markup -- `B
 
 Interact with the calendar below -- click an event, navigate between months, switch between Month/Week/Day/Agenda views.
 
-```xmlui-pg
+```xmlui-pg id="demo-b8b7"
 ---app display
 <App>
   <BigCalendar

@@ -101,7 +101,7 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
   // --- Side variants
   &.left {
     top: 0;
-    left: 0;
+    left: 0; // @rtl-intentional: side="left" always anchors to physical left
     bottom: 0;
     width: $width-Drawer;
     max-width: $maxWidth-Drawer;
@@ -113,7 +113,7 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
 
   &.right {
     top: 0;
-    right: 0;
+    right: 0; // @rtl-intentional: side="right" always anchors to physical right
     bottom: 0;
     width: $width-Drawer;
     max-width: $maxWidth-Drawer;
@@ -125,8 +125,8 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
 
   &.top {
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     height: $height-Drawer;
     max-height: $maxHeight-Drawer;
     border-radius: 0 0 $borderRadius-Drawer $borderRadius-Drawer;
@@ -137,8 +137,8 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
 
   &.bottom {
     bottom: 0;
-    left: 0;
-    right: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     height: $height-Drawer;
     max-height: $maxHeight-Drawer;
     border-radius: $borderRadius-Drawer $borderRadius-Drawer 0 0;
@@ -199,7 +199,7 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
 .closeButton {
   position: absolute;
   top: $top-closeButton-Drawer;
-  right: $right-closeButton-Drawer;
+  right: $right-closeButton-Drawer; // @rtl-intentional: close button is always top-right regardless of direction
   flex-shrink: 0;
   display: flex;
   align-items: center;

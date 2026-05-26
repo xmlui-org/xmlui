@@ -109,7 +109,7 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
 
   .iconWrapper {
     @include t.paddingVars($themeVars, "icon-#{$component}");
-    padding-right: $gap-icon-Link;
+    padding-inline-end: $gap-icon-Link;
     line-height: 0;
   }
 
@@ -183,8 +183,8 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
       content: '';
       position: absolute;
       bottom: 0;
-      left: 0;
-      right: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
       height: 2px;
       background: inherit;
       pointer-events: none;

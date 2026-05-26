@@ -1,6 +1,6 @@
 # News and reviews
 
-```xmlui-pg
+```xmlui-pg id="news-and-reviews-b75a"
 <Table data="/resources/files/news-and-reviews.json" sortBy="date" sortDirection="descending">
   <Column bindTo="date" />
   <Column width="4*" header="title">

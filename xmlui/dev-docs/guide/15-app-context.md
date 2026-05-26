@@ -135,10 +135,56 @@ are a distinct injection path.
 
 ---
 
+## Managed App Namespace
+
+`App` groups managed runtime APIs that need policy, diagnostics, or locale/scheduler state.
+
+### Locale and Translation
+
+| Name | Description |
+|---|---|
+| `App.locale` | Active BCP-47 locale. |
+| `App.localeSource` | Source that won locale resolution: `app`, `user`, `persisted`, `navigator`, or `fallback`. |
+| `App.availableLocales` | Registered locale bundles plus configured locales. |
+| `App.setLocale(locale, options?)` | Sets the app/user locale override. |
+| `App.registerLocaleBundle(bundle)` | Registers one `{ locale, messages }` bundle. |
+| `App.registerLocaleBundles(input)` | Registers URL strings, arrays, bundle objects, or locale maps. |
+| `App.reloadLocale(locale)` | Reloads a URL-backed bundle when its source is known. |
+| `App.translate(key, vars?)` / `App.t(key, vars?)` | Translates and formats a message key. |
+| `App.isRtlLocale(locale?)` | RTL locale heuristic used by `<App direction="auto">`. |
+
+See [26 — Internationalization](./26-i18n.md).
+
+### Locale-Aware Formatters
+
+| Name | Description |
+|---|---|
+| `App.formatNumber(value, options?)` | `Intl.NumberFormat` using `App.locale`. |
+| `App.formatCurrency(value, currency, options?)` | Currency formatting. |
+| `App.formatList(values, options?)` | `Intl.ListFormat`. |
+| `App.formatRelativeTime(value, unit, options?)` | `Intl.RelativeTimeFormat`. |
+| `App.compare(a, b, options?)` | `Intl.Collator` comparison. |
+| `App.pluralRules(value, options?)` | Plural category lookup. |
+
+### Deterministic Scheduler
+
+| Name | Description |
+|---|---|
+| `App.scheduler` | Current handler scheduler mode: `concurrent` or `fifo`. |
+| `App.maxQueuedPerTrace` | Per-trace queue budget. |
+| `App.setScheduler(mode, options?)` | Runtime scheduler override. |
+| `App.scheduleHandler(task)` | Internal handler scheduling hook. |
+
+See [39 — Determinism](./39-determinism.md).
+
+---
+
 ## Date Utilities
 
-All date functions wrap **date-fns** and respect the system locale. You never need to import
-date-fns directly in component code or markup.
+These legacy date functions wrap **date-fns** and continue to use the browser/system locale path.
+For explicit active-locale formatting, use `App.formatNumber`, `App.formatCurrency`,
+`App.formatList`, `App.formatRelativeTime`, `App.compare`, and `App.pluralRules`.
+You never need to import date-fns directly in component code or markup.
 
 ### Formatting Functions
 
@@ -420,17 +466,26 @@ Three `appGlobals` keys configure the script-runner sandbox (see
 | `appStateKeys` | `string[]` | unset (permissive) | Schema for `AppState` bucket names. When set, any `AppState` method called with a bucket whose top-level segment is not in the list throws `AppStateSchemaError`. |
 | `silentConsole` | `boolean` | `false` | When `true`, `Log.*` calls do not mirror to the underlying `console.*`. The trace entry is always emitted. |
 
-### Strict-Mode Configuration Keys (Wave 0/1)
+### Strict-Mode Configuration Keys
 
-These `appGlobals` keys gate the rollout of the long-running Managed React plans. All default to `false`/permissive today and flip to `true` (or strict) in the next major release. See [`xmlui/dev-docs/plans/`](../plans/STATUS.md) for full status.
+These `appGlobals` keys gate the rollout of the long-running Managed React plans. Most default to `false`/permissive today and flip to `true` (or strict) in a major release; rows that have already flipped are marked with `true`. See [`xmlui/dev-docs/plans/`](../plans/STATUS.md) for full status.
 
 | Key | Type | Default | Effect | Plan |
 |---|---|---|---|---|
 | `strictBuildValidation` | `boolean` | `false` | Escalates build-time analyzer diagnostics one severity step (info → warn → error); `xmlui check` exits non-zero on any `error`-severity finding. Drives the `theming-missing-prefix`, `id-unknown-component`, `id-unknown-prop`, `expr-dead-conditional`, etc. rules. | [#13](../plans/13-build-validation-analyzers.md) |
 | `strictAccessibility` | `boolean` | `false` | Escalates `warn`-level findings from the accessibility linter (`icon-only-button-no-label`, `modal-no-title`, `missing-accessible-name`, `form-input-no-label`, …) to `error`, failing the Vite build. Findings are also pushed to `_xsLogs` as `kind:"a11y"` entries when the flag is truthy. | [#05](../plans/05-enforced-accessibility.md) |
+| `autoSkipLink` | `boolean` | `false` | Inserts the default `<SkipLink target="main" />` before app content for keyboard users. | [#05](../plans/05-enforced-accessibility.md) |
 | `strictErrors` | `boolean` | `false` | When `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint pointing to `AppError`. `signError` and `ErrorBoundary` always normalize via `AppError.from()` regardless of this flag. | [#07](../plans/07-structured-exception-model.md) |
 | `errorCorrelationIdHeader` | `string` | `"X-Correlation-Id"` | HTTP response header from which `AppError.correlationId` is read on fetch failures. | [#07](../plans/07-structured-exception-model.md) |
+| `strictTypeContracts` | `boolean` | `true` | Escalates type-contract diagnostics for unknown props, wrong literal types, missing required props, invalid enum values, unknown events, and runtime expression-value mismatches. Set to `false` for warn-only migration mode. | [#01](../plans/01-verified-type-contracts.md) |
 | `strictAuditLogging` | `boolean` | `false` | When `true`, the default redaction policy blocks on un-redacted PII fields and the sink behaviour changes from "drop on backpressure" to "bounded buffer then drop with `audit-loss` diagnostic". | [#15](../plans/15-audit-grade-observability.md) |
+| `strictRouting` | `boolean` | `true` | Escalates defended-routing diagnostics such as rejected constraints and non-canonical URLs (and flips `nonCanonicalUrl` defaults to `"redirect"`). Set `false` to opt out. | [#10](../plans/10-defended-routing.md) |
+| `strictI18n` | `boolean` | `false` | Escalates missing bundle/key and ICU diagnostics. | [#11](../plans/11-i18n-foundations.md) |
+| `defaultLocale` | `string` | `"en"` | Fallback locale for `App.locale`. | [#11](../plans/11-i18n-foundations.md) |
+| `localePersistKey` | `string \| null` | `"xmlui.locale"` | localStorage key for user locale persistence; `null` disables persistence. | [#11](../plans/11-i18n-foundations.md) |
+| `strictDeterminism` | `boolean` | `false` | Selects FIFO scheduling by default and escalates determinism diagnostics. | [#16](../plans/16-concurrent-determinism.md) |
+| `scheduler` | `"concurrent" \| "fifo"` | `"concurrent"` | Handler scheduler mode when strict determinism is off. | [#16](../plans/16-concurrent-determinism.md) |
+| `maxQueuedPerTrace` | `number` | `64` | Per-trace FIFO queue budget. | [#16](../plans/16-concurrent-determinism.md) |
 
 ### Sandbox-Sanctioned Replacement Globals
 

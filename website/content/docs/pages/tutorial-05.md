@@ -2,7 +2,7 @@
 
 The `Dashboard` page continues with a donut chart that visualizes some of the same facts reported using `InfoCard`. We define it as a `Statuses` component whose width and title are defined by its containing `Dashboard` component. Here we'll use it standalone.
 
-```xmlui-pg  noHeader
+```xmlui-pg  noHeader id="charts-b76c"
 ---app display
 <App>
   <Statuses />
@@ -63,7 +63,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 
 The `SimpleDonutChart` works with a single series of data and uses `dataKey`. A `SimpleBarChart` wrapper can display multiple series denoted by `yKeys`. We see that in the `MonthlyStatus` chart.
 
-```xmlui-pg /data/ noHeader
+```xmlui-pg /data/ noHeader id="multiseries-charts-b8f6"
 ---app display /data/ /xKey/ /yKeys/
 <App>
   <MonthlyStatus />

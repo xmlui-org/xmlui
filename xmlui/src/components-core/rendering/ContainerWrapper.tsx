@@ -15,6 +15,7 @@ import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { StateContainer } from "./StateContainer";
 import { useShallowCompareMemoize } from "../utils/hooks";
 import { isContainerLike as isContainerLikeShared } from "./ContainerUtils";
+import type { UdcContract } from "../udc-sandbox";
 
 /**
  * This type is the internal representation of a container component, which manages the state of its children.
@@ -30,6 +31,9 @@ export interface ContainerWrapperDef extends ComponentDef {
 
   // --- If true, this is an API-bound container
   apiBoundContainer?: boolean;
+
+  // --- UDC sandbox contract active for this container, when rendering a UDC.
+  udcContract?: UdcContract;
 }
 
 /**
@@ -266,6 +270,7 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
     api: node.api,
     containerUid: node?.containerUid,
     apiBoundContainer: node?.apiBoundContainer,
+    udcContract: node?.udcContract,
     contextVars: node.contextVars,
     computedUses: node.computedUses,
     props: {

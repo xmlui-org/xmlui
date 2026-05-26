@@ -150,9 +150,15 @@ export const FormItem = memo(forwardRef(function FormItem({
   pattern,
   patternInvalidMessage,
   patternInvalidSeverity,
+  validator,
+  validatorParams,
+  validatorInvalidMessage,
+  validatorInvalidSeverity,
   regex,
   regexInvalidMessage,
   regexInvalidSeverity,
+  matchValue,
+  matchInvalidMessage,
   // ---
   style,
   className,
@@ -200,9 +206,15 @@ export const FormItem = memo(forwardRef(function FormItem({
     pattern,
     patternInvalidMessage,
     patternInvalidSeverity,
+    validator,
+    validatorParams,
+    validatorInvalidMessage,
+    validatorInvalidSeverity,
     regex,
     regexInvalidMessage,
     regexInvalidSeverity,
+  matchValue,
+  matchInvalidMessage,
   });
   const defaultId = useId();
   const inputId = useId();
@@ -546,6 +558,7 @@ export const FormItem = memo(forwardRef(function FormItem({
         className={classnames(classes?.[COMPONENT_PART_KEY], className)}
         validationResult={validationResult}
         layoutContext={layoutContext}
+        compactInlineLabel={type === "checkbox" || type === "switch"}
       >
         {formControl}
       </ItemWithLabel>

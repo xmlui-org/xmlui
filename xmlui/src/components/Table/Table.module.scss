@@ -148,7 +148,6 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    border-bottom: $borderBottom-cell-Table;
 
     &.alignTop {
       align-items: flex-start;
@@ -166,6 +165,13 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
     &[data-column-id="select"] {
       overflow: visible;
     }
+  }
+
+  // Header divider stays on the header cells. Row dividers move to the row
+  // itself (see .row below) so the line spans the full row width even when the
+  // last column is resized narrower than the table.
+  .columnCell {
+    border-bottom: $borderBottom-cell-Table;
   }
 
   .table {
@@ -207,35 +213,35 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
 
       .columnCell:first-child {
         .headerContent {
-          padding-left: $paddingHorizontal-cell-first-Table;
+          padding-inline-start: $paddingHorizontal-cell-first-Table;
         }
 
         >button {
-          padding-left: $paddingHorizontal-cell-first-Table;
+          padding-inline-start: $paddingHorizontal-cell-first-Table;
 
           .headerContent {
-            padding-left: 0;
+            padding-inline-start: 0;
           }
         }
       }
 
       .columnCell:last-child {
         .headerContent {
-          padding-right: $paddingHorizontal-cell-last-Table;
+          padding-inline-end: $paddingHorizontal-cell-last-Table;
         }
 
         >button {
-          padding-right: $paddingHorizontal-cell-last-Table;
+          padding-inline-end: $paddingHorizontal-cell-last-Table;
 
           .headerContent {
-            padding-right: 0;
+            padding-inline-end: 0;
           }
         }
       }
 
       .cell:first-child {
         .cellContent {
-          padding-left: $paddingHorizontal-cell-first-Table;
+          padding-inline-start: $paddingHorizontal-cell-first-Table;
           border-left: 0;
         }
 
@@ -243,7 +249,7 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
 
       .cell:last-child {
         .cellContent {
-          padding-right: $paddingHorizontal-cell-last-Table;
+          padding-inline-end: $paddingHorizontal-cell-last-Table;
           border-right: 0;
         }
       }
@@ -253,6 +259,9 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
       font-size: $fontSize-row-Table;
       font-weight: $fontWeight-row-Table;
       background-color: $backgroundColor-row-Table;
+      // Row divider lives on the row, not the cells, so it spans the full row
+      // width even when the last column is resized narrower than the table.
+      border-bottom: $borderBottom-cell-Table;
       --pinned-cell-bg: #{$backgroundColor-row-Table};
       --checkbox-cell-bg: #{$backgroundColor-selectionCell-Table};
 
@@ -312,16 +321,12 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
         opacity: 0.6;
       }
 
-      &:last-child{
-        .cell {
-          border-bottom: $borderBottom-last-row-Table;
-        }
+      &:last-child {
+        border-bottom: $borderBottom-last-row-Table;
       }
 
       &.noBottomBorder:last-child {
-        .cell {
-          border-bottom: none;
-        }
+        border-bottom: none;
       }
     }
   }
@@ -364,7 +369,7 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
 
   .pagination {
     position: sticky;
-    left: 0;
+    inset-inline-start: 0;
     padding-top: t.$space-4;
     padding-bottom: t.$space-4;
     padding-inline: t.$space-4;
@@ -386,7 +391,7 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
   .paginationSelect {
     color: inherit;
     background-color: transparent;
-    margin-left: t.$space-4;
+    margin-inline-start: t.$space-4;
   }
 
   .paginationButtons {
@@ -464,7 +469,7 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
     cursor: col-resize;
     user-select: none;
     touch-action: none;
-    right: 0;
+    inset-inline-end: 0;
     overflow: visible;
     display: flex;
     flex-direction: row;

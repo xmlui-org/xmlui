@@ -301,7 +301,7 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
       width: 2.5ch; // Uniform width following TimeInput pattern
       min-width: 2.5ch;
       max-width: 2.5ch;
-      text-align: left;
+      text-align: start;
       padding: $padding-input-DateInput !important;
       box-sizing: border-box !important;
     }

@@ -76,14 +76,19 @@ function* walkFiles(dir, ext) {
  *
  * "Interactive" means the codefence body contains an event-handler attribute
  * (on[A-Z]...) or a ---api section marker.
+ * 
+ * Codefences are considered "named" if they have either:
+ *   - A name="..." attribute (preferred for display)
+ *   - An id="..." attribute (stable identifier for testing)
  */
 function extractNamedCodefences(content) {
   const results = [];
-  const pattern = /```xmlui-pg[^\n]*\bname="([^"]+)"[^\n]*\n([\s\S]*?)```/g;
+  // Match codefences with either name or id attribute
+  const pattern = /```xmlui-pg[^\n]*(?:\bname="([^"]+)"|\bid="([^"]+)")[^\n]*\n([\s\S]*?)```/g;
   let match;
   while ((match = pattern.exec(content)) !== null) {
-    const name = match[1];
-    const body = match[2];
+    const name = match[1] || match[2]; // Use name if present, otherwise use id
+    const body = match[3];
     const interactive = /\bon[A-Z]|^---api\b/m.test(body);
     results.push({ name, interactive });
   }

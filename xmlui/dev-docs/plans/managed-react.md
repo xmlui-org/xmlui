@@ -55,7 +55,7 @@ These remain accurate where unchanged; rows updated by the
 | Observable by construction | **Strong** *(updated 2026-04)* | Inspector / `pushXsLog` capture every state change, navigation, and API call. **New trace kinds: `sandbox:warn`, `log:debug`/`info`/`warn`/`error`, `app:randomBytes`, `app:mark`/`measure`, `app:fetch`, `clipboard:copy`, `navigate`, `ws:connect`/`message`/`error`/`close`, `eventsource:*` — every Phase 1 ban produces an audit entry in warn mode, and every Phase 2/3 managed primitive emits its own kind.** |
 | DOM API access | **Strong** *(updated 2026-04 — was Weak)* | A property-access guard (`isBannedMember`) in [eval-tree-common.ts](../src/components-core/script-runner/eval-tree-common.ts) is invoked on every identifier read, member read, member write, and computed-member access. The denylists in [bannedMembers.ts](../src/components-core/script-runner/bannedMembers.ts) cover **47 globals**, **21 `document` keys**, **13 `navigator` keys**, and **18 element-setter / mutation keys** — spanning DOM mutation, observers, concurrency primitives, storage, sensors, navigation, network constructors, crypto, performance, and `console`. Default mode (`strictDomSandbox: false`) emits `sandbox:warn` traces; opt-in `true` throws `BannedApiError`. **`console` is in the denylist but allowed by default (`appGlobals.allowConsole`, default `true`) for developer ergonomics; set to `false` to restore sandbox enforcement.** Sanctioned replacements `Log.*`, `App.randomBytes`, `App.now`/`mark`/`measure`, `App.fetch`, `App.environment`, `Clipboard.copy`, `navigate({target:"_blank"})`, `<WebSocket>`/`<EventSource>` are wired into the global expression scope. |
 | Network origin restrictions | **Available** *(updated 2026-04 — was Absent)* | `App.appGlobals.allowedOrigins: string[]` honoured by `App.fetch()`; cross-origin requests are rejected before reaching the network. Same-origin requests are always permitted. Streaming components honour the same allowlist. |
-| Reactive cycle detection | **Absent** | No static cycle analysis on var ↔ DataSource graph |
+| Reactive cycle detection | ✅ **Verified** *(updated 2026-05 — was Absent)* | Static graph analysis covers vars, code-behind functions, and DataSource/APICall loaders; runtime emits `reactive-cycle` traces and default-strict toasts/errors, LSP diagnostics include per-node related locations, and Vite checks per-file plus aggregate `buildEnd` graphs with warn/strict modes. |
 | XSS protection in Markdown | **Absent** | `rehype-raw` passes raw HTML through; no DOMPurify |
 
 The DOM API access row is the headline change: the verdict moved from **Weak**
@@ -85,28 +85,20 @@ type safety: structurally, not aspirationally.
 arrow-key navigation in option lists. Every form input is paired with a `Label`
 component that wires `htmlFor`/`id` automatically.
 
-**What is missing for a "managed" claim.**
+Plan #05 moves those conventions into framework enforcement. The accessibility
+linter runs against parsed markup through the LSP and Vite plugin, component
+metadata declares roles and accessible-name props, the theme resolver checks
+well-known foreground/background contrast pairs, and `automationId` renders a
+stable `data-automation-id` hook for automation tooling. Runtime primitives
+`<SkipLink>`, `<FocusScope>`, and `<LiveRegion>` centralize skip navigation,
+focus trapping/restoration, and polite/assertive announcements; toasts and app
+errors now announce through the global live region.
 
-- **No build-time a11y verification.** Nothing prevents shipping an icon
-  `Button` without `label` or `aria-label`. WPF's AutomationPeer and JavaFX's
-  Accessible API enforce a name on every actionable node; XMLUI does not.
-- **No automated contrast / hit-target validation.** Theme resolution is
-  unconstrained — a custom theme can produce 1.2:1 text on background. .NET's
-  high-contrast theming layer surfaces violations; XMLUI does not.
-- **No automation tree.** A managed framework exposes a separate accessibility
-  tree (UIA in Windows, AT-SPI on Linux). XMLUI inherits whatever accessibility
-  surface the underlying React+DOM produces; there is no XMLUI-level automation
-  ID mechanism beyond passing `testId`.
-- **Keyboard policy is component-local.** Each component implements its own
-  keymap. There is no central focus manager, no skip-link primitive, no
-  documented modal-stack discipline.
-
-**Verdict.** Accessibility is *documented and conventional*, not *enforced by
-construction*. To match the original "managed" pitch, XMLUI would need a
-parse-time linter ("interactive component without an accessible name"),
-a theme-time contrast checker, and a small set of framework primitives
-(`SkipLink`, `FocusScope`, `LiveRegion`) that components are required to
-participate in.
+**Verdict.** Accessibility is now *enforced by managed framework surfaces*:
+authors get build/editor diagnostics for common violations, runtime primitives
+for keyboard and screen-reader flows, contrast warnings during theme resolution,
+and stable automation hooks. `strictAccessibility` remains opt-in during the
+migration window, with the default flip reserved for the next major release.
 
 ---
 
@@ -328,15 +320,21 @@ selectable.
 
 **What is missing.**
 
-- **No type or constraint syntax on route segments.** `:id` is a string until
-  the developer parses it.
-- **`willNavigate` is bypassable.** Browser back/forward and direct URL
-  entry skip the guard.
-- **No URL canonicalization.** Trailing slashes, case, and query parameter
-  ordering are user concerns.
+- ~~**No type or constraint syntax on route segments.** `:id` is a string until
+  the developer parses it.~~ **Resolved (Wave 4, plan #10).** `<Page url="/users/:id:int(min=1)">`
+  is now first-class; custom constraint names resolve through `App.registerValidator()`.
+- ~~**`willNavigate` is bypassable.** Browser back/forward and direct URL
+  entry skip the guard.~~ **Resolved (Wave 4, plan #10).** Pop-state navigations
+  fire the guard (gated by `appGlobals.guardOnPopState`, default `true`); raw
+  `<a>` / `<form>` interception is opt-in via
+  `appGlobals.interceptExternalNavigation`.
+- ~~**No URL canonicalization.** Trailing slashes, case, and query parameter
+  ordering are user concerns.~~ **Resolved (Wave 4, plan #10).** `App` exposes
+  `urlCase`, `urlTrailingSlash`, `urlQueryParamOrder`, and `nonCanonicalUrl`.
 
-**Verdict.** Routing is convenient but not defensive. A managed framework
-would treat the URL as an untrusted boundary and demand a contract.
+**Verdict.** ✅ **Defended.** Routing now treats the URL as an untrusted boundary:
+typed constraints, all-trigger guards, and canonicalisation are first-class. Strict
+defaults flip in the next major release.
 
 ---
 
@@ -351,21 +349,27 @@ gender across the JVM and CLR.
 [`formatDatetimeToUserFriendly()`](../src/components-core/utils/misc.ts)).
 TimeInput honours locale-specific separators.
 
-**What is missing.**
+**What is missing.** *(All resolved — 2026-06 / plan #11)*
 
-- **No string externalization.** All component-emitted UI strings (validation
-  messages, default placeholders, button labels in built-ins) are English
-  literals.
-- **No pluralization or gender support.**
-- **No locale-aware sorting or collation helpers in expressions.**
-- **No RTL support contract.** Components rely on CSS logical properties
-  *if the author remembered*; there is no framework guarantee.
-- **No currency formatting beyond decimal-place control.**
+- ~~**No string externalization.**~~ ✅ All framework-emitted strings are now
+  keyed under `xmlui.*` and flow through `App.translate()`; app strings use
+  `App.translate(key, vars)` / `<I18n key>` with flat JSON bundles.
+- ~~**No pluralization or gender support.**~~ ✅ `@formatjs/intl-messageformat`
+  ICU runtime ships in `i18n/icu.ts`; plural/select/ordinal honoured for every
+  registered locale including Arabic (6 categories) and Polish (4).
+- ~~**No locale-aware sorting or collation helpers in expressions.**~~ ✅
+  `App.compare(a, b, opts?)` wraps `Intl.Collator`; `App.pluralRules(n)` wraps
+  `Intl.PluralRules`.
+- ~~**No RTL support contract.**~~ ✅ `<App direction="auto">` derives direction
+  from the active locale via the CLDR table; all built-in SCSS modules use CSS
+  logical properties; `scripts/lint-physical-css.ts` guards new additions.
+- ~~**No currency formatting beyond decimal-place control.**~~ ✅
+  `App.formatCurrency(value, currency, opts?)` wraps `Intl.NumberFormat` with
+  `style: "currency"`; `App.formatNumber`, `App.formatList`, and
+  `App.formatRelativeTime` are also on the expression surface.
 
-**Verdict.** XMLUI is effectively monolingual. Anything beyond date display
-requires the developer to roll their own i18n layer. This is a substantial
-gap for any framework that wants to be considered "managed" in the .NET / JVM
-sense.
+**Verdict.** ✅ Resolved. The i18n layer is fully managed: bundles, ICU plurals,
+Intl-backed formatters, and RTL guarantee are all in place (plan #11, 2026-06).
 
 ---
 
@@ -407,18 +411,19 @@ SpotBugs, ErrorProne, and ESLint extend this to project-specific rules.
 hover, definitions, folding, and formatting. Parse errors in `.xmlui`
 markup or expressions are surfaced as LSP diagnostics with line/column.
 
-**What is missing.**
+**What XMLUI now verifies.** The tooling spine has been activated for several
+managed checks: component metadata contracts are verified by LSP, Vite, runtime
+coercion diagnostics, and `check:metadata`; the analyzer reports unknown
+components/props/events, dead conditionals, and handler-value mistakes; and the
+reactive graph analyzer reports dependency cycles across runtime, LSP, and
+Vite.
 
-- No type checking against component metadata at parse time.
-- No "unknown component" diagnostic.
-- No "unknown event" / "unknown method" diagnostic on `Component.event`
-  bindings.
-- No detection of obviously dead expressions or unused vars.
-- No detection of the reactive cycles called out in the original report —
-  the AST has the information; the analyzer does not run.
+**Remaining gaps.** Later plans still need to deepen scope analysis, finish
+versioning diagnostics, and make every analyzer equally visible in CI and the
+website examples.
 
-**Verdict.** The tooling spine (LSP, metadata, parser) is in place. The
-analyzers are not.
+**Verdict.** Build-time validation is no longer parse-only. The remaining work
+is breadth and polish, not substrate.
 
 ---
 
@@ -509,20 +514,20 @@ Combining the original report with the new dimensions:
 | XSS (default rendering) | **Strong** | Sanitize Markdown; **DOM-mutation surface now banned at the property-access guard (2026-04)** |
 | HTTP centralisation | **Strong** *(was Moderate)* | `App.fetch` Gate + `allowedOrigins` allowlist shipped 2026-04; raw `fetch`, `XHR`, `WebSocket`, `EventSource`, `sendBeacon` all banned. |
 | Fetch lifecycle | **Strong** | — |
-| Reactive cycle detection | **Absent** | Build a static AST analyzer |
+| Reactive cycle detection | ✅ **Verified** | Static/runtime graph analyzer with Tarjan SCC detection, runtime `reactive-cycle` traces, LSP related locations, Vite warn/strict checks, and default-on `strictReactiveGraph`. |
 | Observability | **Strong** | Add server sink + redaction; **trace kind union extended with sandbox/log/app/clipboard/navigate/ws/eventsource kinds (2026-04)** |
 | DOM API isolation | **Strong** *(was Weak)* | Property-access guard + 99-entry denylist + sanctioned replacement globals + `App.fetch` Gate + `<WebSocket>`/`<EventSource>` components + `App.environment` shipped 2026-04. **Phase 1, 2, and 3 of the hardening plan are all complete.** |
-| **Accessibility** | **Documented only** | Parse-time linter; framework focus / live-region primitives; theme contrast checker |
-| **Type contracts** | **Metadata, not verified** | Parse-time prop validation against metadata |
-| **Resource lifecycle** | **Strong for framework, asymmetric for user code** | Sandbox-safe lifecycle vocabulary for UDCs |
-| **Exception model** | **Contained, not structured** | Structured error type; retry/fallback policies |
+| **Accessibility** | ✅ **Enforced** | LSP/Vite a11y linter; `<SkipLink>` / `<FocusScope>` / `<LiveRegion>` primitives; theme contrast checker; `automationId` hooks; `strictAccessibility` opt-in until next major |
+| **Type contracts** | ✅ **Verified** | LSP, Vite, and runtime expression diagnostics against metadata; `check:metadata` guards TS↔metadata drift; `strictTypeContracts` is default-on |
+| **Resource lifecycle** | ✅ **Symmetric** | Universal `onMount`/`onUnmount`/`onError` events on every component; `<Lifecycle>` declarative effect primitive; container `onBeforeDispose` async-flush hook; `strictLifecycle` default-on (plan #04, W8-1) |
+| **Exception model** | ✅ **Structured** | `AppError` with `code`/`category`/`retryable`/`correlationId`; `<RetryPolicy>` with backoff + `Retry-After` honouring + circuit breaker; `<Fallback>` declarative recovery UI; `<App onError>` global sink + `App.errors` buffer + Inspector "Errors" tab; `strictErrors` default-on (plan #07, W8-1) |
 | **Concurrency / cancellation** | **Predictable, uncoordinated** | Cooperative cancellation token; in-flight guard primitive |
 | **Theming sandbox** | **Mostly scoped** | Typed theme variables; restrict inline-style escape hatch |
 | **Forms validation** | **State strong, validators absent** | Built-in validators, server-error mapping, submit guard |
-| **Routing input** | **Convenient, undefended** | Route constraints, URL canonicalisation |
-| **i18n** | **Dates only** | String externalisation, ICU plurals, RTL guarantees |
+| **Routing input** | ✅ **Defended (strict by default)** | Typed/custom constraints, all-trigger guards (pop-state + opt-in anchor/form interception), URL canonicalisation, `strictRouting` default-on — plan #10 |
+| **i18n** | ✅ **Sealed — bundles, ICU plurals, Intl-backed formatters, RTL guarantee** | `<App locale\|localeBundles\|direction>`, reactive `App.locale` / `App.setLocale` / `App.translate` / `<I18n>`; `@formatjs/intl-messageformat` ICU runtime; `App.formatNumber\|Currency\|List\|RelativeTime\|compare\|pluralRules`; full SCSS logical-properties + `scripts/lint-physical-css.ts`; framework strings extracted to `xmlui.*` namespace. 33 unit + 5 E2E tests. User docs at `/docs/managed-react/i18n-foundations`. `strictI18n` default flip reserved for next major (plan #11) |
 | **Versioning** | **Mechanism present, unenforced** | LSP deprecation diagnostics, prop-level deprecation |
-| **Build-time validation** | **Parse only** | Metadata-driven type/identifier diagnostics |
+| **Build-time validation** | ✅ **Sealed — identifier, expression, and cross-binding analyzers across LSP / Vite / CLI** | Rule registry + walker (auto-parses markup) + suppression; one `analyze()` pipeline drives LSP `diagnostic.ts`, Vite plugin (`analyze: "off"\|"warn"\|"strict"`), and `xmlui check [dir]` CLI; create-app templates ship `check` script + `xmlui.config.json` + GitHub workflow. Rules: identifier (`id-unknown-component\|prop\|event\|method`, `id-undefined-component-ref\|form-ref`), expression (`expr-dead-conditional`, `expr-handler-no-value`, `expr-unbound-identifier`, `expr-unused-var`), determinism rules. `id-unknown-slot` is a registered no-op pending `ComponentMetadata.slots` metadata (out of scope). Shared infra: `_ast-utils.ts` (lazy expression parsing, identifier-ref / rooted-chain collectors, uid map) + `_reserved-identifiers.ts`. 102 unit tests. User docs at `/docs/managed-react/build-validation-analyzers`. |
 | **UDC sandboxing** | **Absent** | Explicit prop/event contract for UDCs; capability scoping |
 | **Audit logging** | **Browser only, unredacted** | OTLP exporter; PII redaction policy |
 | **Determinism** | **Visual, not concurrent** | Document or constrain handler interleaving |
@@ -553,11 +558,12 @@ The original report's refined pitch stands, with three additions:
 > - **Verified component contracts — props and events checked against metadata at parse time** *(achievable; metadata exists)*
 > - **Accessible by construction — interactive components without an accessible name fail to compile** *(achievable; small primitive set + linter)*
 > - **Cooperative cancellation and structured errors in user code** *(achievable; runtime work)*
-> - No infinite render loops — static cycle detection *(achievable, not yet implemented)*
+> - No infinite render loops — static and runtime reactive-cycle detection *(today, as of 2026-05)*
 
 The original report identified three gaps to close (`fetch`, cycles, Markdown
 sanitization) for the security pitch. **Two of those three have shipped:
-`fetch` is now gated through `App.fetch` with origin allowlist (2026-04);
+`fetch` is now gated through `App.fetch` with origin allowlist (2026-04), and
+reactive-cycle detection now ships across runtime, LSP, and Vite (2026-05);
 Markdown sanitization remains the only original-report security gap still
 open.** The broader managed pitch adds three more high-leverage gaps:
 **metadata-driven parse-time prop validation**, **accessibility linting**, and

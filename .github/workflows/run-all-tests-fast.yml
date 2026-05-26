@@ -6,6 +6,10 @@ concurrency: # Concurrency ensures that only a single job or workflow using the 
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - "support/**"
 
 jobs:
   test:
@@ -22,6 +26,8 @@ jobs:
           cache: "npm"
       - name: Install node dependencies
         run: npm ci --prefer-offline
+      - name: Run allowed install scripts
+        run: npm run allow-scripts
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.1
       - name: Store Playwright's Version
@@ -40,8 +46,12 @@ jobs:
         run: npx playwright install --with-deps
       - name: ensure we can build xmlui and the extensions
         run: npm run build-xmlui
-      - name: run all tests
+      - name: check XMLUI metadata drift
+        run: npm --prefix xmlui run check:metadata
+      - name: run tests
         run: npm run test
+      - name: run integration tests
+        run: npm run test-integration
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-report

@@ -23,6 +23,25 @@ import { useDebugView } from "../DebugViewProvider";
 import { setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
 import { buildAppContextValue, type AppContextDeps } from "../state/appContextFactory";
+import { AppUtilsNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import { announceLiveRegion, GlobalLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
+import { SkipLink } from "../../components/SkipLink/SkipLinkReact";
+import {
+  compare,
+  formatCurrency,
+  formatList,
+  formatNumber,
+  formatRelativeTime,
+  pluralRules,
+  resolveLocale,
+  isValidLocale,
+  createBundleStore,
+  normalizeLocaleBundle,
+  translateMessage,
+  xmluiEnglishBundle,
+  type LocaleBundle,
+} from "../i18n";
+import { createScheduler, type ScheduledTask, type Scheduler } from "../scheduler";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -49,6 +68,10 @@ import {
   formatCycle,
   cycleHash,
 } from "../reactive-graph";
+import {
+  configureValidatorRegistry,
+  registerValidator as registerValidatorImpl,
+} from "../forms";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -124,6 +147,23 @@ export function AppContent({
     [],
   );
 
+  // --- App.onError handler state (plan #07 Step 2.1).
+  // The handler is registered by `<App onError="...">` via setErrorHandler.
+  // signError invokes it after toasting, passing an `AppError` and a
+  // `preventDefault` shaped event payload. The handler may return `false` or
+  // call `event.preventDefault()` to suppress the toast.
+  const errorHandlerRef = useRef<((err: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>) | undefined>(undefined);
+  const setErrorHandler = useCallback(
+    (handler?: (err: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>) => {
+      errorHandlerRef.current = handler;
+    },
+    [],
+  );
+
+  // --- App.errors reactive stream (FIFO buffer of recent AppErrors).
+  // The buffer size is read from appGlobals.errorBufferSize (default 50).
+  const [errors, setErrors] = useState<ReadonlyArray<AppError>>(() => Object.freeze([]) as ReadonlyArray<AppError>);
+
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
   const navigateRouter = useNavigate();
@@ -132,6 +172,78 @@ export function AppContent({
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname + location.search + location.hash);
   const isInitialRenderRef = useRef(true);
+  const programmaticNavigationRef = useRef<string | undefined>();
+  const [appLocaleOverride, setAppLocaleOverride] = useState<string | undefined>();
+  const [userLocaleOverride, setUserLocaleOverride] = useState<string | undefined>();
+  const [directionOverride, setDirectionOverride] = useState<"ltr" | "rtl" | "auto">("auto");
+  const [schedulerOverride, setSchedulerOverride] = useState<"concurrent" | "fifo" | undefined>();
+  const [maxQueuedPerTraceOverride, setMaxQueuedPerTraceOverride] = useState<number | undefined>();
+  const bundleStoreRef = useRef(createBundleStore([xmluiEnglishBundle]));
+  const [bundleVersion, setBundleVersion] = useState(0);
+  const bundleSourcesRef = useRef(new Map<string, string>());
+
+  // --- We extract the global properties from the app configuration and pass them to the app context.
+  const appGlobals = useMemo(() => {
+    return (globalProps ?? EMPTY_OBJECT) as Record<string, any>;
+  }, [globalProps]);
+
+  // --- W5-1 / plan #09 Step 0: wire the forms validator registry to this app's
+  // strict-mode flag and trace sink. Re-runs whenever `appGlobals` identity
+  // changes so `strictForms` toggling is observed without re-importing the
+  // registry module.
+  useMemo(() => {
+    configureValidatorRegistry({
+      isStrict: () => (appGlobals as any)?.strictForms === true,
+      emit: (d) => {
+        pushXsLog({ kind: "forms", ts: Date.now(), ...d });
+      },
+    });
+  }, [appGlobals]);
+
+  // W8-1: `strictDeterminism` default flipped from `false` to `true`.
+  // Reads use `!== false` so undefined / missing keys resolve to strict.
+  const strictDeterminism = appGlobals?.strictDeterminism !== false;
+  const schedulerMode: "concurrent" | "fifo" =
+    strictDeterminism
+      ? "fifo"
+      : (schedulerOverride ?? appGlobals?.scheduler ?? "concurrent");
+  const maxQueuedPerTrace =
+    maxQueuedPerTraceOverride ??
+    (typeof appGlobals?.maxQueuedPerTrace === "number" ? appGlobals.maxQueuedPerTrace : 64);
+  const schedulerRef = useRef<Scheduler | undefined>();
+  const schedulerConfigRef = useRef<string>("");
+  const schedulerConfigKey = `${schedulerMode}:${maxQueuedPerTrace}:${strictDeterminism}`;
+  if (!schedulerRef.current || schedulerConfigRef.current !== schedulerConfigKey) {
+    schedulerConfigRef.current = schedulerConfigKey;
+    schedulerRef.current = createScheduler(schedulerMode, {
+      maxQueuedPerTrace,
+      strict: strictDeterminism,
+      onDiagnostic: (diagnostic) => {
+        pushXsLog({
+          kind: "scheduler",
+          ts: Date.now(),
+          ...diagnostic,
+        });
+      },
+    });
+  }
+
+  const setScheduler = useCallback((mode: "concurrent" | "fifo", options?: { maxQueuedPerTrace?: number }) => {
+    setSchedulerOverride(mode);
+    if (options?.maxQueuedPerTrace !== undefined) {
+      setMaxQueuedPerTraceOverride(options.maxQueuedPerTrace);
+    }
+  }, []);
+
+  const scheduleHandler = useCallback(
+    (task: Omit<ScheduledTask, "enqueuedAt">) => {
+      return schedulerRef.current!.enqueue({
+        ...task,
+        enqueuedAt: Date.now(),
+      });
+    },
+    [],
+  );
 
   // --- Wrapped navigate function that respects willNavigate/didNavigate events
   // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
@@ -187,6 +299,7 @@ export function AppContent({
       });
 
       // Perform the actual navigation
+      programmaticNavigationRef.current = typeof to === "string" ? to : (to?.pathname ?? "");
       navigateRouter(to, navigateOptions);
 
       // didNavigate will be fired by the useEffect that watches location changes
@@ -206,6 +319,33 @@ export function AppContent({
     const previousPath = previousLocationRef.current;
 
     if (currentPath !== previousPath) {
+      const { onWillNavigate } = navigationHandlers;
+      const isProgrammatic = programmaticNavigationRef.current === currentPath || programmaticNavigationRef.current === location.pathname;
+      programmaticNavigationRef.current = undefined;
+
+      if (
+        onWillNavigate &&
+        !isProgrammatic &&
+        appGlobals?.guardOnPopState !== false
+      ) {
+        void Promise.resolve(onWillNavigate(currentPath, undefined)).then((result) => {
+          if (result === false) {
+            pushXsLog({
+              kind: "navigate",
+              ts: Date.now(),
+              from: previousPath,
+              to: currentPath,
+              routingDiagnostic: {
+                code: "guard-bypass-attempt",
+                severity: appGlobals?.strictRouting !== false ? "error" : "warn",
+                message: "Navigation was rejected by willNavigate after a browser-driven route change.",
+              },
+            });
+            navigateRouter(previousPath, { replace: true });
+          }
+        });
+      }
+
       previousLocationRef.current = currentPath;
 
       const { onDidNavigate } = navigationHandlers;
@@ -213,7 +353,76 @@ export function AppContent({
         void onDidNavigate(currentPath, undefined);
       }
     }
-  }, [location, navigationHandlers]);
+  }, [appGlobals?.guardOnPopState, appGlobals?.strictRouting, location, navigateRouter, navigationHandlers]);
+
+  // --- Plan #10 Step 2.1 — Anchor + form interception (opt-in).
+  // When `appGlobals.interceptExternalNavigation === true`, same-origin
+  // anchor clicks and same-origin form submissions are routed through
+  // `appContext.navigate` so the `willNavigate` guard, per-page guards,
+  // and the `kind:"navigate"` trace pipeline observe them. Cross-origin
+  // links, modifier-key clicks, `target="_blank"`, and explicit
+  // `data-xmlui-bypass-router` opt-outs are passed through unchanged.
+  useEffect(() => {
+    if (appGlobals?.interceptExternalNavigation !== true) return;
+    if (typeof document === "undefined") return;
+
+    const sameOrigin = (href: string): string | null => {
+      try {
+        const url = new URL(href, window.location.href);
+        if (url.origin !== window.location.origin) return null;
+        return url.pathname + url.search + url.hash;
+      } catch {
+        return null;
+      }
+    };
+
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented) return;
+      if (event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target as Element | null;
+      const anchor = target?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!anchor) return;
+      if (anchor.dataset.xmluiBypassRouter !== undefined) return;
+      const targetAttr = anchor.getAttribute("target");
+      if (targetAttr && targetAttr !== "_self") return;
+      if (anchor.hasAttribute("download")) return;
+      if (anchor.getAttribute("rel")?.includes("external")) return;
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+        return;
+      }
+      const path = sameOrigin(href);
+      if (!path) return;
+      event.preventDefault();
+      void navigate(path);
+    };
+
+    const onSubmit = (event: SubmitEvent) => {
+      if (event.defaultPrevented) return;
+      const form = event.target as HTMLFormElement | null;
+      if (!form || form.tagName !== "FORM") return;
+      if (form.dataset.xmluiBypassRouter !== undefined) return;
+      const method = (form.method || "get").toLowerCase();
+      if (method !== "get") return;
+      if (form.target && form.target !== "_self") return;
+      const action = form.getAttribute("action") || window.location.pathname;
+      const path = sameOrigin(action);
+      if (!path) return;
+      const params = new URLSearchParams(new FormData(form) as any);
+      const query = params.toString();
+      const url = path.split("?")[0] + (query ? `?${query}` : "");
+      event.preventDefault();
+      void navigate(url);
+    };
+
+    document.addEventListener("click", onClick, true);
+    document.addEventListener("submit", onSubmit, true);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      document.removeEventListener("submit", onSubmit, true);
+    };
+  }, [appGlobals?.interceptExternalNavigation, navigate]);
 
   // --- Create PubSubService with stable reference across renders
   const pubSubServiceRef = useRef(createPubSubService());
@@ -387,13 +596,18 @@ export function AppContent({
     onInit?.();
   }, [onInit]);
 
-  // --- Reactive cycle detection — Plan #03 Phase 1 (warn-only probe).
-  // --- Runs once per AppContent mount, after children have been mounted.
-  // --- Detects cycles in the var/function/loader dependency graph and emits
-  // --- one `kind: "reactive-cycle"` trace entry per unique cycle. In strict
-  // --- mode (`appGlobals.strictReactiveGraph === true`), the entry is logged
-  // --- as a console.error in addition to the trace. Strict-mode toast and
-  // --- LSP/Vite enforcement land in W6.
+  // --- Reactive cycle detection — Plan #03.
+  // --- Phase 1 (W2-7) probe: runs once per AppContent mount, after children
+  // --- have been mounted; detects cycles in the var/function/loader
+  // --- dependency graph and emits one `kind:"reactive-cycle"` trace entry
+  // --- per unique cycle.
+  // --- Phase 2 (W6-7) enforcement: when
+  // --- `appGlobals.strictReactiveGraph === true`, `warn`-severity hits
+  // --- escalate to `severity:"error"`, fire a `console.error`, and surface
+  // --- a single dismissable `toast.error()` per cycle so authors see the
+  // --- failure even with the inspector closed. `info`-severity
+  // --- (pure-conditional) cycles never toast and never escalate; they
+  // --- continue to log at info level only.
   const reportedCyclesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!rootContainer) return;
@@ -410,7 +624,8 @@ export function AppContent({
     }
     if (!hits || hits.length === 0) return;
 
-    const strict = (appGlobals as any)?.strictReactiveGraph === true;
+    // W8-1: `strictReactiveGraph` default flipped from `false` to `true`.
+    const strict = (appGlobals as any)?.strictReactiveGraph !== false;
     const seen = reportedCyclesRef.current;
 
     for (const hit of hits) {
@@ -419,7 +634,12 @@ export function AppContent({
       seen.add(id);
 
       const message = formatCycle(hit);
-      const severity = strict ? "error" : (hit.severity ?? "warn");
+      const hitSeverity = hit.severity ?? "warn";
+      // Strict mode escalates `warn` (true cycles) to `error`; `info`
+      // (pure-conditional) hits keep their original severity so they
+      // never block a build / pop a toast.
+      const severity =
+        strict && hitSeverity === "warn" ? "error" : hitSeverity;
 
       // Always make the cycle visible in the dev console so it shows up
       // even when xsVerbose is off (this is the warn-mode probe).
@@ -428,6 +648,19 @@ export function AppContent({
           console.error(`[xmlui]\n${message}`);
         } else if (console.warn) {
           console.warn(`[xmlui]\n${message}`);
+        }
+      }
+
+      // Phase 2 (W6-7): strict-mode one-shot toast so the author sees
+      // the failure even with the inspector closed. Dedup is by `cycleId`
+      // (already enforced by `seen` above — each cycle toasts at most once
+      // per session).
+      if (severity === "error") {
+        try {
+          toast.error(message, { id: `reactive-cycle:${id}`, duration: 8000 });
+        } catch {
+          // Toast container may not be mounted yet — silent fallback;
+          // the console.error and trace entry above are authoritative.
         }
       }
 
@@ -605,10 +838,152 @@ export function AppContent({
     vpSizeIndex,
   ]);
 
-  // --- We extract the global properties from the app configuration and pass them to the app context
-  const appGlobals = useMemo(() => {
-    return globalProps ?? EMPTY_OBJECT;
-  }, [globalProps]);
+  const localePersistKey =
+    appGlobals?.localePersistKey === null ? null : (appGlobals?.localePersistKey ?? "xmlui.locale");
+  const persistedLocale = useMemo(() => {
+    if (!localePersistKey || typeof window === "undefined") return undefined;
+    return window.localStorage.getItem(localePersistKey) ?? undefined;
+  }, [localePersistKey, storageTimestamp]);
+  const availableLocales = useMemo(() => {
+    const configured = appGlobals?.availableLocales;
+    const configuredLocales = Array.isArray(configured)
+      ? configured.filter((v) => typeof v === "string")
+      : [];
+    return [...new Set([...bundleStoreRef.current.available(), ...configuredLocales])];
+  }, [appGlobals?.availableLocales, bundleVersion]);
+  const activeLocale = useMemo(
+    () =>
+      resolveLocale({
+        appProp: appLocaleOverride,
+        userOverride: userLocaleOverride,
+        persisted: persistedLocale,
+        navigatorLanguages:
+          typeof navigator !== "undefined" && Array.isArray(navigator.languages)
+            ? navigator.languages
+            : ["en"],
+        available: availableLocales,
+        fallback: appGlobals?.defaultLocale ?? "en",
+      }),
+    [appGlobals?.defaultLocale, appLocaleOverride, availableLocales, persistedLocale, userLocaleOverride],
+  );
+
+  const setLocale = useCallback(
+    (locale: string, options?: { source?: "app" | "user" }) => {
+      if (!isValidLocale(locale)) {
+        pushXsLog({
+          kind: "i18n",
+          ts: Date.now(),
+          code: "missing-bundle",
+          severity: appGlobals?.strictI18n === true ? "error" : "warn",
+          locale,
+          message: `Invalid locale "${locale}".`,
+        });
+        return;
+      }
+      if (options?.source === "app") {
+        setAppLocaleOverride(locale);
+      } else {
+        setUserLocaleOverride(locale);
+        if (localePersistKey && typeof window !== "undefined") {
+          window.localStorage.setItem(localePersistKey, locale);
+          setStorageTimestamp(Date.now());
+        }
+      }
+    },
+    [appGlobals?.strictI18n, localePersistKey],
+  );
+
+  const registerLocaleBundle = useCallback(
+    (bundle: LocaleBundle) => {
+      bundleStoreRef.current.register(bundle);
+      setBundleVersion((version) => version + 1);
+    },
+    [],
+  );
+
+  const reportI18nDiagnostic = useCallback(
+    (diagnostic: Record<string, unknown>) => {
+      pushXsLog({
+        kind: "i18n",
+        ts: Date.now(),
+        ...diagnostic,
+      });
+    },
+    [],
+  );
+
+  const registerLocaleBundles = useCallback(
+    async (input: unknown) => {
+      const loadedSourceByLocale = new Map<string, string>();
+      const bundles = await resolveLocaleBundleInput(input, async (url) => {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to load locale bundle "${url}": ${response.status} ${response.statusText}`);
+        }
+        const json = await response.json();
+        const locale = inferLocaleFromBundleUrl(url);
+        const loadedLocale = typeof (json as any)?.locale === "string" ? (json as any).locale : locale;
+        if (loadedLocale) {
+          bundleSourcesRef.current.set(loadedLocale, url);
+          loadedSourceByLocale.set(loadedLocale, url);
+        }
+        if (locale && json && typeof json === "object" && !(json as any).locale) {
+          return { locale, messages: json };
+        }
+        return json;
+      });
+      for (const bundle of bundles) {
+        registerLocaleBundle(bundle);
+        const source = loadedSourceByLocale.get(bundle.locale);
+        if (source) {
+          bundleSourcesRef.current.set(bundle.locale, source);
+        }
+      }
+    },
+    [registerLocaleBundle],
+  );
+
+  const reloadLocale = useCallback(
+    async (locale: string) => {
+      const source = bundleSourcesRef.current.get(locale);
+      if (!source) return false;
+      await registerLocaleBundles(source);
+      return true;
+    },
+    [registerLocaleBundles],
+  );
+
+  useEffect(() => {
+    if (appGlobals?.localeBundles === undefined) return;
+    void registerLocaleBundles(appGlobals.localeBundles).catch((error) => {
+      reportI18nDiagnostic({
+        code: "missing-bundle",
+        severity: appGlobals?.strictI18n === true ? "error" : "warn",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    });
+  }, [appGlobals?.localeBundles, appGlobals?.strictI18n, registerLocaleBundles, reportI18nDiagnostic]);
+
+  const translate = useCallback(
+    (key: string, vars?: Record<string, unknown>) => {
+      return translateMessage(key, vars, {
+        store: bundleStoreRef.current,
+        locale: activeLocale.locale,
+        strict: appGlobals?.strictI18n === true,
+        onDiagnostic: (diagnostic) => {
+          reportI18nDiagnostic(diagnostic as any);
+        },
+      });
+    },
+    [activeLocale.locale, appGlobals?.strictI18n, bundleVersion, reportI18nDiagnostic],
+  );
+
+  const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
+
+  const resolvedDirection = useMemo(() => {
+    if (directionOverride === "ltr" || directionOverride === "rtl") return directionOverride;
+    return isRtlLocale(activeLocale.locale) ? "rtl" : "ltr";
+  }, [directionOverride, isRtlLocale, activeLocale.locale]);
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
   // --- app-wide state using buckets (state sections).
@@ -1062,18 +1437,22 @@ export function AppContent({
     }
     const wrapper: any = (message: unknown, opts?: any) => {
       logToast("default", message);
+      announceLiveRegion(message);
       return toast(message as any, opts);
     };
     wrapper.success = (message: unknown, opts?: any) => {
       logToast("success", message);
+      announceLiveRegion(message);
       return toast.success(message as any, opts);
     };
     wrapper.error = (message: unknown, opts?: any) => {
       logToast("error", message);
+      announceLiveRegion(message, "assertive");
       return toast.error(message as any, opts);
     };
     wrapper.loading = (message: unknown, opts?: any) => {
       logToast("loading", message);
+      announceLiveRegion(message);
       return toast.loading(message as any, opts);
     };
     wrapper.custom = (message: unknown, opts?: any) => {
@@ -1085,6 +1464,164 @@ export function AppContent({
     wrapper.promise = toast.promise.bind(toast);
     return wrapper;
   }, []);
+
+  // --- Plan #07 Step 2.1: structured `signError` that maintains the
+  // `App.errors` buffer and invokes a markup `<App onError>` handler.
+  const signErrorWithHandler = useCallback(
+    (error: Error | AppError | string | unknown) => {
+      const appError = AppError.from(error);
+
+      // Plan #07 Step 5.2 (W8-1): when strictErrors is on (default true), warn
+      // whenever a non-AppError value reaches the pipeline so authors are
+      // nudged toward `throw new AppError({ code, category, message })`.
+      const strictErrors = (appGlobals as any)?.strictErrors !== false;
+      if (strictErrors && !(error instanceof AppError)) {
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+          kind: "errors",
+          severity: "warn",
+          code: "unhandled-error",
+          source: "handler",
+          message:
+            `[strictErrors] A non-AppError was thrown: ` +
+            `${String((error as any)?.message ?? error)}. ` +
+            `Use \`throw new AppError({ code, category, message })\` for structured error handling.`,
+        });
+      }
+
+      // Build event payload with preventDefault — handler can suppress toast.
+      let defaultPrevented = false;
+      const event = {
+        preventDefault() { defaultPrevented = true; },
+        get defaultPrevented() { return defaultPrevented; },
+      };
+
+      // Append to App.errors buffer (FIFO, capped).
+      const bufferSize = Math.max(
+        0,
+        typeof (appGlobals as any)?.errorBufferSize === "number"
+          ? (appGlobals as any).errorBufferSize
+          : 50,
+      );
+      if (bufferSize > 0) {
+        setErrors((prev) => {
+          const next = prev.concat(appError);
+          return Object.freeze(
+            next.length > bufferSize ? next.slice(next.length - bufferSize) : next,
+          ) as ReadonlyArray<AppError>;
+        });
+      }
+
+      // Invoke registered onError handler (may run async). Errors thrown by
+      // the handler are swallowed to avoid feedback loops.
+      const handler = errorHandlerRef.current;
+      let handlerResult: void | boolean | Promise<void | boolean> | undefined;
+      if (handler) {
+        try {
+          handlerResult = handler(appError, event);
+        } catch (e) {
+          console.error("[xmlui] onError handler threw:", e);
+        }
+      }
+
+      const showToast = () => {
+        if (defaultPrevented || handlerResult === false) return;
+        signError(appError);
+      };
+
+      // Async handlers can still call preventDefault before settling.
+      if (handlerResult && typeof (handlerResult as any).then === "function") {
+        (handlerResult as Promise<void | boolean>).then(
+          (result) => {
+            if (result === false) return;
+            // If the handler hasn't called preventDefault yet, still show toast.
+            if (!defaultPrevented) signError(appError);
+          },
+          () => {
+            // Handler rejected — still show toast.
+            if (!defaultPrevented) signError(appError);
+          },
+        );
+      } else {
+        showToast();
+      }
+    },
+    [appGlobals],
+  );
+
+  // --- App namespace: built inline because it pulls together many hooks
+  // (locale state, scheduler, error sink). Passed as a single dep to the
+  // factory so `XMLUI_GLOBAL_NAMES` stays the single source of TOP-LEVEL keys.
+  const appNamespace = useMemo(
+    () => ({
+      ...AppUtilsNamespace,
+      fetch: createAppFetch(appGlobals),
+      environment: getAppEnvironment(),
+      locale: activeLocale.locale,
+      localeSource: activeLocale.source,
+      availableLocales,
+      setLocale,
+      setAppDirection: (dir: "ltr" | "rtl" | "auto") => setDirectionOverride(dir),
+      registerLocaleBundle,
+      registerLocaleBundles,
+      reloadLocale,
+      translate,
+      t: translate,
+      isRtlLocale,
+      direction: resolvedDirection,
+      formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
+        formatNumber(value, activeLocale.locale, options),
+      formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
+        formatCurrency(value, currency, activeLocale.locale, options),
+      formatList: (values: readonly string[], options?: Intl.ListFormatOptions) =>
+        formatList(values, activeLocale.locale, options),
+      formatRelativeTime: (
+        value: number,
+        unit: Intl.RelativeTimeFormatUnit,
+        options?: Intl.RelativeTimeFormatOptions,
+      ) => formatRelativeTime(value, unit, activeLocale.locale, options),
+      compare: (a: string, b: string, options?: Intl.CollatorOptions) =>
+        compare(a, b, activeLocale.locale, options),
+      pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
+        pluralRules(value, activeLocale.locale, options),
+      scheduler: schedulerMode,
+      maxQueuedPerTrace,
+      setScheduler,
+      scheduleHandler,
+      // --- W5-1 / plan #09 Step 1.2: register a named validator from markup.
+      registerValidator: registerValidatorImpl,
+      // --- Plan #07 Step 2.1: structured error sink.
+      // `App.errors` is a FIFO buffer of recent `AppError`s (default 50, see
+      // `appGlobals.errorBufferSize`).  `setErrorHandler` is used by
+      // `<App onError>` to register a markup handler that runs after the
+      // default toast; the handler may call `event.preventDefault()` to
+      // suppress the toast.
+      errors,
+      setErrorHandler,
+    }),
+    [
+      appGlobals,
+      activeLocale,
+      availableLocales,
+      setLocale,
+      setDirectionOverride,
+      registerLocaleBundle,
+      registerLocaleBundles,
+      reloadLocale,
+      translate,
+      isRtlLocale,
+      resolvedDirection,
+      schedulerMode,
+      maxQueuedPerTrace,
+      setScheduler,
+      scheduleHandler,
+      registerValidatorImpl,
+      errors,
+      setErrorHandler,
+    ],
+  );
 
   // --- We assemble the app context object from the collected information.
   // Single declaration: factoryDeps is both the factory's input and the source
@@ -1109,7 +1646,7 @@ export function AppContent({
     routerBaseName,
     setNavigationHandlers,
     confirm,
-    signError,
+    signError: signErrorWithHandler,
     toast: tracedToast,
     activeThemeId,
     activeThemeTone,
@@ -1128,6 +1665,7 @@ export function AppContent({
     Log,
     pubSubService,
     publishTopic: pubSubService.publishTopic,
+    App: appNamespace,
   };
   const appContextValue = useMemo(
     () => buildAppContextValue(factoryDeps),
@@ -1138,16 +1676,50 @@ export function AppContent({
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
+        <GlobalLiveRegion />
+        {(appGlobals as any)?.autoSkipLink === true && <SkipLink />}
         <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
       </AppStateContext.Provider>
     </AppContext.Provider>
   );
 }
 
+async function resolveLocaleBundleInput(
+  input: unknown,
+  loadUrl: (url: string) => Promise<unknown>,
+): Promise<LocaleBundle[]> {
+  if (input === undefined || input === null) return [];
+  if (typeof input === "string") {
+    return resolveLocaleBundleInput(await loadUrl(input), loadUrl);
+  }
+  if (Array.isArray(input)) {
+    const resolved = await Promise.all(input.map((entry) => resolveLocaleBundleInput(entry, loadUrl)));
+    return resolved.flat();
+  }
+  const direct = normalizeLocaleBundle(input);
+  if (direct) return [direct];
+  if (typeof input === "object") {
+    return Object.entries(input as Record<string, unknown>)
+      .filter(([, messages]) => messages && typeof messages === "object")
+      .map(([locale, messages]) => ({ locale, messages: messages as Record<string, string> }));
+  }
+  return [];
+}
+
+function inferLocaleFromBundleUrl(url: string): string | undefined {
+  const filename = url.split(/[/?#]/).filter(Boolean).at(-1) ?? "";
+  const match = filename.match(/(?:^|\.)([a-z]{2,3}(?:-[a-z0-9]{2,8})*)\.json$/i);
+  return match?.[1];
+}
+
 // --- We pass this funtion to the global app context
+// Step 1.1 normalises any thrown value into an `AppError`; Step 2.1 (`<App
+// onError>`) wraps this base behaviour with handler invocation and the
+// `App.errors` buffer inside the component closure (see `signErrorWithHandler`).
 function signError(error: Error | AppError | string | unknown) {
   const appError = AppError.from(error);
   const message = appError.message || "Something went wrong";
+  announceLiveRegion(message, "assertive");
   toast.error(message);
   // Always log to console so Playwright page.on('console') can capture it
   console.error("[xmlui]", message);

@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+
 - **Data binding**: Automatically syncs control values with form data using the `bindTo` property
 - **Validation**: Displays validation states and error messages for the associated input
 - **Flexible labeling**: Supports labels, helper text, and various label positioning options
@@ -192,11 +193,11 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 
 %-PROP-START pattern
 
-| Value   | Description                                                                                                                                                |
-| :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `email` | Accepts the `[username]@[second level domain].[top level domain]` format                                                                                     |
+| Value   | Description                                                                                                                                                     |
+| :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `email` | Accepts the `[username]@[second level domain].[top level domain]` format                                                                                        |
 | `phone` | Requires at least one digit and accepts: numbers, upper- and lowercase letters and the following symbols: `#`, `*`, `)`, `(`, `+`, `.`, `\`, `-`, `_`, `&`, `'` |
-| `url`   | Accepts URLs and URIs starting with either `http` or `https`                                                                                               |
+| `url`   | Accepts URLs and URIs starting with either `http` or `https`                                                                                                    |
 
 > **Note:** To define custom patterns and regular expressions, see the [regex section](#regex).
 
@@ -358,6 +359,40 @@ Just submitting the form as is also produces the same error.
 
 %-PROP-END
 
+%-PROP-START matchValue
+
+Use `matchValue` when a field must equal another value, such as a password confirmation field.
+
+```xmlui-pg copy display name="Example: matchValue"
+<App>
+  <Form
+    data="{{ password: '', confirmPassword: '' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem
+      type="password"
+      label="Password"
+      bindTo="password"
+      required="true" />
+    <FormItem
+      type="password"
+      label="Confirm Password"
+      bindTo="confirmPassword"
+      required="true"
+      noSubmit="true"
+      matchValue="{$data.password}"
+      matchInvalidMessage="Passwords do not match" />
+  </Form>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START matchInvalidMessage
+
+Use `matchInvalidMessage` to customize the validation message displayed when the field does not match `matchValue`.
+
+%-PROP-END
+
 %-PROP-START required
 
 ```xmlui-pg copy display name="Example: required"
@@ -395,7 +430,7 @@ In the demo below, leave the field empty and click outside to see the regular an
 
 %-PROP-START type
 
->[!INFO]
+> [!INFO]
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
 > Omitting the type and providing child components implicitly sets it to custom.
 
@@ -413,9 +448,9 @@ Note how changing the input in the demo below will result in a slight delay of i
     onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem
       customValidationsDebounce="3000"
-      onValidate="(value) => { 
-        validations += '| '; 
-        return value === value.toUpperCase(); 
+      onValidate="(value) => {
+        validations += '| ';
+        return value === value.toUpperCase();
       }"
       bindTo="name" />
     <Text value="{validations}" />

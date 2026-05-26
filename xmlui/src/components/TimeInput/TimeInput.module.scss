@@ -424,7 +424,7 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
   }
 
   .amPmIcon {
-    margin-left: $margin-icon-TimeInput;
+    margin-inline-start: $margin-icon-TimeInput;
     flex-shrink: 0;
     width: 1em; // Scale with font size
     height: 1em; // Scale with font size

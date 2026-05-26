@@ -1,4 +1,8 @@
-import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+  PropertyValueType,
+} from "../abstractions/ComponentDefs";
 
 import { parseParameterString } from "./script-runner/ParameterParser";
 import { Parser } from "../parsers/scripting/Parser";
@@ -20,6 +24,7 @@ export interface MetadataHandler {
 
 export type PropDescriptor = {
   type?: string;
+  valueType?: PropertyValueType;
   availableValues?: any[];
   defaultValue?: any;
   isValid?: IsValidFunction<any>;
@@ -272,12 +277,19 @@ export function visitComponent(
     }
 
     const propValue = currentProps[propName];
-    if (propDescriptor.type === "ComponentDef" && propValue.type) {
-      // --- This property holds a nested component, visit it
-      visitComponent(propValue, def, visitor, continuation, metadataHandler);
-      if (continuation.abort || continuation.cancel) {
-        // --- Stop the visit
-        return;
+    const propValueType = propDescriptor.valueType ?? propDescriptor.type;
+    if (propValueType === "ComponentDef") {
+      const nestedComponents = Array.isArray(propValue) ? propValue : [propValue];
+      for (const nestedComponent of nestedComponents) {
+        if (!nestedComponent?.type) {
+          continue;
+        }
+        // --- This property holds a nested component, visit it
+        visitComponent(nestedComponent, def, visitor, continuation, metadataHandler);
+        if (continuation.abort || continuation.cancel) {
+          // --- Stop the visit
+          return;
+        }
       }
     }
   }

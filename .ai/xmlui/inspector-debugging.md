@@ -84,6 +84,7 @@ interface XsLogEntry {
 | `"clipboard:copy"` | `Clipboard.copy` global | Clipboard write via sanctioned wrapper |
 | `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | `<WebSocket>` component | Managed WebSocket lifecycle |
 | `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | `<EventSource>` component | Managed SSE lifecycle |
+| `"reactive-cycle"` | reactive graph analyzer | Static/runtime reactive dependency cycle; payload includes cycle hash, severity, and formatted nodes |
 | `"build"` | analyzer pipeline (plan #13) | Build-time validation diagnostic echoed at runtime; payload `code, severity, file, line, column, message`, optional `data`, `suggestions` |
 | `"errors"` | structured error pipeline (plan #07) | Structured error event; payload `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId` |
 | `"audit"` | audit subsystem (plan #15) | Audit-pipeline self-diagnostic (redaction gap, sink failure, buffer overflow); payload `code: AuditDiagCode`, `severity`, `message`, optional `data` |

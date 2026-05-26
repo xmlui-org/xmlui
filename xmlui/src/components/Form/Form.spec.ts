@@ -753,6 +753,38 @@ test.describe("Basic Functionality", () => {
       await expect(labels.nth(0)).toHaveCSS("width", "150px");
       await expect(labels.nth(1)).toHaveCSS("width", "150px");
     });
+
+    // Regression: itemLabelWidth used to be applied only to the inner <label>
+    // element, whose percentage width then resolved against the auto-sized
+    // label wrapper instead of the form row, collapsing every label to its
+    // content width and forcing per-character wrapping. The width must now
+    // resolve against the row so percentages give a real fraction of it.
+    test("itemLabelWidth percentage resolves against the form row width", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form
+          itemLabelWidth="50%"
+          itemLabelPosition="start"
+          itemLabelBreak="false"
+          hideButtonRow="true"
+          width="400px"
+        >
+          <FormItem label="A" />
+          <FormItem label="A much longer second label" />
+        </Form>
+      `);
+
+      const labels = page.locator("[data-part-id='label']");
+      await expect(labels).toHaveCount(2);
+      // A 400px row with itemLabelWidth=50% must give each label a 200px slot.
+      // toHaveCSS reports the resolved pixel width, so this catches both the
+      // old "collapses to content width" bug and any future regression where
+      // percentage values silently fall back to auto.
+      await expect(labels.nth(0)).toHaveCSS("width", "200px");
+      await expect(labels.nth(1)).toHaveCSS("width", "200px");
+    });
   });
 
   // =============================================================================

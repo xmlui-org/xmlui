@@ -79,6 +79,22 @@ Both evaluators set **optional chaining as the default** for all member access a
 
 ---
 
+## Reactive Cycle Detection
+
+XMLUI builds a static reactive graph for user `var` values, code-behind
+functions, and DataSource/APICall loaders. The graph records "this value
+depends on that value" edges from parsed expression identifiers, then runs a
+strongly-connected-components pass to find cycles before they become infinite
+updates.
+
+Cycle diagnostics show up in runtime traces (`kind: "reactive-cycle"`), editor
+diagnostics (`code: "reactive-cycle"` with related locations for each member),
+and Vite builds (`reactiveCycles: "off" | "warn" | "strict"`). Strict runtime
+mode is default-on through `App.appGlobals.strictReactiveGraph`; set it to
+`false` only while migrating known cycles.
+
+---
+
 ## The Two Tracks: Sync vs Async
 
 ### Sync evaluation (binding expressions)
