@@ -83,7 +83,7 @@ To avoid "Variable not found in scope" errors, the **full parent state** is pass
 ### Lexical Scoping (Immutable Scope Propagation Mechanism)
 Instead of hardcoded lists of "special" variables, the optimizer uses metadata to build the lexical scope during AST traversal:
 - **Component Scope:** Container components (like `List`, `Table`, `ModalDialog`) declare `childInjectedVars`. All expressions in children of these components automatically filter these variables.
-- **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars`. Expressions inside a specific handler filter these variables.
+- **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars`. Expressions inside a specific handler filter these variables. To reduce boilerplate in `optimizer-metadata.ts`, the `withInjectedContext` utility allows specifying `eventsInheritChildVars`, which automatically copies `childInjectedVars` into the `injectedVars` of the specified event names (e.g., passing `$data` to `Form`'s `submit` event).
 - **Shadowing:** Metadata-driven scoping allows local variables (like `$queryParams` in `onFetch`) to naturally shadow global ones (like router `$queryParams`), preventing false parent dependencies.
 
 ### Lexical Scoping at Runtime: Local Vars Win over Outer Scope (`useVars`)
@@ -233,16 +233,4 @@ const keepDep = (d: string) =>
 
 ---
 
-## 7. TODO (Future Work)
-
-1. **Lazy State Cloning in Event Handlers (Proxy):**
-   Current implementation uses `cloneDeep` for state creation during events. On heavy pages, this causes delays. A `Proxy` with *Copy-on-Write* strategy would be more efficient.
-2. **AST Analysis of `.xs` File Functions:**
-   Enable state narrowing for components with code-behind by performing transitive AST analysis of function bodies in `.xs` files.
-3. **Metadata Consolidation (DRY):**
-   Merge `childInjectedVars` and `contextVars` in future refactorings to reduce duplication.
-4. **Pure Static Tracking:**
-   Eliminate the `$`-prefix fallback in `extractScopedState` entirely once the analyzer is 100% accurate in tracking lexical scope, relying only on explicit `computedUses` lists.
-
----
 *Note: To view render statistics in the browser during development, use `window.__renderCounts` (per-label counters), `window.__topRenderCounts(n=10)` (top N most-rendered labels), and `window.__resetRenderCounts()` (zero all counters).*
