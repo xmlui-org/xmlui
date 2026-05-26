@@ -42,21 +42,43 @@ export const OPTIMIZER_METADATA = {
   DataLoader: {
     events: {
       fetch: {
-        injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
+        injectedVars: [
+          "$url",
+          "$method",
+          "$queryParams",
+          "$requestBody",
+          "$requestHeaders",
+          "$pageParams",
+        ],
       },
     },
   },
   DataSource: {
     events: {
       fetch: {
-        injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
+        injectedVars: [
+          "$url",
+          "$method",
+          "$queryParams",
+          "$requestBody",
+          "$requestHeaders",
+          "$pageParams",
+        ],
       },
     },
   },
   APICall: {
     events: {
       mockExecute: {
-        injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"],
+        injectedVars: [
+          "$pathParams",
+          "$queryParams",
+          "$requestBody",
+          "$cookies",
+          "$requestHeaders",
+          "$param",
+          "$params",
+        ],
       },
     },
   },
@@ -69,7 +91,15 @@ export const OPTIMIZER_METADATA = {
   Items: { childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast"] },
   Table: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex", "$isSelected"],
+    childInjectedVars: [
+      "$item",
+      "$itemIndex",
+      "$cell",
+      "$colIndex",
+      "$row",
+      "$rowIndex",
+      "$isSelected",
+    ],
     events: {
       contextMenu: {
         injectedVars: ["$item", "$row", "$rowIndex", "$itemIndex"],
@@ -100,7 +130,9 @@ export const OPTIMIZER_METADATA = {
   },
   AutoComplete: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$item"],
+    // Keep aligned with the `optionTemplate` renderer's `contextVars` in
+    // `xmlui/src/components/AutoComplete/AutoComplete.tsx`
+    childInjectedVars: ["$item", "$selectedValue", "$inTrigger"],
   },
   Markdown: {
     isImplicitContainerByDefault: true,
@@ -121,8 +153,19 @@ export const OPTIMIZER_METADATA = {
       complete: { injectedVars: ["$completedItems", "$queuedItems"] },
     },
   },
-  Column:      { childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex", "$value", "$setValue"] },
-  Form:        {
+  Column: {
+    childInjectedVars: [
+      "$item",
+      "$cell",
+      "$itemIndex",
+      "$colIndex",
+      "$row",
+      "$rowIndex",
+      "$value",
+      "$setValue",
+    ],
+  },
+  Form: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$data"],
     events: {
@@ -131,17 +174,19 @@ export const OPTIMIZER_METADATA = {
       submitFailed: { injectedVars: ["$data"] },
       cancel: { injectedVars: ["$data"] },
       reset: { injectedVars: ["$data"] },
-      success: { injectedVars: ["$data"] }
-    }
+      success: { injectedVars: ["$data"] },
+    },
   },
-  FormItem:    { childInjectedVars: ["$value", "$setValue", "$validationResult"] },
-  FormSegment: { childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"] },
-  Tabs:        { isImplicitContainerByDefault: true, childInjectedVars: ["$header"] },
-  TabItem:     { childInjectedVars: ["$header"] },
-  Stepper:     { isImplicitContainerByDefault: true },
-  Drawer:      { isImplicitContainerByDefault: true },
-  RadioGroup:  { childInjectedVars: ["$checked", "$setChecked"] },
-  Checkbox:    { childInjectedVars: ["$checked", "$setChecked"] },
+  FormItem: { childInjectedVars: ["$value", "$setValue", "$validationResult"] },
+  FormSegment: {
+    childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"],
+  },
+  Tabs: { isImplicitContainerByDefault: true, childInjectedVars: ["$header"] },
+  TabItem: { childInjectedVars: ["$header"] },
+  Stepper: { isImplicitContainerByDefault: true },
+  Drawer: { isImplicitContainerByDefault: true },
+  RadioGroup: { childInjectedVars: ["$checked", "$setChecked"] },
+  Checkbox: { childInjectedVars: ["$checked", "$setChecked"] },
 } as const satisfies Record<string, Partial<ComponentMetadata>>;
 
 /**

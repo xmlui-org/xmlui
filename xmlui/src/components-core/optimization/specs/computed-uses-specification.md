@@ -186,6 +186,25 @@ To protect against developer error (forgetting to update metadata when adding ne
 - If a mismatch is found (a variable starts with `$` but is not declared), a **hard-fail `throw`** is raised in development (gated by `import.meta.env?.DEV`). In production builds the same condition logs a `console.error` instead, so misconfigured extension components keep working with graceful degradation.
 - The thrown error message names the offending `OPTIMIZER_METADATA.<Component>` entry, so the fix is immediate.
 
+### Static Drift Check (CI-time)
+
+In addition to the runtime `validateInjectedVars` hard-fail, a unit test in
+[`xmlui/tests/components-core/optimization/renderer-metadata-drift.test.ts`](../../../tests/components-core/optimization/renderer-metadata-drift.test.ts)
+statically walks every built-in component's `renderers.{slot}.contextVars`
+declaration and asserts that each `$`-key is also declared in
+`OPTIMIZER_METADATA[type].childInjectedVars` or the component's
+`metadata.contextVars`. This catches drift at PR time (sub-second feedback),
+not at the next E2E run that happens to exercise the affected renderer. The
+test reads `.tsx` files as text and uses a narrow regex extractor — it
+deliberately does NOT import the component modules (which would pull SCSS
+and other Vite-only deps that don't load under vitest).
+
+Renderers that compute `contextVars` via a callback (e.g. `Checkbox`'s
+`inputTemplate` uses `contextVars: (vars) => vars`) cannot be audited
+statically and are skipped; their contract is enforced only by the runtime
+check.
+
+
 ---
 
 ## 7. TODO (Future Work)
@@ -198,9 +217,7 @@ To protect against developer error (forgetting to update metadata when adding ne
    Enable state narrowing for components with code-behind by performing transitive AST analysis of function bodies in `.xs` files.
 4. **Metadata Consolidation (DRY):**
    Merge `childInjectedVars` and `contextVars` in future refactorings to reduce duplication.
-5. **Static AST Audit Test:**
-   Implement a CI-enforced test that statically analyzes component source files to ensure metadata matches actual injections (see `TODO-metadata-protection-layers-2-and-4.md`).
-6. **Pure Static Tracking:**
+5. **Pure Static Tracking:**
    Eliminate the `$`-prefix fallback in `extractScopedState` entirely once the analyzer is 100% accurate in tracking lexical scope, relying only on explicit `computedUses` lists.
 
 ---

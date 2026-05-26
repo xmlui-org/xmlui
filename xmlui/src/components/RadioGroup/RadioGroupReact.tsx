@@ -196,6 +196,13 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
       const nextValue = radios[nextIndex].getAttribute("value");
       if (nextValue != null) {
         onInputChange(nextValue);
+        // Radix's roving-focus does not reliably move focus to the next radio
+        // when the value prop changes via our handler mid-event (same caveat as
+        // the click-on-focus race noted above). Force focus to the new selection
+        // so each keystroke leaves focus on the now-checked option; otherwise
+        // sequential arrow presses stop advancing after one hop and wrap-around
+        // never moves off the second-to-last option.
+        radios[nextIndex].focus();
       }
     },
     [readOnly, enabled, orientation, onInputChange],

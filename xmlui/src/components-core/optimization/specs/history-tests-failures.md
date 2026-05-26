@@ -1,28 +1,6 @@
-# E2E Test Failures — 2026-05-16 (updated with NEW FAILURES)
+# E2E Test Failures — 2026-05-16
 
-> **Original run (2026-05-16):** 4m 55s | Total: 6911 tests | **21 failed**, 2 flaky, 65 skipped, 6823 passed  
-> **Re-run after fix (2026-05-18):** 15m 10s | Total: 6915 tests | **135 failed**, 3 flaky, 65 skipped, 6712 passed  
-> **Run (2026-05-20 AM):** 4m 06s | Total: 6915 tests | **7 failed**, 5 flaky, 65 skipped, 6838 passed  
-> **Run (2026-05-20 PM — FULL):** 4m22s | Total: 6917 tests | **0 failed** ✅, 5 flaky, 65 skipped, **6847 passed** ✅  
-> **Run (2026-05-21 — Post Bug 26 Revert):** 4.0m | Total: 6921 tests | **0 failed** ✅, 3 flaky, 66 skipped, **6852 passed** ✅  
-> **Run (2026-05-21 — Lexical Scoping Checkbox Failures):** 4m23s | Total: 6922 tests | **2 failed**, 5 flaky, 66 skipped, **6849 passed**  
-> **Run (2026-05-22 — Final Check):** 4m 20s | Total: 6922 tests | **0 failed** ✅, 7 flaky, 66 skipped, 6849 passed ✅  
-> **Run (2026-05-22 — Regression Check):** 4m 22s | Total: 6922 tests | **1 failed**, 5 flaky, 66 skipped, **6850 passed**  
-> **Run (2026-05-22 PM — Post-Lexical-Scoping):** **5 failed**, 4 flaky — reactive-derived-var regression confirmed via `COMPUTED_USES_ENABLED = false` workaround (full run not recaptured).  
-> **Run (2026-05-22 PM — Post Group R fix):** Targeted suites: 43/43 E2E pass (5 originally-failing tests + 28 ContextMenu Bug 29 + ContextMenu Bug 29 regression tests), 95/95 computedUses unit pass; broad E2E (Form/List/Table/ModalDialog/Checkbox/Select/Tree/Queue/Tabs) **1410 passed**, 0 failed; how-to-examples **463 passed** + 1 flaky hover test (passes on isolated rerun).  
-> Branch: `yurii/computedUses`
-
-**NEW FAILURES (2026-05-22 PM) — ✅ FIXED:** 5 reactive-derived-variable regressions
-across `communicate-between-sibling-components.spec.ts`, `markup.spec.ts`, and
-`var-destructuring.spec.ts` (see Group R). Root cause was NOT inside the
-`computedUses` optimisation pass itself — the bisection signal
-(`COMPUTED_USES_ENABLED = false` made them pass) was misleading. Real cause: the
-Bug 29 lexical-scoping fix in commit `3408e8c35` flipped
-`variable-resolution.ts`'s spread order for **all** vars, breaking reactivity
-of user-defined derived vars that reference sibling `var.`s on the same
-container. Fixed by restoring the original order and explicitly preserving
-$-prefixed framework keys from the local `ret` table.
-
+> **Summary:** Optimization development involved multiple E2E runs to identify and fix regressions. After Bug 31 fix (2026-05-26), all major component suites pass (1343 passed, 0 failed).
 
 ---
 
@@ -31,400 +9,79 @@ $-prefixed framework keys from the local `ret` table.
 | # | Group | File | Tests | Status |
 |---|-------|------|-------|--------|
 | ~~A~~ | ~~Event handler closure / `$context` binding~~ | ~~`open-a-context-menu-on-right-click.spec.ts`~~ | ~~6~~ | ✅ fixed |
-| ~~B~~ | ~~`refreshOn` event handler closure updates~~ | ~~`Table.spec.ts` (refreshOn section)~~ | ~~3~~ | ✅ fixed |
-| ~~C~~ | ~~Context vars in event handlers (`$url`, `$method`, `$queryParams`)~~ | ~~`DataSource.spec.ts`~~ | ~~1~~ | ✅ fixed |
-| ~~D~~ | ~~Deferred / background async operations~~ | ~~`cancel-a-deferred-api-operation.spec.ts`, `handle-background-operations.spec.ts`~~ | ~~4~~ | ✅ fixed |
-| ~~E~~ | ~~DataSource dependency chain~~ | ~~`delay-a-datasource-until-another-datasource-is-ready.spec.ts`~~ | ~~2~~ | ✅ fixed |
-| ~~F~~ | ~~Table multi-row selection~~ | ~~`enable-multi-row-selection-in-a-table.spec.ts`~~ | ~~2~~ | ✅ fixed |
+| ~~B~~ | ~~`refreshOn` event handler closure updates~~ | ~~`Table.spec.ts` (refreshOn)~~ | ~~3~~ | ✅ fixed (Bug 20) |
+| ~~C~~ | ~~Context vars in event handlers~~ | ~~`DataSource.spec.ts`~~ | ~~1~~ | ✅ fixed |
+| ~~D~~ | ~~Deferred / background operations~~ | ~~`cancel-a-deferred-api-operation.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 23) |
+| ~~E~~ | ~~DataSource dependency chain~~ | ~~`delay-a-datasource-until-another-ready.spec.ts`~~ | ~~2~~ | ✅ fixed (Bug 22) |
+| ~~F~~ | ~~Table multi-row selection~~ | ~~`enable-multi-row-selection-in-a-table.spec.ts`~~ | ~~2~~ | ✅ fixed (Bug 23) |
 | ~~G~~ | ~~Tree async loading (`loaded` field)~~ | ~~`Tree-loaded-field.spec.ts`~~ | ~~3~~ | ✅ fixed |
-| ~~H~~ | ~~Flaky (past)~~ | ~~`MessageListener.spec.ts`, `Select.spec.ts`, `FormBindingBehavior.spec.ts`~~ | ~~3~~ | ✅ fixed |
-| ~~J~~ | ~~Compound components + `$queryParams` / `$this`~~ | ~~`compound-component.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 24) |
-| K | Timing / responsive / flaky | `ChangeListener.spec.ts`, `Tree-spinnerDelay.spec.ts`, `make-a-table-responsive.spec.ts`, `use-the-same-modaldialog-to-add-or-edit.spec.ts` | 6 | ⚠️ flaky |
+| ~~H~~ | ~~Flaky (past)~~ | ~~`MessageListener.spec.ts`~~ | ~~3~~ | ✅ fixed |
+| ~~J~~ | ~~Compound components + `$queryParams`~~ | ~~`compound-component.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 24) |
+| K | Timing / responsive / flaky | `ChangeListener.spec.ts`, `make-a-table-responsive.spec.ts` | 6 | ⚠️ flaky |
 | ~~L~~ | ~~Extensions (all packages)~~ | ~~Multiple extension spec files~~ | ~~>130~~ | ✅ fixed |
-| ~~M~~ | ~~Regressions (2026-05-20)~~ | ~~`APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`, `update-ui-optimistically.spec.ts`~~ | ~~7~~ | ✅ fixed |
-| ~~N~~ | ~~Select basic, grouping & multiselect~~ | ~~`Select.spec.ts`~~ | ~~15~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
-| ~~O~~ | ~~Table `syncWithVar`~~ | ~~`Table.spec.ts`~~ | ~~6~~ | ✅ fixed (Bug 26 — Mandatory Shielding revert) |
-| ~~P~~ | ~~Checkbox `inputTemplate` / Lexical Scoping~~ | ~~`Checkbox.spec.ts`~~ | ~~2~~ | ✅ fixed |
-| ~~Q~~ | ~~ModalDialog context propagation~~ | ~~`ModalDialog.spec.ts`~~ | ~~1~~ | ✅ fixed |
-| ~~R~~ | ~~Reactive derived variables (`var.X="{expr}"` / `var {a} = source`)~~ | ~~`communicate-between-sibling-components.spec.ts`, `markup.spec.ts`, `var-destructuring.spec.ts`~~ | ~~5~~ | ✅ fixed (Bug 30) |
+| ~~M~~ | ~~Regressions (2026-05-20)~~ | ~~`APICall.spec.ts`, `retry-a-failed-api-call.spec.ts`~~ | ~~7~~ | ✅ fixed |
+| ~~N~~ | ~~Select basic, grouping & multiselect~~ | ~~`Select.spec.ts`~~ | ~~15~~ | ✅ fixed (Bug 26) |
+| ~~O~~ | ~~Table `syncWithVar`~~ | ~~`Table.spec.ts`~~ | ~~6~~ | ✅ fixed (Bug 26) |
+| ~~P~~ | ~~Checkbox `inputTemplate` / Lexical Scoping~~ | ~~`Checkbox.spec.ts`~~ | ~~2~~ | ✅ fixed (Bug 27/28) |
+| ~~Q~~ | ~~ModalDialog context propagation~~ | ~~`ModalDialog.spec.ts`~~ | ~~1~~ | ✅ fixed (Bug 28) |
+| ~~R~~ | ~~Reactive derived variables~~ | ~~`communicate-between-sibling-components.spec.ts`~~ | ~~5~~ | ✅ fixed (Bug 29/30) |
+| ~~S~~ | ~~RadioGroup wrap-around focus~~ | ~~`RadioGroup.spec.ts`~~ | ~~4~~ | ✅ fixed (Bug 31) |
 
 ---
 
 ## Group A — ✅ FIXED — Event handler closure / `$context` binding
-
-**Fixed by:** `computedUses` now correctly includes `$context` in the `nonDynamicReadDeps` path;
-`fullParentStateRef` propagates un-narrowed state to event handlers.
-
-All 6 tests in `xmlui/tests-e2e/how-to-examples/open-a-context-menu-on-right-click.spec.ts` now pass.
-
----
+**Fix:** Included `$context` in `nonDynamicReadDeps` path and used `fullParentStateRef` to propagate un-narrowed state to handlers.
 
 ## Group B — ✅ FIXED — `refreshOn` event handler closure updates
+**Fix:** Bug 20. Enabled `includeAssignmentTargets` in `collectVariableDependencies` to include write-only targets in scope.
 
-**Fixed by:** Bug 20 — `collectVariableDependencies` now includes LHS of assignment expressions
-when called with `includeAssignmentTargets: true`. Table's `computedUses` correctly includes
-`testState` (write-only target), making it available in scope for cell event handlers.
+## Group C — ✅ FIXED — Context vars in event handlers
+**Fix:** Refined fetch handler analysis to exclude injected names (`$url`, `$queryParams`) from parent dependencies.
 
-All 3 tests in `xmlui/src/components/Table/Table.spec.ts` (refreshOn Property) now pass.
-
----
-
-## Group C — ✅ FIXED — Context vars in event handlers (`$url`, `$method`, `$queryParams`)
-
-**Fixed by:** 
-1. `computedUses` no longer treats `DataLoader` and `DataSource` `onFetch` references to fetch-injected names (`$url`, `$method`, `$queryParams`, …) as parent-scope deps. `$queryParams` collided with `ROUTING_STATE_KEYS` and narrowed the test Fragment to router query state, breaking merge with handler context.
-2. The logic was refined to analyze `fetch` dependencies separately before adding them, rather than deleting them from the overall `usedHere` set, to prevent accidentally removing genuine dependencies that come from other props like `url="{$queryParams.q}"`.
-3. `event-handlers`: always mirror `componentStateRef` into `stateRef` in `refreshStateRef` when `fullParentStateRef` is absent; apply handler `context` via `Object.assign` after `cloneDeep(originalState)` so injected fetch params reliably override router `$queryParams`.
-
-**File:** `xmlui/src/components/DataSource/DataSource.spec.ts`
-
-| Line | Test name |
-|------|-----------|
-| 549:3 | onFetch event › handler can use `$url`, `$method` and `$queryParams` context vars |
-
----
-
-## Group D — ✅ FIXED — Deferred / background async operations
-
-**Fixed by:** Bug 23 — `computedUses` static analysis now respects the runtime semantics of **implicit containers**. 
-Implicit containers (vars/loaders/etc. but no explicit `uses`) delegate component API registration to the parent container.
-The analyzer now correctly adds escaping child UIDs to the `computedUses` of implicit containers when narrowing is triggered by other dependencies. 
-This prevents narrowed parent state from stripping sibling APIs (like `exportJob` or `fileUpload`) that descendants need to read to show progress feedback.
-
----
+## Group D — ✅ FIXED — Deferred / background operations
+**Fix:** Bug 23. Respect runtime semantics of implicit containers to prevent stripping sibling APIs needed by background tasks.
 
 ## Group E — ✅ FIXED — DataSource dependency chain
-
-**Fixed by:** Bug 22 — `collectVariableDependencies` тепер поважає block scope у гілці `T_FUNCTION_INVOCATION_EXPRESSION`. Параметри arrow-функцій (`departments` у `onLoaded`) більше не витікають у `computedUses` через виклики `param.method(...)`. Це звільняє App від хибного звуження до `["departments"]` і дозволяє DataSource APIs (`users_for_ds_dependency`) бути видимими сусіднім компонентам.
-
-All 3 tests in `xmlui/tests-e2e/how-to-examples/delay-a-datasource-until-another-datasource-is-ready.spec.ts` тепер проходять.
-
----
+**Fix:** Bug 22. Respect block scope in function invocation analyzer to prevent local params from leaking into `computedUses`.
 
 ## Group F — ✅ FIXED — Table multi-row selection
-
-**Fixed by:** Bug 23 (Implicit UID Propagation) — Table components with multi-row selection often read the selection state via sibling APIs. Including escaping UIDs in `computedUses` ensures these APIs remain visible even when the container state is narrowed.
-
----
+**Fix:** Bug 23. Implemented UID propagation to ensure sibling APIs remain visible during state narrowing.
 
 ## Group G — ✅ FIXED — Tree async loading (`loaded` field)
-
-All 3 tests in `xmlui/src/components/Tree/Tree-loaded-field.spec.ts` now pass.
-Likely fixed as a side-effect of the `computedUses` improvements (better dep tracking through event handlers).
-
----
+**Fix:** Indirectly fixed by improving dependency tracking through event handlers.
 
 ## Group H — ✅ FIXED — Flaky (past)
-
-The tests in `MessageListener.spec.ts`, `Select.spec.ts`, and `FormBindingBehavior.spec.ts` are now passing consistently in recent runs.
-
----
+**Status:** Now passing consistently.
 
 ## Group I — ✅ FIXED — Extension smoke — xmlui-recharts
+**Fix:** Improved extension test environment configuration.
 
-Fixed by improving the extension test environment configuration. All 23 tests now pass.
-
----
-
-## Group J — ✅ FIXED — Compound component state / `$queryParams` / `$this`
-
-**Fixed by:** Bug 24 — `CompoundComponent` now strips the stale `computedUses` from the
-compound body before placing it as a child of the freshly created outer Container.
-The static `computedUses` produced by `computeUsesForTree` excludes the compound's own
-`vars` (correctly treating them as local), but once those vars are moved out to the
-outer Container at runtime, the body's stale `computedUses` would narrow them OUT of
-its `parentState`. Result: `Text` reading `{selectedFilter}` saw `undefined`.
-See [computed-uses-specification.md — Бaг 24](./computed-uses-specification.md).
-
-Regression unit test: `xmlui/tests/components-core/optimization/compound-stale-computedUses.test.ts`.
-
-**File:** `xmlui/tests-e2e/compound-component.spec.ts`
-
-| Line | Test name | Status (2026-05-20 PM) |
-|------|-----------|-------------------|
-| 585:1 | `$this` works in compound components | ✅ Pass |
-| 599:1 | call api with id works in compound components | ✅ Pass |
-| 722:1 | var initialized with `$queryParams` resolves correctly after SPA navigation | ✅ Pass |
-| 759:1 | var initialized with `$queryParams` resolves correctly on direct URL load | ✅ Pass |
-
-All 35 tests in `compound-component.spec.ts` pass (also confirmed in a broader sweep:
-no regressions in Groups A, D, F, G, M, context-menu, DataSource chain, Table refreshOn).
-
----
+## Group J — ✅ FIXED — Compound component state / `$queryParams`
+**Fix:** Bug 24. Stripped stale `computedUses` from compound bodies during runtime restructuring.
 
 ## Group K — ⚠️ FLAKY — Timing / responsive layout
-
-These tests are timing-sensitive. Most passed on retry or became flaky.
-
-| File | Test name | Status (2026-05-21) |
-|------|-----------|-------------------|
-| `ChangeListener.spec.ts` | debounceWaitInMs resets timer... | ✅ Pass |
-| `Tree-spinnerDelay.spec.ts` | spinnerDelay Property › ... | ✅ Pass |
-| `make-a-table-responsive.spec.ts` | Make a Table responsive › ... | ⚠️ Flaky |
-| `use-the-same-modaldialog-to-add-or-edit.spec.ts` | Use the same ModalDialog to add or edit › ... | ⚠️ Flaky |
-
----
+**Status:** Timing-sensitive tests; usually pass on retry.
 
 ## Group L — ✅ FIXED — New extension packages
-
-Infrastructure issue resolved. `xmlui-search`, `xmlui-tiptap-editor`, and `xmlui-website-blocks` tests now pass.
-
----
+**Status:** Infrastructure issues resolved.
 
 ## Group M — ✅ FIXED — Regressions (2026-05-20)
-
-**Fixed by:** Bug 24 fix — Full re-run on 2026-05-20 PM confirms all 7 tests now pass.
-
-All tests in the regression group now pass:
-- `APICall.spec.ts` — State Tracking › stores lastError after failed execution ✅
-- `retry-a-failed-api-call.spec.ts` — All Retry tests ✅
-- `update-ui-optimistically.spec.ts` — All optimistic update tests ✅
-
----
+**Fix:** Resolved via Bug 24 fix (stale metadata removal).
 
 ## Group N — ✅ FIXED — Select basic, grouping & multiselect
-
-**Fixed by:** Bug 26 (Mandatory Shielding revert). All 15 tests in `Select.spec.ts` now pass.
-
----
+**Fix:** Bug 26. Reverted mandatory shielding to restore internal reactive paths.
 
 ## Group O — ✅ FIXED — Table `syncWithVar`
-
-**Fixed by:** Bug 26 (Mandatory Shielding revert). All 6 tests in `Table.spec.ts` now pass.
-
----
+**Fix:** Bug 26. Reverted mandatory shielding to keep `syncWithVar` visibility.
 
 ## Group P — ✅ FIXED — Checkbox `inputTemplate` / Lexical Scoping
-
-**Real root cause** (the original "missing childInjectedVars" hypothesis was
-wrong — the metadata was already correct; both `OPTIMIZER_METADATA.Checkbox`
-and `CheckboxMd` already declared `childInjectedVars: ["$checked", "$setChecked"]`):
-
-`extractScopedState` in `ContainerUtils.ts` filtered Symbol-keyed
-component-state entries by `sym.description ∈ usesSet`. When an outer sibling
-referenced `$checked` (e.g. `<Button label="{$checked}"/>` next to a Checkbox),
-the host container received `computedUses=["$checked"]` — and the Symbol filter
-then stripped ALL Symbol-keyed entries whose uid was not in `uses`, including
-the Checkbox's own `value` slice (stored under `Symbol(checkbox-uid)`).
-
-Consequence: `ComponentAdapter`'s `state[uid]` lookup returned `EMPTY_OBJECT`,
-so `props.value = state.value` resolved to `undefined`, `transformToLegitValue`
-coerced it to `false`, and Toggle's `inputRenderer({$checked: false})` made the
-inner template render `"false"` — no matter how many times `useEffect` called
-`updateState({value: true})`, the next narrowing pass discarded the update.
-
-**Why the simpler tests (846/857/870) already passed:** Without an outer
-sibling referencing `$checked`, no host container ever had `computedUses` set
-on `$checked`, so the Symbol filter was a no-op (default branch
-`if (!uses) return parentState`).
-
-**Fix:** `ContainerUtils.ts:extractScopedState` now preserves ALL Symbol-keyed
-entries unconditionally. Symbols are internal component-instance state, not
-external subscribable names; reactive narrowing for string keys is unchanged.
-
-**File:** `xmlui/src/components/Checkbox/Checkbox.spec.ts`
-
-| Line | Test name | Status (2026-05-22) |
-|------|-----------|---------------------|
-| 885:3 | Custom inputTemplate › `$checked` has no meaning outside component | ✅ Pass |
-| 900:3 | Custom inputTemplate › `$setChecked` has no meaning outside component | ✅ Pass |
-
-**Regression test:** `tests/components-core/optimization/computedUses.test.ts`
-→ describe "extractScopedState preserves Symbol-keyed component state across
-narrowing".
-
-**Regression checks performed:** all 114 `Checkbox.spec.ts` tests pass; all 95
-`computedUses` unit tests pass; `RadioGroup` + `Form` + `Tabs` + `List` E2E
-suites (479 tests) pass.
-
----
+**Fix:** Bug 27. Preserved all Symbol-keyed entries in `extractScopedState`.
 
 ## Group Q — ✅ FIXED — ModalDialog context propagation
+**Fix:** Bug 28. Preserved all framework `$`-prefixed variables in `extractScopedState`.
 
-**Real root cause:**
-ModalDialog declares `isImplicitContainerByDefault: true`. The static analyzer
-in `computedUses.ts` therefore added `node.uid` (`"dialog"`) to its
-`parentDependencies` so siblings can read `dialog.value` against the parent
-container's state (lines 477–480), and set `node.computedUses = ["dialog"]`.
+## Group R — ✅ FIXED — Reactive derived variables
+**Fix:** Bug 29/30. Restored spread order in `variable-resolution.ts` and cleared stale metadata between passes.
 
-The lexically-scoped `$item` (injected by `Column.childInjectedVars`) was
-correctly EXCLUDED from `computedUses` by `keepDep` — it doesn't need to be
-subscribed because it's owned by the row's `MemoizedItem` `contextVars`. But
-at runtime, `extractScopedState(parentState, ["dialog"])` then stripped
-`$item` from the narrowed `stateFromOutside` — leaving inner `Text`
-(`{JSON.stringify($item)}`) and `title="{$item.company}"` rendering with
-`$item=undefined`. Only the close button text remained visible.
-
-**Fix:** `ContainerUtils.ts:extractScopedState` now preserves all `$`-prefixed
-keys (except `ROUTING_STATE_KEYS`) from `parentState`, alongside the existing
-preserve-all-Symbol-keyed-entries policy (Group P). These are framework-injected
-lexical context variables (`$item`, `$itemIndex`, `$param`, `$context`, …) that
-flow through implicit containers; they are not consumer-subscribable state
-names and must not be filtered by `uses` narrowing.
-
-Routing keys (`$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`) are
-deliberately EXCLUDED from preservation because they are re-added at every
-`StateContainer` (Layer 6 of `combinedState`) and their value objects (notably
-`$routeParams` from `useParams`) are not reference-stable — preserving them
-here would defeat `useShallowCompareMemoize` and break the `computedUses`
-optimisation (`tests-e2e/computed-uses.spec.ts`: "Select renders ≤5 times after
-N oftenChanges updates").
-
-**File:** `xmlui/src/components/ModalDialog/ModalDialog.spec.ts`
-
-| Line | Test name | Status (2026-05-22) |
-|------|-----------|---------------------|
-| 65:3 | Open/Close › Preserves `$item` context variable from Table Column | ✅ Pass |
-
-**Regression checks performed:** ModalDialog + Checkbox + computed-uses
-E2E suites (151 tests) pass; Table + List + Select + Form + RadioGroup +
-Tabs E2E suites (796 tests) pass; 95 `computedUses` unit tests pass.
-
----
-
-## Group R — ✅ FIXED — Reactive derived variables (Bug 30, regression from Bug 29 fix)
-
-**Symptom:** A `var.derived="{expr}"` declared on the same container as its
-source `var.source`, or a `var {a, b} = source;` destructuring, did not
-re-evaluate when `source` mutated from an event handler. Built-in components
-reading the derived name (or the destructured aliases) kept showing the
-initial value.
-
-**Reproductions (failing 2026-05-22 PM):**
-
-| File | Line | Test name |
-|------|------|-----------|
-| `tests-e2e/how-to-examples/communicate-between-sibling-components.spec.ts` | 28:3 | Shared filter state between siblings › selecting UI filter shows only UI articles @website |
-| same | 37:3 | Shared filter state between siblings › selecting Data filter shows only Data articles @website |
-| same | 45:3 | Shared filter state between siblings › switching back to All restores all articles @website |
-| `tests-e2e/how-to-examples/markup.spec.ts` | 42:3 | Defining and using reactive variables › clicking increment updates count directly and indirectly @website |
-| `tests-e2e/var-destructuring.spec.ts` | 87:1 | var destructuring is reactive |
-
-**Common pattern — all three reproductions involve a *derived* var whose sole
-dependency is another `var` on the same container:**
-
-- **Siblings example** — `<App var.selectedTag="all" var.allSelected="{selectedTag === 'all'}">`.
-  Sibling `<Text when="{allSelected || selectedTag === 'ui'}">` rows never
-  re-rendered after `RadioGroup`'s `onDidChange="(v) => selectedTag = v"` fired.
-- **Reactive vars example** — `<App var.count="{0}" var.countTimes3="{3 * count}">`.
-  `<Text>{countTimes3}</Text>` stayed at the initial value after `count++`.
-- **Destructured example** — `var source = {count: 0, label: "clicks"}; var {count, label} = source;`
-  with `onClick="source = {count: source.count + 1, label: source.label}"`.
-  `<Text>{count}</Text>` did not update after the assignment.
-
-**False-positive bisection signal:** disabling the optimisation
-(`COMPUTED_USES_ENABLED = false` in `computedUses.ts`) made every failing
-scenario pass — which made `computedUses` look like the culprit. It wasn't.
-Disabling the narrowing optimisation also disabled `extractScopedState` →
-`stateFromOutside` reverted to the full parent state, which happened to
-include the parent's `componentState` updates for the source var, *masking*
-the real shadowing bug below.
-
-**Real root cause:** the Bug 29 fix in commit `3408e8c35`
-([variable-resolution.ts:155](../../state/variable-resolution.ts#L155))
-flipped the spread order of `stateContext` for **all** vars:
-
-```ts
-// Before Bug 29 fix
-const stateContext: ContainerState = { ...ret, ...componentState };
-// After Bug 29 fix (this regression)
-const stateContext: ContainerState = { ...componentState, ...ret };
-```
-
-The flip was correct for `$props` (and other `$`-prefixed framework vars
-preserved by `extractScopedState`'s FRAMEWORK_VARS list): in a UDC, the
-locally-resolved `$props` from `CompoundComponent`'s `resolvedProps` must
-shadow an outer `$props` that leaked through narrowing.
-
-The flip was **wrong for user-defined vars** like `count`, `selectedTag`,
-`source`: `ret[count]` always re-evaluates the initial expression (`{0}` → 0),
-while `componentState.count` carries the latest imperative dispatch (`1` after
-`count++`). With `ret` winning, every derived var that referenced `count`
-read the initial value forever. `mergedWithVars` at the next step (which
-spreads `componentState` *over* `resolvedLocalVars`) hid this for the
-source var itself — but the *derived* var was already computed from the
-stale source value, so its slot showed `3 * 0 = 0`.
-
-**Fix:** [variable-resolution.ts:155-172](../../state/variable-resolution.ts#L155-L172)
-— restore the original spread order, then explicitly preserve `$`-prefixed
-keys from `ret` so the Bug 29 lexical-scoping invariant still holds:
-
-```ts
-const stateContext: ContainerState = { ...ret, ...componentState };
-for (const k in ret) {
-  if (k.charCodeAt(0) === 36 /* '$' */) {
-    stateContext[k] = ret[k];
-  }
-}
-```
-
-User-defined vars now correctly take their latest dispatched value from
-`componentState`, while `$props`/`$context`/`$item`/`$value`/… stay
-locally-scoped to the resolving container.
-
-**Files:** `xmlui/src/components-core/state/variable-resolution.ts`.
-
-**Regression checks performed (2026-05-22 PM):**
-
-- All 5 originally-failing tests pass.
-- Bug 29 ContextMenu regression suite (28 tests including the two new
-  `Bug 29 regression` tests) — pass.
-- `computedUses.test.ts` 95/95 unit tests — pass.
-- Broad component suites (Form/List/Table/ModalDialog/Checkbox/Select/Tree/
-  Queue/Tabs) — **1410 passed, 0 failed.**
-- Full how-to-examples suite — **463 passed**, 2 skipped, 1 flaky hover-timing
-  test (`create-a-multi-level-submenu.spec.ts:64`) that passes on isolated
-  re-run (7/8 pass, 1 intentionally skipped).
-
-**Flaky (4) — not investigated yet.**
-
----
-
-## Summary of Results — Post Regression Check (2026-05-22)
-
-**FAILURES:** 0 ❌. ⚠️ FLAKY (5 tests).
-
-### Status by group:
-- **A–Q:** ✅ FIXED
-- **Flaky:** ⚠️ FLAKY (5 tests, timing-sensitive)
-
-### Flaky tests in the current run (2026-05-22):
-1. `FormBindingBehavior.spec.ts:828:3` — Validation › 'required' validation shows error when isDirty and losing focus
-2. `control-cache-invalidation.spec.ts:27:3` — Update user - refreshes user list › promoting a user refreshes users but not stats @website
-3. `hide-an-element-until-its-datasource-is-ready.spec.ts:39:3` — Show content only after the DataSource loads › result text appears and button re-enables after the fetch completes @website
-4. `markup.spec.ts:15:3` — A complex JSON object › filling station name and submitting shows it in the output @website
-5. `run-a-one-time-action-on-page-load.spec.ts:26:3` — One-time page load action › onInit fires on mount and the initialized card appears @website
-
----
-
-## Summary of Results — Post Group R Fix (2026-05-22 PM)
-
-**FAILURES:** 0 ❌. ⚠️ FLAKY (4 tests — list not recaptured; includes the
-known timing-sensitive hover test `create-a-multi-level-submenu.spec.ts:64`
-which passes on isolated re-run).
-
-### Status by group:
-- **A–R:** ✅ FIXED
-- **Flaky:** ⚠️ FLAKY (4 tests, timing-sensitive).
-
-### Verification suites:
-- 43/43 targeted E2E pass (5 originally-failing + 28 ContextMenu including
-  Bug 29 regression).
-- 95/95 `computedUses.test.ts` unit pass.
-- 1410/1410 broad component E2E pass (Form/List/Table/ModalDialog/Checkbox/
-  Select/Tree/Queue/Tabs).
-- 463/463 how-to-examples E2E pass (with 1 known-flaky hover test).
-
-### Lesson learned (false-positive bisection):
-The `COMPUTED_USES_ENABLED = false` workaround initially pointed at the
-`computedUses` pass, but the real cause was in `variable-resolution.ts`.
-Disabling `computedUses` widened `stateFromOutside` to the full parent
-state, which happened to mask the spread-order shadowing in `useVars`.
-Always verify a bisection signal by tracing data flow, not just by
-toggling the suspected feature flag.
-
----
-
-## Priority for investigation
-
-1. **Medium:** Flaky tests — improve test stability for timing-sensitive cases.
+## Group S — ✅ FIXED — RadioGroup wrap-around focus
+**Fix:** Bug 31. Explicitly forced focus on the next radio after value change in `RadioGroupReact`.

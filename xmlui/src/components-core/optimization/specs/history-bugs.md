@@ -1023,3 +1023,27 @@ node.computedUses = undefined;  // ← line 185
 - `xmlui/src/components-core/optimization/specs/TODO - code-review-computedUses-branch.md` (B3 marked resolved)
 
 **Keep in mind:** This bug demonstrates why node objects **must** be cleared of analysis results before re-analysis. The same pattern applies to any future static metadata (e.g., `computedWrites`, `computedClosure`) — always clear before recalculating.
+
+---
+
+### Bug 31: RadioGroup focus desync on keyboard navigation
+
+**Symptom:** Sequential ArrowDown visits all options in order (fails 5/5 isolated runs on HEAD). The wrap-around assertion never passed because focus and value got out of sync after the second ArrowDown.
+
+**Cause:** Custom `handleKeyDown` (the one that defends against radix's "click-on-focus is unreliable because keyup fires before the deferred focus" race) only dispatches the value change — it relied on radix's roving-tabindex to advance focus. Empirically radix's focus-advance fires only on the first hop when our handler is also dispatching mid-event; the re-render arriving synchronously inside the keydown handler appears to short-circuit radix's deferred focus move. From the third keystroke onwards `e.target` is permanently the second-to-last radio, so the modulo wrap computes `nextValue === currentValue` and the test assertion times out.
+
+**Fix:** In `xmlui/src/components/RadioGroup/RadioGroupReact.tsx` — after `onInputChange(nextValue)`, explicitly focus the next radio:
+
+```ts
+if (nextValue != null) {
+  onInputChange(nextValue);
+  // Radix's roving-focus does not reliably advance focus when value changes
+  // via our handler mid-event (same caveat as the click-on-focus race noted
+  // above). Force focus so each keystroke leaves focus on the now-checked
+  // option; otherwise sequential arrow presses stop advancing after one hop
+  // and wrap-around never moves off the second-to-last option.
+  radios[nextIndex].focus();
+}
+```
+
+**Lesson learned:** Bisect signals that perturb timing without changing data flow can be misleading. When failure rate moves between commits without becoming deterministic, stop bisecting and instrument the data flow with one-line `console.log` calls instead.
