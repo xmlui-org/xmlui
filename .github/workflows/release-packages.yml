@@ -30,7 +30,7 @@ jobs:
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.pull_request.merged == true &&
-       (github.event.pull_request.title == 'Version Packages for [stable] release' ||
+       (github.event.pull_request.title == 'Version Packages for [latest] release' ||
        github.event.pull_request.title == 'Version Packages for [support] release'))
     runs-on: ubuntu-latest-8-core
     timeout-minutes: 60
