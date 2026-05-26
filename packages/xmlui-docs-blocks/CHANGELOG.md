@@ -1,5 +1,12 @@
 # xmlui-docs-blocks
 
+## 0.0.10
+
+### Patch Changes
+
+- 5996389: Add custom-language syntax highlighting infrastructure with tone-aware token styling and a Z80 Assembly demo highlighter.
+- 5996389: Add custom syntax highlighting
+
 ## 0.0.9
 
 ### Patch Changes

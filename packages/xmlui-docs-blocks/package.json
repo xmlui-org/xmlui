@@ -1,6 +1,6 @@
 {
   "name": "xmlui-docs-blocks",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "sideEffects": [
     "**/*.css"

@@ -1,5 +1,0 @@
----
-"xmlui": patch
----
-
-Seal plan #11 (i18n foundations): all phases 1–5 verified shipped. Public `App.translate` / `App.setLocale` / `App.locale` / `App.direction` namespace exposed through `AppContext`; `<App locale|localeBundles|direction>` props wired; `direction` prop now properly synced back to `App.direction` (explicit `"ltr"/"rtl"` overrides locale auto-detection); `setAppDirection` added to `AppContextDefs`; `<I18n>` component, ICU MessageFormat runtime, `Intl.*`-backed formatters, and SCSS logical-properties RTL contract all in place. Added 18 E2E tests covering locale switching, ICU plurals, missing-key fallback, RTL auto-direction, direction prop override, HStack mirroring, and root element `dir` attribute. Shipped user-facing docs page `/docs/managed-react/i18n-foundations`; `managed-react.md` §11 resolved bullets updated; `AGENTS.md` doc-map entry added. The `appGlobals.strictI18n` default flip from `false` to `true` (Phase 6.2) remains reserved for the next major release.
