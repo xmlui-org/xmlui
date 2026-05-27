@@ -8,7 +8,6 @@ import type {
   CompoundComponentRendererInfo,
 } from "../abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
-import { mergeOptimizerInjectedVars } from "./optimization/optimizer-metadata";
 
 /**
  * This helper function creates a component renderer definition from its arguments.
@@ -22,7 +21,6 @@ export function createComponentRenderer<TMd extends ComponentMetadata>(
   metadata: TMd,
   renderer: ComponentRendererFn<ComponentDef<any>>,
 ): ComponentRendererDef {
-  mergeOptimizerInjectedVars(type, metadata);
   return {
     type,
     renderer,

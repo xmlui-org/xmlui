@@ -4,7 +4,6 @@ import type { ComponentRendererDef, LayoutContext } from "../abstractions/Render
 import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
 import { validateInjectedVars } from "./optimization/validateInjectedVars";
-import { mergeOptimizerInjectedVars } from "./optimization/optimizer-metadata";
 import { pushXsLog, createLogEntry, pushTrace, popTrace, getCurrentTrace } from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
@@ -523,8 +522,6 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapComponentConfig = {},
 ): ComponentRendererDef {
-  mergeOptimizerInjectedVars(type, metadata);
-
   const {
     booleanSet,
     numberSet,
@@ -1067,8 +1064,6 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapCompoundConfig = {},
 ): ComponentRendererDef {
-  mergeOptimizerInjectedVars(type, metadata);
-
   const {
     booleanSet,
     numberSet,
