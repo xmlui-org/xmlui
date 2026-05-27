@@ -1,5 +1,5 @@
 import { collectedComponentMetadata } from "../../components/collectedComponentMetadata";
-import { DataLoaderMd } from "../loader/DataLoader";
+import { coreComponentMetadata } from "../coreComponentMetadata";
 import { UNSTABLE_GLOBAL_VARS } from "./unstableGlobalVars";
 
 // XMLUI_GLOBAL_NAMES lives in the factory — the single source of truth.
@@ -9,7 +9,7 @@ export { XMLUI_GLOBAL_NAMES } from "./appContextFactory";
 // Re-export so existing callers can still import UNSTABLE_GLOBAL_VARS from here.
 export { UNSTABLE_GLOBAL_VARS } from "./unstableGlobalVars";
 
-const ALL_METADATA = { ...collectedComponentMetadata, DataLoader: DataLoaderMd };
+const ALL_METADATA = { ...collectedComponentMetadata, ...coreComponentMetadata };
 
 for (const meta of Object.values(ALL_METADATA)) {
   const unstableVars = (meta as any)?.unstableChildInjectedVars;

@@ -2,8 +2,8 @@ import { describe, it, expect, afterEach } from "vitest";
 import { computeUsesForTree as originalComputeUsesForTree, COMPUTED_USES_ENABLED } from
   "../../../src/components-core/optimization/computedUses";
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
-import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
 import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
+import { getOptimizerMetadata } from "../../../src/components-core/optimization/metadataLookup";
 import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { Parser } from "../../../src/parsers/scripting/Parser";
@@ -11,7 +11,6 @@ import { Parser } from "../../../src/parsers/scripting/Parser";
 const skipIfDisabled = !COMPUTED_USES_ENABLED;
 
 const computeUsesForTree = (root: any) => originalComputeUsesForTree(root, (t) => {
-  if (t === "DataLoader") return DataLoaderMd;
   if (t === "DataSource") return DataSourceMd;
   if (t === "ScopedContainer") {
     return {
@@ -25,7 +24,7 @@ const computeUsesForTree = (root: any) => originalComputeUsesForTree(root, (t) =
       },
     };
   }
-  return (collectedComponentMetadata as any)[t];
+  return getOptimizerMetadata(t);
 });
 
 function node(

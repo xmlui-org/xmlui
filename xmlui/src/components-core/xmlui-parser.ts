@@ -2,7 +2,7 @@ import type { ComponentDef, CompoundComponentDef, OptimizerMetadataView } from "
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { computeUsesForTree } from "./optimization/computedUses";
-import { DataLoaderMd } from "./loader/DataLoaderMd";
+import { coreComponentMetadata } from "./coreComponentMetadata";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — generated file
 import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
@@ -15,9 +15,12 @@ import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptP
 import type { ModuleErrors, CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { DocumentCursor } from "../language-server/base/text-document";
 
-// Inline lookup avoids duplicating the entire collectedComponentMetadata map in memory.
+// Inline lookup: core-internal components (DataLoader, ExternalDataLoader) are
+// checked first; public components fall through to the generated registry.
 export function defaultMetadataLookup(type: string): OptimizerMetadataView | undefined {
-  if (type === "DataLoader") return DataLoaderMd;
+  if (type in coreComponentMetadata) {
+    return (coreComponentMetadata as Record<string, OptimizerMetadataView>)[type];
+  }
   return (collectedComponentMetadata as Record<string, OptimizerMetadataView>)[type];
 }
 

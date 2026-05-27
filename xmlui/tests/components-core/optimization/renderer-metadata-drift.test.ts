@@ -3,7 +3,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
-import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
+import { coreComponentMetadata } from "../../../src/components-core/coreComponentMetadata";
 
 // Static drift detection —
 // Walks each built-in component's source file, extracts any
@@ -97,7 +97,7 @@ const allFilesToAudit = [...allFiles, ...allCoreFiles];
 /** Combined metadata map for audit purposes — includes all registered components + internal ones */
 const AUDIT_METADATA: Record<string, any> = {
   ...collectedComponentMetadata,
-  DataLoader: DataLoaderMd,
+  ...coreComponentMetadata,
 };
 
 interface DriftRow {

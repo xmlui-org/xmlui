@@ -59,7 +59,7 @@ import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree"
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
 import { computeUsesForTree } from "./optimization/computedUses";
-import { DataLoaderMd } from "./loader/DataLoader";
+import { getOptimizerMetadata } from "./optimization/metadataLookup";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -71,12 +71,11 @@ const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 
 /**
  * Resolves component metadata for the computedUses optimizer at runtime.
- * DataLoader is internal and not in collectedComponentMetadata, so it is
- * handled explicitly. All other components are looked up via the registry.
+ * Delegates to the unified lookup that covers both public and internal
+ * (engine-only) components — no explicit per-type exceptions required.
  */
 function resolveOptimizerMetadata(type: string) {
-  if (type === "DataLoader") return DataLoaderMd;
-  return (collectedComponentMetadata as Record<string, unknown>)[type];
+  return getOptimizerMetadata(type);
 }
 
 // ---------------------------------------------------------------------------
