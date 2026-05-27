@@ -24,7 +24,6 @@ import { useIndexerContext } from "../../components/App/IndexerContext";
 import { createMetadata, d } from "../../components/metadata-helpers";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { createContextVariableError } from "../EngineError";
-import { OPTIMIZER_METADATA } from "../optimization/optimizer-metadata";
 import {
   safeStringify,
   formatDiff,
@@ -62,7 +61,7 @@ export const DataLoaderMd = createMetadata({
     error: d("This event fires when an error occurs while fetching data"),
     fetch: {
       description: "When defined, this event handler replaces the default fetch logic",
-      injectedVars: OPTIMIZER_METADATA.DataLoader.events.fetch.injectedVars,
+      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
     },
   },
 });
