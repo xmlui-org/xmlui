@@ -288,6 +288,15 @@ function computeUsesInternal(
   const childInjected = [
     ...(metadata?.childInjectedVars ?? []),
     ...(metadata?.unstableChildInjectedVars ?? []),
+    // metadata.contextVars keys ($item, $itemIndex, etc.) document what this
+    // component type injects into children (Language Server + runtime metadata).
+    // For core components this is redundant with childInjectedVars (already set
+    // by mergeOptimizerInjectedVars at registration). For extension-package
+    // components (Masonry,
+    // ReactFlow, etc.) that have no OPTIMIZER_METADATA entry, this is the ONLY
+    // optimizer hint available in Standalone mode — without it, $item/$itemIndex
+    // inside their templates would incorrectly count as parent-scope dependencies.
+    ...Object.keys(metadata?.contextVars ?? {}),
   ];
   const childScope = childInjected.length > 0
     ? new Set([...injectedVarsScope, ...childInjected])

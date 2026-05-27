@@ -3,8 +3,12 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OPTIMIZER_METADATA } from "../../../src/components-core/optimization/optimizer-metadata";
+import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
+import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
+import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
+import { APICallMd } from "../../../src/components/APICall/APICall";
 
-// Static drift detection — 
+// Static drift detection —
 // Walks each built-in component's source file, extracts any
 // `renderers: { <slot>: { contextVars: [ "$x", "$y", ... ] } }` declaration,
 // and asserts that every `$`-key listed there is also declared in either
@@ -88,6 +92,11 @@ function extractRegisteredName(source: string): string | undefined {
   return undefined;
 }
 
+const allFiles = listComponentTsxFiles(COMPONENTS_DIR);
+const COMPONENTS_CORE_DIR = resolve(__dirname, "../../../src/components-core");
+const allCoreFiles = listComponentTsxFiles(COMPONENTS_CORE_DIR);
+const allFilesToAudit = [...allFiles, ...allCoreFiles];
+
 interface DriftRow {
   file: string;
   componentType: string;
@@ -95,17 +104,16 @@ interface DriftRow {
   missing: string[];
 }
 
-const allFiles = listComponentTsxFiles(COMPONENTS_DIR);
 const drift: DriftRow[] = [];
 const audited: string[] = [];
 
-for (const file of allFiles) {
+for (const file of allFilesToAudit) {
   const source = readFileSync(file, "utf-8");
   const renderers = extractRendererContextVars(source);
   if (renderers.length === 0) continue;
   const componentType = extractRegisteredName(source);
   if (!componentType) continue;
-  audited.push(`${componentType} (${file.replace(/^.*\/components\//, "components/")})`);
+  audited.push(`${componentType} (${file.replace(/^.*\/src\//, "")})`);
 
   const optEntry = (OPTIMIZER_METADATA as Record<string, any>)[componentType];
   const declared = new Set<string>();
@@ -130,7 +138,10 @@ for (const file of allFiles) {
 
 describe("Renderer contextVars must be declared in OPTIMIZER_METADATA or metadata.contextVars", () => {
   it("audits at least one component (sanity check)", () => {
-    // If audited is empty, the regex / file walker is broken — fail loudly.
+    // Replicate the spirit of drift-test.js by confirming file counts
+    // console.log(`Found ${allFiles.length} comp files and ${allCoreFiles.length} core files.`);
+    expect(allFiles.length).toBeGreaterThan(0);
+    expect(allCoreFiles.length).toBeGreaterThan(0);
     expect(audited.length).toBeGreaterThan(0);
   });
 
@@ -152,4 +163,43 @@ describe("Renderer contextVars must be declared in OPTIMIZER_METADATA or metadat
     }
     expect(drift).toEqual([]);
   });
+});
+
+const RUNTIME_METADATA: Record<string, any> = {
+  ...collectedComponentMetadata,
+  DataLoader: DataLoaderMd,
+  DataSource: DataSourceMd,
+  APICall: APICallMd,
+};
+
+describe("OPTIMIZER_METADATA reflected in runtime metadata (U-audit.1)", () => {
+  for (const [componentType, registryEntry] of Object.entries(OPTIMIZER_METADATA)) {
+    const runtime = RUNTIME_METADATA[componentType];
+    const entry = registryEntry as {
+      childInjectedVars?: readonly string[];
+      events?: Record<string, { injectedVars?: readonly string[] }>;
+    };
+
+    if (entry.childInjectedVars) {
+      it(`${componentType}: runtime metadata uses OPTIMIZER_METADATA.${componentType}.childInjectedVars`, () => {
+        expect(runtime).toBeDefined();
+        expect([...(runtime.childInjectedVars ?? [])].sort()).toEqual(
+          [...entry.childInjectedVars!].sort(),
+        );
+      });
+    }
+
+    if (entry.events) {
+      for (const [eventName, eventEntry] of Object.entries(entry.events)) {
+        it(`${componentType}.events.${eventName}: runtime metadata uses OPTIMIZER_METADATA entry`, () => {
+          expect(runtime).toBeDefined();
+          const runtimeEvent = runtime?.events?.[eventName];
+          expect(runtimeEvent).toBeDefined();
+          expect([...(runtimeEvent?.injectedVars ?? [])].sort()).toEqual(
+            [...(eventEntry.injectedVars ?? [])].sort(),
+          );
+        });
+      }
+    }
+  }
 });

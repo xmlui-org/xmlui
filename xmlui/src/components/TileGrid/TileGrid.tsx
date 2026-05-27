@@ -3,7 +3,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { MouseEvent } from "react";
 import styles from "./TileGrid.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
@@ -172,7 +171,6 @@ export const TileGridMd = createMetadata({
     $isLast: d("`true` when this is the last item in the `data` array."),
     $selected: d("`true` when this tile is currently selected."),
   },
-  ...fromOptimizerMetadata("TileGrid"),
   childrenAsTemplate: "itemTemplate",
 
   themeVars: parseScssVar(styles.themeVars),

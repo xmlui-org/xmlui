@@ -1,7 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { DrawerNative, defaultProps } from "./DrawerReact";
 
@@ -14,7 +13,6 @@ const COMP = "Drawer";
 // =============================================================================
 
 export const DrawerMd = createMetadata({
-  ...fromOptimizerMetadata("Drawer"),
   status: "experimental",
   description:
     "`Drawer` is a panel that slides in from one of the four edges of the viewport. " +

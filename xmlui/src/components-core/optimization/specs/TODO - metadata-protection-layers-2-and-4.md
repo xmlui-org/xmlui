@@ -1,7 +1,7 @@
 # TODO: Metadata Protection — Layer 2 (Static AST Audit) + Layer 4 (Runtime Hard-Fail)
 
-**Status:** Planned / Not started (TODO)
-**Overall:** Layer 4 (Runtime Hard-Fail) повністю реалізовано (validateInjectedVars кидає помилку). Layer 2 (Static AST Audit) ще TODO.
+**Status:** Layer 4 ✅ Done (2026-05-21). Layer 2 ⚠ TODO.
+**Overall:** Layer 4 (Runtime Hard-Fail) повністю реалізовано — `validateInjectedVars` кидає `throw` в DEV (`import.meta.env?.DEV`) і `console.error` в production. Layer 2 (Static AST Audit) ще TODO.
 **Created:** 2026-05-21
 **Related specs:**
 - [2026-05-21-lexical-scoping-code-review.md](./2026-05-21-lexical-scoping-code-review.md)
@@ -41,70 +41,67 @@ Add **two complementary protection layers** that together cover all listed scena
 
 ---
 
-## Layer 2: U-audit.2 — Static AST Audit Test
+## Layer 2: U-audit.2 — Static String-Literal Presence Check
 
 ### What it does
 
-A vitest test that, for every entry in `OPTIMIZER_METADATA`:
+A vitest test that, for every entry in `OPTIMIZER_METADATA` with a non-empty `childInjectedVars`:
 
 1. Locates the corresponding component source file (`xmlui/src/components/<Name>/<Name>.tsx` or `*React.tsx`).
-2. Parses it with TypeScript Compiler API (`ts.createSourceFile`).
-3. Extracts the **actual set of `$`-prefixed variable keys** the renderer provides:
-   - For `childInjectedVars`: find `<ScopeProvider vars={{...}}>` or equivalent context-provider JSX, extract object literal keys starting with `$`.
-   - For `events[*].injectedVars`: find `lookupEventHandler(eventName, { ... })` or wrapping calls, extract keys.
-4. Compares extracted set to `OPTIMIZER_METADATA[componentType].childInjectedVars` / `.events.<event>.injectedVars`.
-5. Fails the test with a clear message on any mismatch.
+2. For each `$var` in `OPTIMIZER_METADATA[type].childInjectedVars` (and event-level `injectedVars`),
+   checks that the string `"$var"` appears somewhere as a string literal in the source file.
+3. Fails with a clear message if any `$var` has no matching string literal.
+
+### Why a "string-literal presence" check rather than a full AST audit
+
+Two previously-considered anchors are not viable:
+
+1. **`ScopeProvider` JSX detection** — original plan, dropped because most components inject via
+   `renderChild(node, { contextVars: { $item: ... } })` inline, not via a `<ScopeProvider>` element.
+   Requires full TypeScript Compiler API to trace.
+
+2. **`metadata.contextVars` bidirectional check** — dropped because `metadata.contextVars` is
+   **intentionally a subset**: it documents only user-facing variables for the Language Server.
+   Internal variables (`$cell`, `$colIndex`, `$isFirst`, `$isLast`, `$inTrigger`, etc.) are absent
+   from `contextVars` by design. A bidirectional check would fail for Items, Tree, Column, Markdown,
+   Select, AutoComplete immediately — all legitimate, not bugs.
+
+A string-literal presence check is weaker (a `"$item"` in a comment would satisfy it) but:
+- Requires **zero TypeScript AST tooling** — pure `readFileSync` + regex.
+- Catches the most dangerous drift: developer adds `"$newVar"` to `OPTIMIZER_METADATA` and never
+  touches the component file at all.
+- Complements Layer 4 (`validateInjectedVars` DEV throw) which is the **strong guard**: if the
+  variable is declared in OPTIMIZER_METADATA but never injected by the renderer, DEV throws on
+  first render.
+
+### What this check does NOT catch
+
+- A variable removed from the renderer but left in OPTIMIZER_METADATA (Layer 4 catches this).
+- A variable present in a comment but absent from the actual `renderChild` call (accepted limitation).
+- Extension-package components (`xmlui-masonry`, etc.) — they have no OPTIMIZER_METADATA entry,
+  so there is nothing to check. They rely on `metadata.contextVars` and runtime validation only.
 
 ### File layout
 
-- **New test:** `xmlui/tests/components-core/optimization/staticMetadataAudit.test.ts`
-- **New helper module:** `xmlui/tests/components-core/optimization/helpers/auditAst.ts`
-  - Exports `extractChildScopeVars(filePath: string): string[]`
-  - Exports `extractEventScopeVars(filePath: string, eventName: string): string[]`
-  - Exports `resolveSourceFile(componentType: string): string` (convention-based mapping)
+- **Extend existing test:** `xmlui/tests/components-core/optimization/renderer-metadata-drift.test.ts`
+  - Add a new `describe` block: `"OPTIMIZER_METADATA vars have a string-literal presence in source"`.
+  - Reuse the same `readFileSync`-based approach already present.
+  - Extractor: for each `$var` in `childInjectedVars`, check `source.includes('"' + var + '"')`.
 
 ### Test cases
 
-For each component in `OPTIMIZER_METADATA`:
-- **`<X>.childInjectedVars matches renderer source`** — assert `extractChildScopeVars(file)` deep-equals registry.
-- **`<X>.events.<e>.injectedVars matches renderer source`** — for each declared event, assert match.
+For each entry in `OPTIMIZER_METADATA` with non-empty `childInjectedVars`:
+- **Every `$var` in `childInjectedVars` MUST appear as a string literal in the component `.tsx` file.**
+  Catches: "developer added `$newVar` to OPTIMIZER_METADATA and never referenced it in the component".
 
-Plus two negative-control tests:
-- **`extractor finds known good case`** — known component (e.g. `List`), known expected vars, assert extractor returns the right list.
-- **`extractor flags injected fixture`** — synthetic test fixture with intentional mismatch, assert the audit fails.
-
-### Convention assumption (document explicitly)
-
-To keep the AST analyzer simple, require/enforce:
-- Each component places its `ScopeProvider` (or context-provider) call in **one of**:
-  - `xmlui/src/components/<Name>/<Name>.tsx`
-  - `xmlui/src/components/<Name>/<Name>React.tsx`
-  - `xmlui/src/components/<Name>/<Name>Native.tsx`
-- The `vars` prop (or equivalent) is passed as an **object literal**, not a spread of a variable.
-
-If a component doesn't fit the convention, an explicit override file or annotation lets it opt out (with a TODO to refactor later).
-
-### Edge cases to handle
-
-| Case | Handling |
-|------|----------|
-| Component uses both `childInjectedVars` and event `injectedVars` | Audit checks both independently |
-| Component uses spread `vars={{...defaults, $x}}` | Extractor must recursively resolve spreads or fail loudly with "unsupported pattern" |
-| Component splits child scope across multiple providers (e.g. nested `ScopeProvider`) | Extractor must collect union of all `$` keys |
-| Component has no `<ScopeProvider>` but is in registry | Audit fails: "registry claims childInjectedVars but no provider found" |
-| Component has `<ScopeProvider>` but no registry entry | Audit warns/fails: "renderer provides child scope but no OPTIMIZER_METADATA entry" |
-
-### Performance budget
-
-- Parsing 18 component files synchronously in one test: target < 200ms total.
-- Avoid heavy `ts-morph` if `typescript` standalone parser suffices.
+For each entry in `OPTIMIZER_METADATA` with per-event `injectedVars`:
+- **Every `$var` in `events[*].injectedVars` MUST appear as a string literal in the component `.tsx` file.**
 
 ### Acceptance criteria (TODO)
 
-- [ ] (TODO) All current components in `OPTIMIZER_METADATA` pass the audit out of the box (no false positives).
-- [ ] (TODO) Intentionally adding `$bogus` to `OPTIMIZER_METADATA.List.childInjectedVars` causes the test to fail with a clear message.
-- [ ] (TODO) Intentionally removing `$item` from `List.tsx` renderer (without updating registry) causes the test to fail.
-- [ ] (TODO) Test runs in < 1s as part of the standard test suite.
+- [ ] (TODO) All current components pass out of the box (no false positives).
+- [ ] (TODO) Intentionally adding `"$bogus"` to `OPTIMIZER_METADATA.List.childInjectedVars` causes the test to fail with a clear message naming the component and the missing key.
+- [ ] (TODO) Test runs in < 200ms as part of the standard test suite (pure file reads, no TS compilation).
 
 ---
 

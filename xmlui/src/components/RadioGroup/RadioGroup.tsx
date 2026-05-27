@@ -2,7 +2,6 @@ import React from "react";
 import styles from "./RadioGroup.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -76,7 +75,6 @@ export const RadioGroupMd = createMetadata({
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
   },
-  ...fromOptimizerMetadata("RadioGroup"),
   apis: {
     value: {
       description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,

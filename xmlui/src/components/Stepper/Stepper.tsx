@@ -2,7 +2,6 @@ import styles from "./Stepper.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { createMetadata, dDidChange } from "../metadata-helpers";
 import { Stepper, defaultProps } from "./StepperReact";
 import React from "react";
@@ -11,7 +10,6 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 const COMP = "Stepper";
 
 export const StepperMd = createMetadata({
-  ...fromOptimizerMetadata("Stepper"),
   status: "experimental",
   description:
     "`Stepper` displays a sequence of steps for a multi-step workflow or wizard. " +

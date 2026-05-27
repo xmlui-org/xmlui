@@ -1,5 +1,4 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
 import { Items, defaultProps } from "./ItemsReact";
@@ -34,7 +33,6 @@ export const ItemsMd = createMetadata({
     $isFirst: dComponent("Boolean indicating if this is the first item"),
     $isLast: dComponent("Boolean indicating if this is the last item"),
   },
-  ...fromOptimizerMetadata("Items"),
   opaque: true,
 });
 

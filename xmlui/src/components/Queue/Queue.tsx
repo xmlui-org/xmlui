@@ -1,5 +1,4 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
 import { QueueWithContextVar, defaultProps } from "./QueueReact";
@@ -128,7 +127,6 @@ export const QueueMd = createMetadata({
       `A list containing the items waiting in the queue, icluding the completed items.`,
     ),
   },
-  ...fromOptimizerMetadata("Queue"),
 });
 
 export const queueComponentRenderer = wrapComponent(COMP, QueueWithContextVar, QueueMd, {

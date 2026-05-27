@@ -1,6 +1,5 @@
 import type React from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { createMetadata } from "../metadata-helpers";
@@ -72,7 +71,6 @@ export const ColumnMd = createMetadata({
       defaultValue: defaultProps.canResize,
     },
   },
-  ...fromOptimizerMetadata("Column"),
   contextVars: {
     $item: {
       description: "The complete data row object being rendered",

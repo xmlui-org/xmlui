@@ -56,7 +56,6 @@ export const CheckboxMd = createMetadata({
     ),
     inputTemplate: dComponent("This property is used to define a custom checkbox input template"),
   },
-  childInjectedVars: ["$checked", "$setChecked"],
   childrenAsTemplate: "inputTemplate",
   events: {
     click: dClick(COMP),

@@ -1,6 +1,5 @@
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
 import { createMetadata, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
@@ -300,7 +299,6 @@ export const APICallMd = createMetadata({
         "The return value of the handler becomes the result of the API call.",
       signature: "() => any",
       parameters: {},
-      injectedVars: OPTIMIZER_METADATA.APICall.events.mockExecute.injectedVars,
     },
     progress: dInternal(),
   },

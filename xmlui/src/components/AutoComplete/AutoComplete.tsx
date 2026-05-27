@@ -1,7 +1,6 @@
 import styles from "./AutoComplete.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import {
   dPlaceholder,
   dInitialValue,
@@ -167,7 +166,6 @@ export const AutoCompleteMd = createMetadata({
       "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
     ),
   },
-  ...fromOptimizerMetadata("AutoComplete"),
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",

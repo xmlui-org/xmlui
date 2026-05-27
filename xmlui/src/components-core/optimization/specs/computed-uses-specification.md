@@ -35,7 +35,7 @@ Consider an application:
 The algorithm works bottom-up, traversing the `ComponentDef` tree before connecting the reactive graph:
 1. Collects all identifiers used in the node (`usedHere`).
 2. Retrieves identifiers "leaking" from children (`childDeps`).
-3. Excludes **locally declared** variables (`vars`, `loaders`, `contextVars` like `$item`, functions).
+3. Excludes **locally provided** variables (`vars`, `loaders`, runtime `node.contextVars` like `$item`, functions). `node.contextVars` refers to `ComponentDef.contextVars` — a field set on wrapper nodes by renderers that create per-instance containers (e.g., ContextMenu creates a `Container` with `contextVars: { $context }`). Adding these to `localDeclared` prevents the container from reporting `$context` as an external dependency — it absorbs it as locally provided for children.
 4. Excludes **Built-in Globals** (`JS_STDLIB_GLOBALS` like `Math`, `JSON_STDLIB_GLOBALS`).
 5. Excludes **Lexical Scoped Vars**. These are variables injected directly into the child context at render time (e.g., `$item` in `List` or `$queryParams` in `onFetch`). They are declared in component metadata (`childInjectedVars`) and event metadata (`injectedVars`), allowing the analyzer to ignore them as external dependencies.
 6. Excludes **Unstable Global Variables** (`UNSTABLE_GLOBAL_VARS`). These are navigation keys (like `$pathname`) declared in root metadata (`unstableChildInjectedVars`).
@@ -86,9 +86,57 @@ Instead of hardcoded lists of "special" variables, the optimizer uses metadata t
 - **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars`. Expressions inside a specific handler filter these variables. To reduce boilerplate in `optimizer-metadata.ts`, the `withInjectedContext` utility allows specifying `eventsInheritChildVars`, which automatically copies `childInjectedVars` into the `injectedVars` of the specified event names (e.g., passing `$data` to `Form`'s `submit` event).
 - **Shadowing:** Metadata-driven scoping allows local variables (like `$queryParams` in `onFetch`) to naturally shadow global ones (like router `$queryParams`), preventing false parent dependencies.
 
+### Metadata Duplication: `OPTIMIZER_METADATA.childInjectedVars` vs. `metadata.contextVars` (intentional)
+
+The same `$`-variable names appear in multiple places for the same component type. This is **not an oversight** — it is architecturally required.
+
+#### Why `OPTIMIZER_METADATA` cannot be removed
+
+The Vite plugin (`xmlui-parser.ts`) runs at **build time in pure Node.js**. It calls `computeUsesForTree(component, lookupOptimizerMetadata)` where `lookupOptimizerMetadata` reads directly from `OPTIMIZER_METADATA`. Component `.tsx` files cannot be imported in this context — they transitively import React, SCSS files, and DOM globals that are unavailable in Node.js.
+
+This means `OPTIMIZER_METADATA` is the **only** source the Vite plugin path can read. Every `childInjectedVars`, `isImplicitContainerByDefault`, and per-event `injectedVars` entry must be present there or the build-time optimizer will misclassify child dependencies for that component.
+
+#### Why `metadata.contextVars` also exists (and why it is NOT a drift anchor)
+
+`metadata.contextVars` (`Record<string, ComponentPropertyMetadata>`) serves a different audience: the **Language Server** and documentation tooling. It stores descriptions, types, and availability of `$`-prefixed template variables — richer information than the bare string arrays in `OPTIMIZER_METADATA`.
+
+Important: `metadata.contextVars` is **intentionally a subset** of `OPTIMIZER_METADATA.childInjectedVars`. Components document only "user-visible" context variables (those a developer would reference in markup), not internal ones like `$cell`, `$colIndex`, `$isFirst`, etc. This means `contextVars` cannot be used as a reliable bidirectional drift anchor — the check `childInjectedVars ⊆ contextVars.keys` would fail for many components by design.
+
+Runtime metadata enrichment (`childInjectedVars`, `isImplicitContainerByDefault`, `unstableChildInjectedVars`) is now handled automatically by `mergeOptimizerInjectedVars` in `wrapComponent`/`wrapCompound` at registration time. Component `.tsx` files no longer need any manual spread — `OPTIMIZER_METADATA` is the single declaration point and the runtime descriptor is auto-enriched.
+
+#### The three-source picture for a component like `List`
+
+| Source | Who reads it | What it contains |
+|--------|-------------|-----------------|
+| `OPTIMIZER_METADATA.List.childInjectedVars` | Vite plugin (`lookupOptimizerMetadata`) | `["$item", "$itemIndex", ...]` — build-time optimizer |
+| `metadata.childInjectedVars` (auto-enriched by `mergeOptimizerInjectedVars`) | Standalone runtime (`resolveOptimizerMetadata`) | same array — runtime optimizer |
+| `metadata.contextVars` | Language Server, drift test, `validateInjectedVars` | `{ $item: d("..."), ... }` — documentation (intentional subset) |
+
+All three must agree. The `renderer-metadata-drift.test.ts` CI test validates this agreement for renderer slots; `validateInjectedVars` validates it at runtime.
+
+#### `...Object.keys(metadata?.contextVars ?? {})` in `computedUses.ts`
+
+```typescript
+const childInjected = [
+  ...(metadata?.childInjectedVars ?? []),        // authoritative for both paths
+  ...(metadata?.unstableChildInjectedVars ?? []),
+  ...Object.keys(metadata?.contextVars ?? {}),   // safety-net for extension packages
+];
+```
+
+For **core components** this third spread is redundant — `childInjectedVars` already contains the same keys (auto-enriched by `mergeOptimizerInjectedVars` at registration). Its purpose is extension packages:
+
+Extension packages (`xmlui-masonry`, `xmlui-react-flow`, `xmlui-grid-layout`, etc.) have **no entry in `OPTIMIZER_METADATA`** (adding them would create a reverse dependency — core must not know about packages). In Standalone mode, `resolveOptimizerMetadata` returns the full component metadata including `contextVars`. Without this third spread, `$item` inside a `<Masonry>` item template would be counted as an external parent dependency, causing unnecessary re-renders.
+
+In Vite plugin mode, extension package components have no `OPTIMIZER_METADATA` entry and no `contextVars` (the Vite path only sees `OPTIMIZER_METADATA`), so they over-subscribe — this is documented as acceptable graceful degradation until a runtime registration API for extension packages is implemented.
+
+#### ⚠ Do not remove `childInjectedVars` from `OPTIMIZER_METADATA`
+
+It may be tempting to remove `childInjectedVars` from `OPTIMIZER_METADATA` entries that already document the same variables in `metadata.contextVars`. **This breaks the Vite plugin path.** The `contextVars` reading in `computedUses.ts` only helps Standalone mode; the Vite plugin receives `undefined` for `metadata.contextVars` because `lookupOptimizerMetadata` returns only `OPTIMIZER_METADATA` entries which never contain `contextVars`. Removing `childInjectedVars` from OPTIMIZER_METADATA would cause the Vite-built app's optimizer to misclassify `$item` etc. as parent-scope dependencies.
+
 ### Lexical Scoping at Runtime: Local Vars Win over Outer Scope (`useVars`)
 
-The static analysis above decides **which** parent-scope names a container subscribes to. At render time, the actual values are merged in [`useVars`](../../src/components-core/state/variable-resolution.ts). When `useVars` iterates over `vars` (an ordered map of `{...node.functions, ...node.vars, ...parsedScriptPart.vars}`) it builds `ret` incrementally — each iteration resolves one var and stores it in `ret`. To evaluate the next var's expression, it constructs a `stateContext`:
+At render time, the actual values are merged in [`useVars`](../../src/components-core/state/variable-resolution.ts). When `useVars` iterates over `vars` (an ordered map of `{...node.functions, ...node.vars, ...parsedScriptPart.vars}`) it builds `ret` incrementally — each iteration resolves one var and stores it in `ret`. To evaluate the next var's expression, it constructs a `stateContext`:
 
 ```ts
 const stateContext: ContainerState = { ...componentState, ...ret };
@@ -127,10 +175,27 @@ In addition to Symbols, lexical context variables (prefixed with `$`) injected b
 
 **Problem:** `computedUses` is calculated as *parent external dependencies*. It doesn't include lexical variables (e.g., `$item`) that live in the parent state but which the parent doesn't "own"—they are injected higher in the tree. Narrowing would otherwise strip them.
 
-**Solution:** Preserve ALL `$`-prefixed keys EXCEPT `UNSTABLE_GLOBAL_VARS` (defined via `unstableChildInjectedVars` in metadata for `App` and other providers):
+**Solution (two-pass):** `extractScopedState` preserves `$`-prefixed keys via two complementary passes:
 
+**Pass 1 — hardcoded `FRAMEWORK_VARS` via the `in` operator** (Proxy-safe; handles non-enumerable keys):
 ```ts
 // ContainerUtils.ts:extractScopedState
+const FRAMEWORK_VARS = [
+  "$item", "$itemIndex", "$isFirst", "$isLast", "$context", "$props",
+  "$cell", "$row", "$rowIndex", "$isSelected", "$value", "$setValue",
+  "$data", "$completedItems", "$queuedItems",
+];
+for (const key of FRAMEWORK_VARS) {
+  if (key in parentState && !(key in picked)) {
+    picked[key] = (parentState as any)[key];
+  }
+}
+```
+
+The `in` operator is required because some state objects may be Proxy instances (e.g., from reactive adapters) where common framework variables are accessible via property lookup but not enumerable via `Object.keys`. Using `in` ensures these are always picked up.
+
+**Pass 2 — general `$`-prefix scan via `Object.keys`** (catches all other enumerable `$`-prefixed keys):
+```ts
 for (const key of Object.keys(parentState)) {
   if (
     typeof key === "string" &&
@@ -180,9 +245,19 @@ This ensures each traversal starts with clean state. The current pass becomes th
 
 ## 6. Optimization Guards (Validation)
 
+### Optimizer Metadata Auto-Injection (`mergeOptimizerInjectedVars`)
+
+Both `wrapComponent` and `wrapCompound` call `mergeOptimizerInjectedVars(type, metadata)` as their **first step** before constructing the renderer closure (lines 560 and 1104 in `wrapComponent.tsx`). This function (lines 14–46) bridges `OPTIMIZER_METADATA` into the runtime `ComponentMetadata`, filling gaps:
+
+- If `OPTIMIZER_METADATA[type].childInjectedVars` exists but `metadata.childInjectedVars` does not → copies it in.
+- For each event in `OPTIMIZER_METADATA[type].events`: if the component already exposes that event but has no `injectedVars` declared → copies the optimizer's `injectedVars` in.
+
+This means `validateInjectedVars` will pass for every component registered via `wrapComponent`/`wrapCompound` even if the component author did not add any metadata spreading. **`OPTIMIZER_METADATA` is the single source of truth; the runtime descriptor is auto-enriched at registration by `mergeOptimizerInjectedVars`.**
+
 ### Runtime Validation (`validateInjectedVars`)
 To protect against developer error (forgetting to update metadata when adding new injected variables), a runtime check exists in `__DEV__` mode.
-- Whenever `ComponentAdapter` or `wrapComponent` injects context variables, it compares them against `injectedVars` / `childInjectedVars` metadata.
+- **`wrapComponent.tsx`** (lines 866, 887): calls `validateInjectedVars(node.type, metadata, contextVars)` — *without* `eventName` — whenever a renderer-slot callback injects contextVars into a `MemoizedItem`. This validates against `metadata.childInjectedVars` and `metadata.contextVars`.
+- **`ComponentAdapter.tsx`** (line 395): calls `validateInjectedVars(safeNode.type, descriptor, actionOptions.context, eventName)` — *with* `eventName` — for event-handler context injections. This validates against `metadata.events[eventName].injectedVars` in addition to the child-level fields.
 - If a mismatch is found (a variable starts with `$` but is not declared), a **hard-fail `throw`** is raised in development (gated by `import.meta.env?.DEV`). In production builds the same condition logs a `console.error` instead, so misconfigured extension components keep working with graceful degradation.
 - The thrown error message names the offending `OPTIMIZER_METADATA.<Component>` entry, so the fix is immediate.
 
@@ -203,6 +278,12 @@ Renderers that compute `contextVars` via a callback (e.g. `Checkbox`'s
 `inputTemplate` uses `contextVars: (vars) => vars`) cannot be audited
 statically and are skipped; their contract is enforced only by the runtime
 check.
+
+The `RendererConfig.contextVars` field accepts two forms:
+- **Positional array** `(string | null)[]`: maps callback arguments by position to variable names (`null` skips a position). E.g. `["$item", null, "$inTrigger"]` maps `args[0] → $item`, skips `args[1]`, maps `args[2] → $inTrigger`.
+- **Function** `(...args) => Record<string, any>`: for computed variables (e.g., `$isFirst: index === 0`).
+
+Only **two components** currently use the static array form in `wrapComponent` config (`AutoComplete`, `Fallback`). Most components inject contextVars directly in their renderer code via inline `renderChild(node, { contextVars: { $item, ... } })` calls, which bypass the static drift check and are covered only by `validateInjectedVars` at runtime.
 
 
 ### Framework Globals Filtering

@@ -1,5 +1,4 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { createMetadata } from "../metadata-helpers";
 import { Fallback, defaultProps } from "./FallbackReact";
 
@@ -13,7 +12,6 @@ export const FallbackMd = createMetadata({
     `component throws during render. The error is exposed as the \`$error\` ` +
     `context variable to the \`errorTemplate\`. An optional \`loadingTemplate\` ` +
     `is rendered while the \`isLoading\` prop is truthy.`,
-  ...fromOptimizerMetadata("Fallback"),
   props: {
     errorTemplate: {
       description:

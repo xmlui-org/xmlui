@@ -1,6 +1,6 @@
 import { httpMethodNames } from "../abstractions";
 import { createMetadata, d } from "../metadata-helpers";
-import { OPTIMIZER_METADATA } from "../../components-core/optimization/optimizer-metadata";
+import { mergeOptimizerInjectedVars } from "../../components-core/optimization/optimizer-metadata";
 
 // NOTE: Original component this is based on is the `Loader` component
 
@@ -168,6 +168,7 @@ export const DataSourceMd = createMetadata({
         error: "The error object that occurred during the request.",
       },
     },
+
     fetch: {
       description:
         "When defined, this event handler replaces the default fetch logic. The handler " +
@@ -179,7 +180,6 @@ export const DataSourceMd = createMetadata({
         "function that powers the default fetch.",
       signature: "fetch(): any",
       parameters: {},
-      injectedVars: OPTIMIZER_METADATA.DataSource.events.fetch.injectedVars,
     },
   },
   apis: {
@@ -212,3 +212,5 @@ export const DataSourceMd = createMetadata({
     },
   },
 });
+
+mergeOptimizerInjectedVars(COMP, DataSourceMd);

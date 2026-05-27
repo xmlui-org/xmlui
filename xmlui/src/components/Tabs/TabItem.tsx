@@ -1,5 +1,4 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { fromOptimizerMetadata } from "../../components-core/optimization/optimizer-metadata";
 import { TabItemComponent } from "./TabItemReact";
 import { createMetadata, d, dComponent, dLabel } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
@@ -27,7 +26,6 @@ export const TabItemMd = createMetadata({
       parameters: {},
     },
   },
-  ...fromOptimizerMetadata("TabItem"),
   contextVars: {
     $header: d(
       "This context value represents the header context with props: id (optional), index, label, isActive.",
