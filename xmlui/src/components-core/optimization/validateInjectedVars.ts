@@ -45,7 +45,7 @@ export function validateInjectedVars(
     const message = `[XMLUI Lexical Scoping] Component ${componentType} injected variables (${missing.join(
       ", "
     )}) into its ${eventName ? "event" : "template"}, but they are NOT declared in its ${target} metadata. ` +
-    `This will cause the variables to be stripped during AST optimization. Please update OPTIMIZER_METADATA.${componentType} in xmlui/src/components-core/optimization/optimizer-metadata.ts.`;
+    `This will cause the variables to be stripped during AST optimization. Please add the missing $-variables to the \`optimization.childInjectedVars\` (or \`optimization.events.${eventName}.injectedVars\`) field in the component's createMetadata call.`;
 
     if (import.meta.env?.DEV) {
       throw new Error(message);

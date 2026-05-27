@@ -254,37 +254,37 @@ Both `wrapComponent` and `wrapCompound` call `mergeOptimizerInjectedVars(type, m
 
 This means `validateInjectedVars` will pass for every component registered via `wrapComponent`/`wrapCompound` even if the component author did not add any metadata spreading. **`OPTIMIZER_METADATA` is the single source of truth; the runtime descriptor is auto-enriched at registration by `mergeOptimizerInjectedVars`.**
 
-### Runtime Validation (`validateInjectedVars`)
+### Runtime Validation (`validateInjectedVars`) — Layer 4 (Runtime Hard-Fail)
 To protect against developer error (forgetting to update metadata when adding new injected variables), a runtime check exists in `__DEV__` mode.
 - **`wrapComponent.tsx`** (lines 866, 887): calls `validateInjectedVars(node.type, metadata, contextVars)` — *without* `eventName` — whenever a renderer-slot callback injects contextVars into a `MemoizedItem`. This validates against `metadata.childInjectedVars` and `metadata.contextVars`.
 - **`ComponentAdapter.tsx`** (line 395): calls `validateInjectedVars(safeNode.type, descriptor, actionOptions.context, eventName)` — *with* `eventName` — for event-handler context injections. This validates against `metadata.events[eventName].injectedVars` in addition to the child-level fields.
 - If a mismatch is found (a variable starts with `$` but is not declared), a **hard-fail `throw`** is raised in development (gated by `import.meta.env?.DEV`). In production builds the same condition logs a `console.error` instead, so misconfigured extension components keep working with graceful degradation.
 - The thrown error message names the offending `OPTIMIZER_METADATA.<Component>` entry, so the fix is immediate.
 
-### Static Drift Check (CI-time)
+### Static Drift Check (CI-time) — Layer 2 (Static AST Audit)
 
-In addition to the runtime `validateInjectedVars` hard-fail, a unit test in
+To ensure consistency between component implementation and registry declarations, a unit test in
 [`xmlui/tests/components-core/optimization/renderer-metadata-drift.test.ts`](../../../tests/components-core/optimization/renderer-metadata-drift.test.ts)
-statically walks every built-in component's `renderers.{slot}.contextVars`
+performs two types of static analysis:
+
+#### U-audit.1: Authoritative Registry Check
+Statically walks every built-in component's `renderers.{slot}.contextVars`
 declaration and asserts that each `$`-key is also declared in
 `OPTIMIZER_METADATA[type].childInjectedVars` or the component's
-`metadata.contextVars`. This catches drift at PR time (sub-second feedback),
-not at the next E2E run that happens to exercise the affected renderer. The
-test reads `.tsx` files as text and uses a narrow regex extractor — it
-deliberately does NOT import the component modules (which would pull SCSS
-and other Vite-only deps that don't load under vitest).
+`metadata.contextVars`. This catches drift at PR time, not at the next E2E
+run. Renderers that compute `contextVars` via a callback cannot be audited
+statically and rely on runtime validation.
 
-Renderers that compute `contextVars` via a callback (e.g. `Checkbox`'s
-`inputTemplate` uses `contextVars: (vars) => vars`) cannot be audited
-statically and are skipped; their contract is enforced only by the runtime
-check.
+#### U-audit.2: Static String-Literal Presence Check
+For every entry in `OPTIMIZER_METADATA` with non-empty `childInjectedVars` or event-level `injectedVars`,
+the test verifies that every declared `$var` actually appears as a string literal somewhere in the component's 
+source files (including `*React.tsx` and related implementation files).
 
-The `RendererConfig.contextVars` field accepts two forms:
-- **Positional array** `(string | null)[]`: maps callback arguments by position to variable names (`null` skips a position). E.g. `["$item", null, "$inTrigger"]` maps `args[0] → $item`, skips `args[1]`, maps `args[2] → $inTrigger`.
-- **Function** `(...args) => Record<string, any>`: for computed variables (e.g., `$isFirst: index === 0`).
+This check catches the "forgotten variable" drift:
+- Developer adds `$newVar` to `OPTIMIZER_METADATA` but never actually uses it in the component.
+- Catching this ensures the build-time optimizer doesn't reserve names that aren't genuinely local, which could otherwise shadow legitimate parent variables.
 
-Only **two components** currently use the static array form in `wrapComponent` config (`AutoComplete`, `Fallback`). Most components inject contextVars directly in their renderer code via inline `renderChild(node, { contextVars: { $item, ... } })` calls, which bypass the static drift check and are covered only by `validateInjectedVars` at runtime.
-
+Both audits read `.tsx` files as text and use regex extractors, avoiding the overhead of TS compilation or importing React modules.
 
 ### Framework Globals Filtering
 

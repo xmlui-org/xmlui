@@ -125,7 +125,7 @@ function listTsxFiles(dir: string): string[] {
 
 /**
  * Build a Record<componentTypeName, OptimizerMeta> by scanning all *.tsx files in `dir`.
- * Used by the Vite plugin at build time instead of importing optimizer-metadata.ts.
+ * Used by the Vite plugin at build time to extract metadata directly from component source files.
  * Only components that have at least one optimizer field are included.
  */
 export function extractOptimizerMetadataFromDir(dir: string): Record<string, OptimizerMeta> {

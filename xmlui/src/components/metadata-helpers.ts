@@ -9,15 +9,60 @@ import type {
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
 import { defaultProps } from "./FormItem/ItemWithLabel.defaults";
 
+/**
+ * Optimizer-specific metadata grouped in one place.
+ * Passed via the `optimization` key in `createMetadata` input.
+ * `createMetadata` spreads these into the correct `ComponentMetadata` fields,
+ * keeping optimizer concerns separate from human-readable API documentation.
+ */
+type OptimizerInput = {
+  /** @see ComponentMetadata.isImplicitContainerByDefault */
+  isImplicitContainerByDefault?: boolean;
+  /** @see ComponentMetadata.childInjectedVars */
+  childInjectedVars?: readonly string[];
+  /** @see ComponentMetadata.unstableChildInjectedVars */
+  unstableChildInjectedVars?: readonly string[];
+  /**
+   * Per-event injected variables. The key is the event name; the value
+   * is merged into the matching `events[name].injectedVars` field.
+   * The event must already be declared in the `events` block.
+   */
+  events?: Record<string, { injectedVars?: readonly string[] }>;
+};
+
 export function createMetadata<
   TProps extends Record<string, ComponentPropertyMetadata>,
   TEvents extends Record<string, ComponentPropertyMetadata>,
   TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 >(
-  metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis>,
+  metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis> & {
+    optimization?: OptimizerInput;
+  },
 ): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
-  return metadata;
+  const { optimization, ...rest } = metadata as any;
+
+  if (!optimization) {
+    return rest as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
+  }
+
+  const { events: optEvents, ...optFields } = optimization as OptimizerInput;
+
+  // Spread isImplicitContainerByDefault, childInjectedVars, unstableChildInjectedVars
+  const result: any = { ...rest, ...optFields };
+
+  // Merge per-event injectedVars from optimization.events into events[name]
+  if (optEvents && rest.events) {
+    const mergedEvents: Record<string, ComponentEventMetadata> = { ...rest.events };
+    for (const [eventName, optEvent] of Object.entries(optEvents)) {
+      if (optEvent.injectedVars && mergedEvents[eventName]) {
+        mergedEvents[eventName] = { ...mergedEvents[eventName], injectedVars: optEvent.injectedVars };
+      }
+    }
+    result.events = mergedEvents;
+  }
+
+  return result as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
 }
 
 export function d(
