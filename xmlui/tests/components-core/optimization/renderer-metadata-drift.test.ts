@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { OPTIMIZER_METADATA } from "../../../src/components-core/optimization/optimizer-metadata";
+import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
+import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
 
 // Static drift detection —
 // Walks each built-in component's source file, extracts any
@@ -93,6 +94,12 @@ const COMPONENTS_CORE_DIR = resolve(__dirname, "../../../src/components-core");
 const allCoreFiles = listComponentTsxFiles(COMPONENTS_CORE_DIR);
 const allFilesToAudit = [...allFiles, ...allCoreFiles];
 
+/** Combined metadata map for audit purposes — includes all registered components + internal ones */
+const AUDIT_METADATA: Record<string, any> = {
+  ...collectedComponentMetadata,
+  DataLoader: DataLoaderMd,
+};
+
 interface DriftRow {
   file: string;
   componentType: string;
@@ -111,7 +118,7 @@ for (const file of allFilesToAudit) {
   if (!componentType) continue;
   audited.push(`${componentType} (${file.replace(/^.*\/src\//, "")})`);
 
-  const optEntry = (OPTIMIZER_METADATA as Record<string, any>)[componentType];
+  const optEntry = AUDIT_METADATA[componentType];
   const declared = new Set<string>();
   if (optEntry?.childInjectedVars) {
     for (const v of optEntry.childInjectedVars) declared.add(v);
@@ -132,7 +139,7 @@ for (const file of allFilesToAudit) {
   }
 }
 
-describe("Renderer contextVars must be declared in OPTIMIZER_METADATA or metadata.contextVars", () => {
+describe("Renderer contextVars must be declared in inline childInjectedVars or metadata.contextVars", () => {
   it("audits at least one component (sanity check)", () => {
     // Replicate the spirit of drift-test.js by confirming file counts
     // console.log(`Found ${allFiles.length} comp files and ${allCoreFiles.length} core files.`);
@@ -148,23 +155,23 @@ describe("Renderer contextVars must be declared in OPTIMIZER_METADATA or metadat
           (d) =>
             `  ${d.componentType} (${d.file.replace(/^.*\/components\//, "components/")}): ` +
             `renderer "${d.slot}" injects [${d.missing.join(", ")}] not declared in ` +
-            `OPTIMIZER_METADATA.${d.componentType}.childInjectedVars or metadata.contextVars`,
+            `optimization.childInjectedVars in <Component>/${d.componentType}.tsx or metadata.contextVars`,
         )
         .join("\n");
       throw new Error(
         `Renderer contextVars drift detected (Group S follow-up):\n${report}\n\n` +
-          `Fix: add the missing $-keys to OPTIMIZER_METADATA.<Component>.childInjectedVars ` +
-          `in xmlui/src/components-core/optimization/optimizer-metadata.ts.`,
+          `Fix: add the missing $-keys to optimization.childInjectedVars in <Component>/<Component>.tsx ` +
+          `in the component's createMetadata call.`,
       );
     }
     expect(drift).toEqual([]);
   });
 });
 
-describe("OPTIMIZER_METADATA vars have a string-literal presence in source (U-audit.2)", () => {
-  // We need to map component names to their source code
+describe("childInjectedVars / injectedVars vars have a string-literal presence in source (U-audit.2)", () => {
+  // Map component names to their source code using the same file scan as above
   const componentToSourceMap = new Map<string, { file: string; source: string }>();
-  
+
   for (const file of allFilesToAudit) {
     const source = readFileSync(file, "utf-8");
     const componentType = extractRegisteredName(source);
@@ -173,97 +180,91 @@ describe("OPTIMIZER_METADATA vars have a string-literal presence in source (U-au
     }
   }
 
-  for (const [componentType, registryEntry] of Object.entries(OPTIMIZER_METADATA)) {
-    const entry = registryEntry as {
+  // DataLoader is internal (not in allFilesToAudit) — add manually
+  const dataLoaderFile = resolve(__dirname, "../../../src/components-core/loader/DataLoader.tsx");
+  componentToSourceMap.set("DataLoader", {
+    file: dataLoaderFile,
+    source: readFileSync(dataLoaderFile, "utf-8"),
+  });
+
+  for (const [componentType, runtimeMd] of Object.entries(AUDIT_METADATA)) {
+    const entry = runtimeMd as {
       childInjectedVars?: readonly string[];
+      unstableChildInjectedVars?: readonly string[];
       events?: Record<string, { injectedVars?: readonly string[] }>;
     };
 
-    if (!entry.childInjectedVars && !entry.events) {
-      continue;
-    }
+    const hasVarsToCheck =
+      (entry.childInjectedVars?.length ?? 0) > 0 ||
+      (entry.unstableChildInjectedVars?.length ?? 0) > 0 ||
+      Object.values(entry.events ?? {}).some((e) => (e.injectedVars?.length ?? 0) > 0);
 
-    it(`${componentType}: has string literals for all OPTIMIZER_METADATA injected variables`, () => {
+    if (!hasVarsToCheck) continue;
+
+    it(`${componentType}: has string literals for all inline injected variables`, () => {
       const sourceInfo = componentToSourceMap.get(componentType);
-      
+
       let source = sourceInfo?.source;
       let filePath = sourceInfo?.file;
-      
+
       if (!source) {
-        const potentialFile = allFilesToAudit.find(f => f.endsWith(`/${componentType}.tsx`));
+        const potentialFile = allFilesToAudit.find((f) =>
+          f.endsWith(`/${componentType}/${componentType}.tsx`),
+        );
         if (potentialFile) {
           source = readFileSync(potentialFile, "utf-8");
           filePath = potentialFile;
         }
       }
 
-      // If we still can't find the source file, skip testing it
-      if (!source) {
-        return;
+      // If source file not found — skip (component may be in extensions or core)
+      if (!source) return;
+
+      // Special cases: vars live across multiple related files
+      if (componentType === "Table" || componentType === "Column") {
+        const tableReactFile = filePath!.replace("Column/Column.tsx", "Table/TableReact.tsx");
+        try { source += readFileSync(tableReactFile, "utf-8"); } catch (_) {}
+        const columnReactFile = filePath!.replace(".tsx", "React.tsx");
+        try { source += readFileSync(columnReactFile, "utf-8"); } catch (_) {}
+      } else if (componentType === "RadioGroup") {
+        const radioReactFile = filePath!.replace(".tsx", "React.tsx");
+        try { source += readFileSync(radioReactFile, "utf-8"); } catch (_) {}
+      } else if (componentType === "Checkbox") {
+        const toggleFile = filePath!.replace("Checkbox/Checkbox.tsx", "Toggle/Toggle.tsx");
+        try { source += readFileSync(toggleFile, "utf-8"); } catch (_) {}
       }
 
-      // Special cases where injected variables are distributed across multiple files
-      if (componentType === 'Table') {
-        const reactFile = filePath.replace('.tsx', 'React.tsx');
-        try { source += readFileSync(reactFile, 'utf-8'); } catch (e) {}
-        const columnReactFile = filePath.replace('Table/Table.tsx', 'Column/ColumnReact.tsx');
-        try { source += readFileSync(columnReactFile, 'utf-8'); } catch (e) {}
-      } else if (componentType === 'Column') {
-        // We already have Column.tsx, we need ColumnReact.tsx or TableReact.tsx which handles column variables too
-        const tableReactFile = filePath.replace('Column/Column.tsx', 'Table/TableReact.tsx');
-        try { source += readFileSync(tableReactFile, 'utf-8'); } catch (e) {}
-        const columnReactFile = filePath.replace('.tsx', 'React.tsx');
-        try { source += readFileSync(columnReactFile, 'utf-8'); } catch (e) {}
-      } else if (componentType === 'RadioGroup') {
-        const radioReactFile = filePath.replace('.tsx', 'React.tsx');
-        try { source += readFileSync(radioReactFile, 'utf-8'); } catch (e) {}
-      } else if (componentType === 'Checkbox') {
-        const toggleFile = filePath.replace('Checkbox/Checkbox.tsx', 'Toggle/Toggle.tsx');
-        try { source += readFileSync(toggleFile, 'utf-8'); } catch (e) {}
-      }
-
-      if (entry.childInjectedVars && entry.childInjectedVars.length > 0) {
-        const missingVars: string[] = [];
-        for (const v of entry.childInjectedVars) {
-          const escapedV = v.replace('$', '\\\\$');
+      function checkVars(vars: readonly string[], label: string): void {
+        const missing: string[] = [];
+        for (const v of vars) {
+          const escapedV = v.replace("$", "\\\\$");
           const regex = new RegExp(`${escapedV}(?![a-zA-Z0-9_])`);
-          if (!source.includes(`"${v}"`) && !source.includes(`'${v}'`) && !source.includes(`\`${v}\``) && !source.includes(`${v}:`) && !regex.test(source)) {
-            missingVars.push(v);
+          if (
+            !source!.includes(`"${v}"`) &&
+            !source!.includes(`'${v}'`) &&
+            !source!.includes(`\`${v}\``) &&
+            !source!.includes(`${v}:`) &&
+            !regex.test(source!)
+          ) {
+            missing.push(v);
           }
         }
-        
-        if (missingVars.length > 0) {
+        if (missing.length > 0) {
           throw new Error(
-            `[U-audit.2] String literal presence check failed for ${componentType} in ${filePath}:\n` +
-            `  The following variables are declared in OPTIMIZER_METADATA.${componentType}.childInjectedVars\n` +
-            `  but the string literal "$var" does not appear in the source code:\n` +
-            `  Missing: [${missingVars.join(", ")}]\n\n` +
-            `Fix: Either use the variable in the component's renderChild/contextVars, or remove it from optimizer-metadata.ts`
+            `[U-audit.2] String literal presence check failed for ${componentType} (${label}) in ${filePath}:\n` +
+            `  Missing: [${missing.join(", ")}]\n\n` +
+            `Fix: Either use the variable in the component source, or remove it from createMetadata optimization block.`,
           );
         }
       }
 
+      if (entry.childInjectedVars?.length) checkVars(entry.childInjectedVars, "childInjectedVars");
+      if (entry.unstableChildInjectedVars?.length) checkVars(entry.unstableChildInjectedVars, "unstableChildInjectedVars");
+
       if (entry.events) {
         for (const [eventName, eventEntry] of Object.entries(entry.events)) {
-          if (eventEntry.injectedVars && eventEntry.injectedVars.length > 0) {
-            const missingEventVars: string[] = [];
-            for (const v of eventEntry.injectedVars) {
-              const escapedV = v.replace('$', '\\\\$');
-          const regex = new RegExp(`${escapedV}(?![a-zA-Z0-9_])`);
-          if (!source.includes(`"${v}"`) && !source.includes(`'${v}'`) && !source.includes(`\`${v}\``) && !source.includes(`${v}:`) && !regex.test(source)) {
-                missingEventVars.push(v);
-              }
-            }
-            
-            if (missingEventVars.length > 0) {
-              throw new Error(
-                `[U-audit.2] String literal presence check failed for ${componentType} event '${eventName}' in ${filePath}:\n` +
-                `  The following variables are declared in OPTIMIZER_METADATA.${componentType}.events["${eventName}"].injectedVars\n` +
-                `  but the string literal "$var" does not appear in the source code:\n` +
-                `  Missing: [${missingEventVars.join(", ")}]\n\n` +
-                `Fix: Either use the variable in the component's event handler, or remove it from optimizer-metadata.ts`
-              );
-            }
+          if (eventEntry.injectedVars?.length) {
+            checkVars(eventEntry.injectedVars, `events.${eventName}.injectedVars`);
           }
         }
       }
