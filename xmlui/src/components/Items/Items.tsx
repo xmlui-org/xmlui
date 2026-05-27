@@ -7,13 +7,13 @@ const COMP = "Items";
 
 export const ItemsMd = createMetadata({
   status: "stable",
-  optimization: {
-    childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast"],
-  },
   description:
     "`Items` renders data arrays without built-in layout or styling, providing " +
     "a lightweight alternative to `List`. Unlike `List`, it provides no " +
     "virtualization, grouping, or visual formatting — just pure data iteration.",
+  optimization: {
+    childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast"],
+  },
   props: {
     items: dInternal(`This property contains the list of data items this component renders.`),
     data: d(

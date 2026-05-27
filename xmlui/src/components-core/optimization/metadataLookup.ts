@@ -1,21 +1,18 @@
 /**
- * Unified optimizer metadata lookup that searches both the engine-internal
- * registry (`coreComponentMetadata`) and the public component registry
- * (`collectedComponentMetadata`), so callers no longer need explicit
- * `if (type === "DataLoader")` guards.
+ * Unified optimizer metadata lookup used by the browser runtime and tests.
  *
- * IMPORTANT: this module imports the **live** `components/collectedComponentMetadata.ts`
- * barrel (the same object every component's metadata is registered into), not the
- * pre-generated `language-server/xmlui-metadata-generated.js` snapshot. Tests
- * mutate the barrel to register extension components on the fly and expect
- * `getOptimizerMetadata` to observe those mutations.
+ * Reads from `metadataRegistry` — the single live registry backed by the
+ * generated snapshot and populated at module-load time by
+ * `components/collectedComponentMetadata.ts`. Node-safe: this module no longer
+ * imports the `.tsx` barrel; tests that mutate `collectedComponentMetadata.X`
+ * are mutating `metadataRegistry.X` directly (same object reference), so
+ * mutations are observable here as before.
  *
- * NOT safe to import from the `xmlui-parser.ts` / language-server path — the
- * barrel transitively imports every `.tsx` component, which language-server
- * (Node.js, no bundler) cannot resolve. The parser keeps its own local lookup
- * that reads from `xmlui-metadata-generated.js`.
+ * `defaultMetadataLookup` in `xmlui-parser.ts` is now a re-export alias of
+ * this function — both read from the same registry, resolving the
+ * two-function split described in issue #13 of the optimizer-metadata review.
  */
-import { collectedComponentMetadata } from "../../components/collectedComponentMetadata";
+import { metadataRegistry } from "../../language-server/metadataRegistry";
 import { coreComponentMetadata } from "../coreComponentMetadata";
 import type { OptimizerMetadataView } from "../../abstractions/ComponentDefs";
 
@@ -23,5 +20,5 @@ export function getOptimizerMetadata(type: string): OptimizerMetadataView | unde
   if (type in coreComponentMetadata) {
     return coreComponentMetadata[type];
   }
-  return collectedComponentMetadata[type];
+  return metadataRegistry[type];
 }

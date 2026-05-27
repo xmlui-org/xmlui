@@ -1,3 +1,4 @@
+import { metadataRegistry } from "../language-server/metadataRegistry";
 import { ButtonMd } from "./Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "./Stack/Stack";
 import { PasswordMd, TextBoxMd } from "./TextBox/TextBox";
@@ -209,7 +210,7 @@ import { DrawerMd } from "./Drawer/Drawer";
 import { TileGridMd } from "./TileGrid/TileGrid";
 import { FormSegmentMd } from "./FormSegment/FormSegment";
 
-export const collectedComponentMetadata = {
+Object.assign(metadataRegistry, {
   // --- HTML tags
   a: HtmlAMd,
   address: HtmlAddressMd,
@@ -420,7 +421,8 @@ export const collectedComponentMetadata = {
   NavPanelCollapseButton: NavPanelCollapseButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
-};
+});
+export const collectedComponentMetadata = metadataRegistry;
 
 export const collectedThemes: Record<string, ThemeDefinition> = {
   root: RootThemeDefinition,

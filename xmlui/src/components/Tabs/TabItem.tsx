@@ -9,15 +9,15 @@ const COMP = "TabItem";
 
 export const TabItemMd = createMetadata({
   status: "stable",
-  optimization: {
-    childInjectedVars: ["$header"],
-  },
   description:
     "`TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, " +
     "providing both the tab header label and the content that displays when the tab " +
     "is selected. As a non-visual structural component, it serves as a container that " +
     "organizes content into distinct, switchable sections.",
   docFolder: "Tabs",
+  optimization: {
+    childInjectedVars: ["$header"],
+  },
   props: {
     label: dLabel(),
     headerTemplate: dComponent("This property allows the customization of the TabItem header."),

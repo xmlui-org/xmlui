@@ -30,9 +30,6 @@ const COMP = "Checkbox";
 
 export const CheckboxMd = createMetadata({
   status: "stable",
-  optimization: {
-    childInjectedVars: ["$checked", "$setChecked"],
-  },
   description:
     "`Checkbox` allows users to make binary choices with a clickable box that shows " +
     "checked/unchecked states. It's essential for settings, preferences, multi-select " +
@@ -44,6 +41,9 @@ export const CheckboxMd = createMetadata({
     input: {
       description: "The checkbox input area.",
     },
+  },
+  optimization: {
+    childInjectedVars: ["$checked", "$setChecked"],
   },
   props: {
     indeterminate: dIndeterminate(toggleDefaultProps.indeterminate),

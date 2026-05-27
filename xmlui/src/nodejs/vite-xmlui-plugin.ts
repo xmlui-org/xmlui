@@ -32,7 +32,7 @@ import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
 import { verifyComponentDef } from "../components-core/type-contracts";
 import type { ComponentDef, ComponentMetadata, OptimizerMetadataView } from "../abstractions/ComponentDefs";
-import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
+import { metadataRegistry } from "../language-server/metadataRegistry";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
@@ -136,7 +136,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   const typeContractMode: AnalyzeMode = pluginOptions.typeContracts ?? "warn";
   const typeContractRegistry =
     pluginOptions.typeContractRegistry ??
-    new Map(Object.entries(collectedComponentMetadata) as [string, ComponentMetadata][]);
+    new Map(Object.entries(metadataRegistry) as [string, ComponentMetadata][]);
   // Dedupe cycle reports across multiple transform calls / HMR within a
   // single dev-server lifetime, so the same cycle is not warned twice.
   const reportedCycles = new Set<string>();
@@ -184,7 +184,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         // (extensionMetadata is checked before getOptimizerMetadata). Warn explicitly so
         // a typo like declaring `List` in an extension doesn't quietly override
         // the built-in metadata that real XMLUI markup depends on.
-        if (key in coreComponentMetadata || key in (collectedComponentMetadata as object)) {
+        if (key in coreComponentMetadata || key in (metadataRegistry as object)) {
           console.warn(
             `[xmlui] optimizerSourceDirs: extension component "${key}" shadows a built-in; the built-in optimizer metadata will be ignored.`,
           );

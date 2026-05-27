@@ -24,9 +24,6 @@ const RGOption = `RadioGroupOption`;
 
 export const RadioGroupMd = createMetadata({
   status: "stable",
-  optimization: {
-    childInjectedVars: ["$checked", "$setChecked"],
-  },
   description:
     "`RadioGroup` creates a mutually exclusive selection interface where users can " +
     "choose only one option from a group of radio buttons. It manages the selection " +
@@ -39,6 +36,9 @@ export const RadioGroupMd = createMetadata({
     label: {
       description: "The label displayed for the radio group.",
     }
+  },
+  optimization: {
+    childInjectedVars: ["$checked", "$setChecked"],
   },
   props: {
     initialValue: {

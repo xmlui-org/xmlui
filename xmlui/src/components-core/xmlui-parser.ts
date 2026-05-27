@@ -2,8 +2,7 @@ import type { ComponentDef, CompoundComponentDef, OptimizerMetadataView } from "
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { computeUsesForTree } from "./optimization/computedUses";
-import { coreComponentMetadata } from "./coreComponentMetadata";
-import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
+import { getOptimizerMetadata } from "./optimization/metadataLookup";
 import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText } from "../parsers/xmlui-parser/parser";
 import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";
@@ -13,20 +12,13 @@ import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptP
 import type { ModuleErrors, CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { DocumentCursor } from "../language-server/base/text-document";
 
-// Optimizer-metadata lookup used as the default for parser-driven
-// computeUsesForTree calls AND by the Vite plugin's extension-metadata
-// fallback. Intentionally NOT shared with
-// `optimization/metadataLookup.ts#getOptimizerMetadata`: that helper reads from
-// the live `components/collectedComponentMetadata.ts` barrel which transitively
-// imports every `.tsx` component file. The language-server (and any other
-// pure-Node consumer of `xmlui-parser`) cannot resolve those `.tsx` imports, so
-// we read the static `xmlui-metadata-generated.js` snapshot here instead.
-export function defaultMetadataLookup(type: string): OptimizerMetadataView | undefined {
-  if (type in coreComponentMetadata) {
-    return coreComponentMetadata[type];
-  }
-  return collectedComponentMetadata[type];
-}
+// Re-export the single shared lookup as `defaultMetadataLookup` so that the
+// Vite plugin and any other existing caller keeps working without changes.
+// `getOptimizerMetadata` reads from `metadataRegistry` (Node-safe), which is
+// populated by `collectedComponentMetadata.ts` in browser/test contexts and
+// falls back to the build-time snapshot in pure-Node contexts (language-server,
+// Vite build). Both paths now read from the same object — issue #13 resolved.
+export { getOptimizerMetadata as defaultMetadataLookup };
 
 interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;
@@ -74,7 +66,7 @@ export function xmlUiMarkupToComponent(
     const warnings: string[] = [];
     const component = nodeToComponentDef(node, getText, fileId, preResolvedImports, warnings, cursor);
     if (component) {
-      computeUsesForTree(component as ComponentDef, metadataLookup ?? defaultMetadataLookup);
+      computeUsesForTree(component as ComponentDef, metadataLookup ?? getOptimizerMetadata);
     }
     const transformResult = { component, errors: [], warnings };
     return transformResult;

@@ -38,15 +38,15 @@ const filteredValidationSeverityValues = validationSeverityValues.filter(
 export const FormItemMd = createMetadata({
   status: "stable",
   allowArbitraryProps: true,
-  optimization: {
-    childInjectedVars: ["$value", "$setValue", "$validationResult"],
-  },
   description:
     "`FormItem` wraps individual input controls within a `Form`, providing data " +
     "binding, validation, labeling, and layout functionality. It connects form " +
     "controls to the parent form's data model and handles validation feedback " +
     "automatically. " +
     "**Note:** `FormItem` must be used inside a `Form` component.",
+  optimization: {
+    childInjectedVars: ["$value", "$setValue", "$validationResult"],
+  },
   props: {
     bindTo: {
       description:

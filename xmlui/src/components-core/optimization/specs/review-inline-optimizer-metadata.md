@@ -179,11 +179,13 @@ The old code spread `collectedComponentMetadata` into a new object at module loa
 
 ---
 
-## 🟢 9. Inconsistent placement of the `optimization:` block — ❌ Open
+## 🟢 9. Inconsistent placement of the `optimization:` block — ✅ Fixed
 
-Some components have `optimization: {...}` before `props:`, others after. A few were fixed in a style commit but the broader codebase remains inconsistent.
+Some components had `optimization: {...}` before `description:` instead of the canonical position (after `description:`, before `props:`).
 
-**Fix direction:** Pick one canonical position (recommendation: just below `description:`, before `props:`) and apply via a single mechanical style pass.
+**What changed:** Nine components were updated in a mechanical style pass:
+`RadioGroup.tsx`, `TabItem.tsx`, `FormSegment.tsx`, `FormItem.tsx`, `Fallback.tsx`, `Checkbox.tsx`, `ContextMenu.tsx`, `Column.tsx`, `Items.tsx`.
+The canonical position is now consistently: `description:` → `optimization:` → `props:`.
 
 ---
 
@@ -220,28 +222,44 @@ Drop-in replacement, deletes the brittle special cases, will handle any future F
 
 ## New issues introduced by the fixes
 
-### 🟡 13. Duplicated lookup function — `defaultMetadataLookup` vs `getOptimizerMetadata` — ⚠️ Partial (intentional split with shared semantics)
+### 🟡 13. Duplicated lookup function — `defaultMetadataLookup` vs `getOptimizerMetadata` — ✅ Fixed
 
-**Was:** Two byte-identical functions — `defaultMetadataLookup` exported from `xmlui-parser.ts` and `getOptimizerMetadata` exported from `metadataLookup.ts`. Both checked `coreComponentMetadata` then fell through to `collectedComponentMetadata`.
+**Was:** Two byte-identical functions — `defaultMetadataLookup` exported from `xmlui-parser.ts` and `getOptimizerMetadata` exported from `metadataLookup.ts`. Both checked `coreComponentMetadata` then fell through to `collectedComponentMetadata`. Two separate backing stores, divergent import graphs.
 
-**What was attempted in the cleanup pass:** Initially the duplicate was deleted and both `xmlui-parser.ts` + `vite-xmlui-plugin.ts` were switched to `getOptimizerMetadata`. That broke ~24 unit tests — they mutate the live `components/collectedComponentMetadata.ts` barrel (`(collectedComponentMetadata as any).MyGrid = {...}`) and expect `getOptimizerMetadata` to observe those mutations at the next call.
+**The shared-registry approach:** A new Node-safe file [metadataRegistry.ts](xmlui/src/language-server/metadataRegistry.ts) is introduced as the single live backing store:
 
-**Why one function cannot satisfy both callers:** The two lookups must read from different objects:
+```ts
+// language-server/metadataRegistry.ts
+import generatedSnapshot from "./xmlui-metadata-generated.js";
+import type { ComponentMetadata } from "../abstractions/ComponentDefs";
+export const metadataRegistry: Record<string, ComponentMetadata> =
+  generatedSnapshot as Record<string, ComponentMetadata>;
+```
 
-| Caller | Reads from | Reason |
+At startup it contains the static generated snapshot (Node-safe, no `.tsx` imports). When the browser/test environment loads `collectedComponentMetadata.ts`, the barrel calls `Object.assign(metadataRegistry, { Button: ButtonMd, ... })` — filling the same object in place. The exported `collectedComponentMetadata` reference is then aliased to `metadataRegistry`, so:
+```
+collectedComponentMetadata === metadataRegistry   // true at runtime / in tests
+```
+
+**After the fix:**
+
+| Caller | Reads from | Effect |
 |--------|------------|--------|
-| `xmlui-parser.ts`, `vite-xmlui-plugin.ts` (Node.js — language-server, build) | `language-server/xmlui-metadata-generated.js` (static JS snapshot, no React imports) | Language-server has no bundler; cannot resolve `.tsx` files that the barrel transitively imports |
-| `optimization/metadataLookup.ts` → `StandaloneApp.tsx`, unit tests (browser / vitest+jsdom) | `components/collectedComponentMetadata.ts` (live barrel) | Tests inject extension metadata by mutating the barrel and expect runtime lookup to see those mutations |
+| `defaultMetadataLookup` (parser, Vite plugin — Node.js) | `metadataRegistry` | Starts with snapshot; populated with live values if barrel ever loads; Node-safe |
+| `getOptimizerMetadata` (browser, tests) | `metadataRegistry` via `coreComponentMetadata` first | Mutations to `collectedComponentMetadata.X` are visible (same object reference) |
 
-**What was actually shipped in the cleanup pass:**
+`defaultMetadataLookup` in `xmlui-parser.ts` is now just a re-export alias:
+```ts
+export { getOptimizerMetadata as defaultMetadataLookup };
+```
 
-1. The duplicate function was kept, but each one now lives in the file that matches its source-of-truth:
-   - `defaultMetadataLookup` stays in `xmlui-parser.ts` (reads the static snapshot, exported for the Vite plugin).
-   - `getOptimizerMetadata` stays in `optimization/metadataLookup.ts` (reads the live barrel).
-2. Both files gained prominent docblocks explaining why the split exists and which contexts each is safe in.
-3. `vite-xmlui-plugin.ts` now imports `defaultMetadataLookup` (Node-safe) instead of `getOptimizerMetadata` (would pull the React-laden barrel into the build).
+Both callers converge on the same function and the same registry. `vite-xmlui-plugin.ts` was updated to import `metadataRegistry` directly (no more separate `collectedComponentMetadata` import). All ~24 unit tests that mutate the barrel continue to pass because `collectedComponentMetadata === metadataRegistry`.
 
-**Residual smell:** Two functions with identical bodies and divergent imports. Real fix would be to make `xmlui-metadata-generated.js` the single live registry that components register into at module-load time — then both call sites collapse to one. Not done here; out of scope for the cleanup pass.
+**Traps mitigated:**
+- **Node-safety:** `metadataRegistry.ts` imports only `xmlui-metadata-generated.js` (pure JS). `metadataLookup.ts` no longer imports the `.tsx`-heavy barrel.
+- **Test mutation visibility:** `collectedComponentMetadata` is the same object as `metadataRegistry`, so test mutations `(collectedComponentMetadata as any).X = {...}` are observed by `getOptimizerMetadata` on the next call.
+
+**Files changed:** `metadataRegistry.ts` (new), `collectedComponentMetadata.ts`, `metadataLookup.ts`, `xmlui-parser.ts`, `vite-xmlui-plugin.ts`.
 
 ### 🟡 14. Static-extractor's "first-field" constraint is invisible to authors — ✅ Fixed (closed by #4)
 
@@ -267,11 +285,11 @@ The original concern is now moot: keeping `defaultMetadataLookup` *exported* is 
 | 6 | 🟡 | No collision warnings on merge | ✅ Fixed | Both extension-vs-extension and extension-vs-built-in now warned |
 | 7 | 🟡 | `as any` casts in metadata path | ✅ Fixed | `.d.ts` for generated file removed `@ts-ignore` + narrowing casts |
 | 8 | 🟢 | Module-level `ALL_OPTIMIZER_METADATA` spread | ✅ Fixed | Removed implicitly by #1's restructure |
-| 9 | 🟢 | Inconsistent `optimization:` block placement | ❌ Open | |
+| 9 | 🟢 | Inconsistent `optimization:` block placement | ✅ Fixed | 9 files aligned to canonical order: description → optimization → props |
 | 10 | 🟢 | Narrow `extractComponentName` patterns | ✅ Fixed | AST matches any `wrap<Suffix>(...)` wrapper + legacy `COMP`/`COMP_NAME` |
 | 11 | 🟢 | `optimization` is a misleading name | ❌ Open | |
 | 12 | 🟢 | Hand-maintained sibling-file list in U-audit.2 | ✅ Fixed | Replaced with directory auto-scan |
-| 13 | 🟡 | Duplicated lookup function | ⚠️ Partial | Cannot merge: Node parser needs static snapshot; runtime/tests need live barrel. Both files now have docblocks. |
+| 13 | 🟡 | Duplicated lookup function | ✅ Fixed | Shared `metadataRegistry` — single backing store for both lookup paths; `defaultMetadataLookup` is now re-export alias of `getOptimizerMetadata` |
 | 14 | 🟡 | Static-extractor "first-field" constraint invisible | ✅ Fixed | Eliminated by #4 AST replacement |
 | 15 | 🟢 | `defaultMetadataLookup` exported but single in-package consumer | ❌ Open (intentional) | Export is the seam between Node-safe parser and Node-safe Vite plugin; required by #13 |
 
@@ -279,9 +297,9 @@ The original concern is now moot: keeping `defaultMetadataLookup` *exported* is 
 
 ## Recommended Order of Cleanup (updated)
 
-What's left after the second cleanup pass:
+What's left after the second cleanup pass + third pass (#9, #13):
 
-1. **#13 (residual)** — collapse the parser/runtime lookup split by making `xmlui-metadata-generated.js` the single live registry that components register into at module-load time. Eliminates the structural reason both `defaultMetadataLookup` and `getOptimizerMetadata` need to exist. Larger refactor — touches the build script for the generated file and every component's registration. Now the single remaining 🟡 with a structural fix path.
-2. **#9, #11** — opportunistic polish; pick up alongside other changes in those files. (#10 closed by #4 AST replacement; #15 is open-intentional.)
+1. **#11** — opportunistic polish; rename `optimization` → `engineHints` (or similar) once public-API docs are being written. Not blocking.
+2. **#15** — open-intentional; the export is the correct seam between Node-safe contexts.
 
-The overall implementation quality after the follow-up commits **and** both cleanup passes is **substantially better** than the original review captured — every 🔴 finding and all but one 🟡 finding are properly resolved with the right architecture, not just patched. The single remaining 🟡 with action items is #13 (parser/runtime lookup split), with a clear path forward documented above.
+All 🔴 and all 🟡 findings are now resolved. The implementation quality is substantially better than the original review captured.

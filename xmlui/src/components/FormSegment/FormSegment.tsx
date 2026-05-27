@@ -7,9 +7,6 @@ const COMP = "FormSegment";
 
 export const FormSegmentMd = createMetadata({
   status: "experimental",
-  optimization: {
-    childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"],
-  },
   description:
     "`FormSegment` groups a subset of form fields within a `Form` and exposes " +
     "segment-scoped context variables for the fields it contains. Use it to build " +
@@ -17,6 +14,9 @@ export const FormSegmentMd = createMetadata({
     "data and validation state without creating a nested form. Children are automatically " +
     'wrapped in a VStack (or HStack if `orientation="horizontal"`) with layout properties ' +
     "transposed from the segment.",
+  optimization: {
+    childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"],
+  },
   props: {
     label: {
       description:
