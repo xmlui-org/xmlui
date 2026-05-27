@@ -19,6 +19,8 @@ export const DrawerMd = createMetadata({
     "It can be opened and closed programmatically using its API methods `open()` and `close()`. " +
     "An optional backdrop dims the content behind the drawer.",
 
+  isImplicitContainerByDefault: true,
+
   props: {
     position: {
       description:
