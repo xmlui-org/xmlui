@@ -15,8 +15,14 @@ import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptP
 import type { ModuleErrors, CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { DocumentCursor } from "../language-server/base/text-document";
 
-// Inline lookup: core-internal components (DataLoader, ExternalDataLoader) are
-// checked first; public components fall through to the generated registry.
+// Optimizer-metadata lookup used as the default for parser-driven
+// computeUsesForTree calls AND by the Vite plugin's extension-metadata
+// fallback. Intentionally NOT shared with
+// `optimization/metadataLookup.ts#getOptimizerMetadata`: that helper reads from
+// the live `components/collectedComponentMetadata.ts` barrel which transitively
+// imports every `.tsx` component file. The language-server (and any other
+// pure-Node consumer of `xmlui-parser`) cannot resolve those `.tsx` imports, so
+// we read the static `xmlui-metadata-generated.js` snapshot here instead.
 export function defaultMetadataLookup(type: string): OptimizerMetadataView | undefined {
   if (type in coreComponentMetadata) {
     return (coreComponentMetadata as Record<string, OptimizerMetadataView>)[type];

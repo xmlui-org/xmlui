@@ -34,14 +34,14 @@ export function createMetadata<
     optimization?: OptimizerInput;
   },
 ): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
-  const { optimization, ...rest } = metadata as any;
+  const { optimization, ...rest } = metadata;
 
   if (!optimization) {
     return rest as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
   }
 
   // Spread isImplicitContainerByDefault, childInjectedVars, unstableChildInjectedVars into the result
-  return { ...rest, ...(optimization as OptimizerInput) } as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
+  return { ...rest, ...optimization } as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
 }
 
 export function d(

@@ -2,6 +2,37 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 /**
+ * Static-extractor authoring contract — READ THIS BEFORE EDITING `events: {}`.
+ *
+ * The Vite plugin reads optimizer metadata from `.tsx` source files at build
+ * time via regex, not via a real TypeScript AST. Two source-level constraints
+ * follow from that — violate them and the optimizer will silently strip
+ * variables from event handlers at build time without any compile-time error:
+ *
+ *   1. Per-event `injectedVars` MUST be the **first** field in its event
+ *      entry. The back-tracking regex below looks for the nearest enclosing
+ *      `eventName: {` with no `{` or `}` between it and `injectedVars:`.
+ *      Any object-literal field appearing before `injectedVars` (e.g.
+ *      `description: "..."`, `parameters: { ... }`) breaks the back-track.
+ *
+ *      ✅ submit: { injectedVars: ["$data"], description: "...", signature: "..." }
+ *      ❌ submit: { description: "...", injectedVars: ["$data"] }
+ *
+ *   2. `childInjectedVars` / `unstableChildInjectedVars` are matched as the
+ *      first occurrence of their literal name in the file. Don't reference
+ *      those identifiers in comments or unrelated code above the
+ *      `optimization` block.
+ *
+ * The runtime path uses `ComponentMetadata` directly via `createMetadata`, so
+ * a violation here will pass type-check, pass tests, and only manifest in
+ * downstream apps consuming the Vite plugin with `optimizerSourceDirs`.
+ *
+ * Long-term fix: swap this regex extractor for `@babel/parser` walking
+ * `createMetadata({...})` as a real AST. Until that lands, the contract above
+ * is the line of defence.
+ */
+
+/**
  * Optimizer-relevant subset extracted from a component source file.
  * After extraction, these fields mirror what createMetadata spreads into ComponentMetadata.
  */

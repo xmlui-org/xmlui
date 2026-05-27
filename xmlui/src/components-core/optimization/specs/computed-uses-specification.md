@@ -83,38 +83,166 @@ To avoid "Variable not found in scope" errors, the **full parent state** is pass
 ### Lexical Scoping (Immutable Scope Propagation Mechanism)
 Instead of hardcoded lists of "special" variables, the optimizer uses metadata to build the lexical scope during AST traversal:
 - **Component Scope:** Container components (like `List`, `Table`, `ModalDialog`) declare `childInjectedVars`. All expressions in children of these components automatically filter these variables.
-- **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars`. Expressions inside a specific handler filter these variables. To reduce boilerplate in `optimizer-metadata.ts`, the `withInjectedContext` utility allows specifying `eventsInheritChildVars`, which automatically copies `childInjectedVars` into the `injectedVars` of the specified event names (e.g., passing `$data` to `Form`'s `submit` event).
+- **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars` inline in the component's `createMetadata()` call, in the `events[eventName].injectedVars` field. Expressions inside a specific handler filter these variables. Previously a `withInjectedContext`/`eventsInheritChildVars` utility in a central registry auto-copied child vars to event scopes; those fields are now written out explicitly per-event in each component file.
 - **Shadowing:** Metadata-driven scoping allows local variables (like `$queryParams` in `onFetch`) to naturally shadow global ones (like router `$queryParams`), preventing false parent dependencies.
 
-### Metadata Duplication: `OPTIMIZER_METADATA.childInjectedVars` vs. `metadata.contextVars` (intentional)
+### Inline Optimizer Fields in `ComponentMetadata` (single declaration, dual path)
 
-The same `$`-variable names appear in multiple places for the same component type. This is **not an oversight** — it is architecturally required.
+Optimizer-relevant fields — `childInjectedVars`, `unstableChildInjectedVars`,
+`isImplicitContainerByDefault`, and per-event `injectedVars` — are declared **directly
+in each component's `createMetadata()` call**. There is no separate central registry.
 
-#### Why `OPTIMIZER_METADATA` cannot be removed
+#### Source-file shape: the `optimization: {}` block
 
-The Vite plugin (`xmlui-parser.ts`) runs at **build time in pure Node.js**. It calls `computeUsesForTree(component, lookupOptimizerMetadata)` where `lookupOptimizerMetadata` reads directly from `OPTIMIZER_METADATA`. Component `.tsx` files cannot be imported in this context — they transitively import React, SCSS files, and DOM globals that are unavailable in Node.js.
+`createMetadata` accepts an optional `optimization: {}` group for component-level optimizer
+fields. Per-event `injectedVars` is **not** part of that group — it sits inline on each event
+entry, beside `description` / `signature`. The `OptimizerInput` type (in `metadata-helpers.ts`):
 
-This means `OPTIMIZER_METADATA` is the **only** source the Vite plugin path can read. Every `childInjectedVars`, `isImplicitContainerByDefault`, and per-event `injectedVars` entry must be present there or the build-time optimizer will misclassify child dependencies for that component.
+```typescript
+type OptimizerInput = {
+  isImplicitContainerByDefault?: boolean;
+  childInjectedVars?: readonly string[];
+  unstableChildInjectedVars?: readonly string[];
+};
+```
 
-#### Why `metadata.contextVars` also exists (and why it is NOT a drift anchor)
+At call time, `createMetadata` spreads `optimization`'s keys into the result `ComponentMetadata`:
+component-level optimizer fields become top-level fields of the metadata object the runtime
+sees. The `events:` block passes through unchanged (its `injectedVars` is already in its final
+position).
 
-`metadata.contextVars` (`Record<string, ComponentPropertyMetadata>`) serves a different audience: the **Language Server** and documentation tooling. It stores descriptions, types, and availability of `$`-prefixed template variables — richer information than the bare string arrays in `OPTIMIZER_METADATA`.
+**Canonical example — a Form with both component-level and per-event injected vars:**
 
-Important: `metadata.contextVars` is **intentionally a subset** of `OPTIMIZER_METADATA.childInjectedVars`. Components document only "user-visible" context variables (those a developer would reference in markup), not internal ones like `$cell`, `$colIndex`, `$isFirst`, etc. This means `contextVars` cannot be used as a reliable bidirectional drift anchor — the check `childInjectedVars ⊆ contextVars.keys` would fail for many components by design.
+```typescript
+// xmlui/src/components/Form/Form.tsx
+export const FormMd = createMetadata({
+  status: "stable",
+  description: "...",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$data"],
+  },
+  props: { /* ... */ },
+  events: {
+    submit:       { description: "...", signature: "...", injectedVars: ["$data"] },
+    cancel:       { description: "...", signature: "...", injectedVars: ["$data"] },
+    submitFailed: { description: "...", signature: "...", injectedVars: ["$data"] },
+    // ...
+  },
+});
+```
 
-Runtime metadata enrichment (`childInjectedVars`, `isImplicitContainerByDefault`, `unstableChildInjectedVars`) is now handled automatically by `mergeOptimizerInjectedVars` in `wrapComponent`/`wrapCompound` at registration time. Component `.tsx` files no longer need any manual spread — `OPTIMIZER_METADATA` is the single declaration point and the runtime descriptor is auto-enriched.
+**Where each field lives:**
 
-#### The three-source picture for a component like `List`
+| Field | Position in source | Position at runtime (after `createMetadata`) |
+|-------|-------------------|----------------------------------------------|
+| `isImplicitContainerByDefault` | Inside `optimization: {}` | Top-level of `ComponentMetadata` |
+| `childInjectedVars` | Inside `optimization: {}` | Top-level of `ComponentMetadata` |
+| `unstableChildInjectedVars` | Inside `optimization: {}` | Top-level of `ComponentMetadata` |
+| `events.{name}.injectedVars` | Inside `events.{name}` (alongside `description`) | Same — unchanged |
 
-| Source | Who reads it | What it contains |
-|--------|-------------|-----------------|
-| `OPTIMIZER_METADATA.List.childInjectedVars` | Vite plugin (`lookupOptimizerMetadata`) | `["$item", "$itemIndex", ...]` — build-time optimizer |
-| `metadata.childInjectedVars` (auto-enriched by `mergeOptimizerInjectedVars`) | Standalone runtime (`resolveOptimizerMetadata`) | same array — runtime optimizer |
-| `metadata.contextVars` | Language Server, drift test, `validateInjectedVars` | `{ $item: d("..."), ... }` — documentation (intentional subset) |
+**Why `injectedVars` sits inline with the event (not inside `optimization`):** it is part of
+the event's API contract (which variables the handler receives), not just an optimizer hint.
+Keeping it alongside `description`/`signature` makes each event entry self-contained — one
+place to look when adding/changing an event's API. This also keeps the merge step inside
+`createMetadata` trivial (a single spread; no per-event merging).
 
-All three must agree. The `renderer-metadata-drift.test.ts` CI test validates this agreement for renderer slots; `validateInjectedVars` validates it at runtime.
+#### The Vite plugin path: `static-extractor.ts`
 
-#### `...Object.keys(metadata?.contextVars ?? {})` in `computedUses.ts`
+The Vite plugin (`vite-xmlui-plugin.ts`) and the parser it calls (`xmlui-parser.ts`) both
+run in pure Node.js and cannot import React component files. The plugin uses
+`static-extractor.ts` to extract optimizer fields at build time by reading
+component source files as plain text:
+
+- `extractOptimizerMetadataFromDir(dir)` globs `*.tsx` files, reads each as a string, and
+  extracts `childInjectedVars`, `isImplicitContainerByDefault`, `unstableChildInjectedVars`,
+  and per-event `injectedVars` via regex (the same field names `createMetadata` accepts).
+- The Vite plugin accepts `optimizerSourceDirs?: string[]` to cover extension packages.
+  Without this option, extension package components in Vite mode over-subscribe (graceful
+  degradation).
+- **Static-literal constraint:** all optimizer values must be **static string literal arrays**
+  in source (no computed values, no spread). This is the established convention.
+- **Field-order constraint (per-event `injectedVars` only):** inside an event entry,
+  `injectedVars` must be the **first field** — i.e. no other inline object literal (`parameters: {...}`,
+  `signature: {...}`, etc.) may appear between `eventName: {` and `injectedVars:` in source.
+  The extractor uses a regex back-tracking strategy `(\w+)\s*:\s*\{[^{}]*$` to attribute
+  `injectedVars` to its enclosing event name; an intermediate `{` block would cause the
+  attribution to land on the wrong name. There is no test that catches a violation today —
+  break this rule and the optimizer silently strips the event's `$`-vars at Vite build time.
+  Documented here because the only other mention is a single comment in `static-extractor.ts`.
+
+**Precedence chain when `optimizerSourceDirs` is provided.** The plugin composes:
+
+```
+extensionMetadata[type]     ← scanned from optimizerSourceDirs (last-dir-wins on collision)
+  ?? coreComponentMetadata  ← engine-internal (DataLoader, ExternalDataLoader)
+  ?? collectedComponentMetadata  ← public components
+```
+
+Extension keys colliding with each other emit a `console.warn(...; last-dir-wins.)`.
+**Extension keys that shadow a built-in (core or public) component currently do NOT warn** —
+an extension package that exports a `List` will silently override the built-in `List`
+metadata in the optimizer's view. This is a known gap; users are expected to namespace
+extension component types.
+
+#### The Standalone runtime path: `getOptimizerMetadata`
+
+`getOptimizerMetadata` (in `optimization/metadataLookup.ts`) is the unified lookup for
+Standalone mode and all non-Vite callers. It searches two registries in order:
+
+1. **`coreComponentMetadata`** (`components-core/coreComponentMetadata.ts`) — engine-internal
+   components (`DataLoader`, `ExternalDataLoader`) that are intentionally absent from the
+   public registry. `DataLoader` metadata lives in the separate `loader/DataLoaderMd.ts` file
+   to avoid circular imports.
+2. **`collectedComponentMetadata`** — all public components registered via `wrapComponent` /
+   `wrapCompound`.
+
+`StandaloneApp.resolveOptimizerMetadata` delegates to `getOptimizerMetadata`:
+
+```ts
+// StandaloneApp.tsx
+function resolveOptimizerMetadata(type: string) {
+  return getOptimizerMetadata(type);
+}
+```
+
+`xmlui-parser.defaultMetadataLookup` currently **duplicates** the same lookup body inline
+(`if (type in coreComponentMetadata) … else collectedComponentMetadata[type]`) rather than
+calling `getOptimizerMetadata`. Both produce the same result — the duplication is a known
+techdebt; either site should be refactored to import the shared `getOptimizerMetadata`.
+
+#### `OptimizerMetadataView` — typed lookup contract
+
+`OptimizerMetadataView` (in `ComponentDefs.ts`) is the strict subset of `ComponentMetadata`
+the optimizer reads:
+
+```typescript
+export type OptimizerMetadataView = {
+  isImplicitContainerByDefault?: boolean;
+  childInjectedVars?: readonly string[];
+  unstableChildInjectedVars?: readonly string[];
+  /** Only the keys of contextVars are read (for extension-package components). */
+  contextVars?: Record<string, unknown>;
+  events?: Record<string, { description?: string; injectedVars?: readonly string[] }>;
+};
+```
+
+All lookup functions are typed `(type: string) => OptimizerMetadataView | undefined`.
+This prevents accidental coupling to unrelated metadata fields and documents exactly
+what the optimizer may read.
+
+#### `metadata.contextVars` — documentation subset (intentional)
+
+`metadata.contextVars` (`Record<string, ComponentPropertyMetadata>`) serves the
+**Language Server** and documentation tooling. It stores descriptions, types, and
+availability of `$`-prefixed template variables.
+
+It is **intentionally a subset** of `metadata.childInjectedVars` — components document
+only "user-visible" context variables (those a developer would reference in markup), not
+internal ones like `$cell`, `$colIndex`, `$isFirst`, etc. The optimizer reads
+`childInjectedVars`; `contextVars` is documentation-only.
+
+#### Safety-net spread in `computedUses.ts` (extension package support)
 
 ```typescript
 const childInjected = [
@@ -124,15 +252,29 @@ const childInjected = [
 ];
 ```
 
-For **core components** this third spread is redundant — `childInjectedVars` already contains the same keys (auto-enriched by `mergeOptimizerInjectedVars` at registration). Its purpose is extension packages:
+For **core components** the third spread is redundant — `childInjectedVars` already contains
+the same keys. Its purpose is extension packages:
 
-Extension packages (`xmlui-masonry`, `xmlui-react-flow`, `xmlui-grid-layout`, etc.) have **no entry in `OPTIMIZER_METADATA`** (adding them would create a reverse dependency — core must not know about packages). In Standalone mode, `resolveOptimizerMetadata` returns the full component metadata including `contextVars`. Without this third spread, `$item` inside a `<Masonry>` item template would be counted as an external parent dependency, causing unnecessary re-renders.
+Extension packages (`xmlui-masonry`, `xmlui-react-flow`, `xmlui-grid-layout`, etc.) may not
+have been added to `optimizerSourceDirs` (or Standalone runtime may be used without Vite).
+In Standalone mode, `getOptimizerMetadata` → `collectedComponentMetadata` returns the full
+registered metadata including `contextVars`. Without this third spread, `$item` inside a
+`<Masonry>` item template would be counted as an external parent dependency, causing
+unnecessary re-renders.
 
-In Vite plugin mode, extension package components have no `OPTIMIZER_METADATA` entry and no `contextVars` (the Vite path only sees `OPTIMIZER_METADATA`), so they over-subscribe — this is documented as acceptable graceful degradation until a runtime registration API for extension packages is implemented.
+In Vite plugin mode with no `optimizerSourceDirs` for the package, extension package
+components have neither `childInjectedVars` nor `contextVars`, so they over-subscribe —
+documented as acceptable graceful degradation.
 
-#### ⚠ Do not remove `childInjectedVars` from `OPTIMIZER_METADATA`
+#### The two-source picture for a component like `List`
 
-It may be tempting to remove `childInjectedVars` from `OPTIMIZER_METADATA` entries that already document the same variables in `metadata.contextVars`. **This breaks the Vite plugin path.** The `contextVars` reading in `computedUses.ts` only helps Standalone mode; the Vite plugin receives `undefined` for `metadata.contextVars` because `lookupOptimizerMetadata` returns only `OPTIMIZER_METADATA` entries which never contain `contextVars`. Removing `childInjectedVars` from OPTIMIZER_METADATA would cause the Vite-built app's optimizer to misclassify `$item` etc. as parent-scope dependencies.
+| Source | Who reads it | What it contains |
+|--------|-------------|------------------|
+| `metadata.childInjectedVars` (inline in `createMetadata`) | Vite plugin (via `static-extractor.ts`) AND Standalone (`getOptimizerMetadata`) | `["$item", "$itemIndex", ...]` — both optimizer paths |
+| `metadata.contextVars` | Language Server, drift test, `validateInjectedVars` | `{ $item: d("..."), ... }` — documentation (intentional subset) |
+
+The `renderer-metadata-drift.test.ts` CI test validates alignment between renderer slots
+and inline `childInjectedVars`; `validateInjectedVars` validates it at runtime.
 
 ### Lexical Scoping at Runtime: Local Vars Win over Outer Scope (`useVars`)
 
@@ -245,21 +387,19 @@ This ensures each traversal starts with clean state. The current pass becomes th
 
 ## 6. Optimization Guards (Validation)
 
-### Optimizer Metadata Auto-Injection (`mergeOptimizerInjectedVars`)
+### Inline Optimizer Fields — no merge step required
 
-Both `wrapComponent` and `wrapCompound` call `mergeOptimizerInjectedVars(type, metadata)` as their **first step** before constructing the renderer closure (lines 560 and 1104 in `wrapComponent.tsx`). This function (lines 14–46) bridges `OPTIMIZER_METADATA` into the runtime `ComponentMetadata`, filling gaps:
-
-- If `OPTIMIZER_METADATA[type].childInjectedVars` exists but `metadata.childInjectedVars` does not → copies it in.
-- For each event in `OPTIMIZER_METADATA[type].events`: if the component already exposes that event but has no `injectedVars` declared → copies the optimizer's `injectedVars` in.
-
-This means `validateInjectedVars` will pass for every component registered via `wrapComponent`/`wrapCompound` even if the component author did not add any metadata spreading. **`OPTIMIZER_METADATA` is the single source of truth; the runtime descriptor is auto-enriched at registration by `mergeOptimizerInjectedVars`.**
+Optimizer fields (`childInjectedVars`, `isImplicitContainerByDefault`, `unstableChildInjectedVars`,
+event `injectedVars`) are declared directly in each component's `createMetadata()` call.
+The `ComponentMetadata` object passed to `wrapComponent` already contains all optimizer
+fields. `validateInjectedVars` reads them directly; no enrichment step at registration time.
 
 ### Runtime Validation (`validateInjectedVars`) — Layer 4 (Runtime Hard-Fail)
 To protect against developer error (forgetting to update metadata when adding new injected variables), a runtime check exists in `__DEV__` mode.
-- **`wrapComponent.tsx`** (lines 866, 887): calls `validateInjectedVars(node.type, metadata, contextVars)` — *without* `eventName` — whenever a renderer-slot callback injects contextVars into a `MemoizedItem`. This validates against `metadata.childInjectedVars` and `metadata.contextVars`.
-- **`ComponentAdapter.tsx`** (line 395): calls `validateInjectedVars(safeNode.type, descriptor, actionOptions.context, eventName)` — *with* `eventName` — for event-handler context injections. This validates against `metadata.events[eventName].injectedVars` in addition to the child-level fields.
+- **`wrapComponent.tsx`** (four call sites in renderer-slot/MemoizedItem injection paths): calls `validateInjectedVars(node.type, metadata, contextVars)` — *without* `eventName` — whenever a renderer-slot callback injects contextVars into a `MemoizedItem`. This validates against `metadata.childInjectedVars` and `metadata.contextVars`.
+- **`ComponentAdapter.tsx`**: calls `validateInjectedVars(safeNode.type, descriptor, actionOptions.context, eventName)` — *with* `eventName` — for event-handler context injections. This validates against `metadata.events[eventName].injectedVars` in addition to the child-level fields.
 - If a mismatch is found (a variable starts with `$` but is not declared), a **hard-fail `throw`** is raised in development (gated by `import.meta.env?.DEV`). In production builds the same condition logs a `console.error` instead, so misconfigured extension components keep working with graceful degradation.
-- The thrown error message names the offending `OPTIMIZER_METADATA.<Component>` entry, so the fix is immediate.
+- The thrown error message names the offending component and its inline `createMetadata()` declaration in `<Component>/<Component>.tsx`, so the fix is immediate.
 
 ### Static Drift Check (CI-time) — Layer 2 (Static AST Audit)
 
@@ -267,24 +407,26 @@ To ensure consistency between component implementation and registry declarations
 [`xmlui/tests/components-core/optimization/renderer-metadata-drift.test.ts`](../../../tests/components-core/optimization/renderer-metadata-drift.test.ts)
 performs two types of static analysis:
 
-#### U-audit.1: Authoritative Registry Check
+#### U-audit.1: Renderer contextVars vs. Inline `childInjectedVars` / `metadata.contextVars`
 Statically walks every built-in component's `renderers.{slot}.contextVars`
 declaration and asserts that each `$`-key is also declared in
-`OPTIMIZER_METADATA[type].childInjectedVars` or the component's
+`metadata.childInjectedVars` (inline in `createMetadata`) or the component's
 `metadata.contextVars`. This catches drift at PR time, not at the next E2E
 run. Renderers that compute `contextVars` via a callback cannot be audited
 statically and rely on runtime validation.
 
 #### U-audit.2: Static String-Literal Presence Check
-For every entry in `OPTIMIZER_METADATA` with non-empty `childInjectedVars` or event-level `injectedVars`,
-the test verifies that every declared `$var` actually appears as a string literal somewhere in the component's 
-source files (including `*React.tsx` and related implementation files).
+For every entry in `collectedComponentMetadata + coreComponentMetadata` that has non-empty
+`childInjectedVars`, `unstableChildInjectedVars`, or event-level `injectedVars`, the test
+verifies that every declared `$var` appears as a string literal somewhere in the component's
+source files (including auto-discovered sibling `*.tsx` files in the same directory — no
+hand-maintained special-case list needed).
 
 This check catches the "forgotten variable" drift:
-- Developer adds `$newVar` to `OPTIMIZER_METADATA` but never actually uses it in the component.
-- Catching this ensures the build-time optimizer doesn't reserve names that aren't genuinely local, which could otherwise shadow legitimate parent variables.
+- Developer adds `$newVar` to inline `createMetadata()` but never actually uses it in the component.
+- Catching this ensures the optimizer doesn't reserve names that aren't genuinely local, which could otherwise shadow legitimate parent variables.
 
-Both audits read `.tsx` files as text and use regex extractors, avoiding the overhead of TS compilation or importing React modules.
+Both audits read `.tsx` files as plain text via regex, avoiding the overhead of TS compilation or importing React modules.
 
 ### Framework Globals Filtering
 

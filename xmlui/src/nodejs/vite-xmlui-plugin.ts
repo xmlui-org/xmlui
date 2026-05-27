@@ -19,6 +19,7 @@ import {
   errReportComponent,
   xmlUiMarkupToComponent,
 } from "../components-core/xmlui-parser";
+import { coreComponentMetadata } from "../components-core/coreComponentMetadata";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import { analyze } from "../components-core/analyzer/walker";
 import {
@@ -177,6 +178,15 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         if (key in extensionMetadata) {
           console.warn(
             `[xmlui] optimizerSourceDirs: component "${key}" declared in multiple dirs; last-dir-wins.`,
+          );
+        }
+        // Extension components silently shadow built-ins on lookup
+        // (extensionMetadata is checked before getOptimizerMetadata). Warn explicitly so
+        // a typo like declaring `List` in an extension doesn't quietly override
+        // the built-in metadata that real XMLUI markup depends on.
+        if (key in coreComponentMetadata || key in (collectedComponentMetadata as object)) {
+          console.warn(
+            `[xmlui] optimizerSourceDirs: extension component "${key}" shadows a built-in; the built-in optimizer metadata will be ignored.`,
           );
         }
       }
