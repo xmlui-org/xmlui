@@ -36,6 +36,11 @@ import {
 export const DataLoaderMd = createMetadata({
   status: "stable",
   description: "This component manages data fetching from a web API",
+  optimization: {
+    events: {
+      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
+    },
+  },
   props: {
     method: d("The HTTP method to use"),
     url: d("The URL to fetch data from"),
@@ -55,11 +60,6 @@ export const DataLoaderMd = createMetadata({
     dataType: d("Type of data to fetch (default: json, or csv, sql, or text)"),
     structuralSharing: d("Whether to use structural sharing for the data"),
     mockData: d("Data to return directly without making a network request (for development and testing)"),
-  },
-  optimization: {
-    events: {
-      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
-    },
   },
   events: {
     loaded: d("Event to trigger when the data is loaded"),

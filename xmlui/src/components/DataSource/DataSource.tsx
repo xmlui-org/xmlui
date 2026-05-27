@@ -10,6 +10,11 @@ export const DataSourceMd = createMetadata({
   description:
     "`DataSource` fetches and caches data from API endpoints, versus " +
     "[`APICall`](/docs/reference/components/APICall) which creates, updates or deletes data.",
+  optimization: {
+    events: {
+      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
+    },
+  },
   props: {
     method: {
       description: `Set the HTTP method.`,
@@ -146,11 +151,6 @@ export const DataSourceMd = createMetadata({
         "headers (e.g. third-party APIs with strict CORS `Access-Control-Allow-Headers`).",
       valueType: "boolean",
       defaultValue: "false",
-    },
-  },
-  optimization: {
-    events: {
-      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
     },
   },
   events: {
