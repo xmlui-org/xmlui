@@ -1,7 +1,7 @@
 # TODO: Metadata Protection — Layer 2 (Static AST Audit) + Layer 4 (Runtime Hard-Fail)
 
-**Status:** Layer 4 ✅ Done (2026-05-21). Layer 2 ⚠ TODO.
-**Overall:** Layer 4 (Runtime Hard-Fail) повністю реалізовано — `validateInjectedVars` кидає `throw` в DEV (`import.meta.env?.DEV`) і `console.error` в production. Layer 2 (Static AST Audit) ще TODO.
+**Status:** Layer 4 ✅ Done (2026-05-21). Layer 2 ✅ Done.
+**Overall:** Layer 4 (Runtime Hard-Fail) повністю реалізовано — `validateInjectedVars` кидає `throw` в DEV (`import.meta.env?.DEV`) і `console.error` в production. Layer 2 (Static AST Audit) повністю реалізовано.
 **Created:** 2026-05-21
 **Related specs:**
 - [2026-05-21-lexical-scoping-code-review.md](./2026-05-21-lexical-scoping-code-review.md)
@@ -97,11 +97,11 @@ For each entry in `OPTIMIZER_METADATA` with non-empty `childInjectedVars`:
 For each entry in `OPTIMIZER_METADATA` with per-event `injectedVars`:
 - **Every `$var` in `events[*].injectedVars` MUST appear as a string literal in the component `.tsx` file.**
 
-### Acceptance criteria (TODO)
+### Acceptance criteria
 
-- [ ] (TODO) All current components pass out of the box (no false positives).
-- [ ] (TODO) Intentionally adding `"$bogus"` to `OPTIMIZER_METADATA.List.childInjectedVars` causes the test to fail with a clear message naming the component and the missing key.
-- [ ] (TODO) Test runs in < 200ms as part of the standard test suite (pure file reads, no TS compilation).
+- [x] All current components pass out of the box (no false positives).
+- [x] Intentionally adding `"$bogus"` to `OPTIMIZER_METADATA.List.childInjectedVars` causes the test to fail with a clear message naming the component and the missing key.
+- [x] Test runs in < 200ms as part of the standard test suite (pure file reads, no TS compilation).
 
 ---
 
@@ -137,11 +137,11 @@ Fix: update OPTIMIZER_METADATA.<ComponentType>.<location> in
 - A thrown error in DEV mode surfaces immediately via React error boundary → impossible to ignore.
 - Cost: developer must fix before continuing, which is the whole point.
 
-### Acceptance criteria (TODO)
+### Acceptance criteria
 
-- [ ] (TODO) Removing `$item` from `OPTIMIZER_METADATA.List.childInjectedVars` while `List.tsx` still injects it → app throws on first render of a `List`.
-- [ ] (TODO) Production builds (`import.meta.env.DEV === false`) skip validation entirely (zero runtime cost).
-- [ ] (TODO) Error message names the component, the location (`childInjectedVars` vs `events.<name>.injectedVars`), and the exact diff.
+- [x] Removing `$item` from `OPTIMIZER_METADATA.List.childInjectedVars` while `List.tsx` still injects it → app throws on first render of a `List`.
+- [x] Production builds (`import.meta.env.DEV === false`) skip validation entirely (zero runtime cost).
+- [x] Error message names the component, the location (`childInjectedVars` vs `events.<name>.injectedVars`), and the exact diff.
 
 ---
 

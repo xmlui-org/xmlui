@@ -113,7 +113,6 @@ export const OPTIMIZER_METADATA = {
       "$colIndex",
       "$row",
       "$rowIndex",
-      "$isSelected",
     ],
     perEventVars: {
       contextMenu: ["$item", "$row", "$rowIndex", "$itemIndex"],
@@ -162,8 +161,6 @@ export const OPTIMIZER_METADATA = {
       "$colIndex",
       "$row",
       "$rowIndex",
-      "$value",
-      "$setValue",
     ],
   }),
   Form: withInjectedContext({
