@@ -18,6 +18,10 @@ export const TabsMd = createMetadata({
     "It provides an efficient way to present multiple related sections in a single " +
     "interface area, with each tab containing distinct content defined by " +
     "[TabItem](/components/TabItem) components.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$header"],
+  },
   props: {
     activeTab: d(
       `This property indicates the index of the active tab. The indexing starts from 0, ` +

@@ -32,6 +32,11 @@ export const AutoCompleteMd = createMetadata({
     "filter through options, with support for single or multiple selections. Unlike " +
     "a basic [`Select`](/docs/reference/components/Select), it provides type-ahead functionality " +
     "and can allow users to create new options.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    // Keep aligned with the optionTemplate renderer's contextVars
+    childInjectedVars: ["$item","$selectedValue","$inTrigger"],
+  },
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

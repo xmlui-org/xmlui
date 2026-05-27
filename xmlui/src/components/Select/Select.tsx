@@ -33,6 +33,10 @@ export const SelectMd = createMetadata({
     "supporting both single and multiple selection modes. It offers extensive " +
     "customization capabilities including search functionality, custom templates, " +
     "and comprehensive form integration.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item","$itemContext","$group","$selectedValue","$inTrigger"],
+  },
   parts: {
     clearButton: {
       description: "The button to clear the selected value(s).",

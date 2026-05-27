@@ -26,6 +26,10 @@ export const ListMd = createMetadata({
     "datasets with built-in grouping, sorting, and visual formatting. It only " +
     "renders visible items in the viewport, making it ideal for displaying " +
     "thousands of records while maintaining smooth scrolling performance.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item","$itemIndex","$isFirst","$isLast","$isSelected","$group"],
+  },
   props: {
     data: d(
       `The component receives data via this property. The \`data\` property is a list of items ` +

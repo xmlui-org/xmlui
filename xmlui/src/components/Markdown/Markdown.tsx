@@ -27,6 +27,10 @@ export const MarkdownMd = createMetadata({
     "`Markdown` renders formatted text using markdown syntax. Use " +
     "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +
     "when you need [rich formatting](/working-with-markdown).",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$anchorId","$anchorHref"],
+  },
   themeVars: parseScssVar(styles.themeVars),
   themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],
   props: {
