@@ -46,6 +46,13 @@ const userSelectValues: PropertyValueDescription[] = [
 export const TableMd = createMetadata({
   status: "stable",
   description: "`Table` presents structured data for viewing, sorting, selection, and interaction.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex"],
+    events: {
+      contextMenu: { injectedVars: ["$item", "$row", "$rowIndex", "$itemIndex"] },
+    },
+  },
   // NOTE: let's leave it like this for now, we'll expand later when the need arises
   parts: {
     table: {

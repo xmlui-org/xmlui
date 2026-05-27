@@ -13,6 +13,13 @@ const COMP = "Tree";
 export const TreeMd = createMetadata({
   status: "stable",
   description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.`,
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item"],
+    events: {
+      contextMenu: { injectedVars: ["$item"] },
+    },
+  },
   props: {
     data: {
       description: `The data source of the tree. Format depends on the dataFormat property.`,

@@ -29,6 +29,13 @@ export const TileGridMd = createMetadata({
     "`TileGrid` renders a data array as a responsive, virtualized tile grid. " +
     "It auto-calculates the number of columns based on the container width, tile width, and gap, " +
     "and only renders visible rows — making it suitable for large datasets.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$selected"],
+    events: {
+      contextMenu: { injectedVars: ["$item", "$itemIndex"] },
+    },
+  },
 
   props: {
     data: d(

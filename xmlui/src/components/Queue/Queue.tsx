@@ -10,6 +10,16 @@ export const QueueMd = createMetadata({
   description:
     "`Queue` manages sequential processing of items in FIFO (first-in, first-out) " +
     "order. It is a non-visual component but provides UI progress reporting and result display.",
+  optimization: {
+    childInjectedVars: ["$completedItems", "$queuedItems"],
+    events: {
+      willProcess:  { injectedVars: ["$completedItems", "$queuedItems"] },
+      process:      { injectedVars: ["$completedItems", "$queuedItems"] },
+      didProcess:   { injectedVars: ["$completedItems", "$queuedItems"] },
+      processError: { injectedVars: ["$completedItems", "$queuedItems"] },
+      complete:     { injectedVars: ["$completedItems", "$queuedItems"] },
+    },
+  },
   props: {
     progressFeedback: {
       description:

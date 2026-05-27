@@ -15,6 +15,18 @@ export const FormMd = createMetadata({
     "input, with built-in data binding, validation, and submission handling. It " +
     "automatically manages form state and provides context for nested form controls " +
     "to work together.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+    childInjectedVars: ["$data"],
+    events: {
+      willSubmit:   { injectedVars: ["$data"] },
+      submit:       { injectedVars: ["$data"] },
+      submitFailed: { injectedVars: ["$data"] },
+      cancel:       { injectedVars: ["$data"] },
+      reset:        { injectedVars: ["$data"] },
+      success:      { injectedVars: ["$data"] },
+    },
+  },
   parts: {
     buttonRow: {
       description: "The container for the form action buttons (e.g., Save, Cancel).",
