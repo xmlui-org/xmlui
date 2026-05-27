@@ -20,6 +20,7 @@ export const AppMd = createMetadata({
     "structure and layout. It provides a complete UI framework with built-in navigation, " +
     "header, footer, and content areas that work together seamlessly.",
   excludeBehaviors: ["tooltip", "animation", "label"],
+  unstableChildInjectedVars: ["$pathname", "$routeParams", "$queryParams", "$linkInfo"],
   props: {
     layout: {
       description:
