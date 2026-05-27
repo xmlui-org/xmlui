@@ -12,7 +12,9 @@ const CMCOMP = "ContextMenu";
 
 export const ContextMenuMd = createMetadata({
   status: "stable",
-  childInjectedVars: ["$context"],
+  optimization: {
+    childInjectedVars: ["$context"],
+  },
   description:
     "`ContextMenu` provides a context-sensitive menu that appears at a specific position " +
     "when opened programmatically via its `openAt()` API. Unlike `DropdownMenu`, it has no " +

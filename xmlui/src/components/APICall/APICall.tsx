@@ -234,6 +234,11 @@ export const APICallMd = createMetadata({
     optimisticValue: dInternal(),
     getOptimisticValue: dInternal(),
   },
+  optimization: {
+    events: {
+      mockExecute: { injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"] },
+    },
+  },
   events: {
     beforeRequest: {
       description:
@@ -299,7 +304,6 @@ export const APICallMd = createMetadata({
         "The return value of the handler becomes the result of the API call.",
       signature: "() => any",
       parameters: {},
-      injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"],
     },
     progress: dInternal(),
   },

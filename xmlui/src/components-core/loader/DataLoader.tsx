@@ -56,12 +56,16 @@ export const DataLoaderMd = createMetadata({
     structuralSharing: d("Whether to use structural sharing for the data"),
     mockData: d("Data to return directly without making a network request (for development and testing)"),
   },
+  optimization: {
+    events: {
+      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
+    },
+  },
   events: {
     loaded: d("Event to trigger when the data is loaded"),
     error: d("This event fires when an error occurs while fetching data"),
     fetch: {
       description: "When defined, this event handler replaces the default fetch logic",
-      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
     },
   },
 });

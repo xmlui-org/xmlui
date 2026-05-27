@@ -148,6 +148,11 @@ export const DataSourceMd = createMetadata({
       defaultValue: "false",
     },
   },
+  optimization: {
+    events: {
+      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
+    },
+  },
   events: {
     loaded: {
       description:
@@ -179,7 +184,6 @@ export const DataSourceMd = createMetadata({
         "function that powers the default fetch.",
       signature: "fetch(): any",
       parameters: {},
-      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
     },
   },
   apis: {

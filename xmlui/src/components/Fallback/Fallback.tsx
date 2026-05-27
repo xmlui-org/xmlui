@@ -6,7 +6,9 @@ const COMP = "Fallback";
 
 export const FallbackMd = createMetadata({
   status: "experimental",
-  childInjectedVars: ["$error"],
+  optimization: {
+    childInjectedVars: ["$error"],
+  },
   description:
     `\`${COMP}\` is a declarative wrapper that renders an alternative UI when ` +
     `a descendant loader (\`DataSource\`, \`APICall\`) fails or a descendant ` +

@@ -7,7 +7,9 @@ const COMP = "FormSegment";
 
 export const FormSegmentMd = createMetadata({
   status: "experimental",
-  childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"],
+  optimization: {
+    childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"],
+  },
   description:
     "`FormSegment` groups a subset of form fields within a `Form` and exposes " +
     "segment-scoped context variables for the fields it contains. Use it to build " +

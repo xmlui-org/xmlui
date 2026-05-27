@@ -10,7 +10,9 @@ const COMP = "Column";
 export const ColumnMd = createMetadata({
   status: "stable",
   nonVisual: true,
-  childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex"],
+  optimization: {
+    childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex"],
+  },
   description:
     "`Column` defines the structure and behavior of individual table columns " +
     "within a [`Table`](/docs/reference/components/Table) component. Each Column controls data " +
