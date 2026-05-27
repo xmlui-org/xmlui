@@ -12,14 +12,6 @@ import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptP
 import type { ModuleErrors, CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { DocumentCursor } from "../language-server/base/text-document";
 
-// Re-export the single shared lookup as `defaultMetadataLookup` so that the
-// Vite plugin and any other existing caller keeps working without changes.
-// `getOptimizerMetadata` reads from `metadataRegistry` (Node-safe), which is
-// populated by `collectedComponentMetadata.ts` in browser/test contexts and
-// falls back to the build-time snapshot in pure-Node contexts (language-server,
-// Vite build). Both paths now read from the same object — issue #13 resolved.
-export { getOptimizerMetadata as defaultMetadataLookup };
-
 interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;
   contextSource: string;

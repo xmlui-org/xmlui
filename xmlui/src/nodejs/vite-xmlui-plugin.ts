@@ -15,10 +15,10 @@ import type { ModuleFetcher } from "../parsers/scripting/types";
 import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import * as fs from "fs/promises";
 import {
-  defaultMetadataLookup,
   errReportComponent,
   xmlUiMarkupToComponent,
 } from "../components-core/xmlui-parser";
+import { getOptimizerMetadata } from "../components-core/optimization/metadataLookup";
 import { coreComponentMetadata } from "../components-core/coreComponentMetadata";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import { analyze } from "../components-core/analyzer/walker";
@@ -194,7 +194,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     }
     // Merged lookup: extension packages first, then built-in components (including DataLoader).
     extensionMetadataLookup = (type: string) =>
-      extensionMetadata[type] ?? defaultMetadataLookup(type);
+      extensionMetadata[type] ?? getOptimizerMetadata(type);
   }
 
   return {

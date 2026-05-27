@@ -154,22 +154,18 @@ run in pure Node.js and cannot import React component files. The plugin uses
 `static-extractor.ts` to extract optimizer fields at build time by reading
 component source files as plain text:
 
-- `extractOptimizerMetadataFromDir(dir)` globs `*.tsx` files, reads each as a string, and
-  extracts `childInjectedVars`, `isImplicitContainerByDefault`, `unstableChildInjectedVars`,
-  and per-event `injectedVars` via regex (the same field names `createMetadata` accepts).
+- `extractOptimizerMetadataFromDir(dir)` globs `*.tsx` files, parses each with
+  `@babel/parser` (TypeScript + JSX plugins, `errorRecovery: true`), and walks the AST to
+  find the first `createMetadata({...})` call expression. Optimizer fields are resolved
+  **by key**, not by position — field order inside `optimization: {}` or an event entry is
+  irrelevant. Non-static values (identifier references, spread expressions) are silently
+  skipped.
 - The Vite plugin accepts `optimizerSourceDirs?: string[]` to cover extension packages.
   Without this option, extension package components in Vite mode over-subscribe (graceful
   degradation).
 - **Static-literal constraint:** all optimizer values must be **static string literal arrays**
-  in source (no computed values, no spread). This is the established convention.
-- **Field-order constraint (per-event `injectedVars` only):** inside an event entry,
-  `injectedVars` must be the **first field** — i.e. no other inline object literal (`parameters: {...}`,
-  `signature: {...}`, etc.) may appear between `eventName: {` and `injectedVars:` in source.
-  The extractor uses a regex back-tracking strategy `(\w+)\s*:\s*\{[^{}]*$` to attribute
-  `injectedVars` to its enclosing event name; an intermediate `{` block would cause the
-  attribution to land on the wrong name. There is no test that catches a violation today —
-  break this rule and the optimizer silently strips the event's `$`-vars at Vite build time.
-  Documented here because the only other mention is a single comment in `static-extractor.ts`.
+  in source (no computed values, no spread, no identifier references). This is the
+  established convention.
 
 **Precedence chain when `optimizerSourceDirs` is provided.** The plugin composes:
 
@@ -179,11 +175,11 @@ extensionMetadata[type]     ← scanned from optimizerSourceDirs (last-dir-wins 
   ?? collectedComponentMetadata  ← public components
 ```
 
-Extension keys colliding with each other emit a `console.warn(...; last-dir-wins.)`.
-**Extension keys that shadow a built-in (core or public) component currently do NOT warn** —
-an extension package that exports a `List` will silently override the built-in `List`
-metadata in the optimizer's view. This is a known gap; users are expected to namespace
-extension component types.
+Extension keys colliding with each other emit a `console.warn` (last-dir-wins).
+**Extension keys that shadow a built-in (core or public) component also emit a `console.warn`** —
+if an extension declares a name matching a core or public built-in, the warning surfaces in
+the Vite startup log. The extension still wins; the warning exists to surface accidental
+overrides rather than silently clobbering metadata.
 
 #### The Standalone runtime path: `getOptimizerMetadata`
 
@@ -194,8 +190,13 @@ Standalone mode and all non-Vite callers. It searches two registries in order:
    components (`DataLoader`, `ExternalDataLoader`) that are intentionally absent from the
    public registry. `DataLoader` metadata lives in the separate `loader/DataLoaderMd.ts` file
    to avoid circular imports.
-2. **`collectedComponentMetadata`** — all public components registered via `wrapComponent` /
-   `wrapCompound`.
+2. **`metadataRegistry`** (`language-server/metadataRegistry.ts`) — the shared live registry
+   that backs both lookup paths. At startup it contains the generated static snapshot
+   (`xmlui-metadata-generated.js`, pure JS, Node-safe). When `collectedComponentMetadata.ts`
+   loads (browser / vitest), it calls `Object.assign(metadataRegistry, { Button: ButtonMd, ... })`
+   — populating the same object in place. Afterwards `collectedComponentMetadata === metadataRegistry`
+   (same reference), so test mutations such as `(collectedComponentMetadata as any).MyGrid = {...}`
+   are immediately visible to `getOptimizerMetadata`.
 
 `StandaloneApp.resolveOptimizerMetadata` delegates to `getOptimizerMetadata`:
 
@@ -206,10 +207,9 @@ function resolveOptimizerMetadata(type: string) {
 }
 ```
 
-`xmlui-parser.defaultMetadataLookup` currently **duplicates** the same lookup body inline
-(`if (type in coreComponentMetadata) … else collectedComponentMetadata[type]`) rather than
-calling `getOptimizerMetadata`. Both produce the same result — the duplication is a known
-techdebt; either site should be refactored to import the shared `getOptimizerMetadata`.
+The Vite plugin (`vite-xmlui-plugin.ts`) also calls `getOptimizerMetadata` as the fallback
+in its extension lookup composition (`extensionMetadata[type] ?? getOptimizerMetadata(type)`),
+so both paths read from the same function and the same backing object.
 
 #### `OptimizerMetadataView` — typed lookup contract
 

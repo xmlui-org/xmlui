@@ -267,9 +267,9 @@ Discussed in #4. Worth flagging as a NEW issue because it didn't exist before co
 
 **What changed:** First cleanup pass promoted the constraint to a module-level docblock (partial mitigation). Second cleanup pass eliminates the constraint entirely — the AST extractor (#4) resolves each event entry's `injectedVars` by key, so any field ordering inside `events.{name}: { ... }` is now valid. The hazard is gone, not just documented.
 
-### 🟢 15. `defaultMetadataLookup` exported but single in-package consumer — ❌ Open (intentional)
+### 🟢 15. `defaultMetadataLookup` exported but single in-package consumer — ✅ Fixed
 
-The original concern is now moot: keeping `defaultMetadataLookup` *exported* is necessary because `vite-xmlui-plugin.ts` cannot use `getOptimizerMetadata` without dragging the React-laden barrel into the build (see #13). The single in-package consumer is the intended one — the export is not gratuitous, it is the seam between the Node-safe parser and the Node-safe Vite plugin. No further action.
+After #13 made `getOptimizerMetadata` Node-safe (reads from `metadataRegistry`, not the `.tsx` barrel), there is no longer a reason for the alias. `vite-xmlui-plugin.ts` now imports `getOptimizerMetadata` directly from `optimization/metadataLookup`. The `export { getOptimizerMetadata as defaultMetadataLookup }` line in `xmlui-parser.ts` is removed.
 
 ---
 
@@ -291,15 +291,14 @@ The original concern is now moot: keeping `defaultMetadataLookup` *exported* is 
 | 12 | 🟢 | Hand-maintained sibling-file list in U-audit.2 | ✅ Fixed | Replaced with directory auto-scan |
 | 13 | 🟡 | Duplicated lookup function | ✅ Fixed | Shared `metadataRegistry` — single backing store for both lookup paths; `defaultMetadataLookup` is now re-export alias of `getOptimizerMetadata` |
 | 14 | 🟡 | Static-extractor "first-field" constraint invisible | ✅ Fixed | Eliminated by #4 AST replacement |
-| 15 | 🟢 | `defaultMetadataLookup` exported but single in-package consumer | ❌ Open (intentional) | Export is the seam between Node-safe parser and Node-safe Vite plugin; required by #13 |
+| 15 | 🟢 | `defaultMetadataLookup` exported but single in-package consumer | ✅ Fixed | Alias removed; `vite-xmlui-plugin.ts` imports `getOptimizerMetadata` directly |
 
 ---
 
 ## Recommended Order of Cleanup (updated)
 
-What's left after the second cleanup pass + third pass (#9, #13):
+What's left after the second cleanup pass + third pass (#9, #13, #15):
 
 1. **#11** — opportunistic polish; rename `optimization` → `engineHints` (or similar) once public-API docs are being written. Not blocking.
-2. **#15** — open-intentional; the export is the correct seam between Node-safe contexts.
 
-All 🔴 and all 🟡 findings are now resolved. The implementation quality is substantially better than the original review captured.
+All 🔴 and all 🟡 findings are now resolved. The only open item is #11 (🟢 minor polish, deferred).
