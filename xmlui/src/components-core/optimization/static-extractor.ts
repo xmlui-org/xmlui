@@ -1,35 +1,29 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { parse, type ParseResult } from "@babel/parser";
+import type { File } from "@babel/types";
 
 /**
- * Static-extractor authoring contract — READ THIS BEFORE EDITING `events: {}`.
+ * AST-based optimizer-metadata extractor.
  *
- * The Vite plugin reads optimizer metadata from `.tsx` source files at build
- * time via regex, not via a real TypeScript AST. Two source-level constraints
- * follow from that — violate them and the optimizer will silently strip
- * variables from event handlers at build time without any compile-time error:
+ * Reads `.tsx` component sources at Vite plugin startup, finds the
+ * `createMetadata({...})` literal, and pulls out the optimizer-relevant
+ * subset (`optimization.*` + per-event `injectedVars`). Used only by the
+ * `optimizerSourceDirs` extension-build path; the runtime path uses
+ * `ComponentMetadata` directly via `createMetadata`.
  *
- *   1. Per-event `injectedVars` MUST be the **first** field in its event
- *      entry. The back-tracking regex below looks for the nearest enclosing
- *      `eventName: {` with no `{` or `}` between it and `injectedVars:`.
- *      Any object-literal field appearing before `injectedVars` (e.g.
- *      `description: "..."`, `parameters: { ... }`) breaks the back-track.
+ * Replaces the previous regex extractor (commit 097fec782). The regex
+ * version had two implicit author-facing constraints that produced silent
+ * stripping of injected variables when violated:
  *
- *      ✅ submit: { injectedVars: ["$data"], description: "...", signature: "..." }
- *      ❌ submit: { description: "...", injectedVars: ["$data"] }
+ *   1. `injectedVars` had to be the first field in each `events.{name}`
+ *      object so a back-tracking regex could find the enclosing event name.
+ *   2. `childInjectedVars` was matched via non-global `.exec()`, so the
+ *      first textual occurrence won — including matches inside comments.
  *
- *   2. `childInjectedVars` / `unstableChildInjectedVars` are matched as the
- *      first occurrence of their literal name in the file. Don't reference
- *      those identifiers in comments or unrelated code above the
- *      `optimization` block.
- *
- * The runtime path uses `ComponentMetadata` directly via `createMetadata`, so
- * a violation here will pass type-check, pass tests, and only manifest in
- * downstream apps consuming the Vite plugin with `optimizerSourceDirs`.
- *
- * Long-term fix: swap this regex extractor for `@babel/parser` walking
- * `createMetadata({...})` as a real AST. Until that lands, the contract above
- * is the line of defence.
+ * Both classes of hazard are gone now: the AST walker resolves keys
+ * positionally inside the actual object expression, and comments are not
+ * part of the AST.
  */
 
 /**
@@ -43,96 +37,191 @@ export type OptimizerMeta = {
   events?: Record<string, { injectedVars?: readonly string[] }>;
 };
 
-/**
- * Extract a static string array literal from source text starting at `startIdx`.
- * Finds the matching `]` and parses string literals (single or double quoted).
- * Returns null if the bracket is not found or content is dynamic (non-string items).
- */
-function extractStringArray(source: string, startIdx: number): string[] | null {
-  const open = source.indexOf("[", startIdx);
-  if (open === -1) return null;
-  let depth = 0;
-  let end = -1;
-  for (let i = open; i < source.length; i++) {
-    if (source[i] === "[") depth++;
-    else if (source[i] === "]") {
-      depth--;
-      if (depth === 0) {
-        end = i;
-        break;
-      }
-    }
+type AnyNode = Record<string, any>;
+
+function parseSource(source: string): ParseResult<File> | null {
+  try {
+    return parse(source, {
+      sourceType: "module",
+      plugins: ["typescript", "jsx"],
+      errorRecovery: true,
+    });
+  } catch {
+    return null;
   }
-  if (end === -1) return null;
-  const body = source.slice(open + 1, end);
-  // Parse string literals — only $-prefixed variables are valid here
-  const matches = [...body.matchAll(/["'](\$[^"']+)["']/g)];
-  return matches.map((m) => m[1]);
+}
+
+function getPropertyKeyName(prop: AnyNode): string | null {
+  if (prop.type !== "ObjectProperty" || prop.computed) return null;
+  if (prop.key.type === "Identifier") return prop.key.name;
+  if (prop.key.type === "StringLiteral") return prop.key.value;
+  return null;
+}
+
+function findProperty(obj: AnyNode | null | undefined, name: string): AnyNode | null {
+  if (!obj || obj.type !== "ObjectExpression") return null;
+  for (const prop of obj.properties) {
+    if (getPropertyKeyName(prop) === name) return prop.value;
+  }
+  return null;
+}
+
+function asStaticStringArray(node: AnyNode | null | undefined): string[] | null {
+  if (!node || node.type !== "ArrayExpression") return null;
+  const out: string[] = [];
+  for (const el of node.elements) {
+    if (!el || el.type !== "StringLiteral") return null;
+    out.push(el.value);
+  }
+  return out;
+}
+
+function isBooleanTrue(node: AnyNode | null | undefined): boolean {
+  return !!node && node.type === "BooleanLiteral" && node.value === true;
+}
+
+function declarationsOf(stmt: AnyNode): AnyNode[] {
+  if (!stmt) return [];
+  if (stmt.type === "VariableDeclaration") return stmt.declarations ?? [];
+  if (
+    stmt.type === "ExportNamedDeclaration" &&
+    stmt.declaration?.type === "VariableDeclaration"
+  ) {
+    return stmt.declaration.declarations ?? [];
+  }
+  return [];
 }
 
 /**
- * Extract optimizer-relevant metadata fields from a component source file string.
- * Reads from the `optimization: { ... }` block inside a `createMetadata` call.
- * Only extracts STATIC values — dynamic callbacks or spread expressions are ignored.
+ * Locate the first `createMetadata({...})` call expression in the file and
+ * return its first-argument ObjectExpression node. Returns null if not found
+ * or if the argument is dynamic (spread / variable / function call).
+ */
+function findCreateMetadataObject(ast: ParseResult<File>): AnyNode | null {
+  for (const stmt of ast.program.body) {
+    for (const decl of declarationsOf(stmt as AnyNode)) {
+      const init = decl.init;
+      if (
+        init?.type === "CallExpression" &&
+        init.callee?.type === "Identifier" &&
+        init.callee.name === "createMetadata"
+      ) {
+        const arg = init.arguments?.[0];
+        if (arg?.type === "ObjectExpression") return arg;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Extract optimizer-relevant metadata fields from a component source file.
+ * Reads from the `optimization: { ... }` block and per-event `injectedVars`
+ * inside the `events: { ... }` block of the first `createMetadata({...})`
+ * call. Only static values are extracted — dynamic computed values, spreads,
+ * or non-literal expressions are silently skipped.
  *
- * Returns an OptimizerMeta (empty if no optimizer block found).
+ * Returns an OptimizerMeta (empty if no metadata block found).
  */
 export function extractOptimizerMetadataFromSource(source: string): OptimizerMeta {
   const result: OptimizerMeta = {};
 
-  // isImplicitContainerByDefault: true (inside optimization block)
-  if (/isImplicitContainerByDefault\s*:\s*true/.test(source)) {
-    result.isImplicitContainerByDefault = true;
+  const ast = parseSource(source);
+  if (!ast) return result;
+
+  const meta = findCreateMetadataObject(ast);
+  if (!meta) return result;
+
+  const optimization = findProperty(meta, "optimization");
+  if (optimization?.type === "ObjectExpression") {
+    if (isBooleanTrue(findProperty(optimization, "isImplicitContainerByDefault"))) {
+      result.isImplicitContainerByDefault = true;
+    }
+    const childVars = asStaticStringArray(findProperty(optimization, "childInjectedVars"));
+    if (childVars && childVars.length > 0) result.childInjectedVars = childVars;
+    const unstableVars = asStaticStringArray(
+      findProperty(optimization, "unstableChildInjectedVars"),
+    );
+    if (unstableVars && unstableVars.length > 0) result.unstableChildInjectedVars = unstableVars;
   }
 
-  // childInjectedVars: [ ... ] (inside optimization block)
-  const childMatch = /childInjectedVars\s*:/.exec(source);
-  if (childMatch) {
-    const arr = extractStringArray(source, childMatch.index);
-    if (arr && arr.length > 0) result.childInjectedVars = arr;
-  }
-
-  // unstableChildInjectedVars: [ ... ] (inside optimization block)
-  const unstableMatch = /unstableChildInjectedVars\s*:/.exec(source);
-  if (unstableMatch) {
-    const arr = extractStringArray(source, unstableMatch.index);
-    if (arr && arr.length > 0) result.unstableChildInjectedVars = arr;
-  }
-
-  // Per-event injectedVars: find each `injectedVars:` occurrence, extract the array,
-  // back-track to find the event name. injectedVars must be the first field in the event
-  // entry so that there are no literal braces between `eventName: {` and `injectedVars:`.
-  const eventVarsRe = /injectedVars\s*:/g;
-  let m: RegExpExecArray | null;
-  while ((m = eventVarsRe.exec(source)) !== null) {
-    const arr = extractStringArray(source, m.index);
-    if (!arr || arr.length === 0) continue;
-
-    // Back-track from m.index to find the event name: last `<word>: {` pattern before injectedVars
-    const before = source.slice(0, m.index);
-    // Match the last occurrence of `word: {` where there's no closing `}` between it and our position
-    const eventNameMatch = /(\w+)\s*:\s*\{[^{}]*$/.exec(before);
-    if (!eventNameMatch) continue;
-    const eventName = eventNameMatch[1];
-    if (!result.events) result.events = {};
-    result.events[eventName] = { injectedVars: arr };
+  const events = findProperty(meta, "events");
+  if (events?.type === "ObjectExpression") {
+    for (const prop of events.properties) {
+      const eventName = getPropertyKeyName(prop);
+      if (!eventName || prop.value?.type !== "ObjectExpression") continue;
+      const injected = asStaticStringArray(findProperty(prop.value, "injectedVars"));
+      if (!injected || injected.length === 0) continue;
+      if (!result.events) result.events = {};
+      result.events[eventName] = { injectedVars: injected };
+    }
   }
 
   return result;
 }
 
+const COMPONENT_NAME_RE = /^[A-Z][A-Za-z0-9]*$/;
+
 /**
  * Extract the registered component type name from a source file.
- * Components register via `wrapComponent("TypeName", ...)` or `wrapCompound("TypeName", ...)`,
- * or declare `const COMP = "TypeName"` / `const COMP_NAME = "TypeName"`.
+ * Recognised patterns (resolved via AST, so comments cannot mislead):
+ *
+ *   - `wrap<Suffix>("TypeName", ...)` — any function whose identifier starts
+ *     with `wrap` (covers `wrapComponent`, `wrapCompound`, and any future
+ *     wrappers extension packages introduce).
+ *   - `const COMP = "TypeName"` / `const COMP_NAME = "TypeName"` — the
+ *     legacy declaration form.
  */
 export function extractComponentName(source: string): string | null {
-  // Try: wrapComponent("Name", ...) or wrapCompound("Name", ...)
-  const wrapMatch = /wrap(?:Component|Compound)\s*\(\s*["']([A-Z][A-Za-z0-9]*)["']/.exec(source);
-  if (wrapMatch) return wrapMatch[1];
-  // Try: const COMP = "Name" or const COMP_NAME = "Name" (PascalCase value)
-  const constMatch = /const\s+COMP(?:_NAME)?\s*=\s*["']([A-Z][A-Za-z0-9]*)["']/.exec(source);
-  if (constMatch) return constMatch[1];
+  const ast = parseSource(source);
+  if (!ast) return null;
+
+  const wrapMatch = findWrapCallName(ast.program as AnyNode);
+  if (wrapMatch) return wrapMatch;
+
+  for (const stmt of ast.program.body) {
+    for (const decl of declarationsOf(stmt as AnyNode)) {
+      if (decl.id?.type !== "Identifier") continue;
+      if (!/^COMP(_NAME)?$/.test(decl.id.name)) continue;
+      if (decl.init?.type === "StringLiteral" && COMPONENT_NAME_RE.test(decl.init.value)) {
+        return decl.init.value;
+      }
+    }
+  }
+
+  return null;
+}
+
+const AST_SKIP_FIELDS = new Set(["loc", "range", "start", "end", "leadingComments", "trailingComments", "innerComments"]);
+
+function findWrapCallName(root: AnyNode): string | null {
+  const stack: AnyNode[] = [root];
+  while (stack.length > 0) {
+    const node = stack.pop()!;
+    if (!node || typeof node !== "object") continue;
+
+    if (
+      node.type === "CallExpression" &&
+      node.callee?.type === "Identifier" &&
+      /^wrap[A-Z][A-Za-z0-9]*$/.test(node.callee.name)
+    ) {
+      const arg = node.arguments?.[0];
+      if (arg?.type === "StringLiteral" && COMPONENT_NAME_RE.test(arg.value)) {
+        return arg.value;
+      }
+    }
+
+    for (const key of Object.keys(node)) {
+      if (AST_SKIP_FIELDS.has(key)) continue;
+      const value = node[key];
+      if (!value) continue;
+      if (Array.isArray(value)) {
+        for (const child of value) if (child && typeof child === "object") stack.push(child);
+      } else if (typeof value === "object") {
+        stack.push(value);
+      }
+    }
+  }
   return null;
 }
 

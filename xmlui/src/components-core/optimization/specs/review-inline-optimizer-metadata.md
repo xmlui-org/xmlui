@@ -1,10 +1,10 @@
 # Code Review: Inline Optimizer Metadata Implementation
 
-> Post-implementation review of the `optimization: {}` migration. Updated after follow-up commits resolved most original findings, then refreshed once more after the cleanup pass for #13, #6, #7, #14.
+> Post-implementation review of the `optimization: {}` migration. Updated after follow-up commits resolved most original findings, refreshed once after the cleanup pass for #13, #6, #7, #14, and refreshed again after the second cleanup wave that replaced the regex extractor with an AST walker (#4, #14, #10) and added a `.d.ts` for the generated metadata file (#7 residual).
 
 **Scope:** Tasks 1-16 (Phases 1-4) + follow-up refactor commits. Branch `yurii/computedUses`.
 
-**Verification commits reviewed:** `276b00a7c`, `fda339542`, `097fec782`, `32b526e48`, + uncommitted cleanup (single lookup function in `metadataLookup.ts`, extension-vs-built-in collision warning, `as any` removal in `metadata-helpers.ts`, prominent docblock for the static-extractor "first-field" constraint).
+**Verification commits reviewed:** `276b00a7c`, `fda339542`, `097fec782`, `32b526e48`, + first cleanup pass (single lookup function in `metadataLookup.ts`, extension-vs-built-in collision warning, `as any` removal in `metadata-helpers.ts`, prominent docblock for the static-extractor "first-field" constraint), + second cleanup pass (uncommitted: `.d.ts` for `xmlui-metadata-generated.js` removes `@ts-ignore` and narrowing casts; `@babel/parser`-based AST extractor replaces the regex extractor and lifts the first-field constraint; `extractComponentName` recognises any `wrap<Suffix>` wrapper via AST).
 
 ---
 
@@ -80,25 +80,29 @@ The cleanup pass added prominent docblocks in both files explaining why the spli
 
 ---
 
-## 🟡 4. Static extractor relies on fragile regex over real syntax — ⚠️ Partial (band-aid + prominent docblock)
+## 🟡 4. Static extractor relies on fragile regex over real syntax — ✅ Fixed (AST replacement)
 
 **Where:** [static-extractor.ts](xmlui/src/components-core/optimization/static-extractor.ts)
 
-**What changed in commit `097fec782`:** A regex-local comment documented a new **implicit ordering constraint**: `injectedVars` must be the first field in each event entry so the back-track `/(\w+)\s*:\s*\{[^{}]*$/` can find the enclosing event name.
+**What changed in the second cleanup pass:** The regex extractor is gone. `static-extractor.ts` now parses each component source with `@babel/parser` (TypeScript + JSX plugins, `errorRecovery: true`) and walks the resulting AST to find the first `createMetadata({...})` call expression. Inside that object expression:
 
-**What changed in the cleanup pass:** The single-line regex comment was upgraded to a **module-level docblock** at the top of `static-extractor.ts`. It now spells out (a) both static-extractor constraints (first-field for event `injectedVars`, first-occurrence for `childInjectedVars`), (b) good vs. bad code shapes, (c) why nothing in the build catches a violation, and (d) the planned AST-based fix. Anyone editing the file or grep-ing `injectedVars` in the optimization dir sees it immediately.
+- `optimization.isImplicitContainerByDefault`, `optimization.childInjectedVars`, `optimization.unstableChildInjectedVars` are resolved by key, not by textual order.
+- Per-event `injectedVars` is found by iterating `events.{eventName}` object properties and looking up `injectedVars` directly — **no first-field constraint**, any order of fields inside an event entry now works.
+- Non-static values (spread expressions, identifier references like `childInjectedVars: SHARED`) are silently skipped, matching the original "only static literals" contract.
 
-**Why this is still 🟡 (not ✅):** The constraint is still **a constraint**, not a removal of the hazard. A regex extractor is still in use and still:
+Both old hazards are gone:
 
-- requires authors to keep `injectedVars` first inside each event entry,
-- can be fooled by comments containing the literal `childInjectedVars:` /`injectedVars:` strings,
-- uses `.exec()` (non-global) on `childInjectedVars:` so only the first occurrence in a file is considered.
+- Comment occurrences of `injectedVars:` / `childInjectedVars:` cannot mislead the extractor (comments are not part of the AST).
+- `description` / `signature` / `parameters` can appear before `injectedVars` inside an event entry without silent stripping.
 
-The docblock reduces the *probability* of a contributor tripping the hazard but doesn't eliminate the hazard.
+`@babel/parser` was added as a direct dependency (`7.29.2`, matching what was already in the workspace via transitive deps). Parse cost is well under 30ms per file at plugin-startup time.
 
-**Fix direction (unchanged):** Replace with `@babel/parser`. Walk `createMetadata({...})` as a real AST → no false matches in comments, no ordering constraint. ~30ms parse cost per source file is negligible at plugin-startup time.
+**New regression tests** ([optimizer-metadata-extractor.test.ts](xmlui/tests/components-core/optimization/optimizer-metadata-extractor.test.ts)) cover:
 
-**Risk assessment of current state:** Low operational risk *today* — only the Vite-plugin `optimizerSourceDirs` build path uses the extractor; all built-in components use `collectedComponentMetadata` (runtime spread, not extractor). The remaining risk is **future-proofing**: an extension author writing events with `description` before `injectedVars` (the natural reading order) would silently strip vars from that handler, with no compile error and no test catching it.
+- per-event `injectedVars` with non-first ordering (description / parameters before injectedVars);
+- literal `childInjectedVars:` inside line and block comments;
+- non-static `childInjectedVars: SHARED` (identifier reference) correctly skipped;
+- single-quote / trailing-comma robustness, now via real source-file shapes wrapping `createMetadata({...})`.
 
 ---
 
@@ -148,7 +152,7 @@ Both warnings go through the same `console.warn` channel, so they appear togethe
 
 ---
 
-## 🟡 7. `as any` casts weaken type safety — ⚠️ Partial
+## 🟡 7. `as any` casts weaken type safety — ✅ Fixed
 
 **What changed:**
 
@@ -157,20 +161,15 @@ Both warnings go through the same `console.warn` channel, so they appear togethe
 3. `computeUsesForTree` and `computeUsesForSubtree` accept the typed lookup.
 4. Vite plugin's `extensionMetadataLookup` is also typed.
 
-**Critical reading — residuals:**
+**Critical reading — residuals (all resolved across the two cleanup passes):**
 
-a. ~~**`metadata-helpers.ts` still uses `as any`.**~~ **Resolved in cleanup pass.** `const { optimization, ...rest } = metadata` now destructures cleanly because the parameter type `ComponentMetadata<...> & { optimization?: OptimizerInput }` is already correct. The redundant `optimization as OptimizerInput` cast inside the final spread was also removed. The only remaining assertion is `rest as ComponentMetadata<...>` / `{...rest, ...optimization} as ComponentMetadata<...>` for the return type — that is honest because the spread-merged shape isn't structurally provable as `ComponentMetadata` even though it is at runtime.
+a. ~~**`metadata-helpers.ts` still uses `as any`.**~~ **Resolved in first cleanup pass.** `const { optimization, ...rest } = metadata` now destructures cleanly because the parameter type `ComponentMetadata<...> & { optimization?: OptimizerInput }` is already correct.
 
-b. **`metadataLookup.ts` uses cast-style type assertions:**
-   ```ts
-   return (coreComponentMetadata as Record<string, OptimizerMetadataView>)[type];
-   return (collectedComponentMetadata as Record<string, OptimizerMetadataView>)[type];
-   ```
-   These are necessary because `coreComponentMetadata` is typed as the wider `ComponentMetadata` (and `collectedComponentMetadata` is `@ts-ignore`d as a `.js` file). The cast is honest but each occurrence is a fresh trust-me to the type system.
+b. ~~**`metadataLookup.ts` uses cast-style type assertions** (`as Record<string, OptimizerMetadataView>`).~~ **Resolved in second cleanup pass.** With the `.d.ts` for `xmlui-metadata-generated.js` (see (c)) typing the default export as `Record<string, ComponentMetadata>`, and `coreComponentMetadata` already typed as a record at its declaration site, indexed-access `coreComponentMetadata[type]` and `collectedComponentMetadata[type]` now type-check directly. `OptimizerMetadataView` is structurally assignable from `ComponentMetadata` (the optimizer view's `events` value type is a strict subset of `ComponentEventMetadata`, intentional by design — see comment on `OptimizerMetadataView`).
 
-c. **`xmlui-metadata-generated.js` import still `@ts-ignore`d.** This is a generated file; adding a `.d.ts` alongside it would let the cast disappear at both call sites.
+c. ~~**`xmlui-metadata-generated.js` import still `@ts-ignore`d.**~~ **Resolved in second cleanup pass.** Added [xmlui-metadata-generated.d.ts](xmlui/src/language-server/xmlui-metadata-generated.d.ts) declaring the default export as `Record<string, ComponentMetadata>`. The `@ts-ignore` and `eslint-disable` lines in `xmlui-parser.ts` are gone; the import in `vite-xmlui-plugin.ts` and `server-common.ts` now sees a real type for the same module.
 
-**Net:** Type safety **substantially improved** (the `(type: string) => any` was the worst offender, now gone; `metadata-helpers.ts` no longer needs `as any`). The two remaining narrowing casts in `metadataLookup.ts` are isolated and conscious; acceptable to leave for a future cleanup pass that adds the generated `.d.ts`.
+**Net:** All previously identified `as any` / cast / `@ts-ignore` sites in the optimizer-metadata code path are gone. The only remaining assertion in the metadata code path is the return-type cast in `createMetadata` (`rest as ComponentMetadata<...>` / `{...rest, ...optimization} as ComponentMetadata<...>`), which is honest — the spread-merged shape isn't structurally provable as `ComponentMetadata` even though it is at runtime.
 
 ---
 
@@ -188,16 +187,11 @@ Some components have `optimization: {...}` before `props:`, others after. A few 
 
 ---
 
-## 🟢 10. `extractComponentName` only knows two patterns — ❌ Open
+## 🟢 10. `extractComponentName` only knows two patterns — ✅ Fixed (via #4 AST replacement)
 
-```ts
-/wrap(?:Component|Compound)\s*\(\s*["']([A-Z][A-Za-z0-9]*)["']/
-/const\s+COMP(?:_NAME)?\s*=\s*["']([A-Z][A-Za-z0-9]*)["']/
-```
+**What changed in the second cleanup pass:** With the AST extractor in place, `extractComponentName` now matches **any** identifier matching `^wrap[A-Z][A-Za-z0-9]*$` called with a PascalCase string literal as the first argument — i.e. `wrapComponent`, `wrapCompound`, `wrapXmluiComp`, and any future wrapper an extension package introduces. The legacy `const COMP = "Name"` / `const COMP_NAME = "Name"` fallback is preserved (also via AST, so string literals containing `wrapComponent(...)` in unrelated code cannot mislead it).
 
-Components that register differently (e.g. `wrapXmluiComp(...)`, third-party patterns) are silently skipped. For extension packages with unusual conventions this is invisible breakage.
-
-**Fix direction:** Add a fallback that derives the name from the `const FooMd = createMetadata({...})` assignment. AST parsing (see #4) would resolve naturally.
+New regression test covers extracting from `wrapXmluiComp("MyWidget", ...)` and asserts that comment / string-literal occurrences do not confuse the matcher.
 
 ---
 
@@ -249,11 +243,11 @@ Drop-in replacement, deletes the brittle special cases, will handle any future F
 
 **Residual smell:** Two functions with identical bodies and divergent imports. Real fix would be to make `xmlui-metadata-generated.js` the single live registry that components register into at module-load time — then both call sites collapse to one. Not done here; out of scope for the cleanup pass.
 
-### 🟡 14. Static-extractor's "first-field" constraint is invisible to authors — ⚠️ Partial
+### 🟡 14. Static-extractor's "first-field" constraint is invisible to authors — ✅ Fixed (closed by #4)
 
 Discussed in #4. Worth flagging as a NEW issue because it didn't exist before commit `097fec782` — the previous extractor structure (when events had nested `optimization.events.{name}.injectedVars`) didn't depend on field ordering. The flattening into top-level `events.{name}.{description, injectedVars, ...}` introduced the requirement.
 
-**What changed in the cleanup pass:** The constraint is now spelled out in a module-level docblock at the top of `static-extractor.ts` (good/bad code shapes, both static-extractor hazards, planned AST replacement). Still partial because the underlying regex extractor is unchanged — the docblock reduces, but does not remove, the foot-gun.
+**What changed:** First cleanup pass promoted the constraint to a module-level docblock (partial mitigation). Second cleanup pass eliminates the constraint entirely — the AST extractor (#4) resolves each event entry's `injectedVars` by key, so any field ordering inside `events.{name}: { ... }` is now valid. The hazard is gone, not just documented.
 
 ### 🟢 15. `defaultMetadataLookup` exported but single in-package consumer — ❌ Open (intentional)
 
@@ -268,28 +262,26 @@ The original concern is now moot: keeping `defaultMetadataLookup` *exported* is 
 | 1 | 🔴 | DataLoader vars lost via `optimizerSourceDirs` | ✅ Fixed | Cleanly composed fallback chain |
 | 2 | 🟡 | Hardcoded `DATALOADER_OPTIMIZER_META` | ✅ Fixed | DataLoader split into `DataLoaderMd.ts` + `DataLoader.tsx` |
 | 3 | 🟡 | Duplicated event names across two blocks | ✅ Fixed | `injectedVars` is now inline per-event |
-| 4 | 🟡 | Regex-based source extraction | ⚠️ Partial | Module-level docblock + good/bad examples; regex still in use |
+| 4 | 🟡 | Regex-based source extraction | ✅ Fixed | Replaced with `@babel/parser` AST walker; first-field constraint and comment-confusion hazards gone |
 | 5 | 🟡 | Silently swallowed extension-dir errors | ✅ Fixed | ENOENT warns; others throw |
 | 6 | 🟡 | No collision warnings on merge | ✅ Fixed | Both extension-vs-extension and extension-vs-built-in now warned |
-| 7 | 🟡 | `as any` casts in metadata path | ⚠️ Partial | `metadata-helpers.ts` cleaned; two narrowing casts in `metadataLookup.ts` remain |
+| 7 | 🟡 | `as any` casts in metadata path | ✅ Fixed | `.d.ts` for generated file removed `@ts-ignore` + narrowing casts |
 | 8 | 🟢 | Module-level `ALL_OPTIMIZER_METADATA` spread | ✅ Fixed | Removed implicitly by #1's restructure |
 | 9 | 🟢 | Inconsistent `optimization:` block placement | ❌ Open | |
-| 10 | 🟢 | Narrow `extractComponentName` patterns | ❌ Open | |
+| 10 | 🟢 | Narrow `extractComponentName` patterns | ✅ Fixed | AST matches any `wrap<Suffix>(...)` wrapper + legacy `COMP`/`COMP_NAME` |
 | 11 | 🟢 | `optimization` is a misleading name | ❌ Open | |
 | 12 | 🟢 | Hand-maintained sibling-file list in U-audit.2 | ✅ Fixed | Replaced with directory auto-scan |
 | 13 | 🟡 | Duplicated lookup function | ⚠️ Partial | Cannot merge: Node parser needs static snapshot; runtime/tests need live barrel. Both files now have docblocks. |
-| 14 | 🟡 | Static-extractor "first-field" constraint invisible | ⚠️ Partial | Promoted from regex-local comment to module-level docblock |
+| 14 | 🟡 | Static-extractor "first-field" constraint invisible | ✅ Fixed | Eliminated by #4 AST replacement |
 | 15 | 🟢 | `defaultMetadataLookup` exported but single in-package consumer | ❌ Open (intentional) | Export is the seam between Node-safe parser and Node-safe Vite plugin; required by #13 |
 
 ---
 
 ## Recommended Order of Cleanup (updated)
 
-What's left after the cleanup pass:
+What's left after the second cleanup pass:
 
-1. **#4** — replace the regex static extractor with `@babel/parser`. Single highest-value remaining cleanup; eliminates the foot-gun documented in #14 instead of mitigating it.
-2. **#13 (residual)** — collapse the parser/runtime lookup split by making `xmlui-metadata-generated.js` the single live registry that components register into at module-load time. Eliminates the structural reason both `defaultMetadataLookup` and `getOptimizerMetadata` need to exist. Larger refactor — touches the build script for the generated file and every component's registration.
-3. **#7 (residual)** — emit a `.d.ts` next to `xmlui-metadata-generated.js`, then drop the two narrowing `as Record<string, OptimizerMetadataView>` casts in `metadataLookup.ts`.
-4. **#9, #10, #11** — opportunistic polish; pick up alongside other changes in those files.
+1. **#13 (residual)** — collapse the parser/runtime lookup split by making `xmlui-metadata-generated.js` the single live registry that components register into at module-load time. Eliminates the structural reason both `defaultMetadataLookup` and `getOptimizerMetadata` need to exist. Larger refactor — touches the build script for the generated file and every component's registration. Now the single remaining 🟡 with a structural fix path.
+2. **#9, #11** — opportunistic polish; pick up alongside other changes in those files. (#10 closed by #4 AST replacement; #15 is open-intentional.)
 
-The overall implementation quality after the follow-up commits **and** the cleanup pass is **substantially better** than the original review captured — every 🔴 and most 🟡 findings are properly resolved with the right architecture, not just patched. Two structural items remain: the static-extractor regex (#4) and the parser/runtime lookup split (#13), both with clear paths forward documented above.
+The overall implementation quality after the follow-up commits **and** both cleanup passes is **substantially better** than the original review captured — every 🔴 finding and all but one 🟡 finding are properly resolved with the right architecture, not just patched. The single remaining 🟡 with action items is #13 (parser/runtime lookup split), with a clear path forward documented above.

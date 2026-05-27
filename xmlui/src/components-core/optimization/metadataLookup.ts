@@ -21,7 +21,7 @@ import type { OptimizerMetadataView } from "../../abstractions/ComponentDefs";
 
 export function getOptimizerMetadata(type: string): OptimizerMetadataView | undefined {
   if (type in coreComponentMetadata) {
-    return (coreComponentMetadata as Record<string, OptimizerMetadataView>)[type];
+    return coreComponentMetadata[type];
   }
-  return (collectedComponentMetadata as Record<string, OptimizerMetadataView>)[type];
+  return collectedComponentMetadata[type];
 }

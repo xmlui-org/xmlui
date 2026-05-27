@@ -3,8 +3,6 @@ import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { computeUsesForTree } from "./optimization/computedUses";
 import { coreComponentMetadata } from "./coreComponentMetadata";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore — generated file
 import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
 import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText } from "../parsers/xmlui-parser/parser";
@@ -25,9 +23,9 @@ import { DocumentCursor } from "../language-server/base/text-document";
 // we read the static `xmlui-metadata-generated.js` snapshot here instead.
 export function defaultMetadataLookup(type: string): OptimizerMetadataView | undefined {
   if (type in coreComponentMetadata) {
-    return (coreComponentMetadata as Record<string, OptimizerMetadataView>)[type];
+    return coreComponentMetadata[type];
   }
-  return (collectedComponentMetadata as Record<string, OptimizerMetadataView>)[type];
+  return collectedComponentMetadata[type];
 }
 
 interface ErrorForDisplay extends GeneralDiag {
