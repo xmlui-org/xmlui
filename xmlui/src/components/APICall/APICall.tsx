@@ -299,6 +299,7 @@ export const APICallMd = createMetadata({
         "The return value of the handler becomes the result of the API call.",
       signature: "() => any",
       parameters: {},
+      injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"],
     },
     progress: dInternal(),
   },
