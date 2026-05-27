@@ -28,6 +28,7 @@ import type { A11yRegistry } from "../components-core/accessibility";
 import { verifyComponentDef } from "../components-core/type-contracts";
 import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
 import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
+import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -95,6 +96,22 @@ export type PluginOptions = {
    * Defaults to the built-in component metadata.
    */
   typeContractRegistry?: ReadonlyMap<string, ComponentMetadata>;
+  /**
+   * Additional directories to scan for optimizer metadata at build time.
+   * Use this for extension packages that contribute container-like components
+   * with `childInjectedVars` or event `injectedVars`. Each entry must be an
+   * absolute path to a directory containing `.tsx` component source files
+   * with `optimization: {}` blocks inside `createMetadata` calls.
+   *
+   * Built-in xmlui components are always included automatically via
+   * `collectedComponentMetadata`; only add dirs for external extension packages.
+   *
+   * @example
+   * viteXmluiPlugin({
+   *   optimizerSourceDirs: [resolve(__dirname, "node_modules/my-extension/src/components")],
+   * })
+   */
+  optimizerSourceDirs?: string[];
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -128,6 +145,25 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
+
+  // Build optimizer metadata lookup for extension packages.
+  // When optimizerSourceDirs are provided, scan them and merge with the built-in
+  // collectedComponentMetadata. Pass undefined when no extension dirs exist, letting
+  // xmlUiMarkupToComponent use its default (also collectedComponentMetadata-based).
+  let extensionMetadataLookup: ((type: string) => any) | undefined;
+  if (pluginOptions.optimizerSourceDirs && pluginOptions.optimizerSourceDirs.length > 0) {
+    const extensionMetadata: Record<string, any> = {};
+    for (const dir of pluginOptions.optimizerSourceDirs) {
+      try {
+        Object.assign(extensionMetadata, extractOptimizerMetadataFromDir(dir));
+      } catch (_err) {
+        // Non-fatal: if the dir doesn't exist, skip it silently
+      }
+    }
+    // Merged lookup: extension packages first, then built-in components
+    extensionMetadataLookup = (type: string) =>
+      extensionMetadata[type] ?? (collectedComponentMetadata as any)[type];
+  }
 
   return {
     name: "vite:transform-xmlui",
@@ -191,7 +227,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         }
 
         let { component, errors, warnings, erroneousCompoundComponentName } =
-          xmlUiMarkupToComponent(code, fileId, codeBehind);
+          xmlUiMarkupToComponent(code, fileId, codeBehind, extensionMetadataLookup);
         if (errors.length > 0) {
           component = errReportComponent(errors, id, erroneousCompoundComponentName);
         }
