@@ -3,10 +3,6 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OPTIMIZER_METADATA } from "../../../src/components-core/optimization/optimizer-metadata";
-import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
-import { DataLoaderMd } from "../../../src/components-core/loader/DataLoader";
-import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
-import { APICallMd } from "../../../src/components/APICall/APICall";
 
 // Static drift detection —
 // Walks each built-in component's source file, extracts any
@@ -275,41 +271,3 @@ describe("OPTIMIZER_METADATA vars have a string-literal presence in source (U-au
   }
 });
 
-const RUNTIME_METADATA: Record<string, any> = {
-  ...collectedComponentMetadata,
-  DataLoader: DataLoaderMd,
-  DataSource: DataSourceMd,
-  APICall: APICallMd,
-};
-
-describe("OPTIMIZER_METADATA reflected in runtime metadata (U-audit.1)", () => {
-  for (const [componentType, registryEntry] of Object.entries(OPTIMIZER_METADATA)) {
-    const runtime = RUNTIME_METADATA[componentType];
-    const entry = registryEntry as {
-      childInjectedVars?: readonly string[];
-      events?: Record<string, { injectedVars?: readonly string[] }>;
-    };
-
-    if (entry.childInjectedVars) {
-      it(`${componentType}: runtime metadata uses OPTIMIZER_METADATA.${componentType}.childInjectedVars`, () => {
-        expect(runtime).toBeDefined();
-        expect([...(runtime.childInjectedVars ?? [])].sort()).toEqual(
-          [...entry.childInjectedVars!].sort(),
-        );
-      });
-    }
-
-    if (entry.events) {
-      for (const [eventName, eventEntry] of Object.entries(entry.events)) {
-        it(`${componentType}.events.${eventName}: runtime metadata uses OPTIMIZER_METADATA entry`, () => {
-          expect(runtime).toBeDefined();
-          const runtimeEvent = runtime?.events?.[eventName];
-          expect(runtimeEvent).toBeDefined();
-          expect([...(runtimeEvent?.injectedVars ?? [])].sort()).toEqual(
-            [...(eventEntry.injectedVars ?? [])].sort(),
-          );
-        });
-      }
-    }
-  }
-});

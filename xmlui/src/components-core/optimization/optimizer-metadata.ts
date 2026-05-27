@@ -18,19 +18,17 @@
  *        eventsInheritChildVars: ["select", "hover"],
  *      }),
  *      ```
- *   2. No extra step needed in the `.tsx` file — `mergeOptimizerInjectedVars` inside
- *      `wrapComponent`/`wrapCompound` automatically copies all projected keys
- *      (`childInjectedVars`, `unstableChildInjectedVars`, `isImplicitContainerByDefault`,
- *      and per-event `injectedVars`) into runtime `ComponentMetadata` at registration.
- *      For events, reference `OPTIMIZER_METADATA.YourComp.events.X.injectedVars` directly
- *      inside the corresponding event metadata if you need the value statically.
+ *   2. No extra step needed in the `.tsx` file — the optimizer reads `OPTIMIZER_METADATA`
+ *      directly via `lookupOptimizerMetadata`. For runtime validation (`validateInjectedVars`),
+ *      component `.tsx` files should reference `OPTIMIZER_METADATA.YourComp` directly
+ *      inside the corresponding event/child metadata if needed.
  *
  * **Extension Packages:** Runtime registration API is pending. Until then, extension
  * components over-subscribe (graceful degradation, correctness preserved).
  */
 import type { ComponentMetadata } from "../../abstractions/ComponentDefs";
 
-export function withInjectedContext(opts: {
+function withInjectedContext(opts: {
   isImplicitContainerByDefault?: boolean;
   childInjectedVars?: readonly string[];
   unstableChildInjectedVars?: readonly string[];
@@ -191,49 +189,3 @@ export function lookupOptimizerMetadata(type: string): ComponentMetadata | undef
   return (OPTIMIZER_METADATA as Record<string, ComponentMetadata>)[type];
 }
 
-/**
- * Populate a component descriptor's metadata with injected-variable
- * declarations sourced from OPTIMIZER_METADATA. The optimizer is the single
- * source of truth for which variables it keeps alive in container/event
- * scopes; this helper mirrors that information into the runtime descriptor
- * so `validateInjectedVars` (and IDE/docs consumers) see the same set and
- * don't report bogus mismatches.
- *
- * Mutates `metadata` in place. Only fills gaps — never overwrites a value
- * the component has already declared explicitly.
- *
- * Called by `wrapComponent`, `wrapCompound`, and `createComponentRenderer`
- * so that every registration path enriches metadata automatically.
- */
-export function mergeOptimizerInjectedVars(type: string, metadata: ComponentMetadata | undefined): void {
-  if (!metadata) return;
-  const opt = lookupOptimizerMetadata(type);
-  if (!opt) return;
-
-  // Copy all three optimizer-projected keys (isImplicitContainerByDefault,
-  // childInjectedVars, unstableChildInjectedVars) — component .tsx files
-  // do not need to declare these manually.
-  if (opt.isImplicitContainerByDefault && !metadata.isImplicitContainerByDefault) {
-    (metadata as any).isImplicitContainerByDefault = true;
-  }
-  if (opt.childInjectedVars && !metadata.childInjectedVars) {
-    (metadata as any).childInjectedVars = opt.childInjectedVars;
-  }
-  if (opt.unstableChildInjectedVars && !metadata.unstableChildInjectedVars) {
-    (metadata as any).unstableChildInjectedVars = opt.unstableChildInjectedVars;
-  }
-
-  if (opt.events) {
-    for (const eventName of Object.keys(opt.events)) {
-      const injected = opt.events[eventName]?.injectedVars;
-      if (!injected) continue;
-      // Only enrich events the component already advertises. If the
-      // optimizer declares an event the component doesn't expose, leave it
-      // alone — that's an OPTIMIZER_METADATA mistake, not a runtime concern.
-      const target = metadata.events?.[eventName];
-      if (target && !target.injectedVars) {
-        (target as any).injectedVars = injected;
-      }
-    }
-  }
-}
