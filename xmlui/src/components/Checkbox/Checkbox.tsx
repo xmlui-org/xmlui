@@ -30,6 +30,7 @@ const COMP = "Checkbox";
 
 export const CheckboxMd = createMetadata({
   status: "stable",
+  childInjectedVars: ["$checked", "$setChecked"],
   description:
     "`Checkbox` allows users to make binary choices with a clickable box that shows " +
     "checked/unchecked states. It's essential for settings, preferences, multi-select " +

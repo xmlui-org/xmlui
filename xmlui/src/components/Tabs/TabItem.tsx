@@ -9,6 +9,7 @@ const COMP = "TabItem";
 
 export const TabItemMd = createMetadata({
   status: "stable",
+  childInjectedVars: ["$header"],
   description:
     "`TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, " +
     "providing both the tab header label and the content that displays when the tab " +

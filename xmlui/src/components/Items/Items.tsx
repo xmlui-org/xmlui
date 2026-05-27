@@ -7,6 +7,7 @@ const COMP = "Items";
 
 export const ItemsMd = createMetadata({
   status: "stable",
+  childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast"],
   description:
     "`Items` renders data arrays without built-in layout or styling, providing " +
     "a lightweight alternative to `List`. Unlike `List`, it provides no " +
