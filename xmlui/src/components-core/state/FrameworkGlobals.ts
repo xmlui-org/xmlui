@@ -1,19 +1,13 @@
 import { collectedComponentMetadata } from "../../components/collectedComponentMetadata";
 import { DataLoaderMd } from "../loader/DataLoader";
+import { UNSTABLE_GLOBAL_VARS } from "./unstableGlobalVars";
 
 // XMLUI_GLOBAL_NAMES lives in the factory — the single source of truth.
-// Re-exported here so the optimizer (computedUses) has a stable import path
-// alongside UNSTABLE_GLOBAL_VARS.
+// Re-exported here so the optimizer (computedUses) has a stable import path.
 export { XMLUI_GLOBAL_NAMES } from "./appContextFactory";
 
-/**
- * A set of global state variables that are reference-unstable.
- * These variables are recreated frequently (e.g., new objects on every navigation).
- * Providing them implicitly to all containers breaks React.memo/useShallowCompareMemoize
- * optimizations, so they must be explicitly excluded from Implicit Pass-through (Layer 3)
- * unless explicitly requested via `computedUses`.
- */
-export const UNSTABLE_GLOBAL_VARS = new Set<string>();
+// Re-export so existing callers can still import UNSTABLE_GLOBAL_VARS from here.
+export { UNSTABLE_GLOBAL_VARS } from "./unstableGlobalVars";
 
 const ALL_METADATA = { ...collectedComponentMetadata, DataLoader: DataLoaderMd };
 

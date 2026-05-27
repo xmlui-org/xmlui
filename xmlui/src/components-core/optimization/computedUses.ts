@@ -22,7 +22,7 @@ import { Parser } from "../../parsers/scripting/Parser";
 import type { Statement } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
 import { isContainerLike } from "../rendering/ContainerUtils";
-import { XMLUI_GLOBAL_NAMES } from "../state/FrameworkGlobals";
+import { XMLUI_GLOBAL_NAMES } from "../state/appContextFactory";
 
 // LRU cache for parsed raw strings to avoid unbounded memory growth.
 // AST_CACHE_MAX_SIZE covers typical apps while guarding against generated code.

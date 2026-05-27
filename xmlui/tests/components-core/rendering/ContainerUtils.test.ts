@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   isParsedEventValue,
   isArrowExpression,
@@ -6,6 +6,7 @@ import {
   CodeBehindParseError,
   ParseVarError,
 } from "../../../src/components-core/rendering/ContainerUtils";
+import { UNSTABLE_GLOBAL_VARS } from "../../../src/components-core/state/unstableGlobalVars";
 import { T_ARROW_EXPRESSION } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import type { ParsedEventValue } from "../../../src/abstractions/scripting/Compilation";
 import type { ArrowExpression } from "../../../src/components-core/script-runner/ScriptingSourceTree";
@@ -98,6 +99,19 @@ describe("ContainerUtils", () => {
   });
 
   describe("extractScopedState", () => {
+    beforeEach(() => {
+      // Populate the unstable vars set as FrameworkGlobals.ts would at app init
+      // (App.tsx metadata declares these as unstableChildInjectedVars).
+      UNSTABLE_GLOBAL_VARS.add("$pathname");
+      UNSTABLE_GLOBAL_VARS.add("$routeParams");
+      UNSTABLE_GLOBAL_VARS.add("$queryParams");
+      UNSTABLE_GLOBAL_VARS.add("$linkInfo");
+    });
+
+    afterEach(() => {
+      UNSTABLE_GLOBAL_VARS.clear();
+    });
+
     it("should return parent state when uses is undefined", () => {
       const parentState = { user: { id: 1 }, count: 5 };
       const result = extractScopedState(parentState);

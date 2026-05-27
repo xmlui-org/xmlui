@@ -14,7 +14,11 @@ import { clearAllModuleCaches } from "../parsers/scripting/ModuleCache";
 import type { ModuleFetcher } from "../parsers/scripting/types";
 import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import * as fs from "fs/promises";
-import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
+import {
+  defaultMetadataLookup,
+  errReportComponent,
+  xmlUiMarkupToComponent,
+} from "../components-core/xmlui-parser";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import { analyze } from "../components-core/analyzer/walker";
 import {
@@ -154,15 +158,33 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   if (pluginOptions.optimizerSourceDirs && pluginOptions.optimizerSourceDirs.length > 0) {
     const extensionMetadata: Record<string, any> = {};
     for (const dir of pluginOptions.optimizerSourceDirs) {
+      let incoming: Record<string, any>;
       try {
-        Object.assign(extensionMetadata, extractOptimizerMetadataFromDir(dir));
-      } catch (_err) {
-        // Non-fatal: if the dir doesn't exist, skip it silently
+        incoming = extractOptimizerMetadataFromDir(dir);
+      } catch (err) {
+        // Non-fatal when the directory simply doesn't exist; re-throw genuine errors.
+        const code = (err as NodeJS.ErrnoException).code;
+        if (code === "ENOENT" || code === "ENOTDIR") {
+          console.warn(`[xmlui] optimizerSourceDirs: directory not found, skipping: ${dir}`);
+          continue;
+        }
+        throw new Error(
+          `[xmlui] optimizerSourceDirs: failed to scan "${dir}": ${(err as Error).message}`,
+        );
       }
+      // Warn on key collisions — last-dir-wins but the developer should know.
+      for (const key of Object.keys(incoming)) {
+        if (key in extensionMetadata) {
+          console.warn(
+            `[xmlui] optimizerSourceDirs: component "${key}" declared in multiple dirs; last-dir-wins.`,
+          );
+        }
+      }
+      Object.assign(extensionMetadata, incoming);
     }
-    // Merged lookup: extension packages first, then built-in components
+    // Merged lookup: extension packages first, then built-in components (including DataLoader).
     extensionMetadataLookup = (type: string) =>
-      extensionMetadata[type] ?? (collectedComponentMetadata as any)[type];
+      extensionMetadata[type] ?? defaultMetadataLookup(type);
   }
 
   return {

@@ -32,13 +32,10 @@ const DATALOADER_OPTIMIZER_META = {
   },
 } as const;
 
-const ALL_OPTIMIZER_METADATA: Record<string, any> = {
-  ...(collectedComponentMetadata as any),
-  DataLoader: DATALOADER_OPTIMIZER_META,
-};
-
-function defaultMetadataLookup(type: string): any {
-  return ALL_OPTIMIZER_METADATA[type];
+// Inline lookup avoids duplicating the entire collectedComponentMetadata map in memory.
+export function defaultMetadataLookup(type: string): any {
+  if (type === "DataLoader") return DATALOADER_OPTIMIZER_META;
+  return (collectedComponentMetadata as any)[type];
 }
 
 interface ErrorForDisplay extends GeneralDiag {
@@ -69,7 +66,7 @@ export function xmlUiMarkupToComponent(
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   const cursor = new DocumentCursor(source);
-  
+
   if (errors.length > 0) {
     const errorsToDisplay = errors.map((err) => {
       return errorWithDisplayFields(err, cursor, source);

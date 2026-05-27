@@ -7,7 +7,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ArrowExpression } from "../script-runner/ScriptingSourceTree";
 import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import { UNSTABLE_GLOBAL_VARS } from "../state/FrameworkGlobals";
+import { UNSTABLE_GLOBAL_VARS } from "../state/unstableGlobalVars";
 
 // ============================================================================
 // TYPE GUARDS
