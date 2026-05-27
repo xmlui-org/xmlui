@@ -315,6 +315,10 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
       @include textVariant("code");
     }
 
+    pre &.code {
+      background-color: transparent;
+    }
+
     &.caption {
       letter-spacing: $letterSpacing-Text-caption;
     }
