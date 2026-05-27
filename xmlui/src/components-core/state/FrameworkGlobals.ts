@@ -1,4 +1,5 @@
-import { OPTIMIZER_METADATA } from "../optimization/optimizer-metadata";
+import { collectedComponentMetadata } from "../../components/collectedComponentMetadata";
+import { DataLoaderMd } from "../loader/DataLoader";
 
 // XMLUI_GLOBAL_NAMES lives in the factory — the single source of truth.
 // Re-exported here so the optimizer (computedUses) has a stable import path
@@ -14,8 +15,10 @@ export { XMLUI_GLOBAL_NAMES } from "./appContextFactory";
  */
 export const UNSTABLE_GLOBAL_VARS = new Set<string>();
 
-for (const meta of Object.values(OPTIMIZER_METADATA)) {
-  const unstableVars = (meta as any).unstableChildInjectedVars;
+const ALL_METADATA = { ...collectedComponentMetadata, DataLoader: DataLoaderMd };
+
+for (const meta of Object.values(ALL_METADATA)) {
+  const unstableVars = (meta as any)?.unstableChildInjectedVars;
   if (unstableVars) {
     for (const v of unstableVars) {
       UNSTABLE_GLOBAL_VARS.add(v);
