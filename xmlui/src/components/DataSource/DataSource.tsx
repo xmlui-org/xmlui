@@ -1,6 +1,5 @@
 import { httpMethodNames } from "../abstractions";
 import { createMetadata, d } from "../metadata-helpers";
-import { mergeOptimizerInjectedVars } from "../../components-core/optimization/optimizer-metadata";
 
 // NOTE: Original component this is based on is the `Loader` component
 
@@ -180,6 +179,7 @@ export const DataSourceMd = createMetadata({
         "function that powers the default fetch.",
       signature: "fetch(): any",
       parameters: {},
+      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
     },
   },
   apis: {
@@ -212,5 +212,3 @@ export const DataSourceMd = createMetadata({
     },
   },
 });
-
-mergeOptimizerInjectedVars(COMP, DataSourceMd);
