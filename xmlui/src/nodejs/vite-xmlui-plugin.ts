@@ -30,7 +30,7 @@ import {
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
 import { verifyComponentDef } from "../components-core/type-contracts";
-import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata, OptimizerMetadataView } from "../abstractions/ComponentDefs";
 import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
 
@@ -154,9 +154,9 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   // When optimizerSourceDirs are provided, scan them and merge with the built-in
   // collectedComponentMetadata. Pass undefined when no extension dirs exist, letting
   // xmlUiMarkupToComponent use its default (also collectedComponentMetadata-based).
-  let extensionMetadataLookup: ((type: string) => any) | undefined;
+  let extensionMetadataLookup: ((type: string) => OptimizerMetadataView | undefined) | undefined;
   if (pluginOptions.optimizerSourceDirs && pluginOptions.optimizerSourceDirs.length > 0) {
-    const extensionMetadata: Record<string, any> = {};
+    const extensionMetadata: Record<string, OptimizerMetadataView> = {};
     for (const dir of pluginOptions.optimizerSourceDirs) {
       let incoming: Record<string, any>;
       try {

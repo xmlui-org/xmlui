@@ -1,4 +1,4 @@
-import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef, OptimizerMetadataView } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { computeUsesForTree } from "./optimization/computedUses";
@@ -16,9 +16,9 @@ import type { ModuleErrors, CollectedDeclarations } from "./script-runner/Script
 import { DocumentCursor } from "../language-server/base/text-document";
 
 // Inline lookup avoids duplicating the entire collectedComponentMetadata map in memory.
-export function defaultMetadataLookup(type: string): any {
+export function defaultMetadataLookup(type: string): OptimizerMetadataView | undefined {
   if (type === "DataLoader") return DataLoaderMd;
-  return (collectedComponentMetadata as any)[type];
+  return (collectedComponentMetadata as Record<string, OptimizerMetadataView>)[type];
 }
 
 interface ErrorForDisplay extends GeneralDiag {
@@ -44,7 +44,7 @@ export function xmlUiMarkupToComponent(
   source: string,
   fileId: string | number = 0,
   preResolvedImports?: CollectedDeclarations,
-  metadataLookup?: (type: string) => any,
+  metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
 ): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();

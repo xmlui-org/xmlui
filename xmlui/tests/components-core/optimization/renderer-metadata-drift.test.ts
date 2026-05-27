@@ -220,18 +220,20 @@ describe("childInjectedVars / injectedVars vars have a string-literal presence i
       // If source file not found — skip (component may be in extensions or core)
       if (!source) return;
 
-      // Special cases: vars live across multiple related files
-      if (componentType === "Table" || componentType === "Column") {
-        const tableReactFile = filePath!.replace("Column/Column.tsx", "Table/TableReact.tsx");
-        try { source += readFileSync(tableReactFile, "utf-8"); } catch (_) {}
-        const columnReactFile = filePath!.replace(".tsx", "React.tsx");
-        try { source += readFileSync(columnReactFile, "utf-8"); } catch (_) {}
-      } else if (componentType === "RadioGroup") {
-        const radioReactFile = filePath!.replace(".tsx", "React.tsx");
-        try { source += readFileSync(radioReactFile, "utf-8"); } catch (_) {}
-      } else if (componentType === "Checkbox") {
-        const toggleFile = filePath!.replace("Checkbox/Checkbox.tsx", "Toggle/Toggle.tsx");
-        try { source += readFileSync(toggleFile, "utf-8"); } catch (_) {}
+      // Auto-discover sibling .tsx files in the same directory
+      // (e.g. TableReact.tsx alongside Table.tsx, ColumnReact.tsx alongside Column.tsx).
+      // This replaces a hand-maintained special-case list that would silently miss
+      // new sibling files whenever a component splits its rendering.
+      if (filePath) {
+        const dir = dirname(filePath);
+        try {
+          for (const sibling of readdirSync(dir)) {
+            const siblingPath = join(dir, sibling);
+            if (sibling.endsWith(".tsx") && siblingPath !== filePath) {
+              try { source += readFileSync(siblingPath, "utf-8"); } catch (_) {}
+            }
+          }
+        } catch (_) {}
       }
 
       function checkVars(vars: readonly string[], label: string): void {

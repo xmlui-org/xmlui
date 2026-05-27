@@ -20,7 +20,7 @@
 import { depsOfValueWithReads } from "../script-runner/visitors";
 import { Parser } from "../../parsers/scripting/Parser";
 import type { Statement } from "../script-runner/ScriptingSourceTree";
-import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, OptimizerMetadataView } from "../../abstractions/ComponentDefs";
 import { isContainerLike } from "../rendering/ContainerUtils";
 import { XMLUI_GLOBAL_NAMES } from "../state/appContextFactory";
 
@@ -151,7 +151,7 @@ function computeUsesInternal(
   parentFunctionNames: Set<string> = new Set(),
   disableNarrowing: boolean = false,
   injectedVarsScope: ReadonlySet<string> = EMPTY_SET,
-  metadataLookup?: (type: string) => ComponentMetadata | undefined,
+  metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
 ): [Set<string>, Set<string>, Set<string>] {
   // Clear stale `computedUses` from prior traversals.
   // Re-running analysis is routine (e.g., after merging code-behind functions).
@@ -407,7 +407,7 @@ function computeUsesInternal(
  * Public API — same contract as before (returns free vars set).
  * Prefer `computeUsesForTree` for whole-tree traversal.
  */
-export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type: string) => ComponentMetadata | undefined): Set<string> {
+export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type: string) => OptimizerMetadataView | undefined): Set<string> {
   if (!COMPUTED_USES_ENABLED) return new Set();
   const [freeVars] = computeUsesInternal(node, new Set(), false, EMPTY_SET, metadataLookup);
   return freeVars;
@@ -435,7 +435,7 @@ function unwrapToComponentDef(node: ComponentDef): ComponentDef {
   return node;
 }
 
-export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => ComponentMetadata | undefined): void {
+export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => OptimizerMetadataView | undefined): void {
   if (!COMPUTED_USES_ENABLED) return;
   // Unwrap potential CompoundComponentDef wrappers before analysis.
   const actualRoot = unwrapToComponentDef(root);

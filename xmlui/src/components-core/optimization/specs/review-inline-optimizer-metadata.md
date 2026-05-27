@@ -14,19 +14,8 @@
 
 ---
 
-## ~~🟡 2. Hardcoded `DATALOADER_OPTIMIZER_META` in `xmlui-parser.ts`~~ ✅ DONE
 
-**Where:** [xmlui-parser.ts](xmlui/src/components-core/xmlui-parser.ts) — ~~a hand-maintained literal~~
 
-**Resolution:** Created [DataLoaderMd.ts](xmlui/src/components-core/loader/DataLoaderMd.ts) as a pure-TypeScript module (no React/papaparse deps) that exports `DataLoaderMd` via `createMetadata`. `DataLoader.tsx` re-exports it. `xmlui-parser.ts` now imports `DataLoaderMd` directly instead of the hardcoded constant. No drift possible.
-
----
-
-## ~~🟡 3. Duplication: `events` declared in two separate blocks~~ ✅ DONE
-
-**Where:** Form, Queue, Table, TileGrid, Tree, DataLoader, DataSource, APICall.
-
-**Resolution:** `injectedVars` is now a first-class field on each event entry (placed first, before `description`/`signature`/`parameters`). The `optimization.events` sub-block is removed from all components. `OptimizerInput.events?` is removed from `metadata-helpers.ts`, and the per-event merge loop in `createMetadata` is deleted (~15 lines). The static extractor continues to work because `injectedVars` is placed as the first field in each event, so the back-tracking regex finds the event name without encountering nested braces.
 
 ---
 
@@ -131,26 +120,29 @@ else if (componentType === "Checkbox") { /* read Toggle.tsx */ }
 
 | # | Severity | Title | Files | Status |
 |---|----------|-------|-------|--------|
-| 1 | 🔴 | DataLoader vars lost via `optimizerSourceDirs` | `vite-xmlui-plugin.ts`, `xmlui-parser.ts` | |
+| 1 | 🔴 | DataLoader vars lost via `optimizerSourceDirs` | `vite-xmlui-plugin.ts`, `xmlui-parser.ts` | ✅ Done |
 | 2 | 🟡 | Hardcoded `DATALOADER_OPTIMIZER_META` | `xmlui-parser.ts`, `DataLoader.tsx` | ✅ Done |
 | 3 | 🟡 | Duplicated event names across two blocks | all components with event `injectedVars` | ✅ Done |
 | 4 | 🟡 | Regex-based source extraction | `static-extractor.ts` | |
-| 5 | 🟡 | Silently swallowed extension-dir errors | `vite-xmlui-plugin.ts` | |
-| 6 | 🟡 | No collision warnings on merge | `vite-xmlui-plugin.ts` | |
-| 7 | 🟡 | `as any` casts in metadata path | `metadata-helpers.ts`, `xmlui-parser.ts` | |
+| 5 | 🟡 | Silently swallowed extension-dir errors | `vite-xmlui-plugin.ts` | ✅ Done |
+| 6 | 🟡 | No collision warnings on merge | `vite-xmlui-plugin.ts` | ✅ Done |
+| 7 | 🟡 | `as any` casts in metadata path | `metadata-helpers.ts`, `xmlui-parser.ts` | ✅ Done |
 | 8 | 🟢 | Module-level `ALL_OPTIMIZER_METADATA` spread | `xmlui-parser.ts` | |
 | 9 | 🟢 | Inconsistent `optimization:` block placement | many components | |
 | 10 | 🟢 | Narrow `extractComponentName` patterns | `static-extractor.ts` | |
 | 11 | 🟢 | `optimization` is a misleading name | naming convention | |
-| 12 | 🟢 | Hand-maintained sibling-file list in U-audit.2 | `renderer-metadata-drift.test.ts` | |
+| 12 | 🟢 | Hand-maintained sibling-file list in U-audit.2 | `renderer-metadata-drift.test.ts` | ✅ Done |
 
 ---
 
 ## Recommended Order of Cleanup
 
-1. ~~**#1** (bug) — quick fix, no architectural change.~~ *(todo)*
+1. ~~**#1** (bug) — fixed: `extensionMetadataLookup` falls back to `defaultMetadataLookup` which includes `DataLoaderMd`.~~ ✅ Done
 2. ~~**#3** (events merge) — biggest structural win; deletes code from `metadata-helpers.ts` and removes a layer of indirection across many files.~~ ✅ Done
 3. ~~**#2** (DataLoader split) — eliminates the worst remaining drift point; opens the door to dropping the hardcoded constant.~~ ✅ Done
-4. **#5, #6** (Vite plugin error handling) — small, defensive, before any extension packages start using `optimizerSourceDirs` in earnest.
+4. ~~**#5, #6** (Vite plugin error handling) — small, defensive, before any extension packages start using `optimizerSourceDirs` in earnest.~~ ✅ Done
 5. **#4** (AST extractor) — only worth doing once a real-world false-positive surfaces, or when adding more extracted fields.
-6. **#7-12** — opportunistic, alongside whatever else touches those files.
+6. ~~**#7-12** — opportunistic, alongside whatever else touches those files.~~
+   - ~~**#7** (`as any` casts) — `OptimizerMetadataView` added to `ComponentDefs.ts`; lookup functions typed.~~ ✅ Done
+   - **#8, #9, #10, #11** — still open.
+   - ~~**#12** (U-audit.2 sibling-file list) — replaced hand-coded special cases with directory scan.~~ ✅ Done

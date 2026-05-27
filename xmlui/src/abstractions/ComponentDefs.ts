@@ -717,6 +717,26 @@ export type ComponentMetadata<
   };
 };
 
+/**
+ * Strict subset of ComponentMetadata fields read by the computedUses optimizer.
+ * Use this type (instead of `any`) for metadata lookup functions to document
+ * exactly which fields the optimizer consumes and prevent accidental coupling
+ * to unrelated metadata.
+ */
+export type OptimizerMetadataView = {
+  isImplicitContainerByDefault?: boolean;
+  childInjectedVars?: readonly string[];
+  unstableChildInjectedVars?: readonly string[];
+  /** Only the keys of contextVars are read (for extension-package components). */
+  contextVars?: Record<string, unknown>;
+  /**
+   * `description` is included so that both `ComponentEventMetadata` and
+   * `ComponentPropertyMetadata` are structurally assignable here (both carry a
+   * required `description` field). The optimizer only reads `injectedVars`.
+   */
+  events?: Record<string, { description?: string; injectedVars?: readonly string[] }>;
+};
+
 export interface ParentRenderContext {
   renderChild: RenderChildFn;
   children?: ComponentDef[];
