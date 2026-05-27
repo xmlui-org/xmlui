@@ -107,13 +107,13 @@ Native XMLUI components and corresponding Markdown elements share common theme v
 Now let's create that same table using this markdown syntax.
 
 ```
-| apples | oranges | pears
-| ---    | ---     | ---
-| 3      | 7       | 11
+| apples | pears   | oranges |
+| ---    | ---     | ---     |
+| 3      | 7       | 11      |
 ```
 
 It looks the same.
 
-| apples | oranges | pears |
-| ------ | ------- | ----- |
-| 3      | 7       | 11    |
+| apples | pears   | oranges |
+| ------ | ------- | -----   |
+| 3      | 7       | 11      |
