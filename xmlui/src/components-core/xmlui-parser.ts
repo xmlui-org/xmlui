@@ -2,6 +2,7 @@ import type { ComponentDef, CompoundComponentDef } from "../abstractions/Compone
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { computeUsesForTree } from "./optimization/computedUses";
+import { DataLoaderMd } from "./loader/DataLoaderMd";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — generated file
 import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
@@ -14,27 +15,9 @@ import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptP
 import type { ModuleErrors, CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { DocumentCursor } from "../language-server/base/text-document";
 
-// DataLoader registers via wrapComponent but is internal (not in collectedComponentMetadata).
-// Its optimizer-relevant event vars are listed here to avoid importing DataLoader.tsx
-// (which has React/papaparse deps incompatible with pure Node.js / Vite plugin contexts).
-const DATALOADER_OPTIMIZER_META = {
-  events: {
-    fetch: {
-      injectedVars: [
-        "$url",
-        "$method",
-        "$queryParams",
-        "$requestBody",
-        "$requestHeaders",
-        "$pageParams",
-      ] as readonly string[],
-    },
-  },
-} as const;
-
 // Inline lookup avoids duplicating the entire collectedComponentMetadata map in memory.
 export function defaultMetadataLookup(type: string): any {
-  if (type === "DataLoader") return DATALOADER_OPTIMIZER_META;
+  if (type === "DataLoader") return DataLoaderMd;
   return (collectedComponentMetadata as any)[type];
 }
 

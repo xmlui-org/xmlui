@@ -10,11 +10,6 @@ export const DataSourceMd = createMetadata({
   description:
     "`DataSource` fetches and caches data from API endpoints, versus " +
     "[`APICall`](/docs/reference/components/APICall) which creates, updates or deletes data.",
-  optimization: {
-    events: {
-      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
-    },
-  },
   props: {
     method: {
       description: `Set the HTTP method.`,
@@ -174,6 +169,7 @@ export const DataSourceMd = createMetadata({
     },
 
     fetch: {
+      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
       description:
         "When defined, this event handler replaces the default fetch logic. The handler " +
         "receives the resolved request properties as context variables: `$url`, `$method`, " +

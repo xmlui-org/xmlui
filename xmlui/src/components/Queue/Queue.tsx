@@ -12,13 +12,6 @@ export const QueueMd = createMetadata({
     "order. It is a non-visual component but provides UI progress reporting and result display.",
   optimization: {
     childInjectedVars: ["$completedItems", "$queuedItems"],
-    events: {
-      willProcess:  { injectedVars: ["$completedItems", "$queuedItems"] },
-      process:      { injectedVars: ["$completedItems", "$queuedItems"] },
-      didProcess:   { injectedVars: ["$completedItems", "$queuedItems"] },
-      processError: { injectedVars: ["$completedItems", "$queuedItems"] },
-      complete:     { injectedVars: ["$completedItems", "$queuedItems"] },
-    },
   },
   props: {
     progressFeedback: {
@@ -46,6 +39,7 @@ export const QueueMd = createMetadata({
   nonVisual: true,
   events: {
     willProcess: {
+      injectedVars: ["$completedItems", "$queuedItems"],
       description: `This event is triggered to process a particular item.`,
       signature: "willProcess(item: any): void | boolean",
       parameters: {
@@ -53,6 +47,7 @@ export const QueueMd = createMetadata({
       },
     },
     process: {
+      injectedVars: ["$completedItems", "$queuedItems"],
       description:
         `This event is fired to process the next item in the queue. If the processing cannot ` +
         `proceed because of some error, raise an exception, and the queue will handle that.`,
@@ -62,6 +57,7 @@ export const QueueMd = createMetadata({
       },
     },
     didProcess: {
+      injectedVars: ["$completedItems", "$queuedItems"],
       description:
         `This event is fired when the processing of a queued item has been successfully processed.`,
       signature: "didProcess(item: any, result: any): void",
@@ -71,6 +67,7 @@ export const QueueMd = createMetadata({
       },
     },
     processError: {
+      injectedVars: ["$completedItems", "$queuedItems"],
       description:
         `This event is fired when processing an item raises an error. The event handler method ` +
         `receives two parameters. The first is the error raised during the processing of the ` +
@@ -82,6 +79,7 @@ export const QueueMd = createMetadata({
       },
     },
     complete: {
+      injectedVars: ["$completedItems", "$queuedItems"],
       description:
         `The queue fires this event when the queue gets empty after processing all items. ` +
         `The event handler has no arguments.`,

@@ -16,9 +16,6 @@ export const TreeMd = createMetadata({
   optimization: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$item"],
-    events: {
-      contextMenu: { injectedVars: ["$item"] },
-    },
   },
   props: {
     data: {
@@ -211,6 +208,7 @@ export const TreeMd = createMetadata({
   },
   events: {
     contextMenu: {
+      injectedVars: ["$item"],
       ...dContextMenu(COMP),
     },
     selectionDidChange: {

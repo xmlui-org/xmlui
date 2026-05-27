@@ -234,11 +234,6 @@ export const APICallMd = createMetadata({
     optimisticValue: dInternal(),
     getOptimisticValue: dInternal(),
   },
-  optimization: {
-    events: {
-      mockExecute: { injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"] },
-    },
-  },
   events: {
     beforeRequest: {
       description:
@@ -296,6 +291,7 @@ export const APICallMd = createMetadata({
       parameters: {},
     },
     mockExecute: {
+      injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"],
       description:
         "When defined, this event handler replaces the actual API request. " +
         "The handler receives the resolved request properties as context variables: " +

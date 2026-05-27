@@ -14,94 +14,19 @@
 
 ---
 
-## 🟡 2. Hardcoded `DATALOADER_OPTIMIZER_META` in `xmlui-parser.ts`
+## ~~🟡 2. Hardcoded `DATALOADER_OPTIMIZER_META` in `xmlui-parser.ts`~~ ✅ DONE
 
-**Where:** [xmlui-parser.ts](xmlui/src/components-core/xmlui-parser.ts) — a hand-maintained literal:
+**Where:** [xmlui-parser.ts](xmlui/src/components-core/xmlui-parser.ts) — ~~a hand-maintained literal~~
 
-```ts
-const DATALOADER_OPTIMIZER_META = {
-  events: {
-    fetch: {
-      injectedVars: ["$url","$method","$queryParams","$requestBody","$requestHeaders","$pageParams"],
-    },
-  },
-} as const;
-```
-
-**Problem:** This re-introduces the exact two-place maintenance burden the whole migration was meant to eliminate. If the DataLoader's `fetch` event ever gains/renames an injected var, a developer must update **both** [`DataLoader.tsx`](xmlui/src/components-core/loader/DataLoader.tsx) and this constant. Worse, the parser doesn't import from DataLoader.tsx (because of React/papaparse deps), so static type-checking won't catch a drift.
-
-**Root cause:** `DataLoader.tsx` mixes pure metadata declarations with React/papaparse/toast imports, making the whole module un-importable from Node.js.
-
-**Fix direction — split DataLoader into two files:**
-
-```
-xmlui/src/components-core/loader/DataLoaderMd.ts       ← pure TS, no React/DOM/SCSS
-xmlui/src/components-core/loader/DataLoader.tsx        ← imports DataLoaderMd + React
-```
-
-`DataLoaderMd.ts` exports `DataLoaderMd` via `createMetadata({...})`. `xmlui-parser.ts` can then `import { DataLoaderMd } from "../loader/DataLoaderMd"` directly — no hardcoding, no drift. The same fix benefits `FrameworkGlobals.ts` which has the same workaround.
-
-This pattern (split metadata from React implementation) is also the *general* solution if any other internal component needs the same treatment.
+**Resolution:** Created [DataLoaderMd.ts](xmlui/src/components-core/loader/DataLoaderMd.ts) as a pure-TypeScript module (no React/papaparse deps) that exports `DataLoaderMd` via `createMetadata`. `DataLoader.tsx` re-exports it. `xmlui-parser.ts` now imports `DataLoaderMd` directly instead of the hardcoded constant. No drift possible.
 
 ---
 
-## 🟡 3. Duplication: `events` declared in two separate blocks
+## ~~🟡 3. Duplication: `events` declared in two separate blocks~~ ✅ DONE
 
-**Where:** Form, Queue, Table, TileGrid, Tree, DataLoader, DataSource, APICall — every component with per-event `injectedVars`.
+**Where:** Form, Queue, Table, TileGrid, Tree, DataLoader, DataSource, APICall.
 
-Current pattern (e.g. `Form.tsx`):
-```ts
-optimization: {
-  childInjectedVars: ["$data"],
-  events: {
-    willSubmit:   { injectedVars: ["$data"] },
-    submit:       { injectedVars: ["$data"] },
-    submitFailed: { injectedVars: ["$data"] },
-    cancel:       { injectedVars: ["$data"] },
-    reset:        { injectedVars: ["$data"] },
-    success:      { injectedVars: ["$data"] },
-  },
-},
-events: {
-  willSubmit:   { description: "...", signature: "..." },
-  submit:       { description: "...", signature: "..." },
-  // ...same 6 names, repeated
-},
-```
-
-**Problems:**
-1. **Event names are spelled twice.** Renaming `submit` → `onSubmit` means touching two blocks, two indents apart. Easy to forget one.
-2. **Mental model split.** A reader looking at the `willSubmit` event has to scroll between two distant blocks to see "what is this event + what vars does it inject?"
-3. **`createMetadata` carries non-trivial merge logic** ([metadata-helpers.ts](xmlui/src/components/metadata-helpers.ts) lines 49-63) specifically to re-unite the two halves at runtime. The complexity exists only because we split them at source.
-4. The U-audit.2 test has to check two structurally-different shapes (top-level `events[*].injectedVars` after the merge, and inside-`optimization` before the merge), making the test logic more involved than necessary.
-
-**Better approach** — make `injectedVars` a first-class field on the existing event entry. The metadata for each event lives in **one** place:
-
-```ts
-optimization: {
-  childInjectedVars: ["$data"],   // only field that's not per-event
-},
-events: {
-  willSubmit:   { description: "...", signature: "...", injectedVars: ["$data"] },
-  submit:       { description: "...", signature: "...", injectedVars: ["$data"] },
-  submitFailed: { description: "...", signature: "...", injectedVars: ["$data"] },
-  cancel:       { description: "...", signature: "...", injectedVars: ["$data"] },
-  reset:        { description: "...", signature: "...", injectedVars: ["$data"] },
-  success:      { description: "...", signature: "...", injectedVars: ["$data"] },
-},
-```
-
-**Benefits:**
-- Event names appear once.
-- Each event entry is self-contained — description, signature, and runtime vars together.
-- `createMetadata`'s `optEvents` merging branch disappears (~15 lines of code + their tests).
-- `OptimizerInput.events?` drops out of `metadata-helpers.ts` entirely.
-- The `OptimizerInput` type collapses to just `{ isImplicitContainerByDefault?, childInjectedVars?, unstableChildInjectedVars? }` — three flat booleans/arrays.
-- `injectedVars` is already a documented field of `ComponentEventMetadata` (see [ComponentDefs.ts](xmlui/src/abstractions/ComponentDefs.ts)), so this is *more aligned* with the existing public API, not less.
-
-**One concern to weigh:** mixing optimizer-relevant fields (`injectedVars`) with API-doc fields (`description`, `signature`) in the same object blurs "what is this metadata for." That's a real but small downside. The win in DRY-ness and reduced split-state complexity outweighs it, especially because `injectedVars` *describes the event's API contract* (which vars the handler receives) — it's not purely an optimizer hint.
-
-**Migration cost:** roughly one edit per component listed above, mechanical, plus 4 lines deleted from `metadata-helpers.ts`.
+**Resolution:** `injectedVars` is now a first-class field on each event entry (placed first, before `description`/`signature`/`parameters`). The `optimization.events` sub-block is removed from all components. `OptimizerInput.events?` is removed from `metadata-helpers.ts`, and the per-event merge loop in `createMetadata` is deleted (~15 lines). The static extractor continues to work because `injectedVars` is placed as the first field in each event, so the back-tracking regex finds the event name without encountering nested braces.
 
 ---
 
@@ -204,28 +129,28 @@ else if (componentType === "Checkbox") { /* read Toggle.tsx */ }
 
 ## Summary Table
 
-| # | Severity | Title | Files |
-|---|----------|-------|-------|
-| 1 | 🔴 | DataLoader vars lost via `optimizerSourceDirs` | `vite-xmlui-plugin.ts`, `xmlui-parser.ts` |
-| 2 | 🟡 | Hardcoded `DATALOADER_OPTIMIZER_META` | `xmlui-parser.ts`, `DataLoader.tsx` |
-| 3 | 🟡 | Duplicated event names across two blocks | all components with event `injectedVars` |
-| 4 | 🟡 | Regex-based source extraction | `static-extractor.ts` |
-| 5 | 🟡 | Silently swallowed extension-dir errors | `vite-xmlui-plugin.ts` |
-| 6 | 🟡 | No collision warnings on merge | `vite-xmlui-plugin.ts` |
-| 7 | 🟡 | `as any` casts in metadata path | `metadata-helpers.ts`, `xmlui-parser.ts` |
-| 8 | 🟢 | Module-level `ALL_OPTIMIZER_METADATA` spread | `xmlui-parser.ts` |
-| 9 | 🟢 | Inconsistent `optimization:` block placement | many components |
-| 10 | 🟢 | Narrow `extractComponentName` patterns | `static-extractor.ts` |
-| 11 | 🟢 | `optimization` is a misleading name | naming convention |
-| 12 | 🟢 | Hand-maintained sibling-file list in U-audit.2 | `renderer-metadata-drift.test.ts` |
+| # | Severity | Title | Files | Status |
+|---|----------|-------|-------|--------|
+| 1 | 🔴 | DataLoader vars lost via `optimizerSourceDirs` | `vite-xmlui-plugin.ts`, `xmlui-parser.ts` | |
+| 2 | 🟡 | Hardcoded `DATALOADER_OPTIMIZER_META` | `xmlui-parser.ts`, `DataLoader.tsx` | ✅ Done |
+| 3 | 🟡 | Duplicated event names across two blocks | all components with event `injectedVars` | ✅ Done |
+| 4 | 🟡 | Regex-based source extraction | `static-extractor.ts` | |
+| 5 | 🟡 | Silently swallowed extension-dir errors | `vite-xmlui-plugin.ts` | |
+| 6 | 🟡 | No collision warnings on merge | `vite-xmlui-plugin.ts` | |
+| 7 | 🟡 | `as any` casts in metadata path | `metadata-helpers.ts`, `xmlui-parser.ts` | |
+| 8 | 🟢 | Module-level `ALL_OPTIMIZER_METADATA` spread | `xmlui-parser.ts` | |
+| 9 | 🟢 | Inconsistent `optimization:` block placement | many components | |
+| 10 | 🟢 | Narrow `extractComponentName` patterns | `static-extractor.ts` | |
+| 11 | 🟢 | `optimization` is a misleading name | naming convention | |
+| 12 | 🟢 | Hand-maintained sibling-file list in U-audit.2 | `renderer-metadata-drift.test.ts` | |
 
 ---
 
 ## Recommended Order of Cleanup
 
-1. **#1** (bug) — quick fix, no architectural change.
-2. **#3** (events merge) — biggest structural win; deletes code from `metadata-helpers.ts` and removes a layer of indirection across many files.
-3. **#2** (DataLoader split) — eliminates the worst remaining drift point; opens the door to dropping the hardcoded constant.
+1. ~~**#1** (bug) — quick fix, no architectural change.~~ *(todo)*
+2. ~~**#3** (events merge) — biggest structural win; deletes code from `metadata-helpers.ts` and removes a layer of indirection across many files.~~ ✅ Done
+3. ~~**#2** (DataLoader split) — eliminates the worst remaining drift point; opens the door to dropping the hardcoded constant.~~ ✅ Done
 4. **#5, #6** (Vite plugin error handling) — small, defensive, before any extension packages start using `optimizerSourceDirs` in earnest.
 5. **#4** (AST extractor) — only worth doing once a real-world false-positive surfaces, or when adding more extracted fields.
 6. **#7-12** — opportunistic, alongside whatever else touches those files.

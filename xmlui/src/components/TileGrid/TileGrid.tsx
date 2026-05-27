@@ -32,9 +32,6 @@ export const TileGridMd = createMetadata({
   optimization: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$selected"],
-    events: {
-      contextMenu: { injectedVars: ["$item", "$itemIndex"] },
-    },
   },
 
   props: {
@@ -165,6 +162,7 @@ export const TileGridMd = createMetadata({
       "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.",
     ),
     contextMenu: {
+      injectedVars: ["$item", "$itemIndex"],
       ...d(
         "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.",
       ),

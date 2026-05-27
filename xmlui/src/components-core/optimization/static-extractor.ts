@@ -68,8 +68,9 @@ export function extractOptimizerMetadataFromSource(source: string): OptimizerMet
     if (arr && arr.length > 0) result.unstableChildInjectedVars = arr;
   }
 
-  // Per-event injectedVars inside optimization.events: { eventName: { injectedVars: [...] } }
-  // Strategy: find each `injectedVars:` occurrence, extract the array, backtrack to find event name.
+  // Per-event injectedVars: find each `injectedVars:` occurrence, extract the array,
+  // back-track to find the event name. injectedVars must be the first field in the event
+  // entry so that there are no literal braces between `eventName: {` and `injectedVars:`.
   const eventVarsRe = /injectedVars\s*:/g;
   let m: RegExpExecArray | null;
   while ((m = eventVarsRe.exec(source)) !== null) {

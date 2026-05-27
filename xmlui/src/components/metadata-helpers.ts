@@ -22,12 +22,6 @@ type OptimizerInput = {
   childInjectedVars?: readonly string[];
   /** @see ComponentMetadata.unstableChildInjectedVars */
   unstableChildInjectedVars?: readonly string[];
-  /**
-   * Per-event injected variables. The key is the event name; the value
-   * is merged into the matching `events[name].injectedVars` field.
-   * The event must already be declared in the `events` block.
-   */
-  events?: Record<string, { injectedVars?: readonly string[] }>;
 };
 
 export function createMetadata<
@@ -46,23 +40,8 @@ export function createMetadata<
     return rest as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
   }
 
-  const { events: optEvents, ...optFields } = optimization as OptimizerInput;
-
-  // Spread isImplicitContainerByDefault, childInjectedVars, unstableChildInjectedVars
-  const result: any = { ...rest, ...optFields };
-
-  // Merge per-event injectedVars from optimization.events into events[name]
-  if (optEvents && rest.events) {
-    const mergedEvents: Record<string, ComponentEventMetadata> = { ...rest.events };
-    for (const [eventName, optEvent] of Object.entries(optEvents)) {
-      if (optEvent.injectedVars && mergedEvents[eventName]) {
-        mergedEvents[eventName] = { ...mergedEvents[eventName], injectedVars: optEvent.injectedVars };
-      }
-    }
-    result.events = mergedEvents;
-  }
-
-  return result as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
+  // Spread isImplicitContainerByDefault, childInjectedVars, unstableChildInjectedVars into the result
+  return { ...rest, ...(optimization as OptimizerInput) } as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
 }
 
 export function d(

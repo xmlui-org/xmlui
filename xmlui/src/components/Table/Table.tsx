@@ -49,9 +49,6 @@ export const TableMd = createMetadata({
   optimization: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex"],
-    events: {
-      contextMenu: { injectedVars: ["$item", "$row", "$rowIndex", "$itemIndex"] },
-    },
   },
   // NOTE: let's leave it like this for now, we'll expand later when the need arises
   parts: {
@@ -375,6 +372,7 @@ export const TableMd = createMetadata({
   },
   events: {
     contextMenu: {
+      injectedVars: ["$item", "$row", "$rowIndex", "$itemIndex"],
       ...dContextMenu(COMP),
     },
     sortingDidChange: {

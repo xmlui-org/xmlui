@@ -18,14 +18,6 @@ export const FormMd = createMetadata({
   optimization: {
     isImplicitContainerByDefault: true,
     childInjectedVars: ["$data"],
-    events: {
-      willSubmit:   { injectedVars: ["$data"] },
-      submit:       { injectedVars: ["$data"] },
-      submitFailed: { injectedVars: ["$data"] },
-      cancel:       { injectedVars: ["$data"] },
-      reset:        { injectedVars: ["$data"] },
-      success:      { injectedVars: ["$data"] },
-    },
   },
   parts: {
     buttonRow: {
@@ -227,6 +219,7 @@ export const FormMd = createMetadata({
   },
   events: {
     willSubmit: {
+      injectedVars: ["$data"],
       description:
         `The form infrastructure fires this event just before the form is submitted. The event receives ` +
         `two arguments: the cleaned form data (fields marked \`noSubmit\` excluded) and the complete form data ` +
@@ -240,6 +233,7 @@ export const FormMd = createMetadata({
       },
     },
     submit: {
+      injectedVars: ["$data"],
       description:
         `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`data\` value to save.`,
@@ -249,6 +243,7 @@ export const FormMd = createMetadata({
       },
     },
     submitFailed: {
+      injectedVars: ["$data"],
       description:
         `The form infrastructure fires this event when a submit attempt is rejected because ` +
         `at least one field failed validation. \`willSubmit\` and \`submit\` are NOT fired in ` +
@@ -261,6 +256,7 @@ export const FormMd = createMetadata({
       isInternal: true,
     },
     success: {
+      injectedVars: ["$data"],
       description: "The form infrastructure fires this event when the form is submitted successfully.",
       signature: "success(response: any): void",
       parameters: {
@@ -268,11 +264,13 @@ export const FormMd = createMetadata({
       },
     },
     cancel: {
+      injectedVars: ["$data"],
       description: `The form infrastructure fires this event when the form is canceled.`,
       signature: "cancel(): void",
       parameters: {},
     },
     reset: {
+      injectedVars: ["$data"],
       description: `The form infrastructure fires this event when the form is reset.`,
       signature: "reset(): void",
       parameters: {},

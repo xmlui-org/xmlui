@@ -58,18 +58,21 @@ describe("extractOptimizerMetadataFromSource", () => {
     });
   });
 
-  it("extracts per-event injectedVars from optimization.events", () => {
+  it("extracts per-event injectedVars from events block", () => {
     const source = `
       export const FormMd = createMetadata({
         optimization: {
           childInjectedVars: ["$data"],
-          events: {
-            submit: { injectedVars: ["$data"] },
-            cancel: { injectedVars: ["$data"] },
-          },
         },
         events: {
-          submit: { description: "..." },
+          submit: {
+            injectedVars: ["$data"],
+            description: "...",
+          },
+          cancel: {
+            injectedVars: ["$data"],
+            description: "...",
+          },
         },
       });
     `;

@@ -21,7 +21,7 @@ import { Loader } from "../loader/Loader";
 import { useAppContext } from "../AppContext";
 import { useShallowCompareMemoize } from "../utils/hooks";
 import { useIndexerContext } from "../../components/App/IndexerContext";
-import { createMetadata, d } from "../../components/metadata-helpers";
+import { DataLoaderMd } from "./DataLoaderMd";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { createContextVariableError } from "../EngineError";
 import {
@@ -33,42 +33,8 @@ import {
 } from "../inspector/inspectorUtils";
 
 // --- Component metadata (prop/event declarations used by the XMLUI language server and docs)
-export const DataLoaderMd = createMetadata({
-  status: "stable",
-  description: "This component manages data fetching from a web API",
-  optimization: {
-    events: {
-      fetch: { injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"] },
-    },
-  },
-  props: {
-    method: d("The HTTP method to use"),
-    url: d("The URL to fetch data from"),
-    rawBody: d("The raw body of the request"),
-    body: d("The body of the request to be sent as JSON"),
-    queryParams: d("Query parameters to send with the request"),
-    headers: d("Headers to send with the request"),
-    credentials: d("Controls whether cookies and credentials are sent with the request (omit, same-origin, or include)"),
-    pollIntervalInSeconds: d("The interval in seconds to poll the API for refreshing data"),
-    resultSelector: d("An expression to extract the result from the response"),
-    prevPageSelector: d("An expression to extract the previous page parameter from the response"),
-    nextPageSelector: d("An expression to extract the next page parameter from the response"),
-    inProgressNotificationMessage: d("The message to show when the loader is in progress"),
-    completedNotificationMessage: d("The message to show when the loader completes"),
-    errorNotificationMessage: d("The message to show when an error occurs"),
-    transformResult: d("Function for transforming the datasource result"),
-    dataType: d("Type of data to fetch (default: json, or csv, sql, or text)"),
-    structuralSharing: d("Whether to use structural sharing for the data"),
-    mockData: d("Data to return directly without making a network request (for development and testing)"),
-  },
-  events: {
-    loaded: d("Event to trigger when the data is loaded"),
-    error: d("This event fires when an error occurs while fetching data"),
-    fetch: {
-      description: "When defined, this event handler replaces the default fetch logic",
-    },
-  },
-});
+// Metadata is defined in DataLoaderMd.ts (pure TypeScript, no React/papaparse deps).
+export { DataLoaderMd };
 
 type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
 
