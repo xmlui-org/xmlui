@@ -80,6 +80,33 @@ The `computedUses` algorithm ensures that child UIDs "bubble up" (as `childEscap
 While state is narrowed for *rendering*, *event handlers* often need to write to variables they don't explicitly display (`onChange="val = 5"`).
 To avoid "Variable not found in scope" errors, the **full parent state** is passed down through wrappers as a stable `MutableRefObject` (`fullParentStateRef`). The handler accesses it when the event occurs, but since it's a ref, React doesn't initiate cascading re-renders (the *useEvent* pattern).
 
+### Copy-on-Write State Isolation in Event Handlers (`createCoWStateProxy`)
+
+When an event handler executes, it needs two things simultaneously: **isolation** (writes inside the handler must not mutate `stateRef.current` directly) and **change tracking** (so the framework can dispatch only the actual mutations via the reducer). Both are satisfied by `createCoWStateProxy` in `getComponentStateClone()`.
+
+**`getComponentStateClone()` flow:**
+1. `stateRef.current` is shallow-copied at the root: `const poj = { ...originalState }`. This gives each invocation its own root object, so injections (`$this`, `$cancel`, `context` overrides) don't affect the live state.
+2. **Component API object tagging (`__componentApiKey__`).** Before creating the proxy, the function iterates `Object.getOwnPropertySymbols(originalState)` to find component API objects — values registered under `Symbol("uid")` keys (e.g. `Symbol("ds")`). For each such object it attaches a non-enumerable `__componentApiKey__` property. This lets the reducer detect API-object references in handler writes (e.g., `myGlobal = ds`) and keep the variable in sync with the live API across subsequent renders.
+
+   **Immer-frozen API objects (invariant).** After each `produce()` call, Immer deep-freezes all objects in state — including component API objects. Because `poj = { ...originalState }` only shallow-copies the root, `poj[uid]` still points to the Immer-frozen original. A frozen object is non-extensible, so `Object.defineProperty(poj[uid], "__componentApiKey__", ...)` would throw `"object is not extensible"`. The fix: `if (!Object.isExtensible(poj[desc])) poj[desc] = { ...poj[desc] }` — a shallow-copy creates a mutable instance before the property is attached. This is equivalent to the old `cloneDeep` behaviour for API objects (getters are invoked, giving snapshot values; method references are preserved).
+3. `createCoWStateProxy(poj, onWrite)` wraps the root copy in a CoW Proxy. `poj` is the "working state" — an extensible shallow copy whose nested properties still point to the original (potentially Immer-frozen) values.
+4. The resulting proxy is passed as `evalContext.localContext` — the mutable state context seen by the script runner.
+
+**Read path:** The `get` trap reads from `liveNode()` — the original until the first write. Sub-objects (arrays and plain objects) are lazily wrapped in their own sub-proxies so that nested writes are also intercepted. Read-heavy handlers pay zero cloning cost.
+
+**Write path:** The `set` trap calls `ensureWritable()`, which shallow-clones the node on first write (`[...original]` or `{...original}`), then sets the property on the clone. The original is never mutated. Each write emits a `ProxyCallbackArgs` entry appended to the `changes` array.
+
+**`changes` array dispatch:** After the handler resolves, `changes` (populated via `onWrite` callbacks) is fed into the reducer for a single batched state update. Each entry contains `{ action, path, pathArray, target, newValue, previousValue }`, matching the `ProxyCallbackArgs` contract, so the downstream dispatch pipeline requires no changes.
+
+**Proxy target discipline (Immer-compatibility invariant):**
+Immer freezes all state values (`Object.isFrozen(stateValue) === true`). The `Proxy` target cannot be the frozen original — a frozen object as the proxy target causes `[[Set]]` invariant violations and blocks `Array.prototype.push` (which writes `length`). Instead, the proxy uses a fresh extensible shallow copy (`proxyTarget`) as its JS target, while all reads go through `liveNode()` and all writes go through `ensureWritable()`. After each write, `syncTarget()` keeps `proxyTarget` in sync so that `ownKeys` and `getOwnPropertyDescriptor` invariant checks remain satisfied.
+
+**`getOwnPropertyDescriptor` trap and frozen-value correctness:**
+When a frozen sub-object is wrapped in a sub-proxy, the frozen original has `configurable: false` on its properties, but `proxyTarget` (extensible copy) has `configurable: true`. The JS engine enforces: *"a property cannot be reported as non-configurable unless there exists a corresponding non-configurable own property of the proxy target."* The trap therefore returns descriptors with `configurable`/`writable` flags sourced from `proxyTarget`, not from `liveNode()`.
+
+**`COW_LIVE_NODE` symbol — preventing proxy leakage into Immer state:**
+When a handler assigns one CoW sub-proxy to another key (`state.a = state.b`), the `set` trap would otherwise store a live Proxy object in the state tree. Immer would then freeze that Proxy, triggering invariant errors on future access. The private `COW_LIVE_NODE` symbol is an escape hatch: `extractRawValue(value)` checks `value[COW_LIVE_NODE]` — if the value is a CoW proxy, it returns the underlying `liveNode()` value instead of the proxy. All `set` inputs pass through `extractRawValue` before storage.
+
 ### Lexical Scoping (Immutable Scope Propagation Mechanism)
 Instead of hardcoded lists of "special" variables, the optimizer uses metadata to build the lexical scope during AST traversal:
 - **Component Scope:** Container components (like `List`, `Table`, `ModalDialog`) declare `childInjectedVars`. All expressions in children of these components automatically filter these variables.

@@ -1,0 +1,1015 @@
+  1) [xmlui-nonsmoke] › xmlui/src/components/DataSou
+rce/DataSource.spec.ts:568:3 › onFetch event › fires
+ the onLoaded event with the handler result
+
+    Error: expect(received).toBe(expected) // Object
+.is equality
+
+    Expected: 7
+    Received: null
+
+    Call Log:
+    - Timeout 2000ms exceeded while waiting on the p
+redicate
+
+      573 |     `);
+      574 |
+    > 575 |     await expect.poll(() => testStateDri
+ver.testState(), { timeout: 2000 }).toBe(7);
+          |     ^
+      576 |   });
+      577 |
+      578 |   test("refetch() re-invokes the onFetch
+ handler", async ({ initTestBed, page }) => {
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/DataSource/DataSource.spe
+c.ts:575:5
+
+    Error Context: test-results/src-components-DataS
+ource--8e2d7-ent-with-the-handler-result-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Error: expect(received).toBe(expected) // Object
+.is equality
+
+    Expected: 7
+    Received: null
+
+    Call Log:
+    - Timeout 2000ms exceeded while waiting on the p
+redicate
+
+      573 |     `);
+      574 |
+    > 575 |     await expect.poll(() => testStateDri
+ver.testState(), { timeout: 2000 }).toBe(7);
+          |     ^
+      576 |   });
+      577 |
+      578 |   test("refetch() re-invokes the onFetch
+ handler", async ({ initTestBed, page }) => {
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/DataSource/DataSource.spe
+c.ts:575:5
+
+    Error Context: test-results/src-components-DataS
+ource--8e2d7-ent-with-the-handler-result-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/src-components-DataSource--8e2d7-en
+t-with-the-handler-result-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/src-c
+omponents-DataSource--8e2d7-ent-with-the-handler-res
+ult-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  2) [xmlui-nonsmoke] › xmlui/src/components/DataSou
+rce/DataSource.spec.ts:578:3 › onFetch event › refet
+ch() re-invokes the onFetch handler
+
+    Error: expect(locator).toHaveText(expected) fail
+ed
+
+    Locator:  getByTestId('output')
+    Expected: "1"
+    Received: ""
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 10000ms
+      - waiting for getByTestId('output')
+        14 × locator resolved to <div data-testid="o
+utput" data-component-type="Text" class="_text_vqbqh
+_14 _default_vqbqh_20 css-1j75jn1 css-1rbf16h"></div
+>
+           - unexpected value ""
+
+
+      587 |     `);
+      588 |
+    > 589 |     await expect(page.getByTestId("outpu
+t")).toHaveText("1");
+          |
+     ^
+      590 |     await expect(page.getByTestId("calls
+")).toHaveText("1");
+      591 |
+      592 |     await page.getByTestId("refetch-btn"
+).click();
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/DataSource/DataSource.spe
+c.ts:589:46
+
+    Error Context: test-results/src-components-DataS
+ource--b2ac4-invokes-the-onFetch-handler-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Error: expect(locator).toHaveText(expected) fail
+ed
+
+    Locator:  getByTestId('output')
+    Expected: "1"
+    Received: ""
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 10000ms
+      - waiting for getByTestId('output')
+        14 × locator resolved to <div data-testid="o
+utput" data-component-type="Text" class="_text_vqbqh
+_14 _default_vqbqh_20 css-1j75jn1 css-1rbf16h"></div
+>
+           - unexpected value ""
+
+
+      587 |     `);
+      588 |
+    > 589 |     await expect(page.getByTestId("outpu
+t")).toHaveText("1");
+          |
+     ^
+      590 |     await expect(page.getByTestId("calls
+")).toHaveText("1");
+      591 |
+      592 |     await page.getByTestId("refetch-btn"
+).click();
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/DataSource/DataSource.spe
+c.ts:589:46
+
+    Error Context: test-results/src-components-DataS
+ource--b2ac4-invokes-the-onFetch-handler-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/src-components-DataSource--b2ac4-in
+vokes-the-onFetch-handler-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/src-c
+omponents-DataSource--b2ac4-invokes-the-onFetch-hand
+ler-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  3) [xmlui-nonsmoke] › xmlui/src/components/DataSou
+rce/DataSource.spec.ts:549:3 › onFetch event › handl
+er can use $url, $method and $queryParams context va
+rs
+
+    Error: expect(locator).toHaveText(expected) fail
+ed
+
+    Locator:  getByTestId('output')
+    Expected: "/api/custom|get|abc"
+    Received: ""
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 10000ms
+      - waiting for getByTestId('output')
+        14 × locator resolved to <div data-testid="o
+utput" data-component-type="Text" class="_text_vqbqh
+_14 _default_vqbqh_20 css-1j75jn1 css-1rbf16h"></div
+>
+           - unexpected value ""
+
+
+      563 |     `);
+      564 |
+    > 565 |     await expect(page.getByTestId("outpu
+t")).toHaveText("/api/custom|get|abc");
+          |
+     ^
+      566 |   });
+      567 |
+      568 |   test("fires the onLoaded event with th
+e handler result", async ({ initTestBed }) => {
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/DataSource/DataSource.spe
+c.ts:565:46
+
+    Error Context: test-results/src-components-DataS
+ource--9f2c7-nd-queryParams-context-vars-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Error: expect(locator).toHaveText(expected) fail
+ed
+
+    Locator:  getByTestId('output')
+    Expected: "/api/custom|get|abc"
+    Received: ""
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 10000ms
+      - waiting for getByTestId('output')
+        14 × locator resolved to <div data-testid="o
+utput" data-component-type="Text" class="_text_vqbqh
+_14 _default_vqbqh_20 css-1j75jn1 css-1rbf16h"></div
+>
+           - unexpected value ""
+
+
+      563 |     `);
+      564 |
+    > 565 |     await expect(page.getByTestId("outpu
+t")).toHaveText("/api/custom|get|abc");
+          |
+     ^
+      566 |   });
+      567 |
+      568 |   test("fires the onLoaded event with th
+e handler result", async ({ initTestBed }) => {
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/DataSource/DataSource.spe
+c.ts:565:46
+
+    Error Context: test-results/src-components-DataS
+ource--9f2c7-nd-queryParams-context-vars-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/src-components-DataSource--9f2c7-nd
+-queryParams-context-vars-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/src-c
+omponents-DataSource--9f2c7-nd-queryParams-context-v
+ars-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  4) [xmlui-nonsmoke] › xmlui/src/components/Form/Fo
+rm.spec.ts:3471:1 › regression: data url through mod
+al context
+
+    Error: expect(received).toEqual(expected) // dee
+p equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+        "id": 10,
+    -   "name": "EDITED-Smith",
+    +   "name": "Smith",
+      }
+
+      3510 |
+      3511 |   const response = await responsePromis
+e;
+    > 3512 |   expect(await response.json()).toEqual
+({
+           |                                 ^
+      3513 |     name: "EDITED-Smith",
+      3514 |     id: 10,
+      3515 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/Form/Form.spec.ts:3512:33
+
+    Error Context: test-results/src-components-Form-
+Form-r-5ac37-a-url-through-modal-context-xmlui-nonsm
+oke/error-context.md
+
+  5) [xmlui-nonsmoke] › xmlui/src/components/Message
+Listener/MessageListener.spec.ts:126:3 › Basic Funct
+ionality › doesn't disrupt HStack layout gaps
+
+    Error: expect(received).toBe(expected) // Object
+.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 10000ms exceeded while waiting on the
+predicate
+
+      144 |     // snapshot to be slightly off; retr
+ying until the value is stable is more
+      145 |     // reliable than a one-shot assertio
+n.
+    > 146 |     await expect.poll(async () => {
+          |     ^
+      147 |       const { right: item1Right } = awai
+t getBounds(page.getByTestId("item1"));
+      148 |       const { left: item2Left } = await
+getBounds(page.getByTestId("item2"));
+      149 |       return Math.abs(item2Left - item1R
+ight - 16) < 1;
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/MessageListener/MessageLi
+stener.spec.ts:146:5
+
+    Error Context: test-results/src-components-Messa
+geList-f907c--disrupt-HStack-layout-gaps-xmlui-nonsm
+oke/error-context.md
+
+  6) [xmlui-nonsmoke] › xmlui/src/components/Text/Te
+xt.spec.ts:170:3 › API › hasOverflow returns true wh
+en text overflows with maxLines constraint
+
+    Error: locator.click: Error: strict mode violati
+on: getByRole('button') resolved to 2 elements:
+        1) <button type="button" class="_button_15rd
+j_14 _buttonHorizontal_15rdj_39 _sm_15rdj_49 _solidP
+rimary_15rdj_104 css-o7p4hm css-1rbf16h css-o7p4hm c
+ss-1rbf16h"></button> aka getByRole('button').filter
+({ hasText: /^$/ })
+        2) <button id="main">Main target</button> ak
+a getByRole('button', { name: 'Main target' })
+
+    Call log:
+      - waiting for getByRole('button')
+
+
+      181 |     `);
+      182 |
+    > 183 |     await page.getByRole("button").click
+();
+          |                                    ^
+      184 |     await expect.poll(testStateDriver.te
+stState).toBe(true);
+      185 |   });
+      186 |
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/src/components/Text/Text.spec.ts:183:36
+
+    Error Context: test-results/src-components-Text-
+Text-A-0a5e5-ws-with-maxLines-constraint-xmlui-nonsm
+oke/error-context.md
+
+…rning group when two sibling components share an id
+[xmlui] Warnings in markup:
+  Duplicate component id "dup" detected at line 6, c
+olumn 17. Component ids must be unique within the sa
+me markup.
+… › warning message contains the duplicated id value
+[xmlui] Warnings in markup:
+  Duplicate component id "my-unique-id" detected at
+line 6, column 19. Component ids must be unique with
+in the same markup.
+… warning for each extra occurrence beyond the first
+[xmlui] Warnings in markup:
+  Duplicate component id "triple" detected at line 6
+, column 17. Component ids must be unique within the
+ same markup.
+  Duplicate component id "triple" detected at line 7
+, column 17. Component ids must be unique within the
+ same markup.
+…g when a nested component duplicates an ancestor id
+[xmlui] Warnings in markup:
+  Duplicate component id "container" detected at lin
+e 5, column 17. Component ids must be unique within
+the same markup.
+  7) [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-examp
+les/control-cache-invalidation.spec.ts:27:3 › Update
+ user - refreshes user list › promoting a user refre
+shes users but not stats @website
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('Stats fetched: 1 time(s)')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByText('Stats fetched: 1 time
+(s)')
+
+
+      32 |       .toBe(true);
+      33 |     // stats counter should NOT have incr
+emented
+    > 34 |     await expect(page.getByText("Stats fe
+tched: 1 time(s)")).toBeVisible();
+         |
+                    ^
+      35 |   });
+      36 |
+      37 |   test("promoted user button becomes disa
+bled", async ({ initTestBed, page }) => {
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/how-to-examples/control-cache-
+invalidation.spec.ts:34:62
+
+    Error Context: test-results/tests-e2e-how-to-exa
+mples--9b012-freshes-users-but-not-stats-xmlui-nonsm
+oke/error-context.md
+
+  8) [xmlui-nonsmoke] › xmlui/tests-e2e/pages/markup
+.spec.ts:57:3 › A complex JSON object › submitting f
+orm with a station name shows it in the output @webs
+ite
+
+    Error: expect(locator).toContainText(expected) f
+ailed
+
+    Locator: locator('textarea')
+    Expected substring: "Liverpool"
+    Error: strict mode violation: locator('textarea'
+) resolved to 2 elements:
+        1) <textarea rows="2" id=":ral5:" name=":ral
+5:" placeholder="" autocomplete="off" data-part-id="
+input" aria-multiline="true" aria-readonly="false" d
+ata-testid="preview" class="_textarea_1ru67_14" data
+-component-type="TextArea">{"station":"Liverpool","w
+ifi":true,"toilets":fals…</textarea> aka getByText('
+{"station":"Liverpool","wifi')
+        2) <textarea tabindex="-1" aria-hidden="true
+"></textarea> aka locator('textarea').nth(1)
+
+    Call log:
+      - Expect "toContainText" with timeout 10000ms
+      - waiting for locator('textarea')
+
+
+      62 |     await page.locator('input[type="text"
+]').fill("Liverpool");
+      63 |     await page.getByRole("button", { name
+: "Search" }).click();
+    > 64 |     await expect(page.locator("textarea")
+).toContainText("Liverpool");
+         |
+  ^
+      65 |   });
+      66 | });
+      67 |
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/markup.spec.ts:64:44
+
+    Error Context: test-results/tests-e2e-pages-mark
+up-A-c-67fa2-name-shows-it-in-the-output-xmlui-nonsm
+oke/error-context.md
+
+  9) [xmlui-nonsmoke] › xmlui/tests-e2e/pages/reacti
+ve-intro.spec.ts:47:3 › Results in a table › renders
+ the Select with Bakerloo as the initial value @webs
+ite
+
+    Error: expect(locator).toContainText(expected) f
+ailed
+
+    Locator: getByRole('combobox')
+    Expected substring: "Bakerloo"
+    Received string:    ""
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 10000ms
+      - waiting for getByRole('combobox')
+        14 × locator resolved to <button dir="ltr" i
+d=":rdc9:" type="button" role="combobox" data-state=
+"closed" data-testid="lines" aria-expanded="false" a
+ria-haspopup="listbox" aria-autocomplete="none" aria
+-controls="radix-:rdca:" data-component-type="Select
+" class="css-1prpa8m css-1rbf16h _selectTrigger_1yru
+e_17">…</button>
+           - unexpected value ""
+
+
+      53 |       await initTestBed(app, { components
+, apiInterceptor });
+      54 |       await expect(page.getByRole("combob
+ox")).toBeVisible();
+    > 55 |       await expect(page.getByRole("combob
+ox")).toContainText("Bakerloo");
+         |
+      ^
+      56 |     },
+      57 |   );
+      58 |
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/reactive-intro.spec.ts:5
+5:48
+
+    Error Context: test-results/tests-e2e-pages-reac
+tive-i-dff0c-kerloo-as-the-initial-value-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Error: expect(locator).toContainText(expected) f
+ailed
+
+    Locator: getByRole('combobox')
+    Expected substring: "Bakerloo"
+    Received string:    ""
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 10000ms
+      - waiting for getByRole('combobox')
+        14 × locator resolved to <button dir="ltr" i
+d=":r8:" type="button" role="combobox" data-state="c
+losed" data-testid="lines" aria-expanded="false" ari
+a-haspopup="listbox" aria-autocomplete="none" aria-c
+ontrols="radix-:r9:" data-component-type="Select" cl
+ass="css-1prpa8m css-1rbf16h _selectTrigger_1yrue_17
+">…</button>
+           - unexpected value ""
+
+
+      53 |       await initTestBed(app, { components
+, apiInterceptor });
+      54 |       await expect(page.getByRole("combob
+ox")).toBeVisible();
+    > 55 |       await expect(page.getByRole("combob
+ox")).toContainText("Bakerloo");
+         |
+      ^
+      56 |     },
+      57 |   );
+      58 |
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/reactive-intro.spec.ts:5
+5:48
+
+    Error Context: test-results/tests-e2e-pages-reac
+tive-i-dff0c-kerloo-as-the-initial-value-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/tests-e2e-pages-reactive-i-dff0c-ke
+rloo-as-the-initial-value-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/tests
+-e2e-pages-reactive-i-dff0c-kerloo-as-the-initial-va
+lue-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  10) [xmlui-nonsmoke] › xmlui/tests-e2e/pages/react
+ive-intro.spec.ts:30:3 › Pick a station › opens the
+dropdown and shows tube line options @website
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('option', { name: 'Central' }
+)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByRole('option', { name: 'Cen
+tral' })
+
+
+      37 |       await page.getByRole("combobox").cl
+ick();
+      38 |       await expect(page.getByRole("listbo
+x")).toBeVisible();
+    > 39 |       await expect(page.getByRole("option
+", { name: "Central" })).toBeVisible();
+         |
+                         ^
+      40 |     },
+      41 |   );
+      42 | });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/reactive-intro.spec.ts:3
+9:67
+
+    Error Context: test-results/tests-e2e-pages-reac
+tive-i-ad12c-and-shows-tube-line-options-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('option', { name: 'Central' }
+)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByRole('option', { name: 'Cen
+tral' })
+
+
+      37 |       await page.getByRole("combobox").cl
+ick();
+      38 |       await expect(page.getByRole("listbo
+x")).toBeVisible();
+    > 39 |       await expect(page.getByRole("option
+", { name: "Central" })).toBeVisible();
+         |
+                         ^
+      40 |     },
+      41 |   );
+      42 | });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/reactive-intro.spec.ts:3
+9:67
+
+    Error Context: test-results/tests-e2e-pages-reac
+tive-i-ad12c-and-shows-tube-line-options-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/tests-e2e-pages-reactive-i-ad12c-an
+d-shows-tube-line-options-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/tests
+-e2e-pages-reactive-i-ad12c-and-shows-tube-line-opti
+ons-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  11) [xmlui-nonsmoke] › xmlui/tests-e2e/pages/react
+ive-intro.spec.ts:59:3 › Results in a table › opens
+the dropdown and shows tube line options @website
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('option', { name: 'Central' }
+)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByRole('option', { name: 'Cen
+tral' })
+
+
+      66 |       await page.getByRole("combobox").cl
+ick();
+      67 |       await expect(page.getByRole("listbo
+x")).toBeVisible();
+    > 68 |       await expect(page.getByRole("option
+", { name: "Central" })).toBeVisible();
+         |
+                         ^
+      69 |     },
+      70 |   );
+      71 | });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/reactive-intro.spec.ts:6
+8:67
+
+    Error Context: test-results/tests-e2e-pages-reac
+tive-i-d4861-and-shows-tube-line-options-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('option', { name: 'Central' }
+)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByRole('option', { name: 'Cen
+tral' })
+
+
+      66 |       await page.getByRole("combobox").cl
+ick();
+      67 |       await expect(page.getByRole("listbo
+x")).toBeVisible();
+    > 68 |       await expect(page.getByRole("option
+", { name: "Central" })).toBeVisible();
+         |
+                         ^
+      69 |     },
+      70 |   );
+      71 | });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/reactive-intro.spec.ts:6
+8:67
+
+    Error Context: test-results/tests-e2e-pages-reac
+tive-i-d4861-and-shows-tube-line-options-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/tests-e2e-pages-reactive-i-d4861-an
+d-shows-tube-line-options-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/tests
+-e2e-pages-reactive-i-d4861-and-shows-tube-line-opti
+ons-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  12) [xmlui-nonsmoke] › xmlui/tests-e2e/pages/tutor
+ial-08.spec.ts:18:3 › Try saving in various stages o
+f completion › initial state renders the invoice for
+m with heading and Add Item button @website
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Save' })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByRole('button', { name: 'Sav
+e' })
+
+
+      23 |     await expect(page.getByRole("heading"
+, { name: "Create New Invoice" })).toBeVisible();
+      24 |     await expect(page.getByRole("button",
+ { name: "Add Item" })).toBeVisible();
+    > 25 |     await expect(page.getByRole("button",
+ { name: "Save" })).toBeVisible();
+         |
+                    ^
+      26 |   });
+      27 |
+      28 |   test("saving without a client shows a r
+equired validation error", async ({
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/tutorial-08.spec.ts:25:6
+2
+
+    Error Context: test-results/tests-e2e-pages-tuto
+rial-0-958d0-heading-and-Add-Item-button-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Save' })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByRole('button', { name: 'Sav
+e' })
+
+
+      23 |     await expect(page.getByRole("heading"
+, { name: "Create New Invoice" })).toBeVisible();
+      24 |     await expect(page.getByRole("button",
+ { name: "Add Item" })).toBeVisible();
+    > 25 |     await expect(page.getByRole("button",
+ { name: "Save" })).toBeVisible();
+         |
+                    ^
+      26 |   });
+      27 |
+      28 |   test("saving without a client shows a r
+equired validation error", async ({
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/tutorial-08.spec.ts:25:6
+2
+
+    Error Context: test-results/tests-e2e-pages-tuto
+rial-0-958d0-heading-and-Add-Item-button-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/tests-e2e-pages-tutorial-0-958d0-he
+ading-and-Add-Item-button-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/tests
+-e2e-pages-tutorial-0-958d0-heading-and-Add-Item-but
+ton-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  13) [xmlui-nonsmoke] › xmlui/tests-e2e/computed-us
+es.spec.ts:743:3 › E1: Bug 21 regression — DataSourc
+e with $queryParams in fetch › changing router query
+ params does NOT cause infinite re-fetch
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForFunction: Target page, contex
+t or browser has been closed
+
+      756 |
+      757 |     // Initial mount fires fetch once.
+    > 758 |     await page.waitForFunction(() => {
+          |                ^
+      759 |       const t = document.querySelector('
+[data-testid="counter"]');
+      760 |       return t && t.textContent === "1";
+      761 |     });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/computed-uses.spec.ts:758:16
+
+    Error Context: test-results/tests-e2e-computed-u
+ses-E1-ce608-NOT-cause-infinite-re-fetch-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForFunction: Target page, contex
+t or browser has been closed
+
+      756 |
+      757 |     // Initial mount fires fetch once.
+    > 758 |     await page.waitForFunction(() => {
+          |                ^
+      759 |       const t = document.querySelector('
+[data-testid="counter"]');
+      760 |       return t && t.textContent === "1";
+      761 |     });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/computed-uses.spec.ts:758:16
+
+    Error Context: test-results/tests-e2e-computed-u
+ses-E1-ce608-NOT-cause-infinite-re-fetch-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/tests-e2e-computed-uses-E1-ce608-NO
+T-cause-infinite-re-fetch-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/tests
+-e2e-computed-uses-E1-ce608-NOT-cause-infinite-re-fe
+tch-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  14) [xmlui-nonsmoke] › xmlui/tests-e2e/pages/tutor
+ial-08.spec.ts:28:3 › Try saving in various stages o
+f completion › saving without a client shows a requi
+red validation error @website
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Target page, context or br
+owser has been closed
+    Call log:
+      - waiting for getByRole('button', { name: 'Sav
+e' })
+
+
+      31 |   }) => {
+      32 |     await initTestBed(app, { components,
+apiInterceptor });
+    > 33 |     await page.getByRole("button", { name
+: "Save" }).click();
+         |
+            ^
+      34 |     // The client FormItem has required="
+true", so a validation message appears
+      35 |     await expect(page.getByText("This fie
+ld is required").first()).toBeVisible();
+      36 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/tutorial-08.spec.ts:33:5
+4
+
+    Error Context: test-results/tests-e2e-pages-tuto
+rial-0-59075-a-required-validation-error-xmlui-nonsm
+oke/error-context.md
+
+    Retry #1 ───────────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Target page, context or br
+owser has been closed
+    Call log:
+      - waiting for getByRole('button', { name: 'Sav
+e' })
+
+
+      31 |   }) => {
+      32 |     await initTestBed(app, { components,
+apiInterceptor });
+    > 33 |     await page.getByRole("button", { name
+: "Save" }).click();
+         |
+            ^
+      34 |     // The client FormItem has required="
+true", so a validation message appears
+      35 |     await expect(page.getByText("This fie
+ld is required").first()).toBeVisible();
+      36 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-mon
+orepo/xmlui/tests-e2e/pages/tutorial-08.spec.ts:33:5
+4
+
+    Error Context: test-results/tests-e2e-pages-tuto
+rial-0-59075-a-required-validation-error-xmlui-nonsm
+oke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────
+    test-results/tests-e2e-pages-tutorial-0-59075-a-
+required-validation-error-xmlui-nonsmoke-retry1/trac
+e.zip
+    Usage:
+
+        npx playwright show-trace test-results/tests
+-e2e-pages-tutorial-0-59075-a-required-validation-er
+ror-xmlui-nonsmoke-retry1/trace.zip
+
+    ────────────────────────────────────────────────
+
+  9 failed
+    [xmlui-nonsmoke] › xmlui/src/components/DataSour
+ce/DataSource.spec.ts:549:3 › onFetch event › handle
+r can use $url, $method and $queryParams context var
+s
+    [xmlui-nonsmoke] › xmlui/src/components/DataSour
+ce/DataSource.spec.ts:568:3 › onFetch event › fires
+the onLoaded event with the handler result
+    [xmlui-nonsmoke] › xmlui/src/components/DataSour
+ce/DataSource.spec.ts:578:3 › onFetch event › refetc
+h() re-invokes the onFetch handler
+    [xmlui-nonsmoke] › xmlui/tests-e2e/computed-uses
+.spec.ts:743:3 › E1: Bug 21 regression — DataSource
+with $queryParams in fetch › changing router query p
+arams does NOT cause infinite re-fetch
+    [xmlui-nonsmoke] › xmlui/tests-e2e/pages/reactiv
+e-intro.spec.ts:30:3 › Pick a station › opens the dr
+opdown and shows tube line options @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/pages/reactiv
+e-intro.spec.ts:47:3 › Results in a table › renders
+the Select with Bakerloo as the initial value @websi
+te
+    [xmlui-nonsmoke] › xmlui/tests-e2e/pages/reactiv
+e-intro.spec.ts:59:3 › Results in a table › opens th
+e dropdown and shows tube line options @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/pages/tutoria
+l-08.spec.ts:18:3 › Try saving in various stages of
+completion › initial state renders the invoice form
+with heading and Add Item button @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/pages/tutoria
+l-08.spec.ts:28:3 › Try saving in various stages of
+completion › saving without a client shows a require
+d validation error @website
+  5 flaky
+    [xmlui-nonsmoke] › xmlui/src/components/Form/For
+m.spec.ts:3471:1 › regression: data url through moda
+l context
+    [xmlui-nonsmoke] › xmlui/src/components/MessageL
+istener/MessageListener.spec.ts:126:3 › Basic Functi
+onality › doesn't disrupt HStack layout gaps
+    [xmlui-nonsmoke] › xmlui/src/components/Text/Tex
+t.spec.ts:170:3 › API › hasOverflow returns true whe
+n text overflows with maxLines constraint
+    [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exampl
+es/control-cache-invalidation.spec.ts:27:3 › Update
+user - refreshes user list › promoting a user refres
+hes users but not stats @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/pages/markup.
+spec.ts:57:3 › A complex JSON object › submitting fo
+rm with a station name shows it in the output @websi
+te
+  70 skipped
+  7163 passed (4.6m)
+
+To open last HTML report run:
+
+  npx playwright show-report
+└─ //#_e2e ──
+
+ Tasks:    13 successful, 14 total
+Cached:    0 cached, 14 total
+  Time:    5m12.71s
+Failed:    //#_e2e
+
+
+~/projects/nsoftware/xmlui-monorepo yurii/computedUses* 5m 14s
+❯

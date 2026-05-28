@@ -24,6 +24,7 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { buildProxy, type ProxyAction } from "../rendering/buildProxy";
+import { createCoWStateProxy } from "./cow-state-proxy";
 import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
@@ -198,9 +199,6 @@ export function createEventHandlers(config: EventHandlerConfig) {
   // ASYNC EVENT HANDLER EXECUTION
   // ========================================================================
 
-  let lastClonedState: any = undefined;
-  let lastClonedResult: any = undefined;
-
   const runCodeAsync = useEvent(
     async (
       source: string | ParsedEventValue | ArrowExpression,
@@ -294,29 +292,27 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const getComponentStateClone = () => {
         changes.length = 0;
         const originalState = stateRef.current;
-        // Deep-clone container state, then shallow-assign handler-injected context on top.
-        // A single cloneDeep({ ...state, ...context }) can mis-handle collisions between
-        // router `$queryParams` (Layer 6) and fetch-handler `$queryParams` when routing
-        // values are deep-cloned structures under computedUses narrowing.
-        //
-        // PERFORMANCE: Cache the clone results if originalState hasn't changed identity.
-        // refreshStateRef() now ensures stateRef.current is stable when inputs don't change.
-        if (originalState !== lastClonedState) {
-          lastClonedState = originalState;
-          lastClonedResult = cloneDeep(originalState);
-        }
-        const poj = { ...lastClonedResult };
+        // Shallow-copy the root so that $this, $cancel, and context overrides
+        // are scoped to this invocation without touching stateRef.current.
+        // Nested objects are isolated lazily by the CoW proxy on first write.
+        const poj: Record<string, any> = { ...originalState };
 
         if (options?.context) {
           Object.assign(poj, options.context);
         }
-        poj["$this"] = originalState[uid];        // --- W3-6: expose `$cancel` as a read-only handler-scope variable.
+        poj["$this"] = originalState[uid];
         poj["$cancel"] = cancelToken;
 
         // Tag component API objects with their key for reference tracking.
         // When a variable is later assigned one of these objects (e.g. myGlobal = ds),
         // the framework can detect the reference and keep the variable in sync with
         // the live component API value across subsequent renders.
+        //
+        // Component API objects are stored in Immer-managed state and may be frozen.
+        // A frozen (non-extensible) object rejects Object.defineProperty. To avoid
+        // the invariant error, shallow-copy the object into poj first — this also
+        // matches the old cloneDeep behavior (getters are invoked, giving snapshot
+        // values; method references are preserved).
         for (const sym of Object.getOwnPropertySymbols(originalState)) {
           const desc = sym.description;
           if (
@@ -327,6 +323,9 @@ export function createEventHandlers(config: EventHandlerConfig) {
             typeof poj[desc] === "object" &&
             !Array.isArray(poj[desc])
           ) {
+            if (!Object.isExtensible(poj[desc])) {
+              poj[desc] = { ...poj[desc] };
+            }
             Object.defineProperty(poj[desc], "__componentApiKey__", {
               value: desc,
               enumerable: false,
@@ -335,7 +334,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           }
         }
 
-        return buildProxy(poj, (changeInfo) => {
+        return createCoWStateProxy(poj, (changeInfo) => {
           const idRoot = (changeInfo.pathArray as string[])?.[0];
           if (idRoot?.startsWith("$")) {
             throw new Error("Cannot update a read-only variable");
@@ -711,7 +710,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
       // Ensure stateRef reflects the latest parent state before reading it.
       refreshStateRef();
       const evalContext: BindingTreeEvaluationContext = {
-        localContext: cloneDeep(stateRef.current),
+        localContext: createCoWStateProxy({ ...stateRef.current }, () => {}),
         appContext,
         eventArgs,
       };
