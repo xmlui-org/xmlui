@@ -19,10 +19,11 @@
  */
 import { depsOfValueWithReads } from "../script-runner/visitors";
 import { Parser } from "../../parsers/scripting/Parser";
-import type { Statement } from "../script-runner/ScriptingSourceTree";
+import type { Statement, CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef, OptimizerMetadataView } from "../../abstractions/ComponentDefs";
 import { isContainerLike } from "../rendering/ContainerUtils";
 import { XMLUI_GLOBAL_NAMES } from "../state/appContextFactory";
+import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 
 // LRU cache for parsed raw strings to avoid unbounded memory growth.
 // AST_CACHE_MAX_SIZE covers typical apps while guarding against generated code.
@@ -138,6 +139,77 @@ function depsOfRecord(
 }
 
 /**
+ * Collects the union of parent-scope identifiers referenced by all code-behind
+ * functions. Each function is an ArrowExpression (identified by ARROW_EXPR_MARK).
+ *
+ * To use depsOfValueWithReads on ArrowExpressions, they are wrapped in a fake
+ * CodeDeclaration { [PARSED_MARK_PROP]: true, tree: arrowExpr }. The
+ * isParsedValue branch of depsOfValueWithReads then calls
+ * collectVariableDependencies(arrowExpr), which handles T_ARROW_EXPRESSION
+ * correctly: parameters become the local block scope, body free vars are returned.
+ *
+ * Transitive calls between functions in the same block are followed with DFS
+ * and a visited-set to avoid infinite recursion on mutually recursive functions.
+ */
+function collectScriptFunctionDeps(
+  functions: Record<string, CodeDeclaration>,
+  localNames: ReadonlySet<string>,
+): { all: Set<string>; reads: Set<string> } {
+  const allDeps = new Set<string>();
+  const readDeps = new Set<string>();
+  const fnCache = new Map<string, { all: Set<string>; reads: Set<string> }>();
+
+  function analyzeOne(
+    name: string,
+    visiting: ReadonlySet<string>,
+  ): { all: Set<string>; reads: Set<string> } {
+    if (fnCache.has(name)) return fnCache.get(name)!;
+    if (visiting.has(name)) return { all: new Set(), reads: new Set() };
+
+    const fn = functions[name];
+    if (!fn) return { all: new Set(), reads: new Set() };
+
+    const nextVisiting = new Set([...visiting, name]);
+    // Wrap the ArrowExpression as a fake CodeDeclaration so that the
+    // isParsedValue branch in depsOfValueWithReads routes it through
+    // collectVariableDependencies, which handles T_ARROW_EXPRESSION:
+    // parameters become the local block scope, body free vars are returned.
+    const wrapped = { [PARSED_MARK_PROP]: true, tree: fn } as unknown as CodeDeclaration;
+    const { all: rawAll, reads: rawReads } = depsOfValueWithReads(wrapped);
+
+    const fnAll = new Set<string>();
+    const fnReads = new Set<string>();
+
+    for (const d of rawAll) {
+      if (localNames.has(d) && d in functions) {
+        // Transitive call to another local code-behind function — recurse.
+        const transitive = analyzeOne(d, nextVisiting);
+        for (const td of transitive.all) fnAll.add(td);
+        for (const td of transitive.reads) fnReads.add(td);
+      } else {
+        fnAll.add(d);
+      }
+    }
+    for (const d of rawReads) {
+      if (!(localNames.has(d) && d in functions)) {
+        fnReads.add(d);
+      }
+    }
+
+    fnCache.set(name, { all: fnAll, reads: fnReads });
+    return { all: fnAll, reads: fnReads };
+  }
+
+  for (const name of Object.keys(functions)) {
+    const { all, reads } = analyzeOne(name, new Set());
+    for (const d of all) allDeps.add(d);
+    for (const d of reads) readDeps.add(d);
+  }
+
+  return { all: allDeps, reads: readDeps };
+}
+
+/**
  * Core recursive worker.
  * Returns a tuple:
  * - [0] freeVars: Identifiers referenced in this subtree that must come from the parent scope.
@@ -219,6 +291,12 @@ function computeUsesInternal(
 
   addRecord(node.props as Record<string, unknown> | undefined);
   addRecord(node.vars);
+  // Analyze code-behind variable declarations for parent-scope initial-value deps.
+  // Their names are already in localDeclared; here we collect what their
+  // initializer expressions reference from the parent scope.
+  if (node.scriptCollected?.vars) {
+    addRecord(node.scriptCollected.vars as Record<string, unknown>);
+  }
 
   const events = node.events as Record<string, unknown> | undefined;
   const metadata = metadataLookup?.(node.type);
@@ -273,12 +351,36 @@ function computeUsesInternal(
     }
   }
 
-  // Disable narrowing propagation if this node has a <script> tag (scriptCollected) OR
-  // a separate .xs code-behind file (functions populated by StandaloneApp merge).
-  // Either means function bodies can reference any state var — template analysis is insufficient.
+  // Propagate narrowing-disable to children whenever this node has code-behind
+  // (scriptCollected or .xs functions). Children that call these functions still
+  // need the conservative "disable narrowing" signal; the node ITSELF can now
+  // be narrowed based on analyzed function deps (see ownHasScript below).
   const hasCodeBehind = !!(node.functions && Object.keys(node.functions).length > 0);
-  const ownHasScript = !!node.scriptCollected || hasCodeBehind;
-  const nextDisableNarrowing = disableNarrowing || ownHasScript;
+  const disablesChildNarrowing = !!node.scriptCollected || hasCodeBehind;
+  const nextDisableNarrowing = disableNarrowing || disablesChildNarrowing;
+
+  // Collect all code-behind functions from both sources and analyze their deps.
+  // This replaces the old blanket "disable narrowing for script nodes" approach:
+  // if all functions are analyzable, we add their parent-scope refs to usedHere
+  // and allow the node itself to be narrowed based on actual dependencies.
+  const scriptFunctions = {
+    ...(node.scriptCollected?.functions ?? {}),
+    ...(node.functions ?? {}),
+  } as Record<string, CodeDeclaration>;
+  if (Object.keys(scriptFunctions).length > 0) {
+    const { all: fnAll, reads: fnReads } = collectScriptFunctionDeps(
+      scriptFunctions,
+      localDeclared,
+    );
+    for (const d of fnAll) usedHere.add(d);
+    for (const d of fnReads) usedHereReads.add(d);
+  }
+
+  // Narrowing is blocked for this node only when its script contains statements
+  // that failed to parse (hasInvalidStatements). In that case the dep set is
+  // incomplete and conservative treatment is required.
+  // With analyzable functions and vars, the dep set is now complete.
+  const ownHasScript = !!(node.scriptCollected?.hasInvalidStatements);
   const childDeps = new Set<string>();
   const childDepsReads = new Set<string>();
   // UIDs from the subtree that will register into THIS node's StateContainer
@@ -357,7 +459,7 @@ function computeUsesInternal(
 
   if (isContainer) {
     // Narrowing safety rules:
-    // 1. Nodes with own <script>/code-behind are NOT narrowed (analysis is incomplete).
+    // 1. Nodes whose script has unparseable statements (hasInvalidStatements) are NOT narrowed.
     // 2. Nodes calling parent-scope functions while narrowing is disabled are NOT narrowed.
     const dependsOnParentFunction = parentFunctionNames.size > 0 &&
       [...parentDependencies].some(d => parentFunctionNames.has(d));

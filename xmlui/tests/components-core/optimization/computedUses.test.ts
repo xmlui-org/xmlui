@@ -7,6 +7,7 @@ import { getOptimizerMetadata } from "../../../src/components-core/optimization/
 import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { Parser } from "../../../src/parsers/scripting/Parser";
+import { collectCodeBehindFromSource } from "../../../src/parsers/scripting/code-behind-collect";
 
 const skipIfDisabled = !COMPUTED_USES_ENABLED;
 
@@ -869,8 +870,10 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free child narr
       children: [select],
     });
     computeUsesForTree(parent);
-    // parent has own <script> → ownHasScript=true → never narrowed
-    expect(parent.computedUses).toBeUndefined();
+    // parent functions are analyzed (empty bodies → no extra deps) so parent
+    // is now narrowed based on actual child deps rather than blanket disabled.
+    expect(parent.computedUses).toBeDefined();
+    expect(parent.computedUses).toContain("items");
     // Select: no function call, only reads {items} → safeToNarrow=true
     expect(select.computedUses).toBeDefined();
     expect(select.computedUses).toContain("items");
@@ -878,8 +881,10 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free child narr
     expect(select.computedUses).not.toContain("loadData");
   });
 
-  it("node with own <script> is NOT narrowed even if it reads parent state without calling functions", () => {
-    // inner has its own <script> — its function bodies may read parent vars not in template
+  it("node with own <script> IS narrowed when its functions are analyzable", () => {
+    // inner has its own <script> with analyzable functions (empty bodies here).
+    // After analysis no extra deps are discovered, but child Text reads {items}
+    // which bubbles up → inner is narrowed to ["items"].
     const inner = nodeWithScript("Stack", { localFn: {} }, {
       children: [node("Text", { props: { text: "{items}" } })],
     });
@@ -888,9 +893,9 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free child narr
       children: [inner],
     });
     computeUsesForTree(outer);
-    // inner reads {items} from outer and doesn't call outer functions,
-    // but it HAS OWN script → ownHasScript=true → safeToNarrow=false
-    expect(inner.computedUses).toBeUndefined();
+    // inner functions analyzed → dep set complete → safeToNarrow=true
+    expect(inner.computedUses).toBeDefined();
+    expect(inner.computedUses).toContain("items");
   });
 
   it("container calling a parent function is NOT narrowed", () => {
@@ -945,9 +950,10 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free child narr
       children: [select],
     });
     computeUsesForTree(parent);
-    // parent has own code-behind → never narrowed
-    expect(parent.computedUses).toBeUndefined();
-    // Select: function-free → narrowed (same as <script> case)
+    // parent .xs functions analyzed (empty bodies → no extra deps) → narrowed
+    expect(parent.computedUses).toBeDefined();
+    expect(parent.computedUses).toContain("items");
+    // Select: function-free → also narrowed
     expect(select.computedUses).toBeDefined();
     expect(select.computedUses).toContain("items");
   });
@@ -1091,9 +1097,9 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free narrowing 
     expect(select.computedUses).toContain("items");
   });
 
-  it("scriptCollected without .functions: ownHasScript=true blocks node, children have no parent functions → all narrowed", () => {
-    // scriptCollected is truthy (so ownHasScript=true) but carries no function names
-    // → parentFunctionNames={} for children → dependsOnParentFunction=false for all
+  it("scriptCollected with only vars: parent is narrowed, children with no parent functions are also narrowed", () => {
+    // scriptCollected carries only vars (no functions) and no hasInvalidStatements
+    // → no function names registered → parentFunctionNames={} for children
     const select = node("Select", {
       children: [
         node("Items", {
@@ -1108,8 +1114,9 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free narrowing 
       children: [select],
     });
     computeUsesForTree(parent);
-    // parent has own script → not narrowed itself
-    expect(parent.computedUses).toBeUndefined();
+    // parent: vars analyzed (0 has no deps) → dep set complete → narrowed
+    expect(parent.computedUses).toBeDefined();
+    expect(parent.computedUses).toContain("items");
     // select: no functions in scope → narrowed
     expect(select.computedUses).toBeDefined();
     expect(select.computedUses).toContain("items");
@@ -1140,13 +1147,186 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free narrowing 
       children: [inner],
     });
     computeUsesForTree(outer);
-    // inner: own script → not narrowed
-    expect(inner.computedUses).toBeUndefined();
+    // inner: fn2 analyzed (empty body → no extra deps) → narrowed based on child deps
+    expect(inner.computedUses).toBeDefined();
+    expect(inner.computedUses).toContain("items");
     // select: reads {items}, fn2 ∉ deps → safeToNarrow=true → narrowed
     expect(select.computedUses).toBeDefined();
     expect(select.computedUses).toContain("items");
     // callerOfFn2: calls fn2 which is in parentFunctionNames → blocked
     expect(callerOfFn2.computedUses).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Transitive AST analysis of .xs / <script> functions
+// Tests for the feature described in TODO-ast-analysis-xs-files.md:
+// code-behind functions are analyzed to determine actual parent-scope deps,
+// replacing the old blanket "disable narrowing for any script node" approach.
+// ---------------------------------------------------------------------------
+
+describe.skipIf(skipIfDisabled)("computeUsesForTree — transitive code-behind function analysis", () => {
+  it("code-behind function reading parent state: node narrowed to actual dep", () => {
+    // handleClick reads and writes `count` from parent scope.
+    // After analysis the node must be narrowed to contain `count`.
+    const { functions: { handleClick } } = collectCodeBehindFromSource(
+      "test.xs",
+      "function handleClick() { count = count + 1; }",
+    );
+    const comp = node("Stack", {
+      vars: { x: "{0}" },
+      functions: { handleClick } as any,
+    });
+    const root = node("Stack", {
+      vars: { count: "{0}", unrelated: "{0}" },
+      children: [comp],
+    });
+    computeUsesForTree(root);
+    expect(comp.computedUses).toBeDefined();
+    expect(comp.computedUses).toContain("count");
+    expect(comp.computedUses).not.toContain("unrelated");
+    // function names must not appear as deps (they are locally declared)
+    expect(comp.computedUses).not.toContain("handleClick");
+  });
+
+  it("transitive call: callHelper → doWork → items; only items in computedUses", () => {
+    // callHelper calls doWork which reads `items`.
+    // collectScriptFunctionDeps must follow the call chain and surface `items`.
+    const { functions: { doWork, callHelper } } = collectCodeBehindFromSource(
+      "test.xs",
+      [
+        "function doWork() { return items.length; }",
+        "function callHelper() { doWork(); }",
+      ].join("\n"),
+    );
+    const comp = node("Stack", {
+      vars: { x: "{0}" },
+      functions: { doWork, callHelper } as any,
+    });
+    const root = node("Stack", {
+      vars: { items: "{[]}", unrelated: "{0}" },
+      children: [comp],
+    });
+    computeUsesForTree(root);
+    expect(comp.computedUses).toBeDefined();
+    expect(comp.computedUses).toContain("items");
+    expect(comp.computedUses).not.toContain("unrelated");
+    expect(comp.computedUses).not.toContain("doWork");
+    expect(comp.computedUses).not.toContain("callHelper");
+  });
+
+  it("mutually recursive functions do not cause infinite recursion", () => {
+    // a calls b, b calls a and reads `count`. DFS visited-set must break the cycle.
+    const { functions: { a, b } } = collectCodeBehindFromSource(
+      "test.xs",
+      [
+        "function a() { return b() + 1; }",
+        "function b() { return a() + count; }",
+      ].join("\n"),
+    );
+    const comp = node("Stack", {
+      vars: { x: "{0}" },
+      functions: { a, b } as any,
+    });
+    const root = node("Stack", {
+      vars: { count: "{0}" },
+      children: [comp],
+    });
+    // Must not throw or hang.
+    expect(() => computeUsesForTree(root)).not.toThrow();
+    expect(comp.computedUses).toBeDefined();
+    expect(comp.computedUses).toContain("count");
+  });
+
+  it("scriptCollected.vars initial-value deps are analyzed", () => {
+    // localCount = sharedCount + 1 — initializer references sharedCount from parent.
+    const { vars } = collectCodeBehindFromSource(
+      "test.xs",
+      "var localCount = sharedCount + 1;",
+    );
+    const comp = node("Stack", {
+      scriptCollected: { vars } as any,
+    });
+    const root = node("Stack", {
+      vars: { sharedCount: "{0}", unrelated: "{0}" },
+      children: [comp],
+    });
+    computeUsesForTree(root);
+    expect(comp.computedUses).toBeDefined();
+    expect(comp.computedUses).toContain("sharedCount");
+    expect(comp.computedUses).not.toContain("unrelated");
+    expect(comp.computedUses).not.toContain("localCount");
+  });
+
+  it("hasInvalidStatements=true: node is NOT narrowed (dep set incomplete)", () => {
+    // When the script parser could not handle all statements, we cannot know
+    // the complete dep set → conservatively block narrowing for this node.
+    const comp = node("Stack", {
+      vars: { x: "{0}" },
+      scriptCollected: {
+        functions: {},
+        hasInvalidStatements: true,
+      } as any,
+      children: [node("Text", { props: { text: "{externalVar}" } })],
+    });
+    const root = node("Stack", {
+      vars: { externalVar: "{0}" },
+      children: [comp],
+    });
+    computeUsesForTree(root);
+    expect(comp.computedUses).toBeUndefined();
+  });
+
+  // myworkdrive pattern: FileVersionsDrawer.handleRestore reads a parent UID +
+  // calls imported self-contained functions (publishEvent reads global `events`,
+  // customConfirm calls window.customConfirmDelegate). The component must still
+  // be narrowed to its REAL parent dependency and must NOT be isolated from it
+  // by the presence of browser/global identifiers (window resolves via globalThis;
+  // Globals.xs vars resolve via the global-vars layer — both bypass narrowing).
+  it("code-behind calling imported self-contained fns (window + global) still narrows to real parent dep", () => {
+    // Imported, self-contained helpers (mirror shared.xs): no refs to the
+    // importing component's own parent state — only window + a global var.
+    const { functions: imported } = collectCodeBehindFromSource(
+      "shared.xs",
+      [
+        "function publishEvent(topic, data) { events[topic] = { v: 1, data: data }; }",
+        "function customConfirm(title) { return window.customConfirmDelegate({ title: title }); }",
+      ].join("\n"),
+    );
+    // Direct code-behind: reads a real parent var (selectedPath) and calls the
+    // imported helpers.
+    const { functions: codeBehind } = collectCodeBehindFromSource(
+      "FileVersionsDrawer.xmlui.xs",
+      [
+        "function handleRestore() {",
+        "  const ok = customConfirm('Restore?');",
+        "  if (!ok) return;",
+        "  Actions.callApi({ url: selectedPath });",
+        "  publishEvent('FilesPage:refresh');",
+        "}",
+      ].join("\n"),
+    );
+    const comp = node("Stack", {
+      scriptCollected: { functions: imported } as any,
+      functions: codeBehind as any,
+    });
+    const root = node("Stack", {
+      vars: { selectedPath: "{''}", unrelated: "{0}" },
+      children: [comp],
+    });
+    computeUsesForTree(root);
+    // The component is narrowed (analysis is complete) ...
+    expect(comp.computedUses).toBeDefined();
+    // ... and the REAL parent dependency is captured → not isolated.
+    expect(comp.computedUses).toContain("selectedPath");
+    // Unrelated parent state is correctly excluded.
+    expect(comp.computedUses).not.toContain("unrelated");
+    // Imported/local function names are not deps (they are locally declared).
+    expect(comp.computedUses).not.toContain("publishEvent");
+    expect(comp.computedUses).not.toContain("customConfirm");
+    expect(comp.computedUses).not.toContain("handleRestore");
+    // Actions (framework global) is filtered by XMLUI_GLOBAL_NAMES.
+    expect(comp.computedUses).not.toContain("Actions");
   });
 });
 

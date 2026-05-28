@@ -19,7 +19,11 @@ export function verifyEnum(
   raw: unknown,
   availableValues: readonly PropertyValueDescription[] | undefined,
 ): VerifyFailure | null {
-  if (raw === undefined || raw === null) return null;
+  // Empty string means "value not set" (same intent as undefined/null): it is
+  // never a meaningful enum member, and the idiomatic markup pattern
+  // `prop="{cond ? 'x' : ''}"` uses '' as the "otherwise default" fallback.
+  // Treating it as a hard failure produces systemic false positives.
+  if (raw === undefined || raw === null || raw === "") return null;
   if (!availableValues || availableValues.length === 0) return null;
 
   const accepted = availableValues.map(unwrap);

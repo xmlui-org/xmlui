@@ -142,4 +142,8 @@ describe("verifyEnum", () => {
       verifyEnum("solid", [{ value: "solid", description: "" }, { value: "ghost", description: "" }]),
     ).toBeNull();
   });
+
+  it("returns null for empty string (treated as not-set, like undefined)", () => {
+    expect(verifyEnum("", ["a", "b"])).toBeNull();
+  });
 });
