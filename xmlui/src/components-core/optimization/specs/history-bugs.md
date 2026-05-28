@@ -1047,3 +1047,45 @@ if (nextValue != null) {
 ```
 
 **Lesson learned:** Bisect signals that perturb timing without changing data flow can be misleading. When failure rate moves between commits without becoming deterministic, stop bisecting and instrument the data flow with one-line `console.log` calls instead.
+
+---
+
+### Bug 32: `__componentApiKey__` Tagging Threw on Immer-Frozen API Objects After CoW Proxy Introduction
+
+**Symptom:** All 7 DataSource `onFetch` tests failed with `ds.value = ""`. Handlers executing in `onFetch` event context saw an empty DataSource value instead of the fetched data. No visible JavaScript errors in test output; the React Query `queryFn` silently rejected.
+
+**Cause (full chain):**
+
+1. **CoW proxy introduction:** `getComponentStateClone()` was refactored from `cloneDeep(originalState) + buildProxy` to `{ ...originalState }` (shallow root copy) + `createCoWStateProxy`. The shallow copy at the root level is correct — it gives each invocation its own root object. However, nested values still reference the originals.
+
+2. **Immer freeze invariant:** After every `produce()` call, Immer deep-freezes all objects in state — including component API objects registered via `registerComponentApi` (e.g., DataSource API stored under `Symbol("ds")`).
+
+3. **`__componentApiKey__` tagging loop:** After creating `poj = { ...originalState }`, the handler iterates `Object.getOwnPropertySymbols(originalState)` to find component API objects and tag them with a non-enumerable `__componentApiKey__` property (used by the reducer to track API references in writes like `myGlobal = ds`). The old `cloneDeep(originalState)` produced deep-cloned, unfrozen copies, so `Object.defineProperty(clonedApiObj, "__componentApiKey__", ...)` always succeeded.
+
+4. **Post-CoW breakage:** With `poj = { ...originalState }`, `poj["ds"]` still points to the Immer-frozen API object. A frozen object is non-extensible. `Object.defineProperty(frozenApiObj, "__componentApiKey__", ...)` throws `"Cannot define property __componentApiKey__, object is not extensible"`.
+
+5. **Silent swallowing:** This exception propagated up through `runCodeAsync` → React Query `queryFn` → React Query silently treated the failed `queryFn` as a query failure → `ds.value` stayed `""` (initial value, never updated).
+
+**Fix:** In `getComponentStateClone()`, before `Object.defineProperty`, check `Object.isExtensible(poj[desc])`. If the object is frozen, shallow-copy it first:
+
+```ts
+// event-handlers.ts
+if (!Object.isExtensible(poj[desc])) {
+  poj[desc] = { ...poj[desc] };
+}
+Object.defineProperty(poj[desc], "__componentApiKey__", {
+  value: desc,
+  enumerable: false,
+  configurable: true,
+});
+```
+
+`{ ...frozenApiObj }` invokes any getters (giving snapshot values) and copies method references — equivalent to the old `cloneDeep` behavior for these API objects.
+
+**Why not caught earlier:** The old `buildProxy` in `buildProxy.ts` had an explicit `!Object.isFrozen(value)` guard and skipped wrapping frozen objects. So frozen objects in state were always benign with the old proxy. The new CoW proxy's `proxyTarget` discipline correctly handles frozen sub-objects for reads/writes, but the *caller* code that does `Object.defineProperty` before creating the proxy was never updated for the frozen-object case.
+
+**Files:** `xmlui/src/components-core/container/event-handlers.ts` (2-line fix before `Object.defineProperty`).
+
+**Regression coverage:** The 7 existing DataSource `onFetch` E2E tests (`DataSource.spec.ts`) serve as regression tests. A new unit test `"reads from an Immer-frozen nested object without throwing invariant errors"` was added to `cow-state-proxy.test.ts` to document that the CoW proxy itself correctly handles Immer-frozen sub-objects at the proxy level.
+
+**Keep in mind:** Any code in `getComponentStateClone()` (or other call sites that do `{ ...originalState }` shallow copy and then mutate sub-values) must account for Immer-frozen nested objects. The invariant: after every Immer `produce()`, ALL nested objects in state are `Object.freeze`d. A shallow copy of the root gives a mutable root, but all nested values remain frozen and non-extensible.
