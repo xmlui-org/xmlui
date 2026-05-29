@@ -79,6 +79,7 @@ const baseSplitterMd = createMetadata({
         `next to each other (\`horizontal\`).`,
       valueType: "string",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultProps.orientation,
     },
   },

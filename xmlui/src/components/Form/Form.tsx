@@ -203,6 +203,7 @@ export const FormMd = createMetadata({
         "`\"reset\"` restores the form to its initial data (the value of the `data` property). " +
         "`\"clear\"` empties the form as if no `data` property were set.",
       availableValues: ["keep", "reset", "clear"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.dataAfterSubmit,
     },
@@ -213,6 +214,7 @@ export const FormMd = createMetadata({
         "`drop-while-running` fires the `submitDropped` event without queuing. " +
         "`queue` is reserved for a future scheduler — currently behaves like `single-flight`.",
       availableValues: ["single-flight", "queue", "drop-while-running"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.submitPolicy,
     },

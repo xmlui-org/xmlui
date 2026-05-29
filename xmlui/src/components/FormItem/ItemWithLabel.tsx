@@ -260,9 +260,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 
   // For other components, use the existing label structure
   return (
-    <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
+    <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel, { [styles.noLabel]: !label && compactInlineLabel })}>
       <div
         className={classnames(styles.container, {
+          [styles.noLabel]: !label && compactInlineLabel,
           [styles.top]: effectiveLabelPosition === "top",
           [styles.bottom]: effectiveLabelPosition === "bottom",
           [styles.start]: effectiveLabelPosition === "start" || (!compactInlineLabel && effectiveLabelPosition === "before"),

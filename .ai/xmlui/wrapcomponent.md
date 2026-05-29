@@ -95,6 +95,21 @@ export type RendererConfig = {
 };
 ```
 
+**Required: declare injected vars in metadata.** Every `$`-prefixed variable listed in `contextVars` **must** also appear in `optimization.childInjectedVars` inside the component's `createMetadata()` call. Without this, the optimizer counts the variable as an external parent dependency (incorrect narrowing) and `validateInjectedVars` hard-fails in DEV mode. The static drift test `renderer-metadata-drift.test.ts` (U-audit.1 for core, U-audit.1-ext for extension packages) enforces this at CI time.
+
+```typescript
+// Correct: both renderer contextVars AND metadata childInjectedVars are declared
+export const MyChartMd = createMetadata({
+  // ...
+  optimization: { childInjectedVars: ["$tooltip"] },
+});
+export const myChartRenderer = wrapComponent(COMP, MyChart, MyChartMd, {
+  renderers: {
+    tooltipTemplate: { reactProp: "tooltipRenderer", contextVars: ["$tooltip"] },
+  },
+});
+```
+
 **Examples:**
 
 ```typescript

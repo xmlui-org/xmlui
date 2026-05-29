@@ -29,6 +29,7 @@ export const DrawerMd = createMetadata({
         "Specifies the edge from which the drawer slides in.",
       valueType: "string",
       availableValues: ["left", "right", "top", "bottom"],
+      isStrictEnum: true,
       defaultValue: defaultProps.position,
     },
     hasBackdrop: {

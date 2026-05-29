@@ -38,7 +38,8 @@ export function emitRuntimeTypeContractDiagnostics(
     }
 
     let diagnostic: TypeContractDiagnostic | undefined;
-    if (propMeta.availableValues && propMeta.availableValues.length > 0) {
+    // availableValues alone is hints-only; strict validation requires isStrictEnum.
+    if (propMeta.isStrictEnum && propMeta.availableValues && propMeta.availableValues.length > 0) {
       const enumFailure = verifyEnum(resolved, propMeta.availableValues);
       if (enumFailure) {
         diagnostic = {

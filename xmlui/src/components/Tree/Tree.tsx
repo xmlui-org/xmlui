@@ -145,6 +145,7 @@ export const TreeMd = createMetadata({
         "On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.",
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      isStrictEnum: true,
       defaultValue: defaultProps.scrollStyle,
     },
     overflow: {

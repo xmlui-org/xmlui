@@ -26,6 +26,7 @@ export const RetryPolicyMd = createMetadata({
         `\`exponential\` doubles each time.`,
       valueType: "string",
       availableValues: ["fixed", "linear", "exponential"],
+      isStrictEnum: true,
       defaultValue: defaultProps.backoff,
     },
     delayMs: {

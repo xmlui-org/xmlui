@@ -91,6 +91,7 @@ export const NavLinkMd = createMetadata({
         `the level is automatically inherited from the group context.`,
       valueType: "number",
       availableValues: [1, 2, 3, 4],
+      isStrictEnum: true,
     },
   },
   events: {

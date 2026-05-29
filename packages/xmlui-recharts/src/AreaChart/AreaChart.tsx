@@ -7,7 +7,7 @@ export const AreaChartMd = createMetadata({
   status: "experimental",
   description: "Interactive area chart for showing data trends over time with filled areas under the curve",
   docFolder: "Charts/AreaChart",
-  
+
   props: {
     data: {
       description:
@@ -76,17 +76,20 @@ export const AreaChartMd = createMetadata({
       description: "This property allows replacing the default template to display a tooltip.",
     },
   },
-  
+
   events: {
     // Standard chart events - customize based on chart type
   },
-  
+
   apis: {
     // Chart-specific APIs if needed
   },
-  
+
   contextVars: {
     // Add context variables if needed
+  },
+  optimization: {
+    childInjectedVars: ["$tooltip"],
   },
 });
 

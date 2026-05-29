@@ -78,6 +78,9 @@ export const LineChartMd: ComponentMetadata = createMetadata({
     marginBottom: d("The bottom margin of the chart"),
     marginLeft: d("The left margin of the chart"),
   },
+  optimization: {
+    childInjectedVars: ["$tooltip"],
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`width-line-LineChart`]: "1px",

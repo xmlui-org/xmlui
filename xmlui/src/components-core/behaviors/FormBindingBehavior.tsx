@@ -115,6 +115,7 @@ export const formBindingBehavior: Behavior = {
     const labelPosition = extractValue(componentNode.props?.labelPosition);
     const labelWidth = extractValue.asOptionalString(componentNode.props?.labelWidth);
     const labelBreak = extractValue.asOptionalBoolean(componentNode.props?.labelBreak);
+    const compactInlineLabel = !!(metadata as any)?.compactInlineLabel;
 
     // Other props
     const enabled = extractValue.asOptionalBoolean(componentNode.props?.enabled, true);
@@ -152,6 +153,7 @@ export const formBindingBehavior: Behavior = {
         labelBreak={labelBreak}
         enabled={enabled}
         requireLabelMode={requireLabelMode}
+        compactInlineLabel={compactInlineLabel}
         className={className}
         layoutContext={layoutContext}
       >

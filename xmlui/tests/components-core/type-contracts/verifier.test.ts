@@ -273,6 +273,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
           variant: {
             description: "Button variant",
             availableValues: ["primary", "secondary", "ghost"],
+            isStrictEnum: true,
           },
         },
       },
@@ -298,6 +299,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
           variant: {
             description: "Button variant",
             availableValues: ["primary", "secondary"],
+            isStrictEnum: true,
           },
         },
       },
@@ -316,6 +318,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
           variant: {
             description: "Button variant",
             availableValues: ["primary", "secondary"],
+            isStrictEnum: true,
           },
         },
       },
@@ -337,6 +340,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
             description: "Size",
             valueType: "string",
             availableValues: ["sm", "md", "lg"],
+            isStrictEnum: true,
           },
         },
       },
@@ -345,6 +349,23 @@ describe("verifyComponentDef — value-not-in-enum", () => {
     const result = verifyComponentDef(def, registry);
     expect(result).toHaveLength(1);
     expect(result[0].code).toBe("value-not-in-enum");
+  });
+
+  it("does not emit value-not-in-enum when isStrictEnum is absent (open enum / hints only)", () => {
+    // availableValues without isStrictEnum is purely IDE hints — no validation.
+    const registry = makeRegistry({
+      Icon: {
+        props: {
+          size: {
+            description: "Icon size",
+            valueType: "string",
+            availableValues: ["xs", "sm", "md", "lg"],
+          },
+        },
+      },
+    });
+    const def = { type: "Icon", props: { size: "64px" } } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
 });
 

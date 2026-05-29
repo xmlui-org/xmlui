@@ -80,6 +80,7 @@ export const mockMetadata = {
         "description": "The button variant determines the level of emphasis the button should possess.",
         "isRequired": false,
         "type": "string",
+        "isStrictEnum": true,
         "availableValues": [
           {
             "value": "solid",

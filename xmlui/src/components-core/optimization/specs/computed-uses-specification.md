@@ -293,6 +293,23 @@ In Vite plugin mode with no `optimizerSourceDirs` for the package, extension pac
 components have neither `childInjectedVars` nor `contextVars`, so they over-subscribe —
 documented as acceptable graceful degradation.
 
+**Critical gap: extension packages that declare `renderers[slot].contextVars` but omit
+`metadata.contextVars`.** The safety-net spread reads `Object.keys(metadata?.contextVars ?? {})`.
+If an extension component injects e.g. `$tooltip` via `renderers: { tooltipTemplate: { contextVars: ["$tooltip"] } }`
+but its `createMetadata` call has no `contextVars` entry for `$tooltip`, the third spread
+contributes nothing. The optimizer then treats `$tooltip` as an external parent dependency
+(incorrectly), and — more critically — runtime `validateInjectedVars` hard-fails in DEV mode
+with `[XMLUI Lexical Scoping] Component X injected variables ($tooltip) into its template,
+but they are NOT declared in its childInjectedVars metadata.`
+
+**Rule:** extension package components that use `wrapComponent` with `renderers[slot].contextVars`
+**must** declare those same vars explicitly in `optimization: { childInjectedVars: ["$tooltip"] }`
+in their `createMetadata` call. Relying on `metadata.contextVars` as a substitute is wrong
+because that field is intentionally a documentation-only subset and is routinely absent for
+internal or synthetic variables (e.g. `$tooltip`, `$cell`, `$colIndex`). The third spread is
+a safety-net for the common case (`$item` from iteration patterns), not a substitute for the
+authoritative declaration.
+
 #### The two-source picture for a component like `List`
 
 | Source | Who reads it | What it contains |
@@ -465,6 +482,13 @@ declaration and asserts that each `$`-key is also declared in
 `metadata.contextVars`. This catches drift at PR time, not at the next E2E
 run. Renderers that compute `contextVars` via a callback cannot be audited
 statically and rely on runtime validation.
+
+**Scope limitation:** the test scans only `xmlui/src/components/` and `xmlui/src/components-core/`.
+Extension packages in `packages/xmlui-*/` are **not covered**. Missing `childInjectedVars` in
+those packages is caught only by the runtime `validateInjectedVars` hard-fail (DEV mode) and
+by E2E tests that exercise the relevant template slot. If a package is mature and its
+templates are covered by E2E, this is acceptable; otherwise, the audit should be extended
+to include the package's source directory.
 
 #### U-audit.2: Static String-Literal Presence Check
 For every entry in `collectedComponentMetadata + coreComponentMetadata` that has non-empty

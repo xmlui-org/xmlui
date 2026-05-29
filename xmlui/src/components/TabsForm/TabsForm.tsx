@@ -66,6 +66,7 @@ export const TabsFormMd = createMetadata({
         "Layout orientation of the inner `Tabs`. In `horizontal` mode the tab headers " +
         "sit on top of the content panel; in `vertical` mode they sit on the side.",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: "horizontal",
     },
@@ -74,6 +75,7 @@ export const TabsFormMd = createMetadata({
         "Alignment of the tab headers within the inner `Tabs` header strip in horizontal " +
         "orientation. Use `start` (default), `end`, `center`, or `stretch`.",
       availableValues: ["start", "end", "center", "stretch"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: "start",
     },
@@ -198,6 +200,7 @@ export const TabsFormMd = createMetadata({
         "`\"reset\"` restores the form to its initial data. " +
         "`\"clear\"` empties the form as if no `data` property were set.",
       availableValues: ["keep", "reset", "clear"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: formDefaultProps.dataAfterSubmit,
     },

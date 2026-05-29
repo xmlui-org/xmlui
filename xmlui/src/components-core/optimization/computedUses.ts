@@ -56,8 +56,14 @@ function parse(source: string): Statement[] {
  * to behaviour before this feature was introduced.
  *
  * Intended for running E2E tests with the optimisation switched off.
+ *
+ * Can be disabled at runtime (e.g. from Playwright addInitScript) by setting
+ * `window.__XMLUI_COMPUTED_USES_DISABLED = true` BEFORE the module loads.
+ * The flag is read once at module-evaluation time; a page reload is required.
  */
-export const COMPUTED_USES_ENABLED = true;
+export const COMPUTED_USES_ENABLED =
+  typeof window === "undefined" ||
+  !(window as any).__XMLUI_COMPUTED_USES_DISABLED;
 
 /**
  * ECMAScript and platform globals that are NEVER stored in XMLUI app state.

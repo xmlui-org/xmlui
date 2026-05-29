@@ -149,8 +149,9 @@ export function verifyComponentDef(
       // until runtime.
       if (isExpressionValue(rawValue)) continue;
 
-      // value-not-in-enum: checked before wrong-type (more specific)
-      if (propMeta.availableValues && propMeta.availableValues.length > 0) {
+      // value-not-in-enum: checked before wrong-type (more specific).
+      // availableValues alone is hints-only; strict validation requires isStrictEnum.
+      if (propMeta.isStrictEnum && propMeta.availableValues && propMeta.availableValues.length > 0) {
         const enumFailure = verifyEnum(rawValue, propMeta.availableValues);
         if (enumFailure) {
           diagnostics.push({

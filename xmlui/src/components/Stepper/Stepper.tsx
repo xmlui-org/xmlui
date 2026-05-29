@@ -36,6 +36,7 @@ export const StepperMd = createMetadata({
         "step's content expanding beneath it.",
       valueType: "string",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultProps.orientation,
     },
     stackedLabel: {

@@ -31,10 +31,11 @@ export const ResponsiveBarMd = createMetadata({
         "arranged top-to-bottom and overflow is based on container height.",
       valueType: "string",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultResponsiveBarProps.orientation,
     },
     overflowIcon: {
-      description: 
+      description:
         "Icon to display in the dropdown trigger button when items overflow. " +
         "You can use component-specific icons in the format \"iconName:ResponsiveBar\".",
       valueType: "string",
@@ -57,7 +58,7 @@ export const ResponsiveBarMd = createMetadata({
     },
     triggerTemplate: dTriggerTemplate(COMP),
     gap: {
-      description: 
+      description:
         "Gap between child elements in pixels. Controls the spacing between items " +
         "in the responsive bar layout.",
       valueType: "number",

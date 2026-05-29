@@ -9,7 +9,7 @@
  *   - `unknown-prop`              A prop name was used that the component metadata does not declare.
  *   - `wrong-type`                A literal prop value failed the declared `valueType` check.
  *   - `missing-required`          A prop declared `isRequired` was not supplied.
- *   - `value-not-in-enum`         A literal value was not in the declared `availableValues`.
+  *   - `value-not-in-enum`         A literal value was not in the declared `availableValues` (requires `isStrictEnum: true`).
  *   - `unknown-event`             An event name was used that the component metadata does not declare.
  *   - `unknown-exposed-method`    An exposed-method reference targets an undeclared method.
  *   - `deprecated-prop`           A prop carrying `deprecationMessage` was used.

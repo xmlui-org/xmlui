@@ -70,6 +70,7 @@ export const TextMd = createMetadata({
         { value: "keep", description: "Prevents breaking within words entirely" },
         { value: "hyphenate", description: "Uses automatic hyphenation when breaking words" },
       ],
+      isStrictEnum: true,
     },
     overflowMode: {
       description:
@@ -96,6 +97,7 @@ export const TextMd = createMetadata({
             "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines)",
         },
       ],
+      isStrictEnum: true,
     },
   },
   events: {

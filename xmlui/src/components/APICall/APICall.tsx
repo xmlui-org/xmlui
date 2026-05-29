@@ -165,6 +165,7 @@ export const APICallMd = createMetadata({
         "'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.",
       valueType: "string",
       availableValues: ["none", "linear", "exponential"],
+      isStrictEnum: true,
       defaultValue: defaultProps.pollingBackoff,
     },
     maxPollingInterval: {

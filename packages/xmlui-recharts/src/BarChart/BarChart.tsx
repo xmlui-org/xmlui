@@ -91,6 +91,9 @@ export const BarChartMd: ComponentMetadata = createMetadata({
       description: "This property allows replacing the default template to display a tooltip.",
     },
   },
+  optimization: {
+    childInjectedVars: ["$tooltip"],
+  },
   themeVars: parseScssVar(styles.themeVars),
 });
 

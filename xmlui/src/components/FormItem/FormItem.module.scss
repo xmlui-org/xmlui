@@ -82,6 +82,10 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
       width: fit-content;
     }
 
+    &.noLabel {
+      width: fit-content;
+    }
+
     .inputLabel {
       color: $textColor-label-formItem;
       font-family: $fontFamily-label-formItem;
@@ -131,6 +135,10 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
    align-items: center;
    flex-direction: column;
    width: 100%;
+
+   &.noLabel {
+     width: fit-content;
+   }
   }
 
   // Stack wrapper for FormItem type="items" children. Reuses the Form's own

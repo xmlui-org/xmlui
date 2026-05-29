@@ -34,6 +34,7 @@ export const TabsMd = createMetadata({
         `orientation, the buttons are at the top. Note: This property is ignored when ` +
         `accordionView is set to true.`,
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
@@ -45,6 +46,7 @@ export const TabsMd = createMetadata({
         `of the header. Note: This property is ignored when orientation is set to 'vertical' ` +
         `or when accordionView is enabled.`,
       availableValues: ["start", "end", "center", "stretch"],
+      isStrictEnum: true,
       defaultValue: defaultProps.tabAlignment,
       valueType: "string",
     },

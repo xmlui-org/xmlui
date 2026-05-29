@@ -352,9 +352,20 @@ export type ComponentPropertyMetadata = {
   // extractValue, enabling XMLUI resource path resolution (e.g. relative paths).
   readonly isResourceUrl?: boolean;
 
-  // This field defines the available values of the property. The rendering engine
-  // uses this information to validate the property value.
+  // This field defines the available values of the property. Used for IDE
+  // autocompletion and documentation. NOT used for runtime validation unless
+  // `isStrictEnum` is also set to `true`.
   readonly availableValues?: readonly PropertyValueDescription[];
+
+  // When true, `availableValues` is treated as a strict closed enum: any value
+  // outside the list triggers a `value-not-in-enum` diagnostic. When false or
+  // absent, `availableValues` is hints-only (autocomplete + docs) and custom
+  // values are silently accepted.
+  //
+  // Use `isStrictEnum: true` ONLY when no value outside the list can ever be
+  // meaningful (e.g. `validationStatus`, `overflowMode`). Never set it for
+  // size/variant props that accept arbitrary CSS values or custom theme tokens.
+  readonly isStrictEnum?: boolean;
 
   // This field defines the default value of the property. The rendering engine uses
   // this information to set the default value of the property.

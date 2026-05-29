@@ -16,6 +16,7 @@ export const ThemeMd = createMetadata({
     tone: {
       description: "This property allows the setting of the current theme's tone.",
       availableValues: ["light", "dark"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: "light",
     },

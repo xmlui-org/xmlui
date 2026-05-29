@@ -293,6 +293,7 @@ export const TableMd = createMetadata({
         `It can be set to \`top\`, \`center\`, or \`bottom\`.`,
       valueType: "string",
       availableValues: ["top", "center", "bottom"],
+      isStrictEnum: true,
       defaultValue: defaultProps.cellVerticalAlign,
     },
     checkboxTolerance: {
