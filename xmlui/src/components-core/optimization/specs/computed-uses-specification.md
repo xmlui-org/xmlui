@@ -48,8 +48,8 @@ The algorithm works bottom-up, traversing the `ComponentDef` tree before connect
 Event-handler strings are parsed once and cached to avoid redundant AST work during boot-time traversal. The cache is an **LRU with a cap of 1 000 entries**, implemented cheaply via JavaScript `Map`'s insertion-order guarantee (delete + re-insert on hit; evict the first/oldest key at capacity). This bounds memory in long-running devserver/studio sessions where generated XMLUI could otherwise accumulate thousands of unique event strings.
 
 ### Runtime Protection (Defense-in-depth)
-- **`ComponentWrapper`:** Uses `extractScopedState(state, computedUses)` and memoizes the result via `useShallowCompareMemoize`. State updates are terminated here if dependencies haven't changed, and lower wrappers aren't even executed.
-- **`ContainerWrapper`:** Receives the narrowed state `parentState={scopedParentState}` and is responsible for deploying the `StateContainer`. It checks if the node is a container (via `isContainerLike`, which considers the presence of `computedUses`).
+- **`ComponentWrapper`:** Uses `extractScopedState(state, computedUses)` and memoizes the result via `useShallowCompareMemoize`. State updates are terminated here if dependencies haven't changed, and lower wrappers aren't even executed. Separately, `narrowGlobalVars(globalVars, computedGlobalUses)` (see Section 7) projects `parentGlobalVars` to the globals the subtree reads before passing it to `ContainerWrapper`.
+- **`ContainerWrapper`:** Receives the narrowed state `parentState={scopedParentState}` and narrowed `parentGlobalVars={scopedGlobalVars}`, and is responsible for deploying the `StateContainer`. It checks if the node is a container (via `isContainerLike`, which considers the presence of `computedUses`).
 - **`StateContainer`:** Registers reactive changes. State for children becomes fully isolated.
 
 ---
@@ -547,6 +547,120 @@ An app-level `Globals.xs` file declares reactive global state (variables and fun
 
 **Zero hardcoding:** The set is derived directly from `globalsXs` at startup — no manual name list to maintain. Adding or removing a variable in `Globals.xs` automatically updates the filter on the next app reload.
 
+> **`appGlobalNames` also drives `computedGlobalUses` narrowing** — the same set is used by
+> the optimizer to identify which dep names belong to the globals layer and must be tracked
+> separately. See Section 7 below.
+
+---
+
+## 7. Global Variables Narrowing (`computedGlobalUses`)
+
+`computedGlobalUses` is the globals-layer counterpart to `computedUses`. Where
+`computedUses` narrows `parentState` (local container state), `computedGlobalUses` narrows
+`parentGlobalVars` (the `Globals.xs` channel). Each container carries a sorted list of the
+Globals.xs variable names its subtree actually reads; `ComponentWrapper` uses this list to
+project `globalVars` before passing it into `ContainerWrapper`, so a container that reads
+only `events` is fully isolated from changes to `sortBy`.
+
+### `computedGlobalUses` in the Data Flow
+
+```
+parentState      narrowed by computedUses        → scopedParentState   (ComponentWrapper)
+parentGlobalVars narrowed by computedGlobalUses  → scopedGlobalVars    (ComponentWrapper)
+```
+
+Both projections are memoized with `useShallowCompareMemoize`. When neither the relevant
+state slice nor the relevant globals slice changes, `ContainerWrapper.memo` sees the same
+props and the subtree does not re-render.
+
+### Static Analysis: `computeUsesInternal` Emits `computedGlobalUses`
+
+`computeUsesInternal` returns a **4-tuple** `[parentDeps, escapingUIDs, parentDepsReads, globalDepsUsed]`.
+The 4th element carries Globals.xs dep names upward through all return paths.
+
+Steps during traversal:
+
+1. `node.computedGlobalUses = undefined` is cleared unconditionally at entry (same
+   mechanical-guard pattern as `node.computedUses`; see Invariant 5.5).
+2. A `childGlobalDeps: Set<string>` accumulator collects global dep names from child
+   subtrees alongside the existing `childDeps`.
+3. After `processChildList`, an `isGlobalDep` predicate identifies names in `usedHere`
+   where `appGlobalNames.has(d)` and the name is not in `localDeclared` or
+   `injectedVarsScope`. These, unioned with `childGlobalDeps`, form `globalDepsUsed`.
+4. For container nodes: if `globalDepsUsed` is non-empty and `node.uses === undefined`,
+   `node.computedGlobalUses = Array.from(globalDepsUsed).sort()`.
+
+**Why a separate 4th return value?**  
+`keepDep` filters `appGlobalNames` out of `parentDependencies` — Globals.xs names must not
+enter `computedUses`. Without explicit tracking they would be silently discarded after that
+filter. The 4th element is their dedicated upward propagation path.
+
+**Subtree coverage invariant:** `computedGlobalUses` on a container node is the **union**
+of all global deps in its entire subtree. Narrowing at the container therefore never
+starves a grandchild component — the grandchild's global reads are always included in the
+ancestor's annotation.
+
+### `getWrappedWithContainer` — forwarding to `ContainerWrapperDef`
+
+`getWrappedWithContainer` in `ContainerWrapper.tsx` uses the same move-and-delete pattern
+as `computedUses`:
+
+```typescript
+computedGlobalUses: node.computedGlobalUses,  // moved to ContainerWrapperDef
+...
+delete wrappedNode.computedGlobalUses;         // prevent isContainerLike re-detection
+```
+
+### `narrowGlobalVars` (`ContainerUtils.ts`)
+
+```typescript
+export function narrowGlobalVars(
+  vars: Record<string, any>,
+  uses: readonly string[],
+): Record<string, any>
+```
+
+Three categories of keys:
+
+| Key pattern | Included? | Rationale |
+|-------------|-----------|-----------|
+| `typeof value === "function"` | **Always** | Globals.xs functions may be called from any expression in the subtree; cannot be narrowed |
+| `__tree_<name>` | Only when `name ∈ uses` | AST metadata used by `useGlobalVariables` for dep-tracking; relevant only when the variable is in scope |
+| all other value keys | Only when `key ∈ uses` | Core narrowing: variables not in the subtree's read-set are excluded |
+
+### `ComponentWrapper.tsx` applies the narrowing
+
+```typescript
+const nodeComputedGlobalUses = nodeWithTransformedDatasourceProp.computedGlobalUses;
+const scopedGlobalVars = useShallowCompareMemoize(
+  useMemo(
+    () =>
+      nodeComputedGlobalUses && globalVars
+        ? narrowGlobalVars(globalVars, nodeComputedGlobalUses)
+        : globalVars,
+    [globalVars, nodeComputedGlobalUses],
+  ),
+);
+// ...
+<ContainerWrapper parentGlobalVars={scopedGlobalVars} ... />
+```
+
+When an unrelated global changes, the narrowed object's contents are identical, the
+memoize returns the same reference, `useGlobalVariables` sees the same `parentGlobalVars`,
+and no re-render is triggered.
+
+### Scope of the change
+
+`useGlobalVariables` and `StateContainer` require no changes — they receive an
+already-narrow `parentGlobalVars` and behave correctly. The existing
+`useShallowCompareMemoize` inside `useGlobalVariables` provides reference stability once
+the input object stops changing.
+
+When `computedGlobalUses` is `undefined` (no Globals.xs reads in the subtree),
+`ComponentWrapper` passes `globalVars` through unchanged — no narrowing, no overhead.
+(no narrowing, no overhead).
+
 ---
 
 *Note: To view render statistics in the browser during development, use `window.__renderCounts` (per-label counters), `window.__topRenderCounts(n=10)` (top N most-rendered labels), and `window.__resetRenderCounts()` (zero all counters).*
+

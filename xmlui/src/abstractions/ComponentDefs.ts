@@ -108,6 +108,23 @@ export interface ComponentDefCore {
   computedUses?: string[];
 
   /**
+   * Automatically computed minimal set of Globals.xs variable names actually
+   * read within this node's subtree. Populated by `computeUsesForTree()` at
+   * transform/boot time alongside `computedUses`.
+   *
+   * Used at runtime to narrow the `parentGlobalVars` object passed to a
+   * container so that only the globals the subtree actually reads are
+   * forwarded. This prevents re-renders when unrelated global variables
+   * change (e.g. a `sortBy` change must not re-render a component that only
+   * reads `events`).
+   *
+   * Globals.xs **functions** are always included in the narrowed object at
+   * runtime regardless of this list (see `narrowGlobalVars` in
+   * `ContainerUtils.ts`).
+   */
+  computedGlobalUses?: string[];
+
+  /**
    * Arbitrary debug information that can be attached to a component definition.
    * Current usage:
    * - `debug: { source: { start: number, end: number } }` The start and end

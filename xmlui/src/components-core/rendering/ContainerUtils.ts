@@ -8,6 +8,7 @@ import type { ArrowExpression } from "../script-runner/ScriptingSourceTree";
 import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { UNSTABLE_GLOBAL_VARS } from "../state/unstableGlobalVars";
+import { collectVariableDependencies } from "../script-runner/visitors";
 
 // ============================================================================
 // TYPE GUARDS
@@ -255,4 +256,87 @@ export class ParseVarError extends Error {
     super(`Error on var: ${varName} - ${originalError?.message || "unknown"}`);
     Object.setPrototypeOf(this, ParseVarError.prototype);
   }
+}
+
+/**
+ * Cache of function-typed key sets per globalVars object reference.
+ * All containers rendered in the same pass receive the same `parentGlobalVars`
+ * reference, so the first call populates the cache and subsequent calls hit it.
+ * The WeakMap releases entries automatically when the vars object is GC'd.
+ */
+const _globalFunctionKeysCache = new WeakMap<Record<string, any>, Set<string>>();
+
+function getGlobalFunctionKeys(vars: Record<string, any>): Set<string> {
+  let keys = _globalFunctionKeysCache.get(vars);
+  if (!keys) {
+    keys = new Set<string>();
+    for (const [key, value] of Object.entries(vars)) {
+      if (!key.startsWith("__") && typeof value === "function") {
+        keys.add(key);
+      }
+    }
+    _globalFunctionKeysCache.set(vars, keys);
+  }
+  return keys;
+}
+
+/**
+ * Narrows a `parentGlobalVars` record to only the keys actually read by a
+ * component subtree (according to `computedGlobalUses`).
+ *
+ * - Globals.xs **functions** are always forwarded — they may be invoked from any
+ *   expression in the subtree and cannot be narrowed away safely.
+ * - `__tree_*` metadata keys (expression ASTs used for dep-tracking inside
+ *   `useGlobalVariables`) are forwarded only when their corresponding variable
+ *   name is in the uses set.
+ * - All other keys are forwarded only when listed in `uses`.
+ * - The uses set is expanded transitively: if global X depends on global Y
+ *   (expressed via `__tree_X` AST), Y is also included so dep-tracking in
+ *   `useGlobalVariables` can compute the correct depMap entry for X.
+ */
+export function narrowGlobalVars(
+  vars: Record<string, any>,
+  uses: readonly string[],
+): Record<string, any> {
+  const usesSet = new Set(uses);
+
+  // Expand usesSet transitively: for each included global, if its __tree_* AST
+  // references other globals, include those too. Without this, dep-tracking
+  // inside useGlobalVariables would see undefined for transitive deps of X
+  // when only X (not its dependency Y) is in the uses set.
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const key of usesSet) {
+      const tree = vars[`__tree_${key}`];
+      if (tree && typeof tree === "object") {
+        for (const dep of collectVariableDependencies(tree)) {
+          if (!dep.startsWith("__") && !usesSet.has(dep) && dep in vars) {
+            usesSet.add(dep);
+            changed = true;
+          }
+        }
+      }
+    }
+  }
+
+  const functionKeys = getGlobalFunctionKeys(vars);
+  const result: Record<string, any> = {};
+
+  for (const key of functionKeys) {
+    result[key] = vars[key];
+  }
+  for (const [key, value] of Object.entries(vars)) {
+    if (functionKeys.has(key)) continue;
+    if (key.startsWith("__tree_")) {
+      // Include AST metadata only for vars that are in the (expanded) uses set.
+      const varName = key.slice(7); // "__tree_".length === 7
+      if (usesSet.has(varName)) {
+        result[key] = value;
+      }
+    } else if (usesSet.has(key)) {
+      result[key] = value;
+    }
+  }
+  return result;
 }

@@ -10,7 +10,7 @@ import ComponentAdapter from "./ComponentAdapter";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { EMPTY_ARRAY } from "../constants";
 import { useShallowCompareMemoize } from "../utils/hooks";
-import { extractScopedState } from "./ContainerUtils";
+import { extractScopedState, narrowGlobalVars } from "./ContainerUtils";
 
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.
@@ -97,6 +97,31 @@ export const ComponentWrapper = memo(
       ),
     );
 
+    // Narrow parentGlobalVars to only the globals this subtree reads.
+    // When computedGlobalUses is undefined (no global deps), pass globalVars as-is.
+    //
+    // Two-step approach to handle write targets correctly:
+    //   Step 1 — build a narrow snapshot containing only the tracked keys; used
+    //            purely for change-detection via useShallowCompareMemoize.
+    //   Step 2 — pass the FULL globalVars to the child but update its reference
+    //            only when the narrow snapshot changes.
+    //
+    // This prevents re-renders on unrelated global changes while still exposing
+    // every global variable (including write targets that aren't in
+    // computedGlobalUses) to the child's expression evaluator.
+    const nodeComputedGlobalUses = nodeWithTransformedDatasourceProp.computedGlobalUses;
+    const narrowedGlobalVarsForComparison = useShallowCompareMemoize(
+      useMemo(
+        () =>
+          nodeComputedGlobalUses && globalVars
+            ? narrowGlobalVars(globalVars, nodeComputedGlobalUses)
+            : globalVars,
+        [globalVars, nodeComputedGlobalUses],
+      ),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const scopedGlobalVars = useMemo(() => globalVars, [narrowedGlobalVarsForComparison]);
+
     // Stable ref holding the full (un-narrowed) parent state for event handlers.
     // Using a MutableRefObject instead of a value prop means ContainerWrapper.memo
     // never sees this as a changed prop — the optimization (no re-render on
@@ -113,7 +138,7 @@ export const ComponentWrapper = memo(
           node={nodeWithTransformedDatasourceProp as ContainerWrapperDef}
           parentState={scopedParentState}
           fullParentStateRef={(nodeUses || nodeComputedUses) ? fullParentStateRef : undefined}
-          parentGlobalVars={globalVars}
+          parentGlobalVars={scopedGlobalVars}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           parentRenderContext={parentRenderContext}

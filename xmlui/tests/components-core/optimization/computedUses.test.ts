@@ -2331,3 +2331,142 @@ describe.skipIf(skipIfDisabled)(
     });
   },
 );
+
+// ---------------------------------------------------------------------------
+// computedGlobalUses — static analysis for Globals.xs narrowing
+// ---------------------------------------------------------------------------
+
+const appGlobalNames = new Set(["theme", "sortBy", "filterText", "myFunc", "otherFunc"]);
+
+const computeUsesForTreeWithGlobals = (root: any) =>
+  originalComputeUsesForTree(
+    root,
+    (t) => {
+      if (t === "DataSource") return DataSourceMd;
+      return getOptimizerMetadata(t);
+    },
+    appGlobalNames,
+  );
+
+describe.skipIf(skipIfDisabled)("computedGlobalUses", () => {
+  it("component reading a global var gets computedGlobalUses annotated", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [node("Text", { props: { text: "{sortBy}" } })],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toEqual(["sortBy"]);
+  });
+
+  it("component not reading any global → computedGlobalUses is undefined", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [node("Text", { props: { text: "{localVar}" } })],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toBeUndefined();
+  });
+
+  it("multiple globals are collected and sorted", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("Text", { props: { text: "{theme}" } }),
+        node("Text", { props: { value: "{sortBy}" } }),
+      ],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toEqual(["sortBy", "theme"]);
+  });
+
+  it("global used only in deeply nested child bubbles up to container", () => {
+    const inner = node("Text", { props: { text: "{filterText}" } });
+    const mid = node("HStack", { children: [inner] });
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [mid],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toContain("filterText");
+  });
+
+  it("computedGlobalUses is cleared when tree is re-analyzed", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [node("Text", { props: { text: "{theme}" } })],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toEqual(["theme"]);
+
+    // Remove the global reference and re-analyze — stale value must be cleared.
+    (root.children as ComponentDef[])[0].props = { text: "static" };
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toBeUndefined();
+  });
+
+  it("globals used in expression on non-container node do not appear on the node itself", () => {
+    // A leaf Text node does not become a container; computedGlobalUses belongs to
+    // the nearest ancestor container (root Stack in this test).
+    const leaf = node("Text", { props: { text: "{sortBy}" } });
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [leaf],
+    });
+    computeUsesForTreeWithGlobals(root);
+    // Only the container (root) should have the annotation.
+    expect(leaf.computedGlobalUses).toBeUndefined();
+    expect(root.computedGlobalUses).toEqual(["sortBy"]);
+  });
+
+  it("hasInvalidStatements=true: computedGlobalUses is NOT set (safeToNarrow gate)", () => {
+    // When the script parser could not handle all statements, the dep set is
+    // knowingly incomplete. A global read only in the unparsed statement would
+    // be silently dropped from globalDepsUsed, causing narrowGlobalVars to strip
+    // it from parentGlobalVars at runtime → wrong undefined value.
+    // The same safeToNarrow guard that protects computedUses must protect
+    // computedGlobalUses.
+    const comp = node("Stack", {
+      vars: { x: "{0}" },
+      // sortBy is a global, but the script also reads it in an invalid statement.
+      // Because hasInvalidStatements=true, globalDepsUsed may be incomplete.
+      props: { label: "{sortBy}" },
+      scriptCollected: {
+        functions: {},
+        hasInvalidStatements: true,
+      } as any,
+    });
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [comp],
+    });
+    computeUsesForTreeWithGlobals(root);
+    // comp has hasInvalidStatements → safeToNarrow=false → computedGlobalUses must be undefined.
+    expect(comp.computedGlobalUses).toBeUndefined();
+  });
+
+  it("disableNarrowing via parent function: computedGlobalUses is NOT set", () => {
+    // A container that depends on a parent-scope function while nextDisableNarrowing=true
+    // is considered unsafe to narrow — the same safeToNarrow condition blocks both
+    // computedUses and computedGlobalUses.
+    const { functions: parentFunctions } = collectCodeBehindFromSource(
+      "parent.xs",
+      "function getFilter() { return sortBy; }",
+    );
+    const parent = node("Stack", {
+      vars: { dummy: "{0}" },
+      scriptCollected: { functions: parentFunctions } as any,
+      children: [
+        // child calls getFilter() (a parent function) and reads a global
+        node("Stack", {
+          vars: { y: "{0}" },
+          props: { label: "{sortBy}", onClick: "{getFilter()}" },
+        }),
+      ],
+    });
+    computeUsesForTreeWithGlobals(parent);
+    const child = (parent.children as ComponentDef[])[0];
+    // child depends on parent function getFilter while narrowing is disabled
+    // → safeToNarrow=false → computedGlobalUses must be undefined
+    expect(child.computedGlobalUses).toBeUndefined();
+  });
+});

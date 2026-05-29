@@ -254,6 +254,9 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
   // state scoping. It must be removed from wrappedNode to prevent isContainerLike
   // from returning true again for the inner node, which would cause infinite wrapping.
   delete wrappedNode.computedUses;
+  // computedGlobalUses follows the same move-and-delete pattern so ComponentWrapper
+  // can read it off the container node when narrowing parentGlobalVars.
+  delete wrappedNode.computedGlobalUses;
 
   // --- Do the wrapping
   return {
@@ -273,6 +276,7 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
     udcContract: node?.udcContract,
     contextVars: node.contextVars,
     computedUses: node.computedUses,
+    computedGlobalUses: node.computedGlobalUses,
     props: {
       debug: (node as any).debug || (node.props as any)?.debug,
     },

@@ -257,10 +257,11 @@ function computeUsesInternal(
   // empty during the parse-time pass (that result is overwritten by the
   // authoritative StandaloneApp pass, which runs in both runtime and Vite modes).
   appGlobalNames: ReadonlySet<string> = EMPTY_SET,
-): [Set<string>, Set<string>, Set<string>] {
-  // Clear stale `computedUses` from prior traversals.
+): [Set<string>, Set<string>, Set<string>, Set<string>] {
+  // Clear stale `computedUses` and `computedGlobalUses` from prior traversals.
   // Re-running analysis is routine (e.g., after merging code-behind functions).
   node.computedUses = undefined;
+  node.computedGlobalUses = undefined;
 
   const isKnownContainer = isContainerLike(node, { strict: true, ignoreComputedUses: true });
 
@@ -419,6 +420,9 @@ function computeUsesInternal(
   // UIDs from the subtree that will register into THIS node's StateContainer
   // at runtime (because they pass through non-container intermediaries).
   const childEscapingUIDs = new Set<string>();
+  // Global variable names (Globals.xs) used anywhere in this subtree.
+  // Collected separately because keepDep filters them out of childDeps.
+  const childGlobalDeps = new Set<string>();
 
   const childInjected = [
     ...(metadata?.childInjectedVars ?? []),
@@ -439,7 +443,7 @@ function computeUsesInternal(
 
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, childScope, metadataLookup, appGlobalNames);
+      const [deps, escapingUIDs, depsReads, globalDeps] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, childScope, metadataLookup, appGlobalNames);
       for (const d of deps) childDeps.add(d);
       for (const d of depsReads) childDepsReads.add(d);
       for (const uid of escapingUIDs) {
@@ -448,6 +452,7 @@ function computeUsesInternal(
         // as locally declared so they don't appear in computedUses.
         localDeclared.add(uid);
       }
+      for (const d of globalDeps) childGlobalDeps.add(d);
     }
   };
 
@@ -472,6 +477,16 @@ function computeUsesInternal(
   for (const d of childDeps) if (keepDep(d)) parentDependencies.add(d);
   for (const d of usedHereReads) if (keepDep(d)) parentDependenciesReads.add(d);
   for (const d of childDepsReads) if (keepDep(d)) parentDependenciesReads.add(d);
+
+  // Collect Globals.xs names used in this subtree (filtered by appGlobalNames, not localDeclared or injectedVars).
+  // These are the global var names the keepDep filter would reject — they need their own tracking.
+  const isGlobalDep = (d: string) =>
+    appGlobalNames.has(d) &&
+    !localDeclared.has(d) &&
+    !injectedVarsScope.has(d);
+  const globalDepsUsed = new Set<string>();
+  for (const d of usedHere) if (isGlobalDep(d)) globalDepsUsed.add(d);
+  for (const d of childGlobalDeps) globalDepsUsed.add(d);
 
   // If this node is an implicit stateful component (Select, List, Table, etc.)
   // with a UID, include its own UID in parentDependencies so the narrowed state
@@ -521,6 +536,15 @@ function computeUsesInternal(
         .sort();
     }
 
+    // Annotate which Globals.xs var names this subtree reads so ContainerWrapper
+    // can narrow parentGlobalVars and prevent re-renders from unrelated globals.
+    // Uses the same safeToNarrow guard as computedUses: nodes with incomplete
+    // dep sets (hasInvalidStatements) must not be narrowed to avoid silently
+    // dropping globals that were read in unparsed statements.
+    if (node.uses === undefined && globalDepsUsed.size > 0 && safeToNarrow) {
+      node.computedGlobalUses = Array.from(globalDepsUsed).sort();
+    }
+
     // Capture child APIs for explicit owners; bubble them up for implicit containers.
     const myEscapingUID: Set<string> = new Set();
     if (node.uid) myEscapingUID.add(node.uid);
@@ -531,7 +555,7 @@ function computeUsesInternal(
     // Dynamic vars ($context) belong to this container's computedUses but don't cascade up.
     const propagatedDeps = nonDynamicParentDeps;
     const propagatedReadDeps = nonDynamicReadDeps;
-    return [propagatedDeps, myEscapingUID, propagatedReadDeps];
+    return [propagatedDeps, myEscapingUID, propagatedReadDeps, globalDepsUsed];
   }
 
   // Non-container: this node's own UID + all child escaping UIDs propagate
@@ -540,7 +564,7 @@ function computeUsesInternal(
   if (node.uid) escapingUIDs.add(node.uid);
   for (const uid of childEscapingUIDs) escapingUIDs.add(uid);
 
-  return [parentDependencies, escapingUIDs, parentDependenciesReads];
+  return [parentDependencies, escapingUIDs, parentDependenciesReads, globalDepsUsed];
 }
 
 /**

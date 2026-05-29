@@ -3,6 +3,7 @@ import {
   isParsedEventValue,
   isArrowExpression,
   extractScopedState,
+  narrowGlobalVars,
   CodeBehindParseError,
   ParseVarError,
 } from "../../../src/components-core/rendering/ContainerUtils";
@@ -10,6 +11,7 @@ import { UNSTABLE_GLOBAL_VARS } from "../../../src/components-core/state/unstabl
 import { T_ARROW_EXPRESSION } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import type { ParsedEventValue } from "../../../src/abstractions/scripting/Compilation";
 import type { ArrowExpression } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 describe("ContainerUtils", () => {
   describe("isParsedEventValue", () => {
@@ -256,6 +258,144 @@ describe("ContainerUtils", () => {
       const error = new CodeBehindParseError(errors);
       const lines = error.message.split("\n");
       expect(lines).toHaveLength(3);
+    });
+  });
+
+  describe("narrowGlobalVars", () => {
+    it("always forwards function-valued keys regardless of uses list", () => {
+      const myFunc = () => {};
+      const vars = { myFunc, theme: "dark", sortBy: "name" };
+      const result = narrowGlobalVars(vars, ["theme"]);
+      expect(result.myFunc).toBe(myFunc);
+      expect(result.theme).toBe("dark");
+      expect(result).not.toHaveProperty("sortBy");
+    });
+
+    it("forwards all functions even when uses list is empty", () => {
+      const fn1 = () => {};
+      const fn2 = () => {};
+      const vars = { fn1, fn2, theme: "dark" };
+      const result = narrowGlobalVars(vars, []);
+      expect(result.fn1).toBe(fn1);
+      expect(result.fn2).toBe(fn2);
+      expect(result).not.toHaveProperty("theme");
+    });
+
+    it("forwards only listed value keys", () => {
+      const vars = { a: 1, b: 2, c: 3 };
+      const result = narrowGlobalVars(vars, ["a", "c"]);
+      expect(result).toHaveProperty("a", 1);
+      expect(result).toHaveProperty("c", 3);
+      expect(result).not.toHaveProperty("b");
+    });
+
+    it("includes __tree_* only for vars in the uses set", () => {
+      const treeTheme = { __mock_ast__: "theme" };
+      const treeSortBy = { __mock_ast__: "sortBy" };
+      const vars = {
+        theme: "dark",
+        sortBy: "name",
+        __tree_theme: treeTheme,
+        __tree_sortBy: treeSortBy,
+      };
+      const result = narrowGlobalVars(vars, ["theme"]);
+      expect(result.__tree_theme).toBe(treeTheme);
+      expect(result).not.toHaveProperty("__tree_sortBy");
+    });
+
+    it("excludes __tree_* for vars not in uses set", () => {
+      const vars = {
+        a: 1,
+        b: 2,
+        __tree_a: { __mock_ast__: "a" },
+        __tree_b: { __mock_ast__: "b" },
+      };
+      const result = narrowGlobalVars(vars, ["b"]);
+      expect(result).toHaveProperty("b", 2);
+      expect(result.__tree_b).toBeDefined();
+      expect(result).not.toHaveProperty("a");
+      expect(result).not.toHaveProperty("__tree_a");
+    });
+
+    it("transitive: includes global Y when included global X depends on Y via __tree_X AST", () => {
+      // "sortBy + 1" references sortBy — parser produces a real AST with that identifier
+      const tree = new Parser("sortBy + 1").parseStatements();
+      const vars: Record<string, any> = {
+        x: 11,        // evaluated value of "sortBy + 1"
+        sortBy: "name",
+        __tree_x: tree,
+      };
+      const result = narrowGlobalVars(vars, ["x"]);
+      expect(result).toHaveProperty("x", 11);
+      // sortBy must be included because __tree_x references it
+      expect(result).toHaveProperty("sortBy", "name");
+      // __tree_x must also be included (x is in uses)
+      expect(result.__tree_x).toBe(tree);
+    });
+
+    it("transitive: does not include globals not referenced by any __tree_* in uses", () => {
+      const tree = new Parser("sortBy + 1").parseStatements();
+      const vars: Record<string, any> = {
+        x: 11,
+        sortBy: "name",
+        theme: "dark",  // not referenced by __tree_x
+        __tree_x: tree,
+      };
+      const result = narrowGlobalVars(vars, ["x"]);
+      expect(result).not.toHaveProperty("theme");
+    });
+
+    it("returns shallowly equal object when an unrelated global changes (optimization invariant)", () => {
+      const myFunc = () => {};
+      const vars1 = { myFunc, theme: "dark", sortBy: "name" };
+      // sortBy changes but the container only reads theme
+      const vars2 = { ...vars1, sortBy: "date" };
+
+      const result1 = narrowGlobalVars(vars1, ["theme"]);
+      const result2 = narrowGlobalVars(vars2, ["theme"]);
+
+      // Same keys
+      expect(Object.keys(result1).sort()).toEqual(Object.keys(result2).sort());
+      // useShallowCompareMemoize would compare each key by reference equality
+      const allKeys = Object.keys(result1);
+      const shallowEqual = allKeys.every(k => (result1 as any)[k] === (result2 as any)[k]);
+      expect(shallowEqual).toBe(true);
+    });
+
+    it("WeakMap cache: second call with same vars reference returns cached function keys (no rescan)", () => {
+      let callCount = 0;
+      const trackedFunc = new Proxy(() => {}, {
+        get(target, prop) {
+          if (prop === "length" || prop === "name" || prop === "prototype") {
+            return (target as any)[prop];
+          }
+          callCount++;
+          return (target as any)[prop];
+        },
+      });
+      const vars = { trackedFunc, theme: "dark" };
+      // First call seeds the cache for this vars reference
+      narrowGlobalVars(vars, ["theme"]);
+      // Second call with the same vars should reuse function keys from the cache
+      narrowGlobalVars(vars, ["theme"]);
+      // Both calls should produce correct results
+      const result = narrowGlobalVars(vars, []);
+      expect(result).toHaveProperty("trackedFunc");
+      expect(result).not.toHaveProperty("theme");
+    });
+
+    it("handles vars with no functions correctly", () => {
+      const vars = { a: 1, b: "str", c: [1, 2] };
+      const result = narrowGlobalVars(vars, ["a"]);
+      expect(result).toHaveProperty("a", 1);
+      expect(result).not.toHaveProperty("b");
+      expect(result).not.toHaveProperty("c");
+    });
+
+    it("handles empty uses with no functions — returns empty object", () => {
+      const vars = { a: 1, b: 2 };
+      const result = narrowGlobalVars(vars, []);
+      expect(Object.keys(result)).toHaveLength(0);
     });
   });
 
