@@ -51,9 +51,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci --prefer-offline
 
-      - name: Run allowed install scripts
-        run: npm run allow-scripts
-
       - name: Create Version PR
         id: changesets_pr
         uses: changesets/action@v1

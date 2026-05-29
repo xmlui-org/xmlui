@@ -53,9 +53,6 @@ jobs:
       - name: Install dependencies
         run: npm ci --prefer-offline
 
-      - name: Run allowed install scripts
-        run: npm run allow-scripts
-
       - name: Resolve release tag
         shell: bash
         run: |
