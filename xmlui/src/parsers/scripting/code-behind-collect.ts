@@ -1,6 +1,7 @@
 import {
   T_ARROW_EXPRESSION,
   T_FUNCTION_DECLARATION,
+  T_IMPORT_DECLARATION,
   T_VAR_STATEMENT,
   type ArrowExpression,
   type CodeDeclaration,
@@ -30,6 +31,7 @@ export function collectCodeBehindFromSource(
     moduleErrors: {},
     functions: {},
     hasInvalidStatements: false,
+    hasUnresolvableImports: false,
   };
 
   const collectedFunctions: Record<string, CodeDeclaration> = {};
@@ -64,6 +66,7 @@ export async function collectCodeBehindFromSourceWithImports(
     moduleErrors: {},
     functions: {},
     hasInvalidStatements: false,
+    hasUnresolvableImports: false,
   };
 
   const collectedFunctions: Record<string, CodeDeclaration> = {};
@@ -139,6 +142,9 @@ function collectStatementFromModule(
       break;
     case T_FUNCTION_DECLARATION:
       addFunctionDeclaration(stmt as FunctionDeclaration, result, collectedFunctions);
+      break;
+    case T_IMPORT_DECLARATION:
+      result.hasUnresolvableImports = true;
       break;
     default:
       result.hasInvalidStatements = true;

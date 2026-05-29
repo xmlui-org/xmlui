@@ -414,7 +414,9 @@ function computeUsesInternal(
   // that failed to parse (hasInvalidStatements). In that case the dep set is
   // incomplete and conservative treatment is required.
   // With analyzable functions and vars, the dep set is now complete.
-  const ownHasScript = !!(node.scriptCollected?.hasInvalidStatements);
+  const ownHasScript = !!(
+    node.scriptCollected?.hasInvalidStatements || node.scriptCollected?.hasUnresolvableImports
+  );
   const childDeps = new Set<string>();
   const childDepsReads = new Set<string>();
   // UIDs from the subtree that will register into THIS node's StateContainer

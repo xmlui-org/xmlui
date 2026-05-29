@@ -1,0 +1,1023 @@
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ [queued]
+ ❯ tests/components-core/i18n/icu.test.ts [queued]
+stderr | tests/parsers/scripting/process-switch-sync.test.
+ts > Process switch statements (sync) > switch fails with
+multiple let
+Error while executing code: Error: Variable z is already d
+eclared in the current scope.
+
+stderr | tests/parsers/scripting/process-switch-sync.test.
+ts > Process switch statements (sync) > switch fails with
+multiple const/let
+Error while executing code: Error: Variable z is already d
+eclared in the current scope.
+
+stderr | tests/parsers/scripting/process-switch-sync.test.
+ts > Process switch statements (sync) > switch fails with
+multiple const
+Error while executing code: Error: Variable z is already d
+eclared in the current scope.
+
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ [queued]
+ ❯ tests/components-core/i18n/icu.test.ts [queued]
+ ✓ tests/parsers/scripting/process-switch-sync.test.ts (24
+ tests) 16ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ [queued]
+ ❯ tests/components-core/i18n/icu.test.ts 1/4
+ ✓ tests/components-core/i18n/icu.test.ts (4 tests) 11ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ 1/13
+ ❯ tests/components-core/i18n/icu.test.ts 4/4
+ ✓ tests/components-core/analyzer/rules/expr-rules.test.ts
+ (13 tests) 13ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ 13/13
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+stderr | tests/parsers/scripting/code-behind-import.test.t
+s > Code-Behind Collection with Imports > With Imports (As
+ync) > should collect vars and functions together
+Warning [W045] in imported module '/config.xs' at line 1:0
+: Only function declarations are allowed in imported modul
+es. Found: expression statement
+
+stderr | tests/parsers/scripting/code-behind-import.test.t
+s > Code-Behind Collection with Imports > With Imports (As
+ync) > should preserve function signature from imports
+Warning [W045] in imported module '/utils.xs' at line 1:0:
+ Only function declarations are allowed in imported module
+s. Found: expression statement
+
+stderr | tests/parsers/scripting/code-behind-import.test.t
+s > Code-Behind Collection with Imports > Complex Scenario
+s > should handle nested imports with shared dependencies
+Warning [W045] in imported module '/common.xs' at line 1:0
+: Only function declarations are allowed in imported modul
+es. Found: expression statement
+
+stderr | tests/parsers/scripting/code-behind-import.test.t
+s > Code-Behind Collection with Imports > Complex Scenario
+s > should handle nested imports with shared dependencies
+Warning [W045] in imported module '/utils.xs' at line 2:1:
+ Only function declarations are allowed in imported module
+s. Found: expression statement
+
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ 13/13
+ ✓ tests/parsers/scripting/code-behind-import.test.ts (22
+tests) 12ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ 13/13
+ ✓ tests/parsers/xmlui/scanner.test.ts (120 tests) 10ms
+ ✓ tests/parsers/scripting/process-statement-asgn.test.ts
+(32 tests) 10ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ 13/13
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 0/11
+ ❯ tests/components-core/analyzer/rules/expr-rules.test.ts
+ 13/13
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+ ✓ tests/components-core/analyzer/rules/determinism-rules.
+test.ts (11 tests) 11ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s [queued]
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+stderr | tests/components-core/lifecycle/dispatcher.test.t
+s > createLifecycleDispatcher > async unmount handler repo
+rts a violation but resolves
+Lifecycle violation on 'uid-a': async 'unmount' handler is
+ not awaited (React commits unmount synchronously). Use 'o
+nBeforeDispose' for async flush. undefined
+
+stderr | tests/components-core/lifecycle/dispatcher.test.t
+s > createLifecycleDispatcher > throwing handler reports a
+ violation and continues
+Lifecycle violation on 'uid-a': 'mount' handler threw. Err
+or: nope
+    at /Users/yurii/projects/nsoftware/xmlui-monorepo/xmlu
+i/tests/components-core/lifecycle/dispatcher.test.ts:93:13
+    at Object.fire (/Users/yurii/projects/nsoftware/xmlui-
+monorepo/xmlui/src/components-core/lifecycle/dispatcher.ts
+:72:26)
+    at /Users/yurii/projects/nsoftware/xmlui-monorepo/xmlu
+i/tests/components-core/lifecycle/dispatcher.test.ts:98:13
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:302:
+11
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:1903
+:26
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:2326
+:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/yurii/projects/nsoftwa
+re/xmlui-monorepo/node_modules/@vitest/runner/dist/chunk-a
+rtifact.js:2323:10)
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:2305
+:20
+    at new Promise (<anonymous>)
+
+stderr | tests/components-core/lifecycle/dispatcher.test.t
+s > trace helpers > reportLifecycleViolation defaults to w
+arn severity
+Lifecycle violation on 'x': 'mount' handler threw. Error:
+boom
+    at /Users/yurii/projects/nsoftware/xmlui-monorepo/xmlu
+i/tests/components-core/lifecycle/dispatcher.test.ts:132:1
+4
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:302:
+11
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:1903
+:26
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:2326
+:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/yurii/projects/nsoftwa
+re/xmlui-monorepo/node_modules/@vitest/runner/dist/chunk-a
+rtifact.js:2323:10)
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:2305
+:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/yurii/projects/nsoftw
+are/xmlui-monorepo/node_modules/@vitest/runner/dist/chunk-
+artifact.js:2272:10)
+    at file:///Users/yurii/projects/nsoftware/xmlui-monore
+po/node_modules/@vitest/runner/dist/chunk-artifact.js:2955
+:64
+
+stderr | tests/components-core/lifecycle/dispatcher.test.t
+s > trace helpers > reportLifecycleViolation strict mode e
+mits error severity
+Lifecycle violation on 'x': async 'unmount' handler is not
+ awaited (React commits unmount synchronously). Use 'onBef
+oreDispose' for async flush. undefined
+
+stderr | tests/components-core/lifecycle/dispatcher.test.t
+s > trace helpers > returned violation is an instance of L
+ifecycleViolationError
+Lifecycle violation on 'x': 'mount' handler threw. undefin
+ed
+
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s [queued]
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+ ✓ tests/components-core/lifecycle/dispatcher.test.ts (14
+tests) 13ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s [queued]
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s 0/17
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+ ✓ tests/components-core/analyzer/rules/scope-rules.test.t
+s (17 tests) 11ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s 17/17
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+ ✓ tests/language-server/services/reactive-cycle-diagnosti
+c.test.ts (5 tests) 11ms
+ ✓ tests/parsers/xmlui/transform.errors.test.ts (22 tests)
+ 13ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s 17/17
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+4
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (+=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (-=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (**=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (*=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (/=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (%=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (<<=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (>>=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (>>>=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (&=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (^=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (|=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (&&=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (||=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (??=) - sync
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (+=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (-=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (**=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (*=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (/=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (%=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (<<=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (>>=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (>>>=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (&=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (^=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (|=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (&&=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (||=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+stderr | tests/components-core/scripts-runner/process-stat
+ement-asgn.test.ts > Process statements - assignments (exp
+) > cannot assign to non-defined variable (??=) - async
+Error while executing code: Error: Left value variable (du
+mmy) not found in the scope.
+
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s 17/17
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+4
+ ✓ tests/components-core/scripts-runner/process-statement-
+asgn.test.ts (32 tests) 10ms
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s 17/17
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+4
+
+ ❯ tests/components-core/analyzer/rules/determinism-rules.
+test.ts 11/11
+ ❯ tests/components-core/analyzer/rules/scope-rules.test.t
+s 17/17
+ ❯ tests/components-core/lifecycle/dispatcher.test.ts 14/1
+4
+stderr | tests/components-core/scripts-runner/bannedMember
+s.test.ts > Eval-tree integration — warn mode > allows acc
+ess to a banned global identifier (warn mode)
+[XMLUI sandbox] DOM API access to 'window.__xmlui_sandbox_
+test__' is not allowed in XMLUI expressions. Use the manag
+ed alternative.
+
+stderr | tests/components-core/scripts-runner/bannedMember
+s.test.ts > Default behaviour (strictDomSandbox not set) >
+ allows access to a banned entry when strictDomSandbox is
+not set (default warn)
+[XMLUI sandbox] DOM API access to 'window.__xmlui_sandbox_
+test__' is not allowed in XMLUI expressions.
+
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ ✓ tests/components-core/scripts-runner/bannedMembers.test
+.ts (38 tests) 12ms
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ ✓ tests/components-core/scripts-runner/process-function.t
+est.ts (4 tests) 7ms
+ ✓ tests/components-core/scripts-runner/eval-tree-func-dec
+l-async.test.ts (12 tests) 11ms
+ ✓ tests/parsers/scripting/module-with-imports.test.ts (18
+ tests) 11ms
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ [queued]
+
+ ❯ tests/components-core/action/callApi-mockExecute.test.t
+s [queued]
+ ✓ tests/components-core/scripts-runner/bannedMembers.step
+1.test.ts (143 tests) 10ms
+
+ ✓ tests/parsers/scripting/parser-binary.test.ts (45 tests
+) 7ms
+
+ ✓ tests/parsers/scripting/parser-arrow.test.ts (28 tests)
+ 9ms
+ ✓ tests/parsers/xmlui/transform.global.test.ts (26 tests)
+ 19ms
+ ✓ tests/components-core/concurrency/timeout.test.ts (4 te
+sts) 12ms
+ ✓ tests/components-core/action/callApi-mockExecute.test.t
+s (7 tests) 10ms
+
+ ❯ tests/components-core/action/callApi-mockExecute.test.t
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Async functi
+on declaration errors > should throw error for async funct
+ion declaration
+Error while executing code: Error: XMLUI does not support
+async function declarations.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Async functi
+on declaration errors > should throw error for async funct
+ion with parameters
+Error while executing code: Error: XMLUI does not support
+async function declarations.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Async functi
+on declaration errors > should throw error for nested asyn
+c function
+Error while executing code: Error: XMLUI does not support
+async function declarations.
+Error while executing code: Error: XMLUI does not support
+async function declarations.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Await expres
+sion errors > should throw error for await in return state
+ment
+Error while executing code: Error: XMLUI does not support
+the await operator.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Await expres
+sion errors > should throw error for await in variable dec
+laration
+Error while executing code: Error: XMLUI does not support
+the await operator.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Combined asy
+nc/await errors > should throw error for async function wi
+th await in body
+Error while executing code: Error: XMLUI does not support
+async function declarations.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Combined asy
+nc/await errors > should throw error for async arrow funct
+ion
+Error while executing code: Error: XMLUI does not support
+async arrow functions.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Combined asy
+nc/await errors > should throw error for async function ex
+pression
+Error while executing code: Error: XMLUI does not support
+async arrow functions.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Combined asy
+nc/await errors > should throw error for async IIFE
+Error while executing code: Error: XMLUI does not support
+async arrow functions.
+
+stderr | tests/components-core/scripts-runner/async-await-
+errors.test.ts > Async/Await Error Handling > Combined asy
+nc/await errors > should throw error for async IIFE with b
+ody
+Error while executing code: Error: XMLUI does not support
+async arrow functions.
+
+
+ ❯ tests/components-core/action/callApi-mockExecute.test.t
+ ✓ tests/components-core/scripts-runner/async-await-errors
+.test.ts (19 tests) 10ms
+
+ ❯ tests/components-core/action/callApi-mockExecute.test.t
+ ✓ tests/parsers/scripting/parser-destructuring.test.ts (2
+3 tests) 7ms
+
+ ❯ tests/components-core/action/callApi-mockExecute.test.t
+s 7/7
+ ✓ tests/parsers/xmlui/lint.test.ts (15 tests) 10ms
+
+ ❯ tests/components-core/forms/form-validator-registry.tes
+t.tsx 0/8
+ ✓ tests/components-core/forms/form-validator-registry.tes
+t.tsx (8 tests) 11ms
+
+ ❯ tests/components-core/forms/form-validator-registry.tes
+t.tsx 8/8
+
+ ❯ tests/components-core/forms/form-validator-registry.tes
+t.tsx 8/8
+
+ ❯ tests/components-core/forms/form-validator-registry.tes
+t.tsx 8/8
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ ✓ tests/components-core/reactive-graph/collectComponentDe
+fGraph.test.ts (10 tests) 7ms
+ ✓ tests/parsers/scripting/parser-new-operator.test.ts (33
+ tests) 11ms
+ ✓ tests/parsers/scripting/parser-async-await.test.ts (28
+tests) 9ms
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ [queued]
+ ❯ tests/components-core/optimization/renderer-metadata-dr
+ ✓ tests/components-core/scripts-runner/phase3-globals.tes
+t.ts (28 tests) 10ms
+ ✓ tests/parsers/xmlui/transform.regression.test.ts (9 tes
+ts) 10ms
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ [queued]
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ 0/132
+ ✓ tests/components-core/optimization/computedUses.test.ts
+ (132 tests) 25ms
+ ✓ tests/language-server/services/completion.test.ts (22 t
+ests | 1 todo) 9ms
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ ✓ tests/components-core/scripts-runner/eval-tree-arrow-as
+ync.test.ts (11 tests) 9ms
+
+ ❯ tests/components-core/optimization/computedUses.test.ts
+ 132/132
+ ✓ tests/components-core/RestApiProxy.uploadProgress.test.
+ts (5 tests) 9ms
+
+ ❯ tests/components-core/optimization/renderer-metadata-dr
+ift.test.ts [queued]
+ ✓ tests/parsers/scripting/parser-source-text.test.ts (26
+tests) 9ms
+ ✓ tests/components-core/optimization/renderer-metadata-dr
+ift.test.ts (28 tests) 25ms
+ ✓ tests/components-core/scripts-runner/eval-tree-func-dec
+l.test.ts (12 tests) 8ms
+ ✓ tests/parsers/scripting/eval-tree-arrow.test.ts (9 test
+s) 8ms
+
+ ❯ tests/components-core/optimization/renderer-metadata-dr
+ ✓ tests/parsers/scripting/import-position.test.ts (19 tes
+ts) 9ms
+
+ ❯ tests/components-core/optimization/renderer-metadata-dr
+
+
+ ✓ tests/components-core/theming/validator.test.ts (72 tes
+ts) 9ms
+ ✓ tests/components-core/rendering/ContainerUtils.test.ts
+(44 tests) 8ms
+ ✓ tests/parsers/scripting/parser-expressions.test.ts (43
+tests) 9ms
+ ✓ tests/components-core/theming/border-segments.test.ts (
+68 tests) 8ms
+ ✓ tests/components-core/scheduler/determinism-utils.test.
+ts (2 tests) 8ms
+ ✓ tests/parsers/scripting/parser-unary.test.ts (54 tests)
+ 8ms
+ ✓ tests/components-core/wrapComponent.test.tsx (14 tests)
+ 8ms
+ ✓ tests/parsers/scripting/function-proxy.test.ts (7 tests
+) 9ms
+ ✓ tests/language-server/services/folding.test.ts (24 test
+s) 10ms
+ ✓ tests/components-core/scripts-runner/eval-tree-arrow.te
+st.ts (11 tests) 11ms
+ ✓ tests/components-core/inspectorUtils.test.ts (43 tests)
+ 9ms
+ ✓ tests/parsers/scripting/eval-tree-pre-post.test.ts (17
+tests) 8ms
+ ✓ tests/components-core/analyzer/walker.test.ts (11 tests
+) 8ms
+
+ ✓ tests/parsers/style-parser/parser.test.ts (50 tests) 6m
+s
+ ✓ tests/components-core/routing/canonicalise.test.ts (2 t
+ests) 8ms
+ ✓ tests/components-core/standalone-import-resolution.test
+.ts (1 test) 9ms
+ ✓ tests/components-core/scripts-runner/eval-tree-new-oper
+ator.test.ts (16 tests) 8ms
+stdout | tests/components-core/scripts-runner/process-even
+t.test.ts > Process statements (exp) > Event issue
+0
+
+stdout | tests/components-core/scripts-runner/process-even
+t.test.ts > Process statements (exp) > Event issue
+1
+
+stdout | tests/components-core/scripts-runner/process-even
+t.test.ts > Process statements (exp) > Event issue
+2
+
+ ✓ tests/components-core/scripts-runner/process-event.test
+.ts (2 tests) 8ms
+
+ ✓ tests/components-core/type-contracts/verifier.test.ts (
+30 tests) 7ms
+
+ ✓ tests/components-core/scripts-runner/AttributeValuePars
+er.test.ts (12 tests) 6ms
+ ✓ tests/parsers/scripting/parser-function.test.ts (14 tes
+ts) 9ms
+ ✓ tests/components-core/scripts-runner/phase2-globals.tes
+t.ts (40 tests) 8ms
+ ✓ tests/parsers/scripting/import-parse-multiple.test.ts (
+14 tests) 7ms
+ ✓ tests/parsers/scripting/import-parse-alias.test.ts (15
+tests) 8ms
+stdout | tests/parsers/scripting/process-event.test.ts > P
+rocess statements > Event issue
+0
+
+stdout | tests/parsers/scripting/process-event.test.ts > P
+rocess statements > Event issue
+1
+
+stdout | tests/parsers/scripting/process-event.test.ts > P
+rocess statements > Event issue
+2
+
+ ✓ tests/parsers/scripting/process-event.test.ts (2 tests)
+ 7ms
+ ✓ tests/parsers/xmlui/transform.attr.test.ts (14 tests) 8
+ms
+ ✓ tests/components-core/theming/component-layout.resolver
+.test.ts (70 tests) 7ms
+ ✓ tests/parsers/xmlui/transform.escape.test.ts (17 tests)
+ 7ms
+ ✓ tests/parsers/xmlui/transform.warnings.test.ts (8 tests
+) 8ms
+ ✓ tests/components-core/theming/layout-property-parser.te
+st.ts (75 tests) 9ms
+ ✓ tests/components-core/local-storage-functions.test.ts (
+22 tests) 7ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown-prop-ev
+
+ ❯ tests/components-core/analyzer/rules/id-unknown-prop-ev
+ent.test.ts [queued]
+ ✓ tests/parsers/scripting/import-parse-basic.test.ts (13
+tests) 7ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown-prop-ev
+ent.test.ts [queued]
+ ✓ tests/components-core/utils/resolveResponsiveWhen.test.
+ts (29 tests) 6ms
+ ✓ tests/components/CodeBlock/hightlight-code.test.ts (56
+tests) 6ms
+ ✓ tests/components-core/container/cow-state-proxy.test.ts
+ (35 tests) 6ms
+ ✓ tests/parsers/scripting/parser-errors.test.ts (38 tests
+) 8ms
+ ✓ tests/nodejs/vite-plugin.type-contracts.test.ts (3 test
+s) 7ms
+
+
+ ✓ tests/keybinding-parser.test.ts (56 tests) 6ms
+ ✓ tests/components-core/pubsub/PubSubService.test.ts (12
+tests) 5ms
+
+ ✓ tests/components-core/analyzer/rules/id-unknown-prop-ev
+ent.test.ts (14 tests) 7ms
+ ✓ tests/parsers/xmlui/transform.standalone-imports.test.t
+s (3 tests) 7ms
+
+ ❯ tests/bin/vite-plugin-import.test.ts [queued]
+ ✓ tests/bin/vite-plugin-import.test.ts (27 tests) 5ms
+
+ ❯ tests/abstractions/layout-context-utils.test.ts [queued
+]
+ ✓ tests/components-core/analyzer/rules/_utils.test.ts (21
+ tests) 5ms
+ ✓ tests/components-core/concurrency/token.test.ts (15 tes
+ts) 5ms
+ ✓ tests/abstractions/layout-context-utils.test.ts (28 tes
+ts) 4ms
+
+
+ ✓ tests/components-core/scripts-runner/process-implicit-c
+ontext.test.ts (2 tests) 5ms
+ ✓ tests/language-server/services/type-contract-diagnostic
+.test.ts (3 tests) 7ms
+ ✓ tests/components-core/forms/builtins.test.ts (72 tests)
+ 6ms
+ ✓ tests/components-core/analyzer/rules/id-unknown-compone
+nt.test.ts (9 tests) 6ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown-compone
+
+
+ ✓ tests/components-core/interception/orderBy.test.ts (12
+tests) 4ms
+ ✓ tests/components-core/analyzer/rules/id-unknown-method.
+test.ts (6 tests) 7ms
+ ✓ tests/components-core/type-contracts/rules/rules.test.t
+s (75 tests) 6ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown-compone
+nt.test.ts 9/9
+ ✓ tests/parsers/xmlui/transform.circular.test.ts (1 test)
+ 5ms
+ ✓ tests/components-core/scripts-runner/eval-tree-regressi
+on.test.ts (4 tests) 5ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown-method.
+test.ts 6/6
+ ✓ tests/parsers/scripting/process-implicit-context.test.t
+s (2 tests) 5ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown-method.
+test.ts 6/6
+
+
+ ❯ tests/components-core/audit/metadata-rules.test.ts [que
+ ✓ tests/components-core/interception/ReadOnlyCollection.t
+est.ts (36 tests) 6ms
+ ✓ tests/components-core/theming/padding-segments.test.ts
+(42 tests) 5ms
+
+ ❯ tests/components-core/audit/metadata-rules.test.ts [que
+ ✓ tests/parsers/scripting/parser-primary.test.ts (15 test
+s) 6ms
+
+
+ ✓ tests/parsers/parameter-parser.test.ts (9 tests) 4ms
+ ✓ tests/parsers/scripting/lexer-import.test.ts (22 tests)
+ 5ms
+ ✓ tests/components-core/standalone-import.test.ts (33 tes
+ts) 5ms
+ ✓ tests/components-core/udc-sandbox/runtime-integration.t
+est.ts (7 tests) 5ms
+ ✓ tests/components-core/behaviors/behaviorConditionEvalua
+tor.test.ts (57 tests) 6ms
+ ✓ tests/parsers/paremeter-parser.test.ts (9 tests) 9ms
+
+ ✓ tests/components-core/scripts-runner/appStateSchema.tes
+t.ts (12 tests) 15ms
+
+ ❯ tests/components-core/audit/metadata-rules.test.ts [que
+ ✓ tests/components-core/forms/server-error-mapping.test.t
+s (10 tests) 5ms
+ ✓ tests/parsers/scripting/circular-import.test.ts (18 tes
+ts) 7ms
+ ✓ tests/components-core/accessibility/linter.test.ts (26
+tests) 7ms
+ ✓ tests/components/Table/Table-keyboard-actions.test.ts (
+19 tests) 7ms
+ ✓ tests/components-core/theming/layout-resolver2.test.ts
+(23 tests) 15ms
+ ✓ tests/components-core/rendering/buildProxy.test.ts (16
+tests) 5ms
+ ✓ tests/components/TileGrid/TileGrid-keyboard-navigation.
+test.ts (23 tests) 8ms
+ ✓ tests/scripts/api-diff/api-diff.test.ts (13 tests) 5ms
+ ✓ tests/components-core/concurrency/coordinator.test.ts (
+9 tests) 5ms
+ ✓ tests/components-core/rendering/stateComposition.test.t
+s (15 tests) 8ms
+ ✓ tests/language-server/services/hover.test.ts (5 tests)
+9ms
+ ✓ tests/parsers/scripting/module-resolver.test.ts (38 tes
+ts) 5ms
+ ✓ tests/components-core/audit/correlation.test.ts (14 tes
+ts) 7ms
+ ✓ tests/components-core/container/buildProxy.test.ts (4 t
+ests) 3ms
+ ✓ tests/components-core/type-contracts/suggestions.test.t
+s (12 tests) 4ms
+ ✓ tests/components-core/audit/metadata-rules.test.ts (16
+tests) 6ms
+ ✓ tests/components-core/type-contracts/rules/coerce.test.
+ts (9 tests) 7ms
+ ✓ tests/parsers/scripting/ast-import.test.ts (9 tests) 5m
+s
+ ✓ tests/components-core/scripts-runner/navigateBlank.test
+.ts (9 tests) 4ms
+ ✓ tests/components-core/RestApiProxy.transactionId.test.t
+s (7 tests) 5ms
+ ✓ tests/components-core/scripts-runner/parser-regression.
+test.ts (1 test) 3ms
+ ✓ tests/language-server/project.test.ts (4 tests) 4ms
+ ✓ tests/components-core/errors/app-error.test.ts (23 test
+s) 6ms
+ ✓ tests/components-core/interception/request-param-conver
+ter.test.ts (16 tests) 6ms
+ ✓ tests/components-core/versioning/verifier.test.ts (11 t
+ests) 5ms
+ ✓ tests/components-core/accessibility/contrast.test.ts (4
+ tests) 3ms
+ ✓ tests/components-core/RestApiProxy.resolveUrl.test.ts (
+12 tests) 4ms
+ ✓ tests/components-core/optimization/optimization-guards.
+test.ts (14 tests) 5ms
+ ✓ tests/components-core/reactive-graph/findCycles.test.ts
+ (8 tests) 4ms
+ ✓ tests/components-core/rendering/collectFnVarDeps.test.t
+s (11 tests) 5ms
+ ✓ tests/parsers/style-parser/parseHVar.test.ts (7 tests)
+3ms
+ ✓ tests/parsers/markdown/parse-binding-expression.test.ts
+ (19 tests) 4ms
+ ✓ tests/parsers/scripting/module-parse.test.ts (3 tests)
+4ms
+ ✓ tests/components-core/inspector-logging.test.ts (5 test
+s) 4ms
+ ✓ tests/components-core/type-contracts/runtime.test.ts (3
+ tests) 4ms
+ ✓ tests/components-core/routing/custom-constraint.test.ts
+ (6 tests) 5ms
+ ✓ tests/parsers/xmlui/transform.test.ts (2 tests) 4ms
+ ✓ tests/components-core/reactive-graph/diagnostics.test.t
+s (8 tests) 3ms
+ ✓ tests/components-core/scheduler/queue.test.ts (5 tests)
+ 5ms
+ ✓ tests/components-core/versioning/rename-helper.test.ts
+(6 tests) 3ms
+ ✓ tests/components-core/versioning/runtime.test.ts (5 tes
+ts) 3ms
+ ✓ tests/parsers/common/input-stream.test.ts (9 tests) 3ms
+ ✓ tests/components-core/behaviors/PubSubBehavior.test.ts
+(10 tests) 3ms
+ ✓ tests/components-core/xmluiMarkupToComponent.test.ts (1
+ test) 3ms
+ ✓ tests/parsers/scripting/parser-assignments.test.ts (1 t
+est) 4ms
+ ✓ tests/components-core/routing/query-constraints.test.ts
+ (3 tests) 3ms
+ ✓ tests/components-core/routing/constraint-compiler.test.
+ts (4 tests) 5ms
+ ✓ tests/components-core/reactive-graph/graph.test.ts (7 t
+ests) 3ms
+ ✓ tests/components-core/audit/policy.test.ts (6 tests) 3m
+s
+ ✓ tests/components-core/forms/submit-guard.test.ts (10 te
+sts) 3ms
+ ✓ tests/components-core/concurrency/transactional.test.ts
+ (6 tests) 3ms
+ ✓ tests/components-core/routing/guard-dispatcher.test.ts
+(3 tests) 4ms
+ ✓ tests/components-core/scheduler/replay.test.ts (2 tests
+) 3ms
+ ✓ tests/components-core/global-variables-runtime.test.ts
+(5 tests) 3ms
+ ✓ tests/components/Tree/Tree-states.test.ts (6 tests) 2ms
+ ✓ tests/components-core/i18n/locale-resolver.test.ts (3 t
+ests) 2ms
+ ✓ tests/components-core/markup-check.test.ts (2 tests) 2m
+s
+ ✓ tests/parsers/style-parser/generateHvarChain.test.ts (2
+ tests) 2ms
+ ✓ tests/components-core/abstractions/treeAbstractions.tes
+t.ts (3 tests) 2ms
+ ✓ tests/components-core/utils/LruCache.test.ts (4 tests |
+ 2 skipped) 2ms
+ ✓ tests/components-core/accessibility/focusScopeStack.tes
+t.ts (1 test) 2ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/parsers/xmlui/transform.script.test.ts > Xmlu
+i transform - script > Script collect - Duplicated functio
+n fails
+TypeError: Cannot read properties of undefined (reading '0
+')
+ ❯ tests/parsers/xmlui/transform.script.test.ts:265:16
+    263|     const err = cd.scriptError as Record<string,…
+    264|     expect(Object.keys(err).length).equal(1);
+    265|     expect(err["Main"][0].code).equal("W020");
+       |                ^
+    266|   });
+    267|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/parsers/xmlui/transform.script.test.ts > Xmlu
+i transform - script > Script creates Fragment #1
+AssertionError: expected undefined to equal 'var a = 1;'
+
+- Expected:
+"var a = 1;"
+
++ Received:
+undefined
+
+ ❯ tests/parsers/xmlui/transform.script.test.ts:313:26
+    311|     const child = cd.children![0] as ComponentDe…
+    312|     expect(child.type).equal("Fragment");
+    313|     expect(child.script).equal("var a = 1;");
+       |                          ^
+    314|     expect(child.children!.length).equal(1);
+    315|     expect(child.children![0].type).equal("Stack…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 221 passed (222)
+      Tests  2 failed | 10184 passed | 2 skipped | 1 todo
+(10189)
+   Start at  17:41:01
+   Duration  30.38s (transform 18.13s, setup 35.65s, impor
+t 87.74s, tests 9.63s, environment 170.68s)
+
+npm error Lifecycle script `test:unit` failed with error:
+npm error code 1
+npm error path /Users/yurii/projects/nsoftware/xmlui-monor
+epo/xmlui
+npm error workspace xmlui@0.12.27
+npm error location /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui
+npm error command failed
+npm error command sh -c vitest run
+└─ xmlui#test:unit ──
+
+ Tasks:    12 successful, 13 total
+Cached:    0 cached, 13 total
+  Time:    35.739s
+Failed:    xmlui#test:unit
+
+
+~/projects/nsoftware/xmlui-monorepo yurii/computedUses* ⇡ 37s
+❯

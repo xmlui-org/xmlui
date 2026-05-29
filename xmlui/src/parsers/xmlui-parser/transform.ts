@@ -1337,7 +1337,7 @@ export function nodeToComponentDef(
     try {
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
-      comp.scriptCollected = collectCodeBehindFromSource("Main", scriptContent);
+      comp.scriptCollected = collectCodeBehindFromSource(fileId.toString(), scriptContent);
 
       // --- Merge pre-resolved imports if provided
       if (preResolvedImports) {
@@ -1516,6 +1516,7 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
         // Merge the Fragment's scriptCollected into the parent
         if (!component.scriptCollected) {
           component.scriptCollected = child.scriptCollected;
+          component.script = child.script;
         } else {
           // Merge vars and functions from the Fragment into the parent
           component.scriptCollected.vars = {
@@ -1526,9 +1527,11 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
             ...component.scriptCollected.functions,
             ...child.scriptCollected.functions,
           };
+          component.script = (component.script || "") + "\n" + (child.script || "");
         }
         // Remove scriptCollected from the Fragment since we've hoisted it
         delete child.scriptCollected;
+        delete child.script;
       }
     }
   }

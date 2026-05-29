@@ -620,6 +620,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   standaloneApp: StandaloneAppDescription;
   projectCompilation?: ProjectCompilation;
   globalVars?: Record<string, any>;
+  appGlobalNames?: ReadonlySet<string>;
 } {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
@@ -826,6 +827,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     },
     projectCompilation,
     globalVars: mergedGlobals,
+    appGlobalNames,
   };
 }
 
@@ -940,15 +942,19 @@ function useStandalone(
   standaloneApp: StandaloneAppDescription | null;
   projectCompilation?: ProjectCompilation;
   globalVars?: Record<string, any>;
+  appGlobalNames?: ReadonlySet<string>;
 } {
   // Prepend basePath to a relative path. Absolute URLs (http/https) are passed through unchanged.
   const prefixPath = (path: string): string => {
     if (!basePath || /^https?:\/\//.test(path)) return path;
     return `${basePath}/${path}`;
   };
+
+  // Extract the memoized runtime resolution so it's calculated exactly once per runtime change
+  const resolvedRuntime = useMemo(() => resolveRuntime(runtime), [runtime]);
+
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
-    const resolvedRuntime = resolveRuntime(runtime);
     const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 
     // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
@@ -1139,7 +1145,6 @@ function useStandalone(
     // Also include markup globals (global.* attributes) and entry-point functions
     // from the app definition so they are available on the very first render.
     // Without this, child components' onInit handlers fire before globals are in scope.
-    const resolvedRuntime = resolveRuntime(runtime);
     const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
     if (appDef?.entryPoint) {
       const ep = appDef.entryPoint as ComponentDef;
@@ -1156,7 +1161,6 @@ function useStandalone(
 
   useIsomorphicLayoutEffect(() => {
     void (async function () {
-      const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
@@ -1443,7 +1447,7 @@ function useStandalone(
       if (loadedEntryPoint.file) {
         sources[loadedEntryPoint.file] = loadedEntryPoint.src;
 
-        resolvedRuntime.projectCompilation.entrypoint.filename = MAIN_FILE;
+        resolvedRuntime.projectCompilation.entrypoint.filename = loadedEntryPoint.file;
         resolvedRuntime.projectCompilation.entrypoint.definition = loadedEntryPoint.component;
         resolvedRuntime.projectCompilation.entrypoint.markupSource = loadedEntryPoint.src;
 
@@ -1608,7 +1612,16 @@ function useStandalone(
               }
             }
 
-            resolvedRuntime.projectCompilation.components.push(compCompilation);
+            // resolvedRuntime is memoized on [runtime], so projectCompilation is shared
+            // across effect re-runs (StrictMode double-invoke, basePath/standaloneAppDef
+            // changes). Guard against re-adding the same compilation to avoid duplicates.
+            const compilations = resolvedRuntime.projectCompilation.components;
+            const existingIdx = compilations.findIndex((c) => c.filename === compCompilation.filename);
+            if (existingIdx === -1) {
+              compilations.push(compCompilation);
+            } else {
+              compilations[existingIdx] = compCompilation;
+            }
 
             const compoundComp = {
               ...compWrapper.component,
@@ -1687,6 +1700,19 @@ function useStandalone(
         extensionManager,
       });
 
+      // --- Resolve imports in standalone mode using sources map
+      const resolvedAny = await collectImportsFromStandaloneSources(newAppDef, resolvedRuntime.projectCompilation, metadataProvider);
+
+      // --- H2 & C2: Only re-compute if imports were resolved, and pass appGlobalNames to prevent regression
+      if (resolvedAny) {
+        computeUsesForTree(newAppDef.entryPoint as ComponentDef, resolveOptimizerMetadata, resolvedRuntime.appGlobalNames);
+        newAppDef.components?.forEach((compound) => {
+          if (compound.component) {
+            computeUsesForTree(compound.component, resolveOptimizerMetadata, resolvedRuntime.appGlobalNames);
+          }
+        });
+      }
+
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
       setPendingLintToasts(toastMessages);
@@ -1726,9 +1752,10 @@ function useStandalone(
       // DO NOT merge with extractedMainXsGlobals - those are static evaluated values that break reactivity
       setGlobalVars(parsedGlobals);
     })();
-  }, [runtime, standaloneAppDef, basePath]);
+  }, [resolvedRuntime, standaloneAppDef, basePath]);
 
-  return { standaloneApp, projectCompilation, globalVars };
+  // We already extracted resolvedRuntime via useMemo, no need to extract appGlobalNames again
+  return { standaloneApp, projectCompilation, globalVars, appGlobalNames: resolvedRuntime.appGlobalNames };
 }
 
 /**
@@ -2053,4 +2080,82 @@ function toThemeUrl(themeNameOrUrl: string): string {
     res += ".json";
   }
   return res;
+}
+
+/**
+ * Resolves imports for all components in standalone mode using the global sources map.
+ */
+export async function collectImportsFromStandaloneSources(
+  appDef: StandaloneAppDescription,
+  projectCompilation: ProjectCompilation,
+  metadataHandler: MetadataHandler,
+): Promise<boolean> {
+  const sources = appDef.sources || {};
+  let resolvedAny = false;
+
+  const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+    // C1: Use sources map from appDef instead of global window._xsSources
+    if (sources[modulePath]) return sources[modulePath];
+    // Fallback to fetch for external modules
+    const response = await fetch(normalizePath(modulePath));
+    if (!response.ok) throw new Error(`Failed to fetch module: ${modulePath}`);
+    return await response.text();
+  };
+
+  const resolveForComponent = async (comp: ComponentDef | CompoundComponentDef, fileId: string) => {
+    const script = comp.script;
+    if (script && comp.scriptCollected?.hasUnresolvableImports) {
+      try {
+        // C4: Sequential execution because this clears global caches
+        const resolved = await collectCodeBehindFromSourceWithImports(fileId, script, moduleFetcher);
+        removeCodeBehindTokensFromTree(resolved);
+        
+        // M3: Merge resolved imports. Sync-collected own decls win.
+        comp.scriptCollected.functions = { ...resolved.functions, ...comp.scriptCollected.functions };
+        comp.scriptCollected.vars = { ...resolved.vars, ...comp.scriptCollected.vars };
+        comp.scriptCollected.hasUnresolvableImports = false;
+        resolvedAny = true;
+      } catch (e) {
+        // M2: Leave a structured warning in the console
+        console.warn(`[XMLUI] Failed to resolve imports for ${fileId}:`, e);
+      }
+    }
+  };
+
+  // H1: Recursively walk the tree to find all script blocks
+  const walkTreeAndResolve = async (root: ComponentDef | CompoundComponentDef, fileId: string) => {
+    const nodesToProcess: ComponentDef[] = [];
+    const visitor = (node: ComponentDef, _parent: any, before: boolean) => {
+      if (before && node.scriptCollected?.hasUnresolvableImports) {
+        nodesToProcess.push(node);
+      }
+    };
+    visitComponent(root as ComponentDef, null, visitor, {}, metadataHandler);
+    
+    for (const node of nodesToProcess) {
+      await resolveForComponent(node, fileId);
+    }
+  };
+
+  // C3: Use real paths from projectCompilation, but walk the actual render tree from appDef
+  if (appDef.entryPoint) {
+    await walkTreeAndResolve(appDef.entryPoint as ComponentDef, projectCompilation.entrypoint.filename);
+  }
+  
+  if (appDef.components) {
+    for (const comp of appDef.components) {
+      // Find the filename from projectCompilation
+      const compFileName = projectCompilation.components.find((c) => c.definition?.name === comp.name)?.filename || comp.name + ".xmlui";
+      
+      // For compound components, the wrapper itself might have a script
+      if (comp.scriptCollected?.hasUnresolvableImports) {
+        await resolveForComponent(comp, compFileName);
+      }
+      if (comp.component) {
+        await walkTreeAndResolve(comp.component as ComponentDef, compFileName);
+      }
+    }
+  }
+
+  return resolvedAny;
 }

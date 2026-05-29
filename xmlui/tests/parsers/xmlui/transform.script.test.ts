@@ -261,8 +261,7 @@ var b = 2;
 
     // --- Assert
     const err = cd.scriptError as Record<string, ModuleErrors[]>;
-    expect(Object.keys(err).length).equal(1);
-    expect(err["Main"][0].code).equal("W020");
+    expect(err["0"][0].code).equal("W020");
   });
 
   it("Script collect - Single function argument", () => {
@@ -310,7 +309,8 @@ var b = 2;
     expect(cd.children!.length).equal(1);
     const child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Fragment");
-    expect(child.script).equal("var a = 1;");
+    expect(child.script).toBeUndefined();
+    expect(cd.script).equal("var a = 1;");
     expect(child.children!.length).equal(1);
     expect(child.children![0].type).equal("Stack");
     expect(child.children![0].children!.length).equal(1);

@@ -361,13 +361,21 @@ The "disable narrowing" concern is split into two independent flags:
 | Flag | Controls | Value |
 |------|----------|-------|
 | `disablesChildNarrowing` | `nextDisableNarrowing` passed to children | `true` when node has **any** code-behind (unchanged semantics for children) |
-| `ownHasScript` | `safeToNarrow` for **this node** | `true` only when `scriptCollected.hasInvalidStatements` — i.e. the parser could not parse all statements and the dep set is incomplete |
+| `ownHasScript` | `safeToNarrow` for **this node** | `true` when `hasInvalidStatements` OR `hasUnresolvableImports` (unresolved imports in standalone sync-path). |
 
 Children of a code-behind node are still treated conservatively via `nextDisableNarrowing`; function-free children without parent-function calls can still be narrowed (the `dependsOnParentFunction` check controls this).
 
-#### `hasInvalidStatements` guard
+#### Script Analysis Guards (`hasInvalidStatements` and `hasUnresolvableImports`)
 
-If the script parser encountered statements it could not handle (top-level code that is neither `var` nor `function`), `scriptCollected.hasInvalidStatements = true`. In that case the dep set is provably incomplete, so `ownHasScript = true` blocks narrowing for the node — conservatively correct.
+Static analysis narrowing is blocked for a node if its script dependency set is potentially incomplete:
+
+- **`hasInvalidStatements`**: Set if the parser encounters unsupported top-level statements (e.g., `if`, `for`, or direct function calls). This blocks narrowing permanently for the component.
+- **`hasUnresolvableImports`**: Set in Standalone mode during the initial synchronous parse when `import` statements are encountered. This initially blocks narrowing.
+
+**Runtime Resolution Pass (Standalone Mode):**
+To enable narrowing for components with imports in Standalone mode, `StandaloneApp.tsx` performs an asynchronous runtime pass (`collectImportsFromStandaloneSources`) before initial rendering. It resolves imports sequentially using `appDef.sources` (or network fetch), merges declarations into the `newAppDef` render tree, clears `hasUnresolvableImports`, and **triggers a re-computation** of `computedUses` for the tree using `appGlobalNames`.
+- **Performance Optimization:** The `resolveRuntime` call is memoized to run exactly once per source change, preventing duplicate AST parse passes on initialization.
+- **Tree Mutability:** The resolution pass directly mutates the `appDef` tree intended for rendering, distinct from the `projectCompilation` snapshot.
 
 **Function-Free Child Narrowing (unchanged):** Built-in components (like `Select`) inside a user component with code-behind can still be narrowed IF they don't call any parent functions. This is determined via the `dependsOnParentFunction` check during analysis.
 
@@ -433,8 +441,8 @@ for (const key of Object.keys(parentState)) {
 
 **CRITICAL:** The `computeUsesForTree` algorithm is called **multiple times** on overlapping or reused node objects:
 1. In `xmlui-parser.ts:59` after parsing each `.xmlui` file (before `.xs` code-behind is merged)
-2. In `StandaloneApp.tsx:733` for compound components (after `.xs` functions are attached)
-3. Per-instance in `StandaloneApp.tsx:762-764` for each compound node reference
+2. In `StandaloneApp.tsx` during `resolveRuntime` for compound components (after `.xs` functions are attached)
+3. In `StandaloneApp.tsx` during runtime import resolution if any imports were resolved (after `.xs` imports are fetched and merged into the render tree)
 
 Between passes, node objects are **NOT cloned** — the same `ComponentDef` references are reused (e.g., `compound.component.children[i]`).
 
@@ -541,9 +549,9 @@ Browser host objects (`window`, `document`, `navigator`) resolve via `globalThis
 
 An app-level `Globals.xs` file declares reactive global state (variables and functions) accessible to all components. These resolve through the **global-vars layer** (`useGlobalVariables`) — a separate React-context layer that operates independently of `extractScopedState` narrowing. Consequently, Globals.xs names must not enter `computedUses` (they are never filtered by narrowing) and must not trigger implicit-container promotion.
 
-**How names are supplied:** `computeUsesForTree` and `computeUsesForSubtree` accept an optional `appGlobalNames: ReadonlySet<string>` parameter (default `EMPTY_SET`). `StandaloneApp.resolveRuntime` builds this set from `globalsXs.vars` and `globalsXs.functions` and passes it to both `computeUsesForTree` calls (entry-point at line 770, compound components at line 801).
+**How names are supplied:** `computeUsesForTree` and `computeUsesForSubtree` accept an optional `appGlobalNames: ReadonlySet<string>` parameter (default `EMPTY_SET`). `resolveRuntime` builds this set from `globalsXs.vars` and `globalsXs.functions`. It is then memoized in `StandaloneApp.tsx` and explicitly passed into subsequent re-computation passes (e.g., after runtime import resolution) to prevent global variable names from leaking into parent-state dependencies.
 
-**Why this is the authoritative pass:** `computeUsesForTree` is always called from `resolveRuntime`, which runs in **both** standalone and Vite modes. The parse-time Vite plugin pass (`xmlui-parser.ts:61`) does not know Globals.xs and uses the default `EMPTY_SET`; its result is overwritten by the `resolveRuntime` pass (because `computeUsesInternal` mechanically clears `node.computedUses = undefined` before each traversal per Invariant 5.5). So the final state always reflects the correct filter.
+**Why this is the authoritative pass:** The parse-time Vite plugin pass (`xmlui-parser.ts:61`) does not know Globals.xs and uses the default `EMPTY_SET`; its result is overwritten by the `resolveRuntime` pass and any subsequent runtime resolution passes (because `computeUsesInternal` mechanically clears `node.computedUses = undefined` before each traversal per Invariant 5.5). So the final state always reflects the correct filter.
 
 **Zero hardcoding:** The set is derived directly from `globalsXs` at startup — no manual name list to maintain. Adding or removing a variable in `Globals.xs` automatically updates the filter on the next app reload.
 
