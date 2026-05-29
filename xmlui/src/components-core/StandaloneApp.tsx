@@ -1701,7 +1701,14 @@ function useStandalone(
       });
 
       // --- Resolve imports in standalone mode using sources map
-      const resolvedAny = await collectImportsFromStandaloneSources(newAppDef, resolvedRuntime.projectCompilation, metadataProvider);
+      const wrappedMetadataHandler: MetadataHandler = {
+        componentRegistered: (comp) => metadataProvider.getComponent(comp) !== null,
+        getComponentProps: (comp) => metadataProvider.getComponent(comp)?.getMetadata()?.props || {},
+        getComponentEvents: (comp) => metadataProvider.getComponent(comp)?.getMetadata()?.events || {},
+        acceptArbitraryProps: () => true,
+        getComponentValidator: () => null,
+      };
+      const resolvedAny = await collectImportsFromStandaloneSources(newAppDef, resolvedRuntime.projectCompilation, wrappedMetadataHandler);
 
       // --- H2 & C2: Only re-compute if imports were resolved, and pass appGlobalNames to prevent regression
       if (resolvedAny) {
@@ -2122,7 +2129,10 @@ export async function collectImportsFromStandaloneSources(
     }
   };
 
-  // H1: Recursively walk the tree to find all script blocks
+  // H1: Recursively walk the tree to find all script blocks.
+  // NOTE: all nodes collected from this subtree are resolved against the same `fileId`.
+  // This is correct for the single-file-per-component case. If multi-source merged trees
+  // with relative imports are ever supported, each node would need its own fileId.
   const walkTreeAndResolve = async (root: ComponentDef | CompoundComponentDef, fileId: string) => {
     const nodesToProcess: ComponentDef[] = [];
     const visitor = (node: ComponentDef, _parent: any, before: boolean) => {

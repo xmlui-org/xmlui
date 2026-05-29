@@ -23,9 +23,9 @@ Consider an application:
 </App>
 ```
 
-**Before optimization:** `Select` (and all its children) re-renders on **every** change of `oftenChanges` (10+ times per second) because it receives the full state from `App`: `parentState = { oftenChanges, rarelyChanges }`.
+Without `computedUses`, `Select` (and all its children) re-renders on **every** change of `oftenChanges` (10+ times per second) because it receives the full state from `App`: `parentState = { oftenChanges, rarelyChanges }`.
 
-**Solution (`computedUses`):** Automatic static analysis of the AST (Abstract Syntax Tree) calculates the minimum list of external dependencies for each container. `Select` receives `computedUses = ["rarelyChanges"]`. During rendering, a state projection (`scopedParentState`) is created, which changes ONLY when `rarelyChanges` changes, isolating the component via `React.memo`.
+`computedUses` is automatic static analysis of the AST (Abstract Syntax Tree) that calculates the minimum list of external dependencies for each container. `Select` receives `computedUses = ["rarelyChanges"]`. During rendering, a state projection (`scopedParentState`) is created that changes **only** when `rarelyChanges` changes, isolating the component via `React.memo`.
 
 ---
 
@@ -48,8 +48,8 @@ The algorithm works bottom-up, traversing the `ComponentDef` tree before connect
 Event-handler strings are parsed once and cached to avoid redundant AST work during boot-time traversal. The cache is an **LRU with a cap of 1 000 entries**, implemented cheaply via JavaScript `Map`'s insertion-order guarantee (delete + re-insert on hit; evict the first/oldest key at capacity). This bounds memory in long-running devserver/studio sessions where generated XMLUI could otherwise accumulate thousands of unique event strings.
 
 ### Runtime Protection (Defense-in-depth)
-- **`ComponentWrapper`:** Uses `extractScopedState(state, computedUses)` and memoizes the result via `useShallowCompareMemoize`. State updates are terminated here if dependencies haven't changed, and lower wrappers aren't even executed. Separately, `narrowGlobalVars(globalVars, computedGlobalUses)` (see Section 7) projects `parentGlobalVars` to the globals the subtree reads before passing it to `ContainerWrapper`.
-- **`ContainerWrapper`:** Receives the narrowed state `parentState={scopedParentState}` and narrowed `parentGlobalVars={scopedGlobalVars}`, and is responsible for deploying the `StateContainer`. It checks if the node is a container (via `isContainerLike`, which considers the presence of `computedUses`).
+- **`ComponentWrapper`:** Uses `extractScopedState(state, computedUses)` and memoizes the result via `useShallowCompareMemoize`. State updates are terminated here if dependencies haven't changed, and lower wrappers aren't even executed. Separately, `narrowGlobalVars(globalVars, computedGlobalUses)` (see Section 7) builds a narrow change-detection snapshot from `parentGlobalVars` and uses it to ref-stabilise the full object passed to `ContainerWrapper`.
+- **`ContainerWrapper`:** Receives the narrowed state `parentState={scopedParentState}` and ref-stabilised `parentGlobalVars={globalVarsWithStableRef}`, and is responsible for deploying the `StateContainer`. It checks if the node is a container (via `isContainerLike`, which considers the presence of `computedUses`).
 - **`StateContainer`:** Registers reactive changes. State for children becomes fully isolated.
 
 ---
@@ -360,7 +360,7 @@ The "disable narrowing" concern is split into two independent flags:
 
 | Flag | Controls | Value |
 |------|----------|-------|
-| `disablesChildNarrowing` | `nextDisableNarrowing` passed to children | `true` when node has **any** code-behind (unchanged semantics for children) |
+| `disablesChildNarrowing` | `nextDisableNarrowing` passed to children | `true` when node has **any** code-behind |
 | `ownHasScript` | `safeToNarrow` for **this node** | `true` when `hasInvalidStatements` OR `hasUnresolvableImports` (unresolved imports in standalone sync-path). |
 
 Children of a code-behind node are still treated conservatively via `nextDisableNarrowing`; function-free children without parent-function calls can still be narrowed (the `dependsOnParentFunction` check controls this).
@@ -374,10 +374,10 @@ Static analysis narrowing is blocked for a node if its script dependency set is 
 
 **Runtime Resolution Pass (Standalone Mode):**
 To enable narrowing for components with imports in Standalone mode, `StandaloneApp.tsx` performs an asynchronous runtime pass (`collectImportsFromStandaloneSources`) before initial rendering. It resolves imports sequentially using `appDef.sources` (or network fetch), merges declarations into the `newAppDef` render tree, clears `hasUnresolvableImports`, and **triggers a re-computation** of `computedUses` for the tree using `appGlobalNames`.
-- **Performance Optimization:** The `resolveRuntime` call is memoized to run exactly once per source change, preventing duplicate AST parse passes on initialization.
+- **Performance Optimization:** The `resolveRuntime` call is memoized (`useMemo`) to run at most once per source-identity change. `collectImportsFromStandaloneSources` itself is idempotent (safe to call multiple times), but wrapping it in `useMemo` prevents redundant async work when other state updates trigger re-renders before resolution completes.
 - **Tree Mutability:** The resolution pass directly mutates the `appDef` tree intended for rendering, distinct from the `projectCompilation` snapshot.
 
-**Function-Free Child Narrowing (unchanged):** Built-in components (like `Select`) inside a user component with code-behind can still be narrowed IF they don't call any parent functions. This is determined via the `dependsOnParentFunction` check during analysis.
+**Function-Free Child Narrowing:** Built-in components (like `Select`) inside a user component with code-behind can still be narrowed IF they don't call any parent functions. This is determined via the `dependsOnParentFunction` check during analysis.
 
 ### Symbols and UID types: Separating Internal State from Subscribable Names
 In static analysis, UID variables are treated as `string`. However, at runtime, the framework stores **internal component state** under `Symbol(uid)` keys. This separation is critical for state narrowing.
@@ -564,17 +564,20 @@ An app-level `Globals.xs` file declares reactive global state (variables and fun
 ## 7. Global Variables Narrowing (`computedGlobalUses`)
 
 `computedGlobalUses` is the globals-layer counterpart to `computedUses`. Where
-`computedUses` narrows `parentState` (local container state), `computedGlobalUses` narrows
-`parentGlobalVars` (the `Globals.xs` channel). Each container carries a sorted list of the
-Globals.xs variable names its subtree actually reads; `ComponentWrapper` uses this list to
-project `globalVars` before passing it into `ContainerWrapper`, so a container that reads
-only `events` is fully isolated from changes to `sortBy`.
+`computedUses` narrows `parentState` (local container state), `computedGlobalUses` drives
+ref-stabilisation of `parentGlobalVars` (the `Globals.xs` channel). Each container carries
+a sorted list of the Globals.xs variable names its subtree actually reads; `ComponentWrapper`
+uses this list for change-detection (narrow snapshot via `useShallowCompareMemoize`) and
+passes the **full** `globalVars` object to `ContainerWrapper`, updating its reference only
+when a tracked global changes. This means a container that reads only `events` is
+re-render-isolated from changes to `sortBy`.
 
 ### `computedGlobalUses` in the Data Flow
 
 ```
-parentState      narrowed by computedUses        → scopedParentState   (ComponentWrapper)
-parentGlobalVars narrowed by computedGlobalUses  → scopedGlobalVars    (ComponentWrapper)
+parentState      narrowed by computedUses              → scopedParentState       (ComponentWrapper)
+parentGlobalVars FULL object, ref-stabilised by        → globalVarsWithStableRef (ComponentWrapper)
+                 computedGlobalUses change-detection
 ```
 
 Both projections are memoized with `useShallowCompareMemoize`. When neither the relevant
@@ -700,40 +703,43 @@ always corresponds to the same content.
 const nodeComputedGlobalUses = nodeWithTransformedDatasourceProp.computedGlobalUses;
 
 // Step 1 — narrow snapshot for change-detection only.
+// When computedGlobalUses is absent, return undefined so useShallowCompareMemoize
+// takes the O(1) reference-identity fast-path instead of an O(n-globals) comparison.
 const narrowedGlobalVarsForComparison = useShallowCompareMemoize(
   useMemo(
     () =>
       nodeComputedGlobalUses && globalVars
         ? narrowGlobalVars(globalVars, nodeComputedGlobalUses)
-        : globalVars,
+        : undefined,
     [globalVars, nodeComputedGlobalUses],
   ),
 );
 // Step 2 — pass the FULL globalVars to the child, but update its reference
-// only when the narrow snapshot changes. This ensures write targets that are
-// absent from computedGlobalUses (e.g. `view = 'large'`) are still present
-// in the scope exposed to the child's expression evaluator.
+// only when the narrow snapshot changes (or, when absent, whenever globalVars
+// itself changes). This ensures write targets that are absent from
+// computedGlobalUses (e.g. `view = 'large'`) are still present in the scope
+// exposed to the child's expression evaluator.
 // eslint-disable-next-line react-hooks/exhaustive-deps
-const scopedGlobalVars = useMemo(() => globalVars, [narrowedGlobalVarsForComparison]);
+const globalVarsWithStableRef = useMemo(() => globalVars, [narrowedGlobalVarsForComparison ?? globalVars]);
 // ...
-<ContainerWrapper parentGlobalVars={scopedGlobalVars} ... />
+<ContainerWrapper parentGlobalVars={globalVarsWithStableRef} ... />
 ```
 
 When an unrelated global changes, the narrowed comparison snapshot's contents are
 identical, `useShallowCompareMemoize` returns the same reference, the outer `useMemo`
-does not recompute, `scopedGlobalVars` keeps the same reference, and `ContainerWrapper.memo`
+does not recompute, `globalVarsWithStableRef` keeps the same reference, and `ContainerWrapper.memo`
 sees unchanged props — no re-render is triggered.
 
-### Scope of the change
+### Impact on downstream components
 
-`useGlobalVariables` and `StateContainer` require no changes — they receive an
-already-narrow `parentGlobalVars` and behave correctly. The existing
-`useShallowCompareMemoize` inside `useGlobalVariables` provides reference stability once
-the input object stops changing.
+`useGlobalVariables` and `StateContainer` require no changes — they receive the full
+`parentGlobalVars` object (`globalVarsWithStableRef`) with a ref-stabilised reference and
+behave correctly. The existing `useShallowCompareMemoize` inside `useGlobalVariables`
+provides reference stability once the input object stops changing.
 
 When `computedGlobalUses` is `undefined` (no Globals.xs reads in the subtree),
-`ComponentWrapper` passes `globalVars` through unchanged — no narrowing, no overhead.
-(no narrowing, no overhead).
+`narrowedGlobalVarsForComparison` is `undefined`, so `globalVarsWithStableRef` tracks
+`globalVars` directly — no narrowing overhead, correct pass-through semantics.
 
 ---
 

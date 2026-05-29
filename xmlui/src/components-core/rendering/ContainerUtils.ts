@@ -259,6 +259,13 @@ export class ParseVarError extends Error {
 }
 
 /**
+ * Prefix used for expression-AST metadata keys in globalVars.
+ * `__tree_<name>` stores the parsed AST for Globals.xs variable `<name>`,
+ * used by `useGlobalVariables` to build the dep-tracking map at runtime.
+ */
+const TREE_PREFIX = "__tree_";
+
+/**
  * Cache of function-typed key sets per globalVars object reference.
  * All containers rendered in the same pass receive the same `parentGlobalVars`
  * reference, so the first call populates the cache and subsequent calls hit it.
@@ -337,21 +344,23 @@ export function narrowGlobalVars(
 
   const usesSet = new Set(uses);
 
-  // Expand usesSet transitively: for each included global, if its __tree_* AST
-  // references other globals, include those too. Without this, dep-tracking
-  // inside useGlobalVariables would see undefined for transitive deps of X
-  // when only X (not its dependency Y) is in the uses set.
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const key of usesSet) {
-      const tree = vars[`__tree_${key}`];
-      if (tree && typeof tree === "object") {
-        for (const dep of collectVariableDependencies(tree)) {
-          if (!dep.startsWith("__") && !usesSet.has(dep) && dep in vars) {
-            usesSet.add(dep);
-            changed = true;
-          }
+  // Expand usesSet transitively using a worklist: for each included global, if its
+  // __tree_<key> AST references other globals, include those too. Without this,
+  // dep-tracking inside useGlobalVariables would see undefined for transitive deps
+  // of X when only X (not its dependency Y) is in the uses set.
+  //
+  // An explicit index-based worklist is used instead of mutating a Set while
+  // iterating it: clearer intent, immune to the Set iteration-during-mutation
+  // footgun, and each dep is processed exactly once (no outer while-loop needed).
+  const worklist = [...uses];
+  for (let i = 0; i < worklist.length; i++) {
+    const key = worklist[i];
+    const tree = vars[`${TREE_PREFIX}${key}`];
+    if (tree && typeof tree === "object") {
+      for (const dep of collectVariableDependencies(tree)) {
+        if (!dep.startsWith("__") && !usesSet.has(dep) && dep in vars) {
+          usesSet.add(dep);
+          worklist.push(dep);
         }
       }
     }
@@ -365,9 +374,9 @@ export function narrowGlobalVars(
   }
   for (const [key, value] of Object.entries(vars)) {
     if (functionKeys.has(key)) continue;
-    if (key.startsWith("__tree_")) {
+    if (key.startsWith(TREE_PREFIX)) {
       // Include AST metadata only for vars that are in the (expanded) uses set.
-      const varName = key.slice(7); // "__tree_".length === 7
+      const varName = key.slice(TREE_PREFIX.length);
       if (usesSet.has(varName)) {
         result[key] = value;
       }

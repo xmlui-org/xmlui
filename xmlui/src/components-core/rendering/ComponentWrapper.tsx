@@ -101,10 +101,13 @@ export const ComponentWrapper = memo(
     // When computedGlobalUses is undefined (no global deps), pass globalVars as-is.
     //
     // Two-step approach to handle write targets correctly:
-    //   Step 1 — build a narrow snapshot containing only the tracked keys; used
-    //            purely for change-detection via useShallowCompareMemoize.
-    //   Step 2 — pass the FULL globalVars to the child but update its reference
-    //            only when the narrow snapshot changes.
+    //   Step 1 — build a narrow snapshot for change-detection. When computedGlobalUses
+    //            is absent, return undefined — useShallowCompareMemoize with a stable
+    //            undefined is O(1) and avoids an O(n-globals) shallow comparison that
+    //            would otherwise run on every render even when no narrowing is needed.
+    //   Step 2 — pass the FULL globalVars to the child but update its reference only
+    //            when the narrow snapshot changes (or, when absent, whenever globalVars
+    //            itself changes).
     //
     // This prevents re-renders on unrelated global changes while still exposing
     // every global variable (including write targets that aren't in
@@ -115,12 +118,12 @@ export const ComponentWrapper = memo(
         () =>
           nodeComputedGlobalUses && globalVars
             ? narrowGlobalVars(globalVars, nodeComputedGlobalUses)
-            : globalVars,
+            : undefined,
         [globalVars, nodeComputedGlobalUses],
       ),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const scopedGlobalVars = useMemo(() => globalVars, [narrowedGlobalVarsForComparison]);
+    const globalVarsWithStableRef = useMemo(() => globalVars, [narrowedGlobalVarsForComparison ?? globalVars]);
 
     // Stable ref holding the full (un-narrowed) parent state for event handlers.
     // Using a MutableRefObject instead of a value prop means ContainerWrapper.memo
@@ -138,7 +141,7 @@ export const ComponentWrapper = memo(
           node={nodeWithTransformedDatasourceProp as ContainerWrapperDef}
           parentState={scopedParentState}
           fullParentStateRef={(nodeUses || nodeComputedUses) ? fullParentStateRef : undefined}
-          parentGlobalVars={scopedGlobalVars}
+          parentGlobalVars={globalVarsWithStableRef}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           parentRenderContext={parentRenderContext}

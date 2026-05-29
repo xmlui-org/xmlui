@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { collectImportsFromStandaloneSources } from "../../src/components-core/StandaloneApp";
-import type { ComponentDef, StandaloneAppDescription } from "../../src/abstractions/ComponentDefs";
-import type { ProjectCompilation } from "../../src/abstractions/ComponentDefs";
+import type { CompoundComponentDef } from "../../src/abstractions/ComponentDefs";
+import type { StandaloneAppDescription } from "../../src/components-core/abstractions/standalone";
+import type { ProjectCompilation } from "../../src/abstractions/scripting/Compilation";
 import { transformSource } from "../parsers/xmlui/xmlui";
 import { computeUsesForTree } from "../../src/components-core/optimization/computedUses";
 
@@ -26,10 +27,11 @@ describe("collectImportsFromStandaloneSources", () => {
     };
 
     // Parse the component (simulating what the parser does)
-    const compDef = transformSource(sources["/app/components/MyComp.xmlui"]) as ComponentDef;
+    const compDef = transformSource(sources["/app/components/MyComp.xmlui"]) as CompoundComponentDef;
+    const actualComponent = compDef.component;
     
     // Check initial state: has unresolvable imports
-    expect(compDef.component!.scriptCollected!.hasUnresolvableImports).toBe(true);
+    expect(actualComponent.scriptCollected!.hasUnresolvableImports).toBe(true);
 
     const appDef: StandaloneAppDescription = {
       sources,
@@ -39,7 +41,7 @@ describe("collectImportsFromStandaloneSources", () => {
     const projectCompilation: ProjectCompilation = {
       entrypoint: {
         filename: "/app/Main.xmlui",
-        definition: null,
+        definition: null as any,
         dependencies: new Set(),
       },
       components: [
@@ -58,26 +60,25 @@ describe("collectImportsFromStandaloneSources", () => {
       getComponentProps: () => ({}),
       getComponentEvents: () => ({}),
       acceptArbitraryProps: () => true,
-      getComponentValidator: () => {},
+      getComponentValidator: () => null,
     };
 
     // 2. Run the resolution pass
-    const resolvedAny = await collectImportsFromStandaloneSources(appDef, projectCompilation, dummyHandler);
+    const resolvedAny = await collectImportsFromStandaloneSources(appDef, projectCompilation, dummyHandler as any);
 
     // 3. Assertions
     expect(resolvedAny).toBe(true);
     
-    const resolvedScript = compDef.component!.scriptCollected!;
+    const resolvedScript = actualComponent.scriptCollected!;
     expect(resolvedScript.hasUnresolvableImports).toBe(false);
     expect(resolvedScript.functions.myFunc).toBeDefined();
 
     // 4. Test narrowing
-    const dummyMetadataLookup = () => ({});
-    computeUsesForTree(compDef.component!, dummyMetadataLookup);
+    const dummyMetadataLookup = () => ({}) as any;
+    computeUsesForTree(actualComponent, dummyMetadataLookup);
     
     // Narrowing should not be blocked by ownHasScript since hasUnresolvableImports is false
-    const container = compDef.component!;
-    expect(container.computedUses).toBeDefined();
-    expect(container.computedUses).toContain("parentVar");
+    expect(actualComponent.computedUses).toBeDefined();
+    expect(actualComponent.computedUses).toContain("parentVar");
   });
 });

@@ -21,7 +21,8 @@ Severity legend: **[H]** high · **[M]** medium · **[L]** low · **[D]** doc/co
 
 ## 1. Correctness bugs / risks
 
-### 1.1 [M] Spec vs. code: `scopedGlobalVars` is NOT narrowed — it is the full object
+### 1.1 ✅ [M] Spec vs. code: `scopedGlobalVars` is NOT narrowed — it is the full object
+**Fixed:** Renamed `scopedGlobalVars` → `globalVarsWithStableRef` in `ComponentWrapper.tsx`; updated `useMemo` fallback to `undefined` (avoids O(n) shallow compare when `computedGlobalUses` is absent); dep array changed to `[narrowedGlobalVarsForComparison ?? globalVars]`. §7 data-flow diagram and prose in `computed-uses-specification.md` updated to match.
 `ComponentWrapper.tsx` (the `scopedGlobalVars` block):
 ```ts
 const scopedGlobalVars = useMemo(() => globalVars, [narrowedGlobalVarsForComparison]);
@@ -73,7 +74,8 @@ happen to be reused. Recommend: gate `collectImportsFromStandaloneSources` behin
 keyed on the resolved source identity, or move it into the `useMemo`, so duplicate network
 fetches don't happen under StrictMode / route changes.
 
-### 1.4 [L] `collectImportsFromStandaloneSources` uses one `fileId` for an entire subtree
+### 1.4 ✅ [L] `collectImportsFromStandaloneSources` uses one `fileId` for an entire subtree
+**Fixed:** Added a comment in `StandaloneApp.tsx:walkTreeAndResolve` documenting the assumption that all nodes originate from the same source file and are resolved against a single `fileId`. The comment flags the limitation for future multi-source trees.
 `walkTreeAndResolve(root, fileId)` resolves **every** node it finds with the same `fileId`:
 ```ts
 for (const node of nodesToProcess) {
@@ -103,7 +105,8 @@ Recommend: verify in `global-variables.ts` that function values are reference-st
 snapshots where only data vars change; if not, exclude functions from the *comparison*
 snapshot (they don't need change-tracking — they're always forwarded downstream anyway).
 
-### 2.2 [L] When `computedGlobalUses` is undefined, there is still per-render overhead
+### 2.2 ✅ [L] When `computedGlobalUses` is undefined, there is still per-render overhead
+**Fixed:** `narrowedGlobalVarsForComparison` now returns `undefined` (not `globalVars`) when `nodeComputedGlobalUses` is absent. `useShallowCompareMemoize` with a stable `undefined` takes the O(1) identity fast-path, eliminating the O(n-globals) comparison for subtrees with zero global reads.
 The spec says "no narrowing, no overhead" when `computedGlobalUses` is `undefined`. In code
 the `useMemo` returns the full `globalVars`, which is then run through
 `useShallowCompareMemoize` — an O(number-of-globals) shallow comparison on **every** container
@@ -111,7 +114,8 @@ render, even subtrees with zero global reads. For apps with many globals this is
 small) overhead introduced for every container. Consider short-circuiting:
 skip the `useShallowCompareMemoize` entirely when `nodeComputedGlobalUses` is `undefined`.
 
-### 2.3 [L] Asymmetric narrowing means `StateContainer`/`useGlobalVariables` still get all globals
+### 2.3 ✅ [L] Asymmetric narrowing means `StateContainer`/`useGlobalVariables` still get all globals
+**Fixed:** Spec wording updated: "fully isolated" → "re-render-isolated". The prose and diagram in `computed-uses-specification.md` now correctly describe that the optimization prevents unnecessary re-renders, not that it narrows the data visible to `useGlobalVariables`.
 Following 1.1: the runtime global-vars layer receives the full set, so the only realized
 optimization is re-render avoidance at the `ContainerWrapper.memo` boundary — there is no
 data narrowing and no reduction of `useGlobalVariables` dep-map size. That is acceptable, but
@@ -136,7 +140,8 @@ silently returns the old value, because the ref only refreshes when a tracked ke
 Pair this with a test that proves a deliberately-missing dep produces a visible failure, so
 the static-analysis contract is enforced rather than assumed.
 
-### 3.2 [M] `collectScriptFunctionDeps` `fnCache` is path-dependent
+### 3.2 ✅ [M] `collectScriptFunctionDeps` `fnCache` is path-dependent
+**Fixed:** Added a `// ⚠ fnCache stores union-only results…` warning comment above the cache declaration in `computedUses.ts`, explaining the union-only invariant and why per-function reuse would be incorrect. Cache logic unchanged.
 `computedUses.ts:collectScriptFunctionDeps`: `analyzeOne` caches per-name results in `fnCache`,
 but the cached value depends on the `visiting` set at first computation. During mutual
 recursion (`a→b→a`), `b` is cached with `a`'s contribution cut by the visited-set; that
@@ -147,7 +152,8 @@ change that consumes per-function results (rather than the union) would be silen
 Recommend: either cache keyed including the cycle state, or add a strong comment that the
 cache is union-only and must not be reused for per-function queries.
 
-### 3.3 [L] `narrowGlobalVars` mutates `usesSet` while iterating it
+### 3.3 ✅ [L] `narrowGlobalVars` mutates `usesSet` while iterating it
+**Fixed:** Replaced the `while (changed)` + Set-mutation pattern with an explicit index-based worklist (`const worklist = [...uses]; for (let i = 0; ...)`) in `ContainerUtils.ts`. Each dependency is processed exactly once; no Set is mutated during iteration.
 ```ts
 for (const key of usesSet) {
   // ...
@@ -169,7 +175,8 @@ profiling shows repeated failing parses.
 
 ## 4. Hardcoding / duplication
 
-### 4.1 [L] `key.slice(7)` magic offset for the `__tree_` prefix
+### 4.1 ✅ [L] `key.slice(7)` magic offset for the `__tree_` prefix
+**Fixed:** Added `const TREE_PREFIX = "__tree_";` as a module-level constant in `ContainerUtils.ts`. All `key.startsWith("__tree_")` and `key.slice(7)` occurrences replaced with `key.startsWith(TREE_PREFIX)` and `key.slice(TREE_PREFIX.length)`.
 `ContainerUtils.ts:narrowGlobalVars`:
 ```ts
 const varName = key.slice(7); // "__tree_".length === 7
@@ -191,7 +198,8 @@ in a test).
 finalized (June)" comment. This is an accepted maintenance burden (the comment explains why),
 but it is drift-prone. No action required beyond the existing note; flagged for visibility.
 
-### 4.4 [L] Repeated `for (const d of X) set.add(d)` merge boilerplate
+### 4.4 ✅ [L] Repeated `for (const d of X) set.add(d)` merge boilerplate
+**Fixed:** Added `function addAll<T>(target: Set<T>, source: ReadonlySet<T>): void` helper in `computedUses.ts`. All ~15 repeated set-union patterns replaced with `addAll()` calls throughout the file.
 `computedUses.ts` repeats the set-union pattern ~15 times. A small `addAll(target, source)`
 helper would cut noise and reduce copy-paste transposition risk (e.g. adding to the wrong
 accumulator in `processChildList`).
@@ -200,7 +208,8 @@ accumulator in `processChildList`).
 
 ## 5. Code structure / maintainability
 
-### 5.1 [M] `computeUsesInternal` has 6 positional parameters (3 of them Set/bool)
+### 5.1 ✅ [M] `computeUsesInternal` has 6 positional parameters (3 of them Set/bool)
+**Fixed:** Introduced `ComputeUsesContext` interface with fields `parentFunctionNames`, `disableNarrowing`, `injectedVarsScope`, `metadataLookup`, and `appGlobalNames` in `computedUses.ts`. `computeUsesInternal` now takes `(node, ctx = {})` and all call sites updated to pass an options object.
 ```ts
 computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, childScope, metadataLookup, appGlobalNames)
 ```
@@ -208,17 +217,20 @@ Positional `Set`/`boolean` args at a call site are easy to transpose and hard to
 function keeps gaining parameters (appGlobalNames is the newest), migrate to a single options
 object. This also makes the recursive `processChildList` call self-documenting.
 
-### 5.2 [D] Stale JSDoc: header documents a 3-tuple, code returns a 4-tuple
+### 5.2 ✅ [D] Stale JSDoc: header documents a 3-tuple, code returns a 4-tuple
+**Fixed:** Module-level JSDoc in `computedUses.ts` updated to document the 4th element `[3] globalDepsUsed: Globals.xs names read anywhere in this subtree (drives computedGlobalUses)`.
 `computedUses.ts` top-of-file comment and the `computeUsesInternal` doc both say
 "returns `[freeVars, escapingUIDs, freeReads]`" / "Returns a tuple: [0]…[2]". The function now
 returns `[Set, Set, Set, Set]` with `globalDepsUsed` as element `[3]`. Update both comments to
 document the 4th element.
 
-### 5.3 [D] `diagnostics.ts` JSDoc star misalignment introduced by the edit
+### 5.3 ✅ [D] `diagnostics.ts` JSDoc star misalignment introduced by the edit
+**Fixed:** Extra leading space removed from the `value-not-in-enum` line in `diagnostics.ts`; `*` column alignment now matches the surrounding JSDoc block.
 The `value-not-in-enum` line gained an extra leading space, breaking the `*` column alignment
 of the surrounding JSDoc block. Cosmetic; fix the indentation.
 
-### 5.4 [D] Spec doc/reality mismatch on "memoized to run exactly once"
+### 5.4 ✅ [D] Spec doc/reality mismatch on "memoized to run exactly once"
+**Fixed:** `computed-uses-specification.md` updated: clarified that `resolveRuntime` is wrapped in `useMemo` (at most once per source-identity change), while `collectImportsFromStandaloneSources` is idempotent but not itself memoized.
 See 1.3 — the spec attributes "exactly once" memoization to the import-resolution pass, but
 only `resolveRuntime` is memoized. Align the spec wording with the actual (mutation-flag-based,
 not memoized) idempotency.

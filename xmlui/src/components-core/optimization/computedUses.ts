@@ -14,7 +14,7 @@
  * - Non-container nodes bubble up their own UID and all escaping UIDs from children.
  * - Container nodes capture everything—only their own UID escapes further.
  *
- * `computeUsesInternal` returns `[freeVars, escapingUIDs, freeReads]` to communicate
+ * `computeUsesInternal` returns `[freeVars, escapingUIDs, freeReads, globalDepsUsed]` to communicate
  * dependencies and registration targets upward.
  */
 import { depsOfValueWithReads } from "../script-runner/visitors";
@@ -158,8 +158,8 @@ function depsOfRecord(
   if (!record) return { all, reads };
   for (const value of Object.values(record)) {
     const { all: a, reads: r } = depsOfValueWithReads(value);
-    for (const dep of a) all.add(dep);
-    for (const dep of r) reads.add(dep);
+    addAll(all, a);
+    addAll(reads, r);
   }
   return { all, reads };
 }
@@ -183,6 +183,13 @@ function collectScriptFunctionDeps(
 ): { all: Set<string>; reads: Set<string> } {
   const allDeps = new Set<string>();
   const readDeps = new Set<string>();
+  // ⚠ UNION-ONLY CACHE: results cached here may be incomplete for per-function queries.
+  // During mutual recursion (a→b→a), 'b' is cached with 'a' cut from its visited-set;
+  // that incomplete 'b' is reused if 'b' is later processed as a top-level entry.
+  // This is CORRECT because the final consumer (the outer for-loop) takes the *union*
+  // over all top-level names — each function also gets an independent top-level pass
+  // that recovers the cut deps. Any future use of cached per-function results (rather
+  // than the union) would silently return incomplete dependency sets.
   const fnCache = new Map<string, { all: Set<string>; reads: Set<string> }>();
 
   function analyzeOne(
@@ -210,8 +217,8 @@ function collectScriptFunctionDeps(
       if (localNames.has(d) && d in functions) {
         // Transitive call to another local code-behind function — recurse.
         const transitive = analyzeOne(d, nextVisiting);
-        for (const td of transitive.all) fnAll.add(td);
-        for (const td of transitive.reads) fnReads.add(td);
+            addAll(fnAll, transitive.all);
+        addAll(fnReads, transitive.reads);
       } else {
         fnAll.add(d);
       }
@@ -228,8 +235,8 @@ function collectScriptFunctionDeps(
 
   for (const name of Object.keys(functions)) {
     const { all, reads } = analyzeOne(name, new Set());
-    for (const d of all) allDeps.add(d);
-    for (const d of reads) readDeps.add(d);
+    addAll(allDeps, all);
+    addAll(readDeps, reads);
   }
 
   return { all: allDeps, reads: readDeps };
@@ -241,23 +248,49 @@ function collectScriptFunctionDeps(
  * - [0] freeVars: Identifiers referenced in this subtree that must come from the parent scope.
  * - [1] escapingUIDs: UIDs that will register into the parent container at runtime.
  * - [2] freeReads: Subset of freeVars containing only read references.
+ * - [3] globalDepsUsed: Globals.xs names read anywhere in this subtree (drives computedGlobalUses).
  */
 const EMPTY_SET: ReadonlySet<string> = Object.freeze(new Set<string>());
 
+/** Adds every item from `source` into `target`. Reduces set-union boilerplate. */
+function addAll<T>(target: Set<T>, source: Iterable<T>): void {
+  for (const item of source) target.add(item);
+}
+
+/**
+ * Options bag for {@link computeUsesInternal}.
+ * All fields are optional — callers supply only what differs from the defaults.
+ */
+interface ComputeUsesContext {
+  /** Functions declared in the nearest ancestor scope, for transitive dep tracking. */
+  parentFunctionNames?: Set<string>;
+  /** When true, narrowing is blocked for this node and its descendants. */
+  disableNarrowing?: boolean;
+  /** Variables injected into this scope by an ancestor component (e.g. $item, $context). */
+  injectedVarsScope?: ReadonlySet<string>;
+  /** Component metadata lookup — provides childInjectedVars, isImplicitContainerByDefault, etc. */
+  metadataLookup?: (type: string) => OptimizerMetadataView | undefined;
+  /**
+   * App-level globals (Globals.xs vars + functions). They resolve through the
+   * global-vars layer at runtime — independent of parent state narrowing — so
+   * they must not enter computedUses nor drive implicit container promotion.
+   * Supplied by StandaloneApp where Globals.xs is known; defaults to EMPTY_SET
+   * during the parse-time pass (overwritten by the authoritative StandaloneApp pass).
+   */
+  appGlobalNames?: ReadonlySet<string>;
+}
+
 function computeUsesInternal(
   node: ComponentDef,
-  parentFunctionNames: Set<string> = new Set(),
-  disableNarrowing: boolean = false,
-  injectedVarsScope: ReadonlySet<string> = EMPTY_SET,
-  metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
-  // App-level globals (Globals.xs vars + functions). They resolve through the
-  // global-vars layer / global functions at runtime — independent of parent
-  // state narrowing — so they must not enter computedUses nor drive implicit
-  // container promotion. Supplied by StandaloneApp where Globals.xs is known;
-  // empty during the parse-time pass (that result is overwritten by the
-  // authoritative StandaloneApp pass, which runs in both runtime and Vite modes).
-  appGlobalNames: ReadonlySet<string> = EMPTY_SET,
+  ctx: ComputeUsesContext = {},
 ): [Set<string>, Set<string>, Set<string>, Set<string>] {
+  const {
+    parentFunctionNames = new Set<string>(),
+    disableNarrowing = false,
+    injectedVarsScope = EMPTY_SET,
+    metadataLookup,
+    appGlobalNames = EMPTY_SET,
+  } = ctx;
   // Clear stale `computedUses` and `computedGlobalUses` from prior traversals.
   // Re-running analysis is routine (e.g., after merging code-behind functions).
   node.computedUses = undefined;
@@ -314,13 +347,13 @@ function computeUsesInternal(
 
   const addRecord = (rec: Record<string, unknown> | undefined) => {
     const { all, reads } = depsOfRecord(rec);
-    for (const d of all) usedHere.add(d);
-    for (const d of reads) usedHereReads.add(d);
+    addAll(usedHere, all);
+    addAll(usedHereReads, reads);
   };
   const addValue = (v: unknown) => {
     const { all, reads } = depsOfValueWithReads(v);
-    for (const d of all) usedHere.add(d);
-    for (const d of reads) usedHereReads.add(d);
+    addAll(usedHere, all);
+    addAll(usedHereReads, reads);
   };
 
   addRecord(node.props as Record<string, unknown> | undefined);
@@ -406,8 +439,8 @@ function computeUsesInternal(
       scriptFunctions,
       localDeclared,
     );
-    for (const d of fnAll) usedHere.add(d);
-    for (const d of fnReads) usedHereReads.add(d);
+    addAll(usedHere, fnAll);
+    addAll(usedHereReads, fnReads);
   }
 
   // Narrowing is blocked for this node only when its script contains statements
@@ -445,16 +478,22 @@ function computeUsesInternal(
 
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs, depsReads, globalDeps] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, childScope, metadataLookup, appGlobalNames);
-      for (const d of deps) childDeps.add(d);
-      for (const d of depsReads) childDepsReads.add(d);
+      const [deps, escapingUIDs, depsReads, globalDeps] = computeUsesInternal(child, {
+        parentFunctionNames: childFunctionNames,
+        disableNarrowing: nextDisableNarrowing,
+        injectedVarsScope: childScope,
+        metadataLookup,
+        appGlobalNames,
+      });
+      addAll(childDeps, deps);
+      addAll(childDepsReads, depsReads);
       for (const uid of escapingUIDs) {
         childEscapingUIDs.add(uid);
         // These UIDs will register in this container at runtime — treat them
         // as locally declared so they don't appear in computedUses.
         localDeclared.add(uid);
       }
-      for (const d of globalDeps) childGlobalDeps.add(d);
+      addAll(childGlobalDeps, globalDeps);
     }
   };
 
@@ -488,7 +527,7 @@ function computeUsesInternal(
     !injectedVarsScope.has(d);
   const globalDepsUsed = new Set<string>();
   for (const d of usedHere) if (isGlobalDep(d)) globalDepsUsed.add(d);
-  for (const d of childGlobalDeps) globalDepsUsed.add(d);
+  addAll(globalDepsUsed, childGlobalDeps);
 
   // If this node is an implicit stateful component (Select, List, Table, etc.)
   // with a UID, include its own UID in parentDependencies so the narrowed state
@@ -584,7 +623,7 @@ export function computeUsesForSubtree(
   appGlobalNames: ReadonlySet<string> = EMPTY_SET,
 ): Set<string> {
   if (!COMPUTED_USES_ENABLED) return new Set();
-  const [freeVars] = computeUsesInternal(node, new Set(), false, EMPTY_SET, metadataLookup, appGlobalNames);
+  const [freeVars] = computeUsesInternal(node, { metadataLookup, appGlobalNames });
   return freeVars;
 }
 
@@ -618,5 +657,5 @@ export function computeUsesForTree(
   if (!COMPUTED_USES_ENABLED) return;
   // Unwrap potential CompoundComponentDef wrappers before analysis.
   const actualRoot = unwrapToComponentDef(root);
-  computeUsesInternal(actualRoot, new Set(), false, EMPTY_SET, metadataLookup, appGlobalNames);
+  computeUsesInternal(actualRoot, { metadataLookup, appGlobalNames });
 }
