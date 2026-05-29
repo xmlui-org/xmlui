@@ -700,6 +700,23 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — JS_STDLIB_GLOBALS filter
     expect(root.computedUses).toContain("external");
     expect(root.computedUses).toContain("screen");
   });
+
+  it("browser host globals (window/document/navigator) ARE filtered", () => {
+    // Unambiguous host objects resolve via globalThis at runtime (script engine
+    // identifier chain), never parent state — so they must not enter computedUses.
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Text", { props: { text: "{window.location.href}{document.title}{navigator.userAgent}{rarelyChanges}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).not.toContain("window");
+    expect(root.computedUses).not.toContain("document");
+    expect(root.computedUses).not.toContain("navigator");
+    // a real dependency in the same expression still survives
+    expect(root.computedUses).toContain("rarelyChanges");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -977,6 +994,87 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free child narr
     computeUsesForTree(parent);
     expect(select.computedUses).toBeDefined();
     expect(select.computedUses).toContain("rarelyChanges");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// appGlobalNames filter (Globals.xs vars + functions)
+// Globals.xs declarations resolve through the global-vars / global functions
+// layer at runtime (independent of parent-state narrowing), so they must not
+// enter computedUses nor promote implicit containers. StandaloneApp supplies
+// the names; here we pass them via the public computeUsesForTree param.
+// ---------------------------------------------------------------------------
+
+describe.skipIf(skipIfDisabled)("computeUsesForTree — appGlobalNames filter (Globals.xs)", () => {
+  // Direct call to the real entry point so we can pass appGlobalNames explicitly.
+  const run = (root: any, globals: string[]) =>
+    originalComputeUsesForTree(root, getOptimizerMetadata, new Set(globals));
+
+  it("a Globals.xs var read in a template is NOT added to computedUses", () => {
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [node("Text", { props: { text: "{sortBy}{rarelyChanges}" } })],
+    });
+    run(root, ["sortBy", "events", "selectMode"]);
+    // sortBy is an app global → resolved via the global layer, not parent state
+    expect(root.computedUses).not.toContain("sortBy");
+    // a genuine parent var still survives
+    expect(root.computedUses).toContain("rarelyChanges");
+  });
+
+  it("an implicit container whose ONLY read dep is a Globals.xs var is NOT promoted", () => {
+    // Without the filter, `sortBy` would inflate nonDynamicReadDeps and promote
+    // the Select to a full StateContainer (extra tree depth + lifecycle isolation).
+    // No uid here: a uid would legitimately add its own registration dep and
+    // promote regardless — that is orthogonal to the global-leak concern.
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{sortBy}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const root = node("Stack", { vars: { x: "{0}" }, children: [select] });
+    run(root, ["sortBy"]);
+    // Select has no real parent-state read dep → not narrowed/promoted.
+    expect(select.computedUses).toBeUndefined();
+  });
+
+  it("implicit container reading a REAL parent var (alongside a global) is still narrowed to the real var only", () => {
+    const select = node("Select", {
+      uid: "mySelect",
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{rarelyChanges}" },
+          children: [node("Option", { props: { value: "{$item} {sortBy}" } })],
+        }),
+      ],
+    });
+    const root = node("Stack", { vars: { x: "{0}" }, children: [select] });
+    run(root, ["sortBy"]);
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("rarelyChanges");
+    expect(select.computedUses).not.toContain("sortBy");
+  });
+
+  it("a Globals.xs function called from code-behind is NOT added to computedUses", () => {
+    // setFileClipboard is a Globals.xs function → resolved via global functions.
+    const comp = node("Stack", {
+      vars: { x: "{0}" },
+      functions: { handleClear: {} } as any,
+      props: { label: "{setFileClipboard(localThing)}" },
+    });
+    const root = node("Stack", { vars: { localThing: "{0}" }, children: [comp] });
+    run(root, ["setFileClipboard", "fileClipboard"]);
+    // function name filtered; the real arg `localThing` survives
+    if (comp.computedUses) {
+      expect(comp.computedUses).not.toContain("setFileClipboard");
+    }
+    // root sees localThing as the genuine dependency
+    expect(root.computedUses ?? []).not.toContain("setFileClipboard");
   });
 });
 

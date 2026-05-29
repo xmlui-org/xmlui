@@ -767,7 +767,16 @@ function resolveRuntime(runtime: Record<string, any>): {
     );
   }
 
-  computeUsesForTree(entryPointWithCodeBehind, resolveOptimizerMetadata);
+  // --- Globals.xs vars + functions resolve through the global-vars / global
+  // --- functions layer at runtime (NOT parent state), so the optimizer must
+  // --- exclude them from computedUses and from implicit-container promotion.
+  // --- This is the authoritative pass for both Standalone and Vite modes.
+  const appGlobalNames = new Set<string>([
+    ...Object.keys(globalsXs?.vars ?? {}),
+    ...Object.keys(globalsXs?.functions ?? {}),
+  ]);
+
+  computeUsesForTree(entryPointWithCodeBehind, resolveOptimizerMetadata, appGlobalNames);
 
   // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];
@@ -798,7 +807,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   // --- Process computedUses for each compound component's tree
   for (const compDef of components) {
     if (compDef.component) {
-      computeUsesForTree(compDef.component, resolveOptimizerMetadata);
+      computeUsesForTree(compDef.component, resolveOptimizerMetadata, appGlobalNames);
     }
   }
 

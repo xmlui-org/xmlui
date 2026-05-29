@@ -110,6 +110,26 @@ const JS_STDLIB_GLOBALS = new Set([
 const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 
 /**
+ * Browser host objects reachable at the END of the script engine's identifier
+ * resolution chain (local scope → localContext → appContext → `globalThis`,
+ * see `script-runner/eval-tree-common.ts`). When markup calls e.g.
+ * `window.MwdHelpers.foo()`, the root identifier `window` resolves via
+ * `globalThis`, NOT parent UI state — so it must not contribute to
+ * `parentDependencies`/`computedUses` nor (more importantly) inflate
+ * `nonDynamicReadDeps` and falsely promote an implicit container.
+ *
+ * Deliberately MINIMAL: only the unambiguous host objects that are never a
+ * plausible XMLUI state-variable name. We intentionally EXCLUDE ambiguous
+ * names like `location`, `history`, `screen`, `self`, `top`, `parent`,
+ * `frames` (a developer could legitimately use them as variable names) — the
+ * same reasoning that keeps browser-legacy props out of JS_STDLIB_GLOBALS
+ * (see Bug 11 in history-bugs.md).
+ */
+const BROWSER_HOST_GLOBALS = new Set(["window", "document", "navigator"]);
+
+const isBrowserHostGlobal = (name: string): boolean => BROWSER_HOST_GLOBALS.has(name);
+
+/**
  * XMLUI framework globals (Actions, navigate, toast, App, Log, theme helpers,
  * date/math/storage utilities, ...). These are wired into every expression
  * scope by AppContent's `appContextValue` and are NEVER stored in parent UI
@@ -224,6 +244,13 @@ function computeUsesInternal(
   disableNarrowing: boolean = false,
   injectedVarsScope: ReadonlySet<string> = EMPTY_SET,
   metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
+  // App-level globals (Globals.xs vars + functions). They resolve through the
+  // global-vars layer / global functions at runtime — independent of parent
+  // state narrowing — so they must not enter computedUses nor drive implicit
+  // container promotion. Supplied by StandaloneApp where Globals.xs is known;
+  // empty during the parse-time pass (that result is overwritten by the
+  // authoritative StandaloneApp pass, which runs in both runtime and Vite modes).
+  appGlobalNames: ReadonlySet<string> = EMPTY_SET,
 ): [Set<string>, Set<string>, Set<string>] {
   // Clear stale `computedUses` from prior traversals.
   // Re-running analysis is routine (e.g., after merging code-behind functions).
@@ -406,7 +433,7 @@ function computeUsesInternal(
 
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, childScope, metadataLookup);
+      const [deps, escapingUIDs, depsReads] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing, childScope, metadataLookup, appGlobalNames);
       for (const d of deps) childDeps.add(d);
       for (const d of depsReads) childDepsReads.add(d);
       for (const uid of escapingUIDs) {
@@ -427,7 +454,12 @@ function computeUsesInternal(
   }
 
   const keepDep = (d: string) =>
-    !localDeclared.has(d) && !isBuiltinGlobal(d) && !isXmluiFrameworkGlobal(d) && !injectedVarsScope.has(d);
+    !localDeclared.has(d) &&
+    !isBuiltinGlobal(d) &&
+    !isBrowserHostGlobal(d) &&
+    !isXmluiFrameworkGlobal(d) &&
+    !appGlobalNames.has(d) &&
+    !injectedVarsScope.has(d);
   const parentDependencies = new Set<string>();
   const parentDependenciesReads = new Set<string>();
   for (const d of usedHere) if (keepDep(d)) parentDependencies.add(d);
@@ -509,9 +541,13 @@ function computeUsesInternal(
  * Public API — same contract as before (returns free vars set).
  * Prefer `computeUsesForTree` for whole-tree traversal.
  */
-export function computeUsesForSubtree(node: ComponentDef, metadataLookup?: (type: string) => OptimizerMetadataView | undefined): Set<string> {
+export function computeUsesForSubtree(
+  node: ComponentDef,
+  metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
+  appGlobalNames: ReadonlySet<string> = EMPTY_SET,
+): Set<string> {
   if (!COMPUTED_USES_ENABLED) return new Set();
-  const [freeVars] = computeUsesInternal(node, new Set(), false, EMPTY_SET, metadataLookup);
+  const [freeVars] = computeUsesInternal(node, new Set(), false, EMPTY_SET, metadataLookup, appGlobalNames);
   return freeVars;
 }
 
@@ -537,9 +573,13 @@ function unwrapToComponentDef(node: ComponentDef): ComponentDef {
   return node;
 }
 
-export function computeUsesForTree(root: ComponentDef, metadataLookup?: (type: string) => OptimizerMetadataView | undefined): void {
+export function computeUsesForTree(
+  root: ComponentDef,
+  metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
+  appGlobalNames: ReadonlySet<string> = EMPTY_SET,
+): void {
   if (!COMPUTED_USES_ENABLED) return;
   // Unwrap potential CompoundComponentDef wrappers before analysis.
   const actualRoot = unwrapToComponentDef(root);
-  computeUsesInternal(actualRoot, new Set(), false, EMPTY_SET, metadataLookup);
+  computeUsesInternal(actualRoot, new Set(), false, EMPTY_SET, metadataLookup, appGlobalNames);
 }

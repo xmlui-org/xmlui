@@ -325,10 +325,34 @@ const stateContext: ContainerState = { ...componentState, ...ret };
 
 **Cache implication:** [`obtainValue`](../../src/components-core/state/variable-resolution.ts) memoizes per-expression with `shallowCompare(newDeps, lastDeps)` where deps come from `pickFromObject(stateContext, dependencies)`. If `stateContext` ever lacks a needed `$`-key, `pickFromObject` returns `{}` (the dotted path resolves to `undefined`), `shallowCompare({}, {}) === true`, and the cache locks in the **first** computed value forever. The spread-order rule prevents this latent cache failure as a side benefit — once `ret.$props` reliably wins, the picked deps reflect the real value and cache invalidation works.
 
-### Code-Behind Exclusion (`scriptCollected` and `.xs` files)
-The optimizer only checks the template (`.xmlui`). If a component has an `.xmlui.xs` file or uses `<script>`, functions inside may access anything in the parent state. Transitive AST analysis of code-behind is not currently performed, so state narrowing for such nodes (and their children: `nextDisableNarrowing`) is disabled. They always receive the full `parentState`.
+### Code-Behind Transitive Analysis (`scriptCollected` and `.xs` files)
 
-**Function-Free Child Narrowing:** Built-in components (like `Select`) inside a user component with code-behind can still be narrowed IF they don't call any parent functions. This is determined via `dependsOnParentFunction` check during analysis.
+The optimizer performs **transitive AST analysis** of code-behind function bodies to determine actual parent-scope dependencies — replacing the old blanket "never narrow if there is code-behind" rule.
+
+#### `collectScriptFunctionDeps` — DFS function-body analysis
+
+The helper `collectScriptFunctionDeps(functions, localNames)` in `computedUses.ts`:
+
+1. For each `ArrowExpression` in the function map, wraps it as a fake `CodeDeclaration` — `{ [PARSED_MARK_PROP]: true, tree: arrowExpr }` — so that `depsOfValueWithReads` routes it through `collectVariableDependencies`. The `T_ARROW_EXPRESSION` handler in the scripting engine sets up parameter scope correctly, meaning function parameters are treated as local variables and only free vars (parent-scope refs) are returned.
+2. Performs DFS with a **visited-set** to follow transitive calls between functions in the same code-behind block. Mutual recursion (`a` calls `b`, `b` calls `a`) is handled safely — the visited-set breaks the cycle and contributes only the deps discovered before the cycle.
+3. Separately analyzes `scriptCollected.vars` initializer expressions via `addRecord`, because a code-behind var's initial value (e.g. `var count = appState.x + 1`) may reference parent state.
+
+#### Narrowing split: node vs. children
+
+The "disable narrowing" concern is split into two independent flags:
+
+| Flag | Controls | Value |
+|------|----------|-------|
+| `disablesChildNarrowing` | `nextDisableNarrowing` passed to children | `true` when node has **any** code-behind (unchanged semantics for children) |
+| `ownHasScript` | `safeToNarrow` for **this node** | `true` only when `scriptCollected.hasInvalidStatements` — i.e. the parser could not parse all statements and the dep set is incomplete |
+
+Children of a code-behind node are still treated conservatively via `nextDisableNarrowing`; function-free children without parent-function calls can still be narrowed (the `dependsOnParentFunction` check controls this).
+
+#### `hasInvalidStatements` guard
+
+If the script parser encountered statements it could not handle (top-level code that is neither `var` nor `function`), `scriptCollected.hasInvalidStatements = true`. In that case the dep set is provably incomplete, so `ownHasScript = true` blocks narrowing for the node — conservatively correct.
+
+**Function-Free Child Narrowing (unchanged):** Built-in components (like `Select`) inside a user component with code-behind can still be narrowed IF they don't call any parent functions. This is determined via the `dependsOnParentFunction` check during analysis.
 
 ### Symbols and UID types: Separating Internal State from Subscribable Names
 In static analysis, UID variables are treated as `string`. However, at runtime, the framework stores **internal component state** under `Symbol(uid)` keys. This separation is critical for state narrowing.
@@ -471,8 +495,10 @@ The optimizer must distinguish between **parent UI state** and **framework globa
 ```ts
 const keepDep = (d: string) =>
   !localDeclared.has(d) &&
-  !isBuiltinGlobal(d) &&
-  !XMLUI_GLOBAL_NAMES.has(d) &&  // ← Framework globals filtered here
+  !isBuiltinGlobal(d) &&          // ECMAScript + universally available platform globals
+  !isBrowserHostGlobal(d) &&      // window, document, navigator
+  !isXmluiFrameworkGlobal(d) &&   // Actions, toast, navigate, …
+  !appGlobalNames.has(d) &&       // Globals.xs vars + functions
   !injectedVarsScope.has(d);
 ```
 
@@ -480,6 +506,22 @@ const keepDep = (d: string) =>
 1. Be added to `AppContextDeps` interface in `appContextFactory.ts` (strict type-checking).
 2. Be passed from `AppContent.tsx` when calling `buildAppContextValue()` (TypeScript will error if forgotten).
 3. Automatically propagate to `XMLUI_GLOBAL_NAMES` (no manual list to maintain).
+
+#### `BROWSER_HOST_GLOBALS` — browser host-object filter
+
+Browser host objects (`window`, `document`, `navigator`) resolve via `globalThis` at the end of the script engine's identifier resolution chain (`eval-tree-common.ts` — the chain is: local scope → `localContext` → `appContext` → `globalThis`). They never live in parent UI state, so they must not enter `computedUses` nor inflate `nonDynamicReadDeps` and falsely promote an implicit container.
+
+**Deliberately minimal set:** Only `{window, document, navigator}` — unambiguous host objects that are never plausible XMLUI state-variable names. `location`, `history`, `screen`, `self`, `top`, `parent`, `frames` etc. are **intentionally excluded** — a developer could legitimately name a variable `screen` or `location`, so filtering those would silently drop real deps. The same reasoning that keeps legacy browser properties out of `JS_STDLIB_GLOBALS` (see Bug 11 in `history-bugs.md`).
+
+#### `appGlobalNames` — Globals.xs variables and functions
+
+An app-level `Globals.xs` file declares reactive global state (variables and functions) accessible to all components. These resolve through the **global-vars layer** (`useGlobalVariables`) — a separate React-context layer that operates independently of `extractScopedState` narrowing. Consequently, Globals.xs names must not enter `computedUses` (they are never filtered by narrowing) and must not trigger implicit-container promotion.
+
+**How names are supplied:** `computeUsesForTree` and `computeUsesForSubtree` accept an optional `appGlobalNames: ReadonlySet<string>` parameter (default `EMPTY_SET`). `StandaloneApp.resolveRuntime` builds this set from `globalsXs.vars` and `globalsXs.functions` and passes it to both `computeUsesForTree` calls (entry-point at line 770, compound components at line 801).
+
+**Why this is the authoritative pass:** `computeUsesForTree` is always called from `resolveRuntime`, which runs in **both** standalone and Vite modes. The parse-time Vite plugin pass (`xmlui-parser.ts:61`) does not know Globals.xs and uses the default `EMPTY_SET`; its result is overwritten by the `resolveRuntime` pass (because `computeUsesInternal` mechanically clears `node.computedUses = undefined` before each traversal per Invariant 5.5). So the final state always reflects the correct filter.
+
+**Zero hardcoding:** The set is derived directly from `globalsXs` at startup — no manual name list to maintain. Adding or removing a variable in `Globals.xs` automatically updates the filter on the next app reload.
 
 ---
 
