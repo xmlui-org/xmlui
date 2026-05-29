@@ -36,10 +36,13 @@ The algorithm works bottom-up, traversing the `ComponentDef` tree before connect
 1. Collects all identifiers used in the node (`usedHere`).
 2. Retrieves identifiers "leaking" from children (`childDeps`).
 3. Excludes **locally provided** variables (`vars`, `loaders`, runtime `node.contextVars` like `$item`, functions). `node.contextVars` refers to `ComponentDef.contextVars` — a field set on wrapper nodes by renderers that create per-instance containers (e.g., ContextMenu creates a `Container` with `contextVars: { $context }`). Adding these to `localDeclared` prevents the container from reporting `$context` as an external dependency — it absorbs it as locally provided for children.
-4. Excludes **Built-in Globals** (`JS_STDLIB_GLOBALS` like `Math`, `JSON_STDLIB_GLOBALS`).
-5. Excludes **Lexical Scoped Vars**. These are variables injected directly into the child context at render time (e.g., `$item` in `List` or `$queryParams` in `onFetch`). They are declared in component metadata (`childInjectedVars`) and event metadata (`injectedVars`), allowing the analyzer to ignore them as external dependencies.
-6. Excludes **Unstable Global Variables** (`UNSTABLE_GLOBAL_VARS`). These are navigation keys (like `$pathname`) declared in root metadata (`unstableChildInjectedVars`).
-7. Forms the `computedUses` list — a minimum set of parent state keys (including necessary child component UIDs that will register their API higher up the tree).
+4. Excludes **ECMAScript / platform built-ins** (`JS_STDLIB_GLOBALS`: `Math`, `Array`, `Promise`, `fetch`, …). These are never stored in XMLUI parent state.
+5. Excludes **Browser host globals** (`BROWSER_HOST_GLOBALS`: `window`, `document`, `navigator`). Deliberately minimal — ambiguous names like `location` or `history` are intentionally left out to avoid silently dropping legitimate state-variable deps (same reasoning as Bug 11).
+6. Excludes **XMLUI framework globals** (`XMLUI_GLOBAL_NAMES`): `Actions`, `toast`, `navigate`, `App`, `Log`, theme helpers, date/math/storage utilities, etc. These are wired into every expression scope by `AppContent.buildAppContextValue()` and never live in parent state. Filtering them prevents `isImplicitContainerByDefault` components (Select, List, Table) from being falsely promoted to full `StateContainer`s simply because they call a framework function.
+7. Excludes **App global names** (`appGlobalNames`): variables and functions declared in `Globals.xs`. They resolve through the global-vars layer (`useGlobalVariables`) at runtime — independent of parent state narrowing — so they must not enter `computedUses` or drive implicit-container promotion. Tracked separately as `globalDepsUsed` to populate `computedGlobalUses` (see §7).
+8. Excludes **Lexical Scoped Vars**. These are variables injected directly into the child context at render time (e.g., `$item` in `List` or `$queryParams` in `onFetch`). They are declared in component metadata (`childInjectedVars`) and event metadata (`injectedVars`), allowing the analyzer to ignore them as external dependencies.
+9. Excludes **Unstable Global Variables** (`UNSTABLE_GLOBAL_VARS`). These are navigation keys (like `$pathname`) declared in root metadata (`unstableChildInjectedVars`).
+10. Forms the `computedUses` list — a minimum set of parent state keys (including necessary child component UIDs that will register their API higher up the tree).
 
 #### Entry-point: `unwrapToComponentDef`
 `computeUsesForTree` may be called with a `CompoundComponentDef` wrapper (e.g., from `StandaloneApp`) whose actual template lives in a `.component` chain. `unwrapToComponentDef()` follows the chain — without a hard depth cap — until it reaches a node that has a `type` string or a `children` array. 
@@ -352,6 +355,7 @@ The helper `collectScriptFunctionDeps(functions, localNames)` in `computedUses.t
 
 1. For each `ArrowExpression` in the function map, wraps it as a fake `CodeDeclaration` — `{ [PARSED_MARK_PROP]: true, tree: arrowExpr }` — so that `depsOfValueWithReads` routes it through `collectVariableDependencies`. The `T_ARROW_EXPRESSION` handler in the scripting engine sets up parameter scope correctly, meaning function parameters are treated as local variables and only free vars (parent-scope refs) are returned.
 2. Performs DFS with a **visited-set** to follow transitive calls between functions in the same code-behind block. Mutual recursion (`a` calls `b`, `b` calls `a`) is handled safely — the visited-set breaks the cycle and contributes only the deps discovered before the cycle.
+   **Union-only cache invariant:** results are cached per function name inside one `collectScriptFunctionDeps` call. The cached value for `b` may be incomplete when first computed during `a`'s DFS (because `a` was still in the visited-set). This is safe only because the outer loop takes the *union* over all top-level function names — each function also receives an independent top-level pass that recovers any deps cut by the visited-set. Do not use cached per-function results directly; only the final union is correct.
 3. Separately analyzes `scriptCollected.vars` initializer expressions via `addRecord`, because a code-behind var's initial value (e.g. `var count = appState.x + 1`) may reference parent state.
 
 #### Narrowing split: node vs. children
@@ -654,10 +658,14 @@ export function narrowGlobalVars(
 
 #### Transitive closure of `uses`
 
-Before applying the inclusion rules, `narrowGlobalVars` expands `uses` transitively: for
-each key already in `uses`, if its `__tree_<key>` entry is present, `collectVariableDependencies`
-extracts the identifiers referenced by that expression AST. Any referenced name that exists
-in `vars` and is not already in `uses` is added, and the BFS continues until stable.
+Before applying the inclusion rules, `narrowGlobalVars` expands `uses` transitively using an
+**index-based worklist**: the initial `uses` array seeds a `worklist[]`; a loop walks it by
+index (not by iterator), so newly discovered deps can safely be appended to the end and
+processed in the same pass without mutating a live iterator. For each entry, if its
+`__tree_<key>` AST is present, `collectVariableDependencies` extracts identifiers referenced
+by that expression; any referenced name that exists in `vars` and is not yet in the set is
+appended to the worklist and added to `usesSet`. Each dep is processed exactly once; no
+`while(changed)` re-scan is needed.
 
 **Why this is necessary:** `useGlobalVariables` builds a `depMap` keyed by `"x:y"` to
 track when a dep `y` of global `x` changes. If `y` is narrowed out of `parentGlobalVars`,

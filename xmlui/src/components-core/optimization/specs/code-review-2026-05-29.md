@@ -19,6 +19,51 @@ Severity legend: **[H]** high · **[M]** medium · **[L]** low · **[D]** doc/co
 
 ---
 
+## Verification status (2026-05-29, post-implementation)
+
+All items marked **✅** below were re-checked against the working tree and are
+**confirmed implemented and correct**:
+
+| Item | Verified in code |
+|------|------------------|
+| 1.1 | `ComponentWrapper.tsx:126,144` (`globalVarsWithStableRef`, dep `[narrowed ?? globalVars]`); spec §2 + §7 diagram updated |
+| 1.4 | `StandaloneApp.tsx:2132-2135` (single-`fileId` assumption comment) |
+| 2.2 | `ComponentWrapper.tsx:121` (returns `undefined` → O(1) `useShallowCompareMemoize` fast-path) |
+| 2.3 | spec §7: "re-render-isolated from changes to `sortBy`" |
+| 3.2 | `computedUses.ts:186-192` (union-only cache warning) |
+| 3.3 | `ContainerUtils.ts:355-367` (index worklist; no Set mutation during iteration) |
+| 4.1 | `ContainerUtils.ts:266` (`TREE_PREFIX` const, used at 358/377/379) |
+| 4.4 | `computedUses.ts:256` (`addAll` helper, applied throughout) |
+| 5.1 | `computedUses.ts:264-293` (`ComputeUsesContext` options bag; all call sites updated) |
+| 5.2 | `computedUses.ts:17,251` (4-tuple documented) |
+| 5.3 | `diagnostics.ts:12` (`*` alignment restored) |
+| 5.4 | spec §6: `resolveRuntime` memoized + `collectImportsFromStandaloneSources` idempotent |
+| 1.2 | `abstractions.ts`: `"none"` added to `validationStatusMd`; `metadata-helpers.ts`: `dValidationStatus()` gains `isStrictEnum: true`; 4 regression tests in `verifier.test.ts` |
+
+**Behavioural re-check of the two risk-bearing fixes (1.1 / 2.2):** the
+`globalVarsWithStableRef = useMemo(() => globalVars, [narrowedGlobalVarsForComparison ?? globalVars])`
+construct was traced through both branches and is correct — when `computedGlobalUses` is
+present, the dep is the narrowed snapshot (ref-stable across unrelated global changes); when
+absent, the dep collapses to `globalVars` (plain pass-through, no O(n) compare). No staleness
+regression introduced.
+
+**New minor nit found during verification (now fixed):** the `addAll` refactor left a stray
+over-indentation at `computedUses.ts:220` (`addAll(fnAll, transitive.all)`). Corrected in this
+pass — purely cosmetic, no behaviour change.
+
+### Still open (not addressed in code)
+- **1.3** [M] standalone import resolution still re-runs per effect invocation (idempotent, but
+  redundant `fetch()` under StrictMode / `basePath` changes). Doc 5.4 now states the idempotency
+  honestly, but the redundant async work itself is unchanged.
+- **2.1** [M] `narrowGlobalVars` still forwards all functions into the comparison snapshot —
+  global-function ref stability remains unverified/untested.
+- **3.1** [M] two-step memo still relies on the disabled `exhaustive-deps` lint; no missing-dep
+  failure test added.
+- **3.4 / 4.2 / 4.3** [L] parse-failure cache, `FRAMEWORK_VARS` duplication, hand-maintained
+  globals lists — accepted as-is for now.
+
+---
+
 ## 1. Correctness bugs / risks
 
 ### 1.1 ✅ [M] Spec vs. code: `scopedGlobalVars` is NOT narrowed — it is the full object
@@ -45,18 +90,23 @@ reintroducing the write-target bug. Also note the **asymmetry** vs. `parentState
 genuinely narrowed via `extractScopedState`. Recommend: rename to e.g.
 `globalVarsWithStableRef` and fix the §7 diagram to match the implementation.
 
-### 1.2 [M] `isStrictEnum` flips enum validation from opt-out to opt-in (silent acceptance)
-`verifier.ts` and `runtime.ts` now gate enum checks on `propMeta.isStrictEnum`:
+### 1.2 ✅ [M] `isStrictEnum` flips enum validation from opt-out to opt-in (silent acceptance)
+**Fixed:** `dValidationStatus()` in `metadata-helpers.ts` now sets `isStrictEnum: true`.
+`"none"` was missing from `validationStatusMd` (commented out); it has been restored so that
+`<TextBox validationStatus="none"/>` is still valid. Four regression tests added in
+`verifier.test.ts` under "strict-enum regression — dValidationStatus helper":
+- asserts `dValidationStatus()` metadata carries `isStrictEnum: true`;
+- asserts `"none"` is present in `availableValues`;
+- asserts invalid value `"danger"` produces `value-not-in-enum`;
+- asserts all four legal values (`"none"`, `"valid"`, `"warning"`, `"error"`) pass verification.
+
+`verifier.ts` and `runtime.ts` gate enum checks on `propMeta.isStrictEnum`:
 ```ts
 if (propMeta.isStrictEnum && propMeta.availableValues && propMeta.availableValues.length > 0) {
 ```
-Previously `availableValues` alone was authoritative. Any component that relied on
-`availableValues` for validation but did **not** receive `isStrictEnum: true` in this commit
-now **silently accepts invalid values** (no `value-not-in-enum` diagnostic). The migration
-in `91194aafa` touched many components, but there is no mechanical guarantee that every prop
-that *should* stay strict was flagged. Recommend an explicit audit / a test asserting that a
-known-strict prop (e.g. `validationStatus`) still rejects out-of-enum values, so regressions
-surface in CI rather than at runtime.
+Previously `availableValues` alone was authoritative. Any shared helper that had
+`availableValues` but did **not** include `isStrictEnum: true` was silently accepting invalid
+values. `dValidationStatus()` was the confirmed affected case; it has been corrected.
 
 ### 1.3 [M] Standalone import resolution re-runs on every effect invocation, not "once"
 `StandaloneApp.tsx`: `newAppDef` is rebuilt fresh inside the

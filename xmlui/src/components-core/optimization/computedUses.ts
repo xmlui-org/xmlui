@@ -217,7 +217,7 @@ function collectScriptFunctionDeps(
       if (localNames.has(d) && d in functions) {
         // Transitive call to another local code-behind function — recurse.
         const transitive = analyzeOne(d, nextVisiting);
-            addAll(fnAll, transitive.all);
+        addAll(fnAll, transitive.all);
         addAll(fnReads, transitive.reads);
       } else {
         fnAll.add(d);

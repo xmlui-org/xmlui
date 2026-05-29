@@ -207,6 +207,7 @@ export function dValidationStatus(value?: string): ComponentPropertyMetadata {
   return {
     description: `This property allows you to set the validation status of the input component.`,
     availableValues: validationStatusMd,
+    isStrictEnum: true,
     defaultValue: value ?? "none",
   };
 }

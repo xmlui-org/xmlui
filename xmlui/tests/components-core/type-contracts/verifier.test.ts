@@ -521,4 +521,63 @@ describe("verifyComponentDef — severity escalation", () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// Strict-enum regression — shared metadata helpers (item 1.2)
+// ---------------------------------------------------------------------------
+// These tests guard against silent regressions where a shared helper loses
+// its `isStrictEnum: true` flag and starts accepting arbitrary values.
+// ---------------------------------------------------------------------------
+
+describe("strict-enum regression — dValidationStatus helper", () => {
+  // Import the real helper to verify it carries the flag.
+  // We can't use a dynamic import in describe(), so use a local inline registry
+  // that mirrors what dValidationStatus() returns.
+
+  it("dValidationStatus() metadata has isStrictEnum:true", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const meta = dValidationStatus();
+    expect(meta.isStrictEnum).toBe(true);
+  });
+
+  it("dValidationStatus() includes 'none' in availableValues", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const meta = dValidationStatus();
+    const values = (meta.availableValues ?? []).map((v: any) =>
+      typeof v === "string" ? v : v.value,
+    );
+    expect(values).toContain("none");
+  });
+
+  it("verifier rejects a value outside validationStatus enum", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const registry = makeRegistry({
+      TextBox: { props: { validationStatus: dValidationStatus() } },
+    });
+    const def = { type: "TextBox", props: { validationStatus: "danger" } } as ComponentDef;
+    const result = verifyComponentDef(def, registry);
+    expect(result).toHaveLength(1);
+    expect(result[0].code).toBe("value-not-in-enum");
+    expect(result[0].propName).toBe("validationStatus");
+  });
+
+  it("verifier accepts all valid validationStatus values", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const registry = makeRegistry({
+      TextBox: { props: { validationStatus: dValidationStatus() } },
+    });
+    for (const status of ["none", "valid", "warning", "error"]) {
+      const def = { type: "TextBox", props: { validationStatus: status } } as ComponentDef;
+      expect(verifyComponentDef(def, registry)).toHaveLength(0);
+    }
+  });
+});
+
 
