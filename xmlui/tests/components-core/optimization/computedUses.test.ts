@@ -4,7 +4,7 @@ import { computeUsesForTree as originalComputeUsesForTree, COMPUTED_USES_ENABLED
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
 import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
 import { getOptimizerMetadata } from "../../../src/components-core/optimization/metadataLookup";
-import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
+import { extractScopedState, narrowGlobalVars } from "../../../src/components-core/rendering/ContainerUtils";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { Parser } from "../../../src/parsers/scripting/Parser";
 import { collectCodeBehindFromSource } from "../../../src/parsers/scripting/code-behind-collect";
@@ -2468,5 +2468,92 @@ describe.skipIf(skipIfDisabled)("computedGlobalUses", () => {
     // child depends on parent function getFilter while narrowing is disabled
     // → safeToNarrow=false → computedGlobalUses must be undefined
     expect(child.computedGlobalUses).toBeUndefined();
+  });
+
+  it("explicit-uses container reading a global gets computedGlobalUses (improvement #2)", () => {
+    // Before the fix, `node.uses !== undefined` prevented computedGlobalUses from
+    // being annotated.  An explicit `uses` list controls parent-*state* narrowing
+    // only; globals are a separate channel that should also be narrowed.
+    const root = node("Stack", {
+      uses: ["localCount"],
+      children: [node("Text", { props: { text: "{sortBy}" } })],
+    });
+    computeUsesForTreeWithGlobals(root);
+    // `uses` must be preserved and `computedUses` must NOT be set (explicit container)
+    expect(root.uses).toEqual(["localCount"]);
+    expect(root.computedUses).toBeUndefined();
+    // The global dep is now annotated independently of the `uses` guard
+    expect(root.computedGlobalUses).toEqual(["sortBy"]);
+  });
+
+  it("explicit-uses container reading no globals has computedGlobalUses undefined", () => {
+    const root = node("Stack", {
+      uses: ["localCount"],
+      children: [node("Text", { props: { text: "{localVar}" } })],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.uses).toEqual(["localCount"]);
+    expect(root.computedGlobalUses).toBeUndefined();
+  });
+
+  it("global referenced in vars initializer appears in computedGlobalUses", () => {
+    // usedHere collects identifiers from vars initializers just like from props.
+    // A container whose vars initializer reads a global must carry that global
+    // in computedGlobalUses so narrowGlobalVars keeps it in parentGlobalVars.
+    const root = node("Stack", {
+      vars: { x: "{sortBy + 1}" },
+      children: [],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toContain("sortBy");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// narrowGlobalVars — caching (improvement #7)
+// ---------------------------------------------------------------------------
+
+describe("narrowGlobalVars cache", () => {
+  it("returns the same object reference for identical (vars, uses) inputs", () => {
+    const vars = { sortBy: "name", theme: "dark", __tree_sortBy: {}, __tree_theme: {} };
+    const uses = ["sortBy"];
+    const first = narrowGlobalVars(vars, uses);
+    const second = narrowGlobalVars(vars, uses);
+    expect(second).toBe(first); // same reference — cache hit
+  });
+
+  it("returns a different object when vars object changes", () => {
+    const vars1 = { sortBy: "name" };
+    const vars2 = { sortBy: "name" }; // same content, different identity
+    const uses = ["sortBy"];
+    const r1 = narrowGlobalVars(vars1, uses);
+    const r2 = narrowGlobalVars(vars2, uses);
+    // Different vars identity → different cache bucket → no false sharing
+    expect(r2).not.toBe(r1);
+  });
+
+  it("returns a different object when uses changes", () => {
+    const vars = { sortBy: "name", theme: "dark" };
+    const r1 = narrowGlobalVars(vars, ["sortBy"]);
+    const r2 = narrowGlobalVars(vars, ["theme"]);
+    expect(r2).not.toBe(r1);
+    expect(r1).toHaveProperty("sortBy");
+    expect(r1).not.toHaveProperty("theme");
+    expect(r2).toHaveProperty("theme");
+    expect(r2).not.toHaveProperty("sortBy");
+  });
+
+  it("cached result contains exactly the requested keys (plus functions)", () => {
+    const myFn = () => {};
+    const vars = { sortBy: "asc", theme: "light", count: 42, myFn };
+    const uses = ["sortBy"];
+    const result = narrowGlobalVars(vars, uses);
+    // Second call returns cached version — verify its contents too
+    const cached = narrowGlobalVars(vars, uses);
+    expect(cached).toBe(result);
+    expect(cached.sortBy).toBe("asc");
+    expect(cached.myFn).toBe(myFn); // functions always pass through
+    expect(cached.theme).toBeUndefined();
+    expect(cached.count).toBeUndefined();
   });
 });

@@ -5,53 +5,39 @@ optimization and areas worth revisiting.
 
 ---
 
-## 1. `disablesChildNarrowing` is too broad
+## 1. `disablesChildNarrowing` is too broad — **⚠️ Already handled**
 
 **Where:** `computedUses.ts` — `disablesChildNarrowing` flag, propagated as `nextDisableNarrowing`.
 
-**Problem:**  
+**Original concern:**  
 When a node has a `<script>` section or `.xs` code-behind functions, narrowing is
 disabled for **all of its descendants** — even descendants that don't call any of
-those functions and don't use globals transitively through them.  
-The concern is: "a child might call a parent function which in turn reads a global".
-But this is only a problem when the child *actually* references a parent-scope function
-name. For descendants with no such references this guard fires unnecessarily.
+those functions and don't use globals transitively through them.
 
-**Improvement:**  
-`dependsOnParentFunction` is already computed per-container at the node level:
+**Analysis (resolved):**  
+This concern is already handled by the existing `safeToNarrow` formula:
 ```ts
-const dependsOnParentFunction = parentFunctionNames.size > 0 &&
-  [...parentDependencies].some(d => parentFunctionNames.has(d));
+const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
 ```
-`safeToNarrow` could use this finer-grained signal instead of the blanket
-`nextDisableNarrowing`. The propagated flag would only need to suppress narrowing
-in the specific subtree branch that provably calls a parent function.
+When `nextDisableNarrowing = true` (ancestor had code-behind), `safeToNarrow` is still
+`true` as long as the current node has **no own invalid script** AND **does not call any
+parent-scope function**. So function-free descendants that don't reference the parent's
+functions ARE already narrowed.
 
-**Note:** The same fix would also recover some lost `computedUses` narrowing
-opportunities, not just `computedGlobalUses`.
+The `dependsOnParentFunction` check already acts as the fine-grained per-container
+signal described in the original "improvement" note. No code change needed.
 
 ---
 
-## 2. Explicit containers (`uses !== undefined`) never get `computedGlobalUses`
+## 2. Explicit containers (`uses !== undefined`) never get `computedGlobalUses` — ✅ **Done**
 
-**Where:** `computedUses.ts` — both `computedUses` and `computedGlobalUses` annotation
-blocks are guarded by `node.uses === undefined`.
+**Where:** `computedUses.ts`
 
-**Problem:**  
-Explicit containers that declare `uses` (or have `type="Container"`) opt into a
-developer-controlled state boundary. Currently they receive **all** `parentGlobalVars`
-with no narrowing — the same problem that existed for parent-state before this feature.
-
-**Improvement:**  
-Explicit containers could still receive a `computedGlobalUses` annotation (it doesn't
-conflict with `uses` semantics because globals are a separate channel). The annotation
-block needs a separate guard that omits the `node.uses === undefined` condition:
-```ts
-// computedGlobalUses: also narrowable for explicit containers
-if (globalDepsUsed.size > 0 && safeToNarrow) {
-  node.computedGlobalUses = Array.from(globalDepsUsed).sort();
-}
-```
+**Status:** **Implemented.** The `node.uses === undefined` guard was removed from the
+`computedGlobalUses` annotation block. Explicit containers (both `type="Container"` and
+nodes with explicit `uses`) now receive `computedGlobalUses` when their subtree reads
+globals. The `uses` property controls parent-*state* narrowing only; globals are a
+separate channel that benefits from narrowing regardless.
 
 ---
 
@@ -103,26 +89,28 @@ would need to expose the LHS identifier as a separate "write" category.
 
 ---
 
-## 5. `safeToNarrow` gate applies identically to `computedGlobalUses` and `computedUses`
+## 5. `safeToNarrow` gate applies identically to `computedGlobalUses` and `computedUses` — **⛔ Incorrect proposal**
 
 **Where:** `computedUses.ts` — single `safeToNarrow` boolean used for both annotations.
 
-**Problem:**  
-For `computedUses` (parent state narrowing), the `dependsOnParentFunction` guard makes
-sense: if a child calls a parent function, that function might read/write parent-state
-variables not visible in the static dep set.
+**Original suggestion:**  
+Use a separate `safeToNarrowGlobals` that drops `dependsOnParentFunction`, since
+"global functions pass through unconditionally".
 
-For `computedGlobalUses` (global narrowing), this concern is **less severe** because:
-- Globals.xs functions are *always* passed through `narrowGlobalVars` (limitation 3),
-  so transitive global reads inside a parent function are still reachable.
-- The annotation controls only the *variable* (non-function) subset.
+**Why this is wrong:**  
+Imagine a child B that calls parent function `doSort()`, and `doSort()` reads global
+`sortBy`. The expression dep walker correctly sees B calls `doSort`, so
+`dependsOnParentFunction = true` and `safeToNarrow = false` → B is not narrowed.
 
-**Improvement:**  
-Use a separate `safeToNarrowGlobals` flag that does not include
-`dependsOnParentFunction` (since global functions pass through unconditionally):
-```ts
-const safeToNarrowGlobals = !nextDisableNarrowing || !ownHasScript;
-```
+If we used `safeToNarrowGlobals = !nextDisableNarrowing || !ownHasScript` (ignoring
+`dependsOnParentFunction`), B *would* be narrowed. B's `globalDepsUsed` does not
+include `sortBy` (that was analyzed inside `doSort`, attributed to the *parent* node).
+So B's `computedGlobalUses` would not contain `sortBy`, and B's `parentGlobalVars`
+would not contain `sortBy`. When `doSort` runs inside B's scope and tries to read
+`sortBy`, it would get `undefined` — a silent stale-data bug.
+
+The `dependsOnParentFunction` guard is **equally necessary** for globals as it is for
+parent state. No change should be made here.
 
 ---
 
@@ -146,21 +134,17 @@ file system) and supply a valid `appGlobalNames` set to the build-time traversal
 
 ---
 
-## 7. `narrowGlobalVars` allocates a new object on every call
+## 7. `narrowGlobalVars` allocates a new object on every call — ✅ **Done**
 
-**Where:** `ContainerUtils.ts` — `narrowGlobalVars`.
+**Where:** `ContainerUtils.ts`
 
-**Problem:**  
-Even when the set of relevant globals hasn't changed, `narrowGlobalVars` always
-returns a fresh `{}` object. The `useShallowCompareMemoize` wrapper in
-`ComponentWrapper` catches unchanged key-value pairs, but the allocation still
-happens on every render where `globalVars` changes.
-
-**Improvement:**  
-Cache the last result keyed on `(vars, usesSet)`. A simple `Map<vars, Map<usesKey, result>>`
-(or a `WeakMap` on the `vars` object) would let the function return the same object
-reference when inputs are identical, short-circuiting `useMemo` before
-`useShallowCompareMemoize` even runs.
+**Status:** **Implemented.** A `WeakMap<vars, Map<cacheKey, result>>` cache was added.
+`cacheKey` is `uses.join("\0")` (stable because `computedGlobalUses` is always emitted
+sorted). The WeakMap is keyed on the `vars` object identity so entries are GC-ed when
+a `globalVars` snapshot is no longer referenced. When multiple containers share the
+same `computedGlobalUses` list and process the same `globalVars` snapshot (e.g. all
+rows in a list during one render cycle), they now get the same narrowed-object
+reference — `useShallowCompareMemoize` short-circuits on identity.
 
 ---
 
@@ -184,13 +168,13 @@ This requires `appGlobalNames` to be available at that stage.
 
 ## Summary table
 
-| # | Area | Impact | Effort |
-|---|------|--------|--------|
-| 1 | `disablesChildNarrowing` too broad | High — blocks many descendants | Medium |
-| 2 | Explicit containers miss `computedGlobalUses` | Low–Medium | Low |
-| 3 | Functions always pass through | Medium — proportional to Globals.xs size | High |
-| 4 | Write-only globals (correctness) | Low (mitigated) | Medium |
-| 5 | Shared `safeToNarrow` gate | Low–Medium | Low |
-| 6 | Parse-time `appGlobalNames` empty | Low | Medium |
-| 7 | `narrowGlobalVars` allocation | Low | Low |
-| 8 | UDC templates not analysed | Medium (UDC-heavy apps) | High |
+| # | Area | Impact | Effort | Status |
+|---|------|--------|--------|--------|
+| 1 | `disablesChildNarrowing` too broad | High — blocks many descendants | — | ⚠️ Already handled by `safeToNarrow` formula |
+| 2 | Explicit containers miss `computedGlobalUses` | Low–Medium | Low | ✅ Done |
+| 3 | Functions always pass through | Medium — proportional to Globals.xs size | High | Open |
+| 4 | Write-only globals (correctness) | Low (mitigated) | Medium | Open |
+| 5 | Shared `safeToNarrow` gate | Low–Medium | Low | ⛔ Incorrect proposal — see analysis |
+| 6 | Parse-time `appGlobalNames` empty | Low | Medium | Open |
+| 7 | `narrowGlobalVars` allocation | Low | Low | ✅ Done |
+| 8 | UDC templates not analysed | Medium (UDC-heavy apps) | High | Open |

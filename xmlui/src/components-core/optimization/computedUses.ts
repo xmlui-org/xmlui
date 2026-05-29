@@ -541,7 +541,12 @@ function computeUsesInternal(
     // Uses the same safeToNarrow guard as computedUses: nodes with incomplete
     // dep sets (hasInvalidStatements) must not be narrowed to avoid silently
     // dropping globals that were read in unparsed statements.
-    if (node.uses === undefined && globalDepsUsed.size > 0 && safeToNarrow) {
+    //
+    // Unlike computedUses, this annotation is set for BOTH implicit and explicit
+    // containers (node.uses !== undefined). The `uses` property controls parent
+    // *state* narrowing, not global-vars narrowing — explicit containers still
+    // benefit from not re-rendering when unrelated Globals.xs vars change.
+    if (globalDepsUsed.size > 0 && safeToNarrow) {
       node.computedGlobalUses = Array.from(globalDepsUsed).sort();
     }
 

@@ -281,6 +281,33 @@ function getGlobalFunctionKeys(vars: Record<string, any>): Set<string> {
 }
 
 /**
+ * Result cache for `narrowGlobalVars`.
+ *
+ * Structure: `WeakMap<vars, Map<cacheKey, result>>`.
+ * - Outer key is the `globalVars` object identity (WeakMap → GC-safe; a new
+ *   snapshot is produced by `useShallowCompareMemoize` only when values change).
+ * - Inner key is `uses.join("\0")`, stable because `computedGlobalUses` is
+ *   always emitted sorted. The `\0` separator prevents delimiter-collision
+ *   attacks from variable names that contain the separator character.
+ *
+ * Benefit: containers sharing the same `computedGlobalUses` in a single render
+ * pass all receive the same narrowed-object reference. `useShallowCompareMemoize`
+ * in `ComponentWrapper` can short-circuit on identity rather than doing a full
+ * shallow comparison.
+ *
+ * ⚠ Immutability contract: every cached result is frozen in development builds
+ * (`Object.freeze`). Callers **must not mutate** the returned object — it is
+ * shared across every container with the same `(vars, uses)` combination. An
+ * in-place write would silently corrupt all other consumers in the same pass.
+ *
+ * ⚠ Correctness depends on `vars` snapshots being immutable. If a snapshot
+ * were mutated in place, the cache would serve stale values for the same key.
+ * This invariant is upheld by `global-variables.ts`, which produces a new
+ * object reference via `useShallowCompareMemoize` whenever any value changes.
+ */
+const _narrowCache = new WeakMap<object, Map<string, Record<string, any>>>();
+
+/**
  * Narrows a `parentGlobalVars` record to only the keys actually read by a
  * component subtree (according to `computedGlobalUses`).
  *
@@ -293,11 +320,21 @@ function getGlobalFunctionKeys(vars: Record<string, any>): Set<string> {
  * - The uses set is expanded transitively: if global X depends on global Y
  *   (expressed via `__tree_X` AST), Y is also included so dep-tracking in
  *   `useGlobalVariables` can compute the correct depMap entry for X.
+ *
+ * The returned object is **shared and immutable** — see `_narrowCache` contract
+ * above. Never mutate the result; use it as a read-only snapshot.
  */
 export function narrowGlobalVars(
   vars: Record<string, any>,
   uses: readonly string[],
 ): Record<string, any> {
+  // Cache lookup.
+  // `uses` is always sorted (computedGlobalUses is emitted sorted), so joining
+  // with \0 produces a stable, collision-free key without needing to sort here.
+  const cacheKey = uses.join("\0");
+  const varMap = _narrowCache.get(vars);
+  if (varMap?.has(cacheKey)) return varMap.get(cacheKey)!;
+
   const usesSet = new Set(uses);
 
   // Expand usesSet transitively: for each included global, if its __tree_* AST
@@ -338,5 +375,19 @@ export function narrowGlobalVars(
       result[key] = value;
     }
   }
+
+  // Freeze in dev/test builds so that any accidental mutation is caught
+  // immediately rather than causing a subtle cross-container corruption bug.
+  if (import.meta.env.DEV) {
+    Object.freeze(result);
+  }
+
+  // Store in cache before returning.
+  const newVarMap = varMap ?? new Map<string, Record<string, any>>();
+  if (!varMap) {
+    _narrowCache.set(vars, newVarMap);
+  }
+  newVarMap.set(cacheKey, result);
+
   return result;
 }

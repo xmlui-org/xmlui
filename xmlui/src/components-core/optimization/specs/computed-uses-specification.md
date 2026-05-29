@@ -88,7 +88,7 @@ When an event handler executes, it needs two things simultaneously: **isolation*
 1. `stateRef.current` is shallow-copied at the root: `const poj = { ...originalState }`. This gives each invocation its own root object, so injections (`$this`, `$cancel`, `context` overrides) don't affect the live state.
 2. **Component API object tagging (`__componentApiKey__`).** Before creating the proxy, the function iterates `Object.getOwnPropertySymbols(originalState)` to find component API objects — values registered under `Symbol("uid")` keys (e.g. `Symbol("ds")`). For each such object it attaches a non-enumerable `__componentApiKey__` property. This lets the reducer detect API-object references in handler writes (e.g., `myGlobal = ds`) and keep the variable in sync with the live API across subsequent renders.
 
-   **Immer-frozen API objects (invariant).** After each `produce()` call, Immer deep-freezes all objects in state — including component API objects. Because `poj = { ...originalState }` only shallow-copies the root, `poj[uid]` still points to the Immer-frozen original. A frozen object is non-extensible, so `Object.defineProperty(poj[uid], "__componentApiKey__", ...)` would throw `"object is not extensible"`. The fix: `if (!Object.isExtensible(poj[desc])) poj[desc] = { ...poj[desc] }` — a shallow-copy creates a mutable instance before the property is attached. This is equivalent to the old `cloneDeep` behaviour for API objects (getters are invoked, giving snapshot values; method references are preserved).
+   **Immer-frozen API objects (invariant).** After each `produce()` call, Immer deep-freezes all objects in state — including component API objects. Because `poj = { ...originalState }` only shallow-copies the root, `poj[uid]` still points to the Immer-frozen original. A frozen object is non-extensible, so `Object.defineProperty(poj[uid], "__componentApiKey__", ...)` would throw `"object is not extensible"`. Therefore: `if (!Object.isExtensible(poj[desc])) poj[desc] = { ...poj[desc] }` — a shallow-copy produces a mutable instance before the property is attached. Getters are invoked on the original (snapshot values) and method references are preserved.
 3. `createCoWStateProxy(poj, onWrite)` wraps the root copy in a CoW Proxy. `poj` is the "working state" — an extensible shallow copy whose nested properties still point to the original (potentially Immer-frozen) values.
 4. The resulting proxy is passed as `evalContext.localContext` — the mutable state context seen by the script runner.
 
@@ -110,7 +110,7 @@ When a handler assigns one CoW sub-proxy to another key (`state.a = state.b`), t
 ### Lexical Scoping (Immutable Scope Propagation Mechanism)
 Instead of hardcoded lists of "special" variables, the optimizer uses metadata to build the lexical scope during AST traversal:
 - **Component Scope:** Container components (like `List`, `Table`, `ModalDialog`) declare `childInjectedVars`. All expressions in children of these components automatically filter these variables.
-- **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars` inline in the component's `createMetadata()` call, in the `events[eventName].injectedVars` field. Expressions inside a specific handler filter these variables. Previously a `withInjectedContext`/`eventsInheritChildVars` utility in a central registry auto-copied child vars to event scopes; those fields are now written out explicitly per-event in each component file.
+- **Event Scope:** Event handlers (like `onFetch` in `DataLoader`) declare `injectedVars` inline in the component's `createMetadata()` call, in the `events[eventName].injectedVars` field. Each event entry is self-contained — one place to look when adding or changing an event's injected variable set. Expressions inside a specific handler filter these variables.
 - **Shadowing:** Metadata-driven scoping allows local variables (like `$queryParams` in `onFetch`) to naturally shadow global ones (like router `$queryParams`), preventing false parent dependencies.
 
 ### Inline Optimizer Fields in `ComponentMetadata` (single declaration, dual path)
@@ -344,7 +344,7 @@ const stateContext: ContainerState = { ...componentState, ...ret };
 
 ### Code-Behind Transitive Analysis (`scriptCollected` and `.xs` files)
 
-The optimizer performs **transitive AST analysis** of code-behind function bodies to determine actual parent-scope dependencies — replacing the old blanket "never narrow if there is code-behind" rule.
+The optimizer performs **transitive AST analysis** of code-behind function bodies to determine the actual parent-scope dependencies of each function.
 
 #### `collectScriptFunctionDeps` — DFS function-body analysis
 
@@ -587,8 +587,21 @@ Steps during traversal:
 3. After `processChildList`, an `isGlobalDep` predicate identifies names in `usedHere`
    where `appGlobalNames.has(d)` and the name is not in `localDeclared` or
    `injectedVarsScope`. These, unioned with `childGlobalDeps`, form `globalDepsUsed`.
-4. For container nodes: if `globalDepsUsed` is non-empty and `node.uses === undefined`,
+4. For container nodes (both implicit and explicit — the `node.uses` field controls
+   *parent-state* narrowing only and is irrelevant here): if `globalDepsUsed` is
+   non-empty **and `safeToNarrow` is true** (the same guard that protects `computedUses`),
    `node.computedGlobalUses = Array.from(globalDepsUsed).sort()`.
+
+**`safeToNarrow` gate:** `computedGlobalUses` is subject to the same safety conditions
+as `computedUses`:
+- Nodes with `scriptCollected.hasInvalidStatements = true` have an incomplete dep set;
+  a global read only in an unparsed statement would be absent from `globalDepsUsed`, so
+  `computedGlobalUses` would silently strip it from `parentGlobalVars` at runtime.
+- Nodes that depend on a parent-scope function while `nextDisableNarrowing = true` are
+  also considered unsafe for the same reason.
+
+In both cases `safeToNarrow = false` and `node.computedGlobalUses` is left `undefined`,
+causing `ComponentWrapper` to pass the full un-narrowed `globalVars` downstream.
 
 **Why a separate 4th return value?**  
 `keepDep` filters `appGlobalNames` out of `parentDependencies` — Globals.xs names must not
@@ -620,19 +633,66 @@ export function narrowGlobalVars(
 ): Record<string, any>
 ```
 
-Three categories of keys:
+#### Key inclusion rules
 
 | Key pattern | Included? | Rationale |
 |-------------|-----------|-----------|
 | `typeof value === "function"` | **Always** | Globals.xs functions may be called from any expression in the subtree; cannot be narrowed |
-| `__tree_<name>` | Only when `name ∈ uses` | AST metadata used by `useGlobalVariables` for dep-tracking; relevant only when the variable is in scope |
-| all other value keys | Only when `key ∈ uses` | Core narrowing: variables not in the subtree's read-set are excluded |
+| `__tree_<name>` | Only when `name ∈ uses` (after transitive expansion) | AST metadata for `useGlobalVariables` dep-tracking; relevant only when the variable is in scope |
+| all other value keys | Only when `key ∈ uses` (after transitive expansion) | Core narrowing: variables not in the subtree's read-set are excluded |
+
+#### Transitive closure of `uses`
+
+Before applying the inclusion rules, `narrowGlobalVars` expands `uses` transitively: for
+each key already in `uses`, if its `__tree_<key>` entry is present, `collectVariableDependencies`
+extracts the identifiers referenced by that expression AST. Any referenced name that exists
+in `vars` and is not already in `uses` is added, and the BFS continues until stable.
+
+**Why this is necessary:** `useGlobalVariables` builds a `depMap` keyed by `"x:y"` to
+track when a dep `y` of global `x` changes. If `y` is narrowed out of `parentGlobalVars`,
+`allCurrentGlobals.y` is `undefined`, the dep-map entry is always `undefined`, and
+`useGlobalVariables` cannot detect that `y` changed — potentially serving a stale value for
+`x`. Including transitive deps prevents this.
+
+#### Function-key cache
+
+`narrowGlobalVars` maintains a module-level `WeakMap` (`_globalFunctionKeysCache`) from
+`vars` reference → `Set<string>` of function-typed keys. All containers rendered in the
+same pass share the same `parentGlobalVars` reference; the first container populates the
+cache and all subsequent containers reuse it without scanning the entire object again.
+
+#### Result cache
+
+A second module-level `WeakMap` (`_narrowCache`) caches the **full narrowed result**
+object keyed on `(vars, usesKey)` where `usesKey = uses.join("\0")` (stable because
+`computedGlobalUses` is always emitted sorted; `\0` avoids delimiter collisions).
+
+```
+_narrowCache: WeakMap<vars, Map<usesKey, narrowedObject>>
+```
+
+Benefit: containers that share the same `computedGlobalUses` list across a single render
+pass (e.g. all rows in a file list all reading `["sortBy", "view"]`) receive the
+**same object reference**. `useShallowCompareMemoize` in `ComponentWrapper` can then
+short-circuit on identity before even doing a key-by-key comparison.
+
+**Immutability contract:** every cached result is `Object.freeze`d in development builds.
+Callers **must not mutate** the returned object — it is shared across all consumers with
+the same `(vars, uses)` combination. An in-place write would silently corrupt every
+other container in the same render pass.
+
+**Snapshot immutability:** the cache is correct only because `globalVars` snapshots are
+effectively immutable — `global-variables.ts` produces a new object reference via
+`useShallowCompareMemoize` whenever any value changes, so the same object identity
+always corresponds to the same content.
 
 ### `ComponentWrapper.tsx` applies the narrowing
 
 ```typescript
 const nodeComputedGlobalUses = nodeWithTransformedDatasourceProp.computedGlobalUses;
-const scopedGlobalVars = useShallowCompareMemoize(
+
+// Step 1 — narrow snapshot for change-detection only.
+const narrowedGlobalVarsForComparison = useShallowCompareMemoize(
   useMemo(
     () =>
       nodeComputedGlobalUses && globalVars
@@ -641,13 +701,20 @@ const scopedGlobalVars = useShallowCompareMemoize(
     [globalVars, nodeComputedGlobalUses],
   ),
 );
+// Step 2 — pass the FULL globalVars to the child, but update its reference
+// only when the narrow snapshot changes. This ensures write targets that are
+// absent from computedGlobalUses (e.g. `view = 'large'`) are still present
+// in the scope exposed to the child's expression evaluator.
+// eslint-disable-next-line react-hooks/exhaustive-deps
+const scopedGlobalVars = useMemo(() => globalVars, [narrowedGlobalVarsForComparison]);
 // ...
 <ContainerWrapper parentGlobalVars={scopedGlobalVars} ... />
 ```
 
-When an unrelated global changes, the narrowed object's contents are identical, the
-memoize returns the same reference, `useGlobalVariables` sees the same `parentGlobalVars`,
-and no re-render is triggered.
+When an unrelated global changes, the narrowed comparison snapshot's contents are
+identical, `useShallowCompareMemoize` returns the same reference, the outer `useMemo`
+does not recompute, `scopedGlobalVars` keeps the same reference, and `ContainerWrapper.memo`
+sees unchanged props — no re-render is triggered.
 
 ### Scope of the change
 

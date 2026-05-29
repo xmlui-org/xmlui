@@ -397,6 +397,15 @@ describe("ContainerUtils", () => {
       const result = narrowGlobalVars(vars, []);
       expect(Object.keys(result)).toHaveLength(0);
     });
+
+    it("cached result is frozen in dev/test builds", () => {
+      // Object.freeze is applied to every cached result when import.meta.env.DEV is true
+      // (which is the case in Vitest). Callers must treat the result as read-only;
+      // this test documents and enforces that contract.
+      const vars = { sortBy: "name", theme: "dark" };
+      const result = narrowGlobalVars(vars, ["sortBy"]);
+      expect(Object.isFrozen(result)).toBe(true);
+    });
   });
 
   describe("ParseVarError", () => {
