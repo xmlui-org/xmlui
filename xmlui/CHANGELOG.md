@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.12.29
+
+### Patch Changes
+
+- f922701: Fixed code text applying background color in a codefence (pre element). Made table and markdown table styles more consistent.
+
 ## 0.12.28
 
 ### Patch Changes
