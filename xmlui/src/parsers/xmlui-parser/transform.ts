@@ -1,6 +1,7 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
+import { collectVariableDependencies } from "../../components-core/script-runner/visitors";
 import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { Node } from "./syntax-node";
 import { SyntaxKind } from "./syntax-kind";
@@ -1506,13 +1507,29 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
 
   for (const child of component.children) {
     if (child.type === "Fragment" && child.scriptCollected) {
-      // Check if the script references context variables (like $item, $itemIndex, etc.)
-      // Use a regex to match $identifier patterns, NOT template literal interpolations like ${...}
-      const hasContextVarReferences = child.script != null && /\$[a-zA-Z_]/.test(child.script);
+      // Use AST-level analysis instead of a textual regex to detect $contextVar
+      // references.  Iterating over the collected AST trees avoids false
+      // positives from `$word` appearing inside string literals or comments.
+      const hasContextVarReferences = scriptCollectedReadsContextVars(child.scriptCollected);
 
       // Only hoist if there are no context variable references
       // Context variables are component-specific and should remain at the iteration level
       if (!hasContextVarReferences) {
+        // Guard against duplicate name collisions before merging.
+        // If parent and Fragment declare the same var/function name, a later
+        // re-parse of the concatenated script would see a duplicate declaration.
+        const parentVars = Object.keys(component.scriptCollected?.vars ?? {});
+        const parentFns = Object.keys(component.scriptCollected?.functions ?? {});
+        const childVarKeys = Object.keys(child.scriptCollected.vars ?? {});
+        const childFnKeys = Object.keys(child.scriptCollected.functions ?? {});
+        const hasDuplicateVars = childVarKeys.some((k) => parentVars.includes(k));
+        const hasDuplicateFns = childFnKeys.some((k) => parentFns.includes(k));
+        if (hasDuplicateVars || hasDuplicateFns) {
+          // Leave the Fragment's script in place rather than risk a duplicate-
+          // declaration error during a later re-parse pass.
+          continue;
+        }
+
         // Merge the Fragment's scriptCollected into the parent
         if (!component.scriptCollected) {
           component.scriptCollected = child.scriptCollected;
@@ -1535,6 +1552,36 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
       }
     }
   }
+}
+
+/**
+ * Returns true if any collected declaration in `sc` reads an identifier that
+ * starts with `$` (a context variable injected by a parent component such as
+ * `$item` or `$index`).  Uses the parsed AST trees directly instead of a
+ * textual regex so that `$word` inside string literals or comments does not
+ * trigger a false positive.
+ */
+function scriptCollectedReadsContextVars(sc: CollectedDeclarations): boolean {
+  const check = (tree: unknown): boolean => {
+    if (!tree) return false;
+    try {
+      const deps = collectVariableDependencies(tree as any);
+      return deps.some((d) => d.startsWith("$"));
+    } catch {
+      // If the AST can't be walked, fall back to conservative: treat as
+      // having context var references to avoid a lost dependency.
+      return true;
+    }
+  };
+  for (const decl of Object.values(sc.vars ?? {})) {
+    // vars entries are { tree: Expression, ... }
+    if (check((decl as any).tree)) return true;
+  }
+  for (const decl of Object.values(sc.functions ?? {})) {
+    // functions entries are stored directly as ArrowExpression (not wrapped in { tree })
+    if (check(decl)) return true;
+  }
+  return false;
 }
 
 function getAttributes(node: Node): Node[] {

@@ -519,14 +519,29 @@ function computeUsesInternal(
   for (const d of usedHereReads) if (keepDep(d)) parentDependenciesReads.add(d);
   for (const d of childDepsReads) if (keepDep(d)) parentDependenciesReads.add(d);
 
-  // Collect Globals.xs names used in this subtree (filtered by appGlobalNames, not localDeclared or injectedVars).
-  // These are the global var names the keepDep filter would reject — they need their own tracking.
+  // Collect Globals.xs names READ in this subtree (filtered by appGlobalNames,
+  // not localDeclared or injectedVars). These are the global var names that the
+  // keepDep filter would reject — they need their own tracking.
+  //
+  // Reads-only (NOT `usedHere`): write-only globals must NOT inflate
+  // `computedGlobalUses`. The two-step `ComponentWrapper` design always
+  // forwards the full `globalVars` to the child for evaluation, so write
+  // targets are reachable at runtime even when absent from the narrowing set.
+  // Including them would only cause unnecessary re-renders whenever an
+  // externally-changed write-only global causes the snapshot to differ — with
+  // no visible effect on the subtree because it never reads the value.
+  //
+  // Contrast with parent-state `computedUses` (built from `parentDependencies`,
+  // which uses `usedHere = all`): that MUST keep write targets because
+  // `extractScopedState` is the actual evaluation scope and the script engine
+  // throws "Left value variable not found in the scope" if a write target is
+  // missing from the narrowed state.
   const isGlobalDep = (d: string) =>
     appGlobalNames.has(d) &&
     !localDeclared.has(d) &&
     !injectedVarsScope.has(d);
   const globalDepsUsed = new Set<string>();
-  for (const d of usedHere) if (isGlobalDep(d)) globalDepsUsed.add(d);
+  for (const d of usedHereReads) if (isGlobalDep(d)) globalDepsUsed.add(d);
   addAll(globalDepsUsed, childGlobalDeps);
 
   // If this node is an implicit stateful component (Select, List, Table, etc.)

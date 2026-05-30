@@ -2116,7 +2116,7 @@ export async function collectImportsFromStandaloneSources(
         // C4: Sequential execution because this clears global caches
         const resolved = await collectCodeBehindFromSourceWithImports(fileId, script, moduleFetcher);
         removeCodeBehindTokensFromTree(resolved);
-        
+
         // M3: Merge resolved imports. Sync-collected own decls win.
         comp.scriptCollected.functions = { ...resolved.functions, ...comp.scriptCollected.functions };
         comp.scriptCollected.vars = { ...resolved.vars, ...comp.scriptCollected.vars };
@@ -2141,7 +2141,7 @@ export async function collectImportsFromStandaloneSources(
       }
     };
     visitComponent(root as ComponentDef, null, visitor, {}, metadataHandler);
-    
+
     for (const node of nodesToProcess) {
       await resolveForComponent(node, fileId);
     }
@@ -2151,12 +2151,12 @@ export async function collectImportsFromStandaloneSources(
   if (appDef.entryPoint) {
     await walkTreeAndResolve(appDef.entryPoint as ComponentDef, projectCompilation.entrypoint.filename);
   }
-  
+
   if (appDef.components) {
     for (const comp of appDef.components) {
       // Find the filename from projectCompilation
       const compFileName = projectCompilation.components.find((c) => c.definition?.name === comp.name)?.filename || comp.name + ".xmlui";
-      
+
       // For compound components, the wrapper itself might have a script
       if (comp.scriptCollected?.hasUnresolvableImports) {
         await resolveForComponent(comp, compFileName);

@@ -142,7 +142,7 @@ export function collectVariableDependencies(
           case T_FOR_STATEMENT:
             thread.blocks!.push({ vars: {} });
             if (stmt.init) {
-              stmtDeps.concat(collectDependencies([stmt.init], stmt, "for"));
+              stmtDeps = stmtDeps.concat(collectDependencies([stmt.init], stmt, "for"));
             }
             if (stmt.cond) {
               stmtDeps = stmtDeps.concat(collectDependencies(stmt.cond, stmt, "for"));

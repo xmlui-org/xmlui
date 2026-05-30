@@ -580,4 +580,156 @@ describe("strict-enum regression — dValidationStatus helper", () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// Guard test: isStrictEnum audit across all components (item 1.2)
+//
+// Every prop with `availableValues` must declare an explicit `isStrictEnum`
+// decision so future additions can't silently skip validation.
+//
+// The allow-list below is the authoritative registry of pre-existing props
+// that were permissive before the isStrictEnum feature was introduced.
+// New props with `availableValues` NOT in this list must explicitly set
+// `isStrictEnum: true` or be added to the list with a justification comment.
+// ---------------------------------------------------------------------------
+describe("isStrictEnum audit — all availableValues props must declare an explicit decision", () => {
+  // Pre-existing props with availableValues that are intentionally permissive.
+  // These were present before the isStrictEnum opt-in model was introduced.
+  // Do NOT add new props here without justification — new props should use
+  // isStrictEnum: true unless they are intentionally open-ended.
+  const INTENTIONALLY_PERMISSIVE = new Set<string>([
+    "Accordion.triggerPosition",
+    "APICall.method",
+    "APICall.credentials",
+    "APICall.statusMethod",
+    "APICall.cancelMethod",
+    "App.layout",
+    "Avatar.size",
+    "Badge.variant",
+    "Button.variant",
+    "Button.themeColor",
+    "Button.size",
+    "Button.type",
+    "Button.orientation",
+    "Button.iconPosition",
+    "Button.contentPosition",
+    "Card.avatarSize",
+    "Card.orientation",
+    "Card.horizontalAlignment",
+    "Card.verticalAlignment",
+    "ContentSeparator.orientation",
+    "DataSource.method",
+    "DataSource.credentials",
+    "DataSource.dataType",
+    "DatePicker.mode",
+    "DatePicker.dateFormat",
+    "DatePicker.weekStartsOn",
+    "DateInput.mode",
+    "DateInput.dateFormat",
+    "DateInput.weekStartsOn",
+    "DropdownMenu.alignment",
+    "DropdownMenu.triggerButtonVariant",
+    "DropdownMenu.triggerButtonThemeColor",
+    "DropdownMenu.triggerButtonIconPosition",
+    "MenuItem.iconPosition",
+    "SubMenuItem.iconPosition",
+    "ExpandableItem.iconPosition",
+    "FileInput.buttonVariant",
+    "FileInput.buttonIconPosition",
+    "FileInput.buttonPosition",
+    "FileInput.buttonSize",
+    "FileInput.buttonThemeColor",
+    "FileInput.parseAs",
+    "FlowLayout.verticalAlignment",
+    "Form.itemLabelPosition",
+    "Form.itemRequireLabelMode",
+    "FormItem.labelPosition",
+    "FormItem.type",
+    "FormItem.validationMode",
+    "FormItem.requireLabelMode",
+    "FormItem.lengthInvalidSeverity",
+    "FormItem.rangeInvalidSeverity",
+    "FormItem.patternInvalidSeverity",
+    "FormItem.validatorInvalidSeverity",
+    "FormItem.regexInvalidSeverity",
+    "Heading.level",
+    "Icon.size",
+    "IFrame.referrerPolicy",
+    "Link.target",
+    "Link.horizontalAlignment",
+    "Link.verticalAlignment",
+    "Link.breakMode",
+    "Link.overflowMode",
+    "List.scrollAnchor",
+    "List.selectionCheckboxPosition",
+    "List.selectionCheckboxAnchor",
+    "Markdown.breakMode",
+    "Markdown.overflowMode",
+    "NavGroup.iconAlignment",
+    "NavGroup.expandIconAlignment",
+    "NavLink.target",
+    "NavLink.iconAlignment",
+    "Pagination.maxVisiblePages",
+    "Pagination.orientation",
+    "Pagination.buttonRowPosition",
+    "RadioGroup.orientation",
+    "ResponsiveBar.dropdownAlignment",
+    "Select.variant",
+    "Stack.horizontalAlignment",
+    "Stack.verticalAlignment",
+    "CHStack.horizontalAlignment",
+    "CHStack.verticalAlignment",
+    "CVStack.horizontalAlignment",
+    "CVStack.verticalAlignment",
+    "HStack.horizontalAlignment",
+    "HStack.verticalAlignment",
+    "VStack.horizontalAlignment",
+    "VStack.verticalAlignment",
+    "Table.buttonRowPosition",
+    "Table.paginationControlsLocation",
+    "Table.checkboxTolerance",
+    "Table.headerUserSelect",
+    "Table.cellUserSelect",
+    "Table.userSelectCell",
+    "Table.userSelectRow",
+    "Table.userSelectHeading",
+    "Text.variant",
+    "TextArea.resize",
+    "TileGrid.checkboxPosition",
+    "TileGrid.itemUserSelect",
+  ]);
+
+  // Timeout is generous because the dynamic import below loads the full
+  // component-metadata barrel (large, slow on cold caches). On warm runs the
+  // test completes in seconds; on cold/CI runs the import alone can take 30s+.
+  // Keep this above the worst observed cold-import time to avoid flakiness.
+  it("every availableValues prop either has isStrictEnum:true or is in the allow-list", { timeout: 120000 }, async () => {
+    const { collectedComponentMetadata } = await import(
+      "../../../src/components/collectedComponentMetadata"
+    );
+
+    const violations: string[] = [];
+
+    for (const [compName, meta] of Object.entries(collectedComponentMetadata as Record<string, any>)) {
+      const props: Record<string, any> = meta?.props ?? {};
+      for (const [propName, propMeta] of Object.entries(props)) {
+        if (!propMeta || !propMeta.availableValues || propMeta.availableValues.length === 0) {
+          continue;
+        }
+        const key = `${compName}.${propName}`;
+        if (!propMeta.isStrictEnum && !INTENTIONALLY_PERMISSIVE.has(key)) {
+          violations.push(key);
+        }
+      }
+    }
+
+    if (violations.length > 0) {
+      throw new Error(
+        `The following NEW props have availableValues but no isStrictEnum decision.\n` +
+        `Either add \`isStrictEnum: true\` (strict enforcement) or add the key to ` +
+        `INTENTIONALLY_PERMISSIVE in this test (document the reason).\n\n` +
+        violations.map(v => `  - ${v}`).join("\n"),
+      );
+    }
+  });
+});
 

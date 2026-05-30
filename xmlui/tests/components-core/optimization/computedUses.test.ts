@@ -2507,6 +2507,57 @@ describe.skipIf(skipIfDisabled)("computedGlobalUses", () => {
     computeUsesForTreeWithGlobals(root);
     expect(root.computedGlobalUses).toContain("sortBy");
   });
+
+  // -------------------------------------------------------------------------
+  // Reads-only semantics (TODO #4 — write-only globals must not inflate the
+  // comparison snapshot). The two-step ComponentWrapper always forwards the
+  // full globalVars for evaluation, so write targets are reachable at runtime
+  // even when absent from computedGlobalUses. Including pure write-only
+  // globals would only cause needless re-renders when an external change to
+  // them differs from the cached snapshot.
+  // -------------------------------------------------------------------------
+  it("write-only global is NOT included in computedGlobalUses", () => {
+    // `sortBy` is in appGlobalNames; the handler writes it but never reads it.
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("Button", {
+          events: { click: parsedEvent("sortBy = 'name'") },
+        }),
+      ],
+    });
+    computeUsesForTreeWithGlobals(root);
+    // No reads of any global → computedGlobalUses must be undefined.
+    expect(root.computedGlobalUses).toBeUndefined();
+  });
+
+  it("global that is BOTH read and written stays in computedGlobalUses", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("Button", {
+          events: { click: parsedEvent("sortBy = sortBy + '_x'") },
+        }),
+      ],
+    });
+    computeUsesForTreeWithGlobals(root);
+    // RHS reads `sortBy` → it is in usedHereReads → kept.
+    expect(root.computedGlobalUses).toEqual(["sortBy"]);
+  });
+
+  it("mixed: one global read, another global write-only — only the read is annotated", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("Text", { props: { text: "{theme}" } }), // read
+        node("Button", {
+          events: { click: parsedEvent("sortBy = 'desc'") }, // write-only
+        }),
+      ],
+    });
+    computeUsesForTreeWithGlobals(root);
+    expect(root.computedGlobalUses).toEqual(["theme"]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -2557,3 +2608,54 @@ describe("narrowGlobalVars cache", () => {
     expect(cached.count).toBeUndefined();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Regression: for-loop init dependency tracking (bug 1.1)
+//
+// `for (let i = startRow; i < total; i++)` — the `startRow` reference appears
+// only in the init clause, which previously called `.concat()` without
+// re-assigning the result (non-mutating). The fix assigns the returned array:
+//   stmtDeps = stmtDeps.concat(collectDependencies([stmt.init], stmt, "for"));
+// ---------------------------------------------------------------------------
+describe.skipIf(skipIfDisabled)(
+  "computeUsesForTree — for-loop init dependency tracking",
+  () => {
+    it("parent var used only in for-init appears in computedUses", () => {
+      // startRow and total are external vars (not declared in root.vars).
+      // The for-init clause is the ONLY place they appear — previously the
+      // .concat() result was discarded, so they were silently dropped.
+      const root = node("Stack", {
+        vars: { dummy: "{0}" },
+        children: [
+          node("Button", {
+            events: {
+              click: parsedEvent("for (let i = startRow; i < total; i++) {}"),
+            },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      expect(root.computedUses).toContain("startRow");
+      expect(root.computedUses).toContain("total");
+    });
+
+    it("parent var used only in for-init clause with no cond/upd appears in computedUses", () => {
+      // Edge case: no condition or update expression — only the init clause
+      // references the external variable.
+      const root = node("Stack", {
+        vars: { dummy: "{0}" },
+        children: [
+          node("Button", {
+            events: {
+              // `let row = items[0]` reads `items` in the init, nothing else
+              click: parsedEvent("for (let row = items[0]; ; ) { break; }"),
+            },
+          }),
+        ],
+      });
+      computeUsesForTree(root);
+      expect(root.computedUses).toContain("items");
+    });
+  },
+);
+

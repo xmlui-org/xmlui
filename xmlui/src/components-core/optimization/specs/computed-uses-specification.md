@@ -1,6 +1,6 @@
 # computedUses — Architectural Specification
 
-> This document describes the `computedUses` feature: how it works, its architectural implementation, potential pitfalls, and future directions for improvement. For a full chronology of identified and fixed bugs during implementation, see [bugs-history.md](./bugs-history.md).
+> This document describes the `computedUses` feature: how it works, its architectural implementation, potential pitfalls, and future directions for improvement.
 
 ---
 
@@ -37,7 +37,7 @@ The algorithm works bottom-up, traversing the `ComponentDef` tree before connect
 2. Retrieves identifiers "leaking" from children (`childDeps`).
 3. Excludes **locally provided** variables (`vars`, `loaders`, runtime `node.contextVars` like `$item`, functions). `node.contextVars` refers to `ComponentDef.contextVars` — a field set on wrapper nodes by renderers that create per-instance containers (e.g., ContextMenu creates a `Container` with `contextVars: { $context }`). Adding these to `localDeclared` prevents the container from reporting `$context` as an external dependency — it absorbs it as locally provided for children.
 4. Excludes **ECMAScript / platform built-ins** (`JS_STDLIB_GLOBALS`: `Math`, `Array`, `Promise`, `fetch`, …). These are never stored in XMLUI parent state.
-5. Excludes **Browser host globals** (`BROWSER_HOST_GLOBALS`: `window`, `document`, `navigator`). Deliberately minimal — ambiguous names like `location` or `history` are intentionally left out to avoid silently dropping legitimate state-variable deps (same reasoning as Bug 11).
+5. Excludes **Browser host globals** (`BROWSER_HOST_GLOBALS`: `window`, `document`, `navigator`). Deliberately minimal — ambiguous names like `location` or `history` are intentionally left out to avoid silently dropping legitimate state-variable deps (a developer could name a variable `location`, and filtering it would silently remove a real dependency).
 6. Excludes **XMLUI framework globals** (`XMLUI_GLOBAL_NAMES`): `Actions`, `toast`, `navigate`, `App`, `Log`, theme helpers, date/math/storage utilities, etc. These are wired into every expression scope by `AppContent.buildAppContextValue()` and never live in parent state. Filtering them prevents `isImplicitContainerByDefault` components (Select, List, Table) from being falsely promoted to full `StateContainer`s simply because they call a framework function.
 7. Excludes **App global names** (`appGlobalNames`): variables and functions declared in `Globals.xs`. They resolve through the global-vars layer (`useGlobalVariables`) at runtime — independent of parent state narrowing — so they must not enter `computedUses` or drive implicit-container promotion. Tracked separately as `globalDepsUsed` to populate `computedGlobalUses` (see §7).
 8. Excludes **Lexical Scoped Vars**. These are variables injected directly into the child context at render time (e.g., `$item` in `List` or `$queryParams` in `onFetch`). They are declared in component metadata (`childInjectedVars`) and event metadata (`injectedVars`), allowing the analyzer to ignore them as external dependencies.
@@ -331,7 +331,7 @@ At render time, the actual values are merged in [`useVars`](../../src/components
 const stateContext: ContainerState = { ...componentState, ...ret };
 ```
 
-**Invariant:** the spread order is `componentState` first, then `ret`. Vars resolved locally in this container (in `ret`) **shadow** any same-named keys arriving from the outer `componentState`. Without this, a parent's `$props`/`$context`/`$item` leaking through narrowing would silently override what `CompoundComponent` (or `MemoizedItem`, or `Container.contextVars`) just placed into `ret` for this very container. The result was Bug 29 in `history-bugs.md`: a nested UDC's `var.x = "{$props.y}"` read the **outer** UDC's `$props` instead of its own.
+**Invariant:** the spread order is `componentState` first, then `ret`. Vars resolved locally in this container (in `ret`) **shadow** any same-named keys arriving from the outer `componentState`. Without this, a parent's `$props`/`$context`/`$item` leaking through narrowing would silently override what `CompoundComponent` (or `MemoizedItem`, or `Container.contextVars`) placed into `ret` for this container — causing a nested UDC's `var.x = "{$props.y}"` to read the **outer** UDC's `$props` instead of its own.
 
 **Why this matters across the framework, not only for UDCs:**
 - `CompoundComponent` writes `$props: resolvedProps` into the inner Container's `node.vars`. Every nested UDC depends on `ret.$props` shadowing any outer `$props`.
@@ -339,7 +339,7 @@ const stateContext: ContainerState = { ...componentState, ...ret };
 - `<MemoizedItem>` per-row contextVars (`$item`, `$itemIndex`, `$row`, `$cell`, ...) must shadow the same names from an enclosing iterator.
 - Form/FormItem/Queue similarly inject names (`$data`, `$value`, `$setValue`, `$completedItems`) into their own scope that must shadow upstream values.
 
-**Interaction with `extractScopedState` preservation:** the Bug 28 fix preserves `$`-prefixed keys across narrowing so lexical names (e.g. `$item` from a parent `<Column>`) survive when an implicit container narrows state. That preservation is correct, but it means `componentState` will routinely carry names that *also* appear in `ret` for nested writers. The `{...componentState, ...ret}` spread order is therefore load-bearing: it's the only thing preventing parent-side framework names from corrupting locally-injected values.
+**Interaction with `extractScopedState` preservation:** `extractScopedState` preserves `$`-prefixed keys across narrowing so lexical names (e.g. `$item` from a parent `<Column>`) survive when an implicit container narrows state. That preservation means `componentState` will routinely carry names that *also* appear in `ret` for nested writers. The `{...componentState, ...ret}` spread order is therefore load-bearing: it's the only thing preventing parent-side framework names from corrupting locally-injected values.
 
 **Why the order is safe:** `ret` only ever contains keys this container's own metadata defines (script `vars`, code-behind `functions`, `node.vars` written by the renderer). It cannot pollute `componentState` for *other* containers — each container has its own `ret`. Outer-scope keys this container does NOT redefine pass through unchanged from `componentState`.
 
@@ -459,9 +459,7 @@ node.computedUses = undefined;
 
 This ensures each traversal starts with clean state. The current pass becomes the single source of truth for `computedUses`. Stale values from previous passes are always cleared.
 
-**Why mechanical (not conditional):** A conditional clear-only-if-needed approach would add control-flow complexity. Clearing unconditionally is safe (we recalculate immediately) and guarantees correctness regardless of code path or future refactoring.
-
-**Real-world impact:** Without this guard, FileVersionsDrawer's Restore button threw `"Cannot read properties of undefined (reading 'close')"` because pass 1 (no `.xs`) narrowed the Table container to `computedUses=["handleRestore"]`, and pass 2 (with `.xs`) couldn't override it — the component reference `versionsDrawer` was filtered during state narrowing at runtime (Bug 30).
+**Why mechanical (not conditional):** Clearing unconditionally guarantees correctness regardless of code path or future refactoring — a conditional clear-only-if-needed approach would add control-flow complexity and risk leaving stale values. A `computedUses` value from pass 1 (before `.xs` functions are attached) that survived into the runtime pass would narrow the wrong state slice: for example, filtering out a component-API reference that is only visible once `.xs` is merged, causing event-handler invocations to fail with `"Cannot read properties of undefined"`.
 
 ---
 
@@ -547,7 +545,7 @@ const keepDep = (d: string) =>
 
 Browser host objects (`window`, `document`, `navigator`) resolve via `globalThis` at the end of the script engine's identifier resolution chain (`eval-tree-common.ts` — the chain is: local scope → `localContext` → `appContext` → `globalThis`). They never live in parent UI state, so they must not enter `computedUses` nor inflate `nonDynamicReadDeps` and falsely promote an implicit container.
 
-**Deliberately minimal set:** Only `{window, document, navigator}` — unambiguous host objects that are never plausible XMLUI state-variable names. `location`, `history`, `screen`, `self`, `top`, `parent`, `frames` etc. are **intentionally excluded** — a developer could legitimately name a variable `screen` or `location`, so filtering those would silently drop real deps. The same reasoning that keeps legacy browser properties out of `JS_STDLIB_GLOBALS` (see Bug 11 in `history-bugs.md`).
+**Deliberately minimal set:** Only `{window, document, navigator}` — unambiguous host objects that are never plausible XMLUI state-variable names. `location`, `history`, `screen`, `self`, `top`, `parent`, `frames` etc. are **intentionally excluded** — a developer could legitimately name a variable `screen` or `location`, so filtering those would silently drop real deps. The same reasoning applies to any ambiguous browser property: when in doubt, leave it out of the filter.
 
 #### `appGlobalNames` — Globals.xs variables and functions
 

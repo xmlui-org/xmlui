@@ -3,6 +3,15 @@
 Known limitations of the current `computedGlobalUses` / `narrowGlobalVars` narrowing
 optimization and areas worth revisiting.
 
+> **Companion review:** branch-wide findings (including items that also affect
+> parent-state `computedUses`, not just the globals channel) live in
+> [`code-review-branch-vs-main.md`](./code-review-branch-vs-main.md). This file
+> tracks only the globals-narrowing channel.
+>
+> **Verified against code on 2026-05-29:** items 2 and 7 confirmed implemented;
+> item 4 was found to be **inverted** and is rewritten below; item 8 has a
+> cheaper fix than originally proposed. New item 9 added.
+
 ---
 
 ## 1. `disablesChildNarrowing` is too broad — **⚠️ Already handled**
@@ -63,29 +72,62 @@ annotation listing only the function names actually invoked in the subtree.
 (e.g. `someOtherFn(myGlobalFn)`) are harder to track and would need a conservative
 fallback.
 
+**Cross-ref:** same finding as §2.2 of `code-review-branch-vs-main.md`. Note that
+the immediate re-render risk is bounded: the narrowed object is cached per
+`(vars-identity, uses)` (item 7), so functions only cause an *extra* re-render
+when a function reference actually changes between snapshots — which
+`global-variables.ts` is believed (but not yet tested) to avoid. The standing
+cost is snapshot size, not per-render churn.
+
 ---
 
-## 4. Write-only globals are absent from `computedGlobalUses` (correctness)
+## 4. Write-only globals inflate `computedGlobalUses` (minor over-render) — ✅ **Done**
 
-**Where:** `computedUses.ts` — `isGlobalDep` predicate, `usedHereReads` tracking.
+**Where:** `computedUses.ts:528-530` — `globalDepsUsed` built from `usedHere`.
 
-**Status:** Partially mitigated by the two-step `ComponentWrapper` approach
-(narrowed snapshot for comparison only; full `globalVars` passed to child).
+**Resolution:** Changed `globalDepsUsed` to iterate `usedHereReads` instead of
+`usedHere`. Pure write-only globals are no longer included in the comparison
+snapshot. Three regression tests added in `computedUses.test.ts` ("computedGlobalUses"
+describe): write-only global is excluded; read+write global is kept; mixed case
+annotates only the read. All 405 tests in the affected suites pass.
 
-**Remaining gap:**  
-`computedGlobalUses` currently only lists globals that are **read** in the subtree.
-A container that writes `view = 'large'` but never reads `view` has
-`computedGlobalUses` that does not include `view`. The two-step approach fixes the
-runtime error (write succeeds), but the narrowed comparison snapshot does not
-account for `view` changing externally — the container still re-renders when `view`
-changes (because the full `globalVars` reference is updated by the two-step gate),
-but only when one of its tracked read-deps changed.
+**Correction (the previous note had this inverted):**  
+`globalDepsUsed` is populated from `usedHere`, which is the `all` set produced by
+`depsOfValueWithReads` — i.e. reads **plus** assignment-only (write) targets
+(`includeAssignmentTargets: true`). So a container that only writes a global
+(`view = 'large'`, never reads `view`) **does** receive `view` in its
+`computedGlobalUses`. There is no correctness gap: the write target is present in
+both the annotation and (via the two-step gate) the runtime object.
 
-**Improvement:**  
-Track write targets separately (`usedHereWrites` set). Include them in
-`computedGlobalUses` so both the comparison snapshot and runtime object agree.
-The expression-dependency walker already models `T_ASSIGNMENT_EXPRESSION` — it
-would need to expose the LHS identifier as a separate "write" category.
+**Actual (opposite) issue — minor pessimization:**  
+Because write-only globals are included, they enter the change-detection snapshot
+built by `narrowGlobalVars`. The container then re-renders whenever such a
+write-only global changes externally — even though it never reads the value, so
+the re-render produces no visible difference. The two-step `ComponentWrapper`
+design already passes the full `globalVars` to the child for evaluation, so write
+targets do **not** need to be in `computedGlobalUses` at all.
+
+**Improvement (safe, ~1 line):**  
+Build `globalDepsUsed` from the reads set instead of `usedHere`:
+```ts
+// computedUses.ts:528-530
+// was: for (const d of usedHere) if (isGlobalDep(d)) globalDepsUsed.add(d);
+for (const d of usedHereReads) if (isGlobalDep(d)) globalDepsUsed.add(d);
+```
+`childGlobalDeps` already propagates each child's `globalDepsUsed`, so making the
+per-node set reads-only makes the whole subtree reads-only. A global that is both
+read and written stays (it is in `usedHereReads`); only **pure** write-only
+globals drop out of the comparison snapshot → fewer re-renders.
+
+**Contrast with parent-state `computedUses`:** that one MUST keep write targets,
+because `extractScopedState(state, computedUses)` is the actual evaluation scope
+and the engine throws "Left value variable not found" if a write target is
+missing. Globals differ only because the full object is always forwarded for
+evaluation — which is exactly why reads-only is safe here but not for state.
+
+**Test to add before changing:** assert a write-only global is absent from
+`computedGlobalUses`, and that an external change to it does not re-render the
+writer-only container.
 
 ---
 
@@ -148,21 +190,68 @@ reference — `useShallowCompareMemoize` short-circuits on identity.
 
 ---
 
-## 8. `computedGlobalUses` not set for UDC templates
+## 8. UDC wrapper containers are not annotated with `computedGlobalUses` — ✅ **Done**
 
-**Where:** `CompoundComponent.tsx` — `containerNode` construction and UDC template
-rendering.
+**Where:** `CompoundComponent.tsx` — the runtime-synthesised wrapper `containerNode`.
 
-**Problem:**  
-When rendering a User-Defined Component (UDC), `CompoundComponent.tsx` synthesises
-a `containerNode` at runtime, bypassing the static analysis that normally annotates
-`computedGlobalUses`. Global variables referenced inside UDC templates are not
-tracked and those containers receive all `parentGlobalVars`.
+**Resolution:** Lifted `compound.computedGlobalUses` onto the synthesised wrapper
+Container (and removed it from `rest` via destructuring, mirroring the
+`computedUses: _staleComputedUses` strip). UDC instances now benefit from the
+same global-narrowing as static containers — no extra analysis pass required.
+The body's annotation is reused as-is because globals are NOT subject to the
+Bug-24 staleness that affects `computedUses` (globals live in the global-vars
+layer regardless of where local vars sit). No new unit test (would require a
+React render harness); covered indirectly by the broader optimization +
+udc-sandbox suites — all 405 tests pass.
 
-**Improvement:**  
-Run `computeUsesForTree` on the UDC's resolved template node during template
-resolution (the point where `.xmlui` markup is parsed and code-behind is merged).
-This requires `appGlobalNames` to be available at that stage.
+**Mechanism (verified against code):**  
+At boot, `StandaloneApp` runs `computeUsesForTree(compDef.component, …)` on the
+compound **body**, so `compound.computedGlobalUses` IS computed. But at render
+time `CompoundComponent.tsx` builds a fresh `{ type: "Container", … }` wrapper,
+moves `vars`/`functions`/`loaders` onto it, and strips `computedUses` from the
+body (`computedUses: _staleComputedUses`) to avoid the Bug-24 staleness. The body
+(`rest`) is then left with no `vars`/`computedUses`, so `isContainerLike(rest)` is
+false → the body renders without its own `StateContainer`. The **wrapper**
+Container is the node that narrows, and it carries **no** `computedGlobalUses`, so
+UDC instances receive ALL `parentGlobalVars`.
+
+**Why the body's annotation is NOT stale for globals (unlike `computedUses`):**  
+Bug 24 makes the body's `computedUses` stale because local `vars` move to the
+wrapper and become external. Globals are different — they live in the global-vars
+layer regardless of where local vars sit, so the set of globals the body reads is
+unchanged by the restructure.
+
+**Improvement (cheap — Low effort, was High):**  
+Lift the already-computed body annotation onto the synthesised wrapper instead of
+re-running analysis: add `computedGlobalUses: compound.computedGlobalUses` to the
+returned container node (and drop it from `rest` for cleanliness, mirroring the
+`computedUses` strip). This gives UDC wrappers the same global-narrowing benefit
+as static containers, with no extra analysis pass and no need for `appGlobalNames`
+at template-resolution time. Add a test: a UDC whose template reads exactly one of
+several globals re-renders only when that one global changes.
+
+---
+
+## 9. NEW — `for`-loop init clause drops global (and state) reads — ✅ **Done**
+
+**Where:** `script-runner/visitors.ts:144-146` (the shared dependency walker).
+
+**Resolution:** Fix shipped as part of `code-review-branch-vs-main.md` §1.1
+(missing `stmtDeps =` assignment). Two regression tests in `computedUses.test.ts`
+under "computeUsesForTree — for-loop init dependency tracking". Both pass.
+
+The `T_FOR_STATEMENT` `init` branch calls `stmtDeps.concat(...)` **without
+assigning the result**, unlike `cond` / `upd` / `body`. `Array.concat` is
+non-mutating, so any identifier referenced only in a `for (init)` clause is lost
+from both the `reads` and `all` sets.
+
+For globals: a global read only in a for-init
+(`for (let i = startIndex; i < total; i++)` where `startIndex` ∈ Globals.xs) is
+absent from `computedGlobalUses` → the container will not re-render when that
+global changes. The same root cause affects parent-state `computedUses`.
+
+**Fix (1 line):** `stmtDeps = stmtDeps.concat(collectDependencies([stmt.init], stmt, "for"));`
+See `code-review-branch-vs-main.md` §1.1.
 
 ---
 
@@ -172,9 +261,10 @@ This requires `appGlobalNames` to be available at that stage.
 |---|------|--------|--------|--------|
 | 1 | `disablesChildNarrowing` too broad | High — blocks many descendants | — | ⚠️ Already handled by `safeToNarrow` formula |
 | 2 | Explicit containers miss `computedGlobalUses` | Low–Medium | Low | ✅ Done |
-| 3 | Functions always pass through | Medium — proportional to Globals.xs size | High | Open |
-| 4 | Write-only globals (correctness) | Low (mitigated) | Medium | Open |
+| 3 | Functions always pass through | Medium — proportional to Globals.xs size | High | Open (= review §2.2) |
+| 4 | Write-only globals **over-render** (not a correctness gap) | Low | Low (~1 line) | ✅ Done — `usedHere` → `usedHereReads` + 3 tests |
 | 5 | Shared `safeToNarrow` gate | Low–Medium | Low | ⛔ Incorrect proposal — see analysis |
 | 6 | Parse-time `appGlobalNames` empty | Low | Medium | Open |
 | 7 | `narrowGlobalVars` allocation | Low | Low | ✅ Done |
-| 8 | UDC templates not analysed | Medium (UDC-heavy apps) | High | Open |
+| 8 | UDC wrapper not annotated | Medium (UDC-heavy apps) | Low (lift body annotation) | ✅ Done — annotation lifted in `CompoundComponent.tsx` |
+| 9 | `for`-init drops reads | Low (latent stale-render) | Low (~1 line) | ✅ Done — assignment fixed in `visitors.ts` + 2 tests |

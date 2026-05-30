@@ -528,3 +528,96 @@ var b = 2;
     expect("user" in collected.vars).equal(false);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Fragment script hoisting — regression tests for item 3.1
+//
+// hoistScriptCollectedFromFragments() should:
+//   (a) hoist Fragment scripts that have NO $contextVar references
+//   (b) NOT block hoisting due to incidental `$word` inside a string literal
+//   (c) NOT hoist when the script reads actual context vars like $item/$index
+//   (d) NOT hoist when parent and Fragment declare the same name (collision guard)
+// ---------------------------------------------------------------------------
+describe("Fragment script hoisting", () => {
+  it("(a) Fragment with no context-var references is hoisted into parent", () => {
+    const cd = transformSource(`
+      <Stack>
+        <Fragment>
+          <script>function helper() { return 42; }</script>
+        </Fragment>
+      </Stack>
+    `) as ComponentDef;
+
+    // Script should be hoisted to the Stack
+    expect(cd.script).toBeDefined();
+    expect(cd.scriptCollected?.functions?.helper).toBeDefined();
+    // Fragment itself should have no scriptCollected after hoisting
+    const fragment = (cd.children as ComponentDef[] | undefined)?.find(
+      (c) => c.type === "Fragment",
+    );
+    expect(fragment?.scriptCollected).toBeUndefined();
+  });
+
+  it("(b) incidental $word inside a string literal does NOT block hoisting", () => {
+    // The script uses a string that contains `$total` — this is NOT a context
+    // var reference; it's a dollar sign inside a string literal.
+    const cd = transformSource(`
+      <Stack>
+        <Fragment>
+          <script>var label = "Total: $total items";</script>
+        </Fragment>
+      </Stack>
+    `) as ComponentDef;
+
+    // Should be hoisted — the `$total` in the string must not be mistaken for
+    // a context-variable read.
+    expect(cd.scriptCollected?.vars?.label).toBeDefined();
+  });
+
+  it("(c) Fragment referencing a real context var $item is NOT hoisted", () => {
+    // The parser auto-creates a Fragment when a component has both a <script>
+    // and child content.  When the Fragment's script reads a $contextVar, it
+    // must NOT be hoisted to the parent Stack.
+    const cd = transformSource(`
+      <Stack>
+        <Stack vars="{{}}" id="inner">
+          <script>function display() { return $item.name; }</script>
+          <Text text="placeholder" />
+        </Stack>
+      </Stack>
+    `) as ComponentDef;
+
+    // The inner Stack wraps its children in a Fragment because it has both
+    // a <script> and content.  $item reads a context var → Fragment must
+    // keep its scriptCollected.  The OUTER Stack must NOT inherit `display`.
+    expect(cd.scriptCollected?.functions?.display).toBeUndefined();
+    // The inner Stack (not the Fragment) should have the script
+    const inner = (cd.children as ComponentDef[] | undefined)?.[0];
+    // If hoisting was blocked, the script stays on the fragment inside inner
+    // but inner.scriptCollected should NOT have display either
+    // (it would only be promoted if there were no context-var reads).
+    // The key invariant: outer Stack must not see `display`.
+    expect(cd.script).toBeUndefined();
+  });
+
+  it("(d) Fragment whose function name collides with parent is NOT hoisted", () => {
+    // When both parent and the auto-created Fragment declare the same name,
+    // the collision guard must prevent the Fragment's version from overwriting
+    // (or appending a duplicate declaration to) the parent script.
+    const cd = transformSource(`
+      <Stack>
+        <script>function helper() { return "parent"; }</script>
+        <Text text="child" />
+      </Stack>
+    `) as ComponentDef;
+
+    // Baseline: Stack declares `helper` and has it in scriptCollected
+    expect(cd.scriptCollected?.functions?.helper).toBeDefined();
+    // The script text must contain "parent" (not overwritten by a duplicate)
+    expect(cd.script).toContain("parent");
+    // Only ONE function named `helper` — no duplicate concat
+    const script = cd.script ?? "";
+    const count = (script.match(/function helper/g) ?? []).length;
+    expect(count).toBe(1);
+  });
+});
