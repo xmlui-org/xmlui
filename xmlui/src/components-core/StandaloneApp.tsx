@@ -1159,7 +1159,39 @@ function useStandalone(
     return extracted;
   });
 
+  // Latch for the import-resolution + tree-rebuild pass below.  Each effect run
+  // rebuilds `newAppDef` from scratch, which makes the per-node
+  // `scriptCollected.hasUnresolvableImports` guard inside
+  // `collectImportsFromStandaloneSources` ineffective across runs — every fresh
+  // tree starts with `hasUnresolvableImports = true` again.  Without this
+  // top-level latch, identical re-runs (most commonly React StrictMode's
+  // double-invoke in dev, but also any harmless parent re-render that does not
+  // change the three deps) would trigger another async pass and potentially
+  // another `fetch()` for every imported `.xs` module.  See
+  // code-review-branch-vs-main.md §1.3.
+  const lastImportResolutionKeyRef = useRef<{
+    rt: unknown;
+    def: unknown;
+    bp: unknown;
+  } | null>(null);
+
   useIsomorphicLayoutEffect(() => {
+    if (
+      lastImportResolutionKeyRef.current &&
+      lastImportResolutionKeyRef.current.rt === resolvedRuntime &&
+      lastImportResolutionKeyRef.current.def === standaloneAppDef &&
+      lastImportResolutionKeyRef.current.bp === basePath
+    ) {
+      // Same inputs as the last resolved pass — nothing new to do.  The state
+      // (standaloneApp, projectCompilation, globalVars, pendingLintToasts) was
+      // already set by the previous run; React's reconciler will reuse it.
+      return;
+    }
+    lastImportResolutionKeyRef.current = {
+      rt: resolvedRuntime,
+      def: standaloneAppDef,
+      bp: basePath,
+    };
     void (async function () {
       const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 

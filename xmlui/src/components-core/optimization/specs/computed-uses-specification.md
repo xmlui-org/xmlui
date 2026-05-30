@@ -369,6 +369,40 @@ The "disable narrowing" concern is split into two independent flags:
 
 Children of a code-behind node are still treated conservatively via `nextDisableNarrowing`; function-free children without parent-function calls can still be narrowed (the `dependsOnParentFunction` check controls this).
 
+#### Fragment script hoisting
+
+When the XMLUI parser encounters a `<script>` sibling alongside other component
+children, it wraps the non-helper siblings in a synthetic `Fragment` and attaches
+`scriptCollected` to that Fragment. `hoistScriptCollectedFromFragments` in
+`transform.ts` then promotes the script up to the enclosing parent component **iff** it
+is safe to do so, so that subsequent static analysis sees `scriptCollected` on the same
+node it logically belongs to (the parent, not the synthetic Fragment).
+
+Two gating rules — both AST-level, not textual — decide hoisting safety:
+
+1. **No context-var reads.** `scriptCollectedReadsContextVars(sc)` walks each
+   collected declaration's tree (`sc.vars[*].tree`, `sc.functions[*]` directly) via
+   `collectVariableDependencies` and returns `true` if any identifier starts with `$`.
+   A textual regex would false-positive on `$word` inside string literals or
+   comments; the AST walk only sees real identifier nodes. If `true`, the Fragment
+   keeps its script (context variables are component-specific and must stay at the
+   iteration level). On AST-walk failure the helper conservatively returns `true`
+   to avoid losing a dependency.
+
+2. **No name collisions.** Before merging, the helper checks that no key in
+   `child.scriptCollected.vars` / `functions` collides with the parent's existing
+   declarations. A collision would cause a duplicate top-level declaration in the
+   concatenated `script` text — fatal if that text is later re-parsed by
+   `collectCodeBehindFromSourceWithImports` during the standalone import-resolution
+   pass. On any collision the Fragment is left in place rather than risk the
+   re-parse error.
+
+When both gates pass, the Fragment's `scriptCollected.vars` and `functions` merge
+into the parent (parent wins on overlap, which is moot because the no-collision
+guard already excluded overlaps), the `script` text is concatenated for re-parse
+fidelity, and `child.scriptCollected` / `child.script` are deleted to prevent
+double-counting.
+
 #### Script Analysis Guards (`hasInvalidStatements` and `hasUnresolvableImports`)
 
 Static analysis narrowing is blocked for a node if its script dependency set is potentially incomplete:
@@ -378,7 +412,25 @@ Static analysis narrowing is blocked for a node if its script dependency set is 
 
 **Runtime Resolution Pass (Standalone Mode):**
 To enable narrowing for components with imports in Standalone mode, `StandaloneApp.tsx` performs an asynchronous runtime pass (`collectImportsFromStandaloneSources`) before initial rendering. It resolves imports sequentially using `appDef.sources` (or network fetch), merges declarations into the `newAppDef` render tree, clears `hasUnresolvableImports`, and **triggers a re-computation** of `computedUses` for the tree using `appGlobalNames`.
-- **Performance Optimization:** The `resolveRuntime` call is memoized (`useMemo`) to run at most once per source-identity change. `collectImportsFromStandaloneSources` itself is idempotent (safe to call multiple times), but wrapping it in `useMemo` prevents redundant async work when other state updates trigger re-renders before resolution completes.
+- **Performance / idempotency (two complementary layers):**
+  1. **`resolveRuntime` memoization** — wrapped in `useMemo([runtime])` so the
+     compilation pass runs at most once per source-identity change.
+  2. **Effect-level `lastImportResolutionKeyRef`** — the `useIsomorphicLayoutEffect`
+     that drives `collectImportsFromStandaloneSources` holds a `useRef` storing the
+     `{resolvedRuntime, standaloneAppDef, basePath}` tuple. On entry the effect
+     strict-compares the current deps to the previously processed key and
+     early-returns when they all match. The ref is updated **synchronously**
+     immediately before the async IIFE, so React StrictMode's dev double-invoke
+     (and any harmless re-render that fires the effect with unchanged deps)
+     observes the populated value on the second pass and skips the async work
+     entirely. Without this latch, every double-invoke would re-fetch every `.xs`
+     module: each fresh `newAppDef` rebuild restores
+     `scriptCollected.hasUnresolvableImports = true`, so the per-node guard
+     inside `collectImportsFromStandaloneSources` cannot prevent re-fetches by
+     itself.
+
+  Combined, the two layers make the resolution pass idempotent *both* per-node
+  (within one run) *and* across runs (under StrictMode and benign re-renders).
 - **Tree Mutability:** The resolution pass directly mutates the `appDef` tree intended for rendering, distinct from the `projectCompilation` snapshot.
 
 **Function-Free Child Narrowing:** Built-in components (like `Select`) inside a user component with code-behind can still be narrowed IF they don't call any parent functions. This is determined via the `dependsOnParentFunction` check during analysis.
@@ -438,6 +490,36 @@ for (const key of Object.keys(parentState)) {
 
 **CRITICAL:** The static `computedUses` array is calculated for a specific tree topology. Any process (like `CompoundComponent.tsx`) that restructures the tree at runtime (e.g., moving `vars` or removing a wrapper) leaves the existing `computedUses` **invalid**, leading to state loss for children.
 **Rule:** Always discard `computedUses` (`delete node.computedUses`) if the code generator creates or removes wrapper containers.
+
+### `computedGlobalUses` — opposite rule: LIFT, do not discard
+
+The globals annotation is *not* sensitive to tree restructure. `Globals.xs` lives in the
+global-vars layer regardless of where local `vars` sit, so the set of globals a body
+reads is unchanged when its `vars` move to a synthesized wrapper. The set of globals
+*written* by the body is similarly invariant — and irrelevant anyway, because
+`computedGlobalUses` is reads-only (see §7).
+
+`CompoundComponent.tsx` therefore extracts `computedGlobalUses` from the body during
+the destructure and **lifts** it onto the synthesized wrapper `Container`:
+
+```ts
+const {
+  loaders, vars, functions, scriptError,
+  computedUses: _staleComputedUses,   // discarded — see invariant above
+  computedGlobalUses,                  // lifted — restructure-invariant
+  ...rest
+} = compound;
+
+return {
+  type: "Container",
+  ...,
+  uses: scopedGlobalKeys,
+  computedGlobalUses,                  // wrapper gets the same narrowing as a static container
+};
+```
+
+Without this lift the runtime wrapper would carry no annotation and receive ALL
+`parentGlobalVars`, defeating the optimization for every UDC instance.
 
 ---
 
@@ -597,8 +679,9 @@ Steps during traversal:
    mechanical-guard pattern as `node.computedUses`; see Invariant 5.5).
 2. A `childGlobalDeps: Set<string>` accumulator collects global dep names from child
    subtrees alongside the existing `childDeps`.
-3. After `processChildList`, an `isGlobalDep` predicate identifies names in `usedHere`
-   where `appGlobalNames.has(d)` and the name is not in `localDeclared` or
+3. After `processChildList`, an `isGlobalDep` predicate identifies names in
+   **`usedHereReads`** (the reads-only set; see "Reads-only asymmetry" below) where
+   `appGlobalNames.has(d)` and the name is not in `localDeclared` or
    `injectedVarsScope`. These, unioned with `childGlobalDeps`, form `globalDepsUsed`.
 4. For container nodes (both implicit and explicit — the `node.uses` field controls
    *parent-state* narrowing only and is irrelevant here): if `globalDepsUsed` is
@@ -615,6 +698,24 @@ as `computedUses`:
 
 In both cases `safeToNarrow = false` and `node.computedGlobalUses` is left `undefined`,
 causing `ComponentWrapper` to pass the full un-narrowed `globalVars` downstream.
+
+**Reads-only asymmetry with `computedUses`:**
+`globalDepsUsed` is built from `usedHereReads` (the reads set), not `usedHere` (reads +
+write targets). A write-only global — e.g. an event handler `myGlobal = 'x'` with no
+read of `myGlobal` anywhere in the subtree — is therefore **not** annotated. This is
+correct because `ComponentWrapper` uses a two-step gate (see below) that always forwards
+the FULL `globalVars` to the child for evaluation; the narrowed snapshot is only used
+for change detection. A write target remains reachable at runtime regardless of whether
+it is in `computedGlobalUses`. Including write-only globals would only cause needless
+re-renders whenever an external change to one produced a different snapshot, with no
+visible effect on the subtree because it never reads the value.
+
+Parent-state `computedUses` is the opposite: it lists `usedHere` (reads + writes)
+because `extractScopedState(state, computedUses)` IS the actual evaluation scope, and
+the script engine throws `"Left value variable not found in the scope"` if a write
+target is missing from the narrowed state. Globals do not have this constraint because
+they are evaluated against the full forwarded object — hence the asymmetry is principled,
+not accidental.
 
 **Why a separate 4th return value?**  
 `keepDep` filters `appGlobalNames` out of `parentDependencies` — Globals.xs names must not

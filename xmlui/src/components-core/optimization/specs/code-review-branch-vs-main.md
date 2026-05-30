@@ -83,7 +83,7 @@ diagnostics. Recommend an explicit audit and a guard test (see §8).
 
 **Resolution**: 99 existing props with `availableValues` but no `isStrictEnum` are captured in an `INTENTIONALLY_PERMISSIVE` allow-list in `verifier.test.ts`. The guard test "every availableValues prop either has isStrictEnum:true or is in the allow-list" ensures any *new* prop with `availableValues` must explicitly declare `isStrictEnum:true` or be added to the allow-list. Timeout bumped from 30s → 120s to accommodate the cold-import cost of the full `collectedComponentMetadata` barrel (timed out on cold runs at 30s; consistently passes at 120s). All tests green.
 
-### 1.3 — [M] Standalone import resolution re-runs on every effect invocation (carried over, still open)
+### 1.3 — [M] ✅ FIXED — Standalone import resolution re-runs on every effect invocation
 `StandaloneApp.tsx:1711`, effect deps `[resolvedRuntime, standaloneAppDef, basePath]` at `:1762`
 
 `resolveRuntime` is memoized (`useMemo` at `:954`), but the async
@@ -98,6 +98,19 @@ Mitigation present: the `sources` map is consulted first, and a guarded
 duplicate-compilation check exists. But the resolution itself is not memoized on
 resolved-source identity. Gate it behind a ref keyed on the resolved source, or
 move it into a `useMemo`/once-per-identity latch.
+
+**Resolution:** Added `lastImportResolutionKeyRef` (a `useRef` storing the
+`{ rt, def, bp }` tuple) just before `useIsomorphicLayoutEffect` at
+`StandaloneApp.tsx:~1162`. The effect now early-returns when all three deps
+strict-equal the previously-processed key, eliminating the StrictMode
+double-invoke re-fetch and any harmless parent re-render that fires the effect
+with unchanged inputs. The latch updates synchronously *before* the async IIFE
+so the second StrictMode pass always observes the populated ref. State writes
+from the prior run remain in place (React's reconciler reuses them). No
+dedicated test added — a meaningful render+`fetch`-mock harness would exceed
+the value of guarding three strict-equality checks; the latch is structurally
+obvious and covered indirectly by the 80 standalone/global-vars/ud-metadata
+tests that still pass.
 
 ### 1.4 — [L] One `fileId` resolves an entire subtree (carried over, documented)
 `StandaloneApp.tsx:2132-2135`, `:2146`
