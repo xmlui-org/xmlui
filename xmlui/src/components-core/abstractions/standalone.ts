@@ -189,14 +189,13 @@ export type StandaloneAppDescription = {
    *   immediate handler execution or deterministic per-trace FIFO ordering.
    * - `maxQueuedPerTrace` (number, default `64`) — bounds deterministic handler
    *   queues before `determinism-convergence-failed` is emitted.
-   * - `strictTheming` (boolean, default `false`) — when `true`, theming
+   * - `strictTheming` (boolean, default `true` — flipped from `false`
+   *   as a W8 risk probe) — when `true`, theming
    *   diagnostics (`invalid-theme-value`, `unknown-theme-variable`,
    *   `raw-css-in-prop`, `important-blocked`, `url-in-style`,
    *   `position-fixed-blocked`) escalate from `warn` to `error`. In
    *   strict mode, blocked declarations are dropped before they reach
-   *   the DOM; in non-strict mode they pass through with a warn-level
-   *   `kind:"theming"` trace entry so apps can audit before the strict
-   *   default flips. Flips to `true` in the next major release. See
+   *   the DOM; set to `false` for legacy warn-only behaviour. See
    *   `dev-docs/plans/08-sealed-theming-sandbox.md`.
    * - `allowInlineRawCss` (boolean, default `true`) — when `false`,
    *   the `style` prop refuses `url(...)` values and `!important`
