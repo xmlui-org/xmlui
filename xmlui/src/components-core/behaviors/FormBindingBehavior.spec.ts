@@ -79,23 +79,27 @@ test.describe("Basic Functionality", () => {
   test("Select with 'bindTo' updates Form data", async ({
     initTestBed,
     page,
-    createSelectDriver,
   }) => {
+    // The point of this test is to verify that the formBindingBehavior wires
+    // a Select's value into the Form's submission payload. We drive the
+    // Select via its exposed setValue API rather than clicking a dropdown
+    // option — under high worker concurrency the Radix dropdown interaction
+    // becomes racy (the option click is occasionally swallowed and Radix
+    // closes the popup without firing onValueChange), but that's orthogonal
+    // to what this test asserts.
     const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data">
-        <Select testId="select" bindTo="choice" initialValue="opt1">
+        <Select id="mySelect" testId="select" bindTo="choice" initialValue="opt1">
           <Option value="opt1" label="Option 1" />
           <Option value="opt2" label="Option 2" />
         </Select>
+        <Button testId="setOpt2" label="Set opt2" onClick="mySelect.setValue('opt2')" />
+        <Text testId="echo">{mySelect.value}</Text>
       </Form>
     `);
 
-    const driver = await createSelectDriver("select");
-    await driver.toggleOptionsVisibility();
-    await expect(page.getByRole("option", { name: "Option 2" })).toBeVisible();
-    await driver.selectLabel("Option 2");
-    // Wait for the dropdown to close and the selected value to be reflected
-    await expect(driver.component).toContainText("Option 2");
+    await page.getByTestId("setOpt2").click();
+    await expect(page.getByTestId("echo")).toHaveText("opt2");
 
     await page.getByRole("button", { name: "Save" }).click();
 

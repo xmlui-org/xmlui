@@ -189,6 +189,60 @@ the cooperative `$cancel` token (see
 [Cooperative Concurrency](/docs/managed-react/cooperative-concurrency))
 short-circuit immediately, otherwise the cancellation is best-effort.
 
+## CSRF and idempotency
+
+`<Form>` carries two reactive props that the built-in submit handler
+forwards as HTTP headers — no handler code required:
+
+| Prop | Default header | Override |
+|---|---|---|
+| `csrfToken` | `X-CSRF-Token` | `appGlobals.csrfHeaderName` |
+| `idempotencyKey` | `Idempotency-Key` | `appGlobals.idempotencyHeaderName` |
+
+```xmlui
+<Form
+    submitUrl="/api/orders"
+    submitMethod="POST"
+    csrfToken="{appState.csrfToken}"
+    idempotencyKey="{$id}-attempt-1">
+    <FormItem bindTo="quantity" />
+</Form>
+```
+
+Setting either prop adds the corresponding header to the generated
+`Actions.callApi` request. Both values are evaluated reactively, so
+rotating the CSRF token in app state re-renders without losing form
+data.
+
+Custom `onSubmit` handlers read the same values through three
+context variables:
+
+- `$formCsrfToken` — the literal `csrfToken` prop value (or `null`)
+- `$formIdempotencyKey` — the literal `idempotencyKey` prop value
+- `$formHeaders` — the assembled `{ "X-CSRF-Token": "…", … }` map,
+  or `undefined` when both are empty
+- `$formCancel.signal` — the per-attempt `AbortSignal` (same one
+  `Form.cancel()` aborts), so a custom handler can pass it to `fetch`
+  or `Actions.callApi`
+
+```xmlui
+<Form onSubmit="(data) => Actions.callApi({
+    url: '/api/orders',
+    method: 'POST',
+    body: data,
+    headers: $formHeaders,
+    signal: $formCancel.signal })">
+    <FormItem bindTo="quantity" />
+</Form>
+```
+
+### Enforcing CSRF policy
+
+Set `appGlobals.requireFormCsrf = true` to require every mutating
+form (anything other than GET / HEAD) to supply a `csrfToken`.
+Forms that don't emit `csrf-token-missing` at `warn` severity, or
+`error` when `strictForms` is also on.
+
 ## Diagnostic codes
 
 All diagnostics emit on the `kind: "forms"` trace channel.
@@ -200,7 +254,7 @@ All diagnostics emit on the `kind: "forms"` trace channel.
 | `validator-throw` | A validator `fn` (field-level or cross-field) threw. The field is marked invalid with the exception message. | warn | error |
 | `server-error-unmapped` | The server reported an error against a field the form does not contain. | warn | error |
 | `submit-while-busy` | The `submitPolicy` rejected a second submit attempt. | warn | warn |
-| `csrf-token-missing` | Reserved for the upcoming CSRF surface. | warn | warn |
+| `csrf-token-missing` | A mutating form (non-GET/HEAD) submits without a `csrfToken` prop while `appGlobals.requireFormCsrf` or `strictForms` is set. | warn | error |
 | `deprecated-alias` | Markup uses `pattern` / `patternInvalidMessage` / `patternInvalidSeverity`; use `validator` / `validatorInvalidMessage` / `validatorInvalidSeverity` instead. | warn | warn |
 
 ## Enabling strict mode

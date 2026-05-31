@@ -72,6 +72,10 @@ import {
   extractServerValidationProblem,
   decideSubmit,
   DEFAULT_SUBMIT_POLICY,
+  buildSubmitHeaders,
+  shouldEmitCsrfMissing,
+  DEFAULT_CSRF_HEADER_NAME,
+  DEFAULT_IDEMPOTENCY_HEADER_NAME,
   type SubmitPolicy,
 } from "../../components-core/forms";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
@@ -322,6 +326,20 @@ type Props = {
   // --- W5-4: submit concurrency policy + drop handler + external cancel.
   submitPolicy?: SubmitPolicy;
   onSubmitDropped?: (reason: string) => void;
+  // --- Plan #09 Step 5.1: CSRF + idempotency surface. Both default to
+  // `undefined`; when set, the built-in submit handler attaches them as
+  // request headers. Custom handlers can read them via `$formCsrfToken` /
+  // `$formIdempotencyKey` context vars.
+  csrfToken?: string;
+  idempotencyKey?: string;
+  /** Mutating HTTP method for the built-in submit; used by the
+   *  `csrf-token-missing` diagnostic guard. */
+  submitMethod?: string;
+  /** Optional external `AbortController` ref shared with the outer
+   *  `FormWithContextVar`. When provided, `doSubmit` writes the per-attempt
+   *  controller into it so the outer component can expose `signal` through
+   *  the `$formCancel` context variable. */
+  submitAbortRefExternal?: { current: AbortController | null };
 };
 
 export const defaultProps: Pick<
@@ -443,6 +461,10 @@ const Form = memo(forwardRef(function (
     onSubmitError,
     submitPolicy = defaultProps.submitPolicy,
     onSubmitDropped,
+    csrfToken,
+    idempotencyKey,
+    submitMethod,
+    submitAbortRefExternal,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -616,6 +638,27 @@ const Form = memo(forwardRef(function (
 
     setConfirmSubmitModalVisible(false);
 
+    // --- Plan #09 Step 5.1: CSRF token missing diagnostic. When the form
+    // submits a mutating request (anything other than GET / HEAD) and the
+    // `csrfToken` prop is empty, emit `csrf-token-missing`. Severity is
+    // `warn` by default; escalates to `error` under `strictForms` or when
+    // `appGlobals.requireFormCsrf === true`.
+    const requireCsrf =
+      !!appContext?.appGlobals?.strictForms ||
+      !!appContext?.appGlobals?.requireFormCsrf;
+    if (shouldEmitCsrfMissing({ requireCsrf, csrfToken, submitMethod })) {
+      pushXsLog({
+        kind: "forms",
+        ts: Date.now(),
+        code: "csrf-token-missing",
+        severity: appContext?.appGlobals?.strictForms ? "error" : "warn",
+        formId: id,
+        message:
+          `Form is configured to require a CSRF token (\`appGlobals.requireFormCsrf\` ` +
+          `or \`strictForms\`) but no \`csrfToken\` was provided.`,
+      });
+    }
+
     // Use the extracted validation logic
     const validationResult = doValidate();
 
@@ -756,6 +799,9 @@ const Form = memo(forwardRef(function (
     // and surfaced to the onSubmit handler via the `$formCancel` context
     // variable. Cleaned up in the `finally` below.
     submitAbortRef.current = new AbortController();
+    if (submitAbortRefExternal) {
+      submitAbortRefExternal.current = submitAbortRef.current;
+    }
     try {
       const filteredSubject = validationResult.data;
       // Pass cleaned data as first arg and full data (including noSubmit fields) as second arg.
@@ -917,6 +963,9 @@ const Form = memo(forwardRef(function (
       // signal, but downstream callers should treat it as scoped to this
       // attempt only.
       submitAbortRef.current = null;
+      if (submitAbortRefExternal) {
+        submitAbortRefExternal.current = null;
+      }
     }
   });
 
@@ -1148,6 +1197,22 @@ export const FormWithContextVar = forwardRef(function (
   // back, which would cause FormItem re-initialization to restore old data).
   const [clearedAtResetVersion, setClearedAtResetVersion] = useState<number | null>(null);
 
+  // --- Plan #09 Step 5.1: shared `AbortController` ref between this outer
+  // wrapper (which exposes `$formCancel` to the onSubmit handler context)
+  // and the inner Form (which creates the controller in `doSubmit`).
+  const submitAbortRefExternal = useRef<AbortController | null>(null);
+  const $formCancel = useMemo(
+    () => ({
+      get signal(): AbortSignal | undefined {
+        return submitAbortRefExternal.current?.signal;
+      },
+      get aborted(): boolean {
+        return !!submitAbortRefExternal.current?.signal.aborted;
+      },
+    }),
+    [],
+  );
+
   // Build a stable callback that captures the *current* resetVersion so that
   // when called inside flushSync it sets the correct target version.
   const handleClearAfterSubmit = useCallback(() => {
@@ -1229,6 +1294,30 @@ export const FormWithContextVar = forwardRef(function (
     extractValue.asOptionalString(node.props.submitUrl) ||
     extractValue.asOptionalString(node.props._data_url);
 
+  // --- Plan #09 Step 5.1: CSRF + idempotency surface. Values are extracted
+  // reactively from the markup. The built-in default submit handler bakes
+  // them into the generated `Actions.callApi` template as a `headers` map
+  // (resolved at handler-eval time through the `$formHeaders` context var
+  // so the values stay reactive across re-renders). Custom `onSubmit`
+  // handlers can read the raw values via `$formCsrfToken` /
+  // `$formIdempotencyKey`.
+  const csrfToken = extractValue.asOptionalString(node.props.csrfToken);
+  const idempotencyKey = extractValue.asOptionalString(node.props.idempotencyKey);
+  const csrfHeaderName =
+    appContext?.appGlobals?.csrfHeaderName || DEFAULT_CSRF_HEADER_NAME;
+  const idempotencyHeaderName =
+    appContext?.appGlobals?.idempotencyHeaderName || DEFAULT_IDEMPOTENCY_HEADER_NAME;
+  const submitHeaders = useMemo(
+    () =>
+      buildSubmitHeaders({
+        csrfToken,
+        idempotencyKey,
+        csrfHeaderName,
+        idempotencyHeaderName,
+      }),
+    [csrfToken, idempotencyKey, csrfHeaderName, idempotencyHeaderName],
+  );
+
   const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
   const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.appGlobals?.disableInlineStyle, appContext?.appGlobals?.applyLayoutProperties);
 
@@ -1264,10 +1353,14 @@ export const FormWithContextVar = forwardRef(function (
         })}
         onSubmit={lookupEventHandler("submit", {
           defaultHandler: submitUrl
-            ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}" })`
+            ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}"${submitHeaders ? ", headers: $formHeaders" : ""} })`
             : undefined,
           context: {
             $data,
+            $formCancel,
+            $formHeaders: submitHeaders,
+            $formCsrfToken: csrfToken,
+            $formIdempotencyKey: idempotencyKey,
           },
         })}
         onSubmitFailed={lookupEventHandler("submitFailed", {
@@ -1321,6 +1414,10 @@ export const FormWithContextVar = forwardRef(function (
         onSubmitDropped={lookupEventHandler("submitDropped" as any, {
           context: { $data },
         }) as any}
+        csrfToken={csrfToken}
+        idempotencyKey={idempotencyKey}
+        submitMethod={submitMethod}
+        submitAbortRefExternal={submitAbortRefExternal}
         enabled={
           extractValue.asOptionalBoolean(node.props.enabled, true) &&
           !extractValue.asOptionalBoolean((node.props as any).loading, false)

@@ -149,6 +149,18 @@ export type StandaloneAppDescription = {
    *   warn-level diagnostics so apps can audit before the strict
    *   default flips. Flips to `true` in the next major. See
    *   `dev-docs/plans/09-forms-validation-discipline.md`.
+   * - `csrfHeaderName` (string, default `"X-CSRF-Token"`) — HTTP header name
+   *   used to carry the `<Form csrfToken>` value on the built-in submit
+   *   request. See `dev-docs/plans/09-forms-validation-discipline.md` Step 5.1.
+   * - `idempotencyHeaderName` (string, default `"Idempotency-Key"`) — HTTP
+   *   header name used to carry the `<Form idempotencyKey>` value on the
+   *   built-in submit request.
+   * - `requireFormCsrf` (boolean, default `false`) — when `true`, any
+   *   `<Form>` whose submit method is non-GET/HEAD and which does not
+   *   supply a `csrfToken` emits the `csrf-token-missing` diagnostic
+   *   (warn). Under `strictForms` the diagnostic is escalated to error.
+   *   Use this to enforce a per-app CSRF policy without having to flip
+   *   `strictForms` globally.
    * - `strictRouting` (boolean, default `true`) — when `true` (the default),
    *   defended-routing diagnostics such as rejected constraints and
    *   non-canonical URLs escalate to errors and `nonCanonicalUrl` defaults to
