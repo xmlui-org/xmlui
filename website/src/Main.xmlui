@@ -309,6 +309,10 @@
                             to="/docs/managed-react/forms-validation-discipline"
                         />
                         <NavLink
+                            label="UDC Sandbox"
+                            to="/docs/managed-react/udc-sandbox"
+                        />
+                        <NavLink
                             label="Cooperative Concurrency"
                             to="/docs/managed-react/cooperative-concurrency"
                         />
@@ -2599,6 +2603,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/forms-validation-discipline.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/udc-sandbox"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/udc-sandbox.md']}"
                 />
             </Page>
             <Page

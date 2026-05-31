@@ -28,6 +28,8 @@ import "./rules/id-unknown-prop";
 import "./rules/id-unknown-event";
 import "./rules/id-unknown-method";
 import "./rules/id-unknown-slot";
+// Plan #14 Step 2.2: UDC sandbox slot consumer check
+import "./rules/udc-slot-undeclared";
 // Phase 2: Expression rules
 import "./rules/expr-unused-var";
 import "./rules/expr-unbound-identifier";

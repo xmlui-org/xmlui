@@ -1058,11 +1058,13 @@ export class ComponentRegistry {
       renderer,
       metadata,
       isCompoundComponent,
+      udcContract,
     }: {
       type: string;
       renderer: ComponentRendererFn<any>;
       isCompoundComponent?: boolean;
       metadata?: ComponentMetadata;
+      udcContract?: unknown;
     },
     namespace: string,
   ) => {
@@ -1070,6 +1072,7 @@ export class ComponentRegistry {
       renderer,
       descriptor: metadata,
       isCompoundComponent,
+      udcContract,
     };
     const fullName = `${namespace}.${type}`;
     if (!this.pool.has(namespace)) {
@@ -1119,6 +1122,7 @@ export class ComponentRegistry {
       },
       isCompoundComponent: true,
       metadata: mergedMetadata,
+      udcContract: compoundComponentDef.contract,
     };
 
     this.registerComponentRenderer(component, namespace);

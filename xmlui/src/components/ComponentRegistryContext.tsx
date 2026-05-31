@@ -15,6 +15,13 @@ export type ComponentRegistryEntry = {
 
   // Indicates whether this entry represents a compound (user-defined) component
   isCompoundComponent?: boolean;
+
+  // For compound components: the UDC sandbox contract parsed from
+  // explicit <Prop>/<Event>/<Method>/<Slot> declarations.  Used by analyzer
+  // rules (e.g. udc-slot-undeclared) to enforce the declared surface
+  // across files.  Typed loosely to avoid pulling components-core types
+  // into the registry layer; consumers cast to `UdcContract`.
+  udcContract?: unknown;
 };
 
 // Context object that makes the component registry available

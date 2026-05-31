@@ -217,14 +217,15 @@ export type StandaloneAppDescription = {
    *   layout-prop values. Higher values are clamped with a
    *   `kind:"theming"` warn entry; the clamp applies in both strict
    *   and non-strict modes.
-   * - `strictUdcSandbox` (boolean, default `false`) — when `true`,
+   * - `strictUdcSandbox` (boolean, default `true`) — when `true`,
    *   UDC sandboxing diagnostics (`udc-prop-undeclared`,
    *   `udc-scope-leak`, `udc-capability-missing`, etc.) escalate from
    *   `info` / `warn` to `error`. In strict mode, undeclared prop
    *   accesses and capability violations are blocked at runtime.
    *   Requires UDCs to carry explicit `<Prop>`, `<Event>`, `<Method>`,
-   *   and `<Slot>` declarations. Flips to `true` in the next major
-   *   release. See `dev-docs/plans/14-udc-sandbox.md`.
+   *   and `<Slot>` declarations. Set to `false` to fall back to the
+   *   legacy warn-only behaviour during migration. See
+   *   `dev-docs/plans/14-udc-sandbox.md`.
    * - `strictVersioning` (boolean, default `false`) — when `true`,
    *   versioning diagnostics (`removed-prop`, `internal-component-use`)
    *   escalate from `warn` to `error`; markup using a removed prop is

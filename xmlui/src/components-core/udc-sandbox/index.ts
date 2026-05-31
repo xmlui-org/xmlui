@@ -35,3 +35,5 @@ export {
 export type { SerializedUdcContract, UdcManifest } from "./manifest";
 export { compareManifest, loadManifest, serializeContract } from "./manifest";
 export { validateUdcPropReferences } from "./validators";
+export type { UdcFinding, UdcReport } from "./report";
+export { collectUdcReport, formatUdcAuditReport } from "./report";
