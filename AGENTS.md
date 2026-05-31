@@ -137,6 +137,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `data-operations.md` | DataSource, APICall, loaders, React Query | Data-fetching components |
 | `behaviors.md` | The 9 auto-attached behaviors, application order | Behavior interactions, form components |
 | `action-execution.md` | Action model, ApiBoundComponent, nested actions | Event handling, API calls |
+| `concurrency.md` | `$cancel` token, `handlerPolicy`, `handlerTimeoutMs`, `transactional`, `App.cancel`, `strictConcurrency` | Handler scheduling, cancellation, timeouts |
 | `user-defined-components.md` | UDCs, slots, template composition | User-facing extensibility |
 | `form-infrastructure.md` | Form/FormItem, validation, dirty/touched state | Form components |
 | `routing.md` | Pages/Page, react-router integration, navigation, defended-routing constraints/guards/canonicalisation, diagnostic codes | Routing changes, constraint authoring, navigation guards |

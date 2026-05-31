@@ -31,7 +31,7 @@ import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
-import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import { AppUtilsNamespace, ClipboardNamespace, appCancel, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
 import { announceLiveRegion, GlobalLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
 import { SkipLink } from "../../components/SkipLink/SkipLinkReact";
 import {
@@ -1680,6 +1680,8 @@ export function AppContent({
         // suppress the toast.
         errors,
         setErrorHandler,
+        // --- Plan #6 Step 1.2: cooperative handler cancellation.
+        cancel: appCancel,
       },
       Clipboard: ClipboardNamespace,
 

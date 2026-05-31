@@ -122,16 +122,16 @@ export type StandaloneAppDescription = {
    *   the budget emits a `kind:"lifecycle"` violation with
    *   `reason:"timeout"` and lets the unmount proceed.
    * - `strictConcurrency` (boolean, default `false`) — when `true`, the
-   *   handler-coordinator (plan #06) refuses unknown `handlerPolicy` values
-   *   at build time and escalates concurrency-policy mismatches (e.g. a
-   *   `single-flight` handler invoked while a previous run is still in
-   *   flight under `parallel` ancestry) from `warn` to `error`. When
-   *   `false` (the W3-6 rollout default — risk-probe phase) the public API
-   *   surface (`$cancel`, `HandlerPolicy`, `createHandlerCoordinator`) is
-   *   available but enforcement is best-effort: handlers that don't read
-   *   `$cancel` and don't declare a non-default policy see no behavioural
-   *   change. Flips to `true` once the W7-1 coordinator runtime ships. See
-   *   `dev-docs/plans/06-handler-concurrency-and-cancellation.md`.
+   *   handler-coordinator (plan #06) escalates `concurrency-handler-timeout`
+   *   diagnostics from `warn` to `error`: in addition to the
+   *   `kind:"concurrency"` trace entry the runtime emits a `console.error`
+   *   and routes the timeout through `App.signError` so it surfaces on the
+   *   global error channel. When `false` (the default during the W3-6/W7-1
+   *   rollout) timeouts are warn-only and only visible in the Inspector.
+   *   Cancellation, supersession, and drop outcomes are always info-level —
+   *   they are expected outcomes of the policies, not failures. Flips to
+   *   `true` in the next major. See
+   *   `dev-docs/plans/06-cooperative-concurrency.md`.
    * - `defaultHandlerTimeoutMs` (number, default `30000`) — millisecond
    *   budget after which an in-flight event handler is automatically
    *   cancelled with `CancellationReason="timeout"` and a

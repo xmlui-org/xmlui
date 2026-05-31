@@ -301,6 +301,10 @@
                             to="/docs/managed-react/i18n-foundations"
                         />
                         <NavLink
+                            label="Cooperative Concurrency"
+                            to="/docs/managed-react/cooperative-concurrency"
+                        />
+                        <NavLink
                             label="Code Injection Prevention"
                             to="/docs/managed-react/code-injection-prevention"
                         />
@@ -2615,6 +2619,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/i18n-foundations.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/cooperative-concurrency"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/cooperative-concurrency.md']}"
                 />
             </Page>
             <Page
