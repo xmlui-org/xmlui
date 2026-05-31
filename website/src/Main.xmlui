@@ -305,6 +305,10 @@
                             to="/docs/managed-react/i18n-foundations"
                         />
                         <NavLink
+                            label="Forms Validation Discipline"
+                            to="/docs/managed-react/forms-validation-discipline"
+                        />
+                        <NavLink
                             label="Cooperative Concurrency"
                             to="/docs/managed-react/cooperative-concurrency"
                         />
@@ -2588,6 +2592,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/sealed-theming-sandbox.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/forms-validation-discipline"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/forms-validation-discipline.md']}"
                 />
             </Page>
             <Page
