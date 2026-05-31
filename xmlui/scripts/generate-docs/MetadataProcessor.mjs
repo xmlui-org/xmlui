@@ -348,9 +348,23 @@ function addPropsSection(data, component) {
         : "";
     const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
     buffer += `### \`${propName}\`\n\n${propModifier ? `> [!DEF] ${propModifier}\n\n` : ""}`;
+    buffer += lifecycleBadge(prop, "prop");
 
     buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
     buffer += "\n\n";
+
+    // --- Plan #12 §1.3: per-value deprecation aliases.
+    if (Array.isArray(prop.valueAliases) && prop.valueAliases.length > 0) {
+      buffer += `**Deprecated values**:\n\n`;
+      for (const alias of prop.valueAliases) {
+        if (!alias || typeof alias !== "object") continue;
+        const repl = alias.to ? ` → use \`${alias.to}\`` : "";
+        const since = alias.deprecatedSince ? ` (since v${alias.deprecatedSince})` : "";
+        const removed = alias.removedIn ? `, removed in v${alias.removedIn}` : "";
+        buffer += `- \`${alias.from}\`${repl}${since}${removed}\n`;
+      }
+      buffer += "\n";
+    }
   });
 
   // Remove last newline
@@ -369,6 +383,7 @@ function addApisSection(data, component) {
   // Use pattern utility for processing APIs
   processComponentSection(component.apis, (apiName, api) => {
     buffer += `### \`${apiName}\`\n\n`;
+    buffer += lifecycleBadge(api, "method");
     buffer += getComponentDescription(api);
     buffer += "\n\n";
     if (api.signature) {
@@ -400,6 +415,7 @@ function addEventsSection(data, component) {
   // Use pattern utility for processing events
   processComponentSection(component.events, (eventName, event) => {
     buffer += `### \`${eventName}\`\n\n`;
+    buffer += lifecycleBadge(event, "event");
     buffer += getComponentDescription(event);
     buffer += "\n\n";
     if (event.signature) {
@@ -710,21 +726,55 @@ function addDeprecationMessage(deprecationMessage) {
   return `>[!WARNING]\n> ${deprecationMessage}\n\n`;
 }
 
+// --- Plan #12 §1.3: emit a one-line lifecycle badge for an individual
+// prop / event / method / value. `entry` is the metadata object; `kind`
+// is "prop" | "event" | "method" | "value" purely for diagnostic clarity.
+// Returns an empty string when nothing to badge.
+function lifecycleBadge(entry, kind = "member") {
+  if (!entry || typeof entry !== "object") return "";
+  const bits = [];
+  const status = entry.status;
+  if (status === "experimental") {
+    bits.push("🟧 **Experimental**");
+  } else if (status === "deprecated") {
+    bits.push("🟥 **Deprecated**");
+  } else if (status === "internal") {
+    bits.push("⚪ **Internal**");
+  }
+  if (entry.deprecatedSince) {
+    bits.push(`since v${entry.deprecatedSince}`);
+  }
+  if (entry.removedIn) {
+    bits.push(`removed in v${entry.removedIn}`);
+  }
+  if (entry.replacement) {
+    bits.push(`use \`${entry.replacement}\` instead`);
+  }
+  if (bits.length === 0 && !entry.deprecationMessage) return "";
+  let line = bits.join(" · ");
+  if (entry.deprecationMessage) {
+    line = line ? `${line} — ${entry.deprecationMessage}` : entry.deprecationMessage;
+  }
+  return line ? `> [!WARNING] ${line}\n\n` : "";
+}
+
 function addComponentStatusDisclaimer(status) {
   let disclaimer = "";
   switch (status) {
     case "stable":
       disclaimer = "";
       break;
-    // --- Tempoparily removed
-    // case "experimental":
-    //   disclaimer =
-    //     "This component is in an **experimental** state; you can use it in your app. " +
-    //     "However, we may modify it, and it may even have breaking changes in the future.";
-    //   break;
+    case "experimental":
+      disclaimer =
+        "This component is in an **experimental** state; you can use it in your app, but expect breaking changes in future XMLUI versions.";
+      break;
     case "deprecated":
       disclaimer =
         "This component has been **deprecated**. We may remove it in a future XMLUI version.";
+      break;
+    case "internal":
+      disclaimer =
+        "This component is **internal**. It is not part of the public surface and may change or disappear without notice.";
       break;
     case "in progress":
       disclaimer =

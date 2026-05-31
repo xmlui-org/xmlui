@@ -133,6 +133,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `wrapcomponent.md` | `wrapComponent` config API, events, templates, state | Components using `wrapComponent` |
 | `expression-eval.md` | Parser pipeline, AST, sync/async eval, dependency tracking | Expression bugs, scripting issues |
 | `type-contracts.md` | Verified component metadata contracts, diagnostics, strict mode | Type-contract verifier or diagnostic surface work |
+| `versioning.md` | Lifecycle vocabulary, `VersioningDiagnostic` codes, `applyValueAliases`, `preserveLegacyDefaults`, release-guard CLI | Adding deprecations, renames, default flips, or touching the api-diff pipeline |
 | `theming-styling.md` | CSS variables, SCSS modules, tone management | Visual components, theme customization |
 | `data-operations.md` | DataSource, APICall, loaders, React Query | Data-fetching components |
 | `behaviors.md` | The 9 auto-attached behaviors, application order | Behavior interactions, form components |

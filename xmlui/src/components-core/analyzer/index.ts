@@ -43,3 +43,5 @@ import "./rules/theming-missing-prefix";
 // W7-3: Determinism rules (plan #16 Phase 3)
 import "./rules/determinism-floating-point-token";
 import "./rules/determinism-iteration-order-symbol";
+// W6-4: Versioning rules (plan #12)
+import "./rules/versioning";
