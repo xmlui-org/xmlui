@@ -277,6 +277,10 @@
                             to="/docs/managed-react/themevars-namespace"
                         />
                         <NavLink
+                            label="Sealed Theming Sandbox"
+                            to="/docs/managed-react/sealed-theming-sandbox"
+                        />
+                        <NavLink
                             label="Enforced Accessibility"
                             to="/docs/managed-react/enforced-accessibility"
                         />
@@ -2577,6 +2581,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/themevars-namespace.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/sealed-theming-sandbox"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/sealed-theming-sandbox.md']}"
                 />
             </Page>
             <Page
