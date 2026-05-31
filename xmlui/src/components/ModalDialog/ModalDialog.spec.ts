@@ -255,6 +255,134 @@ test.describe("Open/Close", () => {
 });
 
 // =============================================================================
+// EVENTS AND VAR TESTS
+// =============================================================================
+
+test.describe("Events and Vars", () => {
+  test("onClose fires and var.counter increments (documented example)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App>
+        <Button testId="open" label="Open Dialog" onClick="myDialog.open()" />
+        <ModalDialog
+          id="myDialog"
+          title="Example Dialog"
+          var.counter="{0}"
+          onClose="counter++">
+          <Text testId="counter">Dialog closed {counter} number of times.</Text>
+        </ModalDialog>
+      </App>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("counter")).toHaveText("Dialog closed 0 number of times.");
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("counter")).toHaveText("Dialog closed 1 number of times.");
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("counter")).toHaveText("Dialog closed 2 number of times.");
+  });
+
+  test("onClose fires in inner context, can modify var declared on ModalDialog", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" var.msg="{'initial'}" onClose="msg = 'closed'">
+          <Text testId="msg">{msg}</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("msg")).toHaveText("initial");
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("msg")).toHaveText("closed");
+  });
+
+  test("onOpen fires when dialog opens", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" var.opened="{0}" onOpen="opened++">
+          <Text testId="opened">{opened}</Text>
+          <Button testId="close" onClick="modal.close()">close</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("opened")).toHaveText("1");
+    await page.getByTestId("close").click();
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("opened")).toHaveText("2");
+  });
+
+  test("onClose returning false prevents close", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" onClose="return false">
+          <Text testId="content">content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByTestId("content")).toBeVisible();
+  });
+
+  test("var on ModalDialog persists across open/close cycles", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" var.count="{0}">
+          <Button testId="increment" onClick="count++">increment</Button>
+          <Text testId="count">{count}</Text>
+          <Button testId="close" onClick="modal.close()">close</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("count")).toHaveText("0");
+    await page.getByTestId("increment").click();
+    await page.getByTestId("increment").click();
+    await expect(page.getByTestId("count")).toHaveText("2");
+    await page.getByTestId("close").click();
+
+    // Reopen: count should persist
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("count")).toHaveText("2");
+  });
+
+  test("declarative onClose can modify ancestor var", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.isOpen="{false}">
+        <Button testId="open" onClick="isOpen = true">open</Button>
+        <ModalDialog when="{isOpen}" onClose="isOpen = false">
+          <Text testId="content">content</Text>
+        </ModalDialog>
+        <Text testId="state">{isOpen + ''}</Text>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await expect(page.getByTestId("state")).toHaveText("true");
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByTestId("content")).not.toBeVisible();
+    await expect(page.getByTestId("state")).toHaveText("false");
+  });
+});
+
+// =============================================================================
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================
 
