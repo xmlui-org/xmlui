@@ -78,14 +78,14 @@ export const ModalDialogFrame = React.forwardRef(
       });
     }, [doClose, doOpen, registerComponentApi]);
 
-    return isOpen ? (
+    return (
       <ModalStateContext.Provider value={modalContextStateValue}>
         {renderDialog({
           openParams,
           ref,
         })}
       </ModalStateContext.Provider>
-    ) : null;
+    );
   },
 );
 
@@ -129,7 +129,28 @@ function useModalLocalOpenState(isInitiallyOpen: boolean, onOpen?: OnOpen, onClo
 function useModalOpenState(isInitiallyOpen = true, onOpen?: OnOpen, onClose?: OnClose) {
   const modalStateContext = useContext(ModalStateContext);
   const modalLocalOpenState = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
-  return modalStateContext || modalLocalOpenState;
+
+  // When inside a ModalDialogFrame context, wrap doClose so the inner onClose handler
+  // (which has access to inner container vars like counter) fires before the frame closes.
+  const wrappedDoClose = useEvent(async () => {
+    const result = await onClose?.();
+    if (result !== false) {
+      await modalStateContext?.doClose();
+    }
+  });
+
+  if (!modalStateContext) {
+    return modalLocalOpenState;
+  }
+
+  if (!onClose) {
+    return modalStateContext;
+  }
+
+  return {
+    ...modalStateContext,
+    doClose: wrappedDoClose,
+  };
 }
 
 export const ModalDialog = memo(React.forwardRef(
@@ -162,7 +183,18 @@ export const ModalDialog = memo(React.forwardRef(
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
+    const modalStateContext = useContext(ModalStateContext);
     const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
+
+    // When inside a ModalDialogFrame, fire onOpen in the inner container context when the
+    // dialog transitions from closed to open (triggered by the outer frame's doOpen call).
+    const prevIsOpenRef = useRef(false);
+    useIsomorphicLayoutEffect(() => {
+      if (modalStateContext && isOpen && !prevIsOpenRef.current) {
+        onOpen?.();
+      }
+      prevIsOpenRef.current = isOpen;
+    }, [isOpen, modalStateContext, onOpen]);
 
     /**
      * https://github.com/radix-ui/primitives/issues/3648
