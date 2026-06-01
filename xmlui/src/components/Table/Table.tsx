@@ -1,8 +1,5 @@
 import { type ForwardedRef, forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
-import produce from "immer";
-
 import styles from "./Table.module.scss";
-
 import "./react-table-config.d.ts";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";

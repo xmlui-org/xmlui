@@ -145,8 +145,6 @@ export const modalViewComponentRenderer = wrapComponent(
           <ModalDialogFrame
             isInitiallyOpen={extractValue(node.when) !== undefined}
             registerComponentApi={registerComponentApi}
-            onClose={lookupEventHandler("close")}
-            onOpen={lookupEventHandler("open")}
             renderDialog={({ openParams, ref }) => {
               return (
                 <MemoizedItem
@@ -175,6 +173,8 @@ export const modalViewComponentRenderer = wrapComponent(
           titleTemplate={renderChild(node.props?.titleTemplate)}
           closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
           externalAnimation={extractValue.asOptionalBoolean(node.props.externalAnimation)}
+          onClose={lookupEventHandler("close")}
+          onOpen={lookupEventHandler("open")}
         >
           {renderChild(node.children, { type: "Stack" })}
         </ModalDialog>

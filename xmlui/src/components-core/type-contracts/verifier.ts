@@ -98,6 +98,9 @@ export function verifyComponentDef(
     // 1. missing-required: props declared isRequired that are absent from the def
     for (const [propName, propMeta] of Object.entries(metaProps)) {
       if (propMeta.isRequired && !(propName in defProps)) {
+        // The XML parser hoists the `id` attribute out of props into `node.uid`.
+        // A present `uid` satisfies a required "id" prop declaration.
+        if (propName === "id" && node.uid !== undefined) continue;
         diagnostics.push({
           code: "missing-required",
           severity,

@@ -1,9 +1,9 @@
-import { DiagnosticSeverity, type Diagnostic, type Position } from "vscode-languageserver";
+import { DiagnosticSeverity, type Diagnostic } from "vscode-languageserver";
 import type { ParserDiag } from "../../parsers/xmlui-parser/diagnostics";
 import type { ParseResult } from "../../parsers/xmlui-parser/parser";
 import type { Project } from "../base/project";
 import type { DocumentUri, DocumentCursor } from "../base/text-document";
-import { analyze } from "../../components-core/analyzer/walker";
+import { analyze } from "../../components-core/analyzer";
 import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { getReactiveCycleDiagnostics } from "./reactive-cycle-diagnostic";
 import { getA11yDiagnostics } from "./a11y-diagnostic";

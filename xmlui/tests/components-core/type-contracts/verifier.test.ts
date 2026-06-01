@@ -114,6 +114,34 @@ describe("verifyComponentDef — missing-required", () => {
     const def = { type: "Form", props: { data: "myData" } } as ComponentDef;
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
+
+  it("does not emit missing-required for 'id' when node.uid is set (parser hoists id→uid)", () => {
+    // The XML parser stores `id="..."` in node.uid, not node.props.
+    // A required `id` prop must be satisfied by uid.
+    const registry = makeRegistry({
+      DataSource: {
+        props: {
+          id: { description: "Component id", isRequired: true, valueType: "string" },
+        },
+      },
+    });
+    const def = { type: "DataSource", uid: "myData" } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
+  it("still emits missing-required for 'id' when neither props.id nor uid is set", () => {
+    const registry = makeRegistry({
+      DataSource: {
+        props: {
+          id: { description: "Component id", isRequired: true, valueType: "string" },
+        },
+      },
+    });
+    const def = { type: "DataSource" } as ComponentDef;
+    const result = verifyComponentDef(def, registry);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ code: "missing-required", propName: "id" });
+  });
 });
 
 describe("verifyComponentDef — unknown-prop", () => {
