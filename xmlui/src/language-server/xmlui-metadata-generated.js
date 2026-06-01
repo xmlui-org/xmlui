@@ -1975,7 +1975,21 @@ export default {
         "description": "This optional property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the request URL. You can specify key and value pairs where the key is the name of a particular query parameter and the value is that parameter's value."
       },
       "headers": {
-        "description": "You can optionally define request header values as key-value pairs, where the key is the ID of the particular header and the value is that header's corresponding value."
+        "description": "You can optionally define request header values as key-value pairs, where the key is the ID of the particular header and the value is that header's corresponding value.",
+        "audit": {
+          "classification": "secret",
+          "defaultRedaction": "mask",
+          "fieldPolicies": {
+            "Authorization": {
+              "classification": "secret",
+              "defaultRedaction": "mask"
+            },
+            "Cookie": {
+              "classification": "secret",
+              "defaultRedaction": "drop"
+            }
+          }
+        }
       },
       "credentials": {
         "description": "Controls whether cookies and other credentials are sent with the request. Set to `\"include\"` to send credentials in cross-origin requests (requires `Access-Control-Allow-Credentials: true` header on the server).",
@@ -2012,7 +2026,7 @@ export default {
         "valueType": "string"
       },
       "deferredMode": {
-        "description": "Enable deferred operation mode for long-running operations that return 202 Accepted. When enabled, the component will automatically poll a status endpoint to track operation progress. (Experimental feature)",
+        "description": "Enable deferred operation mode for long-running operations that return **202 Accepted**. When enabled, the component will automatically poll a status endpoint to track operation progress. (Experimental feature)",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -2037,12 +2051,12 @@ export default {
         "defaultValue": "get"
       },
       "pollingInterval": {
-        "description": "Milliseconds between status polls. Defaults to 2000ms.",
+        "description": "Controls how often status checks run in deferred mode (in milliseconds).",
         "valueType": "number",
         "defaultValue": 2000
       },
       "maxPollingDuration": {
-        "description": "Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).",
+        "description": "Maximum time to poll before timing out, in milliseconds.",
         "valueType": "number",
         "defaultValue": 300000
       },
@@ -2054,10 +2068,11 @@ export default {
           "linear",
           "exponential"
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "maxPollingInterval": {
-        "description": "Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).",
+        "description": "Maximum interval between polls when using backoff strategies, in milliseconds.",
         "valueType": "number",
         "defaultValue": 30000
       },
@@ -2178,6 +2193,15 @@ export default {
         "parameters": {}
       },
       "mockExecute": {
+        "injectedVars": [
+          "$pathParams",
+          "$queryParams",
+          "$requestBody",
+          "$cookies",
+          "$requestHeaders",
+          "$param",
+          "$params"
+        ],
         "description": "When defined, this event handler replaces the actual API request. The handler receives the resolved request properties as context variables: `$pathParams`, `$queryParams`, `$requestBody`, `$cookies`, `$requestHeaders`. When triggered via the `execute()` method, `$param` and `$params` are also available. The return value of the handler becomes the result of the API call.",
         "signature": "() => any",
         "parameters": {}
@@ -2372,7 +2396,8 @@ export default {
         "availableValues": [
           "light",
           "dark"
-        ]
+        ],
+        "isStrictEnum": true
       },
       "defaultTheme": {
         "description": "This property sets the app's default theme.",
@@ -2399,6 +2424,91 @@ export default {
         "description": "The `localStorage` key used to persist the tone when `persistTheme` is `true`. Change this if you need to namespace the key per-app or per-user.",
         "valueType": "string",
         "defaultValue": "appTone",
+        "isInternal": true
+      },
+      "locale": {
+        "description": "BCP-47 locale override for the app.",
+        "valueType": "string",
+        "isInternal": true
+      },
+      "localeBundles": {
+        "description": "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map.",
+        "valueType": "any",
+        "isInternal": true
+      },
+      "direction": {
+        "description": "Text direction for the app.",
+        "valueType": "string",
+        "availableValues": [
+          "ltr",
+          "rtl",
+          "auto"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "auto",
+        "isInternal": true
+      },
+      "scheduler": {
+        "description": "Handler scheduler mode.",
+        "valueType": "string",
+        "availableValues": [
+          "concurrent",
+          "fifo"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "concurrent",
+        "isInternal": true
+      },
+      "maxQueuedPerTrace": {
+        "description": "Maximum number of queued handlers allowed per scheduler trace.",
+        "valueType": "integer",
+        "defaultValue": 64,
+        "isInternal": true
+      },
+      "urlCase": {
+        "description": "URL canonicalisation case policy.",
+        "valueType": "string",
+        "availableValues": [
+          "preserve",
+          "lower"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "preserve",
+        "isInternal": true
+      },
+      "urlTrailingSlash": {
+        "description": "URL canonicalisation trailing-slash policy.",
+        "valueType": "string",
+        "availableValues": [
+          "preserve",
+          "always",
+          "never"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "preserve",
+        "isInternal": true
+      },
+      "urlQueryParamOrder": {
+        "description": "URL canonicalisation query-parameter ordering policy.",
+        "valueType": "string",
+        "availableValues": [
+          "preserve",
+          "alphabetical"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "preserve",
+        "isInternal": true
+      },
+      "nonCanonicalUrl": {
+        "description": "Action taken when the current URL is not canonical.",
+        "valueType": "string",
+        "availableValues": [
+          "warn",
+          "rewrite",
+          "redirect"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "warn",
         "isInternal": true
       }
     },
@@ -2443,6 +2553,14 @@ export default {
         "parameters": {
           "to": "The path that was navigated to.",
           "queryParams": "Query parameters (only available for programmatic navigation)."
+        }
+      },
+      "error": {
+        "description": "This event fires whenever the framework signals an unhandled error (loader failure, handler exception, or render-time throw). The handler receives the structured `AppError` and an event-like object whose `preventDefault()` suppresses the default toast. By default the toast is shown first; the handler can also return `false` to suppress the toast. Use this hook for centralised telemetry or custom error UI.",
+        "signature": "(error: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>",
+        "parameters": {
+          "error": "The structured `AppError` (code, category, retryable, correlationId, data).",
+          "event": "Cancellable event payload. Call `event.preventDefault()` to suppress the toast."
         }
       }
     },
@@ -2492,7 +2610,13 @@ export default {
       "backgroundColor-content-App": "$backgroundColor",
       "light": {},
       "dark": {}
-    }
+    },
+    "unstableChildInjectedVars": [
+      "$pathname",
+      "$routeParams",
+      "$queryParams",
+      "$linkInfo"
+    ]
   },
   "AppHeader": {
     "status": "stable",
@@ -2714,6 +2838,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -2726,6 +2854,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "dropdownHeight": {
@@ -2742,6 +2871,18 @@ export default {
       },
       "emptyListTemplate": {
         "description": "This property defines the template to display when the list of options is empty.",
+        "valueType": "ComponentDef"
+      },
+      "groupBy": {
+        "description": "Field name on each Option to group by. When set, the dropdown shows a section header above each group of options sharing the same value of `option[groupBy]`. Headers are computed against the currently visible (filtered) options, so searching automatically updates which option carries its group's header. Use it together with an extra attribute on `<Option>` (e.g. `clientName=\"{$item.clientName}\"`). Mirrors `Select`'s `groupBy`.",
+        "valueType": "string"
+      },
+      "groupHeaderTemplate": {
+        "description": "Customizes the section header rendered above each group when `groupBy` is set. Use the `$group` context variable to access the group name. When omitted, the group name is rendered as plain text.",
+        "valueType": "ComponentDef"
+      },
+      "ungroupedHeaderTemplate": {
+        "description": "Customizes the section header for the \"Ungrouped\" bucket (options that do not declare a value for the `groupBy` field). When omitted, the Ungrouped bucket has no header.",
         "valueType": "ComponentDef"
       },
       "modal": {
@@ -2811,6 +2952,9 @@ export default {
     "contextVars": {
       "$item": {
         "description": "This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option."
+      },
+      "$group": {
+        "description": "Group name available inside `groupHeaderTemplate` when `groupBy` is set."
       }
     },
     "themeVars": {
@@ -2943,7 +3087,15 @@ export default {
       "backgroundColor-item-AutoComplete": "var(--xmlui-backgroundColor-item-AutoComplete)",
       "backgroundColor-item-AutoComplete--active": "var(--xmlui-backgroundColor-item-AutoComplete--active)",
       "backgroundColor-item-AutoComplete--hover": "var(--xmlui-backgroundColor-item-AutoComplete--hover)",
-      "textColor-item-AutoComplete--disabled": "var(--xmlui-textColor-item-AutoComplete--disabled)"
+      "textColor-item-AutoComplete--disabled": "var(--xmlui-textColor-item-AutoComplete--disabled)",
+      "paddingTop-groupHeader-AutoComplete": "var(--xmlui-paddingTop-groupHeader-AutoComplete)",
+      "paddingBottom-groupHeader-AutoComplete": "var(--xmlui-paddingBottom-groupHeader-AutoComplete)",
+      "paddingHorizontal-groupHeader-AutoComplete": "var(--xmlui-paddingHorizontal-groupHeader-AutoComplete)",
+      "fontSize-groupHeader-AutoComplete": "var(--xmlui-fontSize-groupHeader-AutoComplete)",
+      "fontWeight-groupHeader-AutoComplete": "var(--xmlui-fontWeight-groupHeader-AutoComplete)",
+      "letterSpacing-groupHeader-AutoComplete": "var(--xmlui-letterSpacing-groupHeader-AutoComplete)",
+      "textTransform-groupHeader-AutoComplete": "var(--xmlui-textTransform-groupHeader-AutoComplete)",
+      "textColor-groupHeader-AutoComplete": "var(--xmlui-textColor-groupHeader-AutoComplete)"
     },
     "defaultThemeVars": {
       "backgroundColor-AutoComplete": "transparent",
@@ -2969,8 +3121,22 @@ export default {
       "backgroundColor-item-AutoComplete--hover": "$backgroundColor-dropdown-item--hover",
       "backgroundColor-item-AutoComplete--active": "$backgroundColor-dropdown-item--active",
       "borderColor-AutoComplete--disabled": "$borderColor--disabled",
-      "textColor-AutoComplete--disabled": "$textColor--disabled"
-    }
+      "textColor-AutoComplete--disabled": "$textColor--disabled",
+      "paddingHorizontal-groupHeader-AutoComplete": "$space-3",
+      "paddingTop-groupHeader-AutoComplete": "$space-3",
+      "paddingBottom-groupHeader-AutoComplete": "$space-1",
+      "fontSize-groupHeader-AutoComplete": "$fontSize-tiny",
+      "fontWeight-groupHeader-AutoComplete": "700",
+      "letterSpacing-groupHeader-AutoComplete": "0.05em",
+      "textTransform-groupHeader-AutoComplete": "uppercase",
+      "textColor-groupHeader-AutoComplete": "$textColor-subtitle"
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$item",
+      "$selectedValue",
+      "$inTrigger"
+    ]
   },
   "Avatar": {
     "status": "stable",
@@ -3451,6 +3617,11 @@ export default {
       "contextualLabel": {
         "description": "This optional value is used to provide an accessible name for the Button in the context of its usage.",
         "valueType": "string"
+      },
+      "busyOnClick": {
+        "description": "When `true`, the Button auto-disables itself while its `onClick` handler is running, preventing accidental double-submits. Combine with `handlerPolicy:click=\"single-flight\"` for full dispatcher-level deduplication of rapid repeated clicks.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "events": {
@@ -3536,7 +3707,6 @@ export default {
       "transition-Button": "var(--xmlui-transition-Button)",
       "width-Button": "var(--xmlui-width-Button)",
       "height-Button": "var(--xmlui-height-Button)",
-      "minHeight-Button": "var(--xmlui-minHeight-Button)",
       "gap-Button-vertical": "var(--xmlui-gap-Button-vertical)",
       "width-Button-vertical": "var(--xmlui-width-Button-vertical)",
       "height-Button-vertical": "var(--xmlui-height-Button-vertical)",
@@ -3720,7 +3890,6 @@ export default {
       "width-Button-vertical": "fit-content",
       "height-Button-vertical": "fit-content",
       "gap-Button-vertical": "$space-1",
-      "minHeight-Button": "2.5rem",
       "borderRadius-Button": "$borderRadius",
       "fontSize-Button": "$fontSize-sm",
       "fontWeight-Button": "$fontWeight-medium",
@@ -3752,8 +3921,9 @@ export default {
       "backgroundColor-Button-primary--active": "$color-primary-500",
       "backgroundColor-Button-primary-outlined--hover": "$color-primary-50",
       "backgroundColor-Button-primary-outlined--active": "$color-primary-100",
-      "borderColor-Button-primary-outlined": "$color-primary-600",
-      "borderColor-Button-primary-outlined--hover": "$color-primary-500",
+      "borderColor-Button-primary-outlined": "$borderColor-outlined",
+      "borderColor-Button-primary-outlined--hover": "$borderColor-outlined--hover",
+      "borderColor-Button-primary-outlined--active": "$borderColor-outlined--active",
       "textColor-Button-primary-outlined": "$color-primary-900",
       "textColor-Button-primary-outlined--hover": "$color-primary-950",
       "textColor-Button-primary-outlined--active": "$color-primary-900",
@@ -4044,6 +4214,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -4056,6 +4230,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "description": {
@@ -4190,7 +4365,11 @@ export default {
       "borderColor-checked-Checkbox": "$color-primary-500",
       "backgroundColor-checked-Checkbox": "$color-primary-500",
       "backgroundColor-Checkbox--disabled": "$color-surface-200"
-    }
+    },
+    "childInjectedVars": [
+      "$checked",
+      "$setChecked"
+    ]
   },
   "CODE": {
     "status": "deprecated",
@@ -4228,6 +4407,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -4240,6 +4423,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       }
     },
@@ -4366,6 +4550,7 @@ export default {
           "left",
           "right"
         ],
+        "isStrictEnum": true,
         "valueType": "string"
       },
       "canResize": {
@@ -4393,7 +4578,15 @@ export default {
       "$rowIndex": {
         "description": "Zero-based row index (the same as `$itemIndex`)."
       }
-    }
+    },
+    "childInjectedVars": [
+      "$item",
+      "$cell",
+      "$itemIndex",
+      "$colIndex",
+      "$row",
+      "$rowIndex"
+    ]
   },
   "ContextMenu": {
     "status": "stable",
@@ -4447,7 +4640,10 @@ export default {
       "boxShadow-ContextMenu": "$boxShadow-xl",
       "borderStyle-ContextMenu-content": "solid",
       "borderRadius-ContextMenu": "$borderRadius"
-    }
+    },
+    "childInjectedVars": [
+      "$context"
+    ]
   },
   "ContentSeparator": {
     "status": "stable",
@@ -4653,6 +4849,19 @@ export default {
         "parameters": {
           "error": "The error object that occurred during the request."
         }
+      },
+      "fetch": {
+        "injectedVars": [
+          "$url",
+          "$method",
+          "$queryParams",
+          "$requestBody",
+          "$requestHeaders",
+          "$pageParams"
+        ],
+        "description": "When defined, this event handler replaces the default fetch logic. The handler receives the resolved request properties as context variables: `$url`, `$method`, `$queryParams`, `$requestBody`, `$requestHeaders`, and `$pageParams` (when paging). The return value of the handler becomes the data result. Caching, polling, the `loaded`/`error` events, `resultSelector`, `transformResult`, and the `refetch()` method continue to work normally because the handler runs inside the same query function that powers the default fetch.",
+        "signature": "fetch(): any",
+        "parameters": {}
       }
     },
     "apis": {
@@ -4712,6 +4921,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -4724,6 +4937,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "mode": {
@@ -4838,6 +5052,11 @@ export default {
       "invalidMessages": {
         "description": "The invalid messages to display for the input component.",
         "valueType": "any"
+      },
+      "confirmRangeSelection": {
+        "description": "In `range` mode, show a Cancel/Proceed footer so the user must explicitly confirm the selected range before it is committed. When `false` (default), the range auto-commits on the second click and the popup closes.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "events": {
@@ -4963,6 +5182,19 @@ export default {
       "Input:boxShadow-menu-DatePicker": "var(--xmlui-boxShadow-menu-DatePicker)",
       "Input:backgroundColor-menu-DatePicker": "var(--xmlui-backgroundColor-menu-DatePicker)",
       "Input:borderRadius-menu-DatePicker": "var(--xmlui-borderRadius-menu-DatePicker)",
+      "Input:backgroundColor-overlay-DatePicker": "var(--xmlui-backgroundColor-overlay-DatePicker)",
+      "Input:backgroundColor-day-DatePicker--today": "var(--xmlui-backgroundColor-day-DatePicker--today)",
+      "Input:textColor-day-DatePicker--today": "var(--xmlui-textColor-day-DatePicker--today)",
+      "Input:borderColor-day-DatePicker--today": "var(--xmlui-borderColor-day-DatePicker--today)",
+      "Input:borderWidth-day-DatePicker--today": "var(--xmlui-borderWidth-day-DatePicker--today)",
+      "Input:borderStyle-day-DatePicker--today": "var(--xmlui-borderStyle-day-DatePicker--today)",
+      "Input:backgroundColor-day-DatePicker--disabled": "var(--xmlui-backgroundColor-day-DatePicker--disabled)",
+      "Input:textColor-day-DatePicker--disabled": "var(--xmlui-textColor-day-DatePicker--disabled)",
+      "Input:backgroundColor-day-DatePicker--selected": "var(--xmlui-backgroundColor-day-DatePicker--selected)",
+      "Input:textColor-day-DatePicker--selected": "var(--xmlui-textColor-day-DatePicker--selected)",
+      "Input:backgroundColor-day-DatePicker--rangeMiddle": "var(--xmlui-backgroundColor-day-DatePicker--rangeMiddle)",
+      "Input:textColor-day-DatePicker--rangeMiddle": "var(--xmlui-textColor-day-DatePicker--rangeMiddle)",
+      "Input:textColor-weekday-DatePicker": "var(--xmlui-textColor-weekday-DatePicker)",
       "Input:backgroundColor-item-DatePicker--active": "var(--xmlui-backgroundColor-item-DatePicker--active)",
       "Input:backgroundColor-item-DatePicker--hover": "var(--xmlui-backgroundColor-item-DatePicker--hover)",
       "Input:textColor-value-DatePicker": "var(--xmlui-textColor-value-DatePicker)",
@@ -4977,6 +5209,19 @@ export default {
       "backgroundColor-menu-DatePicker": "$color-surface-50",
       "backgroundColor-item-DatePicker--hover": "$color-surface-100",
       "backgroundColor-item-DatePicker--active": "$color-surface-200",
+      "backgroundColor-overlay-DatePicker": "$backgroundColor-overlay",
+      "backgroundColor-day-DatePicker--selected": "$color-primary-500",
+      "textColor-day-DatePicker--selected": "$color-surface-0",
+      "backgroundColor-day-DatePicker--rangeMiddle": "$color-primary-100",
+      "textColor-day-DatePicker--rangeMiddle": "$textColor-primary",
+      "backgroundColor-day-DatePicker--today": "transparent",
+      "textColor-day-DatePicker--today": "$textColor-primary",
+      "borderColor-day-DatePicker--today": "$color-secondary-300",
+      "borderWidth-day-DatePicker--today": "1px",
+      "borderStyle-day-DatePicker--today": "solid",
+      "backgroundColor-day-DatePicker--disabled": "transparent",
+      "textColor-day-DatePicker--disabled": "$color-secondary-300",
+      "textColor-weekday-DatePicker": "$color-secondary-300",
       "paddingVertical-DatePicker": "$space-2",
       "paddingHorizontal-DatePicker": "$space-2"
     }
@@ -5024,6 +5269,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -5036,6 +5285,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "invalidMessages": {
@@ -5407,6 +5657,7 @@ export default {
           "top",
           "bottom"
         ],
+        "isStrictEnum": true,
         "defaultValue": "left"
       },
       "hasBackdrop": {
@@ -5501,7 +5752,8 @@ export default {
       "animationEasing-Drawer": "cubic-bezier(0.4, 0, 0.2, 1)",
       "top-closeButton-Drawer": "$space-2",
       "right-closeButton-Drawer": "$space-3"
-    }
+    },
+    "isImplicitContainerByDefault": true
   },
   "DropdownMenu": {
     "status": "stable",
@@ -6127,6 +6379,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -6139,6 +6395,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "buttonVariant": {
@@ -6411,6 +6668,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -6589,7 +6847,11 @@ export default {
         "defaultValue": false
       },
       "data": {
-        "description": "This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value."
+        "description": "This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.",
+        "audit": {
+          "classification": "sensitive",
+          "defaultRedaction": "hash"
+        }
       },
       "cancelLabel": {
         "description": "This property defines the label of the Cancel button.",
@@ -6708,12 +6970,27 @@ export default {
           "reset",
           "clear"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "keep"
+      },
+      "submitPolicy": {
+        "description": "Concurrency policy applied when the user triggers a submit while a previous submit is still running. `single-flight` (default) ignores extra clicks. `drop-while-running` fires the `submitDropped` event without queuing. `queue` is reserved for a future scheduler — currently behaves like `single-flight`.",
+        "availableValues": [
+          "single-flight",
+          "queue",
+          "drop-while-running"
+        ],
+        "isStrictEnum": true,
+        "valueType": "string",
+        "defaultValue": "single-flight"
       }
     },
     "events": {
       "willSubmit": {
+        "injectedVars": [
+          "$data"
+        ],
         "description": "The form infrastructure fires this event just before the form is submitted. The event receives two arguments: the cleaned form data (fields marked `noSubmit` excluded) and the complete form data (including all fields). The return value controls submission behavior: returning `false` cancels the submission; returning a plain object submits that object instead; returning `null`, `undefined`, an empty string, or any non-object value proceeds with normal submission.",
         "signature": "willSubmit(data: Record<string, any>, allData: Record<string, any>): false | Record<string, any> | null | undefined | void",
         "parameters": {
@@ -6722,13 +6999,30 @@ export default {
         }
       },
       "submit": {
+        "injectedVars": [
+          "$data"
+        ],
         "description": "The form infrastructure fires this event when the form is submitted. The event argument is the current `data` value to save.",
         "signature": "submit(data: Record<string, any>): void",
         "parameters": {
           "data": "The current form data being submitted."
         }
       },
+      "submitFailed": {
+        "injectedVars": [
+          "$data"
+        ],
+        "description": "The form infrastructure fires this event when a submit attempt is rejected because at least one field failed validation. `willSubmit` and `submit` are NOT fired in this case; `submitFailed` is the only signal available to react to a failed submit.",
+        "signature": "submitFailed(validationResult: { isValid: boolean, errors: any[], warnings: any[], validationResults: Record<string, any>, data: Record<string, any> }): void",
+        "parameters": {
+          "validationResult": "The validation result of the failed submit, including the per-field validation results."
+        },
+        "isInternal": true
+      },
       "success": {
+        "injectedVars": [
+          "$data"
+        ],
         "description": "The form infrastructure fires this event when the form is submitted successfully.",
         "signature": "success(response: any): void",
         "parameters": {
@@ -6736,14 +7030,35 @@ export default {
         }
       },
       "cancel": {
+        "injectedVars": [
+          "$data"
+        ],
         "description": "The form infrastructure fires this event when the form is canceled.",
         "signature": "cancel(): void",
         "parameters": {}
       },
       "reset": {
+        "injectedVars": [
+          "$data"
+        ],
         "description": "The form infrastructure fires this event when the form is reset.",
         "signature": "reset(): void",
         "parameters": {}
+      },
+      "submitError": {
+        "description": "Fires when the submit handler throws. The event receives the raw error and, when the framework was able to extract a structured validation problem (RFC 7807, Spring, Laravel, or the XMLUI legacy shape), the parsed problem object. The form has already merged per-field errors into the validation results when this fires.",
+        "signature": "submitError(error: any, problem: any): void",
+        "parameters": {
+          "error": "The raw error thrown by the submit handler.",
+          "problem": "The parsed RFC 7807-style validation problem, or `undefined` if none could be extracted."
+        }
+      },
+      "submitDropped": {
+        "description": "Fires when a submit attempt is suppressed because the configured `submitPolicy` rejected it (for example `drop-while-running`).",
+        "signature": "submitDropped(reason: string): void",
+        "parameters": {
+          "reason": "Why the submit was dropped (e.g. `drop-while-running`)."
+        }
       }
     },
     "contextVars": {
@@ -6772,6 +7087,10 @@ export default {
         "description": "This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.",
         "signature": "getData(): Record<string, any>",
         "returns": "A deep clone of the current form data object."
+      },
+      "cancel": {
+        "description": "Aborts the AbortController associated with the in-flight submit. The framework still awaits the submit handler's promise — cancellation is cooperative; handlers that wish to bail out early should observe the `$cancel` token / abort signal.",
+        "signature": "cancel(): void"
       }
     },
     "themeVars": {
@@ -6801,7 +7120,11 @@ export default {
       "marginTop-buttonRow-Form": "$space-4",
       "paddingTop-buttonRow-Form": "0",
       "backgroundColor-buttonRow-Form": "transparent"
-    }
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$data"
+    ]
   },
   "FormItem": {
     "status": "stable",
@@ -7042,15 +7365,37 @@ export default {
         "defaultValue": "error"
       },
       "pattern": {
-        "description": "This value specifies a predefined regular expression to test the input value. If this value is not set, no pattern check is done.",
+        "description": "**Deprecated** alias of `validator`. This value specifies a predefined validator name (or regex placeholder) to test the input value. If this value is not set, no validator check is done. Use `validator` instead.",
         "valueType": "string"
       },
       "patternInvalidMessage": {
-        "description": "This optional string property is used to customize the message that is displayed on a failed pattern test.",
+        "description": "**Deprecated** alias of `validatorInvalidMessage`. This optional string property is used to customize the message that is displayed on a failed pattern test.",
         "valueType": "string"
       },
       "patternInvalidSeverity": {
-        "description": "This property sets the severity level of the pattern validation.",
+        "description": "**Deprecated** alias of `validatorInvalidSeverity`. This property sets the severity level of the pattern validation.",
+        "valueType": "string",
+        "availableValues": [
+          "error",
+          "warning",
+          "valid"
+        ],
+        "defaultValue": "error"
+      },
+      "validator": {
+        "description": "Name of a registered validator (or an array of names) to run against the input value. Built-in validators include `email`, `phone`, `url`, `creditCard`, `iban`, `isoDate`, `strongPassword`, `noLeadingTrailingWhitespace`, and `length`. Register additional validators via `App.registerValidator`. When both `validator` and `pattern` are set, `validator` wins.",
+        "valueType": "string"
+      },
+      "validatorParams": {
+        "description": "Optional parameters object forwarded to the validator function (e.g. `{ minLength: 16 }` for `strongPassword`).",
+        "valueType": "any"
+      },
+      "validatorInvalidMessage": {
+        "description": "Optional message displayed when the configured validator reports the value as invalid. Overrides the validator's default message.",
+        "valueType": "string"
+      },
+      "validatorInvalidSeverity": {
+        "description": "Severity level applied to a validator failure.",
         "valueType": "string",
         "availableValues": [
           "error",
@@ -7076,6 +7421,14 @@ export default {
           "valid"
         ],
         "defaultValue": "error"
+      },
+      "matchValue": {
+        "description": "The value this field must match. This is useful for confirmation fields, such as checking a repeated password against the original password.",
+        "valueType": "any"
+      },
+      "matchInvalidMessage": {
+        "description": "This optional string property is used to customize the message displayed when the field value does not match `matchValue`.",
+        "valueType": "string"
       },
       "inputTemplate": {
         "description": "This property is used to define a custom input template.",
@@ -7154,18 +7507,28 @@ export default {
       "textTransform-label-formItem": "none",
       "textColor-requiredMark-formItem": "$color-danger-400",
       "textColor-optionalTag-formItem": "$textColor-secondary"
-    }
+    },
+    "childInjectedVars": [
+      "$value",
+      "$setValue",
+      "$validationResult"
+    ]
   },
   "FormSegment": {
     "status": "experimental",
     "description": "`FormSegment` groups a subset of form fields within a `Form` and exposes segment-scoped context variables for the fields it contains. Use it to build multi-step wizards, collapsible sections, or any layout that needs per-section data and validation state without creating a nested form. Children are automatically wrapped in a VStack (or HStack if `orientation=\"horizontal\"`) with layout properties transposed from the segment.",
     "props": {
+      "label": {
+        "description": "An optional human-readable label for this segment. `StepperForm` uses this label as the corresponding step's title; on its own, `FormSegment` does not render the label (it is metadata only).",
+        "valueType": "string"
+      },
       "orientation": {
         "description": "Stack orientation for the implicit layout container. Use \"vertical\" (default) for a VStack or \"horizontal\" for an HStack. Layout properties (width, height, padding, gap, backgroundColor, etc.) are transposed to this container.",
         "availableValues": [
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "vertical"
       },
@@ -7192,8 +7555,17 @@ export default {
       "hasIssues": {
         "description": "This property returns `true` when any field in this segment has a validation issue, and `false` when all fields are valid. This is the counterpart of `isValid`.",
         "signature": "hasIssues: boolean"
+      },
+      "isDirty": {
+        "description": "This property returns `true` when at least one field in this segment has been modified by the user (touched), and `false` when no field has been changed yet. Useful for showing validation feedback only after the user has interacted with the segment.",
+        "signature": "isDirty: boolean"
       }
-    }
+    },
+    "childInjectedVars": [
+      "$segmentData",
+      "$segmentValidationIssues",
+      "$hasSegmentValidationIssue"
+    ]
   },
   "Heading": {
     "status": "stable",
@@ -11181,7 +11553,13 @@ export default {
         "valueType": "ComponentDef"
       }
     },
-    "opaque": true
+    "opaque": true,
+    "childInjectedVars": [
+      "$item",
+      "$itemIndex",
+      "$isFirst",
+      "$isLast"
+    ]
   },
   "Link": {
     "status": "stable",
@@ -11762,7 +12140,16 @@ export default {
       "backgroundColor-selected-List": "$color-primary-100",
       "backgroundColor-selected-List--hover": "$color-primary-100",
       "backgroundColor-row-List--hover": "$color-primary-50"
-    }
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$item",
+      "$itemIndex",
+      "$isFirst",
+      "$isLast",
+      "$isSelected",
+      "$group"
+    ]
   },
   "Logo": {
     "status": "stable",
@@ -12406,6 +12793,11 @@ export default {
         "description": "This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target=\"_blank\"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.",
         "valueType": "boolean"
       },
+      "enablePlaygroundTracing": {
+        "description": "Automatically enables xsVerbose for xmlui-pg blocks rendered by this Markdown.",
+        "valueType": "boolean",
+        "isInternal": true
+      },
       "breakMode": {
         "description": "This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
         "valueType": "string",
@@ -12498,15 +12890,15 @@ export default {
       "backgroundColor-Blockquote-markdown": "$color-surface-100",
       "width-accent-Blockquote-markdown": "3px",
       "color-accent-Blockquote-markdown": "$color-surface-500",
-      "border-Table-markdown": "1px solid $borderColor",
+      "borderRadius-Table-markdown": "$borderRadius",
       "textColor-Thead-markdown": "$color-surface-500",
       "backgroundColor-Thead-markdown": "$color-surface-100",
       "textTransform-Thead-markdown": "uppercase",
       "fontWeight-Thead-markdown": "$fontWeight-bold",
-      "padding-Th-markdown": "$space-2",
-      "fontSize-Th-markdown": "$fontSize-sm",
-      "border-Tr-markdown": "1px solid $borderColor",
-      "padding-Td-markdown": "$space-2",
+      "padding-Th-markdown": "$space-4 $space-6",
+      "fontSize-Th-markdown": "$fontSize-tiny",
+      "borderBottom-Tr-markdown": "1px solid $borderColor",
+      "padding-Td-markdown": "$space-2 $space-4",
       "verticalAlignment-Td-markdown": "top",
       "marginLeft-Ul-markdown": "$space-8",
       "marginRight-Ul-markdown": "$space-0",
@@ -12534,7 +12926,12 @@ export default {
         "backgroundColor-Blockquote-markdown": "$color-surface-50",
         "backgroundColor-Admonition-markdown": "$color-primary-200"
       }
-    }
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$anchorId",
+      "$anchorHref"
+    ]
   },
   "MenuSeparator": {
     "status": "stable",
@@ -12744,7 +13141,12 @@ export default {
       "maxWidth-ModalDialog": "450px",
       "maxHeight-ModalDialog": "100%",
       "marginBottom-title-ModalDialog": "0"
-    }
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$param",
+      "$params"
+    ]
   },
   "NavGroup": {
     "status": "stable",
@@ -13005,7 +13407,8 @@ export default {
           2,
           3,
           4
-        ]
+        ],
+        "isStrictEnum": true
       }
     },
     "events": {
@@ -13184,6 +13587,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -13203,6 +13607,7 @@ export default {
           "smooth",
           "instant"
         ],
+        "isStrictEnum": true,
         "defaultValue": "smooth"
       },
       "syncScrollPosition": {
@@ -13214,6 +13619,7 @@ export default {
           "start",
           "end"
         ],
+        "isStrictEnum": true,
         "defaultValue": "center"
       }
     },
@@ -13438,6 +13844,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -13450,6 +13860,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "startText": {
@@ -13720,6 +14131,16 @@ export default {
       "navLabel": {
         "description": "The label of the page that is displayed in the navigation panel. If provided, the a new entry will be added to the navigation panel.",
         "isInternal": true
+      },
+      "queryParams": {
+        "description": "Optional query-string constraint declaration, for example `page:int(min=1)?,sort:enum(asc,desc)?`.",
+        "valueType": "string",
+        "isInternal": true
+      },
+      "guard": {
+        "description": "Optional page-level navigation guard. Wave 4 reserves this prop for defended routing.",
+        "valueType": "any",
+        "isInternal": true
       }
     }
   },
@@ -13978,6 +14399,7 @@ export default {
           "Q",
           "H"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "L"
       },
@@ -14040,6 +14462,10 @@ export default {
     "nonVisual": true,
     "events": {
       "willProcess": {
+        "injectedVars": [
+          "$completedItems",
+          "$queuedItems"
+        ],
         "description": "This event is triggered to process a particular item.",
         "signature": "willProcess(item: any): void | boolean",
         "parameters": {
@@ -14047,6 +14473,10 @@ export default {
         }
       },
       "process": {
+        "injectedVars": [
+          "$completedItems",
+          "$queuedItems"
+        ],
         "description": "This event is fired to process the next item in the queue. If the processing cannot proceed because of some error, raise an exception, and the queue will handle that.",
         "signature": "process(item: any): any",
         "parameters": {
@@ -14054,6 +14484,10 @@ export default {
         }
       },
       "didProcess": {
+        "injectedVars": [
+          "$completedItems",
+          "$queuedItems"
+        ],
         "description": "This event is fired when the processing of a queued item has been successfully processed.",
         "signature": "didProcess(item: any, result: any): void",
         "parameters": {
@@ -14062,6 +14496,10 @@ export default {
         }
       },
       "processError": {
+        "injectedVars": [
+          "$completedItems",
+          "$queuedItems"
+        ],
         "description": "This event is fired when processing an item raises an error. The event handler method receives two parameters. The first is the error raised during the processing of the item; the second is an object with these properties:",
         "signature": "processError(error: Error, context: { item: any, itemId: string }): void",
         "parameters": {
@@ -14070,6 +14508,10 @@ export default {
         }
       },
       "complete": {
+        "injectedVars": [
+          "$completedItems",
+          "$queuedItems"
+        ],
         "description": "The queue fires this event when the queue gets empty after processing all items. The event handler has no arguments.",
         "signature": "complete(): void",
         "parameters": {}
@@ -14113,7 +14555,11 @@ export default {
       "$queuedItems": {
         "description": "A list containing the items waiting in the queue, icluding the completed items."
       }
-    }
+    },
+    "childInjectedVars": [
+      "$completedItems",
+      "$queuedItems"
+    ]
   },
   "RadioGroup": {
     "status": "stable",
@@ -14152,6 +14598,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -14164,6 +14614,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "orientation": {
@@ -14267,7 +14718,11 @@ export default {
       "fontSize-RadioGroupOption": "$fontSize-sm",
       "fontWeight-RadioGroupOption": "$fontWeight-bold",
       "textColor-RadioGroupOption--disabled": "$textColor--disabled"
-    }
+    },
+    "childInjectedVars": [
+      "$checked",
+      "$setChecked"
+    ]
   },
   "Redirect": {
     "status": "stable",
@@ -14303,6 +14758,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "defaultValue": "horizontal"
       },
       "overflowIcon": {
@@ -14415,6 +14871,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -14573,6 +15030,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -14585,7 +15046,36 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
+      },
+      "variant": {
+        "description": "Controls the visual border treatment. `outlined` matches the border color of an outlined Button, so that a Select can be visually composed next to one. Only the border color (and its hover/focus states) is affected; padding, background, and typography are unchanged.",
+        "availableValues": [
+          {
+            "value": "default",
+            "description": "Standard input border using the surface color."
+          },
+          {
+            "value": "outlined",
+            "description": "Accent border using the shared `borderColor-outlined` token, matching outlined Buttons."
+          }
+        ],
+        "valueType": "string",
+        "defaultValue": "default"
+      },
+      "data": {
+        "description": "The data array to populate the option list from. When provided, `Option` children are not needed — the component builds options from this array using `valueField` and `labelField`. This is the most efficient approach for large lists because the options are derived in JavaScript and re-evaluated only when the data reference changes, not on every unrelated state update."
+      },
+      "valueField": {
+        "description": "The property name of each data item to use as the option value when `data` is provided. Defaults to `\"value\"`.",
+        "valueType": "string",
+        "defaultValue": "value"
+      },
+      "labelField": {
+        "description": "The property name of each data item to use as the option label when `data` is provided. Defaults to `\"label\"`.",
+        "valueType": "string",
+        "defaultValue": "label"
       },
       "optionLabelTemplate": {
         "description": "This property allows replacing the default template to display an option in the dropdown list.",
@@ -14863,7 +15353,10 @@ export default {
       "textColor-indicator-Select": "var(--xmlui-textColor-indicator-Select)",
       "minHeight-Select": "var(--xmlui-minHeight-Select)",
       "minWidth-Select": "var(--xmlui-minWidth-Select)",
-      "minHeight-item-Select": "var(--xmlui-minHeight-item-Select)"
+      "minHeight-item-Select": "var(--xmlui-minHeight-item-Select)",
+      "Input:borderColor-Select--outlined": "var(--xmlui-borderColor-Select--outlined)",
+      "Input:borderColor-Select--outlined--hover": "var(--xmlui-borderColor-Select--outlined--hover)",
+      "Input:borderColor-Select--outlined--focus": "var(--xmlui-borderColor-Select--outlined--focus)"
     },
     "defaultThemeVars": {
       "backgroundColor-menu-Select": "$color-surface-raised",
@@ -14891,8 +15384,19 @@ export default {
       "textColor-Select--disabled": "$textColor--disabled",
       "minHeight-Select": "2.5rem",
       "minHeight-item-Select": "$space-7",
-      "minWidth-Select": "$space-16"
-    }
+      "minWidth-Select": "$space-16",
+      "borderColor-Select--outlined": "$borderColor-outlined",
+      "borderColor-Select--outlined--hover": "$borderColor-outlined--hover",
+      "borderColor-Select--outlined--focus": "$borderColor-outlined--focus"
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$item",
+      "$itemContext",
+      "$group",
+      "$selectedValue",
+      "$inTrigger"
+    ]
   },
   "SelectionStore": {
     "status": "deprecated",
@@ -14968,6 +15472,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -14980,6 +15488,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "rangeStyle": {
@@ -15216,6 +15725,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "defaultValue": "vertical"
       }
     },
@@ -15258,6 +15768,7 @@ export default {
           "top",
           "bottom"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "top"
       }
@@ -15317,6 +15828,7 @@ export default {
           "bottom",
           "left"
         ],
+        "isStrictEnum": true,
         "defaultValue": "top"
       },
       "align": {
@@ -15327,6 +15839,7 @@ export default {
           "center",
           "end"
         ],
+        "isStrictEnum": true,
         "defaultValue": "center"
       },
       "sideOffset": {
@@ -15470,6 +15983,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "defaultValue": "vertical"
       }
     },
@@ -15551,6 +16065,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "defaultValue": "vertical"
       }
     },
@@ -15615,6 +16130,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "vertical"
       },
@@ -15657,6 +16173,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -15677,6 +16194,7 @@ export default {
           "right",
           "stretch"
         ],
+        "isStrictEnum": true,
         "valueType": "string"
       }
     },
@@ -15758,6 +16276,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "vertical"
       },
@@ -15800,6 +16319,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -15820,6 +16340,7 @@ export default {
           "right",
           "stretch"
         ],
+        "isStrictEnum": true,
         "valueType": "string"
       }
     },
@@ -15902,6 +16423,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "vertical"
       },
@@ -15944,6 +16466,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -15964,6 +16487,7 @@ export default {
           "right",
           "stretch"
         ],
+        "isStrictEnum": true,
         "valueType": "string"
       }
     },
@@ -16046,6 +16570,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "vertical"
       },
@@ -16088,6 +16613,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -16108,6 +16634,7 @@ export default {
           "right",
           "stretch"
         ],
+        "isStrictEnum": true,
         "valueType": "string"
       }
     },
@@ -16190,6 +16717,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "vertical"
       },
@@ -16232,6 +16760,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -16252,6 +16781,7 @@ export default {
           "right",
           "stretch"
         ],
+        "isStrictEnum": true,
         "valueType": "string"
       }
     },
@@ -16313,6 +16843,7 @@ export default {
           "top",
           "bottom"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "top"
       }
@@ -16363,6 +16894,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -16375,6 +16910,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "description": {
@@ -16707,6 +17243,7 @@ export default {
           "center",
           "bottom"
         ],
+        "isStrictEnum": true,
         "defaultValue": "center"
       },
       "checkboxTolerance": {
@@ -16875,6 +17412,12 @@ export default {
     },
     "events": {
       "contextMenu": {
+        "injectedVars": [
+          "$item",
+          "$row",
+          "$rowIndex",
+          "$itemIndex"
+        ],
         "description": "This event is triggered when the Table is right-clicked (context menu).",
         "signature": "contextMenu(event: MouseEvent): void",
         "parameters": {
@@ -17131,7 +17674,16 @@ export default {
       "backgroundColor-pinnedCell-Table--hover": "$backgroundColor-row-Table--hover",
       "backgroundColor-selectionCell-Table": "$backgroundColor-pinnedCell-Table",
       "backgroundColor-selectionCell-Table--hover": "$backgroundColor-row-Table--hover"
-    }
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$item",
+      "$itemIndex",
+      "$cell",
+      "$colIndex",
+      "$row",
+      "$rowIndex"
+    ]
   },
   "TableOfContents": {
     "status": "stable",
@@ -17161,6 +17713,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "showScrollerFade": {
@@ -17626,7 +18179,10 @@ export default {
       "$header": {
         "description": "This context value represents the header context with props: id (optional), index, label, isActive."
       }
-    }
+    },
+    "childInjectedVars": [
+      "$header"
+    ]
   },
   "Tabs": {
     "status": "experimental",
@@ -17641,6 +18197,7 @@ export default {
           "horizontal",
           "vertical"
         ],
+        "isStrictEnum": true,
         "defaultValue": "horizontal",
         "valueType": "string"
       },
@@ -17652,6 +18209,7 @@ export default {
           "center",
           "stretch"
         ],
+        "isStrictEnum": true,
         "defaultValue": "start",
         "valueType": "string"
       },
@@ -17750,7 +18308,11 @@ export default {
       "textColor-trigger-Tabs--hover": "$color-primary-900",
       "gap-list-Tabs": "0px",
       "paddingTop-TabItem": "$gap-normal"
-    }
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$header"
+    ]
   },
   "Text": {
     "status": "stable",
@@ -17898,7 +18460,8 @@ export default {
             "value": "hyphenate",
             "description": "Uses automatic hyphenation when breaking words"
           }
-        ]
+        ],
+        "isStrictEnum": true
       },
       "overflowMode": {
         "description": "This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). When not specified, uses the default text behavior.",
@@ -17921,7 +18484,8 @@ export default {
             "value": "flow",
             "description": "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines)"
           }
-        ]
+        ],
+        "isStrictEnum": true
       }
     },
     "events": {
@@ -18196,6 +18760,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -18208,6 +18776,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "resize": {
@@ -18400,13 +18969,29 @@ export default {
     },
     "defaultPart": "input",
     "props": {
+      "type": {
+        "description": "Sets the HTML input type. Use `\"password\"` to hide the entered text and classify the value as a secret in the audit pipeline; `\"email\"` to classify the value as sensitive (PII).",
+        "valueType": "string",
+        "availableValues": [
+          "text",
+          "password",
+          "search",
+          "email"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "text"
+      },
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
-        "defaultValue": ""
+        "defaultValue": "",
+        "audit": {
+          "classification": "sensitive",
+          "defaultRedaction": "hash"
+        }
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -18436,6 +19021,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -18448,6 +19037,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "invalidMessages": {
@@ -18828,6 +19418,10 @@ export default {
         "description": "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`."
       },
       "contextMenu": {
+        "injectedVars": [
+          "$item",
+          "$itemIndex"
+        ],
         "description": "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`."
       }
     },
@@ -18878,7 +19472,15 @@ export default {
       "outlineStyle-item-TileGrid--focus": "solid",
       "outlineOffset-item-TileGrid--focus": "-2px",
       "fontSize-checkbox-TileGrid": "$fontSize"
-    }
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$item",
+      "$itemIndex",
+      "$isFirst",
+      "$isLast",
+      "$selected"
+    ]
   },
   "PasswordInput": {
     "status": "stable",
@@ -18899,13 +19501,29 @@ export default {
     },
     "defaultPart": "input",
     "props": {
+      "type": {
+        "description": "Sets the HTML input type. Use `\"password\"` to hide the entered text and classify the value as a secret in the audit pipeline; `\"email\"` to classify the value as sensitive (PII).",
+        "valueType": "string",
+        "availableValues": [
+          "text",
+          "password",
+          "search",
+          "email"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "text"
+      },
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
-        "defaultValue": ""
+        "defaultValue": "",
+        "audit": {
+          "classification": "secret",
+          "defaultRedaction": "mask"
+        }
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -18935,6 +19553,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -18947,6 +19569,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "invalidMessages": {
@@ -19200,6 +19823,7 @@ export default {
           "light",
           "dark"
         ],
+        "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "light"
       },
@@ -19263,6 +19887,10 @@ export default {
         "description": "This property allows you to set the validation status of the input component.",
         "availableValues": [
           {
+            "value": "none",
+            "description": "No validation indicator (default state)"
+          },
+          {
             "value": "valid",
             "description": "Visual indicator for an input that is accepted"
           },
@@ -19275,6 +19903,7 @@ export default {
             "description": "Visual indicator for an input that produced an error"
           }
         ],
+        "isStrictEnum": true,
         "defaultValue": "none"
       },
       "hour24": {
@@ -19684,15 +20313,15 @@ export default {
       "color-ToneSwitch-light": "$color-text-primary",
       "backgroundColor-ToneSwitch-dark": "$color-primary-500",
       "color-ToneSwitch-dark": "$color-surface-0",
-      "borderColor-ToneSwitch": "$color-surface-200",
-      "borderColor-ToneSwitch--hover": "$color-surface-300",
+      "borderColor-ToneSwitch": "$color-surface-300",
+      "borderColor-ToneSwitch--hover": "$color-surface-400",
       "backgroundColor-indicator-ToneSwitch": "white",
       "boxShadow-indicator-ToneSwitch": "0 2px 4px rgba(0, 0, 0, 0.1)",
       "dark": {
         "backgroundColor-ToneSwitch-light": "$color-surface-700",
         "color-ToneSwitch-light": "$color-text-primary",
-        "borderColor-ToneSwitch": "$color-surface-600",
-        "borderColor-ToneSwitch--hover": "$color-surface-500"
+        "borderColor-ToneSwitch": "$color-surface-700",
+        "borderColor-ToneSwitch--hover": "$color-surface-600"
       }
     }
   },
@@ -19823,6 +20452,7 @@ export default {
           "whenMouseOver",
           "whenScrolling"
         ],
+        "isStrictEnum": true,
         "defaultValue": "normal"
       },
       "overflow": {
@@ -19861,6 +20491,9 @@ export default {
     },
     "events": {
       "contextMenu": {
+        "injectedVars": [
+          "$item"
+        ],
         "description": "This event is triggered when the Tree is right-clicked (context menu).",
         "signature": "contextMenu(event: MouseEvent): void",
         "parameters": {
@@ -20120,6 +20753,225 @@ export default {
       "outlineWidth-Tree--focus": "$outlineWidth--focus",
       "outlineStyle-Tree--focus": "$outlineStyle--focus",
       "outlineOffset-Tree--focus": "$outlineOffset--focus"
+    },
+    "isImplicitContainerByDefault": true,
+    "childInjectedVars": [
+      "$item"
+    ]
+  },
+  "Fallback": {
+    "status": "experimental",
+    "description": "`Fallback` is a declarative wrapper that renders an alternative UI when a descendant loader (`DataSource`, `APICall`) fails or a descendant component throws during render. The error is exposed as the `$error` context variable to the `errorTemplate`. An optional `loadingTemplate` is rendered while the `isLoading` prop is truthy.",
+    "props": {
+      "errorTemplate": {
+        "description": "Template to render when a descendant produces an `AppError`. The error is available as `$error` (code, category, message, data).",
+        "valueType": "ComponentDef"
+      },
+      "loadingTemplate": {
+        "description": "Template to render when `isLoading` is `true` and no error has been reported yet.",
+        "valueType": "ComponentDef"
+      },
+      "isLoading": {
+        "description": "When `true`, renders the `loadingTemplate` (if provided) instead of the children.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "childInjectedVars": [
+      "$error"
+    ]
+  },
+  "I18n": {
+    "status": "experimental",
+    "description": "`I18n` renders a translated message from the active locale bundle. Variables are passed as props, and translated slot placeholders such as `<link/>` are replaced with matching named XMLUI slots.",
+    "props": {
+      "key": {
+        "description": "Translation key to resolve from the active locale bundle.",
+        "valueType": "string",
+        "isRequired": true
+      }
+    }
+  },
+  "Stepper": {
+    "status": "experimental",
+    "description": "`Stepper` displays a sequence of steps for a multi-step workflow or wizard. Individual steps are declared with [Step](/components/Step) children. Inspired by the Material UI Stepper, it supports horizontal and vertical orientations, an alternative-label layout, and a nonLinear mode that allows users to navigate between steps freely.",
+    "props": {
+      "activeStep": {
+        "description": "The 0-based index of the currently active step. If not set, the first step (index 0) is active. When out of range, it falls back to 0.",
+        "valueType": "number",
+        "defaultValue": 0
+      },
+      "orientation": {
+        "description": "Layout orientation of the stepper. In `horizontal` mode the step headers are laid out in a row above a shared content area; only the active step's content is shown. In `vertical` mode each step renders its own header with the active step's content expanding beneath it.",
+        "valueType": "string",
+        "availableValues": [
+          "horizontal",
+          "vertical"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "horizontal"
+      },
+      "stackedLabel": {
+        "description": "When `true`, step labels are placed below the step icons instead of next to them. Works in both horizontal and vertical orientations.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "nonLinear": {
+        "description": "When `true`, step headers become clickable so users can jump to any step. Default is `false` (linear navigation via the `next`/`prev` APIs).",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "events": {
+      "didChange": {
+        "description": "This event is triggered when value of Stepper has changed.",
+        "signature": "didChange(newValue: any): void",
+        "parameters": {
+          "newValue": "The new value of the component."
+        }
+      }
+    },
+    "apis": {
+      "next": {
+        "description": "Advances to the next step. If the current step is the last, no change occurs.",
+        "signature": "next(): void"
+      },
+      "prev": {
+        "description": "Moves back to the previous step. If the current step is the first, no change occurs.",
+        "signature": "prev(): void"
+      },
+      "reset": {
+        "description": "Resets the stepper back to the first step (index 0).",
+        "signature": "reset(): void"
+      },
+      "setActiveStep": {
+        "description": "Sets the active step by its 0-based index.",
+        "signature": "setActiveStep(index: number): void"
+      }
+    },
+    "themeVars": {
+      "backgroundColor-Stepper": "var(--xmlui-backgroundColor-Stepper)",
+      "padding-Stepper": "var(--xmlui-padding-Stepper)",
+      "gap-Stepper": "var(--xmlui-gap-Stepper)",
+      "size-icon-Stepper": "var(--xmlui-size-icon-Stepper)",
+      "fontSize-icon-Stepper": "var(--xmlui-fontSize-icon-Stepper)",
+      "fontWeight-icon-Stepper": "var(--xmlui-fontWeight-icon-Stepper)",
+      "backgroundColor-icon-Stepper": "var(--xmlui-backgroundColor-icon-Stepper)",
+      "textColor-icon-Stepper": "var(--xmlui-textColor-icon-Stepper)",
+      "backgroundColor-icon-Stepper--active": "var(--xmlui-backgroundColor-icon-Stepper--active)",
+      "textColor-icon-Stepper--active": "var(--xmlui-textColor-icon-Stepper--active)",
+      "backgroundColor-icon-Stepper--completed": "var(--xmlui-backgroundColor-icon-Stepper--completed)",
+      "textColor-icon-Stepper--completed": "var(--xmlui-textColor-icon-Stepper--completed)",
+      "backgroundColor-icon-Stepper--error": "var(--xmlui-backgroundColor-icon-Stepper--error)",
+      "textColor-icon-Stepper--error": "var(--xmlui-textColor-icon-Stepper--error)",
+      "fontSize-label-Stepper": "var(--xmlui-fontSize-label-Stepper)",
+      "fontWeight-label-Stepper": "var(--xmlui-fontWeight-label-Stepper)",
+      "textColor-label-Stepper": "var(--xmlui-textColor-label-Stepper)",
+      "textColor-label-Stepper--active": "var(--xmlui-textColor-label-Stepper--active)",
+      "textColor-label-Stepper--completed": "var(--xmlui-textColor-label-Stepper--completed)",
+      "textColor-label-Stepper--error": "var(--xmlui-textColor-label-Stepper--error)",
+      "fontSize-description-Stepper": "var(--xmlui-fontSize-description-Stepper)",
+      "textColor-description-Stepper": "var(--xmlui-textColor-description-Stepper)",
+      "borderColor-connector-Stepper": "var(--xmlui-borderColor-connector-Stepper)",
+      "borderColor-connector-Stepper--completed": "var(--xmlui-borderColor-connector-Stepper--completed)",
+      "borderWidth-connector-Stepper": "var(--xmlui-borderWidth-connector-Stepper)",
+      "borderStyle-connector-Stepper": "var(--xmlui-borderStyle-connector-Stepper)",
+      "padding-content-Stepper": "var(--xmlui-padding-content-Stepper)"
+    },
+    "defaultThemeVars": {
+      "backgroundColor-Stepper": "transparent",
+      "padding-Stepper": "0",
+      "gap-Stepper": "0",
+      "size-icon-Stepper": "28px",
+      "fontSize-icon-Stepper": "$fontSize-small",
+      "fontWeight-icon-Stepper": "$fontWeight-bold",
+      "backgroundColor-icon-Stepper": "$color-surface-300",
+      "textColor-icon-Stepper": "$color-surface-50",
+      "backgroundColor-icon-Stepper--active": "$color-primary-500",
+      "textColor-icon-Stepper--active": "$color-surface-50",
+      "backgroundColor-icon-Stepper--completed": "$color-primary-500",
+      "textColor-icon-Stepper--completed": "$color-surface-50",
+      "backgroundColor-icon-Stepper--error": "$color-danger-500",
+      "textColor-icon-Stepper--error": "$color-surface-50",
+      "fontSize-label-Stepper": "$fontSize-base",
+      "fontWeight-label-Stepper": "$fontWeight-normal",
+      "textColor-label-Stepper": "$textColor-secondary",
+      "textColor-label-Stepper--active": "$textColor-primary",
+      "textColor-label-Stepper--completed": "$textColor-primary",
+      "textColor-label-Stepper--error": "$color-danger-600",
+      "fontSize-description-Stepper": "$fontSize-small",
+      "textColor-description-Stepper": "$textColor-secondary",
+      "borderColor-connector-Stepper": "$borderColor",
+      "borderColor-connector-Stepper--completed": "$color-primary-500",
+      "borderWidth-connector-Stepper": "1px",
+      "borderStyle-connector-Stepper": "solid",
+      "padding-content-Stepper": "$space-4 0"
+    },
+    "isImplicitContainerByDefault": true
+  },
+  "Step": {
+    "status": "experimental",
+    "description": "`Step` defines an individual step within a [Stepper](/components/Stepper) component. It provides the step header (label, description, icon) and the content shown when the step is active.",
+    "docFolder": "Stepper",
+    "props": {
+      "label": {
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
+        "valueType": "string"
+      },
+      "description": {
+        "description": "Optional secondary text shown under the step label.",
+        "valueType": "string"
+      },
+      "icon": {
+        "description": "Optional icon name to display in the step indicator instead of the step number.",
+        "valueType": "string"
+      },
+      "error": {
+        "description": "When `true`, the step header is rendered in the error state (red icon and label, with an `!` glyph in place of the step number).",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "completed": {
+        "description": "When `true`, the step header is rendered in the completed state (a checkmark glyph and the completed color). Ignored when `error` is also `true`.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "events": {
+      "activated": {
+        "description": "Fires whenever this step becomes the active step.",
+        "signature": "activated(): void",
+        "parameters": {}
+      }
+    },
+    "themeVars": {
+      "backgroundColor-Stepper": "var(--xmlui-backgroundColor-Stepper)",
+      "padding-Stepper": "var(--xmlui-padding-Stepper)",
+      "gap-Stepper": "var(--xmlui-gap-Stepper)",
+      "size-icon-Stepper": "var(--xmlui-size-icon-Stepper)",
+      "fontSize-icon-Stepper": "var(--xmlui-fontSize-icon-Stepper)",
+      "fontWeight-icon-Stepper": "var(--xmlui-fontWeight-icon-Stepper)",
+      "backgroundColor-icon-Stepper": "var(--xmlui-backgroundColor-icon-Stepper)",
+      "textColor-icon-Stepper": "var(--xmlui-textColor-icon-Stepper)",
+      "backgroundColor-icon-Stepper--active": "var(--xmlui-backgroundColor-icon-Stepper--active)",
+      "textColor-icon-Stepper--active": "var(--xmlui-textColor-icon-Stepper--active)",
+      "backgroundColor-icon-Stepper--completed": "var(--xmlui-backgroundColor-icon-Stepper--completed)",
+      "textColor-icon-Stepper--completed": "var(--xmlui-textColor-icon-Stepper--completed)",
+      "backgroundColor-icon-Stepper--error": "var(--xmlui-backgroundColor-icon-Stepper--error)",
+      "textColor-icon-Stepper--error": "var(--xmlui-textColor-icon-Stepper--error)",
+      "fontSize-label-Stepper": "var(--xmlui-fontSize-label-Stepper)",
+      "fontWeight-label-Stepper": "var(--xmlui-fontWeight-label-Stepper)",
+      "textColor-label-Stepper": "var(--xmlui-textColor-label-Stepper)",
+      "textColor-label-Stepper--active": "var(--xmlui-textColor-label-Stepper--active)",
+      "textColor-label-Stepper--completed": "var(--xmlui-textColor-label-Stepper--completed)",
+      "textColor-label-Stepper--error": "var(--xmlui-textColor-label-Stepper--error)",
+      "fontSize-description-Stepper": "var(--xmlui-fontSize-description-Stepper)",
+      "textColor-description-Stepper": "var(--xmlui-textColor-description-Stepper)",
+      "borderColor-connector-Stepper": "var(--xmlui-borderColor-connector-Stepper)",
+      "borderColor-connector-Stepper--completed": "var(--xmlui-borderColor-connector-Stepper--completed)",
+      "borderWidth-connector-Stepper": "var(--xmlui-borderWidth-connector-Stepper)",
+      "borderStyle-connector-Stepper": "var(--xmlui-borderStyle-connector-Stepper)",
+      "padding-content-Stepper": "var(--xmlui-padding-content-Stepper)"
     }
   }
 };
