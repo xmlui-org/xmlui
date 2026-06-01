@@ -56,14 +56,15 @@ are presented.
 | `expr-handler-no-value` | `info` | Event-handler body that returns nothing useful (e.g., a bare identifier). |
 | `determinism-floating-point-token` | `info` | Floating-point literals in expressions evaluated under deterministic schedulers. |
 | `determinism-iteration-order-symbol` | `info` | Iteration helpers that read `Object.getOwnPropertySymbols`. |
+| `theming-missing-prefix` | `info` | Theme-variable reference in `style`/`vars` uses an unknown or missing package prefix (plan #02). |
 
 Additional rule families — `id-unknown-method`, `id-unknown-slot`,
 `expr-unused-var`, `expr-unbound-identifier`,
-`id-undefined-component-ref`, `id-undefined-form-ref`,
-`theming-missing-prefix` — are registered as no-op stubs today
-and will activate once their supporting infrastructure
-(metadata-driven slot declarations and cross-expression scope
-tracking from the verified-type-contracts plan) ships.
+`id-undefined-component-ref`, `id-undefined-form-ref` — are
+registered as no-op stubs today and will activate once their
+supporting infrastructure (metadata-driven slot declarations and
+cross-expression scope tracking from the verified-type-contracts
+plan) ships.
 
 ## The three surfaces
 

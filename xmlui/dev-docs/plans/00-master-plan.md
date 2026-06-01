@@ -766,11 +766,15 @@ phase/step labels from the source plan document.
 
 #### Plan #02 — Themevars namespace
 
-- ⬜ Lint-rule body for `theming-missing-prefix` (currently a
-  registered stub only).
+- ✅ Lint-rule body for `theming-missing-prefix` (shipped
+  2026-06): registry-side `themeNamespacePrefix` plumbing on
+  `ComponentRegistryEntry`; rule body walks `style`/`vars`
+  values, flags unknown prefixes with Levenshtein suggestions
+  and missing prefixes when the bare name unambiguously names
+  a prefixed component; 9 unit tests.
 - ⬜ Migration of existing extension-package theme vars to the
   canonical prefix.
-- ⬜ Documentation update (`.ai/xmlui/theming-styling.md` +
+- ✅ Documentation update (`.ai/xmlui/theming-styling.md` +
   user guide).
 - ⬜ Default flip / "enforce in next major" call.
 

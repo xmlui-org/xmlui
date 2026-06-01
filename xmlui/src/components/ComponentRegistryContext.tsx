@@ -22,6 +22,13 @@ export type ComponentRegistryEntry = {
   // across files.  Typed loosely to avoid pulling components-core types
   // into the registry layer; consumers cast to `UdcContract`.
   udcContract?: unknown;
+
+  // Canonical PascalCase prefix declared by the extension package that owns
+  // this component (`Extension.themeNamespacePrefix`, plan #02). Undefined
+  // for core components and for extension components whose package does not
+  // declare a prefix.  Consumed by the `theming-missing-prefix` analyzer
+  // rule.
+  themeNamespacePrefix?: string;
 };
 
 // Context object that makes the component registry available
