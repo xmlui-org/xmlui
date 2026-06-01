@@ -542,7 +542,7 @@ Combining the original report with the new dimensions:
 | **Build-time validation** | ✅ **Sealed — identifier, expression, and cross-binding analyzers across LSP / Vite / CLI** | Rule registry + walker (auto-parses markup) + suppression; one `analyze()` pipeline drives LSP `diagnostic.ts`, Vite plugin (`analyze: "off"\|"warn"\|"strict"`), and `xmlui check [dir]` CLI; create-app templates ship `check` script + `xmlui.config.json` + GitHub workflow. Rules: identifier (`id-unknown-component\|prop\|event\|method`, `id-undefined-component-ref\|form-ref`), expression (`expr-dead-conditional`, `expr-handler-no-value`, `expr-unbound-identifier`, `expr-unused-var`), determinism rules. `id-unknown-slot` is a registered no-op pending `ComponentMetadata.slots` metadata (out of scope). Shared infra: `_ast-utils.ts` (lazy expression parsing, identifier-ref / rooted-chain collectors, uid map) + `_reserved-identifiers.ts`. 102 unit tests. User docs at `/docs/managed-react/build-validation-analyzers`. |
 | **UDC sandboxing** | **Absent** | Explicit prop/event contract for UDCs; capability scoping |
 | **Audit logging** | **Browser only, unredacted** | OTLP exporter; PII redaction policy |
-| **Determinism** | **Visual, not concurrent** | Document or constrain handler interleaving |
+| **Determinism** | ✅ **Sealed — happens-before contract, FIFO scheduler, fixed-precision tokens, replay harness** | H1–H7 happens-before edges documented; `<App scheduler="fifo\|concurrent" maxQueuedPerTrace>` partitions per `traceId`; `serializeSpacing()` + `orderedKeys()` close visual/iteration non-determinism; `replay()` comparator + `xmlui replay` CLI + Inspector `Replay…` button surface `determinism-replay-divergence`; `strictDeterminism` default-on (plan #16, W8-1). |
 
 ---
 

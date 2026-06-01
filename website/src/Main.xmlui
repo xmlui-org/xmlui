@@ -325,6 +325,10 @@
                             to="/docs/managed-react/cooperative-concurrency"
                         />
                         <NavLink
+                            label="Concurrent-State Determinism"
+                            to="/docs/managed-react/concurrent-state-determinism"
+                        />
+                        <NavLink
                             label="Code Injection Prevention"
                             to="/docs/managed-react/code-injection-prevention"
                         />
@@ -2681,6 +2685,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/cooperative-concurrency.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/concurrent-state-determinism"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/concurrent-state-determinism.md']}"
                 />
             </Page>
             <Page

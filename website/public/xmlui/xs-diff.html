@@ -782,6 +782,8 @@
       <button id="clear">Clear</button>
       <button id="test">Test</button>
       <button id="exportJson">Export</button>
+      <button id="replayTrace" title="Compare a saved trace JSON against the live trace">Replay…</button>
+      <input type="file" id="replayFileInput" accept="application/json,.json" style="display: none;" />
     </div>
     <div id="diff"></div>
 
@@ -794,6 +796,20 @@
         </div>
         <div class="modal-body">
           <pre id="modalFileContent">Loading...</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Replay Result Modal -->
+    <div id="replayModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="file-path" id="replayModalTitle">Replay result</span>
+          <button class="modal-close" id="replayModalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="replayModalSummary" style="padding: var(--space-3) var(--space-4); font-weight: 500;"></div>
+          <div id="replayModalDiff" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); padding: 0 var(--space-4) var(--space-4);"></div>
         </div>
       </div>
     </div>
@@ -7168,6 +7184,119 @@
         const jsonContent = '[\n  ' + jsonEntries.join(',\n  ') + '\n]';
         const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, "");
         downloadFile(`xs-trace-${timestamp}.json`, jsonContent, "application/json");
+      });
+
+      // ---- Replay this trace (Managed React plan #16, Step 4.2) ----
+      function stripReplayVolatileFields(value) {
+        if (Array.isArray(value)) return value.map(stripReplayVolatileFields);
+        if (!value || typeof value !== "object") return value;
+        const out = {};
+        for (const key of Object.keys(value).sort()) {
+          if (key === "ts" || key === "perfTs" || key === "startPerfTs" || key === "duration") continue;
+          out[key] = stripReplayVolatileFields(value[key]);
+        }
+        return out;
+      }
+      function stableReplayString(entry) {
+        return JSON.stringify(stripReplayVolatileFields(entry));
+      }
+      function runReplayCompare(expected, actual) {
+        const length = Math.max(expected.length, actual.length);
+        for (let i = 0; i < length; i++) {
+          const e = expected[i];
+          const a = actual[i];
+          const same = (!e || !a)
+            ? e === a
+            : stableReplayString(e) === stableReplayString(a);
+          if (!same) {
+            return { diverged: true, divergenceAt: i, expected: e, actual: a };
+          }
+        }
+        return { diverged: false };
+      }
+      function getLiveTrace() {
+        const raw = (window.parent && window.parent._xsLogs) || [];
+        return raw.slice().sort((a, b) => (a.perfTs || a.ts || 0) - (b.perfTs || b.ts || 0));
+      }
+      function renderReplayResult(result, expectedFileName) {
+        const summary = document.getElementById("replayModalSummary");
+        const diffBox = document.getElementById("replayModalDiff");
+        diffBox.innerHTML = "";
+        if (!result.diverged) {
+          summary.textContent = "✅ Replay matches — live trace is identical to " + expectedFileName + " (volatile timing fields ignored).";
+          summary.style.color = "var(--color-text)";
+          return;
+        }
+        summary.innerHTML = "❌ <strong>determinism-replay-divergence</strong> at entry #" + result.divergenceAt +
+          " (compared against " + expectedFileName + ").";
+        summary.style.color = "var(--color-text)";
+        const makeColumn = (label, entry) => {
+          const col = document.createElement("div");
+          col.style.border = "1px solid var(--color-border)";
+          col.style.borderRadius = "var(--radius)";
+          col.style.background = "var(--color-bg-subtle, transparent)";
+          const head = document.createElement("div");
+          head.textContent = label;
+          head.style.padding = "var(--space-2) var(--space-3)";
+          head.style.borderBottom = "1px solid var(--color-border)";
+          head.style.fontWeight = "500";
+          head.style.fontSize = "var(--font-sm)";
+          col.appendChild(head);
+          const pre = document.createElement("pre");
+          pre.style.margin = "0";
+          pre.style.padding = "var(--space-3)";
+          pre.style.fontSize = "var(--font-sm)";
+          pre.style.lineHeight = "1.45";
+          pre.style.whiteSpace = "pre-wrap";
+          pre.style.wordBreak = "break-word";
+          pre.textContent = entry ? JSON.stringify(stripReplayVolatileFields(entry), null, 2) : "(missing)";
+          col.appendChild(pre);
+          return col;
+        };
+        diffBox.appendChild(makeColumn("Expected (saved trace)", result.expected));
+        diffBox.appendChild(makeColumn("Actual (live trace)", result.actual));
+      }
+      function openReplayModal() {
+        document.getElementById("replayModal").classList.add("open");
+      }
+      function closeReplayModal() {
+        document.getElementById("replayModal").classList.remove("open");
+      }
+      document.getElementById("replayModalClose").addEventListener("click", closeReplayModal);
+      document.getElementById("replayModal").addEventListener("click", (e) => {
+        if (e.target.id === "replayModal") closeReplayModal();
+      });
+      document.getElementById("replayTrace").addEventListener("click", () => {
+        document.getElementById("replayFileInput").click();
+      });
+      document.getElementById("replayFileInput").addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onerror = () => alert("Failed to read trace file.");
+        reader.onload = () => {
+          let expected;
+          try {
+            expected = JSON.parse(reader.result);
+          } catch (err) {
+            alert("Could not parse JSON: " + (err && err.message ? err.message : err));
+            return;
+          }
+          if (!Array.isArray(expected)) {
+            alert("Trace file must contain a JSON array of log entries.");
+            return;
+          }
+          const actual = getLiveTrace();
+          if (actual.length === 0) {
+            alert("Live trace is empty — interact with the app first, then replay.");
+            return;
+          }
+          const result = runReplayCompare(expected, actual);
+          renderReplayResult(result, file.name);
+          openReplayModal();
+        };
+        reader.readAsText(file);
       });
 
       // Handle hash navigation - expand parent trace-group and highlight target
