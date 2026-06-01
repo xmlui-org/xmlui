@@ -858,6 +858,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Choose between imperative and state-driven ModalDialogs"
+                            to="/docs/howto/choose-between-imperative-and-state-driven-modal-dialogs"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Pass data to a Modal Dialog"
                             to="/docs/howto/pass-data-to-a-modal-dialog"
                         />
@@ -1926,6 +1931,13 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/use-modal-dialog-onclose.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/choose-between-imperative-and-state-driven-modal-dialogs"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/choose-between-imperative-and-state-driven-modal-dialogs.md']}"
                 />
             </Page>
             <Page
