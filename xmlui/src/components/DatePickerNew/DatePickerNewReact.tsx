@@ -6,16 +6,20 @@ import {
 } from "@ark-ui/react/date-picker";
 import { Portal } from "@ark-ui/react/portal";
 import {
+  forwardRef,
+  memo,
   useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type FocusEvent,
   type ReactNode,
   type RefObject,
 } from "react";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./DatePickerNew.module.scss";
 import { useIsMobile } from "./useIsMobile";
@@ -79,15 +83,16 @@ export type DatePickerProps = {
   startText?: string;
   endText?: string;
   width?: string;
-  minWidth?: string;
-  maxWidth?: string;
   locale?: string;
   timeZone?: string;
   numOfMonths?: number | string;
   presets?: RawPreset[] | string | boolean;
   showPresets?: boolean;
-  testId?: string;
+  style?: CSSProperties;
   className?: string;
+  // Applied to the (often portaled) calendar popup so the component theme-var
+  // class reaches the popup subtree even when Ark renders it outside the root.
+  contentClassName?: string;
   onDidChange?: (newValue: DatePickerPayload) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -98,6 +103,26 @@ export type DatePickerProps = {
 const DEFAULT_DATE_FORMAT = "MM/dd/yyyy";
 const DEFAULT_LOCALE = "en-US";
 const DEFAULT_TIME_ZONE = "UTC";
+
+// Shared default prop values referenced by both the metadata (defaultValue) and
+// the native component (destructuring defaults), per the xmlui component contract.
+export const defaultProps = {
+  mode: "single" as Mode,
+  dateFormat: DEFAULT_DATE_FORMAT,
+  enabled: true,
+  readOnly: false,
+  required: false,
+  autoFocus: false,
+  inline: false,
+  validationStatus: "none" as ValidationStatus,
+  weekStartsOn: 0,
+  showWeekNumber: false,
+  showWeekNumbers: false,
+  locale: DEFAULT_LOCALE,
+  timeZone: DEFAULT_TIME_ZONE,
+  numOfMonths: 1,
+  showPresets: true,
+};
 
 // On mobile the calendar is a scrollable stack of months around the focused
 // month, navigated by scrolling instead of prev/next buttons. Presets cover
@@ -812,7 +837,8 @@ function DateField({
   );
 }
 
-export function DatePicker(props: DatePickerProps) {
+export const DatePicker = memo(
+  forwardRef<HTMLDivElement, DatePickerProps>(function DatePicker(props, ref) {
   const {
     id,
     value: controlledValue,
@@ -820,13 +846,13 @@ export function DatePicker(props: DatePickerProps) {
     mode: rawMode,
     label,
     placeholder,
-    dateFormat = DEFAULT_DATE_FORMAT,
-    enabled = true,
-    readOnly = false,
-    required = false,
-    autoFocus = false,
-    inline = false,
-    validationStatus = "none",
+    dateFormat = defaultProps.dateFormat,
+    enabled = defaultProps.enabled,
+    readOnly = defaultProps.readOnly,
+    required = defaultProps.required,
+    autoFocus = defaultProps.autoFocus,
+    inline = defaultProps.inline,
+    validationStatus = defaultProps.validationStatus,
     weekStartsOn,
     showWeekNumber,
     showWeekNumbers,
@@ -837,13 +863,14 @@ export function DatePicker(props: DatePickerProps) {
     startText,
     endText,
     width,
-    locale = DEFAULT_LOCALE,
-    timeZone = DEFAULT_TIME_ZONE,
+    locale = defaultProps.locale,
+    timeZone = defaultProps.timeZone,
     numOfMonths,
     presets,
     showPresets,
-    testId,
+    style,
     className,
+    contentClassName,
     onDidChange,
     onFocus,
     onBlur,
@@ -1123,14 +1150,14 @@ export function DatePicker(props: DatePickerProps) {
       positioning={{ placement: "bottom-start", sameWidth: false }}
     >
       <div
-        ref={rootRef}
+        ref={composeRefs(ref, rootRef)}
         className={cx(styles.root, widthClass(width), className)}
+        style={style}
         data-mode={mode}
         data-validation-status={validationStatus}
         data-inline={inline ? "" : undefined}
         data-mobile={isMobile ? "" : undefined}
         data-open={isOpen ? "" : undefined}
-        data-testid={testId}
         onFocusCapture={handleFocusCapture}
         onBlurCapture={handleBlurCapture}
       >
@@ -1233,7 +1260,7 @@ export function DatePicker(props: DatePickerProps) {
         <MaybePortal disabled={isMobile && insideDialog}>
           <ArkDatePicker.Positioner
             ref={positionerRef}
-            className={styles.positioner}
+            className={cx(styles.positioner, contentClassName)}
           >
             <ArkDatePicker.Content
               className={styles.content}
@@ -1540,7 +1567,8 @@ export function DatePicker(props: DatePickerProps) {
       </div>
     </ArkDatePicker.Root>
   );
-}
+  }),
+);
 
 function CalendarGlyph() {
   return (

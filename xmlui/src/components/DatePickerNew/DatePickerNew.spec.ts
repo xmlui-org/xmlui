@@ -37,4 +37,34 @@ test.describe("DatePickerNew - smoke", () => {
     await page.getByRole("button", { name: "Open calendar" }).click();
     await expect(page.getByTestId("dp")).toHaveAttribute("data-state", "open");
   });
+
+  // The styling was migrated to the xmlui theme-variable system (createThemeVar +
+  // defaultThemeVars), so the SCSS no longer carries inline fallbacks. These
+  // checks lock in that the theme variables resolve to real values: an unset var
+  // would compute to an empty / transparent value instead.
+  test("theme variables resolve (Input inheritance + day defaults)", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `<DatePickerNew testId="dp" mode="single" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`,
+    );
+
+    // Input-family inheritance: the trigger border resolves to a solid border.
+    const borderStyle = await page
+      .getByTestId("dp")
+      .locator('[data-part="control"]')
+      .first()
+      .evaluate((el) => getComputedStyle(el).borderTopStyle);
+    expect(borderStyle).toBe("solid");
+
+    // Day-cell default: the selected day paints a non-transparent background.
+    await page.getByRole("button", { name: "Open calendar" }).click();
+    const selectedBg = await page
+      .locator('[data-selected]')
+      .first()
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(selectedBg).not.toBe("rgba(0, 0, 0, 0)");
+    expect(selectedBg).not.toBe("transparent");
+  });
 });
