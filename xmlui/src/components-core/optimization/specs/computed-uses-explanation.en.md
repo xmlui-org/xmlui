@@ -1,64 +1,273 @@
-# `computedUses` Architecture: Executive Summary
+# `computedUses` — Optimization Architecture Overview
 
-This document provides a high-level overview of the `computedUses` optimization mechanism developed for the XMLUI framework. The primary goal of this optimization is to prevent unnecessary component re-renders by providing components only with the state data they actually depend on.
+This document describes the mechanisms that XMLUI uses to avoid unnecessary component re-renders. It is written at an architectural level — without implementation details.
 
-## 1. Which variables does the framework collect for State Narrowing?
+---
 
-When the framework encounters a component tree, it does not pass the entire global or parent state down. Instead, it works "bottom-up" to collect a **minimum set of external dependencies**—variable names that are actually read or modified within a node and its children.
+## 1. The Problem
 
-**Example:**
+By default, React re-renders the entire subtree whenever the parent component's state changes. In an XMLUI application, this means that even the smallest change (e.g., a timer tick) could re-render dozens of components that don't actually display anything new.
+
 ```xml
-<App var.fast="{0}" var.slow="{1}">
-  <Text value="Fast: {fast}" />
-  <Select data="{slow}" /> <!-- This component receives only ["slow"] -->
+<App var.tick="{0}" var.items="{loadItems()}">
+  <Timer interval="{100}" onTick="tick++" />
+  <Text value="Tick: {tick}" />
+
+  <!-- A heavy table with thousands of rows.
+       It only reads items — but without optimization
+       it will re-render 10 times per second along with tick. -->
+  <Table data="{items}" />
 </App>
 ```
-As a result, when `fast` changes, the heavy `<Select>` component is unaware of the change and does not re-render.
 
-## 2. Why are lexical variables (prefixed with `$`) collected?
+**Optimization Goal:** Automatically determine which specific variables each component depends on and re-render it only when "its" specific variable has changed.
 
-Variables prefixed with a dollar sign (e.g., `$item` in a list, `$context`, `$props`) are lexical variables generated and "injected" by the framework on the fly.
+---
 
-- **During Static Analysis (Parsing):** The framework reads component metadata (e.g., `childInjectedVars: ["$item"]`) and **ignores** them when searching for dependencies in the parent state. This is because `$item` exists locally and does not come from above.
-- **During Runtime:** When the scoped state is created, the framework has a special mechanism that **forcibly preserves** all variables starting with `$`, ensuring they aren't accidentally "stripped away" by the optimizer. Otherwise, a template inside an iterator would lose access to its current row data.
+## 2. Two Narrowing Channels
 
-## 3. Why are functions and JS-standard functions like `JSON` tracked?
+XMLUI distinguishes between two independent types of variables and narrows each separately:
 
-It's important to clarify: the framework **DOES NOT** collect standard functions!
-It employs strict filters (`JS_STDLIB_GLOBALS` and `XMLUI_GLOBAL_NAMES`) to **exclude** from analysis:
-- Standard JS objects: `Math`, `Array`, `Promise`, `JSON`, `fetch`, etc.
-- Browser host globals: `window`, `document`, `navigator`.
-- Built-in XMLUI functions: `Actions`, `navigate`, `toast`.
+| Channel | What is narrowed | Result |
+|---|---|---|
+| `computedUses` | Local state of the parent component | Component does not re-render on changes to "other" parent vars |
+| `computedGlobalUses` | Variables from `Globals.xs` | Component does not re-render on changes to "other" global vars |
 
-**Why is this important?** If the optimizer saw a call like `JSON.stringify(data)` or `Actions.callApi()` and treated `JSON` or `Actions` as part of the parent state, it would falsely expand dependencies. This would lead to the creation of unnecessary isolation containers (wasting memory). Therefore, the framework only tracks calls to **custom functions** defined by the developer in code or scripts.
+### 2.1 `computedUses` — Narrowing Parent State
 
-## 4. Difference between Runtime and Vite Plugin analysis
+```xml
+<App var.tick="{0}" var.items="{loadItems()}">
+  <Timer interval="{100}" onTick="tick++" />
+  <Text value="Tick: {tick}" />
 
-The optimization operates in two distinct environments:
+  <!-- computedUses = ["items"]
+       Re-renders only when items changes, not tick. -->
+  <Table data="{items}" />
+</App>
+```
 
-1. **Vite Plugin (Build-time):** Runs during the project build process in Node.js. To maintain high performance, it doesn't spin up a heavy React environment. It reads `.tsx` files as plain text, quickly parses them using Babel, and extracts the necessary optimizer metadata (`isImplicitContainerByDefault`, `childInjectedVars`).
-2. **Runtime (Standalone/Browser):** Used when the application is running in the browser. It relies on a shared "live" metadata registry. A key feature of the runtime is that if scripts contain `import` statements, it performs a separate asynchronous pass to load them and then recalculates dependencies on the fly.
+### 2.2 `computedGlobalUses` — Narrowing Global Variables
 
-## 5. Untangling functions in `.xs` files (Recursive Parsing)
+```xml
+<!-- Globals.xs -->
+var.sortBy = "name"
+var.view   = "table"
+var.events = {}
+```
 
-When a `<script>` or `.xs` file contains functions that call other functions, the framework untangles this web **recursively**.
+```xml
+<!-- FilesPage.xmlui -->
+<Fragment>
+  <!-- computedGlobalUses = ["sortBy"]
+       Does not re-render when view or events change. -->
+  <Table sortBy="{sortBy}" data="{fileEntries}" />
 
-It uses a Depth-First Search (DFS) algorithm. If function `A` calls function `B`, the analyzer dives into `B` and collects all its external dependencies for `A`.
-To prevent infinite loops (e.g., `A` calls `B`, and `B` calls `A`), a `visited-set` mechanism is used to safely handle mutual recursion.
+  <!-- computedGlobalUses = ["view"]
+       Does not re-render when sortBy or events change. -->
+  <TileGrid when="{view === 'icons'}" data="{fileEntries}" />
+</Fragment>
+```
 
-## 6. Why is there a separate mechanism for Global Variables?
+---
 
-A dedicated mechanism, `computedGlobalUses`, was developed for variables declared in `Globals.xs`.
+## 3. How Dependencies are Determined — Static Analysis
 
-Global variables live in their own separate React context, independent of parent component state. If we passed the entire global state object everywhere, an update to even one global variable (like `theme`) would force every component in the app to re-render.
+The framework analyzes the markup **once during loading** (before the first render), traversing the component tree bottom-up. For each container component, it gathers the minimal list of variables it actually depends on.
 
-`computedGlobalUses` collects only the global variables actually read by a specific subtree. This allows the framework to provide a component with a stable reference that triggers a re-render **only when** the specific global variable it depends on has changed.
+### 3.1 What is Analyzed
 
-## 7. Gaps and Future Plans (What is not yet optimized)
+- Prop values: `data="{items}"`, `when="{view === 'table'}"`
+- Event handlers: `onClick="doSort()"`, `onLoaded="(d) => { files = d; }"`
+- The component's own vars and their initializer expressions
+- Functions in `.xs` files and `<script>` blocks — **recursively** (if a function calls another local function, the analyzer enters it as well)
 
-While the architecture covers most cases, some areas for improvement remain:
+### 3.2 What is Filtered and Not Included in Dependencies
 
-1. **Complex constructs in `.xs` scripts:** If top-level script code contains `if`, `for`, or direct function calls (flagged as `hasInvalidStatements`), the framework currently **completely disables** state narrowing for that component. The analyzer is currently too conservative and avoids the risk of missing a dependency.
-2. **Extension Packages:** If a third-party extension package doesn't perfectly describe its lexical variables (e.g., forgets to add `childInjectedVars`), the framework will trigger a hard-fail error in development mode or fall back to a non-optimized state, subscribing the component to unnecessary data.
-3. **The "Matryoshka" nesting problem:** Heavy components (like `<Select>` or `<Table>`), even if they are completely static and read no variables, still have a sub-optimal wrapper. Plans are in place to decouple their visual isolation (`React.memo`) from the state container mechanism to avoid empty wrappers in the tree.
-4. **Asynchronous Import Resolution:** In Standalone mode, the presence of `import` temporarily blocks optimization until the imports are fetched over the network, requiring an additional dependency recalculation cycle before the first full render.
+| What | Example | Why |
+|---|---|---|
+| JS Standard | `Math.round()`, `JSON.stringify()`, `Array.from()` | Never part of the XMLUI state |
+| Browser Globals | `window.location`, `document.title` | Not part of the component state |
+| Framework Utilities | `Actions`, `toast`, `navigate`, `Log` | Built into the scope of all expressions |
+| Lexical Variables | `$item`, `$index`, `$context` | Injected by the framework in iterators |
+| Component's Own Vars | `var.x` declared in the component itself | Local, doesn't come from above |
+
+```xml
+<List data="{items}">
+  <!-- $item and $index are lexical, not dependencies on the parent -->
+  <Text value="{$index}: {$item.name}" />
+  <!-- JSON is a standard JS function, not state -->
+  <Text value="{JSON.stringify($item)}" />
+</List>
+```
+
+---
+
+## 4. Heavy Components — Automatic Wrapping
+
+Components like `Table`, `Select`, `List`, `TileGrid`, `Tree`, `DataGrid` are marked as "heavy". If such a component reads parent variables, the framework **automatically** wraps it in an isolating container with `computedUses`. If it reads nothing, isolation is not needed, and no extra wrapper is created.
+
+```xml
+<App var.filter="{''}" var.theme="{'light'}">
+
+  <!-- Reads filter → automatically receives computedUses=["filter"].
+       Does not re-render when theme changes. -->
+  <Select data="{filteredItems(filter)}" />
+
+  <!-- Reads nothing from parent → no wrapper is created. -->
+  <Select>
+    <Option value="a" />
+    <Option value="b" />
+  </Select>
+
+</App>
+```
+
+---
+
+## 5. Analyzing Functions in `.xs` Files
+
+When logic is expressed not in the markup but in `.xs` / `<script>` functions, the analyzer **enters the bodies of these functions** and extracts real dependencies from there.
+
+```js
+// FilesView.xmlui.xs
+function rowClass(item) {
+  // Reads the global catalogSelection — the analyzer sees this
+  return item.id === catalogSelection.activeId ? 'selected' : '';
+}
+```
+
+```xml
+<!-- FilesView.xmlui -->
+<Fragment>            <!-- ← owner of the rowClass function -->
+  <Table>
+    <Column cellRenderer="{(item) => rowClass(item)}" />
+  </Table>
+</Fragment>
+```
+
+`Fragment`, as the owner of `rowClass`, will receive `computedGlobalUses = ["catalogSelection"]` — correctly, because the analyzer recursively traversed the function body.
+
+Recursion is safe: if function `A` calls `B`, and `B` calls `A` again (mutual recursion), a "visited nodes" mechanism prevents an infinite loop.
+
+---
+
+## 6. UID Escaping Mechanism
+
+When a component declares an `id`, it registers its API with the **nearest** owner container. During narrowing, the framework ensures that this UID always remains accessible to those who reference it.
+
+```xml
+<App>
+  <Fragment var.x="{0}">   <!-- a container, but not an explicit owner -->
+    <Select id="mySelect" />
+
+    <!-- mySelect.value — a reference to a neighbor's API.
+         The framework will automatically include "mySelect" in the Fragment's computedUses,
+         so Select.value does not disappear from the narrowed state. -->
+    <Button
+      label="{mySelect.value}"
+      onClick="submit(mySelect.value)"
+    />
+  </Fragment>
+</App>
+```
+
+---
+
+## 7. How Narrowing Protects Event Handlers
+
+Narrowing only affects **rendering**: what the component displays. But an event handler can write to any variable, even one that isn't displayed.
+
+```xml
+<Fragment var.counter="{0}">
+  <!-- counter is in computedUses, the component displays it -->
+  <Text value="{counter}" />
+
+  <!-- hidden is NOT in computedUses (the component doesn't read it),
+       but writing to it will still work correctly -->
+  <Button onClick="hidden = Date.now()" />
+</Fragment>
+```
+
+The framework passes the full state to handlers via a stable ref — therefore, writing to a "non-narrowed" variable always reaches its target but does not trigger unnecessary renders.
+
+---
+
+## 8. Current Limitations
+
+Narrowing is disabled conservatively in several situations where the analyzer cannot **reliably** establish dependencies:
+
+### 8.1 A Heavy Component Calls a Parent Component's Function
+
+The analyzer knows which globals the `rowClass` function reads in its owner (`Fragment`). However, `Table` is heavy and forms a separate container — it only receives the **name** of the function, without its dependency list. Therefore, `Table` remains conservative (without `computedGlobalUses`).
+
+```xml
+<Fragment>             <!-- owner of rowClass — knows it reads catalogSelection ✅ -->
+  <script>
+    function rowClass(item) { return item.id === catalogSelection.activeId ? 'sel' : ''; }
+  </script>
+
+  <!-- Table is heavy, sees only the name "rowClass", doesn't know about catalogSelection.
+       Global narrowing for Table is disabled. ❌ -->
+  <Table>
+    <Column cellRenderer="{(item) => rowClass(item)}" />
+  </Table>
+</Fragment>
+```
+
+**Planned:** Pass the list of global dependencies of a function along with its name so that `Table` receives `computedGlobalUses = ["catalogSelection"]` automatically.
+
+### 8.2 Function Imported from Another `.xs` File
+
+If a component calls a function imported from a neighboring `.xs`, the analyzer does not enter that file and does not see which globals it reads internally. Narrowing is disabled.
+
+```xml
+<Fragment>
+  <script>
+    import { publishEvent } from "../shared.xs";
+  </script>
+
+  <!-- publishEvent reads events — but the analyzer doesn't know about it.
+       Global narrowing for Fragment is disabled. ❌ -->
+  <Button onClick="publishEvent('file:deleted', item)" />
+</Fragment>
+```
+
+**Planned:** Resolve `.xs` imports during analysis and extract dependencies from the bodies of imported functions.
+
+### 8.3 Global Functions from `Globals.xs` are Always Passed in Full
+
+Functions declared in `Globals.xs` are always included in the narrowed globals object — even if a specific component does not call them. Variables, however, are narrowed correctly.
+
+**Planned:** Track exactly which global functions the component calls and pass only those.
+
+---
+
+## 9. Analysis Execution Order
+
+```
+1. Vite plugin (build / dev-server) — first pass
+   Analyzes each .xmlui file immediately after parsing.
+   Globals.xs is not yet known → computedGlobalUses is not yet set.
+
+2. StandaloneApp (loading in the browser) — authoritative pass
+   .xs code-behind functions and the known Globals.xs are attached.
+   computedUses and computedGlobalUses are calculated finally — BEFORE the first render.
+
+3. (If needed) After resolving imports — if .xs files were loaded asynchronously,
+   dependencies are recalculated once more before a full render.
+```
+
+The authoritative pass overwrites the result of the first, so the final result is always correct.
+
+---
+
+## 10. Brief Summary
+
+| Mechanism | What it does |
+|---|---|
+| `computedUses` | Narrows local parent state — component doesn't see "other" vars |
+| `computedGlobalUses` | Narrows global variables — component doesn't react to "other" globals |
+| Automatic wrapping of heavy components | `Table`/`Select`/`List`, etc., receive isolation without explicit `uses` |
+| Analysis of `.xs` functions (recursive) | Dependencies are extracted even from deeply nested calls |
+| UID Escaping | Narrowing does not "cut off" a component from its neighbors' APIs |
+| Full state in handlers | Writing to any variable always works, even if it's not in `computedUses` |
