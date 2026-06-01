@@ -223,6 +223,23 @@
       }
       .trace-event-header strong { font-weight: 500; }
 
+      .kind-pill {
+        font-size: var(--font-sm);
+        padding: 2px 8px;
+        border: 1px solid var(--color-border, #ccc);
+        border-radius: 999px;
+        background: var(--color-bg-subtle, #f4f4f4);
+        color: var(--color-text-muted);
+        cursor: pointer;
+        line-height: 1.4;
+      }
+      .kind-pill.active {
+        background: var(--color-warning, #f4b740);
+        color: #000;
+        border-color: var(--color-warning, #f4b740);
+      }
+      .trace-event.kind-hidden { display: none; }
+
       /* =============================================================================
          STATUS INDICATORS
          ============================================================================= */
@@ -753,6 +770,15 @@
       <button id="searchNext" title="Next match">▼</button>
       <span id="searchCount" style="font-size: var(--font-sm); color: var(--color-text-muted);"></span>
       <input type="text" id="filterInput" placeholder="Hide..." style="flex: 1; min-width: 100px;" />
+      <span id="kindPills" style="display: inline-flex; gap: 4px; align-items: center;">
+        <span style="font-size: var(--font-sm); color: var(--color-text-muted);">Hide:</span>
+        <button type="button" class="kind-pill" data-kind="audit" title="Hide audit-pipeline diagnostics">audit</button>
+        <button type="button" class="kind-pill" data-kind="versioning" title="Hide versioning diagnostics">versioning</button>
+        <button type="button" class="kind-pill" data-kind="lifecycle" title="Hide lifecycle diagnostics">lifecycle</button>
+        <button type="button" class="kind-pill" data-kind="errors" title="Hide error-pipeline diagnostics">errors</button>
+        <button type="button" class="kind-pill" data-kind="log:warn" title="Hide warn logs">log:warn</button>
+        <button type="button" class="kind-pill" data-kind="log:info" title="Hide info logs">log:info</button>
+      </span>
       <button id="clear">Clear</button>
       <button id="test">Test</button>
       <button id="exportJson">Export</button>
@@ -4721,6 +4747,42 @@
         });
       }
 
+      // Kind pills: hide trace events whose header starts with [kind]
+      const hiddenKinds = new Set();
+      function applyKindPills() {
+        const events = document.querySelectorAll(".trace-event");
+        events.forEach((ev) => {
+          const header = ev.querySelector(".trace-event-header");
+          if (!header) {
+            ev.classList.remove("kind-hidden");
+            return;
+          }
+          const match = header.textContent.match(/^\s*\[([^\]]+)\]/);
+          if (!match) {
+            ev.classList.remove("kind-hidden");
+            return;
+          }
+          const kind = match[1].trim();
+          // pill "log:warn" matches kind "log:warn"; pill "audit" matches "audit"; pill "errors" matches both "errors" and any "error-*"
+          let hide = hiddenKinds.has(kind);
+          if (!hide && hiddenKinds.has("errors") && /^error/i.test(kind)) hide = true;
+          ev.classList.toggle("kind-hidden", hide);
+        });
+      }
+      document.querySelectorAll(".kind-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const kind = btn.dataset.kind;
+          if (hiddenKinds.has(kind)) {
+            hiddenKinds.delete(kind);
+            btn.classList.remove("active");
+          } else {
+            hiddenKinds.add(kind);
+            btn.classList.add("active");
+          }
+          applyKindPills();
+        });
+      });
+
       // Clear search when view changes or data refreshes
       const originalRender = render;
       render = function() {
@@ -4728,6 +4790,7 @@
         document.getElementById("searchInput").value = "";
         document.getElementById("filterInput").value = "";
         originalRender.apply(this, arguments);
+        applyKindPills();
       };
 
       // =============================================================================

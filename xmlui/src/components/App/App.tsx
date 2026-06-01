@@ -179,6 +179,15 @@ export const AppMd = createMetadata({
       defaultValue: "warn",
       isInternal: true,
     },
+    auditPolicy: {
+      description:
+        "Plan #15: declarative audit-pipeline policy. An object literal with " +
+        "`redact: RedactionRule[]`, `sample: { head?, tail? }`, `retention: { bufferSize, onOverflow }`, " +
+        "and optional `sink: { kind: 'otlp' | 'console' | 'custom', endpoint?, headers? }`. " +
+        "See `dev-docs/plans/15-audit-grade-observability.md`.",
+      valueType: "any",
+      isInternal: true,
+    },
   },
   events: {
     ready: {
@@ -364,6 +373,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
       locale={extractValue(node.props.locale)}
       localeBundles={extractValue(node.props.localeBundles)}
+      auditPolicy={extractValue(node.props.auditPolicy)}
       direction={extractValue.asOptionalString(node.props.direction, "auto")}
       scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
       maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}

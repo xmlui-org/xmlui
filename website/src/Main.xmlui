@@ -313,6 +313,10 @@
                             to="/docs/managed-react/enforced-versioning"
                         />
                         <NavLink
+                            label="Audit-Grade Observability"
+                            to="/docs/managed-react/audit-grade-observability"
+                        />
+                        <NavLink
                             label="UDC Sandbox"
                             to="/docs/managed-react/udc-sandbox"
                         />
@@ -2614,6 +2618,13 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/enforced-versioning.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/audit-grade-observability"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/audit-grade-observability.md']}"
                 />
             </Page>
             <Page

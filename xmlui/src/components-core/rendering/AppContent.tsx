@@ -82,6 +82,12 @@ import {
 } from "../forms";
 import { verifyVersioning } from "../versioning/verifier";
 import { emitVersioningDiagnostics } from "../versioning/runtime";
+import {
+  setAuditPolicy,
+  setStrictAudit,
+  registerAuditSink as registerAuditSinkImpl,
+  registerAuditHeuristic as registerAuditHeuristicImpl,
+} from "../audit";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -208,6 +214,23 @@ export function AppContent({
         pushXsLog({ kind: "forms", ts: Date.now(), ...d });
       },
     });
+  }, [appGlobals]);
+
+  // --- Plan #15: wire `appGlobals.strictAuditLogging` and `appGlobals.auditPolicy`
+  // into the audit pipeline. The policy is normalised by `setAuditPolicy()` and
+  // the strict flag governs whether `audit-redaction-missing` /
+  // `audit-policy-conflict` escalate to errors.
+  useMemo(() => {
+    setStrictAudit((appGlobals as any)?.strictAuditLogging === true);
+    const declared = (appGlobals as any)?.auditPolicy;
+    if (declared && typeof declared === "object") {
+      setAuditPolicy({
+        redact: Array.isArray(declared.redact) ? declared.redact : [],
+        sample: declared.sample ?? {},
+        retention: declared.retention ?? { bufferSize: 200, onOverflow: "drop-oldest" },
+        sink: declared.sink,
+      });
+    }
   }, [appGlobals]);
 
   // W8-1: `strictDeterminism` default flipped from `false` to `true`.
@@ -1700,6 +1723,22 @@ export function AppContent({
         scheduleHandler,
         // --- W5-1 / plan #09 Step 1.2: register a named validator from markup.
         registerValidator: registerValidatorImpl,
+        // --- Plan #15 Step 4.1 + 2.3: register custom audit sinks and PII heuristics.
+        registerAuditSink: registerAuditSinkImpl,
+        registerAuditHeuristic: registerAuditHeuristicImpl,
+        // --- Plan #15 Step 2.2: replace the active audit policy from markup.
+        setAuditPolicy: (policy: unknown) => {
+          if (policy && typeof policy === "object") {
+            const p = policy as Record<string, unknown>;
+            setAuditPolicy({
+              redact: Array.isArray(p.redact) ? (p.redact as any) : [],
+              sample: (p.sample as any) ?? {},
+              retention:
+                (p.retention as any) ?? { bufferSize: 200, onOverflow: "drop-oldest" },
+              sink: p.sink as any,
+            });
+          }
+        },
         // --- Plan #07 Step 2.1: structured error sink.
         // `App.errors` is a FIFO buffer of recent `AppError`s (default 50, see
         // `appGlobals.errorBufferSize`).  `setErrorHandler` is used by

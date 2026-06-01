@@ -31,6 +31,7 @@
 
 import { loggerService } from "../../logging/LoggerService";
 import { currentContext, BOOT_TRACE_ID } from "../audit/correlation";
+import { processAuditEntry } from "../audit/pipeline";
 
 // =============================================================================
 // SAFE STRINGIFY
@@ -359,7 +360,14 @@ export function pushXsLog(
 
   // Safe-clone the entry to prevent circular references from live objects
   // (e.g., React Query cache) from poisoning _xsLogs and breaking JSON export.
-  w._xsLogs.push(safeClone(entry));
+  const cloned = safeClone(entry);
+  w._xsLogs.push(cloned);
+  // Phase 4 of plan #15: forward to the audit pipeline (redaction → sampling → sinks).
+  try {
+    processAuditEntry(cloned);
+  } catch {
+    // pipeline must not break logging
+  }
   return true;
 }
 
@@ -405,6 +413,39 @@ export function createLogEntry(
   const w = typeof window !== "undefined" ? (window as any) : {};
   const ctx = currentContext();
   const traceId = ctx ? ctx.traceId : (w._xsCurrentTrace ?? BOOT_TRACE_ID);
+  // Only emit `audit-correlation-missing` for "user-facing" kinds that *should*
+  // happen inside an active span. Framework-internal/diagnostic kinds
+  // (versioning, forms, audit, build, errors, lifecycle, sandbox warnings,
+  // Log.* calls, i18n) often fire outside spans by design, so suppress.
+  const INTERNAL_KINDS = new Set([
+    "audit",
+    "versioning",
+    "forms",
+    "build",
+    "errors",
+    "lifecycle",
+    "sandbox:warn",
+    "log:debug",
+    "log:info",
+    "log:warn",
+    "log:error",
+    "i18n",
+  ]);
+  if (!ctx && !INTERNAL_KINDS.has(kind) && Array.isArray(w._xsLogs)) {
+    // Per-session dedup by kind to bound the diagnostic volume.
+    const seen: Set<string> = (w._xsCorrelationMissingSeen ??= new Set<string>());
+    if (!seen.has(kind)) {
+      seen.add(kind);
+      w._xsLogs.push({
+        ts: Date.now(),
+        kind: "audit",
+        code: "audit-correlation-missing",
+        severity: "info",
+        message: `Trace entry of kind "${kind}" was produced outside any active span; used boot-trace fallback.`,
+        offendingKind: kind,
+      });
+    }
+  }
   const entry: XsLogEntry = {
     ts: Date.now(),
     perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
