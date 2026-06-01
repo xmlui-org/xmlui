@@ -11,11 +11,11 @@ $themeVars: ();
 // --- Theme vars for paddings
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "overlay-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composeTextVars($themeVars, "title-#{$component}");
 $padding-ModalDialog: createThemeVar("padding-#{$component}");
 $backgroundColor-ModalDialog: createThemeVar("Dialog:backgroundColor-#{$component}");
 $backgroundColor-overlay-ModalDialog: createThemeVar("Dialog:backgroundColor-overlay-#{$component}");
-$borderRadius-ModalDialog: createThemeVar("Dialog:borderRadius-#{$component}");
 $fontFamily-ModalDialog: createThemeVar("Dialog:fontFamily-#{$component}");
 $textColor-ModalDialog: createThemeVar("Dialog:textColor-#{$component}");
 $minWidth-ModalDialog: createThemeVar("Dialog:minWidth-#{$component}");
@@ -45,6 +45,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
       max-width: 100%;
       max-height: 100%;
       padding: 0;
+      border: none;
       border-radius: 0;
     }
   }
@@ -68,7 +69,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
 
   .content {
     background-color: $backgroundColor-ModalDialog;
-    border-radius: $borderRadius-ModalDialog;
+    @include t.borderVars($themeVars, $component);
     font-family: $fontFamily-ModalDialog;
     color: $textColor-ModalDialog;
     @include t.paddingVars($themeVars, $component);
