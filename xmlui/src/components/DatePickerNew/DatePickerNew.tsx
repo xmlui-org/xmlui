@@ -124,12 +124,17 @@ const metadata = createMetadata({
     },
     presets: {
       description:
-        "Range preset list. Accepts a comma-separated string, array of preset " +
-        "keys, or `{ value, label }` objects. Defaults to Last 7 days, Last 30 " +
-        "days, This month, Last month in range mode.",
+        "Customizes the range presets (range mode only). Supplying a list also " +
+        "turns the presets on. Accepts a comma-separated string or array of " +
+        "built-in preset keys (e.g. `last7Days`, `thisMonth`), `{ value, label }` " +
+        "objects to relabel a built-in, or `{ label, from, to }` objects for fully " +
+        "custom date ranges (parsed with `dateFormat`).",
     },
     showPresets: {
-      description: "Set to false to hide range presets.",
+      description:
+        "Range presets are hidden by default. Set to `true` to show the built-in " +
+        "presets (Last 7 days, Last 30 days, This month, Last month); set to " +
+        "`false` to force them off even when a `presets` list is supplied.",
       valueType: "boolean",
       defaultValue: defaultProps.showPresets,
     },

@@ -146,3 +146,58 @@ test.describe("DatePickerNew - DatePicker parity", () => {
     await expect(page.getByTestId("out")).toHaveText("05/25/2024");
   });
 });
+
+// Range presets are optional (showPresets) and customizable (built-in keys,
+// relabeled keys, or fully custom { label, from, to } ranges).
+test.describe("DatePickerNew - presets", () => {
+  // Ark puts a computed range on the preset button's aria-label, so match the
+  // visible label text rather than the accessible name.
+  test("presets are hidden by default in range mode", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" mode="range" />`);
+    await page.getByRole("button", { name: "Open calendar" }).click();
+    await expect(page.getByText("Last 7 days")).toHaveCount(0);
+  });
+
+  test("showPresets=true shows the built-in presets", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" mode="range" showPresets="true" />`);
+    await page.getByRole("button", { name: "Open calendar" }).click();
+    await expect(page.getByText("Last 7 days")).toBeVisible();
+  });
+
+  test("showPresets=false hides presets even with a custom list", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `<DatePickerNew testId="dp" mode="range" showPresets="false"
+         presets="{[{ label: 'Q1 2024', from: '01/01/2024', to: '03/31/2024' }]}" />`,
+    );
+    await page.getByRole("button", { name: "Open calendar" }).click();
+    await expect(page.getByText("Q1 2024")).toHaveCount(0);
+  });
+
+  test("no presets in single mode (even with showPresets)", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" mode="single" showPresets="true" />`);
+    await page.getByRole("button", { name: "Open calendar" }).click();
+    await expect(page.getByText("Last 7 days")).toHaveCount(0);
+  });
+
+  test("a custom { label, from, to } preset renders and applies its range", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `<DatePickerNew testId="dp" mode="range" dateFormat="MM/dd/yyyy"
+         presets="{[{ label: 'Q1 2024', from: '01/01/2024', to: '03/31/2024' }]}" />`,
+    );
+    await page.getByRole("button", { name: "Open calendar" }).click();
+    const preset = page.getByText("Q1 2024");
+    await expect(preset).toBeVisible();
+    // The custom list replaces the built-in defaults.
+    await expect(page.getByText("Last 7 days")).toHaveCount(0);
+    await preset.click();
+    const inputs = page.getByTestId("dp").locator("input");
+    await expect(inputs.nth(0)).toHaveValue("01/01/2024");
+    await expect(inputs.nth(1)).toHaveValue("03/31/2024");
+  });
+});

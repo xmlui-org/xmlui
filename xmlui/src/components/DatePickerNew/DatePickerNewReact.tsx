@@ -63,17 +63,24 @@ type DisabledDateMatcher =
 type DisabledDates = DisabledDateMatcher | DisabledDateMatcher[];
 type PresetValue = DatePickerDateRangePreset;
 
+// A resolved preset: either a built-in Ark preset key or an explicit
+// [start, end] range (both forms are accepted by Ark's PresetTrigger `value`).
 type PresetItem = {
-  value: PresetValue;
+  key: string;
   label: string;
+  value: PresetValue | DateValue[];
 };
 
 type RawPreset =
   | PresetValue
   | string
   | {
+      // Relabel/reorder a built-in preset key.
       value?: string;
       label?: string;
+      // Or a fully custom range with explicit dates (parsed with `dateFormat`).
+      from?: string | Date;
+      to?: string | Date;
     };
 
 export type DatePickerProps = {
@@ -144,7 +151,9 @@ export const defaultProps = {
   locale: DEFAULT_LOCALE,
   timeZone: DEFAULT_TIME_ZONE,
   numOfMonths: 1,
-  showPresets: true,
+  // Presets are off by default; opt in with showPresets, or implicitly by
+  // supplying a custom `presets` list.
+  showPresets: false,
   confirmRangeSelection: false,
 };
 
@@ -171,10 +180,10 @@ const PRESET_LABELS: Record<PresetValue, string> = {
 };
 
 const DEFAULT_PRESETS: PresetItem[] = [
-  { value: "last7Days", label: PRESET_LABELS.last7Days },
-  { value: "last30Days", label: PRESET_LABELS.last30Days },
-  { value: "thisMonth", label: PRESET_LABELS.thisMonth },
-  { value: "lastMonth", label: PRESET_LABELS.lastMonth },
+  { key: "last7Days", value: "last7Days", label: PRESET_LABELS.last7Days },
+  { key: "last30Days", value: "last30Days", label: PRESET_LABELS.last30Days },
+  { key: "thisMonth", value: "thisMonth", label: PRESET_LABELS.thisMonth },
+  { key: "lastMonth", value: "lastMonth", label: PRESET_LABELS.lastMonth },
 ];
 
 const PRESET_ALIASES: Record<string, PresetValue> = {
@@ -582,28 +591,50 @@ const resolvePresets = (
   rawPresets: DatePickerProps["presets"],
   showPresets: boolean | undefined,
   mode: Mode,
+  dateFormat: string,
 ): PresetItem[] => {
   if (mode !== "range") return [];
-  if (showPresets === false || rawPresets === false) return [];
 
-  const source =
-    rawPresets === undefined || rawPresets === true
-      ? DEFAULT_PRESETS
-      : Array.isArray(rawPresets)
-        ? rawPresets
-        : String(rawPresets)
-            .split(",")
-            .map((item) => item.trim())
-            .filter(Boolean);
+  // Presets are OFF by default. They show when explicitly enabled via
+  // `showPresets`, or implicitly when a custom `presets` list is supplied
+  // (customizing them turns them on). An explicit `showPresets={false}` — or
+  // `presets={false}` — always wins and hides them.
+  const hasCustomList =
+    Array.isArray(rawPresets) || (typeof rawPresets === "string" && rawPresets.trim() !== "");
+  if (showPresets === false || rawPresets === false) return [];
+  if (showPresets !== true && !hasCustomList) return [];
+
+  const source = hasCustomList
+    ? Array.isArray(rawPresets)
+      ? rawPresets
+      : String(rawPresets)
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+    : DEFAULT_PRESETS;
 
   const resolved = source
     .map((preset): PresetItem | undefined => {
-      if (typeof preset === "object" && "value" in preset) {
-        const value = preset.value ? resolvePresetValue(preset.value) : undefined;
-        return value ? { value, label: preset.label || PRESET_LABELS[value] } : undefined;
+      if (typeof preset === "object") {
+        // Fully custom range: explicit from/to parsed with the active dateFormat.
+        if (preset.from !== undefined && preset.to !== undefined) {
+          const from = parseDateValue(preset.from, dateFormat);
+          const to = parseDateValue(preset.to, dateFormat);
+          if (!from || !to) return undefined;
+          const label =
+            preset.label ||
+            `${formatDateValue(from, dateFormat)} – ${formatDateValue(to, dateFormat)}`;
+          return { key: label, label, value: [from, to] };
+        }
+        // Relabel/reorder a built-in preset key.
+        if ("value" in preset) {
+          const value = preset.value ? resolvePresetValue(preset.value) : undefined;
+          return value ? { key: value, value, label: preset.label || PRESET_LABELS[value] } : undefined;
+        }
+        return undefined;
       }
       const value = resolvePresetValue(String(preset));
-      return value ? { value, label: PRESET_LABELS[value] } : undefined;
+      return value ? { key: value, value, label: PRESET_LABELS[value] } : undefined;
     })
     .filter((item): item is PresetItem => !!item);
 
@@ -1007,8 +1038,8 @@ export const DatePicker = memo(
   latestPayloadRef.current = toPayload(values, mode, dateFormat);
 
   const presetItems = useMemo(
-    () => resolvePresets(presets, showPresets, mode),
-    [mode, presets, showPresets],
+    () => resolvePresets(presets, showPresets, mode, dateFormat),
+    [mode, presets, showPresets, dateFormat],
   );
 
   const minDate = useMemo(
@@ -1468,7 +1499,7 @@ export const DatePicker = memo(
                 <div className={styles.quickPresets}>
                   {presetItems.map((preset) => (
                     <ArkDatePicker.PresetTrigger
-                      key={preset.value}
+                      key={preset.key}
                       value={preset.value}
                       className={styles.preset}
                     >
