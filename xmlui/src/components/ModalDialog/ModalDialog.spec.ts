@@ -603,4 +603,86 @@ test.describe("Theme Variables", () => {
     await expect(titleHeader).toHaveCSS("font-size", "32px");
     await expect(titleHeader).toHaveCSS("font-weight", "700");
   });
+
+  test("applies border theme variable (shorthand cascades to all sides)", async ({
+    page,
+    initTestBed,
+    createModalDialogDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" title="Bordered">
+          <Text>Content</Text>
+        </ModalDialog>
+      </Fragment>
+    `, {
+      testThemeVars: {
+        "border-ModalDialog": "3px solid rgb(0, 128, 255)",
+      },
+    });
+
+    await page.getByTestId("button").click();
+    const modal = await createModalDialogDriver("modal");
+    await expect(modal.component).toBeVisible();
+
+    for (const side of ["top", "right", "bottom", "left"]) {
+      await expect(modal.component).toHaveCSS(`border-${side}-width`, "3px");
+      await expect(modal.component).toHaveCSS(`border-${side}-style`, "solid");
+      await expect(modal.component).toHaveCSS(`border-${side}-color`, "rgb(0, 128, 255)");
+    }
+  });
+
+  test("applies individual border width/style/color theme variables", async ({
+    page,
+    initTestBed,
+    createModalDialogDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" title="Bordered">
+          <Text>Content</Text>
+        </ModalDialog>
+      </Fragment>
+    `, {
+      testThemeVars: {
+        "borderWidth-ModalDialog": "2px",
+        "borderStyle-ModalDialog": "dashed",
+        "borderColor-ModalDialog": "rgb(255, 0, 0)",
+      },
+    });
+
+    await page.getByTestId("button").click();
+    const modal = await createModalDialogDriver("modal");
+    await expect(modal.component).toBeVisible();
+
+    await expect(modal.component).toHaveCSS("border-top-width", "2px");
+    await expect(modal.component).toHaveCSS("border-top-style", "dashed");
+    await expect(modal.component).toHaveCSS("border-top-color", "rgb(255, 0, 0)");
+  });
+
+  test("applies borderRadius theme variable", async ({
+    page,
+    initTestBed,
+    createModalDialogDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" title="Rounded">
+          <Text>Content</Text>
+        </ModalDialog>
+      </Fragment>
+    `, {
+      testThemeVars: {
+        "borderRadius-ModalDialog": "20px",
+      },
+    });
+
+    await page.getByTestId("button").click();
+    const modal = await createModalDialogDriver("modal");
+    await expect(modal.component).toBeVisible();
+    await expect(modal.component).toHaveCSS("border-top-left-radius", "20px");
+  });
 });
