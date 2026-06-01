@@ -221,6 +221,98 @@ describe("ComponentAdapter", () => {
     }).not.toThrow();
   });
 
+  it("treats mount as the canonical visibility lifecycle event", async () => {
+    const mountHandler = vi.fn();
+    const props = createMockProps({
+      node: createMockNode({
+        when: true,
+        events: { mount: "mountAction" },
+      }),
+      lookupAction: vi.fn((action) => (action === "mountAction" ? mountHandler : undefined)),
+    });
+
+    render(<ComponentAdapter ref={null} {...(props as any)} />);
+
+    await waitFor(() => {
+      expect(mountHandler).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("keeps init as a legacy alias for mount", async () => {
+    const initHandler = vi.fn();
+    const props = createMockProps({
+      node: createMockNode({
+        when: true,
+        events: { init: "initAction" },
+      }),
+      lookupAction: vi.fn((action) => (action === "initAction" ? initHandler : undefined)),
+    });
+
+    render(<ComponentAdapter ref={null} {...(props as any)} />);
+
+    await waitFor(() => {
+      expect(initHandler).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("runs mount only when both mount and init are declared", async () => {
+    const mountHandler = vi.fn();
+    const initHandler = vi.fn();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const props = createMockProps({
+      node: createMockNode({
+        when: true,
+        events: { mount: "mountAction", init: "initAction" },
+      }),
+      lookupAction: vi.fn((action) => {
+        if (action === "mountAction") return mountHandler;
+        if (action === "initAction") return initHandler;
+        return undefined;
+      }),
+    });
+
+    render(<ComponentAdapter ref={null} {...(props as any)} />);
+
+    await waitFor(() => {
+      expect(mountHandler).toHaveBeenCalledTimes(1);
+    });
+    expect(initHandler).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Running 'mount' only"));
+    warnSpy.mockRestore();
+  });
+
+  it("fires unmount once for when transition and not again on actual unmount", async () => {
+    const unmountHandler = vi.fn();
+    const lookupAction = vi.fn((action) =>
+      action === "unmountAction" ? unmountHandler : undefined,
+    );
+    const visibleProps = createMockProps({
+      node: createMockNode({
+        when: true,
+        events: { unmount: "unmountAction" },
+      }),
+      lookupAction,
+    });
+
+    const { rerender, unmount } = render(<ComponentAdapter ref={null} {...(visibleProps as any)} />);
+
+    const hiddenProps = {
+      ...visibleProps,
+      node: createMockNode({
+        when: false,
+        events: { unmount: "unmountAction" },
+      }),
+    };
+    rerender(<ComponentAdapter ref={null} {...(hiddenProps as any)} />);
+
+    await waitFor(() => {
+      expect(unmountHandler).toHaveBeenCalledTimes(1);
+    });
+
+    unmount();
+    expect(unmountHandler).toHaveBeenCalledTimes(1);
+  });
+
   // ========================================================================
   // State Management Tests
   // ========================================================================

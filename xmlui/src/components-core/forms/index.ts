@@ -54,6 +54,17 @@ export type {
   SubmitPolicy,
 } from "./submit-guard";
 
+export {
+  buildSubmitHeaders,
+  shouldEmitCsrfMissing,
+  DEFAULT_CSRF_HEADER_NAME,
+  DEFAULT_IDEMPOTENCY_HEADER_NAME,
+} from "./csrf";
+export type {
+  BuildSubmitHeadersInput,
+  ShouldEmitCsrfMissingInput,
+} from "./csrf";
+
 import { registerBuiltInValidators } from "./builtins";
 
 function ensureBuiltInValidatorsRegistered(): void {

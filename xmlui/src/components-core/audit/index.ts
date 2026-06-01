@@ -33,3 +33,14 @@ export { detectPii } from "./heuristics";
 export { matchesSelector } from "./redactor";
 
 export { BOOT_TRACE_ID } from "./correlation";
+
+export {
+  setAuditPolicy,
+  getAuditPolicy,
+  setStrictAudit,
+  isStrictAudit,
+  registerAuditSink,
+  registerAuditHeuristic,
+  processAuditEntry,
+  _resetAuditPipeline,
+} from "./pipeline";

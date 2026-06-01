@@ -379,25 +379,37 @@ The CLR has assembly versioning, strong names, and binding redirects. Java
 has module descriptors and JDK API stability promises. A managed framework
 is expected to make breakage *visible*.
 
-**What XMLUI provides.** Semantic versioning across the monorepo with
-Changesets (`patch` by default per repository convention). Component metadata
-supports `status: "deprecated"` and `deprecationMessage`. The CHANGELOG
-records breaking changes.
+**What XMLUI now provides (plan #12, 2026-05).** Semantic versioning across
+the monorepo with Changesets (`patch` by default per repository convention).
+Component, prop, event, method, and value metadata carry
+`status`/`deprecationMessage`/`deprecatedSince`/`removedIn`/`replacement`;
+props add `valueAliases` + `defaultValueChangedIn`; components add
+`renamedProps`. A unified `VersioningDiagnostic` taxonomy
+(`deprecated-component`/`-prop`/`-event`/`-method`/`-value`, `removed-prop`,
+`renamed-prop`, `experimental-use`, `default-value-changed`,
+`internal-component-use`) is surfaced through three channels: LSP
+(`language-server/services/versioning-diagnostic.ts`), parse-time
+(`rendering/AppContent.tsx` `useEffect` running `verifyVersioning()`), and an
+analyzer rule family (`components-core/analyzer/rules/versioning.ts`) shared
+by LSP, Vite, and `xmlui check`. Runtime echo via
+`emitVersioningDiagnostics()` (per-session dedup) lands on the Inspector
+"Versioning" tab (`collectVersioningReport()` + `formatMigrationPlan()`).
+Prop-level migration helpers `applyValueAliases()` +
+`applyPreserveLegacyDefault()` (with `appGlobals.preserveLegacyDefaults`) let
+authors flip defaults without breaking existing markup. Doc generation
+(`scripts/generate-docs/MetadataProcessor.mjs`) renders lifecycle badges and
+per-value deprecation tables. Release-time API diff under `scripts/api-diff/`
+(`extract.ts`/`diff.ts`/`suggest-changeset.ts` + new `extract-cli.ts` /
+`release-guard.ts`) classifies every public-surface delta to
+`patch`/`minor`/`major` and a GitHub workflow (`release-guard.yml`) fails the
+PR when the staged changeset under-bumps. `appGlobals.strictVersioning`
+escalates only `removed-prop` + `internal-component-use` from `warn` to
+`error`; deprecation codes always stay `warn`. Default flip reserved for next
+major.
 
-**What is missing.**
-
-- **Deprecation is metadata-only.** The language server does not warn on use
-  of a deprecated component or prop.
-- **No prop-level deprecation channel.** A prop disappears with the
-  changelog as the only signal.
-- **No API surface diff at build time.** Nothing equivalent to .NET's
-  `Microsoft.DotNet.ApiCompat` or Java's `japicmp`.
-- **`patch` for everything** — a convention that minimises noise but also
-  obscures real semantic changes.
-
-**Verdict.** The mechanism exists; the enforcement does not. A managed
-framework would surface deprecation diagnostics in the editor and at parse
-time.
+**Verdict.** ✅ **Enforced.** Deprecation is now visible in the editor, at
+parse time, in the Inspector, in generated docs, and at release time —
+closing the gap with `Microsoft.DotNet.ApiCompat` / `japicmp` style guards.
 
 ---
 
@@ -521,16 +533,16 @@ Combining the original report with the new dimensions:
 | **Type contracts** | ✅ **Verified** | LSP, Vite, and runtime expression diagnostics against metadata; `check:metadata` guards TS↔metadata drift; `strictTypeContracts` is default-on |
 | **Resource lifecycle** | ✅ **Symmetric** | Universal `onMount`/`onUnmount`/`onError` events on every component; `<Lifecycle>` declarative effect primitive; container `onBeforeDispose` async-flush hook; `strictLifecycle` default-on (plan #04, W8-1) |
 | **Exception model** | ✅ **Structured** | `AppError` with `code`/`category`/`retryable`/`correlationId`; `<RetryPolicy>` with backoff + `Retry-After` honouring + circuit breaker; `<Fallback>` declarative recovery UI; `<App onError>` global sink + `App.errors` buffer + Inspector "Errors" tab; `strictErrors` default-on (plan #07, W8-1) |
-| **Concurrency / cancellation** | **Predictable, uncoordinated** | Cooperative cancellation token; in-flight guard primitive |
+| **Concurrency / cancellation** | ✅ **Predictable, coordinated** | `$cancel` token in every handler, four `handlerPolicy` modes (`parallel`/`single-flight`/`queue`/`drop-while-running`), bounded handler lifetime (`handlerTimeoutMs` / `defaultHandlerTimeoutMs`), opt-in `transactional` state writes, `App.cancel()` global. `strictConcurrency` reader wired on timeout enforcement; default flip reserved for next major (plan #06). |
 | **Theming sandbox** | **Mostly scoped** | Typed theme variables; restrict inline-style escape hatch |
 | **Forms validation** | **State strong, validators absent** | Built-in validators, server-error mapping, submit guard |
 | **Routing input** | ✅ **Defended (strict by default)** | Typed/custom constraints, all-trigger guards (pop-state + opt-in anchor/form interception), URL canonicalisation, `strictRouting` default-on — plan #10 |
 | **i18n** | ✅ **Sealed — bundles, ICU plurals, Intl-backed formatters, RTL guarantee** | `<App locale\|localeBundles\|direction>`, reactive `App.locale` / `App.setLocale` / `App.translate` / `<I18n>`; `@formatjs/intl-messageformat` ICU runtime; `App.formatNumber\|Currency\|List\|RelativeTime\|compare\|pluralRules`; full SCSS logical-properties + `scripts/lint-physical-css.ts`; framework strings extracted to `xmlui.*` namespace. 33 unit + 5 E2E tests. User docs at `/docs/managed-react/i18n-foundations`. `strictI18n` default flip reserved for next major (plan #11) |
-| **Versioning** | **Mechanism present, unenforced** | LSP deprecation diagnostics, prop-level deprecation |
+| **Versioning** | ✅ **Enforced** | `VersioningDiagnostic` taxonomy (10 codes) surfaced via LSP, parse-time `verifyVersioning()` in `AppContent`, and the shared analyzer rule family (LSP / Vite / `xmlui check`). Prop-level deprecation + `valueAliases` + `defaultValueChangedIn` + `renamedProps` metadata. `applyValueAliases()` / `applyPreserveLegacyDefault()` coercion helpers. Inspector "Versioning" tab (`collectVersioningReport()` / `formatMigrationPlan()`). Doc badges in `MetadataProcessor`. Release-time API-diff guard (`release-guard.yml` + `extract-cli.ts` / `release-guard.ts`) classifies deltas to `patch`/`minor`/`major` and fails under-staged changesets. `strictVersioning` opt-in escalates `removed-prop` + `internal-component-use` to errors; default flip reserved for next major (plan #12). |
 | **Build-time validation** | ✅ **Sealed — identifier, expression, and cross-binding analyzers across LSP / Vite / CLI** | Rule registry + walker (auto-parses markup) + suppression; one `analyze()` pipeline drives LSP `diagnostic.ts`, Vite plugin (`analyze: "off"\|"warn"\|"strict"`), and `xmlui check [dir]` CLI; create-app templates ship `check` script + `xmlui.config.json` + GitHub workflow. Rules: identifier (`id-unknown-component\|prop\|event\|method`, `id-undefined-component-ref\|form-ref`), expression (`expr-dead-conditional`, `expr-handler-no-value`, `expr-unbound-identifier`, `expr-unused-var`), determinism rules. `id-unknown-slot` is a registered no-op pending `ComponentMetadata.slots` metadata (out of scope). Shared infra: `_ast-utils.ts` (lazy expression parsing, identifier-ref / rooted-chain collectors, uid map) + `_reserved-identifiers.ts`. 102 unit tests. User docs at `/docs/managed-react/build-validation-analyzers`. |
 | **UDC sandboxing** | **Absent** | Explicit prop/event contract for UDCs; capability scoping |
 | **Audit logging** | **Browser only, unredacted** | OTLP exporter; PII redaction policy |
-| **Determinism** | **Visual, not concurrent** | Document or constrain handler interleaving |
+| **Determinism** | ✅ **Sealed — happens-before contract, FIFO scheduler, fixed-precision tokens, replay harness** | H1–H7 happens-before edges documented; `<App scheduler="fifo\|concurrent" maxQueuedPerTrace>` partitions per `traceId`; `serializeSpacing()` + `orderedKeys()` close visual/iteration non-determinism; `replay()` comparator + `xmlui replay` CLI + Inspector `Replay…` button surface `determinism-replay-divergence`; `strictDeterminism` default-on (plan #16, W8-1). |
 
 ---
 

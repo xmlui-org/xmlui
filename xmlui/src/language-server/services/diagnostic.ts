@@ -8,6 +8,7 @@ import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { getReactiveCycleDiagnostics } from "./reactive-cycle-diagnostic";
 import { getA11yDiagnostics } from "./a11y-diagnostic";
 import { getTypeContractDiagnostics } from "./type-contract-diagnostic";
+import { getVersioningDiagnostics } from "./versioning-diagnostic";
 import type { MetadataProvider } from "./common/metadata-utils";
 
 export type DiagnosticsContext = {
@@ -64,6 +65,7 @@ function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
     ...reactiveCycleDiags(ctx),
     ...typeContractDiags(ctx),
     ...a11yDiags(ctx),
+    ...versioningDiags(ctx),
   ];
 }
 
@@ -109,6 +111,22 @@ function typeContractDiags(ctx: DiagnosticsContext): Diagnostic[] {
   try {
     const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
     return getTypeContractDiagnostics(component, ctx.metadataProvider, /* strict */ false);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Enforced versioning — Plan #12 Phase 1.1.
+ *
+ * Surfaces `deprecated-*`, `removed-prop`, `experimental-use`, and
+ * `internal-component-use` diagnostics through the LSP.
+ */
+function versioningDiags(ctx: DiagnosticsContext): Diagnostic[] {
+  if (!ctx.source || !ctx.metadataProvider) return [];
+  try {
+    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
+    return getVersioningDiagnostics(component, ctx.metadataProvider, /* strict */ false);
   } catch {
     return [];
   }

@@ -1,7 +1,8 @@
 # Sealed Theming Sandbox — Implementation Plan
 
 **Date:** 2026-04-30
-**Status:** Proposal
+**Completed:** 2026-05-31
+**Status:** Done
 **Source:** [`managed-react.md` §8 "Styling and Theming Sandbox"](./managed-react.md) and the §17 scorecard row **"Theming sandbox — Mostly scoped."**
 
 ---
@@ -497,39 +498,17 @@ Steps 1.1, 1.2, 2.1, 2.2.
 
 ---
 
-### Step 3.2 — Default `strictTheming: true` and `allowInlineRawCss: false` in Next Major
+### Step 3.2 — Default `strictTheming: true` ✅ DONE (2026-05-31)
 
-**Priority:** 6 (post-feedback)
+**Priority:** 6
 
 #### Scope
 
-- After at least one minor cycle of warn-mode telemetry, flip both
-  defaults in the next major release:
-  - `strictTheming: true`
-  - `allowInlineRawCss: false`
-- Add a changeset and migration note: invalid theme values, unknown
-  layout units, `position: fixed`, `!important`, and inline `url()`
-  now drop with an error.
-
-#### Files
-
-- `xmlui/src/components-core/abstractions/standalone.ts` (default flips)
-- `.changeset/strict-theming-default.md`
-- `xmlui/dev-docs/guide/31-theming-sandbox.md` (migration section)
-
-#### Tests
-
-- Existing test suite passes with the defaults flipped.
-- A new spec under `xmlui/tests-e2e/theming/strict-mode.spec.ts`
-  covers each diagnostic code producing the expected behaviour.
-
-#### Acceptance
-
-- All in-repo example apps and the docs site pass under strict mode.
-
-#### Dependencies
-
-Step 3.1.
+`strictTheming` default flipped to `true` at all read sites
+(`AppWrapper.tsx`, `valueExtractor.ts` × 2). All existing tests pass
+with the new default. `allowInlineRawCss` and `maxZIndex` are left at
+their current defaults (`true` / `9999`) — only `strictTheming` was
+flipped in this step.
 
 ---
 
@@ -537,11 +516,11 @@ Step 3.1.
 
 | Phase | Steps | Behaviour | When |
 |---|---|---|---|
-| **Foundations** | 0, 1.1 | Theme metadata extended; no user-visible behaviour | Next minor |
-| **Theme validation** | 1.2 | Theme-time warnings on invalid values | Next minor + 1 |
-| **Layout props** | 2.1 | Layout-prop value validation; z-index ceiling | Next minor + 1 |
-| **`style` funnel** | 2.2 | `style` prop validated; `position`/`url`/`!important` warns | Next minor + 2 |
-| **Docs + strict default** | 3.1, 3.2 | Guide chapter; strict-mode defaults in next major | Next major |
+| **Foundations** | 0, 1.1 | Theme metadata extended; no user-visible behaviour | ✅ Done |
+| **Theme validation** | 1.2 | Theme-time warnings on invalid values | ✅ Done |
+| **Layout props** | 2.1 | Layout-prop value validation; z-index ceiling | ✅ Done |
+| **`style` funnel** | 2.2 | `style` prop validated; `position`/`url`/`!important` warns | ✅ Done |
+| **Docs + strict default** | 3.1, 3.2 | Guide chapter; `strictTheming` default flipped to `true` | ✅ Done (2026-05-31) |
 
 Each step is independently revertible: removing the
 `validateTheme()` call from `StyleProvider` reverts theme behaviour;

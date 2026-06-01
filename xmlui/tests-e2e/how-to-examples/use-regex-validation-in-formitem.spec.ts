@@ -51,6 +51,7 @@ test.describe("FormItem regex validation with severity", { tag: "@website" }, ()
 
     await page.getByRole("textbox", { name: "Phone number" }).fill("+1234567890");
     await page.getByRole("textbox", { name: "ZIP code (warning only)" }).fill("1234");
+    await page.waitForTimeout(1000); // Wait for validation to trigger
     await page.getByRole('button', { name: 'Submit' }).click();
 
     await expect(page.getByText("Expected a 5-digit ZIP code").first()).toBeVisible();

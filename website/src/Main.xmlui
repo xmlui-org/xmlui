@@ -277,6 +277,10 @@
                             to="/docs/managed-react/themevars-namespace"
                         />
                         <NavLink
+                            label="Sealed Theming Sandbox"
+                            to="/docs/managed-react/sealed-theming-sandbox"
+                        />
+                        <NavLink
                             label="Enforced Accessibility"
                             to="/docs/managed-react/enforced-accessibility"
                         />
@@ -299,6 +303,30 @@
                         <NavLink
                             label="Internationalisation Foundations"
                             to="/docs/managed-react/i18n-foundations"
+                        />
+                        <NavLink
+                            label="Forms Validation Discipline"
+                            to="/docs/managed-react/forms-validation-discipline"
+                        />
+                        <NavLink
+                            label="Enforced Versioning"
+                            to="/docs/managed-react/enforced-versioning"
+                        />
+                        <NavLink
+                            label="Audit-Grade Observability"
+                            to="/docs/managed-react/audit-grade-observability"
+                        />
+                        <NavLink
+                            label="UDC Sandbox"
+                            to="/docs/managed-react/udc-sandbox"
+                        />
+                        <NavLink
+                            label="Cooperative Concurrency"
+                            to="/docs/managed-react/cooperative-concurrency"
+                        />
+                        <NavLink
+                            label="Concurrent-State Determinism"
+                            to="/docs/managed-react/concurrent-state-determinism"
                         />
                         <NavLink
                             label="Code Injection Prevention"
@@ -2588,6 +2616,41 @@
                 />
             </Page>
             <Page
+                url="/docs/managed-react/sealed-theming-sandbox"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/sealed-theming-sandbox.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/forms-validation-discipline"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/forms-validation-discipline.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/enforced-versioning"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/enforced-versioning.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/audit-grade-observability"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/audit-grade-observability.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/udc-sandbox"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/udc-sandbox.md']}"
+                />
+            </Page>
+            <Page
                 url="/docs/managed-react/enforced-accessibility"
             >
                 <DocumentPage
@@ -2627,6 +2690,20 @@
             >
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/managed-react/i18n-foundations.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/cooperative-concurrency"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/cooperative-concurrency.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/managed-react/concurrent-state-determinism"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/managed-react/concurrent-state-determinism.md']}"
                 />
             </Page>
             <Page

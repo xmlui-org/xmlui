@@ -212,6 +212,24 @@ export const FormMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.submitPolicy,
     },
+    csrfToken: {
+      description:
+        "A CSRF token attached to the submit request as an HTTP header. The header name " +
+        "defaults to `X-CSRF-Token` and can be customized via `appGlobals.csrfHeaderName`. " +
+        "When the form uses the built-in submit handler (i.e. `submitUrl` is set and no " +
+        "custom `onSubmit` is provided), the token is added automatically. Custom " +
+        "`onSubmit` handlers can read the value via the `$formCsrfToken` context variable.",
+      valueType: "string",
+    },
+    idempotencyKey: {
+      description:
+        "An idempotency key attached to the submit request as an HTTP header (default " +
+        "header name `Idempotency-Key`, configurable via `appGlobals.idempotencyHeaderName`). " +
+        "Supply a string the server can use to de-duplicate retries. When the form uses the " +
+        "built-in submit handler the header is added automatically; custom handlers can read " +
+        "the value via the `$formIdempotencyKey` context variable.",
+      valueType: "string",
+    },
   },
   events: {
     willSubmit: {
@@ -293,6 +311,21 @@ export const FormMd = createMetadata({
       `This property represents the value of the form data. You can access the fields of the form ` +
         `using the IDs in the \`bindTo\` property of nested \`FormItem\` instances. \`$data\` also ` +
         `provides an \`update\` method as a shortcut to the Form's exposed \`update\` method.`,
+    ),
+    $formCancel: d(
+      `Available inside the form's \`onSubmit\` handler. Exposes the per-attempt ` +
+        `\`AbortSignal\` (\`$formCancel.signal\`) that the framework aborts when ` +
+        `\`Form.cancel()\` is invoked. Pass this signal to \`Actions.callApi({ signal: ... })\` ` +
+        `or other cancellable operations to make your submit handler cooperatively cancellable.`,
+    ),
+    $formCsrfToken: d(
+      `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
+        `\`csrfToken\` prop so custom submit handlers can attach the CSRF header to their own ` +
+        `requests. \`undefined\` when the prop is not set.`,
+    ),
+    $formIdempotencyKey: d(
+      `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
+        `\`idempotencyKey\` prop. \`undefined\` when the prop is not set.`,
     ),
   },
   apis: {

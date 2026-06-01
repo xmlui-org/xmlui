@@ -139,6 +139,10 @@ export const behaviorPropKeys: readonly string[] = [
 ];
 
 export const behaviorEventKeys: readonly string[] = [
+  // Managed lifecycle events available on every component.
+  "mount", "unmount", "error", "beforeDispose",
+  // Legacy lifecycle aliases.
+  "init", "cleanup",
   // ValidationBehavior
   "validate",
 ];

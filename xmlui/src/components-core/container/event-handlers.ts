@@ -510,15 +510,34 @@ export function createEventHandlers(config: EventHandlerConfig) {
           timeoutMs: effectiveTimeoutMs,
           abort: (reason) => abortCancelToken(reason),
           onTimeout: () => {
+            const strict = (appContext as any)?.appGlobals?.strictConcurrency === true;
+            const severity = strict ? "error" : "warn";
+            const message = `Handler timed out after ${effectiveTimeoutMs}ms`;
             pushXsLog({
               kind: "concurrency",
               ts: Date.now(),
               code: "concurrency-handler-timeout",
-              severity: "warn",
+              severity,
               componentUid: componentUidForCoord,
               eventName: eventNameForCoord,
-              message: `Handler timed out after ${effectiveTimeoutMs}ms`,
+              message,
             } as any);
+            if (strict) {
+              // --- Plan #6 strict-mode enforcement: surface the timeout
+              // --- through the console + global error channel so apps can
+              // --- treat it like any other handler bug.
+              if (typeof console !== "undefined" && console.error) {
+                console.error(`[concurrency:strict] ${message}`, {
+                  componentUid: componentUidForCoord,
+                  eventName: eventNameForCoord,
+                });
+              }
+              try {
+                appContext.signError?.(new Error(message));
+              } catch {
+                /* swallow — signError is best-effort */
+              }
+            }
           },
         });
 

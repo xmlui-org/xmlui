@@ -297,10 +297,10 @@ In an `Items` component, each row gets its own fresh context object with `$item`
 
 ### Example: Global Variables
 
-Global variables (declared with `var.global.*`) are owned by the **root container** and flow to every other container via Layer 6. Any container can read them; mutations anywhere bubble all the way up to the root owner.
+Global variables (declared with `global.*`) are owned by the **root container** and flow to every other container via Layer 6. Any container can read them; mutations anywhere bubble all the way up to the root owner.
 
 ```xml
-<App var.global.theme="{'dark'}">
+<App global.theme="{'dark'}">
   <Sidebar />
   <MainContent />
 </App>
