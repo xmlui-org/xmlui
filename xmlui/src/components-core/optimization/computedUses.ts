@@ -473,13 +473,11 @@ function computeUsesInternal(
   const childInjected = [
     ...(metadata?.childInjectedVars ?? []),
     ...(metadata?.unstableChildInjectedVars ?? []),
-    // metadata.contextVars keys ($item, $itemIndex, etc.) document what this
-    // component type injects into children (Language Server + runtime metadata).
-    // For core components this is typically redundant with childInjectedVars
-    // declared in the `optimization: {}` block of createMetadata. For
-    // extension-package components (Masonry, ReactFlow, etc.) that may not have
-    // an `optimization.childInjectedVars` entry, this is the ONLY optimizer hint
-    // available in Standalone mode — without it, $item/$itemIndex inside their
+    // metadata.contextVars keys are the primary injected-var declaration for core
+    // components (post-migration). Extension-package components that still use
+    // `optimization.childInjectedVars` are also covered by the first spread above;
+    // for those without a childInjectedVars entry (e.g. Masonry, ReactFlow) these
+    // keys are the ONLY optimizer hint — without them $item/$itemIndex inside their
     // templates would incorrectly count as parent-scope dependencies.
     ...Object.keys(metadata?.contextVars ?? {}),
   ];

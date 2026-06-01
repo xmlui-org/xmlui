@@ -24,9 +24,6 @@ export const ContextMenuMd = createMetadata({
       description: "The content area of the ContextMenu where menu items are displayed.",
     },
   },
-  optimization: {
-    childInjectedVars: ["$context"],
-  },
   props: {
     menuWidth: {
       valueType: "string",

@@ -1,5 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { createMetadata } from "../metadata-helpers";
+import { createMetadata, d } from "../metadata-helpers";
 import { Fallback, defaultProps } from "./FallbackReact";
 
 const COMP = "Fallback";
@@ -12,8 +12,8 @@ export const FallbackMd = createMetadata({
     `component throws during render. The error is exposed as the \`$error\` ` +
     `context variable to the \`errorTemplate\`. An optional \`loadingTemplate\` ` +
     `is rendered while the \`isLoading\` prop is truthy.`,
-  optimization: {
-    childInjectedVars: ["$error"],
+  contextVars: {
+    $error: d("The error captured by this Fallback boundary."),
   },
   props: {
     errorTemplate: {

@@ -28,7 +28,6 @@ export const ListMd = createMetadata({
     "thousands of records while maintaining smooth scrolling performance.",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$item","$itemIndex","$isFirst","$isLast","$isSelected","$group"],
   },
   props: {
     data: d(

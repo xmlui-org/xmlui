@@ -32,8 +32,6 @@ function loadPristineSnapshot(): Record<string, OptimizerMetadataView> {
 const snapshot = loadPristineSnapshot();
 
 describe("generated snapshot carries optimizer fields (build-time path)", () => {
-  // Components whose injected vars live ONLY in childInjectedVars (not contextVars),
-  // i.e. exactly the ones that were mis-narrowed while the snapshot was stale.
   const cases: Array<[string, string[]]> = [
     ["Table", ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex"]],
     ["Tree", ["$item"]],
@@ -43,13 +41,15 @@ describe("generated snapshot carries optimizer fields (build-time path)", () => 
     ["Markdown", ["$anchorId", "$anchorHref"]],
   ];
 
-  it.each(cases)("%s.childInjectedVars contains its injected vars", (comp, expected) => {
+  it.each(cases)("%s injects its vars via contextVars (build-time path)", (comp, expected) => {
     const entry = snapshot[comp];
     expect(entry, `snapshot missing entry for ${comp}`).toBeDefined();
-    const got = entry.childInjectedVars ?? [];
+    const keys = Object.keys(entry.contextVars ?? {});
     for (const v of expected) {
-      expect(got, `${comp}.childInjectedVars`).toContain(v);
+      expect(keys, `${comp}.contextVars keys`).toContain(v);
     }
+    // childInjectedVars must be gone for core components
+    expect(entry.childInjectedVars ?? []).toEqual([]);
   });
 
   it("implicit-container flag survives into the snapshot (Table)", () => {

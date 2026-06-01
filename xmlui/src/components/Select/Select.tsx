@@ -20,6 +20,7 @@ import {
   dComponent,
   createMetadata,
   d,
+  dInternal,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { Select, defaultProps } from "./SelectReact";
@@ -35,7 +36,6 @@ export const SelectMd = createMetadata({
     "and comprehensive form integration.",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$item","$itemContext","$group","$selectedValue","$inTrigger"],
   },
   parts: {
     clearButton: {
@@ -228,6 +228,8 @@ export const SelectMd = createMetadata({
     $item: d("Represents the current option's data (label and value properties)"),
     $itemContext: d("Provides the `removeItem()` method for multi-select scenarios"),
     $group: d("Group name when using `groupBy` (available in group header templates)"),
+    $selectedValue: dInternal("Currently selected value, injected into the trigger/option template."),
+    $inTrigger: dInternal("True when rendering inside the trigger (vs the dropdown list)."),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

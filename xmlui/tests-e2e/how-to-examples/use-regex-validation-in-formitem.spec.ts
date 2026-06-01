@@ -51,9 +51,11 @@ test.describe("FormItem regex validation with severity", { tag: "@website" }, ()
 
     await page.getByRole("textbox", { name: "Phone number" }).fill("+1234567890");
     await page.getByRole("textbox", { name: "ZIP code (warning only)" }).fill("1234");
-    await page.getByRole('button', { name: 'Submit' }).click();
-
+    
+    // Wait for validation warning to appear before submitting
     await expect(page.getByText("Expected a 5-digit ZIP code").first()).toBeVisible();
+    
+    await page.getByRole('button', { name: 'Submit' }).click();
     await page.getByRole("button", { name: "Yes, proceed" }).click();
 
     await expect(page.getByText("Submitted!")).toBeVisible();

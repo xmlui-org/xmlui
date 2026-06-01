@@ -31,7 +31,6 @@ export const TileGridMd = createMetadata({
     "and only renders visible rows — making it suitable for large datasets.",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$item", "$itemIndex", "$isFirst", "$isLast", "$selected"],
   },
 
   props: {

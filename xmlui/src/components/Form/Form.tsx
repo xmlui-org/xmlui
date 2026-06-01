@@ -17,7 +17,6 @@ export const FormMd = createMetadata({
     "to work together.",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$data"],
   },
   parts: {
     buttonRow: {

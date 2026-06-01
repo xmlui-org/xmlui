@@ -45,7 +45,14 @@ export const TableMd = createMetadata({
   description: "`Table` presents structured data for viewing, sorting, selection, and interaction.",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$item", "$itemIndex", "$cell", "$colIndex", "$row", "$rowIndex"],
+  },
+  contextVars: {
+    $item: d("The complete data row object being rendered."),
+    $itemIndex: d("Zero-based index of the row in the data array."),
+    $cell: d("The value of the current cell for this column."),
+    $colIndex: d("Zero-based index of the current column."),
+    $row: d("The complete data row object being rendered (alias of `$item`)."),
+    $rowIndex: d("Zero-based row index (alias of `$itemIndex`)."),
   },
   // NOTE: let's leave it like this for now, we'll expand later when the need arises
   parts: {

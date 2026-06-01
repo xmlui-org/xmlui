@@ -44,9 +44,6 @@ export const FormItemMd = createMetadata({
     "controls to the parent form's data model and handles validation feedback " +
     "automatically. " +
     "**Note:** `FormItem` must be used inside a `Form` component.",
-  optimization: {
-    childInjectedVars: ["$value", "$setValue", "$validationResult"],
-  },
   props: {
     bindTo: {
       description:

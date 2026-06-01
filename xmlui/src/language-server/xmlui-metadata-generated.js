@@ -2955,6 +2955,14 @@ export default {
       },
       "$group": {
         "description": "Group name available inside `groupHeaderTemplate` when `groupBy` is set."
+      },
+      "$selectedValue": {
+        "description": "Currently selected value, injected into the trigger/option template.",
+        "isInternal": true
+      },
+      "$inTrigger": {
+        "description": "True when rendering inside the trigger (vs the dropdown list).",
+        "isInternal": true
       }
     },
     "themeVars": {
@@ -3131,12 +3139,7 @@ export default {
       "textTransform-groupHeader-AutoComplete": "uppercase",
       "textColor-groupHeader-AutoComplete": "$textColor-subtitle"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$item",
-      "$selectedValue",
-      "$inTrigger"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "Avatar": {
     "status": "stable",
@@ -4181,6 +4184,16 @@ export default {
         "description": "The checkbox input area."
       }
     },
+    "contextVars": {
+      "$checked": {
+        "description": "Current checked state, injected into the input template.",
+        "isInternal": true
+      },
+      "$setChecked": {
+        "description": "Setter for the checked state, injected into the input template.",
+        "isInternal": true
+      }
+    },
     "props": {
       "indeterminate": {
         "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
@@ -4365,11 +4378,7 @@ export default {
       "borderColor-checked-Checkbox": "$color-primary-500",
       "backgroundColor-checked-Checkbox": "$color-primary-500",
       "backgroundColor-Checkbox--disabled": "$color-surface-200"
-    },
-    "childInjectedVars": [
-      "$checked",
-      "$setChecked"
-    ]
+    }
   },
   "CODE": {
     "status": "deprecated",
@@ -4578,15 +4587,7 @@ export default {
       "$rowIndex": {
         "description": "Zero-based row index (the same as `$itemIndex`)."
       }
-    },
-    "childInjectedVars": [
-      "$item",
-      "$cell",
-      "$itemIndex",
-      "$colIndex",
-      "$row",
-      "$rowIndex"
-    ]
+    }
   },
   "ContextMenu": {
     "status": "stable",
@@ -4640,10 +4641,7 @@ export default {
       "boxShadow-ContextMenu": "$boxShadow-xl",
       "borderStyle-ContextMenu-content": "solid",
       "borderRadius-ContextMenu": "$borderRadius"
-    },
-    "childInjectedVars": [
-      "$context"
-    ]
+    }
   },
   "ContentSeparator": {
     "status": "stable",
@@ -7121,10 +7119,7 @@ export default {
       "paddingTop-buttonRow-Form": "0",
       "backgroundColor-buttonRow-Form": "transparent"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$data"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "FormItem": {
     "status": "stable",
@@ -7507,12 +7502,7 @@ export default {
       "textTransform-label-formItem": "none",
       "textColor-requiredMark-formItem": "$color-danger-400",
       "textColor-optionalTag-formItem": "$textColor-secondary"
-    },
-    "childInjectedVars": [
-      "$value",
-      "$setValue",
-      "$validationResult"
-    ]
+    }
   },
   "FormSegment": {
     "status": "experimental",
@@ -7560,12 +7550,7 @@ export default {
         "description": "This property returns `true` when at least one field in this segment has been modified by the user (touched), and `false` when no field has been changed yet. Useful for showing validation feedback only after the user has interacted with the segment.",
         "signature": "isDirty: boolean"
       }
-    },
-    "childInjectedVars": [
-      "$segmentData",
-      "$segmentValidationIssues",
-      "$hasSegmentValidationIssue"
-    ]
+    }
   },
   "Heading": {
     "status": "stable",
@@ -11553,13 +11538,7 @@ export default {
         "valueType": "ComponentDef"
       }
     },
-    "opaque": true,
-    "childInjectedVars": [
-      "$item",
-      "$itemIndex",
-      "$isFirst",
-      "$isLast"
-    ]
+    "opaque": true
   },
   "Link": {
     "status": "stable",
@@ -12141,15 +12120,7 @@ export default {
       "backgroundColor-selected-List--hover": "$color-primary-100",
       "backgroundColor-row-List--hover": "$color-primary-50"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$item",
-      "$itemIndex",
-      "$isFirst",
-      "$isLast",
-      "$isSelected",
-      "$group"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "Logo": {
     "status": "stable",
@@ -12170,6 +12141,14 @@ export default {
   "Markdown": {
     "status": "stable",
     "description": "`Markdown` renders formatted text using markdown syntax. Use [Text](/working-with-text) for simple, styled text content, and `Markdown` when you need [rich formatting](/working-with-markdown).",
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
+      }
+    },
     "themeVars": {
       "textColor-Text": "var(--xmlui-textColor-Text)",
       "fontFamily-Text": "var(--xmlui-fontFamily-Text)",
@@ -12927,11 +12906,7 @@ export default {
         "backgroundColor-Admonition-markdown": "$color-primary-200"
       }
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$anchorId",
-      "$anchorHref"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "MenuSeparator": {
     "status": "stable",
@@ -13142,11 +13117,7 @@ export default {
       "maxHeight-ModalDialog": "100%",
       "marginBottom-title-ModalDialog": "0"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$param",
-      "$params"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "NavGroup": {
     "status": "stable",
@@ -14555,11 +14526,7 @@ export default {
       "$queuedItems": {
         "description": "A list containing the items waiting in the queue, icluding the completed items."
       }
-    },
-    "childInjectedVars": [
-      "$completedItems",
-      "$queuedItems"
-    ]
+    }
   },
   "RadioGroup": {
     "status": "stable",
@@ -14567,6 +14534,16 @@ export default {
     "parts": {
       "label": {
         "description": "The label displayed for the radio group."
+      }
+    },
+    "contextVars": {
+      "$checked": {
+        "description": "Current checked state, injected into the option template.",
+        "isInternal": true
+      },
+      "$setChecked": {
+        "description": "Setter for the checked state, injected into the option template.",
+        "isInternal": true
       }
     },
     "props": {
@@ -14718,11 +14695,7 @@ export default {
       "fontSize-RadioGroupOption": "$fontSize-sm",
       "fontWeight-RadioGroupOption": "$fontWeight-bold",
       "textColor-RadioGroupOption--disabled": "$textColor--disabled"
-    },
-    "childInjectedVars": [
-      "$checked",
-      "$setChecked"
-    ]
+    }
   },
   "Redirect": {
     "status": "stable",
@@ -15206,6 +15179,14 @@ export default {
       },
       "$group": {
         "description": "Group name when using `groupBy` (available in group header templates)"
+      },
+      "$selectedValue": {
+        "description": "Currently selected value, injected into the trigger/option template.",
+        "isInternal": true
+      },
+      "$inTrigger": {
+        "description": "True when rendering inside the trigger (vs the dropdown list).",
+        "isInternal": true
       }
     },
     "themeVars": {
@@ -15389,14 +15370,7 @@ export default {
       "borderColor-Select--outlined--hover": "$borderColor-outlined--hover",
       "borderColor-Select--outlined--focus": "$borderColor-outlined--focus"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$item",
-      "$itemContext",
-      "$group",
-      "$selectedValue",
-      "$inTrigger"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "SelectionStore": {
     "status": "deprecated",
@@ -17051,6 +17025,26 @@ export default {
   "Table": {
     "status": "stable",
     "description": "`Table` presents structured data for viewing, sorting, selection, and interaction.",
+    "contextVars": {
+      "$item": {
+        "description": "The complete data row object being rendered."
+      },
+      "$itemIndex": {
+        "description": "Zero-based index of the row in the data array."
+      },
+      "$cell": {
+        "description": "The value of the current cell for this column."
+      },
+      "$colIndex": {
+        "description": "Zero-based index of the current column."
+      },
+      "$row": {
+        "description": "The complete data row object being rendered (alias of `$item`)."
+      },
+      "$rowIndex": {
+        "description": "Zero-based row index (alias of `$itemIndex`)."
+      }
+    },
     "parts": {
       "table": {
         "description": "The main table container."
@@ -17675,15 +17669,7 @@ export default {
       "backgroundColor-selectionCell-Table": "$backgroundColor-pinnedCell-Table",
       "backgroundColor-selectionCell-Table--hover": "$backgroundColor-row-Table--hover"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$item",
-      "$itemIndex",
-      "$cell",
-      "$colIndex",
-      "$row",
-      "$rowIndex"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "TableOfContents": {
     "status": "stable",
@@ -18179,14 +18165,16 @@ export default {
       "$header": {
         "description": "This context value represents the header context with props: id (optional), index, label, isActive."
       }
-    },
-    "childInjectedVars": [
-      "$header"
-    ]
+    }
   },
   "Tabs": {
     "status": "experimental",
     "description": "`Tabs` enables users to switch among content panels using clickable tab headers. It provides an efficient way to present multiple related sections in a single interface area, with each tab containing distinct content defined by [TabItem](/components/TabItem) components.",
+    "contextVars": {
+      "$header": {
+        "description": "The tab's header context (matches TabItem's `$header`)."
+      }
+    },
     "props": {
       "activeTab": {
         "description": "This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default."
@@ -18309,10 +18297,7 @@ export default {
       "gap-list-Tabs": "0px",
       "paddingTop-TabItem": "$gap-normal"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$header"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "Text": {
     "status": "stable",
@@ -19473,14 +19458,7 @@ export default {
       "outlineOffset-item-TileGrid--focus": "-2px",
       "fontSize-checkbox-TileGrid": "$fontSize"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$item",
-      "$itemIndex",
-      "$isFirst",
-      "$isLast",
-      "$selected"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "PasswordInput": {
     "status": "stable",
@@ -20328,6 +20306,11 @@ export default {
   "Tree": {
     "status": "stable",
     "description": "The `Tree` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.",
+    "contextVars": {
+      "$item": {
+        "description": "The current tree node's data item."
+      }
+    },
     "props": {
       "data": {
         "description": "The data source of the tree. Format depends on the dataFormat property.",
@@ -20754,14 +20737,16 @@ export default {
       "outlineStyle-Tree--focus": "$outlineStyle--focus",
       "outlineOffset-Tree--focus": "$outlineOffset--focus"
     },
-    "isImplicitContainerByDefault": true,
-    "childInjectedVars": [
-      "$item"
-    ]
+    "isImplicitContainerByDefault": true
   },
   "Fallback": {
     "status": "experimental",
     "description": "`Fallback` is a declarative wrapper that renders an alternative UI when a descendant loader (`DataSource`, `APICall`) fails or a descendant component throws during render. The error is exposed as the `$error` context variable to the `errorTemplate`. An optional `loadingTemplate` is rendered while the `isLoading` prop is truthy.",
+    "contextVars": {
+      "$error": {
+        "description": "The error captured by this Fallback boundary."
+      }
+    },
     "props": {
       "errorTemplate": {
         "description": "Template to render when a descendant produces an `AppError`. The error is available as `$error` (code, category, message, data).",
@@ -20776,10 +20761,7 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       }
-    },
-    "childInjectedVars": [
-      "$error"
-    ]
+    }
   },
   "I18n": {
     "status": "experimental",

@@ -14,9 +14,6 @@ export const FormSegmentMd = createMetadata({
     "data and validation state without creating a nested form. Children are automatically " +
     'wrapped in a VStack (or HStack if `orientation="horizontal"`) with layout properties ' +
     "transposed from the segment.",
-  optimization: {
-    childInjectedVars: ["$segmentData", "$segmentValidationIssues", "$hasSegmentValidationIssue"],
-  },
   props: {
     label: {
       description:

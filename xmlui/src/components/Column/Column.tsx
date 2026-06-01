@@ -15,9 +15,6 @@ export const ColumnMd = createMetadata({
     "within a [`Table`](/docs/reference/components/Table) component. Each Column controls data " +
     "binding, header display, sorting capabilities, sizing, and can contain any " +
     "XMLUI components for rich cell content.",
-  optimization: {
-    childInjectedVars: ["$item", "$cell", "$itemIndex", "$colIndex", "$row", "$rowIndex"],
-  },
   props: {
     bindTo: {
       description:

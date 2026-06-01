@@ -20,7 +20,9 @@ export const TabsMd = createMetadata({
     "[TabItem](/components/TabItem) components.",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$header"],
+  },
+  contextVars: {
+    $header: d("The tab's header context (matches TabItem's `$header`)."),
   },
   props: {
     activeTab: d(

@@ -3,7 +3,7 @@ import type { ComponentDef } from "../..";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, dContextMenu } from "../metadata-helpers";
+import { createMetadata, d, dContextMenu } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeReact";
 import styles from "./TreeComponent.module.scss";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
@@ -15,7 +15,9 @@ export const TreeMd = createMetadata({
   description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.`,
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$item"],
+  },
+  contextVars: {
+    $item: d("The current tree node's data item."),
   },
   props: {
     data: {

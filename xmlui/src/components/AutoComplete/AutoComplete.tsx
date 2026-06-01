@@ -17,6 +17,7 @@ import {
   dMulti,
   createMetadata,
   d,
+  dInternal,
 } from "../metadata-helpers";
 import { AutoComplete, defaultProps } from "./AutoCompleteReact";
 import React from "react";
@@ -34,8 +35,6 @@ export const AutoCompleteMd = createMetadata({
     "and can allow users to create new options.",
   optimization: {
     isImplicitContainerByDefault: true,
-    // Keep aligned with the optionTemplate renderer's contextVars
-    childInjectedVars: ["$item","$selectedValue","$inTrigger"],
   },
   props: {
     placeholder: dPlaceholder(),
@@ -170,6 +169,8 @@ export const AutoCompleteMd = createMetadata({
     $group: d(
       "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
     ),
+    $selectedValue: dInternal("Currently selected value, injected into the trigger/option template."),
+    $inTrigger: dInternal("True when rendering inside the trigger (vs the dropdown list)."),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

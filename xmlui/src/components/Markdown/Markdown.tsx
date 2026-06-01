@@ -29,7 +29,10 @@ export const MarkdownMd = createMetadata({
     "when you need [rich formatting](/working-with-markdown).",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$anchorId","$anchorHref"],
+  },
+  contextVars: {
+    $anchorId: d("The generated id of the current heading anchor."),
+    $anchorHref: d("The href (#id) of the current heading anchor."),
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],

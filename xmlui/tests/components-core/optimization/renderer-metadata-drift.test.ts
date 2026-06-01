@@ -4,13 +4,13 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
 import { coreComponentMetadata } from "../../../src/components-core/coreComponentMetadata";
+import { extractOptimizerMetadataFromSource } from "../../../src/components-core/optimization/static-extractor";
 
 // Static drift detection —
 // Walks each built-in component's source file, extracts any
 // `renderers: { <slot>: { contextVars: [ "$x", "$y", ... ] } }` declaration,
-// and asserts that every `$`-key listed there is also declared in either
-// `OPTIMIZER_METADATA[type].childInjectedVars` or the component's own
-// `metadata.contextVars`. Mirrors the runtime `validateInjectedVars` check
+// and asserts that every `$`-key listed there is also declared in the
+// component's own `metadata.contextVars`. Mirrors the runtime `validateInjectedVars` check
 // but runs at CI / PR time so drift surfaces with sub-second feedback
 // instead of waiting for an E2E run that happens to exercise the slot.
 //
@@ -118,16 +118,13 @@ for (const file of allFilesToAudit) {
   if (!componentType) continue;
   audited.push(`${componentType} (${file.replace(/^.*\/src\//, "")})`);
 
-  const optEntry = AUDIT_METADATA[componentType];
-  const declared = new Set<string>();
-  if (optEntry?.childInjectedVars) {
-    for (const v of optEntry.childInjectedVars) declared.add(v);
-  }
-  // Also include `contextVars: { $x: d(...) }` keys from createMetadata.
-  const ctxBlock = source.match(/contextVars:\s*\{([\s\S]*?)\n\s*\},/);
-  if (ctxBlock) {
-    for (const m of ctxBlock[1].matchAll(/(\$\w+)\s*:/g)) declared.add(m[1]);
-  }
+  // Core components must declare injected vars in metadata.contextVars
+  // (public via d(), internal via dInternal()). childInjectedVars is no
+  // longer an accepted declaration site for core components.
+  // AST-based extraction via static-extractor is robust to formatting variations.
+  const declared = new Set<string>(
+    Object.keys(extractOptimizerMetadataFromSource(source).contextVars ?? {}),
+  );
 
   for (const { slot, vars } of renderers) {
     const missing = vars.filter(
@@ -139,7 +136,7 @@ for (const file of allFilesToAudit) {
   }
 }
 
-describe("Renderer contextVars must be declared in inline childInjectedVars or metadata.contextVars", () => {
+describe("Renderer contextVars must be declared in metadata.contextVars (core components)", () => {
   it("audits at least one component (sanity check)", () => {
     // Replicate the spirit of drift-test.js by confirming file counts
     // console.log(`Found ${allFiles.length} comp files and ${allCoreFiles.length} core files.`);
@@ -155,13 +152,13 @@ describe("Renderer contextVars must be declared in inline childInjectedVars or m
           (d) =>
             `  ${d.componentType} (${d.file.replace(/^.*\/components\//, "components/")}): ` +
             `renderer "${d.slot}" injects [${d.missing.join(", ")}] not declared in ` +
-            `optimization.childInjectedVars in <Component>/${d.componentType}.tsx or metadata.contextVars`,
+            `metadata.contextVars of <Component>/${d.componentType}.tsx`,
         )
         .join("\n");
       throw new Error(
-        `Renderer contextVars drift detected (Group S follow-up):\n${report}\n\n` +
-          `Fix: add the missing $-keys to optimization.childInjectedVars in <Component>/<Component>.tsx ` +
-          `in the component's createMetadata call.`,
+        `Renderer contextVars drift detected:\n${report}\n\n` +
+          `Fix: declare the missing $-keys in contextVars in <Component>/<Component>.tsx ` +
+          `(use d("...") for documented values, dInternal("...") for internal ones).`,
       );
     }
     expect(drift).toEqual([]);

@@ -34,7 +34,7 @@ export type OptimizerMeta = {
   isImplicitContainerByDefault?: boolean;
   childInjectedVars?: readonly string[];
   unstableChildInjectedVars?: readonly string[];
-  contextVars?: Record<string, unknown>;
+  contextVars?: Record<string, Record<never, never>>;
   events?: Record<string, { injectedVars?: readonly string[] }>;
 };
 
@@ -79,21 +79,6 @@ function asStaticStringArray(node: AnyNode | null | undefined): string[] | null 
 
 function isBooleanTrue(node: AnyNode | null | undefined): boolean {
   return !!node && node.type === "BooleanLiteral" && node.value === true;
-}
-
-/**
- * Extract the static string keys of a `contextVars` ObjectExpression.
- * `contextVars` is always an object literal; spread / computed keys are skipped.
- * Returns null when the node is absent or not a static object.
- */
-function extractContextVarKeys(node: AnyNode | null | undefined): string[] | null {
-  if (!node || node.type !== "ObjectExpression") return null;
-  const out: string[] = [];
-  for (const prop of node.properties) {
-    const key = getPropertyKeyName(prop);
-    if (key) out.push(key);
-  }
-  return out.length > 0 ? out : null;
 }
 
 function declarationsOf(stmt: AnyNode): AnyNode[] {
@@ -161,12 +146,18 @@ export function extractOptimizerMetadataFromSource(source: string): OptimizerMet
     if (unstableVars && unstableVars.length > 0) result.unstableChildInjectedVars = unstableVars;
   }
 
-  const contextVars = extractContextVarKeys(findProperty(meta, "contextVars"));
-  if (contextVars && contextVars.length > 0) {
-    result.contextVars = {};
-    for (const key of contextVars) {
-      result.contextVars[key] = {};
+  // Extract contextVars keys only — values are empty objects by design.
+  // The optimizer reads only Object.keys(contextVars); descriptions and
+  // isInternal flags live in the runtime metadata and the generated snapshot,
+  // not here.
+  const contextVarsNode = findProperty(meta, "contextVars");
+  if (contextVarsNode?.type === "ObjectExpression") {
+    const ctx: Record<string, Record<never, never>> = {};
+    for (const prop of contextVarsNode.properties) {
+      const key = getPropertyKeyName(prop);
+      if (key) ctx[key] = {};
     }
+    result.contextVars = ctx;
   }
 
   const events = findProperty(meta, "events");

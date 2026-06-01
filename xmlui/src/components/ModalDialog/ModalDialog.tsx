@@ -20,7 +20,6 @@ export const ModalDialogMd = createMetadata({
     "method and can receive parameters for dynamic content.",
   optimization: {
     isImplicitContainerByDefault: true,
-    childInjectedVars: ["$param","$params"],
   },
   parts: {
     content: {

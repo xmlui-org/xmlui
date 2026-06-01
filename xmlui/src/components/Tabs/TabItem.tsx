@@ -15,9 +15,6 @@ export const TabItemMd = createMetadata({
     "is selected. As a non-visual structural component, it serves as a container that " +
     "organizes content into distinct, switchable sections.",
   docFolder: "Tabs",
-  optimization: {
-    childInjectedVars: ["$header"],
-  },
   props: {
     label: dLabel(),
     headerTemplate: dComponent("This property allows the customization of the TabItem header."),
