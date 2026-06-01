@@ -80,8 +80,7 @@ Since missing metadata could lead to "silent" performance degradation, the frame
    - **File Structure Awareness:** The scanner recursively traverses directories and identifies sibling files (e.g., it looks at both `Table.tsx` and `TableReact.tsx`) to ensure that variables defined in "rendering subfiles" are correctly matched against the main metadata.
    - **Source-to-Metadata Sync:** It cross-references the `contextVars` used in component renderers with the `optimization` block in `createMetadata`.
 
-**No, for `isImplicitContainerByDefault`.**
-Whether a component is "heavy" enough to warrant `isImplicitContainerByDefault: true` remains a subjective architectural decision. There is no automated way to detect if a developer *should* have marked a component as heavy. This still relies on **Code Review**.
+> **⚠️ High-Level Important Note:** While the runtime system has a fallback that automatically treats `contextVars` keys as injected variables, the **Vite plugin (build-time) does not yet have this fallback**. The build-time optimizer only extracts `childInjectedVars`. For consistent performance between development and production builds, developers **must** currently declare injected variables in both locations.
 
 ---
 
@@ -91,11 +90,14 @@ Even though runtime errors prevent "silent" bugs, developers still face the burd
 
 High-level ideas to alleviate this burden in the future:
 
-1. **Auto-generation from TypeScript Interfaces**
+1. **Closing the "Vite Gap": Automated contextVars Extraction**
+   Extend the build-time `static-extractor.ts` to automatically extract keys from the `contextVars` block. This would make the runtime fallback consistent across the entire build pipeline, making `childInjectedVars` optional for any variable already documented in `contextVars`.
+
+2. **Auto-generation from TypeScript Interfaces**
    Instead of writing string arrays manually, a build step (or Vite plugin) could extract event payload types and context variable types from the component's TypeScript definitions and automatically inject the `optimization` block into the compiled code.
 
-2. **Unified Definition API (Single Source of Truth)**
+3. **Unified Definition API (Single Source of Truth)**
    Introducing a simpler API or wrapper function that registers both the runtime context/event variables and the optimizer metadata in a single place, eliminating the need to type the same variable name twice.
 
-3. **Advanced AST Inference**
+4. **Advanced AST Inference**
    The static analyzer could be enhanced to infer injected variables directly from the component's logic (e.g., automatically scanning calls to `dispatchEvent` or `renderChild`), eventually removing the need for manual metadata entirely for common patterns.

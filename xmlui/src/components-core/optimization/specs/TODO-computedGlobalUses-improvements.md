@@ -10,197 +10,6 @@ optimization and areas worth revisiting.
 
 ---
 
-## 1. `disablesChildNarrowing` is too broad — **⚠️ Already handled**
-
-**Where:** `computedUses.ts` — `disablesChildNarrowing` flag, propagated as `nextDisableNarrowing`.
-
-**Original concern:**  
-When a node has a `<script>` section or `.xs` code-behind functions, narrowing is
-disabled for **all of its descendants** — even descendants that don't call any of
-those functions and don't use globals transitively through them.
-
-**Analysis (resolved):**  
-This concern is already handled by the existing `safeToNarrow` formula:
-```ts
-const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
-```
-When `nextDisableNarrowing = true` (ancestor had code-behind), `safeToNarrow` is still
-`true` as long as the current node has **no own invalid script** AND **does not call any
-parent-scope function**. So function-free descendants that don't reference the parent's
-functions ARE already narrowed.
-
-The `dependsOnParentFunction` check already acts as the fine-grained per-container
-signal described in the original "improvement" note. No code change needed.
-
----
-
-## 3. Globals.xs **functions** always pass through `narrowGlobalVars`
-
-**Where:** `ContainerUtils.ts` — `narrowGlobalVars` uses `getGlobalFunctionKeys` and
-unconditionally includes every function key in the result.
-
-**Problem:**  
-A large `Globals.xs` with many helper functions causes all of them to be included in
-every container's `parentGlobalVars`, even containers that call none of them. The
-`useShallowCompareMemoize` identity check cannot help here because functions are
-always the same reference, but the object identity of `parentGlobalVars` changes
-when any variable changes — triggering unnecessary work downstream.
-
-**Improvement:**  
-`collectScriptFunctionDeps` already tracks which functions a subtree *calls*
-(transitively). The static analysis could emit a `computedGlobalFunctions?: string[]`
-annotation listing only the function names actually invoked in the subtree.
-`narrowGlobalVars` would then filter functions too, just like variables.
-
-**Caveat:** Functions called *indirectly* via higher-order patterns
-(e.g. `someOtherFn(myGlobalFn)`) are harder to track and would need a conservative
-fallback.
-
-**Cross-ref:** same finding as §2.2 of `code-review-branch-vs-main.md`. Note that
-the immediate re-render risk is bounded: the narrowed object is cached per
-`(vars-identity, uses)` (item 7), so functions only cause an *extra* re-render
-when a function reference actually changes between snapshots — which
-`global-variables.ts` is believed (but not yet tested) to avoid. The standing
-cost is snapshot size, not per-render churn.
-
----
-
-## 5. `safeToNarrow` gate applies identically to `computedGlobalUses` and `computedUses` — **⛔ Incorrect proposal**
-
-**Where:** `computedUses.ts` — single `safeToNarrow` boolean used for both annotations.
-
-**Original suggestion:**  
-Use a separate `safeToNarrowGlobals` that drops `dependsOnParentFunction`, since
-"global functions pass through unconditionally".
-
-**Why this is wrong:**  
-Imagine a child B (a heavy component, e.g. `Table`) that calls parent function
-`doSort()`, and `doSort()` reads global `sortBy`. The expression dep walker correctly
-sees B calls `doSort`, so `dependsOnParentFunction = true` and `safeToNarrow = false`
-→ B is not narrowed.
-
-If we used `safeToNarrowGlobals = !nextDisableNarrowing || !ownHasScript` (ignoring
-`dependsOnParentFunction`), B *would* be narrowed. B's `globalDepsUsed` does not
-include `sortBy` (that was analyzed inside `doSort`, attributed to the *parent* node).
-So B's `computedGlobalUses` would not contain `sortBy`.
-
-**Correction of the stated failure mode:** the original note said B would get
-`undefined` for `sortBy`. This is **inaccurate**. `ComponentWrapper` uses a two-step
-design (see `ComponentWrapper.tsx` ~L115-137): the change-detection snapshot is
-narrowed, but the *actual* `parentGlobalVars` forwarded to the child is always the
-**full** `globalVars` object. So `doSort()` running in B's scope reads the current
-`sortBy` correctly — never `undefined`. The real failure mode is a **stale render**:
-B is not subscribed to `sortBy`, so when `sortBy` changes externally, B's narrow
-snapshot does not change → `React.memo` skips B → B keeps displaying output derived
-from the old `sortBy` until some unrelated re-render forces it. Milder than a crash,
-but still a correctness bug.
-
-This distinction matters for the fix direction: the globals channel can be relaxed
-**independently of parent-state `computedUses`**, because the full object is always
-forwarded for evaluation. The correct path is to **propagate the called parent
-function's global reads into B's `globalDepsUsed`** — not to drop the guard. See
-item #10 for the full design.
-
-The `dependsOnParentFunction` guard is **equally necessary** for globals as it is for
-parent state — but for a different reason (stale render, not undefined). No change
-should be made here without the propagation described in item #10.
-
----
-
-## 6. Parse-time pass produces incomplete `appGlobalNames`
-
-**Where:** `computeUsesForTree` called from `vite-xmlui-plugin.ts` at build time.
-
-**Problem:**  
-The first (parse-time) call to `computeUsesForTree` passes `appGlobalNames = EMPTY_SET`
-because `Globals.xs` has not been resolved yet. This means `computedGlobalUses`
-annotations are not set at build time; the result is overwritten at boot time by the
-authoritative `StandaloneApp` pass.
-
-**Impact:** Low in practice — the boot-time pass overwrites the stale result.  
-**Risk:** In Vite mode the second pass may run *after* first render, leaving a brief
-window where `computedGlobalUses` is undefined and all globals pass through.
-
-**Improvement:**  
-Resolve `Globals.xs` names during the Vite plugin pass (it already has access to the
-file system) and supply a valid `appGlobalNames` set to the build-time traversal.
-
----
-
-## Summary table
-
-| # | Area | Impact | Effort | Status |
-|---|------|--------|--------|--------|
-| 1 | `disablesChildNarrowing` too broad | High — blocks many descendants | — | ⚠️ Already handled by `safeToNarrow` formula |
-| 3 | Functions always pass through | Medium — proportional to Globals.xs size | High | Open (= review §2.2) |
-| 5 | Shared `safeToNarrow` gate | Low–Medium | Low | ⛔ Incorrect proposal — see analysis |
-| 6 | Parse-time `appGlobalNames` empty | Low | Medium | Open |
-| 10 | `dependsOnParentFunction` blocks global-narrowing (no dep propagation) | **High** in script-heavy apps | Medium | Open — design below |
-| 11 | Unresolvable cross-`.xs` imports block global-narrowing | **High** in import-heavy apps | High (needs import resolution) | Open — gated on import resolution |
-
----
-
-# Field evidence — myworkdrive runtime audit (2026-06-01)
-
-The items above were derived mostly from code review. This section adds **measured**
-runtime data from a real app (myworkdrive), because it changes the priority of items
-1/5 and motivates the new items 10 and 11. All numbers come from instrumenting
-`computeUsesInternal` and reading `window.__renderCounts` in the dev server (the
-narrowing runs in the browser/`StandaloneApp` pass; the Vite parse-time pass does
-**not** run `computeUsesForTree` in dev — confirmed: no Node-side invocation).
-
-## E.1 — Narrowing coverage across the whole app
-
-Of **77** container definitions instantiated on the `/my-files` screen:
-
-| Outcome | Count | Runtime effect |
-|---|---|---|
-| `computedGlobalUses` **set** | **2** | Protected — re-renders only on the globals it reads |
-| Reads globals but **suppressed** by `safeToNarrow` | **46** | `computedGlobalUses` undefined → receives **all** globals → re-renders on **any** global change |
-| Reads **no** globals → left `undefined` | **29** | Same as above (undefined → all globals forwarded) |
-
-So **2 of 77** containers actually benefit from the globals channel.
-
-## E.2 — Why the 46 global-reading containers are suppressed
-
-`ownHasScript = scriptCollected.hasInvalidStatements || scriptCollected.hasUnresolvableImports`.
-Classifying the 46:
-
-| Reason | Count | Notes |
-|---|---|---|
-| `hasInvalidStatements` (parser failure) | **0** | The "can't parse script bodies" era is over. `collectScriptFunctionDeps` parses fn bodies and extracts reads. **The old blanket guard is already gone.** |
-| `hasUnresolvableImports` | **35** | A function imported from another `.xs` is opaque; analyzer can't see its global reads. Mostly `Fragment`s reading `events` (imported helpers from `shared.xs`). |
-| `dependsOnParentFunction` only | **11** | Calls a parent-scope function under a disabled-narrowing scope. **Includes the heaviest components:** `Table#filesTable` (reads `bookmarks,selectMode,sortBy,sortDirection`), `TileGrid#filesGrid` (`bookmarks,selectMode`), `Table#favoritesTable` (`sortBy,sortDirection`), `VStack` (`sortBy,sortDirection,view`), and the modal `Form`s (`isFileOperationInProgress`). |
-| suppressed with no reason | **0** | No purely-wasteful suppression — every suppression has a cause. |
-
-**Headline:** `invalidStatements = 0`. The guard people remember as "we couldn't parse
-function bodies" is **not** what blocks narrowing today. The two live blockers are
-**(a) unresolvable cross-file imports (35)** and **(b) parent-function calls (11)** —
-both of which reduce to the *same* missing capability (§10/§11 below).
-
-## E.3 — Benchmark: ON vs OFF re-render delta is 0% in 5 user scenarios
-
-With the optimisation ON vs fully OFF (verified via a real toggle — module-eval flag,
-`onMark=true`/`offMark=false`), the steady-state re-render counts are **identical**:
-
-| Scenario | OPT ON | OPT OFF | Saved |
-|---|---|---|---|
-| Sort change | 124 | 124 | 0% |
-| View switch | 28 | 28 | 0% |
-| Right-click selection | 52 | 52 | 0% |
-| Folder navigation | 88 | 88 | 0% |
-| Favorites toggle (parent-state `bookmarks`) | 944 | 944 | 0% |
-
-**Interpretation:** the 75 unprotected containers behave identically ON vs OFF (both
-have `computedGlobalUses === undefined`); only the 2 protected ones differ, and those
-read the globals that actually change in each scenario, so they re-render anyway.
-**The optimisation is correct and regression-free, but its measurable render saving in
-this app is 0% until items 10/11 unblock the suppressed containers.** This is an
-app-shape problem (myworkdrive routes nearly all state through Globals.xs / the `events`
-bus), not a defect in the narrowing machinery.
-
----
-
 ## 10. `dependsOnParentFunction` blocks `computedGlobalUses` even though globals could be propagated — **supersedes the §5 rejection**
 
 **Where:** `computedUses.ts` — `safeToNarrow` (circa L586), `dependsOnParentFunction`
@@ -408,3 +217,194 @@ file**. So §11 = §10 + **import resolution**:
 **Ordering recommendation:** do **§10 first** (no new file I/O; unlocks the 11 heaviest
 containers; proves the propagation machinery and the test scaffold), then **§11**
 (reuses §10's fold-in step on top of import resolution; unlocks the remaining 35).
+
+---
+
+## 3. Globals.xs **functions** always pass through `narrowGlobalVars`
+
+**Where:** `ContainerUtils.ts` — `narrowGlobalVars` uses `getGlobalFunctionKeys` and
+unconditionally includes every function key in the result.
+
+**Problem:**  
+A large `Globals.xs` with many helper functions causes all of them to be included in
+every container's `parentGlobalVars`, even containers that call none of them. The
+`useShallowCompareMemoize` identity check cannot help here because functions are
+always the same reference, but the object identity of `parentGlobalVars` changes
+when any variable changes — triggering unnecessary work downstream.
+
+**Improvement:**  
+`collectScriptFunctionDeps` already tracks which functions a subtree *calls*
+(transitively). The static analysis could emit a `computedGlobalFunctions?: string[]`
+annotation listing only the function names actually invoked in the subtree.
+`narrowGlobalVars` would then filter functions too, just like variables.
+
+**Caveat:** Functions called *indirectly* via higher-order patterns
+(e.g. `someOtherFn(myGlobalFn)`) are harder to track and would need a conservative
+fallback.
+
+**Cross-ref:** same finding as §2.2 of `code-review-branch-vs-main.md`. Note that
+the immediate re-render risk is bounded: the narrowed object is cached per
+`(vars-identity, uses)` (item 7), so functions only cause an *extra* re-render
+when a function reference actually changes between snapshots — which
+`global-variables.ts` is believed (but not yet tested) to avoid. The standing
+cost is snapshot size, not per-render churn.
+
+---
+
+## 6. Parse-time pass produces incomplete `appGlobalNames`
+
+**Where:** `computeUsesForTree` called from `vite-xmlui-plugin.ts` at build time.
+
+**Problem:**  
+The first (parse-time) call to `computeUsesForTree` passes `appGlobalNames = EMPTY_SET`
+because `Globals.xs` has not been resolved yet. This means `computedGlobalUses`
+annotations are not set at build time; the result is overwritten at boot time by the
+authoritative `StandaloneApp` pass.
+
+**Impact:** Low in practice — the boot-time pass overwrites the stale result.  
+**Risk:** In Vite mode the second pass may run *after* first render, leaving a brief
+window where `computedGlobalUses` is undefined and all globals pass through.
+
+**Improvement:**  
+Resolve `Globals.xs` names during the Vite plugin pass (it already has access to the
+file system) and supply a valid `appGlobalNames` set to the build-time traversal.
+
+---
+
+## 1. `disablesChildNarrowing` is too broad — **⚠️ Already handled**
+
+**Where:** `computedUses.ts` — `disablesChildNarrowing` flag, propagated as `nextDisableNarrowing`.
+
+**Original concern:**  
+When a node has a `<script>` section or `.xs` code-behind functions, narrowing is
+disabled for **all of its descendants** — even descendants that don't call any of
+those functions and don't use globals transitively through them.
+
+**Analysis (resolved):**  
+This concern is already handled by the existing `safeToNarrow` formula:
+```ts
+const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
+```
+When `nextDisableNarrowing = true` (ancestor had code-behind), `safeToNarrow` is still
+`true` as long as the current node has **no own invalid script** AND **does not call any
+parent-scope function**. So function-free descendants that don't reference the parent's
+functions ARE already narrowed.
+
+The `dependsOnParentFunction` check already acts as the fine-grained per-container
+signal described in the original "improvement" note. No code change needed.
+
+---
+
+## 5. `safeToNarrow` gate applies identically to `computedGlobalUses` and `computedUses` — **⛔ Incorrect proposal**
+
+**Where:** `computedUses.ts` — single `safeToNarrow` boolean used for both annotations.
+
+**Original suggestion:**  
+Use a separate `safeToNarrowGlobals` that drops `dependsOnParentFunction`, since
+"global functions pass through unconditionally".
+
+**Why this is wrong:**  
+Imagine a child B (a heavy component, e.g. `Table`) that calls parent function
+`doSort()`, and `doSort()` reads global `sortBy`. The expression dep walker correctly
+sees B calls `doSort`, so `dependsOnParentFunction = true` and `safeToNarrow = false`
+→ B is not narrowed.
+
+If we used `safeToNarrowGlobals = !nextDisableNarrowing || !ownHasScript` (ignoring
+`dependsOnParentFunction`), B *would* be narrowed. B's `globalDepsUsed` does not
+include `sortBy` (that was analyzed inside `doSort`, attributed to the *parent* node).
+So B's `computedGlobalUses` would not contain `sortBy`.
+
+**Correction of the stated failure mode:** the original note said B would get
+`undefined` for `sortBy`. This is **inaccurate**. `ComponentWrapper` uses a two-step
+design (see `ComponentWrapper.tsx` ~L115-137): the change-detection snapshot is
+narrowed, but the *actual* `parentGlobalVars` forwarded to the child is always the
+**full** `globalVars` object. So `doSort()` running in B's scope reads the current
+`sortBy` correctly — never `undefined`. The real failure mode is a **stale render**:
+B is not subscribed to `sortBy` (absent from its `computedGlobalUses`),
+so when `sortBy` changes externally, B's narrow snapshot does not change → `React.memo`
+skips B → B keeps displaying output derived from the old `sortBy` until some unrelated
+re-render forces it. Milder than a crash, but still a correctness bug.
+
+This distinction matters for the fix direction: the globals channel can be relaxed
+**independently of parent-state `computedUses`**, because the full object is always
+forwarded for evaluation. The correct path is to **propagate the called parent
+function's global reads into B's `globalDepsUsed`** — not to drop the guard. See
+item #10 for the full design.
+
+The `dependsOnParentFunction` guard is **equally necessary** for globals as it is for
+parent state — but for a different reason (stale render, not undefined). No change
+should be made here without the propagation described in item #10.
+
+---
+
+## Summary table
+
+| # | Area | Impact | Effort | Status |
+|---|------|--------|--------|--------|
+| 10 | `dependsOnParentFunction` blocks global-narrowing (no dep propagation) | **High** in script-heavy apps | Medium | Open — design below |
+| 11 | Unresolvable cross-`.xs` imports block global-narrowing | **High** in import-heavy apps | High (needs import resolution) | Open — gated on import resolution |
+| 3 | Functions always pass through | Medium — proportional to Globals.xs size | High | Open (= review §2.2) |
+| 6 | Parse-time `appGlobalNames` empty | Low | Medium | Open |
+| 1 | `disablesChildNarrowing` too broad | High — blocks many descendants | — | ⚠️ Already handled by `safeToNarrow` formula |
+| 5 | Shared `safeToNarrow` gate | Low–Medium | Low | ⛔ Incorrect proposal — see analysis |
+
+---
+
+# Field evidence — myworkdrive runtime audit (2026-06-01)
+
+The items above were derived mostly from code review. This section adds **measured**
+runtime data from a real app (myworkdrive), because it changes the priority of items
+1/5 and motivates the new items 10 and 11. All numbers come from instrumenting
+`computeUsesInternal` and reading `window.__renderCounts` in the dev server (the
+narrowing runs in the browser/`StandaloneApp` pass; the Vite parse-time pass does
+**not** run `computeUsesForTree` in dev — confirmed: no Node-side invocation).
+
+## E.1 — Narrowing coverage across the whole app
+
+Of **77** container definitions instantiated on the `/my-files` screen:
+
+| Outcome | Count | Runtime effect |
+|---|---|---|
+| `computedGlobalUses` **set** | **2** | Protected — re-renders only on the globals it reads |
+| Reads globals but **suppressed** by `safeToNarrow` | **46** | `computedGlobalUses` undefined → receives **all** globals → re-renders on **any** global change |
+| Reads **no** globals → left `undefined` | **29** | Same as above (undefined → all globals forwarded) |
+
+So **2 of 77** containers actually benefit from the globals channel.
+
+## E.2 — Why the 46 global-reading containers are suppressed
+
+`ownHasScript = scriptCollected.hasInvalidStatements || scriptCollected.hasUnresolvableImports`.
+Classifying the 46:
+
+| Reason | Count | Notes |
+|---|---|---|
+| `hasInvalidStatements` (parser failure) | **0** | The "can't parse script bodies" era is over. `collectScriptFunctionDeps` parses fn bodies and extracts reads. **The old blanket guard is already gone.** |
+| `hasUnresolvableImports` | **35** | A function imported from another `.xs` is opaque; analyzer can't see its global reads. Mostly `Fragment`s reading `events` (imported helpers from `shared.xs`). |
+| `dependsOnParentFunction` only | **11** | Calls a parent-scope function under a disabled-narrowing scope. **Includes the heaviest components:** `Table#filesTable` (reads `bookmarks,selectMode,sortBy,sortDirection`), `TileGrid#filesGrid` (`bookmarks,selectMode`), `Table#favoritesTable` (`sortBy,sortDirection`), `VStack` (`sortBy,sortDirection,view`), and the modal `Form`s (`isFileOperationInProgress`). |
+| suppressed with no reason | **0** | No purely-wasteful suppression — every suppression has a cause. |
+
+**Headline:** `invalidStatements = 0`. The guard people remember as "we couldn't parse
+function bodies" is **not** what blocks narrowing today. The two live blockers are
+**(a) unresolvable cross-file imports (35)** and **(b) parent-function calls (11)** —
+both of which reduce to the *same* missing capability (§10/§11 below).
+
+## E.3 — Benchmark: ON vs OFF re-render delta is 0% in 5 user scenarios
+
+With the optimisation ON vs fully OFF (verified via a real toggle — module-eval flag,
+`onMark=true`/`offMark=false`), the steady-state re-render counts are **identical**:
+
+| Scenario | OPT ON | OPT OFF | Saved |
+|---|---|---|---|
+| Sort change | 124 | 124 | 0% |
+| View switch | 28 | 28 | 0% |
+| Right-click selection | 52 | 52 | 0% |
+| Folder navigation | 88 | 88 | 0% |
+| Favorites toggle (parent-state `bookmarks`) | 944 | 944 | 0% |
+
+**Interpretation:** the 75 unprotected containers behave identically ON vs OFF (both
+have `computedGlobalUses === undefined`); only the 2 protected ones differ, and those
+read the globals that actually change in each scenario, so they re-render anyway.
+**The optimisation is correct and regression-free, but its measurable render saving in
+this app is 0% until items 10/11 unblock the suppressed containers.** This is an
+app-shape problem (myworkdrive routes nearly all state through Globals.xs / the `events`
+bus), not a defect in the narrowing machinery.
