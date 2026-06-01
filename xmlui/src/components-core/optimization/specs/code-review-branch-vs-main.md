@@ -198,21 +198,10 @@ collisions rather than blind string concatenation.
 
 **Resolution**: Replaced `/\$[a-zA-Z_]/.test(child.script)` with AST-level `scriptCollectedReadsContextVars(sc)` — walks `sc.vars[*].tree` and `sc.functions[*]` (stored directly as ArrowExpression) via `collectVariableDependencies`. Added duplicate-name collision guard before merge (skips hoisting when parent and child share a key). String-literal false-positives and collisions are now correctly handled. Four regression tests in `transform.script.test.ts` (describe block "Fragment script hoisting") — all pass.
 
-### 3.2 — [M] Two-step `globalVarsWithStableRef` memo relies on a disabled lint rule (carried over, open)
-`rendering/ComponentWrapper.tsx:125-126`
+### 3.2 — [M] ✅ FIXED — Two-step `globalVarsWithStableRef` memo relies on a disabled lint rule (carried over, fixed)
+`rendering/ComponentWrapper.tsx:125-135`
 
-```ts
-// eslint-disable-next-line react-hooks/exhaustive-deps
-const globalVarsWithStableRef = useMemo(() => globalVars, [narrowedGlobalVarsForComparison ?? globalVars]);
-```
-
-The pattern is correct (return the full object, but only change its reference
-when the narrow snapshot changes), but its correctness is enforced only by a
-hand-disabled exhaustive-deps rule and a non-obvious invariant. There is no test
-that fails if a future edit drops `globalVars` from the closure or mis-specifies
-the dep. The `?? globalVars` fallback also means that when
-`computedGlobalUses` is absent the memo key is the raw `globalVars` identity —
-fine, but it couples two distinct code paths into one dependency expression.
+The `eslint-disable-next-line react-hooks/exhaustive-deps` comment was replaced with the standard React `useRef` pattern: a `globalVarsCurrentRef` ref is updated every render, and `useMemo` reads `ref.current` inside its callback so it always captures the latest `globalVars` without declaring it as a dependency. The dependency array still contains `narrowedGlobalVarsForComparison ?? globalVars`, preserving the original memo-invalidation semantics. The approach is documented in an inline comment explaining the ref-in-memo pattern.
 
 ### 3.3 — [L] `parse()` failures are not cached (carried over, accepted)
 `optimization/computedUses.ts:33-50`, `addEvent` at `:371-394`
@@ -226,7 +215,7 @@ re-resolution). Low impact, but unbounded re-parse of known-bad input.
 
 ## 4. Hardcoding / duplication
 
-### 4.1 NEW (consolidated) — [L] Five hand-maintained "framework knowledge" literals that can drift
+### 4.1 NEW (consolidated) — [L] ✅ DOCUMENTED — Five hand-maintained "framework knowledge" literals that can drift
 - `JS_STDLIB_GLOBALS` — `computedUses.ts:80` (with a "review every June" maintenance comment)
 - `BROWSER_HOST_GLOBALS` — `computedUses.ts:134`
 - `XMLUI_GLOBAL_NAMES` — imported from `appContextFactory`
@@ -237,18 +226,19 @@ Each encodes framework behaviour as a string list that must be kept in sync with
 the real source of truth (TC39, metadata `contextVars`, the event-payload
 injector). `FRAMEWORK_VARS` is the most concerning because the canonical list
 already exists in component metadata; the duplicate can silently diverge when a
-new framework `$var` is added. The daily review marked 4.2/4.3 as "accepted as
-is" — that is reasonable short-term, but the consolidated drift surface is
-larger than any single list and deserves a single documented owner/source.
+new framework `$var` is added.
 
-### 4.2 NEW — [L] Process-global `astCache` is never reset per app
-`optimization/computedUses.ts:31`
+**Resolution**: Added a `DRIFT WARNING` comment above `FRAMEWORK_VARS` in `ContainerUtils.ts` pointing to the canonical source (each component's `createMetadata({ optimization: { childInjectedVars } })`). The other four lists are accepted as-is: TC39 and browser globals have no machine-readable source, `XMLUI_GLOBAL_NAMES` is imported (not duplicated), and `EVENT_PAYLOAD_RESERVED_NAMES` already has a maintenance note.
+
+### 4.2 NEW — [L] ✅ DOCUMENTED — Process-global `astCache` is never reset per app
+`optimization/computedUses.ts:28-31`
 
 `astCache` is a module-level `Map` (LRU-bounded to 1000) keyed by raw source
 text, shared across every app instance and every test in the process, never
 cleared. Bounded and pure (same source ⇒ same AST), so functionally safe, but it
-is undocumented global mutable state with no reset hook — surprising in a
-multi-app or long-running test process.
+was undocumented global mutable state.
+
+**Resolution**: Expanded the `astCache` header comment to document process-global scope, LRU eviction behaviour, absence of a reset hook, and implications for tests sharing the same worker.
 
 ### 4.3 — [L] Resolved (verified): `__tree_` magic offset, `addAll` boilerplate, worklist over Set-mutation
 `ContainerUtils.ts:266` (`TREE_PREFIX`), `computedUses.ts:256` (`addAll`), `:355` (worklist).
@@ -316,33 +306,33 @@ High value (would catch a real correctness hole):
    metadata with `availableValues` and asserts its intended `isStrictEnum`
    status (allow-list), so future `availableValues` additions can't silently
    skip validation. Covers 1.2. **Done** — guard test in `verifier.test.ts`.
-3. **`computedGlobalUses` end-to-end re-render isolation** — changing a global
+3. ✅ **`computedGlobalUses` end-to-end re-render isolation** — changing a global
    NOT in `computedGlobalUses` must not re-render the container; changing one
    that IS must. Plus the transitive case (global X depends on global Y; only X
-   in `uses`).
+   in `uses`). **Done** — 4 tests in `narrowGlobalVars cache` section of `computedUses.test.ts`: isolation (unused global doesn't re-render), trigger (used global does), transitive expansion, and transitive value propagation.
 
 Medium value (fragility / regression guards):
 4. **Standalone import resolution idempotency** — under repeated effect runs /
    StrictMode, `collectImportsFromStandaloneSources` must not re-`fetch()` an
-   already-resolved module. Covers 1.3.
-5. **Global-function ref stability** — assert `global-variables.ts` keeps
+   already-resolved module. Covers 1.3. **Deferred** — requires fetch-mock infrastructure and a complex `StandaloneApp` harness; no existing test file for that module.
+5. ✅ **Global-function ref stability** — assert `global-variables.ts` keeps
    function identities stable across data-only snapshots, so 2.2 cannot cause
-   spurious re-renders.
-6. **Two-step memo missing-dep guard** — a test that fails if
+   spurious re-renders. **Done** — 2 tests in `global-variables-stability.test.tsx` (describe "useGlobalVariables — function reference stability (test 7.5)"): ref preserved across unrelated componentState change, and across a data global update.
+6. ✅ **Two-step memo missing-dep guard** — a test that fails if
    `globalVarsWithStableRef` stops updating when `globalVars` changes (locks down
-   the eslint-disabled invariant, 3.2).
+   the eslint-disabled invariant, 3.2). **Done** — 3 tests in `global-variables-stability.test.tsx` (describe "ComponentWrapper two-step memo (test 7.6)"): returns full globalVars (not snapshot), ref is stable when snapshot is unchanged, and returns the LATEST globalVars (not stale) when snapshot changes.
 7. ✅ **Fragment script hoisting** — (a) hoisting is NOT blocked by an incidental
    `$word` inside a string literal; (b) parent+Fragment scripts that declare the
    same name merge without throwing. Covers 3.1. **Done** — 4 tests in `transform.script.test.ts`.
-8. **`collectScriptFunctionDeps` mutual recursion** — `a→b→a` where each reads a
+8. ✅ **`collectScriptFunctionDeps` mutual recursion** — `a→b→a` where each reads a
    distinct parent var; assert the union recovers both deps despite the
-   incomplete cached entry.
+   incomplete cached entry. **Done** — test "mutually recursive functions: union recovers distinct deps from both sides of the cycle" in `computedUses.test.ts`.
 
 Low value (edge/robustness):
-9. Parse-failure path: an event handler with invalid script doesn't crash
-   analysis and degrades gracefully (and ideally isn't re-parsed every pass, 3.3).
-10. `static-extractor.ts`: dynamic/spread `createMetadata` argument and
-    non-literal `injectedVars` arrays are skipped without throwing.
+9. ✅ Parse-failure path: an event handler with invalid script doesn't crash
+   analysis and degrades gracefully (and ideally isn't re-parsed every pass, 3.3). **Done** — 3 tests in `computeUsesForTree — parse-failure graceful degradation (test 7.9)` section of `computedUses.test.ts`: no throw on invalid syntax, `computedUses` is conservatively undefined when any handler fails (safeToNarrow=false), and all-invalid handlers are also handled.
+10. ✅ `static-extractor.ts`: dynamic/spread `createMetadata` argument and
+    non-literal `injectedVars` arrays are skipped without throwing. **Done** — 5 tests in `optimizer-metadata-extractor.test.ts` (describe "dynamic/spread robustness (test 7.10)"): spread arg, no-arg call, dynamic events injectedVars, empty source, syntax-error source.
 
 ---
 

@@ -27,6 +27,17 @@ import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 
 // LRU cache for parsed raw strings to avoid unbounded memory growth.
 // AST_CACHE_MAX_SIZE covers typical apps while guarding against generated code.
+//
+// NOTE: This is a process-global module-level Map shared across all app
+// instances and across all test runs within the same process. It is NOT
+// reset between apps or test suites. This is intentional — the cache is
+// purely functional (same source string always yields the same AST) — but
+// it means:
+//   • In long-running processes (dev server, test suites) the cache quietly
+//     accumulates entries until it reaches AST_CACHE_MAX_SIZE, then evicts
+//     the oldest entry on each insertion.
+//   • Tests that inspect cache behaviour must account for entries from
+//     earlier tests in the same worker.
 const AST_CACHE_MAX_SIZE = 1_000;
 const astCache = new Map<string, Statement[]>();
 

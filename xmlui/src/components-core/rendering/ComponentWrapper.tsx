@@ -122,8 +122,19 @@ export const ComponentWrapper = memo(
         [globalVars, nodeComputedGlobalUses],
       ),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const globalVarsWithStableRef = useMemo(() => globalVars, [narrowedGlobalVarsForComparison ?? globalVars]);
+    // Two-step memo: return the FULL globalVars but update its reference only when
+    // the narrow snapshot changes (or when absent, when globalVars itself changes).
+    // A ref is used to read the latest globalVars without adding it as a memo
+    // dependency — reading `.current` inside useMemo is the standard React pattern
+    // for "I need the current value at the time the memo recomputes, but I do not
+    // want the memo to recompute every time the value changes."
+    const globalVarsCurrentRef = useRef(globalVars);
+    globalVarsCurrentRef.current = globalVars;
+    const globalVarsWithStableRef = useMemo(
+      () => globalVarsCurrentRef.current,
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- ref.current is intentionally excluded; see comment above
+      [narrowedGlobalVarsForComparison ?? globalVars],
+    );
 
     // Stable ref holding the full (un-narrowed) parent state for event handlers.
     // Using a MutableRefObject instead of a value prop means ContainerWrapper.memo

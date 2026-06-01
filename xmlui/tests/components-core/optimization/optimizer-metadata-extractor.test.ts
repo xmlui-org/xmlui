@@ -224,3 +224,70 @@ describe("extractComponentName", () => {
     expect(extractComponentName(source)).toBe("Real");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Test 7.10 — static-extractor robustness: dynamic / spread arguments (covers §4.2)
+//
+// The extractor must silently return an empty result (no throw) for patterns it
+// cannot statically resolve: spread createMetadata arguments, missing arguments,
+// and non-literal injectedVars arrays inside the events block.
+// ---------------------------------------------------------------------------
+describe("extractOptimizerMetadataFromSource — dynamic/spread robustness (test 7.10)", () => {
+  it("returns empty object when createMetadata receives a spread argument", () => {
+    // The ObjectExpression check in findCreateMetadataObject guards this:
+    // only plain { ... } is accepted; spread { ...base } is skipped.
+    const source = `
+      const base = { optimization: { childInjectedVars: ["$item"] } };
+      export const FooMd = createMetadata({ ...base });
+    `;
+    const result = extractOptimizerMetadataFromSource(source);
+    // Cannot be statically extracted — must degrade gracefully to an empty result.
+    expect(result.childInjectedVars).toBeUndefined();
+    expect(result.isImplicitContainerByDefault).toBeUndefined();
+    expect(result.events).toBeUndefined();
+  });
+
+  it("returns empty object when createMetadata is called with no arguments", () => {
+    const source = `
+      export const FooMd = createMetadata();
+    `;
+    expect(() => extractOptimizerMetadataFromSource(source)).not.toThrow();
+    const result = extractOptimizerMetadataFromSource(source);
+    expect(result.childInjectedVars).toBeUndefined();
+  });
+
+  it("skips event injectedVars when the value is a non-literal reference (no throw)", () => {
+    // The events block has `injectedVars: SHARED_VARS` (identifier, not array literal).
+    // asStaticStringArray returns null for non-ArrayExpression nodes → entry is omitted.
+    const source = `
+      const SHARED_VARS = ["$data"];
+      export const FormMd = createMetadata({
+        events: {
+          submit: {
+            injectedVars: SHARED_VARS,
+            description: "Submit the form",
+          },
+          cancel: {
+            injectedVars: ["$data"],
+          },
+        },
+      });
+    `;
+    expect(() => extractOptimizerMetadataFromSource(source)).not.toThrow();
+    const result = extractOptimizerMetadataFromSource(source);
+    // Dynamic reference is silently skipped — submit has no injectedVars entry.
+    expect(result.events?.submit).toBeUndefined();
+    // Static literal in cancel is still extracted correctly.
+    expect(result.events?.cancel?.injectedVars).toEqual(["$data"]);
+  });
+
+  it("returns empty object when source is completely empty", () => {
+    expect(() => extractOptimizerMetadataFromSource("")).not.toThrow();
+    const result = extractOptimizerMetadataFromSource("");
+    expect(result).toEqual({});
+  });
+
+  it("returns empty object when source has syntax errors", () => {
+    expect(() => extractOptimizerMetadataFromSource("const x = {{{")).not.toThrow();
+  });
+});

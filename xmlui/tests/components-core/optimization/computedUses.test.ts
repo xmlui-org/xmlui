@@ -1336,6 +1336,35 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — transitive code-behind f
     expect(comp.computedUses).toContain("count");
   });
 
+  it("mutually recursive functions: union recovers distinct deps from both sides of the cycle", () => {
+    // a reads `varA` directly and calls b; b reads `varB` directly and calls a.
+    // The union-only cache invariant (see computedUses.ts:186-192): the cached
+    // result for `b` (stored during a's top-level pass with a cut from the
+    // visited-set) only contains {varB}. When `b` is later processed as a
+    // top-level entry, the cache returns this incomplete result. But `a`'s
+    // top-level result already resolved both sides: a→b gives {varB}, plus a's
+    // own {varA}. Final union = {varA, varB}.
+    const { functions: { a, b } } = collectCodeBehindFromSource(
+      "test.xs",
+      [
+        "function a() { return varA + b(); }",
+        "function b() { return varB + a(); }",
+      ].join("\n"),
+    );
+    const comp = node("Stack", {
+      functions: { a, b } as any,
+    });
+    const root = node("Stack", {
+      vars: { varA: "{0}", varB: "{0}" },
+      children: [comp],
+    });
+    expect(() => computeUsesForTree(root)).not.toThrow();
+    expect(comp.computedUses).toBeDefined();
+    // Both parent vars must be recovered despite the incomplete cached entry for b.
+    expect(comp.computedUses).toContain("varA");
+    expect(comp.computedUses).toContain("varB");
+  });
+
   it("scriptCollected.vars initial-value deps are analyzed", () => {
     // localCount = sharedCount + 1 — initializer references sharedCount from parent.
     const { vars } = collectCodeBehindFromSource(
@@ -2607,6 +2636,82 @@ describe("narrowGlobalVars cache", () => {
     expect(cached.theme).toBeUndefined();
     expect(cached.count).toBeUndefined();
   });
+
+  // ─── Test 7.3: computedGlobalUses re-render isolation ─────────────────────
+  // Changing a global NOT in `computedGlobalUses` must produce a snapshot with
+  // identical content so that useShallowCompareMemoize does NOT see a difference
+  // and therefore does NOT trigger a container re-render.
+  // Changing a global that IS in `computedGlobalUses` must produce a snapshot
+  // with a changed value so that the shallow compare DOES detect the change.
+
+  it("snapshot content is identical when only an unused global changes (re-render isolation)", () => {
+    // globalB changed, but globalA (the one in `uses`) did not.
+    const vars1 = { globalA: "v1", globalB: "original" };
+    const vars2 = { globalA: "v1", globalB: "CHANGED" };
+    const uses = ["globalA"];
+
+    const snap1 = narrowGlobalVars(vars1, uses);
+    const snap2 = narrowGlobalVars(vars2, uses);
+
+    // The two snapshots are different objects (different vars → different cache buckets),
+    // but their content is the same — shallow-compare sees no change → no re-render.
+    expect(snap1.globalA).toBe(snap2.globalA);
+    expect(snap1).not.toHaveProperty("globalB");
+    expect(snap2).not.toHaveProperty("globalB");
+  });
+
+  it("snapshot value changes when a used global changes (re-render is triggered)", () => {
+    const vars1 = { globalA: "original", globalB: "unchanged" };
+    const vars2 = { globalA: "CHANGED", globalB: "unchanged" };
+    const uses = ["globalA"];
+
+    const snap1 = narrowGlobalVars(vars1, uses);
+    const snap2 = narrowGlobalVars(vars2, uses);
+
+    // The snapshots differ on globalA — shallow-compare detects this → re-render.
+    expect(snap1.globalA).toBe("original");
+    expect(snap2.globalA).toBe("CHANGED");
+  });
+
+  it("transitive expansion: dependency of a used global is included in snapshot", () => {
+    // globalX depends on globalY (via its __tree_ AST node).
+    // Only globalX is in uses, but narrowGlobalVars must transitively include globalY
+    // so that useGlobalVariables can re-evaluate globalX when globalY changes.
+    // Use the scripting Parser to produce the correct internal AST format
+    // (collectVariableDependencies uses numeric type constants, not ESTree strings).
+    const treeXdependsOnY = new Parser("globalY").parseStatements();
+    const vars = {
+      globalX: "computed",
+      globalY: "base",
+      globalZ: "unrelated",
+      __tree_globalX: treeXdependsOnY,
+    };
+    const uses = ["globalX"];
+
+    const snap = narrowGlobalVars(vars, uses);
+
+    // globalX is in uses → present.
+    expect(snap).toHaveProperty("globalX");
+    // globalY is transitively required — must be present for correct re-evaluation.
+    expect(snap).toHaveProperty("globalY");
+    // globalZ is unrelated — must not be present (would cause spurious re-renders).
+    expect(snap).not.toHaveProperty("globalZ");
+  });
+
+  it("transitive: changing the transitive dep changes the snapshot (re-render triggered)", () => {
+    const treeXdependsOnY = new Parser("globalY").parseStatements();
+    const vars1 = { globalX: "v", globalY: "original", __tree_globalX: treeXdependsOnY };
+    const vars2 = { globalX: "v", globalY: "CHANGED", __tree_globalX: treeXdependsOnY };
+    const uses = ["globalX"];
+
+    const snap1 = narrowGlobalVars(vars1, uses);
+    const snap2 = narrowGlobalVars(vars2, uses);
+
+    // When globalY (transitive dep) changes, the snapshot must reflect this
+    // so that the shallow compare detects the change and the container re-renders.
+    expect(snap1.globalY).toBe("original");
+    expect(snap2.globalY).toBe("CHANGED");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -2659,3 +2764,70 @@ describe.skipIf(skipIfDisabled)(
   },
 );
 
+// ---------------------------------------------------------------------------
+// Test 7.9 — Parse-failure graceful degradation (covers item 3.3)
+//
+// An event handler whose source string fails the scripting parser must not crash
+// analysis. When a parse failure occurs the implementation sets `hasInvalidStatements`
+// which causes `safeToNarrow` to return false — the node does NOT get `computedUses`
+// and falls back to the safe "re-render on any state change" mode. This is the
+// intentional conservative behavior: better to over-render than to mis-track deps.
+// ---------------------------------------------------------------------------
+describe.skipIf(skipIfDisabled)(
+  "computeUsesForTree — parse-failure graceful degradation (test 7.9)",
+  () => {
+    it("does not throw when an event handler has invalid script syntax", () => {
+      const root = node("Stack", {
+        vars: { count: "{0}" },
+        children: [
+          node("Button", {
+            props: { label: "{count}" },
+            events: {
+              // No '{' in the string → parse() code-path; Parser throws for truncated input.
+              click: "for (" as any,
+            },
+          }),
+        ],
+      });
+      expect(() => computeUsesForTree(root)).not.toThrow();
+    });
+
+    it("conservatively leaves computedUses unset when any handler is unparseable", () => {
+      // When hasInvalidStatements is set (parse failure), safeToNarrow returns false
+      // and computedUses is deliberately not assigned — the component falls back to
+      // re-rendering on any state change rather than risking missed deps.
+      const root = node("Stack", {
+        vars: { count: "{0}", name: "{''}" },
+        children: [
+          node("Button", {
+            props: { label: "{name}" },
+            events: {
+              click: "for (" as any,                   // invalid — triggers parse failure
+              blur: parsedEvent("count + 1"),           // valid — but conservatism wins
+            },
+          }),
+        ],
+      });
+      expect(() => computeUsesForTree(root)).not.toThrow();
+      // Conservative fallback: computedUses must be absent so the runtime falls
+      // back to full re-render, avoiding any risk of stale rendering.
+      expect(root.computedUses).toBeUndefined();
+    });
+
+    it("does not throw when ALL event handlers are unparseable", () => {
+      const root = node("Stack", {
+        vars: { x: "{0}" },
+        children: [
+          node("Button", {
+            events: {
+              click: "for (" as any,
+              change: "while (" as any,
+            },
+          }),
+        ],
+      });
+      expect(() => computeUsesForTree(root)).not.toThrow();
+      expect(root.computedUses).toBeUndefined();
+    });
+  },
+);
