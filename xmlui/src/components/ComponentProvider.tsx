@@ -133,6 +133,7 @@ import { externalDataLoaderRenderer } from "../components-core/loader/ExternalDa
 import { mockLoaderRenderer } from "../components-core/loader/MockLoaderRenderer";
 import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
 import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
+import { datePickerNewComponentRenderer } from "./DatePickerNew/DatePickerNew";
 import { dateInputComponentRenderer } from "./DateInput/DateInput";
 import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
 import { timerComponentRenderer } from "./Timer/Timer";
@@ -604,6 +605,10 @@ export class ComponentRegistry {
       this.registerCoreComponent(dateInputComponentRenderer);
       this.registerCoreComponent(timeInputComponentRenderer);
       this.registerCoreComponent(timerComponentRenderer);
+    }
+
+    if (import.meta.env.VITE_USED_COMPONENTS_DatePickerNew !== "false") {
+      this.registerCoreComponent(datePickerNewComponentRenderer);
     }
 
     if (import.meta.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
