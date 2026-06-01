@@ -418,11 +418,11 @@ export const apiCallRenderer = createComponentRenderer(
         node={node as any}
         uid={uid}
         updateState={updateState}
-        onSuccess={lookupEventHandler("success")}
-        onStatusUpdate={lookupEventHandler("statusUpdate")}
-        onTimeout={lookupEventHandler("timeout")}
-        onPollingStart={lookupEventHandler("pollingStart")}
-        onPollingComplete={lookupEventHandler("pollingComplete")}
+        onSuccess={lookupEventHandler("success", { schedulerBypass: true })}
+        onStatusUpdate={lookupEventHandler("statusUpdate", { schedulerBypass: true })}
+        onTimeout={lookupEventHandler("timeout", { schedulerBypass: true })}
+        onPollingStart={lookupEventHandler("pollingStart", { schedulerBypass: true })}
+        onPollingComplete={lookupEventHandler("pollingComplete", { schedulerBypass: true })}
         hasMockExecute={!!node.events?.mockExecute}
       />
     );

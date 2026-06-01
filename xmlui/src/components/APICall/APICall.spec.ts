@@ -1223,6 +1223,38 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("executed");
     });
 
+    test("runs lifecycle handlers promptly from a multi-statement parent handler", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment
+          var.startedAt="{0}"
+          var.successElapsed="{null}">
+          <APICall
+            id="api"
+            url="/api/test"
+            onSuccess="() => { successElapsed = Date.now() - startedAt; testState = successElapsed; }" />
+          <Button
+            testId="trigger"
+            onClick="startedAt = Date.now(); successElapsed = null; api.execute()"
+            label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+          appGlobals: { strictDeterminism: true, defaultHandlerTimeoutMs: 5000 },
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 1000 }).toEqual(expect.any(Number));
+      expect(await testStateDriver.testState()).toBeLessThan(1000);
+    });
+
     test("accepts parameters", async ({ initTestBed, createButtonDriver }) => {
       const { testStateDriver } = await initTestBed(
         `
