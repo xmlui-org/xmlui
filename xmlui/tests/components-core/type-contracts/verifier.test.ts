@@ -226,6 +226,91 @@ describe("verifyComponentDef — unknown-prop", () => {
     } as ComponentDef;
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
+
+  it("accepts behavior props when the host component supports the behavior", () => {
+    const registry = makeRegistry({
+      TextBox: {
+        props: {
+          placeholder: { description: "Placeholder", valueType: "string" },
+        },
+        apis: {
+          value: { description: "Value", signature: "get value(): string" },
+          setValue: { description: "Set value", signature: "setValue(value: string): void" },
+        },
+      },
+    });
+    const def = {
+      type: "TextBox",
+      props: {
+        label: "Address",
+        bindTo: "address",
+        width: "100%",
+        placeholder: "Street address",
+      },
+    } as ComponentDef;
+
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
+  it("accepts secondary behavior props when the host component supports that behavior", () => {
+    const registry = makeRegistry({
+      TextBox: {
+        apis: {
+          value: { description: "Value", signature: "get value(): string" },
+          setValue: { description: "Set value", signature: "setValue(value: string): void" },
+        },
+      },
+    });
+    const def = {
+      type: "TextBox",
+      props: {
+        bindTo: "address",
+        requiredInvalidMessage: "Address is required",
+        minLength: "3",
+        labelWidth: "120px",
+      },
+    } as ComponentDef;
+
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
+  it("emits unknown-prop for behavior props when the host component does not support the behavior", () => {
+    const registry = makeRegistry({
+      Stack: {},
+    });
+    const def = {
+      type: "Stack",
+      props: { bindTo: "address" },
+    } as ComponentDef;
+
+    const result = verifyComponentDef(def, registry);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      code: "unknown-prop",
+      componentName: "Stack",
+      propName: "bindTo",
+    });
+  });
+
+  it("does not accept behavior props for a component that excludes the behavior", () => {
+    const registry = makeRegistry({
+      App: {
+        excludeBehaviors: ["tooltip"],
+      },
+    });
+    const def = {
+      type: "App",
+      props: { tooltip: "Root tooltip" },
+    } as ComponentDef;
+
+    const result = verifyComponentDef(def, registry);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      code: "unknown-prop",
+      componentName: "App",
+      propName: "tooltip",
+    });
+  });
 });
 
 describe("verifyComponentDef — wrong-type", () => {
@@ -527,5 +612,4 @@ describe("verifyComponentDef — severity escalation", () => {
     expect(result.every((d) => d.severity === "error")).toBe(true);
   });
 });
-
 

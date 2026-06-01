@@ -16,44 +16,125 @@ Under the hood, XMLUI is built entirely on React. But users of the framework nev
 
 When the user clicks the button, `count` increments, and the button label updates automatically. No manual state wiring, no `setState` calls, no effect hooks.
 
+XMLUI uses a **Managed React** model: React remains the rendering engine, but app authors work through supervised XMLUI surfaces — metadata contracts, managed expression evaluation, data APIs, lifecycle/concurrency/error handling, styling, and Inspector diagnostics. The point is not to hide React from framework developers; it is to give application authors a safer, more predictable React-shaped environment.
+
 ## The Two Deployment Modes
 
 XMLUI apps can run in two modes. The choice is made at project creation time, not at runtime.
 
-**Standalone (buildless)** — The app is served as static files. The browser loads `xmlui-standalone.umd.js`, which fetches `Main.xmlui`, discovers components from the `components/` directory, and parses everything at runtime. No build step needed. Deploy by copying files to any static web server. A special case of this mode is: **Islands** — lets you embed one or more independent XMLUI apps inside an arbitrary host web page (one that is not itself an XMLUI app). Each island is declared with a single HTML attribute:
+**Standalone (buildless)** — The app is served as static files. The browser loads `xmlui-standalone.umd.js`, which fetches `Main.xmlui` and parses XMLUI markup at runtime. No build step needed. Deploy by copying files to any static web server.
+
+A minimal standalone `index.html` has no island markers. On `DOMContentLoaded`, the standalone bundle starts one XMLUI app for the page:
 
 ```html
-<div data-xmlui-src="./checkout-form"></div>
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>XMLUI standalone app</title>
+  </head>
+  <body>
+    <script src="https://unpkg.com/xmlui@latest/dist/standalone/xmlui-standalone.umd.js"></script>
+  </body>
+</html>
 ```
 
-The value is a relative path to a folder containing a standard XMLUI project (`Main.xmlui`, optional `config.json`, `components/`, etc...). The standalone UMD bundle detects these markers on mounts a fully isolated XMLUI application into each one, instead of creating a #root div at the body and starting a standalone app there.
+That is enough if `Main.xmlui` lives beside `index.html`. You can also host the runtime yourself and load it locally:
+
+```html
+<script src="./xmlui/xmlui-standalone.umd.js"></script>
+```
+
+Use a CDN for the lowest-friction prototype; host or pin the runtime version when you need repeatable production deployments.
+
+The smallest standalone app is just:
+
+```text
+my-app/
+  index.html
+  Main.xmlui
+```
+
+Optional files and folders can sit beside `Main.xmlui`:
+
+| Path | Optional? | Role |
+|---|---|---|
+| `config.json` | Yes | App-level configuration such as app name/version, default theme/tone, resources, routing/app globals, API interception, and other standalone settings. |
+| `components/` | Yes | User-defined `.xmlui` components discovered by the standalone loader when your app references custom component tags. |
+| `themes/` | Yes | Theme JSON files that define design tokens, tones, and theme overrides for the app. Use this only when the built-in theme is not enough. |
+| `xmlui/xmlui-standalone.umd.js` | Yes | A locally hosted copy of the standalone runtime, used instead of loading it from a CDN. |
+
+**Islands mode** is a special form of standalone mode. It lets an arbitrary host page embed one or more independent XMLUI apps. Each island is declared with a `data-xmlui-src` attribute:
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Host website with XMLUI islands</title>
+    <link rel="stylesheet" href="./site.css" />
+  </head>
+  <body>
+    <main class="marketing-page">
+      <h1>Host website content</h1>
+
+      <section>
+        <h2>Checkout</h2>
+        <div data-xmlui-src="./checkout-form"></div>
+      </section>
+
+      <section>
+        <h2>Newsletter</h2>
+        <div data-xmlui-src="./newsletter-signup"></div>
+      </section>
+    </main>
+
+    <script src="./xmlui/xmlui-standalone.umd.js"></script>
+  </body>
+</html>
+```
+
+The value is a relative path to a folder containing a standard XMLUI project (`Main.xmlui`, optional `config.json`, `components/`, and so on). If the standalone UMD bundle finds any `data-xmlui-src` markers, it activates islands instead of starting a single page-level app. Each marker gets its own XMLUI app mounted into an open shadow root.
+
+That shadow-root boundary is the key distinction. Islands mode prevents the host website's CSS classes from clashing with the nested XMLUI app's styles, and prevents XMLUI styles from leaking back into the host page. If a page embeds multiple XMLUI apps, each island gets isolated styles, so the apps do not accidentally override each other either.
 
 **Vite (built)** — The app uses Vite with the `vite-xmlui-plugin`. All `.xmlui` files are compiled to JavaScript modules at build time. The result is an optimized bundle with no runtime parsing. Used for production sites and when HMR during development is needed. Note: even in this mode, XMLUI expressions (`{...}`) and event handlers are still evaluated at runtime by the scripting engine — the build step eliminates XML parsing overhead, not expression interpretation.
 
 Both modes converge once components are resolved. From `AppRoot` onward, the rendering pipeline is identical.
 
-<!-- DIAGRAM: Side-by-side flow showing standalone (fetch → parse → AppRoot) vs Vite (import → compile → AppRoot) converging at the rendering pipeline -->
+```text
+Standalone mode
+  browser loads xmlui-standalone.umd.js
+    |
+    v
+  fetch Main.xmlui and components/*.xmlui
+    |
+    v
+  parse XML in the browser
+    |
+    v
+  components resolved
+    |
+    v
+  AppRoot
 
-```mermaid
-graph TB
-  subgraph Standalone["Standalone mode"]
-    S1["browser loads<br>xmlui-standalone.umd.js"]
-    S2["fetch Main.xmlui<br>+ components/*.xmlui"]
-    S3["parse XML at runtime"]
-    S1 --> S2 --> S3
-  end
+Vite mode
+  vite-xmlui-plugin compiles .xmlui files
+    |
+    v
+  import.meta.glob() pre-bundles components
+    |
+    v
+  browser loads JavaScript modules
+    |
+    v
+  components resolved
+    |
+    v
+  AppRoot
 
-  subgraph Vite["Vite mode"]
-    V1["vite-xmlui-plugin<br>compiles .xmlui → JS modules"]
-    V2["import.meta.glob()<br>pre-bundles all components"]
-    V3["no runtime XML parsing"]
-    V1 --> V2 --> V3
-  end
-
-  Converge["AppRoot —<br>rendering pipeline begins"]
-
-  S3 -->|"components resolved"| Converge
-  V3 -->|"components resolved"| Converge
+From AppRoot onward both modes use the same provider stack,
+state containers, expression evaluator, and rendering pipeline.
 ```
 
 ## The Full Lifecycle
@@ -100,35 +181,21 @@ ComponentProvider      → component registry (maps names to renderers)
 
 The router type is chosen based on configuration: `HashRouter` (default), `BrowserRouter` (when `useHashBasedRouting: false`), or `MemoryRouter` (SSR fallback or preview mode).
 
-<!-- DIAGRAM: Nested provider stack as concentric rectangles, from outermost (ComponentProvider) to innermost (root Container) -->
-
-```mermaid
-graph LR
-  subgraph CP["ComponentProvider"]
-    subgraph SP["StyleProvider"]
-      subgraph DP["DebugViewProvider"]
-        subgraph R["Router (Hash / Browser / Memory)"]
-          subgraph QC["QueryClient (TanStack React Query)"]
-            subgraph H["Helmet (document head)"]
-              subgraph L["Logger"]
-                subgraph I["Icons"]
-                  subgraph T["Theme"]
-                    subgraph Insp["Inspector"]
-                      subgraph Conf["Confirmation"]
-                        subgraph AC["AppContent (global functions)"]
-                          RC["Root Container<br>renderChild() begins"]
-                        end
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-  end
+```text
+ComponentProvider
+  StyleProvider
+    DebugViewProvider
+      Router (Hash / Browser / Memory)
+        QueryClient (TanStack React Query)
+          Helmet (document head)
+            Logger
+              Icons
+                Theme
+                  Inspector
+                    Confirmation
+                      AppContent (global functions)
+                        Root Container
+                          renderChild() begins
 ```
 
 ### Phase 3: Rendering
@@ -137,8 +204,8 @@ Rendering is driven by `renderChild()`, the recursive function at the heart of X
 
 **What renderChild does for each node:**
 
-1. **Checks visibility** — Evaluates `when` and `responsiveWhen` conditions. If false, the node is skipped. (Exception: nodes with an `init` event handler render once to trigger initialization.)
-2. **Handles special node types** — `TextNode` and `TextNodeCData` are evaluated and returned as text. `Slot` nodes resolve their children from the parent component.
+1. **Checks visibility** — Evaluates `when` and `responsiveWhen` conditions. If false, the node is skipped. Exception: nodes with a `mount` handler, or legacy `init` alias, stay mounted invisibly so the adapter can detect a later false → true transition and fire the lifecycle handler then.
+2. **Handles special node types** — `TextNode` and `TextNodeCData` are evaluated and returned as text. `Slot` nodes resolve their children from the parent component. Regular XMLUI component nodes continue through `ComponentWrapper`.
 3. **Wraps in ComponentWrapper** — All other nodes pass through `ComponentWrapper`, which applies a series of transformations and then routes the node to the correct renderer.
 
 **What ComponentWrapper does:**
@@ -148,53 +215,72 @@ Rendering is driven by `renderChild()`, the recursive function at the heart of X
    - If the node has state (`vars`, `functions`, `uses`, or `loaders`), it goes through `ContainerWrapper` → `StateContainer` → `Container` → recursive `renderChild()`.
    - If the node is stateless, it goes directly to `ComponentAdapter` — no container overhead.
 
-<!-- DIAGRAM: Flowchart: renderChild → when check → node type switch → ComponentWrapper → container-like? → ContainerWrapper or ComponentAdapter -->
-
-```mermaid
-graph TD
-  Start(["renderChild(node)"])
-  When{"when / responsiveWhen<br>condition true?"}
-  Skip(["return null"])
-  TypeSwitch{"node type?"}
-  TextNode(["evaluate expression<br>return text"])
-  SlotNode(["resolve slot children<br>from parent component"])
-  CW["ComponentWrapper"]
-  Transform["transform props<br>(DataSource, childrenAsTemplate)"]
-  Stateful{"has vars / functions<br>/ uses / loaders?"}
-  CWrap["ContainerWrapper<br>→ StateContainer → Container"]
-  CAdapter["ComponentAdapter<br>(stateless path)"]
-  Recurse(["recursive renderChild()<br>for each child"])
-
-  Start --> When
-  When -->|"false"| Skip
-  When -->|"true"| TypeSwitch
-  TypeSwitch -->|"TextNode / CData"| TextNode
-  TypeSwitch -->|"Slot"| SlotNode
-  TypeSwitch -->|"element"| CW
-  CW --> Transform
-  Transform --> Stateful
-  Stateful -->|"yes"| CWrap
-  Stateful -->|"no"| CAdapter
-  CWrap --> Recurse
-  CAdapter --> Recurse
+```text
+renderChild(node)
+  |
+  v
+Evaluate when / responsiveWhen
+  |
+  +-- false --> return null
+  |
+  +-- true --> inspect node type
+                |
+                +-- TextNode / CData --> evaluate expression, return text
+                |
+                +-- Slot -------------> resolve slot children from parent
+                |
+                +-- Component node ---> ComponentWrapper
+                                          |
+                                          v
+                                        transform props
+                                        DataSource, childrenAsTemplate, data refs
+                                          |
+                                          v
+                                        Has vars, functions, uses, or loaders?
+                                          |
+                                          +-- yes --> ContainerWrapper
+                                          |             |
+                                          |             v
+                                          |           StateContainer
+                                          |             |
+                                          |             v
+                                          |           Container
+                                          |             |
+                                          |             v
+                                          |           recursive renderChild()
+                                          |
+                                          +-- no ----> ComponentAdapter
+                                                        |
+                                                        v
+                                                      recursive renderChild()
 ```
 
 ### Phase 4: State Composition
 
-When a node routes through `StateContainer`, the framework composes its state from six layers. Each layer can shadow values from the layer below it.
+When a node routes through `StateContainer`, the framework composes the expression state in a few steps. The source groups are useful for understanding where values come from, but they are not a simple "larger number always wins" precedence ladder. Collision precedence is determined by the final merge order used by `StateContainer`.
 
-| Layer                | What it contains                                                                                          | Example                                                                                           |
-| -------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 1. Parent state      | State inherited from the parent container, scoped by the `uses` prop                                      | A parent's `userData` variable inherited by a child (when `uses="userData"` or `uses` is not set) |
-| 2. Component reducer | Loader results, event progress flags, component state from `updateState`                                  | `DataSource` results, `submitInProgress` flag                                                     |
-| 3. Component APIs    | Methods registered via `registerComponentApi()`                                                           | A TextBox's `value`, `focus()`, `clear()`                                                         |
-| 4. Context variables | Iteration variables, routing params, slot properties                                                      | `$item`, `$itemIndex` inside an `<Items>` loop; `$pathname`, `$routeParams` in any component      |
-| 5. Local variables   | Variables declared with `var.` or `<variable>` tags — resolved in two passes to handle forward references | `var.total="{price * quantity}"`                                                                  |
-| 6. Global variables  | App-wide state owned by the root container and passed down                                                | Variables declared at the `<App>` level that are accessible everywhere                            |
+| Source group               | What it contains                                                                                          | Example                                                                                           |
+| -------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Parent state               | State inherited from the parent container, scoped by the `uses` prop                                      | A parent's `userData` variable inherited by a child (when `uses="userData"` or `uses` is not set) |
+| Context variables          | Iteration variables and slot properties                                                                   | `$item`, `$itemIndex` inside an `<Items>` loop                                                     |
+| Global variables           | App-wide state owned by the root container and passed down                                                | `global.count="{0}"` or `global.theme="{'dark'}"`                                                 |
+| Local variables            | Variables declared with `var.` or `<variable>` tags — resolved in two passes to handle forward references | `var.total="{price * quantity}"`                                                                  |
+| Component reducer and APIs | Loader results, event progress flags, component state from `updateState`, registered component APIs       | `DataSource` results, `submitInProgress`, `myInput.focus()`                                       |
+| Routing params             | Route-derived values injected after the main state groups                                                 | `$pathname`, `$routeParams`                                                                       |
 
-The final merged state is a single flat object available to all expressions within that container's scope.
+The final merged state is a single flat object available to all expressions within that container's scope. For name collisions, local/runtime state wins over globals. This is why a component-local `var.count` shadows an app-level `global.count` inside that component:
 
-**Two-pass variable resolution** — Local variables (layer 5) are resolved in two passes. The first pass pre-resolves variables that may reference each other (forward references). The second pass finalizes all values using the pre-resolved context and a persistent memoization cache.
+```xml
+<App global.count="{0}">
+  <Button var.count="{0}" onClick="count++">
+    Local count: {count}
+  </Button>
+</App>
+```
+
+Inside the `Button`, `{count}` reads the local `var.count`, and `count++` updates the local count. The app-level global `count` still exists and remains visible in containers that do not define a local `count`.
+
+**Two-pass variable resolution** — Local variables are resolved in two passes before the final expression state is assembled. The first pass pre-resolves variables that may reference each other (forward references). The second pass finalizes all values using the pre-resolved context and a persistent memoization cache.
 
 ```xml
 <App
@@ -208,33 +294,52 @@ The final merged state is a single flat object available to all expressions with
 
 `fullName` is declared before `firstName` and `lastName`, but it references both of them. Without two-pass resolution, `fullName` would evaluate before the others are ready, producing an undefined result. With two passes: pass 1 resolves `firstName` and `lastName` first; pass 2 uses those resolved values to evaluate `fullName` correctly as `"John Doe"`.
 
-<!-- DIAGRAM: Stacked layers (1 at bottom, 6 at top) with arrows showing shadowing direction. Label each with concrete example. -->
+```text
+State merge order and collision precedence
 
-```mermaid
-graph BT
-  L1["Layer 1 — Parent state<br>inherited via uses prop<br>e.g. userData from parent container"]
-  L2["Layer 2 — Component reducer state<br>loader results, event flags<br>e.g. DataSource value, submitInProgress"]
-  L3["Layer 3 — Component APIs<br>methods from id-registered children<br>e.g. myInput.focus(), myInput.setValue()"]
-  L4["Layer 4 — Context variables<br>iteration and routing vars<br>e.g. $item, $itemIndex, $routeParams"]
-  L5["Layer 5 — Local variables<br>declared with var.*<br>e.g. var.total = price * quantity"]
-  L6["Layer 6 — Global variables<br>owned by root container<br>e.g. var.global.theme = 'dark'"]
-  Combined(["combined state object<br>higher layers shadow lower layers"])
+StateContainer merges the expression state in this order.
+Later entries override earlier entries when they use the same key.
 
-  L1 -->|"shadowed by L2"| L2
-  L2 -->|"shadowed by L3"| L3
-  L3 -->|"shadowed by L4"| L4
-  L4 -->|"shadowed by L5"| L5
-  L5 -->|"shadowed by L6"| L6
-  L6 --> Combined
+1. Parent state
+         inherited via uses prop
+         merged first
+         example: userData from parent container
+    |
+    v
+2. Context variables
+         iteration and slot vars
+         shadows parent state
+         example: $item, $itemIndex
+    |
+    v
+3. Global variables
+         owned by root container and passed down
+         shadows parent/context values with the same key
+         example: global.count, global.theme
+    |
+    v
+4. Local/runtime component state
+         declared with var.*
+         includes reducer state and registered component APIs
+         shadows globals with the same key
+         example: local var.count shadows global.count
+    |
+    v
+5. Routing params
+         route-derived values applied last
+         example: $pathname, $routeParams
+    |
+    v
+Combined flat state object available to expressions.
 ```
 
 ### Phase 5: Expression Evaluation
 
 Every `{expression}` in the markup is evaluated against the composed state. The expression evaluator has access to:
 
-- All variables from the 6-layer state
+- All values from the composed expression state
 - Global functions from `AppContext` (`navigate()`, `toast()`, `formatDate()`, etc.)
-- The scripting language (a JavaScript subset — no destructuring, no classes, no generators)
+- The scripting language (a JavaScript subset with destructuring support, but no classes or generators)
 
 Expressions in props are evaluated **synchronously** during render. Event handlers are evaluated **asynchronously** when triggered.
 
@@ -256,30 +361,42 @@ When the user interacts with the app:
 8. `renderChild()` re-evaluates expressions that depend on the changed variable
 9. The DOM updates
 
-<!-- DIAGRAM: Circular flow: User clicks → event handler → statePartChanged → mutation routing → reducer → re-render → renderChild → DOM update → back to user -->
-
-```mermaid
-sequenceDiagram
-  actor User
-  participant DOM
-  participant Handler as event handler
-  participant Proxy
-  participant SPC as statePartChanged
-  participant Reducer
-  participant React
-  participant RC as renderChild
-
-  User->>DOM: clicks / types / interacts
-  DOM->>Handler: React synthetic event fires
-  Handler->>Proxy: mutates variable (e.g. count++)
-  Proxy->>SPC: callback(["count"], newVal)
-  SPC->>SPC: find owning container
-  SPC->>Reducer: dispatch STATE_PART_CHANGED
-  Reducer->>React: new immutable state (Immer)
-  React->>RC: re-render container subtree
-  RC->>RC: re-evaluate {expressions}
-  RC->>DOM: updated React elements → DOM update
-  DOM->>User: UI reflects new state
+```text
+User clicks / types / interacts
+  |
+  v
+React synthetic event fires
+  |
+  v
+Cached XMLUI event handler runs
+  |
+  v
+Handler mutates state proxy
+  example: count++
+  |
+  v
+statePartChanged(path, value)
+  |
+  v
+Mutation routing finds owning container
+  |
+  v
+dispatch STATE_PART_CHANGED
+  |
+  v
+Container reducer produces immutable state with Immer
+  |
+  v
+React re-renders the container subtree
+  |
+  v
+renderChild() re-evaluates dependent expressions
+  |
+  v
+DOM updates
+  |
+  v
+User sees the new UI state
 ```
 
 ## Containers: The Unit of State
@@ -364,3 +481,5 @@ A quick-reference table of the most important types and functions mentioned in t
 4. **Mutation routing is automatic** — writing to a variable routes the change to the correct container, whether local, parent, or global.
 5. **The provider stack is deep but stable** — 12+ providers wrap the app. You rarely modify them but need to know they exist.
 6. **Two modes, one pipeline** — Standalone and Vite modes only differ in how components are discovered and parsed. The rendering pipeline is the same.
+7. **Islands are isolated standalone apps** — each `data-xmlui-src` marker mounts an independent XMLUI app in a shadow root so host CSS, XMLUI CSS, and sibling islands do not clash.
+8. **Managed React is the safety frame** — XMLUI uses React, but routes app authoring through managed contracts, expression evaluation, lifecycle, data, styling, and observability surfaces.

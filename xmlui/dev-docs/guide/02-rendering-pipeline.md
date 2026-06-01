@@ -25,39 +25,63 @@ The key fork is in `ComponentWrapper`: **stateful nodes** get a full container s
 | 1 | `renderChild()` | Visibility check, text nodes, slot resolution, entry point |
 | 2 | `ComponentWrapper` | Node normalisation (data transforms), stateful/stateless routing |
 | 3a | `ContainerWrapper` → `StateContainer` → `Container` | State isolation, 6-layer state composition, event handler setup |
-| 3b | `ComponentAdapter` | Value extraction, layout, renderer call, behavior application, theming |
+| 3b | `ComponentAdapter` | Value extraction, runtime type-contract checks, layout, renderer call, behavior application, theming |
 | 4 | Behaviors | Cross-cutting wrappers (label, tooltip, formBinding, …) |
 | ∞ | `renderChild()` (recursive) | Children of the container rendered by repeating from step 1 |
 
-<!-- DIAGRAM: Flowchart of the pipeline above, with arrows and boxes for each step. Highlight the stateful vs stateless fork. -->
-
-```mermaid
-graph TD
-  RC(["renderChild(node)"])
-  CW["ComponentWrapper<br>normalise node props"]
-  Fork{"has vars / loaders<br>/ functions / uses<br>/ script?"}
-  Recurse(["renderChild() — recursive<br>for each child node"])
-
-  subgraph StatefulPath["Stateful path"]
-    CWrap["ContainerWrapper"]
-    EB["ErrorBoundary"]
-    SC["StateContainer<br>compose 6-layer state"]
-    Cont["Container<br>event handlers + renderChild()"]
-    CWrap --> EB --> SC --> Cont
-  end
-
-  subgraph StatelessPath["Stateless path"]
-    CA["ComponentAdapter<br>extract values, layout,<br>renderer call, behaviors"]
-  end
-
-  RC --> CW
-  CW --> Fork
-  Fork -->|"yes"| CWrap
-  Fork -->|"no"| CA
-  Cont -.->|"renders children"| Recurse
-  CA -.->|"renders children"| Recurse
-  Recurse --> RC
+```text
+renderChild(node)
+  |
+  v
+ComponentWrapper
+  |
+  v
+Has vars, loaders, functions, uses, contextVars, or script?
+  |
+  +-- yes --> ContainerWrapper
+  |             |
+  |             v
+  |           ErrorBoundary
+  |             |
+  |             v
+  |           StateContainer
+  |             |
+  |             v
+  |           Container
+  |             |
+  |             v
+  |           renderChild() for children
+  |
+  +-- no ----> ComponentAdapter
+                |
+                v
+              renderer()
+                |
+                v
+              behavior wrappers
+                |
+                v
+              renderChild() for children
 ```
+
+## Before Rendering: Static Verification
+
+Some checks happen before this React rendering pipeline starts. The XMLUI parser
+first turns markup into a `ComponentDef` tree. Tooling can then inspect that tree
+without mounting React components.
+
+Type-contract verification is one of those pre-render checks. The language
+server and Vite plugin call
+`components-core/type-contracts/verifier.ts#verifyComponentDef()` after parsing
+and before rendering. At that point XMLUI can check literal props, required
+props, event names, enum values, and deprecated props against component
+metadata. It cannot evaluate expression-valued props such as
+`value="{state.count}"`, because there is no component state or `ValueExtractor`
+yet.
+
+Runtime checks for those expression-valued props happen later in
+`ComponentAdapter`. See [27-type-contracts.md](27-type-contracts.md) for the
+full contract pipeline.
 
 ## Step 1: renderChild
 
@@ -114,39 +138,66 @@ The distinction between **implicit** and **explicit** matters for state inherita
 
 `ComponentAdapter` does the actual rendering for stateless nodes. It is the most complex step in the pipeline.
 
-**1. Value extraction** — Creates a `ValueExtractor` that evaluates `{expressions}` in the node's props against the current state. Also resolves any `resource://` URLs to physical paths via the theme system.
+**1. Value extraction** — Creates a `ValueExtractor` that evaluates `{expressions}` in the node's props against the current state. Also resolves any `resource://` URLs to physical paths via the theme system. The extractor is also reused by runtime type-contract checks for expression-valued props.
 
-**2. Layout resolution** — Extracts CSS layout properties (`width`, `height`, `padding`, `gap`, etc.) from the node's props. This includes responsive variants (e.g. `padding-md` applies padding at the `md` breakpoint) and part-specific overrides (e.g. `fontSize-label` sets font size for the component's `label` part). Builds a composite `style` object.
+**2. Component lookup** — Asks the `ComponentRegistry` for the renderer, metadata descriptor, and a flag indicating whether this is a compound (user-defined) component. The descriptor is component metadata; it is used by behaviors, docs, prop extraction, and runtime type-contract checks.
 
-**3. Component lookup** — Asks the `ComponentRegistry` for the renderer, metadata descriptor, and a flag indicating whether this is a compound (user-defined) component.
+**3. Runtime type-contract diagnostic effect** — After value extraction and component lookup are both available, `ComponentAdapter` registers a React effect that calls `emitRuntimeTypeContractDiagnostics()`. The effect runs after commit and checks only expression-valued props, because literal props were already covered by the static verifier. Violations are emitted as `kind: "type-contract"` inspector trace entries; in strict mode they also produce a console error and toast. These diagnostics do not stop the renderer call.
 
-**4. RendererContext** — Assembles the context object passed to the renderer function: `uid`, `node.props`, `state`, `extractValue`, `renderChild`, `lookupEventHandler`, `updateState`, `registerComponentApi`, `logInteraction`, and more.
+**4. Layout resolution** — Extracts CSS layout properties (`width`, `height`, `padding`, `gap`, etc.) from the node's props. This includes responsive variants (e.g. `padding-md` applies padding at the `md` breakpoint) and part-specific overrides (e.g. `fontSize-label` sets font size for the component's `label` part). Builds a composite `style` object.
 
-**5. Renderer call** — Calls `renderer(rendererContext)`, producing a `ReactNode`.
+**5. RendererContext** — Assembles the context object passed to the renderer function: `uid`, `node.props`, `state`, `extractValue`, `renderChild`, `lookupEventHandler`, `updateState`, `registerComponentApi`, `logInteraction`, and more.
 
-**6. Behavior application** — Loops over all registered behaviors and applies those whose `canAttach()` returns true. Each behavior wraps the rendered output. **Behaviors never apply to compound (user-defined) components.**
+**6. Renderer call** — Calls `renderer(rendererContext)`, producing a `ReactNode`.
 
-**7. Theme class** — Applies the component's theme-based CSS class via `useComponentThemeClass()`.
+**7. Behavior application** — Loops over all registered behaviors and applies those whose `canAttach()` returns true. Each behavior wraps the rendered output. **Behaviors never apply to compound (user-defined) components.**
 
-**8. Test ID decoration** — If the node has a `testId`, wraps the output in `ComponentDecorator` to inject a `data-testid` attribute.
+**8. Theme class** — Applies the component's theme-based CSS class via `useComponentThemeClass()`.
 
-**9. API-bound wrapping** — If the component's props reference a `DataSource`, `APICall`, or `FileDownload`, wraps in `ApiBoundComponent` to handle data loading and error state.
+**9. Test ID decoration** — If the node has a `testId`, wraps the output in `ComponentDecorator` to inject a `data-testid` attribute.
 
-<!-- DIAGRAM: ComponentAdapter as a vertical pipeline of numbered steps, each labeled. -->
+**10. API-bound wrapping** — If the component's props reference a `DataSource`, `APICall`, or `FileDownload`, wraps in `ApiBoundComponent` to handle data loading and error state.
 
-```mermaid
-graph TD
-  S1["1. Value extraction<br>ValueExtractor evaluates {expressions}<br>resolves resource:// URLs"]
-  S2["2. Layout resolution<br>CSS props: width, height, padding, gap…<br>responsive variants + part overrides"]
-  S3["3. Component lookup<br>ComponentRegistry → renderer fn<br>+ metadata + isCompound flag"]
-  S4["4. RendererContext assembly<br>uid, node.props, state, extractValue,<br>renderChild, lookupEventHandler, …"]
-  S5["5. Renderer call<br>renderer(context) → ReactNode"]
-  S6["6. Behavior application<br>canAttach() per behavior → wrap output<br>(skipped for compound components)"]
-  S7["7. Theme class<br>useComponentThemeClass()"]
-  S8["8. Test ID decoration<br>testId → data-testid via ComponentDecorator"]
-  S9["9. API-bound wrapping<br>DataSource / APICall → ApiBoundComponent"]
-
-  S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9
+```text
+ComponentAdapter
+  |
+  v
+1. Value extraction
+   ValueExtractor evaluates expressions and resolves resource URLs
+  |
+  v
+2. Component lookup
+   ComponentRegistry returns renderer, metadata, and compound flag
+  |
+  v
+3. Register runtime type-contract effect
+   Expression-valued props only; effect runs after commit
+  |
+  v
+4. Layout resolution
+   CSS props, responsive variants, and part overrides
+  |
+  v
+5. RendererContext assembly
+   uid, node.props, state, extractValue, renderChild, handlers, APIs
+  |
+  v
+6. Renderer call
+   renderer(context) returns ReactNode
+  |
+  v
+7. Behavior application
+   canAttach() per behavior; skipped for compound components
+  |
+  v
+8. Theme class
+  |
+  v
+9. Test ID decoration
+  |
+  v
+10. API-bound wrapping
+    DataSource, APICall, and FileDownload integration
 ```
 
 ## Step 4: Behaviors
@@ -190,7 +241,7 @@ This means a user-defined component named the same as a core component will be s
 ## Key Takeaways
 
 1. **The stateful/stateless fork is central** — `ComponentWrapper` routes stateful nodes through a full `StateContainer` + `Container` stack, and stateless nodes directly to `ComponentAdapter`. Knowing which path a component takes explains most rendering behaviour.
-2. **`ComponentAdapter` is where rendering actually happens** — value extraction, layout resolution, renderer call, behavior application, theme classes, and test IDs all happen here.
+2. **`ComponentAdapter` is where rendering actually happens** — value extraction, runtime expression-value type-contract checks, layout resolution, renderer call, behavior application, theme classes, and test IDs all happen here.
 3. **Behaviors wrap from inside out** — registration order determines nesting. `label` is innermost, `validation` is outermost.
 4. **Compound components never get behaviors** — if you're building a user-defined component, behavior props (`tooltip`, `variant`, etc.) won't work unless you explicitly handle them in the template.
 5. **`when` unmounts the component** — when `when` is false the subtree is removed from the React tree and state is lost.

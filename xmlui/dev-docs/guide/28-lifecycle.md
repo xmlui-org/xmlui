@@ -13,8 +13,8 @@ always done internally.
 
 | Primitive | Phase it covers | Where declared |
 |---|---|---|
-| `onMount` | After the component mounts | Any component prop |
-| `onUnmount` | Just before React unmounts | Any component prop |
+| `onMount` | When the component enters the displayed XMLUI tree (`when` absent/true or false → true) | Any component prop |
+| `onUnmount` | When the component leaves the displayed XMLUI tree (`when` true → false or parent teardown) | Any component prop |
 | `onError` | When a lifecycle phase or action handler throws | Any component prop |
 | `<Lifecycle>` | Re-armable mount/unmount inside a component tree | `components/Lifecycle/` |
 | `onBeforeDispose` | Async flush *before* React begins tearing down | Container components |
@@ -24,20 +24,38 @@ always done internally.
 ## Universal events: `onMount` / `onUnmount` / `onError`
 
 Every XMLUI component (rendered through `ComponentAdapter`) exposes three
-lifecycle events without any metadata opt-in.
+lifecycle events without any metadata opt-in. `onMount` and `onUnmount` are the
+canonical names. The older `onInit` and `onCleanup` attributes are compatibility
+aliases for `onMount` and `onUnmount`.
+
+If both names are declared on the same component, XMLUI runs only the canonical
+handler and emits a lifecycle warning:
+
+```xml
+<Stack
+  onMount="Log.info('canonical')"
+  onInit="Log.info('legacy')"
+/>
+```
+
+In this case only `onMount` runs.
 
 ### Wiring (`ComponentAdapter.tsx`)
 
 ```
-useEffect(() => {
-  // mount
-  if (handlers.mount) { ... fire → report / dispatchError }
-  return () => {
-    // unmount
-    if (handlers.beforeDispose) { fireBeforeDispose(...) }
-    if (handlers.unmount)       { ... fire → report / dispatchError }
-  };
-}, []);           // empty dep list — one-shot
+resolve mount handler:
+  onMount if present, otherwise legacy onInit
+
+resolve unmount handler:
+  onUnmount if present, otherwise legacy onCleanup
+
+on visible transition:
+  false/undefined -> true  fire mount
+  true -> false            fire unmount
+
+on React teardown:
+  fire onBeforeDispose
+  if still visible, fire unmount once
 ```
 
 ### Sync contract
