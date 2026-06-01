@@ -84,6 +84,33 @@ describe("extractOptimizerMetadataFromSource", () => {
     expect(result.events?.cancel?.injectedVars).toEqual(["$data"]);
   });
 
+  it("extracts contextVars keys from object literal", () => {
+    const source = `
+      export const FormMd = createMetadata({
+        contextVars: {
+          $data: d("Form data"),
+          $error: d("Form error"),
+        },
+      });
+    `;
+    const result = extractOptimizerMetadataFromSource(source);
+    expect(result.contextVars).toEqual({
+      $data: {},
+      $error: {},
+    });
+  });
+
+  it("skips non-static contextVars", () => {
+    const source = `
+      const SHARED = { $x: d("...") };
+      export const FooMd = createMetadata({
+        contextVars: SHARED,
+      });
+    `;
+    const result = extractOptimizerMetadataFromSource(source);
+    expect(result.contextVars).toBeUndefined();
+  });
+
   it("returns empty object when no optimization block is present", () => {
     const source = `
       export const ButtonMd = createMetadata({

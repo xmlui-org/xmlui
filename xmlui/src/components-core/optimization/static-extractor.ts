@@ -34,6 +34,7 @@ export type OptimizerMeta = {
   isImplicitContainerByDefault?: boolean;
   childInjectedVars?: readonly string[];
   unstableChildInjectedVars?: readonly string[];
+  contextVars?: Record<string, unknown>;
   events?: Record<string, { injectedVars?: readonly string[] }>;
 };
 
@@ -78,6 +79,21 @@ function asStaticStringArray(node: AnyNode | null | undefined): string[] | null 
 
 function isBooleanTrue(node: AnyNode | null | undefined): boolean {
   return !!node && node.type === "BooleanLiteral" && node.value === true;
+}
+
+/**
+ * Extract the static string keys of a `contextVars` ObjectExpression.
+ * `contextVars` is always an object literal; spread / computed keys are skipped.
+ * Returns null when the node is absent or not a static object.
+ */
+function extractContextVarKeys(node: AnyNode | null | undefined): string[] | null {
+  if (!node || node.type !== "ObjectExpression") return null;
+  const out: string[] = [];
+  for (const prop of node.properties) {
+    const key = getPropertyKeyName(prop);
+    if (key) out.push(key);
+  }
+  return out.length > 0 ? out : null;
 }
 
 function declarationsOf(stmt: AnyNode): AnyNode[] {
@@ -143,6 +159,14 @@ export function extractOptimizerMetadataFromSource(source: string): OptimizerMet
       findProperty(optimization, "unstableChildInjectedVars"),
     );
     if (unstableVars && unstableVars.length > 0) result.unstableChildInjectedVars = unstableVars;
+  }
+
+  const contextVars = extractContextVarKeys(findProperty(meta, "contextVars"));
+  if (contextVars && contextVars.length > 0) {
+    result.contextVars = {};
+    for (const key of contextVars) {
+      result.contextVars[key] = {};
+    }
   }
 
   const events = findProperty(meta, "events");
@@ -260,6 +284,7 @@ export function extractOptimizerMetadataFromDir(dir: string): Record<string, Opt
       meta.isImplicitContainerByDefault ||
       meta.childInjectedVars ||
       meta.unstableChildInjectedVars ||
+      meta.contextVars ||
       (meta.events && Object.keys(meta.events).length > 0);
     if (hasData) result[name] = meta;
   }
