@@ -221,11 +221,9 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     font-size: t.$fontSize-sm;
   }
 
-  .trigger,
   .clear,
   .nav,
-  .preset,
-  .adornmentTrigger {
+  .preset {
     border: 0;
     background: transparent;
     color: inherit;
@@ -233,20 +231,6 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     font: inherit;
   }
 
-  .adornmentTrigger {
-    display: inline-flex;
-    align-items: center;
-    gap: t.$space-1;
-    padding: 0;
-    flex: 0 0 auto;
-    color: $color-adornment-DatePickerNew;
-
-    &:hover {
-      color: t.$textColor-primary;
-    }
-  }
-
-  .trigger,
   .clear,
   .nav {
     display: inline-flex;
@@ -261,10 +245,6 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     &:hover {
       background: $backgroundColor-item-DatePickerNew--hover;
     }
-  }
-
-  .trigger {
-    flex: 0 0 t.$space-6;
   }
 
   .clear {

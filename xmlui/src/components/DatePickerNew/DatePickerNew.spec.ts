@@ -1,4 +1,12 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "../../testing/fixtures";
+
+// There is no default calendar icon (matching the core DatePicker): the whole
+// field is the trigger, so open the calendar by clicking the first date input.
+async function openCalendar(page: Page) {
+  await page.getByTestId("dp").locator("input").first().click();
+}
 
 // Smoke coverage for the Ark UI backed DatePickerNew. The full interaction
 // surface is exercised by the original component's app-level e2e suite; these
@@ -34,7 +42,7 @@ test.describe("DatePickerNew - smoke", () => {
   test("opens the calendar from the trigger", async ({ page, initTestBed }) => {
     await initTestBed(`<DatePickerNew testId="dp" />`);
     await expect(page.getByTestId("dp")).toBeVisible();
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.getByTestId("dp")).toHaveAttribute("data-state", "open");
   });
 
@@ -59,7 +67,7 @@ test.describe("DatePickerNew - smoke", () => {
     expect(borderStyle).toBe("solid");
 
     // Day-cell default: the selected day paints a non-transparent background.
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     const selectedBg = await page
       .locator('[data-selected]')
       .first()
@@ -77,7 +85,7 @@ test.describe("DatePickerNew - DatePicker parity", () => {
       `<DatePickerNew testId="dp" mode="single" dateFormat="MM/dd/yyyy"
          initialValue="05/15/2024" disabledDates="{['05/20/2024']}" />`,
     );
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     // Exactly the one disabled day in the visible month is unavailable.
     await expect(page.locator("[data-unavailable]")).toHaveCount(1);
   });
@@ -86,7 +94,7 @@ test.describe("DatePickerNew - DatePicker parity", () => {
     await initTestBed(
       `<DatePickerNew testId="dp" mode="single" dateFormat="MM/dd/yyyy" initialValue="05/15/2024" />`,
     );
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.locator("[data-unavailable]")).toHaveCount(0);
   });
 
@@ -99,7 +107,7 @@ test.describe("DatePickerNew - DatePicker parity", () => {
          initialValue="{{ from: '05/10/2024', to: '05/15/2024' }}" />`,
     );
     const inputs = page.getByTestId("dp").locator("input");
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.getByRole("button", { name: "Proceed" })).toBeVisible();
     await page.getByRole("button", { name: "Cancel" }).click();
     // Cancel drops the pending selection — the committed value is unchanged.
@@ -112,7 +120,7 @@ test.describe("DatePickerNew - DatePicker parity", () => {
       `<DatePickerNew testId="dp" mode="range" dateFormat="MM/dd/yyyy"
          initialValue="{{ from: '05/10/2024', to: '05/15/2024' }}" />`,
     );
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.getByRole("button", { name: "Proceed" })).toHaveCount(0);
   });
 
@@ -154,13 +162,13 @@ test.describe("DatePickerNew - presets", () => {
   // visible label text rather than the accessible name.
   test("presets are hidden by default in range mode", async ({ page, initTestBed }) => {
     await initTestBed(`<DatePickerNew testId="dp" mode="range" />`);
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.getByText("Last 7 days")).toHaveCount(0);
   });
 
   test("showPresets=true shows the built-in presets", async ({ page, initTestBed }) => {
     await initTestBed(`<DatePickerNew testId="dp" mode="range" showPresets="true" />`);
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.getByText("Last 7 days")).toBeVisible();
   });
 
@@ -172,13 +180,13 @@ test.describe("DatePickerNew - presets", () => {
       `<DatePickerNew testId="dp" mode="range" showPresets="false"
          presets="{[{ label: 'Q1 2024', from: '01/01/2024', to: '03/31/2024' }]}" />`,
     );
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.getByText("Q1 2024")).toHaveCount(0);
   });
 
   test("no presets in single mode (even with showPresets)", async ({ page, initTestBed }) => {
     await initTestBed(`<DatePickerNew testId="dp" mode="single" showPresets="true" />`);
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     await expect(page.getByText("Last 7 days")).toHaveCount(0);
   });
 
@@ -190,7 +198,7 @@ test.describe("DatePickerNew - presets", () => {
       `<DatePickerNew testId="dp" mode="range" dateFormat="MM/dd/yyyy"
          presets="{[{ label: 'Q1 2024', from: '01/01/2024', to: '03/31/2024' }]}" />`,
     );
-    await page.getByRole("button", { name: "Open calendar" }).click();
+    await openCalendar(page);
     const preset = page.getByText("Q1 2024");
     await expect(preset).toBeVisible();
     // The custom list replaces the built-in defaults.
@@ -199,5 +207,53 @@ test.describe("DatePickerNew - presets", () => {
     const inputs = page.getByTestId("dp").locator("input");
     await expect(inputs.nth(0)).toHaveValue("01/01/2024");
     await expect(inputs.nth(1)).toHaveValue("03/31/2024");
+  });
+});
+
+// The clear affordance is optional (clearable) and off by default, matching
+// DateInput/TimeInput/Select.
+test.describe("DatePickerNew - clearable", () => {
+  test("the clear button is hidden by default", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" initialValue="05/25/2024" />`);
+    await expect(page.getByRole("button", { name: "Clear date" })).toHaveCount(0);
+  });
+
+  test("clearable shows the clear button", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" clearable="true" initialValue="05/25/2024" />`);
+    await expect(page.getByRole("button", { name: "Clear date" })).toBeVisible();
+  });
+
+  test("clicking the clear button resets the value", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<DatePickerNew testId="dp" clearable="true" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`,
+    );
+    const input = page.getByTestId("dp").locator("input").first();
+    await expect(input).toHaveValue("05/25/2024");
+    await page.getByRole("button", { name: "Clear date" }).click();
+    await expect(input).toHaveValue("");
+  });
+});
+
+// Icons follow the core DatePicker model: no default calendar icon — adornments
+// only appear when startIcon/endIcon/startText/endText are supplied.
+test.describe("DatePickerNew - icons", () => {
+  test("no adornment icon by default", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" initialValue="05/25/2024" />`);
+    await expect(page.getByTestId("dp").locator('[class*="adornment"]')).toHaveCount(0);
+  });
+
+  test("startIcon renders an adornment at the start of the input", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`<DatePickerNew testId="dp" startIcon="date" initialValue="05/25/2024" />`);
+    const adornment = page.getByTestId("dp").locator('[class*="adornment"]');
+    await expect(adornment).toHaveCount(1);
+    await expect(adornment.locator("svg")).toBeVisible();
+  });
+
+  test("endText renders an adornment at the end of the input", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" endText="UTC" initialValue="05/25/2024" />`);
+    await expect(page.getByTestId("dp").getByText("UTC")).toBeVisible();
   });
 });

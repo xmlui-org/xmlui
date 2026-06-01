@@ -9,11 +9,15 @@ import {
   dAutoFocus,
   dDidChange,
   dEnabled,
+  dEndIcon,
+  dEndText,
   dGotFocus,
   dInitialValue,
   dLostFocus,
   dReadonly,
   dRequired,
+  dStartIcon,
+  dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
 import { DatePicker, defaultProps, type DatePickerProps } from "./DatePickerNewReact";
@@ -61,6 +65,12 @@ const metadata = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.inline,
     },
+    clearable: {
+      description:
+        "Set to `true` to show a clear button that resets the value. Hidden by default.",
+      valueType: "boolean",
+      defaultValue: defaultProps.clearable,
+    },
     validationStatus: dValidationStatus(defaultProps.validationStatus),
     weekStartsOn: {
       description: "First day of the week. 0 is Sunday, 1 is Monday, etc.",
@@ -85,24 +95,10 @@ const metadata = createMetadata({
       description: "Latest selectable date, parsed with `dateFormat`.",
       valueType: "string",
     },
-    startIcon: {
-      description:
-        "When present, shows the calendar adornment at the start of the input.",
-      valueType: "string",
-    },
-    endIcon: {
-      description:
-        "When present, shows the calendar adornment at the end of the input.",
-      valueType: "string",
-    },
-    startText: {
-      description: "Optional text at the start of the input.",
-      valueType: "string",
-    },
-    endText: {
-      description: "Optional text at the end of the input.",
-      valueType: "string",
-    },
+    startText: dStartText(),
+    startIcon: dStartIcon(),
+    endText: dEndText(),
+    endIcon: dEndIcon(),
     width: {
       description: "CSS width for the picker root.",
       valueType: "string",
@@ -271,6 +267,7 @@ export const datePickerNewComponentRenderer = createComponentRenderer(
         required={extractValue.asOptionalBoolean(props.required)}
         autoFocus={extractValue.asOptionalBoolean(props.autoFocus)}
         inline={extractValue.asOptionalBoolean(props.inline)}
+        clearable={extractValue.asOptionalBoolean(props.clearable, defaultProps.clearable)}
         validationStatus={
           extractValue.asOptionalString(props.validationStatus) as
             | "none"

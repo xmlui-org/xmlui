@@ -25,6 +25,7 @@ import styles from "./DatePickerNew.module.scss";
 import { useIsMobile } from "./useIsMobile";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { useFormContextPart } from "../Form/FormContext";
+import { Adornment } from "../Input/InputAdornment";
 
 // On mobile the calendar is a fixed full-screen sheet, so it does not need
 // Ark's body portal — and portaling it out of the trigger's DOM subtree breaks
@@ -96,6 +97,7 @@ export type DatePickerProps = {
   required?: boolean;
   autoFocus?: boolean;
   inline?: boolean;
+  clearable?: boolean;
   validationStatus?: ValidationStatus;
   weekStartsOn?: number | string;
   showWeekNumber?: boolean;
@@ -144,6 +146,8 @@ export const defaultProps = {
   required: false,
   autoFocus: false,
   inline: false,
+  // The clear affordance is off by default; opt in with `clearable`.
+  clearable: false,
   validationStatus: "none" as ValidationStatus,
   weekStartsOn: 0,
   showWeekNumber: false,
@@ -972,6 +976,7 @@ export const DatePicker = memo(
     required = defaultProps.required,
     autoFocus = defaultProps.autoFocus,
     inline = defaultProps.inline,
+    clearable = defaultProps.clearable,
     validationStatus = defaultProps.validationStatus,
     weekStartsOn,
     showWeekNumber,
@@ -1369,23 +1374,15 @@ export const DatePicker = memo(
                 apiRef.current?.setOpen(true);
                 return;
               }
+              // The whole field is the trigger (matching the core DatePicker):
+              // clicking anywhere — including the editable inputs — opens the
+              // calendar. Only the clear/footer buttons keep their own handlers.
               const target = event.target as HTMLElement;
-              if (target.closest("input") || target.closest("button")) return;
+              if (target.closest("button")) return;
               apiRef.current?.setOpen(true);
             }}
           >
-            {!endIcon && (
-              <ArkDatePicker.Trigger
-                className={styles.adornmentTrigger}
-                aria-label="Open calendar"
-              >
-                <CalendarGlyph />
-                {startText}
-              </ArkDatePicker.Trigger>
-            )}
-            {endIcon && startText && (
-              <span className={styles.adornment}>{startText}</span>
-            )}
+            <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
 
             <DateField
               fieldRef={inputRef}
@@ -1425,11 +1422,7 @@ export const DatePicker = memo(
               </span>
             )}
 
-            {endText && !endIcon && (
-              <span className={styles.adornment}>{endText}</span>
-            )}
-
-            {!isMobile && (
+            {clearable && !isMobile && (
               <ArkDatePicker.ClearTrigger
                 className={styles.clear}
                 aria-label="Clear date"
@@ -1437,15 +1430,8 @@ export const DatePicker = memo(
                 <CloseGlyph />
               </ArkDatePicker.ClearTrigger>
             )}
-            {endIcon && (
-              <ArkDatePicker.Trigger
-                className={styles.trigger}
-                aria-label="Open calendar"
-              >
-                <CalendarGlyph />
-                {endText}
-              </ArkDatePicker.Trigger>
-            )}
+
+            <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
           </ArkDatePicker.Control>
         </div>
 
@@ -1735,13 +1721,15 @@ export const DatePicker = memo(
                 <ArkDatePicker.Context>
                   {(api) => (
                     <div className={styles.sheetFooter}>
-                      <button
-                        type="button"
-                        className={styles.sheetClear}
-                        onClick={() => api.clearValue()}
-                      >
-                        Clear
-                      </button>
+                      {clearable && (
+                        <button
+                          type="button"
+                          className={styles.sheetClear}
+                          onClick={() => api.clearValue()}
+                        >
+                          Clear
+                        </button>
+                      )}
                       <button
                         type="button"
                         className={styles.sheetApply}
@@ -1780,19 +1768,6 @@ export const DatePicker = memo(
   );
   }),
 );
-
-function CalendarGlyph() {
-  return (
-    <svg
-      className={styles.icon}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4M8 2v4M3 10h18" />
-    </svg>
-  );
-}
 
 function CloseGlyph() {
   return (
