@@ -293,6 +293,7 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
 
   .content {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     width: max-content;
     max-width: calc(100vw - #{t.$space-6});
@@ -446,6 +447,57 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
       color: $textColor-day-DatePickerNew--disabled;
       cursor: default;
       opacity: 0.55;
+    }
+  }
+
+  // Inline (concise) validation icon shown inside the control when verbose
+  // validation feedback is disabled.
+  .conciseValidation {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+
+  // Desktop range confirmation footer (Cancel / Proceed). `flex: 0 0 100%`
+  // wraps it onto its own full-width row below the presets + calendar.
+  .popupFooter {
+    flex: 0 0 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: t.$space-2;
+    padding-top: t.$space-3;
+    margin-top: t.$space-1;
+    border-top: 1px solid $borderColor-menu-DatePickerNew;
+  }
+
+  .footerButton {
+    appearance: none;
+    cursor: pointer;
+    font: inherit;
+    font-weight: t.$fontWeight-medium;
+    padding: t.$space-2 t.$space-4;
+    border-radius: t.$borderRadius;
+    border: 1px solid transparent;
+    transition: background-color 0.15s ease-in, border-color 0.15s ease-in;
+  }
+
+  .footerButtonSecondary {
+    background-color: transparent;
+    border-color: $borderColor-DatePickerNew;
+    color: t.$textColor-primary;
+
+    &:hover {
+      background-color: $backgroundColor-item-DatePickerNew--hover;
+    }
+  }
+
+  .footerButtonPrimary {
+    background-color: $backgroundColor-day-DatePickerNew--selected;
+    color: $textColor-day-DatePickerNew--selected;
+
+    &:hover {
+      opacity: 0.9;
     }
   }
 

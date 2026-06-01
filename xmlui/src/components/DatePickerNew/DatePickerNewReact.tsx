@@ -23,6 +23,8 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./DatePickerNew.module.scss";
 import { useIsMobile } from "./useIsMobile";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { useFormContextPart } from "../Form/FormContext";
 
 // On mobile the calendar is a fixed full-screen sheet, so it does not need
 // Ark's body portal — and portaling it out of the trigger's DOM subtree breaks
@@ -44,6 +46,21 @@ type RegisterApiFn = (
 ) => void;
 type RangePayload = { from?: string; to?: string };
 type DatePickerPayload = string | RangePayload | undefined;
+
+// Mirrors the core DatePicker's `disabledDates` matcher shapes so the same
+// markup works against either component. Dates accept either a `Date` or a
+// string in the component's `dateFormat` (ISO is always accepted too).
+type DisabledDateMatcher =
+  | boolean
+  | string
+  | Date
+  | ((date: Date) => boolean)
+  | { from: string | Date; to?: string | Date }
+  | { before: string | Date }
+  | { after: string | Date }
+  | { before: string | Date; after: string | Date }
+  | { dayOfWeek: number | number[] };
+type DisabledDates = DisabledDateMatcher | DisabledDateMatcher[];
 type PresetValue = DatePickerDateRangePreset;
 
 type PresetItem = {
@@ -88,6 +105,12 @@ export type DatePickerProps = {
   numOfMonths?: number | string;
   presets?: RawPreset[] | string | boolean;
   showPresets?: boolean;
+  disabledDates?: DisabledDates;
+  confirmRangeSelection?: boolean;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
   style?: CSSProperties;
   className?: string;
   // Applied to the (often portaled) calendar popup so the component theme-var
@@ -122,6 +145,7 @@ export const defaultProps = {
   timeZone: DEFAULT_TIME_ZONE,
   numOfMonths: 1,
   showPresets: true,
+  confirmRangeSelection: false,
 };
 
 // On mobile the calendar is a scrollable stack of months around the focused
@@ -586,6 +610,71 @@ const resolvePresets = (
   return resolved.length ? resolved : DEFAULT_PRESETS;
 };
 
+// Day-granular ordinal (UTC) so matcher comparisons ignore the time component.
+const dayOrdinal = (value: { year: number; month: number; day: number }): number =>
+  Date.UTC(value.year, value.month - 1, value.day);
+
+// Converts a matcher date (Date | string in `dateFormat` or ISO) to day parts.
+const matcherDateParts = (
+  value: string | Date,
+  dateFormat: string,
+): { year: number; month: number; day: number } | undefined => {
+  if (value instanceof Date) {
+    return { year: value.getFullYear(), month: value.getMonth() + 1, day: value.getDate() };
+  }
+  if (typeof value === "string") {
+    return datePartsFromString(value, dateFormat);
+  }
+  return undefined;
+};
+
+// Evaluates one matcher (or an array of matchers, combined with OR) against a
+// calendar day. Mirrors the core DatePicker's `disabledDates` semantics:
+// single date, {from,to} range, {before}, {after}, {before,after} interval,
+// {dayOfWeek}, predicate function, and arrays thereof.
+const matchesDisabledDate = (
+  parts: { year: number; month: number; day: number },
+  matcher: DisabledDates | undefined,
+  dateFormat: string,
+): boolean => {
+  if (matcher === undefined || matcher === null) return false;
+  if (typeof matcher === "boolean") return matcher;
+  if (typeof matcher === "function") {
+    return !!matcher(new Date(dayOrdinal(parts)));
+  }
+  if (matcher instanceof Date || typeof matcher === "string") {
+    const target = matcherDateParts(matcher, dateFormat);
+    return !!target && dayOrdinal(parts) === dayOrdinal(target);
+  }
+  if (Array.isArray(matcher)) {
+    return matcher.some((item) => matchesDisabledDate(parts, item, dateFormat));
+  }
+  if (typeof matcher === "object") {
+    const ord = dayOrdinal(parts);
+    if ("dayOfWeek" in matcher) {
+      const dow = matcher.dayOfWeek;
+      const days = Array.isArray(dow) ? dow : [dow];
+      return days.includes(new Date(ord).getUTCDay());
+    }
+    const before = "before" in matcher ? matcherDateParts(matcher.before, dateFormat) : undefined;
+    const after = "after" in matcher ? matcherDateParts(matcher.after, dateFormat) : undefined;
+    if (before && after) {
+      // Interval: the open span strictly between `after` and `before`.
+      return ord > dayOrdinal(after) && ord < dayOrdinal(before);
+    }
+    if (before) return ord < dayOrdinal(before);
+    if (after) return ord > dayOrdinal(after);
+    if ("from" in matcher) {
+      const from = matcherDateParts(matcher.from, dateFormat);
+      const to = matcher.to ? matcherDateParts(matcher.to, dateFormat) : undefined;
+      if (!from) return false;
+      if (to) return ord >= dayOrdinal(from) && ord <= dayOrdinal(to);
+      return ord === dayOrdinal(from);
+    }
+  }
+  return false;
+};
+
 type DateFieldProps = {
   value: DateValue | undefined;
   dateFormat: string;
@@ -868,6 +957,12 @@ export const DatePicker = memo(
     numOfMonths,
     presets,
     showPresets,
+    disabledDates,
+    confirmRangeSelection = defaultProps.confirmRangeSelection,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
     style,
     className,
     contentClassName,
@@ -925,6 +1020,33 @@ export const DatePicker = memo(
     [dateFormat, endDate],
   );
 
+  // --- Concise validation feedback (inline icon), resolved against the Form
+  // context like the core DatePicker. Verbose feedback (the default) hides the
+  // inline icon; the icon shows only when verbose is explicitly disabled.
+  const ctxVerbose = useFormContextPart((ctx: any) => ctx?.verboseValidationFeedback);
+  const ctxIconSuccess = useFormContextPart((ctx: any) => ctx?.validationIconSuccess);
+  const ctxIconError = useFormContextPart((ctx: any) => ctx?.validationIconError);
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? ctxVerbose ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? ctxIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? ctxIconError ?? "close";
+
+  // --- disabledDates → Ark's `isDateUnavailable` predicate.
+  const isDateUnavailable = useMemo(() => {
+    if (disabledDates === undefined || disabledDates === null) return undefined;
+    return (date: DateValue) =>
+      matchesDisabledDate(
+        { year: date.year, month: date.month, day: date.day },
+        disabledDates,
+        dateFormat,
+      );
+  }, [disabledDates, dateFormat]);
+
+  // --- confirmRangeSelection: in desktop range mode defer the commit until the
+  // user clicks Proceed. The pending selection drives the calendar while open;
+  // the committed value keeps driving the typed inputs until confirmed.
+  const isConfirmRange = confirmRangeSelection && mode === "range" && !inline && !isMobile;
+  const [pendingValues, setPendingValues] = useState<DateValue[] | null>(null);
+
   const emitValue = useCallback(
     (next: DateValue[], options?: { initial?: boolean }) => {
       if (!isControlled) setInternalValue(next);
@@ -960,12 +1082,29 @@ export const DatePicker = memo(
     [emitValue, mode, values],
   );
 
+  // While confirming a range, the calendar reflects the pending (uncommitted)
+  // selection; otherwise it reflects the committed value.
+  const displayValues =
+    isConfirmRange && isOpen && pendingValues !== null ? pendingValues : values;
+
   // Ark's value must be a dense array (no holes); the typed fields read the
   // positional `values` instead.
   const arkValue = useMemo(
-    () => values.filter((item): item is DateValue => !!item),
-    [values],
+    () => displayValues.filter((item): item is DateValue => !!item),
+    [displayValues],
   );
+
+  // User confirmed the pending range — commit it and close.
+  const handleProceed = useCallback(() => {
+    emitValue(pendingValues ?? []);
+    apiRef.current?.setOpen(false);
+  }, [emitValue, pendingValues]);
+
+  // User dismissed — drop the pending range without touching the committed value.
+  const handleCancel = useCallback(() => {
+    setPendingValues(null);
+    apiRef.current?.setOpen(false);
+  }, []);
 
   const createFallbackFocusedValue = useCallback(() => {
     try {
@@ -982,7 +1121,13 @@ export const DatePicker = memo(
         setMobileFocusedValue(undefined);
         setDesktopFocusedValue(undefined);
         pendingMobileScrollTopRef.current = null;
+        // Dropping the pending range reverts an unconfirmed selection (Cancel or
+        // dismiss); Proceed commits first, so the revert is a no-op there.
+        setPendingValues(null);
         return;
+      }
+      if (isConfirmRange) {
+        setPendingValues(values);
       }
       if (isMobile) {
         setMobileFocusedValue(values[0] ?? createFallbackFocusedValue());
@@ -990,7 +1135,7 @@ export const DatePicker = memo(
         setDesktopFocusedValue(values[0] ?? createFallbackFocusedValue());
       }
     },
-    [createFallbackFocusedValue, isMobile, values],
+    [createFallbackFocusedValue, isConfirmRange, isMobile, values],
   );
 
   const rememberMobileScrollTop = useCallback(() => {
@@ -1126,7 +1271,11 @@ export const DatePicker = memo(
       focusedValue={isMobile && isOpen ? mobileFocusedValue : undefined}
       onValueChange={(details) => {
         rememberMobileScrollTop();
-        emitValue(details.value);
+        if (isConfirmRange) {
+          setPendingValues(details.value);
+        } else {
+          emitValue(details.value);
+        }
       }}
       onOpenChange={handleOpenChange}
       selectionMode={mode}
@@ -1139,6 +1288,7 @@ export const DatePicker = memo(
       timeZone={timeZone}
       startOfWeek={toNumber(weekStartsOn, 0)}
       showWeekNumbers={showWeekNumber ?? showWeekNumbers ?? false}
+      isDateUnavailable={isDateUnavailable}
       min={minDate}
       max={maxDate}
       numOfMonths={isMobile ? 1 : visibleMonthCount}
@@ -1231,6 +1381,17 @@ export const DatePicker = memo(
                   onCommit={(date) => commitField(1, date)}
                 />
               </>
+            )}
+
+            {!finalVerboseValidationFeedback && (
+              <span className={styles.conciseValidation}>
+                <ConciseValidationFeedback
+                  validationStatus={validationStatus}
+                  invalidMessages={invalidMessages}
+                  successIcon={finalValidationIconSuccess}
+                  errorIcon={finalValidationIconError}
+                />
+              </span>
             )}
 
             {endText && !endIcon && (
@@ -1560,6 +1721,25 @@ export const DatePicker = memo(
                     </div>
                   )}
                 </ArkDatePicker.Context>
+              )}
+
+              {isConfirmRange && (
+                <div className={styles.popupFooter}>
+                  <button
+                    type="button"
+                    className={cx(styles.footerButton, styles.footerButtonSecondary)}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className={cx(styles.footerButton, styles.footerButtonPrimary)}
+                    onClick={handleProceed}
+                  >
+                    Proceed
+                  </button>
+                </div>
               )}
             </ArkDatePicker.Content>
           </ArkDatePicker.Positioner>

@@ -133,6 +133,37 @@ const metadata = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showPresets,
     },
+    disabledDates: {
+      description:
+        "An optional matcher (or array of matchers) of dates to disable. Accepts a " +
+        "date string, `{ from, to }`, `{ before }`, `{ after }`, `{ before, after }`, " +
+        "or `{ dayOfWeek }` — matching the core DatePicker.",
+      valueType: "any",
+    },
+    confirmRangeSelection: {
+      description:
+        "In `range` mode (desktop popup), show a Cancel/Proceed footer so the user " +
+        "must explicitly confirm the selected range before it is committed. When " +
+        "`false` (default), the range auto-commits.",
+      valueType: "boolean",
+      defaultValue: defaultProps.confirmRangeSelection,
+    },
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in the input.",
+      valueType: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for the valid state when the concise summary is enabled.",
+      valueType: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for the error state when the concise summary is enabled.",
+      valueType: "string",
+    },
+    invalidMessages: {
+      description: "The invalid messages to display in the concise validation summary.",
+      valueType: "any",
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -143,6 +174,11 @@ const metadata = createMetadata({
     focus: {
       description: `Focus the ${COMP} component.`,
       signature: "focus(): void",
+    },
+    value: {
+      description:
+        "Query the component's current value. If no value is set, it retrieves `undefined`.",
+      signature: "get value(): any",
     },
     setValue: {
       description: `Set the current value of the ${COMP}.`,
@@ -253,6 +289,12 @@ export const datePickerNewComponentRenderer = createComponentRenderer(
         numOfMonths={extractValue.asOptionalNumber(props.numOfMonths)}
         presets={extractValue(props.presets) as never}
         showPresets={extractValue.asOptionalBoolean(props.showPresets)}
+        disabledDates={extractValue(props.disabledDates) as never}
+        confirmRangeSelection={extractValue.asOptionalBoolean(props.confirmRangeSelection)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(props.verboseValidationFeedback)}
+        validationIconSuccess={extractValue.asOptionalString(props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(props.validationIconError)}
+        invalidMessages={extractValue(props.invalidMessages) as never}
         className={classes?.[COMPONENT_PART_KEY]}
         onDidChange={lookupEventHandler("didChange") as never}
         onFocus={lookupEventHandler("gotFocus")}
