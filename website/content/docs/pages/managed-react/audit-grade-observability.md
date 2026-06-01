@@ -72,28 +72,31 @@ Add an `auditPolicy` to your `<App>` (object literal):
 `appGlobals.auditPolicy`. The framework normalises both into the same
 internal representation.
 
-## Enabling strict mode
+## Strict mode (on by default)
 
-Set `strictAuditLogging: true` on `appGlobals` (in `config.json`):
-
-```json
-{
-  "appGlobals": {
-    "strictAuditLogging": true,
-    "auditPolicy": { /* ...as above... */ }
-  }
-}
-```
-
-In strict mode:
+Strict audit logging is **enabled by default**. In strict mode:
 
 - `audit-redaction-missing` and `audit-policy-conflict` are reported as
   errors instead of warnings.
 - An entry that fails PII scanning is **dropped** and recorded as
   `audit-pii-leaked`, so it never reaches any sink.
 
-Strict mode is opt-in for now; a future major release will flip it on by
-default.
+To downgrade to warn-only mode during migration, set
+`strictAuditLogging: false` in `config.json`:
+
+```json
+{
+  "appGlobals": {
+    "strictAuditLogging": false,
+    "auditPolicy": { /* ...as above... */ }
+  }
+}
+```
+
+> **Tip:** Start with `strictAuditLogging: false` to surface
+> `audit-redaction-missing` warnings without dropping entries, add the
+> needed redaction rules, then remove the override to restore strict
+> mode.
 
 ## Registering a custom sink
 

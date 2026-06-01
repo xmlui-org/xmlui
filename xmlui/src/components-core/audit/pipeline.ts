@@ -28,7 +28,7 @@ import { detectPii } from "./heuristics";
 // ---------------------------------------------------------------------------
 
 let _policy: AuditPolicy = defaultAuditPolicy();
-let _strict = false;
+let _strict = true; // default is strict; opt-out via appGlobals.strictAuditLogging: false
 const _sinks: AuditSink[] = [];
 const _customSinkFactories = new Map<string, (cfg: SinkConfig) => AuditSink>();
 const _customHeuristics: Array<{ name: string; pattern: RegExp }> = [];
@@ -103,7 +103,7 @@ export function registerAuditHeuristic(name: string, pattern: RegExp): void {
 /** Test-only helper to reset module state between unit tests. */
 export function _resetAuditPipeline(): void {
   _policy = defaultAuditPolicy();
-  _strict = false;
+  _strict = true; // mirrors the production default
   _sinks.length = 0;
   _customSinkFactories.clear();
   _customHeuristics.length = 0;

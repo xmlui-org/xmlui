@@ -82,11 +82,10 @@ export type StandaloneAppDescription = {
    * - `errorCorrelationIdHeader` (string, default `"X-Correlation-Id"`) — the HTTP
    *   response header from which `AppError.correlationId` is read when a fetch fails.
    *   See `dev-docs/plans/07-structured-exception-model.md`.
-   * - `strictAuditLogging` (boolean, default `false`) — when `true`, the default
-   *   redaction policy blocks on un-redacted PII fields and the sink behaviour changes
-   *   from "drop on backpressure" to "bounded buffer then drop with `audit-loss`
-   *   diagnostic". Flips to `true` in the next major release. See
-   *   `dev-docs/plans/15-audit-grade-observability.md`.
+ * - `strictAuditLogging` (boolean, default `true`) — when `true` (default), the
+   *   redaction policy blocks on un-redacted PII fields; entry is dropped and
+   *   `audit-pii-leaked` is emitted. Set to `false` to downgrade to warn-only mode.
+   *   See `dev-docs/plans/15-audit-grade-observability.md`.
    * - `strictAccessibility` (boolean, default `false`) — when `true`, accessibility
    *   linter findings (`icon-only-button-no-label`, `modal-no-title`,
    *   `missing-accessible-name`, `form-input-no-label`) escalate from `warn` to

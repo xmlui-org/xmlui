@@ -82,16 +82,16 @@ describe("audit/pipeline", () => {
   });
 
   // -------------------------------------------------------------------------
-  // Strict mode drops the entry + emits audit-pii-leaked
+  // Strict mode is ON by default
   // -------------------------------------------------------------------------
 
-  it("drops the entry and emits audit-pii-leaked under strict audit", () => {
+  it("drops the entry and emits audit-pii-leaked under strict audit (default)", () => {
     setAuditPolicy({
       redact: [],
       sample: {},
       retention: { bufferSize: 100, onOverflow: "drop-oldest" },
     });
-    setStrictAudit(true);
+    // No explicit setStrictAudit() call — strict is the default.
     clearAuditLogs();
 
     const seen: XsLogEntry[] = [];
@@ -111,6 +111,29 @@ describe("audit/pipeline", () => {
     expect(seen.length).toBe(0); // entry dropped
     const leaks = auditLogs().filter((e) => e.code === "audit-pii-leaked");
     expect(leaks.length).toBe(1);
+  });
+
+  it("allows entry through in warn-only mode (strictAuditLogging: false)", () => {
+    setStrictAudit(false); // explicit opt-out
+    const seen: XsLogEntry[] = [];
+    registerAuditSink("warn-sink", () => ({
+      push: (e) => seen.push(e as XsLogEntry),
+      flush: async () => {},
+    }));
+    setAuditPolicy({
+      redact: [],
+      sample: {},
+      retention: { bufferSize: 100, onOverflow: "drop-oldest" },
+      sink: { kind: "custom", endpoint: "warn-sink" } as SinkConfig,
+    });
+    clearAuditLogs();
+
+    processAuditEntry(makeEntry({ payload: { email: "carol@example.com" } }));
+    expect(seen.length).toBe(1); // entry forwarded (not dropped)
+    const warns = auditLogs().filter((e) => e.code === "audit-redaction-missing");
+    expect(warns.length).toBeGreaterThanOrEqual(1);
+    const leaks = auditLogs().filter((e) => e.code === "audit-pii-leaked");
+    expect(leaks.length).toBe(0); // no leak marker in non-strict mode
   });
 
   // -------------------------------------------------------------------------

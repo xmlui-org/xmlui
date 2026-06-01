@@ -221,7 +221,8 @@ export function AppContent({
   // the strict flag governs whether `audit-redaction-missing` /
   // `audit-policy-conflict` escalate to errors.
   useMemo(() => {
-    setStrictAudit((appGlobals as any)?.strictAuditLogging === true);
+    // Default is strict (`!== false`) — only explicit false opts out, matching W8 flip.
+    setStrictAudit((appGlobals as any)?.strictAuditLogging !== false);
     const declared = (appGlobals as any)?.auditPolicy;
     if (declared && typeof declared === "object") {
       setAuditPolicy({
