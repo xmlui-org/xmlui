@@ -16,6 +16,7 @@ export const TreeMd = createMetadata({
   props: {
     data: {
       description: `The data source of the tree. Format depends on the dataFormat property.`,
+      valueType: "any",
       isRequired: true,
     },
     dataFormat: {
@@ -65,9 +66,11 @@ export const TreeMd = createMetadata({
     },
     selectedValue: {
       description: `The selected item ID in source data format.`,
+      valueType: "string",
     },
     selectedId: {
       description: `An alias for selectedValue — selects a tree node by its source data ID.`,
+      valueType: "string",
     },
     defaultExpanded: {
       description: `Initial expansion state: "none", "all", "first-level", or array of specific IDs.`,
@@ -87,12 +90,12 @@ export const TreeMd = createMetadata({
     },
     iconCollapsed: {
       description: `The icon name to use for collapsed nodes (default: "chevronright").`,
-      valueType: "string",
+      valueType: "icon",
       defaultValue: defaultProps.iconCollapsed,
     },
     iconExpanded: {
       description: `The icon name to use for expanded nodes (default: "chevrondown").`,
-      valueType: "string",
+      valueType: "icon",
       defaultValue: defaultProps.iconExpanded,
     },
     iconSize: {

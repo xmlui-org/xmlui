@@ -59,7 +59,7 @@ import {
 import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
 import { enterRenderPhase, exitRenderPhase } from "../scheduler";
-import { emitRuntimeTypeContractDiagnostics } from "../type-contracts";
+import { emitRuntimeTypeContractDiagnostics } from "../type-contracts/runtime";
 
 /**
  * Plan #6 W7-1 — surface the per-component / per-event concurrency knobs
@@ -183,25 +183,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Each component receives a unique identifier
   const uid = useMemo(() => Symbol(safeNode.uid), [safeNode.uid]);
 
-  // --- Track the previous "when" condition value to detect transitions
+  // --- Track the previous "when" condition value to detect visibility transitions
   const prevWhenValueRef = useRef<boolean | undefined>(undefined);
-  const cleanupHandlerRef = useRef<(() => void) | null>(null);
-
-  // --- Takes care the component cleanup function is called when the component
-  // --- is about to be disposed
-  useEffect(() => {
-    return () => {
-      onUnmount(uid);
-      // --- Call cleanup event handler on unmount
-      if (cleanupHandlerRef.current) {
-        try {
-          cleanupHandlerRef.current();
-        } catch (e) {
-          console.error("Error in cleanup event handler:", e);
-        }
-      }
-    };
-  }, [onUnmount, uid]);
+  const visibilityUnmountHandlerRef = useRef<(() => void) | null>(null);
+  const visibilityLifecycleActiveRef = useRef(false);
+  const fireVisibilityLifecycleHandlerRef = useRef<
+    (phase: "mount" | "unmount", handler: (...args: any[]) => any) => void
+  >(() => {});
+  const lifecycleAliasWarningsRef = useRef<Set<string>>(new Set());
 
   // --- Register component info to global map for inspector
   // --- This allows the inspector to resolve testId -> component type/label
@@ -250,7 +239,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Ref to store inspector context for event handlers
   // --- Using a ref allows memoedLookupEventHandler to stay stable while still
-  // --- having access to current values (avoids triggering init/cleanup re-runs)
+  // --- having access to current values (avoids triggering lifecycle re-runs)
   const inspectorContextRef = useRef({
     componentType: safeNode.type,
     componentLabel: resolvedLabel,
@@ -391,11 +380,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     (eventName, actionOptions) => {
       const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
       // Read inspector context from ref to avoid changing callback identity
-      // when label/type/etc change (which would trigger init/cleanup re-runs)
+      // when label/type/etc change (which would trigger lifecycle re-runs)
       const ctx = inspectorContextRef.current;
       // --- When an `onError` handler is declared on this component, route
       // --- action-source throws through it (Plan #04 Step 1.2). The error
-      // --- handler itself, lifecycle handlers, and `init`/`cleanup` are not
+      // --- handler itself and lifecycle handlers are not
       // --- wrapped (lifecycle phases report through `reportLifecycleViolation`
       // --- and call `fireOnError` directly).
       const eventNameStr = eventName as unknown as string;
@@ -648,96 +637,101 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     appContext,
   );
 
-  // --- Handle init and cleanup events based on "when" condition transitions
-  useEffect(() => {
-    const initHandler = memoedLookupEventHandler("init" as any);
-    cleanupHandlerRef.current = memoedLookupEventHandler("cleanup" as any);
-
-    const prevWhenValue = prevWhenValueRef.current;
-
-    // --- Determine if we should call init
-    const shouldCallInit =
-      // Case 1: First render and when is not set (implicitly true) or is true
-      (prevWhenValue === undefined && currentWhenValue) ||
-      // Case 2: Transition from false to true
-      (prevWhenValue === false && currentWhenValue === true);
-
-    // --- Determine if we should call cleanup
-    const shouldCallCleanup =
-      // Transition from true to false
-      prevWhenValue === true && currentWhenValue === false;
-
-    if (shouldCallInit && initHandler) {
-      try {
-        initHandler();
-      } catch (e) {
-        console.error("Error in init event handler:", e);
-      }
-    }
-
-    if (shouldCallCleanup && cleanupHandlerRef.current) {
-      try {
-        cleanupHandlerRef.current();
-      } catch (e) {
-        console.error("Error in cleanup event handler:", e);
-      }
-    }
-
-    // --- Update the previous "when" value for next render
-    prevWhenValueRef.current = currentWhenValue;
-  }, [currentWhenValue, memoedLookupEventHandler]);
-
-  // --- Universal `onMount` / `onUnmount` / `onError` events (Plan #04 Phase 1).
-  // --- These fire on actual React mount/unmount of the component, regardless
-  // --- of `when` transitions. The handlers themselves are looked up through
-  // --- a ref so the mount/unmount effect can stay on an empty dependency
-  // --- list while still seeing the latest event sources.
+  // --- Managed lifecycle events. `mount` / `unmount` are canonical; the
+  // --- older `init` / `cleanup` names remain aliases for compatibility.
+  // --- The handlers themselves are looked up through a ref so the final
+  // --- React unmount cleanup can stay on an empty dependency list while still
+  // --- seeing the latest event sources.
   const lifecycleHandlersRef = useRef<{
     mount?: ((...args: any[]) => any) | null;
     unmount?: ((...args: any[]) => any) | null;
     error?: ((...args: any[]) => any) | null;
     beforeDispose?: ((...args: any[]) => any) | null;
   }>({});
+  const resolveLifecycleHandler = useCallback(
+    (phase: "mount" | "unmount") => {
+      const legacyName = phase === "mount" ? "init" : "cleanup";
+      const hasCanonical = !!safeNode.events?.[phase];
+      const hasLegacy = !!safeNode.events?.[legacyName];
+      if (!hasCanonical && !hasLegacy) return null;
+
+      return memoedLookupEventHandler((hasCanonical ? phase : legacyName) as any);
+    },
+    [memoedLookupEventHandler, safeNode.events],
+  );
+
   lifecycleHandlersRef.current = {
-    mount: safeNode.events?.mount ? memoedLookupEventHandler("mount" as any) : null,
-    unmount: safeNode.events?.unmount ? memoedLookupEventHandler("unmount" as any) : null,
+    mount: resolveLifecycleHandler("mount"),
+    unmount: resolveLifecycleHandler("unmount"),
     error: safeNode.events?.error ? memoedLookupEventHandler("error" as any) : null,
     beforeDispose: safeNode.events?.beforeDispose
       ? memoedLookupEventHandler("beforeDispose" as any)
       : null,
   };
 
+  useEffect(() => {
+    const lifecycleAliases = [
+      ["mount", "init"],
+      ["unmount", "cleanup"],
+    ] as const;
+
+    for (const [phase, legacyName] of lifecycleAliases) {
+      if (
+        safeNode.events?.[phase] &&
+        safeNode.events?.[legacyName] &&
+        !lifecycleAliasWarningsRef.current.has(phase)
+      ) {
+        lifecycleAliasWarningsRef.current.add(phase);
+        const message =
+          `Both '${phase}' and legacy '${legacyName}' lifecycle handlers are declared ` +
+          `on <${safeNode.type}>. Running '${phase}' only.`;
+        // eslint-disable-next-line no-console
+        console.warn(message);
+        pushXsLog({
+          kind: "lifecycle",
+          ts: Date.now(),
+          severity: "warn",
+          code: "deprecated-lifecycle-alias",
+          phase,
+          componentUid: uid.description ?? String(safeNode.uid ?? safeNode.type),
+          componentType: safeNode.type,
+          componentLabel: resolvedLabel,
+          eventName: legacyName,
+          replacement: phase,
+          message,
+        });
+      }
+    }
+  }, [resolvedLabel, safeNode.events, safeNode.type, safeNode.uid, uid]);
+
   const strictLifecycle = appContext.appGlobals?.strictLifecycle !== false;
   const disposeTimeoutMs: number = appContext.appGlobals?.disposeTimeoutMs ?? 250;
-  useEffect(() => {
-    const handlers = lifecycleHandlersRef.current;
-    const componentType = safeNode.type;
-    const componentLabel = resolvedLabel;
-    const uidName = uid.description ?? "";
+  const fireVisibilityLifecycleHandler = useCallback(
+    (phase: "mount" | "unmount", handler: (...args: any[]) => any) => {
+      const componentType = safeNode.type;
+      const componentLabel = resolvedLabel;
+      const uidName = uid.description ?? "";
+      const startedAt = typeof performance !== "undefined" ? performance.now() : undefined;
 
-    // --- Mount: fire `onMount`, then dispatch `onError` on throw.
-    if (handlers.mount) {
-      const mountStart = typeof performance !== "undefined" ? performance.now() : undefined;
       try {
-        const result = handlers.mount();
+        const result = handler();
         if (result && typeof (result as PromiseLike<unknown>).then === "function") {
-          (result as PromiseLike<unknown>).then(
-            () => {
-              if (mountStart !== undefined) {
-                reportLifecycleEvent({
-                  componentUid: uidName,
-                  phase: "mount",
-                  componentType,
-                  componentLabel,
-                  durationMs: performance.now() - mountStart,
-                });
-              }
-            },
-            (err) => {
+          if (phase === "unmount") {
+            reportLifecycleViolation(
+              {
+                componentUid: uidName,
+                phase,
+                reason: "async-onUnmount",
+                componentType,
+                componentLabel,
+              },
+              { strict: strictLifecycle },
+            );
+            (result as PromiseLike<unknown>).then(undefined, (err) => {
               reportLifecycleViolation(
                 {
                   componentUid: uidName,
-                  phase: "mount",
+                  phase,
                   reason: "throw",
                   error: err,
                   componentType,
@@ -745,23 +739,55 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
                 },
                 { strict: strictLifecycle },
               );
-              fireOnError("mount", err, lifecycleHandlersRef.current.error);
+              fireOnError(phase, err, lifecycleHandlersRef.current.error);
+            });
+            return;
+          }
+
+          (result as PromiseLike<unknown>).then(
+            () => {
+              if (startedAt !== undefined) {
+                reportLifecycleEvent({
+                  componentUid: uidName,
+                  phase,
+                  componentType,
+                  componentLabel,
+                  durationMs: performance.now() - startedAt,
+                });
+              }
+            },
+            (err) => {
+              reportLifecycleViolation(
+                {
+                  componentUid: uidName,
+                  phase,
+                  reason: "throw",
+                  error: err,
+                  componentType,
+                  componentLabel,
+                },
+                { strict: strictLifecycle },
+              );
+              fireOnError(phase, err, lifecycleHandlersRef.current.error);
             },
           );
-        } else if (mountStart !== undefined) {
+          return;
+        }
+
+        if (startedAt !== undefined) {
           reportLifecycleEvent({
             componentUid: uidName,
-            phase: "mount",
+            phase,
             componentType,
             componentLabel,
-            durationMs: performance.now() - mountStart,
+            durationMs: performance.now() - startedAt,
           });
         }
       } catch (err) {
         reportLifecycleViolation(
           {
             componentUid: uidName,
-            phase: "mount",
+            phase,
             reason: "throw",
             error: err,
             componentType,
@@ -769,13 +795,21 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
           },
           { strict: strictLifecycle },
         );
-        fireOnError("mount", err, lifecycleHandlersRef.current.error);
+        fireOnError(phase, err, lifecycleHandlersRef.current.error);
       }
-    }
+    },
+    [resolvedLabel, safeNode.type, strictLifecycle, uid],
+  );
+  fireVisibilityLifecycleHandlerRef.current = fireVisibilityLifecycleHandler;
+
+  useEffect(() => {
+    const componentType = safeNode.type;
+    const componentLabel = resolvedLabel;
+    const uidName = uid.description ?? "";
 
     return () => {
       // --- BeforeDispose: fire `onBeforeDispose` with an async budget (Plan #04 Step 3.1).
-      // --- This fires first (before onUnmount) to allow async cleanup before the component
+      // --- This fires before unmount to allow async cleanup before the component
       // --- is removed. React cannot await the cleanup, so the racing is fire-and-forget.
       const beforeDisposeHandler = lifecycleHandlersRef.current.beforeDispose;
       if (beforeDisposeHandler) {
@@ -787,67 +821,55 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
           componentLabel,
         });
       }
-
-      const unmountHandler = lifecycleHandlersRef.current.unmount;
-      if (!unmountHandler) return;
-      const unmountStart = typeof performance !== "undefined" ? performance.now() : undefined;
-      try {
-        const result = unmountHandler();
-        if (result && typeof (result as PromiseLike<unknown>).then === "function") {
-          // Synchronous-only contract for `onUnmount` (see plan #04 Step 0).
-          // Do not await — emit a violation and let the unmount commit.
-          reportLifecycleViolation(
-            {
-              componentUid: uidName,
-              phase: "unmount",
-              reason: "async-onUnmount",
-              componentType,
-              componentLabel,
-            },
-            { strict: strictLifecycle },
-          );
-          // Best-effort: still attach an error reporter to the promise so
-          // late rejections do not become silent unhandled rejections.
-          (result as PromiseLike<unknown>).then(undefined, (err) => {
-            reportLifecycleViolation(
-              {
-                componentUid: uidName,
-                phase: "unmount",
-                reason: "throw",
-                error: err,
-                componentType,
-                componentLabel,
-              },
-              { strict: strictLifecycle },
-            );
-          });
-        } else if (unmountStart !== undefined) {
-          reportLifecycleEvent({
-            componentUid: uidName,
-            phase: "unmount",
-            componentType,
-            componentLabel,
-            durationMs: performance.now() - unmountStart,
-          });
-        }
-      } catch (err) {
-        reportLifecycleViolation(
-          {
-            componentUid: uidName,
-            phase: "unmount",
-            reason: "throw",
-            error: err,
-            componentType,
-            componentLabel,
-          },
-          { strict: strictLifecycle },
-        );
-        fireOnError("unmount", err, lifecycleHandlersRef.current.error);
-      }
     };
-    // --- Empty dep list: fire exactly once on React mount/unmount.
+    // --- Empty dep list: beforeDispose is tied to actual React unmount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // --- Takes care the component cleanup function is called when the component
+  // --- is about to be disposed.
+  useEffect(() => {
+    return () => {
+      onUnmount(uid);
+      // --- If the component is still visible when React disposes it (for
+      // --- example because a parent unmounted), fire the canonical visibility
+      // --- unmount handler once. If it already fired on a true -> false `when`
+      // --- transition, do not fire it again.
+      if (visibilityLifecycleActiveRef.current && visibilityUnmountHandlerRef.current) {
+        fireVisibilityLifecycleHandlerRef.current("unmount", visibilityUnmountHandlerRef.current);
+        visibilityLifecycleActiveRef.current = false;
+      }
+    };
+  }, [onUnmount, uid]);
+
+  // --- Handle canonical mount/unmount visibility lifecycle events based on
+  // --- "when" condition transitions. `init` and `cleanup` are aliases.
+  useEffect(() => {
+    const mountHandler = lifecycleHandlersRef.current.mount;
+    visibilityUnmountHandlerRef.current = lifecycleHandlersRef.current.unmount;
+
+    const prevWhenValue = prevWhenValueRef.current;
+    const shouldCallMount =
+      (prevWhenValue === undefined && currentWhenValue) ||
+      (prevWhenValue === false && currentWhenValue === true);
+    const shouldCallUnmount = prevWhenValue === true && currentWhenValue === false;
+
+    if (shouldCallMount && mountHandler) {
+      fireVisibilityLifecycleHandler("mount", mountHandler);
+      visibilityLifecycleActiveRef.current = true;
+    } else if (shouldCallMount) {
+      visibilityLifecycleActiveRef.current = true;
+    }
+
+    if (shouldCallUnmount && visibilityUnmountHandlerRef.current) {
+      fireVisibilityLifecycleHandler("unmount", visibilityUnmountHandlerRef.current);
+      visibilityLifecycleActiveRef.current = false;
+    } else if (shouldCallUnmount) {
+      visibilityLifecycleActiveRef.current = false;
+    }
+
+    prevWhenValueRef.current = currentWhenValue;
+  }, [currentWhenValue, fireVisibilityLifecycleHandler]);
 
   // --- Create interaction logger for inspector/debugging
   // --- IMPORTANT: This must be BEFORE the early return to maintain consistent hook order

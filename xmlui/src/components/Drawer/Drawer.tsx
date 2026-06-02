@@ -58,9 +58,13 @@ export const DrawerMd = createMetadata({
   events: {
     open: {
       description: `Fired when the \`${COMP}\` is opened.`,
+      signature: "open(): void",
+      parameters: {},
     },
     close: {
       description: `Fired when the \`${COMP}\` is closed.`,
+      signature: "close(): void",
+      parameters: {},
     },
   },
 

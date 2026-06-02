@@ -49,13 +49,14 @@ export function renderChild({
   cleanup,
   uidInfoRef,
 }: ChildRendererContext): ReactNode {
-  // --- Special handling for init event: if component has init event and when=false,
-  // --- we still need to let it render once to trigger init, which may change the when condition
-  const hasInitEvent = node.events?.init;
+  // --- Special handling for visibility lifecycle events: if a component has a
+  // --- mount/init handler and when=false, keep the adapter mounted so it can
+  // --- observe the later false -> true transition and fire the handler then.
+  const hasVisibilityMountEvent = node.events?.mount || node.events?.init;
   const shouldCheckWhen =
-    !hasInitEvent || node.type === "TextNode" || node.type === "TextNodeCData";
+    !hasVisibilityMountEvent || node.type === "TextNode" || node.type === "TextNodeCData";
 
-  // --- Render only visible components (skip when check if component has init event)
+  // --- Render only visible components, except visibility lifecycle adapters.
   if (shouldCheckWhen && !resolveResponsiveWhen(node.when, node.responsiveWhen, state, appContext)) {
     return null;
   }

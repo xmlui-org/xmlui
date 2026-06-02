@@ -25,7 +25,7 @@ import {
 } from "../components-core/reactive-graph";
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
-import { verifyComponentDef } from "../components-core/type-contracts";
+import { verifyComponentDef } from "../components-core/type-contracts/verifier";
 import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
 import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
 

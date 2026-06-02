@@ -114,14 +114,22 @@ export function verifyComponentDef(
     }
 
     // Per-def-prop checks: unknown-prop, wrong-type, value-not-in-enum, deprecated-prop
-    const knownPropNames = Object.keys(metaProps);
+    const knownPropNames = [
+      ...Object.keys(metaProps),
+      ...supportedBehaviorPropNames(typeName, meta),
+    ];
     for (const [propName, rawValue] of Object.entries(defProps)) {
       const propMeta = metaProps[propName];
 
       if (!propMeta) {
         // Not in metadata — acceptable if it is a layout option or the component
-        // allows arbitrary props.
-        if (!isKnownLayoutProp(propName) && !meta.allowArbitraryProps) {
+        // allows arbitrary props, or if a behavior supported by this host
+        // component consumes the prop.
+        if (
+          !isKnownLayoutProp(propName) &&
+          !isSupportedBehaviorProp(propName, typeName, meta) &&
+          !meta.allowArbitraryProps
+        ) {
           const suggestion = findSuggestion(propName, knownPropNames);
           diagnostics.push({
             code: "unknown-prop",
@@ -193,7 +201,7 @@ export function verifyComponentDef(
     const metaEvents = meta.events ?? {};
     const defEvents = (node.events ?? {}) as Record<string, unknown>;
     for (const eventName of Object.keys(defEvents)) {
-      if (!(eventName in metaEvents)) {
+      if (!(eventName in metaEvents) && !isFrameworkEvent(eventName)) {
         diagnostics.push({
           code: "unknown-event",
           severity,
@@ -234,6 +242,19 @@ function isFrameworkType(name: string): boolean {
   return FRAMEWORK_TYPES.has(name);
 }
 
+const FRAMEWORK_EVENTS: ReadonlySet<string> = new Set([
+  "mount",
+  "unmount",
+  "error",
+  "beforeDispose",
+  "init",
+  "cleanup",
+]);
+
+function isFrameworkEvent(name: string): boolean {
+  return FRAMEWORK_EVENTS.has(name);
+}
+
 /**
  * Return `true` when `propName` is a layout option (e.g. `"width"`) or a
  * responsive variant of one (e.g. `"width-md"`).  These props are injected
@@ -254,6 +275,149 @@ function isKnownLayoutProp(propName: string): boolean {
     }
   }
   return false;
+}
+
+type BehaviorContract = {
+  name: string;
+  props: readonly string[];
+  supportsHost: (typeName: string, meta: ComponentMetadata) => boolean;
+};
+
+const FORM_BINDABLE_BEHAVIOR_PROPS = [
+  "bindTo",
+  "initialValue",
+  "noSubmit",
+] as const;
+
+const LABEL_BEHAVIOR_PROPS = [
+  "label",
+  "labelPosition",
+  "labelWidth",
+  "labelBreak",
+  "required",
+  "enabled",
+  "shrinkToLabel",
+  "style",
+  "readOnly",
+] as const;
+
+const VALIDATION_BEHAVIOR_PROPS = [
+  "required",
+  "requiredInvalidMessage",
+  "minLength",
+  "maxLength",
+  "lengthInvalidMessage",
+  "lengthInvalidSeverity",
+  "minValue",
+  "maxValue",
+  "rangeInvalidMessage",
+  "rangeInvalidSeverity",
+  "pattern",
+  "patternInvalidMessage",
+  "patternInvalidSeverity",
+  "regex",
+  "regexInvalidMessage",
+  "regexInvalidSeverity",
+  "matchValue",
+  "matchInvalidMessage",
+  "validationMode",
+  "customValidationsDebounce",
+  "validationDisplayDelay",
+  "verboseValidationFeedback",
+  "validate",
+] as const;
+
+const BEHAVIOR_CONTRACTS: readonly BehaviorContract[] = [
+  {
+    name: "animation",
+    props: ["animation", "animationOptions"],
+    supportsHost: isVisualHost,
+  },
+  {
+    name: "bookmark",
+    props: ["bookmark", "bookmarkLevel", "bookmarkTitle", "bookmarkOmitFromToc"],
+    supportsHost: isVisualHost,
+  },
+  {
+    name: "formBinding",
+    props: FORM_BINDABLE_BEHAVIOR_PROPS,
+    supportsHost: (typeName, meta) => typeName !== "FormItem" && hasValueApiPair(meta),
+  },
+  {
+    name: "label",
+    props: LABEL_BEHAVIOR_PROPS,
+    supportsHost: (typeName, meta) =>
+      isVisualHost(typeName, meta) &&
+      typeName !== "FormItem" &&
+      !hasOwnProp(meta, "label") &&
+      !hasOwnProp(meta, "bindTo"),
+  },
+  {
+    name: "pubsub",
+    props: ["subscribeToTopic"],
+    supportsHost: () => true,
+  },
+  {
+    name: "tooltip",
+    props: ["tooltip", "tooltipMarkdown", "tooltipOptions"],
+    supportsHost: isVisualHost,
+  },
+  {
+    name: "validation",
+    props: VALIDATION_BEHAVIOR_PROPS,
+    supportsHost: (typeName, meta) => typeName === "FormItem" || hasValueApiPair(meta),
+  },
+  {
+    name: "variant",
+    props: ["variant"],
+    supportsHost: isVisualHost,
+  },
+  {
+    name: "eventPropagation",
+    props: ["bubbleEvents"],
+    supportsHost: () => true,
+  },
+];
+
+function supportedBehaviorPropNames(typeName: string, meta: ComponentMetadata): string[] {
+  const names = new Set<string>();
+  for (const contract of BEHAVIOR_CONTRACTS) {
+    if (isBehaviorExcluded(contract.name, meta)) continue;
+    if (!contract.supportsHost(typeName, meta)) continue;
+    for (const propName of contract.props) {
+      names.add(propName);
+    }
+  }
+  return Array.from(names);
+}
+
+function isSupportedBehaviorProp(
+  propName: string,
+  typeName: string,
+  meta: ComponentMetadata,
+): boolean {
+  return BEHAVIOR_CONTRACTS.some(
+    (contract) =>
+      (contract.props as readonly string[]).includes(propName) &&
+      !isBehaviorExcluded(contract.name, meta) &&
+      contract.supportsHost(typeName, meta),
+  );
+}
+
+function isBehaviorExcluded(behaviorName: string, meta: ComponentMetadata): boolean {
+  return meta.excludeBehaviors?.includes(behaviorName) ?? false;
+}
+
+function isVisualHost(_typeName: string, meta: ComponentMetadata): boolean {
+  return !meta.nonVisual;
+}
+
+function hasOwnProp(meta: ComponentMetadata, propName: string): boolean {
+  return !!meta.props?.[propName];
+}
+
+function hasValueApiPair(meta: ComponentMetadata): boolean {
+  return !!meta.apis?.value && !!meta.apis?.setValue;
 }
 
 /**

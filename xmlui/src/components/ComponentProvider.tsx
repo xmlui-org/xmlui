@@ -1021,10 +1021,10 @@ export class ComponentRegistry {
     extension.components?.forEach((c) => {
       if ("type" in c) {
         // --- This is a regular component
-        this.registerComponentRenderer(c, extension.namespace);
+        this.registerComponentRenderer(c, extension.namespace, extension.themeNamespacePrefix);
       } else if ("compoundComponentDef" in c) {
         // --- This is a user defined component
-        this.registerCompoundComponentRenderer(c, extension.namespace);
+        this.registerCompoundComponentRenderer(c, extension.namespace, extension.themeNamespacePrefix);
       }
     });
   };
@@ -1058,18 +1058,23 @@ export class ComponentRegistry {
       renderer,
       metadata,
       isCompoundComponent,
+      udcContract,
     }: {
       type: string;
       renderer: ComponentRendererFn<any>;
       isCompoundComponent?: boolean;
       metadata?: ComponentMetadata;
+      udcContract?: unknown;
     },
     namespace: string,
+    themeNamespacePrefix?: string,
   ) => {
     const component: ComponentRegistryEntry = {
       renderer,
       descriptor: metadata,
       isCompoundComponent,
+      udcContract,
+      themeNamespacePrefix,
     };
     const fullName = `${namespace}.${type}`;
     if (!this.pool.has(namespace)) {
@@ -1094,6 +1099,7 @@ export class ComponentRegistry {
   private registerCompoundComponentRenderer(
     { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
     namespace: string,
+    themeNamespacePrefix?: string,
   ) {
     const autoMetadata = generateUdComponentMetadata(compoundComponentDef);
     const mergedMetadata = metadata ? { ...autoMetadata, ...metadata } : autoMetadata;
@@ -1119,9 +1125,10 @@ export class ComponentRegistry {
       },
       isCompoundComponent: true,
       metadata: mergedMetadata,
+      udcContract: compoundComponentDef.contract,
     };
 
-    this.registerComponentRenderer(component, namespace);
+    this.registerComponentRenderer(component, namespace, themeNamespacePrefix);
 
     // --- Update the per-namespace UDC reference graph and warn on any newly
     // discovered structural cycles. This is the decidable static sub-case of

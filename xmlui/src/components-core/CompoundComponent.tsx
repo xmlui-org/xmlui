@@ -115,8 +115,11 @@ export const CompoundComponent = forwardRef(
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
 
     const udcContract = contract ?? ((compound as any).contract as UdcContract | undefined);
+    // W8-1 (plan #14): strict UDC sandbox is on by default.  Authors must
+    // explicitly opt out with `strictUdcSandbox={false}` in `<App appGlobals>`
+    // to fall back to warn-only diagnostics.
     const strictUdcSandbox =
-      appContext?.appGlobals?.strictUdcSandbox === true ||
+      appContext?.appGlobals?.strictUdcSandbox !== false ||
       (udcContract?.trust === "untrusted" && appContext?.appGlobals?.udcTrust === "strict");
 
     const emitUdcDiagnostic = useEvent((diagnostic: UdcDiagnostic) => {

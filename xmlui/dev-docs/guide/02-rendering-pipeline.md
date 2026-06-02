@@ -2,20 +2,63 @@
 
 The rendering pipeline is what turns a `ComponentDef` tree (the in-memory representation of parsed `.xmlui` markup) into a React element tree that React can commit to the DOM. Understanding this pipeline is essential whenever you need to trace how a component gets rendered, debug unexpected output, or add new rendering behaviour.
 
+The recursive heart of the pipeline is `renderChild()`:
+
+```ts
+export function renderChild({
+  node,
+  state,
+  globalVars,
+  dispatch,
+  appContext,
+  lookupAction,
+  lookupSyncCallback,
+  registerComponentApi,
+  renderChild,
+  statePartChanged,
+  layoutContext,
+  parentRenderContext,
+  memoedVarsRef,
+  cleanup,
+  uidInfoRef,
+}: ChildRendererContext): ReactNode
+```
+
+`ChildRendererContext` carries the `ComponentDef` node plus the current composed state, global variables, app context, action lookups, component API registration, state-change callback, layout context, parent render context for slots, memoized variable cache, cleanup hook, and the recursive `renderChild` callback.
+
+`renderChild()` is responsible for the first routing decision for each node:
+
+- resolve effective visibility from `when` and `responsiveWhen`;
+- keep components with `onMount` or legacy `onInit` handlers mounted invisibly long enough to observe a later false-to-true visibility transition;
+- return raw CDATA text and evaluated `TextNode` text;
+- resolve slot children from the parent render context, including the single-text-node special case;
+- evaluate the node key from `uid`;
+- hand ordinary component nodes to `ComponentWrapper`.
+
+`when` is the component's base visibility condition. `responsiveWhen` holds breakpoint-specific visibility conditions parsed from responsive visibility attributes such as `when-md`. When responsive rules exist, `resolveResponsiveWhen()` uses the current media breakpoint to choose the nearest rule at or below that breakpoint, following XMLUI's mobile-first breakpoint model. If no responsive rule applies, the base `when` is still the fallback when it is explicitly set. If neither a matching responsive rule nor a base `when` is available, XMLUI infers the base visibility from the lowest defined responsive rule so opt-in responsive visibility stays hidden before its first matching breakpoint.
+
 ## The Pipeline at a Glance
 
 Every component in the tree passes through the same sequence of steps:
 
-```
-renderChild()
-  └── ComponentWrapper           transforms node props, then routes:
-        ├── ContainerWrapper     node is stateful (has vars / loaders / functions / uses / script)
-        │     └── ErrorBoundary
-        │           └── StateContainer   composes 6-layer state
-        │                 └── Container  creates event handlers, renders children
-        └── ComponentAdapter     node is stateless
-              └── renderer()     calls the component's renderer function
-                    └── behavior wrappers applied to rendered output
+```mermaid
+flowchart TB
+  renderChild["renderChild()"]
+  wrapper["ComponentWrapper<br/>transforms node props, then routes"]
+  stateful["ContainerWrapper<br/>stateful node: vars / loaders / functions / uses / scriptCollected"]
+  errorBoundary["ErrorBoundary"]
+  stateContainer["StateContainer<br/>composes expression state"]
+  container["Container<br/>creates event handlers, renders children"]
+  adapter["ComponentAdapter<br/>stateless node"]
+  renderer["renderer()<br/>calls the component renderer function"]
+  recursive["renderChild()<br/>as needed for children / slots"]
+  behaviors["behavior wrappers<br/>applied to rendered output"]
+
+  renderChild --> wrapper
+  wrapper --> stateful --> errorBoundary --> stateContainer --> container
+  wrapper --> adapter --> renderer
+  renderer --> recursive
+  renderer --> behaviors
 ```
 
 The key fork is in `ComponentWrapper`: **stateful nodes** get a full container stack; **stateless nodes** go straight to `ComponentAdapter`. Most of the interesting work happens inside `ComponentAdapter`.
@@ -24,40 +67,51 @@ The key fork is in `ComponentWrapper`: **stateful nodes** get a full container s
 |------|-----------|---------------|
 | 1 | `renderChild()` | Visibility check, text nodes, slot resolution, entry point |
 | 2 | `ComponentWrapper` | Node normalisation (data transforms), stateful/stateless routing |
-| 3a | `ContainerWrapper` → `StateContainer` → `Container` | State isolation, 6-layer state composition, event handler setup |
-| 3b | `ComponentAdapter` | Value extraction, layout, renderer call, behavior application, theming |
+| 3a | `ContainerWrapper` → `StateContainer` → `Container` | State isolation, expression-state composition, event handler setup |
+| 3b | `ComponentAdapter` | Value extraction, runtime type-contract checks, layout, renderer call, behavior application, theming |
 | 4 | Behaviors | Cross-cutting wrappers (label, tooltip, formBinding, …) |
 | ∞ | `renderChild()` (recursive) | Children of the container rendered by repeating from step 1 |
 
-<!-- DIAGRAM: Flowchart of the pipeline above, with arrows and boxes for each step. Highlight the stateful vs stateless fork. -->
-
 ```mermaid
-graph TD
-  RC(["renderChild(node)"])
-  CW["ComponentWrapper<br>normalise node props"]
-  Fork{"has vars / loaders<br>/ functions / uses<br>/ script?"}
-  Recurse(["renderChild() — recursive<br>for each child node"])
+flowchart TB
+  start["renderChild(node)"]
+  wrapper["ComponentWrapper"]
+  stateful{"Has vars, loaders, functions, uses, contextVars, or scriptCollected?"}
+  containerWrapper["ContainerWrapper"]
+  errorBoundary["ErrorBoundary"]
+  stateContainer["StateContainer"]
+  container["Container"]
+  childRender["renderChild() for children"]
+  adapter["ComponentAdapter"]
+  renderer["renderer()"]
+  nestedRender["may call renderChild() for children / slots"]
+  behaviors["behavior wrappers"]
 
-  subgraph StatefulPath["Stateful path"]
-    CWrap["ContainerWrapper"]
-    EB["ErrorBoundary"]
-    SC["StateContainer<br>compose 6-layer state"]
-    Cont["Container<br>event handlers + renderChild()"]
-    CWrap --> EB --> SC --> Cont
-  end
-
-  subgraph StatelessPath["Stateless path"]
-    CA["ComponentAdapter<br>extract values, layout,<br>renderer call, behaviors"]
-  end
-
-  RC --> CW
-  CW --> Fork
-  Fork -->|"yes"| CWrap
-  Fork -->|"no"| CA
-  Cont -.->|"renders children"| Recurse
-  CA -.->|"renders children"| Recurse
-  Recurse --> RC
+  start --> wrapper --> stateful
+  stateful -->|yes| containerWrapper --> errorBoundary --> stateContainer --> container --> childRender
+  stateful -->|no| adapter --> renderer
+  renderer --> nestedRender
+  renderer --> behaviors
 ```
+
+## Before Rendering: Static Verification
+
+Some checks happen before this React rendering pipeline starts. The XMLUI parser
+first turns markup into a `ComponentDef` tree. Tooling can then inspect that tree
+without mounting React components.
+
+Type-contract verification is one of those pre-render checks. The language
+server and Vite plugin call
+`components-core/type-contracts/verifier.ts#verifyComponentDef()` after parsing
+and before rendering. At that point XMLUI can check literal props, required
+props, event names, enum values, and deprecated props against component
+metadata. It cannot evaluate expression-valued props such as
+`value="{state.count}"`, because there is no component state or `ValueExtractor`
+yet.
+
+Runtime checks for those expression-valued props happen later in
+`ComponentAdapter`. See [27-type-contracts.md](27-type-contracts.md) for the
+full contract pipeline.
 
 ## Step 1: renderChild
 
@@ -65,7 +119,7 @@ graph TD
 
 **It handles four cases:**
 
-1. **Visibility check** — Evaluates the `when` and `responsiveWhen` conditions. In client mode, a false condition returns `null` immediately (component unmounts, state is lost). One exception: if the node has an `init` event handler, it renders once regardless, so the init handler can run and potentially change the condition.
+1. **Visibility check** — Resolves effective visibility from `when` and `responsiveWhen`. Think of `when` as the base rule and `responsiveWhen` as breakpoint-specific rules layered over it. In client mode, a false effective condition usually returns `null` immediately (component unmounts, state is lost). One exception: if the node has a canonical `mount` handler or legacy `init` handler, `renderChild()` still routes it to `ComponentWrapper`. `ComponentAdapter` then returns `null` while hidden but remains mounted, so it can observe a later false-to-true transition and fire the visibility lifecycle event.
 
 2. **Text nodes** — `TextNodeCData` returns its value raw (no parsing). `TextNode` evaluates any `{expression}` it contains via `extractParam()`.
 
@@ -87,7 +141,7 @@ Before routing to a renderer, `ComponentWrapper` applies a series of transformat
 
 After transformations, `ComponentWrapper` makes the routing decision:
 
-- **Has `vars`, `loaders`, `functions`, `uses`, `contextVars`, or a parsed script?** → `ContainerWrapper` (stateful path)
+- **Has `vars`, `loaders`, `functions`, `uses`, `contextVars`, or `scriptCollected`?** → `ContainerWrapper` (stateful path)
 - **Otherwise?** → `ComponentAdapter` (stateless path)
 
 ## Step 3a: ContainerWrapper (stateful path)
@@ -108,45 +162,47 @@ The distinction between **implicit** and **explicit** matters for state inherita
 </ErrorBoundary>
 ```
 
-`StateContainer` composes the 6-layer state (see [01-mental-model.md](01-mental-model.md)) and hands it to `Container`, which creates the event handler subsystem and calls `renderChild()` on the children.
+`StateContainer` composes the expression state (see [01-mental-model.md](01-mental-model.md)) and hands it to `Container`, which creates the event handler subsystem and calls `renderChild()` on the children.
 
 ## Step 3b: ComponentAdapter (stateless path)
 
 `ComponentAdapter` does the actual rendering for stateless nodes. It is the most complex step in the pipeline.
 
-**1. Value extraction** — Creates a `ValueExtractor` that evaluates `{expressions}` in the node's props against the current state. Also resolves any `resource://` URLs to physical paths via the theme system.
+**1. Value extraction** — Creates a `ValueExtractor` that evaluates `{expressions}` in the node's props against the current state. Also resolves any `resource://` URLs to physical paths via the theme system. The extractor is also reused by runtime type-contract checks for expression-valued props.
 
-**2. Layout resolution** — Extracts CSS layout properties (`width`, `height`, `padding`, `gap`, etc.) from the node's props. This includes responsive variants (e.g. `padding-md` applies padding at the `md` breakpoint) and part-specific overrides (e.g. `fontSize-label` sets font size for the component's `label` part). Builds a composite `style` object.
+**2. Component lookup** — Asks the `ComponentRegistry` for the renderer, metadata descriptor, and a flag indicating whether this is a compound (user-defined) component. The descriptor is component metadata; it is used by behaviors, docs, prop extraction, and runtime type-contract checks.
 
-**3. Component lookup** — Asks the `ComponentRegistry` for the renderer, metadata descriptor, and a flag indicating whether this is a compound (user-defined) component.
+**3. Runtime type-contract diagnostic effect** — After value extraction and component lookup are both available, `ComponentAdapter` registers a React effect that calls `emitRuntimeTypeContractDiagnostics()`. The effect runs after commit and checks only expression-valued props, because literal props were already covered by the static verifier. Violations are emitted as `kind: "type-contract"` inspector trace entries; in strict mode they also produce a console error and toast. These diagnostics do not stop the renderer call.
 
-**4. RendererContext** — Assembles the context object passed to the renderer function: `uid`, `node.props`, `state`, `extractValue`, `renderChild`, `lookupEventHandler`, `updateState`, `registerComponentApi`, `logInteraction`, and more.
+**4. Layout and theme class resolution** — Extracts CSS layout properties (`width`, `height`, `padding`, `gap`, etc.) from the node's props and obtains the component theme class from `useComponentThemeClass()`. Responsive layout variants and SSR `when-*` display rules are merged into the generated style class. The SSR `when-*` styles mirror the same responsive visibility intent used by `responsiveWhen`, but CSS is used because the server does not know the browser's current breakpoint.
 
-**5. Renderer call** — Calls `renderer(rendererContext)`, producing a `ReactNode`.
+**5. RendererContext** — Assembles the context object passed to the renderer function: `uid`, `node.props`, `state`, `extractValue`, `renderChild`, `lookupEventHandler`, `updateState`, `registerComponentApi`, `className`, `classes`, `logInteraction`, and more.
 
-**6. Behavior application** — Loops over all registered behaviors and applies those whose `canAttach()` returns true. Each behavior wraps the rendered output. **Behaviors never apply to compound (user-defined) components.**
+**6. Renderer call** — Calls `renderer(rendererContext)`, producing a `ReactNode`.
 
-**7. Theme class** — Applies the component's theme-based CSS class via `useComponentThemeClass()`.
+**7. Behavior application** — Loops over all registered behaviors and applies those whose `canAttach()` returns true. Each behavior wraps the rendered output. **Behaviors never apply to compound (user-defined) components.**
 
-**8. Test ID decoration** — If the node has a `testId`, wraps the output in `ComponentDecorator` to inject a `data-testid` attribute.
+**8. Test ID / automation / inspector decoration** — If the node has `id`, `testId`, `automationId`, or an inspector id and the descriptor is visual and non-opaque, wraps the output in `ComponentDecorator` to inject the corresponding DOM attributes.
 
 **9. API-bound wrapping** — If the component's props reference a `DataSource`, `APICall`, or `FileDownload`, wraps in `ApiBoundComponent` to handle data loading and error state.
 
-<!-- DIAGRAM: ComponentAdapter as a vertical pipeline of numbered steps, each labeled. -->
+**10. Layout-context wrapping** — If the current layout context provides `wrapChild`, applies it after behavior and decoration.
 
 ```mermaid
-graph TD
-  S1["1. Value extraction<br>ValueExtractor evaluates {expressions}<br>resolves resource:// URLs"]
-  S2["2. Layout resolution<br>CSS props: width, height, padding, gap…<br>responsive variants + part overrides"]
-  S3["3. Component lookup<br>ComponentRegistry → renderer fn<br>+ metadata + isCompound flag"]
-  S4["4. RendererContext assembly<br>uid, node.props, state, extractValue,<br>renderChild, lookupEventHandler, …"]
-  S5["5. Renderer call<br>renderer(context) → ReactNode"]
-  S6["6. Behavior application<br>canAttach() per behavior → wrap output<br>(skipped for compound components)"]
-  S7["7. Theme class<br>useComponentThemeClass()"]
-  S8["8. Test ID decoration<br>testId → data-testid via ComponentDecorator"]
-  S9["9. API-bound wrapping<br>DataSource / APICall → ApiBoundComponent"]
+flowchart TB
+  adapter["ComponentAdapter"]
+  value["1. Value extraction<br/>ValueExtractor evaluates expressions and resolves resource URLs"]
+  lookup["2. Component lookup<br/>ComponentRegistry returns renderer, metadata, and compound flag"]
+  contracts["3. Register runtime type-contract effect<br/>Expression-valued props only; effect runs after commit"]
+  layout["4. Layout and theme class resolution<br/>CSS props, responsive variants, SSR when-* display, theme class"]
+  context["5. RendererContext assembly<br/>uid, node.props, state, extractValue, renderChild, handlers, APIs, classes"]
+  renderer["6. Renderer call<br/>renderer(context) returns ReactNode"]
+  behaviors["7. Behavior application<br/>canAttach() per behavior; skipped for compound components"]
+  decoration["8. Test ID / automation / inspector decoration"]
+  apiBound["9. API-bound wrapping"]
+  layoutWrap["10. Layout-context wrapping<br/>layoutContext.wrapChild when present"]
 
-  S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9
+  adapter --> value --> lookup --> contracts --> layout --> context --> renderer --> behaviors --> decoration --> apiBound --> layoutWrap
 ```
 
 ## Step 4: Behaviors
@@ -157,15 +213,15 @@ Behaviors are cross-cutting wrappers applied automatically based on a component'
 
 | Behavior | Trigger condition | What it wraps with |
 |----------|------------------|--------------------|
-| `label` | `label` prop + visual component | Label element above/beside the component |
-| `animation` | `animation` prop | CSS animation wrapper |
-| `tooltip` | `tooltip` prop | Tooltip overlay |
-| `variant` | `variant` prop | Adds CSS variant class |
-| `bookmark` | `bookmark` prop | URL hash management |
-| `formBinding` | `bindTo` prop + component has `value`/`setValue` APIs | Two-way form value binding |
-| `validation` *(outermost)* | `validationState`/`required`/`pattern` | Validation state wrapping |
+| `label` | `label` prop + visual component that does not own `label`/`bindTo`; skipped when form binding will handle the label | Label element above/beside the component |
+| `animation` | `animation` prop + visual component | CSS animation wrapper |
+| `tooltip` | `tooltip` or `tooltipMarkdown` prop + visual component | Tooltip overlay |
+| `variant` | `variant` prop + visual component | Adds CSS variant class |
+| `bookmark` | `bookmark` prop + visual component | URL hash management |
+| `formBinding` | `bindTo` prop + component has `value`/`setValue` APIs and is not `FormItem` | Two-way form value binding |
+| `validation` *(outermost among built-ins)* | `FormItem`, or `bindTo` prop + component has `value`/`setValue` APIs | Validation state wrapping |
 
-**`when` and visibility** — `when` is evaluated in `renderChild()`. When false, the component returns `null` — it unmounts completely and loses all state.
+**`when` and visibility** — `when` is the base visibility condition; `responsiveWhen` is the parsed map of breakpoint-specific `when-*` conditions. `renderChild()` calls `resolveResponsiveWhen()` to produce one effective boolean for the current render. When that boolean is false, the component usually returns `null`, unmounts completely, and loses local component state. Components with `onMount` or legacy `onInit` are the lifecycle exception: the adapter stays mounted while hidden, returns `null`, and fires `onMount` only when visibility becomes true. `onUnmount` or legacy `onCleanup` fires once when visibility changes from true to false, or when React disposes a still-visible component.
 
 ## Error Boundaries
 
@@ -190,8 +246,8 @@ This means a user-defined component named the same as a core component will be s
 ## Key Takeaways
 
 1. **The stateful/stateless fork is central** — `ComponentWrapper` routes stateful nodes through a full `StateContainer` + `Container` stack, and stateless nodes directly to `ComponentAdapter`. Knowing which path a component takes explains most rendering behaviour.
-2. **`ComponentAdapter` is where rendering actually happens** — value extraction, layout resolution, renderer call, behavior application, theme classes, and test IDs all happen here.
-3. **Behaviors wrap from inside out** — registration order determines nesting. `label` is innermost, `validation` is outermost.
+2. **`ComponentAdapter` is where rendering actually happens** — value extraction, runtime expression-value type-contract checks, layout resolution, renderer call, behavior application, theme classes, and test IDs all happen here.
+3. **Behaviors wrap from inside out** — registration order determines nesting. The built-in order is `label`, `animation`, `tooltip`, `variant`, `bookmark`, `formBinding`, `validation`, so `validation` is outermost among built-ins when it attaches.
 4. **Compound components never get behaviors** — if you're building a user-defined component, behavior props (`tooltip`, `variant`, etc.) won't work unless you explicitly handle them in the template.
-5. **`when` unmounts the component** — when `when` is false the subtree is removed from the React tree and state is lost.
+5. **`when` usually unmounts the component** — when `when` is false the subtree is removed from the React tree and state is lost, except for the visibility lifecycle adapter path used by `onMount`/`onInit`.
 6. **Error boundaries are per-container** — a render error in one component subtree doesn't crash the rest of the app.

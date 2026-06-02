@@ -60,7 +60,10 @@ export const NumberBoxMd = createMetadata({
   },
   props: {
     placeholder: dPlaceholder(),
-    initialValue: dInitialValue(),
+    initialValue: {
+      ...dInitialValue(),
+      valueType: "number",
+    },
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -73,6 +76,7 @@ export const NumberBoxMd = createMetadata({
     endIcon: dEndIcon(),
     gap: {
       description: "This property defines the gap between the adornments and the input area.",
+      valueType: "length",
     },
     hasSpinBox: {
       description: `This boolean prop shows (\`true\`) or hides (\`false\`) the spinner buttons for the input field.`,
@@ -83,11 +87,15 @@ export const NumberBoxMd = createMetadata({
       `Allows setting an alternate icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
         `the default icon for all ${COMP} instances with the "icon.spinnerUp:NumberBox" declaration in the ` +
         `app configuration file.`,
+      undefined,
+      "icon",
     ),
     spinnerDownIcon: d(
       `Allows setting an alternate icon displayed in the ${COMP} spinner for decrementing values. You can change ` +
         `the default icon for all ${COMP} instances with the "icon.spinnerDown:NumberBox" declaration in the ` +
         `app configuration file.`,
+      undefined,
+      "icon",
     ),
     step: {
       description: `This prop governs how big the step when clicking on the spinner of the field.`,
@@ -130,11 +138,11 @@ export const NumberBoxMd = createMetadata({
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
   },
   events: {

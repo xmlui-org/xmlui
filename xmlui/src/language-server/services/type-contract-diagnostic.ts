@@ -3,7 +3,7 @@
  */
 import { DiagnosticSeverity, type Diagnostic } from "vscode-languageserver";
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
-import { verifyComponentDef } from "../../components-core/type-contracts";
+import { verifyComponentDef } from "../../components-core/type-contracts/verifier";
 import type { MetadataProvider } from "./common/metadata-utils";
 
 export function getTypeContractDiagnostics(

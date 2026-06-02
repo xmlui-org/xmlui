@@ -395,8 +395,31 @@ export type AppContextObject = {
       ) => string | null | undefined | Promise<string | null | undefined>;
       defaultMessage: string;
       severity?: "error" | "warning";
-    }) => void;
-    errors: ReadonlyArray<AppError>;
+    }) => void;    /**
+     * Plan #15 Step 4.1: register a custom audit sink factory. The factory is
+     * invoked when `<auditPolicy><sink kind="custom" endpoint="<name>" /></auditPolicy>`
+     * is declared (the `endpoint` field carries the registered name).
+     */
+    registerAuditSink: (
+      name: string,
+      factory: (cfg: {
+        kind: "otlp" | "console" | "custom";
+        endpoint?: string;
+        headers?: Record<string, string>;
+      }) => { push: (entry: unknown) => void; flush: () => Promise<void> },
+    ) => void;
+    /**
+     * Plan #15 Step 2.3: register a custom content-based PII heuristic.
+     * Values matching `pattern` fire `audit-redaction-missing` when no
+     * redaction rule covers them.
+     */
+    registerAuditHeuristic: (name: string, pattern: RegExp) => void;
+    /**
+     * Plan #15 Step 2.2: replace the active `AuditPolicy`. Called by the
+     * `<App auditPolicy>` markup prop. Accepts a plain object literal
+     * with `redact` / `sample` / `retention` / `sink` fields.
+     */
+    setAuditPolicy: (policy: unknown) => void;    errors: ReadonlyArray<AppError>;
     setErrorHandler: (
       handler?: (
         err: AppError,

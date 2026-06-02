@@ -113,6 +113,7 @@ type Props = {
   themeStorageKey?: string;
   locale?: string;
   localeBundles?: unknown;
+  auditPolicy?: unknown;
   direction?: "ltr" | "rtl" | "auto";
   scheduler?: "concurrent" | "fifo";
   maxQueuedPerTrace?: number;
@@ -186,6 +187,7 @@ export const App = memo(function App({
   themeStorageKey = defaultProps.themeStorageKey,
   locale,
   localeBundles,
+  auditPolicy,
   direction = "auto",
   scheduler,
   maxQueuedPerTrace,
@@ -244,6 +246,22 @@ export const App = memo(function App({
     registeredLocaleBundlesRef.current = signature;
     void appContext.App?.registerLocaleBundles?.(localeBundles);
   }, [appContext.App, localeBundles]);
+
+  // Plan #15 Step 2.2: push the declarative <App auditPolicy> markup into the
+  // audit pipeline. Re-runs only when the JSON-serialised policy changes.
+  const lastAuditPolicySig = useRef<string>();
+  useEffect(() => {
+    if (auditPolicy === undefined) return;
+    let sig: string;
+    try {
+      sig = JSON.stringify(auditPolicy);
+    } catch {
+      sig = String(auditPolicy);
+    }
+    if (lastAuditPolicySig.current === sig) return;
+    lastAuditPolicySig.current = sig;
+    appContext.App?.setAuditPolicy?.(auditPolicy);
+  }, [appContext.App, auditPolicy]);
 
   useEffect(() => {
     // Push the direction prop into AppContext so App.direction stays consistent

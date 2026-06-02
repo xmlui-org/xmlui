@@ -99,6 +99,7 @@ export function dIndeterminate(defaultValue?: boolean): ComponentPropertyMetadat
     description:
       `The \`true\` value of this property signals that the component is in an ` +
       `_intedeterminate state_.`,
+    valueType: "boolean",
     defaultValue,
   };
 }
@@ -115,6 +116,7 @@ export function dLabel(): ComponentPropertyMetadata {
 export function dLabelPosition(def?: string): ComponentPropertyMetadata {
   return {
     description: `Places the label at the given position of the component.`,
+    valueType: "string",
     availableValues: labelPositionMd,
     defaultValue: def ?? "top",
   };
@@ -125,6 +127,7 @@ export function dLabelWidth(comp: string): ComponentPropertyMetadata {
     description:
       `This property sets the width of the \`${comp}\` component's label. ` +
       "If not defined, the label's width will be determined by its content and the available space.",
+    valueType: "length",
   };
 }
 
@@ -147,9 +150,10 @@ export function dAutoFocus(): ComponentPropertyMetadata {
   };
 }
 
-export function dInitialValue(value?: any): ComponentPropertyMetadata {
+export function dInitialValue(value?: any, valueType: PropertyValueType = "any"): ComponentPropertyMetadata {
   return {
     description: `This property sets the component's initial value.`,
+    valueType,
     defaultValue: value,
   };
 }
@@ -182,6 +186,7 @@ export function dMulti(): ComponentPropertyMetadata {
 export function dValidationStatus(value?: string): ComponentPropertyMetadata {
   return {
     description: `This property allows you to set the validation status of the input component.`,
+    valueType: "string",
     availableValues: validationStatusMd,
     defaultValue: value ?? "none",
   };

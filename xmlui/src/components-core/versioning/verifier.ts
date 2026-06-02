@@ -40,12 +40,20 @@ export interface VerifyVersioningOptions {
   currentVersion?: string;
 }
 
+export type VersioningRegistry =
+  | ReadonlyMap<string, ComponentMetadata>
+  | ((componentName: string) => ComponentMetadata | undefined);
+
 export function verifyVersioning(
   def: ComponentDef,
-  registry: ReadonlyMap<string, ComponentMetadata>,
+  registry: VersioningRegistry,
   opts?: VerifyVersioningOptions,
 ): VersioningDiagnostic[] {
   const { strict = false, currentVersion } = opts ?? {};
+  const lookup =
+    typeof registry === "function"
+      ? registry
+      : (name: string) => registry.get(name);
   const out: VersioningDiagnostic[] = [];
   visit(def);
   return out;
@@ -57,36 +65,43 @@ export function verifyVersioning(
       recurse(node);
       return;
     }
-    const meta = registry.get(typeName);
+    const meta = lookup(typeName);
     if (!meta) {
       recurse(node);
       return;
     }
 
+    const range = extractRange(node);
+    const sourceOffset = extractOffset(node);
+    const pushDiag = (d: VersioningDiagnostic) => {
+      if (range !== undefined && d.range === undefined) d.range = range;
+      if (sourceOffset !== undefined && d.sourceOffset === undefined) {
+        d.sourceOffset = sourceOffset;
+      }
+      out.push(d);
+    };
+
     if (meta.status === "deprecated") {
-      out.push({
+      pushDiag({
         code: "deprecated-component",
         severity: "warn",
         componentName: typeName,
-        range: extractRange(node),
         message:
           `<${typeName}> is deprecated` +
           (meta.deprecationMessage ? `: ${meta.deprecationMessage}` : "."),
       });
     } else if (meta.status === "experimental") {
-      out.push({
+      pushDiag({
         code: "experimental-use",
         severity: "info",
         componentName: typeName,
-        range: extractRange(node),
         message: `<${typeName}> is experimental; behavior may change.`,
       });
     } else if (meta.status === "internal") {
-      out.push({
+      pushDiag({
         code: "internal-component-use",
         severity: strict ? "error" : "warn",
         componentName: typeName,
-        range: extractRange(node),
         message: `<${typeName}> is internal and should not be used in user markup.`,
       });
     }
@@ -108,7 +123,7 @@ export function verifyVersioning(
       const replacement = propMeta.replacement;
 
       if (removedIn && currentVersion && compareSemver(currentVersion, removedIn) >= 0) {
-        out.push({
+        pushDiag({
           code: "removed-prop",
           severity: strict ? "error" : "warn",
           componentName: typeName,
@@ -116,7 +131,6 @@ export function verifyVersioning(
           deprecatedSince: since,
           removedIn,
           replacement,
-          range: extractRange(node),
           message:
             `Prop "${propName}" on <${typeName}> was removed in ${removedIn}` +
             (replacement ? `. Use ${replacement} instead.` : "."),
@@ -130,7 +144,7 @@ export function verifyVersioning(
         if (since) parts.push(`Deprecated since ${since}.`);
         if (removedIn) parts.push(`Will be removed in ${removedIn}.`);
         if (replacement) parts.push(`Use ${replacement} instead.`);
-        out.push({
+        pushDiag({
           code: "deprecated-prop",
           severity: "warn",
           componentName: typeName,
@@ -138,7 +152,6 @@ export function verifyVersioning(
           deprecatedSince: since,
           removedIn,
           replacement,
-          range: extractRange(node),
           message: `Prop "${propName}" on <${typeName}> is deprecated. ${parts.join(" ")}`.trim(),
         });
       }
@@ -149,7 +162,7 @@ export function verifyVersioning(
     for (const eventName of Object.keys(defEvents)) {
       const evMeta = metaEvents[eventName];
       if (evMeta && (evMeta.deprecationMessage || evMeta.deprecatedSince)) {
-        out.push({
+        pushDiag({
           code: "deprecated-event",
           severity: "warn",
           componentName: typeName,
@@ -157,7 +170,6 @@ export function verifyVersioning(
           deprecatedSince: evMeta.deprecatedSince,
           removedIn: evMeta.removedIn,
           replacement: evMeta.replacement,
-          range: extractRange(node),
           message:
             `Event "${eventName}" on <${typeName}> is deprecated` +
             (evMeta.deprecationMessage ? `: ${evMeta.deprecationMessage}` : "."),
@@ -185,4 +197,9 @@ function extractRange(node: any): VersioningDiagnostic["range"] {
   const col = typeof range.col === "number" ? range.col : range.start?.column;
   if (typeof line !== "number" || typeof col !== "number") return undefined;
   return { line, col };
+}
+
+function extractOffset(node: any): number | undefined {
+  const offset = node?.debug?.source?.start;
+  return typeof offset === "number" ? offset : undefined;
 }

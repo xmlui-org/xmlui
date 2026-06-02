@@ -28,9 +28,9 @@ or failing without writing any React code or wiring `useEffect` yourself.
 
 ## How it works
 
-Every container and wrapper component participates in a shared lifecycle
-dispatcher. When React commits a mount, the dispatcher fires `onMount` for
-that component; when React drops the node, it fires `onUnmount` and
+Every container and wrapper component participates in the managed lifecycle
+surface. When a component enters the displayed XMLUI tree, XMLUI fires
+`onMount`; when it leaves the displayed tree, XMLUI fires `onUnmount` and
 (synchronously) any registered `onError` handler if a handler throws. The
 events are ordinary action handlers — they run through the same expression
 and scope pipeline as `onClick`, so they can read state, call other
@@ -39,7 +39,10 @@ component methods, write to `App.session`, or invoke `Log.info()`.
 ## Universal `onMount` and `onUnmount`
 
 `onMount` and `onUnmount` are available on every component. No
-per-component declaration is needed.
+per-component declaration is needed. They are the canonical names; the older
+`onInit` and `onCleanup` attributes remain compatibility aliases. If both
+canonical and legacy names are declared on the same component, XMLUI runs only
+the canonical handler and emits a lifecycle warning.
 
 ```xmlui copy
 <App>
@@ -53,9 +56,10 @@ per-component declaration is needed.
 </App>
 ```
 
-`onMount` runs once after the first render commits. Re-renders do not
-re-fire it. `onUnmount` runs once, synchronously, before the component is
-removed — the handler can still read the component's state.
+`onMount` runs when the component becomes visible (`when` absent/true or
+false → true). Re-renders do not re-fire it. `onUnmount` runs once,
+synchronously, when the component leaves the displayed tree (`when` true →
+false or parent teardown) — the handler can still read the component's state.
 
 ## Reacting to lifecycle failures with `onError`
 

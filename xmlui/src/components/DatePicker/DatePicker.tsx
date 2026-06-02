@@ -34,12 +34,16 @@ export const DatePickerMd = createMetadata({
     "mouse interaction.",
   props: {
     placeholder: dPlaceholder(),
-    initialValue: dInitialValue(),
     value: {
       description:
         "Controlled value. In single mode, a date string; in range mode, a " +
         "`{ from, to }` object.",
     },
+    initialValue: dInitialValue(null, "string"),
+    autoFocus: dAutoFocus(),
+    readOnly: dReadonly(),
+    enabled: dEnabled(defaultProps.enabled),
+    validationStatus: dValidationStatus(defaultProps.validationStatus),
     mode: {
       description: "The mode of the datepicker (single or range)",
       valueType: "string",
@@ -65,10 +69,7 @@ export const DatePickerMd = createMetadata({
         "MMddyyyy",
       ],
     },
-    enabled: dEnabled(defaultProps.enabled),
-    readOnly: dReadonly(),
     required: dRequired(),
-    autoFocus: dAutoFocus(),
     inline: {
       description:
         "If set to true, the calendar is always visible and its panel is rendered as " +
@@ -83,7 +84,6 @@ export const DatePickerMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.clearable,
     },
-    validationStatus: dValidationStatus(defaultProps.validationStatus),
     weekStartsOn: {
       description: "The first day of the week. 0 is Sunday, 1 is Monday, etc.",
       valueType: "number",

@@ -21,6 +21,8 @@ export const NavGroupMd = createMetadata({
     initiallyExpanded: d(
       "This property defines whether the group is initially expanded or collapsed. If not " +
         "defined, the group is collapsed by default.",
+      undefined,
+      "boolean",
     ),
     enabled: dEnabled(),
     to: {

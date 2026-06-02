@@ -54,6 +54,8 @@ export interface VersioningDiagnostic {
   replacement?: string;
   /** Optional source range — populated when the verifier walks XML AST nodes. */
   range?: { line: number; col: number; length?: number };
+  /** Optional raw character offset into the source file (set by analyzer adapter). */
+  sourceOffset?: number;
   /** Optional workspace-relative source file URI. */
   uri?: string;
   message: string;

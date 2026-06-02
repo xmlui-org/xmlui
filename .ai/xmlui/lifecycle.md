@@ -9,7 +9,7 @@ Reference for agents working on lifecycle hooks, cleanup, or the `<Lifecycle>` c
 | `xmlui/src/components-core/lifecycle/diagnostics.ts` | `LifecyclePhase`, `LifecycleViolationReason`, `LifecycleViolationError` |
 | `xmlui/src/components-core/lifecycle/dispatcher.ts` | `createLifecycleDispatcher()`, `fireBeforeDispose()`, `reportLifecycleEvent()`, `reportLifecycleViolation()` |
 | `xmlui/src/components-core/lifecycle/index.ts` | Public re-exports |
-| `xmlui/src/components-core/rendering/ComponentAdapter.tsx` | Wires `useEffect` → `onMount`/`onUnmount`/`onError`/`onBeforeDispose` |
+| `xmlui/src/components-core/rendering/ComponentAdapter.tsx` | Wires canonical `onMount`/`onUnmount` visibility lifecycle, legacy `onInit`/`onCleanup` aliases, `onError`, and `onBeforeDispose` |
 | `xmlui/src/components/Lifecycle/` | `<Lifecycle>` metadata + renderer |
 
 ## What shipped (Phases 1–4)
@@ -19,7 +19,8 @@ Reference for agents working on lifecycle hooks, cleanup, or the `<Lifecycle>` c
 - **`reportLifecycleEvent` / `reportLifecycleViolation`** — push `kind:"lifecycle"` trace entries.
 - **`kind:"lifecycle"`** registered on `XsLogEntry` in `inspectorUtils.ts`.
 - **`appGlobals.strictLifecycle`** (default `true`) + **`appGlobals.disposeTimeoutMs`** (default `250`).
-- **Universal `onMount`/`onUnmount`** on every component via `ComponentAdapter` `useEffect` (one-shot, empty dep list).
+- **Universal `onMount`/`onUnmount`** on every component via `ComponentAdapter`. These are the canonical visibility lifecycle events (`when` absent/true or false → true; true → false or parent teardown).
+- **Legacy aliases:** `onInit` aliases `onMount`; `onCleanup` aliases `onUnmount`. If both canonical and legacy names are declared, only the canonical handler runs and a lifecycle warning is emitted.
 - Async `onUnmount` emits `async-onUnmount` violation; handler is **not** awaited.
 - **`onError`** event per component (`source: "mount"|"unmount"|"beforeDispose"|"action"`); suppresses global `signError` toast when declared.
 - **`<Lifecycle>`** non-visual component (`stateful: false`, `keyValue` re-arming via `useEffect([keyValue])`).

@@ -212,6 +212,8 @@ export const BEHAVIOR_PROPS: ReadonlySet<string> = new Set([
   "onUnmount",
   "onError",
   "onBeforeDispose",
+  "onInit",
+  "onCleanup",
   "onDidChange",
 ]);
 

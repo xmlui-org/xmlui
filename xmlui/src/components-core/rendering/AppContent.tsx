@@ -31,7 +31,7 @@ import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
-import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import { AppUtilsNamespace, ClipboardNamespace, appCancel, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
 import { announceLiveRegion, GlobalLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
 import { SkipLink } from "../../components/SkipLink/SkipLinkReact";
 import {
@@ -80,6 +80,14 @@ import {
   configureValidatorRegistry,
   registerValidator as registerValidatorImpl,
 } from "../forms";
+import { verifyVersioning } from "../versioning/verifier";
+import { emitVersioningDiagnostics } from "../versioning/runtime";
+import {
+  setAuditPolicy,
+  setStrictAudit,
+  registerAuditSink as registerAuditSinkImpl,
+  registerAuditHeuristic as registerAuditHeuristicImpl,
+} from "../audit";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -206,6 +214,24 @@ export function AppContent({
         pushXsLog({ kind: "forms", ts: Date.now(), ...d });
       },
     });
+  }, [appGlobals]);
+
+  // --- Plan #15: wire `appGlobals.strictAuditLogging` and `appGlobals.auditPolicy`
+  // into the audit pipeline. The policy is normalised by `setAuditPolicy()` and
+  // the strict flag governs whether `audit-redaction-missing` /
+  // `audit-policy-conflict` escalate to errors.
+  useMemo(() => {
+    // Default is strict (`!== false`) — only explicit false opts out, matching W8 flip.
+    setStrictAudit((appGlobals as any)?.strictAuditLogging !== false);
+    const declared = (appGlobals as any)?.auditPolicy;
+    if (declared && typeof declared === "object") {
+      setAuditPolicy({
+        redact: Array.isArray(declared.redact) ? declared.redact : [],
+        sample: declared.sample ?? {},
+        retention: declared.retention ?? { bufferSize: 200, onOverflow: "drop-oldest" },
+        sink: declared.sink,
+      });
+    }
   }, [appGlobals]);
 
   // W8-1: `strictDeterminism` default flipped from `false` to `true`.
@@ -693,6 +719,32 @@ export function AppContent({
     // mount, not per appGlobals identity change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rootContainer]);
+
+  // --- Plan #12 Step 1.2 (parse-time hook): walk the mounted component tree
+  // once and emit `VersioningDiagnostic` entries via the runtime echo. The
+  // echo dedups per-session so repeated mounts (e.g. route changes that
+  // remount the same node) do not flood the trace. Strict mode escalates
+  // `removed-prop` and `internal-component-use` only.
+  useEffect(() => {
+    if (!rootContainer || !componentRegistry) return;
+    try {
+      const strict = (appGlobals as any)?.strictVersioning === true;
+      const diags = verifyVersioning(
+        rootContainer as any,
+        (name: string) =>
+          componentRegistry.lookupComponentRenderer(name)?.descriptor as any,
+        { strict },
+      );
+      if (diags.length > 0) {
+        emitVersioningDiagnostics(diags);
+      }
+    } catch (err) {
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[xmlui] versioning verifier failed:", err);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rootContainer, componentRegistry]);
 
   // useEffect(()=>{
   //   if(isWindowFocused){
@@ -1672,6 +1724,22 @@ export function AppContent({
         scheduleHandler,
         // --- W5-1 / plan #09 Step 1.2: register a named validator from markup.
         registerValidator: registerValidatorImpl,
+        // --- Plan #15 Step 4.1 + 2.3: register custom audit sinks and PII heuristics.
+        registerAuditSink: registerAuditSinkImpl,
+        registerAuditHeuristic: registerAuditHeuristicImpl,
+        // --- Plan #15 Step 2.2: replace the active audit policy from markup.
+        setAuditPolicy: (policy: unknown) => {
+          if (policy && typeof policy === "object") {
+            const p = policy as Record<string, unknown>;
+            setAuditPolicy({
+              redact: Array.isArray(p.redact) ? (p.redact as any) : [],
+              sample: (p.sample as any) ?? {},
+              retention:
+                (p.retention as any) ?? { bufferSize: 200, onOverflow: "drop-oldest" },
+              sink: p.sink as any,
+            });
+          }
+        },
         // --- Plan #07 Step 2.1: structured error sink.
         // `App.errors` is a FIFO buffer of recent `AppError`s (default 50, see
         // `appGlobals.errorBufferSize`).  `setErrorHandler` is used by
@@ -1680,6 +1748,8 @@ export function AppContent({
         // suppress the toast.
         errors,
         setErrorHandler,
+        // --- Plan #6 Step 1.2: cooperative handler cancellation.
+        cancel: appCancel,
       },
       Clipboard: ClipboardNamespace,
 

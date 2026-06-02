@@ -67,10 +67,14 @@ export const TextAreaMd = createMetadata({
     maxRows: d(
       `This optional property sets the maximum number of text rows the \`${COMP}\` ` +
         "can grow. If not set, the number of rows is unlimited.",
+      undefined,
+      "number",
     ),
     minRows: d(
       `This optional property sets the minimum number of text rows the \`${COMP}\` can shrink. ` +
         `If not set, the minimum number of rows is 1.`,
+      undefined,
+      "number",
     ),
     rows: {
       description: `Specifies the number of rows the component initially has.`,
@@ -85,7 +89,10 @@ export const TextAreaMd = createMetadata({
       defaultValue: false,
     },
     placeholder: dPlaceholder(),
-    initialValue: dInitialValue(),
+    initialValue: {
+      ...dInitialValue(),
+      valueType: "string",
+    },
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -97,18 +104,19 @@ export const TextAreaMd = createMetadata({
         `This optional property specifies in which dimensions can the \`TextArea\` ` +
         `be resized by the user.`,
       availableValues: resizeOptionsMd,
+      valueType: "string",
     },
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
+      valueType: "boolean",
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "icon",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "icon",
     },
   },
   events: {

@@ -57,12 +57,16 @@ const VALUE_DESC = d(
   `This property determines the text displayed in the heading. \`${COMP}\` also accepts nested ` +
     `text instead of specifying the \`value\`. If both \`value\` and a nested text are used, ` +
     `the \`value\` will be displayed.`,
+  undefined,
+  "string",
 );
 const MAX_LINES_DESC = d(
   "This optional property determines the maximum number of lines the component can wrap to. " +
     "If there is not enough space for all of the text, the component wraps the text up to as many " +
     "lines as specified. If the value is not specified, there is no limit on the number of " +
     "displayed lines.",
+  undefined,
+  "number",
 );
 const ELLIPSES_DESC = {
   description:
@@ -125,6 +129,7 @@ export const HeadingMd = createMetadata({
         "H1", "H2", "H3", "H4", "H5", "H6",
         "1", "2", "3", "4", "5", "6",
       ],
+      valueType: "string",
       defaultValue: defaultProps.level,
     },
     maxLines: MAX_LINES_DESC,

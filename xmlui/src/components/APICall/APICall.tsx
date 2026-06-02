@@ -76,6 +76,7 @@ export const APICallMd = createMetadata({
       description:
         "You can optionally define request header values as key-value pairs, where the key is the ID " +
         "of the particular header and the value is that header's corresponding value.",
+      valueType: "hash",
       audit: {
         classification: "secret",
         defaultRedaction: "mask",
@@ -208,6 +209,7 @@ export const APICallMd = createMetadata({
       description:
         "Optional body to send with the cancel request. " +
         "Can use $result context from initial response.",
+      valueType: "any",
     },
     inProgressNotificationMessage: {
       description:
@@ -418,11 +420,11 @@ export const apiCallRenderer = createComponentRenderer(
         node={node as any}
         uid={uid}
         updateState={updateState}
-        onSuccess={lookupEventHandler("success")}
-        onStatusUpdate={lookupEventHandler("statusUpdate")}
-        onTimeout={lookupEventHandler("timeout")}
-        onPollingStart={lookupEventHandler("pollingStart")}
-        onPollingComplete={lookupEventHandler("pollingComplete")}
+        onSuccess={lookupEventHandler("success", { schedulerBypass: true })}
+        onStatusUpdate={lookupEventHandler("statusUpdate", { schedulerBypass: true })}
+        onTimeout={lookupEventHandler("timeout", { schedulerBypass: true })}
+        onPollingStart={lookupEventHandler("pollingStart", { schedulerBypass: true })}
+        onPollingComplete={lookupEventHandler("pollingComplete", { schedulerBypass: true })}
         hasMockExecute={!!node.events?.mockExecute}
       />
     );

@@ -1,5 +1,6 @@
 import { pushXsLog } from "../inspector/inspectorUtils";
 import { readCookie } from "../utils/misc";
+import { getDefaultHandlerCoordinator } from "../concurrency";
 
 // =============================================================================
 // App.randomBytes(n)
@@ -216,4 +217,33 @@ export function getAppEnvironment(): AppEnvironment {
         ? [...navigator.languages]
         : ["en"],
   };
+}
+
+// =============================================================================
+// App.cancel — cooperative handler cancellation (Plan #6 Step 1.2)
+// =============================================================================
+
+/**
+ * Aborts running event handlers managed by the default `HandlerCoordinator`.
+ *
+ * - `App.cancel()` aborts every running non-`parallel` handler.
+ * - `App.cancel(componentUid)` narrows to one component.
+ * - `App.cancel(componentUid, eventName)` narrows to a single event slot.
+ *
+ * `parallel` (the default) handlers are not tracked by the coordinator and
+ * are unaffected — they must observe `$cancel` cooperatively or rely on
+ * the per-component lifecycle abort. The cancellation `reason` surfaced
+ * on `$cancel.reason` is `"user"`.
+ */
+export function appCancel(componentUid?: string, eventName?: string): void {
+  getDefaultHandlerCoordinator().abortRunning(componentUid, eventName, "user");
+  pushXsLog({
+    kind: "concurrency",
+    ts: Date.now(),
+    code: "concurrency-handler-cancelled",
+    severity: "info",
+    componentUid: componentUid ?? "*",
+    eventName: eventName ?? "*",
+    message: "App.cancel() invoked",
+  } as any);
 }

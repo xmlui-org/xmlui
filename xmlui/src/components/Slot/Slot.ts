@@ -9,7 +9,7 @@ export const SlotMd = createMetadata({
     "Placeholder in a reusable component. " +
     "Signs the slot where the component's injected children should be rendered.",
   props: {
-    name: d(`This optional property defines the name of the slot.`),
+    name: d(`This optional property defines the name of the slot.`, undefined, "string"),
   },
   allowArbitraryProps: true,
   opaque: true

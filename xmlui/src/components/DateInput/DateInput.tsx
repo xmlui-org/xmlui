@@ -51,7 +51,7 @@ export const DateInputMd = createMetadata({
     },
   },
   props: {
-    initialValue: dInitialValue(),
+    initialValue: dInitialValue(null, "string"),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),

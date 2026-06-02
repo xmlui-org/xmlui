@@ -134,7 +134,7 @@ export const Container = memo(
       return {
         udcContract: node.udcContract,
         strictUdcSandbox:
-          baseAppContext.appGlobals?.strictUdcSandbox === true ||
+          baseAppContext.appGlobals?.strictUdcSandbox !== false ||
           (node.udcContract.trust === "untrusted" &&
             baseAppContext.appGlobals?.udcTrust === "strict"),
         udcDiagnosticLogger: (diagnostic) => {

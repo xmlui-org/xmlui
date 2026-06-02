@@ -123,7 +123,7 @@ export const StateContainer = memo(
       return {
         udcContract: node.udcContract,
         strictUdcSandbox:
-          appContext.appGlobals?.strictUdcSandbox === true ||
+          appContext.appGlobals?.strictUdcSandbox !== false ||
           (node.udcContract.trust === "untrusted" && appContext.appGlobals?.udcTrust === "strict"),
         udcDiagnosticLogger: (diagnostic) => {
           pushXsLog({
