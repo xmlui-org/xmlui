@@ -18,8 +18,6 @@ import { defaultProps } from "./FormItem/ItemWithLabel.defaults";
 type OptimizerInput = {
   /** @see ComponentMetadata.isImplicitContainerByDefault */
   isImplicitContainerByDefault?: boolean;
-  /** @see ComponentMetadata.childInjectedVars */
-  childInjectedVars?: readonly string[];
   /** @see ComponentMetadata.unstableChildInjectedVars */
   unstableChildInjectedVars?: readonly string[];
 };

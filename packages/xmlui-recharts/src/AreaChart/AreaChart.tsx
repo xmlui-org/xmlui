@@ -1,5 +1,5 @@
 import { AreaChart, defaultProps } from "./AreaChartReact";
-import { wrapComponent, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata, d } from "xmlui";
 
 const COMP = "AreaChart";
 
@@ -86,10 +86,7 @@ export const AreaChartMd = createMetadata({
   },
 
   contextVars: {
-    // Add context variables if needed
-  },
-  optimization: {
-    childInjectedVars: ["$tooltip"],
+    $tooltip: d("Context variable available inside tooltipTemplate."),
   },
 });
 

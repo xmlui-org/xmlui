@@ -104,9 +104,9 @@ export type PluginOptions = {
   /**
    * Additional directories to scan for optimizer metadata at build time.
    * Use this for extension packages that contribute container-like components
-   * with `childInjectedVars` or event `injectedVars`. Each entry must be an
+   * with `contextVars` or event `injectedVars`. Each entry must be an
    * absolute path to a directory containing `.tsx` component source files
-   * with `optimization: {}` blocks inside `createMetadata` calls.
+   * with `createMetadata` calls.
    *
    * Built-in xmlui components are always included automatically via
    * `collectedComponentMetadata`; only add dirs for external extension packages.

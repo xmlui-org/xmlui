@@ -4,7 +4,11 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { collectedComponentMetadata } from "../../../src/components/collectedComponentMetadata";
 import { coreComponentMetadata } from "../../../src/components-core/coreComponentMetadata";
-import { extractOptimizerMetadataFromSource } from "../../../src/components-core/optimization/static-extractor";
+import {
+  extractOptimizerMetadataFromSource,
+  extractInjectedKeysFromSource,
+} from "../../../src/components-core/optimization/static-extractor";
+import { EVENT_PAYLOAD_RESERVED_NAMES } from "../../../src/components-core/optimization/validateInjectedVars";
 
 // Static drift detection —
 // Walks each built-in component's source file, extracts any
@@ -186,13 +190,11 @@ describe("childInjectedVars / injectedVars vars have a string-literal presence i
 
   for (const [componentType, runtimeMd] of Object.entries(AUDIT_METADATA)) {
     const entry = runtimeMd as {
-      childInjectedVars?: readonly string[];
       unstableChildInjectedVars?: readonly string[];
       events?: Record<string, { injectedVars?: readonly string[] }>;
     };
 
     const hasVarsToCheck =
-      (entry.childInjectedVars?.length ?? 0) > 0 ||
       (entry.unstableChildInjectedVars?.length ?? 0) > 0 ||
       Object.values(entry.events ?? {}).some((e) => (e.injectedVars?.length ?? 0) > 0);
 
@@ -257,7 +259,6 @@ describe("childInjectedVars / injectedVars vars have a string-literal presence i
         }
       }
 
-      if (entry.childInjectedVars?.length) checkVars(entry.childInjectedVars, "childInjectedVars");
       if (entry.unstableChildInjectedVars?.length) checkVars(entry.unstableChildInjectedVars, "unstableChildInjectedVars");
 
       if (entry.events) {
@@ -272,25 +273,115 @@ describe("childInjectedVars / injectedVars vars have a string-literal presence i
 });
 
 // ---------------------------------------------------------------------------
-// U-audit.1-ext: Extension package renderer contextVars vs. childInjectedVars
+// U-audit.3: Reverse injection audit — every $-var injected in source must be
+// declared in metadata.
+//
+// U-audit.1 only covers `renderers: { slot: { contextVars: [...] } }` config
+// declarations. It does NOT cover $-vars injected via:
+//   (a) direct `<MemoizedItem contextVars={{ $x: ... }}>` JSX in component
+//       source (e.g. Heading, Tree) — bypasses wrapComponent rendererConfigs,
+//       so runtime `validateInjectedVars` is never invoked for them.
+//   (b) event-handler `lookup...({ context: { $x } })` — caught at runtime
+//       only if the event fires in a DEV session; not covered statically.
+//
+// Uses Babel AST via `extractInjectedKeysFromSource` — comments are invisible
+// to the scanner, so commented-out injection patterns are never reported.
+// ---------------------------------------------------------------------------
+
+describe("U-audit.3: Reverse injection audit — injected $-vars must be declared in metadata", () => {
+  const ALWAYS_ALLOWED = new Set<string>([...EVENT_PAYLOAD_RESERVED_NAMES]);
+
+  function declaredVars(md: any): Set<string> {
+    const declared = new Set<string>(ALWAYS_ALLOWED);
+    for (const k of Object.keys(md.contextVars ?? {})) declared.add(k);
+    for (const v of md.unstableChildInjectedVars ?? []) declared.add(v);
+    for (const ev of Object.values(md.events ?? {}) as any[]) {
+      for (const v of ev?.injectedVars ?? []) declared.add(v);
+    }
+    return declared;
+  }
+
+  function sourceFor(componentType: string): string | undefined {
+    let file = allFilesToAudit.find((f) =>
+      f.endsWith(`/${componentType}/${componentType}.tsx`),
+    );
+    if (!file) {
+      file = allFilesToAudit.find(
+        (f) => extractRegisteredName(readFileSync(f, "utf-8")) === componentType,
+      );
+    }
+    if (!file) return undefined;
+    let source = readFileSync(file, "utf-8");
+    const dir = dirname(file);
+    try {
+      for (const sibling of readdirSync(dir)) {
+        const siblingPath = join(dir, sibling);
+        if (!sibling.endsWith(".tsx") || siblingPath === file) continue;
+        try {
+          const siblingSource = readFileSync(siblingPath, "utf-8");
+          // Skip sibling files that declare their own component type — they are
+          // separate components that happen to live in the same directory (e.g.
+          // AccordionItem.tsx next to Accordion.tsx). Including them would
+          // falsely attribute their injection sites to the current component.
+          const siblingType = extractRegisteredName(siblingSource);
+          if (siblingType && siblingType !== componentType) continue;
+          source += siblingSource;
+        } catch (_) {}
+      }
+    } catch (_) {}
+    return source;
+  }
+
+  const drift: Array<{ componentType: string; missing: string[] }> = [];
+
+  for (const [componentType, runtimeMd] of Object.entries(AUDIT_METADATA)) {
+    const source = sourceFor(componentType);
+    if (!source) continue;
+    const injected = extractInjectedKeysFromSource(source);
+    if (injected.length === 0) continue;
+    const declared = declaredVars(runtimeMd);
+    const missing = injected.filter((k) => !declared.has(k));
+    if (missing.length > 0) drift.push({ componentType, missing });
+  }
+
+  it("every injected $-var (MemoizedItem / event context) is declared in metadata", () => {
+    if (drift.length > 0) {
+      const report = drift
+        .map((d) => `  ${d.componentType}: injects [${d.missing.join(", ")}] not declared in metadata`)
+        .join("\n");
+      throw new Error(
+        `Reverse injection drift (U-audit.3):\n${report}\n\n` +
+          `Fix: declare each $-key in the component's metadata — ` +
+          `contextVars: { $x: d("...") } for child-scope vars, or ` +
+          `events.<name>.injectedVars: ["$x"] for event-payload vars.`,
+      );
+    }
+    expect(drift).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// U-audit.1-ext: Extension package renderer contextVars vs. metadata.contextVars
 //
 // The main U-audit.1 block only scans xmlui/src/{components,components-core}.
 // Extension packages in packages/xmlui-*/ are NOT imported into the test
 // runtime, so their metadata is absent from AUDIT_METADATA. This block
-// performs a source-text-only check instead:
+// performs a source-text-only check instead, using the same AST extractor
+// (extractOptimizerMetadataFromSource) that the core audit uses:
 //   1. Scan all .tsx files under packages/xmlui-*/src/
 //   2. Extract `renderers: { slot: { contextVars: ["$x"] } }` declarations
-//   3. Extract `childInjectedVars: ["$x"]` from the same source file
-//   4. Report drift if any contextVar is not declared in childInjectedVars
+//   3. Extract declared vars from the same source via AST (contextVars keys
+//      + legacy childInjectedVars for backwards compat)
+//   4. Report drift if any renderer-injected var is not declared
 //
 // This catches the class of bug where an extension component injects a
 // variable (e.g. `$tooltip` in xmlui-recharts BarChart) via renderers but
-// forgets to declare it in optimization.childInjectedVars — which causes:
+// forgets to declare it in contextVars — which causes:
 //   (a) the optimizer to treat the var as an external parent dependency, and
 //   (b) validateInjectedVars to hard-fail in DEV mode.
 // ---------------------------------------------------------------------------
 
-describe("U-audit.1-ext: Extension package renderer contextVars must be declared in childInjectedVars", () => {
+describe("U-audit.1-ext: Extension package renderer contextVars must be declared in metadata.contextVars", () => {
   const PACKAGES_DIR = resolve(__dirname, "../../../../packages");
 
   function listExtensionTsxFiles(packagesDir: string): string[] {
@@ -305,18 +396,6 @@ describe("U-audit.1-ext: Extension package renderer contextVars must be declared
     return out;
   }
 
-  function extractChildInjectedVarsFromSource(source: string): Set<string> {
-    const declared = new Set<string>();
-    const m = source.match(/childInjectedVars:\s*\[([^\]]*)\]/);
-    if (m) {
-      for (const v of m[1].split(",")) {
-        const trimmed = v.trim().replace(/^["']|["']$/g, "");
-        if (trimmed.startsWith("$")) declared.add(trimmed);
-      }
-    }
-    return declared;
-  }
-
   const extensionFiles = listExtensionTsxFiles(PACKAGES_DIR);
   const extDrift: DriftRow[] = [];
   const extAudited: string[] = [];
@@ -329,13 +408,10 @@ describe("U-audit.1-ext: Extension package renderer contextVars must be declared
     if (!componentType) continue;
 
     extAudited.push(`${componentType} (${file.replace(/^.*\/packages\//, "packages/")})`);
-    const declared = extractChildInjectedVarsFromSource(source);
 
-    // Safety-net: also accept vars documented in metadata.contextVars block
-    const ctxBlock = source.match(/contextVars:\s*\{([\s\S]*?)\n\s*\},/);
-    if (ctxBlock) {
-      for (const m of ctxBlock[1].matchAll(/(\$\w+)\s*:/g)) declared.add(m[1]);
-    }
+    // Use the same AST extractor as the core audit: reads contextVars keys from source.
+    const extracted = extractOptimizerMetadataFromSource(source);
+    const declared = new Set<string>(Object.keys(extracted.contextVars ?? {}));
 
     for (const { slot, vars } of renderers) {
       const missing = vars.filter((v) => v.startsWith("$") && !declared.has(v));
@@ -357,12 +433,12 @@ describe("U-audit.1-ext: Extension package renderer contextVars must be declared
           (d) =>
             `  ${d.componentType} (${d.file.replace(/^.*\/packages\//, "packages/")}): ` +
             `renderer "${d.slot}" injects [${d.missing.join(", ")}] but these are not declared in ` +
-            `optimization.childInjectedVars in createMetadata`,
+            `metadata.contextVars in createMetadata`,
         )
         .join("\n");
       throw new Error(
         `Extension package renderer contextVars drift (U-audit.1-ext):\n${report}\n\n` +
-          `Fix: add optimization: { childInjectedVars: ["$x"] } to the component's createMetadata call.`,
+          `Fix: add contextVars: { $x: d("...") } to the component's createMetadata call.`,
       );
     }
     expect(extDrift).toEqual([]);

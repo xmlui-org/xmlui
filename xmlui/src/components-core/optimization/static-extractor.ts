@@ -18,9 +18,6 @@ import type { File } from "@babel/types";
  *
  *   1. `injectedVars` had to be the first field in each `events.{name}`
  *      object so a back-tracking regex could find the enclosing event name.
- *   2. `childInjectedVars` was matched via non-global `.exec()`, so the
- *      first textual occurrence won — including matches inside comments.
- *
  * Both classes of hazard are gone now: the AST walker resolves keys
  * positionally inside the actual object expression, and comments are not
  * part of the AST.
@@ -32,7 +29,6 @@ import type { File } from "@babel/types";
  */
 export type OptimizerMeta = {
   isImplicitContainerByDefault?: boolean;
-  childInjectedVars?: readonly string[];
   unstableChildInjectedVars?: readonly string[];
   contextVars?: Record<string, Record<never, never>>;
   events?: Record<string, { injectedVars?: readonly string[] }>;
@@ -138,8 +134,6 @@ export function extractOptimizerMetadataFromSource(source: string): OptimizerMet
     if (isBooleanTrue(findProperty(optimization, "isImplicitContainerByDefault"))) {
       result.isImplicitContainerByDefault = true;
     }
-    const childVars = asStaticStringArray(findProperty(optimization, "childInjectedVars"));
-    if (childVars && childVars.length > 0) result.childInjectedVars = childVars;
     const unstableVars = asStaticStringArray(
       findProperty(optimization, "unstableChildInjectedVars"),
     );
@@ -260,6 +254,76 @@ function listTsxFiles(dir: string): string[] {
 }
 
 /**
+ * Walk every node in a Babel AST, calling `visit` on each.
+ * Skips non-object and non-array values to avoid traversing scalar leaves.
+ */
+function walkAst(node: AnyNode, visit: (n: AnyNode) => void): void {
+  if (!node || typeof node !== "object") return;
+  visit(node);
+  for (const val of Object.values(node)) {
+    if (Array.isArray(val)) val.forEach((child) => walkAst(child, visit));
+    else if (val && typeof val === "object" && typeof val.type === "string") walkAst(val, visit);
+  }
+}
+
+/**
+ * Extract all `$`-prefixed keys that are injected into child scope or event
+ * payload anywhere in the source file. Two injection shapes are recognised:
+ *
+ *   (a) JSX `contextVars` attribute:
+ *         <MemoizedItem contextVars={{ $item: ..., $index: ... }} />
+ *
+ *   (b) Event-handler `context` option:
+ *         lookupAction("evt", uid, { context: { $data, $error } })
+ *
+ * Uses the Babel AST parser so comments are invisible to the scanner — a
+ * commented-out `contextVars={{ $gone: x }}` is never reported.
+ *
+ * Only static, non-computed `$`-prefixed keys are collected. Dynamic keys
+ * (`[varName]: val`) cannot be statically determined and are skipped.
+ */
+export function extractInjectedKeysFromSource(source: string): readonly string[] {
+  const ast = parseSource(source);
+  if (!ast) return [];
+
+  const keys = new Set<string>();
+
+  walkAst(ast as AnyNode, (node) => {
+    // (a) JSXAttribute: contextVars={{ $x: val, $y: val }}
+    if (
+      node.type === "JSXAttribute" &&
+      node.name?.type === "JSXIdentifier" &&
+      node.name.name === "contextVars" &&
+      node.value?.type === "JSXExpressionContainer" &&
+      node.value.expression?.type === "ObjectExpression"
+    ) {
+      for (const prop of node.value.expression.properties) {
+        const k = getPropertyKeyName(prop);
+        if (k?.startsWith("$")) keys.add(k);
+      }
+    }
+
+    // (b) ObjectExpression with a `context: { $x, $y }` property
+    if (node.type === "ObjectExpression") {
+      for (const prop of node.properties) {
+        if (
+          prop.type === "ObjectProperty" &&
+          getPropertyKeyName(prop) === "context" &&
+          prop.value?.type === "ObjectExpression"
+        ) {
+          for (const inner of prop.value.properties) {
+            const k = getPropertyKeyName(inner);
+            if (k?.startsWith("$")) keys.add(k);
+          }
+        }
+      }
+    }
+  });
+
+  return [...keys];
+}
+
+/**
  * Build a Record<componentTypeName, OptimizerMeta> by scanning all *.tsx files in `dir`.
  * Used by the Vite plugin at build time to extract metadata directly from component source files.
  * Only components that have at least one optimizer field are included.
@@ -273,7 +337,6 @@ export function extractOptimizerMetadataFromDir(dir: string): Record<string, Opt
     const meta = extractOptimizerMetadataFromSource(source);
     const hasData =
       meta.isImplicitContainerByDefault ||
-      meta.childInjectedVars ||
       meta.unstableChildInjectedVars ||
       meta.contextVars ||
       (meta.events && Object.keys(meta.events).length > 0);

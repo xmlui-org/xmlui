@@ -14,14 +14,14 @@ describe("validateInjectedVars — mismatch detection", () => {
     vi.restoreAllMocks();
   });
 
-  it("emits console.error when a $-var is dispatched but not declared in childInjectedVars", () => {
+  it("emits console.error when a $-var is dispatched but not declared in contextVars", () => {
     expect(() => {
       validateInjectedVars(
         "CustomList",
-        { childInjectedVars: [] } as any,
+        { contextVars: {} } as any,
         { $secret: "value" },
       );
-    }).toThrowError(/Lexical Scoping.*\$secret.*childInjectedVars/);
+    }).toThrowError(/Lexical Scoping.*\$secret.*contextVars/);
   });
 
   it("emits console.error when event $-var is dispatched but not in injectedVars", () => {
@@ -39,11 +39,11 @@ describe("validateInjectedVars — mismatch detection", () => {
     }).toThrowError(/Lexical Scoping.*\$queryParams.*events\["fetch"\]\.injectedVars/);
   });
 
-  it("does NOT report when $-var IS declared in childInjectedVars", () => {
+  it("does NOT report when $-var IS declared in contextVars", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     validateInjectedVars(
       "List",
-      { childInjectedVars: ["$item"] } as any,
+      { contextVars: { $item: {} } } as any,
       { $item: { id: 1 } },
     );
     expect(spy).not.toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe("validateInjectedVars — mismatch detection", () => {
 
   it("returns early (no error) when contextVars is undefined", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    validateInjectedVars("List", { childInjectedVars: [] } as any, undefined);
+    validateInjectedVars("List", { contextVars: {} } as any, undefined);
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -88,7 +88,7 @@ describe("validateInjectedVars — EVENT_PAYLOAD_RESERVED_NAMES exemptions", () 
       const spy = vi.spyOn(console, "error").mockImplementation(() => {});
       validateInjectedVars(
         "SomeComponent",
-        { childInjectedVars: [] } as any,
+        { contextVars: {} } as any,
         { [reserved]: "x" },
       );
       expect(spy).not.toHaveBeenCalled();

@@ -15,7 +15,7 @@ const computeUsesForTree = (root: any) => originalComputeUsesForTree(root, (t) =
   if (t === "DataSource") return DataSourceMd;
   if (t === "ScopedContainer") {
     return {
-      childInjectedVars: ["$item", "$index"],
+      contextVars: { $item: {}, $index: {} },
     };
   }
   if (t === "ScopedEvent") {
@@ -1680,8 +1680,8 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Iteration 2: Children Sc
   });
 
   it("U2.5: Nested scopes — inner scope extends outer scope", () => {
-    (collectedComponentMetadata as any)["Level1"] = { childInjectedVars: ["$a"] };
-    (collectedComponentMetadata as any)["Level2"] = { childInjectedVars: ["$b"] };
+    (collectedComponentMetadata as any)["Level1"] = { contextVars: { $a: {} } };
+    (collectedComponentMetadata as any)["Level2"] = { contextVars: { $b: {} } };
 
     const root = node("Level1", {
       vars: { x: "1" }, // make it a container
@@ -1702,9 +1702,9 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — Iteration 2: Children Sc
     expect(root.computedUses).toEqual(["$c"]);
   });
 
-  it("U2.6: Extension component with childInjectedVars metadata is supported", () => {
+  it("U2.6: Extension component with contextVars metadata is supported", () => {
     (collectedComponentMetadata as any)["MyGrid"] = {
-      childInjectedVars: ["$cellValue"],
+      contextVars: { $cellValue: {} },
     };
     const root = node("Stack", {
       vars: { x: "1" },

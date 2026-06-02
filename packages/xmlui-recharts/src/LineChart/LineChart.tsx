@@ -78,8 +78,8 @@ export const LineChartMd: ComponentMetadata = createMetadata({
     marginBottom: d("The bottom margin of the chart"),
     marginLeft: d("The left margin of the chart"),
   },
-  optimization: {
-    childInjectedVars: ["$tooltip"],
+  contextVars: {
+    $tooltip: d("Context variable available inside tooltipTemplate."),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

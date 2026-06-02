@@ -48,8 +48,6 @@ describe("generated snapshot carries optimizer fields (build-time path)", () => 
     for (const v of expected) {
       expect(keys, `${comp}.contextVars keys`).toContain(v);
     }
-    // childInjectedVars must be gone for core components
-    expect(entry.childInjectedVars ?? []).toEqual([]);
   });
 
   it("implicit-container flag survives into the snapshot (Table)", () => {

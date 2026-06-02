@@ -1,8 +1,8 @@
 import type { ComponentMetadata } from "../../abstractions/ComponentDefs";
 
 // Standard event-payload names that XMLUI injects for every event. These are
-// not injected via contextVars / childInjectedVars, so they must be excluded
-// from the mismatch check. Extend this set when new universal event keys are added.
+// not injected via contextVars, so they must be excluded from the mismatch check.
+// Extend this set when new universal event keys are added.
 export const EVENT_PAYLOAD_RESERVED_NAMES = new Set([
   "$event", "$value", "$oldValue", "$newValue",
 ]);
@@ -29,23 +29,18 @@ export function validateInjectedVars(
     }
   }
 
-  // Also universally include childInjectedVars and contextVars metadata since
-  // our optimizer merges them for both events and templates.
-  if (metadata.childInjectedVars) {
-    metadata.childInjectedVars.forEach(v => declaredVars.add(v));
-  }
   if (metadata.contextVars) {
     Object.keys(metadata.contextVars).forEach(v => declaredVars.add(v));
   }
 
   const missing = injectedKeys.filter(k => !declaredVars.has(k));
   if (missing.length > 0) {
-    const target = eventName ? `events["${eventName}"].injectedVars` : "childInjectedVars";
+    const target = eventName ? `events["${eventName}"].injectedVars` : "contextVars";
 
     const message = `[XMLUI Lexical Scoping] Component ${componentType} injected variables (${missing.join(
       ", "
     )}) into its ${eventName ? "event" : "template"}, but they are NOT declared in its ${target} metadata. ` +
-    `This will cause the variables to be stripped during AST optimization. Please add the missing $-variables to the \`optimization.childInjectedVars\` (or \`optimization.events.${eventName}.injectedVars\`) field in the component's createMetadata call.`;
+    `This will cause the variables to be stripped during AST optimization. Please add the missing $-variables to the \`contextVars\` (or \`events.${eventName}.injectedVars\`) field in the component's createMetadata call.`;
 
     if (import.meta.env?.DEV) {
       throw new Error(message);

@@ -5,34 +5,28 @@ import {
 } from "../../../src/components-core/optimization/static-extractor";
 
 describe("extractOptimizerMetadataFromSource", () => {
-  it("extracts childInjectedVars from optimization block (single-line array)", () => {
+  it("extracts contextVars keys (single-line object)", () => {
     const source = `
       export const ListMd = createMetadata({
-        optimization: {
-          childInjectedVars: ["$item", "$itemIndex"],
-        },
+        contextVars: { $item: d("item"), $itemIndex: d("index") },
       });
     `;
-    expect(extractOptimizerMetadataFromSource(source)).toMatchObject({
-      childInjectedVars: ["$item", "$itemIndex"],
-    });
+    expect(Object.keys(extractOptimizerMetadataFromSource(source).contextVars ?? {}))
+      .toEqual(["$item", "$itemIndex"]);
   });
 
-  it("extracts childInjectedVars from optimization block (multi-line array)", () => {
+  it("extracts contextVars keys (multi-line object)", () => {
     const source = `
       export const TableMd = createMetadata({
-        optimization: {
-          childInjectedVars: [
-            "$item",
-            "$itemIndex",
-            "$row",
-          ],
+        contextVars: {
+          $item: d("item"),
+          $itemIndex: d("index"),
+          $row: d("row"),
         },
       });
     `;
-    expect(extractOptimizerMetadataFromSource(source)).toMatchObject({
-      childInjectedVars: ["$item", "$itemIndex", "$row"],
-    });
+    expect(Object.keys(extractOptimizerMetadataFromSource(source).contextVars ?? {}))
+      .toEqual(["$item", "$itemIndex", "$row"]);
   });
 
   it("extracts isImplicitContainerByDefault from optimization block", () => {
@@ -64,9 +58,6 @@ describe("extractOptimizerMetadataFromSource", () => {
   it("extracts per-event injectedVars from events block", () => {
     const source = `
       export const FormMd = createMetadata({
-        optimization: {
-          childInjectedVars: ["$data"],
-        },
         events: {
           submit: {
             injectedVars: ["$data"],
@@ -118,34 +109,28 @@ describe("extractOptimizerMetadataFromSource", () => {
       });
     `;
     const result = extractOptimizerMetadataFromSource(source);
-    expect(result.childInjectedVars).toBeUndefined();
     expect(result.isImplicitContainerByDefault).toBeUndefined();
   });
 
-  it("handles single-quoted strings in arrays", () => {
+  it("extracts contextVars keys with quoted key names", () => {
     const source = `
       export const ListMd = createMetadata({
-        optimization: {
-          childInjectedVars: ['$item', '$index'],
-        },
+        contextVars: { "$item": d("item"), '$index': d("index") },
       });
     `;
-    expect(extractOptimizerMetadataFromSource(source)).toMatchObject({
-      childInjectedVars: ["$item", "$index"],
-    });
+    const result = extractOptimizerMetadataFromSource(source);
+    expect(Object.keys(result.contextVars ?? {})).toContain("$item");
+    expect(Object.keys(result.contextVars ?? {})).toContain("$index");
   });
 
-  it("handles trailing commas", () => {
+  it("handles trailing commas in contextVars", () => {
     const source = `
       export const ListMd = createMetadata({
-        optimization: {
-          childInjectedVars: ["$item", "$index",],
-        },
+        contextVars: { $item: d("item"), $index: d("index"), },
       });
     `;
-    expect(extractOptimizerMetadataFromSource(source)).toMatchObject({
-      childInjectedVars: ["$item", "$index"],
-    });
+    const result = extractOptimizerMetadataFromSource(source);
+    expect(Object.keys(result.contextVars ?? {})).toEqual(["$item", "$index"]);
   });
 
   it("extracts per-event injectedVars regardless of field order (no first-field constraint)", () => {
@@ -170,32 +155,16 @@ describe("extractOptimizerMetadataFromSource", () => {
     expect(result.events?.cancel?.injectedVars).toEqual(["$data"]);
   });
 
-  it("ignores literal occurrences of childInjectedVars inside comments", () => {
+  it("ignores contextVars keys mentioned only inside comments (AST-based)", () => {
     const source = `
-      // This comment mentions childInjectedVars: ["$ignored"] which must not be picked up.
-      /* Block comment with childInjectedVars: ["$alsoIgnored"] */
+      // This comment mentions $ignored which must not be picked up.
+      /* Block comment with $alsoIgnored: {} */
       export const FormMd = createMetadata({
-        optimization: {
-          childInjectedVars: ["$realItem"],
-        },
-      });
-    `;
-    expect(extractOptimizerMetadataFromSource(source)).toMatchObject({
-      childInjectedVars: ["$realItem"],
-    });
-  });
-
-  it("ignores non-static childInjectedVars (computed expressions)", () => {
-    const source = `
-      const SHARED = ["$x"];
-      export const FooMd = createMetadata({
-        optimization: {
-          childInjectedVars: SHARED,
-        },
+        contextVars: { $realItem: d("real") },
       });
     `;
     const result = extractOptimizerMetadataFromSource(source);
-    expect(result.childInjectedVars).toBeUndefined();
+    expect(Object.keys(result.contextVars ?? {})).toEqual(["$realItem"]);
   });
 });
 
@@ -269,7 +238,6 @@ describe("extractOptimizerMetadataFromSource — dynamic/spread robustness (test
     `;
     const result = extractOptimizerMetadataFromSource(source);
     // Cannot be statically extracted — must degrade gracefully to an empty result.
-    expect(result.childInjectedVars).toBeUndefined();
     expect(result.isImplicitContainerByDefault).toBeUndefined();
     expect(result.events).toBeUndefined();
   });
@@ -280,7 +248,7 @@ describe("extractOptimizerMetadataFromSource — dynamic/spread robustness (test
     `;
     expect(() => extractOptimizerMetadataFromSource(source)).not.toThrow();
     const result = extractOptimizerMetadataFromSource(source);
-    expect(result.childInjectedVars).toBeUndefined();
+    expect(result.contextVars).toBeUndefined();
   });
 
   it("skips event injectedVars when the value is a non-literal reference (no throw)", () => {

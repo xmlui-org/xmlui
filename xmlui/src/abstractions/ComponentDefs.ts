@@ -626,14 +626,12 @@ export type ComponentMetadata<
    * so a template like `<Text value="{$item.name}" />` doesn't register
    * `$item` as a parent dependency.
    */
-  childInjectedVars?: readonly string[];
-
   /**
    * Names of variables that are injected, but whose values are unstable
-   * across re-renders (re-created objects, etc.). This acts like
-   * `childInjectedVars` for static analysis locally (ignoring them),
-   * but flags them to be EXCLUDED from implicit pass-through into deep
-   * container scopes to maintain `React.memo` stability.
+   * across re-renders (re-created objects, etc.). Acts like `contextVars`
+   * for static analysis locally (ignoring them), but flags them to be
+   * EXCLUDED from implicit pass-through into deep container scopes to
+   * maintain `React.memo` stability.
    */
   unstableChildInjectedVars?: readonly string[];
 
@@ -753,9 +751,7 @@ export type ComponentMetadata<
  */
 export type OptimizerMetadataView = {
   isImplicitContainerByDefault?: boolean;
-  childInjectedVars?: readonly string[];
   unstableChildInjectedVars?: readonly string[];
-  /** Only the keys of contextVars are read (for extension-package components). */
   contextVars?: Record<string, unknown>;
   /**
    * `description` is included so that both `ComponentEventMetadata` and

@@ -105,6 +105,11 @@ const APIS_DESC = {
     description: "Returns true when the displayed text overflows the bounds of this heading component.",
   },
 };
+// Context vars injected into the anchorTemplate slot (see HeadingNative render).
+const ANCHOR_CONTEXT_VARS = {
+  $anchorId: d("The generated id of the current heading anchor."),
+  $anchorHref: d("The href (#id) of the current heading anchor."),
+};
 
 export const HeadingMd = createMetadata({
   status: "stable",
@@ -135,6 +140,7 @@ export const HeadingMd = createMetadata({
     anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
@@ -179,6 +185,7 @@ export const H1Md = createMetadata({
     anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H1}`]: "$fontSize-2xl",
@@ -212,6 +219,7 @@ export const H2Md = createMetadata({
     anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H2}`]: "$fontSize-xl",
@@ -245,6 +253,7 @@ export const H3Md = createMetadata({
     anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H3}`]: "$fontSize-lg",
@@ -278,6 +287,7 @@ export const H4Md = createMetadata({
     anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H4}`]: "$fontSize-base",
@@ -311,6 +321,7 @@ export const H5Md = createMetadata({
     anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H5}`]: "$fontSize-sm",
@@ -344,6 +355,7 @@ export const H6Md = createMetadata({
     anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H6}`]: "$fontSize-xs",

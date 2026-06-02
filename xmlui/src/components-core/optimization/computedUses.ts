@@ -279,7 +279,7 @@ interface ComputeUsesContext {
   disableNarrowing?: boolean;
   /** Variables injected into this scope by an ancestor component (e.g. $item, $context). */
   injectedVarsScope?: ReadonlySet<string>;
-  /** Component metadata lookup — provides childInjectedVars, isImplicitContainerByDefault, etc. */
+  /** Component metadata lookup — provides contextVars, isImplicitContainerByDefault, etc. */
   metadataLookup?: (type: string) => OptimizerMetadataView | undefined;
   /**
    * App-level globals (Globals.xs vars + functions). They resolve through the
@@ -471,14 +471,7 @@ function computeUsesInternal(
   const childGlobalDeps = new Set<string>();
 
   const childInjected = [
-    ...(metadata?.childInjectedVars ?? []),
     ...(metadata?.unstableChildInjectedVars ?? []),
-    // metadata.contextVars keys are the primary injected-var declaration for core
-    // components (post-migration). Extension-package components that still use
-    // `optimization.childInjectedVars` are also covered by the first spread above;
-    // for those without a childInjectedVars entry (e.g. Masonry, ReactFlow) these
-    // keys are the ONLY optimizer hint — without them $item/$itemIndex inside their
-    // templates would incorrectly count as parent-scope dependencies.
     ...Object.keys(metadata?.contextVars ?? {}),
   ];
   const childScope = childInjected.length > 0

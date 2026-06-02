@@ -196,7 +196,7 @@ export function extractScopedState<T extends Record<string, any>>(
   // they are picked up even if not enumerable (e.g. from a Proxy prototype).
   //
   // DRIFT WARNING: This list duplicates knowledge encoded in each component's
-  // createMetadata({ optimization: { childInjectedVars } }) declaration.
+  // createMetadata({ contextVars: { ... } }) declaration.
   // When a new $-prefixed framework variable is introduced in a component,
   // add it here as well. The canonical source of truth is the component
   // metadata (e.g. List's `$item`/`$itemIndex`, Form's `$data`, Table's `$row`).
