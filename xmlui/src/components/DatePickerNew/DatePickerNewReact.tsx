@@ -20,7 +20,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./DatePickerNew.module.scss";
 import { useIsMobile } from "./useIsMobile";
@@ -1067,6 +1067,9 @@ export const DatePicker = memo(
   const mobileJumpPendingRef = useRef(false);
   const focusedWithinRef = useRef(false);
 
+  // Stable composed ref for the root (forwarded ref + internal rootRef).
+  const composedRootRef = useComposedRefs(ref, rootRef);
+
   const [internalValue, setInternalValue] = useState<DateValue[]>(() =>
     toDateValues(controlledValue ?? initialValue, mode, dateFormat),
   );
@@ -1480,7 +1483,7 @@ export const DatePicker = memo(
       positioning={{ placement: "bottom-start", sameWidth: false }}
     >
       <div
-        ref={composeRefs(ref, rootRef)}
+        ref={composedRootRef}
         className={cx(styles.root, widthClass(width), className)}
         style={style}
         data-mode={mode}
