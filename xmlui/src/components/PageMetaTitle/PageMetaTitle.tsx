@@ -13,6 +13,7 @@ export const PageMetaTitleMd = createMetadata({
   props: {
     value: {
       description: `This property sets the page's title to display in the browser tab.`,
+      valueType: "string",
       defaultValue: defaultProps.title,
     },
     noSuffix: {

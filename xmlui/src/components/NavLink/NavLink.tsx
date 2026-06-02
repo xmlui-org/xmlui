@@ -24,7 +24,7 @@ export const NavLinkMd = createMetadata({
     },
   },
   props: {
-    to: d(`This property defines the URL of the link.`),
+    to: d(`This property defines the URL of the link.`, undefined, "url"),
     enabled: dEnabled(),
     active: {
       description:
@@ -70,6 +70,8 @@ export const NavLinkMd = createMetadata({
     },
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
+      undefined,
+      "icon",
     ),
     iconAlignment: {
       description:

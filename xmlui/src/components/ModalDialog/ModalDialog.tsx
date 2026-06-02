@@ -34,9 +34,10 @@ export const ModalDialogMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.fullScreen,
     },
-    title: d(`Provides a prestyled heading to display the intent of the dialog.`),
+    title: d(`Provides a prestyled heading to display the intent of the dialog.`, undefined, "string"),
     titleTemplate: {
       description: "A custom template to render the dialog title.",
+      valueType: "ComponentDef",
     },
     closeButtonVisible: {
       description: `Shows (\`true\`) or hides (\`false\`) the visibility of the close button on the dialog.`,

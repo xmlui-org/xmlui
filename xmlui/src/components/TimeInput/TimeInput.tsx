@@ -45,7 +45,10 @@ export const TimeInputMd = createMetadata({
     },
   },
   props: {
-    initialValue: dInitialValue(),
+    initialValue: {
+      ...dInitialValue(),
+      valueType: "string",
+    },
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
@@ -75,7 +78,7 @@ export const TimeInputMd = createMetadata({
     },
     clearIcon: {
       description: "The icon to display in the clear button.",
-      valueType: "string",
+      valueType: "icon",
     },
     clearToInitialValue: {
       description: "Whether the clear button resets the time input to its initial value",

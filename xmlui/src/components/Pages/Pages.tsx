@@ -21,6 +21,8 @@ export const PageMd = createMetadata({
     //TODO illesg rename to path
     url: d(
       `The URL of the route associated with the content. If not set, the page is not available.`,
+      undefined,
+      "url",
     ),
     // NOTE: This is experimental
     searchIndexable: {
@@ -78,6 +80,7 @@ export const PagesMd = createMetadata({
   props: {
     fallbackPath: {
       description: `The fallback path when the current URL does not match any of the paths of the pages.`,
+      valueType: "url",
       defaultValue: defaultProps.fallbackPath,
     },
     defaultScrollRestoration: {

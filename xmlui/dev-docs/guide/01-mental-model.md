@@ -219,28 +219,30 @@ flowchart TB
 
 ### Phase 4: State Composition
 
-When a node routes through `StateContainer`, the framework composes the expression state in a few steps. The source groups are useful for understanding where values come from, but they are not a simple "larger number always wins" precedence ladder. Collision precedence is determined by the final merge order used by `StateContainer`.
+When a node routes through `StateContainer`, the framework composes the expression state from the same six sources described in [03-container-state.md](./03-container-state.md#state-composition-the-6-layers). The layer numbers identify the source groups; avoid using them as shorthand for "higher" or "lower" state. For name collisions, the final merge order used by `StateContainer` determines which value is visible.
 
-| Source group               | What it contains                                                                                          | Example                                                                                           |
-| -------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Parent state               | State inherited from the parent container, scoped by the `uses` prop                                      | A parent's `userData` variable inherited by a child (when `uses="userData"` or `uses` is not set) |
-| Context variables          | Iteration variables and slot properties                                                                   | `$item`, `$itemIndex` inside an `<Items>` loop                                                     |
-| Global variables           | App-wide state owned by the root container and passed down                                                | `global.count="{0}"` or `global.theme="{'dark'}"`                                                 |
-| Local variables            | Variables declared with `var.` or `<variable>` tags — resolved in two passes to handle forward references | `var.total="{price * quantity}"`                                                                  |
-| Component reducer and APIs | Loader results, event progress flags, component state from `updateState`, registered component APIs       | `DataSource` results, `submitInProgress`, `myInput.focus()`                                       |
-| Routing params             | Route-derived values injected after the main state groups                                                 | `$pathname`, `$routeParams`                                                                       |
+| Layer | What it provides | Key detail |
+| ----- | ---------------- | ---------- |
+| 1. Parent state | Variables inherited from the parent container | Scoped by `uses`: all, some, or none |
+| 2. Component reducer state | Loader results, event handler flags, component state from `updateState` | Managed by the container reducer |
+| 3. Component APIs | Methods registered by child components via `registerComponentApi` | Keyed by the child's `id` string |
+| 4. Context variables | Iteration variables, routing params, and slot props | `$item`, `$itemIndex`, `$pathname`, `$routeParams`, `$queryParams` |
+| 5. Local variables | Variables declared with `var.*`, functions, and script variables | Resolved in two passes to handle forward references |
+| 6. Global variables | App-wide variables owned by the root container | Passed down as `parentGlobalVars`; one source of truth |
 
-The final merged state is a single flat object available to all expressions within that container's scope. For name collisions, local/runtime state wins over globals. This is why a component-local `var.count` shadows an app-level `global.count` inside that component:
+After all six sources are merged, a post-processing step resolves `__liveApiRef__` sentinels — placeholders stored when an event handler assigns a variable to a component API — into their actual current values.
+
+The final merged state is a single flat object available to all expressions within that container's scope. For a simple local collision, a component-local `var.count` shadows an inherited parent `count` inside that component:
 
 ```xml
-<App global.count="{0}">
+<App var.count="{0}">
   <Button var.count="{0}" onClick="count++">
     Local count: {count}
   </Button>
 </App>
 ```
 
-Inside the `Button`, `{count}` reads the local `var.count`, and `count++` updates the local count. The app-level global `count` still exists and remains visible in containers that do not define a local `count`.
+Inside the `Button`, `{count}` reads the local `var.count`, and `count++` updates the local count. The app-level `count` still exists in the parent container and remains visible in child containers that inherit it without defining their own `count`.
 
 **Two-pass variable resolution** — Local variables are resolved in two passes before the final expression state is assembled. The first pass pre-resolves variables that may reference each other (forward references). The second pass finalizes all values using the pre-resolved context and a persistent memoization cache.
 
@@ -258,14 +260,16 @@ Inside the `Button`, `{count}` reads the local `var.count`, and `count++` update
 
 ```mermaid
 flowchart TB
-  parent["1. Parent state<br/>inherited via uses prop<br/>merged first<br/>example: userData from parent container"]
-  context["2. Context variables<br/>iteration and slot vars<br/>shadows parent state<br/>example: $item, $itemIndex"]
-  globals["3. Global variables<br/>owned by root container and passed down<br/>shadows parent/context values with the same key<br/>example: global.count, global.theme"]
-  local["4. Local/runtime component state<br/>declared with var.*<br/>includes reducer state and registered component APIs<br/>shadows globals with the same key<br/>example: local var.count shadows global.count"]
-  routing["5. Routing params<br/>route-derived values applied last<br/>example: $pathname, $routeParams"]
+  parent["1. Parent state<br/>inherited via uses prop<br/>example: userData from parent container"]
+  reducer["2. Component reducer state<br/>loader results, event flags, updateState values<br/>example: submitInProgress"]
+  apis["3. Component APIs<br/>registered child component methods<br/>example: myInput.focus()"]
+  context["4. Context variables<br/>iteration, routing, and slot vars<br/>example: $item, $itemIndex, $pathname"]
+  local["5. Local variables<br/>var.*, functions, and script variables<br/>resolved in two passes<br/>example: var.total"]
+  globals["6. Global variables<br/>root-owned app-wide state<br/>example: global.count, global.theme"]
+  liveRefs["Live-reference resolution<br/>post-processing for __liveApiRef__ sentinels"]
   combined["Combined flat state object<br/>available to expressions"]
 
-  parent --> context --> globals --> local --> routing --> combined
+  parent --> reducer --> apis --> context --> local --> globals --> liveRefs --> combined
 ```
 
 ### Phase 5: Expression Evaluation

@@ -34,6 +34,8 @@ export const TileGridMd = createMetadata({
     data: d(
       `The array of items to render as tiles. Each item is exposed as [\`$item\`](#item) ` +
         `inside the tile template.`,
+      undefined,
+      "any",
     ),
     itemWidth: {
       description: "Fixed width of each tile, e.g. `\"120px\"`.",
@@ -87,6 +89,8 @@ export const TileGridMd = createMetadata({
     syncWithVar: d(
       `The name of a global variable to synchronize the grid's selection state with. ` +
         `The named variable must reference an object; the grid will read from and write to its \`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
+      undefined,
+      "string",
     ),
     refreshOn: d(
       `An optional value that, when changed, forces all visible tiles to re-render so their ` +
@@ -134,32 +138,84 @@ export const TileGridMd = createMetadata({
   },
 
   events: {
-    selectionDidChange: d(
-      "Fired when the selection changes. Receives the array of currently selected items.",
-    ),
-    itemDoubleClick: d("Fired when a tile is double-clicked. Receives the data item."),
-    cutAction: d(
-      "Fired when the user presses Ctrl/Cmd+X. " +
+    selectionDidChange: {
+      description: "Fired when the selection changes. Receives the array of currently selected items.",
+      signature: "selectionDidChange(selectedItems: any[], selectedIds: string[]): void",
+      parameters: {
+        selectedItems: "Array of selected tile data items.",
+        selectedIds: "Array of selected tile IDs.",
+      },
+    },
+    itemDoubleClick: {
+      description: "Fired when a tile is double-clicked. Receives the data item.",
+      signature: "itemDoubleClick(item: any, itemIndex: number): void",
+      parameters: {
+        item: "The double-clicked tile data item.",
+        itemIndex: "The zero-based index of the tile item.",
+      },
+    },
+    cutAction: {
+      description:
+        "Fired when the user presses Ctrl/Cmd+X. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-    ),
-    copyAction: d(
-      "Fired when the user presses Ctrl/Cmd+C. " +
+      signature: "cutAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {
+        focusedItem: "The currently focused tile data item, or null if none is focused.",
+        selectedItems: "Array of selected tile data items.",
+        selectedIds: "Array of selected tile IDs.",
+      },
+    },
+    copyAction: {
+      description:
+        "Fired when the user presses Ctrl/Cmd+C. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-    ),
-    pasteAction: d(
-      "Fired when the user presses Ctrl/Cmd+V. " +
+      signature: "copyAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {
+        focusedItem: "The currently focused tile data item, or null if none is focused.",
+        selectedItems: "Array of selected tile data items.",
+        selectedIds: "Array of selected tile IDs.",
+      },
+    },
+    pasteAction: {
+      description:
+        "Fired when the user presses Ctrl/Cmd+V. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-    ),
-    deleteAction: d(
-      "Fired when the user presses the Delete key. " +
+      signature: "pasteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {
+        focusedItem: "The currently focused tile data item, or null if none is focused.",
+        selectedItems: "Array of selected tile data items.",
+        selectedIds: "Array of selected tile IDs.",
+      },
+    },
+    deleteAction: {
+      description:
+        "Fired when the user presses the Delete key. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-    ),
-    selectAllAction: d(
-      "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.",
-    ),
-    contextMenu: d(
-      "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.",
-    ),
+      signature: "deleteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {
+        focusedItem: "The currently focused tile data item, or null if none is focused.",
+        selectedItems: "Array of selected tile data items.",
+        selectedIds: "Array of selected tile IDs.",
+      },
+    },
+    selectAllAction: {
+      description: "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.",
+      signature: "selectAllAction(selectedItems: any[], selectedIds: string[]): void",
+      parameters: {
+        selectedItems: "Array of selected tile data items.",
+        selectedIds: "Array of selected tile IDs.",
+      },
+    },
+    contextMenu: {
+      description:
+        "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.",
+      signature: "contextMenu(item: any, itemIndex: number, event: MouseEvent): void",
+      parameters: {
+        item: "The right-clicked tile data item.",
+        itemIndex: "The zero-based index of the tile item.",
+        event: "The mouse event object.",
+      },
+    },
   },
 
   contextVars: {
