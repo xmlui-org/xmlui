@@ -470,6 +470,15 @@ This event fires after the app has completed any navigation (including Link clic
 - `to`: The path that was navigated to.
 - `queryParams`: Query parameters (only available for programmatic navigation).
 
+### `error` [#error]
+
+This event fires whenever the framework signals an unhandled error (loader failure, handler exception, or render-time throw). The handler receives the structured `AppError` and an event-like object whose `preventDefault()` suppresses the default toast. By default the toast is shown first; the handler can also return `false` to suppress the toast. Use this hook for centralised telemetry or custom error UI.
+
+**Signature**: `(error: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>`
+
+- `error`: The structured `AppError` (code, category, retryable, correlationId, data).
+- `event`: Cancellable event payload. Call `event.preventDefault()` to suppress the toast.
+
 ### `keyDown` [#keydown]
 
 This event fires when a key is pressed while the `App` has focus or when the event reaches the app level without being consumed by a child component.

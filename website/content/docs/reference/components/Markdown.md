@@ -397,10 +397,10 @@ The component itself cannot be styled, but the components that render the final 
 | [border](/docs/styles-and-themes/common-units/#border)-HtmlThead | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-Li-markdown | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-Ol-markdown | *none* | *none* |
-| [border](/docs/styles-and-themes/common-units/#border)-Table-markdown | 1px solid $borderColor | 1px solid $borderColor |
+| [border](/docs/styles-and-themes/common-units/#border)-Table-markdown | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-Td-markdown | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-Th-markdown | *none* | *none* |
-| [border](/docs/styles-and-themes/common-units/#border)-Tr-markdown | 1px solid $borderColor | 1px solid $borderColor |
+| [border](/docs/styles-and-themes/common-units/#border)-Tr-markdown | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-Ul-markdown | *none* | *none* |
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-Admonition-markdown | *none* | *none* |
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-Blockquote-markdown | *none* | *none* |
@@ -411,7 +411,7 @@ The component itself cannot be styled, but the components that render the final 
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-Table-markdown | *none* | *none* |
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-Td-markdown | *none* | *none* |
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-Th-markdown | *none* | *none* |
-| [borderBottom](/docs/styles-and-themes/common-units/#border)-Tr-markdown | *none* | *none* |
+| [borderBottom](/docs/styles-and-themes/common-units/#border)-Tr-markdown | 1px solid $borderColor | 1px solid $borderColor |
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-Ul-markdown | *none* | *none* |
 | [borderBottomColor](/docs/styles-and-themes/common-units/#color)-Admonition-markdown | *none* | *none* |
 | [borderBottomColor](/docs/styles-and-themes/common-units/#color)-Blockquote-markdown | *none* | *none* |
@@ -578,6 +578,7 @@ The component itself cannot be styled, but the components that render the final 
 | [borderLeftWidth](/docs/styles-and-themes/common-units/#size-values)-Ul-markdown | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Admonition-markdown | $space-2 | $space-2 |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Blockquote-markdown | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Table-markdown | $borderRadius | $borderRadius |
 | [borderRight](/docs/styles-and-themes/common-units/#border)-Admonition-markdown | *none* | *none* |
 | [borderRight](/docs/styles-and-themes/common-units/#border)-Blockquote-markdown | *none* | *none* |
 | [borderRight](/docs/styles-and-themes/common-units/#border)-Details-markdown | *none* | *none* |
@@ -786,7 +787,7 @@ The component itself cannot be styled, but the components that render the final 
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Td-markdown | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Text | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Text-markdown | $fontSize | $fontSize |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-Th-markdown | $fontSize-sm | $fontSize-sm |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-Th-markdown | $fontSize-tiny | $fontSize-tiny |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Thead-markdown | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Tr-markdown | *none* | *none* |
 | [fontStretch](/docs/styles-and-themes/common-units/#fontStretch)-Text | *none* | *none* |
@@ -852,8 +853,8 @@ The component itself cannot be styled, but the components that render the final 
 | [padding](/docs/styles-and-themes/common-units/#size-values)-Li-markdown | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-Ol-markdown | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-Table-markdown | *none* | *none* |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-Td-markdown | $space-2 | $space-2 |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-Th-markdown | $space-2 | $space-2 |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-Td-markdown | $space-2 $space-4 | $space-2 $space-4 |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-Th-markdown | $space-4 $space-6 | $space-4 $space-6 |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-Ul-markdown | *none* | *none* |
 | [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-Admonition-markdown | $space-2 | $space-2 |
 | [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-Blockquote-markdown | $space-2_5 | $space-2_5 |

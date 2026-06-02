@@ -29,14 +29,21 @@ test.describe("DatePicker calendar item theming", { tag: "@website" }, () => {
 
   test("clicking the default DatePicker opens a calendar popup", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await page.getByText("Pick a date").first().click();
-    // Calendar popup renders day-of-week headers
-    await expect.poll(() => page.getByText("Su").isVisible()).toBe(true);
+    // The calendar opens from the control's non-input chrome (the editable input
+    // is reserved for typing). Click its leading padding to open.
+    await page.locator('[data-part="control"]').first().click({ position: { x: 6, y: 6 } });
+    // The opened calendar renders day-of-week headers. Both pickers keep their
+    // calendar mounted, so scope to the visible ones.
+    await expect
+      .poll(() => page.locator('[data-part="table-header"]:visible').count())
+      .toBeGreaterThan(0);
   });
 
   test("clicking the themed DatePicker opens a calendar popup", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await page.getByText("Pick a date").nth(1).click();
-    await expect.poll(() => page.getByText("Su").isVisible()).toBe(true);
+    await page.locator('[data-part="control"]').nth(1).click({ position: { x: 6, y: 6 } });
+    await expect
+      .poll(() => page.locator('[data-part="table-header"]:visible').count())
+      .toBeGreaterThan(0);
   });
 });

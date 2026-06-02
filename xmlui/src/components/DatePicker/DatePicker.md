@@ -10,7 +10,7 @@
 
 %-API-START setValue
 
-```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="506px"
+```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="180px"
 <App>
   <HStack>
     <Button
@@ -20,7 +20,7 @@
       label="Remove Date"
       onClick="picker.setValue('')" />
   </HStack>
-  <DatePicker inline id="picker" />
+  <DatePicker id="picker" />
 </App>
 ```
 
@@ -28,9 +28,9 @@
 
 %-PROP-START initialValue
 
-```xmlui-pg copy display name="Example: initialValue" height="446px"
+```xmlui-pg copy display name="Example: initialValue" height="120px"
 <App>
-  <DatePicker inline initialValue="05/25/2024" />
+  <DatePicker initialValue="05/25/2024" />
 </App>
 ```
 
@@ -38,7 +38,7 @@
 
 %-PROP-START placeholder
 
-```xmlui-pg copy display name="Example: placeholder" height="500px"
+```xmlui-pg copy display name="Example: placeholder" height="120px"
 <App>
   <DatePicker placeholder="This is a placeholder" />
 </App>
@@ -64,7 +64,7 @@
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui-pg copy display name="Example: validationStatus" height="500px"
+```xmlui-pg copy display name="Example: validationStatus" height="300px"
 <App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
@@ -77,7 +77,7 @@
 
 %-PROP-START mode
 
-```xmlui-pg copy {2-3} display name="Example: mode" height="560px"
+```xmlui-pg copy {2-3} display name="Example: mode" height="190px"
 <App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
@@ -104,10 +104,9 @@ The table below shows the available date formats:
 | yyyyMMdd   | 20240525   |
 | MMddyyyy   | 05252024   |
 
-```xmlui-pg copy display name="Example: dateFormat" height="446px"
+```xmlui-pg copy display name="Example: dateFormat" height="120px"
 <App>
   <DatePicker
-    inline
     dateFormat="dd-MM-yyyy"
     initialValue="01-01-2024"
     endDate="01-01-2027"
@@ -119,7 +118,7 @@ The table below shows the available date formats:
 
 %-PROP-START showWeekNumber
 
-```xmlui-pg copy display name="Example: showWeekNumber" height="500px"
+```xmlui-pg copy display name="Example: showWeekNumber" height="120px"
 <App>
   <DatePicker showWeekNumber="true" />
 </App>
@@ -139,9 +138,9 @@ The table below shows the available date formats:
 | Friday    | 5      |
 | Saturday  | 6      |
 
-```xmlui-pg copy display name="Example: weekStartsOn" height="446px"
+```xmlui-pg copy display name="Example: weekStartsOn" height="120px"
 <App>
-  <DatePicker inline weekStartsOn="1" />
+  <DatePicker weekStartsOn="1" />
 </App>
 ```
 
@@ -149,9 +148,9 @@ The table below shows the available date formats:
 
 %-PROP-START minValue
 
-```xmlui-pg copy display name="Example: minValue" height="446px"
+```xmlui-pg copy display name="Example: minValue" height="120px"
 <App>
-  <DatePicker inline minValue="05/24/2024" />
+  <DatePicker minValue="05/24/2024" />
 </App>
 ```
 
@@ -159,9 +158,9 @@ The table below shows the available date formats:
 
 %-PROP-START maxValue
 
-```xmlui-pg copy display name="Example: maxValue" height="446px"
+```xmlui-pg copy display name="Example: maxValue" height="120px"
 <App>
-  <DatePicker inline maxValue="05/26/2024" />
+  <DatePicker maxValue="05/26/2024" />
 </App>
 ```
 
@@ -181,10 +180,9 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 
 > [!INFO] You can use the [getDate()](/docs/globals#getdate) function to query the current date.
 
-```xmlui-pg copy display name="Example: Disable specific dates" height="446px"
+```xmlui-pg copy display name="Example: Disable specific dates" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{['05/26/2024', '05/27/2024']}"
     initialValue="05/25/2024" />
 </App>
@@ -201,44 +199,40 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 | Date interval | Disable dates between two dates (exclusive) | `{before: "05/30/2024", after: "05/20/2024"}` |
 
 
-```xmlui-pg copy display name="Example: Disable weekends" height="446px"
+```xmlui-pg copy display name="Example: Disable weekends" height="120px"
 <App>
-  <DatePicker inline disabledDates="{{dayOfWeek: [0, 6]}}" />
+  <DatePicker disabledDates="{{dayOfWeek: [0, 6]}}" />
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable date range" height="446px"
+```xmlui-pg copy display name="Example: Disable date range" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{{from: '05/20/2024', to: '05/25/2024'}}"
     initialValue="05/18/2024" />
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable dates before today" height="446px"
+```xmlui-pg copy display name="Example: Disable dates before today" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{{before: getDate()}}"
     initialValue="{getDate()}"/>
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable dates today and after" height="446px"
+```xmlui-pg copy display name="Example: Disable dates today and after" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{[getDate(), {after: getDate()}]}"
     initialValue="{getDate()}"/>
 </App>
 ```
 
 
-```xmlui-pg copy display name="Example: Complex combination" height="446px"
+```xmlui-pg copy display name="Example: Complex combination" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{[
     {dayOfWeek: [0, 6]},
     {from: '12/24/2024', to: '12/26/2024'},
@@ -254,11 +248,10 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui-pg copy {2} display name="Example: didChange" height="520px"
+```xmlui-pg copy {2} display name="Example: didChange" height="180px"
 <App var.field="(none)">
   <Text value="{field}" />
   <DatePicker
-    inline
     initialValue="{field}"
     onDidChange="(val) => field = val" />
 </App>
@@ -271,7 +264,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="540px"
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="180px"
 <App var.isFocused="false">
   <Text value="{isFocused === true
     ? 'DatePicker focused' : 'DatePicker lost focus'}"
