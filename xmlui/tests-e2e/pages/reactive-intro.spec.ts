@@ -27,7 +27,7 @@ test.describe("Pick a station", { tag: "@website" }, () => {
     },
   );
 
-  test(
+  test.skip(
     "opens the dropdown and shows tube line options",
     SKIP_REASON.OTHER(
       "api.tfl.gov.uk is an external api that we have no control over - need to leverage options",
@@ -44,7 +44,7 @@ test.describe("Pick a station", { tag: "@website" }, () => {
 test.describe("Results in a table", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "Results in a table");
 
-  test(
+  test.skip(
     "renders the Select with Bakerloo as the initial value",
     SKIP_REASON.OTHER(
       "api.tfl.gov.uk is an external api that we have no control over - need to leverage options",
@@ -56,7 +56,7 @@ test.describe("Results in a table", { tag: "@website" }, () => {
     },
   );
 
-  test(
+  test.skip(
     "opens the dropdown and shows tube line options",
     SKIP_REASON.OTHER(
       "api.tfl.gov.uk is an external api that we have no control over - need to leverage options",
