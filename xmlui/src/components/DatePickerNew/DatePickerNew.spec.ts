@@ -694,18 +694,13 @@ test.describe("Accessibility", () => {
   });
 
   test("associates its label with the input (accessible name)", async ({ page, initTestBed }) => {
-    // Behaviour-oriented adaptation of the core DatePicker's "focusable via label"
-    // test. DatePickerNew renders an Ark label that names the editable input, so the
-    // label is exposed as the input's accessible name. (Click-to-focus from the
-    // label onto the custom segment input is not wired — see the fixme below.)
+    // The label names the editable input, so it is exposed as the input's
+    // accessible name.
     await initTestBed(`<DatePickerNew testId="dp" label="Birth Date" />`);
     await expect(page.getByRole("textbox", { name: "Birth Date" })).toBeVisible();
   });
 
-  // GAP: clicking the Ark label does not move focus to the custom segment input
-  // (the label is not a native <label for> pointing at the visible input), so no
-  // focus event fires. The core DatePicker focused the field on label click.
-  test.fixme("is focusable via its label (click moves focus)", async ({ page, initTestBed }) => {
+  test("is focusable via its label (click moves focus)", async ({ page, initTestBed }) => {
     await initTestBed(`<DatePickerNew testId="dp" label="Birth Date" />`);
     await page.getByText("Birth Date").click();
     await expect(page.getByTestId("dp").locator("input").first()).toBeFocused();
@@ -752,10 +747,7 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toBe("blurred");
   });
 
-  // GAP: same root cause as the focus-via-label fixme above — clicking the Ark
-  // label does not focus the editable input, so gotFocus never fires. Re-enable
-  // once label-click focus is wired to the segment input.
-  test.fixme("fires gotFocus when the label is clicked", async ({ page, initTestBed }) => {
+  test("fires gotFocus when the label is clicked", async ({ page, initTestBed }) => {
     const { testStateDriver } = await initTestBed(
       `<DatePickerNew testId="dp" label="Pick" onGotFocus="testState = 'focused'" />`,
     );
@@ -1039,15 +1031,11 @@ test.describe("Layout & Sizing", () => {
   });
 });
 
-// GAP: when a DatePickerNew has both a `label` and a `bindTo` inside a <Form>,
-// the FormItem injects a correctly *decorated* label (e.g. "Birth Date*"), but
-// DatePickerNew ALSO renders its own ArkDatePicker.Label, producing a duplicate
-// label (qa-checklist: behavior double-wrapping). The requireLabelMode marker is
-// therefore present, but a clean single-label assertion fails on the duplicate.
-// These are kept as fixme until the component suppresses its own label inside a
-// FormItem (or otherwise integrates with the Form label decoration).
+// Inside a <Form>, a bound DatePickerNew is wrapped by FormBindingWrapper's
+// ItemWithLabel, which renders the single requireLabelMode-decorated label. The
+// component suppresses its own label in that context (no duplicate).
 test.describe("Behaviors and Parts", () => {
-  test.fixme("requireLabelMode='markRequired' shows an asterisk for required fields", async ({
+  test("requireLabelMode='markRequired' shows an asterisk for required fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1061,7 +1049,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markOptional' shows an optional tag for optional fields", async ({
+  test("requireLabelMode='markOptional' shows an optional tag for optional fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1075,7 +1063,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("requireLabelMode='markBoth' marks required and optional fields distinctly", async ({
+  test("requireLabelMode='markBoth' marks required and optional fields distinctly", async ({
     page,
     initTestBed,
   }) => {
@@ -1089,7 +1077,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(page.getByText("Optional Field")).toContainText("(Optional)");
   });
 
-  test.fixme("input requireLabelMode overrides the Form itemRequireLabelMode", async ({
+  test("input requireLabelMode overrides the Form itemRequireLabelMode", async ({
     page,
     initTestBed,
   }) => {
@@ -1103,7 +1091,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("input inherits the Form itemRequireLabelMode when not specified", async ({
+  test("input inherits the Form itemRequireLabelMode when not specified", async ({
     page,
     initTestBed,
   }) => {
