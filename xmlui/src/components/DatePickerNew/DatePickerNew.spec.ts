@@ -725,6 +725,21 @@ test.describe("Accessibility", () => {
     await page.keyboard.press("ArrowDown");
     await expect(dayCell(page, 23).first()).toBeFocused();
   });
+
+  test("Enter selects the focused day and commits the value", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<DatePickerNew testId="dp" mode="single" dateFormat="MM/dd/yyyy" initialValue="05/15/2024" />`,
+    );
+    const input = page.getByTestId("dp").locator("input").first();
+    await openCalendar(page);
+    const start = dayCell(page, 15).first();
+    await start.focus();
+    await expect(start).toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await expect(dayCell(page, 16).first()).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(input).toHaveValue("05/16/2024");
+  });
 });
 
 test.describe("Event Handling", () => {
@@ -1029,6 +1044,37 @@ test.describe("Layout & Sizing", () => {
       .evaluate((el) => el.scrollWidth > el.clientWidth + 1);
     expect(overflow).toBe(false);
   });
+
+  // GAP: unlike the core DatePicker (which leaves `width` to the framework's
+  // universal layout, so px/% sizes apply to the root), DatePickerNew declares
+  // `width` in its metadata to drive keyword sizing (100%/*/full → fullWidth,
+  // auto → autoWidth). That opt-out means a concrete px/% width is not applied to
+  // the root. Re-enable if DatePickerNew stops claiming `width` (and derives its
+  // full-width layout another way) so the framework can size the root again.
+  test.fixme("applies a px width to the root", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" width="200px" />`);
+    const { width } = (await page.getByTestId("dp").boundingBox())!;
+    expect(Math.round(width)).toBe(200);
+  });
+
+  test.fixme("applies a px width with a label", async ({ page, initTestBed }) => {
+    await initTestBed(`<DatePickerNew testId="dp" width="200px" label="Date" />`);
+    const { width } = (await page.getByTestId("dp").boundingBox())!;
+    expect(Math.round(width)).toBe(200);
+  });
+
+  test.fixme("applies a percentage width relative to its container", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Stack width="400px">
+        <DatePickerNew testId="dp" width="50%" />
+      </Stack>
+    `);
+    const { width } = (await page.getByTestId("dp").boundingBox())!;
+    expect(Math.round(width)).toBe(200);
+  });
 });
 
 // Inside a <Form>, a bound DatePickerNew is wrapped by FormBindingWrapper's
@@ -1145,6 +1191,44 @@ test.describe("Validation Feedback", () => {
     `);
     await expect(page.getByText("Select date")).toHaveCount(1);
   });
+
+  test("shows a valid icon in concise mode when the field becomes valid", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <DatePickerNew testId="dp" bindTo="input" required="{true}" validationMode="onChanged" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    await page.getByTestId("submit").click();
+    // Select a day so the required field becomes valid.
+    await openCalendar(page);
+    await dayCell(page, 15).first().click();
+    const concise = page.getByTestId("dp").locator('[class*="conciseValidation"]');
+    await expect(concise).toBeVisible();
+    await expect(concise.locator("[data-icon-name='checkmark']")).toBeVisible();
+  });
+
+  test("concise feedback shows the error message in a tooltip on hover", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <DatePickerNew testId="dp" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    await page.getByTestId("submit").click();
+    const concise = page.getByTestId("dp").locator('[class*="conciseValidation"]');
+    await expect(concise).toBeVisible();
+    await concise.hover();
+    const tooltip = page.locator("[data-tooltip-container]");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText("This field is required");
+  });
 });
 
 test.describe("Range Mode Features", () => {
@@ -1152,6 +1236,26 @@ test.describe("Range Mode Features", () => {
     await initTestBed(`<DatePickerNew testId="dp" mode="range" dateFormat="MM/dd/yyyy" />`);
     await openCalendar(page);
     await expect(page.locator('[class*="_calendarMonth_"]')).toHaveCount(2);
+  });
+
+  test("range start and end days both use the selected background", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `<DatePickerNew testId="dp" mode="range" dateFormat="MM/dd/yyyy" initialValue="{{ from: '05/10/2024', to: '05/15/2024' }}" />`,
+      {
+        testThemeVars: {
+          "backgroundColor-day-DatePickerNew--selected": "rgb(50, 100, 200)",
+        },
+      },
+    );
+    await openCalendar(page);
+    const may = page.locator('[class*="_calendarMonth_"]').nth(0);
+    const startCell = may.locator('[data-view="day"][data-range-start]').first();
+    const endCell = may.locator('[data-view="day"][data-range-end]').first();
+    await expect(startCell).toHaveCSS("background-color", "rgb(50, 100, 200)");
+    await expect(endCell).toHaveCSS("background-color", "rgb(50, 100, 200)");
   });
 
   test("range mode shows prev and next chevrons", async ({ page, initTestBed }) => {
