@@ -26,6 +26,7 @@ import styles from "./DatePickerNew.module.scss";
 import { useIsMobile } from "./useIsMobile";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId, useIsInsideFormItem } from "../FormItem/FormItemContext";
 import { Adornment } from "../Input/InputAdornment";
 
 // On mobile the calendar is a fixed full-screen sheet, so it does not need
@@ -718,6 +719,7 @@ type DateFieldProps = {
   value: DateValue | undefined;
   dateFormat: string;
   placeholder: string;
+  id?: string;
   className?: string;
   ariaLabel?: string;
   autoFocus?: boolean;
@@ -737,6 +739,7 @@ function DateField({
   value,
   dateFormat,
   placeholder,
+  id,
   className,
   ariaLabel,
   autoFocus,
@@ -954,6 +957,7 @@ function DateField({
   return (
     <input
       ref={fieldRef ?? ownRef}
+      id={id}
       className={className}
       placeholder={placeholder}
       aria-label={ariaLabel}
@@ -1015,6 +1019,17 @@ export const DatePicker = memo(
     updateState,
     registerComponentApi,
   } = props;
+
+  // When a bound DatePickerNew sits inside a <Form>, FormBindingWrapper wraps it
+  // in an ItemWithLabel that already renders the (requireLabelMode-decorated)
+  // label. In that case we must NOT render our own label too, or the field shows
+  // a duplicate label. Standalone (and bindTo-less) pickers render their own.
+  const isInsideFormItem = useIsInsideFormItem();
+  // DOM id the editable input should carry so the FormItem label's `htmlFor`
+  // connects to the actual input (label-click focus + accessible name). Falls back
+  // to a generated id when not inside a FormItem. (Kept off the explicit `id`
+  // prop, which stays on the Ark root, to avoid a duplicate DOM id.)
+  const fieldInputId = useFormItemInputId();
 
   const mode = toMode(rawMode);
   const isControlled = controlledValue !== undefined;
@@ -1477,8 +1492,13 @@ export const DatePicker = memo(
         onFocusCapture={handleFocusCapture}
         onBlurCapture={handleBlurCapture}
       >
-        {!inline && label && (
-          <ArkDatePicker.Label className={styles.label}>
+        {!inline && label && !isInsideFormItem && (
+          // Clicking the label focuses the editable input (Ark's label targets
+          // its own hidden input, not our custom segment field, so wire it here).
+          <ArkDatePicker.Label
+            className={styles.label}
+            onClick={() => inputRef.current?.focus()}
+          >
             {label}
           </ArkDatePicker.Label>
         )}
@@ -1526,6 +1546,7 @@ export const DatePicker = memo(
 
             <DateField
               fieldRef={inputRef}
+              id={fieldInputId}
               value={values[0]}
               dateFormat={dateFormat}
               placeholder={dateFormat.replace(/[A-Za-z]/g, (ch) => ch.toLowerCase())}
