@@ -54,7 +54,13 @@ The declaration requirements fall into two separate categories with different sc
 
 ### `contextVars` — only for components that inject into child scope
 
-Only components that push new `$`-variables into their children's scope need `contextVars`. Most primitive components (`Button`, `Text`, `Icon`) never need it. When it is needed, the declaration is **single-site**: one `contextVars: { $item: d("...") }` entry serves the optimizer, the Language Server, and the docs generator simultaneously.
+Only components that push new `$`-variables into their children's scope need `contextVars`. Most primitive components (`Button`, `Text`, `Icon`) never need it.
+
+**Two things always required:**
+1. **Runtime injection** — the renderer must physically inject the value, e.g. `<MemoizedItem contextVars={{ $item: item }} />`.
+2. **Metadata declaration** — `contextVars: { $item: d("...") }` tells the optimizer, Language Server, and docs generator about the key.
+
+These two will always be separate — the runtime code has *values*, the metadata has *keys and descriptions*. What changed is that the **metadata side is now single-site**: one `contextVars` entry replaces what was previously two separate declarations (`childInjectedVars` + `contextVars`). The U-audit.1 and U-audit.3 CI tests enforce that runtime injection and metadata stay in sync.
 
 **What to write:**
 ```ts
@@ -63,8 +69,6 @@ contextVars: {
   $isSelected: dInternal("Whether this item is currently selected."),
 },
 ```
-
-The implementation still needs to actually inject these values at render time, but on the metadata side there is only one place to declare them.
 
 ### Event `injectedVars` — applies to any component whose events pass `$`-variables
 
@@ -90,8 +94,9 @@ Since missing metadata could lead to "silent" performance degradation, the frame
 
 **Yes, for injected variables.** The framework has multi-layered guards against forgetting `contextVars` and `injectedVars`:
 
-1. **Runtime Guards (`validateInjectedVars`) — 100% Accuracy**
-   Unlike static analysis, this guard works with **real runtime values**. In development mode (`DEV`), the framework monitors the actual objects being injected into children or passed to event handlers. If it sees a key starting with `$` (e.g., `$item`) that isn't in the component's metadata, it throws an error immediately. This works regardless of how complex the component's internal file structure is or how the variable was calculated.
+1. **Runtime Guards (`validateInjectedVars`)**
+   Works with **real runtime values** in development mode (`DEV`). The framework monitors the actual objects being injected into children or passed to event handlers. If it sees a key starting with `$` (e.g., `$item`) that isn't in the component's metadata, it throws an error immediately — regardless of how the variable was calculated.
+   **Caveat:** fires only in DEV mode and only when the injection code actually executes. A component that is never rendered or whose event never fires in DEV will not be caught by this guard.
 
 2. **AST-based Build-time Extraction**
    The system that extracts metadata for the optimizer uses a **full AST parser** (Babel), not regular expressions. 
@@ -99,9 +104,10 @@ Since missing metadata could lead to "silent" performance degradation, the frame
    - **Static Literal Enforcement:** It requires that `contextVars` and `injectedVars` are defined as static literals. This ensures the optimizer can reliably "know" the dependencies without executing the code.
 
 3. **Static Drift Detection (CI Protection)**
-   The CI pipeline ensures metadata consistency via three checks in `renderer-metadata-drift.test.ts` plus a snapshot guard:
-   - **U-audit.1 / U-audit.1-ext (forward):** Scans `renderers: { slot: { contextVars: [...] } }` declarations across all components (core and extension packages) and asserts every listed `$`-key is declared in `metadata.contextVars`. AST-based via `static-extractor.ts`.
-   - **U-audit.3 (reverse):** Scans component source files for direct `$`-variable injection sites — `<MemoizedItem contextVars={{ $x }}>` JSX and event-handler `{ context: { $x } }` blocks — and asserts each `$`-key is covered by metadata. Catches the class of bugs where injection code exists but the `contextVars`/`injectedVars` declaration was forgotten. AST-based via `extractInjectedKeysFromSource`.
+   The CI pipeline ensures metadata consistency via four checks in `renderer-metadata-drift.test.ts` plus a snapshot guard:
+   - **U-audit.1 / U-audit.1-ext (forward, template slots):** Scans `renderers: { slot: { contextVars: [...] } }` declarations across all components (core and extension packages) and asserts every listed `$`-key is declared in `metadata.contextVars`. AST-based via `static-extractor.ts`.
+   - **U-audit.2 (declared → source presence):** For every `$`-var declared in `events[*].injectedVars` or `unstableChildInjectedVars`, asserts it appears as a string literal somewhere in the component's source files. Catches declared-but-unused metadata variables.
+   - **U-audit.3 (reverse, all injection sites):** Scans component source files for direct `$`-variable injection sites — `<MemoizedItem contextVars={{ $x }}>` JSX and event-handler `{ context: { $x } }` blocks — and asserts each `$`-key is covered by metadata. Catches the class of bugs where injection code exists but the metadata declaration was forgotten. AST-based via `extractInjectedKeysFromSource`. **Known gap:** only catches completely forgotten declarations; does not verify that a var is in the correct specific event's `injectedVars` (versus another event or `contextVars`), but from the optimizer's perspective all placements are equivalent.
    - **Snapshot Integrity (`check:metadata-snapshot`):** Enforces that the build-time snapshot (`xmlui-metadata-generated.js`) is identical to a fresh regeneration from source. Any drift between the committed snapshot and the source components fails CI.
 
 4. **`contextVars` as the Single Source (Full Build-Path Support)**
@@ -113,28 +119,26 @@ Since missing metadata could lead to "silent" performance degradation, the frame
    internal via `dInternal`). `optimization.childInjectedVars` has been removed from the
    framework entirely.
 
----
+## 5. Managing Developer Burden: The Strategy of Safe Duplication
 
-## 5. Ideas for Reducing Developer Burden
+While the implementation-to-metadata gap remains (writing the key in code and the key+description in metadata), the framework's strategy is to prioritize **Safe Duplication over Fragile Automation**.
 
-The remaining duplication burden is specifically the **event `injectedVars`** string arrays:
-a developer writes `dispatchEvent({ $isHovered: true })` in the implementation and must
-also write `injectedVars: ["$isHovered"]` in `createMetadata`. The `contextVars` duplication
-has already been eliminated (single declaration with `d()`/`dInternal()`).
+### Why "Safe Duplication" is the Intended State
+The primary "burden" of duplication is the risk of desynchronization. Because **U-audit.3** and the **Runtime Guards** catch missing metadata during development and CI, the cost of duplication is reduced to simply "typing the name twice." 
 
-High-level ideas to eliminate the remaining event `injectedVars` duplication:
+Further automation (eliminating the manual declaration) is currently considered a lower priority for several reasons:
 
-1. **Auto-generation from TypeScript Interfaces**
-   A build step (or Vite plugin) could extract event payload types from the component's
-   TypeScript definitions and automatically populate the per-event `injectedVars` arrays in
-   the compiled metadata.
+1.  **Metadata Richness:** `contextVars` requires human-written descriptions for the documentation generator and Language Server. Even if we could infer the `$key` from code, we would still need a place to write the `description`. Metadata is the natural home for this.
+2.  **Explicit vs. Magic:** Explicit declarations in `createMetadata` serve as a clear contract for the component. Auto-generation adds "build-time magic" that can be difficult to debug when it fails or infers the wrong scope.
+3.  **Verification is Sufficient:** The "Verify" step (CI tests) provides 90% of the value of automation (prevention of silent performance bugs) with 10% of the complexity.
 
-2. **Unified Definition API (Single Source of Truth)**
-   Introducing a wrapper that registers both the runtime event callback signature and the
-   optimizer `injectedVars` declaration in one call, eliminating the need to write the same
-   variable name twice.
+### Comparison of Potential Next Steps
 
-3. **Advanced AST Inference**
-   The static analyzer could be enhanced to infer injected event variables directly from
-   `dispatchEvent(...)` call sites in the component's logic, eventually removing the need for
-   manual `injectedVars` declarations for common patterns.
+| Approach | Effort | Risk | Verdict |
+| :--- | :--- | :--- | :--- |
+| **Verify (Current)** | Low | None | **Recommended.** CI catches all mistakes; manual metadata remains the source of truth for docs. |
+| **Unified API** | High | High | Changing the authoring model for all components to save a few lines of strings is likely not worth the migration cost. |
+| **Auto-generation** | High | High | Inferring "intent to inject" from AST is fragile. Inferring from TS types doesn't provide the descriptions needed for documentation. |
+
+**Conclusion:** The current system of **Manual Declaration + CI Enforcement** is the stable, intended architecture for XMLUI component metadata. It ensures performance without sacrificing the quality of documentation or the simplicity of the build pipeline.
+

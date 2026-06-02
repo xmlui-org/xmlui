@@ -6,6 +6,7 @@ import { DataSourceMd } from "../../../src/components/DataSource/DataSource";
 import { getOptimizerMetadata } from "../../../src/components-core/optimization/metadataLookup";
 import { extractScopedState, narrowGlobalVars } from "../../../src/components-core/rendering/ContainerUtils";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
+import type { CodeDeclaration } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { Parser } from "../../../src/parsers/scripting/Parser";
 import { collectCodeBehindFromSource } from "../../../src/parsers/scripting/code-behind-collect";
 
@@ -2473,10 +2474,11 @@ describe.skipIf(skipIfDisabled)("computedGlobalUses", () => {
     expect(comp.computedGlobalUses).toBeUndefined();
   });
 
-  it("disableNarrowing via parent function: computedGlobalUses is NOT set", () => {
-    // A container that depends on a parent-scope function while nextDisableNarrowing=true
-    // is considered unsafe to narrow — the same safeToNarrow condition blocks both
-    // computedUses and computedGlobalUses.
+  it("disableNarrowing via parent function: computedGlobalUses IS set when parent fn is resolvable (§10)", () => {
+    // §10 relaxed gate: when all called parent functions are resolvable (their global
+    // reads are known), computedGlobalUses CAN be narrowed even with nextDisableNarrowing=true.
+    // The child calls getFilter() which reads sortBy — so computedGlobalUses = ["sortBy"].
+    // This is the correct §10 behaviour: no stale renders, no over-subscription.
     const { functions: parentFunctions } = collectCodeBehindFromSource(
       "parent.xs",
       "function getFilter() { return sortBy; }",
@@ -2494,9 +2496,10 @@ describe.skipIf(skipIfDisabled)("computedGlobalUses", () => {
     });
     computeUsesForTreeWithGlobals(parent);
     const child = (parent.children as ComponentDef[])[0];
-    // child depends on parent function getFilter while narrowing is disabled
-    // → safeToNarrow=false → computedGlobalUses must be undefined
-    expect(child.computedGlobalUses).toBeUndefined();
+    // §10: parent fn getFilter is resolvable → safeToNarrowGlobals=true
+    // → computedGlobalUses must be annotated with sortBy (from both direct read and parent fn)
+    expect(child.computedGlobalUses).toBeDefined();
+    expect(child.computedGlobalUses).toContain("sortBy");
   });
 
   it("explicit-uses container reading a global gets computedGlobalUses (improvement #2)", () => {
@@ -2831,3 +2834,188 @@ describe.skipIf(skipIfDisabled)(
     });
   },
 );
+
+// ---------------------------------------------------------------------------
+// §10 — parent-function global reads propagation
+// ---------------------------------------------------------------------------
+//
+// When a child component calls a parent code-behind function that reads
+// Globals.xs variables, those global reads must be propagated into the child's
+// computedGlobalUses so the child only re-renders when those specific globals
+// change (not on every global change).
+// ---------------------------------------------------------------------------
+
+/**
+ * Parse an arrow expression source string into the ArrowExpression AST node
+ * suitable for use in node.scriptCollected.functions.
+ *
+ * Functions stored in scriptCollected.functions are raw ArrowExpression objects
+ * (type: T_ARROW_EXPRESSION). collectScriptFunctionDeps wraps them internally as
+ * { [PARSED_MARK_PROP]: true, tree: fn }, so fn must be the ArrowExpression node.
+ * Parser.parseStatements() for arrow sources returns a statement whose .expr is
+ * the ArrowExpression.
+ */
+function parseFn(source: string): CodeDeclaration {
+  const parser = new Parser(source);
+  const [stmt] = parser.parseStatements();
+  return (stmt as any).expr as unknown as CodeDeclaration;
+}
+
+describe.skipIf(skipIfDisabled)("§10 parent-function global reads propagation", () => {
+  // Shared runner with a fixed appGlobalNames set for all §10 tests.
+  const globals = new Set(["sortBy", "g1", "g2", "events", "fileClipboard", "sessionId", "unrelated"]);
+  const run = (root: any) => originalComputeUsesForTree(root, getOptimizerMetadata, globals);
+
+  it("child calling parent fn that reads a global gets that global in computedGlobalUses", () => {
+    // §10.1 canonical scenario:
+    //   Parent (explicit container) declares doSort which reads global 'sortBy'.
+    //   Child (implicit container, Table) calls doSort in its props.
+    //   Expected: child.computedGlobalUses contains 'sortBy'.
+    const child = node("Table", { props: { data: "{doSort(items)}" } });
+    const parent = node("Container", {
+      uses: [],
+      scriptCollected: {
+        functions: { doSort: parseFn("(items) => items.sort((a, b) => sortBy === 'name' ? 0 : 1)") },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [child],
+    });
+
+    run(parent);
+
+    expect(child.computedGlobalUses).toBeDefined();
+    expect(child.computedGlobalUses).toContain("sortBy");
+    expect(child.computedGlobalUses).not.toContain("events");
+    expect(child.computedGlobalUses).not.toContain("fileClipboard");
+    expect(child.computedGlobalUses).not.toContain("sessionId");
+  });
+
+  it("parent fn that only writes a global does not add that global to child computedGlobalUses", () => {
+    // §10.4-A: write-only globals must not inflate computedGlobalUses of callers.
+    const child = node("Table", { props: { data: "{doUpdate()}" } });
+    const parent = node("Container", {
+      uses: [],
+      scriptCollected: {
+        functions: { doUpdate: parseFn("() => { sortBy = 'name'; }") },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [child],
+    });
+
+    run(parent);
+
+    expect(child.computedGlobalUses ?? []).not.toContain("sortBy");
+  });
+
+  it("mutually recursive parent fns propagate the full union of global reads to the child", () => {
+    // §10.4-B: mutual recursion — both doA and doB must contribute their reads.
+    const child = node("Table", { props: { data: "{doA()}" } });
+    const parent = node("Container", {
+      uses: [],
+      scriptCollected: {
+        functions: {
+          doA: parseFn("() => g1 + doB()"),  // reads g1, calls doB
+          doB: parseFn("() => g2 + doA()"),  // reads g2, calls doA (mutual recursion)
+        },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [child],
+    });
+
+    run(parent);
+
+    expect(child.computedGlobalUses).toBeDefined();
+    expect(child.computedGlobalUses).toContain("g1");
+    expect(child.computedGlobalUses).toContain("g2");
+    expect(child.computedGlobalUses).not.toContain("unrelated");
+  });
+
+  it("stale-render regression: child calling doSort MUST include sortBy in computedGlobalUses", () => {
+    // Guards against reintroducing the §10.1 stale-render bug where
+    // dependsOnParentFunction=true blocked computedGlobalUses entirely.
+    const child = node("Table", {
+      props: { data: "{doSort(items)}", columns: "{columns}" },
+    });
+    const parent = node("Container", {
+      uses: [],
+      scriptCollected: {
+        functions: {
+          doSort: parseFn("(items) => items.slice().sort((a,b) => sortBy === 'asc' ? 1 : -1)"),
+        },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [child],
+    });
+
+    run(parent);
+
+    expect(child.computedGlobalUses).toBeDefined();
+    expect(child.computedGlobalUses).toContain("sortBy");
+    expect(child.computedGlobalUses).not.toContain("events");
+    expect(child.computedGlobalUses).not.toContain("fileClipboard");
+    expect(child.computedGlobalUses).not.toContain("sessionId");
+  });
+
+  it("transitive parent call chain propagates global reads to the child", () => {
+    // §10.4-C: doSort → helperSort → reads sortBy; child calls doSort.
+    const child = node("Table", { props: { data: "{doSort(items)}" } });
+    const parent = node("Container", {
+      uses: [],
+      scriptCollected: {
+        functions: {
+          doSort: parseFn("(items) => helperSort(items)"),
+          helperSort: parseFn("(items) => items.sort(() => sortBy)"),
+        },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [child],
+    });
+
+    run(parent);
+
+    expect(child.computedGlobalUses).toBeDefined();
+    expect(child.computedGlobalUses).toContain("sortBy");
+    expect(child.computedGlobalUses).not.toContain("unrelated");
+  });
+
+  it("child that locally declares doSort must NOT get parent doSort global reads", () => {
+    // §10.4 over-subscription guard: fold uses parentDependencies (post-keepDep),
+    // so a local function declaration that shadows the parent fn name is excluded.
+    const child = node("Table", {
+      props: { data: "{doSort(items)}" },
+      scriptCollected: {
+        functions: { doSort: parseFn("(items) => items") },  // local, reads nothing
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+    });
+    const parent = node("Container", {
+      uses: [],
+      scriptCollected: {
+        functions: {
+          doSort: parseFn("(items) => items.sort((a, b) => sortBy === 'name' ? 0 : 1)"),
+        },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [child],
+    });
+
+    run(parent);
+
+    expect(child.computedGlobalUses ?? []).not.toContain("sortBy");
+    expect(child.computedGlobalUses ?? []).not.toContain("unrelated");
+  });
+});

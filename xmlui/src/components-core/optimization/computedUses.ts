@@ -191,7 +191,7 @@ function depsOfRecord(
 function collectScriptFunctionDeps(
   functions: Record<string, CodeDeclaration>,
   localNames: ReadonlySet<string>,
-): { all: Set<string>; reads: Set<string> } {
+): { all: Set<string>; reads: Set<string>; perFunction: Map<string, { all: Set<string>; reads: Set<string> }> } {
   const allDeps = new Set<string>();
   const readDeps = new Set<string>();
   // ⚠ UNION-ONLY CACHE: results cached here may be incomplete for per-function queries.
@@ -244,13 +244,19 @@ function collectScriptFunctionDeps(
     return { all: fnAll, reads: fnReads };
   }
 
+  const perFunction = new Map<string, { all: Set<string>; reads: Set<string> }>();
   for (const name of Object.keys(functions)) {
-    const { all, reads } = analyzeOne(name, new Set());
-    addAll(allDeps, all);
-    addAll(readDeps, reads);
+    // Delete the stale cache entry so this top-level pass runs fresh, recovering
+    // any deps that were cut by mutual-recursion visited-sets in earlier calls.
+    // (see UNION-ONLY CACHE warning above — §10.4-B regression fix)
+    fnCache.delete(name);
+    const result = analyzeOne(name, new Set());
+    perFunction.set(name, result);
+    addAll(allDeps, result.all);
+    addAll(readDeps, result.reads);
   }
 
-  return { all: allDeps, reads: readDeps };
+  return { all: allDeps, reads: readDeps, perFunction };
 }
 
 /**
@@ -262,6 +268,8 @@ function collectScriptFunctionDeps(
  * - [3] globalDepsUsed: Globals.xs names read anywhere in this subtree (drives computedGlobalUses).
  */
 const EMPTY_SET: ReadonlySet<string> = Object.freeze(new Set<string>());
+/** Sentinel empty map for §10 copy-on-write — avoids allocating a Map for every leaf node. */
+const EMPTY_PARENT_FN_DEPS: ReadonlyMap<string, { globalReads: ReadonlySet<string> }> = Object.freeze(new Map());
 
 /** Adds every item from `source` into `target`. Reduces set-union boilerplate. */
 function addAll<T>(target: Set<T>, source: Iterable<T>): void {
@@ -275,6 +283,13 @@ function addAll<T>(target: Set<T>, source: Iterable<T>): void {
 interface ComputeUsesContext {
   /** Functions declared in the nearest ancestor scope, for transitive dep tracking. */
   parentFunctionNames?: Set<string>;
+  /**
+   * Per-function global reads from the nearest ancestor container's code-behind.
+   * Enables §10 propagation: when a child calls a parent fn, its global reads are
+   * folded into the child's globalDepsUsed before computedGlobalUses is emitted.
+   * Built cumulatively — each container merges inherited deps with its own functions.
+   */
+  parentFunctionDeps?: ReadonlyMap<string, { globalReads: ReadonlySet<string> }>;
   /** When true, narrowing is blocked for this node and its descendants. */
   disableNarrowing?: boolean;
   /** Variables injected into this scope by an ancestor component (e.g. $item, $context). */
@@ -297,6 +312,7 @@ function computeUsesInternal(
 ): [Set<string>, Set<string>, Set<string>, Set<string>] {
   const {
     parentFunctionNames = new Set<string>(),
+    parentFunctionDeps,
     disableNarrowing = false,
     injectedVarsScope = EMPTY_SET,
     metadataLookup,
@@ -437,6 +453,19 @@ function computeUsesInternal(
   const disablesChildNarrowing = !!node.scriptCollected || hasCodeBehind;
   const nextDisableNarrowing = disableNarrowing || disablesChildNarrowing;
 
+  // Defined here (before children loop) so it can filter perFunction reads
+  // when building childParentFunctionDeps (§10).
+  const isGlobalDep = (d: string) =>
+    appGlobalNames.has(d) &&
+    !localDeclared.has(d) &&
+    !injectedVarsScope.has(d);
+
+  // §10: Propagation map — carries per-function global reads from owner to children.
+  // Copy-on-write: only allocate a new Map when this container actually adds entries.
+  // Non-containers and containers with no script pass the inherited map reference down.
+  let childParentFunctionDeps: ReadonlyMap<string, { globalReads: ReadonlySet<string> }> =
+    parentFunctionDeps ?? EMPTY_PARENT_FN_DEPS;
+
   // Collect all code-behind functions from both sources and analyze their deps.
   // This replaces the old blanket "disable narrowing for script nodes" approach:
   // if all functions are analyzable, we add their parent-scope refs to usedHere
@@ -446,12 +475,26 @@ function computeUsesInternal(
     ...(node.functions ?? {}),
   } as Record<string, CodeDeclaration>;
   if (Object.keys(scriptFunctions).length > 0) {
-    const { all: fnAll, reads: fnReads } = collectScriptFunctionDeps(
+    const { all: fnAll, reads: fnReads, perFunction: fnPerFunction } = collectScriptFunctionDeps(
       scriptFunctions,
       localDeclared,
     );
     addAll(usedHere, fnAll);
     addAll(usedHereReads, fnReads);
+    // §10: Build per-function global reads for child propagation.
+    // Only containers own a new function scope; non-containers pass inherited map down.
+    if (isKnownContainer) {
+      let merged: Map<string, { globalReads: ReadonlySet<string> }> | undefined;
+      for (const [name, { reads }] of fnPerFunction) {
+        const globalReads = new Set([...reads].filter(isGlobalDep));
+        if (globalReads.size > 0) {
+          // Lazily allocate the merged Map only when we have entries to add.
+          if (!merged) merged = new Map(parentFunctionDeps ?? []);
+          merged.set(name, { globalReads });
+        }
+      }
+      if (merged) childParentFunctionDeps = merged;
+    }
   }
 
   // Narrowing is blocked for this node only when its script contains statements
@@ -482,6 +525,7 @@ function computeUsesInternal(
     for (const child of children) {
       const [deps, escapingUIDs, depsReads, globalDeps] = computeUsesInternal(child, {
         parentFunctionNames: childFunctionNames,
+        parentFunctionDeps: childParentFunctionDeps,
         disableNarrowing: nextDisableNarrowing,
         injectedVarsScope: childScope,
         metadataLookup,
@@ -538,13 +582,22 @@ function computeUsesInternal(
   // `extractScopedState` is the actual evaluation scope and the script engine
   // throws "Left value variable not found in the scope" if a write target is
   // missing from the narrowed state.
-  const isGlobalDep = (d: string) =>
-    appGlobalNames.has(d) &&
-    !localDeclared.has(d) &&
-    !injectedVarsScope.has(d);
   const globalDepsUsed = new Set<string>();
   for (const d of usedHereReads) if (isGlobalDep(d)) globalDepsUsed.add(d);
   addAll(globalDepsUsed, childGlobalDeps);
+
+  // §10: Fold in global reads of every parent function this subtree calls.
+  // Use parentDependencies (post-keepDep) instead of usedHere to exclude local
+  // declarations that shadow a parent function name — those must not be treated
+  // as parent-function calls (§10.4 over-subscription guard).
+  if (parentFunctionDeps && parentFunctionDeps.size > 0) {
+    for (const d of parentDependencies) {
+      const fnDeps = parentFunctionDeps.get(d);
+      if (fnDeps) {
+        for (const g of fnDeps.globalReads) globalDepsUsed.add(g);
+      }
+    }
+  }
 
   // If this node is an implicit stateful component (Select, List, Table, etc.)
   // with a UID, include its own UID in parentDependencies so the narrowed state
@@ -576,6 +629,20 @@ function computeUsesInternal(
       [...parentDependencies].some(d => parentFunctionNames.has(d));
     const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
 
+    // §10: Relaxed gate for globals — dependsOnParentFunction does NOT block when every
+    // called parent function has a resolved dep set in parentFunctionDeps (its global
+    // reads have already been folded into globalDepsUsed above, so narrowing is safe).
+    // Only genuinely incomplete dep sets (hasInvalidStatements / hasUnresolvableImports)
+    // block global narrowing. The safeToNarrow (state) gate is left unchanged.
+    const allCalledParentFnsResolvable =
+      !dependsOnParentFunction ||
+      (parentFunctionDeps !== undefined &&
+        [...parentDependencies]
+          .filter((d) => parentFunctionNames.has(d))
+          .every((d) => parentFunctionDeps!.has(d)));
+    const safeToNarrowGlobals =
+      !nextDisableNarrowing || (!ownHasScript && allCalledParentFnsResolvable);
+
     // Narrow only if there are real READ deps (writes don't need re-render tracking).
     // Dynamic vars ($context) are excluded from the initial check to avoid isolation bugs
     // where empty computedUses={} cuts off the container from sibling APIs.
@@ -604,7 +671,7 @@ function computeUsesInternal(
     // containers (node.uses !== undefined). The `uses` property controls parent
     // *state* narrowing, not global-vars narrowing — explicit containers still
     // benefit from not re-rendering when unrelated Globals.xs vars change.
-    if (globalDepsUsed.size > 0 && safeToNarrow) {
+    if (globalDepsUsed.size > 0 && safeToNarrowGlobals) {
       node.computedGlobalUses = Array.from(globalDepsUsed).sort();
     }
 

@@ -359,8 +359,9 @@ The helper `collectScriptFunctionDeps(functions, localNames)` in `computedUses.t
 
 1. For each `ArrowExpression` in the function map, wraps it as a fake `CodeDeclaration` — `{ [PARSED_MARK_PROP]: true, tree: arrowExpr }` — so that `depsOfValueWithReads` routes it through `collectVariableDependencies`. The `T_ARROW_EXPRESSION` handler in the scripting engine sets up parameter scope correctly, meaning function parameters are treated as local variables and only free vars (parent-scope refs) are returned.
 2. Performs DFS with a **visited-set** to follow transitive calls between functions in the same code-behind block. Mutual recursion (`a` calls `b`, `b` calls `a`) is handled safely — the visited-set breaks the cycle and contributes only the deps discovered before the cycle.
-   **Union-only cache invariant:** results are cached per function name inside one `collectScriptFunctionDeps` call. The cached value for `b` may be incomplete when first computed during `a`'s DFS (because `a` was still in the visited-set). This is safe only because the outer loop takes the *union* over all top-level function names — each function also receives an independent top-level pass that recovers any deps cut by the visited-set. Do not use cached per-function results directly; only the final union is correct.
-3. Separately analyzes `scriptCollected.vars` initializer expressions via `addRecord`, because a code-behind var's initial value (e.g. `var count = appState.x + 1`) may reference parent state.
+   **Union-only cache invariant:** results are cached per function name inside one `collectScriptFunctionDeps` call. The cached value for `b` may be incomplete when first computed during `a`'s DFS (because `a` was still in the visited-set). This is safe only because the outer loop takes the *union* over all top-level function names — each function also receives an independent top-level pass that recovers any deps cut by the visited-set. **Before each top-level pass the stale cache entry is deleted** (`fnCache.delete(name)`), ensuring the fresh top-level traversal runs unblocked even if a prior cross-call had cached an incomplete result (§10.4-B mutual-recursion completeness fix). Do not use cached per-function results directly; only the final union is correct.
+3. **Returns three values:** `{ all, reads, perFunction }` where `perFunction` is a `Map<string, { all, reads }>` with the analyzed dep sets for each individual function. This per-function map is used by §10 (see below) to build the `childParentFunctionDeps` propagation map.
+4. Separately analyzes `scriptCollected.vars` initializer expressions via `addRecord`, because a code-behind var's initial value (e.g. `var count = appState.x + 1`) may reference parent state.
 
 #### Narrowing split: node vs. children
 
@@ -706,21 +707,28 @@ Steps during traversal:
    **`usedHereReads`** (the reads-only set; see "Reads-only asymmetry" below) where
    `appGlobalNames.has(d)` and the name is not in `localDeclared` or
    `injectedVarsScope`. These, unioned with `childGlobalDeps`, form `globalDepsUsed`.
-4. For container nodes (both implicit and explicit — the `node.uses` field controls
+4. **§10 fold:** global reads of every parent function this subtree calls are folded into
+   `globalDepsUsed`. For each identifier in `parentDependencies` (post-`keepDep` — see
+   "§10 fold guard" below) that appears in `parentFunctionDeps`, its `globalReads` set is
+   added to `globalDepsUsed`. This ensures a child that calls a parent function inherits
+   the global subscriptions that function requires.
+5. For container nodes (both implicit and explicit — the `node.uses` field controls
    *parent-state* narrowing only and is irrelevant here): if `globalDepsUsed` is
-   non-empty **and `safeToNarrow` is true** (the same guard that protects `computedUses`),
-   `node.computedGlobalUses = Array.from(globalDepsUsed).sort()`.
+   non-empty **and `safeToNarrowGlobals` is true**, `node.computedGlobalUses = Array.from(globalDepsUsed).sort()`.
 
-**`safeToNarrow` gate:** `computedGlobalUses` is subject to the same safety conditions
-as `computedUses`:
-- Nodes with `scriptCollected.hasInvalidStatements = true` have an incomplete dep set;
-  a global read only in an unparsed statement would be absent from `globalDepsUsed`, so
-  `computedGlobalUses` would silently strip it from `parentGlobalVars` at runtime.
-- Nodes that depend on a parent-scope function while `nextDisableNarrowing = true` are
-  also considered unsafe for the same reason.
+**Two-gate narrowing safety — `safeToNarrow` vs `safeToNarrowGlobals`:**
 
-In both cases `safeToNarrow = false` and `node.computedGlobalUses` is left `undefined`,
-causing `ComponentWrapper` to pass the full un-narrowed `globalVars` downstream.
+The `computedUses` (state) and `computedGlobalUses` (globals) narrowing now use **separate safety gates**:
+
+- **`safeToNarrow`** (state gate — unchanged): `!nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction)`. Blocks both state and global narrowing when a parent function's dep set is unknown (e.g., hasInvalidStatements in the parent, or the parent uses unsupported syntax).
+
+- **`safeToNarrowGlobals`** (§10 relaxed gate): `!nextDisableNarrowing || (!ownHasScript && allCalledParentFnsResolvable)`. Key difference: `allCalledParentFnsResolvable` is `true` when every parent function the child calls has a resolved entry in `parentFunctionDeps`. In this case the child's global reads are **complete** — they include both direct reads and transitive reads through parent functions — so global narrowing is safe even when `nextDisableNarrowing = true`. Only genuinely incomplete dep sets (`hasInvalidStatements` / `hasUnresolvableImports`) continue to block global narrowing.
+
+**Invariant:** `safeToNarrow ⟹ safeToNarrowGlobals` (the state gate is strictly more conservative). When `safeToNarrow = true`, global narrowing is always also permitted. The relaxed gate only differs when `nextDisableNarrowing = true` and all called parent functions are resolvable.
+
+**§10 fold guard — `parentDependencies` not `usedHere`:**
+
+The §10 fold iterates `parentDependencies` (the post-`keepDep` set) rather than `usedHere` (all raw identifiers). This is critical: `keepDep` removes identifiers in `localDeclared`, which includes locally declared functions. If a child has its own `doSort` function and the parent also has a `doSort` that reads `sortBy`, the fold must **not** add `sortBy` to the child's `computedGlobalUses` — the child's `doSort` is its own local function, not a call to the parent's. Using `usedHere` would incorrectly fold in the parent's global reads; `parentDependencies` correctly excludes local shadows.
 
 **Reads-only asymmetry with `computedUses`:**
 `globalDepsUsed` is built from `usedHereReads` (the reads set), not `usedHere` (reads +
@@ -870,6 +878,161 @@ provides reference stability once the input object stops changing.
 When `computedGlobalUses` is `undefined` (no Globals.xs reads in the subtree),
 `narrowedGlobalVarsForComparison` is `undefined`, so `globalVarsWithStableRef` tracks
 `globalVars` directly — no narrowing overhead, correct pass-through semantics.
+
+---
+
+## 8. Parent-Function Global Reads Propagation (`parentFunctionDeps`)
+
+When a child component calls a parent-scope function (declared in a parent container's
+code-behind), that function may itself read Globals.xs variables. Without propagating
+these reads, the child's `computedGlobalUses` would be incomplete — it would not contain
+the globals read transitively through the parent function — causing stale renders when
+those globals change externally.
+
+### 8.1 Problem: `dependsOnParentFunction` blocked all global narrowing
+
+Before this feature, `dependsOnParentFunction = true` caused `safeToNarrow = false` for
+the child, preventing both state and global narrowing entirely. The child received the full
+un-narrowed `parentGlobalVars`, defeating isolation from unrelated globals (`events`,
+`fileClipboard`, `sessionId`, etc.).
+
+**Root cause:** `childFunctionNames` only carried a `Set<string>` of names — no dependency
+information. The child knew *that* `doSort` existed in the parent, but not that `doSort`
+reads `sortBy`.
+
+**Failure mode:** stale render, not a crash. `ComponentWrapper` always forwards the full
+`globalVars` to the child for evaluation (Step 2 of the two-step gate), so `doSort()` at
+runtime reads the current `sortBy` correctly. The bug is re-render subscription: without
+`sortBy` in `computedGlobalUses`, the child is not subscribed to `sortBy` changes, so
+when `sortBy` changes externally `React.memo` skips the child — it renders stale output
+until an unrelated state change forces a re-render.
+
+### 8.2 Solution: `parentFunctionDeps` propagation map
+
+**Data structure:** `ComputeUsesContext` carries:
+
+```typescript
+parentFunctionDeps?: ReadonlyMap<string, { globalReads: ReadonlySet<string> }>
+```
+
+Each entry maps a function name to the set of Globals.xs variables that function (and its
+transitive callees, within the same code-behind block) reads. The map is built by the
+container that owns the functions and threaded down through every child call.
+
+**Building the map:** after `collectScriptFunctionDeps` returns `{ all, reads, perFunction }`,
+the owner container iterates `perFunction` and, for each function, filters `.reads` to
+keep only Globals.xs names via `isGlobalDep`. Functions with non-empty `globalReads` are
+added to `childParentFunctionDeps`.
+
+**`isGlobalDep` predicate:**
+```typescript
+const isGlobalDep = (d: string) =>
+  appGlobalNames.has(d) &&
+  !localDeclared.has(d) &&
+  !injectedVarsScope.has(d);
+```
+Defined before the children loop so it can be used both when building `childParentFunctionDeps`
+and when assembling `globalDepsUsed` from `usedHereReads`.
+
+### 8.3 Copy-on-Write: `EMPTY_PARENT_FN_DEPS`
+
+To avoid allocating a `Map` for every leaf node in the tree, the propagation map uses a
+copy-on-write discipline:
+
+```typescript
+const EMPTY_PARENT_FN_DEPS: ReadonlyMap<string, { globalReads: ReadonlySet<string> }> =
+  Object.freeze(new Map());
+```
+
+`childParentFunctionDeps` starts as a reference to the inherited `parentFunctionDeps`
+(or `EMPTY_PARENT_FN_DEPS` when there is none). A new `Map` is allocated lazily only when
+a container actually has functions with global reads:
+
+```typescript
+let childParentFunctionDeps: ReadonlyMap<...> = parentFunctionDeps ?? EMPTY_PARENT_FN_DEPS;
+
+if (isKnownContainer && Object.keys(scriptFunctions).length > 0) {
+  let merged: Map<...> | undefined;
+  for (const [name, { reads }] of fnPerFunction) {
+    const globalReads = new Set([...reads].filter(isGlobalDep));
+    if (globalReads.size > 0) {
+      if (!merged) merged = new Map(parentFunctionDeps ?? []); // lazily clone
+      merged.set(name, { globalReads });
+    }
+  }
+  if (merged) childParentFunctionDeps = merged;
+}
+```
+
+Non-container nodes and containers without global-reading functions pass the inherited map
+reference unchanged — O(1), no allocation.
+
+**Transitive / grandparent scope:** because each container only adds its own functions to
+the map (seeding from the inherited `parentFunctionDeps`), grandparent functions are
+automatically visible to deep descendants. A child that calls both a parent function and a
+grandparent function can resolve both from its `parentFunctionDeps`.
+
+### 8.4 The §10 fold in `computeUsesInternal`
+
+After assembling `globalDepsUsed` from direct reads in this subtree, the optimizer folds
+in the global reads of every parent function this subtree calls:
+
+```typescript
+if (parentFunctionDeps && parentFunctionDeps.size > 0) {
+  for (const d of parentDependencies) {
+    const fnDeps = parentFunctionDeps.get(d);
+    if (fnDeps) {
+      for (const g of fnDeps.globalReads) globalDepsUsed.add(g);
+    }
+  }
+}
+```
+
+This ensures `computedGlobalUses` of a child that calls `doSort()` includes `sortBy`, even
+though the child never references `sortBy` directly.
+
+**Fold guard — `parentDependencies` not `usedHere`:** the fold iterates
+`parentDependencies` (post-`keepDep`) rather than the raw `usedHere` identifiers.
+`keepDep` excludes names in `localDeclared`. If the child has its own `doSort` function
+declared locally, `doSort` is in `localDeclared` and therefore absent from
+`parentDependencies` — the fold correctly skips it, avoiding false subscription to the
+parent function's globals when the name is shadowed locally.
+
+### 8.5 `safeToNarrowGlobals` — relaxed narrowing gate
+
+The global-narrowing gate is relaxed independently of the state gate:
+
+```typescript
+const allCalledParentFnsResolvable =
+  !dependsOnParentFunction ||
+  (parentFunctionDeps !== undefined &&
+    [...parentDependencies]
+      .filter(d => parentFunctionNames.has(d))
+      .every(d => parentFunctionDeps!.has(d)));
+
+const safeToNarrowGlobals =
+  !nextDisableNarrowing || (!ownHasScript && allCalledParentFnsResolvable);
+```
+
+`allCalledParentFnsResolvable` is `true` when every parent function the subtree calls has
+a resolved entry in `parentFunctionDeps`. In this case the child's global reads are
+complete (direct reads + folded reads from called parent functions), so global narrowing
+is safe. Only genuinely incomplete dep sets (`hasInvalidStatements` /
+`hasUnresolvableImports`) continue to block global narrowing.
+
+**Invariant:** `safeToNarrow ⟹ safeToNarrowGlobals`. The state gate (`safeToNarrow`) is
+strictly more conservative — when state narrowing is safe, global narrowing is always
+also permitted. The gates only diverge when `nextDisableNarrowing = true` and all called
+parent functions are resolvable.
+
+### 8.6 Invariants
+
+| Label | Invariant |
+|-------|-----------|
+| **A** (reads-only) | Only the `.reads` set (not `.all`) is propagated as `globalReads`. Write-only globals must not inflate `computedGlobalUses` (same reasoning as the reads-only asymmetry in §7). |
+| **B** (mutual recursion completeness) | `fnCache.delete(name)` before each top-level pass in `collectScriptFunctionDeps` ensures the fresh top-level traversal runs unblocked even if a prior cross-call cached an incomplete result from a visited-set cycle. The `perFunction` values used for `childParentFunctionDeps` are always the top-level-pass results. |
+| **C** (transitive grandparent calls) | `childParentFunctionDeps` is built cumulatively — the new Map is seeded from the inherited `parentFunctionDeps`. Functions from grandparent (or higher) containers remain visible in the map, so deep descendants correctly resolve all ancestor functions. |
+| **D** (unresolvable fallback) | If `allCalledParentFnsResolvable = false` (a called parent function has no entry in `parentFunctionDeps`), `safeToNarrowGlobals = false` and `computedGlobalUses` is left `undefined` — the container passes the full un-narrowed `globalVars` downstream. This is identical to pre-§10 behaviour for that node. |
 
 ---
 
