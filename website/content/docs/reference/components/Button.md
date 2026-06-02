@@ -27,6 +27,12 @@ This component supports the following behaviors:
 
 Indicates if the button should receive focus when the page loads.
 
+### `busyOnClick` [#busyonclick]
+
+> [!DEF]  default: **false**
+
+When `true`, the Button auto-disables itself while its `onClick` handler is running, preventing accidental double-submits. Combine with `handlerPolicy:click="single-flight"` for full dispatcher-level deduplication of rapid repeated clicks.
+
 ### `contentPosition` [#contentposition]
 
 > [!DEF]  default: **"center"**
