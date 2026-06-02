@@ -29,7 +29,7 @@ export const FlowLayoutMd = createMetadata({
       description:
         `This property defines the gap between items in the same row and between rows. The ${COMP} ` +
         `component creates a new row when an item is about to overflow the current row.`,
-      valueType: "string",
+      valueType: "length",
       defaultValue: "$gap-normal",
     },
     itemWidth: {
@@ -43,12 +43,14 @@ export const FlowLayoutMd = createMetadata({
       description:
         "The \`columnGap\` property specifies the space between items in a single row; it overrides " +
         "the \`gap\` value.",
+      valueType: "length",
       defaultValue: defaultProps.columnGap,
     },
     rowGap: {
       description:
         `The \`rowGap\` property specifies the space between the ${COMP} rows; it overrides ` +
         `the \`gap\` value.`,
+      valueType: "length",
       defaultValue: defaultProps.rowGap,
     },
     verticalAlignment: {
@@ -103,25 +105,23 @@ type ThemedFlowLayoutProps = React.ComponentPropsWithoutRef<typeof FlowLayout> &
   classes?: Record<string, string>;
 };
 
-export const ThemedFlowLayout = React.forwardRef<React.ElementRef<typeof FlowLayout>, ThemedFlowLayoutProps>(
-  function ThemedFlowLayout({ className, classes, ...props }, ref) {
-    const themeClass = useComponentThemeClass(FlowLayoutMd);
-    const mergedClasses = {
-      ...classes,
-      [COMPONENT_PART_KEY]: classnames(themeClass, classes?.[COMPONENT_PART_KEY], className),
-    };
-    return (
-      <FlowLayout
-        {...props}
-        classes={mergedClasses}
-        ref={ref}
-      />
-    );
-  },
-);
+export const ThemedFlowLayout = React.forwardRef<
+  React.ElementRef<typeof FlowLayout>,
+  ThemedFlowLayoutProps
+>(function ThemedFlowLayout({ className, classes, ...props }, ref) {
+  const themeClass = useComponentThemeClass(FlowLayoutMd);
+  const mergedClasses = {
+    ...classes,
+    [COMPONENT_PART_KEY]: classnames(themeClass, classes?.[COMPONENT_PART_KEY], className),
+  };
+  return <FlowLayout {...props} classes={mergedClasses} ref={ref} />;
+});
 
 export const flowLayoutComponentRenderer = wrapComponent(COMP, FlowLayout, FlowLayoutMd, {
-  customRender: (_props, { node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler }) => {
+  customRender: (
+    _props,
+    { node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler },
+  ) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -134,7 +134,8 @@ export const flowLayoutComponentRenderer = wrapComponent(COMP, FlowLayout, FlowL
       extractValue.asSize(node.props?.rowGap) ||
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
-    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+    const itemWidth =
+      extractValue.asSize(node.props?.itemWidth) ??
       extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
     const scrollStyle = extractValue.asOptionalString(

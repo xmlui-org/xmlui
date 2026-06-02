@@ -68,7 +68,10 @@ export const AutoCompleteMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
-    dropdownHeight: d("This property sets the height of the dropdown list."),
+    dropdownHeight: {
+      description: "This property sets the height of the dropdown list.",
+      valueType: "length",
+    },
     multi: {
       ...dMulti(),
       defaultValue: defaultProps.multi,

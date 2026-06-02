@@ -23,9 +23,11 @@ It supports both side-by-side and stacked layouts.`,
     },
     app: {
       description: "The source markup of the app to be nested",
+      valueType: "string",
     },
     api: {
       description: "This property defines an optional emulated API to be used with the nested app.",
+      valueType: "hash",
     },
     components: {
       description:
@@ -34,23 +36,28 @@ It supports both side-by-side and stacked layouts.`,
     },
     config: {
       description: "You can define the nested app's configuration with this property.",
+      valueType: "hash",
     },
     activeTheme: {
       description:
         "This property defines the active theme for the nested app. " +
         "If not set, the default theme is used.",
+      valueType: "string",
     },
     activeTone: {
       description:
         "This property defines the active tone for the nested app. " +
         "If not set, the default tone is used.",
+      valueType: "string",
     },
     title: {
       description: "The optional title of the nested app. If not set, no title is displayed.",
+      valueType: "string",
     },
     height: {
       description:
         "The height of the nested app. If not set, the height is determined automatically.",
+      valueType: "length",
     },
     allowPlaygroundPopup: {
       description:

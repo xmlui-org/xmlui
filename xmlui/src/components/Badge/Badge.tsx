@@ -41,6 +41,7 @@ export const BadgeMd = createMetadata({
       description:
         `The \`${COMP}\` component supports the mapping of a list of colors using the \`value\` prop as the ` +
         `key. If this property is not set, no color mapping is used.`,
+      valueType: "hash",
     },
   },
   events: {

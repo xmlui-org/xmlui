@@ -1,4 +1,4 @@
-# Framework Mental Model & Request Lifecycle
+# XMLUI Framework Mental Model
 
 Understanding XMLUI's architecture starts here. This document provides the conceptual map that connects every other subsystem. If you read only one document, make it this one.
 
@@ -102,39 +102,27 @@ That shadow-root boundary is the key distinction. Islands mode prevents the host
 
 Both modes converge once components are resolved. From `AppRoot` onward, the rendering pipeline is identical.
 
-```text
-Standalone mode
-  browser loads xmlui-standalone.umd.js
-    |
-    v
-  fetch Main.xmlui and components/*.xmlui
-    |
-    v
-  parse XML in the browser
-    |
-    v
-  components resolved
-    |
-    v
-  AppRoot
+```mermaid
+flowchart TB
+  subgraph standalone["Standalone mode"]
+    s1["browser loads xmlui-standalone.umd.js"]
+    s2["fetch Main.xmlui and components/*.xmlui"]
+    s3["parse XML in the browser"]
+    s4["components resolved"]
+    s1 --> s2 --> s3 --> s4
+  end
 
-Vite mode
-  vite-xmlui-plugin compiles .xmlui files
-    |
-    v
-  import.meta.glob() pre-bundles components
-    |
-    v
-  browser loads JavaScript modules
-    |
-    v
-  components resolved
-    |
-    v
-  AppRoot
+  subgraph vite["Vite mode"]
+    v1["vite-xmlui-plugin compiles .xmlui files"]
+    v2["import.meta.glob() pre-bundles components"]
+    v3["browser loads JavaScript modules"]
+    v4["components resolved"]
+    v1 --> v2 --> v3 --> v4
+  end
 
-From AppRoot onward both modes use the same provider stack,
-state containers, expression evaluator, and rendering pipeline.
+  s4 --> appRoot["AppRoot"]
+  v4 --> appRoot
+  appRoot --> common["same provider stack, state containers, expression evaluator, and rendering pipeline"]
 ```
 
 ## The Full Lifecycle
@@ -146,7 +134,7 @@ Here is what happens from the moment a user opens an XMLUI app to the moment pix
 | 1. Bootstrap               | Components are resolved; provider stack is established      |
 | 2. Provider stack          | React context providers are layered around the app          |
 | 3. Rendering               | `renderChild()` recursively builds the React element tree   |
-| 4. State composition       | `StateContainer` merges 6 layers into a flat state object   |
+| 4. State composition       | `StateContainer` composes the expression state              |
 | 5. Expression evaluation   | `{expressions}` are evaluated against composed state        |
 | 6. Interaction & re-render | User event → state mutation → routing → reducer → re-render |
 
@@ -162,40 +150,26 @@ The app starts in `StandaloneApp`, which:
 
 `AppRoot` and `AppWrapper` wrap the entire app in a series of React context providers. Each provider adds a capability:
 
-```
-ComponentProvider      → component registry (maps names to renderers)
-  StyleProvider        → CSS-in-JS style registry
-    DebugViewProvider  → debug configuration
-      Router           → Hash, Browser, or Memory router (react-router-dom)
-        QueryClient    → TanStack React Query (data fetching/caching)
-          Helmet       → document head management (title, meta)
-            Logger     → logging infrastructure
-              Icons    → icon registry
-                Theme  → theme context, tone (light/dark)
-                  Inspector        → dev tools / tracing
-                    Confirmation   → modal dialog support
-                      AppContent   → global functions (navigate, toast, confirm)
-                        ↓
-                     Root Container → renderChild() begins
-```
-
 The router type is chosen based on configuration: `HashRouter` (default), `BrowserRouter` (when `useHashBasedRouting: false`), or `MemoryRouter` (SSR fallback or preview mode).
 
-```text
-ComponentProvider
-  StyleProvider
-    DebugViewProvider
-      Router (Hash / Browser / Memory)
-        QueryClient (TanStack React Query)
-          Helmet (document head)
-            Logger
-              Icons
-                Theme
-                  Inspector
-                    Confirmation
-                      AppContent (global functions)
-                        Root Container
-                          renderChild() begins
+```mermaid
+flowchart TB
+  componentProvider["ComponentProvider<br/>component registry"]
+  styleProvider["StyleProvider<br/>CSS-in-JS style registry"]
+  debugViewProvider["DebugViewProvider<br/>debug configuration"]
+  router["Router<br/>Hash / Browser / Memory"]
+  queryClient["QueryClient<br/>TanStack React Query"]
+  helmet["Helmet<br/>document head"]
+  logger["Logger<br/>logging infrastructure"]
+  icons["Icons<br/>icon registry"]
+  theme["Theme<br/>theme context and tone"]
+  inspector["Inspector<br/>dev tools and tracing"]
+  confirmation["Confirmation<br/>modal dialog support"]
+  appContent["AppContent<br/>global functions"]
+  rootContainer["Root Container"]
+  renderChild["renderChild() begins"]
+
+  componentProvider --> styleProvider --> debugViewProvider --> router --> queryClient --> helmet --> logger --> icons --> theme --> inspector --> confirmation --> appContent --> rootContainer --> renderChild
 ```
 
 ### Phase 3: Rendering
@@ -215,44 +189,32 @@ Rendering is driven by `renderChild()`, the recursive function at the heart of X
    - If the node has state (`vars`, `functions`, `uses`, or `loaders`), it goes through `ContainerWrapper` → `StateContainer` → `Container` → recursive `renderChild()`.
    - If the node is stateless, it goes directly to `ComponentAdapter` — no container overhead.
 
-```text
-renderChild(node)
-  |
-  v
-Evaluate when / responsiveWhen
-  |
-  +-- false --> return null
-  |
-  +-- true --> inspect node type
-                |
-                +-- TextNode / CData --> evaluate expression, return text
-                |
-                +-- Slot -------------> resolve slot children from parent
-                |
-                +-- Component node ---> ComponentWrapper
-                                          |
-                                          v
-                                        transform props
-                                        DataSource, childrenAsTemplate, data refs
-                                          |
-                                          v
-                                        Has vars, functions, uses, or loaders?
-                                          |
-                                          +-- yes --> ContainerWrapper
-                                          |             |
-                                          |             v
-                                          |           StateContainer
-                                          |             |
-                                          |             v
-                                          |           Container
-                                          |             |
-                                          |             v
-                                          |           recursive renderChild()
-                                          |
-                                          +-- no ----> ComponentAdapter
-                                                        |
-                                                        v
-                                                      recursive renderChild()
+```mermaid
+flowchart TB
+  start["renderChild(node)"]
+  visible["Evaluate when / responsiveWhen"]
+  hidden["return null"]
+  inspect["inspect node type"]
+  text["TextNode / CData<br/>evaluate expression, return text"]
+  slot["Slot<br/>resolve slot children from parent"]
+  wrapper["Component node<br/>ComponentWrapper"]
+  transform["transform props<br/>DataSource, childrenAsTemplate, data refs"]
+  stateful{"Has vars, functions, uses, contextVars, loaders, or scriptCollected?"}
+  containerWrapper["ContainerWrapper"]
+  stateContainer["StateContainer"]
+  container["Container"]
+  recursiveStateful["recursive renderChild()"]
+  adapter["ComponentAdapter"]
+  recursiveStateless["recursive renderChild()"]
+
+  start --> visible
+  visible -->|false| hidden
+  visible -->|true| inspect
+  inspect --> text
+  inspect --> slot
+  inspect --> wrapper --> transform --> stateful
+  stateful -->|yes| containerWrapper --> stateContainer --> container --> recursiveStateful
+  stateful -->|no| adapter --> recursiveStateless
 ```
 
 ### Phase 4: State Composition
@@ -294,43 +256,16 @@ Inside the `Button`, `{count}` reads the local `var.count`, and `count++` update
 
 `fullName` is declared before `firstName` and `lastName`, but it references both of them. Without two-pass resolution, `fullName` would evaluate before the others are ready, producing an undefined result. With two passes: pass 1 resolves `firstName` and `lastName` first; pass 2 uses those resolved values to evaluate `fullName` correctly as `"John Doe"`.
 
-```text
-State merge order and collision precedence
+```mermaid
+flowchart TB
+  parent["1. Parent state<br/>inherited via uses prop<br/>merged first<br/>example: userData from parent container"]
+  context["2. Context variables<br/>iteration and slot vars<br/>shadows parent state<br/>example: $item, $itemIndex"]
+  globals["3. Global variables<br/>owned by root container and passed down<br/>shadows parent/context values with the same key<br/>example: global.count, global.theme"]
+  local["4. Local/runtime component state<br/>declared with var.*<br/>includes reducer state and registered component APIs<br/>shadows globals with the same key<br/>example: local var.count shadows global.count"]
+  routing["5. Routing params<br/>route-derived values applied last<br/>example: $pathname, $routeParams"]
+  combined["Combined flat state object<br/>available to expressions"]
 
-StateContainer merges the expression state in this order.
-Later entries override earlier entries when they use the same key.
-
-1. Parent state
-         inherited via uses prop
-         merged first
-         example: userData from parent container
-    |
-    v
-2. Context variables
-         iteration and slot vars
-         shadows parent state
-         example: $item, $itemIndex
-    |
-    v
-3. Global variables
-         owned by root container and passed down
-         shadows parent/context values with the same key
-         example: global.count, global.theme
-    |
-    v
-4. Local/runtime component state
-         declared with var.*
-         includes reducer state and registered component APIs
-         shadows globals with the same key
-         example: local var.count shadows global.count
-    |
-    v
-5. Routing params
-         route-derived values applied last
-         example: $pathname, $routeParams
-    |
-    v
-Combined flat state object available to expressions.
+  parent --> context --> globals --> local --> routing --> combined
 ```
 
 ### Phase 5: Expression Evaluation
@@ -361,42 +296,22 @@ When the user interacts with the app:
 8. `renderChild()` re-evaluates expressions that depend on the changed variable
 9. The DOM updates
 
-```text
-User clicks / types / interacts
-  |
-  v
-React synthetic event fires
-  |
-  v
-Cached XMLUI event handler runs
-  |
-  v
-Handler mutates state proxy
-  example: count++
-  |
-  v
-statePartChanged(path, value)
-  |
-  v
-Mutation routing finds owning container
-  |
-  v
-dispatch STATE_PART_CHANGED
-  |
-  v
-Container reducer produces immutable state with Immer
-  |
-  v
-React re-renders the container subtree
-  |
-  v
-renderChild() re-evaluates dependent expressions
-  |
-  v
-DOM updates
-  |
-  v
-User sees the new UI state
+```mermaid
+flowchart TB
+  user["User clicks / types / interacts"]
+  reactEvent["React synthetic event fires"]
+  handler["Cached XMLUI event handler runs"]
+  mutation["Handler mutates state proxy<br/>example: count++"]
+  stateChanged["statePartChanged(path, value)"]
+  routing["Mutation routing finds owning container"]
+  dispatch["dispatch STATE_PART_CHANGED"]
+  reducer["Container reducer produces immutable state with Immer"]
+  rerender["React re-renders the container subtree"]
+  renderChildAgain["renderChild() re-evaluates dependent expressions"]
+  dom["DOM updates"]
+  result["User sees the new UI state"]
+
+  user --> reactEvent --> handler --> mutation --> stateChanged --> routing --> dispatch --> reducer --> rerender --> renderChildAgain --> dom --> result
 ```
 
 ## Containers: The Unit of State
@@ -405,7 +320,7 @@ A **container** is the fundamental unit of state isolation in XMLUI. Every compo
 
 Each container is implemented as two cooperating React components with distinct responsibilities:
 
-- **`StateContainer`** — owns the _data_. It composes the 6-layer state (parent state, reducer state, component APIs, context variables, local variables, routing params) and provides the merged state object to everything below it.
+- **`StateContainer`** — owns the _data_. It composes the expression state (parent state, context variables, globals, local variables, reducer state, component APIs, and routing params) and provides the merged state object to everything below it.
 - **`Container`** — owns the _behaviour_. It receives the composed state from `StateContainer` and is responsible for creating event handlers, caching them, resolving action lookups, and calling `renderChild()` to produce the children.
 
 In other words: `StateContainer` answers _"what is the current state?"_, and `Container` answers _"what do I render and what happens when the user acts?"_.
@@ -465,7 +380,7 @@ A quick-reference table of the most important types and functions mentioned in t
 | `RendererContext`          | TypeScript type | Passed to every renderer function: `node.props`, `state`, `extractValue`, `renderChild`, `lookupEventHandler`, `updateState`, `registerComponentApi` |
 | `renderChild()`            | Function        | Recursive rendering core — evaluates `when`, handles text/slot nodes, delegates to `ComponentWrapper`                                                |
 | `ComponentWrapper`         | React component | Transforms node props, then routes to `ContainerWrapper` (stateful) or `ComponentAdapter` (stateless)                                                |
-| `StateContainer`           | React component | Composes the 6-layer state and provides it to `Container`                                                                                            |
+| `StateContainer`           | React component | Composes the expression state and provides it to `Container`                                                                                         |
 | `Container`                | React component | Creates event handlers, action lookup, and the stable `renderChild` closure; renders children and loaders                                            |
 | `createContainerReducer()` | Function        | Produces the immer-based reducer for a container's state mutations                                                                                   |
 | `statePartChanged()`       | Callback        | Routes a variable mutation to the owning container via `STATE_PART_CHANGED` dispatch                                                                 |
@@ -477,7 +392,7 @@ A quick-reference table of the most important types and functions mentioned in t
 
 1. **XMLUI is React underneath** — but the abstraction layer (containers, renderers, expression evaluation) is what you work with as a framework developer.
 2. **`renderChild()` is the recursive heart** — it drives the entire rendering pipeline.
-3. **Containers are the unit of state** — every component with vars/loaders/functions gets one. State is composed from 6 layers.
+3. **Containers are the unit of state** — every component with vars/loaders/functions gets one. `StateContainer` composes the expression state used by that subtree.
 4. **Mutation routing is automatic** — writing to a variable routes the change to the correct container, whether local, parent, or global.
 5. **The provider stack is deep but stable** — 12+ providers wrap the app. You rarely modify them but need to know they exist.
 6. **Two modes, one pipeline** — Standalone and Vite modes only differ in how components are discovered and parsed. The rendering pipeline is the same.

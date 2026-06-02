@@ -274,6 +274,7 @@ and `any`, plus refined values such as:
 - `url`
 - `icon`
 - `id-ref`
+- `hash` (`Record<string, any>`)
 
 When `availableValues` is present, it is authoritative and checked before the
 broader `valueType`. This produces more helpful diagnostics. For example, a

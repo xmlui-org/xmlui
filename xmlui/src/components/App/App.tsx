@@ -26,6 +26,7 @@ export const AppMd = createMetadata({
         `This property sets the layout template of the app. This setting determines the position ` +
         `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
         `scroll behavior.`,
+      valueType: "string",
       availableValues: appLayoutMd,
     },
     loggedInUser: {

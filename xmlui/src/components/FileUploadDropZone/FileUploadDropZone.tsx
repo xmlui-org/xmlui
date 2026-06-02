@@ -40,10 +40,14 @@ export const FileUploadDropZoneMd = createMetadata({
       "boolean",
       true,
     ),
-    acceptedFileTypes: d(
-      `Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`,
-    ),
-    maxFiles: d(`The maximum number of files that can be selected.`),
+    acceptedFileTypes: {
+      description: `Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`,
+      valueType: "string",
+    },
+    maxFiles: {
+      description: `The maximum number of files that can be selected.`,
+      valueType: "integer",
+    },
   },
   events: {
     upload: {
