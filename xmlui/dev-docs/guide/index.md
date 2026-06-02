@@ -29,7 +29,7 @@ The most common development tasks have ready-made prompt files in `.github/promp
 ---
 
 **Core Architecture**
-- [01 — Framework Mental Model & Request Lifecycle](./01-mental-model.md)
+- [01 — XMLUI Framework Mental Model](./01-mental-model.md)
 - [02 — Rendering Pipeline](./02-rendering-pipeline.md)
 - [03 — Container & State System](./03-container-state.md)
 - [06 — Expression Evaluation & Scripting](./06-expression-eval.md)

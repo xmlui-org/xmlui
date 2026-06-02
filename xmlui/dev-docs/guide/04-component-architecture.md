@@ -1,6 +1,6 @@
-# Component Architecture: The Two-File Pattern
+# Component Architecture: Renderer + React Implementation
 
-Every built-in XMLUI component is built from two cooperating files. This document explains what each file does, why they exist separately, and how to read and write them.
+Most built-in XMLUI components are built from two cooperating files. This document explains what each file does, why they exist separately, and how to read and write them.
 
 ---
 
@@ -9,9 +9,9 @@ Every built-in XMLUI component is built from two cooperating files. This documen
 XMLUI separates **what a component is** from **how it renders**:
 
 - **`ComponentName.tsx`** — the XMLUI side. Defines the component's public contract (props, events, APIs, theme variables) and the *bridge function* that translates XMLUI's reactive context into React props.
-- **`ComponentNameNative.tsx`** — the React side. A normal `forwardRef` + `memo` component that takes plain props and produces DOM output.
+- **`ComponentNameReact.tsx`** — the React side. A normal `forwardRef` + `memo` component that takes plain props and produces DOM output. A few older components still use the legacy `ComponentNameNative.tsx` filename; new and renamed components should use `*React.tsx`.
 
-This boundary exists for a specific reason: the bridge function in `ComponentName.tsx` runs in the XMLUI rendering pipeline and must not use React hooks. All hooks live in the native component. The separation makes this constraint structurally clear.
+This boundary exists for a specific reason: the bridge function in `ComponentName.tsx` runs in the XMLUI rendering pipeline and must not use React hooks. All hooks live in the React implementation file. The separation makes this constraint structurally clear.
 
 ---
 
@@ -22,9 +22,9 @@ This boundary exists for a specific reason: the bridge function in `ComponentNam
 ```
 ComponentName.tsx:
   1. Import metadata helpers, SCSS styles
-  2. Import the native component + defaultProps
+  2. Import the React component + defaultProps
   3. Define the metadata constant (ComponentNameMd)
-  4. Define and export the renderer (componentNameComponentRenderer)
+  4. Define and export the renderer, usually with wrapComponent
 ```
 
 ### Metadata — The Component's Public Contract
@@ -101,7 +101,48 @@ export const TextMd = createMetadata({
 | `dGotFocus(COMP)` / `dLostFocus(COMP)` | Focus events |
 | `dContextMenu(COMP)` | Context menu event |
 
+### Property Value Types and Contracts
+
+`valueType` is not just documentation. It drives `wrapComponent` prop extraction, docs generation, language-server diagnostics, and the type-contract checker used by Managed React strict mode.
+
+Common value types include:
+
+| `valueType` | Meaning |
+|-------------|---------|
+| `"string"` | Text-like values |
+| `"number"` | Numeric values |
+| `"integer"` | Whole numbers |
+| `"boolean"` | Boolean values |
+| `"length"` | CSS lengths and intrinsic length keywords |
+| `"color"` | CSS color values |
+| `"url"` | URL/path-like values |
+| `"icon"` | Registered icon names |
+| `"id-ref"` | Reference to another component by `id` |
+| `"hash"` | Object/hash values, equivalent to TypeScript `Record<string, any>` |
+| `"ComponentDef"` | XMLUI component definition/template |
+| `"any"` | Explicit opt-out when the prop accepts arbitrary values |
+
+Use `valueType`, not `type`. The old `type` property is not read by `wrapComponent` or the type-contract rules. When a prop is intentionally broad, prefer `valueType: "any"` so the opt-out is explicit.
+
 ### The Renderer Function
+
+`wrapComponent` is the preferred renderer path for standard components:
+
+```typescript
+export const componentNameComponentRenderer = wrapComponent(
+  "ComponentName",
+  ComponentNameReact,
+  ComponentNameMd,
+  {
+    events: ["click"],
+    exposeRegisterApi: true,
+  },
+);
+```
+
+`wrapComponent` reads metadata, extracts props according to `valueType`, wires events, forwards theme classes, renders `ComponentDef` templates, and handles common stateful input plumbing. See [05-wrapcomponent.md](05-wrapcomponent.md) for the full API.
+
+Use `createComponentRenderer` when the component needs custom top-level rendering, runtime-dependent child layout, specialized extraction such as `asDisplayText()` or `asSize()`, or other logic that cannot be expressed with `wrapComponent` configuration:
 
 ```typescript
 export const textComponentRenderer = createComponentRenderer(
@@ -127,14 +168,12 @@ export const textComponentRenderer = createComponentRenderer(
 );
 ```
 
-The renderer function is a **plain function, not a React component**. React hooks are not allowed here. Its job is to extract XMLUI values and hand them to the native React component as ordinary props.
+The renderer function is a **plain function, not a React component**. React hooks are not allowed here. Its job is to extract XMLUI values and hand them to the React component as ordinary props.
 
 **Key rules:**
-- `node.props.*` values are raw (may be binding expression ASTs). Always route them through `extractValue` before passing to the native component.
+- `node.props.*` values are raw (may be binding expression ASTs). Always route them through `extractValue` before passing to the React component.
 - The event name string in `lookupEventHandler("contextMenu")` must match a key in the metadata's `events` section.
 - `classes` carries per-part CSS generated from theme variables. Pass it through.
-
-> **Note — active migration:** The codebase is progressively moving from the `createComponentRenderer` approach shown above to `wrapComponent`, a higher-level integration helper. Both produce the same runtime result; `wrapComponent` reduces boilerplate for the common case. The `wrapComponent` API is covered in depth in [05-wrapcomponent.md](05-wrapcomponent.md). When reading existing component source, you will encounter both patterns.
 
 ### Renderer Context Properties
 
@@ -148,7 +187,7 @@ The renderer receives a single context object:
 | `extractValue` | Evaluates expressions and coerces types |
 | `renderChild(node.children)` | Recursively renders child nodes |
 | `lookupEventHandler("name")` | Returns the async callback for a named event |
-| `registerComponentApi` | Pass to native component so it can register imperative methods |
+| `registerComponentApi` | Pass to React component so it can register imperative methods |
 | `updateState` | Update this component's container state |
 | `classes` | Per-part theme CSS class names |
 | `appContext` | Global functions: `navigate()`, `toast()`, `confirm()` |
@@ -170,6 +209,13 @@ The renderer receives a single context object:
 | `extractValue.asBoolean(expr)` | `boolean` | JS truthiness semantics |
 | `extractValue.asOptionalBoolean(expr, default?)` | `boolean \| undefined` | Boolean or default |
 | `extractValue.asSize(expr)` | `string \| undefined` | CSS size string; resolves theme variables |
+| `extractValue.asInteger(expr, default?)` | `number \| undefined` | Whole-number helper |
+| `extractValue.asColor(expr)` | `string \| undefined` | Validated CSS color helper |
+| `extractValue.asLength(expr)` | `string \| undefined` | Validated CSS length helper |
+| `extractValue.asUrl(expr)` | `string \| undefined` | Validated URL/path helper |
+| `extractValue.asIcon(expr)` | `string \| undefined` | Validated icon-name helper |
+| `extractValue.asLayoutProp(propName, expr, valueType?)` | `any` | Validated layout-prop helper |
+| `extractValue.asStyleProp(expr, componentName?)` | `string \| undefined` | Validated style-string helper |
 
 **Example:**
 ```typescript
@@ -181,9 +227,9 @@ step={extractValue.asOptionalNumber(node.props.step, 1)}      // → 5
 
 ---
 
-## The Native File (`ComponentNameNative.tsx`)
+## The React File (`ComponentNameReact.tsx`)
 
-The native component is a standard React component with two structural requirements: `forwardRef` (so parent components can obtain a DOM ref) and `memo` (to prevent unnecessary re-renders).
+The React component is a standard React component with two structural requirements: `forwardRef` (so parent components can obtain a DOM ref) and `memo` (to prevent unnecessary re-renders). Older source may call this the "native" component; that means the same React implementation side of the bridge.
 
 ```typescript
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
@@ -200,8 +246,8 @@ export const defaultProps = {
   variant: "primary" as const,
 };
 
-export const ComponentNameNative = memo(forwardRef<HTMLDivElement, Props>(
-  function ComponentNameNative(
+export const ComponentNameReact = memo(forwardRef<HTMLDivElement, Props>(
+  function ComponentNameReact(
     { label, variant = defaultProps.variant, enabled = defaultProps.enabled,
       updateState, registerComponentApi, style, className, classes, ...rest },
     ref,
@@ -235,13 +281,13 @@ export const ComponentNameNative = memo(forwardRef<HTMLDivElement, Props>(
 ));
 ```
 
-### Key Native Component Rules
+### Key React Component Rules
 
 | Rule | Why |
 |------|-----|
 | `forwardRef` always | Parent components and `id`-based refs need DOM access |
 | `memo` always | Prevents re-renders when props don't change |
-| Export `defaultProps` | Shared by renderer, metadata, and native destructuring |
+| Export `defaultProps` | Shared by renderer, metadata, and React component destructuring |
 | Accept `style` explicitly | Required for layout CSS from the framework |
 | Spread `...rest` on root | HTML attributes (`data-*`, ARIA, etc.) must reach the DOM |
 | No `displayName` | Don't set it manually |
@@ -252,7 +298,7 @@ export const ComponentNameNative = memo(forwardRef<HTMLDivElement, Props>(
 The `defaultProps` object is the single source of truth for default values across three locations:
 
 ```typescript
-// Native file — defines and exports:
+// React file — defines and exports:
 export const defaultProps = {
   enabled: true,
   size: "md" as const,
@@ -261,19 +307,19 @@ export const defaultProps = {
 // Metadata — shows defaults in documentation:
 enabled: { defaultValue: defaultProps.enabled }
 
-// Native destructuring — applies the default:
+// React component destructuring — applies the default:
 function Comp({ enabled = defaultProps.enabled })
 
 // Renderer — does NOT apply defaults:
 enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-// (undefined → native component picks up defaultProps.enabled)
+// (undefined → React component picks up defaultProps.enabled)
 ```
 
-The renderer passes `undefined` when a prop is absent; the native component fills in the default. This keeps defaults defined in exactly one place.
+The renderer passes `undefined` when a prop is absent; the React component fills in the default. This keeps defaults defined in exactly one place.
 
 ### Registering Imperative APIs
 
-When markup references `myComponent.methodName(args)`, those methods must be registered by the native component:
+When markup references `myComponent.methodName(args)`, those methods must be registered by the React component:
 
 ```typescript
 useEffect(() => {
@@ -378,14 +424,30 @@ if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
 
 ---
 
+## Managed React Considerations
+
+Most Managed React features live outside individual components, but component authors affect whether those features can validate, trace, and harden an app correctly.
+
+| Area | Component author responsibility |
+|------|---------------------------------|
+| Type contracts | Declare accurate `valueType`, `availableValues`, `defaultValue`, and `isRequired` metadata. `strictTypeContracts` uses these declarations for diagnostics. |
+| Events | Define every public event in metadata and give non-trivial events signatures/parameters. This keeps `on<Event>` validation and inspector traces meaningful. |
+| Accessibility | Prefer semantic DOM, labels, ARIA attributes, focus handling, and keyboard support in the React component. `strictAccessibility` can escalate missing-accessible-name and related diagnostics. |
+| Errors and lifecycle | Surface user-facing failures through framework error APIs where applicable, and keep cleanup in React effects synchronous unless the XMLUI lifecycle subsystem explicitly owns async disposal. |
+| Browser/global APIs | For behavior exposed to XMLUI markup, prefer framework-managed APIs such as `App.fetch`, `navigate`, `toast`, `AppState`, and `Clipboard` over raw browser globals so sandboxing, tracing, and strict-mode diagnostics can observe the action. |
+
+Do not add Managed React app-globals to a component just because the feature exists. Mention or wire them here only when the component's public contract depends on that validation or managed API surface.
+
+---
+
 ## Implementation Sequence
 
 1. Write metadata (`createMetadata`) — this defines the public API
-2. Create renderer stub (can return `null`) — enough to register the component
-3. Write native component with `forwardRef` + `memo` + `defaultProps`
+2. Create the renderer, preferably with `wrapComponent` for standard prop/event wiring
+3. Write the React component with `forwardRef` + `memo` + `defaultProps`
 4. Register in `ComponentProvider.tsx`
 5. Add SCSS module (visual components)
-6. Wire props, events, and APIs between renderer and native
+6. Wire props, events, and APIs between renderer and React component
 7. Add E2E and unit tests
 
 ---
@@ -394,21 +456,25 @@ if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
 
 | Mistake | Correct approach |
 |---------|-----------------|
-| Calling `useState` or `useEffect` in the renderer | All hooks go in the native component |
+| Calling `useState` or `useEffect` in the renderer | All hooks go in the React component |
 | Using `useImperativeHandle` | Register methods via `registerComponentApi` |
 | Accessing `node.props.x` directly | Always use `extractValue.asXxx(node.props.x)` |
 | Setting `displayName` manually | Remove it; the function name is used automatically |
 | Missing `style` prop on root element | Explicitly accept and spread `style` |
-| Defining defaults in the renderer | Keep all defaults in `defaultProps` in the native file |
+| Defining defaults in the renderer | Keep all defaults in `defaultProps` in the React file |
+| Using `type` instead of `valueType` in metadata | Use `valueType`; `wrapComponent` and type contracts ignore `type` |
+| Leaving broad props untyped by accident | Use a precise `valueType`, or `valueType: "any"` for intentional arbitrary values |
 
 ---
 
 ## Key Takeaways
 
-1. The two-file split enforces a strict boundary: no React hooks in the renderer, all hooks in the native component.
+1. The two-file split enforces a strict boundary: no React hooks in the renderer, all hooks in the React component.
 2. `createMetadata` is the single source of truth for a component's public API — props, events, APIs, theme variables, and documentation are all derived from it.
-3. `extractValue` is mandatory before using any `node.props.*` value; raw values may be binding expressions, not plain values.
-4. `defaultProps` is exported from the native file and referenced by the renderer and metadata — define defaults in exactly one place.
-5. `registerComponentApi` is the only way to expose imperative methods to markup; don't use `useImperativeHandle`.
-6. `classes?.["-component"]` on the root element and `classes?.[partName]` on named parts enable theme variable targeting at part granularity.
-7. Tree-shaking guards (`process.env.VITE_USED_COMPONENTS_X !== "false"`) in `ComponentProvider.tsx` allow unused components to be excluded from production bundles.
+3. Prefer `wrapComponent` for standard components; use `createComponentRenderer` only when the render path needs custom logic.
+4. `valueType` metadata matters: it drives extraction, documentation, type-contract diagnostics, and Managed React strict mode.
+5. `extractValue` is mandatory before using any `node.props.*` value in manual renderers; raw values may be binding expressions, not plain values.
+6. `defaultProps` is exported from the React file and referenced by the renderer and metadata — define defaults in exactly one place.
+7. `registerComponentApi` is the only way to expose imperative methods to markup; don't use `useImperativeHandle`.
+8. `classes?.["-component"]` on the root element and `classes?.[partName]` on named parts enable theme variable targeting at part granularity.
+9. Tree-shaking guards (`process.env.VITE_USED_COMPONENTS_X !== "false"`) in `ComponentProvider.tsx` allow unused components to be excluded from production bundles.

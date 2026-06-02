@@ -9,6 +9,7 @@ import { lengthRule } from "../../../../src/components-core/type-contracts/rules
 import { urlRule } from "../../../../src/components-core/type-contracts/rules/url";
 import { iconRule } from "../../../../src/components-core/type-contracts/rules/icon";
 import { idRefRule } from "../../../../src/components-core/type-contracts/rules/id-ref";
+import { hashRule } from "../../../../src/components-core/type-contracts/rules/hash";
 import { verifyEnum } from "../../../../src/components-core/type-contracts/rules/enum";
 
 describe("integerRule", () => {
@@ -113,6 +114,22 @@ describe("idRefRule", () => {
   it("checks against ctx.scopeIds when supplied", () => {
     expect(idRefRule.verify("a", { scopeIds: new Set(["a", "b"]) })).toBeNull();
     expect(idRefRule.verify("c", { scopeIds: new Set(["a", "b"]) })).not.toBeNull();
+  });
+});
+
+describe("hashRule", () => {
+  it.each([{}, { a: 1 }, Object.create(null) as Record<string, any>])(
+    "accepts plain record %p",
+    (raw) => {
+      expect(hashRule.verify(raw)).toBeNull();
+    },
+  );
+  it.each([[] as unknown, "x", 42, true, () => null, new Date(), new (class Test {})()])("rejects %p", (raw) => {
+    expect(hashRule.verify(raw)).not.toBeNull();
+  });
+  it("coerces by returning the same record", () => {
+    const raw = { a: 1 };
+    expect(hashRule.coerce(raw)).toBe(raw);
   });
 });
 

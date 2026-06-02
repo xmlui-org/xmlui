@@ -3,7 +3,7 @@ import styles from "./Form.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
-import { labelPositionMd, requireLabelModeMd } from "../abstractions";
+import { httpMethodNames, labelPositionMd, requireLabelModeMd } from "../abstractions";
 import { FormWithContextVar, defaultProps } from "./FormReact";
 
 const COMP = "Form";
@@ -22,7 +22,7 @@ export const FormMd = createMetadata({
     // NOTE: There is a ValidationSummary in the form and also one in the modal dialog.
     validationSummary: {
       description: "The area displaying validation summary messages for the form.",
-    }
+    },
   },
   props: {
     buttonRowTemplate: dComponent(
@@ -74,6 +74,7 @@ export const FormMd = createMetadata({
         "This property sets the initial value of the form's data structure. The form infrastructure " +
         "uses this value to set the initial state of form items within the form. If this property is" +
         "not set, the form does not have an initial value.",
+      valueType: "hash",
       audit: {
         classification: "sensitive",
         defaultRedaction: "hash",
@@ -120,14 +121,12 @@ export const FormMd = createMetadata({
       defaultValue: defaultProps.swapCancelAndSave,
     },
     hideButtonRowUntilDirty: {
-      description:
-        `This property hides the button row until the form data is modified (dirty).`,
+      description: `This property hides the button row until the form data is modified (dirty).`,
       valueType: "boolean",
       defaultValue: defaultProps.hideButtonRowUntilDirty,
     },
     hideButtonRow: {
-      description:
-        `This property hides the button row entirely when set to true.`,
+      description: `This property hides the button row entirely when set to true.`,
       valueType: "boolean",
       defaultValue: defaultProps.hideButtonRow,
     },
@@ -145,15 +144,27 @@ export const FormMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enableSubmit,
     },
-    submitUrl: d(`URL to submit the form data.`),
+    submitUrl: { description: `URL to submit the form data.`, valueType: "url" },
     submitMethod: {
       description:
         "This property sets the HTTP method to use when submitting the form data. If not " +
         "defined, `put` is used when the form has initial data; otherwise, `post`.",
+      valueType: "string",
+      availableValues: httpMethodNames,
     },
-    inProgressNotificationMessage: d("This property sets the message to display when the form is being submitted."),
-    completedNotificationMessage: d("This property sets the message to display when the form is submitted successfully."),
-    errorNotificationMessage: d("This property sets the message to display when the form submission fails."),
+    inProgressNotificationMessage: {
+      description: "This property sets the message to display when the form is being submitted.",
+      valueType: "string",
+    },
+    completedNotificationMessage: {
+      description:
+        "This property sets the message to display when the form is submitted successfully.",
+      valueType: "string",
+    },
+    errorNotificationMessage: {
+      description: "This property sets the message to display when the form submission fails.",
+      valueType: "string",
+    },
     enabled: dEnabled(),
     itemRequireLabelMode: {
       description:
@@ -175,7 +186,7 @@ export const FormMd = createMetadata({
       description:
         "The key used to save the form's temporary data in localStorage when `persist` is enabled. " +
         "If omitted, the form's `id` attribute is used. If the form has no `id`, the key " +
-        "defaults to `\"form-data\"`.",
+        'defaults to `"form-data"`.',
       valueType: "string",
     },
     doNotPersistFields: {
@@ -183,7 +194,7 @@ export const FormMd = createMetadata({
         "An optional list of field names (matching the `bindTo` values of nested `FormItem` " +
         "components) that should be excluded from the temporary localStorage save. The fields " +
         "are still submitted normally; they are only excluded from the persisted snapshot.",
-      type: "string[]",
+      valueType: "any",
     },
     keepOnCancel: {
       description:
@@ -195,9 +206,9 @@ export const FormMd = createMetadata({
     dataAfterSubmit: {
       description:
         "Controls what happens to the form data after a successful submit. " +
-        "`\"keep\"` (default) leaves the submitted data in the form. " +
-        "`\"reset\"` restores the form to its initial data (the value of the `data` property). " +
-        "`\"clear\"` empties the form as if no `data` property were set.",
+        '`"keep"` (default) leaves the submitted data in the form. ' +
+        '`"reset"` restores the form to its initial data (the value of the `data` property). ' +
+        '`"clear"` empties the form as if no `data` property were set.',
       availableValues: ["keep", "reset", "clear"],
       valueType: "string",
       defaultValue: defaultProps.dataAfterSubmit,
@@ -239,9 +250,10 @@ export const FormMd = createMetadata({
         `(including all fields). The return value controls submission behavior: returning \`false\` cancels ` +
         `the submission; returning a plain object submits that object instead; returning \`null\`, \`undefined\`, ` +
         `an empty string, or any non-object value proceeds with normal submission.`,
-      signature: "willSubmit(data: Record<string, any>, allData: Record<string, any>): false | Record<string, any> | null | undefined | void",
+      signature:
+        "willSubmit(data: Record<string, any>, allData: Record<string, any>): false | Record<string, any> | null | undefined | void",
       parameters: {
-        data: "The form data to be submitted (fields marked with noSubmit=\"true\" are excluded).",
+        data: 'The form data to be submitted (fields marked with noSubmit="true" are excluded).',
         allData: "The complete form data including all fields, useful for cross-field validation.",
       },
     },
@@ -259,7 +271,8 @@ export const FormMd = createMetadata({
         `The form infrastructure fires this event when a submit attempt is rejected because ` +
         `at least one field failed validation. \`willSubmit\` and \`submit\` are NOT fired in ` +
         `this case; \`submitFailed\` is the only signal available to react to a failed submit.`,
-      signature: "submitFailed(validationResult: { isValid: boolean, errors: any[], warnings: any[], validationResults: Record<string, any>, data: Record<string, any> }): void",
+      signature:
+        "submitFailed(validationResult: { isValid: boolean, errors: any[], warnings: any[], validationResults: Record<string, any>, data: Record<string, any> }): void",
       parameters: {
         validationResult:
           "The validation result of the failed submit, including the per-field validation results.",
@@ -267,7 +280,8 @@ export const FormMd = createMetadata({
       isInternal: true,
     },
     success: {
-      description: "The form infrastructure fires this event when the form is submitted successfully.",
+      description:
+        "The form infrastructure fires this event when the form is submitted successfully.",
       signature: "success(response: any): void",
       parameters: {
         response: "The response from the successful form submission.",
@@ -334,7 +348,8 @@ export const FormMd = createMetadata({
       signature: "reset(): void",
     },
     update: {
-      description: "You can pass a data object to update the form data. The properties in the passed data " +
+      description:
+        "You can pass a data object to update the form data. The properties in the passed data " +
         "object are updated to their values accordingly. Other form properties remain intact.",
       signature: "update(data: Record<string, any>): void",
       parameters: {
@@ -342,15 +357,19 @@ export const FormMd = createMetadata({
       },
     },
     validate: {
-      description: "This method triggers validation on all form fields without submitting the form. " +
+      description:
+        "This method triggers validation on all form fields without submitting the form. " +
         "It displays validation errors and returns the validation result along with the cleaned form data. " +
         "This is useful for implementing custom submit buttons or performing operations that require " +
         "validated data without actually submitting the form.",
-      signature: "validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>",
-      returns: "A promise that resolves to an object containing validation status, cleaned data, and detailed validation results.",
+      signature:
+        "validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>",
+      returns:
+        "A promise that resolves to an object containing validation status, cleaned data, and detailed validation results.",
     },
     getData: {
-      description: "This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.",
+      description:
+        "This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.",
       signature: "getData(): Record<string, any>",
       returns: "A deep clone of the current form data object.",
     },
@@ -385,21 +404,27 @@ export const FormMd = createMetadata({
   },
 });
 
-export const formComponentRenderer = wrapComponent(
-  COMP,
-  FormWithContextVar,
-  FormMd,
-  {
-    customRender: (_props, { node, renderChild, extractValue, lookupEventHandler, classes, registerComponentApi, appContext }) => (
-      <FormWithContextVar
-        node={node as any}
-        renderChild={renderChild}
-        extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler as any}
-        classes={classes}
-        registerComponentApi={registerComponentApi}
-        appContext={appContext}
-      />
-    ),
-  },
-);
+export const formComponentRenderer = wrapComponent(COMP, FormWithContextVar, FormMd, {
+  customRender: (
+    _props,
+    {
+      node,
+      renderChild,
+      extractValue,
+      lookupEventHandler,
+      classes,
+      registerComponentApi,
+      appContext,
+    },
+  ) => (
+    <FormWithContextVar
+      node={node as any}
+      renderChild={renderChild}
+      extractValue={extractValue}
+      lookupEventHandler={lookupEventHandler as any}
+      classes={classes}
+      registerComponentApi={registerComponentApi}
+      appContext={appContext}
+    />
+  ),
+});

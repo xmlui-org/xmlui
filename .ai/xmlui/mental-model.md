@@ -1,4 +1,4 @@
-# XMLUI Mental Model & Request Lifecycle
+# XMLUI Framework Mental Model
 
 ## What XMLUI Is
 

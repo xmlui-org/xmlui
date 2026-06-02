@@ -19,6 +19,7 @@ import {
 } from "../abstractions";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { VisuallyHidden } from "../VisuallyHidden";
+import { defaultProps } from "./Button.defaults";
 
 type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "form"> & {
   type?: ButtonType;
@@ -34,27 +35,6 @@ type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "form"
   classes?: Record<string, string>;
 };
 
-export const defaultProps: Pick<
-  Props,
-  | "type"
-  | "iconPosition"
-  | "contentPosition"
-  | "orientation"
-  | "variant"
-  | "themeColor"
-  | "size"
-  | "autoFocus"
-> & { enabled: boolean } = {
-  type: "button",
-  iconPosition: "start",
-  contentPosition: "center",
-  orientation: "horizontal",
-  variant: "solid",
-  themeColor: "primary",
-  size: "sm",
-  autoFocus: false,
-  enabled: true,
-};
 
 export const Button = memo(forwardRef(function Button(
   {

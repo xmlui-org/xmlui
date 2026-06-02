@@ -34,6 +34,8 @@ export const MarkdownMd = createMetadata({
       "This property sets the markdown content to display. Alternatively, you can nest " +
         "the markdown content as a child in a CDATA section. In neither this property " +
         "value nor any child is defined, empty content is displayed.",
+      undefined,
+      "string",
     ),
     codeHighlighter: {
       description: "This property sets the code highlighter to use.",

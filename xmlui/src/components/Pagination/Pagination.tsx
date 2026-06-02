@@ -75,6 +75,8 @@ export const PaginationMd = createMetadata({
     ),
     pageSizeOptions: d(
       "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
+      undefined,
+      "any",
     ),
     hasPrevPage: d(
       "Whether to disable the previous page button. Only takes effect if itemCount is not provided.",

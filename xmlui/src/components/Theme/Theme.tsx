@@ -12,7 +12,7 @@ export const ThemeMd = createMetadata({
     "components without using CSS.",
   allowArbitraryProps: true,
   props: {
-    themeId: d(`This property specifies which theme to use by setting the theme's id.`),
+    themeId: d(`This property specifies which theme to use by setting the theme's id.`, undefined, "string"),
     tone: {
       description: "This property allows the setting of the current theme's tone.",
       availableValues: ["light", "dark"],

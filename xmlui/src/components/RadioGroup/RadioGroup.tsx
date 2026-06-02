@@ -40,6 +40,7 @@ export const RadioGroupMd = createMetadata({
   props: {
     initialValue: {
       ...dInitialValue(),
+      valueType: "string",
       defaultValue: defaultProps.initialValue,
     },
     autoFocus: dAutoFocus(),

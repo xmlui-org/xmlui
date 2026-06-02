@@ -40,7 +40,10 @@ export const SliderMd = createMetadata({
     },
   },
   props: {
-    initialValue: dInitialValue(),
+    initialValue: {
+      ...dInitialValue(),
+      valueType: "any",
+    },
     minValue: {
       description: `This property specifies the minimum value of the allowed input range.`,
       valueType: "number",
@@ -72,9 +75,13 @@ export const SliderMd = createMetadata({
     },
     rangeStyle: d(
       `This optional property allows you to apply custom styles to the range element of the slider.`,
+      undefined,
+      "hash",
     ),
     thumbStyle: d(
       `This optional property allows you to apply custom styles to the thumb elements of the slider.`,
+      undefined,
+      "hash",
     ),
     showValues: {
       description: `This property controls whether the slider shows the current values of the thumbs.`,

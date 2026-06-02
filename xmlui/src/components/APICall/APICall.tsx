@@ -76,6 +76,7 @@ export const APICallMd = createMetadata({
       description:
         "You can optionally define request header values as key-value pairs, where the key is the ID " +
         "of the particular header and the value is that header's corresponding value.",
+      valueType: "hash",
       audit: {
         classification: "secret",
         defaultRedaction: "mask",
@@ -208,6 +209,7 @@ export const APICallMd = createMetadata({
       description:
         "Optional body to send with the cancel request. " +
         "Can use $result context from initial response.",
+      valueType: "any",
     },
     inProgressNotificationMessage: {
       description:
