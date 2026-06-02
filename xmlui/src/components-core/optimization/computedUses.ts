@@ -487,11 +487,9 @@ function computeUsesInternal(
       let merged: Map<string, { globalReads: ReadonlySet<string> }> | undefined;
       for (const [name, { reads }] of fnPerFunction) {
         const globalReads = new Set([...reads].filter(isGlobalDep));
-        if (globalReads.size > 0) {
-          // Lazily allocate the merged Map only when we have entries to add.
-          if (!merged) merged = new Map(parentFunctionDeps ?? []);
-          merged.set(name, { globalReads });
-        }
+        // Lazily allocate the merged Map only when we have entries to add.
+        if (!merged) merged = new Map(parentFunctionDeps ?? []);
+        merged.set(name, { globalReads });
       }
       if (merged) childParentFunctionDeps = merged;
     }
@@ -627,6 +625,7 @@ function computeUsesInternal(
     // 2. Nodes calling parent-scope functions while narrowing is disabled are NOT narrowed.
     const dependsOnParentFunction = parentFunctionNames.size > 0 &&
       [...parentDependencies].some(d => parentFunctionNames.has(d));
+
     const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
 
     // §10: Relaxed gate for globals — dependsOnParentFunction does NOT block when every
