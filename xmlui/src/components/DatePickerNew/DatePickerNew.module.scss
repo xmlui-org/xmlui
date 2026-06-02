@@ -31,6 +31,11 @@ $textColor-placeholder-DatePickerNew: createThemeVar("Input:textColor-placeholde
 $color-adornment-DatePickerNew: createThemeVar("Input:color-adornment-#{$componentName}");
 $textColor-value-DatePickerNew: createThemeVar("Input:textColor-value-#{$componentName}");
 
+// --- Disabled state (inherits the Input family disabled colors, like DatePicker)
+$backgroundColor-DatePickerNew--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+$textColor-DatePickerNew--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColor-DatePickerNew--disabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+
 // --- Validation variants (inherit the Input validation border colors)
 $borderColor-DatePickerNew--error: createThemeVar("Input:borderColor-#{$componentName}--error");
 $borderColor-DatePickerNew--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
@@ -90,6 +95,18 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
       border-color: $borderColor-DatePickerNew--success;
     }
 
+    // Inline mode renders the calendar in the page flow (no portal, no input
+    // control). With no input there is no reference element for Ark's floating-ui
+    // positioner, so it parks the popup off-screen (transform: translateY(-100vh))
+    // with pointer-events: none. Neutralise all of that so the calendar lays out
+    // in normal flow AND stays interactive (days must be clickable).
+    &[data-inline] .positioner {
+      position: static !important;
+      transform: none !important;
+      inset: auto !important;
+      pointer-events: auto !important;
+    }
+
     &[data-inline] .content {
       box-shadow: none;
     }
@@ -109,10 +126,14 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
       max-width: none;
     }
 
+    // The number input only takes the width its digits need; the rest of the
+    // full-width control stays empty clickable chrome that opens the calendar.
+    // (Don't stretch the input — that would make typing-vs-open ambiguous and
+    // leave almost nothing to click for opening.)
     .input {
-      flex: 1 1 auto;
-      width: auto;
-      min-width: 0;
+      flex: 0 0 auto;
+      width: 11ch;
+      min-width: 11ch;
       text-align: left;
     }
   }
@@ -134,6 +155,13 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
       width: 11ch;
       min-width: 11ch;
       text-align: center;
+    }
+
+    // Keep the centered date group: an auto left margin on the (usually empty)
+    // trailing group would otherwise absorb the free space and left-pack the
+    // range inputs.
+    .trailing {
+      margin-left: 0;
     }
   }
 
@@ -159,6 +187,10 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     display: flex;
     align-items: center;
     flex: 0 0 auto;
+    // The field is the open trigger: the non-input chrome (adornments, range
+    // separator, padding) shows a pointer. The editable input overrides this
+    // with a text caret below so typing still reads as an editable field.
+    cursor: pointer;
     width: max-content;
     max-width: 100%;
     min-width: 0;
@@ -193,6 +225,27 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     }
   }
 
+  // Disabled: non-interactive with a not-allowed cursor, matching DatePicker.
+  // The root carries `data-disabled` (see the React renderer).
+  .root[data-disabled] .control {
+    cursor: not-allowed;
+    background-color: $backgroundColor-DatePickerNew--disabled;
+    color: $textColor-DatePickerNew--disabled;
+    border-color: $borderColor-DatePickerNew--disabled;
+
+    &:hover {
+      border-color: $borderColor-DatePickerNew--disabled;
+      background-color: $backgroundColor-DatePickerNew--disabled;
+    }
+
+    .input,
+    .adornment,
+    .rangeSeparator {
+      cursor: not-allowed;
+      color: inherit;
+    }
+  }
+
   .input {
     width: 11ch;
     min-width: 11ch;
@@ -205,6 +258,15 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     font: inherit;
     font-size: $fontSize-DatePickerNew;
     text-align: center;
+    // Editable input: a text caret signals you can type here (clicking it does
+    // not open the calendar — see the control's onClick guard).
+    cursor: text;
+
+    // A read-only input (mobile sheet trigger, or a read-only picker) can't be
+    // typed into, so it behaves like the rest of the trigger and shows a pointer.
+    &:read-only {
+      cursor: pointer;
+    }
 
     &::placeholder {
       color: $textColor-placeholder-DatePickerNew;
@@ -219,6 +281,20 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     flex: 0 0 auto;
     color: $color-adornment-DatePickerNew;
     font-size: t.$fontSize-sm;
+  }
+
+  // Trailing chrome (validation icon, clear button, end adornment) pinned to the
+  // right edge. `margin-left: auto` consumes the free space between the typed
+  // value and the right edge when the field is wider than its content (e.g.
+  // full-width); that gap is plain control surface, so clicking it opens the
+  // calendar while the numbers stay editable. With no spare width it collapses to
+  // zero, so content-width pickers keep the adornment next to the value.
+  .trailing {
+    display: inline-flex;
+    align-items: center;
+    gap: t.$space-2;
+    flex: 0 0 auto;
+    margin-left: auto;
   }
 
   .clear,
@@ -295,6 +371,9 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
+    // Stretch to the calendar's height so the separator runs the full length
+    // (the content row is align-items: flex-start otherwise).
+    align-self: stretch;
     gap: t.$space-1_5;
     flex-wrap: nowrap;
     padding-right: t.$space-2_5;
@@ -440,23 +519,36 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
 
   // Desktop range confirmation footer (Cancel / Proceed). `flex: 0 0 100%`
   // wraps it onto its own full-width row below the presets + calendar.
+  // Stacks the calendars and the confirm footer in one column whose width is
+  // driven by the calendars — so the footer can't widen the popup past them.
+  .calendarArea {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 0;
+  }
+
+  // Full width of the calendar column: the divider spans both calendars, and
+  // the buttons are pushed to the right (directly under the last calendar).
+  // `margin-top` keeps the divider clear of the day grid above it.
   .popupFooter {
-    flex: 0 0 100%;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: t.$space-2;
+    margin-top: t.$space-3;
     padding-top: t.$space-3;
-    margin-top: t.$space-1;
     border-top: 1px solid $borderColor-menu-DatePickerNew;
   }
 
+  // Compact, proportional to the rest of the dropdown (preset/day scale).
   .footerButton {
     appearance: none;
     cursor: pointer;
     font: inherit;
+    font-size: t.$fontSize-sm;
     font-weight: t.$fontWeight-medium;
-    padding: t.$space-2 t.$space-4;
+    padding: t.$space-1_5 t.$space-3;
     border-radius: t.$borderRadius;
     border: 1px solid transparent;
     transition: background-color 0.15s ease-in, border-color 0.15s ease-in;
@@ -499,13 +591,61 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
       flex-basis: auto;
     }
 
+    // Inline calendars render in the page flow on every viewport (never as a
+    // sheet). The popover sizing chain (positioner/content default to
+    // `max-content`) combined with the sheet's `width: 100%` day grid creates a
+    // `max-content ↔ 100%` feedback loop that explodes into a runaway width. For
+    // the in-flow inline calendar, bind the whole chain to the container (100%)
+    // so it stays put, fills evenly, and shrinks to fit narrow phone layouts.
+    .root[data-inline] {
+      width: 100%;
+
+      .positioner {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .content {
+        width: 100%;
+        max-width: 100%;
+        padding: t.$space-2;
+      }
+
+      .calendarArea {
+        width: 100%;
+      }
+
+      .view {
+        order: 0;
+        flex: 0 0 auto;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        overflow: visible;
+      }
+
+      .view > .table,
+      .table {
+        width: 100%;
+      }
+
+      .calendarMonths,
+      .calendarMonth {
+        width: 100%;
+      }
+    }
+
     // --- Popover becomes a bottom-sheet drawer ---
     // Ark portals the positioner to <body> and anchors it to the trigger with an
     // inline transform. Override that so the positioner fills the screen and acts
     // as the dimmed backdrop, with the sheet pinned to the bottom edge. The
     // transform reset is required: a transformed ancestor would otherwise become
     // the containing block for the sheet's positioning.
-    .positioner {
+    //
+    // Gated on [data-sheet]: only popover pickers become drawers. Inline pickers
+    // carry no data-sheet attribute, so they keep the in-flow desktop layout even
+    // on narrow viewports (no full-screen drawer on load).
+    .positioner[data-sheet] {
       position: fixed !important;
       inset: 0 !important;
       transform: none !important;
@@ -523,14 +663,18 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
 
     // Closed state: Ark keeps the positioner mounted with a hidden content. Don't
     // let the full-screen backdrop cover the app while the picker is closed.
-    .positioner:has(.content[hidden]) {
+    .positioner[data-sheet]:has(.content[hidden]) {
       background: transparent;
       pointer-events: none;
       animation: none;
     }
 
-    .content {
+    .content[data-sheet] {
       flex-direction: column;
+      // The base (desktop) content is flex-wrap:wrap; in a height-constrained
+      // column that wraps the tall day view into a 2nd column beside the
+      // header. Force a single column for the sheet.
+      flex-wrap: nowrap;
       align-items: stretch;
       width: 100%;
       max-width: 100%;
@@ -544,6 +688,7 @@ $borderColor-selectedItem-DatePickerNew: createThemeVar("Input:borderColor-selec
       padding-bottom: env(safe-area-inset-bottom, 0px);
       animation: datepicker-sheet-up 0.24s ease-out;
     }
+
 
     // Pinned header: title, live selection summary, day count, close button.
     // The summary block is centred across the full width; the close button is

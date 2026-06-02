@@ -6,6 +6,7 @@ import {
 } from "@ark-ui/react/date-picker";
 import { Portal } from "@ark-ui/react/portal";
 import {
+  Fragment,
   forwardRef,
   memo,
   useCallback,
@@ -166,6 +167,9 @@ export const defaultProps = {
 // longer spans, so a half-year window each way is plenty for manual scrolling.
 const MOBILE_MONTHS_BEFORE = 6;
 const MOBILE_MONTHS_AFTER = 6;
+// How many months to append/prepend each time the mobile sheet scrolls near an
+// edge, so any past/future date stays reachable by continuing to scroll.
+const MOBILE_SCROLL_CHUNK = 12;
 
 const PRESET_LABELS: Record<PresetValue, string> = {
   thisWeek: "This week",
@@ -718,6 +722,7 @@ type DateFieldProps = {
   ariaLabel?: string;
   autoFocus?: boolean;
   readOnly?: boolean;
+  disabled?: boolean;
   fieldRef?: RefObject<HTMLInputElement | null>;
   onCommit: (value: DateValue | null) => void;
 };
@@ -736,6 +741,7 @@ function DateField({
   ariaLabel,
   autoFocus,
   readOnly,
+  disabled,
   fieldRef,
   onCommit,
 }: DateFieldProps) {
@@ -770,7 +776,7 @@ function DateField({
   // letters + separators — so the structure never disappears while typing.
   useEffect(() => {
     const el = fieldRef?.current ?? ownRef.current;
-    if (!el || readOnly) return;
+    if (!el || readOnly || disabled) return;
 
     const render = () => {
       const { value, positions } = buildDisplay(
@@ -943,7 +949,7 @@ function DateField({
       el.removeEventListener("keydown", onKeyDown);
       el.removeEventListener("blur", onBlur);
     };
-  }, [segments, dateFormat, readOnly, fieldRef]);
+  }, [segments, dateFormat, readOnly, disabled, fieldRef]);
 
   return (
     <input
@@ -954,6 +960,7 @@ function DateField({
       defaultValue={display}
       autoFocus={autoFocus}
       readOnly={readOnly}
+      disabled={disabled}
       inputMode="numeric"
       autoComplete="off"
       spellCheck={false}
@@ -1011,11 +1018,21 @@ export const DatePicker = memo(
 
   const mode = toMode(rawMode);
   const isControlled = controlledValue !== undefined;
-  const isMobile = useIsMobile();
+  const isViewportMobile = useIsMobile();
+  // The mobile bottom-sheet only applies to popover (non-inline) pickers. An
+  // inline calendar is always rendered in the page flow on every viewport, so
+  // it must never engage the sheet (which would otherwise show a drawer on
+  // load). Everything sheet-related keys off this flag.
+  const isMobile = isViewportMobile && !inline;
   const [isOpen, setIsOpen] = useState(false);
   const [insideDialog, setInsideDialog] = useState(false);
   const [mobileFocusedValue, setMobileFocusedValue] = useState<DateValue | undefined>();
   const [desktopFocusedValue, setDesktopFocusedValue] = useState<DateValue | undefined>();
+  // Mobile sheet renders a vertical, infinitely-scrollable window of months
+  // around the focused month. The window grows as the user scrolls toward either
+  // edge so any past/future date is reachable.
+  const [monthsBefore, setMonthsBefore] = useState(MOBILE_MONTHS_BEFORE);
+  const [monthsAfter, setMonthsAfter] = useState(MOBILE_MONTHS_AFTER);
   const rootRef = useRef<HTMLDivElement>(null);
   const positionerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -1025,6 +1042,14 @@ export const DatePicker = memo(
   const dayViewRef = useRef<HTMLDivElement>(null);
   const monthZeroRef = useRef<HTMLDivElement>(null);
   const pendingMobileScrollTopRef = useRef<number | null>(null);
+  // Infinite-scroll bookkeeping: a guard so a burst of scroll events only extends
+  // once per render, and the pre-prepend scrollHeight used to keep the viewport
+  // anchored when months are added above the current position.
+  const monthWindowExtendingRef = useRef(false);
+  const prependPrevHeightRef = useRef<number | null>(null);
+  // Set when a mobile month/year pick re-anchors the sheet, so a layout effect
+  // can scroll the newly focused month to the top.
+  const mobileJumpPendingRef = useRef(false);
   const focusedWithinRef = useRef(false);
 
   const [internalValue, setInternalValue] = useState<DateValue[]>(() =>
@@ -1153,6 +1178,12 @@ export const DatePicker = memo(
   const handleOpenChange = useCallback(
     (details: { open: boolean }) => {
       setIsOpen(details.open);
+      // Re-center the infinite-scroll month window on every open/close so it
+      // starts fresh around the focused month rather than wherever it was left.
+      setMonthsBefore(MOBILE_MONTHS_BEFORE);
+      setMonthsAfter(MOBILE_MONTHS_AFTER);
+      monthWindowExtendingRef.current = false;
+      prependPrevHeightRef.current = null;
       if (!details.open) {
         setMobileFocusedValue(undefined);
         setDesktopFocusedValue(undefined);
@@ -1179,6 +1210,38 @@ export const DatePicker = memo(
     if (pendingMobileScrollTopRef.current != null) return;
     pendingMobileScrollTopRef.current = dayViewRef.current?.scrollTop ?? null;
   }, [isMobile, isOpen]);
+
+  // Infinite scroll for the mobile sheet: when the user scrolls within a viewport
+  // of either edge, grow the month window so they can keep scrolling into the
+  // past or future. The guard ref ensures a burst of scroll events only triggers
+  // one extension per render.
+  const handleMobileScroll = useCallback(() => {
+    const el = dayViewRef.current;
+    if (!el || monthWindowExtendingRef.current) return;
+    const threshold = Math.max(el.clientHeight, 1);
+    if (el.scrollTop < threshold) {
+      monthWindowExtendingRef.current = true;
+      // Remember the height so the layout effect can keep the viewport anchored
+      // after months are prepended above the current scroll position.
+      prependPrevHeightRef.current = el.scrollHeight;
+      setMonthsBefore((before) => before + MOBILE_SCROLL_CHUNK);
+    } else if (el.scrollHeight - el.scrollTop - el.clientHeight < threshold) {
+      monthWindowExtendingRef.current = true;
+      setMonthsAfter((after) => after + MOBILE_SCROLL_CHUNK);
+    }
+  }, []);
+
+  // After the window grows, release the guard. When months were *prepended*, add
+  // their height to scrollTop so the visible month stays put (no jump upward).
+  useLayoutEffect(() => {
+    if (!monthWindowExtendingRef.current) return;
+    const el = dayViewRef.current;
+    if (el && prependPrevHeightRef.current != null) {
+      el.scrollTop += el.scrollHeight - prependPrevHeightRef.current;
+    }
+    prependPrevHeightRef.current = null;
+    monthWindowExtendingRef.current = false;
+  }, [monthsBefore, monthsAfter]);
 
   // When the picker lives inside another overlay that locks scroll (an xmlui
   // Drawer / Radix Dialog), Ark's body portal would place the mobile sheet
@@ -1256,8 +1319,8 @@ export const DatePicker = memo(
   // scrollable window centered on the focused month on mobile.
   const dayMonthOffsets = isMobile
     ? Array.from(
-        { length: MOBILE_MONTHS_BEFORE + MOBILE_MONTHS_AFTER + 1 },
-        (_, i) => i - MOBILE_MONTHS_BEFORE,
+        { length: monthsBefore + monthsAfter + 1 },
+        (_, i) => i - monthsBefore,
       )
     : Array.from({ length: visibleMonthCount }, (_, i) => i);
 
@@ -1270,6 +1333,17 @@ export const DatePicker = memo(
     });
     return () => cancelAnimationFrame(frame);
   }, [isMobile, isOpen]);
+
+  // After a mobile month/year pick re-anchors the window, scroll the newly
+  // focused month to the top so the jump is visible.
+  useLayoutEffect(() => {
+    if (!isMobile || !mobileJumpPendingRef.current) return;
+    mobileJumpPendingRef.current = false;
+    const frame = requestAnimationFrame(() => {
+      monthZeroRef.current?.scrollIntoView({ block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isMobile, mobileFocusedValue]);
 
   // Lock background page scroll while the mobile sheet is open so the page
   // behind the backdrop doesn't move under the user's finger.
@@ -1300,12 +1374,26 @@ export const DatePicker = memo(
       ? daysInclusive(values[0], values[1])
       : undefined;
 
+  // On desktop the calendars + confirm footer are wrapped in a column sized to
+  // the calendars (so the footer can't widen the popup). On mobile the sheet
+  // lays its children out with `order`, so we render them flat (no wrapper) —
+  // a wrapper there breaks the header/view stacking.
+  const CalendarArea = isMobile ? Fragment : "div";
+  const calendarAreaProps = isMobile ? {} : { className: styles.calendarArea };
+
   return (
     <ArkDatePicker.Root
       id={id}
       value={arkValue}
-      focusedValue={isMobile && isOpen ? mobileFocusedValue : undefined}
+      // Focus stays uncontrolled on every viewport. Controlling it on mobile
+      // vetoed the month/year picker (Ark couldn't move focus, so picking a month
+      // or year did nothing). The day-view anchor is our own `mobileFocusedValue`
+      // state, kept in sync through `onFocusChange` below.
+      focusedValue={undefined}
       onValueChange={(details) => {
+        // Read-only never changes the value, no matter how the change was
+        // triggered (calendar selection, presets, etc.) — matches DatePicker.
+        if (readOnly) return;
         rememberMobileScrollTop();
         if (isConfirmRange) {
           setPendingValues(details.value);
@@ -1314,6 +1402,47 @@ export const DatePicker = memo(
         }
       }}
       onOpenChange={handleOpenChange}
+      onFocusChange={(details: { focusedValue?: DateValue }) => {
+        // The day view is rendered from our own focused-value anchor (for the
+        // multi-month desktop layout / mobile scroll sheet). Ark's month & year
+        // pickers (and keyboard navigation) move Ark's internal focus, so mirror
+        // focus changes back into that anchor — but only when focus leaves the
+        // currently visible window, otherwise normal in-view navigation (range
+        // hover, scrolling) would shift the view and make the target jump away.
+        const next = details?.focusedValue;
+        if (!next) return;
+        const monthOrdinal = (d: DateValue) => d.year * 12 + (d.month - 1);
+        const nextOrd = monthOrdinal(next);
+
+        if (isMobile) {
+          // The mobile sheet is an infinite vertical scroll anchored at
+          // mobileFocusedValue. A day tap / nav within the visible (scrolled)
+          // window must not move the anchor; only a month/year pick that lands
+          // outside the window re-anchors, re-centers the window, and scrolls
+          // the picked month to the top.
+          const anchor = mobileFocusedValue;
+          if (anchor) {
+            const anchorOrd = monthOrdinal(anchor);
+            if (nextOrd >= anchorOrd - monthsBefore && nextOrd <= anchorOrd + monthsAfter) {
+              return;
+            }
+          }
+          setMobileFocusedValue(next);
+          setMonthsBefore(MOBILE_MONTHS_BEFORE);
+          setMonthsAfter(MOBILE_MONTHS_AFTER);
+          mobileJumpPendingRef.current = true;
+          return;
+        }
+
+        const anchor = desktopFocusedValue;
+        if (anchor) {
+          const anchorOrd = monthOrdinal(anchor);
+          if (nextOrd >= anchorOrd && nextOrd <= anchorOrd + visibleMonthCount - 1) {
+            return;
+          }
+        }
+        setDesktopFocusedValue(next);
+      }}
       selectionMode={mode}
       disabled={!enabled}
       readOnly={readOnly}
@@ -1343,16 +1472,21 @@ export const DatePicker = memo(
         data-validation-status={validationStatus}
         data-inline={inline ? "" : undefined}
         data-mobile={isMobile ? "" : undefined}
+        data-disabled={!enabled ? "" : undefined}
         data-open={isOpen ? "" : undefined}
         onFocusCapture={handleFocusCapture}
         onBlurCapture={handleBlurCapture}
       >
-        {label && (
+        {!inline && label && (
           <ArkDatePicker.Label className={styles.label}>
             {label}
           </ArkDatePicker.Label>
         )}
 
+        {/* Inline mode mirrors the core DatePicker: only the calendar (the
+            content that would otherwise live in the dropdown) is rendered — no
+            input control, no label, and never a portal/drawer. */}
+        {!inline && (
         <div className={styles.pickerRow}>
           {/* Capture Ark's api so a click on the control's non-value area can
               open the calendar (desktop). */}
@@ -1366,6 +1500,8 @@ export const DatePicker = memo(
             className={styles.control}
             data-has-adornment={hasAdornment ? "" : undefined}
             onClick={(event) => {
+              // Disabled pickers never open (matches the core DatePicker).
+              if (!enabled) return;
               // Mobile: tapping anywhere in the field opens the sheet (the
               // inputs are read-only there). Desktop: clicking the value is for
               // typing and the calendar/clear buttons handle their own clicks;
@@ -1374,11 +1510,15 @@ export const DatePicker = memo(
                 apiRef.current?.setOpen(true);
                 return;
               }
-              // The whole field is the trigger (matching the core DatePicker):
-              // clicking anywhere — including the editable inputs — opens the
-              // calendar. Only the clear/footer buttons keep their own handlers.
+              // Desktop: the non-input chrome (adornments, separator, padding) is
+              // the open trigger. Clicking an editable input lets the user type
+              // instead of opening the calendar; clicking a read-only input (which
+              // can't be typed into) still opens. The clear/footer buttons keep
+              // their own handlers.
               const target = event.target as HTMLElement;
               if (target.closest("button")) return;
+              const clickedInput = target.closest("input") as HTMLInputElement | null;
+              if (clickedInput && !clickedInput.readOnly) return;
               apiRef.current?.setOpen(true);
             }}
           >
@@ -1393,6 +1533,7 @@ export const DatePicker = memo(
               ariaLabel={label || "Date"}
               autoFocus={autoFocus}
               readOnly={isMobile || readOnly}
+              disabled={!enabled}
               onCommit={(date) => commitField(0, date)}
             />
 
@@ -1406,42 +1547,53 @@ export const DatePicker = memo(
                   className={styles.input}
                   ariaLabel="End date"
                   readOnly={isMobile || readOnly}
+                  disabled={!enabled}
                   onCommit={(date) => commitField(1, date)}
                 />
               </>
             )}
 
-            {!finalVerboseValidationFeedback && (
-              <span className={styles.conciseValidation}>
-                <ConciseValidationFeedback
-                  validationStatus={validationStatus}
-                  invalidMessages={invalidMessages}
-                  successIcon={finalValidationIconSuccess}
-                  errorIcon={finalValidationIconError}
-                />
-              </span>
-            )}
+            {/* Trailing chrome pinned to the right edge (the validation icon,
+                clear button and end adornment). `margin-left: auto` on this group
+                opens up a clickable gap between the typed value and the right
+                edge — clicking that gap opens the calendar, the numbers stay
+                editable, and the end text/adornment hugs the right edge. */}
+            <div className={styles.trailing}>
+              {!finalVerboseValidationFeedback && (
+                <span className={styles.conciseValidation}>
+                  <ConciseValidationFeedback
+                    validationStatus={validationStatus}
+                    invalidMessages={invalidMessages}
+                    successIcon={finalValidationIconSuccess}
+                    errorIcon={finalValidationIconError}
+                  />
+                </span>
+              )}
 
-            {clearable && !isMobile && (
-              <ArkDatePicker.ClearTrigger
-                className={styles.clear}
-                aria-label="Clear date"
-              >
-                <CloseGlyph />
-              </ArkDatePicker.ClearTrigger>
-            )}
+              {clearable && !isMobile && (
+                <ArkDatePicker.ClearTrigger
+                  className={styles.clear}
+                  aria-label="Clear date"
+                >
+                  <CloseGlyph />
+                </ArkDatePicker.ClearTrigger>
+              )}
 
-            <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+              <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+            </div>
           </ArkDatePicker.Control>
         </div>
+        )}
 
-        <MaybePortal disabled={isMobile && insideDialog}>
+        <MaybePortal disabled={(isMobile && insideDialog) || inline}>
           <ArkDatePicker.Positioner
             ref={positionerRef}
             className={cx(styles.positioner, contentClassName)}
+            data-sheet={isMobile ? "" : undefined}
           >
             <ArkDatePicker.Content
               className={styles.content}
+              data-sheet={isMobile ? "" : undefined}
               data-testid={isMobile ? "datepicker-sheet" : undefined}
             >
               {isMobile && (
@@ -1495,10 +1647,15 @@ export const DatePicker = memo(
                 </div>
               )}
 
+              {/* Desktop only: a column sized to the calendars so the confirm
+                  footer never widens the popup past them. On mobile this is a
+                  Fragment (no wrapper) so the sheet's order-based layout works. */}
+              <CalendarArea {...calendarAreaProps}>
               <ArkDatePicker.View
                 ref={dayViewRef}
                 view="day"
                 className={styles.view}
+                onScroll={isMobile ? handleMobileScroll : undefined}
                 onPointerDownCapture={rememberMobileScrollTop}
                 onTouchStartCapture={rememberMobileScrollTop}
               >
@@ -1760,6 +1917,7 @@ export const DatePicker = memo(
                   </button>
                 </div>
               )}
+              </CalendarArea>
             </ArkDatePicker.Content>
           </ArkDatePicker.Positioner>
         </MaybePortal>
