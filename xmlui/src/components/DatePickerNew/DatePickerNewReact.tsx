@@ -5,6 +5,7 @@ import {
   type DateValue,
 } from "@ark-ui/react/date-picker";
 import { Portal } from "@ark-ui/react/portal";
+import { EnvironmentProvider } from "@ark-ui/react/environment";
 import {
   Fragment,
   forwardRef,
@@ -28,6 +29,7 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { useFormContextPart } from "../Form/FormContext";
 import { useFormItemInputId, useIsInsideFormItem } from "../FormItem/FormItemContext";
 import { Adornment } from "../Input/InputAdornment";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 // On mobile the calendar is a fixed full-screen sheet, so it does not need
 // Ark's body portal — and portaling it out of the trigger's DOM subtree breaks
@@ -37,8 +39,16 @@ import { Adornment } from "../Input/InputAdornment";
 // drawer's scroll-allowed subtree. Desktop still portals so Ark can anchor the
 // popover to the trigger. No ancestor uses transform/filter, so the fixed sheet
 // still covers the viewport when rendered inline.
-function MaybePortal({ disabled, children }: { disabled: boolean; children: ReactNode }) {
-  return disabled ? <>{children}</> : <Portal>{children}</Portal>;
+function MaybePortal({
+  disabled,
+  container,
+  children,
+}: {
+  disabled: boolean;
+  container?: RefObject<HTMLElement | null>;
+  children: ReactNode;
+}) {
+  return disabled ? <>{children}</> : <Portal container={container}>{children}</Portal>;
 }
 
 type Mode = "single" | "range";
@@ -1070,6 +1080,24 @@ export const DatePicker = memo(
   // Stable composed ref for the root (forwarded ref + internal rootRef).
   const composedRootRef = useComposedRefs(ref, rootRef);
 
+  // Portal the calendar popup into the XMLUI theme root (not document.body) so it
+  // stays inside the themed, scoped subtree and positions correctly — e.g. within
+  // the docs playground container. Ark's Portal expects a ref-shaped container;
+  // the core DatePicker portals into the same theme root.
+  const { root: themeRoot } = useTheme();
+  const portalContainer = useMemo<RefObject<HTMLElement | null>>(
+    () => ({ current: themeRoot ?? null }),
+    [themeRoot],
+  );
+  // Ark resolves window/document and computes popup positioning from the root
+  // node. Inside a Shadow DOM (e.g. the docs playground), default `document`
+  // measurements break and the popup snaps to the corner — point Ark at the
+  // actual root node so positioning works in any host.
+  const getRootNode = useCallback(
+    () => (rootRef.current?.getRootNode() as Document | ShadowRoot) ?? document,
+    [],
+  );
+
   const [internalValue, setInternalValue] = useState<DateValue[]>(() =>
     toDateValues(controlledValue ?? initialValue, mode, dateFormat),
   );
@@ -1400,6 +1428,7 @@ export const DatePicker = memo(
   const calendarAreaProps = isMobile ? {} : { className: styles.calendarArea };
 
   return (
+    <EnvironmentProvider value={getRootNode}>
     <ArkDatePicker.Root
       id={id}
       value={arkValue}
@@ -1480,7 +1509,11 @@ export const DatePicker = memo(
       placeholder={placeholder}
       format={(date) => formatDateValue(date, dateFormat)}
       parse={(value) => parseDateValue(value, dateFormat)}
-      positioning={{ placement: "bottom-start", sameWidth: false }}
+      // `strategy: "fixed"` anchors the popup to the trigger via viewport
+      // coordinates (like the core DatePicker's Radix popover). Absolute strategy
+      // mis-positions to the corner when the popup is portaled into a scoped
+      // container (e.g. the docs playground's Shadow DOM root).
+      positioning={{ placement: "bottom-start", sameWidth: false, strategy: "fixed" }}
     >
       <div
         ref={composedRootRef}
@@ -1609,7 +1642,7 @@ export const DatePicker = memo(
         </div>
         )}
 
-        <MaybePortal disabled={(isMobile && insideDialog) || inline}>
+        <MaybePortal disabled={(isMobile && insideDialog) || inline} container={portalContainer}>
           <ArkDatePicker.Positioner
             ref={positionerRef}
             className={cx(styles.positioner, contentClassName)}
@@ -1947,6 +1980,7 @@ export const DatePicker = memo(
         </MaybePortal>
       </div>
     </ArkDatePicker.Root>
+    </EnvironmentProvider>
   );
   }),
 );

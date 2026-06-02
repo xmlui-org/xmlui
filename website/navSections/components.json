@@ -117,6 +117,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/DatePickerNew",
+          "label": "DatePickerNew",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/Drawer",
           "label": "Drawer",
           "icon": "component"
