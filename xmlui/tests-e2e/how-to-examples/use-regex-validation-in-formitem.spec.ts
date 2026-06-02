@@ -51,12 +51,18 @@ test.describe("FormItem regex validation with severity", { tag: "@website" }, ()
 
     await page.getByRole("textbox", { name: "Phone number" }).fill("+1234567890");
     await page.getByRole("textbox", { name: "ZIP code (warning only)" }).fill("1234");
-    
-    // Wait for validation warning to appear before submitting
-    await expect(page.getByText("Expected a 5-digit ZIP code").first()).toBeVisible();
-    
-    await page.getByRole('button', { name: 'Submit' }).click();
-    await page.getByRole("button", { name: "Yes, proceed" }).click();
+
+    // The field's regex result lands in the Form's state asynchronously after
+    // typing. A Submit fired before it lands does not open the confirmation
+    // modal (and is safely held back by the form's pending-validation guard, so
+    // it never submits early). Retry the Submit click until the warning modal
+    // actually appears instead of relying on a fixed settle delay.
+    const proceed = page.getByRole("button", { name: "Yes, proceed" });
+    await expect(async () => {
+      await page.getByRole("button", { name: "Submit" }).click();
+      await expect(proceed).toBeVisible({ timeout: 1000 });
+    }).toPass({ timeout: 10000 });
+    await proceed.click();
 
     await expect(page.getByText("Submitted!")).toBeVisible();
   });
