@@ -67,7 +67,7 @@ test.describe("FormItem label click focuses the input", () => {
     await expect(target).toBeFocused();
   });
 
-  test("child-template DatePicker opens calendar on label click", async ({
+  test("child-template DatePicker focuses the input on label click", async ({
     initTestBed,
     page,
   }) => {
@@ -80,10 +80,9 @@ test.describe("FormItem label click focuses the input", () => {
     `);
     const label = page.locator("label", { hasText: "When" });
     const forId = await label.getAttribute("for");
-    const trigger = page.locator(`[id="${forId}"]`);
-    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    const input = page.locator(`[id="${forId}"]`);
     await label.click();
-    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(input).toBeFocused();
   });
 
   test("child-template TextArea", async ({ initTestBed, page }) => {
@@ -223,7 +222,7 @@ test.describe("FormItem label click focuses the input", () => {
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 
-  test("type=datePicker opens calendar on label click", async ({ initTestBed, page }) => {
+  test("type=datePicker focuses the input on label click", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
         <FormItem label="Birthday" bindTo="bday" type="datePicker" />
@@ -231,10 +230,9 @@ test.describe("FormItem label click focuses the input", () => {
     `);
     const label = page.locator("label", { hasText: "Birthday" });
     const forId = await label.getAttribute("for");
-    const trigger = page.locator(`[id="${forId}"]`);
-    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    const input = page.locator(`[id="${forId}"]`);
     await label.click();
-    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(input).toBeFocused();
   });
 
   test("type=radioGroup legend click focuses the first radio option", async ({
@@ -372,7 +370,7 @@ test.describe("bindTo on core component directly (no FormItem wrapper)", () => {
     await expect(input).toBeFocused();
   });
 
-  test("DatePicker bindTo + label opens calendar", async ({
+  test("DatePicker bindTo + label focuses the input on label click", async ({
     initTestBed,
     page,
   }) => {
@@ -383,10 +381,9 @@ test.describe("bindTo on core component directly (no FormItem wrapper)", () => {
     `);
     const label = page.locator("label", { hasText: "When" });
     const forId = await label.getAttribute("for");
-    const trigger = page.locator(`[id="${forId}"]`);
-    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    const input = page.locator(`[id="${forId}"]`);
     await label.click();
-    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(input).toBeFocused();
   });
 
   test("TextArea bindTo + label", async ({ initTestBed, page }) => {
