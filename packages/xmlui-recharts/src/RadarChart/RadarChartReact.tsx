@@ -14,6 +14,7 @@ import { useEffect, useRef, useState, useCallback, forwardRef, memo, useMemo } f
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "xmlui";
+import { defaultProps } from "./RadarChart.defaults";
 
 export type RadarChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   data: any[];
@@ -30,27 +31,6 @@ export type RadarChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   strokeWidth?: number;
   fillOpacity?: number;
   tooltipRenderer?: (tooltipData: any) => ReactNode;
-};
-
-export const defaultProps: Pick<
-  RadarChartProps,
-  | "hideGrid"
-  | "hideAngleAxis"
-  | "hideRadiusAxis"
-  | "hideTooltip"
-  | "showLegend"
-  | "filled"
-  | "strokeWidth"
-  | "fillOpacity"
-> = {
-  hideGrid: false,
-  hideAngleAxis: false,
-  hideRadiusAxis: false,
-  hideTooltip: false,
-  showLegend: false,
-  filled: true,
-  strokeWidth: 2,
-  fillOpacity: 0.3,
 };
 
 export const RadarChart = memo(

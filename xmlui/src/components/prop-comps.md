@@ -68,16 +68,16 @@
 * ProgressBar
 * QRCode
 * Queue
-RadarChart
-RadioGroup
-RatingInput
-ReadingTime
-Redirect
-RetryPolicy
-ScaleAnimation
-ScrollToTop
-ScrollViewer
-Search
+* RadarChart
+* RadioGroup
+* RatingInput
+* ReadingTime
+* Redirect
+* RetryPolicy
+* ScaleAnimation
+* ScrollToTop
+* ScrollViewer
+* Search
 Select
 SelectionStore
 Share

@@ -1,7 +1,8 @@
 import type { ComponentProps } from "react";
 import { createComponentRenderer, createMetadata, parseScssVar, useComponentThemeClass } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import { Search, defaultProps } from "./SearchReact";
+import { defaultProps } from "./Search.defaults";
+import { Search } from "./SearchReact";
 import styles from "./Search.module.scss";
 
 const COMP = "Search";

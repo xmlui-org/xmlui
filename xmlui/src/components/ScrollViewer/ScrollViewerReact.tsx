@@ -3,11 +3,7 @@ import classnames from "classnames";
 import { Scroller, type ScrollStyle } from "./Scroller";
 import styles from "./ScrollViewer.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-
-export const defaultProps = {
-  scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: true,
-};
+import { defaultProps } from "./ScrollViewer.defaults";
 
 type Props = {
   header?: React.ReactNode;
