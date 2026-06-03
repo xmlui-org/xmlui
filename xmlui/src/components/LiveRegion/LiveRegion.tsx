@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { LiveRegion, defaultProps } from "./LiveRegionReact";
+import { defaultProps } from "./LiveRegion.defaults";
+import { LiveRegion } from "./LiveRegionReact";
 
 const COMP = "LiveRegion";
 

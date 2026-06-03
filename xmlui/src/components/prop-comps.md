@@ -40,15 +40,15 @@
 * Heading
 * HeroSection
 * Image
-Inspector
-Items
-LabelList
-Legend
-Lifecycle
-LineChart
-Link
-List
-LiveRegion
+* Inspector
+* Items
+* LabelList
+* Legend
+* Lifecycle
+* LineChart
+* Link
+* List
+* LiveRegion
 Logo
 Markdown
 MessageListener

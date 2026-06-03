@@ -1,7 +1,8 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
-import { Items, defaultProps } from "./ItemsReact";
+import { defaultProps } from "./Items.defaults";
+import { Items } from "./ItemsReact";
 
 const COMP = "Items";
 
