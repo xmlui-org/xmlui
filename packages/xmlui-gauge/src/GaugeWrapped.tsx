@@ -10,21 +10,9 @@ import {
   dInitialValue,
   parseScssVar,
 } from "xmlui";
+import { defaultProps } from "./Gauge.defaults";
 
 const COMP = "Gauge";
-
-export const defaultProps = {
-  minValue: 0,
-  maxValue: 100,
-  analogDisplayType: "needle",
-  digitalDisplay: false,
-  startAngle: -30,
-  endAngle: 210,
-  scalePosition: "inside",
-  animation: "none",
-  unit: "",
-  showUnit: false,
-};
 
 export const GaugeMd: ComponentMetadata = createMetadata({
   status: "experimental",

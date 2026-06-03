@@ -32,14 +32,14 @@
 * FileUploadDropZone
 * FlowLayout
 * FocusScope
-Footer
-Form
-FormItem
-FormSegment
-Gauge
-Heading
-HeroSection
-Image
+* Footer
+* Form
+* FormItem
+* FormSegment
+* Gauge
+* Heading
+* HeroSection
+* Image
 Inspector
 Items
 LabelList

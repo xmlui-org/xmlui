@@ -78,6 +78,7 @@ import {
   DEFAULT_IDEMPOTENCY_HEADER_NAME,
   type SubmitPolicy,
 } from "../../components-core/forms";
+import { defaultProps } from "./Form.defaults";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 const PART_CANCEL_BUTTON = "cancelButton";
@@ -340,49 +341,6 @@ type Props = {
    *  controller into it so the outer component can expose `signal` through
    *  the `$formCancel` context variable. */
   submitAbortRefExternal?: { current: AbortController | null };
-};
-
-export const defaultProps: Pick<
-  Props,
-  | "cancelLabel"
-  | "saveLabel"
-  | "saveInProgressLabel"
-  | "savePendingLabel"
-  | "submitFeedbackDelay"
-  | "itemLabelPosition"
-  | "itemLabelBreak"
-  | "keepModalOpenOnSubmit"
-  | "swapCancelAndSave"
-  | "hideButtonRowUntilDirty"
-  | "hideButtonRow"
-  | "stickyButtonRow"
-  | "enableSubmit"
-  | "itemRequireLabelMode"
-  | "validationIconSuccess"
-  | "validationIconError"
-  | "keepOnCancel"
-  | "dataAfterSubmit"
-  | "submitPolicy"
-> = {
-  cancelLabel: "Cancel",
-  saveLabel: "Save",
-  saveInProgressLabel: "Saving...",
-  savePendingLabel: "Validating...",
-  submitFeedbackDelay: 100,
-  itemLabelPosition: "top",
-  itemLabelBreak: true,
-  keepModalOpenOnSubmit: false,
-  swapCancelAndSave: false,
-  hideButtonRowUntilDirty: false,
-  hideButtonRow: false,
-  stickyButtonRow: false,
-  enableSubmit: true,
-  itemRequireLabelMode: "markRequired",
-  validationIconSuccess: "checkmark",
-  validationIconError: "error",
-  keepOnCancel: false,
-  dataAfterSubmit: "keep" as const,
-  submitPolicy: DEFAULT_SUBMIT_POLICY,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX

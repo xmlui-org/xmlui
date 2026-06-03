@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
-import { defaultProps as formDefaultProps } from "../Form/FormReact";
+import { defaultProps as formDefaultProps } from "../Form/Form.defaults";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 const COMP = "StepperForm";

@@ -4,7 +4,8 @@ import styles from "./Image.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata, dClick, dInternal } from "../metadata-helpers";
-import { Image, defaultProps } from "./ImageReact";
+import { defaultProps } from "./Image.defaults";
+import { Image } from "./ImageReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { wrapComponent } from "../../components-core/wrapComponent";
 

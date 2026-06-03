@@ -7,13 +7,10 @@ import styles from "./Footer.module.scss";
 
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Footer.defaults";
 
 // =====================================================================================================================
 // React Footer component implementation
-
-export const defaultProps = {
-  sticky: true,
-};
 
 export const Footer = memo(forwardRef(function Footer(
   {
