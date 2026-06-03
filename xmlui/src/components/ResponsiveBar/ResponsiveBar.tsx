@@ -2,7 +2,7 @@ import styles from "./ResponsiveBar.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d, dClick, dTriggerTemplate } from "../metadata-helpers";
+import { createMetadata, dClick, dTriggerTemplate } from "../metadata-helpers";
 import { defaultResponsiveBarProps, ResponsiveBar } from "./ResponsiveBarReact";
 import { ResponsiveBarItem } from "./ResponsiveBarItem";
 import { alignmentOptionMd } from "../abstractions";
@@ -34,9 +34,9 @@ export const ResponsiveBarMd = createMetadata({
       defaultValue: defaultResponsiveBarProps.orientation,
     },
     overflowIcon: {
-      description: 
+      description:
         "Icon to display in the dropdown trigger button when items overflow. " +
-        "You can use component-specific icons in the format \"iconName:ResponsiveBar\".",
+        'You can use component-specific icons in the format "iconName:ResponsiveBar".',
       valueType: "string",
       defaultValue: defaultResponsiveBarProps.overflowIcon,
     },
@@ -57,7 +57,7 @@ export const ResponsiveBarMd = createMetadata({
     },
     triggerTemplate: dTriggerTemplate(COMP),
     gap: {
-      description: 
+      description:
         "Gap between child elements in pixels. Controls the spacing between items " +
         "in the responsive bar layout.",
       valueType: "number",
@@ -115,53 +115,71 @@ export const ResponsiveBarMd = createMetadata({
   },
 });
 
-export const responsiveBarComponentRenderer = wrapComponent(
-  COMP,
-  ResponsiveBar,
-  ResponsiveBarMd,
-  {
-    exposeRegisterApi: true,
-    exclude: ["orientation", "overflowIcon", "dropdownText", "dropdownAlignment", "triggerTemplate", "gap", "reverse"],
-    events: [],
-    customRender(_props, { node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) {
-      const children = Array.isArray(node.children) ? node.children : node.children ? [node.children] : [];
-
-      const renderChildWithContext = (childNode: any, isOverflow: boolean) => (
-        <ResponsiveBarItem
-          node={childNode}
-          isOverflow={isOverflow}
-          renderChild={renderChild}
-          layoutContext={layoutContext}
-        />
-      );
-
-      return (
-        <ResponsiveBar
-          orientation={extractValue(node.props?.orientation)}
-          overflowIcon={extractValue(node.props?.overflowIcon)}
-          dropdownText={extractValue(node.props?.dropdownText)}
-          dropdownAlignment={extractValue(node.props?.dropdownAlignment)}
-          triggerTemplate={renderChild(node.props?.triggerTemplate)}
-          gap={extractValue(node.props?.gap)}
-          reverse={extractValue.asOptionalBoolean(node.props?.reverse)}
-          onClick={lookupEventHandler("click")}
-          onWillOpen={lookupEventHandler("willOpen")}
-          registerComponentApi={registerComponentApi}
-          classes={classes}
-          childNodes={children}
-          renderChildFn={renderChildWithContext}
-        >
-          {children.map((child, index) => (
-            <ResponsiveBarItem
-              key={index}
-              node={child}
-              isOverflow={false}
-              renderChild={renderChild}
-              layoutContext={layoutContext}
-            />
-          ))}
-        </ResponsiveBar>
-      );
+export const responsiveBarComponentRenderer = wrapComponent(COMP, ResponsiveBar, ResponsiveBarMd, {
+  exposeRegisterApi: true,
+  exclude: [
+    "orientation",
+    "overflowIcon",
+    "dropdownText",
+    "dropdownAlignment",
+    "triggerTemplate",
+    "gap",
+    "reverse",
+  ],
+  events: [],
+  customRender(
+    _props,
+    {
+      node,
+      extractValue,
+      renderChild,
+      classes,
+      lookupEventHandler,
+      registerComponentApi,
+      layoutContext,
     },
+  ) {
+    const children = Array.isArray(node.children)
+      ? node.children
+      : node.children
+        ? [node.children]
+        : [];
+
+    const renderChildWithContext = (childNode: any, isOverflow: boolean) => (
+      <ResponsiveBarItem
+        node={childNode}
+        isOverflow={isOverflow}
+        renderChild={renderChild}
+        layoutContext={layoutContext}
+      />
+    );
+
+    return (
+      <ResponsiveBar
+        orientation={extractValue(node.props?.orientation)}
+        overflowIcon={extractValue(node.props?.overflowIcon)}
+        dropdownText={extractValue(node.props?.dropdownText)}
+        dropdownAlignment={extractValue(node.props?.dropdownAlignment)}
+        triggerTemplate={renderChild(node.props?.triggerTemplate)}
+        gap={extractValue(node.props?.gap)}
+        reverse={extractValue.asOptionalBoolean(node.props?.reverse)}
+        onClick={lookupEventHandler("click")}
+        onWillOpen={lookupEventHandler("willOpen")}
+        registerComponentApi={registerComponentApi}
+        classes={classes}
+        childNodes={children}
+        renderChildFn={renderChildWithContext}
+      >
+        {children.map((child, index) => (
+          <ResponsiveBarItem
+            key={index}
+            node={child}
+            isOverflow={false}
+            renderChild={renderChild}
+            layoutContext={layoutContext}
+          />
+        ))}
+      </ResponsiveBar>
+    );
   },
-);
+});

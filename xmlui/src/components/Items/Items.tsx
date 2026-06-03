@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, dComponent, dInternal } from "../metadata-helpers";
 import { defaultProps } from "./Items.defaults";
 import { Items } from "./ItemsReact";
 
@@ -14,9 +14,9 @@ export const ItemsMd = createMetadata({
     "virtualization, grouping, or visual formatting — just pure data iteration.",
   props: {
     items: dInternal(`This property contains the list of data items this component renders.`),
-    data: d(
-      `This property contains the list of data items (obtained from a data source) this component renders.`,
-    ),
+    data: {
+      description: `This property contains the list of data items (obtained from a data source) this component renders.`,
+    },
     reverse: {
       description:
         "This property reverses the order in which data is mapped to template components.",
@@ -28,9 +28,7 @@ export const ItemsMd = createMetadata({
   childrenAsTemplate: "itemTemplate",
   contextVars: {
     $item: dComponent("Current data item being rendered"),
-    $itemIndex: dComponent(
-      "Zero-based index of current item",
-    ),
+    $itemIndex: dComponent("Zero-based index of current item"),
     $isFirst: dComponent("Boolean indicating if this is the first item"),
     $isLast: dComponent("Boolean indicating if this is the last item"),
   },

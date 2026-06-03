@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 import { defaultProps } from "./Queue.defaults";
 import { QueueWithContextVar } from "./QueueReact";
 
@@ -53,8 +53,7 @@ export const QueueMd = createMetadata({
       },
     },
     didProcess: {
-      description:
-        `This event is fired when the processing of a queued item has been successfully processed.`,
+      description: `This event is fired when the processing of a queued item has been successfully processed.`,
       signature: "didProcess(item: any, result: any): void",
       parameters: {
         item: "The item that was processed.",
@@ -82,7 +81,8 @@ export const QueueMd = createMetadata({
   },
   apis: {
     enqueueItem: {
-      description: `This method enqueues the item passed in the method parameter. The new item will be ` +
+      description:
+        `This method enqueues the item passed in the method parameter. The new item will be ` +
         `processed after the current queue items have been handled. The method retrieves the ` +
         `unique ID of the newly added item; this ID can be used later in other methods, ` +
         `such as \`remove\`.`,
@@ -92,7 +92,8 @@ export const QueueMd = createMetadata({
       },
     },
     enqueueItems: {
-      description: `This method enqueues the array of items passed in the method parameter. The new items ` +
+      description:
+        `This method enqueues the array of items passed in the method parameter. The new items ` +
         `will be processed after the current queue items have been handled. The method ` +
         `retrieves an array of unique IDs, one for each new item. An item ID can be used later ` +
         `in other methods, such as \`remove\`.`,
@@ -102,13 +103,15 @@ export const QueueMd = createMetadata({
       },
     },
     getQueuedItems: {
-      description: `You can use this method to return the items in the queue. These items contain all ` +
+      description:
+        `You can use this method to return the items in the queue. These items contain all ` +
         `entries not removed from the queue yet, including pending, in-progress, and ` +
         `completed items.`,
       signature: "getQueuedItems(): any[]",
     },
     getQueueLength: {
-      description: `This method retrieves the current queue length. The queue contains only those items ` +
+      description:
+        `This method retrieves the current queue length. The queue contains only those items ` +
         `that are not fully processed yet.`,
       signature: "getQueueLength(): number",
     },
@@ -121,19 +124,22 @@ export const QueueMd = createMetadata({
     },
   },
   contextVars: {
-    $completedItems: d(
-      `A list containing the queue items that have been completed (fully processed).`,
-    ),
-    $queuedItems: d(
-      `A list containing the items waiting in the queue, icluding the completed items.`,
-    ),
+    $completedItems: {
+      description: `A list containing the queue items that have been completed (fully processed).`,
+    },
+    $queuedItems: {
+      description: `A list containing the items waiting in the queue, icluding the completed items.`,
+    },
   },
 });
 
 export const queueComponentRenderer = wrapComponent(COMP, QueueWithContextVar, QueueMd, {
   exposeRegisterApi: true,
   exclude: ["progressFeedback", "resultFeedback"],
-  customRender: (_props, { node, registerComponentApi, lookupEventHandler, renderChild, extractValue }) => (
+  customRender: (
+    _props,
+    { node, registerComponentApi, lookupEventHandler, renderChild, extractValue },
+  ) => (
     <QueueWithContextVar
       node={node as any}
       renderChild={renderChild}

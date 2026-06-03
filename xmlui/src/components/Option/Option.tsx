@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 import { defaultProps } from "./Option.defaults";
 import { OptionNative } from "./OptionReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -16,84 +16,80 @@ export const OptionMd = createMetadata({
     "[Select](/components/Select), [AutoComplete](/components/AutoComplete), " +
     "and other selection components.",
   props: {
-    label: d(
-      `This property defines the text to display for the option. If \`label\` is not defined, ` +
+    label: {
+      description:
+        `This property defines the text to display for the option. If \`label\` is not defined, ` +
         `\`Option\` will use the \`value\` as the label.`,
-      undefined,
-      "string",
-    ),
-    value: d(
-      "This property defines the value of the option. If `value` is not defined, " +
+      valueType: "string",
+    },
+    value: {
+      description:
+        "This property defines the value of the option. If `value` is not defined, " +
         "`Option` will use the `label` as the value. If neither is defined, " +
         "the option is not displayed.",
-    ),
+    },
     enabled: {
       description: "This boolean property indicates whether the option is enabled or disabled.",
       valueType: "boolean",
       defaultValue: defaultProps.enabled,
     },
-    keywords: d(
-      "An array of keywords that can be used for searching and filtering the option. " +
+    keywords: {
+      description:
+        "An array of keywords that can be used for searching and filtering the option. " +
         "These keywords are not displayed but help users find the option through search.",
-      undefined,
-      "string[]",
-    ),
+      valueType: "string[]",
+    },
   },
 });
 
-export const optionComponentRenderer = wrapComponent(
-  COMP,
-  OptionNative,
-  OptionMd,
-  {
-    exclude: ["label", "value", "enabled", "keywords"],
-    customRender(_props, { node, extractValue, classes, renderChild, layoutContext }) {
-      const label = extractValue.asOptionalString(node.props.label);
-      let value = extractValue(node.props.value);
-      if (label === undefined && value === undefined) {
-        return null;
+export const optionComponentRenderer = wrapComponent(COMP, OptionNative, OptionMd, {
+  exclude: ["label", "value", "enabled", "keywords"],
+  customRender(_props, { node, extractValue, classes, renderChild, layoutContext }) {
+    const label = extractValue.asOptionalString(node.props.label);
+    let value = extractValue(node.props.value);
+    if (label === undefined && value === undefined) {
+      return null;
+    }
+
+    const hasTextNodeChild =
+      node.children?.length === 1 &&
+      (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
+    const textNodeChild = hasTextNodeChild ? (renderChild(node.children) as string) : undefined;
+
+    // Extract all extra properties (like category, etc.) for grouping and filtering
+    const extraProps: Record<string, any> = {};
+    const knownProps = new Set(["label", "value", "enabled", "keywords"]);
+    Object.keys(node.props).forEach((key) => {
+      if (!knownProps.has(key)) {
+        extraProps[key] = extractValue(node.props[key]);
       }
+    });
 
-      const hasTextNodeChild =
-        node.children?.length === 1 &&
-        (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
-      const textNodeChild = hasTextNodeChild ? (renderChild(node.children) as string) : undefined;
-
-      // Extract all extra properties (like category, etc.) for grouping and filtering
-      const extraProps: Record<string, any> = {};
-      const knownProps = new Set(["label", "value", "enabled", "keywords"]);
-      Object.keys(node.props).forEach((key) => {
-        if (!knownProps.has(key)) {
-          extraProps[key] = extractValue(node.props[key]);
-        }
-      });
-
-      return (
-        <OptionNative
-          label={label || textNodeChild}
-          value={value !== undefined && value !== "" ? value : label}
-          enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-          keywords={extractValue.asOptionalStringArray(node.props.keywords)}
-          className={classes?.[COMPONENT_PART_KEY]}
-          optionRenderer={
-            node.children?.length > 0
-              ? !hasTextNodeChild
-                ? (contextVars) => (
-                    <MemoizedItem
-                      node={node.children}
-                      renderChild={renderChild}
-                      contextVars={contextVars}
-                      layoutContext={layoutContext}
-                    />
-                  )
-                : undefined
+    return (
+      <OptionNative
+        label={label || textNodeChild}
+        value={value !== undefined && value !== "" ? value : label}
+        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+        keywords={extractValue.asOptionalStringArray(node.props.keywords)}
+        className={classes?.[COMPONENT_PART_KEY]}
+        optionRenderer={
+          node.children?.length > 0
+            ? !hasTextNodeChild
+              ? (contextVars) => (
+                  <MemoizedItem
+                    node={node.children}
+                    renderChild={renderChild}
+                    contextVars={contextVars}
+                    layoutContext={layoutContext}
+                  />
+                )
               : undefined
-          }
-          {...extraProps}
-        >
-          {!hasTextNodeChild && renderChild(node.children)}
-        </OptionNative>
-      );
-    },
+            : undefined
+        }
+        {...extraProps}
+      >
+        {!hasTextNodeChild && renderChild(node.children)}
+      </OptionNative>
+    );
   },
-);
+});

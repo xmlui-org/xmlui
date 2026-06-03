@@ -10,7 +10,7 @@ import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import type { OrientationOptions } from "../abstractions";
-import { createMetadata, d, dComponent } from "../metadata-helpers";
+import { createMetadata, dComponent } from "../metadata-helpers";
 import { defaultProps } from "./Splitter.defaults";
 import { Splitter } from "./SplitterReact";
 
@@ -144,15 +144,15 @@ function SplitterRenderer({
       type: "Stack" as const,
       orientation,
     };
-    
+
     if (!Array.isArray(node.children)) {
       const rendered = renderChild(node.children, layoutContext);
       return rendered ? [rendered] : [];
     }
-    
+
     return node.children
       .map((child) => renderChild(child, layoutContext))
-      .filter(child => child !== null && child !== undefined)
+      .filter((child) => child !== null && child !== undefined)
       .map((child, index) => React.cloneElement(child as React.ReactElement, { key: index }));
   }, [node.children, renderChild, orientation]);
 

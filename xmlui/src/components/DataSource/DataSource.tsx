@@ -1,5 +1,5 @@
 import { httpMethodNames } from "../abstractions";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 
 // NOTE: Original component this is based on is the `Loader` component
 
@@ -64,8 +64,14 @@ export const DataSourceMd = createMetadata({
         `\`Access-Control-Allow-Credentials: true\` header on the server).`,
       availableValues: [
         { value: "omit", description: "Never send credentials" },
-        { value: "same-origin", description: "Send credentials only for same-origin requests (default browser behavior)" },
-        { value: "include", description: "Always send credentials, even for cross-origin requests" },
+        {
+          value: "same-origin",
+          description: "Send credentials only for same-origin requests (default browser behavior)",
+        },
+        {
+          value: "include",
+          description: "Always send credentials, even for cross-origin requests",
+        },
       ],
       valueType: "string",
     },
@@ -120,8 +126,8 @@ export const DataSourceMd = createMetadata({
     },
     dataType: {
       description:
-        "Type of data to fetch. When set to `\"text\"`, the response is returned as a raw string " +
-        "without JSON parsing. When set to `\"csv\"`, the response is parsed as CSV.",
+        'Type of data to fetch. When set to `"text"`, the response is returned as a raw string ' +
+        'without JSON parsing. When set to `"csv"`, the response is parsed as CSV.',
       availableValues: [
         { value: "json", description: "Parse response as JSON (default)" },
         { value: "text", description: "Return response as raw text" },

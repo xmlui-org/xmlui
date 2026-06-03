@@ -1,6 +1,6 @@
 import styles from "./HeroSection.module.scss";
 
-import { wrapComponent, createMetadata, dComponent, d, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, dComponent, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
 import { defaultProps } from "./HeroSection.defaults";
 import { HeroSection } from "./HeroSectionReact";
@@ -51,7 +51,7 @@ export const HeroSectionMd: ComponentMetadata = createMetadata({
     },
     contentPlacement: {
       description: "Position of the content area relative to the header",
-      valueType: "string", 
+      valueType: "string",
       defaultValue: defaultProps.contentPlacement,
       availableValues: ["left", "right", "bottom"],
     },
@@ -131,10 +131,15 @@ export const HeroSectionMd: ComponentMetadata = createMetadata({
       availableValues: ["light", "dark", "reverse"],
       defaultValue: "dark",
     },
-    className: d("Additional CSS class names to apply to the hero section", undefined, "string"),
+    className: {
+      description: "Additional CSS class names to apply to the hero section",
+      valueType: "string",
+    },
   },
   events: {
-    ctaClick: d("Triggered when the call-to-action button is clicked"),
+    ctaClick: {
+      description: "Triggered when the call-to-action button is clicked",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

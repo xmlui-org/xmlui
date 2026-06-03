@@ -4,7 +4,6 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -64,12 +63,12 @@ export const FileInputMd = createMetadata({
         `instances with the "icon.browse:FileInput" declaration in the app configuration file.`,
       valueType: "icon",
     },
-    buttonIconPosition: d(
-      `This optional string determines the location of the button icon.`,
-      iconPositionNames,
-      "string",
-      "start",
-    ),
+    buttonIconPosition: {
+      description: `This optional string determines the location of the button icon.`,
+      availableValues: iconPositionNames,
+      valueType: "string",
+      defaultValue: "start",
+    },
     acceptsFileType: {
       description: `An optional list of file types the input controls accepts provided as a string array.`,
       valueType: "string[]",

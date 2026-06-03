@@ -3,7 +3,7 @@ import { defaultProps } from "./PieChart.defaults";
 import { PieChart } from "./PieChartReact";
 import styles from "./PieChartNative.module.scss";
 import { LabelPositionValues } from "../utils/abstractions";
-import { parseScssVar, wrapComponent, createMetadata, d } from "xmlui";
+import { parseScssVar, wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "PieChart";
 
@@ -44,9 +44,9 @@ export const PieChartMd: ComponentMetadata = createMetadata({
       defaultValue: defaultProps.labelListPosition,
       availableValues: LabelPositionValues,
     },
-    outerRadius: d(
-      "The outer radius of the pie chart, can be a number or a string (e.g., '100%').",
-    ),
+    outerRadius: {
+      description: "The outer radius of the pie chart, can be a number or a string (e.g., '100%').",
+    },
     showLegend: {
       description: "Toggles whether to show legend (\`true\`) or not (\`false\`).",
       valueType: "boolean",

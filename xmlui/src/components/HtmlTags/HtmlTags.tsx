@@ -20,7 +20,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import { ThemedHeading as Heading } from "../Heading/Heading";
 import { ThemedText as Text } from "../Text/Text";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
@@ -109,17 +109,36 @@ export const HtmlAMd = createMetadata({
   description: "This component renders an HTML `a` tag.",
   isHtmlTag: true,
   props: {
-    href: d("Specifies the URL of the page the link goes to"),
-    target: d("Specifies where to open the linked document"),
-    rel: d("Specifies the relationship between the current document and the linked document"),
-    download: d("Indicates that the target will be downloaded when a user clicks on the hyperlink"),
-    hreflang: d("Specifies the language of the linked document"),
-    type: d("Specifies the MIME type of the linked document"),
-    ping: d(
-      "Specifies a space-separated list of URLs to be notified if the user follows the hyperlink",
-    ),
-    referrerPolicy: d("Specifies the referrer policy for the element"),
-    disabled: d("Specifies that the link should be disabled"),
+    href: {
+      description: "Specifies the URL of the page the link goes to",
+    },
+    target: {
+      description: "Specifies where to open the linked document",
+    },
+    rel: {
+      description:
+        "Specifies the relationship between the current document and the linked document",
+    },
+    download: {
+      description:
+        "Indicates that the target will be downloaded when a user clicks on the hyperlink",
+    },
+    hreflang: {
+      description: "Specifies the language of the linked document",
+    },
+    type: {
+      description: "Specifies the MIME type of the linked document",
+    },
+    ping: {
+      description:
+        "Specifies a space-separated list of URLs to be notified if the user follows the hyperlink",
+    },
+    referrerPolicy: {
+      description: "Specifies the referrer policy for the element",
+    },
+    disabled: {
+      description: "Specifies that the link should be disabled",
+    },
   },
 });
 
@@ -158,16 +177,37 @@ export const HtmlAreaMd = createMetadata({
   description: "This component renders an HTML `area` tag.",
   isHtmlTag: true,
   props: {
-    alt: d("Specifies an alternate text for the area"),
-    coords: d("Specifies the coordinates of the area"),
-    download: d("Indicates that the target will be downloaded when a user clicks on the area"),
-    href: d("Specifies the URL of the linked document"),
-    hrefLang: d("Specifies the language of the linked document"),
-    referrerPolicy: d("Specifies the referrer policy for the area"),
-    rel: d("Specifies the relationship between the current document and the linked document"),
-    shape: d("Specifies the shape of the area"),
-    target: d("Specifies where to open the linked document"),
-    media: d("Specifies a media query for the linked resource"),
+    alt: {
+      description: "Specifies an alternate text for the area",
+    },
+    coords: {
+      description: "Specifies the coordinates of the area",
+    },
+    download: {
+      description: "Indicates that the target will be downloaded when a user clicks on the area",
+    },
+    href: {
+      description: "Specifies the URL of the linked document",
+    },
+    hrefLang: {
+      description: "Specifies the language of the linked document",
+    },
+    referrerPolicy: {
+      description: "Specifies the referrer policy for the area",
+    },
+    rel: {
+      description:
+        "Specifies the relationship between the current document and the linked document",
+    },
+    shape: {
+      description: "Specifies the shape of the area",
+    },
+    target: {
+      description: "Specifies where to open the linked document",
+    },
+    media: {
+      description: "Specifies a media query for the linked resource",
+    },
   },
 });
 
@@ -210,15 +250,28 @@ export const HtmlAudioMd = createMetadata({
   description: "This component renders an HTML `audio` tag.",
   isHtmlTag: true,
   props: {
-    autoPlay: d("Specifies that the audio will start playing as soon as it is ready"),
-    controls: d("Specifies that audio controls should be displayed"),
-    crossOrigin: d("Specifies how the element handles cross-origin requests"),
-    loop: d("Specifies that the audio will start over again every time it is finished"),
-    muted: d("Specifies that the audio output should be muted"),
-    preload: d(
-      "Specifies if and how the author thinks the audio should be loaded when the page loads",
-    ),
-    src: d("Specifies the URL of the audio file"),
+    autoPlay: {
+      description: "Specifies that the audio will start playing as soon as it is ready",
+    },
+    controls: {
+      description: "Specifies that audio controls should be displayed",
+    },
+    crossOrigin: {
+      description: "Specifies how the element handles cross-origin requests",
+    },
+    loop: {
+      description: "Specifies that the audio will start over again every time it is finished",
+    },
+    muted: {
+      description: "Specifies that the audio output should be muted",
+    },
+    preload: {
+      description:
+        "Specifies if and how the author thinks the audio should be loaded when the page loads",
+    },
+    src: {
+      description: "Specifies the URL of the audio file",
+    },
   },
 });
 
@@ -257,7 +310,9 @@ export const HtmlBdoMd = createMetadata({
   description: "This component renders an HTML `bdo` tag.",
   isHtmlTag: true,
   props: {
-    dir: d("Specifies the text direction override"),
+    dir: {
+      description: "Specifies the text direction override",
+    },
   },
 });
 
@@ -270,7 +325,9 @@ export const HtmlBlockquoteMd = createMetadata({
   description: "This component renders an HTML `blockquote` tag.",
   isHtmlTag: true,
   props: {
-    cite: d("Specifies the source of the quotation"),
+    cite: {
+      description: "Specifies the source of the quotation",
+    },
   },
 });
 
@@ -288,21 +345,40 @@ export const HtmlButtonMd = createMetadata({
   description: "This component renders an HTML `button` tag.",
   isHtmlTag: true,
   props: {
-    autoFocus: d("Specifies that the button should automatically get focus when the page loads"),
-    disabled: d("Specifies that the button should be disabled"),
-    form: d("Specifies the form the button belongs to"),
-    formAction: d(
-      "Specifies the URL of a file that processes the information submitted by the button",
-    ),
-    formEncType: d(
-      "Specifies how the form-data should be encoded when submitting it to the server",
-    ),
-    formMethod: d("Specifies the HTTP method to use when sending form-data"),
-    formNoValidate: d("Specifies that the form should not be validated when submitted"),
-    formTarget: d("Specifies where to display the response after submitting the form"),
-    name: d("Specifies a name for the button"),
-    type: d("Specifies the type of the button"),
-    value: d("Specifies the value associated with the button"),
+    autoFocus: {
+      description: "Specifies that the button should automatically get focus when the page loads",
+    },
+    disabled: {
+      description: "Specifies that the button should be disabled",
+    },
+    form: {
+      description: "Specifies the form the button belongs to",
+    },
+    formAction: {
+      description:
+        "Specifies the URL of a file that processes the information submitted by the button",
+    },
+    formEncType: {
+      description: "Specifies how the form-data should be encoded when submitting it to the server",
+    },
+    formMethod: {
+      description: "Specifies the HTTP method to use when sending form-data",
+    },
+    formNoValidate: {
+      description: "Specifies that the form should not be validated when submitted",
+    },
+    formTarget: {
+      description: "Specifies where to display the response after submitting the form",
+    },
+    name: {
+      description: "Specifies a name for the button",
+    },
+    type: {
+      description: "Specifies the type of the button",
+    },
+    value: {
+      description: "Specifies the value associated with the button",
+    },
   },
 });
 
@@ -321,8 +397,12 @@ export const HtmlCanvasMd = createMetadata({
   description: "This component renders an HTML `canvas` tag.",
   isHtmlTag: true,
   props: {
-    width: d("Specifies the width of the canvas"),
-    height: d("Specifies the height of the canvas"),
+    width: {
+      description: "Specifies the width of the canvas",
+    },
+    height: {
+      description: "Specifies the height of the canvas",
+    },
   },
 });
 
@@ -376,7 +456,9 @@ export const HtmlColMd = createMetadata({
   description: "This component renders an HTML `col` tag.",
   isHtmlTag: true,
   props: {
-    span: d("Specifies the number of columns a `col` element should span"),
+    span: {
+      description: "Specifies the number of columns a `col` element should span",
+    },
   },
 });
 
@@ -395,7 +477,9 @@ export const HtmlColgroupMd = createMetadata({
   description: "This component renders an HTML `colgroup` tag.",
   isHtmlTag: true,
   props: {
-    span: d("Specifies the number of columns in a `colgroup`"),
+    span: {
+      description: "Specifies the number of columns in a `colgroup`",
+    },
   },
 });
 
@@ -414,7 +498,9 @@ export const HtmlDataMd = createMetadata({
   description: "This component renders an HTML `data` tag.",
   isHtmlTag: true,
   props: {
-    value: d("Specifies the machine-readable value of the element"),
+    value: {
+      description: "Specifies the machine-readable value of the element",
+    },
   },
 });
 
@@ -452,8 +538,12 @@ export const HtmlDelMd = createMetadata({
   description: "This component renders an HTML `del` tag.",
   isHtmlTag: true,
   props: {
-    cite: d("Specifies the source of the quotation"),
-    dateTime: d("Specifies the date and time of the edit"),
+    cite: {
+      description: "Specifies the source of the quotation",
+    },
+    dateTime: {
+      description: "Specifies the date and time of the edit",
+    },
   },
 });
 
@@ -466,7 +556,9 @@ export const HtmlDetailsMd = createMetadata({
   description: "This component renders an HTML `details` tag.",
   isHtmlTag: true,
   props: {
-    open: d("Specifies that the details are visible (open)"),
+    open: {
+      description: "Specifies that the details are visible (open)",
+    },
   },
   themeVars: parseScssVar(styles.themeVarsDetails),
   defaultThemeVars: {
@@ -500,7 +592,9 @@ export const HtmlDialogMd = createMetadata({
   description: "This component renders an HTML `dialog` tag.",
   isHtmlTag: true,
   props: {
-    open: d("Specifies that the dialog is open"),
+    open: {
+      description: "Specifies that the dialog is open",
+    },
   },
 });
 
@@ -559,10 +653,18 @@ export const HtmlEmbedMd = createMetadata({
   description: "This component renders an HTML `embed` tag.",
   isHtmlTag: true,
   props: {
-    src: d("Specifies the URL of the resource"),
-    type: d("Specifies the type of the resource"),
-    width: d("Specifies the width of the embed"),
-    height: d("Specifies the height of the embed"),
+    src: {
+      description: "Specifies the URL of the resource",
+    },
+    type: {
+      description: "Specifies the type of the resource",
+    },
+    width: {
+      description: "Specifies the width of the embed",
+    },
+    height: {
+      description: "Specifies the height of the embed",
+    },
   },
 });
 
@@ -581,9 +683,15 @@ export const HtmlFieldsetMd = createMetadata({
   description: "This component renders an HTML `fieldset` tag.",
   isHtmlTag: true,
   props: {
-    disabled: d("Specifies that the fieldset should be disabled"),
-    form: d("Specifies the form the fieldset belongs to"),
-    name: d("Specifies a name for the fieldset"),
+    disabled: {
+      description: "Specifies that the fieldset should be disabled",
+    },
+    form: {
+      description: "Specifies the form the fieldset belongs to",
+    },
+    name: {
+      description: "Specifies a name for the fieldset",
+    },
   },
 });
 
@@ -647,16 +755,30 @@ export const HtmlFormMd = createMetadata({
   description: "This component renders an HTML `form` tag.",
   isHtmlTag: true,
   props: {
-    acceptCharset: d(
-      "Specifies the character encodings that are to be used for the form submission",
-    ),
-    action: d("Specifies where to send the form-data when a form is submitted"),
-    autoComplete: d("Specifies whether a form should have auto-completion"),
-    encType: d("Specifies how the form-data should be encoded when submitting it to the server"),
-    method: d("Specifies the HTTP method to use when sending form-data"),
-    name: d("Specifies the name of the form"),
-    noValidate: d("Specifies that the form should not be validated when submitted"),
-    target: d("Specifies where to display the response after submitting the form"),
+    acceptCharset: {
+      description: "Specifies the character encodings that are to be used for the form submission",
+    },
+    action: {
+      description: "Specifies where to send the form-data when a form is submitted",
+    },
+    autoComplete: {
+      description: "Specifies whether a form should have auto-completion",
+    },
+    encType: {
+      description: "Specifies how the form-data should be encoded when submitting it to the server",
+    },
+    method: {
+      description: "Specifies the HTTP method to use when sending form-data",
+    },
+    name: {
+      description: "Specifies the name of the form",
+    },
+    noValidate: {
+      description: "Specifies that the form should not be validated when submitted",
+    },
+    target: {
+      description: "Specifies where to display the response after submitting the form",
+    },
   },
 });
 
@@ -805,16 +927,36 @@ export const HtmlIframeMd = createMetadata({
   description: "This component renders an HTML `iframe` tag.",
   isHtmlTag: true,
   props: {
-    src: d("Specifies the URL of the page to embed"),
-    srcDoc: d("Specifies the HTML content of the page to embed"),
-    name: d("Specifies the name of the iframe"),
-    sandbox: d("Specifies a set of extra restrictions for the content in the iframe"),
-    allow: d("Specifies a feature policy for the iframe"),
-    allowFullScreen: d("Specifies that the iframe can be displayed in full-screen mode"),
-    width: d("Specifies the width of the iframe"),
-    height: d("Specifies the height of the iframe"),
-    loading: d("Specifies the loading behavior of the iframe"),
-    referrerPolicy: d("Specifies the referrer policy for the iframe"),
+    src: {
+      description: "Specifies the URL of the page to embed",
+    },
+    srcDoc: {
+      description: "Specifies the HTML content of the page to embed",
+    },
+    name: {
+      description: "Specifies the name of the iframe",
+    },
+    sandbox: {
+      description: "Specifies a set of extra restrictions for the content in the iframe",
+    },
+    allow: {
+      description: "Specifies a feature policy for the iframe",
+    },
+    allowFullScreen: {
+      description: "Specifies that the iframe can be displayed in full-screen mode",
+    },
+    width: {
+      description: "Specifies the width of the iframe",
+    },
+    height: {
+      description: "Specifies the height of the iframe",
+    },
+    loading: {
+      description: "Specifies the loading behavior of the iframe",
+    },
+    referrerPolicy: {
+      description: "Specifies the referrer policy for the iframe",
+    },
   },
 });
 
@@ -834,14 +976,30 @@ export const HtmlImgMd = createMetadata({
   description: "This component renders an HTML `img` tag.",
   isHtmlTag: true,
   props: {
-    alt: d("Specifies an alternate text for an image"),
-    height: d("Specifies the height of an image"),
-    src: d("Specifies the path to the image"),
-    width: d("Specifies the width of an image"),
-    useMap: d("Specifies an image as a client-side image map"),
-    loading: d("Specifies the loading behavior of the image"),
-    referrerPolicy: d("Specifies the referrer policy for the image"),
-    sizes: d("Specifies image sizes for different page layouts"),
+    alt: {
+      description: "Specifies an alternate text for an image",
+    },
+    height: {
+      description: "Specifies the height of an image",
+    },
+    src: {
+      description: "Specifies the path to the image",
+    },
+    width: {
+      description: "Specifies the width of an image",
+    },
+    useMap: {
+      description: "Specifies an image as a client-side image map",
+    },
+    loading: {
+      description: "Specifies the loading behavior of the image",
+    },
+    referrerPolicy: {
+      description: "Specifies the referrer policy for the image",
+    },
+    sizes: {
+      description: "Specifies image sizes for different page layouts",
+    },
   },
 });
 
@@ -860,27 +1018,64 @@ export const HtmlInputMd = createMetadata({
   description: "This component renders an HTML `input` tag.",
   isHtmlTag: true,
   props: {
-    type: d("Specifies the type of input"),
-    value: d("Specifies the value of the input"),
-    placeholder: d("Specifies a short hint that describes the expected value of the input"),
-    autoFocus: d("Specifies that the input should automatically get focus when the page loads"),
-    checked: d("Specifies that the input should be pre-selected"),
-    disabled: d("Specifies that the input should be disabled"),
-    form: d("Specifies the form the input belongs to"),
-    name: d("Specifies the name of the input"),
-    list: d(
-      "Specifies the id of a datalist element that contains pre-defined options for the input",
-    ),
-    max: d("Specifies the maximum value for an input"),
-    maxLength: d("Specifies the maximum number of characters allowed in an input"),
-    min: d("Specifies the minimum value for an input"),
-    minLength: d("Specifies the minimum number of characters allowed in an input"),
-    multiple: d("Specifies that a user can enter more than one value"),
-    pattern: d("Specifies a regular expression that an input's value is checked against"),
-    readOnly: d("Specifies that the input is read-only"),
-    required: d("Specifies that the input is required"),
-    size: d("Specifies the width, in characters, of an input"),
-    step: d("Specifies the legal number intervals for an input"),
+    type: {
+      description: "Specifies the type of input",
+    },
+    value: {
+      description: "Specifies the value of the input",
+    },
+    placeholder: {
+      description: "Specifies a short hint that describes the expected value of the input",
+    },
+    autoFocus: {
+      description: "Specifies that the input should automatically get focus when the page loads",
+    },
+    checked: {
+      description: "Specifies that the input should be pre-selected",
+    },
+    disabled: {
+      description: "Specifies that the input should be disabled",
+    },
+    form: {
+      description: "Specifies the form the input belongs to",
+    },
+    name: {
+      description: "Specifies the name of the input",
+    },
+    list: {
+      description:
+        "Specifies the id of a datalist element that contains pre-defined options for the input",
+    },
+    max: {
+      description: "Specifies the maximum value for an input",
+    },
+    maxLength: {
+      description: "Specifies the maximum number of characters allowed in an input",
+    },
+    min: {
+      description: "Specifies the minimum value for an input",
+    },
+    minLength: {
+      description: "Specifies the minimum number of characters allowed in an input",
+    },
+    multiple: {
+      description: "Specifies that a user can enter more than one value",
+    },
+    pattern: {
+      description: "Specifies a regular expression that an input's value is checked against",
+    },
+    readOnly: {
+      description: "Specifies that the input is read-only",
+    },
+    required: {
+      description: "Specifies that the input is required",
+    },
+    size: {
+      description: "Specifies the width, in characters, of an input",
+    },
+    step: {
+      description: "Specifies the legal number intervals for an input",
+    },
   },
 });
 
@@ -903,8 +1098,12 @@ export const HtmlInsMd = createMetadata({
   description: "This component renders an HTML `ins` tag.",
   isHtmlTag: true,
   props: {
-    cite: d("Specifies the source URL for the inserted text"),
-    dateTime: d("Specifies the date and time when the text was inserted"),
+    cite: {
+      description: "Specifies the source URL for the inserted text",
+    },
+    dateTime: {
+      description: "Specifies the date and time when the text was inserted",
+    },
   },
 });
 
@@ -927,7 +1126,9 @@ export const HtmlLabelMd = createMetadata({
   description: "This component renders an HTML `label` tag.",
   isHtmlTag: true,
   props: {
-    htmlFor: d("Specifies which form element a label is bound to"),
+    htmlFor: {
+      description: "Specifies which form element a label is bound to",
+    },
   },
 });
 
@@ -955,7 +1156,9 @@ export const HtmlLiMd = createMetadata({
   description: "This component renders an HTML `li` tag.",
   isHtmlTag: true,
   props: {
-    value: d("Specifies the value of the list item (if the parent is an ordered list)"),
+    value: {
+      description: "Specifies the value of the list item (if the parent is an ordered list)",
+    },
   },
   defaultThemeVars: {
     "marginLeft-HtmlLi": "$space-6",
@@ -983,7 +1186,9 @@ export const HtmlMapMd = createMetadata({
   description: "This component renders an HTML `map` tag.",
   isHtmlTag: true,
   props: {
-    name: d("Specifies the name of the map"),
+    name: {
+      description: "Specifies the name of the map",
+    },
   },
 });
 
@@ -1006,7 +1211,9 @@ export const HtmlMenuMd = createMetadata({
   description: "This component renders an HTML `menu` tag.",
   isHtmlTag: true,
   props: {
-    type: d("Specifies the type of the menu"),
+    type: {
+      description: "Specifies the type of the menu",
+    },
   },
 });
 
@@ -1019,12 +1226,24 @@ export const HtmlMeterMd = createMetadata({
   description: "This component renders an HTML `meter` tag.",
   isHtmlTag: true,
   props: {
-    min: d("Specifies the minimum value"),
-    max: d("Specifies the maximum value"),
-    low: d("Specifies the lower bound of the high value"),
-    high: d("Specifies the upper bound of the low value"),
-    optimum: d("Specifies the optimal value"),
-    value: d("Specifies the current value"),
+    min: {
+      description: "Specifies the minimum value",
+    },
+    max: {
+      description: "Specifies the maximum value",
+    },
+    low: {
+      description: "Specifies the lower bound of the high value",
+    },
+    high: {
+      description: "Specifies the upper bound of the low value",
+    },
+    optimum: {
+      description: "Specifies the optimal value",
+    },
+    value: {
+      description: "Specifies the current value",
+    },
   },
 });
 
@@ -1048,12 +1267,24 @@ export const HtmlObjectMd = createMetadata({
   description: "This component renders an HTML `object` tag.",
   isHtmlTag: true,
   props: {
-    data: d("Specifies the URL of the resource"),
-    type: d("Specifies the MIME type of the resource"),
-    name: d("Specifies the name of the object"),
-    form: d("Specifies the form the object belongs to"),
-    width: d("Specifies the width of the object"),
-    height: d("Specifies the height of the object"),
+    data: {
+      description: "Specifies the URL of the resource",
+    },
+    type: {
+      description: "Specifies the MIME type of the resource",
+    },
+    name: {
+      description: "Specifies the name of the object",
+    },
+    form: {
+      description: "Specifies the form the object belongs to",
+    },
+    width: {
+      description: "Specifies the width of the object",
+    },
+    height: {
+      description: "Specifies the height of the object",
+    },
   },
 });
 
@@ -1091,8 +1322,12 @@ export const HtmlOptgroupMd = createMetadata({
   description: "This component renders an HTML `optgroup` tag.",
   isHtmlTag: true,
   props: {
-    label: d("Specifies the label for the option group"),
-    disabled: d("Specifies that the option group is disabled"),
+    label: {
+      description: "Specifies the label for the option group",
+    },
+    disabled: {
+      description: "Specifies that the option group is disabled",
+    },
   },
 });
 
@@ -1111,10 +1346,18 @@ export const HtmlOptionMd = createMetadata({
   description: "This component renders an HTML `option` tag.",
   isHtmlTag: true,
   props: {
-    disabled: d("Specifies that the option should be disabled"),
-    label: d("Specifies the label of the option"),
-    selected: d("Specifies that the option should be pre-selected"),
-    value: d("Specifies the value of the option"),
+    disabled: {
+      description: "Specifies that the option should be disabled",
+    },
+    label: {
+      description: "Specifies the label of the option",
+    },
+    selected: {
+      description: "Specifies that the option should be pre-selected",
+    },
+    value: {
+      description: "Specifies the value of the option",
+    },
   },
 });
 
@@ -1133,9 +1376,15 @@ export const HtmlOutputMd = createMetadata({
   description: "This component renders an HTML `output` tag.",
   isHtmlTag: true,
   props: {
-    form: d("Specifies the form element that the output is associated with"),
-    htmlFor: d("Specifies the IDs of the elements that this output is related to"),
-    name: d("Specifies the name of the output"),
+    form: {
+      description: "Specifies the form element that the output is associated with",
+    },
+    htmlFor: {
+      description: "Specifies the IDs of the elements that this output is related to",
+    },
+    name: {
+      description: "Specifies the name of the output",
+    },
   },
 });
 
@@ -1163,8 +1412,12 @@ export const HtmlParamMd = createMetadata({
   description: "This component renders an HTML `param` tag.",
   isHtmlTag: true,
   props: {
-    name: d("Specifies the name of the parameter"),
-    value: d("Specifies the value of the parameter"),
+    name: {
+      description: "Specifies the name of the parameter",
+    },
+    value: {
+      description: "Specifies the value of the parameter",
+    },
   },
 });
 
@@ -1207,8 +1460,12 @@ export const HtmlProgressMd = createMetadata({
   description: "This component renders an HTML `progress` tag.",
   isHtmlTag: true,
   props: {
-    max: d("Specifies the maximum value of the progress element"),
-    value: d("Specifies the current value of the progress element"),
+    max: {
+      description: "Specifies the maximum value of the progress element",
+    },
+    value: {
+      description: "Specifies the current value of the progress element",
+    },
   },
 });
 
@@ -1227,7 +1484,9 @@ export const HtmlQMd = createMetadata({
   description: "This component renders an HTML `q` tag.",
   isHtmlTag: true,
   props: {
-    cite: d("Specifies the source URL of the quotation"),
+    cite: {
+      description: "Specifies the source URL of the quotation",
+    },
   },
 });
 
@@ -1305,13 +1564,27 @@ export const HtmlSelectMd = createMetadata({
   description: "This component renders an HTML `select` tag.",
   isHtmlTag: true,
   props: {
-    autoFocus: d("Specifies that the select should automatically get focus when the page loads"),
-    disabled: d("Specifies that the select should be disabled"),
-    form: d("Specifies the form the select belongs to"),
-    multiple: d("Specifies that multiple options can be selected at once"),
-    name: d("Specifies the name of the select"),
-    required: d("Specifies that the select is required"),
-    size: d("Specifies the number of visible options in the select"),
+    autoFocus: {
+      description: "Specifies that the select should automatically get focus when the page loads",
+    },
+    disabled: {
+      description: "Specifies that the select should be disabled",
+    },
+    form: {
+      description: "Specifies the form the select belongs to",
+    },
+    multiple: {
+      description: "Specifies that multiple options can be selected at once",
+    },
+    name: {
+      description: "Specifies the name of the select",
+    },
+    required: {
+      description: "Specifies that the select is required",
+    },
+    size: {
+      description: "Specifies the number of visible options in the select",
+    },
   },
 });
 
@@ -1346,11 +1619,21 @@ export const HtmlSourceMd = createMetadata({
   description: "This component renders an HTML `source` tag.",
   isHtmlTag: true,
   props: {
-    src: d("Specifies the URL of the media file"),
-    type: d("Specifies the type of the media file"),
-    media: d("Specifies a media query for the media file"),
-    srcSet: d("Specifies the source set for responsive images"),
-    sizes: d("Specifies the sizes attribute for responsive images"),
+    src: {
+      description: "Specifies the URL of the media file",
+    },
+    type: {
+      description: "Specifies the type of the media file",
+    },
+    media: {
+      description: "Specifies a media query for the media file",
+    },
+    srcSet: {
+      description: "Specifies the source set for responsive images",
+    },
+    sizes: {
+      description: "Specifies the sizes attribute for responsive images",
+    },
   },
 });
 
@@ -1429,14 +1712,30 @@ export const HtmlTableMd = createMetadata({
   description: "This component renders an HTML `table` tag.",
   isHtmlTag: true,
   props: {
-    border: d("Specifies the width of the border around the table"),
-    cellPadding: d("Specifies the space between the cell content and its borders"),
-    cellSpacing: d("Specifies the space between cells"),
-    summary: d("Provides a summary of the table's purpose and structure"),
-    width: d("Specifies the width of the table"),
-    align: d("Specifies the alignment of the table"),
-    frame: d("Specifies which parts of the table frame to render"),
-    rules: d("Specifies which rules to draw between cells"),
+    border: {
+      description: "Specifies the width of the border around the table",
+    },
+    cellPadding: {
+      description: "Specifies the space between the cell content and its borders",
+    },
+    cellSpacing: {
+      description: "Specifies the space between cells",
+    },
+    summary: {
+      description: "Provides a summary of the table's purpose and structure",
+    },
+    width: {
+      description: "Specifies the width of the table",
+    },
+    align: {
+      description: "Specifies the alignment of the table",
+    },
+    frame: {
+      description: "Specifies which parts of the table frame to render",
+    },
+    rules: {
+      description: "Specifies which rules to draw between cells",
+    },
   },
   themeVars: parseScssVar(styles.themeVarsTable),
   defaultThemeVars: {
@@ -1477,15 +1776,34 @@ export const HtmlTdMd = createMetadata({
   description: "This component renders an HTML `td` tag.",
   isHtmlTag: true,
   props: {
-    align: d("Specifies the horizontal alignment of the content in the cell"),
-    colSpan: d("Specifies the number of columns a cell should span"),
-    headers: d("Specifies a list of header cells the current cell is related to"),
-    rowSpan: d("Specifies the number of rows a cell should span"),
-    valign: d("Specifies the vertical alignment of the content in the cell"),
-    scope: d("Specifies whether a cell is a header for a column, row, or group of columns or rows"),
-    abbr: d("Specifies an abbreviated version of the content in the cell"),
-    height: d("Specifies the height of the cell"),
-    width: d("Specifies the width of the cell"),
+    align: {
+      description: "Specifies the horizontal alignment of the content in the cell",
+    },
+    colSpan: {
+      description: "Specifies the number of columns a cell should span",
+    },
+    headers: {
+      description: "Specifies a list of header cells the current cell is related to",
+    },
+    rowSpan: {
+      description: "Specifies the number of rows a cell should span",
+    },
+    valign: {
+      description: "Specifies the vertical alignment of the content in the cell",
+    },
+    scope: {
+      description:
+        "Specifies whether a cell is a header for a column, row, or group of columns or rows",
+    },
+    abbr: {
+      description: "Specifies an abbreviated version of the content in the cell",
+    },
+    height: {
+      description: "Specifies the height of the cell",
+    },
+    width: {
+      description: "Specifies the width of the cell",
+    },
   },
   themeVars: parseScssVar(styles.themeVarsTd),
   defaultThemeVars: {
@@ -1523,20 +1841,48 @@ export const HtmlTextareaMd = createMetadata({
   description: "This component renders an HTML `textarea` tag.",
   isHtmlTag: true,
   props: {
-    autoFocus: d("Specifies that the textarea should automatically get focus when the page loads"),
-    cols: d("Specifies the visible width of the text area in average character widths"),
-    dirName: d("Specifies the text directionality"),
-    disabled: d("Specifies that the textarea should be disabled"),
-    form: d("Specifies the form the textarea belongs to"),
-    maxLength: d("Specifies the maximum number of characters allowed in the textarea"),
-    minLength: d("Specifies the minimum number of characters allowed in the textarea"),
-    name: d("Specifies the name of the textarea"),
-    placeholder: d("Specifies a short hint that describes the expected value"),
-    readOnly: d("Specifies that the textarea is read-only"),
-    required: d("Specifies that the textarea is required"),
-    rows: d("Specifies the visible number of lines in the textarea"),
-    value: d("Specifies the current value of the textarea"),
-    wrap: d("Specifies how the text in a textarea is to be wrapped when submitted"),
+    autoFocus: {
+      description: "Specifies that the textarea should automatically get focus when the page loads",
+    },
+    cols: {
+      description: "Specifies the visible width of the text area in average character widths",
+    },
+    dirName: {
+      description: "Specifies the text directionality",
+    },
+    disabled: {
+      description: "Specifies that the textarea should be disabled",
+    },
+    form: {
+      description: "Specifies the form the textarea belongs to",
+    },
+    maxLength: {
+      description: "Specifies the maximum number of characters allowed in the textarea",
+    },
+    minLength: {
+      description: "Specifies the minimum number of characters allowed in the textarea",
+    },
+    name: {
+      description: "Specifies the name of the textarea",
+    },
+    placeholder: {
+      description: "Specifies a short hint that describes the expected value",
+    },
+    readOnly: {
+      description: "Specifies that the textarea is read-only",
+    },
+    required: {
+      description: "Specifies that the textarea is required",
+    },
+    rows: {
+      description: "Specifies the visible number of lines in the textarea",
+    },
+    value: {
+      description: "Specifies the current value of the textarea",
+    },
+    wrap: {
+      description: "Specifies how the text in a textarea is to be wrapped when submitted",
+    },
   },
 });
 
@@ -1572,14 +1918,25 @@ export const HtmlThMd = createMetadata({
   description: "This component renders an HTML `th` tag.",
   isHtmlTag: true,
   props: {
-    abbr: d("Specifies an abbreviated version of the content in the header cell"),
-    align: d("Specifies the horizontal alignment of the content in the header cell"),
-    colSpan: d("Specifies the number of columns a header cell should span"),
-    headers: d("Specifies a list of header cells the current header cell is related to"),
-    rowSpan: d("Specifies the number of rows a header cell should span"),
-    scope: d(
-      "Specifies whether a header cell is a header for a column, row, or group of columns or rows",
-    ),
+    abbr: {
+      description: "Specifies an abbreviated version of the content in the header cell",
+    },
+    align: {
+      description: "Specifies the horizontal alignment of the content in the header cell",
+    },
+    colSpan: {
+      description: "Specifies the number of columns a header cell should span",
+    },
+    headers: {
+      description: "Specifies a list of header cells the current header cell is related to",
+    },
+    rowSpan: {
+      description: "Specifies the number of rows a header cell should span",
+    },
+    scope: {
+      description:
+        "Specifies whether a header cell is a header for a column, row, or group of columns or rows",
+    },
   },
   themeVars: parseScssVar(styles.themeVarsTh),
   defaultThemeVars: {
@@ -1625,7 +1982,9 @@ export const HtmlTimeMd = createMetadata({
   description: "This component renders an HTML `time` tag.",
   isHtmlTag: true,
   props: {
-    dateTime: d("Specifies the date and time in a machine-readable format"),
+    dateTime: {
+      description: "Specifies the date and time in a machine-readable format",
+    },
   },
 });
 
@@ -1659,11 +2018,21 @@ export const HtmlTrackMd = createMetadata({
   description: "This component renders an HTML `track` tag.",
   isHtmlTag: true,
   props: {
-    default: d("Specifies that the track is to be enabled if no other track is more suitable"),
-    kind: d("Specifies the kind of text track"),
-    label: d("Specifies the title of the text track"),
-    src: d("Specifies the URL of the track file"),
-    srcLang: d("Specifies the language of the track text data"),
+    default: {
+      description: "Specifies that the track is to be enabled if no other track is more suitable",
+    },
+    kind: {
+      description: "Specifies the kind of text track",
+    },
+    label: {
+      description: "Specifies the title of the text track",
+    },
+    src: {
+      description: "Specifies the URL of the track file",
+    },
+    srcLang: {
+      description: "Specifies the language of the track text data",
+    },
   },
 });
 
@@ -1723,17 +2092,34 @@ export const HtmlVideoMd = createMetadata({
   description: "This component renders an HTML `video` tag.",
   isHtmlTag: true,
   props: {
-    autoPlay: d("Specifies that the video will start playing as soon as it is ready"),
-    controls: d("Specifies that video controls should be displayed"),
-    height: d("Specifies the height of the video player"),
-    loop: d("Specifies that the video will start over again when finished"),
-    muted: d("Specifies that the video output should be muted"),
-    poster: d("Specifies an image to be shown while the video is downloading"),
-    preload: d(
-      "Specifies if and how the author thinks the video should be loaded when the page loads",
-    ),
-    src: d("Specifies the URL of the video file"),
-    width: d("Specifies the width of the video player"),
+    autoPlay: {
+      description: "Specifies that the video will start playing as soon as it is ready",
+    },
+    controls: {
+      description: "Specifies that video controls should be displayed",
+    },
+    height: {
+      description: "Specifies the height of the video player",
+    },
+    loop: {
+      description: "Specifies that the video will start over again when finished",
+    },
+    muted: {
+      description: "Specifies that the video output should be muted",
+    },
+    poster: {
+      description: "Specifies an image to be shown while the video is downloading",
+    },
+    preload: {
+      description:
+        "Specifies if and how the author thinks the video should be loaded when the page loads",
+    },
+    src: {
+      description: "Specifies the URL of the video file",
+    },
+    width: {
+      description: "Specifies the width of the video player",
+    },
   },
   themeVars: parseScssVar(styles.themeVarsVideo),
   defaultThemeVars: {

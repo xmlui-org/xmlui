@@ -1,5 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { createMetadata, d, dEnabled, dInternal } from "../metadata-helpers";
+import { createMetadata, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
 import { defaultProps as formDefaultProps } from "../Form/Form.defaults";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -38,8 +38,7 @@ export const TabsFormMd = createMetadata({
       defaultValue: formDefaultProps.saveInProgressLabel,
     },
     swapCancelAndSave: {
-      description:
-        "By default, Cancel sits to the left of Save. Set this to `true` to swap them.",
+      description: "By default, Cancel sits to the left of Save. Set this to `true` to swap them.",
       valueType: "boolean",
       defaultValue: formDefaultProps.swapCancelAndSave,
     },
@@ -88,7 +87,7 @@ export const TabsFormMd = createMetadata({
     tabsDistributeEvenly: {
       description:
         "When `true`, distributes all tabs evenly across the full width of the inner " +
-        "`Tabs` header strip. Equivalent to `tabsTabAlignment=\"stretch\"`.",
+        '`Tabs` header strip. Equivalent to `tabsTabAlignment="stretch"`.',
       valueType: "boolean",
       defaultValue: false,
     },
@@ -143,28 +142,29 @@ export const TabsFormMd = createMetadata({
       valueType: "boolean",
       defaultValue: formDefaultProps.enableSubmit,
     },
-    submitUrl: d(`URL to submit the form data.`, undefined, "url"),
+    submitUrl: {
+      description: `URL to submit the form data.`,
+      valueType: "url",
+    },
     submitMethod: {
       description:
         "This property sets the HTTP method to use when submitting the form data. If not " +
         "defined, `put` is used when the form has initial data; otherwise, `post`.",
       valueType: "string",
     },
-    inProgressNotificationMessage: d(
-      "This property sets the message to display when the form is being submitted.",
-      undefined,
-      "string",
-    ),
-    completedNotificationMessage: d(
-      "This property sets the message to display when the form is submitted successfully.",
-      undefined,
-      "string",
-    ),
-    errorNotificationMessage: d(
-      "This property sets the message to display when the form submission fails.",
-      undefined,
-      "string",
-    ),
+    inProgressNotificationMessage: {
+      description: "This property sets the message to display when the form is being submitted.",
+      valueType: "string",
+    },
+    completedNotificationMessage: {
+      description:
+        "This property sets the message to display when the form is submitted successfully.",
+      valueType: "string",
+    },
+    errorNotificationMessage: {
+      description: "This property sets the message to display when the form submission fails.",
+      valueType: "string",
+    },
     enabled: dEnabled(),
     itemRequireLabelMode: {
       description:
@@ -201,9 +201,9 @@ export const TabsFormMd = createMetadata({
     dataAfterSubmit: {
       description:
         "Controls what happens to the form data after a successful submit. " +
-        "`\"keep\"` (default) leaves the submitted data in the form. " +
-        "`\"reset\"` restores the form to its initial data. " +
-        "`\"clear\"` empties the form as if no `data` property were set.",
+        '`"keep"` (default) leaves the submitted data in the form. ' +
+        '`"reset"` restores the form to its initial data. ' +
+        '`"clear"` empties the form as if no `data` property were set.',
       availableValues: ["keep", "reset", "clear"],
       valueType: "string",
       defaultValue: formDefaultProps.dataAfterSubmit,
@@ -314,61 +314,56 @@ const FORWARDED_TABS_PROPS: Record<string, string> = {
   tabsActiveTab: "activeTab",
 };
 
-export const tabsFormComponentRenderer = wrapComponent(
-  COMP,
-  () => null,
-  TabsFormMd,
-  {
-    customRender: (_props, context) => {
-      const { node, renderChild } = context;
+export const tabsFormComponentRenderer = wrapComponent(COMP, () => null, TabsFormMd, {
+  customRender: (_props, context) => {
+    const { node, renderChild } = context;
 
-      const segments: ComponentDef[] = (node.children ?? []).filter(
-        (c: ComponentDef) => c.type === "FormSegment",
-      );
+    const segments: ComponentDef[] = (node.children ?? []).filter(
+      (c: ComponentDef) => c.type === "FormSegment",
+    );
 
-      const tabItemNodes: ComponentDef[] = segments.map((seg, i) => buildTabItem(seg, i));
+    const tabItemNodes: ComponentDef[] = segments.map((seg, i) => buildTabItem(seg, i));
 
-      const formProps: Record<string, unknown> = {};
-      for (const key of FORWARDED_FORM_PROPS) {
-        const v = node.props?.[key];
-        if (v !== undefined) formProps[key] = v;
-      }
+    const formProps: Record<string, unknown> = {};
+    for (const key of FORWARDED_FORM_PROPS) {
+      const v = node.props?.[key];
+      if (v !== undefined) formProps[key] = v;
+    }
 
-      const tabsProps: Record<string, unknown> = {};
-      for (const [tabsFormKey, tabsKey] of Object.entries(FORWARDED_TABS_PROPS)) {
-        const v = node.props?.[tabsFormKey];
-        if (v !== undefined) tabsProps[tabsKey] = v;
-      }
+    const tabsProps: Record<string, unknown> = {};
+    for (const [tabsFormKey, tabsKey] of Object.entries(FORWARDED_TABS_PROPS)) {
+      const v = node.props?.[tabsFormKey];
+      if (v !== undefined) tabsProps[tabsKey] = v;
+    }
 
-      // Auto-validation on submit: when the underlying Form rejects a submit attempt,
-      // jump to the first segment that is invalid. The handler runs only on failed
-      // submits; valid submits flow through to the user's `onSubmit` normally.
-      const submitFailedHandler = segments
-        .map(
-          (_seg, i) =>
-            `if (!${SEGMENT_UID_PREFIX}${i}.isValid) { ${TABS_UID}.setActiveTabIndex(${i}); return; }`,
-        )
-        .join(" ");
+    // Auto-validation on submit: when the underlying Form rejects a submit attempt,
+    // jump to the first segment that is invalid. The handler runs only on failed
+    // submits; valid submits flow through to the user's `onSubmit` normally.
+    const submitFailedHandler = segments
+      .map(
+        (_seg, i) =>
+          `if (!${SEGMENT_UID_PREFIX}${i}.isValid) { ${TABS_UID}.setActiveTabIndex(${i}); return; }`,
+      )
+      .join(" ");
 
-      const synthetic: ComponentDef = {
-        type: "Form",
-        uid: node.uid,
-        props: formProps,
-        events: {
-          ...(node.events ?? {}),
-          submitFailed: submitFailedHandler,
-        },
-        children: [
-          {
-            type: "Tabs",
-            uid: TABS_UID,
-            props: tabsProps,
-            children: tabItemNodes,
-          } as ComponentDef,
-        ],
-      } as ComponentDef;
+    const synthetic: ComponentDef = {
+      type: "Form",
+      uid: node.uid,
+      props: formProps,
+      events: {
+        ...(node.events ?? {}),
+        submitFailed: submitFailedHandler,
+      },
+      children: [
+        {
+          type: "Tabs",
+          uid: TABS_UID,
+          props: tabsProps,
+          children: tabItemNodes,
+        } as ComponentDef,
+      ],
+    } as ComponentDef;
 
-      return renderChild(synthetic);
-    },
+    return renderChild(synthetic);
   },
-);
+});

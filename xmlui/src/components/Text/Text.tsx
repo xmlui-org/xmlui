@@ -13,7 +13,7 @@ import {
 } from "../abstractions";
 import { Text } from "./TextReact";
 import { defaultProps } from "./Text.defaults";
-import { createMetadata, d, dContextMenu } from "../metadata-helpers";
+import { createMetadata, dContextMenu } from "../metadata-helpers";
 
 const COMP = "Text";
 
@@ -23,32 +23,32 @@ export const TextMd = createMetadata({
     `The \`${COMP}\` component displays textual information in a number of optional ` +
     `styles and variants.`,
   props: {
-    value: d(
-      `The text to be displayed. This value can also be set via nesting the text into ` +
+    value: {
+      description:
+        `The text to be displayed. This value can also be set via nesting the text into ` +
         `the \`${COMP}\` component.`,
-      undefined,
-      "string",
-    ),
+      valueType: "string",
+    },
     variant: {
       description:
         "An optional string value that provides named presets for text variants with a " +
         "unique combination of font style, weight, size, color, and other parameters. " +
         "If not defined, the text uses the current style of its context. " +
         "In addition to predefined variants, you can specify custom variant names and style them " +
-      "using theme variables with the pattern `{cssProperty}-Text-{variantName}` " +
-      "(e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). " +
-      "See the documentation for a complete list of supported CSS properties.",
+        "using theme variables with the pattern `{cssProperty}-Text-{variantName}` " +
+        "(e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). " +
+        "See the documentation for a complete list of supported CSS properties.",
       availableValues: variantOptionsMd,
       valueType: "string",
     },
-    maxLines: d(
-      "This property determines the maximum number of lines the component can wrap to. " +
+    maxLines: {
+      description:
+        "This property determines the maximum number of lines the component can wrap to. " +
         "If there is no space to display all the contents, the component displays up to as " +
         "many lines as specified in this property. When the value is not defined, there is " +
         "no limit on the displayed lines.",
-      undefined,
-      "number",
-    ),
+      valueType: "number",
+    },
     preserveLinebreaks: {
       description: `This property indicates if linebreaks should be preserved when displaying text.`,
       valueType: "boolean",
@@ -89,12 +89,14 @@ export const TextMd = createMetadata({
       availableValues: [
         {
           value: "none",
-          description: "No wrapping, text stays on a single line with no overflow indicator (ignores maxLines)",
+          description:
+            "No wrapping, text stays on a single line with no overflow indicator (ignores maxLines)",
         },
         { value: "ellipsis", description: "Truncates with an ellipsis (default)" },
         {
           value: "scroll",
-          description: "Forces single line with horizontal scrolling when content overflows (ignores maxLines)",
+          description:
+            "Forces single line with horizontal scrolling when content overflows (ignores maxLines)",
         },
         {
           value: "flow",
@@ -136,7 +138,7 @@ export const TextMd = createMetadata({
     [`paddingVertical-${COMP}-codefence`]: "$space-3",
     [`textColor-${COMP}-codefence`]: "$color-surface-900",
     [`lineHeight-${COMP}-codefence`]: "1.5",
-    
+
     [`fontFamily-${COMP}-code`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-code`]: "$fontSize-sm",
     [`borderWidth-${COMP}-code`]: "1px",
@@ -204,7 +206,7 @@ export const TextMd = createMetadata({
 
     [`textColor-${COMP}-marked`]: "$color-secondary-800",
     [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-300 r g b / 0.4)",
-    
+
     dark: {
       [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-400 r g b / 0.4)",
     },
@@ -212,58 +214,67 @@ export const TextMd = createMetadata({
 });
 
 type ThemedTextProps = React.ComponentProps<typeof Text> & { className?: string };
-export const ThemedText = React.forwardRef<HTMLElement, ThemedTextProps>(
-  function ThemedText({ className, ...props }: ThemedTextProps, ref) {
-    const themeClass = useComponentThemeClass(TextMd);
-    return <Text {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+export const ThemedText = React.forwardRef<HTMLElement, ThemedTextProps>(function ThemedText(
+  { className, ...props }: ThemedTextProps,
+  ref,
+) {
+  const themeClass = useComponentThemeClass(TextMd);
+  return (
+    <Text {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
+  );
+});
+
+export const textComponentRenderer = wrapComponent(COMP, Text, TextMd, {
+  exposeRegisterApi: true,
+  exclude: [
+    "variant",
+    "maxLines",
+    "preserveLinebreaks",
+    "ellipses",
+    "overflowMode",
+    "breakMode",
+    "value",
+  ],
+  events: [],
+  customRender(
+    _props,
+    { node, extractValue, classes, renderChild, registerComponentApi, lookupEventHandler },
+  ) {
+    const {
+      variant,
+      maxLines,
+      preserveLinebreaks,
+      ellipses,
+      overflowMode,
+      breakMode,
+      value,
+      ...variantSpecific
+    } = node.props;
+
+    const variantSpecificProps: VariantProps = Object.fromEntries(
+      Object.entries(variantSpecific)
+        .filter(([key, _]) => VariantPropsKeys.includes(key as any))
+        .map(([key, value]) => [key, extractValue(value)]),
+    );
+
+    return (
+      <Text
+        variant={extractValue(variant)}
+        maxLines={extractValue.asOptionalNumber(maxLines)}
+        classes={classes}
+        preserveLinebreaks={extractValue.asOptionalBoolean(
+          preserveLinebreaks,
+          defaultProps.preserveLinebreaks,
+        )}
+        ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
+        overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
+        breakMode={extractValue(breakMode) as BreakMode | undefined}
+        registerComponentApi={registerComponentApi}
+        onContextMenu={lookupEventHandler("contextMenu")}
+        {...variantSpecificProps}
+      >
+        {extractValue.asDisplayText(value) || renderChild(node.children)}
+      </Text>
+    );
   },
-);
-
-export const textComponentRenderer = wrapComponent(
-  COMP,
-  Text,
-  TextMd,
-  {
-    exposeRegisterApi: true,
-    exclude: ["variant", "maxLines", "preserveLinebreaks", "ellipses", "overflowMode", "breakMode", "value"],
-    events: [],
-    customRender(_props, { node, extractValue, classes, renderChild, registerComponentApi, lookupEventHandler }) {
-      const {
-        variant,
-        maxLines,
-        preserveLinebreaks,
-        ellipses,
-        overflowMode,
-        breakMode,
-        value,
-        ...variantSpecific
-      } = node.props;
-
-      const variantSpecificProps: VariantProps = Object.fromEntries(
-        Object.entries(variantSpecific)
-          .filter(([key, _]) => VariantPropsKeys.includes(key as any))
-          .map(([key, value]) => [key, extractValue(value)]),
-      );
-
-      return (
-        <Text
-          variant={extractValue(variant)}
-          maxLines={extractValue.asOptionalNumber(maxLines)}
-          classes={classes}
-          preserveLinebreaks={extractValue.asOptionalBoolean(
-            preserveLinebreaks,
-            defaultProps.preserveLinebreaks,
-          )}
-          ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
-          overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
-          breakMode={extractValue(breakMode) as BreakMode | undefined}
-          registerComponentApi={registerComponentApi}
-          onContextMenu={lookupEventHandler("contextMenu")}
-          {...variantSpecificProps}
-        >
-          {extractValue.asDisplayText(value) || renderChild(node.children)}
-        </Text>
-      );
-    },
-  },
-);
+});

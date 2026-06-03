@@ -57,7 +57,10 @@ import { ThemedHeading as Heading } from "./components/Heading/Heading";
 import { ThemedImage as Image } from "./components/Image/Image";
 import { ThemedMarkdown as Markdown } from "./components/Markdown/Markdown";
 import { ThemedTableOfContents as TableOfContents } from "./components/TableOfContents/TableOfContents";
-import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayout";
+import {
+  ThemedFlowLayout as FlowLayout,
+  FlowItemWrapper,
+} from "./components/FlowLayout/FlowLayout";
 import { COMPONENT_PART_KEY } from "./components-core/theming/responsive-layout";
 import { Part } from "./components/Part/Part";
 import { useAppContext } from "./components-core/AppContext";
@@ -80,7 +83,6 @@ import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
 import {
   createMetadata,
-  d,
   dComponent,
   dAutoFocus,
   dClick,
@@ -158,7 +160,6 @@ export {
   createComponentRenderer,
   createUserDefinedComponentRenderer,
   createMetadata,
-  d,
   dComponent,
   dAutoFocus,
   dClick,

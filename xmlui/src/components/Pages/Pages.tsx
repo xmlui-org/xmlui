@@ -2,7 +2,7 @@ import styles from "./Pages.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
-import { createMetadata, d, dInternal } from "../metadata-helpers";
+import { createMetadata, dInternal } from "../metadata-helpers";
 import { defaultProps, pageDefaultProps } from "./Pages.defaults";
 import { Pages, RouteWrapper } from "./PagesReact";
 import { extractPaddings } from "../../components-core/utils/css-utils";
@@ -20,14 +20,14 @@ export const PageMd = createMetadata({
     "routing system.",
   props: {
     //TODO illesg rename to path
-    url: d(
-      `The URL of the route associated with the content. If not set, the page is not available.`,
-      undefined,
-      "url",
-    ),
+    url: {
+      description: `The URL of the route associated with the content. If not set, the page is not available.`,
+      valueType: "url",
+    },
     // NOTE: This is experimental
     searchIndexable: {
-      description: "Whether the content of this page should be indexed for search. Defaults to true.",
+      description:
+        "Whether the content of this page should be indexed for search. Defaults to true.",
       valueType: "boolean",
       defaultValue: pageDefaultProps.searchIndexable,
       isInternal: true,
@@ -37,12 +37,14 @@ export const PageMd = createMetadata({
         "a new entry will be added to the navigation panel.",
     ),
     queryParams: {
-      description: "Optional query-string constraint declaration, for example `page:int(min=1)?,sort:enum(asc,desc)?`.",
+      description:
+        "Optional query-string constraint declaration, for example `page:int(min=1)?,sort:enum(asc,desc)?`.",
       valueType: "string",
       isInternal: true,
     },
     guard: {
-      description: "Optional page-level navigation guard. Wave 4 reserves this prop for defended routing.",
+      description:
+        "Optional page-level navigation guard. Wave 4 reserves this prop for defended routing.",
       valueType: "any",
       isInternal: true,
     },
@@ -85,12 +87,13 @@ export const PagesMd = createMetadata({
       defaultValue: defaultProps.fallbackPath,
     },
     defaultScrollRestoration: {
-      description: "When set to true, the page scroll position is restored when navigating back via browser history.",
+      description:
+        "When set to true, the page scroll position is restored when navigating back via browser history.",
       valueType: "boolean",
       defaultValue: defaultProps.defaultScrollRestoration,
     },
   },
-    themeVars: parseScssVar(styles.themeVars),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`paddingVertical-${COMP}`]: "$space-5",
     [`paddingHorizontal-${COMP}`]: "$space-4",

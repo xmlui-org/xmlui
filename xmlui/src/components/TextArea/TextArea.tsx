@@ -5,7 +5,6 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -65,18 +64,18 @@ export const TextAreaMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
-    maxRows: d(
-      `This optional property sets the maximum number of text rows the \`${COMP}\` ` +
+    maxRows: {
+      description:
+        `This optional property sets the maximum number of text rows the \`${COMP}\` ` +
         "can grow. If not set, the number of rows is unlimited.",
-      undefined,
-      "number",
-    ),
-    minRows: d(
-      `This optional property sets the minimum number of text rows the \`${COMP}\` can shrink. ` +
+      valueType: "number",
+    },
+    minRows: {
+      description:
+        `This optional property sets the minimum number of text rows the \`${COMP}\` can shrink. ` +
         `If not set, the minimum number of rows is 1.`,
-      undefined,
-      "number",
-    ),
+      valueType: "number",
+    },
     rows: {
       description: `Specifies the number of rows the component initially has.`,
       valueType: "number",
@@ -145,24 +144,24 @@ export const TextAreaMd = createMetadata({
 
 type ThemedTextAreaProps = React.ComponentPropsWithoutRef<typeof TextArea>;
 
-export const ThemedTextArea = React.forwardRef<React.ElementRef<typeof TextArea>, ThemedTextAreaProps>(
-  function ThemedTextArea({ className, ...props }, ref) {
-    const themeClass = useComponentThemeClass(TextAreaMd);
-    return (
-      <TextArea
-        {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
-        ref={ref}
-      />
-    );
-  },
-);
+export const ThemedTextArea = React.forwardRef<
+  React.ElementRef<typeof TextArea>,
+  ThemedTextAreaProps
+>(function ThemedTextArea({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(TextAreaMd);
+  return (
+    <TextArea {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
+  );
+});
 
 export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaMd, {
   exposeRegisterApi: true,
   // resize is passed raw (not through extractValue). rows is valueType: "number" but
   // maxRows/minRows are not — use customRender to preserve exact original extraction.
-  customRender: (_props, { node, extractValue, state, updateState, classes, registerComponentApi, lookupEventHandler }) => (
+  customRender: (
+    _props,
+    { node, extractValue, state, updateState, classes, registerComponentApi, lookupEventHandler },
+  ) => (
     <TextArea
       value={state?.value}
       initialValue={extractValue(node.props.initialValue)}
@@ -186,7 +185,9 @@ export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaM
       autoSize={extractValue.asOptionalBoolean(node.props.autoSize)}
       validationStatus={extractValue(node.props.validationStatus)}
       required={extractValue.asOptionalBoolean(node.props.required)}
-      verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+      verboseValidationFeedback={extractValue.asOptionalBoolean(
+        node.props.verboseValidationFeedback,
+      )}
       validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
       validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
     />

@@ -3,7 +3,6 @@ import {
   wrapCompound,
   createMetadata,
   type ComponentMetadata,
-  d,
   dDidChange,
   dInitialValue,
 } from "xmlui";
@@ -18,11 +17,31 @@ export const TiptapEditorMd: ComponentMetadata = createMetadata({
     "table editing, task lists, and live markdown output.",
   props: {
     initialValue: dInitialValue(),
-    placeholder: d("Placeholder text shown when the editor is empty.", undefined, "string", "Start writing..."),
-    editable: d("Whether the editor is editable.", undefined, "boolean", true),
-    toolbar: d("Whether to show the formatting toolbar.", undefined, "boolean", true),
-    toolbarItems: d("Comma-separated list of toolbar items to show. If omitted, all items are shown.", undefined, "string"),
-    height: d("The height of the editor content area.", undefined, "string", "300px"),
+    placeholder: {
+      description: "Placeholder text shown when the editor is empty.",
+      valueType: "string",
+      defaultValue: "Start writing...",
+    },
+    editable: {
+      description: "Whether the editor is editable.",
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    toolbar: {
+      description: "Whether to show the formatting toolbar.",
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    toolbarItems: {
+      description:
+        "Comma-separated list of toolbar items to show. If omitted, all items are shown.",
+      valueType: "string",
+    },
+    height: {
+      description: "The height of the editor content area.",
+      valueType: "string",
+      defaultValue: "300px",
+    },
   },
   events: {
     didChange: dDidChange(COMP),

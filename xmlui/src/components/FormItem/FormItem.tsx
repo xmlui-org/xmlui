@@ -10,7 +10,6 @@ import {
 } from "../Form/FormContext";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dComponent,
   dEnabled,
@@ -285,9 +284,15 @@ export const FormItemMd = createMetadata({
     },
   },
   contextVars: {
-    $value: d("Current value of the FormItem, accessible in expressions and code snippets"),
-    $setValue: d("Function to set the FormItem's value programmatically"),
-    $validationResult: d("Current validation state and error messages for this field"),
+    $value: {
+      description: "Current value of the FormItem, accessible in expressions and code snippets",
+    },
+    $setValue: {
+      description: "Function to set the FormItem's value programmatically",
+    },
+    $validationResult: {
+      description: "Current validation state and error messages for this field",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -307,15 +312,18 @@ export const FormItemMd = createMetadata({
 export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemMd, {
   exposeRegisterApi: true,
   exclude: ["inputTemplate"],
-  customRender: (_props, {
-    node,
-    renderChild,
-    extractValue,
-    classes,
-    layoutContext,
-    lookupEventHandler,
-    registerComponentApi,
-  }) => {
+  customRender: (
+    _props,
+    {
+      node,
+      renderChild,
+      extractValue,
+      classes,
+      layoutContext,
+      lookupEventHandler,
+      registerComponentApi,
+    },
+  ) => {
     const {
       bindTo,
       autoFocus,

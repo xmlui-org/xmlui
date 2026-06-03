@@ -16,7 +16,6 @@ import {
   dLostFocus,
   dMulti,
   createMetadata,
-  d,
 } from "../metadata-helpers";
 import { defaultProps } from "./AutoComplete.defaults";
 import { AutoComplete } from "./AutoCompleteReact";
@@ -53,18 +52,18 @@ export const AutoCompleteMd = createMetadata({
       ...dEnabled(),
       defaultValue: defaultProps.enabled,
     },
-    initiallyOpen: d(
-      `This property determines whether the dropdown list is open when the component is first rendered.`,
-      null,
-      "boolean",
-      defaultProps.initiallyOpen,
-    ),
-    creatable: d(
-      `This property allows the user to create new items that are not present in the list of options.`,
-      null,
-      "boolean",
-      defaultProps.creatable,
-    ),
+    initiallyOpen: {
+      description: `This property determines whether the dropdown list is open when the component is first rendered.`,
+      availableValues: null,
+      valueType: "boolean",
+      defaultValue: defaultProps.initiallyOpen,
+    },
+    creatable: {
+      description: `This property allows the user to create new items that are not present in the list of options.`,
+      availableValues: null,
+      valueType: "boolean",
+      defaultValue: defaultProps.creatable,
+    },
     validationStatus: {
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
@@ -91,7 +90,7 @@ export const AutoCompleteMd = createMetadata({
         "`option[groupBy]`. Headers are computed against the currently visible " +
         "(filtered) options, so searching automatically updates which option carries " +
         "its group's header. Use it together with an extra attribute on `<Option>` " +
-        "(e.g. `clientName=\"{$item.clientName}\"`). Mirrors `Select`'s `groupBy`.",
+        '(e.g. `clientName="{$item.clientName}"`). Mirrors `Select`\'s `groupBy`.',
       valueType: "string" as const,
     },
     groupHeaderTemplate: dComponent(
@@ -100,7 +99,7 @@ export const AutoCompleteMd = createMetadata({
         "When omitted, the group name is rendered as plain text.",
     ),
     ungroupedHeaderTemplate: dComponent(
-      "Customizes the section header for the \"Ungrouped\" bucket (options that " +
+      'Customizes the section header for the "Ungrouped" bucket (options that ' +
         "do not declare a value for the `groupBy` field). When omitted, the " +
         "Ungrouped bucket has no header.",
     ),
@@ -161,14 +160,15 @@ export const AutoCompleteMd = createMetadata({
     },
   },
   contextVars: {
-    $item: d(
-      "This context value represents an item when you define an option item template. " +
+    $item: {
+      description:
+        "This context value represents an item when you define an option item template. " +
         "Use `$item.value` and `$item.label` to refer to the value and label of the " +
         "particular option.",
-    ),
-    $group: d(
-      "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
-    ),
+    },
+    $group: {
+      description: "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -210,44 +210,40 @@ export const AutoCompleteMd = createMetadata({
 
 type ThemedAutoCompleteProps = React.ComponentPropsWithoutRef<typeof AutoComplete>;
 
-export const ThemedAutoComplete = React.forwardRef<React.ElementRef<typeof AutoComplete>, ThemedAutoCompleteProps>(
-  function ThemedAutoComplete({ className, ...props }, ref) {
-    const themeClass = useComponentThemeClass(AutoCompleteMd);
-    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
-    return (
-      <AutoComplete
-        {...props}
-        className={combinedClassName}
-        contentClassName={combinedClassName}
-        ref={ref}
-      />
-    );
-  },
-);
+export const ThemedAutoComplete = React.forwardRef<
+  React.ElementRef<typeof AutoComplete>,
+  ThemedAutoCompleteProps
+>(function ThemedAutoComplete({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(AutoCompleteMd);
+  const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
+  return (
+    <AutoComplete
+      {...props}
+      className={combinedClassName}
+      contentClassName={combinedClassName}
+      ref={ref}
+    />
+  );
+});
 
-export const autoCompleteComponentRenderer = wrapComponent(
-  COMP,
-  AutoComplete,
-  AutoCompleteMd,
-  {
-    contentClassName: true,
-    exposeRegisterApi: true,
-    events: {
-      gotFocus: "onFocus",
-      lostFocus: "onBlur",
-      didChange: "onDidChange",
-      itemCreated: "onItemCreated",
+export const autoCompleteComponentRenderer = wrapComponent(COMP, AutoComplete, AutoCompleteMd, {
+  contentClassName: true,
+  exposeRegisterApi: true,
+  events: {
+    gotFocus: "onFocus",
+    lostFocus: "onBlur",
+    didChange: "onDidChange",
+    itemCreated: "onItemCreated",
+  },
+  renderers: {
+    optionTemplate: {
+      contextVars: ["$item", "$selectedValue", "$inTrigger"],
     },
-    renderers: {
-      optionTemplate: {
-        contextVars: ["$item", "$selectedValue", "$inTrigger"],
-      },
-      groupHeaderTemplate: {
-        contextVars: ["$group"],
-      },
-      ungroupedHeaderTemplate: {
-        contextVars: [],
-      },
+    groupHeaderTemplate: {
+      contextVars: ["$group"],
+    },
+    ungroupedHeaderTemplate: {
+      contextVars: [],
     },
   },
-);
+});

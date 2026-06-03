@@ -1,5 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { createMetadata, d, dComponent } from "../metadata-helpers";
+import { createMetadata, dComponent } from "../metadata-helpers";
 import { IncludeMarkupReact } from "./IncludeMarkupReact";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
@@ -13,12 +13,13 @@ export const IncludeMarkupMd = createMetadata({
     "Use it to share common fragments (headers, footers, navigation bars, etc.) across " +
     "multiple XMLUI apps without duplicating markup.",
   props: {
-    url: d(
-      "The URL to fetch XMLUI markup from. " +
+    url: {
+      description:
+        "The URL to fetch XMLUI markup from. " +
         "The component re-fetches and re-renders whenever this value changes. " +
         "The server must allow cross-origin requests (CORS) when the app and the " +
         "markup are served from different origins.",
-    ),
+    },
     loadingContent: dComponent(
       "Optional content rendered while the request is in-flight. " +
         "When the fetch completes this placeholder is replaced by the fetched markup.",
@@ -43,14 +44,19 @@ export const IncludeMarkupMd = createMetadata({
   },
 });
 
-export const includeMarkupComponentRenderer = wrapComponent(COMP, IncludeMarkupReact, IncludeMarkupMd, {
-  customRender: (props, { renderChild }) => (
-    <IncludeMarkupReact
-      url={props.url}
-      loadingContent={props.loadingContent}
-      onDidLoad={props.onDidLoad}
-      onDidFail={props.onDidFail}
-      renderComponent={(def) => renderChild(def as ComponentDef)}
-    />
-  ),
-});
+export const includeMarkupComponentRenderer = wrapComponent(
+  COMP,
+  IncludeMarkupReact,
+  IncludeMarkupMd,
+  {
+    customRender: (props, { renderChild }) => (
+      <IncludeMarkupReact
+        url={props.url}
+        loadingContent={props.loadingContent}
+        onDidLoad={props.onDidLoad}
+        onDidFail={props.onDidFail}
+        renderComponent={(def) => renderChild(def as ComponentDef)}
+      />
+    ),
+  },
+);

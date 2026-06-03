@@ -1,5 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { createMetadata, d, dEnabled, dInternal } from "../metadata-helpers";
+import { createMetadata, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
 import { defaultProps as formDefaultProps } from "../Form/Form.defaults";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -108,28 +108,29 @@ export const StepperFormMd = createMetadata({
       valueType: "boolean",
       defaultValue: formDefaultProps.enableSubmit,
     },
-    submitUrl: d(`URL to submit the form data.`, undefined, "url"),
+    submitUrl: {
+      description: `URL to submit the form data.`,
+      valueType: "url",
+    },
     submitMethod: {
       description:
         "This property sets the HTTP method to use when submitting the form data. If not " +
         "defined, `put` is used when the form has initial data; otherwise, `post`.",
       valueType: "string",
     },
-    inProgressNotificationMessage: d(
-      "This property sets the message to display when the form is being submitted.",
-      undefined,
-      "string",
-    ),
-    completedNotificationMessage: d(
-      "This property sets the message to display when the form is submitted successfully.",
-      undefined,
-      "string",
-    ),
-    errorNotificationMessage: d(
-      "This property sets the message to display when the form submission fails.",
-      undefined,
-      "string",
-    ),
+    inProgressNotificationMessage: {
+      description: "This property sets the message to display when the form is being submitted.",
+      valueType: "string",
+    },
+    completedNotificationMessage: {
+      description:
+        "This property sets the message to display when the form is submitted successfully.",
+      valueType: "string",
+    },
+    errorNotificationMessage: {
+      description: "This property sets the message to display when the form submission fails.",
+      valueType: "string",
+    },
     enabled: dEnabled(),
     itemRequireLabelMode: {
       description:
@@ -166,9 +167,9 @@ export const StepperFormMd = createMetadata({
     dataAfterSubmit: {
       description:
         "Controls what happens to the form data after a successful submit. " +
-        "`\"keep\"` (default) leaves the submitted data in the form. " +
-        "`\"reset\"` restores the form to its initial data. " +
-        "`\"clear\"` empties the form as if no `data` property were set.",
+        '`"keep"` (default) leaves the submitted data in the form. ' +
+        '`"reset"` restores the form to its initial data. ' +
+        '`"clear"` empties the form as if no `data` property were set.',
       availableValues: ["keep", "reset", "clear"],
       valueType: "string",
       defaultValue: formDefaultProps.dataAfterSubmit,
@@ -227,11 +228,16 @@ export const StepperFormMd = createMetadata({
 const STEPPER_UID = "stepper";
 const SEGMENT_UID_PREFIX = "segment";
 
-function buildStep(seg: ComponentDef, i: number, total: number, labels: {
-  back: string;
-  next: string;
-  submit: string;
-}): ComponentDef {
+function buildStep(
+  seg: ComponentDef,
+  i: number,
+  total: number,
+  labels: {
+    back: string;
+    next: string;
+    submit: string;
+  },
+): ComponentDef {
   const segUid = `${SEGMENT_UID_PREFIX}${i}`;
   const isFirst = i === 0;
   const isLast = i === total - 1;
@@ -316,56 +322,51 @@ const FORWARDED_STEPPER_PROPS: Record<string, string> = {
   stepperNonLinear: "nonLinear",
 };
 
-export const stepperFormComponentRenderer = wrapComponent(
-  COMP,
-  () => null,
-  StepperFormMd,
-  {
-    customRender: (_props, context) => {
-      const { node, renderChild, extractValue } = context;
+export const stepperFormComponentRenderer = wrapComponent(COMP, () => null, StepperFormMd, {
+  customRender: (_props, context) => {
+    const { node, renderChild, extractValue } = context;
 
-      const segments: ComponentDef[] = (node.children ?? []).filter(
-        (c: ComponentDef) => c.type === "FormSegment",
-      );
+    const segments: ComponentDef[] = (node.children ?? []).filter(
+      (c: ComponentDef) => c.type === "FormSegment",
+    );
 
-      const labels = {
-        back: extractValue.asOptionalString(node.props?.backLabel) ?? "Back",
-        next: extractValue.asOptionalString(node.props?.nextLabel) ?? "Next",
-        submit: extractValue.asOptionalString(node.props?.submitLabel) ?? "Submit",
-      };
+    const labels = {
+      back: extractValue.asOptionalString(node.props?.backLabel) ?? "Back",
+      next: extractValue.asOptionalString(node.props?.nextLabel) ?? "Next",
+      submit: extractValue.asOptionalString(node.props?.submitLabel) ?? "Submit",
+    };
 
-      const stepNodes: ComponentDef[] = segments.map((seg, i) =>
-        buildStep(seg, i, segments.length, labels),
-      );
+    const stepNodes: ComponentDef[] = segments.map((seg, i) =>
+      buildStep(seg, i, segments.length, labels),
+    );
 
-      const formProps: Record<string, unknown> = { hideButtonRow: true };
-      for (const key of FORWARDED_FORM_PROPS) {
-        const v = node.props?.[key];
-        if (v !== undefined) formProps[key] = v;
-      }
+    const formProps: Record<string, unknown> = { hideButtonRow: true };
+    for (const key of FORWARDED_FORM_PROPS) {
+      const v = node.props?.[key];
+      if (v !== undefined) formProps[key] = v;
+    }
 
-      const stepperProps: Record<string, unknown> = {};
-      for (const [stepperFormKey, stepperKey] of Object.entries(FORWARDED_STEPPER_PROPS)) {
-        const v = node.props?.[stepperFormKey];
-        if (v !== undefined) stepperProps[stepperKey] = v;
-      }
+    const stepperProps: Record<string, unknown> = {};
+    for (const [stepperFormKey, stepperKey] of Object.entries(FORWARDED_STEPPER_PROPS)) {
+      const v = node.props?.[stepperFormKey];
+      if (v !== undefined) stepperProps[stepperKey] = v;
+    }
 
-      const synthetic: ComponentDef = {
-        type: "Form",
-        uid: node.uid,
-        props: formProps,
-        events: node.events,
-        children: [
-          {
-            type: "Stepper",
-            uid: STEPPER_UID,
-            props: stepperProps,
-            children: stepNodes,
-          } as ComponentDef,
-        ],
-      } as ComponentDef;
+    const synthetic: ComponentDef = {
+      type: "Form",
+      uid: node.uid,
+      props: formProps,
+      events: node.events,
+      children: [
+        {
+          type: "Stepper",
+          uid: STEPPER_UID,
+          props: stepperProps,
+          children: stepNodes,
+        } as ComponentDef,
+      ],
+    } as ComponentDef;
 
-      return renderChild(synthetic);
-    },
+    return renderChild(synthetic);
   },
-);
+});

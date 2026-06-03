@@ -1,10 +1,5 @@
 import { EChartRender } from "./EChartRender";
-import {
-  wrapComponent,
-  createMetadata,
-  type ComponentMetadata,
-  d,
-} from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
 
 const COMP = "EChart";
 
@@ -20,8 +15,16 @@ export const EChartMd: ComponentMetadata = createMetadata({
         "XMLUI theme colors are automatically injected for palette, text, axes, " +
         "and tooltip unless explicitly overridden in the option.",
     },
-    width: d("Width of the chart container.", undefined, "string", "100%"),
-    height: d("Height of the chart container.", undefined, "string", "400px"),
+    width: {
+      description: "Width of the chart container.",
+      valueType: "string",
+      defaultValue: "100%",
+    },
+    height: {
+      description: "Height of the chart container.",
+      valueType: "string",
+      defaultValue: "400px",
+    },
     renderer: {
       description: "Rendering engine: 'canvas' or 'svg'.",
       valueType: "string",
@@ -46,9 +49,7 @@ export const echartComponentRenderer = wrapComponent(COMP, EChartRender, EChartM
     if (!option?.series) return "Chart";
     const types = [
       ...new Set(
-        (Array.isArray(option.series) ? option.series : [option.series]).map(
-          (s: any) => s.type,
-        ),
+        (Array.isArray(option.series) ? option.series : [option.series]).map((s: any) => s.type),
       ),
     ];
     const title = option.title?.text;
