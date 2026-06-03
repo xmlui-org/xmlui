@@ -10,7 +10,26 @@ optimization and areas worth revisiting.
 
 ---
 
-## 11. Unresolvable cross-`.xs` imports block `computedGlobalUses` (the 35) — FIXED
+## 11. Unresolvable cross-`.xs` imports block `computedGlobalUses` (the 35) — FULLY FIXED
+
+**Sub-fix 11a — `parentFunctionDeps` guard (commit `a01ce0bf1`):**
+After §11 cleared `hasUnresolvableImports`, `da036c780` had removed the
+`if (globalReads.size > 0)` guard in `childParentFunctionDeps` building. Functions that
+only write locals (e.g., `checkCancel` writing `isCancelRequested`) entered the map,
+making `allCalledParentFnsResolvable = true` incorrectly → `computedGlobalUses` set where
+it shouldn't be → runtime scope missing write-target → throw. Fixed: only add a function
+to `parentFunctionDeps` when its `globalReads.size > 0`.
+
+**Sub-fix 11b — compound component globalDepsUsed propagation (commit `73ba131ba`):**
+Compound components are opaque to ancestor tree analysis. After §11 enabled narrowing for
+`PasteItemsModal`, its `computedGlobalUses` was assembled without `isFileOperationInProgress`
+(which `InProgressPanel` reads inside its own body, invisible to the ancestor's optimizer).
+Result: `ComponentWrapper`'s `globalVarsWithStableRef` never updated when the global changed
+→ progress panel stayed hidden. Fixed: two-pass analysis in `recomputeUsesForApp` (Pass 1:
+collect compound `computedGlobalUses`; Pass 2: feed via enhanced `metadataLookup`) and new
+`metadata.globalDepsUsed` field in `OptimizerMetadataView`.
+
+See §9 of `computed-uses-specification.md` for the full architecture.
 
 **Where:** `computedUses.ts` — `ownHasScript` includes
 `scriptCollected.hasUnresolvableImports` (circa L461-463); `collectScriptFunctionDeps`
@@ -116,9 +135,10 @@ file system) and supply a valid `appGlobalNames` set to the build-time traversal
 
 | # | Area | Impact | Effort | Status |
 |---|------|--------|--------|--------|
-| 11 | Unresolvable cross-`.xs` imports block global-narrowing | **High** in import-heavy apps | High (needs import resolution) | **Implemented** |
-| 3 | Functions always pass through | Medium — proportional to Globals.xs size | High | Open (= review §2.2) |
+| 11 | Unresolvable cross-`.xs` imports block global-narrowing | **High** in import-heavy apps | High | **Fully fixed** (11a guard + 11b compound-propagation) |
+| 3 | Functions always pass through `narrowGlobalVars` | Medium — proportional to Globals.xs size | High | Open |
 | 6 | Parse-time `appGlobalNames` empty | Low | Medium | Open |
+| **12** | **Most containers re-render even with narrowing ON** | Medium — see E.4 analysis | Medium | **Open — root cause identified** |
 
 ---
 
@@ -186,3 +206,85 @@ read the globals that actually change in each scenario, so they re-rendered anyw
 > **Note:** this benchmark was captured *before* §10 was implemented. A re-run is needed
 > to quantify the new ON-vs-OFF delta for the 11 now-protected containers. The remaining
 > 35 (`hasUnresolvableImports`) are still suppressed — pending §11.
+
+## E.4 — Post-§10 + §11 benchmark (2026-06-03)
+
+After implementing §10 (parent-function global propagation), §11 (cross-`.xs` import
+resolution), and the two-pass compound-globalDepsUsed fix, a fresh benchmark was run
+using `benchmark-render-counts.spec.ts` (snapshot-delta methodology):
+
+| Scenario | OPT ON | OPT OFF | Saved |
+|---|---|---|---|
+| S1 — sort (sortBy/sortDirection) | 62 | 66 | **4 (6%)** |
+| S2 — view switch (view) | 14 | 16 | **2 (13%)** |
+| S3 — right-click selection (catalogSelection) | 11 | 11 | **0 (0%)** |
+| S4 — folder navigation (fileEntries + $queryParams) | 22 | 28 | **6 (21%)** |
+
+**The only component actually protected:** `Drawer#versionsDrawer` — eliminated across
+S1, S2, and S4 (4/2/6 renders respectively). All other re-renders (Fragment, VStack,
+DesktopNameCell, Link, Badge, Button, DotMenuButton, Stack, FileDialogShell, App, Theme,
+HStack) fire identically ON and OFF — they genuinely READ the changed globals in their
+templates and must re-render.
+
+**Why savings are still small:** The benchmark measures StateContainer re-renders only.
+Most containers that fire DO read sortBy/view/fileEntries directly, so narrowing cannot
+help them. The optimization is correct and regression-free; savings scale with the ratio
+of "containers that don't read the changed global" to "containers that do." In this app
+that ratio is currently low for the measured scenarios.
+
+**S5 — Favorites toggle (bookmarks Globals.xs var), now measured:**
+
+| Scenario | OPT ON | OPT OFF | Saved |
+|---|---|---|---|
+| S5 — bookmarks (add/remove favorite) | 118 | 127 | **9 (7%)** |
+
+Components: same picture as S1–S4. Only `Drawer#versionsDrawer` is eliminated (9 renders);
+all other containers (DesktopNameCell, Link, Badge, Button, DotMenuButton, VStack, HStack,
+Fragment, Stack, FileDialogShell, App, Theme) fire identically ON and OFF.
+The pre-§10 baseline of 944 renders came from a different measurement methodology or app
+state — under snapshot-delta methodology the actual per-action delta is 118–127.
+
+**Root-cause of the savings plateau (new item 12):**
+
+The components that remain in the ON list (Fragment, VStack, DesktopNameCell, etc.) all
+genuinely read the changed Globals.xs variable in their templates — they receive
+`computedGlobalUses = ["sortBy"]` (or similar) and **must** re-render. The optimization is
+working correctly; there is no remaining suppression or narrowing gap for those components.
+
+The low absolute savings (~6–21%) reflect a fundamental characteristic of myworkdrive's
+rendering: the main file-list rows (DesktopNameCell, Link, Badge, etc.) ALL read `sortBy`/
+`bookmarks`/`view` directly in their templates to render the row content. There are no
+large subtrees of containers that are rendered near the changed global but do not read it.
+
+**Improvement path:** see item 12 below.
+
+---
+
+## 12. Most containers in the file-list still re-render on every global change — root cause
+
+**Where:** the file-list rows (`DesktopNameCell`, `Link`, `Badge`, `Button`, `DotMenuButton`,
+`VStack`, `HStack`, `Fragment`, `Stack`) account for ~10 renders each per sort/view/bookmark
+action even with OPT ON.
+
+**Root cause:** these row-level containers all have `computedGlobalUses` that includes the
+changing global (e.g., `["bookmarks", "sortBy"]`) because their templates directly reference
+it. The optimizer is correct; these ARE genuine readers. The savings limit is architectural:
+every row of the file list re-renders because every row template reads sort/bookmark state.
+
+**Why the parent-state `computedUses` channel is more impactful here:**  
+The file-list rows are children of `Table`/`TileGrid` implicit containers. If the Table/Grid
+container itself is correctly narrowed (reads only `fileEntries`), then changes to `sortBy`
+or `bookmarks` that do NOT change `fileEntries` content should not re-render the rows at all.
+This requires `computedUses` (parent-state) narrowing of the Table/Grid container to be
+correct — which is a separate channel from `computedGlobalUses`.
+
+**Investigation needed:**  
+Check whether `Table#filesTable` and `TileGrid#filesGrid` have `computedUses` set correctly
+and whether `fileEntries` is correctly excluded when sorting (client-side sort that doesn't
+refetch) vs. re-fetching. If the Table container is not narrowed, every `bookmarks` change
+causes the entire file list to re-render regardless of global narrowing.
+
+**Next improvement opportunity (item 3 above):** Globals.xs functions are always included
+in parentGlobalVars regardless of whether the subtree calls them. Filtering functions via
+`computedGlobalFunctions` (symmetric to `computedGlobalUses` for vars) would reduce
+snapshot object size and could give further narrowing gains in function-heavy scenarios.

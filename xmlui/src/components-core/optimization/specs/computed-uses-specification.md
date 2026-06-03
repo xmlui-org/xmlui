@@ -1036,5 +1036,101 @@ parent functions are resolvable.
 
 ---
 
+---
+
+## 9. Cross-File Import Resolution (`§11`) and Compound Component Global Dep Propagation
+
+### 9.1 Background: the 35 suppressed containers
+
+Before §11, 35 of 77 containers on the `/my-files` screen had `hasUnresolvableImports = true`
+because their `.xmlui.xs` files imported helpers from `shared.xs`. This flag caused
+`ownHasScript = true` → `safeToNarrowGlobals = false` → `computedGlobalUses` was never set
+→ those containers forwarded the full `globalVars` on every change, defeating the narrowing.
+
+### 9.2 `collectImportsFromStandaloneSources` (async resolution pass)
+
+`StandaloneApp.tsx` performs an asynchronous pass before rendering that resolves `.xs`
+imports using `appDef.sources` (for dev/inline mode) or network fetch (for the standalone
+fetch path). For each component whose `.xs` declares imports, it calls
+`collectCodeBehindFromSourceWithImports`, which:
+
+1. Builds a `ModuleFetcher` that serves local sources from `appDef.sources` (checked via
+   `modulePath in sources`, not a truthy check — handles legitimately empty modules).
+2. Resolves the full module including transitive imports via `ModuleLoader.parseWithImports`.
+3. **On success:** merges the resolved function/var declarations into `scriptCollected`,
+   propagates `resolved.hasUnresolvableImports` (instead of forcing `false`) — only
+   genuinely resolved imports clear the flag.
+4. **On failure (ModuleFetcher throws):** leaves `hasUnresolvableImports = true` — correct
+   fail-closed posture for a performance optimization.
+
+After all components are resolved, `recomputeUsesForApp` is called to re-run
+`computeUsesForTree` with the now-populated `scriptCollected.functions` and cleared
+`hasUnresolvableImports`, enabling `safeToNarrowGlobals` for previously suppressed containers.
+
+### 9.3 The `parentFunctionDeps` guard fix (commit `a01ce0bf1`)
+
+`da036c780` removed the `if (globalReads.size > 0)` guard when building `childParentFunctionDeps`,
+causing functions with empty global-read sets to enter `parentFunctionDeps`. This made
+`allCalledParentFnsResolvable = true` for containers whose code-behind functions only
+**write** locals (e.g., `FileDialogShell.checkCancel` writing `isCancelRequested`).
+The result: `safeToNarrowGlobals = true` where it should not be, `computedGlobalUses`
+set incorrectly, runtime scope missing the write-target variable →
+`"Left value variable (isCancelRequested) not found in the scope"` throw.
+
+**Fix:** only add a function to `childParentFunctionDeps` when its `globalReads.size > 0`.
+A function that reads no globals contributes nothing to a child's `globalDepsUsed` and
+must not affect `allCalledParentFnsResolvable`.
+
+### 9.4 Compound component global dep propagation (commit `73ba131ba`)
+
+**Problem:** compound components are **opaque** to ancestor tree analysis. When the optimizer
+processes `<InProgressPanel />` inside `PasteItemsModal`, it sees only the node's own
+props/events — it cannot see inside `InProgressPanel`'s component body (which reads
+`isFileOperationInProgress` via `when="{isFileOperationInProgress}"`). After §11 cleared
+`hasUnresolvableImports` and enabled narrowing for `PasteItemsModal`, its
+`computedGlobalUses` was assembled without `isFileOperationInProgress`, so
+`ComponentWrapper`'s `globalVarsWithStableRef` never updated when that global changed →
+`InProgressPanel` never re-rendered → the progress panel stayed hidden.
+
+Before §11 this was hidden: `hasUnresolvableImports` blocked narrowing entirely, so the
+full `globalVars` was always forwarded through `PasteItemsModal`.
+
+**Fix: two-pass analysis in `recomputeUsesForApp`:**
+
+```
+Pass 1: analyze every compound component body → collect its computedGlobalUses.
+Pass 2: re-analyze the full tree with an enhanced metadataLookup that returns
+        globalDepsUsed from Pass 1 for each compound type.
+```
+
+In `computeUsesInternal`, after assembling `globalDepsUsed` from direct reads and the §10
+fold, a new step folds in `metadata.globalDepsUsed` if present:
+
+```typescript
+if (metadata?.globalDepsUsed) {
+  for (const g of metadata.globalDepsUsed) globalDepsUsed.add(g);
+}
+```
+
+`OptimizerMetadataView` gains an optional `globalDepsUsed?: ReadonlySet<string>` field
+populated only in the enhanced `metadataLookup` built by Pass 2. This field is never set
+in static component metadata — it exists only as a per-app-tree enrichment for the
+runtime recomputation pass.
+
+**Subtree coverage invariant (updated):** `computedGlobalUses` on a container node is
+the union of all global deps in its entire subtree, **including globals read inside
+compound component bodies** that would otherwise be opaque to the static analyzer.
+
+### 9.5 `dev-mode` parallel (§11 dev path)
+
+The standalone fetch path (`useStandalone`, schedule/reload branch) already called
+`collectImportsFromStandaloneSources` before this work. §11 adds the **dev/inline path**:
+after `setProjectCompilation(resolvedRuntime.projectCompilation)`, a new code block
+mirrors the fetch path — resolves imports using `appDef.sources` and calls
+`recomputeUsesForApp(appDef, resolvedRuntime.appGlobalNames)` if any imports were
+resolved. This ensures dev-mode hot-reload also benefits from global narrowing.
+
+---
+
 *Note: To view render statistics in the browser during development, use `window.__renderCounts` (per-label counters), `window.__topRenderCounts(n=10)` (top N most-rendered labels), and `window.__resetRenderCounts()` (zero all counters).*
 
