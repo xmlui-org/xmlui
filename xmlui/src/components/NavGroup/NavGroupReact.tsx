@@ -65,24 +65,7 @@ type Props = {
   expandIconAlignment?: "start" | "end";
 };
 
-export const defaultProps: Pick<
-  Props,
-  | "iconHorizontalExpanded"
-  | "iconHorizontalCollapsed"
-  | "iconVerticalExpanded"
-  | "iconVerticalCollapsed"
-  | "noIndicator"
-  | "iconAlignment"
-  | "expandIconAlignment"
-> = {
-  iconHorizontalExpanded: "chevronright",
-  iconHorizontalCollapsed: "chevronright",
-  iconVerticalExpanded: "chevrondown",
-  iconVerticalCollapsed: "chevronright",
-  noIndicator: false,
-  iconAlignment: "center",
-  expandIconAlignment: "start",
-};
+import { defaultProps } from "./NavGroup.defaults";
 
 export const NavGroup = memo(forwardRef(function NavGroup(
   {

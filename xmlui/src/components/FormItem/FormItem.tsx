@@ -21,7 +21,8 @@ import {
   dRequired,
 } from "../metadata-helpers";
 import { parseSeverity } from "./Validations";
-import { CustomFormItem, FormItem, defaultProps } from "./FormItemReact";
+import { defaultProps } from "./FormItem.defaults";
+import { CustomFormItem, FormItem } from "./FormItemReact";
 import { MemoizedItem } from "../container-helpers";
 import { partitionObject } from "../../components-core/utils/misc";
 import { requireLabelModeMd } from "../abstractions";

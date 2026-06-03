@@ -38,26 +38,7 @@ export type LineChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
-export const defaultProps: Pick<
-  LineChartProps,
-  | "hideX"
-  | "hideY"
-  | "hideTooltip"
-  | "showLegend"
-  | "tickFormatterX"
-  | "tickFormatterY"
-  | "hideTickX"
-  | "hideTickY"
-> = {
-  hideTickX: false,
-  hideTickY: false,
-  hideX: false,
-  hideY: false,
-  hideTooltip: false,
-  showLegend: false,
-  tickFormatterX: (value) => value,
-  tickFormatterY: (value) => value,
-};
+import { defaultProps } from "./LineChart.defaults";
 
 const defaultChartParams = {
   chartWidth: 800,

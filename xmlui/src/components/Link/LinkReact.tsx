@@ -51,13 +51,7 @@ type Props = {
   >
 >;
 
-export const defaultProps: Pick<Props, "active" | "enabled" | "noIndicator" | "preserveLinebreaks" | "ellipses"> = {
-  active: false,
-  enabled: true,
-  noIndicator: false,
-  preserveLinebreaks: false,
-  ellipses: true,
-};
+import { defaultProps } from "./Link.defaults";
 
 export const LinkNative = memo(forwardRef(function LinkNative(
   props: Props,

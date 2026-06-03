@@ -18,7 +18,8 @@ import {
   createMetadata,
   d,
 } from "../metadata-helpers";
-import { AutoComplete, defaultProps } from "./AutoCompleteReact";
+import { defaultProps } from "./AutoComplete.defaults";
+import { AutoComplete } from "./AutoCompleteReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";

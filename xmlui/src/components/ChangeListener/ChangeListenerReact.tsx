@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { debounce, isEqual, throttle } from "lodash-es";
 import { usePrevious } from "../../components-core/utils/hooks";
+import { defaultProps } from "./ChangeListener.defaults";
 
 // =====================================================================================================================
 // React ChangeListener component implementation
@@ -10,11 +11,6 @@ type Props = {
   onChange?: (newValue: unknown) => void;
   throttleWaitInMs?: number;
   debounceWaitInMs?: number;
-};
-
-export const defaultProps: Pick<Props, "throttleWaitInMs" | "debounceWaitInMs"> = {
-  throttleWaitInMs: 0,
-  debounceWaitInMs: 0,
 };
 
 export const ChangeListener = memo(function ChangeListener({

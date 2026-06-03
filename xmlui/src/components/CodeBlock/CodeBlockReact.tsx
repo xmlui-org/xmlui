@@ -26,10 +26,6 @@ type CodeBlockProps = {
   classes?: Record<string, string>;
 };
 
-export const defaultProps = {
-  // No default props needed for this component currently
-};
-
 export const CodeBlock = memo(forwardRef(function CodeBlock({
   children,
   meta,

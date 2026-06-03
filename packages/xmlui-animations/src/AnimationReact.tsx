@@ -2,6 +2,7 @@ import { animated, useSpring, useInView } from "@react-spring/web";
 import React, { Children, ForwardedRef, forwardRef, memo, useEffect, useMemo, useState } from "react";
 import { useCallback } from "react";
 import type { RegisterComponentApiFn } from "xmlui";
+import { defaultProps } from "./Animation.defaults";
 
 export type SpringAnimation = {
   from: Record<string, unknown>;
@@ -32,14 +33,6 @@ const AnimatedComponent = animated(
     return React.cloneElement(children, { ...rest, ref });
   }),
 );
-
-export const defaultProps: Pick<AnimationProps, "delay" | "animateWhenInView" | "reverse" | "loop" | "once"> = {
-  delay: 0,
-  animateWhenInView: false,
-  reverse: false,
-  loop: false,
-  once: false,
-};
 
 const TIMES = 1;
 

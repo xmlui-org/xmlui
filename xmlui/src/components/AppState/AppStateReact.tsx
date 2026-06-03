@@ -3,10 +3,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { useAppStateContextPart } from "../../components/App/AppStateContext";
-
-export const defaultProps: Pick<{ bucket?: string }, "bucket"> = {
-  bucket: "default",
-};
+import { defaultProps } from "./AppState.defaults";
 
 type Props = {
   bucket?: string;

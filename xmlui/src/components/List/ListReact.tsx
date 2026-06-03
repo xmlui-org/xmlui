@@ -50,35 +50,13 @@ import {
   type ParsedKeyBinding,
 } from "../../parsers/keybinding-parser/keybinding-parser";
 
-export const selectionCheckboxPositionValues = ["before", "overlay"] as const;
-export type SelectionCheckboxPosition = (typeof selectionCheckboxPositionValues)[number];
-
-export const selectionCheckboxAnchorValues = ["top-left", "top-right", "bottom-left", "bottom-right", "center-left", "center-right"] as const;
-export type SelectionCheckboxAnchor = (typeof selectionCheckboxAnchorValues)[number];
-
-// Default props for List component
-export const defaultProps = {
-  idKey: "id",
-  scrollAnchor: "top" as ScrollAnchoring,
-  hideEmptyGroups: true,
-  borderCollapse: true,
-  groupsInitiallyExpanded: true,
-  rowsSelectable: false,
-  enableMultiRowSelection: true,
-  initiallySelected: EMPTY_ARRAY,
-  hideSelectionCheckboxes: false,
-  selectionCheckboxPosition: "before" as SelectionCheckboxPosition,
-  selectionCheckboxAnchor: "left-center" as SelectionCheckboxAnchor,
-  selectionCheckboxOffsetX: "$space-2",
-  selectionCheckboxOffsetY: "$space-2",
-  keyBindings: {
-    selectAll: "CmdOrCtrl+A",
-    cut: "CmdOrCtrl+X",
-    copy: "CmdOrCtrl+C",
-    paste: "CmdOrCtrl+V",
-    delete: "Delete",
-  },
-};
+import {
+  defaultProps,
+  selectionCheckboxPositionValues,
+  type SelectionCheckboxPosition,
+  selectionCheckboxAnchorValues,
+  type SelectionCheckboxAnchor,
+} from "./List.defaults";
 
 interface IExpandableListContext {
   isExpanded: (id: any) => boolean;

@@ -16,6 +16,7 @@ import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 
 import { useTheme } from "xmlui";
+import { defaultProps } from "./AreaChart.defaults";
 
 export type AreaChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   data: any[];
@@ -36,31 +37,6 @@ export type AreaChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
-export const defaultProps: Pick<
-  AreaChartProps,
-  | "hideTickX"
-  | "hideTickY"
-  | "hideX"
-  | "hideY"
-  | "hideTooltip"
-  | "tickFormatterX"
-  | "tickFormatterY"
-  | "showLegend"
-  | "stacked"
-  | "curved"
-> = {
-  hideTickX: false,
-  hideTickY: false,
-  hideX: false,
-  hideY: false,
-  hideTooltip: false,
-  tickFormatterX: (value) => value,
-  tickFormatterY: (value) => value,
-  showLegend: false,
-  stacked: false,
-  curved: false,
-};
-
 export const AreaChart = memo(
   forwardRef(function AreaChart({
   data = [],
@@ -71,8 +47,8 @@ export const AreaChart = memo(
   hideY = defaultProps.hideY,
   hideX = defaultProps.hideX,
   hideTooltip = defaultProps.hideTooltip,
-  tickFormatterX = defaultProps.tickFormatterX,
-  tickFormatterY = defaultProps.tickFormatterY,
+  tickFormatterX = (value: any) => value,
+  tickFormatterY = (value: any) => value,
   className,
   children,
   showLegend = defaultProps.showLegend,

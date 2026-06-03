@@ -3,7 +3,7 @@ import styles from "./AppWithCodeView.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { AppWithCodeViewNative } from "./AppWithCodeViewNative";
-import { defaultProps } from "./defaultProps";
+import { defaultProps } from "./NestedApp.defaults";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "AppWithCodeView";

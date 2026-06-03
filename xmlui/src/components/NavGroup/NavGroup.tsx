@@ -5,7 +5,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
-import { defaultProps, NavGroup } from "./NavGroupReact";
+import { defaultProps } from "./NavGroup.defaults";
+import { NavGroup } from "./NavGroupReact";
 
 const COMP = "NavGroup";
 

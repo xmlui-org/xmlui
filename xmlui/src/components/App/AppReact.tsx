@@ -42,6 +42,7 @@ import { EMPTY_OBJECT } from "../../components-core/constants";
 import { writeLocalStorage } from "../../components-core/appContext/local-storage-functions";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./App.defaults";
 
 // --- Slot Components ---
 
@@ -120,29 +121,6 @@ type Props = {
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   footerSticky?: boolean;
-};
-
-export const defaultProps: Pick<
-  Props,
-  | "scrollWholePage"
-  | "noScrollbarGutters"
-  | "fitContent"
-  | "defaultTone"
-  | "defaultTheme"
-  | "autoDetectTone"
-  | "persistTheme"
-  | "toneStorageKey"
-  | "themeStorageKey"
-> = {
-  scrollWholePage: true,
-  noScrollbarGutters: false,
-  fitContent: false,
-  defaultTone: undefined,
-  defaultTheme: undefined,
-  autoDetectTone: false,
-  persistTheme: false,
-  toneStorageKey: "appTone",
-  themeStorageKey: "appTheme",
 };
 
 const VALID_LAYOUTS: AppLayoutType[] = [

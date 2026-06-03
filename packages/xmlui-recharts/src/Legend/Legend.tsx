@@ -1,6 +1,6 @@
 import { wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
+import { defaultProps } from "./Legend.defaults";
 import {
-  defaultProps,
   horizontalAlignmentValues,
   Legend,
   verticalAlignmentValues,

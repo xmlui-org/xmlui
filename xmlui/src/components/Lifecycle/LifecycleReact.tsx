@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef } from "react";
 
-export const defaultProps = {};
+import { defaultProps } from "./Lifecycle.defaults";
 
 type LifecycleHandler = ((...args: any[]) => any) | null | undefined;
 

@@ -54,14 +54,14 @@ class FallbackErrorBoundary extends Component<BoundaryProps> {
 // Fallback
 // ---------------------------------------------------------------------------
 
+import { defaultProps } from "./Fallback.defaults";
+
 type FallbackProps = {
   children?: ReactNode;
   errorRender?: ($error: AppError) => ReactNode;
   loadingRender?: () => ReactNode;
   isLoading?: boolean;
 };
-
-export const defaultProps: { isLoading: boolean } = { isLoading: false };
 
 export function Fallback({ children, errorRender, loadingRender, isLoading }: FallbackProps) {
   // Map of descendant-loader uid → latest reported AppError.

@@ -1,13 +1,9 @@
 import { type ReactNode, useEffect } from "react";
-import { noop } from "lodash-es";
+import { defaultProps } from "./MessageListener.defaults";
 
 type Props = {
   children?: ReactNode;
   onMessageReceived?: (data: any, event: MessageEvent<any>) => void;
-};
-
-export const defaultProps: Pick<Props, "onMessageReceived"> = {
-  onMessageReceived: noop,
 };
 
 export function MessageListenerNative({

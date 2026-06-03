@@ -24,10 +24,7 @@ export const horizontalAlignmentValues: readonly HorizontalAlignmentType[] = [
   "center",
 ] as const;
 
-export const defaultProps: Pick<Props, "verticalAlign" | "align"> = {
-  verticalAlign: "bottom",
-  align: "center",
-};
+import { defaultProps } from "./Legend.defaults";
 
 export const Legend = memo(function Legend({
   verticalAlign = defaultProps.verticalAlign,

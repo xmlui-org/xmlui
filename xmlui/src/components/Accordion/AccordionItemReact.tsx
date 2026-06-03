@@ -16,6 +16,7 @@ import styles from "../../components/Accordion/Accordion.module.scss";
 import { useAccordionContext } from "../../components/Accordion/AccordionContext";
 import { ThemedIcon } from "../../components/Icon/Icon";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./AccordionItem.defaults";
 
 function defaultRenderer(header: string) {
   return <div>{header}</div>;
@@ -32,16 +33,11 @@ type Props = {
   classes?: Record<string, string>;
 };
 
-export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> = {
-  initiallyExpanded: false,
-  headerRenderer: defaultRenderer,
-};
-
 export const AccordionItemComponent = memo(forwardRef(function AccordionItemComponent(
   {
     id,
     header,
-    headerRenderer = defaultProps.headerRenderer,
+    headerRenderer = defaultRenderer,
     content,
     initiallyExpanded = defaultProps.initiallyExpanded,
     style,

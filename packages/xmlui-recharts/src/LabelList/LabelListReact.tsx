@@ -13,9 +13,7 @@ type Props = {
   className?: string;
 };
 
-export const defaultProps: Pick<Props, "position"> = {
-  position: "inside",
-};
+import { defaultProps } from "./LabelList.defaults";
 
 export const LabelList = memo(function LabelList({ position = defaultProps.position, nameKey: key, style, className }: Props) {
   const { nameKey } = useChart();

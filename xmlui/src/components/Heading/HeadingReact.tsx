@@ -23,6 +23,7 @@ import { Link } from "react-router-dom";
 import { useAppContext } from "../../components-core/AppContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { defaultProps } from "./Heading.defaults";
 
 export type HeadingProps = {
   uid?: string;
@@ -40,18 +41,6 @@ export type HeadingProps = {
   anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   [furtherProps: string]: any;
-};
-
-export const defaultProps: Pick<
-  HeadingProps,
-  "level" | "ellipses" | "omitFromToc" | "maxLines" | "preserveLinebreaks" | "showAnchor"
-> = {
-  level: "h1",
-  ellipses: true,
-  omitFromToc: false,
-  maxLines: 0,
-  preserveLinebreaks: false,
-  showAnchor: false,
 };
 
 export const Heading = memo(forwardRef(function Heading(

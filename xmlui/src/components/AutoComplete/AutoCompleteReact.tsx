@@ -34,6 +34,7 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { defaultProps } from "./AutoComplete.defaults";
 
 
 type AutoCompleteProps = {
@@ -90,22 +91,6 @@ function isOptionsExist(options: Option[], newOptions: Option[]) {
   );
 }
 
-export const defaultProps: Partial<AutoCompleteProps> = {
-  enabled: true,
-  readOnly: false,
-  autoFocus: false,
-  multi: false,
-  required: false,
-  validationStatus: "none",
-  creatable: false,
-  updateState: noop,
-  onDidChange: noop,
-  onFocus: noop,
-  onBlur: noop,
-  onItemCreated: noop,
-  initiallyOpen: false,
-};
-
 export const AutoComplete = memo(forwardRef(function AutoComplete(
   {
     id: idProp,
@@ -113,12 +98,12 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
     value,
     enabled = defaultProps.enabled,
     placeholder,
-    updateState = defaultProps.updateState,
+    updateState = noop,
     validationStatus = defaultProps.validationStatus,
-    onDidChange = defaultProps.onDidChange,
-    onFocus = defaultProps.onFocus,
-    onBlur = defaultProps.onBlur,
-    onItemCreated = defaultProps.onItemCreated,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    onItemCreated = noop,
     registerComponentApi,
     emptyListTemplate,
     style,

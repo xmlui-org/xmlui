@@ -3,7 +3,8 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
 import { createMetadata, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
-import { APICallReact, defaultProps } from "./APICallReact";
+import { defaultProps } from "./APICall.defaults";
+import { APICallReact } from "./APICallReact";
 
 const COMP = "APICall";
 

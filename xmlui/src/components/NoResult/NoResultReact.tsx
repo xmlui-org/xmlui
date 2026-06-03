@@ -6,11 +6,7 @@ import styles from "./NoResult.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-// Default props for the NoResult component
-export const defaultProps = {
-  hideIcon: false,
-  icon: "noresult",
-};
+import { defaultProps } from "./NoResult.defaults";
 
 type Props = HTMLAttributes<HTMLDivElement> & {
   label: string;

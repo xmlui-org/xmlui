@@ -21,7 +21,8 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { DatePicker, defaultProps, type DatePickerProps } from "./DatePickerReact";
+import { defaultProps } from "./DatePicker.defaults";
+import { DatePicker, type DatePickerProps } from "./DatePickerReact";
 
 const COMP = "DatePicker";
 

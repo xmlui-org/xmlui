@@ -9,6 +9,7 @@ import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { AccordionContext } from "../../components/Accordion/AccordionContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Accordion.defaults";
 
 type Props = {
   className?: string;
@@ -22,16 +23,6 @@ type Props = {
   rotateExpanded?: string;
   registerComponentApi?: RegisterComponentApiFn;
   onDisplayDidChange?: (changedValue: string[]) => void;
-};
-
-export const defaultProps: Pick<
-  Props,
-  "hideIcon" | "collapsedIcon" | "triggerPosition" | "rotateExpanded"
-> = {
-  hideIcon: false,
-  collapsedIcon: "chevrondown",
-  triggerPosition: "end",
-  rotateExpanded: "180deg",
 };
 
 export const AccordionComponent = memo(forwardRef(function AccordionComponent(

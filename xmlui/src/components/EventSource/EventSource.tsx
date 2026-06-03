@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { EventSourceConnection, defaultProps } from "./EventSourceReact";
+import { defaultProps } from "./EventSource.defaults";
+import { EventSourceConnection } from "./EventSourceReact";
 
 const COMP = "EventSource";
 

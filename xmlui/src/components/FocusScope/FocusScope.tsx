@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { FocusScope, defaultProps } from "./FocusScopeReact";
+import { defaultProps } from "./FocusScope.defaults";
+import { FocusScope } from "./FocusScopeReact";
 
 const COMP = "FocusScope";
 

@@ -5,10 +5,10 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   Badge,
   badgeVariantValues,
-  defaultProps,
   isBadgeColors,
   type BadgeColors,
 } from "./BadgeReact";
+import { defaultProps } from "./Badge.defaults";
 import { createMetadata, dContextMenu, dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 

@@ -14,11 +14,6 @@ type Props = OurColumnMetadata & {
   layoutContext?: LayoutContext;
 };
 
-export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
-  canSort: true,
-  canResize: true,
-};
-
 export const Column = memo(function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();

@@ -25,6 +25,7 @@ import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import type { HeadingProps } from "../Heading/HeadingReact";
 import { ThemedHeading as Heading } from "../Heading/Heading";
 import { ThemedText as Text } from "../Text/Text";
+import { defaultProps } from "./Card.defaults";
 
 type Props = {
   style?: CSSProperties;
@@ -49,11 +50,6 @@ type Props = {
 const TITLE_HEADING_PROPS: Partial<HeadingProps> = {
   level: "h2",
   maxLines: 1,
-};
-
-export const defaultProps: Pick<Props, "orientation" | "showAvatar"> = {
-  orientation: "vertical",
-  showAvatar: false,
 };
 
 export const Card = memo(forwardRef(function Card(

@@ -2,7 +2,8 @@ import styles from "./Markdown.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Markdown, defaultProps } from "./MarkdownNative";
+import { defaultProps } from "./Markdown.defaults";
+import { Markdown } from "./MarkdownNative";
 import React from "react";
 import { forwardRef, useMemo } from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";

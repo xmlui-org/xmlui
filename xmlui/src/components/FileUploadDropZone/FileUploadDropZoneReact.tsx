@@ -34,16 +34,7 @@ type Props = {
   maxFiles?: number;
 };
 
-export const defaultProps: Pick<
-  Props,
-  "uid" | "allowPaste" | "text" | "icon" | "disabled"
-> = {
-  uid: "fileUploadDialog",
-  allowPaste: false,
-  text: "Drop files here",
-  icon: "upload",
-  disabled: false,
-};
+import { defaultProps } from "./FileUploadDropZone.defaults";
 
 export const FileUploadDropZone = memo(forwardRef(function FileUploadDropZone(
   {

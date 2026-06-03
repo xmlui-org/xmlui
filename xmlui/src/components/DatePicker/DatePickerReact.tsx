@@ -31,6 +31,7 @@ import { useFormItemInputId, useIsInsideFormItem } from "../FormItem/FormItemCon
 import { Adornment } from "../Input/InputAdornment";
 import { ThemedIcon } from "../Icon/Icon";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { defaultProps } from "./DatePicker.defaults";
 
 // On mobile the calendar is a fixed full-screen sheet, so it does not need
 // Ark's body portal — and portaling it out of the trigger's DOM subtree breaks
@@ -145,34 +146,7 @@ export type DatePickerProps = {
   registerComponentApi?: RegisterApiFn;
 };
 
-const DEFAULT_DATE_FORMAT = "MM/dd/yyyy";
 const DEFAULT_LOCALE = "en-US";
-const DEFAULT_TIME_ZONE = "UTC";
-
-// Shared default prop values referenced by both the metadata (defaultValue) and
-// the native component (destructuring defaults), per the xmlui component contract.
-export const defaultProps = {
-  mode: "single" as Mode,
-  dateFormat: DEFAULT_DATE_FORMAT,
-  enabled: true,
-  readOnly: false,
-  required: false,
-  autoFocus: false,
-  inline: false,
-  // The clear affordance is off by default; opt in with `clearable`.
-  clearable: false,
-  validationStatus: "none" as ValidationStatus,
-  weekStartsOn: 0,
-  showWeekNumber: false,
-  showWeekNumbers: false,
-  locale: DEFAULT_LOCALE,
-  timeZone: DEFAULT_TIME_ZONE,
-  numOfMonths: 1,
-  // Presets are off by default; opt in with showPresets, or implicitly by
-  // supplying a custom `presets` list.
-  showPresets: false,
-  confirmRangeSelection: false,
-};
 
 // On mobile the calendar is a scrollable stack of months around the focused
 // month, navigated by scrolling instead of prev/next buttons. Presets cover
