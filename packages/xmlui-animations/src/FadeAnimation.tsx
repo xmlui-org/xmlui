@@ -1,5 +1,6 @@
 import { wrapComponent, createMetadata } from "xmlui";
-import { Animation, defaultProps } from "./AnimationReact";
+import { defaultProps } from "./Animation.defaults";
+import { Animation } from "./AnimationReact";
 
 const COMP = "FadeAnimation";
 

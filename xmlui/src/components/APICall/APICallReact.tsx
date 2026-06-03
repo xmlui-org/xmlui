@@ -9,6 +9,7 @@ import { evalBinding } from "../../components-core/script-runner/eval-tree-sync"
 import { Parser } from "../../parsers/scripting/Parser";
 import toast from "react-hot-toast";
 import { getCurrentTrace, pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { defaultProps } from "./APICall.defaults";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
@@ -52,17 +53,6 @@ function traceApiComponent(
     ...details,
   });
 }
-
-export const defaultProps = {
-  method: "get",
-  deferredMode: false,
-  statusMethod: "get",
-  pollingInterval: 2000,
-  maxPollingDuration: 300000,
-  pollingBackoff: "none",
-  maxPollingInterval: 30000,
-  cancelMethod: "post",
-};
 
 // =============================================================================
 // HELPER FUNCTIONS

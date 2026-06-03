@@ -3,7 +3,8 @@ import styles from "./Accordion.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dFocus } from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
-import { AccordionComponent, defaultProps } from "./AccordionReact";
+import { defaultProps } from "./Accordion.defaults";
+import { AccordionComponent } from "./AccordionReact";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Accordion";

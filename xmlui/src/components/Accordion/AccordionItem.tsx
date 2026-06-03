@@ -1,10 +1,8 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { MemoizedItem } from "../../components/container-helpers";
-import {
-  AccordionItemComponent,
-  defaultProps,
-} from "../../components/Accordion/AccordionItemReact";
+import { defaultProps } from "../../components/Accordion/AccordionItem.defaults";
+import { AccordionItemComponent } from "../../components/Accordion/AccordionItemReact";
 
 const COMP = "AccordionItem";
 

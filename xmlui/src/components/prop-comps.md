@@ -1,8 +1,8 @@
-Accordion
-AiConversation
-Animation
-APICall
-App
+* Accordion
+* AiConversation
+* Animation
+* APICall
+* App
 AppHeader
 AppState
 AreaChart
