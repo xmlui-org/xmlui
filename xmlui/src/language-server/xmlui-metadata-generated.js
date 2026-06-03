@@ -1976,6 +1976,7 @@ export default {
       },
       "headers": {
         "description": "You can optionally define request header values as key-value pairs, where the key is the ID of the particular header and the value is that header's corresponding value.",
+        "valueType": "hash",
         "audit": {
           "classification": "secret",
           "defaultRedaction": "mask",
@@ -2109,7 +2110,8 @@ export default {
         "defaultValue": "post"
       },
       "cancelBody": {
-        "description": "Optional body to send with the cancel request. Can use $result context from initial response."
+        "description": "Optional body to send with the cancel request. Can use $result context from initial response.",
+        "valueType": "any"
       },
       "inProgressNotificationMessage": {
         "description": "Message to show in toast notification during deferred operation polling. Can include {$progress}, {$statusData.property}, and other context variables. Notification will update on each poll with current values.",
@@ -2316,6 +2318,7 @@ export default {
     "props": {
       "layout": {
         "description": "This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "vertical",
@@ -2509,6 +2512,11 @@ export default {
         ],
         "isStrictEnum": true,
         "defaultValue": "warn",
+        "isInternal": true
+      },
+      "auditPolicy": {
+        "description": "Plan #15: declarative audit-pipeline policy. An object literal with `redact: RedactionRule[]`, `sample: { head?, tail? }`, `retention: { bufferSize, onOverflow }`, and optional `sink: { kind: 'otlp' | 'console' | 'custom', endpoint?, headers? }`. See `dev-docs/plans/15-audit-grade-observability.md`.",
+        "valueType": "any",
         "isInternal": true
       }
     },
@@ -2796,7 +2804,8 @@ export default {
         "valueType": "string"
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "any"
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -2836,6 +2845,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -2858,7 +2868,8 @@ export default {
         "defaultValue": "none"
       },
       "dropdownHeight": {
-        "description": "This property sets the height of the dropdown list."
+        "description": "This property sets the height of the dropdown list.",
+        "valueType": "length"
       },
       "multi": {
         "description": "The `true` value of the property indicates if the user can select multiple items.",
@@ -3264,7 +3275,8 @@ export default {
         "defaultValue": "badge"
       },
       "colorMap": {
-        "description": "The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. If this property is not set, no color mapping is used."
+        "description": "The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. If this property is not set, no color mapping is used.",
+        "valueType": "hash"
       }
     },
     "events": {
@@ -4197,6 +4209,7 @@ export default {
     "props": {
       "indeterminate": {
         "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
+        "valueType": "boolean",
         "defaultValue": false
       },
       "required": {
@@ -4206,6 +4219,7 @@ export default {
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
+        "valueType": "boolean",
         "defaultValue": false
       },
       "autoFocus": {
@@ -4225,6 +4239,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -4390,7 +4405,9 @@ export default {
     "description": "`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.",
     "props": {
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "color",
+        "defaultValue": "#000000"
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -4414,6 +4431,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -4890,15 +4908,20 @@ export default {
     }
   },
   "DatePicker": {
-    "status": "experimental",
+    "status": "stable",
     "description": "`DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction.",
     "props": {
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
+      "value": {
+        "description": "Controlled value. In single mode, a date string; in range mode, a `{ from, to }` object."
+      },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "string",
+        "defaultValue": null
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -4917,6 +4940,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -4941,11 +4965,15 @@ export default {
       "mode": {
         "description": "The mode of the datepicker (single or range)",
         "valueType": "string",
+        "defaultValue": "single",
         "availableValues": [
           "single",
           "range"
-        ],
-        "defaultValue": "single"
+        ]
+      },
+      "label": {
+        "description": "Optional label rendered above the input.",
+        "valueType": "string"
       },
       "dateFormat": {
         "description": "The format of the date displayed in the input field",
@@ -4962,8 +4990,18 @@ export default {
           "MMddyyyy"
         ]
       },
-      "showWeekNumber": {
-        "description": "Whether to show the week number in the calendar",
+      "required": {
+        "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "inline": {
+        "description": "If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "clearable": {
+        "description": "Set to `true` to show a clear button that resets the value. Hidden by default.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -5002,22 +5040,23 @@ export default {
           }
         ]
       },
+      "showWeekNumber": {
+        "description": "Show week number cells in the day table.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "showWeekNumbers": {
+        "description": "Alias for `showWeekNumber`.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "startDate": {
-        "description": "The earliest month to start the month navigation from (inclusive). If not defined, the component allows any dates in the past. Accepts the same date format as the `initialValue`.Example: '2023-01-01' ensures the first month to select a date from is January 2023.",
+        "description": "The earliest month to start the month navigation from (inclusive). If not defined, the component allows any dates in the past. Accepts the same date format as the `initialValue`. Example: '2023-01-01' ensures the first month to select a date from is January 2023.",
         "valueType": "string"
       },
       "endDate": {
-        "description": "The latest month to start the month navigation from (inclusive). If not defined, the component allows any future dates. Accepts the same date format as the `initialValue`.Example: '2023-12-31' ensures the last month to select a date from is December 2023.",
+        "description": "The latest month to start the month navigation from (inclusive). If not defined, the component allows any future dates. Accepts the same date format as the `initialValue`. Example: '2023-12-31' ensures the last month to select a date from is December 2023.",
         "valueType": "string"
-      },
-      "disabledDates": {
-        "description": "An optional array of dates that are to be disabled.",
-        "valueType": "any"
-      },
-      "inline": {
-        "description": "If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.",
-        "valueType": "boolean",
-        "defaultValue": false
       },
       "startText": {
         "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
@@ -5035,26 +5074,57 @@ export default {
         "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
-      "verboseValidationFeedback": {
-        "description": "Enables a concise validation summary (icon) in input components.",
-        "valueType": "boolean"
-      },
-      "validationIconSuccess": {
-        "description": "Icon to display for valid state when concise validation summary is enabled.",
+      "width": {
+        "description": "CSS width for the picker root.",
         "valueType": "string"
       },
-      "validationIconError": {
-        "description": "Icon to display for error state when concise validation summary is enabled.",
-        "valueType": "string"
+      "locale": {
+        "description": "BCP 47 locale used for calendar labels.",
+        "valueType": "string",
+        "defaultValue": "en-US"
       },
-      "invalidMessages": {
-        "description": "The invalid messages to display for the input component.",
+      "timeZone": {
+        "description": "The time zone used for date calculations.",
+        "valueType": "string",
+        "defaultValue": "UTC"
+      },
+      "numOfMonths": {
+        "description": "The number of months displayed at once.",
+        "valueType": "number",
+        "defaultValue": 1
+      },
+      "presets": {
+        "description": "Customizes the range presets (range mode only). Supplying a list also turns the presets on. Accepts a comma-separated string or array of built-in preset keys (e.g. `last7Days`, `thisMonth`), `{ value, label }` objects to relabel a built-in, or `{ label, from, to }` objects for fully custom date ranges (parsed with `dateFormat`)."
+      },
+      "showPresets": {
+        "description": "Range presets are hidden by default. Set to `true` to show the built-in presets (Last 7 days, Last 30 days, This month, Last month); set to `false` to force them off even when a `presets` list is supplied.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "disabledDates": {
+        "description": "An optional array of dates that are to be disabled. Accepts a date string, `{ from, to }`, `{ before }`, `{ after }`, `{ before, after }`, or `{ dayOfWeek }` matchers (parsed with `dateFormat`).",
         "valueType": "any"
       },
       "confirmRangeSelection": {
         "description": "In `range` mode, show a Cancel/Proceed footer so the user must explicitly confirm the selected range before it is committed. When `false` (default), the range auto-commits on the second click and the popup closes.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in the input.",
+        "valueType": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for the valid state when the concise summary is enabled.",
+        "valueType": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for the error state when the concise summary is enabled.",
+        "valueType": "string"
+      },
+      "invalidMessages": {
+        "description": "The invalid messages to display in the concise validation summary.",
+        "valueType": "string[]"
       }
     },
     "events": {
@@ -5087,10 +5157,19 @@ export default {
       },
       "setValue": {
         "description": "This method sets the current value of the DatePicker.",
-        "signature": "set value(value: any): void",
+        "signature": "setValue(value: string | { from?: string; to?: string }): void",
         "parameters": {
           "value": "The new value to set for the date picker."
         }
+      },
+      "getValue": {
+        "description": "Return the current value of the DatePicker.",
+        "signature": "getValue(): string | { from?: string; to?: string } | undefined"
+      }
+    },
+    "contextVars": {
+      "value": {
+        "description": "Current value. Single mode returns a string; range mode returns `{ from, to }`."
       }
     },
     "themeVars": {
@@ -5108,79 +5187,34 @@ export default {
       "Input:backgroundColor-DatePicker": "var(--xmlui-backgroundColor-DatePicker)",
       "Input:boxShadow-DatePicker": "var(--xmlui-boxShadow-DatePicker)",
       "Input:textColor-DatePicker": "var(--xmlui-textColor-DatePicker)",
+      "Input:fontSize-DatePicker": "var(--xmlui-fontSize-DatePicker)",
+      "Input:minHeight-DatePicker": "var(--xmlui-minHeight-DatePicker)",
       "Input:borderColor-DatePicker--hover": "var(--xmlui-borderColor-DatePicker--hover)",
       "Input:backgroundColor-DatePicker--hover": "var(--xmlui-backgroundColor-DatePicker--hover)",
-      "Input:boxShadow-DatePicker--hover": "var(--xmlui-boxShadow-DatePicker--hover)",
-      "Input:textColor-DatePicker--hover": "var(--xmlui-textColor-DatePicker--hover)",
       "Input:outlineWidth-DatePicker--focus": "var(--xmlui-outlineWidth-DatePicker--focus)",
       "Input:outlineColor-DatePicker--focus": "var(--xmlui-outlineColor-DatePicker--focus)",
       "Input:outlineStyle-DatePicker--focus": "var(--xmlui-outlineStyle-DatePicker--focus)",
       "Input:outlineOffset-DatePicker--focus": "var(--xmlui-outlineOffset-DatePicker--focus)",
       "Input:textColor-placeholder-DatePicker": "var(--xmlui-textColor-placeholder-DatePicker)",
-      "Input:fontSize-placeholder-DatePicker": "var(--xmlui-fontSize-placeholder-DatePicker)",
       "Input:color-adornment-DatePicker": "var(--xmlui-color-adornment-DatePicker)",
-      "Input:borderRadius-DatePicker--error": "var(--xmlui-borderRadius-DatePicker--error)",
-      "Input:borderColor-DatePicker--error": "var(--xmlui-borderColor-DatePicker--error)",
-      "Input:borderWidth-DatePicker--error": "var(--xmlui-borderWidth-DatePicker--error)",
-      "Input:borderStyle-DatePicker--error": "var(--xmlui-borderStyle-DatePicker--error)",
-      "Input:backgroundColor-DatePicker--error": "var(--xmlui-backgroundColor-DatePicker--error)",
-      "Input:boxShadow-DatePicker--error": "var(--xmlui-boxShadow-DatePicker--error)",
-      "Input:textColor-DatePicker--error": "var(--xmlui-textColor-DatePicker--error)",
-      "Input:borderColor-DatePicker--error--hover": "var(--xmlui-borderColor-DatePicker--error--hover)",
-      "Input:backgroundColor-DatePicker--error--hover": "var(--xmlui-backgroundColor-DatePicker--error--hover)",
-      "Input:boxShadow-DatePicker--error--hover": "var(--xmlui-boxShadow-DatePicker--error--hover)",
-      "Input:textColor-DatePicker--error--hover": "var(--xmlui-textColor-DatePicker--error--hover)",
-      "Input:outlineWidth-DatePicker--error--focus": "var(--xmlui-outlineWidth-DatePicker--error--focus)",
-      "Input:outlineColor-DatePicker--error--focus": "var(--xmlui-outlineColor-DatePicker--error--focus)",
-      "Input:outlineStyle-DatePicker--error--focus": "var(--xmlui-outlineStyle-DatePicker--error--focus)",
-      "Input:outlineOffset-DatePicker--error--focus": "var(--xmlui-outlineOffset-DatePicker--error--focus)",
-      "Input:textColor-placeholder-DatePicker--error": "var(--xmlui-textColor-placeholder-DatePicker--error)",
-      "Input:fontSize-placeholder-DatePicker--error": "var(--xmlui-fontSize-placeholder-DatePicker--error)",
-      "Input:color-adornment-DatePicker--error": "var(--xmlui-color-adornment-DatePicker--error)",
-      "Input:borderRadius-DatePicker--warning": "var(--xmlui-borderRadius-DatePicker--warning)",
-      "Input:borderColor-DatePicker--warning": "var(--xmlui-borderColor-DatePicker--warning)",
-      "Input:borderWidth-DatePicker--warning": "var(--xmlui-borderWidth-DatePicker--warning)",
-      "Input:borderStyle-DatePicker--warning": "var(--xmlui-borderStyle-DatePicker--warning)",
-      "Input:backgroundColor-DatePicker--warning": "var(--xmlui-backgroundColor-DatePicker--warning)",
-      "Input:boxShadow-DatePicker--warning": "var(--xmlui-boxShadow-DatePicker--warning)",
-      "Input:textColor-DatePicker--warning": "var(--xmlui-textColor-DatePicker--warning)",
-      "Input:borderColor-DatePicker--warning--hover": "var(--xmlui-borderColor-DatePicker--warning--hover)",
-      "Input:backgroundColor-DatePicker--warning--hover": "var(--xmlui-backgroundColor-DatePicker--warning--hover)",
-      "Input:boxShadow-DatePicker--warning--hover": "var(--xmlui-boxShadow-DatePicker--warning--hover)",
-      "Input:textColor-DatePicker--warning--hover": "var(--xmlui-textColor-DatePicker--warning--hover)",
-      "Input:outlineWidth-DatePicker--warning--focus": "var(--xmlui-outlineWidth-DatePicker--warning--focus)",
-      "Input:outlineColor-DatePicker--warning--focus": "var(--xmlui-outlineColor-DatePicker--warning--focus)",
-      "Input:outlineStyle-DatePicker--warning--focus": "var(--xmlui-outlineStyle-DatePicker--warning--focus)",
-      "Input:outlineOffset-DatePicker--warning--focus": "var(--xmlui-outlineOffset-DatePicker--warning--focus)",
-      "Input:textColor-placeholder-DatePicker--warning": "var(--xmlui-textColor-placeholder-DatePicker--warning)",
-      "Input:fontSize-placeholder-DatePicker--warning": "var(--xmlui-fontSize-placeholder-DatePicker--warning)",
-      "Input:color-adornment-DatePicker--warning": "var(--xmlui-color-adornment-DatePicker--warning)",
-      "Input:borderRadius-DatePicker--success": "var(--xmlui-borderRadius-DatePicker--success)",
-      "Input:borderColor-DatePicker--success": "var(--xmlui-borderColor-DatePicker--success)",
-      "Input:borderWidth-DatePicker--success": "var(--xmlui-borderWidth-DatePicker--success)",
-      "Input:borderStyle-DatePicker--success": "var(--xmlui-borderStyle-DatePicker--success)",
-      "Input:backgroundColor-DatePicker--success": "var(--xmlui-backgroundColor-DatePicker--success)",
-      "Input:boxShadow-DatePicker--success": "var(--xmlui-boxShadow-DatePicker--success)",
-      "Input:textColor-DatePicker--success": "var(--xmlui-textColor-DatePicker--success)",
-      "Input:borderColor-DatePicker--success--hover": "var(--xmlui-borderColor-DatePicker--success--hover)",
-      "Input:backgroundColor-DatePicker--success--hover": "var(--xmlui-backgroundColor-DatePicker--success--hover)",
-      "Input:boxShadow-DatePicker--success--hover": "var(--xmlui-boxShadow-DatePicker--success--hover)",
-      "Input:textColor-DatePicker--success--hover": "var(--xmlui-textColor-DatePicker--success--hover)",
-      "Input:outlineWidth-DatePicker--success--focus": "var(--xmlui-outlineWidth-DatePicker--success--focus)",
-      "Input:outlineColor-DatePicker--success--focus": "var(--xmlui-outlineColor-DatePicker--success--focus)",
-      "Input:outlineStyle-DatePicker--success--focus": "var(--xmlui-outlineStyle-DatePicker--success--focus)",
-      "Input:outlineOffset-DatePicker--success--focus": "var(--xmlui-outlineOffset-DatePicker--success--focus)",
-      "Input:textColor-placeholder-DatePicker--success": "var(--xmlui-textColor-placeholder-DatePicker--success)",
-      "Input:fontSize-placeholder-DatePicker--success": "var(--xmlui-fontSize-placeholder-DatePicker--success)",
-      "Input:color-adornment-DatePicker--success": "var(--xmlui-color-adornment-DatePicker--success)",
-      "Input:fontSize-DatePicker": "var(--xmlui-fontSize-DatePicker)",
+      "Input:textColor-value-DatePicker": "var(--xmlui-textColor-value-DatePicker)",
       "Input:backgroundColor-DatePicker--disabled": "var(--xmlui-backgroundColor-DatePicker--disabled)",
       "Input:textColor-DatePicker--disabled": "var(--xmlui-textColor-DatePicker--disabled)",
       "Input:borderColor-DatePicker--disabled": "var(--xmlui-borderColor-DatePicker--disabled)",
+      "Input:borderColor-DatePicker--error": "var(--xmlui-borderColor-DatePicker--error)",
+      "Input:borderColor-DatePicker--warning": "var(--xmlui-borderColor-DatePicker--warning)",
+      "Input:borderColor-DatePicker--success": "var(--xmlui-borderColor-DatePicker--success)",
       "Input:boxShadow-menu-DatePicker": "var(--xmlui-boxShadow-menu-DatePicker)",
       "Input:backgroundColor-menu-DatePicker": "var(--xmlui-backgroundColor-menu-DatePicker)",
+      "Input:borderColor-menu-DatePicker": "var(--xmlui-borderColor-menu-DatePicker)",
       "Input:borderRadius-menu-DatePicker": "var(--xmlui-borderRadius-menu-DatePicker)",
       "Input:backgroundColor-overlay-DatePicker": "var(--xmlui-backgroundColor-overlay-DatePicker)",
+      "Input:backgroundColor-item-DatePicker--hover": "var(--xmlui-backgroundColor-item-DatePicker--hover)",
+      "Input:backgroundColor-item-DatePicker--active": "var(--xmlui-backgroundColor-item-DatePicker--active)",
+      "Input:backgroundColor-day-DatePicker--selected": "var(--xmlui-backgroundColor-day-DatePicker--selected)",
+      "Input:textColor-day-DatePicker--selected": "var(--xmlui-textColor-day-DatePicker--selected)",
+      "Input:backgroundColor-day-DatePicker--rangeMiddle": "var(--xmlui-backgroundColor-day-DatePicker--rangeMiddle)",
+      "Input:textColor-day-DatePicker--rangeMiddle": "var(--xmlui-textColor-day-DatePicker--rangeMiddle)",
       "Input:backgroundColor-day-DatePicker--today": "var(--xmlui-backgroundColor-day-DatePicker--today)",
       "Input:textColor-day-DatePicker--today": "var(--xmlui-textColor-day-DatePicker--today)",
       "Input:borderColor-day-DatePicker--today": "var(--xmlui-borderColor-day-DatePicker--today)",
@@ -5188,26 +5222,19 @@ export default {
       "Input:borderStyle-day-DatePicker--today": "var(--xmlui-borderStyle-day-DatePicker--today)",
       "Input:backgroundColor-day-DatePicker--disabled": "var(--xmlui-backgroundColor-day-DatePicker--disabled)",
       "Input:textColor-day-DatePicker--disabled": "var(--xmlui-textColor-day-DatePicker--disabled)",
-      "Input:backgroundColor-day-DatePicker--selected": "var(--xmlui-backgroundColor-day-DatePicker--selected)",
-      "Input:textColor-day-DatePicker--selected": "var(--xmlui-textColor-day-DatePicker--selected)",
-      "Input:backgroundColor-day-DatePicker--rangeMiddle": "var(--xmlui-backgroundColor-day-DatePicker--rangeMiddle)",
-      "Input:textColor-day-DatePicker--rangeMiddle": "var(--xmlui-textColor-day-DatePicker--rangeMiddle)",
       "Input:textColor-weekday-DatePicker": "var(--xmlui-textColor-weekday-DatePicker)",
-      "Input:backgroundColor-item-DatePicker--active": "var(--xmlui-backgroundColor-item-DatePicker--active)",
-      "Input:backgroundColor-item-DatePicker--hover": "var(--xmlui-backgroundColor-item-DatePicker--hover)",
-      "Input:textColor-value-DatePicker": "var(--xmlui-textColor-value-DatePicker)",
-      "Input:minHeight-DatePicker": "var(--xmlui-minHeight-DatePicker)",
       "Input:borderColor-selectedItem-DatePicker": "var(--xmlui-borderColor-selectedItem-DatePicker)"
     },
     "defaultThemeVars": {
       "boxShadow-menu-DatePicker": "$boxShadow-md",
-      "borderRadius-menu-DatePicker": "$borderRadius",
-      "textColor-value-DatePicker": "$textColor-primary",
-      "borderColor-selectedItem-DatePicker": "$color-primary-200",
       "backgroundColor-menu-DatePicker": "$color-surface-50",
+      "borderColor-menu-DatePicker": "$borderColor",
+      "borderRadius-menu-DatePicker": "$borderRadius",
+      "backgroundColor-overlay-DatePicker": "$backgroundColor-overlay",
       "backgroundColor-item-DatePicker--hover": "$color-surface-100",
       "backgroundColor-item-DatePicker--active": "$color-surface-200",
-      "backgroundColor-overlay-DatePicker": "$backgroundColor-overlay",
+      "textColor-value-DatePicker": "$textColor-primary",
+      "borderColor-selectedItem-DatePicker": "$color-primary-300",
       "backgroundColor-day-DatePicker--selected": "$color-primary-500",
       "textColor-day-DatePicker--selected": "$color-surface-0",
       "backgroundColor-day-DatePicker--rangeMiddle": "$color-primary-100",
@@ -5220,8 +5247,8 @@ export default {
       "backgroundColor-day-DatePicker--disabled": "transparent",
       "textColor-day-DatePicker--disabled": "$color-secondary-300",
       "textColor-weekday-DatePicker": "$color-secondary-300",
-      "paddingVertical-DatePicker": "$space-2",
-      "paddingHorizontal-DatePicker": "$space-2"
+      "paddingHorizontal-DatePicker": "$space-3",
+      "paddingVertical-DatePicker": "$space-2"
     }
   },
   "DateInput": {
@@ -5246,7 +5273,9 @@ export default {
     },
     "props": {
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "string",
+        "defaultValue": null
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -5265,6 +5294,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -5288,7 +5318,7 @@ export default {
       },
       "invalidMessages": {
         "description": "The invalid messages to display for the input component.",
-        "valueType": "any"
+        "valueType": "string[]"
       },
       "mode": {
         "description": "The mode of the date input (single or range)",
@@ -5685,10 +5715,14 @@ export default {
     },
     "events": {
       "open": {
-        "description": "Fired when the `Drawer` is opened."
+        "description": "Fired when the `Drawer` is opened.",
+        "signature": "open(): void",
+        "parameters": {}
       },
       "close": {
-        "description": "Fired when the `Drawer` is closed."
+        "description": "Fired when the `Drawer` is closed.",
+        "signature": "close(): void",
+        "parameters": {}
       }
     },
     "apis": {
@@ -6351,7 +6385,8 @@ export default {
         "valueType": "string"
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "any"
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -6375,6 +6410,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -6398,6 +6434,7 @@ export default {
       },
       "buttonVariant": {
         "description": "The button variant to use",
+        "valueType": "string",
         "availableValues": [
           "solid",
           "outlined",
@@ -6405,10 +6442,12 @@ export default {
         ]
       },
       "buttonLabel": {
-        "description": "This property is an optional string to set a label for the button part."
+        "description": "This property is an optional string to set a label for the button part.",
+        "valueType": "string"
       },
       "buttonIcon": {
-        "description": "The ID of the icon to display in the button. You can change the default icon for all FileInput instances with the \"icon.browse:FileInput\" declaration in the app configuration file."
+        "description": "The ID of the icon to display in the button. You can change the default icon for all FileInput instances with the \"icon.browse:FileInput\" declaration in the app configuration file.",
+        "valueType": "icon"
       },
       "buttonIconPosition": {
         "description": "This optional string determines the location of the button icon.",
@@ -6420,22 +6459,22 @@ export default {
         "defaultValue": "start"
       },
       "acceptsFileType": {
-        "description": "An optional list of file types the input controls accepts provided as a string array."
+        "description": "An optional list of file types the input controls accepts provided as a string array.",
+        "valueType": "string[]"
       },
       "multiple": {
         "description": "This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.",
-        "availableValues": null,
         "valueType": "boolean",
         "defaultValue": false
       },
       "directory": {
         "description": "This boolean property indicates whether the component allows selecting directories (`true`) or files only (`false`).",
-        "availableValues": null,
         "valueType": "boolean",
         "defaultValue": false
       },
       "buttonPosition": {
         "description": "This property determines the position of the button relative to the input field.",
+        "valueType": "string",
         "availableValues": [
           "start",
           "end"
@@ -6444,6 +6483,7 @@ export default {
       },
       "buttonSize": {
         "description": "The size of the button (small, medium, large)",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "xs",
@@ -6469,23 +6509,25 @@ export default {
       },
       "buttonThemeColor": {
         "description": "The button color scheme (primary, secondary, attention)",
+        "valueType": "string",
         "availableValues": [
           "attention",
           "primary",
           "secondary"
         ],
-        "valueType": "string",
         "defaultValue": "primary"
       },
       "parseAs": {
         "description": "Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives an object `{ files: File[], parsedData: ParseResult[] }` containing both the raw files and parsed data. Each `ParseResult` includes `file`, `data` (parsed rows), and optional `error`. When `parseAs` is set, `acceptsFileType` is automatically inferred (e.g., \".csv\" or \".json\") unless explicitly overridden. Empty files are handled gracefully, returning an empty data array.",
+        "valueType": "string",
         "availableValues": [
           "csv",
           "json"
         ]
       },
       "csvOptions": {
-        "description": "Configuration options for CSV parsing (used when `parseAs=\"csv\"`). Supports all Papa Parse configuration options. Default options: `{ header: true, skipEmptyLines: true }`. Common options include `delimiter`, `header`, `dynamicTyping`, `skipEmptyLines`, and `transform`."
+        "description": "Configuration options for CSV parsing (used when `parseAs=\"csv\"`). Supports all Papa Parse configuration options. Default options: `{ header: true, skipEmptyLines: true }`. Common options include `delimiter`, `header`, `dynamicTyping`, `skipEmptyLines`, and `transform`.",
+        "valueType": "any"
       }
     },
     "events": {
@@ -6582,10 +6624,12 @@ export default {
         "defaultValue": true
       },
       "acceptedFileTypes": {
-        "description": "Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'."
+        "description": "Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.",
+        "valueType": "string"
       },
       "maxFiles": {
-        "description": "The maximum number of files that can be selected."
+        "description": "The maximum number of files that can be selected.",
+        "valueType": "integer"
       }
     },
     "events": {
@@ -6631,7 +6675,7 @@ export default {
     "props": {
       "gap": {
         "description": "This property defines the gap between items in the same row and between rows. The FlowLayout component creates a new row when an item is about to overflow the current row.",
-        "valueType": "string",
+        "valueType": "length",
         "defaultValue": "$gap-normal"
       },
       "itemWidth": {
@@ -6641,10 +6685,12 @@ export default {
       },
       "columnGap": {
         "description": "The `columnGap` property specifies the space between items in a single row; it overrides the `gap` value.",
+        "valueType": "length",
         "defaultValue": "$gap-normal"
       },
       "rowGap": {
         "description": "The `rowGap` property specifies the space between the FlowLayout rows; it overrides the `gap` value.",
+        "valueType": "length",
         "defaultValue": "$gap-normal"
       },
       "verticalAlignment": {
@@ -6846,6 +6892,7 @@ export default {
       },
       "data": {
         "description": "This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.",
+        "valueType": "hash",
         "audit": {
           "classification": "sensitive",
           "defaultRedaction": "hash"
@@ -6902,19 +6949,35 @@ export default {
         "defaultValue": true
       },
       "submitUrl": {
-        "description": "URL to submit the form data."
+        "description": "URL to submit the form data.",
+        "valueType": "url"
       },
       "submitMethod": {
-        "description": "This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`."
+        "description": "This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`.",
+        "valueType": "string",
+        "availableValues": [
+          "get",
+          "post",
+          "put",
+          "delete",
+          "patch",
+          "head",
+          "options",
+          "trace",
+          "connect"
+        ]
       },
       "inProgressNotificationMessage": {
-        "description": "This property sets the message to display when the form is being submitted."
+        "description": "This property sets the message to display when the form is being submitted.",
+        "valueType": "string"
       },
       "completedNotificationMessage": {
-        "description": "This property sets the message to display when the form is submitted successfully."
+        "description": "This property sets the message to display when the form is submitted successfully.",
+        "valueType": "string"
       },
       "errorNotificationMessage": {
-        "description": "This property sets the message to display when the form submission fails."
+        "description": "This property sets the message to display when the form submission fails.",
+        "valueType": "string"
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -6954,7 +7017,7 @@ export default {
       },
       "doNotPersistFields": {
         "description": "An optional list of field names (matching the `bindTo` values of nested `FormItem` components) that should be excluded from the temporary localStorage save. The fields are still submitted normally; they are only excluded from the persisted snapshot.",
-        "type": "string[]"
+        "valueType": "string[]"
       },
       "keepOnCancel": {
         "description": "When `persist` is enabled and the user cancels the form, this property controls whether the temporarily saved data is kept (`true`) or cleared (`false`, the default).",
@@ -6982,6 +7045,14 @@ export default {
         "isStrictEnum": true,
         "valueType": "string",
         "defaultValue": "single-flight"
+      },
+      "csrfToken": {
+        "description": "A CSRF token attached to the submit request as an HTTP header. The header name defaults to `X-CSRF-Token` and can be customized via `appGlobals.csrfHeaderName`. When the form uses the built-in submit handler (i.e. `submitUrl` is set and no custom `onSubmit` is provided), the token is added automatically. Custom `onSubmit` handlers can read the value via the `$formCsrfToken` context variable.",
+        "valueType": "string"
+      },
+      "idempotencyKey": {
+        "description": "An idempotency key attached to the submit request as an HTTP header (default header name `Idempotency-Key`, configurable via `appGlobals.idempotencyHeaderName`). Supply a string the server can use to de-duplicate retries. When the form uses the built-in submit handler the header is added automatically; custom handlers can read the value via the `$formIdempotencyKey` context variable.",
+        "valueType": "string"
       }
     },
     "events": {
@@ -7062,6 +7133,18 @@ export default {
     "contextVars": {
       "$data": {
         "description": "This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances. `$data` also provides an `update` method as a shortcut to the Form's exposed `update` method."
+      },
+      "$formCancel": {
+        "description": "Available inside the form's `onSubmit` handler. Exposes the per-attempt `AbortSignal` (`$formCancel.signal`) that the framework aborts when `Form.cancel()` is invoked. Pass this signal to `Actions.callApi({ signal: ... })` or other cancellable operations to make your submit handler cooperatively cancellable."
+      },
+      "$formCsrfToken": {
+        "description": "Available inside the form's `onSubmit` handler. Carries the value of the `csrfToken` prop so custom submit handlers can attach the CSRF header to their own requests. `undefined` when the prop is not set."
+      },
+      "$formIdempotencyKey": {
+        "description": "Available inside the form's `onSubmit` handler. Carries the value of the `idempotencyKey` prop. `undefined` when the prop is not set."
+      },
+      "$formHeaders": {
+        "description": "Available inside the form's `onSubmit` handler. Carries the resolved headers object built from the `submitHeaders` prop. `undefined` when the prop is not set."
       }
     },
     "apis": {
@@ -7127,7 +7210,8 @@ export default {
     "description": "`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically. **Note:** `FormItem` must be used inside a `Form` component.",
     "props": {
       "bindTo": {
-        "description": "This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name. If the property is not set, the input will be bound to an internal data field but not submitted."
+        "description": "This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.If the property is not set, the input will be bound to an internal data field but not submitted.",
+        "valueType": "string"
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -7140,6 +7224,7 @@ export default {
       },
       "labelPosition": {
         "description": "Places the label at the given position of the component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "start",
@@ -7169,7 +7254,8 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `FormItem` component's label. If not defined, the label's width will be determined by its content and the available space."
+        "description": "This property sets the width of the `FormItem` component's label. If not defined, the label's width will be determined by its content and the available space.",
+        "valueType": "length"
       },
       "labelBreak": {
         "description": "This boolean value indicates if the label can be split into multiple lines if it would overflow the available label width.",
@@ -7264,6 +7350,7 @@ export default {
       },
       "validationMode": {
         "description": "This property sets what kind of validation mode or strategy to employ for a particular input field.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "errorLate",
@@ -7300,7 +7387,8 @@ export default {
         "isRequired": false
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "any"
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
@@ -7523,7 +7611,8 @@ export default {
         "defaultValue": "vertical"
       },
       "fields": {
-        "description": "An optional comma-separated list of field names (matching the `bindTo` values of nested inputs) that belong to this segment. When omitted the segment auto-discovers field names by inspecting its direct and nested children for `bindTo` attributes."
+        "description": "An optional comma-separated list of field names (matching the `bindTo` values of nested inputs) that belong to this segment. When omitted the segment auto-discovers field names by inspecting its direct and nested children for `bindTo` attributes.",
+        "valueType": "string"
       }
     },
     "contextVars": {
@@ -7557,7 +7646,8 @@ export default {
     "description": "`Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [`TableOfContents`](/docs/reference/components/TableOfContents).",
     "props": {
       "value": {
-        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
+        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.",
+        "valueType": "string"
       },
       "level": {
         "description": "This property sets the visual significance (level) of the heading. Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`.Invalid values default to `h1`.",
@@ -7581,10 +7671,12 @@ export default {
           "5",
           "6"
         ],
+        "valueType": "string",
         "defaultValue": "h1"
       },
       "maxLines": {
-        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.",
+        "valueType": "number"
       },
       "ellipses": {
         "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
@@ -7619,6 +7711,14 @@ export default {
       "hasOverflow": {
         "signature": "hasOverflow()",
         "description": "Returns true when the displayed text overflows the bounds of this heading component."
+      }
+    },
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
       }
     },
     "themeVars": {
@@ -8107,10 +8207,12 @@ export default {
     "specializedFrom": "Heading",
     "props": {
       "value": {
-        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
+        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.",
+        "valueType": "string"
       },
       "maxLines": {
-        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.",
+        "valueType": "number"
       },
       "ellipses": {
         "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
@@ -8145,6 +8247,14 @@ export default {
       "hasOverflow": {
         "signature": "hasOverflow()",
         "description": "Returns true when the displayed text overflows the bounds of this heading component."
+      }
+    },
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
       }
     },
     "themeVars": {
@@ -8632,10 +8742,12 @@ export default {
     "specializedFrom": "Heading",
     "props": {
       "value": {
-        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
+        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.",
+        "valueType": "string"
       },
       "maxLines": {
-        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.",
+        "valueType": "number"
       },
       "ellipses": {
         "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
@@ -8670,6 +8782,14 @@ export default {
       "hasOverflow": {
         "signature": "hasOverflow()",
         "description": "Returns true when the displayed text overflows the bounds of this heading component."
+      }
+    },
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
       }
     },
     "themeVars": {
@@ -9157,10 +9277,12 @@ export default {
     "specializedFrom": "Heading",
     "props": {
       "value": {
-        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
+        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.",
+        "valueType": "string"
       },
       "maxLines": {
-        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.",
+        "valueType": "number"
       },
       "ellipses": {
         "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
@@ -9195,6 +9317,14 @@ export default {
       "hasOverflow": {
         "signature": "hasOverflow()",
         "description": "Returns true when the displayed text overflows the bounds of this heading component."
+      }
+    },
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
       }
     },
     "themeVars": {
@@ -9682,10 +9812,12 @@ export default {
     "specializedFrom": "Heading",
     "props": {
       "value": {
-        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
+        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.",
+        "valueType": "string"
       },
       "maxLines": {
-        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.",
+        "valueType": "number"
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -9720,6 +9852,14 @@ export default {
       "hasOverflow": {
         "signature": "hasOverflow()",
         "description": "Returns true when the displayed text overflows the bounds of this heading component."
+      }
+    },
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
       }
     },
     "themeVars": {
@@ -10207,10 +10347,12 @@ export default {
     "specializedFrom": "Heading",
     "props": {
       "value": {
-        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
+        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.",
+        "valueType": "string"
       },
       "maxLines": {
-        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.",
+        "valueType": "number"
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -10245,6 +10387,14 @@ export default {
       "hasOverflow": {
         "signature": "hasOverflow()",
         "description": "Returns true when the displayed text overflows the bounds of this heading component."
+      }
+    },
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
       }
     },
     "themeVars": {
@@ -10732,10 +10882,12 @@ export default {
     "specializedFrom": "Heading",
     "props": {
       "value": {
-        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
+        "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.",
+        "valueType": "string"
       },
       "maxLines": {
-        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.",
+        "valueType": "number"
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -10770,6 +10922,14 @@ export default {
       "hasOverflow": {
         "signature": "hasOverflow()",
         "description": "Returns true when the displayed text overflows the bounds of this heading component."
+      }
+    },
+    "contextVars": {
+      "$anchorId": {
+        "description": "The generated id of the current heading anchor."
+      },
+      "$anchorHref": {
+        "description": "The href (#id) of the current heading anchor."
       }
     },
     "themeVars": {
@@ -11276,7 +11436,11 @@ export default {
     },
     "events": {
       "click": {
-        "description": "This event is triggered when the icon is clicked."
+        "description": "This event is triggered when the icon is clicked.",
+        "signature": "click(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
       }
     },
     "themeVars": {
@@ -11821,10 +11985,12 @@ export default {
         "isInternal": true
       },
       "loading": {
-        "description": "This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property."
+        "description": "This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.",
+        "valueType": "boolean"
       },
       "limit": {
-        "description": "This property limits the number of items displayed in the `List`. If not set, all items are displayed."
+        "description": "This property limits the number of items displayed in the `List`. If not set, all items are displayed.",
+        "valueType": "number"
       },
       "scrollAnchor": {
         "description": "This property pins the scroll position to a specified location of the list. Available values are shown below.",
@@ -11841,13 +12007,16 @@ export default {
         "defaultValue": false
       },
       "groupBy": {
-        "description": "This property sets which data item property is used to group the list items. Accepts a field name string or a function that receives an item and returns the group key. If not set, no grouping is done."
+        "description": "This property sets which data item property is used to group the list items. Accepts a field name string or a function that receives an item and returns the group key. If not set, no grouping is done.",
+        "valueType": "any"
       },
       "orderBy": {
-        "description": "This optioanl property enables the ordering of list items by specifying an attribute in the data."
+        "description": "This optioanl property enables the ordering of list items by specifying an attribute in the data.",
+        "valueType": "string"
       },
       "availableGroups": {
-        "description": "This property is an array of group names that the `List` will display. If not set, all groups in the data are displayed."
+        "description": "This property is an array of group names that the `List` will display. If not set, all groups in the data are displayed.",
+        "valueType": "string[]"
       },
       "groupHeaderTemplate": {
         "description": "Enables the customization of how the groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item group and map its individual attributes.",
@@ -11879,7 +12048,8 @@ export default {
         "defaultValue": true
       },
       "defaultGroups": {
-        "description": "This property adds an optional list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic."
+        "description": "This property adds an optional list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic.",
+        "valueType": "string[]"
       },
       "hideEmptyGroups": {
         "description": "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
@@ -11892,7 +12062,8 @@ export default {
         "defaultValue": true
       },
       "rowsSelectable": {
-        "description": "Indicates whether the rows are selectable (`true`) or not (`false`)."
+        "description": "Indicates whether the rows are selectable (`true`) or not (`false`).",
+        "valueType": "boolean"
       },
       "enableMultiRowSelection": {
         "description": "This boolean property indicates whether you can select multiple rows in the list. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.",
@@ -11900,16 +12071,19 @@ export default {
         "defaultValue": true
       },
       "initiallySelected": {
-        "description": "An array of IDs that should be initially selected when the list is rendered. This property only has an effect when the rowsSelectable property is set to `true`."
+        "description": "An array of IDs that should be initially selected when the list is rendered. This property only has an effect when the rowsSelectable property is set to `true`.",
+        "valueType": "any"
       },
       "syncWithVar": {
-        "description": "The name of a global variable to synchronize the list's selection state with. The named variable must reference an object; the list will read from and write to its 'selectedIds' property. When provided, this takes precedence over `initiallySelected`."
+        "description": "The name of a global variable to synchronize the list's selection state with. The named variable must reference an object; the list will read from and write to its 'selectedIds' property. When provided, this takes precedence over `initiallySelected`.",
+        "valueType": "string"
       },
       "refreshOn": {
         "description": "Bind this property to a global variable (or expression) whose change should force all visible list items to re-render and pick up the latest reactive state. When not set, items re-render on every XMLUI reactive cycle (safe but less optimal). When set, items only re-render when the bound value changes, which eliminates spurious re-renders from unrelated global-variable updates (e.g. focus events)."
       },
       "rowUnselectablePredicate": {
-        "description": "This property defines a predicate function with a return value that determines if the row should be unselectable. The function retrieves the item to display and should return a Boolean-like value. This property only has an effect when the `rowsSelectable` property is set to `true`."
+        "description": "This property defines a predicate function with a return value that determines if the row should be unselectable. The function retrieves the item to display and should return a Boolean-like value. This property only has an effect when the `rowsSelectable` property is set to `true`.",
+        "valueType": "any"
       },
       "hideSelectionCheckboxes": {
         "description": "If true, hides selection checkboxes. Selection logic still works via API and keyboard.",
@@ -12736,7 +12910,8 @@ export default {
     ],
     "props": {
       "content": {
-        "description": "This property sets the markdown content to display. Alternatively, you can nest the markdown content as a child in a CDATA section. In neither this property value nor any child is defined, empty content is displayed."
+        "description": "This property sets the markdown content to display. Alternatively, you can nest the markdown content as a child in a CDATA section. In neither this property value nor any child is defined, empty content is displayed.",
+        "valueType": "string"
       },
       "codeHighlighter": {
         "description": "This property sets the code highlighter to use.",
@@ -12985,10 +13160,12 @@ export default {
         "defaultValue": false
       },
       "title": {
-        "description": "Provides a prestyled heading to display the intent of the dialog."
+        "description": "Provides a prestyled heading to display the intent of the dialog.",
+        "valueType": "string"
       },
       "titleTemplate": {
-        "description": "A custom template to render the dialog title."
+        "description": "A custom template to render the dialog title.",
+        "valueType": "ComponentDef"
       },
       "closeButtonVisible": {
         "description": "Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.",
@@ -13046,6 +13223,38 @@ export default {
       "paddingRight-overlay-ModalDialog": "var(--xmlui-paddingRight-overlay-ModalDialog, var(--xmlui-paddingHorizontal-overlay-ModalDialog, var(--xmlui-padding-overlay-ModalDialog)))",
       "paddingTop-overlay-ModalDialog": "var(--xmlui-paddingTop-overlay-ModalDialog, var(--xmlui-paddingVertical-overlay-ModalDialog, var(--xmlui-padding-overlay-ModalDialog)))",
       "paddingBottom-overlay-ModalDialog": "var(--xmlui-paddingBottom-overlay-ModalDialog, var(--xmlui-paddingVertical-overlay-ModalDialog, var(--xmlui-padding-overlay-ModalDialog)))",
+      "border-ModalDialog": "var(--xmlui-border-ModalDialog)",
+      "borderHorizontal-ModalDialog": "var(--xmlui-borderHorizontal-ModalDialog, var(--xmlui-border-ModalDialog))",
+      "borderVertical-ModalDialog": "var(--xmlui-borderVertical-ModalDialog, var(--xmlui-border-ModalDialog))",
+      "borderLeft-ModalDialog": "var(--xmlui-borderLeft-ModalDialog, var(--xmlui-borderHorizontal-ModalDialog, var(--xmlui-border-ModalDialog)))",
+      "borderRight-ModalDialog": "var(--xmlui-borderRight-ModalDialog, var(--xmlui-borderHorizontal-ModalDialog, var(--xmlui-border-ModalDialog)))",
+      "borderTop-ModalDialog": "var(--xmlui-borderTop-ModalDialog, var(--xmlui-borderVertical-ModalDialog, var(--xmlui-border-ModalDialog)))",
+      "borderBottom-ModalDialog": "var(--xmlui-borderBottom-ModalDialog, var(--xmlui-borderVertical-ModalDialog, var(--xmlui-border-ModalDialog)))",
+      "borderWidth-ModalDialog": "var(--xmlui-borderWidth-ModalDialog)",
+      "borderHorizontalWidth-ModalDialog": "var(--xmlui-borderHorizontalWidth-ModalDialog, var(--xmlui-borderWidth-ModalDialog))",
+      "borderLeftWidth-ModalDialog": "var(--xmlui-borderLeftWidth-ModalDialog, var(--xmlui-borderHorizontalWidth-ModalDialog, var(--xmlui-borderWidth-ModalDialog)))",
+      "borderRightWidth-ModalDialog": "var(--xmlui-borderRightWidth-ModalDialog, var(--xmlui-borderHorizontalWidth-ModalDialog, var(--xmlui-borderWidth-ModalDialog)))",
+      "borderVerticalWidth-ModalDialog": "var(--xmlui-borderVerticalWidth-ModalDialog, var(--xmlui-borderWidth-ModalDialog))",
+      "borderTopWidth-ModalDialog": "var(--xmlui-borderTopWidth-ModalDialog, var(--xmlui-borderVerticalWidth-ModalDialog, var(--xmlui-borderWidth-ModalDialog)))",
+      "borderBottomWidth-ModalDialog": "var(--xmlui-borderBottomWidth-ModalDialog, var(--xmlui-borderVerticalWidth-ModalDialog, var(--xmlui-borderWidth-ModalDialog)))",
+      "borderStyle-ModalDialog": "var(--xmlui-borderStyle-ModalDialog)",
+      "borderHorizontalStyle-ModalDialog": "var(--xmlui-borderHorizontalStyle-ModalDialog, var(--xmlui-borderStyle-ModalDialog))",
+      "borderLeftStyle-ModalDialog": "var(--xmlui-borderLeftStyle-ModalDialog, var(--xmlui-borderHorizontalStyle-ModalDialog, var(--xmlui-borderStyle-ModalDialog)))",
+      "borderRightStyle-ModalDialog": "var(--xmlui-borderRightStyle-ModalDialog, var(--xmlui-borderHorizontalStyle-ModalDialog, var(--xmlui-borderStyle-ModalDialog)))",
+      "borderVerticalStyle-ModalDialog": "var(--xmlui-borderVerticalStyle-ModalDialog, var(--xmlui-borderStyle-ModalDialog))",
+      "borderTopStyle-ModalDialog": "var(--xmlui-borderTopStyle-ModalDialog, var(--xmlui-borderVerticalStyle-ModalDialog, var(--xmlui-borderStyle-ModalDialog)))",
+      "borderBottomStyle-ModalDialog": "var(--xmlui-borderBottomStyle-ModalDialog, var(--xmlui-borderVerticalStyle-ModalDialog, var(--xmlui-borderStyle-ModalDialog)))",
+      "borderColor-ModalDialog": "var(--xmlui-borderColor-ModalDialog)",
+      "borderHorizontalColor-ModalDialog": "var(--xmlui-borderHorizontalColor-ModalDialog, var(--xmlui-borderColor-ModalDialog))",
+      "borderLeftColor-ModalDialog": "var(--xmlui-borderLeftColor-ModalDialog, var(--xmlui-borderHorizontalColor-ModalDialog, var(--xmlui-borderColor-ModalDialog)))",
+      "borderRightColor-ModalDialog": "var(--xmlui-borderRightColor-ModalDialog, var(--xmlui-borderHorizontalColor-ModalDialog, var(--xmlui-borderColor-ModalDialog)))",
+      "borderVerticalColor-ModalDialog": "var(--xmlui-borderVerticalColor-ModalDialog, var(--xmlui-borderColor-ModalDialog))",
+      "borderTopColor-ModalDialog": "var(--xmlui-borderTopColor-ModalDialog, var(--xmlui-borderVerticalColor-ModalDialog, var(--xmlui-borderColor-ModalDialog)))",
+      "borderBottomColor-ModalDialog": "var(--xmlui-borderBottomColor-ModalDialog, var(--xmlui-borderVerticalColor-ModalDialog, var(--xmlui-borderColor-ModalDialog)))",
+      "borderStartStartRadius-ModalDialog": "var(--xmlui-borderStartStartRadius-ModalDialog, var(--xmlui-borderRadius-ModalDialog))",
+      "borderStartEndRadius-ModalDialog": "var(--xmlui-borderStartEndRadius-ModalDialog, var(--xmlui-borderRadius-ModalDialog))",
+      "borderEndStartRadius-ModalDialog": "var(--xmlui-borderEndStartRadius-ModalDialog, var(--xmlui-borderRadius-ModalDialog))",
+      "borderEndEndRadius-ModalDialog": "var(--xmlui-borderEndEndRadius-ModalDialog, var(--xmlui-borderRadius-ModalDialog))",
       "textColor-title-ModalDialog": "var(--xmlui-textColor-title-ModalDialog)",
       "fontFamily-title-ModalDialog": "var(--xmlui-fontFamily-title-ModalDialog)",
       "fontSize-title-ModalDialog": "var(--xmlui-fontSize-title-ModalDialog)",
@@ -13074,7 +13283,6 @@ export default {
       "lineBreak-title-ModalDialog": "var(--xmlui-lineBreak-title-ModalDialog)",
       "Dialog:backgroundColor-ModalDialog": "var(--xmlui-backgroundColor-ModalDialog)",
       "Dialog:backgroundColor-overlay-ModalDialog": "var(--xmlui-backgroundColor-overlay-ModalDialog)",
-      "Dialog:borderRadius-ModalDialog": "var(--xmlui-borderRadius-ModalDialog)",
       "Dialog:fontFamily-ModalDialog": "var(--xmlui-fontFamily-ModalDialog)",
       "Dialog:textColor-ModalDialog": "var(--xmlui-textColor-ModalDialog)",
       "Dialog:minWidth-ModalDialog": "var(--xmlui-minWidth-ModalDialog)",
@@ -13128,7 +13336,8 @@ export default {
         "valueType": "string"
       },
       "initiallyExpanded": {
-        "description": "This property defines whether the group is initially expanded or collapsed. If not defined, the group is collapsed by default."
+        "description": "This property defines whether the group is initially expanded or collapsed. If not defined, the group is collapsed by default.",
+        "valueType": "boolean"
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -13284,7 +13493,8 @@ export default {
     },
     "props": {
       "to": {
-        "description": "This property defines the URL of the link."
+        "description": "This property defines the URL of the link.",
+        "valueType": "url"
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -13345,7 +13555,8 @@ export default {
         "valueType": "boolean"
       },
       "icon": {
-        "description": "This property allows you to add an optional icon (specify the icon's name) to the navigation link."
+        "description": "This property allows you to add an optional icon (specify the icon's name) to the navigation link.",
+        "valueType": "icon"
       },
       "iconAlignment": {
         "description": "This property controls the vertical alignment of the icon when the label text wraps to multiple lines. Set to `baseline` to align with the first line of text, `start` to align to the top, `center` for middle alignment (default), or `end` for bottom alignment.",
@@ -13785,7 +13996,8 @@ export default {
         "valueType": "string"
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "number"
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -13813,6 +14025,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -13851,7 +14064,8 @@ export default {
         "valueType": "string"
       },
       "gap": {
-        "description": "This property defines the gap between the adornments and the input area."
+        "description": "This property defines the gap between the adornments and the input area.",
+        "valueType": "length"
       },
       "hasSpinBox": {
         "description": "This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.",
@@ -13859,10 +14073,12 @@ export default {
         "defaultValue": true
       },
       "spinnerUpIcon": {
-        "description": "Allows setting an alternate icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerUp:NumberBox\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerUp:NumberBox\" declaration in the app configuration file.",
+        "valueType": "icon"
       },
       "spinnerDownIcon": {
-        "description": "Allows setting an alternate icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerDown:NumberBox\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerDown:NumberBox\" declaration in the app configuration file.",
+        "valueType": "icon"
       },
       "step": {
         "description": "This prop governs how big the step when clicking on the spinner of the field.",
@@ -13895,11 +14111,11 @@ export default {
       },
       "validationIconSuccess": {
         "description": "Icon to display for valid state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       },
       "validationIconError": {
         "description": "Icon to display for error state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       }
     },
     "events": {
@@ -14054,7 +14270,8 @@ export default {
     "description": "`Option` defines selectable items for choice-based components, providing both the underlying value and display text for selection interfaces. It serves as a non-visual data structure that describes individual choices within [Select](/components/Select), [AutoComplete](/components/AutoComplete), and other selection components.",
     "props": {
       "label": {
-        "description": "This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label."
+        "description": "This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.",
+        "valueType": "string"
       },
       "value": {
         "description": "This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value. If neither is defined, the option is not displayed."
@@ -14065,7 +14282,8 @@ export default {
         "defaultValue": true
       },
       "keywords": {
-        "description": "An array of keywords that can be used for searching and filtering the option. These keywords are not displayed but help users find the option through search."
+        "description": "An array of keywords that can be used for searching and filtering the option. These keywords are not displayed but help users find the option through search.",
+        "valueType": "string[]"
       }
     }
   },
@@ -14076,6 +14294,7 @@ export default {
     "props": {
       "value": {
         "description": "This property sets the page's title to display in the browser tab.",
+        "valueType": "string",
         "defaultValue": "XMLUI Application"
       },
       "noSuffix": {
@@ -14091,7 +14310,8 @@ export default {
     "description": "`Page` defines route endpoints within an application, mapping specific URL patterns to content that displays when users navigate to those routes. Each Page represents a distinct view or screen in your single-page application's routing system.",
     "props": {
       "url": {
-        "description": "The URL of the route associated with the content. If not set, the page is not available."
+        "description": "The URL of the route associated with the content. If not set, the page is not available.",
+        "valueType": "url"
       },
       "searchIndexable": {
         "description": "Whether the content of this page should be indexed for search. Defaults to true.",
@@ -14121,6 +14341,7 @@ export default {
     "props": {
       "fallbackPath": {
         "description": "The fallback path when the current URL does not match any of the paths of the pages.",
+        "valueType": "url",
         "defaultValue": "/"
       },
       "defaultScrollRestoration": {
@@ -14200,7 +14421,8 @@ export default {
         "defaultValue": true
       },
       "pageSizeOptions": {
-        "description": "Array of page sizes the user can select from. If provided, shows a page size selector dropdown"
+        "description": "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
+        "valueType": "any"
       },
       "hasPrevPage": {
         "description": "Whether to disable the previous page button. Only takes effect if itemCount is not provided.",
@@ -14549,6 +14771,7 @@ export default {
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value.",
+        "valueType": "string",
         "defaultValue": ""
       },
       "autoFocus": {
@@ -14573,6 +14796,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -14973,10 +15197,12 @@ export default {
         "defaultValue": ""
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "any"
       },
       "value": {
         "description": "This property sets the current value of the component.",
+        "valueType": "any",
         "isInternal": true
       },
       "autoFocus": {
@@ -15001,6 +15227,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -15038,7 +15265,8 @@ export default {
         "defaultValue": "default"
       },
       "data": {
-        "description": "The data array to populate the option list from. When provided, `Option` children are not needed — the component builds options from this array using `valueField` and `labelField`. This is the most efficient approach for large lists because the options are derived in JavaScript and re-evaluated only when the data reference changes, not on every unrelated state update."
+        "description": "The data array to populate the option list from. When provided, `Option` children are not needed — the component builds options from this array using `valueField` and `labelField`. This is the most efficient approach for large lists because the options are derived in JavaScript and re-evaluated only when the data reference changes, not on every unrelated state update.",
+        "valueType": "any"
       },
       "valueField": {
         "description": "The property name of each data item to use as the option value when `data` is provided. Defaults to `\"value\"`.",
@@ -15064,7 +15292,7 @@ export default {
       },
       "dropdownHeight": {
         "description": "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
-        "valueType": "string"
+        "valueType": "length"
       },
       "scrollIndicators": {
         "description": "This property controls whether scroll indicator arrows are displayed at the top and bottom of the dropdown list when the content overflows.",
@@ -15123,11 +15351,11 @@ export default {
       },
       "validationIconSuccess": {
         "description": "Icon to display for valid state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       },
       "validationIconError": {
         "description": "Icon to display for error state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       }
     },
     "events": {
@@ -15400,7 +15628,8 @@ export default {
     },
     "props": {
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "any"
       },
       "minValue": {
         "description": "This property specifies the minimum value of the allowed input range.",
@@ -15444,6 +15673,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -15466,10 +15696,12 @@ export default {
         "defaultValue": "none"
       },
       "rangeStyle": {
-        "description": "This optional property allows you to apply custom styles to the range element of the slider."
+        "description": "This optional property allows you to apply custom styles to the range element of the slider.",
+        "valueType": "hash"
       },
       "thumbStyle": {
-        "description": "This optional property allows you to apply custom styles to the thumb elements of the slider."
+        "description": "This optional property allows you to apply custom styles to the thumb elements of the slider.",
+        "valueType": "hash"
       },
       "showValues": {
         "description": "This property controls whether the slider shows the current values of the thumbs.",
@@ -15608,7 +15840,8 @@ export default {
     "description": "Placeholder in a reusable component. Signs the slot where the component's injected children should be rendered.",
     "props": {
       "name": {
-        "description": "This optional property defines the name of the slot."
+        "description": "This optional property defines the name of the slot.",
+        "valueType": "string"
       }
     },
     "allowArbitraryProps": true,
@@ -16847,6 +17080,7 @@ export default {
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
+        "valueType": "boolean",
         "defaultValue": false
       },
       "autoFocus": {
@@ -16866,6 +17100,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -17059,7 +17294,8 @@ export default {
         "isInternal": true
       },
       "data": {
-        "description": "The component receives data via this property. The `data` property is a list of items that the `Table` can display."
+        "description": "The component receives data via this property. The `data` property is a list of items that the `Table` can display.",
+        "valueType": "any"
       },
       "idKey": {
         "description": "This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.",
@@ -17072,28 +17308,36 @@ export default {
         "defaultValue": false
       },
       "loading": {
-        "description": "This boolean property indicates if the component is fetching (or processing) data. This property is useful when data is loaded conditionally or receiving it takes some time."
+        "description": "This boolean property indicates if the component is fetching (or processing) data. This property is useful when data is loaded conditionally or receiving it takes some time.",
+        "valueType": "boolean"
       },
       "headerHeight": {
-        "description": "This optional property is used to specify the height of the table header."
+        "description": "This optional property is used to specify the height of the table header.",
+        "valueType": "length"
       },
       "rowsSelectable": {
-        "description": "Indicates whether the rows are selectable (`true`) or not (`false`)."
+        "description": "Indicates whether the rows are selectable (`true`) or not (`false`).",
+        "valueType": "boolean"
       },
       "initiallySelected": {
-        "description": "An array of IDs that should be initially selected when the table is rendered. This property only has an effect when the rowsSelectable property is set to `true`."
+        "description": "An array of IDs that should be initially selected when the table is rendered. This property only has an effect when the rowsSelectable property is set to `true`.",
+        "valueType": "any"
       },
       "syncWithAppState": {
-        "description": "An AppState instance to synchronize the table's selection state with. The table will read from and write to the 'selectedIds' property of the AppState object. When provided, this takes precedence over the initiallySelected property for initial selection. You can use the AppState's didUpdate event to receive notifications when the selection changes."
+        "description": "An AppState instance to synchronize the table's selection state with. The table will read from and write to the 'selectedIds' property of the AppState object. When provided, this takes precedence over the initiallySelected property for initial selection. You can use the AppState's didUpdate event to receive notifications when the selection changes.",
+        "valueType": "string"
       },
       "syncWithVar": {
-        "description": "The name of a global variable to synchronize the table's selection state with. The named variable must reference an object; the table will read from and write to its 'selectedIds' property. When provided, this takes precedence over both `initiallySelected` and `syncWithAppState`. Multiple tables sharing the same variable name will keep their selections in sync automatically. A runtime error is signalled if the value is not a valid JavaScript variable name."
+        "description": "The name of a global variable to synchronize the table's selection state with. The named variable must reference an object; the table will read from and write to its 'selectedIds' property. When provided, this takes precedence over both `initiallySelected` and `syncWithAppState`. Multiple tables sharing the same variable name will keep their selections in sync automatically. A runtime error is signalled if the value is not a valid JavaScript variable name.",
+        "valueType": "string"
       },
       "pageSize": {
-        "description": "This property defines the number of rows to display per page. When set without also setting `isPaginated`, pagination is activated automatically whenever the number of data rows exceeds this value and suppressed otherwise. This makes `pageSize` the minimal way to get auto-activating, auto-hiding pagination: no conditional expressions on `isPaginated` or the position props are needed."
+        "description": "This property defines the number of rows to display per page. When set without also setting `isPaginated`, pagination is activated automatically whenever the number of data rows exceeds this value and suppressed otherwise. This makes `pageSize` the minimal way to get auto-activating, auto-hiding pagination: no conditional expressions on `isPaginated` or the position props are needed.",
+        "valueType": "number"
       },
       "pageSizeOptions": {
-        "description": "This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items."
+        "description": "This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items.",
+        "valueType": "any"
       },
       "showPageInfo": {
         "description": "Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).",
@@ -17117,8 +17361,8 @@ export default {
           "center",
           "end"
         ],
-        "type": "string",
-        "default": "start"
+        "valueType": "string",
+        "defaultValue": "start"
       },
       "pageInfoPosition": {
         "description": "Determines where to place the page information in the layout. It works the same as the [Pagination component property](./Pagination#pageinfoposition).",
@@ -17127,8 +17371,8 @@ export default {
           "center",
           "end"
         ],
-        "type": "string",
-        "default": "end"
+        "valueType": "string",
+        "defaultValue": "end"
       },
       "buttonRowPosition": {
         "description": "Determines where to place the pagination button row in the layout. It works the same as the [Pagination component property](./Pagination#buttonrowposition).",
@@ -17141,20 +17385,24 @@ export default {
         "defaultValue": "center"
       },
       "rowDisabledPredicate": {
-        "description": "This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value."
+        "description": "This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.",
+        "valueType": "any"
       },
       "rowUnselectablePredicate": {
-        "description": "This property defines a predicate function with a return value that determines if the row should be unselectable. The function retrieves the item to display and should return a Boolean-like value. This property only has an effect when the `rowsSelectable` property is set to `true`."
+        "description": "This property defines a predicate function with a return value that determines if the row should be unselectable. The function retrieves the item to display and should return a Boolean-like value. This property only has an effect when the `rowsSelectable` property is set to `true`.",
+        "valueType": "any"
       },
       "noDataTemplate": {
         "description": "A property to customize what to display if the table does not contain any data.",
         "valueType": "ComponentDef"
       },
       "sortBy": {
-        "description": "This property is used to determine which data property to sort by. If not defined, the data is not sorted"
+        "description": "This property is used to determine which data property to sort by. If not defined, the data is not sorted",
+        "valueType": "string"
       },
       "sortDirection": {
-        "description": "This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set. By default ascending order is used."
+        "description": "This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set. By default ascending order is used.",
+        "valueType": "string"
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -17177,13 +17425,16 @@ export default {
         "defaultValue": false
       },
       "iconNoSort": {
-        "description": "Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the \"icon.nosort:Table\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the \"icon.nosort:Table\" declaration in the app configuration file.",
+        "valueType": "icon"
       },
       "iconSortAsc": {
-        "description": "Allows setting an alernate icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the \"icon.sortasc:Table\" declaration in the app configuration file."
+        "description": "Allows setting an alernate icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the \"icon.sortasc:Table\" declaration in the app configuration file.",
+        "valueType": "icon"
       },
       "iconSortDesc": {
-        "description": "Allows setting an alternate icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the \"icon.sortdesc:Table\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the \"icon.sortdesc:Table\" declaration in the app configuration file.",
+        "valueType": "icon"
       },
       "enableMultiRowSelection": {
         "description": "This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.",
@@ -18177,7 +18428,8 @@ export default {
     },
     "props": {
       "activeTab": {
-        "description": "This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default."
+        "description": "This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default.",
+        "valueType": "number"
       },
       "orientation": {
         "description": "This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top. Note: This property is ignored when accordionView is set to true.",
@@ -18304,7 +18556,8 @@ export default {
     "description": "The `Text` component displays textual information in a number of optional styles and variants.",
     "props": {
       "value": {
-        "description": "The text to be displayed. This value can also be set via nesting the text into the `Text` component."
+        "description": "The text to be displayed. This value can also be set via nesting the text into the `Text` component.",
+        "valueType": "string"
       },
       "variant": {
         "description": "An optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color, and other parameters. If not defined, the text uses the current style of its context. In addition to predefined variants, you can specify custom variant names and style them using theme variables with the pattern `{cssProperty}-Text-{variantName}` (e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). See the documentation for a complete list of supported CSS properties.",
@@ -18405,10 +18658,12 @@ export default {
             "value": "var",
             "description": "Represents the name of a variable in a mathematical expression"
           }
-        ]
+        ],
+        "valueType": "string"
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines."
+        "description": "This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.",
+        "valueType": "number"
       },
       "preserveLinebreaks": {
         "description": "This property indicates if linebreaks should be preserved when displaying text.",
@@ -18695,10 +18950,12 @@ export default {
         "defaultValue": false
       },
       "maxRows": {
-        "description": "This optional property sets the maximum number of text rows the `TextArea` can grow. If not set, the number of rows is unlimited."
+        "description": "This optional property sets the maximum number of text rows the `TextArea` can grow. If not set, the number of rows is unlimited.",
+        "valueType": "number"
       },
       "minRows": {
-        "description": "This optional property sets the minimum number of text rows the `TextArea` can shrink. If not set, the minimum number of rows is 1."
+        "description": "This optional property sets the minimum number of text rows the `TextArea` can shrink. If not set, the minimum number of rows is 1.",
+        "valueType": "number"
       },
       "rows": {
         "description": "Specifies the number of rows the component initially has.",
@@ -18715,7 +18972,8 @@ export default {
         "valueType": "string"
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "string"
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -18743,6 +19001,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -18783,19 +19042,20 @@ export default {
             "value": "both",
             "description": "Can resize in both dimensions"
           }
-        ]
+        ],
+        "valueType": "string"
       },
       "verboseValidationFeedback": {
         "description": "Enables a concise validation summary (icon) in input components.",
-        "type": "boolean"
+        "valueType": "boolean"
       },
       "validationIconSuccess": {
         "description": "Icon to display for valid state when concise validation summary is enabled.",
-        "type": "string"
+        "valueType": "icon"
       },
       "validationIconError": {
         "description": "Icon to display for error state when concise validation summary is enabled.",
-        "type": "string"
+        "valueType": "icon"
       }
     },
     "events": {
@@ -18972,6 +19232,7 @@ export default {
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
+        "valueType": "string",
         "defaultValue": "",
         "audit": {
           "classification": "sensitive",
@@ -19004,6 +19265,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -19027,8 +19289,7 @@ export default {
       },
       "invalidMessages": {
         "description": "The invalid messages to display for the input component.",
-        "type": "array",
-        "valueType": "string"
+        "valueType": "string[]"
       },
       "startText": {
         "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
@@ -19047,7 +19308,8 @@ export default {
         "valueType": "string"
       },
       "gap": {
-        "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used."
+        "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.",
+        "valueType": "length"
       },
       "showPasswordToggle": {
         "description": "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
@@ -19056,12 +19318,12 @@ export default {
       },
       "passwordVisibleIcon": {
         "description": "The icon to display when the password is visible (when showPasswordToggle is true).",
-        "valueType": "string",
+        "valueType": "icon",
         "defaultValue": "eye"
       },
       "passwordHiddenIcon": {
         "description": "The icon to display when the password is hidden (when showPasswordToggle is true).",
-        "valueType": "string",
+        "valueType": "icon",
         "defaultValue": "eye-off"
       },
       "verboseValidationFeedback": {
@@ -19070,11 +19332,11 @@ export default {
       },
       "validationIconSuccess": {
         "description": "Icon to display for valid state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       },
       "validationIconError": {
         "description": "Icon to display for error state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       }
     },
     "events": {
@@ -19267,7 +19529,8 @@ export default {
     "description": "`TileGrid` renders a data array as a responsive, virtualized tile grid. It auto-calculates the number of columns based on the container width, tile width, and gap, and only renders visible rows — making it suitable for large datasets.",
     "props": {
       "data": {
-        "description": "The array of items to render as tiles. Each item is exposed as [`$item`](#item) inside the tile template."
+        "description": "The array of items to render as tiles. Each item is exposed as [`$item`](#item) inside the tile template.",
+        "valueType": "any"
       },
       "itemWidth": {
         "description": "Fixed width of each tile, e.g. `\"120px\"`.",
@@ -19310,7 +19573,8 @@ export default {
         "defaultValue": false
       },
       "syncWithVar": {
-        "description": "The name of a global variable to synchronize the grid's selection state with. The named variable must reference an object; the grid will read from and write to its `selectedIds` property. A runtime error is signalled if the value is not a valid JavaScript variable name."
+        "description": "The name of a global variable to synchronize the grid's selection state with. The named variable must reference an object; the grid will read from and write to its `selectedIds` property. A runtime error is signalled if the value is not a valid JavaScript variable name.",
+        "valueType": "string"
       },
       "refreshOn": {
         "description": "An optional value that, when changed, forces all visible tiles to re-render so their XMLUI event-handler closures pick up the latest reactive state. Bind to any global variable whose change should invalidate tile closures (e.g. `\"{selectMode}\"`). If not provided, tiles re-render on every XMLUI reactive cycle."
@@ -19382,32 +19646,77 @@ export default {
     },
     "events": {
       "selectionDidChange": {
-        "description": "Fired when the selection changes. Receives the array of currently selected items."
+        "description": "Fired when the selection changes. Receives the array of currently selected items.",
+        "signature": "selectionDidChange(selectedItems: any[], selectedIds: string[]): void",
+        "parameters": {
+          "selectedItems": "Array of selected tile data items.",
+          "selectedIds": "Array of selected tile IDs."
+        }
       },
       "itemDoubleClick": {
-        "description": "Fired when a tile is double-clicked. Receives the data item."
+        "description": "Fired when a tile is double-clicked. Receives the data item.",
+        "signature": "itemDoubleClick(item: any, itemIndex: number): void",
+        "parameters": {
+          "item": "The double-clicked tile data item.",
+          "itemIndex": "The zero-based index of the tile item."
+        }
       },
       "cutAction": {
-        "description": "Fired when the user presses Ctrl/Cmd+X. Receives `(focusedItem, selectedItems, selectedIds)`."
+        "description": "Fired when the user presses Ctrl/Cmd+X. Receives `(focusedItem, selectedItems, selectedIds)`.",
+        "signature": "cutAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+        "parameters": {
+          "focusedItem": "The currently focused tile data item, or null if none is focused.",
+          "selectedItems": "Array of selected tile data items.",
+          "selectedIds": "Array of selected tile IDs."
+        }
       },
       "copyAction": {
-        "description": "Fired when the user presses Ctrl/Cmd+C. Receives `(focusedItem, selectedItems, selectedIds)`."
+        "description": "Fired when the user presses Ctrl/Cmd+C. Receives `(focusedItem, selectedItems, selectedIds)`.",
+        "signature": "copyAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+        "parameters": {
+          "focusedItem": "The currently focused tile data item, or null if none is focused.",
+          "selectedItems": "Array of selected tile data items.",
+          "selectedIds": "Array of selected tile IDs."
+        }
       },
       "pasteAction": {
-        "description": "Fired when the user presses Ctrl/Cmd+V. Receives `(focusedItem, selectedItems, selectedIds)`."
+        "description": "Fired when the user presses Ctrl/Cmd+V. Receives `(focusedItem, selectedItems, selectedIds)`.",
+        "signature": "pasteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+        "parameters": {
+          "focusedItem": "The currently focused tile data item, or null if none is focused.",
+          "selectedItems": "Array of selected tile data items.",
+          "selectedIds": "Array of selected tile IDs."
+        }
       },
       "deleteAction": {
-        "description": "Fired when the user presses the Delete key. Receives `(focusedItem, selectedItems, selectedIds)`."
+        "description": "Fired when the user presses the Delete key. Receives `(focusedItem, selectedItems, selectedIds)`.",
+        "signature": "deleteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+        "parameters": {
+          "focusedItem": "The currently focused tile data item, or null if none is focused.",
+          "selectedItems": "Array of selected tile data items.",
+          "selectedIds": "Array of selected tile IDs."
+        }
       },
       "selectAllAction": {
-        "description": "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`."
+        "description": "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.",
+        "signature": "selectAllAction(selectedItems: any[], selectedIds: string[]): void",
+        "parameters": {
+          "selectedItems": "Array of selected tile data items.",
+          "selectedIds": "Array of selected tile IDs."
+        }
       },
       "contextMenu": {
         "injectedVars": [
           "$item",
           "$itemIndex"
         ],
-        "description": "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`."
+        "description": "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.",
+        "signature": "contextMenu(item: any, itemIndex: number, event: MouseEvent): void",
+        "parameters": {
+          "item": "The right-clicked tile data item.",
+          "itemIndex": "The zero-based index of the tile item.",
+          "event": "The mouse event object."
+        }
       }
     },
     "contextVars": {
@@ -19497,6 +19806,7 @@ export default {
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
+        "valueType": "string",
         "defaultValue": "",
         "audit": {
           "classification": "secret",
@@ -19529,6 +19839,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -19552,8 +19863,7 @@ export default {
       },
       "invalidMessages": {
         "description": "The invalid messages to display for the input component.",
-        "type": "array",
-        "valueType": "string"
+        "valueType": "string[]"
       },
       "startText": {
         "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
@@ -19572,7 +19882,8 @@ export default {
         "valueType": "string"
       },
       "gap": {
-        "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used."
+        "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.",
+        "valueType": "length"
       },
       "showPasswordToggle": {
         "description": "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
@@ -19581,12 +19892,12 @@ export default {
       },
       "passwordVisibleIcon": {
         "description": "The icon to display when the password is visible (when showPasswordToggle is true).",
-        "valueType": "string",
+        "valueType": "icon",
         "defaultValue": "eye"
       },
       "passwordHiddenIcon": {
         "description": "The icon to display when the password is hidden (when showPasswordToggle is true).",
-        "valueType": "string",
+        "valueType": "icon",
         "defaultValue": "eye-off"
       },
       "verboseValidationFeedback": {
@@ -19595,11 +19906,11 @@ export default {
       },
       "validationIconSuccess": {
         "description": "Icon to display for valid state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       },
       "validationIconError": {
         "description": "Icon to display for error state when concise validation summary is enabled.",
-        "valueType": "string"
+        "valueType": "icon"
       }
     },
     "events": {
@@ -19793,7 +20104,8 @@ export default {
     "allowArbitraryProps": true,
     "props": {
       "themeId": {
-        "description": "This property specifies which theme to use by setting the theme's id."
+        "description": "This property specifies which theme to use by setting the theme's id.",
+        "valueType": "string"
       },
       "tone": {
         "description": "This property allows the setting of the current theme's tone.",
@@ -19844,7 +20156,8 @@ export default {
     },
     "props": {
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "valueType": "string"
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -19863,6 +20176,7 @@ export default {
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
+        "valueType": "string",
         "availableValues": [
           {
             "value": "none",
@@ -19909,7 +20223,7 @@ export default {
       },
       "clearIcon": {
         "description": "The icon to display in the clear button.",
-        "valueType": "string"
+        "valueType": "icon"
       },
       "clearToInitialValue": {
         "description": "Whether the clear button resets the time input to its initial value",
@@ -20314,6 +20628,7 @@ export default {
     "props": {
       "data": {
         "description": "The data source of the tree. Format depends on the dataFormat property.",
+        "valueType": "any",
         "isRequired": true
       },
       "dataFormat": {
@@ -20362,10 +20677,12 @@ export default {
         "defaultValue": "selectable"
       },
       "selectedValue": {
-        "description": "The selected item ID in source data format."
+        "description": "The selected item ID in source data format.",
+        "valueType": "string"
       },
       "selectedId": {
-        "description": "An alias for selectedValue — selects a tree node by its source data ID."
+        "description": "An alias for selectedValue — selects a tree node by its source data ID.",
+        "valueType": "string"
       },
       "defaultExpanded": {
         "description": "Initial expansion state: \"none\", \"all\", \"first-level\", or array of specific IDs.",
@@ -20384,12 +20701,12 @@ export default {
       },
       "iconCollapsed": {
         "description": "The icon name to use for collapsed nodes (default: \"chevronright\").",
-        "valueType": "string",
+        "valueType": "icon",
         "defaultValue": "chevronright"
       },
       "iconExpanded": {
         "description": "The icon name to use for expanded nodes (default: \"chevrondown\").",
-        "valueType": "string",
+        "valueType": "icon",
         "defaultValue": "chevrondown"
       },
       "iconSize": {
