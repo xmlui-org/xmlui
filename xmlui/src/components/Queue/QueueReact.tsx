@@ -31,9 +31,7 @@ import {
 // =====================================================================================================================
 // React Queue component implementation
 
-export const defaultProps = {
-  clearAfterFinish: false,
-};
+import { defaultProps } from "./Queue.defaults";
 
 const getTraceIdForQueue = () => {
   if (typeof window === "undefined") return undefined;

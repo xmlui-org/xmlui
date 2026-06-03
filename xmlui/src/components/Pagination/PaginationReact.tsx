@@ -48,32 +48,7 @@ type Props = {
   classes?: Record<string, string>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const defaultProps: Required<
-  Pick<
-    Props,
-    | "pageSize"
-    | "pageIndex"
-    | "maxVisiblePages"
-    | "showPageInfo"
-    | "showPageSizeSelector"
-    | "orientation"
-    | "buttonRowPosition"
-    | "showCurrentPage"
-    | "pageSizeSelectorPosition"
-    | "pageInfoPosition"
-  >
-> = {
-  pageSize: 10,
-  pageIndex: 0,
-  maxVisiblePages: 1,
-  showPageInfo: true,
-  showPageSizeSelector: true,
-  orientation: "horizontal",
-  showCurrentPage: true,
-  pageSizeSelectorPosition: "start",
-  buttonRowPosition: "center",
-  pageInfoPosition: "end",
-};
+import { defaultProps } from "./Pagination.defaults";
 
 export interface PaginationAPI extends ComponentApi {
   moveFirst: () => void;

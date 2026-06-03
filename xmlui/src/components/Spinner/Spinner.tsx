@@ -2,7 +2,8 @@ import styles from "./Spinner.module.scss";
 
 import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Spinner, defaultProps } from "./SpinnerReact";
+import { defaultProps } from "./Spinner.defaults";
+import { Spinner } from "./SpinnerReact";
 import { createMetadata } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";

@@ -4,13 +4,9 @@ import { Navigate } from "react-router-dom";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createUrlWithQueryParams } from "../component-utils";
 import { createMetadata } from "../metadata-helpers";
+import { defaultProps } from "./Redirect.defaults";
 
 const COMP = "Redirect";
-
-export const defaultProps = {
-  to: "",
-  replace: false,
-};
 
 export const RedirectMd = createMetadata({
   status: "stable",

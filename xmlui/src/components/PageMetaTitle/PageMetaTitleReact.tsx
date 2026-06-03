@@ -2,11 +2,7 @@ import { memo, useEffect } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useAppContext } from "../../components-core/AppContext";
 
-// Default props for PageMetaTitle component
-export const defaultProps = {
-  title: "XMLUI Application",
-  noSuffix: false,
-};
+import { defaultProps } from "./PageMetaTitle.defaults";
 
 export const PageMetaTitle = memo(function PageMetaTitle({
   title = defaultProps.title,

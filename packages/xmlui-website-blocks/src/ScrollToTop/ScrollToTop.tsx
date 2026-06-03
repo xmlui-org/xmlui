@@ -2,10 +2,10 @@ import styles from "./ScrollToTop.module.scss";
 
 import { wrapComponent, createMetadata, d, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import * as ScrollToTopNative from "./ScrollToTopReact";
+import { defaultProps } from "./ScrollToTop.defaults";
+import { ScrollToTop } from "./ScrollToTopReact";
 
 const COMP = "ScrollToTop";
-const { ScrollToTop, defaultProps } = ScrollToTopNative;
 
 export const ScrollToTopMd: ComponentMetadata = createMetadata({
   status: "experimental",

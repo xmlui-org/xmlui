@@ -38,21 +38,7 @@ import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
 
-// Default props for NumberBox component
-export const defaultProps = {
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  hasSpinBox: true,
-  integersOnly: false,
-  zeroOrPositive: false,
-  min: -NUMBERBOX_MAX_VALUE,
-  max: NUMBERBOX_MAX_VALUE,
-  step: 1,
-  updateState: noop,
-  onDidChange: noop,
-  onFocus: noop,
-  onBlur: noop,
-};
+import { defaultProps } from "./NumberBox.defaults";
 
 // =====================================================================================================================
 // React NumberBox component definition

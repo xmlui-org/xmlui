@@ -58,35 +58,35 @@
 * NavPanel
 * NestedApp
 * NoResult
-NumberBox
-Option
-PageMetaTitle
-Pages
-Pagination
-Pdf
-PieChart
-ProgressBar
-QRCode
-Queue
-RadarChart
-RadioGroup
-RatingInput
-ReadingTime
-Redirect
-RetryPolicy
-ScaleAnimation
-ScrollToTop
-ScrollViewer
-Search
-Select
-SelectionStore
-Share
-SkipLink
-SlideInAnimation
-Slider
-Spinner
-Splitter
-Stack
+* NumberBox
+* Option
+* PageMetaTitle
+* Pages
+* Pagination
+* Pdf
+* PieChart
+* ProgressBar
+* QRCode
+* Queue
+* RadarChart
+* RadioGroup
+* RatingInput
+* ReadingTime
+* Redirect
+* RetryPolicy
+* ScaleAnimation
+* ScrollToTop
+* ScrollViewer
+* Search
+* Select
+* SelectionStore
+* Share
+* SkipLink
+* SlideInAnimation
+* Slider
+* Spinner
+* Splitter
+* Stack
 Stepper
 StepperForm
 StickyBox

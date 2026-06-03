@@ -8,6 +8,7 @@ import type { ValidationStatus } from "../abstractions";
 import { noop } from "../../components-core/constants";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./RatingInput.defaults";
 
 type Props = {
   validationStatus?: ValidationStatus;
@@ -36,25 +37,6 @@ type Props = {
 const DEFAULT_MAX_RATING = 5;
 const DEFAULT_VALIDATION_ICON_SUCCESS = "checkmark";
 const DEFAULT_VALIDATION_ICON_ERROR = "error";
-const DEFAULT_INVALID_MESSAGES: string[] = [];
-
-export const defaultProps: {
-  maxRating: number;
-  enabled: boolean;
-  readOnly: boolean;
-  initialValue?: number;
-  value?: number;
-  validationStatus: ValidationStatus;
-  invalidMessages: string[];
-} = {
-  maxRating: DEFAULT_MAX_RATING,
-  enabled: true,
-  readOnly: false,
-  initialValue: undefined,
-  value: undefined,
-  validationStatus: "none",
-  invalidMessages: DEFAULT_INVALID_MESSAGES,
-};
 
 export const RatingInput = memo(forwardRef<HTMLDivElement, Props>(function RatingInput({
   id,

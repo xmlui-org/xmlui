@@ -22,7 +22,8 @@ import {
   d,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
-import { Select, defaultProps } from "./SelectReact";
+import { defaultProps } from "./Select.defaults";
+import { Select } from "./SelectReact";
 
 const COMP = "Select";
 

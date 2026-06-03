@@ -18,12 +18,7 @@ type Props = {
   classes?: Record<string, string>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const defaultProps: Required<Pick<Props, "size" | "level" | "color" | "backgroundColor">> = {
-  size: 256,
-  level: "L",
-  color: "#000000",
-  backgroundColor: "#FFFFFF",
-};
+import { defaultProps } from "./QRCode.defaults";
 
 export const QRCode = memo(
   forwardRef(function QRCode(

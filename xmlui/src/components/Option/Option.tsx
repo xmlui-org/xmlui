@@ -1,7 +1,8 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
-import { OptionNative, defaultProps } from "./OptionReact";
+import { defaultProps } from "./Option.defaults";
+import { OptionNative } from "./OptionReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Option";

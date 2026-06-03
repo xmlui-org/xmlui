@@ -23,7 +23,8 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { defaultProps, NumberBox } from "./NumberBoxReact";
+import { defaultProps } from "./NumberBox.defaults";
+import { NumberBox } from "./NumberBoxReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "NumberBox";

@@ -4,7 +4,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata } from "../../components/metadata-helpers";
-import { ScrollViewer, defaultProps } from "./ScrollViewerReact";
+import { ScrollViewer } from "./ScrollViewerReact";
+import { defaultProps } from "./ScrollViewer.defaults";
 import { Scroller, type ScrollStyle } from "./Scroller";
 export { type ScrollStyle } from "./Scroller";
 

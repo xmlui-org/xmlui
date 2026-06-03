@@ -34,6 +34,7 @@ import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
 import { Popover, PopoverAnchor, PopoverContent } from "@radix-ui/react-popover";
+import { defaultProps } from "./Search.defaults";
 
 type Props = Omit<HTMLAttributes<HTMLSpanElement>, "data"> & {
   data: SearchItemData[];
@@ -47,11 +48,6 @@ type Props = Omit<HTMLAttributes<HTMLSpanElement>, "data"> & {
   defaultSelectedCategories?: string[];
   pageSize?: number;
   mode?: "overlay" | "inline" | "drawer";
-};
-
-export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
-  limit: 10,
-  maxContentMatchNumber: 3,
 };
 
 // --- Search config (from v1)
