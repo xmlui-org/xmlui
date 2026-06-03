@@ -105,11 +105,16 @@ export const ComponentNameMd = createMetadata({
     },
   },
 
+  childInjectedVars: ["$value", "$item"], // Required for Lexical Scoping engine to preserve $vars passed to children
+
   events: {
     click:      dClick(COMP),
     gotFocus:   dGotFocus(COMP),
     lostFocus:  dLostFocus(COMP),
-    didChange:  d("Fired when value changes."),
+    didChange: { 
+      description: "Fired when value changes.",
+      injectedVars: ["$newValue"] // Required for Lexical Scoping to preserve $vars passed to event handlers
+    },
     init:       dInit(COMP),
   },
 

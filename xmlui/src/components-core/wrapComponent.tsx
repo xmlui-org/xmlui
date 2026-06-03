@@ -3,6 +3,7 @@ import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 import type { ComponentRendererDef, LayoutContext } from "../abstractions/RendererDefs";
 import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
+import { validateInjectedVars } from "./optimization/validateInjectedVars";
 import { pushXsLog, createLogEntry, pushTrace, popTrace, getCurrentTrace } from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
@@ -822,14 +823,20 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       const ctxDef = rendererConfig.contextVars;
 
       if (typeof ctxDef === "function") {
-        props[reactProp] = (...args: any[]) => (
-          <MemoizedItem
-            node={template}
-            contextVars={ctxDef(...args)}
-            renderChild={renderChild}
-            layoutContext={context.layoutContext}
-          />
-        );
+        props[reactProp] = (...args: any[]) => {
+          const contextVars = ctxDef(...args);
+          if (import.meta.env.DEV) {
+            validateInjectedVars(node.type, metadata, contextVars);
+          }
+          return (
+            <MemoizedItem
+              node={template}
+              contextVars={contextVars}
+              renderChild={renderChild}
+              layoutContext={context.layoutContext}
+            />
+          );
+        };
       } else {
         props[reactProp] = (...args: any[]) => {
           const contextVars: Record<string, any> = {};
@@ -838,6 +845,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             if (name !== null) {
               contextVars[name] = args[i];
             }
+          }
+          if (import.meta.env.DEV) {
+            validateInjectedVars(node.type, metadata, contextVars);
           }
           return (
             <MemoizedItem
@@ -1472,14 +1482,20 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       const ctxDef = rendererConfig.contextVars;
 
       if (typeof ctxDef === "function") {
-        props[reactProp] = (...args: any[]) => (
-          <MemoizedItem
-            node={template}
-            contextVars={ctxDef(...args)}
-            renderChild={renderChild}
-            layoutContext={context.layoutContext}
-          />
-        );
+        props[reactProp] = (...args: any[]) => {
+          const contextVars = ctxDef(...args);
+          if (import.meta.env.DEV) {
+            validateInjectedVars(node.type, metadata, contextVars);
+          }
+          return (
+            <MemoizedItem
+              node={template}
+              contextVars={contextVars}
+              renderChild={renderChild}
+              layoutContext={context.layoutContext}
+            />
+          );
+        };
       } else {
         props[reactProp] = (...args: any[]) => {
           const contextVars: Record<string, any> = {};
@@ -1488,6 +1504,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             if (name !== null) {
               contextVars[name] = args[i];
             }
+          }
+          if (import.meta.env.DEV) {
+            validateInjectedVars(node.type, metadata, contextVars);
           }
           return (
             <MemoizedItem

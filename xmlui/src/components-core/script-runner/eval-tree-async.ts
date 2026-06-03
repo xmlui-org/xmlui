@@ -1,6 +1,5 @@
 import { isPlainObject } from "lodash-es";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
-
 import type { TemplateLiteralExpression } from "./ScriptingSourceTree";
 import {
   T_ARRAY_LITERAL,
@@ -576,7 +575,6 @@ async function evalFunctionInvocationAsync(
 
   // --- We use context for "this"
   const currentContext = thisStack.length > 0 ? thisStack.pop() : evalContext.localContext;
-
   // --- We need to use proxies for JavaScript functions (such as Array.prototype.filter) not supporting
   // --- async arguments
   functionObj = getAsyncProxy(functionObj, functionArgs, currentContext);
@@ -858,8 +856,10 @@ function completePromise(input: any): Promise<any> {
       for (const key of Object.keys(input)) {
         let completedPromise = await completePromiseInternal(input[key]);
         if (input[key] !== completedPromise) {
-          //prevent write if it's the same reference (can cause problems in frozen objects)
-          input[key] = completedPromise;
+          const descriptor = Object.getOwnPropertyDescriptor(input, key);
+          if (descriptor?.writable || descriptor?.set) {
+            input[key] = completedPromise;
+          }
         }
       }
       return input;

@@ -43,6 +43,10 @@ export const CheckboxMd = createMetadata({
       description: "The checkbox input area.",
     },
   },
+  contextVars: {
+    $checked: dInternal("Current checked state, injected into the input template."),
+    $setChecked: dInternal("Setter for the checked state, injected into the input template."),
+  },
   props: {
     indeterminate: dIndeterminate(toggleDefaultProps.indeterminate),
     required: dRequired(),

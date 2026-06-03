@@ -223,6 +223,7 @@ export const NavPanelMd = createMetadata({
         `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      isStrictEnum: true,
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {
@@ -248,6 +249,7 @@ export const NavPanelMd = createMetadata({
         `animated scroll or \`"instant"\` to jump immediately to the active item without animation.`,
       valueType: "string",
       availableValues: ["smooth", "instant"],
+      isStrictEnum: true,
       defaultValue: defaultProps.syncScrollBehavior,
     },
     syncScrollPosition: {
@@ -258,6 +260,7 @@ export const NavPanelMd = createMetadata({
         `top; \`"end"\` aligns it to the bottom.`,
       valueType: "string",
       availableValues: ["center", "nearest", "start", "end"],
+      isStrictEnum: true,
       defaultValue: defaultProps.syncScrollPosition,
     },
   },

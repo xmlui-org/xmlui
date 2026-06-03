@@ -1,5 +1,5 @@
 import { BarChart, defaultProps } from "./BarChartReact";
-import { wrapComponent, createMetadata, type ComponentMetadata, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata, d, parseScssVar } from "xmlui";
 import styles from "./BarChart.module.scss";
 
 const COMP = "BarChart";
@@ -91,6 +91,9 @@ export const BarChartMd: ComponentMetadata = createMetadata({
     tooltipTemplate: {
       description: "This property allows replacing the default template to display a tooltip.",
     },
+  },
+  contextVars: {
+    $tooltip: d("Context variable available inside tooltipTemplate."),
   },
   themeVars: parseScssVar(styles.themeVars),
 });

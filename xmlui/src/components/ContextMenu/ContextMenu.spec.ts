@@ -79,6 +79,106 @@ test("passes context data via openAt", async ({
   await expect.poll(testStateDriver.testState).toEqual("renamed-app.exe");
 });
 
+test("compound component child reads $context via $props (Bug 29 regression)", async ({
+  initTestBed,
+  page,
+}) => {
+  // Regression for Bug 29 (history-bugs.md): a UDC nested inside <ContextMenu>
+  // that derives local vars from $props.context.* must see the SAME $context
+  // values that openAt was called with. Prior to the lexical-scoping fix in
+  // useVars, an outer-scope $props leaked through narrowing and shadowed the
+  // CompoundComponent-provided $props inside the UDC — every `when` evaluated
+  // false and only the unconditional item was visible (the myworkdrive
+  // "only Refresh shows up" symptom).
+  await initTestBed(
+    `
+    <Card testId="target" title="Right click"
+          onContextMenu="ev => menu.openAt(ev, { selectedItems: ['file1.txt'] })">
+      <Text value="Right click me" />
+    </Card>
+    <ContextMenu id="menu">
+      <FilesMenu context="{$context}" />
+    </ContextMenu>
+    `,
+    {
+      components: [
+        `
+        <Component
+          name="FilesMenu"
+          var.selectedItems="{$props.context?.selectedItems || []}"
+          var.isAnythingSelected="{selectedItems.length > 0}"
+        >
+          <MenuItem when="{isAnythingSelected}">Download</MenuItem>
+          <MenuItem when="{isAnythingSelected}">Delete</MenuItem>
+          <MenuItem>Refresh</MenuItem>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  await page.getByTestId("target").click({ button: "right" });
+
+  // All three items must be visible — the conditional ones (Download/Delete)
+  // depend on $props.context.selectedItems propagating into the UDC scope.
+  await expect(page.getByRole("menuitem", { name: "Download" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Delete" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Refresh" })).toBeVisible();
+});
+
+test("compound component re-reads $context on subsequent openAt calls", async ({
+  initTestBed,
+  page,
+}) => {
+  // Regression for Bug 29's secondary symptom: even after the local var read
+  // $props.context correctly once, the obtainValue memoize would cache the
+  // result with stateDepValues={} (because pickFromObject couldn't traverse
+  // the dotted path against an undefined $props on first render) and return
+  // the stale value forever. Verify consecutive openAt calls with DIFFERENT
+  // context payloads each produce the right set of visible items.
+  await initTestBed(
+    `
+    <Card testId="empty" title="empty"
+          onContextMenu="ev => menu.openAt(ev, { items: [] })">
+      <Text value="ctx menu empty" />
+    </Card>
+    <Card testId="filled" title="filled"
+          onContextMenu="ev => menu.openAt(ev, { items: ['a'] })">
+      <Text value="ctx menu filled" />
+    </Card>
+    <ContextMenu id="menu">
+      <MyMenu context="{$context}" />
+    </ContextMenu>
+    `,
+    {
+      components: [
+        `
+        <Component
+          name="MyMenu"
+          var.count="{$props.context?.items?.length || 0}"
+        >
+          <MenuItem when="{count > 0}">HasItems</MenuItem>
+          <MenuItem when="{count === 0}">Empty</MenuItem>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  // First open with empty items → "Empty" shows, "HasItems" hidden.
+  await page.getByTestId("empty").click({ button: "right" });
+  await expect(page.getByRole("menuitem", { name: "Empty" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "HasItems" })).not.toBeVisible();
+  // Dismiss before opening another.
+  await page.keyboard.press("Escape");
+
+  // Second open with non-empty items → "HasItems" shows, "Empty" hidden.
+  // Proves the var resolution actually re-runs (not stale-cached).
+  await page.getByTestId("filled").click({ button: "right" });
+  await expect(page.getByRole("menuitem", { name: "HasItems" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Empty" })).not.toBeVisible();
+});
+
 test("closes when clicking outside", async ({ initTestBed, page }) => {
   await initTestBed(`
     <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">

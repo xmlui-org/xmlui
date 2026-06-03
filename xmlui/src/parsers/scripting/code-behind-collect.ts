@@ -1,6 +1,7 @@
 import {
   T_ARROW_EXPRESSION,
   T_FUNCTION_DECLARATION,
+  T_IMPORT_DECLARATION,
   T_VAR_STATEMENT,
   type ArrowExpression,
   type CodeDeclaration,
@@ -30,6 +31,7 @@ export function collectCodeBehindFromSource(
     moduleErrors: {},
     functions: {},
     hasInvalidStatements: false,
+    hasUnresolvableImports: false,
   };
 
   const collectedFunctions: Record<string, CodeDeclaration> = {};
@@ -64,6 +66,7 @@ export async function collectCodeBehindFromSourceWithImports(
     moduleErrors: {},
     functions: {},
     hasInvalidStatements: false,
+    hasUnresolvableImports: false,
   };
 
   const collectedFunctions: Record<string, CodeDeclaration> = {};
@@ -86,7 +89,7 @@ export async function collectCodeBehindFromSourceWithImports(
   // --- Handle errors
   if (!loadResult.ok) {
     const errorResult = loadResult as { ok: false; error: any };
-    return { ...result, moduleErrors: errorResult.error };
+    return { ...result, moduleErrors: errorResult.error, hasUnresolvableImports: true };
   }
 
   const parsedModule = loadResult.value;
@@ -95,6 +98,13 @@ export async function collectCodeBehindFromSourceWithImports(
   parsedModule.statements.forEach((stmt) => {
     collectStatementFromModule(stmt, result, collectedFunctions);
   });
+
+  // Since we are in the WithImports version and ModuleLoader succeeded,
+  // we have resolved the imports encountered in collectStatementFromModule.
+  // NOTE: This correctness relies on the ModuleFetcher throwing an error on
+  // missing modules, which parseWithImports/ModuleLoader converts to an
+  // 'err' Result, bypassing this success block.
+  result.hasUnresolvableImports = false;
 
   // --- Add imported functions to the result (these come from imports)
   Object.entries(parsedModule.functions).forEach(([name, func]) => {
@@ -139,6 +149,9 @@ function collectStatementFromModule(
       break;
     case T_FUNCTION_DECLARATION:
       addFunctionDeclaration(stmt as FunctionDeclaration, result, collectedFunctions);
+      break;
+    case T_IMPORT_DECLARATION:
+      result.hasUnresolvableImports = true;
       break;
     default:
       result.hasInvalidStatements = true;

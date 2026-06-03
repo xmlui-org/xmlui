@@ -44,6 +44,7 @@ export const StepperFormMd = createMetadata({
         "step's content is shown. In `vertical` mode each step renders its own header " +
         "with the active step's content expanding beneath it.",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: "horizontal",
     },
@@ -171,6 +172,7 @@ export const StepperFormMd = createMetadata({
         '`"reset"` restores the form to its initial data. ' +
         '`"clear"` empties the form as if no `data` property were set.',
       availableValues: ["keep", "reset", "clear"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: formDefaultProps.dataAfterSubmit,
     },

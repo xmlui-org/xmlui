@@ -4,6 +4,7 @@ import {
   memo,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -39,7 +40,7 @@ import type {
   StatePartChangedFn,
 } from "./ContainerWrapper";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
-import { extractScopedState, CodeBehindParseError } from "./ContainerUtils";
+import { CodeBehindParseError } from "./ContainerUtils";
 import { FnDepsProvider, useFnDeps } from "../FnDepsContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
@@ -75,9 +76,29 @@ type Props = {
   uidInfoRef?: RefObject<Record<string, any>>;
   /** Whether this is an implicit container (follows parent's registration) */
   isImplicit?: boolean;
+  /** Stable ref holding the full un-narrowed parent state for event handler scope.
+   *  Using a ref (not a value) keeps StateContainer.memo stable when unrelated
+   *  parent state changes, preserving the computedUses render optimization. */
+  fullParentStateRef?: MutableRefObject<ContainerState | undefined>;
   /** Child elements to render */
   children?: ReactNode;
 };
+
+// ============================================================================
+// DEV-ONLY RENDER-COUNT PROFILER HELPERS
+// ============================================================================
+
+if (process.env.NODE_ENV === "development") {
+  (globalThis as any).__resetRenderCounts = () => {
+    (globalThis as any).__renderCounts = {};
+  };
+  (globalThis as any).__topRenderCounts = (n = 10) => {
+    const counts: Record<string, number> = (globalThis as any).__renderCounts ?? {};
+    return Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, n);
+  };
+}
 
 // ============================================================================
 // STATE CONTAINER COMPONENT
@@ -108,6 +129,7 @@ export const StateContainer = memo(
       layoutContextRef,
       uidInfoRef,
       isImplicit,
+      fullParentStateRef,
       children,
       ...rest
     }: Props,
@@ -170,9 +192,24 @@ export const StateContainer = memo(
     // LAYER 1: PARENT STATE SCOPING
     // ========================================================================
 
-    const stateFromOutside = useShallowCompareMemoize(
-      useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
-    );
+    const stateFromOutside = useShallowCompareMemoize(parentState);
+
+    const renderCountRef = useRef(0);
+    // Render counter for dev profiling. The useLayoutEffect must be called unconditionally
+    // (Rules of Hooks). The process.env check is placed INSIDE the callback so the bundler
+    // can dead-code-eliminate the body in production while the hook call site stays stable.
+    useLayoutEffect(() => {
+      if (process.env.NODE_ENV !== "development") return;
+      renderCountRef.current += 1;
+      // Use the wrapped component's type (first child) for containers — avoids all containers
+      // colliding on the "Container" label when they have no uid.
+      const innerType = (node as any).children?.[0]?.type;
+      const baseLabel = innerType ?? node.type ?? "anon";
+      const label = node.uid ? `${baseLabel}#${node.uid}` : baseLabel;
+      // accumulate per-label counts silently; read window.__renderCounts in DevTools to inspect
+      (globalThis as any).__renderCounts ??= {};
+      (globalThis as any).__renderCounts[label] = renderCountRef.current;
+    });
 
     // ========================================================================
     // LAYER 2: COMPONENT REDUCER STATE
@@ -396,13 +433,11 @@ export const StateContainer = memo(
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
         produce((draft) => {
-          // console.log("-----BUST----setComponentApis");
           if (!draft[uid]) {
             draft[uid] = {};
           }
           Object.entries(api).forEach(([key, value]) => {
             if (draft[uid][key] !== value) {
-              // console.log(`-----BUST------new api for ${uid}`, draft[uid][key], value)
               draft[uid][key] = value;
             }
           });
@@ -421,11 +456,31 @@ export const StateContainer = memo(
     // STATE CHANGE CALLBACK
     // ========================================================================
 
+    // Keep mutable values in refs so statePartChanged stays a stable function
+    // reference. statePartChanged is passed as a prop deep into the subtree; if
+    // it changes on every render (e.g. because resolvedLocalVars changes when
+    // oftenChanges++), every child Container re-renders despite memo — defeating
+    // the computedUses optimisation. Refs let the callback always see the latest
+    // values without creating a new function reference each render.
+    const resolvedLocalVarsRef = useRef(resolvedLocalVars);
+    resolvedLocalVarsRef.current = resolvedLocalVars;
+
+    const stableCurrentGlobalVarsRef = useRef(stableCurrentGlobalVars);
+    stableCurrentGlobalVarsRef.current = stableCurrentGlobalVars;
+
+    const parentStatePartChangedRef = useRef(parentStatePartChanged);
+    parentStatePartChangedRef.current = parentStatePartChanged;
+
+    const nodeUsesRef = useRef(node.uses);
+    nodeUsesRef.current = node.uses;
+
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
-        const isLocalVar = key in resolvedLocalVars;
-        const isGlobalVar = key in stableCurrentGlobalVars;
+        const localVars = resolvedLocalVarsRef.current;
+        const globalVars = stableCurrentGlobalVarsRef.current;
+        const isLocalVar = key in localVars;
+        const isGlobalVar = key in globalVars;
         const isRoot = node.uid === "root";
 
         // Check local variables FIRST - they shadow globals
@@ -438,7 +493,7 @@ export const StateContainer = memo(
               value: newValue,
               target,
               actionType: action,
-              localVars: resolvedLocalVars,
+              localVars,
             },
           });
         } else if (isGlobalVar) {
@@ -455,12 +510,12 @@ export const StateContainer = memo(
                 value: newValue,
                 target,
                 actionType: action,
-                localVars: stableCurrentGlobalVars,
+                localVars: globalVars,
               },
             });
           } else {
             // Non-root containers bubble globals to parent
-            parentStatePartChanged(pathArray, newValue, target, action);
+            parentStatePartChangedRef.current(pathArray, newValue, target, action);
           }
         } else if (key in componentStateRef.current) {
           // Component state - handle locally
@@ -471,25 +526,24 @@ export const StateContainer = memo(
               value: newValue,
               target,
               actionType: action,
-              localVars: resolvedLocalVars,
+              localVars,
             },
           });
         } else {
           // Not global, not local - bubble up if allowed by uses
-          if (!node.uses || node.uses.includes(key)) {
-            parentStatePartChanged(pathArray, newValue, target, action);
+          const uses = nodeUsesRef.current;
+          // Systemic Fix №7: Always allow framework-level context variables (starting with $)
+          // to bubble up to the app state, even if they are not in the 'uses' list.
+          // This ensures that components like ContextMenu can update $context successfully.
+          const isFrameworkVar = typeof key === 'string' && key.startsWith("$");
+          if (isFrameworkVar || !uses || uses.includes(key)) {
+            parentStatePartChangedRef.current(pathArray, newValue, target, action);
           }
         }
       },
-      [
-        resolvedLocalVars,
-        stableCurrentGlobalVars,
-        node.uses,
-        node.uid,
-        node.globalVars,
-        appContext,
-        parentStatePartChanged,
-      ],
+      // dispatch is stable (from useReducer); node.uid is part of a stable node object.
+      // All other mutable values are accessed via refs above.
+      [dispatch, node.uid],
     );
 
     // ========================================================================
@@ -515,6 +569,7 @@ export const StateContainer = memo(
             parentRenderContext={parentRenderContext}
             memoedVarsRef={memoedVars}
             isImplicit={isImplicit}
+            fullParentStateRef={fullParentStateRef}
             ref={ref}
             uidInfoRef={uidInfoRef}
             {...rest}

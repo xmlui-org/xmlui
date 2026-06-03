@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from "react";
+import type { MutableRefObject, ReactNode, RefObject } from "react";
 import { forwardRef, memo, useMemo, useRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -9,6 +9,8 @@ import { ContainerWrapper, isContainerLike } from "./ContainerWrapper";
 import ComponentAdapter from "./ComponentAdapter";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { EMPTY_ARRAY } from "../constants";
+import { useShallowCompareMemoize } from "../utils/hooks";
+import { extractScopedState, narrowGlobalVars } from "./ContainerUtils";
 
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.
@@ -81,14 +83,76 @@ export const ComponentWrapper = memo(
       );
     }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
+    // When the node declares a scope (uses or computedUses), extract only the
+    // relevant slice of parent state and stabilise it with a shallow-equal memo.
+    // This prevents ContainerWrapper/StateContainer from re-rendering when
+    // unrelated state keys change — e.g. a fast-ticking timer should not
+    // cause a scoped Select to re-render on every tick.
+    const nodeUses = nodeWithTransformedDatasourceProp.uses;
+    const nodeComputedUses = nodeWithTransformedDatasourceProp.computedUses;
+    const scopedParentState = useShallowCompareMemoize(
+      useMemo(
+        () => extractScopedState(state, nodeUses ?? nodeComputedUses) ?? state,
+        [state, nodeUses, nodeComputedUses],
+      ),
+    );
+
+    // Narrow parentGlobalVars to only the globals this subtree reads.
+    // When computedGlobalUses is undefined (no global deps), pass globalVars as-is.
+    //
+    // Two-step approach to handle write targets correctly:
+    //   Step 1 — build a narrow snapshot for change-detection. When computedGlobalUses
+    //            is absent, return undefined — useShallowCompareMemoize with a stable
+    //            undefined is O(1) and avoids an O(n-globals) shallow comparison that
+    //            would otherwise run on every render even when no narrowing is needed.
+    //   Step 2 — pass the FULL globalVars to the child but update its reference only
+    //            when the narrow snapshot changes (or, when absent, whenever globalVars
+    //            itself changes).
+    //
+    // This prevents re-renders on unrelated global changes while still exposing
+    // every global variable (including write targets that aren't in
+    // computedGlobalUses) to the child's expression evaluator.
+    const nodeComputedGlobalUses = nodeWithTransformedDatasourceProp.computedGlobalUses;
+    const narrowedGlobalVarsForComparison = useShallowCompareMemoize(
+      useMemo(
+        () =>
+          nodeComputedGlobalUses && globalVars
+            ? narrowGlobalVars(globalVars, nodeComputedGlobalUses)
+            : undefined,
+        [globalVars, nodeComputedGlobalUses],
+      ),
+    );
+    // Two-step memo: return the FULL globalVars but update its reference only when
+    // the narrow snapshot changes (or when absent, when globalVars itself changes).
+    // A ref is used to read the latest globalVars without adding it as a memo
+    // dependency — reading `.current` inside useMemo is the standard React pattern
+    // for "I need the current value at the time the memo recomputes, but I do not
+    // want the memo to recompute every time the value changes."
+    const globalVarsCurrentRef = useRef(globalVars);
+    globalVarsCurrentRef.current = globalVars;
+    const globalVarsWithStableRef = useMemo(
+      () => globalVarsCurrentRef.current,
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- ref.current is intentionally excluded; see comment above
+      [narrowedGlobalVarsForComparison ?? globalVars],
+    );
+
+    // Stable ref holding the full (un-narrowed) parent state for event handlers.
+    // Using a MutableRefObject instead of a value prop means ContainerWrapper.memo
+    // never sees this as a changed prop — the optimization (no re-render on
+    // unrelated state changes) is preserved while event handlers can still write
+    // to any parent variable even when it is absent from computedUses.
+    const fullParentStateRef = useRef<Record<string, any> | undefined>(undefined);
+    fullParentStateRef.current = (nodeUses || nodeComputedUses) ? state : undefined;
+
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
       return (
         <ContainerWrapper
           resolvedKey={resolvedKey}
           node={nodeWithTransformedDatasourceProp as ContainerWrapperDef}
-          parentState={state}
-          parentGlobalVars={globalVars}
+          parentState={scopedParentState}
+          fullParentStateRef={(nodeUses || nodeComputedUses) ? fullParentStateRef : undefined}
+          parentGlobalVars={globalVarsWithStableRef}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           parentRenderContext={parentRenderContext}

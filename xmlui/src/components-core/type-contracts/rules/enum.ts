@@ -1,16 +1,18 @@
 /**
- * Rule: closed-enum check via `availableValues`.
+ * Rule: closed-enum check via `availableValues` + `isStrictEnum`.
  *
- * `availableValues` is the canonical way to declare a closed string/number
- * enum on a property even when `valueType` is `"string"` or `"number"`.
- * The verifier treats it as authoritative when present.
+ * `availableValues` alone is hints-only (IDE autocomplete + docs).
+ * Strict validation only fires when `isStrictEnum: true` is also declared on
+ * the property metadata. The verifier and runtime both delegate to this rule.
  */
 
 import type { PropertyValueDescription } from "../../../abstractions/ComponentDefs";
 import type { VerifyFailure } from "./types";
 
 /**
- * Verify a literal `raw` against an `availableValues` enum.
+ * Verify a literal `raw` against a closed-enum set.
+ *
+ * Only called when the property metadata has `isStrictEnum: true`.
  *
  * @returns `null` if the value is in the enum (or the enum is empty);
  *          otherwise a `VerifyFailure` with the list of accepted values.
@@ -19,7 +21,11 @@ export function verifyEnum(
   raw: unknown,
   availableValues: readonly PropertyValueDescription[] | undefined,
 ): VerifyFailure | null {
-  if (raw === undefined || raw === null) return null;
+  // Empty string means "value not set" (same intent as undefined/null): it is
+  // never a meaningful enum member, and the idiomatic markup pattern
+  // `prop="{cond ? 'x' : ''}"` uses '' as the "otherwise default" fallback.
+  // Treating it as a hard failure produces systemic false positives.
+  if (raw === undefined || raw === null || raw === "") return null;
   if (!availableValues || availableValues.length === 0) return null;
 
   const accepted = availableValues.map(unwrap);

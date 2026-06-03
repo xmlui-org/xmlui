@@ -18,6 +18,9 @@ export const StepperMd = createMetadata({
     "Inspired by the Material UI Stepper, it supports horizontal and vertical " +
     "orientations, an alternative-label layout, and a nonLinear mode that allows " +
     "users to navigate between steps freely.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
   props: {
     activeStep: {
       description:
@@ -34,6 +37,7 @@ export const StepperMd = createMetadata({
         "step's content expanding beneath it.",
       valueType: "string",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultProps.orientation,
     },
     stackedLabel: {

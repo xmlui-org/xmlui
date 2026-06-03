@@ -31,6 +31,7 @@ export const ResponsiveBarMd = createMetadata({
         "arranged top-to-bottom and overflow is based on container height.",
       valueType: "string",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultResponsiveBarProps.orientation,
     },
     overflowIcon: {

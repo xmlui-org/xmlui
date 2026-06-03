@@ -19,6 +19,7 @@ export const LiveRegionMd = createMetadata({
       description: "Controls whether updates are announced politely or assertively.",
       valueType: "string",
       availableValues: ["polite", "assertive"],
+      isStrictEnum: true,
       defaultValue: defaultProps.politeness,
     },
   },

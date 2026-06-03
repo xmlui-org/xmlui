@@ -64,5 +64,6 @@ The most common development tasks have ready-made prompt files in `.github/promp
 - [23 — Testing Conventions](./23-testing-conventions.md)
 - [24 — Accessibility](./24-accessibility.md)
 - [25 — Documentation Generation](./25-doc-generation.md)
+- [26 — Performance Profiling](./26-performance-profiling.md)
 - [26 — Internationalization](./26-i18n.md)
 - [39 — Determinism](./39-determinism.md)

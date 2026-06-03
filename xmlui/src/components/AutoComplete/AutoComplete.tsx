@@ -16,6 +16,8 @@ import {
   dLostFocus,
   dMulti,
   createMetadata,
+  d,
+  dInternal,
 } from "../metadata-helpers";
 import { defaultProps } from "./AutoComplete.defaults";
 import { AutoComplete } from "./AutoCompleteReact";
@@ -32,6 +34,9 @@ export const AutoCompleteMd = createMetadata({
     "filter through options, with support for single or multiple selections. Unlike " +
     "a basic [`Select`](/docs/reference/components/Select), it provides type-ahead functionality " +
     "and can allow users to create new options.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -165,10 +170,8 @@ export const AutoCompleteMd = createMetadata({
         "This context value represents an item when you define an option item template. " +
         "Use `$item.value` and `$item.label` to refer to the value and label of the " +
         "particular option.",
-    },
-    $group: {
-      description: "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
-    },
+  d,
+  dInternal,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

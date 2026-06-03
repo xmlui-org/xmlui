@@ -16,6 +16,9 @@ export const FormMd = createMetadata({
     "input, with built-in data binding, validation, and submission handling. It " +
     "automatically manages form state and provides context for nested form controls " +
     "to work together.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
   parts: {
     buttonRow: {
       description: "The container for the form action buttons (e.g., Save, Cancel).",
@@ -211,6 +214,7 @@ export const FormMd = createMetadata({
         '`"reset"` restores the form to its initial data (the value of the `data` property). ' +
         '`"clear"` empties the form as if no `data` property were set.',
       availableValues: ["keep", "reset", "clear"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.dataAfterSubmit,
     },
@@ -221,6 +225,7 @@ export const FormMd = createMetadata({
         "`drop-while-running` fires the `submitDropped` event without queuing. " +
         "`queue` is reserved for a future scheduler — currently behaves like `single-flight`.",
       availableValues: ["single-flight", "queue", "drop-while-running"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.submitPolicy,
     },
@@ -245,6 +250,7 @@ export const FormMd = createMetadata({
   },
   events: {
     willSubmit: {
+      injectedVars: ["$data"],
       description:
         `The form infrastructure fires this event just before the form is submitted. The event receives ` +
         `two arguments: the cleaned form data (fields marked \`noSubmit\` excluded) and the complete form data ` +
@@ -259,6 +265,7 @@ export const FormMd = createMetadata({
       },
     },
     submit: {
+      injectedVars: ["$data"],
       description:
         `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`data\` value to save.`,
@@ -268,6 +275,7 @@ export const FormMd = createMetadata({
       },
     },
     submitFailed: {
+      injectedVars: ["$data"],
       description:
         `The form infrastructure fires this event when a submit attempt is rejected because ` +
         `at least one field failed validation. \`willSubmit\` and \`submit\` are NOT fired in ` +
@@ -281,6 +289,7 @@ export const FormMd = createMetadata({
       isInternal: true,
     },
     success: {
+      injectedVars: ["$data"],
       description:
         "The form infrastructure fires this event when the form is submitted successfully.",
       signature: "success(response: any): void",
@@ -289,11 +298,13 @@ export const FormMd = createMetadata({
       },
     },
     cancel: {
+      injectedVars: ["$data"],
       description: `The form infrastructure fires this event when the form is canceled.`,
       signature: "cancel(): void",
       parameters: {},
     },
     reset: {
+      injectedVars: ["$data"],
       description: `The form infrastructure fires this event when the form is reset.`,
       signature: "reset(): void",
       parameters: {},
@@ -345,7 +356,11 @@ export const FormMd = createMetadata({
       description:
         `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
         `\`idempotencyKey\` prop. \`undefined\` when the prop is not set.`,
-    },
+    ),
+    $formHeaders: d(
+      `Available inside the form's \`onSubmit\` handler. Carries the resolved headers object ` +
+        `built from the \`submitHeaders\` prop. \`undefined\` when the prop is not set.`,
+    ),
   },
   apis: {
     reset: {

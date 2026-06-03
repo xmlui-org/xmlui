@@ -29,7 +29,9 @@ export const collectedComponentMetadata = {
 `;
 
 describe("checkMetadataDrift", () => {
-  it("passes when metadata props are present in a nearby Props type", () => {
+  // ts.createProgram cold-start (lib loading) can exceed the 5000ms default.
+  const TIMEOUT = 30_000;
+  it("passes when metadata props are present in a nearby Props type", { timeout: TIMEOUT }, () => {
     const fixture = makeFixture({
       "collectedComponentMetadata.ts": collection,
       "Good/Good.tsx": `
@@ -49,7 +51,7 @@ describe("checkMetadataDrift", () => {
     expect(formatMetadataDriftReport(result)).toContain("passed");
   });
 
-  it("reports metadata props missing from the component's typed surface", () => {
+  it("reports metadata props missing from the component's typed surface", { timeout: TIMEOUT }, () => {
     const fixture = makeFixture({
       "collectedComponentMetadata.ts": collection,
       "Good/Good.tsx": `export const GoodMd = {}; type Props = {};`,
@@ -73,7 +75,7 @@ describe("checkMetadataDrift", () => {
     expect(formatMetadataDriftReport(result)).toContain("missing");
   });
 
-  it("accepts props handled explicitly by wrapComponent config", () => {
+  it("accepts props handled explicitly by wrapComponent config", { timeout: TIMEOUT }, () => {
     const fixture = makeFixture({
       "collectedComponentMetadata.ts": collection,
       "Good/Good.tsx": `

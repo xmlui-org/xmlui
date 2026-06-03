@@ -21,6 +21,9 @@ export const AppMd = createMetadata({
     "structure and layout. It provides a complete UI framework with built-in navigation, " +
     "header, footer, and content areas that work together seamlessly.",
   excludeBehaviors: ["tooltip", "animation", "label"],
+  optimization: {
+    unstableChildInjectedVars: ["$pathname", "$routeParams", "$queryParams", "$linkInfo"],
+  },
   props: {
     layout: {
       description:
@@ -83,6 +86,7 @@ export const AppMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.defaultTone,
       availableValues: ["light", "dark"],
+      isStrictEnum: true,
     },
     defaultTheme: {
       description: "This property sets the app's default theme.",
@@ -138,6 +142,7 @@ export const AppMd = createMetadata({
       description: "Text direction for the app.",
       valueType: "string",
       availableValues: ["ltr", "rtl", "auto"],
+      isStrictEnum: true,
       defaultValue: "auto",
       isInternal: true,
     },
@@ -145,6 +150,7 @@ export const AppMd = createMetadata({
       description: "Handler scheduler mode.",
       valueType: "string",
       availableValues: ["concurrent", "fifo"],
+      isStrictEnum: true,
       defaultValue: "concurrent",
       isInternal: true,
     },
@@ -158,6 +164,7 @@ export const AppMd = createMetadata({
       description: "URL canonicalisation case policy.",
       valueType: "string",
       availableValues: ["preserve", "lower"],
+      isStrictEnum: true,
       defaultValue: "preserve",
       isInternal: true,
     },
@@ -165,6 +172,7 @@ export const AppMd = createMetadata({
       description: "URL canonicalisation trailing-slash policy.",
       valueType: "string",
       availableValues: ["preserve", "always", "never"],
+      isStrictEnum: true,
       defaultValue: "preserve",
       isInternal: true,
     },
@@ -172,6 +180,7 @@ export const AppMd = createMetadata({
       description: "URL canonicalisation query-parameter ordering policy.",
       valueType: "string",
       availableValues: ["preserve", "alphabetical"],
+      isStrictEnum: true,
       defaultValue: "preserve",
       isInternal: true,
     },
@@ -179,6 +188,7 @@ export const AppMd = createMetadata({
       description: "Action taken when the current URL is not canonical.",
       valueType: "string",
       availableValues: ["warn", "rewrite", "redirect"],
+      isStrictEnum: true,
       defaultValue: "warn",
       isInternal: true,
     },

@@ -50,6 +50,17 @@ const userSelectValues: PropertyValueDescription[] = [
 export const TableMd = createMetadata({
   status: "stable",
   description: "`Table` presents structured data for viewing, sorting, selection, and interaction.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
+  contextVars: {
+    $item: d("The complete data row object being rendered."),
+    $itemIndex: d("Zero-based index of the row in the data array."),
+    $cell: d("The value of the current cell for this column."),
+    $colIndex: d("Zero-based index of the current column."),
+    $row: d("The complete data row object being rendered (alias of `$item`)."),
+    $rowIndex: d("Zero-based row index (alias of `$itemIndex`)."),
+  },
   // NOTE: let's leave it like this for now, we'll expand later when the need arises
   parts: {
     table: {
@@ -326,6 +337,7 @@ export const TableMd = createMetadata({
         `It can be set to \`top\`, \`center\`, or \`bottom\`.`,
       valueType: "string",
       availableValues: ["top", "center", "bottom"],
+      isStrictEnum: true,
       defaultValue: defaultProps.cellVerticalAlign,
     },
     checkboxTolerance: {
@@ -405,7 +417,10 @@ export const TableMd = createMetadata({
     },
   },
   events: {
-    contextMenu: dContextMenu(COMP),
+    contextMenu: {
+      injectedVars: ["$item", "$row", "$rowIndex", "$itemIndex"],
+      ...dContextMenu(COMP),
+    },
     sortingDidChange: {
       description:
         `This event is fired when the table data sorting has changed. It has two arguments: ` +

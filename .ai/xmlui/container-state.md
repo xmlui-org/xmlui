@@ -33,7 +33,7 @@ An `id` attribute alone does NOT create a container.
 | 1 | Parent state | `extractScopedState(parentState, node.uses)` | — |
 | 2 | Component reducer state | `useReducer(containerReducer, {})` | Yes |
 | 3 | Component APIs | `mergeComponentApis(componentState, componentApis)` — uses `Symbol.description` (= `id` string) as state key | Yes |
-| 4 | Context variables | `useCombinedState(layers 1–3, node.contextVars, routingParams)` — `$item`, `$itemIndex`, `$pathname`, `$routeParams` | Yes |
+| 4 | Context variables | `useCombinedState(layers 1–3, node.contextVars, routingParams)` — injected `$xxx` vars (must be declared in metadata) | Yes |
 | 5 | Local variables (two-pass) | `useVars()` called twice (pre-resolve + final resolve) | Yes |
 | 6 | Global variables | `useGlobalVariables(parentGlobalVars, node.globalVars, node.functions, componentStateWithApis)` | Yes |
 
@@ -187,7 +187,7 @@ Cycle-safe (uses visited set). Used in layer 5 to determine which variables must
 ## Key Behavioural Rules
 
 - Children receive `parentState` as a reference prop, not a copy. Only the owning container's reducer mutates; children see the new reference on re-render.
-- In an `Items` component, each row gets its own context object (`$item`, `$itemIndex`). Changing one row never affects another.
+- Components can dynamically inject their own context variables (e.g. `Items` injects `$item`). Changing one row never affects another.
 - Globals are stored in the root container's reducer and passed down as `parentGlobalVars`. There is one source of truth.
 
 ## Key Files

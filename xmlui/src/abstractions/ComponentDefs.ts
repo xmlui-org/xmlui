@@ -101,12 +101,59 @@ export interface ComponentDefCore {
   uses?: string[];
 
   /**
+   * Automatically computed minimal set of parent state names actually used
+   * within this node's subtree. Populated by `computeUsesForTree()` at
+   * transform/boot time. Ignored when `uses` is explicitly defined.
+   */
+  computedUses?: string[];
+
+  /**
+   * Automatically computed minimal set of Globals.xs variable names actually
+   * read within this node's subtree. Populated by `computeUsesForTree()` at
+   * transform/boot time alongside `computedUses`.
+   *
+   * Used at runtime to narrow the `parentGlobalVars` object passed to a
+   * container so that only the globals the subtree actually reads are
+   * forwarded. This prevents re-renders when unrelated global variables
+   * change (e.g. a `sortBy` change must not re-render a component that only
+   * reads `events`).
+   *
+   * Globals.xs **functions** are always included in the narrowed object at
+   * runtime regardless of this list (see `narrowGlobalVars` in
+   * `ContainerUtils.ts`).
+   */
+  computedGlobalUses?: string[];
+
+  /**
    * Arbitrary debug information that can be attached to a component definition.
    * Current usage:
    * - `debug: { source: { start: number, end: number } }` The start and end
    *   positions of the source belonging to the particular component definition.
    */
   debug?: Record<string, any>;
+
+  /**
+   * Internal: snapshot of `vars` preserved when a component is wrapped in a
+   * Container by `getWrappedWithContainer` in `ContainerWrapper.tsx`. Wrapping
+   * moves `vars` onto the Container, but components doing two-pass rendering
+   * (currently `ModalDialog`) need the original definitions so they can
+   * re-resolve them in a child scope where dynamic context variables (e.g.
+   * `$param`) are visible.
+   *
+   * Producer: `ContainerWrapper.getWrappedWithContainer`.
+   * Consumer: `ModalDialog`'s custom renderer.
+   */
+  _savedVarDefs?: Record<string, any>;
+
+  /**
+   * Internal: snapshot of `functions` preserved when a component is wrapped
+   * in a Container by `getWrappedWithContainer`. See `_savedVarDefs` for the
+   * full rationale.
+   *
+   * Producer: `ContainerWrapper.getWrappedWithContainer`.
+   * Consumer: `ModalDialog`'s custom renderer.
+   */
+  _savedFunctionDefs?: Record<string, any>;
 }
 // This interface represents the properties of a component definition.
 export interface ComponentDef<TMd extends ComponentMetadata = ComponentMetadata>
@@ -326,9 +373,20 @@ export type ComponentPropertyMetadata = {
   // extractValue, enabling XMLUI resource path resolution (e.g. relative paths).
   readonly isResourceUrl?: boolean;
 
-  // This field defines the available values of the property. The rendering engine
-  // uses this information to validate the property value.
+  // This field defines the available values of the property. Used for IDE
+  // autocompletion and documentation. NOT used for runtime validation unless
+  // `isStrictEnum` is also set to `true`.
   readonly availableValues?: readonly PropertyValueDescription[];
+
+  // When true, `availableValues` is treated as a strict closed enum: any value
+  // outside the list triggers a `value-not-in-enum` diagnostic. When false or
+  // absent, `availableValues` is hints-only (autocomplete + docs) and custom
+  // values are silently accepted.
+  //
+  // Use `isStrictEnum: true` ONLY when no value outside the list can ever be
+  // meaningful (e.g. `validationStatus`, `overflowMode`). Never set it for
+  // size/variant props that accept arbitrary CSS values or custom theme tokens.
+  readonly isStrictEnum?: boolean;
 
   // This field defines the default value of the property. The rendering engine uses
   // this information to set the default value of the property.
@@ -447,6 +505,11 @@ export type ComponentEventMetadata = {
   // is the parameter name, and the value is its description.
   readonly parameters?: Record<string, string>;
 
+  /**
+   * Names of variables that XMLUI runtime injects into THIS event's handler scope.
+   */
+  readonly injectedVars?: readonly string[];
+
   /** Versioning lifecycle metadata (plan #12). See `ComponentPropertyMetadata`. */
   deprecationMessage?: string;
   deprecatedSince?: string;
@@ -556,6 +619,26 @@ export type ComponentMetadata<
   // Describes the individual parts that make up the component
   parts?: Record<string, ComponentPartMetadata>;
 
+  /**
+   * Names of variables that this component injects into the SCOPE OF ITS
+   * CHILDREN at render time (via per-render contextVars, not parent state).
+   *
+   * The computedUses optimizer adds these to the child scope so children
+   * don't treat them as parent-state dependencies.
+   *
+   * Example: `List` injects `$item`, `$itemIndex`, `$isFirst`, `$isLast`,
+   * so a template like `<Text value="{$item.name}" />` doesn't register
+   * `$item` as a parent dependency.
+   */
+  /**
+   * Names of variables that are injected, but whose values are unstable
+   * across re-renders (re-created objects, etc.). Acts like `contextVars`
+   * for static analysis locally (ignoring them), but flags them to be
+   * EXCLUDED from implicit pass-through into deep container scopes to
+   * maintain `React.memo` stability.
+   */
+  unstableChildInjectedVars?: readonly string[];
+
   // The name of the default part. Layout properties will be applied to this part by default.
   defaultPart?: string;
 
@@ -570,6 +653,14 @@ export type ComponentMetadata<
 
   // Optional message to display if the component is deprecated
   deprecationMessage?: string;
+
+  /**
+   * Indicates that the component should be treated as an implicit container
+   * by the computedUses optimizer even if it doesn't have vars/loaders.
+   * Typically used for "heavy" components (List, Table, Select) to provide
+   * a React.memo shield against unrelated parent state changes.
+   */
+  isImplicitContainerByDefault?: boolean;
 
   /**
    * Versioning lifecycle metadata for the component as a whole
@@ -654,6 +745,36 @@ export type ComponentMetadata<
       | "complementary"
       | "search";
   };
+};
+
+/**
+ * Strict subset of ComponentMetadata fields read by the computedUses optimizer.
+ * Use this type (instead of `any`) for metadata lookup functions to document
+ * exactly which fields the optimizer consumes and prevent accidental coupling
+ * to unrelated metadata.
+ */
+export type OptimizerMetadataView = {
+  isImplicitContainerByDefault?: boolean;
+  unstableChildInjectedVars?: readonly string[];
+  contextVars?: Record<string, unknown>;
+  /**
+   * `description` is included so that both `ComponentEventMetadata` and
+   * `ComponentPropertyMetadata` are structurally assignable here (both carry a
+   * required `description` field). The optimizer only reads `injectedVars`.
+   */
+  events?: Record<string, { description?: string; injectedVars?: readonly string[] }>;
+  /**
+   * Global variable names (from Globals.xs) read inside this compound component's
+   * body. Populated during the two-pass analysis in recomputeUsesForApp so that
+   * ancestors can include these in their own computedGlobalUses, ensuring
+   * ComponentWrapper propagates globalVars updates through the chain.
+   *
+   * Without this, a compound component whose body reads a global (e.g.
+   * InProgressPanel reading isFileOperationInProgress) is opaque to ancestor
+   * analyzers — after §11 clears hasUnresolvableImports and enables narrowing,
+   * ancestors omit the global from computedGlobalUses, blocking re-renders.
+   */
+  globalDepsUsed?: ReadonlySet<string>;
 };
 
 export interface ParentRenderContext {

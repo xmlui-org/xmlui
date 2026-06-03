@@ -56,12 +56,14 @@ export const TooltipMd = createMetadata({
       description: "The preferred side of the trigger to render against when open",
       valueType: "string",
       availableValues: ["top", "right", "bottom", "left"],
+      isStrictEnum: true,
       defaultValue: defaultProps.side,
     },
     align: {
       description: "The preferred alignment against the trigger",
       valueType: "string",
       availableValues: ["start", "center", "end"],
+      isStrictEnum: true,
       defaultValue: defaultProps.align,
     },
     sideOffset: {

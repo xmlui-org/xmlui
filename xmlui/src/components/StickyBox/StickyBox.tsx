@@ -18,6 +18,7 @@ export const StickyBoxMd = createMetadata({
         "This property determines whether the StickyBox should be anchored to " +
         "the \`top\` or \`bottom\`.",
       availableValues: ["top", "bottom"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.to,
     },

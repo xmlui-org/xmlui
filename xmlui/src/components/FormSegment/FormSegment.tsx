@@ -27,6 +27,7 @@ export const FormSegmentMd = createMetadata({
         'or "horizontal" for an HStack. Layout properties (width, height, padding, gap, backgroundColor, ' +
         "etc.) are transposed to this container.",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: "vertical",
     },

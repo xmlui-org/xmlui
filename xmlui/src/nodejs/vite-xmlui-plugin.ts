@@ -14,7 +14,12 @@ import { clearAllModuleCaches } from "../parsers/scripting/ModuleCache";
 import type { ModuleFetcher } from "../parsers/scripting/types";
 import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import * as fs from "fs/promises";
-import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
+import {
+  errReportComponent,
+  xmlUiMarkupToComponent,
+} from "../components-core/xmlui-parser";
+import { getOptimizerMetadata } from "../components-core/optimization/metadataLookup";
+import { coreComponentMetadata } from "../components-core/coreComponentMetadata";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import { analyze } from "../components-core/analyzer/walker";
 import {
@@ -26,8 +31,9 @@ import {
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
 import { verifyComponentDef } from "../components-core/type-contracts/verifier";
-import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
-import collectedComponentMetadata from "../language-server/xmlui-metadata-generated.js";
+import type { ComponentDef, ComponentMetadata, OptimizerMetadataView } from "../abstractions/ComponentDefs";
+import { metadataRegistry } from "../language-server/metadataRegistry";
+import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -95,6 +101,22 @@ export type PluginOptions = {
    * Defaults to the built-in component metadata.
    */
   typeContractRegistry?: ReadonlyMap<string, ComponentMetadata>;
+  /**
+   * Additional directories to scan for optimizer metadata at build time.
+   * Use this for extension packages that contribute container-like components
+   * with `contextVars` or event `injectedVars`. Each entry must be an
+   * absolute path to a directory containing `.tsx` component source files
+   * with `createMetadata` calls.
+   *
+   * Built-in xmlui components are always included automatically via
+   * `collectedComponentMetadata`; only add dirs for external extension packages.
+   *
+   * @example
+   * viteXmluiPlugin({
+   *   optimizerSourceDirs: [resolve(__dirname, "node_modules/my-extension/src/components")],
+   * })
+   */
+  optimizerSourceDirs?: string[];
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -114,7 +136,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   const typeContractMode: AnalyzeMode = pluginOptions.typeContracts ?? "warn";
   const typeContractRegistry =
     pluginOptions.typeContractRegistry ??
-    new Map(Object.entries(collectedComponentMetadata) as [string, ComponentMetadata][]);
+    new Map(Object.entries(metadataRegistry) as [string, ComponentMetadata][]);
   // Dedupe cycle reports across multiple transform calls / HMR within a
   // single dev-server lifetime, so the same cycle is not warned twice.
   const reportedCycles = new Set<string>();
@@ -128,6 +150,52 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
+
+  // Build optimizer metadata lookup for extension packages.
+  // When optimizerSourceDirs are provided, scan them and merge with the built-in
+  // collectedComponentMetadata. Pass undefined when no extension dirs exist, letting
+  // xmlUiMarkupToComponent use its default (also collectedComponentMetadata-based).
+  let extensionMetadataLookup: ((type: string) => OptimizerMetadataView | undefined) | undefined;
+  if (pluginOptions.optimizerSourceDirs && pluginOptions.optimizerSourceDirs.length > 0) {
+    const extensionMetadata: Record<string, OptimizerMetadataView> = {};
+    for (const dir of pluginOptions.optimizerSourceDirs) {
+      let incoming: Record<string, any>;
+      try {
+        incoming = extractOptimizerMetadataFromDir(dir);
+      } catch (err) {
+        // Non-fatal when the directory simply doesn't exist; re-throw genuine errors.
+        const code = (err as NodeJS.ErrnoException).code;
+        if (code === "ENOENT" || code === "ENOTDIR") {
+          console.warn(`[xmlui] optimizerSourceDirs: directory not found, skipping: ${dir}`);
+          continue;
+        }
+        throw new Error(
+          `[xmlui] optimizerSourceDirs: failed to scan "${dir}": ${(err as Error).message}`,
+        );
+      }
+      // Warn on key collisions — last-dir-wins but the developer should know.
+      for (const key of Object.keys(incoming)) {
+        if (key in extensionMetadata) {
+          console.warn(
+            `[xmlui] optimizerSourceDirs: component "${key}" declared in multiple dirs; last-dir-wins.`,
+          );
+        }
+        // Extension components silently shadow built-ins on lookup
+        // (extensionMetadata is checked before getOptimizerMetadata). Warn explicitly so
+        // a typo like declaring `List` in an extension doesn't quietly override
+        // the built-in metadata that real XMLUI markup depends on.
+        if (key in coreComponentMetadata || key in (metadataRegistry as object)) {
+          console.warn(
+            `[xmlui] optimizerSourceDirs: extension component "${key}" shadows a built-in; the built-in optimizer metadata will be ignored.`,
+          );
+        }
+      }
+      Object.assign(extensionMetadata, incoming);
+    }
+    // Merged lookup: extension packages first, then built-in components (including DataLoader).
+    extensionMetadataLookup = (type: string) =>
+      extensionMetadata[type] ?? getOptimizerMetadata(type);
+  }
 
   return {
     name: "vite:transform-xmlui",
@@ -191,7 +259,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         }
 
         let { component, errors, warnings, erroneousCompoundComponentName } =
-          xmlUiMarkupToComponent(code, fileId, codeBehind);
+          xmlUiMarkupToComponent(code, fileId, codeBehind, extensionMetadataLookup);
         if (errors.length > 0) {
           component = errReportComponent(errors, id, erroneousCompoundComponentName);
         }

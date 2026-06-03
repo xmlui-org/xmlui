@@ -1,6 +1,8 @@
-import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef, OptimizerMetadataView } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
+import { computeUsesForTree } from "./optimization/computedUses";
+import { getOptimizerMetadata } from "./optimization/metadataLookup";
 import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText } from "../parsers/xmlui-parser/parser";
 import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";
@@ -33,11 +35,12 @@ export function xmlUiMarkupToComponent(
   source: string,
   fileId: string | number = 0,
   preResolvedImports?: CollectedDeclarations,
+  metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
 ): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   const cursor = new DocumentCursor(source);
-  
+
   if (errors.length > 0) {
     const errorsToDisplay = errors.map((err) => {
       return errorWithDisplayFields(err, cursor, source);
@@ -54,6 +57,9 @@ export function xmlUiMarkupToComponent(
   try {
     const warnings: string[] = [];
     const component = nodeToComponentDef(node, getText, fileId, preResolvedImports, warnings, cursor);
+    if (component) {
+      computeUsesForTree(component as ComponentDef, metadataLookup ?? getOptimizerMetadata);
+    }
     const transformResult = { component, errors: [], warnings };
     return transformResult;
   } catch (e) {

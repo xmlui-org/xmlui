@@ -1,6 +1,6 @@
 import { defaultProps } from "./RadarChart.defaults";
 import { RadarChart } from "./RadarChartReact";
-import { wrapComponent, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata, d } from "xmlui";
 
 const COMP = "RadarChart";
 
@@ -8,7 +8,7 @@ export const RadarChartMd = createMetadata({
   status: "experimental",
   description: "Interactive radar chart for displaying multivariate data in a two-dimensional chart of three or more quantitative variables",
   docFolder: "Charts/RadarChart",
-  
+
   props: {
     data: {
       description:
@@ -78,17 +78,17 @@ export const RadarChartMd = createMetadata({
       description: "This property allows replacing the default template to display a tooltip.",
     },
   },
-  
+
   events: {
     // Standard chart events - customize based on chart type
   },
-  
+
   apis: {
     // Chart-specific APIs if needed
   },
-  
+
   contextVars: {
-    // Add context variables if needed
+    $tooltip: d("Context variable available inside tooltipTemplate."),
   },
 });
 

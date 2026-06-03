@@ -13,6 +13,8 @@ import type { ContainerDispatcher } from "../abstractions/ComponentRenderer";
 import type { ProxyAction } from "../rendering/buildProxy";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { StateContainer } from "./StateContainer";
+import { useShallowCompareMemoize } from "../utils/hooks";
+import { isContainerLike as isContainerLikeShared } from "./ContainerUtils";
 import type { UdcContract } from "../udc-sandbox";
 
 /**
@@ -56,23 +58,17 @@ export type ComponentCleanupFn = (uid: symbol) => void;
  * This function checks if a particular component needs a wrapping container to
  * manage its internal state, which is closed from its external context but
  * available to its children.
+ *
+ * Delegates to the shared {@link isContainerLikeShared} predicate in
+ * `ContainerUtils.ts` (non-strict mode = runtime semantics). The static
+ * analysis in `computedUses.ts` calls the same helper with `strict: true` to
+ * unify the two definitions that used to live in separate files.
+ *
  * @param node The component definition node to check
- * @returns Tru, if the component needs a wrapping container
+ * @returns true, if the component needs a wrapping container
  */
 export function isContainerLike(node: ComponentDef) {
-  if (node.type === "Container") {
-    return true;
-  }
-
-  // --- If any of the following properties have a value, we need a container
-  return !!(
-    node.loaders ||
-    node.vars ||
-    node.uses ||
-    node.contextVars ||
-    node.functions ||
-    node.scriptCollected
-  );
+  return isContainerLikeShared(node);
 }
 
 /**
@@ -151,6 +147,10 @@ type Props = {
   node: ContainerWrapperDef;
   resolvedKey?: string;
   parentState: ContainerState;
+  /** Stable ref holding the full un-narrowed parent state for event handler scope.
+   *  Using a ref (not a value) keeps ContainerWrapper.memo stable when unrelated
+   *  parent state changes, preserving the computedUses render optimization. */
+  fullParentStateRef?: MutableRefObject<ContainerState | undefined>;
   parentGlobalVars?: Record<string, any>;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
@@ -172,6 +172,7 @@ export const ContainerWrapper = memo(
       node,
       resolvedKey,
       parentState,
+      fullParentStateRef,
       parentGlobalVars,
       parentStatePartChanged,
       parentRegisterComponentApi,
@@ -184,8 +185,16 @@ export const ContainerWrapper = memo(
     }: Props,
     ref,
   ) {
+    // Stabilise the node reference before wrapping. ComponentWrapper may produce a
+    // new object identity for nodeWithTransformedDatasourceProp (e.g. when
+    // transformNodeWithDataProp or transformNodeWithRawDataProp re-runs) even though
+    // all top-level fields are the same values. Without stabilisation,
+    // getWrappedWithContainer runs again and StateContainer.memo sees a new `node`
+    // prop — triggering an unnecessary full re-render of the container subtree.
+    const stableNode = useShallowCompareMemoize(node);
+
     // --- Make sure the component node is wrapped with a container
-    const containerizedNode = useMemo(() => getWrappedWithContainer(node), [node]);
+    const containerizedNode = useMemo(() => getWrappedWithContainer(stableNode), [stableNode]);
 
     return (
       <ErrorBoundary node={node} location={"container"}>
@@ -193,6 +202,7 @@ export const ContainerWrapper = memo(
           node={containerizedNode as any}
           resolvedKey={resolvedKey}
           parentState={parentState}
+          fullParentStateRef={fullParentStateRef}
           parentGlobalVars={parentGlobalVars}
           parentStatePartChanged={parentStatePartChanged}
           parentRegisterComponentApi={parentRegisterComponentApi}
@@ -200,7 +210,7 @@ export const ContainerWrapper = memo(
           parentRenderContext={parentRenderContext}
           layoutContextRef={layoutContextRef}
           uidInfoRef={uidInfoRef}
-          isImplicit={isImplicitContainer(node, containerizedNode)}
+          isImplicit={isImplicitContainer(stableNode, containerizedNode)}
           ref={ref}
           {...rest}
         >
@@ -240,6 +250,13 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
   delete (wrappedNode.props as any)?.uses;
   delete wrappedNode.api;
   delete wrappedNode.contextVars;
+  // computedUses is moved to the container so the StateContainer can use it for
+  // state scoping. It must be removed from wrappedNode to prevent isContainerLike
+  // from returning true again for the inner node, which would cause infinite wrapping.
+  delete wrappedNode.computedUses;
+  // computedGlobalUses follows the same move-and-delete pattern so ComponentWrapper
+  // can read it off the container node when narrowing parentGlobalVars.
+  delete wrappedNode.computedGlobalUses;
 
   // --- Do the wrapping
   return {
@@ -258,6 +275,8 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
     apiBoundContainer: node?.apiBoundContainer,
     udcContract: node?.udcContract,
     contextVars: node.contextVars,
+    computedUses: node.computedUses,
+    computedGlobalUses: node.computedGlobalUses,
     props: {
       debug: (node as any).debug || (node.props as any)?.debug,
     },

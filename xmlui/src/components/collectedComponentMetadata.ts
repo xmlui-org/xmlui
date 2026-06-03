@@ -1,3 +1,4 @@
+import { metadataRegistry } from "../language-server/metadataRegistry";
 import { ButtonMd } from "./Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "./Stack/Stack";
 import { PasswordMd, TextBoxMd } from "./TextBox/TextBox";
@@ -192,6 +193,7 @@ import {
   XmlUiWebThemeDefinition,
 } from "../components-core/theming/themes/xmlui";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
+import { FallbackMd } from "./Fallback/Fallback";
 import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
 import { TimeInputMd } from "./TimeInput/TimeInput";
@@ -208,7 +210,7 @@ import { DrawerMd } from "./Drawer/Drawer";
 import { TileGridMd } from "./TileGrid/TileGrid";
 import { FormSegmentMd } from "./FormSegment/FormSegment";
 
-export const collectedComponentMetadata = {
+Object.assign(metadataRegistry, {
   // --- HTML tags
   a: HtmlAMd,
   address: HtmlAddressMd,
@@ -338,6 +340,7 @@ export const collectedComponentMetadata = {
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
   ExpandableItem: ExpandableItemMd,
+  Fallback: FallbackMd,
   FileInput: FileInputMd,
   FileUploadDropZone: FileUploadDropZoneMd,
   FlowLayout: FlowLayoutMd,
@@ -418,7 +421,8 @@ export const collectedComponentMetadata = {
   NavPanelCollapseButton: NavPanelCollapseButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
-};
+});
+export const collectedComponentMetadata = metadataRegistry;
 
 export const collectedThemes: Record<string, ThemeDefinition> = {
   root: RootThemeDefinition,

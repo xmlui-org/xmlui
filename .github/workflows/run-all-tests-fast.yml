@@ -46,6 +46,8 @@ jobs:
         run: npm run build-xmlui
       - name: check XMLUI metadata drift
         run: npm --prefix xmlui run check:metadata
+      - name: Check metadata snapshot is up to date
+        run: npm --prefix xmlui run check:metadata-snapshot
       - name: run tests
         run: npm run test
       - name: run integration tests

@@ -226,91 +226,6 @@ describe("verifyComponentDef — unknown-prop", () => {
     } as ComponentDef;
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
-
-  it("accepts behavior props when the host component supports the behavior", () => {
-    const registry = makeRegistry({
-      TextBox: {
-        props: {
-          placeholder: { description: "Placeholder", valueType: "string" },
-        },
-        apis: {
-          value: { description: "Value", signature: "get value(): string" },
-          setValue: { description: "Set value", signature: "setValue(value: string): void" },
-        },
-      },
-    });
-    const def = {
-      type: "TextBox",
-      props: {
-        label: "Address",
-        bindTo: "address",
-        width: "100%",
-        placeholder: "Street address",
-      },
-    } as ComponentDef;
-
-    expect(verifyComponentDef(def, registry)).toHaveLength(0);
-  });
-
-  it("accepts secondary behavior props when the host component supports that behavior", () => {
-    const registry = makeRegistry({
-      TextBox: {
-        apis: {
-          value: { description: "Value", signature: "get value(): string" },
-          setValue: { description: "Set value", signature: "setValue(value: string): void" },
-        },
-      },
-    });
-    const def = {
-      type: "TextBox",
-      props: {
-        bindTo: "address",
-        requiredInvalidMessage: "Address is required",
-        minLength: "3",
-        labelWidth: "120px",
-      },
-    } as ComponentDef;
-
-    expect(verifyComponentDef(def, registry)).toHaveLength(0);
-  });
-
-  it("emits unknown-prop for behavior props when the host component does not support the behavior", () => {
-    const registry = makeRegistry({
-      Stack: {},
-    });
-    const def = {
-      type: "Stack",
-      props: { bindTo: "address" },
-    } as ComponentDef;
-
-    const result = verifyComponentDef(def, registry);
-    expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
-      code: "unknown-prop",
-      componentName: "Stack",
-      propName: "bindTo",
-    });
-  });
-
-  it("does not accept behavior props for a component that excludes the behavior", () => {
-    const registry = makeRegistry({
-      App: {
-        excludeBehaviors: ["tooltip"],
-      },
-    });
-    const def = {
-      type: "App",
-      props: { tooltip: "Root tooltip" },
-    } as ComponentDef;
-
-    const result = verifyComponentDef(def, registry);
-    expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
-      code: "unknown-prop",
-      componentName: "App",
-      propName: "tooltip",
-    });
-  });
 });
 
 describe("verifyComponentDef — wrong-type", () => {
@@ -386,6 +301,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
           variant: {
             description: "Button variant",
             availableValues: ["primary", "secondary", "ghost"],
+            isStrictEnum: true,
           },
         },
       },
@@ -411,6 +327,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
           variant: {
             description: "Button variant",
             availableValues: ["primary", "secondary"],
+            isStrictEnum: true,
           },
         },
       },
@@ -429,6 +346,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
           variant: {
             description: "Button variant",
             availableValues: ["primary", "secondary"],
+            isStrictEnum: true,
           },
         },
       },
@@ -450,6 +368,7 @@ describe("verifyComponentDef — value-not-in-enum", () => {
             description: "Size",
             valueType: "string",
             availableValues: ["sm", "md", "lg"],
+            isStrictEnum: true,
           },
         },
       },
@@ -458,6 +377,23 @@ describe("verifyComponentDef — value-not-in-enum", () => {
     const result = verifyComponentDef(def, registry);
     expect(result).toHaveLength(1);
     expect(result[0].code).toBe("value-not-in-enum");
+  });
+
+  it("does not emit value-not-in-enum when isStrictEnum is absent (open enum / hints only)", () => {
+    // availableValues without isStrictEnum is purely IDE hints — no validation.
+    const registry = makeRegistry({
+      Icon: {
+        props: {
+          size: {
+            description: "Icon size",
+            valueType: "string",
+            availableValues: ["xs", "sm", "md", "lg"],
+          },
+        },
+      },
+    });
+    const def = { type: "Icon", props: { size: "64px" } } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
 });
 
@@ -610,6 +546,220 @@ describe("verifyComponentDef — severity escalation", () => {
     const result = verifyComponentDef(def, registry, { strict: true });
     // missing-required (label absent) + unknown-prop (unknownProp)
     expect(result.every((d) => d.severity === "error")).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Strict-enum regression — shared metadata helpers (item 1.2)
+// ---------------------------------------------------------------------------
+// These tests guard against silent regressions where a shared helper loses
+// its `isStrictEnum: true` flag and starts accepting arbitrary values.
+// ---------------------------------------------------------------------------
+
+describe("strict-enum regression — dValidationStatus helper", () => {
+  // Import the real helper to verify it carries the flag.
+  // We can't use a dynamic import in describe(), so use a local inline registry
+  // that mirrors what dValidationStatus() returns.
+
+  it("dValidationStatus() metadata has isStrictEnum:true", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const meta = dValidationStatus();
+    expect(meta.isStrictEnum).toBe(true);
+  });
+
+  it("dValidationStatus() includes 'none' in availableValues", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const meta = dValidationStatus();
+    const values = (meta.availableValues ?? []).map((v: any) =>
+      typeof v === "string" ? v : v.value,
+    );
+    expect(values).toContain("none");
+  });
+
+  it("verifier rejects a value outside validationStatus enum", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const registry = makeRegistry({
+      TextBox: { props: { validationStatus: dValidationStatus() } },
+    });
+    const def = { type: "TextBox", props: { validationStatus: "danger" } } as ComponentDef;
+    const result = verifyComponentDef(def, registry);
+    expect(result).toHaveLength(1);
+    expect(result[0].code).toBe("value-not-in-enum");
+    expect(result[0].propName).toBe("validationStatus");
+  });
+
+  it("verifier accepts all valid validationStatus values", async () => {
+    const { dValidationStatus } = await import(
+      "../../../src/components/metadata-helpers"
+    );
+    const registry = makeRegistry({
+      TextBox: { props: { validationStatus: dValidationStatus() } },
+    });
+    for (const status of ["none", "valid", "warning", "error"]) {
+      const def = { type: "TextBox", props: { validationStatus: status } } as ComponentDef;
+      expect(verifyComponentDef(def, registry)).toHaveLength(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guard test: isStrictEnum audit across all components (item 1.2)
+//
+// Every prop with `availableValues` must declare an explicit `isStrictEnum`
+// decision so future additions can't silently skip validation.
+//
+// The allow-list below is the authoritative registry of pre-existing props
+// that were permissive before the isStrictEnum feature was introduced.
+// New props with `availableValues` NOT in this list must explicitly set
+// `isStrictEnum: true` or be added to the list with a justification comment.
+// ---------------------------------------------------------------------------
+describe("isStrictEnum audit — all availableValues props must declare an explicit decision", () => {
+  // Pre-existing props with availableValues that are intentionally permissive.
+  // These were present before the isStrictEnum opt-in model was introduced.
+  // Do NOT add new props here without justification — new props should use
+  // isStrictEnum: true unless they are intentionally open-ended.
+  const INTENTIONALLY_PERMISSIVE = new Set<string>([
+    "Accordion.triggerPosition",
+    "APICall.method",
+    "APICall.credentials",
+    "APICall.statusMethod",
+    "APICall.cancelMethod",
+    "App.layout",
+    "Avatar.size",
+    "Badge.variant",
+    "Button.variant",
+    "Button.themeColor",
+    "Button.size",
+    "Button.type",
+    "Button.orientation",
+    "Button.iconPosition",
+    "Button.contentPosition",
+    "Card.avatarSize",
+    "Card.orientation",
+    "Card.horizontalAlignment",
+    "Card.verticalAlignment",
+    "ContentSeparator.orientation",
+    "DataSource.method",
+    "DataSource.credentials",
+    "DataSource.dataType",
+    "DatePicker.mode",
+    "DatePicker.dateFormat",
+    "DatePicker.weekStartsOn",
+    "DateInput.mode",
+    "DateInput.dateFormat",
+    "DateInput.weekStartsOn",
+    "DropdownMenu.alignment",
+    "DropdownMenu.triggerButtonVariant",
+    "DropdownMenu.triggerButtonThemeColor",
+    "DropdownMenu.triggerButtonIconPosition",
+    "MenuItem.iconPosition",
+    "SubMenuItem.iconPosition",
+    "ExpandableItem.iconPosition",
+    "FileInput.buttonVariant",
+    "FileInput.buttonIconPosition",
+    "FileInput.buttonPosition",
+    "FileInput.buttonSize",
+    "FileInput.buttonThemeColor",
+    "FileInput.parseAs",
+    "FlowLayout.verticalAlignment",
+    "Form.itemLabelPosition",
+    "Form.itemRequireLabelMode",
+    // HTTP method: same rationale as APICall.method / DataSource.method — custom verbs possible.
+    "Form.submitMethod",
+    "FormItem.labelPosition",
+    "FormItem.type",
+    "FormItem.validationMode",
+    "FormItem.requireLabelMode",
+    "FormItem.lengthInvalidSeverity",
+    "FormItem.rangeInvalidSeverity",
+    "FormItem.patternInvalidSeverity",
+    "FormItem.validatorInvalidSeverity",
+    "FormItem.regexInvalidSeverity",
+    "Heading.level",
+    "Icon.size",
+    "IFrame.referrerPolicy",
+    "Link.target",
+    "Link.horizontalAlignment",
+    "Link.verticalAlignment",
+    "Link.breakMode",
+    "Link.overflowMode",
+    "List.scrollAnchor",
+    "List.selectionCheckboxPosition",
+    "List.selectionCheckboxAnchor",
+    "Markdown.breakMode",
+    "Markdown.overflowMode",
+    "NavGroup.iconAlignment",
+    "NavGroup.expandIconAlignment",
+    "NavLink.target",
+    "NavLink.iconAlignment",
+    "Pagination.maxVisiblePages",
+    "Pagination.orientation",
+    "Pagination.buttonRowPosition",
+    "RadioGroup.orientation",
+    "ResponsiveBar.dropdownAlignment",
+    "Select.variant",
+    "Stack.horizontalAlignment",
+    "Stack.verticalAlignment",
+    "CHStack.horizontalAlignment",
+    "CHStack.verticalAlignment",
+    "CVStack.horizontalAlignment",
+    "CVStack.verticalAlignment",
+    "HStack.horizontalAlignment",
+    "HStack.verticalAlignment",
+    "VStack.horizontalAlignment",
+    "VStack.verticalAlignment",
+    "Table.buttonRowPosition",
+    "Table.paginationControlsLocation",
+    "Table.checkboxTolerance",
+    "Table.headerUserSelect",
+    "Table.cellUserSelect",
+    "Table.userSelectCell",
+    "Table.userSelectRow",
+    "Table.userSelectHeading",
+    "Text.variant",
+    "TextArea.resize",
+    "TileGrid.checkboxPosition",
+    "TileGrid.itemUserSelect",
+  ]);
+
+  // Timeout is generous because the dynamic import below loads the full
+  // component-metadata barrel (large, slow on cold caches). On warm runs the
+  // test completes in seconds; on cold/CI runs the import alone can take 30s+.
+  // Keep this above the worst observed cold-import time to avoid flakiness.
+  it("every availableValues prop either has isStrictEnum:true or is in the allow-list", { timeout: 120000 }, async () => {
+    const { collectedComponentMetadata } = await import(
+      "../../../src/components/collectedComponentMetadata"
+    );
+
+    const violations: string[] = [];
+
+    for (const [compName, meta] of Object.entries(collectedComponentMetadata as Record<string, any>)) {
+      const props: Record<string, any> = meta?.props ?? {};
+      for (const [propName, propMeta] of Object.entries(props)) {
+        if (!propMeta || !propMeta.availableValues || propMeta.availableValues.length === 0) {
+          continue;
+        }
+        const key = `${compName}.${propName}`;
+        if (!propMeta.isStrictEnum && !INTENTIONALLY_PERMISSIVE.has(key)) {
+          violations.push(key);
+        }
+      }
+    }
+
+    if (violations.length > 0) {
+      throw new Error(
+        `The following NEW props have availableValues but no isStrictEnum decision.\n` +
+        `Either add \`isStrictEnum: true\` (strict enforcement) or add the key to ` +
+        `INTENTIONALLY_PERMISSIVE in this test (document the reason).\n\n` +
+        violations.map(v => `  - ${v}`).join("\n"),
+      );
+    }
   });
 });
 

@@ -13,6 +13,7 @@ const metadata: ComponentMetadata = {
       description: "Variant",
       valueType: "string",
       availableValues: ["solid", "ghost"],
+      isStrictEnum: true,
     },
   },
   events: {},

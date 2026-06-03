@@ -11,6 +11,7 @@ import {
   dEnabled,
   dGotFocus,
   dInitialValue,
+  dInternal,
   dLostFocus,
   dOrientation,
   dReadonly,
@@ -37,6 +38,10 @@ export const RadioGroupMd = createMetadata({
     label: {
       description: "The label displayed for the radio group.",
     }
+  },
+  contextVars: {
+    $checked: dInternal("Current checked state, injected into the option template."),
+    $setChecked: dInternal("Setter for the checked state, injected into the option template."),
   },
   props: {
     initialValue: {
