@@ -217,6 +217,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/I18n",
+          "label": "I18n",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/IFrame",
           "label": "IFrame",
           "icon": "component"

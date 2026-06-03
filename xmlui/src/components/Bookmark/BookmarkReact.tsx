@@ -6,6 +6,7 @@ import classnames from "classnames";
 import styles from "./Bookmark.module.scss";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { defaultProps } from "./Bookmark.defaults";
 
 type Props = React.HTMLAttributes<HTMLSpanElement> & {
   uid?: string;
@@ -13,11 +14,6 @@ type Props = React.HTMLAttributes<HTMLSpanElement> & {
   title?: string;
   omitFromToc?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
-};
-
-export const defaultProps: Pick<Props, "level" | "omitFromToc"> = {
-  level: 1,
-  omitFromToc: false,
 };
 
 export const Bookmark = memo(forwardRef(function Bookmark(

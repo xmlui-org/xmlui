@@ -5,10 +5,10 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   Badge,
   badgeVariantValues,
-  defaultProps,
   isBadgeColors,
   type BadgeColors,
 } from "./BadgeReact";
+import { defaultProps } from "./Badge.defaults";
 import { createMetadata, dContextMenu, dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
@@ -41,6 +41,7 @@ export const BadgeMd = createMetadata({
       description:
         `The \`${COMP}\` component supports the mapping of a list of colors using the \`value\` prop as the ` +
         `key. If this property is not set, no color mapping is used.`,
+      valueType: "hash",
     },
   },
   events: {

@@ -13,7 +13,8 @@ import {
   dRequired,
   dValidationStatus,
 } from "../metadata-helpers";
-import { RatingInput, defaultProps } from "./RatingInputReact";
+import { defaultProps } from "./RatingInput.defaults";
+import { RatingInput } from "./RatingInputReact";
 import styles from "./RatingInput.module.scss";
 
 const COMP = "RatingInput";
@@ -53,6 +54,7 @@ export const RatingInputMd = createMetadata({
     placeholder: dPlaceholder(),
     initialValue: {
       ...dInitialValue(),
+      valueType: "number",
       defaultValue: defaultProps.initialValue,
     },
     maxRating: {
@@ -67,11 +69,11 @@ export const RatingInputMd = createMetadata({
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
     autoFocus: dAutoFocus(),
     required: dRequired(),

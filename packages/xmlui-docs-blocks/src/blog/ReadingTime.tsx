@@ -1,5 +1,6 @@
 import { createMetadata, parseScssVar, wrapComponent, type ComponentMetadata } from "xmlui";
-import { ReadingTime, defaultProps } from "./ReadingTimeNative";
+import { defaultProps } from "./ReadingTime.defaults";
+import { ReadingTime } from "./ReadingTimeNative";
 import styles from "./ReadingTime.module.scss";
 
 const COMP = "ReadingTime";

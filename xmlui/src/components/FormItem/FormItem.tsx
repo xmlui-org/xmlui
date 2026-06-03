@@ -2,13 +2,11 @@ import styles from "./FormItem.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { useMemo } from "react";
 import {
   defaultValidationMode,
   formControlTypesMd,
   validationModeMd,
   validationSeverityValues,
-  type FormItemValidations,
 } from "../Form/FormContext";
 import {
   createMetadata,
@@ -23,7 +21,8 @@ import {
   dRequired,
 } from "../metadata-helpers";
 import { parseSeverity } from "./Validations";
-import { CustomFormItem, FormItem, defaultProps } from "./FormItemReact";
+import { defaultProps } from "./FormItem.defaults";
+import { CustomFormItem, FormItem } from "./FormItemReact";
 import { MemoizedItem } from "../container-helpers";
 import { partitionObject } from "../../components-core/utils/misc";
 import { requireLabelModeMd } from "../abstractions";
@@ -49,8 +48,8 @@ export const FormItemMd = createMetadata({
       description:
         "This property binds a particular input field to one of the attributes of the \`Form\` data. " +
         "It names the property of the form's \`data\` data to get the input's initial value." +
-        "When the field is saved, its value will be stored in the \`data\` property with this name. " +
         "If the property is not set, the input will be bound to an internal data field but not submitted.",
+      valueType: "string",
     },
     autoFocus: dAutoFocus(),
     label: dLabel(),
@@ -90,6 +89,7 @@ export const FormItemMd = createMetadata({
       description:
         `This property sets what kind of validation mode or strategy to employ for a particular ` +
         `input field.`,
+      valueType: "string",
       availableValues: validationModeMd,
       defaultValue: defaultValidationMode,
     },

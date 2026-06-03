@@ -16,6 +16,7 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { PART_HAMBURGER } from "../../components-core/parts";
+import { defaultProps } from "./AppHeader.defaults";
 
 type Props = {
   children?: ReactNode;
@@ -33,10 +34,6 @@ type Props = {
   titleContent?: ReactNode;
   registerSubNavPanelSlot?: (node: HTMLElement) => void;
   renderChild?: RenderChildFn;
-};
-
-export const defaultProps: Pick<Props, "showLogo"> = {
-  showLogo: true,
 };
 
 export function useLogoUrl() {

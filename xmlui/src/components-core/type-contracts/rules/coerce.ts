@@ -20,6 +20,7 @@ import { colorRule } from "./color";
 import { iconRule } from "./icon";
 import { idRefRule } from "./id-ref";
 import { integerRule } from "./integer";
+import { hashRule } from "./hash";
 import { lengthRule } from "./length";
 import type { CoercionRule, VerifyContext, VerifyFailure } from "./types";
 import { urlRule } from "./url";
@@ -88,6 +89,7 @@ const allRules: readonly CoercionRule[] = [
   numberRule,
   booleanRule,
   anyRule,
+  hashRule,
   componentDefRule,
   // Refined Phase-1 types
   integerRule,

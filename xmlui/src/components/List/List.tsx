@@ -15,7 +15,8 @@ import {
   StandaloneSelectionStore,
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreReact";
-import { ListNative, MemoizedSection, defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./ListReact";
+import { defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./List.defaults";
+import { ListNative, MemoizedSection } from "./ListReact";
 
 const COMP = "List";
 
@@ -43,9 +44,13 @@ export const ListMd = createMetadata({
     loading: d(
       `This property delays the rendering of children until it is set to \`false\`, or the ` +
         `component receives usable list items via the [\`data\`](#data) property.`,
+      undefined,
+      "boolean",
     ),
     limit: d(
       `This property limits the number of items displayed in the \`${COMP}\`. If not set, all items are displayed.`,
+      undefined,
+      "number",
     ),
     scrollAnchor: {
       description: `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
@@ -65,13 +70,19 @@ export const ListMd = createMetadata({
       "This property sets which data item property is used to group the list items. " +
         "Accepts a field name string or a function that receives an item and returns the group key. " +
         "If not set, no grouping is done.",
+      undefined,
+      "any",
     ),
     orderBy: d(
       `This optioanl property enables the ordering of list items by specifying an attribute in the data.`,
+      undefined,
+      "string",
     ),
     availableGroups: d(
       `This property is an array of group names that the \`${COMP}\` will display. ` +
         "If not set, all groups in the data are displayed.",
+      undefined,
+      "any",
     ),
     groupHeaderTemplate: dComponent(
       `Enables the customization of how the groups are displayed, similarly to the ` +
@@ -110,6 +121,8 @@ export const ListMd = createMetadata({
         `headers in the specified order. If the data contains group headers not in this list, ` +
         `those headers are also displayed (after the ones in this list); however, their order ` +
         `is not deterministic.`,
+      undefined,
+      "any",
     ),
     hideEmptyGroups: {
       description:
@@ -122,7 +135,7 @@ export const ListMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.borderCollapse,
     },
-    rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
+    rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`, undefined, "boolean"),
     enableMultiRowSelection: {
       description:
         `This boolean property indicates whether you can select multiple rows in the list. ` +
@@ -134,12 +147,16 @@ export const ListMd = createMetadata({
     initiallySelected: d(
       `An array of IDs that should be initially selected when the list is rendered. ` +
         `This property only has an effect when the rowsSelectable property is set to \`true\`.`,
+      undefined,
+      "any",
     ),
     syncWithVar: d(
       `The name of a global variable to synchronize the list's selection state with. ` +
         `The named variable must reference an object; the list will read from and write to its ` +
         `'selectedIds' property. When provided, this takes precedence over ` +
         `\`initiallySelected\`.`,
+      undefined,
+      "string",
     ),
     refreshOn: d(
       `Bind this property to a global variable (or expression) whose change should force all ` +
@@ -153,6 +170,7 @@ export const ListMd = createMetadata({
         `This property defines a predicate function with a return value that determines if the ` +
         `row should be unselectable. The function retrieves the item to display and should return ` +
         `a Boolean-like value. This property only has an effect when the \`rowsSelectable\` property is set to \`true\`.`,
+      valueType: "any",
     },
     hideSelectionCheckboxes: {
       description:

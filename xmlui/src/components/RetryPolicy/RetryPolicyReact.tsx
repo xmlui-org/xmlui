@@ -3,6 +3,7 @@ import { memo, useMemo, useRef, type ReactNode } from "react";
 import { RetryPolicyContext, type RetryPolicyContextValue } from "../../components-core/errors/RetryPolicyContext";
 import { createCircuitState, type CircuitBreakerSpec, type RetryPolicySpec } from "../../components-core/errors/policy";
 import type { ErrorCategory } from "../../components-core/errors/app-error";
+import { defaultProps } from "./RetryPolicy.defaults";
 
 // =====================================================================================================================
 // React RetryPolicy component implementation
@@ -23,14 +24,6 @@ type Props = {
   honourRetryAfter?: boolean;
   circuitBreaker?: CircuitBreakerSpec;
   children?: ReactNode;
-};
-
-export const defaultProps = {
-  attempts: 3,
-  backoff: "exponential" as Backoff,
-  delayMs: 500,
-  jitter: true,
-  honourRetryAfter: true,
 };
 
 function normalizeCategories(

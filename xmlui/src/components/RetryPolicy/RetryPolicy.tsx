@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { RetryPolicy, defaultProps } from "./RetryPolicyReact";
+import { defaultProps } from "./RetryPolicy.defaults";
+import { RetryPolicy } from "./RetryPolicyReact";
 
 const COMP = "RetryPolicy";
 

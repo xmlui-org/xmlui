@@ -1,7 +1,8 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
-import { OptionNative, defaultProps } from "./OptionReact";
+import { defaultProps } from "./Option.defaults";
+import { OptionNative } from "./OptionReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Option";
@@ -18,6 +19,8 @@ export const OptionMd = createMetadata({
     label: d(
       `This property defines the text to display for the option. If \`label\` is not defined, ` +
         `\`Option\` will use the \`value\` as the label.`,
+      undefined,
+      "string",
     ),
     value: d(
       "This property defines the value of the option. If `value` is not defined, " +
@@ -32,6 +35,8 @@ export const OptionMd = createMetadata({
     keywords: d(
       "An array of keywords that can be used for searching and filtering the option. " +
         "These keywords are not displayed but help users find the option through search.",
+      undefined,
+      "any",
     ),
   },
 });

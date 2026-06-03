@@ -1,0 +1,94 @@
+name: Release Guard (API Diff)
+
+# Plan #12 Phase 3 §3.3 — release-guard CI.
+#
+# On every PR that touches `xmlui/src/components/**` or
+# `xmlui/src/abstractions/ComponentDefs.ts`, this workflow extracts the
+# component API surface from the PR branch and the base ref, diffs them,
+# and checks whether the staged `.changeset/*.md` entries satisfy the
+# required semver bump. PRs that ship a breaking change without a
+# matching `major` changeset (or a documented `--allow-patch` waiver)
+# fail the check.
+#
+# Implementation note: the workflow consumes pre-built `ApiSurface` JSON
+# snapshots produced by `tsx xmlui/scripts/api-diff/extract-cli.ts`
+# (separate convenience script — when missing, the workflow installs
+# `tsx` and runs the release-guard CLI directly against the diff
+# without snapshots, treating an unbuilt registry as a hard failure
+# rather than masking it).
+
+concurrency:
+  group: release-guard-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - "support/**"
+    paths:
+      - "xmlui/src/components/**"
+      - "xmlui/src/abstractions/ComponentDefs.ts"
+      - ".changeset/**"
+      - "xmlui/scripts/api-diff/**"
+
+jobs:
+  api-diff:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install node dependencies
+        run: npm ci --prefer-offline
+
+      - name: Determine base ref
+        id: base
+        run: echo "ref=${{ github.event.pull_request.base.sha || github.event.before }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build PR API surface snapshot
+        id: snap-next
+        run: |
+          mkdir -p .api-diff
+          (cd xmlui && npm run build:xmlui-metadata)
+          npx tsx xmlui/scripts/api-diff/extract-cli.ts --out .api-diff/next.json
+
+      - name: Build base API surface snapshot
+        id: snap-prev
+        run: |
+          git worktree add /tmp/base ${{ steps.base.outputs.ref }}
+          (cd /tmp/base && npm ci --prefer-offline)
+          mkdir -p .api-diff
+          (cd /tmp/base/xmlui && npm run build:xmlui-metadata) || true
+          (cd /tmp/base && npx tsx xmlui/scripts/api-diff/extract-cli.ts --out $GITHUB_WORKSPACE/.api-diff/prev.json) || {
+            echo "Base ref does not have extract-cli; treating as empty surface"
+            echo '{"version":"0.0.0","components":{}}' > .api-diff/prev.json
+          }
+          git worktree remove --force /tmp/base
+
+      - name: Run release-guard
+        run: |
+          npx tsx xmlui/scripts/api-diff/release-guard.ts \
+            --prev .api-diff/prev.json \
+            --next .api-diff/next.json \
+            --changesets .changeset \
+            --package xmlui \
+            | tee .api-diff/report.md
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-guard-report
+          path: .api-diff/report.md

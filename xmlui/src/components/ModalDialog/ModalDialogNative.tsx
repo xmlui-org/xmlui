@@ -25,11 +25,7 @@ import { Part } from "../Part/Part";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-// Default props for ModalDialog component
-export const defaultProps = {
-  fullScreen: false,
-  closeButtonVisible: true,
-};
+import { defaultProps } from "./ModalDialog.defaults";
 
 // Part IDs for theming
 const PART_TITLE = "title";

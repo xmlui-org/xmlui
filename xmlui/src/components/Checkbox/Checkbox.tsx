@@ -49,7 +49,7 @@ export const CheckboxMd = createMetadata({
   props: {
     indeterminate: dIndeterminate(toggleDefaultProps.indeterminate),
     required: dRequired(),
-    initialValue: dInitialValue(toggleDefaultProps.initialValue),
+    initialValue: dInitialValue(toggleDefaultProps.initialValue, "boolean"),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(),

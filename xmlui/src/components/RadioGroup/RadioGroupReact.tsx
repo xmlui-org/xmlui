@@ -25,6 +25,7 @@ import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemReact";
 import { convertOptionValue } from "../Option/OptionReact";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { defaultProps } from "./RadioGroup.defaults";
 
 type RadioGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "dir" | "defaultValue"> & {
   id?: string;
@@ -46,20 +47,6 @@ type RadioGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "dir" | "defau
   updateState?: UpdateStateFn;
   onDidChange?: (newValue: string) => void;
   registerComponentApi?: RegisterComponentApiFn;
-};
-
-export const defaultProps: Pick<
-  RadioGroupProps,
-  "value" | "initialValue" | "enabled" | "validationStatus" | "required" | "readOnly" | "orientation" | "gap"
-> = {
-  value: "",
-  initialValue: "",
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  required: false,
-  readOnly: false,
-  orientation: "vertical",
-  gap: "$gap-normal",
 };
 
 const RadioGroupStatusContext = createContext<{

@@ -6,7 +6,8 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { appLayoutMd } from "../App/AppLayoutContext";
-import { App as AppComponent, defaultProps } from "./AppReact";
+import { defaultProps } from "./App.defaults";
+import { App as AppComponent } from "./AppReact";
 import { useRef } from "react";
 import { SearchIndexCollector } from "./SearchIndexCollector";
 import { extractAppComponents, extractNavPanelFromPages } from "./AppNavigation";
@@ -29,6 +30,7 @@ export const AppMd = createMetadata({
         `This property sets the layout template of the app. This setting determines the position ` +
         `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
         `scroll behavior.`,
+      valueType: "string",
       availableValues: appLayoutMd,
     },
     loggedInUser: {
@@ -187,6 +189,15 @@ export const AppMd = createMetadata({
       availableValues: ["warn", "rewrite", "redirect"],
       isStrictEnum: true,
       defaultValue: "warn",
+      isInternal: true,
+    },
+    auditPolicy: {
+      description:
+        "Plan #15: declarative audit-pipeline policy. An object literal with " +
+        "`redact: RedactionRule[]`, `sample: { head?, tail? }`, `retention: { bufferSize, onOverflow }`, " +
+        "and optional `sink: { kind: 'otlp' | 'console' | 'custom', endpoint?, headers? }`. " +
+        "See `dev-docs/plans/15-audit-grade-observability.md`.",
+      valueType: "any",
       isInternal: true,
     },
   },
@@ -374,6 +385,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
       locale={extractValue(node.props.locale)}
       localeBundles={extractValue(node.props.localeBundles)}
+      auditPolicy={extractValue(node.props.auditPolicy)}
       direction={extractValue.asOptionalString(node.props.direction, "auto")}
       scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
       maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}

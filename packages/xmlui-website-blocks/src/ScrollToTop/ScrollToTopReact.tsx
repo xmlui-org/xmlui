@@ -2,6 +2,7 @@ import { forwardRef, memo, useEffect, useState, useCallback, type HTMLAttributes
 import { Icon } from "xmlui";
 import classnames from "classnames";
 import styles from "./ScrollToTop.module.scss";
+import { defaultProps } from "./ScrollToTop.defaults";
 
 type Props = Omit<HTMLAttributes<HTMLButtonElement>, "onClick"> & {
   position?: "start" | "center" | "end";
@@ -10,14 +11,6 @@ type Props = Omit<HTMLAttributes<HTMLButtonElement>, "onClick"> & {
   icon?: string;
   behavior?: "smooth" | "instant" | "auto";
   onClick?: () => void;
-};
-
-export const defaultProps: Pick<Props, "position" | "visible" | "threshold" | "icon" | "behavior"> = {
-  position: "end",
-  visible: true,
-  threshold: 300,
-  icon: "chevronup",
-  behavior: "smooth",
 };
 
 // Returns true only for large containers that are likely the main page scroll area,

@@ -316,7 +316,7 @@ export function createValueExtractor(
     const raw = extractor(expression);
     if (raw === undefined || raw === null) return undefined;
     const opts = {
-      strict: !!(appContext?.appGlobals?.strictTheming),
+      strict: appContext?.appGlobals?.strictTheming !== false,
       allowRawCss: appContext?.appGlobals?.allowInlineRawCss !== false,
       maxZIndex: appContext?.appGlobals?.maxZIndex ?? 9999,
     };
@@ -344,7 +344,7 @@ export function createValueExtractor(
     if (raw === undefined || raw === null || raw === "") return raw;
     const rawStr = typeof raw === "string" ? raw : String(raw);
     const opts = {
-      strict: !!(appContext?.appGlobals?.strictTheming),
+      strict: appContext?.appGlobals?.strictTheming !== false,
       allowRawCss: appContext?.appGlobals?.allowInlineRawCss !== false,
       maxZIndex: appContext?.appGlobals?.maxZIndex ?? 9999,
     };

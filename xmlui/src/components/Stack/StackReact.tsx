@@ -19,18 +19,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 import { useContentAlignment } from "../../components-core/component-hooks";
 import { useOnMount } from "../../components-core/utils/hooks";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
-
-export const DEFAULT_ORIENTATION = "vertical";
-
-export const defaultProps = {
-  orientation: DEFAULT_ORIENTATION,
-  reverse: false,
-  desktopOnly: false,
-  hoverContainer: false,
-  visibleOnHover: false,
-  scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: true,
-};
+import { DEFAULT_ORIENTATION, defaultProps } from "./Stack.defaults";
 
 type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onClick" | "onContextMenu"> & {
   orientation?: string;

@@ -36,6 +36,8 @@ export const FormSegmentMd = createMetadata({
       "An optional comma-separated list of field names (matching the `bindTo` values of " +
         "nested inputs) that belong to this segment. When omitted the segment auto-discovers " +
         "field names by inspecting its direct and nested children for `bindTo` attributes.",
+      undefined,
+      "string",
     ),
   },
   contextVars: {

@@ -11,6 +11,7 @@ import {
 import classnames from "classnames";
 
 import styles from "./Image.module.scss";
+import { defaultProps } from "./Image.defaults";
 
 // =====================================================================================================================
 // React Image component implementation
@@ -28,13 +29,6 @@ type Props = {
   inline?: boolean;
   grayscale?: boolean;
 } & Pick<HTMLAttributes<HTMLImageElement>, "onClick">;
-
-export const defaultProps: Pick<Props, "fit" | "lazyLoad" | "inline" | "grayscale"> = {
-  fit: "contain",
-  lazyLoad: false,
-  inline: false,
-  grayscale: false,
-};
 
 export const Image = memo(forwardRef(function Img(
   {

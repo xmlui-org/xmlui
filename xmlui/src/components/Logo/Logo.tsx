@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { Logo, defaultProps } from "./LogoNative";
+import { defaultProps } from "./Logo.defaults";
+import { Logo } from "./LogoNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 

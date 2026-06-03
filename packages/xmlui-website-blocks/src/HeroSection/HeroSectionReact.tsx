@@ -6,6 +6,7 @@ import styles from "./HeroSection.module.scss";
 
 import classnames from "classnames";
 import { Theme } from "xmlui";
+import { defaultProps } from "./HeroSection.defaults";
 
 const PART_HEADER = "header";
 const PART_CONTENT = "content";
@@ -43,16 +44,6 @@ type Props = {
   headerTone?: string;
   contentTone?: string;
   onCtaClick?: () => void;
-};
-export const defaultProps: Pick<
-  Props,
-  "fullWidthBackground" | "contentPlacement" | "contentAlignment" | "headerWidth" | "contentWidth"
-> = {
-  headerWidth: "50%",
-  fullWidthBackground: true,
-  contentPlacement: "bottom",
-  contentAlignment: "center",
-  contentWidth: "$maxWidth-content",
 };
 
 export const HeroSection = memo(

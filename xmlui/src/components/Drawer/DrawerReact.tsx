@@ -21,6 +21,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useAppContext } from "../../components-core/AppContext";
+import { defaultProps } from "./Drawer.defaults";
 
 // =============================================================================
 // Types
@@ -53,14 +54,6 @@ export interface DrawerProps {
   /** Inline styles applied directly to the drawer panel (overrides theme vars) */
   style?: CSSProperties;
 }
-
-export const defaultProps = {
-  position: "left" as DrawerPosition,
-  hasBackdrop: true,
-  initiallyOpen: false,
-  closeButtonVisible: true,
-  closeOnClickAway: true,
-};
 
 // =============================================================================
 // Hook – manages open/closed state with stable callbacks

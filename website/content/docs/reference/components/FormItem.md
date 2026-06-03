@@ -327,7 +327,7 @@ When set to `true`, the field will not be included in the form's submitted data.
 
 ### `pattern` [#pattern]
 
-This value specifies a predefined regular expression to test the input value. If this value is not set, no pattern check is done.
+**Deprecated** alias of `validator`. This value specifies a predefined validator name (or regex placeholder) to test the input value. If this value is not set, no validator check is done. Use `validator` instead.
 
 | Value   | Description                                                                                                                                                     |
 | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -351,7 +351,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 
 ### `patternInvalidMessage` [#patterninvalidmessage]
 
-This optional string property is used to customize the message that is displayed on a failed pattern test.
+**Deprecated** alias of `validatorInvalidMessage`. This optional string property is used to customize the message that is displayed on a failed pattern test.
 
 In the demo below, enter anything that does not look like an email and click outside to see the regular and custom message.
 
@@ -372,7 +372,7 @@ In the demo below, enter anything that does not look like an email and click out
 
 > [!DEF]  default: **"error"**
 
-This property sets the severity level of the pattern validation.
+**Deprecated** alias of `validatorInvalidSeverity`. This property sets the severity level of the pattern validation.
 
 Available values: `error` **(default)**, `warning`, `valid`
 
@@ -604,6 +604,26 @@ Available values:
 | `errorLate` | Display the error when the field loses focus.If an error is already displayed, continue for every keystroke until input is accepted. **(default)** |
 | `onChanged` | Display error (if present) for every keystroke. |
 | `onLostFocus` | Show/hide error (if present) only if the field loses focus. |
+
+### `validator` [#validator]
+
+Name of a registered validator (or an array of names) to run against the input value. Built-in validators include `email`, `phone`, `url`, `creditCard`, `iban`, `isoDate`, `strongPassword`, `noLeadingTrailingWhitespace`, and `length`. Register additional validators via `App.registerValidator`. When both `validator` and `pattern` are set, `validator` wins.
+
+### `validatorInvalidMessage` [#validatorinvalidmessage]
+
+Optional message displayed when the configured validator reports the value as invalid. Overrides the validator's default message.
+
+### `validatorInvalidSeverity` [#validatorinvalidseverity]
+
+> [!DEF]  default: **"error"**
+
+Severity level applied to a validator failure.
+
+Available values: `error` **(default)**, `warning`, `valid`
+
+### `validatorParams` [#validatorparams]
+
+Optional parameters object forwarded to the validator function (e.g. `{ minLength: 16 }` for `strongPassword`).
 
 ## Events [#events]
 

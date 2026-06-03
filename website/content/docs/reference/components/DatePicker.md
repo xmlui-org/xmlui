@@ -8,6 +8,10 @@
 - **Date restrictions**: Set minimum/maximum dates and disable specific dates
 - **Localization options**: Configure first day of week and show week numbers
 
+**Context variables available during execution:**
+
+- `value`: Current value. Single mode returns a string; range mode returns `{ from, to }`.
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -17,7 +21,6 @@ This component supports the following behaviors:
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
-| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `requiredInvalidMessage`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `matchValue`, `matchInvalidMessage`, `validationMode`, `customValidationsDebounce`, `validationDisplayDelay`, `verboseValidationFeedback`, `validate` |
 | Styling Variant | `variant` |
@@ -29,6 +32,18 @@ This component supports the following behaviors:
 > [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
+
+### `clearable` [#clearable]
+
+> [!DEF]  default: **false**
+
+Set to `true` to show a clear button that resets the value. Hidden by default.
+
+### `confirmRangeSelection` [#confirmrangeselection]
+
+> [!DEF]  default: **false**
+
+In `range` mode, show a Cancel/Proceed footer so the user must explicitly confirm the selected range before it is committed. When `false` (default), the range auto-commits on the second click and the popup closes.
 
 ### `dateFormat` [#dateformat]
 
@@ -54,10 +69,9 @@ The table below shows the available date formats:
 | yyyyMMdd   | 20240525   |
 | MMddyyyy   | 05252024   |
 
-```xmlui-pg copy display name="Example: dateFormat" height="446px"
+```xmlui-pg copy display name="Example: dateFormat" height="120px"
 <App>
   <DatePicker
-    inline
     dateFormat="dd-MM-yyyy"
     initialValue="01-01-2024"
     endDate="01-01-2027"
@@ -67,7 +81,7 @@ The table below shows the available date formats:
 
 ### `disabledDates` [#disableddates]
 
-An optional array of dates that are to be disabled.
+An optional array of dates that are to be disabled. Accepts a date string, `{ from, to }`, `{ before }`, `{ after }`, `{ before, after }`, or `{ dayOfWeek }` matchers (parsed with `dateFormat`).
 
 The `disabledDates` prop supports multiple patterns for disabling specific dates in the calendar. You can use Date objects, strings (parsed using the `dateFormat`), or complex matcher objects.
 
@@ -81,10 +95,9 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 
 > [!INFO] You can use the [getDate()](/docs/globals#getdate) function to query the current date.
 
-```xmlui-pg copy display name="Example: Disable specific dates" height="446px"
+```xmlui-pg copy display name="Example: Disable specific dates" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{['05/26/2024', '05/27/2024']}"
     initialValue="05/25/2024" />
 </App>
@@ -100,43 +113,39 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 | After date | Disable all dates after a specific date | `{after: "05/25/2024"}` |
 | Date interval | Disable dates between two dates (exclusive) | `{before: "05/30/2024", after: "05/20/2024"}` |
 
-```xmlui-pg copy display name="Example: Disable weekends" height="446px"
+```xmlui-pg copy display name="Example: Disable weekends" height="120px"
 <App>
-  <DatePicker inline disabledDates="{{dayOfWeek: [0, 6]}}" />
+  <DatePicker disabledDates="{{dayOfWeek: [0, 6]}}" />
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable date range" height="446px"
+```xmlui-pg copy display name="Example: Disable date range" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{{from: '05/20/2024', to: '05/25/2024'}}"
     initialValue="05/18/2024" />
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable dates before today" height="446px"
+```xmlui-pg copy display name="Example: Disable dates before today" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{{before: getDate()}}"
     initialValue="{getDate()}"/>
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable dates today and after" height="446px"
+```xmlui-pg copy display name="Example: Disable dates today and after" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{[getDate(), {after: getDate()}]}"
     initialValue="{getDate()}"/>
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Complex combination" height="446px"
+```xmlui-pg copy display name="Example: Complex combination" height="120px"
 <App>
   <DatePicker
-    inline
     disabledDates="{[
     {dayOfWeek: [0, 6]},
     {from: '12/24/2024', to: '12/26/2024'},
@@ -160,7 +169,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `endDate` [#enddate]
 
-The latest month to start the month navigation from (inclusive). If not defined, the component allows any future dates. Accepts the same date format as the `initialValue`.Example: '2023-12-31' ensures the last month to select a date from is December 2023.
+The latest month to start the month navigation from (inclusive). If not defined, the component allows any future dates. Accepts the same date format as the `initialValue`. Example: '2023-12-31' ensures the last month to select a date from is December 2023.
 
 ### `endIcon` [#endicon]
 
@@ -174,9 +183,9 @@ This property sets an optional text to appear on the end (right side when the le
 
 This property sets the component's initial value.
 
-```xmlui-pg copy display name="Example: initialValue" height="446px"
+```xmlui-pg copy display name="Example: initialValue" height="120px"
 <App>
-  <DatePicker inline initialValue="05/25/2024" />
+  <DatePicker initialValue="05/25/2024" />
 </App>
 ```
 
@@ -188,7 +197,17 @@ If set to true, the calendar is always visible and its panel is rendered as part
 
 ### `invalidMessages` [#invalidmessages]
 
-The invalid messages to display for the input component.
+The invalid messages to display in the concise validation summary.
+
+### `label` [#label]
+
+Optional label rendered above the input.
+
+### `locale` [#locale]
+
+> [!DEF]  default: **"en-US"**
+
+BCP 47 locale used for calendar labels.
 
 ### `mode` [#mode]
 
@@ -198,22 +217,32 @@ The mode of the datepicker (single or range)
 
 Available values: `single` **(default)**, `range`
 
-```xmlui-pg copy {2-3} display name="Example: mode" height="560px"
+```xmlui-pg copy {2-3} display name="Example: mode" height="190px"
 <App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
 </App>
 ```
 
+### `numOfMonths` [#numofmonths]
+
+> [!DEF]  default: **1**
+
+The number of months displayed at once.
+
 ### `placeholder` [#placeholder]
 
 An optional placeholder text that is visible in the input field when its empty.
 
-```xmlui-pg copy display name="Example: placeholder" height="500px"
+```xmlui-pg copy display name="Example: placeholder" height="120px"
 <App>
   <DatePicker placeholder="This is a placeholder" />
 </App>
 ```
+
+### `presets` [#presets]
+
+Customizes the range presets (range mode only). Supplying a list also turns the presets on. Accepts a comma-separated string or array of built-in preset keys (e.g. `last7Days`, `thisMonth`), `{ value, label }` objects to relabel a built-in, or `{ label, from, to }` objects for fully custom date ranges (parsed with `dateFormat`).
 
 ### `readOnly` [#readonly]
 
@@ -221,21 +250,39 @@ An optional placeholder text that is visible in the input field when its empty.
 
 Set this property to `true` to disallow changing the component value.
 
+### `required` [#required]
+
+> [!DEF]  default: **false**
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `showPresets` [#showpresets]
+
+> [!DEF]  default: **false**
+
+Range presets are hidden by default. Set to `true` to show the built-in presets (Last 7 days, Last 30 days, This month, Last month); set to `false` to force them off even when a `presets` list is supplied.
+
 ### `showWeekNumber` [#showweeknumber]
 
 > [!DEF]  default: **false**
 
-Whether to show the week number in the calendar
+Show week number cells in the day table.
 
-```xmlui-pg copy display name="Example: showWeekNumber" height="500px"
+```xmlui-pg copy display name="Example: showWeekNumber" height="120px"
 <App>
   <DatePicker showWeekNumber="true" />
 </App>
 ```
 
+### `showWeekNumbers` [#showweeknumbers]
+
+> [!DEF]  default: **false**
+
+Alias for `showWeekNumber`.
+
 ### `startDate` [#startdate]
 
-The earliest month to start the month navigation from (inclusive). If not defined, the component allows any dates in the past. Accepts the same date format as the `initialValue`.Example: '2023-01-01' ensures the first month to select a date from is January 2023.
+The earliest month to start the month navigation from (inclusive). If not defined, the component allows any dates in the past. Accepts the same date format as the `initialValue`. Example: '2023-01-01' ensures the first month to select a date from is January 2023.
 
 ### `startIcon` [#starticon]
 
@@ -245,13 +292,19 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
+### `timeZone` [#timezone]
+
+> [!DEF]  default: **"UTC"**
+
+The time zone used for date calculations.
+
 ### `validationIconError` [#validationiconerror]
 
-Icon to display for error state when concise validation summary is enabled.
+Icon to display for the error state when the concise summary is enabled.
 
 ### `validationIconSuccess` [#validationiconsuccess]
 
-Icon to display for valid state when concise validation summary is enabled.
+Icon to display for the valid state when the concise summary is enabled.
 
 ### `validationStatus` [#validationstatus]
 
@@ -273,7 +326,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui-pg copy display name="Example: validationStatus" height="500px"
+```xmlui-pg copy display name="Example: validationStatus" height="300px"
 <App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
@@ -282,9 +335,13 @@ Available values:
 </App>
 ```
 
+### `value` [#value]
+
+Controlled value. In single mode, a date string; in range mode, a `{ from, to }` object.
+
 ### `verboseValidationFeedback` [#verbosevalidationfeedback]
 
-Enables a concise validation summary (icon) in input components.
+Enables a concise validation summary (icon) in the input.
 
 ### `weekStartsOn` [#weekstartson]
 
@@ -314,11 +371,15 @@ Available values:
 | Friday    | 5      |
 | Saturday  | 6      |
 
-```xmlui-pg copy display name="Example: weekStartsOn" height="446px"
+```xmlui-pg copy display name="Example: weekStartsOn" height="120px"
 <App>
-  <DatePicker inline weekStartsOn="1" />
+  <DatePicker weekStartsOn="1" />
 </App>
 ```
+
+### `width` [#width]
+
+CSS width for the picker root.
 
 ## Events [#events]
 
@@ -332,11 +393,10 @@ This event is triggered when value of DatePicker has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui-pg copy {2} display name="Example: didChange" height="520px"
+```xmlui-pg copy {2} display name="Example: didChange" height="180px"
 <App var.field="(none)">
   <Text value="{field}" />
   <DatePicker
-    inline
     initialValue="{field}"
     onDidChange="(val) => field = val" />
 </App>
@@ -351,7 +411,7 @@ This event is triggered when the DatePicker has received the focus.
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="540px"
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="180px"
 <App var.isFocused="false">
   <Text value="{isFocused === true
     ? 'DatePicker focused' : 'DatePicker lost focus'}"
@@ -377,15 +437,21 @@ Focus the DatePicker component.
 
 **Signature**: `focus(): void`
 
+### `getValue` [#getvalue]
+
+Return the current value of the DatePicker.
+
+**Signature**: `getValue(): string | { from?: string; to?: string } | undefined`
+
 ### `setValue` [#setvalue]
 
 This method sets the current value of the DatePicker.
 
-**Signature**: `set value(value: any): void`
+**Signature**: `setValue(value: string | { from?: string; to?: string }): void`
 
 - `value`: The new value to set for the date picker.
 
-```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="506px"
+```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="180px"
 <App>
   <HStack>
     <Button
@@ -395,7 +461,7 @@ This method sets the current value of the DatePicker.
       label="Remove Date"
       onClick="picker.setValue('')" />
   </HStack>
-  <DatePicker inline id="picker" />
+  <DatePicker id="picker" />
 </App>
 ```
 
@@ -413,19 +479,15 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--disabled | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--hover | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success--hover | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning--hover | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-danger-500 | $color-danger-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-danger-500 | $color-danger-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--rangeMiddle | $color-primary-100 | $color-primary-100 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--rangeMiddle | $color-primary-100 | $color-primary-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | transparent | transparent |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-100 |
@@ -437,89 +499,53 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning--hover | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-selectedItem-DatePicker | $color-primary-200 | $color-primary-200 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-selectedItem-DatePicker | $color-primary-200 | $color-primary-200 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $color-secondary-300 | $color-secondary-300 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $color-secondary-300 | $color-secondary-300 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-menu-DatePicker | $borderColor | $borderColor |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-menu-DatePicker | $borderColor | $borderColor |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-selectedItem-DatePicker | $color-primary-300 | $color-primary-300 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-selectedItem-DatePicker | $color-primary-300 | $color-primary-300 |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DatePicker | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DatePicker--error | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DatePicker--success | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DatePicker--warning | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $borderRadius | $borderRadius |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $borderRadius | $borderRadius |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DatePicker | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DatePicker--error | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DatePicker--success | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DatePicker--warning | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-day-DatePicker--today | solid | solid |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-day-DatePicker--today | solid | solid |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker--error | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker--success | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker--warning | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-day-DatePicker--today | 1px | 1px |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-day-DatePicker--today | 1px | 1px |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker--error | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker--error--hover | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker--hover | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker--success | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker--success--hover | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker--warning | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DatePicker--warning--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-DatePicker | *none* | *none* |
-| [color](/docs/styles-and-themes/common-units/#color)-adornment-DatePicker--error | *none* | *none* |
-| [color](/docs/styles-and-themes/common-units/#color)-adornment-DatePicker--success | *none* | *none* |
-| [color](/docs/styles-and-themes/common-units/#color)-adornment-DatePicker--warning | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-DatePicker | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-DatePicker--error | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-DatePicker--success | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-DatePicker--warning | *none* | *none* |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-DatePicker--focus | *none* | *none* |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success--focus | *none* | *none* |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning--focus | *none* | *none* |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DatePicker--error--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DatePicker--focus | *none* | *none* |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DatePicker--success--focus | *none* | *none* |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DatePicker--warning--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-DatePicker--error--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-DatePicker--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-DatePicker--success--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-DatePicker--warning--focus | *none* | *none* |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker--error--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker--focus | *none* | *none* |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker--success--focus | *none* | *none* |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DatePicker--warning--focus | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
 | [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-DatePicker | $space-2 | $space-2 |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-DatePicker | $space-3 | $space-3 |
 | [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-DatePicker | *none* | *none* |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-DatePicker | $space-2 | $space-2 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--disabled | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--error--hover | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--hover | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--success--hover | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DatePicker--warning--hover | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-surface-0 | $color-surface-0 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-surface-0 | $color-surface-0 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-secondary-300 | $color-secondary-300 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--disabled | $color-secondary-300 | $color-secondary-300 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--rangeMiddle | $textColor-primary | $textColor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--rangeMiddle | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-surface-0 | $color-surface-0 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--selected | $color-surface-0 | $color-surface-0 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-day-DatePicker--today | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-DatePicker | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-DatePicker--error | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-DatePicker--success | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-DatePicker--warning | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-value-DatePicker | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-value-DatePicker | $textColor-primary | $textColor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-weekday-DatePicker | $color-secondary-300 | $color-secondary-300 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-weekday-DatePicker | $color-secondary-300 | $color-secondary-300 |

@@ -48,6 +48,7 @@ import { ThemedAutoComplete as AutoComplete } from "../AutoComplete/AutoComplete
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
+import { defaultProps } from "./FormItem.defaults";
 import { resolveFormItemId } from "./FormItemUtils";
 import { ThemedSlider as Slider } from "../Slider/Slider";
 import { ThemedColorPicker as ColorPicker } from "../ColorPicker/ColorPicker";
@@ -90,17 +91,6 @@ type Props = {
   validationInProgress?: boolean;
 } & FormItemValidations;
 
-export const defaultProps: Pick<
-  Props,
-  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap" | "noSubmit"
-> = {
-  type: "text",
-  labelBreak: true,
-  enabled: true,
-  customValidationsDebounce: 0,
-  gap: "0",
-  noSubmit: false,
-};
 
 const ArrayLikeFormItem = forwardRef(function ArrayLikeFormItem({
   children,

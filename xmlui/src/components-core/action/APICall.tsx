@@ -8,7 +8,7 @@ import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
 // --- Tracing helper for API calls
 function traceApiCall(
   appContext: AppContextObject,
-  kind: "api:start" | "api:complete" | "api:error",
+  kind: "api:start" | "api:complete" | "api:error" | "api:lifecycle",
   url: string,
   method: string,
   details?: Record<string, any>,
@@ -34,6 +34,8 @@ import type { ApiActionOptions, ApiOperationDef } from "../RestApiProxy";
 import RestApiProxy, { getLastApiStatus } from "../RestApiProxy";
 import { createAction } from "./actions";
 import { createContextVariableError } from "../EngineError";
+
+const apiLifecycleHandlerOptions = { schedulerBypass: true };
 
 function findQueryKeysToUpdate(updates: string | string[], queryClient: QueryClient) {
   const queryKeysToUpdate: Array<QueryKey> = [];
@@ -249,7 +251,10 @@ async function updateQueriesWithOptimisticValue({
     clientTxId,
     stateContext,
     extractParam(stateContext, optimisticValue, appContext),
-    lookupAction(getOptimisticValue, uid, { eventName: "getOptimisticValue" }),
+    lookupAction(getOptimisticValue, uid, {
+      eventName: "getOptimisticValue",
+      ...apiLifecycleHandlerOptions,
+    }),
   );
 
   await doOptimisticUpdate(optimisticValuesByQueryKeys, queryClient);
@@ -342,8 +347,28 @@ export async function callApi(
   const resolvedInvalidates = extractParam(stateContext, invalidates, appContext);
 
   const clientTxId = randomUUID();
-  const beforeRequestFn = lookupAction(onBeforeRequest, uid, { eventName: "beforeRequest" });
+  traceApiCall(appContext, "api:lifecycle", url as string, method || "GET", {
+    phase: "callApi:entered",
+    transactionId: clientTxId,
+    hasOnSuccess: !!onSuccess,
+    onSuccessKind: typeof onSuccess,
+  });
+  const beforeRequestFn = lookupAction(onBeforeRequest, uid, {
+    eventName: "beforeRequest",
+    ...apiLifecycleHandlerOptions,
+  });
+  traceApiCall(appContext, "api:lifecycle", url as string, method || "GET", {
+    phase: "beforeRequest:start",
+    transactionId: clientTxId,
+    schedulerBypass: true,
+    hasHandler: !!beforeRequestFn,
+  });
   const beforeRequestResult = await beforeRequestFn?.();
+  traceApiCall(appContext, "api:lifecycle", url as string, method || "GET", {
+    phase: "beforeRequest:end",
+    transactionId: clientTxId,
+    resultType: typeof beforeRequestResult,
+  });
   if (typeof beforeRequestResult === "boolean" && beforeRequestResult === false) {
     return;
   }
@@ -402,6 +427,7 @@ export async function callApi(
 
       const mockFn = lookupAction(onMockExecute, uid, {
         eventName: "mockExecute",
+        ...apiLifecycleHandlerOptions,
         context: {
           ...getCurrentState(),
           $pathParams: {},
@@ -427,6 +453,7 @@ export async function callApi(
       };
       const _onProgress = lookupAction(onProgress, uid, {
         eventName: "progress",
+        ...apiLifecycleHandlerOptions,
       });
 
       // Trace API call start — capture traceId before await so api:complete
@@ -459,9 +486,34 @@ export async function callApi(
 
     const onSuccessFn = typeof onSuccess === "function"
       ? onSuccess
-      : lookupAction(onSuccess, uid, { eventName: "success", context: getCurrentState() });
+      : lookupAction(onSuccess, uid, {
+        eventName: "success",
+        ...apiLifecycleHandlerOptions,
+        context: getCurrentState(),
+      });
+    const successStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
+    traceApiCall(appContext, "api:lifecycle", resolvedUrl, resolvedMethod, {
+      phase: "success:start",
+      transactionId: clientTxId,
+      hasHandler: !!onSuccessFn,
+      handlerKind: typeof onSuccess,
+      schedulerBypass: typeof onSuccess === "function" ? "pre-resolved" : true,
+      status: getLastApiStatus(clientTxId),
+    });
     const onSuccessResult = await onSuccessFn?.(result, stateContext["$param"]);
+    traceApiCall(appContext, "api:lifecycle", resolvedUrl, resolvedMethod, {
+      phase: "success:end",
+      transactionId: clientTxId,
+      handlerKind: typeof onSuccess,
+      durationMs: (typeof performance !== "undefined" ? performance.now() : Date.now()) - successStartedAt,
+      resultType: typeof onSuccessResult,
+    });
 
+    traceApiCall(appContext, "api:lifecycle", resolvedUrl, resolvedMethod, {
+      phase: "queryUpdate:start",
+      transactionId: clientTxId,
+      queryKeyCount: queryKeysToUpdate.length,
+    });
     updateQueriesWithResult(
       queryKeysToUpdate,
       optimisticValuesByQueryKeys,
@@ -469,6 +521,11 @@ export async function callApi(
       appContext.queryClient!,
       result,
     );
+    traceApiCall(appContext, "api:lifecycle", resolvedUrl, resolvedMethod, {
+      phase: "queryUpdate:end",
+      transactionId: clientTxId,
+      queryKeyCount: queryKeysToUpdate.length,
+    });
 
     // An explicit `false` return from onSuccess opts out of invalidation.
     // Any other return value (including undefined/void) proceeds normally.
@@ -480,7 +537,17 @@ export async function callApi(
       // unmounts DataSource components before the invalidation triggers a
       // re-fetch. The react-query AbortController cancels any in-flight
       // requests from unmounted components, preventing wasted network traffic.
+      traceApiCall(appContext, "api:lifecycle", resolvedUrl, resolvedMethod, {
+        phase: "invalidate:schedule",
+        transactionId: clientTxId,
+        hasResolvedInvalidates: !!resolvedInvalidates,
+        hasUpdates: !!updates,
+      });
       setTimeout(() => {
+        traceApiCall(appContext, "api:lifecycle", resolvedUrl, resolvedMethod, {
+          phase: "invalidate:run",
+          transactionId: clientTxId,
+        });
         void invalidateQueries(resolvedInvalidates, appContext, state);
       }, 0);
     }
@@ -496,6 +563,10 @@ export async function callApi(
     } else if (loadingToastId) {
       toast.dismiss(loadingToastId);
     }
+    traceApiCall(appContext, "api:lifecycle", resolvedUrl, resolvedMethod, {
+      phase: "callApi:return",
+      transactionId: clientTxId,
+    });
     return result;
   } catch (e: any) {
     // Trace API call error
@@ -510,6 +581,7 @@ export async function callApi(
     }
     const onErrorFn = lookupAction(onError, uid, {
       eventName: "error",
+      ...apiLifecycleHandlerOptions,
     });
     const result = await onErrorFn?.(e, stateContext["$param"]);
     const errorMessage = extractParam(

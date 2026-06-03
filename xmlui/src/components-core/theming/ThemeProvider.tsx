@@ -212,8 +212,6 @@ export function useCompiledTheme(
         });
         if (d.severity === "error") {
           console.error(`[XMLUI Theme] ${d.message}`);
-        } else {
-          console.warn(`[XMLUI Theme] ${d.message}`);
         }
       }
       const errorVarNames = new Set(

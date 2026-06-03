@@ -2,7 +2,7 @@ import styles from "./NestedApp.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { IndexAwareNestedApp } from "./NestedAppReact";
-import { defaultProps } from "./defaultProps";
+import { defaultProps } from "./NestedApp.defaults";
 import { createMetadata } from "../metadata-helpers";
 
 // Wrapper to defer access to IndexAwareNestedApp until render time, avoiding
@@ -21,9 +21,11 @@ export const NestedAppMd = createMetadata({
   props: {
     app: {
       description: "The source markup of the app to be nested",
+      valueType: "string",
     },
     api: {
       description: "This property defines an optional emulated API to be used with the nested app.",
+      valueType: "hash",
     },
     components: {
       description:
@@ -32,20 +34,24 @@ export const NestedAppMd = createMetadata({
     },
     config: {
       description: "You can define the nested app's configuration with this property.",
+      valueType: "hash",
     },
     activeTheme: {
       description:
         "This property defines the active theme for the nested app. " +
         "If not set, the default theme is used.",
+      valueType: "string",
     },
     activeTone: {
       description:
         "This property defines the active tone for the nested app. " +
         "If not set, the default tone is used.",
+      valueType: "string",
     },
     height: {
       description:
         "The height of the nested app. If not set, the height is determined automatically.",
+      valueType: "length",
     },
   },
   themeVars: parseScssVar(styles.themeVars),

@@ -73,6 +73,8 @@ export const TableMd = createMetadata({
     data: d(
       `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`Table\` can display.`,
+      undefined,
+      "any",
     ),
     idKey: {
       description:
@@ -94,18 +96,24 @@ export const TableMd = createMetadata({
     loading: d(
       `This boolean property indicates if the component is fetching (or processing) data. This ` +
         `property is useful when data is loaded conditionally or receiving it takes some time.`,
+      undefined,
+      "boolean",
     ),
-    headerHeight: d(`This optional property is used to specify the height of the table header.`),
-    rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
+    headerHeight: d(`This optional property is used to specify the height of the table header.`, undefined, "length"),
+    rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`, undefined, "boolean"),
     initiallySelected: d(
       `An array of IDs that should be initially selected when the table is rendered. ` +
         `This property only has an effect when the rowsSelectable property is set to \`true\`.`,
+      undefined,
+      "any",
     ),
     syncWithAppState: d(
       `An AppState instance to synchronize the table's selection state with. The table will ` +
         `read from and write to the 'selectedIds' property of the AppState object. When provided, ` +
         `this takes precedence over the initiallySelected property for initial selection. ` +
         `You can use the AppState's didUpdate event to receive notifications when the selection changes.`,
+      undefined,
+      "string",
     ),
     syncWithVar: d(
       `The name of a global variable to synchronize the table's selection state with. ` +
@@ -114,6 +122,8 @@ export const TableMd = createMetadata({
         `\`initiallySelected\` and \`syncWithAppState\`. Multiple tables sharing the same variable ` +
         `name will keep their selections in sync automatically. ` +
         `A runtime error is signalled if the value is not a valid JavaScript variable name.`,
+      undefined,
+      "string",
     ),
     pageSize: d(
       `This property defines the number of rows to display per page. ` +
@@ -121,11 +131,14 @@ export const TableMd = createMetadata({
         `whenever the number of data rows exceeds this value and suppressed otherwise. ` +
         `This makes \`pageSize\` the minimal way to get auto-activating, auto-hiding pagination: ` +
         `no conditional expressions on \`isPaginated\` or the position props are needed.`,
+      undefined,
+      "number",
     ),
     pageSizeOptions: {
       description:
         "This property holds an array of page sizes (numbers) the user can select for " +
         "pagination. If this property is not defined, the component allows only a page size of 10 items.",
+      valueType: "any",
     },
     showPageInfo: d(
       "Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).",
@@ -150,16 +163,16 @@ export const TableMd = createMetadata({
         "Determines where to place the page size selector in the layout. " +
         "It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).",
       options: PositionValues,
-      type: "string",
-      default: defaultProps.pageSizeSelectorPosition,
+      valueType: "string",
+      defaultValue: defaultProps.pageSizeSelectorPosition,
     },
     pageInfoPosition: {
       description:
         "Determines where to place the page information in the layout. " +
         "It works the same as the [Pagination component property](./Pagination#pageinfoposition).",
       options: PositionValues,
-      type: "string",
-      default: defaultProps.pageInfoPosition,
+      valueType: "string",
+      defaultValue: defaultProps.pageInfoPosition,
     },
     buttonRowPosition: d(
       "Determines where to place the pagination button row in the layout. " +
@@ -172,12 +185,15 @@ export const TableMd = createMetadata({
       `This property defines a predicate function with a return value that determines if the ` +
         `row should be disabled. The function retrieves the item to display and should return ` +
         `a Boolean-like value.`,
+      undefined,
+      "any",
     ),
     rowUnselectablePredicate: {
       description:
         `This property defines a predicate function with a return value that determines if the ` +
         `row should be unselectable. The function retrieves the item to display and should return ` +
         `a Boolean-like value. This property only has an effect when the \`rowsSelectable\` property is set to \`true\`.`,
+      valueType: "any",
     },
     noDataTemplate: dComponent(
       `A property to customize what to display if the table does not contain any data.`,
@@ -185,11 +201,15 @@ export const TableMd = createMetadata({
     sortBy: d(
       "This property is used to determine which data property to sort by. If not defined, " +
         "the data is not sorted",
+      undefined,
+      "string",
     ),
     sortDirection: d(
       "This property determines the sort order to be \`ascending\` or \`descending\`. This " +
         "property only works if the [\`sortBy\`](#sortby) property is also set. By default " +
         "ascending order is used.",
+      undefined,
+      "string",
     ),
     autoFocus: dAutoFocus(),
     hideHeader: {
@@ -215,16 +235,22 @@ export const TableMd = createMetadata({
       `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
         `enabled, but the column remains unsorted. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.nosort:Table" declaration in the app configuration file.`,
+      undefined,
+      "icon",
     ),
     iconSortAsc: d(
       `Allows setting an alernate icon displayed in the ${COMP} column header when sorting is enabled, ` +
         `and the column is sorted in ascending order. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.sortasc:Table" declaration in the app configuration file.`,
+      undefined,
+      "icon",
     ),
     iconSortDesc: d(
       `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is enabled, ` +
         `and the column is sorted in descending order. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.sortdesc:Table" declaration in the app configuration file.`,
+      undefined,
+      "icon",
     ),
     enableMultiRowSelection: {
       description:

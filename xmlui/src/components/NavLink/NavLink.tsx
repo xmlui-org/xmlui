@@ -4,7 +4,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
-import { NavLink, defaultProps } from "./NavLinkReact";
+import { defaultProps } from "./NavLink.defaults";
+import { NavLink } from "./NavLinkReact";
 import { LinkTargetMd } from "../abstractions";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -24,7 +25,7 @@ export const NavLinkMd = createMetadata({
     },
   },
   props: {
-    to: d(`This property defines the URL of the link.`),
+    to: d(`This property defines the URL of the link.`, undefined, "url"),
     enabled: dEnabled(),
     active: {
       description:
@@ -70,6 +71,8 @@ export const NavLinkMd = createMetadata({
     },
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
+      undefined,
+      "icon",
     ),
     iconAlignment: {
       description:

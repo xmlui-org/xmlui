@@ -2,11 +2,7 @@ import type { CSSProperties } from "react";
 import { memo, useMemo } from "react";
 import classnames from "classnames";
 import styles from "./ReadingTime.module.scss";
-
-export const defaultProps = {
-  wordsPerMinute: 265,
-  label: "min read",
-};
+import { defaultProps } from "./ReadingTime.defaults";
 
 type Props = {
   content?: string;

@@ -1,4 +1,5 @@
-import { ColorPicker, defaultProps } from "./ColorPickerReact";
+import { defaultProps } from "./ColorPicker.defaults";
+import { ColorPicker } from "./ColorPickerReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -24,7 +25,7 @@ export const ColorPickerMd = createMetadata({
   description:
     "`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.",
   props: {
-    initialValue: dInitialValue(),
+    initialValue: dInitialValue(defaultProps.initialValue, "color"),
     enabled: dEnabled(),
     autoFocus: dAutoFocus(),
     required: dRequired(),

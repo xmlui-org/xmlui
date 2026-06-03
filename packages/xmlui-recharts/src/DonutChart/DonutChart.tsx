@@ -1,6 +1,7 @@
 import { wrapComponent, parseScssVar, createMetadata, type ComponentMetadata } from "xmlui";
 import styles from "../PieChart/PieChartNative.module.scss";
-import { defaultProps, PieChart, type PieChartProps } from "../PieChart/PieChartReact";
+import { PieChart, type PieChartProps } from "../PieChart/PieChartReact";
+import { defaultProps } from "../PieChart/PieChart.defaults";
 
 const COMP = "DonutChart";
 

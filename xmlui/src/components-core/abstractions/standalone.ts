@@ -82,11 +82,10 @@ export type StandaloneAppDescription = {
    * - `errorCorrelationIdHeader` (string, default `"X-Correlation-Id"`) — the HTTP
    *   response header from which `AppError.correlationId` is read when a fetch fails.
    *   See `dev-docs/plans/07-structured-exception-model.md`.
-   * - `strictAuditLogging` (boolean, default `false`) — when `true`, the default
-   *   redaction policy blocks on un-redacted PII fields and the sink behaviour changes
-   *   from "drop on backpressure" to "bounded buffer then drop with `audit-loss`
-   *   diagnostic". Flips to `true` in the next major release. See
-   *   `dev-docs/plans/15-audit-grade-observability.md`.
+ * - `strictAuditLogging` (boolean, default `true`) — when `true` (default), the
+   *   redaction policy blocks on un-redacted PII fields; entry is dropped and
+   *   `audit-pii-leaked` is emitted. Set to `false` to downgrade to warn-only mode.
+   *   See `dev-docs/plans/15-audit-grade-observability.md`.
    * - `strictAccessibility` (boolean, default `false`) — when `true`, accessibility
    *   linter findings (`icon-only-button-no-label`, `modal-no-title`,
    *   `missing-accessible-name`, `form-input-no-label`) escalate from `warn` to
@@ -122,16 +121,16 @@ export type StandaloneAppDescription = {
    *   the budget emits a `kind:"lifecycle"` violation with
    *   `reason:"timeout"` and lets the unmount proceed.
    * - `strictConcurrency` (boolean, default `false`) — when `true`, the
-   *   handler-coordinator (plan #06) refuses unknown `handlerPolicy` values
-   *   at build time and escalates concurrency-policy mismatches (e.g. a
-   *   `single-flight` handler invoked while a previous run is still in
-   *   flight under `parallel` ancestry) from `warn` to `error`. When
-   *   `false` (the W3-6 rollout default — risk-probe phase) the public API
-   *   surface (`$cancel`, `HandlerPolicy`, `createHandlerCoordinator`) is
-   *   available but enforcement is best-effort: handlers that don't read
-   *   `$cancel` and don't declare a non-default policy see no behavioural
-   *   change. Flips to `true` once the W7-1 coordinator runtime ships. See
-   *   `dev-docs/plans/06-handler-concurrency-and-cancellation.md`.
+   *   handler-coordinator (plan #06) escalates `concurrency-handler-timeout`
+   *   diagnostics from `warn` to `error`: in addition to the
+   *   `kind:"concurrency"` trace entry the runtime emits a `console.error`
+   *   and routes the timeout through `App.signError` so it surfaces on the
+   *   global error channel. When `false` (the default during the W3-6/W7-1
+   *   rollout) timeouts are warn-only and only visible in the Inspector.
+   *   Cancellation, supersession, and drop outcomes are always info-level —
+   *   they are expected outcomes of the policies, not failures. Flips to
+   *   `true` in the next major. See
+   *   `dev-docs/plans/06-cooperative-concurrency.md`.
    * - `defaultHandlerTimeoutMs` (number, default `30000`) — millisecond
    *   budget after which an in-flight event handler is automatically
    *   cancelled with `CancellationReason="timeout"` and a
@@ -149,6 +148,18 @@ export type StandaloneAppDescription = {
    *   warn-level diagnostics so apps can audit before the strict
    *   default flips. Flips to `true` in the next major. See
    *   `dev-docs/plans/09-forms-validation-discipline.md`.
+   * - `csrfHeaderName` (string, default `"X-CSRF-Token"`) — HTTP header name
+   *   used to carry the `<Form csrfToken>` value on the built-in submit
+   *   request. See `dev-docs/plans/09-forms-validation-discipline.md` Step 5.1.
+   * - `idempotencyHeaderName` (string, default `"Idempotency-Key"`) — HTTP
+   *   header name used to carry the `<Form idempotencyKey>` value on the
+   *   built-in submit request.
+   * - `requireFormCsrf` (boolean, default `false`) — when `true`, any
+   *   `<Form>` whose submit method is non-GET/HEAD and which does not
+   *   supply a `csrfToken` emits the `csrf-token-missing` diagnostic
+   *   (warn). Under `strictForms` the diagnostic is escalated to error.
+   *   Use this to enforce a per-app CSRF policy without having to flip
+   *   `strictForms` globally.
    * - `strictRouting` (boolean, default `true`) — when `true` (the default),
    *   defended-routing diagnostics such as rejected constraints and
    *   non-canonical URLs escalate to errors and `nonCanonicalUrl` defaults to
@@ -189,14 +200,13 @@ export type StandaloneAppDescription = {
    *   immediate handler execution or deterministic per-trace FIFO ordering.
    * - `maxQueuedPerTrace` (number, default `64`) — bounds deterministic handler
    *   queues before `determinism-convergence-failed` is emitted.
-   * - `strictTheming` (boolean, default `false`) — when `true`, theming
+   * - `strictTheming` (boolean, default `true` — flipped from `false`
+   *   as a W8 risk probe) — when `true`, theming
    *   diagnostics (`invalid-theme-value`, `unknown-theme-variable`,
    *   `raw-css-in-prop`, `important-blocked`, `url-in-style`,
    *   `position-fixed-blocked`) escalate from `warn` to `error`. In
    *   strict mode, blocked declarations are dropped before they reach
-   *   the DOM; in non-strict mode they pass through with a warn-level
-   *   `kind:"theming"` trace entry so apps can audit before the strict
-   *   default flips. Flips to `true` in the next major release. See
+   *   the DOM; set to `false` for legacy warn-only behaviour. See
    *   `dev-docs/plans/08-sealed-theming-sandbox.md`.
    * - `allowInlineRawCss` (boolean, default `true`) — when `false`,
    *   the `style` prop refuses `url(...)` values and `!important`
@@ -206,14 +216,15 @@ export type StandaloneAppDescription = {
    *   layout-prop values. Higher values are clamped with a
    *   `kind:"theming"` warn entry; the clamp applies in both strict
    *   and non-strict modes.
-   * - `strictUdcSandbox` (boolean, default `false`) — when `true`,
+   * - `strictUdcSandbox` (boolean, default `true`) — when `true`,
    *   UDC sandboxing diagnostics (`udc-prop-undeclared`,
    *   `udc-scope-leak`, `udc-capability-missing`, etc.) escalate from
    *   `info` / `warn` to `error`. In strict mode, undeclared prop
    *   accesses and capability violations are blocked at runtime.
    *   Requires UDCs to carry explicit `<Prop>`, `<Event>`, `<Method>`,
-   *   and `<Slot>` declarations. Flips to `true` in the next major
-   *   release. See `dev-docs/plans/14-udc-sandbox.md`.
+   *   and `<Slot>` declarations. Set to `false` to fall back to the
+   *   legacy warn-only behaviour during migration. See
+   *   `dev-docs/plans/14-udc-sandbox.md`.
    * - `strictVersioning` (boolean, default `false`) — when `true`,
    *   versioning diagnostics (`removed-prop`, `internal-component-use`)
    *   escalate from `warn` to `error`; markup using a removed prop is

@@ -30,7 +30,7 @@ import {
 } from "../components-core/reactive-graph";
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
-import { verifyComponentDef } from "../components-core/type-contracts";
+import { verifyComponentDef } from "../components-core/type-contracts/verifier";
 import type { ComponentDef, ComponentMetadata, OptimizerMetadataView } from "../abstractions/ComponentDefs";
 import { metadataRegistry } from "../language-server/metadataRegistry";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";

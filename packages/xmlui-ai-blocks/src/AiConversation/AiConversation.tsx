@@ -1,6 +1,7 @@
 import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import { AiConversation, defaultProps } from "./AiConversationNative";
+import { defaultProps } from "./AiConversation.defaults";
+import { AiConversation } from "./AiConversationNative";
 import styles from "./AiConversation.module.scss";
 
 const COMP = "AiConversation";

@@ -34,7 +34,10 @@ export const SwitchMd = createMetadata({
   },
   props: {
     required: dRequired(),
-    initialValue: dInitialValue(defaultProps.initialValue),
+    initialValue: {
+      ...dInitialValue(defaultProps.initialValue),
+      valueType: "boolean",
+    },
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(),

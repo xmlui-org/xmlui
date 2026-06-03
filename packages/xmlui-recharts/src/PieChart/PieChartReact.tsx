@@ -33,16 +33,7 @@ export type PieChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   outerRadius?: string | number;
 };
 
-export const defaultProps: Pick<
-  PieChartProps,
-  "showLabel" | "showLabelList" | "showLegend" | "labelListPosition" | "innerRadius"
-> = {
-  showLabel: true,
-  showLabelList: false,
-  showLegend: false,
-  labelListPosition: "inside",
-  innerRadius: 0,
-};
+import { defaultProps } from "./PieChart.defaults";
 
 // Custom label renderer that draws connectors and places text outside the pie
 const renderCustomizedLabel = (props: any) => {

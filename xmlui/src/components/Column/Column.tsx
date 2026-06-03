@@ -3,7 +3,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { createMetadata } from "../metadata-helpers";
-import { Column, defaultProps } from "./ColumnReact";
+import { defaultProps } from "./Column.defaults";
+import { Column } from "./ColumnReact";
 
 const COMP = "Column";
 

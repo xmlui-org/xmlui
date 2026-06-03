@@ -256,15 +256,7 @@ export function buildLinkMap(
   return linkMap;
 }
 
-// Default props for NavPanel component
-export const defaultProps = {
-  inDrawer: false,
-  scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: true,
-  syncWithContent: false,
-  syncScrollBehavior: "smooth" as ScrollBehavior,
-  syncScrollPosition: "center" as ScrollLogicalPosition,
-};
+import { defaultProps } from "./NavPanel.defaults";
 
 interface INavPanelContext {
   inDrawer: boolean;

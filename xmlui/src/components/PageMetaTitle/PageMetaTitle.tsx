@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { PageMetaTitle, defaultProps } from "./PageMetaTitleReact";
+import { defaultProps } from "./PageMetaTitle.defaults";
+import { PageMetaTitle } from "./PageMetaTitleReact";
 
 const COMP = "PageMetaTitle";
 
@@ -13,6 +14,7 @@ export const PageMetaTitleMd = createMetadata({
   props: {
     value: {
       description: `This property sets the page's title to display in the browser tab.`,
+      valueType: "string",
       defaultValue: defaultProps.title,
     },
     noSuffix: {

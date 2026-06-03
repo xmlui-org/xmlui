@@ -18,7 +18,8 @@ import {
 } from "../../components/metadata-helpers";
 import { buttonThemeNames, buttonVariantNames, iconPositionNames, sizeMd } from "../abstractions";
 import { ThemedIcon } from "../Icon/Icon";
-import { FileInput, isFileArray, defaultProps } from "./FileInputReact";
+import { defaultProps } from "./FileInput.defaults";
+import { FileInput, isFileArray } from "./FileInputReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 
@@ -48,67 +49,80 @@ export const FileInputMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
-    buttonVariant: d("The button variant to use", buttonVariantNames),
-    buttonLabel: d(`This property is an optional string to set a label for the button part.`),
-    buttonIcon: d(
-      `The ID of the icon to display in the button. You can change the default icon for all ${COMP} ` +
+    buttonVariant: {
+      description: "The button variant to use",
+      valueType: "string",
+      availableValues: buttonVariantNames,
+    },
+    buttonLabel: {
+      description: `This property is an optional string to set a label for the button part.`,
+      valueType: "string",
+    },
+    buttonIcon: {
+      description:
+        `The ID of the icon to display in the button. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.browse:FileInput" declaration in the app configuration file.`,
-    ),
+      valueType: "icon",
+    },
     buttonIconPosition: d(
       `This optional string determines the location of the button icon.`,
       iconPositionNames,
       "string",
       "start",
     ),
-    acceptsFileType: d(
-      `An optional list of file types the input controls accepts provided as a string array.`,
-    ),
+    acceptsFileType: {
+      description: `An optional list of file types the input controls accepts provided as a string array.`,
+      valueType: "any",
+    },
     multiple: {
-      ...d(
+      description:
         `This boolean property enables to add not just one (\`false\`), but multiple files to the field ` +
-          `(\`true\`). This is done either by dragging onto the field or by selecting multiple files ` +
-          `in the browser menu after clicking the input field button.`,
-        null,
-        "boolean",
-      ),
+        `(\`true\`). This is done either by dragging onto the field or by selecting multiple files ` +
+        `in the browser menu after clicking the input field button.`,
+      valueType: "boolean",
       defaultValue: defaultProps.multiple,
     },
     directory: {
-      ...d(
+      description:
         `This boolean property indicates whether the component allows selecting directories (\`true\`) ` +
-          `or files only (\`false\`).`,
-        null,
-        "boolean",
-      ),
+        `or files only (\`false\`).`,
+      valueType: "boolean",
       defaultValue: defaultProps.directory,
     },
     buttonPosition: {
-      ...d(`This property determines the position of the button relative to the input field.`, [
-        "start",
-        "end",
-      ]),
+      description: `This property determines the position of the button relative to the input field.`,
+      valueType: "string",
+      availableValues: ["start", "end"],
       defaultValue: defaultProps.buttonPosition,
     },
-    buttonSize: d("The size of the button (small, medium, large)", sizeMd),
-    buttonThemeColor: d(
-      "The button color scheme (primary, secondary, attention)",
-      buttonThemeNames,
-      "string",
-      defaultProps.buttonThemeColor,
-    ),
-    parseAs: d(
-      `Automatically parse file contents as CSV or JSON. When set, the \`onDidChange\` event receives ` +
+    buttonSize: {
+      description: "The size of the button (small, medium, large)",
+      valueType: "string",
+      availableValues: sizeMd,
+    },
+    buttonThemeColor: {
+      description: "The button color scheme (primary, secondary, attention)",
+      valueType: "string",
+      availableValues: buttonThemeNames,
+      defaultValue: defaultProps.buttonThemeColor,
+    },
+    parseAs: {
+      description:
+        `Automatically parse file contents as CSV or JSON. When set, the \`onDidChange\` event receives ` +
         `an object \`{ files: File[], parsedData: ParseResult[] }\` containing both the raw files and parsed data. ` +
         `Each \`ParseResult\` includes \`file\`, \`data\` (parsed rows), and optional \`error\`. ` +
         `When \`parseAs\` is set, \`acceptsFileType\` is automatically inferred (e.g., ".csv" or ".json") ` +
         `unless explicitly overridden. Empty files are handled gracefully, returning an empty data array.`,
-      ["csv", "json"],
-    ),
-    csvOptions: d(
-      `Configuration options for CSV parsing (used when \`parseAs="csv"\`). Supports all Papa Parse ` +
+      valueType: "string",
+      availableValues: ["csv", "json"],
+    },
+    csvOptions: {
+      description:
+        `Configuration options for CSV parsing (used when \`parseAs="csv"\`). Supports all Papa Parse ` +
         `configuration options. Default options: \`{ header: true, skipEmptyLines: true }\`. ` +
         `Common options include \`delimiter\`, \`header\`, \`dynamicTyping\`, \`skipEmptyLines\`, and \`transform\`.`,
-    ),
+      valueType: "any",
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -126,7 +140,8 @@ export const FileInputMd = createMetadata({
   },
   apis: {
     value: {
-      description: "This property holds the current value of the component, which is an array of files.",
+      description:
+        "This property holds the current value of the component, which is an array of files.",
       signature: "get value(): File[]",
     },
     setValue: {
@@ -145,7 +160,8 @@ export const FileInputMd = createMetadata({
       signature: "open(): void",
     },
     inProgress: {
-      description: "This property indicates whether file parsing is currently in progress (when using parseAs).",
+      description:
+        "This property indicates whether file parsing is currently in progress (when using parseAs).",
       signature: "get inProgress(): boolean",
     },
     getFields: {
@@ -161,18 +177,16 @@ type ThemedFileInputProps = React.ComponentPropsWithoutRef<typeof FileInput>;
 export const ThemedFileInput = React.forwardRef<HTMLDivElement, ThemedFileInputProps>(
   function ThemedFileInput({ className, ...props }, _ref) {
     const themeClass = useComponentThemeClass(FileInputMd);
-    return (
-      <FileInput
-        {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
-      />
-    );
+    return <FileInput {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} />;
   },
 );
 
 export const fileInputRenderer = wrapComponent(COMP, FileInput, FileInputMd, {
   exposeRegisterApi: true,
-  customRender: (_props, { node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, classes }) => {
+  customRender: (
+    _props,
+    { node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, classes },
+  ) => {
     const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
     return (
       <FileInput

@@ -4,16 +4,13 @@ import classnames from "classnames";
 
 import styles from "./Avatar.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Avatar.defaults";
 
 type Props = HTMLAttributes<HTMLElement> & {
   size?: string;
   url?: string;
   name?: string;
   classes?: Record<string, string>;
-};
-
-export const defaultProps: Pick<Props, "size"> = {
-  size: "sm",
 };
 
 // Size tokens that map to predefined SCSS classes; anything else is treated as a

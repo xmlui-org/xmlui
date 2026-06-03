@@ -6,6 +6,7 @@ import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn } from "../..";
 import { isPlainObject } from "lodash-es";
+import { defaultProps } from "./Animation.defaults";
 
 export type AnimationProps = {
   children?: React.ReactNode;
@@ -31,17 +32,6 @@ const AnimatedComponent = animated(
     return React.cloneElement(children, { ...rest, ref });
   }),
 );
-
-export const defaultProps: Pick<
-  AnimationProps,
-  "delay" | "animateWhenInView" | "reverse" | "loop" | "once"
-> = {
-  delay: 0,
-  animateWhenInView: false,
-  reverse: false,
-  loop: false,
-  once: false,
-};
 
 export const parseAnimation = (animation: string | object): object => {
   if (typeof animation === "object") {

@@ -1,6 +1,6 @@
 # SlideInAnimation [#slideinanimation]
 
-The `SlideInAnimation` component represents an animation that slides in the content from a configurable direction.
+The `SlideInAnimation` component represents an animation that slides in the content from the left.
 
 ## Behaviors
 

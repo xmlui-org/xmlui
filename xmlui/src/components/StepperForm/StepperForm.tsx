@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
-import { defaultProps as formDefaultProps } from "../Form/FormReact";
+import { defaultProps as formDefaultProps } from "../Form/Form.defaults";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 const COMP = "StepperForm";
@@ -109,20 +109,27 @@ export const StepperFormMd = createMetadata({
       valueType: "boolean",
       defaultValue: formDefaultProps.enableSubmit,
     },
-    submitUrl: d(`URL to submit the form data.`),
+    submitUrl: d(`URL to submit the form data.`, undefined, "url"),
     submitMethod: {
       description:
         "This property sets the HTTP method to use when submitting the form data. If not " +
         "defined, `put` is used when the form has initial data; otherwise, `post`.",
+      valueType: "string",
     },
     inProgressNotificationMessage: d(
       "This property sets the message to display when the form is being submitted.",
+      undefined,
+      "string",
     ),
     completedNotificationMessage: d(
       "This property sets the message to display when the form is submitted successfully.",
+      undefined,
+      "string",
     ),
     errorNotificationMessage: d(
       "This property sets the message to display when the form submission fails.",
+      undefined,
+      "string",
     ),
     enabled: dEnabled(),
     itemRequireLabelMode: {
@@ -148,7 +155,7 @@ export const StepperFormMd = createMetadata({
     doNotPersistFields: {
       description:
         "An optional list of field names that should be excluded from the temporary localStorage save.",
-      type: "string[]",
+      valueType: "any",
     },
     keepOnCancel: {
       description:

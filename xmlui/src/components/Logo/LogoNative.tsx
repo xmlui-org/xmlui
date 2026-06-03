@@ -6,11 +6,7 @@ import { ThemedImage as Image } from "../Image/Image";
 import { useLogoUrl } from "../AppHeader/AppHeaderReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-// Default props for Logo component
-export const defaultProps = {
-  alt: "Logo",
-  inline: false,
-};
+import { defaultProps } from "./Logo.defaults";
 
 type LogoProps = {
   alt?: string;

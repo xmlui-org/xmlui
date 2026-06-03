@@ -61,6 +61,7 @@ export const TextBoxMd = createMetadata({
     placeholder: dPlaceholder(),
     initialValue: {
       ...dInitialValue(),
+      valueType: "string",
       defaultValue: defaultProps.initialValue,
       audit: {
         classification: "sensitive",
@@ -92,6 +93,7 @@ export const TextBoxMd = createMetadata({
       description:
         "This property defines the gap between the adornments and the input area. If not " +
         "set, the gap declared by the current theme is used.",
+      valueType: "length",
     },
     showPasswordToggle: {
       description:
@@ -102,13 +104,13 @@ export const TextBoxMd = createMetadata({
     passwordVisibleIcon: {
       description:
         "The icon to display when the password is visible (when showPasswordToggle is true).",
-      valueType: "string",
+      valueType: "icon",
       defaultValue: "eye",
     },
     passwordHiddenIcon: {
       description:
         "The icon to display when the password is hidden (when showPasswordToggle is true).",
-      valueType: "string",
+      valueType: "icon",
       defaultValue: "eye-off",
     },
     verboseValidationFeedback: {
@@ -117,11 +119,11 @@ export const TextBoxMd = createMetadata({
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
   },
   events: {

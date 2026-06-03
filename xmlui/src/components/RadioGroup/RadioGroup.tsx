@@ -18,7 +18,8 @@ import {
   dRequired,
   dValidationStatus,
 } from "../metadata-helpers";
-import { RadioGroup, defaultProps } from "./RadioGroupReact";
+import { defaultProps } from "./RadioGroup.defaults";
+import { RadioGroup } from "./RadioGroupReact";
 
 const COMP = "RadioGroup";
 const RGOption = `RadioGroupOption`;
@@ -45,6 +46,7 @@ export const RadioGroupMd = createMetadata({
   props: {
     initialValue: {
       ...dInitialValue(),
+      valueType: "string",
       defaultValue: defaultProps.initialValue,
     },
     autoFocus: dAutoFocus(),

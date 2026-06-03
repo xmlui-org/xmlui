@@ -8,6 +8,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
+import { defaultProps } from "./Slider.defaults";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
@@ -40,29 +41,6 @@ export type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onFocus" | "onBl
   thumbStyle?: CSSProperties;
   showValues?: boolean;
   valueFormat?: (value: number) => string;
-};
-
-export const defaultProps: Pick<
-  Props,
-  | "step"
-  | "min"
-  | "max"
-  | "enabled"
-  | "validationStatus"
-  | "tabIndex"
-  | "showValues"
-  | "valueFormat"
-  | "minStepsBetweenThumbs"
-> = {
-  step: 1,
-  min: 0,
-  max: 10,
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  tabIndex: -1,
-  showValues: true,
-  valueFormat: (value: number) => value.toString(),
-  minStepsBetweenThumbs: 1,
 };
 
 const parseValue = (val: string | number | undefined, defaultVal: number): number => {

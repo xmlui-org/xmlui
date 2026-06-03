@@ -4,7 +4,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject, textSubject } from "../../components-core/theming/themes/base-utils";
 import { MemoizedItem } from "../container-helpers";
-import { ModalDialog, ModalDialogFrame, defaultProps } from "./ModalDialogNative";
+import { defaultProps } from "./ModalDialog.defaults";
+import { ModalDialog, ModalDialogFrame } from "./ModalDialogNative";
 import { createMetadata, d } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -37,9 +38,10 @@ export const ModalDialogMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.fullScreen,
     },
-    title: d(`Provides a prestyled heading to display the intent of the dialog.`),
+    title: d(`Provides a prestyled heading to display the intent of the dialog.`, undefined, "string"),
     titleTemplate: {
       description: "A custom template to render the dialog title.",
+      valueType: "ComponentDef",
     },
     closeButtonVisible: {
       description: `Shows (\`true\`) or hides (\`false\`) the visibility of the close button on the dialog.`,

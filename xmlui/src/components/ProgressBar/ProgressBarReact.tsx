@@ -10,9 +10,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   classes?: Record<string, string>;
 }
 
-export const defaultProps = {
-  value: 0,
-};
+import { defaultProps } from "./ProgressBar.defaults";
 
 export const ProgressBar = memo(forwardRef(function ProgressBar(
   { value = defaultProps.value, style, className, classes, ...rest }: Props,

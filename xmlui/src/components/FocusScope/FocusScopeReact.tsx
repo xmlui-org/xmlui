@@ -1,17 +1,12 @@
 import { forwardRef, memo } from "react";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { useFocusScope } from "../../components-core/accessibility/useFocusScope";
+import { defaultProps } from "./FocusScope.defaults";
 
 export type FocusScopeProps = React.HTMLAttributes<HTMLDivElement> & {
   trap?: boolean;
   restore?: boolean;
   autoFocus?: boolean;
-};
-
-export const defaultProps = {
-  trap: true,
-  restore: true,
-  autoFocus: false,
 };
 
 export const FocusScope = memo(forwardRef<HTMLDivElement, FocusScopeProps>(function FocusScope(

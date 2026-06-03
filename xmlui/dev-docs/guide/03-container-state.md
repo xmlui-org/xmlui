@@ -119,7 +119,49 @@ When an event handler assigns a variable to a component API (e.g. `myVar = ds` w
 
 ## Variable Re-evaluation
 
-`var.foo="{someExpr}"` re-evaluates `someExpr` on **every render** from scratch. When you mutate `foo` in an event handler, the new value enters the reducer state at layer 2 and **shadows** the expression result from layer 5 on subsequent renders. The expression is still evaluated, but the reducer value takes precedence.
+`var.foo="{someExpr}"` is a declaration, not a one-time initializer. On every render, `StateContainer` evaluates the expression again while resolving layer 5 local variables. If nothing has mutated `foo`, the value visible to markup is the fresh result of that expression.
+
+```xml
+<App var.price="{10}" var.quantity="{2}" var.total="{price * quantity}">
+  <Text>{total}</Text>
+</App>
+```
+
+Here, `total` is recalculated on each render from the current `price` and `quantity`. If `price` or `quantity` changes, the next render evaluates `price * quantity` again and `{total}` shows the new derived value.
+
+The behavior changes after an event handler assigns to the same variable:
+
+```xml
+<App var.count="{0}">
+  <Button onClick="count++" label="Increment" />
+  <Text>{count}</Text>
+</App>
+```
+
+The important detail is that the assignment does not rewrite the `var.count` declaration. Instead, the proxy sees the mutation and dispatches `STATE_PART_CHANGED`. The reducer stores the runtime value in layer 2 component reducer state.
+
+On the next render, both values exist:
+
+| Source | Value for `count` | Why |
+| ------ | ----------------- | --- |
+| Layer 5 local variable declaration | `0` | `var.count="{0}"` is evaluated again from the markup declaration |
+| Layer 2 reducer state | `1` | The click handler's `count++` mutation was stored by the reducer |
+
+When `StateContainer` prepares the final local/runtime state, the reducer value shadows the freshly evaluated declaration value. The expression is still evaluated, but the reducer value is the one expressions see. That is why repeated clicks continue from `1` to `2`, `3`, and so on instead of resetting to `0` on every render.
+
+This distinction matters most for derived values. If a `var.*` value is never assigned to, it behaves like a reactive formula. Once that same name is assigned to by an event handler, the assigned runtime value becomes the visible value until that reducer entry is removed or the owning container is remounted.
+
+```xml
+<App var.price="{10}" var.quantity="{2}" var.total="{price * quantity}">
+  <Button onClick="quantity++" label="Increase quantity" />
+  <Button onClick="total = 999" label="Override total" />
+
+  <Text>Quantity: {quantity}</Text>
+  <Text>Total: {total}</Text>
+</App>
+```
+
+Before `total` is assigned directly, it behaves like a formula: clicking **Increase quantity** changes `quantity` from `2` to `3`, and the next render recalculates `total` as `30`. After clicking **Override total**, the assignment `total = 999` stores a reducer value for `total`. From then on, **Increase quantity** can still change `quantity`, and `var.total="{price * quantity}"` is still re-evaluated in layer 5, but `{total}` keeps showing the reducer value `999` because that runtime value shadows the formula result.
 
 ## The Reducer
 
@@ -143,7 +185,9 @@ The `STATE_PART_CHANGED` action is the most complex. It receives a path array (e
 
 When an event handler mutates a variable (e.g. `count = count + 1` or `users[0].name = "Alice"`), the mutation is intercepted by a JavaScript `Proxy` created by `buildProxy()`.
 
-The proxy wraps every object and array in the state tree:
+`buildProxy()` receives the event handler's local context object and a callback that records changes. It returns a proxy for the root context, then lazily creates proxies for nested plain objects and arrays as they are read. Each nested proxy remembers the path that led to it, so a write like `users[0].name = "Bob"` can be reported as the full path `["users", 0, "name"]`. Nested proxies are cached in a `WeakMap`, which keeps repeated reads reference-stable (`state.users === state.users`).
+
+The proxy observes three operations:
 
 - **`get` trap** — Returns proxied versions of nested objects/arrays. Proxies are cached so `state.users === state.users` (reference stability).
 - **`set` trap** — Compares old and new values (first by reference, then by deep equality via `JSON.stringify`). If the value actually changed, fires a callback with the full path and values.
@@ -190,12 +234,14 @@ sequenceDiagram
 
 When the proxy callback fires, `statePartChanged` in `StateContainer` decides where to send the mutation:
 
-1. **Is the key a local variable?** → Dispatch `STATE_PART_CHANGED` to this container's reducer.
-2. **Is the key a global variable?**
+1. **Is the key a local variable?** → Check whether the first path segment exists in `resolvedLocalVars`, the map produced from this container's `var.*`, functions, and script variables. If it does, dispatch `STATE_PART_CHANGED` to this container's reducer.
+2. **Is the key a global variable?** → Check whether the first path segment exists in `stableCurrentGlobalVars`, the map of globals visible to this container.
    - Root container → dispatch locally
    - Non-root → bubble to `parentStatePartChanged`
-3. **Is the key in component state?** → Dispatch locally.
+3. **Is the key in component state?** → Check whether the key exists in the current reducer state (`componentStateRef.current`). If it does, dispatch locally.
 4. **Otherwise** → If `uses` includes the key, bubble to parent. If not, the mutation is dropped (no owner found).
+
+The "key" here is the first segment of the changed path. For `users[0].name = "Bob"`, the key is `users`; for `count++`, the key is `count`. Local variables are checked before globals because a local declaration intentionally shadows a global with the same name.
 
 This routing ensures that only the container that owns a variable processes its updates. Children receive parent state as a reference prop, not a copy — when the owning container's reducer produces a new state object, all children see the updated reference on the next render.
 
@@ -211,11 +257,11 @@ Consider the following code snippet:
 </App>
 ```
 
-`App` owns `x`; `Text` owns `y`. `TextContainer` receives `x` via **Layer 1 (inherited parent state)** as a stable reference to the same object held by `AppContainer` — no copy is made. If an event handler inside `Text` writes `x = newVal`, the proxy intercepts the write, finds that `x` is not a local variable of `TextContainer`, and bubbles the mutation up to `AppContainer`'s reducer. `AppContainer` fires `STATE_PART_CHANGED`, Immer produces a new state object, and `TextContainer` sees the updated value on the next render. There is exactly one owner of `x` at all times.
+`App` owns `x`; `Text` owns `y`. In the explanation below, "App container" and "Text container" mean internal `StateContainer` instances created for those XMLUI nodes, not separate public XMLUI components. The Text node's internal container receives `x` via **Layer 1 (inherited parent state)** as a stable reference to the same object held by the App node's internal container — no copy is made. If an event handler inside `Text` writes `x = newVal`, the proxy intercepts the write, finds that `x` is not in the Text container's `resolvedLocalVars`, and bubbles the mutation up to the App container's reducer. The App container fires `STATE_PART_CHANGED`, Immer produces a new state object, and the Text container sees the updated value on the next render. There is exactly one owner of `x` at all times.
 
 ```mermaid
 graph TD
-  subgraph AppContainer["AppContainer (implicit) — owns x"]
+  subgraph AppContainer["App node's internal StateContainer — owns x"]
     direction TB
     AppOwned["owned state<br>x = 0"]
 
@@ -223,7 +269,7 @@ graph TD
       direction TB
       AppVarDecl["var.x = '{0}'"]
 
-      subgraph TextContainer["TextContainer (implicit) — owns y"]
+      subgraph TextContainer["Text node's internal StateContainer — owns y"]
         direction TB
         TextL5["local state<br>y = 'hello'"]
 
@@ -297,10 +343,10 @@ In an `Items` component, each row gets its own fresh context object with `$item`
 
 ### Example: Global Variables
 
-Global variables (declared with `var.global.*`) are owned by the **root container** and flow to every other container via Layer 6. Any container can read them; mutations anywhere bubble all the way up to the root owner.
+Global variables (declared with `global.*`) are owned by the **root container** and flow to every other container via Layer 6. Any container can read them; mutations anywhere bubble all the way up to the root owner.
 
 ```xml
-<App var.global.theme="{'dark'}">
+<App global.theme="{'dark'}">
   <Sidebar />
   <MainContent />
 </App>

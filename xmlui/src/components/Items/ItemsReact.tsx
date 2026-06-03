@@ -11,9 +11,7 @@ type Props = {
   reverse?: boolean;
 };
 
-export const defaultProps: Pick<Props, "reverse"> = {
-  reverse: false,
-};
+import { defaultProps } from "./Items.defaults";
 
 export function Items({ items, renderItem, reverse = defaultProps.reverse }: Props) {
   const itemsToRender = useMemo(() => {

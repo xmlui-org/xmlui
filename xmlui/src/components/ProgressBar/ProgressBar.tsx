@@ -2,7 +2,8 @@ import styles from "./ProgressBar.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { ProgressBar, defaultProps } from "./ProgressBarReact";
+import { defaultProps } from "./ProgressBar.defaults";
+import { ProgressBar } from "./ProgressBarReact";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "ProgressBar";

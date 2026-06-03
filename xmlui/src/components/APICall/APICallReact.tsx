@@ -8,6 +8,8 @@ import type { ApiActionComponent } from "../../components/APICall/APICall";
 import { evalBinding } from "../../components-core/script-runner/eval-tree-sync";
 import { Parser } from "../../parsers/scripting/Parser";
 import toast from "react-hot-toast";
+import { getCurrentTrace, pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { defaultProps } from "./APICall.defaults";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
@@ -30,16 +32,27 @@ interface DeferredState {
   startTime?: number;
 }
 
-export const defaultProps = {
-  method: "get",
-  deferredMode: false,
-  statusMethod: "get",
-  pollingInterval: 2000,
-  maxPollingDuration: 300000,
-  pollingBackoff: "none",
-  maxPollingInterval: 30000,
-  cancelMethod: "post",
-};
+function traceApiComponent(
+  executionContext: ActionExecutionContext | undefined,
+  node: ApiActionComponent,
+  phase: string,
+  details?: Record<string, any>,
+) {
+  const appContext = executionContext?.appContext;
+  if (appContext?.appGlobals?.xsVerbose !== true) return;
+  pushXsLog({
+    ts: Date.now(),
+    perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+    traceId: getCurrentTrace(),
+    kind: "api:component",
+    component: "APICall",
+    phase,
+    url: node.props?.url,
+    method: node.props?.method || defaultProps.method,
+    uid: String(node.uid || ""),
+    ...details,
+  });
+}
 
 // =============================================================================
 // HELPER FUNCTIONS
@@ -530,10 +543,21 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
 
       // Store execution context for cancel() method
       executionContextRef.current = executionContext;
+      traceApiComponent(executionContext, node, "execute:start", {
+        deferredMode: (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true,
+      });
       
       // Set inProgress before starting
       if (updateState) {
+        traceApiComponent(executionContext, node, "state:update", {
+          inProgress: true,
+          reason: "execute:start",
+        });
         updateState({ inProgress: true });
+        traceApiComponent(executionContext, node, "state:update-dispatched", {
+          inProgress: true,
+          reason: "execute:start",
+        });
       }
       
       // Detect deferred mode early so we can adjust behaviour for the initial POST
@@ -571,6 +595,7 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
             resolveBindingExpressions: true,
           },
         );
+        traceApiComponent(executionContext, node, "callApi:resolved");
 
         // Store result in ref for cancel() method
         lastResultRef.current = result;
@@ -578,18 +603,36 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
         // In deferred mode keep inProgress=true and loaded=false until polling finishes.
         if (updateState) {
           if (deferredMode) {
+            traceApiComponent(executionContext, node, "state:update", {
+              reason: "callApi:resolved:deferred",
+              loaded: false,
+            });
             updateState({
               lastResult: result,
               lastError: undefined,
               lastResponseHeaders: capturedResponseHeaders,
             });
+            traceApiComponent(executionContext, node, "state:update-dispatched", {
+              reason: "callApi:resolved:deferred",
+              loaded: false,
+            });
           } else {
+            traceApiComponent(executionContext, node, "state:update", {
+              inProgress: false,
+              loaded: true,
+              reason: "callApi:resolved",
+            });
             updateState({ 
               inProgress: false, 
               loaded: true, 
               lastResult: result,
               lastError: undefined,
               lastResponseHeaders: capturedResponseHeaders,
+            });
+            traceApiComponent(executionContext, node, "state:update-dispatched", {
+              inProgress: false,
+              loaded: true,
+              reason: "callApi:resolved",
             });
           }
         }
@@ -631,10 +674,21 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
       } catch (error) {
         // Store error and update state on failure
         if (updateState) {
+          traceApiComponent(executionContext, node, "state:update", {
+            inProgress: false,
+            loaded: true,
+            reason: "callApi:error",
+            error: error instanceof Error ? error.message : String(error),
+          });
           updateState({ 
             inProgress: false,
             loaded: true,
             lastError: error,
+          });
+          traceApiComponent(executionContext, node, "state:update-dispatched", {
+            inProgress: false,
+            loaded: true,
+            reason: "callApi:error",
           });
         }
         throw error;

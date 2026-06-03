@@ -272,6 +272,7 @@ interface Scriptable {
  *   - `"string"`         Any value coerced via `String(value)`.
  *   - `"number"`         JS number or numeric string.
  *   - `"any"`            Opt-out of verification; coerced as-is.
+ *   - `"hash"`           Plain object record (`Record<string, any>`).
  *   - `"ComponentDef"`   A nested component definition (template prop).
  *
  * Refined types (Phase 1 of the type-contract plan):
@@ -288,6 +289,7 @@ export type PropertyValueType =
   | "string"
   | "number"
   | "any"
+  | "hash"
   | "ComponentDef"
   | "integer"
   | "color"

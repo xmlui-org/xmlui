@@ -3,9 +3,9 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata, d, dEnabled } from "../metadata-helpers";
+import { defaultProps } from "./Pagination.defaults";
 import {
   PositionValues,
-  defaultProps,
   type PageNumber,
   PageNumberValues,
   Pagination,
@@ -75,6 +75,8 @@ export const PaginationMd = createMetadata({
     ),
     pageSizeOptions: d(
       "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
+      undefined,
+      "any",
     ),
     hasPrevPage: d(
       "Whether to disable the previous page button. Only takes effect if itemCount is not provided.",

@@ -252,6 +252,14 @@ The number of milliseconds to wait before switching the Save button label to `sa
 
 This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`.
 
+### `submitPolicy` [#submitpolicy]
+
+> [!DEF]  default: **"single-flight"**
+
+Concurrency policy applied when the user triggers a submit while a previous submit is still running. `single-flight` (default) ignores extra clicks. `drop-while-running` fires the `submitDropped` event without queuing. `queue` is reserved for a future scheduler — currently behaves like `single-flight`.
+
+Available values: `single-flight` **(default)**, `queue`, `drop-while-running`
+
 ### `submitUrl` [#submiturl]
 
 URL to submit the form data.
@@ -309,6 +317,23 @@ The form infrastructure fires this event when the form is submitted. The event a
   </Form>
 </App>  
 ```
+
+### `submitDropped` [#submitdropped]
+
+Fires when a submit attempt is suppressed because the configured `submitPolicy` rejected it (for example `drop-while-running`).
+
+**Signature**: `submitDropped(reason: string): void`
+
+- `reason`: Why the submit was dropped (e.g. `drop-while-running`).
+
+### `submitError` [#submiterror]
+
+Fires when the submit handler throws. The event receives the raw error and, when the framework was able to extract a structured validation problem (RFC 7807, Spring, Laravel, or the XMLUI legacy shape), the parsed problem object. The form has already merged per-field errors into the validation results when this fires.
+
+**Signature**: `submitError(error: any, problem: any): void`
+
+- `error`: The raw error thrown by the submit handler.
+- `problem`: The parsed RFC 7807-style validation problem, or `undefined` if none could be extracted.
 
 ### `success` [#success]
 
@@ -378,6 +403,12 @@ The following example uses the first argument to inspect what will be submitted,
 ```
 
 ## Exposed Methods [#exposed-methods]
+
+### `cancel` [#cancel]
+
+Aborts the AbortController associated with the in-flight submit. The framework still awaits the submit handler's promise — cancellation is cooperative; handlers that wish to bail out early should observe the `$cancel` token / abort signal.
+
+**Signature**: `cancel(): void`
 
 ### `getData` [#getdata]
 

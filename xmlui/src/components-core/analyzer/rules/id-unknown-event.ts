@@ -28,6 +28,7 @@ const FRAMEWORK_EVENTS: ReadonlySet<string> = new Set([
   "onBeforeDispose",
   "onDidChange",
   "onInit",
+  "onCleanup",
   // Navigation
   "onDidNavigate",
 ]);

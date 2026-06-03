@@ -28,6 +28,7 @@ import { HiddenOption } from "./HiddenOption";
 import { SimpleSelect } from "./SimpleSelect";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
+import { defaultProps, type SelectVariant } from "./Select.defaults";
 import { OptionContext } from "./OptionContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
@@ -51,24 +52,7 @@ export function isIntrinsicHeightKeyword(value?: CSSProperties["height"]): boole
   return typeof value === "string" && INTRINSIC_HEIGHT_KEYWORDS.has(value);
 }
 
-export const defaultProps = {
-  enabled: true,
-  placeholder: "",
-  autoFocus: false,
-  searchable: false,
-  multiSelect: false,
-  required: false,
-  inProgress: false,
-  inProgressNotificationMessage: "",
-  readOnly: false,
-  validationStatus: "none" as ValidationStatus,
-  labelBreak: false,
-  clearable: false,
-  modal: false,
-  variant: "default" as SelectVariant,
-};
-
-export type SelectVariant = "default" | "outlined";
+export type { SelectVariant } from "./Select.defaults";
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];

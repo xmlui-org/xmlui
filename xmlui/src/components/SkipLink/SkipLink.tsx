@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { SkipLink, defaultProps } from "./SkipLinkReact";
+import { defaultProps } from "./SkipLink.defaults";
+import { SkipLink } from "./SkipLinkReact";
 
 const COMP = "SkipLink";
 

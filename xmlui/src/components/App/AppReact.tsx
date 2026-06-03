@@ -42,6 +42,7 @@ import { EMPTY_OBJECT } from "../../components-core/constants";
 import { writeLocalStorage } from "../../components-core/appContext/local-storage-functions";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./App.defaults";
 
 // --- Slot Components ---
 
@@ -113,35 +114,13 @@ type Props = {
   themeStorageKey?: string;
   locale?: string;
   localeBundles?: unknown;
+  auditPolicy?: unknown;
   direction?: "ltr" | "rtl" | "auto";
   scheduler?: "concurrent" | "fifo";
   maxQueuedPerTrace?: number;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   footerSticky?: boolean;
-};
-
-export const defaultProps: Pick<
-  Props,
-  | "scrollWholePage"
-  | "noScrollbarGutters"
-  | "fitContent"
-  | "defaultTone"
-  | "defaultTheme"
-  | "autoDetectTone"
-  | "persistTheme"
-  | "toneStorageKey"
-  | "themeStorageKey"
-> = {
-  scrollWholePage: true,
-  noScrollbarGutters: false,
-  fitContent: false,
-  defaultTone: undefined,
-  defaultTheme: undefined,
-  autoDetectTone: false,
-  persistTheme: false,
-  toneStorageKey: "appTone",
-  themeStorageKey: "appTheme",
 };
 
 const VALID_LAYOUTS: AppLayoutType[] = [
@@ -186,6 +165,7 @@ export const App = memo(function App({
   themeStorageKey = defaultProps.themeStorageKey,
   locale,
   localeBundles,
+  auditPolicy,
   direction = "auto",
   scheduler,
   maxQueuedPerTrace,
@@ -244,6 +224,22 @@ export const App = memo(function App({
     registeredLocaleBundlesRef.current = signature;
     void appContext.App?.registerLocaleBundles?.(localeBundles);
   }, [appContext.App, localeBundles]);
+
+  // Plan #15 Step 2.2: push the declarative <App auditPolicy> markup into the
+  // audit pipeline. Re-runs only when the JSON-serialised policy changes.
+  const lastAuditPolicySig = useRef<string>();
+  useEffect(() => {
+    if (auditPolicy === undefined) return;
+    let sig: string;
+    try {
+      sig = JSON.stringify(auditPolicy);
+    } catch {
+      sig = String(auditPolicy);
+    }
+    if (lastAuditPolicySig.current === sig) return;
+    lastAuditPolicySig.current = sig;
+    appContext.App?.setAuditPolicy?.(auditPolicy);
+  }, [appContext.App, auditPolicy]);
 
   useEffect(() => {
     // Push the direction prop into AppContext so App.direction stays consistent

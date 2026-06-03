@@ -25,6 +25,8 @@ export const TextMd = createMetadata({
     value: d(
       `The text to be displayed. This value can also be set via nesting the text into ` +
         `the \`${COMP}\` component.`,
+      undefined,
+      "string",
     ),
     variant: {
       description:
@@ -32,16 +34,19 @@ export const TextMd = createMetadata({
         "unique combination of font style, weight, size, color, and other parameters. " +
         "If not defined, the text uses the current style of its context. " +
         "In addition to predefined variants, you can specify custom variant names and style them " +
-        "using theme variables with the pattern `{cssProperty}-Text-{variantName}` " +
-        "(e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). " +
-        "See the documentation for a complete list of supported CSS properties.",
+      "using theme variables with the pattern `{cssProperty}-Text-{variantName}` " +
+      "(e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). " +
+      "See the documentation for a complete list of supported CSS properties.",
       availableValues: variantOptionsMd,
+      valueType: "string",
     },
     maxLines: d(
       "This property determines the maximum number of lines the component can wrap to. " +
         "If there is no space to display all the contents, the component displays up to as " +
         "many lines as specified in this property. When the value is not defined, there is " +
         "no limit on the displayed lines.",
+      undefined,
+      "number",
     ),
     preserveLinebreaks: {
       description: `This property indicates if linebreaks should be preserved when displaying text.`,

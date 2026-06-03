@@ -19,7 +19,8 @@ import {
   d,
   dInternal,
 } from "../metadata-helpers";
-import { AutoComplete, defaultProps } from "./AutoCompleteReact";
+import { defaultProps } from "./AutoComplete.defaults";
+import { AutoComplete } from "./AutoCompleteReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";
@@ -72,7 +73,10 @@ export const AutoCompleteMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
-    dropdownHeight: d("This property sets the height of the dropdown list."),
+    dropdownHeight: {
+      description: "This property sets the height of the dropdown list.",
+      valueType: "length",
+    },
     multi: {
       ...dMulti(),
       defaultValue: defaultProps.multi,

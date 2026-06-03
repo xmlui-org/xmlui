@@ -127,3 +127,5 @@ See the [ModalDialog](/docs/reference/components/ModalDialog) reference for all 
 - Example: `when="{$queryParams.dialog === 'settings'}"` for deep-linking, plus `onClick="dialog.close()"` for a manual close button
 
 **Key distinction:** Imperative is about **actions** ("open this now"), declarative is about **state** ("be open when this condition is true"). Choose imperative for user-triggered events, declarative when visibility should track a condition or be URL-addressable.
+
+For a shorter decision guide with side-by-side examples, see [Choose between imperative and state-driven ModalDialogs](/docs/howto/choose-between-imperative-and-state-driven-modal-dialogs).

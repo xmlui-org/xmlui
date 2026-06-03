@@ -2,7 +2,8 @@ import styles from "./FileUploadDropZone.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneReact";
+import { defaultProps } from "./FileUploadDropZone.defaults";
+import { FileUploadDropZone } from "./FileUploadDropZoneReact";
 import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "FileUploadDropZone";
@@ -40,10 +41,14 @@ export const FileUploadDropZoneMd = createMetadata({
       "boolean",
       true,
     ),
-    acceptedFileTypes: d(
-      `Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`,
-    ),
-    maxFiles: d(`The maximum number of files that can be selected.`),
+    acceptedFileTypes: {
+      description: `Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`,
+      valueType: "string",
+    },
+    maxFiles: {
+      description: `The maximum number of files that can be selected.`,
+      valueType: "integer",
+    },
   },
   events: {
     upload: {

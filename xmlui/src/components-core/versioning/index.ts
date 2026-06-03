@@ -12,7 +12,7 @@ export type {
 } from "./diagnostics";
 
 export { verifyVersioning } from "./verifier";
-export type { VerifyVersioningOptions } from "./verifier";
+export type { VerifyVersioningOptions, VersioningRegistry } from "./verifier";
 
 export {
   emitVersioningDiagnostics,
@@ -24,5 +24,7 @@ export type { VersioningFinding, VersioningReport } from "./runtime";
 
 export { applyRenames } from "./rename-helper";
 export type { PropRename, ApplyRenamesResult } from "./rename-helper";
+
+export { applyValueAliases, applyPreserveLegacyDefault } from "./propCoercion";
 
 export { compareSemver, parseSemver } from "./semver";

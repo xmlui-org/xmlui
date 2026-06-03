@@ -18,6 +18,7 @@ import type { ValidationStatus } from "../abstractions";
 import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
 import { ThemedButton as Button } from "../Button/Button";
 import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
+import { defaultProps } from "./FileInput.defaults";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
@@ -89,23 +90,6 @@ type Props = {
   parseAs?: "csv" | "json";
   csvOptions?: Papa.ParseConfig;
   onParseError?: (error: Error, file: File) => void;
-};
-
-export const defaultProps: Pick<
-  Props,
-  | "enabled"
-  | "buttonPosition"
-  | "buttonLabel"
-  | "multiple"
-  | "directory"
-  | "buttonThemeColor"
-> = {
-  enabled: true,
-  buttonPosition: "end",
-  buttonLabel: "Browse",
-  multiple: false,
-  directory: false,
-  buttonThemeColor: "primary",
 };
 
 export const FileInput = memo(forwardRef(function FileInput(

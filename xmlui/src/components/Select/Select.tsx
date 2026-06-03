@@ -23,7 +23,8 @@ import {
   dInternal,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
-import { Select, defaultProps } from "./SelectReact";
+import { defaultProps } from "./Select.defaults";
+import { Select } from "./SelectReact";
 
 const COMP = "Select";
 
@@ -53,9 +54,13 @@ export const SelectMd = createMetadata({
       ...dPlaceholder(),
       defaultValue: defaultProps.placeholder,
     },
-    initialValue: dInitialValue(),
+    initialValue: {
+      ...dInitialValue(),
+      valueType: "any",
+    },
     value: {
       description: "This property sets the current value of the component.",
+      valueType: "any",
       isInternal: true, //TODO illesg temp
     },
     autoFocus: {
@@ -98,6 +103,8 @@ export const SelectMd = createMetadata({
         "the component builds options from this array using `valueField` and `labelField`. " +
         "This is the most efficient approach for large lists because the options are derived in JavaScript " +
         "and re-evaluated only when the data reference changes, not on every unrelated state update.",
+      undefined,
+      "any",
     ),
     valueField: {
       description:
@@ -124,7 +131,7 @@ export const SelectMd = createMetadata({
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
       undefined,
-      "string",
+      "length",
     ),
     scrollIndicators: {
       description:
@@ -190,11 +197,11 @@ export const SelectMd = createMetadata({
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      valueType: "string",
+      valueType: "icon",
     },
   },
   events: {

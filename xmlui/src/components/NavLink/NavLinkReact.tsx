@@ -15,12 +15,7 @@ import { NavPanelContext } from "../NavPanel/NavPanelReact";
 import { NavGroupContext } from "../NavGroup/NavGroupContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 
-// Default props for NavLink component
-export const defaultProps = {
-  active: false,
-  displayActive: true,
-  noIndicator: false,
-};
+import { defaultProps } from "./NavLink.defaults";
 
 type Props = {
   uid?: string;

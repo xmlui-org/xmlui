@@ -2,7 +2,8 @@ import styles from "./HeroSection.module.scss";
 
 import { wrapComponent, createMetadata, dComponent, d, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import { HeroSection, defaultProps } from "./HeroSectionReact";
+import { defaultProps } from "./HeroSection.defaults";
+import { HeroSection } from "./HeroSectionReact";
 
 const COMP = "HeroSection";
 

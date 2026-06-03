@@ -5,9 +5,7 @@ export type LiveRegionProps = React.HTMLAttributes<HTMLDivElement> & {
   politeness?: "polite" | "assertive";
 };
 
-export const defaultProps = {
-  politeness: "polite" as const,
-};
+import { defaultProps } from "./LiveRegion.defaults";
 
 const hiddenStyle: React.CSSProperties = {
   position: "absolute",

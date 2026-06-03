@@ -17,11 +17,11 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
+import { defaultProps } from "./DateInput.defaults";
 import {
   dateFormats,
   DateInput,
   DateInputModeValues,
-  defaultProps,
   WeekDays,
 } from "./DateInputReact";
 
@@ -51,7 +51,7 @@ export const DateInputMd = createMetadata({
     },
   },
   props: {
-    initialValue: dInitialValue(),
+    initialValue: dInitialValue(null, "string"),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
