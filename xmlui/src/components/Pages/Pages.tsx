@@ -3,7 +3,8 @@ import styles from "./Pages.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
 import { createMetadata, d, dInternal } from "../metadata-helpers";
-import { Pages, RouteWrapper, defaultProps, pageDefaultProps } from "./PagesReact";
+import { defaultProps, pageDefaultProps } from "./Pages.defaults";
+import { Pages, RouteWrapper } from "./PagesReact";
 import { extractPaddings } from "../../components-core/utils/css-utils";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 

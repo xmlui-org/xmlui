@@ -3,9 +3,9 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata, d, dEnabled } from "../metadata-helpers";
+import { defaultProps } from "./Pagination.defaults";
 import {
   PositionValues,
-  defaultProps,
   type PageNumber,
   PageNumberValues,
   Pagination,

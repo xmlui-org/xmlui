@@ -58,16 +58,16 @@
 * NavPanel
 * NestedApp
 * NoResult
-NumberBox
-Option
-PageMetaTitle
-Pages
-Pagination
-Pdf
-PieChart
-ProgressBar
-QRCode
-Queue
+* NumberBox
+* Option
+* PageMetaTitle
+* Pages
+* Pagination
+* Pdf
+* PieChart
+* ProgressBar
+* QRCode
+* Queue
 RadarChart
 RadioGroup
 RatingInput

@@ -2,10 +2,7 @@ import { memo } from "react";
 import type { Option } from "../abstractions";
 import { useOptionType } from "./OptionTypeProvider";
 
-// Default props for Option component
-export const defaultProps = {
-  enabled: true,
-};
+import { defaultProps } from "./Option.defaults";
 
 export function convertOptionValue(value: any): any {
   if (

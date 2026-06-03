@@ -2,7 +2,8 @@ import styles from "./QRCode.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { QRCode, defaultProps } from "./QRCodeReact";
+import { defaultProps } from "./QRCode.defaults";
+import { QRCode } from "./QRCodeReact";
 import { createMetadata, d, dInit } from "../metadata-helpers";
 
 const COMP = "QRCode";

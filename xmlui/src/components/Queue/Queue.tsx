@@ -1,7 +1,8 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
-import { QueueWithContextVar, defaultProps } from "./QueueReact";
+import { defaultProps } from "./Queue.defaults";
+import { QueueWithContextVar } from "./QueueReact";
 
 const COMP = "Queue";
 

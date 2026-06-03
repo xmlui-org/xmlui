@@ -89,14 +89,7 @@ export interface PdfNativeProps extends Omit<HTMLAttributes<HTMLDivElement>, "on
   updateState?: (state: any) => void;
 }
 
-export const defaultProps = {
-  mode: "view" as PdfMode,
-  scale: 1.0,
-  annotations: [] as Annotation[],
-  horizontalAlignment: "start" as "start" | "center" | "end",
-  verticalAlignment: "start" as "start" | "center" | "end",
-  scrollStyle: "normal" as "normal" | "overlay" | "whenMouseOver" | "whenScrolling",
-};
+import { defaultProps } from "./Pdf.defaults";
 
 export const PdfNative = memo(forwardRef<HTMLDivElement, PdfNativeProps>(
   function PdfNative(

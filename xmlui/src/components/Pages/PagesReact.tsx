@@ -25,16 +25,7 @@ import {
 } from "../../components-core/routing";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
-// Default props for Pages component
-export const defaultProps = {
-  fallbackPath: "/",
-  defaultScrollRestoration: false,
-};
-
-// Default props for Page component
-export const pageDefaultProps = {
-  searchIndexable: true,
-};
+import { defaultProps, pageDefaultProps } from "./Pages.defaults";
 
 // --- We need this component to make sure all the child routes are wrapped in a
 // --- container and  this way they can access the routeParams

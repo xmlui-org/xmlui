@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { PageMetaTitle, defaultProps } from "./PageMetaTitleReact";
+import { defaultProps } from "./PageMetaTitle.defaults";
+import { PageMetaTitle } from "./PageMetaTitleReact";
 
 const COMP = "PageMetaTitle";
 
