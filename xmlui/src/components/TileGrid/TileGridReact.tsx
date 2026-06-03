@@ -15,6 +15,7 @@ import {
   parseKeyBinding,
   matchesKeyEvent,
 } from "../../parsers/keybinding-parser/keybinding-parser";
+import { defaultProps } from "./TileGrid.defaults";
 
 // Parses a CSS pixel value string (e.g. "120px") to its numeric value.
 function parsePx(value: string | undefined, fallback: number): number {
@@ -130,21 +131,6 @@ const DEFAULT_KEY_BINDINGS = {
   copy: parseKeyBinding("CmdOrCtrl+C"),
   paste: parseKeyBinding("CmdOrCtrl+V"),
   delete: parseKeyBinding("Delete"),
-};
-
-export const defaultProps = {
-  itemWidth: "120px",
-  itemHeight: "140px",
-  gap: "8px",
-  stretchItems: false,
-  loading: false,
-  itemsSelectable: false,
-  enableMultiSelection: true,
-  toggleSelectionOnClick: false,
-  checkboxPosition: "topStart" as CheckboxPosition,
-  hideSelectionCheckboxes: false,
-  idKey: "id",
-  itemUserSelect: "none",
 };
 
 // =====================================================================================================================

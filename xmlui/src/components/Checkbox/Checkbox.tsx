@@ -20,7 +20,8 @@ import {
   dRequired,
   dValidationStatus,
 } from "../../components/metadata-helpers";
-import { defaultProps as toggleDefaultProps, Toggle } from "../Toggle/Toggle";
+import { Toggle } from "../Toggle/Toggle";
+import { defaultProps as toggleDefaultProps } from "../Toggle/Toggle.defaults";
 
 export const defaultProps = {
   ...toggleDefaultProps,

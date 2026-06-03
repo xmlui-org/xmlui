@@ -33,7 +33,7 @@ import { ThemedTreeDisplay as TreeDisplay } from "../TreeDisplay/TreeDisplay";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/ExpandableItem";
-import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
+import NestedAppAndCodeViewReact from "../NestedApp/AppWithCodeViewReact";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
 
@@ -132,7 +132,7 @@ function PlaygroundSampRenderer(props: any) {
   const jsonContent = decodeFromBase64(dataContentBase64);
   const appProps = JSON.parse(jsonContent);
   const content = (
-    <NestedAppAndCodeViewNative
+    <NestedAppAndCodeViewReact
       markdown={markdownContent}
       app={appProps.app}
       config={appProps.config}

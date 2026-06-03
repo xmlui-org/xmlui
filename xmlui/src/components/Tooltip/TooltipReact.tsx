@@ -8,6 +8,7 @@ import styles from "./Tooltip.module.scss";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Markdown } from "../Markdown/Markdown";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Tooltip.defaults";
 
 type TooltipOptions = {
   /**
@@ -81,18 +82,6 @@ type TooltipProps = TooltipOptions & React.HTMLAttributes<HTMLDivElement> & {
 };
 
 export type { TooltipProps, TooltipOptions };
-
-export const defaultProps: TooltipOptions = {
-  delayDuration: 700,
-  skipDelayDuration: 300,
-  defaultOpen: false,
-  showArrow: false,
-  side: "top",
-  align: "center",
-  sideOffset: 4,
-  alignOffset: 0,
-  avoidCollisions: true,
-};
 
 export const Tooltip = memo(forwardRef(function Tooltip({
   text,

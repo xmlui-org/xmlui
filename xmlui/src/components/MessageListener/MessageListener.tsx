@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { MessageListenerNative } from "./MessageListenerNative";
+import { MessageListenerReact } from "./MessageListenerReact";
 
 const COMP = "MessageListener";
 
@@ -25,4 +25,4 @@ export const MessageListenerMd = createMetadata({
   },
 });
 
-export const messageListenerComponentRenderer = wrapComponent(COMP, MessageListenerNative, MessageListenerMd, {});
+export const messageListenerComponentRenderer = wrapComponent(COMP, MessageListenerReact, MessageListenerMd, {});

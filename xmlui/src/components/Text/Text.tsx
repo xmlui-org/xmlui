@@ -11,7 +11,8 @@ import {
   type OverflowMode,
   type BreakMode,
 } from "../abstractions";
-import { Text, defaultProps } from "./TextReact";
+import { Text } from "./TextReact";
+import { defaultProps } from "./Text.defaults";
 import { createMetadata, d, dContextMenu } from "../metadata-helpers";
 
 const COMP = "Text";

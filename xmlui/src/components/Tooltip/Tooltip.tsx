@@ -3,9 +3,10 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { Tooltip, defaultProps } from "./TooltipReact";
+import { Tooltip } from "./TooltipReact";
 import type { TooltipProps } from "./TooltipReact";
 export { parseTooltipOptions } from "./TooltipReact";
+import { defaultProps } from "./Tooltip.defaults";
 import styles from "./Tooltip.module.scss";
 
 const COMP = "Tooltip";

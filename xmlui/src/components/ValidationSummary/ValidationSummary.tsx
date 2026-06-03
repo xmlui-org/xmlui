@@ -4,7 +4,8 @@ import classnames from "classnames";
 
 import styles from "./ValidationSummary.module.scss";
 
-import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import { defaultProps } from "./ValidationSummary.defaults";
 import type {
   SingleValidationResult,
   ValidationResult,
@@ -19,14 +20,6 @@ import { ThemedButton as Button } from "../Button/Button";
 export type ValidationSummaryProps = {
   fieldValidationResults?: Record<string, ValidationResult>;
   generalValidationResults: Array<SingleValidationResult>;
-};
-
-export const defaultProps: Pick<
-  ValidationSummaryProps,
-  "fieldValidationResults" | "generalValidationResults"
-> = {
-  fieldValidationResults: EMPTY_OBJECT,
-  generalValidationResults: EMPTY_ARRAY,
 };
 
 type ValidationDisplayProps = {

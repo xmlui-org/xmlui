@@ -3,7 +3,8 @@ import styles from "./Stepper.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, dDidChange } from "../metadata-helpers";
-import { Stepper, defaultProps } from "./StepperReact";
+import { Stepper } from "./StepperReact";
+import { defaultProps } from "./Stepper.defaults";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 

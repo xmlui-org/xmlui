@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { useTheme, useDevTools } from "xmlui";
-import styles from "./DevToolsNative.module.scss";
+import styles from "./DevToolsReact.module.scss";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import loader from "@monaco-editor/loader";
 

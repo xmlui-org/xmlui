@@ -24,6 +24,7 @@ import {
   type StepItem,
   type StepperOrientation,
 } from "./StepperContext";
+import { defaultProps } from "./Stepper.defaults";
 
 type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   id?: string;
@@ -36,13 +37,6 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   updateState?: UpdateStateFn;
   onDidChange?: (newIndex: number, id: string) => void;
   children?: ReactNode;
-};
-
-export const defaultProps = {
-  activeStep: 0,
-  orientation: "horizontal" as StepperOrientation,
-  stackedLabel: false,
-  nonLinear: false,
 };
 
 export const Stepper = memo(

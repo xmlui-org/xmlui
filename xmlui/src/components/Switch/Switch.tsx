@@ -16,7 +16,8 @@ import {
   dRequired,
   dValidationStatus,
 } from "../metadata-helpers";
-import { defaultProps, Toggle } from "../Toggle/Toggle";
+import { Toggle } from "../Toggle/Toggle";
+import { defaultProps } from "../Toggle/Toggle.defaults";
 
 const COMP = "Switch";
 

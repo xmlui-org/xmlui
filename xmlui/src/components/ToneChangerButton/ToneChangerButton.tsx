@@ -5,17 +5,10 @@ import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata, dClick } from "../metadata-helpers";
 import { noop } from "../../components-core/constants";
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { defaultProps } from "./ToneChangerButton.defaults";
 
 const COMP = "ToneChangerButton";
-const LIGHT_TO_DARK_ICON = "lightToDark:ToneChangerButton";
-const DARK_TO_LIGHT_ICON = "darkToLight:ToneChangerButton";
-
 const GHOST_BUTTON_STYLE = { flexShrink: 0 };
-
-export const defaultProps = {
-  lightToDarkIcon: LIGHT_TO_DARK_ICON,
-  darkToLightIcon: DARK_TO_LIGHT_ICON,
-};
 
 export const ToneChangerButtonMd = createMetadata({
   status: "stable",

@@ -4,6 +4,7 @@ import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./TreeDisplay.module.scss";
+import { defaultProps } from "./TreeDisplay.defaults";
 
 type TreeNode = {
   label: string;
@@ -16,11 +17,6 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
   classes?: Record<string, string>;
   content?: string;
   itemHeight?: number;
-};
-
-export const defaultProps: Pick<Props, "content" | "itemHeight"> = {
-  content: "",
-  itemHeight: 20
 };
 
 // Parse the indented text into a tree structure

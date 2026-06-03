@@ -1,17 +1,53 @@
-# Component Architecture: Renderer + React Implementation
+# Component Architecture: Renderer + Defaults + React Implementation
 
-Most built-in XMLUI components are built from two cooperating files. This document explains what each file does, why they exist separately, and how to read and write them.
+Most built-in XMLUI components are built from three cooperating files. This document explains what each file does, why they exist separately, and how to read and write them.
 
 ---
 
-## Why Two Files?
+## Why Three Files?
 
-XMLUI separates **what a component is** from **how it renders**:
+XMLUI separates **what a component is**, **what its static defaults are**, and **how it renders**:
 
 - **`ComponentName.tsx`** — the XMLUI side. Defines the component's public contract (props, events, APIs, theme variables) and the *bridge function* that translates XMLUI's reactive context into React props.
-- **`ComponentNameReact.tsx`** — the React side. A normal `forwardRef` + `memo` component that takes plain props and produces DOM output. A few older components still use the legacy `ComponentNameNative.tsx` filename; new and renamed components should use `*React.tsx`.
+- **`ComponentName.defaults.ts`** — the shared defaults side. Defines `defaultProps` in a pure module that both metadata and React code can import without pulling React implementation code into metadata builds.
+- **`ComponentNameReact.tsx`** — the React side. A normal `forwardRef` + `memo` component that takes plain props and produces DOM output. All component React implementations use the `*React.tsx` filename convention.
 
 This boundary exists for a specific reason: the bridge function in `ComponentName.tsx` runs in the XMLUI rendering pipeline and must not use React hooks. All hooks live in the React implementation file. The separation makes this constraint structurally clear.
+
+The defaults file exists for a separate build-system reason: metadata generation imports component metadata, and metadata often references `defaultProps`. Keeping defaults in a pure `ComponentName.defaults.ts` file prevents metadata-only builds from loading React components, hooks, SCSS side effects beyond the metadata file, or third-party implementation libraries just to read default values.
+
+---
+
+## The Defaults File (`ComponentName.defaults.ts`)
+
+### Structure
+
+```
+ComponentName.defaults.ts:
+  1. Import only types needed to describe defaults
+  2. Define and export defaultProps
+```
+
+The defaults file is the single source of truth for default property values. Both `ComponentName.tsx` and `ComponentNameReact.tsx` import from it.
+
+```typescript
+import type { ComponentVariant } from "../abstractions";
+
+export const defaultProps: {
+  enabled: boolean;
+  variant: ComponentVariant;
+} = {
+  enabled: true,
+  variant: "primary",
+};
+```
+
+**Key rules:**
+- Keep this file pure: no React imports, JSX, hooks, DOM access, SCSS/CSS imports, theme lookups, or runtime services.
+- Use `import type` for any types needed by the defaults object.
+- Do not import from `ComponentName.tsx` or `ComponentNameReact.tsx`.
+- Do not compute defaults from runtime state. Defaults should be static values that can be safely loaded by metadata tooling.
+- If another component needs these defaults, import them from `ComponentName.defaults.ts`, not from the renderer or React file.
 
 ---
 
@@ -22,9 +58,10 @@ This boundary exists for a specific reason: the bridge function in `ComponentNam
 ```
 ComponentName.tsx:
   1. Import metadata helpers, SCSS styles
-  2. Import the React component + defaultProps
-  3. Define the metadata constant (ComponentNameMd)
-  4. Define and export the renderer, usually with wrapComponent
+  2. Import defaultProps from ComponentName.defaults.ts
+  3. Import the React component
+  4. Define the metadata constant (ComponentNameMd)
+  5. Define and export the renderer, usually with wrapComponent
 ```
 
 ### Metadata — The Component's Public Contract
@@ -229,9 +266,11 @@ step={extractValue.asOptionalNumber(node.props.step, 1)}      // → 5
 
 ## The React File (`ComponentNameReact.tsx`)
 
-The React component is a standard React component with two structural requirements: `forwardRef` (so parent components can obtain a DOM ref) and `memo` (to prevent unnecessary re-renders). Older source may call this the "native" component; that means the same React implementation side of the bridge.
+The React component is a standard React component with two structural requirements: `forwardRef` (so parent components can obtain a DOM ref) and `memo` (to prevent unnecessary re-renders).
 
 ```typescript
+import { defaultProps } from "./ComponentName.defaults";
+
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   label?: string;
   variant?: "primary" | "secondary";
@@ -240,11 +279,6 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   registerComponentApi?: RegisterComponentApiFn;
   classes?: Record<string, string>;
 }
-
-export const defaultProps = {
-  enabled: true,
-  variant: "primary" as const,
-};
 
 export const ComponentNameReact = memo(forwardRef<HTMLDivElement, Props>(
   function ComponentNameReact(
@@ -287,7 +321,7 @@ export const ComponentNameReact = memo(forwardRef<HTMLDivElement, Props>(
 |------|-----|
 | `forwardRef` always | Parent components and `id`-based refs need DOM access |
 | `memo` always | Prevents re-renders when props don't change |
-| Export `defaultProps` | Shared by renderer, metadata, and React component destructuring |
+| Import `defaultProps` from `ComponentName.defaults.ts` | Shared by renderer, metadata, and React component destructuring without metadata-build React leaks |
 | Accept `style` explicitly | Required for layout CSS from the framework |
 | Spread `...rest` on root | HTML attributes (`data-*`, ARIA, etc.) must reach the DOM |
 | No `displayName` | Don't set it manually |
@@ -298,14 +332,20 @@ export const ComponentNameReact = memo(forwardRef<HTMLDivElement, Props>(
 The `defaultProps` object is the single source of truth for default values across three locations:
 
 ```typescript
-// React file — defines and exports:
+// ComponentName.defaults.ts — defines and exports:
 export const defaultProps = {
   enabled: true,
   size: "md" as const,
 };
 
+// ComponentName.tsx — imports defaults for metadata:
+import { defaultProps } from "./ComponentName.defaults";
+
 // Metadata — shows defaults in documentation:
 enabled: { defaultValue: defaultProps.enabled }
+
+// ComponentNameReact.tsx — imports defaults for runtime fallback:
+import { defaultProps } from "./ComponentName.defaults";
 
 // React component destructuring — applies the default:
 function Comp({ enabled = defaultProps.enabled })
@@ -442,13 +482,14 @@ Do not add Managed React app-globals to a component just because the feature exi
 
 ## Implementation Sequence
 
-1. Write metadata (`createMetadata`) — this defines the public API
-2. Create the renderer, preferably with `wrapComponent` for standard prop/event wiring
-3. Write the React component with `forwardRef` + `memo` + `defaultProps`
-4. Register in `ComponentProvider.tsx`
-5. Add SCSS module (visual components)
-6. Wire props, events, and APIs between renderer and React component
-7. Add E2E and unit tests
+1. Write `ComponentName.defaults.ts` with static `defaultProps`
+2. Write metadata (`createMetadata`) — this defines the public API
+3. Create the renderer, preferably with `wrapComponent` for standard prop/event wiring
+4. Write the React component with `forwardRef` + `memo`, importing `defaultProps` from the defaults file
+5. Register in `ComponentProvider.tsx`
+6. Add SCSS module (visual components)
+7. Wire props, events, and APIs between renderer and React component
+8. Add E2E and unit tests
 
 ---
 
@@ -461,7 +502,10 @@ Do not add Managed React app-globals to a component just because the feature exi
 | Accessing `node.props.x` directly | Always use `extractValue.asXxx(node.props.x)` |
 | Setting `displayName` manually | Remove it; the function name is used automatically |
 | Missing `style` prop on root element | Explicitly accept and spread `style` |
-| Defining defaults in the renderer | Keep all defaults in `defaultProps` in the React file |
+| Defining defaults in the renderer | Keep all defaults in `defaultProps` in `ComponentName.defaults.ts` |
+| Defining defaults in the React file | Move them to `ComponentName.defaults.ts` and import from there |
+| Importing `defaultProps` from `ComponentNameReact.tsx` | Import `defaultProps` from `ComponentName.defaults.ts` |
+| Naming the React implementation `ComponentNameNative.tsx` | Rename it to `ComponentNameReact.tsx` |
 | Using `type` instead of `valueType` in metadata | Use `valueType`; `wrapComponent` and type contracts ignore `type` |
 | Leaving broad props untyped by accident | Use a precise `valueType`, or `valueType: "any"` for intentional arbitrary values |
 
@@ -469,12 +513,12 @@ Do not add Managed React app-globals to a component just because the feature exi
 
 ## Key Takeaways
 
-1. The two-file split enforces a strict boundary: no React hooks in the renderer, all hooks in the React component.
+1. The renderer/defaults/React split enforces strict boundaries: no React hooks in the renderer, pure static values in the defaults file, and all hooks in the React component.
 2. `createMetadata` is the single source of truth for a component's public API — props, events, APIs, theme variables, and documentation are all derived from it.
 3. Prefer `wrapComponent` for standard components; use `createComponentRenderer` only when the render path needs custom logic.
 4. `valueType` metadata matters: it drives extraction, documentation, type-contract diagnostics, and Managed React strict mode.
 5. `extractValue` is mandatory before using any `node.props.*` value in manual renderers; raw values may be binding expressions, not plain values.
-6. `defaultProps` is exported from the React file and referenced by the renderer and metadata — define defaults in exactly one place.
+6. `defaultProps` is exported from `ComponentName.defaults.ts` and referenced by the renderer, metadata, and React component — define defaults in exactly one pure file.
 7. `registerComponentApi` is the only way to expose imperative methods to markup; don't use `useImperativeHandle`.
 8. `classes?.["-component"]` on the root element and `classes?.[partName]` on named parts enable theme variable targeting at part granularity.
 9. Tree-shaking guards (`process.env.VITE_USED_COMPONENTS_X !== "false"`) in `ComponentProvider.tsx` allow unused components to be excluded from production bundles.

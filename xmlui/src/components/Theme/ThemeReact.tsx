@@ -10,9 +10,10 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
-import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import { defaultProps } from "./Theme.defaults";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
-import { NotificationToast, DEFAULT_NOTIFICATION_POSITION } from "./NotificationToast";
+import { NotificationToast } from "./NotificationToast";
 import type { NotificationPosition } from "./NotificationToast";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useIndexerContext } from "../App/IndexerContext";
@@ -43,15 +44,6 @@ type Props = {
   notificationPosition?: NotificationPosition;
   themeVars?: Record<string, string>;
   children?: ReactNode;
-};
-
-export const defaultProps = {
-  isRoot: false,
-  applyIf: true,
-  toastDuration: 5000,
-  notificationPosition: DEFAULT_NOTIFICATION_POSITION,
-  themeVars: EMPTY_OBJECT,
-  root: false,
 };
 
 export function Theme({

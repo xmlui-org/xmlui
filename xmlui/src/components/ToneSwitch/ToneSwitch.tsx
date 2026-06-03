@@ -3,13 +3,9 @@ import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ToneSwitch.module.scss";
 import { ToneSwitch } from "./ToneSwitchReact";
+import { defaultProps } from "./ToneSwitch.defaults";
 
 const COMP = "ToneSwitch";
-
-export const defaultProps = {
-  iconLight: "sun",
-  iconDark: "moon",
-};
 
 export const ToneSwitchMd = createMetadata({
   status: "stable",

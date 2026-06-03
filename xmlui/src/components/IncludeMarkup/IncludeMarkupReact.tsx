@@ -25,9 +25,9 @@ type Props = {
 };
 
 // =====================================================================================================================
-// React IncludeMarkupNative component implementation
+// React IncludeMarkup component implementation
 
-export function IncludeMarkupNative({
+export function IncludeMarkupReact({
   url,
   loadingContent,
   onDidLoad,

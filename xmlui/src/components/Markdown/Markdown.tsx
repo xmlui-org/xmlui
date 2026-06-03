@@ -3,7 +3,7 @@ import styles from "./Markdown.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { defaultProps } from "./Markdown.defaults";
-import { Markdown } from "./MarkdownNative";
+import { Markdown } from "./MarkdownReact";
 import React from "react";
 import { forwardRef, useMemo } from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -408,4 +408,4 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
   },
 );
 
-export { Markdown } from "./MarkdownNative";
+export { Markdown } from "./MarkdownReact";
