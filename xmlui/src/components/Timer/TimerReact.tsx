@@ -1,6 +1,7 @@
 import type { CSSProperties, ForwardedRef } from "react";
 import { memo, forwardRef, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { defaultProps } from "./Timer.defaults";
 
 export interface TimerApi {
   pause(): void;
@@ -8,13 +9,6 @@ export interface TimerApi {
   isPaused(): boolean;
   isRunning(): boolean;
 }
-
-export const defaultProps = {
-  enabled: true,
-  interval: 1000,
-  once: false,
-  initialDelay: 0,
-};
 
 type TimerProps = {
   enabled?: boolean;

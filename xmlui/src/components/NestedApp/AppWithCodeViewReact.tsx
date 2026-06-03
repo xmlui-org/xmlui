@@ -12,7 +12,7 @@ import Logo from "./logo.svg?react";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { ThemedIcon } from "../Icon/Icon";
 
-type AppWithCodeViewNativeProps = {
+type AppWithCodeViewReactProps = {
   // Markdown content to display in the left column
   markdown: string;
   // Display layout in side-by-side mode (horizontal) when true,
@@ -43,7 +43,7 @@ type AppWithCodeViewNativeProps = {
 /**
  * A component that displays markdown content on the left and a NestedApp on the right
  */
-export function AppWithCodeViewNative({
+export function AppWithCodeViewReact({
   markdown,
   splitView,
   withFrame = true,
@@ -64,7 +64,7 @@ export function AppWithCodeViewNative({
   immediate,
   closeButton = null,
   controlsWidth,
-}: AppWithCodeViewNativeProps): ReactNode {
+}: AppWithCodeViewReactProps): ReactNode {
   const [showCode, setShowCode] = useState(initiallyShowCode);
   const appContext = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
@@ -230,4 +230,4 @@ export function AppWithCodeViewNative({
 /**
  * Export a named default for easier imports
  */
-export default AppWithCodeViewNative;
+export default AppWithCodeViewReact;

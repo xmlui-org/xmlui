@@ -4,7 +4,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
-import { TreeComponent, defaultProps } from "./TreeReact";
+import { TreeComponent } from "./TreeReact";
+import { defaultProps } from "./Tree.defaults";
 import styles from "./TreeComponent.module.scss";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 

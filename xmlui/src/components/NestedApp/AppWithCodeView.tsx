@@ -2,7 +2,7 @@ import styles from "./AppWithCodeView.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { AppWithCodeViewNative } from "./AppWithCodeViewNative";
+import { AppWithCodeViewReact } from "./AppWithCodeViewReact";
 import { defaultProps } from "./NestedApp.defaults";
 import { createMetadata } from "../metadata-helpers";
 
@@ -82,7 +82,7 @@ It supports both side-by-side and stacked layouts.`,
 
 export const appWithCodeViewComponentRenderer = wrapComponent(
   COMP,
-  AppWithCodeViewNative,
+  AppWithCodeViewReact,
   AppWithCodeViewMd,
   {
     exclude: ["markdown", "app", "api", "components", "config", "activeTheme", "activeTone", "title", "height"],
@@ -110,7 +110,7 @@ export const appWithCodeViewComponentRenderer = wrapComponent(
       }
 
       return (
-        <AppWithCodeViewNative
+        <AppWithCodeViewReact
           markdown={renderedChildren}
           splitView={extractValue.asOptionalBoolean(node.props?.splitView)}
           app={node.props?.app}

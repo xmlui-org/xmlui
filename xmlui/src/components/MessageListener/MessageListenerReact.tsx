@@ -6,7 +6,7 @@ type Props = {
   onMessageReceived?: (data: any, event: MessageEvent<any>) => void;
 };
 
-export function MessageListenerNative({
+export function MessageListenerReact({
   children,
   onMessageReceived = defaultProps.onMessageReceived,
 }: Props) {

@@ -5,8 +5,8 @@ import classnames from "classnames";
 import styles from "./TextBox.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
-import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
+import { defaultProps } from "./TextBox.defaults";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
 import { PART_START_ADORNMENT,
@@ -75,37 +75,6 @@ type Props = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
-};
-
-export const defaultProps: Pick<
-  Props,
-  | "type"
-  | "value"
-  | "initialValue"
-  | "enabled"
-  | "validationStatus"
-  | "invalidMessages"
-  | "onDidChange"
-  | "onFocus"
-  | "onBlur"
-  | "onKeyDown"
-  | "updateState"
-  | "passwordVisibleIcon"
-  | "passwordHiddenIcon"
-> = {
-  type: "text",
-  value: "",
-  initialValue: "",
-  enabled: true,
-  validationStatus: "none",
-  invalidMessages: [],
-  onDidChange: noop,
-  onFocus: noop,
-  onBlur: noop,
-  onKeyDown: noop,
-  updateState: noop,
-  passwordVisibleIcon: "eye",
-  passwordHiddenIcon: "eye-off",
 };
 
 export const TextBox = memo(forwardRef(function TextBox(

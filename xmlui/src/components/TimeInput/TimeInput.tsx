@@ -18,7 +18,8 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { TimeInputNative, defaultProps } from "./TimeInputReact";
+import { TimeInputNative } from "./TimeInputReact";
+import { defaultProps } from "./TimeInput.defaults";
 
 const COMP = "TimeInput";
 

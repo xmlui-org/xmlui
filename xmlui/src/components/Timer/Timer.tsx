@@ -1,5 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { Timer, defaultProps } from "./TimerReact";
+import { Timer } from "./TimerReact";
+import { defaultProps } from "./Timer.defaults";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "Timer";

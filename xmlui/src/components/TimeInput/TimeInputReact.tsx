@@ -10,6 +10,7 @@ import { InputDivider } from "../Input/InputDivider";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
+import { defaultProps } from "./TimeInput.defaults";
 import { Adornment } from "../Input/InputAdornment";
 import { ThemedIcon } from "../Icon/Icon";
 
@@ -73,19 +74,6 @@ type Props = {
   autoFocus?: boolean;
   emptyCharacter?: string;
   ariaLabel?: string;
-};
-
-export const defaultProps = {
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  hour24: true,
-  seconds: false,
-  clearable: false,
-  clearToInitialValue: false,
-  required: false,
-  readOnly: false,
-  autoFocus: false,
-  emptyCharacter: "-",
 };
 
 export const TimeInputNative = memo(forwardRef<HTMLDivElement, Props>(function TimeInput(

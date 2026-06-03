@@ -21,6 +21,7 @@ import type {
   FlatTreeNodeWithState,
 } from "../../components-core/abstractions/treeAbstractions";
 import { toFlatTree, flatToNative, hierarchyToNative } from "../../components-core/utils/treeUtils";
+import { defaultProps } from "./Tree.defaults";
 
 /**
  * Describes the data attached to a particular tree row
@@ -350,36 +351,6 @@ const expandParentPaths = (
   });
 
   return Array.from(allExpandedIds);
-};
-
-// Default props following XMLUI conventions
-export const defaultProps = {
-  dataFormat: "flat" as const,
-  idField: "id",
-  nameField: "name",
-  iconField: "icon",
-  iconExpandedField: "iconExpanded",
-  iconCollapsedField: "iconCollapsed",
-  parentIdField: "parentId",
-  childrenField: "children",
-  selectableField: "selectable",
-  defaultExpanded: "none" as const,
-  autoExpandToSelection: true,
-  itemClickExpands: false,
-  dynamicField: "dynamic",
-  loadedField: "loaded",
-  autoLoadAfterField: "autoLoadAfter",
-  dynamic: false,
-  iconCollapsed: "chevronright",
-  iconExpanded: "chevrondown",
-  iconSize: "16",
-  itemHeight: 32,
-  animateExpand: false,
-  expandRotation: 90,
-  scrollStyle: "normal" as const,
-  showScrollerFade: false,
-  autoLoadAfter: undefined as number | undefined,
-  spinnerDelay: 0,
 };
 
 interface TreeComponentProps {

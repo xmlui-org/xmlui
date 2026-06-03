@@ -1,5 +1,5 @@
 import { createComponentRenderer, createMetadata, type ComponentMetadata } from "xmlui";
-import { Blog } from "./BlogNative";
+import { Blog } from "./BlogReact";
 
 const COMP = "Blog";
 

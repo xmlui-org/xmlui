@@ -1,11 +1,6 @@
 import { memo, useEffect, useRef } from "react";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
-
-export const defaultProps = {
-  enabled: true,
-  reconnect: false,
-  reconnectDelayMs: 3000,
-};
+import { defaultProps } from "./WebSocket.defaults";
 
 type Props = {
   url: string;

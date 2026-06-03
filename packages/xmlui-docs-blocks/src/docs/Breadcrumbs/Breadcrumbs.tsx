@@ -1,6 +1,6 @@
 import { createMetadata, parseScssVar, wrapComponent, type ComponentMetadata } from "xmlui";
 import styles from "./Breadcrumbs.module.scss";
-import { Breadcrumbs } from "./BreadcrumbsNative";
+import { Breadcrumbs } from "./BreadcrumbsReact";
 
 const COMP = "Breadcrumbs";
 

@@ -7,10 +7,7 @@ import styles from "./ToneSwitch.module.scss";
 import classnames from "classnames";
 import { noop } from "../../components-core/constants";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-
-// Default icons for light and dark modes
-const DEFAULT_LIGHT_ICON = "sun";
-const DEFAULT_DARK_ICON = "moon";
+import { defaultProps } from "./ToneSwitch.defaults";
 
 const ROOT_STYLE: CSSProperties = { width: "fit-content", display: "inline-block" };
 const TOGGLE_STYLE: CSSProperties = { width: "fit-content" };
@@ -25,8 +22,8 @@ export type ToneSwitchProps = {
 
 export const ToneSwitch = memo(forwardRef<HTMLDivElement, ToneSwitchProps>(function ToneSwitch(
   {
-    iconLight = DEFAULT_LIGHT_ICON,
-    iconDark = DEFAULT_DARK_ICON,
+    iconLight = defaultProps.iconLight,
+    iconDark = defaultProps.iconDark,
     className,
     classes,
     onDidChange = noop,

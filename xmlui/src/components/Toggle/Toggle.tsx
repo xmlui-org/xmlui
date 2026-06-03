@@ -15,6 +15,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
+import { defaultProps } from "./Toggle.defaults";
 import { PART_INPUT } from "../../components-core/parts";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
@@ -44,17 +45,6 @@ type ToggleProps = Omit<
   invalidMessages?: string[];
   validationResult?: ReactNode;
   validationInProgress?: boolean;
-};
-
-export const defaultProps: Pick<
-  ToggleProps,
-  "initialValue" | "value" | "enabled" | "validationStatus" | "indeterminate"
-> = {
-  initialValue: false,
-  value: false,
-  enabled: true,
-  validationStatus: "none",
-  indeterminate: false,
 };
 
 function transformToLegitValue(inp: unknown): boolean {

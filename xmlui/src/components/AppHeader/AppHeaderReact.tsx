@@ -8,7 +8,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { useAppContext } from "../../components-core/AppContext";
 import { ThemedIcon } from "../../components/Icon/Icon";
-import { Logo } from "../../components/Logo/LogoNative";
+import { Logo } from "../../components/Logo/LogoReact";
 import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 import { ThemedButton as Button } from "../../components/Button/Button";
 import { ThemedNavLink } from "../../components/NavLink/NavLink";

@@ -1,5 +1,5 @@
 import { InspectorDialog } from "./devtools/InspectorDialog";
-import AppWithCodeViewNative from "../components/NestedApp/AppWithCodeViewNative";
+import AppWithCodeViewReact from "../components/NestedApp/AppWithCodeViewReact";
 import React, { useMemo } from "react";
 import { useDevTools } from "./InspectorContext";
 import { Tooltip } from "../components/NestedApp/Tooltip";
@@ -62,7 +62,7 @@ export const ComponentViewer = () => {
     isOpen &&
     inspectedNode !== null ? (
     <InspectorDialog isOpen={isOpen} setIsOpen={setIsOpen} clickPosition={clickPosition}>
-      <AppWithCodeViewNative
+      <AppWithCodeViewReact
         height={"500px"}
         allowPlaygroundPopup
         initiallyShowCode={appGlobals?.initiallyShowCode ?? true}

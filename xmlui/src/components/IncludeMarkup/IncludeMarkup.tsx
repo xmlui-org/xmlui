@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
-import { IncludeMarkupNative } from "./IncludeMarkupNative";
+import { IncludeMarkupReact } from "./IncludeMarkupReact";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 const COMP = "IncludeMarkup";
@@ -43,9 +43,9 @@ export const IncludeMarkupMd = createMetadata({
   },
 });
 
-export const includeMarkupComponentRenderer = wrapComponent(COMP, IncludeMarkupNative, IncludeMarkupMd, {
+export const includeMarkupComponentRenderer = wrapComponent(COMP, IncludeMarkupReact, IncludeMarkupMd, {
   customRender: (props, { renderChild }) => (
-    <IncludeMarkupNative
+    <IncludeMarkupReact
       url={props.url}
       loadingContent={props.loadingContent}
       onDidLoad={props.onDidLoad}

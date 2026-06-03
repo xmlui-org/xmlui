@@ -63,7 +63,7 @@ import { Part } from "./components/Part/Part";
 import { useAppContext } from "./components-core/AppContext";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
-import { Logo } from "./components/Logo/LogoNative";
+import { Logo } from "./components/Logo/LogoReact";
 import { Theme } from "./components/Theme/ThemeReact";
 import { OptionContext, useOption } from "./components/Select/OptionContext";
 

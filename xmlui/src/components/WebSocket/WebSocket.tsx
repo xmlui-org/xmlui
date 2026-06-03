@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { WebSocketConnection, defaultProps } from "./WebSocketReact";
+import { WebSocketConnection } from "./WebSocketReact";
+import { defaultProps } from "./WebSocket.defaults";
 
 const COMP = "WebSocket";
 

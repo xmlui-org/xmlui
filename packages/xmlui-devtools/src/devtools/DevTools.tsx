@@ -1,5 +1,5 @@
 import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
-import { DevTools } from "./DevToolsNative";
+import { DevTools } from "./DevToolsReact";
 
 const COMP = "DevTools";
 
