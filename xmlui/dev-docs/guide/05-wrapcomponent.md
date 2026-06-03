@@ -2,7 +2,7 @@
 
 `wrapComponent` is the primary way to make a React component XMLUI-aware. Where `createComponentRenderer` requires writing every prop extraction and event binding by hand, `wrapComponent` handles the plumbing automatically. You declare the exceptions; everything else is forwarded.
 
-Most built-in components use it, and the codebase is actively migrating the remaining `createComponentRenderer` implementations over to it.
+Built-in components under `xmlui/src/components/` use it, including components with custom rendering needs. Raw `createComponentRenderer` is now reserved for lower-level renderer infrastructure and unusual framework plumbing, not ordinary component authoring.
 
 ---
 
@@ -30,15 +30,10 @@ With `wrapComponent`, you declare the type information once in metadata, and the
 
 ```typescript
 // wrapComponent — the metadata drives everything
-export const buttonComponentRenderer = wrapComponent(
-  "Button",
-  ButtonNative,
-  ButtonMd,
-  {
-    exposeRegisterApi: true,
-    events: ["click"],
-  },
-);
+export const buttonComponentRenderer = wrapComponent("Button", ButtonNative, ButtonMd, {
+  exposeRegisterApi: true,
+  events: ["click"],
+});
 // enabled (boolean), variant (string), label (string) are all
 // auto-extracted from ButtonMd's valueType declarations.
 ```
@@ -49,14 +44,14 @@ export const buttonComponentRenderer = wrapComponent(
 
 `wrapComponent` reads `valueType` from each prop's metadata definition and applies the right extractor automatically for the three primitive coercions it owns:
 
-| `valueType` in metadata | Extractor used |
-|-------------------------|----------------|
-| `"boolean"` | `extractValue.asOptionalBoolean(raw)` |
-| `"number"` | `extractValue.asOptionalNumber(raw)` |
-| `"string"` | `extractValue.asOptionalString(raw)` |
-| `"ComponentDef"` | `renderChild(raw)` (rendered as static template) |
-| `isResourceUrl: true` | `extractResourceUrl(raw)` |
-| anything else / missing | `extractValue(raw)` — raw value |
+| `valueType` in metadata | Extractor used                                   |
+| ----------------------- | ------------------------------------------------ |
+| `"boolean"`             | `extractValue.asOptionalBoolean(raw)`            |
+| `"number"`              | `extractValue.asOptionalNumber(raw)`             |
+| `"string"`              | `extractValue.asOptionalString(raw)`             |
+| `"ComponentDef"`        | `renderChild(raw)` (rendered as static template) |
+| `isResourceUrl: true`   | `extractResourceUrl(raw)`                        |
+| anything else / missing | `extractValue(raw)` — raw value                  |
 
 Refined metadata types such as `"integer"`, `"length"`, `"color"`, `"url"`, `"icon"`, `"id-ref"`, and `"string[]"` are important for tooling, diagnostics, documentation, and manual renderers, but `wrapComponent` does not auto-select their specialized extractors. They fall through to raw `extractValue(raw)` unless the prop is also listed in `booleans`, `numbers`, `strings`, `resourceUrls`, `templates`, or `renderers`, or handled by `customRender`.
 
@@ -106,8 +101,10 @@ Maps XMLUI event names to React handler props.
 
 ```typescript
 // These are equivalent:
-events: ["click"]
-events: { click: "onClick" }
+events: ["click"];
+events: {
+  click: "onClick";
+}
 ```
 
 Events fire through a tracing wrapper in verbose/inspector mode, emitting semantic trace kinds (`value:change` for `didChange`, `focus:change` for `gotFocus`/`lostFocus`). Other metadata events are wired when an XMLUI handler is present, but do not get a semantic trace kind unless separate native-event capture handles them.
@@ -121,7 +118,7 @@ callbacks?: string[] | Record<string, string>
 For props that execute inline JavaScript expressions synchronously — not event handlers, but compute-on-call props:
 
 ```typescript
-callbacks: ["renderIcon"]
+callbacks: ["renderIcon"];
 // or: { renderIcon: "renderIconProp" }  // XMLUI name → React prop name
 ```
 
@@ -134,7 +131,7 @@ Two ways to pass XMLUI component definitions as React props:
 **`templates`** — renders the `ComponentDef` to a static React node and passes it:
 
 ```typescript
-templates: ["emptyListTemplate"]
+templates: ["emptyListTemplate"];
 // XMLUI <MyComp emptyListTemplate="{...}"> → native receives emptyListTemplate as ReactNode
 ```
 
@@ -167,22 +164,22 @@ You rarely need to set `stateful: true` explicitly. Set `passUpdateState: false`
 
 ### Other config options
 
-| Option | Default | Use |
-|--------|---------|-----|
-| `rename` | — | `{ minValue: "min" }` — XMLUI prop name → React prop name |
-| `exclude` | — | Props to skip entirely (useful when `customRender` handles them) |
-| `booleans` | — | Extra prop names to coerce with `extractValue.asOptionalBoolean` |
-| `numbers` | — | Extra prop names to coerce with `extractValue.asOptionalNumber` |
-| `strings` | — | Extra prop names to coerce with `extractValue.asOptionalString` |
-| `stateful` | auto | Override stateful auto-detection from `initialValue`/`didChange` |
-| `passUpdateState` | `true` | Set `false` to suppress `updateState` for stateful event-only components |
-| `exposeRegisterApi` | `false` | Set `true` when the native component calls `registerComponentApi` |
-| `passUid` | `false` | Pass `node.uid` as `uid` prop (Bookmark and anchor components) |
-| `resourceUrls` | — | Prop names containing logical resource URLs; resolved via `extractResourceUrl` |
-| `contentClassName` | `false` | Pass the component-part CSS class as `contentClassName` (portal/overlay components) |
-| `childrenLayoutContext` | — | Layout context for `renderChild(node.children)` |
-| `captureNativeEvents` | `false` | Pass `onNativeEvent` callback for tracing library events (ECharts, etc.) |
-| `deriveAriaLabel` | — | `(props) => string` — compute `aria-label` from already-extracted props |
+| Option                  | Default | Use                                                                                 |
+| ----------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `rename`                | —       | `{ minValue: "min" }` — XMLUI prop name → React prop name                           |
+| `exclude`               | —       | Props to skip entirely (useful when `customRender` handles them)                    |
+| `booleans`              | —       | Extra prop names to coerce with `extractValue.asOptionalBoolean`                    |
+| `numbers`               | —       | Extra prop names to coerce with `extractValue.asOptionalNumber`                     |
+| `strings`               | —       | Extra prop names to coerce with `extractValue.asOptionalString`                     |
+| `stateful`              | auto    | Override stateful auto-detection from `initialValue`/`didChange`                    |
+| `passUpdateState`       | `true`  | Set `false` to suppress `updateState` for stateful event-only components            |
+| `exposeRegisterApi`     | `false` | Set `true` when the native component calls `registerComponentApi`                   |
+| `passUid`               | `false` | Pass `node.uid` as `uid` prop (Bookmark and anchor components)                      |
+| `resourceUrls`          | —       | Prop names containing logical resource URLs; resolved via `extractResourceUrl`      |
+| `contentClassName`      | `false` | Pass the component-part CSS class as `contentClassName` (portal/overlay components) |
+| `childrenLayoutContext` | —       | Layout context for `renderChild(node.children)`                                     |
+| `captureNativeEvents`   | `false` | Pass `onNativeEvent` callback for tracing library events (ECharts, etc.)            |
+| `deriveAriaLabel`       | —       | `(props) => string` — compute `aria-label` from already-extracted props             |
 
 ### Custom rendering
 
@@ -191,6 +188,8 @@ customRender?: (props: Record<string, any>, context: RendererContext) => React.R
 ```
 
 When provided, `customRender` is called instead of `<Component {...props} />`. All prop extraction still runs first, so `props` already has all resolved values. Children are **not** auto-rendered — `customRender` must handle them explicitly.
+
+`customRender` is still part of the `wrapComponent` pattern. Use it when the component needs renderer-context services (`renderChild`, `lookupEventHandler`, `lookupEventHandler(..., { schedulerBypass: true })`, `registerComponentApi`, `uid`, `layoutContext`, specialized extractors, slot handling, or runtime child layout) that cannot be expressed through config alone.
 
 After `customRender` returns, `wrapComponent` injects the resolved `aria-label` and `role` onto the root React element if they were resolved in `props` but not forwarded by the custom renderer. This keeps accessibility metadata from getting lost in custom paths.
 
@@ -215,19 +214,19 @@ customRender(props, { node, extractValue, renderChild }) {
 
 These are blocked from generic forwarding unless the component explicitly declares the same prop in metadata. When metadata declares a prop, the component owns the name and `wrapComponent` forwards it, except for props handled by dedicated template, renderer, callback, or resource URL paths.
 
-| Prop | Why blocked |
-|------|------------|
-| `id` | XMLUI's component identity — not a DOM attribute |
-| `ref` | Never forwarded as a React ref string |
-| `style` | Contains raw XMLUI theme variable strings; the layout processor owns it |
-| Layout props (`width`, `height`, `padding`, `margin`, etc.) and responsive forms (`width-md`, etc.) | Handled by the layout resolver via CSS className |
-| `bindTo` | Consumed by the form binding behavior |
-| `onValidate` | Consumed by the validation behavior |
-| `bubbleEvents` | Consumed by `ComponentAdapter` |
-| Form behavior props (`noSubmit`, `itemIndex`, `labelPosition`, validation message/severity props, etc.) | Consumed by form and validation behaviors |
-| Tooltip/label/pub-sub/animation/bookmark behavior props | Consumed by their behavior implementations |
-| `updateState` | XMLUI-internal callback, never a DOM prop |
-| `aria-label` | Handled by the aria-label cascade |
+| Prop                                                                                                    | Why blocked                                                             |
+| ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `id`                                                                                                    | XMLUI's component identity — not a DOM attribute                        |
+| `ref`                                                                                                   | Never forwarded as a React ref string                                   |
+| `style`                                                                                                 | Contains raw XMLUI theme variable strings; the layout processor owns it |
+| Layout props (`width`, `height`, `padding`, `margin`, etc.) and responsive forms (`width-md`, etc.)     | Handled by the layout resolver via CSS className                        |
+| `bindTo`                                                                                                | Consumed by the form binding behavior                                   |
+| `onValidate`                                                                                            | Consumed by the validation behavior                                     |
+| `bubbleEvents`                                                                                          | Consumed by `ComponentAdapter`                                          |
+| Form behavior props (`noSubmit`, `itemIndex`, `labelPosition`, validation message/severity props, etc.) | Consumed by form and validation behaviors                               |
+| Tooltip/label/pub-sub/animation/bookmark behavior props                                                 | Consumed by their behavior implementations                              |
+| `updateState`                                                                                           | XMLUI-internal callback, never a DOM prop                               |
+| `aria-label`                                                                                            | Handled by the aria-label cascade                                       |
 
 A common mistake is defining layout props (like `width`) in a native component's `Props` interface. `wrapComponent` blocks them from reaching the native component because they're resolved to CSS classes by the layout system. Only declare such a prop in metadata when the component gives that name component-specific meaning and genuinely needs the raw value.
 
@@ -257,12 +256,13 @@ formatExternalValue?: (value: any, props: Record<string, any>) => any
 
 ## Choosing the Right Pattern
 
-| Situation | Use |
-|-----------|-----|
-| Standard React component with props and events | `wrapComponent` |
-| Controlled input; native component manages its own state | `wrapCompound` |
-| Complex child rendering that varies by runtime values | `wrapComponent` with `customRender` |
-| Top-level element changes based on props (e.g., `as` prop) | `createComponentRenderer` |
+| Situation                                                                          | Use                                 |
+| ---------------------------------------------------------------------------------- | ----------------------------------- |
+| Standard React component with props and events                                     | `wrapComponent`                     |
+| Controlled input; native component manages its own state                           | `wrapCompound`                      |
+| Complex child rendering that varies by runtime values                              | `wrapComponent` with `customRender` |
+| Runtime-dependent element selection, slots, or specialized extraction              | `wrapComponent` with `customRender` |
+| Renderer infrastructure or behavior that cannot run through `wrapComponent` at all | `createComponentRenderer`           |
 
 ---
 
@@ -292,32 +292,36 @@ When migrating a `createComponentRenderer` to `wrapComponent`, these problems re
 
 ### 4. Specialized extractors
 
-`wrapComponent` auto-selects only `asOptionalBoolean`, `asOptionalNumber`, `asOptionalString`, `extractResourceUrl`, and `renderChild`/`MemoizedItem` for `ComponentDef` templates. It does not auto-select specialized helpers such as `asSize()`, `asDisplayText()`, `asInteger()`, `asColor()`, `asLength()`, `asUrl()`, `asIcon()`, `asLayoutProp()`, or `asStyleProp()`. Components requiring those semantics need `customRender`, explicit config (`strings`, `numbers`, etc.) when plain coercion is enough, or `createComponentRenderer`.
+`wrapComponent` auto-selects only `asOptionalBoolean`, `asOptionalNumber`, `asOptionalString`, `extractResourceUrl`, and `renderChild`/`MemoizedItem` for `ComponentDef` templates. It does not auto-select specialized helpers such as `asSize()`, `asDisplayText()`, `asInteger()`, `asColor()`, `asLength()`, `asUrl()`, `asIcon()`, `asLayoutProp()`, or `asStyleProp()`. Components requiring those semantics should use `customRender`, or explicit config (`strings`, `numbers`, etc.) when plain coercion is enough.
 
 ### 5. Computed or derived props
 
-Migration is blocked when:
+Use `customRender` when:
+
 - A prop's default depends on another prop (Stack's `itemWidth` defaults from `orientation`)
 - Multiple props merge into one React prop (Badge's `color` from `colorMap` + `value`)
 - A prop is derived from engine-injected layout properties (`height`, `width`)
+- Event lookup needs non-default options such as `{ schedulerBypass: true }`
 
 ### 6. Complex render logic
 
-These patterns are not expressible with `wrapComponent`:
+These patterns require `customRender`:
+
 - Conditional JSX trees (Stack branches to DockLayout, FlowLayout, or Stack)
 - Per-child `wrapChild` callbacks
 - Multiple component variants sharing a render helper (VStack/HStack/CVStack/CHStack)
 - Runtime prop subsetting via whitelist (Text's `VariantPropsKeys`)
+- Slot or template fallback logic (AppHeader uses prop templates or slots)
 
 ### Pre-migration checklist
 
-| Area | Check |
-|------|-------|
-| Metadata | All props use `valueType`, not `type`; `d()` calls pass a `valueType` when typed |
-| Props | No cross-prop defaults; no multi-prop → single React prop; mismatches covered by `rename` |
-| Children | Layout context is static or absent |
-| Extractors | No need for specialized extractors unless handled by `customRender` |
-| Render | Single unconditional JSX path; no per-child wrapChild; no dynamic prop subsetting |
+| Area       | Check                                                                                          |
+| ---------- | ---------------------------------------------------------------------------------------------- |
+| Metadata   | All props use `valueType`, not `type`; `d()` calls pass a `valueType` when typed               |
+| Props      | Cross-prop defaults and multi-prop → single React prop logic are handled by `customRender`     |
+| Children   | Static layout context uses `childrenLayoutContext`; runtime layout context uses `customRender` |
+| Extractors | Specialized extractors are handled by `customRender`                                           |
+| Render     | Dynamic JSX paths, slots, per-child wrapping, or prop subsetting are handled by `customRender` |
 
 ---
 
@@ -326,6 +330,7 @@ These patterns are not expressible with `wrapComponent`:
 A hypothetical `Rating` component with events, a template, and an API:
 
 **Metadata (`Rating.tsx`):**
+
 ```typescript
 export const RatingMd = createMetadata({
   status: "stable",
@@ -347,21 +352,18 @@ export const RatingMd = createMetadata({
 ```
 
 **Renderer (`Rating.tsx`):**
+
 ```typescript
-export const ratingComponentRenderer = wrapComponent(
-  "Rating",
-  RatingNative,
-  RatingMd,
-  {
-    exposeRegisterApi: true,
-    // didChange auto-detected from metadata → isStateful: true
-    // starTemplate auto-detected as ComponentDef template
-    // readOnly/maxStars auto-detected from valueType: "boolean"/"number"
-  },
-);
+export const ratingComponentRenderer = wrapComponent("Rating", RatingNative, RatingMd, {
+  exposeRegisterApi: true,
+  // didChange auto-detected from metadata → isStateful: true
+  // starTemplate auto-detected as ComponentDef template
+  // readOnly/maxStars auto-detected from valueType: "boolean"/"number"
+});
 ```
 
 The wrapper auto-detects:
+
 - `didChange` → stateful (`value`, `updateState`, `initialValue` passed)
 - `readOnly` → `extractValue.asOptionalBoolean`
 - `maxStars` → `extractValue.asOptionalNumber`
@@ -375,6 +377,6 @@ The wrapper auto-detects:
 2. The difference between `templates` and `renderers`: templates render once to a static node; renderers create callbacks that render per-item with context variables.
 3. Layout and behavior props are blocked from generic forwarding, but explicit metadata props take ownership of their names and are forwarded.
 4. `stateful: true` is auto-detected from `initialValue` or `didChange` in metadata. In stateful mode, `value`/`updateState`/`initialValue` are wired automatically; `passUpdateState: false` suppresses only the `updateState` prop.
-5. `customRender` runs in the renderer context, not as a React component. No hooks. It receives already-extracted props and must handle children itself.
+5. `customRender` is the preferred escape hatch for ordinary components that need renderer-context services, custom child rendering, specialized extractors, scheduler-bypass event lookup, or dynamic JSX. It runs in the renderer context, not as a React component. No hooks.
 6. `wrapCompound` is for components whose React implementation manages local state. The native component gets `value`, `onChange`, and `registerApi` — no XMLUI imports required.
 7. `exposeRegisterApi: true` must be set explicitly. Without it, `registerComponentApi` is `undefined` in the native component and no imperative APIs can be registered.

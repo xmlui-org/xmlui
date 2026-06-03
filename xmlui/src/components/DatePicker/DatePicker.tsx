@@ -1,6 +1,6 @@
 import styles from "./DatePicker.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -80,8 +80,7 @@ export const DatePickerMd = createMetadata({
       defaultValue: defaultProps.inline,
     },
     clearable: {
-      description:
-        "Set to `true` to show a clear button that resets the value. Hidden by default.",
+      description: "Set to `true` to show a clear button that resets the value. Hidden by default.",
       valueType: "boolean",
       defaultValue: defaultProps.clearable,
     },
@@ -225,8 +224,7 @@ export const DatePickerMd = createMetadata({
   contextVars: {
     value: {
       description:
-        "Current value. Single mode returns a string; range mode returns " +
-        "`{ from, to }`.",
+        "Current value. Single mode returns a string; range mode returns " + "`{ from, to }`.",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -267,22 +265,14 @@ export const DatePickerMd = createMetadata({
 export function ThemedDatePicker({ className, ...rest }: DatePickerProps) {
   const themeClass = useComponentThemeClass(DatePickerMd);
   const combinedClassName = className ? `${themeClass} ${className}` : themeClass;
-  return (
-    <DatePicker {...rest} className={combinedClassName} contentClassName={themeClass} />
-  );
+  return <DatePicker {...rest} className={combinedClassName} contentClassName={themeClass} />;
 }
 
-export const datePickerComponentRenderer = createComponentRenderer(
-  COMP,
-  DatePickerMd,
-  ({
-    node,
-    extractValue,
-    lookupEventHandler,
-    updateState,
-    registerComponentApi,
-    classes,
-  }) => {
+export const datePickerComponentRenderer = wrapComponent(COMP, ThemedDatePicker, DatePickerMd, {
+  customRender: (
+    _props,
+    { node, extractValue, lookupEventHandler, updateState, registerComponentApi, classes },
+  ) => {
     const props = (node.props ?? {}) as Record<string, any>;
 
     return (
@@ -338,4 +328,4 @@ export const datePickerComponentRenderer = createComponentRenderer(
       />
     );
   },
-);
+});
