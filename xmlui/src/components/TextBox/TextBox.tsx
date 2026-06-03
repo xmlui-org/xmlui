@@ -56,6 +56,7 @@ export const TextBoxMd = createMetadata({
         "the value as sensitive (PII).",
       valueType: "string",
       availableValues: ["text", "password", "search", "email"],
+      isStrictEnum: true,
       defaultValue: "text",
     },
     placeholder: dPlaceholder(),

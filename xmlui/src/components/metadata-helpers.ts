@@ -7,15 +7,37 @@ import type {
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
 import { defaultProps } from "./FormItem/ItemWithLabel.defaults";
 
+/**
+ * Optimizer-specific metadata grouped in one place.
+ * Passed via the `optimization` key in `createMetadata` input.
+ * `createMetadata` spreads these into the correct `ComponentMetadata` fields,
+ * keeping optimizer concerns separate from human-readable API documentation.
+ */
+type OptimizerInput = {
+  /** @see ComponentMetadata.isImplicitContainerByDefault */
+  isImplicitContainerByDefault?: boolean;
+  /** @see ComponentMetadata.unstableChildInjectedVars */
+  unstableChildInjectedVars?: readonly string[];
+};
+
 export function createMetadata<
   TProps extends Record<string, ComponentPropertyMetadata>,
   TEvents extends Record<string, ComponentPropertyMetadata>,
   TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 >(
-  metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis>,
+  metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis> & {
+    optimization?: OptimizerInput;
+  },
 ): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
-  return metadata;
+  const { optimization, ...rest } = metadata;
+
+  if (!optimization) {
+    return rest as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
+  }
+
+  // Spread isImplicitContainerByDefault, childInjectedVars, unstableChildInjectedVars into the result
+  return { ...rest, ...optimization } as ComponentMetadata<TProps, TEvents, TContextVars, TApis>;
 }
 
 export function dInternal(description?: string): ComponentPropertyMetadata {
@@ -176,6 +198,7 @@ export function dValidationStatus(value?: string): ComponentPropertyMetadata {
     description: `This property allows you to set the validation status of the input component.`,
     valueType: "string",
     availableValues: validationStatusMd,
+    isStrictEnum: true,
     defaultValue: value ?? "none",
   };
 }

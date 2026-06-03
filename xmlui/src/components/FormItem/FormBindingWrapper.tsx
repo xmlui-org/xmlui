@@ -35,6 +35,7 @@ type FormBindingWrapperProps = {
   itemIndex?: number;
   validations: FormItemValidations;
   requireLabelMode?: RequireLabelMode;
+  compactInlineLabel?: boolean;
   // Optional label props
   label?: string;
   labelPosition?: LabelPosition;
@@ -63,6 +64,7 @@ export function FormBindingWrapper({
   labelWidth,
   labelBreak,
   requireLabelMode,
+  compactInlineLabel,
   enabled = true,
   style,
   className,
@@ -204,6 +206,7 @@ export function FormBindingWrapper({
         style={style}
         className={className}
         cloneStyle={true}
+        compactInlineLabel={compactInlineLabel}
         validationResult={validationResult}
         requireLabelMode={requireLabelMode ?? formRequireLabelMode}
         layoutContext={layoutContext}

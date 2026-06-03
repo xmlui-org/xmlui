@@ -570,6 +570,7 @@ export type CollectedDeclarations = {
   functions: Record<string, CodeDeclaration>;
   moduleErrors?: ModuleErrors;
   hasInvalidStatements?: boolean;
+  hasUnresolvableImports?: boolean;
 };
 
 export type CodeDeclaration = {

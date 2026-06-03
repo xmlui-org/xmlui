@@ -19,6 +19,12 @@ export const TabsMd = createMetadata({
     "It provides an efficient way to present multiple related sections in a single " +
     "interface area, with each tab containing distinct content defined by " +
     "[TabItem](/components/TabItem) components.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
+  contextVars: {
+    $header: { description: "The tab's header context (matches TabItem's `$header`)." },
+  },
   props: {
     activeTab: {
       description:
@@ -33,6 +39,7 @@ export const TabsMd = createMetadata({
         `orientation, the buttons are at the top. Note: This property is ignored when ` +
         `accordionView is set to true.`,
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
@@ -44,6 +51,7 @@ export const TabsMd = createMetadata({
         `of the header. Note: This property is ignored when orientation is set to 'vertical' ` +
         `or when accordionView is enabled.`,
       availableValues: ["start", "end", "center", "stretch"],
+      isStrictEnum: true,
       defaultValue: defaultProps.tabAlignment,
       valueType: "string",
     },

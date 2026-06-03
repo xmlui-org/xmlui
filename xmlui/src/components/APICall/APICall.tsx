@@ -166,6 +166,7 @@ export const APICallMd = createMetadata({
         "'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.",
       valueType: "string",
       availableValues: ["none", "linear", "exponential"],
+      isStrictEnum: true,
       defaultValue: defaultProps.pollingBackoff,
     },
     maxPollingInterval: {
@@ -292,6 +293,7 @@ export const APICallMd = createMetadata({
       parameters: {},
     },
     mockExecute: {
+      injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"],
       description:
         "When defined, this event handler replaces the actual API request. " +
         "The handler receives the resolved request properties as context variables: " +

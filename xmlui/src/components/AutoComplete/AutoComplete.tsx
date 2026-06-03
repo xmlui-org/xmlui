@@ -32,6 +32,9 @@ export const AutoCompleteMd = createMetadata({
     "filter through options, with support for single or multiple selections. Unlike " +
     "a basic [`Select`](/docs/reference/components/Select), it provides type-ahead functionality " +
     "and can allow users to create new options.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -168,6 +171,14 @@ export const AutoCompleteMd = createMetadata({
     },
     $group: {
       description: "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
+    },
+    $selectedValue: {
+      description: "Currently selected value, injected into the trigger/option template.",
+      isInternal: true,
+    },
+    $inTrigger: {
+      description: "True when rendering inside the trigger (vs the dropdown list).",
+      isInternal: true,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

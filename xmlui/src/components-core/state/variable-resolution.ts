@@ -155,7 +155,25 @@ export function useVars(
               ),
             });
           }
+          // Spread order: componentState (imperative dispatch writes) must win
+          // over ret (initial expression evaluations) for USER-DEFINED vars,
+          // otherwise a derived var like `var.countTimes3="{3 * count}"` sees
+          // count's initial value (0) from ret instead of its latest dispatched
+          // value from componentState — breaking reactivity.
+          //
+          // EXCEPTION: $-prefixed framework vars (`$props`, `$context`, `$item`,
+          // `$value`, …) must keep lexical-scoping precedence so a locally-resolved
+          // `$props` in a nested UDC is not shadowed by an outer `$props` that
+          // leaked through narrowing (see history-bugs.md Bug 29). These keys are
+          // never written via imperative dispatch into this container's
+          // componentState — they come from CompoundComponent / MemoizedItem /
+          // FormItem etc. and the locally-resolved value is authoritative.
           const stateContext: ContainerState = { ...ret, ...componentState };
+          for (const k in ret) {
+            if (k.charCodeAt(0) === 36 /* '$' */) {
+              stateContext[k] = ret[k];
+            }
+          }
 
           let dependencies: Array<string> = [];
           if (fnDeps[key]) {

@@ -74,7 +74,7 @@ function asElement(node: React.ReactNode): React.ReactElement {
 
 describe("wrapComponent — templates (static)", () => {
   it("auto-detects ComponentDef props from metadata and renders them via renderChild", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         emptyListTemplate: { description: "Empty template", valueType: "ComponentDef" as const },
         label: { description: "A label", valueType: "string" as const },
@@ -102,7 +102,7 @@ describe("wrapComponent — templates (static)", () => {
   });
 
   it("uses explicit templates config with rename", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         headerTemplate: { description: "Header", valueType: "ComponentDef" as const },
       },
@@ -129,7 +129,7 @@ describe("wrapComponent — templates (static)", () => {
   });
 
   it("does not forward ComponentDef prop as raw value", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         myTemplate: { description: "A template", valueType: "ComponentDef" as const },
       },
@@ -149,7 +149,7 @@ describe("wrapComponent — templates (static)", () => {
   });
 
   it("skips template prop when not provided in node.props", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         emptyListTemplate: { description: "Empty", valueType: "ComponentDef" as const },
       },
@@ -165,7 +165,7 @@ describe("wrapComponent — templates (static)", () => {
   });
 
   it("templates array form keeps same prop name", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         footerTemplate: { description: "Footer", valueType: "ComponentDef" as const },
       },
@@ -190,7 +190,7 @@ describe("wrapComponent — templates (static)", () => {
 
 describe("wrapComponent — renderers (render-prop)", () => {
   it("creates a render-prop callback with positional context vars", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         optionTemplate: { description: "Option template", valueType: "ComponentDef" as const },
       },
@@ -227,7 +227,7 @@ describe("wrapComponent — renderers (render-prop)", () => {
   });
 
   it("uses custom reactProp name", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         itemTemplate: { description: "Item", valueType: "ComponentDef" as const },
       },
@@ -257,7 +257,7 @@ describe("wrapComponent — renderers (render-prop)", () => {
   });
 
   it("uses function form for computed context vars", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         itemTemplate: { description: "Item", valueType: "ComponentDef" as const },
       },
@@ -300,7 +300,7 @@ describe("wrapComponent — renderers (render-prop)", () => {
   });
 
   it("skips render-prop when template is not provided", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         optionTemplate: { description: "Option", valueType: "ComponentDef" as const },
       },
@@ -323,7 +323,7 @@ describe("wrapComponent — renderers (render-prop)", () => {
   });
 
   it("null in positional contextVars skips that argument", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         itemTemplate: { description: "Item", valueType: "ComponentDef" as const },
       },
@@ -352,7 +352,7 @@ describe("wrapComponent — renderers (render-prop)", () => {
   });
 
   it("renderer overrides auto-detected template for same prop", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         optionTemplate: { description: "Option", valueType: "ComponentDef" as const },
         emptyListTemplate: { description: "Empty", valueType: "ComponentDef" as const },
@@ -389,7 +389,7 @@ describe("wrapComponent — renderers (render-prop)", () => {
 
 describe("wrapComponent — contentClassName", () => {
   it("passes classes[COMPONENT_PART_KEY] as contentClassName when enabled", () => {
-    const metadata = { props: {} };
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} }, props: {} };
     const result = wrapComponent("Test", DummyNative, metadata, {
       contentClassName: true,
     });
@@ -403,7 +403,7 @@ describe("wrapComponent — contentClassName", () => {
   });
 
   it("does not add contentClassName when not configured", () => {
-    const metadata = { props: {} };
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} }, props: {} };
     const result = wrapComponent("Test", DummyNative, metadata);
 
     const context = createMockContext();
@@ -414,7 +414,7 @@ describe("wrapComponent — contentClassName", () => {
 
 describe("wrapComponent — mixed config", () => {
   it("combines templates, renderers, contentClassName, and regular props", () => {
-    const metadata = {
+    const metadata: any = { contextVars: { $item: {}, $selectedValue: {}, $inTrigger: {}, $itemIndex: {}, $isFirst: {}, $isLast: {}, $isSelected: {}, $index: {} },
       props: {
         enabled: { description: "Enabled", valueType: "boolean" as const },
         placeholder: { description: "Placeholder", valueType: "string" as const },

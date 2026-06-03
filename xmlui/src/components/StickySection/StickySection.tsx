@@ -24,6 +24,7 @@ export const StickySectionMd = createMetadata({
         "Use `\"top\"` to keep the section anchored to the top of the scrollable area and " +
         "`\"bottom\"` to keep it anchored to the bottom.",
       availableValues: ["top", "bottom"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.stickTo,
     },

@@ -312,7 +312,7 @@ export const validationStatusValues = ["none", "error", "warning", "valid"] as c
 export const validationStatusNames = [...validationStatusValues];
 export type ValidationStatus = (typeof validationStatusValues)[number];
 export const validationStatusMd: PropertyValueDescription[] = [
-  // { value: "none", description: "No indicator" },
+  { value: "none", description: "No validation indicator (default state)" },
   { value: "valid", description: "Visual indicator for an input that is accepted" },
   { value: "warning", description: "Visual indicator for an input that produced a warning" },
   { value: "error", description: "Visual indicator for an input that produced an error" },

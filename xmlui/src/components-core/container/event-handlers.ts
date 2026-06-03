@@ -24,6 +24,7 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { buildProxy, type ProxyAction } from "../rendering/buildProxy";
+import { createCoWStateProxy } from "./cow-state-proxy";
 import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
@@ -72,6 +73,13 @@ export interface EventHandlerConfig {
   handlerLogger: HandlerLoggerContext;
   // Current state reference
   stateRef: React.MutableRefObject<Record<string | symbol, any>>;
+  // Stable ref tracking the latest componentState (updated every render).
+  // Used to refresh stateRef before handler execution when the Container is
+  // memo-blocked by computedUses and the layout effect hasn't re-fired.
+  componentStateRef?: React.MutableRefObject<Record<string, any>>;
+  // Stable ref to the full (un-narrowed) parent state set by ComponentWrapper.
+  // Updated every time the parent renders, even when Container is memo-blocked.
+  fullParentStateRef?: React.MutableRefObject<Record<string, any> | undefined>;
   // Theme variable getter
   getThemeVar: (varName: string) => any;
   // State dispatch function
@@ -136,6 +144,8 @@ export function createEventHandlers(config: EventHandlerConfig) {
     appContext,
     handlerLogger,
     stateRef,
+    componentStateRef,
+    fullParentStateRef,
     getThemeVar,
     dispatch,
     apiInstance,
@@ -149,6 +159,41 @@ export function createEventHandlers(config: EventHandlerConfig) {
     statementPromises,
     parsedStatementsRef,
   } = config;
+
+  let lastFp: Record<string, any> | undefined = undefined;
+  let lastCompState: Record<string, any> | undefined = undefined;
+
+  // Merge the latest fullParentStateRef.current with componentStateRef.current
+  // into stateRef immediately before each handler execution.
+  //
+  // When computedUses narrows a Container's parentState (e.g. to ['lastAction']),
+  // the Container is memo-blocked on unrelated parent state changes. The layout
+  // effect that normally syncs stateRef doesn't re-fire while memo-blocked. This
+  // means dynamic context vars like $context (stored in parent state via implicit
+  // dispatch) are invisible to event handlers.
+  //
+  // fullParentStateRef.current is always up-to-date (mutated by ComponentWrapper
+  // on every parent render), so refreshing here ensures handlers always see the
+  // full current state regardless of memo-blocking.
+  const refreshStateRef = () => {
+    const fp = fullParentStateRef?.current;
+    const compState = componentStateRef?.current;
+    if (!componentStateRef) {
+      return;
+    }
+    // Only update stateRef if one of the inputs changed identity.
+    if (fp === lastFp && compState === lastCompState) {
+      return;
+    }
+    lastFp = fp;
+    lastCompState = compState;
+    // Always mirror the latest componentState into stateRef. When fullParentStateRef
+    // is absent (no uses/computedUses on this node), the previous guard skipped this
+    // entirely, leaving stateRef stale across handler invocations — e.g. DataSource
+    // onFetch with computedUses-enabled ancestors could run with an empty stateRef so
+    // handler context merge lost injected $url / $method / $queryParams.
+    stateRef.current = fp ? { ...fp, ...compState } : compState;
+  };
 
   // ========================================================================
   // ASYNC EVENT HANDLER EXECUTION
@@ -186,6 +231,11 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const canSignEventLifecycle = () => {
         return uid.description !== undefined && options?.eventName !== undefined;
       };
+
+      // Ensure stateRef reflects the latest parent state before reading it.
+      // Required when Container is memo-blocked by computedUses — the layout
+      // effect that normally syncs stateRef may not have re-fired.
+      refreshStateRef();
 
       // ---------------------------------------------------------------
       // Plan #06 W7-1 — HandlerCoordinator integration.
@@ -242,15 +292,27 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const getComponentStateClone = () => {
         changes.length = 0;
         const originalState = stateRef.current;
-        const poj = cloneDeep({ ...originalState, ...(options?.context || {}) });
+        // Shallow-copy the root so that $this, $cancel, and context overrides
+        // are scoped to this invocation without touching stateRef.current.
+        // Nested objects are isolated lazily by the CoW proxy on first write.
+        const poj: Record<string, any> = { ...originalState };
+
+        if (options?.context) {
+          Object.assign(poj, options.context);
+        }
         poj["$this"] = originalState[uid];
-        // --- W3-6: expose `$cancel` as a read-only handler-scope variable.
         poj["$cancel"] = cancelToken;
 
         // Tag component API objects with their key for reference tracking.
         // When a variable is later assigned one of these objects (e.g. myGlobal = ds),
         // the framework can detect the reference and keep the variable in sync with
         // the live component API value across subsequent renders.
+        //
+        // Component API objects are stored in Immer-managed state and may be frozen.
+        // A frozen (non-extensible) object rejects Object.defineProperty. To avoid
+        // the invariant error, shallow-copy the object into poj first — this also
+        // matches the old cloneDeep behavior (getters are invoked, giving snapshot
+        // values; method references are preserved).
         for (const sym of Object.getOwnPropertySymbols(originalState)) {
           const desc = sym.description;
           if (
@@ -261,6 +323,9 @@ export function createEventHandlers(config: EventHandlerConfig) {
             typeof poj[desc] === "object" &&
             !Array.isArray(poj[desc])
           ) {
+            if (!Object.isExtensible(poj[desc])) {
+              poj[desc] = { ...poj[desc] };
+            }
             Object.defineProperty(poj[desc], "__componentApiKey__", {
               value: desc,
               enumerable: false,
@@ -269,7 +334,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           }
         }
 
-        return buildProxy(poj, (changeInfo) => {
+        return createCoWStateProxy(poj, (changeInfo) => {
           const idRoot = (changeInfo.pathArray as string[])?.[0];
           if (idRoot?.startsWith("$")) {
             throw new Error("Cannot update a read-only variable");
@@ -661,8 +726,10 @@ export function createEventHandlers(config: EventHandlerConfig) {
 
   const runCodeSync = useCallback(
     (arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
+      // Ensure stateRef reflects the latest parent state before reading it.
+      refreshStateRef();
       const evalContext: BindingTreeEvaluationContext = {
-        localContext: cloneDeep(stateRef.current),
+        localContext: createCoWStateProxy({ ...stateRef.current }, () => {}),
         appContext,
         eventArgs,
       };

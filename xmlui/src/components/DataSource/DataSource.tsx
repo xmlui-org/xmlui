@@ -173,7 +173,9 @@ export const DataSourceMd = createMetadata({
         error: "The error object that occurred during the request.",
       },
     },
+
     fetch: {
+      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
       description:
         "When defined, this event handler replaces the default fetch logic. The handler " +
         "receives the resolved request properties as context variables: `$url`, `$method`, " +

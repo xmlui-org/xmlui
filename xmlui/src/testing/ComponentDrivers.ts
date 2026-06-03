@@ -114,7 +114,8 @@ export class TestStateDriver {
   get testState() {
     return async () => {
       const text = await this.testStateLocator.textContent();
-      const testState = text === "undefined" ? undefined : JSON.parse(text!);
+      if (!text) return undefined;
+      const testState = text === "undefined" ? undefined : JSON.parse(text);
       return testState;
     };
   }

@@ -681,7 +681,7 @@ because `"/admin"` is an exact path. Use `url="/admin/*"` to allow sub-routes.
 
 - XMLUI routing wraps **react-router-dom v6** — `Pages` maps to `<Routes>`, `Page` maps to `<Route>`.
 - **HashRouter is the default** and works on any static host. Switch to BrowserRouter for clean URLs, but configure your server accordingly.
-- **`$routeParams`**, **`$queryParams`**, and **`$pathname`** are reactive state variables injected into every expression automatically — no manual hook wiring needed.
+- **`$routeParams`**, **`$queryParams`**, and **`$pathname`** are reactive state variables injected dynamically by the `<Page>` component into its scope — they must be declared in metadata for the Lexical Scope Optimizer.
 - Defended routing constraints validate and coerce params before page content renders. Failed constraints emit navigation diagnostics.
 - Page `guard` can reject or redirect after validation, before rendering.
 - **`navigate()`** is the programmatic navigation function. Use `navigate(-1)` for back, `navigate(path, { replace: true })` to avoid history entries, and `navigate(path, { queryParams: {...} })` for query strings.

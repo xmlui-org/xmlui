@@ -14,6 +14,12 @@ const COMP = "Tree";
 export const TreeMd = createMetadata({
   status: "stable",
   description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.`,
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
+  contextVars: {
+    $item: { description: "The current tree node's data item." },
+  },
   props: {
     data: {
       description: `The data source of the tree. Format depends on the dataFormat property.`,
@@ -145,6 +151,7 @@ export const TreeMd = createMetadata({
         "On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.",
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      isStrictEnum: true,
       defaultValue: defaultProps.scrollStyle,
     },
     overflow: {
@@ -207,7 +214,10 @@ export const TreeMd = createMetadata({
     },
   },
   events: {
-    contextMenu: dContextMenu(COMP),
+    contextMenu: {
+      injectedVars: ["$item"],
+      ...dContextMenu(COMP),
+    },
     selectionDidChange: {
       description: `Fired when the tree selection changes.`,
       signature:

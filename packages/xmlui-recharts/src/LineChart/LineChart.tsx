@@ -88,6 +88,9 @@ export const LineChartMd: ComponentMetadata = createMetadata({
       description: "The left margin of the chart",
     },
   },
+  contextVars: {
+    $tooltip: { description: "Context variable available inside tooltipTemplate." },
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`width-line-LineChart`]: "1px",

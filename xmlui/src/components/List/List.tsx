@@ -35,6 +35,9 @@ export const ListMd = createMetadata({
     "datasets with built-in grouping, sorting, and visual formatting. It only " +
     "renders visible items in the viewport, making it ideal for displaying " +
     "thousands of records while maintaining smooth scrolling performance.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
   props: {
     data: {
       description:

@@ -1,12 +1,7 @@
 import type { ReactNode } from "react";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { get } from "lodash-es";
 import toast from "react-hot-toast";
-
-import { version } from "../../../package.json";
 import { AppError } from "../errors/app-error";
-
-import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { createPubSubService } from "../pubsub/PubSubService";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
@@ -24,13 +19,10 @@ import { EMPTY_OBJECT } from "../constants";
 import type { IAppStateContext } from "../../components/App/AppStateContext";
 import { AppStateContext } from "../../components/App/AppStateContext";
 import { createAppState, type AppState } from "./appState";
-import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 import { useDebugView } from "../DebugViewProvider";
-import { miscellaneousUtils } from "../appContext/misc-utils";
-import { dateFunctions } from "../appContext/date-functions";
-import { mathFunctions } from "../appContext/math-function";
-import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
+import { setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
+import { buildAppContextValue, type AppContextDeps } from "../state/appContextFactory";
 import { AppUtilsNamespace, ClipboardNamespace, appCancel, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
 import { announceLiveRegion, GlobalLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
 import { SkipLink } from "../../components/SkipLink/SkipLinkReact";
@@ -1611,199 +1603,144 @@ export function AppContent({
     [appGlobals],
   );
 
-  // --- We assemble the app context object form the collected information
-  const appContextValue = useMemo(() => {
-    const ret: AppContextObject = {
-      // --- Engine-related
-      version,
-
-      // --- Actions namespace
-      Actions,
-
-      // --- App-specific
-      appGlobals,
-      debugEnabled,
-      decorateComponentsWithTestId,
-      environment,
-      mediaSize,
-      queryClient,
-      standalone,
-      // String-based type checking: Use constructor.name to identify ShadowRoot
-      // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
-      appIsInShadowDom:
-        typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot,
-
-      // --- Date-related
-      ...dateFunctions,
-
-      // --- Math-related
-      ...mathFunctions,
-
-      // --- Local storage utilities
-      ...localStorageFunctions,
-      storageTimestamp,
-
-      // --- File Utilities
-      formatFileSizeInBytes,
-      getFileExtension,
-
-      // --- Navigation-related
-      navigate,
-      routerBaseName,
-      get pathname() { return globalThis?.location?.pathname; },
-      setNavigationHandlers,
-
-      // --- Notifications and dialogs
-      confirm,
-      signError: signErrorWithHandler,
-      toast: tracedToast,
-
-      // --- Theme-related
-      activeThemeId,
-      activeThemeTone,
-      availableThemeIds,
-      setTheme: setActiveThemeId,
-      setThemeTone: setActiveThemeTone,
-      toggleThemeTone,
-      getThemeVar: themeGetThemeVar,
-
-      // --- User-related
-      loggedInUser,
-      setLoggedInUser,
-
-      delay,
-      embed,
-      apiInterceptorContext,
-      getPropertyByPath: get,
-
-      // --- Various utils
-      ...miscellaneousUtils,
-
-      forceRefreshAnchorScroll,
-      scrollBookmarkIntoView,
-
-      // --- AppState global state management
-      AppState,
-
-      // --- Phase 2 managed replacement globals
-      Log,
-      App: {
-        ...AppUtilsNamespace,
-        fetch: createAppFetch(appGlobals),
-        environment: getAppEnvironment(),
-        locale: activeLocale.locale,
-        localeSource: activeLocale.source,
-        availableLocales,
-        setLocale,
-        setAppDirection: (dir: "ltr" | "rtl" | "auto") => setDirectionOverride(dir),
-        registerLocaleBundle,
-        registerLocaleBundles,
-        reloadLocale,
-        translate,
-        t: translate,
-        isRtlLocale,
-        direction: resolvedDirection,
-        formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
-          formatNumber(value, activeLocale.locale, options),
-        formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
-          formatCurrency(value, currency, activeLocale.locale, options),
-        formatList: (values: readonly string[], options?: Intl.ListFormatOptions) =>
-          formatList(values, activeLocale.locale, options),
-        formatRelativeTime: (
-          value: number,
-          unit: Intl.RelativeTimeFormatUnit,
-          options?: Intl.RelativeTimeFormatOptions,
-        ) => formatRelativeTime(value, unit, activeLocale.locale, options),
-        compare: (a: string, b: string, options?: Intl.CollatorOptions) =>
-          compare(a, b, activeLocale.locale, options),
-        pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
-          pluralRules(value, activeLocale.locale, options),
-        scheduler: schedulerMode,
-        maxQueuedPerTrace,
-        setScheduler,
-        scheduleHandler,
-        // --- W5-1 / plan #09 Step 1.2: register a named validator from markup.
-        registerValidator: registerValidatorImpl,
-        // --- Plan #15 Step 4.1 + 2.3: register custom audit sinks and PII heuristics.
-        registerAuditSink: registerAuditSinkImpl,
-        registerAuditHeuristic: registerAuditHeuristicImpl,
-        // --- Plan #15 Step 2.2: replace the active audit policy from markup.
-        setAuditPolicy: (policy: unknown) => {
-          if (policy && typeof policy === "object") {
-            const p = policy as Record<string, unknown>;
-            setAuditPolicy({
-              redact: Array.isArray(p.redact) ? (p.redact as any) : [],
-              sample: (p.sample as any) ?? {},
-              retention:
-                (p.retention as any) ?? { bufferSize: 200, onOverflow: "drop-oldest" },
-              sink: p.sink as any,
-            });
-          }
-        },
-        // --- Plan #07 Step 2.1: structured error sink.
-        // `App.errors` is a FIFO buffer of recent `AppError`s (default 50, see
-        // `appGlobals.errorBufferSize`).  `setErrorHandler` is used by
-        // `<App onError>` to register a markup handler that runs after the
-        // default toast; the handler may call `event.preventDefault()` to
-        // suppress the toast.
-        errors,
-        setErrorHandler,
-        // --- Plan #6 Step 1.2: cooperative handler cancellation.
-        cancel: appCancel,
+  // --- App namespace: built inline because it pulls together many hooks
+  // (locale state, scheduler, error sink). Passed as a single dep to the
+  // factory so `XMLUI_GLOBAL_NAMES` stays the single source of TOP-LEVEL keys.
+  const appNamespace = useMemo(
+    () => ({
+      ...AppUtilsNamespace,
+      fetch: createAppFetch(appGlobals),
+      environment: getAppEnvironment(),
+      locale: activeLocale.locale,
+      localeSource: activeLocale.source,
+      availableLocales,
+      setLocale,
+      setAppDirection: (dir: "ltr" | "rtl" | "auto") => setDirectionOverride(dir),
+      registerLocaleBundle,
+      registerLocaleBundles,
+      reloadLocale,
+      translate,
+      t: translate,
+      isRtlLocale,
+      direction: resolvedDirection,
+      formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
+        formatNumber(value, activeLocale.locale, options),
+      formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
+        formatCurrency(value, currency, activeLocale.locale, options),
+      formatList: (values: readonly string[], options?: Intl.ListFormatOptions) =>
+        formatList(values, activeLocale.locale, options),
+      formatRelativeTime: (
+        value: number,
+        unit: Intl.RelativeTimeFormatUnit,
+        options?: Intl.RelativeTimeFormatOptions,
+      ) => formatRelativeTime(value, unit, activeLocale.locale, options),
+      compare: (a: string, b: string, options?: Intl.CollatorOptions) =>
+        compare(a, b, activeLocale.locale, options),
+      pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
+        pluralRules(value, activeLocale.locale, options),
+      scheduler: schedulerMode,
+      maxQueuedPerTrace,
+      setScheduler,
+      scheduleHandler,
+      // --- W5-1 / plan #09 Step 1.2: register a named validator from markup.
+      registerValidator: registerValidatorImpl,
+      // --- Plan #07 Step 2.1: structured error sink.
+      // `App.errors` is a FIFO buffer of recent `AppError`s (default 50, see
+      // `appGlobals.errorBufferSize`).  `setErrorHandler` is used by
+      // `<App onError>` to register a markup handler that runs after the
+      // default toast; the handler may call `event.preventDefault()` to
+      // suppress the toast.
+      errors,
+      setErrorHandler,
+      // --- Plan #15 Step 4.1 + 2.3: register custom audit sinks and PII heuristics.
+      registerAuditSink: registerAuditSinkImpl,
+      registerAuditHeuristic: registerAuditHeuristicImpl,
+      // --- Plan #15 Step 2.2: replace the active audit policy from markup.
+      setAuditPolicy: (policy: unknown) => {
+        if (policy && typeof policy === "object") {
+          const p = policy as Record<string, unknown>;
+          setAuditPolicy({
+            redact: Array.isArray(p.redact) ? (p.redact as any) : [],
+            sample: (p.sample as any) ?? {},
+            retention: (p.retention as any) ?? { bufferSize: 200, onOverflow: "drop-oldest" },
+            sink: p.sink as any,
+          });
+        }
       },
-      Clipboard: ClipboardNamespace,
+      // --- Plan #6 Step 1.2: cooperative handler cancellation.
+      cancel: appCancel,
+    }),
+    [
+      appGlobals,
+      activeLocale,
+      availableLocales,
+      setLocale,
+      setDirectionOverride,
+      registerLocaleBundle,
+      registerLocaleBundles,
+      reloadLocale,
+      translate,
+      isRtlLocale,
+      resolvedDirection,
+      schedulerMode,
+      maxQueuedPerTrace,
+      setScheduler,
+      scheduleHandler,
+      registerValidatorImpl,
+      errors,
+      setErrorHandler,
+    ],
+  );
 
-      // --- PubSub messaging
-      pubSubService,
-      publishTopic: pubSubService.publishTopic,
-    };
-    return ret;
-  }, [
+  // --- We assemble the app context object from the collected information.
+  // Single declaration: factoryDeps is both the factory's input and the source
+  // of the useMemo deps array (via Object.values). Stable values (module-level
+  // imports, useState setters, memoized callbacks) compare via Object.is and
+  // don't trigger spurious re-memos.
+  const factoryDeps: AppContextDeps = {
     Actions,
     appGlobals,
     debugEnabled,
     decorateComponentsWithTestId,
     environment,
     mediaSize,
+    queryClient,
     standalone,
+    // String-based type checking: Use constructor.name to identify ShadowRoot
+    // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
+    appIsInShadowDom:
+      typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot,
+    storageTimestamp,
     navigate,
     routerBaseName,
     setNavigationHandlers,
     confirm,
-    signErrorWithHandler,
-    errors,
-    setErrorHandler,
+    signError: signErrorWithHandler,
+    toast: tracedToast,
     activeThemeId,
     activeThemeTone,
     availableThemeIds,
-    setActiveThemeId,
-    setActiveThemeTone,
+    setTheme: setActiveThemeId,
+    setThemeTone: setActiveThemeTone,
     toggleThemeTone,
-    themeGetThemeVar,
+    getThemeVar: themeGetThemeVar,
     loggedInUser,
+    setLoggedInUser,
     embed,
     apiInterceptorContext,
     forceRefreshAnchorScroll,
     scrollBookmarkIntoView,
-    root,
     AppState,
     Log,
     pubSubService,
-    storageTimestamp,
-    activeLocale,
-    availableLocales,
-    setLocale,
-    registerLocaleBundle,
-    registerLocaleBundles,
-    reloadLocale,
-    translate,
-    isRtlLocale,
-    resolvedDirection,
-    schedulerMode,
-    maxQueuedPerTrace,
-    setScheduler,
-    scheduleHandler,
-  ]);
+    publishTopic: pubSubService.publishTopic,
+    App: appNamespace,
+  };
+  const appContextValue = useMemo(
+    () => buildAppContextValue(factoryDeps),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Object.values(factoryDeps),
+  );
 
   return (
     <AppContext.Provider value={appContextValue}>

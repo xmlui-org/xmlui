@@ -58,6 +58,8 @@ import { MetadataProvider } from "../language-server/services/common/metadata-ut
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
+import { computeUsesForTree } from "./optimization/computedUses";
+import { getOptimizerMetadata } from "./optimization/metadataLookup";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -66,6 +68,118 @@ const GLOBALS_XS_BUILT_RESOURCE = "/src/Globals.xs";
 const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
+
+/**
+ * Resolves component metadata for the computedUses optimizer at runtime.
+ * Delegates to the unified lookup that covers both public and internal
+ * (engine-only) components — no explicit per-type exceptions required.
+ */
+function resolveOptimizerMetadata(type: string) {
+  return getOptimizerMetadata(type);
+}
+
+/**
+ * Creates a MetadataHandler that delegates component lookups to either a
+ * MetadataProvider or a ComponentRegistry. Memoizes lookups to avoid
+ * redundant work when multiple properties are queried for the same
+ * component during a single traversal.
+ */
+function createMetadataHandler(
+  resolver: MetadataProvider | ComponentRegistry,
+): MetadataHandler {
+  const cache = new Map<string, any>();
+  const isRegistry = resolver instanceof ComponentRegistry;
+  const getComp = (name: string) => {
+    if (!cache.has(name)) {
+      const comp = isRegistry
+        ? (resolver as ComponentRegistry).lookupComponentRenderer(name)
+        : (resolver as MetadataProvider).getComponent(name);
+      cache.set(name, comp);
+    }
+    return cache.get(name);
+  };
+  return {
+    componentRegistered: (comp) => {
+      if (isRegistry) {
+        return (resolver as ComponentRegistry).hasComponent(comp);
+      }
+      return getComp(comp) != null;
+    },
+    getComponentProps: (comp) => {
+      const c = getComp(comp);
+      return (c?.getMetadata?.() || c?.descriptor || c)?.props || {};
+    },
+    getComponentEvents: (comp) => {
+      if (isRegistry) {
+        return null as any;
+      }
+      const c = getComp(comp);
+      return (c?.getMetadata?.() || c?.descriptor || c)?.events || {};
+    },
+    acceptArbitraryProps: () => true,
+    getComponentValidator: () => null,
+  };
+}
+
+/**
+ * Re-runs the computed-uses optimizer over the entire application tree.
+ * Used when app-global names are updated or when cross-.xs imports
+ * are newly resolved.
+ *
+ * Two-pass analysis:
+ *  Pass 1 — analyze every compound component body independently to collect
+ *            its computedGlobalUses (globals read inside its template).
+ *  Pass 2 — analyze the main entry-point tree (and re-analyze compound bodies)
+ *            with an enhanced metadataLookup that surfaces each compound's
+ *            globalDepsUsed to ancestor nodes. This ensures that when a compound
+ *            like InProgressPanel reads a global (e.g. isFileOperationInProgress)
+ *            via `when`, its ancestors include that global in their own
+ *            computedGlobalUses — so ComponentWrapper propagates globalVars
+ *            updates through the full chain.
+ *
+ * Without pass 1, ancestors analyzing a call-site node (e.g. `<InProgressPanel />`)
+ * cannot see globals read inside InProgressPanel's own component body. After §11
+ * clears hasUnresolvableImports and enables narrowing, ancestors omit those globals,
+ * blocking re-renders for them (progress panel never becomes visible).
+ */
+function recomputeUsesForApp(
+  appDef: StandaloneAppDescription,
+  appGlobalNames: ReadonlySet<string> | undefined,
+) {
+  const entryPoint = appDef.entryPoint as ComponentDef;
+  if (!entryPoint) {
+    return;
+  }
+
+  // Pass 1: analyze all compound component bodies to collect their globalDepsUsed.
+  const compoundGlobalDeps = new Map<string, ReadonlySet<string>>();
+  appDef.components?.forEach((compound) => {
+    if (compound.component) {
+      computeUsesForTree(compound.component, resolveOptimizerMetadata, appGlobalNames);
+      if (compound.name && compound.component.computedGlobalUses?.length) {
+        compoundGlobalDeps.set(compound.name, new Set(compound.component.computedGlobalUses));
+      }
+    }
+  });
+
+  // Pass 2: build an enhanced metadataLookup that folds compound globalDepsUsed
+  // into the OptimizerMetadataView, then re-analyze the full tree.
+  const enhancedMetadata = compoundGlobalDeps.size > 0
+    ? (type: string) => {
+        const base = resolveOptimizerMetadata(type);
+        const globalDeps = compoundGlobalDeps.get(type);
+        if (!globalDeps) return base;
+        return base ? { ...base, globalDepsUsed: globalDeps } : { globalDepsUsed: globalDeps };
+      }
+    : resolveOptimizerMetadata;
+
+  computeUsesForTree(entryPoint, enhancedMetadata, appGlobalNames);
+  appDef.components?.forEach((compound) => {
+    if (compound.component) {
+      computeUsesForTree(compound.component, enhancedMetadata, appGlobalNames);
+    }
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Storage escape hatch — runs at module-init time, BEFORE React or the router
@@ -609,6 +723,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   standaloneApp: StandaloneAppDescription;
   projectCompilation?: ProjectCompilation;
   globalVars?: Record<string, any>;
+  appGlobalNames?: ReadonlySet<string>;
 } {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
@@ -756,6 +871,15 @@ function resolveRuntime(runtime: Record<string, any>): {
     );
   }
 
+  // --- Globals.xs vars + functions resolve through the global-vars / global
+  // --- functions layer at runtime (NOT parent state), so the optimizer must
+  // --- exclude them from computedUses and from implicit-container promotion.
+  // --- This is the authoritative pass for both Standalone and Vite modes.
+  const appGlobalNames = new Set<string>([
+    ...Object.keys(globalsXs?.vars ?? {}),
+    ...Object.keys(globalsXs?.functions ?? {}),
+  ]);
+
   // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];
   if (config?.components) {
@@ -782,6 +906,8 @@ function resolveRuntime(runtime: Record<string, any>): {
     });
   }
 
+  recomputeUsesForApp({ entryPoint: entryPointWithCodeBehind, components } as any, appGlobalNames);
+
   // --- Collect globalVars from root element only (components can no longer define globals)
   const mergedGlobals = entryPointWithCodeBehind.globalVars || {};
 
@@ -797,6 +923,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     },
     projectCompilation,
     globalVars: mergedGlobals,
+    appGlobalNames,
   };
 }
 
@@ -911,15 +1038,19 @@ function useStandalone(
   standaloneApp: StandaloneAppDescription | null;
   projectCompilation?: ProjectCompilation;
   globalVars?: Record<string, any>;
+  appGlobalNames?: ReadonlySet<string>;
 } {
   // Prepend basePath to a relative path. Absolute URLs (http/https) are passed through unchanged.
   const prefixPath = (path: string): string => {
     if (!basePath || /^https?:\/\//.test(path)) return path;
     return `${basePath}/${path}`;
   };
+
+  // Extract the memoized runtime resolution so it's calculated exactly once per runtime change
+  const resolvedRuntime = useMemo(() => resolveRuntime(runtime), [runtime]);
+
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
-    const resolvedRuntime = resolveRuntime(runtime);
     const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 
     // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
@@ -1110,7 +1241,6 @@ function useStandalone(
     // Also include markup globals (global.* attributes) and entry-point functions
     // from the app definition so they are available on the very first render.
     // Without this, child components' onInit handlers fire before globals are in scope.
-    const resolvedRuntime = resolveRuntime(runtime);
     const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
     if (appDef?.entryPoint) {
       const ep = appDef.entryPoint as ComponentDef;
@@ -1125,9 +1255,40 @@ function useStandalone(
     return extracted;
   });
 
+  // Latch for the import-resolution + tree-rebuild pass below.  Each effect run
+  // rebuilds `newAppDef` from scratch, which makes the per-node
+  // `scriptCollected.hasUnresolvableImports` guard inside
+  // `collectImportsFromStandaloneSources` ineffective across runs — every fresh
+  // tree starts with `hasUnresolvableImports = true` again.  Without this
+  // top-level latch, identical re-runs (most commonly React StrictMode's
+  // double-invoke in dev, but also any harmless parent re-render that does not
+  // change the three deps) would trigger another async pass and potentially
+  // another `fetch()` for every imported `.xs` module.  See
+  // code-review-branch-vs-main.md §1.3.
+  const lastImportResolutionKeyRef = useRef<{
+    rt: unknown;
+    def: unknown;
+    bp: unknown;
+  } | null>(null);
+
   useIsomorphicLayoutEffect(() => {
+    if (
+      lastImportResolutionKeyRef.current &&
+      lastImportResolutionKeyRef.current.rt === resolvedRuntime &&
+      lastImportResolutionKeyRef.current.def === standaloneAppDef &&
+      lastImportResolutionKeyRef.current.bp === basePath
+    ) {
+      // Same inputs as the last resolved pass — nothing new to do.  The state
+      // (standaloneApp, projectCompilation, globalVars, pendingLintToasts) was
+      // already set by the previous run; React's reconciler will reuse it.
+      return;
+    }
+    lastImportResolutionKeyRef.current = {
+      rt: resolvedRuntime,
+      def: standaloneAppDef,
+      bp: basePath,
+    };
     void (async function () {
-      const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
@@ -1179,6 +1340,18 @@ function useStandalone(
           extensionManager,
         });
         setProjectCompilation(resolvedRuntime.projectCompilation);
+
+        // §11: dev/inline path — resolve cross-.xs imports so computedGlobalUses is not
+        // suppressed by hasUnresolvableImports, mirroring the standalone fetch path.
+        const wrappedMetadataHandler = createMetadataHandler(metadataProvider);
+        const resolvedAny = await collectImportsFromStandaloneSources(
+          appDef,
+          resolvedRuntime.projectCompilation,
+          wrappedMetadataHandler,
+        );
+        if (resolvedAny) {
+          recomputeUsesForApp(appDef, resolvedRuntime.appGlobalNames);
+        }
         setStandaloneApp(appDef);
 
         // --- Collect globalVars from the MERGED app definition (not resolved runtime)
@@ -1414,7 +1587,7 @@ function useStandalone(
       if (loadedEntryPoint.file) {
         sources[loadedEntryPoint.file] = loadedEntryPoint.src;
 
-        resolvedRuntime.projectCompilation.entrypoint.filename = MAIN_FILE;
+        resolvedRuntime.projectCompilation.entrypoint.filename = loadedEntryPoint.file;
         resolvedRuntime.projectCompilation.entrypoint.definition = loadedEntryPoint.component;
         resolvedRuntime.projectCompilation.entrypoint.markupSource = loadedEntryPoint.src;
 
@@ -1579,7 +1752,16 @@ function useStandalone(
               }
             }
 
-            resolvedRuntime.projectCompilation.components.push(compCompilation);
+            // resolvedRuntime is memoized on [runtime], so projectCompilation is shared
+            // across effect re-runs (StrictMode double-invoke, basePath/standaloneAppDef
+            // changes). Guard against re-adding the same compilation to avoid duplicates.
+            const compilations = resolvedRuntime.projectCompilation.components;
+            const existingIdx = compilations.findIndex((c) => c.filename === compCompilation.filename);
+            if (existingIdx === -1) {
+              compilations.push(compCompilation);
+            } else {
+              compilations[existingIdx] = compCompilation;
+            }
 
             const compoundComp = {
               ...compWrapper.component,
@@ -1658,6 +1840,15 @@ function useStandalone(
         extensionManager,
       });
 
+      // --- Resolve imports in standalone mode using sources map
+      const wrappedMetadataHandler = createMetadataHandler(metadataProvider);
+      const resolvedAny = await collectImportsFromStandaloneSources(newAppDef, resolvedRuntime.projectCompilation, wrappedMetadataHandler);
+
+      // --- H2 & C2: Only re-compute if imports were resolved, and pass appGlobalNames to prevent regression
+      if (resolvedAny) {
+        recomputeUsesForApp(newAppDef, resolvedRuntime.appGlobalNames);
+      }
+
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
       setPendingLintToasts(toastMessages);
@@ -1697,9 +1888,10 @@ function useStandalone(
       // DO NOT merge with extractedMainXsGlobals - those are static evaluated values that break reactivity
       setGlobalVars(parsedGlobals);
     })();
-  }, [runtime, standaloneAppDef, basePath]);
+  }, [resolvedRuntime, standaloneAppDef, basePath]);
 
-  return { standaloneApp, projectCompilation, globalVars };
+  // We already extracted resolvedRuntime via useMemo, no need to extract appGlobalNames again
+  return { standaloneApp, projectCompilation, globalVars, appGlobalNames: resolvedRuntime.appGlobalNames };
 }
 
 /**
@@ -1722,23 +1914,7 @@ function collectMissingComponents(
   );
 
   // --- Check the xmlui markup. This check will find all unloaded components
-  const metadataHandler: MetadataHandler = {
-    getComponentProps: (componentName) => {
-      return componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.props;
-    },
-    acceptArbitraryProps: () => {
-      return true;
-    },
-    getComponentValidator: () => {
-      return null;
-    },
-    getComponentEvents: () => {
-      return null;
-    },
-    componentRegistered: (componentName: string) => {
-      return componentRegistry.hasComponent(componentName);
-    },
-  };
+  const metadataHandler = createMetadataHandler(componentRegistry);
   const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, metadataHandler);
 
   componentRegistry.destroy();
@@ -2024,4 +2200,87 @@ function toThemeUrl(themeNameOrUrl: string): string {
     res += ".json";
   }
   return res;
+}
+
+/**
+ * Resolves imports for all components in standalone mode using the global sources map.
+ */
+export async function collectImportsFromStandaloneSources(
+  appDef: StandaloneAppDescription,
+  projectCompilation: ProjectCompilation,
+  metadataHandler: MetadataHandler,
+): Promise<boolean> {
+  const sources = appDef.sources || {};
+  let resolvedAny = false;
+
+  const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+    // C1: Use sources map from appDef instead of global window._xsSources
+    if (modulePath in sources) return sources[modulePath];
+    // Fallback to fetch for external modules
+    const response = await fetch(normalizePath(modulePath));
+    if (!response.ok) throw new Error(`Failed to fetch module: ${modulePath}`);
+    return await response.text();
+  };
+
+  const resolveForComponent = async (comp: ComponentDef | CompoundComponentDef, fileId: string) => {
+    const script = comp.script;
+    if (script && comp.scriptCollected?.hasUnresolvableImports) {
+      try {
+        // C4: Sequential execution because this clears global caches
+        const resolved = await collectCodeBehindFromSourceWithImports(fileId, script, moduleFetcher);
+        removeCodeBehindTokensFromTree(resolved);
+
+        // M3: Merge resolved imports. Sync-collected own decls win.
+        comp.scriptCollected.functions = { ...resolved.functions, ...comp.scriptCollected.functions };
+        comp.scriptCollected.vars = { ...resolved.vars, ...comp.scriptCollected.vars };
+        comp.scriptCollected.hasUnresolvableImports = resolved.hasUnresolvableImports;
+        if (!resolved.hasUnresolvableImports) {
+          resolvedAny = true;
+        }
+      } catch (e) {
+        // M2: Leave a structured warning in the console
+        console.warn(`[XMLUI] Failed to resolve imports for ${fileId}:`, e);
+      }
+    }
+  };
+
+  // H1: Recursively walk the tree to find all script blocks.
+  // NOTE: all nodes collected from this subtree are resolved against the same `fileId`.
+  // This is correct for the single-file-per-component case. If multi-source merged trees
+  // with relative imports are ever supported, each node would need its own fileId.
+  const walkTreeAndResolve = async (root: ComponentDef | CompoundComponentDef, fileId: string) => {
+    const nodesToProcess: ComponentDef[] = [];
+    const visitor = (node: ComponentDef, _parent: any, before: boolean) => {
+      if (before && node.scriptCollected?.hasUnresolvableImports) {
+        nodesToProcess.push(node);
+      }
+    };
+    visitComponent(root as ComponentDef, null, visitor, {}, metadataHandler);
+
+    for (const node of nodesToProcess) {
+      await resolveForComponent(node, fileId);
+    }
+  };
+
+  // C3: Use real paths from projectCompilation, but walk the actual render tree from appDef
+  if (appDef.entryPoint) {
+    await walkTreeAndResolve(appDef.entryPoint as ComponentDef, projectCompilation.entrypoint.filename);
+  }
+
+  if (appDef.components) {
+    for (const comp of appDef.components) {
+      // Find the filename from projectCompilation
+      const compFileName = projectCompilation.components.find((c) => c.definition?.name === comp.name)?.filename || comp.name + ".xmlui";
+
+      // For compound components, the wrapper itself might have a script
+      if (comp.scriptCollected?.hasUnresolvableImports) {
+        await resolveForComponent(comp, compFileName);
+      }
+      if (comp.component) {
+        await walkTreeAndResolve(comp.component as ComponentDef, compFileName);
+      }
+    }
+  }
+
+  return resolvedAny;
 }

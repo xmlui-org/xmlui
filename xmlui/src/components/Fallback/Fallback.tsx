@@ -13,6 +13,9 @@ export const FallbackMd = createMetadata({
     `component throws during render. The error is exposed as the \`$error\` ` +
     `context variable to the \`errorTemplate\`. An optional \`loadingTemplate\` ` +
     `is rendered while the \`isLoading\` prop is truthy.`,
+  contextVars: {
+    $error: { description: "The error captured by this Fallback boundary." },
+  },
   props: {
     errorTemplate: {
       description:

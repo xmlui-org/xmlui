@@ -114,6 +114,12 @@ export const CompoundComponent = forwardRef(
 
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
 
+    // Items-loop and context variables that must propagate through the UDC boundary.
+    // The UDC container uses narrowing which blocks local context vars,
+    // so $item/$itemIndex/$isFirst/$isLast/$context would otherwise be invisible inside the
+    // UDC template and break logic (e.g. form bindings or context menus).
+    const PROPAGATED_CONTEXT_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast", "$context"] as const;
+
     const udcContract = contract ?? ((compound as any).contract as UdcContract | undefined);
     // W8-1 (plan #14): strict UDC sandbox is on by default.  Authors must
     // explicitly opt out with `strictUdcSandbox={false}` in `<App appGlobals>`
@@ -213,11 +219,6 @@ export const CompoundComponent = forwardRef(
 
     const hasEventHandler = useEvent((eventName) => !!lookupEventHandler(eventName));
 
-    // Items-loop context variables that must propagate through the UDC boundary.
-    // The UDC container uses `uses: globalKeys` which blocks local context vars,
-    // so $item/$itemIndex/$isFirst/$isLast would otherwise be invisible inside the
-    // UDC template and break FormBindingBehavior path resolution (bindTo inside UDC).
-    const PROPAGATED_CONTEXT_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast"] as const;
     const propagatedContextVars = useMemo(() => {
       if (!contextVars) return undefined;
       const result: Record<string, any> = {};
@@ -233,7 +234,25 @@ export const CompoundComponent = forwardRef(
 
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
-      const { loaders, vars, functions, scriptError, ...rest } = compound;
+      // Discard any stale `computedUses` from `compound` so the runtime restructure (wrap-in-Container)
+      // doesn't propagate an obsolete static-analysis result. See computed-uses-specification.md §5.
+      //
+      // `computedGlobalUses` is LIFTED (not discarded). Unlike `computedUses`, it is NOT
+      // stale after the restructure: Globals.xs lives in the global-vars layer regardless
+      // of where local vars sit, so the set of globals the body reads is unchanged when
+      // vars move to this wrapper. Forwarding the body's annotation onto the wrapper gives
+      // UDC instances the same global-narrowing benefit as static containers — without
+      // it, every UDC wrapper would receive ALL parentGlobalVars and re-render whenever
+      // any unrelated global changes. See TODO-computedGlobalUses-improvements.md §8.
+      const {
+        loaders,
+        vars,
+        functions,
+        scriptError,
+        computedUses: _staleComputedUses,
+        computedGlobalUses,
+        ...rest
+      } = compound;
 
       // Extract global variable keys from globalVars to set as 'uses'
       // This ensures the compound component only inherits globals, not parent's local vars
@@ -269,6 +288,7 @@ export const CompoundComponent = forwardRef(
         scriptError: scriptError,
         containerUid: uid,
         uses: scopedGlobalKeys, // Only inherit permitted globals, not local parent vars
+        computedGlobalUses, // Lifted from body — see comment above
         udcContract: effectiveContract,
         props: {
           debug: (compound as any).debug || (compound.props as any)?.debug,

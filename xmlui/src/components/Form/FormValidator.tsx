@@ -61,6 +61,7 @@ export const FormValidatorMd = createMetadata({
       description: "Severity applied to errors produced by this validator.",
       valueType: "string",
       availableValues: ["error", "warning"],
+      isStrictEnum: true,
       defaultValue: "error",
     },
   },

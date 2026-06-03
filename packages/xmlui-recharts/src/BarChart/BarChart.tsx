@@ -92,6 +92,9 @@ export const BarChartMd: ComponentMetadata = createMetadata({
       description: "This property allows replacing the default template to display a tooltip.",
     },
   },
+  contextVars: {
+    $tooltip: { description: "Context variable available inside tooltipTemplate." },
+  },
   themeVars: parseScssVar(styles.themeVars),
 });
 

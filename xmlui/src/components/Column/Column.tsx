@@ -60,6 +60,7 @@ export const ColumnMd = createMetadata({
         "of the table. If the writing style is right-to-left, the locations are switched. " +
         "If this property is not set, the column is not pinned to any edge.",
       availableValues: ["left", "right"],
+      isStrictEnum: true,
       valueType: "string",
     },
     canResize: {

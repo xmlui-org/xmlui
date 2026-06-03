@@ -93,8 +93,12 @@ export const TextMd = createMetadata({
     },
   },
 
+  childInjectedVars: ["$textContext"], // Declares variables passed to children for the Lexical Scope Optimizer
+
   events: {
     contextMenu: dContextMenu(COMP),
+    // If an event exposes custom $vars, it must declare them here:
+    // onChange: { description: "...", injectedVars: ["$newValue"] }
   },
 
   apis: {

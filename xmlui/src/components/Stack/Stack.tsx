@@ -78,6 +78,7 @@ const stackMd = createMetadata({
         "An optional property that governs the Stack's orientation (whether " +
         "the Stack lays out its children in a row or a column).",
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.orientation,
     },
@@ -99,6 +100,7 @@ const stackMd = createMetadata({
         `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      isStrictEnum: true,
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {
@@ -129,6 +131,7 @@ const stackMd = createMetadata({
         "Children without a `dock` prop participate as undocked items in the middle row. " +
         "The parent Stack must have a defined height for `bottom`-docked children to anchor correctly.",
       availableValues: ["top", "bottom", "left", "right", "stretch"],
+      isStrictEnum: true,
       valueType: "string",
     },
   },

@@ -39,6 +39,7 @@ export const QRCodeMd = createMetadata({
         `Higher levels increase reliability but also increase the QR code density. ` +
         `'L' = Low (7% recovery), 'M' = Medium (15% recovery), 'Q' = Quartile (25% recovery), 'H' = High (30% recovery).`,
       availableValues: ["L", "M", "Q", "H"],
+      isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.level,
     },

@@ -33,6 +33,9 @@ export const SelectMd = createMetadata({
     "supporting both single and multiple selection modes. It offers extensive " +
     "customization capabilities including search functionality, custom templates, " +
     "and comprehensive form integration.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
   parts: {
     clearButton: {
       description: "The button to clear the selected value(s).",
@@ -236,6 +239,14 @@ export const SelectMd = createMetadata({
     },
     $group: {
       description: "Group name when using `groupBy` (available in group header templates)",
+    },
+    $selectedValue: {
+      description: "Currently selected value, injected into the trigger/option template.",
+      isInternal: true,
+    },
+    $inTrigger: {
+      description: "True when rendering inside the trigger (vs the dropdown list).",
+      isInternal: true,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
