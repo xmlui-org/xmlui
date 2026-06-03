@@ -3,6 +3,7 @@ import classnames from "classnames";
 
 import styles from "./Badge.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Badge.defaults";
 
 export const badgeVariantValues = ["badge", "pill"] as const;
 export type BadgeVariant = (typeof badgeVariantValues)[number];
@@ -27,10 +28,6 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
   color?: string | BadgeColors;
   classes?: Record<string, string>;
   themeColor?: string;
-};
-
-export const defaultProps: Pick<Props, "variant"> = {
-  variant: "badge",
 };
 
 export const Badge = memo(forwardRef(function Badge(

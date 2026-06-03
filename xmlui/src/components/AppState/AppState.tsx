@@ -1,6 +1,7 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, d } from "../metadata-helpers";
-import { AppState, defaultProps } from "./AppStateReact";
+import { defaultProps } from "./AppState.defaults";
+import { AppState } from "./AppStateReact";
 
 const COMP = "AppState";
 
