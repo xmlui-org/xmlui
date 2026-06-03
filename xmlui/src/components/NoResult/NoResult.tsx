@@ -3,7 +3,8 @@ import styles from "./NoResult.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dLabel } from "../metadata-helpers";
-import { NoResult, defaultProps } from "./NoResultReact";
+import { defaultProps } from "./NoResult.defaults";
+import { NoResult } from "./NoResultReact";
 
 const COMP = "NoResult";
 

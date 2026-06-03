@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { defaultProps } from "./NavGroupReact";
+import { defaultProps } from "./NavGroup.defaults";
 
 export const NavGroupContext = createContext({
   level: -1,

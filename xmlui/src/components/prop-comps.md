@@ -49,15 +49,15 @@
 * Link
 * List
 * LiveRegion
-Logo
-Markdown
-MessageListener
-ModalDialog
-NavGroup
-NavLink
-NavPanel
-NestedApp
-NoResult
+* Logo
+* Markdown
+* MessageListener
+* ModalDialog
+* NavGroup
+* NavLink
+* NavPanel
+* NestedApp
+* NoResult
 NumberBox
 Option
 PageMetaTitle

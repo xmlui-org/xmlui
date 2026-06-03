@@ -160,13 +160,7 @@ function PlaygroundSampRenderer(props: any) {
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { BreakMode, OverflowMode } from "../abstractions";
 
-// Default props for the Markdown component
-export const defaultProps = {
-  removeIndents: true,
-  removeBr: false,
-  overflowMode: undefined as OverflowMode | undefined,
-  breakMode: "normal" as BreakMode | undefined,
-};
+import { defaultProps } from "./Markdown.defaults";
 
 type MarkdownProps = {
   removeIndents?: boolean;

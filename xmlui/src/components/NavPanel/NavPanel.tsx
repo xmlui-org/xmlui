@@ -3,7 +3,8 @@ import styles from "./NavPanel.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
-import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelReact";
+import { defaultProps } from "./NavPanel.defaults";
+import { NavPanel, buildNavHierarchy } from "./NavPanelReact";
 import { useMemo } from "react";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 

@@ -1,4 +1,3 @@
-// Default props for NestedApp component
 import { EMPTY_ARRAY } from "../../components-core/constants";
 
 export const defaultProps = {
@@ -7,5 +6,5 @@ export const defaultProps = {
   noHeader: false,
   splitView: false,
   allowReset: true,
-  components: EMPTY_ARRAY
+  components: EMPTY_ARRAY,
 };
