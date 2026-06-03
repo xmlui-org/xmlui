@@ -1,10 +1,6 @@
 import { memo, useEffect, useRef } from "react";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
-
-export const defaultProps = {
-  enabled: true,
-  withCredentials: false,
-};
+import { defaultProps } from "./EventSource.defaults";
 
 type Props = {
   url: string;

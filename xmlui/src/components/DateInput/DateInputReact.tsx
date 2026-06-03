@@ -23,6 +23,7 @@ import {
   PART_MONTH,
   PART_YEAR,
 } from "../../components-core/parts";
+import { defaultProps } from "./DateInput.defaults";
 
 // Date validation constants
 const MIN_YEAR = 1900;
@@ -94,24 +95,6 @@ type Props = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
-};
-
-export const defaultProps = {
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  mode: "single" as DateInputMode,
-  dateFormat: "MM/dd/yyyy" as DateFormat,
-  showWeekNumber: false,
-  weekStartsOn: WeekDays.Sunday,
-  inline: true,
-  clearable: false,
-  clearToInitialValue: false,
-  required: false,
-  labelPosition: "top",
-  readOnly: false,
-  autoFocus: false,
-  labelBreak: false,
-  emptyCharacter: "-",
 };
 
 export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInput(

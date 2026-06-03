@@ -17,13 +17,13 @@
 * Checkbox
 * CodeBlock
 * ColorPicker
-Column
-ContentSeparator
-DateInput
-DatePicker
-DonutChart
-Drawer
-EventSource
+* Column
+* ContentSeparator
+* DateInput
+* DatePicker
+* DonutChart
+* Drawer
+* EventSource
 FadeAnimation
 FadeInAnimation
 FadeOutAnimation

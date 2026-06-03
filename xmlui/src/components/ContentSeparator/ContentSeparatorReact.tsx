@@ -3,6 +3,7 @@ import classnames from "classnames";
 
 import styles from "./ContentSeparator.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./ContentSeparator.defaults";
 
 type ContentSeparatorProps = {
   thickness?: number | string;
@@ -12,10 +13,6 @@ type ContentSeparatorProps = {
   style?: CSSProperties;
   classes?: Record<string, string>;
   className?: string;
-};
-
-export const defaultProps: Pick<ContentSeparatorProps, "orientation"> = {
-  orientation: "horizontal",
 };
 
 export const ContentSeparator = memo(forwardRef<HTMLDivElement, ContentSeparatorProps>(

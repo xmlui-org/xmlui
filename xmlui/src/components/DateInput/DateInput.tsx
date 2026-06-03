@@ -17,11 +17,11 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
+import { defaultProps } from "./DateInput.defaults";
 import {
   dateFormats,
   DateInput,
   DateInputModeValues,
-  defaultProps,
   WeekDays,
 } from "./DateInputReact";
 
