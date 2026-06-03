@@ -144,7 +144,7 @@ function createMetadataHandler(
  */
 function recomputeUsesForApp(
   appDef: StandaloneAppDescription,
-  appGlobalNames: Set<string> | undefined,
+  appGlobalNames: ReadonlySet<string> | undefined,
 ) {
   const entryPoint = appDef.entryPoint as ComponentDef;
   if (!entryPoint) {

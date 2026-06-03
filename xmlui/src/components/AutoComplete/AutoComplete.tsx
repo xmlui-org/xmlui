@@ -16,8 +16,6 @@ import {
   dLostFocus,
   dMulti,
   createMetadata,
-  d,
-  dInternal,
 } from "../metadata-helpers";
 import { defaultProps } from "./AutoComplete.defaults";
 import { AutoComplete } from "./AutoCompleteReact";
@@ -170,8 +168,18 @@ export const AutoCompleteMd = createMetadata({
         "This context value represents an item when you define an option item template. " +
         "Use `$item.value` and `$item.label` to refer to the value and label of the " +
         "particular option.",
-  d,
-  dInternal,
+    },
+    $group: {
+      description: "Group name available inside `groupHeaderTemplate` when `groupBy` is set.",
+    },
+    $selectedValue: {
+      description: "Currently selected value, injected into the trigger/option template.",
+      isInternal: true,
+    },
+    $inTrigger: {
+      description: "True when rendering inside the trigger (vs the dropdown list).",
+      isInternal: true,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

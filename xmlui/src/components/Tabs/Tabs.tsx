@@ -23,7 +23,7 @@ export const TabsMd = createMetadata({
     isImplicitContainerByDefault: true,
   },
   contextVars: {
-    $header: d("The tab's header context (matches TabItem's `$header`)."),
+    $header: { description: "The tab's header context (matches TabItem's `$header`)." },
   },
   props: {
     activeTab: {

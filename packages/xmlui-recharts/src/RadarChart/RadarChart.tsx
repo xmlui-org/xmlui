@@ -1,6 +1,6 @@
 import { defaultProps } from "./RadarChart.defaults";
 import { RadarChart } from "./RadarChartReact";
-import { wrapComponent, createMetadata, d } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "RadarChart";
 
@@ -88,7 +88,7 @@ export const RadarChartMd = createMetadata({
   },
 
   contextVars: {
-    $tooltip: d("Context variable available inside tooltipTemplate."),
+    $tooltip: { description: "Context variable available inside tooltipTemplate." },
   },
 });
 

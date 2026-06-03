@@ -19,8 +19,6 @@ import {
   dMulti,
   dComponent,
   createMetadata,
-  d,
-  dInternal,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { defaultProps } from "./Select.defaults";
@@ -233,8 +231,23 @@ export const SelectMd = createMetadata({
     },
   },
   contextVars: {
-  d,
-  dInternal,
+    $item: {
+      description: "Represents the current option's data (label and value properties)",
+    },
+    $itemContext: {
+      description: "Provides the `removeItem()` method for multi-select scenarios",
+    },
+    $group: {
+      description: "Group name when using `groupBy` (available in group header templates)",
+    },
+    $selectedValue: {
+      description: "Currently selected value, injected into the trigger/option template.",
+      isInternal: true,
+    },
+    $inTrigger: {
+      description: "True when rendering inside the trigger (vs the dropdown list).",
+      isInternal: true,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

@@ -89,7 +89,7 @@ export const LineChartMd: ComponentMetadata = createMetadata({
     },
   },
   contextVars: {
-    $tooltip: d("Context variable available inside tooltipTemplate."),
+    $tooltip: { description: "Context variable available inside tooltipTemplate." },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

@@ -32,8 +32,8 @@ export const MarkdownMd = createMetadata({
     isImplicitContainerByDefault: true,
   },
   contextVars: {
-    $anchorId: d("The generated id of the current heading anchor."),
-    $anchorHref: d("The href (#id) of the current heading anchor."),
+    $anchorId: { description: "The generated id of the current heading anchor." },
+    $anchorHref: { description: "The href (#id) of the current heading anchor." },
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],

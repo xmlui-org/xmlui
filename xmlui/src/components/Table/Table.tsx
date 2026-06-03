@@ -54,12 +54,12 @@ export const TableMd = createMetadata({
     isImplicitContainerByDefault: true,
   },
   contextVars: {
-    $item: d("The complete data row object being rendered."),
-    $itemIndex: d("Zero-based index of the row in the data array."),
-    $cell: d("The value of the current cell for this column."),
-    $colIndex: d("Zero-based index of the current column."),
-    $row: d("The complete data row object being rendered (alias of `$item`)."),
-    $rowIndex: d("Zero-based row index (alias of `$itemIndex`)."),
+    $item: { description: "The complete data row object being rendered." },
+    $itemIndex: { description: "Zero-based index of the row in the data array." },
+    $cell: { description: "The value of the current cell for this column." },
+    $colIndex: { description: "Zero-based index of the current column." },
+    $row: { description: "The complete data row object being rendered (alias of `$item`)." },
+    $rowIndex: { description: "Zero-based row index (alias of `$itemIndex`)." },
   },
   // NOTE: let's leave it like this for now, we'll expand later when the need arises
   parts: {
@@ -862,7 +862,7 @@ const TableWithColumns = memo(
       syncAdapter = syncAdapterHolderRef.current;
 
       // Memoize so the reference is stable across re-renders — ComponentWrapper
-      // is React.memo'd, so a new object would defeat memo and re-render Columns
+      // is React.memo'so a new object would defeat memo and re-render Columns
       // on every Table state update, causing an infinite registerColumn loop.
       const tableChildLayoutContext = useMemo(
         () => createChildLayoutContext(layoutContext, { type: "Table" }),

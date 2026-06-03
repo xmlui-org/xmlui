@@ -1652,6 +1652,23 @@ export function AppContent({
       // suppress the toast.
       errors,
       setErrorHandler,
+      // --- Plan #15 Step 4.1 + 2.3: register custom audit sinks and PII heuristics.
+      registerAuditSink: registerAuditSinkImpl,
+      registerAuditHeuristic: registerAuditHeuristicImpl,
+      // --- Plan #15 Step 2.2: replace the active audit policy from markup.
+      setAuditPolicy: (policy: unknown) => {
+        if (policy && typeof policy === "object") {
+          const p = policy as Record<string, unknown>;
+          setAuditPolicy({
+            redact: Array.isArray(p.redact) ? (p.redact as any) : [],
+            sample: (p.sample as any) ?? {},
+            retention: (p.retention as any) ?? { bufferSize: 200, onOverflow: "drop-oldest" },
+            sink: p.sink as any,
+          });
+        }
+      },
+      // --- Plan #6 Step 1.2: cooperative handler cancellation.
+      cancel: appCancel,
     }),
     [
       appGlobals,

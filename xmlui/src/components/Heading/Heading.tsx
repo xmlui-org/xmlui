@@ -112,8 +112,8 @@ const APIS_DESC = {
 };
 // Context vars injected into the anchorTemplate slot (see HeadingNative render).
 const ANCHOR_CONTEXT_VARS = {
-  $anchorId: d("The generated id of the current heading anchor."),
-  $anchorHref: d("The href (#id) of the current heading anchor."),
+  $anchorId: { description: "The generated id of the current heading anchor." },
+  $anchorHref: { description: "The href (#id) of the current heading anchor." },
 };
 
 export const HeadingMd = createMetadata({

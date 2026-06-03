@@ -3,7 +3,7 @@ import type { ComponentDef } from "../..";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, d, dContextMenu } from "../metadata-helpers";
+import { createMetadata, dContextMenu } from "../metadata-helpers";
 import { TreeComponent } from "./TreeReact";
 import { defaultProps } from "./Tree.defaults";
 import styles from "./TreeComponent.module.scss";
@@ -18,7 +18,7 @@ export const TreeMd = createMetadata({
     isImplicitContainerByDefault: true,
   },
   contextVars: {
-    $item: d("The current tree node's data item."),
+    $item: { description: "The current tree node's data item." },
   },
   props: {
     data: {
