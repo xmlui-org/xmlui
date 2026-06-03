@@ -353,6 +353,10 @@ export const FormMd = createMetadata({
       `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
         `\`idempotencyKey\` prop. \`undefined\` when the prop is not set.`,
     ),
+    $formHeaders: d(
+      `Available inside the form's \`onSubmit\` handler. Carries the resolved headers object ` +
+        `built from the \`submitHeaders\` prop. \`undefined\` when the prop is not set.`,
+    ),
   },
   apis: {
     reset: {

@@ -670,6 +670,8 @@ describe("isStrictEnum audit — all availableValues props must declare an expli
     "FlowLayout.verticalAlignment",
     "Form.itemLabelPosition",
     "Form.itemRequireLabelMode",
+    // HTTP method: same rationale as APICall.method / DataSource.method — custom verbs possible.
+    "Form.submitMethod",
     "FormItem.labelPosition",
     "FormItem.type",
     "FormItem.validationMode",
