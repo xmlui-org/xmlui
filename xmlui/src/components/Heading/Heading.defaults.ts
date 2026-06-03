@@ -5,4 +5,4 @@ export const defaultProps = {
   maxLines: 0,
   preserveLinebreaks: false,
   showAnchor: false,
-};
+} as const;

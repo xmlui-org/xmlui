@@ -426,6 +426,7 @@ export type AppContextObject = {
         event: { preventDefault(): void; defaultPrevented: boolean },
       ) => void | boolean | Promise<void | boolean>,
     ) => void;
+    cancel: (componentUid?: string, eventName?: string) => void;
   };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the

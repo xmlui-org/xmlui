@@ -3,4 +3,4 @@ export const defaultProps = {
   lazyLoad: false,
   inline: false,
   grayscale: false,
-};
+} as const;
