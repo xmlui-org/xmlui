@@ -2612,6 +2612,33 @@ describe.skipIf(skipIfDisabled)("computedGlobalUses", () => {
     expect(owner.computedGlobalUses).not.toContain("unrelated");
   });
 
+  it("global read in 'when' of a grandchild bubbles up through a script-owning container", () => {
+    // Mirrors PasteItemsModal → FileDialogShell → InProgressPanel where
+    // InProgressPanel reads `isFileOperationInProgress` in when="{isFileOperationInProgress}".
+    // The ancestor has scriptCollected (imported functions) → disablesChildNarrowing=true.
+    // `isFileOperationInProgress` must still reach computedGlobalUses of the ancestor so
+    // ComponentWrapper re-renders when this global changes (showing the progress panel).
+    const progressPanel = node("Stack", {
+      // no vars — not a container itself; represents InProgressPanel reading the global
+      when: "{isFileOperationInProgress}",
+    });
+    const outer = node("Stack", {
+      vars: { dummy: "{0}" },
+      scriptCollected: {
+        functions: {},
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [progressPanel],
+    });
+    const globals = new Set([...appGlobalNames, "isFileOperationInProgress"]);
+    originalComputeUsesForTree(outer, getOptimizerMetadata, globals);
+
+    expect(outer.computedGlobalUses).toBeDefined();
+    expect(outer.computedGlobalUses).toContain("isFileOperationInProgress");
+  });
+
   it("§11: child calling parent's IMPORTED helper gets the helper's global in computedGlobalUses", () => {
     // Parent imported publishEvent from shared.xs (now merged). Child calls it.
     const child = node("Table", { props: { onSelect: "{publishEvent('select')}" } });

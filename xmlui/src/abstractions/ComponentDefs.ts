@@ -759,6 +759,18 @@ export type OptimizerMetadataView = {
    * required `description` field). The optimizer only reads `injectedVars`.
    */
   events?: Record<string, { description?: string; injectedVars?: readonly string[] }>;
+  /**
+   * Global variable names (from Globals.xs) read inside this compound component's
+   * body. Populated during the two-pass analysis in recomputeUsesForApp so that
+   * ancestors can include these in their own computedGlobalUses, ensuring
+   * ComponentWrapper propagates globalVars updates through the chain.
+   *
+   * Without this, a compound component whose body reads a global (e.g.
+   * InProgressPanel reading isFileOperationInProgress) is opaque to ancestor
+   * analyzers — after §11 clears hasUnresolvableImports and enables narrowing,
+   * ancestors omit the global from computedGlobalUses, blocking re-renders.
+   */
+  globalDepsUsed?: ReadonlySet<string>;
 };
 
 export interface ParentRenderContext {

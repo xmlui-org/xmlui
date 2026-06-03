@@ -487,13 +487,6 @@ function computeUsesInternal(
       let merged: Map<string, { globalReads: ReadonlySet<string> }> | undefined;
       for (const [name, { reads }] of fnPerFunction) {
         const globalReads = new Set([...reads].filter(isGlobalDep));
-        // Only propagate functions that actually read globals. A function with
-        // an empty global-read set contributes nothing to a child's
-        // globalDepsUsed, and — critically — must NOT make `allCalledParentFnsResolvable`
-        // flip to true for it (see consumer below). Removing this guard (commit
-        // da036c780) caused `computedGlobalUses` to be set on containers whose
-        // code-behind functions only WRITE locals (e.g. FileDialogShell.checkCancel
-        // writing isCancelRequested), which broke their runtime scope. Restored.
         if (globalReads.size > 0) {
           // Lazily allocate the merged Map only when we have entries to add.
           if (!merged) merged = new Map(parentFunctionDeps ?? []);
@@ -593,6 +586,20 @@ function computeUsesInternal(
   for (const d of usedHereReads) if (isGlobalDep(d)) globalDepsUsed.add(d);
   addAll(globalDepsUsed, childGlobalDeps);
 
+  // Propagate global deps from compound component bodies upward.
+  // Compound components are opaque to ancestor tree analysis: their internal
+  // reads are not visible when processing a call-site node (e.g. InProgressPanel
+  // reading isFileOperationInProgress via `when` is invisible to PasteItemsModal).
+  // After §11 clears hasUnresolvableImports and enables narrowing, ancestors would
+  // omit such globals from computedGlobalUses, blocking re-renders for them.
+  // Solution: populate metadata.globalDepsUsed in the two-pass recomputeUsesForApp
+  // and fold it in here so ancestors correctly track the global.
+  if (metadata?.globalDepsUsed) {
+    for (const g of metadata.globalDepsUsed) {
+      globalDepsUsed.add(g);
+    }
+  }
+
   // §10: Fold in global reads of every parent function this subtree calls.
   // Use parentDependencies (post-keepDep) instead of usedHere to exclude local
   // declarations that shadow a parent function name — those must not be treated
@@ -634,7 +641,6 @@ function computeUsesInternal(
     // 2. Nodes calling parent-scope functions while narrowing is disabled are NOT narrowed.
     const dependsOnParentFunction = parentFunctionNames.size > 0 &&
       [...parentDependencies].some(d => parentFunctionNames.has(d));
-
     const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
 
     // §10: Relaxed gate for globals — dependsOnParentFunction does NOT block when every

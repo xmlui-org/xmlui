@@ -125,6 +125,22 @@ function createMetadataHandler(
  * Re-runs the computed-uses optimizer over the entire application tree.
  * Used when app-global names are updated or when cross-.xs imports
  * are newly resolved.
+ *
+ * Two-pass analysis:
+ *  Pass 1 — analyze every compound component body independently to collect
+ *            its computedGlobalUses (globals read inside its template).
+ *  Pass 2 — analyze the main entry-point tree (and re-analyze compound bodies)
+ *            with an enhanced metadataLookup that surfaces each compound's
+ *            globalDepsUsed to ancestor nodes. This ensures that when a compound
+ *            like InProgressPanel reads a global (e.g. isFileOperationInProgress)
+ *            via `when`, its ancestors include that global in their own
+ *            computedGlobalUses — so ComponentWrapper propagates globalVars
+ *            updates through the full chain.
+ *
+ * Without pass 1, ancestors analyzing a call-site node (e.g. `<InProgressPanel />`)
+ * cannot see globals read inside InProgressPanel's own component body. After §11
+ * clears hasUnresolvableImports and enables narrowing, ancestors omit those globals,
+ * blocking re-renders for them (progress panel never becomes visible).
  */
 function recomputeUsesForApp(
   appDef: StandaloneAppDescription,
@@ -134,10 +150,33 @@ function recomputeUsesForApp(
   if (!entryPoint) {
     return;
   }
-  computeUsesForTree(entryPoint, resolveOptimizerMetadata, appGlobalNames);
+
+  // Pass 1: analyze all compound component bodies to collect their globalDepsUsed.
+  const compoundGlobalDeps = new Map<string, ReadonlySet<string>>();
   appDef.components?.forEach((compound) => {
     if (compound.component) {
       computeUsesForTree(compound.component, resolveOptimizerMetadata, appGlobalNames);
+      if (compound.name && compound.component.computedGlobalUses?.length) {
+        compoundGlobalDeps.set(compound.name, new Set(compound.component.computedGlobalUses));
+      }
+    }
+  });
+
+  // Pass 2: build an enhanced metadataLookup that folds compound globalDepsUsed
+  // into the OptimizerMetadataView, then re-analyze the full tree.
+  const enhancedMetadata = compoundGlobalDeps.size > 0
+    ? (type: string) => {
+        const base = resolveOptimizerMetadata(type);
+        const globalDeps = compoundGlobalDeps.get(type);
+        if (!globalDeps) return base;
+        return base ? { ...base, globalDepsUsed: globalDeps } : { globalDepsUsed: globalDeps };
+      }
+    : resolveOptimizerMetadata;
+
+  computeUsesForTree(entryPoint, enhancedMetadata, appGlobalNames);
+  appDef.components?.forEach((compound) => {
+    if (compound.component) {
+      computeUsesForTree(compound.component, enhancedMetadata, appGlobalNames);
     }
   });
 }
