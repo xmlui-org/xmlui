@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { Fallback, defaultProps } from "./FallbackReact";
+import { defaultProps } from "./Fallback.defaults";
+import { Fallback } from "./FallbackReact";
 
 const COMP = "Fallback";
 

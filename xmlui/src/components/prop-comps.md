@@ -24,14 +24,14 @@
 * DonutChart
 * Drawer
 * EventSource
-FadeAnimation
-FadeInAnimation
-FadeOutAnimation
-Fallback
-FileInput
-FileUploadDropZone
-FlowLayout
-FocusScope
+* FadeAnimation
+* FadeInAnimation
+* FadeOutAnimation
+* Fallback
+* FileInput
+* FileUploadDropZone
+* FlowLayout
+* FocusScope
 Footer
 Form
 FormItem

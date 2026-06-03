@@ -18,7 +18,8 @@ import {
 } from "../../components/metadata-helpers";
 import { buttonThemeNames, buttonVariantNames, iconPositionNames, sizeMd } from "../abstractions";
 import { ThemedIcon } from "../Icon/Icon";
-import { FileInput, isFileArray, defaultProps } from "./FileInputReact";
+import { defaultProps } from "./FileInput.defaults";
+import { FileInput, isFileArray } from "./FileInputReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 

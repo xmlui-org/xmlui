@@ -2,7 +2,8 @@ import styles from "./FileUploadDropZone.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneReact";
+import { defaultProps } from "./FileUploadDropZone.defaults";
+import { FileUploadDropZone } from "./FileUploadDropZoneReact";
 import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "FileUploadDropZone";

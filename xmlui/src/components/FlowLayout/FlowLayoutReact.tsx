@@ -23,6 +23,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { normalizeCssValueForCalc, getSizeString } from "../../components-core/utils/css-utils";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
+import { defaultProps } from "./FlowLayout.defaults";
 import { useAppContext } from "../../components-core/AppContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useStyles } from "../../components-core/theming/StyleContext";
@@ -344,15 +345,6 @@ type FlowLayoutProps = {
   children: ReactNode;
   onContextMenu?: any;
   registerComponentApi?: (api: any) => void;
-};
-
-export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "itemWidth" | "verticalAlignment" | "scrollStyle" | "showScrollerFade"> = {
-  columnGap: "$gap-normal",
-  rowGap: "$gap-normal",
-  itemWidth: "100%",
-  verticalAlignment: "start",
-  scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: true,
 };
 
 export const FlowLayout = memo(forwardRef(function FlowLayout(
