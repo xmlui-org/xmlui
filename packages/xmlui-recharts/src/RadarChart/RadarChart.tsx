@@ -19,6 +19,7 @@ export const RadarChartMd = createMetadata({
       description:
         "This property specifies the keys in the data objects that should be used for rendering the chart elements. " +
         "E.g. 'value' or 'amount'.",
+      valueType: "string[]",
     },
     nameKey: {
       description:

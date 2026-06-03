@@ -72,7 +72,7 @@ export const FileInputMd = createMetadata({
     ),
     acceptsFileType: {
       description: `An optional list of file types the input controls accepts provided as a string array.`,
-      valueType: "any",
+      valueType: "string[]",
     },
     multiple: {
       description:

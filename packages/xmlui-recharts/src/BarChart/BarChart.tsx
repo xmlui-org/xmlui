@@ -20,6 +20,7 @@ export const BarChartMd: ComponentMetadata = createMetadata({
     yKeys: {
       description:
         "Specifies the key in the data objects that will be used to label the different data series.",
+      valueType: "string[]",
     },
     stacked: {
       description:

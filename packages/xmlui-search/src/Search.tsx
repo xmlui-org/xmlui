@@ -49,6 +49,7 @@ export const SearchMd: ComponentMetadata = createMetadata({
     },
     suggestedQueries: {
       description: `A list of suggested query strings shown when there are no results.`,
+      valueType: "string[]",
     },
     noResultsMessage: {
       description: `Custom message displayed when the search returns no results.`,
@@ -61,6 +62,7 @@ export const SearchMd: ComponentMetadata = createMetadata({
     },
     defaultSelectedCategories: {
       description: `Initial set of selected category filters.`,
+      valueType: "string[]",
     },
     pageSize: {
       description: `Number of results to show per page when using load more.`,

@@ -195,7 +195,7 @@ export const FormMd = createMetadata({
         "An optional list of field names (matching the `bindTo` values of nested `FormItem` " +
         "components) that should be excluded from the temporary localStorage save. The fields " +
         "are still submitted normally; they are only excluded from the persisted snapshot.",
-      valueType: "any",
+      valueType: "string[]",
     },
     keepOnCancel: {
       description:

@@ -88,7 +88,7 @@ export const RatingInputMd = createMetadata({
     },
     invalidMessages: {
       description: "The invalid messages to display for the input component.",
-      valueType: "any",
+      valueType: "string[]",
     },
   },
   events: {

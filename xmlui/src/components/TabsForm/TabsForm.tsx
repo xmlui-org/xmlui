@@ -189,7 +189,7 @@ export const TabsFormMd = createMetadata({
     doNotPersistFields: {
       description:
         "An optional list of field names that should be excluded from the temporary localStorage save.",
-      valueType: "any",
+      valueType: "string[]",
     },
     keepOnCancel: {
       description:

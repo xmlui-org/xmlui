@@ -36,7 +36,7 @@ export const OptionMd = createMetadata({
       "An array of keywords that can be used for searching and filtering the option. " +
         "These keywords are not displayed but help users find the option through search.",
       undefined,
-      "any",
+      "string[]",
     ),
   },
 });

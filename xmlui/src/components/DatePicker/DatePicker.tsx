@@ -193,7 +193,7 @@ export const DatePickerMd = createMetadata({
     },
     invalidMessages: {
       description: "The invalid messages to display in the concise validation summary.",
-      valueType: "any",
+      valueType: "string[]",
     },
   },
   events: {

@@ -79,7 +79,7 @@ export const ListMd = createMetadata({
       `This property is an array of group names that the \`${COMP}\` will display. ` +
         "If not set, all groups in the data are displayed.",
       undefined,
-      "any",
+      "string[]",
     ),
     groupHeaderTemplate: dComponent(
       `Enables the customization of how the groups are displayed, similarly to the ` +
@@ -119,7 +119,7 @@ export const ListMd = createMetadata({
         `those headers are also displayed (after the ones in this list); however, their order ` +
         `is not deterministic.`,
       undefined,
-      "any",
+      "string[]",
     ),
     hideEmptyGroups: {
       description:
