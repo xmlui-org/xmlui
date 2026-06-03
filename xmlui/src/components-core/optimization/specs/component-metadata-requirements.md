@@ -119,6 +119,8 @@ Since missing metadata could lead to "silent" performance degradation, the frame
    internal via `dInternal`). `optimization.childInjectedVars` has been removed from the
    framework entirely.
 
+---
+
 ## 5. Managing Developer Burden: The Strategy of Safe Duplication
 
 While the implementation-to-metadata gap remains (writing the key in code and the key+description in metadata), the framework's strategy is to prioritize **Safe Duplication over Fragile Automation**.

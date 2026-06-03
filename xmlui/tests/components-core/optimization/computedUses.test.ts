@@ -2590,6 +2590,49 @@ describe.skipIf(skipIfDisabled)("computedGlobalUses", () => {
     computeUsesForTreeWithGlobals(root);
     expect(root.computedGlobalUses).toEqual(["theme"]);
   });
+
+  it("§11: resolved imported helper's global read lands in the owner's computedGlobalUses", () => {
+    // Post-resolution shape: publishEvent was imported from shared.xs and merged
+    // into scriptCollected.functions. It reads the global `events`.
+    const owner = node("Container", {
+      uses: [],
+      props: { onMount: "{publishEvent('open')}" },
+      scriptCollected: {
+        functions: { publishEvent: parseFn("(name) => { events = events.concat(name); }") },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false, // cleared by the resolver
+      },
+    });
+    const globals = new Set(["events", "unrelated"]);
+    originalComputeUsesForTree(owner, getOptimizerMetadata, globals);
+
+    expect(owner.computedGlobalUses).toBeDefined();
+    expect(owner.computedGlobalUses).toContain("events");
+    expect(owner.computedGlobalUses).not.toContain("unrelated");
+  });
+
+  it("§11: child calling parent's IMPORTED helper gets the helper's global in computedGlobalUses", () => {
+    // Parent imported publishEvent from shared.xs (now merged). Child calls it.
+    const child = node("Table", { props: { onSelect: "{publishEvent('select')}" } });
+    const parent = node("Container", {
+      uses: [],
+      scriptCollected: {
+        functions: { publishEvent: parseFn("(name) => { events = events.concat(name); }") },
+        vars: {},
+        hasInvalidStatements: false,
+        hasUnresolvableImports: false,
+      },
+      children: [child],
+    });
+    const globals = new Set(["events", "sortBy", "unrelated"]);
+    originalComputeUsesForTree(parent, getOptimizerMetadata, globals);
+
+    expect(child.computedGlobalUses).toBeDefined();
+    expect(child.computedGlobalUses).toContain("events");
+    expect(child.computedGlobalUses).not.toContain("sortBy");
+    expect(child.computedGlobalUses).not.toContain("unrelated");
+  });
 });
 
 // ---------------------------------------------------------------------------

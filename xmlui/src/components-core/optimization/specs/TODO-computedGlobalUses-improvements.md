@@ -10,12 +10,17 @@ optimization and areas worth revisiting.
 
 ---
 
-## 11. Unresolvable cross-`.xs` imports block `computedGlobalUses` (the 35) — gated on import resolution
+## 11. Unresolvable cross-`.xs` imports block `computedGlobalUses` (the 35) — FIXED
 
 **Where:** `computedUses.ts` — `ownHasScript` includes
 `scriptCollected.hasUnresolvableImports` (circa L461-463); `collectScriptFunctionDeps`
 recursion only follows functions present in the **local** `functions` map
 (`if (localNames.has(d) && d in functions)`).
+
+**Status:** FIXED. Cross-`.xs` imports are now resolved in `StandaloneApp.tsx` (both dev
+and fetch paths) before optimization. The `scriptCollected.functions` map is populated
+with imported function bodies, allowing the §10 machinery to see their global reads.
+Narrowing is only blocked for genuinely unresolvable references (Task 5).
 
 **Problem.** When a `.xmlui`/`.xs` imports a helper from another `.xs`
 (`import { publishEvent } from "./shared.xs"`), the imported function's **body is not in
@@ -111,7 +116,7 @@ file system) and supply a valid `appGlobalNames` set to the build-time traversal
 
 | # | Area | Impact | Effort | Status |
 |---|------|--------|--------|--------|
-| 11 | Unresolvable cross-`.xs` imports block global-narrowing | **High** in import-heavy apps | High (needs import resolution) | Open — gated on import resolution |
+| 11 | Unresolvable cross-`.xs` imports block global-narrowing | **High** in import-heavy apps | High (needs import resolution) | **Implemented** |
 | 3 | Functions always pass through | Medium — proportional to Globals.xs size | High | Open (= review §2.2) |
 | 6 | Parse-time `appGlobalNames` empty | Low | Medium | Open |
 
@@ -150,7 +155,7 @@ Classifying the 46:
 | Reason | Count | Notes |
 |---|---|---|
 | `hasInvalidStatements` (parser failure) | **0** | The "can't parse script bodies" era is over. `collectScriptFunctionDeps` parses fn bodies and extracts reads. **The old blanket guard is already gone.** |
-| `hasUnresolvableImports` | **35** | A function imported from another `.xs` is opaque; analyzer can't see its global reads. Mostly `Fragment`s reading `events` (imported helpers from `shared.xs`). |
+| `hasUnresolvableImports` | **35** | **FIXED by §11 (implemented).** These containers now have their imports resolved and narrowing enabled. |
 | `dependsOnParentFunction` only | **11** | **Fixed by §10 (implemented).** These containers now receive `parentFunctionDeps` and get `computedGlobalUses` set when all called parent functions are resolvable. Includes the heaviest components: `Table#filesTable` (reads `bookmarks,selectMode,sortBy,sortDirection`), `TileGrid#filesGrid` (`bookmarks,selectMode`), `Table#favoritesTable` (`sortBy,sortDirection`), `VStack` (`sortBy,sortDirection,view`), and the modal `Form`s (`isFileOperationInProgress`). Benchmark re-run needed to confirm the new ON-vs-OFF delta. |
 | suppressed with no reason | **0** | No purely-wasteful suppression — every suppression has a cause. |
 

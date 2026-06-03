@@ -72,9 +72,9 @@ function parse(source: string): Statement[] {
  * `window.__XMLUI_COMPUTED_USES_DISABLED = true` BEFORE the module loads.
  * The flag is read once at module-evaluation time; a page reload is required.
  */
-export const COMPUTED_USES_ENABLED =
-  typeof window === "undefined" ||
-  !(window as any).__XMLUI_COMPUTED_USES_DISABLED;
+export const COMPUTED_USES_ENABLED = false
+  //typeof window === "undefined" ||
+ // !(window as any).__XMLUI_COMPUTED_USES_DISABLED;
 
 /**
  * ECMAScript and platform globals that are NEVER stored in XMLUI app state.

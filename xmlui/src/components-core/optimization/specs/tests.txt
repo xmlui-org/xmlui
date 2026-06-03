@@ -1,0 +1,1020 @@
+ ❯ tests/bin/vite-plugin-import.test.ts [queued]
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts [queued]
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/optimization/snapshot-opt
+imizer-fields.test.ts 8/8
+ ✓ tests/parsers/scripting/circular-import.test.ts
+ (18 tests) 5ms
+
+ ❯ tests/bin/vite-plugin-import.test.ts 0/27
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts [queued]
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/optimization/snapshot-opt
+imizer-fields.test.ts 8/8
+ ✓ tests/bin/vite-plugin-import.test.ts (27 tests)
+ 6ms
+
+ ❯ tests/bin/vite-plugin-import.test.ts 27/27
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts [queued]
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts [queued]
+ ❯ tests/components-core/concurrency/coordinator.t
+est.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ✓ tests/components-core/concurrency/coordinator.t
+est.ts (9 tests) 5ms
+ ✓ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts (57 tests) 6ms
+
+ ❯ tests/bin/vite-plugin-import.test.ts 27/27
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts [queued]
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts 57/57
+ ❯ tests/components-core/concurrency/coordinator.t
+est.ts 9/9
+ ❯ tests/components-core/optimization/renderer-met
+ ✓ tests/components-core/udc-sandbox/runtime-integ
+ration.test.ts (7 tests) 5ms
+
+ ❯ tests/bin/vite-plugin-import.test.ts 27/27
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts 0/6
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts 57/57
+ ❯ tests/components-core/concurrency/coordinator.t
+est.ts 9/9
+ ❯ tests/components-core/optimization/renderer-met
+ ✓ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts (6 tests) 8ms
+ ✓ tests/parsers/paremeter-parser.test.ts (9 tests
+) 4ms
+
+ ❯ tests/bin/vite-plugin-import.test.ts 27/27
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts 6/6
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts 57/57
+ ❯ tests/components-core/concurrency/coordinator.t
+est.ts 9/9
+ ❯ tests/components-core/optimization/renderer-met
+ ✓ tests/components/Table/Table-keyboard-actions.t
+est.ts (19 tests) 7ms
+ ✓ tests/parsers/scripting/lexer-import.test.ts (2
+2 tests) 5ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts 6/6
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts 57/57
+ ❯ tests/components-core/concurrency/coordinator.t
+est.ts 9/9
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ✓ tests/parsers/parameter-parser.test.ts (9 tests
+) 9ms
+ ✓ tests/components-core/RestApiProxy.transactionI
+d.test.ts (7 tests) 4ms
+
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts 6/6
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/behaviors/behaviorConditi
+onEvaluator.test.ts 57/57
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+
+ ❯ tests/abstractions/layout-context-utils.test.ts
+ [queued]
+ ❯ tests/components-core/analyzer/rules/id-unknown
+-method.test.ts 6/6
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/behaviors/PubSubBehavior.
+test.ts [queued]
+ ✓ tests/components-core/theming/layout-resolver2.
+test.ts (23 tests) 5ms
+ ✓ tests/components-core/behaviors/PubSubBehavior.
+test.ts (10 tests) 3ms
+
+ ❯ tests/abstractions/layout-context-utils.test.ts
+ [queued]
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/behaviors/PubSubBehavior.
+test.ts 10/10
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/rendering/stateCompositio
+ ✓ tests/abstractions/layout-context-utils.test.ts
+ (28 tests) 4ms
+
+ ❯ tests/abstractions/layout-context-utils.test.ts
+ 28/28
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/behaviors/PubSubBehavior.
+test.ts 10/10
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+
+ ❯ tests/abstractions/layout-context-utils.test.ts
+ 28/28
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/behaviors/PubSubBehavior.
+test.ts 10/10
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+ ✓ tests/components-core/rendering/stateCompositio
+n.test.ts (15 tests) 5ms
+ ✓ tests/scripts/api-diff/api-diff.test.ts (13 tes
+ts) 5ms
+
+ ❯ tests/abstractions/layout-context-utils.test.ts
+ 28/28
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/behaviors/PubSubBehavior.
+test.ts 10/10
+ ❯ tests/components-core/forms/server-error-mappin
+g.test.ts [queued]
+ ❯ tests/components-core/optimization/optimization
+ ✓ tests/components-core/forms/server-error-mappin
+g.test.ts (10 tests) 4ms
+ ✓ tests/components-core/versioning/runtime.test.t
+s (5 tests) 3ms
+
+ ❯ tests/abstractions/layout-context-utils.test.ts
+ 28/28
+ ❯ tests/components-core/analyzer/rules/_utils.tes
+t.ts [queued]
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/behaviors/PubSubBehavior.
+test.ts 10/10
+ ❯ tests/components-core/forms/server-error-mappin
+ ✓ tests/language-server/services/hover.test.ts (5
+ tests) 5ms
+
+ ❯ tests/components-core/analyzer/rules/_utils.tes
+t.ts [queued]
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/forms/server-error-mappin
+g.test.ts 10/10
+ ❯ tests/components-core/interception/request-para
+m-converter.test.ts [queued]
+ ❯ tests/components-core/optimization/optimization
+ ✓ tests/components-core/analyzer/rules/_utils.tes
+t.ts (21 tests) 5ms
+ ✓ tests/components-core/interception/request-para
+m-converter.test.ts (16 tests) 4ms
+
+ ❯ tests/components-core/analyzer/rules/_utils.tes
+t.ts 21/21
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/forms/server-error-mappin
+g.test.ts 10/10
+ ❯ tests/components-core/interception/request-para
+m-converter.test.ts 16/16
+ ❯ tests/components-core/optimization/optimization
+ ✓ tests/parsers/markdown/parse-binding-expression
+.test.ts (19 tests) 4ms
+
+ ❯ tests/components-core/analyzer/rules/_utils.tes
+t.ts 21/21
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/forms/server-error-mappin
+g.test.ts 10/10
+ ❯ tests/components-core/interception/request-para
+m-converter.test.ts 16/16
+ ❯ tests/components-core/optimization/optimization
+
+ ❯ tests/components-core/analyzer/rules/_utils.tes
+t.ts 21/21
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/interception/request-para
+m-converter.test.ts 16/16
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+
+ ❯ tests/components-core/analyzer/rules/_utils.tes
+t.ts 21/21
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/interception/request-para
+m-converter.test.ts 16/16
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ✓ tests/components-core/routing/custom-constraint
+.test.ts (6 tests) 4ms
+ ✓ tests/components-core/versioning/verifier.test.
+ts (11 tests) 6ms
+
+ ❯ tests/components-core/analyzer/rules/_utils.tes
+t.ts 21/21
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/interception/request-para
+m-converter.test.ts 16/16
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ✓ tests/components-core/rendering/collectFnVarDep
+s.test.ts (11 tests) 4ms
+
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/concurrency/transactional
+.test.ts [queued]
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/rendering/collectFnVarDep
+ ✓ tests/components-core/concurrency/transactional
+.test.ts (6 tests) 3ms
+ ✓ tests/components-core/scripts-runner/navigateBl
+ank.test.ts (9 tests) 4ms
+ ✓ tests/components-core/RestApiProxy.resolveUrl.t
+est.ts (12 tests) 4ms
+
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts [queued]
+ ❯ tests/components-core/concurrency/transactional
+.test.ts 6/6
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/rendering/collectFnVarDep
+ ✓ tests/components/TileGrid/TileGrid-keyboard-nav
+igation.test.ts (23 tests) 4ms
+
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts 0/16
+ ❯ tests/components-core/concurrency/transactional
+.test.ts 6/6
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/rendering/collectFnVarDep
+ ✓ tests/components-core/audit/metadata-rules.test
+.ts (16 tests) 5ms
+
+ ❯ tests/components-core/accessibility/contrast.te
+st.ts [queued]
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts 16/16
+ ❯ tests/components-core/concurrency/transactional
+.test.ts 6/6
+ ❯ tests/components-core/interception/orderBy.test
+.ts [queued]
+ ❯ tests/components-core/optimization/optimization
+ ✓ tests/components-core/accessibility/contrast.te
+st.ts (4 tests) 3ms
+ ✓ tests/language-server/project.test.ts (4 tests)
+ 4ms
+
+ ❯ tests/components-core/accessibility/contrast.te
+st.ts 4/4
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts 16/16
+ ❯ tests/components-core/concurrency/transactional
+.test.ts 6/6
+ ❯ tests/components-core/interception/orderBy.test
+.ts [queued]
+ ❯ tests/components-core/optimization/optimization
+ ✓ tests/components-core/versioning/rename-helper.
+test.ts (6 tests) 3ms
+
+ ❯ tests/components-core/accessibility/contrast.te
+st.ts 4/4
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts 16/16
+ ❯ tests/components-core/interception/orderBy.test
+.ts [queued]
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts [queued]
+ ❯ tests/components-core/optimization/renderer-met
+ ✓ tests/components-core/reactive-graph/findCycles
+.test.ts (8 tests) 4ms
+ ✓ tests/parsers/scripting/module-parse.test.ts (3
+ tests) 4ms
+ ✓ tests/components-core/type-contracts/runtime.te
+st.ts (3 tests) 4ms
+
+ ❯ tests/components-core/accessibility/contrast.te
+st.ts 4/4
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts 16/16
+ ❯ tests/components-core/inspector-logging.test.ts
+ [queued]
+ ❯ tests/components-core/interception/orderBy.test
+.ts [queued]
+ ❯ tests/components-core/optimization/optimization
+ ✓ tests/components-core/optimization/optimization
+-guards.test.ts (14 tests) 4ms
+ ✓ tests/components-core/inspector-logging.test.ts
+ (5 tests) 3ms
+
+ ❯ tests/components-core/accessibility/contrast.te
+st.ts 4/4
+ ❯ tests/components-core/audit/metadata-rules.test
+.ts 16/16
+ ❯ tests/components-core/inspector-logging.test.ts
+ 5/5
+ ❯ tests/components-core/interception/orderBy.test
+.ts 1/12
+ ❯ tests/components-core/optimization/optimization
+ ✓ tests/components-core/interception/orderBy.test
+.ts (12 tests) 4ms
+
+ ❯ tests/components-core/accessibility/contrast.te
+st.ts 4/4
+ ❯ tests/components-core/inspector-logging.test.ts
+ 5/5
+ ❯ tests/components-core/interception/orderBy.test
+.ts 12/12
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts 14/14
+ ❯ tests/components-core/optimization/renderer-met
+
+ ❯ tests/components-core/accessibility/contrast.te
+st.ts 4/4
+ ❯ tests/components-core/inspector-logging.test.ts
+ 5/5
+ ❯ tests/components-core/interception/orderBy.test
+.ts 12/12
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts 14/14
+ ❯ tests/components-core/optimization/renderer-met
+ ✓ tests/components-core/routing/query-constraints
+.test.ts (3 tests) 3ms
+
+ ❯ tests/components-core/inspector-logging.test.ts
+ 5/5
+ ❯ tests/components-core/interception/orderBy.test
+.ts 12/12
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts 14/14
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/diagnostic
+s.test.ts [queued]
+ ✓ tests/components-core/reactive-graph/diagnostic
+s.test.ts (8 tests) 4ms
+ ✓ tests/components-core/type-contracts/suggestion
+s.test.ts (12 tests) 3ms
+
+ ❯ tests/components-core/inspector-logging.test.ts
+ 5/5
+ ❯ tests/components-core/interception/orderBy.test
+.ts 12/12
+ ❯ tests/components-core/optimization/optimization
+-guards.test.ts 14/14
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/diagnostic
+s.test.ts 8/8
+ ✓ tests/components-core/scripts-runner/parser-reg
+ression.test.ts (1 test) 3ms
+
+ ❯ tests/components-core/forms/submit-guard.test.t
+s [queued]
+ ❯ tests/components-core/interception/orderBy.test
+.ts 12/12
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/diagnostic
+s.test.ts 8/8
+ ❯ tests/components-core/routing/query-constraints
+.test.ts 3/3
+ ✓ tests/components-core/scheduler/queue.test.ts (
+5 tests) 3ms
+ ✓ tests/components-core/forms/submit-guard.test.t
+s (10 tests) 5ms
+ ✓ tests/parsers/scripting/parser-assignments.test
+.ts (1 test) 4ms
+
+ ❯ tests/components-core/audit/policy.test.ts [que
+ued]
+ ❯ tests/components-core/forms/submit-guard.test.t
+s 10/10
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/diagnostic
+s.test.ts 8/8
+ ❯ tests/components-core/routing/query-constraints
+ ✓ tests/parsers/common/input-stream.test.ts (9 te
+sts) 4ms
+
+ ❯ tests/components-core/audit/policy.test.ts 0/6
+ ❯ tests/components-core/forms/submit-guard.test.t
+s 10/10
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/diagnostic
+s.test.ts 8/8
+ ❯ tests/components-core/routing/query-constraints
+ ✓ tests/components-core/audit/policy.test.ts (6 t
+ests) 3ms
+
+ ❯ tests/components-core/audit/policy.test.ts 6/6
+ ❯ tests/components-core/forms/submit-guard.test.t
+s 10/10
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/diagnostic
+s.test.ts 8/8
+ ❯ tests/components-core/scheduler/queue.test.ts 5
+
+ ❯ tests/components-core/audit/policy.test.ts 6/6
+ ❯ tests/components-core/forms/submit-guard.test.t
+s 10/10
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/diagnostic
+s.test.ts 8/8
+ ❯ tests/components-core/scheduler/queue.test.ts 5
+ ✓ tests/parsers/style-parser/parseHVar.test.ts (7
+ tests) 3ms
+
+ ❯ tests/components-core/audit/policy.test.ts 6/6
+ ❯ tests/components-core/forms/submit-guard.test.t
+s 10/10
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/graph.test
+.ts [queued]
+ ❯ tests/components-core/routing/constraint-compil
+ ✓ tests/components/Tree/Tree-states.test.ts (6 te
+sts) 3ms
+ ✓ tests/components-core/reactive-graph/graph.test
+.ts (7 tests) 3ms
+
+ ❯ tests/components-core/audit/policy.test.ts 6/6
+ ❯ tests/components-core/forms/submit-guard.test.t
+s 10/10
+ ❯ tests/components-core/optimization/renderer-met
+adata-drift.test.ts [queued]
+ ❯ tests/components-core/reactive-graph/graph.test
+.ts 7/7
+ ✓ tests/components-core/xmluiMarkupToComponent.te
+st.ts (1 test) 3ms
+ ✓ tests/components-core/routing/constraint-compil
+er.test.ts (4 tests) 3ms
+
+ ❯ tests/components-core/audit/policy.test.ts 6/6
+ ❯ tests/components-core/global-variables-runtime.
+test.ts [queued]
+ ❯ tests/components-core/i18n/locale-resolver.test
+ ✓ tests/components-core/global-variables-runtime.
+test.ts (5 tests) 3ms
+ ✓ tests/components-core/scheduler/replay.test.ts
+(2 tests) 3ms
+ ✓ tests/components-core/routing/guard-dispatcher.
+test.ts (3 tests) 2ms
+ ✓ tests/components-core/i18n/locale-resolver.test
+.ts (3 tests) 2ms
+ ✓ tests/parsers/style-parser/generateHvarChain.te
+st.ts (2 tests) 2ms
+ ✓ tests/components-core/markup-check.test.ts (2 t
+ests) 2ms
+ ✓ tests/components-core/accessibility/focusScopeS
+tack.test.ts (1 test) 2ms
+ ✓ tests/components-core/abstractions/treeAbstract
+ions.test.ts (3 tests) 2ms
+ ✓ tests/components-core/utils/LruCache.test.ts (4
+ tests | 2 skipped) 2ms
+ ✓ tests/components-core/optimization/renderer-met
+adata-drift.test.ts (14 tests) 5ms
+
+ Test Files  223 passed (223)
+      Tests  10225 passed | 2 skipped | 1 todo (10
+228)
+   Start at  09:12:39
+   Duration  29.10s (transform 18.75s, setup 31.29
+s, import 76.17s, tests 20.53s, environment 155.19
+s)
+└─ xmlui#test:unit ──
+┌─ //#_e2e > cache miss, executing d528d90122033751
+cache miss, executing d528d90122033751
+
+
+> xmlui-root@1.0.0 _e2e
+> cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwr
+ight test
+[WebServer] (node:43303) [DEP0040] DeprecationWarn
+ing: The `punycode` module is deprecated. Please u
+se a userland alternative instead.
+[WebServer] (Use `node --trace-deprecation ...` to
+ show where the warning was created)
+
+
+Running 7253 tests using 9 workers
+  1) [xmlui-nonsmoke] › xmlui/src/components/Icon/
+Icon.spec.ts:449:3 › Theme Variables › size prop o
+verrides theme variable
+
+    Error: expect(received).toBe(expected) // Obje
+ct.is equality
+
+    Expected: "32px"
+    Received: "26px"
+
+      460 |     });
+      461 |
+    > 462 |     expect(computedStyle.width).toBe("
+32px"); // 2rem calculated, not 4rem from theme
+          |                                 ^
+      463 |     expect(computedStyle.height).toBe(
+"32px");
+      464 |   });
+      465 |
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/src/components/Icon/Icon.spec.ts:462
+:33
+
+    Error Context: test-results/src-components-Ico
+n-Icon-T-2d95d-op-overrides-theme-variable-xmlui-n
+onsmoke/error-context.md
+
+  2) [xmlui-nonsmoke] › xmlui/src/components/ToneC
+hangerButton/ToneChangerButton.spec.ts:69:3 › Basi
+c Functionality › switches from dark to light mode
+ when clicked
+
+    Error: locator.click: Error: strict mode viola
+tion: getByRole('button') resolved to 2 elements:
+        1) <button type="button" class="_button_15
+rdj_14 _buttonHorizontal_15rdj_39 _sm_15rdj_49 _gh
+ostPrimary_15rdj_311 css-o7p4hm">…</button> aka ge
+tByRole('button', { name: 'lightToDark:ToneChanger
+Button' })
+        2) <button id="main">Main target</button>
+aka getByRole('button', { name: 'Main target' })
+
+    Call log:
+      - waiting for getByRole('button')
+
+
+      78 |
+      79 |     // Switch to dark mode first
+    > 80 |     await button.click();
+         |                  ^
+      81 |     await expect(page.getByTestId("them
+e-state")).toHaveText("dark");
+      82 |
+      83 |     // Click again to switch back to li
+ght mode
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/src/components/ToneChangerButton/Ton
+eChangerButton.spec.ts:80:18
+
+    Error Context: test-results/src-components-Ton
+eChanger-6f004--to-light-mode-when-clicked-xmlui-n
+onsmoke/error-context.md
+
+…ing group when two sibling components share an id
+[xmlui] Warnings in markup:
+  Duplicate component id "dup" detected at line 6,
+ column 17. Component ids must be unique within th
+e same markup.
+… warning message contains the duplicated id value
+[xmlui] Warnings in markup:
+  Duplicate component id "my-unique-id" detected a
+t line 6, column 19. Component ids must be unique
+within the same markup.
+…arning for each extra occurrence beyond the first
+[xmlui] Warnings in markup:
+  Duplicate component id "triple" detected at line
+ 6, column 17. Component ids must be unique within
+ the same markup.
+  Duplicate component id "triple" detected at line
+ 7, column 17. Component ids must be unique within
+ the same markup.
+…when a nested component duplicates an ancestor id
+[xmlui] Warnings in markup:
+  Duplicate component id "container" detected at l
+ine 5, column 17. Component ids must be unique wit
+hin the same markup.
+  3) [xmlui-nonsmoke] › xmlui/tests-e2e/datasource
+-responseHeaders.spec.ts:3:1 › DataSource exposes
+responseHeaders after successful fetch
+
+    TypeError: Cannot read properties of undefined
+ (reading 'x-custom-header')
+
+      24 |   await expect.poll(testStateDriver.tes
+tState, { timeout: 5000 }).not.toBeNull();
+      25 |   const headers = await testStateDriver
+.testState();
+    > 26 |   expect(headers["x-custom-header"]).to
+Be("hello-world");
+         |                 ^
+      27 | });
+      28 |
+      29 | test("DataSource responseHeaders includ
+es content-type from server", async ({
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/tests-e2e/datasource-responseHeaders
+.spec.ts:26:17
+
+    Error Context: test-results/tests-e2e-datasour
+ce-respo-7e64b-ders-after-successful-fetch-xmlui-n
+onsmoke/error-context.md
+
+  4) [xmlui-nonsmoke] › xmlui/src/components-core/
+behaviors/FormBindingBehavior.spec.ts:79:3 › Basic
+ Functionality › Select with 'bindTo' updates Form
+ data
+
+    Error: expect(received).toEqual(expected) // d
+eep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "choice": "opt2",
+    +   "choice": "opt1",
+      }
+
+    Call Log:
+    - Timeout 10000ms exceeded while waiting on th
+e predicate
+
+      100 |     await page.getByRole("button", { n
+ame: "Save" }).click();
+      101 |
+    > 102 |     await expect.poll(testStateDriver.
+testState).toEqual({
+          |     ^
+      103 |       choice: "opt2",
+      104 |     });
+      105 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/src/components-core/behaviors/FormBi
+ndingBehavior.spec.ts:102:5
+
+    Error Context: test-results/src-components-cor
+e-behavi-dd9cd-th-bindTo-updates-Form-data-xmlui-n
+onsmoke/error-context.md
+
+    Retry #1 ─────────────────────────────────────
+
+    Error: expect(received).toEqual(expected) // d
+eep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "choice": "opt2",
+    +   "choice": "opt1",
+      }
+
+    Call Log:
+    - Timeout 10000ms exceeded while waiting on th
+e predicate
+
+      100 |     await page.getByRole("button", { n
+ame: "Save" }).click();
+      101 |
+    > 102 |     await expect.poll(testStateDriver.
+testState).toEqual({
+          |     ^
+      103 |       choice: "opt2",
+      104 |     });
+      105 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/src/components-core/behaviors/FormBi
+ndingBehavior.spec.ts:102:5
+
+    Error Context: test-results/src-components-cor
+e-behavi-dd9cd-th-bindTo-updates-Form-data-xmlui-n
+onsmoke-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ───────
+    test-results/src-components-core-behavi-dd9cd-
+th-bindTo-updates-Form-data-xmlui-nonsmoke-retry1/
+trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/src
+-components-core-behavi-dd9cd-th-bindTo-updates-Fo
+rm-data-xmlui-nonsmoke-retry1/trace.zip
+
+    ──────────────────────────────────────────────
+
+  5) [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exa
+mples/customize-tooltip-appearance.spec.ts:50:3 ›
+Custom Tooltip appearance › hovering Left with arr
+ow shows the tooltip text @website
+
+    Error: expect(received).toBe(expected) // Obje
+ct.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 10000ms exceeded while waiting on th
+e predicate
+
+      51 |     await initTestBed(app, { components
+, apiInterceptor });
+      52 |     await page.getByRole("button", { na
+me: "Left with arrow" }).hover();
+    > 53 |     await expect.poll(() =>
+         |     ^
+      54 |       page.getByText("Appears to the le
+ft with arrow").isVisible(),
+      55 |     ).toBe(true);
+      56 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/tests-e2e/how-to-examples/customize-
+tooltip-appearance.spec.ts:53:5
+
+    Error Context: test-results/tests-e2e-how-to-e
+xamples--3dd1d-rrow-shows-the-tooltip-text-xmlui-n
+onsmoke/error-context.md
+
+  6) [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exa
+mples/chain-a-refetch.spec.ts:46:3 › Click the Lik
+e button › clicking like on a favorited post refet
+ches the decremented count @website
+
+    Error: expect(received).toBe(expected) // Obje
+ct.is equality
+
+    Expected: 1
+    Received: 0
+
+    Call Log:
+    - Timeout 10000ms exceeded while waiting on th
+e predicate
+
+      52 |     await page.getByRole("button", { na
+me: "like" }).nth(1).click();
+      53 |
+    > 54 |     await expect.poll(async () => await
+ page.getByText("11", { exact: true }).count()).to
+Be(1);
+         |     ^
+      55 |     await expect(page.getByText("12", {
+ exact: true })).not.toBeVisible();
+      56 |     await expect(page.getByText("Idle",
+ { exact: true })).toBeVisible();
+      57 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/tests-e2e/how-to-examples/chain-a-re
+fetch.spec.ts:54:5
+
+    Error Context: test-results/tests-e2e-how-to-e
+xamples--cef42-tches-the-decremented-count-xmlui-n
+onsmoke/error-context.md
+
+  7) [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exa
+mples/poll-an-api-at-regular-intervals.spec.ts:34:
+3 › Live server metrics dashboard › displays metri
+c values and timestamp @website
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/\d+%/)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByText(/\d+%/)
+
+
+      35 |     await initTestBed(app, { components
+, apiInterceptor });
+      36 |     // CPU renders as e.g. "42%", Memor
+y as "612 MB"
+    > 37 |     await expect(page.getByText(/\d+%/)
+).toBeVisible();
+         |
+  ^
+      38 |     await expect(page.getByText(/\d+ MB
+/)).toBeVisible();
+      39 |     await expect(page.getByText(/Last u
+pdated:/)).toBeVisible();
+      40 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/tests-e2e/how-to-examples/poll-an-ap
+i-at-regular-intervals.spec.ts:37:42
+
+    Error Context: test-results/tests-e2e-how-to-e
+xamples--b415f-metric-values-and-timestamp-xmlui-n
+onsmoke/error-context.md
+
+  8) [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exa
+mples/hide-an-element-until-its-datasource-is-read
+y.spec.ts:39:3 › Show content only after the DataS
+ource loads › result text appears and button re-en
+ables after the fetch completes @website
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  getByRole('button', { name: 'Run (ta
+kes about 3s)' })
+    Expected: enabled
+    Received: disabled
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeEnabled" with timeout 10000ms
+      - waiting for getByRole('button', { name: 'R
+un (takes about 3s)' })
+        14 × locator resolved to <button disabled
+type="button" class="_button_15rdj_14 _buttonHoriz
+ontal_15rdj_39 _sm_15rdj_49 _solidPrimary_15rdj_10
+4 css-o7p4hm css-1rbf16h css-o7p4hm css-1rbf16h">R
+un (takes about 3s)</button>
+           - unexpected value "disabled"
+
+
+      46 |       .poll(() => page.getByText("Fruit
+s: 3 found").isVisible(), { timeout: 8000 })
+      47 |       .toBe(true);
+    > 48 |     await expect(page.getByRole("button
+", { name: "Run (takes about 3s)" })).toBeEnabled(
+);
+         |
+                                      ^
+      49 |   });
+      50 | });
+      51 |
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/tests-e2e/how-to-examples/hide-an-el
+ement-until-its-datasource-is-ready.spec.ts:48:78
+
+    Error Context: test-results/tests-e2e-how-to-e
+xamples--8b04e-s-after-the-fetch-completes-xmlui-n
+onsmoke/error-context.md
+
+  9) [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exa
+mples/run-a-one-time-action-on-page-load.spec.ts:2
+1:3 › One-time page load action › onInit fires on
+mount and the initialized card appears @website
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/Page initialized at \d/)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByText(/Page initialized at
+ \d/)
+
+
+      21 |   test("onInit fires on mount and the i
+nitialized card appears", async ({ initTestBed, pa
+ge }) => {
+      22 |     await initTestBed(app, { components
+, apiInterceptor });
+    > 23 |     await expect(page.getByText(/Page i
+nitialized at \d/)).toBeVisible();
+         |
+                    ^
+      24 |   });
+      25 | });
+      26 |
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/tests-e2e/how-to-examples/run-a-one-
+time-action-on-page-load.spec.ts:23:60
+
+    Error Context: test-results/tests-e2e-how-to-e
+xamples--2e338-he-initialized-card-appears-xmlui-n
+onsmoke/error-context.md
+
+  10) [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-ex
+amples/update-ui-optimistically.spec.ts:32:3 › Cli
+ck the Like button - immediate feedback › clicking
+ like on an unfavorited post updates immediately a
+nd keeps the server value @website
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('6', { exact: true })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByText('6', { exact: true }
+)
+
+
+      38 |     await page.getByRole("button", { na
+me: "like" }).first().click();
+      39 |
+    > 40 |     await expect(page.getByText("6", {
+exact: true })).toBeVisible();
+         |
+                ^
+      41 |     await expect.poll(async () => await
+ page.getByText("Post favorited!").count()).toBe(1
+);
+      42 |     await expect(page.getByText("6", {
+exact: true })).toBeVisible();
+      43 |   });
+        at /Users/yurii/projects/nsoftware/xmlui-m
+onorepo/xmlui/tests-e2e/how-to-examples/update-ui-
+optimistically.spec.ts:40:56
+
+    Error Context: test-results/tests-e2e-how-to-e
+xamples--abb76--and-keeps-the-server-value-xmlui-n
+onsmoke/error-context.md
+
+  1 failed
+    [xmlui-nonsmoke] › xmlui/src/components-core/b
+ehaviors/FormBindingBehavior.spec.ts:79:3 › Basic
+Functionality › Select with 'bindTo' updates Form
+data
+  9 flaky
+    [xmlui-nonsmoke] › xmlui/src/components/Icon/I
+con.spec.ts:449:3 › Theme Variables › size prop ov
+errides theme variable
+    [xmlui-nonsmoke] › xmlui/src/components/ToneCh
+angerButton/ToneChangerButton.spec.ts:69:3 › Basic
+ Functionality › switches from dark to light mode
+when clicked
+    [xmlui-nonsmoke] › xmlui/tests-e2e/datasource-
+responseHeaders.spec.ts:3:1 › DataSource exposes r
+esponseHeaders after successful fetch
+    [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exam
+ples/chain-a-refetch.spec.ts:46:3 › Click the Like
+ button › clicking like on a favorited post refetc
+hes the decremented count @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exam
+ples/customize-tooltip-appearance.spec.ts:50:3 › C
+ustom Tooltip appearance › hovering Left with arro
+w shows the tooltip text @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exam
+ples/hide-an-element-until-its-datasource-is-ready
+.spec.ts:39:3 › Show content only after the DataSo
+urce loads › result text appears and button re-ena
+bles after the fetch completes @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exam
+ples/poll-an-api-at-regular-intervals.spec.ts:34:3
+ › Live server metrics dashboard › displays metric
+ values and timestamp @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exam
+ples/run-a-one-time-action-on-page-load.spec.ts:21
+:3 › One-time page load action › onInit fires on m
+ount and the initialized card appears @website
+    [xmlui-nonsmoke] › xmlui/tests-e2e/how-to-exam
+ples/update-ui-optimistically.spec.ts:32:3 › Click
+ the Like button - immediate feedback › clicking l
+ike on an unfavorited post updates immediately and
+ keeps the server value @website
+  73 skipped
+  7170 passed (4.0m)
+
+To open last HTML report run:
+
+  npx playwright show-report
+└─ //#_e2e ──
+
+ Tasks:    13 successful, 14 total
+Cached:    0 cached, 14 total
+  Time:    4m37.574s
+Failed:    //#_e2e
+
+
+~/projects/nsoftware/xmlui-monorepo yurii/computedUses* 4m 38s
+❯

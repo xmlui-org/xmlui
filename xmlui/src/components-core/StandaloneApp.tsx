@@ -78,6 +78,70 @@ function resolveOptimizerMetadata(type: string) {
   return getOptimizerMetadata(type);
 }
 
+/**
+ * Creates a MetadataHandler that delegates component lookups to either a
+ * MetadataProvider or a ComponentRegistry. Memoizes lookups to avoid
+ * redundant work when multiple properties are queried for the same
+ * component during a single traversal.
+ */
+function createMetadataHandler(
+  resolver: MetadataProvider | ComponentRegistry,
+): MetadataHandler {
+  const cache = new Map<string, any>();
+  const isRegistry = resolver instanceof ComponentRegistry;
+  const getComp = (name: string) => {
+    if (!cache.has(name)) {
+      const comp = isRegistry
+        ? (resolver as ComponentRegistry).lookupComponentRenderer(name)
+        : (resolver as MetadataProvider).getComponent(name);
+      cache.set(name, comp);
+    }
+    return cache.get(name);
+  };
+  return {
+    componentRegistered: (comp) => {
+      if (isRegistry) {
+        return (resolver as ComponentRegistry).hasComponent(comp);
+      }
+      return getComp(comp) != null;
+    },
+    getComponentProps: (comp) => {
+      const c = getComp(comp);
+      return (c?.getMetadata?.() || c?.descriptor || c)?.props || {};
+    },
+    getComponentEvents: (comp) => {
+      if (isRegistry) {
+        return null as any;
+      }
+      const c = getComp(comp);
+      return (c?.getMetadata?.() || c?.descriptor || c)?.events || {};
+    },
+    acceptArbitraryProps: () => true,
+    getComponentValidator: () => null,
+  };
+}
+
+/**
+ * Re-runs the computed-uses optimizer over the entire application tree.
+ * Used when app-global names are updated or when cross-.xs imports
+ * are newly resolved.
+ */
+function recomputeUsesForApp(
+  appDef: StandaloneAppDescription,
+  appGlobalNames: Set<string> | undefined,
+) {
+  const entryPoint = appDef.entryPoint as ComponentDef;
+  if (!entryPoint) {
+    return;
+  }
+  computeUsesForTree(entryPoint, resolveOptimizerMetadata, appGlobalNames);
+  appDef.components?.forEach((compound) => {
+    if (compound.component) {
+      computeUsesForTree(compound.component, resolveOptimizerMetadata, appGlobalNames);
+    }
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Storage escape hatch — runs at module-init time, BEFORE React or the router
 // are instantiated. By the time BrowserRouter reads globalThis.location the
@@ -777,8 +841,6 @@ function resolveRuntime(runtime: Record<string, any>): {
     ...Object.keys(globalsXs?.functions ?? {}),
   ]);
 
-  computeUsesForTree(entryPointWithCodeBehind, resolveOptimizerMetadata, appGlobalNames);
-
   // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];
   if (config?.components) {
@@ -805,12 +867,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     });
   }
 
-  // --- Process computedUses for each compound component's tree
-  for (const compDef of components) {
-    if (compDef.component) {
-      computeUsesForTree(compDef.component, resolveOptimizerMetadata, appGlobalNames);
-    }
-  }
+  recomputeUsesForApp({ entryPoint: entryPointWithCodeBehind, components } as any, appGlobalNames);
 
   // --- Collect globalVars from root element only (components can no longer define globals)
   const mergedGlobals = entryPointWithCodeBehind.globalVars || {};
@@ -1244,6 +1301,18 @@ function useStandalone(
           extensionManager,
         });
         setProjectCompilation(resolvedRuntime.projectCompilation);
+
+        // §11: dev/inline path — resolve cross-.xs imports so computedGlobalUses is not
+        // suppressed by hasUnresolvableImports, mirroring the standalone fetch path.
+        const wrappedMetadataHandler = createMetadataHandler(metadataProvider);
+        const resolvedAny = await collectImportsFromStandaloneSources(
+          appDef,
+          resolvedRuntime.projectCompilation,
+          wrappedMetadataHandler,
+        );
+        if (resolvedAny) {
+          recomputeUsesForApp(appDef, resolvedRuntime.appGlobalNames);
+        }
         setStandaloneApp(appDef);
 
         // --- Collect globalVars from the MERGED app definition (not resolved runtime)
@@ -1733,23 +1802,12 @@ function useStandalone(
       });
 
       // --- Resolve imports in standalone mode using sources map
-      const wrappedMetadataHandler: MetadataHandler = {
-        componentRegistered: (comp) => metadataProvider.getComponent(comp) !== null,
-        getComponentProps: (comp) => metadataProvider.getComponent(comp)?.getMetadata()?.props || {},
-        getComponentEvents: (comp) => metadataProvider.getComponent(comp)?.getMetadata()?.events || {},
-        acceptArbitraryProps: () => true,
-        getComponentValidator: () => null,
-      };
+      const wrappedMetadataHandler = createMetadataHandler(metadataProvider);
       const resolvedAny = await collectImportsFromStandaloneSources(newAppDef, resolvedRuntime.projectCompilation, wrappedMetadataHandler);
 
       // --- H2 & C2: Only re-compute if imports were resolved, and pass appGlobalNames to prevent regression
       if (resolvedAny) {
-        computeUsesForTree(newAppDef.entryPoint as ComponentDef, resolveOptimizerMetadata, resolvedRuntime.appGlobalNames);
-        newAppDef.components?.forEach((compound) => {
-          if (compound.component) {
-            computeUsesForTree(compound.component, resolveOptimizerMetadata, resolvedRuntime.appGlobalNames);
-          }
-        });
+        recomputeUsesForApp(newAppDef, resolvedRuntime.appGlobalNames);
       }
 
       setProjectCompilation(resolvedRuntime.projectCompilation);
@@ -1817,23 +1875,7 @@ function collectMissingComponents(
   );
 
   // --- Check the xmlui markup. This check will find all unloaded components
-  const metadataHandler: MetadataHandler = {
-    getComponentProps: (componentName) => {
-      return componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.props;
-    },
-    acceptArbitraryProps: () => {
-      return true;
-    },
-    getComponentValidator: () => {
-      return null;
-    },
-    getComponentEvents: () => {
-      return null;
-    },
-    componentRegistered: (componentName: string) => {
-      return componentRegistry.hasComponent(componentName);
-    },
-  };
+  const metadataHandler = createMetadataHandler(componentRegistry);
   const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, metadataHandler);
 
   componentRegistry.destroy();
@@ -2134,7 +2176,7 @@ export async function collectImportsFromStandaloneSources(
 
   const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
     // C1: Use sources map from appDef instead of global window._xsSources
-    if (sources[modulePath]) return sources[modulePath];
+    if (modulePath in sources) return sources[modulePath];
     // Fallback to fetch for external modules
     const response = await fetch(normalizePath(modulePath));
     if (!response.ok) throw new Error(`Failed to fetch module: ${modulePath}`);
@@ -2152,8 +2194,10 @@ export async function collectImportsFromStandaloneSources(
         // M3: Merge resolved imports. Sync-collected own decls win.
         comp.scriptCollected.functions = { ...resolved.functions, ...comp.scriptCollected.functions };
         comp.scriptCollected.vars = { ...resolved.vars, ...comp.scriptCollected.vars };
-        comp.scriptCollected.hasUnresolvableImports = false;
-        resolvedAny = true;
+        comp.scriptCollected.hasUnresolvableImports = resolved.hasUnresolvableImports;
+        if (!resolved.hasUnresolvableImports) {
+          resolvedAny = true;
+        }
       } catch (e) {
         // M2: Leave a structured warning in the console
         console.warn(`[XMLUI] Failed to resolve imports for ${fileId}:`, e);

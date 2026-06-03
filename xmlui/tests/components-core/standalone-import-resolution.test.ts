@@ -81,4 +81,109 @@ describe("collectImportsFromStandaloneSources", () => {
     expect(actualComponent.computedUses).toBeDefined();
     expect(actualComponent.computedUses).toContain("parentVar");
   });
+
+  it("§11: resolving imports enables computedGlobalUses for an imported global-reading helper", async () => {
+    const sources = {
+      "/app/components/MyComp.xmlui": `
+      <Component name="MyComp">
+        <Container>
+          <script>
+            import { publishEvent } from "./shared.xs";
+            var a = 1;
+          </script>
+          <Text value="{publishEvent(a)}"/>
+        </Container>
+      </Component>
+    `,
+      "/app/components/shared.xs": `
+      function publishEvent(x) { events = events.concat(x); return x; }
+    `,
+    };
+
+    const compDef = transformSource(sources["/app/components/MyComp.xmlui"]) as CompoundComponentDef;
+    const actualComponent = compDef.component;
+    expect(actualComponent.scriptCollected!.hasUnresolvableImports).toBe(true);
+
+    const appDef: StandaloneAppDescription = { sources, components: [compDef as any] };
+    const projectCompilation: ProjectCompilation = {
+      entrypoint: { filename: "/app/Main.xmlui", definition: null as any, dependencies: new Set() },
+      components: [
+        {
+          filename: "/app/components/MyComp.xmlui",
+          markupSource: sources["/app/components/MyComp.xmlui"],
+          definition: compDef as any,
+          dependencies: new Set(),
+        },
+      ],
+      themes: {},
+    };
+    const dummyHandler = {
+      componentRegistered: () => true,
+      getComponentProps: () => ({}),
+      getComponentEvents: () => ({}),
+      acceptArbitraryProps: () => true,
+      getComponentValidator: () => null,
+    };
+
+    const resolvedAny = await collectImportsFromStandaloneSources(appDef, projectCompilation, dummyHandler as any);
+    expect(resolvedAny).toBe(true);
+    expect(actualComponent.scriptCollected!.hasUnresolvableImports).toBe(false);
+    expect(actualComponent.scriptCollected!.functions.publishEvent).toBeDefined();
+
+    // The crux: optimizer must now credit `events` to computedGlobalUses.
+    const dummyMetadataLookup = () => ({}) as any;
+    computeUsesForTree(actualComponent, dummyMetadataLookup, new Set(["events", "unrelated"]));
+
+    expect(actualComponent.computedGlobalUses).toBeDefined();
+    expect(actualComponent.computedGlobalUses).toContain("events");
+    expect(actualComponent.computedGlobalUses).not.toContain("unrelated");
+  });
+
+  it("§11: a missing/unresolvable imported module keeps narrowing blocked", async () => {
+    const sources = {
+      "/app/components/Bad.xmlui": `
+      <Component name="Bad">
+        <Container>
+          <script>
+            import { ghost } from "./does-not-exist.xs";
+            var a = 1;
+          </script>
+          <Text value="{ghost(a)}"/>
+        </Container>
+      </Component>
+    `,
+      // note: ./does-not-exist.xs intentionally absent from sources
+    };
+    const compDef = transformSource(sources["/app/components/Bad.xmlui"]) as CompoundComponentDef;
+    const actualComponent = compDef.component;
+    expect(actualComponent.scriptCollected!.hasUnresolvableImports).toBe(true);
+
+    const appDef: StandaloneAppDescription = { sources, components: [compDef as any] };
+    const projectCompilation: ProjectCompilation = {
+      entrypoint: { filename: "/app/Main.xmlui", definition: null as any, dependencies: new Set() },
+      components: [
+        {
+          filename: "/app/components/Bad.xmlui",
+          markupSource: sources["/app/components/Bad.xmlui"],
+          definition: compDef as any,
+          dependencies: new Set(),
+        },
+      ],
+      themes: {},
+    };
+    const dummyHandler = {
+      componentRegistered: () => true,
+      getComponentProps: () => ({}),
+      getComponentEvents: () => ({}),
+      acceptArbitraryProps: () => true,
+      getComponentValidator: () => null,
+    };
+
+    await collectImportsFromStandaloneSources(appDef, projectCompilation, dummyHandler as any);
+
+    // Resolution failed (module not found) → flag stays set, narrowing blocked.
+    expect(actualComponent.scriptCollected!.hasUnresolvableImports).toBe(true);
+    computeUsesForTree(actualComponent, () => ({}) as any, new Set(["events"]));
+    expect(actualComponent.computedGlobalUses).toBeUndefined();
+  });
 });
