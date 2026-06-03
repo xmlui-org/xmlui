@@ -5,4 +5,4 @@ export const defaultProps = {
   customValidationsDebounce: 0,
   gap: "0",
   noSubmit: false,
-};
+} as const;

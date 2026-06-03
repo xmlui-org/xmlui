@@ -1,6 +1,6 @@
 import styles from "./ScrollToTop.module.scss";
 
-import { wrapComponent, createMetadata, d, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
 import { defaultProps } from "./ScrollToTop.defaults";
 import { ScrollToTop } from "./ScrollToTopReact";

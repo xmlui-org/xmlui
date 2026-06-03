@@ -4,4 +4,4 @@ export const defaultProps = {
   contentPlacement: "bottom",
   contentAlignment: "center",
   contentWidth: "$maxWidth-content",
-};
+} as const;

@@ -1,5 +1,4 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { defaultProps } from "../DateInput/DateInputReact";
 import { createMetadata } from "../metadata-helpers";
 import { FormSegmentNative } from "./FormSegmentReact";
 

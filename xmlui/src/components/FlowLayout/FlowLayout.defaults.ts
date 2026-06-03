@@ -5,4 +5,4 @@ export const defaultProps = {
   verticalAlignment: "start",
   scrollStyle: "normal",
   showScrollerFade: true,
-};
+} as const;
