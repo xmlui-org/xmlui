@@ -82,8 +82,7 @@ export const TextBoxMd = createMetadata({
     },
     invalidMessages: {
       description: "The invalid messages to display for the input component.",
-      type: "array",
-      valueType: "string",
+      valueType: "string[]",
     },
     startText: dStartText(),
     startIcon: dStartIcon(),

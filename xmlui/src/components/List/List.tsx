@@ -8,14 +8,22 @@ import { MemoizedItem } from "../container-helpers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
-import type { RendererContext, LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
-import { createMetadata, d, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
+import type {
+  RendererContext,
+  LayoutContext,
+  RenderChildFn,
+} from "../../abstractions/RendererDefs";
+import { createMetadata, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
 import {
   StandaloneSelectionStore,
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreReact";
-import { defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./List.defaults";
+import {
+  defaultProps,
+  selectionCheckboxPositionValues,
+  selectionCheckboxAnchorValues,
+} from "./List.defaults";
 import { ListNative, MemoizedSection } from "./ListReact";
 
 const COMP = "List";
@@ -28,27 +36,27 @@ export const ListMd = createMetadata({
     "renders visible items in the viewport, making it ideal for displaying " +
     "thousands of records while maintaining smooth scrolling performance.",
   props: {
-    data: d(
-      `The component receives data via this property. The \`data\` property is a list of items ` +
+    data: {
+      description:
+        `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`List\` can display.`,
-    ),
+    },
     items: dInternal(
       `You can use \`items\` as an alias for the \`data\` property. ` +
         `When you bind the list to a data source (e.g. an API endpoint), ` +
         `the \`data\` acts as the property that accepts a URL to fetch information from an API.` +
         `When both \`items\` and \`data\` are used, \`items\` has priority.`,
     ),
-    loading: d(
-      `This property delays the rendering of children until it is set to \`false\`, or the ` +
+    loading: {
+      description:
+        `This property delays the rendering of children until it is set to \`false\`, or the ` +
         `component receives usable list items via the [\`data\`](#data) property.`,
-      undefined,
-      "boolean",
-    ),
-    limit: d(
-      `This property limits the number of items displayed in the \`${COMP}\`. If not set, all items are displayed.`,
-      undefined,
-      "number",
-    ),
+      valueType: "boolean",
+    },
+    limit: {
+      description: `This property limits the number of items displayed in the \`${COMP}\`. If not set, all items are displayed.`,
+      valueType: "number",
+    },
     scrollAnchor: {
       description: `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
       availableValues: scrollAnchoringValues,
@@ -63,24 +71,23 @@ export const ListMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
-    groupBy: d(
-      "This property sets which data item property is used to group the list items. " +
+    groupBy: {
+      description:
+        "This property sets which data item property is used to group the list items. " +
         "Accepts a field name string or a function that receives an item and returns the group key. " +
         "If not set, no grouping is done.",
-      undefined,
-      "any",
-    ),
-    orderBy: d(
-      `This optioanl property enables the ordering of list items by specifying an attribute in the data.`,
-      undefined,
-      "string",
-    ),
-    availableGroups: d(
-      `This property is an array of group names that the \`${COMP}\` will display. ` +
+      valueType: "any",
+    },
+    orderBy: {
+      description: `This optioanl property enables the ordering of list items by specifying an attribute in the data.`,
+      valueType: "string",
+    },
+    availableGroups: {
+      description:
+        `This property is an array of group names that the \`${COMP}\` will display. ` +
         "If not set, all groups in the data are displayed.",
-      undefined,
-      "any",
-    ),
+      valueType: "string[]",
+    },
     groupHeaderTemplate: dComponent(
       `Enables the customization of how the groups are displayed, similarly to the ` +
         `[\`itemTemplate\`](#itemtemplate). You can use the \`$item\` context variable to access ` +
@@ -98,29 +105,29 @@ export const ListMd = createMetadata({
     emptyListTemplate: dComponent(
       `This property defines the template to display when the list is empty.`,
     ),
-    pageInfo: d(
-      `This property contains the current page information. Setting this property also enures the ` +
+    pageInfo: {
+      description:
+        `This property contains the current page information. Setting this property also enures the ` +
         `\`${COMP}\` uses pagination.`,
-    ),
+    },
     idKey: {
       description: "Denotes which attribute of an item acts as the ID or key of the item",
       valueType: "string",
       defaultValue: defaultProps.idKey,
     },
-    groupsInitiallyExpanded: d(
-      `This Boolean property defines whether the list groups are initially expanded.`,
-      undefined,
-      "boolean",
-      defaultProps.groupsInitiallyExpanded,
-    ),
-    defaultGroups: d(
-      `This property adds an optional list of default groups for the \`${COMP}\` and displays the group ` +
+    groupsInitiallyExpanded: {
+      description: `This Boolean property defines whether the list groups are initially expanded.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.groupsInitiallyExpanded,
+    },
+    defaultGroups: {
+      description:
+        `This property adds an optional list of default groups for the \`${COMP}\` and displays the group ` +
         `headers in the specified order. If the data contains group headers not in this list, ` +
         `those headers are also displayed (after the ones in this list); however, their order ` +
         `is not deterministic.`,
-      undefined,
-      "any",
-    ),
+      valueType: "string[]",
+    },
     hideEmptyGroups: {
       description:
         "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
@@ -132,7 +139,10 @@ export const ListMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.borderCollapse,
     },
-    rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`, undefined, "boolean"),
+    rowsSelectable: {
+      description: `Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`,
+      valueType: "boolean",
+    },
     enableMultiRowSelection: {
       description:
         `This boolean property indicates whether you can select multiple rows in the list. ` +
@@ -141,27 +151,28 @@ export const ListMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enableMultiRowSelection,
     },
-    initiallySelected: d(
-      `An array of IDs that should be initially selected when the list is rendered. ` +
+    initiallySelected: {
+      description:
+        `An array of IDs that should be initially selected when the list is rendered. ` +
         `This property only has an effect when the rowsSelectable property is set to \`true\`.`,
-      undefined,
-      "any",
-    ),
-    syncWithVar: d(
-      `The name of a global variable to synchronize the list's selection state with. ` +
+      valueType: "any",
+    },
+    syncWithVar: {
+      description:
+        `The name of a global variable to synchronize the list's selection state with. ` +
         `The named variable must reference an object; the list will read from and write to its ` +
         `'selectedIds' property. When provided, this takes precedence over ` +
         `\`initiallySelected\`.`,
-      undefined,
-      "string",
-    ),
-    refreshOn: d(
-      `Bind this property to a global variable (or expression) whose change should force all ` +
+      valueType: "string",
+    },
+    refreshOn: {
+      description:
+        `Bind this property to a global variable (or expression) whose change should force all ` +
         `visible list items to re-render and pick up the latest reactive state. When not set, ` +
         `items re-render on every XMLUI reactive cycle (safe but less optimal). When set, items ` +
         `only re-render when the bound value changes, which eliminates spurious re-renders from ` +
         `unrelated global-variable updates (e.g. focus events).`,
-    ),
+    },
     rowUnselectablePredicate: {
       description:
         `This property defines a predicate function with a return value that determines if the ` +
@@ -313,14 +324,16 @@ export const ListMd = createMetadata({
       signature: "scrollToBottom(): void",
     },
     scrollToIndex: {
-      description: "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
+      description:
+        "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
       signature: "scrollToIndex(index: number): void",
       parameters: {
         index: "The index to scroll to.",
       },
     },
     scrollToId: {
-      description: "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
+      description:
+        "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
       signature: "scrollToId(id: string): void",
       parameters: {
         id: "The ID of the item to scroll to.",
@@ -356,7 +369,9 @@ export const ListMd = createMetadata({
     },
   },
   contextVars: {
-    $item: d("Current data item being rendered"),
+    $item: {
+      description: "Current data item being rendered",
+    },
     $itemIndex: dComponent("Zero-based index of current item"),
     $isFirst: dComponent("Boolean indicating if this is the first item"),
     $isLast: dComponent("Boolean indicating if this is the last item"),
@@ -447,8 +462,8 @@ const ListWithSelection = memo(function ListWithSelection({
   renderChildRef.current = renderChild;
   const layoutContextRef = useRef(layoutContext);
   layoutContextRef.current = layoutContext;
-  const stableRenderChildFnRef = useRef<RenderChildFn>(
-    (node: any, ctx: any) => renderChildRef.current(node, ctx),
+  const stableRenderChildFnRef = useRef<RenderChildFn>((node: any, ctx: any) =>
+    renderChildRef.current(node, ctx),
   );
 
   // --- renderVersion counter (L7) ---
@@ -457,7 +472,8 @@ const ListWithSelection = memo(function ListWithSelection({
   const refreshOn = extractValue(node.props.refreshOn);
   const prevRefreshOnRef = useRef<unknown>(refreshOn);
   const renderVersionRef = useRef(0);
-  const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+  const shouldForceRefresh =
+    node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
   if (shouldForceRefresh) {
     prevRefreshOnRef.current = refreshOn;
     renderVersionRef.current++;
@@ -503,10 +519,9 @@ const ListWithSelection = memo(function ListWithSelection({
               pendingOwnWriteVersionRef.current = thisVersion;
               const windowKey = `__listSync_${syncVarName}`;
               (window as any)[windowKey] = { selectedIds, __v: thisVersion };
-              const handler = lookupActionRef.current?.(
-                `{${syncVarName} = window.${windowKey}}`,
-                { ephemeral: true },
-              );
+              const handler = lookupActionRef.current?.(`{${syncVarName} = window.${windowKey}}`, {
+                ephemeral: true,
+              });
               startTransition(() => {
                 handler?.();
               });
@@ -514,7 +529,8 @@ const ListWithSelection = memo(function ListWithSelection({
           };
         } else if (currentSyncVarValue !== syncAdapterHolderRef.current.value) {
           // Detect whether this value change is from our own write or external.
-          const isOwnWrite = pendingOwnWrite ||
+          const isOwnWrite =
+            pendingOwnWrite ||
             (pendingOwnWriteVersionRef.current > 0 &&
               currentSyncVarValue?.__v === pendingOwnWriteVersionRef.current);
 
@@ -641,10 +657,18 @@ const ListWithSelection = memo(function ListWithSelection({
       syncWithAppState={syncAdapter}
       rowUnselectablePredicate={lookupSyncCallback(node.props.rowUnselectablePredicate)}
       hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
-      selectionCheckboxPosition={extractValue.asOptionalString(node.props.selectionCheckboxPosition) as any}
-      selectionCheckboxAnchor={extractValue.asOptionalString(node.props.selectionCheckboxAnchor) as any}
-      selectionCheckboxOffsetX={extractValue.asSize(node.props.selectionCheckboxOffsetX || defaultProps.selectionCheckboxOffsetX) }
-      selectionCheckboxOffsetY={extractValue.asSize(node.props.selectionCheckboxOffsetY || defaultProps.selectionCheckboxOffsetY)}
+      selectionCheckboxPosition={
+        extractValue.asOptionalString(node.props.selectionCheckboxPosition) as any
+      }
+      selectionCheckboxAnchor={
+        extractValue.asOptionalString(node.props.selectionCheckboxAnchor) as any
+      }
+      selectionCheckboxOffsetX={extractValue.asSize(
+        node.props.selectionCheckboxOffsetX || defaultProps.selectionCheckboxOffsetX,
+      )}
+      selectionCheckboxOffsetY={extractValue.asSize(
+        node.props.selectionCheckboxOffsetY || defaultProps.selectionCheckboxOffsetY,
+      )}
       selectionCheckboxSize={extractValue.asSize(node.props.selectionCheckboxSize)}
       onSelectionDidChange={lookupEventHandler("selectionDidChange")}
       onSelectAllAction={lookupEventHandler("selectAllAction")}

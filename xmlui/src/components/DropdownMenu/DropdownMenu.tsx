@@ -5,7 +5,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { alignmentOptionMd, buttonThemeMd, buttonVariantMd, iconPositionMd } from "../abstractions";
-import { createMetadata, d, dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
+import { createMetadata, dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
 import {
   defaultDropdownMenuProps,
@@ -80,8 +80,8 @@ export const DropdownMenuMd = createMetadata({
     modal: {
       isInternal: true,
       description: "internal radix modal prop",
-      valueType: "boolean"
-    }
+      valueType: "boolean",
+    },
   },
   events: {
     willOpen: {
@@ -120,29 +120,41 @@ export const ThemedDropdownMenu = React.forwardRef<HTMLButtonElement, ThemedDrop
   function ThemedDropdownMenu({ className, ...props }: ThemedDropdownMenuProps, ref) {
     const themeClass = useComponentThemeClass(DropdownMenuMd);
     const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
-    return <DropdownMenu {...props} className={combinedClassName} contentClassName={combinedClassName} ref={ref} />;
-  },
-);
-
-export const dropdownMenuComponentRenderer = wrapComponent(DDMCOMP, ThemedDropdownMenu, DropdownMenuMd, {
-  exposeRegisterApi: true,
-  contentClassName: true,
-  exclude: ["enabled"],
-  customRender: (props, { node, extractValue, renderChild }) => {
-    // Filter separators dynamically: accounts for adjacent/leading/trailing separators
-    // and `when` conditions on menu items so hidden items don't leave orphaned separators.
-    const filteredChildren = filterSeparators(node.children, extractValue);
-
     return (
       <DropdownMenu
         {...props}
-        disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
-      >
-        {renderChild(filteredChildren)}
-      </DropdownMenu>
+        className={combinedClassName}
+        contentClassName={combinedClassName}
+        ref={ref}
+      />
     );
   },
-});
+);
+
+export const dropdownMenuComponentRenderer = wrapComponent(
+  DDMCOMP,
+  ThemedDropdownMenu,
+  DropdownMenuMd,
+  {
+    exposeRegisterApi: true,
+    contentClassName: true,
+    exclude: ["enabled"],
+    customRender: (props, { node, extractValue, renderChild }) => {
+      // Filter separators dynamically: accounts for adjacent/leading/trailing separators
+      // and `when` conditions on menu items so hidden items don't leave orphaned separators.
+      const filteredChildren = filterSeparators(node.children, extractValue);
+
+      return (
+        <DropdownMenu
+          {...props}
+          disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
+        >
+          {renderChild(filteredChildren)}
+        </DropdownMenu>
+      );
+    },
+  },
+);
 
 const MICOMP = "MenuItem";
 
@@ -208,7 +220,13 @@ type ThemedMenuItemProps = React.ComponentProps<typeof MenuItem> & { className?:
 export const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemProps>(
   function ThemedMenuItem({ className, ...props }: ThemedMenuItemProps, ref) {
     const themeClass = useComponentThemeClass(MenuItemMd);
-    return <MenuItem {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    return (
+      <MenuItem
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
   },
 );
 
@@ -234,7 +252,10 @@ export const menuItemRenderer = wrapComponent(MICOMP, ThemedMenuItem, MenuItemMd
         onClick={clickHandler}
         icon={
           node.props?.icon && (
-            <ThemedIcon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />
+            <ThemedIcon
+              name={extractValue(node.props.icon)}
+              fallback={extractValue(node.props.icon)}
+            />
           )
         }
       >
@@ -278,7 +299,14 @@ const ThemedSubMenuItem = React.forwardRef<HTMLDivElement, ThemedSubMenuItemProp
   function ThemedSubMenuItem({ className, ...props }: ThemedSubMenuItemProps, ref) {
     const themeClass = useComponentThemeClass(SubMenuItemMd);
     const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
-    return <SubMenuItem {...props} className={combinedClassName} contentClassName={combinedClassName} ref={ref} />;
+    return (
+      <SubMenuItem
+        {...props}
+        className={combinedClassName}
+        contentClassName={combinedClassName}
+        ref={ref}
+      />
+    );
   },
 );
 
@@ -293,11 +321,7 @@ export const subMenuItemRenderer = wrapComponent(SMCOMP, ThemedSubMenuItem, SubM
     return (
       <ThemedSubMenuItem
         {...props}
-        icon={
-          iconName && (
-            <ThemedIcon name={iconName} fallback={iconName} />
-          )
-        }
+        icon={iconName && <ThemedIcon name={iconName} fallback={iconName} />}
       >
         {renderChild(filteredChildren)}
       </ThemedSubMenuItem>
@@ -333,13 +357,16 @@ const MenuSeparatorTyped = MenuSeparator as React.ForwardRefExoticComponent<
 export const ThemedMenuSeparator = React.forwardRef<HTMLDivElement, ThemedMenuSeparatorProps>(
   function ThemedMenuSeparator({ className, ...props }: ThemedMenuSeparatorProps, ref) {
     const themeClass = useComponentThemeClass(MenuSeparatorMd);
-    return <MenuSeparatorTyped {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    return (
+      <MenuSeparatorTyped
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
   },
 );
 
-export const menuSeparatorRenderer = wrapComponent(
-  MSEP,
-  MenuSeparator,
-  MenuSeparatorMd,
-  { customRender: () => <MenuSeparator /> },
-);
+export const menuSeparatorRenderer = wrapComponent(MSEP, MenuSeparator, MenuSeparatorMd, {
+  customRender: () => <MenuSeparator />,
+});

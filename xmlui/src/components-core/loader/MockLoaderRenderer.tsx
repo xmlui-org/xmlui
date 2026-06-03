@@ -12,7 +12,7 @@ import { extractParam } from "../utils/extractParam";
 import { createLoaderRenderer } from "../renderers";
 import { useAppContext } from "../AppContext";
 import { Loader } from "./Loader";
-import { createMetadata, d } from "../../components/metadata-helpers";
+import { createMetadata } from "../../components/metadata-helpers";
 
 type MockLoaderProps = {
   loader: MockLoaderDef;
@@ -62,8 +62,12 @@ export const MockLoaderMd = createMetadata({
   status: "stable",
   description: "A loader that simulates a delay and returns a predefined response",
   props: {
-    waitTime: d("The time to wait before returning the response"),
-    data: d("The data to return"),
+    waitTime: {
+      description: "The time to wait before returning the response",
+    },
+    data: {
+      description: "The data to return",
+    },
   },
 });
 

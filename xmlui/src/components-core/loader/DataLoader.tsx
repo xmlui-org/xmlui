@@ -21,7 +21,7 @@ import { Loader } from "../loader/Loader";
 import { useAppContext } from "../AppContext";
 import { useShallowCompareMemoize } from "../utils/hooks";
 import { useIndexerContext } from "../../components/App/IndexerContext";
-import { createMetadata, d } from "../../components/metadata-helpers";
+import { createMetadata } from "../../components/metadata-helpers";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { createContextVariableError } from "../EngineError";
 import {
@@ -37,29 +37,73 @@ export const DataLoaderMd = createMetadata({
   status: "stable",
   description: "This component manages data fetching from a web API",
   props: {
-    method: d("The HTTP method to use"),
-    url: d("The URL to fetch data from"),
-    rawBody: d("The raw body of the request"),
-    body: d("The body of the request to be sent as JSON"),
-    queryParams: d("Query parameters to send with the request"),
-    headers: d("Headers to send with the request"),
-    credentials: d("Controls whether cookies and credentials are sent with the request (omit, same-origin, or include)"),
-    pollIntervalInSeconds: d("The interval in seconds to poll the API for refreshing data"),
-    resultSelector: d("An expression to extract the result from the response"),
-    prevPageSelector: d("An expression to extract the previous page parameter from the response"),
-    nextPageSelector: d("An expression to extract the next page parameter from the response"),
-    inProgressNotificationMessage: d("The message to show when the loader is in progress"),
-    completedNotificationMessage: d("The message to show when the loader completes"),
-    errorNotificationMessage: d("The message to show when an error occurs"),
-    transformResult: d("Function for transforming the datasource result"),
-    dataType: d("Type of data to fetch (default: json, or csv, sql, or text)"),
-    structuralSharing: d("Whether to use structural sharing for the data"),
-    mockData: d("Data to return directly without making a network request (for development and testing)"),
+    method: {
+      description: "The HTTP method to use",
+    },
+    url: {
+      description: "The URL to fetch data from",
+    },
+    rawBody: {
+      description: "The raw body of the request",
+    },
+    body: {
+      description: "The body of the request to be sent as JSON",
+    },
+    queryParams: {
+      description: "Query parameters to send with the request",
+    },
+    headers: {
+      description: "Headers to send with the request",
+    },
+    credentials: {
+      description:
+        "Controls whether cookies and credentials are sent with the request (omit, same-origin, or include)",
+    },
+    pollIntervalInSeconds: {
+      description: "The interval in seconds to poll the API for refreshing data",
+    },
+    resultSelector: {
+      description: "An expression to extract the result from the response",
+    },
+    prevPageSelector: {
+      description: "An expression to extract the previous page parameter from the response",
+    },
+    nextPageSelector: {
+      description: "An expression to extract the next page parameter from the response",
+    },
+    inProgressNotificationMessage: {
+      description: "The message to show when the loader is in progress",
+    },
+    completedNotificationMessage: {
+      description: "The message to show when the loader completes",
+    },
+    errorNotificationMessage: {
+      description: "The message to show when an error occurs",
+    },
+    transformResult: {
+      description: "Function for transforming the datasource result",
+    },
+    dataType: {
+      description: "Type of data to fetch (default: json, or csv, sql, or text)",
+    },
+    structuralSharing: {
+      description: "Whether to use structural sharing for the data",
+    },
+    mockData: {
+      description:
+        "Data to return directly without making a network request (for development and testing)",
+    },
   },
   events: {
-    loaded: d("Event to trigger when the data is loaded"),
-    error: d("This event fires when an error occurs while fetching data"),
-    fetch: d("When defined, this event handler replaces the default fetch logic"),
+    loaded: {
+      description: "Event to trigger when the data is loaded",
+    },
+    error: {
+      description: "This event fires when an error occurs while fetching data",
+    },
+    fetch: {
+      description: "When defined, this event handler replaces the default fetch logic",
+    },
   },
 });
 
@@ -106,7 +150,7 @@ function DataLoader({
   const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
   const prevDataRef = useRef<any>(undefined);
   const instanceIdRef = useRef<string>(
-    `ds-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`
+    `ds-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`,
   );
 
   // Capture trace ID when fetch is triggered, not when it completes
@@ -120,29 +164,37 @@ function DataLoader({
       xsConsoleLog(...args);
       const detail = args[1];
       const w = typeof window !== "undefined" ? (window as any) : {};
-      pushXsLog({
-        ts: Date.now(),
-        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-        traceId: pendingTraceIdRef.current || getCurrentTrace(),
-        instanceId: instanceIdRef.current,
-        dataSourceId: (loader?.props as any)?.id,
-        dataSourceUrl: loader?.props?.url,
-        dataSourceBody: loader?.props?.body,
-        ownerUid: loader?.uid,
-        ownerFileId: loader?.debug?.source?.fileId,
-        ownerSource: loader?.debug?.source
-          ? { start: loader.debug.source.start, end: loader.debug.source.end }
-          : undefined,
-        text: safeStringify(args),
-        kind: args[0] ?? undefined,
-        eventName: detail?.eventName,
-        uid: detail?.uid ? String(detail.uid) : undefined,
-        componentType: "DataSource",
-        diffPretty: detail?.diffPretty ||
-          (Array.isArray(detail?.diff) && detail.diff.map((d: any) => d?.diffPretty).filter(Boolean).join("\n\n")) ||
-          undefined,
-        diffJson: Array.isArray(detail?.diff) ? detail.diff : undefined,
-      }, xsLogMax);
+      pushXsLog(
+        {
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: pendingTraceIdRef.current || getCurrentTrace(),
+          instanceId: instanceIdRef.current,
+          dataSourceId: (loader?.props as any)?.id,
+          dataSourceUrl: loader?.props?.url,
+          dataSourceBody: loader?.props?.body,
+          ownerUid: loader?.uid,
+          ownerFileId: loader?.debug?.source?.fileId,
+          ownerSource: loader?.debug?.source
+            ? { start: loader.debug.source.start, end: loader.debug.source.end }
+            : undefined,
+          text: safeStringify(args),
+          kind: args[0] ?? undefined,
+          eventName: detail?.eventName,
+          uid: detail?.uid ? String(detail.uid) : undefined,
+          componentType: "DataSource",
+          diffPretty:
+            detail?.diffPretty ||
+            (Array.isArray(detail?.diff) &&
+              detail.diff
+                .map((d: any) => d?.diffPretty)
+                .filter(Boolean)
+                .join("\n\n")) ||
+            undefined,
+          diffJson: Array.isArray(detail?.diff) ? detail.diff : undefined,
+        },
+        xsLogMax,
+      );
     },
     [xsLogMax, xsVerbose, loader],
   );
@@ -164,7 +216,7 @@ function DataLoader({
       return { url: rawUrl, queryParams: rawQueryParams };
     }
 
-    const queryIndex = rawUrl.indexOf('?');
+    const queryIndex = rawUrl.indexOf("?");
     if (queryIndex === -1) {
       // No embedded query params
       return { url: rawUrl, queryParams: rawQueryParams };
@@ -184,9 +236,10 @@ function DataLoader({
 
     // Merge embedded params with explicit queryParams
     // Explicit queryParams take precedence
-    const mergedParams = Object.keys(embeddedParams).length > 0
-      ? { ...embeddedParams, ...rawQueryParams }
-      : rawQueryParams;
+    const mergedParams =
+      Object.keys(embeddedParams).length > 0
+        ? { ...embeddedParams, ...rawQueryParams }
+        : rawQueryParams;
 
     return { url: baseUrl, queryParams: mergedParams };
   }, [rawUrl, rawQueryParams]);
@@ -249,8 +302,7 @@ function DataLoader({
       if (onFetch) {
         const resolvedMethod = extractParam(state, loader.props.method, appContext) || "GET";
         const resolvedHeaders = extractParam(state, loader.props.headers, appContext) || {};
-        const resolvedQueryParams =
-          extractParam(state, loader.props.queryParams, appContext) || {};
+        const resolvedQueryParams = extractParam(state, loader.props.queryParams, appContext) || {};
         const resolvedBody = rawBody
           ? extractParam(state, loader.props.rawBody, appContext)
           : extractParam(state, loader.props.body, appContext);
@@ -272,7 +324,10 @@ function DataLoader({
           const method = extractParam(state, loader.props.method, appContext) || "GET";
           const headers = extractParam(state, loader.props.headers, appContext) || {};
           const fetchUrl = api.resolveUrl({ operation: { url, queryParams } as any });
-          const response = await fetch(fetchUrl, buildSimpleFetchOptions(method, headers, abortSignal, rawBody));
+          const response = await fetch(
+            fetchUrl,
+            buildSimpleFetchOptions(method, headers, abortSignal, rawBody),
+          );
 
           if (!response.ok) {
             throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
@@ -311,7 +366,10 @@ function DataLoader({
           const method = extractParam(state, loader.props.method, appContext) || "GET";
           const headers = extractParam(state, loader.props.headers, appContext) || {};
           const fetchUrl = api.resolveUrl({ operation: { url, queryParams } as any });
-          const response = await fetch(fetchUrl, buildSimpleFetchOptions(method, headers, abortSignal, rawBody));
+          const response = await fetch(
+            fetchUrl,
+            buildSimpleFetchOptions(method, headers, abortSignal, rawBody),
+          );
           if (!response.ok) {
             throw new Error(`Failed to fetch text: ${response.status} ${response.statusText}`);
           }
@@ -369,14 +427,17 @@ function DataLoader({
 
         // Trace API call start
         if (xsVerbose) {
-          pushXsLog({
-            ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
-            kind: "api:start",
-            url: queryUrl,
-            method,
-            dataType: "sql",
-            body: { sql: sqlQuery, params: sqlParams },
-          }, xsLogMax);
+          pushXsLog(
+            {
+              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
+              kind: "api:start",
+              url: queryUrl,
+              method,
+              dataType: "sql",
+              body: { sql: sqlQuery, params: sqlParams },
+            },
+            xsLogMax,
+          );
         }
 
         try {
@@ -386,15 +447,18 @@ function DataLoader({
             const errorMsg = `Failed to execute SQL query: ${response.status} ${response.statusText}`;
             // Trace API call error
             if (xsVerbose) {
-              pushXsLog({
-                ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
-                kind: "api:error",
-                url: queryUrl,
-                method,
-                dataType: "sql",
-                error: { message: errorMsg },
-                status: response.status,
-              }, xsLogMax);
+              pushXsLog(
+                {
+                  ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
+                  kind: "api:error",
+                  url: queryUrl,
+                  method,
+                  dataType: "sql",
+                  error: { message: errorMsg },
+                  status: response.status,
+                },
+                xsLogMax,
+              );
             }
             throw new Error(errorMsg);
           }
@@ -415,29 +479,39 @@ function DataLoader({
 
           // Trace API call completion
           if (xsVerbose) {
-            pushXsLog({
-              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
-              kind: "api:complete",
-              url: queryUrl,
-              method,
-              dataType: "sql",
-              result: finalResult,
-              status: response.status,
-            }, xsLogMax);
+            pushXsLog(
+              {
+                ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
+                kind: "api:complete",
+                url: queryUrl,
+                method,
+                dataType: "sql",
+                result: finalResult,
+                status: response.status,
+              },
+              xsLogMax,
+            );
           }
 
           return finalResult;
         } catch (error: any) {
           // Trace API call error (for network errors, etc.)
-          if (xsVerbose && error?.message && !error.message.startsWith("Failed to execute SQL query:")) {
-            pushXsLog({
-              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
-              kind: "api:error",
-              url: queryUrl,
-              method,
-              dataType: "sql",
-              error: { message: error?.message || String(error), stack: error?.stack },
-            }, xsLogMax);
+          if (
+            xsVerbose &&
+            error?.message &&
+            !error.message.startsWith("Failed to execute SQL query:")
+          ) {
+            pushXsLog(
+              {
+                ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
+                kind: "api:error",
+                url: queryUrl,
+                method,
+                dataType: "sql",
+                error: { message: error?.message || String(error), stack: error?.stack },
+              },
+              xsLogMax,
+            );
           }
           console.error("Error executing SQL query:", error);
           throw error;
@@ -446,13 +520,16 @@ function DataLoader({
         // Trace API call start
         if (xsVerbose) {
           const method = (loader.props as any).method || "GET";
-          pushXsLog({
-            ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
-            kind: "api:start",
-            url,
-            method,
-            body: body || rawBody,
-          }, xsLogMax);
+          pushXsLog(
+            {
+              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
+              kind: "api:start",
+              url,
+              method,
+              body: body || rawBody,
+            },
+            xsLogMax,
+          );
         }
 
         try {
@@ -473,13 +550,16 @@ function DataLoader({
           // Trace API call completion
           if (xsVerbose) {
             const method = (loader.props as any).method || "GET";
-            pushXsLog({
-              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
-              kind: "api:complete",
-              url,
-              method,
-              result,
-            }, xsLogMax);
+            pushXsLog(
+              {
+                ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
+                kind: "api:complete",
+                url,
+                method,
+                result,
+              },
+              xsLogMax,
+            );
           }
 
           return result;
@@ -487,19 +567,34 @@ function DataLoader({
           // Trace API call error
           if (xsVerbose) {
             const method = (loader.props as any).method || "GET";
-            pushXsLog({
-              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
-              kind: "api:error",
-              url,
-              method,
-              error: { message: e?.message || String(e), stack: e?.stack },
-            }, xsLogMax);
+            pushXsLog(
+              {
+                ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
+                kind: "api:error",
+                url,
+                method,
+                error: { message: e?.message || String(e), stack: e?.stack },
+              },
+              xsLogMax,
+            );
           }
           throw e;
         }
       }
     },
-    [api, loader.props, state, url, queryParams, body, rawBody, appContext, xsVerbose, xsLogMax, onFetch],
+    [
+      api,
+      loader.props,
+      state,
+      url,
+      queryParams,
+      body,
+      rawBody,
+      appContext,
+      xsVerbose,
+      xsLogMax,
+      onFetch,
+    ],
   );
 
   const queryId = useMemo(() => {
@@ -548,7 +643,8 @@ function DataLoader({
       if (xsVerbose) {
         const before = prevDataRef.current;
         const after = data;
-        const dataSourceId = (loader.props as any).id || loader.uid || loader.props.url || "DataSource";
+        const dataSourceId =
+          (loader.props as any).id || loader.uid || loader.props.url || "DataSource";
         const path = `DataSource:${dataSourceId}`;
         xsLog("state:changes", {
           uid: dataSourceId,
@@ -561,7 +657,11 @@ function DataLoader({
         pendingTraceIdRef.current = undefined;
       }
 
-      loaderLoaded(data, pageInfo, data !== undefined ? pendingResponseHeadersRef.current : undefined);
+      loaderLoaded(
+        data,
+        pageInfo,
+        data !== undefined ? pendingResponseHeadersRef.current : undefined,
+      );
 
       const completedMessage = extractParam(
         {

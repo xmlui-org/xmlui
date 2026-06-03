@@ -6,7 +6,6 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -84,20 +83,20 @@ export const NumberBoxMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.hasSpinBox,
     },
-    spinnerUpIcon: d(
-      `Allows setting an alternate icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
+    spinnerUpIcon: {
+      description:
+        `Allows setting an alternate icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
         `the default icon for all ${COMP} instances with the "icon.spinnerUp:NumberBox" declaration in the ` +
         `app configuration file.`,
-      undefined,
-      "icon",
-    ),
-    spinnerDownIcon: d(
-      `Allows setting an alternate icon displayed in the ${COMP} spinner for decrementing values. You can change ` +
+      valueType: "icon",
+    },
+    spinnerDownIcon: {
+      description:
+        `Allows setting an alternate icon displayed in the ${COMP} spinner for decrementing values. You can change ` +
         `the default icon for all ${COMP} instances with the "icon.spinnerDown:NumberBox" declaration in the ` +
         `app configuration file.`,
-      undefined,
-      "icon",
-    ),
+      valueType: "icon",
+    },
     step: {
       description: `This prop governs how big the step when clicking on the spinner of the field.`,
       valueType: "number",

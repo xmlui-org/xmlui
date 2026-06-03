@@ -4,7 +4,7 @@ import navLinkStyles from "../NavLink/NavLink.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ThemedIcon } from "../Icon/Icon";
-import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, dEnabled, dLabel } from "../metadata-helpers";
 import { defaultProps } from "./NavGroup.defaults";
 import { NavGroup } from "./NavGroupReact";
 
@@ -19,12 +19,12 @@ export const NavGroupMd = createMetadata({
     "icons and states.",
   props: {
     label: dLabel(),
-    initiallyExpanded: d(
-      "This property defines whether the group is initially expanded or collapsed. If not " +
+    initiallyExpanded: {
+      description:
+        "This property defines whether the group is initially expanded or collapsed. If not " +
         "defined, the group is collapsed by default.",
-      undefined,
-      "boolean",
-    ),
+      valueType: "boolean",
+    },
     enabled: dEnabled(),
     to: {
       description: `This property defines an optional navigation link.`,
@@ -120,7 +120,9 @@ export const navGroupComponentRenderer = wrapComponent(COMP, NavGroup, NavGroupM
       label={extractValue.asDisplayText(node.props.label)}
       disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
       to={extractValue.asOptionalString(node.props.to)}
-      icon={<ThemedIcon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
+      icon={
+        <ThemedIcon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />
+      }
       node={node}
       initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
       noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}

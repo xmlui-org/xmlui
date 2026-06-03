@@ -19,7 +19,6 @@ import {
   dMulti,
   dComponent,
   createMetadata,
-  d,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { defaultProps } from "./Select.defaults";
@@ -79,11 +78,12 @@ export const SelectMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
-    variant: d(
-      "Controls the visual border treatment. `outlined` matches the border color of an outlined Button, " +
+    variant: {
+      description:
+        "Controls the visual border treatment. `outlined` matches the border color of an outlined Button, " +
         "so that a Select can be visually composed next to one. Only the border color (and its hover/focus " +
         "states) is affected; padding, background, and typography are unchanged.",
-      [
+      availableValues: [
         { value: "default", description: "Standard input border using the surface color." },
         {
           value: "outlined",
@@ -91,26 +91,26 @@ export const SelectMd = createMetadata({
             "Accent border using the shared `borderColor-outlined` token, matching outlined Buttons.",
         },
       ],
-      "string",
-      defaultProps.variant,
-    ),
-    data: d(
-      "The data array to populate the option list from. When provided, `Option` children are not needed — " +
+      valueType: "string",
+      defaultValue: defaultProps.variant,
+    },
+    data: {
+      description:
+        "The data array to populate the option list from. When provided, `Option` children are not needed — " +
         "the component builds options from this array using `valueField` and `labelField`. " +
         "This is the most efficient approach for large lists because the options are derived in JavaScript " +
         "and re-evaluated only when the data reference changes, not on every unrelated state update.",
-      undefined,
-      "any",
-    ),
+      valueType: "any",
+    },
     valueField: {
       description:
-        "The property name of each data item to use as the option value when `data` is provided. Defaults to `\"value\"`.",
+        'The property name of each data item to use as the option value when `data` is provided. Defaults to `"value"`.',
       valueType: "string",
       defaultValue: "value",
     },
     labelField: {
       description:
-        "The property name of each data item to use as the option label when `data` is provided. Defaults to `\"label\"`.",
+        'The property name of each data item to use as the option label when `data` is provided. Defaults to `"label"`.',
       valueType: "string",
       defaultValue: "label",
     },
@@ -124,11 +124,11 @@ export const SelectMd = createMetadata({
       `This property allows replacing the default template to display a selected value. ` +
         `It works in both single-select and multi-select modes (\`multiSelect\` is \`true\`).`,
     ),
-    dropdownHeight: d(
-      "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
-      undefined,
-      "length",
-    ),
+    dropdownHeight: {
+      description:
+        "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
+      valueType: "length",
+    },
     scrollIndicators: {
       description:
         "This property controls whether scroll indicator arrows are displayed at the top and bottom of the dropdown list when the content overflows.",
@@ -228,9 +228,15 @@ export const SelectMd = createMetadata({
     },
   },
   contextVars: {
-    $item: d("Represents the current option's data (label and value properties)"),
-    $itemContext: d("Provides the `removeItem()` method for multi-select scenarios"),
-    $group: d("Group name when using `groupBy` (available in group header templates)"),
+    $item: {
+      description: "Represents the current option's data (label and value properties)",
+    },
+    $itemContext: {
+      description: "Provides the `removeItem()` method for multi-select scenarios",
+    },
+    $group: {
+      description: "Group name when using `groupBy` (available in group header templates)",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

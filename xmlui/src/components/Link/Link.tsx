@@ -2,7 +2,7 @@ import styles from "./Link.module.scss";
 
 import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd, alignmentOptionValues } from "../abstractions";
 import { defaultProps } from "./Link.defaults";
 import { LinkNative } from "./LinkReact";
@@ -21,12 +21,13 @@ export const LinkMd = createMetadata({
   parts: {
     icon: {
       description: "The icon within the Link component.",
-    }
+    },
   },
   props: {
-    to: d(
-      "This property defines the URL of the link. If the value is not defined, the link cannot be activated.",
-    ),
+    to: {
+      description:
+        "This property defines the URL of the link. If the value is not defined, the link cannot be activated.",
+    },
     enabled: dEnabled(),
     active: {
       description: `Indicates whether this link is active or not. If so, it will have a distinct visual appearance.`,
@@ -46,9 +47,9 @@ export const LinkMd = createMetadata({
       valueType: "string",
     },
     label: dLabel(),
-    icon: d(
-      `This property allows you to add an optional icon (specify the icon's name) to the link.`,
-    ),
+    icon: {
+      description: `This property allows you to add an optional icon (specify the icon's name) to the link.`,
+    },
     horizontalAlignment: {
       description: "Manages the horizontal content alignment for child elements in the Link.",
       availableValues: alignmentOptionValues,
@@ -164,7 +165,7 @@ export const LinkMd = createMetadata({
       [`textColor-${COMP}`]: "$color-primary-600",
       [`textColor-${COMP}--hover`]: `$color-primary-500`,
       [`textColor-${COMP}--active`]: "$color-primary-500",
-    }
+    },
   },
 });
 
@@ -175,15 +176,16 @@ type ThemedLinkNativeProps = React.ComponentProps<typeof LinkNative> & { classNa
 export const ThemedLinkNative = React.forwardRef<HTMLDivElement, ThemedLinkNativeProps>(
   function ThemedLinkNative({ className, ...props }: ThemedLinkNativeProps, ref) {
     const themeClass = useComponentThemeClass(LinkMd);
-    return <LinkNative {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    return (
+      <LinkNative
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
   },
 );
 
-export const localLinkComponentRenderer = wrapComponent(
-  COMP,
-  ThemedLinkNative,
-  LinkMd,
-  {
-    deriveAriaLabel: (props) => props.label,
-  },
-);
+export const localLinkComponentRenderer = wrapComponent(COMP, ThemedLinkNative, LinkMd, {
+  deriveAriaLabel: (props) => props.label,
+});

@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { MemoizedItem } from "../../components/container-helpers";
 import { defaultProps } from "../../components/Accordion/AccordionItem.defaults";
@@ -13,8 +13,9 @@ export const AccordionItemMd = createMetadata({
     `${COMP} instances from which the user can select.`,
   props: {
     header: {
-      description: "This property declares the text used in the component's header. If not provided, the header will be empty.",
-      valueType: "string"
+      description:
+        "This property declares the text used in the component's header. If not provided, the header will be empty.",
+      valueType: "string",
     },
     headerTemplate: dComponent(
       "This property describes the template to use as the component's header.",
@@ -22,37 +23,39 @@ export const AccordionItemMd = createMetadata({
     initiallyExpanded: {
       description: `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
       valueType: "boolean",
-      defaultValue: defaultProps.initiallyExpanded
+      defaultValue: defaultProps.initiallyExpanded,
     },
   },
 });
 
-export const accordionItemComponentRenderer = createComponentRenderer(
+export const accordionItemComponentRenderer = wrapComponent(
   COMP,
+  AccordionItemComponent,
   AccordionItemMd,
-  (rendererContext) => {
-    const { node, renderChild, extractValue, classes } = rendererContext;
-    return (
-      <AccordionItemComponent
-        classes={classes}
-        id={extractValue(node.uid)}
-        header={extractValue(node.props.header)}
-        initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
-        headerRenderer={
-          node.props.headerTemplate
-            ? (item) => (
-                <MemoizedItem
-                  node={node.props.headerTemplate ?? ({ type: "Fragment" } as any)}
-                  contextVars={{
-                    $item: item,
-                  }}
-                  renderChild={renderChild}
-                />
-              )
-            : undefined
-        }
-        content={renderChild(node.children)}
-      />
-    );
+  {
+    customRender: (_props, { node, renderChild, extractValue, classes }) => {
+      return (
+        <AccordionItemComponent
+          classes={classes}
+          id={extractValue(node.uid)}
+          header={extractValue(node.props.header)}
+          initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
+          headerRenderer={
+            node.props.headerTemplate
+              ? (item) => (
+                  <MemoizedItem
+                    node={node.props.headerTemplate ?? ({ type: "Fragment" } as any)}
+                    contextVars={{
+                      $item: item,
+                    }}
+                    renderChild={renderChild}
+                  />
+                )
+              : undefined
+          }
+          content={renderChild(node.children)}
+        />
+      );
+    },
   },
 );

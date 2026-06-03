@@ -1,6 +1,6 @@
 import { defaultProps } from "./LineChart.defaults";
 import { LineChart } from "./LineChartReact";
-import { wrapComponent, createMetadata, type ComponentMetadata, d, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata, parseScssVar } from "xmlui";
 import styles from "./LineChart.module.scss";
 
 const COMP = "LineChart";
@@ -26,6 +26,7 @@ export const LineChartMd: ComponentMetadata = createMetadata({
     yKeys: {
       description:
         "This property specifies the keys in the data objects that should be used for rendering the lines.",
+      valueType: "string[]",
     },
     hideX: {
       description:
@@ -74,10 +75,18 @@ export const LineChartMd: ComponentMetadata = createMetadata({
     tooltipTemplate: {
       description: "This property allows replacing the default template to display a tooltip.",
     },
-    marginTop: d("The top margin of the chart"),
-    marginRight: d("The right margin of the chart"),
-    marginBottom: d("The bottom margin of the chart"),
-    marginLeft: d("The left margin of the chart"),
+    marginTop: {
+      description: "The top margin of the chart",
+    },
+    marginRight: {
+      description: "The right margin of the chart",
+    },
+    marginBottom: {
+      description: "The bottom margin of the chart",
+    },
+    marginLeft: {
+      description: "The left margin of the chart",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

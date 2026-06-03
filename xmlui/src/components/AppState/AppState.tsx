@@ -1,5 +1,5 @@
-import { createComponentRenderer } from "../../components-core/renderers";
-import { createMetadata, d } from "../metadata-helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { createMetadata } from "../metadata-helpers";
 import { defaultProps } from "./AppState.defaults";
 import { AppState } from "./AppStateReact";
 
@@ -22,7 +22,8 @@ export const AppStateMd = createMetadata({
         "the new state value as its parameter.",
       signature: "(updateInfo: { bucket: string; value: any; previousValue: any }) => void",
       parameters: {
-        updateInfo: "An object containing the bucket name, the new state value, and the previous value.",
+        updateInfo:
+          "An object containing the bucket name, the new state value, and the previous value.",
       },
     },
   },
@@ -87,18 +88,9 @@ export const AppStateMd = createMetadata({
   nonVisual: true,
 });
 
-export const appStateComponentRenderer = createComponentRenderer(
-  COMP,
-  AppStateMd,
-  ({ node, extractValue, updateState, registerComponentApi, lookupEventHandler }) => {
-    return (
-      <AppState
-        bucket={extractValue(node.props.bucket)}
-        initialValue={extractValue(node.props.initialValue)}
-        updateState={updateState}
-        registerComponentApi={registerComponentApi}
-        onDidUpdate={lookupEventHandler("didUpdate")}
-      />
-    );
+export const appStateComponentRenderer = wrapComponent(COMP, AppState, AppStateMd, {
+  exposeRegisterApi: true,
+  events: {
+    didUpdate: "onDidUpdate",
   },
-);
+});

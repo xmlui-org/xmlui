@@ -7,7 +7,6 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -60,12 +59,11 @@ export const SliderMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.step,
     },
-    minStepsBetweenThumbs: d(
-      `This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.`,
-      undefined,
-      "number",
-      1,
-    ),
+    minStepsBetweenThumbs: {
+      description: `This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.`,
+      valueType: "number",
+      defaultValue: 1,
+    },
     enabled: dEnabled(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -74,16 +72,14 @@ export const SliderMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: "none",
     },
-    rangeStyle: d(
-      `This optional property allows you to apply custom styles to the range element of the slider.`,
-      undefined,
-      "hash",
-    ),
-    thumbStyle: d(
-      `This optional property allows you to apply custom styles to the thumb elements of the slider.`,
-      undefined,
-      "hash",
-    ),
+    rangeStyle: {
+      description: `This optional property allows you to apply custom styles to the range element of the slider.`,
+      valueType: "hash",
+    },
+    thumbStyle: {
+      description: `This optional property allows you to apply custom styles to the thumb elements of the slider.`,
+      valueType: "hash",
+    },
     showValues: {
       description: `This property controls whether the slider shows the current values of the thumbs.`,
       valueType: "boolean",
@@ -113,7 +109,8 @@ export const SliderMd = createMetadata({
       description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
       signature: "setValue(value: number | [number, number] | undefined): void",
       parameters: {
-        value: "The new value to set. Can be a single value or an array of values for range sliders.",
+        value:
+          "The new value to set. Can be a single value or an array of values for range sliders.",
       },
     },
   },
@@ -158,11 +155,7 @@ export const ThemedSlider = React.forwardRef<React.ElementRef<typeof Slider>, Th
   function ThemedSlider({ className, ...props }, ref) {
     const themeClass = useComponentThemeClass(SliderMd);
     return (
-      <Slider
-        {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
-        ref={ref}
-      />
+      <Slider {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
     );
   },
 );
@@ -172,7 +165,19 @@ export const sliderComponentRenderer = wrapComponent(COMP, Slider, SliderMd, {
   // for non-numeric strings (e.g. "invalid"). invalidMessages is handled by form wrappers and should
   // not leak to the underlying slider DOM.
   exclude: ["minValue", "maxValue", "minStepsBetweenThumbs", "invalidMessages"],
-  customRender: (props, { node, extractValue, lookupEventHandler, lookupSyncCallback, classes, updateState, state, registerComponentApi }) => {
+  customRender: (
+    props,
+    {
+      node,
+      extractValue,
+      lookupEventHandler,
+      lookupSyncCallback,
+      classes,
+      updateState,
+      state,
+      registerComponentApi,
+    },
+  ) => {
     const {
       invalidMessages: _invalidMessages,
       labelPosition: _labelPosition,

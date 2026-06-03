@@ -4,7 +4,6 @@ import {
   wrapCompound,
   createMetadata,
   type ComponentMetadata,
-  d,
   dDidChange,
   dEnabled,
   dInitialValue,
@@ -31,20 +30,46 @@ export const GaugeMd: ComponentMetadata = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.maxValue,
     },
-    analogDisplayType: d(
-      "Display type: 'needle', 'fill', or 'line'.",
-      undefined, "string", defaultProps.analogDisplayType,
-    ),
-    digitalDisplay: d("Show digital value display.", undefined, "boolean", defaultProps.digitalDisplay),
-    startAngle: d("Start angle in degrees.", undefined, "number", defaultProps.startAngle),
-    endAngle: d("End angle in degrees.", undefined, "number", defaultProps.endAngle),
-    scalePosition: d(
-      "Scale position: 'inside', 'outside', or 'none'.",
-      undefined, "string", defaultProps.scalePosition,
-    ),
-    animation: d("Animation type: 'none' or 'advanced'.", undefined, "string", defaultProps.animation),
-    unit: d("Unit text appended to values.", undefined, "string", defaultProps.unit),
-    showUnit: d("Whether to show the unit.", undefined, "boolean", defaultProps.showUnit),
+    analogDisplayType: {
+      description: "Display type: 'needle', 'fill', or 'line'.",
+      valueType: "string",
+      defaultValue: defaultProps.analogDisplayType,
+    },
+    digitalDisplay: {
+      description: "Show digital value display.",
+      valueType: "boolean",
+      defaultValue: defaultProps.digitalDisplay,
+    },
+    startAngle: {
+      description: "Start angle in degrees.",
+      valueType: "number",
+      defaultValue: defaultProps.startAngle,
+    },
+    endAngle: {
+      description: "End angle in degrees.",
+      valueType: "number",
+      defaultValue: defaultProps.endAngle,
+    },
+    scalePosition: {
+      description: "Scale position: 'inside', 'outside', or 'none'.",
+      valueType: "string",
+      defaultValue: defaultProps.scalePosition,
+    },
+    animation: {
+      description: "Animation type: 'none' or 'advanced'.",
+      valueType: "string",
+      defaultValue: defaultProps.animation,
+    },
+    unit: {
+      description: "Unit text appended to values.",
+      valueType: "string",
+      defaultValue: defaultProps.unit,
+    },
+    showUnit: {
+      description: "Whether to show the unit.",
+      valueType: "boolean",
+      defaultValue: defaultProps.showUnit,
+    },
     enabled: dEnabled(),
   },
   events: {

@@ -1,7 +1,7 @@
 import styles from "./App.module.scss";
 import drawerStyles from "./Sheet.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 
 import { createMetadata, dComponent } from "../metadata-helpers";
@@ -91,34 +91,34 @@ export const AppMd = createMetadata({
     },
     autoDetectTone: {
       description:
-        'This boolean property enables automatic detection of the system theme preference. ' +
-        'When set to true and no defaultTone is specified, the app will automatically use ' +
+        "This boolean property enables automatic detection of the system theme preference. " +
+        "When set to true and no defaultTone is specified, the app will automatically use " +
         '"light" or "dark" tone based on the user\'s system theme setting. The app will ' +
-        'also respond to changes in the system theme preference.',
+        "also respond to changes in the system theme preference.",
       valueType: "boolean",
       defaultValue: defaultProps.autoDetectTone,
     },
     persistTheme: {
       description:
         'When set to `true`, both the current theme ID and tone ("light" or "dark") are ' +
-        'automatically saved to `localStorage` and restored on the next visit. The persisted ' +
-        'values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.',
+        "automatically saved to `localStorage` and restored on the next visit. The persisted " +
+        "values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.",
       valueType: "boolean",
       defaultValue: defaultProps.persistTheme,
       isInternal: true,
     },
     themeStorageKey: {
       description:
-        'The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. ' +
-        'Change this if you need to namespace the key per-app or per-user.',
+        "The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. " +
+        "Change this if you need to namespace the key per-app or per-user.",
       valueType: "string",
       defaultValue: defaultProps.themeStorageKey,
       isInternal: true,
     },
     toneStorageKey: {
       description:
-        'The `localStorage` key used to persist the tone when `persistTheme` is `true`. ' +
-        'Change this if you need to namespace the key per-app or per-user.',
+        "The `localStorage` key used to persist the tone when `persistTheme` is `true`. " +
+        "Change this if you need to namespace the key per-app or per-user.",
       valueType: "string",
       defaultValue: defaultProps.toneStorageKey,
       isInternal: true,
@@ -129,7 +129,8 @@ export const AppMd = createMetadata({
       isInternal: true,
     },
     localeBundles: {
-      description: "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map.",
+      description:
+        "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map.",
       valueType: "any",
       isInternal: true,
     },
@@ -229,7 +230,8 @@ export const AppMd = createMetadata({
         `returning \`null\`, \`undefined\`, or any other value proceeds with normal navigation. ` +
         `Note: This event does NOT fire for Link clicks or browser back/forward navigation due to React Router limitations ` +
         `(event handlers are async, but router blocking is synchronous).`,
-      signature: "(to: string | number, queryParams?: Record<string, any>) => Promise<false | void | null | undefined>",
+      signature:
+        "(to: string | number, queryParams?: Record<string, any>) => Promise<false | void | null | undefined>",
       parameters: {
         to: "The target path or history delta (e.g., -1 for back) to navigate to.",
         queryParams: "Optional query parameters to include in the navigation.",
@@ -299,8 +301,14 @@ export const AppMd = createMetadata({
   },
 });
 
-
-function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) {
+function AppNode({
+  node,
+  extractValue,
+  renderChild,
+  classes,
+  lookupEventHandler,
+  registerComponentApi,
+}) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
@@ -322,7 +330,9 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       if (originalNavPanel) {
         NavPanel = {
           ...originalNavPanel,
-          children: originalNavPanel.children ? [...originalNavPanel.children, ...extraNavs] : extraNavs,
+          children: originalNavPanel.children
+            ? [...originalNavPanel.children, ...extraNavs]
+            : extraNavs,
         };
       } else {
         NavPanel = {
@@ -336,17 +346,20 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
 
   // Determine if default content padding should be applied
   // Only apply if Pages is not present AND padding/paddingTop is not explicitly set
-  const hasExplicitPadding = node.props.padding !== undefined
+  const hasExplicitPadding = node.props.padding !== undefined;
   const applyDefaultContentPadding = !Pages && !hasExplicitPadding;
-  const footerSticky = Footer?.props?.sticky !== undefined
-    ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
-    : true;
+  const footerSticky =
+    Footer?.props?.sticky !== undefined
+      ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
+      : true;
   const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
   const fitContent = extractValue.asOptionalBoolean(node.props.fitContent, false);
 
   // When scrollWholePage is false, pageContentContainer is a vertical flex container
   // Pass layout context so children can properly resolve star sizing
-  const contentLayoutContext = !scrollWholePage ? { type: "Stack" as const, orientation: "vertical" as const } : undefined;
+  const contentLayoutContext = !scrollWholePage
+    ? { type: "Stack" as const, orientation: "vertical" as const }
+    : undefined;
 
   return (
     <AppComponent
@@ -379,7 +392,6 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       direction={extractValue.asOptionalString(node.props.direction, "auto")}
       scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
       maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}
-
       applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader)}
       footer={renderChild(Footer)}
@@ -396,10 +408,11 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
   );
 }
 
-export const appRenderer = createComponentRenderer(
-  COMP,
-  AppMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+export const appRenderer = wrapComponent(COMP, AppNode, AppMd, {
+  customRender: (
+    _props,
+    { node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi },
+  ) => {
     return (
       <AppNode
         node={node}
@@ -411,4 +424,4 @@ export const appRenderer = createComponentRenderer(
       />
     );
   },
-);
+});

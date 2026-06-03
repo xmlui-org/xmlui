@@ -5,14 +5,14 @@ import type {
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
 } from "../abstractions/LoaderRenderer";
-import type { ComponentDef} from "../../abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import { removeNullProperties } from "../utils/misc";
 import { extractParam } from "../utils/extractParam";
 import { createLoaderRenderer } from "../renderers";
 import { useAppContext } from "../AppContext";
 import { Loader } from "./Loader";
-import { createMetadata, d } from "../../components/metadata-helpers";
+import { createMetadata } from "../../components/metadata-helpers";
 
 /**
  * Properties of the Data loader component
@@ -86,10 +86,18 @@ export const ExternalDataLoaderMd = createMetadata({
   status: "stable",
   description: `Represents a loader that calls an API through an HTTP/HTTPS GET request`,
   props: {
-    url: d("URL segment to use in the GET request"),
-    method: d("The HTTP method to use"),
-    headers: d("Headers to send with the request"),
-    data: d("The body of the request to be sent as JSON"),
+    url: {
+      description: "URL segment to use in the GET request",
+    },
+    method: {
+      description: "The HTTP method to use",
+    },
+    headers: {
+      description: "Headers to send with the request",
+    },
+    data: {
+      description: "The body of the request to be sent as JSON",
+    },
   },
 });
 
@@ -97,7 +105,14 @@ type ExternalDataLoaderDef = ComponentDef<typeof ExternalDataLoaderMd>;
 
 export const externalDataLoaderRenderer = createLoaderRenderer(
   "ExternalDataLoader",
-  ({ loader, state, loaderInProgressChanged, loaderIsRefetchingChanged, loaderError, loaderLoaded }) => {
+  ({
+    loader,
+    state,
+    loaderInProgressChanged,
+    loaderIsRefetchingChanged,
+    loaderError,
+    loaderLoaded,
+  }) => {
     return (
       <ExternalDataLoader
         loader={loader}

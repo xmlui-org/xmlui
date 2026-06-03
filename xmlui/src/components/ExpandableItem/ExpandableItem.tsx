@@ -3,8 +3,13 @@ import styles from "./ExpandableItem.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { iconPositionMd } from "../abstractions";
-import { createMetadata, d, dComponent } from "../../components/metadata-helpers";
-import { defaultExpandableItemProps, ExpandableItem, PART_CONTENT, PART_SUMMARY } from "./ExpandableItemReact";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
+import {
+  defaultExpandableItemProps,
+  ExpandableItem,
+  PART_CONTENT,
+  PART_SUMMARY,
+} from "./ExpandableItemReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 
@@ -59,23 +64,25 @@ export const ExpandableItemMd = createMetadata({
       defaultValue: defaultExpandableItemProps.withSwitch,
     },
     contentWidth: {
-      description: "Sets the width of the expanded content area. Defaults to 100% to fill the parent container.",
+      description:
+        "Sets the width of the expanded content area. Defaults to 100% to fill the parent container.",
       valueType: "string",
       defaultValue: defaultExpandableItemProps.contentWidth,
     },
     fullWidthSummary: {
-      description: "When true, the summary section takes the full width of the parent container. When combined with iconPosition='end', the icon is aligned to the far edge.",
+      description:
+        "When true, the summary section takes the full width of the parent container. When combined with iconPosition='end', the icon is aligned to the far edge.",
       valueType: "boolean",
       defaultValue: defaultExpandableItemProps.fullWidthSummary,
     },
   },
   events: {
     expandedChange: {
-      description:
-        `This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`,
+      description: `This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`,
       signature: "expandedChange(isExpanded: boolean): void",
       parameters: {
-        isExpanded: "A boolean indicating whether the item is now expanded (true) or collapsed (false).",
+        isExpanded:
+          "A boolean indicating whether the item is now expanded (true) or collapsed (false).",
       },
     },
   },
@@ -129,70 +136,79 @@ export const ExpandableItemMd = createMetadata({
 
 type ThemedExpandableItemProps = React.ComponentPropsWithoutRef<typeof ExpandableItem>;
 
-export const ThemedExpandableItem = React.forwardRef<React.ElementRef<typeof ExpandableItem>, ThemedExpandableItemProps>(
-  function ThemedExpandableItem({ className, ...props }, ref) {
-    const themeClass = useComponentThemeClass(ExpandableItemMd);
-    return (
-      <ExpandableItem
-        {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
-        ref={ref}
-      />
-    );
+export const ThemedExpandableItem = React.forwardRef<
+  React.ElementRef<typeof ExpandableItem>,
+  ThemedExpandableItemProps
+>(function ThemedExpandableItem({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(ExpandableItemMd);
+  return (
+    <ExpandableItem
+      {...props}
+      className={`${themeClass}${className ? ` ${className}` : ""}`}
+      ref={ref}
+    />
+  );
+});
+
+export const expandableItemComponentRenderer = wrapComponent(
+  COMP,
+  ExpandableItem,
+  ExpandableItemMd,
+  {
+    exposeRegisterApi: true,
+    exclude: ["summary"],
+    customRender: (
+      _props,
+      { node, renderChild, lookupEventHandler, registerComponentApi, extractValue, classes },
+    ) => {
+      // summary can be a ComponentDef (render via renderChild) or a plain value (extract as string)
+      const summaryProp = node.props?.summary;
+      const summaryContent = summaryProp
+        ? typeof summaryProp === "object" && summaryProp.type
+          ? renderChild(summaryProp)
+          : extractValue(summaryProp)
+        : undefined;
+
+      return (
+        <ExpandableItem
+          summary={summaryContent}
+          initiallyExpanded={extractValue.asOptionalBoolean(
+            node.props.initiallyExpanded,
+            defaultExpandableItemProps.initiallyExpanded,
+          )}
+          enabled={extractValue.asOptionalBoolean(
+            node.props.enabled,
+            defaultExpandableItemProps.enabled,
+          )}
+          iconExpanded={
+            extractValue(node.props?.iconExpanded) ?? defaultExpandableItemProps.iconExpanded
+          }
+          iconCollapsed={
+            extractValue(node.props?.iconCollapsed) ?? defaultExpandableItemProps.iconCollapsed
+          }
+          iconPosition={
+            extractValue.asOptionalString(node.props.iconPosition) ??
+            defaultExpandableItemProps.iconPosition
+          }
+          withSwitch={extractValue.asOptionalBoolean(
+            node.props.withSwitch,
+            defaultExpandableItemProps.withSwitch,
+          )}
+          contentWidth={
+            extractValue.asOptionalString(node.props.contentWidth) ??
+            defaultExpandableItemProps.contentWidth
+          }
+          fullWidthSummary={extractValue.asOptionalBoolean(
+            node.props.fullWidthSummary,
+            defaultExpandableItemProps.fullWidthSummary,
+          )}
+          onExpandedChange={lookupEventHandler("expandedChange")}
+          classes={classes}
+          registerComponentApi={registerComponentApi}
+        >
+          {renderChild(node.children)}
+        </ExpandableItem>
+      );
+    },
   },
 );
-
-export const expandableItemComponentRenderer = wrapComponent(COMP, ExpandableItem, ExpandableItemMd, {
-  exposeRegisterApi: true,
-  exclude: ["summary"],
-  customRender: (_props, { node, renderChild, lookupEventHandler, registerComponentApi, extractValue, classes }) => {
-    // summary can be a ComponentDef (render via renderChild) or a plain value (extract as string)
-    const summaryProp = node.props?.summary;
-    const summaryContent = summaryProp
-      ? typeof summaryProp === 'object' && summaryProp.type
-        ? renderChild(summaryProp)
-        : extractValue(summaryProp)
-      : undefined;
-
-    return (
-      <ExpandableItem
-        summary={summaryContent}
-        initiallyExpanded={extractValue.asOptionalBoolean(
-          node.props.initiallyExpanded,
-          defaultExpandableItemProps.initiallyExpanded,
-        )}
-        enabled={extractValue.asOptionalBoolean(
-          node.props.enabled,
-          defaultExpandableItemProps.enabled,
-        )}
-        iconExpanded={
-          extractValue(node.props?.iconExpanded) ?? defaultExpandableItemProps.iconExpanded
-        }
-        iconCollapsed={
-          extractValue(node.props?.iconCollapsed) ?? defaultExpandableItemProps.iconCollapsed
-        }
-        iconPosition={
-          extractValue.asOptionalString(node.props.iconPosition) ??
-          defaultExpandableItemProps.iconPosition
-        }
-        withSwitch={extractValue.asOptionalBoolean(
-          node.props.withSwitch,
-          defaultExpandableItemProps.withSwitch,
-        )}
-        contentWidth={
-          extractValue.asOptionalString(node.props.contentWidth) ??
-          defaultExpandableItemProps.contentWidth
-        }
-        fullWidthSummary={extractValue.asOptionalBoolean(
-          node.props.fullWidthSummary,
-          defaultExpandableItemProps.fullWidthSummary,
-        )}
-        onExpandedChange={lookupEventHandler("expandedChange")}
-        classes={classes}
-        registerComponentApi={registerComponentApi}
-      >
-        {renderChild(node.children)}
-      </ExpandableItem>
-    );
-  },
-});

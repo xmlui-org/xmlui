@@ -2,7 +2,7 @@ import styles from "./Form.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
+import { createMetadata, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { httpMethodNames, labelPositionMd, requireLabelModeMd } from "../abstractions";
 import { defaultProps } from "./Form.defaults";
 import { FormWithContextVar } from "./FormReact";
@@ -195,7 +195,7 @@ export const FormMd = createMetadata({
         "An optional list of field names (matching the `bindTo` values of nested `FormItem` " +
         "components) that should be excluded from the temporary localStorage save. The fields " +
         "are still submitted normally; they are only excluded from the persisted snapshot.",
-      valueType: "any",
+      valueType: "string[]",
     },
     keepOnCancel: {
       description:
@@ -322,26 +322,30 @@ export const FormMd = createMetadata({
     },
   },
   contextVars: {
-    $data: d(
-      `This property represents the value of the form data. You can access the fields of the form ` +
+    $data: {
+      description:
+        `This property represents the value of the form data. You can access the fields of the form ` +
         `using the IDs in the \`bindTo\` property of nested \`FormItem\` instances. \`$data\` also ` +
         `provides an \`update\` method as a shortcut to the Form's exposed \`update\` method.`,
-    ),
-    $formCancel: d(
-      `Available inside the form's \`onSubmit\` handler. Exposes the per-attempt ` +
+    },
+    $formCancel: {
+      description:
+        `Available inside the form's \`onSubmit\` handler. Exposes the per-attempt ` +
         `\`AbortSignal\` (\`$formCancel.signal\`) that the framework aborts when ` +
         `\`Form.cancel()\` is invoked. Pass this signal to \`Actions.callApi({ signal: ... })\` ` +
         `or other cancellable operations to make your submit handler cooperatively cancellable.`,
-    ),
-    $formCsrfToken: d(
-      `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
+    },
+    $formCsrfToken: {
+      description:
+        `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
         `\`csrfToken\` prop so custom submit handlers can attach the CSRF header to their own ` +
         `requests. \`undefined\` when the prop is not set.`,
-    ),
-    $formIdempotencyKey: d(
-      `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
+    },
+    $formIdempotencyKey: {
+      description:
+        `Available inside the form's \`onSubmit\` handler. Carries the value of the ` +
         `\`idempotencyKey\` prop. \`undefined\` when the prop is not set.`,
-    ),
+    },
   },
   apis: {
     reset: {

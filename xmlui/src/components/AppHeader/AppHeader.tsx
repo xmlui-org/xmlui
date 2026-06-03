@@ -1,6 +1,6 @@
 import styles from "./AppHeader.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { createMetadata, dComponent } from "../../components/metadata-helpers";
@@ -61,40 +61,43 @@ export const AppHeaderMd = createMetadata({
   },
 });
 
-export const appHeaderComponentRenderer = createComponentRenderer(
+export const appHeaderComponentRenderer = wrapComponent(
   COMP,
+  AppContextAwareAppHeader,
   AppHeaderMd,
-  ({ node, renderChild, classes, layoutContext, extractValue }) => {
-    // --- Convert the plain (text) logo template into component definition
-    const logoTemplate = node.props.logoTemplate || node.slots?.logoSlot;
-    const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
-    return (
-      <AppContextAwareAppHeader
-        profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
-        title={extractValue(node.props.title)}
-        showLogo={extractValue.asOptionalBoolean(node.props.showLogo)}
-        titleContent={
-          titleTemplate && (
-            <SlotItem
-              node={titleTemplate}
-              renderChild={renderChild}
-              slotProps={{ title: extractValue(node.props.title) }}
-            />
-          )
-        }
-        logoContent={renderChild(logoTemplate, {
-          type: "Stack",
-          orientation: "horizontal",
-        })}
-        classes={classes}
-        className={layoutContext?.themeClassName}
-        renderChild={renderChild}
-      >
-        {renderChild(node.children, {
-          // Since the AppHeader is a flex container, it's children should behave the same as in a stack
-          type: "Stack",
-        })}
-      </AppContextAwareAppHeader>
-    );
+  {
+    customRender: (_props, { node, renderChild, classes, layoutContext, extractValue }) => {
+      // --- Convert the plain (text) logo template into component definition
+      const logoTemplate = node.props.logoTemplate || node.slots?.logoSlot;
+      const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
+      return (
+        <AppContextAwareAppHeader
+          profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
+          title={extractValue(node.props.title)}
+          showLogo={extractValue.asOptionalBoolean(node.props.showLogo)}
+          titleContent={
+            titleTemplate && (
+              <SlotItem
+                node={titleTemplate}
+                renderChild={renderChild}
+                slotProps={{ title: extractValue(node.props.title) }}
+              />
+            )
+          }
+          logoContent={renderChild(logoTemplate, {
+            type: "Stack",
+            orientation: "horizontal",
+          })}
+          classes={classes}
+          className={layoutContext?.themeClassName}
+          renderChild={renderChild}
+        >
+          {renderChild(node.children, {
+            // Since the AppHeader is a flex container, its children should behave the same as in a stack.
+            type: "Stack",
+          })}
+        </AppContextAwareAppHeader>
+      );
+    },
   },
 );

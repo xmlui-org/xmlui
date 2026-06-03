@@ -1,4 +1,4 @@
-import { wrapComponent, createMetadata, d, parseScssVar, type ComponentMetadata } from "xmlui";
+import { wrapComponent, createMetadata, parseScssVar, type ComponentMetadata } from "xmlui";
 import { LazyPdf } from "./LazyPdfReact";
 import styles from "./Pdf.module.scss";
 
@@ -12,11 +12,12 @@ export const PdfMd: ComponentMetadata = createMetadata({
       description: `This property defines the source URL of the PDF document to display.`,
       valueType: "string",
     },
-    data: d(
-      `This property contains the binary data that represents the PDF document for in-memory display. ` +
-      `Supports: ArrayBuffer, Uint8Array, Blob, File, or data URL string. ` +
-      `Example: \`data={arrayBuffer}\` or \`data={blob}\` or \`data="data:application/pdf;base64,..."\`.`,
-    ),
+    data: {
+      description:
+        `This property contains the binary data that represents the PDF document for in-memory display. ` +
+        `Supports: ArrayBuffer, Uint8Array, Blob, File, or data URL string. ` +
+        `Example: \`data={arrayBuffer}\` or \`data={blob}\` or \`data="data:application/pdf;base64,..."\`.`,
+    },
     mode: {
       description: `Display mode: "view" for read-only or "edit" for annotation editing. Default: "view".`,
       valueType: "string",
@@ -30,12 +31,12 @@ export const PdfMd: ComponentMetadata = createMetadata({
       description: `Current page number (1-indexed). When provided, page navigation is controlled by parent.`,
       valueType: "number",
     },
-    annotations: d(
-      `Array of annotations to display on the PDF. Each annotation has id, type, position, size, and properties.`,
-    ),
-    signatureData: d(
-      `Pre-loaded signature data to apply to signature fields.`,
-    ),
+    annotations: {
+      description: `Array of annotations to display on the PDF. Each annotation has id, type, position, size, and properties.`,
+    },
+    signatureData: {
+      description: `Pre-loaded signature data to apply to signature fields.`,
+    },
     horizontalAlignment: {
       description: `Horizontal alignment of PDF pages within the viewer. Options: "start" (default), "center", "end".`,
       valueType: "string",
@@ -193,11 +194,15 @@ export const PdfMd: ComponentMetadata = createMetadata({
         `(1-based) determines which page the annotation appears on. ` +
         `When \`scrollIntoView\` is \`true\` the viewer automatically scrolls that page into view. ` +
         `Returns the newly assigned annotation ID.`,
-      signature: "addAnnotation(annotationData: object, scrollIntoView?: boolean, scrollBehavior?: string): string",
+      signature:
+        "addAnnotation(annotationData: object, scrollIntoView?: boolean, scrollBehavior?: string): string",
       parameters: {
-        annotationData: "An object describing the annotation to add. Include `page` (1-based) to place it on a specific page.",
-        scrollIntoView: "When true, scrolls the annotation's page into view after adding. Defaults to false.",
-        scrollBehavior: "Controls the scroll animation: `\"smooth\"` (default) animates the scroll, `\"instant\"` jumps immediately.",
+        annotationData:
+          "An object describing the annotation to add. Include `page` (1-based) to place it on a specific page.",
+        scrollIntoView:
+          "When true, scrolls the annotation's page into view after adding. Defaults to false.",
+        scrollBehavior:
+          'Controls the scroll animation: `"smooth"` (default) animates the scroll, `"instant"` jumps immediately.',
       },
       returns: "The unique ID assigned to the new annotation.",
     },
@@ -261,9 +266,11 @@ export const PdfMd: ComponentMetadata = createMetadata({
       description: `Retrieve stored signature data. Supports retrieving a specific signature by fieldId or all stored signatures.`,
       signature: "getSignature(fieldId?: string): object | object[] | null",
       parameters: {
-        fieldId: "Optional. The ID of a specific signature field. If omitted, returns all stored signatures.",
+        fieldId:
+          "Optional. The ID of a specific signature field. If omitted, returns all stored signatures.",
       },
-      returns: "The requested signature data, an object containing all signatures if no fieldId provided, or null if no signature exists.",
+      returns:
+        "The requested signature data, an object containing all signatures if no fieldId provided, or null if no signature exists.",
     },
     saveSignature: {
       description: `Save a signature to storage for later retrieval and reuse across fields.`,
@@ -291,7 +298,8 @@ export const PdfMd: ComponentMetadata = createMetadata({
     exportAnnotations: {
       description: `Collect all annotations and signatures and trigger the onExportRequest event. Use this to prepare data for backend processing to flatten annotations and save the PDF.`,
       signature: "exportAnnotations(): void",
-      returns: "Fires onExportRequest event with PdfExportData containing annotations, signatures, and metadata.",
+      returns:
+        "Fires onExportRequest event with PdfExportData containing annotations, signatures, and metadata.",
     },
     getMetadata: {
       description: `Retrieve document metadata from the PDF. Returns an object with an info dictionary (Title, Author, Subject, Keywords, Creator, Producer, CreationDate, ModDate) and an optional xmp key-value map from XMP metadata.`,
@@ -301,22 +309,26 @@ export const PdfMd: ComponentMetadata = createMetadata({
     getOutline: {
       description: `Retrieve the document outline (table of contents / bookmarks). Each node has title, bold, italic, color, dest, url, and items (children).`,
       signature: "getOutline(): Promise<object[] | null>",
-      returns: "Promise resolving to an array of outline nodes, null if the document has no outline, or null if no document is loaded.",
+      returns:
+        "Promise resolving to an array of outline nodes, null if the document has no outline, or null if no document is loaded.",
     },
     getPageLabels: {
       description: `Retrieve custom page labels defined in the PDF (e.g. "i", "ii", "1", "A-1"). Returns one label per page in document order.`,
       signature: "getPageLabels(): Promise<string[] | null>",
-      returns: "Promise resolving to a string array of page labels, or null if the document has no custom labels / no document is loaded.",
+      returns:
+        "Promise resolving to a string array of page labels, or null if the document has no custom labels / no document is loaded.",
     },
     getPermissions: {
       description: `Retrieve the document permission flags. Permissions control whether the user may print, copy, modify, add/modify annotations, etc.`,
       signature: "getPermissions(): Promise<number[] | null>",
-      returns: "Promise resolving to an array of permission flag numbers, or null if the document has no restrictions / no document is loaded.",
+      returns:
+        "Promise resolving to an array of permission flag numbers, or null if the document has no restrictions / no document is loaded.",
     },
     getFieldObjects: {
       description: `Retrieve AcroForm field objects from the PDF. Returns a map from field name to an array of field descriptors containing name, type, value, and position information.`,
       signature: "getFieldObjects(): Promise<Record<string, object[]> | null>",
-      returns: "Promise resolving to a map of field name → field descriptors, or null if the document has no form fields / no document is loaded.",
+      returns:
+        "Promise resolving to a map of field name → field descriptors, or null if the document has no form fields / no document is loaded.",
     },
     getTextContent: {
       description: `Extract plain text from the PDF. When a page number is supplied, returns the text for that page only. When called without arguments, returns concatenated text for all pages separated by newlines.`,
@@ -329,17 +341,20 @@ export const PdfMd: ComponentMetadata = createMetadata({
     getAttachments: {
       description: `Retrieve embedded files (attachments) from the PDF. Returns a mapping of attachment names to attachment objects containing file data.`,
       signature: "getAttachments(): Promise<Record<string, object> | null>",
-      returns: "Promise resolving to a map of attachment names → attachment objects, or null if the document has no attachments / no document is loaded.",
+      returns:
+        "Promise resolving to a map of attachment names → attachment objects, or null if the document has no attachments / no document is loaded.",
     },
     getViewerPreferences: {
       description: `Retrieve viewer preferences from the PDF. Preferences control how the PDF should be displayed (e.g., layout mode, fullscreen behavior, zoom settings).`,
       signature: "getViewerPreferences(): Promise<object | null>",
-      returns: "Promise resolving to viewer preferences object, or null if none defined / no document is loaded.",
+      returns:
+        "Promise resolving to viewer preferences object, or null if none defined / no document is loaded.",
     },
     getDestinations: {
       description: `Retrieve all named destinations in the PDF. Destinations are used for internal links and bookmarks. Returns a mapping from destination name to destination data.`,
       signature: "getDestinations(): Promise<Record<string, any[]> | null>",
-      returns: "Promise resolving to a map of destination name → destination data, or null if no destinations exist / no document is loaded.",
+      returns:
+        "Promise resolving to a map of destination name → destination data, or null if no destinations exist / no document is loaded.",
     },
     getDestination: {
       description: `Retrieve a specific named destination by ID. Useful for internal navigation within the PDF.`,
@@ -347,7 +362,8 @@ export const PdfMd: ComponentMetadata = createMetadata({
       parameters: {
         id: "The destination name/ID to retrieve.",
       },
-      returns: "Promise resolving to the destination data array, or null if the destination does not exist / no document is loaded.",
+      returns:
+        "Promise resolving to the destination data array, or null if the destination does not exist / no document is loaded.",
     },
     hasJSActions: {
       description: `Check whether the PDF contains JavaScript actions. Useful for detecting forms or documents with interactive behaviors.`,
@@ -357,56 +373,69 @@ export const PdfMd: ComponentMetadata = createMetadata({
     getJSActions: {
       description: `Retrieve JavaScript actions from the PDF. Includes document-level and field-level scripts used in forms.`,
       signature: "getJSActions(): Promise<object | null>",
-      returns: "Promise resolving to a JavaScript actions object, or null if no actions exist / no document is loaded.",
+      returns:
+        "Promise resolving to a JavaScript actions object, or null if no actions exist / no document is loaded.",
     },
     getOptionalContentConfig: {
       description: `Retrieve optional content (layers) configuration from the PDF. Useful for CAD drawings, technical documents, and PDFs with multiple content layers that can be toggled.`,
       signature: "getOptionalContentConfig(): Promise<object | null>",
-      returns: "Promise resolving to optional content configuration object, or null if no optional content exists / no document is loaded.",
+      returns:
+        "Promise resolving to optional content configuration object, or null if no optional content exists / no document is loaded.",
     },
     getPageLayout: {
       description: `Retrieve the page layout preference from the PDF. The layout indicates how pages should be displayed (single page, two-page spread, etc.).`,
       signature: "getPageLayout(): Promise<string | null>",
-      returns: "Promise resolving to page layout name (e.g., 'SinglePage', 'TwoPageLeft', 'TwoPageRight', 'TwoColumnLeft', 'TwoColumnRight') or null if no preference is set / no document is loaded.",
+      returns:
+        "Promise resolving to page layout name (e.g., 'SinglePage', 'TwoPageLeft', 'TwoPageRight', 'TwoColumnLeft', 'TwoColumnRight') or null if no preference is set / no document is loaded.",
     },
     getPageMode: {
       description: `Retrieve the page mode preference from the PDF. The mode indicates what to display when the PDF is opened (outlines, thumbnails, etc.).`,
       signature: "getPageMode(): Promise<string | null>",
-      returns: "Promise resolving to page mode name (e.g., 'UseNone', 'UseOutlines', 'UseThumbs', 'UseOC', 'UseAttachments') or null if no mode is set / no document is loaded.",
+      returns:
+        "Promise resolving to page mode name (e.g., 'UseNone', 'UseOutlines', 'UseThumbs', 'UseOC', 'UseAttachments') or null if no mode is set / no document is loaded.",
     },
     getOpenAction: {
       description: `Retrieve the PDF's open action destination. This is the page/location the PDF author intended to be displayed when the document is opened.`,
       signature: "getOpenAction(): Promise<any[] | null>",
-      returns: "Promise resolving to the open action destination array, or null if no open action is defined / no document is loaded.",
+      returns:
+        "Promise resolving to the open action destination array, or null if no open action is defined / no document is loaded.",
     },
     getData: {
       description: `Retrieve the raw PDF file bytes. Useful for downloading the PDF file, exporting to a backend, or further processing.`,
       signature: "getData(): Promise<Uint8Array | null>",
-      returns: "Promise resolving to a Uint8Array containing the complete PDF file data, or null if no document is loaded.",
+      returns:
+        "Promise resolving to a Uint8Array containing the complete PDF file data, or null if no document is loaded.",
     },
     getAnnotationsByType: {
       description: `Retrieve annotations filtered by type from across the entire document. More efficient than getAnnotations() when you only need specific annotation types.`,
-      signature: "getAnnotationsByType(types: Set<number>, pageIndexesToSkip?: Set<number>): Promise<object[] | null>",
+      signature:
+        "getAnnotationsByType(types: Set<number>, pageIndexesToSkip?: Set<number>): Promise<object[] | null>",
       parameters: {
-        types: "A Set of PDF annotation type IDs to retrieve (e.g., annotation type constants from PDF.js)",
-        pageIndexesToSkip: "Optional Set of 0-indexed page numbers to exclude from the search. Omit to search all pages.",
+        types:
+          "A Set of PDF annotation type IDs to retrieve (e.g., annotation type constants from PDF.js)",
+        pageIndexesToSkip:
+          "Optional Set of 0-indexed page numbers to exclude from the search. Omit to search all pages.",
       },
-      returns: "Promise resolving to an array of annotation objects matching the specified types, or null if no document is loaded.",
+      returns:
+        "Promise resolving to an array of annotation objects matching the specified types, or null if no document is loaded.",
     },
     saveDocument: {
       description: `Save the PDF document with any modifications (filled form fields, annotations, etc.). Returns the modified PDF as raw bytes that can be downloaded or sent to a backend.`,
       signature: "saveDocument(): Promise<Uint8Array | null>",
-      returns: "Promise resolving to a Uint8Array containing the modified PDF file, or null if no document is loaded.",
+      returns:
+        "Promise resolving to a Uint8Array containing the modified PDF file, or null if no document is loaded.",
     },
     getMarkInfo: {
       description: `Retrieve accessibility mark info from the PDF. Indicates whether the PDF has been properly tagged for accessibility and contains structural information for screen readers.`,
       signature: "getMarkInfo(): Promise<object | null>",
-      returns: "Promise resolving to the mark info object (contains properties like 'Marked' indicating accessibility tagging), or null if no mark info exists / no document is loaded.",
+      returns:
+        "Promise resolving to the mark info object (contains properties like 'Marked' indicating accessibility tagging), or null if no mark info exists / no document is loaded.",
     },
     getDownloadInfo: {
       description: `Retrieve download progress information for the PDF. Provides granular tracking of how much of the PDF file has been downloaded, useful for large remote PDFs.`,
       signature: "getDownloadInfo(): Promise<{ length: number } | null>",
-      returns: "Promise resolving to an object with a 'length' property indicating the total file size in bytes, or null if no document is loaded.",
+      returns:
+        "Promise resolving to an object with a 'length' property indicating the total file size in bytes, or null if no document is loaded.",
     },
     exportToPdf: {
       description:
@@ -414,16 +443,29 @@ export const PdfMd: ComponentMetadata = createMetadata({
         `PDF content using pdf-lib. The returned \`Uint8Array\` can be downloaded or sent to a backend. ` +
         `Unlike \`saveDocument()\`, this output is fully readable in Acrobat Reader and any standard PDF viewer.`,
       signature: "exportToPdf(): Promise<Uint8Array | null>",
-      returns: "Promise resolving to a Uint8Array of the flattened PDF bytes with all annotations embedded, or null if no document is loaded.",
+      returns:
+        "Promise resolving to a Uint8Array of the flattened PDF bytes with all annotations embedded, or null if no document is loaded.",
     },
   },
   contextVars: {
-    $pageCount: d(`Total number of pages in the PDF.`),
-    $currentPage: d(`Current page number (1-indexed).`),
-    $annotations: d(`Array of all annotations.`),
-    $mode: d(`Current display mode ("view" or "edit").`),
-    $scale: d(`Current zoom scale (e.g. 1.0 = 100%).`),
-    $hasSignature: d(`Whether a signature has been captured (Phase 2).`),
+    $pageCount: {
+      description: `Total number of pages in the PDF.`,
+    },
+    $currentPage: {
+      description: `Current page number (1-indexed).`,
+    },
+    $annotations: {
+      description: `Array of all annotations.`,
+    },
+    $mode: {
+      description: `Current display mode ("view" or "edit").`,
+    },
+    $scale: {
+      description: `Current zoom scale (e.g. 1.0 = 100%).`,
+    },
+    $hasSignature: {
+      description: `Whether a signature has been captured (Phase 2).`,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

@@ -1,4 +1,12 @@
-import { type ForwardedRef, forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
+import {
+  type ForwardedRef,
+  forwardRef,
+  useMemo,
+  useRef,
+  useState,
+  memo,
+  startTransition,
+} from "react";
 import styles from "./Table.module.scss";
 import "./react-table-config.d.ts";
 import { wrapComponent } from "../../components-core/wrapComponent";
@@ -6,7 +14,6 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dComponent,
   dContextMenu,
@@ -59,12 +66,12 @@ export const TableMd = createMetadata({
         `the \`data\` acts as the property that accepts a URL to fetch information from an API. ` +
         `When both \`items\` and \`data\` are used, \`items\` has priority.`,
     ),
-    data: d(
-      `The component receives data via this property. The \`data\` property is a list of items ` +
+    data: {
+      description:
+        `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`Table\` can display.`,
-      undefined,
-      "any",
-    ),
+      valueType: "any",
+    },
     idKey: {
       description:
         `This property is used to specify the unique ID property in the data array. ` +
@@ -82,71 +89,77 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.isPaginated,
     },
-    loading: d(
-      `This boolean property indicates if the component is fetching (or processing) data. This ` +
+    loading: {
+      description:
+        `This boolean property indicates if the component is fetching (or processing) data. This ` +
         `property is useful when data is loaded conditionally or receiving it takes some time.`,
-      undefined,
-      "boolean",
-    ),
-    headerHeight: d(`This optional property is used to specify the height of the table header.`, undefined, "length"),
-    rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`, undefined, "boolean"),
-    initiallySelected: d(
-      `An array of IDs that should be initially selected when the table is rendered. ` +
+      valueType: "boolean",
+    },
+    headerHeight: {
+      description: `This optional property is used to specify the height of the table header.`,
+      valueType: "length",
+    },
+    rowsSelectable: {
+      description: `Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`,
+      valueType: "boolean",
+    },
+    initiallySelected: {
+      description:
+        `An array of IDs that should be initially selected when the table is rendered. ` +
         `This property only has an effect when the rowsSelectable property is set to \`true\`.`,
-      undefined,
-      "any",
-    ),
-    syncWithAppState: d(
-      `An AppState instance to synchronize the table's selection state with. The table will ` +
+      valueType: "any",
+    },
+    syncWithAppState: {
+      description:
+        `An AppState instance to synchronize the table's selection state with. The table will ` +
         `read from and write to the 'selectedIds' property of the AppState object. When provided, ` +
         `this takes precedence over the initiallySelected property for initial selection. ` +
         `You can use the AppState's didUpdate event to receive notifications when the selection changes.`,
-      undefined,
-      "string",
-    ),
-    syncWithVar: d(
-      `The name of a global variable to synchronize the table's selection state with. ` +
+      valueType: "string",
+    },
+    syncWithVar: {
+      description:
+        `The name of a global variable to synchronize the table's selection state with. ` +
         `The named variable must reference an object; the table will read from and write to its ` +
         `'selectedIds' property. When provided, this takes precedence over both ` +
         `\`initiallySelected\` and \`syncWithAppState\`. Multiple tables sharing the same variable ` +
         `name will keep their selections in sync automatically. ` +
         `A runtime error is signalled if the value is not a valid JavaScript variable name.`,
-      undefined,
-      "string",
-    ),
-    pageSize: d(
-      `This property defines the number of rows to display per page. ` +
+      valueType: "string",
+    },
+    pageSize: {
+      description:
+        `This property defines the number of rows to display per page. ` +
         `When set without also setting \`isPaginated\`, pagination is activated automatically ` +
         `whenever the number of data rows exceeds this value and suppressed otherwise. ` +
         `This makes \`pageSize\` the minimal way to get auto-activating, auto-hiding pagination: ` +
         `no conditional expressions on \`isPaginated\` or the position props are needed.`,
-      undefined,
-      "number",
-    ),
+      valueType: "number",
+    },
     pageSizeOptions: {
       description:
         "This property holds an array of page sizes (numbers) the user can select for " +
         "pagination. If this property is not defined, the component allows only a page size of 10 items.",
       valueType: "any",
     },
-    showPageInfo: d(
-      "Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).",
-      undefined,
-      "boolean",
-      defaultProps.showPageInfo,
-    ),
-    showPageSizeSelector: d(
-      "Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).",
-      undefined,
-      "boolean",
-      defaultProps.showPageSizeSelector,
-    ),
-    showCurrentPage: d(
-      "Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).",
-      undefined,
-      "boolean",
-      defaultProps.showCurrentPage,
-    ),
+    showPageInfo: {
+      description:
+        "Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).",
+      valueType: "boolean",
+      defaultValue: defaultProps.showPageInfo,
+    },
+    showPageSizeSelector: {
+      description:
+        "Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).",
+      valueType: "boolean",
+      defaultValue: defaultProps.showPageSizeSelector,
+    },
+    showCurrentPage: {
+      description:
+        "Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).",
+      valueType: "boolean",
+      defaultValue: defaultProps.showCurrentPage,
+    },
     pageSizeSelectorPosition: {
       description:
         "Determines where to place the page size selector in the layout. " +
@@ -163,20 +176,21 @@ export const TableMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.pageInfoPosition,
     },
-    buttonRowPosition: d(
-      "Determines where to place the pagination button row in the layout. " +
+    buttonRowPosition: {
+      description:
+        "Determines where to place the pagination button row in the layout. " +
         "It works the same as the [Pagination component property](./Pagination#buttonrowposition).",
-      PositionValues,
-      "string",
-      defaultProps.buttonRowPosition,
-    ),
-    rowDisabledPredicate: d(
-      `This property defines a predicate function with a return value that determines if the ` +
+      availableValues: PositionValues,
+      valueType: "string",
+      defaultValue: defaultProps.buttonRowPosition,
+    },
+    rowDisabledPredicate: {
+      description:
+        `This property defines a predicate function with a return value that determines if the ` +
         `row should be disabled. The function retrieves the item to display and should return ` +
         `a Boolean-like value.`,
-      undefined,
-      "any",
-    ),
+      valueType: "any",
+    },
     rowUnselectablePredicate: {
       description:
         `This property defines a predicate function with a return value that determines if the ` +
@@ -187,19 +201,19 @@ export const TableMd = createMetadata({
     noDataTemplate: dComponent(
       `A property to customize what to display if the table does not contain any data.`,
     ),
-    sortBy: d(
-      "This property is used to determine which data property to sort by. If not defined, " +
+    sortBy: {
+      description:
+        "This property is used to determine which data property to sort by. If not defined, " +
         "the data is not sorted",
-      undefined,
-      "string",
-    ),
-    sortDirection: d(
-      "This property determines the sort order to be \`ascending\` or \`descending\`. This " +
+      valueType: "string",
+    },
+    sortDirection: {
+      description:
+        "This property determines the sort order to be \`ascending\` or \`descending\`. This " +
         "property only works if the [\`sortBy\`](#sortby) property is also set. By default " +
         "ascending order is used.",
-      undefined,
-      "string",
-    ),
+      valueType: "string",
+    },
     autoFocus: dAutoFocus(),
     hideHeader: {
       description:
@@ -220,27 +234,27 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.hideSelectionCheckboxesHeader,
     },
-    iconNoSort: d(
-      `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
+    iconNoSort: {
+      description:
+        `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
         `enabled, but the column remains unsorted. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.nosort:Table" declaration in the app configuration file.`,
-      undefined,
-      "icon",
-    ),
-    iconSortAsc: d(
-      `Allows setting an alernate icon displayed in the ${COMP} column header when sorting is enabled, ` +
+      valueType: "icon",
+    },
+    iconSortAsc: {
+      description:
+        `Allows setting an alernate icon displayed in the ${COMP} column header when sorting is enabled, ` +
         `and the column is sorted in ascending order. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.sortasc:Table" declaration in the app configuration file.`,
-      undefined,
-      "icon",
-    ),
-    iconSortDesc: d(
-      `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is enabled, ` +
+      valueType: "icon",
+    },
+    iconSortDesc: {
+      description:
+        `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is enabled, ` +
         `and the column is sorted in descending order. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.sortdesc:Table" declaration in the app configuration file.`,
-      undefined,
-      "icon",
-    ),
+      valueType: "icon",
+    },
     enableMultiRowSelection: {
       description:
         `This boolean property indicates whether you can select multiple rows in the table. ` +
@@ -325,12 +339,13 @@ export const TableMd = createMetadata({
       availableValues: CheckboxToleranceValues,
       defaultValue: defaultProps.checkboxTolerance,
     },
-    refreshOn: d(
-      `An expression whose value change forces all table rows and cells to re-render. ` +
+    refreshOn: {
+      description:
+        `An expression whose value change forces all table rows and cells to re-render. ` +
         `Use this to ensure that closure variables bound in row or cell templates are updated when ` +
         `global state changes (e.g. \`{selectMode}\`). Without this, virtualized rows might retain ` +
         `stale references to global variables for performance reasons.`,
-    ),
+    },
     headerUserSelect: {
       description: `This property controls whether users can select text within table headers.`,
       valueType: "string",
@@ -608,7 +623,8 @@ const TableWithColumns = memo(
       const renderVersionRef = useRef(0);
       const prevRefreshOnRef = useRef(refreshOn);
 
-      const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+      const shouldForceRefresh =
+        node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
       if (shouldForceRefresh) {
         prevRefreshOnRef.current = refreshOn;
         renderVersionRef.current++;
@@ -624,21 +640,45 @@ const TableWithColumns = memo(
       lookupActionRef.current = lookupAction;
 
       // Stable delegates to prevent React.memo busts on TableNative.
-      const stableSortingDidChange = useEvent((...args: any[]) => lookupEventHandler("sortingDidChange")?.(...args));
-      const stableSelectionDidChange = useEvent((...args: any[]) => lookupEventHandler("selectionDidChange")?.(...args));
-      const stableWillSort = useEvent((...args: any[]) => lookupEventHandler("willSort")?.(...args));
-      const stableRowDoubleClick = useEvent((...args: any[]) => lookupEventHandler("rowDoubleClick")?.(...args));
-      const stableSelectAllAction = useEvent((...args: any[]) => lookupEventHandler("selectAllAction")?.(...args));
-      const stableCutAction = useEvent((...args: any[]) => lookupEventHandler("cutAction")?.(...args));
-      const stableCopyAction = useEvent((...args: any[]) => lookupEventHandler("copyAction")?.(...args));
-      const stablePasteAction = useEvent((...args: any[]) => lookupEventHandler("pasteAction")?.(...args));
-      const stableDeleteAction = useEvent((...args: any[]) => lookupEventHandler("deleteAction")?.(...args));
-      const stableLookupEventHandler = useEvent((...args: Parameters<typeof lookupEventHandler>) => lookupEventHandler(...args));
+      const stableSortingDidChange = useEvent((...args: any[]) =>
+        lookupEventHandler("sortingDidChange")?.(...args),
+      );
+      const stableSelectionDidChange = useEvent((...args: any[]) =>
+        lookupEventHandler("selectionDidChange")?.(...args),
+      );
+      const stableWillSort = useEvent((...args: any[]) =>
+        lookupEventHandler("willSort")?.(...args),
+      );
+      const stableRowDoubleClick = useEvent((...args: any[]) =>
+        lookupEventHandler("rowDoubleClick")?.(...args),
+      );
+      const stableSelectAllAction = useEvent((...args: any[]) =>
+        lookupEventHandler("selectAllAction")?.(...args),
+      );
+      const stableCutAction = useEvent((...args: any[]) =>
+        lookupEventHandler("cutAction")?.(...args),
+      );
+      const stableCopyAction = useEvent((...args: any[]) =>
+        lookupEventHandler("copyAction")?.(...args),
+      );
+      const stablePasteAction = useEvent((...args: any[]) =>
+        lookupEventHandler("pasteAction")?.(...args),
+      );
+      const stableDeleteAction = useEvent((...args: any[]) =>
+        lookupEventHandler("deleteAction")?.(...args),
+      );
+      const stableLookupEventHandler = useEvent((...args: Parameters<typeof lookupEventHandler>) =>
+        lookupEventHandler(...args),
+      );
 
       const rowDisabledPredicate = node.props.rowDisabledPredicate;
-      const stableRowDisabledPredicate = useEvent((item: any) => lookupSyncCallback(rowDisabledPredicate)?.(item));
+      const stableRowDisabledPredicate = useEvent((item: any) =>
+        lookupSyncCallback(rowDisabledPredicate)?.(item),
+      );
       const rowUnselectablePredicate = node.props.rowUnselectablePredicate;
-      const stableRowUnselectablePredicate = useEvent((item: any) => lookupSyncCallback(rowUnselectablePredicate)?.(item));
+      const stableRowUnselectablePredicate = useEvent((item: any) =>
+        lookupSyncCallback(rowUnselectablePredicate)?.(item),
+      );
 
       const tableContextValue = useMemo(() => {
         return {
@@ -735,7 +775,12 @@ const TableWithColumns = memo(
       pendingOwnWriteRef.current = false; // consume immediately
 
       // Holder for the stable adapter object.
-      const syncAdapterHolderRef = useRef<{ value: any; update: any; _raw?: any; selectedIds?: any } | null>(null);
+      const syncAdapterHolderRef = useRef<{
+        value: any;
+        update: any;
+        _raw?: any;
+        selectedIds?: any;
+      } | null>(null);
 
       let syncAdapter: any;
       if (syncVarName !== undefined) {
@@ -745,7 +790,7 @@ const TableWithColumns = memo(
         } else {
           const currentSyncVarValue = extractValue(`{${syncVarName}}`);
           if (shouldForceRefresh && syncAdapterHolderRef.current) {
-             syncAdapterHolderRef.current = { ...syncAdapterHolderRef.current };
+            syncAdapterHolderRef.current = { ...syncAdapterHolderRef.current };
           }
           if (currentSyncVarValue != null) {
             if (!syncAdapterHolderRef.current) {
@@ -773,7 +818,8 @@ const TableWithColumns = memo(
               // the inner selectedIds array is the exact same reference we wrote.
               // XMLUI evaluates `{selectedIds: window.__tgSync_x}` and preserves the
               // window array reference, so this O(1) check is sufficient.
-              const isOwnWrite = pendingOwnWrite ||
+              const isOwnWrite =
+                pendingOwnWrite ||
                 (pendingOwnWriteVersionRef.current > 0 &&
                   currentSyncVarValue?.__v === pendingOwnWriteVersionRef.current);
 
@@ -919,7 +965,20 @@ const TableWithColumns = memo(
 TableWithColumns.displayName = "TableWithColumns";
 
 export const tableComponentRenderer = wrapComponent(COMP, Table, TableMd, {
-  customRender: (_props, { extractValue, node, renderChild, lookupEventHandler, lookupAction, lookupSyncCallback, classes, registerComponentApi, layoutContext }) => (
+  customRender: (
+    _props,
+    {
+      extractValue,
+      node,
+      renderChild,
+      lookupEventHandler,
+      lookupAction,
+      lookupSyncCallback,
+      classes,
+      registerComponentApi,
+      layoutContext,
+    },
+  ) => (
     <TableWithColumns
       node={node}
       extractValue={extractValue}

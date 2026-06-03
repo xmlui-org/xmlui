@@ -58,7 +58,7 @@ export const DateInputMd = createMetadata({
     validationStatus: dValidationStatus(defaultProps.validationStatus),
     invalidMessages: {
       description: "The invalid messages to display for the input component.",
-      valueType: "any",
+      valueType: "string[]",
     },
     mode: {
       description: "The mode of the date input (single or range)",

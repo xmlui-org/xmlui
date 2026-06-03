@@ -338,6 +338,7 @@ and the runtime extractor share a single rule table — see
 |---|---|---|
 | `"boolean"` | JS truthy/falsy or string `"true"`/`"false"` | `asBoolean` / `asOptionalBoolean` |
 | `"string"` | Anything coerced via `String(value)` | `asString` / `asOptionalString` |
+| `"string[]"` | Array whose items are strings | extractor |
 | `"number"` | JS number or numeric string | `asNumber` / `asOptionalNumber` |
 | `"any"` | Opt-out of verification | extractor |
 | `"ComponentDef"` | Nested component definition (template prop) | extractor |

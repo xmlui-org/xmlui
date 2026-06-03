@@ -2,7 +2,7 @@ import styles from "./Inspector.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 import { defaultProps } from "./Inspector.defaults";
 import { Inspector } from "./InspectorReact";
 
@@ -23,10 +23,18 @@ export const InspectorMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.src,
     },
-    tooltip: d("Tooltip text shown when hovering over the inspector icon."),
-    dialogTitle: d("Title displayed in the inspector modal dialog header."),
-    dialogWidth: d("Minimum width of the inspector modal dialog."),
-    dialogHeight: d("Minimum height of the inspector modal dialog."),
+    tooltip: {
+      description: "Tooltip text shown when hovering over the inspector icon.",
+    },
+    dialogTitle: {
+      description: "Title displayed in the inspector modal dialog header.",
+    },
+    dialogWidth: {
+      description: "Minimum width of the inspector modal dialog.",
+    },
+    dialogHeight: {
+      description: "Minimum height of the inspector modal dialog.",
+    },
   },
   apis: {
     open: {

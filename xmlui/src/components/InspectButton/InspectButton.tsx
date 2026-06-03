@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { ThemedButton as Button } from "../Button/Button";
 import { useInspectMode } from "../../components-core/InspectorContext";
 import styles from "./InspectButton.module.scss";
@@ -7,7 +7,6 @@ import type { CSSProperties, ReactNode } from "react";
 import FileCodeIcon from "../Icon/svg/l-file-code.svg?react";
 import { createMetadata } from "../metadata-helpers";
 import classnames from "classnames";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "InspectButton";
 export const InspectButtonMd = createMetadata({
@@ -19,7 +18,15 @@ export const InspectButtonMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-function InspectButton({ children, style, className }: { children: ReactNode; style?: CSSProperties, className?: string }) {
+function InspectButton({
+  children,
+  style,
+  className,
+}: {
+  children: ReactNode;
+  style?: CSSProperties;
+  className?: string;
+}) {
   const { setInspectMode, inspectMode } = useInspectMode();
 
   return (
@@ -32,7 +39,7 @@ function InspectButton({ children, style, className }: { children: ReactNode; st
         setInspectMode((prev: any) => !prev);
       }}
     >
-      <FileCodeIcon className={styles.icon}/>
+      <FileCodeIcon className={styles.icon} />
       {children}
     </Button>
   );
@@ -41,10 +48,4 @@ function InspectButton({ children, style, className }: { children: ReactNode; st
 /**
  * Define the renderer for the Button component
  */
-export const inspectButtonComponentRenderer = createComponentRenderer(
-  COMP,
-  InspectButtonMd,
-  ({ renderChild, node, classes }) => {
-    return <InspectButton className={classes?.[COMPONENT_PART_KEY]}>{renderChild(node.children)}</InspectButton>;
-  },
-);
+export const inspectButtonComponentRenderer = wrapComponent(COMP, InspectButton, InspectButtonMd);

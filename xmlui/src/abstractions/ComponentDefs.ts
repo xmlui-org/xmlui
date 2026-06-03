@@ -223,6 +223,7 @@ interface Scriptable {
  * Coarse types (legacy):
  *   - `"boolean"`        JS truthy/falsy or string `"true"`/`"false"`.
  *   - `"string"`         Any value coerced via `String(value)`.
+ *   - `"string[]"`       Array whose items are strings.
  *   - `"number"`         JS number or numeric string.
  *   - `"any"`            Opt-out of verification; coerced as-is.
  *   - `"hash"`           Plain object record (`Record<string, any>`).
@@ -240,6 +241,7 @@ interface Scriptable {
 export type PropertyValueType =
   | "boolean"
   | "string"
+  | "string[]"
   | "number"
   | "any"
   | "hash"

@@ -2,7 +2,7 @@ import styles from "./NavLink.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
 import { defaultProps } from "./NavLink.defaults";
 import { NavLink } from "./NavLinkReact";
@@ -25,7 +25,10 @@ export const NavLinkMd = createMetadata({
     },
   },
   props: {
-    to: d(`This property defines the URL of the link.`, undefined, "url"),
+    to: {
+      description: `This property defines the URL of the link.`,
+      valueType: "url",
+    },
     enabled: dEnabled(),
     active: {
       description:
@@ -69,11 +72,10 @@ export const NavLinkMd = createMetadata({
         `paths that start with the same prefix (e.g. a link with to="/a" is active on "/a/b").`,
       valueType: "boolean",
     },
-    icon: d(
-      `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
-      undefined,
-      "icon",
-    ),
+    icon: {
+      description: `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
+      valueType: "icon",
+    },
     iconAlignment: {
       description:
         `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +

@@ -1,5 +1,5 @@
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
 import { createMetadata, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
@@ -156,8 +156,7 @@ export const APICallMd = createMetadata({
       defaultValue: defaultProps.pollingInterval,
     },
     maxPollingDuration: {
-      description:
-        "Maximum time to poll before timing out, in milliseconds.",
+      description: "Maximum time to poll before timing out, in milliseconds.",
       valueType: "number",
       defaultValue: defaultProps.maxPollingDuration,
     },
@@ -170,8 +169,7 @@ export const APICallMd = createMetadata({
       defaultValue: defaultProps.pollingBackoff,
     },
     maxPollingInterval: {
-      description:
-        "Maximum interval between polls when using backoff strategies, in milliseconds.",
+      description: "Maximum interval between polls when using backoff strategies, in milliseconds.",
       valueType: "number",
       defaultValue: defaultProps.maxPollingInterval,
     },
@@ -411,10 +409,9 @@ export const APICallMd = createMetadata({
   },
 });
 
-export const apiCallRenderer = createComponentRenderer(
-  COMP,
-  APICallMd,
-  ({ node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
+export const apiCallRenderer = wrapComponent(COMP, APICallReact, APICallMd, {
+  exclude: Object.keys(APICallMd.props ?? {}),
+  customRender: (_props, { node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
     return (
       <APICallReact
         registerComponentApi={registerComponentApi}
@@ -430,4 +427,4 @@ export const apiCallRenderer = createComponentRenderer(
       />
     );
   },
-);
+});

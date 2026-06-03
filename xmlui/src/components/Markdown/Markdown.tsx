@@ -16,7 +16,7 @@ import {
   observePlaygroundPattern,
   observeTreeDisplay,
 } from "./utils";
-import { createMetadata, d, dComponent } from "../metadata-helpers";
+import { createMetadata, dComponent } from "../metadata-helpers";
 import type { BreakMode, OverflowMode } from "../abstractions";
 import { MemoizedItem } from "../container-helpers";
 
@@ -31,13 +31,13 @@ export const MarkdownMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],
   props: {
-    content: d(
-      "This property sets the markdown content to display. Alternatively, you can nest " +
+    content: {
+      description:
+        "This property sets the markdown content to display. Alternatively, you can nest " +
         "the markdown content as a child in a CDATA section. In neither this property " +
         "value nor any child is defined, empty content is displayed.",
-      undefined,
-      "string",
-    ),
+      valueType: "string",
+    },
     codeHighlighter: {
       description: "This property sets the code highlighter to use.",
       isInternal: true,
@@ -69,8 +69,8 @@ export const MarkdownMd = createMetadata({
     },
     anchorTemplate: dComponent(
       "An optional template to customize the anchor link rendered next to each heading. " +
-      "Requires `showHeadingAnchors` to be `true`. " +
-      "The template receives `$anchorId` and `$anchorHref` as context variables.",
+        "Requires `showHeadingAnchors` to be `true`. " +
+        "The template receives `$anchorId` and `$anchorHref` as context variables.",
     ),
     grayscale: {
       description:
@@ -90,7 +90,7 @@ export const MarkdownMd = createMetadata({
       description:
         "This boolean property specifies whether links should open in a new tab. " +
         "If set to `true`, all links within the markdown will open in a new tab " +
-        "with `target=\"_blank\"`. Links that explicitly specify their own target " +
+        'with `target="_blank"`. Links that explicitly specify their own target ' +
         "using the `| target=...` syntax will override this setting.",
       valueType: "boolean",
     },
@@ -235,67 +235,70 @@ export const MarkdownMd = createMetadata({
 
 type ThemedMarkdownProps = React.ComponentPropsWithoutRef<typeof Markdown>;
 
-export const ThemedMarkdown = React.forwardRef<React.ElementRef<typeof Markdown>, ThemedMarkdownProps>(
-  function ThemedMarkdown({ className, ...props }, ref) {
-    const themeClass = useComponentThemeClass(MarkdownMd);
+export const ThemedMarkdown = React.forwardRef<
+  React.ElementRef<typeof Markdown>,
+  ThemedMarkdownProps
+>(function ThemedMarkdown({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(MarkdownMd);
+  return (
+    <Markdown {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
+  );
+});
+
+export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownMd, {
+  exclude: [
+    "content",
+    "removeIndents",
+    "removeBr",
+    "codeHighlighter",
+    "showHeadingAnchors",
+    "grayscale",
+    "truncateLinks",
+    "openLinkInNewTab",
+    "overflowMode",
+    "breakMode",
+    "anchorTemplate",
+    "enablePlaygroundTracing",
+  ],
+  customRender(_props, { node, extractValue, renderChild, classes }) {
+    let renderedChildren = "";
+
+    // 1. Static content prop fallback
+    if (!renderedChildren) {
+      renderedChildren = extractValue.asString(node.props.content);
+    }
+
+    // 2. "data" property fallback
+    if (!renderedChildren && typeof (node.props as any).data === "string") {
+      renderedChildren = extractValue.asString((node.props as any).data);
+    }
+
+    // 3. Children fallback
+    if (!renderedChildren) {
+      (node.children ?? []).forEach((child) => {
+        const renderedChild = renderChild(child);
+        if (typeof renderedChild === "string") {
+          renderedChildren += renderedChild;
+        }
+      });
+    }
+
     return (
-      <Markdown
-        {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
-        ref={ref}
-      />
-    );
-  },
-);
-
-export const markdownComponentRenderer = wrapComponent(
-  COMP,
-  Markdown,
-  MarkdownMd,
-  {
-    exclude: [
-      "content", "removeIndents", "removeBr", "codeHighlighter",
-      "showHeadingAnchors", "grayscale", "truncateLinks", "openLinkInNewTab",
-      "overflowMode", "breakMode", "anchorTemplate", "enablePlaygroundTracing",
-    ],
-    customRender(_props, { node, extractValue, renderChild, classes }) {
-      let renderedChildren = "";
-
-      // 1. Static content prop fallback
-      if (!renderedChildren) {
-        renderedChildren = extractValue.asString(node.props.content);
-      }
-
-      // 2. "data" property fallback
-      if (!renderedChildren && typeof (node.props as any).data === "string") {
-        renderedChildren = extractValue.asString((node.props as any).data);
-      }
-
-      // 3. Children fallback
-      if (!renderedChildren) {
-        (node.children ?? []).forEach((child) => {
-          const renderedChild = renderChild(child);
-          if (typeof renderedChild === "string") {
-            renderedChildren += renderedChild;
-          }
-        });
-      }
-
-      return (
-        <TransformedMarkdown
-          classes={classes}
-          removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
-          removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
-          codeHighlighter={extractValue(node.props.codeHighlighter)}
-          extractValue={extractValue}
-          showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
-          grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
-          truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
-          openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
-          overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
-          breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
-          enablePlaygroundTracing={extractValue.asOptionalBoolean(node.props.enablePlaygroundTracing)}
-          anchorRenderer={node.props.anchorTemplate
+      <TransformedMarkdown
+        classes={classes}
+        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+        removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
+        codeHighlighter={extractValue(node.props.codeHighlighter)}
+        extractValue={extractValue}
+        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
+        grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
+        truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
+        openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
+        overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
+        breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
+        enablePlaygroundTracing={extractValue.asOptionalBoolean(node.props.enablePlaygroundTracing)}
+        anchorRenderer={
+          node.props.anchorTemplate
             ? (anchorId: string, anchorHref: string) => (
                 <MemoizedItem
                   node={(node.props as any).anchorTemplate}
@@ -304,14 +307,13 @@ export const markdownComponentRenderer = wrapComponent(
                 />
               )
             : undefined
-          }
-        >
-          {renderedChildren}
-        </TransformedMarkdown>
-      );
-    },
+        }
+      >
+        {renderedChildren}
+      </TransformedMarkdown>
+    );
   },
-);
+});
 
 type TransformedMarkdownProps = {
   children: React.ReactNode;

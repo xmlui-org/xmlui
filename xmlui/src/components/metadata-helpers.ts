@@ -2,8 +2,6 @@ import type {
   ComponentEventMetadata,
   ComponentMetadata,
   ComponentPropertyMetadata,
-  IsValidFunction,
-  PropertyValueDescription,
   PropertyValueType,
 } from "../abstractions/ComponentDefs";
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
@@ -18,17 +16,6 @@ export function createMetadata<
   metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis>,
 ): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
   return metadata;
-}
-
-export function d(
-  description: string,
-  availableValues?: readonly PropertyValueDescription[],
-  valueType?: PropertyValueType,
-  defaultValue?: any,
-  isValid?: IsValidFunction<any>,
-  isRequired?: boolean,
-): ComponentPropertyMetadata {
-  return { description, isRequired, availableValues, valueType, defaultValue, isValid };
 }
 
 export function dInternal(description?: string): ComponentPropertyMetadata {
@@ -70,8 +57,7 @@ export function dGotFocus(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when the ${comp} has received the focus.`,
     signature: "gotFocus(): void",
-    parameters: {
-    },
+    parameters: {},
   };
 }
 
@@ -79,8 +65,7 @@ export function dLostFocus(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when the ${comp} has lost the focus.`,
     signature: "lostFocus(): void",
-    parameters: {
-    },
+    parameters: {},
   };
 }
 
@@ -150,7 +135,10 @@ export function dAutoFocus(): ComponentPropertyMetadata {
   };
 }
 
-export function dInitialValue(value?: any, valueType: PropertyValueType = "any"): ComponentPropertyMetadata {
+export function dInitialValue(
+  value?: any,
+  valueType: PropertyValueType = "any",
+): ComponentPropertyMetadata {
   return {
     description: `This property sets the component's initial value.`,
     valueType,

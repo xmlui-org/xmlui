@@ -6,7 +6,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
-import { createMetadata, d, dComponent } from "../metadata-helpers";
+import { createMetadata, dComponent } from "../metadata-helpers";
 import type { PropertyValueDescription, ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import { TileGridNative } from "./TileGridReact";
@@ -32,24 +32,24 @@ export const TileGridMd = createMetadata({
     "and only renders visible rows — making it suitable for large datasets.",
 
   props: {
-    data: d(
-      `The array of items to render as tiles. Each item is exposed as [\`$item\`](#item) ` +
+    data: {
+      description:
+        `The array of items to render as tiles. Each item is exposed as [\`$item\`](#item) ` +
         `inside the tile template.`,
-      undefined,
-      "any",
-    ),
+      valueType: "any",
+    },
     itemWidth: {
-      description: "Fixed width of each tile, e.g. `\"120px\"`.",
+      description: 'Fixed width of each tile, e.g. `"120px"`.',
       valueType: "string",
       defaultValue: defaultProps.itemWidth,
     },
     itemHeight: {
-      description: "Fixed height of each tile, e.g. `\"140px\"`.",
+      description: 'Fixed height of each tile, e.g. `"140px"`.',
       valueType: "string",
       defaultValue: defaultProps.itemHeight,
     },
     gap: {
-      description: "Gap between tiles, e.g. `\"8px\"` or a theme variable like `\"$gap-normal\"`.",
+      description: 'Gap between tiles, e.g. `"8px"` or a theme variable like `"$gap-normal"`.',
       valueType: "string",
       defaultValue: defaultProps.gap,
     },
@@ -87,18 +87,19 @@ export const TileGridMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.toggleSelectionOnClick,
     },
-    syncWithVar: d(
-      `The name of a global variable to synchronize the grid's selection state with. ` +
+    syncWithVar: {
+      description:
+        `The name of a global variable to synchronize the grid's selection state with. ` +
         `The named variable must reference an object; the grid will read from and write to its \`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
-      undefined,
-      "string",
-    ),
-    refreshOn: d(
-      `An optional value that, when changed, forces all visible tiles to re-render so their ` +
+      valueType: "string",
+    },
+    refreshOn: {
+      description:
+        `An optional value that, when changed, forces all visible tiles to re-render so their ` +
         `XMLUI event-handler closures pick up the latest reactive state. Bind to any global ` +
         `variable whose change should invalidate tile closures (e.g. \`"{selectMode}"\`). ` +
         `If not provided, tiles re-render on every XMLUI reactive cycle.`,
-    ),
+    },
     hideSelectionCheckboxes: {
       description:
         "If `true`, hides selection checkboxes. Selection logic still works via click, API, and keyboard.",
@@ -140,7 +141,8 @@ export const TileGridMd = createMetadata({
 
   events: {
     selectionDidChange: {
-      description: "Fired when the selection changes. Receives the array of currently selected items.",
+      description:
+        "Fired when the selection changes. Receives the array of currently selected items.",
       signature: "selectionDidChange(selectedItems: any[], selectedIds: string[]): void",
       parameters: {
         selectedItems: "Array of selected tile data items.",
@@ -159,7 +161,8 @@ export const TileGridMd = createMetadata({
       description:
         "Fired when the user presses Ctrl/Cmd+X. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-      signature: "cutAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      signature:
+        "cutAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
       parameters: {
         focusedItem: "The currently focused tile data item, or null if none is focused.",
         selectedItems: "Array of selected tile data items.",
@@ -170,7 +173,8 @@ export const TileGridMd = createMetadata({
       description:
         "Fired when the user presses Ctrl/Cmd+C. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-      signature: "copyAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      signature:
+        "copyAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
       parameters: {
         focusedItem: "The currently focused tile data item, or null if none is focused.",
         selectedItems: "Array of selected tile data items.",
@@ -181,7 +185,8 @@ export const TileGridMd = createMetadata({
       description:
         "Fired when the user presses Ctrl/Cmd+V. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-      signature: "pasteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      signature:
+        "pasteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
       parameters: {
         focusedItem: "The currently focused tile data item, or null if none is focused.",
         selectedItems: "Array of selected tile data items.",
@@ -192,7 +197,8 @@ export const TileGridMd = createMetadata({
       description:
         "Fired when the user presses the Delete key. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
-      signature: "deleteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
+      signature:
+        "deleteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void",
       parameters: {
         focusedItem: "The currently focused tile data item, or null if none is focused.",
         selectedItems: "Array of selected tile data items.",
@@ -200,7 +206,8 @@ export const TileGridMd = createMetadata({
       },
     },
     selectAllAction: {
-      description: "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.",
+      description:
+        "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.",
       signature: "selectAllAction(selectedItems: any[], selectedIds: string[]): void",
       parameters: {
         selectedItems: "Array of selected tile data items.",
@@ -220,11 +227,21 @@ export const TileGridMd = createMetadata({
   },
 
   contextVars: {
-    $item: d("The current data item."),
-    $itemIndex: d("The zero-based index of the current item in the full `data` array."),
-    $isFirst: d("`true` when this is the first item in the `data` array."),
-    $isLast: d("`true` when this is the last item in the `data` array."),
-    $selected: d("`true` when this tile is currently selected."),
+    $item: {
+      description: "The current data item.",
+    },
+    $itemIndex: {
+      description: "The zero-based index of the current item in the full `data` array.",
+    },
+    $isFirst: {
+      description: "`true` when this is the first item in the `data` array.",
+    },
+    $isLast: {
+      description: "`true` when this is the last item in the `data` array.",
+    },
+    $selected: {
+      description: "`true` when this tile is currently selected.",
+    },
   },
 
   childrenAsTemplate: "itemTemplate",
@@ -289,7 +306,16 @@ const TileGridMemoizedItem = memo(
 const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 
 const TileGridWithSync = memo(
-  ({ node, extractValue, renderChild, classes, layoutContext, lookupEventHandler, lookupAction, registerComponentApi }: any) => {
+  ({
+    node,
+    extractValue,
+    renderChild,
+    classes,
+    layoutContext,
+    lookupEventHandler,
+    lookupAction,
+    registerComponentApi,
+  }: any) => {
     const itemTemplate = node.props.itemTemplate;
     const idKey = extractValue.asOptionalString(node.props.idKey) ?? defaultProps.idKey;
     const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
@@ -323,7 +349,8 @@ const TileGridWithSync = memo(
     const pendingOwnWrite = pendingOwnWriteRef.current;
     pendingOwnWriteRef.current = false;
 
-    const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+    const shouldForceRefresh =
+      node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
     if (shouldForceRefresh) {
       prevRefreshOnRef.current = refreshOn;
       renderVersionRef.current++;
@@ -350,11 +377,14 @@ const TileGridWithSync = memo(
                   `{${syncVarName} = {selectedIds: window.${windowKey}.selectedIds, __v: window.${windowKey}.__v}}`,
                   { ephemeral: true },
                 );
-                startTransition(() => { handler?.(); });
+                startTransition(() => {
+                  handler?.();
+                });
               },
             };
           } else if (currentValue !== syncAdapterHolderRef.current.value) {
-            const isOwnWrite = pendingOwnWrite ||
+            const isOwnWrite =
+              pendingOwnWrite ||
               (pendingOwnWriteVersionRef.current > 0 &&
                 currentValue?.__v === pendingOwnWriteVersionRef.current);
             if (isOwnWrite) {
@@ -390,8 +420,8 @@ const TileGridWithSync = memo(
     // Stable function wrappers: created once, never reassigned, always delegate
     // to the latest ref value. MemoizedItem's comparator receives the same
     // reference every render, so it never fails on renderChild/layoutContext.
-    const stableRenderChildFnRef = useRef<typeof renderChild>(
-      (node: any, ctx: any) => renderChildRef.current(node, ctx),
+    const stableRenderChildFnRef = useRef<typeof renderChild>((node: any, ctx: any) =>
+      renderChildRef.current(node, ctx),
     );
 
     // Stable contextMenu handler — evaluated ephemeral at click time so the XMLUI expression
@@ -413,13 +443,27 @@ const TileGridWithSync = memo(
       [hasContextMenu],
     );
 
-    const stableSelectionDidChange = useEvent((...args: any[]) => lookupEventHandler("selectionDidChange")?.(...args));
-    const stableItemDoubleClick = useEvent((...args: any[]) => lookupEventHandler("itemDoubleClick")?.(...args));
-    const stableCutAction = useEvent((...args: any[]) => lookupEventHandler("cutAction")?.(...args));
-    const stableCopyAction = useEvent((...args: any[]) => lookupEventHandler("copyAction")?.(...args));
-    const stablePasteAction = useEvent((...args: any[]) => lookupEventHandler("pasteAction")?.(...args));
-    const stableDeleteAction = useEvent((...args: any[]) => lookupEventHandler("deleteAction")?.(...args));
-    const stableSelectAllAction = useEvent((...args: any[]) => lookupEventHandler("selectAllAction")?.(...args));
+    const stableSelectionDidChange = useEvent((...args: any[]) =>
+      lookupEventHandler("selectionDidChange")?.(...args),
+    );
+    const stableItemDoubleClick = useEvent((...args: any[]) =>
+      lookupEventHandler("itemDoubleClick")?.(...args),
+    );
+    const stableCutAction = useEvent((...args: any[]) =>
+      lookupEventHandler("cutAction")?.(...args),
+    );
+    const stableCopyAction = useEvent((...args: any[]) =>
+      lookupEventHandler("copyAction")?.(...args),
+    );
+    const stablePasteAction = useEvent((...args: any[]) =>
+      lookupEventHandler("pasteAction")?.(...args),
+    );
+    const stableDeleteAction = useEvent((...args: any[]) =>
+      lookupEventHandler("deleteAction")?.(...args),
+    );
+    const stableSelectAllAction = useEvent((...args: any[]) =>
+      lookupEventHandler("selectAllAction")?.(...args),
+    );
 
     const stableItemRenderer = useMemo(
       () =>
@@ -458,7 +502,9 @@ const TileGridWithSync = memo(
         enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
         toggleSelectionOnClick={extractValue.asOptionalBoolean(node.props.toggleSelectionOnClick)}
         syncWithAppState={syncAdapter}
-        checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as CheckboxPosition}
+        checkboxPosition={
+          extractValue.asOptionalString(node.props.checkboxPosition) as CheckboxPosition
+        }
         hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
         idKey={idKey}
         itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
@@ -479,29 +525,49 @@ const TileGridWithSync = memo(
   },
 );
 
-export const tileGridComponentRenderer = wrapComponent(
-  COMP,
-  TileGridNative,
-  TileGridMd,
-  {
-    exposeRegisterApi: true,
-    exclude: [
-      "data", "itemWidth", "itemHeight", "gap", "stretchItems", "loading", "itemsSelectable",
-      "enableMultiSelection", "toggleSelectionOnClick", "syncWithVar", "refreshOn", "checkboxPosition", "hideSelectionCheckboxes",
-      "idKey", "itemUserSelect", "itemTemplate",
-    ],
-    events: [],
-    customRender: (_props, { node, extractValue, renderChild, classes, layoutContext, lookupEventHandler, lookupAction, registerComponentApi }) => (
-      <TileGridWithSync
-        node={node}
-        extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler as any}
-        lookupAction={lookupAction}
-        classes={classes}
-        renderChild={renderChild}
-        registerComponentApi={registerComponentApi}
-        layoutContext={layoutContext}
-      />
-    ),
-  },
-);
+export const tileGridComponentRenderer = wrapComponent(COMP, TileGridNative, TileGridMd, {
+  exposeRegisterApi: true,
+  exclude: [
+    "data",
+    "itemWidth",
+    "itemHeight",
+    "gap",
+    "stretchItems",
+    "loading",
+    "itemsSelectable",
+    "enableMultiSelection",
+    "toggleSelectionOnClick",
+    "syncWithVar",
+    "refreshOn",
+    "checkboxPosition",
+    "hideSelectionCheckboxes",
+    "idKey",
+    "itemUserSelect",
+    "itemTemplate",
+  ],
+  events: [],
+  customRender: (
+    _props,
+    {
+      node,
+      extractValue,
+      renderChild,
+      classes,
+      layoutContext,
+      lookupEventHandler,
+      lookupAction,
+      registerComponentApi,
+    },
+  ) => (
+    <TileGridWithSync
+      node={node}
+      extractValue={extractValue}
+      lookupEventHandler={lookupEventHandler as any}
+      lookupAction={lookupAction}
+      classes={classes}
+      renderChild={renderChild}
+      registerComponentApi={registerComponentApi}
+      layoutContext={layoutContext}
+    />
+  ),
+});

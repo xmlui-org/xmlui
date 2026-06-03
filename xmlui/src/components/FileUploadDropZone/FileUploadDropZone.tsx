@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { defaultProps } from "./FileUploadDropZone.defaults";
 import { FileUploadDropZone } from "./FileUploadDropZoneReact";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "FileUploadDropZone";
 
@@ -35,12 +35,12 @@ export const FileUploadDropZoneMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.allowPaste,
     },
-    enabled: d(
-      `If set to \`false\`, the drop zone will be disabled and users will not be able to upload files.`,
-      null,
-      "boolean",
-      true,
-    ),
+    enabled: {
+      description: `If set to \`false\`, the drop zone will be disabled and users will not be able to upload files.`,
+      availableValues: null,
+      valueType: "boolean",
+      defaultValue: true,
+    },
     acceptedFileTypes: {
       description: `Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`,
       valueType: "string",

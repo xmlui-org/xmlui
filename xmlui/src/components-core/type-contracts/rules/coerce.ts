@@ -35,6 +35,16 @@ const stringRule: CoercionRule = {
   coerce: (raw) => (raw === undefined || raw === null ? raw : String(raw)),
 };
 
+const stringArrayRule: CoercionRule = {
+  valueType: "string[]",
+  verify(raw) {
+    if (raw === undefined || raw === null) return null;
+    if (Array.isArray(raw) && raw.every((item) => typeof item === "string")) return null;
+    return { message: `Expected an array of strings, got ${typeof raw}.`, expected: "string[]" };
+  },
+  coerce: (raw) => raw,
+};
+
 const numberRule: CoercionRule = {
   valueType: "number",
   verify(raw) {
@@ -86,6 +96,7 @@ const componentDefRule: CoercionRule = {
 const allRules: readonly CoercionRule[] = [
   // Legacy coarse types
   stringRule,
+  stringArrayRule,
   numberRule,
   booleanRule,
   anyRule,

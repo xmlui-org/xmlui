@@ -14,6 +14,7 @@ describe("coercionRules", () => {
     const expected = [
       "boolean",
       "string",
+      "string[]",
       "number",
       "any",
       "hash",
@@ -49,6 +50,7 @@ describe("coercionRules", () => {
       ["icon", "save", "save"],
       ["id-ref", "myField", "myField"],
       ["hash", { a: 1 }, { a: 1 }],
+      ["string[]", ["one", "two"], ["one", "two"]],
     ];
     for (const [t, raw, expected] of cases) {
       expect(verifyValue(t, raw)).toBeNull();
@@ -67,6 +69,8 @@ describe("coercionRules", () => {
     expect(verifyValue("id-ref", "1abc")).not.toBeNull();
     expect(verifyValue("hash", [])).not.toBeNull();
     expect(verifyValue("hash", "not an object")).not.toBeNull();
+    expect(verifyValue("string[]", "one,two")).not.toBeNull();
+    expect(verifyValue("string[]", ["one", 2])).not.toBeNull();
   });
 
   it("returns null verification for unknown / undefined valueType (forward-compat)", () => {

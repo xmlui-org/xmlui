@@ -147,6 +147,7 @@ Common value types include:
 | `valueType` | Meaning |
 |-------------|---------|
 | `"string"` | Text-like values |
+| `"string[]"` | Arrays of text values |
 | `"number"` | Numeric values |
 | `"integer"` | Whole numbers |
 | `"boolean"` | Boolean values |

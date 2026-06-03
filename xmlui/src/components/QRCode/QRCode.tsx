@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { defaultProps } from "./QRCode.defaults";
 import { QRCode } from "./QRCodeReact";
-import { createMetadata, d, dInit } from "../metadata-helpers";
+import { createMetadata, dInit } from "../metadata-helpers";
 
 const COMP = "QRCode";
 

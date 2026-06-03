@@ -10,7 +10,7 @@ import { defaultProps } from "./Heading.defaults";
 import { Heading } from "./HeadingReact";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 import type { HeadingLevel } from "./abstractions";
-import { d, dComponent, createMetadata } from "../metadata-helpers";
+import { dComponent, createMetadata } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { MemoizedItem } from "../container-helpers";
 
@@ -25,7 +25,7 @@ function normalizeHeadingLevel(value: any): HeadingLevel {
   if (value === null || value === undefined) {
     return "h1";
   }
-  
+
   // Handle numeric values (1-6)
   if (typeof value === "number") {
     if (value >= 1 && value <= 6) {
@@ -33,42 +33,41 @@ function normalizeHeadingLevel(value: any): HeadingLevel {
     }
     return "h1";
   }
-  
+
   // Handle string values
   if (typeof value === "string") {
     const trimmed = value.trim().toLowerCase();
-    
+
     // Handle "h1"-"h6" (case insensitive)
     if (/^h[1-6]$/.test(trimmed)) {
       return trimmed as HeadingLevel;
     }
-    
+
     // Handle "1"-"6"
     if (/^[1-6]$/.test(trimmed)) {
       return `h${trimmed}` as HeadingLevel;
     }
   }
-  
+
   // Default fallback
   return "h1";
 }
 
-
-const VALUE_DESC = d(
-  `This property determines the text displayed in the heading. \`${COMP}\` also accepts nested ` +
+const VALUE_DESC = {
+  description:
+    `This property determines the text displayed in the heading. \`${COMP}\` also accepts nested ` +
     `text instead of specifying the \`value\`. If both \`value\` and a nested text are used, ` +
     `the \`value\` will be displayed.`,
-  undefined,
-  "string",
-);
-const MAX_LINES_DESC = d(
-  "This optional property determines the maximum number of lines the component can wrap to. " +
+  valueType: "string" as const,
+};
+const MAX_LINES_DESC = {
+  description:
+    "This optional property determines the maximum number of lines the component can wrap to. " +
     "If there is not enough space for all of the text, the component wraps the text up to as many " +
     "lines as specified. If the value is not specified, there is no limit on the number of " +
     "displayed lines.",
-  undefined,
-  "number",
-);
+  valueType: "number" as const,
+};
 const ELLIPSES_DESC = {
   description:
     `This property indicates whether ellipses should be displayed (\`true\`) when the heading ` +
@@ -76,12 +75,12 @@ const ELLIPSES_DESC = {
   valueType: "boolean" as const,
   defaultValue: defaultProps.ellipses,
 };
-const PRESERVE_DESC = d(
-  `This property indicates whether linebreaks should be preserved when ` + `displaying text.`,
-  undefined,
-  "boolean",
-  defaultProps.preserveLinebreaks,
-);
+const PRESERVE_DESC = {
+  description:
+    `This property indicates whether linebreaks should be preserved when ` + `displaying text.`,
+  valueType: "boolean" as const,
+  defaultValue: defaultProps.preserveLinebreaks,
+};
 const LEVEL_DESC = (level: number) => `Represents a heading level ${level} text`;
 const OMIT_FROM_TOC_DESC = {
   description: "If true, this heading will be excluded from the table of contents.",
@@ -97,8 +96,8 @@ const SHOW_ANCHOR_DESC = {
 };
 const ANCHOR_TEMPLATE_DESC = dComponent(
   "An optional template to customize the anchor link rendered next to the heading when " +
-  "`showAnchor` is enabled. The template receives `$anchorId` (the computed anchor ID) " +
-  "and `$anchorHref` (the anchor href string, e.g. `#my-heading`) as context variables.",
+    "`showAnchor` is enabled. The template receives `$anchorId` (the computed anchor ID) " +
+    "and `$anchorHref` (the anchor href string, e.g. `#my-heading`) as context variables.",
 );
 const APIS_DESC = {
   scrollIntoView: {
@@ -107,7 +106,8 @@ const APIS_DESC = {
   },
   hasOverflow: {
     signature: "hasOverflow()",
-    description: "Returns true when the displayed text overflows the bounds of this heading component.",
+    description:
+      "Returns true when the displayed text overflows the bounds of this heading component.",
   },
 };
 
@@ -121,14 +121,29 @@ export const HeadingMd = createMetadata({
   props: {
     value: VALUE_DESC,
     level: {
-      description: 
+      description:
         "This property sets the visual significance (level) of the heading. " +
         "Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`." +
         "Invalid values default to `h1`.",
       availableValues: [
-        "h1", "h2", "h3", "h4", "h5", "h6",
-        "H1", "H2", "H3", "H4", "H5", "H6",
-        "1", "2", "3", "4", "5", "6",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
       ],
       valueType: "string",
       defaultValue: defaultProps.level,
@@ -167,7 +182,13 @@ type ThemedHeadingProps = React.ComponentProps<typeof Heading> & { className?: s
 export const ThemedHeading = React.forwardRef<HTMLHeadingElement, ThemedHeadingProps>(
   function ThemedHeading({ className, ...props }: ThemedHeadingProps, ref) {
     const themeClass = useComponentThemeClass(HeadingMd);
-    return <Heading {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    return (
+      <Heading
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
   },
 );
 
@@ -389,14 +410,15 @@ function renderHeading({
   registerComponentApi,
   layoutContext,
 }: RenderHeadingProps) {
-  const { maxLines, preserveLinebreaks, ellipses, showAnchor, anchorTemplate, ...restProps } = node.props;
+  const { maxLines, preserveLinebreaks, ellipses, showAnchor, anchorTemplate, ...restProps } =
+    node.props;
   delete restProps.level; // Remove level from restProps as it is handled separately
   const showAnchorValue = extractValue.asOptionalBoolean(node.props?.showAnchor);
-  
+
   // Extract and normalize the level value
   const extractedLevel = extractValue(level);
   const normalizedLevel = normalizeHeadingLevel(extractedLevel);
-  
+
   const anchorRenderer = anchorTemplate
     ? (anchorId: string, anchorHref: string) => (
         <MemoizedItem
@@ -427,13 +449,10 @@ function renderHeading({
   );
 }
 
-export const headingComponentRenderer = wrapComponent(
-  COMP,
-  Heading,
-  HeadingMd,
-  {
-    exposeRegisterApi: true,
-    customRender: (_props, context) => renderHeading({
+export const headingComponentRenderer = wrapComponent(COMP, Heading, HeadingMd, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
       node: context.node as HeadingComponentDef,
       extractValue: context.extractValue,
       classes: context.classes,
@@ -442,16 +461,12 @@ export const headingComponentRenderer = wrapComponent(
       registerComponentApi: context.registerComponentApi,
       layoutContext: context.layoutContext,
     }),
-  },
-);
+});
 
-export const h1ComponentRenderer = wrapComponent(
-  H1,
-  Heading,
-  H1Md,
-  {
-    exposeRegisterApi: true,
-    customRender: (_props, context) => renderHeading({
+export const h1ComponentRenderer = wrapComponent(H1, Heading, H1Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
       node: context.node as any,
       extractValue: context.extractValue,
       classes: context.classes,
@@ -460,16 +475,12 @@ export const h1ComponentRenderer = wrapComponent(
       registerComponentApi: context.registerComponentApi,
       layoutContext: context.layoutContext,
     }),
-  },
-);
+});
 
-export const h2ComponentRenderer = wrapComponent(
-  H2,
-  Heading,
-  H2Md,
-  {
-    exposeRegisterApi: true,
-    customRender: (_props, context) => renderHeading({
+export const h2ComponentRenderer = wrapComponent(H2, Heading, H2Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
       node: context.node as any,
       extractValue: context.extractValue,
       classes: context.classes,
@@ -478,16 +489,12 @@ export const h2ComponentRenderer = wrapComponent(
       registerComponentApi: context.registerComponentApi,
       layoutContext: context.layoutContext,
     }),
-  },
-);
+});
 
-export const h3ComponentRenderer = wrapComponent(
-  H3,
-  Heading,
-  H3Md,
-  {
-    exposeRegisterApi: true,
-    customRender: (_props, context) => renderHeading({
+export const h3ComponentRenderer = wrapComponent(H3, Heading, H3Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
       node: context.node as any,
       extractValue: context.extractValue,
       classes: context.classes,
@@ -496,16 +503,12 @@ export const h3ComponentRenderer = wrapComponent(
       registerComponentApi: context.registerComponentApi,
       layoutContext: context.layoutContext,
     }),
-  },
-);
+});
 
-export const h4ComponentRenderer = wrapComponent(
-  H4,
-  Heading,
-  H4Md,
-  {
-    exposeRegisterApi: true,
-    customRender: (_props, context) => renderHeading({
+export const h4ComponentRenderer = wrapComponent(H4, Heading, H4Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
       node: context.node as any,
       extractValue: context.extractValue,
       classes: context.classes,
@@ -514,16 +517,12 @@ export const h4ComponentRenderer = wrapComponent(
       registerComponentApi: context.registerComponentApi,
       layoutContext: context.layoutContext,
     }),
-  },
-);
+});
 
-export const h5ComponentRenderer = wrapComponent(
-  H5,
-  Heading,
-  H5Md,
-  {
-    exposeRegisterApi: true,
-    customRender: (_props, context) => renderHeading({
+export const h5ComponentRenderer = wrapComponent(H5, Heading, H5Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
       node: context.node as any,
       extractValue: context.extractValue,
       classes: context.classes,
@@ -532,16 +531,12 @@ export const h5ComponentRenderer = wrapComponent(
       registerComponentApi: context.registerComponentApi,
       layoutContext: context.layoutContext,
     }),
-  },
-);
+});
 
-export const h6ComponentRenderer = wrapComponent(
-  H6,
-  Heading,
-  H6Md,
-  {
-    exposeRegisterApi: true,
-    customRender: (_props, context) => renderHeading({
+export const h6ComponentRenderer = wrapComponent(H6, Heading, H6Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
       node: context.node as any,
       extractValue: context.extractValue,
       classes: context.classes,
@@ -550,5 +545,4 @@ export const h6ComponentRenderer = wrapComponent(
       registerComponentApi: context.registerComponentApi,
       layoutContext: context.layoutContext,
     }),
-  },
-);
+});

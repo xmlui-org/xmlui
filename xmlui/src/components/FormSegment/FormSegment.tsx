@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { defaultProps } from "../DateInput/DateInputReact";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 import { FormSegmentNative } from "./FormSegmentReact";
 
 const COMP = "FormSegment";
@@ -31,27 +31,30 @@ export const FormSegmentMd = createMetadata({
       valueType: "string",
       defaultValue: "vertical",
     },
-    fields: d(
-      "An optional comma-separated list of field names (matching the `bindTo` values of " +
+    fields: {
+      description:
+        "An optional comma-separated list of field names (matching the `bindTo` values of " +
         "nested inputs) that belong to this segment. When omitted the segment auto-discovers " +
         "field names by inspecting its direct and nested children for `bindTo` attributes.",
-      undefined,
-      "string",
-    ),
+      valueType: "string",
+    },
   },
   contextVars: {
-    $segmentData: d(
-      "An object containing the current form values of the fields that belong to this segment, " +
+    $segmentData: {
+      description:
+        "An object containing the current form values of the fields that belong to this segment, " +
         "keyed by field name. Only fields registered with this segment are included.",
-    ),
-    $segmentValidationIssues: d(
-      "An object keyed by field name containing an array of failed validation results for each " +
+    },
+    $segmentValidationIssues: {
+      description:
+        "An object keyed by field name containing an array of failed validation results for each " +
         "field that belongs to this segment. Fields without validation issues are omitted.",
-    ),
-    $hasSegmentValidationIssue: d(
-      "A function that returns `true` when any field in this segment has a validation issue. " +
+    },
+    $hasSegmentValidationIssue: {
+      description:
+        "A function that returns `true` when any field in this segment has a validation issue. " +
         "Pass a field name as the first argument to check a specific field only.",
-    ),
+    },
   },
   apis: {
     isValid: {

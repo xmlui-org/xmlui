@@ -12,7 +12,7 @@ import { extractParam } from "../utils/extractParam";
 import { createLoaderRenderer } from "../renderers";
 import { useAppContext } from "../AppContext";
 import { Loader } from "./Loader";
-import { createMetadata, d } from "../../components/metadata-helpers";
+import { createMetadata } from "../../components/metadata-helpers";
 
 // Wires an XMLUI ApiLoader definition to the shared Loader lifecycle.
 type ApiLoaderProps = {
@@ -77,8 +77,13 @@ const ApiLoaderMd = createMetadata({
   status: "stable",
   description: `Represents a loader that calls an API through an HTTP/HTTPS GET request`,
   props: {
-    url: d("URL segment to use in the GET request"),
-    raw: d("If true, the loader returns the raw text response instead of parsing it as JSON"),
+    url: {
+      description: "URL segment to use in the GET request",
+    },
+    raw: {
+      description:
+        "If true, the loader returns the raw text response instead of parsing it as JSON",
+    },
   },
 });
 

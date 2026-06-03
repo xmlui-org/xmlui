@@ -6,7 +6,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { Tabs } from "./TabsReact";
 import { defaultProps } from "./Tabs.defaults";
-import { createMetadata, d, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
+import { createMetadata, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 
@@ -20,12 +20,12 @@ export const TabsMd = createMetadata({
     "interface area, with each tab containing distinct content defined by " +
     "[TabItem](/components/TabItem) components.",
   props: {
-    activeTab: d(
-      `This property indicates the index of the active tab. The indexing starts from 0, ` +
+    activeTab: {
+      description:
+        `This property indicates the index of the active tab. The indexing starts from 0, ` +
         `representing the starting (leftmost) tab. If not set, the first tab is selected by default.`,
-      undefined,
-      "number",
-    ),
+      valueType: "number",
+    },
     orientation: {
       description:
         `This property indicates the orientation of the component. In horizontal orientation, ` +
@@ -129,54 +129,56 @@ export const ThemedTabs = React.forwardRef<React.ElementRef<typeof Tabs>, Themed
   function ThemedTabs({ className, ...props }, ref) {
     const themeClass = useComponentThemeClass(TabsMd);
     return (
-      <Tabs
-        {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
-        ref={ref}
-      />
+      <Tabs {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
     );
   },
 );
 
-export const tabsComponentRenderer = wrapComponent(
-  COMP,
-  Tabs,
-  TabsMd,
-  {
-    exposeRegisterApi: true,
-    exclude: ["activeTab", "orientation", "tabAlignment", "accordionView", "headerTemplate", "keepMounted", "gap"],
-    events: [],
-    customRender(_props, { extractValue, node, renderChild, classes, registerComponentApi, lookupEventHandler }) {
-      return (
-        <Tabs
-          id={node?.uid}
-          classes={classes}
-          headerRenderer={
-            node?.props?.headerTemplate
-              ? (item) => (
-                  <MemoizedItem
-                    node={node.props.headerTemplate! as any}
-                    contextVars={{
-                      $header: item,
-                    }}
-                    renderChild={renderChild}
-                  />
-                )
-              : undefined
-          }
-          activeTab={extractValue(node.props?.activeTab)}
-          orientation={extractValue(node.props?.orientation)}
-          tabAlignment={extractValue(node.props?.tabAlignment)}
-          accordionView={extractValue(node.props?.accordionView)}
-          keepMounted={extractValue.asOptionalBoolean(node.props?.keepMounted)}
-          gap={extractValue.asOptionalString(node.props?.gap)}
-          onDidChange={lookupEventHandler("didChange")}
-          onContextMenu={lookupEventHandler("contextMenu")}
-          registerComponentApi={registerComponentApi}
-        >
-          {renderChild(node.children)}
-        </Tabs>
-      );
-    },
+export const tabsComponentRenderer = wrapComponent(COMP, Tabs, TabsMd, {
+  exposeRegisterApi: true,
+  exclude: [
+    "activeTab",
+    "orientation",
+    "tabAlignment",
+    "accordionView",
+    "headerTemplate",
+    "keepMounted",
+    "gap",
+  ],
+  events: [],
+  customRender(
+    _props,
+    { extractValue, node, renderChild, classes, registerComponentApi, lookupEventHandler },
+  ) {
+    return (
+      <Tabs
+        id={node?.uid}
+        classes={classes}
+        headerRenderer={
+          node?.props?.headerTemplate
+            ? (item) => (
+                <MemoizedItem
+                  node={node.props.headerTemplate! as any}
+                  contextVars={{
+                    $header: item,
+                  }}
+                  renderChild={renderChild}
+                />
+              )
+            : undefined
+        }
+        activeTab={extractValue(node.props?.activeTab)}
+        orientation={extractValue(node.props?.orientation)}
+        tabAlignment={extractValue(node.props?.tabAlignment)}
+        accordionView={extractValue(node.props?.accordionView)}
+        keepMounted={extractValue.asOptionalBoolean(node.props?.keepMounted)}
+        gap={extractValue.asOptionalString(node.props?.gap)}
+        onDidChange={lookupEventHandler("didChange")}
+        onContextMenu={lookupEventHandler("contextMenu")}
+        registerComponentApi={registerComponentApi}
+      >
+        {renderChild(node.children)}
+      </Tabs>
+    );
   },
-);
+});
