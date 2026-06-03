@@ -87,17 +87,17 @@
 * Spinner
 * Splitter
 * Stack
-Stepper
-StepperForm
-StickyBox
-StickySection
-Table
-TableOfContents
-TableSelect
-Tabs
-TabsForm
-Text
-TextArea
+* Stepper
+* StepperForm
+* StickyBox
+* StickySection
+* Table
+* TableOfContents
+* TableSelect
+* Tabs
+* TabsForm
+* Text
+* TextArea
 TextBox
 Theme
 TileGrid

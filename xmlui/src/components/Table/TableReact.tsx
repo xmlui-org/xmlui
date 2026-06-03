@@ -32,6 +32,7 @@ import "./react-table-config.d.ts";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { EMPTY_ARRAY } from "../../components-core/constants";
+import { defaultProps } from "./Table.defaults";
 import { useEvent } from "../../components-core/utils/misc";
 import {
   useHasExplicitHeight,
@@ -1916,47 +1917,4 @@ function isTextInputElement(target: HTMLElement): boolean {
   );
 }
 
-export const defaultProps = {
-  idKey: "id",
-  data: EMPTY_ARRAY,
-  columns: EMPTY_ARRAY,
-  isPaginated: false,
-  loading: false,
-  rowsSelectable: false,
-  enableMultiRowSelection: true,
-  toggleSelectionOnClick: false,
-  initiallySelected: EMPTY_ARRAY,
-  pageSizeOptions: [5, 10, 15],
-  sortingDirection: "ascending" as SortingDirection,
-  autoFocus: false,
-  hideHeader: false,
-  hideNoDataView: false,
-  hideSelectionCheckboxes: false,
-  hideSelectionCheckboxesHeader: false,
-  alwaysShowSelectionCheckboxesHeader: false,
-  alwaysShowSelectionCheckboxes: false,
-  alwaysShowSortingIndicator: false,
-  noBottomBorder: false,
-  paginationControlsLocation: "bottom" as TablePaginationControlsLocation,
-  cellVerticalAlign: "center" as CellVerticalAlign,
-  showPageInfo: true,
-  showPageSizeSelector: true,
-  showCurrentPage: true,
-  buttonRowPosition: "center" as Position,
-  pageSizeSelectorPosition: "start" as Position,
-  pageInfoPosition: "end" as Position,
-  checkboxTolerance: "compact" as CheckboxTolerance,
-  rowHeight: 40, // For virtua virtualization
-  userSelectCell: "auto",
-  userSelectRow: "auto",
-  userSelectHeading: "none",
-  keyBindings: {
-    selectAll: "CmdOrCtrl+A",
-    cut: "CmdOrCtrl+X",
-    copy: "CmdOrCtrl+C",
-    paste: "CmdOrCtrl+V",
-    delete: "Delete",
-  },
-  alwaysShowHeader: false,
-  striped: false,
-};
+export { defaultProps } from "./Table.defaults";

@@ -47,14 +47,7 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onContextMenu"> & {
   gap?: string;
 };
 
-export const defaultProps = {
-  activeTab: 0,
-  orientation: "horizontal" as "horizontal" | "vertical",
-  tabAlignment: "start" as "start" | "end" | "center" | "stretch",
-  accordionView: false,
-  distributeEvenly: false,
-  keepMounted: undefined as boolean | undefined,
-};
+import { defaultProps } from "./Tabs.defaults";
 
 export const Tabs = memo(forwardRef(function Tabs(
   {

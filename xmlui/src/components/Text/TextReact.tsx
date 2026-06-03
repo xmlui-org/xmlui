@@ -111,13 +111,7 @@ type TextProps = Omit<HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   [variantSpecificProps: string]: any;
 };
 
-export const defaultProps = {
-  maxLines: 0,
-  preserveLinebreaks: false,
-  ellipses: true,
-  overflowMode: undefined as OverflowMode | undefined,
-  breakMode: undefined as BreakMode | undefined,
-};
+import { defaultProps } from "./Text.defaults";
 
 export const Text = memo(forwardRef(function Text(
   {

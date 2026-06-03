@@ -23,8 +23,8 @@ import {
   Table,
   TablePaginationControlsLocationValues,
   CheckboxToleranceValues,
-  defaultProps,
 } from "./TableReact";
+import { defaultProps } from "./Table.defaults";
 import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
 import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 import { PositionValues } from "../Pagination/Pagination";

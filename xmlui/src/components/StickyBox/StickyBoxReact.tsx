@@ -11,9 +11,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 // =====================================================================================================================
 // React StickyBox component implementation
 
-export const defaultProps = {
-  to: "top" as const,
-};
+import { defaultProps } from "./StickyBox.defaults";
 
 const HIDDEN_STYLE = { display: "none" } as const;
 

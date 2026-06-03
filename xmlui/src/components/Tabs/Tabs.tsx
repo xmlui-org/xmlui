@@ -4,7 +4,8 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 import { MemoizedItem } from "../container-helpers";
-import { Tabs, defaultProps } from "./TabsReact";
+import { Tabs } from "./TabsReact";
+import { defaultProps } from "./Tabs.defaults";
 import { createMetadata, d, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";

@@ -31,6 +31,8 @@ import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
+import { defaultProps } from "./TextArea.defaults";
+
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
 
@@ -66,24 +68,6 @@ type Props = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
-};
-
-export const defaultProps = {
-  value: "",
-  placeholder: "",
-  required: false,
-  readOnly: false,
-  allowCopy: true,
-  updateState: noop,
-  autoFocus: false,
-  initialValue: "",
-  onDidChange: noop,
-  onFocus: noop,
-  onBlur: noop,
-  controlled: true,
-  enterSubmits: true,
-  rows: 2,
-  enabled: true,
 };
 
 export const TextArea = memo(forwardRef(function TextArea(

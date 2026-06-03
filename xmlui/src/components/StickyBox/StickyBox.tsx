@@ -2,7 +2,8 @@ import styles from "./StickyBox.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { StickyBox, defaultProps } from "./StickyBoxReact";
+import { StickyBox } from "./StickyBoxReact";
+import { defaultProps } from "./StickyBox.defaults";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "StickyBox";

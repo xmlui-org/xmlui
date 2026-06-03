@@ -35,13 +35,7 @@ type Props = Omit<React.HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   showScrollerFade?: boolean;
 };
 
-export const defaultProps = {
-  smoothScrolling: false,
-  maxHeadingLevel: 6,
-  omitH1: false,
-  scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: true,
-};
+import { defaultProps } from "./TableOfContents.defaults";
 
 export const TableOfContents = memo(forwardRef(function TableOfContents(
   {

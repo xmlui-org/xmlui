@@ -2,7 +2,8 @@ import styles from "./StickySection.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { StickySection, defaultProps } from "./StickySectionReact";
+import { StickySection } from "./StickySectionReact";
+import { defaultProps } from "./StickySection.defaults";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "StickySection";

@@ -8,9 +8,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 // =====================================================================================================================
 // StickySection React component
 
-export const defaultProps = {
-  stickTo: "top" as const,
-};
+import { defaultProps } from "./StickySection.defaults";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   stickTo?: "top" | "bottom";
