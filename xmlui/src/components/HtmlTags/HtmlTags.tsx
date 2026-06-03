@@ -1,28 +1,108 @@
 /**
  * @deprecated HTML Tag Components are temporary and will be removed from the framework.
- * 
+ *
  * DEPRECATION NOTICE:
  * All HTML tag wrapper components in this file are scheduled for removal in a future version.
  * These components were created as temporary solutions and should not be used in new development.
- * 
+ *
  * Migration Path:
  * - Replace with native HTML elements or dedicated XMLUI components
  * - Use semantic HTML directly for better performance and maintainability
  * - Consider existing XMLUI components (Button, Link, Text, Heading, etc.) for common use cases
- * 
+ *
  * Timeline: These components will be removed in the next major version release.
  */
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import React from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import { ThemedHeading as Heading } from "../Heading/Heading";
 import { ThemedText as Text } from "../Text/Text";
-import { PropsTrasform } from "../../components-core/utils/extractParam";
 import { createMetadata, d } from "../metadata-helpers";
-import classnames from 'classnames';
+import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
+type HtmlTagProps = Record<string, any> & {
+  children?: React.ReactNode;
+  classes?: Record<string, string>;
+};
+
+type HtmlTagOptions = {
+  extraClassName?: string;
+  booleanProps?: string[];
+  voidElement?: boolean;
+};
+
+function getHtmlTagClassName(classes?: Record<string, string>, extraClassName?: string) {
+  return classnames(extraClassName, classes?.[COMPONENT_PART_KEY]);
+}
+
+function createHtmlTag(tag: keyof React.JSX.IntrinsicElements, options: HtmlTagOptions = {}) {
+  return function HtmlTag({ children, classes, className: _className, ...props }: HtmlTagProps) {
+    const htmlProps = { ...props };
+    for (const prop of options.booleanProps ?? []) {
+      htmlProps[prop] = htmlProps[prop] ?? false;
+    }
+    htmlProps.className = getHtmlTagClassName(classes, options.extraClassName);
+    return React.createElement(tag, htmlProps, options.voidElement ? undefined : children);
+  };
+}
+
+function createHtmlTextTag(variant: string) {
+  return function HtmlTextTag({
+    children,
+    classes,
+    className: _className,
+    ...props
+  }: HtmlTagProps) {
+    return (
+      <Text className={getHtmlTagClassName(classes)} {...props} variant={variant}>
+        {children}
+      </Text>
+    );
+  };
+}
+
+function createHtmlHeadingTag(level: string) {
+  return function HtmlHeadingTag({
+    children,
+    classes,
+    className: _className,
+    ...props
+  }: HtmlTagProps) {
+    return (
+      <Heading
+        className={getHtmlTagClassName(classes, styles.htmlHeading)}
+        {...props}
+        level={level}
+      >
+        {children}
+      </Heading>
+    );
+  };
+}
+
+function HtmlLinkTag({
+  children,
+  classes,
+  className: _className,
+  href,
+  disabled,
+  ...props
+}: HtmlTagProps) {
+  return (
+    <LinkNative
+      to={href}
+      enabled={!(disabled ?? false)}
+      className={getHtmlTagClassName(classes)}
+      {...props}
+    >
+      {children}
+    </LinkNative>
+  );
+}
 
 export const HtmlAMd = createMetadata({
   status: "deprecated",
@@ -43,20 +123,10 @@ export const HtmlAMd = createMetadata({
   },
 });
 
-export const htmlATagRenderer = createComponentRenderer(
-  "a",
-  HtmlAMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { disabled } = p.asOptionalBoolean("disabled");
-    const { href, ...rest } = p.asRest();
-    return (
-      <LinkNative to={href} enabled={!(disabled ?? false)} className={classes?.[COMPONENT_PART_KEY]} {...rest}>
-        {renderChild(node.children)}
-      </LinkNative>
-    );
-  },
-);
+export const htmlATagRenderer = wrapComponent("a", HtmlLinkTag, HtmlAMd, {
+  stateful: false,
+  booleans: ["disabled"],
+});
 
 export const HtmlAbbrMd = createMetadata({
   status: "deprecated",
@@ -64,19 +134,9 @@ export const HtmlAbbrMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlAbbrTagRenderer = createComponentRenderer(
-  "abbr",
-  HtmlAbbrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="abbr">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlAbbrTagRenderer = wrapComponent("abbr", createHtmlTextTag("abbr"), HtmlAbbrMd, {
+  stateful: false,
+});
 
 export const HtmlAddressMd = createMetadata({
   status: "deprecated",
@@ -84,17 +144,12 @@ export const HtmlAddressMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlAddressTagRenderer = createComponentRenderer(
+export const htmlAddressTagRenderer = wrapComponent(
   "address",
+  createHtmlTag("address"),
   HtmlAddressMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <address className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </address>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -116,17 +171,12 @@ export const HtmlAreaMd = createMetadata({
   },
 });
 
-export const htmlAreaTagRenderer = createComponentRenderer(
+export const htmlAreaTagRenderer = wrapComponent(
   "area",
+  createHtmlTag("area", { voidElement: true }),
   HtmlAreaMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <area className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </area>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -136,17 +186,12 @@ export const HtmlArticleMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlArticleTagRenderer = createComponentRenderer(
+export const htmlArticleTagRenderer = wrapComponent(
   "article",
+  createHtmlTag("article"),
   HtmlArticleMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <article className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </article>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -156,19 +201,9 @@ export const HtmlAsideMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlAsideTagRenderer = createComponentRenderer(
-  "aside",
-  HtmlAsideMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <aside className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </aside>
-    );
-  },
-);
+export const htmlAsideTagRenderer = wrapComponent("aside", createHtmlTag("aside"), HtmlAsideMd, {
+  stateful: false,
+});
 
 export const HtmlAudioMd = createMetadata({
   status: "deprecated",
@@ -187,30 +222,13 @@ export const HtmlAudioMd = createMetadata({
   },
 });
 
-export const htmlAudioTagRenderer = createComponentRenderer(
+export const htmlAudioTagRenderer = wrapComponent(
   "audio",
+  createHtmlTag("audio", { booleanProps: ["autoPlay", "controls", "loop", "muted"] }),
   HtmlAudioMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { autoPlay, controls, loop, muted } = p.asOptionalBoolean(
-      "autoPlay",
-      "controls",
-      "loop",
-      "muted",
-    );
-    const props = p.asRest();
-    return (
-      <audio
-        className={classes?.[COMPONENT_PART_KEY]}
-        autoPlay={autoPlay ?? false}
-        controls={controls ?? false}
-        loop={loop ?? false}
-        muted={muted ?? false}
-        {...props}
-      >
-        {renderChild(node.children)}
-      </audio>
-    );
+  {
+    stateful: false,
+    booleans: ["autoPlay", "controls", "loop", "muted"],
   },
 );
 
@@ -220,19 +238,9 @@ export const HtmlBMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlBTagRenderer = createComponentRenderer(
-  "b",
-  HtmlBMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <b className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </b>
-    );
-  },
-);
+export const htmlBTagRenderer = wrapComponent("b", createHtmlTag("b"), HtmlBMd, {
+  stateful: false,
+});
 
 export const HtmlBdiMd = createMetadata({
   status: "deprecated",
@@ -240,19 +248,9 @@ export const HtmlBdiMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlBdiTagRenderer = createComponentRenderer(
-  "bdi",
-  HtmlBdiMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <bdi className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </bdi>
-    );
-  },
-);
+export const htmlBdiTagRenderer = wrapComponent("bdi", createHtmlTag("bdi"), HtmlBdiMd, {
+  stateful: false,
+});
 
 export const HtmlBdoMd = createMetadata({
   status: "deprecated",
@@ -263,19 +261,9 @@ export const HtmlBdoMd = createMetadata({
   },
 });
 
-export const htmlBdoTagRenderer = createComponentRenderer(
-  "bdo",
-  HtmlBdoMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <bdo className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </bdo>
-    );
-  },
-);
+export const htmlBdoTagRenderer = wrapComponent("bdo", createHtmlTag("bdo"), HtmlBdoMd, {
+  stateful: false,
+});
 
 export const HtmlBlockquoteMd = createMetadata({
   status: "deprecated",
@@ -286,17 +274,12 @@ export const HtmlBlockquoteMd = createMetadata({
   },
 });
 
-export const htmlBlockquoteTagRenderer = createComponentRenderer(
+export const htmlBlockquoteTagRenderer = wrapComponent(
   "blockquote",
+  createHtmlTag("blockquote"),
   HtmlBlockquoteMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <blockquote className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </blockquote>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -323,28 +306,13 @@ export const HtmlButtonMd = createMetadata({
   },
 });
 
-export const htmlButtonTagRenderer = createComponentRenderer(
+export const htmlButtonTagRenderer = wrapComponent(
   "button",
+  createHtmlTag("button", { booleanProps: ["autoFocus", "disabled", "formNoValidate"] }),
   HtmlButtonMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { autoFocus, disabled, formNoValidate } = p.asOptionalBoolean(
-      "autoFocus",
-      "disabled",
-      "formNoValidate",
-    );
-    const props = p.asRest();
-    return (
-      <button
-        className={classes?.[COMPONENT_PART_KEY]}
-        autoFocus={autoFocus ?? false}
-        disabled={disabled ?? false}
-        formNoValidate={formNoValidate ?? false}
-        {...props}
-      >
-        {renderChild(node.children)}
-      </button>
-    );
+  {
+    stateful: false,
+    booleans: ["autoFocus", "disabled", "formNoValidate"],
   },
 );
 
@@ -358,18 +326,13 @@ export const HtmlCanvasMd = createMetadata({
   },
 });
 
-export const htmlCanvasTagRenderer = createComponentRenderer(
+export const htmlCanvasTagRenderer = wrapComponent(
   "canvas",
+  createHtmlTag("canvas"),
   HtmlCanvasMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const sizeProps = p.asOptionalNumber("width", "height");
-    const props = p.asRest();
-    return (
-      <canvas className={classes?.[COMPONENT_PART_KEY]} {...sizeProps} {...props}>
-        {renderChild(node.children)}
-      </canvas>
-    );
+  {
+    stateful: false,
+    numbers: ["width", "height"],
   },
 );
 
@@ -379,17 +342,12 @@ export const HtmlCaptionMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlCaptionTagRenderer = createComponentRenderer(
+export const htmlCaptionTagRenderer = wrapComponent(
   "caption",
+  createHtmlTag("caption"),
   HtmlCaptionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <caption className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </caption>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -399,19 +357,9 @@ export const HtmlCiteMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlCiteTagRenderer = createComponentRenderer(
-  "cite",
-  HtmlCiteMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="cite">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlCiteTagRenderer = wrapComponent("cite", createHtmlTextTag("cite"), HtmlCiteMd, {
+  stateful: false,
+});
 
 export const HtmlCodeMd = createMetadata({
   status: "deprecated",
@@ -419,19 +367,9 @@ export const HtmlCodeMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlCodeTagRenderer = createComponentRenderer(
-  "code",
-  HtmlCodeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="code">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlCodeTagRenderer = wrapComponent("code", createHtmlTextTag("code"), HtmlCodeMd, {
+  stateful: false,
+});
 
 export const HtmlColMd = createMetadata({
   status: "deprecated",
@@ -442,18 +380,13 @@ export const HtmlColMd = createMetadata({
   },
 });
 
-export const htmlColTagRenderer = createComponentRenderer(
+export const htmlColTagRenderer = wrapComponent(
   "col",
+  createHtmlTag("col", { voidElement: true }),
   HtmlColMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { span } = p.asOptionalNumber("span");
-    const props = p.asRest();
-    return (
-      <col className={classes?.[COMPONENT_PART_KEY]} span={span} {...props}>
-        {renderChild(node.children)}
-      </col>
-    );
+  {
+    stateful: false,
+    numbers: ["span"],
   },
 );
 
@@ -466,18 +399,13 @@ export const HtmlColgroupMd = createMetadata({
   },
 });
 
-export const htmlColgroupTagRenderer = createComponentRenderer(
+export const htmlColgroupTagRenderer = wrapComponent(
   "colgroup",
+  createHtmlTag("colgroup"),
   HtmlColgroupMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { span } = p.asOptionalNumber("span");
-    const props = p.asRest();
-    return (
-      <colgroup className={classes?.[COMPONENT_PART_KEY]} span={span} {...props}>
-        {renderChild(node.children)}
-      </colgroup>
-    );
+  {
+    stateful: false,
+    numbers: ["span"],
   },
 );
 
@@ -490,19 +418,9 @@ export const HtmlDataMd = createMetadata({
   },
 });
 
-export const htmlDataTagRenderer = createComponentRenderer(
-  "data",
-  HtmlDataMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <data className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </data>
-    );
-  },
-);
+export const htmlDataTagRenderer = wrapComponent("data", createHtmlTag("data"), HtmlDataMd, {
+  stateful: false,
+});
 
 export const HtmlDatalistMd = createMetadata({
   status: "deprecated",
@@ -510,17 +428,12 @@ export const HtmlDatalistMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlDatalistTagRenderer = createComponentRenderer(
+export const htmlDatalistTagRenderer = wrapComponent(
   "datalist",
+  createHtmlTag("datalist"),
   HtmlDatalistMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <datalist className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </datalist>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -530,19 +443,9 @@ export const HtmlDdMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlDdTagRenderer = createComponentRenderer(
-  "dd",
-  HtmlDdMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <dd className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </dd>
-    );
-  },
-);
+export const htmlDdTagRenderer = wrapComponent("dd", createHtmlTag("dd"), HtmlDdMd, {
+  stateful: false,
+});
 
 export const HtmlDelMd = createMetadata({
   status: "deprecated",
@@ -554,19 +457,9 @@ export const HtmlDelMd = createMetadata({
   },
 });
 
-export const htmlDelTagRenderer = createComponentRenderer(
-  "del",
-  HtmlDelMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="deleted">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlDelTagRenderer = wrapComponent("del", createHtmlTextTag("deleted"), HtmlDelMd, {
+  stateful: false,
+});
 
 export const HtmlDetailsMd = createMetadata({
   status: "deprecated",
@@ -582,18 +475,13 @@ export const HtmlDetailsMd = createMetadata({
   },
 });
 
-export const htmlDetailsTagRenderer = createComponentRenderer(
+export const htmlDetailsTagRenderer = wrapComponent(
   "details",
+  createHtmlTag("details", { extraClassName: styles.htmlDetails, booleanProps: ["open"] }),
   HtmlDetailsMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { open } = p.asOptionalBoolean("open");
-    const props = p.asRest();
-    return (
-      <details className={classnames(styles.htmlDetails, classes?.[COMPONENT_PART_KEY])} open={open ?? false} {...props}>
-        {renderChild(node.children)}
-      </details>
-    );
+  {
+    stateful: false,
+    booleans: ["open"],
   },
 );
 
@@ -603,19 +491,9 @@ export const HtmlDfnMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlDfnTagRenderer = createComponentRenderer(
-  "dfn",
-  HtmlDfnMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <dfn className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </dfn>
-    );
-  },
-);
+export const htmlDfnTagRenderer = wrapComponent("dfn", createHtmlTag("dfn"), HtmlDfnMd, {
+  stateful: false,
+});
 
 export const HtmlDialogMd = createMetadata({
   status: "deprecated",
@@ -626,18 +504,13 @@ export const HtmlDialogMd = createMetadata({
   },
 });
 
-export const htmlDialogTagRenderer = createComponentRenderer(
+export const htmlDialogTagRenderer = wrapComponent(
   "dialog",
+  createHtmlTag("dialog", { booleanProps: ["open"] }),
   HtmlDialogMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { open } = p.asOptionalBoolean("open");
-    const props = p.asRest();
-    return (
-      <dialog className={classes?.[COMPONENT_PART_KEY]} open={open ?? false} {...props}>
-        {renderChild(node.children)}
-      </dialog>
-    );
+  {
+    stateful: false,
+    booleans: ["open"],
   },
 );
 
@@ -647,19 +520,9 @@ export const HtmlDivMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlDivTagRenderer = createComponentRenderer(
-  "div",
-  HtmlDivMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <div className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </div>
-    );
-  },
-);
+export const htmlDivTagRenderer = wrapComponent("div", createHtmlTag("div"), HtmlDivMd, {
+  stateful: false,
+});
 
 export const HtmlDlMd = createMetadata({
   status: "deprecated",
@@ -667,19 +530,9 @@ export const HtmlDlMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlDlTagRenderer = createComponentRenderer(
-  "dl",
-  HtmlDlMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <dl className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </dl>
-    );
-  },
-);
+export const htmlDlTagRenderer = wrapComponent("dl", createHtmlTag("dl"), HtmlDlMd, {
+  stateful: false,
+});
 
 export const HtmlDtMd = createMetadata({
   status: "deprecated",
@@ -687,19 +540,9 @@ export const HtmlDtMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlDtTagRenderer = createComponentRenderer(
-  "dt",
-  HtmlDtMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <dt className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </dt>
-    );
-  },
-);
+export const htmlDtTagRenderer = wrapComponent("dt", createHtmlTag("dt"), HtmlDtMd, {
+  stateful: false,
+});
 
 export const HtmlEMMd = createMetadata({
   status: "deprecated",
@@ -707,19 +550,9 @@ export const HtmlEMMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlEMTagRenderer = createComponentRenderer(
-  "em",
-  HtmlEMMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="em">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlEMTagRenderer = wrapComponent("em", createHtmlTextTag("em"), HtmlEMMd, {
+  stateful: false,
+});
 
 export const HtmlEmbedMd = createMetadata({
   status: "deprecated",
@@ -733,14 +566,13 @@ export const HtmlEmbedMd = createMetadata({
   },
 });
 
-export const htmlEmbedTagRenderer = createComponentRenderer(
+export const htmlEmbedTagRenderer = wrapComponent(
   "embed",
+  createHtmlTag("embed", { voidElement: true }),
   HtmlEmbedMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { src } = p.asUrlResource("src");
-    const props = p.asRest();
-    return <embed className={classes?.[COMPONENT_PART_KEY]} src={src} {...props} />;
+  {
+    stateful: false,
+    resourceUrls: ["src"],
   },
 );
 
@@ -755,18 +587,13 @@ export const HtmlFieldsetMd = createMetadata({
   },
 });
 
-export const htmlFieldsetTagRenderer = createComponentRenderer(
+export const htmlFieldsetTagRenderer = wrapComponent(
   "fieldset",
+  createHtmlTag("fieldset", { booleanProps: ["disabled"] }),
   HtmlFieldsetMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { disabled } = p.asOptionalBoolean("disabled");
-    const props = p.asRest();
-    return (
-      <fieldset className={classes?.[COMPONENT_PART_KEY]} disabled={disabled ?? false} {...props}>
-        {renderChild(node.children)}
-      </fieldset>
-    );
+  {
+    stateful: false,
+    booleans: ["disabled"],
   },
 );
 
@@ -776,17 +603,12 @@ export const HtmlFigcaptionMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlFigcaptionTagRenderer = createComponentRenderer(
+export const htmlFigcaptionTagRenderer = wrapComponent(
   "figcaption",
+  createHtmlTag("figcaption"),
   HtmlFigcaptionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <figcaption className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </figcaption>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -796,17 +618,12 @@ export const HtmlFigureMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlFigureTagRenderer = createComponentRenderer(
+export const htmlFigureTagRenderer = wrapComponent(
   "figure",
+  createHtmlTag("figure"),
   HtmlFigureMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <figure className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </figure>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -816,17 +633,12 @@ export const HtmlFooterMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlFooterTagRenderer = createComponentRenderer(
+export const htmlFooterTagRenderer = wrapComponent(
   "footer",
+  createHtmlTag("footer"),
   HtmlFooterMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <footer className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </footer>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -848,18 +660,13 @@ export const HtmlFormMd = createMetadata({
   },
 });
 
-export const htmlFormTagRenderer = createComponentRenderer(
+export const htmlFormTagRenderer = wrapComponent(
   "form",
+  createHtmlTag("form", { booleanProps: ["noValidate"] }),
   HtmlFormMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { noValidate } = p.asOptionalBoolean("noValidate");
-    const props = p.asRest();
-    return (
-      <form className={classes?.[COMPONENT_PART_KEY]} noValidate={noValidate ?? false} {...props}>
-        {renderChild(node.children)}
-      </form>
-    );
+  {
+    stateful: false,
+    booleans: ["noValidate"],
   },
 );
 
@@ -874,19 +681,9 @@ export const HtmlH1Md = createMetadata({
   },
 });
 
-export const htmlH1TagRenderer = createComponentRenderer(
-  "h1",
-  HtmlH1Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h1">
-        {renderChild(node.children)}
-      </Heading>
-    );
-  },
-);
+export const htmlH1TagRenderer = wrapComponent("h1", createHtmlHeadingTag("h1"), HtmlH1Md, {
+  stateful: false,
+});
 
 export const HtmlH2Md = createMetadata({
   status: "deprecated",
@@ -899,19 +696,9 @@ export const HtmlH2Md = createMetadata({
   },
 });
 
-export const htmlH2TagRenderer = createComponentRenderer(
-  "h2",
-  HtmlH2Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h2">
-        {renderChild(node.children)}
-      </Heading>
-    );
-  },
-);
+export const htmlH2TagRenderer = wrapComponent("h2", createHtmlHeadingTag("h2"), HtmlH2Md, {
+  stateful: false,
+});
 
 export const HtmlH3Md = createMetadata({
   status: "deprecated",
@@ -924,19 +711,9 @@ export const HtmlH3Md = createMetadata({
   },
 });
 
-export const htmlH3TagRenderer = createComponentRenderer(
-  "h3",
-  HtmlH3Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h3">
-        {renderChild(node.children)}
-      </Heading>
-    );
-  },
-);
+export const htmlH3TagRenderer = wrapComponent("h3", createHtmlHeadingTag("h3"), HtmlH3Md, {
+  stateful: false,
+});
 
 export const HtmlH4Md = createMetadata({
   status: "deprecated",
@@ -949,19 +726,9 @@ export const HtmlH4Md = createMetadata({
   },
 });
 
-export const htmlH4TagRenderer = createComponentRenderer(
-  "h4",
-  HtmlH4Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h4">
-        {renderChild(node.children)}
-      </Heading>
-    );
-  },
-);
+export const htmlH4TagRenderer = wrapComponent("h4", createHtmlHeadingTag("h4"), HtmlH4Md, {
+  stateful: false,
+});
 
 export const HtmlH5Md = createMetadata({
   status: "deprecated",
@@ -974,19 +741,9 @@ export const HtmlH5Md = createMetadata({
   },
 });
 
-export const htmlH5TagRenderer = createComponentRenderer(
-  "h5",
-  HtmlH5Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h5">
-        {renderChild(node.children)}
-      </Heading>
-    );
-  },
-);
+export const htmlH5TagRenderer = wrapComponent("h5", createHtmlHeadingTag("h5"), HtmlH5Md, {
+  stateful: false,
+});
 
 export const HtmlH6Md = createMetadata({
   status: "deprecated",
@@ -999,19 +756,9 @@ export const HtmlH6Md = createMetadata({
   },
 });
 
-export const htmlH6TagRenderer = createComponentRenderer(
-  "h6",
-  HtmlH6Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h6">
-        {renderChild(node.children)}
-      </Heading>
-    );
-  },
-);
+export const htmlH6TagRenderer = wrapComponent("h6", createHtmlHeadingTag("h6"), HtmlH6Md, {
+  stateful: false,
+});
 
 export const HtmlHeaderMd = createMetadata({
   status: "deprecated",
@@ -1019,17 +766,12 @@ export const HtmlHeaderMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlHeaderTagRenderer = createComponentRenderer(
+export const htmlHeaderTagRenderer = wrapComponent(
   "header",
+  createHtmlTag("header"),
   HtmlHeaderMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <header className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </header>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1039,13 +781,12 @@ export const HtmlHrMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlHrTagRenderer = createComponentRenderer(
+export const htmlHrTagRenderer = wrapComponent(
   "hr",
+  createHtmlTag("hr", { voidElement: true }),
   HtmlHrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return <hr className={classes?.[COMPONENT_PART_KEY]} {...props} />;
+  {
+    stateful: false,
   },
 );
 
@@ -1055,19 +796,9 @@ export const HtmlIMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlITagRenderer = createComponentRenderer(
-  "i",
-  HtmlIMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <i className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </i>
-    );
-  },
-);
+export const htmlITagRenderer = wrapComponent("i", createHtmlTag("i"), HtmlIMd, {
+  stateful: false,
+});
 
 export const HtmlIframeMd = createMetadata({
   status: "deprecated",
@@ -1087,19 +818,14 @@ export const HtmlIframeMd = createMetadata({
   },
 });
 
-export const htmlIframeTagRenderer = createComponentRenderer(
+export const htmlIframeTagRenderer = wrapComponent(
   "iframe",
+  createHtmlTag("iframe", { booleanProps: ["allowFullScreen"] }),
   HtmlIframeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { src } = p.asUrlResource("src");
-    const { allowFullScreen } = p.asOptionalBoolean("allowFullScreen");
-    const props = p.asRest();
-    return (
-      <iframe className={classes?.[COMPONENT_PART_KEY]} src={src} allowFullScreen={allowFullScreen ?? false} {...props}>
-        {renderChild(node.children)}
-      </iframe>
-    );
+  {
+    stateful: false,
+    booleans: ["allowFullScreen"],
+    resourceUrls: ["src"],
   },
 );
 
@@ -1116,17 +842,16 @@ export const HtmlImgMd = createMetadata({
     loading: d("Specifies the loading behavior of the image"),
     referrerPolicy: d("Specifies the referrer policy for the image"),
     sizes: d("Specifies image sizes for different page layouts"),
-  }
+  },
 });
 
-export const htmlImgTagRenderer = createComponentRenderer(
+export const htmlImgTagRenderer = wrapComponent(
   "img",
+  createHtmlTag("img", { voidElement: true }),
   HtmlImgMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { src } = p.asUrlResource("src");
-    const props = p.asRest() as unknown as Record<string, unknown>;
-    return <img className={classes?.[COMPONENT_PART_KEY]} src={src} {...props} />;
+  {
+    stateful: false,
+    resourceUrls: ["src"],
   },
 );
 
@@ -1159,34 +884,17 @@ export const HtmlInputMd = createMetadata({
   },
 });
 
-export const htmlInputTagRenderer = createComponentRenderer(
+export const htmlInputTagRenderer = wrapComponent(
   "input",
+  createHtmlTag("input", {
+    booleanProps: ["autoFocus", "checked", "disabled", "readOnly", "required", "multiple"],
+    voidElement: true,
+  }),
   HtmlInputMd,
-  ({ node, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { autoFocus, checked, disabled, readOnly, required, multiple } = p.asOptionalBoolean(
-      "autoFocus",
-      "checked",
-      "disabled",
-      "readOnly",
-      "required",
-      "multiple",
-    );
-    const numberProps = p.asOptionalNumber("maxLength", "minLength", "size");
-    const props = p.asRest();
-    return (
-      <input
-        className={classes?.[COMPONENT_PART_KEY]}
-        autoFocus={autoFocus ?? false}
-        checked={checked ?? false}
-        disabled={disabled ?? false}
-        multiple={multiple ?? false}
-        readOnly={readOnly ?? false}
-        required={required ?? false}
-        {...numberProps}
-        {...props}
-      />
-    );
+  {
+    stateful: false,
+    booleans: ["autoFocus", "checked", "disabled", "readOnly", "required", "multiple"],
+    numbers: ["maxLength", "minLength", "size"],
   },
 );
 
@@ -1200,19 +908,9 @@ export const HtmlInsMd = createMetadata({
   },
 });
 
-export const htmlInsTagRenderer = createComponentRenderer(
-  "ins",
-  HtmlInsMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="inserted">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlInsTagRenderer = wrapComponent("ins", createHtmlTextTag("inserted"), HtmlInsMd, {
+  stateful: false,
+});
 
 export const HtmlKbdMd = createMetadata({
   status: "deprecated",
@@ -1220,19 +918,9 @@ export const HtmlKbdMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlKbdTagRenderer = createComponentRenderer(
-  "kbd",
-  HtmlKbdMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="keyboard">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlKbdTagRenderer = wrapComponent("kbd", createHtmlTextTag("keyboard"), HtmlKbdMd, {
+  stateful: false,
+});
 
 export const HtmlLabelMd = createMetadata({
   status: "deprecated",
@@ -1243,19 +931,9 @@ export const HtmlLabelMd = createMetadata({
   },
 });
 
-export const htmlLabelTagRenderer = createComponentRenderer(
-  "label",
-  HtmlLabelMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <label className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </label>
-    );
-  },
-);
+export const htmlLabelTagRenderer = wrapComponent("label", createHtmlTag("label"), HtmlLabelMd, {
+  stateful: false,
+});
 
 export const HtmlLegendMd = createMetadata({
   status: "deprecated",
@@ -1263,17 +941,12 @@ export const HtmlLegendMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlLegendTagRenderer = createComponentRenderer(
+export const htmlLegendTagRenderer = wrapComponent(
   "legend",
+  createHtmlTag("legend"),
   HtmlLegendMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <legend className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </legend>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1287,23 +960,13 @@ export const HtmlLiMd = createMetadata({
   defaultThemeVars: {
     "marginLeft-HtmlLi": "$space-6",
     "paddingLeft-HtmlLi": "$space-1",
-  }
+  },
 });
 
-export const htmlLiTagRenderer = createComponentRenderer(
-  "li",
-  HtmlLiMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { value } = p.asOptionalNumber("value");
-    const props = p.asRest();
-    return (
-      <li className={classes?.[COMPONENT_PART_KEY]} value={value} {...props}>
-        {renderChild(node.children)}
-      </li>
-    );
-  },
-);
+export const htmlLiTagRenderer = wrapComponent("li", createHtmlTag("li"), HtmlLiMd, {
+  stateful: false,
+  numbers: ["value"],
+});
 
 export const HtmlMainMd = createMetadata({
   status: "deprecated",
@@ -1311,19 +974,9 @@ export const HtmlMainMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlMainTagRenderer = createComponentRenderer(
-  "main",
-  HtmlMainMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <main className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </main>
-    );
-  },
-);
+export const htmlMainTagRenderer = wrapComponent("main", createHtmlTag("main"), HtmlMainMd, {
+  stateful: false,
+});
 
 export const HtmlMapMd = createMetadata({
   status: "deprecated",
@@ -1334,19 +987,9 @@ export const HtmlMapMd = createMetadata({
   },
 });
 
-export const htmlMapTagRenderer = createComponentRenderer(
-  "map",
-  HtmlMapMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <map className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </map>
-    );
-  },
-);
+export const htmlMapTagRenderer = wrapComponent("map", createHtmlTag("map"), HtmlMapMd, {
+  stateful: false,
+});
 
 export const HtmlMarkMd = createMetadata({
   status: "deprecated",
@@ -1354,19 +997,9 @@ export const HtmlMarkMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlMarkTagRenderer = createComponentRenderer(
-  "mark",
-  HtmlMarkMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="marked">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlMarkTagRenderer = wrapComponent("mark", createHtmlTextTag("marked"), HtmlMarkMd, {
+  stateful: false,
+});
 
 export const HtmlMenuMd = createMetadata({
   status: "deprecated",
@@ -1377,19 +1010,9 @@ export const HtmlMenuMd = createMetadata({
   },
 });
 
-export const htmlMenuTagRenderer = createComponentRenderer(
-  "menu",
-  HtmlMenuMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <menu className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </menu>
-    );
-  },
-);
+export const htmlMenuTagRenderer = wrapComponent("menu", createHtmlTag("menu"), HtmlMenuMd, {
+  stateful: false,
+});
 
 export const HtmlMeterMd = createMetadata({
   status: "deprecated",
@@ -1405,20 +1028,10 @@ export const HtmlMeterMd = createMetadata({
   },
 });
 
-export const htmlMeterTagRenderer = createComponentRenderer(
-  "meter",
-  HtmlMeterMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const numberProps = p.asOptionalNumber("value", "min", "max", "low", "high", "optimum");
-    const props = p.asRest();
-    return (
-      <meter className={classes?.[COMPONENT_PART_KEY]} {...numberProps} {...props}>
-        {renderChild(node.children)}
-      </meter>
-    );
-  },
-);
+export const htmlMeterTagRenderer = wrapComponent("meter", createHtmlTag("meter"), HtmlMeterMd, {
+  stateful: false,
+  numbers: ["value", "min", "max", "low", "high", "optimum"],
+});
 
 export const HtmlNavMd = createMetadata({
   status: "deprecated",
@@ -1426,19 +1039,9 @@ export const HtmlNavMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlNavTagRenderer = createComponentRenderer(
-  "nav",
-  HtmlNavMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <nav className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </nav>
-    );
-  },
-);
+export const htmlNavTagRenderer = wrapComponent("nav", createHtmlTag("nav"), HtmlNavMd, {
+  stateful: false,
+});
 
 export const HtmlObjectMd = createMetadata({
   status: "deprecated",
@@ -1454,17 +1057,12 @@ export const HtmlObjectMd = createMetadata({
   },
 });
 
-export const htmlObjectTagRenderer = createComponentRenderer(
+export const htmlObjectTagRenderer = wrapComponent(
   "object",
+  createHtmlTag("object"),
   HtmlObjectMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <object className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </object>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1479,17 +1077,12 @@ export const HtmlOlMd = createMetadata({
   },
 });
 
-export const htmlOlTagRenderer = createComponentRenderer(
+export const htmlOlTagRenderer = wrapComponent(
   "ol",
-  HtmlOlMd, // Use HtmlOlMd instead of HtmlListMd
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <ol className={classnames(styles.htmlOl, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </ol>
-    );
+  createHtmlTag("ol", { extraClassName: styles.htmlOl }),
+  HtmlOlMd,
+  {
+    stateful: false,
   },
 );
 
@@ -1503,18 +1096,13 @@ export const HtmlOptgroupMd = createMetadata({
   },
 });
 
-export const htmlOptgroupTagRenderer = createComponentRenderer(
+export const htmlOptgroupTagRenderer = wrapComponent(
   "optgroup",
+  createHtmlTag("optgroup", { booleanProps: ["disabled"] }),
   HtmlOptgroupMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { disabled } = p.asOptionalBoolean("disabled");
-    const props = p.asRest();
-    return (
-      <optgroup className={classes?.[COMPONENT_PART_KEY]} disabled={disabled ?? false} {...props}>
-        {renderChild(node.children)}
-      </optgroup>
-    );
+  {
+    stateful: false,
+    booleans: ["disabled"],
   },
 );
 
@@ -1530,23 +1118,13 @@ export const HtmlOptionMd = createMetadata({
   },
 });
 
-export const htmlOptionTagRenderer = createComponentRenderer(
+export const htmlOptionTagRenderer = wrapComponent(
   "option",
+  createHtmlTag("option", { booleanProps: ["disabled", "selected"] }),
   HtmlOptionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { disabled, selected } = p.asOptionalBoolean("disabled", "selected");
-    const props = p.asRest();
-    return (
-      <option
-        className={classes?.[COMPONENT_PART_KEY]}
-        disabled={disabled ?? false}
-        selected={selected ?? false}
-        {...props}
-      >
-        {renderChild(node.children)}
-      </option>
-    );
+  {
+    stateful: false,
+    booleans: ["disabled", "selected"],
   },
 );
 
@@ -1561,17 +1139,12 @@ export const HtmlOutputMd = createMetadata({
   },
 });
 
-export const htmlOutputTagRenderer = createComponentRenderer(
+export const htmlOutputTagRenderer = wrapComponent(
   "output",
+  createHtmlTag("output"),
   HtmlOutputMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <output className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </output>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1581,19 +1154,9 @@ export const HtmlPMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlPTagRenderer = createComponentRenderer(
-  "p",
-  HtmlPMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="paragraph">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlPTagRenderer = wrapComponent("p", createHtmlTextTag("paragraph"), HtmlPMd, {
+  stateful: false,
+});
 
 export const HtmlParamMd = createMetadata({
   status: "deprecated",
@@ -1605,13 +1168,12 @@ export const HtmlParamMd = createMetadata({
   },
 });
 
-export const htmlParamTagRenderer = createComponentRenderer(
+export const htmlParamTagRenderer = wrapComponent(
   "param",
+  createHtmlTag("param", { voidElement: true }),
   HtmlParamMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return <param className={classes?.[COMPONENT_PART_KEY]} {...props} />;
+  {
+    stateful: false,
   },
 );
 
@@ -1621,17 +1183,12 @@ export const HtmlPictureMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlPictureTagRenderer = createComponentRenderer(
+export const htmlPictureTagRenderer = wrapComponent(
   "picture",
+  createHtmlTag("picture"),
   HtmlPictureMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <picture className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </picture>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1641,19 +1198,9 @@ export const HtmlPreMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlPreTagRenderer = createComponentRenderer(
-  "pre",
-  HtmlPreMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="codefence">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlPreTagRenderer = wrapComponent("pre", createHtmlTextTag("codefence"), HtmlPreMd, {
+  stateful: false,
+});
 
 export const HtmlProgressMd = createMetadata({
   status: "deprecated",
@@ -1665,18 +1212,13 @@ export const HtmlProgressMd = createMetadata({
   },
 });
 
-export const htmlProgressTagRenderer = createComponentRenderer(
+export const htmlProgressTagRenderer = wrapComponent(
   "progress",
+  createHtmlTag("progress"),
   HtmlProgressMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const numberProps = p.asOptionalNumber("max", "value");
-    const props = p.asRest();
-    return (
-      <progress className={classes?.[COMPONENT_PART_KEY]} {...numberProps} {...props}>
-        {renderChild(node.children)}
-      </progress>
-    );
+  {
+    stateful: false,
+    numbers: ["max", "value"],
   },
 );
 
@@ -1689,19 +1231,9 @@ export const HtmlQMd = createMetadata({
   },
 });
 
-export const htmlQTagRenderer = createComponentRenderer(
-  "q",
-  HtmlQMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <q className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </q>
-    );
-  },
-);
+export const htmlQTagRenderer = wrapComponent("q", createHtmlTag("q"), HtmlQMd, {
+  stateful: false,
+});
 
 export const HtmlRpMd = createMetadata({
   status: "deprecated",
@@ -1709,19 +1241,9 @@ export const HtmlRpMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlRpTagRenderer = createComponentRenderer(
-  "rp",
-  HtmlRpMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <rp className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </rp>
-    );
-  },
-);
+export const htmlRpTagRenderer = wrapComponent("rp", createHtmlTag("rp"), HtmlRpMd, {
+  stateful: false,
+});
 
 export const HtmlRtMd = createMetadata({
   status: "deprecated",
@@ -1729,19 +1251,9 @@ export const HtmlRtMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlRtTagRenderer = createComponentRenderer(
-  "rt",
-  HtmlRtMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <rt className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </rt>
-    );
-  },
-);
+export const htmlRtTagRenderer = wrapComponent("rt", createHtmlTag("rt"), HtmlRtMd, {
+  stateful: false,
+});
 
 export const HtmlRubyMd = createMetadata({
   status: "deprecated",
@@ -1749,19 +1261,9 @@ export const HtmlRubyMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlRubyTagRenderer = createComponentRenderer(
-  "ruby",
-  HtmlRubyMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <ruby className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </ruby>
-    );
-  },
-);
+export const htmlRubyTagRenderer = wrapComponent("ruby", createHtmlTag("ruby"), HtmlRubyMd, {
+  stateful: false,
+});
 
 export const HtmlSMd = createMetadata({
   status: "deprecated",
@@ -1769,19 +1271,9 @@ export const HtmlSMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSTagRenderer = createComponentRenderer(
-  "s",
-  HtmlSMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <s className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </s>
-    );
-  },
-);
+export const htmlSTagRenderer = wrapComponent("s", createHtmlTag("s"), HtmlSMd, {
+  stateful: false,
+});
 
 export const HtmlSampMd = createMetadata({
   status: "deprecated",
@@ -1789,19 +1281,9 @@ export const HtmlSampMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSampTagRenderer = createComponentRenderer(
-  "samp",
-  HtmlSampMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="sample">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlSampTagRenderer = wrapComponent("samp", createHtmlTextTag("sample"), HtmlSampMd, {
+  stateful: false,
+});
 
 export const HtmlSectionMd = createMetadata({
   status: "deprecated",
@@ -1809,17 +1291,12 @@ export const HtmlSectionMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSectionTagRenderer = createComponentRenderer(
+export const htmlSectionTagRenderer = wrapComponent(
   "section",
+  createHtmlTag("section"),
   HtmlSectionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <section className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </section>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1838,32 +1315,14 @@ export const HtmlSelectMd = createMetadata({
   },
 });
 
-export const htmlSelectTagRenderer = createComponentRenderer(
+export const htmlSelectTagRenderer = wrapComponent(
   "select",
+  createHtmlTag("select", { booleanProps: ["autoFocus", "disabled", "multiple", "required"] }),
   HtmlSelectMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { autoFocus, disabled, multiple, required } = p.asOptionalBoolean(
-      "autoFocus",
-      "disabled",
-      "multiple",
-      "required",
-    );
-    const { size } = p.asOptionalNumber("size");
-    const props = p.asRest();
-    return (
-      <select
-        className={classes?.[COMPONENT_PART_KEY]}
-        autoFocus={autoFocus ?? false}
-        disabled={disabled ?? false}
-        multiple={multiple ?? false}
-        required={required ?? false}
-        size={size}
-        {...props}
-      >
-        {renderChild(node.children)}
-      </select>
-    );
+  {
+    stateful: false,
+    booleans: ["autoFocus", "disabled", "multiple", "required"],
+    numbers: ["size"],
   },
 );
 
@@ -1873,17 +1332,12 @@ export const HtmlSmallMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSmallTagRenderer = createComponentRenderer(
+export const htmlSmallTagRenderer = wrapComponent(
   "small",
+  createHtmlTextTag("small"),
   HtmlSmallMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="small">
-        {renderChild(node.children)}
-      </Text>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1900,14 +1354,13 @@ export const HtmlSourceMd = createMetadata({
   },
 });
 
-export const htmlSourceTagRenderer = createComponentRenderer(
+export const htmlSourceTagRenderer = wrapComponent(
   "source",
+  createHtmlTag("source", { voidElement: true }),
   HtmlSourceMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { src } = p.asUrlResource("src");
-    const props = p.asRest();
-    return <source className={classes?.[COMPONENT_PART_KEY]} src={src} {...props} />;
+  {
+    stateful: false,
+    resourceUrls: ["src"],
   },
 );
 
@@ -1917,19 +1370,9 @@ export const HtmlSpanMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSpanTagRenderer = createComponentRenderer(
-  "span",
-  HtmlSpanMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <span className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </span>
-    );
-  },
-);
+export const htmlSpanTagRenderer = wrapComponent("span", createHtmlTag("span"), HtmlSpanMd, {
+  stateful: false,
+});
 
 export const HtmlStrongMd = createMetadata({
   status: "deprecated",
@@ -1937,17 +1380,12 @@ export const HtmlStrongMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlStrongTagRenderer = createComponentRenderer(
+export const htmlStrongTagRenderer = wrapComponent(
   "strong",
+  createHtmlTextTag("strong"),
   HtmlStrongMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="strong">
-        {renderChild(node.children)}
-      </Text>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1957,19 +1395,9 @@ export const HtmlSubMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSubTagRenderer = createComponentRenderer(
-  "sub",
-  HtmlSubMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="sub">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlSubTagRenderer = wrapComponent("sub", createHtmlTextTag("sub"), HtmlSubMd, {
+  stateful: false,
+});
 
 export const HtmlSummaryMd = createMetadata({
   status: "deprecated",
@@ -1977,17 +1405,12 @@ export const HtmlSummaryMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSummaryTagRenderer = createComponentRenderer(
+export const htmlSummaryTagRenderer = wrapComponent(
   "summary",
+  createHtmlTag("summary"),
   HtmlSummaryMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <summary className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </summary>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -1997,19 +1420,9 @@ export const HtmlSupMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlSupTagRenderer = createComponentRenderer(
-  "sup",
-  HtmlSupMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="sup">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlSupTagRenderer = wrapComponent("sup", createHtmlTextTag("sup"), HtmlSupMd, {
+  stateful: false,
+});
 
 export const HtmlTableMd = createMetadata({
   status: "deprecated",
@@ -2034,17 +1447,12 @@ export const HtmlTableMd = createMetadata({
   },
 });
 
-export const htmlTableTagRenderer = createComponentRenderer(
+export const htmlTableTagRenderer = wrapComponent(
   "table",
+  createHtmlTag("table", { extraClassName: styles.htmlTable }),
   HtmlTableMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <table className={classnames(styles.htmlTable, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </table>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2055,17 +1463,12 @@ export const HtmlTbodyMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsTbody),
 });
 
-export const htmlTbodyTagRenderer = createComponentRenderer(
+export const htmlTbodyTagRenderer = wrapComponent(
   "tbody",
+  createHtmlTag("tbody", { extraClassName: styles.htmlTbody }),
   HtmlTbodyMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <tbody className={classnames(styles.htmlTbody, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </tbody>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2091,17 +1494,12 @@ export const HtmlTdMd = createMetadata({
   },
 });
 
-export const htmlTdTagRenderer = createComponentRenderer(
+export const htmlTdTagRenderer = wrapComponent(
   "td",
+  createHtmlTag("td", { extraClassName: styles.htmlTd }),
   HtmlTdMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <td className={classnames(styles.htmlTd, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </td>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2111,17 +1509,12 @@ export const HtmlTemplateMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlTemplateTagRenderer = createComponentRenderer(
+export const htmlTemplateTagRenderer = wrapComponent(
   "template",
+  createHtmlTag("template"),
   HtmlTemplateMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <template className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </template>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2147,32 +1540,14 @@ export const HtmlTextareaMd = createMetadata({
   },
 });
 
-export const htmlTextareaTagRenderer = createComponentRenderer(
+export const htmlTextareaTagRenderer = wrapComponent(
   "textarea",
+  createHtmlTag("textarea", { booleanProps: ["autoFocus", "disabled", "readOnly", "required"] }),
   HtmlTextareaMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { autoFocus, disabled, readOnly, required } = p.asOptionalBoolean(
-      "autoFocus",
-      "disabled",
-      "readOnly",
-      "required",
-    );
-    const numberProps = p.asOptionalNumber("cols", "rows", "maxLength", "minLength");
-    const props = p.asRest();
-    return (
-      <textarea
-        className={classes?.[COMPONENT_PART_KEY]}
-        autoFocus={autoFocus ?? false}
-        disabled={disabled ?? false}
-        readOnly={readOnly ?? false}
-        required={required ?? false}
-        {...numberProps}
-        {...props}
-      >
-        {renderChild(node.children)}
-      </textarea>
-    );
+  {
+    stateful: false,
+    booleans: ["autoFocus", "disabled", "readOnly", "required"],
+    numbers: ["cols", "rows", "maxLength", "minLength"],
   },
 );
 
@@ -2183,17 +1558,12 @@ export const HtmlTfootMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsTfoot),
 });
 
-export const htmlTfootTagRenderer = createComponentRenderer(
+export const htmlTfootTagRenderer = wrapComponent(
   "tfoot",
+  createHtmlTag("tfoot", { extraClassName: styles.htmlTfoot }),
   HtmlTfootMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <tfoot className={classnames(styles.htmlTfoot, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </tfoot>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2220,17 +1590,12 @@ export const HtmlThMd = createMetadata({
   },
 });
 
-export const htmlThTagRenderer = createComponentRenderer(
+export const htmlThTagRenderer = wrapComponent(
   "th",
+  createHtmlTag("th", { extraClassName: styles.htmlTh }),
   HtmlThMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <th className={classnames(styles.htmlTh, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </th>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2246,17 +1611,12 @@ export const HtmlTheadMd = createMetadata({
   },
 });
 
-export const htmlTheadTagRenderer = createComponentRenderer(
+export const htmlTheadTagRenderer = wrapComponent(
   "thead",
+  createHtmlTag("thead", { extraClassName: styles.htmlThead }),
   HtmlTheadMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <thead className={classnames(styles.htmlThead, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </thead>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2269,19 +1629,9 @@ export const HtmlTimeMd = createMetadata({
   },
 });
 
-export const htmlTimeTagRenderer = createComponentRenderer(
-  "time",
-  HtmlTimeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <time className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </time>
-    );
-  },
-);
+export const htmlTimeTagRenderer = wrapComponent("time", createHtmlTag("time"), HtmlTimeMd, {
+  stateful: false,
+});
 
 export const HtmlTrMd = createMetadata({
   status: "deprecated",
@@ -2295,17 +1645,12 @@ export const HtmlTrMd = createMetadata({
   },
 });
 
-export const htmlTrTagRenderer = createComponentRenderer(
+export const htmlTrTagRenderer = wrapComponent(
   "tr",
+  createHtmlTag("tr", { extraClassName: styles.htmlTr }),
   HtmlTrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <tr className={classnames(styles.htmlTr, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </tr>
-    );
+  {
+    stateful: false,
   },
 );
 
@@ -2322,15 +1667,14 @@ export const HtmlTrackMd = createMetadata({
   },
 });
 
-export const htmlTrackTagRenderer = createComponentRenderer(
+export const htmlTrackTagRenderer = wrapComponent(
   "track",
+  createHtmlTag("track", { booleanProps: ["default"], voidElement: true }),
   HtmlTrackMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { src } = p.asUrlResource("src");
-    const { default: defaultProp } = p.asOptionalBoolean("default");
-    const props = p.asRest();
-    return <track className={classes?.[COMPONENT_PART_KEY]} default={defaultProp ?? false} src={src} {...props} />;
+  {
+    stateful: false,
+    booleans: ["default"],
+    resourceUrls: ["src"],
   },
 );
 
@@ -2340,19 +1684,9 @@ export const HtmlUMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlUTagRenderer = createComponentRenderer(
-  "u",
-  HtmlUMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <u className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </u>
-    );
-  },
-);
+export const htmlUTagRenderer = wrapComponent("u", createHtmlTag("u"), HtmlUMd, {
+  stateful: false,
+});
 
 export const HtmlUlMd = createMetadata({
   status: "deprecated",
@@ -2365,17 +1699,12 @@ export const HtmlUlMd = createMetadata({
   },
 });
 
-export const htmlUlTagRenderer = createComponentRenderer(
+export const htmlUlTagRenderer = wrapComponent(
   "ul",
-  HtmlUlMd, // Use HtmlOlMd instead of HtmlListMd
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <ul className={classnames(styles.htmlUl, classes?.[COMPONENT_PART_KEY])} {...props}>
-        {renderChild(node.children)}
-      </ul>
-    );
+  createHtmlTag("ul", { extraClassName: styles.htmlUl }),
+  HtmlUlMd,
+  {
+    stateful: false,
   },
 );
 
@@ -2385,19 +1714,9 @@ export const HtmlVarMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlVarTagRenderer = createComponentRenderer(
-  "var",
-  HtmlVarMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="var">
-        {renderChild(node.children)}
-      </Text>
-    );
-  },
-);
+export const htmlVarTagRenderer = wrapComponent("var", createHtmlTextTag("var"), HtmlVarMd, {
+  stateful: false,
+});
 
 export const HtmlVideoMd = createMetadata({
   status: "deprecated",
@@ -2423,32 +1742,14 @@ export const HtmlVideoMd = createMetadata({
   },
 });
 
-export const htmlVideoTagRenderer = createComponentRenderer(
+export const htmlVideoTagRenderer = wrapComponent(
   "video",
+  createHtmlTag("video", { booleanProps: ["autoPlay", "controls", "loop", "muted"] }),
   HtmlVideoMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const { src } = p.asUrlResource("src");
-    const { autoPlay, controls, loop, muted } = p.asOptionalBoolean(
-      "autoPlay",
-      "controls",
-      "loop",
-      "muted",
-    );
-    const props = p.asRest();
-    return (
-      <video
-        className={classes?.[COMPONENT_PART_KEY]}
-        src={src}
-        autoPlay={autoPlay ?? false}
-        controls={controls ?? false}
-        loop={loop ?? false}
-        muted={muted ?? false}
-        {...props}
-      >
-        {renderChild(node.children)}
-      </video>
-    );
+  {
+    stateful: false,
+    booleans: ["autoPlay", "controls", "loop", "muted"],
+    resourceUrls: ["src"],
   },
 );
 
@@ -2458,16 +1759,11 @@ export const HtmlWbrMd = createMetadata({
   isHtmlTag: true,
 });
 
-export const htmlWbrTagRenderer = createComponentRenderer(
+export const htmlWbrTagRenderer = wrapComponent(
   "wbr",
+  createHtmlTag("wbr", { voidElement: true }),
   HtmlWbrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <wbr className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </wbr>
-    );
+  {
+    stateful: false,
   },
 );

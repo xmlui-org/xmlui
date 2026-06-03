@@ -47,7 +47,7 @@ export const buttonComponentRenderer = wrapComponent(
 
 ## Auto-detection from Metadata
 
-`wrapComponent` reads `valueType` from each prop's metadata definition and applies the right extractor automatically:
+`wrapComponent` reads `valueType` from each prop's metadata definition and applies the right extractor automatically for the three primitive coercions it owns:
 
 | `valueType` in metadata | Extractor used |
 |-------------------------|----------------|
@@ -58,10 +58,12 @@ export const buttonComponentRenderer = wrapComponent(
 | `isResourceUrl: true` | `extractResourceUrl(raw)` |
 | anything else / missing | `extractValue(raw)` — raw value |
 
-**The most common mistake when migrating to `wrapComponent`:** props declared with the `d()` shorthand helper get no `valueType`, so they fall through to raw `extractValue`. Always write the full form for typed props:
+Refined metadata types such as `"integer"`, `"length"`, `"color"`, `"url"`, `"icon"`, `"id-ref"`, and `"string[]"` are important for tooling, diagnostics, documentation, and manual renderers, but `wrapComponent` does not auto-select their specialized extractors. They fall through to raw `extractValue(raw)` unless the prop is also listed in `booleans`, `numbers`, `strings`, `resourceUrls`, `templates`, or `renderers`, or handled by `customRender`.
+
+**The most common mistake when migrating to `wrapComponent`:** props declared with `d()` only get a `valueType` if you pass the third argument. `d("description")` by itself carries no type information, so the prop falls through to raw `extractValue`. Either use the explicit object form or pass `valueType` to `d()`:
 
 ```typescript
-// Wrong — d() carries no valueType
+// Wrong — no valueType
 maxLines: d("Maximum lines before truncation"),
 
 // Correct
@@ -70,6 +72,9 @@ maxLines: {
   valueType: "number",
   defaultValue: defaultProps.maxLines,
 },
+
+// Also correct
+maxLines: d("Maximum lines before truncation", undefined, "number", defaultProps.maxLines),
 ```
 
 Similarly, using `type` instead of `valueType` (a common copy-paste mistake) is not detected:
@@ -97,6 +102,7 @@ Maps XMLUI event names to React handler props.
 - **Array form** applies the `on` + capitalize convention: `["click"]` → `onClick`
 - **Object form** for non-standard names: `{ didChange: "onDidChange" }`
 - All keys in `metadata.events` are also auto-detected; the config extends or overrides them
+- A React handler prop is only set when there is an XMLUI handler to call or verbose tracing has a semantic trace to emit. This preserves native components that test `!!onClick`.
 
 ```typescript
 // These are equivalent:
@@ -104,7 +110,7 @@ events: ["click"]
 events: { click: "onClick" }
 ```
 
-Events fire through a tracing wrapper in verbose/inspector mode, emitting semantic trace kinds (`value:change` for `didChange`, `focus:change` for `gotFocus`/`lostFocus`).
+Events fire through a tracing wrapper in verbose/inspector mode, emitting semantic trace kinds (`value:change` for `didChange`, `focus:change` for `gotFocus`/`lostFocus`). Other metadata events are wired when an XMLUI handler is present, but do not get a semantic trace kind unless separate native-event capture handles them.
 
 ### Callbacks
 
@@ -147,6 +153,8 @@ The default React prop name replaces `Template` with `Renderer` (e.g., `optionTe
 
 `ComponentDef`-typed props in metadata are auto-detected as static templates unless they appear in `renderers` or `exclude`.
 
+When `metadata.childrenAsTemplate` is set, `wrapComponent` also understands the data-template convention. It consumes `data` and the named template prop internally, renders one `MemoizedItem` per data item, and injects `$item`, `$itemIndex`, `$isFirst`, and `$isLast`. If there is no array data, it renders the template prop as normal children. If that template prop is configured in `renderers`, this automatic children-as-template path is skipped.
+
 ### Controlled inputs (`stateful`)
 
 When a component has `initialValue` in its props or `didChange` in its events, `wrapComponent` automatically detects it as stateful. In stateful mode it passes:
@@ -155,7 +163,7 @@ When a component has `initialValue` in its props or `didChange` in its events, `
 - `updateState={updateState}` — for the native component to report value changes back
 - `initialValue={extractValue(node.props.initialValue)}` — the starting value
 
-You rarely need to set `stateful: true` explicitly.
+You rarely need to set `stateful: true` explicitly. Set `passUpdateState: false` when the component is stateful only because it declares `didChange`, but the native component never calls `updateState` itself.
 
 ### Other config options
 
@@ -163,6 +171,11 @@ You rarely need to set `stateful: true` explicitly.
 |--------|---------|-----|
 | `rename` | — | `{ minValue: "min" }` — XMLUI prop name → React prop name |
 | `exclude` | — | Props to skip entirely (useful when `customRender` handles them) |
+| `booleans` | — | Extra prop names to coerce with `extractValue.asOptionalBoolean` |
+| `numbers` | — | Extra prop names to coerce with `extractValue.asOptionalNumber` |
+| `strings` | — | Extra prop names to coerce with `extractValue.asOptionalString` |
+| `stateful` | auto | Override stateful auto-detection from `initialValue`/`didChange` |
+| `passUpdateState` | `true` | Set `false` to suppress `updateState` for stateful event-only components |
 | `exposeRegisterApi` | `false` | Set `true` when the native component calls `registerComponentApi` |
 | `passUid` | `false` | Pass `node.uid` as `uid` prop (Bookmark and anchor components) |
 | `resourceUrls` | — | Prop names containing logical resource URLs; resolved via `extractResourceUrl` |
@@ -178,6 +191,8 @@ customRender?: (props: Record<string, any>, context: RendererContext) => React.R
 ```
 
 When provided, `customRender` is called instead of `<Component {...props} />`. All prop extraction still runs first, so `props` already has all resolved values. Children are **not** auto-rendered — `customRender` must handle them explicitly.
+
+After `customRender` returns, `wrapComponent` injects the resolved `aria-label` and `role` onto the root React element if they were resolved in `props` but not forwarded by the custom renderer. This keeps accessibility metadata from getting lost in custom paths.
 
 Use when the rendered element or child layout depends on runtime values:
 
@@ -196,22 +211,25 @@ customRender(props, { node, extractValue, renderChild }) {
 
 ---
 
-## Props Never Forwarded
+## Props Blocked from Generic Forwarding
 
-These are always blocked, regardless of what appears in `node.props`:
+These are blocked from generic forwarding unless the component explicitly declares the same prop in metadata. When metadata declares a prop, the component owns the name and `wrapComponent` forwards it, except for props handled by dedicated template, renderer, callback, or resource URL paths.
 
 | Prop | Why blocked |
 |------|------------|
 | `id` | XMLUI's component identity — not a DOM attribute |
 | `ref` | Never forwarded as a React ref string |
 | `style` | Contains raw XMLUI theme variable strings; the layout processor owns it |
-| Layout props (`width`, `height`, `padding`, `margin`, etc.) | Handled by the layout resolver via CSS className |
+| Layout props (`width`, `height`, `padding`, `margin`, etc.) and responsive forms (`width-md`, etc.) | Handled by the layout resolver via CSS className |
 | `bindTo` | Consumed by the form binding behavior |
 | `onValidate` | Consumed by the validation behavior |
 | `bubbleEvents` | Consumed by `ComponentAdapter` |
+| Form behavior props (`noSubmit`, `itemIndex`, `labelPosition`, validation message/severity props, etc.) | Consumed by form and validation behaviors |
+| Tooltip/label/pub-sub/animation/bookmark behavior props | Consumed by their behavior implementations |
+| `updateState` | XMLUI-internal callback, never a DOM prop |
 | `aria-label` | Handled by the aria-label cascade |
 
-A common mistake is defining layout props (like `width`) in a native component's `Props` interface. `wrapComponent` blocks them from reaching the native component because they're resolved to CSS classes by the layout system. Don't accept them in the native component.
+A common mistake is defining layout props (like `width`) in a native component's `Props` interface. `wrapComponent` blocks them from reaching the native component because they're resolved to CSS classes by the layout system. Only declare such a prop in metadata when the component gives that name component-specific meaning and genuinely needs the raw value.
 
 ---
 
@@ -254,13 +272,13 @@ When migrating a `createComponentRenderer` to `wrapComponent`, these problems re
 
 ### 1. Wrong or missing `valueType`
 
-`wrapComponent` reads `valueType` (not `type`) to choose the correct extractor. Three causes:
+`wrapComponent` reads `valueType` (not `type`) to choose the correct extractor. Common causes:
 
 - **`type` instead of `valueType`** — Link used `type: "boolean"` for `active`; wrapComponent ignores `type`.
-- **`d()` shorthand** — produces no `valueType`, so the prop falls through to raw `extractValue`. Affected Link (`maxLines`), Icon (`name`, `size`), Image (`src`, `alt`), Card (`avatarUrl`).
+- **`d()` without the third argument** — `d("description")` produces no `valueType`, so the prop falls through to raw `extractValue`. Use the object form or `d(description, availableValues, valueType, defaultValue)`.
 - **Wrong `valueType` breaks native logic** — setting `valueType: "string"` on Image's `data` caused `asOptionalString()` to be called, which converted a `Blob` to a string, breaking `instanceof Blob` checks.
 
-**Fix:** always use the full object form with `valueType` for typed props; omit `valueType` when the native component needs the raw value (e.g., Blob or arbitrary object).
+**Fix:** set `valueType` intentionally for typed props; omit `valueType` or use `valueType: "any"` when the native component needs the raw value (e.g., Blob or arbitrary object).
 
 ### 2. Children not rendered
 
@@ -272,9 +290,9 @@ When migrating a `createComponentRenderer` to `wrapComponent`, these problems re
 - **XMLUI name ≠ React name** — use `rename: { data: "imageData" }`.
 - **Resource URLs** — props resolved via `extractResourceUrl` need `isResourceUrl: true` in metadata.
 
-### 4. Unsupported extractor types
+### 4. Specialized extractors
 
-`extractValue.asSize()` and `extractValue.asDisplayText()` have no equivalent in `wrapComponent`. Components requiring these (ContentSeparator, Badge, Text) must stay in `createComponentRenderer`.
+`wrapComponent` auto-selects only `asOptionalBoolean`, `asOptionalNumber`, `asOptionalString`, `extractResourceUrl`, and `renderChild`/`MemoizedItem` for `ComponentDef` templates. It does not auto-select specialized helpers such as `asSize()`, `asDisplayText()`, `asInteger()`, `asColor()`, `asLength()`, `asUrl()`, `asIcon()`, `asLayoutProp()`, or `asStyleProp()`. Components requiring those semantics need `customRender`, explicit config (`strings`, `numbers`, etc.) when plain coercion is enough, or `createComponentRenderer`.
 
 ### 5. Computed or derived props
 
@@ -295,9 +313,10 @@ These patterns are not expressible with `wrapComponent`:
 
 | Area | Check |
 |------|-------|
-| Metadata | All props use `valueType`, not `type`; no `d()` on typed props |
+| Metadata | All props use `valueType`, not `type`; `d()` calls pass a `valueType` when typed |
 | Props | No cross-prop defaults; no multi-prop → single React prop; mismatches covered by `rename` |
 | Children | Layout context is static or absent |
+| Extractors | No need for specialized extractors unless handled by `customRender` |
 | Render | Single unconditional JSX path; no per-child wrapChild; no dynamic prop subsetting |
 
 ---
@@ -352,10 +371,10 @@ The wrapper auto-detects:
 
 ## Key Takeaways
 
-1. `wrapComponent` eliminates prop-extraction boilerplate by reading `valueType` from metadata — but only if `valueType` is set correctly. The `d()` shorthand produces no type information and falls back to raw extraction.
+1. `wrapComponent` eliminates prop-extraction boilerplate by reading `valueType` from metadata for boolean, number, string, resource URL, and `ComponentDef` template handling. Other `valueType` values still matter, but they do not automatically pick a specialized extractor.
 2. The difference between `templates` and `renderers`: templates render once to a static node; renderers create callbacks that render per-item with context variables.
-3. Layout props (`width`, `height`, `padding`, etc.) are always blocked from forwarding. The layout system resolves them to CSS class names — the native component should not accept them.
-4. `stateful: true` is auto-detected from `initialValue` or `didChange` in metadata. In stateful mode, `value`/`updateState`/`initialValue` are wired automatically.
+3. Layout and behavior props are blocked from generic forwarding, but explicit metadata props take ownership of their names and are forwarded.
+4. `stateful: true` is auto-detected from `initialValue` or `didChange` in metadata. In stateful mode, `value`/`updateState`/`initialValue` are wired automatically; `passUpdateState: false` suppresses only the `updateState` prop.
 5. `customRender` runs in the renderer context, not as a React component. No hooks. It receives already-extracted props and must handle children itself.
 6. `wrapCompound` is for components whose React implementation manages local state. The native component gets `value`, `onChange`, and `registerApi` — no XMLUI imports required.
 7. `exposeRegisterApi: true` must be set explicitly. Without it, `registerComponentApi` is `undefined` in the native component and no imperative APIs can be registered.
