@@ -487,9 +487,18 @@ function computeUsesInternal(
       let merged: Map<string, { globalReads: ReadonlySet<string> }> | undefined;
       for (const [name, { reads }] of fnPerFunction) {
         const globalReads = new Set([...reads].filter(isGlobalDep));
-        // Lazily allocate the merged Map only when we have entries to add.
-        if (!merged) merged = new Map(parentFunctionDeps ?? []);
-        merged.set(name, { globalReads });
+        // Only propagate functions that actually read globals. A function with
+        // an empty global-read set contributes nothing to a child's
+        // globalDepsUsed, and — critically — must NOT make `allCalledParentFnsResolvable`
+        // flip to true for it (see consumer below). Removing this guard (commit
+        // da036c780) caused `computedGlobalUses` to be set on containers whose
+        // code-behind functions only WRITE locals (e.g. FileDialogShell.checkCancel
+        // writing isCancelRequested), which broke their runtime scope. Restored.
+        if (globalReads.size > 0) {
+          // Lazily allocate the merged Map only when we have entries to add.
+          if (!merged) merged = new Map(parentFunctionDeps ?? []);
+          merged.set(name, { globalReads });
+        }
       }
       if (merged) childParentFunctionDeps = merged;
     }
