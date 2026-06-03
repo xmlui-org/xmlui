@@ -3,27 +3,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
 import { Icon } from "xmlui";
 import styles from "./Share.module.scss";
-
-export const defaultProps = {
-  label: "Copy page",
-  toggleAriaLabel: "Open share menu",
-  copyLabel: "Copy page",
-  copyDescription: "Copy page as markdown for LLMs",
-  copiedLabel: "Copied!",
-  chatGptLabel: "Open in ChatGPT",
-  chatGptDescription: "Ask questions about this page",
-  claudeLabel: "Open in Claude",
-  claudeDescription: "Ask questions about this page",
-  twitterLabel: "Share in X (Twitter)",
-  twitterDescription: "Start conversation",
-  linkedInLabel: "Share in LinkedIn",
-  linkedInDescription: "Start conversation",
-  showCopy: true,
-  showChatGpt: true,
-  showClaude: true,
-  showTwitter: true,
-  showLinkedIn: true,
-};
+import { defaultProps } from "./Share.defaults";
 
 type Props = {
   label?: string;

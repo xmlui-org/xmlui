@@ -1,6 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { SelectionStore, defaultProps } from "./SelectionStoreReact";
+import { defaultProps } from "./SelectionStore.defaults";
+import { SelectionStore } from "./SelectionStoreReact";
 
 const COMP = "SelectionStore";
 

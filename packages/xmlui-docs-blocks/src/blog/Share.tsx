@@ -1,5 +1,6 @@
 import { createMetadata, parseScssVar, wrapComponent, type ComponentMetadata } from "xmlui";
-import { Share, defaultProps } from "./ShareNative";
+import { defaultProps } from "./Share.defaults";
+import { Share } from "./ShareNative";
 import styles from "./Share.module.scss";
 
 const COMP = "Share";

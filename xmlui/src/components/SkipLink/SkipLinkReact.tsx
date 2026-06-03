@@ -1,13 +1,9 @@
 import { forwardRef, memo, useState } from "react";
+import { defaultProps } from "./SkipLink.defaults";
 
 export type SkipLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   target?: string;
   label?: string;
-};
-
-export const defaultProps = {
-  target: "main",
-  label: "Skip to main content",
 };
 
 export const SkipLink = memo(forwardRef<HTMLAnchorElement, SkipLinkProps>(function SkipLink(

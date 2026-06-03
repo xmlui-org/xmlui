@@ -10,15 +10,7 @@ import type { OrientationOptions } from "../abstractions";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { PART_PRIMARY_PANEL, PART_SECONDARY_PANEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
-
-export const defaultProps = {
-  initialPrimarySize: "50%",
-  minPrimarySize: "0%",
-  maxPrimarySize: "100%",
-  orientation: "vertical" as OrientationOptions,
-  swapped: false,
-  floating: false,
-};
+import { defaultProps } from "./Splitter.defaults";
 
 type SplitterProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   children?: React.ReactNode;

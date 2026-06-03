@@ -1,4 +1,5 @@
-import { Slider, defaultProps } from "./SliderReact";
+import { defaultProps } from "./Slider.defaults";
+import { Slider } from "./SliderReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import styles from "./Slider.module.scss";

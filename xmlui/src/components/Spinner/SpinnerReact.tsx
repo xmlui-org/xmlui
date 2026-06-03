@@ -6,11 +6,7 @@ import classnames from "classnames";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { PART_RING } from "../../components-core/parts";
-
-export const defaultProps = {
-  delay: 400,
-  fullScreen: false,
-};
+import { defaultProps } from "./Spinner.defaults";
 
 type SpinnerProps = React.HTMLAttributes<HTMLDivElement> & {
   delay?: number;

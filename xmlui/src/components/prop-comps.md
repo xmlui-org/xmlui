@@ -78,15 +78,15 @@
 * ScrollToTop
 * ScrollViewer
 * Search
-Select
-SelectionStore
-Share
-SkipLink
-SlideInAnimation
-Slider
-Spinner
-Splitter
-Stack
+* Select
+* SelectionStore
+* Share
+* SkipLink
+* SlideInAnimation
+* Slider
+* Spinner
+* Splitter
+* Stack
 Stepper
 StepperForm
 StickyBox

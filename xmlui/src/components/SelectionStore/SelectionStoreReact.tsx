@@ -4,12 +4,8 @@ import { isEqual } from "lodash-es";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY, noop } from "../../components-core/constants";
+import { defaultProps } from "./SelectionStore.defaults";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
-
-export const defaultProps = {
-  idKey: "id",
-  selectedItems: EMPTY_ARRAY,
-};
 
 type SelectionStoreProps = {
   idKey?: string;
