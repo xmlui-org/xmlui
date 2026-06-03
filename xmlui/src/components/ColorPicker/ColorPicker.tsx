@@ -1,4 +1,5 @@
-import { ColorPicker, defaultProps } from "./ColorPickerReact";
+import { defaultProps } from "./ColorPicker.defaults";
+import { ColorPicker } from "./ColorPickerReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {

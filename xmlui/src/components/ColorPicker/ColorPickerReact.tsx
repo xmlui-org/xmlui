@@ -12,6 +12,7 @@ import { Part } from "../Part/Part";
 import { PART_INPUT } from "../../components-core/parts";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { defaultProps } from "./ColorPicker.defaults";
 
 type Props = {
   id?: string;
@@ -33,14 +34,6 @@ type Props = {
   validationStatus?: ValidationStatus;
   invalidMessages?: string[];
 };
-
-export const defaultProps: Pick<Props, "initialValue" | "value" | "enabled" | "validationStatus"> =
-  {
-    initialValue: "#000000",
-    value: "#000000",
-    enabled: true,
-    validationStatus: "none",
-  };
 
 export const ColorPicker = memo(forwardRef(
   (

@@ -3,20 +3,20 @@
 * Animation
 * APICall
 * App
-AppHeader
-AppState
-AreaChart
-AutoComplete
-Avatar
-Badge
-BarChart
-Bookmark
-Card
-Carousel
-ChangeListener
-Checkbox
-CodeBlock
-ColorPicker
+* AppHeader
+* AppState
+* AreaChart
+* AutoComplete
+* Avatar
+* Badge
+* BarChart
+* Bookmark
+* Card
+* Carousel
+* ChangeListener
+* Checkbox
+* CodeBlock
+* ColorPicker
 Column
 ContentSeparator
 DateInput

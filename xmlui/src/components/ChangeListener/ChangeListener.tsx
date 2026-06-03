@@ -1,5 +1,6 @@
 import { createMetadata, dDidChange } from "../metadata-helpers";
-import { ChangeListener, defaultProps } from "./ChangeListenerReact";
+import { defaultProps } from "./ChangeListener.defaults";
+import { ChangeListener } from "./ChangeListenerReact";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "ChangeListener";
