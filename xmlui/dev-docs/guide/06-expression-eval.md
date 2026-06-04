@@ -2,8 +2,6 @@
 
 XMLUI uses its own scripting engine — a restricted JavaScript subset with custom semantics. Understanding where it differs from JavaScript is essential for writing correct markup and debugging unexpected behavior. This document covers the full pipeline from XMLUI attribute parsing through evaluation, and catalogs every semantic difference from standard JavaScript.
 
-<!-- DIAGRAM: Pipeline overview — XMLUI attribute → AttributeValueParser → Parser → AST → eval-tree-sync/async → result -->
-
 ```mermaid
 graph TD
   Attr["XMLUI attribute value<br>e.g. 'Hello {name}, you have {count} items'"]
@@ -92,6 +90,36 @@ diagnostics (`code: "reactive-cycle"` with related locations for each member),
 and Vite builds (`reactiveCycles: "off" | "warn" | "strict"`). Strict runtime
 mode is default-on through `App.appGlobals.strictReactiveGraph`; set it to
 `false` only while migrating known cycles.
+
+## Lexical Scoping Optimizer (`computedUses`)
+
+Expression dependencies are also used before runtime to reduce unnecessary
+container re-renders. `computeUsesForTree()` walks the component tree at
+transform/boot time and stores the minimal parent-state dependency set in
+`node.computedUses`. When a container renders, that list narrows the parent
+state passed down to the subtree, so changing an unrelated parent value does not
+re-evaluate children that never read it.
+
+The optimizer is intentionally metadata-driven:
+
+- Component templates must declare injected `$` variables in `metadata.contextVars`.
+- Event handlers must declare event-specific injected `$` variables in
+  `metadata.events[eventName].injectedVars`.
+- `$event`, `$value`, `$oldValue`, and `$newValue` are universal event payload
+  names and do not need explicit declarations.
+- Framework globals such as `Actions`, `navigate`, `toast`, `App`, and `Log`,
+  plus unambiguous host globals like `window`, `document`, and `navigator`, are
+  filtered out because they are not XMLUI parent-state variables.
+
+`validateInjectedVars()` checks the runtime injections against component
+metadata. In development, undeclared injected `$` variables throw a
+`[XMLUI Lexical Scoping]` error so component authors catch metadata drift before
+the optimizer strips a variable from the dependency list. Production logs the
+same mismatch with `console.error`.
+
+The same pass also stores `node.computedGlobalUses` for variables read from
+`Globals.xs`, allowing global variable updates to re-render only the subtrees
+that actually depend on them. Explicit `uses` still wins over `computedUses`.
 
 ---
 
@@ -377,8 +405,6 @@ When XMLUI encounters an identifier like `count` or `user`, it searches through 
 4. **localContext** — the container's reactive state (variables declared with `var`, context variables like `$data`)
 5. **appContext** — global functions (`navigate`, `toast`, `confirm`), `Actions` namespace, date/math utilities
 6. **globalThis** — browser globals (`Math`, `JSON`, `console`, `window`, etc.)
-
-<!-- DIAGRAM: Scope resolution ladder — block → closure → parent thread → localContext → appContext → globalThis -->
 
 ```mermaid
 graph BT

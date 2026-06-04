@@ -2106,30 +2106,10 @@ export class Parser {
    *   ;
    */
   private parseNullCoalescingExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseLogicalOrExpr();
-    if (!leftExpr) {
-      return null;
-    }
-    while (this.skipToken(TokenType.NullCoalesce)) {
-      const rightExpr = this.parseLogicalOrExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: "??",
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseLogicalOrExpr(),
+      TokenType.NullCoalesce,
+    );
   }
 
   /**
@@ -2138,31 +2118,10 @@ export class Parser {
    *   ;
    */
   private parseLogicalOrExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseLogicalAndExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    while (this.skipToken(TokenType.LogicalOr)) {
-      const rightExpr = this.parseLogicalAndExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: "||",
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseLogicalAndExpr(),
+      TokenType.LogicalOr,
+    );
   }
 
   /**
@@ -2171,31 +2130,10 @@ export class Parser {
    *   ;
    */
   private parseLogicalAndExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseBitwiseOrExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    while (this.skipToken(TokenType.LogicalAnd)) {
-      const rightExpr = this.parseBitwiseOrExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: "&&",
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseBitwiseOrExpr(),
+      TokenType.LogicalAnd,
+    );
   }
 
   /**
@@ -2204,31 +2142,10 @@ export class Parser {
    *   ;
    */
   private parseBitwiseOrExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseBitwiseXorExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    while (this.skipToken(TokenType.BitwiseOr)) {
-      const rightExpr = this.parseBitwiseXorExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: "|",
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseBitwiseXorExpr(),
+      TokenType.BitwiseOr,
+    );
   }
 
   /**
@@ -2237,31 +2154,10 @@ export class Parser {
    *   ;
    */
   private parseBitwiseXorExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseBitwiseAndExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    while (this.skipToken(TokenType.BitwiseXor)) {
-      const rightExpr = this.parseBitwiseAndExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: "^",
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseBitwiseAndExpr(),
+      TokenType.BitwiseXor,
+    );
   }
 
   /**
@@ -2270,31 +2166,7 @@ export class Parser {
    *   ;
    */
   private parseBitwiseAndExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseEquExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    while (this.skipToken(TokenType.BitwiseAnd)) {
-      const rightExpr = this.parseEquExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: "&",
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(() => this.parseEquExpr(), TokenType.BitwiseAnd);
   }
 
   /**
@@ -2303,39 +2175,13 @@ export class Parser {
    *   ;
    */
   private parseEquExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseRelOrInExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    let opType: Token | null;
-    while (
-      (opType = this.skipTokens(
-        TokenType.Equal,
-        TokenType.StrictEqual,
-        TokenType.NotEqual,
-        TokenType.StrictNotEqual,
-      ))
-    ) {
-      const rightExpr = this.parseRelOrInExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: opType.text,
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseRelOrInExpr(),
+      TokenType.Equal,
+      TokenType.StrictEqual,
+      TokenType.NotEqual,
+      TokenType.StrictNotEqual,
+    );
   }
 
   /**
@@ -2344,41 +2190,15 @@ export class Parser {
    *   ;
    */
   private parseRelOrInExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseShiftExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    let opType: Token | null;
-    while (
-      (opType = this.skipTokens(
-        TokenType.LessThan,
-        TokenType.LessThanOrEqual,
-        TokenType.GreaterThan,
-        TokenType.GreaterThanOrEqual,
-        TokenType.In,
-        TokenType.Instanceof,
-      ))
-    ) {
-      const rightExpr = this.parseShiftExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: opType.text,
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseShiftExpr(),
+      TokenType.LessThan,
+      TokenType.LessThanOrEqual,
+      TokenType.GreaterThan,
+      TokenType.GreaterThanOrEqual,
+      TokenType.In,
+      TokenType.Instanceof,
+    );
   }
 
   /**
@@ -2387,38 +2207,12 @@ export class Parser {
    *   ;
    */
   private parseShiftExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseAddExpr();
-    if (!leftExpr) {
-      return null;
-    }
-
-    let opType: Token | null;
-    while (
-      (opType = this.skipTokens(
-        TokenType.ShiftLeft,
-        TokenType.ShiftRight,
-        TokenType.SignedShiftRight,
-      ))
-    ) {
-      const rightExpr = this.parseAddExpr();
-      if (!rightExpr) {
-        this.reportError("W001");
-        return null;
-      }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: opType.text,
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
-    }
-    return leftExpr;
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseAddExpr(),
+      TokenType.ShiftLeft,
+      TokenType.ShiftRight,
+      TokenType.SignedShiftRight,
+    );
   }
 
   /**
@@ -2427,20 +2221,48 @@ export class Parser {
    *   ;
    */
   private parseAddExpr(): Expression | null {
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseMultExpr(),
+      TokenType.Plus,
+      TokenType.Minus,
+    );
+  }
+
+  /**
+   * multExpr
+   *   : exponentialExpr ( ( "*" | "/" | "%") exponentialExpr )?
+   *   ;
+   */
+  private parseMultExpr(): Expression | null {
+    return this.parseLeftAssociativeBinaryExpr(
+      () => this.parseExponentialExpr(),
+      TokenType.Multiply,
+      TokenType.Divide,
+      TokenType.Remainder,
+    );
+  }
+
+  /**
+   * Parses one left-associative binary precedence level.
+   */
+  private parseLeftAssociativeBinaryExpr(
+    parseOperand: () => Expression | null,
+    ...operatorTypes: TokenType[]
+  ): Expression | null {
     const startToken = this._lexer.peek();
-    let leftExpr = this.parseMultExpr();
+    let leftExpr = parseOperand();
     if (!leftExpr) {
       return null;
     }
 
     let opType: Token | null;
-    while ((opType = this.skipTokens(TokenType.Plus, TokenType.Minus))) {
-      const rightExpr = this.parseMultExpr();
+    while ((opType = this.skipTokens(...operatorTypes))) {
+      const rightExpr = parseOperand();
       if (!rightExpr) {
         this.reportError("W001");
         return null;
       }
-      let endToken = rightExpr.endToken;
+      const endToken = rightExpr.endToken;
       leftExpr = this.createExpressionNode<BinaryExpression>(
         T_BINARY_EXPRESSION,
         {
@@ -2456,37 +2278,26 @@ export class Parser {
   }
 
   /**
-   * multExpr
-   *   : exponentialExpr ( ( "*" | "/" | "%") exponentialExpr )?
-   *   ;
+   * Parses the argument list after a call site's opening parenthesis has been consumed.
    */
-  private parseMultExpr(): Expression | null {
-    const startToken = this._lexer.peek();
-    let leftExpr = this.parseExponentialExpr();
-    if (!leftExpr) {
-      return null;
-    }
+  private parseCallArgumentsAfterOpeningParenthesis(): {
+    args: Expression[];
+    endToken: Token;
+  } | null {
+    let args: Expression[] = [];
 
-    let opType: Token | null;
-    while ((opType = this.skipTokens(TokenType.Multiply, TokenType.Divide, TokenType.Remainder))) {
-      const rightExpr = this.parseExponentialExpr();
-      if (!rightExpr) {
+    if (this._lexer.peek().type !== TokenType.RParent) {
+      const expr = this.parseExpr();
+      if (!expr) {
         this.reportError("W001");
         return null;
       }
-      let endToken = rightExpr.endToken;
-      leftExpr = this.createExpressionNode<BinaryExpression>(
-        T_BINARY_EXPRESSION,
-        {
-          op: opType.text,
-          left: leftExpr,
-          right: rightExpr,
-        },
-        startToken,
-        endToken,
-      );
+      args = expr.type === T_SEQUENCE_EXPRESSION ? expr.exprs : [expr];
     }
-    return leftExpr;
+
+    const endToken = this._lexer.peek();
+    this.expectToken(TokenType.RParent, "W006");
+    return { args, endToken };
   }
 
   /**
@@ -2625,16 +2436,10 @@ export class Parser {
       // Check if there are constructor arguments
       if (nextToken.type === TokenType.LParent) {
         this._lexer.get();
-        if (this._lexer.peek().type !== TokenType.RParent) {
-          const expr = this.parseExpr();
-          if (!expr) {
-            this.reportError("W001");
-            return null;
-          }
-          args = expr.type === T_SEQUENCE_EXPRESSION ? expr.exprs : [expr];
-        }
-        endToken = this._lexer.peek();
-        this.expectToken(TokenType.RParent, "W006");
+        const argList = this.parseCallArgumentsAfterOpeningParenthesis();
+        if (!argList) return null;
+        args = argList.args;
+        endToken = argList.endToken;
       }
 
       let newExprResult: Expression = this.createExpressionNode<NewExpression>(
@@ -2656,25 +2461,16 @@ export class Parser {
         switch (currentStart.type) {
           case TokenType.LParent: {
             this._lexer.get();
-            let invokeArgs: Expression[] = [];
-            if (this._lexer.peek().type !== TokenType.RParent) {
-              const expr = this.parseExpr();
-              if (!expr) {
-                this.reportError("W001");
-                return null;
-              }
-              invokeArgs = expr.type === T_SEQUENCE_EXPRESSION ? expr.exprs : [expr];
-            }
-            const invokeEndToken = this._lexer.peek();
-            this.expectToken(TokenType.RParent, "W006");
+            const argList = this.parseCallArgumentsAfterOpeningParenthesis();
+            if (!argList) return null;
             newExprResult = this.createExpressionNode<FunctionInvocationExpression>(
               T_FUNCTION_INVOCATION_EXPRESSION,
               {
                 obj: newExprResult,
-                arguments: invokeArgs,
+                arguments: argList.args,
               },
               startToken,
-              invokeEndToken,
+              argList.endToken,
             );
             break;
           }
@@ -2807,25 +2603,16 @@ export class Parser {
       switch (currentStart.type) {
         case TokenType.LParent: {
           this._lexer.get();
-          let args: Expression[] = [];
-          if (this._lexer.peek().type !== TokenType.RParent) {
-            const expr = this.parseExpr();
-            if (!expr) {
-              this.reportError("W001");
-              return null;
-            }
-            args = expr.type === T_SEQUENCE_EXPRESSION ? expr.exprs : [expr];
-          }
-          const endToken = this._lexer.peek();
-          this.expectToken(TokenType.RParent, "W006");
+          const argList = this.parseCallArgumentsAfterOpeningParenthesis();
+          if (!argList) return null;
           primary = this.createExpressionNode<FunctionInvocationExpression>(
             T_FUNCTION_INVOCATION_EXPRESSION,
             {
               obj: primary,
-              arguments: args,
+              arguments: argList.args,
             },
             startToken,
-            endToken,
+            argList.endToken,
           );
           break;
         }
