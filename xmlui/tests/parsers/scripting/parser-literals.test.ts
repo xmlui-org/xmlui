@@ -17,6 +17,7 @@ import {
   T_ARRAY_LITERAL,
   T_UNARY_EXPRESSION,
   T_OBJECT_LITERAL,
+  T_ARROW_EXPRESSION,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { tokenTraits } from "../../../src/parsers/scripting/TokenTrait";
 import { TokenType } from "../../../src/parsers/scripting/TokenType";
@@ -481,6 +482,53 @@ describe("Parser - literals", () => {
         expect((array.props[c.idx] as [Expression, Expression])[1].type).equal(c.val);
       }
     });
+  });
+
+  it("Object literal: getter accessor", () => {
+    const wParser = new Parser("{ get value() { return count; } }");
+    const expr = wParser.parseExpr();
+
+    expect(expr).not.equal(null);
+    if (!expr) return;
+    expect(expr.type).equal(T_OBJECT_LITERAL);
+    const object = expr as ObjectLiteral;
+    expect(object.props.length).equal(1);
+    const prop = object.props[0];
+    expect(Array.isArray(prop)).equal(false);
+    expect("kind" in prop).equal(true);
+    if (Array.isArray(prop) || !("kind" in prop)) return;
+    expect(prop.kind).equal("get");
+    expect(prop.key.type).equal(T_IDENTIFIER);
+    expect((prop.key as Identifier).name).equal("value");
+    expect(prop.value.type).equal(T_ARROW_EXPRESSION);
+    expect(prop.value.args.length).equal(0);
+  });
+
+  it("Object literal: setter accessor", () => {
+    const wParser = new Parser("{ set value(next) { stored = next; } }");
+    const expr = wParser.parseExpr();
+
+    expect(expr).not.equal(null);
+    if (!expr) return;
+    expect(expr.type).equal(T_OBJECT_LITERAL);
+    const object = expr as ObjectLiteral;
+    const prop = object.props[0];
+    expect(Array.isArray(prop)).equal(false);
+    expect("kind" in prop).equal(true);
+    if (Array.isArray(prop) || !("kind" in prop)) return;
+    expect(prop.kind).equal("set");
+    expect(prop.value.args.length).equal(1);
+    expect((prop.value.args[0] as Identifier).name).equal("next");
+  });
+
+  it("Object literal: get remains a normal shorthand property", () => {
+    const wParser = new Parser("{ get }");
+    const expr = wParser.parseExpr();
+
+    expect(expr).not.equal(null);
+    if (!expr) return;
+    const object = expr as ObjectLiteral;
+    expect(Array.isArray(object.props[0])).equal(true);
   });
 
   const allKeywords = Object.keys(tokenTraits)

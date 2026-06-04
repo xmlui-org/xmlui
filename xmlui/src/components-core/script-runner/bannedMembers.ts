@@ -20,6 +20,10 @@
 
 /** Banned property keys on `globalThis` / `window`. */
 export const BANNED_GLOBAL_KEYS = new Set<string>([
+  // Root host objects. Member-level allow-list entries can exempt these roots
+  // when needed, e.g. `document.*` allows reaching document members.
+  "document",
+  "navigator",
   // Step 1.3 — DOM mutation: observers and Range/Selection constructors
   "MutationObserver",
   "ResizeObserver",
@@ -70,6 +74,8 @@ export const BANNED_GLOBAL_KEYS = new Set<string>([
 
 /** Migration hints for banned global keys. */
 export const BANNED_GLOBAL_HELP = new Map<string, string>([
+  ["document", "Use XMLUI components and managed APIs instead of raw document access."],
+  ["navigator", "Use App.environment, Clipboard.copy(), or managed components instead of raw navigator access."],
   ["localStorage", "Use AppState.get/set() for persistent key-value storage."],
   ["sessionStorage", "Use AppState.get/set() for session-scoped storage."],
   ["location", "Use navigate() instead of window.location."],

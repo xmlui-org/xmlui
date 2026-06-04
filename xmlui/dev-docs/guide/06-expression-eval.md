@@ -2,8 +2,6 @@
 
 XMLUI uses its own scripting engine — a restricted JavaScript subset with custom semantics. Understanding where it differs from JavaScript is essential for writing correct markup and debugging unexpected behavior. This document covers the full pipeline from XMLUI attribute parsing through evaluation, and catalogs every semantic difference from standard JavaScript.
 
-<!-- DIAGRAM: Pipeline overview — XMLUI attribute → AttributeValueParser → Parser → AST → eval-tree-sync/async → result -->
-
 ```mermaid
 graph TD
   Attr["XMLUI attribute value<br>e.g. 'Hello {name}, you have {count} items'"]
@@ -93,6 +91,36 @@ and Vite builds (`reactiveCycles: "off" | "warn" | "strict"`). Strict runtime
 mode is default-on through `App.appGlobals.strictReactiveGraph`; set it to
 `false` only while migrating known cycles.
 
+## Lexical Scoping Optimizer (`computedUses`)
+
+Expression dependencies are also used before runtime to reduce unnecessary
+container re-renders. `computeUsesForTree()` walks the component tree at
+transform/boot time and stores the minimal parent-state dependency set in
+`node.computedUses`. When a container renders, that list narrows the parent
+state passed down to the subtree, so changing an unrelated parent value does not
+re-evaluate children that never read it.
+
+The optimizer is intentionally metadata-driven:
+
+- Component templates must declare injected `$` variables in `metadata.contextVars`.
+- Event handlers must declare event-specific injected `$` variables in
+  `metadata.events[eventName].injectedVars`.
+- `$event`, `$value`, `$oldValue`, and `$newValue` are universal event payload
+  names and do not need explicit declarations.
+- Framework globals such as `Actions`, `navigate`, `toast`, `App`, and `Log`,
+  plus unambiguous host globals like `window`, `document`, and `navigator`, are
+  filtered out because they are not XMLUI parent-state variables.
+
+`validateInjectedVars()` checks the runtime injections against component
+metadata. In development, undeclared injected `$` variables throw a
+`[XMLUI Lexical Scoping]` error so component authors catch metadata drift before
+the optimizer strips a variable from the dependency list. Production logs the
+same mismatch with `console.error`.
+
+The same pass also stores `node.computedGlobalUses` for variables read from
+`Globals.xs`, allowing global variable updates to re-render only the subtrees
+that actually depend on them. Explicit `uses` still wins over `computedUses`.
+
 ---
 
 ## The Two Tracks: Sync vs Async
@@ -126,7 +154,7 @@ Entry points: `evalBindingAsync(ast, context)` and `executeArrowExpression(...)`
 Used for `onClick`, `onDidChange`, and other event handlers, as well as code-behind script execution. The async evaluator handles Promises transparently:
 
 1. Function return values are awaited via `completePromise()`, which recursively resolves nested Promises in arrays and objects
-2. Eight array methods are replaced with async-safe proxies (see [Array Method Proxies](#array-method-proxies) below)
+2. Twelve array methods are replaced with async-safe proxies (see [Array Method Proxies](#array-method-proxies) below)
 
 **Timeout:** configurable via `evalContext.timeout`, no default.
 
@@ -214,6 +242,13 @@ and related DOM-query methods.
 |--------------------|--------|
 | `false` (default) | Blocked access emits a `sandbox:warn` trace entry and still executes. |
 | `true` | Blocked access throws `BannedApiError` immediately. |
+| `string[]` | Strict mode with exemptions. Matching API labels are allowed and produce no sandbox warning/error. Entries can be exact labels such as `"window.document"` or `"document.body"`, or wildcard prefixes such as `"document.*"` and `"navigator.*"`. |
+
+Allow-list entries match the API label reported by the sandbox. Exact member
+entries such as `"document.body"` also permit the root read needed to reach that
+member (`document` / `window.document`), but they do not permit sibling members
+like `document.head`. Use `"document.*"` when an app intentionally needs the
+whole document surface.
 
 **Sanctioned replacements** for the common use-cases:
 
@@ -233,29 +268,52 @@ and related DOM-query methods.
 See [15-app-context.md](15-app-context.md) and
 [managed-react.md](../plans/managed-react.md) Appendix A for the full hardening plan.
 
-### 3. The `new` Operator — Only 4 Constructors
+### 3. The `new` Operator — Safe Constructor Allow-List
 
-XMLUI restricts `new` to exactly four constructors:
+XMLUI restricts `new` to a curated set of inert value/container constructors.
+Constructors that execute code, open browser capabilities, start background
+work, or expose unmanaged platform control are not allowed.
 
 | Constructor | Allowed |
 |-------------|---------|
 | `new String(...)` | Yes |
+| `new Number(...)` | Yes |
+| `new Boolean(...)` | Yes |
 | `new Date(...)` | Yes |
+| `new RegExp(...)` | Yes |
+| `new Array(...)` | Yes |
+| `new Object(...)` | Yes |
+| `new Map(...)` | Yes |
+| `new Set(...)` | Yes |
+| `new WeakMap(...)` | Yes |
+| `new WeakSet(...)` | Yes |
+| `new ArrayBuffer(...)` | Yes |
+| `new DataView(...)` | Yes |
+| `new Int8Array(...)`, `new Uint8Array(...)`, etc. | Yes |
+| `new URL(...)` | Yes |
+| `new URLSearchParams(...)` | Yes |
+| `new TextEncoder(...)` | Yes |
+| `new TextDecoder(...)` | Yes |
 | `new Blob(...)` | Yes |
+| `new File(...)` | Yes, when available |
 | `new Error(...)` | Yes |
+| `new TypeError(...)`, `new RangeError(...)`, etc. | Yes |
+| `new AggregateError(...)` | Yes, when available |
+| `new DOMException(...)` | Yes, when available |
 | Everything else | **No** |
 
-Attempting `new Array(5)`, `new Map()`, `new RegExp(...)`, `new Set()`, or any other constructor throws:
+Attempting `new Function(...)`, `new Promise(...)`, `new WebSocket(...)`, a
+custom constructor, or any other constructor outside the allow-list throws:
 
 ```
-"XMLUI does not support the new operator with constructor 'Array'."
+"XMLUI does not support the new operator with constructor 'Function'."
 ```
-**Future:** The whitelist will be extended in future releases to support additional safe constructors.
+
 **Alternatives:**
-- Array: use array literals `[1, 2, 3]`
-- Object: use object literals `{ key: value }`
-- RegExp: use regex literals `/pattern/flags`
-- Map/Set: not available (use plain objects/arrays)
+- Array/Object: literals (`[1, 2, 3]`, `{ key: value }`) are still preferred for readability.
+- RegExp: regex literals (`/pattern/flags`) remain the shortest option for static patterns.
+- Async work: call managed async functions from the async track instead of constructing `Promise`.
+- Browser capabilities: use XMLUI-managed replacements such as `App.fetch`, `Clipboard.copy`, or dedicated components.
 
 ### 4. `async`/`await` — Parsed but Rejected
 
@@ -272,7 +330,7 @@ The parser recognizes all `async` and `await` syntax (for forward compatibility)
 
 ### 5. Array Method Proxies (Async Track Only)
 
-In the **async evaluator**, 8 array methods are transparently replaced with async-aware versions. This is necessary because native Array methods like `filter()` don't support async predicates — they would see a Promise object (which is truthy) instead of awaiting it.
+In the **async evaluator**, 12 array methods are transparently replaced with async-aware versions. This is necessary because native Array methods like `filter()` don't support async predicates — they would see a Promise object (which is truthy) instead of awaiting it.
 
 | Method | Async behavior |
 |--------|---------------|
@@ -283,9 +341,13 @@ In the **async evaluator**, 8 array methods are transparently replaced with asyn
 | `some` | Evaluates all predicates in parallel, then checks any true |
 | `find` | Evaluates all predicates in parallel, then finds first match |
 | `findIndex` | Evaluates all predicates in parallel, then finds first index |
+| `findLast` | Evaluates all predicates in parallel, then finds last match |
+| `findLastIndex` | Evaluates all predicates in parallel, then finds last index |
 | `flatMap` | Evaluates all predicates in parallel, then flat-maps results |
+| `reduce` | Evaluates reducers **sequentially**, awaiting each accumulator before the next iteration |
+| `reduceRight` | Evaluates reducers **sequentially** from right to left, awaiting each accumulator before the next iteration |
 
-**Key detail:** `map` and `forEach` use sequential execution (order-preserving), while the others use `Promise.all` (parallel). This matters when predicates have side effects.
+**Key detail:** `map`, `forEach`, `reduce`, and `reduceRight` use sequential execution (order-preserving), while the predicate-based methods use `Promise.all` (parallel). This matters when callbacks have side effects.
 
 The sync evaluator does NOT apply these proxies — if a predicate returns a Promise in sync mode, it throws.
 
@@ -330,12 +392,11 @@ These JavaScript features are **not available** in XMLUI's scripting language �
 | `with` statement | Not supported |
 | `debugger` statement | Not supported |
 | Labeled statements (`label: statement`) | Not supported |
-| Getter/setter in object literals | Not supported |
 | Dynamic `import()` | Not supported |
 | `for await...of` | Not supported |
 | `export` | Not supported |
 | Private class fields (`#field`) | Not supported |
-| `Symbol`, `WeakMap`, `WeakSet` | Not constructable (only 4 constructors allowed) |
+| `Symbol` | Not constructable |
 
 ### 9. Import System Restrictions
 
@@ -377,8 +438,6 @@ When XMLUI encounters an identifier like `count` or `user`, it searches through 
 4. **localContext** — the container's reactive state (variables declared with `var`, context variables like `$data`)
 5. **appContext** — global functions (`navigate`, `toast`, `confirm`), `Actions` namespace, date/math utilities
 6. **globalThis** — browser globals (`Math`, `JSON`, `console`, `window`, etc.)
-
-<!-- DIAGRAM: Scope resolution ladder — block → closure → parent thread → localContext → appContext → globalThis -->
 
 ```mermaid
 graph BT

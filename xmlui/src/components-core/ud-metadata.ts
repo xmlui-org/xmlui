@@ -107,6 +107,9 @@ function walkExpression(expr: Expression, props: Set<string>): void {
         if (Array.isArray(prop)) {
           walkExpression(prop[0], props);
           walkExpression(prop[1], props);
+        } else if ("kind" in prop) {
+          walkExpression(prop.key, props);
+          walkExpression(prop.value, props);
         } else {
           walkExpression(prop, props);
         }

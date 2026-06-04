@@ -1,4 +1,3 @@
-import { isPlainObject } from "lodash-es";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import type { TemplateLiteralExpression } from "./ScriptingSourceTree";
 import {
@@ -10,7 +9,6 @@ import {
   T_BLOCK_STATEMENT,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
   T_CONDITIONAL_EXPRESSION,
-  T_DESTRUCTURE,
   T_EMPTY_STATEMENT,
   T_EXPRESSION_STATEMENT,
   T_FUNCTION_INVOCATION_EXPRESSION,
@@ -26,7 +24,6 @@ import {
   T_SPREAD_EXPRESSION,
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_UNARY_EXPRESSION,
-  T_VAR_DECLARATION,
   type ArrayLiteral,
   type ArrowExpression,
   type AssignmentExpression,
@@ -45,16 +42,18 @@ import {
   type SequenceExpression,
   type Statement,
   type UnaryExpression,
-  type VarDeclaration,
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { processDeclarationsAsync, processStatementQueueAsync } from "./process-statement-async";
 import {
+  completeExprValue,
+  completePromise,
+  createArrowArgDeclaration,
+  createArrowWorkingThread,
   evalArrow,
   evalAssignmentCore,
-  allowedNewConstructors,
   evalBinaryCore,
   evalCalculatedMemberAccessCore,
   evalIdentifier,
@@ -63,9 +62,10 @@ import {
   evalPreOrPostCore,
   evalTemplateLiteralCore,
   evalUnaryCore,
-  getExprValue,
-  getRootIdScope,
-  isPromise,
+  getAllowedNewConstructor,
+  getStateUpdateScope,
+  notifyStateUpdate,
+  removeArrowWorkingThread,
   setExprValue,
 } from "./eval-tree-common";
 import { ensureMainThread } from "./process-statement-common";
@@ -325,7 +325,7 @@ async function evalObjectLiteralAsync(
 ): Promise<any> {
   const objectHash: any = {};
   for (const prop of expr.props) {
-    if (!Array.isArray(prop)) {
+    if (!Array.isArray(prop) && !("kind" in prop)) {
       // --- We're using a spread expression
       const spreadItems = await evaluator(thisStack, prop.expr, evalContext, thread);
       thisStack.pop();
@@ -343,28 +343,73 @@ async function evalObjectLiteralAsync(
       continue;
     }
 
-    // --- We're using key/[value] pairs
-    let key: any;
-    switch (prop[0].type) {
-      case T_LITERAL:
-        key = prop[0].value;
-        break;
-      case T_IDENTIFIER:
-        key = prop[0].name;
-        break;
-      default:
-        key = await evaluator(thisStack, prop[0], evalContext, thread);
-        thisStack.pop();
-        break;
+    if (!Array.isArray(prop)) {
+      const key = await evaluateObjectLiteralKeyAsync(
+        evaluator,
+        thisStack,
+        prop.key,
+        evalContext,
+        thread,
+      );
+      const accessor = createArrowFunctionAsync(evaluator, prop.value);
+      const existing = Object.getOwnPropertyDescriptor(objectHash, key);
+      const pairedAccessor =
+        existing && ("get" in existing || "set" in existing)
+          ? prop.kind === "get"
+            ? { set: existing.set }
+            : { get: existing.get }
+          : {};
+      Object.defineProperty(objectHash, key, {
+        ...pairedAccessor,
+        enumerable: true,
+        configurable: true,
+        [prop.kind]: (...args: any[]) => accessor(prop.value.args, evalContext, thread, ...args),
+      });
+      continue;
     }
-    objectHash[key] = await evaluator(thisStack, prop[1], evalContext, thread);
+
+    // --- We're using key/[value] pairs
+    const key = await evaluateObjectLiteralKeyAsync(
+      evaluator,
+      thisStack,
+      prop[0],
+      evalContext,
+      thread,
+    );
+    const value = await evaluator(thisStack, prop[1], evalContext, thread);
     thisStack.pop();
+    Object.defineProperty(objectHash, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   // --- Done.
   setExprValue(expr, { value: objectHash }, thread);
   thisStack.push(objectHash);
   return objectHash;
+}
+
+async function evaluateObjectLiteralKeyAsync(
+  evaluator: EvaluatorAsyncFunction,
+  thisStack: any[],
+  expr: Expression,
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThread,
+): Promise<any> {
+  switch (expr.type) {
+    case T_LITERAL:
+      return expr.value;
+    case T_IDENTIFIER:
+      return expr.name;
+    default: {
+      const key = await evaluator(thisStack, expr, evalContext, thread);
+      thisStack.pop();
+      return key;
+    }
+  }
 }
 
 async function evalUnaryAsync(
@@ -434,11 +479,8 @@ async function evalAssignmentAsync(
   thread: LogicalThread,
 ): Promise<any> {
   const leftValue = expr.leftValue;
-  const rootScope = getRootIdScope(leftValue, evalContext, thread);
-  const updatesState = rootScope && rootScope.type !== "block";
-  if (updatesState && evalContext.onWillUpdate) {
-    void evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
-  }
+  const rootScope = getStateUpdateScope(leftValue, evalContext, thread);
+  notifyStateUpdate("will", evalContext, rootScope, "assignment");
   await evaluator(thisStack, leftValue, evalContext, thread);
   thisStack.pop();
   await completeExprValue(leftValue, thread);
@@ -446,9 +488,7 @@ async function evalAssignmentAsync(
   thisStack.pop();
   await completeExprValue(expr.expr, thread);
   const value = evalAssignmentCore(thisStack, expr, evalContext, thread);
-  if (updatesState && evalContext.onDidUpdate) {
-    void evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
-  }
+  notifyStateUpdate("did", evalContext, rootScope, "assignment");
   return value;
 }
 
@@ -459,18 +499,13 @@ async function evalPreOrPostAsync(
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThread,
 ): Promise<any> {
-  const rootScope = getRootIdScope(expr.expr, evalContext, thread);
-  const updatesState = rootScope && rootScope.type !== "block";
-  if (updatesState && evalContext.onWillUpdate) {
-    void evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
-  }
+  const rootScope = getStateUpdateScope(expr.expr, evalContext, thread);
+  notifyStateUpdate("will", evalContext, rootScope, "pre-post");
   await evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
   await completeExprValue(expr.expr, thread);
   const value = evalPreOrPostCore(thisStack, expr, evalContext, thread);
-  if (updatesState && evalContext.onDidUpdate) {
-    void evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
-  }
+  notifyStateUpdate("did", evalContext, rootScope, "pre-post");
   return value;
 }
 
@@ -580,19 +615,14 @@ async function evalFunctionInvocationAsync(
   functionObj = getAsyncProxy(functionObj, functionArgs, currentContext);
 
   // --- Now, invoke the function
-  const rootScope = getRootIdScope(expr.obj, evalContext, thread);
-  const updatesState = rootScope && rootScope.type !== "block";
-  if (updatesState && evalContext.onWillUpdate) {
-    void evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
-  }
+  const rootScope = getStateUpdateScope(expr.obj, evalContext, thread);
+  notifyStateUpdate("will", evalContext, rootScope, "function-call");
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? (functionObj as Function)?.call(currentContext, ...functionArgs)
     : (functionObj as Function).call(currentContext, ...functionArgs);
 
   let returnValue = await completePromise(value);
-  if (updatesState && evalContext.onDidUpdate) {
-    void evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
-  }
+  notifyStateUpdate("did", evalContext, rootScope, "function-call");
 
   // --- Done.
   setExprValue(expr, { value: returnValue }, thread);
@@ -613,21 +643,7 @@ async function evalNewExpressionAsync(
   thisStack.pop();
 
   // --- Check if the constructor is allowed
-  let allowedConstructor: any = null;
-  for (const [name, ctor] of allowedNewConstructors) {
-    if (constructorObj === ctor) {
-      allowedConstructor = ctor;
-      break;
-    }
-  }
-
-  if (!allowedConstructor) {
-    const constructorName = constructorObj?.name || "unknown";
-    throw new Error(
-      `XMLUI does not support the new operator with constructor '${constructorName}'. ` +
-      `Only String, Date, and Blob are allowed.`
-    );
-  }
+  const allowedConstructor = getAllowedNewConstructor(constructorObj);
 
   // --- Evaluate arguments
   const constructorArgs: any[] = [];
@@ -668,24 +684,7 @@ function createArrowFunctionAsync(
     const runtimeThread = args[2] as LogicalThread;
 
     // --- Create the thread that runs the arrow function
-    const workingThread: LogicalThread = {
-      parent: runtimeThread,
-      childThreads: [],
-      blocks: [{ vars: {} }],
-      loops: [],
-      breakLabelValue: -1,
-      closures: (expr as any).closureContext,
-    };
-    runtimeThread.childThreads.push(workingThread);
-
-    // --- Create a block for a named arrow function
-    if (expr.name) {
-      const functionBlock: BlockScope = { vars: {} };
-      workingThread.blocks ??= [];
-      workingThread.blocks.push(functionBlock);
-      functionBlock.vars[expr.name] = expr;
-      functionBlock.constVars = new Set([expr.name]);
-    }
+    const workingThread = createArrowWorkingThread(expr, runtimeThread);
 
     // --- Assign argument values to names
     const arrowBlock: BlockScope = { vars: {} };
@@ -696,74 +695,43 @@ function createArrowFunctionAsync(
     for (let i = 0; i < argSpecs.length; i++) {
       // --- Turn argument specification into processable variable declarations
       const argSpec = argSpecs[i];
-      let decl: VarDeclaration | undefined;
-      switch (argSpec.type) {
-        case T_IDENTIFIER: {
-          decl = {
-            type: T_VAR_DECLARATION,
-            id: argSpec.name,
-          } as VarDeclaration;
-          break;
-        }
-        case T_DESTRUCTURE: {
-          decl = {
-            type: T_VAR_DECLARATION,
-            id: argSpec.id,
-            aDestr: argSpec.aDestr,
-            oDestr: argSpec.oDestr,
-          } as VarDeclaration;
-          break;
-        }
-        case T_SPREAD_EXPRESSION: {
-          restFound = true;
-          decl = {
-            type: T_VAR_DECLARATION,
-            id: (argSpec.expr as unknown as Identifier).name,
-          } as VarDeclaration;
-          break;
-        }
-
-        default:
-          throw new Error("Unexpected arrow argument specification");
-      }
-
-      if (decl) {
-        if (restFound) {
-          // --- Get the rest of the arguments
-          const restArgs = args.slice(i + 3);
-          let argVals: any[] = [];
-          for (const arg of restArgs) {
-            if (arg?._EXPRESSION_) {
-              argVals.push(await evaluator([], arg, runTimeEvalContext, runtimeThread));
-            } else {
-              argVals.push(arg);
-            }
+      const decl = createArrowArgDeclaration(argSpec);
+      restFound = restFound || argSpec.type === T_SPREAD_EXPRESSION;
+      if (restFound) {
+        // --- Get the rest of the arguments
+        const restArgs = args.slice(i + 3);
+        let argVals: any[] = [];
+        for (const arg of restArgs) {
+          if (arg?._EXPRESSION_) {
+            argVals.push(await evaluator([], arg, runTimeEvalContext, runtimeThread));
+          } else {
+            argVals.push(arg);
           }
-          await processDeclarationsAsync(
-            arrowBlock,
-            runTimeEvalContext,
-            runtimeThread,
-            [decl],
-            false,
-            true,
-            argVals,
-          );
-        } else {
-          // --- Get the actual value to work with
-          let argVal = args[i + 3];
-          if (argVal?._EXPRESSION_) {
-            argVal = await evaluator([], argVal, runTimeEvalContext, runtimeThread);
-          }
-          await processDeclarationsAsync(
-            arrowBlock,
-            runTimeEvalContext,
-            runtimeThread,
-            [decl],
-            false,
-            true,
-            argVal,
-          );
         }
+        await processDeclarationsAsync(
+          arrowBlock,
+          runTimeEvalContext,
+          runtimeThread,
+          [decl],
+          false,
+          true,
+          argVals,
+        );
+      } else {
+        // --- Get the actual value to work with
+        let argVal = args[i + 3];
+        if (argVal?._EXPRESSION_) {
+          argVal = await evaluator([], argVal, runTimeEvalContext, runtimeThread);
+        }
+        await processDeclarationsAsync(
+          arrowBlock,
+          runTimeEvalContext,
+          runtimeThread,
+          [decl],
+          false,
+          true,
+          argVal,
+        );
       }
     }
 
@@ -801,73 +769,11 @@ function createArrowFunctionAsync(
     returnValue = workingThread.returnValue;
 
     // --- Remove the current working thread
-    const workingIndex = runtimeThread.childThreads.indexOf(workingThread);
-    if (workingIndex < 0) {
-      throw new Error("Cannot find thread to remove.");
-    }
-    runtimeThread.childThreads.splice(workingIndex, 1);
-
-    // --- Remove the function level block
-    workingThread.blocks.pop();
+    removeArrowWorkingThread(runtimeThread, workingThread);
 
     // --- Return the function value
     return returnValue;
   };
-}
-
-// --- Completes all promises within the input
-function completePromise(input: any): Promise<any> {
-  const visited = new Map<any, any>();
-
-  return completePromiseInternal(input);
-
-  async function completePromiseInternal(input: any): Promise<any> {
-    // --- No need to resolve undefined or null
-    if (input === undefined || input === null) return input;
-
-    // --- Already visited?
-    const resolved = visited.get(input);
-    if (resolved) return resolved;
-
-    // --- Resolve the chain of promises
-    if (isPromise(input)) {
-      const awaited = await input;
-      visited.set(input, awaited);
-      return completePromiseInternal(awaited);
-    }
-
-    // --- In any other cases, we keep the input reference
-    visited.set(input, input);
-
-    // --- Resolve promises within an array
-    if (Array.isArray(input)) {
-      for (let i = 0; i < input.length; i++) {
-        const completedPromise = await completePromiseInternal(input[i]);
-        if (input[i] !== completedPromise) {
-          //prevent write if it's the same reference (can cause problems in frozen objects)
-          input.splice(i, 1, completedPromise);
-        }
-      }
-      return input;
-    }
-
-    // --- Resolve promises in object properties
-    if (isPlainObject(input)) {
-      for (const key of Object.keys(input)) {
-        let completedPromise = await completePromiseInternal(input[key]);
-        if (input[key] !== completedPromise) {
-          const descriptor = Object.getOwnPropertyDescriptor(input, key);
-          if (descriptor?.writable || descriptor?.set) {
-            input[key] = completedPromise;
-          }
-        }
-      }
-      return input;
-    }
-
-    // --- Done.
-    return input;
-  }
 }
 
 async function evalTemplateLiteralAsync(
@@ -888,11 +794,4 @@ async function evalTemplateLiteralAsync(
   setExprValue(expr, { value }, thread);
   thisStack.push(value);
   return value;
-}
-
-export async function completeExprValue(expr: Expression, thread: LogicalThread): Promise<any> {
-  const exprValue = getExprValue(expr, thread);
-  const awaited = await completePromise(exprValue?.value);
-  setExprValue(expr, { ...exprValue, value: awaited }, thread);
-  return awaited;
 }

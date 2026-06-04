@@ -190,4 +190,137 @@ describe("Function proxies (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].returnValue).eql([4, 4, 1, 1]);
   });
+
+  it("Array.prototype.findLast with async predicate", async () => {
+    // --- Arrange
+    if (!Array.prototype.findLast) return;
+    const source = `()=> {
+      return items.findLast((item) => isEven(item));
+    }`;
+    const evalContext = createEvalContext({
+      localContext: {
+        items: [1, 2, 4, 5, 6, 7],
+        isEven: async (item: number) => item % 2 === 0,
+      },
+    });
+    const statements = parseStatements(source);
+    const arrowStmt = {
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: (statements[0] as ExpressionStatement).expr,
+    } as ArrowExpressionStatement;
+    await processStatementQueueAsync([arrowStmt], evalContext);
+    // --- Assert
+    const thread = evalContext.mainThread!;
+    expect(thread.blocks![0].returnValue).eql(6);
+  });
+
+  it("Array.prototype.findLastIndex with async predicate", async () => {
+    // --- Arrange
+    if (!Array.prototype.findLastIndex) return;
+    const source = `()=> {
+      return items.findLastIndex((item) => isEven(item));
+    }`;
+    const evalContext = createEvalContext({
+      localContext: {
+        items: [1, 2, 4, 5, 6, 7],
+        isEven: async (item: number) => item % 2 === 0,
+      },
+    });
+    const statements = parseStatements(source);
+    const arrowStmt = {
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: (statements[0] as ExpressionStatement).expr,
+    } as ArrowExpressionStatement;
+    await processStatementQueueAsync([arrowStmt], evalContext);
+    // --- Assert
+    const thread = evalContext.mainThread!;
+    expect(thread.blocks![0].returnValue).eql(4);
+  });
+
+  it("Array.prototype.reduce with async reducer and initial value", async () => {
+    // --- Arrange
+    const source = `()=> {
+      return items.reduce((accumulator, item) => add(accumulator, item), 0);
+    }`;
+    const evalContext = createEvalContext({
+      localContext: {
+        items: [1, 2, 3, 4],
+        add: async (left: number, right: number) => left + right,
+      },
+    });
+    const statements = parseStatements(source);
+    const arrowStmt = {
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: (statements[0] as ExpressionStatement).expr,
+    } as ArrowExpressionStatement;
+    await processStatementQueueAsync([arrowStmt], evalContext);
+    // --- Assert
+    const thread = evalContext.mainThread!;
+    expect(thread.blocks![0].returnValue).eql(10);
+  });
+
+  it("Array.prototype.reduce with async reducer and no initial value", async () => {
+    // --- Arrange
+    const source = `()=> {
+      return items.reduce((accumulator, item) => add(accumulator, item));
+    }`;
+    const evalContext = createEvalContext({
+      localContext: {
+        items: [1, 2, 3, 4],
+        add: async (left: number, right: number) => left + right,
+      },
+    });
+    const statements = parseStatements(source);
+    const arrowStmt = {
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: (statements[0] as ExpressionStatement).expr,
+    } as ArrowExpressionStatement;
+    await processStatementQueueAsync([arrowStmt], evalContext);
+    // --- Assert
+    const thread = evalContext.mainThread!;
+    expect(thread.blocks![0].returnValue).eql(10);
+  });
+
+  it("Array.prototype.reduceRight with async reducer", async () => {
+    // --- Arrange
+    const source = `()=> {
+      return items.reduceRight((accumulator, item) => append(accumulator, item), "");
+    }`;
+    const evalContext = createEvalContext({
+      localContext: {
+        items: ["a", "b", "c"],
+        append: async (left: string, right: string) => left + right,
+      },
+    });
+    const statements = parseStatements(source);
+    const arrowStmt = {
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: (statements[0] as ExpressionStatement).expr,
+    } as ArrowExpressionStatement;
+    await processStatementQueueAsync([arrowStmt], evalContext);
+    // --- Assert
+    const thread = evalContext.mainThread!;
+    expect(thread.blocks![0].returnValue).eql("cba");
+  });
+
+  it("Array.prototype.reduce preserves native empty-array error", async () => {
+    // --- Arrange
+    const source = `()=> {
+      return items.reduce((accumulator, item) => add(accumulator, item));
+    }`;
+    const evalContext = createEvalContext({
+      localContext: {
+        items: [],
+        add: async (left: number, right: number) => left + right,
+      },
+    });
+    const statements = parseStatements(source);
+    const arrowStmt = {
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: (statements[0] as ExpressionStatement).expr,
+    } as ArrowExpressionStatement;
+    await expect(processStatementQueueAsync([arrowStmt], evalContext)).rejects.toThrow(
+      "Reduce of empty array with no initial value",
+    );
+  });
 });

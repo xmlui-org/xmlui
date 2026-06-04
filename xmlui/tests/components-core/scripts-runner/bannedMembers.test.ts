@@ -375,7 +375,166 @@ describe("Eval-tree async integration — strict mode", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. Default behaviour (no option set) — must not throw or warn
+// 6. Eval-tree integration — strict mode with allow-list exemptions
+// ---------------------------------------------------------------------------
+
+describe("Eval-tree integration — strictDomSandbox allow-list", () => {
+  beforeEach(() => addTestGlobalEntry("Use the managed alternative."));
+  afterEach(() => removeTestGlobalEntry());
+
+  it("treats a string array as strict mode for non-exempt banned globals", () => {
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: ["window.document"] },
+    });
+    expect(() => evalBindingExpression(TEST_KEY, ctx)).toThrow(BannedApiError);
+  });
+
+  it("allows an exact banned global identifier when its API label is listed", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({
+        localContext: {},
+        options: { strictDomSandbox: [`window.${TEST_KEY}`] },
+      });
+      expect(evalBindingExpression(TEST_KEY, ctx)).toBe("test-value");
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("allows exact member access when the full API label is listed", () => {
+    if (typeof document === "undefined") return;
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({
+        localContext: {},
+        options: { strictDomSandbox: ["document.body"] },
+      });
+      expect(evalBindingExpression("document.body", ctx)).toBe(document.body);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("allows exact member access through window.<root>.<member>", () => {
+    if (typeof document === "undefined") return;
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: ["document.body"] },
+    });
+    expect(evalBindingExpression("window.document.body", ctx)).toBe(document.body);
+  });
+
+  it("does not let one exact member exemption allow sibling members", () => {
+    if (typeof document === "undefined") return;
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: ["document.body"] },
+    });
+    expect(() => evalBindingExpression("document.head", ctx)).toThrow(BannedApiError);
+  });
+
+  it("allows a wildcard member prefix and suppresses warnings", () => {
+    if (typeof document === "undefined") return;
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({
+        localContext: {},
+        options: { strictDomSandbox: ["document.*"] },
+      });
+      expect(evalBindingExpression("document.head", ctx)).toBe(document.head);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("allows calculated member access when covered by a wildcard", () => {
+    if (typeof document === "undefined") return;
+    const parser = new Parser("document['body']");
+    const expr = parser.parseExpr()!;
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: ["document.*"] },
+    });
+    expect(evalBinding(expr, ctx)).toBe(document.body);
+  });
+
+  it("allows assignment to an exact listed member", () => {
+    if (typeof document === "undefined") return;
+    const originalTitle = document.title;
+    try {
+      const ctx = createEvalContext({
+        localContext: {},
+        options: { strictDomSandbox: ["document.title"] },
+      });
+      expect(evalBindingExpression(`document.title = "XMLUI sandbox test"`, ctx)).toBe(
+        "XMLUI sandbox test",
+      );
+      expect(document.title).toBe("XMLUI sandbox test");
+    } finally {
+      document.title = originalTitle;
+    }
+  });
+
+  it("allows an exact root global identifier without allowing its banned members", () => {
+    if (typeof document === "undefined") return;
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: ["window.document"] },
+    });
+    expect(evalBindingExpression("document", ctx)).toBe(document);
+    expect(() => evalBindingExpression("document.body", ctx)).toThrow(BannedApiError);
+  });
+
+  it("allows navigator wildcard entries", () => {
+    if (typeof navigator === "undefined") return;
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: ["navigator.*"] },
+    });
+    expect(evalBindingExpression("navigator.userAgent", ctx)).toBe(navigator.userAgent);
+  });
+
+  it("does not allow prefix-like but non-matching entries", () => {
+    if (typeof document === "undefined") return;
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: ["doc.*"] },
+    });
+    expect(() => evalBindingExpression("document.body", ctx)).toThrow(BannedApiError);
+  });
+
+  it("lets the allow-list override console enforcement when allowConsole is false", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({
+        localContext: {},
+        options: { allowConsole: false, strictDomSandbox: ["window.console"] },
+      });
+      expect(evalBindingExpression("console.log", ctx)).toBe(console.log);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("applies allow-list exemptions in async evaluation", async () => {
+    const parser = new Parser(TEST_KEY);
+    const expr = parser.parseExpr()!;
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { strictDomSandbox: [`window.${TEST_KEY}`] },
+    });
+    await expect(evalBindingAsync(expr, ctx, undefined)).resolves.toBe("test-value");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 7. Default behaviour (no option set) — must not throw or warn
 // ---------------------------------------------------------------------------
 
 describe("Default behaviour (strictDomSandbox not set)", () => {
@@ -391,7 +550,7 @@ describe("Default behaviour (strictDomSandbox not set)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. allowConsole feature switch
+// 8. allowConsole feature switch
 // ---------------------------------------------------------------------------
 
 describe("allowConsole feature switch", () => {
