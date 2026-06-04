@@ -14,7 +14,7 @@ blocks got a thrown `Error` or string; `LOADER_ERROR` payloads carried
 the original `Response`; `ErrorBoundary` got React's error info plus a
 stack. Subscribers had to defensively duck-type each one.
 
-The structured exception model (plan #07) normalises every caught error
+The structured exception model normalises every caught error
 into a single `AppError` type at every chokepoint. Downstream consumers
 — toast pipeline, `$error` markup, trace entries, telemetry sinks, and
 the new retry/fallback components — read the same shape.
@@ -116,12 +116,12 @@ Spec fields: `attempts`, `backoff` (`fixed`/`linear`/`exponential`),
 `delayMs`, `jitter` (±25%), `onlyCategories`, `timeoutMs`,
 `honourRetryAfter`, `circuitBreaker` (`{failureThreshold, resetMs}`).
 
-`Retry-After` honouring (Step 3.2): when an HTTP 429 response carries a
+`Retry-After` honouring: when an HTTP 429 response carries a
 `Retry-After` header (seconds or HTTP-date), `RestApiProxy` parses it
 into `AppError.data.retryAfterMs`. `executeWithPolicy` overrides the
 computed backoff with that value, capped at 60 000 ms.
 
-Cancellation: the cooperative `$cancel` token (plan #06) aborts both
+Cancellation: the cooperative `$cancel` token aborts both
 in-flight attempts and mid-backoff timers.
 
 Each retry emits a `kind: "errors"` trace `info`; exhaustion emits a
@@ -147,8 +147,7 @@ plumbing as inline `<Text when="{$error.category === ...}">`.
 
 ## `strictErrors` Switch
 
-`App.appGlobals.strictErrors` (default `true`) is on by default since plan
-#07 W8-1. When enabled, any non-`AppError` value that reaches `signError`
+`App.appGlobals.strictErrors` (default `true`) controls whether any non-`AppError` value that reaches `signError`
 emits a `kind:"errors"` warn in the trace pipeline with a migration hint.
 Set it to `false` for warn-only migration mode:
 

@@ -4,8 +4,6 @@ XMLUI's theming system converts declarative theme definitions into CSS custom pr
 
 This document covers how themes are defined, compiled, applied, and extended.
 
-<!-- DIAGRAM: ThemeDefinition → inheritance chain → tone overlay → derived tokens → $ref resolution → CSS variables → SCSS consumption -->
-
 ```mermaid
 graph TD
   TD1["ThemeDefinition<br>id, extends, themeVars, tones"]
@@ -39,14 +37,12 @@ Every theme is a `ThemeDefinition` object:
 ```typescript
 interface ThemeDefinition {
   id: string;
-  extends?: string | string[];        // parent theme(s)
+  name?: string;                       // optional display name
+  extends?: string | string[];         // parent theme(s)
   color?: string;                      // primary color hint
-  resources?: Record<string, any>;     // fonts, images
+  resources?: Record<string, string | FontDef>;  // fonts, images
   themeVars?: Record<string, string>;  // CSS variable definitions
-  tones?: {
-    light?: ThemeDefinitionDetails;    // { themeVars, resources }
-    dark?: ThemeDefinitionDetails;
-  };
+  tones?: Record<string, ThemeDefinitionDetails>; // tone-specific overrides (e.g. "light", "dark")
 }
 ```
 
@@ -62,8 +58,8 @@ Themes form an inheritance chain via `extends`. The chain is resolved by `collec
 
 ```
 [root] → [xmlui] → [xmlui-green]
-                  → [xmlui-docs]
-                  → [custom-theme]
+                 → [xmlui-docs]
+                 → [custom-theme]
 ```
 
 - The **root** theme (in `themes/root.ts`) provides foundational design tokens: spacing, font sizes, color palettes, shadows, borders
@@ -88,9 +84,10 @@ Variables merge left-to-right: later themes override earlier ones. Multiple inhe
 | `xmlui-red` | Red accent |
 | `xmlui-blog` | Blog layout theme |
 | `xmlui-web` | Marketing site theme |
-| `xmlui-docs` | Documentation site theme |
 
 All are defined in `themes/xmlui.ts` and extend the `xmlui` base theme.
+
+> **Note:** The `xmlui-docs` theme (used by the documentation site) is defined in the `xmlui-docs-blocks` extension package, not in core.
 
 ---
 
@@ -213,7 +210,7 @@ property[-partNameOrScreenSize][-ComponentName][-variantName][--stateName]
 - `--` introduces state names only — structural segments use single `-`
 - Screen size tokens (`sm`, `md`, etc.) in the part position generate responsive `@media` rules, not named parts
 
-### Extension-package prefix (Wave 0, plan #02)
+### Extension-package prefix
 
 Components shipped from an extension package must prefix the `ComponentName` segment with the package's PascalCase token, separated by `_`:
 
@@ -225,7 +222,7 @@ Components shipped from an extension package must prefix the `ComponentName` seg
 
 The separator is `_` (not `-`) to avoid colliding with the existing `-`-delimited segment convention. Core components leave the prefix off. Each first-party package's canonical prefix lives in [`components-core/themevars/prefix-registry.ts`](../../src/components-core/themevars/prefix-registry.ts) and is declared at the package level via `Extension.themeNamespacePrefix` (see [14-extension-packages.md](14-extension-packages.md)).
 
-The build-time analyzer rule `theming-missing-prefix` (plan #13 / plan #02 Phase 1) is registered in [`components-core/analyzer/rules/theming-missing-prefix.ts`](../../src/components-core/analyzer/rules/theming-missing-prefix.ts). It flags theme variable references that do not follow the `PackagePrefix_ComponentName-token-name` convention once `strictBuildValidation` is enabled.
+The build-time analyzer rule `theming-missing-prefix` is registered in [`components-core/analyzer/rules/theming-missing-prefix.ts`](../../src/components-core/analyzer/rules/theming-missing-prefix.ts). It flags theme variable references that do not follow the `PackagePrefix_ComponentName-token-name` convention once `strictBuildValidation` is enabled.
 
 ---
 
@@ -528,8 +525,11 @@ Components can designate a `defaultPart` in metadata. Properties without a part 
 For accessing compiled CSS variables and resources:
 
 ```typescript
-const { themeCssVars, getThemeVar, getResourceUrl, fontLinks } = useTheme();
+const { themeStyles, themeVars, getThemeVar, getResourceUrl } = useTheme();
 ```
+
+- `themeStyles` — CSS variable map with `--xmlui-` prefixed keys (ready for injection)
+- `themeVars` — same values without the prefix (for programmatic lookup)
 
 ### ThemesContext (`useThemes()`)
 

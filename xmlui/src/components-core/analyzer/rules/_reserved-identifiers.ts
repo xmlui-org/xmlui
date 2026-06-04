@@ -124,7 +124,6 @@ export const XMLUI_GLOBALS: ReadonlySet<string> = new Set([
   "Lifecycle",
   "DataSource",
   "APICall",
-  "MockLoader",
   "ApiInstance",
 ]);
 

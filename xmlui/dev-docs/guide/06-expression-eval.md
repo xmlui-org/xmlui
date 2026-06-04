@@ -265,8 +265,7 @@ whole document surface.
 | `window.open(url, "_blank")` | `navigate(to, { target: "_blank" })` | `navigate` |
 | Raw global state | `AppState` (with optional `appGlobals.appStateKeys` schema) | state-change trace |
 
-See [15-app-context.md](15-app-context.md) and
-[managed-react.md](../plans/managed-react.md) Appendix A for the full hardening plan.
+See [15-app-context.md](15-app-context.md) for the app-level sandbox configuration keys.
 
 ### 3. The `new` Operator — Safe Constructor Allow-List
 

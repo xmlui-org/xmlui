@@ -1,13 +1,12 @@
 # 28 — Managed Lifecycle Vocabulary
 
-> **Plan #04 — Wave 3 (W3-3/W3-4) + strict default (W8-1)**
 > Source: `components-core/lifecycle/`, `components-core/rendering/ComponentAdapter.tsx`
 
 ---
 
 ## Overview
 
-Plan #04 adds a symmetric lifecycle vocabulary so that user-defined component
+XMLUI provides a symmetric lifecycle vocabulary so that user-defined component
 trees can safely set up and tear down resources — just as the framework has
 always done internally.
 

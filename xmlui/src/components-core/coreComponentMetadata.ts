@@ -6,10 +6,8 @@
  * use the `getOptimizerMetadata` helper from `optimization/metadataLookup`).
  */
 import { DataLoaderMd } from "./loader/DataLoaderMd";
-import { ExternalDataLoaderMd } from "./loader/ExternalDataLoader";
 
 export const coreComponentMetadata = {
   DataLoader: DataLoaderMd,
-  ExternalDataLoader: ExternalDataLoaderMd,
   // Future internal components (e.g. ApiBoundDataLoader) belong here.
 };

@@ -241,7 +241,7 @@ an error to the user:
 
 ```ts
 function signError(error: Error | AppError | string | unknown) {
-  const appError = AppError.from(error);              // normalize via plan #07
+  const appError = AppError.from(error);              // normalize to AppError
   const message = appError.message;
   toast.error(message);                               // Red toast
   console.error("[xmlui]", message);                  // Console (Playwright captures this)
@@ -255,7 +255,7 @@ function signError(error: Error | AppError | string | unknown) {
 }
 ```
 
-> **Wave 1 update (plan #07).** `signError` now accepts any thrown value (`Error | AppError | string | unknown`) and normalizes it through [`AppError.from()`](#apperror--structured-exception-type-plan-07-wave-01). `ErrorBoundary.componentDidCatch` does the same and includes the resulting `category` field in the `kind:"error:boundary"` trace entry.
+`signError` accepts any thrown value (`Error | AppError | string | unknown`) and normalizes it through [`AppError.from()`](#apperror--structured-exception-type). `ErrorBoundary.componentDidCatch` does the same and includes the resulting `category` field in the `kind:"error:boundary"` trace entry.
 
 You can call it directly in event handlers:
 
@@ -421,7 +421,7 @@ All error domains write to the trace system via `pushXsLog()`:
 | React render crash | `"error:boundary"` | message, stack, component stack, boundary location, `category` (from `AppError.from`) |
 | `signError()` call | `"error:runtime"` | message, stack |
 | Handler failure | `"error:handler"` | uid, eventName, error details |
-| Structured error pipeline | `"errors"` | `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId` (plan #07) |
+| Structured error pipeline | `"errors"` | `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId` |
 
 `pushXsLog()` is a complete noop when `window._xsVerbose` is not set (the default). There is
 no performance cost for trace calls in production.
@@ -434,9 +434,9 @@ window._xsVerbose = true;
 
 ---
 
-## AppError — Structured Exception Type (plan #07, Wave 0/1)
+## AppError — Structured Exception Type
 
-`AppError` is the canonical structured exception class introduced by plan #07. It lives at [xmlui/src/components-core/errors/](../../src/components-core/errors/index.ts) and replaces bare `Error` / string throws at every XMLUI error boundary site (`ErrorBoundary`, `event-handlers`, `LOADER_ERROR`).
+`AppError` is the canonical structured exception class. It lives at [xmlui/src/components-core/errors/](../../src/components-core/errors/index.ts) and replaces bare `Error` / string throws at every XMLUI error boundary site (`ErrorBoundary`, `event-handlers`, `LOADER_ERROR`).
 
 ### Construction
 
@@ -489,9 +489,9 @@ Override per-instance via `AppErrorInit.retryable`.
 
 | Symbol | Purpose |
 |---|---|
-| `RetryPolicySpec` | Spec for retry behaviour (max attempts, backoff). Stub today; consumed by `executeWithPolicy` in later phases. |
+| `RetryPolicySpec` | Spec for retry behaviour (max attempts, backoff). Consumed by `executeWithPolicy`. |
 | `CircuitBreakerSpec` | Spec for circuit-breaker behaviour. Stub today. |
-| `executeWithPolicy(...)` | Stub helper that will execute a callable under a `RetryPolicySpec` / `CircuitBreakerSpec` once Phase 2 lands. |
+| `executeWithPolicy(...)` | Helper that executes a callable under a `RetryPolicySpec` / `CircuitBreakerSpec`. |
 | `ErrorDiagnostic` | Runtime diagnostic shape consumed by the `kind:"errors"` Inspector trace. |
 | `ErrorDiagnosticCode` | Code union for the runtime diagnostic. |
 | `ErrorSource` | Source classifier (`boundary`, `handler`, `loader`, `script`, …). |
@@ -523,7 +523,7 @@ Two `App.appGlobals` entries govern the rollout (see [15-app-context.md](15-app-
 | [xmlui/src/components-core/rendering/reducer.ts](../../xmlui/src/components-core/rendering/reducer.ts) | `LOADER_ERROR` reducer case |
 | [xmlui/src/components-core/loader/DataLoader.tsx](../../xmlui/src/components-core/loader/DataLoader.tsx) | Loader error path, `$error` creation, toast handling |
 | [xmlui/src/components-core/utils/EngineError.ts](../../xmlui/src/components-core/utils/EngineError.ts) | Custom error type hierarchy |
-| [xmlui/src/components-core/errors/](../../xmlui/src/components-core/errors/) | `AppError`, retry/circuit-breaker types, `ErrorDiagnostic` (plan #07) |
+| [xmlui/src/components-core/errors/](../../xmlui/src/components-core/errors/) | `AppError`, retry/circuit-breaker types, `ErrorDiagnostic` |
 | [xmlui/src/components-core/xmlui-parser.ts](../../xmlui/src/components-core/xmlui-parser.ts) | `errReport*` fallback component factories |
 | [xmlui/src/components-core/inspector/inspectorUtils.ts](../../xmlui/src/components-core/inspector/inspectorUtils.ts) | `pushXsLog()` |
 

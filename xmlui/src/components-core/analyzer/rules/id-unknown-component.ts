@@ -28,9 +28,7 @@ const FRAMEWORK_TYPES: ReadonlySet<string> = new Set([
 const LOADER_TYPES: ReadonlySet<string> = new Set([
   "DataSource",
   "APICall",
-  "MockLoader",
   "DataLoader",
-  "ExternalDataLoader",
 ]);
 
 registerRule({

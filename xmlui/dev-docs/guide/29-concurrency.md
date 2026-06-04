@@ -1,8 +1,5 @@
 # Cooperative Concurrency and Cancellation
 
-> Status: Phase 1–4 shipped; strict default flip pending next major.
-> Plan: [`xmlui/dev-docs/plans/06-cooperative-concurrency.md`](../plans/06-cooperative-concurrency.md)
-
 This chapter describes the cooperative concurrency model XMLUI exposes
 to handler authors. The framework gives every async event handler a
 **cancellation token**, four **handler policies** that decide how
@@ -210,6 +207,5 @@ policies — they stay info-level even in strict mode.
 ## 9. See also
 
 - [`.ai/xmlui/concurrency.md`](../../.ai/xmlui/concurrency.md) — AI reference
-- [`xmlui/dev-docs/plans/06-cooperative-concurrency.md`](../plans/06-cooperative-concurrency.md) — full implementation plan
 - [`xmlui/dev-docs/guide/15-app-context.md`](./15-app-context.md) — `App.*` global functions
 - [`xmlui/dev-docs/guide/17-error-handling.md`](./17-error-handling.md) — `signError` pipeline
