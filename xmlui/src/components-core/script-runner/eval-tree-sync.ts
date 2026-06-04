@@ -1,6 +1,6 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
-import type { Identifier, TemplateLiteralExpression } from "./ScriptingSourceTree";
+import type { TemplateLiteralExpression } from "./ScriptingSourceTree";
 import {
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
@@ -10,7 +10,6 @@ import {
   T_BLOCK_STATEMENT,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
   T_CONDITIONAL_EXPRESSION,
-  T_DESTRUCTURE,
   T_EMPTY_STATEMENT,
   T_EXPRESSION_STATEMENT,
   T_FUNCTION_INVOCATION_EXPRESSION,
@@ -26,7 +25,6 @@ import {
   T_SPREAD_EXPRESSION,
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_UNARY_EXPRESSION,
-  T_VAR_DECLARATION,
   type ArrayLiteral,
   type ArrowExpression,
   type AssignmentExpression,
@@ -43,16 +41,16 @@ import {
   type SequenceExpression,
   type Statement,
   type UnaryExpression,
-  type VarDeclaration,
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting/Parser";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { isBannedFunction } from "./bannedFunctions";
 import {
+  createArrowArgDeclaration,
+  createArrowWorkingThread,
   evalArrow,
   evalAssignmentCore,
-  allowedNewConstructors,
   evalBinaryCore,
   evalCalculatedMemberAccessCore,
   evalIdentifier,
@@ -61,9 +59,12 @@ import {
   evalPreOrPostCore,
   evalTemplateLiteralCore,
   evalUnaryCore,
+  getAllowedNewConstructor,
   getExprValue,
-  getRootIdScope,
+  getStateUpdateScope,
   isPromise,
+  notifyStateUpdate,
+  removeArrowWorkingThread,
   setExprValue,
 } from "./eval-tree-common";
 import { ensureMainThread } from "./process-statement-common";
@@ -459,19 +460,14 @@ function evalAssignment(
   thread: LogicalThread,
 ): any {
   const leftValue = expr.leftValue;
-  const rootScope = getRootIdScope(leftValue, evalContext, thread);
-  const updatesState = rootScope && rootScope.type !== "block";
-  if (updatesState && evalContext.onWillUpdate) {
-    void evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
-  }
+  const rootScope = getStateUpdateScope(leftValue, evalContext, thread);
+  notifyStateUpdate("will", evalContext, rootScope, "assignment");
   evaluator(thisStack, leftValue, evalContext, thread);
   thisStack.pop();
   evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
   const value = evalAssignmentCore(thisStack, expr, evalContext, thread);
-  if (updatesState && evalContext.onDidUpdate) {
-    void evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
-  }
+  notifyStateUpdate("did", evalContext, rootScope, "assignment");
   return value;
 }
 
@@ -482,17 +478,12 @@ function evalPreOrPost(
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThread,
 ): any {
-  const rootScope = getRootIdScope(expr.expr, evalContext, thread);
-  const updatesState = rootScope && rootScope.type !== "block";
-  if (updatesState && evalContext.onWillUpdate) {
-    void evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
-  }
+  const rootScope = getStateUpdateScope(expr.expr, evalContext, thread);
+  notifyStateUpdate("will", evalContext, rootScope, "pre-post");
   evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
   const value = evalPreOrPostCore(thisStack, expr, evalContext, thread);
-  if (updatesState && evalContext.onDidUpdate) {
-    void evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
-  }
+  notifyStateUpdate("did", evalContext, rootScope, "pre-post");
   return value;
 }
 
@@ -593,19 +584,14 @@ function evalFunctionInvocation(
   const currentContext = thisStack.length > 0 ? thisStack.pop() : evalContext.localContext;
 
   // --- Now, invoke the function
-  const rootScope = getRootIdScope(expr.obj, evalContext, thread);
-  const updatesState = rootScope && rootScope.type !== "block";
-  if (updatesState && evalContext.onWillUpdate) {
-    void evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
-  }
+  const rootScope = getStateUpdateScope(expr.obj, evalContext, thread);
+  notifyStateUpdate("will", evalContext, rootScope, "function-call");
 
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? (functionObj as Function)?.call(currentContext, ...functionArgs)
     : (functionObj as Function).call(currentContext, ...functionArgs);
 
-  if (updatesState && evalContext.onDidUpdate) {
-    void evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
-  }
+  notifyStateUpdate("did", evalContext, rootScope, "function-call");
 
   setExprValue(expr, { value }, thread);
   thisStack.push(value);
@@ -624,21 +610,7 @@ function evalNewExpression(
   thisStack.pop();
 
   // --- Check if the constructor is allowed
-  let allowedConstructor: any = null;
-  for (const [name, ctor] of allowedNewConstructors) {
-    if (constructorObj === ctor) {
-      allowedConstructor = ctor;
-      break;
-    }
-  }
-
-  if (!allowedConstructor) {
-    const constructorName = constructorObj?.name || "unknown";
-    throw new Error(
-      `XMLUI does not support the new operator with constructor '${constructorName}'. ` +
-      `Only String, Date, and Blob are allowed.`
-    );
-  }
+  const allowedConstructor = getAllowedNewConstructor(constructorObj);
 
   // --- Evaluate arguments
   const constructorArgs: any[] = [];
@@ -673,24 +645,7 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
     const runtimeThread = args[2] as LogicalThread;
 
     // --- Create the thread that runs the arrow function
-    const workingThread: LogicalThread = {
-      parent: runtimeThread,
-      childThreads: [],
-      blocks: [{ vars: {} }],
-      loops: [],
-      breakLabelValue: -1,
-      closures: (expr as any).closureContext,
-    };
-    runtimeThread.childThreads.push(workingThread);
-
-    // --- Create a block for a named arrow function
-    if (expr.name) {
-      const functionBlock: BlockScope = { vars: {} };
-      workingThread.blocks ??= [];
-      workingThread.blocks.push(functionBlock);
-      functionBlock.vars[expr.name] = expr;
-      functionBlock.constVars = new Set([expr.name]);
-    }
+    const workingThread = createArrowWorkingThread(expr, runtimeThread);
 
     // --- Assign argument values to names
     const arrowBlock: BlockScope = { vars: {} };
@@ -701,73 +656,43 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
     for (let i = 0; i < argSpecs.length; i++) {
       // --- Turn argument specification into processable variable declarations
       const argSpec = argSpecs[i];
-      let decl: VarDeclaration | undefined;
-      switch (argSpec.type) {
-        case T_IDENTIFIER: {
-          decl = {
-            type: T_VAR_DECLARATION,
-            id: argSpec.name,
-          } as VarDeclaration;
-          break;
-        }
-        case T_DESTRUCTURE: {
-          decl = {
-            type: T_VAR_DECLARATION,
-            id: argSpec.id,
-            aDestr: argSpec.aDestr,
-            oDestr: argSpec.oDestr,
-          } as VarDeclaration;
-          break;
-        }
-        case T_SPREAD_EXPRESSION: {
-          restFound = true;
-          decl = {
-            type: T_VAR_DECLARATION,
-            id: (argSpec.expr as unknown as Identifier).name,
-          } as VarDeclaration;
-          break;
-        }
-
-        default:
-          throw new Error("Unexpected arrow argument specification");
-      }
-      if (decl) {
-        if (restFound) {
-          // --- Get the rest of the arguments
-          const restArgs = args.slice(i + 3);
-          let argVals: any[] = [];
-          for (const arg of restArgs) {
-            if (arg?._EXPRESSION_) {
-              argVals.push(evaluator([], arg, runTimeEvalContext, runtimeThread));
-            } else {
-              argVals.push(arg);
-            }
+      const decl = createArrowArgDeclaration(argSpec);
+      restFound = restFound || argSpec.type === T_SPREAD_EXPRESSION;
+      if (restFound) {
+        // --- Get the rest of the arguments
+        const restArgs = args.slice(i + 3);
+        let argVals: any[] = [];
+        for (const arg of restArgs) {
+          if (arg?._EXPRESSION_) {
+            argVals.push(evaluator([], arg, runTimeEvalContext, runtimeThread));
+          } else {
+            argVals.push(arg);
           }
-          processDeclarations(
-            arrowBlock,
-            runTimeEvalContext,
-            runtimeThread,
-            [decl],
-            false,
-            true,
-            argVals,
-          );
-        } else {
-          // --- Get the actual value to work with
-          let argVal = args[i + 3];
-          if (argVal?._EXPRESSION_) {
-            argVal = evaluator([], argVal, runTimeEvalContext, runtimeThread);
-          }
-          processDeclarations(
-            arrowBlock,
-            runTimeEvalContext,
-            runtimeThread,
-            [decl],
-            false,
-            true,
-            argVal,
-          );
         }
+        processDeclarations(
+          arrowBlock,
+          runTimeEvalContext,
+          runtimeThread,
+          [decl],
+          false,
+          true,
+          argVals,
+        );
+      } else {
+        // --- Get the actual value to work with
+        let argVal = args[i + 3];
+        if (argVal?._EXPRESSION_) {
+          argVal = evaluator([], argVal, runTimeEvalContext, runtimeThread);
+        }
+        processDeclarations(
+          arrowBlock,
+          runTimeEvalContext,
+          runtimeThread,
+          [decl],
+          false,
+          true,
+          argVal,
+        );
       }
     }
 
@@ -806,14 +731,7 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
     returnValue = workingThread.returnValue;
 
     // --- Remove the current working thread
-    const workingIndex = runtimeThread.childThreads.indexOf(workingThread);
-    if (workingIndex < 0) {
-      throw new Error("Cannot find thread to remove.");
-    }
-    runtimeThread.childThreads.splice(workingIndex, 1);
-
-    // --- Remove the function level block
-    workingThread.blocks.pop();
+    removeArrowWorkingThread(runtimeThread, workingThread);
 
     // --- Return the function value
     return returnValue;

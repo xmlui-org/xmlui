@@ -1,6 +1,6 @@
 /**
  * Error thrown when an expression attempts to access a banned DOM API while
- * `App.appGlobals.strictDomSandbox` is `true`.
+ * `App.appGlobals.strictDomSandbox` is `true` or a non-exempt allow-list mode.
  */
 export class BannedApiError extends Error {
   constructor(

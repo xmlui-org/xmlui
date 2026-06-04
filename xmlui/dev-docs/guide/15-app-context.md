@@ -461,7 +461,7 @@ Three `appGlobals` keys configure the script-runner sandbox (see
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
-| `strictDomSandbox` | `boolean` | `false` | When `true`, banned DOM-API access throws `BannedApiError`. Default mode emits a `sandbox:warn` trace and lets the access through. |
+| `strictDomSandbox` | `boolean \| string[]` | `false` | When `true`, banned DOM-API access throws `BannedApiError`. Default mode emits a `sandbox:warn` trace and lets the access through. A string array enables strict mode with exact or wildcard exemptions such as `"window.document"`, `"document.body"`, or `"document.*"`. |
 | `allowedOrigins` | `string[]` | `[]` | Origin allowlist consulted by `App.fetch`. Same-origin is always allowed; cross-origin requests are rejected before the network call. |
 | `appStateKeys` | `string[]` | unset (permissive) | Schema for `AppState` bucket names. When set, any `AppState` method called with a bucket whose top-level segment is not in the list throws `AppStateSchemaError`. |
 | `silentConsole` | `boolean` | `false` | When `true`, `Log.*` calls do not mirror to the underlying `console.*`. The trace entry is always emitted. |

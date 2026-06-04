@@ -242,6 +242,13 @@ and related DOM-query methods.
 |--------------------|--------|
 | `false` (default) | Blocked access emits a `sandbox:warn` trace entry and still executes. |
 | `true` | Blocked access throws `BannedApiError` immediately. |
+| `string[]` | Strict mode with exemptions. Matching API labels are allowed and produce no sandbox warning/error. Entries can be exact labels such as `"window.document"` or `"document.body"`, or wildcard prefixes such as `"document.*"` and `"navigator.*"`. |
+
+Allow-list entries match the API label reported by the sandbox. Exact member
+entries such as `"document.body"` also permit the root read needed to reach that
+member (`document` / `window.document`), but they do not permit sibling members
+like `document.head`. Use `"document.*"` when an app intentionally needs the
+whole document surface.
 
 **Sanctioned replacements** for the common use-cases:
 

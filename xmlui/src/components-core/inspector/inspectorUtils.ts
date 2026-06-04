@@ -197,7 +197,9 @@ export interface XsLogEntry {
    * - `"handler:start"` / `"handler:complete"` / `"handler:error"` — event handler lifecycle
    * - `"state:change"` — container state mutation
    * - `"sandbox:warn"` — a banned DOM API was accessed while `strictDomSandbox` is `false`;
-   *   the access was allowed but flagged. Contains `api` and optionally `help` fields.
+   *   the access was allowed but flagged. Strict boolean mode and string-array allow-list
+   *   mode throw instead unless the API is exempted. Contains `api` and optionally `help`
+   *   fields.
    * - `"log:debug"` | `"log:info"` | `"log:warn"` | `"log:error"` — Log.* calls from
    *   expressions. Contains `args: unknown[]`.
    * - `"app:randomBytes"` — App.randomBytes(n) called. Contains `n: number`.

@@ -94,7 +94,7 @@ The `kind` field is the key to understanding what an entry represents.
 | `"modal:cancel"` | The user clicked cancel |
 | `"method:call"` | A component API method was called programmatically |
 | `"value:change"` | A user-declared variable changed value |
-| `"sandbox:warn"` | A banned DOM API was accessed while `App.appGlobals.strictDomSandbox` is `false` (the access still executes; in `true` mode it throws `BannedApiError` instead). |
+| `"sandbox:warn"` | A banned DOM API was accessed while `App.appGlobals.strictDomSandbox` is `false` (the access still executes; in strict boolean or allow-list mode it throws `BannedApiError` unless exempted). |
 | `"log:debug"` / `"log:info"` / `"log:warn"` / `"log:error"` | A `Log.*` call (the sanctioned replacement for `console.*`). |
 | `"app:fetch"` | An `App.fetch(url, init?)` call \u2014 the sanctioned, origin-allowlisted replacement for `fetch`/`XMLHttpRequest`. |
 | `"app:randomBytes"` | An `App.randomBytes(n)` call \u2014 the sanctioned replacement for `crypto.getRandomValues`. |

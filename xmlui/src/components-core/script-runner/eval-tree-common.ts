@@ -1,13 +1,18 @@
+import { isPlainObject } from "lodash-es";
 import type { LogicalThread, ValueResult } from "../../abstractions/scripting/LogicalThread";
 import {
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_DESTRUCTURE,
   T_IDENTIFIER,
   T_MEMBER_ACCESS_EXPRESSION,
   T_PREFIX_OP_EXPRESSION,
+  T_SPREAD_EXPRESSION,
+  T_VAR_DECLARATION,
   type ArrowExpression,
   type AssignmentExpression,
   type BinaryExpression,
   type CalculatedMemberAccessExpression,
+  type Destructure,
   type Expression,
   type Identifier,
   type Literal,
@@ -15,6 +20,7 @@ import {
   type PostfixOpExpression,
   type PrefixOpExpression,
   type UnaryExpression,
+  type VarDeclaration,
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { BindingTreeEvaluationContext, EvalTreeOptions } from "./BindingTreeEvaluationContext";
@@ -34,7 +40,12 @@ import {
 /**
  * Handles a banned-member check result.
  *
- * - In **strict mode** (`strictDomSandbox === true`): throws `BannedApiError`.
+ * - In **strict mode** (`strictDomSandbox === true` or a string array): throws
+ *   `BannedApiError`.
+ * - In **allow-list strict mode** (`strictDomSandbox` is a string array):
+ *   matching API labels are exempted before warn/throw handling. Entries can
+ *   be exact labels (`"window.document"`, `"document.body"`) or wildcard
+ *   prefixes (`"document.*"`).
  * - In **warn mode** (default): emits `console.warn` so the access is visible
  *   in DevTools, and also pushes a `"sandbox:warn"` trace entry so it appears
  *   in the Inspector when verbose logging is active.
@@ -48,7 +59,8 @@ function handleMemberBan(result: BannedMemberResult, options?: EvalTreeOptions):
   if (!result.banned) return;
   // console access is allowed unless the caller explicitly opts out.
   if (result.api === "window.console" && options?.allowConsole !== false) return;
-  const strict = options?.strictDomSandbox ?? false;
+  if (isAllowedDomSandboxApi(result.api, options?.strictDomSandbox)) return;
+  const strict = options?.strictDomSandbox === true || Array.isArray(options?.strictDomSandbox);
   const warnLogger = options?.sandboxWarnLogger;
   const msg = `DOM API access to '${result.api}' is not allowed in XMLUI expressions.${
     result.help ? ` ${result.help}` : ""
@@ -59,6 +71,26 @@ function handleMemberBan(result: BannedMemberResult, options?: EvalTreeOptions):
   // Warn mode: surface in DevTools and optionally in the Inspector trace.
   console.warn(`[XMLUI sandbox] ${msg}`);
   warnLogger?.({ api: result.api, help: result.help, text: msg });
+}
+
+function isAllowedDomSandboxApi(
+  api: string | undefined,
+  strictDomSandbox: EvalTreeOptions["strictDomSandbox"],
+): boolean {
+  if (!api || !Array.isArray(strictDomSandbox)) return false;
+  return strictDomSandbox.some((entry) => domSandboxEntryMatches(entry, api));
+}
+
+function domSandboxEntryMatches(entry: string, api: string): boolean {
+  const trimmed = entry.trim();
+  if (!trimmed) return false;
+  if (trimmed.endsWith(".*")) {
+    const base = trimmed.slice(0, -2);
+    return api === base || api.startsWith(`${base}.`) || api === `window.${base}`;
+  }
+  if (api === trimmed || api === `window.${trimmed}`) return true;
+  const root = trimmed.split(".")[0];
+  return Boolean(root && api === `window.${root}` && trimmed.startsWith(`${root}.`));
 }
 
 // --- Get the cached expression value
@@ -75,6 +107,68 @@ export function setExprValue(expr: Expression, value: any, thread: LogicalThread
 // --- Type guard to check for a Promise
 export function isPromise(obj: any): obj is Promise<any> {
   return obj && typeof obj.then === "function";
+}
+
+// --- Completes all promises within the input
+export function completePromise(input: any): Promise<any> {
+  const visited = new Map<any, any>();
+
+  return completePromiseInternal(input);
+
+  async function completePromiseInternal(input: any): Promise<any> {
+    // --- No need to resolve undefined or null
+    if (input === undefined || input === null) return input;
+
+    // --- Already visited?
+    const resolved = visited.get(input);
+    if (resolved) return resolved;
+
+    // --- Resolve the chain of promises
+    if (isPromise(input)) {
+      const awaited = await input;
+      visited.set(input, awaited);
+      return completePromiseInternal(awaited);
+    }
+
+    // --- In any other cases, we keep the input reference
+    visited.set(input, input);
+
+    // --- Resolve promises within an array
+    if (Array.isArray(input)) {
+      for (let i = 0; i < input.length; i++) {
+        const completedPromise = await completePromiseInternal(input[i]);
+        if (input[i] !== completedPromise) {
+          //prevent write if it's the same reference (can cause problems in frozen objects)
+          input.splice(i, 1, completedPromise);
+        }
+      }
+      return input;
+    }
+
+    // --- Resolve promises in object properties
+    if (isPlainObject(input)) {
+      for (const key of Object.keys(input)) {
+        let completedPromise = await completePromiseInternal(input[key]);
+        if (input[key] !== completedPromise) {
+          const descriptor = Object.getOwnPropertyDescriptor(input, key);
+          if (descriptor?.writable || descriptor?.set) {
+            input[key] = completedPromise;
+          }
+        }
+      }
+      return input;
+    }
+
+    // --- Done.
+    return input;
+  }
+}
+
+export async function completeExprValue(expr: Expression, thread: LogicalThread): Promise<any> {
+  const exprValue = getExprValue(expr, thread);
+  const awaited = await completePromise(exprValue?.value);
+  setExprValue(expr, { ...exprValue, value: awaited }, thread);
+  return awaited;
 }
 
 // --- Evaluates a literal value (sync & async context)
@@ -623,6 +717,109 @@ export const allowedNewConstructors = new Map<string, Function>([
   ["Error", Error],
 ]);
 
+export function getAllowedNewConstructor(constructorObj: any): any {
+  for (const [, ctor] of allowedNewConstructors) {
+    if (constructorObj === ctor) {
+      return ctor;
+    }
+  }
+
+  const constructorName = constructorObj?.name || "unknown";
+  throw new Error(
+    `XMLUI does not support the new operator with constructor '${constructorName}'. ` +
+      `Only String, Date, and Blob are allowed.`
+  );
+}
+
 export function evalTemplateLiteralCore(segmentValues: any[]): string {
   return segmentValues.map((value) => (typeof value === "string" ? value : `${value}`)).join("");
+}
+
+export type StateUpdateKind = "assignment" | "pre-post" | "function-call";
+export type RootUpdateScope = ReturnType<typeof getRootIdScope>;
+
+export function getStateUpdateScope(
+  expr: Expression,
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThread,
+): RootUpdateScope {
+  const rootScope = getRootIdScope(expr, evalContext, thread);
+  return rootScope && rootScope.type !== "block" ? rootScope : null;
+}
+
+export function notifyStateUpdate(
+  phase: "will" | "did",
+  evalContext: BindingTreeEvaluationContext,
+  rootScope: RootUpdateScope,
+  kind: StateUpdateKind,
+): void {
+  if (!rootScope) return;
+  const hook = phase === "will" ? evalContext.onWillUpdate : evalContext.onDidUpdate;
+  if (hook) {
+    void hook(rootScope, rootScope.name, kind);
+  }
+}
+
+export function createArrowWorkingThread(
+  expr: ArrowExpression,
+  runtimeThread: LogicalThread,
+): LogicalThread {
+  const workingThread: LogicalThread = {
+    parent: runtimeThread,
+    childThreads: [],
+    blocks: [{ vars: {} }],
+    loops: [],
+    breakLabelValue: -1,
+    closures: (expr as any).closureContext,
+  };
+  runtimeThread.childThreads.push(workingThread);
+
+  if (expr.name) {
+    const functionBlock: BlockScope = { vars: {} };
+    workingThread.blocks ??= [];
+    workingThread.blocks.push(functionBlock);
+    functionBlock.vars[expr.name] = expr;
+    functionBlock.constVars = new Set([expr.name]);
+  }
+
+  return workingThread;
+}
+
+export function createArrowArgDeclaration(argSpec: Expression): VarDeclaration {
+  switch (argSpec.type) {
+    case T_IDENTIFIER:
+      return {
+        type: T_VAR_DECLARATION,
+        id: argSpec.name,
+      } as VarDeclaration;
+
+    case T_DESTRUCTURE:
+      return {
+        type: T_VAR_DECLARATION,
+        id: (argSpec as Destructure).id,
+        aDestr: (argSpec as Destructure).aDestr,
+        oDestr: (argSpec as Destructure).oDestr,
+      } as VarDeclaration;
+
+    case T_SPREAD_EXPRESSION:
+      return {
+        type: T_VAR_DECLARATION,
+        id: (argSpec.expr as unknown as Identifier).name,
+      } as VarDeclaration;
+
+    default:
+      throw new Error("Unexpected arrow argument specification");
+  }
+}
+
+export function removeArrowWorkingThread(
+  runtimeThread: LogicalThread,
+  workingThread: LogicalThread,
+): void {
+  const workingIndex = runtimeThread.childThreads.indexOf(workingThread);
+  if (workingIndex < 0) {
+    throw new Error("Cannot find thread to remove.");
+  }
+  runtimeThread.childThreads.splice(workingIndex, 1);
+  workingThread.blocks.pop();
 }

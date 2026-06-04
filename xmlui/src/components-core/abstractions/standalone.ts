@@ -41,11 +41,13 @@ export type StandaloneAppDescription = {
    * - `defaultToOptionalMemberAccess` (boolean) — treat all member accesses as optional
    *   (default `true`).
    * - `maxCompoundDepth` (number) — max recursion depth for compound components.
-   * - `strictDomSandbox` (boolean, default `false`) — when `true`, any expression that
-   *   accesses a banned DOM API throws a `BannedApiError` immediately. When `false`
-   *   (the rollout warn phase default), the access proceeds but a `console.warn` is
-   *   emitted and a `"sandbox:warn"` Inspector trace entry is pushed so teams can audit
-   *   usages before flipping to `true`. See `dev-docs/plans/dom-api-hardening.md`.
+   * - `strictDomSandbox` (boolean | string[], default `false`) — when `true`, any
+   *   expression that accesses a banned DOM API throws a `BannedApiError` immediately.
+   *   When `false` (the rollout warn phase default), the access proceeds but a
+   *   `console.warn` is emitted and a `"sandbox:warn"` Inspector trace entry is pushed
+   *   so teams can audit usages before flipping to `true`. A string array enables
+   *   strict mode with exact or wildcard exemptions, e.g. `"window.document"`,
+   *   `"document.body"`, or `"document.*"`. See `dev-docs/plans/dom-api-hardening.md`.
    * - `silentConsole` (boolean, default `false`) — controls whether `Log.*` calls mirror
    *   to the native `console.*` in addition to the Inspector trace. When `false` (default),
    *   `Log.info("x")` writes both to the trace and to `console.info`. When `true`, only the

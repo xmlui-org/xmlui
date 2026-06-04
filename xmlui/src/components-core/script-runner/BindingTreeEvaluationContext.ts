@@ -102,12 +102,15 @@ export type EvalTreeOptions = {
    * When `true`, any expression that accesses a banned DOM API throws a
    * `BannedApiError` immediately. When `false` (the default), the access
    * still proceeds but emits a `console.warn` and a `"sandbox:warn"` trace
-   * entry so teams can audit and migrate before the default flips.
+   * entry so teams can audit and migrate before the default flips. When this
+   * is a string array, the sandbox runs in strict mode except for matching API
+   * labels, such as `"window.document"`, `"document.body"`, or wildcard
+   * prefixes like `"document.*"`.
    *
    * Set via `App.appGlobals.strictDomSandbox` in config.json or the App
    * component; the event-handler pipeline propagates it into this option.
    */
-  strictDomSandbox?: boolean;
+  strictDomSandbox?: boolean | string[];
   /**
    * Optional callback invoked in warn mode (i.e. when `strictDomSandbox` is
    * `false`) every time a banned DOM API is accessed. The event-handler
