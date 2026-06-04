@@ -295,6 +295,10 @@ function simplifyObjectLiteral(obj: ObjectLiteral): ObjectLiteral {
       const prop0 = simplifyExpression(prop[0]);
       const prop1 = simplifyExpression(prop[1]);
       return prop0 !== prop[0] || prop1 !== prop[1] ? [prop0, prop1] : prop;
+    } else if ("kind" in prop) {
+      const key = simplifyExpression(prop.key);
+      const value = simplifyExpression(prop.value);
+      return key !== prop.key || value !== prop.value ? { ...prop, key, value } : prop;
     } else {
       return {
         ...prop,

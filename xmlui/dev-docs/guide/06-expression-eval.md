@@ -392,12 +392,11 @@ These JavaScript features are **not available** in XMLUI's scripting language â€
 | `with` statement | Not supported |
 | `debugger` statement | Not supported |
 | Labeled statements (`label: statement`) | Not supported |
-| Getter/setter in object literals | Not supported |
 | Dynamic `import()` | Not supported |
 | `for await...of` | Not supported |
 | `export` | Not supported |
 | Private class fields (`#field`) | Not supported |
-| `Symbol`, `WeakMap`, `WeakSet` | Not constructable (only 4 constructors allowed) |
+| `Symbol` | Not constructable |
 
 ### 9. Import System Restrictions
 

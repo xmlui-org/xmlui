@@ -325,7 +325,7 @@ async function evalObjectLiteralAsync(
 ): Promise<any> {
   const objectHash: any = {};
   for (const prop of expr.props) {
-    if (!Array.isArray(prop)) {
+    if (!Array.isArray(prop) && !("kind" in prop)) {
       // --- We're using a spread expression
       const spreadItems = await evaluator(thisStack, prop.expr, evalContext, thread);
       thisStack.pop();
@@ -343,28 +343,73 @@ async function evalObjectLiteralAsync(
       continue;
     }
 
-    // --- We're using key/[value] pairs
-    let key: any;
-    switch (prop[0].type) {
-      case T_LITERAL:
-        key = prop[0].value;
-        break;
-      case T_IDENTIFIER:
-        key = prop[0].name;
-        break;
-      default:
-        key = await evaluator(thisStack, prop[0], evalContext, thread);
-        thisStack.pop();
-        break;
+    if (!Array.isArray(prop)) {
+      const key = await evaluateObjectLiteralKeyAsync(
+        evaluator,
+        thisStack,
+        prop.key,
+        evalContext,
+        thread,
+      );
+      const accessor = createArrowFunctionAsync(evaluator, prop.value);
+      const existing = Object.getOwnPropertyDescriptor(objectHash, key);
+      const pairedAccessor =
+        existing && ("get" in existing || "set" in existing)
+          ? prop.kind === "get"
+            ? { set: existing.set }
+            : { get: existing.get }
+          : {};
+      Object.defineProperty(objectHash, key, {
+        ...pairedAccessor,
+        enumerable: true,
+        configurable: true,
+        [prop.kind]: (...args: any[]) => accessor(prop.value.args, evalContext, thread, ...args),
+      });
+      continue;
     }
-    objectHash[key] = await evaluator(thisStack, prop[1], evalContext, thread);
+
+    // --- We're using key/[value] pairs
+    const key = await evaluateObjectLiteralKeyAsync(
+      evaluator,
+      thisStack,
+      prop[0],
+      evalContext,
+      thread,
+    );
+    const value = await evaluator(thisStack, prop[1], evalContext, thread);
     thisStack.pop();
+    Object.defineProperty(objectHash, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   // --- Done.
   setExprValue(expr, { value: objectHash }, thread);
   thisStack.push(objectHash);
   return objectHash;
+}
+
+async function evaluateObjectLiteralKeyAsync(
+  evaluator: EvaluatorAsyncFunction,
+  thisStack: any[],
+  expr: Expression,
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThread,
+): Promise<any> {
+  switch (expr.type) {
+    case T_LITERAL:
+      return expr.value;
+    case T_IDENTIFIER:
+      return expr.name;
+    default: {
+      const key = await evaluator(thisStack, expr, evalContext, thread);
+      thisStack.pop();
+      return key;
+    }
+  }
 }
 
 async function evalUnaryAsync(

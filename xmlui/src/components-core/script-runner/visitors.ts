@@ -347,6 +347,11 @@ export function collectVariableDependencies(
               objectDeps = objectDeps.concat(
                 collectDependencies(prop[1], program, "objectLiteral"),
               );
+            } else if ("kind" in prop) {
+              objectDeps = objectDeps.concat(
+                collectDependencies(prop.key, program, "objectLiteralAccessorKey"),
+                collectDependencies(prop.value, program, "objectLiteralAccessor"),
+              );
             } else {
               objectDeps = objectDeps.concat(collectDependencies(prop, program, "objectLiteral"));
             }

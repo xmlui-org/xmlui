@@ -498,12 +498,20 @@ export interface ArrayLiteral extends ExpressionBase {
 
 export interface ObjectLiteral extends ExpressionBase {
   type: OBJECT_LITERAL;
-  props: (SpreadExpression | [Expression, Expression])[];
+  props: (SpreadExpression | ObjectLiteralProp | ObjectLiteralAccessorProp)[];
 }
 
 export interface SpreadExpression extends ExpressionBase {
   type: SPREAD_EXPRESSION;
   expr: Expression;
+}
+
+export type ObjectLiteralProp = [Expression, Expression];
+
+export interface ObjectLiteralAccessorProp {
+  kind: "get" | "set";
+  key: Expression;
+  value: ArrowExpression;
 }
 
 export interface AssignmentExpression extends ExpressionBase {

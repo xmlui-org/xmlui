@@ -519,6 +519,11 @@ export function visitNode<TState = any>(
             if (state.cancel) return state;
             state = visitNode(value, state, stmtVisitor, exprVisitor, subject, "propValue");
             if (state.cancel) return state;
+          } else if ("kind" in prop) {
+            state = visitNode(prop.key, state, stmtVisitor, exprVisitor, subject, "accessorKey");
+            if (state.cancel) return state;
+            state = visitNode(prop.value, state, stmtVisitor, exprVisitor, subject, "accessorValue");
+            if (state.cancel) return state;
           } else {
             //SpreadExpression branch
             state = visitNode(prop, state, stmtVisitor, exprVisitor, subject, "prop");

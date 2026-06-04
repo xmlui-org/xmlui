@@ -346,6 +346,85 @@ describe("Evaluate binding expression tree (exp)", () => {
     });
   });
 
+  it("Object literal: getter property", () => {
+    const value = evalBindingExpression("({ get doubled() { return count * 2; } }).doubled", {
+      ...createEvalContext({ localContext: { count: 21 } }),
+    });
+    expect(value).equal(42);
+  });
+
+  it("Object literal: setter property", () => {
+    const context = createEvalContext({ localContext: { assigned: 0 } });
+    const value = evalBindingExpression("({ set value(v) { assigned = v; } }).value = 42", context);
+    expect(value).equal(undefined);
+    expect(context.localContext.assigned).equal(42);
+  });
+
+  it("Object literal: getter and setter share the same property descriptor", () => {
+    const context = createEvalContext({ localContext: { stored: 5 } });
+    const obj = evalBindingExpression(
+      "({ get value() { return stored; }, set value(v) { stored = v; } })",
+      context,
+    );
+    const descriptor = Object.getOwnPropertyDescriptor(obj, "value");
+    expect(typeof descriptor?.get).equal("function");
+    expect(typeof descriptor?.set).equal("function");
+    expect(obj.value).equal(5);
+    obj.value = 9;
+    expect(context.localContext.stored).equal(9);
+  });
+
+  it("Object literal: accessor can override an earlier data property", () => {
+    const value = evalBindingExpression(
+      "({ value: 1, get value() { return 2; } }).value",
+      createEvalContext({ localContext: {} }),
+    );
+    expect(value).equal(2);
+  });
+
+  it("Object literal: data property can override an earlier accessor", () => {
+    const obj = evalBindingExpression(
+      "({ get value() { return 1; }, value: 2 })",
+      createEvalContext({ localContext: {} }),
+    );
+    const descriptor = Object.getOwnPropertyDescriptor(obj, "value");
+    expect(descriptor?.value).equal(2);
+    expect(descriptor?.get).equal(undefined);
+  });
+
+  it("Object literal: computed getter property name", () => {
+    const value = evalBindingExpression('({ get ["total" + suffix]() { return count; } }).totalNow', {
+      ...createEvalContext({ localContext: { suffix: "Now", count: 7 } }),
+    });
+    expect(value).equal(7);
+  });
+
+  it("Object literal: get remains available as shorthand property", () => {
+    const value = evalBindingExpression("({ get }).get", {
+      ...createEvalContext({ localContext: { get: "ordinary" } }),
+    });
+    expect(value).equal("ordinary");
+  });
+
+  it("Object literal: get remains available as data property name", () => {
+    const value = evalBindingExpression("({ get: 123 }).get", createEvalContext({ localContext: {} }));
+    expect(value).equal(123);
+  });
+
+  it("Object literal: async getter resolves in async evaluation", async () => {
+    const wParser = new Parser("({ get value() { return loadValue(); } }).value");
+    const expr = wParser.parseExpr();
+    expect(expr).not.equal(null);
+    if (!expr) return;
+    const context = createEvalContext({
+      localContext: {
+        loadValue: async () => 123,
+      },
+    });
+    const value = await evalBindingAsync(expr, context, undefined);
+    expect(value).equal(123);
+  });
+
   const unaryCases = [
     { src: "+alma.b", con: { alma: { b: 123 } }, exp: 123 },
     { src: "-alma.b", con: { alma: { b: 123 } }, exp: -123 },

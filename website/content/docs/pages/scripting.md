@@ -27,6 +27,16 @@ An object literal:
 >
 ```
 
+Object literals can also define getters and setters:
+
+```js
+let selectedCount = 2;
+const summary = {
+  get label() { return `${selectedCount} selected`; },
+  set selected(value) { selectedCount = value; }
+};
+```
+
 A function call:
 
 ```xmlui !/() => { preview.setValue(JSON.stringify($data)) }/

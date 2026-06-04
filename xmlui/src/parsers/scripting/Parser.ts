@@ -33,6 +33,8 @@ import {
   type NoArgExpression,
   type NewExpression,
   type ObjectDestructure,
+  type ObjectLiteralAccessorProp,
+  type ObjectLiteralProp,
   type ObjectLiteral,
   type PostfixOpExpression,
   type PrefixOpExpression,
@@ -2889,9 +2891,21 @@ export class Parser {
    */
   private parseObjectLiteral(): ObjectLiteral | null {
     const start = this._lexer.get();
-    let props: (SpreadExpression | [Expression, Expression])[] = [];
+    let props: (SpreadExpression | ObjectLiteralProp | ObjectLiteralAccessorProp)[] = [];
     if (this._lexer.peek().type !== TokenType.RBrace) {
       while (this._lexer.peek().type !== TokenType.RBrace) {
+        const accessorProp = this.parseObjectLiteralAccessor();
+        if (accessorProp) {
+          props.push(accessorProp);
+          const next = this._lexer.peek().type;
+          if (next === TokenType.Comma) {
+            this._lexer.get();
+          } else if (next !== TokenType.RBrace) {
+            break;
+          }
+          continue;
+        }
+
         // --- Check the next token
         const nextToken = this._lexer.peek();
         const traits = tokenTraits[nextToken.type];
@@ -3003,6 +3017,209 @@ export class Parser {
       start,
       endToken,
     );
+  }
+
+  private parseObjectLiteralAccessor(): ObjectLiteralAccessorProp | null {
+    const accessorToken = this._lexer.peek();
+    if (
+      accessorToken.type !== TokenType.Identifier ||
+      (accessorToken.text !== "get" && accessorToken.text !== "set")
+    ) {
+      return null;
+    }
+
+    const nextToken = this._lexer.ahead(1);
+    if (
+      !nextToken ||
+      nextToken.type === TokenType.Colon ||
+      nextToken.type === TokenType.Comma ||
+      nextToken.type === TokenType.RBrace
+    ) {
+      return null;
+    }
+
+    this._lexer.get();
+    const key = this.parseObjectLiteralPropertyName(accessorToken);
+    if (!key) {
+      return null;
+    }
+    if (this._lexer.peek().type !== TokenType.LParent) {
+      this.reportError("W014", this._lexer.peek());
+      return null;
+    }
+
+    const args = this.parseFunctionParameterList(accessorToken);
+    if (!args) {
+      return null;
+    }
+    if (accessorToken.text === "get" && args.length !== 0) {
+      this.reportError("W010", accessorToken);
+      return null;
+    }
+    if (accessorToken.text === "set" && args.length !== 1) {
+      this.reportError("W010", accessorToken);
+      return null;
+    }
+
+    if (this._lexer.peek().type !== TokenType.LBrace) {
+      this.reportError("W012", this._lexer.peek());
+      return null;
+    }
+    const statement = this.parseBlockStatement();
+    if (!statement) return null;
+
+    return {
+      kind: accessorToken.text as "get" | "set",
+      key,
+      value: this.createExpressionNode<ArrowExpression>(
+        T_ARROW_EXPRESSION,
+        {
+          args,
+          statement,
+        },
+        accessorToken,
+        statement.endToken,
+      ),
+    };
+  }
+
+  private parseObjectLiteralPropertyName(start: Token): Expression | null {
+    const nextToken = this._lexer.peek();
+    const traits = tokenTraits[nextToken.type];
+
+    if (traits.keywordLike) {
+      const nameExpr = {
+        type: T_IDENTIFIER,
+        nodeId: createXmlUiTreeNodeId(),
+        name: nextToken.text,
+        startToken: nextToken,
+        endToken: nextToken,
+      } as Identifier;
+      this._lexer.get();
+      return nameExpr;
+    }
+
+    if (traits.expressionStart) {
+      if (nextToken.type === TokenType.LSquare) {
+        this._lexer.get();
+        const nameExpr = this.getExpression();
+        if (!nameExpr) {
+          return null;
+        }
+        this.expectToken(TokenType.RSquare, "W005");
+        return this.createExpressionNode<SequenceExpression>(
+          T_SEQUENCE_EXPRESSION,
+          {
+            exprs: [nameExpr],
+          },
+          start,
+        );
+      }
+      if (traits.isPropLiteral) {
+        const nameExpr = this.getExpression(false);
+        if (!nameExpr) {
+          return null;
+        }
+        if (nameExpr.type !== T_IDENTIFIER && nameExpr.type !== T_LITERAL) {
+          this.reportError("W007");
+          return null;
+        }
+        return nameExpr;
+      }
+    }
+
+    this.reportError("W007");
+    return null;
+  }
+
+  private parseFunctionParameterList(startToken: Token): Expression[] | null {
+    const exprList = this.getExpression(true);
+    if (!exprList) return null;
+    let isValid: boolean;
+    const args: Expression[] = [];
+    switch (exprList.type) {
+      case T_NO_ARG_EXPRESSION:
+        isValid = true;
+        break;
+      case T_IDENTIFIER:
+        isValid = (exprList.parenthesized ?? 0) <= 1;
+        args.push(exprList);
+        break;
+      case T_SEQUENCE_EXPRESSION:
+        isValid = exprList.parenthesized === 1;
+        let spreadFound = false;
+        if (isValid) {
+          for (const expr of exprList.exprs) {
+            if (spreadFound) {
+              isValid = false;
+              break;
+            }
+            switch (expr.type) {
+              case T_IDENTIFIER:
+                isValid = !expr.parenthesized;
+                args.push(expr);
+                break;
+              case T_OBJECT_LITERAL: {
+                isValid = !expr.parenthesized;
+                if (isValid) {
+                  const des = this.convertToObjectDestructure(expr);
+                  if (des) args.push(des);
+                }
+                break;
+              }
+              case T_ARRAY_LITERAL: {
+                isValid = !expr.parenthesized;
+                if (isValid) {
+                  const des = this.convertToArrayDestructure(expr);
+                  if (des) args.push(des);
+                }
+                break;
+              }
+              case T_SPREAD_EXPRESSION:
+                spreadFound = true;
+                if (expr.expr.type !== T_IDENTIFIER) {
+                  isValid = false;
+                  break;
+                }
+                args.push(expr);
+                break;
+              default:
+                isValid = false;
+                break;
+            }
+          }
+        }
+        break;
+      case T_OBJECT_LITERAL:
+        isValid = exprList.parenthesized === 1;
+        if (isValid) {
+          const des = this.convertToObjectDestructure(exprList);
+          if (des) args.push(des);
+        }
+        break;
+      case T_ARRAY_LITERAL:
+        isValid = exprList.parenthesized === 1;
+        if (isValid) {
+          const des = this.convertToArrayDestructure(exprList);
+          if (des) args.push(des);
+        }
+        break;
+      case T_SPREAD_EXPRESSION:
+        if (exprList.expr.type !== T_IDENTIFIER) {
+          isValid = false;
+          break;
+        }
+        isValid = true;
+        args.push(exprList);
+        break;
+      default:
+        isValid = false;
+    }
+    if (!isValid) {
+      this.reportError("W010", startToken);
+      return null;
+    }
+    return args;
   }
 
   private parseRegExpLiteral(): Literal | null {
