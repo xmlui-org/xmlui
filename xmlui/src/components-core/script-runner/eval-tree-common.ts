@@ -709,13 +709,60 @@ function isConstVar(id: string, thread: LogicalThread): boolean {
   return false;
 }
 
-// --- Constructors allowed with the 'new' operator in XMLUI scripts
-export const allowedNewConstructors = new Map<string, Function>([
-  ["String", String],
-  ["Date", Date],
-  ["Blob", Blob],
-  ["Error", Error],
-]);
+// --- Constructors allowed with the 'new' operator in XMLUI scripts.
+// Keep this list to inert value/container types. Constructors that execute code,
+// start browser capabilities, or expose raw platform control stay blocked.
+export const allowedNewConstructors = new Map<string, Function>();
+
+addAllowedNewConstructor("String", String);
+addAllowedNewConstructor("Number", Number);
+addAllowedNewConstructor("Boolean", Boolean);
+addAllowedNewConstructor("Date", Date);
+addAllowedNewConstructor("RegExp", RegExp);
+
+addAllowedNewConstructor("Array", Array);
+addAllowedNewConstructor("Object", Object);
+addAllowedNewConstructor("Map", Map);
+addAllowedNewConstructor("Set", Set);
+addAllowedNewConstructor("WeakMap", WeakMap);
+addAllowedNewConstructor("WeakSet", WeakSet);
+
+addAllowedNewConstructor("ArrayBuffer", ArrayBuffer);
+addAllowedNewConstructor("DataView", DataView);
+addAllowedNewConstructor("Int8Array", Int8Array);
+addAllowedNewConstructor("Uint8Array", Uint8Array);
+addAllowedNewConstructor("Uint8ClampedArray", Uint8ClampedArray);
+addAllowedNewConstructor("Int16Array", Int16Array);
+addAllowedNewConstructor("Uint16Array", Uint16Array);
+addAllowedNewConstructor("Int32Array", Int32Array);
+addAllowedNewConstructor("Uint32Array", Uint32Array);
+addAllowedNewConstructor("Float32Array", Float32Array);
+addAllowedNewConstructor("Float64Array", Float64Array);
+addAllowedNewConstructor("BigInt64Array", globalThis.BigInt64Array);
+addAllowedNewConstructor("BigUint64Array", globalThis.BigUint64Array);
+
+addAllowedNewConstructor("URL", globalThis.URL);
+addAllowedNewConstructor("URLSearchParams", globalThis.URLSearchParams);
+addAllowedNewConstructor("TextEncoder", globalThis.TextEncoder);
+addAllowedNewConstructor("TextDecoder", globalThis.TextDecoder);
+addAllowedNewConstructor("Blob", globalThis.Blob);
+addAllowedNewConstructor("File", globalThis.File);
+
+addAllowedNewConstructor("Error", Error);
+addAllowedNewConstructor("EvalError", EvalError);
+addAllowedNewConstructor("RangeError", RangeError);
+addAllowedNewConstructor("ReferenceError", ReferenceError);
+addAllowedNewConstructor("SyntaxError", SyntaxError);
+addAllowedNewConstructor("TypeError", TypeError);
+addAllowedNewConstructor("URIError", URIError);
+addAllowedNewConstructor("AggregateError", globalThis.AggregateError);
+addAllowedNewConstructor("DOMException", globalThis.DOMException);
+
+function addAllowedNewConstructor(name: string, ctor: Function | undefined): void {
+  if (typeof ctor === "function") {
+    allowedNewConstructors.set(name, ctor);
+  }
+}
 
 export function getAllowedNewConstructor(constructorObj: any): any {
   for (const [, ctor] of allowedNewConstructors) {
@@ -727,7 +774,7 @@ export function getAllowedNewConstructor(constructorObj: any): any {
   const constructorName = constructorObj?.name || "unknown";
   throw new Error(
     `XMLUI does not support the new operator with constructor '${constructorName}'. ` +
-      `Only String, Date, and Blob are allowed.`
+      `Allowed constructors: ${Array.from(allowedNewConstructors.keys()).join(", ")}.`
   );
 }
 

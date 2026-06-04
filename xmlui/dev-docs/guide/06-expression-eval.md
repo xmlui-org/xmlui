@@ -268,29 +268,52 @@ whole document surface.
 See [15-app-context.md](15-app-context.md) and
 [managed-react.md](../plans/managed-react.md) Appendix A for the full hardening plan.
 
-### 3. The `new` Operator — Only 4 Constructors
+### 3. The `new` Operator — Safe Constructor Allow-List
 
-XMLUI restricts `new` to exactly four constructors:
+XMLUI restricts `new` to a curated set of inert value/container constructors.
+Constructors that execute code, open browser capabilities, start background
+work, or expose unmanaged platform control are not allowed.
 
 | Constructor | Allowed |
 |-------------|---------|
 | `new String(...)` | Yes |
+| `new Number(...)` | Yes |
+| `new Boolean(...)` | Yes |
 | `new Date(...)` | Yes |
+| `new RegExp(...)` | Yes |
+| `new Array(...)` | Yes |
+| `new Object(...)` | Yes |
+| `new Map(...)` | Yes |
+| `new Set(...)` | Yes |
+| `new WeakMap(...)` | Yes |
+| `new WeakSet(...)` | Yes |
+| `new ArrayBuffer(...)` | Yes |
+| `new DataView(...)` | Yes |
+| `new Int8Array(...)`, `new Uint8Array(...)`, etc. | Yes |
+| `new URL(...)` | Yes |
+| `new URLSearchParams(...)` | Yes |
+| `new TextEncoder(...)` | Yes |
+| `new TextDecoder(...)` | Yes |
 | `new Blob(...)` | Yes |
+| `new File(...)` | Yes, when available |
 | `new Error(...)` | Yes |
+| `new TypeError(...)`, `new RangeError(...)`, etc. | Yes |
+| `new AggregateError(...)` | Yes, when available |
+| `new DOMException(...)` | Yes, when available |
 | Everything else | **No** |
 
-Attempting `new Array(5)`, `new Map()`, `new RegExp(...)`, `new Set()`, or any other constructor throws:
+Attempting `new Function(...)`, `new Promise(...)`, `new WebSocket(...)`, a
+custom constructor, or any other constructor outside the allow-list throws:
 
 ```
-"XMLUI does not support the new operator with constructor 'Array'."
+"XMLUI does not support the new operator with constructor 'Function'."
 ```
-**Future:** The whitelist will be extended in future releases to support additional safe constructors.
+
 **Alternatives:**
-- Array: use array literals `[1, 2, 3]`
-- Object: use object literals `{ key: value }`
-- RegExp: use regex literals `/pattern/flags`
-- Map/Set: not available (use plain objects/arrays)
+- Array/Object: literals (`[1, 2, 3]`, `{ key: value }`) are still preferred for readability.
+- RegExp: regex literals (`/pattern/flags`) remain the shortest option for static patterns.
+- Async work: call managed async functions from the async track instead of constructing `Promise`.
+- Browser capabilities: use XMLUI-managed replacements such as `App.fetch`, `Clipboard.copy`, or dedicated components.
 
 ### 4. `async`/`await` — Parsed but Rejected
 
