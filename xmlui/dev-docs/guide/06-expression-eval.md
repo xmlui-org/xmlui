@@ -154,7 +154,7 @@ Entry points: `evalBindingAsync(ast, context)` and `executeArrowExpression(...)`
 Used for `onClick`, `onDidChange`, and other event handlers, as well as code-behind script execution. The async evaluator handles Promises transparently:
 
 1. Function return values are awaited via `completePromise()`, which recursively resolves nested Promises in arrays and objects
-2. Eight array methods are replaced with async-safe proxies (see [Array Method Proxies](#array-method-proxies) below)
+2. Twelve array methods are replaced with async-safe proxies (see [Array Method Proxies](#array-method-proxies) below)
 
 **Timeout:** configurable via `evalContext.timeout`, no default.
 
@@ -307,7 +307,7 @@ The parser recognizes all `async` and `await` syntax (for forward compatibility)
 
 ### 5. Array Method Proxies (Async Track Only)
 
-In the **async evaluator**, 8 array methods are transparently replaced with async-aware versions. This is necessary because native Array methods like `filter()` don't support async predicates — they would see a Promise object (which is truthy) instead of awaiting it.
+In the **async evaluator**, 12 array methods are transparently replaced with async-aware versions. This is necessary because native Array methods like `filter()` don't support async predicates — they would see a Promise object (which is truthy) instead of awaiting it.
 
 | Method | Async behavior |
 |--------|---------------|
@@ -318,9 +318,13 @@ In the **async evaluator**, 8 array methods are transparently replaced with asyn
 | `some` | Evaluates all predicates in parallel, then checks any true |
 | `find` | Evaluates all predicates in parallel, then finds first match |
 | `findIndex` | Evaluates all predicates in parallel, then finds first index |
+| `findLast` | Evaluates all predicates in parallel, then finds last match |
+| `findLastIndex` | Evaluates all predicates in parallel, then finds last index |
 | `flatMap` | Evaluates all predicates in parallel, then flat-maps results |
+| `reduce` | Evaluates reducers **sequentially**, awaiting each accumulator before the next iteration |
+| `reduceRight` | Evaluates reducers **sequentially** from right to left, awaiting each accumulator before the next iteration |
 
-**Key detail:** `map` and `forEach` use sequential execution (order-preserving), while the others use `Promise.all` (parallel). This matters when predicates have side effects.
+**Key detail:** `map`, `forEach`, `reduce`, and `reduceRight` use sequential execution (order-preserving), while the predicate-based methods use `Promise.all` (parallel). This matters when callbacks have side effects.
 
 The sync evaluator does NOT apply these proxies — if a predicate returns a Promise in sync mode, it throws.
 
