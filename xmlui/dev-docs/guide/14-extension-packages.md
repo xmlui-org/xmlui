@@ -21,7 +21,7 @@ export interface Extension {
   components?: ComponentExtension[];  // Component renderer defs
   themes?: ThemeDefinition[];         // Custom theme files
   functions?: Record<string, (...args: any[]) => any>; // Global utility functions
-  themeNamespacePrefix?: string;      // PascalCase prefix for theme-variable namespacing (plan #02)
+  themeNamespacePrefix?: string;      // PascalCase prefix for theme-variable namespacing
 }
 ```
 
@@ -41,7 +41,7 @@ export default {
 That's the complete public surface. The rest of the system is scaffolding that gets the extension
 loaded and its components registered in the framework's component pool.
 
-### Theme variable namespacing — `themeNamespacePrefix` (Wave 0, plan #02)
+### Theme variable namespacing — `themeNamespacePrefix`
 
 Extension packages **must** declare a PascalCase `themeNamespacePrefix` so the CSS variables they produce are unambiguously scoped under a per-package segment:
 
@@ -75,7 +75,7 @@ Canonical first-party prefixes:
 | `xmlui-tiptap-editor` | `Tiptap` |
 | `xmlui-website-blocks` | `Websites` |
 
-The build-time analyzer rule `theming-missing-prefix` (plan #13 / plan #02 Phase 1) flags variables in extension packages that omit the prefix once `strictBuildValidation` is enabled.
+The build-time analyzer rule `theming-missing-prefix` flags variables in extension packages that omit the prefix once `strictBuildValidation` is enabled.
 
 The `components-core/themevars` barrel exposes helpers used by the analyzer and the LSP:
 

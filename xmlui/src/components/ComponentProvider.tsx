@@ -129,8 +129,6 @@ import type {
   LoaderRendererDef,
 } from "../components-core/abstractions/LoaderRenderer";
 import { apiLoaderRenderer } from "../components-core/loader/ApiLoader";
-import { externalDataLoaderRenderer } from "../components-core/loader/ExternalDataLoader";
-import { mockLoaderRenderer } from "../components-core/loader/MockLoaderRenderer";
 import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
 import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
 import { dateInputComponentRenderer } from "./DateInput/DateInput";
@@ -875,8 +873,6 @@ export class ComponentRegistry {
     this.registerActionFn(timedAction);
 
     this.registerLoaderRenderer(apiLoaderRenderer);
-    this.registerLoaderRenderer(externalDataLoaderRenderer);
-    this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
     this.registerBehavior(labelBehavior);

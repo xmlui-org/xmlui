@@ -182,7 +182,7 @@ npm run changeset:publish       # Publish to npm, create git tags
 ### Useful Turborepo commands directly
 
 ```bash
-turbo run build:xmlui-all --dry-run     # See execution plan without running
+turbo run build:xmlui-all --dry-run     # See the task graph without running
 turbo run build:xmlui-all --force       # Rebuild, ignoring the cache
 turbo run build:xmlui-all --graph       # Output a dependency graph
 turbo run build:xmlui-all --verbosity=3 # Debug cache hits and misses

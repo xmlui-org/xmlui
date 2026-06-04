@@ -162,7 +162,7 @@ Each Page also wraps its content in a `TableOfContentsProvider` for on-page head
 
 ## Defended Routing
 
-Wave 4 adds defended routing on top of React Router. The feature is additive: existing
+XMLUI adds defended routing on top of React Router. The feature is additive: existing
 unconstrained `Page url` values keep their old string-based behavior.
 
 ### Route Constraints

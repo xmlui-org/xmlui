@@ -2,7 +2,7 @@
 
 XMLUI treats component lifecycle metadata as a first-class, machine-checkable contract. Every prop, event, method, value, and component can declare when it was deprecated, when it will be removed, and how to migrate. The framework surfaces those declarations in the editor (LSP), at parse-time in the running app, in generated docs, and at release-time as an API-diff gate that blocks under-staged changesets.
 
-This chapter is the developer-facing companion to plan `dev-docs/plans/12-enforced-versioning.md`. Application-author guidance lives at `/docs/managed-react/enforced-versioning`.
+This chapter covers the developer-facing versioning machinery. Application-author guidance lives at `/docs/managed-react/enforced-versioning`.
 
 ## Vocabulary
 
@@ -111,7 +111,7 @@ If an app declares `<App preserveLegacyDefaults="{['Form.submitPolicy']}">`, cal
 
 ## Migrating `pattern` → `validator`
 
-`FormItem.pattern` is the canonical worked example for the rename pipeline. The metadata declares the deprecation; the rename helper rewrites markup; the analyzer rule surfaces it everywhere; the Inspector "Versioning" tab aggregates a "Copy migration plan" report; the release-guard CI ensures the changeset bump matches the surface change.
+`FormItem.pattern` is the canonical worked example for the rename pipeline. The metadata declares the deprecation; the rename helper rewrites markup; the analyzer rule surfaces it everywhere; the Inspector "Versioning" tab aggregates a "Copy migration report"; the release-guard CI ensures the changeset bump matches the surface change.
 
 When `removedIn` (`2.0.0`) lands, strict mode escalates the prop to `error`. Apps that pin the legacy behaviour must drop the prop, swap in `<Validator>`, or list `Form.pattern` in `preserveLegacyDefaults` to delay the break.
 

@@ -338,9 +338,9 @@ Before marking a component as complete, verify:
 
 ---
 
-## Enforced Accessibility (plan #05)
+## Enforced Accessibility
 
-XMLUI ships an accessibility enforcement layer at [xmlui/src/components-core/accessibility/](../../src/components-core/accessibility/index.ts). It is the runtime/CLI surface for plan #05: parsed-markup linting, framework focus and announcement primitives, theme contrast checks, and stable automation IDs.
+XMLUI ships an accessibility enforcement layer at [xmlui/src/components-core/accessibility/](../../src/components-core/accessibility/index.ts): parsed-markup linting, framework focus and announcement primitives, theme contrast checks, and stable automation IDs.
 
 ### Public API
 
@@ -385,7 +385,7 @@ When `strictAccessibility` is truthy at runtime, findings also emit `kind:"a11y"
 
 ### Framework primitives
 
-Plan #05 adds built-in primitives so app authors and framework components share one accessibility vocabulary:
+XMLUI includes built-in primitives so app authors and framework components share one accessibility vocabulary:
 
 - `<SkipLink target="main" label="Skip to main content" />` renders a focus-visible skip link. `App.appGlobals.autoSkipLink: true` inserts the default skip link before app content.
 - `<FocusScope trap restore autoFocus />` centralizes focus trapping, initial focus, and focus restoration for overlays.
@@ -418,7 +418,7 @@ This block is purely advisory at runtime — it changes no behaviour. When autho
 ### How to extend the linter
 
 1. Add a new `A11yCode` to `xmlui/src/components-core/accessibility/diagnostics.ts`.
-2. Implement the rule in `linter.ts` next to the Phase 1 rules.
+2. Implement the rule in `linter.ts` next to the existing rules.
 3. Decide its default severity. If it should escalate under `strictAccessibility`, add it to the strict-mode escalation list.
 4. Add tests in `xmlui/tests/components-core/accessibility/`.
 

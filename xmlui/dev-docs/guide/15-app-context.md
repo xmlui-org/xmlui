@@ -125,9 +125,7 @@ same-tab — emits a `kind: "navigate"` trace entry.
 ```
 
 This is the sanctioned replacement for `window.open()` and direct
-`window.location` mutation — both of which the DOM sandbox blocks. See
-[managed-react.md Appendix A](../plans/managed-react.md) for the full hardening
-plan.
+`window.location` mutation — both of which the DOM sandbox blocks.
 
 Note: `$pathname`, `$routeParams`, and `$queryParams` (the `$`-prefixed variables) come from
 the routing state layer (Layer 6), not from AppContext. They are reactive in the same way but
@@ -456,8 +454,7 @@ Don't confuse `appGlobals` with extension functions. Extension functions (added 
 
 ### DOM-Sandbox Configuration Keys
 
-Three `appGlobals` keys configure the script-runner sandbox (see
-[managed-react.md Appendix A](../plans/managed-react.md)):
+Three `appGlobals` keys configure the script-runner sandbox:
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
@@ -468,24 +465,26 @@ Three `appGlobals` keys configure the script-runner sandbox (see
 
 ### Strict-Mode Configuration Keys
 
-These `appGlobals` keys gate the rollout of the long-running Managed React plans. Most default to `false`/permissive today and flip to `true` (or strict) in a major release; rows that have already flipped are marked with `true`. See [`xmlui/dev-docs/plans/`](../plans/STATUS.md) for full status.
+These `appGlobals` keys configure strictness, diagnostics, localization, and scheduling behaviour.
+Some keys intentionally remain permissive by default for application compatibility; strict defaults
+are called out directly in the table.
 
-| Key | Type | Default | Effect | Plan |
-|---|---|---|---|---|
-| `strictBuildValidation` | `boolean` | `false` | Escalates build-time analyzer diagnostics one severity step (info → warn → error); `xmlui check` exits non-zero on any `error`-severity finding. Drives the `theming-missing-prefix`, `id-unknown-component`, `id-unknown-prop`, `expr-dead-conditional`, etc. rules. | [#13](../plans/13-build-validation-analyzers.md) |
-| `strictAccessibility` | `boolean` | `false` | Escalates `warn`-level findings from the accessibility linter (`icon-only-button-no-label`, `modal-no-title`, `missing-accessible-name`, `form-input-no-label`, …) to `error`, failing the Vite build. Findings are also pushed to `_xsLogs` as `kind:"a11y"` entries when the flag is truthy. | [#05](../plans/05-enforced-accessibility.md) |
-| `autoSkipLink` | `boolean` | `false` | Inserts the default `<SkipLink target="main" />` before app content for keyboard users. | [#05](../plans/05-enforced-accessibility.md) |
-| `strictErrors` | `boolean` | `false` | When `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint pointing to `AppError`. `signError` and `ErrorBoundary` always normalize via `AppError.from()` regardless of this flag. | [#07](../plans/07-structured-exception-model.md) |
-| `errorCorrelationIdHeader` | `string` | `"X-Correlation-Id"` | HTTP response header from which `AppError.correlationId` is read on fetch failures. | [#07](../plans/07-structured-exception-model.md) |
-| `strictTypeContracts` | `boolean` | `true` | Escalates type-contract diagnostics for unknown props, wrong literal types, missing required props, invalid enum values, unknown events, and runtime expression-value mismatches. Set to `false` for warn-only migration mode. | [#01](../plans/01-verified-type-contracts.md) |
-| `strictAuditLogging` | `boolean` | `true` | When `true` (default), the redaction policy blocks on un-redacted PII fields; the entry is dropped and `audit-pii-leaked` is emitted instead of forwarding it. Set to `false` for warn-only (migration) mode. | [#15](../plans/15-audit-grade-observability.md) |
-| `strictRouting` | `boolean` | `true` | Escalates defended-routing diagnostics such as rejected constraints and non-canonical URLs (and flips `nonCanonicalUrl` defaults to `"redirect"`). Set `false` to opt out. | [#10](../plans/10-defended-routing.md) |
-| `strictI18n` | `boolean` | `false` | Escalates missing bundle/key and ICU diagnostics. | [#11](../plans/11-i18n-foundations.md) |
-| `defaultLocale` | `string` | `"en"` | Fallback locale for `App.locale`. | [#11](../plans/11-i18n-foundations.md) |
-| `localePersistKey` | `string \| null` | `"xmlui.locale"` | localStorage key for user locale persistence; `null` disables persistence. | [#11](../plans/11-i18n-foundations.md) |
-| `strictDeterminism` | `boolean` | `false` | Selects FIFO scheduling by default and escalates determinism diagnostics. | [#16](../plans/16-concurrent-determinism.md) |
-| `scheduler` | `"concurrent" \| "fifo"` | `"concurrent"` | Handler scheduler mode when strict determinism is off. | [#16](../plans/16-concurrent-determinism.md) |
-| `maxQueuedPerTrace` | `number` | `64` | Per-trace FIFO queue budget. | [#16](../plans/16-concurrent-determinism.md) |
+| Key | Type | Default | Effect |
+|---|---|---|---|
+| `strictBuildValidation` | `boolean` | `false` | Escalates build-time analyzer diagnostics one severity step (info → warn → error); `xmlui check` exits non-zero on any `error`-severity finding. Drives the `theming-missing-prefix`, `id-unknown-component`, `id-unknown-prop`, `expr-dead-conditional`, etc. rules. |
+| `strictAccessibility` | `boolean` | `false` | Escalates `warn`-level findings from the accessibility linter (`icon-only-button-no-label`, `modal-no-title`, `missing-accessible-name`, `form-input-no-label`, …) to `error`, failing the Vite build. Findings are also pushed to `_xsLogs` as `kind:"a11y"` entries when the flag is truthy. |
+| `autoSkipLink` | `boolean` | `false` | Inserts the default `<SkipLink target="main" />` before app content for keyboard users. |
+| `strictErrors` | `boolean` | `false` | When `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint pointing to `AppError`. `signError` and `ErrorBoundary` always normalize via `AppError.from()` regardless of this flag. |
+| `errorCorrelationIdHeader` | `string` | `"X-Correlation-Id"` | HTTP response header from which `AppError.correlationId` is read on fetch failures. |
+| `strictTypeContracts` | `boolean` | `true` | Escalates type-contract diagnostics for unknown props, wrong literal types, missing required props, invalid enum values, unknown events, and runtime expression-value mismatches. Set to `false` for warn-only migration mode. |
+| `strictAuditLogging` | `boolean` | `true` | When `true` (default), the redaction policy blocks on un-redacted PII fields; the entry is dropped and `audit-pii-leaked` is emitted instead of forwarding it. Set to `false` for warn-only (migration) mode. |
+| `strictRouting` | `boolean` | `true` | Escalates defended-routing diagnostics such as rejected constraints and non-canonical URLs (and flips `nonCanonicalUrl` defaults to `"redirect"`). Set `false` to opt out. |
+| `strictI18n` | `boolean` | `false` | Escalates missing bundle/key and ICU diagnostics. |
+| `defaultLocale` | `string` | `"en"` | Fallback locale for `App.locale`. |
+| `localePersistKey` | `string \| null` | `"xmlui.locale"` | localStorage key for user locale persistence; `null` disables persistence. |
+| `strictDeterminism` | `boolean` | `false` | Selects FIFO scheduling by default and escalates determinism diagnostics. |
+| `scheduler` | `"concurrent" \| "fifo"` | `"concurrent"` | Handler scheduler mode when strict determinism is off. |
+| `maxQueuedPerTrace` | `number` | `64` | Per-trace FIFO queue budget. |
 
 ### Sandbox-Sanctioned Replacement Globals
 

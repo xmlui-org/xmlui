@@ -3,8 +3,6 @@
 > **Internal architecture chapter for the UDC (user-defined component)
 > sandbox.** For the application-developer-facing guide, see
 > [website/content/docs/pages/managed-react/udc-sandbox.md].
-> For the implementation history and design rationale, see
-> [`xmlui/dev-docs/plans/14-udc-sandbox.md`](../plans/14-udc-sandbox.md).
 
 ## Why This Matters
 
@@ -17,7 +15,7 @@ User-defined components (UDCs) are written by application authors in
 - silently grow its public surface as authors added `$props.x`
   references inside the body, with no checksum or review trail.
 
-The sandbox (plan #14) makes the contract between a UDC and its host
+The sandbox makes the contract between a UDC and its host
 *declarative*: the UDC enumerates its props, events, methods, slots, and
 capabilities in markup, and the runtime enforces every boundary that
 contract draws.
@@ -192,7 +190,7 @@ Two scripts live under `xmlui/scripts/cli/`:
 
 Both scripts are standalone (no central `xmlui` CLI dispatcher exists
 yet — they are invoked as `node xmlui/scripts/cli/udc-audit.ts …`),
-matching the established pattern from plan #16 (`xmlui replay`).
+matching the established pattern used by `xmlui replay`.
 
 ---
 
@@ -207,9 +205,9 @@ trust/strict-mode escalation. UDCs that declare no slots opt out
 
 ---
 
-## Strict Default (W8-1)
+## Strict Default
 
-As of plan #14 Step 6.2, `appGlobals.strictUdcSandbox` defaults to
+`appGlobals.strictUdcSandbox` defaults to
 **`true`** at the three host bindings. The flip is safe because:
 
 - `buildScopeGate()` and `validateUdcPropReferences()` only fire when
@@ -221,15 +219,12 @@ As of plan #14 Step 6.2, `appGlobals.strictUdcSandbox` defaults to
   production app surface is unchanged.
 
 Authors who need the legacy warn-only behaviour during migration set
-`appGlobals.strictUdcSandbox={false}` on `<App>`. The strict flip
-mirrors the same risk-probe pattern used for `strictForms` (W5-4) and
-`strictTheming` (#08).
+`appGlobals.strictUdcSandbox={false}` on `<App>`.
 
 ---
 
 ## Cross-References
 
-- **Plan record:** [`xmlui/dev-docs/plans/14-udc-sandbox.md`](../plans/14-udc-sandbox.md)
 - **End-user docs page:** [`website/content/docs/pages/managed-react/udc-sandbox.md`](../../../website/content/docs/pages/managed-react/udc-sandbox.md)
 - **Related chapter:** [`11-user-defined-components.md`](11-user-defined-components.md) — UDC semantics outside the sandbox
 - **Related chapter:** [`19-inspector-debugging.md`](19-inspector-debugging.md) — how `pushXsLog` powers Inspector panels

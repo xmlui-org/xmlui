@@ -123,7 +123,7 @@ Each loader `uid` occupies a dedicated slot in the container's state object. The
 // state[uid] shape:
 {
   value: any,                              // Transformed response data
-  byId: Record<string, any> | undefined,  // Index by $id (arrays only)
+  byId: Record<string, any> | undefined,   // Index by $id (arrays only)
   inProgress: boolean,                     // Currently fetching
   isRefetching: boolean,                   // Background refetch in progress
   loaded: boolean,                         // True after first fetch (success or error)
@@ -267,7 +267,7 @@ Events fire in sequence during an APICall execution:
 | `beforeRequest` | Before the request is sent | `$param`, `$params`; return `false` to cancel |
 | `success` | After successful response | `$result` (response data) |
 | `error` | After failure | `$error` (error object) |
-| `progress` | During long operations | `$progress` (0–100), `$statusData` |
+| `statusUpdate` | Each poll in deferred mode | `$statusData`, `$progress` (0–100), `$attempts`, `$elapsed` |
 
 ### Cache invalidation
 
@@ -396,14 +396,15 @@ XMLUI chooses between two strategies based on the request:
 
 ## Loader Type Selection
 
-XMLUI selects the appropriate loader implementation based on DataSource configuration:
+XMLUI selects the appropriate loader implementation based on DataSource configuration. All `DataSource` props are resolved to a `DataLoader` by `ApiBoundComponent`. Within `DataLoader`, the actual React component is chosen as follows:
 
 | Condition | Loader used |
 |-----------|------------|
 | `prevPageSelector` or `nextPageSelector` set | `PageableLoader` (useInfiniteQuery) |
-| `mock` prop set | `MockLoaderRenderer` |
-| POST method with body | `ExternalDataLoader` |
-| Default | `DataLoader` (useQuery) |
+| `mockData` prop set | `Loader` with a mock query function (no network request) |
+| Default | `Loader` (useQuery via RestApiProxy) |
+
+> **Note:** `ExternalDataLoader` and `MockLoader` are separate internal loader types registered in the component registry. They are not triggered by `DataSource` — `DataLoader` handles all `DataSource`-backed queries directly.
 
 ---
 

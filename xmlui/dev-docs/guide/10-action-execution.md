@@ -61,7 +61,7 @@ The function returned by `lookupEventHandler` is always `async`: it returns a `P
 
 ### Deterministic scheduler integration
 
-Wave 4 routes async handler execution through the managed scheduler before the handler body runs.
+Async handler execution routes through the managed scheduler before the handler body runs.
 The hook point is `runCodeAsync()` in `components-core/container/event-handlers.ts`.
 
 ```mermaid
@@ -90,6 +90,27 @@ independently. `maxQueuedPerTrace` bounds runaway chains and emits
 Mouse and hover DOM wrappers remain fire-and-forget: they call the async handler but do not await its
 promise. Components such as `Form` that explicitly await handlers continue to observe completion.
 
+### Handler concurrency, cancellation, and timeouts
+
+After the deterministic scheduler admits a handler, `runCodeAsync()` also applies the cooperative
+concurrency layer described in [29-concurrency.md](./29-concurrency.md). `ComponentAdapter` threads
+these props into `LookupActionOptions`:
+
+- `handlerPolicy` / `handlerPolicy:<eventName>` — `parallel` (default), `single-flight`, `queue`, or `drop-while-running`
+- `handlerTimeoutMs` / `handlerTimeoutMs:<eventName>` — per-handler timeout override
+- `transactional` / `transactional:<eventName>` — buffer state writes and commit them only after successful completion
+
+Every async handler invocation receives a `$cancel` token in its local context. The token is
+AbortSignal-shaped (`aborted`, `reason`, `throwIfAborted()`, `onAbort()`, `signal`) and is aborted on
+timeout, supersession, unmount, normal cleanup, and explicit `App.cancel()` for tracked invocations.
+Cancellation is treated as a control-flow contract: `HandlerCancelledError` is swallowed by the
+dispatcher and reported through concurrency traces rather than the component's `onError` channel.
+
+Handlers are bounded by `handlerTimeoutMs` or `appGlobals.defaultHandlerTimeoutMs` (default `30000`).
+A timeout emits `kind:"concurrency"` / `code:"concurrency-handler-timeout"`; with
+`appGlobals.strictConcurrency === true`, the diagnostic escalates to error severity and is routed
+through the global error surface. A timeout value `<= 0` disables the timeout.
+
 ### Mouse events: synchronous lockdown, then async fire-and-forget
 
 When the user clicks a button, the React `onClick` fires. XMLUI's `useMouseEventHandlers` hook intercepts it:
@@ -116,9 +137,9 @@ This design has profound consequences:
 
 **`stopPropagation()` and `preventDefault()` happen before user code runs.** The DOM event is locked down the instant the handler fires. By the time your `onClick` expression starts executing, the event has already been prevented and stopped from bubbling. There is no way for user code to conditionally allow propagation based on logic — the decision is made before the handler runs.
 
-**The handler's return value is discarded.** `onEvent(event)` is called without `await`. The returned `Promise` is dropped on the floor. Mouse event handlers are fire-and-forget — the framework does not observe their completion, success, or failure.
+**The handler's return value is discarded.** `onEvent(event)` is called without `await`. Mouse event handlers are fire-and-forget at the DOM boundary, so the wrapper does not observe completion or return values.
 
-**Errors in async handlers are uncaught at the event level.** Because the `Promise` is never awaited, a thrown error inside an `onClick` handler becomes an unhandled promise rejection, not a caught exception.
+**Errors in async handlers are not observed by the DOM event wrapper.** Because the `Promise` is never awaited, the mouse wrapper itself does not catch errors or observe completion. The dispatcher still logs handler errors and calls `signError` unless suppressed. If the component declares an `onError` handler, `ComponentAdapter` wraps non-lifecycle action events and routes sync or async failures to that handler instead of the global error toast.
 
 ### The `bubbleEvents` escape hatch
 
@@ -170,6 +191,7 @@ This means that **state changes from one statement are visible to the next state
 However, this async-between-statements design also means:
 - **Long handlers yield to the main thread.** After 100 statements with no state changes, the engine inserts `await delay(0)` to prevent blocking.
 - **Unmounting during execution loses remaining state changes.** If the component unmounts while a handler is mid-execution, the `mountedRef` check causes the state update `await` to skip, and remaining statements run against a stale snapshot.
+- **Transactional handlers delay state writes.** When `transactional` is set, state mutations are collected in a buffer and replayed only after the handler finishes successfully. Errors, cancellation, and timeouts discard the buffer.
 
 ### Event lifecycle signals
 
@@ -179,6 +201,8 @@ The container dispatches lifecycle actions around handler execution:
 dispatch({ type: ContainerActionKind.EVENT_HANDLER_STARTED, payload: { uid, eventName } });
 // ... handler executes ...
 dispatch({ type: ContainerActionKind.EVENT_HANDLER_COMPLETED, payload: { uid, eventName } });
+// ... or, if the handler throws ...
+dispatch({ type: ContainerActionKind.EVENT_HANDLER_ERROR, payload: { uid, eventName, error } });
 ```
 
 These signals drive the inspector UI and can be used to track whether an event is in progress (e.g., showing a loading state on a button during an async operation).
@@ -414,6 +438,8 @@ const memoedLookupEventHandler = useCallback(
       componentId: ctx.componentId,
       sourceFileId: ctx.sourceFileId,
       sourceRange: ctx.sourceRange,
+      ...(wrapForOnError ? { signError: false } : {}),
+      ...resolveConcurrencyOptions(safeNode.props, eventName),
       ...actionOptions,
     });
   },
@@ -434,6 +460,12 @@ Key options for controlling handler resolution and execution:
 | `ephemeral` | `true` → skip the resolved function cache (for one-off calls like `Actions.*`) |
 | `defaultHandler` | Fallback handler code if the event isn't defined on the component |
 | `context` | Extra state injected into the execution context |
+| `componentType`, `componentLabel`, `componentId` | Inspector metadata from `inspectorContextRef.current` |
+| `sourceFileId`, `sourceRange` | Source mapping metadata for inspector traces |
+| `schedulerBypass` | Internal flag that prevents the deterministic scheduler from recursively re-enqueuing a handler body |
+| `handlerPolicy` | Cooperative concurrency policy: `parallel`, `single-flight`, `queue`, or `drop-while-running` |
+| `handlerTimeoutMs` | Per-handler timeout override; falls back to `appGlobals.defaultHandlerTimeoutMs` |
+| `transactional` | Buffer state writes and commit them only after successful handler completion |
 
 ---
 
@@ -450,6 +482,11 @@ traceApiCall(appContext, "api:error",    url, method, { transactionId, error });
 The `traceId` is captured synchronously before the `await` — this ensures the `api:complete` event carries the same trace context as `api:start`, even if the call stack has changed by the time the promise resolves.
 
 The `componentType`, `componentLabel`, `componentId`, `sourceFileId`, and `sourceRange` fields in `LookupActionOptions` are passed from the component's inspector context (tracked in a ref in `ComponentAdapter`) and appear in the inspector panel for every action invocation.
+
+Handler concurrency outcomes emit `kind:"concurrency"` traces, including
+`concurrency-handler-cancelled`, `concurrency-handler-superseded`,
+`concurrency-handler-dropped`, and `concurrency-handler-timeout`. Deterministic scheduler diagnostics
+remain `kind:"scheduler"`.
 
 ---
 
@@ -494,8 +531,10 @@ Or directly in script expressions:
 
 - **XMLUI event handlers are always async.** Every handler — even a one-liner like `navigate('/')` — executes as an async function through the scripting engine's AST interpreter. There is no synchronous event handler path.
 - **`preventDefault()` and `stopPropagation()` happen before user code runs.** For mouse events, the framework locks down the DOM event synchronously, then fires the async handler. User code cannot conditionally allow propagation — it's already stopped by the time the handler starts.
-- **Mouse event handlers are fire-and-forget.** The `Promise` returned by the handler is never awaited. Errors become unhandled promise rejections. Return values are discarded.
+- **Mouse event handlers are fire-and-forget.** The `Promise` returned by the handler is never awaited by the DOM wrapper. Return values are discarded; errors are handled by the dispatcher and optionally routed to component `onError`.
 - **State changes are visible between statements.** The scripting engine dispatches state mutations and awaits React's commit after each statement. The next statement sees the updated state — unlike raw React where `setState` batches.
+- **Handlers are cooperatively cancellable.** Async handlers receive `$cancel`; `single-flight`, timeout, unmount, and `App.cancel()` abort through that token.
+- **Concurrency knobs are component props.** `handlerPolicy`, `handlerTimeoutMs`, and `transactional` can be set at component level or per event with `:<eventName>` suffixes.
 - **Form handlers are the exception** — `onWillSubmit`, `onSubmit`, and `onSuccess` are awaited, and their return values control the submission flow. `onWillSubmit` returning `false` cancels; returning an object replaces the submitted data.
 - **`bubbleEvents` is the escape hatch for conditional event pass-through.** Use it when a component should either handle an event or let the parent handle it based on runtime state — without `bubbleEvents`, `stopPropagation` fires unconditionally even when the handler returns `undefined`.
 

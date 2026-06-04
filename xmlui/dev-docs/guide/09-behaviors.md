@@ -2,9 +2,7 @@
 
 Every component in XMLUI can gain additional capabilities automatically — without the component author writing a single line of extra code. This capability is delivered by **behaviors**: small, focused objects that wrap a rendered component with new functionality when specific props are present.
 
-This document explains how the behavior system works internally, covers all eight framework behaviors, and shows how extension packages can contribute their own.
-
-<!-- DIAGRAM: renderer() → renderedNode → [label? → wrap] → [animation? → wrap] → [tooltip? → wrap] → [variant? → wrap] → [bookmark? → wrap] → [formBinding? → wrap] → [validation? → wrap] → final DOM node -->
+This document explains how the behavior system works internally, covers all seven framework behaviors, and shows how extension packages can contribute their own.
 
 ```mermaid
 graph TD
@@ -70,12 +68,13 @@ renderer() → node₀
 
 The result is a tree of nested wrappers. Registration order is innermost → outermost: `label` registers first and wraps closest to the real component; `validation` registers last and is the outermost wrapper in the DOM.
 
-### Two absolute skip conditions
+### Global and per-behavior skip conditions
 
-Behaviors never attach to:
+Behaviors have three mechanisms that prevent attachment:
 
-- **Compound components** — user-defined components written as `.xmlui` files. These are already composed from multiple XMLUI elements, and wrapping their rendered output would produce incorrect nesting.
-- **Non-visual components** — components with `nonVisual: true` in their metadata (e.g., `DataSource`, `APICall`). These produce no DOM output, so wrapping them makes no sense.
+- **Compound components (global)** — `ComponentAdapter` skips the entire behavior loop for compound components (user-defined `.xmlui` files). This is an unconditional framework-level guard, not something individual behaviors implement.
+- **Non-visual components (per-behavior)** — Components with `nonVisual: true` in their metadata (e.g., `DataSource`, `APICall`) produce no DOM output. Each behavior that should skip them checks `nonVisual` independently in its own `canAttach` (e.g., Tooltip, Bookmark) or declares `condition: { type: "visual" }` in its metadata (used by the language server for IDE hints). There is no single global check for `nonVisual`.
+- **`excludeBehaviors` opt-out (per-component)** — A component can list specific behavior names in `excludeBehaviors` in its descriptor. `ComponentAdapter` reads this list and skips any behavior whose `metadata.name` matches, even if `canAttach` would return `true`.
 
 ---
 
