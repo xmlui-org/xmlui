@@ -13,11 +13,14 @@ declaration.
 
 ## What problems this prevents
 
-- A typo in a theme override (`backgroundColor-Button: "#abc def"`,
+- A bad value in a theme override (`backgroundColor-Button: "#abc def"`,
   `padding-Card: "1rim"`) no longer disappears into the browser's
   invalid-declaration trash. The theme validator emits an
   `invalid-theme-value` diagnostic naming the variable, the expected
   shape (`color`, `length`, `duration`, …), and the offending value.
+  In strict mode, XMLUI treats the invalid override as if it had not
+  been declared, so it cannot mask a lower-priority theme value or a
+  component default.
 - A theme override that targets a variable no component ever declared
   (`backgroundColor-Buton`) emits an `unknown-theme-variable` warning
   instead of being silently ignored.
@@ -50,6 +53,13 @@ of the `style` prop through the same rule table. Diagnostics surface as
 strict mode); blocked declarations in strict mode are dropped before the
 rule reaches the DOM, but the rest of the surrounding declarations
 still apply.
+
+Strict theme-variable validation runs before each theme layer is merged.
+That ordering matters: if a child `<Theme>` sets
+`backgroundColor-Button="#abc def"`, the invalid value is reported and
+removed before it can override the inherited `backgroundColor-Button`
+value. The resulting rendering is the same as omitting that one
+attribute, while the console and trace still show the diagnostic.
 
 ## Diagnostic codes
 
@@ -99,6 +109,14 @@ next major release.
 Validation runs in development builds unconditionally and in production
 only when `strictTheming === true`, so production users do not pay the
 validator cost unless they have opted in.
+
+Standalone apps use the same verifier and theming validator as built
+apps. With `strictTheming: true`, invalid `<Theme>` attributes are
+reported in the browser console with messages such as:
+
+```text
+[XMLUI Theme] [invalid-theme-value] Theme variable "backgroundColor-Button": Expected a CSS color, got "#abc def".
+```
 
 ## Migrating away from `style="position: fixed"`
 

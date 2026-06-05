@@ -10,6 +10,8 @@ import type { CoercionRule } from "../../../type-contracts/rules/types";
 const NAMED: ReadonlySet<string> = new Set(["normal", "bold", "lighter", "bolder"]);
 const VAR_RE = /^var\(\s*--[A-Za-z0-9_-]+(?:\s*,.*)?\)$/;
 const TOKEN_RE = /^\$[A-Za-z0-9_-]+$/;
+const THEME_VAR_REF_RE =
+  /^[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*-[A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*(?:--[A-Za-z0-9_-]+)*$/;
 
 export const fontWeightRule: CoercionRule = {
   valueType: "fontWeight" as any,
@@ -30,6 +32,7 @@ export const fontWeightRule: CoercionRule = {
     if (NAMED.has(v.toLowerCase())) return null;
     if (VAR_RE.test(v)) return null;
     if (TOKEN_RE.test(v)) return null;
+    if (THEME_VAR_REF_RE.test(v)) return null;
     const n = Number(v);
     if (Number.isFinite(n) && n >= 100 && n <= 900 && n % 100 === 0) return null;
     return {

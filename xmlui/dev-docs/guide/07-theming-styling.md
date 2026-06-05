@@ -8,8 +8,8 @@ This document covers how themes are defined, compiled, applied, and extended.
 graph TD
   TD1["ThemeDefinition<br>id, extends, themeVars, tones"]
   TD2["Inheritance chain<br>collectThemeChainByExtends()<br>root → xmlui → custom theme"]
-  TD3["Merge base themeVars<br>left-to-right, later overrides earlier"]
-  TD4["Tone overlay<br>tones.light / tones.dark themeVars<br>merged on top of base"]
+  TD3["Validate each theme layer<br>strict invalid values are reported and skipped"]
+  TD4["Merge base + tone themeVars<br>left-to-right, later valid values override earlier"]
   TD5["Derived token generation<br>transformThemeVars()<br>spacing scale, color palettes, font sizes"]
   TD6["\$ref resolution<br>\$color-primary-500<br>→ var(--xmlui-color-primary-500)"]
   TD7["CSS variable map<br>Record&lt;--xmlui-*, string&gt;<br>injected on &lt;html&gt; or nested &lt;div&gt;"]
@@ -23,10 +23,11 @@ graph TD
 ## How It Works at a Glance
 
 1. A **ThemeDefinition** declares an `id`, optional `extends` parent(s), color tokens, and tone-specific overrides
-2. At startup, `ThemeProvider` builds an **inheritance chain** and merges variables left-to-right
-3. **Derived tokens** are generated automatically (spacing scales, color palettes, font sizes)
-4. `$reference` values are resolved to `var(--xmlui-...)` CSS custom properties
-5. Components declare their consumed variables in SCSS modules; `useComponentThemeClass()` injects the resolved values as a CSS class
+2. At startup, `ThemeProvider` builds an **inheritance chain**
+3. In strict theming mode, each layer is validated before it is merged; invalid values are reported and skipped
+4. Valid variables merge left-to-right, tone overrides are applied, and **derived tokens** are generated automatically (spacing scales, color palettes, font sizes)
+5. `$reference` values are resolved to `var(--xmlui-...)` CSS custom properties
+6. Components declare their consumed variables in SCSS modules; `useComponentThemeClass()` injects the resolved values as a CSS class
 
 ---
 
@@ -67,7 +68,7 @@ Themes form an inheritance chain via `extends`. The chain is resolved by `collec
 - All 10 built-in themes extend `xmlui`
 - Custom themes can extend any theme
 
-Variables merge left-to-right: later themes override earlier ones. Multiple inheritance (`extends: ["xmlui", "other"]`) processes parents in array order.
+Variables merge left-to-right: later themes override earlier ones. Multiple inheritance (`extends: ["xmlui", "other"]`) processes parents in array order. In strict theming mode, invalid values are removed before their layer is merged, so an invalid value behaves as if that one theme variable had not been declared.
 
 ---
 
@@ -99,13 +100,15 @@ All are defined in `themes/xmlui.ts` and extend the `xmlui` base theme.
 
 `collectThemeChainByExtends(activeTheme, allThemes, componentDefaults)` walks the `extends` graph to produce a flat array from root to current theme.
 
-### 2. Merge base themeVars
+### 2. Validate and merge base themeVars
 
-All `themeVars` in the chain are merged left-to-right. Component default theme variables (from `defaultThemeVars` in component metadata) are included in the merge.
+Component default theme variables (from `defaultThemeVars` in component metadata) are included in the root layer. In strict theming mode, `sanitizeThemeVarsForStrictTheming()` validates each layer before it is merged. Invalid values produce `invalid-theme-value` diagnostics and are skipped, so they do not mask earlier values from the root theme, parent themes, or component defaults.
+
+For example, if a nested theme sets `backgroundColor-Button="#abc def"`, the value is reported as an invalid color and removed before merge. The rendering is the same as if the attribute were omitted.
 
 ### 3. Apply tone overrides
 
-The active tone's variables (`tones.light.themeVars` or `tones.dark.themeVars`) are merged on top, overriding base values for tone-specific adjustments.
+The active tone's variables (`tones.light.themeVars` or `tones.dark.themeVars`) are validated and merged on top, overriding base values for tone-specific adjustments only when their values are valid.
 
 ### 4. Generate derived tokens
 
@@ -132,6 +135,12 @@ The prefix is always `xmlui` (constant `THEME_VAR_PREFIX`).
 ### 6. Output
 
 A flat `Record<string, string>` with `--xmlui-` prefixed keys, ready for CSS injection.
+
+### Diagnostics
+
+Theme diagnostics are emitted through `emitThemeDiagnostics()`, which writes `kind: "theming"` entries to the inspector trace and reports messages in the browser console. Early layer diagnostics are carried forward even though the offending variables are removed before the final compiled map is built. This keeps strict rendering safe without hiding the reason a variable was ignored.
+
+`unknown-theme-variable` remains a warning even in strict mode because extension packages can register variables late. `invalid-theme-value` becomes an error when `strictTheming` is enabled.
 
 ---
 
@@ -339,7 +348,7 @@ The `wrapComponent()` call receives `ThemedFoo`, not `NativeFoo`.
 
 ## Theme Variable Injection Reduction (Nested Themes)
 
-An XMLUI app can have multiple `<Theme>` elements nested inside each other. Without optimization, every nested theme would inject the entire compiled variable set as CSS custom properties on its wrapper div — hundreds of variables multiplied by nesting depth. The framework avoids this through a 3-layer filtering system in `ThemeNative.tsx`.
+An XMLUI app can have multiple `<Theme>` elements nested inside each other. Without optimization, every nested theme would inject the entire compiled variable set as CSS custom properties on its wrapper div — hundreds of variables multiplied by nesting depth. The framework avoids this through a 3-layer filtering system in `ThemeReact.tsx`.
 
 ### Layer 1: The decision gate
 
@@ -361,7 +370,8 @@ If ALL three conditions are false — meaning this is a layout-only override lik
 When compilation IS needed (tone or theme change), the framework doesn't inject everything. Each compiled variable is checked against the component registry:
 
 ```typescript
-const rawKey = key.replace(/^--[^-]+-/, "");     // strip --xmlui- prefix
+const rawKey = stripThemeCssVarPrefix(key);        // strip --xmlui- prefix
+if (invalidThemeVarNames.has(rawKey)) return;      // strict invalid vars are not emitted
 const componentName = parseHVar(rawKey)?.component;
 const allowed =
   !componentName ||                                // base vars → always
@@ -378,17 +388,18 @@ const allowed =
 
 The `componentThemeVars` set is populated automatically when compound (user-defined) components are registered — `generateUdComponentMetadata` collects all `$variable` references from templates.
 
-### Layer 3: Explicit overrides always pass
+### Layer 3: Explicit valid overrides pass
 
-Regardless of the filtering above, any variable explicitly provided in the `themeVars` prop is always injected:
+Regardless of the filtering above, any valid variable explicitly provided in the `themeVars` prop is injected:
 
 ```typescript
 Object.entries(themeVars).forEach(([key, value]) => {
+  if (invalidThemeVarNames.has(key)) return;
   filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
 });
 ```
 
-This ensures user intent is never lost.
+This ensures scoped overrides keep working without letting invalid values reach the DOM. In strict theming mode, invalid explicit overrides are reported through the theming diagnostics and treated as absent.
 
 ### Practical examples
 
@@ -398,6 +409,7 @@ This ensures user intent is never lost.
 | `<Theme tone="dark">` | Filtered set: base vars + compound component vars + special built-ins + template-referenced vars |
 | `<Theme id="xmlui-green">` | Filtered set for the new theme's compiled output |
 | `<Theme themeVars={{ "color-primary": "red" }}>` | Full filtered set — the base var triggers compilation |
+| `<Theme themeVars={{ "backgroundColor-Button": "#abc def" }}>` with `strictTheming` | Diagnostic emitted; invalid override skipped; inherited/default value remains effective |
 
 ---
 
