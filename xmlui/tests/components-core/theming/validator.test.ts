@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   lookupThemeRule,
@@ -7,7 +7,16 @@ import {
   validateTheme,
   verifyThemeValue,
 } from "../../../src/components-core/theming/validator";
+import {
+  emitThemeDiagnostics,
+  resetThemeDiagnosticDeduplication,
+} from "../../../src/components-core/theming/validator/emit";
 import type { ThemeVarMetadata } from "../../../src/abstractions/ComponentDefs";
+
+afterEach(() => {
+  resetThemeDiagnosticDeduplication();
+  vi.restoreAllMocks();
+});
 
 describe("theming validator — rule table", () => {
   it("returns undefined for opt-out 'string' and unknown types", () => {
@@ -35,6 +44,15 @@ describe("theming validator — rule table", () => {
     ] as const) {
       expect(lookupThemeRule(t), `${t} rule`).toBeDefined();
     }
+  });
+});
+
+describe("theming validator — color", () => {
+  it("accepts component-shaped theme variable references", () => {
+    expect(verifyThemeValue("color", "textColor-Link--hover")).toBeNull();
+  });
+  it("still rejects arbitrary bare words", () => {
+    expect(verifyThemeValue("color", "not-a-color")).not.toBeNull();
   });
 });
 
@@ -84,7 +102,14 @@ describe("theming validator — border", () => {
 });
 
 describe("theming validator — fontFamily", () => {
-  it.each(["Inter, sans-serif", '"Segoe UI", Arial', "serif", "monospace"])("accepts %s", (v) => {
+  it.each([
+    "Inter, sans-serif",
+    '"Segoe UI", Arial',
+    "serif",
+    "monospace",
+    "-apple-system",
+    "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+  ])("accepts %s", (v) => {
     expect(verifyThemeValue("fontFamily", v)).toBeNull();
   });
   it("rejects an entry with stray punctuation", () => {
@@ -93,7 +118,7 @@ describe("theming validator — fontFamily", () => {
 });
 
 describe("theming validator — fontWeight", () => {
-  it.each([100, 400, 900, "normal", "bold", "300", "lighter"])("accepts %s", (v) => {
+  it.each([100, 400, 900, "normal", "bold", "300", "lighter", "fontWeight-Text"])("accepts %s", (v) => {
     expect(verifyThemeValue("fontWeight", v as any)).toBeNull();
   });
   it.each([150, "abc", -100])("rejects %s", (v) => {
@@ -108,6 +133,18 @@ describe("theming validator — lineHeight", () => {
   it("rejects a non-numeric non-length", () => {
     expect(verifyThemeValue("lineHeight", "fluffy")).not.toBeNull();
   });
+});
+
+describe("theming validator — length", () => {
+  it("accepts CSS calc expressions", () => {
+    expect(verifyThemeValue("length", "calc(var(--xmlui-fontSize-Text) * 0.875)")).toBeNull();
+  });
+  it.each(["min(10px, 2rem)", "max(10px, 2rem)", "clamp(12px, 2vw, 18px)"])(
+    "accepts CSS math expression %s",
+    (value) => {
+      expect(verifyThemeValue("length", value)).toBeNull();
+    },
+  );
 });
 
 describe("validateTheme", () => {
@@ -149,6 +186,172 @@ describe("validateTheme", () => {
     const strict = validateTheme(resolved, decls, { strict: true });
     expect(strict[0].code).toBe("unknown-theme-variable");
     expect(strict[0].severity).toBe("warn");
+  });
+
+  it("treats empty string theme values as unset", () => {
+    const resolved = new Map([
+      ["backgroundColor-Button", ""],
+      ["paddingHorizontal-ModalDialog", "   "],
+      ["unknown-theme-variable", ""],
+    ]);
+    expect(validateTheme(resolved, decls, { strict: true })).toEqual([]);
+  });
+
+  it("does not emit unknown-theme-variable for known but untyped names", () => {
+    const resolved = new Map([["backgroundColor-track-Slider", "$color-surface-200"]]);
+    const diags = validateTheme(resolved, decls, {
+      strict: true,
+      knownNames: new Set(["backgroundColor-track-Slider"]),
+    });
+    expect(diags).toEqual([]);
+  });
+
+  it("infers color validation for known theme variables without explicit valueType", () => {
+    const resolved = new Map([["backgroundColor-Button", "#abc def"]]);
+    const diags = validateTheme(
+      resolved,
+      new Map([["backgroundColor-Button", { name: "backgroundColor-Button" }]]),
+      { strict: true },
+    );
+    expect(diags).toHaveLength(1);
+    expect(diags[0]).toMatchObject({
+      code: "invalid-theme-value",
+      severity: "error",
+      variableName: "backgroundColor-Button",
+      expected: "color",
+    });
+  });
+
+  it("does not repeat invalid base color diagnostics for derived Button variants", () => {
+    const resolved = new Map([
+      ["backgroundColor-Button", "#abc def"],
+      ["backgroundColor-Button--hover", "#abc def"],
+      ["backgroundColor-Button-primary-solid", "#abc def"],
+      ["backgroundColor-Button-primary-solid--hover", "#abc def"],
+      ["backgroundColor-Button-primary-solid--active", "#abc def"],
+    ]);
+    const diags = validateTheme(resolved, new Map(), {
+      strict: true,
+      knownNames: new Set(resolved.keys()),
+    });
+    expect(diags.map((diag) => diag.variableName)).toEqual(["backgroundColor-Button"]);
+  });
+
+  it("can include derived diagnostics for strict filtering", () => {
+    const resolved = new Map([
+      ["backgroundColor-Button", "#abc def"],
+      ["backgroundColor-Button--hover", "#abc def"],
+    ]);
+    const diags = validateTheme(resolved, new Map(), {
+      strict: true,
+      knownNames: new Set(resolved.keys()),
+      includeDerived: true,
+    });
+    expect(diags.map((diag) => diag.variableName)).toEqual([
+      "backgroundColor-Button",
+      "backgroundColor-Button--hover",
+    ]);
+  });
+
+  it("keeps explicit invalid derived color diagnostics when the base color is valid", () => {
+    const resolved = new Map([
+      ["backgroundColor-Button", "#fff"],
+      ["backgroundColor-Button-primary-solid", "#abc def"],
+    ]);
+    const diags = validateTheme(resolved, new Map(), {
+      strict: true,
+      knownNames: new Set(resolved.keys()),
+    });
+    expect(diags.map((diag) => diag.variableName)).toEqual([
+      "backgroundColor-Button-primary-solid",
+    ]);
+  });
+
+  it("infers length validation for known theme variables without explicit valueType", () => {
+    const resolved = new Map([["padding-Button", "1rim"]]);
+    const diags = validateTheme(
+      resolved,
+      new Map([["padding-Button", { name: "padding-Button" }]]),
+      { strict: true },
+    );
+    expect(diags).toHaveLength(1);
+    expect(diags[0]).toMatchObject({
+      code: "invalid-theme-value",
+      severity: "error",
+      variableName: "padding-Button",
+      expected: "length",
+    });
+  });
+
+  it("does not repeat invalid shorthand padding diagnostics for generated side variables", () => {
+    const resolved = new Map([
+      ["padding-Button", "1rim"],
+      ["paddingTop-Button", "1rim"],
+      ["paddingRight-Button", "1rim"],
+      ["paddingBottom-Button", "1rim"],
+      ["paddingLeft-Button", "1rim"],
+    ]);
+    const diags = validateTheme(resolved, new Map(), {
+      strict: true,
+      knownNames: new Set(resolved.keys()),
+    });
+    expect(diags.map((diag) => diag.variableName)).toEqual(["padding-Button"]);
+  });
+
+  it("does not repeat invalid base padding diagnostics for size fallback variables", () => {
+    const resolved = new Map([
+      ["padding-Button", "1rim"],
+      ["padding-Button-xs", "1rim"],
+      ["padding-Button-sm", "1rim"],
+      ["padding-Button-md", "1rim"],
+      ["padding-Button-lg", "1rim"],
+    ]);
+    const diags = validateTheme(resolved, new Map(), {
+      strict: true,
+      knownNames: new Set(resolved.keys()),
+    });
+    expect(diags.map((diag) => diag.variableName)).toEqual(["padding-Button"]);
+  });
+
+  it("keeps explicit invalid size-specific padding diagnostics when base padding is valid", () => {
+    const resolved = new Map([
+      ["padding-Button", "4px"],
+      ["padding-Button-xs", "1rim"],
+    ]);
+    const diags = validateTheme(resolved, new Map(), {
+      strict: true,
+      knownNames: new Set(resolved.keys()),
+    });
+    expect(diags.map((diag) => diag.variableName)).toEqual(["padding-Button-xs"]);
+  });
+
+  it("keeps explicit invalid padding side diagnostics when no shorthand is invalid", () => {
+    const resolved = new Map([["paddingTop-Button", "1rim"]]);
+    const diags = validateTheme(resolved, new Map(), {
+      strict: true,
+      knownNames: new Set(resolved.keys()),
+    });
+    expect(diags.map((diag) => diag.variableName)).toEqual(["paddingTop-Button"]);
+  });
+
+  it("accepts multi-token length values for inferred spacing variables", () => {
+    const resolved = new Map([["padding-Button", "$space-2 $space-4"]]);
+    const diags = validateTheme(
+      resolved,
+      new Map([["padding-Button", { name: "padding-Button" }]]),
+      { strict: true },
+    );
+    expect(diags).toEqual([]);
+  });
+
+  it("still emits unknown-theme-variable for typos not in knownNames", () => {
+    const resolved = new Map([["backgroundColor-Buton", "#ff0066"]]);
+    const diags = validateTheme(resolved, decls, {
+      strict: true,
+      knownNames: new Set(["backgroundColor-Button"]),
+    });
+    expect(diags).toHaveLength(1);
+    expect(diags[0].code).toBe("unknown-theme-variable");
   });
 
   it("rejects values not in availableValues", () => {
@@ -274,5 +477,65 @@ describe("validateStyleString (style prop funnel)", () => {
   it("handles empty input", () => {
     expect(validateStyleString("").diagnostics).toEqual([]);
     expect(validateStyleString("   ").diagnostics).toEqual([]);
+  });
+});
+
+describe("emitThemeDiagnostics", () => {
+  it("echoes warning diagnostics to the browser console", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    emitThemeDiagnostics([
+      {
+        code: "unknown-theme-variable",
+        severity: "warn",
+        variableName: "backgroundColor-Buton",
+        actual: "#ff0066",
+        message: "Unknown theme variable 'backgroundColor-Buton'.",
+      },
+    ]);
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("[XMLUI Theme] [unknown-theme-variable]"),
+    );
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("does not echo identical diagnostics more than once", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const diagnostic = {
+      code: "invalid-theme-value" as const,
+      severity: "error" as const,
+      variableName: "backgroundColor-Button",
+      actual: "#abc def",
+      message: 'Theme variable "backgroundColor-Button": Expected a CSS color.',
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    emitThemeDiagnostics([diagnostic]);
+    emitThemeDiagnostics([diagnostic]);
+
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("echoes strict diagnostics to the browser console as errors", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    emitThemeDiagnostics([
+      {
+        code: "position-fixed-blocked",
+        severity: "error",
+        propName: "style",
+        actual: "position: fixed",
+        message: "style blocks position: fixed.",
+      },
+    ]);
+
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining("[XMLUI Theme] [position-fixed-blocked]"),
+    );
+    expect(warn).not.toHaveBeenCalled();
   });
 });

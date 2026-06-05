@@ -5,7 +5,8 @@
  *   - A bare JS `number` (treated as pixels).
  *   - A string of the form `<number><unit>` with a known CSS unit.
  *   - A bare numeric string (treated as pixels).
- *   - CSS custom properties (`var(--…)`) and theme-token references (`$xxx`).
+ *   - CSS custom properties (`var(--…)`), CSS math functions, and
+ *     theme-token references (`$xxx`).
  *   - Special values `auto`, `inherit`, `initial`, `unset`, `revert`.
  */
 
@@ -16,6 +17,7 @@ const UNIT_RE =
 const NUMERIC_RE = /^-?(?:\d+\.?\d*|\.\d+)$/;
 const VAR_RE = /^var\(\s*--[A-Za-z0-9_-]+(?:\s*,.*)?\)$/;
 const TOKEN_RE = /^\$[A-Za-z0-9_-]+$/;
+const CSS_MATH_RE = /^(?:calc|min|max|clamp)\s*\(.+\)$/i;
 const SPECIAL: ReadonlySet<string> = new Set([
   "auto",
   "inherit",
@@ -48,7 +50,22 @@ export const lengthRule: CoercionRule = {
     if (UNIT_RE.test(value)) return null;
     if (VAR_RE.test(value)) return null;
     if (TOKEN_RE.test(value)) return null;
+    if (CSS_MATH_RE.test(value)) return null;
     if (SPECIAL.has(value.toLowerCase())) return null;
+    if (value.includes(" ")) {
+      const parts = value.split(/\s+/).filter(Boolean);
+      if (parts.length >= 2 && parts.length <= 4) {
+        const allLengthParts = parts.every(
+          (part) =>
+            NUMERIC_RE.test(part) ||
+            UNIT_RE.test(part) ||
+            VAR_RE.test(part) ||
+            TOKEN_RE.test(part) ||
+            SPECIAL.has(part.toLowerCase()),
+        );
+        if (allLengthParts) return null;
+      }
+    }
     return {
       message: `Expected a CSS length, got ${JSON.stringify(value)}.`,
       expected: "length",

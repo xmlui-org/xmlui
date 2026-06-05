@@ -317,7 +317,6 @@ const LABEL_BEHAVIOR_PROPS = [
   "required",
   "enabled",
   "shrinkToLabel",
-  "style",
   "readOnly",
 ] as const;
 

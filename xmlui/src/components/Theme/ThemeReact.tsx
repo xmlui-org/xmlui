@@ -28,8 +28,10 @@ import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver"
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import baseStyles from "../../index.scss?inline";
 import { getCSSInjectionAPI } from "../../components-core/cssInjectionRegistry";
+import { useAppContext } from "../../components-core/AppContext";
 
 const STYLE_ID = "xmlui-base-styles";
+const THEME_CSS_VAR_PREFIX = `--${THEME_VAR_PREFIX}-`;
 
 type Props = {
   id?: string;
@@ -61,6 +63,7 @@ export function Theme({
   children,
 }: Props) {
   const generatedId = useId();
+  const appContext = useAppContext();
 
   const { themes, resources, resourceMap, activeThemeId } = useThemes();
   const { activeTheme, activeThemeTone, root } = useTheme();
@@ -94,8 +97,17 @@ export function Theme({
     getResourceUrl,
     fontLinks,
     allThemeVarsWithResolvedHierarchicalVars,
+    invalidThemeVarNames,
     getThemeVar,
-  } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
+  } = useCompiledTheme(
+    currentTheme,
+    themeTone,
+    themes,
+    resources,
+    resourceMap,
+    appContext?.appGlobals?.strictTheming !== false,
+    appContext?.appGlobals?.strictAccessibility === true,
+  );
   const componentRegistry = useComponentRegistry();
 
   const transformedStyles = useMemo(() => {
@@ -122,7 +134,10 @@ export function Theme({
         // parseHVar correctly identifies the component part of a theme var name.
         // Without stripping, "--xmlui-backgroundColor" is parsed as component="backgroundColor"
         // instead of a base (no-component) var.
-        const rawKey = key.replace(/^--[^-]+-/, "");
+        const rawKey = stripThemeCssVarPrefix(key);
+        if (invalidThemeVarNames.has(rawKey)) {
+          return;
+        }
         let componentName = parseHVar(rawKey)?.component;
         const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
         const inComponentThemeVars = componentRegistry.componentThemeVars.has(rawKey);
@@ -152,6 +167,9 @@ export function Theme({
     // Always add the explicitly specified themeVars with the correct prefix,
     // even if they don't match the componentName pattern
     Object.entries(themeVars).forEach(([key, value]) => {
+      if (invalidThemeVarNames.has(key)) {
+        return;
+      }
       filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
     });
 
@@ -209,6 +227,7 @@ export function Theme({
     isRoot,
     componentRegistry,
     allThemeVarsWithResolvedHierarchicalVars,
+    invalidThemeVarNames,
     getThemeVar,
   ]);
 
@@ -321,6 +340,10 @@ export function Theme({
       )}
     </ThemeContext.Provider>
   );
+}
+
+function stripThemeCssVarPrefix(key: string): string {
+  return key.startsWith(THEME_CSS_VAR_PREFIX) ? key.slice(THEME_CSS_VAR_PREFIX.length) : key;
 }
 
 type HtmlClassProps = {

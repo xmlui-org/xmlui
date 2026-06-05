@@ -17,7 +17,7 @@ import type { FnDeps } from "../FnDepsContext";
 import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 import { validateInlineStyle, validateStyleString } from "../theming/validator";
 import type { ThemeValueType } from "../../abstractions/ComponentDefs";
-import { pushXsLog } from "../inspector/inspectorUtils";
+import { emitThemeDiagnostics } from "../theming/validator/emit";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -324,18 +324,7 @@ export function createValueExtractor(
       { propName, rawValue: raw, valueType },
       opts,
     );
-    for (const d of diagnostics) {
-      pushXsLog({
-        kind: "theming",
-        ts: Date.now(),
-        severity: d.severity,
-        code: d.code,
-        propName: d.propName,
-        expected: d.expected,
-        actual: d.actual,
-        message: d.message,
-      });
-    }
+    emitThemeDiagnostics(diagnostics);
     return value;
   };
 
@@ -349,18 +338,7 @@ export function createValueExtractor(
       maxZIndex: appContext?.appGlobals?.maxZIndex ?? 9999,
     };
     const { value, diagnostics } = validateStyleString(rawStr, { componentName }, opts);
-    for (const d of diagnostics) {
-      pushXsLog({
-        kind: "theming",
-        ts: Date.now(),
-        severity: d.severity,
-        code: d.code,
-        propName: d.propName,
-        expected: d.expected,
-        actual: d.actual,
-        message: d.message,
-      });
-    }
+    emitThemeDiagnostics(diagnostics);
     return value;
   };
 

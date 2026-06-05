@@ -40,8 +40,75 @@ import { omit } from "lodash-es";
 import { ThemeToneKeys } from "./utils";
 import { useDomRoot } from "./StyleContext";
 import { validateTheme } from "./validator";
+import { emitThemeDiagnostics } from "./validator/emit";
 import { pushXsLog } from "../inspector/inspectorUtils";
 import { checkThemeContrast } from "../accessibility/contrast";
+import type { ThemeVarMetadata } from "../../abstractions/ComponentDefs";
+import type { ThemeDiagnostic } from "./validator/diagnostics";
+
+function collectThemeVarKeys(value: unknown, keys: Set<string> = new Set()): Set<string> {
+  if (!value || typeof value !== "object") return keys;
+  for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+    if (key === "light" || key === "dark" || key === "tones") {
+      collectThemeVarKeys(nested, keys);
+      continue;
+    }
+    keys.add(key);
+    if (nested && typeof nested === "object") {
+      collectThemeVarKeys(nested, keys);
+    }
+  }
+  return keys;
+}
+
+function addKnownThemeVarName(known: Set<string>, name: string): void {
+  known.add(name);
+  const denamespaced = name.substring(name.lastIndexOf(":") + 1);
+  known.add(denamespaced);
+}
+
+function sanitizeThemeVarsForStrictTheming(
+  vars: Record<string, string> | undefined,
+  strictTheming: boolean | undefined,
+  declarations: ReadonlyMap<string, ThemeVarMetadata>,
+  knownNames: ReadonlySet<string>,
+  invalidNames?: Set<string>,
+  diagnostics?: Array<ThemeDiagnostic>,
+): Record<string, string> {
+  if (!vars || !strictTheming) {
+    return vars ?? {};
+  }
+  const normalizedVars = Object.fromEntries(
+    Object.entries(vars).filter(([, value]) => value !== null && value !== undefined && `${value}`.trim() !== ""),
+  ) as Record<string, string>;
+  const resolved = new Map<string, string>();
+  Object.entries(normalizedVars).forEach(([key, value]) => {
+    resolved.set(key, resolveThemeVar(key, normalizedVars));
+  });
+  const allDiagnostics = validateTheme(resolved, declarations, {
+    strict: true,
+    knownNames,
+    includeDerived: true,
+  });
+  diagnostics?.push(
+    ...validateTheme(resolved, declarations, { strict: true, knownNames }).filter(
+      (diagnostic) => diagnostic.code === "invalid-theme-value",
+    ),
+  );
+  const localInvalidNames = new Set(
+    allDiagnostics
+      .filter((diagnostic) => diagnostic.severity === "error" && diagnostic.code !== "unknown-theme-variable")
+      .map((diagnostic) => diagnostic.variableName)
+      .filter(Boolean) as string[],
+  );
+  localInvalidNames.forEach((name) => invalidNames?.add(name));
+  if (!localInvalidNames.size) {
+    return normalizedVars;
+  }
+  return Object.fromEntries(
+    Object.entries(normalizedVars).filter(([key]) => !localInvalidNames.has(key)),
+  ) as Record<string, string>;
+}
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,
@@ -112,28 +179,59 @@ export function useCompiledTheme(
     return (allFonts?.filter((theme) => typeof theme === "string") || []) as Array<string>;
   }, [allFonts]);
 
-  const themeDefChainVars = useMemo(() => {
+  const declaredThemeVarNames = useMemo(() => {
+    const known = new Set<string>();
+    Object.keys(themeVars.themeVars).forEach((name) => addKnownThemeVarName(known, name));
+    componentThemeVars.forEach((name) => addKnownThemeVarName(known, name));
+    collectThemeVarKeys(componentDefaultThemeVars).forEach((name) => addKnownThemeVarName(known, name));
+    return known;
+  }, [componentDefaultThemeVars, componentThemeVars]);
+
+  const [themeDefChainVars, layerInvalidThemeVarNames, layerThemeDiagnostics] = useMemo<
+    [Array<Record<string, string>>, Set<string>, Array<ThemeDiagnostic>]
+  >(() => {
     if (!themeDefChain?.length) {
-      return [];
+      return [[], new Set<string>(), []];
     }
     let mergedThemeVars = {};
+    const invalidNames = new Set<string>();
+    const layerDiagnostics: Array<ThemeDiagnostic> = [];
     themeDefChain?.forEach((theme) => {
+      const themeVarsForTone = sanitizeThemeVarsForStrictTheming(
+        {
+          ...omit(theme.themeVars, "light", "dark"),
+          ...(theme.themeVars?.[activeTone] as unknown as Record<string, string>),
+          ...theme.tones?.[activeTone]?.themeVars,
+        },
+        strictTheming,
+        componentThemeVarDeclarations,
+        declaredThemeVarNames,
+        invalidNames,
+        layerDiagnostics,
+      );
       mergedThemeVars = {
         ...mergedThemeVars,
-        ...omit(theme.themeVars, "light", "dark"),
-        ...(theme.themeVars?.[activeTone] as unknown as Record<string, string>),
-        ...theme.tones?.[activeTone]?.themeVars,
+        ...themeVarsForTone,
       };
     });
 
     //we put the generated theme vars before the last item in the chain
     const resultedTheme = [
       ...themeDefChain
-        .map((themeDef) => ({
-            ...omit(themeDef.themeVars, "light", "dark"),
-            ...(themeDef.themeVars?.[activeTone] as unknown as Record<string, string>),
-            ...themeDef.tones?.[activeTone]?.themeVars,
-        }))
+        .map((themeDef) =>
+          sanitizeThemeVarsForStrictTheming(
+            {
+              ...omit(themeDef.themeVars, "light", "dark"),
+              ...(themeDef.themeVars?.[activeTone] as unknown as Record<string, string>),
+              ...themeDef.tones?.[activeTone]?.themeVars,
+            },
+            strictTheming,
+            componentThemeVarDeclarations,
+            declaredThemeVarNames,
+            invalidNames,
+            layerDiagnostics,
+          ),
+        )
         .slice(0, themeDefChain.length - 1),
       {
         ...generateBootstrapBaseColumns(mergedThemeVars),
@@ -145,20 +243,45 @@ export function useCompiledTheme(
         ...generateBaseFontSizes(mergedThemeVars),
         ...generateTextFontSizes(mergedThemeVars),
       },
-      {
-        ...omit(themeDefChain[themeDefChain.length - 1].themeVars, "light", "dark"),
-        //...generateTextFontSizes(mergedThemeVars),
-        ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
-          string,
-          string
-        >),
-        ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
-      },
+      sanitizeThemeVarsForStrictTheming(
+        {
+          ...omit(themeDefChain[themeDefChain.length - 1].themeVars, "light", "dark"),
+          //...generateTextFontSizes(mergedThemeVars),
+          ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
+            string,
+            string
+          >),
+          ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
+        },
+        strictTheming,
+        componentThemeVarDeclarations,
+        declaredThemeVarNames,
+        invalidNames,
+        layerDiagnostics,
+      ),
     ];
-    return resultedTheme;
-  }, [activeTone, themeDefChain]);
+    return [resultedTheme, invalidNames, layerDiagnostics];
+  }, [activeTone, componentThemeVarDeclarations, declaredThemeVarNames, strictTheming, themeDefChain]);
 
-  const [allThemeVarsWithResolvedHierarchicalVars, rawAllThemeVars] = useMemo(() => {
+  const knownThemeVarNames = useMemo(() => {
+    const known = new Set(declaredThemeVarNames);
+    themeDefChainVars?.forEach((theme) => {
+      const generated = {
+        ...generateBootstrapBaseColumns(theme),
+        ...generateBaseSpacings(theme),
+        ...generatePaddingSegments(theme),
+        ...generateBorderSegments(theme),
+        ...generateBaseTones(theme),
+        ...generateButtonTones(theme),
+        ...generateBaseFontSizes(theme),
+        ...generateTextFontSizes(theme),
+      };
+      Object.keys(generated).forEach((key) => addKnownThemeVarName(known, key));
+    });
+    return known;
+  }, [declaredThemeVarNames, themeDefChainVars]);
+
+  const [allThemeVarsWithResolvedHierarchicalVars, rawAllThemeVars, invalidThemeVarNames] = useMemo(() => {
     let mergedThemeVars: Record<string, string> = {};
 
     themeDefChainVars?.forEach((theme) => {
@@ -193,38 +316,29 @@ export function useCompiledTheme(
       Object.keys(rawVars).forEach((key) => {
         resolvedForValidation.set(key, resolveThemeVar(key, rawVars));
       });
-      const diags = validateTheme(
+      const allDiags = validateTheme(
         resolvedForValidation,
         componentThemeVarDeclarations,
-        { strict: !!strictTheming },
+        { strict: !!strictTheming, knownNames: knownThemeVarNames, includeDerived: true },
       );
-      for (const d of diags) {
-        pushXsLog({
-          kind: "theming",
-          ts: Date.now(),
-          severity: d.severity,
-          code: d.code,
-          variableName: d.variableName,
-          propName: d.propName,
-          expected: d.expected,
-          actual: d.actual,
-          message: d.message,
-        });
-        if (d.severity === "error") {
-          console.error(`[XMLUI Theme] ${d.message}`);
-        }
-      }
+      const displayDiags = validateTheme(
+        resolvedForValidation,
+        componentThemeVarDeclarations,
+        { strict: !!strictTheming, knownNames: knownThemeVarNames },
+      );
+      emitThemeDiagnostics([...layerThemeDiagnostics, ...displayDiags]);
       const errorVarNames = new Set(
-        diags
+        allDiags
           .filter((d) => d.severity === "error" && d.code !== "unknown-theme-variable")
           .map((d) => d.variableName!)
           .filter(Boolean),
       );
-      if (errorVarNames.size > 0) {
+      const allErrorVarNames = new Set([...layerInvalidThemeVarNames, ...errorVarNames]);
+      if (allErrorVarNames.size > 0) {
         const filteredRawVars = Object.fromEntries(
-          Object.entries(rawVars).filter(([k]) => !errorVarNames.has(k)),
+          Object.entries(rawVars).filter(([k]) => !allErrorVarNames.has(k)),
         );
-        return [resolveThemeVarsWithCssVars(filteredRawVars), rawVars];
+        return [resolveThemeVarsWithCssVars(filteredRawVars), filteredRawVars, allErrorVarNames];
       }
     }
 
@@ -250,8 +364,8 @@ export function useCompiledTheme(
       }
     }
 
-    return [resolveThemeVarsWithCssVars(rawVars), rawVars];
-  }, [componentThemeVarDeclarations, componentThemeVars, strictAccessibility, strictTheming, themeDefChainVars]);
+    return [resolveThemeVarsWithCssVars(rawVars), rawVars, new Set<string>()];
+  }, [componentThemeVarDeclarations, componentThemeVars, knownThemeVarNames, layerInvalidThemeVarNames, layerThemeDiagnostics, strictAccessibility, strictTheming, themeDefChainVars]);
 
   const themeCssVars = useMemo(() => {
     const ret: Record<string, string> = {};
@@ -299,6 +413,7 @@ export function useCompiledTheme(
     fontLinks,
     allThemeVarsWithResolvedHierarchicalVars,
     themeCssVars,
+    invalidThemeVarNames,
     getThemeVar,
   };
 }

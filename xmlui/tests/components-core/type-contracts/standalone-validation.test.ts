@@ -19,6 +19,10 @@ describe("standalone type-contract validation", () => {
       props: {},
       events: {},
     },
+    Stack: {
+      props: {},
+      events: {},
+    },
     Text: {
       props: {
         variant: {
@@ -84,6 +88,32 @@ describe("standalone type-contract validation", () => {
     const messages = validationIssues[0].issues.map((diag) => diag.message);
     expect(messages.some((message) => message.includes("[id-unknown-prop]"))).toBe(false);
     expect(messages.some((message) => message.includes("[value-not-in-enum]"))).toBe(true);
+  });
+
+  it("reports style as an unknown prop when the component does not declare it", () => {
+    const source = `
+      <App>
+        <Stack style="position: fixed; color: red !important;">
+          <Text>Unsafe inline style attempt</Text>
+        </Stack>
+      </App>
+    `;
+    const entryPoint = transformSource(source, "Main.xmlui") as ComponentDef;
+    const appDef: StandaloneAppDescription = { entryPoint, sources: { "Main.xmlui": source } };
+
+    const validationIssues = validateStandaloneAppTypeContracts({
+      appDef,
+      metadataProvider: textContractProvider,
+      strict: false,
+    });
+
+    expect(validationIssues).toHaveLength(1);
+    const messages = validationIssues[0].issues.map((diag) => diag.message);
+    expect(messages).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('[id-unknown-prop] <Stack> has unknown prop "style"'),
+      ]),
+    );
   });
 
   it("does not format enum diagnostics for expression values", () => {

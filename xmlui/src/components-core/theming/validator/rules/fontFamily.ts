@@ -8,7 +8,8 @@
 
 import type { CoercionRule } from "../../../type-contracts/rules/types";
 
-const BARE_IDENT_RE = /^[A-Za-z_][A-Za-z0-9_-]*(?:\s+[A-Za-z_][A-Za-z0-9_-]*)*$/;
+const CSS_IDENT_RE = /-?[A-Za-z_][A-Za-z0-9_-]*/;
+const BARE_IDENT_RE = new RegExp(`^${CSS_IDENT_RE.source}(?:\\s+${CSS_IDENT_RE.source})*$`);
 const QUOTED_RE = /^(?:"[^"]*"|'[^']*')$/;
 const VAR_RE = /^var\(\s*--[A-Za-z0-9_-]+(?:\s*,.*)?\)$/;
 const TOKEN_RE = /^\$[A-Za-z0-9_-]+$/;
