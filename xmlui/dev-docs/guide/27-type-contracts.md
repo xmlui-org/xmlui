@@ -54,7 +54,7 @@ flowchart TD
 | `xmlui/src/components-core/type-contracts/diagnostics.ts` | Diagnostic code and payload types. |
 | `xmlui/src/components-core/type-contracts/rules/coerce.ts` | Shared value-verification and coercion table. |
 | `xmlui/src/components-core/type-contracts/rules/*` | Refined value rules such as `integer`, `color`, `length`, `url`, `icon`, and `id-ref`. |
-| `xmlui/src/components-core/type-contracts/suggestions.ts` | Levenshtein helper for `unknown-prop` suggestions. |
+| `xmlui/src/components-core/type-contracts/suggestions.ts` | Levenshtein helper for `id-unknown-prop` suggestions. |
 | `xmlui/src/components-core/type-contracts/suppression.ts` | Source-aware suppression filter for LSP, Vite, and standalone adapters. |
 | `xmlui/src/components-core/type-contracts/standalone-validation.ts` | Browser startup adapter for standalone console, toast, and error-screen presentation. |
 | `xmlui/src/language-server/services/type-contract-diagnostic.ts` | LSP adapter from type-contract diagnostics to `vscode-languageserver` diagnostics. |
@@ -115,7 +115,7 @@ runtime path.
 If `Button` metadata declares `label` and a finite set of `variant` values, the
 static verifier reports:
 
-- `unknown-prop` for `labe`, with a suggestion for `label` when the edit
+- `id-unknown-prop` for `labe`, with a suggestion for `label` when the edit
   distance is close enough.
 - `value-not-in-enum` for `variant` if `"vibrant"` is not declared in
   `availableValues`.
@@ -125,7 +125,7 @@ static verifier reports:
 ```
 
 If the component metadata declares `submit` but not `submitt`, the verifier
-reports `unknown-event`.
+reports `id-unknown-event`.
 
 ```xml
 <Image />
@@ -139,7 +139,7 @@ If `Image` metadata marks `src` as required, the verifier reports
 ```
 
 If `Button` metadata declares `focus` but not `reset`, the verifier reports
-`unknown-exposed-method`.
+`id-unknown-method`.
 
 ### Static Verification Boundaries
 
@@ -150,12 +150,12 @@ in editor tooling, build tooling, tests, and any future CLI surfaces.
 
 The verifier also does not parse suppression comments itself. Source-aware
 adapters call `filterSuppressedTypeContractDiagnostics()` after verification.
-The filter honors both type-contract codes and analyzer-style aliases such as
-`id-unknown-prop` for `unknown-prop`, so build-validation suppression comments
-work across LSP, Vite, and standalone startup validation.
+Shared identifier-oriented checks use the same codes as the analyzer, such as
+`id-unknown-prop`, so build-validation suppression comments work across LSP,
+Vite, and standalone startup validation without alias translation.
 
 Unknown components can be skipped by passing `skipUnknown: true`. The LSP and
-Vite integration currently do this because unknown-component diagnostics are
+Vite integration currently do this because id-unknown-component diagnostics are
 also handled by the broader analyzer pipeline.
 
 Standalone startup validation also uses `skipUnknown: true` so user-defined
@@ -315,13 +315,13 @@ errors while you clean up markup.
 
 Strict mode escalates these diagnostics to errors:
 
-- `unknown-component`
-- `unknown-prop`
+- `id-unknown-component`
+- `id-unknown-prop`
 - `wrong-type`
 - `missing-required`
 - `value-not-in-enum`
-- `unknown-event`
-- `unknown-exposed-method`
+- `id-unknown-event`
+- `id-unknown-method`
 
 Deprecation diagnostics remain warnings because deprecated APIs are still valid
 during their migration window.
@@ -335,13 +335,13 @@ ships.
 
 | Code | Cause | Typical surface |
 |---|---|---|
-| `unknown-component` | Component type is absent from the registry. | Analyzer/static verifier, depending on caller options |
-| `unknown-prop` | Prop is not declared in component metadata and is not a layout prop. | LSP, Vite, standalone |
+| `id-unknown-component` | Component type is absent from the registry. | Analyzer/static verifier, depending on caller options |
+| `id-unknown-prop` | Prop is not declared in component metadata and is not a layout prop. | LSP, Vite, standalone |
 | `wrong-type` | Literal or resolved value fails `valueType`. | LSP/Vite/standalone for literals, runtime for expressions |
 | `missing-required` | Required prop is absent. | LSP, Vite, standalone |
 | `value-not-in-enum` | Literal or resolved value is outside `availableValues`. | LSP/Vite/standalone for literals, runtime for expressions |
-| `unknown-event` | Event is not declared in component metadata. | LSP, Vite, standalone |
-| `unknown-exposed-method` | Method reference targets an undeclared component API. | LSP, Vite, standalone |
+| `id-unknown-event` | Event is not declared in component metadata. | LSP, Vite, standalone |
+| `id-unknown-method` | Method reference targets an undeclared component API. | LSP, Vite, standalone |
 | `deprecated-prop` | Prop has `deprecationMessage`. | LSP, Vite, standalone |
 
 ## Authoring Metadata for Contracts

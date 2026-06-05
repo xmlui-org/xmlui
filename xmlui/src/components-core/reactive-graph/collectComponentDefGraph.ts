@@ -175,7 +175,10 @@ function sourceInfoFor(
   const debug = node.debug as
     | {
         source?: { fileId?: string | number; line?: number; col?: number };
-        reactiveNodes?: Record<string, { fileId?: string | number; line?: number; col?: number }>;
+        reactiveNodes?: Record<
+          string,
+          { fileId?: string | number; line?: number; col?: number; length?: number }
+        >;
       }
     | undefined;
   const source = debug?.reactiveNodes?.[`${kind}.${name}`] ?? debug?.source;
@@ -183,8 +186,9 @@ function sourceInfoFor(
   const uri = source.fileId === undefined ? undefined : String(source.fileId);
   const line = typeof source.line === "number" ? source.line : undefined;
   const col = typeof source.col === "number" ? source.col : undefined;
+  const length = typeof (source as any).length === "number" ? (source as any).length : undefined;
   return {
     ...(uri !== undefined ? { uri } : {}),
-    ...(line !== undefined && col !== undefined ? { range: { line, col } } : {}),
+    ...(line !== undefined && col !== undefined ? { range: { line, col, length } } : {}),
   };
 }

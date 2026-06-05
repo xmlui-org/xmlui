@@ -107,7 +107,7 @@ export type StandaloneAppDescription = {
    * - `strictTypeContracts` (boolean, default `true`) — when `true`, parse-time
    *   prop / event / value-type violations surfaced by the type-contract verifier
    *   escalate from `warn` to `error`: the LSP reports `DiagnosticSeverity.Error`,
-   *   the Vite plugin fails the build on `unknown-prop`, `wrong-type`,
+   *   the Vite plugin fails the build on `id-unknown-prop`, `wrong-type`,
    *   `missing-required`, and `value-not-in-enum`, and the runtime emits a
    *   `kind:"type-contract"` error trace entry. Set to `false` to keep the
    *   Wave 3 rollout behaviour where the verifier emits warn-level diagnostics. See

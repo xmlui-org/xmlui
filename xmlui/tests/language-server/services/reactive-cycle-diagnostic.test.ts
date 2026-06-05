@@ -26,31 +26,35 @@ describe("reactive-cycle-diagnostic (LSP provider)", () => {
     expect(diags).toEqual([]);
   });
 
-  it("returns one Warning diagnostic for a two-var cycle", () => {
+  it("returns one Warning diagnostic per member of a two-var cycle", () => {
     const diags = diagnosticsForMarkup(`
       <Stack var.a="{b + 1}" var.b="{a + 1}" />
     `);
-    expect(diags).toHaveLength(1);
-    const [d] = diags;
-    expect(d.severity).toBe(DiagnosticSeverity.Warning);
-    expect(d.code).toBe("reactive-cycle");
-    expect(d.source).toBe("xmlui-reactive-graph");
+    expect(diags).toHaveLength(2);
+    for (const d of diags) {
+      expect(d.severity).toBe(DiagnosticSeverity.Warning);
+      expect(d.code).toBe("reactive-cycle");
+      expect(d.source).toBe("xmlui-reactive-graph");
+    }
     // The cycle text should reference both var names.
-    expect(d.message).toMatch(/\ba\b/);
-    expect(d.message).toMatch(/\bb\b/);
+    expect(diags[0].message).toMatch(/\ba\b/);
+    expect(diags[0].message).toMatch(/\bb\b/);
   });
 
-  it("anchors diagnostics and related information to cycle members", () => {
+  it("anchors diagnostics and related information to all cycle members", () => {
     const diags = diagnosticsForMarkup(`
       <Stack var.a="{b + 1}" var.b="{a + 1}" />
     `);
-    expect(diags).toHaveLength(1);
-    const [d] = diags;
-    expect(d.range.start.line).toBeGreaterThan(0);
-    expect(d.relatedInformation).toHaveLength(2);
-    expect(d.relatedInformation?.map((info) => info.location.uri)).toEqual(["0", "0"]);
-    expect(d.relatedInformation?.map((info) => info.message).join("\n")).toMatch(/\ba\b/);
-    expect(d.relatedInformation?.map((info) => info.message).join("\n")).toMatch(/\bb\b/);
+    expect(diags).toHaveLength(2);
+    expect(diags.map((d) => d.range.start.line)).toEqual([1, 1]);
+    expect(diags.map((d) => d.range.start.character).sort((a, b) => a - b)).toEqual([13, 29]);
+    expect(diags.every((d) => d.range.end.character > d.range.start.character + 1)).toBe(true);
+    for (const d of diags) {
+      expect(d.relatedInformation).toHaveLength(2);
+      expect(d.relatedInformation?.map((info) => info.location.uri)).toEqual(["0", "0"]);
+      expect(d.relatedInformation?.map((info) => info.message).join("\n")).toMatch(/\ba\b/);
+      expect(d.relatedInformation?.map((info) => info.message).join("\n")).toMatch(/\bb\b/);
+    }
   });
 
   it("returns no diagnostics for null component", () => {
@@ -62,9 +66,11 @@ describe("reactive-cycle-diagnostic (LSP provider)", () => {
     const diags = diagnosticsForMarkup(`
       <Stack var.x="{y}" var.y="{x}" />
     `);
-    expect(diags).toHaveLength(1);
+    expect(diags).toHaveLength(2);
+    expect(new Set(diags.map((d) => (d as any).data.cycleId)).size).toBe(1);
     expect((diags[0] as any).data).toMatchObject({
       cycleId: expect.any(String),
+      nodeId: expect.any(String),
     });
   });
 });

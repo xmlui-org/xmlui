@@ -26,7 +26,7 @@ export function getTypeContractDiagnostics(
 
     return filterSuppressedTypeContractDiagnostics(diagnostics, source).map((d) => {
       const line = Math.max(0, (d.range?.line ?? 1) - 1);
-      const col = Math.max(0, d.range?.col ?? 0);
+      const col = Math.max(0, (d.range?.col ?? 1) - 1);
       const lspDiag: Diagnostic = {
         severity:
           d.severity === "error" ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning,
@@ -34,7 +34,7 @@ export function getTypeContractDiagnostics(
           start: { line, character: col },
           end: { line, character: col + (d.range?.length ?? 1) },
         },
-        message: d.message,
+        message: formatDiagnosticMessage(d),
         code: d.code,
         source: "xmlui-type-contract",
       };
@@ -59,4 +59,13 @@ function unwrapCompound(def: ComponentDef | CompoundComponentDef): ComponentDef 
     return (def as CompoundComponentDef).component as ComponentDef;
   }
   return def as ComponentDef;
+}
+
+function formatDiagnosticMessage(
+  diagnostic: ReturnType<typeof verifyComponentDef>[number],
+): string {
+  if (!diagnostic.suggestion) {
+    return diagnostic.message;
+  }
+  return `${diagnostic.message} Did you mean "${diagnostic.suggestion}"?`;
 }

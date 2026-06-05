@@ -658,16 +658,20 @@ export function nodeToComponentDef(
         } else if (startSegment === "method") {
           comp.api ??= {};
           comp.api[name] = parseEvent(value, attrValueStringNode);
+          setAttributeLocation(comp, name, attr);
         } else if (startSegment === "event") {
           comp.events ??= {};
           comp.events[name] = parseEvent(value, attrValueStringNode);
+          setAttributeLocation(comp, name, attr);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
           comp.events[eventName] = parseEvent(value, attrValueStringNode);
+          setAttributeLocation(comp, eventName, attr);
         } else {
           comp.props ??= {};
           comp.props[name] = value;
+          setAttributeLocation(comp, name, attr);
         }
         return;
     }
@@ -954,6 +958,7 @@ export function nodeToComponentDef(
     fileId: string | number;
     line?: number;
     col?: number;
+    length?: number;
   } {
     const loc: {
       start: number;
@@ -961,17 +966,57 @@ export function nodeToComponentDef(
       fileId: string | number;
       line?: number;
       col?: number;
+      length?: number;
     } = {
-      start: node.start ?? node.pos ?? 0,
-      end: node.end ?? node.start ?? node.pos ?? 0,
+      start: node.pos ?? node.start ?? 0,
+      end: node.end ?? node.pos ?? node.start ?? 0,
       fileId,
     };
     if (cursor) {
-      const { line, character } = cursor.positionAt(node.pos ?? node.start ?? 0);
+      const { line, character } = cursor.positionAt(loc.start);
       loc.line = line + 1;
       loc.col = character + 1;
+      loc.length = Math.max(1, loc.end - loc.start);
     }
     return loc;
+  }
+
+  function sourceLocationForAttribute(attr: Node): {
+    name?: ReturnType<typeof sourceLocationFor>;
+    value?: ReturnType<typeof sourceLocationFor>;
+    full: ReturnType<typeof sourceLocationFor>;
+  } {
+    const keyNode = attr.children?.[0];
+    const valueNode = attr.children?.[2];
+    return {
+      ...(keyNode ? { name: sourceLocationFor(keyNode) } : {}),
+      ...(valueNode ? { value: sourceLocationForAttributeValue(valueNode) } : {}),
+      full: sourceLocationFor(attr),
+    };
+  }
+
+  function sourceLocationForAttributeValue(node: Node): ReturnType<typeof sourceLocationFor> {
+    const loc = sourceLocationFor(node);
+    if (loc.end - loc.start >= 2) {
+      loc.start += 1;
+      loc.end -= 1;
+      if (loc.col !== undefined) {
+        loc.col += 1;
+      }
+      loc.length = Math.max(1, loc.end - loc.start);
+    }
+    return loc;
+  }
+
+  function setAttributeLocation(
+    comp: ComponentDef | CompoundComponentDef,
+    name: string | undefined,
+    attr: Node,
+  ): void {
+    if (!name || !isComponent(comp)) return;
+    const debug = (comp.debug ??= {});
+    const attributes = ((debug as any).attributes ??= {});
+    attributes[name] = sourceLocationForAttribute(attr);
   }
 
   function setReactiveNodeLocation(

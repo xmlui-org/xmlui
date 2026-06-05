@@ -55,7 +55,7 @@ describe("standalone type-contract validation", () => {
     expect(validationIssues[0].componentName).toBe("Main");
     expect(validationIssues[0].issues.map((diag) => diag.message)).toEqual(
       expect.arrayContaining([
-        expect.stringContaining("[xmlui:type-contract] [unknown-prop]"),
+        expect.stringContaining("[xmlui:type-contract] [id-unknown-prop]"),
         expect.stringContaining("[xmlui:type-contract] [value-not-in-enum]"),
       ]),
     );
@@ -82,7 +82,7 @@ describe("standalone type-contract validation", () => {
 
     expect(validationIssues).toHaveLength(1);
     const messages = validationIssues[0].issues.map((diag) => diag.message);
-    expect(messages.some((message) => message.includes("[unknown-prop]"))).toBe(false);
+    expect(messages.some((message) => message.includes("[id-unknown-prop]"))).toBe(false);
     expect(messages.some((message) => message.includes("[value-not-in-enum]"))).toBe(true);
   });
 

@@ -5,13 +5,6 @@ import {
 } from "../analyzer/suppression";
 import type { TypeContractDiagnostic } from "./diagnostics";
 
-const TYPE_CONTRACT_SUPPRESSION_ALIASES: Partial<Record<string, string>> = {
-  "unknown-component": "id-unknown-component",
-  "unknown-prop": "id-unknown-prop",
-  "unknown-event": "id-unknown-event",
-  "unknown-exposed-method": "id-unknown-method",
-};
-
 export function filterSuppressedTypeContractDiagnostics(
   diagnostics: readonly TypeContractDiagnostic[],
   source: string | undefined,
@@ -31,15 +24,5 @@ export function isTypeContractDiagnosticSuppressed(
   const line = diagnostic.range?.line;
   if (line === undefined) return false;
 
-  for (const code of suppressionCodesFor(diagnostic.code)) {
-    if (isSuppressed(code, line, suppressions)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function suppressionCodesFor(code: TypeContractDiagnostic["code"]): string[] {
-  const alias = TYPE_CONTRACT_SUPPRESSION_ALIASES[code];
-  return alias ? [code, alias] : [code];
+  return isSuppressed(diagnostic.code, line, suppressions);
 }

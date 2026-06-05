@@ -9,10 +9,10 @@
  *
  * Phase 2 (W3-2) fills in the full per-component checks:
  *   - `missing-required`   required prop absent from the def
- *   - `unknown-prop`       prop not declared in metadata (Levenshtein hint)
+ *   - `id-unknown-prop`       prop not declared in metadata (Levenshtein hint)
  *   - `wrong-type`         literal value fails the declared `valueType` rule
  *   - `value-not-in-enum`  literal value outside the `availableValues` set
- *   - `unknown-event`      event not declared in metadata
+ *   - `id-unknown-event`      event not declared in metadata
  *   - `deprecated-prop`    prop carries a `deprecationMessage`
  *
  * Expression-valued props (`value="{state.x}"`) are skipped for type/enum
@@ -37,7 +37,7 @@ export interface VerifyOptions {
   strict?: boolean;
   /**
    * When `true`, components not found in the registry are silently skipped
-   * (no `unknown-component` diagnostic).
+   * (no `id-unknown-component` diagnostic).
    */
   skipUnknown?: boolean;
 }
@@ -79,7 +79,7 @@ export function verifyComponentDef(
     if (!meta) {
       if (!skipUnknown && !isFrameworkType(typeName)) {
         diagnostics.push({
-          code: "unknown-component",
+          code: "id-unknown-component",
           severity,
           componentName: typeName,
           range: extractRange(node),
@@ -113,7 +113,7 @@ export function verifyComponentDef(
       }
     }
 
-    // Per-def-prop checks: unknown-prop, wrong-type, value-not-in-enum, deprecated-prop
+    // Per-def-prop checks: id-unknown-prop, wrong-type, value-not-in-enum, deprecated-prop
     const knownPropNames = [
       ...Object.keys(metaProps),
       ...supportedBehaviorPropNames(typeName, meta),
@@ -132,11 +132,11 @@ export function verifyComponentDef(
         ) {
           const suggestion = findSuggestion(propName, knownPropNames);
           diagnostics.push({
-            code: "unknown-prop",
+            code: "id-unknown-prop",
             severity,
             componentName: typeName,
             propName,
-            range: extractRange(node),
+            range: extractAttributeNameRange(node, propName),
             message: `<${typeName}> has unknown prop "${propName}".`,
             ...(suggestion !== undefined ? { suggestion } : {}),
           });
@@ -151,7 +151,7 @@ export function verifyComponentDef(
           severity: "warn",
           componentName: typeName,
           propName,
-          range: extractRange(node),
+          range: extractAttributeNameRange(node, propName),
           message: `Prop "${propName}" on <${typeName}> is deprecated: ${propMeta.deprecationMessage}`,
         });
       }
@@ -172,7 +172,7 @@ export function verifyComponentDef(
             propName,
             expected: enumFailure.expected,
             actual: rawValue != null ? String(rawValue) : undefined,
-            range: extractRange(node),
+            range: extractAttributeValueRange(node, propName),
             message: `<${typeName}> prop "${propName}": ${enumFailure.message}`,
           });
           continue; // enum failure subsumes type failure for the same value
@@ -190,7 +190,7 @@ export function verifyComponentDef(
             propName,
             expected: typeFailure.expected ?? propMeta.valueType,
             actual: rawValue != null ? String(rawValue) : undefined,
-            range: extractRange(node),
+            range: extractAttributeValueRange(node, propName),
             message: `<${typeName}> prop "${propName}": ${typeFailure.message}`,
           });
         }
@@ -204,11 +204,11 @@ export function verifyComponentDef(
     for (const eventName of Object.keys(defEvents)) {
       if (!(eventName in metaEvents) && !isFrameworkEvent(eventName)) {
         diagnostics.push({
-          code: "unknown-event",
+          code: "id-unknown-event",
           severity,
           componentName: typeName,
           propName: eventName,
-          range: extractRange(node),
+          range: extractAttributeNameRange(node, eventName),
           message: `<${typeName}> has unknown event "${eventName}".`,
         });
       }
@@ -221,11 +221,11 @@ export function verifyComponentDef(
     for (const apiName of Object.keys(defApis)) {
       if (!(apiName in metaApis)) {
         diagnostics.push({
-          code: "unknown-exposed-method",
+          code: "id-unknown-method",
           severity,
           componentName: typeName,
           propName: apiName,
-          range: extractRange(node),
+          range: extractAttributeNameRange(node, apiName),
           message: `<${typeName}> exposes unknown method "${apiName}".`,
         });
       }
@@ -454,8 +454,23 @@ function isExpressionValue(value: unknown): boolean {
   return /\{[^}]+\}/.test(value);
 }
 
-function extractRange(node: any): TypeContractDiagnostic["range"] {
-  const sourceRange = node?.debug?.source ?? node?.__SOURCE_RANGE ?? node?.__SOURCE;
+function extractAttributeNameRange(
+  node: any,
+  propName: string,
+): TypeContractDiagnostic["range"] {
+  return extractRange(node?.debug?.attributes?.[propName]?.name) ?? extractRange(node);
+}
+
+function extractAttributeValueRange(
+  node: any,
+  propName: string,
+): TypeContractDiagnostic["range"] {
+  const attrRange = node?.debug?.attributes?.[propName];
+  return extractRange(attrRange?.value) ?? extractRange(attrRange?.name) ?? extractRange(node);
+}
+
+function extractRange(nodeOrRange: any): TypeContractDiagnostic["range"] {
+  const sourceRange = nodeOrRange?.debug?.source ?? nodeOrRange?.__SOURCE_RANGE ?? nodeOrRange?.__SOURCE ?? nodeOrRange;
   if (!sourceRange) return undefined;
   if (
     typeof sourceRange.line === "number" &&

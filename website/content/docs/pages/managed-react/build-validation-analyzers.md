@@ -165,10 +165,9 @@ Directives can name more than one code:
 <Button labe="Save" variant="vibrant" />
 ```
 
-Type-contract diagnostics honor these directives too. For example,
-`id-unknown-prop` suppresses the type-contract `unknown-prop` diagnostic, while
-verifier-only diagnostics such as `value-not-in-enum` can be suppressed by their
-own code.
+Type-contract diagnostics honor these directives too. Shared checks use the same
+codes as the analyzer, such as `id-unknown-prop`; type-contract-specific
+diagnostics such as `value-not-in-enum` are suppressed by their own code.
 
 There is **no blanket disable** (`<!-- xmlui-disable -->` with no
 code is intentionally not supported). Suppression must always

@@ -19,7 +19,7 @@ describe("language-server diagnostics - type contracts", () => {
       expect.arrayContaining([
         expect.objectContaining({
           source: "xmlui-type-contract",
-          code: "unknown-prop",
+          code: "id-unknown-prop",
         }),
         expect.objectContaining({
           source: "xmlui-type-contract",

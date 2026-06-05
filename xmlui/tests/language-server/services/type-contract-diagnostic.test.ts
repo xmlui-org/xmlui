@@ -15,8 +15,9 @@ describe("type-contract-diagnostic (LSP provider)", () => {
     expect(diags).toHaveLength(1);
     expect(diags[0]).toMatchObject({
       severity: DiagnosticSeverity.Warning,
-      code: "unknown-prop",
+      code: "id-unknown-prop",
       source: "xmlui-type-contract",
+      message: `<Button> has unknown prop "labe". Did you mean "label"?`,
       data: {
         propName: "labe",
         replacement: "label",
@@ -47,7 +48,7 @@ describe("type-contract-diagnostic (LSP provider)", () => {
       </App>
     `);
 
-    expect(diags.some((diag) => diag.code === "unknown-prop")).toBe(false);
+    expect(diags.some((diag) => diag.code === "id-unknown-prop")).toBe(false);
     expect(diags.some((diag) => diag.code === "value-not-in-enum")).toBe(true);
   });
 
@@ -60,5 +61,32 @@ describe("type-contract-diagnostic (LSP provider)", () => {
     `);
 
     expect(diags).toEqual([]);
+  });
+
+  it("targets attribute names and values instead of the host tag", () => {
+    const markup = `<App>
+  <Button labe="Save" variant="vibrant" />
+</App>`;
+
+    const diags = diagnosticsForMarkup(markup);
+
+    expect(diags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "id-unknown-prop",
+          range: {
+            start: { line: 1, character: 10 },
+            end: { line: 1, character: 14 },
+          },
+        }),
+        expect.objectContaining({
+          code: "value-not-in-enum",
+          range: {
+            start: { line: 1, character: 31 },
+            end: { line: 1, character: 38 },
+          },
+        }),
+      ]),
+    );
   });
 });

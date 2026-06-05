@@ -91,6 +91,11 @@ and Vite builds (`reactiveCycles: "off" | "warn" | "strict"`). Strict runtime
 mode is default-on through `App.appGlobals.strictReactiveGraph`; set it to
 `false` only while migrating known cycles.
 
+Runtime variable resolution skips local vars and functions that belong to a
+detected cycle. This keeps cyclic declarations unresolved for consumers instead
+of evaluating them from partial two-pass state and producing accidental values
+such as `NaN`.
+
 ## Lexical Scoping Optimizer (`computedUses`)
 
 Expression dependencies are also used before runtime to reduce unnecessary
