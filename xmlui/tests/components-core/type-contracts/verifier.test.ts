@@ -216,6 +216,28 @@ describe("verifyComponentDef — unknown-prop", () => {
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
 
+  it("skips layout props with state variants", () => {
+    const registry = makeRegistry({
+      Button: { props: { label: { description: "label" } } },
+    });
+    const def = {
+      type: "Button",
+      props: { "backgroundColor--hover": "red", "color--hover--active": "white" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
+  it("skips layout props with responsive and state variants", () => {
+    const registry = makeRegistry({
+      Button: { props: { label: { description: "label" } } },
+    });
+    const def = {
+      type: "Button",
+      props: { "backgroundColor-md--hover": "red" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
   it("skips all props for components with allowArbitraryProps", () => {
     const registry = makeRegistry({
       HtmlDiv: { allowArbitraryProps: true },
@@ -223,6 +245,17 @@ describe("verifyComponentDef — unknown-prop", () => {
     const def = {
       type: "HtmlDiv",
       props: { "data-testid": "div", customAttr: "val" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
+  it("normalizes Xmlui namespace component names before metadata lookup", () => {
+    const registry = makeRegistry({
+      Button: { props: { label: { description: "label" } } },
+    });
+    const def = {
+      type: "#xmlui-core-ns:Button",
+      props: { label: "Save" },
     } as ComponentDef;
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
@@ -428,6 +461,78 @@ describe("verifyComponentDef — unknown-event", () => {
       events: { click: "handleClick()" },
     } as ComponentDef;
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+});
+
+describe("verifyComponentDef — unknown-exposed-method", () => {
+  it("emits unknown-exposed-method for an api not in metadata", () => {
+    const registry = makeRegistry({
+      Button: {
+        apis: { focus: { description: "Focus the button" } },
+      },
+    });
+    const def = {
+      type: "Button",
+      api: { reset: "resetButton()" },
+    } as ComponentDef;
+    const result = verifyComponentDef(def, registry);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      code: "unknown-exposed-method",
+      componentName: "Button",
+      propName: "reset",
+    });
+  });
+
+  it("does not emit unknown-exposed-method for a declared api", () => {
+    const registry = makeRegistry({
+      Button: {
+        apis: { focus: { description: "Focus the button" } },
+      },
+    });
+    const def = {
+      type: "Button",
+      api: { focus: "focusButton()" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+});
+
+describe("verifyComponentDef — behavior props", () => {
+  it("accepts behavior props only when the behavior supports the host", () => {
+    const registry = makeRegistry({
+      Visual: {
+        props: {},
+      },
+      NonVisual: {
+        props: {},
+        nonVisual: true,
+      },
+    });
+
+    expect(
+      verifyComponentDef(
+        {
+          type: "Visual",
+          props: { tooltip: "Help" },
+        } as ComponentDef,
+        registry,
+      ),
+    ).toHaveLength(0);
+
+    const result = verifyComponentDef(
+      {
+        type: "NonVisual",
+        props: { tooltip: "Help" },
+      } as ComponentDef,
+      registry,
+    );
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      code: "unknown-prop",
+      componentName: "NonVisual",
+      propName: "tooltip",
+    });
   });
 });
 

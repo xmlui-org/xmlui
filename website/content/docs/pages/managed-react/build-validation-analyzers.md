@@ -56,15 +56,15 @@ are presented.
 | `expr-handler-no-value` | `info` | Event-handler body that returns nothing useful (e.g., a bare identifier). |
 | `determinism-floating-point-token` | `info` | Floating-point literals in expressions evaluated under deterministic schedulers. |
 | `determinism-iteration-order-symbol` | `info` | Iteration helpers that read `Object.getOwnPropertySymbols`. |
-| `theming-missing-prefix` | `info` | Theme-variable reference in `style`/`vars` uses an unknown or missing package prefix (plan #02). |
+| `theming-missing-prefix` | `info` | Theme-variable reference in `style`/`vars` uses an unknown or missing package prefix. |
 
 Additional rule families — `id-unknown-method`, `id-unknown-slot`,
 `expr-unused-var`, `expr-unbound-identifier`,
 `id-undefined-component-ref`, `id-undefined-form-ref` — are
 registered as no-op stubs today and will activate once their
 supporting infrastructure (metadata-driven slot declarations and
-cross-expression scope tracking from the verified-type-contracts
-plan) ships.
+cross-expression scope tracking from verified type contracts)
+is available on those analyzer paths.
 
 ## The three surfaces
 
@@ -139,7 +139,15 @@ The `xmlui.config.json` accepts per-rule overrides:
 
 ## Suppression directives
 
-Single-rule, comment-based, modelled on the standard LSP norm:
+Suppression directives are XML comments that silence specific diagnostic codes.
+Each directive must name at least one code, and multiple codes can be separated
+with spaces.
+
+| Directive | Scope |
+|---|---|
+| `<!-- xmlui-disable-next-line code -->` | Suppresses `code` on the following source line only. |
+| `<!-- xmlui-disable code -->` | Starts a suppression block for `code` on the next source line. |
+| `<!-- xmlui-enable code -->` | Ends an active suppression block for `code`; the enable comment line itself is not suppressed. |
 
 ```xmlui
 <!-- xmlui-disable-next-line id-unknown-component -->
@@ -149,6 +157,18 @@ Single-rule, comment-based, modelled on the standard LSP norm:
 <Button experimentalProp="…" />
 <!-- xmlui-enable id-unknown-prop -->
 ```
+
+Directives can name more than one code:
+
+```xmlui
+<!-- xmlui-disable-next-line id-unknown-prop value-not-in-enum -->
+<Button labe="Save" variant="vibrant" />
+```
+
+Type-contract diagnostics honor these directives too. For example,
+`id-unknown-prop` suppresses the type-contract `unknown-prop` diagnostic, while
+verifier-only diagnostics such as `value-not-in-enum` can be suppressed by their
+own code.
 
 There is **no blanket disable** (`<!-- xmlui-disable -->` with no
 code is intentionally not supported). Suppression must always
@@ -169,10 +189,9 @@ release; for now, choose strict at each call site.
 ## Related
 
 - Component metadata diagnostics on **prop value types** live in
-  the [verified-type-contracts plan](../../../../xmlui/dev-docs/plans/01-verified-type-contracts.md);
-  this analyzer surface is shared with that plan.
+  [Verified Type Contracts](/docs/managed-react/verified-type-contracts).
 - **Reactive cycle** diagnostics live in
   [Reactive Cycle Detection](./reactive-cycle-detection.md).
 - **Deprecation** diagnostics live in the
-  [Enforced Versioning](../../../../xmlui/dev-docs/plans/12-enforced-versioning.md)
-  plan and flow through the same pipeline.
+  [Enforced Versioning](/docs/managed-react/enforced-versioning)
+  pipeline.

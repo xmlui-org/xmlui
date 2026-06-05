@@ -1,7 +1,6 @@
 export * from "./CharacterCodes";
 export * from "./diagnostics";
 export * from "./fileExtensions";
-export * from "./lint";
 export * from "./parser";
 export * from "./scanner";
 export * from "./syntax-kind";

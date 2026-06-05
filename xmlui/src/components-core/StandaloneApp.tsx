@@ -40,12 +40,12 @@ import StandaloneExtensionManager from "./StandaloneExtensionManager";
 import { builtInThemes } from "./theming/ThemeProvider";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import {
-  getLintSeverity,
-  lintErrorsComponent,
-  LintSeverity,
-  printComponentLints,
-  typeContractLintApp,
-} from "../parsers/xmlui-parser/lint";
+  getStandaloneValidationSeverity,
+  printComponentValidationIssues,
+  StandaloneValidationSeverity,
+  validateStandaloneAppTypeContracts,
+  validationErrorsComponent,
+} from "./type-contracts/standalone-validation";
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 import type { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
 import type {
@@ -2107,25 +2107,25 @@ function processAppLinting(
   appDef: StandaloneAppDescription,
   metadataProvider: MetadataProvider,
 ): { errorComponent: ComponentDef | null; toastMessages: string[] } {
-  const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
+  const validationSeverity = getStandaloneValidationSeverity(appDef.appGlobals?.lintSeverity);
 
-  if (lintSeverity !== LintSeverity.Skip) {
-    const allComponentLints = typeContractLintApp({
+  if (validationSeverity !== StandaloneValidationSeverity.Skip) {
+    const allComponentIssues = validateStandaloneAppTypeContracts({
       appDef,
       metadataProvider,
       strict: appDef.appGlobals?.strictTypeContracts !== false,
     });
 
-    if (allComponentLints.length > 0) {
-      if (lintSeverity === LintSeverity.Warning) {
-        allComponentLints.forEach(printComponentLints);
-      } else if (lintSeverity === LintSeverity.Error) {
-        return { errorComponent: lintErrorsComponent(allComponentLints), toastMessages: [] };
-      } else if (lintSeverity === LintSeverity.Strict) {
-        allComponentLints.forEach(printComponentLints);
-        const toastMessages = allComponentLints.map(({ componentName, lints }) => {
-          const messages = lints.map(({ message }) => message).join("\n");
-          return `Lint issues in '${componentName}':\n${messages}`;
+    if (allComponentIssues.length > 0) {
+      if (validationSeverity === StandaloneValidationSeverity.Warning) {
+        allComponentIssues.forEach(printComponentValidationIssues);
+      } else if (validationSeverity === StandaloneValidationSeverity.Error) {
+        return { errorComponent: validationErrorsComponent(allComponentIssues), toastMessages: [] };
+      } else if (validationSeverity === StandaloneValidationSeverity.Strict) {
+        allComponentIssues.forEach(printComponentValidationIssues);
+        const toastMessages = allComponentIssues.map(({ componentName, issues }) => {
+          const messages = issues.map(({ message }) => message).join("\n");
+          return `Validation issues in '${componentName}':\n${messages}`;
         });
         return { errorComponent: null, toastMessages };
       }

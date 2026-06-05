@@ -8,11 +8,12 @@ Verified type contracts use XMLUI component metadata to check your markup before
 - Invalid enum values, such as an unsupported button variant, are caught against the component's documented options.
 - Literal values with the wrong type are reported before the component tries to coerce them.
 - Missing required props are surfaced as component-level diagnostics.
+- Unknown events and exposed methods are reported against the component's metadata.
 - Expression-bound props are checked after their value resolves, so dynamic values can still produce runtime warnings.
 
 ## How it works
 
-Each built-in component declares metadata for its props, events, accepted values, and refined value types. XMLUI uses that metadata in the language server, the Vite plugin, and runtime warning mode, so the same contract is enforced in the editor, during builds, and when expression values resolve in the browser.
+Each built-in component declares metadata for its props, events, exposed methods, accepted values, and refined value types. XMLUI uses that metadata in the language server, the Vite plugin, standalone browser startup validation, and runtime warning mode, so the same contract is enforced in the editor, during builds, when standalone apps load in the browser, and when expression values resolve.
 
 ## Using warn-only mode
 
@@ -26,7 +27,15 @@ Type-contract strict mode is on by default. Set `strictTypeContracts` to `false`
 }
 ```
 
-In strict mode, unknown props, missing required props, wrong literal types, and invalid enum values escalate from warnings to errors. Deprecated props remain warnings so migration guidance stays visible without blocking the app.
+In strict mode, unknown props, missing required props, wrong literal types, invalid enum values, unknown events, and unknown exposed methods escalate from warnings to errors. Deprecated props remain warnings so migration guidance stays visible without blocking the app.
+
+Standalone apps also use `appGlobals.lintSeverity` to decide how startup validation is shown in the browser: console warnings, an error screen, toast notifications, or no startup validation.
+
+Type-contract diagnostics honor XMLUI suppression comments. Analyzer-style
+codes suppress matching contract diagnostics, so `<!-- xmlui-disable
+id-unknown-prop -->` also suppresses `unknown-prop`. Verifier-only diagnostics
+can be suppressed by their own code, for example `<!-- xmlui-disable-next-line
+value-not-in-enum -->`.
 
 ## Related
 

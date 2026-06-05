@@ -476,7 +476,7 @@ are called out directly in the table.
 | `autoSkipLink` | `boolean` | `false` | Inserts the default `<SkipLink target="main" />` before app content for keyboard users. |
 | `strictErrors` | `boolean` | `false` | When `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint pointing to `AppError`. `signError` and `ErrorBoundary` always normalize via `AppError.from()` regardless of this flag. |
 | `errorCorrelationIdHeader` | `string` | `"X-Correlation-Id"` | HTTP response header from which `AppError.correlationId` is read on fetch failures. |
-| `strictTypeContracts` | `boolean` | `true` | Escalates type-contract diagnostics for unknown props, wrong literal types, missing required props, invalid enum values, unknown events, and runtime expression-value mismatches. Set to `false` for warn-only migration mode. |
+| `strictTypeContracts` | `boolean` | `true` | Escalates type-contract diagnostics for unknown props, wrong literal types, missing required props, invalid enum values, unknown events, unknown exposed methods, and runtime expression-value mismatches. Set to `false` for warn-only migration mode. |
 | `strictAuditLogging` | `boolean` | `true` | When `true` (default), the redaction policy blocks on un-redacted PII fields; the entry is dropped and `audit-pii-leaked` is emitted instead of forwarding it. Set to `false` for warn-only (migration) mode. |
 | `strictRouting` | `boolean` | `true` | Escalates defended-routing diagnostics such as rejected constraints and non-canonical URLs (and flips `nonCanonicalUrl` defaults to `"redirect"`). Set `false` to opt out. |
 | `strictI18n` | `boolean` | `false` | Escalates missing bundle/key and ICU diagnostics. |

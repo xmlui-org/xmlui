@@ -16,6 +16,7 @@ import { getRules } from "./rule-registry";
 import type { RuleContext } from "./rule-registry";
 import { xmlUiMarkupToComponent } from "../xmlui-parser";
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import { buildSuppressionMap, isSuppressed } from "./suppression";
 
 export interface AnalyzerInputFile {
   /** Workspace-relative or absolute path of the source file. */
@@ -54,6 +55,7 @@ export function analyze(input: AnalyzerInput): BuildDiagnostic[] {
   const diagnostics: BuildDiagnostic[] = [];
 
   for (const fileEntry of input.files) {
+    const suppressions = buildSuppressionMap(fileEntry.source);
     // Lazy-parse the markup AST when the caller did not pre-supply one.
     // Parser failures must not abort analysis — they're already surfaced
     // through the parser's own diagnostic channel.
@@ -74,6 +76,9 @@ export function analyze(input: AnalyzerInput): BuildDiagnostic[] {
     for (const rule of rules) {
       try {
         for (const diag of rule.run(ctx)) {
+          if (diag.line !== undefined && isSuppressed(diag.code, diag.line, suppressions)) {
+            continue;
+          }
           diagnostics.push(diag);
         }
       } catch (err) {

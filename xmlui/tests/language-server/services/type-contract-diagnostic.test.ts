@@ -6,7 +6,7 @@ import { mockMetadataProvider } from "../mockData";
 
 function diagnosticsForMarkup(markup: string, strict = false) {
   const { component } = xmlUiMarkupToComponent(markup, "test.xmlui");
-  return getTypeContractDiagnostics(component, mockMetadataProvider, strict);
+  return getTypeContractDiagnostics(component, mockMetadataProvider, strict, markup);
 }
 
 describe("type-contract-diagnostic (LSP provider)", () => {
@@ -36,5 +36,29 @@ describe("type-contract-diagnostic (LSP provider)", () => {
 
   it("returns no diagnostics for valid markup", () => {
     expect(diagnosticsForMarkup(`<Button label="Save" />`)).toEqual([]);
+  });
+
+  it("honors analyzer-style suppression comments for type-contract diagnostics", () => {
+    const diags = diagnosticsForMarkup(`
+      <App>
+        <!-- xmlui-disable id-unknown-prop -->
+        <Button labe="Save" />
+        <Button variant="vibrant" />
+      </App>
+    `);
+
+    expect(diags.some((diag) => diag.code === "unknown-prop")).toBe(false);
+    expect(diags.some((diag) => diag.code === "value-not-in-enum")).toBe(true);
+  });
+
+  it("honors type-contract code suppression comments", () => {
+    const diags = diagnosticsForMarkup(`
+      <App>
+        <!-- xmlui-disable-next-line value-not-in-enum -->
+        <Button variant="vibrant" />
+      </App>
+    `);
+
+    expect(diags).toEqual([]);
   });
 });

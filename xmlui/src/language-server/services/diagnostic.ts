@@ -110,7 +110,7 @@ function typeContractDiags(ctx: DiagnosticsContext): Diagnostic[] {
   if (!ctx.source || !ctx.metadataProvider) return [];
   try {
     const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
-    return getTypeContractDiagnostics(component, ctx.metadataProvider, /* strict */ false);
+    return getTypeContractDiagnostics(component, ctx.metadataProvider, /* strict */ false, ctx.source);
   } catch {
     return [];
   }

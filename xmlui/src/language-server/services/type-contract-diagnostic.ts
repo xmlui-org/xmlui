@@ -4,12 +4,14 @@
 import { DiagnosticSeverity, type Diagnostic } from "vscode-languageserver";
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { verifyComponentDef } from "../../components-core/type-contracts/verifier";
+import { filterSuppressedTypeContractDiagnostics } from "../../components-core/type-contracts/suppression";
 import type { MetadataProvider } from "./common/metadata-utils";
 
 export function getTypeContractDiagnostics(
   component: ComponentDef | CompoundComponentDef | null | undefined,
   metadataProvider: MetadataProvider,
   strict = false,
+  source?: string,
 ): Diagnostic[] {
   if (!component) return [];
 
@@ -17,10 +19,12 @@ export function getTypeContractDiagnostics(
     const root = unwrapCompound(component);
     if (!root) return [];
 
-    return verifyComponentDef(root, metadataProvider.componentMetadataMap(), {
+    const diagnostics = verifyComponentDef(root, metadataProvider.componentMetadataMap(), {
       strict,
       skipUnknown: true,
-    }).map((d) => {
+    });
+
+    return filterSuppressedTypeContractDiagnostics(diagnostics, source).map((d) => {
       const line = Math.max(0, (d.range?.line ?? 1) - 1);
       const col = Math.max(0, d.range?.col ?? 0);
       const lspDiag: Diagnostic = {

@@ -22,8 +22,8 @@
  */
 
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
-import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { layoutOptionKeys } from "../descriptorHelper";
+import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { verifyValue } from "./rules/coerce";
 import { verifyEnum } from "./rules/enum";
 import { findSuggestion } from "./suggestions";
@@ -67,7 +67,7 @@ export function verifyComponentDef(
 
   function visit(node: ComponentDef | undefined): void {
     if (!node || typeof node !== "object") return;
-    const typeName = node.type;
+    const typeName = normalizeTypeName(node.type);
 
     if (typeof typeName !== "string" || typeName.length === 0) {
       recurse(node);
@@ -214,6 +214,23 @@ export function verifyComponentDef(
       }
     }
 
+    // ─── Per-exposed-method checks ─────────────────────────────────────────
+
+    const metaApis = meta.apis ?? {};
+    const defApis = (node.api ?? {}) as Record<string, unknown>;
+    for (const apiName of Object.keys(defApis)) {
+      if (!(apiName in metaApis)) {
+        diagnostics.push({
+          code: "unknown-exposed-method",
+          severity,
+          componentName: typeName,
+          propName: apiName,
+          range: extractRange(node),
+          message: `<${typeName}> exposes unknown method "${apiName}".`,
+        });
+      }
+    }
+
     recurse(node);
   }
 
@@ -239,6 +256,15 @@ const FRAMEWORK_TYPES: ReadonlySet<string> = new Set([
   "#cdata-section",
 ]);
 
+const CORE_NAMESPACE_PREFIX = "#xmlui-core-ns:";
+
+function normalizeTypeName(typeName: unknown): unknown {
+  if (typeof typeName !== "string") return typeName;
+  return typeName.startsWith(CORE_NAMESPACE_PREFIX)
+    ? typeName.slice(CORE_NAMESPACE_PREFIX.length)
+    : typeName;
+}
+
 function isFrameworkType(name: string): boolean {
   return FRAMEWORK_TYPES.has(name);
 }
@@ -262,20 +288,13 @@ function isFrameworkEvent(name: string): boolean {
  * by the layout engine and are not declared in component metadata.
  */
 function isKnownLayoutProp(propName: string): boolean {
-  if (layoutOptionKeys.includes(propName)) return true;
-  // Handle responsive variants like "width-md", "height-xs"
-  const dashIdx = propName.lastIndexOf("-");
-  if (dashIdx > 0) {
-    const base = propName.slice(0, dashIdx);
-    const suffix = propName.slice(dashIdx + 1);
-    if (
-      layoutOptionKeys.includes(base) &&
-      (MediaBreakpointKeys as readonly string[]).includes(suffix)
-    ) {
-      return true;
-    }
+  const parsed = parseLayoutProperty(propName, false);
+
+  if (typeof parsed === "string") {
+    return false;
   }
-  return false;
+
+  return layoutOptionKeys.includes(parsed.property);
 }
 
 type BehaviorContract = {
@@ -436,7 +455,7 @@ function isExpressionValue(value: unknown): boolean {
 }
 
 function extractRange(node: any): TypeContractDiagnostic["range"] {
-  const sourceRange = node?.__SOURCE_RANGE ?? node?.__SOURCE;
+  const sourceRange = node?.debug?.source ?? node?.__SOURCE_RANGE ?? node?.__SOURCE;
   if (!sourceRange) return undefined;
   if (
     typeof sourceRange.line === "number" &&

@@ -73,6 +73,33 @@ describe("vite-xmlui-plugin type-contract diagnostics", () => {
     ).toBe(true);
   });
 
+  it("honors suppression comments for type-contract diagnostics", async () => {
+    const plugin = viteXmluiPlugin({
+      analyze: "off",
+      reactiveCycles: "off",
+      accessibility: "off",
+      typeContracts: "warn",
+    });
+    const ctx = makeCtx();
+    await runTransform(
+      plugin,
+      `<App>
+        <H1>Typed Contracts</H1>
+        <!-- xmlui-disable id-unknown-prop -->
+        <Text varian="strong">Contains an invalid property name</Text>
+        <Text variant="dummy">Contains an invalid property value</Text>
+      </App>`,
+      "/x/Main.xmlui",
+      ctx,
+    );
+
+    expect(ctx.errors).toEqual([]);
+    expect(ctx.warns.some((w) => /unknown-prop/.test(w) && /varian/.test(w))).toBe(false);
+    expect(
+      ctx.warns.some((w) => /value-not-in-enum/.test(w) && /variant/.test(w) && /dummy/.test(w)),
+    ).toBe(true);
+  });
+
   it("fails the build in strict mode", async () => {
     const plugin = viteXmluiPlugin({
       analyze: "off",

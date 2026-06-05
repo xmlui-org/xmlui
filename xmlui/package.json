@@ -2,7 +2,8 @@
   "name": "xmlui",
   "version": "0.12.29",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "src/components-core/analyzer/rules/**/*.ts"
   ],
   "type": "module",
   "scripts": {
