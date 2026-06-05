@@ -18,7 +18,7 @@ type SplitterProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   splitterTemplate?: React.ReactNode;
   orientation?: OrientationOptions;
   floating?: boolean;
-  resize?: (sizes: [number, number]) => void;
+  resize?: (primarySize: number) => void;
   swapped?: boolean;
   initialPrimarySize?: string;
   minPrimarySize?: string;
@@ -114,7 +114,7 @@ export const Splitter = memo(forwardRef(function Splitter({
 
       if (resize) {
         const actualPrimarySize = (initialPercentage / 100) * newContainerSize;
-        resize([actualPrimarySize, newContainerSize - actualPrimarySize]);
+        resize(actualPrimarySize);
       }
     }
   }, [initialPrimarySize, orientation, resize, splitter, swapped]);
@@ -143,7 +143,7 @@ export const Splitter = memo(forwardRef(function Splitter({
         setSizePercentage(newPercentage);
 
         if (resize) {
-          resize([newPercentage, 100 - newPercentage]);
+          resize(newSize);
         }
       }
     };
