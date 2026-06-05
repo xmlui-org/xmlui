@@ -91,6 +91,44 @@ test.describe("Basic Functionality", () => {
 });
 
 // =============================================================================
+// EVENT TESTS
+// =============================================================================
+
+test.describe("resize event", () => {
+  test("emits primary size as pixels when initialPrimarySize uses percent", async ({
+    initTestBed,
+    page,
+    createSplitterDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <HSplitter
+        height="200px"
+        width="400px"
+        initialPrimarySize="50%"
+        onResize="arg => testState = { isArray: Array.isArray(arg), type: typeof arg, value: arg }"
+        testId="hsplitter"
+      >
+        <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
+        <Stack backgroundColor="darksalmon" height="100%" testId="secondary"/>
+      </HSplitter>
+    `);
+
+    const hsplitter = page.getByTestId("hsplitter");
+    const driver = await createSplitterDriver(hsplitter);
+
+    await driver.dragResizer(50, 0);
+
+    await expect.poll(testStateDriver.testState).toMatchObject({
+      isArray: false,
+      type: "number",
+    });
+    const resizeData = await testStateDriver.testState();
+    expect(resizeData.value).toBeGreaterThan(200);
+    expect(resizeData.value).toBeLessThanOrEqual(400);
+  });
+});
+
+// =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 

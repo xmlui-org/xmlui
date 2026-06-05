@@ -682,13 +682,13 @@ test.describe("Basic Functionality", () => {
       // Drag resizer
       await driver.dragResizer(50, 0);
       
-      // Verify resize event was called with array of percentages
+      // Verify resize event was called with the primary panel size in pixels
       await expect.poll(testStateDriver.testState).toBeDefined();
       const resizeData = await testStateDriver.testState();
-      expect(Array.isArray(resizeData)).toBe(true);
-      expect(resizeData).toHaveLength(2);
-      expect(typeof resizeData[0]).toBe("number");
-      expect(typeof resizeData[1]).toBe("number");
+      expect(Array.isArray(resizeData)).toBe(false);
+      expect(typeof resizeData).toBe("number");
+      expect(resizeData).toBeGreaterThan(200);
+      expect(resizeData).toBeLessThanOrEqual(400);
     });
   });
 
