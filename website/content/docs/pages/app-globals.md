@@ -155,14 +155,17 @@ appGlobals: {
 lintSeverity?: "warning" | "error" | "strict" | "skip"; // default: "warning"
 ```
 
-Controls how the XMLUI engine reports markup linting issues at startup.
+Controls how standalone startup validation issues are shown in the browser.
+These issues come from the type-contract verifier, such as unknown props,
+invalid literal values, missing required props, unknown events, and unknown
+exposed methods.
 
 | Value | Behavior |
 |---|---|
 | `"warning"` | Issues are printed to the browser console as warnings (default). |
 | `"error"` | Issues block app rendering and are displayed as an error screen. |
 | `"strict"` | Issues are displayed as toast notifications in the UI and also printed to the browser console. |
-| `"skip"` | Linting is disabled entirely. |
+| `"skip"` | Standalone startup validation is disabled. |
 
 ```ts
 appGlobals: {

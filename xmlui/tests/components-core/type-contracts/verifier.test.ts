@@ -34,7 +34,7 @@ describe("verifyComponentDef — Step 0 baseline", () => {
     ).toEqual([]);
   });
 
-  it("emits unknown-component (warn) for an unregistered component when not skipping", () => {
+  it("emits id-unknown-component (warn) for an unregistered component when not skipping", () => {
     const def: ComponentDef = {
       type: "App",
       children: [{ type: "UnknownWidget" }],
@@ -43,7 +43,7 @@ describe("verifyComponentDef — Step 0 baseline", () => {
     const result = verifyComponentDef(def, registry);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      code: "unknown-component",
+      code: "id-unknown-component",
       severity: "warn",
       componentName: "UnknownWidget",
     });
@@ -144,8 +144,8 @@ describe("verifyComponentDef — missing-required", () => {
   });
 });
 
-describe("verifyComponentDef — unknown-prop", () => {
-  it("emits unknown-prop for a prop not in metadata", () => {
+describe("verifyComponentDef — id-unknown-prop", () => {
+  it("emits id-unknown-prop for a prop not in metadata", () => {
     const registry = makeRegistry({
       Button: {
         props: { label: { description: "Button label" } },
@@ -155,7 +155,7 @@ describe("verifyComponentDef — unknown-prop", () => {
     const result = verifyComponentDef(def, registry);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      code: "unknown-prop",
+      code: "id-unknown-prop",
       componentName: "Button",
       propName: "typoField",
     });
@@ -172,7 +172,7 @@ describe("verifyComponentDef — unknown-prop", () => {
     const result = verifyComponentDef(def, registry);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      code: "unknown-prop",
+      code: "id-unknown-prop",
       componentName: "Button",
       propName: "labe",
       suggestion: "label",
@@ -216,6 +216,28 @@ describe("verifyComponentDef — unknown-prop", () => {
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
 
+  it("skips layout props with state variants", () => {
+    const registry = makeRegistry({
+      Button: { props: { label: { description: "label" } } },
+    });
+    const def = {
+      type: "Button",
+      props: { "backgroundColor--hover": "red", "color--hover--active": "white" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
+  it("skips layout props with responsive and state variants", () => {
+    const registry = makeRegistry({
+      Button: { props: { label: { description: "label" } } },
+    });
+    const def = {
+      type: "Button",
+      props: { "backgroundColor-md--hover": "red" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
   it("skips all props for components with allowArbitraryProps", () => {
     const registry = makeRegistry({
       HtmlDiv: { allowArbitraryProps: true },
@@ -223,6 +245,17 @@ describe("verifyComponentDef — unknown-prop", () => {
     const def = {
       type: "HtmlDiv",
       props: { "data-testid": "div", customAttr: "val" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+
+  it("normalizes Xmlui namespace component names before metadata lookup", () => {
+    const registry = makeRegistry({
+      Button: { props: { label: { description: "label" } } },
+    });
+    const def = {
+      type: "#xmlui-core-ns:Button",
+      props: { label: "Save" },
     } as ComponentDef;
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
   });
@@ -397,8 +430,8 @@ describe("verifyComponentDef — value-not-in-enum", () => {
   });
 });
 
-describe("verifyComponentDef — unknown-event", () => {
-  it("emits unknown-event for an event not in metadata", () => {
+describe("verifyComponentDef — id-unknown-event", () => {
+  it("emits id-unknown-event for an event not in metadata", () => {
     const registry = makeRegistry({
       Button: {
         events: { click: { description: "Click event" } },
@@ -411,13 +444,13 @@ describe("verifyComponentDef — unknown-event", () => {
     const result = verifyComponentDef(def, registry);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      code: "unknown-event",
+      code: "id-unknown-event",
       componentName: "Button",
       propName: "doubleClick",
     });
   });
 
-  it("does not emit unknown-event for a declared event", () => {
+  it("does not emit id-unknown-event for a declared event", () => {
     const registry = makeRegistry({
       Button: {
         events: { click: { description: "Click event" } },
@@ -428,6 +461,78 @@ describe("verifyComponentDef — unknown-event", () => {
       events: { click: "handleClick()" },
     } as ComponentDef;
     expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+});
+
+describe("verifyComponentDef — id-unknown-method", () => {
+  it("emits id-unknown-method for an api not in metadata", () => {
+    const registry = makeRegistry({
+      Button: {
+        apis: { focus: { description: "Focus the button" } },
+      },
+    });
+    const def = {
+      type: "Button",
+      api: { reset: "resetButton()" },
+    } as ComponentDef;
+    const result = verifyComponentDef(def, registry);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      code: "id-unknown-method",
+      componentName: "Button",
+      propName: "reset",
+    });
+  });
+
+  it("does not emit id-unknown-method for a declared api", () => {
+    const registry = makeRegistry({
+      Button: {
+        apis: { focus: { description: "Focus the button" } },
+      },
+    });
+    const def = {
+      type: "Button",
+      api: { focus: "focusButton()" },
+    } as ComponentDef;
+    expect(verifyComponentDef(def, registry)).toHaveLength(0);
+  });
+});
+
+describe("verifyComponentDef — behavior props", () => {
+  it("accepts behavior props only when the behavior supports the host", () => {
+    const registry = makeRegistry({
+      Visual: {
+        props: {},
+      },
+      NonVisual: {
+        props: {},
+        nonVisual: true,
+      },
+    });
+
+    expect(
+      verifyComponentDef(
+        {
+          type: "Visual",
+          props: { tooltip: "Help" },
+        } as ComponentDef,
+        registry,
+      ),
+    ).toHaveLength(0);
+
+    const result = verifyComponentDef(
+      {
+        type: "NonVisual",
+        props: { tooltip: "Help" },
+      } as ComponentDef,
+      registry,
+    );
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      code: "id-unknown-prop",
+      componentName: "NonVisual",
+      propName: "tooltip",
+    });
   });
 });
 
@@ -502,7 +607,7 @@ describe("verifyComponentDef — recursion and tree walk", () => {
     const result = verifyComponentDef(def, registry);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      code: "unknown-prop",
+      code: "id-unknown-prop",
       componentName: "Button",
       propName: "lable",
       suggestion: "label",
@@ -544,7 +649,7 @@ describe("verifyComponentDef — severity escalation", () => {
       props: { unknownProp: "x" },
     } as ComponentDef;
     const result = verifyComponentDef(def, registry, { strict: true });
-    // missing-required (label absent) + unknown-prop (unknownProp)
+    // missing-required (label absent) + id-unknown-prop (unknownProp)
     expect(result.every((d) => d.severity === "error")).toBe(true);
   });
 });
@@ -722,7 +827,6 @@ describe("isStrictEnum audit — all availableValues props must declare an expli
     "Table.userSelectCell",
     "Table.userSelectRow",
     "Table.userSelectHeading",
-    "Text.variant",
     "TextArea.resize",
     "TileGrid.checkboxPosition",
     "TileGrid.itemUserSelect",
@@ -762,4 +866,3 @@ describe("isStrictEnum audit — all availableValues props must declare an expli
     }
   });
 });
-

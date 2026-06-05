@@ -3,7 +3,8 @@
 Type contracts turn XMLUI component metadata into an enforceable interface.
 The same metadata that powers generated docs and editor completions is also
 used to detect unknown props, missing required props, invalid enum values,
-wrong literal value types, unknown events, and deprecated props.
+wrong literal value types, unknown events, unknown exposed methods, and
+deprecated props.
 
 This guide is for framework developers. If you are changing metadata, the
 parser, the rendering pipeline, the Vite plugin, or component prop extraction,
@@ -17,7 +18,8 @@ XMLUI has two moments when it can verify a component contract:
 1. **Before rendering, after markup is parsed.** At this point XMLUI has a
    `ComponentDef` tree and component metadata, but expression-valued props such
    as `value="{state.count}"` have not been evaluated yet. This is the static
-   verifier path used by the language server and Vite plugin.
+   verifier path used by the language server, Vite plugin, and standalone
+   browser startup validation.
 2. **During component rendering, once expressions can be resolved.** At this
    point `ComponentAdapter` has the current component instance, the current
    state, the component metadata descriptor, and a `ValueExtractor`. It
@@ -28,34 +30,19 @@ The split is intentional. Static verification catches mistakes that are visible
 from the markup alone. Runtime verification catches values that only become
 known after XMLUI evaluates reactive expressions.
 
-```text
-.xmlui source
-  |
-  v
-XMLUI parser
-  |
-  v
-ComponentDef tree
-  |
-  +--> verifyComponentDef()
-  |      |
-  |      +--> Language server diagnostics
-  |      |
-  |      +--> Vite warnings/errors
-  |
-  +--> renderChild()
-         |
-         v
-       ComponentAdapter
-         |
-         v
-       ValueExtractor resolves expressions
-         |
-         v
-       emitRuntimeTypeContractDiagnostics()
-         |
-         v
-       Inspector trace + optional toast
+```mermaid
+flowchart TD
+  source[".xmlui source"] --> parser["XMLUI parser"]
+  parser --> tree["ComponentDef tree"]
+  tree --> verifier["verifyComponentDef()"]
+  verifier --> lsp["Language server diagnostics"]
+  verifier --> vite["Vite warnings/errors"]
+  verifier --> standalone["Standalone browser validation"]
+  tree --> render["renderChild()"]
+  render --> adapter["ComponentAdapter"]
+  adapter --> extractor["ValueExtractor resolves expressions"]
+  extractor --> runtime["emitRuntimeTypeContractDiagnostics()"]
+  runtime --> inspector["Inspector trace + optional toast"]
 ```
 
 ## Core Files
@@ -67,7 +54,9 @@ ComponentDef tree
 | `xmlui/src/components-core/type-contracts/diagnostics.ts` | Diagnostic code and payload types. |
 | `xmlui/src/components-core/type-contracts/rules/coerce.ts` | Shared value-verification and coercion table. |
 | `xmlui/src/components-core/type-contracts/rules/*` | Refined value rules such as `integer`, `color`, `length`, `url`, `icon`, and `id-ref`. |
-| `xmlui/src/components-core/type-contracts/suggestions.ts` | Levenshtein helper for `unknown-prop` suggestions. |
+| `xmlui/src/components-core/type-contracts/suggestions.ts` | Levenshtein helper for `id-unknown-prop` suggestions. |
+| `xmlui/src/components-core/type-contracts/suppression.ts` | Source-aware suppression filter for LSP, Vite, and standalone adapters. |
+| `xmlui/src/components-core/type-contracts/standalone-validation.ts` | Browser startup adapter for standalone console, toast, and error-screen presentation. |
 | `xmlui/src/language-server/services/type-contract-diagnostic.ts` | LSP adapter from type-contract diagnostics to `vscode-languageserver` diagnostics. |
 | `xmlui/src/nodejs/vite-xmlui-plugin.ts` | Build-time integration and diagnostic summary. |
 | `xmlui/src/components-core/rendering/ComponentAdapter.tsx` | Runtime integration point for expression-valued props. |
@@ -95,14 +84,16 @@ Output:
 
 The verifier walks the whole component tree recursively. For each node it:
 
-1. Looks up `node.type` in the metadata registry.
+1. Normalizes core namespace type names and looks up `node.type` in the metadata
+   registry.
 2. Checks required props declared with `isRequired`.
 3. Checks every literal prop against component metadata.
-4. Allows layout props and responsive layout variants even though they are not
-   declared per component.
+4. Allows layout props plus responsive and state layout variants even though
+   they are not declared per component.
 5. Checks deprecated props and emits warning-level diagnostics.
 6. Checks event names against `metadata.events`.
-7. Recurses into children.
+7. Checks exposed method names against `metadata.apis`.
+8. Recurses into children.
 
 Expression-valued props are skipped for type and enum checks because their
 actual value is not known yet:
@@ -124,7 +115,7 @@ runtime path.
 If `Button` metadata declares `label` and a finite set of `variant` values, the
 static verifier reports:
 
-- `unknown-prop` for `labe`, with a suggestion for `label` when the edit
+- `id-unknown-prop` for `labe`, with a suggestion for `label` when the edit
   distance is close enough.
 - `value-not-in-enum` for `variant` if `"vibrant"` is not declared in
   `availableValues`.
@@ -134,7 +125,7 @@ static verifier reports:
 ```
 
 If the component metadata declares `submit` but not `submitt`, the verifier
-reports `unknown-event`.
+reports `id-unknown-event`.
 
 ```xml
 <Image />
@@ -143,6 +134,13 @@ reports `unknown-event`.
 If `Image` metadata marks `src` as required, the verifier reports
 `missing-required`.
 
+```xml
+<Button api:reset="resetButton()" />
+```
+
+If `Button` metadata declares `focus` but not `reset`, the verifier reports
+`id-unknown-method`.
+
 ### Static Verification Boundaries
 
 The verifier does not execute expressions, import React, call component
@@ -150,9 +148,19 @@ renderers, inspect the DOM, or instantiate containers. It also does not make
 network calls or read files. That purity matters because the same function runs
 in editor tooling, build tooling, tests, and any future CLI surfaces.
 
+The verifier also does not parse suppression comments itself. Source-aware
+adapters call `filterSuppressedTypeContractDiagnostics()` after verification.
+Shared identifier-oriented checks use the same codes as the analyzer, such as
+`id-unknown-prop`, so build-validation suppression comments work across LSP,
+Vite, and standalone startup validation without alias translation.
+
 Unknown components can be skipped by passing `skipUnknown: true`. The LSP and
-Vite integration currently do this because unknown-component diagnostics are
+Vite integration currently do this because id-unknown-component diagnostics are
 also handled by the broader analyzer pipeline.
+
+Standalone startup validation also uses `skipUnknown: true` so user-defined
+components and extension components are not falsely reported by the built-in
+metadata pass.
 
 ## Language Server Surface
 
@@ -200,6 +208,23 @@ useful in CI because individual warnings can scroll away in a large build log.
 Static Vite checks happen before React rendering. They only know the parsed
 definition tree and metadata. They do not have component state, loader results,
 form state, or resolved expression values.
+
+## Standalone Browser Surface
+
+Standalone mode runs the static verifier during browser startup after XMLUI has
+fetched and parsed the app files. The old parser linter has been removed; the
+type-contract verifier is now the single startup validation path.
+
+Standalone presentation is controlled by `App.appGlobals.lintSeverity`:
+
+- `"warning"` prints validation issues to the browser console.
+- `"error"` replaces the app with an error screen.
+- `"strict"` prints browser console warnings and shows toast notifications.
+- `"skip"` disables standalone startup validation.
+
+The verifier still receives `strict: appGlobals.strictTypeContracts !== false`,
+so diagnostic severity follows the type-contract policy. `lintSeverity` only
+controls how standalone displays the issues it finds.
 
 ## Runtime Rendering Surface
 
@@ -290,13 +315,13 @@ errors while you clean up markup.
 
 Strict mode escalates these diagnostics to errors:
 
-- `unknown-component`
-- `unknown-prop`
+- `id-unknown-component`
+- `id-unknown-prop`
 - `wrong-type`
 - `missing-required`
 - `value-not-in-enum`
-- `unknown-event`
-- `unknown-exposed-method`
+- `id-unknown-event`
+- `id-unknown-method`
 
 Deprecation diagnostics remain warnings because deprecated APIs are still valid
 during their migration window.
@@ -310,14 +335,14 @@ ships.
 
 | Code | Cause | Typical surface |
 |---|---|---|
-| `unknown-component` | Component type is absent from the registry. | Analyzer/static verifier, depending on caller options |
-| `unknown-prop` | Prop is not declared in component metadata and is not a layout prop. | LSP, Vite |
-| `wrong-type` | Literal or resolved value fails `valueType`. | LSP/Vite for literals, runtime for expressions |
-| `missing-required` | Required prop is absent. | LSP, Vite |
-| `value-not-in-enum` | Literal or resolved value is outside `availableValues`. | LSP/Vite for literals, runtime for expressions |
-| `unknown-event` | Event is not declared in component metadata. | LSP, Vite |
-| `unknown-exposed-method` | Method reference targets an undeclared component API. | Static surfaces |
-| `deprecated-prop` | Prop has `deprecationMessage`. | LSP, Vite |
+| `id-unknown-component` | Component type is absent from the registry. | Analyzer/static verifier, depending on caller options |
+| `id-unknown-prop` | Prop is not declared in component metadata and is not a layout prop. | LSP, Vite, standalone |
+| `wrong-type` | Literal or resolved value fails `valueType`. | LSP/Vite/standalone for literals, runtime for expressions |
+| `missing-required` | Required prop is absent. | LSP, Vite, standalone |
+| `value-not-in-enum` | Literal or resolved value is outside `availableValues`. | LSP/Vite/standalone for literals, runtime for expressions |
+| `id-unknown-event` | Event is not declared in component metadata. | LSP, Vite, standalone |
+| `id-unknown-method` | Method reference targets an undeclared component API. | LSP, Vite, standalone |
+| `deprecated-prop` | Prop has `deprecationMessage`. | LSP, Vite, standalone |
 
 ## Authoring Metadata for Contracts
 
@@ -330,7 +355,8 @@ component:
 4. Prefer `availableValues` for finite option sets.
 5. Add `deprecationMessage` when keeping a legacy prop during migration.
 6. Declare public events in `events`.
-7. Keep renderer-side extraction consistent with metadata.
+7. Declare public exposed methods in `apis`.
+8. Keep renderer-side extraction consistent with metadata.
 
 Avoid ad hoc validator logic in individual components when the rule belongs in
 metadata. Component-specific runtime validation is still appropriate for

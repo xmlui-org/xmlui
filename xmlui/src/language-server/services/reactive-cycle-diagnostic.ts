@@ -3,7 +3,7 @@
  *
  * Given a parsed XMLUI document, build the reactive dependency graph
  * (`collectComponentDefGraph`), run Tarjan SCC cycle detection
- * (`findCycles`), and convert each hit into one LSP `Diagnostic`.
+ * (`findCycles`), and convert each hit into LSP diagnostics.
  *
  * Severity mapping (matches the runtime probe):
  *   - `CycleHit.severity === "warn"` → `DiagnosticSeverity.Warning`
@@ -11,9 +11,9 @@
  *     (pure-conditional cycles inside `when` / `displayWhen`)
  *
  * Reactive-graph nodes carry parser-derived source positions when available.
- * The primary diagnostic is anchored to the first node in the cycle, and
- * `relatedInformation` points at each cycle member so editors can navigate the
- * full loop.
+ * Each cycle member receives its own diagnostic so editors underline every
+ * declaration that participates in the loop. `relatedInformation` points at
+ * each cycle member so editors can navigate the full loop from any marker.
  *
  * The analyzer must never crash the LSP server; any error from the graph
  * builder or cycle finder is swallowed and yields zero diagnostics.
@@ -55,23 +55,26 @@ export function getReactiveCycleDiagnostics(
     const hits = findCycles(graph);
     if (!hits.length) return [];
 
-    return hits.map((hit) => {
+    return hits.flatMap((hit) => {
       const severity =
         hit.severity === "info"
           ? DiagnosticSeverity.Information
           : DiagnosticSeverity.Warning;
       const relatedInformation = relatedInformationFor(hit.nodes, options.uri);
-      return {
-        severity,
-        range: rangeForNode(hit.nodes[0]) ?? zeroRange(),
-        message: formatCycle(hit),
-        code: "reactive-cycle",
-        source: "xmlui-reactive-graph",
-        ...(relatedInformation.length > 0 ? { relatedInformation } : {}),
-        // Use the cycle hash as an opaque data payload so editors can
-        // dedupe across re-parses if they choose.
-        data: { cycleId: cycleHash(hit) },
-      } satisfies Diagnostic;
+      const cycleId = cycleHash(hit);
+      return hit.nodes.map((node) => {
+        return {
+          severity,
+          range: rangeForNode(node) ?? zeroRange(),
+          message: formatCycle(hit),
+          code: "reactive-cycle",
+          source: "xmlui-reactive-graph",
+          ...(relatedInformation.length > 0 ? { relatedInformation } : {}),
+          // Use the cycle hash as an opaque data payload so editors can
+          // dedupe across re-parses if they choose.
+          data: { cycleId, nodeId: node.id },
+        } satisfies Diagnostic;
+      });
     });
   } catch {
     // Analyzer must never crash the LSP server.
@@ -100,9 +103,10 @@ function rangeForNode(node: ReactiveNode | undefined): Range | null {
   if (!node?.range) return null;
   const line = Math.max(0, node.range.line - 1);
   const character = Math.max(0, node.range.col - 1);
+  const length = Math.max(1, node.range.length ?? 1);
   return {
     start: { line, character },
-    end: { line, character: character + 1 },
+    end: { line, character: character + length },
   };
 }
 

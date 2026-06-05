@@ -123,6 +123,57 @@ describe("analyzer/rule-registry", () => {
     expect(found[0].message).toBe("test diagnostic");
   });
 
+  it("suppresses diagnostics emitted by registered rules", () => {
+    const uniqueCode = `test-suppress-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const rule: AnalyzerRule = {
+      code: uniqueCode,
+      description: "Always emits diagnostics on lines 2 and 3",
+      defaultSeverity: "warn",
+      strictSeverity: "error",
+      appliesTo: "markup",
+      run: (ctx: RuleContext): BuildDiagnostic[] => [
+        {
+          code: uniqueCode,
+          severity: "warn",
+          file: ctx.file,
+          line: 2,
+          column: 1,
+          length: 1,
+          message: "suppressed diagnostic",
+        },
+        {
+          code: uniqueCode,
+          severity: "warn",
+          file: ctx.file,
+          line: 3,
+          column: 1,
+          length: 1,
+          message: "visible diagnostic",
+        },
+      ],
+    };
+    registerRule(rule);
+
+    const result = analyze({
+      files: [
+        {
+          file: "Test.xmlui",
+          source: [
+            `<!-- xmlui-disable-next-line ${uniqueCode} -->`,
+            "<App />",
+            "<App />",
+          ].join("\n"),
+        },
+      ],
+      componentRegistry: mockRegistry(),
+      strict: false,
+    });
+
+    const found = result.filter((diag) => diag.code === uniqueCode);
+    expect(found).toHaveLength(1);
+    expect(found[0].message).toBe("visible diagnostic");
+  });
+
   it("a crashing rule produces an internal-rule-error diagnostic instead of throwing", () => {
     const uniqueCode = `test-crashing-${Date.now()}-${Math.random()}`;
     const rule: AnalyzerRule = {
@@ -158,7 +209,6 @@ describe("analyzer/rule-registry", () => {
 // ---------------------------------------------------------------------------
 
 describe("analyzer/suppression", () => {
-
   it("returns an empty map for a file with no suppression comments", () => {
     const map = buildSuppressionMap("<App><Button /></App>");
     expect(map.size).toBe(0);
@@ -175,6 +225,18 @@ describe("analyzer/suppression", () => {
     expect(isSuppressed("id-unknown-component", 1, map)).toBe(false);
     // A different code is not suppressed.
     expect(isSuppressed("id-unknown-prop", 2, map)).toBe(false);
+  });
+
+  it("xmlui-disable-next-line suppresses multiple named codes on the following line", () => {
+    const source = [
+      "<!-- xmlui-disable-next-line id-unknown-prop value-not-in-enum -->",
+      '<Button labe="Save" variant="vibrant" />',
+    ].join("\n");
+    const map = buildSuppressionMap(source);
+
+    expect(isSuppressed("id-unknown-prop", 2, map)).toBe(true);
+    expect(isSuppressed("value-not-in-enum", 2, map)).toBe(true);
+    expect(isSuppressed("id-unknown-event", 2, map)).toBe(false);
   });
 
   it("xmlui-disable/enable suppresses a range", () => {
@@ -195,6 +257,21 @@ describe("analyzer/suppression", () => {
     expect(isSuppressed("expr-unused-var", 6, map)).toBe(false);
   });
 
+  it("xmlui-enable ends only the named code's suppression range", () => {
+    const source = [
+      "<!-- xmlui-disable id-unknown-prop value-not-in-enum -->",
+      '<Button labe="Save" variant="vibrant" />',
+      "<!-- xmlui-enable id-unknown-prop -->",
+      '<Button labe="Save" variant="vibrant" />',
+    ].join("\n");
+    const map = buildSuppressionMap(source);
+
+    expect(isSuppressed("id-unknown-prop", 2, map)).toBe(true);
+    expect(isSuppressed("value-not-in-enum", 2, map)).toBe(true);
+    expect(isSuppressed("id-unknown-prop", 4, map)).toBe(false);
+    expect(isSuppressed("value-not-in-enum", 4, map)).toBe(true);
+  });
+
   it("an unterminated disable block is suppressed to end-of-file", () => {
     const source = [
       "<!-- xmlui-disable id-unknown-component -->",
@@ -204,5 +281,16 @@ describe("analyzer/suppression", () => {
     const map = buildSuppressionMap(source);
     expect(isSuppressed("id-unknown-component", 2, map)).toBe(true);
     expect(isSuppressed("id-unknown-component", 3, map)).toBe(true);
+  });
+
+  it("ignores blanket disable directives without a named code", () => {
+    const source = [
+      "<!-- xmlui-disable -->",
+      "<Buttn />",
+    ].join("\n");
+    const map = buildSuppressionMap(source);
+
+    expect(map.size).toBe(0);
+    expect(isSuppressed("id-unknown-component", 2, map)).toBe(false);
   });
 });

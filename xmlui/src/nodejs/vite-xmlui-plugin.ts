@@ -31,6 +31,7 @@ import {
 import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
 import { verifyComponentDef } from "../components-core/type-contracts/verifier";
+import { filterSuppressedTypeContractDiagnostics } from "../components-core/type-contracts/suppression";
 import type { ComponentDef, ComponentMetadata, OptimizerMetadataView } from "../abstractions/ComponentDefs";
 import { metadataRegistry } from "../language-server/metadataRegistry";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
@@ -376,7 +377,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             // Type-contract verifier failure must never break the build.
           }
           const strictTypes = typeContractMode === "strict";
-          for (const hit of hits) {
+          for (const hit of filterSuppressedTypeContractDiagnostics(hits, code)) {
             const message = `[xmlui:type-contract] ${fileId}: [${hit.code}] ${hit.message}${hit.suggestion ? ` Did you mean "${hit.suggestion}"?` : ""}`;
             typeContractCounts.set(hit.code, (typeContractCounts.get(hit.code) ?? 0) + 1);
             if (strictTypes && hit.severity === "error") {

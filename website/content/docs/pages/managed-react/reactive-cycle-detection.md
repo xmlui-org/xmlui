@@ -36,6 +36,11 @@ on `a`. Break the loop by turning one side into an event-driven update,
 deriving both values from a third source, or moving asynchronous data flow into
 a DataSource with an independent key.
 
+At runtime, XMLUI also withholds local vars and functions that participate in a
+detected cycle from variable resolution. Components that read those names see an
+unresolved value instead of a partial arithmetic result such as `NaN`; the
+`reactive-cycle` diagnostic remains the source of truth for fixing the markup.
+
 ## Strict mode
 
 `strictReactiveGraph` is default-on. In strict mode, runtime cycle warnings are

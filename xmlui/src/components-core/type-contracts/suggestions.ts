@@ -1,7 +1,7 @@
 /**
  * Levenshtein-distance suggestion helper for the type-contract verifier.
  *
- * Used by the `unknown-prop` check to surface "did you mean…?" hints
+ * Used by the `id-unknown-prop` check to surface "did you mean…?" hints
  * when a prop name is close (distance ≤ 2) to a known prop name.
  *
  * See `dev-docs/plans/01-verified-type-contracts.md` Phase 2 §2.1.

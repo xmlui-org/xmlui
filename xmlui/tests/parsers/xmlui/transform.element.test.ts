@@ -1141,9 +1141,16 @@ describe("Xmlui transform - child elements", () => {
     `;
       const cd = transformSource(source) as CompoundComponentDef;
       const comp = cd.component;
+      expect(comp.debug).toMatchObject({
+        source: {
+          start: source.indexOf("<Stack>"),
+          end: source.indexOf("</Stack>") + "</Stack>".length,
+          fileId: 0,
+        },
+      });
       expect(comp.children[0].debug).toMatchObject({
         source: {
-          start: source.indexOf("<Stack>") + "<Stack>".length,
+          start: source.indexOf(innerComp),
           end: source.indexOf(innerComp) + innerComp.length,
           fileId: 0,
         },

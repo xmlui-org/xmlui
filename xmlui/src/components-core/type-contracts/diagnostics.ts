@@ -5,26 +5,26 @@
  * verifier. Each code maps to a specific contract violation.
  *
  * Code taxonomy (matches the `TypeContractCode` union):
- *   - `unknown-component`         A component type was referenced that is not in the registry.
- *   - `unknown-prop`              A prop name was used that the component metadata does not declare.
- *   - `wrong-type`                A literal prop value failed the declared `valueType` check.
- *   - `missing-required`          A prop declared `isRequired` was not supplied.
- *   - `value-not-in-enum`         A literal value was not in the declared `availableValues` (requires `isStrictEnum: true`).
- *   - `unknown-event`             An event name was used that the component metadata does not declare.
- *   - `unknown-exposed-method`    An exposed-method reference targets an undeclared method.
- *   - `deprecated-prop`           A prop carrying `deprecationMessage` was used.
+ *   - `id-unknown-component`  A component type was referenced that is not in the registry.
+ *   - `id-unknown-prop`       A prop name was used that the component metadata does not declare.
+ *   - `wrong-type`            A literal prop value failed the declared `valueType` check.
+ *   - `missing-required`      A prop declared `isRequired` was not supplied.
+ *   - `value-not-in-enum`     A literal value was not in the declared `availableValues` (requires `isStrictEnum: true`).
+ *   - `id-unknown-event`      An event name was used that the component metadata does not declare.
+ *   - `id-unknown-method`     An exposed-method reference targets an undeclared method.
+ *   - `deprecated-prop`       A prop carrying `deprecationMessage` was used.
  *
  * See `dev-docs/plans/01-verified-type-contracts.md`.
  */
 
 export type TypeContractCode =
-  | "unknown-component"
-  | "unknown-prop"
+  | "id-unknown-component"
+  | "id-unknown-prop"
   | "wrong-type"
   | "missing-required"
   | "value-not-in-enum"
-  | "unknown-event"
-  | "unknown-exposed-method"
+  | "id-unknown-event"
+  | "id-unknown-method"
   | "deprecated-prop";
 
 export interface TypeContractDiagnostic {

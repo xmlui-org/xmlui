@@ -16,8 +16,8 @@ export interface ReactiveNode {
   kind: ReactiveNodeKind;
   /** Optional source URI for diagnostics (LSP / Vite). */
   uri?: string;
-  /** Optional source range (1-based line/col). */
-  range?: { line: number; col: number };
+  /** Optional source range (1-based line/col, optional character length). */
+  range?: { line: number; col: number; length?: number };
   /** Outgoing edges — populated by `edge()`. Stored as a `Set` to deduplicate. */
   deps: Set<string>;
 }

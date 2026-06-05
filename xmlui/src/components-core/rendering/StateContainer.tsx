@@ -34,6 +34,10 @@ import { useGlobalVariables } from "../state/global-variables";
 import { useRoutingParams } from "../state/routing-state";
 import { useAppContext } from "../AppContext";
 import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
+import {
+  filterCyclicLocalDefinitions,
+  getCyclicLocalDefinitionNames,
+} from "../reactive-graph/cyclicLocalDefinitions";
 import type {
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
@@ -270,12 +274,20 @@ export const StateContainer = memo(
       ...parsedScriptPart?.vars,
     });
 
+    const cyclicLocalDefinitionNames = useMemo(
+      () => getCyclicLocalDefinitionNames(node),
+      [node],
+    );
+    const resolvableVarDefinitions = useShallowCompareMemoize(
+      filterCyclicLocalDefinitions(varDefinitions, cyclicLocalDefinitionNames),
+    );
+
     //first: collection function (arrowExpressions) dependencies
     //    -> do it until there's no function dep, only var deps
     const parentFnDeps = useFnDeps();
     const functionDeps = useMemo(() => {
       const fnDeps: Record<string, Array<string>> = {};
-      Object.entries(varDefinitions).forEach(([key, value]) => {
+      Object.entries(resolvableVarDefinitions).forEach(([key, value]) => {
         if (isParsedValue(value) && value.tree.type === T_ARROW_EXPRESSION) {
           fnDeps[key] = collectVariableDependencies(value.tree, referenceTrackedApi);
         } else if (isArrowExpressionObject(value) && value.type === T_ARROW_EXPRESSION) {
@@ -288,7 +300,7 @@ export const StateContainer = memo(
       if (Object.keys(parentFnDeps).length === 0) return localFnDeps;
       if (Object.keys(localFnDeps).length === 0) return parentFnDeps;
       return { ...parentFnDeps, ...localFnDeps };
-    }, [parentFnDeps, referenceTrackedApi, varDefinitions]);
+    }, [parentFnDeps, referenceTrackedApi, resolvableVarDefinitions]);
 
     /**
      * Variable Resolution Strategy
@@ -317,7 +329,7 @@ export const StateContainer = memo(
 
     // Pass 1: Pre-resolve variables to handle forward references
     const preResolvedLocalVars = useVars(
-      varDefinitions,
+      resolvableVarDefinitions,
       functionDeps,
       localVarsStateContext,
       useRef<MemoedVars>(new Map()), // Temporary cache, discarded after this pass
@@ -332,7 +344,7 @@ export const StateContainer = memo(
 
     // Pass 2: Final resolution with complete context
     const resolvedLocalVars = useVars(
-      varDefinitions,
+      resolvableVarDefinitions,
       functionDeps,
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars, // Persistent cache for performance
