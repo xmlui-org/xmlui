@@ -17,6 +17,7 @@ import type {
 import { CORE_NAMESPACE_VALUE } from "./transform";
 import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { parseLayoutProperty } from "../../components-core/theming/parse-layout-props";
+import { verifyComponentDef } from "../../components-core/type-contracts/verifier";
 
 export enum LintSeverity {
   Skip,
@@ -27,6 +28,7 @@ export enum LintSeverity {
 
 export enum LintDiagKind {
   UnrecognisedProp,
+  TypeContract,
 }
 
 type Options = {
@@ -94,6 +96,35 @@ export function lintApp({
       component: c,
       metadataProvider,
     });
+    return { lints, componentName: c.name };
+  });
+
+  return [entryPointLints, ...compoundCompLints].filter((diags) => diags.lints.length > 0);
+}
+
+export function typeContractLintApp({
+  appDef,
+  metadataProvider,
+  strict,
+}: {
+  appDef: StandaloneAppDescription;
+  metadataProvider: MetadataProvider;
+  strict: boolean;
+}): ComponentLints[] {
+  const registry = metadataProvider.componentMetadataMap();
+  const entryPointLints: ComponentLints = {
+    componentName: "Main",
+    lints: verifyComponentDef(appDef.entryPoint, registry, {
+      strict,
+      skipUnknown: true,
+    }).map(toTypeContractLintDiag),
+  };
+
+  const compoundCompLints: ComponentLints[] = (appDef.components ?? []).map((c) => {
+    const lints = verifyComponentDef(c.component, registry, {
+      strict,
+      skipUnknown: true,
+    }).map(toTypeContractLintDiag);
     return { lints, componentName: c.name };
   });
 
@@ -267,5 +298,16 @@ function toUnrecognisedAttrDiag(component: ComponentDef, attr: string): LintDiag
   return {
     message: `Unrecognised property '${attr}' on component '${component.type}'.`,
     kind: LintDiagKind.UnrecognisedProp,
+  };
+}
+
+function toTypeContractLintDiag(
+  diag: ReturnType<typeof verifyComponentDef>[number],
+): LintDiagnostic {
+  return {
+    message: `[xmlui:type-contract] [${diag.code}] ${diag.message}${
+      diag.suggestion ? ` Did you mean "${diag.suggestion}"?` : ""
+    }`,
+    kind: LintDiagKind.TypeContract,
   };
 }

@@ -41,10 +41,10 @@ import { builtInThemes } from "./theming/ThemeProvider";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import {
   getLintSeverity,
-  lintApp,
   lintErrorsComponent,
   LintSeverity,
   printComponentLints,
+  typeContractLintApp,
 } from "../parsers/xmlui-parser/lint";
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 import type { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
@@ -2110,9 +2110,10 @@ function processAppLinting(
   const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
 
   if (lintSeverity !== LintSeverity.Skip) {
-    const allComponentLints = lintApp({
+    const allComponentLints = typeContractLintApp({
       appDef,
       metadataProvider,
+      strict: appDef.appGlobals?.strictTypeContracts !== false,
     });
 
     if (allComponentLints.length > 0) {

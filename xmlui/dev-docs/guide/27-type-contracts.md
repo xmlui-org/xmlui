@@ -28,34 +28,18 @@ The split is intentional. Static verification catches mistakes that are visible
 from the markup alone. Runtime verification catches values that only become
 known after XMLUI evaluates reactive expressions.
 
-```text
-.xmlui source
-  |
-  v
-XMLUI parser
-  |
-  v
-ComponentDef tree
-  |
-  +--> verifyComponentDef()
-  |      |
-  |      +--> Language server diagnostics
-  |      |
-  |      +--> Vite warnings/errors
-  |
-  +--> renderChild()
-         |
-         v
-       ComponentAdapter
-         |
-         v
-       ValueExtractor resolves expressions
-         |
-         v
-       emitRuntimeTypeContractDiagnostics()
-         |
-         v
-       Inspector trace + optional toast
+```mermaid
+flowchart TD
+  source[".xmlui source"] --> parser["XMLUI parser"]
+  parser --> tree["ComponentDef tree"]
+  tree --> verifier["verifyComponentDef()"]
+  verifier --> lsp["Language server diagnostics"]
+  verifier --> vite["Vite warnings/errors"]
+  tree --> render["renderChild()"]
+  render --> adapter["ComponentAdapter"]
+  adapter --> extractor["ValueExtractor resolves expressions"]
+  extractor --> runtime["emitRuntimeTypeContractDiagnostics()"]
+  runtime --> inspector["Inspector trace + optional toast"]
 ```
 
 ## Core Files

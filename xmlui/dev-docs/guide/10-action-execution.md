@@ -189,6 +189,7 @@ After each statement completes, the `onStatementCompleted` callback runs:
 This means that **state changes from one statement are visible to the next statement within the same handler**. Unlike raw React (where `setState` batches and only applies on the next render), XMLUI's scripting engine gives the illusion of synchronous, sequential state mutation — each statement sees the effects of the previous one.
 
 However, this async-between-statements design also means:
+
 - **Long handlers yield to the main thread.** After 100 statements with no state changes, the engine inserts `await delay(0)` to prevent blocking.
 - **Unmounting during execution loses remaining state changes.** If the component unmounts while a handler is mid-execution, the `mountedRef` check causes the state update `await` to skip, and remaining statements run against a stale snapshot.
 - **Transactional handlers delay state writes.** When `transactional` is set, state mutations are collected in a buffer and replayed only after the handler finishes successfully. Errors, cancellation, and timeouts discard the buffer.
@@ -215,7 +216,7 @@ These signals drive the inspector UI and can be used to track whether an event i
 useEffect(() => {
   const initHandler = memoedLookupEventHandler("init");
   if (shouldCallInit && initHandler) {
-    initHandler();  // NOT awaited
+    initHandler(); // NOT awaited
   }
   // ...
 }, [currentWhenValue, memoedLookupEventHandler]);
@@ -240,13 +241,13 @@ await onSuccess?.(result);
 
 ### Summary: event handler behavior by category
 
-| Category | Examples | `preventDefault` | `stopPropagation` | Awaited? | Return value observed? |
-|----------|---------|-------------------|-------------------|----------|----------------------|
-| Mouse events | `onClick`, `onDoubleClick`, `onContextMenu` | Yes, synchronously before handler | Yes, synchronously before handler | No (fire-and-forget) | No |
-| Mouse hover | `onMouseEnter`, `onMouseLeave` | Yes | Yes | No | No |
-| Init/cleanup | `onInit`, `onCleanup` | N/A | N/A | No | No |
-| Form events | `onSubmit`, `onWillSubmit`, `onSuccess` | Yes (by Form component) | Yes (by Form component) | **Yes** | **Yes** |
-| Keyboard (component-internal) | Arrow keys in Select, Table | Component calls synchronously | Component calls synchronously | Varies | Varies |
+| Category                      | Examples                                    | `preventDefault`                  | `stopPropagation`                 | Awaited?             | Return value observed? |
+| ----------------------------- | ------------------------------------------- | --------------------------------- | --------------------------------- | -------------------- | ---------------------- |
+| Mouse events                  | `onClick`, `onDoubleClick`, `onContextMenu` | Yes, synchronously before handler | Yes, synchronously before handler | No (fire-and-forget) | No                     |
+| Mouse hover                   | `onMouseEnter`, `onMouseLeave`              | Yes                               | Yes                               | No                   | No                     |
+| Init/cleanup                  | `onInit`, `onCleanup`                       | N/A                               | N/A                               | No                   | No                     |
+| Form events                   | `onSubmit`, `onWillSubmit`, `onSuccess`     | Yes (by Form component)           | Yes (by Form component)           | **Yes**              | **Yes**                |
+| Keyboard (component-internal) | Arrow keys in Select, Table                 | Component calls synchronously     | Component calls synchronously     | Varies               | Varies                 |
 
 ---
 
@@ -262,7 +263,7 @@ Actions are registered as `ActionRendererDef` objects:
 
 ```typescript
 interface ActionRendererDef {
-  actionName: string;   // The name used to call it: "callApi", "upload", "navigate", ...
+  actionName: string; // The name used to call it: "callApi", "upload", "navigate", ...
   actionFn: ActionFunction;
 }
 ```
@@ -279,14 +280,14 @@ Every action receives an `ActionExecutionContext` as its first argument:
 
 ```typescript
 interface ActionExecutionContext {
-  uid: symbol;                        // The container executing this action
-  state: ContainerState;              // State snapshot at call time
+  uid: symbol; // The container executing this action
+  state: ContainerState; // State snapshot at call time
   getCurrentState: () => ContainerState; // Live state getter — use inside async continuations
-  appContext: AppContextObject;       // Everything global: queryClient, navigate, toast, etc.
-  apiInstance?: IApiInterceptor;      // Optional HTTP interceptor override
-  lookupAction: LookupAsyncFnInner;   // Resolve nested action handlers by name
-  navigate: any;                      // react-router navigate
-  location: any;                      // react-router location
+  appContext: AppContextObject; // Everything global: queryClient, navigate, toast, etc.
+  apiInstance?: IApiInterceptor; // Optional HTTP interceptor override
+  lookupAction: LookupAsyncFnInner; // Resolve nested action handlers by name
+  navigate: any; // react-router navigate
+  location: any; // react-router location
 }
 ```
 
@@ -298,13 +299,13 @@ The distinction between `state` and `getCurrentState()` matters for async action
 
 The framework registers five actions in `ComponentProvider`:
 
-| Name | Trigger | What it does |
-|------|---------|--------------|
-| `callApi` | `APICall` component | HTTP mutation with confirmation, optimistic updates, and cache invalidation |
-| `upload` | `FileUpload` component | Chunked file upload via FormData |
-| `download` | `FileDownload` component | File download via iframe (GET) or fetch+anchor (other methods) |
-| `navigate` | `Navigate` component or `navigate()` | Programmatic routing with relative path resolution |
-| `delay` | `TimedAction` component | `setTimeout`-based callback delay |
+| Name       | Trigger                              | What it does                                                                |
+| ---------- | ------------------------------------ | --------------------------------------------------------------------------- |
+| `callApi`  | `APICall` component                  | HTTP mutation with confirmation, optimistic updates, and cache invalidation |
+| `upload`   | `FileUpload` component               | Chunked file upload via FormData                                            |
+| `download` | `FileDownload` component             | File download via iframe (GET) or fetch+anchor (other methods)              |
+| `navigate` | `Navigate` component or `navigate()` | Programmatic routing with relative path resolution                          |
+| `delay`    | `TimedAction` component              | `setTimeout`-based callback delay                                           |
 
 They're available in scripting via the `Actions` namespace: `Actions.callApi(...)`, `Actions.upload(...)`, etc.
 
@@ -338,16 +339,19 @@ For each `APICall`, `FileUpload`, or `FileDownload` child, `ApiBoundComponent` c
 
 ```javascript
 (eventArgs, options) => {
-  return Actions.callApi({
-    uid: "...",
-    url: "/api/users/{id}",
-    method: "DELETE",
-    body: undefined || (options?.passAsDefaultBody ? eventArgs : undefined),
-    onSuccess: "navigate('/')",
-    invalidates: "/api/users",
-    params: { '$param': eventArgs },
-  }, { resolveBindingExpressions: true });
-}
+  return Actions.callApi(
+    {
+      uid: "...",
+      url: "/api/users/{id}",
+      method: "DELETE",
+      body: undefined || (options?.passAsDefaultBody ? eventArgs : undefined),
+      onSuccess: "navigate('/')",
+      invalidates: "/api/users",
+      params: { $param: eventArgs },
+    },
+    { resolveBindingExpressions: true },
+  );
+};
 ```
 
 All the configuration from the markup is serialized as JSON literals directly into the generated string. Nested handlers (`success`, `error`, `progress`, `beforeRequest`, `mockExecute`) are embedded recursively.
@@ -417,6 +421,7 @@ If `invalidates` is omitted entirely (and `updates` is also absent), **all queri
 ### Error path
 
 On any error:
+
 1. The query cache is fully invalidated if optimistic updates were applied (to restore real data)
 2. The `onError` handler runs. Returning `false` suppresses error re-throw.
 3. `toast.error` displays if `errorNotificationMessage` is set
@@ -453,19 +458,19 @@ const memoedLookupEventHandler = useCallback(
 
 Key options for controlling handler resolution and execution:
 
-| Option | Effect |
-|--------|--------|
-| `signError` | Default `true` — surface errors in the UI error indicator |
-| `eventName` | Names the event for inspector logging |
-| `ephemeral` | `true` → skip the resolved function cache (for one-off calls like `Actions.*`) |
-| `defaultHandler` | Fallback handler code if the event isn't defined on the component |
-| `context` | Extra state injected into the execution context |
-| `componentType`, `componentLabel`, `componentId` | Inspector metadata from `inspectorContextRef.current` |
-| `sourceFileId`, `sourceRange` | Source mapping metadata for inspector traces |
-| `schedulerBypass` | Internal flag that prevents the deterministic scheduler from recursively re-enqueuing a handler body |
-| `handlerPolicy` | Cooperative concurrency policy: `parallel`, `single-flight`, `queue`, or `drop-while-running` |
-| `handlerTimeoutMs` | Per-handler timeout override; falls back to `appGlobals.defaultHandlerTimeoutMs` |
-| `transactional` | Buffer state writes and commit them only after successful handler completion |
+| Option                                           | Effect                                                                                               |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `signError`                                      | Default `true` — surface errors in the UI error indicator                                            |
+| `eventName`                                      | Names the event for inspector logging                                                                |
+| `ephemeral`                                      | `true` → skip the resolved function cache (for one-off calls like `Actions.*`)                       |
+| `defaultHandler`                                 | Fallback handler code if the event isn't defined on the component                                    |
+| `context`                                        | Extra state injected into the execution context                                                      |
+| `componentType`, `componentLabel`, `componentId` | Inspector metadata from `inspectorContextRef.current`                                                |
+| `sourceFileId`, `sourceRange`                    | Source mapping metadata for inspector traces                                                         |
+| `schedulerBypass`                                | Internal flag that prevents the deterministic scheduler from recursively re-enqueuing a handler body |
+| `handlerPolicy`                                  | Cooperative concurrency policy: `parallel`, `single-flight`, `queue`, or `drop-while-running`        |
+| `handlerTimeoutMs`                               | Per-handler timeout override; falls back to `appGlobals.defaultHandlerTimeoutMs`                     |
+| `transactional`                                  | Buffer state writes and commit them only after successful handler completion                         |
 
 ---
 
@@ -474,9 +479,9 @@ Key options for controlling handler resolution and execution:
 When `appGlobals.xsVerbose === true`, `callApi` emits structured trace events:
 
 ```typescript
-traceApiCall(appContext, "api:start",    url, method, { transactionId, body });
+traceApiCall(appContext, "api:start", url, method, { transactionId, body });
 traceApiCall(appContext, "api:complete", url, method, { transactionId, result, status, _traceId });
-traceApiCall(appContext, "api:error",    url, method, { transactionId, error });
+traceApiCall(appContext, "api:error", url, method, { transactionId, error });
 ```
 
 The `traceId` is captured synchronously before the `await` — this ensures the `api:complete` event carries the same trace context as `api:start`, even if the call stack has changed by the time the promise resolves.

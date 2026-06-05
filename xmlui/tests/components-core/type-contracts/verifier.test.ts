@@ -722,7 +722,6 @@ describe("isStrictEnum audit — all availableValues props must declare an expli
     "Table.userSelectCell",
     "Table.userSelectRow",
     "Table.userSelectHeading",
-    "Text.variant",
     "TextArea.resize",
     "TileGrid.checkboxPosition",
     "TileGrid.itemUserSelect",
@@ -762,4 +761,3 @@ describe("isStrictEnum audit — all availableValues props must declare an expli
     }
   });
 });
-
