@@ -205,8 +205,15 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     min-width: 0;
     width: 100%;
     overflow-wrap: break-word;
+    user-select: text;
+    -webkit-user-select: text;
     @include t.textVars($themeVars, "Text");
     font-size: t.$fontSize;
+
+    :where(p, h1, h2, h3, h4, h5, h6, li, code, pre, blockquote, td, th, dt, dd, figcaption) {
+      user-select: text;
+      -webkit-user-select: text;
+    }
 
     &.grayscale {
       img {

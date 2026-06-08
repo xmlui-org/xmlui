@@ -198,6 +198,46 @@ test("renders code block", async ({ initTestBed, createMarkdownDriver }) => {
   expect(await driver.hasHtmlElement(["pre", "code"])).toBeTruthy();
 });
 
+test("rendered text-bearing content can be selected by default", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Markdown>
+      <![CDATA[
+## Selectable heading
+
+Try to select this paragraph.
+
+- Selectable list item
+
+\`Selectable inline code\`
+
+| Header |
+| --- |
+| Selectable table cell |
+
+\`\`\`
+Selectable code fence
+\`\`\`
+      ]]>
+    </Markdown>
+  `);
+
+  await expect(page.getByRole("heading", { name: "Selectable heading" })).toHaveCSS(
+    "user-select",
+    "text",
+  );
+  await expect(page.getByText("Try to select this paragraph.")).toHaveCSS("user-select", "text");
+  await expect(page.getByText("Selectable list item")).toHaveCSS("user-select", "text");
+  await expect(page.getByText("Selectable inline code")).toHaveCSS("user-select", "text");
+  await expect(page.getByRole("cell", { name: "Selectable table cell" })).toHaveCSS(
+    "user-select",
+    "text",
+  );
+  await expect(page.locator("pre").filter({ hasText: "Selectable code fence" })).toHaveCSS(
+    "user-select",
+    "text",
+  );
+});
+
 test("4space/1 tab indent is not code block by default", async ({
   initTestBed,
   createMarkdownDriver,

@@ -121,6 +121,13 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toHaveText(expected);
   });
 
+  test("text can be selected by default", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`<Text value="Selectable text" />`);
+    const driver = await createTextDriver();
+
+    await expect(driver.component).toHaveCSS("user-select", "text");
+  });
+
   test("supports preserveLinebreaks prop", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
     <VStack>
