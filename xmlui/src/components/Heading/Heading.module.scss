@@ -129,6 +129,9 @@ $textUnderlineOffset-H6: createThemeVar("Heading:textUnderlineOffset-H6");
 
 @layer components{
   .heading {
+    user-select: text;
+    -webkit-user-select: text;
+
     &.h1 {
       @include heading("H1");
     }

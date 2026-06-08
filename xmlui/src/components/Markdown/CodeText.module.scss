@@ -30,6 +30,8 @@ $component: "Text";
     margin: 0;
     padding: 0.75em;
     min-height: fit-content;
+    user-select: text;
+    -webkit-user-select: text;
 
     // --- Styling <pre><code> elements
 

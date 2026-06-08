@@ -69,6 +69,13 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect(driver.component).toHaveText(expected);
   });
 
+  test("heading text can be selected by default", async ({ initTestBed, createHeadingDriver }) => {
+    await initTestBed(`<Heading level="h3" value="Selectable heading" />`);
+    const driver = await createHeadingDriver();
+
+    await expect(driver.component).toHaveCSS("user-select", "text");
+  });
+
   test("child overrides value", async ({ initTestBed, createHeadingDriver }) => {
     const expected = "this test text is the value of the heading";
     await initTestBed(`

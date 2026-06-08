@@ -159,6 +159,8 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     margin: 0;
     padding: 0;
     vertical-align: baseline;
+    user-select: text;
+    -webkit-user-select: text;
 
     &.default {
       @include textVariant("");
