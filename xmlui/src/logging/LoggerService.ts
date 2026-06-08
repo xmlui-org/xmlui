@@ -6,7 +6,12 @@ class LoggerService {
   private isDev: boolean;
 
   private constructor() {
-    this.isDev = !!(import.meta.env?.DEV || import.meta.env?.VITE_XMLUI_DEV_MODE);
+    const devMode = import.meta.env?.VITE_XMLUI_DEV_MODE;
+    this.isDev = !!(
+      import.meta.env?.DEV ||
+      devMode === true ||
+      devMode === "true"
+    );
   }
 
   public static getInstance(): LoggerService {
