@@ -254,7 +254,7 @@ async function run() {
     )
     .command<{ dir?: string; format?: string; strict?: boolean; rule?: string[]; noRule?: string[] }>(
       "check [dir]",
-      "Run static analyzer on .xmlui files",
+      "Lint .xmlui files (parser, analyzer, prop/type contracts, a11y, versioning)",
       (yargs) => {
         return yargs
           .positional("dir", {
