@@ -33,7 +33,7 @@ export default ({ mode = "lib" }) => {
         "import.meta.env.NODE_ENV": JSON.stringify(env.NODE_ENV),
         "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(xmluiVersion),
         "import.meta.env.VITE_XMLUI_BUILD_MODE": JSON.stringify("INLINE_ALL"),
-        "import.meta.env.VITE_XMLUI_DEV_MODE": JSON.stringify("false"),
+        "import.meta.env.VITE_XMLUI_DEV_MODE": "false",
         "import.meta.env.VITE_MOCK_ENABLED": "true",
         "import.meta.env.VITE_MOCK_WORKER_LOCATION": JSON.stringify("mockApi.js"),
         "import.meta.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter": JSON.stringify("false"),
