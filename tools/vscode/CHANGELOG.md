@@ -1,5 +1,39 @@
 # xmlui-vscode
 
+## 0.12.30
+
+### Patch Changes
+
+- 7d8761a: Use analyzer-style diagnostic codes for overlapping type-contract checks, so unknown component, prop, event, and method diagnostics share one canonical code vocabulary across the verifier, analyzer, Vite, standalone, and VS Code surfaces.
+- 3696a42: Fixed plugin falsely indicating DataSource not having an id prop while actually having it.
+- Updated dependencies [b7a2b09]
+- Updated dependencies [72fa7d1]
+- Updated dependencies [59a45ec]
+- Updated dependencies [59a45ec]
+- Updated dependencies [59a45ec]
+- Updated dependencies [7d8761a]
+- Updated dependencies [59a45ec]
+- Updated dependencies [59a45ec]
+- Updated dependencies [72fa7d1]
+- Updated dependencies [e64e666]
+- Updated dependencies [59a45ec]
+- Updated dependencies [72fa7d1]
+- Updated dependencies [72fa7d1]
+- Updated dependencies [59a45ec]
+- Updated dependencies [7d8761a]
+- Updated dependencies [7d6cd98]
+- Updated dependencies [c70b348]
+- Updated dependencies [f19e98c]
+- Updated dependencies [e9afe59]
+- Updated dependencies [bb94744]
+- Updated dependencies [59a45ec]
+- Updated dependencies [4b17fad]
+- Updated dependencies [b72529d]
+- Updated dependencies [888e28e]
+- Updated dependencies [7d8761a]
+- Updated dependencies [59a45ec]
+  - xmlui@0.12.30
+
 ## 0.12.29
 
 ### Patch Changes

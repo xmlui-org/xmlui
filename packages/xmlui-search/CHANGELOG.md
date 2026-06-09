@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.13
+
+### Patch Changes
+
+- e9afe59: Add `string[]` as a component metadata value type and apply it to string-array props.
+
 ## 0.1.12
 
 ### Patch Changes

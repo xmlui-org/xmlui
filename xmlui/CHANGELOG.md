@@ -1,5 +1,55 @@
 # xmlui
 
+## 0.12.30
+
+### Patch Changes
+
+- b7a2b09: Prevent APICall lifecycle handlers from being delayed by FIFO handler scheduling when an API call is invoked from another event handler.
+- 72fa7d1: Add async evaluator proxies for `Array.prototype.reduce`, `reduceRight`, `findLast`, and `findLastIndex`.
+- 59a45ec: Plan #15 (Audit-grade observability) — final orchestration: `components-core/audit/pipeline.ts` wires redactor + content-PII scanner + sampler + sinks behind the existing `pushXsLog()` call. Adds declarative `<App auditPolicy>` markup and `appGlobals.auditPolicy` / `appGlobals.strictAuditLogging`. Exposes `App.setAuditPolicy()`, `App.registerAuditSink()`, and `App.registerAuditHeuristic()` for programmatic policy. Emits `audit-redaction-missing`, `audit-policy-conflict`, `audit-sink-failure`, `audit-pii-leaked`, and `audit-correlation-missing` self-diagnostics; strict mode escalates to errors and drops entries that leak un-redacted PII. Framework-internal trace kinds (`versioning`, `forms`, `audit`, `build`, `errors`, `lifecycle`, `sandbox:warn`, `log:*`, `i18n`) bypass redaction by design. New end-user docs page at `/docs/managed-react/audit-grade-observability`. Inspector toolbar gains one-click kind-filter pills (audit/versioning/lifecycle/errors/log:warn/log:info) to silence noisy internal diagnostic kinds. `strictAuditLogging` default is now `true` — set `strictAuditLogging: false` in `appGlobals` for warn-only migration mode.
+- 59a45ec: Suppress type-contract unknown-prop diagnostics for behavior-owned props when the host component supports the corresponding behavior.
+- 59a45ec: Make `onMount` and `onUnmount` the canonical visibility lifecycle events while keeping `onInit` and `onCleanup` as compatibility aliases.
+- 7d8761a: Use analyzer-style diagnostic codes for overlapping type-contract checks, so unknown component, prop, event, and method diagnostics share one canonical code vocabulary across the verifier, analyzer, Vite, standalone, and VS Code surfaces.
+- 59a45ec: Plan #16 (Concurrent-state determinism) — final piece shipped. Adds the Inspector overlay `Replay…` button in `website/public/xmlui/xs-diff.html`: loads a previously exported trace JSON, runs the `replay()` comparator against the live `window.parent._xsLogs`, and surfaces either a "Replay matches" confirmation or a `determinism-replay-divergence` modal with a side-by-side diff of the first divergent entry. Volatile timing fields (`ts`, `perfTs`, `startPerfTs`, `duration`) are stripped before comparing, matching the runtime comparator and the `xmlui replay` CLI subcommand. Ships user-facing docs page `/docs/managed-react/concurrent-state-determinism`, with a NavLink and Page route in `website/src/Main.xmlui`. Updates the §17 scorecard row from "Visual, not concurrent" to "Sealed — happens-before contract, FIFO scheduler, fixed-precision tokens, replay harness". No runtime API changes.
+- 59a45ec: Cooperative concurrency: ship `App.cancel()` global for aborting tracked
+  handlers, propagate `appGlobals.strictConcurrency` to timeout enforcement
+  (escalates `concurrency-handler-timeout` to error trace + `console.error`
+  - `signError`), and add docs (dev-guide chapter, AI reference, and
+    user-facing website page).
+- 72fa7d1: Allow `appGlobals.strictDomSandbox` to accept exact and wildcard DOM sandbox exemptions in addition to boolean modes.
+- e64e666: Fix Splitter resize events to emit the primary panel size as a single pixel value.
+- 59a45ec: Forms: add `<Form csrfToken>` and `<Form idempotencyKey>` props. When set, the built-in submit handler attaches them as the `X-CSRF-Token` and `Idempotency-Key` headers (header names override via `appGlobals.csrfHeaderName` / `appGlobals.idempotencyHeaderName`). Custom `onSubmit` handlers can read the values through new context variables `$formCsrfToken`, `$formIdempotencyKey`, `$formHeaders`, and the per-attempt `AbortSignal` via `$formCancel.signal`. Setting `appGlobals.requireFormCsrf = true` makes mutating submits without a token emit the `csrf-token-missing` diagnostic (escalated under `strictForms`).
+- 72fa7d1: Allow the XMLUI `new` operator to construct additional safe value, collection, URL, text, binary, and error types.
+- 72fa7d1: Add scripting support for getter and setter properties in object literals.
+- 59a45ec: Keep warning-level theming diagnostics out of the browser console to avoid flooding E2E runs when strict theming is enabled by default.
+- 7d8761a: Avoid resolving local variables and functions that participate in detected reactive cycles, preventing cyclic bindings from rendering fallback arithmetic results such as `NaN`.
+- 7d6cd98: Remove unused loader types `ExternalDataLoader` and `MockLoader`.
+
+  Neither loader type was used anywhere in the framework or any known application. Both carried `status: "stable"` metadata but had no markup usage, no tests, and were never emitted by `ApiBoundComponent` at runtime. The `MockLoader` functionality is fully covered by `DataSource.mockData`; `ExternalDataLoader` served only as a reference pattern for the planned `ApiBoundDataLoader` (documented in `api-components-plan.md`), which will be introduced as a new loader type when that feature lands.
+
+- c70b348: Allow rendered Markdown, Text, and Heading content to be selected by default.
+- f19e98c: refactor(DatePicker): replace the implementation with the new picker
+- e9afe59: Add `string[]` as a component metadata value type and apply it to string-array props.
+- bb94744: feat: add border theme variables to ModalDialog
+- 59a45ec: Plan #02 (themevars namespace) — Activate the `theming-missing-prefix`
+  analyzer rule. The rule walks `style`/`vars` attribute values and flags
+  two cases: theme-variable references whose package prefix is not
+  registered (e.g. `--xmlui-color-Animation_Button` → suggests
+  `Animations_…`), and references that omit a required prefix when the
+  bare component name unambiguously names a prefixed extension component
+  (e.g. `--xmlui-color-Viewer` → suggests `Pdf_Viewer`). The rule's
+  `defaultSeverity` is `info` (`warn` in strict mode); the canonical
+  prefix table lives in `components-core/themevars/prefix-registry.ts`.
+  Extension packages declare their prefix on
+  `Extension.themeNamespacePrefix`, which is now plumbed through
+  `ComponentRegistryEntry.themeNamespacePrefix` so the rule can resolve
+  bare → prefixed mappings.
+- 4b17fad: Echo sealed theming sandbox diagnostics to the browser console and apply strict theme validation to scoped Theme overrides.
+- b72529d: Fixed bug where declaring a variable outside of a ModalDialog and modifying it inside it did not affect that outer variable.
+- 888e28e: Add `hash` as a component metadata property value type for plain object records.
+- 7d8761a: Validate literal `Text` variant values with typed contracts.
+- 59a45ec: Complete plan #14 (UDC sandbox): `udc-slot-undeclared` consumer analyzer rule (warn → error in strict), filesystem `loadManifest()` reading sibling `udc.manifest.json`, `collectUdcReport()` / `formatUdcAuditReport()` aggregator for Inspector + CI, `xmlui udc declare` migration scaffolder CLI (`scripts/cli/udc-declare.ts`), `ComponentRegistryEntry.udcContract` plumbed through `registerComponentRenderer`, `appGlobals.strictUdcSandbox` default flipped to `true` (W8-1, opt out with `={false}`), dev-guide chapter `35-udc-sandbox.md`, AI reference `.ai/xmlui/udc-sandbox.md`.
+
 ## 0.12.29
 
 ### Patch Changes
