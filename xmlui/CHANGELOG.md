@@ -6,11 +6,9 @@
 
 - b7a2b09: Prevent APICall lifecycle handlers from being delayed by FIFO handler scheduling when an API call is invoked from another event handler.
 - 72fa7d1: Add async evaluator proxies for `Array.prototype.reduce`, `reduceRight`, `findLast`, and `findLastIndex`.
-- 59a45ec: Plan #15 (Audit-grade observability) — final orchestration: `components-core/audit/pipeline.ts` wires redactor + content-PII scanner + sampler + sinks behind the existing `pushXsLog()` call. Adds declarative `<App auditPolicy>` markup and `appGlobals.auditPolicy` / `appGlobals.strictAuditLogging`. Exposes `App.setAuditPolicy()`, `App.registerAuditSink()`, and `App.registerAuditHeuristic()` for programmatic policy. Emits `audit-redaction-missing`, `audit-policy-conflict`, `audit-sink-failure`, `audit-pii-leaked`, and `audit-correlation-missing` self-diagnostics; strict mode escalates to errors and drops entries that leak un-redacted PII. Framework-internal trace kinds (`versioning`, `forms`, `audit`, `build`, `errors`, `lifecycle`, `sandbox:warn`, `log:*`, `i18n`) bypass redaction by design. New end-user docs page at `/docs/managed-react/audit-grade-observability`. Inspector toolbar gains one-click kind-filter pills (audit/versioning/lifecycle/errors/log:warn/log:info) to silence noisy internal diagnostic kinds. `strictAuditLogging` default is now `true` — set `strictAuditLogging: false` in `appGlobals` for warn-only migration mode.
 - 59a45ec: Suppress type-contract unknown-prop diagnostics for behavior-owned props when the host component supports the corresponding behavior.
 - 59a45ec: Make `onMount` and `onUnmount` the canonical visibility lifecycle events while keeping `onInit` and `onCleanup` as compatibility aliases.
 - 7d8761a: Use analyzer-style diagnostic codes for overlapping type-contract checks, so unknown component, prop, event, and method diagnostics share one canonical code vocabulary across the verifier, analyzer, Vite, standalone, and VS Code surfaces.
-- 59a45ec: Plan #16 (Concurrent-state determinism) — final piece shipped. Adds the Inspector overlay `Replay…` button in `website/public/xmlui/xs-diff.html`: loads a previously exported trace JSON, runs the `replay()` comparator against the live `window.parent._xsLogs`, and surfaces either a "Replay matches" confirmation or a `determinism-replay-divergence` modal with a side-by-side diff of the first divergent entry. Volatile timing fields (`ts`, `perfTs`, `startPerfTs`, `duration`) are stripped before comparing, matching the runtime comparator and the `xmlui replay` CLI subcommand. Ships user-facing docs page `/docs/managed-react/concurrent-state-determinism`, with a NavLink and Page route in `website/src/Main.xmlui`. Updates the §17 scorecard row from "Visual, not concurrent" to "Sealed — happens-before contract, FIFO scheduler, fixed-precision tokens, replay harness". No runtime API changes.
 - 59a45ec: Cooperative concurrency: ship `App.cancel()` global for aborting tracked
   handlers, propagate `appGlobals.strictConcurrency` to timeout enforcement
   (escalates `concurrency-handler-timeout` to error trace + `console.error`
@@ -31,24 +29,10 @@
 - f19e98c: refactor(DatePicker): replace the implementation with the new picker
 - e9afe59: Add `string[]` as a component metadata value type and apply it to string-array props.
 - bb94744: feat: add border theme variables to ModalDialog
-- 59a45ec: Plan #02 (themevars namespace) — Activate the `theming-missing-prefix`
-  analyzer rule. The rule walks `style`/`vars` attribute values and flags
-  two cases: theme-variable references whose package prefix is not
-  registered (e.g. `--xmlui-color-Animation_Button` → suggests
-  `Animations_…`), and references that omit a required prefix when the
-  bare component name unambiguously names a prefixed extension component
-  (e.g. `--xmlui-color-Viewer` → suggests `Pdf_Viewer`). The rule's
-  `defaultSeverity` is `info` (`warn` in strict mode); the canonical
-  prefix table lives in `components-core/themevars/prefix-registry.ts`.
-  Extension packages declare their prefix on
-  `Extension.themeNamespacePrefix`, which is now plumbed through
-  `ComponentRegistryEntry.themeNamespacePrefix` so the rule can resolve
-  bare → prefixed mappings.
 - 4b17fad: Echo sealed theming sandbox diagnostics to the browser console and apply strict theme validation to scoped Theme overrides.
 - b72529d: Fixed bug where declaring a variable outside of a ModalDialog and modifying it inside it did not affect that outer variable.
 - 888e28e: Add `hash` as a component metadata property value type for plain object records.
 - 7d8761a: Validate literal `Text` variant values with typed contracts.
-- 59a45ec: Complete plan #14 (UDC sandbox): `udc-slot-undeclared` consumer analyzer rule (warn → error in strict), filesystem `loadManifest()` reading sibling `udc.manifest.json`, `collectUdcReport()` / `formatUdcAuditReport()` aggregator for Inspector + CI, `xmlui udc declare` migration scaffolder CLI (`scripts/cli/udc-declare.ts`), `ComponentRegistryEntry.udcContract` plumbed through `registerComponentRenderer`, `appGlobals.strictUdcSandbox` default flipped to `true` (W8-1, opt out with `={false}`), dev-guide chapter `35-udc-sandbox.md`, AI reference `.ai/xmlui/udc-sandbox.md`.
 
 ## 0.12.29
 
@@ -61,9 +45,7 @@
 ### Patch Changes
 
 - f2b4dfa: feat: implement the xmlui islands feature working in standalone mode
-- c798b9a: Plan #13 (build-time validation analyzers) sealed — implemented remaining identifier, expression, and cross-binding rules: `id-unknown-method`, `expr-unbound-identifier`, `expr-unused-var`, `id-undefined-component-ref`, `id-undefined-form-ref`. The analyzer walker now lazy-parses XMLUI markup via `xmlUiMarkupToComponent` when callers don't supply a pre-built `markupAst`, so rules fire across the CLI (`xmlui check`), Vite plugin (`analyze: "off"|"warn"|"strict"`), and LSP diagnostic provider without callers having to pre-parse. New shared AST infrastructure (`rules/_ast-utils.ts`, `rules/_reserved-identifiers.ts`) supports identifier-reference / rooted-chain collection, lazy expression parsing, and framework-context-variable whitelisting. `id-unknown-slot` is registered as a documented no-op pending a `ComponentMetadata.slots` field (out of plan scope).
 - 6a139ca: Fixed wordBreak and wordWrap properties on Text.
-- bc35484: Plan #6 Cooperative Concurrency — W7-1 (Phases 2–4): real `HandlerCoordinator` runtime backing the four declarative handler policies (`parallel`, `single-flight`, `queue`, `drop-while-running`); per-handler timeout via `handlerTimeoutMs` and ambient `appGlobals.defaultHandlerTimeoutMs` (default 30 s, `<= 0` disables); transactional state writes opt-in with `transactional` / `transactional:<event>`, buffered and replayed in one batch on success and discarded on cancellation; `Button.busyOnClick` convenience that auto-disables the button while its `onClick` handler is in flight. Default behaviour (`parallel`, 30 s ambient timeout, no buffering) is unchanged for existing apps; supersession, drop, timeout and cancellation are surfaced as `kind:"concurrency"` Inspector traces.
 - bb04859: feat: AutoComplete - add overflow truncation, option grouping, and stable tests
 - b367cc1: Fix standalone component discovery for user-defined components nested inside component template properties.
 - 304a642: Fix: `DataSource` no longer silently drops `queryParams` when `dataType="text"` or `dataType="csv"`
@@ -73,7 +55,7 @@
   receives the resolved request properties as `$url`, `$method`,
   `$queryParams`, `$requestBody`, `$requestHeaders`, and `$pageParams`. This
   is the `DataSource` counterpart of `APICall`'s `mockExecute`.
-- 2825582: **Defended routing — Plan #10 W4 follow-ups.**
+- 2825582: **Defended routing**
   - Custom route constraints now fall back to the forms validator registry
     (`App.registerValidator`). Unknown names emit a `unknown-constraint`
     diagnostic and fall back to `string`; thrown exceptions and `Promise`
@@ -90,12 +72,11 @@
     `dev-docs/guide/13-routing.md` and `.ai/xmlui/routing.md`, and shipped
     a user-facing `Defended Routing` docs page on the website.
 
-- bc35484: Plan #16 (W7-3, W7-4): add `determinism-floating-point-token` and `determinism-iteration-order-symbol` analyzer rules, and ship the `xmlui replay <expected.json> [actual.json]` CLI subcommand for trace-divergence checks.
 - 5996389: Add custom syntax highlighting
 - 304a642: Ensure standalone XMLUI declares its CSS layer order before extensions can inject component styles.
 - c798b9a: Complete the managed-react enforced accessibility plan with LSP/Vite diagnostics, accessibility primitives, theme contrast checks, automation IDs, and user-facing documentation.
 - e14e7af: Fix VS Code Go-to-Definition (F12) failing with "No definition found" for user-defined components whose `.xmlui` file lives in a different directory than the file being edited, when no `Main.xmlui` or `config.json` project root marker can be found. The language server's `findProjectRoot` fallback now returns `null` instead of the current document's directory, so the search covers all discovered `.xmlui` files when the project boundary cannot be determined.
-- ecc4d27: Forms validation discipline (plan #09, W5-1..W5-4):
+- ecc4d27: Forms validation discipline:
   - New validator registry (`components-core/forms/`): `registerValidator`, `lookupValidator`, `hasValidator`, `runValidator`. Sync + async support, parameterised, multi-validator chains; nine builtins ship and auto-register (`required`, `email`, `url`, `phone`, `numericRange`, `integer`, `isoDate`, `length`, `strongPassword`).
   - New `appGlobals.strictForms` flag (default `false`) controls diagnostic severity (warn vs error). New `kind:"forms"` trace entries with codes `unknown-validator`, `duplicate-validator`, `server-error-unmapped`, `submit-while-busy`, `csrf-token-missing`, `validator-throw`, `deprecated-alias`.
   - `<FormItem>` gains `validator`, `validatorParams`, `validatorInvalidMessage`, `validatorInvalidSeverity`. The legacy `pattern` / `patternInvalidMessage` / `patternInvalidSeverity` are aliased (one-shot `deprecated-alias` warn per name).
@@ -109,7 +90,7 @@
 - afa1cf5: fix(FormItem): propagate compactInlineLabel for checkbox and switch types so labels stay snug
 - 1571fb8: fix: Table - redistribute column widths after resize
 - e77ce01: fix: ensure ColorPicker updates synchronously on value change to prevent lag
-- ad1536b: **Plan #11 Phase 2.2 + Phase 2.3 — `<I18n>` component and framework-string extraction**
+- ad1536b: **`<I18n>` component and framework-string extraction**
   - **`<I18n>` component** (`components/I18n/`): renders translated messages from the active
     locale bundle; supports variable props (`:name="{expr}"` syntax) and named slot
     placeholders (`<link/>` patterns) for inline markup. Now documented in `I18n.md`.
@@ -128,8 +109,7 @@
     literal; `ValidationWrapper` translates any `xmlui.*` message at render time, so the
     English fallback is still shown when no bundle override is loaded.
 
-- c798b9a: Seal plan #11 (i18n foundations): all phases 1–5 verified shipped. Public `App.translate` / `App.setLocale` / `App.locale` / `App.direction` namespace exposed through `AppContext`; `<App locale|localeBundles|direction>` props wired; `direction` prop now properly synced back to `App.direction` (explicit `"ltr"/"rtl"` overrides locale auto-detection); `setAppDirection` added to `AppContextDefs`; `<I18n>` component, ICU MessageFormat runtime, `Intl.*`-backed formatters, and SCSS logical-properties RTL contract all in place. Added 18 E2E tests covering locale switching, ICU plurals, missing-key fallback, RTL auto-direction, direction prop override, HStack mirroring, and root element `dir` attribute. Shipped user-facing docs page `/docs/managed-react/i18n-foundations`; `managed-react.md` §11 resolved bullets updated; `AGENTS.md` doc-map entry added. The `appGlobals.strictI18n` default flip from `false` to `true` (Phase 6.2) remains reserved for the next major release.
-- 9be5f8f: Add `onBeforeDispose` lifecycle event on all components (Plan #04 Step 3.1).
+- 9be5f8f: Add `onBeforeDispose` lifecycle event on all components
 
   `onBeforeDispose` fires just before a component unmounts, with support for
   async handlers. The handler is raced against a configurable budget
@@ -147,21 +127,10 @@
   </Page>
   ```
 
-- 9be5f8f: Plan #04 (Managed Lifecycle Vocabulary) Phases 1–2 (W3-3): universal
-  `onMount` / `onUnmount` / `onError` events on every component plus a new
-  declarative `<Lifecycle>` primitive (with `keyValue` re-arming) for
-  one-shot side effects that don't fit `<Timer>`, `<DataSource>`,
-  `<APICall>`, `<WebSocket>`, or `<EventSource>`. Adds the
-  `appGlobals.strictLifecycle` switch (default `false`) and the
-  `appGlobals.disposeTimeoutMs` setting, registers a new
-  `kind:"lifecycle"` trace entry, and ships the `components-core/lifecycle/`
-  module skeleton with `LifecycleViolationError`, dispatcher, and trace
-  helpers.
 - 2825582: Document the managed lifecycle vocabulary (universal `onMount` / `onUnmount` / `onError` events, the declarative `<Lifecycle>` component, and the container-level `onBeforeDispose` flush hook) on the website under **Docs › Managed React › Managed Lifecycle Vocabulary**.
 - 98f039d: Start Managed React Wave 4 foundations for defended routing, i18n locale APIs, and determinism scheduler diagnostics.
 - 2825582: Complete reactive cycle detection with source-linked LSP diagnostics, aggregate Vite build checks, and managed-react documentation.
 - 8f704cf: W6-7 (Plan #03 Reactive Cycle Detection — Phase 2 enforcement).
-
   Builds on the W2-7 warn-only probe with three new enforcement surfaces:
   - **Runtime (Step 3.2):** when `appGlobals.strictReactiveGraph === true`,
     `warn`-severity cycle hits in `AppContent` escalate to `severity:"error"`,

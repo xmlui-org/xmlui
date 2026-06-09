@@ -6,31 +6,6 @@
 
 - 7d8761a: Use analyzer-style diagnostic codes for overlapping type-contract checks, so unknown component, prop, event, and method diagnostics share one canonical code vocabulary across the verifier, analyzer, Vite, standalone, and VS Code surfaces.
 - 3696a42: Fixed plugin falsely indicating DataSource not having an id prop while actually having it.
-- Updated dependencies [b7a2b09]
-- Updated dependencies [72fa7d1]
-- Updated dependencies [59a45ec]
-- Updated dependencies [59a45ec]
-- Updated dependencies [59a45ec]
-- Updated dependencies [7d8761a]
-- Updated dependencies [59a45ec]
-- Updated dependencies [59a45ec]
-- Updated dependencies [72fa7d1]
-- Updated dependencies [e64e666]
-- Updated dependencies [59a45ec]
-- Updated dependencies [72fa7d1]
-- Updated dependencies [72fa7d1]
-- Updated dependencies [59a45ec]
-- Updated dependencies [7d8761a]
-- Updated dependencies [7d6cd98]
-- Updated dependencies [c70b348]
-- Updated dependencies [f19e98c]
-- Updated dependencies [e9afe59]
-- Updated dependencies [bb94744]
-- Updated dependencies [59a45ec]
-- Updated dependencies [4b17fad]
-- Updated dependencies [b72529d]
-- Updated dependencies [888e28e]
-- Updated dependencies [7d8761a]
 - Updated dependencies [59a45ec]
   - xmlui@0.12.30
 
@@ -45,54 +20,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [f2b4dfa]
-- Updated dependencies [c798b9a]
-- Updated dependencies [6a139ca]
-- Updated dependencies [bc35484]
-- Updated dependencies [bb04859]
-- Updated dependencies [b367cc1]
-- Updated dependencies [304a642]
-- Updated dependencies [0c42b6f]
-- Updated dependencies [2825582]
-- Updated dependencies [bc35484]
-- Updated dependencies [5996389]
-- Updated dependencies [304a642]
-- Updated dependencies [c798b9a]
-- Updated dependencies [e14e7af]
-- Updated dependencies [ecc4d27]
-- Updated dependencies [795bf3a]
-- Updated dependencies [a53f917]
-- Updated dependencies [afa1cf5]
-- Updated dependencies [1571fb8]
-- Updated dependencies [e77ce01]
-- Updated dependencies [ad1536b]
-- Updated dependencies [c798b9a]
-- Updated dependencies [9be5f8f]
-- Updated dependencies [9be5f8f]
-- Updated dependencies [2825582]
-- Updated dependencies [98f039d]
-- Updated dependencies [2825582]
-- Updated dependencies [8f704cf]
-- Updated dependencies [9082f34]
-- Updated dependencies [d3c75d5]
-- Updated dependencies [ecc4d27]
-- Updated dependencies [2825582]
-- Updated dependencies [2825582]
-- Updated dependencies [8f704cf]
-- Updated dependencies [2825582]
-- Updated dependencies [ad1536b]
-- Updated dependencies [825da7c]
-- Updated dependencies [e3dfa4e]
-- Updated dependencies [ad1536b]
-- Updated dependencies [ecc4d27]
-- Updated dependencies [9be5f8f]
-- Updated dependencies [9be5f8f]
-- Updated dependencies [ecc4d27]
-- Updated dependencies [2825582]
-- Updated dependencies [8f704cf]
-- Updated dependencies [9be5f8f]
-- Updated dependencies [9be5f8f]
-- Updated dependencies [ad1536b]
 - Updated dependencies [ad1536b]
   - xmlui@0.12.28
 
@@ -100,14 +27,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [61f078d]
-- Updated dependencies [5ff51a0]
-- Updated dependencies [f2abca7]
-- Updated dependencies [0b7c318]
-- Updated dependencies [61407a8]
-- Updated dependencies [29947d4]
-- Updated dependencies [69d4762]
-- Updated dependencies [4caecde]
 - Updated dependencies [dbae535]
   - xmlui@0.12.27
 
@@ -115,12 +34,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [2a615fe]
-- Updated dependencies [3e7c7d5]
-- Updated dependencies [cf45ffa]
-- Updated dependencies [b230d80]
-- Updated dependencies [c28814d]
-- Updated dependencies [67cc308]
 - Updated dependencies [292c69f]
   - xmlui@0.12.26
 
@@ -128,7 +41,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [81e9ef8]
 - Updated dependencies [a82544d]
   - xmlui@0.12.25
 
@@ -136,7 +48,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [cfa46e7]
 - Updated dependencies [ba102d8]
   - xmlui@0.12.24
 
@@ -144,10 +55,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [7acf59e]
-- Updated dependencies [826e360]
-- Updated dependencies [7acf59e]
-- Updated dependencies [ed53f00]
 - Updated dependencies [0e3b85f]
   - xmlui@0.12.23
 
