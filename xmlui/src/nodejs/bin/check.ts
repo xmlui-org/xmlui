@@ -31,7 +31,12 @@ export interface CheckOptions {
   strict: boolean;
   includeRules: string[];
   excludeRules: string[];
+  /** Include accessibility findings. Off by default — opt in with `--a11y`. */
+  a11y: boolean;
 }
+
+/** `source` tag carried by accessibility diagnostics (see a11y-diagnostic.ts). */
+const A11Y_SOURCE = "xmlui-a11y";
 
 type CliSeverity = "error" | "warn" | "info";
 
@@ -138,6 +143,11 @@ export async function check(opts: CheckOptions): Promise<void> {
         source: d.source,
       });
     }
+  }
+
+  // Accessibility checks are opt-in on the CLI.
+  if (!opts.a11y) {
+    diagnostics = diagnostics.filter((d) => d.source !== A11Y_SOURCE);
   }
 
   // In strict mode, warn-severity findings are treated as errors.

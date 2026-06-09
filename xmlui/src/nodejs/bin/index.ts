@@ -252,9 +252,9 @@ async function run() {
         });
       },
     )
-    .command<{ dir?: string; format?: string; strict?: boolean; rule?: string[]; noRule?: string[] }>(
+    .command<{ dir?: string; format?: string; strict?: boolean; rule?: string[]; noRule?: string[]; a11y?: boolean }>(
       "check [dir]",
-      "Lint .xmlui files (parser, analyzer, prop/type contracts, a11y, versioning)",
+      "Lint .xmlui files (parser, analyzer, prop/type contracts, versioning)",
       (yargs) => {
         return yargs
           .positional("dir", {
@@ -281,6 +281,11 @@ async function run() {
             type: "string",
             array: true,
             description: "Exclude findings with this rule code",
+          })
+          .option("a11y", {
+            type: "boolean",
+            default: false,
+            description: "Include accessibility findings (off by default)",
           });
       },
       async (argv) => {
@@ -290,6 +295,7 @@ async function run() {
           strict: argv.strict ?? false,
           includeRules: argv.rule ?? [],
           excludeRules: argv.noRule ?? [],
+          a11y: argv.a11y ?? false,
         });
       },
     )
