@@ -209,11 +209,13 @@ export function nodeToComponentDef(
 
     // --- Get var attributes
     let vars: Record<string, any> | undefined;
-    const varsAttrs = attrs.filter((attr) => attr.startSegment === "var");
+    const varsAttrs = attrNodes
+      .map((attrNode) => ({ attrNode, segmented: segmentAttr(attrNode) }))
+      .filter(({ segmented }) => segmented.startSegment === "var");
     if (varsAttrs.length > 0) {
       vars = {};
-      varsAttrs.forEach((attr) => {
-        vars![attr.name] = attr.value;
+      varsAttrs.forEach(({ segmented }) => {
+        vars![segmented.name] = segmented.value;
       });
     }
 
@@ -357,6 +359,9 @@ export function nodeToComponentDef(
     }
     if (vars) {
       nestedComponent.vars = { ...nestedComponent.vars, ...vars };
+      varsAttrs.forEach(({ attrNode, segmented }) => {
+        setReactiveNodeLocation(nestedComponent, "var", segmented.name, attrNode);
+      });
     }
     if (codeBehind) {
       component.codeBehind = codeBehind.value;
@@ -379,6 +384,7 @@ export function nodeToComponentDef(
     }
 
     nestedComponent.debug = {
+      ...nestedComponent.debug,
       source: sourceLocationFor(element),
     };
 

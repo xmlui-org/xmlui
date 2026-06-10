@@ -35,8 +35,17 @@ import {
   collectIdentifierRefs,
   collectUidMap,
   iterComponentExpressions,
+  type ComponentExpression,
 } from "./_ast-utils";
 import { isReservedRoot } from "./_reserved-identifiers";
+
+function getExpressionLocation(ce: ComponentExpression) {
+  const debug = ce.owner.debug as any;
+  if (ce.kind === "var") {
+    return debug?.reactiveNodes?.[`var.${ce.name}`];
+  }
+  return debug?.attributes?.[ce.name]?.value ?? debug?.attributes?.[ce.name]?.full;
+}
 
 registerRule({
   code: "expr-unbound-identifier",
@@ -51,7 +60,6 @@ registerRule({
     const root = ctx.markupAst as ComponentDef;
     const uidMap = collectUidMap(root);
 
-    const { line, col } = offsetToLineCol(ctx.source, (root.debug?.source as any)?.start ?? 0);
     const diagnostics: BuildDiagnostic[] = [];
     const reported = new Set<string>();
 
@@ -87,19 +95,23 @@ registerRule({
           if (reported.has(key)) continue;
           reported.add(key);
 
-          const candidatePool = [
-            ...inScopeVars,
-            ...uidMap.keys(),
-            ...bodyLocals,
-          ];
+          const candidatePool = [...inScopeVars, ...uidMap.keys(), ...bodyLocals];
           const suggestion = closestMatch(name, candidatePool);
+          const exprLocation = getExpressionLocation(ce);
+          const { line, col } =
+            exprLocation?.line && exprLocation?.col
+              ? { line: exprLocation.line, col: exprLocation.col }
+              : offsetToLineCol(
+                  ctx.source,
+                  (exprLocation as any)?.start ?? (node.debug?.source as any)?.start ?? 0,
+                );
           diagnostics.push({
             code: "expr-unbound-identifier",
             severity: "error",
             file: ctx.file,
             line,
             column: col,
-            length: name.length,
+            length: exprLocation?.length ?? name.length,
             message: `Unbound identifier "${name}" in ${ce.kind} "${ce.name}" on <${node.type}>.${
               suggestion ? ` Did you mean "${suggestion}"?` : ""
             }`,

@@ -31,6 +31,14 @@ function runWithAst(root: ComponentDef, strict = false) {
   });
 }
 
+function runWithSource(source: string, strict = false) {
+  return analyze({
+    files: [{ file: "T.xmlui", source }],
+    componentRegistry: emptyRegistry(),
+    strict,
+  });
+}
+
 function expectNoDiagnostic(root: ComponentDef, code: string) {
   const results = runWithAst(root);
   expect(results.filter((d) => d.code === code)).toHaveLength(0);
@@ -132,6 +140,24 @@ describe("rule: expr-unbound-identifier", () => {
     expectNoDiagnostic(root, "expr-unbound-identifier");
   });
 
+  it("does not flag a single-parameter event-handler arrow on parsed markup", () => {
+    const results = runWithSource(`
+      <Component name="EmuApp">
+        <SharedAppState id="state" />
+        <VStack
+          var.initialKeyboardSplitterPosition="{state.value.globalSettings.emuViewOptions.keyboardSplitterPosition + ''}"
+          var.liveKeyboardSplitterPosition="{initialKeyboardSplitterPosition}"
+        >
+          <VSplitter
+            initialPrimarySize="{initialKeyboardSplitterPosition.indexOf('px') >= 0 ? initialKeyboardSplitterPosition : initialKeyboardSplitterPosition + 'px'}"
+            onResize="primarySize => liveKeyboardSplitterPosition = primarySize + 'px'"
+          />
+        </VStack>
+      </Component>
+    `);
+    expect(results.filter((d) => d.code === "expr-unbound-identifier")).toHaveLength(0);
+  });
+
   it("does not flag a $-prefixed context variable", () => {
     const root: ComponentDef = {
       type: "App",
@@ -180,6 +206,16 @@ describe("rule: expr-unused-var", () => {
     const results = runWithAst(root, true);
     const diags = results.filter((d) => d.code === "expr-unused-var");
     expect(diags[0].severity).toBe("warn");
+  });
+
+  it("does not flag a var declared on a reusable <Component> definition", () => {
+    const results = runWithSource(`
+      <Component name="Demo" var.machineState="{state.value.machineState ?? 0}">
+        <SharedAppState id="state" />
+        <Text value="ready" />
+      </Component>
+    `);
+    expect(results.filter((d) => d.code === "expr-unused-var")).toHaveLength(0);
   });
 });
 

@@ -120,17 +120,23 @@ export function getPathToLangServer(context: ExtensionContext): ResolvedServer {
 	return { serverModule: bundled, source: 'bundled' };
 }
 
-const SERVER_REL_PATH = path.join('node_modules', 'xmlui', 'dist', 'nodejs', 'server.js');
+const SERVER_REL_PATHS = [
+	path.join('node_modules', 'xmlui', 'dist', 'nodejs', 'server.cjs'),
+	path.join('node_modules', 'xmlui', 'dist', 'nodejs', 'server.mjs'),
+	path.join('node_modules', 'xmlui', 'dist', 'nodejs', 'server.js')
+];
 
 function findInAncestors(startDir: string): string | undefined {
 	let current = startDir;
-	// Walk up to the filesystem root looking for node_modules/xmlui/dist/nodejs/server.js.
+	// Walk up to the filesystem root looking for node_modules/xmlui/dist/nodejs/server.*.
 	// This handles both single-package workspaces and monorepo setups where xmlui is
 	// hoisted to a parent directory.
 	while (true) {
-		const candidate = path.join(current, SERVER_REL_PATH);
-		if (fs.existsSync(candidate)) {
-			return candidate;
+		for (const relPath of SERVER_REL_PATHS) {
+			const candidate = path.join(current, relPath);
+			if (fs.existsSync(candidate)) {
+				return candidate;
+			}
 		}
 		const parent = path.dirname(current);
 		if (parent === current) {
