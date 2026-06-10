@@ -1,4 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
+import { getBounds } from "../../testing/component-test-helpers";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -172,6 +173,51 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`<App scrollWholePage="false" testId="app"/>`);
 
     await expect(page.getByTestId("app")).not.toHaveClass(/scrollWholePage/);
+  });
+});
+
+// =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("content spacing theme variables control App default content padding and gap", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App testId="app">
+        <Stack testId="item1" height="32px" width="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" width="32px" backgroundColor="blue" />
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "paddingHorizontal-content-App": "28px",
+          "paddingVertical-content-App": "32px",
+          "gap-content-App": "24px",
+        },
+      },
+    );
+
+    const item1 = page.getByTestId("item1");
+    const item2 = page.getByTestId("item2");
+    const contentSpacing = await item1.evaluate((element) => {
+      const style = getComputedStyle(element.parentElement!);
+      return {
+        paddingLeft: style.paddingLeft,
+        paddingTop: style.paddingTop,
+        gap: style.gap,
+      };
+    });
+    const { bottom: item1Bottom } = await getBounds(item1);
+    const { top: item2Top } = await getBounds(item2);
+
+    expect(contentSpacing.paddingLeft).toBe("28px");
+    expect(contentSpacing.paddingTop).toBe("32px");
+    expect(contentSpacing.gap).toBe("24px");
+    expect(item2Top - item1Bottom).toBeCloseTo(24, 0);
   });
 });
 

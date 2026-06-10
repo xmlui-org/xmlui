@@ -101,6 +101,11 @@ export const FlowLayoutMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`gap-${COMP}`]: "$gap-layout",
+    [`columnGap-${COMP}`]: `$gap-${COMP}`,
+    [`rowGap-${COMP}`]: `$gap-${COMP}`,
+  },
 });
 
 type ThemedFlowLayoutProps = React.ComponentPropsWithoutRef<typeof FlowLayout> & {
@@ -131,11 +136,11 @@ export const flowLayoutComponentRenderer = wrapComponent(COMP, FlowLayout, FlowL
     const columnGap =
       extractValue.asSize(node.props?.columnGap) ||
       extractValue.asSize(node.props?.gap) ||
-      extractValue.asSize("$space-4");
+      extractValue.asSize(`$columnGap-${COMP}`);
     const rowGap =
       extractValue.asSize(node.props?.rowGap) ||
       extractValue.asSize(node.props?.gap) ||
-      extractValue.asSize("$space-4");
+      extractValue.asSize(`$rowGap-${COMP}`);
     const itemWidth =
       extractValue.asSize(node.props?.itemWidth) ??
       extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);

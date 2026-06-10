@@ -156,4 +156,6 @@ Describes the logic that fires when the component is clicked.
 ## Styling
 
 `Stack` is a layout container; its purpose is to render its nested child components.
-`Stack` has no theme variables to change its visual appearance.
+Use `gap-Stack` to set the default spacing between child components. The default
+value comes from the app-bound `gap-layout` token. A `gap` prop on an individual
+`Stack`, `VStack`, `HStack`, `CHStack`, or `CVStack` still overrides the theme.

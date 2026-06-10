@@ -1,4 +1,59 @@
 import { test, expect } from "../../testing/fixtures";
+import { getBounds } from "../../testing/component-test-helpers";
+
+test.describe("Theme Variables", () => {
+  test("paddingHorizontal-layout controls the default horizontal Pages padding", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <Pages>
+          <Page url="/">
+            <Stack testId="content" height="32px" width="32px" backgroundColor="red" />
+          </Page>
+        </Pages>
+      </App>
+    `,
+      {
+        testThemeVars: { "paddingHorizontal-layout": "28px" },
+      },
+    );
+
+    const pageRoot = page.locator(".xmlui-page-root");
+    const { left: pageLeft } = await getBounds(pageRoot);
+    const { left: contentLeft } = await getBounds(page.getByTestId("content"));
+
+    expect(contentLeft - pageLeft).toBeCloseTo(28, 0);
+  });
+
+  test("Pages-specific padding overrides the layout alias", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Pages>
+          <Page url="/">
+            <Stack testId="content" height="32px" width="32px" backgroundColor="red" />
+          </Page>
+        </Pages>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "paddingHorizontal-layout": "28px",
+          "paddingHorizontal-Pages": "12px",
+        },
+      },
+    );
+
+    const pageRoot = page.locator(".xmlui-page-root");
+    const { left: pageLeft } = await getBounds(pageRoot);
+    const { left: contentLeft } = await getBounds(page.getByTestId("content"));
+
+    expect(contentLeft - pageLeft).toBeCloseTo(12, 0);
+  });
+});
 
 
 test.describe("Scroll Restoration", () => {
