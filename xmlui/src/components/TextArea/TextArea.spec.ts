@@ -1017,6 +1017,29 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   expect(width).toBe(200);
 });
 
+test("layout props are applied without leaking to textarea DOM attributes", async ({
+  page,
+  initTestBed,
+}) => {
+  const reactWarnings: string[] = [];
+  page.on("console", (msg) => {
+    const text = msg.text();
+    if (text.includes("React does not recognize the `minHeight` prop")) {
+      reactWarnings.push(text);
+    }
+  });
+
+  await initTestBed(`<TextArea minHeight="200px" testId="test" />`, {});
+
+  const component = page.getByTestId("test").first();
+  const textarea = page.getByRole("textbox");
+
+  await expect(component).toHaveCSS("min-height", "200px");
+  await expect(textarea).not.toHaveAttribute("minHeight");
+  await expect(textarea).not.toHaveAttribute("minheight");
+  expect(reactWarnings).toEqual([]);
+});
+
 // =============================================================================
 // THEME VARIABLE TESTS
 // =============================================================================
