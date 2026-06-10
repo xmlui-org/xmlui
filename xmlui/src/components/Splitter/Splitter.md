@@ -67,6 +67,19 @@ See also: [HSplitter](/docs/reference/components/HSplitter), [VSplitter](/docs/r
 
 %-PROP-END
 
+%-PROP-START resizeMode
+
+```xmlui-pg copy display name="Example: resizeMode"
+<App>
+  <Splitter height="200px" initialPrimarySize="120px" resizeMode="preservePrimary">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START orientation
 
 ```xmlui-pg copy display name="Example: orientation"

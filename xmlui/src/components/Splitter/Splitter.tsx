@@ -11,7 +11,7 @@ import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import type { OrientationOptions } from "../abstractions";
 import { createMetadata, dComponent } from "../metadata-helpers";
-import { defaultProps } from "./Splitter.defaults";
+import { defaultProps, type SplitterResizeMode } from "./Splitter.defaults";
 import { Splitter } from "./SplitterReact";
 
 const COMP = "Splitter";
@@ -72,6 +72,18 @@ const baseSplitterMd = createMetadata({
         `or dragged. The default value is \`false\`, meaning the resizer is visible all the time.`,
       valueType: "boolean",
       defaultValue: defaultProps.floating,
+    },
+    resizeMode: {
+      description:
+        `Sets how the \`${COMP}\` adjusts its panel sizes when the splitter container itself is resized. ` +
+        `\`preserveRatio\` keeps the current primary/secondary ratio, \`preservePrimary\` keeps the ` +
+        `primary panel size and resizes the secondary panel, and \`preserveSecondary\` keeps the ` +
+        `secondary panel size and resizes the primary panel. Minimum and maximum primary panel size ` +
+        `constraints are still applied.`,
+      valueType: "string",
+      availableValues: ["preserveRatio", "preservePrimary", "preserveSecondary"],
+      isStrictEnum: true,
+      defaultValue: defaultProps.resizeMode,
     },
     orientation: {
       description:
@@ -168,6 +180,12 @@ function SplitterRenderer({
       initialPrimarySize={extractValue(node.props?.initialPrimarySize)}
       minPrimarySize={extractValue(node.props?.minPrimarySize)}
       maxPrimarySize={extractValue(node.props?.maxPrimarySize)}
+      resizeMode={
+        extractValue.asOptionalString(
+          node.props?.resizeMode,
+          defaultProps.resizeMode,
+        ) as SplitterResizeMode
+      }
       floating={extractValue.asOptionalBoolean(node.props?.floating)}
       resize={lookupEventHandler("resize")}
       visibleChildCount={visibleChildCount}

@@ -563,6 +563,92 @@ test.describe("Basic Functionality", () => {
       const newBounds = await getBounds(primary);
       expect(newBounds.height).toBeGreaterThan(initialBounds.height + 15); // Allow some tolerance
     });
+
+    test("resizeMode=preserveRatio keeps current panel ratio when container resizes", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" initialPrimarySize="240px" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary"/>
+        </Splitter>
+      `);
+
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+
+      await splitter.evaluate((el) => {
+        (el as HTMLElement).style.width = "300px";
+      });
+
+      await expect.poll(async () => (await getBounds(primary)).width).toBeLessThan(190);
+      const primaryBounds = await getBounds(primary);
+      expect(Math.abs(primaryBounds.width - 180)).toBeLessThan(10);
+    });
+
+    test("resizeMode=preservePrimary keeps primary panel size when container resizes", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" initialPrimarySize="240px" resizeMode="preservePrimary" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary"/>
+        </Splitter>
+      `);
+
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+
+      await splitter.evaluate((el) => {
+        (el as HTMLElement).style.width = "300px";
+      });
+
+      await expect.poll(async () => (await getBounds(splitter)).width).toBeLessThan(310);
+      const primaryBounds = await getBounds(primary);
+      expect(Math.abs(primaryBounds.width - 240)).toBeLessThan(10);
+    });
+
+    test("resizeMode=preserveSecondary keeps secondary panel size when container resizes", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" initialPrimarySize="240px" resizeMode="preserveSecondary" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary"/>
+        </Splitter>
+      `);
+
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+      const secondary = page.getByTestId("secondary");
+
+      const initialSecondaryBounds = await getBounds(secondary);
+
+      await splitter.evaluate((el) => {
+        (el as HTMLElement).style.width = "300px";
+      });
+
+      await expect.poll(async () => (await getBounds(primary)).width).toBeLessThan(150);
+      const primaryBounds = await getBounds(primary);
+      const secondaryBounds = await getBounds(secondary);
+      expect(Math.abs(primaryBounds.width - 140)).toBeLessThan(10);
+      expect(Math.abs(secondaryBounds.width - initialSecondaryBounds.width)).toBeLessThan(10);
+    });
+
+    test("resizeMode respects primary size constraints when preserving secondary", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" initialPrimarySize="100px" minPrimarySize="80px" resizeMode="preserveSecondary" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary"/>
+        </Splitter>
+      `);
+
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+
+      await splitter.evaluate((el) => {
+        (el as HTMLElement).style.width = "200px";
+      });
+
+      await expect.poll(async () => (await getBounds(primary)).width).toBeGreaterThan(70);
+      const primaryBounds = await getBounds(primary);
+      expect(primaryBounds.width).toBeGreaterThanOrEqual(75);
+      expect(primaryBounds.width).toBeLessThan(90);
+    });
   });
 
   test.describe("size constraint properties", () => {

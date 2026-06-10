@@ -15940,6 +15940,17 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "resizeMode": {
+        "description": "Sets how the `Splitter` adjusts its panel sizes when the splitter container itself is resized. `preserveRatio` keeps the current primary/secondary ratio, `preservePrimary` keeps the primary panel size and resizes the secondary panel, and `preserveSecondary` keeps the secondary panel size and resizes the primary panel. Minimum and maximum primary panel size constraints are still applied.",
+        "valueType": "string",
+        "availableValues": [
+          "preserveRatio",
+          "preservePrimary",
+          "preserveSecondary"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "preserveRatio"
+      },
       "orientation": {
         "description": "Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`), or vertically by placing the sections next to each other (`horizontal`).",
         "valueType": "string",
@@ -16198,6 +16209,17 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "resizeMode": {
+        "description": "Sets how the `Splitter` adjusts its panel sizes when the splitter container itself is resized. `preserveRatio` keeps the current primary/secondary ratio, `preservePrimary` keeps the primary panel size and resizes the secondary panel, and `preserveSecondary` keeps the secondary panel size and resizes the primary panel. Minimum and maximum primary panel size constraints are still applied.",
+        "valueType": "string",
+        "availableValues": [
+          "preserveRatio",
+          "preservePrimary",
+          "preserveSecondary"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "preserveRatio"
+      },
       "orientation": {
         "description": "Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`), or vertically by placing the sections next to each other (`horizontal`).",
         "valueType": "string",
@@ -16279,6 +16301,17 @@ export default {
         "description": "Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged. The default value is `false`, meaning the resizer is visible all the time.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "resizeMode": {
+        "description": "Sets how the `Splitter` adjusts its panel sizes when the splitter container itself is resized. `preserveRatio` keeps the current primary/secondary ratio, `preservePrimary` keeps the primary panel size and resizes the secondary panel, and `preserveSecondary` keeps the secondary panel size and resizes the primary panel. Minimum and maximum primary panel size constraints are still applied.",
+        "valueType": "string",
+        "availableValues": [
+          "preserveRatio",
+          "preservePrimary",
+          "preserveSecondary"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "preserveRatio"
       },
       "orientation": {
         "description": "Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`), or vertically by placing the sections next to each other (`horizontal`).",

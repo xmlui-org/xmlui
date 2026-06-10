@@ -10,7 +10,7 @@ import type { OrientationOptions } from "../abstractions";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { PART_PRIMARY_PANEL, PART_SECONDARY_PANEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
-import { defaultProps } from "./Splitter.defaults";
+import { defaultProps, type SplitterResizeMode } from "./Splitter.defaults";
 
 type SplitterProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   children?: React.ReactNode;
@@ -23,13 +23,22 @@ type SplitterProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   initialPrimarySize?: string;
   minPrimarySize?: string;
   maxPrimarySize?: string;
+  resizeMode?: SplitterResizeMode;
   visibleChildCount?: number;
 };
+
+function clampPrimarySize(size: number, containerSize: number, minSize: string, maxSize: string) {
+  return Math.min(
+    Math.max(size, parseSize(minSize, containerSize)),
+    parseSize(maxSize, containerSize),
+  );
+}
 
 export const Splitter = memo(forwardRef(function Splitter({
   initialPrimarySize = defaultProps.initialPrimarySize,
   minPrimarySize = defaultProps.minPrimarySize,
   maxPrimarySize = defaultProps.maxPrimarySize,
+  resizeMode = defaultProps.resizeMode,
   orientation = defaultProps.orientation,
   children,
   style,
@@ -52,10 +61,25 @@ export const Splitter = memo(forwardRef(function Splitter({
   const [resizer, setResizer] = useState<HTMLDivElement | null>(null);
   const [floatingResizer, setFloatingResizer] = useState<HTMLDivElement | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const sizePercentageRef = useRef(sizePercentage);
+  const containerSizeRef = useRef(containerSize);
+  const isInitializedRef = useRef(isInitialized);
   const resizerElement = useMemo(
     () => (floating ? floatingResizer : resizer),
     [floating, resizer, floatingResizer],
   );
+
+  useEffect(() => {
+    sizePercentageRef.current = sizePercentage;
+  }, [sizePercentage]);
+
+  useEffect(() => {
+    containerSizeRef.current = containerSize;
+  }, [containerSize]);
+
+  useEffect(() => {
+    isInitializedRef.current = isInitialized;
+  }, [isInitialized]);
 
   // Calculate actual size in pixels from percentage
   const size = useMemo(() => {
@@ -84,7 +108,30 @@ export const Splitter = memo(forwardRef(function Splitter({
       for (const entry of entries) {
         const newContainerSize =
           orientation === "horizontal" ? entry.contentRect.width : entry.contentRect.height;
+        const currentContainerSize = containerSizeRef.current;
+
+        if (!isInitializedRef.current || currentContainerSize <= 0 || newContainerSize <= 0) {
+          setContainerSize(newContainerSize);
+          continue;
+        }
+
+        const currentPrimarySize = (sizePercentageRef.current / 100) * currentContainerSize;
+        const currentSecondarySize = currentContainerSize - currentPrimarySize;
+        const nextPrimarySize =
+          resizeMode === "preservePrimary"
+            ? currentPrimarySize
+            : resizeMode === "preserveSecondary"
+              ? newContainerSize - currentSecondarySize
+              : (sizePercentageRef.current / 100) * newContainerSize;
+        const constrainedPrimarySize = clampPrimarySize(
+          nextPrimarySize,
+          newContainerSize,
+          minPrimarySize,
+          maxPrimarySize,
+        );
+
         setContainerSize(newContainerSize);
+        setSizePercentage(toPercentage(constrainedPrimarySize, newContainerSize));
       }
     });
 
@@ -93,7 +140,7 @@ export const Splitter = memo(forwardRef(function Splitter({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [splitter, orientation]);
+  }, [maxPrimarySize, minPrimarySize, orientation, resizeMode, splitter]);
 
   // Initialize container size and primary panel percentage
   useEffect(() => {
@@ -106,7 +153,12 @@ export const Splitter = memo(forwardRef(function Splitter({
       setContainerSize(newContainerSize);
 
       // Parse initial size and convert to percentage
-      const initialParsedSize = parseSize(initialPrimarySize, newContainerSize);
+      const initialParsedSize = clampPrimarySize(
+        parseSize(initialPrimarySize, newContainerSize),
+        newContainerSize,
+        minPrimarySize,
+        maxPrimarySize,
+      );
       const initialPercentage = toPercentage(initialParsedSize, newContainerSize);
 
       setSizePercentage(initialPercentage);
@@ -117,26 +169,24 @@ export const Splitter = memo(forwardRef(function Splitter({
         resize(actualPrimarySize);
       }
     }
-  }, [initialPrimarySize, orientation, resize, splitter, swapped]);
+  }, [initialPrimarySize, maxPrimarySize, minPrimarySize, orientation, resize, splitter, swapped]);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       if (splitter && resizerElement && containerSize > 0) {
         const newSize =
           orientation === "horizontal"
-            ? Math.min(
-                Math.max(
-                  event.clientX - splitter.getBoundingClientRect().left,
-                  parseSize(minPrimarySize, containerSize),
-                ),
-                parseSize(maxPrimarySize, containerSize),
+            ? clampPrimarySize(
+                event.clientX - splitter.getBoundingClientRect().left,
+                containerSize,
+                minPrimarySize,
+                maxPrimarySize,
               )
-            : Math.min(
-                Math.max(
-                  event.clientY - splitter.getBoundingClientRect().top,
-                  parseSize(minPrimarySize, containerSize),
-                ),
-                parseSize(maxPrimarySize, containerSize),
+            : clampPrimarySize(
+                event.clientY - splitter.getBoundingClientRect().top,
+                containerSize,
+                minPrimarySize,
+                maxPrimarySize,
               );
 
         const newPercentage = toPercentage(newSize, containerSize);
