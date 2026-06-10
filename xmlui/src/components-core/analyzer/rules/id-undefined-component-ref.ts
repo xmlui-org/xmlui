@@ -20,6 +20,8 @@ import type { ComponentDef } from "../../../abstractions/ComponentDefs";
 import { closestMatch, offsetToLineCol } from "./_utils";
 import {
   collectDeclaredNames,
+  collectDeclaredNamesFromNode,
+  collectDeclaredNamesFromSource,
   collectRootedChains,
   collectUidMap,
   iterComponentExpressions,
@@ -51,7 +53,12 @@ registerRule({
       const inScopeVars = new Set<string>(nextStack.flat());
 
       for (const ce of iterComponentExpressions(node)) {
-        const bodyLocals = ce.statements ? collectDeclaredNames(ce.statements) : [];
+        const bodyLocals = ce.statements
+          ? collectDeclaredNames(ce.statements)
+          : ce.expr
+            ? collectDeclaredNamesFromNode(ce.expr)
+            : [];
+        bodyLocals.push(...collectDeclaredNamesFromSource(ce.source));
 
         const chains = ce.expr
           ? collectRootedChains(ce.expr)
