@@ -1,5 +1,329 @@
 [
   {
+    "tag_name": "xmlui@0.12.30",
+    "published_at": "2026-06-09T10:55:58Z",
+    "changes": [
+      {
+        "description": "Prevent APICall lifecycle handlers from being delayed by FIFO handler scheduling when an API call is invoked from another event handler.",
+        "commit_sha": "b7a2b09"
+      },
+      {
+        "description": "Add async evaluator proxies for `Array.prototype.reduce`, `reduceRight`, `findLast`, and `findLastIndex`.",
+        "commit_sha": "72fa7d1"
+      },
+      {
+        "description": "Suppress type-contract unknown-prop diagnostics for behavior-owned props when the host component supports the corresponding behavior.",
+        "commit_sha": "59a45ec"
+      },
+      {
+        "description": "Make `onMount` and `onUnmount` the canonical visibility lifecycle events while keeping `onInit` and `onCleanup` as compatibility aliases.",
+        "commit_sha": "59a45ec"
+      },
+      {
+        "description": "Use analyzer-style diagnostic codes for overlapping type-contract checks, so unknown component, prop, event, and method diagnostics share one canonical code vocabulary across the verifier, analyzer, Vite, standalone, and VS Code surfaces.",
+        "commit_sha": "7d8761a"
+      },
+      {
+        "description": "Cooperative concurrency: ship `App.cancel()` global for aborting tracked",
+        "commit_sha": "59a45ec"
+      },
+      {
+        "description": "Allow `appGlobals.strictDomSandbox` to accept exact and wildcard DOM sandbox exemptions in addition to boolean modes.",
+        "commit_sha": "72fa7d1"
+      },
+      {
+        "description": "Fix Splitter resize events to emit the primary panel size as a single pixel value.",
+        "commit_sha": "e64e666"
+      },
+      {
+        "description": "Forms: add `<Form csrfToken>` and `<Form idempotencyKey>` props. When set, the built-in submit handler attaches them as the `X-CSRF-Token` and `Idempotency-Key` headers (header names override via `appGlobals.csrfHeaderName` / `appGlobals.idempotencyHeaderName`). Custom `onSubmit` handlers can read the values through new context variables `$formCsrfToken`, `$formIdempotencyKey`, `$formHeaders`, and the per-attempt `AbortSignal` via `$formCancel.signal`. Setting `appGlobals.requireFormCsrf = true` makes mutating submits without a token emit the `csrf-token-missing` diagnostic (escalated under `strictForms`).",
+        "commit_sha": "59a45ec"
+      },
+      {
+        "description": "Allow the XMLUI `new` operator to construct additional safe value, collection, URL, text, binary, and error types.",
+        "commit_sha": "72fa7d1"
+      },
+      {
+        "description": "Add scripting support for getter and setter properties in object literals.",
+        "commit_sha": "72fa7d1"
+      },
+      {
+        "description": "Keep warning-level theming diagnostics out of the browser console to avoid flooding E2E runs when strict theming is enabled by default.",
+        "commit_sha": "59a45ec"
+      },
+      {
+        "description": "Avoid resolving local variables and functions that participate in detected reactive cycles, preventing cyclic bindings from rendering fallback arithmetic results such as `NaN`.",
+        "commit_sha": "7d8761a"
+      },
+      {
+        "description": "Remove unused loader types `ExternalDataLoader` and `MockLoader`.",
+        "commit_sha": "7d6cd98"
+      },
+      {
+        "description": "Allow rendered Markdown, Text, and Heading content to be selected by default.",
+        "commit_sha": "c70b348"
+      },
+      {
+        "description": "refactor(DatePicker): replace the implementation with the new picker",
+        "commit_sha": "f19e98c"
+      },
+      {
+        "description": "Add `string[]` as a component metadata value type and apply it to string-array props.",
+        "commit_sha": "e9afe59"
+      },
+      {
+        "description": "feat: add border theme variables to ModalDialog",
+        "commit_sha": "bb94744"
+      },
+      {
+        "description": "Echo sealed theming sandbox diagnostics to the browser console and apply strict theme validation to scoped Theme overrides.",
+        "commit_sha": "4b17fad"
+      },
+      {
+        "description": "Fixed bug where declaring a variable outside of a ModalDialog and modifying it inside it did not affect that outer variable.",
+        "commit_sha": "b72529d"
+      },
+      {
+        "description": "Add `hash` as a component metadata property value type for plain object records.",
+        "commit_sha": "888e28e"
+      },
+      {
+        "description": "Validate literal `Text` variant values with typed contracts.",
+        "commit_sha": "7d8761a"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.30.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.30/xmlui-0.12.30.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.29",
+    "published_at": "2026-05-29T15:41:25Z",
+    "changes": [
+      {
+        "description": "Fixed code text applying background color in a codefence (pre element). Made table and markdown table styles more consistent.",
+        "commit_sha": "f922701"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.29.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.29/xmlui-0.12.29.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.28",
+    "published_at": "2026-05-26T13:25:20Z",
+    "changes": [
+      {
+        "description": "feat: implement the xmlui islands feature working in standalone mode",
+        "commit_sha": "f2b4dfa"
+      },
+      {
+        "description": "Plan #13 (build-time validation analyzers) sealed — implemented remaining identifier, expression, and cross-binding rules: `id-unknown-method`, `expr-unbound-identifier`, `expr-unused-var`, `id-undefined-component-ref`, `id-undefined-form-ref`. The analyzer walker now lazy-parses XMLUI markup via `xmlUiMarkupToComponent` when callers don't supply a pre-built `markupAst`, so rules fire across the CLI (`xmlui check`), Vite plugin (`analyze: \"off\"|\"warn\"|\"strict\"`), and LSP diagnostic provider without callers having to pre-parse. New shared AST infrastructure (`rules/_ast-utils.ts`, `rules/_reserved-identifiers.ts`) supports identifier-reference / rooted-chain collection, lazy expression parsing, and framework-context-variable whitelisting. `id-unknown-slot` is registered as a documented no-op pending a `ComponentMetadata.slots` field (out of plan scope).",
+        "commit_sha": "c798b9a"
+      },
+      {
+        "description": "Fixed wordBreak and wordWrap properties on Text.",
+        "commit_sha": "6a139ca"
+      },
+      {
+        "description": "Plan #6 Cooperative Concurrency — W7-1 (Phases 2–4): real `HandlerCoordinator` runtime backing the four declarative handler policies (`parallel`, `single-flight`, `queue`, `drop-while-running`); per-handler timeout via `handlerTimeoutMs` and ambient `appGlobals.defaultHandlerTimeoutMs` (default 30 s, `<= 0` disables); transactional state writes opt-in with `transactional` / `transactional:<event>`, buffered and replayed in one batch on success and discarded on cancellation; `Button.busyOnClick` convenience that auto-disables the button while its `onClick` handler is in flight. Default behaviour (`parallel`, 30 s ambient timeout, no buffering) is unchanged for existing apps; supersession, drop, timeout and cancellation are surfaced as `kind:\"concurrency\"` Inspector traces.",
+        "commit_sha": "bc35484"
+      },
+      {
+        "description": "feat: AutoComplete - add overflow truncation, option grouping, and stable tests",
+        "commit_sha": "bb04859"
+      },
+      {
+        "description": "Fix standalone component discovery for user-defined components nested inside component template properties.",
+        "commit_sha": "b367cc1"
+      },
+      {
+        "description": "Fix: `DataSource` no longer silently drops `queryParams` when `dataType=\"text\"` or `dataType=\"csv\"`",
+        "commit_sha": "304a642"
+      },
+      {
+        "description": "`DataSource`: add an `onFetch` event handler that fully replaces the default",
+        "commit_sha": "0c42b6f"
+      },
+      {
+        "description": "**Defended routing — Plan #10 W4 follow-ups.**",
+        "commit_sha": "2825582"
+      },
+      {
+        "description": "Plan #16 (W7-3, W7-4): add `determinism-floating-point-token` and `determinism-iteration-order-symbol` analyzer rules, and ship the `xmlui replay <expected.json> [actual.json]` CLI subcommand for trace-divergence checks.",
+        "commit_sha": "bc35484"
+      },
+      {
+        "description": "Add custom syntax highlighting",
+        "commit_sha": "5996389"
+      },
+      {
+        "description": "Ensure standalone XMLUI declares its CSS layer order before extensions can inject component styles.",
+        "commit_sha": "304a642"
+      },
+      {
+        "description": "Complete the managed-react enforced accessibility plan with LSP/Vite diagnostics, accessibility primitives, theme contrast checks, automation IDs, and user-facing documentation.",
+        "commit_sha": "c798b9a"
+      },
+      {
+        "description": "Fix VS Code Go-to-Definition (F12) failing with \"No definition found\" for user-defined components whose `.xmlui` file lives in a different directory than the file being edited, when no `Main.xmlui` or `config.json` project root marker can be found. The language server's `findProjectRoot` fallback now returns `null` instead of the current document's directory, so the search covers all discovered `.xmlui` files when the project boundary cannot be determined.",
+        "commit_sha": "e14e7af"
+      },
+      {
+        "description": "Forms validation discipline (plan #09, W5-1..W5-4):",
+        "commit_sha": "ecc4d27"
+      },
+      {
+        "description": "Add `matchValue` and `matchInvalidMessage` validation props for simple field confirmation checks.",
+        "commit_sha": "795bf3a"
+      },
+      {
+        "description": "fix(Select): apply intrinsic dropdownHeight keywords as height, not max-height",
+        "commit_sha": "a53f917"
+      },
+      {
+        "description": "fix(FormItem): propagate compactInlineLabel for checkbox and switch types so labels stay snug",
+        "commit_sha": "afa1cf5"
+      },
+      {
+        "description": "fix: Table - redistribute column widths after resize",
+        "commit_sha": "1571fb8"
+      },
+      {
+        "description": "fix: ensure ColorPicker updates synchronously on value change to prevent lag",
+        "commit_sha": "e77ce01"
+      },
+      {
+        "description": "**Plan #11 Phase 2.2 + Phase 2.3 — `<I18n>` component and framework-string extraction**",
+        "commit_sha": "ad1536b"
+      },
+      {
+        "description": "Seal plan #11 (i18n foundations): all phases 1–5 verified shipped. Public `App.translate` / `App.setLocale` / `App.locale` / `App.direction` namespace exposed through `AppContext`; `<App locale|localeBundles|direction>` props wired; `direction` prop now properly synced back to `App.direction` (explicit `\"ltr\"/\"rtl\"` overrides locale auto-detection); `setAppDirection` added to `AppContextDefs`; `<I18n>` component, ICU MessageFormat runtime, `Intl.*`-backed formatters, and SCSS logical-properties RTL contract all in place. Added 18 E2E tests covering locale switching, ICU plurals, missing-key fallback, RTL auto-direction, direction prop override, HStack mirroring, and root element `dir` attribute. Shipped user-facing docs page `/docs/managed-react/i18n-foundations`; `managed-react.md` §11 resolved bullets updated; `AGENTS.md` doc-map entry added. The `appGlobals.strictI18n` default flip from `false` to `true` (Phase 6.2) remains reserved for the next major release.",
+        "commit_sha": "c798b9a"
+      },
+      {
+        "description": "Add `onBeforeDispose` lifecycle event on all components (Plan #04 Step 3.1).",
+        "commit_sha": "9be5f8f"
+      },
+      {
+        "description": "Plan #04 (Managed Lifecycle Vocabulary) Phases 1–2 (W3-3): universal",
+        "commit_sha": "9be5f8f"
+      },
+      {
+        "description": "Document the managed lifecycle vocabulary (universal `onMount` / `onUnmount` / `onError` events, the declarative `<Lifecycle>` component, and the container-level `onBeforeDispose` flush hook) on the website under **Docs › Managed React › Managed Lifecycle Vocabulary**.",
+        "commit_sha": "2825582"
+      },
+      {
+        "description": "Start Managed React Wave 4 foundations for defended routing, i18n locale APIs, and determinism scheduler diagnostics.",
+        "commit_sha": "98f039d"
+      },
+      {
+        "description": "Complete reactive cycle detection with source-linked LSP diagnostics, aggregate Vite build checks, and managed-react documentation.",
+        "commit_sha": "2825582"
+      },
+      {
+        "description": "W6-7 (Plan #03 Reactive Cycle Detection — Phase 2 enforcement).",
+        "commit_sha": "8f704cf"
+      },
+      {
+        "description": "improve: DatePicker - redesign range visuals, add mobile drawer",
+        "commit_sha": "9082f34"
+      },
+      {
+        "description": "fix(FormItem): apply labelWidth on labelWrapper so percentage values work and labels stay aligned",
+        "commit_sha": "d3c75d5"
+      },
+      {
+        "description": "RTL + logical CSS audit (plan #11 W5-8): exposes `App.direction` as a reactive `\"ltr\"|\"rtl\"` accessor derived from the active locale; converts all component SCSS modules from physical CSS properties (`margin-left/right`, `padding-left/right`, `text-align: left/right`, positional `left`/`right`) to CSS logical properties (`margin-inline-start/end`, `padding-inline-start/end`, `text-align: start/end`, `inset-inline-start/end`); adds `scripts/lint-physical-css.ts` to detect remaining violations. No behaviour change for LTR apps; RTL apps now mirror correctly without override styles.",
+        "commit_sha": "ecc4d27"
+      },
+      {
+        "description": "Plan #07 W8-1: flip `appGlobals.strictErrors` default to `true`. Non-`AppError` throws from handlers now emit a `kind:\"errors\"` warn diagnostic in the Inspector trace with a migration hint. Set `appGlobals.strictErrors: false` to restore the previous warn-only behaviour during migration.",
+        "commit_sha": "2825582"
+      },
+      {
+        "description": "**Plan #10 Step 4.2 — `strictRouting` default flipped to `true`.**",
+        "commit_sha": "2825582"
+      },
+      {
+        "description": "Implement UDC sandbox scope, capability, trust mode, and manifest comparison foundations.",
+        "commit_sha": "8f704cf"
+      },
+      {
+        "description": "Plan #07 (Structured Exception Model) — documentation closure: end-user docs page at `/docs/managed-react/structured-exception-model`, dev-guide chapter `30-errors.md`, AI reference `.ai/xmlui/errors.md`, `AGENTS.md` doc-map entry, and `managed-react.md` scorecard updated to ✅ **Structured**. The `strictErrors` default flip is deferred to the next major.",
+        "commit_sha": "2825582"
+      },
+      {
+        "description": "Structured exception model (plan #07): `<App onError>` event + `App.errors`",
+        "commit_sha": "ad1536b"
+      },
+      {
+        "description": "feat(DatePicker): refine range mode UX, styling, and add confirm-range opt-in",
+        "commit_sha": "825da7c"
+      },
+      {
+        "description": "fix: DatePicker - keep dropdown within viewport, switch to bottom-sheet on mobile",
+        "commit_sha": "e3dfa4e"
+      },
+      {
+        "description": "Sealed theming sandbox — hot-path wiring (Plan #08 Phase 1 Step 1.2 + Phase 2 Steps 2.1 + 2.2).",
+        "commit_sha": "ad1536b"
+      },
+      {
+        "description": "Theming sandbox W5-6 + W5-7 risk probe (plan #08 Phases 1 + 2): introduces the `ThemeVarMetadata.valueType` vocabulary (`color`/`length`/`integer`/`number`/`duration`/`easing`/`shadow`/`border`/`fontFamily`/`fontWeight`/`lineHeight`/`string` opt-out), ships a side-effect-free theme validator (`validateTheme`), a layout-prop validator (`validateInlineStyle` with a `zIndex` ceiling), and a `style`-prop token funnel (`validateStyleString` flagging `position: fixed|sticky`, `url(...)`, `!important`, and unknown declarations). Registers the `kind:\"theming\"` trace entry shape and documents the `strictTheming`, `allowInlineRawCss`, and `maxZIndex` appGlobals (defaults preserve current behaviour). No call sites are switched onto the validator yet — this ships the API surface so apps can adopt it incrementally before strict-mode enforcement lands.",
+        "commit_sha": "ecc4d27"
+      },
+      {
+        "description": "Type-contract scaffolding (Wave 3-1). Adds the `strictTypeContracts`",
+        "commit_sha": "9be5f8f"
+      },
+      {
+        "description": "Type-contract verifier (W3-2): full per-component prop/event checks — missing-required, unknown-prop with Levenshtein suggestions, wrong-type, value-not-in-enum, unknown-event, deprecated-prop; layout props and expression bindings skipped.",
+        "commit_sha": "9be5f8f"
+      },
+      {
+        "description": "UDC sandbox foundation (plan #14, W5-9). Adds the `components-core/udc-sandbox` module with diagnostic codes (`UdcDiagCode`), `UdcContract` types, and stub scope / capability gates. Parser now recognises `<Prop>`, `<Event>`, `<Method>`, and `<Slot>` declaration blocks inside `<Component>` definitions and attaches the resulting contract to the `CompoundComponentDef`. When a UDC has a declared contract, references to `$props.<name>` without a matching `<Prop>` declaration emit a `udc-prop-undeclared` info-level trace entry. `strictUdcSandbox` is documented as a new `App.appGlobals` flag (escalation lands in W6). Legacy UDCs without declaration blocks continue to work unchanged.",
+        "commit_sha": "ecc4d27"
+      },
+      {
+        "description": "Surface verified type-contract diagnostics through the XMLUI language server, Vite plugin, and runtime expression path; add a metadata drift guard and make `strictTypeContracts` default-on with an explicit warn-only migration mode.",
+        "commit_sha": "2825582"
+      },
+      {
+        "description": "W6-4 / W6-5 / W6-6 — Enforced versioning (plan #12) Step 0 + Phases 1–4 land",
+        "commit_sha": "8f704cf"
+      },
+      {
+        "description": "Add component metadata `audit` classification flag (W3-5 / Plan #15 Step 2.1): extends `PropertyDef` with an `audit` field (including `fieldPolicies` for per-key object overrides), annotates `TextBox.initialValue`, `PasswordInput.initialValue`, `APICall.headers`, and `Form.data` with their PII classifications, and adds `buildBaselineRules()` to the audit redactor to derive baseline `RedactionRule[]` from component metadata.",
+        "commit_sha": "9be5f8f"
+      },
+      {
+        "description": "Ship the W3-6 risk-probe API surface for handler concurrency: new `concurrency/` module exporting `CancellationToken`, `HandlerCancelledError`, `createCancellationToken`, `HandlerPolicy`, and a pass-through `createHandlerCoordinator()` stub. Each event handler now receives a fresh `$cancel` token in its evaluation context; the dispatcher-side coordinator runtime ships in W7-1.",
+        "commit_sha": "9be5f8f"
+      },
+      {
+        "description": "UDC sandbox: ship runtime enforcement for scope, capabilities, and trust modes (plan #14 W6-1, W6-2, W6-3).",
+        "commit_sha": "ad1536b"
+      },
+      {
+        "description": "W8-1 (targeted): flip strict-mode defaults from `false` to `true` for the two plans whose remaining work is documentation/UI only.",
+        "commit_sha": "ad1536b"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.28.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.28/xmlui-0.12.28.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.27",
     "published_at": "2026-05-08T05:15:09Z",
     "changes": [
@@ -156,158 +480,6 @@
       {
         "name": "xmlui-0.12.23.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.23/xmlui-0.12.23.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.22",
-    "published_at": "2026-04-27T15:02:09Z",
-    "changes": [
-      {
-        "description": "fix: icon positioning in button component",
-        "commit_sha": "39b3cda"
-      },
-      {
-        "description": "Handle user-defined component recursion",
-        "commit_sha": "b6c5ea0"
-      },
-      {
-        "description": "Fix root cause of CSS `@layer` order regression: `metadata-helpers.ts` no longer transitively imports a React component (`ItemWithLabel.tsx`) and its SCSS module. The shared `defaultProps` constant was extracted into a new leaf module `ItemWithLabel.defaults.ts` with no React/SCSS dependencies, eliminating the stray per-module CSS chunk that inverted the cascade in production builds.",
-        "commit_sha": "107bd72"
-      },
-      {
-        "description": "Fix: reactive variable names cannot start with \"$\"",
-        "commit_sha": "9e9ba66"
-      },
-      {
-        "description": "feat: add Stepper and Step components",
-        "commit_sha": "92cd77d"
-      },
-      {
-        "description": "Fix React warnings visible in the website",
-        "commit_sha": "b62b4bd"
-      },
-      {
-        "description": "Remove the displayWhen behavior",
-        "commit_sha": "dfef575"
-      },
-      {
-        "description": "Fix CSS @layer cascade order being inverted under Vite 8 / Rolldown. Per-module CSS chunks (e.g. one containing only `@layer components { ... }`) could be loaded before the main entry CSS, causing the browser to derive a wrong layer order in which `components` ranked lower than `base`. This made the CSS reset (transparent background on `button`) override component styles like `Button` solid-primary background. The xmlui build pipeline now declares the canonical layer order (`reset, base, components, themes, dynamic`) inline at the top of every generated `index.html` and prepends it to every emitted CSS asset, guaranteeing a deterministic cascade regardless of chunk load order.",
-        "commit_sha": "fa94885"
-      },
-      {
-        "description": "Improve goto-definition in the language server: resolve components by their declared `name` attribute (falling back to filename), scope candidates to the same XMLUI project as the requesting document, and position the cursor on the `<Component>` tag name instead of the start of the file.",
-        "commit_sha": "49c058a"
-      },
-      {
-        "description": "Display warning with duplicated component IDs",
-        "commit_sha": "2e6e24b"
-      },
-      {
-        "description": "upgrade to vite 8",
-        "commit_sha": "562743c"
-      },
-      {
-        "description": "Fix subtle issues in the playground",
-        "commit_sha": "e57d50a"
-      },
-      {
-        "description": "Preserve form field values across FormItem unmount/remount",
-        "commit_sha": "af81fb8"
-      },
-      {
-        "description": "fix: wire FormItem label htmlFor to the underlying input id across all input components",
-        "commit_sha": "46d9398"
-      },
-      {
-        "description": "fix: enhance FormItem to support nested items with proper label width and spacing",
-        "commit_sha": "3c094f8"
-      },
-      {
-        "description": "Select now supports data-bound options",
-        "commit_sha": "21d76fd"
-      },
-      {
-        "description": "Stabilize a few flaky E2E tests:",
-        "commit_sha": "36fd1f3"
-      },
-      {
-        "description": "Introduce the shared semantic theme tokens `borderColor-outlined`,",
-        "commit_sha": "aac0959"
-      },
-      {
-        "description": "Upgrade from Vite 7 to Vite 8 (Rolldown/Oxc). Migrates build config from rollupOptions to rolldownOptions, removes deprecated esbuild transform options, adds moduleType to vite-xmlui-plugin transform output for Rolldown compatibility, and updates server.ws to server.hot API. Bumps @vitejs/plugin-react to v6, vite-plugin-svgr to v5, vite-plugin-lib-inject-css to v2.",
-        "commit_sha": "562743c"
-      },
-      {
-        "description": "fix: Checkbox/Switch labelPosition=start/end snug against control",
-        "commit_sha": "03a0d43"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.22.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.22/xmlui-0.12.22.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.21",
-    "published_at": "2026-04-21T09:16:01Z",
-    "changes": [
-      {
-        "description": "Extend the confirm global function with the actionThemeColor option",
-        "commit_sha": "4b7a288"
-      },
-      {
-        "description": "Emit XMLUI base styles during SSR so SSG pages render with framework styling before hydration.",
-        "commit_sha": "aa3cd6e"
-      },
-      {
-        "description": "Revert the xmlui islands feature",
-        "commit_sha": "cb88c69"
-      },
-      {
-        "description": "fix: circular module initialization resulting in problems when building the vscode extension",
-        "commit_sha": "b10ff4d"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.21.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.21/xmlui-0.12.21.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.20",
-    "published_at": "2026-04-20T11:42:06Z",
-    "changes": [
-      {
-        "description": "The XMLUI islands concept is ready for QA",
-        "commit_sha": "87ae4e9"
-      },
-      {
-        "description": "refactor: Migrated all monochrome pool icons from mixed icon packs to Lucide — a single, consistent icon set",
-        "commit_sha": "5ddb712"
-      },
-      {
-        "description": "feat: enhance ExpandableItem to respect explicit width and prevent sibling push in flex/grid layouts",
-        "commit_sha": "b400578"
-      },
-      {
-        "description": "Scripting engine improvements: removed deprecated `::` global scope operator, added configurable sync execution timeout via `appGlobals.syncExecutionTimeout`, implemented `instanceof` operator support.",
-        "commit_sha": "16bff91"
-      },
-      {
-        "description": "Fix VStack not filling available width inside HStack, causing Table star-sized columns to render too narrow",
-        "commit_sha": "8d59847"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.20.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.20/xmlui-0.12.20.js"
       }
     ]
   }
