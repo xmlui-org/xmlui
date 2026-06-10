@@ -7,6 +7,13 @@
 
 %-DESC-END
 
+## Styling
+
+When an `App` renders direct content without a `Pages` component, XMLUI applies
+default spacing to the content area. Use `paddingHorizontal-content-App`,
+`paddingVertical-content-App`, and `gap-content-App` to customize that spacing
+from the theme while preserving per-component layout props for local overrides.
+
 %-PROP-START layout
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:

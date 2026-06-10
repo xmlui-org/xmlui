@@ -68,6 +68,14 @@ All items within a `FlowLayout` instance fit in a single row, so `gap` affects o
 
 %-PROP-END
 
+## Styling
+
+Use `gap-FlowLayout` to set the default row and column spacing for `FlowLayout`.
+The default value comes from the app-bound `gap-layout` token. You can also set
+`columnGap-FlowLayout` and `rowGap-FlowLayout` independently. Explicit `gap`,
+`columnGap`, and `rowGap` props on a `FlowLayout` instance override these theme
+variables.
+
 %-PROP-START columnGap
 
 The `columnGap` property specifies the space between items in a single row; it overrides the `gap` value.

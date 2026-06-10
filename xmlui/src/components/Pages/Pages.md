@@ -52,3 +52,11 @@ No page is fetched from the server, thus the application operates as a [Single P
 ```
 
 %-PROP-END
+
+## Styling
+
+`Pages` wraps the active `Page` in a vertical layout surface. Use
+`paddingHorizontal-Pages`, `paddingVertical-Pages`, and `gap-Pages` to control
+that surface's default spacing. `paddingHorizontal-Pages` defaults through the
+app-bound `paddingHorizontal-layout` token; the vertical padding and gap keep
+their historical `$space-5` defaults for compatibility.

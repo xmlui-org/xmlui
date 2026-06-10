@@ -175,6 +175,25 @@ test.describe("Theme Variables", () => {
 
     expect(item2Top - item1Bottom).toBeCloseTo(0, 0);
   });
+
+  test("gap-layout theme variable controls default Stack gap", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <VStack testId="stack">
+        <Stack testId="item1" height="32px" width="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" width="32px" backgroundColor="blue" />
+      </VStack>
+    `,
+      {
+        testThemeVars: { "gap-layout": "28px" },
+      },
+    );
+
+    const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Top - item1Bottom).toBeCloseTo(28, 0);
+  });
 });
 
 // =============================================================================

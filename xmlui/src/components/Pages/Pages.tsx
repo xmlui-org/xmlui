@@ -96,7 +96,7 @@ export const PagesMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`paddingVertical-${COMP}`]: "$space-5",
-    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`paddingHorizontal-${COMP}`]: "$paddingHorizontal-layout",
     [`gap-${COMP}`]: "$space-5",
   },
 });

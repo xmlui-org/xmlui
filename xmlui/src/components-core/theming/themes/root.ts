@@ -256,12 +256,16 @@ export const RootThemeDefinition: ThemeDefinition = {
     "gap-tight": "$space-2",
     "gap-normal": "$space-4",
     "gap-loose": "$space-8",
+    "gap-layout": "$gap-normal",
 
     // --- Predefined paddings
     "padding-none": "$space-0",
     "padding-tight": "$space-2",
     "padding-normal": "$space-4",
     "padding-loose": "$space-8",
+    "padding-layout": "$padding-normal",
+    "paddingHorizontal-layout": "$padding-layout",
+    "paddingVertical-layout": "$padding-layout",
 
     // --- Predefined spaces
     "space-none": "$space-0",

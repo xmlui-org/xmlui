@@ -165,7 +165,7 @@ const stackMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`gap-Stack`]: "$gap-normal",
+    [`gap-Stack`]: "$gap-layout",
   },
 });
 
@@ -406,7 +406,7 @@ function renderStack({
   if (orientation === "horizontal" && wrapContent) {
     const columnGap =
       extractValue.asSize(node.props?.gap) ||
-      extractValue.asSize("$space-4");
+      extractValue.asSize("$gap-Stack");
     const rowGap = columnGap; // Use same gap for rows
 
     return (

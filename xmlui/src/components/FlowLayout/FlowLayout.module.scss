@@ -7,6 +7,10 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$gap-FlowLayout: createThemeVar("gap-FlowLayout");
+$columnGap-FlowLayout: createThemeVar("columnGap-FlowLayout");
+$rowGap-FlowLayout: createThemeVar("rowGap-FlowLayout");
+
 @layer components {
   .outer {
     contain: layout;

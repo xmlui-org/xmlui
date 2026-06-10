@@ -56,6 +56,14 @@ Your designer wants a more compact, data-dense layout for an analytics dashboard
 </Theme>
 ```
 
+**Layout defaults**: `gap-layout`, `paddingHorizontal-layout`, and `paddingVertical-layout` are app-bound aliases used by layout surfaces that expose themeable defaults. Override these when you want layout containers to share a spacing policy without changing lower-level spacing tokens:
+
+```xmlui
+<Theme gap-layout="$space-3" paddingHorizontal-layout="$space-3">
+  <!-- default layout gaps and horizontal page padding use these aliases -->
+</Theme>
+```
+
 **Global padding tokens**: `padding-none`, `padding-tight`, `padding-normal`, and `padding-loose` work the same way for internal spacing:
 
 ```xmlui

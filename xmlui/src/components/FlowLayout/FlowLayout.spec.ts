@@ -570,6 +570,75 @@ test.describe("Basic functionality", () => {
 });
 
 // =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("gap-FlowLayout theme variable controls the default item gap", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <FlowLayout testId="layout" width="200px" itemWidth="50px">
+        <Stack testId="item1" height="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" backgroundColor="blue" />
+      </FlowLayout>
+    `,
+      {
+        testThemeVars: { "gap-FlowLayout": "24px" },
+      },
+    );
+
+    const { right: item1Right } = await getBounds(page.getByTestId("item1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Left - item1Right).toBeCloseTo(24, 0);
+  });
+
+  test("gap-layout theme variable controls FlowLayout default gap", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <FlowLayout testId="layout" width="200px" itemWidth="50px">
+        <Stack testId="item1" height="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" backgroundColor="blue" />
+      </FlowLayout>
+    `,
+      {
+        testThemeVars: { "gap-layout": "28px" },
+      },
+    );
+
+    const { right: item1Right } = await getBounds(page.getByTestId("item1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Left - item1Right).toBeCloseTo(28, 0);
+  });
+
+  test("explicit gap prop overrides FlowLayout theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <FlowLayout testId="layout" width="200px" itemWidth="50px" gap="12px">
+        <Stack testId="item1" height="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" backgroundColor="blue" />
+      </FlowLayout>
+    `,
+      {
+        testThemeVars: { "gap-FlowLayout": "24px", "gap-layout": "28px" },
+      },
+    );
+
+    const { right: item1Right } = await getBounds(page.getByTestId("item1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Left - item1Right).toBeCloseTo(12, 0);
+  });
+});
+
+// =============================================================================
 // TEXT ELLIPSIS TESTS
 // =============================================================================
 
