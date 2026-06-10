@@ -24,10 +24,28 @@ import { offsetToLineCol, walkComponentDef } from "./_utils";
 import { iterComponentExpressions, walkAstNodes, T_IDENTIFIER } from "./_ast-utils";
 import type { Identifier } from "../../script-runner/ScriptingSourceTree";
 
+function getVarLocation(node: ComponentDef, varName: string) {
+  return (node.debug as any)?.reactiveNodes?.[`var.${varName}`];
+}
+
+function getDeclaringComponentLabel(node: ComponentDef, varName: string): string {
+  const varLocation = getVarLocation(node, varName);
+  const nodeLocation = (node.debug?.source as any) ?? undefined;
+  if (
+    varLocation &&
+    nodeLocation &&
+    typeof varLocation.start === "number" &&
+    typeof nodeLocation.start === "number" &&
+    varLocation.start < nodeLocation.start
+  ) {
+    return "Component";
+  }
+  return node.type;
+}
+
 registerRule({
   code: "expr-unused-var",
-  description:
-    "A `var` is declared but never referenced in any descendant expression.",
+  description: "A `var` is declared but never referenced in any descendant expression.",
   defaultSeverity: "info",
   strictSeverity: "warn",
   appliesTo: "both",
@@ -43,9 +61,10 @@ registerRule({
     walkComponentDef(root, (node) => {
       for (const ce of iterComponentExpressions(node)) {
         const seed = (ce.expr as any) ?? null;
-        if (seed) walkAstNodes(seed, (n) => {
-          if (n.type === T_IDENTIFIER) referenced.add((n as Identifier).name);
-        });
+        if (seed)
+          walkAstNodes(seed, (n) => {
+            if (n.type === T_IDENTIFIER) referenced.add((n as Identifier).name);
+          });
         if (ce.statements) {
           for (const s of ce.statements) {
             walkAstNodes(s as any, (n) => {
@@ -57,21 +76,30 @@ registerRule({
     });
 
     // Pass 2: emit one diagnostic per `node.vars` key never referenced.
-    const { line, col } = offsetToLineCol(ctx.source, (root.debug?.source as any)?.start ?? 0);
     const diagnostics: BuildDiagnostic[] = [];
     walkComponentDef(root, (node) => {
       if (!node.vars || typeof node.vars !== "object") return;
       for (const varName of Object.keys(node.vars)) {
         if (referenced.has(varName)) continue;
+        const varLocation = getVarLocation(node, varName);
+        const componentType = getDeclaringComponentLabel(node, varName);
+        if (componentType === "Component") continue;
+        const { line, col } =
+          varLocation?.line && varLocation?.col
+            ? { line: varLocation.line, col: varLocation.col }
+            : offsetToLineCol(
+                ctx.source,
+                (varLocation as any)?.start ?? (node.debug?.source as any)?.start ?? 0,
+              );
         diagnostics.push({
           code: "expr-unused-var",
           severity,
           file: ctx.file,
           line,
           column: col,
-          length: varName.length,
-          message: `Var "${varName}" declared on <${node.type}> is never referenced.`,
-          data: { varName, componentType: node.type },
+          length: varLocation?.length ?? varName.length,
+          message: `Var "${varName}" declared on <${componentType}> is never referenced.`,
+          data: { varName, componentType },
         });
       }
     });
