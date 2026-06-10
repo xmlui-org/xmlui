@@ -51,7 +51,7 @@ For state that needs to flush before a container goes away, like a draft to pers
 
 ## Data flow is declarative
 
-Another common React footgun is the `useState` that gets out of sync with the `useEffect` that fetches its data. The agent writes a state variable, an effect that depends on it, a fetch call, a setState in the `.then`, and ( if it remembers) an abort controller and a cleanup. Then it does the whole dance again for the next variable that depends on this one. The bug surface is enormous: missing dependencies, stale closures, races between two effects, double-fetches in development mode, state that updates after unmount.
+Another common React footgun is the `useState` that gets out of sync with the `useEffect` that fetches its data. The agent writes a state variable, an effect that depends on it, a fetch call, a setState in the `.then`, and (if it remembers) an abort controller and a cleanup. Then it does the whole dance again for the next variable that depends on this one. The bug surface is enormous: missing dependencies, stale closures, races between two effects, double-fetches in development mode, state that updates after unmount.
 
 In XMLUI an agent writes none of that. A small Tube-status app, complete:
 
@@ -81,7 +81,7 @@ Because the graph is implicit in markup, the framework can analyze it statically
 
 The agent also doesn't write the cancellation logic. The `DataSource` carries an `AbortController` under the hood. When the user picks a different line in the `Select`, the in-flight request for the previous line is aborted; when the page unmounts, every in-flight request is aborted. React Query manages the cache key, so a return visit to a previously-loaded line shows its data immediately while the framework decides whether to revalidate.
 
-It isn't that the agent gets a cleaner version of `useState` + `useEffect`, rather it doesn't see those primitives at all. The class of bug that comes from coordinating them is removed, in the same sense that the class of bug that comes from coordinating `malloc` and `free` is removed in Java.
+It isn't that the agent gets a cleaner version of `useState` + `useEffect`; rather it doesn't see those primitives at all. The class of bug that comes from coordinating them is removed, in the same sense that the class of bug that comes from coordinating `malloc` and `free` is removed in Java.
 
 ## From convention to contract
 
