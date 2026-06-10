@@ -16,14 +16,18 @@ import { Parser } from "../../../parsers/scripting/Parser";
 import {
   T_ARROW_EXPRESSION,
   T_ARROW_EXPRESSION_STATEMENT,
+  T_ARRAY_DESTRUCTURE,
   T_BLOCK_STATEMENT,
   T_CONST_STATEMENT,
+  T_DESTRUCTURE,
   T_EXPRESSION_STATEMENT,
   T_FUNCTION_DECLARATION,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_IDENTIFIER,
   T_LET_STATEMENT,
   T_MEMBER_ACCESS_EXPRESSION,
+  T_OBJECT_DESTRUCTURE,
+  T_SPREAD_EXPRESSION,
   T_VAR_STATEMENT,
   type Expression,
   type FunctionInvocationExpression,
@@ -278,29 +282,127 @@ export function collectRootedChains(
 // Var / param declaration collection
 // ---------------------------------------------------------------------------
 
+/** Identifiers declared inside a statement or expression subtree. */
+export function collectDeclaredNamesFromNode(
+  node: Expression | Statement | undefined | null,
+): string[] {
+  const names = new Set<string>();
+  if (!node) return [];
+
+  function addPatternName(pattern: any): void {
+    if (!pattern || typeof pattern !== "object") return;
+    if (typeof pattern.id === "string") {
+      names.add(pattern.id);
+    } else if (pattern.id?.name) {
+      names.add(pattern.id.name);
+    }
+    if (pattern.type === T_IDENTIFIER && pattern.name) {
+      names.add(pattern.name);
+    }
+    if (pattern.type === T_SPREAD_EXPRESSION) {
+      addPatternName(pattern.expr);
+    }
+    if (
+      pattern.type === T_DESTRUCTURE ||
+      pattern.type === T_ARRAY_DESTRUCTURE ||
+      pattern.type === T_OBJECT_DESTRUCTURE
+    ) {
+      for (const item of pattern.aDestr ?? []) addPatternName(item);
+      for (const item of pattern.oDestr ?? []) addPatternName(item);
+    }
+  }
+
+  walkAstNodes(node as any, (current) => {
+    if (!current || typeof current !== "object") return undefined;
+    if (
+      current.type === T_LET_STATEMENT ||
+      current.type === T_CONST_STATEMENT ||
+      current.type === T_VAR_STATEMENT
+    ) {
+      for (const d of current.decls ?? []) {
+        addPatternName(d);
+      }
+    } else if (current.type === T_FUNCTION_DECLARATION) {
+      const id = current.id;
+      if (id?.name) names.add(id.name);
+    } else if (current.type === T_ARROW_EXPRESSION) {
+      for (const arg of current.args ?? []) {
+        addPatternName(arg);
+      }
+    }
+    return undefined;
+  });
+  return [...names];
+}
+
 /** Identifiers declared by a `let` / `const` / `var` / `function` statement. */
 export function collectDeclaredNames(
   stmts: ReadonlyArray<Statement> | undefined | null,
 ): string[] {
-  const names: string[] = [];
-  if (!stmts) return names;
-
+  const names = new Set<string>();
+  if (!stmts) return [];
   for (const s of stmts) {
-    if (!s || typeof s !== "object") continue;
-    if (s.type === T_LET_STATEMENT || s.type === T_CONST_STATEMENT) {
-      for (const d of (s as any).decls ?? []) {
-        if (d?.id) names.push(d.id);
-      }
-    } else if (s.type === T_VAR_STATEMENT) {
-      for (const d of (s as any).decls ?? []) {
-        if (d?.id?.name) names.push(d.id.name);
-      }
-    } else if (s.type === T_FUNCTION_DECLARATION) {
-      const id = (s as any).id;
-      if (id?.name) names.push(id.name);
+    for (const name of collectDeclaredNamesFromNode(s as any)) {
+      names.add(name);
     }
   }
-  return names;
+  return [...names];
+}
+
+/**
+ * Conservative source fallback for lexical names the scripting AST does not
+ * currently expose uniformly, such as function params, catch params, and
+ * destructuring declarations nested in inline handlers.
+ */
+export function collectDeclaredNamesFromSource(source: string | undefined | null): string[] {
+  const names = new Set<string>();
+  if (!source) return [];
+
+  function addName(name: string): void {
+    const trimmed = name.trim();
+    if (/^[A-Za-z_$][\w$]*$/.test(trimmed)) names.add(trimmed);
+  }
+
+  function addPattern(pattern: string): void {
+    const trimmed = pattern.trim();
+    if (!trimmed) return;
+    if (/^[A-Za-z_$][\w$]*$/.test(trimmed)) {
+      names.add(trimmed);
+      return;
+    }
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      for (const match of trimmed.matchAll(/\b([A-Za-z_$][\w$]*)\b(?=\s*(?::|,|}|=|\]))/g)) {
+        addName(match[1]);
+      }
+    }
+  }
+
+  function addParamList(params: string): void {
+    for (const param of params.split(",")) {
+      addPattern(param.replace(/=.*$/, "").replace(/^\s*\.\.\./, ""));
+    }
+  }
+
+  for (const match of source.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*|\{[^}]*\}|\[[^\]]*\])/g)) {
+    addPattern(match[1]);
+  }
+  for (const match of source.matchAll(/\bfor\s*\(\s*(?:const|let|var)\s+([A-Za-z_$][\w$]*|\{[^}]*\}|\[[^\]]*\])/g)) {
+    addPattern(match[1]);
+  }
+  for (const match of source.matchAll(/\bcatch\s*\(\s*([A-Za-z_$][\w$]*)\s*\)/g)) {
+    addName(match[1]);
+  }
+  for (const match of source.matchAll(/\bfunction(?:\s+[A-Za-z_$][\w$]*)?\s*\(([^)]*)\)/g)) {
+    addParamList(match[1]);
+  }
+  for (const match of source.matchAll(/\(([^)]*)\)\s*=>/g)) {
+    addParamList(match[1]);
+  }
+  for (const match of source.matchAll(/\b([A-Za-z_$][\w$]*)\s*=>/g)) {
+    addName(match[1]);
+  }
+
+  return [...names];
 }
 
 // ---------------------------------------------------------------------------

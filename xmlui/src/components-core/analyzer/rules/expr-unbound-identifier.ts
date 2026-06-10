@@ -30,6 +30,8 @@ import type { ComponentDef } from "../../../abstractions/ComponentDefs";
 import { closestMatch, offsetToLineCol } from "./_utils";
 import {
   collectDeclaredNames,
+  collectDeclaredNamesFromNode,
+  collectDeclaredNamesFromSource,
   collectIdentifierRefs,
   collectUidMap,
   iterComponentExpressions,
@@ -59,7 +61,12 @@ registerRule({
       const inScopeVars = new Set<string>(nextStack.flat());
 
       for (const ce of iterComponentExpressions(node)) {
-        const bodyLocals = ce.statements ? new Set(collectDeclaredNames(ce.statements)) : new Set<string>();
+        const bodyLocals = ce.statements
+          ? new Set(collectDeclaredNames(ce.statements))
+          : ce.expr
+            ? new Set(collectDeclaredNamesFromNode(ce.expr))
+            : new Set<string>();
+        for (const name of collectDeclaredNamesFromSource(ce.source)) bodyLocals.add(name);
         if (ce.kind === "var") bodyLocals.add(ce.name);
 
         const refs = ce.expr
