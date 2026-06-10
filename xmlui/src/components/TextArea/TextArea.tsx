@@ -22,6 +22,7 @@ import { type ResizeOptions, TextArea } from "./TextAreaReact";
 import { defaultProps } from "./TextArea.defaults";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "TextArea";
 
@@ -147,11 +148,13 @@ type ThemedTextAreaProps = React.ComponentPropsWithoutRef<typeof TextArea>;
 export const ThemedTextArea = React.forwardRef<
   React.ElementRef<typeof TextArea>,
   ThemedTextAreaProps
->(function ThemedTextArea({ className, ...props }, ref) {
+>(function ThemedTextArea({ classes, ...props }, ref) {
   const themeClass = useComponentThemeClass(TextAreaMd);
-  return (
-    <TextArea {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
-  );
+  const themedClasses: Record<string, string> = {
+    ...(classes ?? {}),
+    [COMPONENT_PART_KEY]: [themeClass, classes?.[COMPONENT_PART_KEY]].filter(Boolean).join(" "),
+  };
+  return <TextArea {...props} classes={themedClasses} ref={ref} />;
 });
 
 export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaMd, {
@@ -162,7 +165,7 @@ export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaM
     _props,
     { node, extractValue, state, updateState, classes, registerComponentApi, lookupEventHandler },
   ) => (
-    <TextArea
+    <ThemedTextArea
       value={state?.value}
       initialValue={extractValue(node.props.initialValue)}
       updateState={updateState}
