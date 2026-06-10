@@ -31,6 +31,11 @@ function runWithAst(root: ComponentDef, strict = false) {
   });
 }
 
+function expectNoDiagnostic(root: ComponentDef, code: string) {
+  const results = runWithAst(root);
+  expect(results.filter((d) => d.code === code)).toHaveLength(0);
+}
+
 // ---------------------------------------------------------------------------
 // expr-unbound-identifier
 // ---------------------------------------------------------------------------
@@ -81,8 +86,50 @@ describe("rule: expr-unbound-identifier", () => {
         { type: "Button", events: { onClick: "let x = 1; x + 1" } },
       ],
     };
-    const results = runWithAst(root);
-    expect(results.filter((d) => d.code === "expr-unbound-identifier")).toHaveLength(0);
+    expectNoDiagnostic(root, "expr-unbound-identifier");
+  });
+
+  it("does not flag a destructured body-local declaration", () => {
+    const root: ComponentDef = {
+      type: "App",
+      children: [
+        {
+          type: "Button",
+          events: {
+            onClick: "const { item } = { item: 1 }; item + 1",
+          },
+        },
+      ],
+    };
+    expectNoDiagnostic(root, "expr-unbound-identifier");
+  });
+
+  it("does not flag a function parameter used in a local function body", () => {
+    const root: ComponentDef = {
+      type: "App",
+      children: [
+        {
+          type: "Button",
+          events: {
+            onClick: "function format(value) { return value + 1; } format(1)",
+          },
+        },
+      ],
+    };
+    expectNoDiagnostic(root, "expr-unbound-identifier");
+  });
+
+  it("does not flag an arrow parameter used in a bound expression", () => {
+    const root: ComponentDef = {
+      type: "App",
+      children: [
+        {
+          type: "Text",
+          props: { value: "{[1, 2, 3].map(item => item + 1).join(',')}" },
+        },
+      ],
+    };
+    expectNoDiagnostic(root, "expr-unbound-identifier");
   });
 
   it("does not flag a $-prefixed context variable", () => {
@@ -92,8 +139,7 @@ describe("rule: expr-unbound-identifier", () => {
         { type: "Button", events: { onClick: "$event.preventDefault()" } },
       ],
     };
-    const results = runWithAst(root);
-    expect(results.filter((d) => d.code === "expr-unbound-identifier")).toHaveLength(0);
+    expectNoDiagnostic(root, "expr-unbound-identifier");
   });
 });
 
@@ -187,8 +233,50 @@ describe("rule: id-undefined-component-ref", () => {
         { type: "Text", props: { value: "{state.foo}" } },
       ],
     };
-    const results = runWithAst(root);
-    expect(results.filter((d) => d.code === "id-undefined-component-ref")).toHaveLength(0);
+    expectNoDiagnostic(root, "id-undefined-component-ref");
+  });
+
+  it("does not flag chain rooted at a body-local declaration", () => {
+    const root: ComponentDef = {
+      type: "App",
+      children: [
+        {
+          type: "Button",
+          events: {
+            onClick: "const localState = { ready: true }; localState.ready",
+          },
+        },
+      ],
+    };
+    expectNoDiagnostic(root, "id-undefined-component-ref");
+  });
+
+  it("does not flag chain rooted at a function parameter", () => {
+    const root: ComponentDef = {
+      type: "App",
+      children: [
+        {
+          type: "Button",
+          events: {
+            onClick: "function visit(item) { return item.value; } visit({ value: 1 })",
+          },
+        },
+      ],
+    };
+    expectNoDiagnostic(root, "id-undefined-component-ref");
+  });
+
+  it("does not flag chain rooted at an arrow parameter", () => {
+    const root: ComponentDef = {
+      type: "App",
+      children: [
+        {
+          type: "Text",
+          props: { value: "{[{ value: 1 }].map(item => item.value).join(',')}" },
+        },
+      ],
+    };
+    expectNoDiagnostic(root, "id-undefined-component-ref");
   });
 });
 
