@@ -2587,6 +2587,9 @@ export default {
       "backgroundColor-AppHeader": "var(--xmlui-backgroundColor-AppHeader)",
       "borderBottom-AppHeader": "var(--xmlui-borderBottom-AppHeader)",
       "scroll-padding-block-Pages": "var(--xmlui-scroll-padding-block-Pages)",
+      "paddingHorizontal-content-App": "var(--xmlui-paddingHorizontal-content-App)",
+      "paddingVertical-content-App": "var(--xmlui-paddingVertical-content-App)",
+      "gap-content-App": "var(--xmlui-gap-content-App)",
       "maxWidth-drawer-App": "var(--xmlui-maxWidth-drawer-App)",
       "top-closeButton-App": "var(--xmlui-top-closeButton-App)",
       "right-closeButton-App": "var(--xmlui-right-closeButton-App)"
@@ -2616,6 +2619,9 @@ export default {
       "boxShadow-navPanel-App": "none",
       "scroll-padding-block-Pages": "$space-4",
       "backgroundColor-content-App": "$backgroundColor",
+      "paddingHorizontal-content-App": "$space-4",
+      "paddingVertical-content-App": "$space-5",
+      "gap-content-App": "$space-5",
       "light": {},
       "dark": {}
     },
@@ -6740,7 +6746,16 @@ export default {
         "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
-    "themeVars": []
+    "themeVars": {
+      "gap-FlowLayout": "var(--xmlui-gap-FlowLayout)",
+      "columnGap-FlowLayout": "var(--xmlui-columnGap-FlowLayout)",
+      "rowGap-FlowLayout": "var(--xmlui-rowGap-FlowLayout)"
+    },
+    "defaultThemeVars": {
+      "gap-FlowLayout": "$gap-layout",
+      "columnGap-FlowLayout": "$gap-FlowLayout",
+      "rowGap-FlowLayout": "$gap-FlowLayout"
+    }
   },
   "Footer": {
     "status": "stable",
@@ -14357,7 +14372,7 @@ export default {
     },
     "defaultThemeVars": {
       "paddingVertical-Pages": "$space-5",
-      "paddingHorizontal-Pages": "$space-4",
+      "paddingHorizontal-Pages": "$paddingHorizontal-layout",
       "gap-Pages": "$space-5"
     }
   },
@@ -16449,7 +16464,7 @@ export default {
       "gap-Stack": "var(--xmlui-gap-Stack)"
     },
     "defaultThemeVars": {
-      "gap-Stack": "$gap-normal"
+      "gap-Stack": "$gap-layout"
     }
   },
   "CHStack": {
@@ -16595,7 +16610,7 @@ export default {
       "gap-Stack": "var(--xmlui-gap-Stack)"
     },
     "defaultThemeVars": {
-      "gap-Stack": "$gap-normal"
+      "gap-Stack": "$gap-layout"
     },
     "specializedFrom": "Stack"
   },
@@ -16742,7 +16757,7 @@ export default {
       "gap-Stack": "var(--xmlui-gap-Stack)"
     },
     "defaultThemeVars": {
-      "gap-Stack": "$gap-normal"
+      "gap-Stack": "$gap-layout"
     },
     "specializedFrom": "Stack"
   },
@@ -16889,7 +16904,7 @@ export default {
       "gap-Stack": "var(--xmlui-gap-Stack)"
     },
     "defaultThemeVars": {
-      "gap-Stack": "$gap-normal"
+      "gap-Stack": "$gap-layout"
     },
     "specializedFrom": "Stack"
   },
@@ -17036,7 +17051,7 @@ export default {
       "gap-Stack": "var(--xmlui-gap-Stack)"
     },
     "defaultThemeVars": {
-      "gap-Stack": "$gap-normal"
+      "gap-Stack": "$gap-layout"
     },
     "specializedFrom": "Stack"
   },

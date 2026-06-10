@@ -367,6 +367,16 @@ and the runtime extractor share a single rule table — see
 6. Wire props, events, APIs
 7. Write tests
 
+## Metadata Snapshot
+
+Component metadata is also committed as the generated language-server snapshot at `xmlui/src/language-server/xmlui-metadata-generated.js`. If you change `createMetadata()`, `themeVars`, `defaultThemeVars`, props, events, APIs, parts, context variables, or injected variable metadata, run this before committing:
+
+```bash
+npm --prefix xmlui run check:metadata-snapshot
+```
+
+If the command fails with a diff in `xmlui-metadata-generated.js`, that is the expected drift signal. Include the regenerated file in the same commit as the metadata source change, then rerun the check.
+
 ## Anti-Patterns
 
 | Anti-pattern | Fix |
