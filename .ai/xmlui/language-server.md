@@ -345,7 +345,9 @@ type TaggedAttribute = {
 
 ```bash
 # After changing component metadata:
-npm run gen:langserver-metadata   # Regenerate xmlui-metadata-generated.js
+npm --prefix xmlui run check:metadata-snapshot
+# Regenerates xmlui-metadata-generated.js and fails if the snapshot now differs.
+# Include that generated diff before committing, then rerun the command.
 
 # Build the VS Code extension:
 cd tools/vscode

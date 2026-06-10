@@ -93,6 +93,16 @@ The cli tool is interactive, so instead do the following manual steps:
 3. Markdow body is the change description
 4. Check your changes are recognised by running `npx changeset status` at the monorepo root
 
+### Metadata snapshot
+
+When changing component metadata, theme variables, default theme variables, props, events, APIs, parts, or context variables, rebuild the language-server metadata snapshot before committing:
+
+```
+npm --prefix xmlui run check:metadata-snapshot
+```
+
+This command intentionally fails when `xmlui/src/language-server/xmlui-metadata-generated.js` changes. Include that regenerated file in the commit, then rerun the command; CI expects the snapshot to match the metadata source.
+
 ---
 
 ## Task Quick Reference

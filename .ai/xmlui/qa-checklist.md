@@ -93,6 +93,7 @@ actionable and maps to a concrete, verifiable pattern.
 - [ ] Variable names follow the pattern: `property-ComponentName`, `property-ComponentName-Variant`, `property-ComponentName--State`.
 - [ ] `:export { themeVars: t.json-stringify($themeVars); }` at the bottom of every SCSS module.
 - [ ] `defaultThemeVars` in metadata covers every SCSS variable.
+- [ ] After changing metadata or theme variable metadata, run `npm --prefix xmlui run check:metadata-snapshot` and include any regenerated `xmlui/src/language-server/xmlui-metadata-generated.js` diff before committing.
 - [ ] No duplicate `$themeVars: t.composeFooVars(...)` calls — each compose function called once.
 - [ ] Sub-element `:focus` uses element-scoped variables (e.g. `$outlineColor-button-Foo--focused`), not the component-root variable.
 - [ ] Duplicate layout CSS across variant classes extracted to a shared base class.
