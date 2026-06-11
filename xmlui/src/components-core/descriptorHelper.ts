@@ -115,6 +115,8 @@ export const behaviorPropKeys: readonly string[] = [
   "animation", "animationOptions",
   // BookmarkBehavior — triggerProps: bookmark
   "bookmark", "bookmarkLevel", "bookmarkTitle", "bookmarkOmitFromToc",
+  // LiveRegionBehavior — triggerProps: withLiveRegion
+  "withLiveRegion", "liveRegionMessage", "liveRegionPoliteness",
   // FormBindingBehavior — triggerProps: bindTo
   "bindTo", "initialValue", "noSubmit",
   // LabelBehavior — triggerProps: label

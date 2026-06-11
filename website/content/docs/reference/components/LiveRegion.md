@@ -27,6 +27,46 @@ XMLUI also includes a shared global live region. Built-in notifications and
 runtime errors use that global region automatically, so you only need
 `LiveRegion` when your own component state needs a custom announcement.
 
+For text-like visual components, you may not need to add a separate
+`LiveRegion`. The `withLiveRegion` behavior can add a related hidden live
+region to `Text`, `Heading`, `H1` through `H6`, `Badge`, `NoResult`, and
+`ProgressBar`.
+
+```xmlui-pg copy display height="220px" name="Example: withLiveRegion behavior"
+<App>
+  <Fragment var.statusMessage="Waiting for an update">
+    <VStack>
+      <Button
+        label="Save"
+        onClick="statusMessage = 'Settings saved'"
+      />
+      <Text withLiveRegion>{statusMessage}</Text>
+    </VStack>
+  </Fragment>
+</App>
+```
+
+Use `liveRegionMessage` when the visible text is compact, generated from
+complex children, or not descriptive enough for an announcement.
+
+```xmlui-pg copy display height="220px" name="Example: custom live region message"
+<App>
+  <Fragment var.progress="{0.25}">
+    <VStack>
+      <Button
+        label="Advance"
+        onClick="progress = 0.75"
+      />
+      <ProgressBar
+        value="{progress}"
+        withLiveRegion
+        liveRegionMessage="Upload is {Math.round(progress * 100)} percent complete"
+      />
+    </VStack>
+  </Fragment>
+</App>
+```
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:

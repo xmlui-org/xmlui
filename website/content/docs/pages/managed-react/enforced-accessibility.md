@@ -102,6 +102,7 @@ XMLUI also ships three accessibility primitives:
 - `<SkipLink>` renders a focus-visible skip link to the main content region.
 - `<FocusScope>` centralizes focus trapping, initial focus, and focus restoration for overlays.
 - `<LiveRegion>` provides polite/assertive screen-reader announcements. Toasts and runtime errors announce through the shared global live region.
+- `withLiveRegion` adds the same announcement pattern to supported text-like components such as `Text`, headings, `Badge`, `NoResult`, and `ProgressBar`.
 
 Theme resolution runs a contrast checker over known foreground/background token pairs. In development it warns; with strict accessibility enabled it escalates those findings.
 

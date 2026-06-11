@@ -634,6 +634,10 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   specialProps.add("bookmarkLevel");
   specialProps.add("bookmarkTitle");
   specialProps.add("bookmarkOmitFromToc");
+  // LiveRegionBehavior props — consumed by LiveRegionBehavior and must not be forwarded.
+  specialProps.add("withLiveRegion");
+  specialProps.add("liveRegionMessage");
+  specialProps.add("liveRegionPoliteness");
 
   // If the component explicitly declares a prop in its metadata, it owns that prop
   // and it must always be forwarded (even if the same name is also a behavior-consumed
@@ -1119,6 +1123,10 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   specialProps.add("bookmarkLevel");
   specialProps.add("bookmarkTitle");
   specialProps.add("bookmarkOmitFromToc");
+  // LiveRegionBehavior props — consumed by LiveRegionBehavior and must not be forwarded.
+  specialProps.add("withLiveRegion");
+  specialProps.add("liveRegionMessage");
+  specialProps.add("liveRegionPoliteness");
 
   // If the component explicitly declares a prop in its metadata, it owns that prop
   // and it must always be forwarded (even if the same name is also a behavior-consumed

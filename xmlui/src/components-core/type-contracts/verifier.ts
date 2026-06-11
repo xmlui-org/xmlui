@@ -346,6 +346,26 @@ const VALIDATION_BEHAVIOR_PROPS = [
   "validate",
 ] as const;
 
+const LIVE_REGION_BEHAVIOR_PROPS = [
+  "withLiveRegion",
+  "liveRegionMessage",
+  "liveRegionPoliteness",
+] as const;
+
+const LIVE_REGION_HOSTS = new Set([
+  "Text",
+  "Heading",
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "H5",
+  "H6",
+  "Badge",
+  "NoResult",
+  "ProgressBar",
+]);
+
 const BEHAVIOR_CONTRACTS: readonly BehaviorContract[] = [
   {
     name: "animation",
@@ -370,6 +390,11 @@ const BEHAVIOR_CONTRACTS: readonly BehaviorContract[] = [
       typeName !== "FormItem" &&
       !hasOwnProp(meta, "label") &&
       !hasOwnProp(meta, "bindTo"),
+  },
+  {
+    name: "liveRegion",
+    props: LIVE_REGION_BEHAVIOR_PROPS,
+    supportsHost: (typeName, meta) => isVisualHost(typeName, meta) && LIVE_REGION_HOSTS.has(typeName),
   },
   {
     name: "pubsub",

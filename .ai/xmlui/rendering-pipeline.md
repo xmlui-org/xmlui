@@ -138,8 +138,9 @@ Behaviors are registered in this order. **Last registered = outermost wrapper** 
 | 3 | `tooltipBehavior` | `tooltip` prop |
 | 4 | `variantBehavior` | `variant` prop |
 | 5 | `bookmarkBehavior` | `bookmark` prop |
-| 6 | `formBindingBehavior` | `bindTo` prop + component has `value`/`setValue` APIs |
-| 7 (outermost) | `validationBehavior` | `validationState`/`required`/`pattern` props |
+| 6 | `liveRegionBehavior` | `withLiveRegion` prop + supported text-like component |
+| 7 | `formBindingBehavior` | `bindTo` prop + component has `value`/`setValue` APIs |
+| 8 (outermost) | `validationBehavior` | `validationState`/`required`/`pattern` props |
 
 ### BehaviorCondition Types
 
