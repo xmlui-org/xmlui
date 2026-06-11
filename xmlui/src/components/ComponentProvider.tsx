@@ -124,6 +124,7 @@ import { variantBehavior } from "../components-core/behaviors/VariantBehavior";
 import { bookmarkBehavior } from "../components-core/behaviors/BookmarkBehavior";
 import { formBindingBehavior } from "../components-core/behaviors/FormBindingBehavior";
 import { validationBehavior } from "../components-core/behaviors/ValidationBehavior";
+import { liveRegionBehavior } from "../components-core/behaviors/LiveRegionBehavior";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
@@ -880,6 +881,7 @@ export class ComponentRegistry {
     this.registerBehavior(tooltipBehavior);
     this.registerBehavior(variantBehavior);
     this.registerBehavior(bookmarkBehavior);
+    this.registerBehavior(liveRegionBehavior);
     this.registerBehavior(formBindingBehavior);
     this.registerBehavior(validationBehavior);
 

@@ -132,6 +132,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/Fallback",
+          "label": "Fallback",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/FileInput",
           "label": "FileInput",
           "icon": "component"
@@ -144,6 +149,11 @@
         {
           "to": "/docs/reference/components/FlowLayout",
           "label": "FlowLayout",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/FocusScope",
+          "label": "FocusScope",
           "icon": "component"
         },
         {
@@ -254,6 +264,11 @@
         {
           "to": "/docs/reference/components/List",
           "label": "List",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/LiveRegion",
+          "label": "LiveRegion",
           "icon": "component"
         },
         {
@@ -384,6 +399,11 @@
         {
           "to": "/docs/reference/components/Select",
           "label": "Select",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/SkipLink",
+          "label": "SkipLink",
           "icon": "component"
         },
         {

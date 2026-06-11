@@ -283,6 +283,7 @@ const diagnostics: A11yDiagnostic[] = lintComponentDef(componentDef, options);
 - `<SkipLink target="main" label="Skip to main content" />` renders a focus-visible skip link and can be inserted automatically with `App.appGlobals.autoSkipLink: true`.
 - `<FocusScope trap restore autoFocus />` centralizes focus trapping, initial focus, and focus restoration for overlays and nested modal-like surfaces.
 - `<LiveRegion politeness="polite|assertive">` exposes screen-reader announcements. Toasts and runtime errors announce through the global live region.
+- `withLiveRegion` attaches a related hidden live region to supported text-like visual components (`Text`, `Heading`/`H1`-`H6`, `Badge`, `NoResult`, and `ProgressBar`).
 - `automationId="save-order"` is parsed as a framework field and rendered as `data-automation-id="save-order"` on the component decorator.
 
 ### Component a11y metadata

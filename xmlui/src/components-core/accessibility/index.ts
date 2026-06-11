@@ -12,4 +12,10 @@ export { lintComponentDef } from "./linter";
 export { checkThemeContrast, contrastRatio, parseColor } from "./contrast";
 export type { ContrastPair } from "./contrast";
 export { focusableElements, useFocusScope } from "./useFocusScope";
-export { clearFocusScopesForTests, popFocusScope, pushFocusScope, topFocusScope } from "./focusScopeStack";
+export {
+  clearFocusScopesForTests,
+  popFocusScope,
+  pushFocusScope,
+  topFocusScope,
+  topFocusScopeForElement,
+} from "./focusScopeStack";

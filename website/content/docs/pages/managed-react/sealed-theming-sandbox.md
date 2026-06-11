@@ -42,17 +42,17 @@ declaration.
 
 ## How it works
 
-When a theme is resolved (the same pass that walks `$reference` chains),
-the validator checks every variable against the `valueType` declared in
-that variable's metadata using the same rule table the type-contract
-verifier uses for component props — so a `color` theme variable accepts
-exactly the same values as a `color` prop. The inline-style boundary
-funnels every layout-shorthand value and every declaration parsed out
+When XMLUI resolves a theme, it also resolves theme-variable references
+such as `$color-primary-500` into the CSS custom properties that components
+consume. During that same pass, the validator checks every variable against
+the `valueType` declared in that variable's metadata using the same rule table
+the type-contract verifier uses for component props — so a `color` theme
+variable accepts exactly the same values as a `color` prop. The inline-style
+boundary funnels every layout-shorthand value and every declaration parsed out
 of the `style` prop through the same rule table. Diagnostics surface as
-`kind:"theming"` entries on the trace (and as a one-shot toast in
-strict mode); blocked declarations in strict mode are dropped before the
-rule reaches the DOM, but the rest of the surrounding declarations
-still apply.
+`kind:"theming"` entries on the trace (and as a one-shot toast in strict mode);
+blocked declarations in strict mode are dropped before the rule reaches the DOM,
+but the rest of the surrounding declarations still apply.
 
 Strict theme-variable validation runs before each theme layer is merged.
 That ordering matters: if a child `<Theme>` sets

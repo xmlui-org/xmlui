@@ -12,7 +12,7 @@ export const SkipLinkMd = createMetadata({
     "content region. It stays visually hidden until focused.",
   props: {
     target: {
-      description: "The id of the element to focus and scroll to.",
+      description: "The DOM id, XMLUI component id, or test id of the element to focus and scroll to.",
       valueType: "string",
       defaultValue: defaultProps.target,
     },

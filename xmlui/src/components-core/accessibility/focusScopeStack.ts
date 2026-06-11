@@ -24,6 +24,17 @@ export function topFocusScope(): FocusScopeEntry | undefined {
   return stack[stack.length - 1];
 }
 
+export function topFocusScopeForElement(element: Element | null): FocusScopeEntry | undefined {
+  if (!element) return undefined;
+  for (let i = stack.length - 1; i >= 0; i--) {
+    const entry = stack[i];
+    if (entry.element.contains(element)) {
+      return entry;
+    }
+  }
+  return undefined;
+}
+
 export function clearFocusScopesForTests(): void {
   stack.length = 0;
   nextId = 1;

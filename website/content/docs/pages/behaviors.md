@@ -38,6 +38,7 @@ The following table summarizes the currently supported XMLUI behaviors.
 | `Bookmark` | Adds navigation anchors and table of contents integration to visual components. | `bookmark` |
 | `FormBinding` | Binds input components directly to form data without requiring a FormItem wrapper. | `bindTo` |
 | `Label` | Wraps components with a label element for form inputs and other labeled content. | `label` |
+| `Live Region` | Adds a hidden live region to supported text-like components so dynamic text changes are announced to assistive technologies. | `withLiveRegion` |
 | `Tooltip` | Displays informational text or markdown content when hovering over visual components. | `tooltip`, `tooltipMarkdown` |
 | `Validation` | Provides validation logic and feedback for form input components. | `bindTo` (with validation props) |
 | `Variant` | Applies custom theme-aware styling for non-predefined variant values. | `variant` |
@@ -203,6 +204,64 @@ You can add a label to components using the label property. Though labels are pr
 </App>
 ```
 
+## Live Region
+
+Use this behavior when a text-like component displays an important dynamic
+status and you want assistive technologies to announce changes without moving
+focus. It adds a visually hidden live region next to the host component.
+
+**Trigger Properties**
+
+| Name | Description |
+|---|---|
+| `withLiveRegion` | When `true`, adds a hidden live region related to the component's displayed message |
+
+**Additional Properties**
+
+| Name | Description |
+|---|---|
+| `liveRegionMessage` | The message to announce. Use this when the component has complex children or when the announcement should differ from the visible text |
+| `liveRegionPoliteness` | Whether updates are announced politely or assertively (`polite` or `assertive`; default: `polite`) |
+
+The behavior is available on `Text`, `Heading`, `H1` through `H6`, `Badge`,
+`NoResult`, and `ProgressBar`.
+
+For simple text components, XMLUI can use the component's visible text:
+
+```xmlui-pg copy display height="220px" name="Example: live region behavior"
+<App>
+  <Fragment var.statusMessage="Waiting for an update">
+    <VStack>
+      <Button
+        label="Save"
+        onClick="statusMessage = 'Settings saved'"
+      />
+      <Text withLiveRegion>{statusMessage}</Text>
+    </VStack>
+  </Fragment>
+</App>
+```
+
+For compact status components, provide a more descriptive announcement:
+
+```xmlui-pg copy display height="220px" name="Example: liveRegionMessage"
+<App>
+  <Fragment var.pending="{2}">
+    <VStack>
+      <Button
+        label="Add approval"
+        onClick="pending = pending + 1"
+      />
+      <Badge
+        value="{pending}"
+        withLiveRegion
+        liveRegionMessage="There are {pending} pending approvals"
+      />
+    </VStack>
+  </Fragment>
+</App>
+```
+
 ## Tooltip
 
 This behavior displays informational text or markdown content when hovering over visual components.
@@ -347,4 +406,3 @@ XMLUI will apply theme variables where the `variantName` section is replaced wit
   </Theme>
 </App>
 ```
-

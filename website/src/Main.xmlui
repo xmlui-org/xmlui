@@ -863,6 +863,29 @@
                         />
                     </NavGroup>
 
+                    <NavGroup label="Accessibility">
+                        <NavLink
+                            icon="article"
+                            label="Add a skip link to main content"
+                            to="/docs/howto/add-a-skip-link-to-main-content"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Announce status changes with LiveRegion"
+                            to="/docs/howto/announce-status-changes-with-liveregion"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Announce text changes with withLiveRegion"
+                            to="/docs/howto/announce-text-changes-with-withliveregion"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Keep keyboard focus inside a custom panel"
+                            to="/docs/howto/keep-keyboard-focus-inside-a-custom-panel"
+                        />
+                    </NavGroup>
+
                     <NavGroup label="Modals, Drawers & Overlays">
                         <NavLink
                             icon="article"
@@ -1858,6 +1881,34 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/set-a-right-to-left-layout-direction.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/add-a-skip-link-to-main-content"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/add-a-skip-link-to-main-content.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/announce-status-changes-with-liveregion"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/announce-status-changes-with-liveregion.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/announce-text-changes-with-withliveregion"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/announce-text-changes-with-withliveregion.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/keep-keyboard-focus-inside-a-custom-panel"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/keep-keyboard-focus-inside-a-custom-panel.md']}"
                 />
             </Page>
             <Page

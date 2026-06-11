@@ -1,4 +1,6 @@
-%-DESC-START
+# FocusScope [#focusscope]
+
+`FocusScope` traps Tab navigation inside its subtree and restores focus when the subtree unmounts. Use it for custom popovers, drawers, and modal surfaces.
 
 Use `FocusScope` when you build a custom overlay, popover-like panel, or inline
 editor that should temporarily own keyboard focus. Built-in components such as
@@ -30,13 +32,31 @@ panel instead of moving to the button after it.
 </App>
 ```
 
-%-DESC-END
+## Behaviors [#behaviors]
 
-By default, `Tab` and `Shift+Tab` cycle through focusable children inside the
-scope. When the scope unmounts, focus returns to the element that was focused
-before the scope opened.
+This component supports the following behaviors:
 
-%-PROP-START restore
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | `variant` |
+
+## Properties [#properties]
+
+### `autoFocus` [#autofocus]
+
+> [!DEF]  default: **false**
+
+When true, the first focusable child receives focus after mount.
+
+### `restore` [#restore]
+
+> [!DEF]  default: **true**
+
+When true, focus returns to the previously focused element on unmount.
 
 Click **Edit customer**, then click **Cancel** or **Save**. Focus returns to
 the button that opened the scope.
@@ -61,12 +81,11 @@ the button that opened the scope.
 </App>
 ```
 
-%-PROP-END
+### `trap` [#trap]
 
-Set `trap="false"` when you only want initial focus and focus restoration, but
-do not want to keep keyboard navigation inside the scope.
+> [!DEF]  default: **true**
 
-%-PROP-START trap
+When true, Tab and Shift+Tab cycle inside the scope.
 
 ```xmlui-pg copy display height="260px" name="Example: focus without trapping"
 <App>
@@ -83,4 +102,14 @@ do not want to keep keyboard navigation inside the scope.
 </App>
 ```
 
-%-PROP-END
+## Events [#events]
+
+This component does not have any events.
+
+## Exposed Methods [#exposed-methods]
+
+This component does not expose any methods.
+
+## Styling [#styling]
+
+This component does not have any styles.

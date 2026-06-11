@@ -183,6 +183,10 @@ export const BEHAVIOR_PROPS: ReadonlySet<string> = new Set([
   // --- BookmarkBehavior
   "bookmark",
   "scrollOffset",
+  // --- LiveRegionBehavior
+  "withLiveRegion",
+  "liveRegionMessage",
+  "liveRegionPoliteness",
   // --- FormBindingBehavior
   "bindTo",
   "initialValue",

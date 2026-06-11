@@ -1,4 +1,6 @@
-%-DESC-START
+# SkipLink [#skiplink]
+
+`SkipLink` renders a keyboard-first link that jumps directly to the main content region. It stays visually hidden until focused.
 
 Use `SkipLink` near the start of a page or app shell, before repeated
 navigation. Keyboard users tab to it first, activate it, and move directly to
@@ -61,12 +63,30 @@ embedded documentation preview is too constrained for this example.
 </App>
 ```
 
-%-DESC-END
+## Behaviors [#behaviors]
 
-Use `target` to point at a focusable element near the start of the main content.
-The value can be a DOM id, XMLUI component id, or test id, with or without `#`.
+This component supports the following behaviors:
 
-%-PROP-START target
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | `variant` |
+
+## Properties [#properties]
+
+### `label` [#label]
+
+> [!DEF]  default: **"Skip to main content"**
+
+The accessible text shown when the skip link receives focus.
+
+### `target` [#target]
+
+> [!DEF]  default: **"main"**
+
+The DOM id, XMLUI component id, or test id of the element to focus and scroll to.
 
 ```xmlui-pg copy display height="260px" name="Example: custom target"
 <App>
@@ -87,4 +107,14 @@ The value can be a DOM id, XMLUI component id, or test id, with or without `#`.
 </App>
 ```
 
-%-PROP-END
+## Events [#events]
+
+This component does not have any events.
+
+## Exposed Methods [#exposed-methods]
+
+This component does not expose any methods.
+
+## Styling [#styling]
+
+This component does not have any styles.

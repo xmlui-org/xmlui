@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { popFocusScope, pushFocusScope, topFocusScope } from "./focusScopeStack";
+import { popFocusScope, pushFocusScope, topFocusScopeForElement } from "./focusScopeStack";
 
 const FOCUSABLE_SELECTOR = [
   "a[href]",
@@ -26,7 +26,8 @@ export function useFocusScope<T extends HTMLElement>({
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const scopeId = pushFocusScope(element, typeof document !== "undefined" ? document.activeElement : null);
+    const ownerRoot = element.getRootNode() as Document | ShadowRoot;
+    const scopeId = pushFocusScope(element, ownerRoot.activeElement);
 
     if (autoFocus) {
       queueMicrotask(() => {
@@ -35,7 +36,13 @@ export function useFocusScope<T extends HTMLElement>({
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!trap || event.key !== "Tab" || topFocusScope()?.id !== scopeId) return;
+      if (
+        !trap ||
+        event.key !== "Tab" ||
+        topFocusScopeForElement(event.target instanceof Element ? event.target : null)?.id !== scopeId
+      ) {
+        return;
+      }
       const focusables = focusableElements(element);
       if (focusables.length === 0) {
         event.preventDefault();
@@ -44,7 +51,8 @@ export function useFocusScope<T extends HTMLElement>({
       }
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
-      const active = document.activeElement;
+      const activeRoot = element.getRootNode() as Document | ShadowRoot;
+      const active = activeRoot.activeElement;
       if (event.shiftKey && active === first) {
         event.preventDefault();
         last.focus();
@@ -58,7 +66,7 @@ export function useFocusScope<T extends HTMLElement>({
     return () => {
       element.removeEventListener("keydown", onKeyDown);
       const popped = popFocusScope(scopeId);
-      if (restore && popped?.restoreTo instanceof HTMLElement && document.contains(popped.restoreTo)) {
+      if (restore && popped?.restoreTo instanceof HTMLElement && popped.restoreTo.isConnected) {
         popped.restoreTo.focus();
       }
     };
