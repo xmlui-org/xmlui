@@ -20,6 +20,8 @@ test.describe("One-time page load action", { tag: "@website" }, () => {
 
   test("onInit fires on mount and the initialized card appears", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByText(/Page initialized at \d/)).toBeVisible();
+    await expect(page.getByText("Dashboard")).toBeVisible();
+    await expect(page.getByText("Welcome! The page has loaded.")).toBeVisible();
+    await expect.poll(async () => await page.getByText(/Page initialized at/).count()).toBe(1);
   });
 });

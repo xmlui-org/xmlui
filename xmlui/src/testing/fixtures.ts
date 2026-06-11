@@ -262,6 +262,16 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
     (_sharedPage as any).addInitScript = origAddInitScript;
     (_sharedPage as any).__initScriptQueue__ = undefined;
 
+    // Remove any network routes registered via page.route() by this test.
+    // The page is shared across all tests in the worker, so without this the
+    // routes accumulate and a previous test's mock (or a still-pending gated
+    // route) can intercept the next test's requests, causing cross-test flakiness.
+    try {
+      await _sharedPage.unrouteAll({ behavior: "ignoreErrors" });
+    } catch {
+      // ignore if the page is already closed
+    }
+
     // Cleanup between tests: clear storage to prevent state leakage
     try {
       await _sharedPage.evaluate(() => {
@@ -293,7 +303,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
   baseComponentTestId: "test-id-component",
   testStateViewTestId: "test-state-view-testid",
 
-  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
+  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use, testInfo) => {
     // Each initTestBed call gets a unique marker ID to prevent the fast-path
     // __XMLUI_REINIT__ race: flushSync removes the old testStateViewTestId
     // synchronously in the browser, but Playwright's CDP connection has small
@@ -435,13 +445,21 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           ? description.extensionIds
           : [description.extensionIds]
         : [];
+      if (extensionIds.length > 0) {
+        // Extension bundles can be large (notably ECharts) and their first
+        // browser-side import may exceed the default 30s test timeout when the
+        // full suite runs with many workers. The app is still on the test-bed
+        // Loading screen during that time, so give extension-backed tests enough
+        // headroom without slowing ordinary no-extension tests.
+        testInfo.setTimeout(Math.max(testInfo.timeout, 240_000));
+      }
 
       // Check if page already has the app loaded (from a previous test in this worker)
       const isReady = await page
         .evaluate(() => !!(window as any).__XMLUI_READY__)
         .catch(() => false);
 
-      if (isReady) {
+      if (isReady && extensionIds.length === 0) {
         // Fast path: update globals and reinit in-page (skip full page navigation).
         // flushSync in __XMLUI_REINIT__ ensures the old DOM is removed synchronously,
         // so the subsequent waitFor sees only the new render's elements.
@@ -460,7 +478,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           initScriptQueue.length = 0;
 
           await page.evaluate(
-            ({ app, extensionIds }: { app: any; extensionIds: string[] }) => {
+            async ({ app, extensionIds }: { app: any; extensionIds: string[] }) => {
               // Reset URL so React Router starts fresh at the app root.
               history.replaceState(null, "", "/");
               // Reset page-level scroll: anchor navigation from the previous test
@@ -470,7 +488,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
               (window as any).TEST_ENV = app;
               (window as any).TEST_RUNTIME = app.runtime;
               (window as any).TEST_EXTENSION_IDS = extensionIds;
-              (window as any).__XMLUI_REINIT__();
+              await (window as any).__XMLUI_REINIT__();
             },
             { app: _appDescription, extensionIds },
           );
@@ -488,7 +506,12 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           await page.goto("/");
         }
       } else {
-        // Slow path: first test in this worker — do full page navigation
+        // Slow path: first test in this worker, or extension-backed tests.
+        // Extension bundles are large and are loaded by browser-side dynamic
+        // imports. In full-suite 10-worker runs, importing them after many
+        // in-page reinits can leave the TestBed stuck on "Loading..."; a fresh
+        // navigation gives extension examples the same startup path as the
+        // first test in a worker while keeping the fast path for ordinary tests.
         if (isCI) {
           await page.addInitScript(clipboard.init);
         }

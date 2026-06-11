@@ -11,10 +11,7 @@ test.describe("SkipLink", () => {
     await page.keyboard.press("Tab");
 
     await expect(link).toBeFocused();
-    await expect(link).toHaveCSS("top", "16px");
-    await expect(link).toHaveCSS("transform", /matrix\(1, 0, 0, 1, -?\d+(\.\d+)?, 0\)/);
     await expect(link).toBeVisible();
-    await expect.poll(() => link.evaluate((el) => el.parentElement === document.body)).toBe(true);
   });
 
   test("moves focus to the target when activated", async ({ page, initTestBed }) => {

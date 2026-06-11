@@ -746,7 +746,7 @@ test.describe("E1: Bug 21 regression — DataSource with $queryParams in fetch",
   }) => {
     await initTestBed(
       `<App var.counter="{0}">
-        <DataSource id="ds" url="/fake"
+        <DataSource id="ds" url="/fake-bug21-queryparams"
           onFetch="() => { counter = counter + 1; return 'q=' + $queryParams.q; }" />
         <Text testId="counter" value="{counter}" />
         <Button testId="nav" onClick="Actions.navigate('?q=abc')" />

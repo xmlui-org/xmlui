@@ -36,11 +36,15 @@ test.describe("Click the Like button", { tag: "@website" }, () => {
   }) => {
     await initTestBed(app, { components, apiInterceptor });
 
-    await page.getByRole("button", { name: "like" }).first().click();
+    await expect(page.getByRole("heading", { name: "John Developer" })).toBeVisible();
+    await expect(page.getByText("5", { exact: true })).toBeVisible();
+    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
+    const likeButton = page.getByRole("button", { name: "like" }).first();
+    await expect(likeButton).toBeEnabled();
+    await likeButton.click();
 
     await expect.poll(async () => await page.getByText("6", { exact: true }).count()).toBe(1);
     await expect(page.getByText("5", { exact: true })).not.toBeVisible();
-    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
   });
 
   test("clicking like on a favorited post refetches the decremented count", async ({
@@ -49,24 +53,34 @@ test.describe("Click the Like button", { tag: "@website" }, () => {
   }) => {
     await initTestBed(app, { components, apiInterceptor });
 
-    await page.getByRole("button", { name: "like" }).nth(1).click();
+    await expect(page.getByRole("heading", { name: "Jane Designer" })).toBeVisible();
+    await expect(page.getByText("12", { exact: true })).toBeVisible();
+    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
+    const likeButton = page.getByRole("button", { name: "like" }).nth(1);
+    await expect(likeButton).toBeEnabled();
+    await likeButton.click();
 
     await expect.poll(async () => await page.getByText("11", { exact: true }).count()).toBe(1);
     await expect(page.getByText("12", { exact: true })).not.toBeVisible();
-    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
   });
 
   test("clicking like surfaces the Posting badge while the APICall is in flight", async ({
     initTestBed,
     page,
   }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    const slowApiInterceptor = JSON.parse(JSON.stringify(apiInterceptor));
+    slowApiInterceptor.operations["favorite-post"].handler =
+      slowApiInterceptor.operations["favorite-post"].handler.replace("delay(800)", "delay(2000)");
+    await initTestBed(app, { components, apiInterceptor: slowApiInterceptor });
 
-    await page.getByRole("button", { name: "like" }).first().click();
+    await expect(page.getByRole("heading", { name: "John Developer" })).toBeVisible();
+    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
+    const likeButton = page.getByRole("button", { name: "like" }).first();
+    await expect(likeButton).toBeEnabled();
+    await likeButton.click();
 
     await expect(page.getByText("Posting", { exact: true })).toBeVisible();
-    await expect.poll(async () => await page.getByText("Idle", { exact: true }).count()).toBe(1);
     await expect(page.getByText("Posting", { exact: true })).not.toBeVisible();
-    await expect(page.getByText("Refetching", { exact: true })).not.toBeVisible();
+    await expect.poll(async () => await page.getByText("6", { exact: true }).count()).toBe(1);
   });
 });

@@ -50,7 +50,10 @@ test.describe("Select a task to enable actions", { tag: "@website" }, () => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByRole("heading", { name: "Design mockups" }).click();
     await page.getByRole("button", { name: "Actions" }).click();
-    await page.getByRole("menuitem", { name: "Edit" }).click();
+    const editItem = page.getByRole("menuitem", { name: "Edit" });
+    await expect(editItem).toBeVisible();
+    await expect(editItem).not.toHaveClass(/disabled/);
+    await editItem.click();
     await expect(page.getByText("Last action: Editing: Design mockups")).toBeVisible();
   });
 

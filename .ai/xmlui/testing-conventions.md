@@ -177,6 +177,38 @@ await page.getByTestId("dp").click();
 
 **CSS pseudo-classes cannot be tested with `.toHaveCSS()`** — Playwright `.hover()` triggers JavaScript hover events but not CSS `:hover`/`:focus`/`:active`. Test the functional outcome instead (e.g., tooltip appearing).
 
+### Flake resistance under parallel E2E runs
+
+The full E2E suite runs many tests in parallel and reuses browser pages through the test bed. A test that passes alone can fail in the full suite if it depends on leaked page state, transient UI phases, or reactive side effects. When investigating flakes, inspect `test-results/**/error-context.md` first and look for stale toasts/status live regions, portal/body nodes, hover/focus state, React Query cache, MSW handlers, or extension loading state.
+
+**Do not use reactive markup variables as fetch counters.** In `DataSource`/`APICall` tests, code like `onFetch="() => { calls = calls + 1; return calls; }"` can make the rendered output depend on the same value the fetch mutates, causing self-amplifying refetches under full-suite load. Prefer non-reactive outcomes:
+
+```xml
+<DataSource id="ds" onFetch="() => Math.random()" />
+<Text testId="output">{ds.value}</Text>
+<Button testId="refetch" onClick="ds.refetch()" />
+```
+
+Then assert the visible value is non-empty, equal across cached consumers, or changes after an explicit refetch. Use `testState` for event capture from user actions, but avoid reading and mutating it inside fetch functions that are also rendered by the component under test.
+
+**Assert durable outcomes, not incidental phases.** It is fine to check that a transient badge like `Posting` appears while an API call is in flight. Avoid also requiring a specific final intermediate label such as `Idle` unless that state is the behavior under test. Prefer final user-visible results: the count changed, the button is enabled, the modal closed, or the new content appears.
+
+**Treat hover, focus, and timers as shared page state.** Before hover-sensitive tests, move the mouse to a neutral position when needed and hover a precise target. For keyboard tests, always wait for focus before pressing keys. Avoid exact bounding-box assertions when focus, visibility, DOM order, or a semantic relationship proves the behavior.
+
+**Be careful with website how-to examples and extensions.** These specs often exercise a larger app shell than component tests. Wait on stable headings or controls before interacting. Extension-backed examples, such as charting examples, may need full page navigation instead of fast in-page reinitialization because extension modules and managers can keep process-level state.
+
+**Use forced clicks only for setup, and only when the target click is not under test.** Prefer true user clicks. If a stale overlay or status region can intercept an icon button while the test is really about the confirmation/dialog behavior that follows, use a precise locator plus `toBeVisible()` first; `click({ force: true })` is acceptable for that setup click when the subsequent modal behavior is still tested normally.
+
+**Normalize browser-dependent values before asserting.** For iframe URLs, compare `new URL(src).origin` rather than exact `src` strings, because browsers normalize URLs such as adding a trailing slash. For text or metric regexes, anchor the regex so it cannot match unrelated live-region/status text such as progress messages.
+
+After changing E2E infrastructure or browser-side test bed code, rebuild the test bed with:
+
+```bash
+npm --prefix xmlui run build:xmlui-test-bed
+```
+
+For verification, use a focused test run first, then a full parallel run such as `npx playwright test --workers=10`. Do not call a flake fixed until it survives the full run configuration where it failed.
+
 ### Component drivers
 
 For complex component interactions, use typed drivers instead of raw Playwright:
