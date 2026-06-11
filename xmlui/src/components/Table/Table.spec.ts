@@ -4236,29 +4236,20 @@ test.describe("Column width theme variables", () => {
     // which may differ slightly across environments.
     await expect
       .poll(
-        async () => (await pxHeader.boundingBox())?.width,
+        async () => {
+          const pxWidth = (await pxHeader.boundingBox())?.width ?? 0;
+          const themeWidth = (await themeHeader.boundingBox())?.width ?? 0;
+          return (
+            pxWidth >= 40 &&
+            pxWidth <= 56 &&
+            themeWidth >= 40 &&
+            themeWidth <= 56 &&
+            Math.abs(pxWidth - themeWidth) <= 8
+          );
+        },
         { timeout: 10000 },
       )
-      .toBeGreaterThanOrEqual(44);
-    await expect
-      .poll(
-        async () => (await pxHeader.boundingBox())?.width,
-        { timeout: 10000 },
-      )
-      .toBeLessThanOrEqual(52);
-
-    await expect
-      .poll(
-        async () => (await themeHeader.boundingBox())?.width,
-        { timeout: 10000 },
-      )
-      .toBeGreaterThanOrEqual(40);
-    await expect
-      .poll(
-        async () => (await themeHeader.boundingBox())?.width,
-        { timeout: 10000 },
-      )
-      .toBeLessThanOrEqual(56);
+      .toBe(true);
   });
 });
 

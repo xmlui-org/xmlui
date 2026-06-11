@@ -112,7 +112,7 @@ test.describe("Basic Functionality", () => {
         apiInterceptor: basicApiInterceptor,
       },
     );
-    await expect(page.getByText("Error 500: Internal server error")).toBeVisible();
+    await expect(page.getByText("Error 500: Internal server error").first()).toBeVisible();
   });
 
   test("shows error notification with error details", async ({ initTestBed, page }) => {
@@ -577,21 +577,19 @@ test.describe("onFetch event", () => {
 
   test("refetch() re-invokes the onFetch handler", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App var.calls="{0}">
+      <Fragment>
         <DataSource id="ds" url="/api/cached"
-          onFetch="() => { calls = calls + 1; return calls; }" />
+          onFetch="() => Math.random()" />
         <Text testId="output" value="{ds.value}" />
-        <Text testId="calls" value="{calls}" />
         <Button testId="refetch-btn" label="Refetch" onClick="ds.refetch()" />
-      </App>
+      </Fragment>
     `);
 
-    await expect(page.getByTestId("output")).toHaveText("1");
-    await expect(page.getByTestId("calls")).toHaveText("1");
+    await expect(page.getByTestId("output")).not.toHaveText("");
+    const initialValue = await page.getByTestId("output").textContent();
 
     await page.getByTestId("refetch-btn").click();
-    await expect(page.getByTestId("output")).toHaveText("2");
-    await expect(page.getByTestId("calls")).toHaveText("2");
+    await expect.poll(async () => await page.getByTestId("output").textContent()).not.toBe(initialValue);
   });
 
   test("two DataSources with the same url share the cached onFetch result", async ({
@@ -602,20 +600,24 @@ test.describe("onFetch event", () => {
     // DataSources with identical inputs must call the handler only once and
     // both surface the same value.
     await initTestBed(`
-      <App var.calls="{0}">
+      <Fragment>
         <DataSource id="ds1" url="/api/shared"
-          onFetch="() => { calls = calls + 1; return 'payload-' + calls; }" />
+          onFetch="() => Math.random()" />
         <DataSource id="ds2" url="/api/shared"
-          onFetch="() => { calls = calls + 1; return 'payload-' + calls; }" />
+          onFetch="() => Math.random()" />
         <Text testId="out1" value="{ds1.value}" />
         <Text testId="out2" value="{ds2.value}" />
-        <Text testId="calls" value="{calls}" />
-      </App>
+      </Fragment>
     `);
 
-    await expect(page.getByTestId("out1")).toHaveText("payload-1");
-    await expect(page.getByTestId("out2")).toHaveText("payload-1");
-    await expect(page.getByTestId("calls")).toHaveText("1");
+    await expect(page.getByTestId("out1")).not.toHaveText("");
+    await expect
+      .poll(async () => {
+        const out1 = await page.getByTestId("out1").textContent();
+        const out2 = await page.getByTestId("out2").textContent();
+        return out1 && out1 === out2 ? out1 : null;
+      })
+      .not.toBeNull();
   });
 
   test("resultSelector is applied to the onFetch result", async ({ initTestBed, page }) => {

@@ -35,7 +35,11 @@ test.describe("Click the Like button - immediate feedback", { tag: "@website" },
   }) => {
     await initTestBed(app, { components, apiInterceptor });
 
-    await page.getByRole("button", { name: "like" }).first().click();
+    await expect(page.getByText("John Developer")).toBeVisible();
+    await expect(page.getByText("5", { exact: true })).toBeVisible();
+    const likeButton = page.getByRole("button", { name: "like" }).first();
+    await expect(likeButton).toBeVisible();
+    await likeButton.click();
 
     await expect(page.getByText("6", { exact: true })).toBeVisible();
     await expect.poll(async () => await page.getByText("Post favorited!").count()).toBe(1);
@@ -48,7 +52,10 @@ test.describe("Click the Like button - immediate feedback", { tag: "@website" },
   }) => {
     await initTestBed(app, { components, apiInterceptor });
 
-    await page.getByRole("button", { name: "like" }).nth(1).click();
+    await expect(page.getByText("Jane Designer")).toBeVisible();
+    const likeButton = page.getByRole("button", { name: "like" }).nth(1);
+    await expect(likeButton).toBeVisible();
+    await likeButton.click();
 
     await expect(page.getByText("11", { exact: true })).toBeVisible();
     await expect.poll(async () => await page.getByText("Post unfavorited!").count()).toBe(1);
@@ -58,7 +65,10 @@ test.describe("Click the Like button - immediate feedback", { tag: "@website" },
   test("a failed favorite rolls back and shows an error toast", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
 
-    await page.getByRole("button", { name: "like" }).nth(2).click();
+    await expect(page.getByText("Taylor QA")).toBeVisible();
+    const likeButton = page.getByRole("button", { name: "like" }).nth(2);
+    await expect(likeButton).toBeVisible();
+    await likeButton.click();
 
     await expect(page.getByText("8", { exact: true })).toBeVisible();
     await expect.poll(async () => await page.getByText("Could not save that change.").count()).toBe(

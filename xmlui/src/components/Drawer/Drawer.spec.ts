@@ -510,8 +510,11 @@ test.describe("Events", () => {
     // Wait for the open animation to fully settle so Radix's pointer-down-outside
     // listener is registered before we click outside.
     await expect(dialog).toHaveAttribute("data-state", "open");
+    await expect
+      .poll(() => dialog.evaluate((el) => getComputedStyle(el).transform))
+      .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
     // Click the far-left area, well outside the right-side drawer (320px wide)
-    await page.mouse.click(100, 300);
+    await page.mouse.click(8, 300);
     await expect.poll(testStateDriver.testState).toEqual("closed");
   });
 });

@@ -34,8 +34,8 @@ test.describe("Live server metrics dashboard", { tag: "@website" }, () => {
   test("displays metric values and timestamp", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     // CPU renders as e.g. "42%", Memory as "612 MB"
-    await expect(page.getByText(/\d+%/)).toBeVisible();
-    await expect(page.getByText(/\d+ MB/)).toBeVisible();
+    await expect(page.getByText(/^\d+%$/)).toBeVisible();
+    await expect(page.getByText(/^\d+ MB$/)).toBeVisible();
     await expect(page.getByText(/Last updated:/)).toBeVisible();
   });
 });

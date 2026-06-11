@@ -12,6 +12,8 @@ const markdown = getExampleSource(
   ),
 );
 
+test.describe.configure({ mode: "serial" });
+
 // display-only example — no interaction to test
 test.describe("basic-bar-chart-b6ce", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(

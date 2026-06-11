@@ -21,9 +21,9 @@ test("DataSource exposes responseHeaders after successful fetch", async ({
     },
   );
 
-  await expect.poll(testStateDriver.testState, { timeout: 5000 }).not.toBeNull();
-  const headers = await testStateDriver.testState();
-  expect(headers["x-custom-header"]).toBe("hello-world");
+  await expect
+    .poll(async () => (await testStateDriver.testState())?.["x-custom-header"])
+    .toBe("hello-world");
 });
 
 test("DataSource responseHeaders includes content-type from server", async ({
@@ -44,9 +44,9 @@ test("DataSource responseHeaders includes content-type from server", async ({
     },
   );
 
-  await expect.poll(testStateDriver.testState, { timeout: 5000 }).not.toBeNull();
-  const headers = await testStateDriver.testState();
-  expect(headers["content-type"]).toContain("application/json");
+  await expect
+    .poll(async () => (await testStateDriver.testState())?.["content-type"])
+    .toContain("application/json");
 });
 
 test("DataSource responseHeaders accessible in markup via binding", async ({
@@ -74,7 +74,7 @@ test("DataSource responseHeaders accessible in markup via binding", async ({
     },
   );
 
-  await expect(page.getByTestId("header-value")).toHaveText("42", { timeout: 5000 });
+  await expect(page.getByTestId("header-value")).toHaveText("42");
 });
 
 test("DataSource responseHeaders updated on refetch", async ({ page, initTestBed }) => {
@@ -165,5 +165,5 @@ test("DataSource onLoaded receives responseHeaders on the datasource state", asy
     },
   );
 
-  await expect.poll(testStateDriver.testState, { timeout: 5000 }).toBe("100");
+  await expect.poll(testStateDriver.testState).toBe("100");
 });

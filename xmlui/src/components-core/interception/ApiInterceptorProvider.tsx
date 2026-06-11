@@ -62,7 +62,8 @@ export function ApiInterceptorProvider({
         // setInitialized(false);
 
         // --- We use "msw" to manage the API interception
-        let interceptorWorker: SetupWorker;
+        let interceptorWorker: SetupWorker | undefined;
+        let cancelled = false;
         void (async () => {
           // --- Create the worker on the fly
           if (import.meta.env.VITE_MOCK_ENABLED) {
@@ -87,12 +88,21 @@ export function ApiInterceptorProvider({
                   url: workerFileLocation,
                 },
               });
+              if (cancelled) {
+                if (!parentInterceptorWorker) {
+                  interceptorWorker.stop();
+                }
+                return;
+              }
               setInterceptorWorker(interceptorWorker);
             }
           }
-          setInitialized(true);
+          if (!cancelled) {
+            setInitialized(true);
+          }
         })();
         return () => {
+          cancelled = true;
           // if the apiWorker comes from the outside, we don't handle the lifecycle here
           if (!parentInterceptorWorker) {
             interceptorWorker?.stop();

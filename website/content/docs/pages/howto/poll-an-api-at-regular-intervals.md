@@ -51,7 +51,7 @@ Some dashboards need live data — stock prices, queue lengths, build status. In
     "get-metrics": {
       "url": "/metrics",
       "method": "get",
-      "handler": "$state.tick++; return { cpu: 30 + Math.floor(Math.random() * 40), memory: 512 + Math.floor(Math.random() * 256), connections: 80 + Math.floor(Math.random() * 120), timestamp: new Date().toLocaleTimeString() }"
+      "handler": "$state.tick++; return { cpu: 30 + Math.floor(Math.random() * 40), memory: 512 + Math.floor(Math.random() * 256), connections: 80 + Math.floor(Math.random() * 120), timestamp: formatTime(getDate()) }"
     }
   }
 }

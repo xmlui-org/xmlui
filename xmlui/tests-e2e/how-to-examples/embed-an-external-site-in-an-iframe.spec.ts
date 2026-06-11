@@ -25,6 +25,8 @@ test.describe("Embedded web page", { tag: "@website" }, () => {
     await input.clear();
     await input.fill("https://example.org");
     await page.getByRole("button", { name: "Load" }).click();
-    await expect(page.locator("iframe")).toHaveAttribute("src", "https://example.org");
+    await expect
+      .poll(async () => new URL((await page.locator("iframe").getAttribute("src")) ?? "").origin)
+      .toBe("https://example.org");
   });
 });

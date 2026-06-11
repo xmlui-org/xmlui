@@ -40,10 +40,13 @@ test.describe("Show content only after the DataSource loads", { tag: "@website" 
     initTestBed,
     page,
   }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    const fastApiInterceptor = JSON.parse(JSON.stringify(apiInterceptor));
+    fastApiInterceptor.operations["get-fruits"].handler =
+      fastApiInterceptor.operations["get-fruits"].handler.replace("delay(3000)", "delay(500)");
+    await initTestBed(app, { components, apiInterceptor: fastApiInterceptor });
     await page.getByRole("button", { name: "Run (takes about 3s)" }).click();
     await expect
-      .poll(() => page.getByText("Fruits: 3 found").isVisible(), { timeout: 8000 })
+      .poll(() => page.getByText("Fruits: 3 found").isVisible(), { timeout: 15000 })
       .toBe(true);
     await expect(page.getByRole("button", { name: "Run (takes about 3s)" })).toBeEnabled();
   });

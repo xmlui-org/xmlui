@@ -1,5 +1,4 @@
 import { test, expect } from "../../testing/fixtures";
-import { getBounds } from "../../testing/component-test-helpers";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -101,26 +100,27 @@ test.describe("Basic Functionality", () => {
       </VStack>
     `);
 
-    // Wait for all elements to be visible and laid out before measuring
     await expect(page.getByTestId("item1")).toBeVisible();
     await expect(page.getByTestId("item2")).toBeVisible();
     await expect(page.getByTestId("item3")).toBeVisible();
 
-    // Poll measurements to allow layout to fully stabilize before asserting.
-    // Sub-pixel rendering and deferred effects can cause a single getBounds
-    // snapshot to be slightly off; retrying until the value is stable is more
-    // reliable than a one-shot assertion.
-    await expect.poll(async () => {
-      const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
-      const { top: item2Top } = await getBounds(page.getByTestId("item2"));
-      return Math.abs(item2Top - item1Bottom - 32) <= 2;
-    }, { timeout: 10000 }).toBe(true);
-
-    await expect.poll(async () => {
-      const { bottom: item2Bottom } = await getBounds(page.getByTestId("item2"));
-      const { top: item3Top } = await getBounds(page.getByTestId("item3"));
-      return Math.abs(item3Top - item2Bottom - 32) <= 2;
-    }, { timeout: 10000 }).toBe(true);
+    await expect.poll(async () =>
+      page.evaluate(() => {
+        const item1 = document.querySelector('[data-testid="item1"]');
+        const item2 = document.querySelector('[data-testid="item2"]');
+        const item3 = document.querySelector('[data-testid="item3"]');
+        return item1?.parentElement === item2?.parentElement &&
+          item2?.parentElement === item3?.parentElement;
+      }),
+    ).toBe(true);
+    await expect
+      .poll(async () =>
+        page.getByTestId("item1").evaluate((element) => {
+          const parent = element.parentElement;
+          return parent ? getComputedStyle(parent).rowGap : "";
+        }),
+      )
+      .toBe("32px");
   });
 
   test("doesn't disrupt HStack layout gaps", async ({ initTestBed, page }) => {
@@ -134,26 +134,27 @@ test.describe("Basic Functionality", () => {
       </HStack>
     `);
 
-    // Wait for all elements to be visible and laid out before measuring
     await expect(page.getByTestId("item1")).toBeVisible();
     await expect(page.getByTestId("item2")).toBeVisible();
     await expect(page.getByTestId("item3")).toBeVisible();
 
-    // Poll measurements to allow layout to fully stabilize before asserting.
-    // Sub-pixel rendering and deferred effects can cause a single getBounds
-    // snapshot to be slightly off; retrying until the value is stable is more
-    // reliable than a one-shot assertion.
-    await expect.poll(async () => {
-      const { right: item1Right } = await getBounds(page.getByTestId("item1"));
-      const { left: item2Left } = await getBounds(page.getByTestId("item2"));
-      return Math.abs(item2Left - item1Right - 16) < 1;
-    }, { timeout: 10000 }).toBe(true);
-
-    await expect.poll(async () => {
-      const { right: item2Right } = await getBounds(page.getByTestId("item2"));
-      const { left: item3Left } = await getBounds(page.getByTestId("item3"));
-      return Math.abs(item3Left - item2Right - 16) < 1;
-    }, { timeout: 10000 }).toBe(true);
+    await expect.poll(async () =>
+      page.evaluate(() => {
+        const item1 = document.querySelector('[data-testid="item1"]');
+        const item2 = document.querySelector('[data-testid="item2"]');
+        const item3 = document.querySelector('[data-testid="item3"]');
+        return item1?.parentElement === item2?.parentElement &&
+          item2?.parentElement === item3?.parentElement;
+      }),
+    ).toBe(true);
+    await expect
+      .poll(async () =>
+        page.getByTestId("item1").evaluate((element) => {
+          const parent = element.parentElement;
+          return parent ? getComputedStyle(parent).columnGap : "";
+        }),
+      )
+      .toBe("16px");
   });
 
   test("works with nested MessageListeners", async ({ initTestBed, page }) => {

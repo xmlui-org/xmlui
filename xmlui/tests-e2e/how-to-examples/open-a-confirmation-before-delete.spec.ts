@@ -12,10 +12,16 @@ const markdown = getExampleSource(
 test.describe("Confirm before deleting a task", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "Confirm before deleting a task");
 
+  async function clickDeleteForTask(page: any, taskTitle: string) {
+    const deleteButton = page.getByText(taskTitle).locator("..").getByRole("button");
+    await expect(deleteButton).toBeVisible();
+    await deleteButton.click({ force: true });
+  }
+
   test("confirming delete removes the task", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     await expect(page.getByText("Write proposal")).toBeVisible();
-    await page.getByText("Write proposal").locator("..").getByRole("button").click();
+    await clickDeleteForTask(page, "Write proposal");
     await page.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByText("Write proposal")).not.toBeVisible();
   });
@@ -23,7 +29,7 @@ test.describe("Confirm before deleting a task", { tag: "@website" }, () => {
   test("cancelling delete keeps the task", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     await expect(page.getByText("Write proposal")).toBeVisible();
-    await page.getByText("Write proposal").locator("..").getByRole("button").click();
+    await clickDeleteForTask(page, "Write proposal");
     await page.getByRole("button", { name: "Keep" }).click();
     await expect(page.getByText("Write proposal")).toBeVisible();
   });
@@ -31,7 +37,7 @@ test.describe("Confirm before deleting a task", { tag: "@website" }, () => {
   test("task count decreases after confirmed delete", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     await expect(page.getByText("Task list (3)")).toBeVisible();
-    await page.getByText("Write proposal").locator("..").getByRole("button").click();
+    await clickDeleteForTask(page, "Write proposal");
     await page.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByText("Task list (2)")).toBeVisible();
   });

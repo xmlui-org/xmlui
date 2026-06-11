@@ -8,7 +8,7 @@ Use `onInit` on `App` (or any component) to run initialization logic exactly onc
 ---app display /onInit/
 <App
   var.loadedAt=""
-  onInit="loadedAt = new Date().toLocaleTimeString()"
+  onInit="loadedAt = formatTime(getDate())"
 >
   <VStack padding="$space-4" gap="$space-3">
     <Text variant="h5">Dashboard</Text>

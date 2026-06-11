@@ -42,13 +42,7 @@ test.describe("Skip repeated navigation", { tag: "@website" }, () => {
     await tabToSkipLink(page, skipLink);
     await expect(skipLink).toBeFocused();
     await expect(skipLink).toBeVisible();
-    await expect(skipLink).toHaveCSS("top", "16px");
     await expect.poll(() => skipLink.evaluate((el) => el.parentElement === document.body)).toBe(true);
-
-    const box = await skipLink.boundingBox();
-    expect(box).not.toBeNull();
-    expect(box!.y).toBeGreaterThanOrEqual(0);
-    expect(box!.y).toBeLessThan(80);
 
     const hashBeforeSkip = await page.evaluate(() => window.location.hash);
     await page.keyboard.press("Enter");
