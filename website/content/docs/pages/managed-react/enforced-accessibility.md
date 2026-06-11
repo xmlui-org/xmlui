@@ -1,8 +1,21 @@
 # Enforced Accessibility
 
-XMLUI now treats common accessibility requirements as framework contracts instead of informal component conventions.
+XMLUI treats common accessibility requirements as framework contracts instead
+of informal component conventions. Enforced accessibility means the framework
+does three things for app authors:
 
-The accessibility pass checks parsed markup in the language server and the Vite plugin, adds reusable runtime primitives for keyboard and screen-reader flows, validates theme contrast during theme resolution, and exposes a stable `automationId` surface for test and assistive automation tooling.
+- It generates predictable accessibility attributes when the component already
+  has enough information.
+- It asks you for missing intent when only the app author can know the right
+  accessible name or label.
+- It reports accessibility diagnostics through the XMLUI analyzer surfaces
+  before the problem reaches users.
+
+The accessibility analyzer checks parsed markup in the language server, the
+Vite plugin, and `xmlui check --a11y`. XMLUI also adds reusable runtime
+primitives for keyboard and screen-reader flows, validates theme contrast
+during theme resolution, and exposes a stable `automationId` surface for test
+and assistive automation tooling.
 
 ## What problems this prevents
 
@@ -14,9 +27,75 @@ The accessibility pass checks parsed markup in the language server and the Vite 
 
 ## How it works
 
-The linter reads component metadata from the same registry used by type-contract validation. Components can declare their accessibility role, accessible-name props, and landmark role in metadata, and `lintComponentDef()` reports diagnostics against the parsed XMLUI tree.
+The XMLUI accessibility analyzer reads component metadata from the same registry
+used by type-contract validation. Components declare their accessibility role,
+accessible-name props, and landmark role in metadata. The analyzer reports
+diagnostics against the parsed XMLUI tree, and those diagnostics appear in the
+LSP, Vite builds, and the `xmlui check --a11y` CLI path.
 
-Those diagnostics surface in the LSP while editing and in the Vite plugin during builds. Vite supports the same rollout modes used by the other managed-react analyzers: off, warn, and strict.
+Vite supports the same rollout modes used by the other Managed React analyzers:
+`"off"`, `"warn"`, and `"strict"`.
+
+## What XMLUI generates
+
+XMLUI does not guess application meaning, but it does reuse meaning you already
+provided in markup.
+
+For many wrapped components, XMLUI resolves an `aria-label` in this order:
+your explicit `aria-label`, a component-specific derived label, the component's
+default accessibility label, and finally the component's `label` prop.
+
+```xmlui
+<TextBox label="Email address" />
+<TextBox placeholder="Search orders" />
+<Avatar name="Ada Lovelace" />
+<Spinner />
+```
+
+These produce accessible names from existing values:
+
+```html
+<input aria-label="Email address" />
+<input aria-label="Search orders" />
+<div aria-label="Ada Lovelace">...</div>
+<div aria-label="Loading">...</div>
+```
+
+Form components also connect visible labels, required state, and validation
+messages to the underlying control:
+
+```xmlui
+<FormItem label="Email address" required="true">
+  <TextBox bindTo="email" />
+</FormItem>
+```
+
+XMLUI gives the input a stable generated `id`, connects the visible label with
+`htmlFor`, marks the control with `aria-required`, and connects validation text
+with `aria-describedby` when messages are shown.
+
+Composite components generate their own navigation state where the component
+knows the correct value. For example:
+
+```xmlui
+<Pagination totalItems="{250}" pageSize="{25}" />
+<NavGroup label="Reports">...</NavGroup>
+```
+
+Pagination renders a navigation region labelled `"Pagination"` and page buttons
+with names such as `"Next page"` or `"Page 2 (current)"`. Disclosure-style
+components such as `NavGroup`, `Accordion`, and `ExpandableItem` update
+`aria-expanded` as they open and close.
+
+When XMLUI cannot infer a meaningful name, the analyzer tells you what to add:
+
+```xmlui
+<!-- Reports an accessibility diagnostic: icon-only button has no name. -->
+<Button icon="trash" />
+
+<!-- OK: the action has a screen-reader name. -->
+<Button icon="trash" aria-label="Delete order" />
+```
 
 XMLUI also ships three accessibility primitives:
 
@@ -30,7 +109,7 @@ Theme resolution runs a contrast checker over known foreground/background token 
 
 `strictAccessibility` remains opt-in for the current migration window:
 
-```xml
+```xmlui
 <App appGlobals="{{ strictAccessibility: true }}">
   <Pages />
 </App>
@@ -40,7 +119,7 @@ With strict mode enabled, warn-level accessibility diagnostics escalate to error
 
 For navigation-heavy apps, `autoSkipLink` can insert the default skip link before the app content:
 
-```xml
+```xmlui
 <App appGlobals="{{ autoSkipLink: true }}">
   <Pages />
 </App>
@@ -48,7 +127,7 @@ For navigation-heavy apps, `autoSkipLink` can insert the default skip link befor
 
 Use `automationId` when a component needs a stable automation hook:
 
-```xml
+```xmlui
 <Button automationId="save-order" label="Save" />
 ```
 

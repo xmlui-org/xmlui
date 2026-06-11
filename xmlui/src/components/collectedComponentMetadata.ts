@@ -23,6 +23,7 @@ import {
 import { FileInputMd } from "./FileInput/FileInput";
 import { FileUploadDropZoneMd } from "./FileUploadDropZone/FileUploadDropZone";
 import { FlowLayoutMd } from "./FlowLayout/FlowLayout";
+import { FocusScopeMd } from "./FocusScope/FocusScope";
 import { FooterMd } from "./Footer/Footer";
 import { FormMd } from "./Form/Form";
 import { FormItemMd } from "./FormItem/FormItem";
@@ -34,6 +35,7 @@ import { ImageMd } from "./Image/Image";
 import { ItemsMd } from "./Items/Items";
 import { LinkMd } from "./Link/Link";
 import { ListMd } from "./List/List";
+import { LiveRegionMd } from "./LiveRegion/LiveRegion";
 import { LogoMd } from "./Logo/Logo";
 import { MarkdownMd } from "./Markdown/Markdown";
 import { ModalDialogMd } from "./ModalDialog/ModalDialog";
@@ -177,6 +179,7 @@ import {
   HtmlWbrMd,
 } from "./HtmlTags/HtmlTags";
 import { SliderMd } from "./Slider/Slider";
+import { SkipLinkMd } from "./SkipLink/SkipLink";
 import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
@@ -344,6 +347,7 @@ Object.assign(metadataRegistry, {
   FileInput: FileInputMd,
   FileUploadDropZone: FileUploadDropZoneMd,
   FlowLayout: FlowLayoutMd,
+  FocusScope: FocusScopeMd,
   Footer: FooterMd,
   Form: FormMd,
   FormItem: FormItemMd,
@@ -363,6 +367,7 @@ Object.assign(metadataRegistry, {
   Items: ItemsMd,
   Link: LinkMd,
   List: ListMd,
+  LiveRegion: LiveRegionMd,
   Logo: LogoMd,
   Markdown: MarkdownMd,
   MenuSeparator: MenuSeparatorMd,
@@ -387,6 +392,7 @@ Object.assign(metadataRegistry, {
   ScrollViewer: ScrollViewerMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
+  SkipLink: SkipLinkMd,
   Slider: SliderMd,
   Slot: SlotMd,
   SpaceFiller: SpaceFillerMd,

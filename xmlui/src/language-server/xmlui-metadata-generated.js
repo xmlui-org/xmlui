@@ -21321,5 +21321,75 @@ export default {
       "borderStyle-connector-Stepper": "var(--xmlui-borderStyle-connector-Stepper)",
       "padding-content-Stepper": "var(--xmlui-padding-content-Stepper)"
     }
+  },
+  "FocusScope": {
+    "status": "stable",
+    "description": "`FocusScope` traps Tab navigation inside its subtree and restores focus when the subtree unmounts. Use it for custom popovers, drawers, and modal surfaces.",
+    "props": {
+      "trap": {
+        "description": "When true, Tab and Shift+Tab cycle inside the scope.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "restore": {
+        "description": "When true, focus returns to the previously focused element on unmount.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "autoFocus": {
+        "description": "When true, the first focusable child receives focus after mount.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    }
+  },
+  "LiveRegion": {
+    "status": "stable",
+    "description": "`LiveRegion` announces dynamic status messages to assistive technologies without changing the visible layout.",
+    "props": {
+      "message": {
+        "description": "The message announced by the live region.",
+        "valueType": "string"
+      },
+      "politeness": {
+        "description": "Controls whether updates are announced politely or assertively.",
+        "valueType": "string",
+        "availableValues": [
+          "polite",
+          "assertive"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "polite"
+      }
+    },
+    "a11y": {
+      "role": "decorative",
+      "requiresAccessibleName": false
+    }
+  },
+  "SkipLink": {
+    "status": "stable",
+    "description": "`SkipLink` renders a keyboard-first link that jumps directly to the main content region. It stays visually hidden until focused.",
+    "props": {
+      "target": {
+        "description": "The id of the element to focus and scroll to.",
+        "valueType": "string",
+        "defaultValue": "main"
+      },
+      "label": {
+        "description": "The accessible text shown when the skip link receives focus.",
+        "valueType": "string",
+        "defaultValue": "Skip to main content"
+      }
+    },
+    "a11y": {
+      "role": "link",
+      "accessibleNameProps": [
+        "label",
+        "aria-label",
+        "title"
+      ],
+      "requiresAccessibleName": true
+    }
   }
 };

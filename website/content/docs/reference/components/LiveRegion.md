@@ -1,4 +1,6 @@
-%-DESC-START
+# LiveRegion [#liveregion]
+
+`LiveRegion` announces dynamic status messages to assistive technologies without changing the visible layout.
 
 Use `LiveRegion` for updates that are important but not represented by moving
 focus, such as save results, background sync status, or validation summaries.
@@ -25,12 +27,31 @@ XMLUI also includes a shared global live region. Built-in notifications and
 runtime errors use that global region automatically, so you only need
 `LiveRegion` when your own component state needs a custom announcement.
 
-%-DESC-END
+## Behaviors [#behaviors]
 
-`politeness="polite"` renders a `status` region and waits for a natural pause
-before announcing the message. Use it for routine updates.
+This component supports the following behaviors:
 
-%-PROP-START politeness
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | `variant` |
+
+## Properties [#properties]
+
+### `message` [#message]
+
+The message announced by the live region.
+
+### `politeness` [#politeness]
+
+> [!DEF]  default: **"polite"**
+
+Controls whether updates are announced politely or assertively.
+
+Available values: `polite` **(default)**, `assertive`
 
 ```xmlui-pg copy display height="260px" name="Example: polite announcements"
 <App>
@@ -75,4 +96,14 @@ urgent updates that should interrupt the current announcement.
 </App>
 ```
 
-%-PROP-END
+## Events [#events]
+
+This component does not have any events.
+
+## Exposed Methods [#exposed-methods]
+
+This component does not expose any methods.
+
+## Styling [#styling]
+
+This component does not have any styles.

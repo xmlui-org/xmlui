@@ -68,7 +68,8 @@ Type-contract diagnostics are shown in the places where you normally work:
 
 - The VS Code language server shows them in the editor and Problems panel.
 - The Vite plugin reports them during development and production builds.
-- Standalone apps report them during browser startup validation.
+- Standalone apps report type-contract issues during browser startup validation.
+- Buildless apps can use `xmlui check` for the full static analyzer in CI.
 - Runtime warning mode can report expression-bound values after they resolve.
 
 The source for these diagnostics is `xmlui-type-contract`, which helps separate
@@ -145,17 +146,27 @@ contract problems are easier to spot in larger logs.
 
 Standalone apps run startup validation in the browser after XMLUI fetches and
 parses the app files. Startup validation uses the same verifier as the language
-server and Vite build path.
+server and Vite build path for type-contract checks.
 
-Standalone display is controlled by `appGlobals.lintSeverity`:
+The browser startup pass is controlled by two settings:
+
+- `strictTypeContracts` controls how type-contract diagnostics are classified.
+  It defaults to `true`, which means error-capable contract violations are
+  treated as errors. Set it to `false` for warning-only migration behavior.
+- `appGlobals.lintSeverity` controls how standalone startup validation is shown
+  in the browser.
+
+`lintSeverity` accepts these values:
 
 - `"warning"` prints validation issues to the browser console.
 - `"error"` replaces the app with an error screen.
 - `"strict"` prints console warnings and shows toast notifications.
 - `"skip"` disables standalone startup validation.
 
-`strictTypeContracts` controls diagnostic severity. `lintSeverity` controls how
-standalone mode displays the issues it finds.
+The `"strict"` `lintSeverity` value is a standalone display mode; it is separate
+from `strictTypeContracts`. Use `xmlui check` when a buildless app needs the
+broader static analyzer rules in CI rather than only browser startup
+type-contract validation.
 
 ## Suppressing diagnostics
 

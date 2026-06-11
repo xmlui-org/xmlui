@@ -29,4 +29,60 @@ test.describe("LiveRegion", () => {
     await expect(page.getByText("Saved")).toHaveCount(1);
     await expect(page.locator("[aria-live][aria-label='Saved']")).toBeAttached();
   });
+
+  test("updates message from a variable declared on a parent Fragment", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Fragment var.statusMessage="Waiting for an update">
+          <VStack>
+            <Button
+              label="Save"
+              onClick="statusMessage = 'Settings saved'"
+            />
+            <Text testId="status-text">{statusMessage}</Text>
+            <LiveRegion message="{statusMessage}" politeness="polite" />
+          </VStack>
+        </Fragment>
+      </App>
+    `, { noFragmentWrapper: true });
+
+    await expect(page.getByTestId("status-text")).toHaveText("Waiting for an update");
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByTestId("status-text")).toHaveText("Settings saved");
+    await expect(page.getByRole("status")).toHaveText("Settings saved");
+  });
+
+  test("updates message from a variable declared on a themed Fragment in App", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Theme>
+          <Fragment var.statusMessage="Waiting for an update">
+            <VStack>
+              <Button
+                label="Save"
+                onClick="statusMessage = 'Settings saved'"
+              />
+              <Text testId="status-text">{statusMessage}</Text>
+              <LiveRegion message="{statusMessage}" politeness="polite" />
+            </VStack>
+          </Fragment>
+        </Theme>
+      </App>
+    `, { noFragmentWrapper: true });
+
+    await expect(page.getByTestId("status-text")).toHaveText("Waiting for an update");
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByTestId("status-text")).toHaveText("Settings saved");
+    await expect(page.getByRole("status")).toHaveText("Settings saved");
+  });
 });
