@@ -41,6 +41,7 @@ vi.mock("../../../src/components-core/event-handlers", () => ({
 vi.mock("../../../src/components-core/utils/hooks", () => ({
   useReferenceTrackedApi: vi.fn(() => ({})),
   useShallowCompareMemoize: vi.fn((value) => value),
+  useIsomorphicLayoutEffect: React.useLayoutEffect,
 }));
 
 vi.mock("../../../src/components-core/utils/extractParam", () => ({
