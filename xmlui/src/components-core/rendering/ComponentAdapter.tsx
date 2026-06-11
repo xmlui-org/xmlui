@@ -975,12 +975,15 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       }
     }
 
-    // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
-    // --- into the DOM object of the rendered React component.
+    // --- Visual components with XMLUI ids expose a stable component-target attribute.
+    // --- Test ids remain controlled by decorateComponentsWithTestId.
+    const shouldExposeXmluiId = safeNode.uid !== undefined;
+    const shouldDecorateWithTestId =
+      appContext?.decorateComponentsWithTestId &&
+      (safeNode.uid !== undefined || safeNode.testId !== undefined);
     if (
-      // --- The component has its "id" (internally, "uid") or "testId" property defined
-      ((appContext?.decorateComponentsWithTestId &&
-        (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
+      (shouldExposeXmluiId ||
+        shouldDecorateWithTestId ||
         safeNode.automationId !== undefined ||
         // --- The component has its "inspectId" property defined
         inspectId !== undefined) &&
@@ -989,14 +992,17 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- The component is not opaque
       descriptor?.opaque !== true
     ) {
-      // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
-      const testId = safeNode.testId || safeNode.uid;
-      const resolvedUid = extractParam(state, testId, appContext, true);
+      // --- Use `ComponentDecorator` to inject framework helper attributes into the component.
+      const resolvedXmluiId = extractParam(state, safeNode.uid, appContext, true);
+      const resolvedTestId = shouldDecorateWithTestId
+        ? extractParam(state, safeNode.testId || safeNode.uid, appContext, true)
+        : undefined;
       const automationId = extractParam(state, safeNode.automationId, appContext, true);
       renderedNode = (
         <ComponentDecorator
           attr={{
-            "data-testid": resolvedUid,
+            "data-xmlui-id": resolvedXmluiId,
+            "data-testid": resolvedTestId,
             "data-automation-id": automationId,
             "data-inspectId": inspectId,
             "data-component-type": safeNode.type,

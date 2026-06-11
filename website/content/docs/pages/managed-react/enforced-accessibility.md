@@ -61,8 +61,11 @@ These produce accessible names from existing values:
 <div aria-label="Loading">...</div>
 ```
 
-Form components also connect visible labels, required state, and validation
-messages to the underlying control:
+[TextBox](/docs/reference/components/TextBox), [Avatar](/docs/reference/components/Avatar),
+and [Spinner](/docs/reference/components/Spinner) all reuse values already present
+in the markup. Form components such as [FormItem](/docs/reference/components/FormItem)
+also connect visible labels, required state, and validation messages to the
+underlying control:
 
 ```xmlui
 <FormItem label="Email address" required="true">
@@ -82,10 +85,13 @@ knows the correct value. For example:
 <NavGroup label="Reports">...</NavGroup>
 ```
 
-Pagination renders a navigation region labelled `"Pagination"` and page buttons
-with names such as `"Next page"` or `"Page 2 (current)"`. Disclosure-style
-components such as `NavGroup`, `Accordion`, and `ExpandableItem` update
-`aria-expanded` as they open and close.
+[Pagination](/docs/reference/components/Pagination) renders a navigation region
+labelled `"Pagination"` and page buttons with names such as `"Next page"` or
+`"Page 2 (current)"`. Disclosure-style components such as
+[NavGroup](/docs/reference/components/NavGroup),
+[Accordion](/docs/reference/components/Accordion), and
+[ExpandableItem](/docs/reference/components/ExpandableItem) update `aria-expanded`
+as they open and close.
 
 When XMLUI cannot infer a meaningful name, the analyzer tells you what to add:
 
@@ -97,12 +103,23 @@ When XMLUI cannot infer a meaningful name, the analyzer tells you what to add:
 <Button icon="trash" aria-label="Delete order" />
 ```
 
-XMLUI also ships three accessibility primitives:
+XMLUI also ships dedicated accessibility components and behaviors:
 
-- `<SkipLink>` renders a focus-visible skip link to the main content region.
-- `<FocusScope>` centralizes focus trapping, initial focus, and focus restoration for overlays.
-- `<LiveRegion>` provides polite/assertive screen-reader announcements. Toasts and runtime errors announce through the shared global live region.
-- `withLiveRegion` adds the same announcement pattern to supported text-like components such as `Text`, headings, `Badge`, `NoResult`, and `ProgressBar`.
+- [`SkipLink`](/docs/reference/components/SkipLink) renders a focus-visible skip
+  link that lets keyboard, switch-device, and screen-reader users bypass repeated
+  navigation and move focus to the active page's main content. Its `target` can
+  point at a DOM id, an XMLUI component id, or a test id.
+- [`FocusScope`](/docs/reference/components/FocusScope) centralizes focus
+  trapping, initial focus, and focus restoration for custom overlays and panels.
+- [`LiveRegion`](/docs/reference/components/LiveRegion) provides polite or
+  assertive screen-reader announcements for updates that should not move focus.
+  Toasts and runtime errors announce through the shared global live region.
+- `withLiveRegion` adds the same announcement pattern to supported text-like
+  components such as [Text](/docs/reference/components/Text), headings
+  ([H1](/docs/reference/components/H1)-[H6](/docs/reference/components/H6)),
+  [Badge](/docs/reference/components/Badge),
+  [NoResult](/docs/reference/components/NoResult), and
+  [ProgressBar](/docs/reference/components/ProgressBar).
 
 Theme resolution runs a contrast checker over known foreground/background token pairs. In development it warns; with strict accessibility enabled it escalates those findings.
 
@@ -126,16 +143,26 @@ For navigation-heavy apps, `autoSkipLink` can insert the default skip link befor
 </App>
 ```
 
+Use an explicit [`SkipLink`](/docs/reference/components/SkipLink) when different
+routes need different first focus targets, for example a dashboard filter on `/`
+and an order search field on `/orders`.
+
 Use `automationId` when a component needs a stable automation hook:
 
 ```xmlui
 <Button automationId="save-order" label="Save" />
 ```
 
-XMLUI renders this as `data-automation-id="save-order"` on the component decorator without making the value part of the public visual design.
+XMLUI renders this [Button](/docs/reference/components/Button) as
+`data-automation-id="save-order"` on the component decorator without making the
+value part of the public visual design.
 
 ## Related
 
+- [Add a skip link to main content](/docs/howto/add-a-skip-link-to-main-content)
+- [Keep keyboard focus inside a custom panel](/docs/howto/keep-keyboard-focus-inside-a-custom-panel)
+- [Announce status changes with LiveRegion](/docs/howto/announce-status-changes-with-liveregion)
+- [Announce text changes with withLiveRegion](/docs/howto/announce-text-changes-with-withliveregion)
 - [Verified Type Contracts](/docs/managed-react/verified-type-contracts)
 - [Build Validation Analyzers](/docs/managed-react/build-validation-analyzers)
 - [Managed Lifecycle Vocabulary](/docs/managed-react/managed-lifecycle-vocabulary)

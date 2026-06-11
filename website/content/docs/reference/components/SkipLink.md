@@ -6,25 +6,60 @@ Use `SkipLink` near the start of a page or app shell, before repeated
 navigation. Keyboard users tab to it first, activate it, and move directly to
 the page's main content region.
 
-To try the example, focus the preview and press `Tab`. The skip link appears
-only while focused. Press `Enter` to move focus to the main content.
+This helps people who navigate with a keyboard, switch device, or screen reader
+avoid traversing the same header and navigation links on every route. The link
+is visually hidden until it receives keyboard focus, so it does not add visual
+noise for pointer users, but it remains the first useful escape hatch in the tab
+order. When activated, it moves focus to a meaningful control or focusable
+element in the active page.
 
-```xmlui-pg copy display height="320px" name="Example: skip repeated navigation"
-<App>
-  <SkipLink target="main" />
-  <HStack height="260px">
-    <NavPanel>
-      <NavLink label="Dashboard" to="/" />
-      <NavLink label="Orders" to="/orders" />
-    </NavPanel>
+To try the example, open it in the playground, switch the preview to full
+screen, focus the page, and press `Tab`. The skip link appears only while
+focused. Press `Enter` to move focus to the active page's first field. The
+embedded documentation preview is too constrained for this example.
 
-    <main id="main" tabindex="-1">
-      <VStack padding="$space-4">
-        <H1>Orders</H1>
-        <Text>Keyboard focus lands here when the skip link is activated.</Text>
+```xmlui-pg copy display height="420px" name="Example: skip repeated navigation"
+---app display
+<App layout="horizontal" scrollWholePage="false">
+  <SkipLink
+    target="{$pathname === '/orders' ? 'orders-search' : 'dashboard-filter'}"
+    label="Skip to main content"
+  />
+
+  <NavPanel>
+    <NavLink label="Dashboard" to="/" icon="home" />
+    <NavLink label="Orders" to="/orders" icon="list" />
+  </NavPanel>
+
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <VStack padding="$space-6" gap="$space-4">
+        <H1>Dashboard</H1>
+        <Text>Use the skip link to move past the navigation and land here.</Text>
+        <TextBox
+          id="dashboard-filter"
+          label="Filter dashboard cards"
+          placeholder="Try typing after skipping"
+        />
       </VStack>
-    </main>
-  </HStack>
+    </Page>
+
+    <Page url="/orders">
+      <VStack padding="$space-6" gap="$space-4">
+        <H1>Orders</H1>
+        <Text>On this route the same skip link lands on the orders search field.</Text>
+        <TextBox
+          id="orders-search"
+          label="Search orders"
+          placeholder="Order number or customer"
+        />
+        <HStack wrapContent>
+          <Button label="Create order" />
+          <Button label="Export orders" variant="outlined" />
+        </HStack>
+      </VStack>
+    </Page>
+  </Pages>
 </App>
 ```
 
@@ -51,11 +86,11 @@ The accessible text shown when the skip link receives focus.
 
 > [!DEF]  default: **"main"**
 
-The id of the element to focus and scroll to.
+The DOM id, XMLUI component id, or test id of the element to focus and scroll to.
 
 ```xmlui-pg copy display height="260px" name="Example: custom target"
 <App>
-  <SkipLink target="report-content" label="Skip report filters" />
+  <SkipLink target="report-export" label="Skip report filters" />
 
   <VStack>
     <HStack>
@@ -63,10 +98,11 @@ The id of the element to focus and scroll to.
       <Button label="Export" />
     </HStack>
 
-    <main id="report-content" tabindex="-1">
+    <VStack padding="$space-4" gap="$space-3">
       <H2>Revenue report</H2>
       <Text>The report content starts here.</Text>
-    </main>
+      <Button id="report-export" label="Export report" />
+    </VStack>
   </VStack>
 </App>
 ```
