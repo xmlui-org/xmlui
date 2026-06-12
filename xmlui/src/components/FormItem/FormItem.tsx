@@ -25,8 +25,27 @@ import { CustomFormItem, FormItem } from "./FormItemReact";
 import { MemoizedItem } from "../container-helpers";
 import { partitionObject } from "../../components-core/utils/misc";
 import { requireLabelModeMd } from "../abstractions";
+import { layoutOptionKeys } from "../../components-core/descriptorHelper";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 
 const COMP = "FormItem";
+const layoutOptionKeySet = new Set(layoutOptionKeys);
+const mediaBreakpointKeySet = new Set<string>(MediaBreakpointKeys);
+
+function isLayoutPropName(propName: string) {
+  if (layoutOptionKeySet.has(propName)) {
+    return true;
+  }
+
+  const separatorIndex = propName.lastIndexOf("-");
+  if (separatorIndex < 0) {
+    return false;
+  }
+
+  const baseName = propName.slice(0, separatorIndex);
+  const breakpointName = propName.slice(separatorIndex + 1);
+  return mediaBreakpointKeySet.has(breakpointName) && layoutOptionKeySet.has(baseName);
+}
 
 // NOTE: We need to filter the "none" value out so that it doesn't show up in the docs.
 const filteredValidationSeverityValues = validationSeverityValues.filter(
@@ -372,7 +391,9 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
     // Remove the *Template suffix and create renderer functions with the same name + Renderer
     const resolvedRestProps: Record<string | number | symbol, any> = {
       ...Object.fromEntries(
-        Object.entries(nonTemplateProps).map(([key, value]) => [key, extractValue(value)]),
+        Object.entries(nonTemplateProps)
+          .filter(([key]) => !isLayoutPropName(key))
+          .map(([key, value]) => [key, extractValue(value)]),
       ),
       ...Object.fromEntries(
         Object.entries(templateProps).map(([key, value]) => [
