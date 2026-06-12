@@ -218,7 +218,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     return extractParam(state, rawLabel, appContext, true);
   }, [state, safeNode.props, appContext]);
 
-  const xsVerboseForMap = appContext.appGlobals?.xsVerbose === true;
+  const xsVerboseForMap = appContext.xmluiConfig?.xsVerbose === true;
   useEffect(() => {
     if (!xsVerboseForMap || !resolvedTestId || typeof window === "undefined") return;
     const w = window as any;
@@ -507,8 +507,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         ...layoutContextRef?.current,
         mediaSize: appContext.mediaSize,
       },
-      themeDisableInlineStyle ?? appContext.appGlobals?.disableInlineStyle,
-      appContext.appGlobals?.applyLayoutProperties,
+      themeDisableInlineStyle ?? appContext.xmluiConfig?.disableInlineStyle,
+      appContext.xmluiConfig?.applyLayoutProperties,
     );
 
     // --- Old layout property resolution
@@ -519,8 +519,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   }, [
     layoutContextRef,
     appContext.mediaSize,
-    appContext.appGlobals?.disableInlineStyle,
-    appContext.appGlobals?.applyLayoutProperties,
+    appContext.xmluiConfig?.disableInlineStyle,
+    appContext.xmluiConfig?.applyLayoutProperties,
     themeDisableInlineStyle,
     safeNode.props,
     valueExtractor,
@@ -538,7 +538,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- (e.g. "fontSize-label", "padding-md", "color-input-lg")
   const extendedLayoutProps = useMemo(() => {
     if (!safeNode.props) return EMPTY_OBJECT as Record<string, any>;
-    const applyMode = appContext.appGlobals?.applyLayoutProperties ?? "all";
+    const applyMode = appContext.xmluiConfig?.applyLayoutProperties ?? "all";
     // Mirror the applyLayoutProperties check that resolveLayoutProps applies to the base props
     if (applyMode === "none") return EMPTY_OBJECT as Record<string, any>;
     const extended: Record<string, any> = {};
@@ -564,7 +564,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       }
     }
     return extended;
-  }, [safeNode.props, valueExtractor, appContext.appGlobals?.applyLayoutProperties]);
+  }, [safeNode.props, valueExtractor, appContext.xmluiConfig?.applyLayoutProperties]);
 
   // --- Build composite responsive style object covering root + all parts
   const responsiveStyleObject = useMemo(
@@ -711,8 +711,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     }
   }, [resolvedLabel, safeNode.events, safeNode.type, safeNode.uid, uid]);
 
-  const strictLifecycle = appContext.appGlobals?.strictLifecycle !== false;
-  const disposeTimeoutMs: number = appContext.appGlobals?.disposeTimeoutMs ?? 250;
+  const strictLifecycle = appContext.xmluiConfig?.strictLifecycle !== false;
+  const disposeTimeoutMs: number = appContext.xmluiConfig?.disposeTimeoutMs ?? 250;
   const fireVisibilityLifecycleHandler = useCallback(
     (phase: "mount" | "unmount", handler: (...args: any[]) => any) => {
       const componentType = safeNode.type;
@@ -880,7 +880,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Create interaction logger for inspector/debugging
   // --- IMPORTANT: This must be BEFORE the early return to maintain consistent hook order
-  const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+  const xsVerbose = appContext.xmluiConfig?.xsVerbose === true;
   const logInteraction = useCallback(
     (interaction: string, detail?: Record<string, any>) => {
       if (!xsVerbose) return;

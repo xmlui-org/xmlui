@@ -32,7 +32,7 @@ import type { TypeContractDiagnostic } from "./diagnostics";
 export interface VerifyOptions {
   /**
    * When `true`, contract violations escalate from `warn` to `error`.
-   * Controlled by `App.appGlobals.strictTypeContracts`.
+   * Controlled by `App.xmluiConfig.strictTypeContracts`.
    */
   strict?: boolean;
   /**

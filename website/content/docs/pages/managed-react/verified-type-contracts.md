@@ -117,7 +117,7 @@ contract violations as warnings while you clean up the markup:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictTypeContracts": false
   }
 }
@@ -153,7 +153,7 @@ The browser startup pass is controlled by two settings:
 - `strictTypeContracts` controls how type-contract diagnostics are classified.
   It defaults to `true`, which means error-capable contract violations are
   treated as errors. Set it to `false` for warning-only migration behavior.
-- `appGlobals.lintSeverity` controls how standalone startup validation is shown
+- `xmluiConfig.lintSeverity` controls how standalone startup validation is shown
   in the browser.
 
 `lintSeverity` accepts these values:

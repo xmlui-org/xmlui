@@ -84,7 +84,7 @@ A user-defined component can already declare methods that callers invoke through
 ### 2.2 What's missing for true "API endpoints"
 
 - The `api` slot only stores **script source**, not **request metadata**. A consumer that wants to *introspect* an endpoint (HTTP method, URL template, body schema, response transform) has nothing to read.
-- `DataSource.url` and `APICall.url` are *required string* props ([DataSource.tsx](../components/DataSource/DataSource.tsx#L28-L34), [APICall.tsx](../components/APICall/APICall.tsx#L48-L54)). There is **no existing indirection** like `sourceApi="..."`. They are resolved by `RestApiProxy.resolveUrl` → `generateFullApiUrl` against `appGlobals.apiUrl` ([RestApiProxy.ts](./RestApiProxy.ts#L490-L505)).
+- `DataSource.url` and `APICall.url` are *required string* props ([DataSource.tsx](../components/DataSource/DataSource.tsx#L28-L34), [APICall.tsx](../components/APICall/APICall.tsx#L48-L54)). There is **no existing indirection** like `sourceApi="..."`. They are resolved by `RestApiProxy.resolveUrl` → `generateFullApiUrl` against `xmluiConfig.apiUrl` with legacy `appGlobals.apiUrl` fallback ([RestApiProxy.ts](./RestApiProxy.ts#L490-L505)).
 - There is **no notion of a parameter schema** on either component. Today everything is built ad-hoc with `extractParam`.
 - A compound component has **no implicit access to its outer scope**. The only inbound channels are (a) its declared properties, exposed inside the template as the implicit `$props` object, and (b) the outbound `emitEvent(name, ...args)` mechanism that lets the template signal back to the consumer ([CompoundComponent.tsx](./CompoundComponent.tsx#L155-L175)). It can keep its *own* internal state through `<variable name="…">` declarations, but those are not inherited from anywhere. There is **no registry of endpoint metadata** that downstream `DataSource`/`APICall` instances could look up by dotted name.
 
@@ -432,7 +432,7 @@ API components leverage what compound components already provide:
 | Need | How |
 |------|-----|
 | Per-instance configuration (token, baseUrl, …) | Standard compound props: `<GoogleDocsApi token="…" baseUrl="…" />`. Inside endpoint definitions they are read through `$props.token`, `$props.baseUrl`. |
-| Derived / cached values | `<variable name="baseUrl" value="{$props.baseUrl ?? appGlobals.apiUrl}" />` inside `<Component>`; referenced as `{baseUrl}` in endpoint URLs. |
+| Derived / cached values | `<variable name="baseUrl" value="{$props.baseUrl}" />` inside `<Component>`; referenced as `{baseUrl}` in endpoint URLs. |
 | Default headers (auth) | Either set on each `<ApiEndpoint headers="…">` referencing `$props.token`, or hoisted to a `defaults` slot (see §13). |
 | Multiple instances | Each id has its own state container and its own `$props`. The endpoint table is registered per instance, so two `<GoogleDocsApi>` instances with different tokens stay isolated. |
 

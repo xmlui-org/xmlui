@@ -241,6 +241,24 @@ export type StandaloneAppDescription = {
    *   diagnostic per affected component on use.
    */
   appGlobals?: Record<string, any>;
+
+  /**
+   * Framework / runtime configuration for the XMLUI engine. Settings here
+   * govern the engine's behaviour rather than application data (which lives
+   * in `appGlobals`). Examples: `disableInlineStyle`, `useHashBasedRouting`,
+   * `withXSRFToken`, `logRestApiErrors`, `xsVerbose`, `xsVerboseLogMax`,
+   * `syncExecutionTimeout`, `defaultToOptionalMemberAccess`,
+   * `applyLayoutProperties`, `lintSeverity`, `searchIndexEnabled`, and the
+   * `strict*` family.
+   *
+   * Any framework setting not present in `xmluiConfig` falls back to the same
+   * key in `appGlobals`. Existing apps that still keep framework settings
+   * inside `appGlobals` continue to work unchanged.
+   *
+   * Accessible at runtime as `appContext.xmluiConfig` and via the
+   * `useXmluiConfig()` hook.
+   */
+  xmluiConfig?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
   sources?: Record<string, string>;
 
@@ -251,6 +269,11 @@ export type StandaloneAppDescription = {
 export type StandaloneJsonConfig = {
   name?: string;
   appGlobals?: Record<string, any>;
+  /**
+   * Framework / runtime configuration. See `StandaloneAppDescription.xmluiConfig`
+   * for the full description; values not set here fall back to `appGlobals`.
+   */
+  xmluiConfig?: Record<string, any>;
   entryPoint?: string;
   components?: string[];
   themes?: string[];

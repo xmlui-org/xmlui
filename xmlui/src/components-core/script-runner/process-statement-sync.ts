@@ -102,7 +102,7 @@ export function processStatementQueue(
   // --- Consume the queue
   while (queue.length > 0) {
     // --- Check sync timeout
-    const syncTimeout = evalContext.appContext?.appGlobals?.syncExecutionTimeout ?? DEFAULT_SYNC_EVAL_TIMEOUT;
+    const syncTimeout = evalContext.appContext?.xmluiConfig?.syncExecutionTimeout ?? DEFAULT_SYNC_EVAL_TIMEOUT;
     if (
       evalContext.startTick !== undefined &&
       new Date().valueOf() - evalContext.startTick > syncTimeout

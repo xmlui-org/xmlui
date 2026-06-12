@@ -1273,14 +1273,14 @@ describe("Playground pattern parsing", () => {
     expect(base64ToJson(base64!)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
       config: {
-        appGlobals: {
+        xmluiConfig: {
           xsVerbose: true,
         },
       },
     });
   });
 
-  it("Convert existing config with tracing enabled merges xsVerbose into appGlobals", () => {
+  it("Convert existing config with tracing enabled merges xsVerbose into xmluiConfig", () => {
     const content = `\`\`\`xmlui-pg
 ---app
 <Button>Click me</Button>
@@ -1303,6 +1303,8 @@ describe("Playground pattern parsing", () => {
         apiUrl: "/api",
         appGlobals: {
           traceBucket: "docs",
+        },
+        xmluiConfig: {
           xsVerbose: true,
         },
       },

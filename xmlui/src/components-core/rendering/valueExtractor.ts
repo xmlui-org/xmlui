@@ -316,9 +316,9 @@ export function createValueExtractor(
     const raw = extractor(expression);
     if (raw === undefined || raw === null) return undefined;
     const opts = {
-      strict: appContext?.appGlobals?.strictTheming !== false,
-      allowRawCss: appContext?.appGlobals?.allowInlineRawCss !== false,
-      maxZIndex: appContext?.appGlobals?.maxZIndex ?? 9999,
+      strict: appContext?.xmluiConfig?.strictTheming !== false,
+      allowRawCss: appContext?.xmluiConfig?.allowInlineRawCss !== false,
+      maxZIndex: appContext?.xmluiConfig?.maxZIndex ?? 9999,
     };
     const { value, diagnostics } = validateInlineStyle(
       { propName, rawValue: raw, valueType },
@@ -333,9 +333,9 @@ export function createValueExtractor(
     if (raw === undefined || raw === null || raw === "") return raw;
     const rawStr = typeof raw === "string" ? raw : String(raw);
     const opts = {
-      strict: appContext?.appGlobals?.strictTheming !== false,
-      allowRawCss: appContext?.appGlobals?.allowInlineRawCss !== false,
-      maxZIndex: appContext?.appGlobals?.maxZIndex ?? 9999,
+      strict: appContext?.xmluiConfig?.strictTheming !== false,
+      allowRawCss: appContext?.xmluiConfig?.allowInlineRawCss !== false,
+      maxZIndex: appContext?.xmluiConfig?.maxZIndex ?? 9999,
     };
     const { value, diagnostics } = validateStyleString(rawStr, { componentName }, opts);
     emitThemeDiagnostics(diagnostics);

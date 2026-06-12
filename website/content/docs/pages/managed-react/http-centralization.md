@@ -24,7 +24,7 @@ are not reachable from expressions.
 The framework's request proxy is the only network entry point for built-in
 components and for the `App.fetch()` global. It injects the configured
 CSRF token and transaction headers and checks the destination against
-`appGlobals.allowedOrigins`. Same-origin requests are always permitted;
+`xmluiConfig.allowedOrigins`. Same-origin requests are always permitted;
 cross-origin requests are rejected before the network is touched. The
 managed `<WebSocket>` and `<EventSource>` components apply the same
 allowlist to streaming connections.
@@ -32,12 +32,12 @@ allowlist to streaming connections.
 ## Configuring the origin allowlist
 
 List the cross-origin hosts your app is allowed to call in
-`appGlobals.allowedOrigins`. Same-origin requests do not need to appear
+`xmluiConfig.allowedOrigins`. Same-origin requests do not need to appear
 in the list.
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "allowedOrigins": [
       "https://api.example.com",
       "https://cdn.example.com"

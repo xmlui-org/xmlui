@@ -98,12 +98,15 @@ pair, so RTL never regresses silently.
 
 By default the i18n diagnostics are non-fatal so apps can adopt
 externalisation incrementally. To turn them into hard failures
-during development, set the `strictI18n` global on the `<App>`:
+during development, set `xmluiConfig.strictI18n`:
 
-```xmlui
-<App global.strictI18n="{true}" defaultLocale="en" localeBundles="{...}">
-  <!-- ... -->
-</App>
+```json
+{
+  "xmluiConfig": {
+    "strictI18n": true,
+    "defaultLocale": "en"
+  }
+}
 ```
 
 Under strict mode:

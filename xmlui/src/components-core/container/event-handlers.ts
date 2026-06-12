@@ -375,13 +375,13 @@ export function createEventHandlers(config: EventHandlerConfig) {
         },
         options: {
           defaultToOptionalMemberAccess:
-            typeof appContext.appGlobals?.defaultToOptionalMemberAccess === "boolean"
-              ? appContext.appGlobals.defaultToOptionalMemberAccess
+            typeof appContext.xmluiConfig?.defaultToOptionalMemberAccess === "boolean"
+              ? appContext.xmluiConfig.defaultToOptionalMemberAccess
               : true,
-          strictDomSandbox: Array.isArray(appContext.appGlobals?.strictDomSandbox)
-            ? appContext.appGlobals.strictDomSandbox
-            : appContext.appGlobals?.strictDomSandbox === true,
-          allowConsole: appContext.appGlobals?.allowConsole !== false,
+          strictDomSandbox: Array.isArray(appContext.xmluiConfig?.strictDomSandbox)
+            ? appContext.xmluiConfig.strictDomSandbox
+            : appContext.xmluiConfig?.strictDomSandbox === true,
+          allowConsole: appContext.xmluiConfig?.allowConsole !== false,
           sandboxWarnLogger: (entry) =>
             pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
           ...(appContext as any).__udcEvalOptions,
@@ -569,7 +569,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         // --- `defaultHandlerTimeoutMs` from `appGlobals`. `<= 0` disables
         // --- the timeout (long-poll opt-out).
         const ambientTimeout = Number(
-          (appContext as any)?.appGlobals?.defaultHandlerTimeoutMs ?? 30000,
+          (appContext as any)?.xmluiConfig?.defaultHandlerTimeoutMs ?? 30000,
         );
         const effectiveTimeoutMs =
           options?.handlerTimeoutMs !== undefined ? options.handlerTimeoutMs : ambientTimeout;
@@ -577,7 +577,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           timeoutMs: effectiveTimeoutMs,
           abort: (reason) => abortCancelToken(reason),
           onTimeout: () => {
-            const strict = (appContext as any)?.appGlobals?.strictConcurrency === true;
+            const strict = (appContext as any)?.xmluiConfig?.strictConcurrency === true;
             const severity = strict ? "error" : "warn";
             const message = `Handler timed out after ${effectiveTimeoutMs}ms`;
             pushXsLog({

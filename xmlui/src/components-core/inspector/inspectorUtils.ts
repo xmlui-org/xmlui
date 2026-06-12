@@ -223,7 +223,7 @@ export interface XsLogEntry {
    *   encounters a structural problem (redaction gap, sink failure, buffer overflow, etc.)
    *   (plan #15). Contains `code: AuditDiagCode`, `severity`, `message`, optional `data`.
    * - `"a11y"` — accessibility linter finding emitted at runtime when
-   *   `App.appGlobals.strictAccessibility` is truthy; produced by the accessibility
+   *   `App.xmluiConfig.strictAccessibility` is truthy; produced by the accessibility
    *   module (plan #05). Contains `code: A11yCode`, `severity`, `componentName`,
    *   `message`, and optional `fix`.
    * - `"reactive-cycle"` — a reactive dependency cycle detected at app startup by
@@ -232,7 +232,7 @@ export interface XsLogEntry {
    *   `ReactiveNode[]`), `message` (human-readable diagnostic from `formatCycle`),
    *   and `cycleId` (stable hash for deduplication within a session).
    * - `"type-contract"` — a parse-time type-contract violation surfaced at runtime
-   *   when `App.appGlobals.strictTypeContracts` is truthy; produced by the
+   *   when `App.xmluiConfig.strictTypeContracts` is truthy; produced by the
    *   type-contract verifier (plan #01). Contains `code: TypeContractCode`,
    *   `severity`, `componentName`, optional `propName` / `expected` / `actual`,
    *   `message`, and optional `suggestion`.
@@ -242,7 +242,7 @@ export interface XsLogEntry {
    *   `componentLabel`, optional `durationMs` (info entries), optional
    *   `reason: LifecycleViolationReason` (warn/error entries), and optional
    *   `error: { message, stack? }`. Severity escalates from `warn` to `error`
-   *   when `App.appGlobals.strictLifecycle` is truthy.
+   *   when `App.xmluiConfig.strictLifecycle` is truthy.
    * - `"concurrency"` — handler-concurrency event or diagnostic emitted by the
    *   handler-coordinator surface (plan #06). Contains
    *   `code: ConcurrencyCode` (one of `concurrency-handler-cancelled`,
@@ -260,7 +260,7 @@ export interface XsLogEntry {
    *   `validator-throw`, `deprecated-alias`), `severity: "info" | "warn"
    *   | "error"`, optional `formId` / `fieldName` / `validatorName`, and
    *   `message`. Severity escalates from `warn` to `error` when
-   *   `App.appGlobals.strictForms` is truthy.
+   *   `App.xmluiConfig.strictForms` is truthy.
    * - `"i18n"` — internationalisation diagnostic (plan #11). Contains
    *   `code: I18nDiagnosticCode`, `severity`, optional `locale` / `key`, and `message`.
    * - `"scheduler"` — scheduler/determinism event or diagnostic (plan #16). Contains
@@ -273,7 +273,7 @@ export interface XsLogEntry {
    *   `severity: "warn" | "error"`, optional `variableName` / `propName`
    *   / `componentName` / `expected` / `actual`, and `message`. Severity
    *   escalates from `warn` to `error` when
-   *   `App.appGlobals.strictTheming` is truthy.
+   *   `App.xmluiConfig.strictTheming` is truthy.
    * - `"udc"` — user-defined-component sandbox diagnostic (plan #14)
    *   emitted by the UDC contract / scope / capability gates. Contains
    *   `code: UdcDiagCode` (one of `udc-prop-undeclared`,
@@ -283,7 +283,7 @@ export interface XsLogEntry {
    *   `udc-manifest-mismatch`, `udc-untrusted-violation`),
    *   `severity: "info" | "warn" | "error"`, `udc` (the component name),
    *   optional `file` / `line` / `column`, and `message`. Severity
-   *   escalates to `error` when `App.appGlobals.strictUdcSandbox` is truthy.
+   *   escalates to `error` when `App.xmluiConfig.strictUdcSandbox` is truthy.
    * - `"versioning"` — versioning diagnostic (plan #12) emitted by the
    *   versioning verifier at parse / runtime when markup references
    *   deprecated, removed, renamed, experimental, or internal API
@@ -296,7 +296,7 @@ export interface XsLogEntry {
    *   `methodName` / `deprecatedSince` / `removedIn` / `replacement`,
    *   and `message`. Severity escalates from `warn` to `error` for
    *   `removed-prop` and `internal-component-use` when
-   *   `App.appGlobals.strictVersioning` is truthy. Per-session
+   *   `App.xmluiConfig.strictVersioning` is truthy. Per-session
    *   deduplication by `(componentName, propName, code)` keeps the
    *   trace bounded.
    */

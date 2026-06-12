@@ -124,23 +124,21 @@ reviewable.
 
 Mark a UDC `trust="untrusted"` when its source is a third-party pack,
 a user-supplied file, or any other origin you do not fully control.
-Pair that with `appGlobals.udcTrust` to decide what the app does about
+Pair that with `xmluiConfig.udcTrust` to decide what the app does about
 untrusted UDCs globally:
 
 | `udcTrust` | Behaviour for `trust="untrusted"` UDCs |
 |---|---|
 | `"open"` (default) | The trust attribute is informational only. |
 | `"review"` | Every untrusted UDC emits `udc-untrusted-violation` listing missing declarations and implicit (unlisted) capabilities, so CI surfaces the unreviewed surface. |
-| `"strict"` | Untrusted UDCs run with strict scope + capability enforcement unconditionally, regardless of `appGlobals.strictUdcSandbox`. |
+| `"strict"` | Untrusted UDCs run with strict scope + capability enforcement unconditionally, regardless of `xmluiConfig.strictUdcSandbox`. |
 
-```xmlui
-<App
-    appGlobals="{{
-        udcTrust: 'review'
-    }}"
->
-    <!-- ... -->
-</App>
+```json
+{
+  "xmluiConfig": {
+    "udcTrust": "review"
+  }
+}
 ```
 
 Untrusted UDCs must carry an explicit declaration block and an explicit
@@ -204,20 +202,18 @@ review pipeline reads.
 
 ## Enabling strict mode
 
-Set `appGlobals.strictUdcSandbox` to `true` to escalate the table above
+Set `xmluiConfig.strictUdcSandbox` to `true` to escalate the table above
 from warn / info to error and to throw `UdcScopeError` /
 `UdcCapabilityError` from offending reads instead of merely tracing
 them:
 
-```xmlui
-<App
-    appGlobals="{{
-        strictUdcSandbox: true,
-        udcTrust: 'strict'
-    }}"
->
-    <!-- ... -->
-</App>
+```json
+{
+  "xmluiConfig": {
+    "strictUdcSandbox": true,
+    "udcTrust": "strict"
+  }
+}
 ```
 
 Strict mode flips to the default in the next major release. Turning it

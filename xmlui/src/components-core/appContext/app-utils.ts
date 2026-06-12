@@ -122,26 +122,29 @@ function isAppFetchSameOrigin(url: string): boolean {
 
 /**
  * Factory — returns a managed `App.fetch(input, init?)` bound to the
- * provided `appGlobals`.
+ * provided `appGlobals` / `xmluiConfig`.
  *
  * The returned function:
- * 1. Rejects cross-origin requests when `appGlobals.allowedOrigins` is set
+ * 1. Rejects cross-origin requests when `xmluiConfig.allowedOrigins` is set
  *    and the request URL's origin is not in the list.
  * 2. Injects the XSRF token (`X-XSRF-TOKEN`) for same-origin requests
- *    (controlled by `appGlobals.withXSRFToken !== false`).
+ *    (controlled by `xmluiConfig.withXSRFToken !== false`).
  * 3. Pushes an `"app:fetch"` Inspector trace entry for every call.
  *
  * This is the sanctioned replacement for the banned global `fetch`.
  */
 export function createAppFetch(
   appGlobals?: Record<string, any>,
+  xmluiConfig?: Record<string, any>,
 ): (input: string | URL, init?: RequestInit) => Promise<Response> {
   return async function appFetch(input: string | URL, init?: RequestInit): Promise<Response> {
     const url = typeof input === "string" ? input : input.toString();
     const method = ((init?.method ?? "GET") as string).toUpperCase();
 
+    const resolvedConfig = xmluiConfig ?? appGlobals;
+
     // --- Origin allowlist check ---
-    const allowedOrigins: string[] | undefined = appGlobals?.allowedOrigins;
+    const allowedOrigins: string[] | undefined = resolvedConfig?.allowedOrigins;
     if (Array.isArray(allowedOrigins) && allowedOrigins.length > 0) {
       const base =
         typeof window !== "undefined"
@@ -163,7 +166,7 @@ export function createAppFetch(
 
     // --- XSRF injection for same-origin requests ---
     const headers = new Headers(init?.headers);
-    if (appGlobals?.withXSRFToken !== false && isAppFetchSameOrigin(url)) {
+    if (resolvedConfig?.withXSRFToken !== false && isAppFetchSameOrigin(url)) {
       const xsrfToken = readCookie("XSRF-TOKEN");
       if (xsrfToken) {
         headers.set("X-XSRF-TOKEN", xsrfToken);

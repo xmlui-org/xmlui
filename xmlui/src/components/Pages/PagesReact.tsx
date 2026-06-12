@@ -59,7 +59,7 @@ export const RouteWrapper = memo(function RouteWrapper({
   const params = useParams();
   const location = useLocation();
   const appContext = useAppContext();
-  const strictRouting = appContext.appGlobals?.strictRouting !== false;
+  const strictRouting = appContext.xmluiConfig?.strictRouting !== false;
   const [guardState, setGuardState] = useState<"pending" | "allowed">(() => guard ? "pending" : "allowed");
 
   const validated = useMemo(() => {
@@ -207,25 +207,25 @@ export const Pages = memo(function Pages({
 }: PagesProps) {
   const context = useAppLayoutContext();
   const appContext = useAppContext();
-  const strictRouting = appContext.appGlobals?.strictRouting !== false;
+  const strictRouting = appContext.xmluiConfig?.strictRouting !== false;
   const canonicalPolicy: CanonicalPolicy = useMemo(
     () => ({
-      case: appContext.appGlobals?.urlCase === "lower" ? "lower" : "preserve",
-      trailingSlash: ["always", "never", "preserve"].includes(appContext.appGlobals?.urlTrailingSlash)
-        ? appContext.appGlobals?.urlTrailingSlash
+      case: appContext.xmluiConfig?.urlCase === "lower" ? "lower" : "preserve",
+      trailingSlash: ["always", "never", "preserve"].includes(appContext.xmluiConfig?.urlTrailingSlash)
+        ? appContext.xmluiConfig?.urlTrailingSlash
         : "preserve",
-      queryParamOrder: appContext.appGlobals?.urlQueryParamOrder === "alphabetical" ? "alphabetical" : "preserve",
-      onMismatch: ["redirect", "rewrite", "warn"].includes(appContext.appGlobals?.nonCanonicalUrl)
-        ? appContext.appGlobals?.nonCanonicalUrl
+      queryParamOrder: appContext.xmluiConfig?.urlQueryParamOrder === "alphabetical" ? "alphabetical" : "preserve",
+      onMismatch: ["redirect", "rewrite", "warn"].includes(appContext.xmluiConfig?.nonCanonicalUrl)
+        ? appContext.xmluiConfig?.nonCanonicalUrl
         : strictRouting
           ? "redirect"
           : "warn",
     }),
     [
-      appContext.appGlobals?.nonCanonicalUrl,
-      appContext.appGlobals?.urlCase,
-      appContext.appGlobals?.urlQueryParamOrder,
-      appContext.appGlobals?.urlTrailingSlash,
+      appContext.xmluiConfig?.nonCanonicalUrl,
+      appContext.xmluiConfig?.urlCase,
+      appContext.xmluiConfig?.urlQueryParamOrder,
+      appContext.xmluiConfig?.urlTrailingSlash,
       strictRouting,
     ],
   );

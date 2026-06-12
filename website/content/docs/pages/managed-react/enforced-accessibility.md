@@ -127,20 +127,24 @@ Theme resolution runs a contrast checker over known foreground/background token 
 
 `strictAccessibility` remains opt-in for the current migration window:
 
-```xmlui
-<App appGlobals="{{ strictAccessibility: true }}">
-  <Pages />
-</App>
+```json
+{
+  "xmluiConfig": {
+    "strictAccessibility": true
+  }
+}
 ```
 
 With strict mode enabled, warn-level accessibility diagnostics escalate to errors and can fail the Vite build. The default flip is reserved for the next major release so existing apps get a warning-first path.
 
 For navigation-heavy apps, `autoSkipLink` can insert the default skip link before the app content:
 
-```xmlui
-<App appGlobals="{{ autoSkipLink: true }}">
-  <Pages />
-</App>
+```json
+{
+  "xmluiConfig": {
+    "autoSkipLink": true
+  }
+}
 ```
 
 Use an explicit [`SkipLink`](/docs/reference/components/SkipLink) when different

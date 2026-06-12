@@ -117,6 +117,12 @@ export type AppWrapperProps = {
   // --- property. This property contains the values to pass to `appGlobals`.
   globalProps?: GlobalProps;
 
+  // --- Framework / runtime configuration that overrides matching keys in
+  // --- `globalProps` (which carries `appGlobals`). Any key not set here
+  // --- falls back to `globalProps`. Reaches `appContext.xmluiConfig` and
+  // --- the `useXmluiConfig()` hook.
+  xmluiConfig?: Record<string, any>;
+
   // --- Global variables extracted from Globals.xs file and added to the
   // --- root container state, accessible throughout the entire app.
   globalVars?: Record<string, any>;
@@ -187,6 +193,7 @@ export const AppWrapper = ({
   routerBaseName: baseName = "",
   contributes = EMPTY_OBJECT,
   globalProps,
+  xmluiConfig,
   standalone,
   trackContainerHeight,
   decorateComponentsWithTestId,
@@ -208,9 +215,18 @@ export const AppWrapper = ({
     HelmetProvider.canUseDOM = false;
   }
 
-  // --- Set a few default properties
+  // --- Set a few default properties. Framework-runtime values
+  // --- (`useHashBasedRouting`, `strictTheming`, `strictAccessibility`,
+  // --- `demoMockApi`) read from `xmluiConfig` with fallback to `globalProps`
+  // --- (which carries `appGlobals`) for back-compat.
   const siteName = globalProps?.name || "XMLUI app";
-  const useHashBasedRouting = globalProps?.useHashBasedRouting ?? true;
+  const useHashBasedRouting =
+    xmluiConfig?.useHashBasedRouting ?? globalProps?.useHashBasedRouting ?? true;
+  const strictTheming =
+    (xmluiConfig?.strictTheming ?? globalProps?.strictTheming) !== false;
+  const strictAccessibility =
+    (xmluiConfig?.strictAccessibility ?? globalProps?.strictAccessibility) === true;
+  const demoMockApi = xmluiConfig?.demoMockApi ?? globalProps?.demoMockApi;
 
   // --- Resolve theme/tone synchronously from localStorage if persistTheme is set on the
   // --- App component. This ensures ThemeProvider's useState initializer gets the correct
@@ -240,13 +256,13 @@ export const AppWrapper = ({
             defaultTheme={resolvedDefaultTheme}
             defaultTone={resolvedDefaultTone}
             resources={resources}
-            strictTheming={globalProps?.strictTheming !== false}
-            strictAccessibility={globalProps?.strictAccessibility === true}
+            strictTheming={strictTheming}
+            strictAccessibility={strictAccessibility}
           >
             <InspectorProvider
               sources={sources}
               projectCompilation={projectCompilation}
-              mockApi={globalProps?.demoMockApi}
+              mockApi={demoMockApi}
             >
               <ConfirmationModalContextProvider>
                 <AppContent
@@ -254,6 +270,7 @@ export const AppWrapper = ({
                   rootContainer={node as ContainerWrapperDef}
                   routerBaseName={baseName}
                   globalProps={globalProps}
+                  xmluiConfig={xmluiConfig}
                   standalone={standalone}
                   decorateComponentsWithTestId={decorateComponentsWithTestId}
                   debugEnabled={debugEnabled}

@@ -38,7 +38,7 @@ export interface AnalyzerInput {
   componentRegistry?: ComponentRegistry;
   /**
    * When `true`, every rule's `strictSeverity` overrides its `defaultSeverity`.
-   * Controlled by `App.appGlobals.strictBuildValidation`.
+   * Controlled by `App.xmluiConfig.strictBuildValidation`.
    */
   strict: boolean;
 }

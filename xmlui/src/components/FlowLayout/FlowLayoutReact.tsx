@@ -220,7 +220,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
   ref: any,
 ) {
   const { rowGap, columnGap, itemWidth, setNumberOfChildren } = useContext(FlowLayoutContext);
-  const { appGlobals } = useAppContext();
+  const { xmluiConfig } = useAppContext();
   useIsomorphicLayoutEffect(() => {
     setNumberOfChildren((prev) => prev + 1);
     return () => {
@@ -261,10 +261,10 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
           type: "Stack",
           orientation: "horizontal",
         },
-        appGlobals?.disableInlineStyle,
+        xmluiConfig?.disableInlineStyle,
       ).cssProps || {}
     );
-  }, [_maxWidth, _minWidth, _width, appGlobals, isIntrinsicWidth]);
+  }, [_maxWidth, _minWidth, _width, xmluiConfig, isIntrinsicWidth]);
 
   const resolvedWidth = useMemo(() => {
     if (width && typeof width === "string" && width.startsWith("var(")) {

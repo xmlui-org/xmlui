@@ -49,7 +49,7 @@ cycles, temporarily opt into warn-only migration mode:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictReactiveGraph": false
   }
 }

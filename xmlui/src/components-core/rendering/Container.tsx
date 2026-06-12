@@ -140,9 +140,9 @@ export const Container = memo(
       return {
         udcContract: node.udcContract,
         strictUdcSandbox:
-          baseAppContext.appGlobals?.strictUdcSandbox !== false ||
+          baseAppContext.xmluiConfig?.strictUdcSandbox !== false ||
           (node.udcContract.trust === "untrusted" &&
-            baseAppContext.appGlobals?.udcTrust === "strict"),
+            baseAppContext.xmluiConfig?.udcTrust === "strict"),
         udcDiagnosticLogger: (diagnostic) => {
           pushXsLog({
             ts: Date.now(),
@@ -155,8 +155,8 @@ export const Container = memo(
         },
       };
     }, [
-      baseAppContext.appGlobals?.strictUdcSandbox,
-      baseAppContext.appGlobals?.udcTrust,
+      baseAppContext.xmluiConfig?.strictUdcSandbox,
+      baseAppContext.xmluiConfig?.udcTrust,
       node.udcContract,
     ]);
     const appContext: AppContextObject = useMemo(() => {

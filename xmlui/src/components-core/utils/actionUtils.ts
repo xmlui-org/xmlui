@@ -19,7 +19,7 @@ export async function invalidateQueries(
         new DataLoaderQueryKeyGenerator(
           extractParam(state, invalidate, appContext),
           undefined,
-          appContext?.appGlobals.apiUrl,
+          appContext?.xmluiConfig?.apiUrl ?? appContext?.appGlobals?.apiUrl,
           undefined,
           undefined,
         ).asPredicate(),

@@ -118,14 +118,14 @@ Rejected guards emit `code:"guard-bypass-attempt"`.
 By default, the global `willNavigate` handler is invoked for **every**
 navigation, including browser back/forward and direct URL entry. If a
 guard rejects a pop-state navigation, the user-agent URL is reverted.
-To opt out (e.g. for legacy apps), set `appGlobals.guardOnPopState: false`.
+To opt out (e.g. for legacy apps), set `xmluiConfig.guardOnPopState: false`.
 
 Raw `<a href>` clicks and form submissions bypass routing by default.
 Opt in to interception in `config.json`:
 
 ```jsonc
 {
-  "appGlobals": { "interceptExternalNavigation": true }
+  "xmluiConfig": { "interceptExternalNavigation": true }
 }
 ```
 
@@ -175,13 +175,13 @@ Every routing event flows through `pushXsLog({ kind: "navigate", code,
 
 ## Strict mode
 
-Strict mode is **on by default**. `appGlobals.strictRouting` defaults to
+Strict mode is **on by default**. `xmluiConfig.strictRouting` defaults to
 `true`, which escalates routing diagnostics from warnings to errors and
 flips `nonCanonicalUrl` defaults to `"redirect"`. To opt out for a
 legacy app that needs pre-1.0 warn-only behaviour:
 
 ```jsonc
-{ "appGlobals": { "strictRouting": false } }
+{ "xmluiConfig": { "strictRouting": false } }
 ```
 
 ## Related

@@ -234,7 +234,7 @@ The error object provides:
 - `error.response` - Full original response body (includes custom fields)
 
 **NOTE:** While we support Microsoft/Google-style and RFC 7807 errors, not all response shapes can be accounted for.
-Because of this, there is an attribute available in the `configuration` file called `errorResponseTransform` under `appGlobals`. This exposes the error response using the `$response` context variable.
+Because of this, there is an attribute available in the `configuration` file called `errorResponseTransform` under `xmluiConfig`. This exposes the error response using the `$response` context variable.
 Here is an example on how to use it (note that this is evaluated as a `binding expression`):
 
 Error looks the following coming from the backend:
@@ -250,7 +250,7 @@ This is how to transform it in config:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "errorResponseTransform": "{{ statusCode: $response.code, message: $response.error }}"
   }
 }

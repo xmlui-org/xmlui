@@ -130,7 +130,7 @@ final telemetry beacon:
 ```
 
 The dispatcher races the handler against a per-app budget
-(`appGlobals.disposeTimeoutMs`, default `250` ms). If the handler exceeds
+(`xmluiConfig.disposeTimeoutMs`, default `250` ms). If the handler exceeds
 the budget the unmount proceeds anyway and a `kind: "lifecycle"`
 violation with `reason: "timeout"` is reported in the trace — you are
 never trapped in a hanging unmount.
@@ -144,7 +144,7 @@ latency.
 |---------------------|----------------|----------------------------------------------------|
 | `onMount`           | Yes            | The dispatcher provides an abort signal on unmount |
 | `onUnmount`         | **No**         | Synchronous only; async handlers report a violation |
-| `onBeforeDispose`   | Yes            | Bounded by `appGlobals.disposeTimeoutMs`           |
+| `onBeforeDispose`   | Yes            | Bounded by `xmluiConfig.disposeTimeoutMs`          |
 | `onError`           | Sync preferred | Runs in the same phase as the failing event        |
 
 If a piece of cleanup truly needs to await something, move it from
@@ -159,13 +159,13 @@ errors:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictLifecycle": true
   }
 }
 ```
 
-When strict mode is off (the default during this rollout), violations
+When strict mode is off (for example, while migrating), violations
 still appear as `kind: "lifecycle"` entries in the Inspector trace, so
 you can audit them without affecting the running app.
 

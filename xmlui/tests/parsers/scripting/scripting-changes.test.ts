@@ -81,7 +81,7 @@ describe("Configurable sync execution timeout", () => {
     const evalContext = createEvalContext({
       localContext: { x: 0 },
       appContext: {
-        appGlobals: { syncExecutionTimeout: 50 },
+        xmluiConfig: { syncExecutionTimeout: 50 },
       },
       startTick: Date.now(),
     });

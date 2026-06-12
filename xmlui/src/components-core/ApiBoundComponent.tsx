@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 
 import type { ComponentDef, ParentRenderContext } from "../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs";
+import { useAppContext } from "./AppContext";
 import { parseAttributeValue } from "./script-runner/AttributeValueParser";
 
 type ApiBoundComponentProps = {
@@ -24,6 +25,12 @@ export function ApiBoundComponent({
   layoutContextRef,
   parentRendererContext,
 }: ApiBoundComponentProps) {
+  const appContext = useAppContext();
+  const prefetchedContent =
+    appContext?.xmluiConfig?.prefetchedContent ??
+    appContext?.appGlobals?.prefetchedContent ??
+    {};
+
   const wrappedWithAdapter = useMemo(() => {
     function generateloaderUid(key: string) {
       return `${node.uid ?? node.type}_data_${key}`;
@@ -168,6 +175,7 @@ export function ApiBoundComponent({
     const props = { ...node.props } as any;
     const vars = { ...node.vars };
     const api = { ...node.api };
+    const prefetchedContentVar = "__xmluiPrefetchedContent";
 
     apiBoundEvents.forEach((key) => {
       const actionComponent = node.events![key];
@@ -220,8 +228,9 @@ export function ApiBoundComponent({
       if (prefetchKey === null) {
         props[key] = `{ ${loaderUid}.value }`;
       } else {
+        vars[prefetchedContentVar] = prefetchedContent;
         props[key] =
-          `{ ${loaderUid}.value || ( appGlobals.prefetchedContent[${prefetchKey}] || appGlobals.prefetchedContent['/' + ${prefetchKey}] ) }`;
+          `{ ${loaderUid}.value || ( ${prefetchedContentVar}[${prefetchKey}] || ${prefetchedContentVar}['/' + ${prefetchKey}] ) }`;
       }
       props.loading = `{ ${loaderUid}.inProgress === undefined ? true : ${loaderUid}.inProgress}`;
       props.pageInfo = `{${loaderUid}.pageInfo}`;
@@ -253,7 +262,7 @@ export function ApiBoundComponent({
       wrapped.api = api;
     }
     return wrapped;
-  }, [apiBoundEvents, apiBoundProps, node, uid]);
+  }, [apiBoundEvents, apiBoundProps, node, prefetchedContent, uid]);
 
   // useEffect(() => {
   //   console.log("wrapped with adapter changed", wrappedWithAdapter);

@@ -105,8 +105,8 @@ export function Theme({
     themes,
     resources,
     resourceMap,
-    appContext?.appGlobals?.strictTheming !== false,
-    appContext?.appGlobals?.strictAccessibility === true,
+    appContext?.xmluiConfig?.strictTheming !== false,
+    appContext?.xmluiConfig?.strictAccessibility === true,
   );
   const componentRegistry = useComponentRegistry();
 

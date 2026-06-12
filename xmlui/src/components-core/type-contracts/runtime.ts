@@ -21,7 +21,7 @@ export function emitRuntimeTypeContractDiagnostics(
 ): TypeContractDiagnostic[] {
   if (!metadata?.props || !node.props) return [];
 
-  const strict = appContext.appGlobals?.strictTypeContracts !== false;
+  const strict = appContext.xmluiConfig?.strictTypeContracts !== false;
   const severity: "error" | "warn" = strict ? "error" : "warn";
   const diagnostics: TypeContractDiagnostic[] = [];
 

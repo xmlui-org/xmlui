@@ -166,7 +166,7 @@ The handler receives `event.error` (the `AppError`). Calling
 app reports errors through its own UI.
 
 The most recent errors are also exposed on `App.errors` (FIFO buffer,
-default size 50, configurable via `appGlobals.errorBufferSize`). The
+default size 50, configurable via `xmluiConfig.errorBufferSize`). The
 Inspector overlay has an "Errors" tab that reads this buffer.
 
 ## Per-component `onError`
@@ -183,14 +183,14 @@ the structured `AppError` directly:
 
 ## Enabling strict mode
 
-`App.appGlobals.strictErrors` is `true` by default. When on, throwing a
+`xmluiConfig.strictErrors` is `true` by default. When on, throwing a
 plain string or non-`AppError` value from a handler emits a `kind:"errors"`
 warn diagnostic, nudging code toward `throw new AppError({...})`. To
 temporarily silence the warning while migrating, set it to `false`:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictErrors": false
   }
 }

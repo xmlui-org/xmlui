@@ -75,8 +75,8 @@ function DataLoader({
   structuralSharing = true,
 }: LoaderProps) {
   const appContext = useAppContext();
-  const xsVerbose = appContext.appGlobals?.xsVerbose === true;
-  const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
+  const xsVerbose = appContext.xmluiConfig?.xsVerbose === true;
+  const xsLogMax = Number(appContext.xmluiConfig?.xsVerboseLogMax ?? 200);
   const prevDataRef = useRef<any>(undefined);
   const instanceIdRef = useRef<string>(
     `ds-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`,
@@ -530,11 +530,11 @@ function DataLoader({
     return new DataLoaderQueryKeyGenerator(
       url,
       queryParams,
-      appContext?.appGlobals.apiUrl,
+      appContext?.xmluiConfig?.apiUrl ?? appContext?.appGlobals?.apiUrl,
       body,
       rawBody,
     ).asKey();
-  }, [appContext?.appGlobals.apiUrl, queryParams, url, body, rawBody]);
+  }, [appContext?.appGlobals?.apiUrl, appContext?.xmluiConfig?.apiUrl, queryParams, url, body, rawBody]);
 
   const stateRef = useRef({ state, appContext });
   stateRef.current = { state, appContext };

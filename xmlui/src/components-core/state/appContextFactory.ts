@@ -33,6 +33,7 @@ import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 export interface AppContextDeps {
   Actions: AppContextObject["Actions"];
   appGlobals: AppContextObject["appGlobals"];
+  xmluiConfig: AppContextObject["xmluiConfig"];
   debugEnabled: AppContextObject["debugEnabled"];
   decorateComponentsWithTestId: AppContextObject["decorateComponentsWithTestId"];
   environment: AppContextObject["environment"];
@@ -92,6 +93,8 @@ export function buildAppContextValue(d: AppContextDeps): AppContextObject {
 
     // --- App-specific
     appGlobals: d.appGlobals,
+    // --- Framework / runtime settings (merged view: xmluiConfig overlaid on appGlobals)
+    xmluiConfig: d.xmluiConfig,
     debugEnabled: d.debugEnabled,
     decorateComponentsWithTestId: d.decorateComponentsWithTestId,
     environment: d.environment,

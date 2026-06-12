@@ -35,7 +35,7 @@ export const ThemeMd = createMetadata({
       defaultValue: "auto",
     },
     disableInlineStyle: {
-      description: `This property controls whether inline styles are disabled for components within this theme. When undefined, uses the appGlobals.disableInlineStyle setting.`,
+      description: `This property controls whether inline styles are disabled for components within this theme. When undefined, uses the xmluiConfig.disableInlineStyle setting.`,
       valueType: "boolean",
     },
   },
@@ -46,8 +46,10 @@ export const themeComponentRenderer = wrapComponent(COMP, Theme, ThemeMd, {
   exclude: ["tone", "themeId", "root", "applyIf", "disableInlineStyle"],
   customRender(_props, { node, extractValue, renderChild, layoutContext, appContext }) {
     const { tone, ...restProps } = node.props;
-    const toastDuration = appContext?.appGlobals?.notifications?.duration;
-    const notificationPosition = appContext?.appGlobals?.notifications?.position;
+    const notifications =
+      appContext?.xmluiConfig?.notifications ?? appContext?.appGlobals?.notifications;
+    const toastDuration = notifications?.duration;
+    const notificationPosition = notifications?.position;
     let themeTone = extractValue.asOptionalString(tone);
     if (themeTone && themeTone !== "dark") {
       themeTone = "light";

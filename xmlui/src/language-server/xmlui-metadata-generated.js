@@ -7062,11 +7062,11 @@ export default {
         "defaultValue": "single-flight"
       },
       "csrfToken": {
-        "description": "A CSRF token attached to the submit request as an HTTP header. The header name defaults to `X-CSRF-Token` and can be customized via `appGlobals.csrfHeaderName`. When the form uses the built-in submit handler (i.e. `submitUrl` is set and no custom `onSubmit` is provided), the token is added automatically. Custom `onSubmit` handlers can read the value via the `$formCsrfToken` context variable.",
+        "description": "A CSRF token attached to the submit request as an HTTP header. The header name defaults to `X-CSRF-Token` and can be customized via `xmluiConfig.csrfHeaderName`. When the form uses the built-in submit handler (i.e. `submitUrl` is set and no custom `onSubmit` is provided), the token is added automatically. Custom `onSubmit` handlers can read the value via the `$formCsrfToken` context variable.",
         "valueType": "string"
       },
       "idempotencyKey": {
-        "description": "An idempotency key attached to the submit request as an HTTP header (default header name `Idempotency-Key`, configurable via `appGlobals.idempotencyHeaderName`). Supply a string the server can use to de-duplicate retries. When the form uses the built-in submit handler the header is added automatically; custom handlers can read the value via the `$formIdempotencyKey` context variable.",
+        "description": "An idempotency key attached to the submit request as an HTTP header (default header name `Idempotency-Key`, configurable via `xmluiConfig.idempotencyHeaderName`). Supply a string the server can use to de-duplicate retries. When the form uses the built-in submit handler the header is added automatically; custom handlers can read the value via the `$formIdempotencyKey` context variable.",
         "valueType": "string"
       }
     },
@@ -20177,7 +20177,7 @@ export default {
         "defaultValue": "auto"
       },
       "disableInlineStyle": {
-        "description": "This property controls whether inline styles are disabled for components within this theme. When undefined, uses the appGlobals.disableInlineStyle setting.",
+        "description": "This property controls whether inline styles are disabled for components within this theme. When undefined, uses the xmluiConfig.disableInlineStyle setting.",
         "valueType": "boolean"
       }
     },

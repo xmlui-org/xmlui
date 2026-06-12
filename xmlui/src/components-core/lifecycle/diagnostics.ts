@@ -18,7 +18,7 @@ export type LifecycleViolationReason =
   | "async-onUnmount"
   /** The handler threw. */
   | "throw"
-  /** The handler exceeded `App.appGlobals.disposeTimeoutMs` (default 250ms). */
+  /** The handler exceeded `App.xmluiConfig.disposeTimeoutMs` (default 250ms). */
   | "timeout";
 
 export class LifecycleViolationError extends Error {

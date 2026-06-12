@@ -97,8 +97,8 @@ export const ColumnMd = createMetadata({
 
 export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
   customRender: (_props, { node, extractValue, renderChild, classes, appContext, layoutContext }) => {
-    // Allow config.json to override the default canSort value via appGlobals.columnCanSortDefault
-    const canSortDefault = appContext?.appGlobals?.columnCanSortDefault ?? defaultProps.canSort;
+    // Allow config.json to override the default canSort value via xmluiConfig.columnCanSortDefault
+    const canSortDefault = appContext?.xmluiConfig?.columnCanSortDefault ?? defaultProps.canSort;
 
     // Convert horizontalAlignment and verticalAlignment to CSS properties for table cells
     // since columns are not flex containers

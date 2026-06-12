@@ -63,7 +63,7 @@ import {
 } from "./components/FlowLayout/FlowLayout";
 import { COMPONENT_PART_KEY } from "./components-core/theming/responsive-layout";
 import { Part } from "./components/Part/Part";
-import { useAppContext } from "./components-core/AppContext";
+import { useAppContext, useAppGlobals, useXmluiConfig } from "./components-core/AppContext";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoReact";
@@ -234,6 +234,8 @@ export {
   COMPONENT_PART_KEY,
   Part,
   useAppContext,
+  useAppGlobals,
+  useXmluiConfig,
   ToneChangerButton,
   NavPanelCollapseButton,
   Logo,

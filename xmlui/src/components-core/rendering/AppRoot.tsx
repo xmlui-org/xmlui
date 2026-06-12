@@ -45,6 +45,7 @@ export function AppRoot({
   defaultTone,
   resources,
   globalProps,
+  xmluiConfig,
   globalVars,
   standalone,
   trackContainerHeight,
@@ -122,6 +123,7 @@ export function AppRoot({
             defaultTheme={defaultTheme}
             defaultTone={defaultTone}
             globalProps={enhancedGlobalProps}
+            xmluiConfig={xmluiConfig}
             standalone={standalone}
             trackContainerHeight={trackContainerHeight}
             previewMode={previewMode}

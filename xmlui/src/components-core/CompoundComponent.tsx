@@ -79,8 +79,8 @@ export const CompoundComponent = forwardRef(
     const parentDepthInfo = useCompoundDepth();
     const myType = node?.type ?? compound?.type ?? "<anonymous>";
     const maxDepth =
-      typeof appContext?.appGlobals?.maxCompoundDepth === "number"
-        ? appContext.appGlobals.maxCompoundDepth
+      typeof appContext?.xmluiConfig?.maxCompoundDepth === "number"
+        ? appContext.xmluiConfig.maxCompoundDepth
         : DEFAULT_MAX_COMPOUND_DEPTH;
     const nextDepth = parentDepthInfo.depth + 1;
     if (nextDepth > maxDepth) {
@@ -122,11 +122,11 @@ export const CompoundComponent = forwardRef(
 
     const udcContract = contract ?? ((compound as any).contract as UdcContract | undefined);
     // W8-1 (plan #14): strict UDC sandbox is on by default.  Authors must
-    // explicitly opt out with `strictUdcSandbox={false}` in `<App appGlobals>`
+    // explicitly opt out with `strictUdcSandbox={false}` in `xmluiConfig`
     // to fall back to warn-only diagnostics.
     const strictUdcSandbox =
-      appContext?.appGlobals?.strictUdcSandbox !== false ||
-      (udcContract?.trust === "untrusted" && appContext?.appGlobals?.udcTrust === "strict");
+      appContext?.xmluiConfig?.strictUdcSandbox !== false ||
+      (udcContract?.trust === "untrusted" && appContext?.xmluiConfig?.udcTrust === "strict");
 
     const emitUdcDiagnostic = useEvent((diagnostic: UdcDiagnostic) => {
       pushXsLog({
@@ -162,7 +162,7 @@ export const CompoundComponent = forwardRef(
     if (effectiveContract) {
       validateUdcPropReferences(compound as any, strictUdcSandbox, emitUdcDiagnostic);
       if (effectiveContract.trust === "untrusted") {
-        const trustMode = appContext?.appGlobals?.udcTrust;
+        const trustMode = appContext?.xmluiConfig?.udcTrust;
         const missingDeclarations =
           effectiveContract.props.size === 0 &&
           effectiveContract.events.size === 0 &&
@@ -199,7 +199,7 @@ export const CompoundComponent = forwardRef(
       const handler = lookupEventHandler(eventName);
 
       // Log emitEvent calls when inspector is enabled
-      if (appContext?.appGlobals?.xsVerbose === true) {
+      if (appContext?.xmluiConfig?.xsVerbose === true) {
         pushXsLog({
           ts: Date.now(),
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,

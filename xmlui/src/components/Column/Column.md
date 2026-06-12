@@ -216,7 +216,7 @@ To change the default for all columns in your app, set `columnCanSortDefault` in
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "columnCanSortDefault": false
   }
 }

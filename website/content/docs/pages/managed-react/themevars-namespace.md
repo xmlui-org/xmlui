@@ -108,7 +108,7 @@ when strict mode is on:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictBuildValidation": true
   }
 }

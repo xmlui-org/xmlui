@@ -600,19 +600,19 @@ const Form = memo(forwardRef(function (
     // submits a mutating request (anything other than GET / HEAD) and the
     // `csrfToken` prop is empty, emit `csrf-token-missing`. Severity is
     // `warn` by default; escalates to `error` under `strictForms` or when
-    // `appGlobals.requireFormCsrf === true`.
+    // `xmluiConfig.requireFormCsrf === true`.
     const requireCsrf =
-      !!appContext?.appGlobals?.strictForms ||
-      !!appContext?.appGlobals?.requireFormCsrf;
+      !!appContext?.xmluiConfig?.strictForms ||
+      !!appContext?.xmluiConfig?.requireFormCsrf;
     if (shouldEmitCsrfMissing({ requireCsrf, csrfToken, submitMethod })) {
       pushXsLog({
         kind: "forms",
         ts: Date.now(),
         code: "csrf-token-missing",
-        severity: appContext?.appGlobals?.strictForms ? "error" : "warn",
+        severity: appContext?.xmluiConfig?.strictForms ? "error" : "warn",
         formId: id,
         message:
-          `Form is configured to require a CSRF token (\`appGlobals.requireFormCsrf\` ` +
+          `Form is configured to require a CSRF token (\`xmluiConfig.requireFormCsrf\` ` +
           `or \`strictForms\`) but no \`csrfToken\` was provided.`,
       });
     }
@@ -1262,9 +1262,9 @@ export const FormWithContextVar = forwardRef(function (
   const csrfToken = extractValue.asOptionalString(node.props.csrfToken);
   const idempotencyKey = extractValue.asOptionalString(node.props.idempotencyKey);
   const csrfHeaderName =
-    appContext?.appGlobals?.csrfHeaderName || DEFAULT_CSRF_HEADER_NAME;
+    appContext?.xmluiConfig?.csrfHeaderName || DEFAULT_CSRF_HEADER_NAME;
   const idempotencyHeaderName =
-    appContext?.appGlobals?.idempotencyHeaderName || DEFAULT_IDEMPOTENCY_HEADER_NAME;
+    appContext?.xmluiConfig?.idempotencyHeaderName || DEFAULT_IDEMPOTENCY_HEADER_NAME;
   const submitHeaders = useMemo(
     () =>
       buildSubmitHeaders({
@@ -1277,7 +1277,7 @@ export const FormWithContextVar = forwardRef(function (
   );
 
   const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
-  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.appGlobals?.disableInlineStyle, appContext?.appGlobals?.applyLayoutProperties);
+  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.xmluiConfig?.disableInlineStyle, appContext?.xmluiConfig?.applyLayoutProperties);
 
   return (
     <Slot ref={ref} style={style}>
