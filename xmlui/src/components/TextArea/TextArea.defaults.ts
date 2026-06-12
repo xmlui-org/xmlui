@@ -16,4 +16,5 @@ export const defaultProps = {
   enterSubmits: true,
   rows: 2,
   enabled: true,
+  autoComplete: "off" as string | boolean,
 };

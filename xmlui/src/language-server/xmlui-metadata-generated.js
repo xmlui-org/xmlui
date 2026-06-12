@@ -19033,6 +19033,30 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "autoComplete": {
+        "description": "Sets the HTML `autocomplete` attribute on the underlying text area. Boolean values are passed as `\"on\"` or `\"off\"`; string values are passed through.",
+        "valueType": "any",
+        "defaultValue": "off"
+      },
+      "autoCorrect": {
+        "description": "Sets the HTML `autocorrect` attribute on the underlying text area. When set, `true` is passed as `\"on\"` and `false` as `\"off\"`.",
+        "valueType": "boolean"
+      },
+      "spellCheck": {
+        "description": "Sets the HTML `spellcheck` attribute on the underlying text area.",
+        "valueType": "boolean"
+      },
+      "autoCapitalize": {
+        "description": "Sets the HTML `autocapitalize` attribute on the underlying text area.",
+        "valueType": "string",
+        "availableValues": [
+          "off",
+          "none",
+          "sentences",
+          "words",
+          "characters"
+        ]
+      },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
         "valueType": "boolean",
@@ -19296,6 +19320,30 @@ export default {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "autoComplete": {
+        "description": "Sets the HTML `autocomplete` attribute on the underlying input. Boolean values are passed as `\"on\"` or `\"off\"`; string values are passed through.",
+        "valueType": "any",
+        "defaultValue": "off"
+      },
+      "autoCorrect": {
+        "description": "Sets the HTML `autocorrect` attribute on the underlying input. When set, `true` is passed as `\"on\"` and `false` as `\"off\"`.",
+        "valueType": "boolean"
+      },
+      "spellCheck": {
+        "description": "Sets the HTML `spellcheck` attribute on the underlying input.",
+        "valueType": "boolean"
+      },
+      "autoCapitalize": {
+        "description": "Sets the HTML `autocapitalize` attribute on the underlying input.",
+        "valueType": "string",
+        "availableValues": [
+          "off",
+          "none",
+          "sentences",
+          "words",
+          "characters"
+        ]
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
@@ -19870,6 +19918,30 @@ export default {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "autoComplete": {
+        "description": "Sets the HTML `autocomplete` attribute on the underlying input. Boolean values are passed as `\"on\"` or `\"off\"`; string values are passed through.",
+        "valueType": "any",
+        "defaultValue": "off"
+      },
+      "autoCorrect": {
+        "description": "Sets the HTML `autocorrect` attribute on the underlying input. When set, `true` is passed as `\"on\"` and `false` as `\"off\"`.",
+        "valueType": "boolean"
+      },
+      "spellCheck": {
+        "description": "Sets the HTML `spellcheck` attribute on the underlying input.",
+        "valueType": "boolean"
+      },
+      "autoCapitalize": {
+        "description": "Sets the HTML `autocapitalize` attribute on the underlying input.",
+        "valueType": "string",
+        "availableValues": [
+          "off",
+          "none",
+          "sentences",
+          "words",
+          "characters"
+        ]
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
