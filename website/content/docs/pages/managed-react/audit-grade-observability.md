@@ -69,7 +69,7 @@ Add an `auditPolicy` to your `<App>` (object literal):
 ```
 
 `config.json` also accepts the same shape under
-`appGlobals.auditPolicy`. The framework normalises both into the same
+`xmluiConfig.auditPolicy`. The framework normalises both into the same
 internal representation.
 
 ## Strict mode (on by default)
@@ -86,7 +86,7 @@ To downgrade to warn-only mode during migration, set
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictAuditLogging": false,
     "auditPolicy": { /* ...as above... */ }
   }

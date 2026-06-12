@@ -28,7 +28,7 @@ import { detectPii } from "./heuristics";
 // ---------------------------------------------------------------------------
 
 let _policy: AuditPolicy = defaultAuditPolicy();
-let _strict = true; // default is strict; opt-out via appGlobals.strictAuditLogging: false
+let _strict = true; // default is strict; opt-out via xmluiConfig.strictAuditLogging: false
 const _sinks: AuditSink[] = [];
 const _customSinkFactories = new Map<string, (cfg: SinkConfig) => AuditSink>();
 const _customHeuristics: Array<{ name: string; pattern: RegExp }> = [];
@@ -56,7 +56,7 @@ export function getAuditPolicy(): AuditPolicy {
   return _policy;
 }
 
-/** Set or clear the strict-audit flag (driven by `appGlobals.strictAuditLogging`). */
+/** Set or clear the strict-audit flag (driven by `xmluiConfig.strictAuditLogging`). */
 export function setStrictAudit(strict: boolean): void {
   _strict = !!strict;
 }

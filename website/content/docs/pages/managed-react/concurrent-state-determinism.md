@@ -79,7 +79,7 @@ overlapping a click — never block each other. The FIFO guarantee applies
 
 ## Strict determinism
 
-`appGlobals.strictDeterminism` (default `true`) enables:
+`xmluiConfig.strictDeterminism` (default `true`) enables:
 
 - `scheduler="fifo"` as the default mode.
 - Spacing-token serialisation through the fixed-precision helper.
@@ -90,7 +90,7 @@ migrate:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictDeterminism": false
   }
 }

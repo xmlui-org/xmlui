@@ -13,7 +13,7 @@ function traceApiCall(
   method: string,
   details?: Record<string, any>,
 ) {
-  if (appContext.appGlobals?.xsVerbose !== true) return;
+  if (appContext.xmluiConfig?.xsVerbose !== true) return;
   const { _traceId, ...rest } = details || {};
   pushXsLog({
     ts: Date.now(),

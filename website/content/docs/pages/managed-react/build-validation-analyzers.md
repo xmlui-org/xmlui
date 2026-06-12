@@ -181,7 +181,7 @@ Strict mode is opt-in today: pass `--strict` to the CLI or
 rule's `strictSeverity` (always one step higher than the default,
 capped at `error`) replaces its default severity — so `warn`
 findings become build-failing `error`s. The global
-`appGlobals.strictBuildValidation` setting that flips strict on
+`xmluiConfig.strictBuildValidation` setting that flips strict on
 for *every* surface will become the default in the next major
 release; for now, choose strict at each call site.
 

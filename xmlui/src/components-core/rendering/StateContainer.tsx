@@ -143,14 +143,14 @@ export const StateContainer = memo(
     const routingParams = useRoutingParams();
     const memoedVars = useRef<MemoedVars>(new Map());
     const appContext = useAppContext();
-    const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+    const xsVerbose = appContext.xmluiConfig?.xsVerbose === true;
     const udcEvalOptions = useMemo<EvalTreeOptions>(() => {
       if (!node.udcContract) return EMPTY_OBJECT;
       return {
         udcContract: node.udcContract,
         strictUdcSandbox:
-          appContext.appGlobals?.strictUdcSandbox !== false ||
-          (node.udcContract.trust === "untrusted" && appContext.appGlobals?.udcTrust === "strict"),
+          appContext.xmluiConfig?.strictUdcSandbox !== false ||
+          (node.udcContract.trust === "untrusted" && appContext.xmluiConfig?.udcTrust === "strict"),
         udcDiagnosticLogger: (diagnostic) => {
           pushXsLog({
             ts: Date.now(),
@@ -163,8 +163,8 @@ export const StateContainer = memo(
         },
       };
     }, [
-      appContext.appGlobals?.strictUdcSandbox,
-      appContext.appGlobals?.udcTrust,
+      appContext.xmluiConfig?.strictUdcSandbox,
+      appContext.xmluiConfig?.udcTrust,
       node.udcContract,
     ]);
 

@@ -311,7 +311,7 @@ export default class RestApiProxy {
   };
 
   constructor(appContext?: AppContextObject, apiInstance?: IApiInterceptor) {
-    const conf = appContext?.appGlobals || { apiUrl: "" };
+    const conf = { ...(appContext?.appGlobals ?? {}), ...(appContext?.xmluiConfig ?? {}) };
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
     this.apiInstance = apiInstance;
@@ -320,7 +320,7 @@ export default class RestApiProxy {
       apiUrl,
       errorResponseTransform,
       headers: {
-        ...appContext?.appGlobals?.headers,
+        ...conf.headers,
       },
     };
   }
@@ -590,7 +590,7 @@ export default class RestApiProxy {
       method &&
       method !== "get" &&
       !!transactionId &&
-      this.appContext?.appGlobals?.enableTransactionIds !== false &&
+      this.appContext?.xmluiConfig?.enableTransactionIds !== false &&
       !omitTransactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
     let url = this.generateFullApiUrl(relativePath, queryParams);
@@ -604,7 +604,7 @@ export default class RestApiProxy {
       aggregatedHeaders["x-ue-client-tx-id"] = transactionId;
     }
 
-    if (this.appContext.appGlobals?.withXSRFToken !== false && isURLSameOrigin(url)) {
+    if (this.appContext.xmluiConfig?.withXSRFToken !== false && isURLSameOrigin(url)) {
       const xsrfToken = readCookie("XSRF-TOKEN");
       if (xsrfToken) {
         aggregatedHeaders["X-XSRF-TOKEN"] = xsrfToken;
@@ -668,7 +668,7 @@ export default class RestApiProxy {
         });
         onResponseHeaders(xhrHeaders);
       }
-      return await parseResponse(response, this.appContext?.appGlobals?.logRestApiErrors ?? false);
+      return await parseResponse(response, this.appContext?.xmluiConfig?.logRestApiErrors ?? false);
     } else {
       let response: any;
       if (this.apiInstance && this.apiInstance.hasMockForRequest(url, options)) {
@@ -689,7 +689,7 @@ export default class RestApiProxy {
       }
       const parsedResponse = await parseResponse(
         response.clone(),
-        this.appContext?.appGlobals?.logRestApiErrors ?? false,
+        this.appContext?.xmluiConfig?.logRestApiErrors ?? false,
       );
       return parsedResponse;
     }

@@ -196,8 +196,8 @@ forwards as HTTP headers — no handler code required:
 
 | Prop | Default header | Override |
 |---|---|---|
-| `csrfToken` | `X-CSRF-Token` | `appGlobals.csrfHeaderName` |
-| `idempotencyKey` | `Idempotency-Key` | `appGlobals.idempotencyHeaderName` |
+| `csrfToken` | `X-CSRF-Token` | `xmluiConfig.csrfHeaderName` |
+| `idempotencyKey` | `Idempotency-Key` | `xmluiConfig.idempotencyHeaderName` |
 
 ```xmlui
 <Form
@@ -238,7 +238,7 @@ context variables:
 
 ### Enforcing CSRF policy
 
-Set `appGlobals.requireFormCsrf = true` to require every mutating
+Set `xmluiConfig.requireFormCsrf = true` to require every mutating
 form (anything other than GET / HEAD) to supply a `csrfToken`.
 Forms that don't emit `csrf-token-missing` at `warn` severity, or
 `error` when `strictForms` is also on.
@@ -254,14 +254,14 @@ All diagnostics emit on the `kind: "forms"` trace channel.
 | `validator-throw` | A validator `fn` (field-level or cross-field) threw. The field is marked invalid with the exception message. | warn | error |
 | `server-error-unmapped` | The server reported an error against a field the form does not contain. | warn | error |
 | `submit-while-busy` | The `submitPolicy` rejected a second submit attempt. | warn | warn |
-| `csrf-token-missing` | A mutating form (non-GET/HEAD) submits without a `csrfToken` prop while `appGlobals.requireFormCsrf` or `strictForms` is set. | warn | error |
+| `csrf-token-missing` | A mutating form (non-GET/HEAD) submits without a `csrfToken` prop while `xmluiConfig.requireFormCsrf` or `strictForms` is set. | warn | error |
 | `deprecated-alias` | Markup uses `pattern` / `patternInvalidMessage` / `patternInvalidSeverity`; use `validator` / `validatorInvalidMessage` / `validatorInvalidSeverity` instead. | warn | warn |
 
 ## Enabling strict mode
 
 ```json
 {
-    "appGlobals": {
+    "xmluiConfig": {
         "strictForms": true
     }
 }

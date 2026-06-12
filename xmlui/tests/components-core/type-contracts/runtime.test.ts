@@ -21,7 +21,7 @@ const metadata: ComponentMetadata = {
 
 function appContext(strict = false): any {
   return {
-    appGlobals: { strictTypeContracts: strict },
+    xmluiConfig: { strictTypeContracts: strict },
     toast: { error: vi.fn() },
   };
 }

@@ -99,7 +99,7 @@ the two categories where silent behaviour is dangerous:
 
 ## Opting into strict mode
 
-`appGlobals.strictVersioning` defaults to `false` today and is
+`xmluiConfig.strictVersioning` defaults to `false` today and is
 scheduled to flip to `true` in the next major release. Opt in
 early to get build-failing errors for removed props and internal
 component use:
@@ -107,7 +107,7 @@ component use:
 ```jsonc
 // config.json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictVersioning": true
   }
 }

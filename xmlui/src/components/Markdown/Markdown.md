@@ -167,7 +167,7 @@ Use this property when the text you provide is not static but a result of calcul
 
 %-PROP-START showHeadingAnchors
 
-If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
+If this property is not set, the engine checks if the `showHeadingAnchors` flag is turned on in `xmluiConfig` and displays the heading anchor accordingly.
 
 %-PROP-END
 

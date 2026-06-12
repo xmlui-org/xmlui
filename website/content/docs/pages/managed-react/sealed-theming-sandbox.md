@@ -77,13 +77,13 @@ as a `kind:"theming"` warn entry.
 
 ## Enabling strict mode
 
-Three `appGlobals` switches govern the sandbox. All three default to a
-non-breaking value during the rollout window and flip together in the
-next major release.
+Three `xmluiConfig` switches govern the sandbox. The theming sandbox is
+strict by default; set `strictTheming` to `false` temporarily only while
+migrating existing unsafe styles.
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictTheming": true,
     "allowInlineRawCss": false,
     "maxZIndex": 9999
@@ -91,7 +91,7 @@ next major release.
 }
 ```
 
-- **`strictTheming`** (default `false`) — escalates the theming
+- **`strictTheming`** (default `true`) — escalates the theming
   diagnostics above from `warn` to `error` and drops the offending
   declarations before they reach the DOM. `unknown-theme-variable` is
   the one exception: it stays at `warn` even in strict mode so a
@@ -107,8 +107,7 @@ next major release.
   reserves higher z-indexes for itself.
 
 Validation runs in development builds unconditionally and in production
-only when `strictTheming === true`, so production users do not pay the
-validator cost unless they have opted in.
+when `strictTheming === true`.
 
 Standalone apps use the same verifier and theming validator as built
 apps. With `strictTheming: true`, invalid `<Theme>` attributes are

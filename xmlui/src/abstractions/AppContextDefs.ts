@@ -58,6 +58,13 @@ export type AppContextObject = {
   // defined in the app's configuration file.
   appGlobals?: Record<string, any>;
 
+  // Framework / runtime settings exposed as a merged read-only view: keys defined
+  // in the configuration's `xmluiConfig` win, with any missing key falling back
+  // to the same key in `appGlobals`. Existing apps that keep framework settings
+  // (e.g. `disableInlineStyle`, `useHashBasedRouting`, `xsVerbose`, the `strict*`
+  // family) under `appGlobals` continue to work unchanged.
+  xmluiConfig: Record<string, any>;
+
   // Indicates that the application is running in debug-enabled mode.
   debugEnabled?: boolean;
 

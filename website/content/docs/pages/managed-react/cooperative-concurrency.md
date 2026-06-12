@@ -133,7 +133,7 @@ unmount abort.
 ## Handler timeouts
 
 A hung handler does not pin the queue forever. The ambient budget is
-`appGlobals.defaultHandlerTimeoutMs` (default `30000` ms). Override per
+`xmluiConfig.defaultHandlerTimeoutMs` (default `30000` ms). Override per
 handler with `handlerTimeoutMs:<eventName>`; set to `0` to disable.
 
 ```xmlui copy
@@ -183,7 +183,7 @@ cancellations can branch on `$cancel.reason`:
 
 ## Enabling strict mode
 
-`appGlobals.strictConcurrency` defaults to `false`. When `true`, handler
+`xmluiConfig.strictConcurrency` defaults to `false`. When `true`, handler
 timeouts escalate from a warn-level Inspector trace to:
 
 - a `kind:"concurrency"` `code:"concurrency-handler-timeout"` *error*
@@ -197,7 +197,7 @@ policies and stay info-level even in strict mode.
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictConcurrency": true
   }
 }

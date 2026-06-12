@@ -1301,6 +1301,11 @@
                         to="/docs/app-globals"
                     />
                     <NavLink
+                        icon="settings"
+                        label="XMLUI Config"
+                        to="/docs/xmlui-config"
+                    />
+                    <NavLink
                         icon="glossary"
                         label="Glossary"
                         to="/docs/glossary"
@@ -1637,6 +1642,11 @@
             <Page url="/docs/app-globals">
                 <DocumentPage
                     content="{appGlobals.docsContent['pages/app-globals.md']}"
+                />
+            </Page>
+            <Page url="/docs/xmlui-config">
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/xmlui-config.md']}"
                 />
             </Page>
             <Page url="/docs/helper-tags">

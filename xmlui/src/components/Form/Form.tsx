@@ -232,7 +232,7 @@ export const FormMd = createMetadata({
     csrfToken: {
       description:
         "A CSRF token attached to the submit request as an HTTP header. The header name " +
-        "defaults to `X-CSRF-Token` and can be customized via `appGlobals.csrfHeaderName`. " +
+        "defaults to `X-CSRF-Token` and can be customized via `xmluiConfig.csrfHeaderName`. " +
         "When the form uses the built-in submit handler (i.e. `submitUrl` is set and no " +
         "custom `onSubmit` is provided), the token is added automatically. Custom " +
         "`onSubmit` handlers can read the value via the `$formCsrfToken` context variable.",
@@ -241,7 +241,7 @@ export const FormMd = createMetadata({
     idempotencyKey: {
       description:
         "An idempotency key attached to the submit request as an HTTP header (default " +
-        "header name `Idempotency-Key`, configurable via `appGlobals.idempotencyHeaderName`). " +
+        "header name `Idempotency-Key`, configurable via `xmluiConfig.idempotencyHeaderName`). " +
         "Supply a string the server can use to de-duplicate retries. When the form uses the " +
         "built-in submit handler the header is added automatically; custom handlers can read " +
         "the value via the `$formIdempotencyKey` context variable.",

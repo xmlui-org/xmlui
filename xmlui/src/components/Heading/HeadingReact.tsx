@@ -73,7 +73,10 @@ export const Heading = memo(forwardRef(function Heading(
   const registerHeading = tableOfContentsContext?.registerHeading;
   const appContext = useAppContext();
   if (showAnchor === undefined) {
-    showAnchor = appContext?.appGlobals?.showHeadingAnchors ?? false;
+    showAnchor =
+      appContext?.xmluiConfig?.showHeadingAnchors ??
+      appContext?.appGlobals?.showHeadingAnchors ??
+      false;
   }
 
   const ref = useComposedRefs(elementRef, forwardedRef);

@@ -363,4 +363,4 @@ Code-behind functions have full access to component variables and the XMLUI glob
 
 Synchronous expressions (bindings in markup attributes) are subject to a **1000 ms timeout**. An expression that takes longer than one second to evaluate throws an error to prevent the UI from freezing. If you hit this limit, move the work into an event handler (which runs asynchronously) or pre-process data in a `transformResult` function on a `DataSource`.
 
-The timeout threshold can be raised by setting [`appGlobals.syncExecutionTimeout`](/docs/app-globals#syncExecutionTimeout) (in milliseconds) in your app configuration, but increasing it is rarely the right solution — it usually indicates that computation belongs in an async handler instead.
+The timeout threshold can be raised by setting [`xmluiConfig.syncExecutionTimeout`](/docs/xmlui-config#syncExecutionTimeout) (in milliseconds) in your app configuration, but increasing it is rarely the right solution — it usually indicates that computation belongs in an async handler instead.

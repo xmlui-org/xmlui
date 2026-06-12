@@ -416,7 +416,7 @@ export type ComponentPropertyMetadata = {
    * - `removedIn` — semver of the version in which this prop will be (or
    *   was) removed. When the current runtime version is ≥ `removedIn`,
    *   the versioning verifier escalates to a `removed-prop` diagnostic
-   *   (warn in non-strict, error when `App.appGlobals.strictVersioning`
+   *   (warn in non-strict, error when `App.xmluiConfig.strictVersioning`
    *   is truthy).
    * - `replacement` — free text or `<componentName>.<propName>` pointing
    *   at the recommended replacement; appended to the diagnostic message
@@ -445,7 +445,7 @@ export type ComponentPropertyMetadata = {
   /**
    * Default-value-change history. Each entry records a version in which
    * the framework changed this prop's default value, plus the previous
-   * default so apps can opt back via `App.appGlobals.preserveLegacyDefaults`.
+   * default so apps can opt back via `App.xmluiConfig.preserveLegacyDefaults`.
    * Triggers a `default-value-changed` diagnostic when the opt-back is
    * active. See plan #12 §2.3.
    */

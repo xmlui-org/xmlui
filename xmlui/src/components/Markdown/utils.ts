@@ -318,7 +318,7 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
 function ensurePlaygroundTracingConfig(config: unknown): unknown {
   if (config == null) {
     return {
-      appGlobals: {
+      xmluiConfig: {
         xsVerbose: true,
       },
     };
@@ -329,18 +329,18 @@ function ensurePlaygroundTracingConfig(config: unknown): unknown {
   }
 
   const resolvedConfig = config as Record<string, any>;
-  const resolvedAppGlobals =
-    resolvedConfig.appGlobals &&
-    typeof resolvedConfig.appGlobals === "object" &&
-    !Array.isArray(resolvedConfig.appGlobals)
-      ? resolvedConfig.appGlobals
+  const resolvedXmluiConfig =
+    resolvedConfig.xmluiConfig &&
+    typeof resolvedConfig.xmluiConfig === "object" &&
+    !Array.isArray(resolvedConfig.xmluiConfig)
+      ? resolvedConfig.xmluiConfig
       : {};
 
   return {
     ...resolvedConfig,
-    appGlobals: {
-      ...resolvedAppGlobals,
-      xsVerbose: resolvedAppGlobals.xsVerbose ?? true,
+    xmluiConfig: {
+      ...resolvedXmluiConfig,
+      xsVerbose: resolvedXmluiConfig.xsVerbose ?? true,
     },
   };
 }

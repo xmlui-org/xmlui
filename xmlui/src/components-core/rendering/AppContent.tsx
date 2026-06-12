@@ -43,7 +43,7 @@ import {
 } from "../i18n";
 import { createScheduler, type ScheduledTask, type Scheduler } from "../scheduler";
 import { TableOfContentsContext } from "../TableOfContentsContext";
-import { AppContext } from "../AppContext";
+import { AppContext, mergeXmluiConfig } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
@@ -86,6 +86,7 @@ type AppContentProps = {
   rootContainer: ContainerWrapperDef;
   routerBaseName: string;
   globalProps?: GlobalProps;
+  xmluiConfig?: Record<string, any>;
   standalone?: boolean;
   trackContainerHeight?: TrackContainerHeight;
   decorateComponentsWithTestId?: boolean;
@@ -120,6 +121,7 @@ export function AppContent({
   rootContainer,
   routerBaseName,
   globalProps,
+  xmluiConfig: xmluiConfigRaw,
   standalone,
   trackContainerHeight,
   decorateComponentsWithTestId,
@@ -169,7 +171,7 @@ export function AppContent({
   );
 
   // --- App.errors reactive stream (FIFO buffer of recent AppErrors).
-  // The buffer size is read from appGlobals.errorBufferSize (default 50).
+  // The buffer size is read from xmluiConfig.errorBufferSize (default 50).
   const [errors, setErrors] = useState<ReadonlyArray<AppError>>(() => Object.freeze([]) as ReadonlyArray<AppError>);
 
   const debugView = useDebugView();
@@ -195,27 +197,37 @@ export function AppContent({
     return (globalProps ?? EMPTY_OBJECT) as Record<string, any>;
   }, [globalProps]);
 
+  // --- Build the framework / runtime configuration view: keys defined in
+  // --- `xmluiConfig` win, with fallback to `appGlobals` for any missing key.
+  // --- Internal framework consumers read from this view through
+  // --- `appContext.xmluiConfig` so apps can keep framework settings under
+  // --- either `appGlobals` (legacy) or the new `xmluiConfig` key.
+  const xmluiConfig = useMemo(
+    () => mergeXmluiConfig(appGlobals, xmluiConfigRaw),
+    [appGlobals, xmluiConfigRaw],
+  );
+
   // --- W5-1 / plan #09 Step 0: wire the forms validator registry to this app's
-  // strict-mode flag and trace sink. Re-runs whenever `appGlobals` identity
+  // strict-mode flag and trace sink. Re-runs whenever `xmluiConfig` identity
   // changes so `strictForms` toggling is observed without re-importing the
   // registry module.
   useMemo(() => {
     configureValidatorRegistry({
-      isStrict: () => (appGlobals as any)?.strictForms === true,
+      isStrict: () => (xmluiConfig as any)?.strictForms === true,
       emit: (d) => {
         pushXsLog({ kind: "forms", ts: Date.now(), ...d });
       },
     });
-  }, [appGlobals]);
+  }, [xmluiConfig]);
 
-  // --- Plan #15: wire `appGlobals.strictAuditLogging` and `appGlobals.auditPolicy`
-  // into the audit pipeline. The policy is normalised by `setAuditPolicy()` and
-  // the strict flag governs whether `audit-redaction-missing` /
-  // `audit-policy-conflict` escalate to errors.
+  // --- Plan #15: wire `strictAuditLogging` and `auditPolicy` into the audit
+  // pipeline. The policy is normalised by `setAuditPolicy()` and the strict
+  // flag governs whether `audit-redaction-missing` / `audit-policy-conflict`
+  // escalate to errors.
   useMemo(() => {
     // Default is strict (`!== false`) — only explicit false opts out, matching W8 flip.
-    setStrictAudit((appGlobals as any)?.strictAuditLogging !== false);
-    const declared = (appGlobals as any)?.auditPolicy;
+    setStrictAudit((xmluiConfig as any)?.strictAuditLogging !== false);
+    const declared = (xmluiConfig as any)?.auditPolicy;
     if (declared && typeof declared === "object") {
       setAuditPolicy({
         redact: Array.isArray(declared.redact) ? declared.redact : [],
@@ -224,18 +236,18 @@ export function AppContent({
         sink: declared.sink,
       });
     }
-  }, [appGlobals]);
+  }, [xmluiConfig]);
 
   // W8-1: `strictDeterminism` default flipped from `false` to `true`.
   // Reads use `!== false` so undefined / missing keys resolve to strict.
-  const strictDeterminism = appGlobals?.strictDeterminism !== false;
+  const strictDeterminism = xmluiConfig?.strictDeterminism !== false;
   const schedulerMode: "concurrent" | "fifo" =
     strictDeterminism
       ? "fifo"
-      : (schedulerOverride ?? appGlobals?.scheduler ?? "concurrent");
+      : (schedulerOverride ?? xmluiConfig?.scheduler ?? "concurrent");
   const maxQueuedPerTrace =
     maxQueuedPerTraceOverride ??
-    (typeof appGlobals?.maxQueuedPerTrace === "number" ? appGlobals.maxQueuedPerTrace : 64);
+    (typeof xmluiConfig?.maxQueuedPerTrace === "number" ? xmluiConfig.maxQueuedPerTrace : 64);
   const schedulerRef = useRef<Scheduler | undefined>();
   const schedulerConfigRef = useRef<string>("");
   const schedulerConfigKey = `${schedulerMode}:${maxQueuedPerTrace}:${strictDeterminism}`;
@@ -352,7 +364,7 @@ export function AppContent({
       if (
         onWillNavigate &&
         !isProgrammatic &&
-        appGlobals?.guardOnPopState !== false
+        xmluiConfig?.guardOnPopState !== false
       ) {
         void Promise.resolve(onWillNavigate(currentPath, undefined)).then((result) => {
           if (result === false) {
@@ -363,7 +375,7 @@ export function AppContent({
               to: currentPath,
               routingDiagnostic: {
                 code: "guard-bypass-attempt",
-                severity: appGlobals?.strictRouting !== false ? "error" : "warn",
+                severity: xmluiConfig?.strictRouting !== false ? "error" : "warn",
                 message: "Navigation was rejected by willNavigate after a browser-driven route change.",
               },
             });
@@ -379,17 +391,17 @@ export function AppContent({
         void onDidNavigate(currentPath, undefined);
       }
     }
-  }, [appGlobals?.guardOnPopState, appGlobals?.strictRouting, location, navigateRouter, navigationHandlers]);
+  }, [xmluiConfig?.guardOnPopState, xmluiConfig?.strictRouting, location, navigateRouter, navigationHandlers]);
 
   // --- Plan #10 Step 2.1 — Anchor + form interception (opt-in).
-  // When `appGlobals.interceptExternalNavigation === true`, same-origin
+  // When `xmluiConfig.interceptExternalNavigation === true`, same-origin
   // anchor clicks and same-origin form submissions are routed through
   // `appContext.navigate` so the `willNavigate` guard, per-page guards,
   // and the `kind:"navigate"` trace pipeline observe them. Cross-origin
   // links, modifier-key clicks, `target="_blank"`, and explicit
   // `data-xmlui-bypass-router` opt-outs are passed through unchanged.
   useEffect(() => {
-    if (appGlobals?.interceptExternalNavigation !== true) return;
+    if (xmluiConfig?.interceptExternalNavigation !== true) return;
     if (typeof document === "undefined") return;
 
     const sameOrigin = (href: string): string | null => {
@@ -448,7 +460,7 @@ export function AppContent({
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("submit", onSubmit, true);
     };
-  }, [appGlobals?.interceptExternalNavigation, navigate]);
+  }, [xmluiConfig?.interceptExternalNavigation, navigate]);
 
   // --- Create PubSubService with stable reference across renders
   const pubSubServiceRef = useRef(createPubSubService());
@@ -628,7 +640,7 @@ export function AppContent({
   // --- dependency graph and emits one `kind:"reactive-cycle"` trace entry
   // --- per unique cycle.
   // --- Phase 2 (W6-7) enforcement: when
-  // --- `appGlobals.strictReactiveGraph === true`, `warn`-severity hits
+  // --- `xmluiConfig.strictReactiveGraph === true`, `warn`-severity hits
   // --- escalate to `severity:"error"`, fire a `console.error`, and surface
   // --- a single dismissable `toast.error()` per cycle so authors see the
   // --- failure even with the inspector closed. `info`-severity
@@ -651,7 +663,7 @@ export function AppContent({
     if (!hits || hits.length === 0) return;
 
     // W8-1: `strictReactiveGraph` default flipped from `false` to `true`.
-    const strict = (appGlobals as any)?.strictReactiveGraph !== false;
+    const strict = (xmluiConfig as any)?.strictReactiveGraph !== false;
     const seen = reportedCyclesRef.current;
 
     for (const hit of hits) {
@@ -707,8 +719,8 @@ export function AppContent({
         xsLogMax,
       );
     }
-    // Intentionally not depending on `appGlobals` — we want one detection per
-    // mount, not per appGlobals identity change.
+    // Intentionally not depending on `xmluiConfig` — we want one detection per
+    // mount, not per config identity change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rootContainer]);
 
@@ -720,7 +732,7 @@ export function AppContent({
   useEffect(() => {
     if (!rootContainer || !componentRegistry) return;
     try {
-      const strict = (appGlobals as any)?.strictVersioning === true;
+      const strict = (xmluiConfig as any)?.strictVersioning === true;
       const diags = verifyVersioning(
         rootContainer as any,
         (name: string) =>
@@ -891,18 +903,18 @@ export function AppContent({
   ]);
 
   const localePersistKey =
-    appGlobals?.localePersistKey === null ? null : (appGlobals?.localePersistKey ?? "xmlui.locale");
+    xmluiConfig?.localePersistKey === null ? null : (xmluiConfig?.localePersistKey ?? "xmlui.locale");
   const persistedLocale = useMemo(() => {
     if (!localePersistKey || typeof window === "undefined") return undefined;
     return window.localStorage.getItem(localePersistKey) ?? undefined;
   }, [localePersistKey, storageTimestamp]);
   const availableLocales = useMemo(() => {
-    const configured = appGlobals?.availableLocales;
+    const configured = xmluiConfig?.availableLocales;
     const configuredLocales = Array.isArray(configured)
       ? configured.filter((v) => typeof v === "string")
       : [];
     return [...new Set([...bundleStoreRef.current.available(), ...configuredLocales])];
-  }, [appGlobals?.availableLocales, bundleVersion]);
+  }, [xmluiConfig?.availableLocales, bundleVersion]);
   const activeLocale = useMemo(
     () =>
       resolveLocale({
@@ -914,9 +926,9 @@ export function AppContent({
             ? navigator.languages
             : ["en"],
         available: availableLocales,
-        fallback: appGlobals?.defaultLocale ?? "en",
+        fallback: xmluiConfig?.defaultLocale ?? "en",
       }),
-    [appGlobals?.defaultLocale, appLocaleOverride, availableLocales, persistedLocale, userLocaleOverride],
+    [xmluiConfig?.defaultLocale, appLocaleOverride, availableLocales, persistedLocale, userLocaleOverride],
   );
 
   const setLocale = useCallback(
@@ -926,7 +938,7 @@ export function AppContent({
           kind: "i18n",
           ts: Date.now(),
           code: "missing-bundle",
-          severity: appGlobals?.strictI18n === true ? "error" : "warn",
+          severity: xmluiConfig?.strictI18n === true ? "error" : "warn",
           locale,
           message: `Invalid locale "${locale}".`,
         });
@@ -942,7 +954,7 @@ export function AppContent({
         }
       }
     },
-    [appGlobals?.strictI18n, localePersistKey],
+    [xmluiConfig?.strictI18n, localePersistKey],
   );
 
   const registerLocaleBundle = useCallback(
@@ -1006,28 +1018,28 @@ export function AppContent({
   );
 
   useEffect(() => {
-    if (appGlobals?.localeBundles === undefined) return;
-    void registerLocaleBundles(appGlobals.localeBundles).catch((error) => {
+    if (xmluiConfig?.localeBundles === undefined) return;
+    void registerLocaleBundles(xmluiConfig.localeBundles).catch((error) => {
       reportI18nDiagnostic({
         code: "missing-bundle",
-        severity: appGlobals?.strictI18n === true ? "error" : "warn",
+        severity: xmluiConfig?.strictI18n === true ? "error" : "warn",
         message: error instanceof Error ? error.message : String(error),
       });
     });
-  }, [appGlobals?.localeBundles, appGlobals?.strictI18n, registerLocaleBundles, reportI18nDiagnostic]);
+  }, [xmluiConfig?.localeBundles, xmluiConfig?.strictI18n, registerLocaleBundles, reportI18nDiagnostic]);
 
   const translate = useCallback(
     (key: string, vars?: Record<string, unknown>) => {
       return translateMessage(key, vars, {
         store: bundleStoreRef.current,
         locale: activeLocale.locale,
-        strict: appGlobals?.strictI18n === true,
+        strict: xmluiConfig?.strictI18n === true,
         onDiagnostic: (diagnostic) => {
           reportI18nDiagnostic(diagnostic as any);
         },
       });
     },
-    [activeLocale.locale, appGlobals?.strictI18n, bundleVersion, reportI18nDiagnostic],
+    [activeLocale.locale, xmluiConfig?.strictI18n, bundleVersion, reportI18nDiagnostic],
   );
 
   const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
@@ -1041,8 +1053,8 @@ export function AppContent({
   // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
 
-  const xsVerbose = (appGlobals as any)?.xsVerbose === true;
-  const xsLogMax = Number((appGlobals as any)?.xsVerboseLogMax ?? 200);
+  const xsVerbose = (xmluiConfig as any)?.xsVerbose === true;
+  const xsLogMax = Number((xmluiConfig as any)?.xsVerboseLogMax ?? 200);
 
   // Initialize startup trace early during render, BEFORE children mount
   // This ensures DataLoader can capture the trace when useQuery triggers fetches
@@ -1526,7 +1538,7 @@ export function AppContent({
       // Plan #07 Step 5.2 (W8-1): when strictErrors is on (default true), warn
       // whenever a non-AppError value reaches the pipeline so authors are
       // nudged toward `throw new AppError({ code, category, message })`.
-      const strictErrors = (appGlobals as any)?.strictErrors !== false;
+      const strictErrors = (xmluiConfig as any)?.strictErrors !== false;
       if (strictErrors && !(error instanceof AppError)) {
         pushXsLog({
           ts: Date.now(),
@@ -1553,8 +1565,8 @@ export function AppContent({
       // Append to App.errors buffer (FIFO, capped).
       const bufferSize = Math.max(
         0,
-        typeof (appGlobals as any)?.errorBufferSize === "number"
-          ? (appGlobals as any).errorBufferSize
+        typeof (xmluiConfig as any)?.errorBufferSize === "number"
+          ? (xmluiConfig as any).errorBufferSize
           : 50,
       );
       if (bufferSize > 0) {
@@ -1600,7 +1612,7 @@ export function AppContent({
         showToast();
       }
     },
-    [appGlobals],
+    [xmluiConfig],
   );
 
   // --- App namespace: built inline because it pulls together many hooks
@@ -1609,7 +1621,7 @@ export function AppContent({
   const appNamespace = useMemo(
     () => ({
       ...AppUtilsNamespace,
-      fetch: createAppFetch(appGlobals),
+      fetch: createAppFetch(appGlobals, xmluiConfig),
       environment: getAppEnvironment(),
       locale: activeLocale.locale,
       localeSource: activeLocale.source,
@@ -1646,7 +1658,7 @@ export function AppContent({
       registerValidator: registerValidatorImpl,
       // --- Plan #07 Step 2.1: structured error sink.
       // `App.errors` is a FIFO buffer of recent `AppError`s (default 50, see
-      // `appGlobals.errorBufferSize`).  `setErrorHandler` is used by
+      // `xmluiConfig.errorBufferSize`).  `setErrorHandler` is used by
       // `<App onError>` to register a markup handler that runs after the
       // default toast; the handler may call `event.preventDefault()` to
       // suppress the toast.
@@ -1700,6 +1712,7 @@ export function AppContent({
   const factoryDeps: AppContextDeps = {
     Actions,
     appGlobals,
+    xmluiConfig,
     debugEnabled,
     decorateComponentsWithTestId,
     environment,
@@ -1746,7 +1759,7 @@ export function AppContent({
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
         <GlobalLiveRegion />
-        {(appGlobals as any)?.autoSkipLink === true && <SkipLink />}
+        {(xmluiConfig as any)?.autoSkipLink === true && <SkipLink />}
         <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
       </AppStateContext.Provider>
     </AppContext.Provider>

@@ -39,7 +39,7 @@ function traceApiComponent(
   details?: Record<string, any>,
 ) {
   const appContext = executionContext?.appContext;
-  if (appContext?.appGlobals?.xsVerbose !== true) return;
+  if (appContext?.xmluiConfig?.xsVerbose !== true) return;
   pushXsLog({
     ts: Date.now(),
     perfTs: typeof performance !== "undefined" ? performance.now() : undefined,

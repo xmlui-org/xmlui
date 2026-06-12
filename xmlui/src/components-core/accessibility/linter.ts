@@ -36,7 +36,7 @@ export type A11yRegistry = ReadonlyMap<string, { readonly a11y?: ComponentMetada
 export interface LintOptions {
   /**
    * When `true`, the four "must-have" codes escalate from `warn` to `error`.
-   * Controlled by `App.appGlobals.strictAccessibility`.
+   * Controlled by `App.xmluiConfig.strictAccessibility`.
    */
   strict?: boolean;
   /**

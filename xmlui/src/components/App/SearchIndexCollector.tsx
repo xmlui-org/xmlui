@@ -84,7 +84,7 @@ export function SearchIndexCollector({ Pages, NavPanel, renderChild }: SearchInd
     });
   }, [pagesToIndex.length]); // Recreate if the total number of pages changes
 
-  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done || loadedExternalIndex) {
+  if (!appContext.xmluiConfig?.searchIndexEnabled || indexState.done || loadedExternalIndex) {
     return null;
   }
 

@@ -245,7 +245,7 @@ export function reportLifecycleEvent(payload: {
  * (async `onUnmount`, handler throw, or `onBeforeDispose` timeout).
  *
  * Severity escalates from `warn` to `error` when the second argument's
- * `strict` is `true` (i.e. `App.appGlobals.strictLifecycle === true`).
+ * `strict` is `true` (i.e. `App.xmluiConfig.strictLifecycle === true`).
  */
 export function reportLifecycleViolation(
   payload: {

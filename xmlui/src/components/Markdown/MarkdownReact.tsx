@@ -187,6 +187,8 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   let _codeHighlighter = null;
   if (codeHighlighter) {
     _codeHighlighter = codeHighlighter;
+  } else if (isCodeHighlighter(appContext?.xmluiConfig?.codeHighlighter)) {
+    _codeHighlighter = appContext.xmluiConfig.codeHighlighter;
   } else if (isCodeHighlighter(appContext?.appGlobals?.codeHighlighter)) {
     _codeHighlighter = appContext.appGlobals.codeHighlighter;
   } else if (typeof window !== "undefined" && isCodeHighlighter((window as any).__xmluiCodeHighlighter)) {

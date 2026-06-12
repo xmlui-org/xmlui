@@ -677,7 +677,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     const ownerSource = nodeSource ? { start: nodeSource.start, end: nodeSource.end } : undefined;
 
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
-    const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
+    const xsVerbose = context.appContext?.xmluiConfig?.xsVerbose === true;
 
     // --- Resolve aria-label cascade ---
     // Computed after prop forwarding (below) but declared here so event handler
@@ -1324,7 +1324,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     const ownerSource = nodeSource ? { start: nodeSource.start, end: nodeSource.end } : undefined;
 
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
-    const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
+    const xsVerbose = context.appContext?.xmluiConfig?.xsVerbose === true;
 
     // --- Resolve aria-label cascade ---
     let ariaLabel: string | undefined;

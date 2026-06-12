@@ -94,7 +94,7 @@ This property is particularly useful for:
 
 ### `disableInlineStyle` [#disableinlinestyle]
 
-This property controls whether inline styles are disabled for components within this theme. When undefined, uses the appGlobals.disableInlineStyle setting.
+This property controls whether inline styles are disabled for components within this theme. When undefined, uses the xmluiConfig.disableInlineStyle setting.
 
 ### `root` [#root]
 

@@ -336,6 +336,7 @@ function StandaloneApp({
     apiInterceptor,
     name,
     appGlobals,
+    xmluiConfig,
     defaultTheme,
     defaultTone,
     resources,
@@ -404,14 +405,16 @@ function StandaloneApp({
   // --- Components can be decorated with test IDs used in end-to-end tests.
   // --- This flag checks the environment if the app runs in E2E test mode.
   // --- Also enable when xsVerbose is true (for inspector support).
+  const xsVerbose = xmluiConfig?.xsVerbose ?? appGlobals?.xsVerbose;
   const shouldDecorateWithTestId =
     decorateComponentsWithTestId ||
-    appGlobals?.xsVerbose === true ||
+    xsVerbose === true ||
     // @ts-ignore
     (typeof globalThis.window !== "undefined" ? (globalThis as any).XMLUI_MOCK_TEST_ID : false);
 
   // --- An app can turn off the default hash routing.
-  const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
+  const useHashBasedRouting =
+    xmluiConfig?.useHashBasedRouting ?? appGlobals?.useHashBasedRouting ?? true;
 
   return (
     <ApiInterceptorProvider
@@ -436,6 +439,7 @@ function StandaloneApp({
                 : ""
           }
           globalProps={globalProps}
+          xmluiConfig={xmluiConfig}
           globalVars={filterGlobalVars(globalVars)}
           defaultTheme={defaultTheme}
           defaultTone={defaultTone as ThemeTone}
@@ -1419,6 +1423,7 @@ function useStandalone(
           ...appDef,
           name: config.name,
           appGlobals: config.appGlobals,
+          xmluiConfig: config.xmluiConfig,
           defaultTheme: config.defaultTheme,
           resources: config.resources,
           resourceMap: config.resourceMap,
@@ -2107,13 +2112,17 @@ function processAppLinting(
   appDef: StandaloneAppDescription,
   metadataProvider: MetadataProvider,
 ): { errorComponent: ComponentDef | null; toastMessages: string[] } {
-  const validationSeverity = getStandaloneValidationSeverity(appDef.appGlobals?.lintSeverity);
+  const lintSeverity =
+    appDef.xmluiConfig?.lintSeverity ?? appDef.appGlobals?.lintSeverity;
+  const validationSeverity = getStandaloneValidationSeverity(lintSeverity);
 
   if (validationSeverity !== StandaloneValidationSeverity.Skip) {
+    const strictTypeContracts =
+      appDef.xmluiConfig?.strictTypeContracts ?? appDef.appGlobals?.strictTypeContracts;
     const allComponentIssues = validateStandaloneAppTypeContracts({
       appDef,
       metadataProvider,
-      strict: appDef.appGlobals?.strictTypeContracts !== false,
+      strict: strictTypeContracts !== false,
     });
 
     if (allComponentIssues.length > 0) {

@@ -19,9 +19,9 @@ function mockFetchSuccess(body: object = {}) {
   });
 }
 
-function createProxy(appGlobals: Record<string, any> = {}) {
+function createProxy(xmluiConfig: Record<string, any> = {}) {
   return new RestApiProxy(
-    { appGlobals: { apiUrl: "https://api.example", ...appGlobals } } as any,
+    { appGlobals: { apiUrl: "https://api.example" }, xmluiConfig } as any,
   );
 }
 

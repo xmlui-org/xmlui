@@ -29,7 +29,7 @@ export const SearchContextProvider = ({ children }) => {
   const [loadedExternalIndex, setLoadedExternalIndex] = useState(false);
 
   useEffect(() => {
-    if (!appContext.appGlobals?.searchIndexEnabled || !ssgEnv?.searchIndexFile) {
+    if (!appContext.xmluiConfig?.searchIndexEnabled || !ssgEnv?.searchIndexFile) {
       return;
     }
 
@@ -51,7 +51,7 @@ export const SearchContextProvider = ({ children }) => {
       .catch(() => {
         // Pre-built index not available (e.g. dev server) — SearchIndexCollector will run instead.
       });
-  }, [appContext.appGlobals?.searchIndexEnabled, ssgEnv]);
+  }, [appContext.xmluiConfig?.searchIndexEnabled, ssgEnv]);
 
   const storeContent = useCallback((entry: SearchItemData) => {
     setContent((prevContent) => ({

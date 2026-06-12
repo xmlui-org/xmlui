@@ -196,12 +196,12 @@ export function createHandlerLogger(config: HandlerLoggerConfig): HandlerLoggerC
   const { appContext, nodeDebugSource } = config;
 
   // Check if verbose logging is enabled
-  const isVerbose = () => appContext.appGlobals?.xsVerbose === true;
+  const isVerbose = () => appContext.xmluiConfig?.xsVerbose === true;
 
   // Create the xsLog helper function
   const createXsLog = () => {
-    const xsLogBucket = appContext.appGlobals?.xsVerboseLogBucket;
-    const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
+    const xsLogBucket = appContext.xmluiConfig?.xsVerboseLogBucket;
+    const xsLogMax = Number(appContext.xmluiConfig?.xsVerboseLogMax ?? 200);
 
     return (...args: any[]) => {
       if (!isVerbose()) return;

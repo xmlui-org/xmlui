@@ -107,7 +107,7 @@ export type EvalTreeOptions = {
    * labels, such as `"window.document"`, `"document.body"`, or wildcard
    * prefixes like `"document.*"`.
    *
-   * Set via `App.appGlobals.strictDomSandbox` in config.json or the App
+   * Set via `App.xmluiConfig.strictDomSandbox` in config.json or the App
    * component; the event-handler pipeline propagates it into this option.
    */
   strictDomSandbox?: boolean | string[];
@@ -126,7 +126,7 @@ export type EvalTreeOptions = {
    * to `Log.*()` functions.
    *
    * Default: `true` — console access is **allowed** unless explicitly opted out.
-   * Set via `App.appGlobals.allowConsole` in config.json or the App component.
+   * Set via `App.xmluiConfig.allowConsole` in config.json or the App component.
    */
   allowConsole?: boolean;
   /**

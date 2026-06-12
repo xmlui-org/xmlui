@@ -48,19 +48,19 @@ error pipeline.
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "strictDomSandbox": true
   }
 }
 ```
 
 `console` is a special case: it is in the denylist but allowed by default
-for developer ergonomics. Set `appGlobals.allowConsole` to `false` to
+for developer ergonomics. Set `xmluiConfig.allowConsole` to `false` to
 include it in the sandbox enforcement:
 
 ```json
 {
-  "appGlobals": {
+  "xmluiConfig": {
     "allowConsole": false
   }
 }
