@@ -373,6 +373,33 @@ test.describe("Type Property", () => {
       expect(isVisible).toBe(false);
     }
   });
+
+  test("textarea layout props do not leak to the textarea DOM attributes", async ({
+    page,
+    initTestBed,
+  }) => {
+    const reactWarnings: string[] = [];
+    page.on("console", (msg) => {
+      const text = msg.text();
+      if (text.includes("React does not recognize the `minHeight` prop")) {
+        reactWarnings.push(text);
+      }
+    });
+
+    await initTestBed(`
+      <Form>
+        <FormItem testId="fi-textarea" type="textarea" minHeight="200px" />
+      </Form>
+    `);
+
+    const formItem = page.getByTestId("fi-textarea");
+    const textarea = formItem.locator("textarea");
+
+    await expect(formItem).toHaveCSS("min-height", "200px");
+    await expect(textarea).not.toHaveAttribute("minHeight");
+    await expect(textarea).not.toHaveAttribute("minheight");
+    expect(reactWarnings).toEqual([]);
+  });
 });
 
 test.describe("Validation Properties", () => {
