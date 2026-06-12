@@ -99,6 +99,26 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByLabel("Auto-focused input")).toBeFocused();
   });
 
+  test("passes input assistance attributes to textarea", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<TextArea autoComplete="new-password" autoCorrect="{false}" spellCheck="{false}" autoCapitalize="off" />`,
+    );
+    const textarea = page.getByRole("textbox");
+
+    await expect(textarea).toHaveAttribute("autocomplete", "new-password");
+    await expect(textarea).toHaveAttribute("autocorrect", "off");
+    await expect(textarea).toHaveAttribute("spellcheck", "false");
+    await expect(textarea).toHaveAttribute("autocapitalize", "off");
+  });
+
+  test("coerces boolean autoComplete values to on/off", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea autoComplete="{true}" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("autocomplete", "on");
+
+    await initTestBed(`<TextArea autoComplete="{false}" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("autocomplete", "off");
+  });
+
   test("placeholder shows when textarea is empty", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea placeholder="Enter your comments here..." />`);
     await expect(page.getByRole("textbox")).toHaveAttribute(
@@ -485,8 +505,14 @@ test.describe("Visual States", () => {
         "textColor-TextArea": "rgb(0, 255, 0)",
       },
     });
-    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("color", "rgb(0, 255, 0)");
+    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS(
+      "background-color",
+      "rgb(255, 0, 0)",
+    );
+    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS(
+      "color",
+      "rgb(0, 255, 0)",
+    );
   });
 
   test("resize prop controls CSS resize property", async ({ initTestBed, page }) => {
@@ -963,7 +989,7 @@ test.describe("Regression", () => {
     `);
 
     const tbDriver = await createTextBoxDriver("myTextBox");
-    const driver = (await createTextAreaDriver("myTextArea"));
+    const driver = await createTextAreaDriver("myTextArea");
 
     // Test basic layout integration
     await expect(driver.component.locator("textarea")).toBeVisible();
@@ -1062,7 +1088,10 @@ test.describe("Theme Variables", () => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`borderColor-TextArea${variant.value}`]: "rgb(255, 0, 0)" },
       });
-      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "border-color",
+        "rgb(255, 0, 0)",
+      );
     });
 
     test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
@@ -1076,7 +1105,10 @@ test.describe("Theme Variables", () => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`borderStyle-TextArea${variant.value}`]: "dashed" },
       });
-      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-style", "dashed");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "border-style",
+        "dashed",
+      );
     });
 
     test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
@@ -1090,7 +1122,10 @@ test.describe("Theme Variables", () => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`backgroundColor-TextArea${variant.value}`]: "rgb(240, 240, 240)" },
       });
-      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "background-color",
+        "rgb(240, 240, 240)",
+      );
     });
 
     test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
@@ -1117,7 +1152,10 @@ test.describe("Theme Variables", () => {
         testThemeVars: { [`borderColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
       });
       await page.getByTestId("test").locator("textarea").hover();
-      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "border-color",
+        "rgb(0, 0, 0)",
+      );
     });
 
     test(`applies correct backgroundColor on hover ${variant.value}`, async ({
@@ -1128,7 +1166,10 @@ test.describe("Theme Variables", () => {
         testThemeVars: { [`backgroundColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
       });
       await page.getByTestId("test").locator("textarea").hover();
-      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "background-color",
+        "rgb(0, 0, 0)",
+      );
     });
 
     test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
@@ -1161,22 +1202,22 @@ test.describe("Theme Variables", () => {
 test.describe("Behaviors and Parts", () => {
   test("handles tooltip", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
-    
+
     const component = page.getByTestId("test").locator("textarea");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltipMarkdown="**Bold text**" />`);
-    
+
     const component = page.getByTestId("test").locator("textarea");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
@@ -1203,17 +1244,17 @@ test.describe("Behaviors and Parts", () => {
 
   test("animation behavior", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" animation="fadeIn" />`);
-    
+
     const component = page.getByTestId("test").locator("textarea");
     await expect(component).toBeVisible();
   });
 
   test("combined tooltip and animation", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
-    
+
     const component = page.getByTestId("test").locator("textarea");
     await expect(component).toBeVisible();
-    
+
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
@@ -1229,9 +1270,9 @@ test.describe("Behaviors and Parts", () => {
   test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
     const inputPart = page.locator("[data-part-id='input']");
-    
+
     await expect(inputPart).toBeVisible();
-    
+
     await inputPart.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
@@ -1244,132 +1285,159 @@ test.describe("Behaviors and Parts", () => {
         "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
       },
     });
-    
+
     const component = page.getByTestId("test").locator("textarea");
     const inputPart = component.locator("[data-part-id='input']");
-    
+
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
     await expect(inputPart).toBeVisible();
   });
 
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <TextArea 
         testId="test" 
         variant="CustomVariant"
         animation="fadeIn"
       />
-    `, {
-      testThemeVars: {
-        "backgroundColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+        },
       },
-    });
-    
+    );
+
     const component = page.getByTestId("test").locator("textarea");
     const inputPart = component.locator("[data-part-id='input']");
-    
+
     // Verify variant applied
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    
+
     // Verify parts are visible
     await expect(inputPart).toBeVisible();
   });
 
-  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <TextArea testId="test" label="Comments" required="true" requireLabelMode="markRequired" bindTo="comments" />
       </Form>
     `);
-    
+
     const label = page.getByText("Comments");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <TextArea testId="test" label="Comments" required="false" requireLabelMode="markRequired" bindTo="comments" />
       </Form>
     `);
-    
+
     const label = page.getByText("Comments");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <TextArea testId="test" label="Comments" required="false" requireLabelMode="markOptional" bindTo="comments" />
       </Form>
     `);
-    
+
     const label = page.getByText("Comments");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <TextArea testId="test" label="Comments" required="true" requireLabelMode="markOptional" bindTo="comments" />
       </Form>
     `);
-    
+
     const label = page.getByText("Comments");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <TextArea testId="test" label="Comments" required="true" requireLabelMode="markBoth" bindTo="comments" />
       </Form>
     `);
-    
+
     const label = page.getByText("Comments");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <TextArea testId="test" label="Comments" required="false" requireLabelMode="markBoth" bindTo="comments" />
       </Form>
     `);
-    
+
     const label = page.getByText("Comments");
     await expect(label).not.toContainText("*");
     await expect(label).toContainText("(Optional)");
   });
 
-  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markRequired">
         <TextArea testId="test" label="Comments" required="false" requireLabelMode="markOptional" bindTo="comments" />
       </Form>
     `);
-    
+
     const label = page.getByText("Comments");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+  test("input inherits Form itemRequireLabelMode when not specified", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markBoth">
         <TextArea testId="test1" label="Required Field" required="true" bindTo="field1" />
         <TextArea testId="test2" label="Optional Field" required="false" bindTo="field2" />
       </Form>
     `);
-    
+
     const requiredLabel = page.getByText("Required Field");
     const optionalLabel = page.getByText("Optional Field");
-    
+
     await expect(requiredLabel).toContainText("*");
     await expect(requiredLabel).not.toContainText("(Optional)");
     await expect(optionalLabel).toContainText("(Optional)");
@@ -1382,43 +1450,49 @@ test.describe("Behaviors and Parts", () => {
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">
         <TextArea testId="input" bindTo="input" required="{true}" />
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation by submitting empty required field
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text
     await expect(page.getByText("This field is required")).toBeVisible();
-    
+
     // Check absence of concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).not.toBeVisible();
   });
 
-  test("shows icon and no helper text when verboseValidationFeedback is false", async ({ initTestBed, page }) => {
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <TextArea testId="input" bindTo="input" required="{true}" />
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text (should be hidden)
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Check for concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
-    
+
     // Check that it shows error icon
     await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
   });
@@ -1430,12 +1504,12 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     // Helper text hidden
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Concise feedback visible
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
@@ -1448,16 +1522,16 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     const textarea = page.getByRole("textbox");
-    
+
     // First make it invalid
     await page.getByTestId("submit").click();
-    
+
     // Now make it valid
     await textarea.fill("valid value");
     await textarea.blur();
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
     await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
@@ -1470,20 +1544,23 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     // Hover over the icon
     await conciseFeedback.hover();
-    
+
     // Check tooltip content
     const tooltip = page.locator("[data-tooltip-container]");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
 
-  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+  test("does not duplicate label when inside Form with label prop", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form>
         <TextArea
@@ -1493,7 +1570,7 @@ test.describe("Validation Feedback", () => {
         />
       </Form>
     `);
-    
+
     // Should only have one label with the text "Comments"
     const labels = page.getByText("Comments");
     await expect(labels).toHaveCount(1);

@@ -15,4 +15,5 @@ export const defaultProps = {
   updateState: noop,
   passwordVisibleIcon: "eye",
   passwordHiddenIcon: "eye-off",
+  autoComplete: "off" as string | boolean,
 };

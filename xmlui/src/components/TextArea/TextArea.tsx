@@ -96,6 +96,29 @@ export const TextAreaMd = createMetadata({
     },
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
+    autoComplete: {
+      description:
+        "Sets the HTML `autocomplete` attribute on the underlying text area. " +
+        'Boolean values are passed as `"on"` or `"off"`; string values are passed through.',
+      valueType: "any",
+      defaultValue: defaultProps.autoComplete,
+    },
+    autoCorrect: {
+      description:
+        "Sets the HTML `autocorrect` attribute on the underlying text area. " +
+        'When set, `true` is passed as `"on"` and `false` as `"off"`.',
+      valueType: "boolean",
+    },
+    spellCheck: {
+      description: "Sets the HTML `spellcheck` attribute on the underlying text area.",
+      valueType: "boolean",
+    },
+    autoCapitalize: {
+      description: "Sets the HTML `autocapitalize` attribute on the underlying text area.",
+      valueType: "string",
+      availableValues: ["off", "none", "sentences", "words", "characters"],
+      isStrictEnum: true,
+    },
     required: dRequired(),
     readOnly: dReadonly(),
     enabled: dEnabled(),
@@ -170,6 +193,10 @@ export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaM
       initialValue={extractValue(node.props.initialValue)}
       updateState={updateState}
       autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+      autoComplete={extractValue(node.props.autoComplete) ?? defaultProps.autoComplete}
+      autoCorrect={extractValue.asOptionalBoolean(node.props.autoCorrect)}
+      spellCheck={extractValue.asOptionalBoolean(node.props.spellCheck)}
+      autoCapitalize={extractValue.asOptionalString(node.props.autoCapitalize)}
       enabled={extractValue.asOptionalBoolean(node.props.enabled)}
       placeholder={extractValue(node.props.placeholder)}
       onDidChange={lookupEventHandler("didChange")}

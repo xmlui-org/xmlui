@@ -51,8 +51,8 @@ export const TextBoxMd = createMetadata({
   props: {
     type: {
       description:
-        "Sets the HTML input type. Use `\"password\"` to hide the entered text and " +
-        "classify the value as a secret in the audit pipeline; `\"email\"` to classify " +
+        'Sets the HTML input type. Use `"password"` to hide the entered text and ' +
+        'classify the value as a secret in the audit pipeline; `"email"` to classify ' +
         "the value as sensitive (PII).",
       valueType: "string",
       availableValues: ["text", "password", "search", "email"],
@@ -71,6 +71,29 @@ export const TextBoxMd = createMetadata({
     },
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
+    autoComplete: {
+      description:
+        "Sets the HTML `autocomplete` attribute on the underlying input. Boolean values are " +
+        'passed as `"on"` or `"off"`; string values are passed through.',
+      valueType: "any",
+      defaultValue: defaultProps.autoComplete,
+    },
+    autoCorrect: {
+      description:
+        "Sets the HTML `autocorrect` attribute on the underlying input. When set, `true` is " +
+        'passed as `"on"` and `false` as `"off"`.',
+      valueType: "boolean",
+    },
+    spellCheck: {
+      description: "Sets the HTML `spellcheck` attribute on the underlying input.",
+      valueType: "boolean",
+    },
+    autoCapitalize: {
+      description: "Sets the HTML `autocapitalize` attribute on the underlying input.",
+      valueType: "string",
+      availableValues: ["off", "none", "sentences", "words", "characters"],
+      isStrictEnum: true,
+    },
     required: dRequired(),
     readOnly: dReadonly(),
     enabled: {
@@ -226,16 +249,21 @@ export const PasswordMd = createMetadata({
 });
 
 // Password: same as ThemedTextBox but forces type="password"
-const PasswordBox = React.forwardRef((props: any, ref: any) =>
+const PasswordBox = React.forwardRef((props: any, ref: any) => (
   <ThemedTextBox {...props} ref={ref} type="password" />
-);
+));
 PasswordBox.displayName = "PasswordBox";
 
-export const passwordInputComponentRenderer = wrapComponent("PasswordInput", PasswordBox, PasswordMd, {
-  exposeRegisterApi: true,
-  events: {
-    gotFocus: "onFocus",
-    lostFocus: "onBlur",
+export const passwordInputComponentRenderer = wrapComponent(
+  "PasswordInput",
+  PasswordBox,
+  PasswordMd,
+  {
+    exposeRegisterApi: true,
+    events: {
+      gotFocus: "onFocus",
+      lostFocus: "onBlur",
+    },
+    deriveAriaLabel: (props) => props.label || props.placeholder,
   },
-  deriveAriaLabel: (props) => props.label || props.placeholder,
-});
+);

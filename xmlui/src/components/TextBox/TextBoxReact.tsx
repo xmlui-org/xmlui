@@ -9,7 +9,8 @@ import { useEvent } from "../../components-core/utils/misc";
 import { defaultProps } from "./TextBox.defaults";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
-import { PART_START_ADORNMENT,
+import {
+  PART_START_ADORNMENT,
   PART_INPUT,
   PART_END_ADORNMENT,
   PART_CONCISE_VALIDATION_FEEDBACK,
@@ -53,6 +54,10 @@ type Props = {
   endIcon?: string;
   gap?: string;
   autoFocus?: boolean;
+  autoComplete?: string | boolean;
+  autoCorrect?: boolean;
+  spellCheck?: boolean;
+  autoCapitalize?: string;
   readOnly?: boolean;
   tabIndex?: number;
   required?: boolean;
@@ -77,230 +82,249 @@ type Props = {
   invalidMessages?: string[];
 };
 
-export const TextBox = memo(forwardRef(function TextBox(
-  {
-    id: idProp,
-    type = defaultProps.type,
-    value = defaultProps.value,
-    updateState = defaultProps.updateState,
-    initialValue = defaultProps.initialValue,
-    style,
-    classes,
-    className,
-    maxLength,
-    enabled = defaultProps.enabled,
-    placeholder,
-    validationStatus = defaultProps.validationStatus,
-    invalidMessages = defaultProps.invalidMessages,
-    onDidChange = defaultProps.onDidChange,
-    onFocus = defaultProps.onFocus,
-    onBlur = defaultProps.onBlur,
-    onKeyDown = defaultProps.onKeyDown,
-    registerComponentApi,
-    startText,
-    startIcon,
-    endText,
-    endIcon,
-    gap,
-    autoFocus,
-    readOnly,
-    tabIndex,
-    required,
-    showPasswordToggle,
-    passwordVisibleIcon = defaultProps.passwordVisibleIcon,
-    passwordHiddenIcon = defaultProps.passwordHiddenIcon,
-    verboseValidationFeedback,
-    validationIconSuccess,
-    validationIconError,
-    ...rest
-  }: Props,
-  forwardedRef: ForwardedRef<HTMLDivElement>,
-) {
-  const id = useFormItemInputId(idProp);
-  const inputRef = useRef<HTMLInputElement>(null);
+const normalizeOnOff = (value: boolean | undefined) =>
+  value === undefined ? undefined : value ? "on" : "off";
 
-  // State to control password visibility
-  const [showPassword, setShowPassword] = useState(false);
+const normalizeAutoComplete = (value: string | boolean | undefined) =>
+  typeof value === "boolean" ? normalizeOnOff(value) : value;
 
-  // Determine the actual input type based on the password visibility toggle
-  const actualType = type === "password" && showPassword ? "text" : type;
+export const TextBox = memo(
+  forwardRef(function TextBox(
+    {
+      id: idProp,
+      type = defaultProps.type,
+      value = defaultProps.value,
+      updateState = defaultProps.updateState,
+      initialValue = defaultProps.initialValue,
+      style,
+      classes,
+      className,
+      maxLength,
+      enabled = defaultProps.enabled,
+      placeholder,
+      validationStatus = defaultProps.validationStatus,
+      invalidMessages = defaultProps.invalidMessages,
+      onDidChange = defaultProps.onDidChange,
+      onFocus = defaultProps.onFocus,
+      onBlur = defaultProps.onBlur,
+      onKeyDown = defaultProps.onKeyDown,
+      registerComponentApi,
+      startText,
+      startIcon,
+      endText,
+      endIcon,
+      gap,
+      autoFocus,
+      autoComplete = defaultProps.autoComplete,
+      autoCorrect,
+      spellCheck,
+      autoCapitalize,
+      readOnly,
+      tabIndex,
+      required,
+      showPasswordToggle,
+      passwordVisibleIcon = defaultProps.passwordVisibleIcon,
+      passwordHiddenIcon = defaultProps.passwordHiddenIcon,
+      verboseValidationFeedback,
+      validationIconSuccess,
+      validationIconError,
+      ...rest
+    }: Props,
+    forwardedRef: ForwardedRef<HTMLDivElement>,
+  ) {
+    const id = useFormItemInputId(idProp);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-  // Toggle password visibility
-  const togglePasswordVisibility = useCallback(() => {
-    setShowPassword((prev) => !prev);
-  }, []);
+    // State to control password visibility
+    const [showPassword, setShowPassword] = useState(false);
 
-  const contextVerboseValidationFeedback = useFormContextPart(
-    (ctx) => ctx?.verboseValidationFeedback,
-  );
-  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
-  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+    // Determine the actual input type based on the password visibility toggle
+    const actualType = type === "password" && showPassword ? "text" : type;
 
-  const finalVerboseValidationFeedback =
-    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess =
-    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
-  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
+    // Toggle password visibility
+    const togglePasswordVisibility = useCallback(() => {
+      setShowPassword((prev) => !prev);
+    }, []);
 
-  useEffect(() => {
-    if (autoFocus) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-    }
-  }, [autoFocus, inputRef]);
+    const contextVerboseValidationFeedback = useFormContextPart(
+      (ctx) => ctx?.verboseValidationFeedback,
+    );
+    const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+    const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  // --- NOTE: This is a workaround for the jumping caret issue.
-  // --- Local state can sync up values that can get set asynchronously outside the component.
-  const [localValue, setLocalValue] = React.useState(value);
-  useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
-  // --- End NOTE
+    const finalVerboseValidationFeedback =
+      verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+    const finalValidationIconSuccess =
+      validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+    const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
-  // --- Initialize the related field with the input's initial value
-  // Normalize null/undefined to empty string
-  const normalizedInitialValue = initialValue ?? "";
-  useEffect(() => {
-    updateState({ value: normalizedInitialValue }, { initial: true });
-  }, [normalizedInitialValue, updateState]);
+    useEffect(() => {
+      if (autoFocus) {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 0);
+      }
+    }, [autoFocus, inputRef]);
 
-  const updateValue = useCallback(
-    (value: string) => {
+    // --- NOTE: This is a workaround for the jumping caret issue.
+    // --- Local state can sync up values that can get set asynchronously outside the component.
+    const [localValue, setLocalValue] = React.useState(value);
+    useEffect(() => {
       setLocalValue(value);
-      updateState({ value });
-      onDidChange(value);
-    },
-    [onDidChange, updateState],
-  );
+    }, [value]);
+    // --- End NOTE
 
-  // --- Handle the value change events for this input
-  const onInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      updateValue(event.target.value);
-    },
-    [updateValue],
-  );
+    // --- Initialize the related field with the input's initial value
+    // Normalize null/undefined to empty string
+    const normalizedInitialValue = initialValue ?? "";
+    useEffect(() => {
+      updateState({ value: normalizedInitialValue }, { initial: true });
+    }, [normalizedInitialValue, updateState]);
 
-  // --- Manage obtaining and losing the focus
-  const handleOnFocus = useCallback(() => {
-    onFocus?.();
-  }, [onFocus]);
+    const updateValue = useCallback(
+      (value: string) => {
+        setLocalValue(value);
+        updateState({ value });
+        onDidChange(value);
+      },
+      [onDidChange, updateState],
+    );
 
-  const handleOnBlur = useCallback(() => {
-    onBlur?.();
-  }, [onBlur]);
+    // --- Handle the value change events for this input
+    const onInputChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        updateValue(event.target.value);
+      },
+      [updateValue],
+    );
 
-  const focus = useCallback(() => {
-    inputRef.current?.focus();
-  }, []);
+    // --- Manage obtaining and losing the focus
+    const handleOnFocus = useCallback(() => {
+      onFocus?.();
+    }, [onFocus]);
 
-  // Relay focus from the outer div to the inner input without triggering browser scroll.
-  // The outer div (tabIndex=-1) acts as a focus relay target; we don't want an additional
-  // scroll side-effect here since the host already handles scroll if desired.
-  // Only relay when focus arrives from outside — if a child (e.g. the password toggle button)
-  // receives focus we must not steal it back, otherwise Tab navigation becomes trapped.
-  const relayFocus = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
-    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-      inputRef.current?.focus({ preventScroll: true });
-    }
-  }, []);
+    const handleOnBlur = useCallback(() => {
+      onBlur?.();
+    }, [onBlur]);
 
-  const setValue = useEvent((newValue) => {
-    updateValue(newValue);
-  });
+    const focus = useCallback(() => {
+      inputRef.current?.focus();
+    }, []);
 
-  useEffect(() => {
-    registerComponentApi?.({
-      focus,
-      setValue,
+    // Relay focus from the outer div to the inner input without triggering browser scroll.
+    // The outer div (tabIndex=-1) acts as a focus relay target; we don't want an additional
+    // scroll side-effect here since the host already handles scroll if desired.
+    // Only relay when focus arrives from outside — if a child (e.g. the password toggle button)
+    // receives focus we must not steal it back, otherwise Tab navigation becomes trapped.
+    const relayFocus = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+        inputRef.current?.focus({ preventScroll: true });
+      }
+    }, []);
+
+    const setValue = useEvent((newValue) => {
+      updateValue(newValue);
     });
-  }, [focus, registerComponentApi, setValue]);
 
-  const searchAriaAttributes =
-    type === "search"
-      ? {
-          "aria-controls": rest["aria-controls"],
-          "aria-autocomplete": rest["aria-autocomplete"],
-          "aria-activedescendant": rest["aria-activedescendant"],
-        }
-      : {};
-  return (
-    <div
-      {...rest}
-      ref={forwardedRef}
-      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.inputRoot, {
-        [styles.disabled]: !enabled,
-        [styles.readOnly]: readOnly,
-        [styles.error]: validationStatus === "error",
-        [styles.warning]: validationStatus === "warning",
-        [styles.valid]: validationStatus === "valid",
-      })}
-      tabIndex={-1}
-      onFocus={relayFocus}
-      style={{ ...style, gap }}
-    >
-      <Part partId={PART_START_ADORNMENT}>
-        <Adornment text={startText} iconName={startIcon} className={classnames(styles.adornment)} />
-      </Part>
-      <Part partId={PART_INPUT}>
-        <input
-          id={id}
-          ref={inputRef}
-          type={actualType}
-          aria-label={(rest as any)["aria-label"]}
-          className={classnames(styles.input, {
-            [styles.readOnly]: readOnly,
-          })}
-          disabled={!enabled}
-          value={localValue}
-          maxLength={maxLength}
-          placeholder={placeholder}
-          onChange={onInputChange}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-          onKeyDown={onKeyDown}
-          readOnly={readOnly}
-          autoFocus={autoFocus}
-          tabIndex={enabled ? tabIndex : -1}
-          required={required}
-          autoComplete="off"
-          {...searchAriaAttributes}
-        />
-      </Part>
-      {!readOnly && enabled && type == "search" && localValue?.length > 0 && (
-        <Part partId={PART_END_ADORNMENT}>
+    useEffect(() => {
+      registerComponentApi?.({
+        focus,
+        setValue,
+      });
+    }, [focus, registerComponentApi, setValue]);
+
+    const searchAriaAttributes =
+      type === "search"
+        ? {
+            "aria-controls": rest["aria-controls"],
+            "aria-autocomplete": rest["aria-autocomplete"],
+            "aria-activedescendant": rest["aria-activedescendant"],
+          }
+        : {};
+    return (
+      <div
+        {...rest}
+        ref={forwardedRef}
+        className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.inputRoot, {
+          [styles.disabled]: !enabled,
+          [styles.readOnly]: readOnly,
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        })}
+        tabIndex={-1}
+        onFocus={relayFocus}
+        style={{ ...style, gap }}
+      >
+        <Part partId={PART_START_ADORNMENT}>
           <Adornment
-            iconName="close"
-            className={styles.adornment}
-            onClick={() => updateValue("")}
+            text={startText}
+            iconName={startIcon}
+            className={classnames(styles.adornment)}
           />
         </Part>
-      )}
-      {!finalVerboseValidationFeedback && (
-        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
-          <ConciseValidationFeedback
-            validationStatus={validationStatus}
-            invalidMessages={invalidMessages}
-            successIcon={finalValidationIconSuccess}
-            errorIcon={finalValidationIconError}
+        <Part partId={PART_INPUT}>
+          <input
+            id={id}
+            ref={inputRef}
+            type={actualType}
+            aria-label={(rest as any)["aria-label"]}
+            className={classnames(styles.input, {
+              [styles.readOnly]: readOnly,
+            })}
+            disabled={!enabled}
+            value={localValue}
+            maxLength={maxLength}
+            placeholder={placeholder}
+            onChange={onInputChange}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            onKeyDown={onKeyDown}
+            readOnly={readOnly}
+            autoFocus={autoFocus}
+            autoComplete={normalizeAutoComplete(autoComplete)}
+            autoCorrect={normalizeOnOff(autoCorrect)}
+            spellCheck={spellCheck}
+            autoCapitalize={autoCapitalize}
+            tabIndex={enabled ? tabIndex : -1}
+            required={required}
+            {...searchAriaAttributes}
           />
         </Part>
-      )}
-      {type === "password" && showPasswordToggle ? (
-        <Part partId={PART_END_ADORNMENT}>
-          <Adornment
-            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
-            className={classnames(styles.adornment, styles.passwordToggle)}
-            onClick={togglePasswordVisibility}
-            tabIndex={-1}
-          />
-        </Part>
-      ) : (
-        <Part partId={PART_END_ADORNMENT}>
-          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
-        </Part>
-      )}
-    </div>
-  );
-}));
+        {!readOnly && enabled && type == "search" && localValue?.length > 0 && (
+          <Part partId={PART_END_ADORNMENT}>
+            <Adornment
+              iconName="close"
+              className={styles.adornment}
+              onClick={() => updateValue("")}
+            />
+          </Part>
+        )}
+        {!finalVerboseValidationFeedback && (
+          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+            <ConciseValidationFeedback
+              validationStatus={validationStatus}
+              invalidMessages={invalidMessages}
+              successIcon={finalValidationIconSuccess}
+              errorIcon={finalValidationIconError}
+            />
+          </Part>
+        )}
+        {type === "password" && showPasswordToggle ? (
+          <Part partId={PART_END_ADORNMENT}>
+            <Adornment
+              iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
+              className={classnames(styles.adornment, styles.passwordToggle)}
+              onClick={togglePasswordVisibility}
+              tabIndex={-1}
+            />
+          </Part>
+        ) : (
+          <Part partId={PART_END_ADORNMENT}>
+            <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+          </Part>
+        )}
+      </div>
+    );
+  }),
+);
