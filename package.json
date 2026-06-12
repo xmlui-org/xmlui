@@ -38,6 +38,7 @@
     "build-extensions": "turbo run build:extension",
     "build-docs": "turbo run build:docs",
     "build-playground": "turbo run build:playground",
+    "fix:metadata-drift": "npm --prefix xmlui run build:xmlui-metadata && npm --prefix xmlui run gen:langserver-metadata",
     "generate-docs": "turbo run generate-docs",
     "test-integration": "node integration-tests/test-app/scripts/test-integration.mjs"
   }

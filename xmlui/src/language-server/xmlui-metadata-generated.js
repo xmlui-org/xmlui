@@ -19055,7 +19055,8 @@ export default {
           "sentences",
           "words",
           "characters"
-        ]
+        ],
+        "isStrictEnum": true
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
@@ -19343,7 +19344,8 @@ export default {
           "sentences",
           "words",
           "characters"
-        ]
+        ],
+        "isStrictEnum": true
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
@@ -19941,7 +19943,8 @@ export default {
           "sentences",
           "words",
           "characters"
-        ]
+        ],
+        "isStrictEnum": true
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
