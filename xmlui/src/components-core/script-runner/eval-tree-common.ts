@@ -669,6 +669,7 @@ export function evalPreOrPostCore(
 export function evalArrow(
   thisStack: any[],
   expr: ArrowExpression,
+  evalContext: BindingTreeEvaluationContext,
   thread: LogicalThread,
 ): ArrowExpression {
   // --- Check if this is an async arrow function
@@ -681,6 +682,11 @@ export function evalArrow(
     _ARROW_EXPR_: true,
     closureContext: obtainClosures(thread),
   } as ArrowExpression;
+  Object.defineProperty(lazyArrow, "closureEvalContext", {
+    value: evalContext,
+    enumerable: false,
+    configurable: true,
+  });
   setExprValue(expr, { value: lazyArrow }, thread);
   thisStack.push(lazyArrow);
   return lazyArrow;
@@ -805,6 +811,57 @@ export function notifyStateUpdate(
   if (hook) {
     void hook(rootScope, rootScope.name, kind);
   }
+}
+
+export function createClosureEvalContext(
+  callerEvalContext: BindingTreeEvaluationContext,
+  closureEvalContext?: BindingTreeEvaluationContext,
+): BindingTreeEvaluationContext {
+  if (!closureEvalContext) return callerEvalContext;
+  return {
+    ...callerEvalContext,
+    localContext: createLayeredScope(
+      callerEvalContext.localContext,
+      closureEvalContext.localContext,
+    ),
+    appContext: createLayeredScope(
+      callerEvalContext.appContext,
+      closureEvalContext.appContext,
+    ),
+  };
+}
+
+function createLayeredScope<T>(callerScope: T, closureScope: T): T {
+  if (!callerScope || !closureScope || callerScope === closureScope) {
+    return callerScope ?? closureScope;
+  }
+
+  return new Proxy(callerScope as any, {
+    has(target, prop) {
+      return prop in target || prop in (closureScope as any);
+    },
+    get(target, prop, receiver) {
+      return prop in target
+        ? Reflect.get(target, prop, receiver)
+        : Reflect.get(closureScope as any, prop);
+    },
+    set(target, prop, value, receiver) {
+      return prop in target || !(prop in (closureScope as any))
+        ? Reflect.set(target, prop, value, receiver)
+        : Reflect.set(closureScope as any, prop, value);
+    },
+    ownKeys(target) {
+      return Array.from(
+        new Set([...Reflect.ownKeys(closureScope as any), ...Reflect.ownKeys(target)]),
+      );
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      return (
+        Reflect.getOwnPropertyDescriptor(target, prop) ??
+        Reflect.getOwnPropertyDescriptor(closureScope as any, prop)
+      );
+    },
+  }) as T;
 }
 
 export function createArrowWorkingThread(

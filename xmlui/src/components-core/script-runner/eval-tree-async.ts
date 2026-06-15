@@ -51,6 +51,7 @@ import {
   completeExprValue,
   completePromise,
   createArrowArgDeclaration,
+  createClosureEvalContext,
   createArrowWorkingThread,
   evalArrow,
   evalAssignmentCore,
@@ -216,7 +217,7 @@ async function evalBindingExpressionTreeAsync(
         return await evalFunctionInvocationAsync(evaluator, thisStack, expr, evalContext, thread);
 
       case T_ARROW_EXPRESSION:
-        return evalArrow(thisStack, expr, thread);
+        return evalArrow(thisStack, expr, evalContext, thread);
 
       case T_SPREAD_EXPRESSION:
         throw new Error("Cannot use spread expression (...) with the current intermediate value.");
@@ -680,7 +681,11 @@ function createArrowFunctionAsync(
   // --- Use this function, it evaluates the arrow function
   return async (...args: any[]) => {
     // --- Prepare the variables to pass
-    const runTimeEvalContext = args[1] as BindingTreeEvaluationContext;
+    const callerEvalContext = args[1] as BindingTreeEvaluationContext;
+    const closureEvalContext = (expr as any).closureEvalContext as
+      | BindingTreeEvaluationContext
+      | undefined;
+    const runTimeEvalContext = createClosureEvalContext(callerEvalContext, closureEvalContext);
     const runtimeThread = args[2] as LogicalThread;
 
     // --- Create the thread that runs the arrow function
@@ -703,7 +708,7 @@ function createArrowFunctionAsync(
         let argVals: any[] = [];
         for (const arg of restArgs) {
           if (arg?._EXPRESSION_) {
-            argVals.push(await evaluator([], arg, runTimeEvalContext, runtimeThread));
+            argVals.push(await evaluator([], arg, callerEvalContext, runtimeThread));
           } else {
             argVals.push(arg);
           }
@@ -721,7 +726,7 @@ function createArrowFunctionAsync(
         // --- Get the actual value to work with
         let argVal = args[i + 3];
         if (argVal?._EXPRESSION_) {
-          argVal = await evaluator([], argVal, runTimeEvalContext, runtimeThread);
+          argVal = await evaluator([], argVal, callerEvalContext, runtimeThread);
         }
         await processDeclarationsAsync(
           arrowBlock,
