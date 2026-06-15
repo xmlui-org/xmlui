@@ -48,6 +48,7 @@ import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContex
 import { isBannedFunction } from "./bannedFunctions";
 import {
   createArrowArgDeclaration,
+  createClosureEvalContext,
   createArrowWorkingThread,
   evalArrow,
   evalAssignmentCore,
@@ -233,7 +234,7 @@ function evalBindingExpressionTree(
 
     case T_ARROW_EXPRESSION:
       // --- Special sync handling
-      return evalArrow(thisStack, expr, thread);
+      return evalArrow(thisStack, expr, evalContext, thread);
 
     case T_SPREAD_EXPRESSION:
       throw new Error("Cannot use spread expression (...) with the current intermediate value.");
@@ -674,7 +675,11 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
   // --- Use this function, it evaluates the arrow function
   return (...args: any[]) => {
     // --- Prepare the variables to pass
-    const runTimeEvalContext = args[1] as BindingTreeEvaluationContext;
+    const callerEvalContext = args[1] as BindingTreeEvaluationContext;
+    const closureEvalContext = (expr as any).closureEvalContext as
+      | BindingTreeEvaluationContext
+      | undefined;
+    const runTimeEvalContext = createClosureEvalContext(callerEvalContext, closureEvalContext);
     const runtimeThread = args[2] as LogicalThread;
 
     // --- Create the thread that runs the arrow function
@@ -697,7 +702,7 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
         let argVals: any[] = [];
         for (const arg of restArgs) {
           if (arg?._EXPRESSION_) {
-            argVals.push(evaluator([], arg, runTimeEvalContext, runtimeThread));
+            argVals.push(evaluator([], arg, callerEvalContext, runtimeThread));
           } else {
             argVals.push(arg);
           }
@@ -715,7 +720,7 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
         // --- Get the actual value to work with
         let argVal = args[i + 3];
         if (argVal?._EXPRESSION_) {
-          argVal = evaluator([], argVal, runTimeEvalContext, runtimeThread);
+          argVal = evaluator([], argVal, callerEvalContext, runtimeThread);
         }
         processDeclarations(
           arrowBlock,

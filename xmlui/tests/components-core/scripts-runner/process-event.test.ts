@@ -55,4 +55,61 @@ describe("Process statements (exp)", () => {
     // --- Assert
     expect(evalContext.mainThread!.blocks![0].returnValue).equal(undefined);
   });
+
+  it("registered event callback assigns parenthesized logical-or RHS to outer var", async () => {
+    // --- Arrange
+    let callback: ((event: any) => Promise<void>) | undefined;
+    const source = `
+      subscribe((e) => {
+        activeTool = (e && e.payload && e.payload.description) || null;
+      });
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        subscribe: (handler: (event: any) => Promise<void>) => {
+          callback = handler;
+        },
+      },
+    });
+    evalContext.mainThread!.blocks![0].vars.activeTool = null;
+    const statements = parseStatements(source);
+
+    // --- Act
+    await processStatementQueueAsync(statements, evalContext);
+    expect(callback).toBeTypeOf("function");
+    await callback!({ payload: { description: "hammer" } });
+
+    // --- Assert
+    expect(evalContext.mainThread!.blocks![0].vars.activeTool).toEqual("hammer");
+  });
+
+  it("stored script callback assigns parenthesized logical-or RHS to defining context var", async () => {
+    // --- Arrange
+    const source = `
+      let __tauriEventCallbacks = {};
+      function subscribeTauriEvent(unsubKey, eventName, callback) {
+        __tauriEventCallbacks[eventName] = callback;
+      }
+      function fireTauriEvent(eventName, payload) {
+        __tauriEventCallbacks[eventName]({ payload: payload });
+      }
+
+      subscribeTauriEvent('__bramActiveToolUnsub', 'active-tool-changed', (e) => {
+        activeTool = (e && e.payload && e.payload.description) || null;
+      });
+      fireTauriEvent('active-tool-changed', { description: 'hammer' });
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        activeTool: null,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    await processStatementQueueAsync(statements, evalContext);
+
+    // --- Assert
+    expect(evalContext.localContext!.activeTool).toEqual("hammer");
+  });
 });
