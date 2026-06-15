@@ -44,6 +44,10 @@ function expectNoDiagnostic(root: ComponentDef, code: string) {
   expect(results.filter((d) => d.code === code)).toHaveLength(0);
 }
 
+function diagnosticNames(diags: ReturnType<typeof runWithAst>): unknown[] {
+  return diags.map((d) => (d.data as { name?: unknown } | undefined)?.name);
+}
+
 // ---------------------------------------------------------------------------
 // expr-unbound-identifier
 // ---------------------------------------------------------------------------
@@ -156,6 +160,49 @@ describe("rule: expr-unbound-identifier", () => {
       </Component>
     `);
     expect(results.filter((d) => d.code === "expr-unbound-identifier")).toHaveLength(0);
+  });
+
+  it("flags an unresolved identifier inside a nested arrow handler body", () => {
+    const root: ComponentDef = {
+      type: "App",
+      vars: { activeTool: "{null}" },
+      children: [
+        {
+          type: "Button",
+          events: {
+            onClick:
+              "const subscribe = (handler) => handler({ payload: { description: 'saw', id: 1 } }); subscribe((e) => { activeTool = e.payload.description; missingTarget.value = e.payload.id; })",
+          },
+        },
+      ],
+    };
+
+    const results = runWithAst(root);
+    const diags = results.filter((d) => d.code === "expr-unbound-identifier");
+    const names = diagnosticNames(diags);
+
+    expect(names).toContain("missingTarget");
+    expect(names).not.toContain("e");
+    expect(names).not.toContain("handler");
+  });
+
+  it("does not let arrow parameters resolve outside the arrow body", () => {
+    const root: ComponentDef = {
+      type: "App",
+      children: [
+        {
+          type: "Button",
+          events: {
+            onClick: "[1].map(item => item + 1); item + 2",
+          },
+        },
+      ],
+    };
+
+    const results = runWithAst(root);
+    const diags = results.filter((d) => d.code === "expr-unbound-identifier");
+
+    expect(diagnosticNames(diags)).toContain("item");
   });
 
   it("does not flag a $-prefixed context variable", () => {

@@ -53,7 +53,7 @@ Fires once when the component is unmounted, and on each `keyValue`
 change before the new `mount`. The handler **must be synchronous** —
 React commits the unmount synchronously, so awaited work after this
 point may write to a torn-down container. For the asynchronous flush
-case use the upcoming container `onBeforeDispose` hook.
+case use a container's `onBeforeDispose` hook.
 
 Throws are caught and routed to `onError` (when declared) with
 `source: "unmount"`.

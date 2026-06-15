@@ -18,6 +18,46 @@ An attribute may also be a JavaScript expression — enclosed in curly braces `{
 <Text value="Life, the universe, and everything: { 6 * 7 }" />
 ```
 
+XML comments are ignored before expression parsing. Curly braces inside comments are treated as comment text, so expressions such as `{count}` in `<!-- ... -->` are not evaluated and do not affect the markup that follows.
+
+```xmlui copy name="Comments are ignored"
+<!-- This comment mentions {count}, but XMLUI does not evaluate it. -->
+<Text value="Count: {count}" />
+```
+
+### Quotes inside attributes
+
+XMLUI markup follows XML quoting rules before it parses JavaScript expressions or event handlers. If an attribute is wrapped in double quotes, an unescaped double quote inside the value closes the attribute, even when that quote appears in JavaScript code or a JavaScript comment.
+
+This is invalid markup:
+
+```xml
+<Button onClick="() => {
+  // "quoted text" closes the onClick attribute early
+  count++;
+}" />
+```
+
+Prefer single quotes inside a double-quoted attribute:
+
+```xmlui copy
+<Button onClick="() => {
+  // 'quoted text' is safe here
+  count++;
+}" />
+```
+
+Or wrap the attribute in single quotes when the handler needs double-quoted strings:
+
+```xmlui copy
+<Button onClick='() => {
+  const label = "Save";
+  count++;
+}' />
+```
+
+You can also escape literal double quotes as `&quot;`, but the two patterns above are usually easier to read.
+
 An expression can hold a JSON list.
 
 ```xmlui-pg copy name="A JSON list" display /['Bakerloo', 'Central', 'Circle']/

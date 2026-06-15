@@ -66,7 +66,7 @@ interface XsLogEntry {
 | `"api:error"` | DataLoader, APICall | Fetch failed |
 | `"handler:start"` | handler-logging | Event handler begins |
 | `"handler:complete"` | handler-logging | Handler finished (with duration) |
-| `"handler:error"` | handler-logging | Handler threw |
+| `"handler:error"` | handler-logging | Handler threw; payload includes component/event context, `handlerCode`, and optional `diagnosticCode` / `diagnosticHint` |
 | `"state:changes"` | handler-logging, AppContent | Container state diff |
 | `"error:boundary"` | ErrorBoundary | React render error caught |
 | `"toast"` | AppContent | Toast notification shown |
@@ -82,6 +82,7 @@ interface XsLogEntry {
 | `"app:randomBytes"` | `App.randomBytes` global | Entropy use via the gated `crypto.getRandomValues` wrapper |
 | `"app:mark"` / `"app:measure"` | `App.mark` / `App.measure` globals | User performance marks/measures |
 | `"clipboard:copy"` | `Clipboard.copy` global | Clipboard write via sanctioned wrapper |
+| `"storage"` | local-storage-functions | Managed localStorage operation degraded; payload includes `code`, `operation`, `key`, and `error` |
 | `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | `<WebSocket>` component | Managed WebSocket lifecycle |
 | `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | `<EventSource>` component | Managed SSE lifecycle |
 | `"reactive-cycle"` | reactive graph analyzer | Static/runtime reactive dependency cycle; payload includes cycle hash, severity, and formatted nodes |
@@ -165,6 +166,22 @@ try {
 }
 logger.logStateChanges({ traceId, before, after });
 ```
+
+Handler failures are isolated to the current invocation. A failed handler logs
+the error, signs the error unless suppressed by the caller, releases its trace
+and coordinator state in `finally`, and must not block later handlers or sibling
+host callbacks.
+
+When a handler fails, XMLUI always writes a contextual console error. With
+`xsVerbose: true`, it also records a `"handler:error"` entry in `window._xsLogs`
+with these observability fields:
+
+| Field | Meaning |
+|-------|---------|
+| `componentType` / `componentLabel` / `eventName` | Component and event that ran |
+| `handlerCode` | Source snippet for the handler when available |
+| `diagnosticCode` | Stable machine-readable category, such as `handler-assignment-target`, `handler-await-syntax`, or `handler-unresolved-identifier` |
+| `diagnosticHint` | Human-readable recovery hint for the category |
 
 ### State Logging (`state-logging.ts`)
 

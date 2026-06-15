@@ -684,6 +684,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           error: e,
           ownerFileId: options?.sourceFileId ?? handlerFileId,
           ownerSource: options?.sourceRange ?? handlerSourceRange,
+          handlerCode,
           traceId: handlerTraceId,
         });
 

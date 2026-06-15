@@ -17,6 +17,22 @@ Prevent the `DataSource` from executing until the specified condition in the `wh
   when="{selectedUserId}" />
 ```
 
+On a `DataSource`, `when` controls whether the request runs. On visual components, `when` controls whether the component subtree is rendered. Both are reactive, but they affect different things.
+
+When one `DataSource` depends on another, guard the dependent request with explicit state from the first source:
+
+```xmlui
+<DataSource id="user" url="/api/users/me" />
+
+<DataSource
+  id="orders"
+  url="/api/orders/{user.value.id}"
+  when="{user.loaded && user.value.id}"
+/>
+```
+
+For simple one-off visibility checks, read the fetched payload directly in `when`. For reused or business-specific decisions, store a named boolean in `onLoaded` and bind UI visibility to that boolean.
+
 
 ## Structural Sharing
 
@@ -34,6 +50,40 @@ When reading a `DataSource` in code, distinguish the reactive wrapper from the f
 - `userData.value` — the raw payload returned by the request.
 
 Logging or rendering `userData` shows the wrapper's metadata; `userData.value` shows the data itself. This is a common gotcha when debugging — `console.log(userData)` displays the wrapper, while `console.log(userData.value)` displays what came back from the server.
+
+The wrapper's status properties and `value` are reactive reads. Before the first successful load, `userData.value` is usually `undefined`. XMLUI member access is optional by default, so `userData.value.profile.name` evaluates to `undefined` if an intermediate segment is missing. Use `userData.loaded` to model the fetch lifecycle, not to prevent a JavaScript-style null-reference error:
+
+```xmlui
+<Text when="{userData.loaded}">
+  {userData.value.name}
+</Text>
+```
+
+Deep paths can be used directly in `when`; missing segments simply make the expression falsy:
+
+```xmlui
+<Card when="{userData.loaded && userData.value.billing.address}">
+  ...
+</Card>
+```
+
+Structural sharing may preserve references for unchanged parts of the payload during refetches. If a visibility decision is reused or has business meaning, store that decision as its own `var` in `onLoaded` instead of repeating a long payload path in multiple `when` expressions:
+
+```xmlui
+<App var.showBillingPanel="{false}">
+  <DataSource
+    id="userData"
+    url="/api/users/me"
+    onLoaded="data => showBillingPanel = !!data.billing.address"
+  />
+
+  <Card when="{showBillingPanel}">
+    ...
+  </Card>
+</App>
+```
+
+Use this pattern to name the decision, not to make deep member access safe; XMLUI's `.` member access is already optional by default.
 
 %-DESC-END
 

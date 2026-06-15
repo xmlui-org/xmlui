@@ -12,6 +12,67 @@ Values in attributes are either literal strings or JavaScript expressions in `{ 
 <Text value="Count: {count}" />                   <!-- interpolated -->
 ```
 
+XML comments are inert. Text inside `<!-- ... -->`, including `{expression}`-looking content, is ignored before expression parsing and must not affect following markup:
+
+```xml
+<!-- This comment mentions {count}; it is not parsed or evaluated. -->
+<Text value="Count: {count}" />
+```
+
+XMLUI markup follows XML quoting rules before JavaScript expressions or event handlers are parsed. An unescaped quote that matches the surrounding attribute quote closes the attribute, even inside JavaScript code or comments:
+
+```xml
+<!-- Invalid: the quote before quoted closes onClick early -->
+<Button onClick="() => {
+  // "quoted text"
+  count++;
+}" />
+```
+
+Preferred fixes:
+
+```xml
+<!-- Use single quotes inside a double-quoted attribute -->
+<Button onClick="() => {
+  // 'quoted text'
+  count++;
+}" />
+
+<!-- Or wrap the XML attribute in single quotes when the handler needs double quotes -->
+<Button onClick='() => {
+  const label = "Save";
+  count++;
+}' />
+```
+
+`&quot;` is also valid for literal double quotes, but prefer matching the quote style to keep handlers readable.
+
+Arrow callback parameters are local to that callback body. Other identifiers in the body must resolve through XMLUI scope: declared `var`/`global`, component `id`, local `let`/`const`/function declarations, framework globals, or host globals intentionally exposed to the expression environment.
+
+```xml
+<App var.activeTool="{null}">
+  <Button
+    onClick="
+      subscribeHostEvent('menu', (event) => {
+        activeTool = event.payload.description;
+      })
+    "
+  />
+</App>
+```
+
+`event` is visible only inside the arrow body. `activeTool` is valid because it is declared on the `<App>`. A handler can assign to a name only when that name already exists in XMLUI scope:
+
+```xml
+<!-- Invalid: missingTarget was never declared -->
+<Button onClick="(event) => { missingTarget.value = event.payload.id }" />
+
+<!-- Valid: missingTarget is declared before the handler uses it -->
+<App var.missingTarget="{{ value: null }}">
+  <Button onClick="(event) => { missingTarget.value = event.payload.id }" />
+</App>
+```
+
 JSON lists and object literals need an outer `{ }` for the expression and an inner `{ }` for the object:
 
 ```xml

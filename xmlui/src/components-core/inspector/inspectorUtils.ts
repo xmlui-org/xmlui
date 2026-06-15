@@ -50,7 +50,7 @@ export function safeStringify(value: any): string {
         if (typeof val === "function") return "[Function]";
         if (typeof window !== "undefined") {
           if (val === window) return "[Window]";
-          if (val === document) return "[Document]";
+          if (typeof document !== "undefined" && val === document) return "[Document]";
         }
         if (val && typeof Node !== "undefined" && val instanceof Node) {
           return "[DOM Node]";

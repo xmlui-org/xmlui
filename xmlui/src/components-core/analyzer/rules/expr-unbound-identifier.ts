@@ -32,7 +32,7 @@ import {
   collectDeclaredNames,
   collectDeclaredNamesFromNode,
   collectDeclaredNamesFromSource,
-  collectIdentifierRefs,
+  collectIdentifierRefsWithLexicalScopes,
   collectUidMap,
   iterComponentExpressions,
   type ComponentExpression,
@@ -78,9 +78,9 @@ registerRule({
         if (ce.kind === "var") bodyLocals.add(ce.name);
 
         const refs = ce.expr
-          ? collectIdentifierRefs(ce.expr)
+          ? collectIdentifierRefsWithLexicalScopes(ce.expr)
           : ce.statements
-            ? ce.statements.flatMap((s) => collectIdentifierRefs(s as any))
+            ? collectIdentifierRefsWithLexicalScopes(ce.statements)
             : [];
 
         for (const ref of refs) {
@@ -88,7 +88,6 @@ registerRule({
           if (!name) continue;
           if (isReservedRoot(name)) continue;
           if (inScopeVars.has(name)) continue;
-          if (bodyLocals.has(name)) continue;
           if (uidMap.has(name)) continue;
 
           const key = `${name}@${ce.kind}:${ce.name}`;

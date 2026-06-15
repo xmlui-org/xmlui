@@ -422,18 +422,18 @@ function renderHeading({
   registerComponentApi,
   layoutContext,
 }: RenderHeadingProps) {
-  const {
-    maxLines,
-    preserveLinebreaks,
-    ellipses,
-    showAnchor,
-    anchorTemplate,
-    withLiveRegion,
-    liveRegionMessage,
-    liveRegionPoliteness,
-    ...restProps
-  } = node.props;
+  const { maxLines, preserveLinebreaks, ellipses, anchorTemplate } = node.props;
+  const restProps = { ...node.props } as Record<string, any>;
   delete restProps.level; // Remove level from restProps as it is handled separately
+  delete restProps.maxLines;
+  delete restProps.preserveLinebreaks;
+  delete restProps.ellipses;
+  delete restProps.showAnchor;
+  delete restProps.anchorTemplate;
+  delete restProps.omitFromToc;
+  delete restProps.withLiveRegion;
+  delete restProps.liveRegionMessage;
+  delete restProps.liveRegionPoliteness;
   const showAnchorValue = extractValue.asOptionalBoolean(node.props?.showAnchor);
 
   // Extract and normalize the level value

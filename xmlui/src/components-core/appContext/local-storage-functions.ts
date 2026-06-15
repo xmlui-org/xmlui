@@ -1,4 +1,5 @@
 import { get as lodashGet, set as lodashSet, unset as lodashUnset } from "lodash-es";
+import { pushXsLog } from "../inspector/inspectorUtils";
 
 // Module-level callback invoked after any mutating localStorage operation.
 // Only one listener at a time — AppContent registers (and cleans up) this during its lifecycle.
@@ -48,11 +49,21 @@ function splitStorageKey(key: string): [rootKey: string, subPath: string | undef
 
 /** Read and parse the raw localStorage entry, returning `undefined` on any error. */
 function safeRead(rootKey: string): any {
+  let raw: string | null;
   try {
-    const raw = localStorage.getItem(rootKey);
-    if (raw === null) return undefined;
+    raw = localStorage.getItem(rootKey);
+  } catch (error) {
+    logLocalStorageFailure("read", rootKey, error);
+    return undefined;
+  }
+
+  if (raw === null) return undefined;
+
+  try {
     return JSON.parse(raw);
   } catch {
+    // Invalid JSON is an expected fallback path: reads return the caller's fallback,
+    // and getAllLocalStorage falls back to the raw string.
     return undefined;
   }
 }
@@ -65,7 +76,8 @@ function safeWrite(rootKey: string, value: any): void {
     } else {
       localStorage.setItem(rootKey, JSON.stringify(value));
     }
-  } catch {
+  } catch (error) {
+    logLocalStorageFailure(value === undefined ? "delete" : "write", rootKey, error);
     // QuotaExceededError, SecurityError (private browsing) → degrade gracefully
   }
 }
@@ -151,7 +163,8 @@ export function deleteLocalStorage(key: string): void {
     if (!subPath) {
       try {
         localStorage.removeItem(rootKey);
-      } catch {
+      } catch (error) {
+        logLocalStorageFailure("delete", rootKey, error);
         // SecurityError → degrade gracefully
       }
     } else {
@@ -194,12 +207,14 @@ export function clearLocalStorage(prefix?: string): void {
       keysToRemove.forEach((k) => {
         try {
           localStorage.removeItem(k);
-        } catch {
+        } catch (error) {
+          logLocalStorageFailure("delete", k, error);
           // SecurityError → degrade gracefully
         }
       });
     }
-  } catch {
+  } catch (error) {
+    logLocalStorageFailure("clear", prefix, error);
     // Degrade gracefully
   }
   notifyStorageChange();
@@ -253,6 +268,37 @@ export function getAllLocalStorage(): Record<string, any> {
   } catch {
     return {};
   }
+}
+
+type LocalStorageOperation = "read" | "write" | "delete" | "clear";
+
+function logLocalStorageFailure(
+  operation: LocalStorageOperation,
+  key: string | undefined,
+  error: unknown,
+): void {
+  const message =
+    error && typeof error === "object" && "message" in error
+      ? String((error as { message: unknown }).message)
+      : String(error);
+  const errorName =
+    error && typeof error === "object" && "name" in error
+      ? String((error as { name: unknown }).name)
+      : undefined;
+
+  pushXsLog({
+    kind: "storage",
+    ts: Date.now(),
+    code: "storage-operation-failed",
+    severity: "warn",
+    operation,
+    key,
+    message: `localStorage ${operation} failed${key ? ` for "${key}"` : ""}.`,
+    error: {
+      message,
+      name: errorName,
+    },
+  } as any);
 }
 
 export const localStorageFunctions = {

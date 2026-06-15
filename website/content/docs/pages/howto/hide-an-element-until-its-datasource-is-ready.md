@@ -51,5 +51,6 @@ When a DataSource fetches from a slow endpoint, hide result content until data a
 ## See also
 
 - [Delay a DataSource until another is ready](/docs/howto/delay-a-datasource-until-another-datasource-is-ready) — chain dependent fetches using `when`
+- [Use fetched data safely in `when`](/docs/howto/use-fetched-data-safely-in-when) — derive clear visibility conditions from fetched payloads
 - [Transform nested API responses](/docs/howto/filter-and-transform-data-from-an-api) — reshape data after it loads
 - [Poll an API at regular intervals](/docs/howto/poll-an-api-at-regular-intervals) — keep data fresh with periodic refetches

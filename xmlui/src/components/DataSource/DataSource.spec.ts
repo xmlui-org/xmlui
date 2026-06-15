@@ -513,6 +513,118 @@ test.describe("mockData property", () => {
     await page.getByTestId("btn").click();
     await expect(page.getByTestId("output")).toHaveText("second");
   });
+
+  test("when can react to DataSource loaded status", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="profile" mockData="{{ name: 'Ada' }}" />
+        <Text testId="loading" when="{!profile.loaded}">Loading</Text>
+        <Text testId="ready" when="{profile.loaded}">{profile.value.name}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("ready")).toHaveText("Ada");
+    await expect(page.getByTestId("loading")).not.toBeVisible();
+  });
+
+  test("when can guard a deep DataSource value path after load", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="profile"
+          url="/api/profile"
+        />
+        <Text
+          testId="city"
+          when="{profile.loaded && profile.value.billing.address.city}"
+        >
+          {profile.value.billing.address.city}
+        </Text>
+      </Fragment>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: { address: { city: "London" } } };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("city")).toHaveText("London");
+  });
+
+  test("when treats a missing deep DataSource value path as falsy after load", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="profile"
+          url="/api/profile"
+        />
+        <Text
+          testId="city"
+          when="{profile.loaded && profile.value.billing.address.city}"
+        >
+          City exists
+        </Text>
+        <Text testId="done" when="{profile.loaded}">Loaded</Text>
+      </Fragment>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: {} };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("done")).toHaveText("Loaded");
+    await expect(page.getByTestId("city")).not.toBeVisible();
+  });
+
+  test("onLoaded can store a named visibility decision", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App var.showBillingPanel="{false}">
+        <DataSource
+          id="profile"
+          url="/api/profile"
+          onLoaded="data => showBillingPanel = !!data.billing.address"
+        />
+        <Text testId="billing" when="{showBillingPanel}">
+          Billing address is available.
+        </Text>
+      </App>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: { address: { city: "London" } } };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("billing")).toHaveText("Billing address is available.");
+  });
 });
 
 // =============================================================================
