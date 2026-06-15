@@ -56,3 +56,4 @@ With `when="{user.value.id}"`, the orders request starts only after the first `D
 ## See also
 
 - [Delay a DataSource until another is ready](/docs/howto/delay-a-datasource-until-another-datasource-is-ready)
+- [Use fetched data safely in `when`](/docs/howto/use-fetched-data-safely-in-when)

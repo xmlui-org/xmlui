@@ -48,37 +48,51 @@ Set `when` to `false` to prevent rendering of a component.
 <Spinner when="{isLoading}">Loading...</Spinner>
 ```
 
-## onInit and onCleanup
+## Lifecycle: onMount and onUnmount
 
-The `onInit` event fires when a component is first rendered. The paired `onCleanup` event fires when the component is removed. These events work on any component.
+The `onMount` event fires when a component enters the displayed XMLUI tree. The paired `onUnmount` event fires when the component leaves it. These events work on any component.
+
+The older `onInit` and `onCleanup` names still work as compatibility aliases for `onMount` and `onUnmount`. Prefer the canonical names in new code.
 
 ```xmlui
 <App var.loaded="{false}">
-  <Button onInit="loaded = true" label="I'm loaded" />
-  <Text when="{loaded}">Button has initialized</Text>
+  <Button onMount="loaded = true" label="I'm loaded" />
+  <Text when="{loaded}">Button has mounted</Text>
 </App>
 ```
 
-`onInit` and `onCleanup` also respond to `when` transitions. When `when` changes from `false` to `true`, `onInit` fires. When `when` changes from `true` to `false`, `onCleanup` fires.
+Lifecycle events also respond to `when` transitions. When `when` changes from `false` to `true`, `onMount` fires. When `when` changes from `true` to `false`, `onUnmount` fires.
 
 ```xmlui
 <App var.showPanel="{false}">
   <Button label="Toggle" onClick="showPanel = !showPanel" />
   <Stack
     when="{showPanel}"
-    onInit="console.log('Panel appeared')"
-    onCleanup="console.log('Panel hidden')"
+    onMount="console.log('Panel appeared')"
+    onUnmount="console.log('Panel hidden')"
   >
     <Text>Panel content</Text>
   </Stack>
 </App>
 ```
 
-A component with `onInit` and `when="{false}"` still renders once so the init handler can run. This lets `onInit` change the condition that controls rendering:
+Lifecycle handlers run once per visibility cycle, not once for the lifetime of the markup node:
+
+| Situation | Lifecycle behavior |
+| --- | --- |
+| `when` is omitted or initially truthy | `onMount` fires once after the component mounts |
+| `when` is initially falsy | No lifecycle handler fires yet |
+| `when` changes from falsy to truthy | `onMount` fires |
+| `when` changes from truthy to falsy | `onUnmount` fires |
+| A visible parent unmounts, such as during navigation | `onUnmount` fires once |
+| The component re-renders while remaining visible | Lifecycle handlers do not fire again |
+
+One subtle implementation detail: when a component has `onMount` or legacy `onInit` and its `when` value is false, XMLUI may keep a lightweight internal lifecycle wrapper alive so it can detect a later `false` -> `true` transition. The component itself is not rendered, its children are not rendered, and `onMount` does not fire until the effective `when` value becomes true.
 
 ```xmlui
 <App var.ready="{false}">
-  <Text when="{ready}" onInit="ready = true">Now visible</Text>
+  <!-- This handler does not run while ready is false. -->
+  <Text when="{ready}" onMount="console.log('Now visible')">Now visible</Text>
 </App>
 ```
 

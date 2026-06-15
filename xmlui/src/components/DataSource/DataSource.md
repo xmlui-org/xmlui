@@ -17,6 +17,22 @@ Prevent the `DataSource` from executing until the specified condition in the `wh
   when="{selectedUserId}" />
 ```
 
+On a `DataSource`, `when` controls whether the request runs. On visual components, `when` controls whether the component subtree is rendered. Both are reactive, but they affect different things.
+
+When one `DataSource` depends on another, guard the dependent request with explicit state from the first source:
+
+```xmlui
+<DataSource id="user" url="/api/users/me" />
+
+<DataSource
+  id="orders"
+  url="/api/orders/{user.value.id}"
+  when="{user.loaded && user.value.id}"
+/>
+```
+
+For complex conditions inside a fetched payload, compute a simple boolean in `onLoaded` and bind UI visibility to that boolean. This keeps the fetch lifecycle separate from the rendering rule.
+
 
 ## Structural Sharing
 
@@ -34,6 +50,16 @@ When reading a `DataSource` in code, distinguish the reactive wrapper from the f
 - `userData.value` — the raw payload returned by the request.
 
 Logging or rendering `userData` shows the wrapper's metadata; `userData.value` shows the data itself. This is a common gotcha when debugging — `console.log(userData)` displays the wrapper, while `console.log(userData.value)` displays what came back from the server.
+
+The wrapper's status properties and `value` are reactive reads. Before the first successful load, `userData.value` is usually `undefined`, so guard payload reads with `userData.loaded`, optional member access, or a derived boolean:
+
+```xmlui
+<Text when="{userData.loaded}">
+  {userData.value.name}
+</Text>
+```
+
+Structural sharing may preserve references for unchanged parts of the payload during refetches. If a visibility decision depends on a business rule inside the payload, store that rule as its own `var` in `onLoaded` instead of repeating a long payload path in multiple `when` expressions.
 
 %-DESC-END
 

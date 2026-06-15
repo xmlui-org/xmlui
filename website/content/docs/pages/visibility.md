@@ -4,9 +4,9 @@ Every XMLUI component supports a `when` attribute that controls whether the comp
 
 ## The `when` attribute
 
-`when` is not a visibility toggle — it controls whether XMLUI **processes the component at all**. When `when` evaluates to a falsy value, the component and every one of its nested children are skipped entirely: no rendering happens, no nodes are created, and no component lifecycle runs. The component simply does not exist on the page until `when` becomes truthy again.
+`when` is not a visibility toggle — it controls whether XMLUI **processes the component at all**. When `when` evaluates to a falsy value, the component and every one of its nested children are skipped: no component output is rendered, no child nodes are created, and no visible lifecycle runs. The component simply does not exist on the page until `when` becomes truthy again.
 
-This is distinct from merely hiding a component. A hidden-but-rendered component still occupies memory, its event handlers are still active, and it can still affect the layout of the surrounding elements. A component with `when="false"` has none of that overhead — XMLUI never touches it.
+This is distinct from merely hiding a component. A hidden-but-rendered component still occupies memory, its event handlers are still active, and it can still affect the layout of the surrounding elements. A component with `when="false"` has none of that rendered subtree overhead.
 
 Set `when` to `false` (or any expression that evaluates falsy) to opt out of rendering:
 
@@ -23,22 +23,54 @@ When `when` is omitted or evaluates to `true`, the component renders normally.
 
 ### `when` and lifecycle events
 
-`onInit` and `onCleanup` respond to `when` transitions. When `when` switches from `false` to `true`, `onInit` fires. When `when` switches from `true` to `false`, `onCleanup` fires. This lets you perform setup and teardown logic tied to a component's visibility.
+`onMount` and `onUnmount` respond to `when` transitions. When `when` switches from `false` to `true`, `onMount` fires. When `when` switches from `true` to `false`, `onUnmount` fires. This lets you perform setup and teardown logic tied to a component's visibility.
+
+The older `onInit` and `onCleanup` names still work as compatibility aliases for `onMount` and `onUnmount`.
 
 ```xmlui
 <App var.showPanel="{false}">
   <Button label="Toggle panel" onClick="showPanel = !showPanel" />
   <Card
     when="{showPanel}"
-    onInit="console.log('panel appeared')"
-    onCleanup="console.log('panel removed')"
+    onMount="console.log('panel appeared')"
+    onUnmount="console.log('panel removed')"
   >
     <Text>Panel content</Text>
   </Card>
 </App>
 ```
 
-One subtlety: if `when` starts as `false`, `onInit` does **not** fire at that point. It fires the first time `when` transitions from `false` to `true` — that is, when the component first becomes visible. Each subsequent `false`→`true` transition fires `onInit` again; the matching `true`→`false` transition fires `onCleanup`.
+One subtlety: if `when` starts as `false`, `onMount` does **not** fire at that point. It fires the first time `when` transitions from `false` to `true` — that is, when the component first becomes visible. Each subsequent `false` -> `true` transition fires `onMount` again; the matching `true` -> `false` transition fires `onUnmount`.
+
+### Reactivity of `when`
+
+`when` is a reactive binding expression. XMLUI re-evaluates it when the XMLUI variables, component state, or context values it reads change. The result controls whether the component subtree exists.
+
+Keep `when` expressions focused on explicit state:
+
+```xmlui
+<Stack when="{user.loaded}">
+  <Text>{user.value.name}</Text>
+</Stack>
+```
+
+When a condition depends on fetched data, prefer `DataSource` status properties such as `loaded`, `inProgress`, and `error`, or reduce the condition to a local `var` in `onLoaded`.
+
+```xmlui
+<App var.hasBillingAddress="{false}">
+  <DataSource
+    id="user"
+    url="/api/users/me"
+    onLoaded="data => hasBillingAddress = !!data.billing.address"
+  />
+
+  <Stack when="{hasBillingAddress}">
+    <Text>Billing address is available.</Text>
+  </Stack>
+</App>
+```
+
+Deep payload checks are valid expressions, but they are harder to reason about because the payload may be `undefined` before the first load and `DataSource` may preserve unchanged object references during refetches. For visibility decisions, a simple boolean makes the dependency and the rendering rule obvious.
 
 ## Responsive `when-*` attributes
 

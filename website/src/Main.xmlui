@@ -594,6 +594,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Use fetched data safely in when"
+                            to="/docs/howto/use-fetched-data-safely-in-when"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Retry a failed API call"
                             to="/docs/howto/retry-a-failed-api-call"
                         />
@@ -1814,6 +1819,13 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/hide-an-element-until-its-datasource-is-ready.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/use-fetched-data-safely-in-when"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/use-fetched-data-safely-in-when.md']}"
                 />
             </Page>
             <Page

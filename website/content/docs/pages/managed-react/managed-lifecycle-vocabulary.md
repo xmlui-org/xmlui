@@ -24,7 +24,7 @@ or failing without writing any React code or wiring `useEffect` yourself.
   (`onBeforeDispose`) with a bounded time budget.
 - Re-arming a side effect when an input changes (the React `useEffect`
   with a dependency array pattern) is expressible in markup using the
-  `<Lifecycle key="...">` form, without exposing closures or refs.
+  `<Lifecycle keyValue="...">` form, without exposing closures or refs.
 
 ## How it works
 
@@ -95,13 +95,13 @@ non-visual `<Lifecycle>` component is the escape hatch:
 </Page>
 ```
 
-The optional `key` prop re-arms the cycle whenever the key changes. The
+The optional `keyValue` prop re-arms the cycle whenever the value changes. The
 dispatcher fires `onUnmount` for the old key, then `onMount` for the new
 one — declaratively, with the correct value captured at each phase:
 
 ```xmlui copy
 <Lifecycle
-  key="{state.activeConversationId}"
+  keyValue="{state.activeConversationId}"
   onMount="markRead.execute({ conversationId: state.activeConversationId })"
   onUnmount="flushUnread.execute({ conversationId: state.activeConversationId })"
 />
@@ -123,7 +123,7 @@ final telemetry beacon:
 
 ```xmlui copy
 <Page
-  onBeforeDispose="await saveDraft.execute({ content: state.draft })"
+  onBeforeDispose="saveDraft.execute({ content: state.draft })"
 >
   <TextArea bindTo="{state.draft}" />
 </Page>
@@ -174,7 +174,6 @@ you can audit them without affecting the running app.
 - [Managed React Overview](/docs/managed-react/overview)
 - [Reactive Cycle Detection](/docs/managed-react/reactive-cycle-detection)
 - [Observability Substrate](/docs/managed-react/observability-substrate)
-- [Timer](/components/Timer)
-- [DataSource](/components/DataSource)
-- [WebSocket](/components/WebSocket)
-- [EventSource](/components/EventSource)
+- [Timer](/docs/reference/components/Timer)
+- [DataSource](/docs/reference/components/DataSource)
+- [APICall](/docs/reference/components/APICall)

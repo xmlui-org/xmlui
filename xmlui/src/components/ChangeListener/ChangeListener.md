@@ -25,6 +25,8 @@ It also supports two listening modes:
 - **Previous/new values**: Access both old and new values in change handlers
 - **Reactive patterns**: Coordinates between components or triggers side effects
 
+Use `ChangeListener` when a derived condition should update after several possible source changes, or when repeating the same complex expression in several `when` attributes would make the markup hard to follow. Store the derived result in a `var`, then bind `when` to that simple value.
+
 %-DESC-END
 
 %-PROP-START listenTo

@@ -79,5 +79,6 @@ When a dropdown needs data from two endpoints — users and departments — and 
 ## See also
 
 - [Show a skeleton while data loads](/docs/howto/hide-an-element-until-its-datasource-is-ready) — display placeholders during the wait
+- [Use fetched data safely in `when`](/docs/howto/use-fetched-data-safely-in-when) — derive clear visibility conditions from fetched payloads
 - [Chain a DataSource refetch](/docs/howto/chain-a-refetch) — trigger a refetch after a mutation
 - [Transform nested API responses](/docs/howto/filter-and-transform-data-from-an-api) — reshape data before rendering
