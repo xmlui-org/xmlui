@@ -270,9 +270,9 @@ The component has some parts that can be styled through layout properties and th
 | [textColor](/docs/styles-and-themes/common-units/#color)-Link--active | $color-primary-400 | $color-primary-500 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Link--hover | $color-primary-400 | $color-primary-500 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Link--hover--active | $textColor-Link--active | $textColor-Link--active |
-| [textDecorationColor](/docs/styles-and-themes/common-units/#color)-Link | textDecorationColor-Link | textDecorationColor-Link |
-| [textDecorationColor](/docs/styles-and-themes/common-units/#color)-Link--active | textColor-Link--active | textColor-Link--active |
-| [textDecorationColor](/docs/styles-and-themes/common-units/#color)-Link--hover | textColor-Link--hover | textColor-Link--hover |
+| [textDecorationColor](/docs/styles-and-themes/common-units/#color)-Link | $textColor-Link | $textColor-Link |
+| [textDecorationColor](/docs/styles-and-themes/common-units/#color)-Link--active | $textColor-Link--active | $textColor-Link--active |
+| [textDecorationColor](/docs/styles-and-themes/common-units/#color)-Link--hover | $textColor-Link--hover | $textColor-Link--hover |
 | [textDecorationLine](/docs/styles-and-themes/common-units/#textDecoration)-Link | underline | underline |
 | [textDecorationStyle](/docs/styles-and-themes/common-units/#textDecoration)-Link | solid | solid |
 | [textDecorationThickness](/docs/styles-and-themes/common-units/#textDecoration)-Link | *none* | *none* |

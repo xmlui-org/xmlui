@@ -4169,6 +4169,10 @@ export default {
         "description": "Value to the changes of which this component listens. If this property is not set, the `ChangeListener` is inactive.",
         "valueType": "any"
       },
+      "listenToSources": {
+        "description": "Named values to watch as independent change sources. Use an object whose property names identify the sources. When this property is set, it takes precedence over `listenTo` and the `didChange` event receives source-level change details.",
+        "valueType": "any"
+      },
       "throttleWaitInMs": {
         "description": "This property sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.",
         "valueType": "number",
@@ -4182,11 +4186,10 @@ export default {
     },
     "events": {
       "didChange": {
-        "description": "This event is triggered when the value specified in the `listenTo` property changes.",
-        "signature": "(oldValue: any, newValue: any) => void",
+        "description": "This event is triggered when the value specified in `listenTo` changes, or when any value specified in `listenToSources` changes.",
+        "signature": "(change: ChangeListenerChange) => void",
         "parameters": {
-          "oldValue": "The previous value of the property being listened to.",
-          "newValue": "The new value of the property being listened to."
+          "change": "An object with `prevValue` and `newValue`. When `listenToSources` is used, it also contains `changedSources` and `changes` with source-level details."
         }
       }
     }

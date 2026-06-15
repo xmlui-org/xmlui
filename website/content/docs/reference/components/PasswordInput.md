@@ -18,6 +18,22 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `autoCapitalize` [#autocapitalize]
+
+Sets the HTML `autocapitalize` attribute on the underlying input.
+
+Available values: `off`, `none`, `sentences`, `words`, `characters`
+
+### `autoComplete` [#autocomplete]
+
+> [!DEF]  default: **"off"**
+
+Sets the HTML `autocomplete` attribute on the underlying input. Boolean values are passed as `"on"` or `"off"`; string values are passed through.
+
+### `autoCorrect` [#autocorrect]
+
+Sets the HTML `autocorrect` attribute on the underlying input. When set, `true` is passed as `"on"` and `false` as `"off"`.
+
 ### `autoFocus` [#autofocus]
 
 > [!DEF]  default: **false**
@@ -90,6 +106,10 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 If `true`, a toggle button is displayed to switch between showing and hiding the password input.
 
+### `spellCheck` [#spellcheck]
+
+Sets the HTML `spellcheck` attribute on the underlying input.
+
 ### `startIcon` [#starticon]
 
 This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.
@@ -124,6 +144,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
+| `none` | No validation indicator (default state) **(default)** |
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |

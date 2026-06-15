@@ -38,6 +38,15 @@ All samples use table columns with the following definition unless noted otherwi
 
 > **Note**: See [`Column`](../components/Column) to learn more about table columns.
 
+**Context variables available during execution:**
+
+- `$cell`: The value of the current cell for this column.
+- `$colIndex`: Zero-based index of the current column.
+- `$item`: The complete data row object being rendered.
+- `$itemIndex`: Zero-based index of the row in the data array.
+- `$row`: The complete data row object being rendered (alias of `$item`).
+- `$rowIndex`: Zero-based row index (alias of `$itemIndex`).
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -1021,6 +1030,8 @@ A property to customize what to display if the table does not contain any data.
 
 ### `pageInfoPosition` [#pageinfoposition]
 
+> [!DEF]  default: **"end"**
+
 Determines where to place the page information in the layout. It works the same as the [Pagination component property](./Pagination#pageinfoposition).
 
 ### `pageSize` [#pagesize]
@@ -1182,6 +1193,8 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 ```
 
 ### `pageSizeSelectorPosition` [#pagesizeselectorposition]
+
+> [!DEF]  default: **"start"**
 
 Determines where to place the page size selector in the layout. It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).
 

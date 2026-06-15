@@ -193,4 +193,10 @@ Scrolls the FlowLayout container to the top. Works when the FlowLayout has an ex
 
 ## Styling [#styling]
 
-This component does not have any styles.
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| columnGap-FlowLayout | $gap-FlowLayout | $gap-FlowLayout |
+| [gap](/docs/styles-and-themes/common-units/#size)-FlowLayout | $gap-layout | $gap-layout |
+| rowGap-FlowLayout | $gap-FlowLayout | $gap-FlowLayout |

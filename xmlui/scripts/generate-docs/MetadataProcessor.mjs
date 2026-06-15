@@ -765,8 +765,7 @@ function addComponentStatusDisclaimer(status) {
       disclaimer = "";
       break;
     case "experimental":
-      disclaimer =
-        "This component is in an **experimental** state; you can use it in your app, but expect breaking changes in future XMLUI versions.";
+      disclaimer = "";
       break;
     case "deprecated":
       disclaimer =

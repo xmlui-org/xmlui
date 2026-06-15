@@ -716,6 +716,12 @@ The default value is `false`.
 
 Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.
 
+**Signature**: `contextMenu(item: any, itemIndex: number, event: MouseEvent): void`
+
+- `item`: The right-clicked tile data item.
+- `itemIndex`: The zero-based index of the tile item.
+- `event`: The mouse event object.
+
 Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.
 
 ```xmlui copy /onContextMenu="testState = $item.name"/
@@ -740,6 +746,12 @@ Fired when a tile is right-clicked. Receives the tile data item as `$item` and i
 
 Fired when the user presses Ctrl/Cmd+C. Receives `(focusedItem, selectedItems, selectedIds)`.
 
+**Signature**: `copyAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void`
+
+- `focusedItem`: The currently focused tile data item, or null if none is focused.
+- `selectedItems`: Array of selected tile data items.
+- `selectedIds`: Array of selected tile IDs.
+
 Fired when the user presses Ctrl/Cmd+C while the grid is focused and `itemsSelectable` is `true`.
 The handler receives `(focusedItem, selectedItems, selectedIds)`.
 
@@ -749,6 +761,12 @@ The handler receives `(focusedItem, selectedItems, selectedIds)`.
 
 Fired when the user presses Ctrl/Cmd+X. Receives `(focusedItem, selectedItems, selectedIds)`.
 
+**Signature**: `cutAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void`
+
+- `focusedItem`: The currently focused tile data item, or null if none is focused.
+- `selectedItems`: Array of selected tile data items.
+- `selectedIds`: Array of selected tile IDs.
+
 Fired when the user presses Ctrl/Cmd+X while the grid is focused and `itemsSelectable` is `true`.
 The handler receives `(focusedItem, selectedItems, selectedIds)`.
 
@@ -757,6 +775,12 @@ The handler receives `(focusedItem, selectedItems, selectedIds)`.
 ### `deleteAction` [#deleteaction]
 
 Fired when the user presses the Delete key. Receives `(focusedItem, selectedItems, selectedIds)`.
+
+**Signature**: `deleteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void`
+
+- `focusedItem`: The currently focused tile data item, or null if none is focused.
+- `selectedItems`: Array of selected tile data items.
+- `selectedIds`: Array of selected tile IDs.
 
 Fired when the user presses the Delete key while the grid is focused and `itemsSelectable` is `true`.
 The handler receives `(focusedItem, selectedItems, selectedIds)`.
@@ -784,6 +808,11 @@ The component does **not** remove items automatically — the handler must imple
 ### `itemDoubleClick` [#itemdoubleclick]
 
 Fired when a tile is double-clicked. Receives the data item.
+
+**Signature**: `itemDoubleClick(item: any, itemIndex: number): void`
+
+- `item`: The double-clicked tile data item.
+- `itemIndex`: The zero-based index of the tile item.
 
 Fired when a tile is double-clicked. The handler receives the tile's data item.
 
@@ -829,6 +858,12 @@ Fired when a tile is double-clicked. The handler receives the tile's data item.
 
 Fired when the user presses Ctrl/Cmd+V. Receives `(focusedItem, selectedItems, selectedIds)`.
 
+**Signature**: `pasteAction(focusedItem: any | null, selectedItems: any[], selectedIds: string[]): void`
+
+- `focusedItem`: The currently focused tile data item, or null if none is focused.
+- `selectedItems`: Array of selected tile data items.
+- `selectedIds`: Array of selected tile IDs.
+
 Fired when the user presses Ctrl/Cmd+V while the grid is focused and `itemsSelectable` is `true`.
 The handler receives `(focusedItem, selectedItems, selectedIds)`.
 
@@ -837,6 +872,11 @@ The handler receives `(focusedItem, selectedItems, selectedIds)`.
 ### `selectAllAction` [#selectallaction]
 
 Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.
+
+**Signature**: `selectAllAction(selectedItems: any[], selectedIds: string[]): void`
+
+- `selectedItems`: Array of selected tile data items.
+- `selectedIds`: Array of selected tile IDs.
 
 Fired when the user presses Ctrl/Cmd+A while the grid is focused and `itemsSelectable` is `true`.
 The component automatically selects all tiles before invoking this handler.
@@ -864,6 +904,11 @@ The handler receives `(selectedItems, selectedIds)`.
 ### `selectionDidChange` [#selectiondidchange]
 
 Fired when the selection changes. Receives the array of currently selected items.
+
+**Signature**: `selectionDidChange(selectedItems: any[], selectedIds: string[]): void`
+
+- `selectedItems`: Array of selected tile data items.
+- `selectedIds`: Array of selected tile IDs.
 
 Fired when the set of selected tiles changes.
 The handler receives an array of the currently selected data items.

@@ -26,6 +26,11 @@ For the shorthand versions see: [H1](/docs/reference/components/H1), [H2](/docs/
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$anchorHref`: The href (#id) of the current heading anchor.
+- `$anchorId`: The generated id of the current heading anchor.
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -146,7 +151,7 @@ You can observe the effect of using `preserveLinebreaks`:
 
 This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.
 
-If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
+If this property is not set, the engine checks if the `showHeadingAnchors` flag is turned on in `xmluiConfig` and displays the heading anchor accordingly.
 
 ### `value` [#value]
 

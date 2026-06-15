@@ -1,0 +1,39 @@
+# BasicLayout [#basiclayout]
+
+A generic list layout for blog or documentation posts.
+
+## Behaviors
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | `variant` |
+
+## Properties
+
+### `showTags`
+
+> [!DEF]  default: **true**
+
+Whether to render the tag list for each post.
+
+### `sortedPosts`
+
+Array of post objects to render in the list.
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+This component does not have any styles.

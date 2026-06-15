@@ -115,7 +115,7 @@ For each component, the generator produces an `.mdx` page containing:
 
 | Section | Source | Description |
 |---------|--------|-------------|
-| Title and status badges | `metadata.displayName`, `metadata.status` | Component name, deprecation warnings, experimental disclaimers |
+| Title and status badges | `metadata.displayName`, `metadata.status` | Component name and deprecation warnings |
 | Description | Hand-written `.md` file | Preserved verbatim from `website/content/docs/` |
 | Props table | `metadata.props` | Auto-generated: name, type, available values, default, description |
 | Events table | `metadata.events` | Auto-generated: name, description |

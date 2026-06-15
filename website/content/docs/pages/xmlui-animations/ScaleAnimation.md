@@ -1,7 +1,6 @@
 # ScaleAnimation [#scaleanimation]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `ScaleAnimation` component represents an animation that scales the content.
+The `ScaleAnimation` component represents an animation that scales the content.
 
 ## Properties
 

@@ -20,6 +20,22 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `autoCapitalize` [#autocapitalize]
+
+Sets the HTML `autocapitalize` attribute on the underlying text area.
+
+Available values: `off`, `none`, `sentences`, `words`, `characters`
+
+### `autoComplete` [#autocomplete]
+
+> [!DEF]  default: **"off"**
+
+Sets the HTML `autocomplete` attribute on the underlying text area. Boolean values are passed as `"on"` or `"off"`; string values are passed through.
+
+### `autoCorrect` [#autocorrect]
+
+Sets the HTML `autocorrect` attribute on the underlying text area. When set, `true` is passed as `"on"` and `false` as `"off"`.
+
 ### `autoFocus` [#autofocus]
 
 > [!DEF]  default: **false**
@@ -194,6 +210,10 @@ Specifies the number of rows the component initially has.
 </App>
 ```
 
+### `spellCheck` [#spellcheck]
+
+Sets the HTML `spellcheck` attribute on the underlying text area.
+
 ### `validationIconError` [#validationiconerror]
 
 Icon to display for error state when concise validation summary is enabled.
@@ -212,6 +232,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
+| `none` | No validation indicator (default state) **(default)** |
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |

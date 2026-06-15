@@ -5,6 +5,11 @@
 - **Throttling**: Use `throttleWaitInMs` when you want **periodic updates** during rapid changes — fires immediately, then at most once per interval. Good for progress tracking or scroll events.
 - **Debouncing**: Use `debounceWaitInMs` when you want to **wait for silence** — fires only after the value stops changing for the specified duration. Ideal for search-as-you-type or auto-save.
 
+It also supports two listening modes:
+
+- **Single value**: Use `listenTo` when one expression is the value you care about. That expression can be a primitive, object, or array; XMLUI treats it as one aggregate value.
+- **Multiple sources**: Use `listenToSources` when several independent values should trigger the same listener. Pass an object so source names appear in `changedSources` and `changes`.
+
 | Aspect | Throttle | Debounce |
 |--------|----------|----------|
 | Fires on first change? | Yes | No — waits for silence |
@@ -16,6 +21,7 @@
 
 **Key features:**
 - **Value monitoring**: Watches any expression, variable, or component property for changes
+- **Multi-source monitoring**: Watches named values as independent sources with source-level diffs
 - **Previous/new values**: Access both old and new values in change handlers
 - **Reactive patterns**: Coordinates between components or triggers side effects
 
@@ -34,6 +40,83 @@ The following sample demonstrates using this property. Every time the user click
   <Text>Counter is {counter} which {isEven? "is": "isn't"} even.</Text>
 </App>
 ```
+
+%-PROP-END
+
+%-PROP-START listenToSources
+
+Use `listenToSources` when a listener should react to any change among several independent values.
+Pass an object whose property names identify the sources being watched.
+
+```xmlui-pg copy display name="Example: listenToSources"
+<App var.firstName="Ada" var.lastName="Lovelace" var.changed="<none>">
+  <VStack>
+    <TextBox
+      id="firstNameBox"
+      initialValue="{firstName}"
+      onDidChange="value => firstName = value"
+    />
+    <TextBox
+      id="lastNameBox"
+      initialValue="{lastName}"
+      onDidChange="value => lastName = value"
+    />
+    <Button
+      label="Use sample name"
+      onClick="
+        firstNameBox.setValue('Grace');
+        lastNameBox.setValue('Hopper');
+      " />
+  </VStack>
+
+  <ChangeListener
+    listenToSources="{{
+      firstName: firstName,
+      lastName: lastName
+    }}"
+    onDidChange="(change) =>
+      changed = 'Changed: ' + change.changedSources.join(', ')
+    " />
+
+  <Text>{changed}</Text>
+</App>
+```
+
+The event argument keeps the same aggregate `prevValue` and `newValue` shape as `listenTo`, but adds source-level detail:
+
+```javascript
+{
+  prevValue: {
+    firstName: "Ada",
+    lastName: "Lovelace"
+  },
+  newValue: {
+    firstName: "Augusta Ada",
+    lastName: "Lovelace"
+  },
+  changedSources: ["firstName"],
+  changes: {
+    firstName: {
+      prevValue: "Ada",
+      newValue: "Augusta Ada"
+    }
+  }
+}
+```
+
+Prefer an object over an array because names make the handler self-documenting.
+For example, `firstName` says what changed, while index `0` only says where the value appeared in the list.
+Arrays are accepted when useful, but array sources report changed indexes:
+
+```xmlui
+<ChangeListener
+  listenToSources="{[firstName, lastName]}"
+  onDidChange="(change) => changedIndex = change.changedSources[0]" />
+```
+
+If both `listenTo` and `listenToSources` are set, `listenToSources` takes precedence and XMLUI logs a warning.
+Use `listenTo` for a single aggregate value, and use `listenToSources` when the values are independent sources.
+This distinction is important: existing `listenTo="{[a, b, c]}"` markup still listens to one array value and does not receive `changedSources` or `changes`.
 
 %-PROP-END
 
@@ -109,13 +192,16 @@ The following sample lets you compare different debounce wait times for a search
 This event is fired when the component observes a value change (within the specified throttling interval). Define the event handler that responds to that change (as the previous samples demonstrate).
 
 The event argument is an object with `prevValue` and `newValue` properties that (as their name suggests) contain the previous and the new values.
+When you use `listenToSources`, the event argument also contains `changedSources` and `changes`.
+`changedSources` is an array of the names, or indexes for array sources, that changed during the observed render.
+`changes` is an object keyed by those source names, with each entry containing that source's `prevValue` and `newValue`.
 
 ```xmlui-pg copy display name="Example: prevValue and newValue"
 <App var.counter="{0}">
   <Button label="Increment counter" onClick="{counter++}" />
   <ChangeListener
     listenTo="{counter}"
-    onDidChange="(change) => 
+    onDidChange="(change) =>
       changeLog.setValue('prev: ' + change.prevValue + ' new: ' + change.newValue)"
   />
   <TextArea id="changeLog" />

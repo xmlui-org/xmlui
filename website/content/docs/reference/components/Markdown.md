@@ -125,6 +125,11 @@ Function calls are executed: @{x()}
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$anchorHref`: The href (#id) of the current heading anchor.
+- `$anchorId`: The generated id of the current heading anchor.
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -329,7 +334,7 @@ This boolean property specifies whether leading indents should be removed from t
 
 This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.
 
-If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
+If this property is not set, the engine checks if the `showHeadingAnchors` flag is turned on in `xmluiConfig` and displays the heading anchor accordingly.
 
 ### `truncateLinks` [#truncatelinks]
 
@@ -796,7 +801,7 @@ The component itself cannot be styled, but the components that render the final 
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Table-markdown | *none* | *none* |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Td-markdown | *none* | *none* |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Text | *none* | *none* |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Text-markdown | fontWeight-Text | fontWeight-Text |
+| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Text-markdown | $fontWeight-Text | $fontWeight-Text |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Th-markdown | *none* | *none* |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Thead-markdown | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Tr-markdown | *none* | *none* |

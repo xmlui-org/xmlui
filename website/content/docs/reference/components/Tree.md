@@ -370,6 +370,10 @@ Set `autoLoadAfter` to automatically reload children after a specified time when
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$item`: The current tree node's data item.
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:

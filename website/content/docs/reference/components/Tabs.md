@@ -47,6 +47,10 @@ You can create `TabItem` children dynamically:
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$header`: The tab's header context (matches TabItem's `$header`).
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:

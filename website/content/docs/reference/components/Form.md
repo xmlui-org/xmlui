@@ -13,6 +13,10 @@ See [this guide](/docs/guides/forms) for details.
 **Context variables available during execution:**
 
 - `$data`: This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances. `$data` also provides an `update` method as a shortcut to the Form's exposed `update` method.
+- `$formCancel`: Available inside the form's `onSubmit` handler. Exposes the per-attempt `AbortSignal` (`$formCancel.signal`) that the framework aborts when `Form.cancel()` is invoked. Pass this signal to `Actions.callApi({ signal: ... })` or other cancellable operations to make your submit handler cooperatively cancellable.
+- `$formCsrfToken`: Available inside the form's `onSubmit` handler. Carries the value of the `csrfToken` prop so custom submit handlers can attach the CSRF header to their own requests. `undefined` when the prop is not set.
+- `$formHeaders`: Available inside the form's `onSubmit` handler. Carries the resolved headers object built from the `submitHeaders` prop. `undefined` when the prop is not set.
+- `$formIdempotencyKey`: Available inside the form's `onSubmit` handler. Carries the value of the `idempotencyKey` prop. `undefined` when the prop is not set.
 
 ## Behaviors [#behaviors]
 
@@ -71,6 +75,10 @@ This property defines the label of the Cancel button.
 
 This property sets the message to display when the form is submitted successfully.
 
+### `csrfToken` [#csrftoken]
+
+A CSRF token attached to the submit request as an HTTP header. The header name defaults to `X-CSRF-Token` and can be customized via `xmluiConfig.csrfHeaderName`. When the form uses the built-in submit handler (i.e. `submitUrl` is set and no custom `onSubmit` is provided), the token is added automatically. Custom `onSubmit` handlers can read the value via the `$formCsrfToken` context variable.
+
 ### `data` [#data]
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.
@@ -114,6 +122,10 @@ This property hides the button row entirely when set to true.
 > [!DEF]  default: **false**
 
 This property hides the button row until the form data is modified (dirty).
+
+### `idempotencyKey` [#idempotencykey]
+
+An idempotency key attached to the submit request as an HTTP header (default header name `Idempotency-Key`, configurable via `xmluiConfig.idempotencyHeaderName`). Supply a string the server can use to de-duplicate retries. When the form uses the built-in submit handler the header is added automatically; custom handlers can read the value via the `$formIdempotencyKey` context variable.
 
 ### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
@@ -251,6 +263,8 @@ The number of milliseconds to wait before switching the Save button label to `sa
 ### `submitMethod` [#submitmethod]
 
 This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`.
+
+Available values: `get`, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
 
 ### `submitPolicy` [#submitpolicy]
 

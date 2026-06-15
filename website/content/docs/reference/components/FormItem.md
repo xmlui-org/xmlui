@@ -38,7 +38,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 ### `bindTo` [#bindto]
 
-This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name. If the property is not set, the input will be bound to an internal data field but not submitted.
+This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.If the property is not set, the input will be bound to an internal data field but not submitted.
 
 Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data looks like compared to the one set in `data`.
 

@@ -181,6 +181,8 @@ This property sets an optional text to appear on the end (right side when the le
 
 ### `initialValue` [#initialvalue]
 
+> [!DEF]  default: **null**
+
 This property sets the component's initial value.
 
 ```xmlui-pg copy display name="Example: initialValue" height="120px"
@@ -316,6 +318,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
+| `none` | No validation indicator (default state) **(default)** |
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |

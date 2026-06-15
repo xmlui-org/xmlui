@@ -378,6 +378,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
+| `none` | No validation indicator (default state) **(default)** |
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |

@@ -204,6 +204,8 @@ Available values: `left` **(default)**, `right`, `top`, `bottom`
 
 Fired when the `Drawer` is closed.
 
+**Signature**: `close(): void`
+
 Fired when the drawer closes (via API, close button, backdrop click, or Escape key).
 
 ```xmlui-pg copy display name="Example: onClose event" height="280px"
@@ -225,6 +227,8 @@ Fired when the drawer closes (via API, close button, backdrop click, or Escape k
 ### `open` [#open]
 
 Fired when the `Drawer` is opened.
+
+**Signature**: `open(): void`
 
 Fired when the drawer opens (either via `open()` API or another trigger).
 

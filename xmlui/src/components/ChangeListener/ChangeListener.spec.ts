@@ -79,6 +79,151 @@ test("component passes both previous and new values to the handler", async ({
   await expect(page.getByTestId("text")).toHaveText("0|1");
 });
 
+test("component passes source-level changes with listenToSources object", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="alpha" var.second="beta" var.result="">
+      <Button testId="changeSecond" onClick="second = 'gamma'">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenToSources="{{ first: first, second: second }}"
+        onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.changes.second.prevValue + '>' + chg.changes.second.newValue" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSecond").click();
+
+  await expect(page.getByTestId("text")).toHaveText("second:beta>gamma");
+});
+
+test("component reports the changed named source with aggregate values", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="{1}" var.second="{10}" var.result="">
+      <Button testId="changeSecond" onClick="second++">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenToSources="{{ first: first, second: second }}"
+        onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.newValue.first + ',' + chg.newValue.second" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSecond").click();
+
+  await expect(page.getByTestId("text")).toHaveText("second:1,11");
+});
+
+test("listenToSources does not fire when unrelated values change", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="{1}" var.second="{10}" var.unrelated="{0}" var.fireCount="{0}">
+      <Button testId="changeUnrelated" onClick="unrelated++">Change unrelated</Button>
+      <Text testId="text">{unrelated}|{fireCount}</Text>
+      <ChangeListener
+        listenToSources="{{ first: first, second: second }}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeUnrelated").click();
+
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+});
+
+test("listenToSources takes precedence over listenTo", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.single="{0}" var.source="{0}" var.fireCount="{0}">
+      <Button testId="changeSingle" onClick="single++">Change single</Button>
+      <Button testId="changeSource" onClick="source++">Change source</Button>
+      <Text testId="text">{single}|{source}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{single}"
+        listenToSources="{{ source: source }}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSingle").click();
+  await expect(page.getByTestId("text")).toHaveText("1|0|0");
+
+  await page.getByTestId("changeSource").click();
+  await expect(page.getByTestId("text")).toHaveText("1|1|1");
+});
+
+test("listenToSources accepts arrays and reports changed indexes", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="alpha" var.second="beta" var.result="">
+      <Button testId="changeSecond" onClick="second = 'gamma'">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenToSources="{[first, second]}"
+        onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.changes['1'].prevValue + '>' + chg.changes['1'].newValue" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSecond").click();
+
+  await expect(page.getByTestId("text")).toHaveText("1:beta>gamma");
+});
+
+test("listenTo keeps the existing aggregate payload shape", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.first="{1}" var.second="{10}" var.result="">
+      <Button testId="changeSecond" onClick="second++">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenTo="{[first, second]}"
+        onDidChange="chg => result = (chg.changes === undefined ? 'single' : 'multi') + ':' + chg.prevValue.join('|') + '>' + chg.newValue.join('|')" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSecond").click();
+
+  await expect(page.getByTestId("text")).toHaveText("single:1|10>1|11");
+});
+
+test("listenTo keeps object values as a single aggregate payload", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.data="{{ first: 'Ada', last: 'Lovelace' }}" var.result="">
+      <Button testId="changeLast" onClick="data.last = 'Byron'">Change last</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenTo="{data}"
+        onDidChange="chg => result = (chg.changes === undefined ? 'single' : 'multi') + ':' + chg.prevValue.last + '>' + chg.newValue.last" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeLast").click();
+
+  await expect(page.getByTestId("text")).toHaveText("single:Lovelace>Byron");
+});
+
+test("component stays inactive when listenTo is not set", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="increment" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("increment").click();
+
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+});
+
 // =============================================================================
 // EDGE CASE TESTS
 // =============================================================================

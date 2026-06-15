@@ -19,6 +19,8 @@ The `initialValue` and `value` properties of the checkbox are transformed to a B
 - The empty array value goes to `false`; other array values result in `true`.
 - Object values with no properties result in `false`; other values represent `true`.
 
+**Context variables available during execution:**
+
 ## Use children as Content Template [#use-children-as-content-template]
 
 The [inputTemplate](#inputtemplate) property can be replaced by setting the item template component directly as the Checkbox's child.
@@ -152,6 +154,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
+| `none` | No validation indicator (default state) **(default)** |
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |

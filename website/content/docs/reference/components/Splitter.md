@@ -106,6 +106,23 @@ Available values: `horizontal`, `vertical` **(default)**
 </App>
 ```
 
+### `resizeMode` [#resizemode]
+
+> [!DEF]  default: **"preserveRatio"**
+
+Sets how the `Splitter` adjusts its panel sizes when the splitter container itself is resized. `preserveRatio` keeps the current primary/secondary ratio, `preservePrimary` keeps the primary panel size and resizes the secondary panel, and `preserveSecondary` keeps the secondary panel size and resizes the primary panel. Minimum and maximum primary panel size constraints are still applied.
+
+Available values: `preserveRatio` **(default)**, `preservePrimary`, `preserveSecondary`
+
+```xmlui-pg copy display name="Example: resizeMode"
+<App>
+  <Splitter height="200px" initialPrimarySize="120px" resizeMode="preservePrimary">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+</App>
+```
+
 ### `splitterTemplate` [#splittertemplate]
 
 The divider can be customized using XMLUI components via this property.

@@ -76,6 +76,10 @@ Available values: `xs`, `sm`, `md`, `lg`
 
 This event is triggered when the icon is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.

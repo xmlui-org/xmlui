@@ -561,10 +561,13 @@ This component does not expose any methods.
 | [borderRight](/docs/styles-and-themes/common-units/#border)-navPanelWrapper-App | 1px solid $borderColor | 1px solid $borderColor |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-header-App | none | none |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
+| [gap](/docs/styles-and-themes/common-units/#size)-content-App | $space-5 | $space-5 |
 | [maxWidth](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App--withToc | *none* | *none* |
 | [maxWidth](/docs/styles-and-themes/common-units/#size-values)-drawer-App | 100% | 100% |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-content-App | $space-4 | $space-4 |
+| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-content-App | $space-5 | $space-5 |
 | right-closeButton-App | $space-2 | $space-2 |
 | top-closeButton-App | $space-2 | $space-2 |
 | [width](/docs/styles-and-themes/common-units/#size-values)-navPanel-App | $space-64 | $space-64 |

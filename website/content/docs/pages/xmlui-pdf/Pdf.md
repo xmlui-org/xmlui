@@ -1,7 +1,6 @@
 # Pdf [#pdf]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `Pdf` component provides a read-only preview of a pdf document's contents.
+The `Pdf` component provides a read-only preview of a pdf document's contents.
 
 ## Properties
 

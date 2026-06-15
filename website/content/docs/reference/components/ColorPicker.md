@@ -43,6 +43,8 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `initialValue` [#initialvalue]
 
+> [!DEF]  default: **"#000000"**
+
 This property sets the component's initial value.
 
 ```xmlui-pg copy display name="Example: using ColorPicker"
@@ -84,6 +86,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
+| `none` | No validation indicator (default state) **(default)** |
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
