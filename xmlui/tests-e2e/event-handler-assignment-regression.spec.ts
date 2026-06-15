@@ -169,3 +169,48 @@ test("subscriber callback error does not poison sibling host subscription", asyn
 
   await expect(page.getByTestId("activeTool")).toHaveText("saw");
 });
+
+test("runtime handler failures include component context in console and Inspector trace", async ({
+  initTestBed,
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      consoleErrors.push(msg.text());
+    }
+  });
+
+  await initTestBed(
+    `
+    <App>
+      <Button testId="fail" label="Fail" onClick="missingTarget.value = 1" />
+    </App>
+  `,
+    {
+      noFragmentWrapper: true,
+      appGlobals: {
+        xsVerbose: true,
+      },
+    },
+  );
+
+  await page.getByTestId("fail").click();
+
+  await expect
+    .poll(() => consoleErrors.join("\n"))
+    .toContain("[XMLUI handler error] Button Fail.click failed.");
+  expect(consoleErrors.join("\n")).toContain("The assignment target may not exist");
+
+  const handlerError = await page.waitForFunction(() => {
+    const logs = (window as any)._xsLogs ?? [];
+    return logs.find((entry: any) => entry.kind === "handler:error");
+  });
+  const entry = await handlerError.jsonValue();
+
+  expect(entry.eventName).toBe("click");
+  expect(entry.componentType).toBe("Button");
+  expect(entry.componentLabel).toBe("Fail");
+  expect(entry.handlerCode).toContain("missingTarget.value = 1");
+  expect(entry.diagnosticHint).toContain("Declare it with var.*");
+});
