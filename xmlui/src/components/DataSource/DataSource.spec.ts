@@ -596,16 +596,16 @@ test.describe("mockData property", () => {
     await expect(page.getByTestId("city")).not.toBeVisible();
   });
 
-  test("onLoaded bridge can drive a simple when boolean", async ({ initTestBed, page }) => {
+  test("onLoaded can store a named visibility decision", async ({ initTestBed, page }) => {
     await initTestBed(
       `
-      <App var.hasBillingAddress="{false}">
+      <App var.showBillingPanel="{false}">
         <DataSource
           id="profile"
           url="/api/profile"
-          onLoaded="data => hasBillingAddress = !!data.billing?.address"
+          onLoaded="data => showBillingPanel = !!data.billing.address"
         />
-        <Text testId="billing" when="{hasBillingAddress}">
+        <Text testId="billing" when="{showBillingPanel}">
           Billing address is available.
         </Text>
       </App>

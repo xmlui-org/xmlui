@@ -2,26 +2,26 @@
 
 When a visibility rule depends on fetched data, guard the fetch lifecycle first and keep the final `when` expression simple.
 
-A `DataSource` value is usually `undefined` before the first successful load. XMLUI member access is optional by default, so a path like `profile.value.billing.address.city` evaluates to `undefined` if an intermediate segment is missing. After the source loads, refetches can preserve unchanged object references through structural sharing. For conditional rendering, use explicit status such as `loaded`, or compute the business rule once and store it in a `var`.
+A `DataSource` value is usually `undefined` before the first successful load. XMLUI member access is optional by default, so a path like `profile.value.billing.address.city` evaluates to `undefined` if an intermediate segment is missing. After the source loads, refetches can preserve unchanged object references through structural sharing. For conditional rendering, use explicit status such as `loaded`; when the condition is reused or has business meaning, compute it once and store it in a named `var`.
 
 ```xmlui-pg copy display name="Use fetched data safely in when"
----app display /hasBillingAddress/ /profile.loaded/
-<App var.hasBillingAddress="{false}">
+---app display /showBillingPanel/ /profile.loaded/
+<App var.showBillingPanel="{false}">
   <DataSource
     id="profile"
     url="/api/profile"
-    onLoaded="data => hasBillingAddress = !!data.billing.address"
+    onLoaded="data => showBillingPanel = !!data.billing.address"
   />
 
   <Text when="{!profile.loaded}">Loading profile...</Text>
 
-  <Card when="{hasBillingAddress}">
+  <Card when="{showBillingPanel}">
     <Text variant="strong">Billing address</Text>
     <Text>{profile.value.billing.address.line1}</Text>
     <Text>{profile.value.billing.address.city}</Text>
   </Card>
 
-  <Text when="{profile.loaded && !hasBillingAddress}">
+  <Text when="{profile.loaded && !showBillingPanel}">
     No billing address on file.
   </Text>
 </App>
@@ -43,14 +43,35 @@ A `DataSource` value is usually `undefined` before the first successful load. XM
 
 **Use `loaded` for readiness**: `when="{profile.loaded}"` is the clearest way to wait until the first successful response exists.
 
-**Keep business rules in a `var`**: If visibility depends on a nested payload condition, compute it in `onLoaded` and bind `when` to the boolean. This avoids repeating long paths and makes the dependency explicit.
-
-**Use `loaded` for lifecycle, not null safety**: Deep paths can be used directly in `when`; missing segments simply make the expression falsy. The `loaded` check says "evaluate this business rule after the first successful response":
+**Read directly for simple cases**: A one-off nested payload check can stay in `when`:
 
 ```xmlui
 <Card when="{profile.loaded && profile.value.billing.address}">
   ...
 </Card>
+```
+
+**Keep business decisions in a `var`**: If the condition is reused or has a name in the product domain, compute it in `onLoaded` and bind `when` to the boolean. This avoids repeating long paths and makes the rendering rule explicit:
+
+```xmlui
+<App var.showBillingPanel="{false}">
+  <DataSource
+    id="profile"
+    url="/api/profile"
+    onLoaded="data => showBillingPanel = !!data.billing.address"
+  />
+  <Card when="{showBillingPanel}">
+    ...
+  </Card>
+</App>
+```
+
+**Use `loaded` for lifecycle, not null safety**: Deep paths can be used directly in `when`; missing segments simply make the expression falsy. The `loaded` check says "evaluate this business rule after the first successful response":
+
+```xmlui
+<Text when="{profile.loaded && !profile.value.billing.address}">
+  ...
+</Text>
 ```
 
 **Use `ChangeListener` for several sources**: When a derived condition depends on multiple values, watch those values with `ChangeListener` and store the result in a `var`.

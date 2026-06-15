@@ -33,7 +33,7 @@ When one `DataSource` depends on another, guard the dependent request with expli
 />
 ```
 
-For complex conditions inside a fetched payload, compute a simple boolean in `onLoaded` and bind UI visibility to that boolean. This keeps the fetch lifecycle separate from the rendering rule.
+For simple one-off visibility checks, read the fetched payload directly in `when`. For reused or business-specific decisions, store a named boolean in `onLoaded` and bind UI visibility to that boolean.
 
 ## Structural Sharing [#structural-sharing]
 
@@ -68,7 +68,23 @@ Deep paths can be used directly in `when`; missing segments simply make the expr
 </Card>
 ```
 
-Structural sharing may preserve references for unchanged parts of the payload during refetches. If a visibility decision depends on a business rule inside the payload, store that rule as its own `var` in `onLoaded` instead of repeating a long payload path in multiple `when` expressions.
+Structural sharing may preserve references for unchanged parts of the payload during refetches. If a visibility decision is reused or has business meaning, store that decision as its own `var` in `onLoaded` instead of repeating a long payload path in multiple `when` expressions:
+
+```xmlui
+<App var.showBillingPanel="{false}">
+  <DataSource
+    id="userData"
+    url="/api/users/me"
+    onLoaded="data => showBillingPanel = !!data.billing.address"
+  />
+
+  <Card when="{showBillingPanel}">
+    ...
+  </Card>
+</App>
+```
+
+Use this pattern to name the decision, not to make deep member access safe; XMLUI's `.` member access is already optional by default.
 
 ## Behaviors [#behaviors]
 

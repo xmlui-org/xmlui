@@ -16,7 +16,7 @@ The goal is to keep diagnosis concrete before changing framework behavior.
 | --- | --- | --- |
 | `when` on DataSource status should update after load | `xmlui/src/components/DataSource/DataSource.spec.ts` — "when can react to DataSource loaded status" | Covered |
 | Deep payload path in `when` can combine load state with optional-by-default member access | `xmlui/src/components/DataSource/DataSource.spec.ts` — "when can guard a deep DataSource value path after load" and "when treats a missing deep DataSource value path as falsy after load" | Covered |
-| Bridging fetched payload into a simple boolean should drive visibility | `xmlui/src/components/DataSource/DataSource.spec.ts` — "onLoaded bridge can drive a simple when boolean" | Covered |
+| `onLoaded` can store a named visibility decision from fetched payload data | `xmlui/src/components/DataSource/DataSource.spec.ts` — "onLoaded can store a named visibility decision" | Covered |
 
 ## Host Event Handler Repros
 

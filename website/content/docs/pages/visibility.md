@@ -54,23 +54,23 @@ Keep `when` expressions focused on explicit state:
 </Stack>
 ```
 
-When a condition depends on fetched data, prefer `DataSource` status properties such as `loaded`, `inProgress`, and `error`, or reduce the condition to a local `var` in `onLoaded`.
+When a condition depends on fetched data, prefer `DataSource` status properties such as `loaded`, `inProgress`, and `error`. For a one-off payload check, reading a deep path directly is fine; XMLUI member access is optional by default. When the condition is reused or has business meaning, store that named decision in a local `var` from `onLoaded`.
 
 ```xmlui
-<App var.hasBillingAddress="{false}">
+<App var.showBillingPanel="{false}">
   <DataSource
     id="user"
     url="/api/users/me"
-    onLoaded="data => hasBillingAddress = !!data.billing.address"
+    onLoaded="data => showBillingPanel = !!data.billing.address"
   />
 
-  <Stack when="{hasBillingAddress}">
+  <Stack when="{showBillingPanel}">
     <Text>Billing address is available.</Text>
   </Stack>
 </App>
 ```
 
-Deep payload checks are valid expressions, but they are harder to reason about because the payload may be `undefined` before the first load and `DataSource` may preserve unchanged object references during refetches. For visibility decisions, a simple boolean makes the dependency and the rendering rule obvious.
+Deep payload checks are valid expressions. Use a named boolean when it makes the rendering rule easier to read or when the same decision appears in multiple places.
 
 ## Responsive `when-*` attributes
 
