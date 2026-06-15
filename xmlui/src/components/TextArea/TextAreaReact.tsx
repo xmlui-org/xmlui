@@ -128,6 +128,10 @@ export const TextArea = memo(
     const ref = useComposedRefs(inputRef, forwardedRef);
     const [cursorPosition, setCursorPosition] = useState(null);
     const [focused, setFocused] = React.useState(false);
+    const [localValue, setLocalValue] = React.useState(value);
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
 
     const contextVerboseValidationFeedback = useFormContextPart(
       (ctx) => ctx?.verboseValidationFeedback,
@@ -152,6 +156,7 @@ export const TextArea = memo(
 
     const updateValue = useCallback(
       (value: string) => {
+        setLocalValue(value);
         updateState({ value: value });
         onDidChange(value);
       },
@@ -233,7 +238,7 @@ export const TextArea = memo(
           setCursorPosition(null);
         }
       }
-    }, [value, cursorPosition, inputRef]);
+    }, [localValue, cursorPosition, inputRef]);
 
     useEffect(() => {
       registerComponentApi?.({
@@ -281,7 +286,7 @@ export const TextArea = memo(
       className: textareaClasses,
       ref,
       style: style as any,
-      value: controlled ? value || "" : undefined,
+      value: controlled ? localValue || "" : undefined,
       disabled: !enabled,
       name: id,
       placeholder,

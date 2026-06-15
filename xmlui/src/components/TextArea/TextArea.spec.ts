@@ -976,6 +976,68 @@ test.describe("Api", () => {
 // =============================================================================
 
 test.describe("Regression", () => {
+  test("bindTo preserves caret when inserting text in the middle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TextArea testId="notes" bindTo="notes" initialValue="Hello world" />
+        <Text testId="dataValue">{$data.notes}</Text>
+      </Form>
+    `);
+
+    const textarea = page.getByTestId("notes").locator("textarea");
+    await expect(textarea).toBeVisible();
+    await textarea.focus();
+    await expect(textarea).toBeFocused();
+    await textarea.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(5, 5));
+
+    await page.keyboard.type(" brave");
+
+    await expect(textarea).toHaveValue("Hello brave world");
+    await expect(page.getByTestId("dataValue")).toHaveText("Hello brave world");
+    await expect
+      .poll(() =>
+        textarea.evaluate((el: HTMLTextAreaElement) => ({
+          start: el.selectionStart,
+          end: el.selectionEnd,
+        })),
+      )
+      .toEqual({ start: 11, end: 11 });
+  });
+
+  test("bindTo preserves caret when replacing a selected multiline range", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TextArea id="notes" testId="notes" bindTo="notes" />
+        <Button testId="setText" onClick="notes.setValue('alpha\\nbeta\\ngamma')" />
+        <Text testId="dataValue">{$data.notes}</Text>
+      </Form>
+    `);
+
+    const textarea = page.getByTestId("notes").locator("textarea");
+    await expect(textarea).toBeVisible();
+    await page.getByTestId("setText").click();
+    await expect(textarea).toHaveValue("alpha\nbeta\ngamma");
+    await textarea.focus();
+    await expect(textarea).toBeFocused();
+    await textarea.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(6, 10));
+
+    await page.keyboard.type("BETA");
+
+    await expect(textarea).toHaveValue("alpha\nBETA\ngamma");
+    await expect(page.getByTestId("dataValue")).toHaveText("alpha\nBETA\ngamma");
+    await expect
+      .poll(() =>
+        textarea.evaluate((el: HTMLTextAreaElement) => ({
+          start: el.selectionStart,
+          end: el.selectionEnd,
+        })),
+      )
+      .toEqual({ start: 10, end: 10 });
+  });
+
   test("component does not loose focus #1", async ({
     initTestBed,
     createTextAreaDriver,
