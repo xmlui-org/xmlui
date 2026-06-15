@@ -53,6 +53,9 @@ describe("handler logging", () => {
     expect(consoleErrorSpy.mock.calls[0][0]).toContain("[XMLUI handler error] Button Save.onClick failed.");
     expect(consoleErrorSpy.mock.calls[0][0]).toContain("The assignment target may not exist");
     expect(consoleErrorSpy.mock.calls[0][0]).toContain("missingTarget.value");
+    expect(consoleErrorSpy.mock.calls[0][1]).toMatchObject({
+      diagnosticCode: "handler-assignment-target",
+    });
     expect((globalThis as any).window._xsLogs).toBeUndefined();
   });
 
@@ -72,12 +75,16 @@ describe("handler logging", () => {
       traceId: "trace-1",
     });
 
-    const entry = (globalThis as any).window._xsLogs.at(-1);
+    const entry = (globalThis as any).window._xsLogs.find(
+      (entry: any) => entry.kind === "handler:error",
+    );
+    expect(entry).toBeDefined();
     expect(entry.kind).toBe("handler:error");
     expect(entry.eventName).toBe("onClick");
     expect(entry.componentType).toBe("Button");
     expect(entry.componentLabel).toBe("Save");
     expect(entry.handlerCode).toBe("missingTarget.value = event.payload.id");
+    expect(entry.diagnosticCode).toBe("handler-assignment-target");
     expect(entry.diagnosticHint).toContain("Declare it with var.*");
     expect(entry.error.message).toBe("Evaluation of = requires a left-hand value.");
   });

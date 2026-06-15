@@ -212,5 +212,58 @@ test("runtime handler failures include component context in console and Inspecto
   expect(entry.componentType).toBe("Button");
   expect(entry.componentLabel).toBe("Fail");
   expect(entry.handlerCode).toContain("missingTarget.value = 1");
+  expect(entry.diagnosticCode).toBe("handler-assignment-target");
   expect(entry.diagnosticHint).toContain("Declare it with var.*");
+});
+
+test("failed runtime handler does not block later successful handlers", async ({
+  initTestBed,
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      consoleErrors.push(msg.text());
+    }
+  });
+
+  await initTestBed(
+    `
+    <App var.count="{0}">
+      <Text testId="count">{count}</Text>
+      <Button testId="fail" label="Fail" onClick="missingTarget.value = 1" />
+      <Button testId="increment" label="Increment" onClick="count = count + 1" />
+    </App>
+  `,
+    {
+      noFragmentWrapper: true,
+      appGlobals: {
+        xsVerbose: true,
+      },
+    },
+  );
+
+  await expect(page.getByTestId("count")).toHaveText("0");
+
+  await page.getByTestId("fail").click();
+  await expect
+    .poll(() => consoleErrors.join("\n"))
+    .toContain("[XMLUI handler error] Button Fail.click failed.");
+
+  await page.getByTestId("increment").click();
+  await expect(page.getByTestId("count")).toHaveText("1");
+
+  const successfulHandler = await page.waitForFunction(() => {
+    const logs = (window as any)._xsLogs ?? [];
+    return logs.find(
+      (entry: any) =>
+        entry.kind === "handler:complete" &&
+        entry.componentType === "Button" &&
+        entry.componentLabel === "Increment",
+    );
+  });
+  const entry = await successfulHandler.jsonValue();
+
+  expect(entry.eventName).toBe("click");
+  expect(entry.handlerCode).toContain("count = count + 1");
 });

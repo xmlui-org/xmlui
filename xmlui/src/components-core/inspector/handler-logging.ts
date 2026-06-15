@@ -236,6 +236,7 @@ export function createHandlerLogger(config: HandlerLoggerConfig): HandlerLoggerC
           duration: detail?.duration,
           startPerfTs: detail?.startPerfTs,
           handlerCode: detail?.handlerCode,
+          diagnosticCode: detail?.diagnosticCode,
           diagnosticHint: detail?.diagnosticHint,
           eventArgs: detail?.args?.length ? detail.args : undefined,
         },
@@ -387,8 +388,8 @@ export function createHandlerLogger(config: HandlerLoggerConfig): HandlerLoggerC
   // Log handler error
   const logHandlerError = (details: HandlerErrorDetails) => {
     const errorMessage = getErrorMessage(details.error);
-    const diagnosticHint = getHandlerErrorHint(errorMessage);
-    logHandlerErrorToConsole(details, errorMessage, diagnosticHint);
+    const diagnostic = getHandlerErrorDiagnostic(errorMessage);
+    logHandlerErrorToConsole(details, errorMessage, diagnostic);
 
     if (!isVerbose()) return;
 
@@ -399,7 +400,8 @@ export function createHandlerLogger(config: HandlerLoggerConfig): HandlerLoggerC
       componentType: details.componentType,
       componentLabel: details.componentLabel,
       error: details.error,
-      diagnosticHint,
+      diagnosticCode: diagnostic?.code,
+      diagnosticHint: diagnostic?.hint,
       ownerFileId: details.ownerFileId,
       ownerSource: details.ownerSource,
       handlerCode: details.handlerCode,
@@ -458,15 +460,26 @@ function getErrorMessage(error: any): string {
   return error?.message || String(error);
 }
 
-function getHandlerErrorHint(message: string): string | undefined {
+function getHandlerErrorDiagnostic(
+  message: string,
+): { code: string; hint: string } | undefined {
   if (/requires a left-hand value/i.test(message)) {
-    return "The assignment target may not exist in XMLUI scope. Declare it with var.*, global.*, or as a component id before assigning to it.";
+    return {
+      code: "handler-assignment-target",
+      hint: "The assignment target may not exist in XMLUI scope. Declare it with var.*, global.*, or as a component id before assigning to it.",
+    };
   }
   if (/does not support the await operator|does not support async/i.test(message)) {
-    return "XMLUI awaits async operations automatically in handlers; write operations sequentially without async/await syntax.";
+    return {
+      code: "handler-await-syntax",
+      hint: "XMLUI awaits async operations automatically in handlers; write operations sequentially without async/await syntax.",
+    };
   }
   if (/not defined|unbound identifier|cannot resolve/i.test(message)) {
-    return "This name is not visible in the handler scope. Declare it locally, as an XMLUI variable/global, as a component id, or expose it intentionally as a host global.";
+    return {
+      code: "handler-unresolved-identifier",
+      hint: "This name is not visible in the handler scope. Declare it locally, as an XMLUI variable/global, as a component id, or expose it intentionally as a host global.",
+    };
   }
   return undefined;
 }
@@ -474,7 +487,7 @@ function getHandlerErrorHint(message: string): string | undefined {
 function logHandlerErrorToConsole(
   details: HandlerErrorDetails,
   message: string,
-  diagnosticHint?: string,
+  diagnostic?: { code: string; hint: string },
 ): void {
   if (typeof console === "undefined" || !console.error) return;
 
@@ -486,7 +499,7 @@ function logHandlerErrorToConsole(
   const lines = [
     `[XMLUI handler error] ${component}${eventName} failed.`,
     message,
-    diagnosticHint,
+    diagnostic?.hint,
     details.handlerCode ? `Handler code:\n${details.handlerCode}` : undefined,
   ].filter(Boolean);
 
@@ -496,6 +509,7 @@ function logHandlerErrorToConsole(
     eventName: details.eventName,
     ownerFileId: details.ownerFileId,
     ownerSource: details.ownerSource,
+    diagnosticCode: diagnostic?.code,
     error: details.error,
   });
 }
