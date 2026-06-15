@@ -82,6 +82,7 @@ interface XsLogEntry {
 | `"app:randomBytes"` | `App.randomBytes` global | Entropy use via the gated `crypto.getRandomValues` wrapper |
 | `"app:mark"` / `"app:measure"` | `App.mark` / `App.measure` globals | User performance marks/measures |
 | `"clipboard:copy"` | `Clipboard.copy` global | Clipboard write via sanctioned wrapper |
+| `"storage"` | local-storage-functions | Managed localStorage operation degraded; payload includes `code`, `operation`, `key`, and `error` |
 | `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | `<WebSocket>` component | Managed WebSocket lifecycle |
 | `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | `<EventSource>` component | Managed SSE lifecycle |
 | `"reactive-cycle"` | reactive graph analyzer | Static/runtime reactive dependency cycle; payload includes cycle hash, severity, and formatted nodes |

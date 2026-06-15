@@ -5,16 +5,11 @@ describe("handler logging", () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let originalXsLogs: any;
   let originalWindow: any;
-  let originalDocument: any;
 
   beforeEach(() => {
     originalWindow = (globalThis as any).window;
-    originalDocument = (globalThis as any).document;
     if (!(globalThis as any).window) {
       (globalThis as any).window = {};
-    }
-    if (!(globalThis as any).document) {
-      (globalThis as any).document = {};
     }
     originalXsLogs = (globalThis as any).window._xsLogs;
     (globalThis as any).window._xsLogs = undefined;
@@ -27,11 +22,6 @@ describe("handler logging", () => {
       (globalThis as any).window._xsLogs = originalXsLogs;
     } else {
       delete (globalThis as any).window;
-    }
-    if (originalDocument) {
-      (globalThis as any).document = originalDocument;
-    } else {
-      delete (globalThis as any).document;
     }
   });
 

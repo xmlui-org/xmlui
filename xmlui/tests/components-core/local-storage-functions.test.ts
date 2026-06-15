@@ -29,14 +29,25 @@ function createLocalStorageMock() {
 
 describe("local-storage-functions", () => {
   let mockStorage: ReturnType<typeof createLocalStorageMock>;
+  let originalWindow: any;
 
   beforeEach(() => {
     mockStorage = createLocalStorageMock();
     vi.stubGlobal("localStorage", mockStorage);
+    originalWindow = (globalThis as any).window;
+    if (!(globalThis as any).window) {
+      (globalThis as any).window = {};
+    }
+    (globalThis as any).window._xsLogs = undefined;
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    if (originalWindow) {
+      (globalThis as any).window = originalWindow;
+    } else {
+      delete (globalThis as any).window;
+    }
   });
 
   // --------------------------------------------------------------------------
@@ -77,6 +88,31 @@ describe("local-storage-functions", () => {
     it("returns fallback when SecurityError is thrown", () => {
       mockStorage.getItem.mockImplementation(() => { throw new DOMException("SecurityError"); });
       expect(readLocalStorage("key", "fallback")).toBe("fallback");
+    });
+
+    it("traces read failures when inspector logging is enabled", () => {
+      (globalThis as any).window._xsLogs = [];
+      mockStorage.getItem.mockImplementation(() => {
+        throw new DOMException("blocked", "SecurityError");
+      });
+
+      expect(readLocalStorage("key", "fallback")).toBe("fallback");
+
+      const entry = (globalThis as any).window._xsLogs.find(
+        (entry: any) => entry.kind === "storage",
+      );
+      expect(entry).toMatchObject({
+        kind: "storage",
+        code: "storage-operation-failed",
+        severity: "warn",
+        operation: "read",
+        key: "key",
+      });
+      expect(entry.message).toContain("localStorage read failed");
+      expect(entry.error).toMatchObject({
+        name: "SecurityError",
+        message: "blocked",
+      });
     });
 
     it("reads null stored value as null (not fallback)", () => {
@@ -129,9 +165,33 @@ describe("local-storage-functions", () => {
 
     it("silently ignores QuotaExceededError", () => {
       mockStorage.setItem.mockImplementation(() => {
-        throw new DOMException("QuotaExceededError");
+        throw new DOMException("quota full", "QuotaExceededError");
       });
       expect(() => writeLocalStorage("key", "value")).not.toThrow();
+    });
+
+    it("traces write failures when inspector logging is enabled", () => {
+      (globalThis as any).window._xsLogs = [];
+      mockStorage.setItem.mockImplementation(() => {
+        throw new DOMException("quota full", "QuotaExceededError");
+      });
+
+      expect(() => writeLocalStorage("key", "value")).not.toThrow();
+
+      const entry = (globalThis as any).window._xsLogs.find(
+        (entry: any) => entry.kind === "storage",
+      );
+      expect(entry).toMatchObject({
+        kind: "storage",
+        code: "storage-operation-failed",
+        severity: "warn",
+        operation: "write",
+        key: "key",
+      });
+      expect(entry.error).toMatchObject({
+        name: "QuotaExceededError",
+        message: "quota full",
+      });
     });
   });
 
@@ -164,9 +224,29 @@ describe("local-storage-functions", () => {
 
     it("silently ignores SecurityError on removeItem", () => {
       mockStorage.removeItem.mockImplementation(() => {
-        throw new DOMException("SecurityError");
+        throw new DOMException("blocked", "SecurityError");
       });
       expect(() => deleteLocalStorage("key")).not.toThrow();
+    });
+
+    it("traces delete failures when inspector logging is enabled", () => {
+      (globalThis as any).window._xsLogs = [];
+      mockStorage.removeItem.mockImplementation(() => {
+        throw new DOMException("blocked", "SecurityError");
+      });
+
+      expect(() => deleteLocalStorage("key")).not.toThrow();
+
+      const entry = (globalThis as any).window._xsLogs.find(
+        (entry: any) => entry.kind === "storage",
+      );
+      expect(entry).toMatchObject({
+        kind: "storage",
+        code: "storage-operation-failed",
+        severity: "warn",
+        operation: "delete",
+        key: "key",
+      });
     });
   });
 
@@ -200,6 +280,25 @@ describe("local-storage-functions", () => {
       expect(mockStorage.removeItem).toHaveBeenCalledWith("myApp.v1");
       expect(mockStorage.removeItem).toHaveBeenCalledWith("myApp.v2");
       expect(mockStorage.removeItem).not.toHaveBeenCalledWith("otherApp");
+    });
+
+    it("traces clear failures when inspector logging is enabled", () => {
+      (globalThis as any).window._xsLogs = [];
+      mockStorage.clear.mockImplementation(() => {
+        throw new DOMException("blocked", "SecurityError");
+      });
+
+      expect(() => clearLocalStorage()).not.toThrow();
+
+      const entry = (globalThis as any).window._xsLogs.find(
+        (entry: any) => entry.kind === "storage",
+      );
+      expect(entry).toMatchObject({
+        kind: "storage",
+        code: "storage-operation-failed",
+        severity: "warn",
+        operation: "clear",
+      });
     });
   });
 });
