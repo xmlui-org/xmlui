@@ -530,6 +530,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (errNode) {
         if (at(SyntaxKind.Equal)) {
           errorAt(DIAGS_PARSER.expAttrNameBeforeEq, errNode.pos, errNode.end);
+        } else if (startsWithSuspiciousStringLiteral(errNode)) {
+          errorAt(DIAGS_PARSER.quoteInAttrList, errNode.pos, errNode.end);
         } else {
           errorAt(DIAGS_PARSER.expAttrName, errNode.pos, errNode.end);
         }
@@ -553,6 +555,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
 
     stack.completeNode(SyntaxKind.AttributeNode);
+  }
+
+  function startsWithSuspiciousStringLiteral(node: Node): boolean {
+    const firstChild = node.children?.[0];
+    if (firstChild?.kind !== SyntaxKind.StringLiteral) {
+      return false;
+    }
+    return text.substring(firstChild.pos, firstChild.end).trim().length > 2;
   }
 
   function parseAttrName(attrNames: { ns?: string; name: string }[]) {

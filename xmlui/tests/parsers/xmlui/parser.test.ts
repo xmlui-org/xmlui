@@ -45,6 +45,40 @@ describe("Xmlui parser", () => {
     expect(getText(nameId)).equal("Stack");
   });
 
+  it("curly braces in XML comments do not affect the following component", () => {
+    const { node, getText, errors } = parseSource(`
+      <!-- This comment mentions {state.value} and { another.expression } -->
+      <Stack testId="safe" />
+    `);
+    const rootElem = node.children![0];
+    const nameNode = rootElem.children[1];
+    const nameId = nameNode.children[0];
+
+    expect(errors.length).toEqual(0);
+    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+    expect(getText(nameId)).equal("Stack");
+  });
+
+  it("reports a quote-specific error for unescaped double quotes in a double-quoted handler comment", () => {
+    const { errors } = parseSource(`
+      <Button onClick="() => {
+        // "quoted text" inside a double-quoted XML attribute is invalid markup
+        count++;
+      }" />
+    `);
+
+    expect(errors.some((err) => err.code === ErrCodesParser.quoteInAttrList)).toEqual(true);
+    expect(errors.find((err) => err.code === ErrCodesParser.quoteInAttrList)?.message).toContain(
+      "surrounding XML attribute was probably closed early",
+    );
+  });
+
+  it("keeps the generic attribute-name error for non-quote attribute-list recovery", () => {
+    const { errors } = parseSource(`<Stack =bad />`);
+
+    expect(errors[0].code).toEqual(ErrCodesParser.expAttrName);
+  });
+
   it("Single node works #4", () => {
     const { node, getText } = parseSource(`
       <Stack></Stack>

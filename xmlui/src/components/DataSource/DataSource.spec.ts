@@ -513,6 +513,81 @@ test.describe("mockData property", () => {
     await page.getByTestId("btn").click();
     await expect(page.getByTestId("output")).toHaveText("second");
   });
+
+  test("when can react to DataSource loaded status", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="profile" mockData="{{ name: 'Ada' }}" />
+        <Text testId="loading" when="{!profile.loaded}">Loading</Text>
+        <Text testId="ready" when="{profile.loaded}">{profile.value.name}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("ready")).toHaveText("Ada");
+    await expect(page.getByTestId("loading")).not.toBeVisible();
+  });
+
+  test("when can guard a deep DataSource value path after load", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="profile"
+          url="/api/profile"
+        />
+        <Text
+          testId="city"
+          when="{profile.loaded && profile.value.billing.address.city}"
+        >
+          {profile.value.billing.address.city}
+        </Text>
+      </Fragment>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: { address: { city: "London" } } };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("city")).toHaveText("London");
+  });
+
+  test("onLoaded bridge can drive a simple when boolean", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App var.hasBillingAddress="{false}">
+        <DataSource
+          id="profile"
+          url="/api/profile"
+          onLoaded="data => hasBillingAddress = !!data.billing?.address"
+        />
+        <Text testId="billing" when="{hasBillingAddress}">
+          Billing address is available.
+        </Text>
+      </App>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: { address: { city: "London" } } };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("billing")).toHaveText("Billing address is available.");
+  });
 });
 
 // =============================================================================

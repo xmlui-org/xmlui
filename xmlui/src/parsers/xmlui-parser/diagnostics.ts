@@ -104,6 +104,7 @@ export enum ErrCodesParser {
   nsNotFound = "U039",
   nsValueIncorrect = "U040",
   nsSchemeIncorrect = "U041",
+  quoteInAttrList = "U042",
   invalidChar = "W001",
   untermStr = "W002",
   untermComment = "W007",
@@ -176,6 +177,11 @@ export const DIAGS_PARSER = {
   expAttrName: {
     code: ErrCodesParser.expAttrName,
     message: `An attribute name expected.`,
+  },
+  quoteInAttrList: {
+    code: ErrCodesParser.quoteInAttrList,
+    message:
+      "Unexpected quoted text in an attribute list. If this quote belongs inside another attribute value, the surrounding XML attribute was probably closed early. Use single quotes inside the value, wrap the attribute in single quotes, or escape the quote as &quot;.",
   },
   expAttrNameAfterNamespace: function (namespaceName: string) {
     return {
