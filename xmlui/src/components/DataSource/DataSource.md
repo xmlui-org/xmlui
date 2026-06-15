@@ -51,12 +51,20 @@ When reading a `DataSource` in code, distinguish the reactive wrapper from the f
 
 Logging or rendering `userData` shows the wrapper's metadata; `userData.value` shows the data itself. This is a common gotcha when debugging — `console.log(userData)` displays the wrapper, while `console.log(userData.value)` displays what came back from the server.
 
-The wrapper's status properties and `value` are reactive reads. Before the first successful load, `userData.value` is usually `undefined`, so guard payload reads with `userData.loaded`, optional member access, or a derived boolean:
+The wrapper's status properties and `value` are reactive reads. Before the first successful load, `userData.value` is usually `undefined`. XMLUI member access is optional by default, so `userData.value.profile.name` evaluates to `undefined` if an intermediate segment is missing. Use `userData.loaded` to model the fetch lifecycle, not to prevent a JavaScript-style null-reference error:
 
 ```xmlui
 <Text when="{userData.loaded}">
   {userData.value.name}
 </Text>
+```
+
+Deep paths can be used directly in `when`; missing segments simply make the expression falsy:
+
+```xmlui
+<Card when="{userData.loaded && userData.value.billing.address}">
+  ...
+</Card>
 ```
 
 Structural sharing may preserve references for unchanged parts of the payload during refetches. If a visibility decision depends on a business rule inside the payload, store that rule as its own `var` in `onLoaded` instead of repeating a long payload path in multiple `when` expressions.

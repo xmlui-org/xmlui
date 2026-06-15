@@ -559,6 +559,43 @@ test.describe("mockData property", () => {
     await expect(page.getByTestId("city")).toHaveText("London");
   });
 
+  test("when treats a missing deep DataSource value path as falsy after load", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="profile"
+          url="/api/profile"
+        />
+        <Text
+          testId="city"
+          when="{profile.loaded && profile.value.billing.address.city}"
+        >
+          City exists
+        </Text>
+        <Text testId="done" when="{profile.loaded}">Loaded</Text>
+      </Fragment>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: {} };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("done")).toHaveText("Loaded");
+    await expect(page.getByTestId("city")).not.toBeVisible();
+  });
+
   test("onLoaded bridge can drive a simple when boolean", async ({ initTestBed, page }) => {
     await initTestBed(
       `

@@ -2,7 +2,7 @@
 
 When a visibility rule depends on fetched data, guard the fetch lifecycle first and keep the final `when` expression simple.
 
-A `DataSource` value is usually `undefined` before the first successful load. After it loads, refetches can preserve unchanged object references through structural sharing. For conditional rendering, use explicit status such as `loaded`, or compute the business rule once and store it in a `var`.
+A `DataSource` value is usually `undefined` before the first successful load. XMLUI member access is optional by default, so a path like `profile.value.billing.address.city` evaluates to `undefined` if an intermediate segment is missing. After the source loads, refetches can preserve unchanged object references through structural sharing. For conditional rendering, use explicit status such as `loaded`, or compute the business rule once and store it in a `var`.
 
 ```xmlui-pg copy display name="Use fetched data safely in when"
 ---app display /hasBillingAddress/ /profile.loaded/
@@ -45,7 +45,7 @@ A `DataSource` value is usually `undefined` before the first successful load. Af
 
 **Keep business rules in a `var`**: If visibility depends on a nested payload condition, compute it in `onLoaded` and bind `when` to the boolean. This avoids repeating long paths and makes the dependency explicit.
 
-**Guard direct payload reads**: If you read `profile.value` directly in a `when` expression, also guard for readiness or use optional member access:
+**Use `loaded` for lifecycle, not null safety**: Deep paths can be used directly in `when`; missing segments simply make the expression falsy. The `loaded` check says "evaluate this business rule after the first successful response":
 
 ```xmlui
 <Card when="{profile.loaded && profile.value.billing.address}">
