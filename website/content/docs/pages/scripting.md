@@ -59,6 +59,44 @@ A function call with an argument:
 > [!INFO]
 > The JavaScript [arrow function expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), `=>`, is a concise way to define and use a function in an XMLUI attribute.
 
+## Identifier resolution in callbacks
+
+Arrow callback parameters are local to that callback body. Any other name you read or assign in the callback must resolve to an XMLUI variable, a component id/API, a local declaration in the handler, a global function, or a framework-provided name.
+
+```xml
+<App var.activeTool="{null}">
+  <Button
+    label="Subscribe"
+    onClick="
+      subscribeHostEvent('menu', (event) => {
+        activeTool = event.payload.description;
+      })
+    "
+  />
+</App>
+```
+
+In this example, `event` exists only inside the arrow body. `activeTool` is valid because it is declared on the `<App>`.
+
+When a handler assigns to a name, that name must already exist in XMLUI scope. XMLUI will not create `missingTarget` just because a handler writes to `missingTarget.value`:
+
+```xml
+<!-- Invalid: missingTarget was never declared -->
+<Button onClick="(event) => { missingTarget.value = event.payload.id }" />
+
+<!-- Valid: missingTarget is declared before the handler uses it -->
+<App var.missingTarget="{{ value: null }}">
+  <Button onClick="(event) => { missingTarget.value = event.payload.id }" />
+</App>
+```
+
+Callback parameters do not leak outside their callback:
+
+```xml
+[1, 2, 3].map(item => item + 1);
+item + 2; // invalid: item is not visible here
+```
+
 ## Writing longer functions
 
 The most elaborate function we've seen so far was this one, used in [Components](/docs/components-intro) chapter to extract data from a complex API response.

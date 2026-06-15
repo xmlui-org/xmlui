@@ -26,6 +26,13 @@ The goal is to keep diagnosis concrete before changing framework behavior.
 | Error in one host subscriber callback should not poison a sibling subscription | `xmlui/tests-e2e/event-handler-assignment-regression.spec.ts` — "subscriber callback error does not poison sibling host subscription" | Covered |
 | Simple synchronous subscriber assignment should be easy to measure for latency | `xmlui/tests-e2e/event-handler-assignment-regression.spec.ts` — first-event assignment repro is the minimal harness | Covered as a correctness characterization; no CI timing threshold |
 
+## Analyzer and Scope Repros
+
+| Reported failure mode | Coverage | Status |
+| --- | --- | --- |
+| Unresolved identifiers in nested arrow handler bodies should be reported | `xmlui/tests/components-core/analyzer/rules/scope-rules.test.ts` — "flags an unresolved identifier inside a nested arrow handler body" | Covered |
+| Arrow callback parameters should not resolve outside the callback body | `xmlui/tests/components-core/analyzer/rules/scope-rules.test.ts` — "does not let arrow parameters resolve outside the arrow body" | Covered |
+
 ## Remaining Diagnostic Gaps
 
 - Runtime handler failures still need louder diagnostics: console warning and/or Inspector trace event.

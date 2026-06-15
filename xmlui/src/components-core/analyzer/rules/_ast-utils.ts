@@ -19,16 +19,35 @@ import {
   T_ARRAY_DESTRUCTURE,
   T_BLOCK_STATEMENT,
   T_CONST_STATEMENT,
+  T_ARRAY_LITERAL,
   T_DESTRUCTURE,
   T_EXPRESSION_STATEMENT,
+  T_ASSIGNMENT_EXPRESSION,
+  T_ASYNC_FUNCTION_DECLARATION,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_DO_WHILE_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_FOR_STATEMENT,
   T_FUNCTION_DECLARATION,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_IDENTIFIER,
+  T_IF_STATEMENT,
   T_LET_STATEMENT,
   T_MEMBER_ACCESS_EXPRESSION,
+  T_OBJECT_LITERAL,
   T_OBJECT_DESTRUCTURE,
+  T_PREFIX_OP_EXPRESSION,
+  T_POSTFIX_OP_EXPRESSION,
+  T_REACTIVE_VAR_DECLARATION,
+  T_RETURN_STATEMENT,
+  T_SEQUENCE_EXPRESSION,
   T_SPREAD_EXPRESSION,
+  T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
   T_VAR_STATEMENT,
+  T_WHILE_STATEMENT,
   type Expression,
   type FunctionInvocationExpression,
   type Identifier,
@@ -205,6 +224,246 @@ export function collectIdentifierRefs(
     }
     return undefined;
   });
+
+  return out;
+}
+
+/**
+ * Collect identifier references while respecting local lexical scopes created
+ * by handler-local declarations, function parameters, and arrow parameters.
+ *
+ * Unlike `collectIdentifierRefs()`, this helper does not return identifiers
+ * that resolve to a local declaration in the expression/handler itself. This
+ * matters for nested callbacks: `item` is local inside `items.map(item => ...)`
+ * but must still be reported if it is used after the callback.
+ */
+export function collectIdentifierRefsWithLexicalScopes(
+  node: Expression | Statement | ReadonlyArray<Statement> | undefined | null,
+): IdentifierRef[] {
+  const out: IdentifierRef[] = [];
+  if (!node) return out;
+
+  function addPatternName(pattern: any, names: Set<string>): void {
+    if (!pattern || typeof pattern !== "object") return;
+    if (typeof pattern.id === "string") {
+      names.add(pattern.id);
+    } else if (pattern.id?.name) {
+      names.add(pattern.id.name);
+    }
+    if (pattern.type === T_IDENTIFIER && pattern.name) {
+      names.add(pattern.name);
+    }
+    if (pattern.type === T_SPREAD_EXPRESSION) {
+      addPatternName(pattern.expr, names);
+    }
+    for (const item of pattern.aDestr ?? []) addPatternName(item, names);
+    for (const item of pattern.oDestr ?? []) addPatternName(item, names);
+    if (
+      pattern.type === T_DESTRUCTURE ||
+      pattern.type === T_ARRAY_DESTRUCTURE ||
+      pattern.type === T_OBJECT_DESTRUCTURE
+    ) {
+      for (const item of pattern.aDestr ?? []) addPatternName(item, names);
+      for (const item of pattern.oDestr ?? []) addPatternName(item, names);
+    }
+  }
+
+  function scopeWith(scope: ReadonlySet<string>, names: Iterable<string>): Set<string> {
+    const next = new Set(scope);
+    for (const name of names) next.add(name);
+    return next;
+  }
+
+  function addDeclarationNames(decls: ReadonlyArray<any> | undefined, scope: Set<string>): void {
+    for (const decl of decls ?? []) addPatternName(decl, scope);
+  }
+
+  function isLocal(name: string, scope: ReadonlySet<string>): boolean {
+    return scope.has(name);
+  }
+
+  function visitStatementList(stmts: ReadonlyArray<any>, parentScope: ReadonlySet<string>): void {
+    const scope = new Set(parentScope);
+    for (const stmt of stmts) visitNode(stmt, scope);
+  }
+
+  function visitGeneric(node: any, scope: ReadonlySet<string>): void {
+    for (const key of Object.keys(node)) {
+      if (key === "startToken" || key === "endToken" || key === "type" || key === "nodeId") {
+        continue;
+      }
+      const child = node[key];
+      if (child == null) continue;
+      if (Array.isArray(child)) {
+        for (const item of child) {
+          if (item && typeof item === "object" && "type" in item) visitNode(item, scope);
+        }
+      } else if (typeof child === "object" && "type" in child) {
+        visitNode(child, scope);
+      }
+    }
+  }
+
+  function visitNode(current: any, scope: ReadonlySet<string>): void {
+    if (!current || typeof current !== "object") return;
+
+    switch (current.type) {
+      case T_IDENTIFIER:
+        if (!isLocal(current.name, scope)) {
+          out.push({ name: current.name, isRoot: true });
+        }
+        return;
+
+      case T_BLOCK_STATEMENT:
+        visitStatementList(current.stmts ?? [], scope);
+        return;
+
+      case T_LET_STATEMENT:
+      case T_CONST_STATEMENT:
+      case T_VAR_STATEMENT:
+        for (const decl of current.decls ?? []) {
+          if (decl.expr) visitNode(decl.expr, scope);
+        }
+        if (scope instanceof Set) addDeclarationNames(current.decls, scope);
+        return;
+
+      case T_REACTIVE_VAR_DECLARATION:
+        if (current.expr) visitNode(current.expr, scope);
+        return;
+
+      case T_FUNCTION_DECLARATION:
+      case T_ASYNC_FUNCTION_DECLARATION: {
+        if (current.id?.name && scope instanceof Set) scope.add(current.id.name);
+        const localNames = new Set<string>();
+        if (current.id?.name) localNames.add(current.id.name);
+        for (const arg of current.args ?? []) addPatternName(arg, localNames);
+        visitNode(current.stmt, scopeWith(scope, localNames));
+        return;
+      }
+
+      case T_ARROW_EXPRESSION: {
+        const localNames = new Set<string>();
+        for (const arg of current.args ?? []) addPatternName(arg, localNames);
+        visitNode(current.statement, scopeWith(scope, localNames));
+        return;
+      }
+
+      case T_ARROW_EXPRESSION_STATEMENT:
+        visitNode(current.expr, scope);
+        return;
+
+      case T_EXPRESSION_STATEMENT:
+        visitNode(current.expr, scope);
+        return;
+
+      case T_MEMBER_ACCESS_EXPRESSION:
+        visitNode(current.obj, scope);
+        return;
+
+      case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
+        visitNode(current.obj, scope);
+        visitNode(current.member, scope);
+        return;
+
+      case T_FUNCTION_INVOCATION_EXPRESSION:
+        visitNode(current.obj, scope);
+        for (const arg of current.arguments ?? []) visitNode(arg, scope);
+        return;
+
+      case T_ASSIGNMENT_EXPRESSION:
+        visitNode(current.leftValue, scope);
+        visitNode(current.expr, scope);
+        return;
+
+      case T_PREFIX_OP_EXPRESSION:
+      case T_POSTFIX_OP_EXPRESSION:
+      case T_SPREAD_EXPRESSION:
+        visitNode(current.expr, scope);
+        return;
+
+      case T_RETURN_STATEMENT:
+      case T_THROW_STATEMENT:
+        visitNode(current.expr, scope);
+        return;
+
+      case T_IF_STATEMENT:
+        visitNode(current.cond, scope);
+        visitNode(current.thenB, scope);
+        visitNode(current.elseB, scope);
+        return;
+
+      case T_WHILE_STATEMENT:
+      case T_DO_WHILE_STATEMENT:
+        visitNode(current.cond, scope);
+        visitNode(current.body, scope);
+        return;
+
+      case T_FOR_STATEMENT: {
+        const loopScope = new Set(scope);
+        visitNode(current.init, loopScope);
+        visitNode(current.cond, loopScope);
+        visitNode(current.body, loopScope);
+        visitNode(current.upd, loopScope);
+        return;
+      }
+
+      case T_FOR_IN_STATEMENT:
+      case T_FOR_OF_STATEMENT: {
+        visitNode(current.expr, scope);
+        const loopScope = current.varB === "none" ? scope : scopeWith(scope, [current.id?.name]);
+        if (current.varB === "none") visitNode(current.id, scope);
+        visitNode(current.body, loopScope);
+        return;
+      }
+
+      case T_TRY_STATEMENT:
+        visitNode(current.tryB, scope);
+        if (current.catchB) {
+          const catchScope = current.catchV?.name ? scopeWith(scope, [current.catchV.name]) : scope;
+          visitNode(current.catchB, catchScope);
+        }
+        visitNode(current.finallyB, scope);
+        return;
+
+      case T_CONDITIONAL_EXPRESSION:
+        visitNode(current.cond, scope);
+        visitNode(current.thenExpr, scope);
+        visitNode(current.elseExpr, scope);
+        return;
+
+      case T_SEQUENCE_EXPRESSION:
+        for (const expr of current.exprs ?? []) visitNode(expr, scope);
+        return;
+
+      case T_ARRAY_LITERAL:
+        for (const item of current.items ?? []) visitNode(item, scope);
+        return;
+
+      case T_OBJECT_LITERAL:
+        for (const prop of current.props ?? []) {
+          if (Array.isArray(prop)) {
+            const [key, value] = prop;
+            if (key === value) {
+              visitNode(value, scope);
+            } else {
+              visitNode(value, scope);
+            }
+          } else {
+            visitNode(prop.value, scope);
+          }
+        }
+        return;
+
+      default:
+        visitGeneric(current, scope);
+    }
+  }
+
+  if (Array.isArray(node)) {
+    visitStatementList(node, new Set());
+  } else {
+    visitNode(node, new Set());
+  }
 
   return out;
 }
