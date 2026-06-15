@@ -46,7 +46,7 @@ describe("standalone type-contract validation", () => {
         <Text variant="dummy">Contains an invalid property value</Text>
       </App>
     `;
-    const entryPoint = transformSource(source, "Main.xmlui") as ComponentDef;
+    const entryPoint = transformSource(source, 0) as ComponentDef;
     const appDef: StandaloneAppDescription = { entryPoint, sources: { "Main.xmlui": source } };
 
     const validationIssues = validateStandaloneAppTypeContracts({
@@ -75,7 +75,7 @@ describe("standalone type-contract validation", () => {
         <Text variant="dummy">Contains an invalid property value</Text>
       </App>
     `;
-    const entryPoint = transformSource(source, "Main.xmlui") as ComponentDef;
+    const entryPoint = transformSource(source, 0) as ComponentDef;
     const appDef: StandaloneAppDescription = { entryPoint, sources: { "Main.xmlui": source } };
 
     const validationIssues = validateStandaloneAppTypeContracts({
@@ -98,7 +98,7 @@ describe("standalone type-contract validation", () => {
         </Stack>
       </App>
     `;
-    const entryPoint = transformSource(source, "Main.xmlui") as ComponentDef;
+    const entryPoint = transformSource(source, 0) as ComponentDef;
     const appDef: StandaloneAppDescription = { entryPoint, sources: { "Main.xmlui": source } };
 
     const validationIssues = validateStandaloneAppTypeContracts({
