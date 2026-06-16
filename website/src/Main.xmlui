@@ -659,6 +659,34 @@
                         />
                     </NavGroup>
 
+                    <NavGroup label="Errors & Recovery">
+                        <NavLink
+                            icon="article"
+                            label="Branch on structured loader errors"
+                            to="/docs/howto/branch-on-structured-loader-errors"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Retry retryable loader errors"
+                            to="/docs/howto/retry-retryable-loader-errors"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Show section fallback from a loader error"
+                            to="/docs/howto/show-section-fallback-from-loader-error"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Collect global errors with App onError"
+                            to="/docs/howto/collect-global-errors-with-app-onerror"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Handle action errors on a component"
+                            to="/docs/howto/handle-action-errors-on-a-component"
+                        />
+                    </NavGroup>
+
                     <NavGroup label="Tables & Data Display">
                         <NavLink
                             icon="article"
@@ -2422,6 +2450,33 @@
             <Page url="/docs/howto/communicate-between-sibling-components">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/communicate-between-sibling-components.md']}"
+                />
+            </Page>
+
+            <!-- New how-to articles: Errors & Recovery -->
+            <Page url="/docs/howto/branch-on-structured-loader-errors">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/branch-on-structured-loader-errors.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/retry-retryable-loader-errors">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/retry-retryable-loader-errors.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/show-section-fallback-from-loader-error">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/show-section-fallback-from-loader-error.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/collect-global-errors-with-app-onerror">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/collect-global-errors-with-app-onerror.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/handle-action-errors-on-a-component">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/handle-action-errors-on-a-component.md']}"
                 />
             </Page>
 
