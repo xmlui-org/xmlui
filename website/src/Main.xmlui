@@ -1028,6 +1028,21 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Clean up when a panel closes"
+                            to="/docs/howto/clean-up-when-a-panel-closes"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Rerun a lifecycle effect when a value changes"
+                            to="/docs/howto/rerun-a-lifecycle-effect-when-a-value-changes"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Handle lifecycle errors with onError"
+                            to="/docs/howto/handle-lifecycle-errors-with-onerror"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Communicate between sibling components"
                             to="/docs/howto/communicate-between-sibling-components"
                         />
@@ -2387,6 +2402,21 @@
             <Page url="/docs/howto/run-a-one-time-action-on-page-load">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/run-a-one-time-action-on-page-load.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/clean-up-when-a-panel-closes">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/clean-up-when-a-panel-closes.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/rerun-a-lifecycle-effect-when-a-value-changes">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/rerun-a-lifecycle-effect-when-a-value-changes.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/handle-lifecycle-errors-with-onerror">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/handle-lifecycle-errors-with-onerror.md']}"
                 />
             </Page>
             <Page url="/docs/howto/communicate-between-sibling-components">
