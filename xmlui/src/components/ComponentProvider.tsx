@@ -291,6 +291,7 @@ import { drawerComponentRenderer } from "./Drawer/Drawer";
  * values declare renderer functions for the built-in property holders.
  */
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
+const externalPropHolder = createPropHolderComponent("External");
 const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
 const includeNavSectionPropHolder = createPropHolderComponent("IncludeNavSection");
@@ -406,6 +407,7 @@ export class ComponentRegistry {
 
     this.registerCoreComponent(SlotHolder);
     this.registerCoreComponent(dataSourcePropHolder);
+    this.registerCoreComponent(externalPropHolder);
     this.registerCoreComponent(textNodePropHolder);
     this.registerCoreComponent(textNodeCDataPropHolder);
     this.registerCoreComponent(includeNavSectionPropHolder);
