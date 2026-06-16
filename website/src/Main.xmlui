@@ -813,6 +813,36 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Constrain route parameters"
+                            to="/docs/howto/constrain-route-parameters"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Validate query parameters in a page route"
+                            to="/docs/howto/validate-query-parameters-in-a-page-route"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Register a custom route constraint"
+                            to="/docs/howto/register-a-custom-route-constraint"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Protect navigation with willNavigate"
+                            to="/docs/howto/protect-a-page-with-a-route-guard"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Intercept raw form navigation"
+                            to="/docs/howto/intercept-raw-form-navigation"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Canonicalize application URLs"
+                            to="/docs/howto/canonicalize-application-urls"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Make NavPanel width responsive"
                             to="/docs/howto/make-navpanel-width-responsive"
                         />
@@ -2290,6 +2320,36 @@
             <Page url="/docs/howto/highlight-the-active-nav-link">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/highlight-the-active-nav-link.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/constrain-route-parameters">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/constrain-route-parameters.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/validate-query-parameters-in-a-page-route">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/validate-query-parameters-in-a-page-route.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/register-a-custom-route-constraint">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/register-a-custom-route-constraint.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/protect-a-page-with-a-route-guard">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/protect-a-page-with-a-route-guard.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/intercept-raw-form-navigation">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/intercept-raw-form-navigation.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/canonicalize-application-urls">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/canonicalize-application-urls.md']}"
                 />
             </Page>
 
