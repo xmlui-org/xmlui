@@ -85,6 +85,249 @@ function Actions.upload(options: {
 
 This function uploads a file to the specified URL.
 
+## App Namespace
+
+The `App` namespace exposes framework-level runtime state and utilities. Use these functions
+from XMLUI expressions and event handlers when you need application services rather than
+domain-specific `appGlobals` values.
+
+### Internationalization
+
+These properties and functions use the active XMLUI locale. Define initial bundles with
+[`localeBundles` on `App`](/docs/reference/components/App#localebundles), render translated
+text with [`I18n`](/docs/reference/components/I18n), and use the functions below from
+expressions or event handlers.
+
+### `App.locale`
+
+```ts
+get App.locale: string;
+```
+
+Returns the active BCP-47 locale after XMLUI resolves app props, user changes, persisted
+settings, browser language, and the configured fallback.
+
+```xmlui-pg copy display name="Example: read the active locale" id="app-locale-active-locale"
+<App localeBundles="{{ en: {}, de: {} }}">
+  <VStack>
+    <Text>Active locale: {App.locale}</Text>
+    <Button label="Deutsch" onClick="App.setLocale('de')" />
+  </VStack>
+</App>
+```
+
+### `App.localeSource`
+
+```ts
+get App.localeSource: "app" | "user" | "persisted" | "navigator" | "fallback";
+```
+
+Returns which source selected the current locale.
+
+### `App.availableLocales`
+
+```ts
+get App.availableLocales: string[];
+```
+
+Returns the union of registered locale bundle IDs and configured `availableLocales`.
+
+### `App.direction`
+
+```ts
+get App.direction: "ltr" | "rtl";
+```
+
+Returns the resolved layout direction. With `<App direction="auto">`, XMLUI derives this
+from `App.locale`.
+
+### `App.setLocale`
+
+```ts
+function App.setLocale(locale: string, options?: { source?: "app" | "user" }): void;
+```
+
+Sets the active locale. By default this is treated as a user choice and is persisted when
+locale persistence is enabled. Use `{ source: "app" }` when application code should override
+the active locale without treating it as a user preference.
+
+```xmlui-pg copy display name="Example: switch locale from buttons" id="app-locale-switch-buttons"
+<App
+  localeBundles="{{
+    en: { greeting: 'Hello' },
+    de: { greeting: 'Hallo' }
+  }}">
+  <VStack>
+    <HStack>
+      <Button label="English" onClick="App.setLocale('en')" />
+      <Button label="Deutsch" onClick="App.setLocale('de')" />
+    </HStack>
+    <Text>{App.translate('greeting')}</Text>
+  </VStack>
+</App>
+```
+
+### `App.registerLocaleBundle`
+
+```ts
+function App.registerLocaleBundle(bundle: {
+  locale: string;
+  messages: Record<string, string>;
+}): void;
+```
+
+Registers one already-loaded locale bundle.
+
+### `App.registerLocaleBundles`
+
+```ts
+function App.registerLocaleBundles(input: unknown): Promise<void>;
+```
+
+Registers one or more locale bundles. The input can be a bundle object, a locale-to-messages
+map, a URL string, or an array combining those forms. URL bundles are fetched and then
+registered.
+
+```xmlui-pg copy display name="Example: register an inline bundle at runtime" id="app-locale-register-inline-bundle"
+<App localeBundles="{{ en: { greeting: 'Hello' } }}">
+  <VStack>
+    <Button
+      label="Register German"
+      onClick="() => {
+        App.registerLocaleBundle({
+          locale: 'de',
+          messages: { greeting: 'Hallo' }
+        });
+        App.setLocale('de');
+      }"
+    />
+    <Text>{App.translate('greeting')}</Text>
+  </VStack>
+</App>
+```
+
+### `App.reloadLocale`
+
+```ts
+function App.reloadLocale(locale: string): Promise<boolean>;
+```
+
+Reloads a locale that was previously registered from a URL. Returns `false` when XMLUI does
+not know a source URL for that locale.
+
+### `App.translate`
+
+```ts
+function App.translate(key: string, vars?: Record<string, unknown>): string;
+function App.t(key: string, vars?: Record<string, unknown>): string;
+```
+
+Looks up a message in the active locale bundle and formats ICU variables, plurals, and
+select branches. `App.t` is an alias for `App.translate`.
+
+```xmlui-pg copy display name="Example: translate with variables" id="app-locale-translate-variables"
+<App
+  localeBundles="{{
+    en: { welcome: 'Welcome, {name}!' }
+  }}">
+  <Text>{App.translate('welcome', { name: 'Ada' })}</Text>
+</App>
+```
+
+### `App.isRtlLocale`
+
+```ts
+function App.isRtlLocale(locale?: string): boolean;
+```
+
+Returns whether a locale should use right-to-left layout according to XMLUI's built-in
+locale heuristic. When no locale is passed, it checks `App.locale`.
+
+### `App.formatNumber`
+
+```ts
+function App.formatNumber(value: number, options?: Intl.NumberFormatOptions): string;
+```
+
+Formats a number with `Intl.NumberFormat` and the active locale.
+
+### `App.formatCurrency`
+
+```ts
+function App.formatCurrency(
+  value: number,
+  currency: string,
+  options?: Intl.NumberFormatOptions
+): string;
+```
+
+Formats a currency value with `Intl.NumberFormat` and the active locale.
+
+### `App.formatList`
+
+```ts
+function App.formatList(
+  values: readonly string[],
+  options?: Intl.ListFormatOptions
+): string;
+```
+
+Formats a list with `Intl.ListFormat` and the active locale.
+
+### `App.formatRelativeTime`
+
+```ts
+function App.formatRelativeTime(
+  value: number,
+  unit: Intl.RelativeTimeFormatUnit,
+  options?: Intl.RelativeTimeFormatOptions
+): string;
+```
+
+Formats relative time with `Intl.RelativeTimeFormat` and the active locale.
+
+### `App.compare`
+
+```ts
+function App.compare(
+  a: string,
+  b: string,
+  options?: Intl.CollatorOptions
+): number;
+```
+
+Compares two strings with `Intl.Collator` and the active locale. Use this for locale-aware
+sorting.
+
+### `App.pluralRules`
+
+```ts
+function App.pluralRules(
+  value: number,
+  options?: Intl.PluralRulesOptions
+): Intl.LDMLPluralRule;
+```
+
+Returns the plural category for a number in the active locale, such as `one` or `other`.
+
+```xmlui-pg copy display name="Example: active-locale formatters" id="app-locale-formatters"
+<App
+  localeBundles="{{ en: {}, de: {} }}"
+  var.items="{['Ada', 'Grace', 'Linus']}"
+>
+  <VStack>
+    <HStack>
+      <Button label="English" onClick="App.setLocale('en')" />
+      <Button label="Deutsch" onClick="App.setLocale('de')" />
+    </HStack>
+    <Text>Number: {App.formatNumber(123456.78)}</Text>
+    <Text>Currency: {App.formatCurrency(42, 'EUR')}</Text>
+    <Text>List: {App.formatList(items)}</Text>
+    <Text>Relative: {App.formatRelativeTime(-2, 'day')}</Text>
+  </VStack>
+</App>
+```
+
 ## App-Specific Globals
 
 ### `appGlobals`

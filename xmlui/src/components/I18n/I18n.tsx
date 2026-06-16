@@ -13,6 +13,7 @@ export const I18nMd = createMetadata({
     "`I18n` renders a translated message from the active locale bundle. Variables are " +
     "passed as props, and translated slot placeholders such as `<link/>` are replaced " +
     "with matching named XMLUI slots.",
+  allowArbitraryProps: true,
   props: {
     key: {
       description: "Translation key to resolve from the active locale bundle.",
@@ -35,28 +36,46 @@ function I18nView({
 }) {
   const appContext = useAppContext();
   const translated = appContext.App.translate(messageKey, vars);
-  return <>{renderTranslatedSlots(translated, slots, renderChild)}</>;
+  return <span>{renderTranslatedSlots(translated, slots, renderChild)}</span>;
 }
 
-export const i18nComponentRenderer = wrapComponent(COMP, Fragment as unknown as React.ComponentType, I18nMd, {
-  customRender: (_props, { node, extractValue, renderChild }) => {
-    const messageKey = extractValue.asOptionalString(node.props.key) ?? "";
-    const vars: Record<string, unknown> = {};
-    for (const [rawName, rawValue] of Object.entries(node.props ?? {})) {
-      if (rawName === "key") continue;
-      const name = rawName.startsWith(":") ? rawName.slice(1) : rawName;
-      vars[name] = extractValue(rawValue);
-    }
-    return (
-      <I18nView
-        messageKey={messageKey}
-        vars={vars}
-        slots={node.slots}
-        renderChild={renderChild}
-      />
-    );
+export const i18nComponentRenderer = wrapComponent(
+  COMP,
+  Fragment as unknown as React.ComponentType,
+  I18nMd,
+  {
+    customRender: (_props, { node, extractValue, renderChild }) => {
+      const messageKey = extractValue.asOptionalString(node.props.key) ?? "";
+      const vars: Record<string, unknown> = {};
+      const slots: Record<string, ComponentDef[]> = { ...(node.slots ?? {}) };
+      for (const [rawName, rawValue] of Object.entries(node.props ?? {})) {
+        if (rawName === "key") continue;
+        const slotValue = asSlotValue(rawValue);
+        if (slotValue) {
+          slots[rawName] = slotValue;
+          continue;
+        }
+        const name = rawName.startsWith(":") ? rawName.slice(1) : rawName;
+        vars[name] = extractValue(rawValue);
+      }
+      return (
+        <I18nView messageKey={messageKey} vars={vars} slots={slots} renderChild={renderChild} />
+      );
+    },
   },
-});
+);
+
+function asSlotValue(value: unknown): ComponentDef[] | undefined {
+  if (isComponentDef(value)) return [value];
+  if (Array.isArray(value) && value.every(isComponentDef)) return value;
+  return undefined;
+}
+
+function isComponentDef(value: unknown): value is ComponentDef {
+  return (
+    typeof value === "object" && value !== null && typeof (value as ComponentDef).type === "string"
+  );
+}
 
 function renderTranslatedSlots(
   translated: string,

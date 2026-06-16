@@ -2430,17 +2430,15 @@ export default {
         "isInternal": true
       },
       "locale": {
-        "description": "BCP-47 locale override for the app.",
-        "valueType": "string",
-        "isInternal": true
+        "description": "BCP-47 locale override for the app. Use this to set the active locale from markup; user-driven locale changes through `App.setLocale()` can still update the active locale at runtime.",
+        "valueType": "string"
       },
       "localeBundles": {
-        "description": "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map.",
-        "valueType": "any",
-        "isInternal": true
+        "description": "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map used by `App.translate()` and the `I18n` component.",
+        "valueType": "any"
       },
       "direction": {
-        "description": "Text direction for the app.",
+        "description": "Text direction for the app. Use `auto` to derive left-to-right or right-to-left direction from the active locale.",
         "valueType": "string",
         "availableValues": [
           "ltr",
@@ -2448,8 +2446,7 @@ export default {
           "auto"
         ],
         "isStrictEnum": true,
-        "defaultValue": "auto",
-        "isInternal": true
+        "defaultValue": "auto"
       },
       "scheduler": {
         "description": "Handler scheduler mode.",
@@ -21210,6 +21207,7 @@ export default {
   "I18n": {
     "status": "experimental",
     "description": "`I18n` renders a translated message from the active locale bundle. Variables are passed as props, and translated slot placeholders such as `<link/>` are replaced with matching named XMLUI slots.",
+    "allowArbitraryProps": true,
     "props": {
       "key": {
         "description": "Translation key to resolve from the active locale bundle.",

@@ -34,6 +34,14 @@ This property sets the app's default tone ("light" or "dark").
 
 Available values: `light`, `dark`
 
+### `direction` [#direction]
+
+> [!DEF]  default: **"auto"**
+
+Text direction for the app. Use `auto` to derive left-to-right or right-to-left direction from the active locale.
+
+Available values: `ltr`, `rtl`, `auto` **(default)**
+
 ### `fitContent` [#fitcontent]
 
 > [!DEF]  default: **false**
@@ -343,6 +351,14 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 ```
 
 The `desktop` layout is designed for full-screen desktop applications. It stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content area stretches to fill all remaining vertical and horizontal space. This layout ignores all max-width constraints and scrollbar gutter settings to ensure edge-to-edge display.
+
+### `locale` [#locale]
+
+BCP-47 locale override for the app. Use this to set the active locale from markup; user-driven locale changes through `App.setLocale()` can still update the active locale at runtime.
+
+### `localeBundles` [#localebundles]
+
+Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map used by `App.translate()` and the `I18n` component.
 
 ### `loggedInUser` [#loggedinuser]
 

@@ -926,6 +926,39 @@
                         />
                     </NavGroup>
 
+                    <NavGroup label="Internationalization">
+                        <NavLink
+                            icon="article"
+                            label="Switch locale with inline bundles"
+                            to="/docs/howto/switch-locale-with-inline-bundles"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Register locale bundles at runtime"
+                            to="/docs/howto/register-locale-bundles-at-runtime"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Render ICU plurals and selects"
+                            to="/docs/howto/render-icu-plurals-and-selects"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Format values for the active locale"
+                            to="/docs/howto/format-values-for-the-active-locale"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Switch layout direction from locale"
+                            to="/docs/howto/switch-layout-direction-from-locale"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Handle missing i18n translations"
+                            to="/docs/howto/handle-missing-i18n-translations"
+                        />
+                    </NavGroup>
+
                     <NavGroup label="Accessibility">
                         <NavLink
                             icon="article"
@@ -1976,6 +2009,48 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/set-a-right-to-left-layout-direction.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/switch-locale-with-inline-bundles"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/switch-locale-with-inline-bundles.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/register-locale-bundles-at-runtime"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/register-locale-bundles-at-runtime.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/render-icu-plurals-and-selects"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/render-icu-plurals-and-selects.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/format-values-for-the-active-locale"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/format-values-for-the-active-locale.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/switch-layout-direction-from-locale"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/switch-layout-direction-from-locale.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/handle-missing-i18n-translations"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/handle-missing-i18n-translations.md']}"
                 />
             </Page>
             <Page

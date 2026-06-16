@@ -128,23 +128,25 @@ export const AppMd = createMetadata({
       isInternal: true,
     },
     locale: {
-      description: "BCP-47 locale override for the app.",
+      description:
+        "BCP-47 locale override for the app. Use this to set the active locale from markup; " +
+        "user-driven locale changes through `App.setLocale()` can still update the active locale at runtime.",
       valueType: "string",
-      isInternal: true,
     },
     localeBundles: {
       description:
-        "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map.",
+        "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, " +
+        "or a locale-to-messages map used by `App.translate()` and the `I18n` component.",
       valueType: "any",
-      isInternal: true,
     },
     direction: {
-      description: "Text direction for the app.",
+      description:
+        "Text direction for the app. Use `auto` to derive left-to-right or right-to-left " +
+        "direction from the active locale.",
       valueType: "string",
       availableValues: ["ltr", "rtl", "auto"],
       isStrictEnum: true,
       defaultValue: "auto",
-      isInternal: true,
     },
     scheduler: {
       description: "Handler scheduler mode.",
