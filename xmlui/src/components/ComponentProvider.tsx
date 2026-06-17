@@ -131,6 +131,7 @@ import type {
 } from "../components-core/abstractions/LoaderRenderer";
 import { apiLoaderRenderer } from "../components-core/loader/ApiLoader";
 import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
+import { externalLoaderRenderer } from "../components-core/loader/ExternalLoader";
 import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
 import { dateInputComponentRenderer } from "./DateInput/DateInput";
 import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
@@ -290,6 +291,7 @@ import { drawerComponentRenderer } from "./Drawer/Drawer";
  * values declare renderer functions for the built-in property holders.
  */
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
+const externalPropHolder = createPropHolderComponent("External");
 const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
 const includeNavSectionPropHolder = createPropHolderComponent("IncludeNavSection");
@@ -405,6 +407,7 @@ export class ComponentRegistry {
 
     this.registerCoreComponent(SlotHolder);
     this.registerCoreComponent(dataSourcePropHolder);
+    this.registerCoreComponent(externalPropHolder);
     this.registerCoreComponent(textNodePropHolder);
     this.registerCoreComponent(textNodeCDataPropHolder);
     this.registerCoreComponent(includeNavSectionPropHolder);
@@ -875,6 +878,7 @@ export class ComponentRegistry {
 
     this.registerLoaderRenderer(apiLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
+    this.registerLoaderRenderer(externalLoaderRenderer);
 
     this.registerBehavior(labelBehavior);
     this.registerBehavior(animationBehavior);
