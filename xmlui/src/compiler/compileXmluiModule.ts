@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
+import { emitRuntimeDocument } from "./emitRuntimeDocument";
 import { buildCompilerIrFromDocument, compilerIrToRuntimeDocument } from "./ir/index";
 import { parseXmlui } from "./parseXmlui";
 
@@ -22,7 +23,7 @@ export function compileXmluiModule({ id, source }: CompileXmluiModuleOptions): s
   if (compilerIr.diagnostics.length > 0) {
     throw new Error(compilerIr.diagnostics[0].message);
   }
-  const moduleJson = JSON.stringify(compilerIrToRuntimeDocument(compilerIr), null, 2);
+  const moduleSource = emitRuntimeDocument(compilerIrToRuntimeDocument(compilerIr));
   const componentArray = imports.map((item) => item.localName).join(", ");
   const importLines = imports
     .map((item) => `import ${item.localName} from ${JSON.stringify(item.specifier)};`)
@@ -32,7 +33,7 @@ export function compileXmluiModule({ id, source }: CompileXmluiModuleOptions): s
 import { createXmluiModule } from "/src/runtime/index.tsx";
 ${importLines}
 
-const document = ${moduleJson};
+const document = ${moduleSource};
 const module = createXmluiModule(document, [${componentArray}]);
 
 export default module;

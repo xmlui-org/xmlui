@@ -2,6 +2,8 @@ import type { ProgramNode, ScriptNode } from "../parser";
 import type {
   BoundDependency,
   BoundWriteTarget,
+  CompiledEventContext,
+  CompiledExpressionContext,
   XmluiEventHandlerIr,
   XmluiScriptIr,
 } from "./scriptSemantics";
@@ -17,6 +19,7 @@ export type ParsedExpression = {
   range: SourceRange;
   ir?: XmluiScriptIr;
   compiledSource?: string;
+  evaluate?: (context: CompiledExpressionContext) => unknown;
   dependencies?: BoundDependency[];
 };
 
@@ -26,6 +29,7 @@ export type ParsedEvent = {
   range: SourceRange;
   ir?: XmluiEventHandlerIr;
   compiledSource?: string;
+  execute?: (context: CompiledEventContext) => void;
   dependencies?: BoundDependency[];
   writes?: BoundWriteTarget[];
   invalidates?: Array<{ kind: "local" | "global"; name: string }>;
@@ -45,6 +49,7 @@ export type MixedTextSegment =
       ast: ScriptNode;
       ir?: XmluiScriptIr;
       compiledSource?: string;
+      evaluate?: (context: CompiledExpressionContext) => unknown;
       dependencies?: BoundDependency[];
     };
 

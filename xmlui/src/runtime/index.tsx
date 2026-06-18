@@ -265,7 +265,7 @@ function evaluateExpressionOrText(
   if (Array.isArray(parsed)) {
     return renderMixedText(parsed, value, scope);
   }
-  if (parsed?.ir) {
+  if (parsed?.evaluate || parsed?.ir) {
     return executeExpression(parsed, scope);
   }
   const expression = unwrapExpression(value);
@@ -294,6 +294,10 @@ function executeExpression(
   expression: ParsedExpression | Extract<MixedTextSegment, { kind: "expression" }>,
   scope: RenderScope | undefined,
 ): unknown {
+  const context = createExpressionContext(scope);
+  if (expression.evaluate) {
+    return expression.evaluate(context);
+  }
   if (!expression.ir) {
     throw new Error(`XMLUI expression was not compiled: ${expression.source}`);
   }
@@ -302,11 +306,16 @@ function executeExpression(
     compiled = compileXmluiExpression(expression.ir, expression.dependencies ?? []);
     expressionCache.set(expression, compiled);
   }
-  return compiled.execute(createExpressionContext(scope));
+  return compiled.execute(context);
 }
 
 function runEvent(event: ParsedEvent | undefined, scope: RenderScope): void {
   if (!event) {
+    return;
+  }
+  const context = createEventContext(scope);
+  if (event.execute) {
+    event.execute(context);
     return;
   }
   if (!event.ir) {
@@ -317,7 +326,7 @@ function runEvent(event: ParsedEvent | undefined, scope: RenderScope): void {
     compiled = compileXmluiEventHandler(event.ir, event.dependencies ?? [], event.writes ?? []);
     eventCache.set(event, compiled);
   }
-  compiled.execute(createEventContext(scope));
+  compiled.execute(context);
 }
 
 function readName(scope: RenderScope, name: string): unknown {

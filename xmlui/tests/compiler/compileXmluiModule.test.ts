@@ -23,6 +23,8 @@ describe("compileXmluiModule", () => {
     expect(code).toContain('"sourceId": ' + JSON.stringify(id));
     expect(code).toContain('"source": "count++"');
     expect(code).toContain('"compiledSource": "ctx.writeGlobal');
+    expect(code).toContain('"evaluate": (ctx) => {');
+    expect(code).toContain('"execute": (ctx) => {');
     expect(code).toContain('"invalidates"');
   });
 

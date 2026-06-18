@@ -7,8 +7,8 @@ Parent plan: `.plans/master-plan.md`, section `5. Compiler IR`
 
 This plan covers the next compiler slice: replacing the current bootstrap
 document shape with a typed XMLUI compiler IR that can serve as the shared
-contract for expression/event code generation, runtime state, diagnostics,
-editor services, tests, and later production/SSG builds.
+contract for code generation, runtime state, diagnostics, editor services,
+tests, and later production/SSG builds.
 
 The first implementation should still target the initial counter experiments,
 but the IR architecture must be durable enough to grow toward full XMLUI:
@@ -29,9 +29,7 @@ but the IR architecture must be durable enough to grow toward full XMLUI:
 
 The IR should become the compiler boundary. Parser trees remain concrete syntax
 for editing and recovery; semantic script IR remains the expression/event
-subtree; this Compiler IR owns XMLUI document/component/module structure. It
-does not imply rendering compilation; XMLUI node rendering remains a runtime
-responsibility.
+subtree; this Compiler IR owns XMLUI document/component/module structure.
 
 ## Compatibility Baseline
 
@@ -60,12 +58,11 @@ compiler-first IR rather than a runtime-first data structure.
 The current experimental compiler already produces `XmluiDocument`,
 `XmluiElement`, `XmluiText`, mixed text segments, parsed bindings, semantic
 script IR, dependency metadata, write metadata, invalidation metadata, and
-generated expression/event source strings.
+generated source strings.
 
 This is a useful bootstrap, but it is not yet a real Compiler IR:
 
-- raw user-facing strings and compiled expression/event metadata live side by
-  side;
+- raw user-facing strings and compiled metadata live side by side;
 - element identity is implicit;
 - document/module identity is minimal;
 - lexical scope information is computed during analysis but not represented as
@@ -85,11 +82,10 @@ runtime slice.
 - The IR is not the parser CST. It should retain source spans and references,
   but not parser-only trivia or recovery nodes.
 - The IR is not the final runtime object. It may contain compiler-only metadata
-  such as scopes, dependencies, source spans, diagnostics, and generated
-  expression/event source strings.
+  such as scopes, dependencies, source spans, diagnostics, and generated source
+  strings.
 - The IR must be serializable enough for Vite/dev-server module output, with a
-  clear separation between serializable structural descriptors and generated
-  expression/event functions.
+  clear separation between serializable descriptors and runtime closures.
 - The IR must preserve compatibility-facing raw values where needed for error
   messages and debugging.
 - Every declaration, binding, dependency, write, node, and component definition
@@ -117,7 +113,7 @@ Use layered IR types instead of one all-purpose object:
      dependencies, and public component contract metadata.
 
 3. `XmluiNodeIr`
-   - Represents runtime-renderable node data.
+   - Represents renderable nodes.
    - Variants for built-in element, component reference, and text.
    - Contains node ID, type/name, source span, own scope ID, bindings, events,
      children, and dependency summaries.
@@ -126,13 +122,12 @@ Use layered IR types instead of one all-purpose object:
    - Represents props, local variables, globals, and mixed text/expression
      values.
    - Keeps raw value, parsed expression or mixed segments, semantic expression
-     IR, generated expression source, dependency metadata, and source spans.
+     IR, compiled source, dependency metadata, and source spans.
 
 5. `XmluiEventIr`
    - Represents an event handler.
-   - Keeps raw source, semantic event IR, generated event-handler source,
-     dependency metadata, write metadata, invalidation metadata, and source
-     spans.
+   - Keeps raw source, semantic event IR, compiled source, dependency metadata,
+     write metadata, invalidation metadata, and source spans.
 
 6. `XmluiScopeIr`
    - Represents lexical visibility and ownership.
@@ -192,9 +187,7 @@ The pipeline should become explicit:
 4. Bind expressions and events against scopes.
 5. Lower into `XmluiModuleIr`.
 6. Validate the IR.
-7. Emit dev-server/runtime structural descriptors. These descriptors may carry
-   generated expression/event functions, but the compiler must not emit
-   rendering code or render functions.
+7. Emit dev-server/runtime serializable descriptors.
 
 Each phase should have a small API and tests. Avoid adding more behavior to the
 current `parseXmlui` function until its responsibilities are separated.
@@ -207,8 +200,7 @@ should become the source object it consumes. Migration should be incremental:
 - first create IR alongside the current `XmluiDocument`;
 - then add a compatibility adapter from `XmluiModuleIr` to the current runtime
   descriptor;
-- then switch Vite module generation to emit IR-derived descriptors with
-  generated expression/event functions;
+- then switch Vite module generation to emit IR-derived descriptors;
 - finally remove duplicated raw runtime fields when the runtime can consume IR
   directly.
 
@@ -270,14 +262,14 @@ runtime, VS Code, and E2E checks still pass when relevant.
 6. Binding IR — completed
    - Lower prop, variable, global, and text bindings into `XmluiBindingIr`.
    - Preserve raw values, parsed expression/mixed segments, semantic IR,
-     generated expression source, source spans, and dependencies.
+     compiled source, source spans, and dependencies.
    - Tests: literal props, expression props, mixed text, variable initializers,
      global initializers, and `$props.label || ...`.
 
 7. Event IR — completed
    - Lower `on*` handlers into `XmluiEventIr`.
-   - Preserve raw source, semantic event IR, generated event-handler source,
-     dependencies, writes, invalidations, and source spans.
+   - Preserve raw source, semantic event IR, compiled source, dependencies,
+     writes, invalidations, and source spans.
    - Tests: local `count++`, global `count++`, local-shadowed `count++`,
      invalid event target diagnostics.
 
@@ -311,8 +303,8 @@ runtime, VS Code, and E2E checks still pass when relevant.
 12. Vite module integration — completed
     - Update `compileXmluiModule` to build IR and emit IR-derived descriptors.
     - Preserve sibling component import behavior.
-    - Tests: generated module includes stable IR-derived expression/event
-      metadata and source IDs.
+    - Tests: generated module includes stable IR-derived compiled metadata and
+      source IDs.
 
 13. VS Code diagnostic integration — completed
     - Feed IR validation diagnostics into the existing VS Code diagnostic
