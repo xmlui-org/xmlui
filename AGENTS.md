@@ -101,9 +101,10 @@ document as source material for later blog posts, articles, or books.
 
 When the user asks for a plan snapshot:
 
-- Snapshot the plan document the user names. If the user does not name a plan,
-  default to the current active plan subject. The current active plan subject is
-  `.plans/managed-react-contracts-plan.md`.
+- Snapshot the plan document the user names. If the user does not name a plan
+  and no active plan subject has been explicitly set for the current work,
+  ask which plan should be snapshotted before creating files. There is
+  currently no active plan subject.
 - Create a versioned copy of that plan file.
 - Use two-digit sequential names based on the plan filename:
   `.plans/master-plan-01.md`, `.plans/master-plan-02.md`,
