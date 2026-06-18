@@ -1,4 +1,0 @@
-{
-  "excludeComponentStatuses": ["in progress", "deprecated"],
-  "cleanFolder": true
-}

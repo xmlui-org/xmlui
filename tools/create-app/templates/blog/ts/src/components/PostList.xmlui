@@ -1,7 +1,0 @@
-<Component name="PostList">
-  <VStack maxWidth="720px" marginHorizontal="auto" padding="2rem" gap="2rem">
-    <Items data="{$props.posts || []}">
-      <PostCard post="{$item}" />
-    </Items>
-  </VStack>
-</Component>

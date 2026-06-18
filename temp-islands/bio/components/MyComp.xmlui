@@ -1,5 +1,0 @@
-<Component name="MyComp">
-<Card>
-<Text><Text fontWeight="800">MyComp</Text> from bio island</Text>
-</Card>
-</Component>

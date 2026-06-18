@@ -1,5 +1,0 @@
-{
-  "extends": "../tsconfig.json",
-  "include": ["src/**/*", "demo/**/*", "index.ts"],
-  "exclude": ["node_modules", "dist", "demo/**/*.xmlui.xs"]
-}

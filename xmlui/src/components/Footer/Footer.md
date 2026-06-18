@@ -1,3 +1,0 @@
-%-DESC-START
-
-%-DESC-END
