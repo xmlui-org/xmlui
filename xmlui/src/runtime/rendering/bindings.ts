@@ -1,0 +1,231 @@
+import type {
+  MixedTextSegment,
+  ParsedEvent,
+  ParsedExpression,
+  XmluiParsedBindings,
+} from "../../compiler/ir";
+import {
+  compileXmluiEventHandler,
+  compileXmluiExpression,
+  type BoundDependency,
+  type CompiledEventHandler,
+  type CompiledExpression,
+} from "../../compiler/scriptSemantics";
+import {
+  createEventContext,
+  createExpressionContext,
+  resolveLocalOwner,
+  type RuntimeScope,
+} from "../state";
+import type { NormalizedRuntimeDependency } from "./types";
+
+type ExpressionLike = ParsedExpression | Extract<MixedTextSegment, { kind: "expression" }>;
+
+const expressionCache = new WeakMap<object, CompiledExpression>();
+const eventCache = new WeakMap<ParsedEvent, CompiledEventHandler>();
+
+const bindingCounters = new Map<string, number>();
+
+export function normalizeDependencies(
+  dependencies: BoundDependency[] | undefined,
+  scope: RuntimeScope | undefined,
+): NormalizedRuntimeDependency[] {
+  if (!dependencies || !scope) {
+    return [];
+  }
+  const normalized: NormalizedRuntimeDependency[] = [];
+  const seen = new Set<string>();
+  for (const dependency of dependencies) {
+    if (dependency.kind === "local") {
+      const ownerId = resolveLocalOwner(scope, dependency.name);
+      if (!ownerId) {
+        continue;
+      }
+      const key = `local:${ownerId}:${dependency.name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        normalized.push({ kind: "local", ownerId, name: dependency.name, source: dependency });
+      }
+    } else if (dependency.kind === "global") {
+      const key = `global:${dependency.name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        normalized.push({ kind: "global", name: dependency.name, source: dependency });
+      }
+    } else if (dependency.kind === "props") {
+      const name = dependency.path[0] ?? dependency.name;
+      const key = `prop:${name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        normalized.push({ kind: "prop", name, source: dependency });
+      }
+    }
+  }
+  return normalized;
+}
+
+export function stateDependencies(
+  dependencies: NormalizedRuntimeDependency[],
+): Array<{ kind: "local"; ownerId: string; name: string } | { kind: "global"; name: string }> {
+  return dependencies.filter(
+    (
+      dependency,
+    ): dependency is
+      | { kind: "local"; ownerId: string; name: string; source: BoundDependency }
+      | { kind: "global"; name: string; source: BoundDependency } =>
+      dependency.kind === "local" || dependency.kind === "global",
+  );
+}
+
+export function dependenciesForBinding(
+  parsed: ParsedExpression | MixedTextSegment[] | undefined,
+): BoundDependency[] {
+  if (!parsed) {
+    return [];
+  }
+  if (Array.isArray(parsed)) {
+    return parsed.flatMap((segment) => (segment.kind === "expression" ? segment.dependencies ?? [] : []));
+  }
+  return parsed.dependencies ?? [];
+}
+
+export function evaluateProps(
+  props: Record<string, string>,
+  parsed: XmluiParsedBindings["props"] | undefined,
+  scope: RuntimeScope,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(props).map(([key, value]) => [
+      key,
+      evaluateExpressionOrText(value, parsed?.[key], scope, `prop:${key}`),
+    ]),
+  );
+}
+
+export function evaluateExpressionOrText(
+  value: string,
+  parsed: ParsedExpression | MixedTextSegment[] | undefined,
+  scope: RuntimeScope | undefined,
+  counterKey?: string,
+): unknown {
+  recordBindingEvaluation(counterKey);
+  if (Array.isArray(parsed)) {
+    return renderMixedText(parsed, value, scope, counterKey);
+  }
+  if (parsed?.evaluate || parsed?.ir) {
+    return executeExpression(parsed, scope);
+  }
+  const expression = unwrapExpression(value);
+  if (expression) {
+    return literalInitialValue(value);
+  }
+  return value;
+}
+
+export function renderMixedText(
+  segments: MixedTextSegment[] | undefined,
+  fallback: string,
+  scope: RuntimeScope | undefined,
+  counterKey?: string,
+): string {
+  recordBindingEvaluation(counterKey ? `${counterKey}:mixed` : undefined);
+  if (!segments) {
+    return fallback;
+  }
+  return segments
+    .map((segment, index) =>
+      segment.kind === "literal"
+        ? segment.value
+        : stringify(executeExpression(segment, scope, counterKey ? `${counterKey}:${index}` : undefined)),
+    )
+    .join("");
+}
+
+export function executeExpression(
+  expression: ExpressionLike,
+  scope: RuntimeScope | undefined,
+  counterKey?: string,
+): unknown {
+  recordBindingEvaluation(counterKey);
+  const context = createExpressionContext(scope);
+  if (expression.evaluate) {
+    return expression.evaluate(context);
+  }
+  if (!expression.ir) {
+    throw new Error(`XMLUI expression was not compiled: ${expression.source}`);
+  }
+  let compiled = expressionCache.get(expression);
+  if (!compiled) {
+    compiled = compileXmluiExpression(expression.ir, expression.dependencies ?? []);
+    expressionCache.set(expression, compiled);
+  }
+  return compiled.execute(context);
+}
+
+export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope): void {
+  if (!event) {
+    return;
+  }
+  const context = createEventContext(scope);
+  if (event.execute) {
+    event.execute(context);
+    return;
+  }
+  if (!event.ir) {
+    throw new Error(`XMLUI event handler was not compiled: ${event.source}`);
+  }
+  let compiled = eventCache.get(event);
+  if (!compiled) {
+    compiled = compileXmluiEventHandler(event.ir, event.dependencies ?? [], event.writes ?? []);
+    eventCache.set(event, compiled);
+  }
+  compiled.execute(context);
+}
+
+export function resetBindingEvaluationCounters(): void {
+  bindingCounters.clear();
+}
+
+export function getBindingEvaluationCount(key: string): number {
+  return bindingCounters.get(key) ?? 0;
+}
+
+function recordBindingEvaluation(key: string | undefined): void {
+  if (!key) {
+    return;
+  }
+  bindingCounters.set(key, (bindingCounters.get(key) ?? 0) + 1);
+}
+
+function unwrapExpression(value: string): string | undefined {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return undefined;
+}
+
+function literalInitialValue(value: string): unknown {
+  const expression = unwrapExpression(value);
+  if (!expression) {
+    return value;
+  }
+  const number = Number(expression);
+  if (!Number.isNaN(number)) {
+    return number;
+  }
+  if (
+    (expression.startsWith(`"`) && expression.endsWith(`"`)) ||
+    (expression.startsWith(`'`) && expression.endsWith(`'`))
+  ) {
+    return expression.slice(1, -1);
+  }
+  throw new Error(`XMLUI expression was not compiled: ${expression}`);
+}
+
+function stringify(value: unknown): string {
+  if (value === undefined || value === null) {
+    return "";
+  }
+  return String(value);
+}
