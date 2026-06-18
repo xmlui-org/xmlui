@@ -1,0 +1,65 @@
+{
+  "name": "XMLUI",
+  "scopeName": "source.xmlui",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#tag" },
+    { "include": "#binding" },
+    { "include": "#entity" }
+  ],
+  "repository": {
+    "comment": {
+      "begin": "<!--",
+      "end": "-->",
+      "name": "comment.block.xmlui"
+    },
+    "tag": {
+      "begin": "(</?)([A-Za-z_$][\\w$.-]*)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.xmlui" },
+        "2": { "name": "entity.name.tag.xmlui" }
+      },
+      "end": "(/?>)",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.xmlui" }
+      },
+      "patterns": [
+        {
+          "match": "([A-Za-z_$][\\w$.-]*)(\\s*=)",
+          "captures": {
+            "1": { "name": "entity.other.attribute-name.xmlui" },
+            "2": { "name": "keyword.operator.assignment.xmlui" }
+          }
+        },
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double.xmlui",
+          "patterns": [{ "include": "#binding" }]
+        },
+        {
+          "begin": "'",
+          "end": "'",
+          "name": "string.quoted.single.xmlui",
+          "patterns": [{ "include": "#binding" }]
+        }
+      ]
+    },
+    "binding": {
+      "begin": "\\{",
+      "end": "\\}",
+      "contentName": "meta.embedded.block.javascript",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.embedded.begin.xmlui" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.section.embedded.end.xmlui" }
+      },
+      "patterns": [{ "include": "source.js" }]
+    },
+    "entity": {
+      "match": "&(?:amp|lt|gt|quot|apos);",
+      "name": "constant.character.entity.xmlui"
+    }
+  }
+}

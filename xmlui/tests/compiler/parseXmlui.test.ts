@@ -21,6 +21,8 @@ describe("parseXmlui", () => {
     expect(document.root.parsed?.vars?.count).toMatchObject({
       source: "0",
       ast: { kind: "Literal", value: 0 },
+      ir: { kind: "LiteralExpression", value: 0 },
+      compiledSource: "return 0;",
     });
     expect(document.root.children[1]).toMatchObject({
       parsed: {
@@ -28,6 +30,22 @@ describe("parseXmlui", () => {
           click: {
             source: "count++",
             ast: { kind: "Program" },
+            ir: {
+              kind: "EventHandler",
+              body: [
+                {
+                  expression: {
+                    kind: "PostfixUpdate",
+                    target: {
+                      kind: "local",
+                      name: "count",
+                    },
+                  },
+                },
+              ],
+            },
+            compiledSource: `ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`,
+            invalidates: [{ kind: "local", name: "count" }],
           },
         },
       },
@@ -63,6 +81,8 @@ describe("parseXmlui", () => {
               kind: "expression",
               source: "$props.label || 'Click to increment'",
               ast: expect.objectContaining({ kind: "BinaryExpression" }),
+              ir: expect.objectContaining({ kind: "LogicalExpression" }),
+              compiledSource: `return (ctx.props?.["label"] || "Click to increment");`,
             }),
             expect.objectContaining({
               kind: "literal",
@@ -72,6 +92,10 @@ describe("parseXmlui", () => {
               kind: "expression",
               source: "count",
               ast: expect.objectContaining({ kind: "Identifier", name: "count" }),
+              ir: expect.objectContaining({
+                kind: "IdentifierRead",
+                dependency: expect.objectContaining({ kind: "local", name: "count" }),
+              }),
             }),
           ],
         },
@@ -105,10 +129,31 @@ describe("parseXmlui", () => {
               kind: "expression",
               source: "count",
               ast: expect.objectContaining({ kind: "Identifier", name: "count" }),
+              ir: expect.objectContaining({
+                kind: "IdentifierRead",
+                dependency: expect.objectContaining({ kind: "local", name: "count" }),
+              }),
             }),
           ],
         },
       ],
     });
+  });
+
+  it("surfaces unresolved expression diagnostics with XMLUI source ranges", () => {
+    expect(() => parseXmlui(`<App><Button>{missing}</Button></App>`, { sourceId: "Main.xmlui" }))
+      .toThrow("Unresolved XMLUI script identifier 'missing'.");
+  });
+
+  it("surfaces invalid event target diagnostics", () => {
+    expect(() =>
+      parseXmlui(`<Component name="Broken"><Button onClick="$props.label++" /></Component>`),
+    ).toThrow("Cannot write to read-only XMLUI script target '$props.label'.");
+  });
+
+  it("surfaces malformed mixed text expression diagnostics", () => {
+    expect(() => parseXmlui(`<App><Button>{count ||}</Button></App>`)).toThrow(
+      "Expected expression.",
+    );
   });
 });

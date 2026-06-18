@@ -22,6 +22,8 @@ describe("compileXmluiModule", () => {
     expect(code).toContain('"kind": "app"');
     expect(code).toContain('"sourceId": ' + JSON.stringify(id));
     expect(code).toContain('"source": "count++"');
+    expect(code).toContain('"compiledSource": "ctx.writeGlobal');
+    expect(code).toContain('"invalidates"');
   });
 
   it("surfaces parser diagnostics during compilation", () => {
@@ -31,5 +33,14 @@ describe("compileXmluiModule", () => {
         source: `<App><Button label /></App>`,
       }),
     ).toThrow("Expected '=' after attribute name.");
+  });
+
+  it("surfaces semantic diagnostics during compilation", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: `<App><Button>{missing}</Button></App>`,
+      }),
+    ).toThrow("Unresolved XMLUI script identifier 'missing'.");
   });
 });

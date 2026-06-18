@@ -1,5 +1,8 @@
 node_modules/
 dist/
+!tools/vscode/dist/
+!tools/vscode/dist/**
 test-results/
 playwright-report/
+*.vsix
 .DS_Store

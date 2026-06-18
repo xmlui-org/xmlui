@@ -10,6 +10,7 @@ import {
 } from "../parser";
 import { parseExpressionOrMixedText, parseMixedTextSegments } from "./mixedText";
 import type {
+  MixedTextSegment,
   ParsedEvent,
   ParsedExpression,
   SourceRange,
@@ -18,6 +19,15 @@ import type {
   XmluiNode,
   XmluiParsedBindings,
 } from "./ir";
+import {
+  compileXmluiEventHandler,
+  compileXmluiExpression,
+  createChildXmluiScope,
+  createXmluiScope,
+  lowerScriptEventHandler,
+  lowerScriptExpression,
+  type XmluiScope,
+} from "./scriptSemantics";
 
 type AttributeInfo = {
   name: string;
@@ -29,6 +39,13 @@ type AttributeInfo = {
 export type ParseXmluiOptions = {
   sourceId?: string;
 };
+
+export class XmluiParseError extends Error {
+  constructor(public readonly diagnostic: ParserDiagnostic) {
+    super(diagnostic.message);
+    this.name = "XmluiParseError";
+  }
+}
 
 export function parseXmlui(source: string, options: ParseXmluiOptions = {}): XmluiDocument {
   const sourceId = options.sourceId ?? "anonymous.xmlui";
@@ -49,10 +66,15 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     if (!name) {
       throw new Error("<Component> requires a name attribute.");
     }
+    const componentRoot = stripInternalRoot(transformedRoot, name);
+    analyzeElementScripts(componentRoot, {
+      sourceId,
+      allowImplicitGlobals: true,
+    });
     return {
       kind: "component",
       name,
-      root: stripInternalRoot(transformedRoot, name),
+      root: componentRoot,
     };
   }
 
@@ -62,10 +84,100 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     );
   }
 
+  analyzeElementScripts(transformedRoot, {
+    sourceId,
+    allowImplicitGlobals: false,
+  });
+
   return {
     kind: "app",
     root: transformedRoot,
   };
+}
+
+type AnalyzeOptions = {
+  sourceId: string;
+  allowImplicitGlobals: boolean;
+};
+
+function analyzeElementScripts(
+  element: XmluiElement,
+  options: AnalyzeOptions,
+  parentScope?: XmluiScope,
+): void {
+  const scope = parentScope
+    ? createChildXmluiScope(parentScope, element)
+    : createXmluiScope(element, {
+        sourceId: options.sourceId,
+        allowImplicitGlobals: options.allowImplicitGlobals,
+      });
+
+  analyzeParsedBindings(element.parsed, scope);
+  for (const child of element.children) {
+    if (child.kind === "element") {
+      analyzeElementScripts(child, options, scope);
+    } else {
+      analyzeTextSegments(child.segments, scope);
+    }
+  }
+}
+
+function analyzeParsedBindings(parsed: XmluiParsedBindings | undefined, scope: XmluiScope): void {
+  if (!parsed) {
+    return;
+  }
+  for (const bucket of [parsed.props, parsed.vars, parsed.globals]) {
+    if (!bucket) {
+      continue;
+    }
+    for (const value of Object.values(bucket)) {
+      if (Array.isArray(value)) {
+        analyzeTextSegments(value, scope);
+      } else {
+        analyzeExpression(value, scope);
+      }
+    }
+  }
+  if (parsed.events) {
+    for (const event of Object.values(parsed.events)) {
+      analyzeEvent(event, scope);
+    }
+  }
+}
+
+function analyzeTextSegments(segments: MixedTextSegment[] | undefined, scope: XmluiScope): void {
+  for (const segment of segments ?? []) {
+    if (segment.kind === "expression") {
+      analyzeExpression(segment, scope);
+    }
+  }
+}
+
+function analyzeExpression(
+  expression: ParsedExpression | Extract<MixedTextSegment, { kind: "expression" }>,
+  scope: XmluiScope,
+): void {
+  const lowered = lowerScriptExpression(expression.ast, scope);
+  if (lowered.diagnostics.length > 0) {
+    throw diagnosticToError(lowered.diagnostics[0]);
+  }
+  const compiled = compileXmluiExpression(lowered.ir, lowered.dependencies);
+  expression.ir = lowered.ir;
+  expression.dependencies = lowered.dependencies;
+  expression.compiledSource = compiled.source;
+}
+
+function analyzeEvent(event: ParsedEvent, scope: XmluiScope): void {
+  const lowered = lowerScriptEventHandler(event.ast, scope);
+  if (lowered.diagnostics.length > 0) {
+    throw diagnosticToError(lowered.diagnostics[0]);
+  }
+  const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+  event.ir = lowered.ir;
+  event.dependencies = lowered.dependencies;
+  event.writes = lowered.writes;
+  event.invalidates = compiled.invalidates;
+  event.compiledSource = compiled.source;
 }
 
 function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiElement {
@@ -235,11 +347,18 @@ function tagName(node: MarkupSyntaxNode, source: SourceText): string {
 }
 
 function stripInternalRoot(component: XmluiElement, name: string): XmluiElement {
-  const { props: _props, parsed: _parsed, ...rest } = component;
+  const { props: _props, parsed, ...rest } = component;
+  const parsedProps = { ...parsed?.props };
+  delete parsedProps.name;
+  const nextParsed = {
+    ...parsed,
+    ...(Object.keys(parsedProps).length > 0 ? { props: parsedProps } : { props: undefined }),
+  };
   return {
     ...rest,
     type: name,
     props: {},
+    ...(hasParsedBindings(nextParsed) ? { parsed: nextParsed } : {}),
   };
 }
 
@@ -298,5 +417,5 @@ function expressionInnerRange(value: string, range: SourceRange): SourceRange {
 }
 
 function diagnosticToError(diagnostic: ParserDiagnostic): Error {
-  return new Error(diagnostic.message);
+  return new XmluiParseError(diagnostic);
 }

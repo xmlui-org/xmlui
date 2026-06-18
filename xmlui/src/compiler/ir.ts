@@ -1,4 +1,10 @@
 import type { ProgramNode, ScriptNode } from "../parser";
+import type {
+  BoundDependency,
+  BoundWriteTarget,
+  XmluiEventHandlerIr,
+  XmluiScriptIr,
+} from "./scriptSemantics";
 
 export type SourceRange = {
   start: number;
@@ -9,12 +15,20 @@ export type ParsedExpression = {
   source: string;
   ast: ScriptNode;
   range: SourceRange;
+  ir?: XmluiScriptIr;
+  compiledSource?: string;
+  dependencies?: BoundDependency[];
 };
 
 export type ParsedEvent = {
   source: string;
   ast: ProgramNode;
   range: SourceRange;
+  ir?: XmluiEventHandlerIr;
+  compiledSource?: string;
+  dependencies?: BoundDependency[];
+  writes?: BoundWriteTarget[];
+  invalidates?: Array<{ kind: "local" | "global"; name: string }>;
 };
 
 export type MixedTextSegment =
@@ -29,6 +43,9 @@ export type MixedTextSegment =
       range: SourceRange;
       expressionRange: SourceRange;
       ast: ScriptNode;
+      ir?: XmluiScriptIr;
+      compiledSource?: string;
+      dependencies?: BoundDependency[];
     };
 
 export type XmluiParsedBindings = {

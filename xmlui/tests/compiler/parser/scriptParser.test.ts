@@ -126,6 +126,19 @@ describe("ScriptParser expression mode", () => {
     expect((lookup?.chainAtPos.at(-1) as IdentifierNode).name).toBe("$props");
   });
 
+  it("reports the previous script node when the cursor is between child nodes", () => {
+    const result = parseScriptExpression("$props.label || count");
+    const lookup = findScriptNodeAtOffset(result.node, 13);
+
+    expect(lookup?.chainAtPos.map((node) => node.kind)).toEqual(["BinaryExpression"]);
+    expect(lookup?.chainBeforePos?.map((node) => node.kind)).toEqual([
+      "BinaryExpression",
+      "MemberExpression",
+      "Identifier",
+    ]);
+    expect((lookup?.chainBeforePos?.at(-1) as IdentifierNode).name).toBe("label");
+  });
+
   it("reports malformed expressions without throwing", () => {
     const missingProperty = parseScriptExpression("$props.");
     const missingParen = parseScriptExpression("save(count");
@@ -143,6 +156,87 @@ describe("ScriptParser expression mode", () => {
         expect.objectContaining({
           code: "XS108",
           message: "Expected ')' after call arguments.",
+        }),
+      ]),
+    );
+  });
+
+  it("keeps a recoverable member expression for incomplete member access", () => {
+    const result = parseScriptExpression("$props.");
+
+    expect(result.node.kind).toBe("MemberExpression");
+    const member = result.node as MemberExpressionNode;
+    expect(member.object).toMatchObject({
+      kind: "Identifier",
+      name: "$props",
+    });
+    expect(member.property).toMatchObject({
+      kind: "Identifier",
+      name: "",
+      children: [expect.objectContaining({ kind: "Error" })],
+    });
+    expect(member.span).toEqual({
+      sourceId: "anonymous.xmlui",
+      start: 0,
+      end: 7,
+    });
+  });
+
+  it("keeps postfix update children and spans stable", () => {
+    const result = parseScriptExpression("count++");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.node).toMatchObject({
+      kind: "PostfixExpression",
+      operator: "++",
+      span: { sourceId: "anonymous.xmlui", start: 0, end: 7 },
+      children: [
+        expect.objectContaining({
+          kind: "Identifier",
+          name: "count",
+          span: { sourceId: "anonymous.xmlui", start: 0, end: 5 },
+        }),
+      ],
+    });
+  });
+
+  it("preserves a literal node for unterminated strings while reporting diagnostics", () => {
+    const result = parseScriptExpression("'unterminated");
+
+    expect(result.node).toMatchObject({
+      kind: "Literal",
+      raw: "'unterminated",
+      value: "unterminated",
+      span: { sourceId: "anonymous.xmlui", start: 0, end: 13 },
+    });
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XS002",
+          message: "Unterminated string literal.",
+          span: { sourceId: "anonymous.xmlui", start: 0, end: 13 },
+        }),
+      ]),
+    );
+  });
+
+  it("keeps a recoverable binary expression for incomplete logical expressions", () => {
+    const result = parseScriptExpression("count ||");
+
+    expect(result.node.kind).toBe("BinaryExpression");
+    const binary = result.node as BinaryExpressionNode;
+    expect(binary).toMatchObject({
+      operator: "||",
+      left: expect.objectContaining({ kind: "Identifier", name: "count" }),
+      right: expect.objectContaining({ kind: "Error" }),
+      span: { sourceId: "anonymous.xmlui", start: 0, end: 8 },
+    });
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XS105",
+          message: "Expected expression.",
+          span: { sourceId: "anonymous.xmlui", start: 8, end: 8 },
         }),
       ]),
     );

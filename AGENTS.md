@@ -102,7 +102,8 @@ document as source material for later blog posts, articles, or books.
 When the user asks for a plan snapshot:
 
 - Snapshot the plan document the user names. If the user does not name a plan,
-  default to `.plans/master-plan.md`.
+  default to the current active plan subject. The current active plan subject is
+  `.plans/compiler-ir-plan.md`.
 - Create a versioned copy of that plan file.
 - Use two-digit sequential names based on the plan filename:
   `.plans/master-plan-01.md`, `.plans/master-plan-02.md`,

@@ -1,0 +1,87 @@
+{
+  "name": "xmlui-vscode",
+  "displayName": "XMLUI",
+  "description": "XMLUI language support",
+  "version": "0.0.0",
+  "private": true,
+  "publisher": "xmlui",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xmlui-com/xmlui"
+  },
+  "type": "commonjs",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "activationEvents": [
+    "onLanguage:xmlui"
+  ],
+  "vsce": {
+    "dependencies": false
+  },
+  "main": "./dist/extension.cjs",
+  "files": [
+    "dist/extension.cjs",
+    "language-configuration.json",
+    "syntaxes/**",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "xmlui",
+        "aliases": [
+          "XMLUI",
+          "Xmlui"
+        ],
+        "extensions": [
+          ".xmlui"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "xmlui",
+        "scopeName": "source.xmlui",
+        "path": "./syntaxes/xmlui.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.javascript": "javascript"
+        }
+      }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "xmluiTag",
+        "superType": "type",
+        "description": "XMLUI tag names"
+      },
+      {
+        "id": "xmluiAttribute",
+        "superType": "property",
+        "description": "XMLUI attribute names"
+      },
+      {
+        "id": "xmluiText",
+        "superType": "string",
+        "description": "XMLUI text nodes"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "build:vsix": "vsce package",
+    "test": "vitest run tests",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.13",
+    "@types/vscode": "^1.75.1",
+    "@vscode/vsce": "^3.6.0",
+    "esbuild": "^0.27.1",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.0"
+  }
+}

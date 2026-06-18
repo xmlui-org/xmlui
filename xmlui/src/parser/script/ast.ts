@@ -114,6 +114,7 @@ export type ScriptSourceInput = SourceText | TextSource | string;
 
 export type FindScriptNodeSuccess = {
   chainAtPos: ScriptNode[];
+  chainBeforePos?: ScriptNode[];
 };
 
 export function findScriptNodeAtOffset(
@@ -124,17 +125,43 @@ export function findScriptNodeAtOffset(
     return undefined;
   }
 
-  const chain: ScriptNode[] = [node];
-  let current = node;
-  while (current.children && current.children.length > 0) {
-    const next = current.children.find(
-      (child) => child.span.start <= offset && offset <= child.span.end,
-    );
-    if (!next || next === current) {
+  const chainAtPos = findChainAtOffset(node, offset) ?? [node];
+  const chainBeforePos = findChainBeforeOffset(node, offset);
+  return {
+    chainAtPos,
+    ...(chainBeforePos ? { chainBeforePos } : {}),
+  };
+}
+
+function findChainAtOffset(node: ScriptNode, offset: number): ScriptNode[] | undefined {
+  if (offset < node.span.start || offset > node.span.end) {
+    return undefined;
+  }
+
+  const children = node.children ?? [];
+  for (const child of children) {
+    const childChain = findChainAtOffset(child, offset);
+    if (childChain) {
+      return [node, ...childChain];
+    }
+  }
+
+  return [node];
+}
+
+function findChainBeforeOffset(node: ScriptNode, offset: number): ScriptNode[] | undefined {
+  let best: ScriptNode[] | undefined;
+
+  for (const child of node.children ?? []) {
+    if (child.span.end <= offset) {
+      const childBest = findChainBeforeOffset(child, offset) ?? [child];
+      best = [node, ...childBest];
+      continue;
+    }
+    if (child.span.start > offset) {
       break;
     }
-    chain.push(next);
-    current = next;
   }
-  return { chainAtPos: chain };
+
+  return best;
 }
