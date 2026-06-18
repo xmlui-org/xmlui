@@ -1,0 +1,5 @@
+<Component name="IncrementButton">
+  <Button onClick="count++">
+    {$props.label || 'Click to increment (Global)'}: {count}
+  </Button>
+</Component>

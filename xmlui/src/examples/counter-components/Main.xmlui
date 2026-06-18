@@ -1,0 +1,6 @@
+<App>
+  <H1>Counter with components</H1>
+  <IncrementButton />
+  <IncrementButton label="Counter #2" />
+  <IncrementButton label="Counter #3" />
+</App>

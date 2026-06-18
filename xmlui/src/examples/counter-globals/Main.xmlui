@@ -1,0 +1,9 @@
+<App global.count="{0}">
+  <H1>Counter with components</H1>
+  <IncrementButton />
+  <IncrementButton label="Global Counter #2" />
+  <IncrementButton label="Global Counter #3" />
+  <Button var.count="{0}" onClick="count++">
+    Local count: {count}
+  </Button>
+</App>

@@ -1,0 +1,6 @@
+<App var.count="{0}">
+  <H1>Counter example</H1>
+  <Button onClick="count++">
+    Click to increment: {count}
+  </Button>
+</App>
