@@ -18,6 +18,20 @@ describe("parseXmlui", () => {
       type: "Button",
       events: { click: "count++" },
     });
+    expect(document.root.parsed?.vars?.count).toMatchObject({
+      source: "0",
+      ast: { kind: "Literal", value: 0 },
+    });
+    expect(document.root.children[1]).toMatchObject({
+      parsed: {
+        events: {
+          click: {
+            source: "count++",
+            ast: { kind: "Program" },
+          },
+        },
+      },
+    });
   });
 
   it("parses component definitions and props", () => {
@@ -39,6 +53,30 @@ describe("parseXmlui", () => {
       type: "Button",
       events: { click: "count++" },
     });
+    expect(document.root.children[0]).toMatchObject({
+      children: [
+        {
+          kind: "text",
+          value: "{$props.label || 'Click to increment'}: {count}",
+          segments: [
+            expect.objectContaining({
+              kind: "expression",
+              source: "$props.label || 'Click to increment'",
+              ast: expect.objectContaining({ kind: "BinaryExpression" }),
+            }),
+            expect.objectContaining({
+              kind: "literal",
+              value: ": ",
+            }),
+            expect.objectContaining({
+              kind: "expression",
+              source: "count",
+              ast: expect.objectContaining({ kind: "Identifier", name: "count" }),
+            }),
+          ],
+        },
+      ],
+    });
   });
 
   it("parses global variables and local shadowing", () => {
@@ -55,6 +93,22 @@ describe("parseXmlui", () => {
       type: "Button",
       vars: { count: "{0}" },
       events: { click: "count++" },
+    });
+    expect(document.root.children[0]).toMatchObject({
+      children: [
+        {
+          kind: "text",
+          value: "Local count: {count}",
+          segments: [
+            { kind: "literal", value: "Local count: " },
+            expect.objectContaining({
+              kind: "expression",
+              source: "count",
+              ast: expect.objectContaining({ kind: "Identifier", name: "count" }),
+            }),
+          ],
+        },
+      ],
     });
   });
 });

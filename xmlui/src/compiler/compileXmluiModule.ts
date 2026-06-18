@@ -10,7 +10,7 @@ export type CompileXmluiModuleOptions = {
 };
 
 export function compileXmluiModule({ id, source }: CompileXmluiModuleOptions): string {
-  const document = parseXmlui(source);
+  const document = parseXmlui(source, { sourceId: id });
   const imports = document.kind === "app" ? siblingComponentImports(id) : [];
   const moduleJson = JSON.stringify(document, null, 2);
   const componentArray = imports.map((item) => item.localName).join(", ");

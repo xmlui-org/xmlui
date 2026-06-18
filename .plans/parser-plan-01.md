@@ -199,7 +199,7 @@ Each step should be independently implementable and should leave the project in
 a working state. A step is complete only when its focused unit tests pass and
 the existing parser/runtime tests still pass.
 
-1. Parser package layout and shared source primitives — completed
+1. Parser package layout and shared source primitives
    - Create the parser module structure under the `xmlui` package.
    - Add shared `SourceId`, `SourceSpan`, diagnostic, token, and text-source
      types.
@@ -208,7 +208,7 @@ the existing parser/runtime tests still pass.
    - Tests: source slicing, offset movement, line/column lookup, EOF behavior,
      and multi-source span creation.
 
-2. Markup token kinds and scanner-only API — completed
+2. Markup token kinds and scanner-only API
    - Define the initial markup `SyntaxKind` / token kind set.
    - Implement `MarkupScanner.scan()` and a scanner-only `tokenizeMarkup()`
      helper.
@@ -218,14 +218,14 @@ the existing parser/runtime tests still pass.
      preservation, string values, token spans, and syntax-highlighting
      classifications.
 
-3. Markup scanner diagnostics — completed
+3. Markup scanner diagnostics
    - Report unknown characters, unterminated strings, and unterminated comments
      as diagnostics instead of throwing.
    - Keep tokenization useful after an error when possible.
    - Tests: malformed examples produce stable diagnostic codes and ranges while
      still returning tokens.
 
-4. Concrete syntax tree model — completed
+4. Concrete syntax tree model
    - Add syntax node types for document/content list, element, tag name,
      attribute list, attribute, attribute key, text, trivia/comment attachment,
      and error spans.
@@ -235,21 +235,21 @@ the existing parser/runtime tests still pass.
    - Tests: node range invariants, text slicing, debug output snapshots if
      useful, and token lookup inside and between tokens.
 
-5. Markup parser happy path — completed
+5. Markup parser happy path
    - Parse nested elements, self-closing elements, attributes, text nodes, and
      comments/trivia into the concrete syntax tree.
    - Enforce a single document root only as far as the initial examples need.
    - Tests: tree shape and source ranges for local counter, component counter,
      global-shadowing counter, and small self-closing/comment cases.
 
-6. Markup parser recovery — completed
+6. Markup parser recovery
    - Add recovery for missing closing tags, mismatched tag names, missing
      attribute names, missing `=`, and missing attribute values.
    - Insert error nodes where useful for editor features.
    - Tests: each recovery case returns a partial tree, stable diagnostics, and
      useful token lookup near the error.
 
-7. Script token kinds and scanner-only API — completed
+7. Script token kinds and scanner-only API
    - Define the initial script token set needed by expressions and event
      handlers in the examples.
    - Implement `ScriptScanner` and `tokenizeScript()` with source spans mapped
@@ -258,7 +258,7 @@ the existing parser/runtime tests still pass.
    - Tests: tokenization and classification for `{0}`, `{count}`,
      `{$props.label || 'Click to increment'}`, and `count++`.
 
-8. Script expression parser — completed
+8. Script expression parser
    - Implement expression mode for literals, identifiers, `$`-prefixed names,
      member access, calls, unary operators, logical/binary operators, postfix
      increment, and grouping.
@@ -266,21 +266,21 @@ the existing parser/runtime tests still pass.
    - Tests: AST shape, precedence, source spans, and diagnostics for malformed
      expressions.
 
-9. Script event-handler parser — completed
+9. Script event-handler parser
    - Implement statement/event-handler mode with expression statements and
      statement lists.
    - Keep the door open for later statements without adding them now.
    - Tests: `count++` parses as an event-handler statement list, and malformed
      event handlers map diagnostics back to the containing attribute value.
 
-10. Mixed text segmentation — completed
+10. Mixed text segmentation
     - Derive literal and `{expression}` segments from raw text nodes.
     - Parse expression segments with `ScriptParser` expression mode.
     - Preserve both the full brace span and the inner expression span.
     - Tests: literal-only text, expression-only text, mixed text before/after an
       expression, multiple expressions, and malformed expression diagnostics.
 
-11. XMLUI transform integration — completed
+11. XMLUI transform integration
     - Replace the current ad hoc `parseXmlui` internals with
       markup-parse-plus-transform.
     - Preserve the existing runtime-facing IR for the initial examples.
@@ -290,20 +290,20 @@ the existing parser/runtime tests still pass.
     - Tests: existing public parser tests remain almost unchanged, with added
       assertions for source metadata where helpful.
 
-12. Vite plugin and dev-server integration — completed
+12. Vite plugin and dev-server integration
     - Route `.xmlui` module loading through the new parser pipeline.
     - Ensure diagnostics surface clearly during dev builds.
     - Keep source IDs stable for `Main.xmlui` and user-defined component files.
     - Tests: unit tests for compile integration and existing E2E counter tests.
 
-13. LSP readiness adapters — completed
+13. LSP readiness adapters
     - Add parser-core adapters for semantic-token data, diagnostics, and
       cursor lookup without creating the VS Code extension.
     - Keep adapters protocol-shaped but not extension-specific.
     - Tests: semantic token classification snapshots, diagnostic range mapping,
       and cursor lookup across markup and embedded script regions.
 
-14. Compatibility hardening for the first parser slice — completed
+14. Compatibility hardening for the first parser slice
     - Compare behavior against old XMLUI parser cases that overlap the initial
       experiment.
     - Add regression tests for any discovered differences that should remain

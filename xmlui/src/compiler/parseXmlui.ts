@@ -1,162 +1,105 @@
-import type { XmluiDocument, XmluiElement, XmluiNode } from "./ir";
+import {
+  getNodeText,
+  MarkupSyntaxKind,
+  parseMarkup,
+  parseScriptEventHandler,
+  parseScriptExpression,
+  type MarkupSyntaxNode,
+  type ParserDiagnostic,
+  type SourceText,
+} from "../parser";
+import { parseExpressionOrMixedText, parseMixedTextSegments } from "./mixedText";
+import type {
+  ParsedEvent,
+  ParsedExpression,
+  SourceRange,
+  XmluiDocument,
+  XmluiElement,
+  XmluiNode,
+  XmluiParsedBindings,
+} from "./ir";
 
-type RawElement = XmluiElement & {
-  parent?: RawElement;
+type AttributeInfo = {
+  name: string;
+  value: string;
+  nameRange: SourceRange;
+  valueRange: SourceRange;
 };
 
-type ParseFrame = {
-  element: RawElement;
+export type ParseXmluiOptions = {
+  sourceId?: string;
 };
 
-const NAME_RE = /^[A-Za-z_$][\w$.-]*/;
-
-export function parseXmlui(source: string): XmluiDocument {
-  const root = parseXml(source);
-
-  if (root.type === "Component") {
-    const name = root.props.name;
-    if (!name) {
-      throw new Error("<Component> requires a name attribute.");
-    }
-    const componentRoot = stripInternalRoot(root, name);
-    return {
-      kind: "component",
-      name,
-      root: componentRoot,
-    };
+export function parseXmlui(source: string, options: ParseXmluiOptions = {}): XmluiDocument {
+  const sourceId = options.sourceId ?? "anonymous.xmlui";
+  const parsed = parseMarkup(source, sourceId);
+  if (parsed.diagnostics.length > 0) {
+    throw diagnosticToError(parsed.diagnostics[0]);
   }
 
-  if (root.type !== "App") {
-    throw new Error(`Expected <App> or <Component> as the document root, got <${root.type}>.`);
-  }
-
-  return {
-    kind: "app",
-    root,
-  };
-}
-
-function parseXml(source: string): XmluiElement {
-  const stack: ParseFrame[] = [];
-  let root: RawElement | undefined;
-  let index = 0;
-
-  while (index < source.length) {
-    if (source.startsWith("<!--", index)) {
-      const end = source.indexOf("-->", index + 4);
-      if (end < 0) {
-        throw new Error("Unterminated XML comment.");
-      }
-      index = end + 3;
-      continue;
-    }
-
-    if (source[index] === "<") {
-      if (source[index + 1] === "/") {
-        const closeEnd = source.indexOf(">", index + 2);
-        if (closeEnd < 0) {
-          throw new Error("Unterminated closing tag.");
-        }
-        const closeName = source.slice(index + 2, closeEnd).trim();
-        const frame = stack.pop();
-        if (!frame) {
-          throw new Error(`Unexpected closing tag </${closeName}>.`);
-        }
-        if (frame.element.type !== closeName) {
-          throw new Error(`Expected </${frame.element.type}>, got </${closeName}>.`);
-        }
-        frame.element.range.end = closeEnd + 1;
-        index = closeEnd + 1;
-        continue;
-      }
-
-      const openEnd = findTagEnd(source, index + 1);
-      const rawTag = source.slice(index + 1, openEnd);
-      const selfClosing = rawTag.trimEnd().endsWith("/");
-      const element = parseOpenTag(rawTag, index, openEnd + 1, selfClosing);
-
-      const parent = stack.at(-1)?.element;
-      if (parent) {
-        parent.children.push(element);
-        element.parent = parent;
-      } else if (!root) {
-        root = element;
-      } else {
-        throw new Error("XMLUI documents must have a single root element.");
-      }
-
-      if (!selfClosing) {
-        stack.push({ element });
-      }
-      index = openEnd + 1;
-      continue;
-    }
-
-    const nextTag = source.indexOf("<", index);
-    const end = nextTag < 0 ? source.length : nextTag;
-    const rawText = source.slice(index, end);
-    const text = normalizeText(rawText);
-    if (text) {
-      const parent = stack.at(-1)?.element;
-      if (!parent) {
-        throw new Error("Text is not allowed outside the root element.");
-      }
-      parent.children.push({
-        kind: "text",
-        value: text,
-        range: { start: index, end },
-      });
-    }
-    index = end;
-  }
-
-  if (stack.length > 0) {
-    throw new Error(`Unclosed tag <${stack.at(-1)!.element.type}>.`);
-  }
-
+  const root = rootElement(parsed.node);
   if (!root) {
     throw new Error("XMLUI document is empty.");
   }
 
-  return detach(root);
-}
+  const transformedRoot = transformElement(root, parsed.source, sourceId);
 
-function parseOpenTag(
-  rawTag: string,
-  start: number,
-  end: number,
-  selfClosing: boolean,
-): RawElement {
-  const tag = selfClosing ? rawTag.trimEnd().slice(0, -1).trimEnd() : rawTag;
-  const nameMatch = tag.match(NAME_RE);
-  if (!nameMatch) {
-    throw new Error(`Invalid tag near offset ${start}.`);
+  if (transformedRoot.type === "Component") {
+    const name = transformedRoot.props.name;
+    if (!name) {
+      throw new Error("<Component> requires a name attribute.");
+    }
+    return {
+      kind: "component",
+      name,
+      root: stripInternalRoot(transformedRoot, name),
+    };
   }
 
-  const type = nameMatch[0];
-  const attrSource = tag.slice(type.length);
+  if (transformedRoot.type !== "App") {
+    throw new Error(
+      `Expected <App> or <Component> as the document root, got <${transformedRoot.type}>.`,
+    );
+  }
+
+  return {
+    kind: "app",
+    root: transformedRoot,
+  };
+}
+
+function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiElement {
+  const type = tagName(node, source);
   const props: Record<string, string> = {};
   const vars: Record<string, string> = {};
   const globals: Record<string, string> = {};
   const events: Record<string, string> = {};
+  const parsed: XmluiParsedBindings = {};
 
-  for (const attr of parseAttributes(attrSource)) {
+  for (const attr of attributes(node, source)) {
     if (attr.name.startsWith("var.")) {
-      vars[attr.name.slice(4)] = attr.value;
+      const name = attr.name.slice(4);
+      vars[name] = attr.value;
+      setParsedValue(parsed, "vars", name, attr, sourceId);
       continue;
     }
     if (attr.name.startsWith("global.")) {
-      globals[attr.name.slice(7)] = attr.value;
+      const name = attr.name.slice(7);
+      globals[name] = attr.value;
+      setParsedValue(parsed, "globals", name, attr, sourceId);
       continue;
     }
     if (/^on[A-Z]/.test(attr.name)) {
       const eventName = attr.name.slice(2, 3).toLowerCase() + attr.name.slice(3);
       events[eventName] = attr.value;
+      setParsedEvent(parsed, eventName, attr, sourceId);
       continue;
     }
     props[attr.name] = attr.value;
+    setParsedValue(parsed, "props", attr.name, attr, sourceId);
   }
 
+  const children = contentChildren(node, source, sourceId);
   return {
     kind: "element",
     type,
@@ -164,87 +107,151 @@ function parseOpenTag(
     vars,
     globals,
     events,
-    children: [],
-    range: { start, end },
+    children,
+    range: rangeOf(node),
+    ...(hasParsedBindings(parsed) ? { parsed } : {}),
   };
 }
 
-function parseAttributes(source: string): Array<{ name: string; value: string }> {
-  const attrs: Array<{ name: string; value: string }> = [];
-  let index = 0;
+function contentChildren(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiNode[] {
+  const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
+  const children = content?.children ?? [];
+  const result: XmluiNode[] = [];
 
-  while (index < source.length) {
-    while (/\s/.test(source[index] ?? "")) {
-      index++;
+  for (const child of children) {
+    if (child.kind === MarkupSyntaxKind.Element) {
+      result.push(transformElement(child, source, sourceId));
+      continue;
     }
-    if (index >= source.length) {
-      break;
-    }
-
-    const nameMatch = source.slice(index).match(NAME_RE);
-    if (!nameMatch) {
-      throw new Error(`Invalid attribute near "${source.slice(index).trim()}".`);
-    }
-
-    const name = nameMatch[0];
-    index += name.length;
-    while (/\s/.test(source[index] ?? "")) {
-      index++;
-    }
-
-    let value = "";
-    if (source[index] === "=") {
-      index++;
-      while (/\s/.test(source[index] ?? "")) {
-        index++;
+    if (child.kind === MarkupSyntaxKind.Text) {
+      const rawText = getNodeText(child, source);
+      const value = normalizeText(rawText);
+      if (!value) {
+        continue;
       }
-      const quote = source[index];
-      if (quote !== `"` && quote !== `'`) {
-        throw new Error(`Attribute "${name}" must use quoted values.`);
-      }
-      index++;
-      const valueStart = index;
-      const valueEnd = source.indexOf(quote, valueStart);
-      if (valueEnd < 0) {
-        throw new Error(`Unterminated value for attribute "${name}".`);
-      }
-      value = decodeEntities(source.slice(valueStart, valueEnd));
-      index = valueEnd + 1;
+      const range = rangeOf(child);
+      result.push({
+        kind: "text",
+        value,
+        range,
+        segments: parseMixedTextSegments(value, range, { sourceId }),
+      });
     }
-    attrs.push({ name, value });
   }
 
-  return attrs;
+  return result;
+}
+
+function attributes(node: MarkupSyntaxNode, source: SourceText): AttributeInfo[] {
+  const list = node.children?.find((child) => child.kind === MarkupSyntaxKind.AttributeList);
+  return (
+    list?.children?.flatMap((attribute) => {
+      const key = attribute.children?.find((child) => child.kind === MarkupSyntaxKind.AttributeKey);
+      const value = attribute.children?.find((child) => child.kind === MarkupSyntaxKind.StringLiteral);
+      if (!key || !value) {
+        return [];
+      }
+      const rawValue = value.value ?? stripQuotes(getNodeText(value, source));
+      return [
+        {
+          name: key.children?.map((child) => getNodeText(child, source)).join("") ?? "",
+          value: decodeEntities(rawValue),
+          nameRange: rangeOf(key),
+          valueRange: {
+            start: value.pos + 1,
+            end: Math.max(value.pos + 1, value.end - 1),
+          },
+        },
+      ];
+    }) ?? []
+  );
+}
+
+function setParsedValue(
+  parsed: XmluiParsedBindings,
+  bucket: "props" | "vars" | "globals",
+  name: string,
+  attr: AttributeInfo,
+  sourceId: string,
+): void {
+  const target = (parsed[bucket] ??= {});
+  const expression = unwrapExpression(attr.value);
+  if (expression !== undefined) {
+    const expressionRange = expressionInnerRange(attr.value, attr.valueRange);
+    const result = parseScriptExpression(expression, {
+      originSpan: {
+        sourceId,
+        start: expressionRange.start,
+        end: expressionRange.end,
+      },
+    });
+    if (result.diagnostics.length > 0) {
+      throw diagnosticToError(result.diagnostics[0]);
+    }
+    target[name] = {
+      source: expression,
+      ast: result.node,
+      range: expressionRange,
+    } satisfies ParsedExpression;
+    return;
+  }
+
+  target[name] = parseExpressionOrMixedText(attr.value, attr.valueRange, { sourceId });
+}
+
+function setParsedEvent(
+  parsed: XmluiParsedBindings,
+  name: string,
+  attr: AttributeInfo,
+  sourceId: string,
+): void {
+  const events = (parsed.events ??= {});
+  const result = parseScriptEventHandler(attr.value, {
+    originSpan: {
+      sourceId,
+      start: attr.valueRange.start,
+      end: attr.valueRange.end,
+    },
+  });
+  if (result.diagnostics.length > 0) {
+    throw diagnosticToError(result.diagnostics[0]);
+  }
+  events[name] = {
+    source: attr.value,
+    ast: result.node,
+    range: attr.valueRange,
+  } satisfies ParsedEvent;
+}
+
+function rootElement(node: MarkupSyntaxNode): MarkupSyntaxNode | undefined {
+  return node.children
+    ?.find((child) => child.kind === MarkupSyntaxKind.ContentList)
+    ?.children?.find((child) => child.kind === MarkupSyntaxKind.Element);
+}
+
+function tagName(node: MarkupSyntaxNode, source: SourceText): string {
+  const name = node.children?.find((child) => child.kind === MarkupSyntaxKind.TagName);
+  return name?.children?.map((child) => getNodeText(child, source)).join("") ?? "";
 }
 
 function stripInternalRoot(component: XmluiElement, name: string): XmluiElement {
-  const { props: _props, ...rest } = component;
-  return detach({
+  const { props: _props, parsed: _parsed, ...rest } = component;
+  return {
     ...rest,
     type: name,
     props: {},
-  });
+  };
 }
 
-function findTagEnd(source: string, index: number): number {
-  let quote: string | undefined;
-  for (let i = index; i < source.length; i++) {
-    const ch = source[i];
-    if (quote) {
-      if (ch === quote) {
-        quote = undefined;
-      }
-      continue;
-    }
-    if (ch === `"` || ch === `'`) {
-      quote = ch;
-      continue;
-    }
-    if (ch === ">") {
-      return i;
-    }
-  }
-  throw new Error("Unterminated opening tag.");
+function hasParsedBindings(parsed: XmluiParsedBindings): boolean {
+  return Boolean(parsed.props || parsed.vars || parsed.globals || parsed.events);
+}
+
+function rangeOf(node: MarkupSyntaxNode): SourceRange {
+  return {
+    start: node.pos,
+    end: node.end,
+  };
 }
 
 function normalizeText(text: string): string {
@@ -260,12 +267,36 @@ function decodeEntities(value: string): string {
     .replace(/&amp;/g, "&");
 }
 
-function detach<T extends XmluiElement>(element: T): T {
-  delete (element as RawElement).parent;
-  for (const child of element.children) {
-    if (child.kind === "element") {
-      detach(child as RawElement);
-    }
+function stripQuotes(value: string): string {
+  if (
+    (value.startsWith(`"`) && value.endsWith(`"`)) ||
+    (value.startsWith(`'`) && value.endsWith(`'`))
+  ) {
+    return value.slice(1, -1);
   }
-  return element;
+  return value;
+}
+
+function unwrapExpression(value: string): string | undefined {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return undefined;
+}
+
+function expressionInnerRange(value: string, range: SourceRange): SourceRange {
+  const open = value.indexOf("{");
+  const close = value.lastIndexOf("}");
+  const inner = value.slice(open + 1, close);
+  const leading = inner.length - inner.trimStart().length;
+  const trimmed = inner.trim();
+  return {
+    start: range.start + open + 1 + leading,
+    end: range.start + open + 1 + leading + trimmed.length,
+  };
+}
+
+function diagnosticToError(diagnostic: ParserDiagnostic): Error {
+  return new Error(diagnostic.message);
 }
