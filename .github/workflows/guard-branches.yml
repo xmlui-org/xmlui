@@ -3,11 +3,24 @@ name: Guard certain branches from changes
 on:
   pull_request:
     branches:
+      - main
       - "support/**"
 
 jobs:
-  check:
+  block-reshape-to-main:
+    name: Block dotneteer/reshape PRs to main
+    if: github.base_ref == 'main' && github.head_ref == 'dotneteer/reshape'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail blocked branch pairing
+        run: |
+          echo "The dotneteer/reshape branch is experimental and must not be merged into main."
+          echo "Open PRs from a dedicated integration branch instead."
+          exit 1
+
+  support-changeset-check:
     name: Enforce patch-only changesets on "support/**" branches
+    if: startsWith(github.base_ref, 'support/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
