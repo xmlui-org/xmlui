@@ -227,93 +227,93 @@ Each step should be independently implementable and leave the repository
 working. A step is complete only when focused tests pass and existing compiler,
 runtime, VS Code, and E2E checks still pass when relevant.
 
-1. Old IR compatibility notes
+1. Old IR compatibility notes — completed
    - Inspect old `ComponentDef`, `CompoundComponentDef`, `computedUses`, Vite
      transform output, and language-server diagnostic consumers.
    - Record concise findings in `.ai/`.
    - Tests: none required, but findings must cite old source files.
 
-2. IR type skeleton
+2. IR type skeleton — completed
    - Add typed IR modules for module, definition, node, binding, event, scope,
      dependency summary, IDs, and source references.
    - Keep the current `XmluiDocument` types intact while the new IR grows.
    - Tests: type-level construction helpers and minimal snapshot fixtures.
 
-3. Stable ID and source-reference model
+3. Stable ID and source-reference model — completed
    - Add deterministic IDs for modules, definitions, nodes, bindings, events,
      scopes, state slots, and props.
    - Use source ID plus structural path or parse order so tests are stable.
    - Tests: identical input creates stable IDs; sibling/repeated nodes get
      distinct IDs; spans map to the original source file.
 
-4. Raw XMLUI transform phase
+4. Raw XMLUI transform phase — completed
    - Split the current parser-to-runtime transform into a raw XMLUI structural
      transform before semantic analysis.
    - Preserve elements, attributes, text, child order, and source spans.
    - Tests: the three counter examples produce expected raw structures.
 
-5. Scope and declaration IR
+5. Scope and declaration IR — completed
    - Lower `var.*`, `global.*`, props, and component definitions into explicit
      declaration and scope IR.
    - Represent parent scope links and component implicit-global policy.
    - Tests: local scope, global scope, component props, shadowing, inherited
      locals, and repeated component instances.
 
-6. Binding IR
+6. Binding IR — completed
    - Lower prop, variable, global, and text bindings into `XmluiBindingIr`.
    - Preserve raw values, parsed expression/mixed segments, semantic IR,
      compiled source, source spans, and dependencies.
    - Tests: literal props, expression props, mixed text, variable initializers,
      global initializers, and `$props.label || ...`.
 
-7. Event IR
+7. Event IR — completed
    - Lower `on*` handlers into `XmluiEventIr`.
    - Preserve raw source, semantic event IR, compiled source, dependencies,
      writes, invalidations, and source spans.
    - Tests: local `count++`, global `count++`, local-shadowed `count++`,
      invalid event target diagnostics.
 
-8. Node and definition IR
+8. Node and definition IR — completed
    - Lower built-in elements, user-defined component references, and text nodes
      into `XmluiNodeIr`.
    - Distinguish component definition roots from component reference nodes.
    - Tests: app root, component root, `H1`, `Button`, `IncrementButton`, text
      nodes, child order, and source spans.
 
-9. Dependency summaries
+9. Dependency summaries — completed
    - Aggregate expression reads and event writes at binding, event, node,
      definition, and module levels.
    - Keep granularity by local, global, props, unresolved, and later extension
      kinds.
    - Tests: summary snapshots for all three counter examples.
 
-10. IR validation
+10. IR validation — completed
     - Add a validation pass for the initial subset: missing component names,
       invalid roots, unresolved component references where known, invalid
       declarations, unresolved reads, invalid writes, and duplicate state slots
       if detectable.
     - Tests: validation diagnostics retain stable codes and source ranges.
 
-11. Runtime compatibility adapter
+11. Runtime compatibility adapter — completed
     - Add an adapter from `XmluiModuleIr` to the current runtime descriptor.
     - Keep existing runtime behavior unchanged while allowing compiler tests to
       assert against the new IR.
     - Tests: adapter output matches current descriptor for the three examples.
 
-12. Vite module integration
+12. Vite module integration — completed
     - Update `compileXmluiModule` to build IR and emit IR-derived descriptors.
     - Preserve sibling component import behavior.
     - Tests: generated module includes stable IR-derived compiled metadata and
       source IDs.
 
-13. VS Code diagnostic integration
+13. VS Code diagnostic integration — completed
     - Feed IR validation diagnostics into the existing VS Code diagnostic
       adapter.
     - Keep the extension thin and protocol-adapter-only.
     - Tests: extension diagnostics for missing component name, unresolved
       expression, invalid event write, and malformed markup.
 
-14. Compatibility and omission closure
+14. Compatibility and omission closure — completed
     - Record implemented IR compatibility and deferred old `ComponentDef`
       fields in `.ai/`.
     - Update this plan with completed steps and known next experiments.
@@ -362,4 +362,3 @@ Required coverage:
 - production optimizations;
 - source-map file emission;
 - full LSP hover/completion/definition/rename.
-

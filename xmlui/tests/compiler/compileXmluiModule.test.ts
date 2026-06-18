@@ -43,4 +43,16 @@ describe("compileXmluiModule", () => {
       }),
     ).toThrow("Unresolved XMLUI script identifier 'missing'.");
   });
+
+  it("surfaces IR diagnostics during compilation", () => {
+    const dir = path.join(tmpdir(), `xmlui-rs-${Date.now()}-ir`);
+    mkdirSync(dir, { recursive: true });
+
+    expect(() =>
+      compileXmluiModule({
+        id: path.join(dir, "Main.xmlui"),
+        source: `<App><MissingPanel /></App>`,
+      }),
+    ).toThrow("Unknown XMLUI component reference 'MissingPanel'.");
+  });
 });

@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
-import type { XmluiDocument } from "./ir";
+import { buildCompilerIrFromDocument, compilerIrToRuntimeDocument } from "./ir/index";
 import { parseXmlui } from "./parseXmlui";
 
 export type CompileXmluiModuleOptions = {
@@ -12,7 +12,17 @@ export type CompileXmluiModuleOptions = {
 export function compileXmluiModule({ id, source }: CompileXmluiModuleOptions): string {
   const document = parseXmlui(source, { sourceId: id });
   const imports = document.kind === "app" ? siblingComponentImports(id) : [];
-  const moduleJson = JSON.stringify(document, null, 2);
+  const compilerIr = buildCompilerIrFromDocument(document, {
+    sourceId: id,
+    filename: id,
+    validation: document.kind === "app"
+      ? { knownComponents: new Set(imports.map((item) => item.componentName)) }
+      : undefined,
+  });
+  if (compilerIr.diagnostics.length > 0) {
+    throw new Error(compilerIr.diagnostics[0].message);
+  }
+  const moduleJson = JSON.stringify(compilerIrToRuntimeDocument(compilerIr), null, 2);
   const componentArray = imports.map((item) => item.localName).join(", ");
   const importLines = imports
     .map((item) => `import ${item.localName} from ${JSON.stringify(item.specifier)};`)
@@ -29,13 +39,16 @@ export default module;
 `;
 }
 
-function siblingComponentImports(id: string): Array<{ localName: string; specifier: string }> {
+function siblingComponentImports(
+  id: string,
+): Array<{ localName: string; componentName: string; specifier: string }> {
   const dir = path.dirname(id);
   return readdirSync(dir)
     .filter((file) => file.endsWith(".xmlui") && file !== path.basename(id))
     .sort()
     .map((file, index) => ({
       localName: `component${index}`,
+      componentName: path.basename(file, ".xmlui"),
       specifier: `./${file}`,
     }));
 }

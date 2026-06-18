@@ -1,5 +1,6 @@
+import { buildCompilerIrFromDocument } from "../../../xmlui/src/compiler/ir/index";
 import { parseXmlui, XmluiParseError } from "../../../xmlui/src/compiler/parseXmlui";
-import { SourceText } from "../../../xmlui/src/parser";
+import { SourceText, type ParserDiagnostic } from "../../../xmlui/src/parser";
 
 export type XmluiDiagnostic = {
   code: string;
@@ -11,27 +12,45 @@ export type XmluiDiagnostic = {
   endCharacter: number;
 };
 
-export function collectXmluiDiagnostics(text: string, sourceId = "document.xmlui"): XmluiDiagnostic[] {
+export type CollectXmluiDiagnosticsOptions = {
+  knownComponents?: ReadonlySet<string>;
+};
+
+export function collectXmluiDiagnostics(
+  text: string,
+  sourceId = "document.xmlui",
+  options: CollectXmluiDiagnosticsOptions = {},
+): XmluiDiagnostic[] {
   try {
-    parseXmlui(text, { sourceId });
-    return [];
+    const document = parseXmlui(text, { sourceId });
+    const ir = buildCompilerIrFromDocument(document, {
+      sourceId,
+      validation: options.knownComponents ? { knownComponents: options.knownComponents } : undefined,
+    });
+    return ir.diagnostics.map((diagnostic) => diagnosticToVsCodeDiagnostic(text, sourceId, diagnostic));
   } catch (error) {
     if (!(error instanceof XmluiParseError)) {
       throw error;
     }
-    const source = new SourceText(text, sourceId);
-    const start = source.positionAt(error.diagnostic.span.start);
-    const end = source.positionAt(error.diagnostic.span.end);
-    return [
-      {
-        code: error.diagnostic.code,
-        message: error.diagnostic.message,
-        severity: error.diagnostic.severity,
-        line: start.line,
-        character: start.column,
-        endLine: end.line,
-        endCharacter: end.column,
-      },
-    ];
+    return [diagnosticToVsCodeDiagnostic(text, sourceId, error.diagnostic)];
   }
+}
+
+function diagnosticToVsCodeDiagnostic(
+  text: string,
+  sourceId: string,
+  diagnostic: ParserDiagnostic,
+): XmluiDiagnostic {
+  const source = new SourceText(text, sourceId);
+  const start = source.positionAt(diagnostic.span.start);
+  const end = source.positionAt(diagnostic.span.end);
+  return {
+    code: diagnostic.code,
+    message: diagnostic.message,
+    severity: diagnostic.severity,
+    line: start.line,
+    character: start.column,
+    endLine: end.line,
+    endCharacter: end.column,
+  };
 }

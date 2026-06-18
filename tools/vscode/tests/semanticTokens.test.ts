@@ -92,4 +92,21 @@ describe("collectXmluiDiagnostics", () => {
       }),
     ]);
   });
+
+  it("returns IR diagnostics when component knowledge is available", () => {
+    const diagnostics = collectXmluiDiagnostics(
+      "<App><MissingPanel /></App>",
+      "Main.xmlui",
+      { knownComponents: new Set(["IncrementButton"]) },
+    );
+
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        code: "IR003",
+        message: "Unknown XMLUI component reference 'MissingPanel'.",
+        character: 5,
+        endCharacter: 21,
+      }),
+    ]);
+  });
 });
