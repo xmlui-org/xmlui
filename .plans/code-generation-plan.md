@@ -247,25 +247,25 @@ Each step should be independently implementable and tested. A step is complete
 only when focused tests pass and existing compiler, runtime, VS Code, and E2E
 checks still pass when relevant.
 
-1. Old code-generation compatibility notes
+1. Old code-generation compatibility notes — completed
    - Inspect old Vite transform output, XMLUI build entry points, and any
      expression-result compatibility helpers such as `extractParam`.
    - Record concise findings in `.ai/`.
    - Tests: none required.
 
-2. Generated runtime descriptor types
+2. Generated runtime descriptor types — completed
    - Add types for compiled expression bindings, mixed-text segments, event
      handlers, and source metadata.
    - Keep these separate from `XmluiModuleIr` and the old runtime descriptor.
    - Tests: type construction fixtures for prop/local/global/text bindings and
      events.
 
-3. Code emitter foundation
+3. Code emitter foundation — completed
    - Add deterministic code-emission helpers for imports, identifiers, object
      literals, function expressions, arrays, string escaping, and indentation.
    - Tests: stable output snapshots and escaping edge cases.
 
-4. Script function generator
+4. Script function generator — completed
    - Move expression/event code emission from string snippets into a generator
      that emits complete JavaScript functions.
    - Support literals, local/global reads, `$props.member`, logical OR, and
@@ -273,21 +273,21 @@ checks still pass when relevant.
    - Tests: generated source snapshots and execution tests through explicit
      fake contexts.
 
-5. Binding and text code generation
+5. Binding and text code generation — completed
    - Generate compiled binding entries for props, locals, globals, and text.
    - Generate mixed-text evaluators without interpreter fallback.
    - Preserve dependency metadata for invalidation.
    - Tests: `{0}`, `{count}`, `$props.label || ...`, literal text, and mixed
      text in the three counter examples.
 
-6. Event code generation
+6. Event code generation — completed
    - Generate compiled event entries with executable event functions, writes,
      invalidations, dependencies, and source metadata.
    - Reject invalid event write targets at generation time.
    - Tests: local `count++`, global `count++`, shadowed local `count++`, and
      invalid write diagnostic behavior.
 
-7. Runtime descriptor attachment
+7. Runtime descriptor attachment — completed
    - Walk `XmluiModuleIr` and produce the normal runtime node tree with compiled
      expression and event functions attached to bindings/events.
    - Preserve child order, source IDs, IR IDs, props, events, declarations, and
@@ -295,26 +295,26 @@ checks still pass when relevant.
    - Tests: descriptor shape and compiled binding/event attachment for all
      three counter examples.
 
-8. Runtime compiled-function execution
+8. Runtime compiled-function execution — completed
    - Execute generated expression/event functions directly.
    - Keep `createXmluiModule` working for compatibility during the transition.
    - Tests: runtime unit tests for state initialization, prop evaluation, text
      evaluation, local/global writes, and component instance isolation.
 
-9. Vite module integration
+9. Vite module integration — completed
    - Update `compileXmluiModule` to emit generated modules through the new code
      generator.
    - Preserve sibling component imports and transform diagnostics.
    - Tests: module output snapshots, parser/semantic/IR diagnostic propagation,
      and generated import order.
 
-10. Dev-mode debugging metadata
+10. Dev-mode debugging metadata — completed
     - Carry source IDs, source spans, IR IDs, dependency metadata, and generated
       function labels into the compiled module shape.
     - Keep a documented source-map placeholder if full mappings are deferred.
     - Tests: metadata snapshots and diagnostic range stability.
 
-11. E2E counter validation
+11. E2E counter validation — completed
     - Run the three counter scenarios in Vite dev-server mode with generated
       modules.
     - Confirm repeated component instances keep isolated local state and shared
@@ -322,7 +322,7 @@ checks still pass when relevant.
     - Tests: Playwright coverage for local counter, component counters, and
       global/shadowed counter.
 
-12. Compatibility and omission closure
+12. Compatibility and omission closure — completed
     - Record what old transform behaviors are preserved and what remains
       deferred.
     - Update this plan with completed steps and next runtime-state/rendering

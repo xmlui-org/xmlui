@@ -6,6 +6,8 @@ Date: 2026-06-18
 
 - `/Users/dotneteer/source/xmlui/xmlui/src/nodejs/vite-xmlui-plugin.ts`
 - `/Users/dotneteer/source/xmlui/xmlui/src/nodejs/bin/viteConfig.ts`
+- `/Users/dotneteer/source/xmlui/xmlui/src/nodejs/bin/start.ts`
+- `/Users/dotneteer/source/xmlui/xmlui/src/nodejs/bin/build.ts`
 - `/Users/dotneteer/source/xmlui/xmlui/src/components-core/utils/extractParam.ts`
 - Current rewrite files:
   - `xmlui/src/compiler/compileXmluiModule.ts`
@@ -16,6 +18,9 @@ Date: 2026-06-18
 
 - The old Vite plugin treats `.xmlui` files as module inputs and emits JavaScript
   modules. The generated module boundary is part of the developer contract.
+- The old `start` and `build` commands both obtain the XMLUI Vite config and run
+  Vite with the XMLUI transform installed, so code generation must stay usable
+  in both dev-server and production-build command paths.
 - Old transform output uses a data-oriented module shape through `dataToEsm`,
   including the parsed component tree, original source, code-behind data, file
   ID, and warnings.

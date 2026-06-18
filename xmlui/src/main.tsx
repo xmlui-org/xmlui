@@ -1,10 +1,14 @@
 import { renderXmluiApp } from "./runtime";
 
-// Switch this import while manually trying the first experiment:
-// - ./examples/counter-local/Main.xmlui
-// - ./examples/counter-components/Main.xmlui
-// - ./examples/counter-globals/Main.xmlui
-import app from "./examples/counter-globals/Main.xmlui";
+import componentCounterApp from "./examples/counter-components/Main.xmlui";
+import globalCounterApp from "./examples/counter-globals/Main.xmlui";
+import localCounterApp from "./examples/counter-local/Main.xmlui";
+
+const examples = {
+  components: componentCounterApp,
+  globals: globalCounterApp,
+  local: localCounterApp,
+};
 
 const root = document.getElementById("root");
 
@@ -12,4 +16,5 @@ if (!root) {
   throw new Error("Missing #root element");
 }
 
-renderXmluiApp(app, root);
+const example = new URLSearchParams(window.location.search).get("example") ?? "globals";
+renderXmluiApp(examples[example as keyof typeof examples] ?? globalCounterApp, root);
