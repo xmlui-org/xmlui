@@ -46,4 +46,16 @@ describe("example API mocks", () => {
       { id: "3", title: "Ship runtime" },
     ]);
   });
+
+  it("serves route-param driven message endpoints", async () => {
+    const response = await resolveExampleApiMockRequest({
+      method: "get",
+      url: "/api/messages/2",
+    });
+
+    expect(response).toMatchObject({
+      status: 200,
+      body: { id: "2", text: "Message 2" },
+    });
+  });
 });

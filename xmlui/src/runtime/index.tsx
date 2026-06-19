@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { createRoot } from "react-dom/client";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
@@ -9,6 +9,7 @@ import {
   type RuntimeScope,
   useRuntimeStateStore,
 } from "./state";
+import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 
 export function createXmluiModule(
@@ -50,6 +51,12 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
   const rootOwnerId = "app:root";
+  const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
+  const routingRef = useRef<RuntimeRoutingStore>();
+  if (!routingRef.current) {
+    routingRef.current = new RuntimeRoutingStore(routeMode, () => store.invalidateRoute());
+  }
+  useEffect(() => routingRef.current?.attach(), []);
 
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
@@ -58,6 +65,7 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
       localOwnerId: rootOwnerId,
       props: {},
       references: referencesRef.current,
+      routing: routingRef.current,
     });
     initializeStateValuesIntoStore({
       kind: "global",
@@ -83,6 +91,7 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
       localOwnerId: rootOwnerId,
       props: {},
       references: referencesRef.current,
+      routing: routingRef.current,
     }),
     [store],
   );
@@ -92,3 +101,10 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
 }
 
 export type { XmluiModule } from "./types";
+
+function routeModeFromApp(value: string | undefined): RoutingMode {
+  if (value === "false" || value === "{false}") {
+    return "history";
+  }
+  return "hash";
+}

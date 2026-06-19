@@ -202,6 +202,13 @@ export class RuntimeStateStore {
     }
   }
 
+  invalidateRoute(): void {
+    this.revision += 1;
+    for (const listener of this.allSubscribers) {
+      listener();
+    }
+  }
+
   private writeGlobalInternal(name: string, value: unknown): StateInvalidation {
     const previousValue = this.globals[name];
     this.globals[name] = value;

@@ -46,6 +46,11 @@ export async function resolveExampleApiMockRequest(
     return jsonResponse({ text: "Managed hello" });
   }
 
+  const messageMatch = /^\/api\/messages\/([^/]+)$/.exec(url.pathname);
+  if (method === "get" && messageMatch) {
+    return jsonResponse({ id: messageMatch[1], text: `Message ${messageMatch[1]}` });
+  }
+
   if (method === "get" && url.pathname === "/api/stats") {
     state.statsCount += 1;
     return jsonResponse({ count: state.statsCount });

@@ -43,6 +43,11 @@ export type NormalizedRuntimeDependency =
       name: string;
       source: BoundDependency;
     }
+  | {
+      kind: "route";
+      name: string;
+      source: BoundDependency;
+    }
   | (RuntimePropDependency & {
       source: BoundDependency;
     });

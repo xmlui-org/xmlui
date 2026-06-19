@@ -71,6 +71,12 @@ export function normalizeDependencies(
         seen.add(key);
         normalized.push({ kind: "reference", name: dependency.name, source: dependency });
       }
+    } else if (dependency.kind === "context" && isRouteContextName(dependency.name)) {
+      const key = `route:${dependency.name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        normalized.push({ kind: "route", name: dependency.name, source: dependency });
+      }
     }
   }
   return normalized;
@@ -87,6 +93,13 @@ export function stateDependencies(
       | { kind: "global"; name: string; source: BoundDependency } =>
       dependency.kind === "local" || dependency.kind === "global",
   );
+}
+
+function isRouteContextName(name: string): boolean {
+  return name === "$pathname" ||
+    name === "$routeParams" ||
+    name === "$queryParams" ||
+    name === "$queryString";
 }
 
 export function dependenciesForBinding(

@@ -1,5 +1,6 @@
 import type { CompiledEventContext, CompiledExpressionContext } from "../../compiler/scriptSemantics";
 import { managedFetchService } from "../data";
+import type { RuntimeRoutingStore } from "../routing";
 import type { RuntimeStateStore } from "./store";
 import type { StateOwnerId } from "./types";
 
@@ -11,6 +12,7 @@ export type RuntimeScope = {
   contextValues: Record<string, unknown>;
   references: Record<string, unknown>;
   slots: Record<string, unknown>;
+  routing?: RuntimeRoutingStore;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
 };
 
@@ -22,6 +24,7 @@ export function createRuntimeScope({
   contextValues = {},
   references = {},
   slots = {},
+  routing,
   emitEvent,
 }: {
   store: RuntimeStateStore;
@@ -31,6 +34,7 @@ export function createRuntimeScope({
   contextValues?: Record<string, unknown>;
   references?: Record<string, unknown>;
   slots?: Record<string, unknown>;
+  routing?: RuntimeRoutingStore;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
 }): RuntimeScope {
   return {
@@ -41,6 +45,7 @@ export function createRuntimeScope({
     contextValues,
     references,
     slots,
+    routing,
     emitEvent,
   };
 }
@@ -120,6 +125,7 @@ export function createEventContext(scope: RuntimeScope): CompiledEventContext {
       return method.apply(target, args);
     },
     complete: completeValue,
+    navigate: (target, queryParams) => scope.routing?.navigate(target, queryParams),
     yieldIfNeeded: (iteration) => {
       if (iteration % 100 !== 0) {
         return undefined;
@@ -135,6 +141,10 @@ export function readContext(scope: RuntimeScope | undefined, name: string): unkn
   }
   if (Object.prototype.hasOwnProperty.call(scope.contextValues, name)) {
     return scope.contextValues[name];
+  }
+  const routeValue = readRouteContext(scope, name);
+  if (routeValue !== undefined) {
+    return routeValue;
   }
   return readContext(scope.parent, name);
 }
@@ -182,6 +192,25 @@ function createActionsReference() {
       return response.data;
     },
   };
+}
+
+function readRouteContext(scope: RuntimeScope, name: string): unknown {
+  const snapshot = scope.routing?.getSnapshot();
+  if (!snapshot) {
+    return undefined;
+  }
+  switch (name) {
+    case "$pathname":
+      return snapshot.pathname;
+    case "$queryParams":
+      return snapshot.queryParams;
+    case "$queryString":
+      return snapshot.search;
+    case "$routeParams":
+      return {};
+    default:
+      return undefined;
+  }
 }
 
 function findLocalOwner(scope: RuntimeScope | undefined, name: string): StateOwnerId | undefined {

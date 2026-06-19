@@ -65,6 +65,15 @@ describe("rendering dependency normalization", () => {
       expect.objectContaining({ kind: "global", name: "count" }),
     ]);
   });
+
+  it("normalizes route context dependencies separately from state slots", () => {
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({ store });
+
+    expect(normalizeDependencies([dependency("context", "$pathname")], scope)).toEqual([
+      expect.objectContaining({ kind: "route", name: "$pathname" }),
+    ]);
+  });
 });
 
 describe("rendering binding evaluation", () => {
@@ -280,13 +289,18 @@ describe("built-in renderer registry", () => {
     expect(Object.keys(builtInRenderers).sort()).toEqual([
       "APICall",
       "App",
+      "AppHeader",
       "Button",
       "Checkbox",
       "DataSource",
       "H1",
       "HStack",
       "Items",
+      "NavLink",
+      "NavPanel",
       "Option",
+      "Page",
+      "Pages",
       "Select",
       "Slot",
       "Stack",
@@ -310,7 +324,7 @@ describe("built-in renderer registry", () => {
 });
 
 function dependency(
-  kind: "local" | "global" | "props",
+  kind: "local" | "global" | "props" | "context",
   name: string,
   path: string[] = [name],
 ): BoundDependency {

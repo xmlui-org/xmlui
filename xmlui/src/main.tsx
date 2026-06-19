@@ -26,6 +26,10 @@ import reactiveDerivedChainApp from "./examples/reactive-derived-chain/Main.xmlu
 import reactiveDerivedGlobalsApp from "./examples/reactive-derived-globals/Main.xmlui";
 import reactiveDerivedOverrideApp from "./examples/reactive-derived-override/Main.xmlui";
 import reactiveDerivedPropsApp from "./examples/reactive-derived-props/Main.xmlui";
+import routingBasicApp from "./examples/routing-basic/Main.xmlui";
+import routingDataApp from "./examples/routing-data/Main.xmlui";
+import routingQueryApp from "./examples/routing-query/Main.xmlui";
+import routingStateApp from "./examples/routing-state/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -59,6 +63,10 @@ const examples = {
   reactiveDerivedGlobals: reactiveDerivedGlobalsApp,
   reactiveDerivedOverride: reactiveDerivedOverrideApp,
   reactiveDerivedProps: reactiveDerivedPropsApp,
+  routingBasic: routingBasicApp,
+  routingData: routingDataApp,
+  routingQuery: routingQueryApp,
+  routingState: routingStateApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

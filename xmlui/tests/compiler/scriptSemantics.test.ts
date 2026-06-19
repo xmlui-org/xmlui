@@ -485,6 +485,25 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     expect(context.globals.count).toBe(100);
   });
 
+  it("compiles navigate calls as special event calls", async () => {
+    const document = parseXmlui(`<App />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("navigate('/search', { q: 'xmlui', page: 2 })").node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const calls: unknown[][] = [];
+    const context = testContext({
+      navigate: (target, queryParams) => calls.push([target, queryParams]),
+    });
+
+    expect(lowered.diagnostics).toEqual([]);
+    expect(compiled.source).toContain("ctx.navigate");
+    await compiled.execute(context);
+    expect(calls).toEqual([["/search", { q: "xmlui", page: 2 }]]);
+  });
+
   it("compiles assignments and compound assignments into explicit writes", async () => {
     const document = parseXmlui(`<App var.count="{0}" var.total="{0}" />`);
     const scope = createXmluiScope(document.root);
@@ -786,10 +805,12 @@ function testContext({
   locals = {},
   globals = {},
   props = {},
+  navigate,
 }: {
   locals?: Record<string, unknown>;
   globals?: Record<string, unknown>;
   props?: Record<string, unknown>;
+  navigate?: CompiledEventContext["navigate"];
 } = {}): CompiledEventContext & {
   locals: Record<string, unknown>;
   globals: Record<string, unknown>;
@@ -806,5 +827,6 @@ function testContext({
     writeGlobal: (name: string, value: unknown) => {
       globals[name] = value;
     },
+    navigate,
   };
 }

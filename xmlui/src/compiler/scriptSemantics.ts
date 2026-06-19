@@ -270,6 +270,7 @@ export type CompiledEventContext = CompiledExpressionContext & {
   emitEvent?(name: string, args: unknown[]): unknown | Promise<unknown>;
   call?(target: unknown, methodName: string, args: unknown[]): unknown | Promise<unknown>;
   complete?(value: unknown): Promise<unknown>;
+  navigate?(target: unknown, queryParams?: Record<string, unknown>): void;
   yieldIfNeeded?(iteration: number): Promise<void> | void;
 };
 
@@ -324,6 +325,14 @@ export function createXmluiScope(
     scope.specials.set("emitEvent", {
       kind: "special",
       name: "emitEvent",
+      mutable: false,
+      span: spanFromRange(sourceId, element.range),
+    });
+  }
+  if (!scope.specials.has("navigate")) {
+    scope.specials.set("navigate", {
+      kind: "special",
+      name: "navigate",
       mutable: false,
       span: spanFromRange(sourceId, element.range),
     });
@@ -1163,6 +1172,9 @@ function isAllowedCall(callee: ScriptNode): boolean {
   if (callee.kind === "Identifier" && callee.name === "emitEvent") {
     return true;
   }
+  if (callee.kind === "Identifier" && callee.name === "navigate") {
+    return true;
+  }
   if (callee.kind === "MemberExpression") {
     return true;
   }
@@ -1464,6 +1476,10 @@ function emitAsyncCallExpression(ir: XmluiCallExpressionIr): string {
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "emitEvent") {
     const [name, ...eventArgs] = ir.args.map(emitAsyncExpression);
     return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.emitEvent?.(${name ?? "undefined"}, [${eventArgs.join(", ")}])))`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
+    const [target, queryParams] = ir.args.map(emitAsyncExpression);
+    return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
   }
   if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot compile unsupported XMLUI event call target.");
@@ -1799,6 +1815,11 @@ async function executeCallExpressionAsync(
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "emitEvent") {
     const [name, ...args] = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
     return (context.complete ?? completeValue)(await context.emitEvent?.(String(name), args));
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
+    const [target, queryParams] = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    context.navigate?.(target, queryParams as Record<string, unknown> | undefined);
+    return undefined;
   }
   if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot execute unsupported XMLUI event call target.");

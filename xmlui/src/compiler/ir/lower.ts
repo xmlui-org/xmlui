@@ -406,6 +406,7 @@ function isComponentReference(type: string, isDefinitionRoot: boolean): boolean 
 
 const builtInElementNames = new Set([
   "App",
+  "AppHeader",
   "APICall",
   "DataSource",
   "H1",
@@ -414,6 +415,10 @@ const builtInElementNames = new Set([
   "HStack",
   "Items",
   "Option",
+  "Page",
+  "Pages",
+  "NavLink",
+  "NavPanel",
   "Select",
   "Slot",
   "Stack",

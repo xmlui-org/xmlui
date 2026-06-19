@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { evaluateExpressionOrText, runEvent } from "./bindings";
 import type { XmluiBuiltInRenderer } from "./types";
@@ -6,6 +6,7 @@ import { useBindingRevision } from "./reactive";
 import { createSlotScope, type RenderFragment } from "./components";
 import { createRuntimeScope } from "../state";
 import { applyResultSelector, managedFetchService } from "../data";
+import { compileRoutePattern, matchRoutePattern, type RouteSnapshot } from "../routing";
 import {
   flexStyle,
   renderValueOrChildren,
@@ -17,6 +18,7 @@ import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 
 export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
   App: ({ context, node, scope }) => context.renderChildren(node.children, scope),
+  AppHeader: ({ context, node, scope }) => <header>{context.renderChildren(node.children, scope)}</header>,
   H1: ({ context, node, scope }) => <h1>{context.renderChildren(node.children, scope)}</h1>,
   Stack: ({ context, node, scope }) => {
     const orientation = useStringProp(node, scope, "orientation", "");
@@ -184,9 +186,108 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
     );
   },
   Option: () => null,
+  Pages: PagesRenderer,
+  Page: () => null,
+  NavLink: NavLinkRenderer,
+  NavPanel: ({ context, node, scope }) => <nav>{context.renderChildren(node.children, scope)}</nav>,
   DataSource: DataSourceRenderer,
   APICall: ApiCallRenderer,
 };
+
+function PagesRenderer({ context, node, scope }: Parameters<XmluiBuiltInRenderer>[0]) {
+  const fallbackPath = useStringProp(node, scope, "fallbackPath", "");
+  const snapshot = useRouteSnapshot(scope);
+  const pages = node.children.filter(
+    (child): child is XmluiElement => child.kind === "element" && child.type === "Page",
+  );
+  const restChildren = node.children.filter(
+    (child) => !(child.kind === "element" && child.type === "Page"),
+  );
+  const routeDescriptors = useMemo(
+    () => pages
+      .map((page) => ({
+        page,
+        url: page.props.url ?? "",
+        pattern: compileRoutePattern(page.props.url ?? ""),
+      }))
+      .sort((left, right) => right.pattern.score - left.pattern.score),
+    [pages],
+  );
+  const matched = routeDescriptors
+    .map((descriptor) => ({
+      ...descriptor,
+      params: matchRoutePattern(descriptor.pattern, snapshot.pathname),
+    }))
+    .find((descriptor) => descriptor.params !== undefined);
+
+  useEffect(() => {
+    if (!matched && fallbackPath && snapshot.pathname !== fallbackPath) {
+      scope.routing?.navigate(fallbackPath);
+    }
+  }, [fallbackPath, matched, scope.routing, snapshot.pathname]);
+
+  const pageContent = matched
+    ? context.renderChildren(
+        matched.page.children,
+        createRuntimeScope({
+          store: scope.store,
+          parent: scope,
+          props: scope.props,
+          references: scope.references,
+          slots: scope.slots,
+          routing: scope.routing,
+          contextValues: {
+            $routeParams: matched.params ?? {},
+            $queryParams: snapshot.queryParams,
+            $queryString: snapshot.search,
+            $pathname: snapshot.pathname,
+          },
+          emitEvent: scope.emitEvent,
+        }),
+      )
+    : null;
+
+  return (
+    <>
+      {pageContent}
+      {context.renderChildren(restChildren, scope)}
+    </>
+  );
+}
+
+function NavLinkRenderer({ context, node, scope }: Parameters<XmluiBuiltInRenderer>[0]) {
+  const to = useStringProp(node, scope, "to", "");
+  const label = useEvaluatedProp(node, scope, "label", undefined);
+  const enabled = useBooleanProp(node, scope, "enabled", true);
+  const forceActive = useBooleanProp(node, scope, "active", false);
+  const exact = useBooleanProp(node, scope, "exact", false);
+  const target = useStringProp(node, scope, "target", "");
+  const snapshot = useRouteSnapshot(scope);
+  const href = scope.routing?.href(to) ?? to;
+  const active = forceActive || isNavLinkActive(snapshot.pathname, to, exact);
+  const content = label === undefined ? context.renderChildren(node.children, scope) : String(label);
+  if (!enabled) {
+    return <button type="button" disabled data-active={active || undefined}>{content}</button>;
+  }
+  return (
+    <a
+      href={href}
+      target={target || undefined}
+      aria-current={active ? "page" : undefined}
+      data-active={active || undefined}
+      onClick={(event) => {
+        if (!scope.routing || target || isExternalUrl(to)) {
+          return;
+        }
+        event.preventDefault();
+        scope.routing.navigate(to);
+        void runEvent(node.parsed?.events?.click, scope);
+      }}
+    >
+      {content}
+    </a>
+  );
+}
 
 function DataSourceRenderer({ node, scope }: Parameters<XmluiBuiltInRenderer>[0]) {
   const id = useStringProp(node, scope, "id", "");
@@ -536,4 +637,31 @@ function invalidateDataSources(
     const api = scope.references[String(name)] as { refetch?: () => unknown } | undefined;
     void api?.refetch?.();
   }
+}
+
+function useRouteSnapshot(scope: Parameters<XmluiBuiltInRenderer>[0]["scope"]): RouteSnapshot {
+  const fallback = {
+    pathname: "/",
+    search: "",
+    hash: "",
+    queryParams: {},
+    revision: 0,
+  };
+  return useSyncExternalStore(
+    (listener) => scope.routing?.subscribe(listener) ?? (() => undefined),
+    () => scope.routing?.getSnapshot() ?? fallback,
+    () => fallback,
+  );
+}
+
+function isNavLinkActive(pathname: string, to: string, exact: boolean): boolean {
+  const target = to.split(/[?#]/)[0] || "/";
+  if (exact || target === "/") {
+    return pathname === target;
+  }
+  return pathname === target || pathname.startsWith(`${target}/`);
+}
+
+function isExternalUrl(to: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(to);
 }

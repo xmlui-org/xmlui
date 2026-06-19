@@ -1,0 +1,16 @@
+<App>
+  <NavPanel>
+    <NavLink to="/" label="Home" exact="{true}" />
+    <NavLink to="/details/42" label="Details" />
+  </NavPanel>
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <H1>Routing home</H1>
+      <Text>Path: {$pathname}</Text>
+    </Page>
+    <Page url="/details/:id">
+      <H1>Routing details</H1>
+      <Text>Id: {$routeParams.id}</Text>
+    </Page>
+  </Pages>
+</App>
