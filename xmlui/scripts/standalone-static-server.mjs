@@ -2,12 +2,14 @@ import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize, resolve, sep } from "node:path";
 
-const root = resolve(process.cwd(), "standalone-samples");
-const port = Number(process.env.XMLUI_STANDALONE_PORT ?? 5174);
+const root = resolve(process.cwd(), process.env.XMLUI_STATIC_ROOT ?? "standalone-samples");
+const port = Number(process.env.XMLUI_STANDALONE_PORT ?? process.env.XMLUI_STATIC_PORT ?? 5174);
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
   ".xmlui": "text/plain; charset=utf-8",
 };
 
@@ -36,6 +38,5 @@ const server = createServer((request, response) => {
 });
 
 server.listen(port, "127.0.0.1", () => {
-  console.log(`Standalone sample server listening on http://127.0.0.1:${port}`);
+  console.log(`Static sample server listening on http://127.0.0.1:${port} from ${root}`);
 });
-

@@ -10,6 +10,8 @@
   "scripts": {
     "dev": "npm --workspace xmlui run dev",
     "build": "npm --workspace xmlui run build",
+    "build:production": "npm --workspace xmlui run build:production",
+    "serve:production": "npm --workspace xmlui run serve:production",
     "build:vscode": "npm --workspace xmlui-vscode run build",
     "test": "npm --workspace xmlui run test",
     "test:vscode": "npm --workspace xmlui-vscode run test",

@@ -13,6 +13,11 @@ export default defineConfig({
       url: "http://127.0.0.1:5174/counter-components/",
       reuseExistingServer: true,
     },
+    {
+      command: "npm run build:production && XMLUI_STATIC_ROOT=dist-production XMLUI_STANDALONE_PORT=5175 node scripts/standalone-static-server.mjs",
+      url: "http://127.0.0.1:5175/index.html",
+      reuseExistingServer: true,
+    },
   ],
   use: {
     baseURL: "http://127.0.0.1:5173/",

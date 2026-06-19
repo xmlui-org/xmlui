@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist-production/
+.xmlui-production/
 !tools/vscode/dist/
 !tools/vscode/dist/**
 test-results/
