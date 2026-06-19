@@ -401,8 +401,24 @@ function dependencySummary(
 }
 
 function isComponentReference(type: string, isDefinitionRoot: boolean): boolean {
-  return !isDefinitionRoot && /^[A-Z]/.test(type) && !["App", "H1", "Button", "Text"].includes(type);
+  return !isDefinitionRoot && /^[A-Z]/.test(type) && !builtInElementNames.has(type);
 }
+
+const builtInElementNames = new Set([
+  "App",
+  "H1",
+  "Button",
+  "Checkbox",
+  "HStack",
+  "Items",
+  "Option",
+  "Select",
+  "Slot",
+  "Stack",
+  "Text",
+  "TextBox",
+  "VStack",
+]);
 
 function isComponentRoot(document: XmluiDocument): boolean {
   return document.kind === "component";

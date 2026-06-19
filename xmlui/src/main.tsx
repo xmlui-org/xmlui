@@ -4,6 +4,10 @@ import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
 import asyncSequenceApp from "./examples/async-sequence/Main.xmlui";
 import componentCounterApp from "./examples/counter-components/Main.xmlui";
+import builtinsInputsApp from "./examples/builtins-inputs/Main.xmlui";
+import builtinsItemsApp from "./examples/builtins-items/Main.xmlui";
+import builtinsLayoutApp from "./examples/builtins-layout/Main.xmlui";
+import builtinsTaskFilterApp from "./examples/builtins-task-filter/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import expressionUpdateComponentsApp from "./examples/expression-update-components/Main.xmlui";
 import expressionUpdatesApp from "./examples/expression-updates/Main.xmlui";
@@ -28,6 +32,10 @@ const examples = {
   asyncDirectives: asyncDirectivesApp,
   asyncResponsiveLoop: asyncResponsiveLoopApp,
   asyncSequence: asyncSequenceApp,
+  builtinsInputs: builtinsInputsApp,
+  builtinsItems: builtinsItemsApp,
+  builtinsLayout: builtinsLayoutApp,
+  builtinsTaskFilter: builtinsTaskFilterApp,
   components: componentCounterApp,
   expressions: broaderExpressionsApp,
   expressionComponents: expressionUpdateComponentsApp,

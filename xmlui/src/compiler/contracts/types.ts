@@ -25,6 +25,18 @@ export type XmluiEventContract = {
   attributeName: string;
 };
 
+export type XmluiTemplateContract = {
+  name: string;
+};
+
+export type XmluiContextVariableContract = {
+  name: string;
+};
+
+export type XmluiApiContract = {
+  name: string;
+};
+
 export type XmluiComponentContract = {
   name: string;
   kind: XmluiComponentContractKind;
@@ -33,6 +45,9 @@ export type XmluiComponentContract = {
   declarations: XmluiDeclarationPermission;
   props: Record<string, XmluiPropContract>;
   events: Record<string, XmluiEventContract>;
+  templates?: Record<string, XmluiTemplateContract>;
+  contextVariables?: Record<string, XmluiContextVariableContract>;
+  apis?: Record<string, XmluiApiContract>;
 };
 
 export type XmluiContractRegistry = {

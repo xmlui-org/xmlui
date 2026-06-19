@@ -1,0 +1,9 @@
+<App var.count="{0}">
+  <VStack gap="8px">
+    <H1>Built-ins layout</H1>
+    <HStack gap="8px" verticalAlignment="center">
+      <Text variant="strong">Count: {count}</Text>
+      <Button onClick="count++">Increment layout count</Button>
+    </HStack>
+  </VStack>
+</App>

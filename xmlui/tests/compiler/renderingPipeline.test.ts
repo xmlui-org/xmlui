@@ -276,8 +276,22 @@ describe("rendering binding evaluation", () => {
 });
 
 describe("built-in renderer registry", () => {
-  it("contains the initial built-in renderers", () => {
-    expect(Object.keys(builtInRenderers).sort()).toEqual(["App", "Button", "H1", "Items", "Slot", "Text"]);
+  it("contains the expanded built-in renderers", () => {
+    expect(Object.keys(builtInRenderers).sort()).toEqual([
+      "App",
+      "Button",
+      "Checkbox",
+      "H1",
+      "HStack",
+      "Items",
+      "Option",
+      "Select",
+      "Slot",
+      "Stack",
+      "Text",
+      "TextBox",
+      "VStack",
+    ]);
   });
 
   it("exposes render errors with the unknown component name", () => {

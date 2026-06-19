@@ -39,8 +39,39 @@ describe("Managed React contract registry", () => {
     expect(metadata.components).toContainEqual(
       expect.objectContaining({
         name: "Button",
-        props: ["label"],
+        props: ["enabled", "label"],
         events: ["click"],
+        templates: [],
+        contextVariables: [],
+        apis: [],
+      }),
+    );
+    expect(metadata.components).toContainEqual(
+      expect.objectContaining({
+        name: "Items",
+        props: ["data", "items", "reverse"],
+        templates: ["itemTemplate"],
+        contextVariables: ["$isFirst", "$isLast", "$item", "$itemIndex"],
+      }),
+    );
+    expect(metadata.components).toContainEqual(
+      expect.objectContaining({
+        name: "TextBox",
+        props: ["enabled", "initialValue", "label", "placeholder", "readOnly"],
+        events: ["didChange", "gotFocus", "lostFocus"],
+      }),
+    );
+    expect(metadata.components).toContainEqual(
+      expect.objectContaining({
+        name: "Checkbox",
+        props: ["enabled", "indeterminate", "initialValue", "label", "readOnly"],
+        events: ["click", "didChange", "gotFocus", "lostFocus"],
+      }),
+    );
+    expect(metadata.components).toContainEqual(
+      expect.objectContaining({
+        name: "Option",
+        props: ["enabled", "keywords", "label", "value"],
       }),
     );
     expect(metadata.components).toContainEqual(
