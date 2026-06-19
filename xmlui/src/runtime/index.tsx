@@ -1,19 +1,23 @@
-import React, { useMemo, useRef } from "react";
-import { createRoot } from "react-dom/client";
+import React, { useEffect, useMemo, useRef } from "react";
+import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
 import { createRenderContext, XmluiNodeRenderer } from "./rendering/renderer";
 import {
   createRuntimeScope,
-  initializeStateValues,
+  initializeStateValuesIntoStore,
   type RuntimeScope,
   useRuntimeStateStore,
 } from "./state";
+import { RuntimeRoutingStore, type RoutingMode } from "./routing";
+import { XmluiThemeRoot } from "./rendering/theme";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
+import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 
 export function createXmluiModule(
   document: XmluiDocumentInput,
   components: XmluiModule[] = [],
+  options: { extensions?: Iterable<Extension> } = {},
 ): XmluiModule {
   if (document.kind === "component") {
     return {
@@ -30,56 +34,142 @@ export function createXmluiModule(
     }
   }
 
+  const normalizedExtensions = normalizeExtensions(options.extensions ?? []);
   return {
     kind: "app",
     root: document.root,
     components: componentMap,
+    extensionRenderers: normalizedExtensions.renderers,
+    extensionFunctions: normalizedExtensions.functions,
   };
 }
 
-export function renderXmluiApp(module: XmluiModule, container: HTMLElement): void {
+export function renderXmluiApp(
+  module: XmluiModule,
+  container: HTMLElement,
+  options: MountXmluiAppOptions = {},
+): void {
   if (module.kind !== "app") {
     throw new Error("renderXmluiApp expected an app module.");
   }
 
-  createRoot(container).render(<XmluiRoot module={module} />);
+  mountXmluiApp(module, container, options);
 }
 
-function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }) {
+export type MountXmluiAppOptions = {
+  hydrate?: boolean;
+  initialUrl?: string;
+  extensions?: Iterable<Extension>;
+};
+
+export function mountXmluiApp(
+  module: XmluiModule,
+  container: HTMLElement,
+  options: MountXmluiAppOptions = {},
+): Root {
+  if (module.kind !== "app") {
+    throw new Error("mountXmluiApp expected an app module.");
+  }
+  if (options.hydrate) {
+    return hydrateRoot(container, <XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
+  }
+  const root = createRoot(container);
+  root.render(<XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
+  return root;
+}
+
+export function XmluiRoot({
+  module,
+  initialUrl,
+  extensions,
+}: {
+  module: Extract<XmluiModule, { kind: "app" }>;
+  initialUrl?: string;
+  extensions?: Iterable<Extension>;
+}) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
+  const referencesRef = useRef<Record<string, unknown>>({});
   const rootOwnerId = "app:root";
+  const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
+  const routingRef = useRef<RuntimeRoutingStore>();
+  if (!routingRef.current) {
+    routingRef.current = new RuntimeRoutingStore(routeMode, () => store.invalidateRoute(), initialUrl);
+  }
+  const normalizedExtensions = useMemo(
+    () => normalizeExtensions([
+      ...listRegisteredExtensions(),
+      ...(extensions ?? []),
+    ]),
+    [extensions],
+  );
+  useEffect(() => routingRef.current?.attach(), []);
 
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
-    const initialScope = createRuntimeScope({ store, localOwnerId: rootOwnerId, props: {} });
-    store.setInitialGlobalValues(
-      initializeStateValues(
-        module.root.globals,
-        module.root.parsed?.globals,
-        initialScope,
-        evaluateExpressionOrText,
-      ),
-    );
-    store.setInitialLocalValues(
-      rootOwnerId,
-      initializeStateValues(
-        module.root.vars,
-        module.root.parsed?.vars,
-        initialScope,
-        evaluateExpressionOrText,
-      ),
-    );
+    const initialScope = createRuntimeScope({
+      store,
+      localOwnerId: rootOwnerId,
+      props: {},
+      references: referencesRef.current,
+      routing: routingRef.current,
+      extensionFunctions: {
+        ...(module.extensionFunctions ?? {}),
+        ...normalizedExtensions.functions,
+      },
+    });
+    initializeStateValuesIntoStore({
+      kind: "global",
+      expressions: module.root.globals,
+      parsed: module.root.parsed?.globals,
+      scope: initialScope,
+      evaluate: evaluateExpressionOrText,
+    });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: rootOwnerId,
+      expressions: module.root.vars,
+      parsed: module.root.parsed?.vars,
+      scope: initialScope,
+      evaluate: evaluateExpressionOrText,
+    });
     initializedRef.current = true;
   }
 
   const scope = useMemo<RuntimeScope>(
-    () => createRuntimeScope({ store, localOwnerId: rootOwnerId, props: {} }),
-    [store],
+    () => createRuntimeScope({
+      store,
+      localOwnerId: rootOwnerId,
+      props: {},
+      references: referencesRef.current,
+      routing: routingRef.current,
+      extensionFunctions: {
+        ...(module.extensionFunctions ?? {}),
+        ...normalizedExtensions.functions,
+      },
+    }),
+    [module.extensionFunctions, normalizedExtensions.functions, store],
   );
-  const context = useMemo(() => createRenderContext(module.components), [module.components]);
+  const context = useMemo(
+    () => createRenderContext(module.components, {
+      ...(module.extensionRenderers ?? {}),
+      ...normalizedExtensions.renderers,
+    }),
+    [module.components, module.extensionRenderers, normalizedExtensions.renderers],
+  );
 
-  return <XmluiNodeRenderer context={context} node={module.root} scope={scope} />;
+  return (
+    <XmluiThemeRoot>
+      <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+    </XmluiThemeRoot>
+  );
 }
 
-export type { XmluiModule } from "./types";
+export type { XmluiDocumentInput, XmluiModule } from "./types";
+
+function routeModeFromApp(value: string | undefined): RoutingMode {
+  if (value === "false" || value === "{false}") {
+    return "history";
+  }
+  return "hash";
+}

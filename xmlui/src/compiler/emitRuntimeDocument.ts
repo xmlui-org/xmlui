@@ -49,6 +49,7 @@ function emitElement(element: XmluiElement): EmitJsValue {
     vars: element.vars,
     globals: element.globals,
     events: element.events,
+    methods: element.methods,
     children: element.children.map(emitNode),
     range: element.range,
     ...(element.parsed ? { parsed: emitParsedBindings(element.parsed) } : {}),
@@ -70,6 +71,7 @@ function emitParsedBindings(parsed: XmluiParsedBindings): EmitJsValue {
     ...(parsed.vars ? { vars: emitBindingBucket(parsed.vars) } : {}),
     ...(parsed.globals ? { globals: emitBindingBucket(parsed.globals) } : {}),
     ...(parsed.events ? { events: emitEventBucket(parsed.events) } : {}),
+    ...(parsed.methods ? { methods: emitEventBucket(parsed.methods) } : {}),
   };
 }
 

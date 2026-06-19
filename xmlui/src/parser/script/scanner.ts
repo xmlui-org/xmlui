@@ -77,6 +77,66 @@ export class ScriptScanner {
       this.input.advance(2);
       return this.createToken(ScriptTokenKind.PlusPlus, start, this.input.position);
     }
+    if (this.input.startsWith("--")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.MinusMinus, start, this.input.position);
+    }
+    if (this.input.startsWith("??")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.NullishCoalescing, start, this.input.position);
+    }
+    if (this.input.startsWith("?.")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.QuestionDot, start, this.input.position);
+    }
+    if (this.input.startsWith("=>")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.Arrow, start, this.input.position);
+    }
+    if (this.input.startsWith("===")) {
+      this.input.advance(3);
+      return this.createToken(ScriptTokenKind.EqualEqualEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("!==")) {
+      this.input.advance(3);
+      return this.createToken(ScriptTokenKind.ExclamationEqualEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("==")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.EqualEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("!=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.ExclamationEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("<=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.LessThanEqual, start, this.input.position);
+    }
+    if (this.input.startsWith(">=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.GreaterThanEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("+=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.PlusEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("-=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.MinusEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("*=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.StarEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("/=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.SlashEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("%=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.PercentEqual, start, this.input.position);
+    }
 
     const ch = this.input.peek();
     this.input.advance();
@@ -109,6 +169,20 @@ export class ScriptScanner {
         return this.createToken(ScriptTokenKind.Exclamation, start, this.input.position);
       case "=":
         return this.createToken(ScriptTokenKind.Equal, start, this.input.position);
+      case "<":
+        return this.createToken(ScriptTokenKind.LessThan, start, this.input.position);
+      case ">":
+        return this.createToken(ScriptTokenKind.GreaterThan, start, this.input.position);
+      case "+":
+        return this.createToken(ScriptTokenKind.Plus, start, this.input.position);
+      case "-":
+        return this.createToken(ScriptTokenKind.Minus, start, this.input.position);
+      case "*":
+        return this.createToken(ScriptTokenKind.Star, start, this.input.position);
+      case "/":
+        return this.createToken(ScriptTokenKind.Slash, start, this.input.position);
+      case "%":
+        return this.createToken(ScriptTokenKind.Percent, start, this.input.position);
       default:
         this.report("XS001", `Unknown script character '${ch}'.`, start, this.input.position);
         return this.createToken(ScriptTokenKind.Unknown, start, this.input.position);
@@ -283,6 +357,12 @@ function classifyScriptToken(kind: ScriptTokenKind): TokenClassification {
     case ScriptTokenKind.FalseKeyword:
     case ScriptTokenKind.NullKeyword:
     case ScriptTokenKind.UndefinedKeyword:
+    case ScriptTokenKind.LetKeyword:
+    case ScriptTokenKind.ConstKeyword:
+    case ScriptTokenKind.IfKeyword:
+    case ScriptTokenKind.ElseKeyword:
+    case ScriptTokenKind.WhileKeyword:
+    case ScriptTokenKind.ForKeyword:
       return "keyword";
     case ScriptTokenKind.NumberLiteral:
     case ScriptTokenKind.StringLiteral:
@@ -297,9 +377,30 @@ function classifyScriptToken(kind: ScriptTokenKind): TokenClassification {
       return "unknown";
     case ScriptTokenKind.LogicalOr:
     case ScriptTokenKind.LogicalAnd:
+    case ScriptTokenKind.NullishCoalescing:
     case ScriptTokenKind.Exclamation:
     case ScriptTokenKind.Equal:
+    case ScriptTokenKind.EqualEqual:
+    case ScriptTokenKind.EqualEqualEqual:
+    case ScriptTokenKind.ExclamationEqual:
+    case ScriptTokenKind.ExclamationEqualEqual:
+    case ScriptTokenKind.LessThan:
+    case ScriptTokenKind.LessThanEqual:
+    case ScriptTokenKind.GreaterThan:
+    case ScriptTokenKind.GreaterThanEqual:
+    case ScriptTokenKind.Plus:
+    case ScriptTokenKind.Minus:
+    case ScriptTokenKind.Star:
+    case ScriptTokenKind.Slash:
+    case ScriptTokenKind.Percent:
     case ScriptTokenKind.PlusPlus:
+    case ScriptTokenKind.MinusMinus:
+    case ScriptTokenKind.PlusEqual:
+    case ScriptTokenKind.MinusEqual:
+    case ScriptTokenKind.StarEqual:
+    case ScriptTokenKind.SlashEqual:
+    case ScriptTokenKind.PercentEqual:
+    case ScriptTokenKind.Arrow:
       return "operator";
     default:
       return "punctuation";
@@ -316,6 +417,18 @@ function keywordKind(text: string): ScriptTokenKind {
       return ScriptTokenKind.NullKeyword;
     case "undefined":
       return ScriptTokenKind.UndefinedKeyword;
+    case "let":
+      return ScriptTokenKind.LetKeyword;
+    case "const":
+      return ScriptTokenKind.ConstKeyword;
+    case "if":
+      return ScriptTokenKind.IfKeyword;
+    case "else":
+      return ScriptTokenKind.ElseKeyword;
+    case "while":
+      return ScriptTokenKind.WhileKeyword;
+    case "for":
+      return ScriptTokenKind.ForKeyword;
     default:
       return ScriptTokenKind.Identifier;
   }

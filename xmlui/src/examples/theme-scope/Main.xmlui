@@ -1,0 +1,10 @@
+<App>
+  <VStack gap="8px">
+    <Text color="$color-primary">Outer scoped text</Text>
+    <Theme color-primary="#047857">
+      <Text color="$color-primary">Inner scoped text</Text>
+    </Theme>
+    <Text color="$color-primary">Outer scoped text again</Text>
+  </VStack>
+</App>
+

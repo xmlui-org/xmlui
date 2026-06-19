@@ -1,0 +1,7 @@
+<App var.count="{1}" var.total="{0}">
+  <H1>Loop handler updates</H1>
+  <Text value="{'total: ' + total}" />
+  <Button onClick="let i = 0; while (i < 3) { total += count + i; i++ }">
+    Run loop
+  </Button>
+</App>

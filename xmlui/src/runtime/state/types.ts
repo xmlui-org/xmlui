@@ -12,10 +12,20 @@ export type StateSlotKey = {
 
 export type PropDependencyKey = {
   kind: "prop";
+  ownerId?: StateOwnerId;
   name: string;
 };
 
 export type RuntimeDependencyKey = StateSlotKey | PropDependencyKey;
+
+export type ReactiveVariableMode = "source" | "derived" | "assigned";
+
+export type ReactiveVariableNode = {
+  slot: StateSlotKey;
+  mode: ReactiveVariableMode;
+  dependencies: RuntimeDependencyKey[];
+  evaluate?: () => unknown;
+};
 
 export type StateWrite = {
   slot: StateSlotKey;
@@ -42,6 +52,15 @@ export function slotKeyId(slot: StateSlotKey): string {
   return normalized.kind === "global"
     ? `global:${normalized.name}`
     : `local:${normalized.ownerId}:${normalized.name}`;
+}
+
+export function dependencyKeyId(dependency: RuntimeDependencyKey): string {
+  if (dependency.kind === "prop") {
+    return dependency.ownerId
+      ? `prop:${dependency.ownerId}:${dependency.name}`
+      : `prop:${dependency.name}`;
+  }
+  return slotKeyId(dependency);
 }
 
 export function sameSlotKey(left: StateSlotKey, right: StateSlotKey): boolean {

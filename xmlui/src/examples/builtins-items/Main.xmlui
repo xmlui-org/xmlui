@@ -1,0 +1,21 @@
+<App
+  var.active="{''}"
+  var.items="{[
+    { id: 'build', label: 'Build' },
+    { id: 'test', label: 'Test' },
+    { id: 'ship', label: 'Ship' }
+  ]}"
+>
+  <VStack gap="8px">
+    <H1>Built-ins items</H1>
+    <Items data="{items}">
+      <property name="itemTemplate">
+        <HStack gap="8px">
+          <Text>{$itemIndex}: {$item.label}</Text>
+          <Button onClick="active = $item.id">Pick {$item.label}</Button>
+        </HStack>
+      </property>
+    </Items>
+    <Text>Active: {active || 'none'}</Text>
+  </VStack>
+</App>

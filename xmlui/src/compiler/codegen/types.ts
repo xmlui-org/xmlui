@@ -1,19 +1,28 @@
-import type { BoundDependency, BoundWriteTarget } from "../scriptSemantics";
+import type { BoundDependency, BoundWriteTarget, XmluiHandlerOptions } from "../scriptSemantics";
 import type { XmluiIrBindingKind, XmluiIrId, XmluiIrSourceRef } from "../ir/index";
 
 export type GeneratedExpressionFunction = (context: GeneratedExpressionContext) => unknown;
 
-export type GeneratedEventFunction = (context: GeneratedEventContext) => void;
+export type GeneratedEventFunction = (context: GeneratedEventContext) => Promise<unknown>;
 
 export type GeneratedExpressionContext = {
   props?: Record<string, unknown>;
   readLocal(name: string): unknown;
   readGlobal(name: string): unknown;
+  readContext?(name: string): unknown;
+  readReference?(name: string): unknown;
 };
 
 export type GeneratedEventContext = GeneratedExpressionContext & {
   writeLocal(name: string, value: unknown): void;
   writeGlobal(name: string, value: unknown): void;
+  delay?(ms: number): Promise<void>;
+  emitEvent?(name: string, args: unknown[]): unknown | Promise<unknown>;
+  call?(target: unknown, methodName: string, args: unknown[]): unknown | Promise<unknown>;
+  callFunction?(name: string, args: unknown[]): unknown | Promise<unknown>;
+  complete?(value: unknown): Promise<unknown>;
+  navigate?(target: unknown, queryParams?: Record<string, unknown>): void;
+  yieldIfNeeded?(iteration: number): Promise<void> | void;
 };
 
 export type GeneratedSourceMetadata = {
@@ -61,5 +70,6 @@ export type GeneratedEventHandler = GeneratedSourceMetadata & {
   dependencies: BoundDependency[];
   writes: BoundWriteTarget[];
   invalidates: Array<{ kind: "local" | "global"; name: string }>;
+  options?: XmluiHandlerOptions;
   execute: GeneratedEventFunction;
 };

@@ -1,0 +1,7 @@
+<Component name="StatusList">
+  <Items data="{$props.items}">
+    <Slot name="rowTemplate" item="{$item}">
+      <Text>{$item.label}</Text>
+    </Slot>
+  </Items>
+</Component>

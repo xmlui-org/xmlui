@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "vite.config.ts", "tests", "playwright.config.ts"]
+  "include": ["src", "vite.config.ts", "vite.*.config.ts", "tests", "playwright.config.ts"]
 }

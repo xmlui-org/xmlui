@@ -51,6 +51,42 @@ describe("collectXmluiSemanticTokens", () => {
       ]),
     );
   });
+
+  it("highlights broader embedded expression syntax", () => {
+    const tokens = collectXmluiSemanticTokens(
+      `<Text value="{items.map(item => item.label).join(', ') ?? fallback}" />`,
+    );
+
+    expect(tokens).toEqual(
+      expect.arrayContaining([
+        { line: 0, character: 14, length: 5, tokenType: "variable" },
+        { line: 0, character: 20, length: 3, tokenType: "xmluiMember" },
+        { line: 0, character: 24, length: 4, tokenType: "variable" },
+        { line: 0, character: 29, length: 2, tokenType: "operator" },
+        { line: 0, character: 32, length: 4, tokenType: "variable" },
+        { line: 0, character: 37, length: 5, tokenType: "xmluiMember" },
+        { line: 0, character: 44, length: 4, tokenType: "xmluiMember" },
+        { line: 0, character: 49, length: 4, tokenType: "string" },
+        { line: 0, character: 55, length: 2, tokenType: "operator" },
+        { line: 0, character: 58, length: 8, tokenType: "variable" },
+      ]),
+    );
+  });
+
+  it("highlights statement keywords and assignment write targets in event handlers", () => {
+    const tokens = collectXmluiSemanticTokens(
+      `<Button onClick="let next = count + 1; count = next; --count" />`,
+    );
+
+    expect(tokens).toEqual(
+      expect.arrayContaining([
+        { line: 0, character: 17, length: 3, tokenType: "keyword" },
+        { line: 0, character: 21, length: 4, tokenType: "variable" },
+        { line: 0, character: 39, length: 5, tokenType: "xmluiWriteTarget" },
+        { line: 0, character: 55, length: 5, tokenType: "xmluiWriteTarget" },
+      ]),
+    );
+  });
 });
 
 describe("collectXmluiDiagnostics", () => {

@@ -43,8 +43,13 @@ export function emitIdentifier(base: string, used: ReadonlySet<string> = new Set
   return `${normalized}${index}`;
 }
 
-export function emitFunctionExpression(body: string, parameter = "ctx"): string {
-  return `(${parameter}) => {\n${indent(body, 1)}\n}`;
+export function emitFunctionExpression(
+  body: string,
+  parameter = "ctx",
+  options: { async?: boolean } = {},
+): string {
+  const asyncKeyword = options.async ? "async " : "";
+  return `${asyncKeyword}(${parameter}) => {\n${indent(body, 1)}\n}`;
 }
 
 export function emitValue(value: EmitJsValue, level = 0): string {

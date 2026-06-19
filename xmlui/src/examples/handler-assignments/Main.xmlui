@@ -1,0 +1,8 @@
+<App var.count="{0}" var.doubled="{0}">
+  <H1>Assignment handler updates</H1>
+  <Text value="{'count: ' + count}" />
+  <Text value="{'doubled: ' + doubled}" />
+  <Button onClick="count = count + 1; doubled = count * 2">
+    Update: {count}
+  </Button>
+</App>

@@ -1,0 +1,14 @@
+<App var.selected="{''}">
+  <H1>UDC slot context</H1>
+  <StatusList items="{[
+    { id: 'build', label: 'Build' },
+    { id: 'test', label: 'Test' }
+  ]}">
+    <property name="rowTemplate">
+      <Button onClick="selected = $item.id">
+        {$item.label}: {selected === $item.id ? 'selected' : 'idle'}
+      </Button>
+    </property>
+  </StatusList>
+  <Text>Selected: {selected || 'none'}</Text>
+</App>

@@ -12,7 +12,11 @@ import {
   stateDependencies,
   XmluiRenderError,
 } from "../../src/runtime/rendering";
-import { createRuntimeScope, createRuntimeStateStore } from "../../src/runtime/state";
+import {
+  createRuntimeScope,
+  createRuntimeStateStore,
+  initializeStateValuesIntoStore,
+} from "../../src/runtime/state";
 
 describe("rendering dependency normalization", () => {
   it("resolves local dependencies to the owning runtime scope", () => {
@@ -61,10 +65,19 @@ describe("rendering dependency normalization", () => {
       expect.objectContaining({ kind: "global", name: "count" }),
     ]);
   });
+
+  it("normalizes route context dependencies separately from state slots", () => {
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({ store });
+
+    expect(normalizeDependencies([dependency("context", "$pathname")], scope)).toEqual([
+      expect.objectContaining({ kind: "route", name: "$pathname" }),
+    ]);
+  });
 });
 
 describe("rendering binding evaluation", () => {
-  it("uses generated functions for expressions, mixed text, and events", () => {
+  it("uses generated functions for expressions, mixed text, and events", async () => {
     const document = parseXmlui(
       `<App global.count="{0}"><Button onClick="count++">Count: {count}</Button></App>`,
     );
@@ -80,11 +93,183 @@ describe("rendering binding evaluation", () => {
     expect(evaluateExpressionOrText(text.value, text.segments, scope, "counter-text")).toBe(
       "Count: 0",
     );
-    runEvent(button.parsed?.events?.click, scope);
+    await runEvent(button.parsed?.events?.click, scope);
     expect(store.readGlobal("count")).toBe(1);
     expect(evaluateExpressionOrText(text.value, text.segments, scope, "counter-text")).toBe(
       "Count: 1",
     );
+  });
+
+  it("runs event handlers in parallel by default", async () => {
+    const document = parseXmlui(
+      `<App global.count="{0}"><Button onClick="delay(1); count++">Count</Button></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.setInitialGlobalValues({ count: 0 });
+    const scope = createRuntimeScope({ store });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await Promise.all([
+      runEvent(button.parsed?.events?.click, scope),
+      runEvent(button.parsed?.events?.click, scope),
+    ]);
+
+    expect(store.readGlobal("count")).toBe(2);
+  });
+
+  it("lets async handlers observe recomputed derived values after writes", async () => {
+    const document = parseXmlui(
+      `<App var.count="{1}" var.double="{count * 2}" var.status="{''}">
+        <Button onClick="delay(1); count++; status = double">Update</Button>
+      </App>`,
+      { sourceId: "Main.xmlui" },
+    );
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: document.root.vars,
+      parsed: document.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await runEvent(button.parsed?.events?.click, scope);
+
+    expect(store.readLocal("root", "count")).toBe(2);
+    expect(store.readLocal("root", "double")).toBe(4);
+    expect(store.readLocal("root", "status")).toBe(4);
+  });
+
+  it("drops same-event starts while block handlers are running", async () => {
+    const document = parseXmlui(
+      `<App global.count="{0}"><Button onClick='"block"; delay(1); count++'>Count</Button></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.setInitialGlobalValues({ count: 0 });
+    const scope = createRuntimeScope({ store });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await Promise.all([
+      runEvent(button.parsed?.events?.click, scope),
+      runEvent(button.parsed?.events?.click, scope),
+    ]);
+
+    expect(store.readGlobal("count")).toBe(1);
+  });
+
+  it("queues same-event starts for queue handlers", async () => {
+    const document = parseXmlui(
+      `<App global.count="{0}"><Button onClick='"queue"; delay(1); count++'>Count</Button></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.setInitialGlobalValues({ count: 0 });
+    const scope = createRuntimeScope({ store });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await Promise.all([
+      runEvent(button.parsed?.events?.click, scope),
+      runEvent(button.parsed?.events?.click, scope),
+    ]);
+
+    expect(store.readGlobal("count")).toBe(2);
+  });
+
+  it("passes emitted event payloads to arrow listeners in the caller scope", async () => {
+    const document = parseXmlui(
+      `<App var.selected="{''}"><TaskButton onDone="(id) => selected = id" /></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: document.root.vars,
+      parsed: document.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    const task = document.root.children[0];
+    if (task.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await runEvent(task.parsed?.events?.done, scope, ["alpha"]);
+
+    expect(store.readLocal("root", "selected")).toBe("alpha");
+  });
+
+  it("resolves component references from event handlers", async () => {
+    const document = parseXmlui(
+      `<App var.visible="{0}"><Button onClick="counter.increment(); visible = counter.getCount()" /></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const counter = {
+      count: 0,
+      increment() {
+        this.count++;
+      },
+      getCount() {
+        return this.count;
+      },
+    };
+    const scope = createRuntimeScope({
+      store,
+      localOwnerId: "root",
+      references: {
+        counter,
+      },
+    });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: document.root.vars,
+      parsed: document.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await runEvent(button.parsed?.events?.click, scope);
+
+    expect(store.readLocal("root", "visible")).toBe(1);
+  });
+
+  it("reads slot context values through $-prefixed names", () => {
+    const document = parseXmlui(`<App><Text value="{$item.label}" /></App>`);
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({
+      store,
+      contextValues: {
+        $item: { label: "Build" },
+      },
+    });
+    const text = document.root.children[0];
+    if (text.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    expect(evaluateExpressionOrText(text.props.value, text.parsed?.props?.value, scope)).toBe("Build");
   });
 
   it("records binding recomputation counters", () => {
@@ -100,8 +285,30 @@ describe("rendering binding evaluation", () => {
 });
 
 describe("built-in renderer registry", () => {
-  it("contains the initial built-in renderers", () => {
-    expect(Object.keys(builtInRenderers).sort()).toEqual(["App", "Button", "H1"]);
+  it("contains the expanded built-in renderers", () => {
+    expect(Object.keys(builtInRenderers).sort()).toEqual([
+      "APICall",
+      "App",
+      "AppHeader",
+      "Button",
+      "Checkbox",
+      "DataSource",
+      "H1",
+      "HStack",
+      "Items",
+      "NavLink",
+      "NavPanel",
+      "Option",
+      "Page",
+      "Pages",
+      "Select",
+      "Slot",
+      "Stack",
+      "Text",
+      "TextBox",
+      "Theme",
+      "VStack",
+    ]);
   });
 
   it("exposes render errors with the unknown component name", () => {
@@ -118,7 +325,7 @@ describe("built-in renderer registry", () => {
 });
 
 function dependency(
-  kind: "local" | "global" | "props",
+  kind: "local" | "global" | "props" | "context",
   name: string,
   path: string[] = [name],
 ): BoundDependency {

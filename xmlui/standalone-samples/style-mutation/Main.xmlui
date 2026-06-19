@@ -1,0 +1,18 @@
+<App var.compact="{false}">
+  <VStack
+    gap="{compact ? '4px' : '18px'}"
+    padding="16px"
+    width="{compact ? '260px' : '420px'}"
+    backgroundColor="{compact ? '$color-surface-100' : '$color-primary-100'}"
+    border="1px solid #d1d5db"
+    borderRadius="6px">
+    <H1 margin="0">Standalone style mutation</H1>
+    <Text color="{compact ? '$color-muted' : '$color-primary'}">
+      Mode: {compact ? 'compact' : 'comfortable'}
+    </Text>
+    <Button onClick="compact = !compact" paddingHorizontal="12px">
+      Toggle standalone style
+    </Button>
+  </VStack>
+</App>
+

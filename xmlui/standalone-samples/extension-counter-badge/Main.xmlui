@@ -1,0 +1,4 @@
+<App xmlns:ext="XMLUIExtensions" var.count="{0}">
+  <H1>Standalone extension counter</H1>
+  <ext:CounterBadge label="Standalone extension" value="{count}" onIncrement="count = addAmount(count, 1)" />
+</App>

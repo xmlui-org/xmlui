@@ -19,6 +19,8 @@ import {
 import { buildCompilerIrFromDocument } from "../../src/compiler/ir/index";
 import { createIrId, createXmluiIrSourceRef, sourceSpanFromOffsets } from "../../src/compiler/ir/index";
 import { parseXmlui } from "../../src/compiler/parseXmlui";
+import { createXmluiScope, lowerScriptExpression } from "../../src/compiler/scriptSemantics";
+import { parseScriptExpression } from "../../src/parser";
 
 describe("codegen descriptor types", () => {
   it("constructs compiled expression, text, and event descriptors separately from Compiler IR", () => {
@@ -63,7 +65,9 @@ describe("codegen descriptor types", () => {
       dependencies: [],
       writes: [{ kind: "local", name: "count", path: ["count"], operator: "++", span: source.span }],
       invalidates: [{ kind: "local", name: "count" }],
-      execute: (ctx) => ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1),
+      execute: async (ctx) => {
+        ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);
+      },
     };
 
     expect(localBinding.evaluate({ readLocal: () => 1, readGlobal: () => 2 })).toBe(0);
@@ -154,18 +158,18 @@ describe("script function generation", () => {
     })).toBe(11);
   });
 
-  it("generates executable event functions for local, global, and shadowed writes", () => {
+  it("generates executable event functions for local, global, and shadowed writes", async () => {
     const localEvent = eventFrom(`<App var.count="{0}"><Button onClick="count++" /></App>`);
     const localGenerated = generateEventHandlerFunction(localEvent.ir!, localEvent.writes);
     const localState = { count: 1 };
-    runGeneratedEvent(localGenerated.functionSource, { locals: localState, globals: {} });
+    await runGeneratedEvent(localGenerated.functionSource, { locals: localState, globals: {} });
     expect(localState.count).toBe(2);
     expect(localGenerated.invalidates).toEqual([{ kind: "local", name: "count" }]);
 
     const globalEvent = eventFrom(`<App global.count="{0}"><Button onClick="count++" /></App>`);
     const globalGenerated = generateEventHandlerFunction(globalEvent.ir!, globalEvent.writes);
     const globalState = { count: 4 };
-    runGeneratedEvent(globalGenerated.functionSource, { locals: {}, globals: globalState });
+    await runGeneratedEvent(globalGenerated.functionSource, { locals: {}, globals: globalState });
     expect(globalState.count).toBe(5);
     expect(globalGenerated.invalidates).toEqual([{ kind: "global", name: "count" }]);
 
@@ -175,9 +179,55 @@ describe("script function generation", () => {
     const shadowGenerated = generateEventHandlerFunction(shadowEvent.ir!, shadowEvent.writes);
     const shadowLocals = { count: 10 };
     const shadowGlobals = { count: 99 };
-    runGeneratedEvent(shadowGenerated.functionSource, { locals: shadowLocals, globals: shadowGlobals });
+    await runGeneratedEvent(shadowGenerated.functionSource, { locals: shadowLocals, globals: shadowGlobals });
     expect(shadowLocals.count).toBe(11);
     expect(shadowGlobals.count).toBe(99);
+  });
+
+  it("generates executable event functions for assignments, locals, branches, and loops", async () => {
+    const event = eventFrom(
+      `<App var.count="{0}" var.total="{0}" var.label="{''}"><Button onClick="let i = 0; count += 1; while (i < 2) { total += count + i; i++ }; if (total > 4) { label = 'done' }" /></App>`,
+    );
+    const generated = generateEventHandlerFunction(event.ir!, event.writes);
+    const locals = { count: 1, total: 0, label: "" };
+
+    expect(generated.body).toContain("let i = 0;");
+    expect(generated.body).toContain(`ctx.writeLocal("count", (ctx.readLocal("count") + 1));`);
+    expect(generated.body).toContain("while (");
+    expect(generated.body).toContain("XMLUI handler loop guard exceeded");
+    expect(generated.invalidates).toEqual([
+      { kind: "local", name: "count" },
+      { kind: "local", name: "total" },
+      { kind: "local", name: "label" },
+    ]);
+    await runGeneratedEvent(generated.functionSource, { locals, globals: {} });
+    expect(locals).toEqual({ count: 2, total: 5, label: "done" });
+  });
+
+  it("generates executable expression functions for broader expression syntax", () => {
+    const document = parseXmlui(
+      `<App var.count="{0}" var.user="{0}" var.items="{0}" var.index="{0}" />`,
+      { sourceId: "Main.xmlui" },
+    );
+    const scope = createXmluiScope(document.root, { sourceId: "Main.xmlui" });
+    const expression = lowerScriptExpression(
+      parseScriptExpression(
+        "items.map(item => item.label).join(', ') || (count > 1 ? user.name : items[index].label)",
+      ).node,
+      scope,
+    );
+    const generated = generateExpressionFunction(expression.ir);
+
+    expect(generated.body).toContain(`?.["map"]?.((item) =>`);
+    expect(generated.body).toContain(`?.["join"]?.(", ")`);
+    expect(runGeneratedExpression(generated.functionSource, {
+      locals: {
+        count: 0,
+        user: { name: "Ada" },
+        items: [{ label: "One" }, { label: "Two" }],
+        index: 1,
+      },
+    })).toBe("One, Two");
   });
 
   it("rejects invalid event write targets during generation", () => {
@@ -187,6 +237,11 @@ describe("script function generation", () => {
       generateEventHandlerFunction({
         kind: "EventHandler",
         span: source.span,
+        options: {
+          directives: [],
+          executionMode: "async",
+          schedulingPolicy: "parallel",
+        },
         body: [
           {
             kind: "ExpressionStatement",
@@ -272,7 +327,11 @@ describe("runtime descriptor attachment and module emission", () => {
     });
     expect(button.parsed.events.click.generatedName).toContain("event_");
     expect(button.parsed.events.click.compiledSource).toBe(
-      `ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
+      [
+        "let __xmluiResult;",
+        `__xmluiResult = ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
+        "return __xmluiResult;",
+      ].join("\n"),
     );
     expect(text.segments[1].generatedName).toContain("expr_");
     expect(text.segments[1].evaluate(fakeContext({ globals: { count: 3 } }))).toBe(3);
@@ -323,9 +382,9 @@ function runGeneratedExpression(
 function runGeneratedEvent(
   functionSource: string,
   options: { locals: Record<string, unknown>; globals: Record<string, unknown> },
-): void {
-  const fn = evaluateGeneratedFunction(functionSource) as (ctx: ReturnType<typeof fakeContext>) => void;
-  fn(fakeContext(options));
+): Promise<void> {
+  const fn = evaluateGeneratedFunction(functionSource) as (ctx: ReturnType<typeof fakeContext>) => Promise<void>;
+  return fn(fakeContext(options));
 }
 
 function fakeContext({

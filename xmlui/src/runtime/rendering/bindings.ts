@@ -23,8 +23,14 @@ type ExpressionLike = ParsedExpression | Extract<MixedTextSegment, { kind: "expr
 
 const expressionCache = new WeakMap<object, CompiledExpression>();
 const eventCache = new WeakMap<ParsedEvent, CompiledEventHandler>();
+const eventSchedules = new WeakMap<ParsedEvent, EventScheduleState>();
 
 const bindingCounters = new Map<string, number>();
+
+type EventScheduleState = {
+  running: boolean;
+  tail: Promise<unknown>;
+};
 
 export function normalizeDependencies(
   dependencies: BoundDependency[] | undefined,
@@ -59,6 +65,18 @@ export function normalizeDependencies(
         seen.add(key);
         normalized.push({ kind: "prop", name, source: dependency });
       }
+    } else if (dependency.kind === "reference") {
+      const key = `reference:${dependency.name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        normalized.push({ kind: "reference", name: dependency.name, source: dependency });
+      }
+    } else if (dependency.kind === "context" && isRouteContextName(dependency.name)) {
+      const key = `route:${dependency.name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        normalized.push({ kind: "route", name: dependency.name, source: dependency });
+      }
     }
   }
   return normalized;
@@ -75,6 +93,13 @@ export function stateDependencies(
       | { kind: "global"; name: string; source: BoundDependency } =>
       dependency.kind === "local" || dependency.kind === "global",
   );
+}
+
+function isRouteContextName(name: string): boolean {
+  return name === "$pathname" ||
+    name === "$routeParams" ||
+    name === "$queryParams" ||
+    name === "$queryString";
 }
 
 export function dependenciesForBinding(
@@ -162,14 +187,28 @@ export function executeExpression(
   return compiled.execute(context);
 }
 
-export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope): void {
+export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope, args: unknown[] = []): Promise<unknown> {
   if (!event) {
-    return;
+    return Promise.resolve();
   }
+  return scheduleEvent(event, () => executeEvent(event, scope, args));
+}
+
+function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]): Promise<unknown> {
   const context = createEventContext(scope);
+  const arrow = event.ir?.body.length === 1 &&
+    event.ir.body[0].kind === "ExpressionStatement" &&
+    event.ir.body[0].expression.kind === "ArrowFunctionExpression"
+      ? event.ir.body[0].expression
+      : undefined;
+  if (arrow) {
+    const fn = compileXmluiExpression(arrow, event.dependencies ?? []).execute(context);
+    if (typeof fn === "function") {
+      return Promise.resolve(fn(...args));
+    }
+  }
   if (event.execute) {
-    event.execute(context);
-    return;
+    return event.execute(context);
   }
   if (!event.ir) {
     throw new Error(`XMLUI event handler was not compiled: ${event.source}`);
@@ -179,7 +218,32 @@ export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope): v
     compiled = compileXmluiEventHandler(event.ir, event.dependencies ?? [], event.writes ?? []);
     eventCache.set(event, compiled);
   }
-  compiled.execute(context);
+  return compiled.execute(context);
+}
+
+function scheduleEvent(event: ParsedEvent, execute: () => Promise<unknown>): Promise<unknown> {
+  const policy = event.options?.schedulingPolicy ?? event.ir?.options.schedulingPolicy ?? "parallel";
+  if (policy === "parallel") {
+    return execute();
+  }
+
+  const state = eventSchedules.get(event) ?? { running: false, tail: Promise.resolve() };
+  eventSchedules.set(event, state);
+
+  if (policy === "drop-while-running") {
+    if (state.running) {
+      return Promise.resolve();
+    }
+    state.running = true;
+    const running = execute();
+    return running.finally(() => {
+      state.running = false;
+    });
+  }
+
+  const next = state.tail.catch(() => undefined).then(execute);
+  state.tail = next.catch(() => undefined);
+  return next;
 }
 
 export function resetBindingEvaluationCounters(): void {

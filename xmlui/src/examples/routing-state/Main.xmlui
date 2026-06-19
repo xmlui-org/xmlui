@@ -1,0 +1,16 @@
+<App global.count="{0}">
+  <NavPanel>
+    <NavLink to="/" label="Counter" exact="{true}" />
+    <NavLink to="/summary" label="Summary" />
+  </NavPanel>
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <H1>Routing counter</H1>
+      <Button onClick="count++">Count: {count}</Button>
+    </Page>
+    <Page url="/summary">
+      <H1>Routing summary</H1>
+      <Text>Count is {count}</Text>
+    </Page>
+  </Pages>
+</App>

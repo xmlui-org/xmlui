@@ -53,6 +53,19 @@ describe("parser LSP adapters", () => {
     );
   });
 
+  it("returns broader expression semantic-token data", () => {
+    const tokens = scriptSemanticTokens("items.map(item => item.label).join(', ') ?? fallback");
+
+    expect(tokens).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ text: "items", classification: "identifier" }),
+        expect.objectContaining({ text: "=>", classification: "operator" }),
+        expect.objectContaining({ text: "??", classification: "operator" }),
+        expect.objectContaining({ text: "', '", classification: "string" }),
+      ]),
+    );
+  });
+
   it("maps diagnostics to LSP ranges", () => {
     const source = new SourceText("<App>\n<Button label />\n</App>", "Main.xmlui");
     const parsed = parseMarkup(source);

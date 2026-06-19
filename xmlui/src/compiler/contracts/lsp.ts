@@ -6,6 +6,9 @@ export type XmluiContractMetadata = {
     kind: XmluiComponentContract["kind"];
     props: string[];
     events: string[];
+    templates: string[];
+    contextVariables: string[];
+    apis: string[];
     acceptsArbitraryProps: boolean;
   }>;
 };
@@ -21,6 +24,9 @@ export function contractRegistryToLspMetadata(
         kind: contract.kind,
         props: Object.keys(contract.props).sort(),
         events: Object.keys(contract.events).sort(),
+        templates: Object.keys(contract.templates ?? {}).sort(),
+        contextVariables: Object.keys(contract.contextVariables ?? {}).sort(),
+        apis: Object.keys(contract.apis ?? {}).sort(),
         acceptsArbitraryProps: contract.acceptsArbitraryProps === true,
       }))
       .sort((left, right) => left.name.localeCompare(right.name)),

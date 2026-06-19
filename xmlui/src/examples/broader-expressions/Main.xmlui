@@ -1,0 +1,13 @@
+<App
+  var.count="{2}"
+  var.user="{{ name: 'Ada', profile: null }}"
+  var.items="{[{ label: 'One' }, { label: 'Two' }]}"
+  var.index="{1}"
+>
+  <H1>Broader expression compilation</H1>
+  <Text value="{count + 1 * 2}" />
+  <Text value="{user.profile.title ?? user.name}" />
+  <Text value="{items.map(item => item.label).join(', ')}" />
+  <Text value="{count > 1 ? 'many' : 'one'}" />
+  <Text value="{items[index].label}" />
+</App>

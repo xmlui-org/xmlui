@@ -1,0 +1,31 @@
+<App
+  var.query="{''}"
+  var.onlyOpen="{false}"
+  var.status="{'open'}"
+  var.tasks="{[
+    { id: 1, title: 'Write notes', done: false, status: 'open' },
+    { id: 2, title: 'Review plan', done: false, status: 'open' },
+    { id: 3, title: 'Archive draft', done: true, status: 'closed' }
+  ]}"
+>
+  <VStack gap="8px">
+    <H1>Built-ins task filter</H1>
+    <HStack gap="8px" verticalAlignment="center">
+      <TextBox initialValue="{query}" placeholder="Search tasks" onDidChange="(value) => query = value" />
+      <Checkbox initialValue="{onlyOpen}" label="Only open" onDidChange="(value) => onlyOpen = value" />
+      <Select initialValue="{status}" onDidChange="(value) => status = value">
+        <Option value="open" label="Open" />
+        <Option value="closed" label="Closed" />
+        <Option value="all" label="All" />
+      </Select>
+    </HStack>
+    <Items data="{tasks.filter(task => (status === 'all' || task.status === status) && (!onlyOpen || !task.done) && task.title.toLowerCase().includes(query.toLowerCase()))}">
+      <property name="itemTemplate">
+        <HStack gap="8px">
+          <Text>{$item.title}</Text>
+          <Text>{$item.done ? 'done' : 'open'}</Text>
+        </HStack>
+      </property>
+    </Items>
+  </VStack>
+</App>

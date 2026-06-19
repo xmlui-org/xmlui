@@ -1,0 +1,11 @@
+<App var.count="{1}" var.double="{count * 2}">
+  <H1>Reactive derived override</H1>
+  <Text value="{'count: ' + count}" />
+  <Text value="{'double: ' + double}" />
+  <Button onClick="double = 99">
+    Override double
+  </Button>
+  <Button onClick="count++">
+    Increment count
+  </Button>
+</App>

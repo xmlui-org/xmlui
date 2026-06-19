@@ -1,0 +1,13 @@
+<App>
+  <NavPanel>
+    <NavLink to="/messages/1" label="Message 1" />
+    <NavLink to="/messages/2" label="Message 2" />
+  </NavPanel>
+  <Pages fallbackPath="/messages/1">
+    <Page url="/messages/:id">
+      <DataSource id="message" url="/api/messages/{$routeParams.id}" />
+      <H1>Routing data</H1>
+      <Text>Message text: {message.value.text || 'Loading'}</Text>
+    </Page>
+  </Pages>
+</App>

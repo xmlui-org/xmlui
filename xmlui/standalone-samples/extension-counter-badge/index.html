@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XMLUI Standalone Extension Counter</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="./xmlui/xmlui-latest.js"></script>
+    <script>
+      const extension = {
+        namespace: "XMLUIExtensions",
+        themeNamespacePrefix: "CounterBadge",
+        functions: {
+          addAmount: (value, amount) => Number(value || 0) + Number(amount || 0),
+        },
+        components: [{
+          name: "CounterBadge",
+          props: ["label", "value"],
+          events: ["increment"],
+          component: ({ props, events }) => window.xmlui.createElement(
+            "div",
+            { "data-part-id": "CounterBadge" },
+            window.xmlui.createElement("span", null, `${props.label || "Extension"}: ${props.value || 0}`),
+            window.xmlui.createElement("button", { type: "button", onClick: () => events.increment?.(1) }, "+1"),
+          ),
+        }],
+      };
+      window.xmlui?.registerExtension?.(extension);
+    </script>
+  </body>
+</html>

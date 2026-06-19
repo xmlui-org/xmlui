@@ -1,0 +1,6 @@
+<App var.count="{0}">
+  <H1>UDC default children</H1>
+  <Panel title="Projected Counter">
+    <Button onClick="count++">Projected count: {count}</Button>
+  </Panel>
+</App>

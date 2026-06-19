@@ -81,6 +81,20 @@ describe("parseMarkup", () => {
     ]);
   });
 
+  it("parses namespaced tag and attribute names", () => {
+    const result = parseMarkup(
+      '<App xmlns:ext="XMLUIExtensions"><ext:CounterBadge ext.value="{1}" /></App>',
+      "Main.xmlui",
+    );
+
+    expect(result.diagnostics).toEqual([]);
+    const app = rootElement(result.node);
+    const badge = elementChildren(app)[0];
+    expect(attributeKeys(app, result.source)).toEqual(["xmlns:ext"]);
+    expect(tagName(badge, result.source)).toBe("ext:CounterBadge");
+    expect(attributeKeys(badge, result.source)).toEqual(["ext.value"]);
+  });
+
   it("supports cursor lookup on parsed trees", () => {
     const result = parseMarkup('<App><Button onClick="count++">Hi</Button></App>', "Main.xmlui");
     const lookup = findTokenAtOffset(result.node, 15);

@@ -4,9 +4,11 @@ import type { BoundDependency } from "../../compiler/scriptSemantics";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import type { RuntimeScope } from "../state";
 import type { XmluiComponentModule } from "../types";
+import type { XmluiExtensionComponent } from "../../extensions";
 
 export type RenderContext = {
   components: Record<string, XmluiComponentModule>;
+  extensionRenderers: Record<string, XmluiExtensionComponent>;
   renderElement(node: XmluiElement, scope: RuntimeScope): ReactNode;
   renderChildren(children: XmluiNode[], scope: RuntimeScope): ReactNode;
 };
@@ -35,6 +37,16 @@ export type NormalizedRuntimeDependency =
     }
   | {
       kind: "global";
+      name: string;
+      source: BoundDependency;
+    }
+  | {
+      kind: "reference";
+      name: string;
+      source: BoundDependency;
+    }
+  | {
+      kind: "route";
       name: string;
       source: BoundDependency;
     }

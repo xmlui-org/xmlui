@@ -1,0 +1,11 @@
+<App var.visibleCount="{0}">
+  <H1>UDC methods</H1>
+  <CounterBox id="counter" />
+  <Button onClick="{
+    counter.increment();
+    visibleCount = counter.getCount();
+  }">
+    Read component count
+  </Button>
+  <Text>Component count: {visibleCount}</Text>
+</App>

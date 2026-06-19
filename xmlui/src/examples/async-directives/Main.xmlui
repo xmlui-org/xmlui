@@ -1,0 +1,11 @@
+<App global.blocked="{0}" global.queued="{0}">
+  <H1>Async handler directives</H1>
+  <Text value="{'blocked: ' + blocked}" />
+  <Text value="{'queued: ' + queued}" />
+  <Button onClick='"block"; delay(1000); blocked++'>
+    Block: {blocked}
+  </Button>
+  <Button onClick='"queue"; delay(1000); queued++'>
+    Queue: {queued}
+  </Button>
+</App>

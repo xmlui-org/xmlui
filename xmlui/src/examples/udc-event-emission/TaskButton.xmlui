@@ -1,0 +1,3 @@
+<Component name="TaskButton">
+  <Button onClick="emitEvent('done')">{$props.label}</Button>
+</Component>

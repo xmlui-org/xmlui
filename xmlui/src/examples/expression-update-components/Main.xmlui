@@ -1,0 +1,5 @@
+<App>
+  <H1>Expression update components</H1>
+  <MetricCounter label="Alpha" />
+  <MetricCounter label="Beta" />
+</App>

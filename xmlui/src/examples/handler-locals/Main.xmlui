@@ -1,0 +1,7 @@
+<App var.count="{0}" var.total="{0}">
+  <H1>Handler locals</H1>
+  <Text value="{'total: ' + total}" />
+  <Button onClick="let next = count + 1; count = next; total = total + next">
+    Add next: {count}
+  </Button>
+</App>

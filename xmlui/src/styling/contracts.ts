@@ -1,0 +1,145 @@
+export const THEME_VAR_PREFIX = "xmlui";
+
+export const responsiveBreakpoints = {
+  sm: 576,
+  md: 768,
+  lg: 992,
+  xl: 1200,
+  xxl: 1400,
+} as const;
+
+export const styleStates = [
+  "hover",
+  "focus",
+  "active",
+  "focusVisible",
+  "focusWithin",
+  "disabled",
+] as const;
+
+export const supportedLayoutPropNames = [
+  "horizontalAlignment",
+  "verticalAlignment",
+  "orientation",
+  "width",
+  "minWidth",
+  "maxWidth",
+  "height",
+  "minHeight",
+  "maxHeight",
+  "gap",
+  "border",
+  "borderTop",
+  "borderRight",
+  "borderBottom",
+  "borderLeft",
+  "borderColor",
+  "borderStyle",
+  "borderWidth",
+  "borderHorizontal",
+  "borderVertical",
+  "borderRadius",
+  "radiusTopLeft",
+  "radiusTopRight",
+  "radiusBottomLeft",
+  "radiusBottomRight",
+  "padding",
+  "paddingHorizontal",
+  "paddingVertical",
+  "paddingTop",
+  "paddingRight",
+  "paddingBottom",
+  "paddingLeft",
+  "backgroundColor",
+  "background",
+  "boxShadow",
+  "direction",
+  "overflowX",
+  "overflowY",
+  "zIndex",
+  "scrollSnapType",
+  "scrollSnapAlign",
+  "scrollSnapStop",
+  "scrollPadding",
+  "scrollPaddingTop",
+  "scrollPaddingRight",
+  "scrollPaddingBottom",
+  "scrollPaddingLeft",
+  "scrollMargin",
+  "scrollMarginTop",
+  "scrollMarginRight",
+  "scrollMarginBottom",
+  "scrollMarginLeft",
+  "color",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "fontStyle",
+  "textDecoration",
+  "wrapContent",
+  "canShrink",
+  "margin",
+  "marginHorizontal",
+  "marginVertical",
+  "marginTop",
+  "marginRight",
+  "marginBottom",
+  "marginLeft",
+  "userSelect",
+  "letterSpacing",
+  "textTransform",
+  "lineHeight",
+  "opacity",
+  "cursor",
+  "textWrap",
+  "textAlign",
+  "textAlignLast",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "zoom",
+  "whiteSpace",
+  "textDecorationLine",
+  "textDecorationColor",
+  "textDecorationStyle",
+  "textDecorationThickness",
+  "textUnderlineOffset",
+  "outline",
+  "outlineWidth",
+  "outlineColor",
+  "outlineStyle",
+  "outlineOffset",
+  "fontVariant",
+  "lineBreak",
+  "textIndent",
+  "textShadow",
+  "wordBreak",
+  "wordSpacing",
+  "wordWrap",
+  "writingMode",
+  "transition",
+  "transform",
+] as const;
+
+export type LayoutPropName = (typeof supportedLayoutPropNames)[number];
+export type LayoutOrientation = "horizontal" | "vertical";
+
+export const layoutPropNameSet = new Set<string>(supportedLayoutPropNames);
+
+export function isLayoutPropName(name: string): name is LayoutPropName {
+  return layoutPropNameSet.has(name);
+}
+
+export function themeVarName(name: string): string {
+  return `--${THEME_VAR_PREFIX}-${name}`;
+}
+
+export function themeVarReference(name: string): string {
+  return `var(${themeVarName(name)})`;
+}
+
+export function themePropNameToCssVarName(name: string): string {
+  return name.startsWith("--") ? name : themeVarName(name);
+}
+

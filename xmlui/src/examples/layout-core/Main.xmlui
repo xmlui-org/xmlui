@@ -1,0 +1,23 @@
+<App>
+  <VStack
+    gap="12px"
+    padding="16px"
+    width="420px"
+    backgroundColor="$color-surface-100"
+    border="1px solid #d1d5db"
+    borderRadius="6px">
+    <H1 margin="0" color="$color-text">Layout core</H1>
+    <HStack gap="8px" verticalAlignment="center">
+      <Text
+        width="2*"
+        paddingHorizontal="8px"
+        paddingVertical="4px"
+        backgroundColor="$color-surface"
+        border="1px solid #d1d5db">
+        Flexible text
+      </Text>
+      <Button width="*" paddingHorizontal="10px">Action</Button>
+    </HStack>
+  </VStack>
+</App>
+

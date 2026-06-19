@@ -1,0 +1,11 @@
+<App>
+  <Button onClick="navigate('/search', { q: 'xmlui', page: 2 })">Search</Button>
+  <Pages fallbackPath="/search">
+    <Page url="/search">
+      <H1>Routing query</H1>
+      <Text>Query: {$queryParams.q || 'none'}</Text>
+      <Text>Page: {$queryParams.page || 'none'}</Text>
+      <Text>Query string: {$queryString || 'none'}</Text>
+    </Page>
+  </Pages>
+</App>

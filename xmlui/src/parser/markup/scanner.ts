@@ -87,6 +87,10 @@ export class MarkupScanner {
       this.input.advance();
       return this.createToken(MarkupSyntaxKind.Dot, start, this.input.position);
     }
+    if (ch === ":") {
+      this.input.advance();
+      return this.createToken(MarkupSyntaxKind.Colon, start, this.input.position);
+    }
     if (ch === `"` || ch === "'") {
       return this.scanString();
     }

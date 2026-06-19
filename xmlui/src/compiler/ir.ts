@@ -4,6 +4,7 @@ import type {
   BoundWriteTarget,
   CompiledEventContext,
   CompiledExpressionContext,
+  XmluiHandlerOptions,
   XmluiEventHandlerIr,
   XmluiScriptIr,
 } from "./scriptSemantics";
@@ -19,6 +20,7 @@ export type ParsedExpression = {
   range: SourceRange;
   ir?: XmluiScriptIr;
   compiledSource?: string;
+  bindingMode?: "source" | "derived";
   evaluate?: (context: CompiledExpressionContext) => unknown;
   dependencies?: BoundDependency[];
 };
@@ -29,7 +31,8 @@ export type ParsedEvent = {
   range: SourceRange;
   ir?: XmluiEventHandlerIr;
   compiledSource?: string;
-  execute?: (context: CompiledEventContext) => void;
+  execute?: (context: CompiledEventContext) => Promise<void>;
+  options?: XmluiHandlerOptions;
   dependencies?: BoundDependency[];
   writes?: BoundWriteTarget[];
   invalidates?: Array<{ kind: "local" | "global"; name: string }>;
@@ -49,6 +52,7 @@ export type MixedTextSegment =
       ast: ScriptNode;
       ir?: XmluiScriptIr;
       compiledSource?: string;
+      bindingMode?: "source" | "derived";
       evaluate?: (context: CompiledExpressionContext) => unknown;
       dependencies?: BoundDependency[];
     };
@@ -58,6 +62,7 @@ export type XmluiParsedBindings = {
   vars?: Record<string, ParsedExpression | MixedTextSegment[]>;
   globals?: Record<string, ParsedExpression | MixedTextSegment[]>;
   events?: Record<string, ParsedEvent>;
+  methods?: Record<string, ParsedEvent>;
 };
 
 export type XmluiDocument = XmluiAppDocument | XmluiComponentDocument;
@@ -82,6 +87,7 @@ export type XmluiElement = {
   vars: Record<string, string>;
   globals: Record<string, string>;
   events: Record<string, string>;
+  methods: Record<string, string>;
   children: XmluiNode[];
   range: SourceRange;
   parsed?: XmluiParsedBindings;

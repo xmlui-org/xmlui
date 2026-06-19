@@ -3,6 +3,7 @@ import type {
   BoundDependency,
   BoundWriteTarget,
   XmluiEventHandlerIr,
+  XmluiHandlerOptions,
   XmluiScriptIr,
 } from "../scriptSemantics";
 
@@ -61,6 +62,7 @@ export type XmluiNodeIrBase = {
   scopeId?: XmluiIrId;
   bindings: XmluiBindingIr[];
   events: XmluiEventIr[];
+  methods: XmluiEventIr[];
   dependencies: XmluiDependencySummary;
 };
 
@@ -100,6 +102,7 @@ export type XmluiBindingIr = {
   kind: XmluiIrBindingKind;
   name: string;
   rawValue: string;
+  bindingMode?: "source" | "derived";
   source: XmluiIrSourceRef;
   expression?: XmluiExpressionIrRef;
   textSegments?: XmluiIrTextSegment[];
@@ -111,6 +114,7 @@ export type XmluiExpressionIrRef = {
   ast: ScriptNode;
   ir: XmluiScriptIr;
   compiledSource?: string;
+  bindingMode?: "source" | "derived";
   dependencies: BoundDependency[];
   source: XmluiIrSourceRef;
 };
@@ -123,6 +127,7 @@ export type XmluiEventIr = {
   ast: ProgramNode;
   ir: XmluiEventHandlerIr;
   compiledSource?: string;
+  options?: XmluiHandlerOptions;
   dependencies: BoundDependency[];
   writes: BoundWriteTarget[];
   invalidates: Array<{ kind: "local" | "global"; name: string }>;

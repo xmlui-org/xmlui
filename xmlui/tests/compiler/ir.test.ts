@@ -268,6 +268,24 @@ describe("Compiler IR lowering from analyzed XMLUI documents", () => {
     });
   });
 
+  it("preserves derived binding metadata through Compiler IR round-trips", () => {
+    const document = parseXmlui(
+      `<App var.count="{1}" var.double="{count * 2}"><Text value="{double}" /></App>`,
+      { sourceId: "Main.xmlui" },
+    );
+    const ir = buildCompilerIrFromDocument(document, { sourceId: "Main.xmlui" });
+
+    expect(ir.definition.root.bindings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: "local", name: "count", bindingMode: "source" }),
+        expect.objectContaining({ kind: "local", name: "double", bindingMode: "derived" }),
+      ]),
+    );
+    expect(compilerIrToRuntimeDocument(ir).root.parsed?.vars?.double).toMatchObject({
+      bindingMode: "derived",
+    });
+  });
+
   it("lowers event IR for local, global, and shadowed writes", () => {
     const localDocument = parseXmlui(`<App var.count="{0}"><Button onClick="count++" /></App>`);
     const localIr = buildCompilerIrFromDocument(localDocument);
@@ -488,6 +506,7 @@ function builtinNode(
     source: createXmluiIrSourceRef(sourceId, sourceSpanFromOffsets(sourceId, 0, 1)),
     bindings: [],
     events: [],
+    methods: [],
     dependencies: emptyDependencySummary(),
     children,
   };
@@ -505,6 +524,7 @@ function componentReferenceNode(
     source: createXmluiIrSourceRef(sourceId, sourceSpanFromOffsets(sourceId, 0, 1)),
     bindings: [],
     events: [],
+    methods: [],
     dependencies: emptyDependencySummary(),
     children: [],
   };

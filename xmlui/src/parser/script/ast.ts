@@ -5,14 +5,26 @@ import type { ScriptToken } from "./scanner";
 export type ScriptNodeKind =
   | "Program"
   | "ExpressionStatement"
+  | "BlockStatement"
+  | "IfStatement"
+  | "WhileStatement"
+  | "VariableDeclaration"
+  | "VariableDeclarator"
   | "Identifier"
   | "Literal"
   | "MemberExpression"
+  | "IndexExpression"
   | "CallExpression"
+  | "ArrowFunctionExpression"
   | "UnaryExpression"
   | "BinaryExpression"
+  | "ConditionalExpression"
   | "AssignmentExpression"
+  | "PrefixExpression"
   | "PostfixExpression"
+  | "ArrayExpression"
+  | "ObjectExpression"
+  | "ObjectProperty"
   | "Error";
 
 export type ScriptNodeBase = {
@@ -33,6 +45,36 @@ export type ExpressionStatementNode = ScriptNodeBase & {
   expression: ScriptNode;
 };
 
+export type BlockStatementNode = ScriptNodeBase & {
+  kind: "BlockStatement";
+  body: ScriptNode[];
+};
+
+export type IfStatementNode = ScriptNodeBase & {
+  kind: "IfStatement";
+  test: ScriptNode;
+  consequent: ScriptNode;
+  alternate?: ScriptNode;
+};
+
+export type WhileStatementNode = ScriptNodeBase & {
+  kind: "WhileStatement";
+  test: ScriptNode;
+  body: ScriptNode;
+};
+
+export type VariableDeclarationNode = ScriptNodeBase & {
+  kind: "VariableDeclaration";
+  declarationKind: "let" | "const";
+  declarations: VariableDeclaratorNode[];
+};
+
+export type VariableDeclaratorNode = ScriptNodeBase & {
+  kind: "VariableDeclarator";
+  id: IdentifierNode;
+  init?: ScriptNode;
+};
+
 export type IdentifierNode = ScriptNodeBase & {
   kind: "Identifier";
   name: string;
@@ -48,12 +90,27 @@ export type MemberExpressionNode = ScriptNodeBase & {
   kind: "MemberExpression";
   object: ScriptNode;
   property: IdentifierNode;
+  optional?: boolean;
+};
+
+export type IndexExpressionNode = ScriptNodeBase & {
+  kind: "IndexExpression";
+  object: ScriptNode;
+  index: ScriptNode;
+  optional?: boolean;
 };
 
 export type CallExpressionNode = ScriptNodeBase & {
   kind: "CallExpression";
   callee: ScriptNode;
   args: ScriptNode[];
+  optional?: boolean;
+};
+
+export type ArrowFunctionExpressionNode = ScriptNodeBase & {
+  kind: "ArrowFunctionExpression";
+  params: IdentifierNode[];
+  body: ScriptNode;
 };
 
 export type UnaryExpressionNode = ScriptNodeBase & {
@@ -69,6 +126,13 @@ export type BinaryExpressionNode = ScriptNodeBase & {
   right: ScriptNode;
 };
 
+export type ConditionalExpressionNode = ScriptNodeBase & {
+  kind: "ConditionalExpression";
+  test: ScriptNode;
+  consequent: ScriptNode;
+  alternate: ScriptNode;
+};
+
 export type AssignmentExpressionNode = ScriptNodeBase & {
   kind: "AssignmentExpression";
   operator: string;
@@ -76,10 +140,33 @@ export type AssignmentExpressionNode = ScriptNodeBase & {
   right: ScriptNode;
 };
 
+export type PrefixExpressionNode = ScriptNodeBase & {
+  kind: "PrefixExpression";
+  operator: string;
+  argument: ScriptNode;
+};
+
 export type PostfixExpressionNode = ScriptNodeBase & {
   kind: "PostfixExpression";
   operator: string;
   argument: ScriptNode;
+};
+
+export type ArrayExpressionNode = ScriptNodeBase & {
+  kind: "ArrayExpression";
+  elements: ScriptNode[];
+};
+
+export type ObjectPropertyNode = ScriptNodeBase & {
+  kind: "ObjectProperty";
+  key: IdentifierNode | LiteralNode;
+  value: ScriptNode;
+  shorthand?: boolean;
+};
+
+export type ObjectExpressionNode = ScriptNodeBase & {
+  kind: "ObjectExpression";
+  properties: ObjectPropertyNode[];
 };
 
 export type ErrorNode = ScriptNodeBase & {
@@ -89,14 +176,26 @@ export type ErrorNode = ScriptNodeBase & {
 export type ScriptNode =
   | ProgramNode
   | ExpressionStatementNode
+  | BlockStatementNode
+  | IfStatementNode
+  | WhileStatementNode
+  | VariableDeclarationNode
+  | VariableDeclaratorNode
   | IdentifierNode
   | LiteralNode
   | MemberExpressionNode
+  | IndexExpressionNode
   | CallExpressionNode
+  | ArrowFunctionExpressionNode
   | UnaryExpressionNode
   | BinaryExpressionNode
+  | ConditionalExpressionNode
   | AssignmentExpressionNode
+  | PrefixExpressionNode
   | PostfixExpressionNode
+  | ArrayExpressionNode
+  | ObjectPropertyNode
+  | ObjectExpressionNode
   | ErrorNode;
 
 export type ParseScriptResult<TNode extends ScriptNode = ScriptNode> = {

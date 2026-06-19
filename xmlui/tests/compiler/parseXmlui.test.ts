@@ -145,6 +145,28 @@ describe("parseXmlui", () => {
       .toThrow("Unresolved XMLUI script identifier 'missing'.");
   });
 
+  it("classifies source and derived variable initializers", () => {
+    const document = parseXmlui(
+      `<App var.count="{1}" var.double="{count * 2}" global.seed="{2}" global.total="{seed + 1}" />`,
+      { sourceId: "Main.xmlui" },
+    );
+
+    expect(document.root.parsed?.vars?.count).toMatchObject({ bindingMode: "source" });
+    expect(document.root.parsed?.vars?.double).toMatchObject({ bindingMode: "derived" });
+    expect(document.root.parsed?.globals?.seed).toMatchObject({ bindingMode: "source" });
+    expect(document.root.parsed?.globals?.total).toMatchObject({ bindingMode: "derived" });
+  });
+
+  it("diagnoses local and global derived variable cycles", () => {
+    expect(() =>
+      parseXmlui(`<App var.a="{b + 1}" var.b="{a + 1}" />`, { sourceId: "Main.xmlui" }),
+    ).toThrow("Reactive XMLUI local variable cycle detected: a -> b -> a.");
+
+    expect(() =>
+      parseXmlui(`<App global.a="{b + 1}" global.b="{a + 1}" />`, { sourceId: "Main.xmlui" }),
+    ).toThrow("Reactive XMLUI global variable cycle detected: a -> b -> a.");
+  });
+
   it("surfaces invalid event target diagnostics", () => {
     expect(() =>
       parseXmlui(`<Component name="Broken"><Button onClick="$props.label++" /></Component>`),

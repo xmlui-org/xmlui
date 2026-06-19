@@ -114,9 +114,23 @@ function lowerElement(
     ast: event.ast,
     ir: event.ir!,
     compiledSource: event.compiledSource,
+    options: event.options,
     dependencies: event.dependencies ?? [],
     writes: event.writes ?? [],
     invalidates: event.invalidates ?? [],
+  }));
+  const methods = Object.entries(element.parsed?.methods ?? {}).map(([name, method]) => ({
+    id: createIrId({ sourceId: context.sourceId, kind: "event", path: [...path, "methods"], name }),
+    name,
+    rawSource: method.source,
+    source: sourceRef(context.sourceId, method.range),
+    ast: method.ast,
+    ir: method.ir!,
+    compiledSource: method.compiledSource,
+    options: method.options,
+    dependencies: method.dependencies ?? [],
+    writes: method.writes ?? [],
+    invalidates: method.invalidates ?? [],
   }));
   const children = element.children.map((child, index) =>
     lowerNode(child, context, [...path, "children", index], scope.id),
@@ -124,6 +138,7 @@ function lowerElement(
   const dependencies = summarizeDependencies([
     ...bindings.map((binding) => binding.dependencies),
     ...events.map((event) => dependencySummary(event.dependencies, event.writes, event.invalidates)),
+    ...methods.map((method) => dependencySummary(method.dependencies, method.writes, method.invalidates)),
     ...children.map(summarizeNode),
   ]);
 
@@ -133,6 +148,7 @@ function lowerElement(
     scopeId: scope.id,
     bindings,
     events,
+    methods,
     dependencies,
     children,
   };
@@ -179,6 +195,7 @@ function lowerText(
     source: sourceRef(context.sourceId, node.range),
     bindings: [binding],
     events: [],
+    methods: [],
     dependencies: binding.dependencies,
   };
 }
@@ -289,6 +306,7 @@ function createBinding(
     kind,
     name,
     rawValue,
+    bindingMode: dependencies.reads.length > 0 ? "derived" : "source",
     source: sourceRef(context.sourceId, bindingRange(value)),
     ...(expression ? { expression } : {}),
     ...(textSegments ? { textSegments } : {}),
@@ -348,6 +366,7 @@ function expressionRef(
     ast: expression.ast,
     ir: expression.ir!,
     compiledSource: expression.compiledSource,
+    bindingMode: expression.bindingMode,
     dependencies: expression.dependencies ?? [],
     source: sourceRef(context.sourceId, "expressionRange" in expression ? expression.expressionRange : expression.range),
   };
@@ -382,8 +401,32 @@ function dependencySummary(
 }
 
 function isComponentReference(type: string, isDefinitionRoot: boolean): boolean {
-  return !isDefinitionRoot && /^[A-Z]/.test(type) && !["App", "H1", "Button"].includes(type);
+  return !isDefinitionRoot && /^[A-Z]/.test(type) && !builtInElementNames.has(type);
 }
+
+const builtInElementNames = new Set([
+  "App",
+  "AppHeader",
+  "APICall",
+  "DataSource",
+  "H1",
+  "Button",
+  "Checkbox",
+  "HStack",
+  "Items",
+  "Option",
+  "Page",
+  "Pages",
+  "NavLink",
+  "NavPanel",
+  "Select",
+  "Slot",
+  "Stack",
+  "Text",
+  "TextBox",
+  "Theme",
+  "VStack",
+]);
 
 function isComponentRoot(document: XmluiDocument): boolean {
   return document.kind === "component";

@@ -5,14 +5,26 @@
   "type": "module",
   "workspaces": [
     "xmlui",
+    "packages/*",
     "tools/vscode"
   ],
   "scripts": {
     "dev": "npm --workspace xmlui run dev",
     "build": "npm --workspace xmlui run build",
+    "build:production": "npm --workspace xmlui run build:production",
+    "build:ssg": "npm --workspace xmlui run build:ssg",
+    "build:metadata": "npm --workspace xmlui run build:metadata",
+    "build:docs-reference": "npm --workspace xmlui run build:docs-reference",
+    "inspect:ssg": "npm --workspace xmlui run inspect:ssg",
+    "serve:production": "npm --workspace xmlui run serve:production",
+    "preview:ssg": "npm --workspace xmlui run preview:ssg",
     "build:vscode": "npm --workspace xmlui-vscode run build",
     "test": "npm --workspace xmlui run test",
     "test:vscode": "npm --workspace xmlui-vscode run test",
-    "test:e2e": "npm --workspace xmlui run test:e2e"
+    "test:e2e": "npm --workspace xmlui run test:e2e",
+    "compatibility:sweep": "npm --workspace xmlui run compatibility:sweep",
+    "compatibility:perf": "npm --workspace xmlui run compatibility:perf",
+    "build:counter-badge": "npm --workspace xmlui-counter-badge run build",
+    "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata"
   }
 }

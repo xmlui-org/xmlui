@@ -1,5 +1,6 @@
 import {
   getNodeText,
+  createErrorDiagnostic,
   MarkupSyntaxKind,
   parseMarkup,
   parseScriptEventHandler,
@@ -19,6 +20,7 @@ import type {
   XmluiNode,
   XmluiParsedBindings,
 } from "./ir";
+import type { BoundDependency } from "./scriptSemantics";
 import {
   compileXmluiEventHandler,
   compileXmluiExpression,
@@ -38,6 +40,7 @@ type AttributeInfo = {
 
 export type ParseXmluiOptions = {
   sourceId?: string;
+  extensionFunctions?: Iterable<string>;
 };
 
 export class XmluiParseError extends Error {
@@ -66,10 +69,11 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     if (!name) {
       throw new Error("<Component> requires a name attribute.");
     }
-    const componentRoot = stripInternalRoot(transformedRoot, name);
+    const componentRoot = stripInternalRoot(transformedRoot, name, sourceId);
     analyzeElementScripts(componentRoot, {
       sourceId,
       allowImplicitGlobals: true,
+      extensionFunctions: options.extensionFunctions,
     });
     return {
       kind: "component",
@@ -87,6 +91,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
   analyzeElementScripts(transformedRoot, {
     sourceId,
     allowImplicitGlobals: false,
+    extensionFunctions: options.extensionFunctions,
   });
 
   return {
@@ -98,6 +103,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
 type AnalyzeOptions = {
   sourceId: string;
   allowImplicitGlobals: boolean;
+  extensionFunctions?: Iterable<string>;
 };
 
 function analyzeElementScripts(
@@ -110,6 +116,7 @@ function analyzeElementScripts(
     : createXmluiScope(element, {
         sourceId: options.sourceId,
         allowImplicitGlobals: options.allowImplicitGlobals,
+        specialNames: options.extensionFunctions,
       });
 
   analyzeParsedBindings(element.parsed, scope);
@@ -143,6 +150,12 @@ function analyzeParsedBindings(parsed: XmluiParsedBindings | undefined, scope: X
       analyzeEvent(event, scope);
     }
   }
+  if (parsed.methods) {
+    for (const method of Object.values(parsed.methods)) {
+      analyzeEvent(method, scope);
+    }
+  }
+  validateReactiveCycles(parsed);
 }
 
 function analyzeTextSegments(segments: MixedTextSegment[] | undefined, scope: XmluiScope): void {
@@ -164,6 +177,9 @@ function analyzeExpression(
   const compiled = compileXmluiExpression(lowered.ir, lowered.dependencies);
   expression.ir = lowered.ir;
   expression.dependencies = lowered.dependencies;
+  expression.bindingMode = lowered.dependencies.some((dependency) =>
+    dependency.kind === "local" || dependency.kind === "global" || dependency.kind === "props"
+  ) ? "derived" : "source";
   expression.compiledSource = compiled.source;
 }
 
@@ -174,21 +190,108 @@ function analyzeEvent(event: ParsedEvent, scope: XmluiScope): void {
   }
   const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
   event.ir = lowered.ir;
+  event.options = lowered.ir.options;
   event.dependencies = lowered.dependencies;
   event.writes = lowered.writes;
   event.invalidates = compiled.invalidates;
   event.compiledSource = compiled.source;
 }
 
-function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiElement {
-  const type = tagName(node, source);
+function validateReactiveCycles(parsed: XmluiParsedBindings | undefined): void {
+  validateReactiveBucketCycles("local", parsed?.vars);
+  validateReactiveBucketCycles("global", parsed?.globals);
+}
+
+function validateReactiveBucketCycles(
+  kind: "local" | "global",
+  bucket: Record<string, ParsedExpression | MixedTextSegment[]> | undefined,
+): void {
+  if (!bucket) {
+    return;
+  }
+  const bindings = bucket;
+  const names = new Set(Object.keys(bindings));
+  const visiting: string[] = [];
+  const visited = new Set<string>();
+
+  for (const name of names) {
+    visit(name);
+  }
+
+  function visit(name: string): void {
+    if (visited.has(name)) {
+      return;
+    }
+    const activeIndex = visiting.indexOf(name);
+    if (activeIndex >= 0) {
+      const cycle = [...visiting.slice(activeIndex), name];
+      const parsedValue = bindings[name];
+      const range = Array.isArray(parsedValue)
+        ? parsedValue[0]?.range
+        : parsedValue?.range;
+      throw diagnosticToError(
+        createErrorDiagnostic(
+          "XS301",
+          `Reactive XMLUI ${kind} variable cycle detected: ${cycle.join(" -> ")}.`,
+          {
+            sourceId: scopeSourceId(parsedValue),
+            start: range?.start ?? 0,
+            end: range?.end ?? 0,
+          },
+        ),
+      );
+    }
+
+    visiting.push(name);
+    for (const dependency of bindingDependencies(bindings[name])) {
+      if (dependency.kind === kind && names.has(dependency.name)) {
+        visit(dependency.name);
+      }
+    }
+    visiting.pop();
+    visited.add(name);
+  }
+}
+
+function bindingDependencies(
+  parsed: ParsedExpression | MixedTextSegment[] | undefined,
+): BoundDependency[] {
+  if (!parsed) {
+    return [];
+  }
+  if (Array.isArray(parsed)) {
+    return parsed.flatMap((segment) => (segment.kind === "expression" ? segment.dependencies ?? [] : []));
+  }
+  return parsed.dependencies ?? [];
+}
+
+function scopeSourceId(parsed: ParsedExpression | MixedTextSegment[] | undefined): string {
+  if (Array.isArray(parsed)) {
+    return parsed.find((segment) => segment.kind === "expression")?.ast.span.sourceId ?? "anonymous.xmlui";
+  }
+  return parsed?.ast.span.sourceId ?? "anonymous.xmlui";
+}
+
+function transformElement(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  sourceId: string,
+  inheritedNamespaces: Record<string, string> = {},
+): XmluiElement {
+  const attributesForElement = attributes(node, source);
+  const namespaces = collectNamespaces(attributesForElement, inheritedNamespaces);
+  const type = resolveNamespacedName(tagName(node, source), namespaces);
   const props: Record<string, string> = {};
   const vars: Record<string, string> = {};
   const globals: Record<string, string> = {};
   const events: Record<string, string> = {};
+  const methods: Record<string, string> = {};
   const parsed: XmluiParsedBindings = {};
 
-  for (const attr of attributes(node, source)) {
+  for (const attr of attributesForElement) {
+    if (attr.name === "xmlns" || attr.name.startsWith("xmlns:")) {
+      continue;
+    }
     if (attr.name.startsWith("var.")) {
       const name = attr.name.slice(4);
       vars[name] = attr.value;
@@ -204,14 +307,20 @@ function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: 
     if (/^on[A-Z]/.test(attr.name)) {
       const eventName = attr.name.slice(2, 3).toLowerCase() + attr.name.slice(3);
       events[eventName] = attr.value;
-      setParsedEvent(parsed, eventName, attr, sourceId);
+      setParsedEvent(parsed, "events", eventName, attr, sourceId);
+      continue;
+    }
+    if (attr.name.startsWith("method.")) {
+      const name = attr.name.slice(7);
+      methods[name] = attr.value;
+      setParsedEvent(parsed, "methods", name, attr, sourceId);
       continue;
     }
     props[attr.name] = attr.value;
     setParsedValue(parsed, "props", attr.name, attr, sourceId);
   }
 
-  const children = contentChildren(node, source, sourceId);
+  const children = contentChildren(node, source, sourceId, namespaces);
   return {
     kind: "element",
     type,
@@ -219,20 +328,26 @@ function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: 
     vars,
     globals,
     events,
+    methods,
     children,
     range: rangeOf(node),
     ...(hasParsedBindings(parsed) ? { parsed } : {}),
   };
 }
 
-function contentChildren(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiNode[] {
+function contentChildren(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  sourceId: string,
+  namespaces: Record<string, string>,
+): XmluiNode[] {
   const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
   const children = content?.children ?? [];
   const result: XmluiNode[] = [];
 
   for (const child of children) {
     if (child.kind === MarkupSyntaxKind.Element) {
-      result.push(transformElement(child, source, sourceId));
+      result.push(transformElement(child, source, sourceId, namespaces));
       continue;
     }
     if (child.kind === MarkupSyntaxKind.Text) {
@@ -252,6 +367,32 @@ function contentChildren(node: MarkupSyntaxNode, source: SourceText, sourceId: s
   }
 
   return result;
+}
+
+function collectNamespaces(
+  attributes: AttributeInfo[],
+  inheritedNamespaces: Record<string, string>,
+): Record<string, string> {
+  const namespaces = { ...inheritedNamespaces };
+  for (const attr of attributes) {
+    if (attr.name === "xmlns") {
+      namespaces[""] = attr.value;
+    } else if (attr.name.startsWith("xmlns:")) {
+      namespaces[attr.name.slice("xmlns:".length)] = attr.value;
+    }
+  }
+  return namespaces;
+}
+
+function resolveNamespacedName(name: string, namespaces: Record<string, string>): string {
+  const separator = name.indexOf(":");
+  if (separator < 0) {
+    return name;
+  }
+  const prefix = name.slice(0, separator);
+  const localName = name.slice(separator + 1);
+  const namespace = namespaces[prefix];
+  return namespace ? `${namespace}.${localName}` : name;
 }
 
 function attributes(node: MarkupSyntaxNode, source: SourceText): AttributeInfo[] {
@@ -313,11 +454,12 @@ function setParsedValue(
 
 function setParsedEvent(
   parsed: XmluiParsedBindings,
+  bucket: "events" | "methods",
   name: string,
   attr: AttributeInfo,
   sourceId: string,
 ): void {
-  const events = (parsed.events ??= {});
+  const events = (parsed[bucket] ??= {});
   const result = parseScriptEventHandler(attr.value, {
     originSpan: {
       sourceId,
@@ -346,24 +488,62 @@ function tagName(node: MarkupSyntaxNode, source: SourceText): string {
   return name?.children?.map((child) => getNodeText(child, source)).join("") ?? "";
 }
 
-function stripInternalRoot(component: XmluiElement, name: string): XmluiElement {
+function stripInternalRoot(component: XmluiElement, name: string, sourceId: string): XmluiElement {
   const { props: _props, parsed, ...rest } = component;
+  const children: XmluiNode[] = [];
+  const methods = { ...component.methods };
+  const parsedMethods = { ...parsed?.methods };
+
+  for (const child of component.children) {
+    if (child.kind === "element" && child.type === "method") {
+      const methodName = child.props.name;
+      if (methodName) {
+        const source = child.children
+          .map((methodChild) => methodChild.kind === "text" ? methodChild.value : "")
+          .join(" ")
+          .trim();
+        methods[methodName] = source;
+        const range = child.children[0]?.range ?? child.range;
+        const result = parseScriptEventHandler(source, {
+          originSpan: {
+            sourceId,
+            start: range.start,
+            end: range.end,
+          },
+        });
+        if (result.diagnostics.length > 0) {
+          throw diagnosticToError(result.diagnostics[0]);
+        }
+        parsedMethods[methodName] = {
+          source,
+          ast: result.node,
+          range,
+        };
+      }
+      continue;
+    }
+    children.push(child);
+  }
+
   const parsedProps = { ...parsed?.props };
   delete parsedProps.name;
   const nextParsed = {
     ...parsed,
     ...(Object.keys(parsedProps).length > 0 ? { props: parsedProps } : { props: undefined }),
+    ...(Object.keys(parsedMethods).length > 0 ? { methods: parsedMethods } : { methods: undefined }),
   };
   return {
     ...rest,
     type: name,
     props: {},
+    methods,
+    children,
     ...(hasParsedBindings(nextParsed) ? { parsed: nextParsed } : {}),
   };
 }
 
 function hasParsedBindings(parsed: XmluiParsedBindings): boolean {
-  return Boolean(parsed.props || parsed.vars || parsed.globals || parsed.events);
+  return Boolean(parsed.props || parsed.vars || parsed.globals || parsed.events || parsed.methods);
 }
 
 function rangeOf(node: MarkupSyntaxNode): SourceRange {

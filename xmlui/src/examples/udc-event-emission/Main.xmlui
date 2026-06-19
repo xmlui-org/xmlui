@@ -1,0 +1,6 @@
+<App var.doneCount="{0}">
+  <H1>UDC event emission</H1>
+  <TaskButton label="Ship it" onDone="doneCount++" />
+  <TaskButton label="Ship again" onDone="doneCount++" />
+  <Text>Done: {doneCount}</Text>
+</App>

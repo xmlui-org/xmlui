@@ -1,0 +1,7 @@
+<App var.count="{1}">
+  <H1>Reactive derived props</H1>
+  <DerivedChild value="{count}" />
+  <Button onClick="count++">
+    Parent count: {count}
+  </Button>
+</App>

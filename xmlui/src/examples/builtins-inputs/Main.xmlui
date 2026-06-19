@@ -1,0 +1,15 @@
+<App var.name="{''}" var.enabled="{false}" var.status="{'open'}">
+  <VStack gap="8px">
+    <H1>Built-ins inputs</H1>
+    <TextBox initialValue="{name}" placeholder="Name" onDidChange="(value) => name = value" />
+    <Checkbox initialValue="{enabled}" label="Enabled" onDidChange="(value) => enabled = value" />
+    <Select initialValue="{status}" onDidChange="(value) => status = value">
+      <Option value="open" label="Open" />
+      <Option value="closed" label="Closed" />
+      <Option value="all" label="All" />
+    </Select>
+    <Text>Name: {name || 'none'}</Text>
+    <Text>Enabled: {enabled ? 'yes' : 'no'}</Text>
+    <Text>Status: {status}</Text>
+  </VStack>
+</App>

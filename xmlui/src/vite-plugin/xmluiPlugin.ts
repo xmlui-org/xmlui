@@ -1,10 +1,15 @@
 import type { Plugin } from "vite";
 
 import { compileXmluiModule } from "../compiler/compileXmluiModule";
+import type { Extension } from "../extensions";
 
 const XMLUI_RE = /\.xmlui$/;
 
-export function xmluiPlugin(): Plugin {
+export type XmluiPluginOptions = {
+  extensions?: Iterable<Extension>;
+};
+
+export function xmluiPlugin(options: XmluiPluginOptions = {}): Plugin {
   return {
     name: "xmlui-rs:xmlui",
     enforce: "pre",
@@ -14,7 +19,7 @@ export function xmluiPlugin(): Plugin {
       }
 
       return {
-        code: compileXmluiModule({ id, source }),
+        code: compileXmluiModule({ id, source, extensions: options.extensions }),
         map: { mappings: "" },
       };
     },

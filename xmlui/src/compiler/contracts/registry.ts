@@ -3,6 +3,7 @@ import type { XmluiComponentContract, XmluiContractRegistry } from "./types";
 
 export type CreateContractRegistryOptions = {
   userComponents?: Iterable<string>;
+  extensionComponents?: Iterable<XmluiComponentContract>;
 };
 
 export function createContractRegistry(
@@ -10,6 +11,9 @@ export function createContractRegistry(
 ): XmluiContractRegistry {
   const components = new Map<string, XmluiComponentContract>();
   for (const contract of builtInComponentContracts) {
+    components.set(contract.name, contract);
+  }
+  for (const contract of options.extensionComponents ?? []) {
     components.set(contract.name, contract);
   }
   for (const name of options.userComponents ?? []) {

@@ -5,15 +5,18 @@ import type { RuntimeScope } from "../state";
 import { renderMixedText } from "./bindings";
 import { builtInRenderers } from "./builtins";
 import { ComponentInstance, ScopedElement } from "./components";
+import { ExtensionComponentInstance } from "./extensionComponent";
 import { useBindingRevision } from "./reactive";
 import type { RenderContext } from "./types";
 import { XmluiRenderError } from "./types";
 
 export function createRenderContext(
   components: RenderContext["components"],
+  extensionRenderers: RenderContext["extensionRenderers"] = {},
 ): RenderContext {
   const context: RenderContext = {
     components,
+    extensionRenderers,
     renderElement: (node, scope) => renderElement(context, node, scope),
     renderChildren: (children, scope) => renderChildren(context, children, scope),
   };
@@ -50,6 +53,11 @@ function renderElement(context: RenderContext, node: Extract<XmluiNode, { kind: 
   const component = context.components[node.type];
   if (component) {
     return <ComponentInstance component={component} context={context} node={node} scope={scope} />;
+  }
+
+  const extensionRenderer = context.extensionRenderers[node.type];
+  if (extensionRenderer) {
+    return <ExtensionComponentInstance renderer={extensionRenderer} context={context} node={node} scope={scope} />;
   }
 
   throw new XmluiRenderError(`Unknown XMLUI component: ${node.type}`, node);
