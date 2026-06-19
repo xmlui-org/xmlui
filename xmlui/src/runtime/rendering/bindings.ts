@@ -29,7 +29,7 @@ const bindingCounters = new Map<string, number>();
 
 type EventScheduleState = {
   running: boolean;
-  tail: Promise<void>;
+  tail: Promise<unknown>;
 };
 
 export function normalizeDependencies(
@@ -168,15 +168,26 @@ export function executeExpression(
   return compiled.execute(context);
 }
 
-export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope): Promise<void> {
+export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope, args: unknown[] = []): Promise<unknown> {
   if (!event) {
     return Promise.resolve();
   }
-  return scheduleEvent(event, () => executeEvent(event, scope));
+  return scheduleEvent(event, () => executeEvent(event, scope, args));
 }
 
-function executeEvent(event: ParsedEvent, scope: RuntimeScope): Promise<void> {
+function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]): Promise<unknown> {
   const context = createEventContext(scope);
+  const arrow = event.ir?.body.length === 1 &&
+    event.ir.body[0].kind === "ExpressionStatement" &&
+    event.ir.body[0].expression.kind === "ArrowFunctionExpression"
+      ? event.ir.body[0].expression
+      : undefined;
+  if (arrow) {
+    const fn = compileXmluiExpression(arrow, event.dependencies ?? []).execute(context);
+    if (typeof fn === "function") {
+      return Promise.resolve(fn(...args));
+    }
+  }
   if (event.execute) {
     return event.execute(context);
   }
@@ -191,7 +202,7 @@ function executeEvent(event: ParsedEvent, scope: RuntimeScope): Promise<void> {
   return compiled.execute(context);
 }
 
-function scheduleEvent(event: ParsedEvent, execute: () => Promise<void>): Promise<void> {
+function scheduleEvent(event: ParsedEvent, execute: () => Promise<unknown>): Promise<unknown> {
   const policy = event.options?.schedulingPolicy ?? event.ir?.options.schedulingPolicy ?? "parallel";
   if (policy === "parallel") {
     return execute();

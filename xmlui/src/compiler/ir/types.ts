@@ -62,6 +62,7 @@ export type XmluiNodeIrBase = {
   scopeId?: XmluiIrId;
   bindings: XmluiBindingIr[];
   events: XmluiEventIr[];
+  methods: XmluiEventIr[];
   dependencies: XmluiDependencySummary;
 };
 

@@ -181,6 +181,88 @@ describe("rendering binding evaluation", () => {
     expect(store.readGlobal("count")).toBe(2);
   });
 
+  it("passes emitted event payloads to arrow listeners in the caller scope", async () => {
+    const document = parseXmlui(
+      `<App var.selected="{''}"><TaskButton onDone="(id) => selected = id" /></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: document.root.vars,
+      parsed: document.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    const task = document.root.children[0];
+    if (task.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await runEvent(task.parsed?.events?.done, scope, ["alpha"]);
+
+    expect(store.readLocal("root", "selected")).toBe("alpha");
+  });
+
+  it("resolves component references from event handlers", async () => {
+    const document = parseXmlui(
+      `<App var.visible="{0}"><Button onClick="counter.increment(); visible = counter.getCount()" /></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const counter = {
+      count: 0,
+      increment() {
+        this.count++;
+      },
+      getCount() {
+        return this.count;
+      },
+    };
+    const scope = createRuntimeScope({
+      store,
+      localOwnerId: "root",
+      references: {
+        counter,
+      },
+    });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: document.root.vars,
+      parsed: document.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await runEvent(button.parsed?.events?.click, scope);
+
+    expect(store.readLocal("root", "visible")).toBe(1);
+  });
+
+  it("reads slot context values through $-prefixed names", () => {
+    const document = parseXmlui(`<App><Text value="{$item.label}" /></App>`);
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({
+      store,
+      contextValues: {
+        $item: { label: "Build" },
+      },
+    });
+    const text = document.root.children[0];
+    if (text.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    expect(evaluateExpressionOrText(text.props.value, text.parsed?.props?.value, scope)).toBe("Build");
+  });
+
   it("records binding recomputation counters", () => {
     resetBindingEvaluationCounters();
     const store = createRuntimeStateStore();
@@ -195,7 +277,7 @@ describe("rendering binding evaluation", () => {
 
 describe("built-in renderer registry", () => {
   it("contains the initial built-in renderers", () => {
-    expect(Object.keys(builtInRenderers).sort()).toEqual(["App", "Button", "H1", "Text"]);
+    expect(Object.keys(builtInRenderers).sort()).toEqual(["App", "Button", "H1", "Items", "Slot", "Text"]);
   });
 
   it("exposes render errors with the unknown component name", () => {

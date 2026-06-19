@@ -327,7 +327,11 @@ describe("runtime descriptor attachment and module emission", () => {
     });
     expect(button.parsed.events.click.generatedName).toContain("event_");
     expect(button.parsed.events.click.compiledSource).toBe(
-      `ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
+      [
+        "let __xmluiResult;",
+        `__xmluiResult = ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
+        "return __xmluiResult;",
+      ].join("\n"),
     );
     expect(text.segments[1].generatedName).toContain("expr_");
     expect(text.segments[1].evaluate(fakeContext({ globals: { count: 3 } }))).toBe(3);

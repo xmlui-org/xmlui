@@ -2,7 +2,7 @@ import { createErrorDiagnostic, type ParserDiagnostic, type ScriptNode } from ".
 import type { SourceSpan } from "../parser";
 import type { XmluiElement } from "./ir";
 
-export type XmluiBindingKind = "local" | "global" | "props" | "special";
+export type XmluiBindingKind = "local" | "global" | "props" | "special" | "context" | "reference";
 
 export type XmluiBinding = {
   kind: XmluiBindingKind;
@@ -259,12 +259,15 @@ export type CompiledExpressionContext = {
   props?: Record<string, unknown>;
   readLocal(name: string): unknown;
   readGlobal(name: string): unknown;
+  readContext?(name: string): unknown;
+  readReference?(name: string): unknown;
 };
 
 export type CompiledEventContext = CompiledExpressionContext & {
   writeLocal(name: string, value: unknown): void;
   writeGlobal(name: string, value: unknown): void;
   delay?(ms: number): Promise<void>;
+  emitEvent?(name: string, args: unknown[]): unknown | Promise<unknown>;
   call?(target: unknown, methodName: string, args: unknown[]): unknown | Promise<unknown>;
   complete?(value: unknown): Promise<unknown>;
   yieldIfNeeded?(iteration: number): Promise<void> | void;
@@ -284,7 +287,7 @@ export type CompiledEventHandler = {
   dependencies: BoundDependency[];
   writes: BoundWriteTarget[];
   invalidates: Array<{ kind: "local" | "global"; name: string }>;
-  execute(context: CompiledEventContext): Promise<void>;
+  execute(context: CompiledEventContext): Promise<unknown>;
 };
 
 export function createXmluiScope(
@@ -313,6 +316,14 @@ export function createXmluiScope(
     scope.specials.set("delay", {
       kind: "special",
       name: "delay",
+      mutable: false,
+      span: spanFromRange(sourceId, element.range),
+    });
+  }
+  if (!scope.specials.has("emitEvent")) {
+    scope.specials.set("emitEvent", {
+      kind: "special",
+      name: "emitEvent",
       mutable: false,
       span: spanFromRange(sourceId, element.range),
     });
@@ -361,6 +372,20 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
   }
   if (scope.specials.has(name)) {
     return scope.specials.get(name);
+  }
+  if (name === "$self") {
+    return {
+      kind: "reference",
+      name,
+      mutable: false,
+    };
+  }
+  if (name.startsWith("$")) {
+    return {
+      kind: "context",
+      name,
+      mutable: false,
+    };
   }
   if (scope.allowImplicitGlobals && isImplicitGlobalCandidate(name)) {
     return {
@@ -514,7 +539,18 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
       }
       const binding = resolveXmluiIdentifier(scope, rootName);
       if (!binding) {
-        pushUnresolved(rootName, current.object.span);
+        result.dependencies.push({
+          kind: "reference",
+          name: rootName,
+          path,
+          span: current.span,
+          binding: {
+            kind: "reference",
+            name: rootName,
+            mutable: false,
+            span: current.object.span,
+          },
+        });
         return;
       }
       result.dependencies.push({
@@ -654,9 +690,11 @@ export function compileXmluiEventHandler(
       .map((write) => ({ kind: write.kind, name: write.name }))),
     execute: async (context) => {
       const lexical: Record<string, unknown> = {};
+      let result: unknown;
       for (const statement of ir.body) {
-        await executeEventStatement(statement, context, lexical);
+        result = await executeEventStatement(statement, context, lexical);
       }
+      return result;
     },
   };
 }
@@ -1122,8 +1160,11 @@ function isAllowedCall(callee: ScriptNode): boolean {
   if (callee.kind === "Identifier" && callee.name === "delay") {
     return true;
   }
+  if (callee.kind === "Identifier" && callee.name === "emitEvent") {
+    return true;
+  }
   if (callee.kind === "MemberExpression") {
-    return isAllowedMethodName(callee.property.name);
+    return true;
   }
   return false;
 }
@@ -1346,6 +1387,11 @@ function emitExpression(ir: XmluiScriptIr): string {
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
       return `(${ir.params.join(", ")}) => ${emitExpression(ir.body)}`;
+    case "AssignmentExpression":
+      return emitAssignmentExpression(ir);
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+      return emitUpdateExpression(ir);
     default:
       throw new Error(`Cannot compile ${ir.kind} as an XMLUI expression.`);
   }
@@ -1415,11 +1461,15 @@ function emitAsyncCallExpression(ir: XmluiCallExpressionIr): string {
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "delay") {
     return `await ((ctx.delay ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(${args}))`;
   }
-  if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "emitEvent") {
+    const [name, ...eventArgs] = ir.args.map(emitAsyncExpression);
+    return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.emitEvent?.(${name ?? "undefined"}, [${eventArgs.join(", ")}])))`;
+  }
+  if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot compile unsupported XMLUI event call target.");
   }
   const objectSource = emitAsyncExpression(ir.callee.object);
-  return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ((ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args}])))`;
+  return `await (ctx.complete ?? ((value) => Promise.resolve(value)))(await (ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args}]))`;
 }
 
 function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string {
@@ -1504,6 +1554,10 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
       return `ctx.readLocal(${JSON.stringify(name)})`;
     case "global":
       return `ctx.readGlobal(${JSON.stringify(name)})`;
+    case "context":
+      return `ctx.readContext?.(${JSON.stringify(name)})`;
+    case "reference":
+      return `ctx.readReference?.(${JSON.stringify(name)})`;
     case undefined:
       return name;
     default:
@@ -1571,6 +1625,9 @@ function executeExpressionIr(
         ir.params.forEach((param, index) => {
           nextLexical[param] = args[index];
         });
+        if (isEventMutationExpression(ir.body)) {
+          return executeExpressionIrAsync(ir.body, context as CompiledEventContext, nextLexical);
+        }
         return executeExpressionIr(ir.body, context, nextLexical);
       };
     case "CallExpression":
@@ -1642,6 +1699,11 @@ async function executeExpressionIrAsync(
   lexical: Record<string, unknown> = {},
 ): Promise<unknown> {
   switch (ir.kind) {
+    case "AssignmentExpression":
+      return executeAssignmentExpression(ir, context, lexical);
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+      return executeUpdateExpression(ir, context, lexical);
     case "LogicalExpression":
       if (ir.operator === "||") {
         return await executeExpressionIrAsync(ir.left, context, lexical) ||
@@ -1734,7 +1796,11 @@ async function executeCallExpressionAsync(
     await (context.delay ?? defaultDelay)(Number(ms));
     return undefined;
   }
-  if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "emitEvent") {
+    const [name, ...args] = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    return (context.complete ?? completeValue)(await context.emitEvent?.(String(name), args));
+  }
+  if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot execute unsupported XMLUI event call target.");
   }
   const object = await executeExpressionIrAsync(ir.callee.object, context, lexical);
@@ -1791,41 +1857,42 @@ async function executeEventStatement(
   statement: XmluiHandlerStatementIr,
   context: CompiledEventContext,
   lexical: Record<string, unknown>,
-): Promise<void> {
+): Promise<unknown> {
   switch (statement.kind) {
     case "ExpressionStatement":
-      await executeEventExpression(statement.expression, context, lexical);
-      return;
+      return executeEventExpression(statement.expression, context, lexical);
     case "VariableDeclaration":
       for (const declaration of statement.declarations) {
         lexical[declaration.name] = declaration.init
           ? await executeExpressionIrAsync(declaration.init, context, lexical)
           : undefined;
       }
-      return;
+      return undefined;
     case "BlockStatement":
       const blockLexical = Object.create(lexical) as Record<string, unknown>;
+      let blockResult: unknown;
       for (const child of statement.body) {
-        await executeEventStatement(child, context, blockLexical);
+        blockResult = await executeEventStatement(child, context, blockLexical);
       }
-      return;
+      return blockResult;
     case "IfStatement":
       if (await executeExpressionIrAsync(statement.test, context, lexical)) {
-        await executeEventStatement(statement.consequent, context, lexical);
+        return executeEventStatement(statement.consequent, context, lexical);
       } else if (statement.alternate) {
-        await executeEventStatement(statement.alternate, context, lexical);
+        return executeEventStatement(statement.alternate, context, lexical);
       }
-      return;
+      return undefined;
     case "WhileStatement": {
       let loopGuard = 0;
+      let loopResult: unknown;
       while (await executeExpressionIrAsync(statement.test, context, lexical)) {
         if (++loopGuard > 10000) {
           throw new Error("XMLUI handler loop guard exceeded.");
         }
         await (context.yieldIfNeeded ?? defaultYieldIfNeeded)(loopGuard);
-        await executeEventStatement(statement.body, context, lexical);
+        loopResult = await executeEventStatement(statement.body, context, lexical);
       }
-      return;
+      return loopResult;
     }
   }
 }
@@ -1953,9 +2020,45 @@ function executeRead(
       return context.readLocal(name);
     case "global":
       return context.readGlobal(name);
+    case "context":
+      return context.readContext?.(name);
+    case "reference":
+      return context.readReference?.(name);
     case undefined:
       return lexical[name];
     default:
       throw new Error(`Cannot execute unresolved XMLUI identifier '${name}'.`);
+  }
+}
+
+function isEventMutationExpression(ir: XmluiScriptIr): boolean {
+  switch (ir.kind) {
+    case "AssignmentExpression":
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+      return true;
+    case "LogicalExpression":
+    case "BinaryExpression":
+      return isEventMutationExpression(ir.left) || isEventMutationExpression(ir.right);
+    case "UnaryExpression":
+      return isEventMutationExpression(ir.argument);
+    case "ConditionalExpression":
+      return isEventMutationExpression(ir.test) ||
+        isEventMutationExpression(ir.consequent) ||
+        isEventMutationExpression(ir.alternate);
+    case "ArrayExpression":
+      return ir.elements.some(isEventMutationExpression);
+    case "ObjectExpression":
+      return ir.properties.some((property) => isEventMutationExpression(property.value));
+    case "CallExpression":
+      return ir.args.some(isEventMutationExpression);
+    case "MemberRead":
+      return isEventMutationExpression(ir.object);
+    case "IndexRead":
+      return isEventMutationExpression(ir.object) || isEventMutationExpression(ir.index);
+    case "ArrowFunctionExpression":
+      return isEventMutationExpression(ir.body);
+    default:
+      return false;
   }
 }

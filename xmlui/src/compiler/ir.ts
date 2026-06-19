@@ -62,6 +62,7 @@ export type XmluiParsedBindings = {
   vars?: Record<string, ParsedExpression | MixedTextSegment[]>;
   globals?: Record<string, ParsedExpression | MixedTextSegment[]>;
   events?: Record<string, ParsedEvent>;
+  methods?: Record<string, ParsedEvent>;
 };
 
 export type XmluiDocument = XmluiAppDocument | XmluiComponentDocument;
@@ -86,6 +87,7 @@ export type XmluiElement = {
   vars: Record<string, string>;
   globals: Record<string, string>;
   events: Record<string, string>;
+  methods: Record<string, string>;
   children: XmluiNode[];
   range: SourceRange;
   parsed?: XmluiParsedBindings;

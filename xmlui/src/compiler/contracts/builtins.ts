@@ -40,6 +40,47 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {},
   },
   {
+    name: "Items",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: {
+      data: { name: "data" },
+    },
+    events: {},
+  },
+  {
+    name: "Slot",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: {},
+    acceptsArbitraryProps: true,
+    props: {
+      name: { name: "name" },
+    },
+    events: {},
+  },
+  {
+    name: "property",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: {},
+    props: {
+      name: { name: "name" },
+    },
+    events: {},
+  },
+  {
+    name: "method",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: {},
+    props: {
+      name: { name: "name" },
+    },
+    events: {},
+  },
+  {
     name: "Component",
     kind: "builtin",
     allowsChildren: true,

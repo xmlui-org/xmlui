@@ -22,7 +22,7 @@ describe("compileXmluiModule", () => {
     expect(code).toContain('"kind": "app"');
     expect(code).toContain('"sourceId": ' + JSON.stringify(id));
     expect(code).toContain('"source": "count++"');
-    expect(code).toContain('"compiledSource": "ctx.writeGlobal');
+    expect(code).toContain('"compiledSource": "let __xmluiResult;\\n__xmluiResult = ctx.writeGlobal');
     expect(code).toContain('"evaluate": (ctx) => {');
     expect(code).toContain('"execute": async (ctx) => {');
     expect(code).toContain('"invalidates"');

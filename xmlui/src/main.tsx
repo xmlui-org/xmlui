@@ -18,6 +18,11 @@ import reactiveDerivedChainApp from "./examples/reactive-derived-chain/Main.xmlu
 import reactiveDerivedGlobalsApp from "./examples/reactive-derived-globals/Main.xmlui";
 import reactiveDerivedOverrideApp from "./examples/reactive-derived-override/Main.xmlui";
 import reactiveDerivedPropsApp from "./examples/reactive-derived-props/Main.xmlui";
+import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
+import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
+import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
+import udcMethodsApp from "./examples/udc-methods/Main.xmlui";
+import udcSlotContextApp from "./examples/udc-slot-context/Main.xmlui";
 
 const examples = {
   asyncDirectives: asyncDirectivesApp,
@@ -38,6 +43,11 @@ const examples = {
   reactiveDerivedGlobals: reactiveDerivedGlobalsApp,
   reactiveDerivedOverride: reactiveDerivedOverrideApp,
   reactiveDerivedProps: reactiveDerivedPropsApp,
+  udcCombined: udcCombinedApp,
+  udcDefaultChildren: udcDefaultChildrenApp,
+  udcEventEmission: udcEventEmissionApp,
+  udcMethods: udcMethodsApp,
+  udcSlotContext: udcSlotContextApp,
 };
 
 const root = document.getElementById("root");

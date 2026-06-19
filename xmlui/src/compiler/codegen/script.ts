@@ -37,7 +37,11 @@ export function generateEventHandlerFunction(
   ir: XmluiEventHandlerIr,
   writes: readonly BoundWriteTarget[] = [],
 ): GeneratedEventFunctionSource {
-  const body = ir.body.map((statement) => emitEventStatement(statement)).join("\n");
+  const body = [
+    "let __xmluiResult;",
+    ...ir.body.map((statement) => emitEventStatement(statement)),
+    "return __xmluiResult;",
+  ].join("\n");
   return {
     body,
     functionSource: emitFunctionExpression(body, "ctx", { async: true }),
@@ -77,6 +81,11 @@ function emitExpression(ir: XmluiScriptIr): string {
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
       return `(${ir.params.join(", ")}) => ${emitExpression(ir.body)}`;
+    case "AssignmentExpression":
+      return emitAssignmentExpression(ir);
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+      return emitUpdateExpression(ir);
     default:
       throw new Error(`Cannot generate ${ir.kind} as an XMLUI expression.`);
   }
@@ -104,7 +113,7 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
 function emitEventStatement(statement: XmluiHandlerStatementIr): string {
   switch (statement.kind) {
     case "ExpressionStatement":
-      return `${emitEventExpression(statement.expression)};`;
+      return `__xmluiResult = ${emitEventExpression(statement.expression)};`;
     case "VariableDeclaration":
       return emitVariableDeclaration(statement);
     case "BlockStatement":
@@ -140,11 +149,15 @@ function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpress
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "delay") {
     return `await ((ctx.delay ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(${args}))`;
   }
-  if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "emitEvent") {
+    const [name, ...eventArgs] = ir.args.map(emitAsyncExpression);
+    return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.emitEvent?.(${name ?? "undefined"}, [${eventArgs.join(", ")}])))`;
+  }
+  if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot generate unsupported XMLUI event call target.");
   }
   const objectSource = emitAsyncExpression(ir.callee.object);
-  return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ((ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args}])))`;
+  return `await (ctx.complete ?? ((value) => Promise.resolve(value)))(await (ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args}]))`;
 }
 
 function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string {
@@ -243,6 +256,10 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
       return `ctx.readLocal(${JSON.stringify(name)})`;
     case "global":
       return `ctx.readGlobal(${JSON.stringify(name)})`;
+    case "context":
+      return `ctx.readContext?.(${JSON.stringify(name)})`;
+    case "reference":
+      return `ctx.readReference?.(${JSON.stringify(name)})`;
     case undefined:
       return name;
     default:

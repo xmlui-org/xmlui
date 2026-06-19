@@ -53,7 +53,8 @@ function runtimeNodeFromIr(node: XmluiNodeIr): XmluiNode {
   const vars = bindingsForKind(node.bindings, "local");
   const globals = bindingsForKind(node.bindings, "global");
   const events = Object.fromEntries(node.events.map((event) => [event.name, event.rawSource]));
-  const parsed = parsedBindingsFromIr(node.bindings, node.events);
+  const methods = Object.fromEntries(node.methods.map((method) => [method.name, method.rawSource]));
+  const parsed = parsedBindingsFromIr(node.bindings, node.events, node.methods);
 
   return {
     kind: "element",
@@ -62,6 +63,7 @@ function runtimeNodeFromIr(node: XmluiNodeIr): XmluiNode {
     vars,
     globals,
     events,
+    methods,
     children: node.children.map(runtimeNodeFromIr),
     range: rangeFromSource(node.source),
     ...(hasParsedBindings(parsed) ? { parsed } : {}),
@@ -80,6 +82,7 @@ function bindingsForKind(
 function parsedBindingsFromIr(
   bindings: readonly XmluiBindingIr[],
   events: readonly XmluiEventIr[],
+  methods: readonly XmluiEventIr[],
 ): XmluiParsedBindings {
   const parsed: XmluiParsedBindings = {};
 
@@ -89,6 +92,9 @@ function parsedBindingsFromIr(
 
   if (events.length > 0) {
     parsed.events = Object.fromEntries(events.map((event) => [event.name, parsedEventFromIr(event)]));
+  }
+  if (methods.length > 0) {
+    parsed.methods = Object.fromEntries(methods.map((method) => [method.name, parsedEventFromIr(method)]));
   }
 
   return parsed;

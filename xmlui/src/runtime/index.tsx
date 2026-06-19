@@ -48,11 +48,17 @@ export function renderXmluiApp(module: XmluiModule, container: HTMLElement): voi
 function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
+  const referencesRef = useRef<Record<string, unknown>>({});
   const rootOwnerId = "app:root";
 
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
-    const initialScope = createRuntimeScope({ store, localOwnerId: rootOwnerId, props: {} });
+    const initialScope = createRuntimeScope({
+      store,
+      localOwnerId: rootOwnerId,
+      props: {},
+      references: referencesRef.current,
+    });
     initializeStateValuesIntoStore({
       kind: "global",
       expressions: module.root.globals,
@@ -72,7 +78,12 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
   }
 
   const scope = useMemo<RuntimeScope>(
-    () => createRuntimeScope({ store, localOwnerId: rootOwnerId, props: {} }),
+    () => createRuntimeScope({
+      store,
+      localOwnerId: rootOwnerId,
+      props: {},
+      references: referencesRef.current,
+    }),
     [store],
   );
   const context = useMemo(() => createRenderContext(module.components), [module.components]);

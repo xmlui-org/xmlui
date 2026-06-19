@@ -1,0 +1,17 @@
+<App var.selected="{''}" var.events="{0}">
+  <H1>UDC combined composition</H1>
+  <SelectableList
+    items="{[
+      { id: 'alpha', label: 'Alpha' },
+      { id: 'beta', label: 'Beta' }
+    ]}"
+  >
+    <property name="rowTemplate">
+      <Button onClick="selected = $item.id; events++">
+        {$item.label}: {selected === $item.id ? 'picked' : 'ready'}
+      </Button>
+    </property>
+  </SelectableList>
+  <Text>Picked: {selected || 'none'}</Text>
+  <Text>Events: {events}</Text>
+</App>

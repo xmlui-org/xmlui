@@ -7,6 +7,10 @@ export type RuntimeScope = {
   localOwnerId?: StateOwnerId;
   parent?: RuntimeScope;
   props: Record<string, unknown>;
+  contextValues: Record<string, unknown>;
+  references: Record<string, unknown>;
+  slots: Record<string, unknown>;
+  emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
 };
 
 export function createRuntimeScope({
@@ -14,17 +18,29 @@ export function createRuntimeScope({
   localOwnerId,
   parent,
   props = {},
+  contextValues = {},
+  references = {},
+  slots = {},
+  emitEvent,
 }: {
   store: RuntimeStateStore;
   localOwnerId?: StateOwnerId;
   parent?: RuntimeScope;
   props?: Record<string, unknown>;
+  contextValues?: Record<string, unknown>;
+  references?: Record<string, unknown>;
+  slots?: Record<string, unknown>;
+  emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
 }): RuntimeScope {
   return {
     store,
     localOwnerId,
     parent,
     props,
+    contextValues,
+    references,
+    slots,
+    emitEvent,
   };
 }
 
@@ -83,6 +99,8 @@ export function createExpressionContext(scope: RuntimeScope | undefined): Compil
     props: scope?.props,
     readLocal: (name) => readLocal(scope, name),
     readGlobal: (name) => readGlobal(scope, name),
+    readContext: (name) => readContext(scope, name),
+    readReference: (name) => readReference(scope, name),
   };
 }
 
@@ -92,6 +110,7 @@ export function createEventContext(scope: RuntimeScope): CompiledEventContext {
     writeLocal: (name, value) => writeLocal(scope, name, value),
     writeGlobal: (name, value) => writeGlobal(scope, name, value),
     delay: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    emitEvent: (name, args) => scope.emitEvent?.(name, args),
     call: (target, methodName, args) => {
       const method = (target as Record<string, unknown> | null | undefined)?.[methodName];
       if (typeof method !== "function") {
@@ -107,6 +126,26 @@ export function createEventContext(scope: RuntimeScope): CompiledEventContext {
       return new Promise((resolve) => setTimeout(resolve, 0));
     },
   };
+}
+
+export function readContext(scope: RuntimeScope | undefined, name: string): unknown {
+  if (!scope) {
+    return undefined;
+  }
+  if (Object.prototype.hasOwnProperty.call(scope.contextValues, name)) {
+    return scope.contextValues[name];
+  }
+  return readContext(scope.parent, name);
+}
+
+export function readReference(scope: RuntimeScope | undefined, name: string): unknown {
+  if (!scope) {
+    return undefined;
+  }
+  if (Object.prototype.hasOwnProperty.call(scope.references, name)) {
+    return scope.references[name];
+  }
+  return readReference(scope.parent, name);
 }
 
 async function completeValue(value: unknown): Promise<unknown> {

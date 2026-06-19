@@ -3,18 +3,21 @@ import type { XmluiIrBindingKind, XmluiIrId, XmluiIrSourceRef } from "../ir/inde
 
 export type GeneratedExpressionFunction = (context: GeneratedExpressionContext) => unknown;
 
-export type GeneratedEventFunction = (context: GeneratedEventContext) => Promise<void>;
+export type GeneratedEventFunction = (context: GeneratedEventContext) => Promise<unknown>;
 
 export type GeneratedExpressionContext = {
   props?: Record<string, unknown>;
   readLocal(name: string): unknown;
   readGlobal(name: string): unknown;
+  readContext?(name: string): unknown;
+  readReference?(name: string): unknown;
 };
 
 export type GeneratedEventContext = GeneratedExpressionContext & {
   writeLocal(name: string, value: unknown): void;
   writeGlobal(name: string, value: unknown): void;
   delay?(ms: number): Promise<void>;
+  emitEvent?(name: string, args: unknown[]): unknown | Promise<unknown>;
   call?(target: unknown, methodName: string, args: unknown[]): unknown | Promise<unknown>;
   complete?(value: unknown): Promise<unknown>;
   yieldIfNeeded?(iteration: number): Promise<void> | void;

@@ -50,19 +50,21 @@ function emitRuntimeNode(node: XmluiNodeIr): EmitJsValue {
     vars: rawValues(node.bindings, "local"),
     globals: rawValues(node.bindings, "global"),
     events: Object.fromEntries(node.events.map((event) => [event.name, event.rawSource])),
+    methods: Object.fromEntries(node.methods.map((method) => [method.name, method.rawSource])),
     children: node.children.map(emitRuntimeNode),
     range: rangeFromSource(node.source),
     source: node.source,
     irId: node.id,
     scopeId: node.scopeId,
     generatedName: generatedName("node", node.id),
-    parsed: emitParsedBindings(node.bindings, node.events),
+    parsed: emitParsedBindings(node.bindings, node.events, node.methods),
   };
 }
 
 function emitParsedBindings(
   bindings: readonly XmluiBindingIr[],
   events: readonly XmluiEventIr[],
+  methods: readonly XmluiEventIr[],
 ): EmitJsValue | undefined {
   const props = bindingBucket(bindings, "prop");
   const vars = bindingBucket(bindings, "local");
@@ -70,7 +72,10 @@ function emitParsedBindings(
   const eventBucket = events.length > 0
     ? Object.fromEntries(events.map((event) => [event.name, emitRuntimeEvent(event)]))
     : undefined;
-  if (!props && !vars && !globals && !eventBucket) {
+  const methodBucket = methods.length > 0
+    ? Object.fromEntries(methods.map((method) => [method.name, emitRuntimeEvent(method)]))
+    : undefined;
+  if (!props && !vars && !globals && !eventBucket && !methodBucket) {
     return undefined;
   }
   return {
@@ -78,6 +83,7 @@ function emitParsedBindings(
     vars,
     globals,
     events: eventBucket,
+    methods: methodBucket,
   };
 }
 

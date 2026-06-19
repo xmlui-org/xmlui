@@ -119,12 +119,26 @@ function lowerElement(
     writes: event.writes ?? [],
     invalidates: event.invalidates ?? [],
   }));
+  const methods = Object.entries(element.parsed?.methods ?? {}).map(([name, method]) => ({
+    id: createIrId({ sourceId: context.sourceId, kind: "event", path: [...path, "methods"], name }),
+    name,
+    rawSource: method.source,
+    source: sourceRef(context.sourceId, method.range),
+    ast: method.ast,
+    ir: method.ir!,
+    compiledSource: method.compiledSource,
+    options: method.options,
+    dependencies: method.dependencies ?? [],
+    writes: method.writes ?? [],
+    invalidates: method.invalidates ?? [],
+  }));
   const children = element.children.map((child, index) =>
     lowerNode(child, context, [...path, "children", index], scope.id),
   );
   const dependencies = summarizeDependencies([
     ...bindings.map((binding) => binding.dependencies),
     ...events.map((event) => dependencySummary(event.dependencies, event.writes, event.invalidates)),
+    ...methods.map((method) => dependencySummary(method.dependencies, method.writes, method.invalidates)),
     ...children.map(summarizeNode),
   ]);
 
@@ -134,6 +148,7 @@ function lowerElement(
     scopeId: scope.id,
     bindings,
     events,
+    methods,
     dependencies,
     children,
   };
@@ -180,6 +195,7 @@ function lowerText(
     source: sourceRef(context.sourceId, node.range),
     bindings: [binding],
     events: [],
+    methods: [],
     dependencies: binding.dependencies,
   };
 }

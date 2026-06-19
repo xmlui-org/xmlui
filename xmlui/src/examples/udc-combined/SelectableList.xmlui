@@ -1,0 +1,7 @@
+<Component name="SelectableList">
+  <Items data="{$props.items}">
+    <Slot name="rowTemplate" item="{$item}">
+      <Button onClick="emitEvent('picked', $item.id)">{$item.label}</Button>
+    </Slot>
+  </Items>
+</Component>

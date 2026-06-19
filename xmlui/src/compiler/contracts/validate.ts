@@ -120,7 +120,7 @@ function validateEvents(
 ): void {
   for (const event of events) {
     const name = normalizeEventName(event.name);
-    if (!contract.events[name]) {
+    if (contract.kind !== "user" && !contract.events[name]) {
       diagnostics.push(
         diagnostic(
           "XC003",

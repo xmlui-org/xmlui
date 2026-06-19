@@ -506,6 +506,7 @@ function builtinNode(
     source: createXmluiIrSourceRef(sourceId, sourceSpanFromOffsets(sourceId, 0, 1)),
     bindings: [],
     events: [],
+    methods: [],
     dependencies: emptyDependencySummary(),
     children,
   };
@@ -523,6 +524,7 @@ function componentReferenceNode(
     source: createXmluiIrSourceRef(sourceId, sourceSpanFromOffsets(sourceId, 0, 1)),
     bindings: [],
     events: [],
+    methods: [],
     dependencies: emptyDependencySummary(),
     children: [],
   };

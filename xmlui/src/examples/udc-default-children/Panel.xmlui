@@ -1,0 +1,6 @@
+<Component name="Panel">
+  <Text value="{$props.title}" />
+  <Slot>
+    <Text>No content</Text>
+  </Slot>
+</Component>

@@ -1,0 +1,9 @@
+<Component name="CounterBox" var.count="{0}">
+  <Text>Internal count: {count}</Text>
+  <method name="increment">
+    count++
+  </method>
+  <method name="getCount">
+    count
+  </method>
+</Component>

@@ -2,10 +2,24 @@ import React, { useEffect, useId, useMemo, useRef } from "react";
 
 import { initializeStateValuesIntoStore, createRuntimeOwnerId, createRuntimeScope, type RuntimeScope } from "../state";
 import type { XmluiComponentModule } from "../types";
-import { evaluateExpressionOrText, evaluateProps } from "./bindings";
+import { evaluateExpressionOrText, evaluateProps, runEvent } from "./bindings";
 import type { RenderContext } from "./types";
 import { useBindingRevision } from "./reactive";
-import type { XmluiElement } from "../../compiler/ir";
+import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+
+export type RenderFragment = {
+  children: XmluiNode[];
+  scope: RuntimeScope;
+};
+
+export function createSlotScope(baseScope: RuntimeScope, contextValues: Record<string, unknown>): RuntimeScope {
+  return createRuntimeScope({
+    store: baseScope.store,
+    parent: baseScope,
+    props: baseScope.props,
+    contextValues,
+  });
+}
 
 export function ScopedElement({
   context,
@@ -28,6 +42,9 @@ export function ScopedElement({
       localOwnerId: ownerId,
       parent: parentScope,
       props,
+      references: parentScope.references,
+      slots: parentScope.slots,
+      emitEvent: parentScope.emitEvent,
     });
     parentScope.store.createLocalOwner(ownerId);
     initializeStateValuesIntoStore({
@@ -55,6 +72,9 @@ export function ScopedElement({
         localOwnerId: ownerId,
         parent: parentScope,
         props,
+        references: parentScope.references,
+        slots: parentScope.slots,
+        emitEvent: parentScope.emitEvent,
       }),
     [ownerId, parentScope, props],
   );
@@ -89,13 +109,25 @@ export function ComponentInstance({
     reactId,
   ]);
   const initializedRef = useRef(false);
+  const componentScopeRef = useRef<RuntimeScope>();
+  const componentReferences = useMemo<Record<string, unknown>>(() => ({}), []);
+  const api = useMemo<Record<string, (...args: unknown[]) => Promise<unknown>>>(() => {
+    const methods: Record<string, (...args: unknown[]) => Promise<unknown>> = {};
+    for (const [name, method] of Object.entries(component.root.parsed?.methods ?? {})) {
+      methods[name] = (...args: unknown[]) => {
+        const methodScope = componentScopeRef.current;
+        return methodScope ? Promise.resolve(runEvent(method, methodScope, args)) : Promise.resolve(undefined);
+      };
+    }
+    return methods;
+  }, [component.root.parsed?.methods]);
 
   if (!initializedRef.current) {
     const initialScope = createRuntimeScope({
       store: scope.store,
       localOwnerId: ownerId,
-      parent: scope,
       props,
+      references: componentReferences,
     });
     scope.store.createLocalOwner(ownerId);
     initializeStateValuesIntoStore({
@@ -113,8 +145,8 @@ export function ComponentInstance({
     const latestScope = createRuntimeScope({
       store: scope.store,
       localOwnerId: ownerId,
-      parent: scope,
       props,
+      references: componentReferences,
     });
     for (const [name, value] of Object.entries(component.root.vars)) {
       const parsed = component.root.parsed?.vars?.[name];
@@ -126,7 +158,7 @@ export function ComponentInstance({
     for (const name of Object.keys(props)) {
       scope.store.invalidateProp(ownerId, name);
     }
-  }, [component.root.parsed?.vars, component.root.vars, ownerId, props, scope]);
+  }, [component.root.parsed?.vars, component.root.vars, componentReferences, ownerId, props, scope]);
 
   useEffect(
     () => () => {
@@ -140,11 +172,50 @@ export function ComponentInstance({
       createRuntimeScope({
         store: scope.store,
         localOwnerId: ownerId,
-        parent: scope,
         props,
+        references: componentReferences,
+        slots: createSlots(node, scope),
+        emitEvent: (eventName, args) => runEvent(node.parsed?.events?.[eventName], scope, args),
       }),
-    [ownerId, props, scope],
+    [componentReferences, node, ownerId, props, scope],
   );
+  componentReferences.$self = api;
+  componentScopeRef.current = componentScope;
+
+  useEffect(() => {
+    const id = typeof props.id === "string" ? props.id : undefined;
+    if (!id) {
+      return;
+    }
+    scope.references[id] = api;
+    return () => {
+      if (scope.references[id] === api) {
+        delete scope.references[id];
+      }
+    };
+  }, [api, props.id, scope.references]);
 
   return <>{context.renderChildren(component.root.children, componentScope)}</>;
+}
+
+function createSlots(node: XmluiElement, scope: RuntimeScope): Record<string, RenderFragment> {
+  const slots: Record<string, RenderFragment> = {};
+  const defaultChildren: XmluiNode[] = [];
+
+  for (const child of node.children) {
+    if (child.kind === "element" && child.type === "property") {
+      const name = child.props.name;
+      if (name) {
+        slots[name] = { children: child.children, scope };
+      }
+      continue;
+    }
+    defaultChildren.push(child);
+  }
+
+  if (defaultChildren.length > 0) {
+    slots.default = { children: defaultChildren, scope };
+  }
+
+  return slots;
 }
