@@ -1,0 +1,6 @@
+<Component name="IncrementButton" var.count="{0}">
+  <Button onClick="count++">
+    {$props.label || 'Standalone increment'}: {count}
+  </Button>
+</Component>
+

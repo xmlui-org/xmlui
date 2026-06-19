@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
 import { createRenderContext, XmluiNodeRenderer } from "./rendering/renderer";
@@ -45,6 +45,22 @@ export function renderXmluiApp(module: XmluiModule, container: HTMLElement): voi
   }
 
   createRoot(container).render(<XmluiRoot module={module} />);
+}
+
+export function mountXmluiApp(
+  module: XmluiModule,
+  container: HTMLElement,
+  options: { hydrate?: boolean } = {},
+): Root {
+  if (module.kind !== "app") {
+    throw new Error("mountXmluiApp expected an app module.");
+  }
+  if (options.hydrate) {
+    return hydrateRoot(container, <XmluiRoot module={module} />);
+  }
+  const root = createRoot(container);
+  root.render(<XmluiRoot module={module} />);
+  return root;
 }
 
 function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }) {
@@ -105,7 +121,7 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
   );
 }
 
-export type { XmluiModule } from "./types";
+export type { XmluiDocumentInput, XmluiModule } from "./types";
 
 function routeModeFromApp(value: string | undefined): RoutingMode {
   if (value === "false" || value === "{false}") {

@@ -1,0 +1,7 @@
+<App>
+  <H1>Standalone counter with components</H1>
+  <IncrementButton />
+  <IncrementButton label="Standalone Counter #2" />
+  <IncrementButton label="Standalone Counter #3" />
+</App>
+

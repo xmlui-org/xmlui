@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:standalone": "vite build --config vite.standalone.config.ts",
+    "prepare:standalone-samples": "npm run build:standalone && node scripts/prepare-standalone-samples.mjs",
+    "serve:standalone-samples": "npm run prepare:standalone-samples && node scripts/standalone-static-server.mjs",
     "test": "vitest run tests/compiler",
     "test:e2e": "playwright test"
   },
