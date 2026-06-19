@@ -700,7 +700,7 @@ function useRouteSnapshot(scope: Parameters<XmluiBuiltInRenderer>[0]["scope"]): 
   return useSyncExternalStore(
     (listener) => scope.routing?.subscribe(listener) ?? (() => undefined),
     () => scope.routing?.getSnapshot() ?? fallback,
-    () => fallback,
+    () => scope.routing?.getSnapshot() ?? fallback,
   );
 }
 

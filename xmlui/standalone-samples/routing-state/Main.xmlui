@@ -1,4 +1,4 @@
-<App global.count="{0}">
+<App global.count="{0}" useHashBasedRouting="{false}">
   <NavPanel>
     <NavLink to="/" label="Counter" exact="{true}" />
     <NavLink to="/summary" label="Summary" />
@@ -14,4 +14,3 @@
     </Page>
   </Pages>
 </App>
-

@@ -69,7 +69,7 @@ async function writeMockApiCompatibilityStub(outDir: string): Promise<void> {
     path.join(outDir, "mockApi.js"),
     [
       "// Compatibility stub for stale dev mock-loader requests.",
-      "export {};",
+      "globalThis.__xmluiMockApiStub = true;",
       "",
     ].join("\n"),
   );

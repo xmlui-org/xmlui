@@ -44,26 +44,32 @@ export function renderXmluiApp(module: XmluiModule, container: HTMLElement): voi
     throw new Error("renderXmluiApp expected an app module.");
   }
 
-  createRoot(container).render(<XmluiRoot module={module} />);
+  mountXmluiApp(module, container);
 }
 
 export function mountXmluiApp(
   module: XmluiModule,
   container: HTMLElement,
-  options: { hydrate?: boolean } = {},
+  options: { hydrate?: boolean; initialUrl?: string } = {},
 ): Root {
   if (module.kind !== "app") {
     throw new Error("mountXmluiApp expected an app module.");
   }
   if (options.hydrate) {
-    return hydrateRoot(container, <XmluiRoot module={module} />);
+    return hydrateRoot(container, <XmluiRoot module={module} initialUrl={options.initialUrl} />);
   }
   const root = createRoot(container);
-  root.render(<XmluiRoot module={module} />);
+  root.render(<XmluiRoot module={module} initialUrl={options.initialUrl} />);
   return root;
 }
 
-function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }) {
+export function XmluiRoot({
+  module,
+  initialUrl,
+}: {
+  module: Extract<XmluiModule, { kind: "app" }>;
+  initialUrl?: string;
+}) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
@@ -71,7 +77,7 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
   const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
   if (!routingRef.current) {
-    routingRef.current = new RuntimeRoutingStore(routeMode, () => store.invalidateRoute());
+    routingRef.current = new RuntimeRoutingStore(routeMode, () => store.invalidateRoute(), initialUrl);
   }
   useEffect(() => routingRef.current?.attach(), []);
 

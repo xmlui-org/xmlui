@@ -340,7 +340,7 @@ dist-production/
 
 The production app imports compiled `.xmlui` modules through the existing Vite XMLUI plugin. It does not fetch `.xmlui` source files at runtime.
 
-`mockApi.js` is emitted as a no-op ES module compatibility stub so stale dev/mock-loader requests do not fail with a module MIME error when the folder is served directly with `npx http-server`.
+`mockApi.js` is emitted as a syntax-neutral compatibility stub so stale dev/mock-loader requests do not fail when the folder is served directly with `npx http-server`, whether they are loaded as classic scripts or modules.
 
 Production fixtures:
 

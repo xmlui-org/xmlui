@@ -27,8 +27,9 @@ export class RuntimeRoutingStore {
   constructor(
     readonly mode: RoutingMode = "hash",
     private readonly onChange?: () => void,
+    initialUrl?: string,
   ) {
-    this.snapshot = readBrowserSnapshot(mode, 0);
+    this.snapshot = initialUrl ? snapshotFromUrl(initialUrl, 0) : readBrowserSnapshot(mode, 0);
   }
 
   getSnapshot(): RouteSnapshot {

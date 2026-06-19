@@ -20,4 +20,14 @@ describe("runtime routing", () => {
 
     expect(routing.href("/search", { q: "xmlui", page: 2 })).toBe("#/search?q=xmlui&page=2");
   });
+
+  it("uses an explicit initial route for server-side rendering", () => {
+    const routing = new RuntimeRoutingStore("history", undefined, "/summary?q=xmlui");
+
+    expect(routing.getSnapshot()).toMatchObject({
+      pathname: "/summary",
+      search: "?q=xmlui",
+      queryParams: { q: "xmlui" },
+    });
+  });
 });

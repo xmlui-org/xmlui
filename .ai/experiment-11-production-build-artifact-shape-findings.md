@@ -57,7 +57,7 @@ The manifest currently records:
 - diagnostics;
 - deferred compatibility items.
 
-`mockApi.js` is currently emitted as a no-op ES module compatibility stub. It prevents stale dev/mock-loader requests from failing with a module MIME error when the production directory is served directly with `npx http-server`.
+`mockApi.js` is currently emitted as a syntax-neutral compatibility stub. It prevents stale dev/mock-loader requests from failing when the production directory is served directly with `npx http-server`, whether the browser loads it as a classic script or a module.
 
 ## Verification
 

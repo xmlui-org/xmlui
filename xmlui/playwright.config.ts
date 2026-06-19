@@ -18,6 +18,11 @@ export default defineConfig({
       url: "http://127.0.0.1:5175/index.html",
       reuseExistingServer: true,
     },
+    {
+      command: "npm run build:ssg && XMLUI_SSG_PORT=5176 node scripts/preview-ssg.mjs",
+      url: "http://127.0.0.1:5176/xmlui-ssg-manifest.json",
+      reuseExistingServer: true,
+    },
   ],
   use: {
     baseURL: "http://127.0.0.1:5173/",

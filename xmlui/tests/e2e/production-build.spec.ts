@@ -73,7 +73,7 @@ test("production output includes a JavaScript mock API compatibility stub", asyn
   const response = await request.get(`${productionBaseUrl}/mockApi.js`);
   expect(response.ok()).toBe(true);
   expect(response.headers()["content-type"]).toContain("text/javascript");
-  await expect(response.text()).resolves.toContain("export {}");
+  await expect(response.text()).resolves.toContain("__xmluiMockApiStub");
 });
 
 test("production output exposes a diagnostic marker", async ({ request }) => {

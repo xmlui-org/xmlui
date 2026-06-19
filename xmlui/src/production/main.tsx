@@ -1,4 +1,4 @@
-import { renderXmluiApp } from "../runtime";
+import { mountXmluiApp } from "../runtime";
 
 import counterComponentsApp from "../../standalone-samples/counter-components/Main.xmlui";
 import routingStateApp from "../../standalone-samples/routing-state/Main.xmlui";
@@ -16,6 +16,12 @@ if (!root) {
   throw new Error("Missing #root element");
 }
 
-const example = new URLSearchParams(window.location.search).get("example") ?? "counterComponents";
-renderXmluiApp(examples[example as keyof typeof examples] ?? counterComponentsApp, root);
-
+const example =
+  root.dataset.xmluiExample ??
+  new URLSearchParams(window.location.search).get("example") ??
+  "counterComponents";
+const initialUrl = root.dataset.xmluiSsgPath;
+mountXmluiApp(examples[example as keyof typeof examples] ?? counterComponentsApp, root, {
+  hydrate: root.dataset.xmluiSsg === "true",
+  initialUrl,
+});
