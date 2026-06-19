@@ -1,0 +1,7 @@
+<App xmlns:ext="XMLUIExtensions" var.count="{0}">
+  <H1>Extension counter</H1>
+  <CounterBadge label="Plain extension" value="{count}" onIncrement="count = addAmount(count, 1)" />
+  <ext:CounterBadge label="Namespaced extension" value="{count}" onIncrement="count = addAmount(count, 2)">
+    <Text value="Shared count: {count}" />
+  </ext:CounterBadge>
+</App>

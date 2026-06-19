@@ -4,6 +4,8 @@ dist-production/
 dist-ssg/
 dist-metadata/
 dist-docs-reference/
+packages/*/dist/
+packages/*/dist-metadata/
 .xmlui-production/
 .xmlui-ssg-ssr/
 !tools/vscode/dist/

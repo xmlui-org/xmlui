@@ -9,7 +9,7 @@ export type XmluiContractDiagnosticCode =
   | "XC006"
   | "XC007";
 
-export type XmluiComponentContractKind = "builtin" | "user";
+export type XmluiComponentContractKind = "builtin" | "user" | "extension";
 
 export type XmluiDeclarationPermission = {
   local?: boolean;

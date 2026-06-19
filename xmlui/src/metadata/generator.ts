@@ -6,6 +6,7 @@ import {
   type XmluiComponentContract,
   type XmluiContractRegistry,
 } from "../compiler/contracts";
+import { normalizeExtensions, type Extension } from "../extensions";
 import type { XmluiNode } from "../compiler/ir";
 import { layoutPropNameSet } from "../styling";
 import {
@@ -25,16 +26,26 @@ import {
 export type GenerateXmluiMetadataOptions = {
   registry?: XmluiContractRegistry;
   userComponents?: Array<{ id: string; source: string }>;
+  extensions?: Iterable<Extension>;
   examples?: XmluiExampleMetadata[];
 };
 
 export function generateXmluiMetadata(
   options: GenerateXmluiMetadataOptions = {},
 ): XmluiMetadataArtifact {
-  const registry = options.registry ?? createContractRegistry();
+  const normalizedExtensions = normalizeExtensions(options.extensions ?? []);
+  const registry = options.registry ?? createContractRegistry({
+    extensionComponents: normalizedExtensions.contracts,
+  });
   const userComponentContracts = extractUserComponentMetadata(options.userComponents ?? []);
   const components = [
-    ...registry.list().map((contract) => contractToMetadata(contract, options.examples ?? [])),
+    ...registry.list().map((contract) => contractToMetadata(
+      contract,
+      options.examples ?? [],
+      normalizedExtensions.components.find((component) =>
+        component.localName === contract.name || component.qualifiedName === contract.name
+      )?.description,
+    )),
     ...userComponentContracts,
   ].sort((left, right) => left.name.localeCompare(right.name));
   const contractHash = hash(JSON.stringify(components.map((component) => ({
@@ -104,13 +115,14 @@ export function metadataToJson(artifact: XmluiMetadataArtifact): string {
 function contractToMetadata(
   contract: XmluiComponentContract,
   examples: XmluiExampleMetadata[],
+  description?: string,
 ): XmluiComponentMetadata {
   const propNames = Object.keys(contract.props).sort();
   return {
     name: contract.name,
     kind: contract.kind,
     category: categoryForComponent(contract.name),
-    description: componentDescription(contract.name),
+    description: description ?? componentDescription(contract.name),
     docsPath: `/docs/reference/components/${contract.name}`,
     allowsChildren: contract.allowsChildren,
     acceptsArbitraryProps: contract.acceptsArbitraryProps === true,

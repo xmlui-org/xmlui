@@ -11,6 +11,7 @@ export const MarkupSyntaxKind = {
   NodeClose: "NodeClose",
   Equal: "Equal",
   Dot: "Dot",
+  Colon: "Colon",
   StringLiteral: "StringLiteral",
   Text: "Text",
   Document: "Document",

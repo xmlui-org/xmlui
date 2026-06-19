@@ -36,6 +36,12 @@ const routes = [
     output: "style-mutation/index.html",
     title: "Standalone style mutation",
   },
+  {
+    example: "extensionCounterBadge",
+    route: "/extension-counter-badge",
+    output: "extension-counter-badge/index.html",
+    title: "Extension counter badge",
+  },
 ];
 
 await assertExists(path.join(productionDir, "index.html"), "Run npm run build:production before build-ssg.");
@@ -99,7 +105,6 @@ const manifest = {
     "full xmlui ssg CLI",
     "content directory route discovery",
     "dynamic route prerendering",
-    "extension package SSG",
     "full head/search metadata parity",
     "style registry SSR parity",
   ],

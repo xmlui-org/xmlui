@@ -166,7 +166,16 @@ class MarkupParser {
       return this.expected("XP007", message, this.current());
     }
 
-    return createSyntaxNode(MarkupSyntaxKind.TagName, [this.consume(MarkupSyntaxKind.Identifier)]);
+    const children = [this.consume(MarkupSyntaxKind.Identifier)];
+    if (this.at(MarkupSyntaxKind.Colon)) {
+      children.push(this.consume(MarkupSyntaxKind.Colon));
+      if (this.at(MarkupSyntaxKind.Identifier)) {
+        children.push(this.consume(MarkupSyntaxKind.Identifier));
+      } else {
+        children.push(this.expected("XP013", "A tag name segment expected after ':'.", this.current()));
+      }
+    }
+    return createSyntaxNode(MarkupSyntaxKind.TagName, children);
   }
 
   private parseAttributeList(): MarkupSyntaxNode {
@@ -198,12 +207,17 @@ class MarkupParser {
     }
 
     keyChildren.push(this.consume(MarkupSyntaxKind.Identifier));
-    while (this.at(MarkupSyntaxKind.Dot)) {
-      keyChildren.push(this.consume(MarkupSyntaxKind.Dot));
+    while (this.at(MarkupSyntaxKind.Dot) || this.at(MarkupSyntaxKind.Colon)) {
+      const separator = this.consume();
+      keyChildren.push(separator);
       if (this.at(MarkupSyntaxKind.Identifier)) {
         keyChildren.push(this.consume(MarkupSyntaxKind.Identifier));
       } else {
-        keyChildren.push(this.expected("XP009", "An attribute segment expected after '.'.", this.current()));
+        keyChildren.push(this.expected(
+          "XP009",
+          `An attribute segment expected after '${separator.text}'.`,
+          this.current(),
+        ));
         break;
       }
     }

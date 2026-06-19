@@ -5,6 +5,7 @@
   "type": "module",
   "workspaces": [
     "xmlui",
+    "packages/*",
     "tools/vscode"
   ],
   "scripts": {
@@ -20,6 +21,8 @@
     "build:vscode": "npm --workspace xmlui-vscode run build",
     "test": "npm --workspace xmlui run test",
     "test:vscode": "npm --workspace xmlui-vscode run test",
-    "test:e2e": "npm --workspace xmlui run test:e2e"
+    "test:e2e": "npm --workspace xmlui run test:e2e",
+    "build:counter-badge": "npm --workspace xmlui-counter-badge run build",
+    "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata"
   }
 }

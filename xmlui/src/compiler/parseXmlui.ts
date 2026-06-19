@@ -40,6 +40,7 @@ type AttributeInfo = {
 
 export type ParseXmluiOptions = {
   sourceId?: string;
+  extensionFunctions?: Iterable<string>;
 };
 
 export class XmluiParseError extends Error {
@@ -72,6 +73,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     analyzeElementScripts(componentRoot, {
       sourceId,
       allowImplicitGlobals: true,
+      extensionFunctions: options.extensionFunctions,
     });
     return {
       kind: "component",
@@ -89,6 +91,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
   analyzeElementScripts(transformedRoot, {
     sourceId,
     allowImplicitGlobals: false,
+    extensionFunctions: options.extensionFunctions,
   });
 
   return {
@@ -100,6 +103,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
 type AnalyzeOptions = {
   sourceId: string;
   allowImplicitGlobals: boolean;
+  extensionFunctions?: Iterable<string>;
 };
 
 function analyzeElementScripts(
@@ -112,6 +116,7 @@ function analyzeElementScripts(
     : createXmluiScope(element, {
         sourceId: options.sourceId,
         allowImplicitGlobals: options.allowImplicitGlobals,
+        specialNames: options.extensionFunctions,
       });
 
   analyzeParsedBindings(element.parsed, scope);
@@ -267,8 +272,15 @@ function scopeSourceId(parsed: ParsedExpression | MixedTextSegment[] | undefined
   return parsed?.ast.span.sourceId ?? "anonymous.xmlui";
 }
 
-function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiElement {
-  const type = tagName(node, source);
+function transformElement(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  sourceId: string,
+  inheritedNamespaces: Record<string, string> = {},
+): XmluiElement {
+  const attributesForElement = attributes(node, source);
+  const namespaces = collectNamespaces(attributesForElement, inheritedNamespaces);
+  const type = resolveNamespacedName(tagName(node, source), namespaces);
   const props: Record<string, string> = {};
   const vars: Record<string, string> = {};
   const globals: Record<string, string> = {};
@@ -276,7 +288,10 @@ function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: 
   const methods: Record<string, string> = {};
   const parsed: XmluiParsedBindings = {};
 
-  for (const attr of attributes(node, source)) {
+  for (const attr of attributesForElement) {
+    if (attr.name === "xmlns" || attr.name.startsWith("xmlns:")) {
+      continue;
+    }
     if (attr.name.startsWith("var.")) {
       const name = attr.name.slice(4);
       vars[name] = attr.value;
@@ -305,7 +320,7 @@ function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: 
     setParsedValue(parsed, "props", attr.name, attr, sourceId);
   }
 
-  const children = contentChildren(node, source, sourceId);
+  const children = contentChildren(node, source, sourceId, namespaces);
   return {
     kind: "element",
     type,
@@ -320,14 +335,19 @@ function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: 
   };
 }
 
-function contentChildren(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiNode[] {
+function contentChildren(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  sourceId: string,
+  namespaces: Record<string, string>,
+): XmluiNode[] {
   const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
   const children = content?.children ?? [];
   const result: XmluiNode[] = [];
 
   for (const child of children) {
     if (child.kind === MarkupSyntaxKind.Element) {
-      result.push(transformElement(child, source, sourceId));
+      result.push(transformElement(child, source, sourceId, namespaces));
       continue;
     }
     if (child.kind === MarkupSyntaxKind.Text) {
@@ -347,6 +367,32 @@ function contentChildren(node: MarkupSyntaxNode, source: SourceText, sourceId: s
   }
 
   return result;
+}
+
+function collectNamespaces(
+  attributes: AttributeInfo[],
+  inheritedNamespaces: Record<string, string>,
+): Record<string, string> {
+  const namespaces = { ...inheritedNamespaces };
+  for (const attr of attributes) {
+    if (attr.name === "xmlns") {
+      namespaces[""] = attr.value;
+    } else if (attr.name.startsWith("xmlns:")) {
+      namespaces[attr.name.slice("xmlns:".length)] = attr.value;
+    }
+  }
+  return namespaces;
+}
+
+function resolveNamespacedName(name: string, namespaces: Record<string, string>): string {
+  const separator = name.indexOf(":");
+  if (separator < 0) {
+    return name;
+  }
+  const prefix = name.slice(0, separator);
+  const localName = name.slice(separator + 1);
+  const namespace = namespaces[prefix];
+  return namespace ? `${namespace}.${localName}` : name;
 }
 
 function attributes(node: MarkupSyntaxNode, source: SourceText): AttributeInfo[] {

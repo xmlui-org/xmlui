@@ -44,3 +44,11 @@ test("standalone hash routing preserves global state", async ({ page }) => {
   await expect(page.getByText("Count is 1", { exact: true })).toBeVisible();
 });
 
+test("standalone extension package registration renders and mutates state", async ({ page }) => {
+  await page.goto(`${standaloneBaseUrl}/extension-counter-badge/`);
+
+  await expect(page.getByRole("heading", { name: "Standalone extension counter" })).toBeVisible();
+  await expect(page.getByText("Standalone extension: 0")).toBeVisible();
+  await page.getByRole("button", { name: "+1" }).click();
+  await expect(page.getByText("Standalone extension: 1")).toBeVisible();
+});

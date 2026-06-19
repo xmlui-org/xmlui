@@ -57,6 +57,7 @@ test("production manifest records fixtures, routes, built-ins, and emitted asset
     "counterComponents",
     "styleMutation",
     "routingState",
+    "extensionCounterBadge",
   ]);
   expect(manifest.routes).toEqual([
     { fixture: "routingState", url: "/" },

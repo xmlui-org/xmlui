@@ -4,11 +4,16 @@ import { materializeRuntimeDocumentFromIr } from "./materializeRuntimeDocument";
 import { parseXmlui } from "./parseXmlui";
 import type { XmluiDocument } from "./ir";
 import type { XmluiModuleIr } from "./ir/index";
+import type { Extension } from "../extensions";
+import { normalizeExtensions } from "../extensions";
+import type { XmluiComponentContract } from "./contracts";
 
 export type CompileXmluiSourceOptions = {
   id: string;
   source: string;
   knownComponents?: Iterable<string>;
+  extensionComponents?: Iterable<XmluiComponentContract>;
+  extensions?: Iterable<Extension>;
   validateComponentReferences?: boolean;
 };
 
@@ -23,10 +28,23 @@ export function compileXmluiSource({
   id,
   source,
   knownComponents = [],
+  extensionComponents = [],
+  extensions = [],
   validateComponentReferences = true,
 }: CompileXmluiSourceOptions): CompiledXmluiSource {
-  const document = parseXmlui(source, { sourceId: id });
+  const normalizedExtensions = normalizeExtensions(extensions);
+  const allExtensionContracts = [
+    ...extensionComponents,
+    ...normalizedExtensions.contracts,
+  ];
+  const document = parseXmlui(source, {
+    sourceId: id,
+    extensionFunctions: normalizedExtensions.functionNames,
+  });
   const userComponents = new Set(knownComponents);
+  for (const contract of allExtensionContracts) {
+    userComponents.add(contract.name);
+  }
   if (document.kind === "component") {
     userComponents.add(document.name);
   }
@@ -39,7 +57,7 @@ export function compileXmluiSource({
     compilerIr.diagnostics.push(
       ...validateManagedReactContracts(
         compilerIr,
-        createContractRegistry({ userComponents }),
+        createContractRegistry({ userComponents, extensionComponents: allExtensionContracts }),
       ),
     );
   }
@@ -56,4 +74,3 @@ export function throwFirstCompilerDiagnostic(compiled: CompiledXmluiSource): voi
     throw new Error(compiled.compilerIr.diagnostics[0].message);
   }
 }
-

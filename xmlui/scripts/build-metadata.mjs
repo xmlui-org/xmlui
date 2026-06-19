@@ -12,8 +12,13 @@ const server = await createServer({
 });
 
 try {
-  const metadataModule = await server.ssrLoadModule("/src/metadata/index.ts");
-  const artifact = metadataModule.generateXmluiMetadata();
+  const [metadataModule, counterBadgeModule] = await Promise.all([
+    server.ssrLoadModule("/src/metadata/index.ts"),
+    server.ssrLoadModule("xmlui-counter-badge"),
+  ]);
+  const artifact = metadataModule.generateXmluiMetadata({
+    extensions: [counterBadgeModule.default],
+  });
   const errors = metadataModule.validateXmluiMetadataArtifact(artifact);
   if (errors.length > 0) {
     throw new Error(errors.join("\n"));
@@ -26,4 +31,3 @@ try {
 } finally {
   await server.close();
 }
-

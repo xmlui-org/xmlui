@@ -1,3 +1,5 @@
+import React from "react";
+
 import { mountXmluiApp, type XmluiModule } from "../runtime";
 import { StandaloneExtensionManager, type StandaloneExtension } from "./extensionManager";
 import {
@@ -16,6 +18,8 @@ export type RenderStandaloneOptions = StandaloneLoadOptions & {
 
 export type StandaloneGlobal = {
   standalone: StandaloneExtensionManager;
+  createElement: typeof React.createElement;
+  registerExtension(extensionOrExtensions: StandaloneExtension | StandaloneExtension[] | undefined): void;
   startApp(runtime?: XmluiModule, extensions?: StandaloneExtension | StandaloneExtension[]): Promise<unknown>;
   loadStandaloneXmluiApp(options?: StandaloneLoadOptions): Promise<StandaloneLoadResult>;
   renderStandaloneXmluiApp(options?: RenderStandaloneOptions): Promise<StandaloneLoadResult>;
@@ -30,6 +34,7 @@ export async function renderStandaloneXmluiApp(
   const container = options.container ?? ensureRootElement();
   contentRoot = mountXmluiApp(result.module, container, {
     hydrate: container.innerHTML.trim().length > 0,
+    extensions: standaloneExtensionManager.listExtensions(),
   });
   return result;
 }
@@ -44,10 +49,14 @@ export async function startApp(
   if (runtime) {
     contentRoot = mountXmluiApp(runtime, container, {
       hydrate: container.innerHTML.trim().length > 0,
+      extensions: extensionManager.listExtensions(),
     });
     return { module: runtime };
   }
-  return renderStandaloneXmluiApp({ container });
+  return renderStandaloneXmluiApp({
+    container,
+    extensions: extensionManager.listExtensions(),
+  });
 }
 
 export function installStandaloneAutoStart(): void {
@@ -98,6 +107,8 @@ export function renderStandaloneError(container: HTMLElement, error: unknown): v
 export function exposeStandaloneGlobal(globalObject: Window & typeof globalThis = window): StandaloneGlobal {
   const api: StandaloneGlobal = {
     standalone: standaloneExtensionManager,
+    createElement: React.createElement,
+    registerExtension: (extensions) => standaloneExtensionManager.registerExtension(extensions),
     startApp,
     loadStandaloneXmluiApp,
     renderStandaloneXmluiApp,
@@ -107,6 +118,14 @@ export function exposeStandaloneGlobal(globalObject: Window & typeof globalThis 
     ...api,
   };
   return api;
+}
+
+export const createElement = React.createElement;
+
+export function registerExtension(
+  extensionOrExtensions: StandaloneExtension | StandaloneExtension[] | undefined,
+): void {
+  standaloneExtensionManager.registerExtension(extensionOrExtensions);
 }
 
 declare global {

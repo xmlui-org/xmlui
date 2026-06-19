@@ -19,6 +19,7 @@ export type GeneratedEventContext = GeneratedExpressionContext & {
   delay?(ms: number): Promise<void>;
   emitEvent?(name: string, args: unknown[]): unknown | Promise<unknown>;
   call?(target: unknown, methodName: string, args: unknown[]): unknown | Promise<unknown>;
+  callFunction?(name: string, args: unknown[]): unknown | Promise<unknown>;
   complete?(value: unknown): Promise<unknown>;
   navigate?(target: unknown, queryParams?: Record<string, unknown>): void;
   yieldIfNeeded?(iteration: number): Promise<void> | void;

@@ -1,4 +1,5 @@
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "../compiler/compileXmluiSource";
+import { extensionComponentNames, type Extension } from "../extensions";
 import type { XmluiDocumentInput, XmluiModule } from "../runtime";
 import { createXmluiModule } from "../runtime";
 
@@ -11,6 +12,7 @@ export type StandaloneLoadOptions = {
   entry?: string;
   baseUrl?: string | URL;
   fetch?: typeof globalThis.fetch;
+  extensions?: Iterable<Extension>;
 };
 
 export type StandaloneLoadResult = {
@@ -42,6 +44,7 @@ export async function loadStandaloneXmluiApp(
   }
 
   const entryUrl = resolveUrl(options.entry ?? "Main.xmlui", options.baseUrl);
+  const extensionNames = new Set(extensionComponentNames(options.extensions ?? []));
   const sources = new Map<string, LoadedSource>();
   const entry = await fetchSource(fetchImpl, entryUrl);
   sources.set(entry.url, entry);
@@ -50,8 +53,9 @@ export async function loadStandaloneXmluiApp(
     id: entry.url,
     source: entry.source,
     validateComponentReferences: false,
+    extensions: options.extensions,
   });
-  const pending = [...initial.referencedComponents];
+  const pending = initial.referencedComponents.filter((name) => !extensionNames.has(name));
   const componentUrls = new Map<string, string>();
 
   while (pending.length > 0) {
@@ -67,6 +71,7 @@ export async function loadStandaloneXmluiApp(
       id: source.url,
       source: source.source,
       validateComponentReferences: false,
+      extensions: options.extensions,
     });
     if (compiled.document.kind !== "component") {
       throw new StandaloneLoadError(
@@ -75,7 +80,7 @@ export async function loadStandaloneXmluiApp(
       );
     }
     for (const reference of compiled.referencedComponents) {
-      if (!componentUrls.has(reference)) {
+      if (!componentUrls.has(reference) && !extensionNames.has(reference)) {
         pending.push(reference);
       }
     }
@@ -86,6 +91,7 @@ export async function loadStandaloneXmluiApp(
     id: entry.url,
     source: entry.source,
     knownComponents,
+    extensions: options.extensions,
   });
   throwFirstCompilerDiagnostic(compiledEntry);
 
@@ -102,6 +108,7 @@ export async function loadStandaloneXmluiApp(
       id: componentUrl,
       source: source.source,
       knownComponents,
+      extensions: options.extensions,
     });
     throwFirstCompilerDiagnostic(compiled);
     if (compiled.runtimeDocument.kind !== "component") {
@@ -116,6 +123,7 @@ export async function loadStandaloneXmluiApp(
   const module = createXmluiModule(
     compiledEntry.runtimeDocument,
     componentDocuments.map((document) => createXmluiModule(document)),
+    { extensions: options.extensions },
   );
   if (module.kind !== "app") {
     throw new StandaloneLoadError("Standalone entry must compile to an XMLUI app.", { url: entry.url });

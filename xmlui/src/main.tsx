@@ -1,4 +1,5 @@
 import { renderXmluiApp } from "./runtime";
+import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -15,6 +16,7 @@ import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
 import dataSourceRefetchApp from "./examples/data-source-refetch/Main.xmlui";
 import expressionUpdateComponentsApp from "./examples/expression-update-components/Main.xmlui";
 import expressionUpdatesApp from "./examples/expression-updates/Main.xmlui";
+import extensionCounterBadgeApp from "./examples/extension-counter-badge/Main.xmlui";
 import globalCounterApp from "./examples/counter-globals/Main.xmlui";
 import handlerAssignmentsApp from "./examples/handler-assignments/Main.xmlui";
 import handlerConditionalsApp from "./examples/handler-conditionals/Main.xmlui";
@@ -57,6 +59,7 @@ const examples = {
   expressions: broaderExpressionsApp,
   expressionComponents: expressionUpdateComponentsApp,
   expressionUpdates: expressionUpdatesApp,
+  extensionCounterBadge: extensionCounterBadgeApp,
   globals: globalCounterApp,
   handlerAssignments: handlerAssignmentsApp,
   handlerConditionals: handlerConditionalsApp,
@@ -91,4 +94,6 @@ if (!root) {
 }
 
 const example = new URLSearchParams(window.location.search).get("example") ?? "globals";
-renderXmluiApp(examples[example as keyof typeof examples] ?? globalCounterApp, root);
+renderXmluiApp(examples[example as keyof typeof examples] ?? globalCounterApp, root, {
+  extensions: [counterBadgeExtension],
+});

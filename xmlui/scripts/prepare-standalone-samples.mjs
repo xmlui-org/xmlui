@@ -8,6 +8,7 @@ const samples = [
   "counter-components",
   "style-mutation",
   "routing-state",
+  "extension-counter-badge",
 ];
 
 for (const sample of samples) {
@@ -17,4 +18,3 @@ for (const sample of samples) {
 }
 
 console.log("Prepared standalone samples.");
-

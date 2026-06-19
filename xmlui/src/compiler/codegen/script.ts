@@ -157,6 +157,9 @@ function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpress
     const [target, queryParams] = ir.args.map(emitAsyncExpression);
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
   }
+  if (ir.callee.kind === "IdentifierRead") {
+    return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])))`;
+  }
   if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot generate unsupported XMLUI event call target.");
   }

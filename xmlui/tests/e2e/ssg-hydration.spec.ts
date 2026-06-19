@@ -38,6 +38,11 @@ test("SSG hydrates component and style mutation fixtures", async ({ page }) => {
   await page.getByRole("button", { name: "Toggle standalone style" }).click();
   await expect(page.getByText("Mode: compact", { exact: true })).toBeVisible();
   await expect(stack).toHaveCSS("width", "260px");
+
+  await page.goto(`${ssgBaseUrl}/extension-counter-badge/`);
+  await expect(page.getByRole("heading", { name: "Standalone extension counter" })).toBeVisible();
+  await page.getByRole("button", { name: "+1" }).click();
+  await expect(page.getByText("Standalone extension: 1")).toBeVisible();
 });
 
 test("SSG emits search and manifest artifacts and previews resource 404s", async ({ request }) => {
@@ -47,6 +52,7 @@ test("SSG emits search and manifest artifacts and previews resource 404s", async
   expect(entries).toEqual(expect.arrayContaining([
     expect.objectContaining({ path: "/", title: "Standalone routing counter" }),
     expect.objectContaining({ path: "/summary", title: "Standalone routing summary" }),
+    expect.objectContaining({ path: "/extension-counter-badge", title: "Standalone extension counter" }),
   ]));
 
   const manifest = await request.get(`${ssgBaseUrl}/xmlui-ssg-manifest.json`);

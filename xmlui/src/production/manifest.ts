@@ -6,6 +6,7 @@ import path from "node:path";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "../compiler/compileXmluiSource";
 import type { XmluiElement, XmluiNode } from "../compiler/ir";
 import type { XmluiModuleIr, XmluiNodeIr } from "../compiler/ir/index";
+import { extensionComponentNames, type Extension } from "../extensions";
 
 export type ProductionBuildFixture = {
   name: string;
@@ -65,12 +66,16 @@ export async function generateProductionManifest({
   outDir,
   fixtures,
   assets = [],
+  extensions = [],
 }: {
   rootDir: string;
   outDir: string;
   fixtures: ProductionBuildFixture[];
   assets?: string[];
+  extensions?: Iterable<Extension>;
 }): Promise<ProductionBuildManifest> {
+  const extensionList = [...extensions];
+  const extensionNames = new Set(extensionComponentNames(extensionList));
   const allSources = new Map<string, SourceRecord>();
   const fixtureManifests: ProductionBuildManifestFixture[] = [];
   const components = new Map<string, ProductionBuildManifestComponent>();
@@ -79,7 +84,7 @@ export async function generateProductionManifest({
   const diagnostics: string[] = [];
 
   for (const fixture of fixtures) {
-    const graph = await discoverFixtureGraph(rootDir, fixture);
+    const graph = await discoverFixtureGraph(rootDir, fixture, extensionList);
     for (const source of graph.sources) {
       allSources.set(source.id, source);
     }
@@ -88,6 +93,7 @@ export async function generateProductionManifest({
       id: graph.entry.id,
       source: graph.entry.source,
       knownComponents,
+      extensions: extensionList,
     });
     collectUsedBuiltins(compiledEntry.compilerIr, usedBuiltins, knownComponents);
     routes.push(...collectRoutes(fixture.name, compiledEntry.runtimeDocument.root));
@@ -99,6 +105,7 @@ export async function generateProductionManifest({
         id: componentSource.id,
         source: componentSource.source,
         knownComponents,
+        extensions: extensionList,
       });
       collectUsedBuiltins(compiled.compilerIr, usedBuiltins, knownComponents);
       diagnostics.push(...compiled.compilerIr.diagnostics.map((diagnostic) => diagnostic.message));
@@ -166,7 +173,9 @@ async function readMetadataReference(outDir: string): Promise<ProductionBuildMan
 export async function discoverFixtureGraph(
   rootDir: string,
   fixture: ProductionBuildFixture,
+  extensions: Iterable<Extension> = [],
 ): Promise<{ entry: SourceRecord; sources: SourceRecord[] }> {
+  const extensionNames = new Set(extensionComponentNames(extensions));
   const directory = path.resolve(rootDir, fixture.directory);
   const entryPath = path.resolve(directory, fixture.entry);
   const entry = await readSource(entryPath);
@@ -174,8 +183,9 @@ export async function discoverFixtureGraph(
     id: entry.id,
     source: entry.source,
     validateComponentReferences: false,
+    extensions,
   });
-  const pending = [...initial.referencedComponents];
+  const pending = initial.referencedComponents.filter((name) => !extensionNames.has(name));
   const sources = [entry];
   const seenComponents = new Set<string>();
 
@@ -195,9 +205,10 @@ export async function discoverFixtureGraph(
       id: componentSource.id,
       source: componentSource.source,
       validateComponentReferences: false,
+      extensions,
     });
     for (const reference of compiled.referencedComponents) {
-      if (!seenComponents.has(reference)) {
+      if (!seenComponents.has(reference) && !extensionNames.has(reference)) {
         pending.push(reference);
       }
     }

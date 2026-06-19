@@ -83,24 +83,36 @@ export function parseRawXmlui(
   };
 }
 
-function transformRawElement(node: MarkupSyntaxNode, source: SourceText): RawXmluiElement {
+function transformRawElement(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  inheritedNamespaces: Record<string, string> = {},
+): RawXmluiElement {
+  const elementAttributes = attributes(node, source);
+  const namespaces = collectNamespaces(elementAttributes, inheritedNamespaces);
   return {
     kind: "element",
-    type: tagName(node, source),
-    attributes: attributes(node, source),
-    children: contentChildren(node, source),
+    type: resolveNamespacedName(tagName(node, source), namespaces),
+    attributes: elementAttributes.filter((attribute) =>
+      attribute.name !== "xmlns" && !attribute.name.startsWith("xmlns:")
+    ),
+    children: contentChildren(node, source, namespaces),
     range: rangeOf(node),
   };
 }
 
-function contentChildren(node: MarkupSyntaxNode, source: SourceText): RawXmluiNode[] {
+function contentChildren(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  namespaces: Record<string, string>,
+): RawXmluiNode[] {
   const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
   const children = content?.children ?? [];
   const result: RawXmluiNode[] = [];
 
   for (const child of children) {
     if (child.kind === MarkupSyntaxKind.Element) {
-      result.push(transformRawElement(child, source));
+      result.push(transformRawElement(child, source, namespaces));
       continue;
     }
     if (child.kind === MarkupSyntaxKind.Text) {
@@ -116,6 +128,32 @@ function contentChildren(node: MarkupSyntaxNode, source: SourceText): RawXmluiNo
   }
 
   return result;
+}
+
+function collectNamespaces(
+  attributes: RawXmluiAttribute[],
+  inheritedNamespaces: Record<string, string>,
+): Record<string, string> {
+  const namespaces = { ...inheritedNamespaces };
+  for (const attr of attributes) {
+    if (attr.name === "xmlns") {
+      namespaces[""] = attr.value;
+    } else if (attr.name.startsWith("xmlns:")) {
+      namespaces[attr.name.slice("xmlns:".length)] = attr.value;
+    }
+  }
+  return namespaces;
+}
+
+function resolveNamespacedName(name: string, namespaces: Record<string, string>): string {
+  const separator = name.indexOf(":");
+  if (separator < 0) {
+    return name;
+  }
+  const prefix = name.slice(0, separator);
+  const localName = name.slice(separator + 1);
+  const namespace = namespaces[prefix];
+  return namespace ? `${namespace}.${localName}` : name;
 }
 
 function attributes(node: MarkupSyntaxNode, source: SourceText): RawXmluiAttribute[] {

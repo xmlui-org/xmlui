@@ -14,6 +14,7 @@ export type RuntimeScope = {
   slots: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
+  extensionFunctions: Record<string, (...args: unknown[]) => unknown>;
 };
 
 export function createRuntimeScope({
@@ -26,6 +27,7 @@ export function createRuntimeScope({
   slots = {},
   routing,
   emitEvent,
+  extensionFunctions,
 }: {
   store: RuntimeStateStore;
   localOwnerId?: StateOwnerId;
@@ -36,6 +38,7 @@ export function createRuntimeScope({
   slots?: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
+  extensionFunctions?: Record<string, (...args: unknown[]) => unknown>;
 }): RuntimeScope {
   return {
     store,
@@ -47,6 +50,7 @@ export function createRuntimeScope({
     slots,
     routing,
     emitEvent,
+    extensionFunctions: extensionFunctions ?? parent?.extensionFunctions ?? {},
   };
 }
 
@@ -126,6 +130,7 @@ export function createEventContext(scope: RuntimeScope): CompiledEventContext {
     },
     complete: completeValue,
     navigate: (target, queryParams) => scope.routing?.navigate(target, queryParams),
+    callFunction: (name, args) => scope.extensionFunctions[name]?.(...args),
     yieldIfNeeded: (iteration) => {
       if (iteration % 100 !== 0) {
         return undefined;

@@ -3,17 +3,20 @@ import path from "node:path";
 
 import { emitXmluiModule, type XmluiModuleImport } from "./codegen";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compileXmluiSource";
+import type { Extension } from "../extensions";
 
 export type CompileXmluiModuleOptions = {
   id: string;
   source: string;
+  extensions?: Iterable<Extension>;
 };
 
-export function compileXmluiModule({ id, source }: CompileXmluiModuleOptions): string {
+export function compileXmluiModule({ id, source, extensions = [] }: CompileXmluiModuleOptions): string {
   const initial = compileXmluiSource({
     id,
     source,
     validateComponentReferences: false,
+    extensions,
   });
   const imports = initial.document.kind === "app" ? siblingComponentImports(id) : [];
   const userComponents = new Set(imports.map((item) => item.componentName));
@@ -25,6 +28,7 @@ export function compileXmluiModule({ id, source }: CompileXmluiModuleOptions): s
     source,
     knownComponents: userComponents,
     validateComponentReferences: true,
+    extensions,
   });
   throwFirstCompilerDiagnostic(compiled);
   return emitXmluiModule({ compilerIr: compiled.compilerIr, imports });

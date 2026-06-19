@@ -24,6 +24,7 @@ export type CreateXmluiScopeOptions = {
   sourceId?: string;
   parent?: XmluiScope;
   allowImplicitGlobals?: boolean;
+  specialNames?: Iterable<string>;
 };
 
 export type DependencyKind = XmluiBindingKind | "unresolved";
@@ -271,6 +272,7 @@ export type CompiledEventContext = CompiledExpressionContext & {
   call?(target: unknown, methodName: string, args: unknown[]): unknown | Promise<unknown>;
   complete?(value: unknown): Promise<unknown>;
   navigate?(target: unknown, queryParams?: Record<string, unknown>): void;
+  callFunction?(name: string, args: unknown[]): unknown | Promise<unknown>;
   yieldIfNeeded?(iteration: number): Promise<void> | void;
 };
 
@@ -336,6 +338,16 @@ export function createXmluiScope(
       mutable: false,
       span: spanFromRange(sourceId, element.range),
     });
+  }
+  for (const name of options.specialNames ?? []) {
+    if (!scope.specials.has(name)) {
+      scope.specials.set(name, {
+        kind: "special",
+        name,
+        mutable: false,
+        span: spanFromRange(sourceId, element.range),
+      });
+    }
   }
 
   for (const name of Object.keys(element.globals)) {
@@ -629,7 +641,7 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
   }
 
   function validateCallExpression(current: Extract<ScriptNode, { kind: "CallExpression" }>): void {
-    if (isAllowedCall(current.callee)) {
+    if (isAllowedCall(current.callee, scope)) {
       return;
     }
     result.diagnostics.push(
@@ -1165,7 +1177,7 @@ function isSupportedAssignmentOperator(
   return ["=", "+=", "-=", "*=", "/=", "%="].includes(operator);
 }
 
-function isAllowedCall(callee: ScriptNode): boolean {
+function isAllowedCall(callee: ScriptNode, scope?: XmluiScope): boolean {
   if (callee.kind === "Identifier" && callee.name === "delay") {
     return true;
   }
@@ -1173,6 +1185,9 @@ function isAllowedCall(callee: ScriptNode): boolean {
     return true;
   }
   if (callee.kind === "Identifier" && callee.name === "navigate") {
+    return true;
+  }
+  if (callee.kind === "Identifier" && scope?.specials.has(callee.name)) {
     return true;
   }
   if (callee.kind === "MemberExpression") {
@@ -1480,6 +1495,9 @@ function emitAsyncCallExpression(ir: XmluiCallExpressionIr): string {
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
     const [target, queryParams] = ir.args.map(emitAsyncExpression);
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
+  }
+  if (ir.callee.kind === "IdentifierRead") {
+    return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])))`;
   }
   if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot compile unsupported XMLUI event call target.");
@@ -1820,6 +1838,10 @@ async function executeCallExpressionAsync(
     const [target, queryParams] = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
     context.navigate?.(target, queryParams as Record<string, unknown> | undefined);
     return undefined;
+  }
+  if (ir.callee.kind === "IdentifierRead") {
+    const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    return completeValue(context.callFunction?.(ir.callee.name, args));
   }
   if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot execute unsupported XMLUI event call target.");

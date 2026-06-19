@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { copyFile, mkdir, readdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
+import counterBadgeExtension from "../packages/xmlui-counter-badge/src";
 
 import {
   generateProductionManifest,
@@ -26,6 +27,11 @@ const productionFixtures: ProductionBuildFixture[] = [
     directory: "standalone-samples/routing-state",
     entry: "Main.xmlui",
   },
+  {
+    name: "extensionCounterBadge",
+    directory: "standalone-samples/extension-counter-badge",
+    entry: "Main.xmlui",
+  },
 ];
 
 function productionArtifactsPlugin(): Plugin {
@@ -45,6 +51,7 @@ function productionArtifactsPlugin(): Plugin {
         outDir,
         fixtures: productionFixtures,
         assets,
+        extensions: [counterBadgeExtension],
       });
     },
   };
@@ -112,7 +119,7 @@ async function collectAssets(outDir: string): Promise<string[]> {
 
 export default defineConfig({
   base: "./",
-  plugins: [xmluiPlugin(), react(), productionArtifactsPlugin()],
+  plugins: [xmluiPlugin({ extensions: [counterBadgeExtension] }), react(), productionArtifactsPlugin()],
   build: {
     outDir: "dist-production",
     emptyOutDir: true,

@@ -12,10 +12,12 @@ import {
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiThemeRoot } from "./rendering/theme";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
+import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 
 export function createXmluiModule(
   document: XmluiDocumentInput,
   components: XmluiModule[] = [],
+  options: { extensions?: Iterable<Extension> } = {},
 ): XmluiModule {
   if (document.kind === "component") {
     return {
@@ -32,43 +34,58 @@ export function createXmluiModule(
     }
   }
 
+  const normalizedExtensions = normalizeExtensions(options.extensions ?? []);
   return {
     kind: "app",
     root: document.root,
     components: componentMap,
+    extensionRenderers: normalizedExtensions.renderers,
+    extensionFunctions: normalizedExtensions.functions,
   };
 }
 
-export function renderXmluiApp(module: XmluiModule, container: HTMLElement): void {
+export function renderXmluiApp(
+  module: XmluiModule,
+  container: HTMLElement,
+  options: MountXmluiAppOptions = {},
+): void {
   if (module.kind !== "app") {
     throw new Error("renderXmluiApp expected an app module.");
   }
 
-  mountXmluiApp(module, container);
+  mountXmluiApp(module, container, options);
 }
+
+export type MountXmluiAppOptions = {
+  hydrate?: boolean;
+  initialUrl?: string;
+  extensions?: Iterable<Extension>;
+};
 
 export function mountXmluiApp(
   module: XmluiModule,
   container: HTMLElement,
-  options: { hydrate?: boolean; initialUrl?: string } = {},
+  options: MountXmluiAppOptions = {},
 ): Root {
   if (module.kind !== "app") {
     throw new Error("mountXmluiApp expected an app module.");
   }
   if (options.hydrate) {
-    return hydrateRoot(container, <XmluiRoot module={module} initialUrl={options.initialUrl} />);
+    return hydrateRoot(container, <XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
   }
   const root = createRoot(container);
-  root.render(<XmluiRoot module={module} initialUrl={options.initialUrl} />);
+  root.render(<XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
   return root;
 }
 
 export function XmluiRoot({
   module,
   initialUrl,
+  extensions,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
   initialUrl?: string;
+  extensions?: Iterable<Extension>;
 }) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
@@ -79,6 +96,13 @@ export function XmluiRoot({
   if (!routingRef.current) {
     routingRef.current = new RuntimeRoutingStore(routeMode, () => store.invalidateRoute(), initialUrl);
   }
+  const normalizedExtensions = useMemo(
+    () => normalizeExtensions([
+      ...listRegisteredExtensions(),
+      ...(extensions ?? []),
+    ]),
+    [extensions],
+  );
   useEffect(() => routingRef.current?.attach(), []);
 
   if (!initializedRef.current) {
@@ -89,6 +113,10 @@ export function XmluiRoot({
       props: {},
       references: referencesRef.current,
       routing: routingRef.current,
+      extensionFunctions: {
+        ...(module.extensionFunctions ?? {}),
+        ...normalizedExtensions.functions,
+      },
     });
     initializeStateValuesIntoStore({
       kind: "global",
@@ -115,10 +143,20 @@ export function XmluiRoot({
       props: {},
       references: referencesRef.current,
       routing: routingRef.current,
+      extensionFunctions: {
+        ...(module.extensionFunctions ?? {}),
+        ...normalizedExtensions.functions,
+      },
     }),
-    [store],
+    [module.extensionFunctions, normalizedExtensions.functions, store],
   );
-  const context = useMemo(() => createRenderContext(module.components), [module.components]);
+  const context = useMemo(
+    () => createRenderContext(module.components, {
+      ...(module.extensionRenderers ?? {}),
+      ...normalizedExtensions.renderers,
+    }),
+    [module.components, module.extensionRenderers, normalizedExtensions.renderers],
+  );
 
   return (
     <XmluiThemeRoot>
