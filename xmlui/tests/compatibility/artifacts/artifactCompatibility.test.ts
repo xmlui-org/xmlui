@@ -25,12 +25,14 @@ describe("compatibility artifact shape", () => {
 
   it("documents package export compatibility gaps against the old package shape", () => {
     const packageJson = JSON.parse(readFileSync(join(xmluiRoot, "package.json"), "utf8"));
+    const debt = readFileSync(join(repoRoot, ".ai/compatibility-debt.md"), "utf8");
     const exports = Object.keys(packageJson.exports ?? {});
 
     expect(exports).toContain(".");
     expect(exports).not.toContain("./parser");
     expect(exports).not.toContain("./language-server");
     expect(exports).not.toContain("./testing");
+    expect(debt).toContain("COMP-0002");
   });
 
   it("recognizes production and SSG artifact locations when they have been built", () => {

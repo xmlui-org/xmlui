@@ -23,7 +23,7 @@ Classifications:
 | COMP-0004 | Preview SSG tool | `/Users/dotneteer/source/xmlui/tools/preview-ssg` | `xmlui/scripts/preview-ssg.mjs` | Public preview-ssg tool behavior and package shape are preserved. | Local preview script exists, package/tool compatibility is incomplete. | known-gap | medium | Phase 7 | Tool package smoke test and artifact comparison. |
 | COMP-0005 | Website | `/Users/dotneteer/source/xmlui/website` | missing | Documentation website builds and examples execute against XMLUI. | No rewrite website package yet. | blocked | high | Phase 7 | Docs website build and example smoke tests. |
 | COMP-0006 | Playground | `/Users/dotneteer/source/xmlui/playground` | missing | Playground starts, runs templates/examples, reports diagnostics, and supports sharing. | No rewrite playground package yet. | blocked | high | Phase 7 | Playground smoke tests. |
-| COMP-0007 | Integration tests | `/Users/dotneteer/source/xmlui/integration-tests` | missing | Integration test apps validate create-app, extensions, builds, and workflows. | No equivalent rewrite integration package yet. | blocked | high | Phase 1 | `test-integration` equivalent passes. |
+| COMP-0007 | Integration tests | `/Users/dotneteer/source/xmlui/integration-tests` | `scripts/phase1-integration-smoke.mjs` | Integration test apps validate create-app, extensions, builds, and workflows. | Phase 1 has a command-surface smoke; full old integration app parity is not rebuilt yet. | known-gap | high | Phase 1 | Full `test-integration` equivalent creates/builds/runs generated app and extension workflow. |
 | COMP-0008 | Release workflows | `/Users/dotneteer/source/xmlui/.github/workflows` | missing | CI/release checks build, test, package, and publish the old artifact set. | No rewrite workflow parity yet. | blocked | medium | Phase 9 | Release readiness checklist and workflow smoke. |
 | COMP-0009 | Extension packages | `/Users/dotneteer/source/xmlui/packages/*` | `packages/xmlui-counter-badge` | First-party extension packages build, publish metadata, register functions/components/themes, and run in all app modes. | One fixture package exists; original packages are not ported. | known-gap | high | Phase 6 | Each package has package build, metadata, and runtime tests. |
 | COMP-0010 | Theme and visual parity | component `.defaults.ts`, `.module.scss`, theming core | runtime theme/style slice | Old theme variables, parts, defaults, variants, responsive props, and CSS hooks are preserved. | Experimental theme/layout subset only. | known-gap | high | Phase 3 | Visual/theme artifact and E2E checks pass. |
@@ -34,3 +34,10 @@ Classifications:
 
 Do not delete closed rows. Mark them closed in a future `Status` or notes column
 once verification exists, so the historical sweep remains useful.
+
+All current rows are classified as `known-gap` or `blocked`; there are no
+unclassified compatibility gaps in the control center as of Phase 0.
+
+When adding a new row, include a stable ID, a classification, a severity, a
+rebuild phase, and concrete verification needed to close the row. If the root
+cause is unknown, use `needs-investigation` rather than leaving the row vague.

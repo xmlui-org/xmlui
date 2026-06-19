@@ -131,6 +131,8 @@ For components, the inventory must include:
 
 ## 5. Phase 0: Rebuild Control Center
 
+Status: operational; keep this phase maintained throughout the rebuild.
+
 Create the process scaffolding before broad implementation.
 
 Tasks:
@@ -140,14 +142,17 @@ Tasks:
   rebuild phases.
 - Maintain `.ai/compatibility-debt.md`, which now records known gaps, blocked
   surfaces, and deferred compatibility work with stable IDs.
+- Use `.ai/rebuild-control-center.md` as the short orientation note for future
+  agents entering the rebuild.
 - Keep the component tracking table aligned with
   `/Users/dotneteer/source/xmlui/xmlui/src/components`.
 - Refine status labels as implementation matures: `not-started`,
   `inventoried`, `tests-ported`, `implemented`, `parity-tested`, `closed`,
   `deferred`.
-- Define the standard component closure note template before closing the first
+- Use `.ai/component-compatibility-closure-template.md` before closing any
   non-experimental component.
-- Keep the minimum required verification command set current for each surface:
+- Keep `.ai/verification-command-matrix.md` current as the minimum required
+  verification command set for each surface:
   parser/compiler unit, runtime unit, E2E, visual/theme, integration, package,
   docs, VS Code metadata, compatibility sweep, and performance baseline.
 
@@ -160,7 +165,13 @@ Exit criteria:
   `npm --workspace xmlui run compatibility:perf` are documented as standard
   control commands.
 
+Phase 0 completion note: the initial control center files exist. Future phases
+must keep them synchronized rather than treating Phase 0 as a one-time setup.
+
 ## 6. Phase 1: Package, Build, and Test Infrastructure
+
+Status: initial command surface implemented; full old integration parity still
+tracked as compatibility debt.
 
 Stabilize the repo and command surface before rebuilding broad behavior.
 
@@ -190,6 +201,9 @@ Tasks:
 - Expand the Experiment 15 sweep so it can include integration tests,
   create-app output checks, package export checks, and release-artifact checks
   as those surfaces are rebuilt.
+- Keep old root and `xmlui` package command names available as aliases or
+  debt-backed placeholders so public command compatibility is explicit while
+  missing surfaces are rebuilt.
 
 Exit criteria:
 
@@ -198,6 +212,20 @@ Exit criteria:
 - The test harness can run old component tests incrementally without bespoke
   setup per component.
 - The compatibility sweep is part of the normal CI-facing verification path.
+
+Current Phase 1 result:
+
+- root aliases exist for `build-xmlui`, `build-vscode-extension`,
+  `build-extensions`, `build-docs`, `generate-docs`, `test-smoke`, and
+  `test-integration`;
+- `build-playground` exists as an explicit `COMP-0006` placeholder until the
+  playground is rebuilt;
+- `xmlui` package aliases exist for `build:xmlui`, `build:xmlui-standalone`,
+  `build:xmlui-metadata`, `test:unit`, `check:metadata`, and `generate-docs`;
+- `scripts/phase1-integration-smoke.mjs` is the first integration command
+  placeholder and validates the command/debt/inventory surface;
+- `.ai/phase-1-package-build-test-infrastructure-findings.md` records the
+  implemented slice and remaining debt.
 
 ## 7. Phase 2: Core Language and Runtime Semantics
 

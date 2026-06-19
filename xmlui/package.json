@@ -9,6 +9,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:xmlui": "npm run build",
+    "build:xmlui-standalone": "npm run build:standalone",
+    "build:xmlui-metadata": "npm run build:metadata",
     "build:production": "npm run build:metadata && tsc --noEmit && vite build --config vite.production.config.ts && node scripts/verify-production-output.mjs",
     "build:ssg": "npm run build:production && vite build --config vite.ssg-render.config.ts && node scripts/build-ssg.mjs",
     "build:metadata": "node scripts/build-metadata.mjs",
@@ -23,6 +26,9 @@
     "compatibility:sweep": "node scripts/compatibility-sweep.mjs",
     "compatibility:perf": "node scripts/performance-baseline.mjs",
     "test": "vitest run tests/compiler",
+    "test:unit": "npm run test",
+    "check:metadata": "npm run build:metadata",
+    "generate-docs": "npm run build:docs-reference",
     "test:e2e": "playwright test"
   },
   "dependencies": {
