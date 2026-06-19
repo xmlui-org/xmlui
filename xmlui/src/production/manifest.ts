@@ -24,6 +24,10 @@ export type ProductionBuildManifest = {
   routes: ProductionBuildManifestRoute[];
   usedBuiltins: string[];
   assets: string[];
+  metadata?: {
+    path: string;
+    hash: string;
+  };
   diagnostics: string[];
   deferredCompatibility: string[];
 };
@@ -129,6 +133,7 @@ export async function generateProductionManifest({
     routes: routes.sort((left, right) => `${left.fixture}:${left.url}`.localeCompare(`${right.fixture}:${right.url}`)),
     usedBuiltins: [...usedBuiltins].sort(),
     assets: [...assets].sort(),
+    metadata: await readMetadataReference(outDir),
     diagnostics,
     deferredCompatibility: [
       "CONFIG_ONLY build mode",
@@ -145,6 +150,17 @@ export async function generateProductionManifest({
     `${JSON.stringify(manifest, null, 2)}\n`,
   );
   return manifest;
+}
+
+async function readMetadataReference(outDir: string): Promise<ProductionBuildManifest["metadata"]> {
+  const metadataPath = path.join(outDir, "xmlui-metadata.json");
+  if (!existsSync(metadataPath)) {
+    return undefined;
+  }
+  return {
+    path: "xmlui-metadata.json",
+    hash: hashSource(await readFile(metadataPath, "utf-8")),
+  };
 }
 
 export async function discoverFixtureGraph(

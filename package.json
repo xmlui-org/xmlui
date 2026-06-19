@@ -12,6 +12,8 @@
     "build": "npm --workspace xmlui run build",
     "build:production": "npm --workspace xmlui run build:production",
     "build:ssg": "npm --workspace xmlui run build:ssg",
+    "build:metadata": "npm --workspace xmlui run build:metadata",
+    "build:docs-reference": "npm --workspace xmlui run build:docs-reference",
     "inspect:ssg": "npm --workspace xmlui run inspect:ssg",
     "serve:production": "npm --workspace xmlui run serve:production",
     "preview:ssg": "npm --workspace xmlui run preview:ssg",

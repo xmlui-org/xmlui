@@ -35,4 +35,9 @@ if (!existsSync(diagnosticPath)) {
   throw new Error("Production output is missing production-check.json.");
 }
 
+const metadataPath = path.join(outDir, "xmlui-metadata.json");
+if (!existsSync(metadataPath)) {
+  throw new Error("Production output is missing xmlui-metadata.json.");
+}
+
 console.log(`Verified production output: ${path.relative(process.cwd(), indexPath)} -> ${moduleMatch[1]}`);

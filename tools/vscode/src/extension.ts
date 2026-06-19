@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 
+import { collectXmluiCompletions } from "./completions";
 import { collectXmluiDiagnostics } from "./diagnostics";
+import { collectXmluiHover } from "./hover";
 import { collectXmluiSemanticTokens, tokenTypes } from "./semanticTokens";
 
 const legend = new vscode.SemanticTokensLegend([...tokenTypes], []);
@@ -13,6 +15,17 @@ export function activate(context: vscode.ExtensionContext): void {
       { language: "xmlui", scheme: "file" },
       new XmluiSemanticTokensProvider(),
       legend,
+    ),
+    vscode.languages.registerCompletionItemProvider(
+      { language: "xmlui", scheme: "file" },
+      new XmluiCompletionProvider(),
+      "<",
+      " ",
+      "$",
+    ),
+    vscode.languages.registerHoverProvider(
+      { language: "xmlui", scheme: "file" },
+      new XmluiHoverProvider(),
     ),
     vscode.workspace.onDidOpenTextDocument((document) =>
       updateDiagnostics(document, diagnosticCollection),
@@ -70,5 +83,46 @@ class XmluiSemanticTokensProvider implements vscode.DocumentSemanticTokensProvid
       builder.push(token.line, token.character, token.length, tokenTypes.indexOf(token.tokenType), 0);
     }
     return builder.build();
+  }
+}
+
+class XmluiCompletionProvider implements vscode.CompletionItemProvider {
+  provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
+    const offset = document.offsetAt(position);
+    return collectXmluiCompletions(document.getText(), offset).map((completion) => {
+      const item = new vscode.CompletionItem(
+        completion.label,
+        completionKind(completion.kind),
+      );
+      item.detail = completion.detail;
+      return item;
+    });
+  }
+}
+
+class XmluiHoverProvider implements vscode.HoverProvider {
+  provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.Hover | undefined {
+    const hover = collectXmluiHover(document.getText(), document.offsetAt(position));
+    if (!hover) {
+      return undefined;
+    }
+    return new vscode.Hover([`**${hover.title}**`, hover.body]);
+  }
+}
+
+function completionKind(kind: ReturnType<typeof collectXmluiCompletions>[number]["kind"]): vscode.CompletionItemKind {
+  switch (kind) {
+    case "component":
+      return vscode.CompletionItemKind.Class;
+    case "event":
+      return vscode.CompletionItemKind.Event;
+    case "template":
+      return vscode.CompletionItemKind.Snippet;
+    case "variable":
+      return vscode.CompletionItemKind.Variable;
+    case "api":
+      return vscode.CompletionItemKind.Method;
+    default:
+      return vscode.CompletionItemKind.Property;
   }
 }

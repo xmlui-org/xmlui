@@ -55,7 +55,7 @@ test("SSG emits search and manifest artifacts and previews resource 404s", async
     schemaVersion: 1,
     fallbackFile: "200.html",
     searchIndexFile: "__xmlui-search-index.json",
-    assets: expect.arrayContaining(["xmlui-ssg-manifest.json"]),
+    assets: expect.arrayContaining(["xmlui-ssg-manifest.json", "xmlui-metadata.json"]),
   });
 
   const missingResource = await request.get(`${ssgBaseUrl}/missing.js`);

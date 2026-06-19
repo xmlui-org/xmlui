@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { existsSync } from "node:fs";
-import { mkdir, readdir, rename, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
 
@@ -38,6 +38,7 @@ function productionArtifactsPlugin(): Plugin {
       await normalizeIndexHtml(outDir);
       await writeMockApiCompatibilityStub(outDir);
       await writeProductionDiagnostic(outDir);
+      await copyMetadataArtifact(rootDir, outDir);
       const assets = await collectAssets(outDir);
       await generateProductionManifest({
         rootDir,
@@ -47,6 +48,13 @@ function productionArtifactsPlugin(): Plugin {
       });
     },
   };
+}
+
+async function copyMetadataArtifact(rootDir: string, outDir: string): Promise<void> {
+  const metadataPath = path.resolve(rootDir, "dist-metadata/xmlui-metadata.json");
+  if (existsSync(metadataPath)) {
+    await copyFile(metadataPath, path.join(outDir, "xmlui-metadata.json"));
+  }
 }
 
 async function writeProductionDiagnostic(outDir: string): Promise<void> {

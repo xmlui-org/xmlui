@@ -2,6 +2,8 @@ node_modules/
 dist/
 dist-production/
 dist-ssg/
+dist-metadata/
+dist-docs-reference/
 .xmlui-production/
 .xmlui-ssg-ssr/
 !tools/vscode/dist/

@@ -66,6 +66,8 @@ test("production manifest records fixtures, routes, built-ins, and emitted asset
   expect(manifest.assets).toContain("index.html");
   expect(manifest.assets).toContain("mockApi.js");
   expect(manifest.assets).toContain("production-check.json");
+  expect(manifest.assets).toContain("xmlui-metadata.json");
+  expect(manifest.metadata).toMatchObject({ path: "xmlui-metadata.json" });
   expect(manifest.assets.some((asset: string) => /^internal\/.*\.mjs$/.test(asset))).toBe(true);
 });
 
