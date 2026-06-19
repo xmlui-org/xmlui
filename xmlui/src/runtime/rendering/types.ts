@@ -38,6 +38,11 @@ export type NormalizedRuntimeDependency =
       name: string;
       source: BoundDependency;
     }
+  | {
+      kind: "reference";
+      name: string;
+      source: BoundDependency;
+    }
   | (RuntimePropDependency & {
       source: BoundDependency;
     });

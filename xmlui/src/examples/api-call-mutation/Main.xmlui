@@ -1,0 +1,16 @@
+<App>
+  <DataSource id="tasksSource" url="/api/tasks" />
+  <APICall
+    id="addTask"
+    url="/api/tasks"
+    method="post"
+    body="{{ title: 'Ship runtime' }}"
+    invalidates="tasksSource"
+  />
+  <H1>API call mutation</H1>
+  <Button onClick="addTask.execute()">Add task</Button>
+  <Items data="{tasksSource.value}">
+    <Text>{$item.title}</Text>
+  </Items>
+  <Text>Last result: {addTask.lastResult ? addTask.lastResult.title : 'none'}</Text>
+</App>

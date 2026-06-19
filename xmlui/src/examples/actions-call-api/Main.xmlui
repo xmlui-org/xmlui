@@ -1,0 +1,7 @@
+<App var.message="{''}">
+  <H1>Actions call API</H1>
+  <Button onClick="let result = Actions.callApi({ url: '/api/message' }); message = result.text">
+    Load message
+  </Button>
+  <Text>{message || 'No message'}</Text>
+</App>

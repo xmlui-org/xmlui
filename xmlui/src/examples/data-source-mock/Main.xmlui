@@ -1,0 +1,11 @@
+<App>
+  <DataSource id="tasks" mockData="{[
+    { id: 'build', title: 'Build runtime' },
+    { id: 'test', title: 'Write tests' }
+  ]}" />
+  <H1>Data source mock</H1>
+  <Text>Loaded: {tasks.loaded ? 'yes' : 'no'}</Text>
+  <Items data="{tasks.value}">
+    <Text>{$itemIndex}: {$item.title}</Text>
+  </Items>
+</App>

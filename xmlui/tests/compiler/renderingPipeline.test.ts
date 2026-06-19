@@ -278,9 +278,11 @@ describe("rendering binding evaluation", () => {
 describe("built-in renderer registry", () => {
   it("contains the expanded built-in renderers", () => {
     expect(Object.keys(builtInRenderers).sort()).toEqual([
+      "APICall",
       "App",
       "Button",
       "Checkbox",
+      "DataSource",
       "H1",
       "HStack",
       "Items",

@@ -1,0 +1,6 @@
+<App var.count="{1}">
+  <DataSource id="stats" mockData="{{ count: count }}" />
+  <H1>Data source refetch</H1>
+  <Text>Count: {stats.value.count}</Text>
+  <Button onClick="count++; stats.refetch()">Refresh</Button>
+</App>

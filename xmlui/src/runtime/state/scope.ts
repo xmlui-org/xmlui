@@ -1,4 +1,5 @@
 import type { CompiledEventContext, CompiledExpressionContext } from "../../compiler/scriptSemantics";
+import { managedFetchService } from "../data";
 import type { RuntimeStateStore } from "./store";
 import type { StateOwnerId } from "./types";
 
@@ -100,7 +101,7 @@ export function createExpressionContext(scope: RuntimeScope | undefined): Compil
     readLocal: (name) => readLocal(scope, name),
     readGlobal: (name) => readGlobal(scope, name),
     readContext: (name) => readContext(scope, name),
-    readReference: (name) => readReference(scope, name),
+    readReference: (name) => name === "Actions" ? createActionsReference() : readReference(scope, name),
   };
 }
 
@@ -171,6 +172,16 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   }
   const prototype = Object.getPrototypeOf(value);
   return prototype === Object.prototype || prototype === null;
+}
+
+function createActionsReference() {
+  return {
+    callApi: async (input: Record<string, unknown>) => {
+      const request = managedFetchService.buildRequest(input);
+      const response = await managedFetchService.execute(request);
+      return response.data;
+    },
+  };
 }
 
 function findLocalOwner(scope: RuntimeScope | undefined, name: string): StateOwnerId | undefined {

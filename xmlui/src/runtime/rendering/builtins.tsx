@@ -1,10 +1,11 @@
-import React, { useEffect, useState, type ReactNode } from "react";
+import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { evaluateExpressionOrText, runEvent } from "./bindings";
 import type { XmluiBuiltInRenderer } from "./types";
 import { useBindingRevision } from "./reactive";
 import { createSlotScope, type RenderFragment } from "./components";
 import { createRuntimeScope } from "../state";
+import { applyResultSelector, managedFetchService } from "../data";
 import {
   flexStyle,
   renderValueOrChildren,
@@ -183,7 +184,228 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
     );
   },
   Option: () => null,
+  DataSource: DataSourceRenderer,
+  APICall: ApiCallRenderer,
 };
+
+function DataSourceRenderer({ node, scope }: Parameters<XmluiBuiltInRenderer>[0]) {
+  const id = useStringProp(node, scope, "id", "");
+  const url = useStringProp(node, scope, "url", "");
+  const method = useStringProp(node, scope, "method", "get");
+  const mockData = useEvaluatedProp(node, scope, "mockData", undefined);
+  const body = useEvaluatedProp(node, scope, "body", undefined);
+  const rawBody = useStringProp(node, scope, "rawBody", "");
+  const queryParams = useEvaluatedProp(node, scope, "queryParams", undefined);
+  const headers = useEvaluatedProp(node, scope, "headers", undefined);
+  const credentials = useStringProp(node, scope, "credentials", "") as RequestCredentials | "";
+  const dataType = useStringProp(node, scope, "dataType", "json") as "json" | "text";
+  const resultSelector = useStringProp(node, scope, "resultSelector", "");
+  const transformResult = useEvaluatedProp(node, scope, "transformResult", undefined);
+  const pollIntervalInSeconds = Number(useEvaluatedProp(node, scope, "pollIntervalInSeconds", 0) ?? 0);
+  const apiRef = useRef<Record<string, unknown>>();
+  const mockDataKey = stableDataKey(mockData);
+  const transformResultKey = stableDataKey(transformResult);
+  const request = useMemo(
+    () => managedFetchService.buildRequest({
+      url,
+      method,
+      body,
+      rawBody: rawBody || undefined,
+      queryParams,
+      headers,
+      credentials: credentials || undefined,
+      dataType,
+    }),
+    [body, credentials, dataType, headers, method, queryParams, rawBody, url],
+  );
+  const requestKey = useMemo(() => managedFetchService.requestKey(request), [request]);
+  const latest = useRef({ mockData, request, resultSelector, transformResult });
+  latest.current = { mockData, request, resultSelector, transformResult };
+
+  if (!apiRef.current) {
+    apiRef.current = createDataSourceApi(id, scope);
+  }
+  useEffect(() => registerReference(scope, id, apiRef.current!), [id, scope]);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    let cancelled = false;
+    const load = async (force = false) => {
+      updateApi(apiRef.current!, id, scope, {
+        inProgress: true,
+        isRefetching: Boolean(apiRef.current!.loaded),
+        error: undefined,
+      });
+      try {
+        let value: unknown;
+        let responseHeaders: Record<string, string> | undefined;
+        const current = latest.current;
+        if (current.mockData !== undefined) {
+          value = current.mockData;
+        } else if (node.parsed?.events?.fetch) {
+          value = await runEvent(
+            node.parsed.events.fetch,
+            createRuntimeScope({
+              store: scope.store,
+              parent: scope,
+              references: scope.references,
+              contextValues: {
+                $url: current.request.url,
+                $method: current.request.method,
+                $queryParams: current.request.queryParams,
+                $requestBody: current.request.rawBody ?? current.request.body,
+                $requestHeaders: current.request.headers,
+              },
+            }),
+          );
+        } else {
+          const entry = await managedFetchService.load(current.request, { force });
+          value = entry.value;
+          responseHeaders = entry.responseHeaders;
+        }
+        value = applyDataTransforms(value, current.resultSelector, current.transformResult);
+        if (cancelled) {
+          return;
+        }
+        updateApi(apiRef.current!, id, scope, {
+          value,
+          loaded: true,
+          inProgress: false,
+          isRefetching: false,
+          error: undefined,
+          responseHeaders,
+        });
+        void runEvent(node.parsed?.events?.loaded, scope, [value, force]);
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        updateApi(apiRef.current!, id, scope, {
+          error,
+          inProgress: false,
+          isRefetching: false,
+        });
+        void runEvent(node.parsed?.events?.error, scope, [error]);
+      }
+    };
+    apiRef.current!.refetch = () => load(true);
+    void load(false);
+    const interval = pollIntervalInSeconds > 0
+      ? window.setInterval(() => void load(true), pollIntervalInSeconds * 1000)
+      : undefined;
+    return () => {
+      cancelled = true;
+      if (interval !== undefined) {
+        window.clearInterval(interval);
+      }
+    };
+  }, [
+    id,
+    mockDataKey,
+    node.parsed?.events?.error,
+    node.parsed?.events?.fetch,
+    node.parsed?.events?.loaded,
+    pollIntervalInSeconds,
+    requestKey,
+    resultSelector,
+    scope,
+    transformResultKey,
+  ]);
+
+  return null;
+}
+
+function ApiCallRenderer({ node, scope }: Parameters<XmluiBuiltInRenderer>[0]) {
+  const id = useStringProp(node, scope, "id", "");
+  const url = useStringProp(node, scope, "url", "");
+  const method = useStringProp(node, scope, "method", "get");
+  const body = useEvaluatedProp(node, scope, "body", undefined);
+  const rawBody = useStringProp(node, scope, "rawBody", "");
+  const queryParams = useEvaluatedProp(node, scope, "queryParams", undefined);
+  const headers = useEvaluatedProp(node, scope, "headers", undefined);
+  const credentials = useStringProp(node, scope, "credentials", "") as RequestCredentials | "";
+  const invalidates = useEvaluatedProp(node, scope, "invalidates", undefined);
+  const apiRef = useRef<Record<string, unknown>>();
+  const latest = useRef({ url, method, body, rawBody, queryParams, headers, credentials, invalidates });
+  latest.current = { url, method, body, rawBody, queryParams, headers, credentials, invalidates };
+
+  if (!apiRef.current) {
+    apiRef.current = createApiCallApi(id, scope);
+  }
+  useEffect(() => registerReference(scope, id, apiRef.current!), [id, scope]);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    apiRef.current!.execute = async (...args: unknown[]) => {
+      const before = await runEvent(node.parsed?.events?.beforeRequest, scope, args);
+      if (before === false) {
+        return undefined;
+      }
+      updateApi(apiRef.current!, id, scope, {
+        inProgress: true,
+        lastError: undefined,
+      });
+      try {
+        const request = managedFetchService.buildRequest({
+          url: latest.current.url,
+          method: latest.current.method,
+          body: latest.current.body,
+          rawBody: latest.current.rawBody || undefined,
+          queryParams: latest.current.queryParams,
+          headers: latest.current.headers,
+          credentials: latest.current.credentials || undefined,
+        });
+        const executionScope = createRuntimeScope({
+          store: scope.store,
+          parent: scope,
+          references: scope.references,
+          contextValues: {
+            $param: args[0],
+            $params: args,
+            $queryParams: request.queryParams,
+            $requestBody: request.rawBody ?? request.body,
+            $requestHeaders: request.headers,
+          },
+        });
+        let responseHeaders: Record<string, string> | undefined;
+        let result: unknown;
+        if (node.parsed?.events?.mockExecute) {
+          result = await runEvent(node.parsed.events.mockExecute, executionScope, args);
+        } else {
+          const response = await managedFetchService.execute(request);
+          result = response.data;
+          responseHeaders = response.headers;
+        }
+        updateApi(apiRef.current!, id, scope, {
+          inProgress: false,
+          loaded: true,
+          lastResult: result,
+          lastError: undefined,
+          lastResponseHeaders: responseHeaders,
+        });
+        const successResult = await runEvent(node.parsed?.events?.success, scope, [result]);
+        if (successResult !== false) {
+          invalidateDataSources(scope, latest.current.invalidates);
+        }
+        return result;
+      } catch (error) {
+        updateApi(apiRef.current!, id, scope, {
+          inProgress: false,
+          lastError: error,
+        });
+        void runEvent(node.parsed?.events?.error, scope, [error]);
+        throw error;
+      }
+    };
+    scope.store.invalidateReference(id);
+  }, [id, node.parsed?.events?.beforeRequest, node.parsed?.events?.error, node.parsed?.events?.mockExecute, node.parsed?.events?.success, scope]);
+
+  return null;
+}
 
 function templateChildren(node: XmluiElement, name: string): XmluiNode[] | undefined {
   const property = node.children.find(
@@ -213,4 +435,105 @@ function optionDescriptors(
       : true;
     return [{ value: String(value ?? label ?? ""), label: String(label ?? value ?? ""), enabled }];
   });
+}
+
+function createDataSourceApi(id: string, scope: Parameters<XmluiBuiltInRenderer>[0]["scope"]): Record<string, unknown> {
+  const api: Record<string, unknown> = {
+    value: undefined,
+    error: undefined,
+    inProgress: false,
+    isRefetching: false,
+    loaded: false,
+    responseHeaders: undefined,
+    refetch: () => undefined,
+  };
+  if (id) {
+    scope.references[id] = api;
+  }
+  return api;
+}
+
+function createApiCallApi(id: string, scope: Parameters<XmluiBuiltInRenderer>[0]["scope"]): Record<string, unknown> {
+  const api: Record<string, unknown> = {
+    execute: () => Promise.resolve(undefined),
+    inProgress: false,
+    loaded: false,
+    lastResult: undefined,
+    lastError: undefined,
+    lastResponseHeaders: undefined,
+  };
+  if (id) {
+    scope.references[id] = api;
+  }
+  return api;
+}
+
+function registerReference(
+  scope: Parameters<XmluiBuiltInRenderer>[0]["scope"],
+  id: string,
+  api: Record<string, unknown>,
+): () => void {
+  if (!id) {
+    return () => undefined;
+  }
+  scope.references[id] = api;
+  scope.store.invalidateReference(id);
+  return () => {
+    if (scope.references[id] === api) {
+      delete scope.references[id];
+      scope.store.invalidateReference(id);
+    }
+  };
+}
+
+function updateApi(
+  api: Record<string, unknown>,
+  id: string,
+  scope: Parameters<XmluiBuiltInRenderer>[0]["scope"],
+  patch: Record<string, unknown>,
+): void {
+  let changed = false;
+  for (const [key, value] of Object.entries(patch)) {
+    if (!Object.is(api[key], value)) {
+      api[key] = value;
+      changed = true;
+    }
+  }
+  if (changed && id) {
+    scope.store.invalidateReference(id);
+  }
+}
+
+function stableDataKey(value: unknown): string {
+  if (typeof value === "function") {
+    return "function";
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function applyDataTransforms(value: unknown, selector: string, transform: unknown): unknown {
+  const selected = applyResultSelector(value, selector || undefined);
+  if (typeof transform === "function") {
+    return transform(selected);
+  }
+  return selected;
+}
+
+function invalidateDataSources(
+  scope: Parameters<XmluiBuiltInRenderer>[0]["scope"],
+  invalidates: unknown,
+): void {
+  const names = Array.isArray(invalidates)
+    ? invalidates
+    : typeof invalidates === "string"
+      ? invalidates.split(",").map((name) => name.trim()).filter(Boolean)
+      : [];
+  for (const name of names) {
+    const api = scope.references[String(name)] as { refetch?: () => unknown } | undefined;
+    void api?.refetch?.();
+  }
 }

@@ -65,6 +65,12 @@ export function normalizeDependencies(
         seen.add(key);
         normalized.push({ kind: "prop", name, source: dependency });
       }
+    } else if (dependency.kind === "reference") {
+      const key = `reference:${dependency.name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        normalized.push({ kind: "reference", name: dependency.name, source: dependency });
+      }
     }
   }
   return normalized;

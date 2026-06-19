@@ -406,6 +406,8 @@ function isComponentReference(type: string, isDefinitionRoot: boolean): boolean 
 
 const builtInElementNames = new Set([
   "App",
+  "APICall",
+  "DataSource",
   "H1",
   "Button",
   "Checkbox",
