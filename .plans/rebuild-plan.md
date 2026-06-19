@@ -1,9 +1,11 @@
 # XMLUI Rebuild Plan
 
-Status: draft  
+Status: active draft  
 Source baseline: `/Users/dotneteer/source/xmlui`  
-Assumption: all experiments in `.plans/master-plan.md` have been successfully
-executed and their findings are available as implementation baseline.
+Assumption: Experiments 1-15 in `.plans/master-plan.md` have been successfully
+executed for the experimental subset, and their findings are available as the
+implementation baseline. Experiment 15 created the first repeatable
+compatibility sweep; it does not mean the rewrite is fully compatible yet.
 
 ## 1. Purpose
 
@@ -56,22 +58,63 @@ The completed experiments are assumed to provide these foundations:
   initial full compatibility sweep;
 - unit and E2E harnesses that can port old XMLUI test cases with minimal edits.
 
-Before implementing any phase below, update this section if an experiment result
-differs from the assumption.
+Experiment 15 produced these durable control artifacts:
+
+- `.ai/compatibility-inventory.md`: seeded compatibility surface and component
+  inventory, mapped to old sources and rebuild phases;
+- `.ai/compatibility-debt.md`: seeded compatibility debt log with stable IDs;
+- `.ai/experiment-15-full-compatibility-sweep-findings.md`: first sweep
+  findings and operational notes;
+- `xmlui/scripts/compatibility-sweep.mjs`: command runner for the current
+  compatibility gate;
+- `xmlui/scripts/performance-baseline.mjs`: first-pass performance and artifact
+  size baseline;
+- `xmlui/tests/compatibility/`: initial source-anchored compatibility tests and
+  artifact-shape checks.
+
+The first verified sweep on June 19, 2026 passed for the current experimental
+surface:
+
+- compiler/runtime unit tests: 209 passing tests;
+- compatibility unit tests: 8 passing tests;
+- metadata build: 26 components and 3 mutation-capable examples;
+- production build, SSG build, docs-reference generation, VS Code build/tests,
+  extension fixture build/tests/metadata, and E2E suite: all passing;
+- E2E suite: 54 passing tests.
+
+Current sweep commands:
+
+```text
+npm --workspace xmlui run compatibility:sweep
+npm --workspace xmlui run compatibility:perf
+```
+
+Operational note: the full sweep starts local Playwright/Vite servers. In
+sandboxed agent execution it may need explicit permission to bind localhost
+ports.
+
+Before implementing any phase below, update this section if later experiment or
+sweep results differ from these assumptions.
 
 ## 4. Compatibility Closure Rules
 
 Each infrastructure area and component must go through the same closure loop:
 
 1. Inventory old behavior from `/Users/dotneteer/source/xmlui`.
-2. Record source-of-truth files in `.ai/` or this plan.
+2. Record source-of-truth files in `.ai/compatibility-inventory.md`, a
+   component closure note, or this plan.
 3. Port or adapt old tests before or alongside implementation.
 4. Implement the smallest compatible slice.
 5. Run unit, E2E, integration, visual, and packaging checks appropriate to the
    surface.
-6. Record deferred gaps, intentional deviations, and remaining risks.
+6. Record deferred gaps, intentional deviations, and remaining risks in
+   `.ai/compatibility-debt.md`.
 7. Mark the surface complete only when old tests pass or documented old tests
    are proven obsolete.
+
+Every compatibility-sensitive change should either keep
+`npm --workspace xmlui run compatibility:sweep` passing or add a debt entry
+explaining why a failure is expected and which rebuild phase will close it.
 
 For components, the inventory must include:
 
@@ -92,22 +135,30 @@ Create the process scaffolding before broad implementation.
 
 Tasks:
 
-- Add a compatibility inventory index under `.ai/` that links every framework
-  area and component to old source files, tests, docs, and port status.
-- Add a component tracking table generated or maintained from
+- Maintain `.ai/compatibility-inventory.md`, which now links framework areas
+  and the original component set to old source files, rewrite status, and
+  rebuild phases.
+- Maintain `.ai/compatibility-debt.md`, which now records known gaps, blocked
+  surfaces, and deferred compatibility work with stable IDs.
+- Keep the component tracking table aligned with
   `/Users/dotneteer/source/xmlui/xmlui/src/components`.
-- Define status labels: `not-started`, `inventoried`, `tests-ported`,
-  `implemented`, `parity-tested`, `closed`, `deferred`.
-- Define the standard component closure note template.
-- Define the minimum required verification command set for each surface:
+- Refine status labels as implementation matures: `not-started`,
+  `inventoried`, `tests-ported`, `implemented`, `parity-tested`, `closed`,
+  `deferred`.
+- Define the standard component closure note template before closing the first
+  non-experimental component.
+- Keep the minimum required verification command set current for each surface:
   parser/compiler unit, runtime unit, E2E, visual/theme, integration, package,
-  docs, and VS Code metadata.
-- Add a "compatibility debt" log for gaps found during implementation.
+  docs, VS Code metadata, compatibility sweep, and performance baseline.
 
 Exit criteria:
 
 - Every old component and infrastructure area has an owner row in the inventory.
 - The first component closure note can be produced without inventing structure.
+- The compatibility debt log has no unclassified known gaps.
+- `npm --workspace xmlui run compatibility:sweep` and
+  `npm --workspace xmlui run compatibility:perf` are documented as standard
+  control commands.
 
 ## 6. Phase 1: Package, Build, and Test Infrastructure
 
@@ -136,6 +187,9 @@ Tasks:
 - Add fixture comparison for generated JS, CSS, metadata, source maps, package
   exports, generated app templates, and SSG output.
 - Add CI-friendly commands that fail on untriaged compatibility gaps.
+- Expand the Experiment 15 sweep so it can include integration tests,
+  create-app output checks, package export checks, and release-artifact checks
+  as those surfaces are rebuilt.
 
 Exit criteria:
 
@@ -143,6 +197,7 @@ Exit criteria:
   the same user-facing commands as the old framework.
 - The test harness can run old component tests incrementally without bespoke
   setup per component.
+- The compatibility sweep is part of the normal CI-facing verification path.
 
 ## 7. Phase 2: Core Language and Runtime Semantics
 
@@ -172,6 +227,9 @@ Tasks:
 - Ensure runtime diagnostics match old user-visible messages where practical.
 - Benchmark expression and handler execution against the old interpreter and
   keep the master-plan performance target visible in CI.
+- Extend `compatibility:perf` beyond command durations into old/new oracle
+  measurements for expression evaluation, handler execution, invalidation, and
+  startup.
 
 Exit criteria:
 
@@ -202,6 +260,8 @@ Tasks:
   dark/light behavior where supported, responsive layout, and SSG first paint.
 - Make docs metadata and VS Code metadata describe the same theme variables and
   component parts used by runtime.
+- Add theme/style artifact checks to the compatibility sweep once stable CSS
+  and visual baselines exist.
 
 Exit criteria:
 
@@ -350,7 +410,12 @@ For each component:
 - compare generated metadata with old metadata;
 - run keyboard/focus checks for interactive components;
 - run visual/theme checks for styled components;
-- record exact old files and any deferred behavior in `.ai/<component>-compatibility-closure.md`.
+- record exact old files and any deferred behavior in
+  `.ai/<component>-compatibility-closure.md`;
+- update `.ai/compatibility-inventory.md` and `.ai/compatibility-debt.md` when
+  the component status changes;
+- keep at least one state mutation path in the component's tests when the
+  component can mutate or participate in mutable data.
 
 ## 11. Phase 6: Extension Packages and External Authoring
 
@@ -367,6 +432,8 @@ Exit criteria:
 
 - At least one representative first-party extension and one generated extension
   fixture work in Vite, production build, standalone, docs metadata, and tests.
+- The existing `xmlui-counter-badge` fixture remains green in
+  `compatibility:sweep` while original first-party packages are ported.
 
 ## 12. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
 
@@ -389,11 +456,14 @@ Exit criteria:
 
 - Old docs, playground, create-app, preview-ssg, VS Code, and AI-tooling smoke
   tests pass against the new implementation.
+- Missing tooling surfaces no longer appear as blocked entries in
+  `.ai/compatibility-debt.md`.
 
 ## 13. Phase 8: Full Compatibility Sweep
 
 Tasks:
 
+- Continue using the Experiment 15 sweep infrastructure as the base command.
 - Run old unit, E2E, integration, docs-example, package, extension, playground,
   and CI workflow tests against the new implementation.
 - Run generated artifact comparisons for package exports, CLI outputs, app
@@ -405,6 +475,8 @@ Tasks:
   bundle size.
 - Triage every failure into fixed gap, documented intentional deviation, or
   obsolete old test.
+- Capture old-framework oracle results or stable old artifacts where direct
+  old/new execution would be noisy or hard to isolate.
 
 Exit criteria:
 
@@ -412,6 +484,8 @@ Exit criteria:
 - All intentional deviations have migration notes and user-facing rationale.
 - The new framework can replace the old framework in representative real apps
   without user-visible surprises.
+- `compatibility:sweep` and `compatibility:perf` both pass with all rebuilt
+  surfaces enabled, and their reports are suitable as release evidence.
 
 ## 14. Phase 9: Release Readiness and Migration Safety
 
@@ -434,15 +508,18 @@ Exit criteria:
 
 ## 15. Suggested Incremental Order
 
-1. Create the compatibility inventory and component tracking table.
-2. Stabilize package/build/test infrastructure.
+1. Maintain and refine the compatibility inventory and debt log created by
+   Experiment 15.
+2. Stabilize package/build/test infrastructure and promote the compatibility
+   sweep into the normal verification path.
 3. Close parser, scripting, state, rendering, UDC, and diagnostics semantics.
 4. Close theming/layout infrastructure.
 5. Close data/actions/forms/routing/app-shell infrastructure.
 6. Implement component waves A through G, closing each component individually.
 7. Close extension packages.
 8. Close docs, playground, VS Code, create-app, preview-ssg, and AI tooling.
-9. Run the full compatibility sweep.
+9. Run and expand the full compatibility sweep continuously, not only at the
+   end.
 10. Prepare release readiness artifacts.
 
 ## 16. Definition of 100% Compatibility

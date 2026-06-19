@@ -22,6 +22,8 @@
     "test": "npm --workspace xmlui run test",
     "test:vscode": "npm --workspace xmlui-vscode run test",
     "test:e2e": "npm --workspace xmlui run test:e2e",
+    "compatibility:sweep": "npm --workspace xmlui run compatibility:sweep",
+    "compatibility:perf": "npm --workspace xmlui run compatibility:perf",
     "build:counter-badge": "npm --workspace xmlui-counter-badge run build",
     "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata"
   }

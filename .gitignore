@@ -4,6 +4,7 @@ dist-production/
 dist-ssg/
 dist-metadata/
 dist-docs-reference/
+xmlui/.compatibility-report/
 packages/*/dist/
 packages/*/dist-metadata/
 .xmlui-production/
