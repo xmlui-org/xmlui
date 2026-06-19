@@ -114,6 +114,7 @@ function lowerElement(
     ast: event.ast,
     ir: event.ir!,
     compiledSource: event.compiledSource,
+    options: event.options,
     dependencies: event.dependencies ?? [],
     writes: event.writes ?? [],
     invalidates: event.invalidates ?? [],

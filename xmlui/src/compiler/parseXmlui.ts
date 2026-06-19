@@ -174,6 +174,7 @@ function analyzeEvent(event: ParsedEvent, scope: XmluiScope): void {
   }
   const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
   event.ir = lowered.ir;
+  event.options = lowered.ir.options;
   event.dependencies = lowered.dependencies;
   event.writes = lowered.writes;
   event.invalidates = compiled.invalidates;

@@ -24,7 +24,7 @@ describe("compileXmluiModule", () => {
     expect(code).toContain('"source": "count++"');
     expect(code).toContain('"compiledSource": "ctx.writeGlobal');
     expect(code).toContain('"evaluate": (ctx) => {');
-    expect(code).toContain('"execute": (ctx) => {');
+    expect(code).toContain('"execute": async (ctx) => {');
     expect(code).toContain('"invalidates"');
   });
 

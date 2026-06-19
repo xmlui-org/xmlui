@@ -23,8 +23,14 @@ type ExpressionLike = ParsedExpression | Extract<MixedTextSegment, { kind: "expr
 
 const expressionCache = new WeakMap<object, CompiledExpression>();
 const eventCache = new WeakMap<ParsedEvent, CompiledEventHandler>();
+const eventSchedules = new WeakMap<ParsedEvent, EventScheduleState>();
 
 const bindingCounters = new Map<string, number>();
+
+type EventScheduleState = {
+  running: boolean;
+  tail: Promise<void>;
+};
 
 export function normalizeDependencies(
   dependencies: BoundDependency[] | undefined,
@@ -162,14 +168,17 @@ export function executeExpression(
   return compiled.execute(context);
 }
 
-export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope): void {
+export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope): Promise<void> {
   if (!event) {
-    return;
+    return Promise.resolve();
   }
+  return scheduleEvent(event, () => executeEvent(event, scope));
+}
+
+function executeEvent(event: ParsedEvent, scope: RuntimeScope): Promise<void> {
   const context = createEventContext(scope);
   if (event.execute) {
-    event.execute(context);
-    return;
+    return event.execute(context);
   }
   if (!event.ir) {
     throw new Error(`XMLUI event handler was not compiled: ${event.source}`);
@@ -179,7 +188,32 @@ export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope): v
     compiled = compileXmluiEventHandler(event.ir, event.dependencies ?? [], event.writes ?? []);
     eventCache.set(event, compiled);
   }
-  compiled.execute(context);
+  return compiled.execute(context);
+}
+
+function scheduleEvent(event: ParsedEvent, execute: () => Promise<void>): Promise<void> {
+  const policy = event.options?.schedulingPolicy ?? event.ir?.options.schedulingPolicy ?? "parallel";
+  if (policy === "parallel") {
+    return execute();
+  }
+
+  const state = eventSchedules.get(event) ?? { running: false, tail: Promise.resolve() };
+  eventSchedules.set(event, state);
+
+  if (policy === "drop-while-running") {
+    if (state.running) {
+      return Promise.resolve();
+    }
+    state.running = true;
+    const running = execute();
+    return running.finally(() => {
+      state.running = false;
+    });
+  }
+
+  const next = state.tail.catch(() => undefined).then(execute);
+  state.tail = next.catch(() => undefined);
+  return next;
 }
 
 export function resetBindingEvaluationCounters(): void {

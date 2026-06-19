@@ -133,6 +133,7 @@ function parsedEventFromIr(event: XmluiEventIr): ParsedEvent {
     range: rangeFromSource(event.source),
     ir: event.ir,
     compiledSource: event.compiledSource,
+    options: event.options,
     dependencies: event.dependencies,
     writes: event.writes,
     invalidates: event.invalidates,

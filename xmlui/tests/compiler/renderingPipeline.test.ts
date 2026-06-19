@@ -64,7 +64,7 @@ describe("rendering dependency normalization", () => {
 });
 
 describe("rendering binding evaluation", () => {
-  it("uses generated functions for expressions, mixed text, and events", () => {
+  it("uses generated functions for expressions, mixed text, and events", async () => {
     const document = parseXmlui(
       `<App global.count="{0}"><Button onClick="count++">Count: {count}</Button></App>`,
     );
@@ -80,11 +80,71 @@ describe("rendering binding evaluation", () => {
     expect(evaluateExpressionOrText(text.value, text.segments, scope, "counter-text")).toBe(
       "Count: 0",
     );
-    runEvent(button.parsed?.events?.click, scope);
+    await runEvent(button.parsed?.events?.click, scope);
     expect(store.readGlobal("count")).toBe(1);
     expect(evaluateExpressionOrText(text.value, text.segments, scope, "counter-text")).toBe(
       "Count: 1",
     );
+  });
+
+  it("runs event handlers in parallel by default", async () => {
+    const document = parseXmlui(
+      `<App global.count="{0}"><Button onClick="delay(1); count++">Count</Button></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.setInitialGlobalValues({ count: 0 });
+    const scope = createRuntimeScope({ store });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await Promise.all([
+      runEvent(button.parsed?.events?.click, scope),
+      runEvent(button.parsed?.events?.click, scope),
+    ]);
+
+    expect(store.readGlobal("count")).toBe(2);
+  });
+
+  it("drops same-event starts while block handlers are running", async () => {
+    const document = parseXmlui(
+      `<App global.count="{0}"><Button onClick='"block"; delay(1); count++'>Count</Button></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.setInitialGlobalValues({ count: 0 });
+    const scope = createRuntimeScope({ store });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await Promise.all([
+      runEvent(button.parsed?.events?.click, scope),
+      runEvent(button.parsed?.events?.click, scope),
+    ]);
+
+    expect(store.readGlobal("count")).toBe(1);
+  });
+
+  it("queues same-event starts for queue handlers", async () => {
+    const document = parseXmlui(
+      `<App global.count="{0}"><Button onClick='"queue"; delay(1); count++'>Count</Button></App>`,
+    );
+    const store = createRuntimeStateStore();
+    store.setInitialGlobalValues({ count: 0 });
+    const scope = createRuntimeScope({ store });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await Promise.all([
+      runEvent(button.parsed?.events?.click, scope),
+      runEvent(button.parsed?.events?.click, scope),
+    ]);
+
+    expect(store.readGlobal("count")).toBe(2);
   });
 
   it("records binding recomputation counters", () => {

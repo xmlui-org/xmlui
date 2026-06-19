@@ -1,0 +1,10 @@
+<App var.count="{0}" var.fast="{0}" var.status="{'idle'}">
+  <H1>Async responsive loop</H1>
+  <Text value="{'status: ' + status}" />
+  <Button onClick="status = 'running'; let i = 0; while (i < 9000) { i++ }; count++; status = 'done'">
+    Run slow loop: {count}
+  </Button>
+  <Button onClick="fast++">
+    Fast counter: {fast}
+  </Button>
+</App>

@@ -1,5 +1,8 @@
 import { renderXmluiApp } from "./runtime";
 
+import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
+import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
+import asyncSequenceApp from "./examples/async-sequence/Main.xmlui";
 import componentCounterApp from "./examples/counter-components/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import expressionUpdateComponentsApp from "./examples/expression-update-components/Main.xmlui";
@@ -12,6 +15,9 @@ import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 
 const examples = {
+  asyncDirectives: asyncDirectivesApp,
+  asyncResponsiveLoop: asyncResponsiveLoopApp,
+  asyncSequence: asyncSequenceApp,
   components: componentCounterApp,
   expressions: broaderExpressionsApp,
   expressionComponents: expressionUpdateComponentsApp,

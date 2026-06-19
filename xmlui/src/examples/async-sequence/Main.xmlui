@@ -1,0 +1,7 @@
+<App var.count="{0}" var.status="{'idle'}">
+  <H1>Async handler sequence</H1>
+  <Text value="{'status: ' + status}" />
+  <Button onClick="status = 'waiting'; delay(200); count++; status = 'done'">
+    Run async step: {count}
+  </Button>
+</App>

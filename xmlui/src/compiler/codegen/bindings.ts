@@ -40,6 +40,7 @@ export function emitGeneratedEventHandler(event: ParsedEvent): EmitJsValue {
     ir: event.ir,
     compiledSource: generated.body,
     execute: rawJs(generated.functionSource),
+    options: event.ir.options,
     dependencies: event.dependencies,
     writes: event.writes,
     invalidates: generated.invalidates,

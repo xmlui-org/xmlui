@@ -4,6 +4,7 @@ import type {
   BoundWriteTarget,
   CompiledEventContext,
   CompiledExpressionContext,
+  XmluiHandlerOptions,
   XmluiEventHandlerIr,
   XmluiScriptIr,
 } from "./scriptSemantics";
@@ -29,7 +30,8 @@ export type ParsedEvent = {
   range: SourceRange;
   ir?: XmluiEventHandlerIr;
   compiledSource?: string;
-  execute?: (context: CompiledEventContext) => void;
+  execute?: (context: CompiledEventContext) => Promise<void>;
+  options?: XmluiHandlerOptions;
   dependencies?: BoundDependency[];
   writes?: BoundWriteTarget[];
   invalidates?: Array<{ kind: "local" | "global"; name: string }>;

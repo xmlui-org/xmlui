@@ -91,7 +91,47 @@ export function createEventContext(scope: RuntimeScope): CompiledEventContext {
     ...createExpressionContext(scope),
     writeLocal: (name, value) => writeLocal(scope, name, value),
     writeGlobal: (name, value) => writeGlobal(scope, name, value),
+    delay: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    call: (target, methodName, args) => {
+      const method = (target as Record<string, unknown> | null | undefined)?.[methodName];
+      if (typeof method !== "function") {
+        return undefined;
+      }
+      return method.apply(target, args);
+    },
+    complete: completeValue,
+    yieldIfNeeded: (iteration) => {
+      if (iteration % 100 !== 0) {
+        return undefined;
+      }
+      return new Promise((resolve) => setTimeout(resolve, 0));
+    },
   };
+}
+
+async function completeValue(value: unknown): Promise<unknown> {
+  const settled = await value;
+  if (Array.isArray(settled)) {
+    return Promise.all(settled.map(completeValue));
+  }
+  if (isPlainObject(settled)) {
+    const entries = await Promise.all(
+      Object.entries(settled).map(async ([key, entryValue]) => [
+        key,
+        await completeValue(entryValue),
+      ] as const),
+    );
+    return Object.fromEntries(entries);
+  }
+  return settled;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }
 
 function findLocalOwner(scope: RuntimeScope | undefined, name: string): StateOwnerId | undefined {

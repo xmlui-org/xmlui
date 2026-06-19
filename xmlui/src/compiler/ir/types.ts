@@ -3,6 +3,7 @@ import type {
   BoundDependency,
   BoundWriteTarget,
   XmluiEventHandlerIr,
+  XmluiHandlerOptions,
   XmluiScriptIr,
 } from "../scriptSemantics";
 
@@ -123,6 +124,7 @@ export type XmluiEventIr = {
   ast: ProgramNode;
   ir: XmluiEventHandlerIr;
   compiledSource?: string;
+  options?: XmluiHandlerOptions;
   dependencies: BoundDependency[];
   writes: BoundWriteTarget[];
   invalidates: Array<{ kind: "local" | "global"; name: string }>;

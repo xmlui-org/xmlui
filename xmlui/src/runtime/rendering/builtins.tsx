@@ -26,7 +26,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
         ? context.renderChildren(node.children, scope)
         : String(label ?? "");
     return (
-      <button type="button" onClick={() => runEvent(node.parsed?.events?.click, scope)}>
+      <button type="button" onClick={() => void runEvent(node.parsed?.events?.click, scope)}>
         {content}
       </button>
     );

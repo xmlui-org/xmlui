@@ -156,6 +156,7 @@ function emitRuntimeEvent(event: XmluiEventIr): EmitJsValue {
     generatedName: generatedName("event", event.id),
     compiledSource: generated.body,
     execute: rawJs(generated.functionSource),
+    options: event.ir.options,
     dependencies: event.dependencies,
     writes: event.writes,
     invalidates: generated.invalidates,

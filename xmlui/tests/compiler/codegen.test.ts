@@ -65,7 +65,9 @@ describe("codegen descriptor types", () => {
       dependencies: [],
       writes: [{ kind: "local", name: "count", path: ["count"], operator: "++", span: source.span }],
       invalidates: [{ kind: "local", name: "count" }],
-      execute: (ctx) => ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1),
+      execute: async (ctx) => {
+        ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);
+      },
     };
 
     expect(localBinding.evaluate({ readLocal: () => 1, readGlobal: () => 2 })).toBe(0);
@@ -156,18 +158,18 @@ describe("script function generation", () => {
     })).toBe(11);
   });
 
-  it("generates executable event functions for local, global, and shadowed writes", () => {
+  it("generates executable event functions for local, global, and shadowed writes", async () => {
     const localEvent = eventFrom(`<App var.count="{0}"><Button onClick="count++" /></App>`);
     const localGenerated = generateEventHandlerFunction(localEvent.ir!, localEvent.writes);
     const localState = { count: 1 };
-    runGeneratedEvent(localGenerated.functionSource, { locals: localState, globals: {} });
+    await runGeneratedEvent(localGenerated.functionSource, { locals: localState, globals: {} });
     expect(localState.count).toBe(2);
     expect(localGenerated.invalidates).toEqual([{ kind: "local", name: "count" }]);
 
     const globalEvent = eventFrom(`<App global.count="{0}"><Button onClick="count++" /></App>`);
     const globalGenerated = generateEventHandlerFunction(globalEvent.ir!, globalEvent.writes);
     const globalState = { count: 4 };
-    runGeneratedEvent(globalGenerated.functionSource, { locals: {}, globals: globalState });
+    await runGeneratedEvent(globalGenerated.functionSource, { locals: {}, globals: globalState });
     expect(globalState.count).toBe(5);
     expect(globalGenerated.invalidates).toEqual([{ kind: "global", name: "count" }]);
 
@@ -177,12 +179,12 @@ describe("script function generation", () => {
     const shadowGenerated = generateEventHandlerFunction(shadowEvent.ir!, shadowEvent.writes);
     const shadowLocals = { count: 10 };
     const shadowGlobals = { count: 99 };
-    runGeneratedEvent(shadowGenerated.functionSource, { locals: shadowLocals, globals: shadowGlobals });
+    await runGeneratedEvent(shadowGenerated.functionSource, { locals: shadowLocals, globals: shadowGlobals });
     expect(shadowLocals.count).toBe(11);
     expect(shadowGlobals.count).toBe(99);
   });
 
-  it("generates executable event functions for assignments, locals, branches, and loops", () => {
+  it("generates executable event functions for assignments, locals, branches, and loops", async () => {
     const event = eventFrom(
       `<App var.count="{0}" var.total="{0}" var.label="{''}"><Button onClick="let i = 0; count += 1; while (i < 2) { total += count + i; i++ }; if (total > 4) { label = 'done' }" /></App>`,
     );
@@ -198,7 +200,7 @@ describe("script function generation", () => {
       { kind: "local", name: "total" },
       { kind: "local", name: "label" },
     ]);
-    runGeneratedEvent(generated.functionSource, { locals, globals: {} });
+    await runGeneratedEvent(generated.functionSource, { locals, globals: {} });
     expect(locals).toEqual({ count: 2, total: 5, label: "done" });
   });
 
@@ -235,6 +237,11 @@ describe("script function generation", () => {
       generateEventHandlerFunction({
         kind: "EventHandler",
         span: source.span,
+        options: {
+          directives: [],
+          executionMode: "async",
+          schedulingPolicy: "parallel",
+        },
         body: [
           {
             kind: "ExpressionStatement",
@@ -371,9 +378,9 @@ function runGeneratedExpression(
 function runGeneratedEvent(
   functionSource: string,
   options: { locals: Record<string, unknown>; globals: Record<string, unknown> },
-): void {
-  const fn = evaluateGeneratedFunction(functionSource) as (ctx: ReturnType<typeof fakeContext>) => void;
-  fn(fakeContext(options));
+): Promise<void> {
+  const fn = evaluateGeneratedFunction(functionSource) as (ctx: ReturnType<typeof fakeContext>) => Promise<void>;
+  return fn(fakeContext(options));
 }
 
 function fakeContext({

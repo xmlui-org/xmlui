@@ -40,7 +40,7 @@ export function generateEventHandlerFunction(
   const body = ir.body.map((statement) => emitEventStatement(statement)).join("\n");
   return {
     body,
-    functionSource: emitFunctionExpression(body),
+    functionSource: emitFunctionExpression(body, "ctx", { async: true }),
     invalidates: dedupeInvalidates(writes
       .filter((write): write is BoundWriteTarget & { kind: "local" | "global" } =>
         write.kind === "local" || write.kind === "global",
@@ -124,15 +124,34 @@ function emitEventExpression(expression: XmluiScriptIr): string {
     case "PostfixUpdate":
       return emitUpdateExpression(expression);
     default:
-      return emitExpression(expression);
+      return emitAsyncExpression(expression);
   }
+}
+
+function emitAsyncExpression(expression: XmluiScriptIr): string {
+  if (expression.kind === "CallExpression") {
+    return emitAsyncCallExpression(expression);
+  }
+  return emitExpression(expression);
+}
+
+function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" }>): string {
+  const args = ir.args.map(emitAsyncExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "delay") {
+    return `await ((ctx.delay ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(${args}))`;
+  }
+  if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
+    throw new Error("Cannot generate unsupported XMLUI event call target.");
+  }
+  const objectSource = emitAsyncExpression(ir.callee.object);
+  return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ((ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args}])))`;
 }
 
 function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string {
   const declarations = statement.declarations
     .map((declaration) =>
       declaration.init
-        ? `${declaration.name} = ${emitExpression(declaration.init)}`
+        ? `${declaration.name} = ${emitAsyncExpression(declaration.init)}`
         : declaration.name,
     )
     .join(", ");
@@ -146,11 +165,11 @@ function emitBlockStatement(statement: XmluiBlockStatementIr): string {
 function emitIfStatement(statement: XmluiIfStatementIr): string {
   const consequent = emitStatementBlock(statement.consequent);
   const alternate = statement.alternate ? ` else ${emitStatementBlock(statement.alternate)}` : "";
-  return `if (${emitExpression(statement.test)}) ${consequent}${alternate}`;
+  return `if (${emitAsyncExpression(statement.test)}) ${consequent}${alternate}`;
 }
 
 function emitWhileStatement(statement: XmluiWhileStatementIr): string {
-  return `{\nlet __xmluiLoopGuard = 0;\nwhile (${emitExpression(statement.test)}) {\nif (++__xmluiLoopGuard > 10000) throw new Error("XMLUI handler loop guard exceeded.");\n${emitEventStatement(statement.body)}\n}\n}`;
+  return `{\nlet __xmluiLoopGuard = 0;\nwhile (${emitAsyncExpression(statement.test)}) {\nif (++__xmluiLoopGuard > 10000) throw new Error("XMLUI handler loop guard exceeded.");\nawait ((ctx.yieldIfNeeded ?? ((iteration) => iteration % 100 === 0 ? new Promise((resolve) => setTimeout(resolve, 0)) : undefined))(__xmluiLoopGuard));\n${emitEventStatement(statement.body)}\n}\n}`;
 }
 
 function emitStatementBlock(statement: XmluiHandlerStatementIr): string {
@@ -159,7 +178,7 @@ function emitStatementBlock(statement: XmluiHandlerStatementIr): string {
 
 function emitAssignmentExpression(expression: XmluiAssignmentExpressionIr): string {
   const target = expression.target;
-  const right = emitExpression(expression.right);
+  const right = emitAsyncExpression(expression.right);
   if (target.kind === "handlerLocal") {
     if (expression.operator === "=") {
       return `${target.name} = ${right}`;
