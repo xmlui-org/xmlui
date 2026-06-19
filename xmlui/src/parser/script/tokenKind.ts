@@ -12,6 +12,12 @@ export const ScriptTokenKind = {
   FalseKeyword: "FalseKeyword",
   NullKeyword: "NullKeyword",
   UndefinedKeyword: "UndefinedKeyword",
+  LetKeyword: "LetKeyword",
+  ConstKeyword: "ConstKeyword",
+  IfKeyword: "IfKeyword",
+  ElseKeyword: "ElseKeyword",
+  WhileKeyword: "WhileKeyword",
+  ForKeyword: "ForKeyword",
   Dollar: "Dollar",
   Dot: "Dot",
   OpenParen: "OpenParen",
@@ -45,6 +51,12 @@ export const ScriptTokenKind = {
   Slash: "Slash",
   Percent: "Percent",
   PlusPlus: "PlusPlus",
+  MinusMinus: "MinusMinus",
+  PlusEqual: "PlusEqual",
+  MinusEqual: "MinusEqual",
+  StarEqual: "StarEqual",
+  SlashEqual: "SlashEqual",
+  PercentEqual: "PercentEqual",
 } as const;
 
 export type ScriptTokenKind = (typeof ScriptTokenKind)[keyof typeof ScriptTokenKind];

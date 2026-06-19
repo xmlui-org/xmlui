@@ -6,16 +6,21 @@ import {
   parseScriptExpression,
   type AssignmentExpressionNode,
   type BinaryExpressionNode,
+  type BlockStatementNode,
   type CallExpressionNode,
   type ConditionalExpressionNode,
+  type IfStatementNode,
   type IdentifierNode,
   type IndexExpressionNode,
   type MemberExpressionNode,
   type ObjectExpressionNode,
   type PostfixExpressionNode,
+  type PrefixExpressionNode,
   type ProgramNode,
   type ScriptNode,
   type UnaryExpressionNode,
+  type VariableDeclarationNode,
+  type WhileStatementNode,
 } from "../../../src/parser";
 
 describe("ScriptParser expression mode", () => {
@@ -321,6 +326,49 @@ describe("ScriptParser event-handler mode", () => {
     expect(secondExpression(result.node).kind).toBe("CallExpression");
   });
 
+  it("parses assignment, declaration, conditional, and loop statements", () => {
+    const result = parseScriptEventHandler(
+      "let next = count + 1; count = next; if (count > 1) { label = 'many' } else { label = 'one' }; while (next < 3) { next++ }",
+    );
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.node.body.map((statement) => statement.kind)).toEqual([
+      "VariableDeclaration",
+      "ExpressionStatement",
+      "IfStatement",
+      "WhileStatement",
+    ]);
+    const declaration = result.node.body[0] as VariableDeclarationNode;
+    expect(declaration).toMatchObject({
+      declarationKind: "let",
+      declarations: [
+        expect.objectContaining({
+          id: expect.objectContaining({ name: "next" }),
+          init: expect.objectContaining({ kind: "BinaryExpression" }),
+        }),
+      ],
+    });
+    expect(firstExpression(result.node, 1)).toMatchObject({
+      kind: "AssignmentExpression",
+      operator: "=",
+    });
+    const ifStatement = result.node.body[2] as IfStatementNode;
+    expect(ifStatement.consequent.kind).toBe("BlockStatement");
+    expect((ifStatement.consequent as BlockStatementNode).body[0].kind).toBe("ExpressionStatement");
+    expect(ifStatement.alternate?.kind).toBe("BlockStatement");
+    const loop = result.node.body[3] as WhileStatementNode;
+    expect(loop.body.kind).toBe("BlockStatement");
+  });
+
+  it("parses prefix and postfix decrement/update expressions", () => {
+    const result = parseScriptEventHandler("++count; count--; --other");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(firstExpression(result.node).kind).toBe("PrefixExpression");
+    expect((firstExpression(result.node) as PrefixExpressionNode).operator).toBe("++");
+    expect((secondExpression(result.node) as PostfixExpressionNode).operator).toBe("--");
+  });
+
   it("maps malformed event-handler diagnostics to the containing attribute value", () => {
     const result = parseScriptEventHandler("count++ save(count)", {
       originSpan: {
@@ -343,8 +391,8 @@ describe("ScriptParser event-handler mode", () => {
   });
 });
 
-function firstExpression(program: ProgramNode): ScriptNode {
-  return program.body[0].children![0];
+function firstExpression(program: ProgramNode, index = 0): ScriptNode {
+  return program.body[index].children![0];
 }
 
 function secondExpression(program: ProgramNode): ScriptNode {

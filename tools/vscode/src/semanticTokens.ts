@@ -187,6 +187,20 @@ function pushScriptAstTokens(
       pushScriptAstTokens(semanticTokens, source, node.object, node);
       pushToken(semanticTokens, source, node.property.span, "xmluiMember");
       return;
+    case "AssignmentExpression":
+      if (node.left.kind === "Identifier" || node.left.kind === "MemberExpression") {
+        pushWriteTargetToken(semanticTokens, source, node.left);
+      } else {
+        pushScriptAstTokens(semanticTokens, source, node.left, node);
+      }
+      pushScriptAstTokens(semanticTokens, source, node.right, node);
+      return;
+    case "PrefixExpression":
+      if (node.argument.kind === "Identifier" || node.argument.kind === "MemberExpression") {
+        pushWriteTargetToken(semanticTokens, source, node.argument);
+        return;
+      }
+      break;
     case "PostfixExpression":
       if (node.argument.kind === "Identifier" || node.argument.kind === "MemberExpression") {
         pushWriteTargetToken(semanticTokens, source, node.argument);

@@ -249,9 +249,14 @@ describe("XMLUI expression and event semantic IR", () => {
     const component = document.root.children[0] as XmluiElement;
     const componentScope = createChildXmluiScope(appScope, component);
     const lowered = lowerScriptEventHandler(parseScriptEventHandler("count++").node, componentScope);
+    const statement = lowered.ir.body[0];
 
     expect(lowered.diagnostics).toEqual([]);
-    expect(lowered.ir.body[0].expression).toMatchObject({
+    expect(statement.kind).toBe("ExpressionStatement");
+    if (statement.kind !== "ExpressionStatement") {
+      throw new Error("Expected expression statement.");
+    }
+    expect(statement.expression).toMatchObject({
       kind: "PostfixUpdate",
       target: {
         kind: "global",
@@ -442,6 +447,131 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     compiled.execute(context);
     expect(context.locals.count).toBe(11);
     expect(context.globals.count).toBe(100);
+  });
+
+  it("compiles assignments and compound assignments into explicit writes", () => {
+    const document = parseXmlui(`<App var.count="{0}" var.total="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("count = count + 1; total += count * 2").node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { count: 1, total: 4 } });
+
+    expect(compiled.source).toContain(`ctx.writeLocal("count", (ctx.readLocal("count") + 1));`);
+    expect(compiled.source).toContain(`ctx.writeLocal("total", (ctx.readLocal("total") + (ctx.readLocal("count") * 2)));`);
+    expect(compiled.invalidates).toEqual([
+      { kind: "local", name: "count" },
+      { kind: "local", name: "total" },
+    ]);
+    compiled.execute(context);
+    expect(context.locals).toMatchObject({ count: 2, total: 8 });
+  });
+
+  it("compiles handler-local variables, branches, and loops", () => {
+    const document = parseXmlui(`<App var.count="{0}" var.total="{0}" var.label="{''}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler(
+        "let i = 0; while (i < 3) { total += count + i; i++ }; if (total > 5) { label = 'high' } else { label = 'low' }",
+      ).node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { count: 1, total: 0, label: "" } });
+
+    expect(lowered.diagnostics).toEqual([]);
+    expect(compiled.source).toContain("let i = 0;");
+    expect(compiled.source).toContain("while (");
+    expect(compiled.source).toContain("XMLUI handler loop guard exceeded");
+    expect(compiled.invalidates).toEqual([
+      { kind: "local", name: "total" },
+      { kind: "local", name: "label" },
+    ]);
+    compiled.execute(context);
+    expect(context.locals).toMatchObject({ count: 1, total: 6, label: "high" });
+  });
+
+  it("compiles prefix and decrement updates", () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler("++count; count--; --count").node, scope);
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { count: 2 } });
+
+    compiled.execute(context);
+    expect(context.locals.count).toBe(1);
+  });
+
+  it("keeps handler-local block shadowing separate during IR execution", () => {
+    const document = parseXmlui(`<App var.total="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("let count = 10; { let count = 1; count++ }; total = count").node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { total: 0 } });
+
+    expect(lowered.diagnostics).toEqual([]);
+    compiled.execute(context);
+    expect(context.locals.total).toBe(10);
+  });
+
+  it("uses the expression call allowlist in handlers", () => {
+    const document = parseXmlui(`<App var.items="{0}" var.label="{''}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("label = items.join(', ')").node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { items: ["One", "Two"], label: "" } });
+
+    expect(lowered.diagnostics).toEqual([]);
+    compiled.execute(context);
+    expect(context.locals.label).toBe("One, Two");
+  });
+
+  it("rejects unsupported handler calls during semantic analysis", () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler("save(count)").node, scope);
+
+    expect(lowered.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XS204",
+          message: "Unsupported XMLUI expression call target.",
+        }),
+      ]),
+    );
+  });
+
+  it("throws when a compiled handler loop exceeds the guard limit", () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler("while (true) { count++ }").node, scope);
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { count: 0 } });
+
+    expect(() => compiled.execute(context)).toThrow("XMLUI handler loop guard exceeded.");
+  });
+
+  it("rejects writes to const handler-local variables", () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler("const next = count + 1; next++").node, scope);
+
+    expect(lowered.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XS202",
+          message: "Cannot write to read-only XMLUI script target 'next'.",
+        }),
+      ]),
+    );
   });
 
   it("rejects invalid event write targets during compilation", () => {

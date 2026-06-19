@@ -1,0 +1,7 @@
+<App var.count="{0}" var.label="{'idle'}">
+  <H1>Conditional handler updates</H1>
+  <Text value="{label}" />
+  <Button onClick="count += 1; if (count > 1) { label = 'many' } else { label = 'one' }">
+    Count: {count}
+  </Button>
+</App>

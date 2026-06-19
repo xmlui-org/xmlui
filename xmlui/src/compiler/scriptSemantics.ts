@@ -37,10 +37,10 @@ export type BoundDependency = {
 };
 
 export type BoundWriteTarget = {
-  kind: "local" | "global" | "unresolved" | "invalid";
+  kind: "local" | "global" | "handlerLocal" | "unresolved" | "invalid";
   name: string;
   path: string[];
-  operator: "++";
+  operator: "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=";
   span: SourceSpan;
   binding?: XmluiBinding;
 };
@@ -66,8 +66,14 @@ export type XmluiScriptIr =
   | XmluiObjectExpressionIr
   | XmluiCallExpressionIr
   | XmluiArrowFunctionExpressionIr
+  | XmluiAssignmentExpressionIr
+  | XmluiPrefixUpdateIr
   | XmluiPostfixUpdateIr
   | XmluiExpressionStatementIr
+  | XmluiVariableDeclarationIr
+  | XmluiBlockStatementIr
+  | XmluiIfStatementIr
+  | XmluiWhileStatementIr
   | XmluiEventHandlerIr
   | XmluiUnsupportedIr;
 
@@ -163,9 +169,22 @@ export type XmluiArrowFunctionExpressionIr = XmluiScriptIrBase & {
   body: XmluiScriptIr;
 };
 
+export type XmluiAssignmentExpressionIr = XmluiScriptIrBase & {
+  kind: "AssignmentExpression";
+  operator: "=" | "+=" | "-=" | "*=" | "/=" | "%=";
+  target: BoundWriteTarget;
+  right: XmluiScriptIr;
+};
+
+export type XmluiPrefixUpdateIr = XmluiScriptIrBase & {
+  kind: "PrefixUpdate";
+  operator: "++" | "--";
+  target: BoundWriteTarget;
+};
+
 export type XmluiPostfixUpdateIr = XmluiScriptIrBase & {
   kind: "PostfixUpdate";
-  operator: "++";
+  operator: "++" | "--";
   target: BoundWriteTarget;
 };
 
@@ -174,9 +193,44 @@ export type XmluiExpressionStatementIr = XmluiScriptIrBase & {
   expression: XmluiScriptIr;
 };
 
+export type XmluiVariableDeclarationIr = XmluiScriptIrBase & {
+  kind: "VariableDeclaration";
+  declarationKind: "let" | "const";
+  declarations: Array<{
+    name: string;
+    init?: XmluiScriptIr;
+    span: SourceSpan;
+  }>;
+};
+
+export type XmluiBlockStatementIr = XmluiScriptIrBase & {
+  kind: "BlockStatement";
+  body: XmluiHandlerStatementIr[];
+};
+
+export type XmluiIfStatementIr = XmluiScriptIrBase & {
+  kind: "IfStatement";
+  test: XmluiScriptIr;
+  consequent: XmluiHandlerStatementIr;
+  alternate?: XmluiHandlerStatementIr;
+};
+
+export type XmluiWhileStatementIr = XmluiScriptIrBase & {
+  kind: "WhileStatement";
+  test: XmluiScriptIr;
+  body: XmluiHandlerStatementIr;
+};
+
+export type XmluiHandlerStatementIr =
+  | XmluiExpressionStatementIr
+  | XmluiVariableDeclarationIr
+  | XmluiBlockStatementIr
+  | XmluiIfStatementIr
+  | XmluiWhileStatementIr;
+
 export type XmluiEventHandlerIr = XmluiScriptIrBase & {
   kind: "EventHandler";
-  body: XmluiExpressionStatementIr[];
+  body: XmluiHandlerStatementIr[];
 };
 
 export type XmluiUnsupportedIr = XmluiScriptIrBase & {
@@ -299,7 +353,7 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
     writes: [],
     diagnostics: [],
   };
-  const lexicalScopes: Array<Set<string>> = [];
+  const lexicalScopes: Array<Map<string, { mutable: boolean; span: SourceSpan }>> = [new Map()];
 
   visit(node);
   result.dependencies = dedupeDependencies(result.dependencies);
@@ -308,6 +362,39 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
 
   function visit(current: ScriptNode): void {
     switch (current.kind) {
+      case "BlockStatement":
+        lexicalScopes.push(new Map());
+        current.body.forEach(visit);
+        lexicalScopes.pop();
+        return;
+      case "IfStatement":
+        visit(current.test);
+        visit(current.consequent);
+        if (current.alternate) {
+          visit(current.alternate);
+        }
+        return;
+      case "WhileStatement":
+        visit(current.test);
+        visit(current.body);
+        return;
+      case "VariableDeclaration":
+        for (const declaration of current.declarations) {
+          if (declaration.init) {
+            visit(declaration.init);
+          }
+          declareLexical(
+            declaration.id.name,
+            current.declarationKind === "let",
+            declaration.id.span,
+          );
+        }
+        return;
+      case "VariableDeclarator":
+        if (current.init) {
+          visit(current.init);
+        }
+        return;
       case "Identifier":
         bindIdentifierRead(current.name, current.span);
         return;
@@ -336,16 +423,26 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         visit(current.consequent);
         visit(current.alternate);
         return;
-      case "BinaryExpression":
       case "AssignmentExpression":
+        result.writes.push(bindWriteTarget(current.left, current.operator, scope, result, findLexicalBinding));
+        if (current.operator !== "=") {
+          visit(current.left);
+        }
+        visit(current.right);
+        return;
+      case "BinaryExpression":
         visit(current.left);
         visit(current.right);
         return;
       case "UnaryExpression":
         visit(current.argument);
         return;
+      case "PrefixExpression":
+        result.writes.push(bindWriteTarget(current.argument, current.operator, scope, result, findLexicalBinding));
+        visit(current.argument);
+        return;
       case "PostfixExpression":
-        result.writes.push(bindPostfixWrite(current, scope, result));
+        result.writes.push(bindWriteTarget(current.argument, current.operator, scope, result, findLexicalBinding));
         visit(current.argument);
         return;
       case "CallExpression":
@@ -354,7 +451,10 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         validateCallExpression(current);
         return;
       case "ArrowFunctionExpression":
-        lexicalScopes.push(new Set(current.params.map((param) => param.name)));
+        lexicalScopes.push(new Map(current.params.map((param) => [param.name, {
+          mutable: false,
+          span: param.span,
+        }])));
         visit(current.body);
         lexicalScopes.pop();
         return;
@@ -383,7 +483,7 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
     const path = dependencyPathFromNode(current);
     if (path) {
       const [rootName] = path;
-      if (isLexicalName(rootName)) {
+      if (findLexicalBinding(rootName)) {
         return;
       }
       const binding = resolveXmluiIdentifier(scope, rootName);
@@ -408,7 +508,7 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
     if (!name) {
       return;
     }
-    if (isLexicalName(name)) {
+    if (findLexicalBinding(name)) {
       return;
     }
     const binding = resolveXmluiIdentifier(scope, name);
@@ -428,8 +528,21 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
     });
   }
 
-  function isLexicalName(name: string): boolean {
-    return lexicalScopes.some((names) => names.has(name));
+  function findLexicalBinding(name: string): { mutable: boolean; span: SourceSpan } | undefined {
+    for (let index = lexicalScopes.length - 1; index >= 0; index--) {
+      const binding = lexicalScopes[index].get(name);
+      if (binding) {
+        return binding;
+      }
+    }
+    return undefined;
+  }
+
+  function declareLexical(name: string, mutable: boolean, span: SourceSpan): void {
+    if (!name) {
+      return;
+    }
+    lexicalScopes.at(-1)?.set(name, { mutable, span });
   }
 
   function pushUnresolved(name: string, span: SourceSpan): void {
@@ -472,8 +585,8 @@ export function lowerScriptEventHandler(
   const bound = bindScriptExpression(node, scope);
   const body =
     node.kind === "Program"
-      ? node.body.map((statement) => lowerExpressionStatement(statement, bound))
-      : [lowerExpressionStatement(node, bound)];
+      ? node.body.map((statement) => lowerHandlerStatement(statement, bound))
+      : [lowerHandlerStatement(node, bound)];
 
   return {
     ...bound,
@@ -501,31 +614,58 @@ export function compileXmluiEventHandler(
 ): CompiledEventHandler {
   return {
     kind: "eventHandler",
-    source: ir.body.map((statement) => `${emitEventStatement(statement)};`).join("\n"),
+    source: ir.body.map((statement) => emitEventStatement(statement)).join("\n"),
     dependencies,
     writes,
-    invalidates: writes
+    invalidates: dedupeInvalidates(writes
       .filter((write): write is BoundWriteTarget & { kind: "local" | "global" } =>
         write.kind === "local" || write.kind === "global",
       )
-      .map((write) => ({ kind: write.kind, name: write.name })),
+      .map((write) => ({ kind: write.kind, name: write.name }))),
     execute: (context) => {
+      const lexical: Record<string, unknown> = {};
       for (const statement of ir.body) {
-        executeEventStatement(statement, context);
+        executeEventStatement(statement, context, lexical);
       }
     },
   };
 }
 
-function bindPostfixWrite(
-  node: Extract<ScriptNode, { kind: "PostfixExpression" }>,
+function bindWriteTarget(
+  target: ScriptNode,
+  operator: string,
   scope: XmluiScope,
   result: BoundScriptResult,
+  findLexicalBinding: (name: string) => { mutable: boolean; span: SourceSpan } | undefined,
 ): BoundWriteTarget {
-  const target = node.argument;
-
   if (target.kind === "Identifier") {
-    return bindIdentifierWrite(target.name, target.span, node.operator, scope, result);
+    const lexical = findLexicalBinding(target.name);
+    if (lexical) {
+      if (!lexical.mutable) {
+        result.diagnostics.push(
+          createErrorDiagnostic(
+            "XS202",
+            `Cannot write to read-only XMLUI script target '${target.name}'.`,
+            target.span,
+          ),
+        );
+        return {
+          kind: "invalid",
+          name: target.name,
+          path: [target.name],
+          operator: operator as BoundWriteTarget["operator"],
+          span: target.span,
+        };
+      }
+      return {
+        kind: "handlerLocal",
+        name: target.name,
+        path: [target.name],
+        operator: operator as BoundWriteTarget["operator"],
+        span: target.span,
+      };
+    }
+    return bindIdentifierWrite(target.name, target.span, operator, scope, result);
   }
 
   if (
@@ -537,7 +677,7 @@ function bindPostfixWrite(
       kind: "invalid",
       name: target.property.name,
       path: [target.property.name],
-      operator: node.operator as "++",
+      operator: operator as BoundWriteTarget["operator"],
       span: target.span,
     };
     result.diagnostics.push(
@@ -557,7 +697,7 @@ function bindPostfixWrite(
     kind: "invalid",
     name: "",
     path: [],
-    operator: node.operator as "++",
+    operator: operator as BoundWriteTarget["operator"],
     span: target.span,
   };
 }
@@ -669,18 +809,33 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
         params: node.params.map((param) => param.name),
         body: lowerNode(node.body, bound),
       };
+    case "AssignmentExpression":
+      if (isSupportedAssignmentOperator(node.operator)) {
+        return {
+          kind: "AssignmentExpression",
+          span: node.span,
+          operator: node.operator,
+          target: findWrite(bound, node.left.span) ?? invalidWrite(node.left.span),
+          right: lowerNode(node.right, bound),
+        };
+      }
+      return unsupported(node);
+    case "PrefixExpression":
+      if (node.operator === "++" || node.operator === "--") {
+        return {
+          kind: "PrefixUpdate",
+          span: node.span,
+          operator: node.operator,
+          target: findWrite(bound, node.argument.span) ?? invalidWrite(node.argument.span),
+        };
+      }
+      return unsupported(node);
     case "PostfixExpression":
       return {
         kind: "PostfixUpdate",
         span: node.span,
-        operator: "++",
-        target: findWrite(bound, node.argument.span) ?? {
-          kind: "invalid",
-          name: "",
-          path: [],
-          operator: "++",
-          span: node.argument.span,
-        },
+        operator: node.operator === "--" ? "--" : "++",
+        target: findWrite(bound, node.argument.span) ?? invalidWrite(node.argument.span),
       };
     case "ExpressionStatement":
       return lowerExpressionStatement(node, bound);
@@ -688,10 +843,52 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       return {
         kind: "EventHandler",
         span: node.span,
-        body: node.body.map((statement) => lowerExpressionStatement(statement, bound)),
+        body: node.body.map((statement) => lowerHandlerStatement(statement, bound)),
       };
     default:
       return unsupported(node);
+  }
+}
+
+function lowerHandlerStatement(
+  node: ScriptNode,
+  bound: BoundScriptResult,
+): XmluiHandlerStatementIr {
+  switch (node.kind) {
+    case "BlockStatement":
+      return {
+        kind: "BlockStatement",
+        span: node.span,
+        body: node.body.map((statement) => lowerHandlerStatement(statement, bound)),
+      };
+    case "IfStatement":
+      return {
+        kind: "IfStatement",
+        span: node.span,
+        test: lowerNode(node.test, bound),
+        consequent: lowerHandlerStatement(node.consequent, bound),
+        ...(node.alternate ? { alternate: lowerHandlerStatement(node.alternate, bound) } : {}),
+      };
+    case "WhileStatement":
+      return {
+        kind: "WhileStatement",
+        span: node.span,
+        test: lowerNode(node.test, bound),
+        body: lowerHandlerStatement(node.body, bound),
+      };
+    case "VariableDeclaration":
+      return {
+        kind: "VariableDeclaration",
+        span: node.span,
+        declarationKind: node.declarationKind,
+        declarations: node.declarations.map((declaration) => ({
+          name: declaration.id.name,
+          span: declaration.id.span,
+          ...(declaration.init ? { init: lowerNode(declaration.init, bound) } : {}),
+        })),
+      };
+    default:
+      return lowerExpressionStatement(node, bound);
   }
 }
 
@@ -719,6 +916,16 @@ function unsupported(node: ScriptNode): XmluiUnsupportedIr {
     kind: "Unsupported",
     span: node.span,
     sourceKind: node.kind,
+  };
+}
+
+function invalidWrite(span: SourceSpan): BoundWriteTarget {
+  return {
+    kind: "invalid",
+    name: "",
+    path: [],
+    operator: "=",
+    span,
   };
 }
 
@@ -759,6 +966,12 @@ function isSupportedBinaryOperator(operator: string): operator is XmluiBinaryExp
     "===",
     "!==",
   ].includes(operator);
+}
+
+function isSupportedAssignmentOperator(
+  operator: string,
+): operator is XmluiAssignmentExpressionIr["operator"] {
+  return ["=", "+=", "-=", "*=", "/=", "%="].includes(operator);
 }
 
 function isAllowedCall(callee: ScriptNode): boolean {
@@ -811,7 +1024,7 @@ function bindIdentifierWrite(
       kind: "unresolved",
       name,
       path: [name],
-      operator: operator as "++",
+      operator: operator as BoundWriteTarget["operator"],
       span,
     };
   }
@@ -828,7 +1041,7 @@ function bindIdentifierWrite(
       kind: "invalid",
       name,
       path: [name],
-      operator: operator as "++",
+      operator: operator as BoundWriteTarget["operator"],
       span,
       binding,
     };
@@ -838,7 +1051,7 @@ function bindIdentifierWrite(
     kind: binding.kind,
     name,
     path: [name],
-    operator: operator as "++",
+    operator: operator as BoundWriteTarget["operator"],
     span,
     binding,
   };
@@ -878,6 +1091,20 @@ function dedupeWrites(writes: BoundWriteTarget[]): BoundWriteTarget[] {
   const seen = new Set<string>();
   return writes.filter((write) => {
     const key = `${write.kind}:${write.path.join(".")}:${write.operator}:${write.span.start}:${write.span.end}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
+
+function dedupeInvalidates(
+  invalidates: Array<{ kind: "local" | "global"; name: string }>,
+): Array<{ kind: "local" | "global"; name: string }> {
+  const seen = new Set<string>();
+  return invalidates.filter((invalidate) => {
+    const key = `${invalidate.kind}:${invalidate.name}`;
     if (seen.has(key)) {
       return false;
     }
@@ -1002,18 +1229,107 @@ function emitCallExpression(ir: XmluiCallExpressionIr): string {
   return `(${objectSource})?.[${JSON.stringify(ir.callee.member)}]?.(${args})`;
 }
 
-function emitEventStatement(statement: XmluiExpressionStatementIr): string {
-  const expression = statement.expression;
-  if (expression.kind !== "PostfixUpdate") {
-    return emitExpression(expression);
+function emitEventStatement(statement: XmluiHandlerStatementIr): string {
+  switch (statement.kind) {
+    case "ExpressionStatement":
+      return `${emitEventExpression(statement.expression)};`;
+    case "VariableDeclaration":
+      return emitVariableDeclaration(statement);
+    case "BlockStatement":
+      return emitBlockStatement(statement);
+    case "IfStatement":
+      return emitIfStatement(statement);
+    case "WhileStatement":
+      return emitWhileStatement(statement);
   }
+}
+
+function emitEventExpression(expression: XmluiScriptIr): string {
+  switch (expression.kind) {
+    case "AssignmentExpression":
+      return emitAssignmentExpression(expression);
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+      return emitUpdateExpression(expression);
+    default:
+      return emitExpression(expression);
+  }
+}
+
+function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string {
+  const declarations = statement.declarations
+    .map((declaration) =>
+      declaration.init
+        ? `${declaration.name} = ${emitExpression(declaration.init)}`
+        : declaration.name,
+    )
+    .join(", ");
+  return `${statement.declarationKind} ${declarations};`;
+}
+
+function emitBlockStatement(statement: XmluiBlockStatementIr): string {
+  return `{\n${statement.body.map((child) => emitEventStatement(child)).join("\n")}\n}`;
+}
+
+function emitIfStatement(statement: XmluiIfStatementIr): string {
+  const consequent = emitStatementBlock(statement.consequent);
+  const alternate = statement.alternate ? ` else ${emitStatementBlock(statement.alternate)}` : "";
+  return `if (${emitExpression(statement.test)}) ${consequent}${alternate}`;
+}
+
+function emitWhileStatement(statement: XmluiWhileStatementIr): string {
+  return `{\nlet __xmluiLoopGuard = 0;\nwhile (${emitExpression(statement.test)}) {\nif (++__xmluiLoopGuard > 10000) throw new Error("XMLUI handler loop guard exceeded.");\n${emitEventStatement(statement.body)}\n}\n}`;
+}
+
+function emitStatementBlock(statement: XmluiHandlerStatementIr): string {
+  return statement.kind === "BlockStatement" ? emitBlockStatement(statement) : `{\n${emitEventStatement(statement)}\n}`;
+}
+
+function emitAssignmentExpression(expression: XmluiAssignmentExpressionIr): string {
   const target = expression.target;
+  const right = emitExpression(expression.right);
+  if (target.kind === "handlerLocal") {
+    if (expression.operator === "=") {
+      return `${target.name} = ${right}`;
+    }
+    return `${target.name} ${expression.operator} ${right}`;
+  }
+  const next = expression.operator === "="
+    ? right
+    : `(${emitTargetRead(target)} ${compoundOperator(expression.operator)} ${right})`;
+  return emitTargetWrite(target, next);
+}
+
+function emitUpdateExpression(expression: XmluiPrefixUpdateIr | XmluiPostfixUpdateIr): string {
+  const delta = expression.operator === "--" ? "- 1" : "+ 1";
+  const target = expression.target;
+  if (target.kind === "handlerLocal") {
+    return `${expression.kind === "PrefixUpdate" ? expression.operator : ""}${target.name}${expression.kind === "PostfixUpdate" ? expression.operator : ""}`;
+  }
+  return emitTargetWrite(target, `Number(${emitTargetRead(target)}) ${delta}`);
+}
+
+function emitTargetRead(target: BoundWriteTarget): string {
+  if (target.kind === "handlerLocal") {
+    return target.name;
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
   const read = target.kind === "local" ? "readLocal" : "readGlobal";
+  return `ctx.${read}(${JSON.stringify(target.name)})`;
+}
+
+function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
+  if (target.kind !== "local" && target.kind !== "global") {
+    throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
+  }
   const write = target.kind === "local" ? "writeLocal" : "writeGlobal";
-  return `ctx.${write}(${JSON.stringify(target.name)}, Number(ctx.${read}(${JSON.stringify(target.name)})) + 1)`;
+  return `ctx.${write}(${JSON.stringify(target.name)}, ${valueSource})`;
+}
+
+function compoundOperator(operator: XmluiAssignmentExpressionIr["operator"]): string {
+  return operator === "=" ? "=" : operator.slice(0, -1);
 }
 
 function emitRead(dependency: BoundDependency | undefined, name: string): string {
@@ -1155,25 +1471,156 @@ function executeCallExpression(
 }
 
 function executeEventStatement(
-  statement: XmluiExpressionStatementIr,
+  statement: XmluiHandlerStatementIr,
   context: CompiledEventContext,
+  lexical: Record<string, unknown>,
 ): void {
-  const expression = statement.expression;
-  if (expression.kind !== "PostfixUpdate") {
-    executeExpressionIr(expression, context);
+  switch (statement.kind) {
+    case "ExpressionStatement":
+      executeEventExpression(statement.expression, context, lexical);
+      return;
+    case "VariableDeclaration":
+      for (const declaration of statement.declarations) {
+        lexical[declaration.name] = declaration.init
+          ? executeExpressionIr(declaration.init, context, lexical)
+          : undefined;
+      }
+      return;
+    case "BlockStatement":
+      const blockLexical = Object.create(lexical) as Record<string, unknown>;
+      for (const child of statement.body) {
+        executeEventStatement(child, context, blockLexical);
+      }
+      return;
+    case "IfStatement":
+      if (executeExpressionIr(statement.test, context, lexical)) {
+        executeEventStatement(statement.consequent, context, lexical);
+      } else if (statement.alternate) {
+        executeEventStatement(statement.alternate, context, lexical);
+      }
+      return;
+    case "WhileStatement": {
+      let loopGuard = 0;
+      while (executeExpressionIr(statement.test, context, lexical)) {
+        if (++loopGuard > 10000) {
+          throw new Error("XMLUI handler loop guard exceeded.");
+        }
+        executeEventStatement(statement.body, context, lexical);
+      }
+      return;
+    }
+  }
+}
+
+function executeEventExpression(
+  expression: XmluiScriptIr,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): unknown {
+  switch (expression.kind) {
+    case "AssignmentExpression":
+      return executeAssignmentExpression(expression, context, lexical);
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+      return executeUpdateExpression(expression, context, lexical);
+    default:
+      return executeExpressionIr(expression, context, lexical);
+  }
+}
+
+function executeAssignmentExpression(
+  expression: XmluiAssignmentExpressionIr,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): unknown {
+  const target = expression.target;
+  const right = executeExpressionIr(expression.right, context, lexical);
+  const next = expression.operator === "="
+    ? right
+    : executeCompoundAssignment(expression.operator, executeTargetRead(target, context, lexical), right);
+  executeTargetWrite(target, next, context, lexical);
+  return next;
+}
+
+function executeUpdateExpression(
+  expression: XmluiPrefixUpdateIr | XmluiPostfixUpdateIr,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): unknown {
+  const current = Number(executeTargetRead(expression.target, context, lexical));
+  const next = expression.operator === "--" ? current - 1 : current + 1;
+  executeTargetWrite(expression.target, next, context, lexical);
+  return expression.kind === "PrefixUpdate" ? next : current;
+}
+
+function executeTargetRead(
+  target: BoundWriteTarget,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): unknown {
+  if (target.kind === "handlerLocal") {
+    return lexical[target.name];
+  }
+  if (target.kind === "local") {
+    return context.readLocal(target.name);
+  }
+  if (target.kind === "global") {
+    return context.readGlobal(target.name);
+  }
+  throw new Error(`Cannot execute invalid XMLUI event write target '${target.name}'.`);
+}
+
+function executeTargetWrite(
+  target: BoundWriteTarget,
+  value: unknown,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): void {
+  if (target.kind === "handlerLocal") {
+    writeLexical(lexical, target.name, value);
     return;
   }
-  const target = expression.target;
-  if (target.kind !== "local" && target.kind !== "global") {
-    throw new Error(`Cannot execute invalid XMLUI event write target '${target.name}'.`);
-  }
-  const current =
-    target.kind === "local" ? context.readLocal(target.name) : context.readGlobal(target.name);
-  const next = Number(current) + 1;
   if (target.kind === "local") {
-    context.writeLocal(target.name, next);
-  } else {
-    context.writeGlobal(target.name, next);
+    context.writeLocal(target.name, value);
+    return;
+  }
+  if (target.kind === "global") {
+    context.writeGlobal(target.name, value);
+    return;
+  }
+  throw new Error(`Cannot execute invalid XMLUI event write target '${target.name}'.`);
+}
+
+function writeLexical(lexical: Record<string, unknown>, name: string, value: unknown): void {
+  let current: Record<string, unknown> | null = lexical;
+  while (current) {
+    if (Object.prototype.hasOwnProperty.call(current, name)) {
+      current[name] = value;
+      return;
+    }
+    current = Object.getPrototypeOf(current) as Record<string, unknown> | null;
+  }
+  lexical[name] = value;
+}
+
+function executeCompoundAssignment(
+  operator: XmluiAssignmentExpressionIr["operator"],
+  left: unknown,
+  right: unknown,
+): unknown {
+  switch (operator) {
+    case "+=":
+      return (left as never) + (right as never);
+    case "-=":
+      return Number(left) - Number(right);
+    case "*=":
+      return Number(left) * Number(right);
+    case "/=":
+      return Number(left) / Number(right);
+    case "%=":
+      return Number(left) % Number(right);
+    case "=":
+      return right;
   }
 }
 

@@ -72,6 +72,21 @@ describe("collectXmluiSemanticTokens", () => {
       ]),
     );
   });
+
+  it("highlights statement keywords and assignment write targets in event handlers", () => {
+    const tokens = collectXmluiSemanticTokens(
+      `<Button onClick="let next = count + 1; count = next; --count" />`,
+    );
+
+    expect(tokens).toEqual(
+      expect.arrayContaining([
+        { line: 0, character: 17, length: 3, tokenType: "keyword" },
+        { line: 0, character: 21, length: 4, tokenType: "variable" },
+        { line: 0, character: 39, length: 5, tokenType: "xmluiWriteTarget" },
+        { line: 0, character: 55, length: 5, tokenType: "xmluiWriteTarget" },
+      ]),
+    );
+  });
 });
 
 describe("collectXmluiDiagnostics", () => {

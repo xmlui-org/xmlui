@@ -5,10 +5,12 @@ import {
   type ArrayExpressionNode,
   type ArrowFunctionExpressionNode,
   type BinaryExpressionNode,
+  type BlockStatementNode,
   type CallExpressionNode,
   type ConditionalExpressionNode,
   type ErrorNode,
   type ExpressionStatementNode,
+  type IfStatementNode,
   type IdentifierNode,
   type IndexExpressionNode,
   type LiteralNode,
@@ -18,11 +20,15 @@ import {
   type ParseScriptOptions,
   type ParseScriptResult,
   type PostfixExpressionNode,
+  type PrefixExpressionNode,
   type ProgramNode,
   type ScriptNode,
   type ScriptNodeKind,
   type ScriptSourceInput,
   type UnaryExpressionNode,
+  type VariableDeclarationNode,
+  type VariableDeclaratorNode,
+  type WhileStatementNode,
 } from "./ast";
 import { tokenizeScript, type ScriptToken } from "./scanner";
 import { isScriptTrivia, ScriptTokenKind } from "./tokenKind";
@@ -69,11 +75,10 @@ class ScriptParser {
   parseEventHandlerDocument(): ParseScriptResult<ProgramNode> {
     const body: ScriptNode[] = [];
     while (!this.at(ScriptTokenKind.EndOfFile)) {
-      const expression = this.parseExpression();
-      body.push(this.createExpressionStatement(expression));
+      body.push(this.parseStatement());
       if (this.at(ScriptTokenKind.Semicolon)) {
         this.consume();
-      } else if (!this.at(ScriptTokenKind.EndOfFile)) {
+      } else if (!this.at(ScriptTokenKind.EndOfFile) && !this.at(ScriptTokenKind.CloseBrace)) {
         this.report("XS102", "Expected ';' between event-handler statements.", this.current());
         this.recoverToStatementBoundary();
         if (this.at(ScriptTokenKind.Semicolon)) {
@@ -89,11 +94,134 @@ class ScriptParser {
     };
   }
 
+  private parseStatement(): ScriptNode {
+    switch (this.current().kind) {
+      case ScriptTokenKind.OpenBrace:
+        return this.parseBlockStatement();
+      case ScriptTokenKind.IfKeyword:
+        return this.parseIfStatement();
+      case ScriptTokenKind.WhileKeyword:
+        return this.parseWhileStatement();
+      case ScriptTokenKind.LetKeyword:
+      case ScriptTokenKind.ConstKeyword:
+        return this.parseVariableDeclaration();
+      default:
+        return this.createExpressionStatement(this.parseExpression());
+    }
+  }
+
+  private parseBlockStatement(): BlockStatementNode {
+    const open = this.consume(ScriptTokenKind.OpenBrace);
+    const body: ScriptNode[] = [];
+    while (!this.at(ScriptTokenKind.EndOfFile) && !this.at(ScriptTokenKind.CloseBrace)) {
+      body.push(this.parseStatement());
+      if (this.at(ScriptTokenKind.Semicolon)) {
+        this.consume();
+      }
+    }
+    const close = this.at(ScriptTokenKind.CloseBrace)
+      ? this.consume(ScriptTokenKind.CloseBrace)
+      : this.current();
+    if (close.kind !== ScriptTokenKind.CloseBrace) {
+      this.report("XS119", "Expected '}' to close block statement.", close);
+    }
+    return this.node("BlockStatement", open, close, body, { body }) as BlockStatementNode;
+  }
+
+  private parseIfStatement(): IfStatementNode {
+    const keyword = this.consume(ScriptTokenKind.IfKeyword);
+    const test = this.parseParenthesizedStatementExpression("if");
+    const consequent = this.parseStatement();
+    let alternate: ScriptNode | undefined;
+    if (this.at(ScriptTokenKind.ElseKeyword)) {
+      this.consume();
+      alternate = this.parseStatement();
+    }
+    return this.node("IfStatement", keyword, (alternate ?? consequent).endToken, [
+      test,
+      consequent,
+      ...(alternate ? [alternate] : []),
+    ], {
+      test,
+      consequent,
+      ...(alternate ? { alternate } : {}),
+    }) as IfStatementNode;
+  }
+
+  private parseWhileStatement(): WhileStatementNode {
+    const keyword = this.consume(ScriptTokenKind.WhileKeyword);
+    const test = this.parseParenthesizedStatementExpression("while");
+    const body = this.parseStatement();
+    return this.node("WhileStatement", keyword, body.endToken, [test, body], {
+      test,
+      body,
+    }) as WhileStatementNode;
+  }
+
+  private parseParenthesizedStatementExpression(keyword: string): ScriptNode {
+    if (!this.at(ScriptTokenKind.OpenParen)) {
+      return this.expected("XS120", `Expected '(' after '${keyword}'.`);
+    }
+    const open = this.consume(ScriptTokenKind.OpenParen);
+    const expression = this.parseExpression();
+    if (this.at(ScriptTokenKind.CloseParen)) {
+      const close = this.consume(ScriptTokenKind.CloseParen);
+      return {
+        ...expression,
+        span: this.span(open, close),
+        startToken: open,
+        endToken: close,
+      };
+    }
+    this.report("XS121", `Expected ')' after '${keyword}' condition.`, this.current());
+    return expression;
+  }
+
+  private parseVariableDeclaration(): VariableDeclarationNode {
+    const keyword = this.consume();
+    const declarations: VariableDeclaratorNode[] = [];
+    while (!this.at(ScriptTokenKind.EndOfFile)) {
+      declarations.push(this.parseVariableDeclarator());
+      if (this.at(ScriptTokenKind.Comma)) {
+        this.consume();
+        continue;
+      }
+      break;
+    }
+    return this.node("VariableDeclaration", keyword, declarations.at(-1)?.endToken ?? keyword, declarations, {
+      declarationKind: keyword.kind === ScriptTokenKind.ConstKeyword ? "const" : "let",
+      declarations,
+    }) as VariableDeclarationNode;
+  }
+
+  private parseVariableDeclarator(): VariableDeclaratorNode {
+    const id = this.at(ScriptTokenKind.Identifier)
+      ? this.createIdentifier(this.consume())
+      : this.createIdentifierFromError(this.expected("XS122", "Expected variable name."));
+    let init: ScriptNode | undefined;
+    if (this.at(ScriptTokenKind.Equal)) {
+      this.consume();
+      init = this.parseExpression();
+    }
+    return this.node("VariableDeclarator", id.startToken, init?.endToken ?? id.endToken, [
+      id,
+      ...(init ? [init] : []),
+    ], {
+      id,
+      ...(init ? { init } : {}),
+    }) as VariableDeclaratorNode;
+  }
+
   private parseExpression(precedence = 0): ScriptNode {
     let left = this.parseArrowExpression();
 
     while (true) {
       if (this.at(ScriptTokenKind.PlusPlus)) {
+        const operator = this.consume();
+        left = this.createPostfixExpression(left, operator);
+        continue;
+      }
+      if (this.at(ScriptTokenKind.MinusMinus)) {
         const operator = this.consume();
         left = this.createPostfixExpression(left, operator);
         continue;
@@ -149,10 +277,10 @@ class ScriptParser {
 
       const operator = this.consume();
       const right = this.parseExpression(
-        operator.kind === ScriptTokenKind.Equal ? currentPrecedence - 1 : currentPrecedence,
+        this.isAssignmentOperator(operator.kind) ? currentPrecedence - 1 : currentPrecedence,
       );
       left =
-        operator.kind === ScriptTokenKind.Equal
+        this.isAssignmentOperator(operator.kind)
           ? this.createAssignmentExpression(left, operator, right)
           : this.createBinaryExpression(left, operator, right);
     }
@@ -204,6 +332,9 @@ class ScriptParser {
       case ScriptTokenKind.Plus:
       case ScriptTokenKind.Minus:
         return this.createUnaryExpression(this.consume(), this.parseExpression(10));
+      case ScriptTokenKind.PlusPlus:
+      case ScriptTokenKind.MinusMinus:
+        return this.createPrefixExpression(this.consume(), this.parseExpression(10));
       case ScriptTokenKind.OpenParen:
         return this.parseGroupedExpression();
       case ScriptTokenKind.OpenBracket:
@@ -462,6 +593,13 @@ class ScriptParser {
     }) as PostfixExpressionNode;
   }
 
+  private createPrefixExpression(operator: ScriptToken, argument: ScriptNode): PrefixExpressionNode {
+    return this.node("PrefixExpression", operator, argument.endToken, [argument], {
+      operator: operator.text,
+      argument,
+    }) as PrefixExpressionNode;
+  }
+
   private createMemberExpression(
     object: ScriptNode,
     property: IdentifierNode,
@@ -558,6 +696,11 @@ class ScriptParser {
   private binaryPrecedence(kind: ScriptTokenKind): number {
     switch (kind) {
       case ScriptTokenKind.Equal:
+      case ScriptTokenKind.PlusEqual:
+      case ScriptTokenKind.MinusEqual:
+      case ScriptTokenKind.StarEqual:
+      case ScriptTokenKind.SlashEqual:
+      case ScriptTokenKind.PercentEqual:
         return 1;
       case ScriptTokenKind.NullishCoalescing:
         return 2;
@@ -589,6 +732,17 @@ class ScriptParser {
 
   private peekNonTriviaKind(distance: number): ScriptTokenKind {
     return this.tokens[this.offset + distance]?.kind ?? ScriptTokenKind.EndOfFile;
+  }
+
+  private isAssignmentOperator(kind: ScriptTokenKind): boolean {
+    return (
+      kind === ScriptTokenKind.Equal ||
+      kind === ScriptTokenKind.PlusEqual ||
+      kind === ScriptTokenKind.MinusEqual ||
+      kind === ScriptTokenKind.StarEqual ||
+      kind === ScriptTokenKind.SlashEqual ||
+      kind === ScriptTokenKind.PercentEqual
+    );
   }
 
   private recoverToStatementBoundary(): void {

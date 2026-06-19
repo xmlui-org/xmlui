@@ -182,6 +182,26 @@ describe("script function generation", () => {
     expect(shadowGlobals.count).toBe(99);
   });
 
+  it("generates executable event functions for assignments, locals, branches, and loops", () => {
+    const event = eventFrom(
+      `<App var.count="{0}" var.total="{0}" var.label="{''}"><Button onClick="let i = 0; count += 1; while (i < 2) { total += count + i; i++ }; if (total > 4) { label = 'done' }" /></App>`,
+    );
+    const generated = generateEventHandlerFunction(event.ir!, event.writes);
+    const locals = { count: 1, total: 0, label: "" };
+
+    expect(generated.body).toContain("let i = 0;");
+    expect(generated.body).toContain(`ctx.writeLocal("count", (ctx.readLocal("count") + 1));`);
+    expect(generated.body).toContain("while (");
+    expect(generated.body).toContain("XMLUI handler loop guard exceeded");
+    expect(generated.invalidates).toEqual([
+      { kind: "local", name: "count" },
+      { kind: "local", name: "total" },
+      { kind: "local", name: "label" },
+    ]);
+    runGeneratedEvent(generated.functionSource, { locals, globals: {} });
+    expect(locals).toEqual({ count: 2, total: 5, label: "done" });
+  });
+
   it("generates executable expression functions for broader expression syntax", () => {
     const document = parseXmlui(
       `<App var.count="{0}" var.user="{0}" var.items="{0}" var.index="{0}" />`,

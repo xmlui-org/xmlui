@@ -69,6 +69,34 @@ describe("ScriptScanner", () => {
     ]);
   });
 
+  it("tokenizes handler statement keywords and mutation operators", () => {
+    const result = tokenizeScript("let next = 1; if (next >= 1) { count += next; --next }");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(kinds(result.tokens).filter((kind) => kind !== ScriptTokenKind.WhitespaceTrivia)).toEqual([
+      ScriptTokenKind.LetKeyword,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.Equal,
+      ScriptTokenKind.NumberLiteral,
+      ScriptTokenKind.Semicolon,
+      ScriptTokenKind.IfKeyword,
+      ScriptTokenKind.OpenParen,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.GreaterThanEqual,
+      ScriptTokenKind.NumberLiteral,
+      ScriptTokenKind.CloseParen,
+      ScriptTokenKind.OpenBrace,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.PlusEqual,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.Semicolon,
+      ScriptTokenKind.MinusMinus,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.CloseBrace,
+      ScriptTokenKind.EndOfFile,
+    ]);
+  });
+
   it("classifies keywords, identifiers, literals, trivia, and punctuation", () => {
     const result = tokenizeScript("true false null undefined call(1)");
 

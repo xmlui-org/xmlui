@@ -77,6 +77,10 @@ export class ScriptScanner {
       this.input.advance(2);
       return this.createToken(ScriptTokenKind.PlusPlus, start, this.input.position);
     }
+    if (this.input.startsWith("--")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.MinusMinus, start, this.input.position);
+    }
     if (this.input.startsWith("??")) {
       this.input.advance(2);
       return this.createToken(ScriptTokenKind.NullishCoalescing, start, this.input.position);
@@ -112,6 +116,26 @@ export class ScriptScanner {
     if (this.input.startsWith(">=")) {
       this.input.advance(2);
       return this.createToken(ScriptTokenKind.GreaterThanEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("+=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.PlusEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("-=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.MinusEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("*=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.StarEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("/=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.SlashEqual, start, this.input.position);
+    }
+    if (this.input.startsWith("%=")) {
+      this.input.advance(2);
+      return this.createToken(ScriptTokenKind.PercentEqual, start, this.input.position);
     }
 
     const ch = this.input.peek();
@@ -333,6 +357,12 @@ function classifyScriptToken(kind: ScriptTokenKind): TokenClassification {
     case ScriptTokenKind.FalseKeyword:
     case ScriptTokenKind.NullKeyword:
     case ScriptTokenKind.UndefinedKeyword:
+    case ScriptTokenKind.LetKeyword:
+    case ScriptTokenKind.ConstKeyword:
+    case ScriptTokenKind.IfKeyword:
+    case ScriptTokenKind.ElseKeyword:
+    case ScriptTokenKind.WhileKeyword:
+    case ScriptTokenKind.ForKeyword:
       return "keyword";
     case ScriptTokenKind.NumberLiteral:
     case ScriptTokenKind.StringLiteral:
@@ -364,6 +394,12 @@ function classifyScriptToken(kind: ScriptTokenKind): TokenClassification {
     case ScriptTokenKind.Slash:
     case ScriptTokenKind.Percent:
     case ScriptTokenKind.PlusPlus:
+    case ScriptTokenKind.MinusMinus:
+    case ScriptTokenKind.PlusEqual:
+    case ScriptTokenKind.MinusEqual:
+    case ScriptTokenKind.StarEqual:
+    case ScriptTokenKind.SlashEqual:
+    case ScriptTokenKind.PercentEqual:
     case ScriptTokenKind.Arrow:
       return "operator";
     default:
@@ -381,6 +417,18 @@ function keywordKind(text: string): ScriptTokenKind {
       return ScriptTokenKind.NullKeyword;
     case "undefined":
       return ScriptTokenKind.UndefinedKeyword;
+    case "let":
+      return ScriptTokenKind.LetKeyword;
+    case "const":
+      return ScriptTokenKind.ConstKeyword;
+    case "if":
+      return ScriptTokenKind.IfKeyword;
+    case "else":
+      return ScriptTokenKind.ElseKeyword;
+    case "while":
+      return ScriptTokenKind.WhileKeyword;
+    case "for":
+      return ScriptTokenKind.ForKeyword;
     default:
       return ScriptTokenKind.Identifier;
   }

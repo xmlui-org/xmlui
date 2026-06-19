@@ -5,6 +5,11 @@ import type { ScriptToken } from "./scanner";
 export type ScriptNodeKind =
   | "Program"
   | "ExpressionStatement"
+  | "BlockStatement"
+  | "IfStatement"
+  | "WhileStatement"
+  | "VariableDeclaration"
+  | "VariableDeclarator"
   | "Identifier"
   | "Literal"
   | "MemberExpression"
@@ -15,6 +20,7 @@ export type ScriptNodeKind =
   | "BinaryExpression"
   | "ConditionalExpression"
   | "AssignmentExpression"
+  | "PrefixExpression"
   | "PostfixExpression"
   | "ArrayExpression"
   | "ObjectExpression"
@@ -37,6 +43,36 @@ export type ProgramNode = ScriptNodeBase & {
 export type ExpressionStatementNode = ScriptNodeBase & {
   kind: "ExpressionStatement";
   expression: ScriptNode;
+};
+
+export type BlockStatementNode = ScriptNodeBase & {
+  kind: "BlockStatement";
+  body: ScriptNode[];
+};
+
+export type IfStatementNode = ScriptNodeBase & {
+  kind: "IfStatement";
+  test: ScriptNode;
+  consequent: ScriptNode;
+  alternate?: ScriptNode;
+};
+
+export type WhileStatementNode = ScriptNodeBase & {
+  kind: "WhileStatement";
+  test: ScriptNode;
+  body: ScriptNode;
+};
+
+export type VariableDeclarationNode = ScriptNodeBase & {
+  kind: "VariableDeclaration";
+  declarationKind: "let" | "const";
+  declarations: VariableDeclaratorNode[];
+};
+
+export type VariableDeclaratorNode = ScriptNodeBase & {
+  kind: "VariableDeclarator";
+  id: IdentifierNode;
+  init?: ScriptNode;
 };
 
 export type IdentifierNode = ScriptNodeBase & {
@@ -104,6 +140,12 @@ export type AssignmentExpressionNode = ScriptNodeBase & {
   right: ScriptNode;
 };
 
+export type PrefixExpressionNode = ScriptNodeBase & {
+  kind: "PrefixExpression";
+  operator: string;
+  argument: ScriptNode;
+};
+
 export type PostfixExpressionNode = ScriptNodeBase & {
   kind: "PostfixExpression";
   operator: string;
@@ -134,6 +176,11 @@ export type ErrorNode = ScriptNodeBase & {
 export type ScriptNode =
   | ProgramNode
   | ExpressionStatementNode
+  | BlockStatementNode
+  | IfStatementNode
+  | WhileStatementNode
+  | VariableDeclarationNode
+  | VariableDeclaratorNode
   | IdentifierNode
   | LiteralNode
   | MemberExpressionNode
@@ -144,6 +191,7 @@ export type ScriptNode =
   | BinaryExpressionNode
   | ConditionalExpressionNode
   | AssignmentExpressionNode
+  | PrefixExpressionNode
   | PostfixExpressionNode
   | ArrayExpressionNode
   | ObjectPropertyNode

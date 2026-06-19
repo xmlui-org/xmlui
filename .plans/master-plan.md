@@ -649,6 +649,33 @@ What we learn:
   container/reducer machinery;
 - which scripting features need XMLUI-specific runtime helpers.
 
+### Experiment 4A: Async Handler Execution and Scheduling
+
+Scope:
+
+- make compiled event handlers asynchronous while preserving the current XMLUI
+  authoring model where handlers do not necessarily use `async` or `await`;
+- compile long-running handler code so the JavaScript event loop can be yielded
+  to periodically, keeping the UI responsive and allowing other event handlers to
+  start even when one handler contains a long-running or infinite loop;
+- introduce deterministic handler scheduling, error propagation, cancellation
+  hooks, and source-aware diagnostics for async handler execution;
+- investigate how the old XMLUI framework recognizes async function invocations
+  and async expressions without requiring explicit `async`/`await` syntax;
+- preserve explicit local/global state writes and invalidation metadata across
+  asynchronous execution boundaries.
+
+What we learn:
+
+- whether compiled handlers can preserve XMLUI's async statement-queue behavior
+  without returning to AST interpretation;
+- how much cooperative scheduling instrumentation the compiler must inject into
+  loops, calls, and statement boundaries;
+- how concurrent handlers should interleave state reads, writes, invalidations,
+  errors, and cancellation;
+- which async semantics must be settled before data operations, API calls, and
+  loader lifecycles are implemented.
+
 ### Experiment 4: Reactive Graph and Derived Variables
 
 Scope:
