@@ -11,6 +11,7 @@ import {
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiThemeRoot } from "./rendering/theme";
+import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 
@@ -90,6 +91,10 @@ export function XmluiRoot({
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
+  const toastRef = useRef<ToastService>();
+  if (!toastRef.current) {
+    toastRef.current = createToastService();
+  }
   const rootOwnerId = "app:root";
   const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
@@ -113,6 +118,7 @@ export function XmluiRoot({
       props: {},
       references: referencesRef.current,
       routing: routingRef.current,
+      toast: toastRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,
@@ -143,6 +149,7 @@ export function XmluiRoot({
       props: {},
       references: referencesRef.current,
       routing: routingRef.current,
+      toast: toastRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,
@@ -161,6 +168,7 @@ export function XmluiRoot({
   return (
     <XmluiThemeRoot>
       <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+      <ToastHost service={toastRef.current} />
     </XmluiThemeRoot>
   );
 }

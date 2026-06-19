@@ -12,6 +12,7 @@ describe("compatibility sweep smoke fixtures", () => {
       "async-handler-mutation",
       "managed-fetch-data-update",
       "extension-event-mutation",
+      "event-tag-handler-mutation",
     ]);
 
     for (const anchor of compatibilityAnchors) {
@@ -73,5 +74,29 @@ describe("compatibility sweep smoke fixtures", () => {
     const metadata = generateXmluiMetadata();
     expect(metadata.examples.length).toBeGreaterThan(0);
     expect(metadata.examples.every((example) => example.demonstratesMutation)).toBe(true);
+  });
+
+  it("compiles null-safe property reads for XMLUI expression compatibility", () => {
+    const compiled = compileXmluiSource({
+      id: "compatibility/null-safe-member.xmlui",
+      source: `
+        <App var.user="{null}">
+          <Text value="{user.address.city ?? 'Unknown'}" />
+        </App>
+      `,
+    });
+
+    const text = compiled.document.root.children[0];
+    if (text.kind !== "element") {
+      throw new Error("Expected Text element.");
+    }
+
+    const value = text.parsed?.props?.value;
+    expect(Array.isArray(value)).toBe(false);
+    if (!value || Array.isArray(value)) {
+      throw new Error("Expected expression prop.");
+    }
+    expect(value.compiledSource).toContain("== null ? undefined");
+    expect(value.compiledSource).toContain("Unknown");
   });
 });

@@ -51,6 +51,52 @@ describe("compatibility artifact shape", () => {
     }
   });
 
+  it("recognizes the styling compatibility artifact when generated", () => {
+    const styleArtifactPath = join(xmluiRoot, ".compatibility-report/style-artifact-latest.json");
+
+    if (existsSync(styleArtifactPath)) {
+      const artifact = JSON.parse(readFileSync(styleArtifactPath, "utf8"));
+
+      expect(artifact.schemaVersion).toBe(1);
+      expect(artifact.oldSourceAnchors).toContain("/Users/dotneteer/source/xmlui/xmlui/src/components-core/theming");
+      expect(artifact.supportedLayoutPropNames).toEqual(expect.arrayContaining([
+        "gap",
+        "paddingHorizontal",
+        "textUnderlineOffset",
+      ]));
+      expect(artifact.responsiveBreakpoints).toMatchObject({
+        md: 768,
+        xxl: 1400,
+      });
+      expect(artifact.styleStates).toContain("hover");
+      expect(artifact.defaultThemeVariables["color-primary"]).toBe("#2563eb");
+      expect(artifact.deferred).toContain("Full visual regression suite");
+    }
+  });
+
+  it("recognizes the runtime compatibility artifact when generated", () => {
+    const runtimeArtifactPath = join(xmluiRoot, ".compatibility-report/runtime-artifact-latest.json");
+
+    if (existsSync(runtimeArtifactPath)) {
+      const artifact = JSON.parse(readFileSync(runtimeArtifactPath, "utf8"));
+
+      expect(artifact.schemaVersion).toBe(1);
+      expect(artifact.oldSourceAnchors).toEqual(expect.arrayContaining([
+        "/Users/dotneteer/source/xmlui/xmlui/src/components/DataSource",
+        "/Users/dotneteer/source/xmlui/xmlui/src/components/Form",
+        "/Users/dotneteer/source/xmlui/xmlui/src/components/App",
+      ]));
+      expect(artifact.implementedSlices).toEqual(expect.arrayContaining([
+        expect.stringContaining("App-scoped toast service"),
+        expect.stringContaining("Pages/Page/NavLink"),
+      ]));
+      expect(artifact.deferred).toEqual(expect.arrayContaining([
+        expect.stringContaining("Full form context"),
+        expect.stringContaining("Full App shell"),
+      ]));
+    }
+  });
+
   it("recognizes the extension fixture package metadata artifact when built", () => {
     const metadataPath = join(
       repoRoot,

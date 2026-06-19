@@ -59,6 +59,22 @@ const commands = [
     required: true,
   },
   {
+    id: "style-artifact",
+    surface: "styling",
+    command: "npm",
+    args: ["run", "compatibility:style-artifact"],
+    cwd: xmluiRoot,
+    required: true,
+  },
+  {
+    id: "runtime-artifact",
+    surface: "runtime-services",
+    command: "npm",
+    args: ["run", "compatibility:runtime-artifact"],
+    cwd: xmluiRoot,
+    required: true,
+  },
+  {
     id: "vscode-build",
     surface: "vscode",
     command: "npm",

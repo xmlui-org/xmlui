@@ -23,11 +23,9 @@ export function resolveThemeReferences(value: unknown): unknown {
   if (typeof value !== "string") {
     return value;
   }
-  if (!value.startsWith("$")) {
-    return value;
-  }
-  const name = value.slice(1).trim();
-  return name ? themeVarReference(name) : value;
+  return value.replace(/\$([A-Za-z][A-Za-z0-9_-]*)/g, (_match, name: string) =>
+    themeVarReference(name),
+  );
 }
 
 export function themeVariablesToCssProperties(
@@ -42,4 +40,3 @@ export function themeVariablesToCssProperties(
   }
   return style as CSSProperties;
 }
-

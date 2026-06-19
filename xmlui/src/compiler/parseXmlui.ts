@@ -320,7 +320,40 @@ function transformElement(
     setParsedValue(parsed, "props", attr.name, attr, sourceId);
   }
 
-  const children = contentChildren(node, source, sourceId, namespaces);
+  if (type === "event" || type === "method") {
+    return {
+      kind: "element",
+      type,
+      props,
+      vars,
+      globals,
+      events,
+      methods,
+      children: rawScriptChildren(node, source),
+      range: rangeOf(node),
+      ...(hasParsedBindings(parsed) ? { parsed } : {}),
+    };
+  }
+
+  const transformedChildren = contentChildren(node, source, sourceId, namespaces);
+  const children: XmluiNode[] = [];
+  for (const child of transformedChildren) {
+    if (child.kind === "element" && child.type === "event") {
+      const eventName = child.props.name;
+      if (!eventName) {
+        throw new Error("<event> requires a name attribute.");
+      }
+      const eventSource = child.children
+        .map((eventChild) => eventChild.kind === "text" ? eventChild.value : "")
+        .join(" ")
+        .trim();
+      const range = child.children[0]?.range ?? child.range;
+      events[eventName] = eventSource;
+      setParsedEventSource(parsed, "events", eventName, eventSource, range, sourceId);
+      continue;
+    }
+    children.push(child);
+  }
   return {
     kind: "element",
     type,
@@ -362,6 +395,32 @@ function contentChildren(
         value,
         range,
         segments: parseMixedTextSegments(value, range, { sourceId }),
+      });
+    }
+  }
+
+  return result;
+}
+
+function rawScriptChildren(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+): XmluiNode[] {
+  const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
+  const children = content?.children ?? [];
+  const result: XmluiNode[] = [];
+
+  for (const child of children) {
+    if (child.kind === MarkupSyntaxKind.Text) {
+      const rawText = getNodeText(child, source);
+      const value = normalizeText(rawText);
+      if (!value) {
+        continue;
+      }
+      result.push({
+        kind: "text",
+        value,
+        range: rangeOf(child),
       });
     }
   }
@@ -459,21 +518,32 @@ function setParsedEvent(
   attr: AttributeInfo,
   sourceId: string,
 ): void {
+  setParsedEventSource(parsed, bucket, name, attr.value, attr.valueRange, sourceId);
+}
+
+function setParsedEventSource(
+  parsed: XmluiParsedBindings,
+  bucket: "events" | "methods",
+  name: string,
+  eventSource: string,
+  range: SourceRange,
+  sourceId: string,
+): void {
   const events = (parsed[bucket] ??= {});
-  const result = parseScriptEventHandler(attr.value, {
+  const result = parseScriptEventHandler(eventSource, {
     originSpan: {
       sourceId,
-      start: attr.valueRange.start,
-      end: attr.valueRange.end,
+      start: range.start,
+      end: range.end,
     },
   });
   if (result.diagnostics.length > 0) {
     throw diagnosticToError(result.diagnostics[0]);
   }
   events[name] = {
-    source: attr.value,
+    source: eventSource,
     ast: result.node,
-    range: attr.valueRange,
+    range,
   } satisfies ParsedEvent;
 }
 

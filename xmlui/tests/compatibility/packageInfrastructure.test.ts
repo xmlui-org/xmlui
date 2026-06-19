@@ -36,6 +36,8 @@ describe("Phase 1 package and command compatibility", () => {
       "test:unit": "npm run test",
       "check:metadata": "npm run build:metadata",
       "generate-docs": "npm run build:docs-reference",
+      "compatibility:style-artifact": "node scripts/style-artifact-report.mjs",
+      "compatibility:runtime-artifact": "node scripts/runtime-artifact-report.mjs",
     });
   });
 

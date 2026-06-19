@@ -23,6 +23,7 @@ describe("styling contracts", () => {
 describe("theme variable helpers", () => {
   it("resolves XMLUI dollar theme references to CSS variables", () => {
     expect(resolveThemeReferences("$color-primary")).toBe("var(--xmlui-color-primary)");
+    expect(resolveThemeReferences("1px solid $color-border")).toBe("1px solid var(--xmlui-color-border)");
     expect(resolveThemeReferences("red")).toBe("red");
     expect(resolveThemeReferences(12)).toBe(12);
     expect(resolveThemeReferences("var(--xmlui-color-primary)")).toBe("var(--xmlui-color-primary)");
@@ -60,7 +61,7 @@ describe("layout resolver", () => {
       paddingTop: "12px",
       marginTop: "4px",
       marginBottom: "4px",
-      border: "1px solid $color-border",
+      border: "1px solid var(--xmlui-color-border)",
       backgroundColor: "var(--xmlui-color-surface)",
       justifyContent: "center",
       alignItems: "flex-end",
@@ -89,4 +90,3 @@ describe("layout resolver", () => {
     });
   });
 });
-

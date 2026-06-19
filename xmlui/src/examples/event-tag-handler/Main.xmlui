@@ -1,0 +1,11 @@
+<App var.count="{0}">
+  <H1>Event tag handler</H1>
+  <Button>
+    <event name="click">
+    {
+      count++;
+    }
+    </event>
+    Event tag count: {count}
+  </Button>
+</App>

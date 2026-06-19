@@ -229,6 +229,9 @@ Current Phase 1 result:
 
 ## 7. Phase 2: Core Language and Runtime Semantics
 
+Status: initial event-tag and compatibility-test slice implemented; code-behind,
+full config loading, and old/new performance oracle remain compatibility debt.
+
 Close the behavior behind XMLUI authoring before expanding components.
 
 Areas:
@@ -258,11 +261,22 @@ Tasks:
 - Extend `compatibility:perf` beyond command durations into old/new oracle
   measurements for expression evaluation, handler execution, invalidation, and
   startup.
+- Preserve documented child `<event name="...">...</event>` syntax by lowering
+  event tags into parent event handlers without rendering the event tag itself.
 
 Exit criteria:
 
 - Core old tests pass before component-specific behavior is enabled broadly.
 - New component work can depend on stable parser/compiler/runtime contracts.
+
+Current Phase 2 result:
+
+- child event tags compile into parent events and mutate state through the same
+  runtime path as `onClick`;
+- event and method tag script bodies bypass mixed-text parsing;
+- source-anchored null-safe member-read compatibility coverage exists;
+- `.ai/phase-2-core-language-runtime-semantics-findings.md` records the slice
+  and remaining debt.
 
 ## 8. Phase 3: Theme, Styling, Layout, and Visual Verification
 
@@ -288,14 +302,27 @@ Tasks:
   dark/light behavior where supported, responsive layout, and SSG first paint.
 - Make docs metadata and VS Code metadata describe the same theme variables and
   component parts used by runtime.
-- Add theme/style artifact checks to the compatibility sweep once stable CSS
-  and visual baselines exist.
+- Add theme/style artifact checks to the compatibility sweep as the first
+  repeatable styling inventory; expand it with stable CSS and visual baselines
+  as the old theme/component-part contracts are rebuilt.
 
 Exit criteria:
 
 - Visual and CSS parity checks exist before layout-heavy components are closed.
 - Component closure can cite reusable theme/layout tests instead of duplicating
   infrastructure tests.
+
+Current Phase 3 result:
+
+- theme references are resolved both when the whole value is a token
+  (`$color-primary`) and when the token appears inside a CSS value such as
+  `1px solid $color-border`;
+- `compatibility:style-artifact` emits a deterministic styling compatibility
+  report from the current runtime contracts;
+- `compatibility:sweep` includes the style artifact report, and compatibility
+  tests validate the generated report shape when it exists;
+- `.ai/phase-3-theme-styling-layout-visual-findings.md` records the initial
+  slice and the remaining visual/theme parity debt.
 
 ## 9. Phase 4: Data, Actions, Forms, Routing, and App Shell Infrastructure
 
@@ -326,6 +353,21 @@ Exit criteria:
 - Old E2E and integration tests for app creation, routing, data operations,
   forms, and standalone mode pass or have recorded deferrals.
 
+Current Phase 4 result:
+
+- the runtime exposes an app-scoped `toast` reference to compiled expressions
+  and event handlers, matching the documented `toast()`, `toast.success()`,
+  `toast.error()`, `toast.loading()`, and `toast.dismiss()` surface;
+- `XmluiRoot` renders a managed toast host without requiring app markup;
+- `runtimeToast` verifies toast calls together with data mutation from compiled
+  handlers;
+- `compatibility:runtime-artifact` emits a deterministic report for data,
+  routing, app shell, forms, and runtime-service slices;
+- `compatibility:sweep` includes the runtime artifact report, and
+  compatibility tests validate the generated report shape when it exists;
+- `.ai/phase-4-runtime-services-data-routing-forms-findings.md` records the
+  implemented slice and the remaining Phase 4 debt.
+
 ## 10. Phase 5: Component Rebuild Waves
 
 Implement components one by one. Within each wave, close each component
@@ -335,15 +377,22 @@ individually before relying on it as complete.
 
 Components:
 
-- `Text`, `Heading`, `HtmlTags`, `Br`, `Fragment`, `Image`, `Icon`, `Logo`,
-  `IFrame`, `Markdown`, `CodeBlock`, `QRCode`, `PageMetaTitle`,
-  `ContentSeparator`, `SpaceFiller`, `NoResult`, `Fallback`.
+- `App` main-content layout subset, `Text`, `Heading`, `HtmlTags`, `Br`,
+  `Fragment`, `Image`, `Icon`, `Logo`, `IFrame`, `Markdown`, `CodeBlock`,
+  `QRCode`, `PageMetaTitle`, `ContentSeparator`, `SpaceFiller`, `NoResult`,
+  `Fallback`.
 
 Compatibility focus:
 
+- `App` main content layout only: vertical stack behavior, content padding,
+  gap/spacing, and layout props that affect the primary app content area;
 - text/content rendering, markdown and code behavior, HTML tag mapping,
-  media loading, alt/title semantics, sizing/layout props, metadata, and
-  docs examples.
+  media loading, alt/title semantics, sizing/layout props, metadata, and docs
+  examples.
+
+The Wave A `App` slice deliberately excludes app shell behavior such as
+navigation, routing, headers, footers, mobile shell, search, page metadata,
+index collection, and standalone startup. Those remain Wave G responsibilities.
 
 ### Wave B: Core Interaction and Inputs
 
@@ -427,9 +476,11 @@ Components:
 
 Compatibility focus:
 
-- app startup, navigation events, route matching, route/query context variables,
-  nested app boundaries, standalone/Vite differences, SSG route discovery,
-  search/index collection, and page metadata.
+- `App` shell behavior beyond the Wave A main-content layout slice: startup,
+  navigation regions, headers, footers, mobile shell, search, index collection,
+  page metadata, and standalone/Vite differences;
+- page startup, navigation events, route matching, route/query context
+  variables, nested app boundaries, SSG route discovery, and page metadata.
 
 For each component:
 

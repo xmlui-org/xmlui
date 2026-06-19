@@ -44,21 +44,25 @@ Status labels:
 | --- | --- | --- | --- | --- | --- |
 | XMLUI markup parser | `xmlui/src/parsers` | `xmlui/src/parser/markup` | tests-ported | compiler parser tests, compatibility smoke | Phase 2 |
 | Expression parser/compiler | `xmlui/src/components-core/script-runner` and parser sources | `xmlui/src/parser/script`, `xmlui/src/compiler` | tests-ported | compiler tests, perf baseline | Phase 2 |
-| Event handler execution | scripting docs and script-runner sources | `xmlui/src/compiler/scriptSemantics.ts`, runtime scope | tests-ported | async handlers, compatibility smoke | Phase 2 |
+| Event handler execution | scripting docs and script-runner sources | `xmlui/src/compiler/scriptSemantics.ts`, runtime scope | tests-ported | async handlers, event-tag tests, compatibility smoke | Phase 2 |
 | State and scopes | runtime/state sources | `xmlui/src/runtime/state` | tests-ported | runtime state tests, E2E mutation | Phase 2 |
 | Reactive graph | runtime invalidation behavior | `xmlui/src/runtime/rendering/reactive.tsx` | tests-ported | reactive derived tests | Phase 2 |
 | Rendering pipeline | managed React runtime | `xmlui/src/runtime/rendering` | tests-ported | rendering pipeline tests, E2E | Phase 2 |
 | User-defined components | component runtime and docs | compiler/runtime UDC support | tests-ported | UDC E2E | Phase 2 |
 | Diagnostics and source locations | parser/analyzer/language server | parser/compiler/metadata diagnostics | tests-ported | metadata and VS Code tests | Phase 2 |
+| Event tag syntax | `/Users/dotneteer/source/xmlui/website/content/docs/pages/scripting.md` | `xmlui/src/compiler/parseXmlui.ts` | tests-ported | parser test and `event-tags` E2E | Phase 2 |
+| Code-behind modules | `/Users/dotneteer/source/xmlui/xmlui/src/parsers/scripting`, `Globals.xs` docs | missing | debt entry COMP-0013 | Phase 2 |
+| App config loading | `/Users/dotneteer/source/xmlui/website/content/docs/pages/xmlui-config.md` | partial local config-free runtime | debt entry COMP-0014 | Phase 2 / Phase 4 / Phase 7 |
 
 ## Data, Routing, Styling, Tooling
 
 | Surface | Original Anchor | Rewrite Anchor | Status | Tests | Rebuild Phase |
 | --- | --- | --- | --- | --- | --- |
-| Theming/layout/style props | `xmlui/src/components-core/theming`, component SCSS/defaults | runtime rendering/theme and styling compiler | tests-ported | theming/layout E2E | Phase 3 |
+| Theming/layout/style props | `xmlui/src/components-core/theming`, component SCSS/defaults | runtime rendering/theme and styling compiler | tests-ported | theming/layout E2E; style artifact report; embedded theme-token unit coverage | Phase 3 |
 | Data operations | `DataSource`, `APICall`, `Actions` sources | `xmlui/src/runtime/data` | tests-ported | data E2E and compiler tests | Phase 4 |
 | Forms | `Form`, `FormItem`, validators | missing/minimal input slices | deferred | debt entry | Phase 4 |
 | Routing/app shell | `App`, `Pages`, `Page`, navigation sources | runtime routing and app-shell slice | tests-ported | routing E2E, SSG tests | Phase 4 |
+| Runtime services | toast/confirm/modal/lifecycle/runtime docs and sources | `xmlui/src/runtime/services`, app root service wiring | tests-ported | runtime service unit tests; `runtimeToast` E2E; runtime artifact report | Phase 4 |
 | Standalone runtime | old standalone build/startup | `xmlui/src/standalone` | tests-ported | standalone E2E | Phase 1 |
 | Production build | old Vite/package build | `vite.production.config.ts`, production scripts | tests-ported | production E2E and artifact checks | Phase 1 |
 | SSG/hydration | `tools/preview-ssg`, SSG docs/sources | `build:ssg`, `preview:ssg` | tests-ported | SSG E2E and artifact checks | Phase 1 |
@@ -114,7 +118,7 @@ implemented yet remain compatibility debt until their rebuild wave closes them.
 | APICall | `xmlui/src/components/APICall` | partial | Phase 4 / Wave F |
 | Accordion | `xmlui/src/components/Accordion` | not-started | Wave D |
 | Animation | `xmlui/src/components/Animation` | not-started | Wave F |
-| App | `xmlui/src/components/App` | partial | Wave G |
+| App | `xmlui/src/components/App` | partial | Wave A for main-content vertical stack/padding/gap layout; Wave G for app shell, routing, navigation, startup, search, page metadata, and standalone behavior |
 | AppHeader | `xmlui/src/components/AppHeader` | not-started | Wave D |
 | AppState | `xmlui/src/components/AppState` | not-started | Wave F |
 | AutoComplete | `xmlui/src/components/AutoComplete` | not-started | Wave C |

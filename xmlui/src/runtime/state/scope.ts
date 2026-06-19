@@ -1,6 +1,7 @@
 import type { CompiledEventContext, CompiledExpressionContext } from "../../compiler/scriptSemantics";
 import { managedFetchService } from "../data";
 import type { RuntimeRoutingStore } from "../routing";
+import type { ToastService } from "../services/toast";
 import type { RuntimeStateStore } from "./store";
 import type { StateOwnerId } from "./types";
 
@@ -13,6 +14,7 @@ export type RuntimeScope = {
   references: Record<string, unknown>;
   slots: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
+  toast?: ToastService;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
   extensionFunctions: Record<string, (...args: unknown[]) => unknown>;
 };
@@ -26,6 +28,7 @@ export function createRuntimeScope({
   references = {},
   slots = {},
   routing,
+  toast,
   emitEvent,
   extensionFunctions,
 }: {
@@ -37,6 +40,7 @@ export function createRuntimeScope({
   references?: Record<string, unknown>;
   slots?: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
+  toast?: ToastService;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
   extensionFunctions?: Record<string, (...args: unknown[]) => unknown>;
 }): RuntimeScope {
@@ -49,6 +53,7 @@ export function createRuntimeScope({
     references,
     slots,
     routing,
+    toast: toast ?? parent?.toast,
     emitEvent,
     extensionFunctions: extensionFunctions ?? parent?.extensionFunctions ?? {},
   };
@@ -110,7 +115,7 @@ export function createExpressionContext(scope: RuntimeScope | undefined): Compil
     readLocal: (name) => readLocal(scope, name),
     readGlobal: (name) => readGlobal(scope, name),
     readContext: (name) => readContext(scope, name),
-    readReference: (name) => name === "Actions" ? createActionsReference() : readReference(scope, name),
+    readReference: (name) => readBuiltInReference(scope, name) ?? readReference(scope, name),
   };
 }
 
@@ -197,6 +202,16 @@ function createActionsReference() {
       return response.data;
     },
   };
+}
+
+function readBuiltInReference(scope: RuntimeScope | undefined, name: string): unknown {
+  if (name === "Actions") {
+    return createActionsReference();
+  }
+  if (name === "toast") {
+    return scope?.toast?.reference;
+  }
+  return undefined;
 }
 
 function readRouteContext(scope: RuntimeScope, name: string): unknown {

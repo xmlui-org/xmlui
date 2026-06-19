@@ -16,6 +16,7 @@ import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
 import dataSourceRefetchApp from "./examples/data-source-refetch/Main.xmlui";
 import expressionUpdateComponentsApp from "./examples/expression-update-components/Main.xmlui";
 import expressionUpdatesApp from "./examples/expression-updates/Main.xmlui";
+import eventTagHandlerApp from "./examples/event-tag-handler/Main.xmlui";
 import extensionCounterBadgeApp from "./examples/extension-counter-badge/Main.xmlui";
 import globalCounterApp from "./examples/counter-globals/Main.xmlui";
 import handlerAssignmentsApp from "./examples/handler-assignments/Main.xmlui";
@@ -34,6 +35,7 @@ import routingBasicApp from "./examples/routing-basic/Main.xmlui";
 import routingDataApp from "./examples/routing-data/Main.xmlui";
 import routingQueryApp from "./examples/routing-query/Main.xmlui";
 import routingStateApp from "./examples/routing-state/Main.xmlui";
+import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
 import styleMutationApp from "./examples/style-mutation/Main.xmlui";
 import themeScopeApp from "./examples/theme-scope/Main.xmlui";
 import themeVarsApp from "./examples/theme-vars/Main.xmlui";
@@ -59,6 +61,7 @@ const examples = {
   expressions: broaderExpressionsApp,
   expressionComponents: expressionUpdateComponentsApp,
   expressionUpdates: expressionUpdatesApp,
+  eventTagHandler: eventTagHandlerApp,
   extensionCounterBadge: extensionCounterBadgeApp,
   globals: globalCounterApp,
   handlerAssignments: handlerAssignmentsApp,
@@ -77,6 +80,7 @@ const examples = {
   routingData: routingDataApp,
   routingQuery: routingQueryApp,
   routingState: routingStateApp,
+  runtimeToast: runtimeToastApp,
   styleMutation: styleMutationApp,
   themeScope: themeScopeApp,
   themeVars: themeVarsApp,

@@ -25,6 +25,8 @@
     "serve:standalone-samples": "npm run prepare:standalone-samples && node scripts/standalone-static-server.mjs",
     "compatibility:sweep": "node scripts/compatibility-sweep.mjs",
     "compatibility:perf": "node scripts/performance-baseline.mjs",
+    "compatibility:style-artifact": "node scripts/style-artifact-report.mjs",
+    "compatibility:runtime-artifact": "node scripts/runtime-artifact-report.mjs",
     "test": "vitest run tests/compiler",
     "test:unit": "npm run test",
     "check:metadata": "npm run build:metadata",
