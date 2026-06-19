@@ -1,0 +1,9 @@
+<App var.count="{0}">
+  <H1>Expression updates</H1>
+  <Text value="{count + 1}" />
+  <Text value="{count > 1 ? 'many' : 'one'}" />
+  <Text value="{[count, count + 1, count + 2].join(', ')}" />
+  <Button onClick="count++">
+    Increment count: {count}
+  </Button>
+</App>

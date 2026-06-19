@@ -7,8 +7,11 @@ import {
   type AssignmentExpressionNode,
   type BinaryExpressionNode,
   type CallExpressionNode,
+  type ConditionalExpressionNode,
   type IdentifierNode,
+  type IndexExpressionNode,
   type MemberExpressionNode,
+  type ObjectExpressionNode,
   type PostfixExpressionNode,
   type ProgramNode,
   type ScriptNode,
@@ -68,6 +71,59 @@ describe("ScriptParser expression mode", () => {
     expect(((grouped.node as BinaryExpressionNode).left as BinaryExpressionNode).operator).toBe(
       "||",
     );
+  });
+
+  it("parses arithmetic, comparisons, nullish, and ternary expressions", () => {
+    const arithmetic = parseScriptExpression("count + 1 * 2");
+    const comparison = parseScriptExpression("count >= 2 ? 'many' : 'one'");
+    const nullish = parseScriptExpression("label ?? 'fallback'");
+
+    expect(arithmetic.diagnostics).toEqual([]);
+    expect((arithmetic.node as BinaryExpressionNode).operator).toBe("+");
+    expect(((arithmetic.node as BinaryExpressionNode).right as BinaryExpressionNode).operator).toBe(
+      "*",
+    );
+
+    expect(comparison.diagnostics).toEqual([]);
+    expect(comparison.node.kind).toBe("ConditionalExpression");
+    expect(((comparison.node as ConditionalExpressionNode).test as BinaryExpressionNode).operator).toBe(
+      ">=",
+    );
+
+    expect(nullish.diagnostics).toEqual([]);
+    expect((nullish.node as BinaryExpressionNode).operator).toBe("??");
+  });
+
+  it("parses arrays, objects, index access, optional members, and arrows", () => {
+    const array = parseScriptExpression("[{ label: 'One' }, { label: 'Two' }]");
+    const object = parseScriptExpression("{ name, 'title': user?.profile?.title }");
+    const indexed = parseScriptExpression("items?.[index].label");
+    const mapped = parseScriptExpression("items.map(item => item.label).join(', ')");
+
+    expect(array.diagnostics).toEqual([]);
+    expect(array.node.kind).toBe("ArrayExpression");
+
+    expect(object.diagnostics).toEqual([]);
+    expect((object.node as ObjectExpressionNode).properties).toHaveLength(2);
+    expect((object.node as ObjectExpressionNode).properties[0]).toMatchObject({
+      kind: "ObjectProperty",
+      shorthand: true,
+    });
+
+    expect(indexed.diagnostics).toEqual([]);
+    expect(indexed.node.kind).toBe("MemberExpression");
+    const indexedObject = (indexed.node as MemberExpressionNode).object as IndexExpressionNode;
+    expect(indexedObject.kind).toBe("IndexExpression");
+    expect(indexedObject.optional).toBe(true);
+
+    expect(mapped.diagnostics).toEqual([]);
+    expect(mapped.node.kind).toBe("CallExpression");
+    const joinMember = (mapped.node as CallExpressionNode).callee as MemberExpressionNode;
+    const mapCall = joinMember.object as CallExpressionNode;
+    expect(mapCall.args[0]).toMatchObject({
+      kind: "ArrowFunctionExpression",
+      params: [expect.objectContaining({ name: "item" })],
+    });
   });
 
   it("parses calls, unary expressions, assignments, and postfix increments", () => {

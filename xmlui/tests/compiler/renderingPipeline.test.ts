@@ -101,7 +101,7 @@ describe("rendering binding evaluation", () => {
 
 describe("built-in renderer registry", () => {
   it("contains the initial built-in renderers", () => {
-    expect(Object.keys(builtInRenderers).sort()).toEqual(["App", "Button", "H1"]);
+    expect(Object.keys(builtInRenderers).sort()).toEqual(["App", "Button", "H1", "Text"]);
   });
 
   it("exposes render errors with the unknown component name", () => {

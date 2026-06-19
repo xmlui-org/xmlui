@@ -30,6 +30,16 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     },
   },
   {
+    name: "Text",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: {
+      value: { name: "value" },
+    },
+    events: {},
+  },
+  {
     name: "Component",
     kind: "builtin",
     allowsChildren: true,

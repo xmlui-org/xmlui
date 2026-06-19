@@ -1,7 +1,9 @@
 # Experiment 2: Broader Expression Compilation Plan
 
-Status: draft  
+Status: implemented  
 Parent plan: `.plans/master-plan.md`, section `7. Incremental Experiment Roadmap`
+
+Implementation closure: `.ai/experiment-2-broader-expression-compatibility-closure.md`
 
 ## Purpose
 

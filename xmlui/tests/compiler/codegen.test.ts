@@ -19,6 +19,8 @@ import {
 import { buildCompilerIrFromDocument } from "../../src/compiler/ir/index";
 import { createIrId, createXmluiIrSourceRef, sourceSpanFromOffsets } from "../../src/compiler/ir/index";
 import { parseXmlui } from "../../src/compiler/parseXmlui";
+import { createXmluiScope, lowerScriptExpression } from "../../src/compiler/scriptSemantics";
+import { parseScriptExpression } from "../../src/parser";
 
 describe("codegen descriptor types", () => {
   it("constructs compiled expression, text, and event descriptors separately from Compiler IR", () => {
@@ -178,6 +180,32 @@ describe("script function generation", () => {
     runGeneratedEvent(shadowGenerated.functionSource, { locals: shadowLocals, globals: shadowGlobals });
     expect(shadowLocals.count).toBe(11);
     expect(shadowGlobals.count).toBe(99);
+  });
+
+  it("generates executable expression functions for broader expression syntax", () => {
+    const document = parseXmlui(
+      `<App var.count="{0}" var.user="{0}" var.items="{0}" var.index="{0}" />`,
+      { sourceId: "Main.xmlui" },
+    );
+    const scope = createXmluiScope(document.root, { sourceId: "Main.xmlui" });
+    const expression = lowerScriptExpression(
+      parseScriptExpression(
+        "items.map(item => item.label).join(', ') || (count > 1 ? user.name : items[index].label)",
+      ).node,
+      scope,
+    );
+    const generated = generateExpressionFunction(expression.ir);
+
+    expect(generated.body).toContain(`?.["map"]?.((item) =>`);
+    expect(generated.body).toContain(`?.["join"]?.(", ")`);
+    expect(runGeneratedExpression(generated.functionSource, {
+      locals: {
+        count: 0,
+        user: { name: "Ada" },
+        items: [{ label: "One" }, { label: "Two" }],
+        index: 1,
+      },
+    })).toBe("One, Two");
   });
 
   it("rejects invalid event write targets during generation", () => {

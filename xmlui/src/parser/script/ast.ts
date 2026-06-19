@@ -8,11 +8,17 @@ export type ScriptNodeKind =
   | "Identifier"
   | "Literal"
   | "MemberExpression"
+  | "IndexExpression"
   | "CallExpression"
+  | "ArrowFunctionExpression"
   | "UnaryExpression"
   | "BinaryExpression"
+  | "ConditionalExpression"
   | "AssignmentExpression"
   | "PostfixExpression"
+  | "ArrayExpression"
+  | "ObjectExpression"
+  | "ObjectProperty"
   | "Error";
 
 export type ScriptNodeBase = {
@@ -48,12 +54,27 @@ export type MemberExpressionNode = ScriptNodeBase & {
   kind: "MemberExpression";
   object: ScriptNode;
   property: IdentifierNode;
+  optional?: boolean;
+};
+
+export type IndexExpressionNode = ScriptNodeBase & {
+  kind: "IndexExpression";
+  object: ScriptNode;
+  index: ScriptNode;
+  optional?: boolean;
 };
 
 export type CallExpressionNode = ScriptNodeBase & {
   kind: "CallExpression";
   callee: ScriptNode;
   args: ScriptNode[];
+  optional?: boolean;
+};
+
+export type ArrowFunctionExpressionNode = ScriptNodeBase & {
+  kind: "ArrowFunctionExpression";
+  params: IdentifierNode[];
+  body: ScriptNode;
 };
 
 export type UnaryExpressionNode = ScriptNodeBase & {
@@ -69,6 +90,13 @@ export type BinaryExpressionNode = ScriptNodeBase & {
   right: ScriptNode;
 };
 
+export type ConditionalExpressionNode = ScriptNodeBase & {
+  kind: "ConditionalExpression";
+  test: ScriptNode;
+  consequent: ScriptNode;
+  alternate: ScriptNode;
+};
+
 export type AssignmentExpressionNode = ScriptNodeBase & {
   kind: "AssignmentExpression";
   operator: string;
@@ -82,6 +110,23 @@ export type PostfixExpressionNode = ScriptNodeBase & {
   argument: ScriptNode;
 };
 
+export type ArrayExpressionNode = ScriptNodeBase & {
+  kind: "ArrayExpression";
+  elements: ScriptNode[];
+};
+
+export type ObjectPropertyNode = ScriptNodeBase & {
+  kind: "ObjectProperty";
+  key: IdentifierNode | LiteralNode;
+  value: ScriptNode;
+  shorthand?: boolean;
+};
+
+export type ObjectExpressionNode = ScriptNodeBase & {
+  kind: "ObjectExpression";
+  properties: ObjectPropertyNode[];
+};
+
 export type ErrorNode = ScriptNodeBase & {
   kind: "Error";
 };
@@ -92,11 +137,17 @@ export type ScriptNode =
   | IdentifierNode
   | LiteralNode
   | MemberExpressionNode
+  | IndexExpressionNode
   | CallExpressionNode
+  | ArrowFunctionExpressionNode
   | UnaryExpressionNode
   | BinaryExpressionNode
+  | ConditionalExpressionNode
   | AssignmentExpressionNode
   | PostfixExpressionNode
+  | ArrayExpressionNode
+  | ObjectPropertyNode
+  | ObjectExpressionNode
   | ErrorNode;
 
 export type ParseScriptResult<TNode extends ScriptNode = ScriptNode> = {

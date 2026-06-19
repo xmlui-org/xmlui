@@ -50,11 +50,48 @@ function emitExpression(ir: XmluiScriptIr): string {
       return emitRead(ir.dependency, ir.name);
     case "ScopedMemberRead":
       return `ctx.props?.[${JSON.stringify(ir.member)}]`;
+    case "MemberRead":
+      return emitOptionalMemberRead(ir.object, ir.member);
+    case "IndexRead":
+      return emitOptionalIndexRead(ir.object, ir.index);
     case "LogicalExpression":
-      return `(${emitExpression(ir.left)} || ${emitExpression(ir.right)})`;
+      return `(${emitExpression(ir.left)} ${ir.operator} ${emitExpression(ir.right)})`;
+    case "BinaryExpression":
+      return `(${emitExpression(ir.left)} ${ir.operator} ${emitExpression(ir.right)})`;
+    case "UnaryExpression":
+      return `(${ir.operator}${emitExpression(ir.argument)})`;
+    case "ConditionalExpression":
+      return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
+    case "ArrayExpression":
+      return `[${ir.elements.map(emitExpression).join(", ")}]`;
+    case "ObjectExpression":
+      return `{${ir.properties.map((property) => `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`).join(", ")}}`;
+    case "CallExpression":
+      return emitCallExpression(ir);
+    case "ArrowFunctionExpression":
+      return `(${ir.params.join(", ")}) => ${emitExpression(ir.body)}`;
     default:
       throw new Error(`Cannot generate ${ir.kind} as an XMLUI expression.`);
   }
+}
+
+function emitOptionalMemberRead(object: XmluiScriptIr, member: string): string {
+  const objectSource = emitExpression(object);
+  return `(${objectSource} == null ? undefined : ${objectSource}[${JSON.stringify(member)}])`;
+}
+
+function emitOptionalIndexRead(object: XmluiScriptIr, index: XmluiScriptIr): string {
+  const objectSource = emitExpression(object);
+  return `(${objectSource} == null ? undefined : ${objectSource}[${emitExpression(index)}])`;
+}
+
+function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" }>): string {
+  if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
+    throw new Error("Cannot generate unsupported XMLUI expression call target.");
+  }
+  const objectSource = emitExpression(ir.callee.object);
+  const args = ir.args.map(emitExpression).join(", ");
+  return `(${objectSource})?.[${JSON.stringify(ir.callee.member)}]?.(${args})`;
 }
 
 function emitEventStatement(statement: XmluiExpressionStatementIr): string {
@@ -77,7 +114,25 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
       return `ctx.readLocal(${JSON.stringify(name)})`;
     case "global":
       return `ctx.readGlobal(${JSON.stringify(name)})`;
+    case undefined:
+      return name;
     default:
       throw new Error(`Cannot generate unresolved XMLUI identifier '${name}'.`);
   }
+}
+
+function isAllowedMethodName(name: string): boolean {
+  return [
+    "map",
+    "filter",
+    "find",
+    "some",
+    "every",
+    "includes",
+    "join",
+    "toLowerCase",
+    "toUpperCase",
+    "startsWith",
+    "endsWith",
+  ].includes(name);
 }

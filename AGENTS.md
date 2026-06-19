@@ -93,6 +93,10 @@ Use `.plans/` for durable plans. A good plan includes:
 Keep plans current. If implementation discoveries invalidate part of a plan,
 update the plan instead of leaving stale instructions behind.
 
+New experiments should include data modification, not only static display. Each
+experiment plan should describe at least one user-visible state update path and
+should include tests proving that the update changes the rendered result.
+
 ### Plan Snapshots
 
 The user's primary planning document is expected to be

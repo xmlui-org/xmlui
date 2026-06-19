@@ -1,0 +1,7 @@
+<Component name="MetricCounter" var.count="{0}">
+  <Text value="{$props.label + ' doubled: ' + (count * 2)}" />
+  <Text value="{count > 0 ? 'active' : 'idle'}" />
+  <Button onClick="count++">
+    {$props.label}: {count}
+  </Button>
+</Component>

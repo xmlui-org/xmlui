@@ -260,6 +260,30 @@ describe("XMLUI expression and event semantic IR", () => {
       },
     });
   });
+
+  it("lowers broader expressions with dependencies and callback-local parameters", () => {
+    const document = parseXmlui(`<App var.count="{2}" var.user="{0}" var.items="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptExpression(
+      parseScriptExpression(
+        "items.map(item => item.label).join(', ') || (count > 1 ? user.name : 'one')",
+      ).node,
+      scope,
+    );
+
+    expect(lowered.diagnostics).toEqual([]);
+    expect(lowered.dependencies).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: "local", name: "items", path: ["items", "map"] }),
+        expect.objectContaining({ kind: "local", name: "count", path: ["count"] }),
+        expect.objectContaining({ kind: "local", name: "user", path: ["user", "name"] }),
+      ]),
+    );
+    expect(lowered.dependencies).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: "item" })]),
+    );
+    expect(lowered.ir.kind).toBe("LogicalExpression");
+  });
 });
 
 describe("XMLUI expression JavaScript compilation", () => {
@@ -308,6 +332,63 @@ describe("XMLUI expression JavaScript compilation", () => {
     expect(compiled.source).toBe(`return (ctx.props?.["label"] || "Click to increment");`);
     expect(compiled.execute(testContext({ props: { label: "Counter #2" } }))).toBe("Counter #2");
     expect(compiled.execute(testContext())).toBe("Click to increment");
+  });
+
+  it("compiles broader expression syntax into executable functions", () => {
+    const document = parseXmlui(
+      `<App var.count="{0}" var.user="{0}" var.items="{0}" var.index="{0}" />`,
+    );
+    const scope = createXmluiScope(document.root);
+    const context = testContext({
+      locals: {
+        count: 2,
+        user: { name: "Ada", profile: null },
+        items: [{ label: "One" }, { label: "Two" }],
+        index: 1,
+      },
+    });
+
+    const arithmetic = compileXmluiExpression(
+      lowerScriptExpression(parseScriptExpression("count + 1 * 2").node, scope).ir,
+    );
+    const optional = compileXmluiExpression(
+      lowerScriptExpression(parseScriptExpression("user.profile.title ?? user.name").node, scope).ir,
+    );
+    const ternary = compileXmluiExpression(
+      lowerScriptExpression(parseScriptExpression("count > 1 ? 'many' : 'one'").node, scope).ir,
+    );
+    const indexed = compileXmluiExpression(
+      lowerScriptExpression(parseScriptExpression("items[index].label").node, scope).ir,
+    );
+    const mapped = compileXmluiExpression(
+      lowerScriptExpression(parseScriptExpression("items.map(item => item.label).join(', ')").node, scope).ir,
+    );
+    const object = compileXmluiExpression(
+      lowerScriptExpression(parseScriptExpression("{ name: user.name, labels: items.map(item => item.label) }").node, scope).ir,
+    );
+
+    expect(arithmetic.source).toBe(`return (ctx.readLocal("count") + (1 * 2));`);
+    expect(arithmetic.execute(context)).toBe(4);
+    expect(optional.execute(context)).toBe("Ada");
+    expect(ternary.execute(context)).toBe("many");
+    expect(indexed.execute(context)).toBe("Two");
+    expect(mapped.execute(context)).toBe("One, Two");
+    expect(object.execute(context)).toEqual({ name: "Ada", labels: ["One", "Two"] });
+  });
+
+  it("rejects unsupported expression calls during semantic analysis", () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptExpression(parseScriptExpression("save(count)").node, scope);
+
+    expect(lowered.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XS204",
+          message: "Unsupported XMLUI expression call target.",
+        }),
+      ]),
+    );
   });
 
   it("rejects unresolved expression reads during compilation", () => {

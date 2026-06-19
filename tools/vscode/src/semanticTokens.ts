@@ -185,11 +185,7 @@ function pushScriptAstTokens(
       break;
     case "MemberExpression":
       pushScriptAstTokens(semanticTokens, source, node.object, node);
-      if (node.object.kind === "Identifier" && node.object.name.startsWith("$")) {
-        pushToken(semanticTokens, source, node.property.span, "xmluiMember");
-      } else {
-        pushScriptAstTokens(semanticTokens, source, node.property, node);
-      }
+      pushToken(semanticTokens, source, node.property.span, "xmluiMember");
       return;
     case "PostfixExpression":
       if (node.argument.kind === "Identifier" || node.argument.kind === "MemberExpression") {

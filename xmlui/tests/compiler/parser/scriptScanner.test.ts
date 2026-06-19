@@ -40,6 +40,35 @@ describe("ScriptScanner", () => {
     });
   });
 
+  it("tokenizes broader expression operators", () => {
+    const result = tokenizeScript("a?.b ?? c >= 1 && d !== e => f + g[0] % 2");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(kinds(result.tokens).filter((kind) => kind !== ScriptTokenKind.WhitespaceTrivia)).toEqual([
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.QuestionDot,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.NullishCoalescing,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.GreaterThanEqual,
+      ScriptTokenKind.NumberLiteral,
+      ScriptTokenKind.LogicalAnd,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.ExclamationEqualEqual,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.Arrow,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.Plus,
+      ScriptTokenKind.Identifier,
+      ScriptTokenKind.OpenBracket,
+      ScriptTokenKind.NumberLiteral,
+      ScriptTokenKind.CloseBracket,
+      ScriptTokenKind.Percent,
+      ScriptTokenKind.NumberLiteral,
+      ScriptTokenKind.EndOfFile,
+    ]);
+  });
+
   it("classifies keywords, identifiers, literals, trivia, and punctuation", () => {
     const result = tokenizeScript("true false null undefined call(1)");
 

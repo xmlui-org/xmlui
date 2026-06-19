@@ -382,7 +382,7 @@ function dependencySummary(
 }
 
 function isComponentReference(type: string, isDefinitionRoot: boolean): boolean {
-  return !isDefinitionRoot && /^[A-Z]/.test(type) && !["App", "H1", "Button"].includes(type);
+  return !isDefinitionRoot && /^[A-Z]/.test(type) && !["App", "H1", "Button", "Text"].includes(type);
 }
 
 function isComponentRoot(document: XmluiDocument): boolean {
