@@ -10,6 +10,7 @@ import {
   useRuntimeStateStore,
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
+import { XmluiThemeRoot } from "./rendering/theme";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 
 export function createXmluiModule(
@@ -97,7 +98,11 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
   );
   const context = useMemo(() => createRenderContext(module.components), [module.components]);
 
-  return <XmluiNodeRenderer context={context} node={module.root} scope={scope} />;
+  return (
+    <XmluiThemeRoot>
+      <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+    </XmluiThemeRoot>
+  );
 }
 
 export type { XmluiModule } from "./types";

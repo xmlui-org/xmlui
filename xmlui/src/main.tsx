@@ -20,16 +20,21 @@ import handlerAssignmentsApp from "./examples/handler-assignments/Main.xmlui";
 import handlerConditionalsApp from "./examples/handler-conditionals/Main.xmlui";
 import handlerLocalsApp from "./examples/handler-locals/Main.xmlui";
 import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
+import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
 import reactiveDerivedChainApp from "./examples/reactive-derived-chain/Main.xmlui";
 import reactiveDerivedGlobalsApp from "./examples/reactive-derived-globals/Main.xmlui";
 import reactiveDerivedOverrideApp from "./examples/reactive-derived-override/Main.xmlui";
 import reactiveDerivedPropsApp from "./examples/reactive-derived-props/Main.xmlui";
+import responsiveStateBasicsApp from "./examples/responsive-state-basics/Main.xmlui";
 import routingBasicApp from "./examples/routing-basic/Main.xmlui";
 import routingDataApp from "./examples/routing-data/Main.xmlui";
 import routingQueryApp from "./examples/routing-query/Main.xmlui";
 import routingStateApp from "./examples/routing-state/Main.xmlui";
+import styleMutationApp from "./examples/style-mutation/Main.xmlui";
+import themeScopeApp from "./examples/theme-scope/Main.xmlui";
+import themeVarsApp from "./examples/theme-vars/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -57,16 +62,21 @@ const examples = {
   handlerConditionals: handlerConditionalsApp,
   handlerLocals: handlerLocalsApp,
   handlerLoops: handlerLoopsApp,
+  layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,
   reactiveDerivedChain: reactiveDerivedChainApp,
   reactiveDerivedGlobals: reactiveDerivedGlobalsApp,
   reactiveDerivedOverride: reactiveDerivedOverrideApp,
   reactiveDerivedProps: reactiveDerivedPropsApp,
+  responsiveStateBasics: responsiveStateBasicsApp,
   routingBasic: routingBasicApp,
   routingData: routingDataApp,
   routingQuery: routingQueryApp,
   routingState: routingStateApp,
+  styleMutation: styleMutationApp,
+  themeScope: themeScopeApp,
+  themeVars: themeVarsApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

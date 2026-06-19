@@ -9,32 +9,60 @@ import { applyResultSelector, managedFetchService } from "../data";
 import { compileRoutePattern, matchRoutePattern, type RouteSnapshot } from "../routing";
 import {
   flexStyle,
+  partAttrs,
   renderValueOrChildren,
   useBooleanProp,
   useEvaluatedProp,
+  useLayoutStyle,
   useStringProp,
+  useThemeOverrideProps,
 } from "./props";
+import { ThemeScope, useThemeVariables } from "./theme";
+import { themeVariablesToCssProperties } from "../../styling";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 
 export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
-  App: ({ context, node, scope }) => context.renderChildren(node.children, scope),
-  AppHeader: ({ context, node, scope }) => <header>{context.renderChildren(node.children, scope)}</header>,
-  H1: ({ context, node, scope }) => <h1>{context.renderChildren(node.children, scope)}</h1>,
+  App: ({ context, node, scope }) => (
+    <div
+      {...partAttrs("App")}
+      style={{ ...themeVariablesToCssProperties(useThemeVariables()), ...useLayoutStyle(node, scope) }}
+    >
+      {context.renderChildren(node.children, scope)}
+    </div>
+  ),
+  AppHeader: ({ context, node, scope }) => (
+    <header {...partAttrs("AppHeader")} style={useLayoutStyle(node, scope)}>
+      {context.renderChildren(node.children, scope)}
+    </header>
+  ),
+  H1: ({ context, node, scope }) => (
+    <h1 {...partAttrs("H1")} style={useLayoutStyle(node, scope)}>
+      {context.renderChildren(node.children, scope)}
+    </h1>
+  ),
   Stack: ({ context, node, scope }) => {
     const orientation = useStringProp(node, scope, "orientation", "");
     const direction = orientation === "horizontal" ? "row" : orientation === "vertical" ? "column" : undefined;
-    return <div style={flexStyle(direction, node, scope)}>{context.renderChildren(node.children, scope)}</div>;
+    return <div {...partAttrs("Stack")} style={flexStyle(direction, node, scope)}>{context.renderChildren(node.children, scope)}</div>;
   },
   HStack: ({ context, node, scope }) => (
-    <div style={flexStyle("row", node, scope)}>{context.renderChildren(node.children, scope)}</div>
+    <div {...partAttrs("HStack")} style={flexStyle("row", node, scope)}>{context.renderChildren(node.children, scope)}</div>
   ),
   VStack: ({ context, node, scope }) => (
-    <div style={flexStyle("column", node, scope)}>{context.renderChildren(node.children, scope)}</div>
+    <div {...partAttrs("VStack")} style={flexStyle("column", node, scope)}>{context.renderChildren(node.children, scope)}</div>
   ),
   Text: ({ context, node, scope }) => {
     const value = useEvaluatedProp(node, scope, "value", undefined);
     const variant = useStringProp(node, scope, "variant", "");
-    return <span data-variant={variant || undefined}>{renderValueOrChildren(context, node, scope, value)}</span>;
+    return (
+      <span
+        {...partAttrs("Text")}
+        data-variant={variant || undefined}
+        style={useLayoutStyle(node, scope)}
+      >
+        {renderValueOrChildren(context, node, scope, value)}
+      </span>
+    );
   },
   Button: ({ context, node, scope }) => {
     const label = useEvaluatedProp(node, scope, "label", undefined);
@@ -44,11 +72,25 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
         ? context.renderChildren(node.children, scope)
         : String(label ?? "");
     return (
-      <button type="button" disabled={!enabled} onClick={() => void runEvent(node.parsed?.events?.click, scope)}>
+      <button
+        {...partAttrs("Button")}
+        type="button"
+        disabled={!enabled}
+        style={useLayoutStyle(node, scope)}
+        onClick={() => void runEvent(node.parsed?.events?.click, scope)}
+      >
         {content}
       </button>
     );
   },
+  Theme: ({ context, node, scope }) => (
+    <ThemeScope
+      variables={useThemeOverrideProps(node, scope)}
+      style={useLayoutStyle(node, scope)}
+    >
+      {context.renderChildren(node.children, scope)}
+    </ThemeScope>
+  ),
   Slot: ({ context, node, scope }) => {
     const nameBinding = node.parsed?.props?.name;
     useBindingRevision(nameBinding, scope);
@@ -78,7 +120,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
     const renderedItems = reverse ? [...items].reverse() : items;
     const itemTemplate = templateChildren(node, "itemTemplate") ?? nonPropertyChildren(node.children);
     return (
-      <>
+      <div {...partAttrs("Items")} style={useLayoutStyle(node, scope)}>
         {renderedItems.map((item, index) => {
           const sourceIndex = reverse ? items.length - index - 1 : index;
           const itemScope = createRuntimeScope({
@@ -97,7 +139,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
           });
           return <React.Fragment key={index}>{context.renderChildren(itemTemplate, itemScope)}</React.Fragment>;
         })}
-      </>
+      </div>
     );
   },
   TextBox: ({ node, scope }) => {
@@ -109,7 +151,9 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
     useEffect(() => setValue(initialValue), [initialValue]);
     return (
       <input
+        {...partAttrs("TextBox")}
         type="text"
+        style={useLayoutStyle(node, scope)}
         value={value}
         placeholder={placeholder}
         disabled={!enabled}
@@ -132,6 +176,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
     useEffect(() => setChecked(initialValue), [initialValue]);
     const input = (
       <input
+        {...partAttrs("Checkbox", "input")}
         type="checkbox"
         checked={checked}
         disabled={!enabled}
@@ -150,7 +195,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
       />
     );
     const content = label === undefined ? context.renderChildren(node.children, scope) : String(label);
-    return <label>{input}{content}</label>;
+    return <label {...partAttrs("Checkbox")} style={useLayoutStyle(node, scope)}>{input}{content}</label>;
   },
   Select: ({ context, node, scope }) => {
     const initialValue = useStringProp(node, scope, "initialValue", "");
@@ -163,6 +208,8 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
     const options = optionDescriptors(node, scope);
     return (
       <select
+        {...partAttrs("Select")}
+        style={useLayoutStyle(node, scope)}
         value={effectiveValue}
         disabled={!enabled}
         onChange={(event) => {
@@ -189,7 +236,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
   Pages: PagesRenderer,
   Page: () => null,
   NavLink: NavLinkRenderer,
-  NavPanel: ({ context, node, scope }) => <nav>{context.renderChildren(node.children, scope)}</nav>,
+  NavPanel: ({ context, node, scope }) => <nav {...partAttrs("NavPanel")} style={useLayoutStyle(node, scope)}>{context.renderChildren(node.children, scope)}</nav>,
   DataSource: DataSourceRenderer,
   APICall: ApiCallRenderer,
 };
@@ -262,19 +309,22 @@ function NavLinkRenderer({ context, node, scope }: Parameters<XmluiBuiltInRender
   const forceActive = useBooleanProp(node, scope, "active", false);
   const exact = useBooleanProp(node, scope, "exact", false);
   const target = useStringProp(node, scope, "target", "");
+  const style = useLayoutStyle(node, scope);
   const snapshot = useRouteSnapshot(scope);
   const href = scope.routing?.href(to) ?? to;
   const active = forceActive || isNavLinkActive(snapshot.pathname, to, exact);
   const content = label === undefined ? context.renderChildren(node.children, scope) : String(label);
   if (!enabled) {
-    return <button type="button" disabled data-active={active || undefined}>{content}</button>;
+    return <button {...partAttrs("NavLink")} type="button" disabled data-active={active || undefined} style={style}>{content}</button>;
   }
   return (
     <a
+      {...partAttrs("NavLink")}
       href={href}
       target={target || undefined}
       aria-current={active ? "page" : undefined}
       data-active={active || undefined}
+      style={style}
       onClick={(event) => {
         if (!scope.routing || target || isExternalUrl(to)) {
           return;

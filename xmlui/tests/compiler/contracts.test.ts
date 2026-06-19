@@ -39,7 +39,7 @@ describe("Managed React contract registry", () => {
     expect(metadata.components).toContainEqual(
       expect.objectContaining({
         name: "Button",
-        props: ["enabled", "label"],
+        props: expect.arrayContaining(["backgroundColor", "enabled", "label", "padding"]),
         events: ["click"],
         templates: [],
         contextVariables: [],
@@ -49,7 +49,7 @@ describe("Managed React contract registry", () => {
     expect(metadata.components).toContainEqual(
       expect.objectContaining({
         name: "Items",
-        props: ["data", "items", "reverse"],
+        props: expect.arrayContaining(["data", "gap", "items", "reverse"]),
         templates: ["itemTemplate"],
         contextVariables: ["$isFirst", "$isLast", "$item", "$itemIndex"],
       }),
@@ -57,14 +57,14 @@ describe("Managed React contract registry", () => {
     expect(metadata.components).toContainEqual(
       expect.objectContaining({
         name: "TextBox",
-        props: ["enabled", "initialValue", "label", "placeholder", "readOnly"],
+        props: expect.arrayContaining(["enabled", "initialValue", "label", "placeholder", "readOnly", "width"]),
         events: ["didChange", "gotFocus", "lostFocus"],
       }),
     );
     expect(metadata.components).toContainEqual(
       expect.objectContaining({
         name: "Checkbox",
-        props: ["enabled", "indeterminate", "initialValue", "label", "readOnly"],
+        props: expect.arrayContaining(["enabled", "indeterminate", "initialValue", "label", "readOnly", "margin"]),
         events: ["click", "didChange", "gotFocus", "lostFocus"],
       }),
     );
@@ -72,6 +72,14 @@ describe("Managed React contract registry", () => {
       expect.objectContaining({
         name: "Option",
         props: ["enabled", "keywords", "label", "value"],
+      }),
+    );
+    expect(metadata.components).toContainEqual(
+      expect.objectContaining({
+        name: "Theme",
+        kind: "builtin",
+        acceptsArbitraryProps: true,
+        props: expect.arrayContaining(["backgroundColor", "padding"]),
       }),
     );
     expect(metadata.components).toContainEqual(
@@ -91,6 +99,15 @@ describe("Managed React contract validation", () => {
       validateSource(`<App><IncrementButton label="Counter" /></App>`, ["IncrementButton"]),
     ).toEqual([]);
     expect(validateSource(`<Component name="IncrementButton" var.count="{0}"><Button onClick="count++" /></Component>`)).toEqual([]);
+  });
+
+  it("accepts theming and layout props as built-in behavior", () => {
+    expect(
+      validateSource(`<App><Theme color-primary="red"><Text color="$color-primary">Theme</Text></Theme></App>`),
+    ).toEqual([]);
+    expect(
+      validateSource(`<App><Button backgroundColor="$color-primary" paddingHorizontal="8px">Styled</Button></App>`),
+    ).toEqual([]);
   });
 
   it("reports unknown components, props, and events with contract codes", () => {

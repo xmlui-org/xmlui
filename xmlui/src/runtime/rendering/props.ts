@@ -1,6 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
 
 import type { XmluiElement } from "../../compiler/ir";
+import {
+  isLayoutPropName,
+  resolveLayoutStyle,
+  type LayoutOrientation,
+} from "../../styling";
 import type { RuntimeScope } from "../state";
 import { evaluateExpressionOrText, dependenciesForBinding } from "./bindings";
 import { useBindingRevision } from "./reactive";
@@ -56,20 +61,48 @@ export function renderValueOrChildren(
   return value === undefined ? context.renderChildren(node.children, scope) : String(value);
 }
 
+export function useLayoutStyle(
+  node: XmluiElement,
+  scope: RuntimeScope,
+  options: { orientation?: LayoutOrientation } = {},
+): CSSProperties {
+  const props: Record<string, unknown> = {};
+  for (const name of Object.keys(node.props)) {
+    if (isLayoutPropName(name)) {
+      props[name] = useEvaluatedProp(node, scope, name, undefined);
+    }
+  }
+  return resolveLayoutStyle(props, options);
+}
+
 export function flexStyle(
   direction: "row" | "column" | undefined,
   node: XmluiElement,
   scope: RuntimeScope,
 ): CSSProperties {
+  return useLayoutStyle(node, scope, {
+    orientation: direction === "row" ? "horizontal" : direction === "column" ? "vertical" : undefined,
+  });
+}
+
+export function useThemeOverrideProps(
+  node: XmluiElement,
+  scope: RuntimeScope,
+): Record<string, unknown> {
+  const variables: Record<string, unknown> = {};
+  for (const name of Object.keys(node.props)) {
+    if (isLayoutPropName(name) || name === "name") {
+      continue;
+    }
+    variables[name] = useEvaluatedProp(node, scope, name, undefined);
+  }
+  return variables;
+}
+
+export function partAttrs(component: string, part = "root"): Record<string, string> {
   return {
-    display: direction ? "flex" : undefined,
-    flexDirection: direction,
-    gap: useStringProp(node, scope, "gap", ""),
-    width: normalizeSize(useEvaluatedProp(node, scope, "width", undefined)),
-    height: normalizeSize(useEvaluatedProp(node, scope, "height", undefined)),
-    padding: normalizeSize(useEvaluatedProp(node, scope, "padding", undefined)),
-    justifyContent: alignment(useStringProp(node, scope, "horizontalAlignment", "")),
-    alignItems: alignment(useStringProp(node, scope, "verticalAlignment", "")),
+    "data-xmlui-component": component,
+    "data-xmlui-part": part,
   };
 }
 
@@ -90,37 +123,5 @@ function coerceBoolean(value: unknown, fallback: boolean): boolean {
     }
   }
   return value == null ? fallback : Boolean(value);
-}
-
-function normalizeSize(value: unknown): string | undefined {
-  if (value === undefined || value === null || value === "") {
-    return undefined;
-  }
-  if (value === "*") {
-    return "1 1 0";
-  }
-  return typeof value === "number" ? `${value}px` : String(value);
-}
-
-function alignment(value: string): CSSProperties["alignItems"] {
-  switch (value) {
-    case "center":
-    case "middle":
-      return "center";
-    case "end":
-    case "right":
-    case "bottom":
-      return "flex-end";
-    case "space-between":
-      return "space-between";
-    case "stretch":
-      return "stretch";
-    case "start":
-    case "left":
-    case "top":
-      return "flex-start";
-    default:
-      return undefined;
-  }
 }
 

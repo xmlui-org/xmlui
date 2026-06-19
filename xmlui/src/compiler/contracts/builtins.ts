@@ -1,4 +1,5 @@
 import type { XmluiComponentContract } from "./types";
+import { supportedLayoutPropNames } from "../../styling";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
   {
@@ -6,9 +7,9 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true, global: true },
-    props: {
+    props: withLayoutProps({
       useHashBasedRouting: { name: "useHashBasedRouting" },
-    },
+    }),
     events: {},
   },
   {
@@ -16,7 +17,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: {},
+    props: withLayoutProps(),
     events: {},
   },
   {
@@ -24,7 +25,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: {},
-    props: {},
+    props: withLayoutProps(),
     events: {},
   },
   {
@@ -32,7 +33,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: layoutProps(),
+    props: withLayoutProps(),
     events: {},
   },
   {
@@ -40,7 +41,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: layoutProps(),
+    props: withLayoutProps(),
     events: {},
   },
   {
@@ -48,7 +49,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: layoutProps(),
+    props: withLayoutProps(),
     events: {},
   },
   {
@@ -56,10 +57,10 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: {
+    props: withLayoutProps({
       label: { name: "label" },
       enabled: { name: "enabled" },
-    },
+    }),
     events: {
       click: { name: "click", attributeName: "onClick" },
     },
@@ -69,10 +70,19 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: {
+    props: withLayoutProps({
       value: { name: "value" },
       variant: { name: "variant" },
-    },
+    }),
+    events: {},
+  },
+  {
+    name: "Theme",
+    kind: "builtin",
+    acceptsArbitraryProps: true,
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps(),
     events: {},
   },
   {
@@ -80,11 +90,11 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: {
+    props: withLayoutProps({
       items: { name: "items" },
       data: { name: "data" },
       reverse: { name: "reverse" },
-    },
+    }),
     events: {},
     templates: {
       itemTemplate: { name: "itemTemplate" },
@@ -101,13 +111,13 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: false,
     declarations: {},
-    props: {
+    props: withLayoutProps({
       initialValue: { name: "initialValue" },
       placeholder: { name: "placeholder" },
       enabled: { name: "enabled" },
       readOnly: { name: "readOnly" },
       label: { name: "label" },
-    },
+    }),
     events: {
       didChange: { name: "didChange", attributeName: "onDidChange" },
       gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
@@ -119,13 +129,13 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: {},
-    props: {
+    props: withLayoutProps({
       initialValue: { name: "initialValue" },
       label: { name: "label" },
       enabled: { name: "enabled" },
       readOnly: { name: "readOnly" },
       indeterminate: { name: "indeterminate" },
-    },
+    }),
     events: {
       click: { name: "click", attributeName: "onClick" },
       didChange: { name: "didChange", attributeName: "onDidChange" },
@@ -138,7 +148,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: {},
-    props: {
+    props: withLayoutProps({
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       enabled: { name: "enabled" },
@@ -151,7 +161,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       multiSelect: { name: "multiSelect" },
       clearable: { name: "clearable" },
       searchable: { name: "searchable" },
-    },
+    }),
     events: {
       didChange: { name: "didChange", attributeName: "onDidChange" },
       gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
@@ -218,10 +228,10 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: {
+    props: withLayoutProps({
       fallbackPath: { name: "fallbackPath" },
       defaultScrollRestoration: { name: "defaultScrollRestoration" },
-    },
+    }),
     events: {},
   },
   {
@@ -249,7 +259,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: {},
+    props: withLayoutProps(),
     events: {},
   },
   {
@@ -257,7 +267,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: {
+    props: withLayoutProps({
       to: { name: "to" },
       enabled: { name: "enabled" },
       active: { name: "active" },
@@ -270,7 +280,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       icon: { name: "icon" },
       iconAlignment: { name: "iconAlignment" },
       level: { name: "level" },
-    },
+    }),
     events: {
       click: { name: "click", attributeName: "onClick" },
     },
@@ -357,17 +367,14 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   },
 ];
 
-function layoutProps(): XmluiComponentContract["props"] {
+function withLayoutProps(
+  props: XmluiComponentContract["props"] = {},
+): XmluiComponentContract["props"] {
   return {
-    gap: { name: "gap" },
-    orientation: { name: "orientation" },
-    reverse: { name: "reverse" },
-    wrapContent: { name: "wrapContent" },
-    width: { name: "width" },
-    height: { name: "height" },
-    padding: { name: "padding" },
-    horizontalAlignment: { name: "horizontalAlignment" },
-    verticalAlignment: { name: "verticalAlignment" },
+    ...Object.fromEntries(
+      supportedLayoutPropNames.map((name) => [name, { name }]),
+    ),
+    ...props,
   };
 }
 

@@ -424,6 +424,7 @@ const builtInElementNames = new Set([
   "Stack",
   "Text",
   "TextBox",
+  "Theme",
   "VStack",
 ]);
 

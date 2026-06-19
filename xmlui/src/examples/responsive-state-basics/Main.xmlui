@@ -1,0 +1,9 @@
+<App>
+  <VStack gap="8px" padding="12px">
+    <H1 margin="0">Responsive state basics</H1>
+    <Button backgroundColor="$color-primary" color="$color-surface" paddingHorizontal="12px">
+      Styled button
+    </Button>
+  </VStack>
+</App>
+
