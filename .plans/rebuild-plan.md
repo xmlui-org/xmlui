@@ -368,10 +368,146 @@ Current Phase 4 result:
 - `.ai/phase-4-runtime-services-data-routing-forms-findings.md` records the
   implemented slice and the remaining Phase 4 debt.
 
-## 10. Phase 5: Component Rebuild Waves
+## 10. Phase 5: Component Transfer and Rebuild Waves
 
-Implement components one by one. Within each wave, close each component
-individually before relying on it as complete.
+Transfer components one by one, using the original component source
+organization as the default shape. A component is not complete merely because a
+runtime renderer exists. It is complete only when its component folder contains
+the transferred public contract: implementation, metadata, renderer/wrapper,
+tests, docs, style/default information where applicable, and a closure note.
+
+Source organization rule:
+
+- Use `/Users/dotneteer/source/xmlui/xmlui/src/components/<ComponentName>` as
+  the compatibility template for each component.
+- Create the rewrite component under
+  `xmlui/src/components/<ComponentName>/`.
+- Keep component-owned code in that folder: implementation, renderer adapter,
+  metadata, default styles/theme variables, docs source, tests, fixtures, and
+  component-local helpers.
+- Keep central runtime files as registry and orchestration glue only. They may
+  load component modules, but they must not become the primary home of
+  component behavior.
+- Existing experimental built-ins are compatibility scaffolding. During Phase 5
+  they must either move behind component modules or remain explicitly marked as
+  temporary debt.
+- Deviations from the old file shape are allowed only when recorded in the
+  component closure note with the reason and compatibility risk.
+
+Suggested component folder shape:
+
+```text
+xmlui/src/components/Button/
+  Button.tsx
+  Button.metadata.ts
+  Button.renderer.tsx
+  Button.defaults.ts
+  Button.md
+  __tests__/
+    Button.spec.ts
+    transferred/
+      Button.original.spec.ts
+  index.ts
+```
+
+The exact filenames may follow the old component when that improves
+traceability, for example `ButtonNative.tsx`, `ButtonReact.tsx`, or old
+metadata/default filenames. The important rule is that the component owns the
+same categories of artifacts the original component owned.
+
+### Wave 0: Component Transfer Scaffold
+
+Status: implemented as the initial scaffold; component behavior migration remains
+Wave A-G work.
+
+Before Wave A implementation resumes, create the component transfer scaffold.
+
+Tasks:
+
+- Define the component module contract consumed by the runtime registry:
+  component name, renderer, metadata, default styles/theme parts, docs metadata,
+  and test fixture registration.
+- Refactor the central built-in registry so it imports component modules instead
+  of owning component implementations directly.
+- Define the mapping from old XMLUI component artifacts to rewrite artifacts:
+  metadata factory, renderer/wrapper, React implementation, default styles,
+  SCSS/theme parts, docs markdown, docs examples, unit specs, E2E specs, and
+  test utilities.
+- Decide and document where verbatim transferred tests live. Prefer
+  `xmlui/src/components/<ComponentName>/__tests__/transferred/` for
+  source-adjacent archival copies, with runnable ports beside them or in the
+  shared E2E harness when browser orchestration requires it.
+- Add a component closure note template section for source organization:
+  old files inventoried, transferred files, simplified files, deleted/obsolete
+  old internals, runnable tests, deferred tests, docs status, metadata status,
+  and verification commands.
+- Add compatibility checks that fail or warn when a component is marked
+  `closed` without metadata, docs/test inventory, and a runnable verification
+  path.
+- Migrate the experimental partial components into the new folder structure
+  before claiming them as Phase 5 progress.
+
+Exit criteria:
+
+- A new component can be transferred without inventing file layout or registry
+  wiring.
+- The registry delegates to per-component modules.
+- The first component closure note can cite both old and rewrite files in the
+  same source-organization categories.
+- The inventory can distinguish `partial-centralized` from
+  `transferred-folder`, `tests-ported`, `parity-tested`, and `closed`.
+
+Current Wave 0 result:
+
+- `xmlui/src/components` defines the component transfer module contract,
+  runtime component module registry, transfer conventions, and source-adjacent
+  placeholder folders for the experimental runtime-backed components.
+- The runtime renderer looks up built-ins through the component module registry
+  instead of importing the legacy built-in renderer table directly.
+- Existing experimental renderers still point at
+  `xmlui/src/runtime/rendering/builtins.tsx` and are explicitly marked
+  `partial-centralized`; they are not closed component transfers.
+- The scaffold handles component-folder aliases such as the `H1` runtime tag
+  mapping to the original `Heading` component folder.
+- `.ai/component-compatibility-closure-template.md` now records source
+  organization, transferred tests, runnable tests, and deviations.
+- `npm --workspace xmlui run compatibility:component-transfer` validates the
+  closure guard and is included in `compatibility:sweep`.
+
+### Per-Component Closure Loop
+
+For each component in Waves A-G:
+
+1. Inventory the original component folder, including `.tsx`, `*React.tsx`,
+   metadata, defaults, SCSS, docs, unit specs, E2E specs, test helpers, and
+   generated docs metadata.
+2. Copy or reference the original tests before implementation. Keep an
+   archival transferred version close to the component and create runnable
+   ports in the rewrite test infrastructure.
+3. Transfer docs and docs examples into the component folder or the docs
+   generation source expected by the new tooling. Docs are part of closure, not
+   a later cleanup task.
+4. Implement the component through the per-component module. Internals may be
+   simplified, but the public props, events, methods, context variables,
+   accepted children, API refs, DOM behavior, accessibility, styling hooks, and
+   diagnostics must follow the old component.
+5. Register the component through the shared registry by importing its module.
+   Do not add new component-specific behavior directly to the central renderer.
+6. Compare generated metadata with the old metadata and record any deliberate
+   simplification or deferred metadata field.
+7. Run the ported unit/E2E tests and any visual/theme checks needed by the
+   component.
+8. Keep at least one state mutation path in tests when the component can mutate
+   local state, global state, form state, data state, or component API state.
+9. Record exact old files, rewrite files, deferred behavior, obsolete old tests,
+   and verification commands in `.ai/<component>-compatibility-closure.md`.
+10. Update `.ai/compatibility-inventory.md` and
+    `.ai/compatibility-debt.md`.
+
+Completion rule: a component cannot be marked `closed` while copied old tests
+are failing, unported, or silently ignored. Any old test that will not be
+ported must be listed in compatibility debt as `obsolete-old-test`,
+`intentional-deviation`, or a phase-scoped `known-gap`.
 
 ### Wave A: Primitive Text, Media, and Utility Components
 
@@ -393,6 +529,11 @@ Compatibility focus:
 The Wave A `App` slice deliberately excludes app shell behavior such as
 navigation, routing, headers, footers, mobile shell, search, page metadata,
 index collection, and standalone startup. Those remain Wave G responsibilities.
+
+Wave A starts only after Wave 0 is in place. The `App` main-content layout
+slice must be transferred under `xmlui/src/components/App/`, not as a central
+runtime-only renderer. The old `App` tests that cover this layout slice must be
+copied or ported before the slice is considered complete.
 
 ### Wave B: Core Interaction and Inputs
 
@@ -482,19 +623,10 @@ Compatibility focus:
 - page startup, navigation events, route matching, route/query context
   variables, nested app boundaries, SSG route discovery, and page metadata.
 
-For each component:
-
-- port old specs first, preserving test markup and assertions where practical;
-- port docs examples as executable smoke fixtures;
-- compare generated metadata with old metadata;
-- run keyboard/focus checks for interactive components;
-- run visual/theme checks for styled components;
-- record exact old files and any deferred behavior in
-  `.ai/<component>-compatibility-closure.md`;
-- update `.ai/compatibility-inventory.md` and `.ai/compatibility-debt.md` when
-  the component status changes;
-- keep at least one state mutation path in the component's tests when the
-  component can mutate or participate in mutable data.
+Each wave should close components in small batches that can keep
+`compatibility:sweep` useful. If a component requires infrastructure from a
+later phase or wave, mark it as blocked in compatibility debt instead of
+placing partial behavior in the wrong layer.
 
 ## 11. Phase 6: Extension Packages and External Authoring
 

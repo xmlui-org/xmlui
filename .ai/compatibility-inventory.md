@@ -112,6 +112,29 @@ Current rewrite support is intentionally partial. Existing implemented slices
 include `App`, headings, `Button`, `Text`, stacks, `Items`, basic inputs,
 selection, data, routing, theming, and the extension fixture. Components not
 implemented yet remain compatibility debt until their rebuild wave closes them.
+Phase 5 Wave 0 added source-adjacent component module scaffolding for the
+runtime-backed experimental slices, but those slices remain
+`partial-centralized` until their implementation, metadata, docs, and tests are
+fully transferred.
+
+Phase 5 source-organization rule: component compatibility is transferred
+through `xmlui/src/components/<ComponentName>/`, following the original
+component folder's artifact categories: implementation, renderer/wrapper,
+metadata, defaults/styles, docs, unit and E2E tests, fixtures, and
+component-local helpers. Central runtime renderer files may register and
+orchestrate components, but they are not the closure location for component
+behavior. Existing partial centralized slices remain compatibility scaffolding
+until they move behind per-component modules and satisfy the transferred-test
+closure loop.
+
+Use these additional Phase 5 status labels when useful:
+
+- `partial-centralized`: behavior exists but is still implemented primarily in
+  runtime scaffolding;
+- `transferred-folder`: the component folder exists with old artifact inventory;
+- `tests-transferred`: original tests have archival copies or direct
+  source-adjacent references;
+- `tests-ported`: runnable rewrite tests cover the transferred old behavior.
 
 | Component | Old Anchor | Rewrite Status | Planned Wave |
 | --- | --- | --- | --- |

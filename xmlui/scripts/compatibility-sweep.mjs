@@ -75,6 +75,14 @@ const commands = [
     required: true,
   },
   {
+    id: "component-transfer",
+    surface: "components",
+    command: "npm",
+    args: ["run", "compatibility:component-transfer"],
+    cwd: xmluiRoot,
+    required: true,
+  },
+  {
     id: "vscode-build",
     surface: "vscode",
     command: "npm",

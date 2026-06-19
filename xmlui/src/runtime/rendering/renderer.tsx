@@ -1,9 +1,9 @@
 import React, { type ReactNode } from "react";
 
 import type { XmluiNode, XmluiText } from "../../compiler/ir";
+import { builtInComponentRenderers } from "../../components";
 import type { RuntimeScope } from "../state";
 import { renderMixedText } from "./bindings";
-import { builtInRenderers } from "./builtins";
 import { ComponentInstance, ScopedElement } from "./components";
 import { ExtensionComponentInstance } from "./extensionComponent";
 import { useBindingRevision } from "./reactive";
@@ -44,7 +44,7 @@ export function XmluiNodeRenderer({
 }
 
 function renderElement(context: RenderContext, node: Extract<XmluiNode, { kind: "element" }>, scope: RuntimeScope) {
-  const renderer = builtInRenderers[node.type];
+  const renderer = builtInComponentRenderers[node.type];
   if (renderer) {
     const BuiltInRenderer = renderer;
     return <BuiltInRenderer context={context} node={node} scope={scope} />;

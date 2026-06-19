@@ -25,6 +25,23 @@ List every relevant old source file:
 - Integration-test usage:
 - Metadata or generated artifact:
 
+## Source Organization
+
+Record how the transferred component follows the original folder pattern:
+
+- Old component folder:
+- Rewrite component folder:
+- Implementation files:
+- Renderer/wrapper files:
+- Metadata files:
+- Defaults/style/theme files:
+- Documentation files:
+- Transferred test archive:
+- Runnable unit tests:
+- Runnable E2E tests:
+- Simplified or intentionally removed old internals:
+- Source-organization deviations and reason:
+
 ## Public Contract
 
 Record the public behavior to preserve:
