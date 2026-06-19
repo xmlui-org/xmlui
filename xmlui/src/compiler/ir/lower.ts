@@ -290,6 +290,7 @@ function createBinding(
     kind,
     name,
     rawValue,
+    bindingMode: dependencies.reads.length > 0 ? "derived" : "source",
     source: sourceRef(context.sourceId, bindingRange(value)),
     ...(expression ? { expression } : {}),
     ...(textSegments ? { textSegments } : {}),
@@ -349,6 +350,7 @@ function expressionRef(
     ast: expression.ast,
     ir: expression.ir!,
     compiledSource: expression.compiledSource,
+    bindingMode: expression.bindingMode,
     dependencies: expression.dependencies ?? [],
     source: sourceRef(context.sourceId, "expressionRange" in expression ? expression.expressionRange : expression.range),
   };

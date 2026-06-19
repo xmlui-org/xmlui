@@ -101,6 +101,7 @@ export type XmluiBindingIr = {
   kind: XmluiIrBindingKind;
   name: string;
   rawValue: string;
+  bindingMode?: "source" | "derived";
   source: XmluiIrSourceRef;
   expression?: XmluiExpressionIrRef;
   textSegments?: XmluiIrTextSegment[];
@@ -112,6 +113,7 @@ export type XmluiExpressionIrRef = {
   ast: ScriptNode;
   ir: XmluiScriptIr;
   compiledSource?: string;
+  bindingMode?: "source" | "derived";
   dependencies: BoundDependency[];
   source: XmluiIrSourceRef;
 };

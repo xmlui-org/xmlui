@@ -1,0 +1,8 @@
+<App var.count="{1}" var.double="{count * 2}">
+  <H1>Reactive derived basic</H1>
+  <Text value="{'count: ' + count}" />
+  <Text value="{'double: ' + double}" />
+  <Button onClick="count++">
+    Increment: {count}
+  </Button>
+</App>

@@ -5,7 +5,7 @@ import { evaluateExpressionOrText } from "./rendering/bindings";
 import { createRenderContext, XmluiNodeRenderer } from "./rendering/renderer";
 import {
   createRuntimeScope,
-  initializeStateValues,
+  initializeStateValuesIntoStore,
   type RuntimeScope,
   useRuntimeStateStore,
 } from "./state";
@@ -53,23 +53,21 @@ function XmluiRoot({ module }: { module: Extract<XmluiModule, { kind: "app" }> }
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
     const initialScope = createRuntimeScope({ store, localOwnerId: rootOwnerId, props: {} });
-    store.setInitialGlobalValues(
-      initializeStateValues(
-        module.root.globals,
-        module.root.parsed?.globals,
-        initialScope,
-        evaluateExpressionOrText,
-      ),
-    );
-    store.setInitialLocalValues(
-      rootOwnerId,
-      initializeStateValues(
-        module.root.vars,
-        module.root.parsed?.vars,
-        initialScope,
-        evaluateExpressionOrText,
-      ),
-    );
+    initializeStateValuesIntoStore({
+      kind: "global",
+      expressions: module.root.globals,
+      parsed: module.root.parsed?.globals,
+      scope: initialScope,
+      evaluate: evaluateExpressionOrText,
+    });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: rootOwnerId,
+      expressions: module.root.vars,
+      parsed: module.root.parsed?.vars,
+      scope: initialScope,
+      evaluate: evaluateExpressionOrText,
+    });
     initializedRef.current = true;
   }
 

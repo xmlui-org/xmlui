@@ -123,6 +123,7 @@ function emitRuntimeTextSegment(segment: XmluiIrTextSegment): EmitJsValue {
     expressionRange: rangeFromSource(segment.expression.source),
     ast: segment.expression.ast,
     ir: segment.expression.ir,
+    bindingMode: segment.expression.bindingMode,
     ...emitGeneratedExpressionFields(segment.expression, generatedName("expr", segment.expression.source)),
     dependencies: segment.expression.dependencies,
   };
@@ -140,6 +141,7 @@ function emitRuntimeExpression(
     ir: expression.ir,
     rawValue,
     irId,
+    bindingMode: expression.bindingMode,
     ...emitGeneratedExpressionFields(expression, generatedName("expr", irId)),
     dependencies: expression.dependencies,
   };

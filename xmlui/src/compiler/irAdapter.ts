@@ -122,6 +122,7 @@ function parsedExpressionFromIr(expression: XmluiExpressionIrRef): ParsedExpress
     range: rangeFromSource(expression.source),
     ir: expression.ir,
     compiledSource: expression.compiledSource,
+    bindingMode: expression.bindingMode,
     dependencies: expression.dependencies,
   };
 }
@@ -157,6 +158,7 @@ function runtimeTextSegmentFromIr(segment: XmluiIrTextSegment): MixedTextSegment
     ast: segment.expression.ast,
     ir: segment.expression.ir,
     compiledSource: segment.expression.compiledSource,
+    bindingMode: segment.expression.bindingMode,
     dependencies: segment.expression.dependencies,
   };
 }

@@ -1,0 +1,3 @@
+<Component name="DerivedChild" var.double="{$props.value * 2}">
+  <Text value="{'child double: ' + double}" />
+</Component>

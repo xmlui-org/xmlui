@@ -13,6 +13,11 @@ import handlerConditionalsApp from "./examples/handler-conditionals/Main.xmlui";
 import handlerLocalsApp from "./examples/handler-locals/Main.xmlui";
 import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
+import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
+import reactiveDerivedChainApp from "./examples/reactive-derived-chain/Main.xmlui";
+import reactiveDerivedGlobalsApp from "./examples/reactive-derived-globals/Main.xmlui";
+import reactiveDerivedOverrideApp from "./examples/reactive-derived-override/Main.xmlui";
+import reactiveDerivedPropsApp from "./examples/reactive-derived-props/Main.xmlui";
 
 const examples = {
   asyncDirectives: asyncDirectivesApp,
@@ -28,6 +33,11 @@ const examples = {
   handlerLocals: handlerLocalsApp,
   handlerLoops: handlerLoopsApp,
   local: localCounterApp,
+  reactiveDerivedBasic: reactiveDerivedBasicApp,
+  reactiveDerivedChain: reactiveDerivedChainApp,
+  reactiveDerivedGlobals: reactiveDerivedGlobalsApp,
+  reactiveDerivedOverride: reactiveDerivedOverrideApp,
+  reactiveDerivedProps: reactiveDerivedPropsApp,
 };
 
 const root = document.getElementById("root");

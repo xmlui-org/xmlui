@@ -1,0 +1,7 @@
+<App var.count="{1}" var.double="{count * 2}" var.message="{'double: ' + double}">
+  <H1>Reactive derived chain</H1>
+  <Text value="{message}" />
+  <Button onClick="count++">
+    Chain count: {count}
+  </Button>
+</App>

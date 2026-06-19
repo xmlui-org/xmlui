@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useMemo, useRef } from "react";
 
-import { initializeStateValues, createRuntimeOwnerId, createRuntimeScope, type RuntimeScope } from "../state";
+import { initializeStateValuesIntoStore, createRuntimeOwnerId, createRuntimeScope, type RuntimeScope } from "../state";
 import type { XmluiComponentModule } from "../types";
 import { evaluateExpressionOrText, evaluateProps } from "./bindings";
 import type { RenderContext } from "./types";
@@ -29,10 +29,15 @@ export function ScopedElement({
       parent: parentScope,
       props,
     });
-    parentScope.store.createLocalOwner(
+    parentScope.store.createLocalOwner(ownerId);
+    initializeStateValuesIntoStore({
+      kind: "local",
       ownerId,
-      initializeStateValues(node.vars, node.parsed?.vars, initialScope, evaluateExpressionOrText),
-    );
+      expressions: node.vars,
+      parsed: node.parsed?.vars,
+      scope: initialScope,
+      evaluate: evaluateExpressionOrText,
+    });
     initializedRef.current = true;
   }
 
@@ -92,17 +97,36 @@ export function ComponentInstance({
       parent: scope,
       props,
     });
-    scope.store.createLocalOwner(
+    scope.store.createLocalOwner(ownerId);
+    initializeStateValuesIntoStore({
+      kind: "local",
       ownerId,
-      initializeStateValues(
-        component.root.vars,
-        component.root.parsed?.vars,
-        initialScope,
-        evaluateExpressionOrText,
-      ),
-    );
+      expressions: component.root.vars,
+      parsed: component.root.parsed?.vars,
+      scope: initialScope,
+      evaluate: evaluateExpressionOrText,
+    });
     initializedRef.current = true;
   }
+
+  useEffect(() => {
+    const latestScope = createRuntimeScope({
+      store: scope.store,
+      localOwnerId: ownerId,
+      parent: scope,
+      props,
+    });
+    for (const [name, value] of Object.entries(component.root.vars)) {
+      const parsed = component.root.parsed?.vars?.[name];
+      scope.store.updateReactiveEvaluator(
+        { kind: "local", ownerId, name },
+        () => evaluateExpressionOrText(value, parsed, latestScope),
+      );
+    }
+    for (const name of Object.keys(props)) {
+      scope.store.invalidateProp(ownerId, name);
+    }
+  }, [component.root.parsed?.vars, component.root.vars, ownerId, props, scope]);
 
   useEffect(
     () => () => {

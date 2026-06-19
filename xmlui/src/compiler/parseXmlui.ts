@@ -1,5 +1,6 @@
 import {
   getNodeText,
+  createErrorDiagnostic,
   MarkupSyntaxKind,
   parseMarkup,
   parseScriptEventHandler,
@@ -19,6 +20,7 @@ import type {
   XmluiNode,
   XmluiParsedBindings,
 } from "./ir";
+import type { BoundDependency } from "./scriptSemantics";
 import {
   compileXmluiEventHandler,
   compileXmluiExpression,
@@ -143,6 +145,7 @@ function analyzeParsedBindings(parsed: XmluiParsedBindings | undefined, scope: X
       analyzeEvent(event, scope);
     }
   }
+  validateReactiveCycles(parsed);
 }
 
 function analyzeTextSegments(segments: MixedTextSegment[] | undefined, scope: XmluiScope): void {
@@ -164,6 +167,9 @@ function analyzeExpression(
   const compiled = compileXmluiExpression(lowered.ir, lowered.dependencies);
   expression.ir = lowered.ir;
   expression.dependencies = lowered.dependencies;
+  expression.bindingMode = lowered.dependencies.some((dependency) =>
+    dependency.kind === "local" || dependency.kind === "global" || dependency.kind === "props"
+  ) ? "derived" : "source";
   expression.compiledSource = compiled.source;
 }
 
@@ -179,6 +185,81 @@ function analyzeEvent(event: ParsedEvent, scope: XmluiScope): void {
   event.writes = lowered.writes;
   event.invalidates = compiled.invalidates;
   event.compiledSource = compiled.source;
+}
+
+function validateReactiveCycles(parsed: XmluiParsedBindings | undefined): void {
+  validateReactiveBucketCycles("local", parsed?.vars);
+  validateReactiveBucketCycles("global", parsed?.globals);
+}
+
+function validateReactiveBucketCycles(
+  kind: "local" | "global",
+  bucket: Record<string, ParsedExpression | MixedTextSegment[]> | undefined,
+): void {
+  if (!bucket) {
+    return;
+  }
+  const bindings = bucket;
+  const names = new Set(Object.keys(bindings));
+  const visiting: string[] = [];
+  const visited = new Set<string>();
+
+  for (const name of names) {
+    visit(name);
+  }
+
+  function visit(name: string): void {
+    if (visited.has(name)) {
+      return;
+    }
+    const activeIndex = visiting.indexOf(name);
+    if (activeIndex >= 0) {
+      const cycle = [...visiting.slice(activeIndex), name];
+      const parsedValue = bindings[name];
+      const range = Array.isArray(parsedValue)
+        ? parsedValue[0]?.range
+        : parsedValue?.range;
+      throw diagnosticToError(
+        createErrorDiagnostic(
+          "XS301",
+          `Reactive XMLUI ${kind} variable cycle detected: ${cycle.join(" -> ")}.`,
+          {
+            sourceId: scopeSourceId(parsedValue),
+            start: range?.start ?? 0,
+            end: range?.end ?? 0,
+          },
+        ),
+      );
+    }
+
+    visiting.push(name);
+    for (const dependency of bindingDependencies(bindings[name])) {
+      if (dependency.kind === kind && names.has(dependency.name)) {
+        visit(dependency.name);
+      }
+    }
+    visiting.pop();
+    visited.add(name);
+  }
+}
+
+function bindingDependencies(
+  parsed: ParsedExpression | MixedTextSegment[] | undefined,
+): BoundDependency[] {
+  if (!parsed) {
+    return [];
+  }
+  if (Array.isArray(parsed)) {
+    return parsed.flatMap((segment) => (segment.kind === "expression" ? segment.dependencies ?? [] : []));
+  }
+  return parsed.dependencies ?? [];
+}
+
+function scopeSourceId(parsed: ParsedExpression | MixedTextSegment[] | undefined): string {
+  if (Array.isArray(parsed)) {
+    return parsed.find((segment) => segment.kind === "expression")?.ast.span.sourceId ?? "anonymous.xmlui";
+  }
+  return parsed?.ast.span.sourceId ?? "anonymous.xmlui";
 }
 
 function transformElement(node: MarkupSyntaxNode, source: SourceText, sourceId: string): XmluiElement {

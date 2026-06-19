@@ -6,6 +6,7 @@ import {
   createRuntimeScope,
   createRuntimeStateStore,
   initializeStateValues,
+  initializeStateValuesIntoStore,
   sameSlotKey,
   slotKeyId,
 } from "../../src/runtime/state";
@@ -160,5 +161,198 @@ describe("runtime state initialization", () => {
     );
 
     expect(values).toEqual({ count: 0, next: 42 });
+  });
+
+  it("initializes derived slots in dependency order and registers graph edges", () => {
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+
+    const values = initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: { double: "{count * 2}", count: "{2}" },
+      parsed: {
+        count: {
+          source: "2",
+          ast: {} as never,
+          range: { start: 0, end: 3 },
+          bindingMode: "source",
+          dependencies: [],
+          evaluate: () => 2,
+        },
+        double: {
+          source: "count * 2",
+          ast: {} as never,
+          range: { start: 0, end: 12 },
+          bindingMode: "derived",
+          dependencies: [
+            {
+              kind: "local",
+              name: "count",
+              path: ["count"],
+              span: { sourceId: "Main.xmlui", start: 0, end: 5 },
+            },
+          ],
+          evaluate: (context) => Number(context.readLocal("count")) * 2,
+        },
+      },
+      scope,
+      evaluate: (_value, parsed, evalScope) =>
+        !Array.isArray(parsed) && parsed?.evaluate
+          ? parsed.evaluate(createExpressionContext(evalScope))
+          : null,
+    });
+
+    expect(values).toEqual({ count: 2, double: 4 });
+    expect(store.readLocal("root", "double")).toBe(4);
+    expect(store.getReactiveVariable({ kind: "local", ownerId: "root", name: "double" })).toMatchObject({
+      mode: "derived",
+      dependencies: [{ kind: "local", ownerId: "root", name: "count" }],
+    });
+    expect(store.getReactiveDependents({ kind: "local", ownerId: "root", name: "count" })).toEqual([
+      expect.objectContaining({
+        slot: { kind: "local", ownerId: "root", name: "double" },
+      }),
+    ]);
+  });
+
+  it("recomputes derived variables and transitive chains after source writes", () => {
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: {
+        count: "{1}",
+        double: "{count * 2}",
+        label: "{'double: ' + double}",
+      },
+      parsed: {
+        count: {
+          source: "1",
+          ast: {} as never,
+          range: { start: 0, end: 3 },
+          evaluate: () => 1,
+          dependencies: [],
+        },
+        double: {
+          source: "count * 2",
+          ast: {} as never,
+          range: { start: 0, end: 12 },
+          dependencies: [
+            { kind: "local", name: "count", path: ["count"], span: { sourceId: "Main.xmlui", start: 0, end: 5 } },
+          ],
+          evaluate: (context) => Number(context.readLocal("count")) * 2,
+        },
+        label: {
+          source: "'double: ' + double",
+          ast: {} as never,
+          range: { start: 0, end: 20 },
+          dependencies: [
+            { kind: "local", name: "double", path: ["double"], span: { sourceId: "Main.xmlui", start: 12, end: 18 } },
+          ],
+          evaluate: (context) => `double: ${context.readLocal("double")}`,
+        },
+      },
+      scope,
+      evaluate: (_value, parsed, evalScope) =>
+        !Array.isArray(parsed) && parsed?.evaluate
+          ? parsed.evaluate(createExpressionContext(evalScope))
+          : null,
+    });
+
+    store.writeLocal("root", "count", 3);
+
+    expect(store.readLocal("root", "count")).toBe(3);
+    expect(store.readLocal("root", "double")).toBe(6);
+    expect(store.readLocal("root", "label")).toBe("double: 6");
+  });
+
+  it("stops recomputing a derived variable after explicit assignment", () => {
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: {
+        count: "{1}",
+        double: "{count * 2}",
+      },
+      parsed: {
+        count: {
+          source: "1",
+          ast: {} as never,
+          range: { start: 0, end: 3 },
+          evaluate: () => 1,
+          dependencies: [],
+        },
+        double: {
+          source: "count * 2",
+          ast: {} as never,
+          range: { start: 0, end: 12 },
+          dependencies: [
+            { kind: "local", name: "count", path: ["count"], span: { sourceId: "Main.xmlui", start: 0, end: 5 } },
+          ],
+          evaluate: (context) => Number(context.readLocal("count")) * 2,
+        },
+      },
+      scope,
+      evaluate: (_value, parsed, evalScope) =>
+        !Array.isArray(parsed) && parsed?.evaluate
+          ? parsed.evaluate(createExpressionContext(evalScope))
+          : null,
+    });
+
+    expect(store.readLocal("root", "double")).toBe(2);
+    store.writeLocal("root", "double", 99);
+    store.writeLocal("root", "count", 2);
+
+    expect(store.readLocal("root", "double")).toBe(99);
+    expect(store.getReactiveVariable({ kind: "local", ownerId: "root", name: "double" })).toMatchObject({
+      mode: "assigned",
+    });
+  });
+
+  it("recomputes prop-driven derived locals when props are invalidated", () => {
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("child");
+    const scope = createRuntimeScope({ store, localOwnerId: "child", props: { value: 2 } });
+
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "child",
+      expressions: { doubled: "{$props.value * 2}" },
+      parsed: {
+        doubled: {
+          source: "$props.value * 2",
+          ast: {} as never,
+          range: { start: 0, end: 18 },
+          dependencies: [
+            { kind: "props", name: "value", path: ["value"], span: { sourceId: "Child.xmlui", start: 7, end: 12 } },
+          ],
+          evaluate: (context) => Number(context.props?.value) * 2,
+        },
+      },
+      scope,
+      evaluate: (_value, parsed, evalScope) =>
+        !Array.isArray(parsed) && parsed?.evaluate
+          ? parsed.evaluate(createExpressionContext(evalScope))
+          : null,
+    });
+
+    expect(store.readLocal("child", "doubled")).toBe(4);
+    const nextScope = createRuntimeScope({ store, localOwnerId: "child", props: { value: 5 } });
+    store.updateReactiveEvaluator(
+      { kind: "local", ownerId: "child", name: "doubled" },
+      () => Number(nextScope.props.value) * 2,
+    );
+    store.invalidateProp("child", "value");
+
+    expect(store.readLocal("child", "doubled")).toBe(10);
   });
 });

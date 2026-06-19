@@ -1,0 +1,7 @@
+<App global.count="{1}" global.double="{count * 2}">
+  <H1>Reactive derived globals</H1>
+  <Text value="{'global double: ' + double}" />
+  <Button onClick="count++">
+    Global count: {count}
+  </Button>
+</App>

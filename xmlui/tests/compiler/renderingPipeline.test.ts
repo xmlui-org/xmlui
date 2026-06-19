@@ -12,7 +12,11 @@ import {
   stateDependencies,
   XmluiRenderError,
 } from "../../src/runtime/rendering";
-import { createRuntimeScope, createRuntimeStateStore } from "../../src/runtime/state";
+import {
+  createRuntimeScope,
+  createRuntimeStateStore,
+  initializeStateValuesIntoStore,
+} from "../../src/runtime/state";
 
 describe("rendering dependency normalization", () => {
   it("resolves local dependencies to the owning runtime scope", () => {
@@ -105,6 +109,36 @@ describe("rendering binding evaluation", () => {
     ]);
 
     expect(store.readGlobal("count")).toBe(2);
+  });
+
+  it("lets async handlers observe recomputed derived values after writes", async () => {
+    const document = parseXmlui(
+      `<App var.count="{1}" var.double="{count * 2}" var.status="{''}">
+        <Button onClick="delay(1); count++; status = double">Update</Button>
+      </App>`,
+      { sourceId: "Main.xmlui" },
+    );
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: document.root.vars,
+      parsed: document.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    const button = document.root.children[0];
+    if (button.kind !== "element") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+
+    await runEvent(button.parsed?.events?.click, scope);
+
+    expect(store.readLocal("root", "count")).toBe(2);
+    expect(store.readLocal("root", "double")).toBe(4);
+    expect(store.readLocal("root", "status")).toBe(4);
   });
 
   it("drops same-event starts while block handlers are running", async () => {

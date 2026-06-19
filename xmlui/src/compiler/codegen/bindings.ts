@@ -15,6 +15,7 @@ export function emitGeneratedExpressionBinding(
     range: expression.range,
     ir: expression.ir,
     compiledSource: generated.body,
+    bindingMode: expression.bindingMode,
     evaluate: rawJs(generated.functionSource),
     dependencies: expression.dependencies,
     ...("expressionRange" in expression ? { expressionRange: expression.expressionRange } : {}),

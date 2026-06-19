@@ -20,6 +20,7 @@ export type ParsedExpression = {
   range: SourceRange;
   ir?: XmluiScriptIr;
   compiledSource?: string;
+  bindingMode?: "source" | "derived";
   evaluate?: (context: CompiledExpressionContext) => unknown;
   dependencies?: BoundDependency[];
 };
@@ -51,6 +52,7 @@ export type MixedTextSegment =
       ast: ScriptNode;
       ir?: XmluiScriptIr;
       compiledSource?: string;
+      bindingMode?: "source" | "derived";
       evaluate?: (context: CompiledExpressionContext) => unknown;
       dependencies?: BoundDependency[];
     };
