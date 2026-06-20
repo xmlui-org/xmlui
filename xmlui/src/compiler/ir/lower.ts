@@ -419,6 +419,8 @@ const builtInElementNames = new Set([
   "H5",
   "H6",
   "Icon",
+  "Image",
+  "IFrame",
   "Button",
   "Br",
   "br",

@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 
-import { resolveThemeReferences, resolveThemeVariable } from "../../styling/theme";
 import { defaultProps } from "./Heading.defaults";
+import styles from "./Heading.module.scss?xmlui-css-module";
 
 export type HeadingLevel = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
@@ -18,7 +18,6 @@ export type HeadingProps = {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
-  themeVariables: Record<string, unknown>;
   registerApi?: (api: Record<string, unknown>) => void;
 };
 
@@ -35,7 +34,6 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
     className,
     style,
     children,
-    themeVariables,
     registerApi,
     ...rest
   },
@@ -61,15 +59,6 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
 
   const resolvedAnchorId = useMemo(() => anchorId || textFromChildren(children), [anchorId, children]);
 
-  const headingStyle = useMemo(
-    () => ({
-      ...baseHeadingStyle(themeVariables, normalizedLevel),
-      ...overflowStyle(maxLines, preserveLinebreaks, ellipses),
-      ...style,
-    }),
-    [ellipses, maxLines, normalizedLevel, preserveLinebreaks, style, themeVariables],
-  );
-
   return (
     <Element
       {...rest}
@@ -82,14 +71,25 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
         }
       }}
       id={id}
-      className={className}
-      style={headingStyle}
+      className={cx(
+        styles.heading,
+        styles[normalizedLevel],
+        maxLines > 0 ? styles.truncateOverflow : undefined,
+        maxLines > 1 ? styles.multiLineOverflow : undefined,
+        maxLinesClass(maxLines),
+        preserveLinebreaks ? styles.preserveLinebreaks : undefined,
+        !ellipses ? styles.noEllipsis : undefined,
+        className,
+      )}
+      style={style}
       data-xmlui-heading-level={normalizedLevel}
     >
-      {resolvedAnchorId ? <span id={resolvedAnchorId} data-anchor="true" style={anchorRefStyle} /> : null}
+      {resolvedAnchorId ? (
+        <span id={resolvedAnchorId} data-anchor="true" className={styles.anchorRef} />
+      ) : null}
       {children}
       {showAnchor && resolvedAnchorId ? (
-        <a href={`#${resolvedAnchorId}`} aria-hidden="true" style={anchorStyle(themeVariables)}>
+        <a href={`#${resolvedAnchorId}`} aria-hidden="true">
           #
         </a>
       ) : null}
@@ -113,61 +113,6 @@ export function normalizeHeadingLevel(value: unknown): HeadingLevel {
   return "h1";
 }
 
-function baseHeadingStyle(themeVariables: Record<string, unknown>, level: HeadingLevel): CSSProperties {
-  const key = level.toUpperCase();
-  return {
-    userSelect: "text",
-    color: themeValue(themeVariables, `Heading:textColor-${key}`) ?? themeValue(themeVariables, "textColor-Heading"),
-    fontFamily: themeValue(themeVariables, `Heading:fontFamily-${key}`) ?? themeValue(themeVariables, "fontFamily-Heading"),
-    fontSize: themeValue(themeVariables, `fontSize-${key}`),
-    fontWeight: themeValue(themeVariables, `Heading:fontWeight-${key}`) ?? themeValue(themeVariables, "fontWeight-Heading"),
-    lineHeight: themeValue(themeVariables, `lineHeight-${key}`),
-    letterSpacing: themeValue(themeVariables, `Heading:letterSpacing-${key}`),
-    marginTop: themeValue(themeVariables, `marginTop-${key}`) ?? 0,
-    marginBottom: themeValue(themeVariables, `marginBottom-${key}`) ?? 0,
-    textDecorationLine: themeValue(themeVariables, `Heading:textDecorationLine-${key}`),
-    textDecorationColor: themeValue(themeVariables, `Heading:textDecorationColor-${key}`),
-    textDecorationStyle: themeValue(themeVariables, `Heading:textDecorationStyle-${key}`),
-    textDecorationThickness: themeValue(themeVariables, `Heading:textDecorationThickness-${key}`),
-    textUnderlineOffset: themeValue(themeVariables, `Heading:textUnderlineOffset-${key}`),
-  } as CSSProperties;
-}
-
-function overflowStyle(maxLines: number, preserveLinebreaks: boolean, ellipses: boolean): CSSProperties {
-  if (maxLines <= 0) {
-    return preserveLinebreaks ? { whiteSpace: "pre-wrap" } : {};
-  }
-  if (maxLines > 1) {
-    return {
-      display: "-webkit-box",
-      overflow: "hidden",
-      textOverflow: ellipses ? "ellipsis" : "clip",
-      whiteSpace: preserveLinebreaks ? "pre-wrap" : undefined,
-      WebkitBoxOrient: "vertical",
-      WebkitLineClamp: maxLines,
-    };
-  }
-  return {
-    overflow: "hidden",
-    textOverflow: ellipses ? "ellipsis" : "clip",
-    whiteSpace: preserveLinebreaks ? "pre-wrap" : "nowrap",
-  };
-}
-
-function anchorStyle(themeVariables: Record<string, unknown>): CSSProperties {
-  return {
-    marginInlineStart: themeValue(themeVariables, "gap-anchor-Heading"),
-    color: themeValue(themeVariables, "color-anchor-Heading"),
-    textDecorationLine: themeValue(themeVariables, "textDecorationLine-anchor-Heading"),
-  };
-}
-
-const anchorRefStyle: CSSProperties = {
-  width: 0,
-  height: 0,
-  scrollMarginTop: "var(--header-height)",
-};
-
 function textFromChildren(children: ReactNode): string | undefined {
   if (typeof children !== "string" && typeof children !== "number") {
     return undefined;
@@ -180,10 +125,14 @@ function slugifyHeading(text: string): string {
   return /^[0-9]/.test(slug) ? `heading-${slug}` : slug;
 }
 
-function themeValue(themeVariables: Record<string, unknown>, name: string): string | undefined {
-  const value = resolveThemeVariable(name, [themeVariables]);
-  if (value === undefined || value === null || value === "") {
+function maxLinesClass(maxLines: number): string | undefined {
+  if (maxLines < 1) {
     return undefined;
   }
-  return String(resolveThemeReferences(value));
+  const capped = Math.min(Math.floor(maxLines), 12);
+  return styles[`maxLines${capped}`];
+}
+
+function cx(...classes: Array<string | undefined | false>): string {
+  return classes.filter(Boolean).join(" ");
 }

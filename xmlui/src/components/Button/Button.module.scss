@@ -122,3 +122,268 @@ $outlineOffset-Button--focus: createThemeVar("outlineOffset-Button--focus");
 :export {
   themeVars: ();
 }
+
+@layer components {
+  .button {
+    width: var(--xmlui-width-Button);
+    height: var(--xmlui-height-Button);
+    min-width: 0;
+    margin: 0;
+    padding: var(--xmlui-padding-Button);
+    border-width: var(--xmlui-borderWidth-Button);
+    border-style: var(--xmlui-borderStyle-Button);
+    border-color: var(--xmlui-borderColor-Button);
+    border-radius: var(--xmlui-borderRadius-Button);
+    background: var(--xmlui-backgroundColor-Button);
+    color: var(--xmlui-textColor-Button);
+    box-shadow: var(--xmlui-boxShadow-Button);
+    font-family: var(--xmlui-fontFamily-Button);
+    font-size: var(--xmlui-fontSize-Button);
+    font-weight: var(--xmlui-fontWeight-Button);
+    font-style: var(--xmlui-fontStyle-Button);
+    line-height: normal;
+    transition: var(--xmlui-transition-Button);
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    gap: var(--xmlui-gap-Button);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .button * {
+    color: inherit;
+  }
+
+  .button:focus-visible {
+    outline-width: var(--xmlui-outlineWidth-Button--focus);
+    outline-color: var(--xmlui-outlineColor-Button--focus);
+    outline-style: var(--xmlui-outlineStyle-Button--focus);
+    outline-offset: var(--xmlui-outlineOffset-Button--focus);
+  }
+
+  .button:disabled {
+    cursor: not-allowed;
+    background: var(--xmlui-backgroundColor-Button--disabled);
+    color: var(--xmlui-textColor-Button--disabled);
+    border-color: var(--xmlui-borderColor-Button--disabled);
+  }
+
+  .buttonHorizontal {
+    flex-direction: row;
+  }
+
+  .buttonVertical {
+    flex-direction: column;
+    gap: var(--xmlui-gap-Button-vertical);
+    width: var(--xmlui-width-Button-vertical);
+    height: var(--xmlui-height-Button-vertical);
+  }
+
+  .xs {
+    padding: var(--xmlui-paddingVertical-Button-xs) var(--xmlui-paddingHorizontal-Button-xs);
+  }
+
+  .sm {
+    padding: var(--xmlui-paddingVertical-Button-sm) var(--xmlui-paddingHorizontal-Button-sm);
+  }
+
+  .md {
+    padding: var(--xmlui-paddingVertical-Button-md) var(--xmlui-paddingHorizontal-Button-md);
+  }
+
+  .lg {
+    padding: var(--xmlui-paddingVertical-Button-lg) var(--xmlui-paddingHorizontal-Button-lg);
+  }
+
+  .alignStart {
+    justify-content: start;
+  }
+
+  .alignEnd {
+    justify-content: end;
+  }
+
+  .solidPrimary {
+    border-color: var(--xmlui-borderColor-Button-primary);
+    background: var(--xmlui-backgroundColor-Button-primary);
+    color: var(--xmlui-textColor-Button-solid);
+    font-family: var(--xmlui-fontFamily-Button-primary-solid, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-primary-solid, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-primary-solid, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-primary-solid, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-primary-solid, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-primary-solid, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-primary-solid, var(--xmlui-borderStyle-Button));
+    background: var(--xmlui-backgroundColor-Button-primary-solid, var(--xmlui-backgroundColor-Button-primary, var(--xmlui-backgroundColor-Button)));
+    color: var(--xmlui-textColor-Button-primary-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button)));
+    box-shadow: var(--xmlui-boxShadow-Button-primary-solid, var(--xmlui-boxShadow-Button));
+    transition: var(--xmlui-transition-Button-primary-solid, var(--xmlui-transition-Button));
+  }
+
+  .solidSecondary {
+    border-color: var(--xmlui-borderColor-Button-secondary);
+    background: var(--xmlui-backgroundColor-Button-secondary);
+    color: var(--xmlui-textColor-Button-solid);
+    font-family: var(--xmlui-fontFamily-Button-secondary-solid, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-secondary-solid, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-secondary-solid, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-secondary-solid, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-secondary-solid, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-secondary-solid, var(--xmlui-borderColor-Button-secondary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-secondary-solid, var(--xmlui-borderStyle-Button));
+    background: var(--xmlui-backgroundColor-Button-secondary-solid, var(--xmlui-backgroundColor-Button-secondary, var(--xmlui-backgroundColor-Button)));
+    color: var(--xmlui-textColor-Button-secondary-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button)));
+    box-shadow: var(--xmlui-boxShadow-Button-secondary-solid, var(--xmlui-boxShadow-Button));
+    transition: var(--xmlui-transition-Button-secondary-solid, var(--xmlui-transition-Button));
+  }
+
+  .solidAttention {
+    border-color: var(--xmlui-borderColor-Button-attention);
+    background: var(--xmlui-backgroundColor-Button-attention);
+    color: var(--xmlui-textColor-Button-solid);
+    font-family: var(--xmlui-fontFamily-Button-attention-solid, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-attention-solid, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-attention-solid, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-attention-solid, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-attention-solid, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-attention-solid, var(--xmlui-borderColor-Button-attention, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-attention-solid, var(--xmlui-borderStyle-Button));
+    background: var(--xmlui-backgroundColor-Button-attention-solid, var(--xmlui-backgroundColor-Button-attention, var(--xmlui-backgroundColor-Button)));
+    color: var(--xmlui-textColor-Button-attention-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button)));
+    box-shadow: var(--xmlui-boxShadow-Button-attention-solid, var(--xmlui-boxShadow-Button));
+    transition: var(--xmlui-transition-Button-attention-solid, var(--xmlui-transition-Button));
+  }
+
+  .outlinedPrimary {
+    background: transparent;
+    font-family: var(--xmlui-fontFamily-Button-primary-outlined, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-primary-outlined, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-primary-outlined, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-primary-outlined, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-primary-outlined, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-primary-outlined, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-primary-outlined, var(--xmlui-borderStyle-Button));
+    color: var(--xmlui-textColor-Button-primary-outlined, var(--xmlui-textColor-Button));
+    box-shadow: var(--xmlui-boxShadow-Button-primary-outlined, var(--xmlui-boxShadow-Button));
+  }
+
+  .outlinedSecondary {
+    background: transparent;
+    font-family: var(--xmlui-fontFamily-Button-secondary-outlined, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-secondary-outlined, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-secondary-outlined, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-secondary-outlined, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-secondary-outlined, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-secondary-outlined, var(--xmlui-borderColor-Button-secondary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-secondary-outlined, var(--xmlui-borderStyle-Button));
+    color: var(--xmlui-textColor-Button-secondary-outlined, var(--xmlui-textColor-Button));
+    box-shadow: var(--xmlui-boxShadow-Button-secondary-outlined, var(--xmlui-boxShadow-Button));
+  }
+
+  .outlinedAttention {
+    background: transparent;
+    font-family: var(--xmlui-fontFamily-Button-attention-outlined, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-attention-outlined, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-attention-outlined, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-attention-outlined, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-attention-outlined, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-attention-outlined, var(--xmlui-borderColor-Button-attention, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-attention-outlined, var(--xmlui-borderStyle-Button));
+    color: var(--xmlui-textColor-Button-attention-outlined, var(--xmlui-textColor-Button));
+    box-shadow: var(--xmlui-boxShadow-Button-attention-outlined, var(--xmlui-boxShadow-Button));
+  }
+
+  .ghostPrimary {
+    background: transparent;
+    border-color: transparent;
+    border-style: solid;
+    font-family: var(--xmlui-fontFamily-Button-primary-ghost, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-primary-ghost, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-primary-ghost, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-primary-ghost, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-primary-ghost, var(--xmlui-borderWidth-Button));
+    color: var(--xmlui-textColor-Button-primary-ghost, var(--xmlui-textColor-Button));
+  }
+
+  .ghostSecondary {
+    background: transparent;
+    border-color: transparent;
+    border-style: solid;
+    font-family: var(--xmlui-fontFamily-Button-secondary-ghost, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-secondary-ghost, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-secondary-ghost, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-secondary-ghost, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-secondary-ghost, var(--xmlui-borderWidth-Button));
+    color: var(--xmlui-textColor-Button-secondary-ghost, var(--xmlui-textColor-Button));
+  }
+
+  .ghostAttention {
+    background: transparent;
+    border-color: transparent;
+    border-style: solid;
+    font-family: var(--xmlui-fontFamily-Button-attention-ghost, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-attention-ghost, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-attention-ghost, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-attention-ghost, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-attention-ghost, var(--xmlui-borderWidth-Button));
+    color: var(--xmlui-textColor-Button-attention-ghost, var(--xmlui-textColor-Button));
+  }
+
+  .solidPrimary:not([disabled]):hover {
+    border-color: var(--xmlui-borderColor-Button-primary-solid--hover);
+    color: var(--xmlui-textColor-Button-primary-solid--hover);
+    background: var(--xmlui-backgroundColor-Button-primary-solid--hover);
+  }
+
+  .outlinedPrimary:not([disabled]):hover {
+    border-color: var(--xmlui-borderColor-Button-primary-outlined--hover);
+    background: var(--xmlui-backgroundColor-Button-primary-outlined--hover);
+    color: var(--xmlui-textColor-Button-primary-outlined--hover);
+  }
+
+  .ghostPrimary:not([disabled]):hover {
+    background: var(--xmlui-backgroundColor-Button-primary-ghost--hover);
+    color: var(--xmlui-textColor-Button-primary-ghost--hover);
+  }
+
+  .solidPrimary:not([disabled]):active {
+    border-color: var(--xmlui-borderColor-Button-primary-solid--active);
+    color: var(--xmlui-textColor-Button-primary-solid--active);
+    box-shadow: var(--xmlui-boxShadow-Button-primary-solid--active);
+    background: var(--xmlui-backgroundColor-Button-primary-solid--active);
+  }
+
+  .outlinedPrimary:not([disabled]):active {
+    border-color: var(--xmlui-borderColor-Button-primary-outlined--active);
+    background: var(--xmlui-backgroundColor-Button-primary-outlined--active);
+    color: var(--xmlui-textColor-Button-primary-outlined--active);
+  }
+
+  .ghostPrimary:not([disabled]):active {
+    background: var(--xmlui-backgroundColor-Button-primary-ghost--active);
+    color: var(--xmlui-textColor-Button-primary-ghost--active);
+  }
+
+  .icon {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    mask: radial-gradient(circle, black 55%, transparent 56%);
+    -webkit-mask: radial-gradient(circle, black 55%, transparent 56%);
+  }
+
+  .visuallyHidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap;
+  }
+}

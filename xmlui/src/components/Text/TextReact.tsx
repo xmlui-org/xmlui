@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 
-import { resolveThemeReferences, resolveThemeVariable } from "../../styling/theme";
 import { defaultProps } from "./Text.defaults";
+import styles from "./Text.module.scss?xmlui-css-module";
 
 export const textVariantElement = {
   abbr: "abbr",
@@ -43,7 +43,6 @@ export type TextProps = {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
-  themeVariables: Record<string, unknown>;
   onContextMenu?: () => void | Promise<void>;
   registerApi?: (api: Record<string, unknown>) => void;
 };
@@ -60,7 +59,6 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
     className,
     style,
     children,
-    themeVariables,
     onContextMenu,
     registerApi,
     ...rest
@@ -90,12 +88,6 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
     registerApi?.({ hasOverflow });
   }, [hasOverflow, registerApi]);
 
-  const textStyle = {
-    ...baseTextStyle(themeVariables, variant),
-    ...overflowStyle({ maxLines, preserveLinebreaks, ellipses, overflowMode, breakMode }),
-    ...style,
-  };
-
   return (
     <Element
       {...rest}
@@ -108,8 +100,17 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
         }
       }}
       id={id}
-      className={className}
-      style={textStyle}
+      className={cx(
+        styles.text,
+        variant ? styles[`variant_${variant}`] : undefined,
+        overflowClass(overflowMode, maxLines),
+        overflowUsesMaxLines(overflowMode, maxLines) ? maxLinesClass(maxLines) : undefined,
+        preserveLinebreaks ? styles.preserveLinebreaks : undefined,
+        !ellipses ? styles.noEllipsis : undefined,
+        breakModeClass(breakMode),
+        className,
+      )}
+      style={style}
       onContextMenu={onContextMenu}
       data-xmlui-text-variant={variant}
     >
@@ -118,116 +119,50 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
   );
 });
 
-function baseTextStyle(themeVariables: Record<string, unknown>, variant?: string): CSSProperties {
-  const suffix = variant ? `-${variant}` : "";
-  return {
-    display: "inline-block",
-    margin: 0,
-    padding: textPadding(themeVariables, suffix),
-    verticalAlign: themeValue(themeVariables, `verticalAlignment-Text${suffix}`) ?? "baseline",
-    userSelect: "text",
-    color: themeValue(themeVariables, `textColor-Text${suffix}`),
-    backgroundColor: themeValue(themeVariables, `backgroundColor-Text${suffix}`),
-    fontFamily: themeValue(themeVariables, `fontFamily-Text${suffix}`),
-    fontSize: themeValue(themeVariables, `fontSize-Text${suffix}`),
-    fontWeight: themeValue(themeVariables, `fontWeight-Text${suffix}`),
-    fontStyle: themeValue(themeVariables, `fontStyle-Text${suffix}`),
-    fontStretch: themeValue(themeVariables, `fontStretch-Text${suffix}`),
-    lineHeight: themeValue(themeVariables, `lineHeight-Text${suffix}`),
-    letterSpacing: themeValue(themeVariables, `letterSpacing-Text${suffix}`),
-    wordSpacing: themeValue(themeVariables, `wordSpacing-Text${suffix}`),
-    textShadow: themeValue(themeVariables, `textShadow-Text${suffix}`),
-    textIndent: themeValue(themeVariables, `textIndent-Text${suffix}`),
-    textAlign: themeValue(themeVariables, `textAlign-Text${suffix}`) as CSSProperties["textAlign"],
-    textAlignLast: themeValue(themeVariables, `textAlignLast-Text${suffix}`) as CSSProperties["textAlignLast"],
-    direction: themeValue(themeVariables, `direction-Text${suffix}`) as CSSProperties["direction"],
-    writingMode: themeValue(themeVariables, `writingMode-Text${suffix}`) as CSSProperties["writingMode"],
-    lineBreak: themeValue(themeVariables, `lineBreak-Text${suffix}`) as CSSProperties["lineBreak"],
-    textTransform: themeValue(themeVariables, `textTransform-Text${suffix}`),
-    textDecorationLine: themeValue(themeVariables, `textDecorationLine-Text${suffix}`),
-    textDecorationColor: themeValue(themeVariables, `textDecorationColor-Text${suffix}`),
-    textDecorationStyle: themeValue(themeVariables, `textDecorationStyle-Text${suffix}`) as CSSProperties["textDecorationStyle"],
-    textDecorationThickness: themeValue(themeVariables, `textDecorationThickness-Text${suffix}`),
-    textUnderlineOffset: themeValue(themeVariables, `textUnderlineOffset-Text${suffix}`),
-    wordBreak: themeValue(themeVariables, `wordBreak-Text${suffix}`) as CSSProperties["wordBreak"],
-    overflowWrap: themeValue(themeVariables, `wordWrap-Text${suffix}`) as CSSProperties["overflowWrap"],
-    borderWidth: themeValue(themeVariables, `borderWidth-Text${suffix}`),
-    borderStyle: themeValue(themeVariables, `borderStyle-Text${suffix}`),
-    borderColor: themeValue(themeVariables, `borderColor-Text${suffix}`),
-    borderRadius: themeValue(themeVariables, `borderRadius-Text${suffix}`),
-    marginTop: themeValue(themeVariables, `marginTop-Text${suffix}`),
-    marginBottom: themeValue(themeVariables, `marginBottom-Text${suffix}`),
-    marginInlineStart: themeValue(themeVariables, `marginLeft-Text${suffix}`),
-    marginInlineEnd: themeValue(themeVariables, `marginRight-Text${suffix}`),
-  };
-}
-
-function textPadding(themeVariables: Record<string, unknown>, suffix: string): string | undefined {
-  const vertical =
-    themeValue(themeVariables, `paddingVertical-Text${suffix}`)
-    ?? themeValue(themeVariables, `paddingBottom-Text${suffix}`);
-  const horizontal = themeValue(themeVariables, `paddingHorizontal-Text${suffix}`);
-  return vertical || horizontal ? `${vertical ?? 0} ${horizontal ?? 0}` : undefined;
-}
-
-function overflowStyle({
-  maxLines,
-  preserveLinebreaks,
-  ellipses,
-  overflowMode,
-  breakMode,
-}: {
-  maxLines: number;
-  preserveLinebreaks: boolean;
-  ellipses: boolean;
-  overflowMode?: string;
-  breakMode?: string;
-}): CSSProperties {
-  const style: CSSProperties = {};
-  if (preserveLinebreaks) {
-    style.whiteSpace = "pre-wrap";
-  }
+function overflowClass(overflowMode: string | undefined, maxLines: number): string | undefined {
   if (overflowMode === "none") {
-    style.whiteSpace = "nowrap";
-    style.overflow = "hidden";
-    style.textOverflow = "clip";
-  } else if (overflowMode === "scroll") {
-    style.whiteSpace = "nowrap";
-    style.overflowX = "auto";
-    style.overflowY = "hidden";
-    style.textOverflow = "clip";
-  } else if (overflowMode === "flow") {
-    style.whiteSpace = "normal";
-    style.overflowY = "auto";
-    style.overflowX = "hidden";
-  } else if (maxLines > 0 || overflowMode === "ellipsis") {
-    style.overflow = "hidden";
-    style.textOverflow = ellipses ? "ellipsis" : "clip";
-    if (maxLines <= 1) {
-      style.whiteSpace = preserveLinebreaks ? "pre-wrap" : "nowrap";
-    } else {
-      style.display = "-webkit-box";
-      style.WebkitBoxOrient = "vertical";
-      style.WebkitLineClamp = maxLines;
-    }
+    return styles.overflowNone;
   }
-  if (breakMode === "word") {
-    style.overflowWrap = "break-word";
-  } else if (breakMode === "anywhere") {
-    style.overflowWrap = "anywhere";
-  } else if (breakMode === "keep") {
-    style.wordBreak = "keep-all";
-  } else if (breakMode === "hyphenate") {
-    style.hyphens = "auto";
-    style.overflowWrap = "break-word";
+  if (overflowMode === "scroll") {
+    return styles.overflowScroll;
   }
-  return style;
+  if (overflowMode === "flow") {
+    return styles.overflowFlow;
+  }
+  if (overflowMode === "ellipsis" || maxLines > 0) {
+    return maxLines > 1 ? styles.overflowMultiLine : styles.overflowEllipsis;
+  }
+  return undefined;
 }
 
-function themeValue(themeVariables: Record<string, unknown>, name: string): string | undefined {
-  const value = resolveThemeVariable(name, [themeVariables]);
-  if (value === undefined || value === null || value === "") {
+function overflowUsesMaxLines(overflowMode: string | undefined, maxLines: number): boolean {
+  return maxLines > 0 && overflowMode !== "none" && overflowMode !== "scroll" && overflowMode !== "flow";
+}
+
+function breakModeClass(breakMode?: string): string | undefined {
+  if (breakMode === "word") {
+    return styles.breakWord;
+  }
+  if (breakMode === "anywhere") {
+    return styles.breakAnywhere;
+  }
+  if (breakMode === "keep") {
+    return styles.breakKeep;
+  }
+  if (breakMode === "hyphenate") {
+    return styles.breakHyphenate;
+  }
+  return undefined;
+}
+
+function maxLinesClass(maxLines: number): string | undefined {
+  if (maxLines < 1) {
     return undefined;
   }
-  return String(resolveThemeReferences(value));
+  const capped = Math.min(Math.floor(maxLines), 12);
+  return styles[`maxLines${capped}`];
+}
+
+function cx(...classes: Array<string | undefined | false>): string {
+  return classes.filter(Boolean).join(" ");
 }

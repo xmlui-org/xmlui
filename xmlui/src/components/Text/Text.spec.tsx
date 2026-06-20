@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { parseXmlui } from "../../compiler/parseXmlui";
+import { builtInComponentContracts } from "../../compiler/contracts";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { XmluiThemeRoot } from "../../runtime/rendering/theme";
@@ -9,12 +10,13 @@ import {
   createRuntimeScope,
   createRuntimeStateStore,
 } from "../../runtime/state";
-import { textContract, textRenderer } from "./Text";
+import { textRenderer } from "./Text";
 import { Text as TextReact } from "./TextReact";
 
 describe("Text migration", () => {
   it("uses source-adjacent metadata, renderer, defaults, styles, docs, and tests", () => {
     const textModule = componentTransferModules.find((component) => component.name === "Text");
+    const textContract = builtInComponentContracts.find((contract) => contract.name === "Text");
 
     expect(textModule?.status).toBe("transferred-folder");
     expect(textModule?.contract).toBe(textContract);
@@ -58,7 +60,7 @@ describe("Text migration", () => {
 
 function renderTextVariant(variant: string) {
   return renderToStaticMarkup(
-    <TextReact variant={variant} themeVariables={{}}>
+    <TextReact variant={variant}>
       content
     </TextReact>,
   );

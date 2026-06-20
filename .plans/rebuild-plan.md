@@ -1028,7 +1028,7 @@ Original E2E sources transferred:
 
 Verification completed:
 
-- `npm --workspace xmlui run test:e2e -- src/components/Br/Br-old-e2e.spec.ts src/components/Fragment/Fragment-old-e2e.spec.ts src/components/HtmlTags/HtmlTags-old-e2e.spec.ts`;
+- `npm --workspace xmlui run test:e2e -- src/components/Br/Br.spec.ts src/components/Fragment/Fragment.spec.ts src/components/HtmlTags/HtmlTags.spec.ts`;
 - `npm --workspace xmlui run test -- tests/compiler 'src/components/**/*.spec.tsx'`;
 - `npm --workspace xmlui run compatibility:sweep`.
 
@@ -1039,11 +1039,15 @@ Visual check:
 
 ##### Wave A3: Images and Embedded Media
 
+This wave is intentionally split into smaller closure chunks so each component
+can bring over all old colocated E2E coverage before the next media component
+starts.
+
+##### Wave A3a: Image and IFrame - completed
+
 Components:
 
 - `Image`;
-- `Icon`;
-- `Logo`;
 - `IFrame`.
 
 Compatibility focus:
@@ -1052,10 +1056,50 @@ Compatibility focus:
 - alt/title/accessibility behavior;
 - intrinsic and explicit sizing;
 - loading/error/fallback behavior;
-- icon name resolution and old theme-variable styling.
+- iframe security attributes, `srcdoc`, load events, and exposed APIs.
 
 Closure requires transferred old E2E tests, visual examples for image/icon/media
 rendering, and any needed asset fixtures.
+
+Status: completed for `Image` and `IFrame`. Migrated component folders include
+old-shaped metadata in `Image.tsx`/`IFrame.tsx`, defaults where the old component
+has them, SCSS theme-variable declarations, docs copied from the old component
+folders, source-adjacent renderers, and the original old E2E specs under their
+original names. The renderer preserves Image alt omission semantics for
+non-string/object/function values, keeps `inline=true` compatible even inside
+the App flex content layout, and exposes IFrame `postMessage`,
+`getContentWindow`, and `getContentDocument` APIs.
+
+Original E2E sources transferred:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Image/Image.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/IFrame/IFrame.spec.ts`.
+
+Verification completed:
+
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/Image/Image.spec.ts src/components/IFrame/IFrame.spec.ts` passed 98/98.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=imageIFrameMedia`.
+
+##### Wave A3b: Icon and Logo
+
+Components:
+
+- `Icon`;
+- `Logo`.
+
+Compatibility focus:
+
+- icon name resolution;
+- SVG/icon registry behavior;
+- old theme-variable styling;
+- default sizing, color inheritance, accessibility, and docs metadata.
+
+Closure requires transferred old E2E tests, visual examples for icon/logo
+rendering, and any needed icon asset fixtures.
 
 ##### Wave A4: Rich Text and Code Rendering
 

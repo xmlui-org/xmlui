@@ -1,11 +1,5 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
-import {
-  collectComponentThemeDefaults,
-  extractScssThemeVars,
-  mergeThemeVariableLayers,
-} from "../../styling/theme";
-import { useThemeVariables } from "../../runtime/rendering/theme";
-import { componentMetadataToContract } from "../../component-core/metadata/contract";
+import { extractScssThemeVars } from "../../styling/theme";
 import {
   createMetadata,
   dComponent,
@@ -145,35 +139,6 @@ export const H4Md = shortcutMetadata.H4;
 export const H5Md = shortcutMetadata.H5;
 export const H6Md = shortcutMetadata.H6;
 
-export const headingContract = componentMetadataToContract(HeadingMd, {
-  name: "Heading",
-  includeLayoutProps: true,
-});
-export const h1Contract = componentMetadataToContract(H1Md, {
-  name: "H1",
-  includeLayoutProps: true,
-});
-export const h2Contract = componentMetadataToContract(H2Md, {
-  name: "H2",
-  includeLayoutProps: true,
-});
-export const h3Contract = componentMetadataToContract(H3Md, {
-  name: "H3",
-  includeLayoutProps: true,
-});
-export const h4Contract = componentMetadataToContract(H4Md, {
-  name: "H4",
-  includeLayoutProps: true,
-});
-export const h5Contract = componentMetadataToContract(H5Md, {
-  name: "H5",
-  includeLayoutProps: true,
-});
-export const h6Contract = componentMetadataToContract(H6Md, {
-  name: "H6",
-  includeLayoutProps: true,
-});
-
 export const headingRenderer = createHeadingRenderer("Heading", HeadingMd);
 export const h1Renderer = createHeadingRenderer("H1", H1Md, "h1");
 export const h2Renderer = createHeadingRenderer("H2", H2Md, "h2");
@@ -218,13 +183,8 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
   return wrapComponent({
     name,
     metadata,
+    themeContributors: fixedLevel ? [HeadingMd] : [],
     renderer: ({ adapter }) => {
-      const themeVariables = useThemeVariables();
-      const mergedThemeVariables = mergeThemeVariableLayers([
-        collectComponentThemeDefaults(HeadingMd),
-        collectComponentThemeDefaults(metadata),
-        themeVariables,
-      ]);
       const hasValue = Object.prototype.hasOwnProperty.call(adapter.node.props, "value");
       const value = adapter.prop("value");
       const children = hasValue ? displayText(value) : adapter.renderChildren();
@@ -241,7 +201,6 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
           ellipses={adapter.booleanProp("ellipses", defaultProps.ellipses)}
           omitFromToc={adapter.booleanProp("omitFromToc", defaultProps.omitFromToc)}
           showAnchor={adapter.booleanProp("showAnchor", defaultProps.showAnchor)}
-          themeVariables={mergedThemeVariables}
           registerApi={adapter.registerApi}
         >
           {children}

@@ -70,3 +70,177 @@ $backgroundColor-Text-marked: createThemeVar("backgroundColor-Text-marked");
 :export {
   themeVars: ();
 }
+
+@layer components {
+  .text {
+    display: inline-block;
+    margin: 0;
+    margin-top: var(--xmlui-current-marginTop-Text, var(--xmlui-marginTop-Text, 0));
+    margin-bottom: var(--xmlui-current-marginBottom-Text, var(--xmlui-marginBottom-Text, 0));
+    margin-inline-start: var(--xmlui-current-marginLeft-Text, var(--xmlui-marginLeft-Text, 0));
+    margin-inline-end: var(--xmlui-current-marginRight-Text, var(--xmlui-marginRight-Text, 0));
+    padding: var(--xmlui-current-paddingVertical-Text, var(--xmlui-current-paddingBottom-Text, var(--xmlui-paddingVertical-Text, var(--xmlui-paddingBottom-Text, 0)))) var(--xmlui-current-paddingHorizontal-Text, var(--xmlui-paddingHorizontal-Text, 0));
+    vertical-align: var(--xmlui-current-verticalAlignment-Text, var(--xmlui-verticalAlignment-Text, baseline));
+    user-select: text;
+    color: var(--xmlui-current-textColor-Text, var(--xmlui-textColor-Text));
+    background-color: var(--xmlui-current-backgroundColor-Text, var(--xmlui-backgroundColor-Text));
+    font-family: var(--xmlui-current-fontFamily-Text, var(--xmlui-fontFamily-Text));
+    font-size: var(--xmlui-current-fontSize-Text, var(--xmlui-fontSize-Text));
+    font-weight: var(--xmlui-current-fontWeight-Text, var(--xmlui-fontWeight-Text));
+    font-style: var(--xmlui-current-fontStyle-Text, var(--xmlui-fontStyle-Text));
+    font-stretch: var(--xmlui-current-fontStretch-Text, var(--xmlui-fontStretch-Text));
+    line-height: var(--xmlui-current-lineHeight-Text, var(--xmlui-lineHeight-Text));
+    letter-spacing: var(--xmlui-current-letterSpacing-Text, var(--xmlui-letterSpacing-Text));
+    word-spacing: var(--xmlui-current-wordSpacing-Text, var(--xmlui-wordSpacing-Text));
+    text-shadow: var(--xmlui-current-textShadow-Text, var(--xmlui-textShadow-Text));
+    text-indent: var(--xmlui-current-textIndent-Text, var(--xmlui-textIndent-Text));
+    text-align: var(--xmlui-current-textAlign-Text, var(--xmlui-textAlign-Text));
+    text-align-last: var(--xmlui-current-textAlignLast-Text, var(--xmlui-textAlignLast-Text));
+    direction: var(--xmlui-current-direction-Text, var(--xmlui-direction-Text));
+    writing-mode: var(--xmlui-current-writingMode-Text, var(--xmlui-writingMode-Text));
+    line-break: var(--xmlui-current-lineBreak-Text, var(--xmlui-lineBreak-Text));
+    text-transform: var(--xmlui-current-textTransform-Text, var(--xmlui-textTransform-Text));
+    text-decoration-line: var(--xmlui-current-textDecorationLine-Text, var(--xmlui-textDecorationLine-Text));
+    text-decoration-color: var(--xmlui-current-textDecorationColor-Text, var(--xmlui-textDecorationColor-Text));
+    text-decoration-style: var(--xmlui-current-textDecorationStyle-Text, var(--xmlui-textDecorationStyle-Text));
+    text-decoration-thickness: var(--xmlui-current-textDecorationThickness-Text, var(--xmlui-textDecorationThickness-Text));
+    text-underline-offset: var(--xmlui-current-textUnderlineOffset-Text, var(--xmlui-textUnderlineOffset-Text));
+    word-break: var(--xmlui-current-wordBreak-Text, var(--xmlui-wordBreak-Text));
+    overflow-wrap: var(--xmlui-current-wordWrap-Text, var(--xmlui-wordWrap-Text));
+    border-width: var(--xmlui-current-borderWidth-Text, var(--xmlui-borderWidth-Text));
+    border-style: var(--xmlui-current-borderStyle-Text, var(--xmlui-borderStyle-Text));
+    border-color: var(--xmlui-current-borderColor-Text, var(--xmlui-borderColor-Text));
+    border-radius: var(--xmlui-current-borderRadius-Text, var(--xmlui-borderRadius-Text));
+  }
+
+  .variant_abbr,
+  .variant_cite,
+  .variant_code,
+  .variant_deleted,
+  .variant_em,
+  .variant_inserted,
+  .variant_keyboard,
+  .variant_marked,
+  .variant_mono,
+  .variant_paragraph,
+  .variant_placeholder,
+  .variant_sample,
+  .variant_secondary,
+  .variant_small,
+  .variant_strong,
+  .variant_subheading,
+  .variant_subtitle,
+  .variant_tableheading,
+  .variant_title {
+    /* Variant classes intentionally activate current variant CSS variables in .text. */
+  }
+
+  .preserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .overflowNone {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  .overflowScroll {
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-overflow: clip;
+  }
+
+  .overflowFlow {
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .overflowEllipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .overflowEllipsis.preserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .overflowMultiLine {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+  }
+
+  .noEllipsis {
+    text-overflow: clip;
+  }
+
+  .breakWord {
+    overflow-wrap: break-word;
+  }
+
+  .breakAnywhere {
+    overflow-wrap: anywhere;
+  }
+
+  .breakKeep {
+    word-break: keep-all;
+  }
+
+  .breakHyphenate {
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
+  .maxLines1 {
+    -webkit-line-clamp: 1;
+  }
+
+  .maxLines2 {
+    -webkit-line-clamp: 2;
+  }
+
+  .maxLines3 {
+    -webkit-line-clamp: 3;
+  }
+
+  .maxLines4 {
+    -webkit-line-clamp: 4;
+  }
+
+  .maxLines5 {
+    -webkit-line-clamp: 5;
+  }
+
+  .maxLines6 {
+    -webkit-line-clamp: 6;
+  }
+
+  .maxLines7 {
+    -webkit-line-clamp: 7;
+  }
+
+  .maxLines8 {
+    -webkit-line-clamp: 8;
+  }
+
+  .maxLines9 {
+    -webkit-line-clamp: 9;
+  }
+
+  .maxLines10 {
+    -webkit-line-clamp: 10;
+  }
+
+  .maxLines11 {
+    -webkit-line-clamp: 11;
+  }
+
+  .maxLines12 {
+    -webkit-line-clamp: 12;
+  }
+}

@@ -1,14 +1,51 @@
 import type { XmluiComponentContract } from "./types";
 import { supportedLayoutPropNames } from "../../styling";
-import { htmlTagContracts } from "../../components/HtmlTags/HtmlTags";
-import { brContract, BrContract } from "../../components/Br/Br";
-import { fragmentContract } from "../../components/Fragment/Fragment";
+import { htmlTagDefinitions } from "../../component-core/htmlTags";
+import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
+import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
+import { FragmentMd } from "../../components/Fragment/Fragment";
+import { ImageMd } from "../../components/Image/Image";
+import { IFrameMd } from "../../components/IFrame/IFrame";
+import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
-  ...htmlTagContracts,
-  brContract,
-  BrContract,
-  fragmentContract,
+  ...htmlTagDefinitions.map((definition) =>
+    contractFromMetadata(htmlTagMetadata[definition.name], {
+      name: definition.name,
+      acceptsArbitraryProps: true,
+      includeLayoutProps: true,
+    }),
+  ),
+  contractFromMetadata(BrMd, {
+    name: "br",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(BrCapitalizedMd, {
+    name: "Br",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(FragmentMd, {
+    name: "Fragment",
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(ImageMd, {
+    name: "Image",
+    includeLayoutProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
+  contractFromMetadata(IFrameMd, {
+    name: "IFrame",
+    includeLayoutProps: true,
+    eventAttributes: {
+      load: "onLoad",
+    },
+  }),
   {
     name: "App",
     kind: "builtin",
@@ -18,7 +55,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       testId: { name: "testId" },
       useHashBasedRouting: { name: "useHashBasedRouting" },
     }),
-    events: {},
+    events: {
+      ready: { name: "ready", attributeName: "onReady" },
+      messageReceived: { name: "messageReceived", attributeName: "onMessageReceived" },
+      keyDown: { name: "keyDown", attributeName: "onKeyDown" },
+      keyUp: { name: "keyUp", attributeName: "onKeyUp" },
+    },
   },
   {
     name: "AppHeader",
@@ -48,29 +90,19 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       testId: { name: "testId" },
     }),
     events: {},
-  },
-  {
-    name: "H1",
-    kind: "builtin",
-    acceptsArbitraryProps: true,
-    allowsChildren: true,
-    declarations: {},
-    props: withLayoutProps({
-      id: { name: "id" },
-      value: { name: "value" },
-      level: { name: "level" },
-      maxLines: { name: "maxLines" },
-      ellipses: { name: "ellipses" },
-      preserveLinebreaks: { name: "preserveLinebreaks" },
-      omitFromToc: { name: "omitFromToc" },
-      showAnchor: { name: "showAnchor" },
-      anchorId: { name: "anchorId" },
+    templates: {
       anchorTemplate: { name: "anchorTemplate" },
-      testId: { name: "testId" },
-    }),
-    events: {},
+    },
+    contextVariables: {
+      $anchorId: { name: "$anchorId" },
+      $anchorHref: { name: "$anchorHref" },
+    },
+    apis: {
+      scrollIntoView: { name: "scrollIntoView" },
+      hasOverflow: { name: "hasOverflow" },
+    },
   },
-  ...["H2", "H3", "H4", "H5", "H6"].map((name): XmluiComponentContract => ({
+  ...["H1", "H2", "H3", "H4", "H5", "H6"].map((name): XmluiComponentContract => ({
     name,
     kind: "builtin",
     acceptsArbitraryProps: true,
@@ -90,6 +122,17 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       testId: { name: "testId" },
     }),
     events: {},
+    templates: {
+      anchorTemplate: { name: "anchorTemplate" },
+    },
+    contextVariables: {
+      $anchorId: { name: "$anchorId" },
+      $anchorHref: { name: "$anchorHref" },
+    },
+    apis: {
+      scrollIntoView: { name: "scrollIntoView" },
+      hasOverflow: { name: "hasOverflow" },
+    },
   })),
   {
     name: "Icon",
@@ -183,6 +226,14 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       doubleClick: { name: "doubleClick", attributeName: "onDoubleClick" },
       contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
     },
+    apis: {
+      scrollToTop: { name: "scrollToTop" },
+      scrollToBottom: { name: "scrollToBottom" },
+      scrollToLeft: { name: "scrollToLeft" },
+      scrollToRight: { name: "scrollToRight" },
+      scrollToStart: { name: "scrollToStart" },
+      scrollToEnd: { name: "scrollToEnd" },
+    },
   },
   {
     name: "Text",
@@ -203,6 +254,9 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     }),
     events: {
       contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    },
+    apis: {
+      hasOverflow: { name: "hasOverflow" },
     },
   },
   {

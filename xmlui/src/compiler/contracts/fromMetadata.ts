@@ -1,14 +1,14 @@
+import type { ComponentMetadata, ComponentPropertyMetadata } from "../../component-core/metadata/types";
+import { behaviorPropsForComponent } from "../../component-core/behaviors";
+import { supportedLayoutPropNames } from "../../styling";
 import type {
   XmluiComponentContract,
   XmluiComponentContractKind,
   XmluiDeclarationPermission,
   XmluiEventContract,
-} from "../../compiler/contracts";
-import { supportedLayoutPropNames } from "../../styling";
-import { behaviorPropsForComponent } from "../behaviors";
-import type { ComponentMetadata, ComponentPropertyMetadata } from "./types";
+} from "./types";
 
-export type ComponentMetadataContractOptions = {
+export type MetadataContractOptions = {
   name: string;
   kind?: XmluiComponentContractKind;
   allowsChildren?: boolean;
@@ -18,9 +18,9 @@ export type ComponentMetadataContractOptions = {
   eventAttributes?: Record<string, string>;
 };
 
-export function componentMetadataToContract(
+export function contractFromMetadata(
   metadata: ComponentMetadata,
-  options: ComponentMetadataContractOptions,
+  options: MetadataContractOptions,
 ): XmluiComponentContract {
   const props = {
     ...propsFromMetadata(metadata.props, options.includeLayoutProps),

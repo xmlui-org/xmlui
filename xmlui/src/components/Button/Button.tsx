@@ -1,11 +1,5 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
-import {
-  collectComponentThemeDefaults,
-  extractScssThemeVars,
-  mergeThemeVariableLayers,
-} from "../../styling/theme";
-import { useThemeVariables } from "../../runtime/rendering/theme";
-import { componentMetadataToContract } from "../../component-core/metadata/contract";
+import { extractScssThemeVars } from "../../styling/theme";
 import {
   createMetadata,
   dAutoFocus,
@@ -159,26 +153,10 @@ export const ButtonMd = createMetadata({
   },
 });
 
-export const buttonContract = componentMetadataToContract(ButtonMd, {
-  name: "Button",
-  includeLayoutProps: true,
-  eventAttributes: {
-    click: "onClick",
-    contextMenu: "onContextMenu",
-    gotFocus: "onGotFocus",
-    lostFocus: "onLostFocus",
-  },
-});
-
 export const buttonRenderer = wrapComponent({
   name: "Button",
   metadata: ButtonMd as ComponentMetadata,
   renderer: ({ adapter }) => {
-    const themeVariables = useThemeVariables();
-    const mergedThemeVariables = mergeThemeVariableLayers([
-      collectComponentThemeDefaults(ButtonMd),
-      themeVariables,
-    ]);
     const label = adapter.prop("label");
     const hasLabelProp = Object.prototype.hasOwnProperty.call(adapter.node.props, "label");
     const enabled = adapter.booleanProp("enabled", defaultProps.enabled);
@@ -202,8 +180,6 @@ export const buttonRenderer = wrapComponent({
         icon={buttonIconValue(adapter.prop("icon"))}
         autoFocus={adapter.booleanProp("autoFocus", defaultProps.autoFocus)}
         disabled={!enabled}
-        themeVariables={mergedThemeVariables}
-        themeOverrides={themeVariables}
         onClick={(event) => void adapter.event("click")(event)}
         onContextMenu={(event) => void adapter.event("contextMenu")(event)}
         onFocus={() => void adapter.event("gotFocus")()}

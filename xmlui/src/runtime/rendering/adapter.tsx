@@ -26,6 +26,7 @@ export type XmluiAdapterRenderer = (props: XmluiAdapterRendererProps) => ReactNo
 export type XmluiComponentAdapterOptions = {
   name: string;
   metadata: ComponentMetadata;
+  themeContributors?: readonly ComponentMetadata[];
   renderer: XmluiAdapterRenderer;
   defaultPart?: string;
 };
@@ -80,6 +81,7 @@ export function wrapComponent(options: XmluiComponentAdapterOptions): XmluiWrapp
 export function useXmluiComponentAdapter({
   name,
   metadata,
+  themeContributors = [],
   context,
   node,
   scope,
@@ -108,7 +110,7 @@ export function useXmluiComponentAdapter({
   );
   const apiRef = useRef<Record<string, unknown>>({});
   const registeredIdRef = useRef<string>();
-  const themeClass = useComponentThemeClass(name, metadata);
+  const themeClass = useComponentThemeClass(name, metadata, themeContributors);
   const layoutStyle = useMemo(() => resolveLayoutStyle(props), [props]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
     Object.assign(apiRef.current, api);
@@ -210,6 +212,7 @@ export function useXmluiComponentAdapter({
     events,
     layoutStyle,
     metadata,
+    themeContributors,
     name,
     node,
     props,

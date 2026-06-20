@@ -1,0 +1,23 @@
+<App var.showAlt="{false}" var.frameMode="intro">
+  <H1>Image and IFrame media</H1>
+  <Text>Image mode: {showAlt ? 'grayscale cover' : 'plain contain'}</Text>
+  <Button onClick="showAlt = !showAlt">
+    Toggle image state
+  </Button>
+  <Image
+    testId="sample-image"
+    width="160px"
+    height="96px"
+    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='96'%3E%3Crect width='160' height='96' fill='%23cfe2f6'/%3E%3Ccircle cx='48' cy='48' r='24' fill='%23206bc4'/%3E%3Ctext x='86' y='54' font-family='Arial' font-size='16' fill='%231f2937'%3EXMLUI%3C/text%3E%3C/svg%3E"
+    alt="{showAlt ? 'XMLUI sample image' : undefined}"
+    fit="{showAlt ? 'cover' : 'contain'}"
+    grayscale="{showAlt}" />
+  <Button onClick="frameMode = frameMode === 'intro' ? 'details' : 'intro'">
+    Toggle frame content
+  </Button>
+  <IFrame
+    testId="sample-frame"
+    width="320px"
+    height="120px"
+    srcdoc="{frameMode === 'intro' ? '&lt;h1&gt;Intro&lt;/h1&gt;&lt;p&gt;Initial iframe content.&lt;/p&gt;' : '&lt;h1&gt;Details&lt;/h1&gt;&lt;p&gt;Updated by XMLUI state.&lt;/p&gt;'}" />
+</App>

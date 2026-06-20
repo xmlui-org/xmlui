@@ -1,11 +1,8 @@
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import { forwardRef, useEffect, useRef } from "react";
 
-import {
-  resolveThemeReferences,
-  resolveThemeVariable,
-} from "../../styling/theme";
 import { defaultProps } from "./Button.defaults";
+import styles from "./Button.module.scss?xmlui-css-module";
 
 export type ButtonProps = {
   id?: string;
@@ -27,8 +24,6 @@ export type ButtonProps = {
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
   children?: ReactNode;
-  themeVariables: Record<string, unknown>;
-  themeOverrides?: Record<string, unknown>;
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -47,8 +42,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     className,
     style,
     children,
-    themeVariables,
-    themeOverrides = {},
     ...rest
   },
   ref,
@@ -65,10 +58,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const normalizedIcon = normalizeIcon(icon);
   const iconToLeft = iconPosition === "start";
   const hasChildren = children !== undefined && children !== null;
-  const buttonStyle = {
-    ...baseButtonStyle(themeVariables, themeOverrides, { variant, themeColor, size, orientation, contentPosition }),
-    ...style,
-  };
+  const normalizedVariant = validVariant(variant);
+  const normalizedThemeColor = validThemeColor(themeColor);
+  const normalizedSize = validSize(size);
+  const normalizedOrientation = validOrientation(orientation);
 
   return (
     <button
@@ -82,166 +75,31 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         }
       }}
       type={normalizeButtonType(type)}
-      className={className}
+      className={cx(
+        styles.button,
+        normalizedOrientation === "horizontal" ? styles.buttonHorizontal : styles.buttonVertical,
+        styles[normalizedSize],
+        variantThemeClass(normalizedVariant, normalizedThemeColor),
+        contentPosition === "start" ? styles.alignStart : undefined,
+        contentPosition === "end" ? styles.alignEnd : undefined,
+        className,
+      )}
       disabled={disabled}
-      style={buttonStyle}
-      data-xmlui-button-variant={variant}
-      data-xmlui-button-theme-color={themeColor}
-      data-xmlui-button-size={size}
-      data-xmlui-button-orientation={orientation}
+      style={style}
+      data-xmlui-button-variant={normalizedVariant}
+      data-xmlui-button-theme-color={normalizedThemeColor}
+      data-xmlui-button-size={normalizedSize}
+      data-xmlui-button-orientation={normalizedOrientation}
     >
       {normalizedIcon && iconToLeft ? <ButtonIcon icon={normalizedIcon} /> : null}
       {children}
       {normalizedIcon && !hasChildren ? (
-        <span style={visuallyHiddenStyle}>{contextualLabel ?? normalizedIcon}</span>
+        <span className={styles.visuallyHidden}>{contextualLabel ?? normalizedIcon}</span>
       ) : null}
       {normalizedIcon && !iconToLeft ? <ButtonIcon icon={normalizedIcon} /> : null}
     </button>
   );
 });
-
-function baseButtonStyle(
-  themeVariables: Record<string, unknown>,
-  themeOverrides: Record<string, unknown>,
-  options: {
-    variant: string;
-    themeColor: string;
-    size: string;
-    orientation: string;
-    contentPosition: string;
-  },
-): CSSProperties {
-  const horizontal = options.orientation !== "vertical";
-  const size = validSize(options.size);
-  const variant = validVariant(options.variant);
-  const themeColor = validThemeColor(options.themeColor);
-  const paddingHorizontal = themeValue(themeVariables, `paddingHorizontal-Button-${size}`);
-  const paddingVertical = themeValue(themeVariables, `paddingVertical-Button-${size}`);
-  const border = themeValue(themeVariables, `border-Button-${themeColor}-${variant}`);
-  const parsedBorder = parseBorderShorthand(border);
-  const borderWidth =
-    exactThemeValue(themeVariables, `borderWidth-Button-${themeColor}-${variant}`)
-    ?? parsedBorder.width
-    ?? themeValue(themeVariables, "borderWidth-Button");
-  const borderStyle =
-    exactThemeValue(themeVariables, `borderStyle-Button-${themeColor}-${variant}`)
-    ?? parsedBorder.style
-    ?? themeValue(themeVariables, "borderStyle-Button");
-  const borderColor =
-    exactThemeValue(themeOverrides, `borderColor-Button-${themeColor}-${variant}`)
-    ?? parsedBorder.color
-    ?? exactThemeValue(themeVariables, `borderColor-Button-${themeColor}-${variant}`)
-    ?? defaultButtonBorderColor(themeVariables, variant, themeColor);
-  return {
-    width: themeValue(themeVariables, horizontal ? "width-Button" : "width-Button-vertical"),
-    height: themeValue(themeVariables, horizontal ? "height-Button" : "height-Button-vertical"),
-    minWidth: 0,
-    margin: 0,
-    padding: paddingHorizontal && paddingVertical
-      ? `${paddingVertical} ${paddingHorizontal}`
-      : themeValue(themeVariables, "padding-Button"),
-    borderWidth,
-    borderStyle,
-    borderColor,
-    borderRadius:
-      exactThemeValue(themeVariables, `borderRadius-Button-${themeColor}-${variant}`)
-      ?? themeValue(themeVariables, "borderRadius-Button"),
-    background: buttonBackground(themeVariables, variant, themeColor),
-    color: buttonTextColor(themeVariables, variant, themeColor),
-    boxShadow: themeValue(themeVariables, "boxShadow-Button"),
-    fontFamily:
-      exactThemeValue(themeVariables, `fontFamily-Button-${themeColor}-${variant}`)
-      ?? themeValue(themeVariables, "fontFamily-Button"),
-    fontSize:
-      exactThemeValue(themeVariables, `fontSize-Button-${themeColor}-${variant}`)
-      ?? themeValue(themeVariables, "fontSize-Button"),
-    fontWeight:
-      exactThemeValue(themeVariables, `fontWeight-Button-${themeColor}-${variant}`)
-      ?? themeValue(themeVariables, "fontWeight-Button"),
-    fontStyle: themeValue(themeVariables, "fontStyle-Button"),
-    lineHeight: "normal",
-    transition: themeValue(themeVariables, "transition-Button"),
-    userSelect: "none",
-    cursor: "pointer",
-    display: "flex",
-    flexDirection: horizontal ? "row" : "column",
-    gap: themeValue(themeVariables, horizontal ? "gap-Button" : "gap-Button-vertical"),
-    justifyContent: contentJustify(options.contentPosition),
-    alignItems: "center",
-  };
-}
-
-function buttonBackground(themeVariables: Record<string, unknown>, variant: string, themeColor: string): string | undefined {
-  const exact = themeValue(themeVariables, `backgroundColor-Button-${themeColor}-${variant}`);
-  if (exact) {
-    return exact;
-  }
-  if (variant === "solid") {
-    return themeValue(themeVariables, `backgroundColor-Button-${themeColor}`);
-  }
-  return variant === "outlined" || variant === "ghost"
-    ? "transparent"
-    : themeValue(themeVariables, "backgroundColor-Button");
-}
-
-function defaultButtonBorderColor(
-  themeVariables: Record<string, unknown>,
-  variant: string,
-  themeColor: string,
-): string | undefined {
-  return variant === "solid"
-    ? themeValue(themeVariables, `borderColor-Button-${themeColor}`)
-    : undefined;
-}
-
-function buttonTextColor(themeVariables: Record<string, unknown>, variant: string, themeColor: string): string | undefined {
-  const exact = themeValue(themeVariables, `textColor-Button-${themeColor}-${variant}`);
-  if (exact) {
-    return exact;
-  }
-  if (variant === "solid") {
-    return themeValue(themeVariables, "textColor-Button-solid");
-  }
-  return themeValue(themeVariables, "textColor-Button");
-}
-
-function themeValue(themeVariables: Record<string, unknown>, name: string): string | undefined {
-  const value = resolveThemeVariable(name, [themeVariables]);
-  if (value === undefined || value === null || value === "") {
-    return undefined;
-  }
-  return String(resolveThemeReferences(value));
-}
-
-function exactThemeValue(themeVariables: Record<string, unknown>, name: string): string | undefined {
-  const value = themeVariables[name];
-  if (value === undefined || value === null || value === "") {
-    return undefined;
-  }
-  return String(resolveThemeReferences(value));
-}
-
-function parseBorderShorthand(border: string | undefined): {
-  color?: string;
-  style?: string;
-  width?: string;
-} {
-  if (!border) {
-    return {};
-  }
-  const width = border.match(/-?\d*\.?\d+(?:px|em|rem|%)\b/)?.[0];
-  const style = border.match(/\b(?:none|hidden|dotted|dashed|solid|double|groove|ridge|inset|outset)\b/)?.[0];
-  const colorSource = border
-    .replace(width ?? "", "")
-    .replace(style ?? "", "")
-    .trim();
-  const color = colorSource.match(/(?:rgb|hsl)a?\([^)]+\)|#[0-9a-fA-F]{3,8}\b|[a-zA-Z]+/)?.[0];
-  return {
-    color,
-    style,
-    width,
-  };
-}
 
 function validSize(value: string): string {
   return ["xs", "sm", "md", "lg"].includes(value) ? value : defaultProps.size;
@@ -253,6 +111,10 @@ function validVariant(value: string): string {
 
 function validThemeColor(value: string): string {
   return ["primary", "secondary", "attention"].includes(value) ? value : defaultProps.themeColor;
+}
+
+function validOrientation(value: string): string {
+  return value === "vertical" ? "vertical" : defaultProps.orientation;
 }
 
 function normalizeButtonType(value: string): "button" | "submit" | "reset" {
@@ -270,39 +132,16 @@ function ButtonIcon({ icon }: { icon: string }) {
       data-icon={icon}
       data-xmlui-component="Button"
       data-xmlui-part="icon"
-      style={iconStyle}
+      className={styles.icon}
     />
   );
 }
 
-function contentJustify(value: string): CSSProperties["justifyContent"] {
-  if (value === "start") {
-    return "start";
-  }
-  if (value === "end") {
-    return "end";
-  }
-  return "center";
+function variantThemeClass(variant: string, themeColor: string): string | undefined {
+  const className = `${variant}${themeColor[0]?.toUpperCase() ?? ""}${themeColor.slice(1)}`;
+  return styles[className];
 }
 
-const visuallyHiddenStyle: CSSProperties = {
-  border: 0,
-  clip: "rect(0 0 0 0)",
-  height: 1,
-  margin: -1,
-  overflow: "hidden",
-  padding: 0,
-  position: "absolute",
-  width: 1,
-  whiteSpace: "nowrap",
-};
-
-const iconStyle: CSSProperties = {
-  display: "inline-block",
-  flex: "0 0 auto",
-  width: "1em",
-  height: "1em",
-  backgroundColor: "currentColor",
-  mask: "radial-gradient(circle, black 55%, transparent 56%)",
-  WebkitMask: "radial-gradient(circle, black 55%, transparent 56%)",
-};
+function cx(...classes: Array<string | undefined | false>): string {
+  return classes.filter(Boolean).join(" ");
+}

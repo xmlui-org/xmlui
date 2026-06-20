@@ -1,6 +1,5 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
-import { componentMetadataToContract } from "../../component-core/metadata/contract";
 import {
   createMetadata,
   dComponent,
@@ -59,6 +58,10 @@ export const AppMd = createMetadata({
       description: "Use hash-based routing instead of browser history routing.",
       valueType: "boolean",
       defaultValue: false,
+    },
+    testId: {
+      description: "Adds a test identifier to the app root element.",
+      valueType: "string",
     },
   },
   events: {
@@ -137,20 +140,6 @@ export const AppMd = createMetadata({
     "gap-content-App": "$space-5",
   },
 });
-
-export const appContract = componentMetadataToContract(AppMd, {
-  name: "App",
-  declarations: { local: true, global: true },
-  includeLayoutProps: true,
-  eventAttributes: {
-    ready: "onReady",
-    messageReceived: "onMessageReceived",
-    keyDown: "onKeyDown",
-    keyUp: "onKeyUp",
-  },
-});
-
-appContract.props.testId = { name: "testId" };
 
 export const appRenderer = wrapComponent({
   name: "App",

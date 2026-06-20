@@ -2,25 +2,10 @@ import React from "react";
 
 import { createMetadata } from "../../component-core/metadata/helpers";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { componentMetadataToContract } from "../../component-core/metadata/contract";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 
 export const BrMd = createBrMetadata("br");
 export const BrCapitalizedMd = createBrMetadata("Br");
-
-export const brContract = componentMetadataToContract(BrMd, {
-  name: "br",
-  allowsChildren: false,
-  includeLayoutProps: true,
-  acceptsArbitraryProps: true,
-});
-
-export const BrContract = componentMetadataToContract(BrCapitalizedMd, {
-  name: "Br",
-  allowsChildren: false,
-  includeLayoutProps: true,
-  acceptsArbitraryProps: true,
-});
 
 export const brRenderer = createBrRenderer("br", BrMd);
 export const BrRenderer = createBrRenderer("Br", BrCapitalizedMd);

@@ -1,13 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { contractFromMetadata } from "../../src/compiler/contracts";
 import {
   ButtonMd,
   TextMd,
   attachBehaviors,
   canBehaviorAttachToComponent,
   collectedBehaviorMetadata,
-  componentMetadataToContract,
   createMetadata,
   dEnabled,
 } from "../../src/component-core";
@@ -51,7 +51,7 @@ describe("component behavior metadata compatibility", () => {
       },
       events: {},
     });
-    const contract = componentMetadataToContract(metadata, {
+    const contract = contractFromMetadata(metadata, {
       name: "CompatInput",
     });
 
@@ -62,10 +62,10 @@ describe("component behavior metadata compatibility", () => {
   });
 
   it("honors excludeBehaviors when deriving behavior props", () => {
-    const contract = componentMetadataToContract(ButtonMd, {
+    const contract = contractFromMetadata(ButtonMd, {
       name: "Button",
     });
-    const appContract = componentMetadataToContract(
+    const appContract = contractFromMetadata(
       { excludeBehaviors: ["tooltip"], props: {}, events: {} },
       { name: "App" },
     );

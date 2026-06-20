@@ -2,6 +2,9 @@ import { renderXmluiApp } from "./runtime";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import { createXmluiModule } from "./runtime";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
+import "./components/HtmlTags/HtmlTags.module.scss?xmlui-css-module";
+import "./components/IFrame/IFrame.module.scss?xmlui-css-module";
+import "./components/Image/Image.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -29,6 +32,7 @@ import handlerLocalsApp from "./examples/handler-locals/Main.xmlui";
 import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
 import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Main.xmlui";
 import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
+import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
@@ -89,6 +93,7 @@ const examples = {
   handlerLoops: handlerLoopsApp,
   headingOldCompatibility: headingOldCompatibilityApp,
   htmlTagsFragment: htmlTagsFragmentApp,
+  imageIFrameMedia: imageIFrameMediaApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,

@@ -2,7 +2,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { parseXmlui } from "../../compiler/parseXmlui";
-import { appContract, appRenderer } from "./App";
+import { builtInComponentContracts } from "../../compiler/contracts";
+import { appRenderer } from "./App";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { ThemeScope, XmluiThemeRoot } from "../../runtime/rendering/theme";
@@ -14,6 +15,7 @@ import {
 describe("App main content layout migration", () => {
   it("uses source-adjacent metadata, renderer, defaults, styles, docs, and runnable tests", () => {
     const appModule = componentTransferModules.find((component) => component.name === "App");
+    const appContract = builtInComponentContracts.find((contract) => contract.name === "App");
 
     expect(appModule?.status).toBe("transferred-folder");
     expect(appModule?.contract).toBe(appContract);
@@ -65,8 +67,10 @@ describe("App main content layout migration", () => {
   });
 
   it("does not expose content theme variables as App props", () => {
-    expect(appContract.props["paddingHorizontal-content-App"]).toBeUndefined();
-    expect(appContract.props["paddingVertical-content-App"]).toBeUndefined();
-    expect(appContract.props["gap-content-App"]).toBeUndefined();
+    const appContract = builtInComponentContracts.find((contract) => contract.name === "App");
+
+    expect(appContract?.props["paddingHorizontal-content-App"]).toBeUndefined();
+    expect(appContract?.props["paddingVertical-content-App"]).toBeUndefined();
+    expect(appContract?.props["gap-content-App"]).toBeUndefined();
   });
 });

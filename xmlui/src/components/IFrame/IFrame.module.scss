@@ -1,0 +1,25 @@
+// IFrame.tsx extracts available theme variables from createThemeVar declarations
+// in this file, mirroring the old IFrame component pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$width-IFrame: createThemeVar("width-IFrame");
+$height-IFrame: createThemeVar("height-IFrame");
+$border-IFrame: createThemeVar("border-IFrame");
+$borderRadius-IFrame: createThemeVar("borderRadius-IFrame");
+
+@layer components {
+  .xmlui-iframeRoot {
+    display: block;
+    width: var(--xmlui-width-IFrame);
+    height: var(--xmlui-height-IFrame);
+    border: var(--xmlui-border-IFrame);
+    border-radius: var(--xmlui-borderRadius-IFrame);
+  }
+}
+
+:export {
+  themeVars: ();
+}

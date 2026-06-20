@@ -513,24 +513,27 @@ export function componentThemeVariablesToCssProperties(
   metadata: ComponentMetadata,
   themeVariables: ThemeVariableMap,
   contributors: readonly ComponentMetadata[] = [],
+  explicitThemeVariables: ThemeVariableMap = themeVariables,
 ): CSSProperties {
   const declarations = new Set<string>();
+  const declarationSources = new Map<string, Set<string>>();
   for (const descriptor of [metadata, ...contributors]) {
     for (const key of Object.keys(descriptor.themeVars ?? {})) {
-      declarations.add(stripLegacyThemeClassPrefix(key));
+      addThemeDeclaration(declarations, declarationSources, key);
     }
     for (const key of Object.keys(descriptor.defaultThemeVars ?? {})) {
-      declarations.add(stripLegacyThemeClassPrefix(key));
+      addThemeDeclaration(declarations, declarationSources, key);
     }
   }
 
   const cssVariables: Record<string, string | number> = {};
   for (const name of declarations) {
-    const value = resolveThemeVariable(name, [themeVariables]);
+    const value = themeVariableValue(name, declarationSources.get(name), themeVariables);
     if (value !== undefined && value !== null && value !== "") {
       cssVariables[themePropNameToCssVarName(name)] = String(resolveThemeReferences(value));
     }
   }
+  addBorderShorthandLonghands(cssVariables, themeVariables, explicitThemeVariables);
   return cssVariables as CSSProperties;
 }
 
@@ -540,7 +543,16 @@ export function createComponentThemeClass(
   themeVariables: ThemeVariableMap,
   contributors: readonly ComponentMetadata[] = [],
 ): ComponentThemeClass {
-  const style = componentThemeVariablesToCssProperties(metadata, themeVariables, contributors);
+  const mergedThemeVariables = mergeThemeVariableLayers([
+    collectComponentThemeDefaults(metadata, contributors),
+    themeVariables,
+  ]);
+  const style = componentThemeVariablesToCssProperties(
+    metadata,
+    mergedThemeVariables,
+    contributors,
+    themeVariables,
+  );
   return {
     className: `xmlui-${componentName}`,
     style,
@@ -589,8 +601,91 @@ export function themeVariablesToCssProperties(
   return style as CSSProperties;
 }
 
+function addThemeDeclaration(
+  declarations: Set<string>,
+  declarationSources: Map<string, Set<string>>,
+  originalName: string,
+): void {
+  const name = stripLegacyThemeClassPrefix(originalName);
+  declarations.add(name);
+  const sources = declarationSources.get(name) ?? new Set<string>();
+  sources.add(originalName);
+  sources.add(name);
+  declarationSources.set(name, sources);
+}
+
+function themeVariableValue(
+  name: string,
+  sourceNames: Set<string> | undefined,
+  themeVariables: ThemeVariableMap,
+): unknown {
+  for (const sourceName of sourceNames ?? [name]) {
+    const value = themeVariables[sourceName];
+    if (value !== undefined) {
+      return value;
+    }
+  }
+  return themeVariables[name];
+}
+
 function stripLegacyThemeClassPrefix(name: string): string {
   return name.replace("Input:", "").replace("Heading:", "");
+}
+
+function addBorderShorthandLonghands(
+  cssVariables: Record<string, string | number>,
+  themeVariables: ThemeVariableMap,
+  explicitThemeVariables: ThemeVariableMap,
+): void {
+  for (const [name, value] of Object.entries(themeVariables)) {
+    if (!name.startsWith("border-") || value === undefined || value === null || value === "") {
+      continue;
+    }
+    const suffix = name.slice("border-".length);
+    const parsed = parseBorderShorthand(String(resolveThemeReferences(value)));
+    if (!parsed) {
+      continue;
+    }
+    addDerivedCssVariable(cssVariables, explicitThemeVariables, `borderWidth-${suffix}`, parsed.width);
+    addDerivedCssVariable(cssVariables, explicitThemeVariables, `borderStyle-${suffix}`, parsed.style);
+    addDerivedCssVariable(cssVariables, explicitThemeVariables, `borderColor-${suffix}`, parsed.color);
+  }
+}
+
+function addDerivedCssVariable(
+  cssVariables: Record<string, string | number>,
+  themeVariables: ThemeVariableMap,
+  name: string,
+  value: string | undefined,
+): void {
+  if (!value || themeVariables[name] !== undefined) {
+    return;
+  }
+  cssVariables[themePropNameToCssVarName(name)] = value;
+}
+
+function parseBorderShorthand(
+  value: string,
+): { width?: string; style?: string; color?: string } | undefined {
+  const source = value.trim();
+  if (!source) {
+    return undefined;
+  }
+  const stylePattern = /\b(none|hidden|dotted|dashed|solid|double|groove|ridge|inset|outset)\b/;
+  const widthPattern = /(?:^|\s)(thin|medium|thick|-?\d*\.?\d+(?:px|em|rem|%|vh|vw|vmin|vmax|ch|ex)?)(?=\s|$)/;
+  const style = source.match(stylePattern)?.[1];
+  const widthMatch = source.match(widthPattern);
+  const width = widthMatch?.[1];
+  const color = source
+    .replace(stylePattern, "")
+    .replace(widthPattern, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+  return {
+    width,
+    style,
+    color: color || undefined,
+  };
 }
 
 function parseHierarchicalThemeVarName(name: string):

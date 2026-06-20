@@ -30,23 +30,261 @@ $fontSize-H2: createThemeVar("fontSize-H2");
 $lineHeight-H2: createThemeVar("lineHeight-H2");
 $marginTop-H2: createThemeVar("marginTop-H2");
 $marginBottom-H2: createThemeVar("marginBottom-H2");
+$textColor-H2: createThemeVar("Heading:textColor-H2");
+$letterSpacing-H2: createThemeVar("Heading:letterSpacing-H2");
+$fontFamily-H2: createThemeVar("Heading:fontFamily-H2");
+$fontWeight-H2: createThemeVar("Heading:fontWeight-H2");
+$textDecorationLine-H2: createThemeVar("Heading:textDecorationLine-H2");
+$textDecorationColor-H2: createThemeVar("Heading:textDecorationColor-H2");
+$textDecorationStyle-H2: createThemeVar("Heading:textDecorationStyle-H2");
+$textDecorationThickness-H2: createThemeVar("Heading:textDecorationThickness-H2");
+$textUnderlineOffset-H2: createThemeVar("Heading:textUnderlineOffset-H2");
 $fontSize-H3: createThemeVar("fontSize-H3");
 $lineHeight-H3: createThemeVar("lineHeight-H3");
 $marginTop-H3: createThemeVar("marginTop-H3");
 $marginBottom-H3: createThemeVar("marginBottom-H3");
+$textColor-H3: createThemeVar("Heading:textColor-H3");
+$letterSpacing-H3: createThemeVar("Heading:letterSpacing-H3");
+$fontFamily-H3: createThemeVar("Heading:fontFamily-H3");
+$fontWeight-H3: createThemeVar("Heading:fontWeight-H3");
+$textDecorationLine-H3: createThemeVar("Heading:textDecorationLine-H3");
+$textDecorationColor-H3: createThemeVar("Heading:textDecorationColor-H3");
+$textDecorationStyle-H3: createThemeVar("Heading:textDecorationStyle-H3");
+$textDecorationThickness-H3: createThemeVar("Heading:textDecorationThickness-H3");
+$textUnderlineOffset-H3: createThemeVar("Heading:textUnderlineOffset-H3");
 $fontSize-H4: createThemeVar("fontSize-H4");
 $lineHeight-H4: createThemeVar("lineHeight-H4");
 $marginTop-H4: createThemeVar("marginTop-H4");
 $marginBottom-H4: createThemeVar("marginBottom-H4");
+$textColor-H4: createThemeVar("Heading:textColor-H4");
+$letterSpacing-H4: createThemeVar("Heading:letterSpacing-H4");
+$fontFamily-H4: createThemeVar("Heading:fontFamily-H4");
+$fontWeight-H4: createThemeVar("Heading:fontWeight-H4");
+$textDecorationLine-H4: createThemeVar("Heading:textDecorationLine-H4");
+$textDecorationColor-H4: createThemeVar("Heading:textDecorationColor-H4");
+$textDecorationStyle-H4: createThemeVar("Heading:textDecorationStyle-H4");
+$textDecorationThickness-H4: createThemeVar("Heading:textDecorationThickness-H4");
+$textUnderlineOffset-H4: createThemeVar("Heading:textUnderlineOffset-H4");
 $fontSize-H5: createThemeVar("fontSize-H5");
 $lineHeight-H5: createThemeVar("lineHeight-H5");
 $marginTop-H5: createThemeVar("marginTop-H5");
 $marginBottom-H5: createThemeVar("marginBottom-H5");
+$textColor-H5: createThemeVar("Heading:textColor-H5");
+$letterSpacing-H5: createThemeVar("Heading:letterSpacing-H5");
+$fontFamily-H5: createThemeVar("Heading:fontFamily-H5");
+$fontWeight-H5: createThemeVar("Heading:fontWeight-H5");
+$textDecorationLine-H5: createThemeVar("Heading:textDecorationLine-H5");
+$textDecorationColor-H5: createThemeVar("Heading:textDecorationColor-H5");
+$textDecorationStyle-H5: createThemeVar("Heading:textDecorationStyle-H5");
+$textDecorationThickness-H5: createThemeVar("Heading:textDecorationThickness-H5");
+$textUnderlineOffset-H5: createThemeVar("Heading:textUnderlineOffset-H5");
 $fontSize-H6: createThemeVar("fontSize-H6");
 $lineHeight-H6: createThemeVar("lineHeight-H6");
 $marginTop-H6: createThemeVar("marginTop-H6");
 $marginBottom-H6: createThemeVar("marginBottom-H6");
+$textColor-H6: createThemeVar("Heading:textColor-H6");
+$letterSpacing-H6: createThemeVar("Heading:letterSpacing-H6");
+$fontFamily-H6: createThemeVar("Heading:fontFamily-H6");
+$fontWeight-H6: createThemeVar("Heading:fontWeight-H6");
+$textDecorationLine-H6: createThemeVar("Heading:textDecorationLine-H6");
+$textDecorationColor-H6: createThemeVar("Heading:textDecorationColor-H6");
+$textDecorationStyle-H6: createThemeVar("Heading:textDecorationStyle-H6");
+$textDecorationThickness-H6: createThemeVar("Heading:textDecorationThickness-H6");
+$textUnderlineOffset-H6: createThemeVar("Heading:textUnderlineOffset-H6");
 
 :export {
   themeVars: ();
+}
+
+@layer components {
+  .heading {
+    user-select: text;
+    -webkit-user-select: text;
+    color: var(--xmlui-textColor-Heading);
+    font-family: var(--xmlui-fontFamily-Heading);
+    font-weight: var(--xmlui-fontWeight-Heading);
+    scroll-margin-top: var(--header-height);
+  }
+
+  .heading a {
+    opacity: 0;
+    margin-inline-start: var(--xmlui-gap-anchor-Heading);
+    color: var(--xmlui-color-anchor-Heading);
+    text-decoration-line: var(--xmlui-textDecorationLine-anchor-Heading);
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .heading:hover a {
+    opacity: 1;
+  }
+
+  .anchorRef {
+    width: 0;
+    height: 0;
+    scroll-margin-top: var(--header-height);
+  }
+
+  .h1 {
+    color: var(--xmlui-textColor-H1, var(--xmlui-textColor-Heading));
+    font-family: var(--xmlui-fontFamily-H1, var(--xmlui-fontFamily-Heading));
+    font-size: var(--xmlui-fontSize-H1);
+    font-weight: var(--xmlui-fontWeight-H1, var(--xmlui-fontWeight-Heading));
+    line-height: var(--xmlui-lineHeight-H1);
+    letter-spacing: var(--xmlui-letterSpacing-H1);
+    margin-top: var(--xmlui-marginTop-H1, 0);
+    margin-bottom: var(--xmlui-marginBottom-H1, 0);
+    text-decoration-line: var(--xmlui-textDecorationLine-H1);
+    text-decoration-color: var(--xmlui-textDecorationColor-H1);
+    text-decoration-style: var(--xmlui-textDecorationStyle-H1);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-H1);
+    text-underline-offset: var(--xmlui-textUnderlineOffset-H1);
+  }
+
+  .h2 {
+    color: var(--xmlui-textColor-H2, var(--xmlui-textColor-Heading));
+    font-family: var(--xmlui-fontFamily-H2, var(--xmlui-fontFamily-Heading));
+    font-size: var(--xmlui-fontSize-H2);
+    font-weight: var(--xmlui-fontWeight-H2, var(--xmlui-fontWeight-Heading));
+    line-height: var(--xmlui-lineHeight-H2);
+    letter-spacing: var(--xmlui-letterSpacing-H2);
+    margin-top: var(--xmlui-marginTop-H2, 0);
+    margin-bottom: var(--xmlui-marginBottom-H2, 0);
+    text-decoration-line: var(--xmlui-textDecorationLine-H2);
+    text-decoration-color: var(--xmlui-textDecorationColor-H2);
+    text-decoration-style: var(--xmlui-textDecorationStyle-H2);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-H2);
+    text-underline-offset: var(--xmlui-textUnderlineOffset-H2);
+  }
+
+  .h3 {
+    color: var(--xmlui-textColor-H3, var(--xmlui-textColor-Heading));
+    font-family: var(--xmlui-fontFamily-H3, var(--xmlui-fontFamily-Heading));
+    font-size: var(--xmlui-fontSize-H3);
+    font-weight: var(--xmlui-fontWeight-H3, var(--xmlui-fontWeight-Heading));
+    line-height: var(--xmlui-lineHeight-H3);
+    letter-spacing: var(--xmlui-letterSpacing-H3);
+    margin-top: var(--xmlui-marginTop-H3, 0);
+    margin-bottom: var(--xmlui-marginBottom-H3, 0);
+    text-decoration-line: var(--xmlui-textDecorationLine-H3);
+    text-decoration-color: var(--xmlui-textDecorationColor-H3);
+    text-decoration-style: var(--xmlui-textDecorationStyle-H3);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-H3);
+    text-underline-offset: var(--xmlui-textUnderlineOffset-H3);
+  }
+
+  .h4 {
+    color: var(--xmlui-textColor-H4, var(--xmlui-textColor-Heading));
+    font-family: var(--xmlui-fontFamily-H4, var(--xmlui-fontFamily-Heading));
+    font-size: var(--xmlui-fontSize-H4);
+    font-weight: var(--xmlui-fontWeight-H4, var(--xmlui-fontWeight-Heading));
+    line-height: var(--xmlui-lineHeight-H4);
+    letter-spacing: var(--xmlui-letterSpacing-H4);
+    margin-top: var(--xmlui-marginTop-H4, 0);
+    margin-bottom: var(--xmlui-marginBottom-H4, 0);
+    text-decoration-line: var(--xmlui-textDecorationLine-H4);
+    text-decoration-color: var(--xmlui-textDecorationColor-H4);
+    text-decoration-style: var(--xmlui-textDecorationStyle-H4);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-H4);
+    text-underline-offset: var(--xmlui-textUnderlineOffset-H4);
+  }
+
+  .h5 {
+    color: var(--xmlui-textColor-H5, var(--xmlui-textColor-Heading));
+    font-family: var(--xmlui-fontFamily-H5, var(--xmlui-fontFamily-Heading));
+    font-size: var(--xmlui-fontSize-H5);
+    font-weight: var(--xmlui-fontWeight-H5, var(--xmlui-fontWeight-Heading));
+    line-height: var(--xmlui-lineHeight-H5);
+    letter-spacing: var(--xmlui-letterSpacing-H5);
+    margin-top: var(--xmlui-marginTop-H5, 0);
+    margin-bottom: var(--xmlui-marginBottom-H5, 0);
+    text-decoration-line: var(--xmlui-textDecorationLine-H5);
+    text-decoration-color: var(--xmlui-textDecorationColor-H5);
+    text-decoration-style: var(--xmlui-textDecorationStyle-H5);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-H5);
+    text-underline-offset: var(--xmlui-textUnderlineOffset-H5);
+  }
+
+  .h6 {
+    color: var(--xmlui-textColor-H6, var(--xmlui-textColor-Heading));
+    font-family: var(--xmlui-fontFamily-H6, var(--xmlui-fontFamily-Heading));
+    font-size: var(--xmlui-fontSize-H6);
+    font-weight: var(--xmlui-fontWeight-H6, var(--xmlui-fontWeight-Heading));
+    line-height: var(--xmlui-lineHeight-H6);
+    letter-spacing: var(--xmlui-letterSpacing-H6);
+    margin-top: var(--xmlui-marginTop-H6, 0);
+    margin-bottom: var(--xmlui-marginBottom-H6, 0);
+    text-decoration-line: var(--xmlui-textDecorationLine-H6);
+    text-decoration-color: var(--xmlui-textDecorationColor-H6);
+    text-decoration-style: var(--xmlui-textDecorationStyle-H6);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-H6);
+    text-underline-offset: var(--xmlui-textUnderlineOffset-H6);
+  }
+
+  .truncateOverflow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .multiLineOverflow {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+  }
+
+  .preserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .noEllipsis {
+    text-overflow: clip;
+  }
+
+  .maxLines1 {
+    -webkit-line-clamp: 1;
+  }
+
+  .maxLines2 {
+    -webkit-line-clamp: 2;
+  }
+
+  .maxLines3 {
+    -webkit-line-clamp: 3;
+  }
+
+  .maxLines4 {
+    -webkit-line-clamp: 4;
+  }
+
+  .maxLines5 {
+    -webkit-line-clamp: 5;
+  }
+
+  .maxLines6 {
+    -webkit-line-clamp: 6;
+  }
+
+  .maxLines7 {
+    -webkit-line-clamp: 7;
+  }
+
+  .maxLines8 {
+    -webkit-line-clamp: 8;
+  }
+
+  .maxLines9 {
+    -webkit-line-clamp: 9;
+  }
+
+  .maxLines10 {
+    -webkit-line-clamp: 10;
+  }
+
+  .maxLines11 {
+    -webkit-line-clamp: 11;
+  }
+
+  .maxLines12 {
+    -webkit-line-clamp: 12;
+  }
 }

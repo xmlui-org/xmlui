@@ -1,11 +1,14 @@
+import type { CSSProperties } from "react";
+
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import {
   collectComponentThemeDefaults,
   extractScssThemeVars,
   mergeThemeVariableLayers,
+  resolveThemeReferences,
+  resolveThemeVariable,
 } from "../../styling/theme";
 import { useThemeVariables } from "../../runtime/rendering/theme";
-import { componentMetadataToContract } from "../../component-core/metadata/contract";
 import {
   createMetadata,
   dContextMenu,
@@ -130,14 +133,6 @@ export const TextMd = createMetadata({
   },
 });
 
-export const textContract = componentMetadataToContract(TextMd, {
-  name: "Text",
-  includeLayoutProps: true,
-  eventAttributes: {
-    contextMenu: "onContextMenu",
-  },
-});
-
 export const textRenderer = wrapComponent({
   name: "Text",
   metadata: TextMd as ComponentMetadata,
@@ -147,21 +142,26 @@ export const textRenderer = wrapComponent({
       collectComponentThemeDefaults(TextMd),
       themeVariables,
     ]);
+    const variant = adapter.stringProp("variant");
+    const rootAttrs = adapter.rootAttrs();
     const hasValue = Object.prototype.hasOwnProperty.call(adapter.node.props, "value");
     const value = adapter.prop("value");
     const children = hasValue ? displayText(value) : adapter.renderChildren();
 
     return (
       <Text
-        {...adapter.rootAttrs()}
+        {...rootAttrs}
         id={adapter.stringProp("id")}
-        variant={adapter.stringProp("variant")}
+        variant={variant}
         maxLines={adapter.numberProp("maxLines", defaultProps.maxLines)}
         preserveLinebreaks={adapter.booleanProp("preserveLinebreaks", defaultProps.preserveLinebreaks)}
         ellipses={adapter.booleanProp("ellipses", defaultProps.ellipses)}
         overflowMode={adapter.stringProp("overflowMode")}
         breakMode={adapter.stringProp("breakMode")}
-        themeVariables={mergedThemeVariables}
+        style={{
+          ...(rootAttrs.style as CSSProperties | undefined),
+          ...currentVariantCssVariables(variant, mergedThemeVariables),
+        }}
         onContextMenu={() => void adapter.event("contextMenu")()}
         registerApi={adapter.registerApi}
       >
@@ -173,4 +173,61 @@ export const textRenderer = wrapComponent({
 
 function displayText(value: unknown): string {
   return value === undefined || value === null ? "" : String(value);
+}
+
+const currentVariantThemeProps = [
+  "textColor",
+  "backgroundColor",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "fontStyle",
+  "fontStretch",
+  "lineHeight",
+  "letterSpacing",
+  "wordSpacing",
+  "textShadow",
+  "textIndent",
+  "textAlign",
+  "textAlignLast",
+  "direction",
+  "writingMode",
+  "lineBreak",
+  "textTransform",
+  "textDecorationLine",
+  "textDecorationColor",
+  "textDecorationStyle",
+  "textDecorationThickness",
+  "textUnderlineOffset",
+  "wordBreak",
+  "wordWrap",
+  "borderWidth",
+  "borderStyle",
+  "borderColor",
+  "borderRadius",
+  "marginTop",
+  "marginBottom",
+  "marginLeft",
+  "marginRight",
+  "paddingHorizontal",
+  "paddingVertical",
+  "paddingBottom",
+  "verticalAlignment",
+] as const;
+
+function currentVariantCssVariables(
+  variant: string | undefined,
+  themeVariables: Record<string, unknown>,
+): CSSProperties {
+  if (!variant) {
+    return {};
+  }
+  const style: Record<string, string> = {};
+  for (const prop of currentVariantThemeProps) {
+    const value = resolveThemeVariable(`${prop}-${COMP}-${variant}`, [themeVariables]);
+    if (value !== undefined && value !== null && value !== "") {
+      style[`--xmlui-current-${prop}-${COMP}`] = String(resolveThemeReferences(value));
+    }
+  }
+  return style as CSSProperties;
 }

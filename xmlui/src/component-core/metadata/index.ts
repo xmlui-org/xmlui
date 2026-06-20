@@ -1,4 +1,3 @@
-export { componentMetadataToContract, type ComponentMetadataContractOptions } from "./contract";
 export {
   createMetadata,
   dAutoFocus,

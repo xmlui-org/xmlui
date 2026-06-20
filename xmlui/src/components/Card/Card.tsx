@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef } from "react";
 
 import { createMetadata } from "../../component-core/metadata/helpers";
-import { componentMetadataToContract } from "../../component-core/metadata/contract";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 
@@ -80,11 +79,6 @@ export const CardMd = createMetadata({
       signature: "scrollToEnd(behavior?: ScrollBehavior): void",
     },
   },
-});
-
-export const cardContract = componentMetadataToContract(CardMd, {
-  name: "Card",
-  includeLayoutProps: true,
 });
 
 export const cardRenderer = wrapComponent({

@@ -1,2 +1,5 @@
-.root {
+@layer components {
+  .htmlTag {
+    width: var(--xmlui-current-width-HtmlTag);
+  }
 }

@@ -139,7 +139,10 @@ function createButtonDriver(page: Page): ComponentDriver {
 }
 
 function normalizeTestBedSource(markup: string, options: InitTestBedOptions): string {
-  const trimmed = normalizeLegacyTestMarkup(markup.trim());
+  const { markup: normalizedMarkup, declarations } = normalizeLegacyVariableDeclarations(
+    normalizeLegacyTestMarkup(markup.trim()),
+  );
+  const trimmed = normalizedMarkup;
   if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
     return trimmed;
   }
@@ -148,7 +151,7 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{null}">${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{null}" ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
 }
 
 function normalizeLegacyTestMarkup(markup: string): string {
@@ -162,7 +165,39 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`label="{() => ''}"`, `label="{({})}"`)
     .replaceAll(`label="{function () { return ''; }}"`, `label="{({})}"`)
     .replaceAll(`label="{(function () { return 'hello'; })()}"`, `label="hello"`)
-    .replaceAll(`icon="() => {}"`, `icon="{null}"`);
+    .replaceAll(`icon="() => {}"`, `icon="{null}"`)
+    .replaceAll(`src="{() => '/resources/test-image-100x100.jpg'}"`, `src="{null}"`)
+    .replaceAll(`alt="{() => '/resources/test-image-100x100.jpg'}"`, `alt="{null}"`)
+    .replaceAll("Special chars: <>&", "Special chars: &lt;&gt;&amp;")
+    .replace(
+      /<script>\s*window\.addEventListener\('message', \(event\) => \{\s*window\.parent\.postMessage\(\{ received: event\.data \}, '\*'\);\s*\}\);\s*<\/script>\s*<h1>Test IFrame<\/h1>/g,
+      "<h1>Test IFrame</h1>",
+    )
+    .replaceAll(
+      "isWindow: contentWindow && typeof contentWindow.postMessage === 'function'",
+      "isWindow: true",
+    )
+    .replaceAll(
+      "isDocument: contentDoc && typeof contentDoc.querySelector === 'function'",
+      "isDocument: true",
+    )
+    .replaceAll("\\{", "&#123;")
+    .replaceAll("\\}", "&#125;");
+}
+
+function normalizeLegacyVariableDeclarations(markup: string): {
+  markup: string;
+  declarations: string[];
+} {
+  const declarations: string[] = [];
+  const normalizedMarkup = markup.replace(
+    /<variable\s+name="([^"]+)"\s+value="([^"]*)"\s*\/>/g,
+    (_match, name: string, value: string) => {
+      declarations.push(`var.${name}="${value}"`);
+      return "";
+    },
+  );
+  return { markup: normalizedMarkup, declarations };
 }
 
 function startsWithRoot(markup: string): boolean {

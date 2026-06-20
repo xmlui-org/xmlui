@@ -1,32 +1,26 @@
 import { builtInComponentContracts } from "../compiler/contracts";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
-import { appContract, appRenderer } from "../components/App/App";
-import { buttonContract, buttonRenderer } from "../components/Button/Button";
-import { cardContract, cardRenderer } from "../components/Card/Card";
+import { appRenderer } from "../components/App/App";
+import { buttonRenderer } from "../components/Button/Button";
+import { cardRenderer } from "../components/Card/Card";
 import {
-  headingContract,
   headingRenderer,
-  h1Contract,
   h1Renderer,
-  h2Contract,
   h2Renderer,
-  h3Contract,
   h3Renderer,
-  h4Contract,
   h4Renderer,
-  h5Contract,
   h5Renderer,
-  h6Contract,
   h6Renderer,
 } from "../components/Heading/Heading";
-import { textContract, textRenderer } from "../components/Text/Text";
+import { textRenderer } from "../components/Text/Text";
 import {
-  htmlTagContracts,
   htmlTagRenderers,
 } from "../components/HtmlTags/HtmlTags";
-import { brContract, BrContract, brRenderer, BrRenderer } from "../components/Br/Br";
-import { fragmentContract, fragmentRenderer } from "../components/Fragment/Fragment";
+import { brRenderer, BrRenderer } from "../components/Br/Br";
+import { fragmentRenderer } from "../components/Fragment/Fragment";
+import { imageRenderer } from "../components/Image/Image";
+import { iframeRenderer } from "../components/IFrame/IFrame";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -39,6 +33,8 @@ const implementedRuntimeNames = [
   "App",
   "AppHeader",
   "Fragment",
+  "Image",
+  "IFrame",
   "Heading",
   "H1",
   "H2",
@@ -71,23 +67,6 @@ const implementedRuntimeNames = [
 
 const implementedRuntimeNameSet = new Set<string>(implementedRuntimeNames);
 const legacyRuntimeRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = legacyBuiltInRenderers;
-const transferredContracts: Partial<Record<string, (typeof builtInComponentContracts)[number]>> = {
-  App: appContract,
-  br: brContract,
-  Br: BrContract,
-  Button: buttonContract,
-  Card: cardContract,
-  Fragment: fragmentContract,
-  Heading: headingContract,
-  H1: h1Contract,
-  H2: h2Contract,
-  H3: h3Contract,
-  H4: h4Contract,
-  H5: h5Contract,
-  H6: h6Contract,
-  Text: textContract,
-  ...Object.fromEntries(htmlTagContracts.map((contract) => [contract.name, contract])),
-};
 const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   App: appRenderer,
   br: brRenderer,
@@ -95,6 +74,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Button: buttonRenderer,
   Card: cardRenderer,
   Fragment: fragmentRenderer,
+  Image: imageRenderer,
+  IFrame: iframeRenderer,
   Heading: headingRenderer,
   H1: h1Renderer,
   H2: h2Renderer,
@@ -128,7 +109,7 @@ function componentFolderName(name: string): string {
 
 export const componentTransferModules: XmluiComponentTransferModule[] = builtInComponentContracts
   .map((builtInContract) => {
-    const contract = transferredContracts[builtInContract.name] ?? builtInContract;
+    const contract = builtInContract;
     const renderer = transferredRenderers[contract.name] ?? legacyRuntimeRenderers[contract.name];
     const folderName = componentFolderName(contract.name);
     const appTransferred = contract.name === "App";
@@ -138,6 +119,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
     const fragmentTransferred = contract.name === "Fragment";
+    const imageTransferred = contract.name === "Image";
+    const iframeTransferred = contract.name === "IFrame";
     const transferredFolder =
       appTransferred ||
       buttonTransferred ||
@@ -145,7 +128,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
-      fragmentTransferred;
+      fragmentTransferred ||
+      imageTransferred ||
+      iframeTransferred;
     const sharedComponentFile = htmlTagTransferred
       ? "HtmlTags"
       : brTransferred
@@ -176,8 +161,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
             ? [`xmlui/src/components/${folderName}/ButtonReact.tsx`]
             : textTransferred
               ? [`xmlui/src/components/${folderName}/TextReact.tsx`]
-              : headingTransferred
-                ? [`xmlui/src/components/${folderName}/HeadingReact.tsx`]
+                : headingTransferred
+                  ? [`xmlui/src/components/${folderName}/HeadingReact.tsx`]
+                  : imageTransferred
+                    ? [`xmlui/src/components/${folderName}/ImageReact.tsx`]
+                    : iframeTransferred
+                      ? [`xmlui/src/components/${folderName}/IFrameReact.tsx`]
                 : transferredFolder
                   ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.tsx`]
             : [],
@@ -219,22 +208,27 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
               ]
             : textTransferred
               ? [
-                  "xmlui/src/components/Text/Text.spec.tsx",
-                  "xmlui/src/components/Text/Text-style.spec.ts",
-                  "xmlui/src/components/Text/Text-old-e2e.spec.ts",
-                ]
+                    "xmlui/src/components/Text/Text.spec.tsx",
+                    "xmlui/src/components/Text/Text-style.spec.ts",
+                    "xmlui/src/components/Text/Text.spec.ts",
+                  ]
               : headingTransferred
                 ? [
                     "xmlui/src/components/Heading/Heading.spec.tsx",
                     "xmlui/src/components/Heading/Heading-style.spec.ts",
-                    "xmlui/src/components/Heading/Heading-old-e2e.spec.ts",
+                    "xmlui/src/components/Heading/Heading.spec.ts",
+                    "xmlui/src/components/Heading/HeadingShortcuts.spec.ts",
                   ]
                 : htmlTagTransferred
-                  ? ["xmlui/src/components/HtmlTags/HtmlTags-old-e2e.spec.ts"]
+                  ? ["xmlui/src/components/HtmlTags/HtmlTags.spec.ts"]
                   : brTransferred
-                    ? ["xmlui/src/components/Br/Br-old-e2e.spec.ts"]
+                    ? ["xmlui/src/components/Br/Br.spec.ts"]
                     : fragmentTransferred
-                      ? ["xmlui/src/components/Fragment/Fragment-old-e2e.spec.ts"]
+                      ? ["xmlui/src/components/Fragment/Fragment.spec.ts"]
+                      : imageTransferred
+                        ? ["xmlui/src/components/Image/Image.spec.ts"]
+                        : iframeTransferred
+                          ? ["xmlui/src/components/IFrame/IFrame.spec.ts"]
           : [],
       },
     } satisfies XmluiComponentTransferModule;

@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { contractRegistryToLspMetadata, createContractRegistry } from "../../src/compiler/contracts";
+import {
+  contractFromMetadata,
+  contractRegistryToLspMetadata,
+  createContractRegistry,
+} from "../../src/compiler/contracts";
 import {
   AppMd,
   ButtonMd,
   StackMd,
   TextMd,
-  componentMetadataToContract,
   createMetadata,
   dComponent,
 } from "../../src/component-core/metadata";
@@ -67,9 +70,9 @@ describe("component metadata compatibility shape", () => {
   });
 });
 
-describe("component metadata to compiler contract bridge", () => {
+describe("compiler contract derivation from component metadata", () => {
   it("derives props, events, templates, context variables, and APIs", () => {
-    const contract = componentMetadataToContract(AppMd, {
+    const contract = contractFromMetadata(AppMd, {
       name: "App",
       declarations: { local: true, global: true },
       eventAttributes: {
@@ -103,7 +106,7 @@ describe("component metadata to compiler contract bridge", () => {
       },
       events: {},
     });
-    const contract = componentMetadataToContract(metadata, { name: "Items" });
+    const contract = contractFromMetadata(metadata, { name: "Items" });
 
     expect(contract.props).toHaveProperty("itemTemplate");
     expect(contract.templates).toEqual({
@@ -114,7 +117,7 @@ describe("component metadata to compiler contract bridge", () => {
   it("feeds derived metadata contracts into the existing LSP metadata path", () => {
     const registry = createContractRegistry({
       extensionComponents: [
-        componentMetadataToContract(ButtonMd, {
+        contractFromMetadata(ButtonMd, {
           name: "CompatButton",
           eventAttributes: {
             click: "onClick",
