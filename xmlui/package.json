@@ -28,11 +28,15 @@
     "compatibility:style-artifact": "node scripts/style-artifact-report.mjs",
     "compatibility:runtime-artifact": "node scripts/runtime-artifact-report.mjs",
     "compatibility:component-transfer": "node scripts/check-component-transfer.mjs",
+    "compatibility:component-e2e-audit": "node scripts/component-e2e-audit.mjs",
+    "compatibility:component-e2e-audit:expanded": "node scripts/component-e2e-audit.mjs --expanded-all",
     "test": "vitest run tests/compiler src/components/**/*.spec.tsx",
     "test:unit": "npm run test",
     "check:metadata": "npm run build:metadata",
     "generate-docs": "npm run build:docs-reference",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:all": "XMLUI_INCLUDE_INCOMPLETE_COMPAT=1 playwright test",
+    "test:e2e:app-compat": "XMLUI_INCLUDE_INCOMPLETE_COMPAT=1 playwright test src/components/App/App.spec.ts src/components/App/App-layout.spec.ts src/components/App/App-layout-mobile.spec.ts src/components/App/App-navigation-events.spec.ts src/components/App/App-script-imports.spec.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.0",

@@ -28,6 +28,7 @@ export type ButtonProps = {
   onBlur?: () => void | Promise<void>;
   children?: ReactNode;
   themeVariables: Record<string, unknown>;
+  themeOverrides?: Record<string, unknown>;
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -47,6 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     style,
     children,
     themeVariables,
+    themeOverrides = {},
     ...rest
   },
   ref,
@@ -64,7 +66,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const iconToLeft = iconPosition === "start";
   const hasChildren = children !== undefined && children !== null;
   const buttonStyle = {
-    ...baseButtonStyle(themeVariables, { variant, themeColor, size, orientation, contentPosition }),
+    ...baseButtonStyle(themeVariables, themeOverrides, { variant, themeColor, size, orientation, contentPosition }),
     ...style,
   };
 
@@ -100,6 +102,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 
 function baseButtonStyle(
   themeVariables: Record<string, unknown>,
+  themeOverrides: Record<string, unknown>,
   options: {
     variant: string;
     themeColor: string;
@@ -115,12 +118,20 @@ function baseButtonStyle(
   const paddingHorizontal = themeValue(themeVariables, `paddingHorizontal-Button-${size}`);
   const paddingVertical = themeValue(themeVariables, `paddingVertical-Button-${size}`);
   const border = themeValue(themeVariables, `border-Button-${themeColor}-${variant}`);
+  const parsedBorder = parseBorderShorthand(border);
   const borderWidth =
     exactThemeValue(themeVariables, `borderWidth-Button-${themeColor}-${variant}`)
-    ?? (border ? borderWidthFromShorthand(border) : themeValue(themeVariables, "borderWidth-Button"));
+    ?? parsedBorder.width
+    ?? themeValue(themeVariables, "borderWidth-Button");
   const borderStyle =
     exactThemeValue(themeVariables, `borderStyle-Button-${themeColor}-${variant}`)
-    ?? (border ? undefined : themeValue(themeVariables, "borderStyle-Button"));
+    ?? parsedBorder.style
+    ?? themeValue(themeVariables, "borderStyle-Button");
+  const borderColor =
+    exactThemeValue(themeOverrides, `borderColor-Button-${themeColor}-${variant}`)
+    ?? parsedBorder.color
+    ?? exactThemeValue(themeVariables, `borderColor-Button-${themeColor}-${variant}`)
+    ?? defaultButtonBorderColor(themeVariables, variant, themeColor);
   return {
     width: themeValue(themeVariables, horizontal ? "width-Button" : "width-Button-vertical"),
     height: themeValue(themeVariables, horizontal ? "height-Button" : "height-Button-vertical"),
@@ -129,10 +140,9 @@ function baseButtonStyle(
     padding: paddingHorizontal && paddingVertical
       ? `${paddingVertical} ${paddingHorizontal}`
       : themeValue(themeVariables, "padding-Button"),
-    border,
     borderWidth,
     borderStyle,
-    borderColor: buttonBorderColor(themeVariables, variant, themeColor),
+    borderColor,
     borderRadius:
       exactThemeValue(themeVariables, `borderRadius-Button-${themeColor}-${variant}`)
       ?? themeValue(themeVariables, "borderRadius-Button"),
@@ -161,13 +171,6 @@ function baseButtonStyle(
   };
 }
 
-function borderWidthFromShorthand(border: string | undefined): string | undefined {
-  if (!border) {
-    return undefined;
-  }
-  return border.split(/\s+/).find((part) => /^-?\d*\.?\d+(px|em|rem|%)$/.test(part));
-}
-
 function buttonBackground(themeVariables: Record<string, unknown>, variant: string, themeColor: string): string | undefined {
   const exact = themeValue(themeVariables, `backgroundColor-Button-${themeColor}-${variant}`);
   if (exact) {
@@ -181,10 +184,14 @@ function buttonBackground(themeVariables: Record<string, unknown>, variant: stri
     : themeValue(themeVariables, "backgroundColor-Button");
 }
 
-function buttonBorderColor(themeVariables: Record<string, unknown>, variant: string, themeColor: string): string | undefined {
-  return themeValue(themeVariables, `borderColor-Button-${themeColor}-${variant}`)
-    ?? (variant === "solid" ? themeValue(themeVariables, `borderColor-Button-${themeColor}`) : undefined)
-    ?? themeValue(themeVariables, "borderColor-Button");
+function defaultButtonBorderColor(
+  themeVariables: Record<string, unknown>,
+  variant: string,
+  themeColor: string,
+): string | undefined {
+  return variant === "solid"
+    ? themeValue(themeVariables, `borderColor-Button-${themeColor}`)
+    : undefined;
 }
 
 function buttonTextColor(themeVariables: Record<string, unknown>, variant: string, themeColor: string): string | undefined {
@@ -212,6 +219,28 @@ function exactThemeValue(themeVariables: Record<string, unknown>, name: string):
     return undefined;
   }
   return String(resolveThemeReferences(value));
+}
+
+function parseBorderShorthand(border: string | undefined): {
+  color?: string;
+  style?: string;
+  width?: string;
+} {
+  if (!border) {
+    return {};
+  }
+  const width = border.match(/-?\d*\.?\d+(?:px|em|rem|%)\b/)?.[0];
+  const style = border.match(/\b(?:none|hidden|dotted|dashed|solid|double|groove|ridge|inset|outset)\b/)?.[0];
+  const colorSource = border
+    .replace(width ?? "", "")
+    .replace(style ?? "", "")
+    .trim();
+  const color = colorSource.match(/(?:rgb|hsl)a?\([^)]+\)|#[0-9a-fA-F]{3,8}\b|[a-zA-Z]+/)?.[0];
+  return {
+    color,
+    style,
+    width,
+  };
 }
 
 function validSize(value: string): string {

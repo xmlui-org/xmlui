@@ -937,14 +937,27 @@ finish the full component migration loop for its components:
 - inspect the original component folder and docs;
 - transfer component-owned metadata, defaults, SCSS theme variables, renderer,
   docs, and colocated tests;
-- transfer the original component E2E tests into the migrated component folder,
-  keeping assertions as close to the original as the current harness allows;
+- transfer all original component E2E tests into the migrated component folder,
+  including tests from every old `*.spec.ts` file and every loop-expanded test
+  case, keeping assertions as close to the original as the current harness
+  allows;
 - add or point to a visual example runnable with `npm run dev`;
 - include at least one state/data mutation path when the component can
   participate in mutation;
 - run focused unit/E2E tests and the compatibility sweep;
 - record any blocked old E2E test with the original source file, missing
   dependency, and follow-up wave.
+
+Before declaring any component complete, run or update the component E2E audit:
+
+```text
+npm --workspace xmlui run compatibility:component-e2e-audit
+```
+
+The audit report is written to
+`xmlui/.compatibility-report/component-e2e-audit-latest.md`. A component is not
+closed while this report, an expanded old test listing, or a component closure
+note shows missing old tests.
 
 `App` main content layout is no longer part of this wave; it is the dedicated
 Wave 2 proof component.
@@ -967,7 +980,9 @@ Compatibility focus:
 - max-line clipping, ellipses, overflow APIs, selection behavior, and
   component API references through `id`.
 
-Status: completed for the current compatibility slice. Migrated component
+Status: incomplete. The current implementation has useful source-adjacent
+metadata, defaults, SCSS theme declarations, docs, renderers, focused tests,
+and visual examples, but it does not yet transfer all old E2E tests. Migrated component
 folders include metadata, defaults, SCSS theme declarations, docs, renderers,
 colocated unit/E2E tests, transferred old component E2E coverage, and the
 `primitiveTextHeading`, `textOldCompatibility`, and `headingOldCompatibility`
@@ -995,6 +1010,32 @@ Compatibility focus:
 
 Closure requires transferred old E2E tests for these components or a recorded
 blocker if tests depend on not-yet-migrated surrounding components.
+
+Status: incomplete until the audit is reconciled for every component in the
+chunk. Migrated component
+folders include old-shaped metadata, docs, renderers, colocated transferred E2E
+tests, and a runnable `htmlTagsFragment` dev example. The rewrite now has a
+shared HTML tag inventory in `component-core`, supports lower-case HTML wrapper
+components in compiler contracts and IR lowering, supports both `<br />` and
+`<Br />`, and treats `Fragment` as a no-wrapper grouping component. The
+universal `when` behavior was added through the behavior pipeline so
+conditional `Fragment` groups compile and update via normal state mutation.
+Original E2E sources transferred:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/HtmlTags/HtmlTags.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Br/Br.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Fragment/Fragment.spec.ts`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test:e2e -- src/components/Br/Br-old-e2e.spec.ts src/components/Fragment/Fragment-old-e2e.spec.ts src/components/HtmlTags/HtmlTags-old-e2e.spec.ts`;
+- `npm --workspace xmlui run test -- tests/compiler 'src/components/**/*.spec.tsx'`;
+- `npm --workspace xmlui run compatibility:sweep`.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=htmlTagsFragment`.
 
 ##### Wave A3: Images and Embedded Media
 

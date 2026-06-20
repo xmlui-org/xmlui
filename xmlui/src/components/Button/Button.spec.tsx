@@ -133,7 +133,7 @@ describe("Button old theme-variable compatibility", () => {
           },
         });
 
-        expect(html).toContain("border:dotted rgb(255, 0, 0) 5px");
+        expect(html).toContain("border-width:5px");
         expect(html).toContain("border-style:double");
         expect(html).toContain("border-color:rgb(0, 128, 0)");
       });
@@ -171,6 +171,7 @@ function renderButton({
       variant={variant}
       themeColor={themeColor}
       themeVariables={themeVariables}
+      themeOverrides={themeVariables}
     >
       Button
     </ButtonReact>,

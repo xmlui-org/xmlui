@@ -3,6 +3,7 @@ import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 import { appContract, appRenderer } from "../components/App/App";
 import { buttonContract, buttonRenderer } from "../components/Button/Button";
+import { cardContract, cardRenderer } from "../components/Card/Card";
 import {
   headingContract,
   headingRenderer,
@@ -20,6 +21,13 @@ import {
   h6Renderer,
 } from "../components/Heading/Heading";
 import { textContract, textRenderer } from "../components/Text/Text";
+import {
+  htmlTagContracts,
+  htmlTagRenderers,
+} from "../components/HtmlTags/HtmlTags";
+import { brContract, BrContract, brRenderer, BrRenderer } from "../components/Br/Br";
+import { fragmentContract, fragmentRenderer } from "../components/Fragment/Fragment";
+import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
   XmluiRuntimeComponentModule,
@@ -30,6 +38,7 @@ const oldComponentRoot = "/Users/dotneteer/source/xmlui/xmlui/src/components";
 const implementedRuntimeNames = [
   "App",
   "AppHeader",
+  "Fragment",
   "Heading",
   "H1",
   "H2",
@@ -42,6 +51,9 @@ const implementedRuntimeNames = [
   "VStack",
   "Text",
   "Button",
+  "Card",
+  "Br",
+  "br",
   "Theme",
   "Slot",
   "Items",
@@ -61,7 +73,11 @@ const implementedRuntimeNameSet = new Set<string>(implementedRuntimeNames);
 const legacyRuntimeRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = legacyBuiltInRenderers;
 const transferredContracts: Partial<Record<string, (typeof builtInComponentContracts)[number]>> = {
   App: appContract,
+  br: brContract,
+  Br: BrContract,
   Button: buttonContract,
+  Card: cardContract,
+  Fragment: fragmentContract,
   Heading: headingContract,
   H1: h1Contract,
   H2: h2Contract,
@@ -70,10 +86,15 @@ const transferredContracts: Partial<Record<string, (typeof builtInComponentContr
   H5: h5Contract,
   H6: h6Contract,
   Text: textContract,
+  ...Object.fromEntries(htmlTagContracts.map((contract) => [contract.name, contract])),
 };
 const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   App: appRenderer,
+  br: brRenderer,
+  Br: BrRenderer,
   Button: buttonRenderer,
+  Card: cardRenderer,
+  Fragment: fragmentRenderer,
   Heading: headingRenderer,
   H1: h1Renderer,
   H2: h2Renderer,
@@ -82,9 +103,13 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   H5: h5Renderer,
   H6: h6Renderer,
   Text: textRenderer,
+  ...htmlTagRenderers,
 };
 
 const componentFolderNames: Record<string, string> = {
+  br: "Br",
+  Br: "Br",
+  Fragment: "Fragment",
   Heading: "Heading",
   H1: "Heading",
   H2: "Heading",
@@ -93,6 +118,9 @@ const componentFolderNames: Record<string, string> = {
   H5: "Heading",
   H6: "Heading",
 };
+for (const name of htmlTagComponentNames) {
+  componentFolderNames[name] = "HtmlTags";
+}
 
 function componentFolderName(name: string): string {
   return componentFolderNames[name] ?? name;
@@ -107,7 +135,29 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const buttonTransferred = contract.name === "Button";
     const textTransferred = contract.name === "Text";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
-    const transferredFolder = appTransferred || buttonTransferred || textTransferred || headingTransferred;
+    const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
+    const brTransferred = contract.name === "br" || contract.name === "Br";
+    const fragmentTransferred = contract.name === "Fragment";
+    const transferredFolder =
+      appTransferred ||
+      buttonTransferred ||
+      textTransferred ||
+      headingTransferred ||
+      htmlTagTransferred ||
+      brTransferred ||
+      fragmentTransferred;
+    const sharedComponentFile = htmlTagTransferred
+      ? "HtmlTags"
+      : brTransferred
+        ? "Br"
+        : fragmentTransferred
+          ? "Fragment"
+          : headingTransferred
+            ? "Heading"
+            : contract.name;
+    const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
+      ? contract.name
+      : sharedComponentFile;
     return {
       name: contract.name,
       contract,
@@ -128,22 +178,30 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
               ? [`xmlui/src/components/${folderName}/TextReact.tsx`]
               : headingTransferred
                 ? [`xmlui/src/components/${folderName}/HeadingReact.tsx`]
+                : transferredFolder
+                  ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.tsx`]
             : [],
         renderer: transferredFolder
-          ? [`xmlui/src/components/${folderName}/${headingTransferred ? "Heading" : contract.name}.tsx`]
+          ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.tsx`]
           : renderer ? ["xmlui/src/runtime/rendering/builtins.tsx"] : [],
         metadata: transferredFolder
           ? [
               "xmlui/src/compiler/contracts/builtins.ts",
-              `xmlui/src/components/${folderName}/${headingTransferred ? "Heading" : contract.name}.tsx`,
+              `xmlui/src/components/${folderName}/${sharedComponentFile}.tsx`,
             ]
           : ["xmlui/src/compiler/contracts/builtins.ts"],
-        defaults: transferredFolder ? [`xmlui/src/components/${folderName}/${headingTransferred ? "Heading" : contract.name}.defaults.ts`] : [],
-        styles: transferredFolder ? [`xmlui/src/components/${folderName}/${headingTransferred ? "Heading" : contract.name}.module.scss`] : [],
-        docs: transferredFolder ? [`xmlui/src/components/${folderName}/${contract.name}.md`] : [],
+        defaults:
+          transferredFolder && !htmlTagTransferred && !brTransferred && !fragmentTransferred
+            ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.defaults.ts`]
+            : [],
+        styles:
+          transferredFolder && !brTransferred && !fragmentTransferred
+            ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.module.scss`]
+            : [],
+        docs: transferredFolder ? [`xmlui/src/components/${folderName}/${docsFile}.md`] : [],
       },
       docs: {
-        path: `xmlui/src/components/${folderName}/${contract.name}.md`,
+        path: `xmlui/src/components/${folderName}/${docsFile}.md`,
       },
       transferredTests: {
         runnablePaths: appTransferred
@@ -153,6 +211,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
             ]
           : buttonTransferred
             ? [
+                "xmlui/src/components/Button/Button.spec.ts",
                 "xmlui/src/components/Button/Button.spec.tsx",
                 "xmlui/src/components/Button/Button-style.spec.ts",
                 "xmlui/tests/e2e/counter-components.spec.ts",
@@ -170,6 +229,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                     "xmlui/src/components/Heading/Heading-style.spec.ts",
                     "xmlui/src/components/Heading/Heading-old-e2e.spec.ts",
                   ]
+                : htmlTagTransferred
+                  ? ["xmlui/src/components/HtmlTags/HtmlTags-old-e2e.spec.ts"]
+                  : brTransferred
+                    ? ["xmlui/src/components/Br/Br-old-e2e.spec.ts"]
+                    : fragmentTransferred
+                      ? ["xmlui/src/components/Fragment/Fragment-old-e2e.spec.ts"]
           : [],
       },
     } satisfies XmluiComponentTransferModule;

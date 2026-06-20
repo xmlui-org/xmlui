@@ -1,4 +1,6 @@
 import { renderXmluiApp } from "./runtime";
+import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
+import { createXmluiModule } from "./runtime";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
@@ -26,6 +28,7 @@ import handlerConditionalsApp from "./examples/handler-conditionals/Main.xmlui";
 import handlerLocalsApp from "./examples/handler-locals/Main.xmlui";
 import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
 import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Main.xmlui";
+import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
@@ -49,6 +52,15 @@ import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
 import udcMethodsApp from "./examples/udc-methods/Main.xmlui";
 import udcSlotContextApp from "./examples/udc-slot-context/Main.xmlui";
+
+declare global {
+  interface Window {
+    __xmluiTestBedProbe?: {
+      readLocal(name: string): unknown;
+      readGlobal(name: string): unknown;
+    };
+  }
+}
 
 const examples = {
   actionsCallApi: actionsCallApiApp,
@@ -76,6 +88,7 @@ const examples = {
   handlerLocals: handlerLocalsApp,
   handlerLoops: handlerLoopsApp,
   headingOldCompatibility: headingOldCompatibilityApp,
+  htmlTagsFragment: htmlTagsFragmentApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,
@@ -107,7 +120,38 @@ if (!root) {
   throw new Error("Missing #root element");
 }
 
-const example = new URLSearchParams(window.location.search).get("example") ?? "globals";
-renderXmluiApp(examples[example as keyof typeof examples] ?? globalCounterApp, root, {
-  extensions: [counterBadgeExtension],
-});
+const params = new URLSearchParams(window.location.search);
+if (params.has("__xmluiTestBed")) {
+  const source = window.sessionStorage.getItem("__xmluiTestBedSource") ?? "<App />";
+  try {
+    const compiled = compileXmluiSource({
+      id: "testbed.xmlui",
+      source,
+      extensions: [counterBadgeExtension],
+    });
+    throwFirstCompilerDiagnostic(compiled);
+    renderXmluiApp(createXmluiModule(compiled.runtimeDocument, [], {
+      extensions: [counterBadgeExtension],
+    }), root, {
+      extensions: [counterBadgeExtension],
+      testProbe: (probe) => {
+        window.__xmluiTestBedProbe = probe;
+      },
+    });
+  } catch (error) {
+    root.innerHTML = `<pre data-testid="xmlui-testbed-error">${escapeHtml(error instanceof Error ? error.message : String(error))}</pre>`;
+  }
+} else {
+  const example = params.get("example") ?? "globals";
+  renderXmluiApp(examples[example as keyof typeof examples] ?? globalCounterApp, root, {
+    extensions: [counterBadgeExtension],
+  });
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}

@@ -1209,6 +1209,11 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "hasOverflow",
+    "scrollToTop",
+    "scrollToBottom",
+    "scrollToStart",
+    "scrollToEnd",
   ].includes(name);
 }
 

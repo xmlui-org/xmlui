@@ -32,7 +32,7 @@ export function resolveLayoutStyle(
   props: Record<string, unknown>,
   options: LayoutStyleOptions = {},
 ): CSSProperties {
-  const style: CSSProperties = {};
+  const style: CSSProperties = { boxSizing: "border-box" };
   const orientation = options.orientation ?? orientationFromProp(props.orientation);
 
   if (orientation) {

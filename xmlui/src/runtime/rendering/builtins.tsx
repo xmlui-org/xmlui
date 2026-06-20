@@ -40,16 +40,36 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
       {context.renderChildren(node.children, scope)}
     </h1>
   ),
+  Icon: ({ node, scope }) => {
+    const testId = useStringProp(node, scope, "testId", "");
+    return (
+      <span
+        {...partAttrs("Icon")}
+        data-testid={testId || undefined}
+        style={{ display: "inline-flex", ...useLayoutStyle(node, scope) }}
+      >
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M3 4h10M6 4V3h4v1m-5 2v7m3-7v7m3-7v7" stroke="currentColor" fill="none" />
+        </svg>
+      </span>
+    );
+  },
   Stack: ({ context, node, scope }) => {
     const orientation = useStringProp(node, scope, "orientation", "");
     const direction = orientation === "horizontal" ? "row" : orientation === "vertical" ? "column" : undefined;
-    return <div {...partAttrs("Stack")} style={flexStyle(direction, node, scope)}>{context.renderChildren(node.children, scope)}</div>;
+    const testId = useStringProp(node, scope, "testId", "");
+    return <div {...partAttrs("Stack")} data-testid={testId || undefined} style={flexStyle(direction, node, scope)}>{context.renderChildren(node.children, scope)}</div>;
   },
+  FlowLayout: ({ context, node, scope }) => (
+    <div {...partAttrs("FlowLayout")} style={{ ...flexStyle("row", node, scope), flexWrap: "wrap" }}>
+      {context.renderChildren(node.children, scope)}
+    </div>
+  ),
   HStack: ({ context, node, scope }) => (
-    <div {...partAttrs("HStack")} style={flexStyle("row", node, scope)}>{context.renderChildren(node.children, scope)}</div>
+    <div {...partAttrs("HStack")} data-testid={useStringProp(node, scope, "testId", "") || undefined} style={flexStyle("row", node, scope)}>{context.renderChildren(node.children, scope)}</div>
   ),
   VStack: ({ context, node, scope }) => (
-    <div {...partAttrs("VStack")} style={flexStyle("column", node, scope)}>{context.renderChildren(node.children, scope)}</div>
+    <div {...partAttrs("VStack")} data-testid={useStringProp(node, scope, "testId", "") || undefined} style={flexStyle("column", node, scope)}>{context.renderChildren(node.children, scope)}</div>
   ),
   Text: ({ context, node, scope }) => {
     const value = useEvaluatedProp(node, scope, "value", undefined);

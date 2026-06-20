@@ -1,7 +1,14 @@
 import type { XmluiComponentContract } from "./types";
 import { supportedLayoutPropNames } from "../../styling";
+import { htmlTagContracts } from "../../components/HtmlTags/HtmlTags";
+import { brContract, BrContract } from "../../components/Br/Br";
+import { fragmentContract } from "../../components/Fragment/Fragment";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
+  ...htmlTagContracts,
+  brContract,
+  BrContract,
+  fragmentContract,
   {
     name: "App",
     kind: "builtin",
@@ -24,6 +31,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   {
     name: "Heading",
     kind: "builtin",
+    acceptsArbitraryProps: true,
     allowsChildren: true,
     declarations: {},
     props: withLayoutProps({
@@ -35,6 +43,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       preserveLinebreaks: { name: "preserveLinebreaks" },
       omitFromToc: { name: "omitFromToc" },
       showAnchor: { name: "showAnchor" },
+      anchorId: { name: "anchorId" },
       anchorTemplate: { name: "anchorTemplate" },
       testId: { name: "testId" },
     }),
@@ -43,6 +52,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   {
     name: "H1",
     kind: "builtin",
+    acceptsArbitraryProps: true,
     allowsChildren: true,
     declarations: {},
     props: withLayoutProps({
@@ -54,6 +64,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       preserveLinebreaks: { name: "preserveLinebreaks" },
       omitFromToc: { name: "omitFromToc" },
       showAnchor: { name: "showAnchor" },
+      anchorId: { name: "anchorId" },
       anchorTemplate: { name: "anchorTemplate" },
       testId: { name: "testId" },
     }),
@@ -62,6 +73,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   ...["H2", "H3", "H4", "H5", "H6"].map((name): XmluiComponentContract => ({
     name,
     kind: "builtin",
+    acceptsArbitraryProps: true,
     allowsChildren: true,
     declarations: {},
     props: withLayoutProps({
@@ -73,17 +85,37 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       preserveLinebreaks: { name: "preserveLinebreaks" },
       omitFromToc: { name: "omitFromToc" },
       showAnchor: { name: "showAnchor" },
+      anchorId: { name: "anchorId" },
       anchorTemplate: { name: "anchorTemplate" },
       testId: { name: "testId" },
     }),
     events: {},
   })),
   {
+    name: "Icon",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: withLayoutProps({
+      name: { name: "name" },
+      testId: { name: "testId" },
+    }),
+    events: {},
+  },
+  {
     name: "Stack",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({ testId: { name: "testId" } }),
+    events: {},
+  },
+  {
+    name: "FlowLayout",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({ testId: { name: "testId" } }),
     events: {},
   },
   {
@@ -91,7 +123,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({ testId: { name: "testId" } }),
     events: {},
   },
   {
@@ -99,7 +131,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({ testId: { name: "testId" } }),
     events: {},
   },
   {
@@ -131,6 +163,28 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     },
   },
   {
+    name: "Card",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({
+      id: { name: "id" },
+      avatarUrl: { name: "avatarUrl" },
+      showAvatar: { name: "showAvatar" },
+      avatarSize: { name: "avatarSize" },
+      title: { name: "title" },
+      subtitle: { name: "subtitle" },
+      linkTo: { name: "linkTo" },
+      orientation: { name: "orientation" },
+      testId: { name: "testId" },
+    }),
+    events: {
+      click: { name: "click", attributeName: "onClick" },
+      doubleClick: { name: "doubleClick", attributeName: "onDoubleClick" },
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    },
+  },
+  {
     name: "Text",
     kind: "builtin",
     allowsChildren: true,
@@ -144,6 +198,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       ellipses: { name: "ellipses" },
       overflowMode: { name: "overflowMode" },
       breakMode: { name: "breakMode" },
+      lang: { name: "lang" },
       testId: { name: "testId" },
     }),
     events: {
@@ -448,6 +503,7 @@ function withLayoutProps(
     ...Object.fromEntries(
       supportedLayoutPropNames.map((name) => [name, { name }]),
     ),
+    when: { name: "when" },
     ...props,
   };
 }

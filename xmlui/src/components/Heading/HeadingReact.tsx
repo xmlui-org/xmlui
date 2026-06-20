@@ -13,6 +13,7 @@ export type HeadingProps = {
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
   showAnchor?: boolean;
+  anchorId?: string;
   omitFromToc?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -29,6 +30,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
     showAnchor = defaultProps.showAnchor,
+    anchorId,
     omitFromToc: _omitFromToc = defaultProps.omitFromToc,
     className,
     style,
@@ -57,7 +59,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
     registerApi?.({ hasOverflow, scrollIntoView });
   }, [hasOverflow, registerApi, scrollIntoView]);
 
-  const anchorId = useMemo(() => textFromChildren(children), [children]);
+  const resolvedAnchorId = useMemo(() => anchorId || textFromChildren(children), [anchorId, children]);
 
   const headingStyle = useMemo(
     () => ({
@@ -84,10 +86,10 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
       style={headingStyle}
       data-xmlui-heading-level={normalizedLevel}
     >
-      {anchorId ? <span id={anchorId} data-anchor="true" style={anchorRefStyle} /> : null}
+      {resolvedAnchorId ? <span id={resolvedAnchorId} data-anchor="true" style={anchorRefStyle} /> : null}
       {children}
-      {showAnchor && anchorId ? (
-        <a href={`#${anchorId}`} aria-hidden="true" style={anchorStyle(themeVariables)}>
+      {showAnchor && resolvedAnchorId ? (
+        <a href={`#${resolvedAnchorId}`} aria-hidden="true" style={anchorStyle(themeVariables)}>
           #
         </a>
       ) : null}
@@ -121,8 +123,8 @@ function baseHeadingStyle(themeVariables: Record<string, unknown>, level: Headin
     fontWeight: themeValue(themeVariables, `Heading:fontWeight-${key}`) ?? themeValue(themeVariables, "fontWeight-Heading"),
     lineHeight: themeValue(themeVariables, `lineHeight-${key}`),
     letterSpacing: themeValue(themeVariables, `Heading:letterSpacing-${key}`),
-    marginTop: themeValue(themeVariables, `marginTop-${key}`),
-    marginBottom: themeValue(themeVariables, `marginBottom-${key}`),
+    marginTop: themeValue(themeVariables, `marginTop-${key}`) ?? 0,
+    marginBottom: themeValue(themeVariables, `marginBottom-${key}`) ?? 0,
     textDecorationLine: themeValue(themeVariables, `Heading:textDecorationLine-${key}`),
     textDecorationColor: themeValue(themeVariables, `Heading:textDecorationColor-${key}`),
     textDecorationStyle: themeValue(themeVariables, `Heading:textDecorationStyle-${key}`),

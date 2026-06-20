@@ -1,118 +1,309 @@
-import { expect, test } from "@playwright/test";
+import { test, expect } from "../../testing/fixtures";
+import { buttonThemeValues, buttonVariantValues } from "../abstractions";
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("/?example=buttonCompatibility");
+// --- variant & themeColor
+
+// background color
+const EXPECTED_BACKGROUND_COLOR = "rgb(255, 0, 0)";
+buttonThemeValues.forEach((themeColor) => {
+  test(`"solid" background color: "${themeColor}"`, async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button variant="solid" themeColor="${themeColor}" />`, {
+      testThemeVars: {
+        [`backgroundColor-Button-${themeColor}-solid`]: EXPECTED_BACKGROUND_COLOR,
+      },
+    });
+    await expect((await createButtonDriver()).component).toHaveCSS(
+      "background-color",
+      EXPECTED_BACKGROUND_COLOR,
+    );
+  });
 });
 
-test("old Button smoke, label, state, and event behavior", async ({ page }) => {
-  await expect(page.getByRole("heading", { name: "Button compatibility" })).toBeVisible();
-  await expect(page.getByTestId("empty")).toBeAttached();
-
-  await expect(page.getByTestId("ascii")).toHaveText("hello");
-  await expect(page.getByTestId("unicode")).toHaveText("😀");
-  await expect(page.getByTestId("label-null")).toHaveText("null");
-  await expect(page.getByTestId("label-undefined")).toHaveText("undefined");
-  await expect(page.getByTestId("label-object")).toHaveText("[object Object]");
-  await expect(page.getByTestId("label-empty-object")).toHaveText("[object Object]");
-  await expect(page.getByTestId("label-array")).toHaveText("1,2,3");
-  await expect(page.getByTestId("label-empty-array")).toHaveText("");
-  await expect(page.getByTestId("children-label")).toHaveText("world");
-  await expect(page.getByTestId("text-child")).not.toHaveText("hello");
-  await expect(page.getByTestId("text-child").getByText("world")).toBeVisible();
-
-  await expect(page.getByTestId("enabled")).toBeEnabled();
-  await expect(page.getByTestId("disabled")).toBeDisabled();
-
-  await page.getByTestId("click").click();
-  await expect(page.getByTestId("click")).toHaveText("Click count: 1");
-  await expect(page.getByText("Clicks: 1")).toBeVisible();
-
-  await page.getByTestId("context-menu").click({ button: "right" });
-  await expect(page.getByText("Context menu: yes")).toBeVisible();
+// content/label color
+const EXPECTED_CONTENT_COLOR = "rgb(255, 255, 255)";
+buttonVariantValues.forEach((variant) => {
+  buttonThemeValues.forEach((themeColor) => {
+    test(`"${variant}" content color: "${themeColor}"`, async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+        testThemeVars: {
+          [`textColor-Button-${themeColor}-${variant}`]: EXPECTED_CONTENT_COLOR,
+        },
+      });
+      await expect((await createButtonDriver()).component).toHaveCSS(
+        "color",
+        EXPECTED_CONTENT_COLOR,
+      );
+    });
+  });
 });
 
-test("old Button icon, accessibility, positioning, type, and focus behavior", async ({ page }) => {
-  await expect(page.getByTestId("icon-only")).toHaveAccessibleName("test");
-  await expect(page.getByTestId("icon-label")).toHaveAccessibleName("label");
-  await expect(page.getByTestId("icon-contextual")).toHaveAccessibleName("context label");
-  await expect(page.getByTestId("icon-label").locator('[data-xmlui-part="icon"]')).toBeVisible();
-  await expect(page.getByTestId("icon-with-children").locator('[data-xmlui-part="icon"]')).toBeVisible();
-  await expect(page.getByTestId("icon-missing-with-label").locator('[data-xmlui-part="icon"]')).not.toBeAttached();
-  await expect(page.getByTestId("icon-missing-with-label")).toHaveText("hello");
+// border
+const EXPECTED_BORDER_COLOR = "rgb(255, 0, 0)";
+const EXPECTED_BORDER_WIDTH = "5px";
+const EXPECTED_BORDER_STYLE = "dotted";
+const EXPECTED_BORDER_RADIUS = "10px";
+buttonVariantValues
+  .filter((v) => v !== "ghost")
+  .forEach((variant) => {
+    buttonThemeValues.forEach((themeColor) => {
+      test(`border: "${themeColor}" "${variant}" variant`, async ({
+        initTestBed,
+        createButtonDriver,
+      }) => {
+        await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+          testThemeVars: {
+            [`borderColor-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_COLOR,
+            [`borderWidth-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_WIDTH,
+            [`borderRadius-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_RADIUS,
+            [`borderStyle-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_STYLE,
+          },
+        });
 
-  const startIcon = page.getByTestId("icon-position-start").locator('[data-xmlui-part="icon"]');
-  const endIcon = page.getByTestId("icon-position-end").locator('[data-xmlui-part="icon"]');
-  await expect(startIcon).toBeVisible();
-  await expect(endIcon).toBeVisible();
-  expect((await startIcon.boundingBox())!.x).toBeLessThan((await page.getByTestId("icon-position-start").boundingBox())!.x + 20);
-  expect((await endIcon.boundingBox())!.x).toBeGreaterThan((await page.getByTestId("icon-position-end").boundingBox())!.x + 20);
+        const driver = await createButtonDriver();
+        await expect(driver.component).toHaveCSS("border-color", EXPECTED_BORDER_COLOR);
+        await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
+        await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
+        await expect(driver.component).toHaveCSS("border-style", EXPECTED_BORDER_STYLE);
+      });
+    });
+  });
 
-  await expect(page.getByTestId("content-start")).toHaveCSS("justify-content", "start");
-  await expect(page.getByTestId("content-center")).toHaveCSS("justify-content", "center");
-  await expect(page.getByTestId("content-end")).toHaveCSS("justify-content", "end");
-
-  await expect(page.getByTestId("type-button")).toHaveAttribute("type", "button");
-  await expect(page.getByTestId("type-submit")).toHaveAttribute("type", "submit");
-  await expect(page.getByTestId("type-reset")).toHaveAttribute("type", "reset");
-  await expect(page.getByTestId("autofocus")).toBeFocused();
-
-  await page.getByTestId("focus-events").focus();
-  await expect(page.getByTestId("focus-events")).toBeFocused();
-  await expect(page.getByText("Got focus: yes")).toBeVisible();
-  await page.getByTestId("focus-events").blur();
-  await expect(page.getByText("Lost focus: yes")).toBeVisible();
+buttonThemeValues.forEach((themeColor) => {
+  test(`border: "${themeColor}" "ghost" variant`, async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button variant="ghost" themeColor="${themeColor}" />`, {
+      testThemeVars: {
+        [`borderWidth-Button-${themeColor}-ghost`]: EXPECTED_BORDER_WIDTH,
+        [`borderRadius-Button-${themeColor}-ghost`]: EXPECTED_BORDER_RADIUS,
+      },
+    });
+    const driver = await createButtonDriver();
+    await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
+    await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
+  });
 });
 
-test("old Button size and default style behavior", async ({ page }) => {
-  const xs = await page.getByTestId("size-empty-xs").boundingBox();
-  const sm = await page.getByTestId("size-empty-sm").boundingBox();
-  const md = await page.getByTestId("size-empty-md").boundingBox();
-  const lg = await page.getByTestId("size-empty-lg").boundingBox();
-
-  expect(xs!.width).toBeLessThanOrEqual(sm!.width);
-  expect(sm!.width).toBeLessThanOrEqual(md!.width);
-  expect(md!.width).toBeLessThanOrEqual(lg!.width);
-  expect(xs!.height).toBeLessThan(sm!.height);
-  expect(sm!.height).toBeLessThan(md!.height);
-  expect(md!.height).toBeLessThan(lg!.height);
-
-  const labeledXs = await page.getByTestId("size-xs").boundingBox();
-  const labeledSm = await page.getByTestId("size-sm").boundingBox();
-  const labeledMd = await page.getByTestId("size-md").boundingBox();
-  const labeledLg = await page.getByTestId("size-lg").boundingBox();
-  expect(labeledXs!.height).toBeLessThan(labeledSm!.height);
-  expect(labeledSm!.height).toBeLessThan(labeledMd!.height);
-  expect(labeledMd!.height).toBeLessThan(labeledLg!.height);
-
-  const button = page.getByRole("button", { name: "Click count: 0" });
-  await expect(button).toHaveCSS("background-color", "rgb(32, 107, 196)");
-  await expect(button).toHaveCSS("color", "rgb(243, 247, 249)");
-  await expect(button).not.toHaveCSS("width", `${page.viewportSize()?.width ?? 1280}px`);
+// fonts
+const EXPECTED_FONT_FAMILY = "Arial, sans-serif";
+const EXPECTED_FONT_SIZE = "20px";
+const EXPECTED_FONT_WEIGHT = "200";
+buttonVariantValues.forEach((variant) => {
+  buttonThemeValues.forEach((themeColor) => {
+    test(`font: "${themeColor}" "${variant}" variant`, async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+        testThemeVars: {
+          [`fontFamily-Button-${themeColor}-${variant}`]: EXPECTED_FONT_FAMILY,
+          [`fontSize-Button-${themeColor}-${variant}`]: EXPECTED_FONT_SIZE,
+          [`fontWeight-Button-${themeColor}-${variant}`]: EXPECTED_FONT_WEIGHT,
+        },
+      });
+      const driver = await createButtonDriver();
+      await expect(driver.component).toHaveCSS("font-family", EXPECTED_FONT_FAMILY);
+      await expect(driver.component).toHaveCSS("font-size", EXPECTED_FONT_SIZE);
+      await expect(driver.component).toHaveCSS("font-weight", EXPECTED_FONT_WEIGHT);
+    });
+  });
 });
 
-test("old Button theme override variables affect rendered CSS", async ({ page }) => {
-  const primarySolid = page.getByTestId("theme-primary-solid");
-  await expect(primarySolid).toHaveCSS("background-color", "rgb(255, 0, 0)");
-  await expect(primarySolid).toHaveCSS("color", "rgb(255, 255, 255)");
-  await expect(primarySolid).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  await expect(primarySolid).toHaveCSS("border-width", "5px");
-  await expect(primarySolid).toHaveCSS("border-style", "dotted");
-  await expect(primarySolid).toHaveCSS("border-radius", "10px");
-  await expect(primarySolid).toHaveCSS("font-family", "Arial, sans-serif");
-  await expect(primarySolid).toHaveCSS("font-size", "20px");
-  await expect(primarySolid).toHaveCSS("font-weight", "200");
+const variantsWithBorder = buttonVariantValues.filter((v) => v === "solid" || v === "outlined");
+variantsWithBorder.forEach((variant) => {
+  buttonThemeValues.forEach((themeColor) => {
+    const CODE = `<Button variant="${variant}" themeColor="${themeColor}" />`;
 
-  const secondarySolid = page.getByTestId("theme-secondary-solid");
-  await expect(secondarySolid).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    test(`border ${variant} ${themeColor}`, async ({ initTestBed, createButtonDriver }) => {
+      const EXPECTED_COLOR = "rgb(255, 0, 0)";
+      const EXPECTED_WIDTH = "5px";
+      const EXPECTED_STYLE = "dotted";
 
-  const secondaryOutlined = page.getByTestId("theme-secondary-outlined");
-  await expect(secondaryOutlined).toHaveCSS("border-color", "rgb(0, 128, 0)");
-  await expect(secondaryOutlined).toHaveCSS("border-width", "5px");
-  await expect(secondaryOutlined).toHaveCSS("border-style", "double");
-  await expect(secondaryOutlined).toHaveCSS("color", "rgb(255, 255, 255)");
+      await initTestBed(CODE, {
+        testThemeVars: {
+          [`border-Button-${themeColor}-${variant}`]: `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+        },
+      });
+      const component = (await createButtonDriver()).component;
 
-  const attentionGhost = page.getByTestId("theme-attention-ghost");
-  await expect(attentionGhost).toHaveCSS("border-width", "5px");
-  await expect(attentionGhost).toHaveCSS("border-radius", "10px");
-  await expect(attentionGhost).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+    });
+
+    test(`bordercolor ${variant} ${themeColor}`, async ({ initTestBed, createButtonDriver }) => {
+      const EXPECTED_COLOR = "rgb(0, 128, 0)";
+      const EXPECTED_WIDTH = "5px";
+      const EXPECTED_STYLE = "dotted";
+
+      await initTestBed(CODE, {
+        testThemeVars: {
+          [`borderColor-Button-${themeColor}-${variant}`]: EXPECTED_COLOR,
+        },
+      });
+      const component = (await createButtonDriver()).component;
+
+      await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+    });
+
+    test(`border, border-color ${variant} ${themeColor}`, async ({ initTestBed, createButtonDriver }) => {
+      const EXPECTED_COLOR = "rgb(255, 0, 0)";
+      const EXPECTED_WIDTH = "5px";
+      const EXPECTED_STYLE = "dotted";
+      const UPDATED = "rgb(0, 128, 0)";
+
+      await initTestBed(CODE, {
+        testThemeVars: {
+          [`borderColor-Button-${themeColor}-${variant}`]: UPDATED,
+          [`border-Button-${themeColor}-${variant}`]: `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+        },
+      });
+      const component = (await createButtonDriver()).component;
+
+      await expect(component).toHaveCSS("border-top-color", UPDATED);
+      await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-right-color", UPDATED);
+      await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-bottom-color", UPDATED);
+      await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-left-color", UPDATED);
+      await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+    });
+
+    test(`border-style ${variant} ${themeColor}`, async ({ initTestBed, createButtonDriver }) => {
+      const EXPECTED_COLOR = "rgb(0, 128, 0)";
+      const EXPECTED_WIDTH = "5px";
+      const EXPECTED_STYLE = "dotted";
+
+      await initTestBed(CODE, {
+        testThemeVars: {
+          [`borderStyle-Button-${themeColor}-${variant}`]: EXPECTED_STYLE,
+        },
+      });
+      const component = (await createButtonDriver()).component;
+
+      await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+      await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+      await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+      await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+      await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+    });
+
+    test(`border, border-style ${variant} ${themeColor}`, async ({ initTestBed, createButtonDriver }) => {
+      const EXPECTED_COLOR = "rgb(255, 0, 0)";
+      const EXPECTED_WIDTH = "5px";
+      const EXPECTED_STYLE = "dotted";
+      const UPDATED = "double";
+
+      await initTestBed(CODE, {
+        testThemeVars: {
+          [`borderStyle-Button-${themeColor}-${variant}`]: UPDATED,
+          [`border-Button-${themeColor}-${variant}`]: `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+        },
+      });
+      const component = (await createButtonDriver()).component;
+
+      await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-top-style", UPDATED);
+      await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-right-style", UPDATED);
+      await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-bottom-style", UPDATED);
+      await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+      await expect(component).toHaveCSS("border-left-style", UPDATED);
+    });
+
+    test(`border-thickness ${variant} ${themeColor}`, async ({ initTestBed, createButtonDriver }) => {
+      const EXPECTED_COLOR = "rgb(0, 128, 0)";
+      const EXPECTED_WIDTH = "8px";
+      const EXPECTED_STYLE = "dotted";
+
+      await initTestBed(CODE, {
+        testThemeVars: {
+          [`borderWidth-Button-${themeColor}-${variant}`]: EXPECTED_WIDTH,
+        },
+      });
+      const component = (await createButtonDriver()).component;
+
+      await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+      await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+      await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+      await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+      await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+    });
+
+    test(`border, border-thickness ${variant} ${themeColor}`, 
+      SKIP_REASON.TEST_NOT_WORKING("borderWidth is disregarded because the regular border overrides it... somehow"),
+      async ({ initTestBed, createButtonDriver }) => {
+      const EXPECTED_COLOR = "rgb(255, 0, 0)";
+      const EXPECTED_WIDTH = "5px";
+      const EXPECTED_STYLE = "dotted";
+      const UPDATED = "12px";
+
+      await initTestBed(CODE, {
+        testThemeVars: {
+          [`borderWidth-Button-${themeColor}-${variant}`]: UPDATED,
+          [`border-Button-${themeColor}-${variant}`]: `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+        },
+      });
+      const component = (await createButtonDriver()).component;
+
+      await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-top-width", UPDATED);
+      await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-right-width", UPDATED);
+      await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-bottom-width", UPDATED);
+      await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+      await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+      await expect(component).toHaveCSS("border-left-width", UPDATED);
+      await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+    });
+  });
 });

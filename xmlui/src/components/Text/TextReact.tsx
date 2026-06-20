@@ -11,21 +11,25 @@ export const textVariantElement = {
   codefence: "pre",
   deleted: "del",
   em: "em",
+  inherit: "span",
   inserted: "ins",
   keyboard: "kbd",
   marked: "mark",
-  mono: "span",
+  mono: "pre",
   paragraph: "p",
+  placeholder: "span",
   sample: "samp",
   secondary: "span",
-  small: "small",
+  small: "span",
   strong: "strong",
   sub: "sub",
-  subheading: "span",
+  subheading: "h6",
   subtitle: "span",
   sup: "sup",
+  tableheading: "h6",
   title: "span",
   var: "var",
+  caption: "span",
 } as const;
 
 export type TextProps = {
@@ -128,10 +132,25 @@ function baseTextStyle(themeVariables: Record<string, unknown>, variant?: string
     fontSize: themeValue(themeVariables, `fontSize-Text${suffix}`),
     fontWeight: themeValue(themeVariables, `fontWeight-Text${suffix}`),
     fontStyle: themeValue(themeVariables, `fontStyle-Text${suffix}`),
+    fontStretch: themeValue(themeVariables, `fontStretch-Text${suffix}`),
     lineHeight: themeValue(themeVariables, `lineHeight-Text${suffix}`),
     letterSpacing: themeValue(themeVariables, `letterSpacing-Text${suffix}`),
+    wordSpacing: themeValue(themeVariables, `wordSpacing-Text${suffix}`),
+    textShadow: themeValue(themeVariables, `textShadow-Text${suffix}`),
+    textIndent: themeValue(themeVariables, `textIndent-Text${suffix}`),
+    textAlign: themeValue(themeVariables, `textAlign-Text${suffix}`) as CSSProperties["textAlign"],
+    textAlignLast: themeValue(themeVariables, `textAlignLast-Text${suffix}`) as CSSProperties["textAlignLast"],
+    direction: themeValue(themeVariables, `direction-Text${suffix}`) as CSSProperties["direction"],
+    writingMode: themeValue(themeVariables, `writingMode-Text${suffix}`) as CSSProperties["writingMode"],
+    lineBreak: themeValue(themeVariables, `lineBreak-Text${suffix}`) as CSSProperties["lineBreak"],
     textTransform: themeValue(themeVariables, `textTransform-Text${suffix}`),
     textDecorationLine: themeValue(themeVariables, `textDecorationLine-Text${suffix}`),
+    textDecorationColor: themeValue(themeVariables, `textDecorationColor-Text${suffix}`),
+    textDecorationStyle: themeValue(themeVariables, `textDecorationStyle-Text${suffix}`) as CSSProperties["textDecorationStyle"],
+    textDecorationThickness: themeValue(themeVariables, `textDecorationThickness-Text${suffix}`),
+    textUnderlineOffset: themeValue(themeVariables, `textUnderlineOffset-Text${suffix}`),
+    wordBreak: themeValue(themeVariables, `wordBreak-Text${suffix}`) as CSSProperties["wordBreak"],
+    overflowWrap: themeValue(themeVariables, `wordWrap-Text${suffix}`) as CSSProperties["overflowWrap"],
     borderWidth: themeValue(themeVariables, `borderWidth-Text${suffix}`),
     borderStyle: themeValue(themeVariables, `borderStyle-Text${suffix}`),
     borderColor: themeValue(themeVariables, `borderColor-Text${suffix}`),
@@ -168,7 +187,20 @@ function overflowStyle({
   if (preserveLinebreaks) {
     style.whiteSpace = "pre-wrap";
   }
-  if (maxLines > 0 || overflowMode === "ellipsis") {
+  if (overflowMode === "none") {
+    style.whiteSpace = "nowrap";
+    style.overflow = "hidden";
+    style.textOverflow = "clip";
+  } else if (overflowMode === "scroll") {
+    style.whiteSpace = "nowrap";
+    style.overflowX = "auto";
+    style.overflowY = "hidden";
+    style.textOverflow = "clip";
+  } else if (overflowMode === "flow") {
+    style.whiteSpace = "normal";
+    style.overflowY = "auto";
+    style.overflowX = "hidden";
+  } else if (maxLines > 0 || overflowMode === "ellipsis") {
     style.overflow = "hidden";
     style.textOverflow = ellipses ? "ellipsis" : "clip";
     if (maxLines <= 1) {
@@ -179,16 +211,6 @@ function overflowStyle({
       style.WebkitLineClamp = maxLines;
     }
   }
-  if (overflowMode === "scroll") {
-    style.whiteSpace = "nowrap";
-    style.overflowX = "auto";
-    style.overflowY = "hidden";
-  }
-  if (overflowMode === "flow") {
-    style.whiteSpace = "normal";
-    style.overflowY = "auto";
-    style.overflowX = "hidden";
-  }
   if (breakMode === "word") {
     style.overflowWrap = "break-word";
   } else if (breakMode === "anywhere") {
@@ -197,6 +219,7 @@ function overflowStyle({
     style.wordBreak = "keep-all";
   } else if (breakMode === "hyphenate") {
     style.hyphens = "auto";
+    style.overflowWrap = "break-word";
   }
   return style;
 }

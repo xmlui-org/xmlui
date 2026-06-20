@@ -91,7 +91,7 @@ export function useThemeOverrideProps(
 ): Record<string, unknown> {
   const variables: Record<string, unknown> = {};
   for (const name of Object.keys(node.props)) {
-    if ((isLayoutPropName(name) && !looksLikeComponentThemeVariable(name)) || name === "name") {
+    if ((isLayoutPropName(name) && name !== "fontSize" && !looksLikeComponentThemeVariable(name)) || name === "name") {
       continue;
     }
     variables[name] = useEvaluatedProp(node, scope, name, undefined);

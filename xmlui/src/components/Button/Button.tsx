@@ -199,10 +199,11 @@ export const buttonRenderer = wrapComponent({
         contentPosition={adapter.stringProp("contentPosition", defaultProps.contentPosition)}
         orientation={adapter.stringProp("orientation", defaultProps.orientation)}
         contextualLabel={adapter.stringProp("contextualLabel")}
-        icon={adapter.stringProp("icon")}
+        icon={buttonIconValue(adapter.prop("icon"))}
         autoFocus={adapter.booleanProp("autoFocus", defaultProps.autoFocus)}
         disabled={!enabled}
         themeVariables={mergedThemeVariables}
+        themeOverrides={themeVariables}
         onClick={(event) => void adapter.event("click")(event)}
         onContextMenu={(event) => void adapter.event("contextMenu")(event)}
         onFocus={() => void adapter.event("gotFocus")()}
@@ -225,4 +226,22 @@ function stringifyButtonLabel(value: unknown): string {
     return "[object Object]";
   }
   return String(value);
+}
+
+function buttonIconValue(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  if (
+    value === "" ||
+    value === "_" ||
+    value === "null" ||
+    value === "undefined" ||
+    value === "[object Object]" ||
+    value.includes("=>") ||
+    value.startsWith("function")
+  ) {
+    return undefined;
+  }
+  return value;
 }

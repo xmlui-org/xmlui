@@ -3,6 +3,23 @@ import { cloneElement, isValidElement } from "react";
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
 
+export const whenBehavior: Behavior = {
+  metadata: {
+    name: "when",
+    friendlyName: "Conditional Rendering",
+    description: "Conditionally renders a component when the `when` prop is truthy.",
+    triggerProps: ["when"],
+    props: {
+      when: {
+        valueType: "boolean",
+        description: "If false, the component is not rendered.",
+      },
+    },
+  },
+  canAttach: (context) => Object.prototype.hasOwnProperty.call(context.props, "when"),
+  attach: (context, node) => isTruthyWhenValue(context.props.when) ? node : null,
+};
+
 export const tooltipBehavior: Behavior = {
   metadata: {
     name: "tooltip",
@@ -233,6 +250,7 @@ export const formBindingBehavior = simpleWrapperBehavior({
 });
 
 export const collectedBehaviors: Behavior[] = [
+  whenBehavior,
   formBindingBehavior,
   validationBehavior,
   labelBehavior,
@@ -265,6 +283,10 @@ function simpleWrapperBehavior(metadata: BehaviorMetadata): Behavior {
     ),
   };
   return behavior;
+}
+
+function isTruthyWhenValue(value: unknown): boolean {
+  return value !== undefined && value !== null && value !== false && value !== "" && value !== "false";
 }
 
 function canAttachWhenTriggered(name: string) {

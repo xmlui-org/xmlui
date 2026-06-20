@@ -14,6 +14,7 @@ import {
   createIrId,
   emptyDependencySummary,
 } from "./builders";
+import { htmlTagComponentNames } from "../../component-core/htmlTags";
 import { createXmluiIrSourceRef, sourceSpanFromOffsets } from "./ids";
 import type {
   XmluiBindingIr,
@@ -405,6 +406,7 @@ function isComponentReference(type: string, isDefinitionRoot: boolean): boolean 
 }
 
 const builtInElementNames = new Set([
+  ...htmlTagComponentNames,
   "App",
   "AppHeader",
   "APICall",
@@ -416,8 +418,14 @@ const builtInElementNames = new Set([
   "H4",
   "H5",
   "H6",
+  "Icon",
   "Button",
+  "Br",
+  "br",
+  "Card",
   "Checkbox",
+  "Fragment",
+  "FlowLayout",
   "HStack",
   "Items",
   "Option",

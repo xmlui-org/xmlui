@@ -213,10 +213,12 @@ describe("layout resolver", () => {
     })).toEqual({
       [COMPONENT_PART_KEY]: {
         base: {
+          boxSizing: "border-box",
           padding: "var(--xmlui-space-2)",
         },
         breakpoints: {
           md: {
+            boxSizing: "border-box",
             gap: "16px",
           },
         },
@@ -231,6 +233,7 @@ describe("layout resolver", () => {
             breakpoints: {
               md: {
                 backgroundColor: "var(--xmlui-color-primary)",
+                boxSizing: "border-box",
               },
             },
           },

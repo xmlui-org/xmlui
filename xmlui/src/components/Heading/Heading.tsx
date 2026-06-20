@@ -57,6 +57,10 @@ const sharedHeadingProps = {
     valueType: "boolean" as const,
     defaultValue: defaultProps.showAnchor,
   },
+  anchorId: {
+    description: "Sets the generated anchor id for this heading.",
+    valueType: "string" as const,
+  },
   anchorTemplate: dComponent("Optional template for the heading anchor."),
   testId: {
     description: "Adds a test identifier to the rendered heading.",
@@ -83,6 +87,7 @@ const contextVars = {
 export const HeadingMd = createMetadata({
   status: "stable",
   description: "`Heading` displays hierarchical text headings from H1 to H6.",
+  allowArbitraryProps: true,
   props: {
     ...sharedHeadingProps,
     level: {
@@ -110,6 +115,7 @@ export const H1Md = createMetadata({
   status: "stable",
   description: "Represents a heading level 1 text.",
   specializedFrom: COMP,
+  allowArbitraryProps: true,
   props: sharedHeadingProps,
   apis,
   contextVars,
@@ -181,6 +187,7 @@ function createHeadingShortcutMetadata(name: string, description: string): Compo
     status: "stable",
     description,
     specializedFrom: COMP,
+    allowArbitraryProps: true,
     props: sharedHeadingProps,
     apis,
     contextVars,
@@ -227,6 +234,7 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
         <Heading
           {...adapter.rootAttrs()}
           id={adapter.stringProp("id")}
+          anchorId={adapter.stringProp("anchorId")}
           level={level}
           maxLines={adapter.numberProp("maxLines", defaultProps.maxLines)}
           preserveLinebreaks={adapter.booleanProp("preserveLinebreaks", defaultProps.preserveLinebreaks)}

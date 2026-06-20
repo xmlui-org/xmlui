@@ -61,6 +61,12 @@ export type MountXmluiAppOptions = {
   hydrate?: boolean;
   initialUrl?: string;
   extensions?: Iterable<Extension>;
+  testProbe?: XmluiRuntimeTestProbe;
+};
+
+export type XmluiRuntimeTestProbe = {
+  readLocal(name: string): unknown;
+  readGlobal(name: string): unknown;
 };
 
 export function mountXmluiApp(
@@ -72,10 +78,25 @@ export function mountXmluiApp(
     throw new Error("mountXmluiApp expected an app module.");
   }
   if (options.hydrate) {
-    return hydrateRoot(container, <XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
+    return hydrateRoot(
+      container,
+      <XmluiRoot
+        module={module}
+        initialUrl={options.initialUrl}
+        extensions={options.extensions}
+        testProbe={options.testProbe}
+      />,
+    );
   }
   const root = createRoot(container);
-  root.render(<XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
+  root.render(
+    <XmluiRoot
+      module={module}
+      initialUrl={options.initialUrl}
+      extensions={options.extensions}
+      testProbe={options.testProbe}
+    />,
+  );
   return root;
 }
 
@@ -83,10 +104,12 @@ export function XmluiRoot({
   module,
   initialUrl,
   extensions,
+  testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
   initialUrl?: string;
   extensions?: Iterable<Extension>;
+  testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
@@ -109,6 +132,12 @@ export function XmluiRoot({
     [extensions],
   );
   useEffect(() => routingRef.current?.attach(), []);
+  useEffect(() => {
+    testProbe?.({
+      readLocal: (name) => store.readLocal(rootOwnerId, name),
+      readGlobal: (name) => store.readGlobal(name),
+    });
+  }, [store, testProbe]);
 
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);

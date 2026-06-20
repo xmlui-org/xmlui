@@ -10,7 +10,7 @@ import React, {
 import { attachBehaviors } from "../../component-core/behaviors";
 import type { ComponentMetadata } from "../../component-core/metadata";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
-import { resolveLayoutStyle } from "../../styling";
+import { resolveLayoutStyle, supportedLayoutPropNames } from "../../styling";
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
@@ -155,6 +155,7 @@ export function useXmluiComponentAdapter({
       ...layoutStyle,
     },
     rootAttrs: (part = defaultPart) => ({
+      ...arbitraryRootAttrs(metadata, props),
       "data-xmlui-component": name,
       "data-xmlui-part": part,
       "data-xmlui-id": props.id,
@@ -233,4 +234,29 @@ function templateChildren(node: XmluiElement, name: string): XmluiNode[] | undef
 
 function nonPropertyChildren(children: XmluiNode[]): XmluiNode[] {
   return children.filter((child) => !(child.kind === "element" && child.type === "property"));
+}
+
+function arbitraryRootAttrs(
+  metadata: ComponentMetadata,
+  props: Record<string, unknown>,
+): Record<string, unknown> {
+  if (!metadata.allowArbitraryProps) {
+    return {};
+  }
+  const knownProps = new Set([
+    ...Object.keys(metadata.props ?? {}),
+    ...supportedLayoutPropNames,
+    "testId",
+    "when",
+  ]);
+  return Object.fromEntries(
+    Object.entries(props).filter(([name, value]) =>
+      !knownProps.has(name) &&
+      value !== undefined &&
+      value !== null &&
+      typeof value !== "object" &&
+      typeof value !== "function" &&
+      !name.startsWith("on"),
+    ),
+  );
 }

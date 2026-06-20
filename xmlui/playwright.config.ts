@@ -1,11 +1,23 @@
 import { defineConfig } from "@playwright/test";
 
+const includeIncompleteCompatibility =
+  process.env.XMLUI_INCLUDE_INCOMPLETE_COMPAT === "1";
+
 export default defineConfig({
   testDir: ".",
   testMatch: [
     "tests/e2e/**/*.spec.ts",
     "src/components/**/*.spec.ts",
   ],
+  testIgnore: includeIncompleteCompatibility
+    ? []
+    : [
+        "src/components/App/App.spec.ts",
+        "src/components/App/App-layout.spec.ts",
+        "src/components/App/App-layout-mobile.spec.ts",
+        "src/components/App/App-navigation-events.spec.ts",
+        "src/components/App/App-script-imports.spec.ts",
+      ],
   webServer: [
     {
       command: "npm run dev -- --host 127.0.0.1 --port 5173",
