@@ -582,6 +582,74 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toContainText("Item 1");
   });
 
+  test("scrollAnchor=bottom follows newly appended items", async ({
+    initTestBed,
+    page,
+    createListDriver,
+  }) => {
+    // A large list so virtualization actually drops off-screen rows (otherwise
+    // every row stays in the DOM and scroll position is unobservable via text).
+    await initTestBed(`
+      <Fragment var.items="{Array.from({length: 100}).map((_, i) => ({ id: i + 1, name: 'Item ' + (i + 1) }))}">
+        <Button testId="add" label="Add"
+          onClick="items = [...items, { id: items.length + 1, name: 'Item ' + (items.length + 1) }]" />
+        <List testId="testList" scrollAnchor="bottom" height="80px" data="{items}">
+          <Text>{$item.name}</Text>
+        </List>
+      </Fragment>
+    `);
+    const driver = await createListDriver("testList");
+    await expect(driver.component).toBeVisible();
+
+    // Starts pinned to the bottom: newest row rendered, oldest virtualized away.
+    // (exact match so "Item 1" does not also match "Item 10", "Item 100", ...)
+    await expect(page.getByText("Item 100", { exact: true })).toBeVisible();
+    await expect(page.getByText("Item 1", { exact: true })).toHaveCount(0);
+
+    // Appending follows the bottom to each newest item.
+    for (let i = 0; i < 3; i++) {
+      await page.getByTestId("add").click();
+      await page.waitForTimeout(100);
+    }
+    await expect(page.getByText("Item 103", { exact: true })).toBeVisible();
+    await expect(page.getByText("Item 1", { exact: true })).toHaveCount(0);
+  });
+
+  // A content-sized (maxHeight) bottom-anchored list grows from the top while it
+  // fits, then keeps following the bottom once content exceeds the cap, rather
+  // than stranding the user at the top -- exercising follow across the
+  // fits -> overflows transition for the maxHeight case.
+  test("scrollAnchor=bottom with maxHeight follows past the overflow cap", async ({
+    initTestBed,
+    page,
+    createListDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment var.items="{[{ id: 1, name: 'Item 1' }]}">
+        <Button testId="add" label="Add"
+          onClick="items = [...items, { id: items.length + 1, name: 'Item ' + (items.length + 1) }]" />
+        <List testId="testList" scrollAnchor="bottom" maxHeight="80px" data="{items}">
+          <Text>{$item.name}</Text>
+        </List>
+      </Fragment>
+    `);
+    const driver = await createListDriver("testList");
+    await expect(driver.component).toBeVisible();
+
+    // One item fits under the 80px cap, so the top item is visible.
+    await expect(page.getByText("Item 1", { exact: true })).toBeVisible();
+
+    // Append ONE row at a time across the cap; the list must keep following the
+    // newest row through the fits -> overflows transition.
+    for (let i = 0; i < 60; i++) {
+      await page.getByTestId("add").click();
+      await page.waitForTimeout(30);
+    }
+    // Followed to the bottom: newest rendered, oldest virtualized away.
+    await expect(page.getByText("Item 61", { exact: true })).toBeVisible();
+    await expect(page.getByText("Item 1", { exact: true })).toHaveCount(0);
+  });
+
   test("handles empty data with default display", async ({ initTestBed, createListDriver }) => {
     await initTestBed(`<List data="{[]}"/>`);
     const driver = await createListDriver();
