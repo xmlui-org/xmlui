@@ -263,6 +263,9 @@ export function createValueExtractor(
       if (size?.themeId) {
         return toCssVar(size.themeId);
       }
+      if (size?.extSize) {
+        return size.extSize;
+      }
       return size ? `${size.value}${size.unit ?? "px"}` : undefined;
     } catch {
       return undefined;

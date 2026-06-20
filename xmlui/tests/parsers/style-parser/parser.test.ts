@@ -50,6 +50,23 @@ describe("Style parser", () => {
     })
   );
 
+  // Intrinsic / keyword sizes are valid CSS but not numeric; they must pass
+  // through as SizeNode.extSize instead of failing the numeric path.
+  const keywordSizeCases = ["auto", "fit-content", "min-content", "max-content"];
+
+  keywordSizeCases.forEach((s) =>
+    it(`parseSize keyword '${s}'`, () => {
+      // --- Arrange
+      const sp = new StyleParser(s);
+
+      // --- Act
+      const size = sp.parseSize()!;
+
+      // --- Assert
+      expect(size.extSize).equal(s);
+    })
+  );
+
   const sizeErrorCases = ["12left", "12wavy"];
 
   sizeErrorCases.forEach((s) =>
