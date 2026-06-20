@@ -39,7 +39,6 @@ for (const cells of componentRows) {
 
   const componentDir = resolve(xmluiRoot, "src/components", name);
   const closureNote = resolve(repoRoot, ".ai", `${name}-compatibility-closure.md`);
-  const transferredTests = resolve(componentDir, "__tests__/transferred");
   const indexFile = resolve(componentDir, "index.ts");
 
   if (!existsSync(componentDir)) {
@@ -50,9 +49,6 @@ for (const cells of componentRows) {
   }
   if (!existsSync(closureNote)) {
     errors.push(`${name} is closed but ${closureNote} does not exist.`);
-  }
-  if (!existsSync(transferredTests)) {
-    errors.push(`${name} is closed but ${transferredTests} does not exist.`);
   }
 }
 

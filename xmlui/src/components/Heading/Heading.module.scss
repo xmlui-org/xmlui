@@ -1,0 +1,52 @@
+// Heading.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old Heading component pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$fontFamily-Heading: createThemeVar("fontFamily-Heading");
+$textColor-Heading: createThemeVar("textColor-Heading");
+$fontWeight-Heading: createThemeVar("fontWeight-Heading");
+$color-anchor-Heading: createThemeVar("color-anchor-Heading");
+$gap-anchor-Heading: createThemeVar("gap-anchor-Heading");
+$textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-Heading");
+
+$fontSize-H1: createThemeVar("fontSize-H1");
+$lineHeight-H1: createThemeVar("lineHeight-H1");
+$marginTop-H1: createThemeVar("marginTop-H1");
+$marginBottom-H1: createThemeVar("marginBottom-H1");
+$textColor-H1: createThemeVar("Heading:textColor-H1");
+$letterSpacing-H1: createThemeVar("Heading:letterSpacing-H1");
+$fontFamily-H1: createThemeVar("Heading:fontFamily-H1");
+$fontWeight-H1: createThemeVar("Heading:fontWeight-H1");
+$textDecorationLine-H1: createThemeVar("Heading:textDecorationLine-H1");
+$textDecorationColor-H1: createThemeVar("Heading:textDecorationColor-H1");
+$textDecorationStyle-H1: createThemeVar("Heading:textDecorationStyle-H1");
+$textDecorationThickness-H1: createThemeVar("Heading:textDecorationThickness-H1");
+$textUnderlineOffset-H1: createThemeVar("Heading:textUnderlineOffset-H1");
+
+$fontSize-H2: createThemeVar("fontSize-H2");
+$lineHeight-H2: createThemeVar("lineHeight-H2");
+$marginTop-H2: createThemeVar("marginTop-H2");
+$marginBottom-H2: createThemeVar("marginBottom-H2");
+$fontSize-H3: createThemeVar("fontSize-H3");
+$lineHeight-H3: createThemeVar("lineHeight-H3");
+$marginTop-H3: createThemeVar("marginTop-H3");
+$marginBottom-H3: createThemeVar("marginBottom-H3");
+$fontSize-H4: createThemeVar("fontSize-H4");
+$lineHeight-H4: createThemeVar("lineHeight-H4");
+$marginTop-H4: createThemeVar("marginTop-H4");
+$marginBottom-H4: createThemeVar("marginBottom-H4");
+$fontSize-H5: createThemeVar("fontSize-H5");
+$lineHeight-H5: createThemeVar("lineHeight-H5");
+$marginTop-H5: createThemeVar("marginTop-H5");
+$marginBottom-H5: createThemeVar("marginBottom-H5");
+$fontSize-H6: createThemeVar("fontSize-H6");
+$lineHeight-H6: createThemeVar("lineHeight-H6");
+$marginTop-H6: createThemeVar("marginTop-H6");
+$marginBottom-H6: createThemeVar("marginBottom-H6");
+
+:export {
+  themeVars: ();
+}

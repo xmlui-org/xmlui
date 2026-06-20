@@ -7,10 +7,12 @@ import asyncSequenceApp from "./examples/async-sequence/Main.xmlui";
 import componentCounterApp from "./examples/counter-components/Main.xmlui";
 import actionsCallApiApp from "./examples/actions-call-api/Main.xmlui";
 import apiCallMutationApp from "./examples/api-call-mutation/Main.xmlui";
+import appMainContentLayoutApp from "./examples/app-main-content-layout/Main.xmlui";
 import builtinsInputsApp from "./examples/builtins-inputs/Main.xmlui";
 import builtinsItemsApp from "./examples/builtins-items/Main.xmlui";
 import builtinsLayoutApp from "./examples/builtins-layout/Main.xmlui";
 import builtinsTaskFilterApp from "./examples/builtins-task-filter/Main.xmlui";
+import buttonCompatibilityApp from "./examples/button-compatibility/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
 import dataSourceRefetchApp from "./examples/data-source-refetch/Main.xmlui";
@@ -23,6 +25,7 @@ import handlerAssignmentsApp from "./examples/handler-assignments/Main.xmlui";
 import handlerConditionalsApp from "./examples/handler-conditionals/Main.xmlui";
 import handlerLocalsApp from "./examples/handler-locals/Main.xmlui";
 import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
+import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
@@ -30,6 +33,7 @@ import reactiveDerivedChainApp from "./examples/reactive-derived-chain/Main.xmlu
 import reactiveDerivedGlobalsApp from "./examples/reactive-derived-globals/Main.xmlui";
 import reactiveDerivedOverrideApp from "./examples/reactive-derived-override/Main.xmlui";
 import reactiveDerivedPropsApp from "./examples/reactive-derived-props/Main.xmlui";
+import primitiveTextHeadingApp from "./examples/primitive-text-heading/Main.xmlui";
 import responsiveStateBasicsApp from "./examples/responsive-state-basics/Main.xmlui";
 import routingBasicApp from "./examples/routing-basic/Main.xmlui";
 import routingDataApp from "./examples/routing-data/Main.xmlui";
@@ -39,6 +43,7 @@ import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
 import styleMutationApp from "./examples/style-mutation/Main.xmlui";
 import themeScopeApp from "./examples/theme-scope/Main.xmlui";
 import themeVarsApp from "./examples/theme-vars/Main.xmlui";
+import textOldCompatibilityApp from "./examples/text-old-compatibility/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -48,6 +53,7 @@ import udcSlotContextApp from "./examples/udc-slot-context/Main.xmlui";
 const examples = {
   actionsCallApi: actionsCallApiApp,
   apiCallMutation: apiCallMutationApp,
+  appMainContentLayout: appMainContentLayoutApp,
   asyncDirectives: asyncDirectivesApp,
   asyncResponsiveLoop: asyncResponsiveLoopApp,
   asyncSequence: asyncSequenceApp,
@@ -55,6 +61,7 @@ const examples = {
   builtinsItems: builtinsItemsApp,
   builtinsLayout: builtinsLayoutApp,
   builtinsTaskFilter: builtinsTaskFilterApp,
+  buttonCompatibility: buttonCompatibilityApp,
   components: componentCounterApp,
   dataSourceMock: dataSourceMockApp,
   dataSourceRefetch: dataSourceRefetchApp,
@@ -68,6 +75,7 @@ const examples = {
   handlerConditionals: handlerConditionalsApp,
   handlerLocals: handlerLocalsApp,
   handlerLoops: handlerLoopsApp,
+  headingOldCompatibility: headingOldCompatibilityApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,
@@ -75,6 +83,7 @@ const examples = {
   reactiveDerivedGlobals: reactiveDerivedGlobalsApp,
   reactiveDerivedOverride: reactiveDerivedOverrideApp,
   reactiveDerivedProps: reactiveDerivedPropsApp,
+  primitiveTextHeading: primitiveTextHeadingApp,
   responsiveStateBasics: responsiveStateBasicsApp,
   routingBasic: routingBasicApp,
   routingData: routingDataApp,
@@ -84,6 +93,7 @@ const examples = {
   styleMutation: styleMutationApp,
   themeScope: themeScopeApp,
   themeVars: themeVarsApp,
+  textOldCompatibility: textOldCompatibilityApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

@@ -181,7 +181,8 @@ old source anchors, tasks, and exit criteria for each step.
 
     Migrate `App` as the first proof component, limited to main content layout:
     vertical stack behavior, padding, gap, layout props, theme variables,
-    default styling, docs, and old layout tests.
+    default styling, docs, old layout tests, and a runnable visual sample that
+    can be inspected from the dev server.
 
 13. Phase 5 Wave 3: Experiment 1 Component Migration Spike
 
@@ -510,12 +511,18 @@ Source organization rule:
 - Keep component-owned code in that folder: implementation, renderer adapter,
   metadata, default styles/theme variables, docs source, tests, fixtures, and
   component-local helpers.
-- Keep central runtime files as registry and orchestration glue only. They may
-  load component modules, but they must not become the primary home of
-  component behavior.
+- Keep `xmlui/src/components` free of shared infrastructure files/folders; it
+  should contain component folders only.
+- Keep shared component infrastructure under `xmlui/src/component-core`.
+  Central runtime files may load component modules, but they must not become
+  the primary home of component behavior.
 - Existing experimental built-ins are compatibility scaffolding. During Phase 5
   they must either move behind component modules or remain explicitly marked as
   temporary debt.
+- After every Phase 5 wave, either create a runnable visual example or point to
+  an existing one that exercises that wave's result. Record the command and
+  route, such as `npm run dev` plus a `?example=...` URL, so the wave can be
+  checked visually outside the automated tests.
 - Deviations from the old file shape are allowed only when recorded in the
   component closure note with the reason and compatibility risk.
 
@@ -524,21 +531,19 @@ Suggested component folder shape:
 ```text
 xmlui/src/components/Button/
   Button.tsx
-  Button.metadata.ts
-  Button.renderer.tsx
+  ButtonReact.tsx
   Button.defaults.ts
+  Button.module.scss
   Button.md
-  __tests__/
-    Button.spec.ts
-    transferred/
-      Button.original.spec.ts
+  Button.spec.tsx
+  Button-style.spec.ts
   index.ts
 ```
 
 The exact filenames may follow the old component when that improves
-traceability, for example `ButtonNative.tsx`, `ButtonReact.tsx`, or old
-metadata/default filenames. The important rule is that the component owns the
-same categories of artifacts the original component owned.
+traceability. The important rule is that the component owns the same categories
+of artifacts the original component owned, and component-specific tests are
+colocated beside the component files.
 
 ### Wave 0: Component Transfer Scaffold
 
@@ -558,10 +563,11 @@ Tasks:
   metadata factory, renderer/wrapper, React implementation, default styles,
   SCSS/theme parts, docs markdown, docs examples, unit specs, E2E specs, and
   test utilities.
-- Decide and document where verbatim transferred tests live. Prefer
-  `xmlui/src/components/<ComponentName>/__tests__/transferred/` for
-  source-adjacent archival copies, with runnable ports beside them or in the
-  shared E2E harness when browser orchestration requires it.
+- Decide and document where transferred tests live. Port component-specific
+  tests directly beside the component files, following the original component
+  folder pattern. Do not create `__tests__` folders for migrated component
+  tests; if a test cannot be ported yet, record the old source and the reason in
+  the component closure note.
 - Add a component closure note template section for source organization:
   old files inventoried, transferred files, simplified files, deleted/obsolete
   old internals, runnable tests, deferred tests, docs status, metadata status,
@@ -852,6 +858,8 @@ Scope:
 - Preserve visible main-content layout behavior: vertical stack, content
   padding, gap/spacing, layout props, theme variables, DOM/test identifiers,
   and docs examples related to this slice.
+- Add or identify a dev-server example that visually exercises this migrated
+  App content layout and a data mutation that changes visible layout or content.
 - Exclude app shell behavior such as navigation, routing, headers, footers,
   mobile shell, search, page metadata, index collection, and standalone startup;
   these remain Wave G.
@@ -862,6 +870,8 @@ Verification:
 - A visual/theme fixture proves default content layout and theme-var override.
 - At least one mutation test changes a value that affects rendered content or
   layout so the compiled data-update path remains covered.
+- The wave's visual sample can be opened with `npm run dev` or an equivalent
+  command and a documented URL.
 
 ### Wave 3: Experiment 1 Component Migration Spike
 
@@ -891,6 +901,18 @@ Scope:
   `Button.module.scss`, `Button.md`, and `Button.spec.ts`, the rewrite should
   keep corresponding names unless a closure note records why the implementation
   uses a different internal file.
+- Keep `xmlui/src/components` reserved for component folders only. Shared
+  component infrastructure such as metadata helpers, behavior definitions,
+  registries, transfer inventory, and future component-wide utilities belongs
+  under `xmlui/src/component-core`.
+- Port component-specific tests beside the component files, following the old
+  project pattern (`Button.spec.ts`, `Button-style.spec.ts`,
+  `App-layout.spec.ts`, etc.). Do not create `__tests__` folders for migrated
+  component tests.
+- Do not treat newly written focused compatibility tests as migrated old tests.
+  A component wave is not complete until the relevant old component specs have
+  been inspected, either ported beside the component or recorded in the closure
+  note as intentionally deferred with a reason.
 - Test the three Experiment 1 apps unchanged or as close to unchanged as the
   current parser/compiler allows.
 
@@ -909,21 +931,157 @@ the infrastructure-backed closure loop, not the earlier renderer-only transfer.
 
 #### Wave A: Primitive Text, Media, and Utility Components
 
-Components:
+Wave A is intentionally split into smaller closure-sized chunks. Each chunk must
+finish the full component migration loop for its components:
 
-- `Text`, `Heading`, `HtmlTags`, `Br`,
-  `Fragment`, `Image`, `Icon`, `Logo`, `IFrame`, `Markdown`, `CodeBlock`,
-  `QRCode`, `PageMetaTitle`, `ContentSeparator`, `SpaceFiller`, `NoResult`,
-  `Fallback`.
-
-Compatibility focus:
-
-- text/content rendering, markdown and code behavior, HTML tag mapping,
-  media loading, alt/title semantics, sizing/layout props, metadata, and docs
-  examples.
+- inspect the original component folder and docs;
+- transfer component-owned metadata, defaults, SCSS theme variables, renderer,
+  docs, and colocated tests;
+- transfer the original component E2E tests into the migrated component folder,
+  keeping assertions as close to the original as the current harness allows;
+- add or point to a visual example runnable with `npm run dev`;
+- include at least one state/data mutation path when the component can
+  participate in mutation;
+- run focused unit/E2E tests and the compatibility sweep;
+- record any blocked old E2E test with the original source file, missing
+  dependency, and follow-up wave.
 
 `App` main content layout is no longer part of this wave; it is the dedicated
 Wave 2 proof component.
+
+##### Wave A1: Text and Heading Family
+
+Components:
+
+- `Text`;
+- `Heading`;
+- `H1`, `H2`, `H3`, `H4`, `H5`, `H6`.
+
+Compatibility focus:
+
+- value and child text precedence;
+- whitespace collapsing and `preserveLinebreaks`;
+- value coercion for primitive, array, object, null, and undefined values;
+- semantic heading levels and shortcut-level override behavior;
+- text variants and HTML element mapping owned by `Text`;
+- max-line clipping, ellipses, overflow APIs, selection behavior, and
+  component API references through `id`.
+
+Status: completed for the current compatibility slice. Migrated component
+folders include metadata, defaults, SCSS theme declarations, docs, renderers,
+colocated unit/E2E tests, transferred old component E2E coverage, and the
+`primitiveTextHeading`, `textOldCompatibility`, and `headingOldCompatibility`
+visual/test examples. Original E2E sources transferred:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Text/Text.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Heading/Heading.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Heading/HeadingShortcuts.spec.ts`.
+
+##### Wave A2: HTML Text Tags and Fragment
+
+Components:
+
+- `HtmlTags`;
+- `Br`;
+- `Fragment`.
+
+Compatibility focus:
+
+- old HTML tag component aliases and semantic DOM output;
+- text-flow behavior around inline tags and line breaks;
+- child rendering without extra wrapper DOM for `Fragment`;
+- parser/compiler treatment of lower-case or alias tag names used by the old
+  framework.
+
+Closure requires transferred old E2E tests for these components or a recorded
+blocker if tests depend on not-yet-migrated surrounding components.
+
+##### Wave A3: Images and Embedded Media
+
+Components:
+
+- `Image`;
+- `Icon`;
+- `Logo`;
+- `IFrame`.
+
+Compatibility focus:
+
+- source/resource URL resolution;
+- alt/title/accessibility behavior;
+- intrinsic and explicit sizing;
+- loading/error/fallback behavior;
+- icon name resolution and old theme-variable styling.
+
+Closure requires transferred old E2E tests, visual examples for image/icon/media
+rendering, and any needed asset fixtures.
+
+##### Wave A4: Rich Text and Code Rendering
+
+Components:
+
+- `Markdown`;
+- `CodeBlock`.
+
+Compatibility focus:
+
+- markdown parsing and sanitization semantics;
+- code language/class handling;
+- theme variables and typography;
+- embedded XMLUI/component behavior if supported by the old component;
+- copy/interaction behavior if present in the original implementation.
+
+Closure requires transferred old E2E tests. If the old tests depend on a
+markdown/code dependency not yet present in the rewrite, record the dependency
+and add the smallest compatible implementation needed for the tests.
+
+##### Wave A5: Generated/Structured Utility Output
+
+Components:
+
+- `QRCode`;
+- `PageMetaTitle`.
+
+Compatibility focus:
+
+- QR value encoding, sizing, colors, accessibility, and error handling;
+- document title/meta behavior and routing/SSG interactions for
+  `PageMetaTitle`.
+
+Closure requires transferred old E2E tests plus visual/runtime checks that prove
+DOM side effects such as title updates are observable.
+
+##### Wave A6: Separators and Spacing Utilities
+
+Components:
+
+- `ContentSeparator`;
+- `SpaceFiller`.
+
+Compatibility focus:
+
+- layout participation in stacks and flex containers;
+- theme-variable driven spacing, line, color, and sizing behavior;
+- hidden/empty-content behavior.
+
+Closure requires transferred old E2E tests and a layout-focused visual example.
+
+##### Wave A7: Empty and Fallback States
+
+Components:
+
+- `NoResult`;
+- `Fallback`.
+
+Compatibility focus:
+
+- default content and iconography;
+- custom children/template behavior;
+- empty/error state semantics;
+- theme variables and accessibility.
+
+Closure requires transferred old E2E tests and examples that demonstrate both
+default and customized rendering.
 
 #### Wave B: Core Interaction and Inputs
 

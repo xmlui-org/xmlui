@@ -69,7 +69,8 @@ describe("compatibility artifact shape", () => {
         xxl: 1400,
       });
       expect(artifact.styleStates).toContain("hover");
-      expect(artifact.defaultThemeVariables["color-primary"]).toBe("#2563eb");
+      expect(artifact.defaultThemeVariables["color-primary"]).toBe("$const-color-primary-500");
+      expect(artifact.defaultThemeVariables["const-color-primary-500"]).toBe("#206bc4");
       expect(artifact.deferred).toContain("Full visual regression suite");
     }
   });

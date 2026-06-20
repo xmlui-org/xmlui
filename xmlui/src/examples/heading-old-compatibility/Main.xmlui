@@ -1,0 +1,82 @@
+<App var.compact="{false}" var.overflowResult="unset">
+  <Heading testId="headingEmpty" />
+  <Heading testId="headingBasic">Test Heading</Heading>
+  <Heading testId="headingValue" value="Value prop text" />
+  <Heading testId="headingValueWins" value="this test text is the value of the heading">
+    This is a child
+  </Heading>
+
+  <Heading testId="levelH1" level="h1">Level h1</Heading>
+  <Heading testId="levelH2" level="h2">Level h2</Heading>
+  <Heading testId="levelH3" level="h3">Level h3</Heading>
+  <Heading testId="levelH4" level="h4">Level h4</Heading>
+  <Heading testId="levelH5" level="h5">Level h5</Heading>
+  <Heading testId="levelH6" level="h6">Level h6</Heading>
+  <Heading testId="levelNumber" level="{3}">Numeric Level 3</Heading>
+  <Heading testId="levelStringNumber" level="2">String Level 2</Heading>
+  <Heading testId="levelUppercase" level="H4">Uppercase Level H4</Heading>
+  <Heading testId="levelWhitespace" level=" h2 ">Whitespace Level</Heading>
+  <Heading testId="levelInvalid" level="invalid">Invalid Level Fallback</Heading>
+
+  <H1 testId="shortcutH1">Shortcut H1</H1>
+  <H2 testId="shortcutH2">Shortcut H2</H2>
+  <H3 testId="shortcutH3">Shortcut H3</H3>
+  <H4 testId="shortcutH4">Shortcut H4</H4>
+  <H5 testId="shortcutH5">Shortcut H5</H5>
+  <H6 testId="shortcutH6">Shortcut H6</H6>
+  <H2 testId="shortcutIgnoresLevel" level="h5">Should be h2</H2>
+
+  <Heading testId="genericH2" level="h2">Content</Heading>
+  <H2 testId="specializedH2">Content</H2>
+
+  <Heading testId="headingV0" value="{undefined}" />
+  <Heading testId="headingV1" value="{null}" />
+  <Heading testId="headingV2" value="" />
+  <Heading testId="headingV3" value="test" />
+  <Heading testId="headingV4" value="{1}" />
+  <Heading testId="headingV5" value="{1.2}" />
+  <Heading testId="headingV6" value="{true}" />
+  <Heading testId="headingV7" value="{{}}" />
+  <Heading testId="headingV8" value="{{ a: 1, b: 'hi' }}" />
+  <Heading testId="headingV9" value="{[]}" />
+  <Heading testId="headingV10" value="{[1, 2, 3]}" />
+
+  <Heading testId="headingWhitespaceValue" value="test        content" />
+  <Heading testId="headingSelectable" level="h3" value="Selectable heading" />
+
+  <Heading testId="headingShort" width="200px">Short</Heading>
+  <Heading testId="headingMaxLines" width="200px" maxLines="{2}">
+    Though this long text does not fit into a single line, please do not break it!
+  </Heading>
+  <Heading
+    testId="headingPreserve"
+    preserveLinebreaks="true"
+    value="Though this long
+text does not fit into a single line,
+please do not break it!" />
+  <Heading testId="headingEllipsis" width="200px" maxLines="{1}">
+    Though this long text does not fit into a single line, please do not break it!
+  </Heading>
+  <Heading testId="headingNoEllipsis" width="200px" maxLines="{1}" ellipses="{false}">
+    Though this long text does not fit into a single line, please do not break it!
+  </Heading>
+  <Heading testId="headingWrapped" width="200px">
+    This long text does not fit into a viewport with a 200-pixel width.
+  </Heading>
+
+  <Stack width="100px">
+    <Heading id="overflowHeading" testId="apiHeading" value="{compact ? 'short' : 'This is a very long heading text that will definitely overflow'}" maxLines="{1}" />
+    <Button testId="checkHeadingOverflow" onClick="overflowResult = overflowHeading.hasOverflow()">
+      Check heading overflow
+    </Button>
+    <Button testId="toggleHeadingText" onClick="compact = !compact">
+      Toggle heading text
+    </Button>
+    <Text testId="headingOverflowResult">{overflowResult}</Text>
+  </Stack>
+
+  <Heading testId="nestedHeadingWhitespace">
+      test      content
+          here
+  </Heading>
+</App>

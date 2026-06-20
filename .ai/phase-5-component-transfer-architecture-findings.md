@@ -50,18 +50,23 @@ folders with transferred tests.
 
 Wave 0 now has the initial scaffold:
 
-- `xmlui/src/components/types.ts` defines transfer and runtime component module
-  types.
-- `xmlui/src/components/registry.ts` maps built-in contracts and current
+- `xmlui/src/component-core/types.ts` defines transfer and runtime component
+  module types.
+- `xmlui/src/component-core/registry.ts` maps built-in contracts and current
   experimental renderers into component transfer modules.
-- `xmlui/src/components/_conventions.md` documents the folder shape,
-  transferred-test location, and `partial-centralized` status.
+- `xmlui/src/component-core/component-conventions.md` documents the folder
+  shape, transferred-test location, and `partial-centralized` status.
+- `xmlui/src/component-core/metadata` and
+  `xmlui/src/component-core/behaviors` hold shared component infrastructure.
 - The runtime renderer imports built-in renderers from the component registry.
 - Current experimental runtime-backed components have placeholder folders under
   `xmlui/src/components/<ComponentName>/`.
 - `H1` is mapped to the original `Heading` component folder.
 - `scripts/check-component-transfer.mjs` prevents components from being marked
   `closed` without closure evidence.
+- Component-specific tests are colocated in the component folder, following the
+  original project pattern. Do not introduce `__tests__` folders for transferred
+  components.
 
 The current renderer implementations still live in
 `xmlui/src/runtime/rendering/builtins.tsx`; this is intentional scaffolding

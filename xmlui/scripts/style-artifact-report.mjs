@@ -1,17 +1,27 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createServer } from "vite";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const xmluiRoot = resolve(scriptDir, "..");
 const reportDir = resolve(xmluiRoot, ".compatibility-report");
 const contractsSource = await readFile(resolve(xmluiRoot, "src/styling/contracts.ts"), "utf8");
-const themeSource = await readFile(resolve(xmluiRoot, "src/styling/theme.ts"), "utf8");
 
 const supportedLayoutPropNames = extractStringArray(contractsSource, "supportedLayoutPropNames");
 const styleStates = extractStringArray(contractsSource, "styleStates");
 const responsiveBreakpoints = extractNumberObject(contractsSource, "responsiveBreakpoints");
-const defaultThemeVariables = extractStringObject(themeSource, "defaultThemeVariables");
+const server = await createServer({
+  appType: "custom",
+  server: { middlewareMode: true },
+  logLevel: "silent",
+});
+let defaultThemeVariables;
+try {
+  ({ defaultThemeVariables } = await server.ssrLoadModule("/src/styling/theme.ts"));
+} finally {
+  await server.close();
+}
 
 const report = {
   schemaVersion: 1,
@@ -88,18 +98,5 @@ function extractNumberObject(source, name) {
   return Object.fromEntries([...match[1].matchAll(/([A-Za-z0-9_-]+):\s*([0-9]+)/g)].map((item) => [
     item[1],
     Number(item[2]),
-  ]));
-}
-
-function extractStringObject(source, name) {
-  const match = source.match(
-    new RegExp(String.raw`export const ${name}: Record<string, string> = \{([\s\S]*?)\};`),
-  );
-  if (!match) {
-    throw new Error(`Cannot find ${name}.`);
-  }
-  return Object.fromEntries([...match[1].matchAll(/"([^"]+)":\s*"([^"]+)"/g)].map((item) => [
-    item[1],
-    item[2],
   ]));
 }

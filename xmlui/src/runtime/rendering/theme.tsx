@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, type CSSProperties, type ReactNode } from "react";
 
-import type { ComponentMetadata } from "../../components/metadata";
+import type { ComponentMetadata } from "../../component-core/metadata";
 import {
   createComponentThemeClass,
   defaultThemeVariables,

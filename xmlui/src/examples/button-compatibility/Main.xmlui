@@ -1,0 +1,95 @@
+<App
+  var.clicks="{0}"
+  var.contextMenu="{false}"
+  var.gotFocus="{false}"
+  var.lostFocus="{false}">
+  <H1>Button compatibility</H1>
+
+  <Button testId="empty" />
+  <Button testId="ascii" label="hello" />
+  <Button testId="unicode" label="😀" />
+  <Button testId="label-null" label="{null}" />
+  <Button testId="label-undefined" label="{undefined}" />
+  <Button testId="label-object" label="{{ a: 1, b: 'hi' }}" />
+  <Button testId="label-empty-object" label="{{}}" />
+  <Button testId="label-array" label="{[1, 2, 3]}" />
+  <Button testId="label-empty-array" label="{[]}" />
+  <Button testId="children-label" label="hello">world</Button>
+  <Button testId="text-child" label="hello"><Text>world</Text></Button>
+
+  <Button testId="enabled" enabled="true">Enabled</Button>
+  <Button testId="disabled" enabled="false">Disabled</Button>
+  <Button testId="click" onClick="clicks++">Click count: {clicks}</Button>
+  <Text>Clicks: {clicks}</Text>
+
+  <Button testId="context-menu" onContextMenu="contextMenu = true">Context menu</Button>
+  <Text>Context menu: {contextMenu ? 'yes' : 'no'}</Text>
+
+  <Button testId="icon-only" icon="test" />
+  <Button testId="icon-label" icon="test" label="label" />
+  <Button testId="icon-contextual" icon="test" contextualLabel="context label" />
+  <Button testId="icon-with-children" icon="test">Hello World</Button>
+  <Button testId="icon-missing-with-label" icon="_" label="hello" />
+  <Button testId="icon-position-start" icon="test" iconPosition="start" label="hello" />
+  <Button testId="icon-position-end" icon="test" iconPosition="end" label="hello" />
+
+  <Button testId="content-start" width="300px" icon="test" label="hello" contentPosition="start" />
+  <Button testId="content-center" width="300px" icon="test" label="hello" contentPosition="center" />
+  <Button testId="content-end" width="300px" icon="test" label="hello" contentPosition="end" />
+
+  <Button testId="type-button" type="button">Button type</Button>
+  <Button testId="type-submit" type="submit">Submit type</Button>
+  <Button testId="type-reset" type="reset">Reset type</Button>
+  <Button testId="autofocus" autoFocus="{true}">Autofocus</Button>
+
+  <Button testId="focus-events" onGotFocus="gotFocus = true" onLostFocus="lostFocus = true">
+    Focus events
+  </Button>
+  <Text>Got focus: {gotFocus ? 'yes' : 'no'}</Text>
+  <Text>Lost focus: {lostFocus ? 'yes' : 'no'}</Text>
+
+  <Button testId="size-xs" size="xs" label="xs" />
+  <Button testId="size-sm" size="sm" label="sm" />
+  <Button testId="size-md" size="md" label="md" />
+  <Button testId="size-lg" size="lg" label="lg" />
+  <Button testId="size-empty-xs" size="xs" />
+  <Button testId="size-empty-sm" size="sm" />
+  <Button testId="size-empty-md" size="md" />
+  <Button testId="size-empty-lg" size="lg" />
+
+  <Theme
+    backgroundColor-Button-primary-solid="rgb(255, 0, 0)"
+    textColor-Button-primary-solid="rgb(255, 255, 255)"
+    borderColor-Button-primary-solid="rgb(255, 0, 0)"
+    borderWidth-Button-primary-solid="5px"
+    borderStyle-Button-primary-solid="dotted"
+    borderRadius-Button-primary-solid="10px"
+    fontFamily-Button-primary-solid="Arial, sans-serif"
+    fontSize-Button-primary-solid="20px"
+    fontWeight-Button-primary-solid="200">
+    <Button testId="theme-primary-solid" variant="solid" themeColor="primary">Primary solid</Button>
+  </Theme>
+
+  <Theme
+    backgroundColor-Button-secondary-solid="rgb(255, 0, 0)"
+    textColor-Button-secondary-outlined="rgb(255, 255, 255)"
+    border-Button-secondary-outlined="dotted rgb(255, 0, 0) 5px"
+    borderColor-Button-secondary-outlined="rgb(0, 128, 0)"
+    borderStyle-Button-secondary-outlined="double"
+    fontFamily-Button-secondary-outlined="Arial, sans-serif"
+    fontSize-Button-secondary-outlined="20px"
+    fontWeight-Button-secondary-outlined="200">
+    <Button testId="theme-secondary-solid" variant="solid" themeColor="secondary">Secondary solid</Button>
+    <Button testId="theme-secondary-outlined" variant="outlined" themeColor="secondary">Secondary outlined</Button>
+  </Theme>
+
+  <Theme
+    textColor-Button-attention-ghost="rgb(255, 255, 255)"
+    borderWidth-Button-attention-ghost="5px"
+    borderRadius-Button-attention-ghost="10px"
+    fontFamily-Button-attention-ghost="Arial, sans-serif"
+    fontSize-Button-attention-ghost="20px"
+    fontWeight-Button-attention-ghost="200">
+    <Button testId="theme-attention-ghost" variant="ghost" themeColor="attention">Attention ghost</Button>
+  </Theme>
+</App>

@@ -5,17 +5,21 @@ import {
   componentTransferModules,
   getComponentTransferModule,
   runtimeComponentModules,
-} from "../../src/components";
+} from "../../src/component-core";
 
 describe("component transfer registry", () => {
   it("exposes runtime renderers through component modules", () => {
     const button = getComponentTransferModule("Button");
 
     expect(button?.name).toBe("Button");
-    expect(button?.status).toBe("partial-centralized");
+    expect(button?.status).toBe("transferred-folder");
     expect(button?.sources.oldFolder).toBe("/Users/dotneteer/source/xmlui/xmlui/src/components/Button");
     expect(button?.sources.rewriteFolder).toBe("xmlui/src/components/Button");
-    expect(button?.transferredTests?.archivePath).toBe("xmlui/src/components/Button/__tests__/transferred/");
+    expect(button?.sources.implementation).toContain("xmlui/src/components/Button/ButtonReact.tsx");
+    expect(button?.sources.metadata).toContain("xmlui/src/components/Button/Button.tsx");
+    expect(button?.sources.styles).toContain("xmlui/src/components/Button/Button.module.scss");
+    expect(button?.transferredTests?.runnablePaths).toContain("xmlui/src/components/Button/Button.spec.tsx");
+    expect(button?.transferredTests?.runnablePaths).toContain("xmlui/src/components/Button/Button-style.spec.ts");
     expect(runtimeComponentModules.map((component) => component.name)).toContain("Button");
     expect(builtInComponentRenderers.Button).toBe(button?.renderer);
   });

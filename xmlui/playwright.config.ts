@@ -1,7 +1,11 @@
 import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./tests/e2e",
+  testDir: ".",
+  testMatch: [
+    "tests/e2e/**/*.spec.ts",
+    "src/components/**/*.spec.ts",
+  ],
   webServer: [
     {
       command: "npm run dev -- --host 127.0.0.1 --port 5173",

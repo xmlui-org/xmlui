@@ -1,0 +1,13 @@
+<App var.compact="{false}">
+  <H1>App main content layout</H1>
+  <Text>Mode: {compact ? 'compact' : 'comfortable'}</Text>
+  <Button onClick="compact = !compact">
+    Toggle sample state
+  </Button>
+  <VStack
+    width="{compact ? '160px' : '220px'}"
+    height="48px"
+    backgroundColor="{compact ? '$color-surface-100' : '$color-primary-100'}"
+    border="1px solid $color-border" />
+  <Text>The items above are laid out by the migrated App content container.</Text>
+</App>

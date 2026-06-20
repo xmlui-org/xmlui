@@ -36,7 +36,7 @@ Record how the transferred component follows the original folder pattern:
 - Metadata files:
 - Defaults/style/theme files:
 - Documentation files:
-- Transferred test archive:
+- Old tests ported beside component:
 - Runnable unit tests:
 - Runnable E2E tests:
 - Simplified or intentionally removed old internals:

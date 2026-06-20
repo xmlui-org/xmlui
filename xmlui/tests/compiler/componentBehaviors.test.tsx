@@ -10,7 +10,7 @@ import {
   componentMetadataToContract,
   createMetadata,
   dEnabled,
-} from "../../src/components";
+} from "../../src/component-core";
 
 describe("component behavior metadata compatibility", () => {
   it("evaluates old behavior conditions against component metadata", () => {

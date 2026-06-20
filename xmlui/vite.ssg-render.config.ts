@@ -3,10 +3,15 @@ import path from "node:path";
 import { defineConfig } from "vite";
 import counterBadgeExtension from "../packages/xmlui-counter-badge/src";
 
+import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
 
 export default defineConfig({
-  plugins: [xmluiPlugin({ extensions: [counterBadgeExtension] }), react()],
+  plugins: [
+    rawScssModulePlugin(),
+    xmluiPlugin({ extensions: [counterBadgeExtension] }),
+    react(),
+  ],
   build: {
     ssr: true,
     outDir: ".xmlui-ssg-ssr",

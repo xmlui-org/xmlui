@@ -2,7 +2,7 @@ import {
   collectedBehaviorMetadata,
   canBehaviorAttachToComponent,
   type ComponentMetadata,
-} from "../components";
+} from "../component-core";
 import type {
   XmluiComponentMetadata,
   XmluiEventMetadata,

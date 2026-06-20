@@ -11,7 +11,7 @@ import {
   createRuntimeStateStore,
 } from "../../src/runtime/state";
 import { parseXmlui } from "../../src/compiler/parseXmlui";
-import { createMetadata, dClick, dComponent, dEnabled } from "../../src/components";
+import { createMetadata, dClick, dComponent, dEnabled } from "../../src/component-core";
 
 const DummyMd = createMetadata({
   props: {

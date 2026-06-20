@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -6,10 +7,8 @@ import React, {
   type ReactNode,
 } from "react";
 
-import {
-  attachBehaviors,
-  type ComponentMetadata,
-} from "../../components";
+import { attachBehaviors } from "../../component-core/behaviors";
+import type { ComponentMetadata } from "../../component-core/metadata";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import { resolveLayoutStyle } from "../../styling";
 import type { RuntimeScope } from "../state";
@@ -51,6 +50,7 @@ export type XmluiComponentAdapter = {
   rootAttrs(part?: string): Record<string, unknown>;
   prop<T = unknown>(name: string, fallback?: T): T;
   stringProp(name: string, fallback?: string): string | undefined;
+  numberProp(name: string, fallback?: number): number;
   booleanProp(name: string, fallback?: boolean): boolean;
   event(name: string): (...args: unknown[]) => Promise<unknown>;
   renderChildren(children?: XmluiNode[]): ReactNode;
@@ -110,6 +110,14 @@ export function useXmluiComponentAdapter({
   const registeredIdRef = useRef<string>();
   const themeClass = useComponentThemeClass(name, metadata);
   const layoutStyle = useMemo(() => resolveLayoutStyle(props), [props]);
+  const registerApi = useCallback((api: Record<string, unknown>) => {
+    Object.assign(apiRef.current, api);
+    const id = typeof props.id === "string" ? props.id : undefined;
+    if (id) {
+      scope.references[id] = apiRef.current;
+      scope.store.invalidateReference(id);
+    }
+  }, [props.id, scope.references, scope.store]);
 
   useEffect(() => {
     const id = typeof props.id === "string" ? props.id : undefined;
@@ -150,6 +158,7 @@ export function useXmluiComponentAdapter({
       "data-xmlui-component": name,
       "data-xmlui-part": part,
       "data-xmlui-id": props.id,
+      "data-testid": props.testId,
       className: themeClass.className,
       style: {
         ...themeClass.style,
@@ -161,6 +170,17 @@ export function useXmluiComponentAdapter({
     stringProp: (propName, fallback) => {
       const value = props[propName];
       return value === undefined || value === null ? fallback : String(value);
+    },
+    numberProp: (propName, fallback = 0) => {
+      const value = props[propName];
+      if (typeof value === "number") {
+        return value;
+      }
+      if (typeof value === "string" && value.trim() !== "") {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : fallback;
+      }
+      return value === undefined || value === null ? fallback : Number(value) || fallback;
     },
     booleanProp: (propName, fallback = false) => {
       const value = props[propName];
@@ -181,14 +201,7 @@ export function useXmluiComponentAdapter({
         templateChildren(node, templateName) ?? fallbackChildren ?? [],
         scope,
       ),
-    registerApi: (api) => {
-      Object.assign(apiRef.current, api);
-      const id = typeof props.id === "string" ? props.id : undefined;
-      if (id) {
-        scope.references[id] = apiRef.current;
-        scope.store.invalidateReference(id);
-      }
-    },
+    registerApi,
     resourceUrl: (value) => value == null || value === "" ? undefined : String(value),
   }), [
     context,
@@ -199,6 +212,7 @@ export function useXmluiComponentAdapter({
     name,
     node,
     props,
+    registerApi,
     scope,
     themeClass.className,
     themeClass.style,

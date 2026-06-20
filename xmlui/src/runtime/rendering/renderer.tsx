@@ -1,7 +1,7 @@
 import React, { type ReactNode } from "react";
 
 import type { XmluiNode, XmluiText } from "../../compiler/ir";
-import { builtInComponentRenderers } from "../../components";
+import { builtInComponentRenderers } from "../../component-core";
 import type { RuntimeScope } from "../state";
 import { renderMixedText } from "./bindings";
 import { ComponentInstance, ScopedElement } from "./components";

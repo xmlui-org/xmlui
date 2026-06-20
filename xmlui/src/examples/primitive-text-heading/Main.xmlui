@@ -1,0 +1,22 @@
+<App var.compact="{false}" var.contextMenu="{false}">
+  <H1
+    testId="wave-a-heading"
+    value="{compact ? 'Compact primitives' : 'Primitive text and heading'}"
+    showAnchor="{true}" />
+  <Text testId="wave-a-mode" variant="secondary">
+    Mode: {compact ? 'compact' : 'comfortable'}
+  </Text>
+  <Text
+    testId="wave-a-context"
+    onContextMenu="contextMenu = true">
+    Context menu: {contextMenu ? 'yes' : 'no'}
+  </Text>
+  <Text testId="wave-a-strong" variant="strong">Strong text</Text>
+  <Text testId="wave-a-code" variant="code">const answer = 42;</Text>
+  <Text testId="wave-a-clamped" width="160px" maxLines="{1}">
+    This is a long primitive text value that should clamp to one line.
+  </Text>
+  <Button testId="wave-a-toggle" onClick="compact = !compact">
+    Toggle text state
+  </Button>
+</App>

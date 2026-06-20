@@ -1,0 +1,72 @@
+// Text.tsx extracts available theme variables from createThemeVar declarations
+// in this file, mirroring the old Text component pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$fontFamily-Text: createThemeVar("fontFamily-Text");
+$fontSize-Text: createThemeVar("fontSize-Text");
+$fontWeight-Text: createThemeVar("fontWeight-Text");
+$fontStyle-Text: createThemeVar("fontStyle-Text");
+$textColor-Text: createThemeVar("textColor-Text");
+$backgroundColor-Text: createThemeVar("backgroundColor-Text");
+$lineHeight-Text: createThemeVar("lineHeight-Text");
+$letterSpacing-Text: createThemeVar("letterSpacing-Text");
+$textTransform-Text: createThemeVar("textTransform-Text");
+$textDecorationLine-Text: createThemeVar("textDecorationLine-Text");
+$borderWidth-Text: createThemeVar("borderWidth-Text");
+$borderStyle-Text: createThemeVar("borderStyle-Text");
+$borderColor-Text: createThemeVar("borderColor-Text");
+$borderRadius-Text: createThemeVar("borderRadius-Text");
+$paddingHorizontal-Text: createThemeVar("paddingHorizontal-Text");
+$paddingVertical-Text: createThemeVar("paddingVertical-Text");
+$marginTop-Text: createThemeVar("marginTop-Text");
+$marginBottom-Text: createThemeVar("marginBottom-Text");
+$marginLeft-Text: createThemeVar("marginLeft-Text");
+$marginRight-Text: createThemeVar("marginRight-Text");
+$verticalAlignment-Text: createThemeVar("verticalAlignment-Text");
+$textColor-Text-secondary: createThemeVar("textColor-Text-secondary");
+$fontSize-Text-secondary: createThemeVar("fontSize-Text-secondary");
+$fontWeight-Text-strong: createThemeVar("fontWeight-Text-strong");
+$fontStyle-Text-em: createThemeVar("fontStyle-Text-em");
+$fontStyle-Text-cite: createThemeVar("fontStyle-Text-cite");
+$fontFamily-Text-mono: createThemeVar("fontFamily-Text-mono");
+$fontFamily-Text-code: createThemeVar("fontFamily-Text-code");
+$fontSize-Text-code: createThemeVar("fontSize-Text-code");
+$borderWidth-Text-code: createThemeVar("borderWidth-Text-code");
+$borderStyle-Text-code: createThemeVar("borderStyle-Text-code");
+$borderRadius-Text-code: createThemeVar("borderRadius-Text-code");
+$paddingHorizontal-Text-code: createThemeVar("paddingHorizontal-Text-code");
+$paddingBottom-Text-code: createThemeVar("paddingBottom-Text-code");
+$backgroundColor-Text-code: createThemeVar("backgroundColor-Text-code");
+$borderColor-Text-code: createThemeVar("borderColor-Text-code");
+$fontWeight-Text-abbr: createThemeVar("fontWeight-Text-abbr");
+$textTransform-Text-abbr: createThemeVar("textTransform-Text-abbr");
+$textDecorationLine-Text-deleted: createThemeVar("textDecorationLine-Text-deleted");
+$textDecorationLine-Text-inserted: createThemeVar("textDecorationLine-Text-inserted");
+$fontFamily-Text-keyboard: createThemeVar("fontFamily-Text-keyboard");
+$fontSize-Text-keyboard: createThemeVar("fontSize-Text-keyboard");
+$fontWeight-Text-keyboard: createThemeVar("fontWeight-Text-keyboard");
+$borderWidth-Text-keyboard: createThemeVar("borderWidth-Text-keyboard");
+$paddingHorizontal-Text-keyboard: createThemeVar("paddingHorizontal-Text-keyboard");
+$backgroundColor-Text-keyboard: createThemeVar("backgroundColor-Text-keyboard");
+$borderColor-Text-keyboard: createThemeVar("borderColor-Text-keyboard");
+$fontSize-Text-title: createThemeVar("fontSize-Text-title");
+$fontSize-Text-subtitle: createThemeVar("fontSize-Text-subtitle");
+$fontSize-Text-small: createThemeVar("fontSize-Text-small");
+$letterSpacing-Text-caption: createThemeVar("letterSpacing-Text-caption");
+$fontSize-Text-placeholder: createThemeVar("fontSize-Text-placeholder");
+$textColor-Text-placeholder: createThemeVar("textColor-Text-placeholder");
+$paddingVertical-Text-paragraph: createThemeVar("paddingVertical-Text-paragraph");
+$fontSize-Text-subheading: createThemeVar("fontSize-Text-subheading");
+$fontWeight-Text-subheading: createThemeVar("fontWeight-Text-subheading");
+$letterSpacing-Text-subheading: createThemeVar("letterSpacing-Text-subheading");
+$textTransform-Text-subheading: createThemeVar("textTransform-Text-subheading");
+$textColor-Text-subheading: createThemeVar("textColor-Text-subheading");
+$textColor-Text-marked: createThemeVar("textColor-Text-marked");
+$backgroundColor-Text-marked: createThemeVar("backgroundColor-Text-marked");
+
+:export {
+  themeVars: ();
+}

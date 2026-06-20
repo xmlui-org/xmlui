@@ -9,7 +9,7 @@ export const compatibilityAnchors: CompatibilityAnchor[] = [
   {
     id: "counter-local-mutation",
     oldSource: "/Users/dotneteer/source/xmlui/xmlui/src/components/Button/Button.spec.ts",
-    rewriteSource: "xmlui/tests/e2e/counter-local.spec.ts",
+    rewriteSource: "xmlui/src/components/Button/Button-style.spec.ts",
     note: "Button click handlers must mutate XMLUI state and re-render bound text.",
   },
   {

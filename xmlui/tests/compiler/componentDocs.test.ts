@@ -5,7 +5,7 @@ import {
   ButtonMd,
   StackMd,
   TextMd,
-} from "../../src/components/metadata";
+} from "../../src/component-core/metadata";
 import {
   componentReferenceSectionTitles,
   generateComponentReferenceMarkdown,

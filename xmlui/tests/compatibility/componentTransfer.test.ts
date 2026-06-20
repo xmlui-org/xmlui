@@ -5,14 +5,15 @@ import { describe, expect, it } from "vitest";
 
 describe("Phase 5 component transfer scaffold", () => {
   it("records the source-adjacent component transfer convention", () => {
-    const conventions = readFileSync(resolve("src/components/_conventions.md"), "utf8");
+    const conventions = readFileSync(resolve("src/component-core/component-conventions.md"), "utf8");
     const closureTemplate = readFileSync(resolve("../.ai/component-compatibility-closure-template.md"), "utf8");
 
     expect(conventions).toContain("xmlui/src/components/<ComponentName>/");
-    expect(conventions).toContain("__tests__/transferred");
+    expect(conventions).toContain("xmlui/src/component-core");
+    expect(conventions).toContain("Do not create `__tests__` folders");
     expect(conventions).toContain("partial-centralized");
     expect(closureTemplate).toContain("## Source Organization");
-    expect(closureTemplate).toContain("Transferred test archive");
+    expect(closureTemplate).toContain("Old tests ported beside component");
   });
 
   it("runs the component transfer closure guard", () => {

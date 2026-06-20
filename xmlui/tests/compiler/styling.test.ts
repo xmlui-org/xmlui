@@ -3,12 +3,13 @@ import { describe, expect, it } from "vitest";
 import {
   ButtonMd,
   StackMd,
-} from "../../src/components/metadata";
+} from "../../src/component-core/metadata";
 import {
   COMPONENT_PART_KEY,
   collectComponentThemeDefaults,
   componentThemeVariablesToCssProperties,
   createComponentThemeClass,
+  extractScssThemeVars,
   mergeThemeVariableLayers,
   isLayoutPropName,
   parseScssVar,
@@ -42,6 +43,18 @@ describe("theme variable helpers", () => {
     expect(parseScssVar("(gap-Stack: $gap-layout, color: #fff)")).toEqual({
       "gap-Stack": "$gap-layout",
       color: "#fff",
+    });
+  });
+
+  it("extracts theme variable metadata from createThemeVar declarations", () => {
+    expect(
+      extractScssThemeVars(`
+        $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
+        $gap-content-App: createThemeVar('gap-content-App');
+      `),
+    ).toEqual({
+      "backgroundColor-content-App": "Theme variable declared by backgroundColor-content-App.",
+      "gap-content-App": "Theme variable declared by gap-content-App.",
     });
   });
 
