@@ -7,6 +7,11 @@ executed for the experimental subset, and their findings are available as the
 implementation baseline. Experiment 15 created the first repeatable
 compatibility sweep; it does not mean the rewrite is fully compatible yet.
 
+This document is the single narrative rebuild plan. Supporting `.ai` files are
+memory, inventories, and evidence logs for agents, but the intended rebuild
+sequence and blocking decisions must be readable from this file alone. If a
+supporting note changes the plan, fold the decision back into this document.
+
 ## 1. Purpose
 
 This plan turns the completed experiments into an incremental rebuild program
@@ -96,7 +101,127 @@ ports.
 Before implementing any phase below, update this section if later experiment or
 sweep results differ from these assumptions.
 
-## 4. Compatibility Closure Rules
+Phase 5 reset note: after Wave 0, the earlier Wave A-D implementation attempt
+was rolled back because source-adjacent renderers without old metadata,
+theming/default styles, behavior wrappers, docs format, and rendering adapter
+semantics could not preserve the original component outlook. The replanned
+Phase 5 therefore rebuilds those shared component systems first, then migrates
+`App` main content layout, then proves the model with the original
+Experiment 1 counter components before broader component waves continue.
+
+## 4. Sequential Execution Order
+
+Execute the rebuild in this order. Later sections provide the detailed scope,
+old source anchors, tasks, and exit criteria for each step.
+
+1. Phase 0: Rebuild Control Center
+
+   Maintain the compatibility inventory, debt log, verification command matrix,
+   and closure templates. Keep these files synchronized throughout the rebuild.
+
+2. Phase 1: Package, Build, and Test Infrastructure
+
+   Stabilize package scripts, workspaces, build outputs, test harnesses,
+   integration smoke commands, and the compatibility sweep as the normal gate.
+
+3. Phase 2: Core Language and Runtime Semantics
+
+   Close parser, scripting, expression/event compilation, runtime state,
+   reactive graph, rendering semantics, user-defined components, diagnostics,
+   source maps, and code-behind/config gaps.
+
+4. Phase 3: Theme, Styling, Layout, and Visual Verification
+
+   Rebuild shared theme variable resolution, layout props, CSS/style artifact
+   reporting, component part semantics, responsive props, and visual-regression
+   foundations.
+
+5. Phase 4: Data, Actions, Forms, Routing, and App Shell Infrastructure
+
+   Close shared data operations, actions, form context, routing, app shell,
+   runtime services, lifecycle, accessibility, and inspector dependencies that
+   components rely on.
+
+6. Phase 5 Wave 0: Component Transfer Scaffold
+
+   Keep the completed component module registry and source-organization
+   scaffold as the baseline. Do not treat existing experimental centralized
+   built-ins as completed component transfers.
+
+7. Phase 5 Wave 1A: Metadata Shape Compatibility - completed
+
+   Rebuild the old component metadata shape as the source of truth for props,
+   events, APIs, context vars, parts, theme vars, behaviors, docs, validation,
+   LSP metadata, and generated reference content.
+
+8. Phase 5 Wave 1B: Theme Variable and Styling Compatibility - completed
+
+   Rebuild old component outlook principles: default theme variables,
+   `*.defaults.ts`, `*.module.scss`, component theme classes, parts, tones,
+   scoped overrides, and responsive layout styling.
+
+9. Phase 5 Wave 1C: Behavior Compatibility - completed
+
+   Rebuild shared behavior metadata, condition evaluation, docs integration,
+   and attachment for behaviors such as tooltip, label, validation, variant,
+   form binding, animation, bookmark, live region, and pub/sub.
+
+10. Phase 5 Wave 1D: Component Docs Format Compatibility - completed
+
+    Preserve the old `ComponentName.md` additional-docs convention and generate
+    component reference pages from old-shaped metadata plus markdown additions.
+
+11. Phase 5 Wave 1E: Rendering Adapter Compatibility - completed
+
+    Rebuild the gist of the old `wrapComponent`/component adapter pipeline
+    while replacing interpreter/proxy internals with compiled expressions,
+    compiled event handlers, and the new reactive graph.
+
+12. Phase 5 Wave 2: App Main Content Layout Migration
+
+    Migrate `App` as the first proof component, limited to main content layout:
+    vertical stack behavior, padding, gap, layout props, theme variables,
+    default styling, docs, and old layout tests.
+
+13. Phase 5 Wave 3: Experiment 1 Component Migration Spike
+
+    Migrate the exact components needed by the original counter experiments,
+    including `Button`, `Text` or text rendering, `Heading`/`H1`, and any
+    minimal layout primitive needed to validate metadata, styling, behaviors,
+    docs, rendering adapter, and compiled data mutation together.
+
+14. Phase 5 Wave 4: Replanned Component Migration Waves A-G
+
+    Continue the broader component families only after the proof spike passes.
+    Close each component through the infrastructure-backed closure loop with
+    old-shaped metadata, default styling, behaviors, docs, source-adjacent
+    tests, visual/theme checks, and mutation coverage where applicable.
+
+15. Phase 6: Extension Packages and External Authoring
+
+    Rebuild extension package registration, metadata, functions, components,
+    themes, package exports, standalone scripts, Vite imports, and first-party
+    extension packages.
+
+16. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
+
+    Rebuild VS Code, docs generation, website examples, playground, create-app,
+    preview SSG, and XMLUI AI workflow tooling around the rebuilt compiler,
+    metadata, runtime, and component model.
+
+17. Phase 8: Full Compatibility Sweep
+
+    Expand the sweep to old unit, E2E, integration, docs-example, package,
+    extension, playground, CI workflow, artifact, visual, and performance
+    parity checks. Triage every failure.
+
+18. Phase 9: Release Readiness and Migration Safety
+
+    Mirror the old release process, verify package/artifact contents, record
+    known deviations, provide rollback/side-by-side testing instructions, and
+    freeze compatibility shims for the release candidate.
+
+## 5. Compatibility Closure Rules
 
 Each infrastructure area and component must go through the same closure loop:
 
@@ -129,7 +254,7 @@ For components, the inventory must include:
 - docs examples, website examples, playground examples, and integration-test
   usage.
 
-## 5. Phase 0: Rebuild Control Center
+## 6. Phase 0: Rebuild Control Center
 
 Status: operational; keep this phase maintained throughout the rebuild.
 
@@ -168,7 +293,7 @@ Exit criteria:
 Phase 0 completion note: the initial control center files exist. Future phases
 must keep them synchronized rather than treating Phase 0 as a one-time setup.
 
-## 6. Phase 1: Package, Build, and Test Infrastructure
+## 7. Phase 1: Package, Build, and Test Infrastructure
 
 Status: initial command surface implemented; full old integration parity still
 tracked as compatibility debt.
@@ -227,7 +352,7 @@ Current Phase 1 result:
 - `.ai/phase-1-package-build-test-infrastructure-findings.md` records the
   implemented slice and remaining debt.
 
-## 7. Phase 2: Core Language and Runtime Semantics
+## 8. Phase 2: Core Language and Runtime Semantics
 
 Status: initial event-tag and compatibility-test slice implemented; code-behind,
 full config loading, and old/new performance oracle remain compatibility debt.
@@ -278,7 +403,7 @@ Current Phase 2 result:
 - `.ai/phase-2-core-language-runtime-semantics-findings.md` records the slice
   and remaining debt.
 
-## 8. Phase 3: Theme, Styling, Layout, and Visual Verification
+## 9. Phase 3: Theme, Styling, Layout, and Visual Verification
 
 Rebuild the styling contract as shared infrastructure rather than per-component
 ad hoc work.
@@ -324,7 +449,7 @@ Current Phase 3 result:
 - `.ai/phase-3-theme-styling-layout-visual-findings.md` records the initial
   slice and the remaining visual/theme parity debt.
 
-## 9. Phase 4: Data, Actions, Forms, Routing, and App Shell Infrastructure
+## 10. Phase 4: Data, Actions, Forms, Routing, and App Shell Infrastructure
 
 Close shared features that many components depend on.
 
@@ -368,7 +493,7 @@ Current Phase 4 result:
 - `.ai/phase-4-runtime-services-data-routing-forms-findings.md` records the
   implemented slice and the remaining Phase 4 debt.
 
-## 10. Phase 5: Component Transfer and Rebuild Waves
+## 11. Phase 5: Component Transfer and Rebuild Waves
 
 Transfer components one by one, using the original component source
 organization as the default shape. A component is not complete merely because a
@@ -509,33 +634,298 @@ are failing, unported, or silently ignored. Any old test that will not be
 ported must be listed in compatibility debt as `obsolete-old-test`,
 `intentional-deviation`, or a phase-scoped `known-gap`.
 
-### Wave A: Primitive Text, Media, and Utility Components
+### Wave 1: Metadata, Theme, Behavior, Docs, and Rendering Infrastructure
+
+Status: required before Wave A component migration resumes.
+
+The initial Wave A-D attempt proved that a component folder plus a renderer is
+not enough. XMLUI component compatibility includes the old visual styling
+contract and the component authoring/documentation model. Before migrating
+individual components, rebuild the shared component infrastructure so migrated
+components can preserve old semantics, principles, and visible interfaces while
+still using the new compiler/runtime internals.
+
+Old source anchors:
+
+- metadata: `/Users/dotneteer/source/xmlui/xmlui/src/abstractions/ComponentDefs.ts`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components/metadata-helpers.ts`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/renderers.ts`;
+- renderer adapter: `/Users/dotneteer/source/xmlui/xmlui/src/components-core/wrapComponent.tsx`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/rendering/ComponentAdapter.tsx`;
+- theming: `/Users/dotneteer/source/xmlui/xmlui/src/components-core/theming`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/themevars`,
+  component `*.defaults.ts` and `*.module.scss` files;
+- behaviors: `/Users/dotneteer/source/xmlui/xmlui/src/components-core/behaviors`;
+- docs: component `ComponentName.md` files and generated docs under
+  `/Users/dotneteer/source/xmlui/website/content/docs/reference/components`.
+
+#### Wave 1A: Metadata Shape Compatibility
+
+Goal: Preserve the old component metadata model closely enough that component
+metadata can be migrated instead of re-invented.
+
+Status: completed. The rewrite now has old-shaped component metadata types,
+descriptor helpers, representative metadata for `App`, `Button`, `Text`, and
+`Stack`, and a bridge that derives current compiler/LSP contracts from that
+metadata.
+
+Tasks:
+
+- [x] Recreate the old `ComponentMetadata`, `ComponentPropertyMetadata`,
+  `ComponentEventMetadata`, API, context-var, parts, theme-var, and behavior
+  metadata shape in the rewrite.
+- [x] Keep helper functions such as `createMetadata`, `dClick`, `dContextMenu`,
+  `dComponent`, `dEnabled`, `dLabel`, and related descriptor helpers where they
+  preserve old authoring/readability semantics.
+- [x] Map metadata to the current compiler contract and LSP metadata as a derived
+  artifact, not as the source of truth.
+- [x] Preserve metadata fields that affect docs, validation, theme variables,
+  behaviors, default values, strict enums, internal markers, `nonVisual`,
+  `status`, and `specializedFrom`.
+- [x] Add metadata parity tests against a small old-framework oracle fixture for
+  `App`, `Button`, `Text`, and `Stack`.
+
+Exit criteria:
+
+- [x] A migrated component can expose old-shaped metadata and the rewrite can derive
+  compiler validation, docs metadata, and VS Code metadata from it.
+- [x] No component migration after Wave 1A hand-writes a smaller bespoke contract
+  unless the closure note records a deliberate compatibility decision.
+
+#### Wave 1B: Theme Variable and Styling Compatibility
+
+Goal: Rebuild the theming principles that make migrated components look like
+the old components by default and respond to old theme variables.
+
+Status: completed for shared infrastructure. The rewrite now has reusable old-style theme variable
+utilities for SCSS-exported declarations, `$var` reference resolution,
+base/tone/component default merging, hierarchical component variable fallback,
+scoped component theme CSS properties, and responsive part/state layout style
+resolution. Per-component visual parity remains part of each component migration
+closure after renderers adopt this infrastructure.
+
+Tasks:
+
+- [x] Recreate the old theme-variable naming and resolution semantics:
+  `$var` references, hierarchical/component variables, tone-specific variables,
+  default theme variables, and component-supplied theme var declarations.
+- [x] Preserve the component-level pattern:
+  `Component.defaults.ts` for default props and metadata defaults;
+  `Component.module.scss` as the source of theme-var declarations and default
+  CSS structure when the component uses SCSS in the old project.
+- [x] Decide the implementation mechanism for the rewrite:
+  either compile the old-style SCSS/CSS-module artifacts into runtime classes,
+  or convert their semantics into generated CSS while preserving public class,
+  part, theme-var, and default style behavior.
+- [x] Recreate `useComponentThemeClass` semantics: component metadata contributes
+  theme vars, the active theme resolves them to CSS custom properties, and the
+  component receives a generated class that scopes those variables.
+- [x] Preserve part styling and responsive layout semantics used by old
+  `COMPONENT_PART_KEY`, `Part`, state selectors, and breakpoint-specific layout
+  props.
+- [x] Add style-contract tests before component migration:
+  default app/text/button/stack appearances;
+  theme var override;
+  scoped theme override;
+  component part selector;
+  responsive layout prop.
+
+Exit criteria:
+
+- [x] A migrated component can use old-shaped `*.defaults.ts`, `*.module.scss`,
+  metadata theme vars, and `useComponentThemeClass`-style hooks to produce the
+  default style contract required for later visual parity checks.
+- [x] Component migration cannot be marked `parity-tested` without default style
+  and theme-var checks when the old component had styles/theme variables.
+
+#### Wave 1C: Behavior Compatibility
+
+Goal: Preserve the old behavior system as a shared wrapper layer rather than
+duplicating behavior props inside every component.
+
+Status: completed for shared infrastructure. The rewrite now has old-style
+behavior metadata, condition evaluation against old-shaped component metadata,
+contract-derived behavior props for migrated components, and a shared behavior
+attachment function. Full behavior visuals remain part of each migrated
+component's rendering closure.
+
+Tasks:
+
+- [x] Recreate the behavior metadata and attachment model for at least the common
+  behavior surface: tooltip, label, validation, variant, form binding,
+  animation, bookmark, live region, and pub/sub where applicable.
+- [x] Preserve behavior trigger props and docs generation so component reference
+  pages list supported behaviors as before.
+- [x] Implement behavior condition evaluation against old-shaped component metadata
+  (`visual`, `nonVisual`, `hasProp`, `hasEvent`, `hasApi`, `isType`, etc.).
+- [x] Attach behaviors in the rendering pipeline after the component renderer has
+  produced its base React node and before the node is returned to its parent.
+- [x] Add tests proving that a migrated component can receive tooltip/label/variant
+  behavior without the component renderer knowing those props directly.
+
+Exit criteria:
+
+- [x] Behavior props are validated, documented, rendered, and tested through the
+  shared behavior layer.
+- [x] Individual component renderers do not absorb behavior-specific responsibilities
+  unless the old component did so explicitly.
+
+#### Wave 1D: Component Docs Format Compatibility
+
+Goal: Preserve the old `ComponentName.md` additional-docs convention and keep
+generated docs compatible with the current website/reference style.
+
+Status: completed for shared infrastructure. The rewrite can parse old
+component docs marker blocks, combine additional markdown with generated
+metadata sections, list applicable behaviors, and generate docs reference files
+through the existing `build:docs-reference` command.
+
+Tasks:
+
+- [x] Document and implement the old component docs markdown format, including
+  examples, special sections, behavior listings, property/event/API generated
+  sections, and additional explanatory content.
+- [x] Ensure migrated component docs are copied or transformed from the original
+  component folder before the component is considered transferred.
+- [x] Keep generated docs output structurally comparable to
+  `/Users/dotneteer/source/xmlui/website/content/docs/reference/components`.
+- [x] Add docs-generation tests that compare representative generated output for
+  `App`, `Button`, `Text`, and `Stack` at the section/title level.
+
+Exit criteria:
+
+- [x] Component docs can be generated from old-shaped metadata plus
+  `ComponentName.md`.
+- [x] A component closure note must list docs status and generated reference status.
+
+#### Wave 1E: Rendering Adapter Compatibility
+
+Goal: Migrate the gist of the old managed rendering pipeline while fitting the
+new compiler/runtime architecture.
+
+Status: completed for shared infrastructure. The rewrite now has a lightweight
+`wrapComponent` adapter that evaluates compiled props/events, renders children
+and templates, provides standard XMLUI attributes, merges layout/theme styles,
+registers component APIs, coerces resource URLs, and attaches shared behaviors.
+
+Tasks:
+
+- [x] Recreate a lightweight `wrapComponent`/component-adapter layer that handles
+  old-visible responsibilities:
+  prop extraction and coercion, event lookup, template rendering,
+  layout context, child rendering context, stateful value conventions,
+  component API registration, resource URL extraction, class/style merging,
+  behavior attachment, lifecycle hooks, diagnostics, and inspector/test
+  identifiers.
+- [x] Keep only responsibilities still needed after compilation:
+  use compiled expression/event functions instead of interpreter callbacks;
+  keep reactive dependencies from the compiler/runtime graph instead of old
+  proxy-based dependency collection;
+  remove old optimization or container concepts that were only compensating for
+  interpreted expressions or proxy change detection.
+- [x] Preserve visible errors, diagnostics, and fallback rendering for unknown or
+  invalid components where old behavior was user-visible.
+- [x] Define the boundary between renderer adapter and component implementation:
+  shared XMLUI concerns live in the adapter; component-specific DOM and state
+  live in the component folder.
+- [x] Add adapter tests with a dummy component covering prop extraction, children,
+  templates, events, API registration, behavior attachment, theme class, and
+  diagnostics.
+
+Exit criteria:
+
+- [x] Migrated components use the adapter instead of duplicating XMLUI-wide
+  concerns.
+- [x] Central runtime files are orchestration only; old-visible component behavior
+  is either in shared adapter infrastructure or component-owned files.
+
+### Wave 2: App Main Content Layout Migration
+
+Start component migration only after Wave 1A-E exit criteria pass.
+
+First component: `App`, focused only on main content layout compatibility.
+
+Scope:
+
+- Transfer old `App` metadata shape, docs, defaults, relevant styles/theme
+  variables, and the old tests that cover main content layout.
+- Preserve visible main-content layout behavior: vertical stack, content
+  padding, gap/spacing, layout props, theme variables, DOM/test identifiers,
+  and docs examples related to this slice.
+- Exclude app shell behavior such as navigation, routing, headers, footers,
+  mobile shell, search, page metadata, index collection, and standalone startup;
+  these remain Wave G.
+
+Verification:
+
+- Ported old `App` layout tests pass.
+- A visual/theme fixture proves default content layout and theme-var override.
+- At least one mutation test changes a value that affects rendered content or
+  layout so the compiled data-update path remains covered.
+
+### Wave 3: Experiment 1 Component Migration Spike
+
+After the `App` layout slice works through the new infrastructure, migrate the
+exact components needed by the original increment-button Experiment 1 to prove
+the migration concept end to end.
 
 Components:
 
-- `App` main-content layout subset, `Text`, `Heading`, `HtmlTags`, `Br`,
+- `Button`;
+- `Text` or text-node rendering, depending on the old component boundary used
+  by the sample;
+- `Heading`/`H1`;
+- any minimal layout primitive that the old component implementation requires
+  through the adapter or theme system.
+
+Scope:
+
+- Migrate old-shaped metadata, defaults, SCSS/theme vars, docs, renderer
+  adapter usage, behavior compatibility, and tests for only the subset needed
+  by the Experiment 1 counter apps.
+- Preserve old visible semantics for the sample: label/children precedence,
+  click event behavior, disabled/enabled basics, default styling, heading
+  rendering, theme variables, and docs metadata.
+- Keep source file naming compatible with the old component folders. If the old
+  project has `Button.tsx`, `ButtonReact.tsx`, `Button.defaults.ts`,
+  `Button.module.scss`, `Button.md`, and `Button.spec.ts`, the rewrite should
+  keep corresponding names unless a closure note records why the implementation
+  uses a different internal file.
+- Test the three Experiment 1 apps unchanged or as close to unchanged as the
+  current parser/compiler allows.
+
+Verification:
+
+- Ported old component tests for the selected subset pass.
+- Experiment 1 counter apps render with old-compatible component styling.
+- Click handlers mutate data and update rendered output.
+- Metadata/docs/theming/behavior fixtures pass for these components.
+
+### Wave 4: Replanned Component Migration Waves
+
+After Wave 3 proves the migration model, continue with the original component
+families. The ordering below can remain, but each component must now go through
+the infrastructure-backed closure loop, not the earlier renderer-only transfer.
+
+#### Wave A: Primitive Text, Media, and Utility Components
+
+Components:
+
+- `Text`, `Heading`, `HtmlTags`, `Br`,
   `Fragment`, `Image`, `Icon`, `Logo`, `IFrame`, `Markdown`, `CodeBlock`,
   `QRCode`, `PageMetaTitle`, `ContentSeparator`, `SpaceFiller`, `NoResult`,
   `Fallback`.
 
 Compatibility focus:
 
-- `App` main content layout only: vertical stack behavior, content padding,
-  gap/spacing, and layout props that affect the primary app content area;
 - text/content rendering, markdown and code behavior, HTML tag mapping,
   media loading, alt/title semantics, sizing/layout props, metadata, and docs
   examples.
 
-The Wave A `App` slice deliberately excludes app shell behavior such as
-navigation, routing, headers, footers, mobile shell, search, page metadata,
-index collection, and standalone startup. Those remain Wave G responsibilities.
+`App` main content layout is no longer part of this wave; it is the dedicated
+Wave 2 proof component.
 
-Wave A starts only after Wave 0 is in place. The `App` main-content layout
-slice must be transferred under `xmlui/src/components/App/`, not as a central
-runtime-only renderer. The old `App` tests that cover this layout slice must be
-copied or ported before the slice is considered complete.
-
-### Wave B: Core Interaction and Inputs
+#### Wave B: Core Interaction and Inputs
 
 Components:
 
@@ -549,7 +939,7 @@ Compatibility focus:
   behavior, validation hooks, form binding, disabled/enabled semantics,
   imperative APIs, accessibility, and native-browser edge cases.
 
-### Wave C: Selection and Collection Components
+#### Wave C: Selection and Collection Components
 
 Components:
 
@@ -563,7 +953,7 @@ Compatibility focus:
   paging, option enablement, keyboard navigation, virtual/list rendering where
   present, table column contracts, and API references.
 
-### Wave D: Layout and Container Components
+#### Wave D: Layout and Container Components
 
 Components:
 
@@ -580,7 +970,7 @@ Compatibility focus:
   z-index/focus trapping, dismissal behavior, keyboard navigation, mobile
   layout, nested interactive children, and CSS parity.
 
-### Wave E: Forms and Validation Components
+#### Wave E: Forms and Validation Components
 
 Components:
 
@@ -593,7 +983,7 @@ Compatibility focus:
   disabled/read-only propagation, multi-step state, tabbed forms, error
   rendering, server validation, and accessibility.
 
-### Wave F: Data, Side-Effect, and Runtime Service Components
+#### Wave F: Data, Side-Effect, and Runtime Service Components
 
 Components:
 
@@ -609,7 +999,7 @@ Compatibility focus:
   subscriptions, cleanup, app state persistence, accessibility announcements,
   theme scoping, inspector behavior, and event timing.
 
-### Wave G: Routing, App Composition, and Navigation Components
+#### Wave G: Routing, App Composition, and Navigation Components
 
 Components:
 
@@ -628,7 +1018,7 @@ Each wave should close components in small batches that can keep
 later phase or wave, mark it as blocked in compatibility debt instead of
 placing partial behavior in the wrong layer.
 
-## 11. Phase 6: Extension Packages and External Authoring
+## 12. Phase 6: Extension Packages and External Authoring
 
 Tasks:
 
@@ -646,7 +1036,7 @@ Exit criteria:
 - The existing `xmlui-counter-badge` fixture remains green in
   `compatibility:sweep` while original first-party packages are ported.
 
-## 12. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
+## 13. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
 
 Tasks:
 
@@ -670,7 +1060,7 @@ Exit criteria:
 - Missing tooling surfaces no longer appear as blocked entries in
   `.ai/compatibility-debt.md`.
 
-## 13. Phase 8: Full Compatibility Sweep
+## 14. Phase 8: Full Compatibility Sweep
 
 Tasks:
 
@@ -698,7 +1088,7 @@ Exit criteria:
 - `compatibility:sweep` and `compatibility:perf` both pass with all rebuilt
   surfaces enabled, and their reports are suitable as release evidence.
 
-## 14. Phase 9: Release Readiness and Migration Safety
+## 15. Phase 9: Release Readiness and Migration Safety
 
 Tasks:
 
@@ -717,7 +1107,7 @@ Exit criteria:
 - A release candidate can be built and tested using the same public commands
   and expected artifacts as the old framework.
 
-## 15. Suggested Incremental Order
+## 16. Condensed Execution Checklist
 
 1. Maintain and refine the compatibility inventory and debt log created by
    Experiment 15.
@@ -726,14 +1116,22 @@ Exit criteria:
 3. Close parser, scripting, state, rendering, UDC, and diagnostics semantics.
 4. Close theming/layout infrastructure.
 5. Close data/actions/forms/routing/app-shell infrastructure.
-6. Implement component waves A through G, closing each component individually.
-7. Close extension packages.
-8. Close docs, playground, VS Code, create-app, preview-ssg, and AI tooling.
-9. Run and expand the full compatibility sweep continuously, not only at the
+6. Keep Phase 5 Wave 0 scaffold as the component transfer baseline.
+7. Implement Phase 5 Wave 1 shared component infrastructure:
+   metadata shape, theme/default styling, behaviors, component docs format, and
+   the managed rendering adapter.
+8. Migrate `App` main content layout as the first proof component.
+9. Migrate the exact Experiment 1 counter components to prove default outlook,
+   metadata, docs, behaviors, styling, and compiled mutation semantics together.
+10. Continue replanned component waves A through G, closing each component
+   individually through the infrastructure-backed closure loop.
+11. Close extension packages.
+12. Close docs, playground, VS Code, create-app, preview-ssg, and AI tooling.
+13. Run and expand the full compatibility sweep continuously, not only at the
    end.
-10. Prepare release readiness artifacts.
+14. Prepare release readiness artifacts.
 
-## 16. Definition of 100% Compatibility
+## 17. Definition of 100% Compatibility
 
 The rebuild reaches 100% compatibility when:
 

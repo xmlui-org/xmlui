@@ -1,11 +1,32 @@
 import type { CSSProperties } from "react";
 
-import type { LayoutOrientation } from "./contracts";
+import {
+  responsiveBreakpoints,
+  supportedLayoutPropNames,
+  type LayoutOrientation,
+} from "./contracts";
 import { resolveThemeReferences } from "./theme";
 
 export type LayoutStyleOptions = {
   orientation?: LayoutOrientation;
 };
+
+export const COMPONENT_PART_KEY = "-component";
+
+export type ResponsiveLayoutStyles = Record<
+  string,
+  {
+    base: CSSProperties;
+    breakpoints: Partial<Record<keyof typeof responsiveBreakpoints, CSSProperties>>;
+    states: Record<
+      string,
+      {
+        base: CSSProperties;
+        breakpoints: Partial<Record<keyof typeof responsiveBreakpoints, CSSProperties>>;
+      }
+    >;
+  }
+>;
 
 export function resolveLayoutStyle(
   props: Record<string, unknown>,
@@ -97,12 +118,64 @@ export function parseStyleSelectorKey(key: string): {
 } {
   const [beforeState, state] = key.split("--", 2);
   const segments = beforeState.split("-").filter(Boolean);
+  const propertyMatch = findLayoutPropertyPrefix(segments);
+  if (!propertyMatch) {
+    return {
+      property: segments[0] ?? key,
+      part: segments.length > 2 ? segments.slice(1, -1).join("-") : segments[1],
+      breakpoint: segments.length > 2 ? segments[segments.length - 1] : undefined,
+      state,
+    };
+  }
+  const rest = segments.slice(propertyMatch.segmentCount);
+  const breakpoint = rest.length > 0 && isBreakpoint(rest[rest.length - 1])
+    ? rest[rest.length - 1]
+    : undefined;
+  const partSegments = breakpoint ? rest.slice(0, -1) : rest;
   return {
-    property: segments[0] ?? key,
-    part: segments.length > 2 ? segments.slice(1, -1).join("-") : segments[1],
-    breakpoint: segments.length > 2 ? segments[segments.length - 1] : undefined,
+    property: propertyMatch.property,
+    part: partSegments.length > 0 ? partSegments.join("-") : undefined,
+    breakpoint,
     state,
   };
+}
+
+export function resolveResponsiveLayoutStyles(
+  props: Record<string, unknown>,
+  options: LayoutStyleOptions = {},
+): ResponsiveLayoutStyles {
+  const styles: ResponsiveLayoutStyles = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (value === undefined || value === null || value === "") {
+      continue;
+    }
+    const selector = parseStyleSelectorKey(key);
+    if (!supportedLayoutPropNames.includes(selector.property as never)) {
+      continue;
+    }
+    const part = selector.part ?? COMPONENT_PART_KEY;
+    const entry = styles[part] ??= { base: {}, breakpoints: {}, states: {} };
+    const style = resolveLayoutStyle({ [selector.property]: value }, options);
+    if (selector.state) {
+      const state = entry.states[selector.state] ??= { base: {}, breakpoints: {} };
+      if (selector.breakpoint && isBreakpoint(selector.breakpoint)) {
+        state.breakpoints[selector.breakpoint] = {
+          ...state.breakpoints[selector.breakpoint],
+          ...style,
+        };
+      } else {
+        Object.assign(state.base, style);
+      }
+    } else if (selector.breakpoint && isBreakpoint(selector.breakpoint)) {
+      entry.breakpoints[selector.breakpoint] = {
+        ...entry.breakpoints[selector.breakpoint],
+        ...style,
+      };
+    } else {
+      Object.assign(entry.base, style);
+    }
+  }
+  return styles;
 }
 
 function assign(
@@ -277,10 +350,25 @@ function alignment(value: unknown): CSSProperties["alignItems"] {
   }
 }
 
+function findLayoutPropertyPrefix(
+  segments: string[],
+): { property: string; segmentCount: number } | undefined {
+  for (let count = segments.length; count >= 1; count -= 1) {
+    const property = segments.slice(0, count).join("-");
+    if (supportedLayoutPropNames.includes(property as never)) {
+      return { property, segmentCount: count };
+    }
+  }
+  return undefined;
+}
+
+function isBreakpoint(value: string | undefined): value is keyof typeof responsiveBreakpoints {
+  return value !== undefined && Object.prototype.hasOwnProperty.call(responsiveBreakpoints, value);
+}
+
 function coerceBoolean(value: unknown): boolean {
   if (typeof value === "string") {
     return value === "true";
   }
   return Boolean(value);
 }
-
