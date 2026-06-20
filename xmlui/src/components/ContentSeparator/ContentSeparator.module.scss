@@ -1,0 +1,63 @@
+// ContentSeparator.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old component metadata pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-ContentSeparator: createThemeVar("backgroundColor-ContentSeparator");
+$thickness-ContentSeparator: createThemeVar("thickness-ContentSeparator");
+$length-ContentSeparator: createThemeVar("length-ContentSeparator");
+$marginTop-ContentSeparator: createThemeVar("marginTop-ContentSeparator");
+$marginBottom-ContentSeparator: createThemeVar("marginBottom-ContentSeparator");
+$marginVertical-ContentSeparator: createThemeVar("marginVertical-ContentSeparator");
+$marginLeft-ContentSeparator: createThemeVar("marginLeft-ContentSeparator");
+$marginRight-ContentSeparator: createThemeVar("marginRight-ContentSeparator");
+$marginHorizontal-ContentSeparator: createThemeVar("marginHorizontal-ContentSeparator");
+$paddingTop-ContentSeparator: createThemeVar("paddingTop-ContentSeparator");
+$paddingBottom-ContentSeparator: createThemeVar("paddingBottom-ContentSeparator");
+$paddingVertical-ContentSeparator: createThemeVar("paddingVertical-ContentSeparator");
+$paddingLeft-ContentSeparator: createThemeVar("paddingLeft-ContentSeparator");
+$paddingRight-ContentSeparator: createThemeVar("paddingRight-ContentSeparator");
+$paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSeparator");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .xmluiContentSeparator {
+    box-sizing: border-box;
+    background-color: var(--xmlui-backgroundColor-ContentSeparator);
+    background-clip: content-box;
+    margin-top: var(--xmlui-marginTop-ContentSeparator, var(--xmlui-marginVertical-ContentSeparator));
+    margin-bottom: var(--xmlui-marginBottom-ContentSeparator, var(--xmlui-marginVertical-ContentSeparator));
+    margin-inline-start: var(--xmlui-marginLeft-ContentSeparator, var(--xmlui-marginHorizontal-ContentSeparator));
+    margin-inline-end: var(--xmlui-marginRight-ContentSeparator, var(--xmlui-marginHorizontal-ContentSeparator));
+    padding-top: var(--xmlui-paddingTop-ContentSeparator, var(--xmlui-paddingVertical-ContentSeparator));
+    padding-bottom: var(--xmlui-paddingBottom-ContentSeparator, var(--xmlui-paddingVertical-ContentSeparator));
+    padding-inline-start: var(--xmlui-paddingLeft-ContentSeparator, var(--xmlui-paddingHorizontal-ContentSeparator));
+    padding-inline-end: var(--xmlui-paddingRight-ContentSeparator, var(--xmlui-paddingHorizontal-ContentSeparator));
+  }
+
+  .xmluiContentSeparator.horizontal {
+    height: var(--xmlui-effective-thickness-ContentSeparator, var(--xmlui-thickness-ContentSeparator));
+    width: var(--xmlui-effective-length-ContentSeparator, var(--xmlui-length-ContentSeparator));
+  }
+
+  .xmluiContentSeparator.horizontal.stretchToFit {
+    width: auto;
+    align-self: stretch;
+  }
+
+  .xmluiContentSeparator.vertical {
+    width: var(--xmlui-effective-thickness-ContentSeparator, var(--xmlui-thickness-ContentSeparator));
+    height: var(--xmlui-effective-length-ContentSeparator, var(--xmlui-length-ContentSeparator));
+  }
+
+  .xmluiContentSeparator.vertical.stretchToFit {
+    height: auto;
+    min-height: var(--xmlui-effective-thickness-ContentSeparator, var(--xmlui-thickness-ContentSeparator));
+    align-self: stretch;
+  }
+}

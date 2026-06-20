@@ -1,0 +1,47 @@
+// CodeBlock.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old component metadata pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-CodeBlock: createThemeVar("backgroundColor-CodeBlock");
+$backgroundColor-CodeBlock-header: createThemeVar("backgroundColor-CodeBlock-header");
+$border-CodeBlock: createThemeVar("border-CodeBlock");
+$borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
+$height-CodeBlock: createThemeVar("height-CodeBlock");
+$marginTop-CodeBlock: createThemeVar("marginTop-CodeBlock");
+$marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
+$paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-CodeBlock");
+$paddingHorizontal-content-CodeBlock: createThemeVar("paddingHorizontal-content-CodeBlock");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .xmluiCodeBlock {
+    width: 100%;
+    height: var(--xmlui-height-CodeBlock);
+    margin-top: var(--xmlui-marginTop-CodeBlock);
+    margin-bottom: var(--xmlui-marginBottom-CodeBlock);
+    border: var(--xmlui-border-CodeBlock);
+    border-radius: var(--xmlui-borderRadius-CodeBlock);
+    background-color: var(--xmlui-backgroundColor-CodeBlock);
+    overflow: hidden;
+    color: inherit;
+  }
+
+  .xmluiCodeBlockHeader {
+    padding: 0.5rem 0.75rem;
+    background-color: var(--xmlui-backgroundColor-CodeBlock-header);
+    border-bottom: var(--xmlui-border-CodeBlock);
+  }
+
+  .xmluiCodeBlockContent {
+    position: relative;
+    padding: var(--xmlui-paddingVertical-content-CodeBlock) var(--xmlui-paddingHorizontal-content-CodeBlock);
+    overflow: auto;
+    min-height: 1em;
+  }
+}

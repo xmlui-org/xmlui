@@ -6,6 +6,12 @@ import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
 import { FragmentMd } from "../../components/Fragment/Fragment";
 import { ImageMd } from "../../components/Image/Image";
 import { IFrameMd } from "../../components/IFrame/IFrame";
+import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
+import { FallbackMd } from "../../components/Fallback/Fallback";
+import { NoResultMd } from "../../components/NoResult/NoResult";
+import { PageMetaTitleMd } from "../../components/PageMetaTitle/PageMetaTitle";
+import { QRCodeMd } from "../../components/QRCode/QRCode";
+import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -138,13 +144,65 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "Icon",
     kind: "builtin",
     allowsChildren: false,
+    acceptsArbitraryProps: true,
     declarations: {},
     props: withLayoutProps({
+      fallback: { name: "fallback" },
       name: { name: "name" },
+      size: { name: "size" },
+      testId: { name: "testId" },
+    }),
+    events: {
+      click: { name: "click", attributeName: "onClick" },
+    },
+  },
+  {
+    name: "Logo",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: withLayoutProps({
+      src: { name: "src" },
+      alt: { name: "alt" },
+      inline: { name: "inline" },
       testId: { name: "testId" },
     }),
     events: {},
   },
+  contractFromMetadata(PageMetaTitleMd, {
+    name: "PageMetaTitle",
+    allowsChildren: true,
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(QRCodeMd, {
+    name: "QRCode",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    eventAttributes: {
+      init: "onInit",
+    },
+  }),
+  contractFromMetadata(ContentSeparatorMd, {
+    name: "ContentSeparator",
+    allowsChildren: false,
+    includeLayoutProps: true,
+  }),
+  contractFromMetadata(NoResultMd, {
+    name: "NoResult",
+    allowsChildren: true,
+    includeLayoutProps: true,
+  }),
+  contractFromMetadata(FallbackMd, {
+    name: "Fallback",
+    allowsChildren: true,
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(SpaceFillerMd, {
+    name: "SpaceFiller",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    acceptsArbitraryProps: true,
+  }),
   {
     name: "Stack",
     kind: "builtin",
@@ -175,6 +233,18 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     declarations: { local: true },
     props: withLayoutProps({ testId: { name: "testId" } }),
+    events: {},
+  },
+  {
+    name: "CodeBlock",
+    kind: "builtin",
+    acceptsArbitraryProps: true,
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({
+      meta: { name: "meta" },
+      testId: { name: "testId" },
+    }),
     events: {},
   },
   {

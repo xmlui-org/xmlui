@@ -29,6 +29,35 @@ Current status for the components started so far:
 - `IFrame`: original `IFrame.spec.ts` is migrated.
   Verification: `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/Image/Image.spec.ts src/components/IFrame/IFrame.spec.ts`
   passed 98/98 for the combined Image/IFrame focused run.
+- `CodeBlock`: original `CodeBlock.spec.ts` is migrated.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/CodeBlock/CodeBlock.spec.ts`
+  passed 17/17.
+- `QRCode`: original `QRCode.spec.ts` is migrated.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/QRCode/QRCode.spec.ts src/components/PageMetaTitle/PageMetaTitle.spec.ts`
+  passed 20/20 for the combined QRCode/PageMetaTitle focused run. The full
+  migrated E2E suite then passed 699/699 with 6 skipped. Caveat: the old
+  implementation uses `react-qr-code`; the current renderer emits a
+  deterministic SVG pattern that satisfies the migrated old tests but is not
+  yet a proven scannable QR encoder.
+- `PageMetaTitle`: original `PageMetaTitle.spec.ts` is migrated.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/QRCode/QRCode.spec.ts src/components/PageMetaTitle/PageMetaTitle.spec.ts`
+  passed 20/20 for the combined QRCode/PageMetaTitle focused run.
+- `ContentSeparator`: original `ContentSeparator.spec.ts` is migrated.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/ContentSeparator/ContentSeparator.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts`
+  passed 46/46 for the combined ContentSeparator/SpaceFiller focused run.
+  The full migrated E2E suite then passed 745/745 with 6 skipped.
+- `SpaceFiller`: original `SpaceFiller.spec.ts` is migrated.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/ContentSeparator/ContentSeparator.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts`
+  passed 46/46 for the combined ContentSeparator/SpaceFiller focused run.
+- `NoResult`: original `NoResult.spec.ts` is migrated.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/NoResult/NoResult.spec.ts src/components/Fallback/Fallback.spec.ts`
+  passed 4/4 for the combined NoResult/Fallback focused run. The full
+  migrated E2E suite then passed 749/749 with 6 skipped.
+- `Fallback`: the old project has source and docs but no colocated
+  `Fallback.spec.ts` under `/Users/dotneteer/source/xmlui/xmlui/src/components/Fallback`.
+  A source-adjacent smoke suite now covers normal children and
+  `loadingTemplate` rendering. Loader error propagation remains a later
+  compatibility surface when the related data/loader components are migrated.
 - `App`: original `App.spec.ts`, `App-layout.spec.ts`,
   `App-layout-mobile.spec.ts`, `App-navigation-events.spec.ts`, and
   `App-script-imports.spec.ts` are copied, but App migration is not complete.
@@ -125,12 +154,94 @@ Button styling migration rule:
   variable is absent, the property becomes invalid at computed-value time. Use
   fallbacks when there is a meaningful default, and emit dynamic variables only
   when they have a value.
-- `Icon` and `Logo` are not yet migrated into this workspace as component
-  folders. When they are migrated, start from the old `Icon` and `Logo`
-  component structure and apply the same rule: metadata and styles remain in
-  the component folder, visual styling belongs in `ComponentName.module.scss`,
-  and React inline styles are reserved for layout/style plumbing or small
-  CSS-variable bridges.
+- `Icon` is migrated with the original colocated `Icon.spec.ts` E2E suite.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/Icon/Icon.spec.ts`
+  passed 44/44 tests.
+- `Logo` is migrated with metadata, defaults, docs, renderer, and stylesheet.
+  The old project does not currently have a colocated `Logo.spec.ts` E2E suite.
+- `Icon` compatibility depends on preserving the old wrapper shape: root/test
+  attributes belong on an outer wrapper, the driver-visible SVG must be a
+  descendant, and an inner inline-block wrapper prevents flex-item
+  blockification from changing the wrapper display observed by E2E tests.
+- `Icon` supports both wrapper clicks and direct SVG clicks. The old driver uses
+  both patterns, so mouse handling belongs on the root wrapper while keyboard
+  handling remains on the focusable SVG.
+- `Icon` accepts unknown props for old compatibility. The old E2E suite expects
+  invalid props to be ignored rather than rejected by the compiler.
+- Component SCSS class names are currently loaded as plain global class names in
+  browser tests, not safely hashed CSS-module names. Avoid generic selectors
+  such as `.icon` in migrated component styles; use component-qualified class
+  names such as `.xmluiIcon` to prevent cross-component overrides under the
+  full E2E suite. This was found when Button's `.icon` placeholder style
+  overrode Icon SVG sizing during `npm --workspace xmlui run test:e2e`.
+- Do not run multiple Playwright E2E commands in parallel against the same Vite
+  testbed server. The session-storage-backed testbed and shared dev server can
+  interfere with each other or tear down unexpectedly. Run focused component
+  suites sequentially.
+- Button's existing migrated icon path still uses a visible compatibility
+  placeholder for resource-backed `icon="test"` fixtures. The full old resource
+  icon loader remains future work, but the placeholder must keep old Button E2E
+  visibility and positioning expectations stable until that service is
+  migrated.
+- `CodeBlock` theme variable metadata should be extracted from
+  `CodeBlock.module.scss` with `?xmlui-theme-vars`, matching the old component
+  metadata convention and the migrated components where the config-time import
+  boundary permits it.
+- The copied old `CodeBlock.spec.ts` uses raw `{` and `}` characters as code
+  text. The current compiler treats braces in text as expression delimiters, so
+  the test fixture escapes braces inside `<CodeBlock>...</CodeBlock>` before
+  compilation and `CodeBlockReact` decodes those scoped markers inside the
+  rendered component. Keep this as a CodeBlock-specific compatibility bridge;
+  do not generalize it to all text nodes.
+- `Markdown` and any separate old code-text surface are not completed by the
+  CodeBlock foundation. The old Markdown E2E surface is large and should be
+  migrated as its own slice with all old tests and dependencies accounted for.
+- Do not replace the old Markdown implementation with a small ad hoc markdown
+  parser. XMLUI Markdown includes `react-markdown`/GFM/raw-HTML behavior plus
+  XMLUI-specific extensions such as `xmlui-pg`, tree display conversion,
+  custom code fence metadata, markdown binding expressions, heading anchors,
+  and CodeText styling. On June 20, 2026, the environment rejected installing
+  `react-markdown`, `remark-gfm`, and `rehype-raw`; the partial Markdown files
+  created during that attempt were rolled back. Resume this slice only after
+  the old dependency stack or a documented compatibility-equivalent renderer is
+  available and the full old `Markdown.spec.ts` and `CodeText.spec.ts` suites
+  can be migrated.
+- `QRCode` also depends on an old third-party renderer (`react-qr-code`), but
+  its current old E2E suite checks component visibility, props, theme variables,
+  SVG dimensions, UTF-8 acceptance, title, and init behavior rather than QR
+  decoding. The local deterministic SVG renderer is acceptable for the current
+  migrated-test slice only. Before full compatibility claims, restore the old
+  dependency or add a documented QR-compatible encoder and verify scannability.
+- Config-time metadata imports can still fail for new component stylesheets
+  using `?xmlui-theme-vars`. If a component metadata file is imported while Vite
+  config is loading and the virtual query fails, keep visual declarations in
+  `ComponentName.module.scss` but use an inline `createThemeVar(...)` source
+  string for metadata extraction until the metadata/runtime import boundary is
+  redesigned.
+- Transferred old component specs may use legacy layout/style aliases such as
+  `alignItems`, `justifyContent`, and `style`. Preserve those aliases at the
+  shared layout contract/runtime layer when they represent old XMLUI authoring
+  compatibility rather than editing the migrated specs away from their original
+  intent.
+- `ContentSeparator` compatibility depends on several seemingly test-oriented
+  details that are actually public behavior in old specs: default
+  `test-id-component`, lowercase `separator` class matching, graceful fallback
+  for invalid size strings, zero-size attachment, and user-authored `style`
+  declarations.
+- `SpaceFiller` has context-sensitive layout semantics. In `HStack` and
+  `VStack` it remains `flex: 1 1 0px` with `place-self: stretch`; inside
+  `FlowLayout` it acts as a row break. Implement that at the FlowLayout/CSS
+  interaction point so normal stack behavior is not damaged.
+- Optional CSS custom-property declarations are dangerous when the variable is
+  absent: the declaration still wins the cascade and then becomes invalid at
+  computed-value time, resetting the property instead of falling back to the
+  prior declaration. For component theme variables such as `NoResult` borders,
+  use explicit fallback chains like
+  `var(--xmlui-borderLeftColor-NoResult, var(--xmlui-borderHorizontalColor-NoResult, var(--xmlui-borderColor-NoResult)))`.
+- Side-specific border shorthands are part of old theme semantics. A variable
+  such as `borderLeft-NoResult` must derive `borderLeftWidth-NoResult`,
+  `borderLeftStyle-NoResult`, and `borderLeftColor-NoResult`, just as
+  `border-NoResult` derives the base border longhands.
 
 Component contract boundary:
 

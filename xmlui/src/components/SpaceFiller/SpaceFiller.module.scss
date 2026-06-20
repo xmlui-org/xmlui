@@ -1,0 +1,21 @@
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .xmluiSpaceFiller {
+    flex: 1 1 0 !important;
+    place-self: stretch;
+  }
+
+  [data-xmlui-component="FlowLayout"] > .xmluiSpaceFiller {
+    flex: 0 0 100% !important;
+    width: 100%;
+    height: 0;
+  }
+}

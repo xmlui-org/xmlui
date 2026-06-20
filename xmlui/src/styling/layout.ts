@@ -96,6 +96,8 @@ export function resolveLayoutStyle(
   assign(style, "writingMode", props.writingMode);
   assign(style, "transition", props.transition);
   assign(style, "transform", props.transform);
+  assign(style, "alignItems", props.alignItems);
+  assign(style, "justifyContent", props.justifyContent);
   assign(style, "scrollSnapType", props.scrollSnapType);
   assign(style, "scrollSnapAlign", props.scrollSnapAlign);
   assign(style, "scrollSnapStop", props.scrollSnapStop);
@@ -106,6 +108,7 @@ export function resolveLayoutStyle(
   assignBorder(style, props);
   assignAlignment(style, props, orientation);
   assignFlexBehavior(style, props);
+  assignInlineCss(style, props.style);
 
   return style;
 }
@@ -311,6 +314,28 @@ function normalizeCssValue(value: unknown, pxForNumber = true): string | number 
     return pxForNumber ? `${resolved}px` : resolved;
   }
   return String(resolved);
+}
+
+function assignInlineCss(style: CSSProperties, value: unknown): void {
+  if (typeof value !== "string" || value.trim() === "") {
+    return;
+  }
+  for (const declaration of value.split(";")) {
+    const separatorIndex = declaration.indexOf(":");
+    if (separatorIndex <= 0) {
+      continue;
+    }
+    const name = declaration.slice(0, separatorIndex).trim();
+    const rawValue = declaration.slice(separatorIndex + 1).trim();
+    if (!name || !rawValue) {
+      continue;
+    }
+    (style as Record<string, unknown>)[cssNameToReactName(name)] = resolveThemeReferences(rawValue);
+  }
+}
+
+function cssNameToReactName(name: string): string {
+  return name.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase());
 }
 
 function parseStarSize(value: unknown): { grow: number } | undefined {

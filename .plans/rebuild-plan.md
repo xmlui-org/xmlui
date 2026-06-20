@@ -1086,6 +1086,8 @@ Visual check:
 
 ##### Wave A3b: Icon and Logo
 
+Status: completed.
+
 Components:
 
 - `Icon`;
@@ -1101,26 +1103,138 @@ Compatibility focus:
 Closure requires transferred old E2E tests, visual examples for icon/logo
 rendering, and any needed icon asset fixtures.
 
-##### Wave A4: Rich Text and Code Rendering
+Implementation completed:
+
+- `Icon` was migrated into an old-style component folder with colocated
+  metadata, renderer, SCSS module, docs, and the original E2E spec.
+- `Logo` was migrated into an old-style component folder with colocated
+  metadata, renderer, defaults, SCSS module, and docs. The old project does not
+  currently provide a colocated Logo E2E spec.
+- `Icon` keeps the old wrapper shape: the test/root wrapper owns root
+  attributes, an inner inline-block wrapper prevents flex-item blockification,
+  and the SVG remains the focusable/clickable icon surface.
+- `Logo` uses the migrated `Image` foundation and keeps logo visual defaults in
+  `Logo.module.scss`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250 unit/compiler tests.
+- `npm --workspace xmlui run test:e2e -- src/components/Icon/Icon.spec.ts`
+  passed 44/44 migrated Icon E2E tests.
+- `npm --workspace xmlui run test:e2e -- src/components/Button/Button.spec.ts`
+  passed 87/87 Button tests after making the existing Button placeholder icon
+  visible and stable.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  662 passed, 6 skipped.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=iconLogoMedia`.
+
+##### Wave A4a: CodeBlock Foundation
+
+Status: completed.
 
 Components:
 
-- `Markdown`;
 - `CodeBlock`.
 
 Compatibility focus:
 
+- code-container DOM shape and content part semantics;
+- metadata, theme variables, defaults, and SCSS-owned component styling;
+- old `CodeBlock.spec.ts` behavior, including Text-codefence children,
+  filename/header metadata, special characters, multiline content, and theme
+  overrides;
+- runnable visual sample with a state update path.
+
+Implementation completed:
+
+- `CodeBlock` was migrated into an old-style component folder with colocated
+  metadata, renderer, React primitive, SCSS module, and the original E2E spec.
+- Theme variables are extracted from `CodeBlock.module.scss` with the same
+  `?xmlui-theme-vars` pattern used by migrated components whose metadata can
+  safely import the stylesheet.
+- The test fixture escapes raw code braces inside copied old `CodeBlock` test
+  markup before compilation, and `CodeBlockReact` decodes those markers inside
+  the component. This preserves old code-text tests while the current XMLUI
+  compiler still treats `{...}` text as expression delimiters.
+- The dev example `codeBlockFoundation` exercises CodeBlock display plus a
+  Button-driven state update that changes rendered code-like content.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 141 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/CodeBlock/CodeBlock.spec.ts`
+  passed 17/17 migrated CodeBlock E2E tests.
+- Before the final metadata-import cleanup,
+  `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  679 passed, 6 skipped. The focused CodeBlock suite was rerun after the
+  cleanup and remained green.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=codeBlockFoundation`.
+
+##### Wave A4b: Markdown and CodeText Foundation
+
+Status: deferred until prerequisites are available.
+
+Components:
+
+- `Markdown`;
+- `CodeText` or the old equivalent code-text rendering surface, if it is
+  exposed separately from `Markdown`/`Text variant="codefence"`.
+
+Compatibility focus:
+
 - markdown parsing and sanitization semantics;
+- original `react-markdown`, `remark-gfm`, and `rehype-raw` based behavior, or
+  an explicitly approved compatible replacement;
+- XMLUI-specific markdown extensions such as `xmlui-pg`, tree display
+  conversion, custom code fence metadata, and markdown binding-expression
+  handling;
 - code language/class handling;
+- markdown-generated `CodeBlock` integration;
 - theme variables and typography;
 - embedded XMLUI/component behavior if supported by the old component;
 - copy/interaction behavior if present in the original implementation.
 
-Closure requires transferred old E2E tests. If the old tests depend on a
-markdown/code dependency not yet present in the rewrite, record the dependency
-and add the smallest compatible implementation needed for the tests.
+Prerequisites before implementation:
+
+- old source review must include `Markdown.tsx`, `MarkdownReact.tsx`,
+  `CodeText.tsx`, `parse-binding-expr`, `utils`, `CodeBlock/highlight-code.ts`,
+  `Markdown.spec.ts`, `CodeText.spec.ts`, `Markdown.md`, and
+  `markdown-styles.md`;
+- the rewrite package must be allowed to add or otherwise provide the old
+  markdown dependency stack (`react-markdown`, `remark-gfm`, `rehype-raw`) or a
+  documented compatibility-equivalent parser/rendering layer;
+- the implementation plan must cover `xmlui-pg` playground fences, tree display
+  fences, custom code-block metadata, raw HTML handling, binding-expression
+  evaluation inside markdown text, heading anchors, image/link behavior,
+  sanitization/security expectations, and CodeText styling;
+- the original `Markdown.spec.ts` and `CodeText.spec.ts` must be migrated in
+  full and run successfully before the component is considered migrated.
+
+Closure requires transferred old E2E tests. The old Markdown component has a
+large browser suite, so migrate it as its own focused slice rather than folding
+it into the CodeBlock foundation. If the old tests depend on markdown/code
+dependencies not yet present in the rewrite, record the dependencies and add
+the smallest compatible implementation needed for the tests.
+
+Deferral note: on June 20, 2026, a dependency install attempt for the original
+markdown stack was blocked by the execution environment, and a local
+dependency-free markdown renderer was deemed too risky because it would miss
+XMLUI-specific behavior. Partial files from that attempt were rolled back.
 
 ##### Wave A5: Generated/Structured Utility Output
+
+Status: completed for the currently migrated old E2E surface.
 
 Components:
 
@@ -1136,7 +1250,53 @@ Compatibility focus:
 Closure requires transferred old E2E tests plus visual/runtime checks that prove
 DOM side effects such as title updates are observable.
 
+Implementation completed:
+
+- `QRCode` was migrated into an old-style component folder with colocated
+  metadata, renderer, React primitive, defaults, SCSS module, docs, and the
+  original `QRCode.spec.ts` E2E suite.
+- `PageMetaTitle` was migrated into an old-style component folder with
+  colocated metadata, renderer, React primitive, defaults, docs, and the
+  original `PageMetaTitle.spec.ts` E2E suite.
+- `QRCode` preserves the old public props, theme variables, SVG visibility,
+  SVG size attributes, foreground/background colors, UTF-8 input acceptance,
+  `title`, and `init` event behavior covered by the old tests.
+- `PageMetaTitle` updates `document.title`, supports dynamic value changes,
+  child-title fallback, value-over-child precedence, multiple component
+  ordering, and repeated testbed updates.
+- The dev example `generatedOutput` exercises QR output plus Button-driven
+  state updates that change both QR props and page title.
+
+Compatibility caveat:
+
+- The old implementation uses `react-qr-code`. That package is not currently
+  installed in the rewrite workspace, and the environment blocked adding new
+  dependencies during the Markdown prerequisite check. The current QRCode
+  renderer emits a deterministic SVG pattern that satisfies the old migrated
+  E2E surface, but it should be replaced with the old dependency or a
+  documented QR-compatible encoder before claiming full scannable QR
+  compatibility.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 143 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/QRCode/QRCode.spec.ts src/components/PageMetaTitle/PageMetaTitle.spec.ts`
+  passed 20/20 migrated E2E tests.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  699 passed, 6 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=generatedOutput`.
+
 ##### Wave A6: Separators and Spacing Utilities
+
+Status: completed on 2026-06-20.
 
 Components:
 
@@ -1149,9 +1309,43 @@ Compatibility focus:
 - theme-variable driven spacing, line, color, and sizing behavior;
 - hidden/empty-content behavior.
 
-Closure requires transferred old E2E tests and a layout-focused visual example.
+Implementation completed:
+
+- created source-adjacent component folders with metadata, renderers, SCSS,
+  docs, and copied old E2E specs for `ContentSeparator` and `SpaceFiller`;
+- wired both components into the compiler contracts, lowering, runtime
+  registry, and metadata generation;
+- preserved `ContentSeparator` default test id behavior, orientation classes,
+  lowercase separator class compatibility hook, theme variables, size fallback
+  behavior, explicit length/thickness props, and user-authored `style`
+  compatibility;
+- preserved `SpaceFiller` core flex behavior and FlowLayout line-break
+  semantics without changing its HStack/VStack flex contract;
+- added old layout prop aliases needed by transferred tests:
+  `alignItems`, `justifyContent`, and `style`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 145 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/ContentSeparator/ContentSeparator.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts`
+  passed 46/46 migrated E2E tests.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  745 passed, 6 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` reported
+  791/1707 old component tests accounted for by transferred old E2E specs.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=separatorSpacing`.
 
 ##### Wave A7: Empty and Fallback States
+
+Status: completed on 2026-06-20.
 
 Components:
 
@@ -1165,8 +1359,41 @@ Compatibility focus:
 - empty/error state semantics;
 - theme variables and accessibility.
 
-Closure requires transferred old E2E tests and examples that demonstrate both
-default and customized rendering.
+Implementation completed:
+
+- created source-adjacent component folders with metadata, renderers, defaults,
+  docs, SCSS, and tests for `NoResult` and `Fallback`;
+- copied the old `NoResult.spec.ts` E2E suite and made it pass unchanged;
+- implemented `NoResult` label, custom children fallback, default icon,
+  `hideIcon`, theme-variable driven border/padding/background/icon spacing,
+  and default `test-id-component` behavior;
+- implemented `Fallback` normal children and `loadingTemplate` rendering, with
+  an error-boundary/context foundation for later loader error reporting;
+- extended shared theme handling so side border shorthands such as
+  `borderLeft-NoResult` derive `borderLeftWidth/Style/Color-NoResult`,
+  matching old theme-variable semantics;
+- added explicit CSS custom-property fallback chains for optional border and
+  padding variables so missing optionals do not reset computed styles;
+- added the visual example `emptyFallbackStates`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 147 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/NoResult/NoResult.spec.ts src/components/Fallback/Fallback.spec.ts`
+  passed 4/4 focused E2E tests.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  749 passed, 6 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` reported
+  795/1709 old component tests accounted for by transferred old E2E specs.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=emptyFallbackStates`.
 
 #### Wave B: Core Interaction and Inputs
 

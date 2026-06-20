@@ -5,6 +5,11 @@ import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import "./components/HtmlTags/HtmlTags.module.scss?xmlui-css-module";
 import "./components/IFrame/IFrame.module.scss?xmlui-css-module";
 import "./components/Image/Image.module.scss?xmlui-css-module";
+import "./components/CodeBlock/CodeBlock.module.scss?xmlui-css-module";
+import "./components/ContentSeparator/ContentSeparator.module.scss?xmlui-css-module";
+import "./components/NoResult/NoResult.module.scss?xmlui-css-module";
+import "./components/QRCode/QRCode.module.scss?xmlui-css-module";
+import "./components/SpaceFiller/SpaceFiller.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -18,6 +23,10 @@ import builtinsItemsApp from "./examples/builtins-items/Main.xmlui";
 import builtinsLayoutApp from "./examples/builtins-layout/Main.xmlui";
 import builtinsTaskFilterApp from "./examples/builtins-task-filter/Main.xmlui";
 import buttonCompatibilityApp from "./examples/button-compatibility/Main.xmlui";
+import codeBlockFoundationApp from "./examples/code-block-foundation/Main.xmlui";
+import generatedOutputApp from "./examples/generated-output/Main.xmlui";
+import emptyFallbackStatesApp from "./examples/empty-fallback-states/Main.xmlui";
+import separatorSpacingApp from "./examples/separator-spacing/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
 import dataSourceRefetchApp from "./examples/data-source-refetch/Main.xmlui";
@@ -32,6 +41,7 @@ import handlerLocalsApp from "./examples/handler-locals/Main.xmlui";
 import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
 import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Main.xmlui";
 import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
+import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
@@ -78,6 +88,10 @@ const examples = {
   builtinsLayout: builtinsLayoutApp,
   builtinsTaskFilter: builtinsTaskFilterApp,
   buttonCompatibility: buttonCompatibilityApp,
+  codeBlockFoundation: codeBlockFoundationApp,
+  generatedOutput: generatedOutputApp,
+  emptyFallbackStates: emptyFallbackStatesApp,
+  separatorSpacing: separatorSpacingApp,
   components: componentCounterApp,
   dataSourceMock: dataSourceMockApp,
   dataSourceRefetch: dataSourceRefetchApp,
@@ -93,6 +107,7 @@ const examples = {
   handlerLoops: handlerLoopsApp,
   headingOldCompatibility: headingOldCompatibilityApp,
   htmlTagsFragment: htmlTagsFragmentApp,
+  iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,

@@ -1,0 +1,12 @@
+<App var.short="{false}">
+  <PageMetaTitle value="{short ? 'Generated output compact' : 'Generated output sample'}" />
+  <H1>Generated output</H1>
+  <Text>Title mode: {short ? 'compact' : 'full'}</Text>
+  <Button onClick="short = !short">Toggle page title and QR data</Button>
+  <QRCode
+    value="{short ? 'xmlui' : 'https://xmlui.com'}"
+    size="{short ? 128 : 192}"
+    level="{short ? 'M' : 'H'}"
+    title="{short ? 'Compact QR code' : 'XMLUI QR code'}"
+    testId="generated-qr" />
+</App>

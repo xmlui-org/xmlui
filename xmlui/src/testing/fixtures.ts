@@ -1,5 +1,12 @@
 import { expect as baseExpect, test as base, type Locator, type Page } from "@playwright/test";
-import { CardDriver, ComponentDriver, IconDriver } from "./ComponentDrivers";
+import {
+  CardDriver,
+  CodeBlockDriver,
+  ComponentDriver,
+  ContentSeparatorDriver,
+  IconDriver,
+  NoResultDriver,
+} from "./ComponentDrivers";
 
 export type InitTestBedOptions = {
   testThemeVars?: Record<string, unknown>;
@@ -19,6 +26,9 @@ type Fixtures = {
   createTextDriver: (testId?: string) => Promise<ComponentDriver>;
   createHeadingDriver: (testId?: string) => Promise<ComponentDriver>;
   createCardDriver: (testId?: string) => Promise<CardDriver>;
+  createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
+  createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
+  createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
   createIconDriver: (target: string | Locator) => Promise<IconDriver>;
   createHtmlTagDriver: () => Promise<ComponentDriver>;
   createStackDriver: (testId?: string) => Promise<ComponentDriver>;
@@ -85,6 +95,26 @@ export const test = base.extend<Fixtures>({
   createCardDriver: async ({ page }, use) => {
     await use(async (testId) => new CardDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="Card"]').first(),
+      page,
+    }));
+  },
+  createContentSeparatorDriver: async ({ page }, use) => {
+    await use(async (testId) => new ContentSeparatorDriver({
+      locator: testId
+        ? page.getByTestId(testId)
+        : page.locator('[data-xmlui-component="ContentSeparator"]').first(),
+      page,
+    }));
+  },
+  createCodeBlockDriver: async ({ page }, use) => {
+    await use(async (testId) => new CodeBlockDriver({
+      locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="CodeBlock"]').first(),
+      page,
+    }));
+  },
+  createNoResultDriver: async ({ page }, use) => {
+    await use(async (testId) => new NoResultDriver({
+      locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="NoResult"]').first(),
       page,
     }));
   },
@@ -156,6 +186,9 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
 
 function normalizeLegacyTestMarkup(markup: string): string {
   return markup
+    .replace(/(<CodeBlock\b[^>]*>)([\s\S]*?)(<\/CodeBlock>)/g, (_match, open, content, close) =>
+      `${open}${content.replaceAll("{", "&#123;").replaceAll("}", "&#125;")}${close}`
+    )
     .replaceAll("&nbsp;", "\u00a0")
     .replaceAll("&amp;", "&")
     .replace(/\sboolean(?=[\s>])/g, ` boolean="true"`)

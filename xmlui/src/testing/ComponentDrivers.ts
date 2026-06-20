@@ -48,3 +48,44 @@ export class CardDriver extends ComponentDriver {
     return this.component.getByRole("img", { name: "avatar" });
   }
 }
+
+export class ContentSeparatorDriver extends ComponentDriver {
+  get separator(): Locator {
+    return this.component;
+  }
+
+  async getOrientation(): Promise<string> {
+    const className = await this.separator.evaluate((element) => String(element.className));
+    if (className.includes("horizontal")) {
+      return "horizontal";
+    }
+    if (className.includes("vertical")) {
+      return "vertical";
+    }
+    return "unknown";
+  }
+
+  getComputedHeight(): Promise<string> {
+    return this.separator.evaluate((element) => window.getComputedStyle(element).height);
+  }
+
+  getComputedWidth(): Promise<string> {
+    return this.separator.evaluate((element) => window.getComputedStyle(element).width);
+  }
+
+  getBackgroundColor(): Promise<string> {
+    return this.separator.evaluate((element) => window.getComputedStyle(element).backgroundColor);
+  }
+}
+
+export class CodeBlockDriver extends ComponentDriver {
+  getContent(): Locator {
+    return this.component.locator('[data-xmlui-part="content"]').first();
+  }
+
+  getCodeText(): Promise<string> {
+    return this.getContent().textContent().then((text) => text ?? "");
+  }
+}
+
+export class NoResultDriver extends ComponentDriver {}

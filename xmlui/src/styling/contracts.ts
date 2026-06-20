@@ -120,6 +120,9 @@ export const supportedLayoutPropNames = [
   "writingMode",
   "transition",
   "transform",
+  "alignItems",
+  "justifyContent",
+  "style",
 ] as const;
 
 export type LayoutPropName = (typeof supportedLayoutPropNames)[number];
@@ -142,4 +145,3 @@ export function themeVarReference(name: string): string {
 export function themePropNameToCssVarName(name: string): string {
   return name.startsWith("--") ? name : themeVarName(name);
 }
-

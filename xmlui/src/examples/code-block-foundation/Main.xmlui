@@ -1,0 +1,11 @@
+<App var.showExtra="{false}">
+  <H1>CodeBlock foundation</H1>
+  <Text>CodeBlock renders code-like content and keeps component theme styling in SCSS.</Text>
+  <Button onClick="showExtra = !showExtra">
+    Toggle extra line
+  </Button>
+  <CodeBlock>
+    <Text variant="codefence">const message = "Hello CodeBlock";</Text>
+    <Text variant="codefence">{showExtra ? 'const extra = true;' : ''}</Text>
+  </CodeBlock>
+</App>

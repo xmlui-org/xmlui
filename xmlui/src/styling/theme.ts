@@ -638,18 +638,43 @@ function addBorderShorthandLonghands(
   explicitThemeVariables: ThemeVariableMap,
 ): void {
   for (const [name, value] of Object.entries(themeVariables)) {
-    if (!name.startsWith("border-") || value === undefined || value === null || value === "") {
+    const shorthand = borderShorthandLonghandPrefix(name);
+    if (!shorthand || value === undefined || value === null || value === "") {
       continue;
     }
-    const suffix = name.slice("border-".length);
+    const suffix = name.slice(shorthand.sourcePrefix.length);
     const parsed = parseBorderShorthand(String(resolveThemeReferences(value)));
     if (!parsed) {
       continue;
     }
-    addDerivedCssVariable(cssVariables, explicitThemeVariables, `borderWidth-${suffix}`, parsed.width);
-    addDerivedCssVariable(cssVariables, explicitThemeVariables, `borderStyle-${suffix}`, parsed.style);
-    addDerivedCssVariable(cssVariables, explicitThemeVariables, `borderColor-${suffix}`, parsed.color);
+    addDerivedCssVariable(cssVariables, explicitThemeVariables, `${shorthand.targetPrefix}Width-${suffix}`, parsed.width);
+    addDerivedCssVariable(cssVariables, explicitThemeVariables, `${shorthand.targetPrefix}Style-${suffix}`, parsed.style);
+    addDerivedCssVariable(cssVariables, explicitThemeVariables, `${shorthand.targetPrefix}Color-${suffix}`, parsed.color);
   }
+}
+
+function borderShorthandLonghandPrefix(name: string): {
+  sourcePrefix: string;
+  targetPrefix: string;
+} | undefined {
+  for (const prefix of [
+    "borderHorizontal",
+    "borderVertical",
+    "borderLeft",
+    "borderRight",
+    "borderTop",
+    "borderBottom",
+    "border",
+  ]) {
+    const sourcePrefix = `${prefix}-`;
+    if (name.startsWith(sourcePrefix)) {
+      return {
+        sourcePrefix,
+        targetPrefix: prefix,
+      };
+    }
+  }
+  return undefined;
 }
 
 function addDerivedCssVariable(
