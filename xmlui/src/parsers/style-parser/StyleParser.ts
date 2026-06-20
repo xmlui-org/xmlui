@@ -339,7 +339,7 @@ export class StyleParser {
     if (token.type === StyleTokenType.Number) {
       return parseFloat(token.text);
     }
-    this.reportError("S001", token);
+    this.reportError("S001", token, token.text || token.type, this.source);
     return null;
   }
 
