@@ -227,19 +227,19 @@ export function createValueExtractor(
   // --- Extract a numeric value
   extractor.asNumber = (expression?: any) => {
     const value = extractor(expression);
-    if (typeof value === "number") return value;
-    throw new Error(`A numeric value expected but ${typeof value} received.`);
+    const failure = verifyValue("number", value);
+    if (failure) throw new Error(failure.message);
+    return coerceValue("number", value) as number;
   };
 
   // --- Extract an optional numeric value
   extractor.asOptionalNumber = (expression?: any, defValue?: number) => {
     const value = extractor(expression);
     if (value === undefined || value === null) return defValue;
-    if (typeof value === "string" && !isNaN(parseFloat(value))) {
-      return Number(value);
-    }
-    if (typeof value === "number") return value;
-    throw new Error(`A numeric value expected but ${typeof value} received.`);
+    if (typeof value === "string" && value.trim() === "") return defValue;
+    const failure = verifyValue("number", value);
+    if (failure) throw new Error(failure.message);
+    return coerceValue("number", value) as number;
   };
 
   // --- Extract a Boolean value
@@ -262,6 +262,9 @@ export function createValueExtractor(
       const size = parser.parseSize();
       if (size?.themeId) {
         return toCssVar(size.themeId);
+      }
+      if (size?.extSize) {
+        return size.extSize;
       }
       return size ? `${size.value}${size.unit ?? "px"}` : undefined;
     } catch {

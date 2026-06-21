@@ -36,7 +36,7 @@ type ErrorText = Record<string, string>;
 
 // The error messages of error codes
 export const styleErrorMessages: ErrorText = {
-  S001: "A numeric value expected",
+  S001: "A numeric value expected, but '{0}' received while parsing '{1}'",
   S002: "A dimension unit expected",
   S003: "An alignment value expected",
   S004: "A border style value expected",

@@ -16,6 +16,12 @@ import { StyleTokenType } from "./tokens";
 
 export const THEME_VAR_PREFIX = "xmlui";
 
+// Non-numeric CSS intrinsic-size keywords that are valid wherever a size is
+// expected. They lex as identifiers; parseSizeLike passes them through as the
+// SizeNode.extSize keyword rather than failing the numeric path. ("auto" is its
+// own token type, StyleTokenType.Auto, and is handled alongside these.)
+const keywordSizes = new Set(["fit-content", "min-content", "max-content"]);
+
 type StyleParserErrorMessage = {
   code: StyleErrorCodes;
   text: string;
@@ -339,7 +345,7 @@ export class StyleParser {
     if (token.type === StyleTokenType.Number) {
       return parseFloat(token.text);
     }
-    this.reportError("S001", token);
+    this.reportError("S001", token, token.text || token.type, this.source);
     return null;
   }
 
@@ -474,6 +480,30 @@ export class StyleParser {
           value: 1,
           unit: "*",
         },
+        startToken,
+      );
+    }
+
+    // --- Intrinsic / keyword sizes (auto, fit-content, min-content,
+    // --- max-content): valid CSS that is not numeric. Pass them through via
+    // --- SizeNode.extSize so callers (e.g. asSize) emit the keyword verbatim
+    // --- instead of failing the numeric path.
+    if (
+      startToken.type === StyleTokenType.Auto ||
+      (startToken.type === StyleTokenType.Identifier &&
+        keywordSizes.has(startToken.text))
+    ) {
+      this._lexer.get();
+      const nextToken = this._lexer.peek(true);
+      if (nextToken.type === StyleTokenType.Ws) {
+        this._lexer.get(true);
+      } else if (nextToken.type !== StyleTokenType.Eof) {
+        this.reportError("S016", nextToken);
+        return null;
+      }
+      return this.createNode<SizeNode>(
+        "Size",
+        { value: 0, unit: "", extSize: startToken.text },
         startToken,
       );
     }

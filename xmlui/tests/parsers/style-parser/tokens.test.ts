@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { StyleTokenType } from "../../../src/parsers/style-parser/tokens";
 import { StyleLexer } from "../../../src/parsers/style-parser/StyleLexer";
 import { StyleInputStream } from "../../../src/parsers/style-parser/StyleInputStream";
+import { StyleParser } from "../../../src/parsers/style-parser/StyleParser";
 
 describe("Parser - Binary operations", () => {
   const simpleTokens = [
@@ -243,6 +244,12 @@ describe("Parser - Binary operations", () => {
       expect(parseFloat(token.text)).equal(s.value);
     })
   );
+
+  it("reports source and token for missing numeric style values", () => {
+    const parser = new StyleParser("var(--bad-size)");
+
+    expect(() => parser.parseSize()).toThrow(/A numeric value expected.*var.*var\(--bad-size\)/);
+  });
 
   const hexaColorTokens = [
     { src: "#", token: StyleTokenType.Unknown },
