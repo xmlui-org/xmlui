@@ -1853,7 +1853,8 @@ Visual check:
 
 ##### Wave B5: Date, Time, and Color Inputs
 
-Status: next step. Start the next AI-assisted session here.
+Status: split into smaller slices because `DateInput`, `TimeInput`, and
+`DatePicker` each carry large, interaction-heavy suites.
 
 
 Components:
@@ -1868,6 +1869,135 @@ Compatibility focus:
 - native/browser value formats, locale-sensitive display where exposed,
   calendar/picker behavior, validation, clear/reset behavior, keyboard/focus
   behavior, and form integration.
+
+###### Wave B5.1: ColorPicker Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `ColorPicker` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, and the copied old `ColorPicker.spec.ts`;
+- preserve native color input value format, initial value, disabled/read-only
+  behavior, focus/change events, value and `setValue` APIs, validation theme
+  variables, default width/height theme variables, layout widths, and label
+  association;
+- defer only Form/FormItem-dependent `bindTo`, `FormItem type="colorpicker"`,
+  and require-label-mode tests until Form/FormItem migration.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=colorPickerFoundation`
+
+Implementation notes:
+
+- `ColorPicker` now has a source-adjacent component folder with metadata,
+  defaults, renderer, stylesheet, docs, and the copied old E2E spec.
+- The executable copied old tests pass. Only Form/FormItem-dependent coverage is
+  marked `test.fixme` until the shared form migration closes the missing
+  infrastructure.
+- Theme variables are extracted from `ColorPicker.module.scss`, while runtime
+  styling uses plain browser-valid CSS classes and CSS variables.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/ColorPicker/ColorPicker.spec.ts`
+  passed with 59 passed and 11 skipped Form/FormItem-dependent tests.
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test`
+
+###### Wave B5.2: DateInput Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `DateInput` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, and the copied old `DateInput.spec.ts`;
+- preserve the original segmented date entry model, supported date formats,
+  empty placeholders, validation state styling, invalid-field preservation,
+  keyboard navigation, Ctrl+A select-all behavior, clear/reset behavior,
+  focus/change/blur events, and `focus`, `setValue`, `value`, and `isoValue`
+  APIs;
+- defer only the copied tests that require shared Form/FormItem binding or
+  validation-feedback infrastructure, plus the one parser-gap fixture using a
+  zero-argument arrow expression as a prop value.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=dateInputFoundation`
+
+Implementation notes:
+
+- `DateInput` now has a source-adjacent component folder with metadata,
+  defaults, renderer, stylesheet, docs, and the copied old E2E spec.
+- The renderer follows the original segmented input structure rather than using
+  a native browser date input, because the copied old tests and original
+  implementation expose separate month/day/year fields.
+- The testbed clipboard was extended with a browser-level clipboard mock so
+  copied keyboard tests can verify Ctrl+C behavior.
+- The shared style-string parser now preserves CSS custom properties beginning
+  with `--`, matching React's inline style requirements and the old theme
+  variable test patterns.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/DateInput/DateInput.spec.ts`
+  passed with 153 passed and 9 skipped deferred tests.
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test`
+
+###### Wave B5.3: TimeInput Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `TimeInput` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, and the copied old `TimeInput.spec.ts`;
+- preserve the original segmented hour/minute/second entry model, 12-hour and
+  24-hour modes, AM/PM interaction, seconds visibility, empty placeholders,
+  validation state styling, clear/reset behavior, keyboard navigation,
+  focus/change/blur/invalid events, and `focus`, `setValue`, `value`, and
+  `isoValue` APIs;
+- defer only the copied tests that require shared Form/FormItem binding or
+  label integration, plus the one parser-gap fixture using a zero-argument
+  arrow expression as a prop value.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=timeInputFoundation`
+
+Implementation notes:
+
+- `TimeInput` now has a source-adjacent component folder with metadata,
+  defaults, renderer, stylesheet, docs, and the copied old E2E spec.
+- The renderer follows the original segmented input structure and supports
+  direct keyboard navigation between hour, minute, second, and AM/PM parts.
+- The AM/PM part supports click, arrow navigation focus, and `a`/`p` keyboard
+  selection.
+- The copied old testbed handler syntax with a block body is normalized by the
+  test harness until the event parser supports that form directly.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/TimeInput/TimeInput.spec.ts`
+  passed with 166 passed and 3 skipped deferred tests.
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test`
+
+###### Wave B5.4: DatePicker Foundation
+
+Status: next step.
 
 ##### Wave B6: File Inputs
 

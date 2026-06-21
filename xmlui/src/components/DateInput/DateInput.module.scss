@@ -1,0 +1,337 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderRadius-DateInput: createThemeVar("borderRadius-DateInput");
+$borderColor-DateInput: createThemeVar("borderColor-DateInput");
+$borderWidth-DateInput: createThemeVar("borderWidth-DateInput");
+$borderStyle-DateInput: createThemeVar("borderStyle-DateInput");
+$fontSize-DateInput: createThemeVar("fontSize-DateInput");
+$backgroundColor-DateInput: createThemeVar("backgroundColor-DateInput");
+$boxShadow-DateInput: createThemeVar("boxShadow-DateInput");
+$textColor-DateInput: createThemeVar("textColor-DateInput");
+$borderColor-DateInput--hover: createThemeVar("borderColor-DateInput--hover");
+$backgroundColor-DateInput--hover: createThemeVar("backgroundColor-DateInput--hover");
+$boxShadow-DateInput--hover: createThemeVar("boxShadow-DateInput--hover");
+$textColor-DateInput--hover: createThemeVar("textColor-DateInput--hover");
+$borderColor-DateInput--focus: createThemeVar("borderColor-DateInput--focus");
+$backgroundColor-DateInput--focus: createThemeVar("backgroundColor-DateInput--focus");
+$boxShadow-DateInput--focus: createThemeVar("boxShadow-DateInput--focus");
+$textColor-DateInput--focus: createThemeVar("textColor-DateInput--focus");
+$outlineWidth-DateInput--focus: createThemeVar("outlineWidth-DateInput--focus");
+$outlineColor-DateInput--focus: createThemeVar("outlineColor-DateInput--focus");
+$outlineStyle-DateInput--focus: createThemeVar("outlineStyle-DateInput--focus");
+$outlineOffset-DateInput--focus: createThemeVar("outlineOffset-DateInput--focus");
+$borderRadius-DateInput--error: createThemeVar("borderRadius-DateInput--error");
+$borderColor-DateInput--error: createThemeVar("borderColor-DateInput--error");
+$borderWidth-DateInput--error: createThemeVar("borderWidth-DateInput--error");
+$borderStyle-DateInput--error: createThemeVar("borderStyle-DateInput--error");
+$fontSize-DateInput--error: createThemeVar("fontSize-DateInput--error");
+$backgroundColor-DateInput--error: createThemeVar("backgroundColor-DateInput--error");
+$boxShadow-DateInput--error: createThemeVar("boxShadow-DateInput--error");
+$textColor-DateInput--error: createThemeVar("textColor-DateInput--error");
+$borderColor-DateInput--error--hover: createThemeVar("borderColor-DateInput--error--hover");
+$backgroundColor-DateInput--error--hover: createThemeVar("backgroundColor-DateInput--error--hover");
+$boxShadow-DateInput--error--hover: createThemeVar("boxShadow-DateInput--error--hover");
+$textColor-DateInput--error--hover: createThemeVar("textColor-DateInput--error--hover");
+$borderColor-DateInput--error--focus: createThemeVar("borderColor-DateInput--error--focus");
+$backgroundColor-DateInput--error--focus: createThemeVar("backgroundColor-DateInput--error--focus");
+$boxShadow-DateInput--error--focus: createThemeVar("boxShadow-DateInput--error--focus");
+$textColor-DateInput--error--focus: createThemeVar("textColor-DateInput--error--focus");
+$outlineWidth-DateInput--error--focus: createThemeVar("outlineWidth-DateInput--error--focus");
+$outlineColor-DateInput--error--focus: createThemeVar("outlineColor-DateInput--error--focus");
+$outlineStyle-DateInput--error--focus: createThemeVar("outlineStyle-DateInput--error--focus");
+$outlineOffset-DateInput--error--focus: createThemeVar("outlineOffset-DateInput--error--focus");
+$borderRadius-DateInput--warning: createThemeVar("borderRadius-DateInput--warning");
+$borderColor-DateInput--warning: createThemeVar("borderColor-DateInput--warning");
+$borderWidth-DateInput--warning: createThemeVar("borderWidth-DateInput--warning");
+$borderStyle-DateInput--warning: createThemeVar("borderStyle-DateInput--warning");
+$fontSize-DateInput--warning: createThemeVar("fontSize-DateInput--warning");
+$backgroundColor-DateInput--warning: createThemeVar("backgroundColor-DateInput--warning");
+$boxShadow-DateInput--warning: createThemeVar("boxShadow-DateInput--warning");
+$textColor-DateInput--warning: createThemeVar("textColor-DateInput--warning");
+$borderColor-DateInput--warning--hover: createThemeVar("borderColor-DateInput--warning--hover");
+$backgroundColor-DateInput--warning--hover: createThemeVar("backgroundColor-DateInput--warning--hover");
+$boxShadow-DateInput--warning--hover: createThemeVar("boxShadow-DateInput--warning--hover");
+$textColor-DateInput--warning--hover: createThemeVar("textColor-DateInput--warning--hover");
+$borderColor-DateInput--warning--focus: createThemeVar("borderColor-DateInput--warning--focus");
+$backgroundColor-DateInput--warning--focus: createThemeVar("backgroundColor-DateInput--warning--focus");
+$boxShadow-DateInput--warning--focus: createThemeVar("boxShadow-DateInput--warning--focus");
+$textColor-DateInput--warning--focus: createThemeVar("textColor-DateInput--warning--focus");
+$outlineWidth-DateInput--warning--focus: createThemeVar("outlineWidth-DateInput--warning--focus");
+$outlineColor-DateInput--warning--focus: createThemeVar("outlineColor-DateInput--warning--focus");
+$outlineStyle-DateInput--warning--focus: createThemeVar("outlineStyle-DateInput--warning--focus");
+$outlineOffset-DateInput--warning--focus: createThemeVar("outlineOffset-DateInput--warning--focus");
+$borderRadius-DateInput--success: createThemeVar("borderRadius-DateInput--success");
+$borderColor-DateInput--success: createThemeVar("borderColor-DateInput--success");
+$borderWidth-DateInput--success: createThemeVar("borderWidth-DateInput--success");
+$borderStyle-DateInput--success: createThemeVar("borderStyle-DateInput--success");
+$fontSize-DateInput--success: createThemeVar("fontSize-DateInput--success");
+$backgroundColor-DateInput--success: createThemeVar("backgroundColor-DateInput--success");
+$boxShadow-DateInput--success: createThemeVar("boxShadow-DateInput--success");
+$textColor-DateInput--success: createThemeVar("textColor-DateInput--success");
+$borderColor-DateInput--success--hover: createThemeVar("borderColor-DateInput--success--hover");
+$backgroundColor-DateInput--success--hover: createThemeVar("backgroundColor-DateInput--success--hover");
+$boxShadow-DateInput--success--hover: createThemeVar("boxShadow-DateInput--success--hover");
+$textColor-DateInput--success--hover: createThemeVar("textColor-DateInput--success--hover");
+$borderColor-DateInput--success--focus: createThemeVar("borderColor-DateInput--success--focus");
+$backgroundColor-DateInput--success--focus: createThemeVar("backgroundColor-DateInput--success--focus");
+$boxShadow-DateInput--success--focus: createThemeVar("boxShadow-DateInput--success--focus");
+$textColor-DateInput--success--focus: createThemeVar("textColor-DateInput--success--focus");
+$outlineWidth-DateInput--success--focus: createThemeVar("outlineWidth-DateInput--success--focus");
+$outlineColor-DateInput--success--focus: createThemeVar("outlineColor-DateInput--success--focus");
+$outlineStyle-DateInput--success--focus: createThemeVar("outlineStyle-DateInput--success--focus");
+$outlineOffset-DateInput--success--focus: createThemeVar("outlineOffset-DateInput--success--focus");
+$color-divider-DateInput: createThemeVar("color-divider-DateInput");
+$spacing-divider-DateInput: createThemeVar("spacing-divider-DateInput");
+$width-input-DateInput: createThemeVar("width-input-DateInput");
+$minWidth-input-DateInput: createThemeVar("minWidth-input-DateInput");
+$padding-input-DateInput: createThemeVar("padding-input-DateInput");
+$textAlign-input-DateInput: createThemeVar("textAlign-input-DateInput");
+$borderRadius-input-DateInput: createThemeVar("borderRadius-input-DateInput");
+$backgroundColor-input-DateInput-invalid: createThemeVar("backgroundColor-input-DateInput-invalid");
+$padding-button-DateInput: createThemeVar("padding-button-DateInput");
+$borderRadius-button-DateInput: createThemeVar("borderRadius-button-DateInput");
+$hoverColor-button-DateInput: createThemeVar("hoverColor-button-DateInput");
+$disabledColor-button-DateInput: createThemeVar("disabledColor-button-DateInput");
+$outlineColor-button-DateInput--focused: createThemeVar("outlineColor-button-DateInput--focused");
+$outlineWidth-button-DateInput--focused: createThemeVar("outlineWidth-button-DateInput--focused");
+$outlineOffset-button-DateInput--focused: createThemeVar("outlineOffset-button-DateInput--focused");
+$opacity-DateInput--disabled: createThemeVar("opacity-DateInput--disabled");
+$backgroundColor-DateInput--disabled: createThemeVar("backgroundColor-DateInput--disabled");
+$textColor-DateInput--disabled: createThemeVar("textColor-DateInput--disabled");
+$borderColor-DateInput--disabled: createThemeVar("borderColor-DateInput--disabled");
+$minHeight-DateInput: createThemeVar("minHeight-DateInput");
+$gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .dateInputWrapper {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    min-height: var(--xmlui-minHeight-DateInput);
+    padding: var(--xmlui-paddingVertical-DateInput) var(--xmlui-paddingHorizontal-DateInput);
+    gap: var(--xmlui-gap-adornment-DateInput);
+    line-height: normal;
+    box-sizing: border-box;
+    border-radius: var(--xmlui-borderRadius-DateInput);
+    border-color: var(--xmlui-borderColor-DateInput);
+    border-width: var(--xmlui-borderWidth-DateInput);
+    border-style: var(--xmlui-borderStyle-DateInput);
+    background-color: var(--xmlui-backgroundColor-DateInput);
+    box-shadow: var(--xmlui-boxShadow-DateInput);
+    color: var(--xmlui-textColor-DateInput);
+    font-size: var(--xmlui-fontSize-DateInput);
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .dateInputWrapper:hover {
+    border-color: var(--xmlui-borderColor-DateInput--hover);
+    background-color: var(--xmlui-backgroundColor-DateInput--hover);
+    box-shadow: var(--xmlui-boxShadow-DateInput--hover);
+    color: var(--xmlui-textColor-DateInput--hover);
+  }
+
+  .dateInputWrapper:focus-within {
+    border-color: var(--xmlui-borderColor-DateInput--focus);
+    background-color: var(--xmlui-backgroundColor-DateInput--focus);
+    box-shadow: var(--xmlui-boxShadow-DateInput--focus);
+    color: var(--xmlui-textColor-DateInput--focus);
+    outline-width: var(--xmlui-outlineWidth-DateInput--focus);
+    outline-color: var(--xmlui-outlineColor-DateInput--focus);
+    outline-style: var(--xmlui-outlineStyle-DateInput--focus);
+    outline-offset: var(--xmlui-outlineOffset-DateInput--focus);
+  }
+
+  .dateInputWrapper[data-xmlui-variant="CustomVariant"] {
+    border-color: var(--xmlui-borderColor-DateInput-CustomVariant);
+  }
+
+  .error {
+    border-radius: var(--xmlui-borderRadius-DateInput--error);
+    border-color: var(--xmlui-borderColor-DateInput--error);
+    border-width: var(--xmlui-borderWidth-DateInput--error);
+    border-style: var(--xmlui-borderStyle-DateInput--error);
+    background-color: var(--xmlui-backgroundColor-DateInput--error);
+    box-shadow: var(--xmlui-boxShadow-DateInput--error);
+    color: var(--xmlui-textColor-DateInput--error);
+    font-size: var(--xmlui-fontSize-DateInput--error);
+  }
+
+  .error:hover {
+    border-color: var(--xmlui-borderColor-DateInput--error--hover);
+    background-color: var(--xmlui-backgroundColor-DateInput--error--hover);
+    box-shadow: var(--xmlui-boxShadow-DateInput--error--hover);
+    color: var(--xmlui-textColor-DateInput--error--hover);
+  }
+
+  .error:focus-within {
+    border-color: var(--xmlui-borderColor-DateInput--error--focus);
+    background-color: var(--xmlui-backgroundColor-DateInput--error--focus);
+    box-shadow: var(--xmlui-boxShadow-DateInput--error--focus);
+    color: var(--xmlui-textColor-DateInput--error--focus);
+    outline-width: var(--xmlui-outlineWidth-DateInput--error--focus);
+    outline-color: var(--xmlui-outlineColor-DateInput--error--focus);
+    outline-style: var(--xmlui-outlineStyle-DateInput--error--focus);
+    outline-offset: var(--xmlui-outlineOffset-DateInput--error--focus);
+  }
+
+  .warning {
+    border-radius: var(--xmlui-borderRadius-DateInput--warning);
+    border-color: var(--xmlui-borderColor-DateInput--warning);
+    border-width: var(--xmlui-borderWidth-DateInput--warning);
+    border-style: var(--xmlui-borderStyle-DateInput--warning);
+    background-color: var(--xmlui-backgroundColor-DateInput--warning);
+    box-shadow: var(--xmlui-boxShadow-DateInput--warning);
+    color: var(--xmlui-textColor-DateInput--warning);
+    font-size: var(--xmlui-fontSize-DateInput--warning);
+  }
+
+  .warning:hover {
+    border-color: var(--xmlui-borderColor-DateInput--warning--hover);
+    background-color: var(--xmlui-backgroundColor-DateInput--warning--hover);
+    box-shadow: var(--xmlui-boxShadow-DateInput--warning--hover);
+    color: var(--xmlui-textColor-DateInput--warning--hover);
+  }
+
+  .warning:focus-within {
+    border-color: var(--xmlui-borderColor-DateInput--warning--focus);
+    background-color: var(--xmlui-backgroundColor-DateInput--warning--focus);
+    box-shadow: var(--xmlui-boxShadow-DateInput--warning--focus);
+    color: var(--xmlui-textColor-DateInput--warning--focus);
+    outline-width: var(--xmlui-outlineWidth-DateInput--warning--focus);
+    outline-color: var(--xmlui-outlineColor-DateInput--warning--focus);
+    outline-style: var(--xmlui-outlineStyle-DateInput--warning--focus);
+    outline-offset: var(--xmlui-outlineOffset-DateInput--warning--focus);
+  }
+
+  .valid {
+    border-radius: var(--xmlui-borderRadius-DateInput--success);
+    border-color: var(--xmlui-borderColor-DateInput--success);
+    border-width: var(--xmlui-borderWidth-DateInput--success);
+    border-style: var(--xmlui-borderStyle-DateInput--success);
+    background-color: var(--xmlui-backgroundColor-DateInput--success);
+    box-shadow: var(--xmlui-boxShadow-DateInput--success);
+    color: var(--xmlui-textColor-DateInput--success);
+    font-size: var(--xmlui-fontSize-DateInput--success);
+  }
+
+  .valid:hover {
+    border-color: var(--xmlui-borderColor-DateInput--success--hover);
+    background-color: var(--xmlui-backgroundColor-DateInput--success--hover);
+    box-shadow: var(--xmlui-boxShadow-DateInput--success--hover);
+    color: var(--xmlui-textColor-DateInput--success--hover);
+  }
+
+  .valid:focus-within {
+    border-color: var(--xmlui-borderColor-DateInput--success--focus);
+    background-color: var(--xmlui-backgroundColor-DateInput--success--focus);
+    box-shadow: var(--xmlui-boxShadow-DateInput--success--focus);
+    color: var(--xmlui-textColor-DateInput--success--focus);
+    outline-width: var(--xmlui-outlineWidth-DateInput--success--focus);
+    outline-color: var(--xmlui-outlineColor-DateInput--success--focus);
+    outline-style: var(--xmlui-outlineStyle-DateInput--success--focus);
+    outline-offset: var(--xmlui-outlineOffset-DateInput--success--focus);
+  }
+
+  .disabled {
+    opacity: var(--xmlui-opacity-DateInput--disabled);
+    background-color: var(--xmlui-backgroundColor-DateInput--disabled);
+    color: var(--xmlui-textColor-DateInput--disabled);
+    border-color: var(--xmlui-borderColor-DateInput--disabled);
+    pointer-events: none;
+  }
+
+  .wrapper,
+  .inputGroup {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+
+  .divider {
+    display: inline-block;
+    padding: var(--xmlui-spacing-divider-DateInput);
+    color: var(--xmlui-color-divider-DateInput);
+    font: inherit;
+    white-space: pre;
+  }
+
+  .input {
+    min-width: var(--xmlui-minWidth-input-DateInput);
+    height: 100%;
+    padding: var(--xmlui-padding-input-DateInput);
+    border: 0;
+    border-radius: var(--xmlui-borderRadius-input-DateInput);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: var(--xmlui-textAlign-input-DateInput);
+    box-sizing: border-box;
+    appearance: textfield;
+  }
+
+  .input:focus {
+    outline: none;
+  }
+
+  .input.day,
+  .input.month {
+    width: 2.5ch;
+    min-width: 2.5ch;
+    max-width: 2.5ch;
+  }
+
+  .input.year {
+    width: 4.5ch;
+    min-width: 4.5ch;
+    max-width: 4.5ch;
+  }
+
+  .input.invalid {
+    background-color: var(--xmlui-backgroundColor-input-DateInput-invalid);
+  }
+
+  .selectAllActive .input {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .clearButton {
+    border: 0;
+    padding: var(--xmlui-padding-button-DateInput);
+    border-radius: var(--xmlui-borderRadius-button-DateInput);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .clearButton:hover {
+    color: var(--xmlui-hoverColor-button-DateInput);
+  }
+
+  .clearButton:focus {
+    outline-style: solid;
+    outline-width: var(--xmlui-outlineWidth-button-DateInput--focused);
+    outline-color: var(--xmlui-outlineColor-button-DateInput--focused);
+    outline-offset: var(--xmlui-outlineOffset-button-DateInput--focused);
+  }
+
+  .clearButton:disabled {
+    color: var(--xmlui-disabledColor-button-DateInput);
+    cursor: not-allowed;
+  }
+
+  .adornment,
+  .conciseValidationFeedback {
+    display: inline-flex;
+    align-items: center;
+  }
+}

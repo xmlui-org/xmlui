@@ -164,6 +164,46 @@ export class NumberBoxDriver extends InputComponentDriver {
   };
 }
 
+export class DateInputDriver extends InputComponentDriver {
+  get dayInput(): Locator {
+    return this.getByPartName("day");
+  }
+
+  get monthInput(): Locator {
+    return this.getByPartName("month");
+  }
+
+  get yearInput(): Locator {
+    return this.getByPartName("year");
+  }
+
+  get clearButton(): Locator {
+    return this.getByPartName("clearButton");
+  }
+}
+
+export class TimeInputDriver extends InputComponentDriver {
+  get hourInput(): Locator {
+    return this.getByPartName("hour");
+  }
+
+  get minuteInput(): Locator {
+    return this.getByPartName("minute");
+  }
+
+  get secondInput(): Locator {
+    return this.getByPartName("second");
+  }
+
+  get amPmInput(): Locator {
+    return this.getByPartName("ampm");
+  }
+
+  get clearButton(): Locator {
+    return this.getByPartName("clearButton");
+  }
+}
+
 export class CheckboxDriver extends InputComponentDriver {
   get input(): Locator {
     return this.component.locator("input").or(this.component).first();

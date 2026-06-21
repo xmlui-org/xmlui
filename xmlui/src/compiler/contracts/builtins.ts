@@ -12,6 +12,9 @@ import { TextAreaMd } from "../../components/TextArea/TextArea";
 import { NumberBoxMd } from "../../components/NumberBox/NumberBox";
 import { RatingInputMd } from "../../components/RatingInput/RatingInput";
 import { SliderMd } from "../../components/Slider/Slider";
+import { ColorPickerMd } from "../../components/ColorPicker/ColorPicker";
+import { DateInputMd } from "../../components/DateInput/DateInput";
+import { TimeInputMd } from "../../components/TimeInput/TimeInput";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
 import { NoResultMd } from "../../components/NoResult/NoResult";
@@ -288,6 +291,40 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       didChange: "onDidChange",
       gotFocus: "onGotFocus",
       lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(ColorPickerMd, {
+    name: "ColorPicker",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(DateInputMd, {
+    name: "DateInput",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(TimeInputMd, {
+    name: "TimeInput",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+      invalidTime: "onInvalidTime",
     },
   }),
   {

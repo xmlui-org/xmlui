@@ -5,6 +5,7 @@ import type { XmluiElement } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
   isLayoutPropName,
+  looksLikeComponentThemeVariableName,
   parseStyleSelectorKey,
   responsiveBreakpoints,
   resolveResponsiveLayoutStyles,
@@ -98,16 +99,12 @@ export function useThemeOverrideProps(
 ): Record<string, unknown> {
   const variables: Record<string, unknown> = {};
   for (const name of Object.keys(node.props)) {
-    if ((isLayoutPropName(name) && name !== "fontSize" && !looksLikeComponentThemeVariable(name)) || name === "name") {
+    if ((isLayoutPropName(name) && name !== "fontSize" && !looksLikeComponentThemeVariableName(name)) || name === "name") {
       continue;
     }
     variables[name] = useEvaluatedProp(node, scope, name, undefined);
   }
   return variables;
-}
-
-function looksLikeComponentThemeVariable(name: string): boolean {
-  return /-[A-Z][A-Za-z0-9]*(?:-|$)/.test(name);
 }
 
 export function partAttrs(component: string, part = "root"): Record<string, string> {
@@ -159,6 +156,9 @@ function resolveActiveLayoutStyle(
 }
 
 function isResponsiveLayoutPropName(name: string): boolean {
+  if (looksLikeComponentThemeVariableName(name)) {
+    return false;
+  }
   const selector = parseStyleSelectorKey(name);
   return selector.breakpoint !== undefined &&
     supportedLayoutPropNames.includes(selector.property as never);
