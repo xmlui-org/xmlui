@@ -13,7 +13,7 @@ describe("XMLUI extension packages", () => {
       "CounterBadge",
       "XMLUIExtensions.CounterBadge",
     ]);
-    expect(normalized.functionNames).toEqual(["addAmount"]);
+    expect(normalized.functionNames).toEqual(["addAmount", "now"]);
     expect(normalized.renderers.CounterBadge).toBeTypeOf("function");
     expect(normalized.renderers["XMLUIExtensions.CounterBadge"]).toBeTypeOf("function");
   });

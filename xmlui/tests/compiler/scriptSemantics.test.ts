@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { parseScriptEventHandler, parseScriptExpression } from "../../src/parser";
 import { parseXmlui } from "../../src/compiler/parseXmlui";
@@ -412,23 +412,27 @@ describe("XMLUI event-handler JavaScript compilation", () => {
   it("extracts event handler directive prologues into execution options", () => {
     const document = parseXmlui(`<App var.count="{0}" />`);
     const scope = createXmluiScope(document.root);
-    const lowered = lowerScriptEventHandler(parseScriptEventHandler(`"async, queue"; count++`).node, scope);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler(`"async, queue"; "dedicatedYield"; count++`).node, scope);
     const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
 
     expect(lowered.diagnostics).toEqual([]);
     expect(lowered.ir.options).toEqual({
-      directives: ["async", "queue"],
+      directives: ["async", "queue", "dedicatedYield"],
       executionMode: "async",
       schedulingPolicy: "queue",
     });
-    expect(compiled.source).toBe(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).toContain("__xmluiYieldIfNeeded");
     expect(compiled.options).toEqual(lowered.ir.options);
   });
 
   it("diagnoses unknown and conflicting event handler directives", () => {
     const document = parseXmlui(`<App var.count="{0}" />`);
     const scope = createXmluiScope(document.root);
-    const lowered = lowerScriptEventHandler(parseScriptEventHandler(`"sync; async"; "block, queue"; count++`).node, scope);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler(`"sync; async"; "block, queue"; "dedicatedYield"; count++`).node,
+      scope,
+    );
 
     expect(lowered.diagnostics).toEqual(
       expect.arrayContaining([
@@ -439,6 +443,40 @@ describe("XMLUI event-handler JavaScript compilation", () => {
         expect.objectContaining({
           code: "XS206",
           message: "Conflicting XMLUI event handler directives 'block' and 'queue'.",
+        }),
+        expect.objectContaining({
+          code: "XS206",
+          message: "Conflicting XMLUI event handler directives 'sync' and 'dedicatedYield'.",
+        }),
+      ]),
+    );
+  });
+
+  it("omits yield checkpoints for sync handlers", async () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler(`"sync"; count++`).node, scope);
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { count: 0 } });
+
+    expect(lowered.diagnostics).toEqual([]);
+    expect(lowered.ir.options.executionMode).toBe("sync");
+    expect(compiled.source).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).not.toContain("__xmluiYieldIfNeeded");
+    await compiled.execute(context);
+    expect(context.locals.count).toBe(1);
+  });
+
+  it("diagnoses function calls in sync handlers", () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler(`"sync"; delay(1); count++`).node, scope);
+
+    expect(lowered.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XS207",
+          message: "Sync XMLUI event handlers cannot contain async-capable function calls.",
         }),
       ]),
     );
@@ -451,7 +489,8 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
     const context = testContext({ locals: { count: 0 } });
 
-    expect(compiled.source).toBe(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).toContain("__xmluiYieldIfNeeded");
     expect(compiled.invalidates).toEqual([{ kind: "local", name: "count" }]);
     await compiled.execute(context);
     expect(context.locals.count).toBe(1);
@@ -464,7 +503,8 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
     const context = testContext({ globals: { count: 5 } });
 
-    expect(compiled.source).toBe(`ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`);
+    expect(compiled.source).toContain(`ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`);
+    expect(compiled.source).toContain("__xmluiYieldIfNeeded");
     expect(compiled.invalidates).toEqual([{ kind: "global", name: "count" }]);
     await compiled.execute(context);
     expect(context.globals.count).toBe(6);
@@ -539,7 +579,8 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     expect(lowered.diagnostics).toEqual([]);
     expect(compiled.source).toContain("let i = 0;");
     expect(compiled.source).toContain("while (");
-    expect(compiled.source).toContain("XMLUI handler loop guard exceeded");
+    expect(compiled.source).not.toContain("XMLUI handler loop guard exceeded");
+    expect(compiled.source).toContain("__xmluiYieldIfNeeded");
     expect(compiled.source).toContain("ctx.yieldIfNeeded");
     expect(compiled.invalidates).toEqual([
       { kind: "local", name: "total" },
@@ -557,13 +598,50 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     const yielded: number[] = [];
     const context = testContext({ locals: { count: 0 } });
 
+    let now = 0;
+    const nowSpy = vi.spyOn(performance, "now").mockImplementation(() => {
+      now += 101;
+      return now;
+    });
     context.yieldIfNeeded = (iteration) => {
       yielded.push(iteration);
     };
 
-    await compiled.execute(context);
-    expect(yielded).toEqual([1, 2, 3]);
-    expect(context.locals.count).toBe(3);
+    try {
+      await compiled.execute(context);
+      expect(yielded.length).toBeGreaterThan(0);
+      expect(yielded.every((iteration) => iteration === 0)).toBe(true);
+      expect(context.locals.count).toBe(3);
+    } finally {
+      nowSpy.mockRestore();
+    }
+  });
+
+  it("paces fallback execution for long cheap loops", async () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler("let i = 0; while (i < 512) { i++ }; count = i").node, scope);
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const yielded: number[] = [];
+    const context = testContext({ locals: { count: 0 } });
+
+    let now = 0;
+    const nowSpy = vi.spyOn(performance, "now").mockImplementation(() => {
+      now += 101;
+      return now;
+    });
+    context.yieldIfNeeded = (iteration) => {
+      yielded.push(iteration);
+    };
+
+    try {
+      await compiled.execute(context);
+      expect(yielded.length).toBeGreaterThanOrEqual(2);
+      expect(yielded.every((iteration) => iteration === 0)).toBe(true);
+      expect(context.locals.count).toBe(512);
+    } finally {
+      nowSpy.mockRestore();
+    }
   });
 
   it("compiles prefix and decrement updates", async () => {
@@ -665,14 +743,15 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     );
   });
 
-  it("throws when a compiled handler loop exceeds the guard limit", async () => {
+  it("runs loops beyond the old guard limit", async () => {
     const document = parseXmlui(`<App var.count="{0}" />`);
     const scope = createXmluiScope(document.root);
-    const lowered = lowerScriptEventHandler(parseScriptEventHandler("while (true) { count++ }").node, scope);
+    const lowered = lowerScriptEventHandler(parseScriptEventHandler("let i = 0; while (i < 10001) { i++; count++ }").node, scope);
     const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
     const context = testContext({ locals: { count: 0 } });
 
-    await expect(compiled.execute(context)).rejects.toThrow("XMLUI handler loop guard exceeded.");
+    await compiled.execute(context);
+    expect(context.locals.count).toBe(10001);
   });
 
   it("rejects writes to const handler-local variables", () => {

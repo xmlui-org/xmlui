@@ -44,7 +44,7 @@ describe("parseXmlui", () => {
                 },
               ],
             },
-            compiledSource: `ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`,
+            compiledSource: expect.stringContaining(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`),
             invalidates: [{ kind: "local", name: "count" }],
           },
         },

@@ -543,9 +543,13 @@ export function createComponentThemeClass(
   themeVariables: ThemeVariableMap,
   contributors: readonly ComponentMetadata[] = [],
 ): ComponentThemeClass {
-  const mergedThemeVariables = mergeThemeVariableLayers([
+  const baseThemeVariables = mergeThemeVariableLayers([
     collectComponentThemeDefaults(metadata, contributors),
     themeVariables,
+  ]);
+  const mergedThemeVariables = mergeThemeVariableLayers([
+    generateButtonTones(baseThemeVariables),
+    baseThemeVariables,
   ]);
   const style = componentThemeVariablesToCssProperties(
     metadata,
@@ -563,6 +567,102 @@ export function createComponentThemeClass(
       ]),
     ),
   };
+}
+
+export function generateButtonTones(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
+  if (!themeVariables) {
+    return {};
+  }
+  const generated: ThemeVariableMap = {};
+  for (const themeColor of ["primary", "secondary", "attention"]) {
+    const tone = buttonToneReferences(themeColor, themeVariables);
+    Object.assign(generated, {
+      [`backgroundColor-Button-${themeColor}-solid`]: tone.base,
+      [`backgroundColor-Button-${themeColor}-solid--hover`]: tone.hover,
+      [`backgroundColor-Button-${themeColor}-solid--active`]: tone.active,
+      [`borderColor-Button-${themeColor}-solid`]: tone.base,
+      [`borderColor-Button-${themeColor}-solid--hover`]: tone.base,
+      [`borderColor-Button-${themeColor}-solid--active`]: tone.base,
+      [`textColor-Button-${themeColor}-solid`]: tone.contrast,
+      [`textColor-Button-${themeColor}-solid--hover`]: tone.contrast,
+      [`textColor-Button-${themeColor}-solid--active`]: tone.contrast,
+
+      [`backgroundColor-Button-${themeColor}-outlined--hover`]: tone.alphaHover,
+      [`backgroundColor-Button-${themeColor}-outlined--active`]: tone.alphaActive,
+      [`borderColor-Button-${themeColor}-outlined`]: tone.base,
+      [`borderColor-Button-${themeColor}-outlined--hover`]: tone.hover,
+      [`borderColor-Button-${themeColor}-outlined--active`]: tone.active,
+      [`textColor-Button-${themeColor}-outlined`]: tone.base,
+      [`textColor-Button-${themeColor}-outlined--hover`]: tone.hover,
+      [`textColor-Button-${themeColor}-outlined--active`]: tone.active,
+
+      [`backgroundColor-Button-${themeColor}-ghost--hover`]: tone.alphaHover,
+      [`backgroundColor-Button-${themeColor}-ghost--active`]: tone.alphaActive,
+      [`textColor-Button-${themeColor}-ghost`]: tone.base,
+      [`textColor-Button-${themeColor}-ghost--hover`]: tone.hover,
+      [`textColor-Button-${themeColor}-ghost--active`]: tone.active,
+    });
+  }
+  return generated;
+}
+
+function buttonToneReferences(themeColor: string, themeVariables: ThemeVariableMap): {
+  base: string;
+  hover: string;
+  active: string;
+  contrast: string;
+  alphaHover: string;
+  alphaActive: string;
+} {
+  const base = firstThemeReference(themeVariables, [
+    `color-Button-${themeColor}-solid`,
+    `color-Button-${themeColor}`,
+    `backgroundColor-Button-${themeColor}-solid`,
+    `backgroundColor-Button-${themeColor}`,
+    themeColor === "attention" ? "color-attention" : `color-${themeColor}-500`,
+    `color-${themeColor}`,
+  ]) ?? (themeColor === "attention" ? "$color-attention" : `$color-${themeColor}-500`);
+  const hover = firstThemeReference(themeVariables, [
+    `color-Button-${themeColor}-solid--hover`,
+    `backgroundColor-Button-${themeColor}-solid--hover`,
+    `backgroundColor-Button-${themeColor}--hover`,
+    themeColor === "attention" ? "color-danger-400" : `color-${themeColor}-400`,
+  ]) ?? base;
+  const active = firstThemeReference(themeVariables, [
+    `color-Button-${themeColor}-solid--active`,
+    `backgroundColor-Button-${themeColor}-solid--active`,
+    `backgroundColor-Button-${themeColor}--active`,
+    themeColor === "attention" ? "color-attention" : `color-${themeColor}-500`,
+  ]) ?? base;
+  const contrast = firstThemeReference(themeVariables, [
+    `textColor-Button-${themeColor}-solid`,
+    "textColor-Button-solid",
+  ]) ?? "$const-color-surface-50";
+  return {
+    base,
+    hover,
+    active,
+    contrast,
+    alphaHover: alphaThemeColor(base, 0.1),
+    alphaActive: alphaThemeColor(base, 0.2),
+  };
+}
+
+function firstThemeReference(
+  themeVariables: ThemeVariableMap,
+  names: readonly string[],
+): string | undefined {
+  for (const name of names) {
+    const value = themeVariables[name];
+    if (value !== undefined && value !== null && value !== "") {
+      return typeof value === "string" ? value : String(value);
+    }
+  }
+  return undefined;
+}
+
+function alphaThemeColor(value: string, alpha: number): string {
+  return `rgb(from ${resolveThemeReferences(value)} r g b / ${alpha})`;
 }
 
 export function themeVariableFallbackNames(name: string): string[] {

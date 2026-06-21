@@ -194,7 +194,7 @@ describe("script function generation", () => {
     expect(generated.body).toContain("let i = 0;");
     expect(generated.body).toContain(`ctx.writeLocal("count", (ctx.readLocal("count") + 1));`);
     expect(generated.body).toContain("while (");
-    expect(generated.body).toContain("XMLUI handler loop guard exceeded");
+    expect(generated.body).not.toContain("XMLUI handler loop guard exceeded");
     expect(generated.invalidates).toEqual([
       { kind: "local", name: "count" },
       { kind: "local", name: "total" },
@@ -202,6 +202,38 @@ describe("script function generation", () => {
     ]);
     await runGeneratedEvent(generated.functionSource, { locals, globals: {} });
     expect(locals).toEqual({ count: 2, total: 5, label: "done" });
+  });
+
+  it("skips cheap handler-local checkpoints and gates loop pacing", async () => {
+    const event = eventFrom(
+      `<App var.result="{0}"><Button onClick="let sum = 0; let i = 0; while (i <= 300000) { sum += i; i++ }; result = sum" /></App>`,
+    );
+    const generated = generateEventHandlerFunction(event.ir!, event.writes);
+    const locals = { result: 0 };
+
+    expect(generated.body).not.toContain("let sum = 0;\nawait");
+    expect(generated.body).not.toContain("__xmluiResult = sum += i;\nawait");
+    expect(generated.body).not.toContain("__xmluiResult = i++;\nawait");
+    expect(generated.body).toContain("let __xmluiLoopCheckpoint0 = 0;");
+    expect(generated.body).toContain("if (((++__xmluiLoopCheckpoint0) & 255) === 0)");
+    expect(generated.body).toContain(`ctx.writeLocal("result", sum)`);
+    expect(generated.body).toContain(`ctx.writeLocal("result", sum);\nawait __xmluiYieldIfNeeded();`);
+
+    await runGeneratedEvent(generated.functionSource, { locals, globals: {} });
+    expect(locals.result).toBe(45000150000);
+  });
+
+  it("keeps checkpoints after calls and avoids loop counter name collisions", () => {
+    const event = eventFrom(
+      `<App var.result="{0}"><Button onClick="let __xmluiLoopCheckpoint0 = 0; delay(1); while (__xmluiLoopCheckpoint0 < 2) { __xmluiLoopCheckpoint0++ }; result = __xmluiLoopCheckpoint0" /></App>`,
+    );
+    const generated = generateEventHandlerFunction(event.ir!, event.writes);
+
+    expect(generated.body).toContain("__xmluiResult = await ((ctx.delay");
+    expect(generated.body).toContain("await __xmluiYieldIfNeeded();");
+    expect(generated.body).toContain("let __xmluiLoopCheckpoint1 = 0;");
+    expect(generated.body).toContain("if (((++__xmluiLoopCheckpoint1) & 255) === 0)");
+    expect(generated.body).not.toContain("let __xmluiLoopCheckpoint0 = 0;\nwhile");
   });
 
   it("generates executable expression functions for broader expression syntax", () => {
@@ -326,13 +358,11 @@ describe("runtime descriptor attachment and module emission", () => {
       },
     });
     expect(button.parsed.events.click.generatedName).toContain("event_");
-    expect(button.parsed.events.click.compiledSource).toBe(
-      [
-        "let __xmluiResult;",
-        `__xmluiResult = ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
-        "return __xmluiResult;",
-      ].join("\n"),
+    expect(button.parsed.events.click.compiledSource).toContain("__xmluiYieldIfNeeded");
+    expect(button.parsed.events.click.compiledSource).toContain(
+      `__xmluiResult = ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
     );
+    expect(button.parsed.events.click.compiledSource).toContain("return __xmluiResult;");
     expect(text.segments[1].generatedName).toContain("expr_");
     expect(text.segments[1].evaluate(fakeContext({ globals: { count: 3 } }))).toBe(3);
   });

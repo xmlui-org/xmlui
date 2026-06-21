@@ -185,7 +185,7 @@ describe("Compiler IR lowering from analyzed XMLUI documents", () => {
         expect.objectContaining({
           name: "click",
           rawSource: "count++",
-          compiledSource: `ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`,
+          compiledSource: expect.stringContaining(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`),
           invalidates: [{ kind: "local", name: "count" }],
         }),
       ],
@@ -293,7 +293,7 @@ describe("Compiler IR lowering from analyzed XMLUI documents", () => {
     expect(localButton.events[0]).toMatchObject({
       name: "click",
       rawSource: "count++",
-      compiledSource: `ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`,
+      compiledSource: expect.stringContaining(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`),
       writes: [expect.objectContaining({ kind: "local", name: "count" })],
       invalidates: [{ kind: "local", name: "count" }],
     });
@@ -302,7 +302,7 @@ describe("Compiler IR lowering from analyzed XMLUI documents", () => {
     const globalIr = buildCompilerIrFromDocument(globalDocument);
     const globalButton = expectChildren(globalIr.definition.root).children[0];
     expect(globalButton.events[0]).toMatchObject({
-      compiledSource: `ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
+      compiledSource: expect.stringContaining(`ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`),
       writes: [expect.objectContaining({ kind: "global", name: "count" })],
       invalidates: [{ kind: "global", name: "count" }],
     });
@@ -313,7 +313,7 @@ describe("Compiler IR lowering from analyzed XMLUI documents", () => {
     const shadowIr = buildCompilerIrFromDocument(shadowDocument);
     const shadowButton = expectChildren(shadowIr.definition.root).children[0];
     expect(shadowButton.events[0]).toMatchObject({
-      compiledSource: `ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`,
+      compiledSource: expect.stringContaining(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`),
       writes: [expect.objectContaining({ kind: "local", name: "count" })],
     });
   });
