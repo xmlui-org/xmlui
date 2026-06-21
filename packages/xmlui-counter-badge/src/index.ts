@@ -6,6 +6,7 @@ export const counterBadgeExtension: Extension = {
   themeNamespacePrefix: "CounterBadge",
   functions: {
     addAmount: (value: unknown, amount: unknown) => Number(value ?? 0) + Number(amount ?? 0),
+    now: () => (typeof performance !== "undefined" ? performance.now() : Date.now()),
   },
   themes: [
     {
@@ -51,4 +52,3 @@ export const counterBadgeExtension: Extension = {
 };
 
 export default counterBadgeExtension;
-

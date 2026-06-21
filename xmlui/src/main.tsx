@@ -44,6 +44,7 @@ import globalCounterApp from "./examples/counter-globals/Main.xmlui";
 import handlerAssignmentsApp from "./examples/handler-assignments/Main.xmlui";
 import handlerConditionalsApp from "./examples/handler-conditionals/Main.xmlui";
 import handlerLocalsApp from "./examples/handler-locals/Main.xmlui";
+import handlerLoopBenchmarkApp from "./examples/handler-loop-benchmark/Main.xmlui";
 import handlerLoopsApp from "./examples/handler-loops/Main.xmlui";
 import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Main.xmlui";
 import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
@@ -115,6 +116,7 @@ const examples = {
   handlerAssignments: handlerAssignmentsApp,
   handlerConditionals: handlerConditionalsApp,
   handlerLocals: handlerLocalsApp,
+  handlerLoopBenchmark: handlerLoopBenchmarkApp,
   handlerLoops: handlerLoopsApp,
   headingOldCompatibility: headingOldCompatibilityApp,
   htmlTagsFragment: htmlTagsFragmentApp,

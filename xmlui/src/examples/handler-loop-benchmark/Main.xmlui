@@ -1,0 +1,32 @@
+<App
+  var.asyncResult="{0}"
+  var.asyncElapsed="{0}"
+  var.asyncStatus="{'idle'}"
+  var.syncResult="{0}"
+  var.syncElapsed="{0}"
+  var.syncStatus="{'idle'}"
+>
+  <H1>Handler loop benchmark</H1>
+
+  <H2>Async checkpoints</H2>
+  <Text testId="async-benchmark-status" value="{'status: ' + asyncStatus}" />
+  <Text testId="async-benchmark-sum" value="{'sum: ' + asyncResult}" />
+  <Text testId="async-benchmark-elapsed" value="{'elapsed ms: ' + asyncElapsed}" />
+  <Button
+    testId="run-async-benchmark"
+    onClick="'async'; asyncStatus = 'running'; let start = now(); let sum = 0; let i = 0; while (i <= 300000) { sum += i; i++ }; let end = now(); asyncResult = sum; asyncElapsed = end - start; asyncStatus = 'done'"
+  >
+    Run async benchmark
+  </Button>
+
+  <H2>Sync checkpoints omitted</H2>
+  <Text testId="sync-benchmark-status" value="{'status: ' + syncStatus}" />
+  <Text testId="sync-benchmark-sum" value="{'sum: ' + syncResult}" />
+  <Text testId="sync-benchmark-elapsed" value="{'elapsed ms: ' + syncElapsed}" />
+  <Button
+    testId="run-sync-benchmark"
+    onClick="'sync'; syncStatus = 'running'; let start = now(); let sum = 0; let i = 0; while (i <= 300000) { sum += i; i++ }; let end = now(); syncResult = sum; syncElapsed = end - start; syncStatus = 'done'"
+  >
+    Run sync benchmark
+  </Button>
+</App>

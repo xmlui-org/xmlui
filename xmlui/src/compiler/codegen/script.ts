@@ -12,6 +12,7 @@ import type {
   XmluiVariableDeclarationIr,
   XmluiWhileStatementIr,
 } from "../scriptSemantics";
+import { handlerUsesSharedYield, loopNeedsPacing, statementNeedsCheckpoint } from "../eventHandlerAnalysis";
 import { emitFunctionExpression } from "./emitter";
 
 export type GeneratedExpressionFunctionSource = {
@@ -25,6 +26,15 @@ export type GeneratedEventFunctionSource = {
   invalidates: Array<{ kind: "local" | "global"; name: string }>;
 };
 
+export type SharedYieldHelperOptions = {
+  createStateName: string;
+  checkpointName: string;
+};
+
+export type GenerateEventHandlerFunctionOptions = {
+  yieldHelper?: "inline" | "none" | SharedYieldHelperOptions;
+};
+
 export function generateExpressionFunction(ir: XmluiScriptIr): GeneratedExpressionFunctionSource {
   const body = `return ${emitExpression(ir)};`;
   return {
@@ -36,10 +46,17 @@ export function generateExpressionFunction(ir: XmluiScriptIr): GeneratedExpressi
 export function generateEventHandlerFunction(
   ir: XmluiEventHandlerIr,
   writes: readonly BoundWriteTarget[] = [],
+  options: GenerateEventHandlerFunctionOptions = {},
 ): GeneratedEventFunctionSource {
+  const context = createEventCodegenContext(
+    ir.options.executionMode === "sync" ? "none" : options.yieldHelper ?? "inline",
+    collectHandlerLocalNames(ir.body),
+  );
   const body = [
+    ...context.prologue,
+    context.stateDeclaration,
     "let __xmluiResult;",
-    ...ir.body.map((statement) => emitEventStatement(statement)),
+    ...ir.body.map((statement) => emitEventStatement(statement, context)),
     "return __xmluiResult;",
   ].join("\n");
   return {
@@ -50,6 +67,86 @@ export function generateEventHandlerFunction(
         write.kind === "local" || write.kind === "global",
       )
       .map((write) => ({ kind: write.kind, name: write.name }))),
+  };
+}
+
+type EventCodegenContext = {
+  prologue: string[];
+  stateDeclaration: string;
+  checkpointCall: string;
+  allocateLoopCheckpointName(): string;
+};
+
+export function emitSharedYieldHelperSource({
+  createStateName,
+  checkpointName,
+}: SharedYieldHelperOptions = {
+  createStateName: "__xmluiCreateYieldState",
+  checkpointName: "__xmluiYieldIfNeeded",
+}): string {
+  return [
+    `const __xmluiNow = () => typeof performance !== "undefined" ? performance.now() : Date.now();`,
+    `const ${createStateName} = () => ({ lastYield: __xmluiNow() });`,
+    `const ${checkpointName} = async (ctx, state) => {`,
+    `const __xmluiElapsed = __xmluiNow() - state.lastYield;`,
+    `if (__xmluiElapsed < 100) return;`,
+    `await ((ctx.yieldIfNeeded ?? (() => new Promise((resolve) => setTimeout(resolve, 0))))(0));`,
+    `state.lastYield = __xmluiNow();`,
+    `};`,
+  ].join("\n");
+}
+
+export { handlerUsesSharedYield };
+
+function inlineYieldPrologue(): string[] {
+  return [
+    `const __xmluiNow = () => typeof performance !== "undefined" ? performance.now() : Date.now();`,
+    `let __xmluiLastYield = __xmluiNow();`,
+    `const __xmluiYieldIfNeeded = async () => {`,
+    `const __xmluiElapsed = __xmluiNow() - __xmluiLastYield;`,
+    `if (__xmluiElapsed < 100) return;`,
+    `await ((ctx.yieldIfNeeded ?? (() => new Promise((resolve) => setTimeout(resolve, 0))))(0));`,
+    `__xmluiLastYield = __xmluiNow();`,
+    `};`,
+  ];
+}
+
+function createEventCodegenContext(
+  yieldHelper: "inline" | "none" | SharedYieldHelperOptions,
+  userNames: Set<string>,
+): EventCodegenContext {
+  const usedNames = new Set(userNames);
+  let nextLoopCheckpointId = 0;
+  const allocateLoopCheckpointName = () => {
+    while (true) {
+      const name = `__xmluiLoopCheckpoint${nextLoopCheckpointId++}`;
+      if (!usedNames.has(name)) {
+        usedNames.add(name);
+        return name;
+      }
+    }
+  };
+  if (yieldHelper === "none") {
+    return {
+      prologue: [],
+      stateDeclaration: "",
+      checkpointCall: "",
+      allocateLoopCheckpointName,
+    };
+  }
+  if (yieldHelper !== "inline") {
+    return {
+      prologue: [],
+      stateDeclaration: `const __xmluiYieldState = ${yieldHelper.createStateName}();`,
+      checkpointCall: `await ${yieldHelper.checkpointName}(ctx, __xmluiYieldState);`,
+      allocateLoopCheckpointName,
+    };
+  }
+  return {
+    prologue: inlineYieldPrologue(),
+    stateDeclaration: "",
+    checkpointCall: "await __xmluiYieldIfNeeded();",
+    allocateLoopCheckpointName,
   };
 }
 
@@ -110,18 +207,25 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
   return `(${objectSource})?.[${JSON.stringify(ir.callee.member)}]?.(${args})`;
 }
 
-function emitEventStatement(statement: XmluiHandlerStatementIr): string {
+function emitEventStatement(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
+  const emitted = emitEventStatementBody(statement, context);
+  return context.checkpointCall && statementNeedsCheckpoint(statement)
+    ? `${emitted}\n${context.checkpointCall}`
+    : emitted;
+}
+
+function emitEventStatementBody(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
   switch (statement.kind) {
     case "ExpressionStatement":
       return `__xmluiResult = ${emitEventExpression(statement.expression)};`;
     case "VariableDeclaration":
       return emitVariableDeclaration(statement);
     case "BlockStatement":
-      return emitBlockStatement(statement);
+      return emitBlockStatement(statement, context);
     case "IfStatement":
-      return emitIfStatement(statement);
+      return emitIfStatement(statement, context);
     case "WhileStatement":
-      return emitWhileStatement(statement);
+      return emitWhileStatement(statement, context);
   }
 }
 
@@ -178,22 +282,26 @@ function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string 
   return `${statement.declarationKind} ${declarations};`;
 }
 
-function emitBlockStatement(statement: XmluiBlockStatementIr): string {
-  return `{\n${statement.body.map((child) => emitEventStatement(child)).join("\n")}\n}`;
+function emitBlockStatement(statement: XmluiBlockStatementIr, context: EventCodegenContext): string {
+  return `{\n${statement.body.map((child) => emitEventStatement(child, context)).join("\n")}\n}`;
 }
 
-function emitIfStatement(statement: XmluiIfStatementIr): string {
-  const consequent = emitStatementBlock(statement.consequent);
-  const alternate = statement.alternate ? ` else ${emitStatementBlock(statement.alternate)}` : "";
+function emitIfStatement(statement: XmluiIfStatementIr, context: EventCodegenContext): string {
+  const consequent = emitStatementBlock(statement.consequent, context);
+  const alternate = statement.alternate ? ` else ${emitStatementBlock(statement.alternate, context)}` : "";
   return `if (${emitAsyncExpression(statement.test)}) ${consequent}${alternate}`;
 }
 
-function emitWhileStatement(statement: XmluiWhileStatementIr): string {
-  return `{\nlet __xmluiLoopGuard = 0;\nwhile (${emitAsyncExpression(statement.test)}) {\nif (++__xmluiLoopGuard > 10000) throw new Error("XMLUI handler loop guard exceeded.");\nawait ((ctx.yieldIfNeeded ?? ((iteration) => iteration % 100 === 0 ? new Promise((resolve) => setTimeout(resolve, 0)) : undefined))(__xmluiLoopGuard));\n${emitEventStatement(statement.body)}\n}\n}`;
+function emitWhileStatement(statement: XmluiWhileStatementIr, context: EventCodegenContext): string {
+  if (!context.checkpointCall || !loopNeedsPacing(statement)) {
+    return `{\nwhile (${emitAsyncExpression(statement.test)}) {\n${emitEventStatement(statement.body, context)}\n}\n}`;
+  }
+  const checkpointName = context.allocateLoopCheckpointName();
+  return `{\nlet ${checkpointName} = 0;\nwhile (${emitAsyncExpression(statement.test)}) {\n${emitEventStatement(statement.body, context)}\nif (((++${checkpointName}) & 255) === 0) {\n${context.checkpointCall}\n}\n}\n}`;
 }
 
-function emitStatementBlock(statement: XmluiHandlerStatementIr): string {
-  return statement.kind === "BlockStatement" ? emitBlockStatement(statement) : `{\n${emitEventStatement(statement)}\n}`;
+function emitStatementBlock(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
+  return statement.kind === "BlockStatement" ? emitBlockStatement(statement, context) : `{\n${emitEventStatement(statement, context)}\n}`;
 }
 
 function emitAssignmentExpression(expression: XmluiAssignmentExpressionIr): string {
@@ -293,4 +401,33 @@ function isAllowedMethodName(name: string): boolean {
     "scrollToStart",
     "scrollToEnd",
   ].includes(name);
+}
+
+function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]): Set<string> {
+  const names = new Set<string>();
+  const visit = (statement: XmluiHandlerStatementIr) => {
+    switch (statement.kind) {
+      case "VariableDeclaration":
+        for (const declaration of statement.declarations) {
+          names.add(declaration.name);
+        }
+        break;
+      case "BlockStatement":
+        statement.body.forEach(visit);
+        break;
+      case "IfStatement":
+        visit(statement.consequent);
+        if (statement.alternate) {
+          visit(statement.alternate);
+        }
+        break;
+      case "WhileStatement":
+        visit(statement.body);
+        break;
+      case "ExpressionStatement":
+        break;
+    }
+  };
+  statements.forEach(visit);
+  return names;
 }

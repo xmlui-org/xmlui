@@ -109,6 +109,23 @@ $fontWeight-Button-attention-outlined: createThemeVar("fontWeight-Button-attenti
 $fontWeight-Button-primary-ghost: createThemeVar("fontWeight-Button-primary-ghost");
 $fontWeight-Button-secondary-ghost: createThemeVar("fontWeight-Button-secondary-ghost");
 $fontWeight-Button-attention-ghost: createThemeVar("fontWeight-Button-attention-ghost");
+$backgroundColor-Button-primary-solid--hover: createThemeVar("backgroundColor-Button-primary-solid--hover");
+$borderColor-Button-primary-solid--hover: createThemeVar("borderColor-Button-primary-solid--hover");
+$textColor-Button-primary-solid--hover: createThemeVar("textColor-Button-primary-solid--hover");
+$backgroundColor-Button-primary-solid--active: createThemeVar("backgroundColor-Button-primary-solid--active");
+$borderColor-Button-primary-solid--active: createThemeVar("borderColor-Button-primary-solid--active");
+$textColor-Button-primary-solid--active: createThemeVar("textColor-Button-primary-solid--active");
+$boxShadow-Button-primary-solid--active: createThemeVar("boxShadow-Button-primary-solid--active");
+$backgroundColor-Button-primary-outlined--hover: createThemeVar("backgroundColor-Button-primary-outlined--hover");
+$borderColor-Button-primary-outlined--hover: createThemeVar("borderColor-Button-primary-outlined--hover");
+$textColor-Button-primary-outlined--hover: createThemeVar("textColor-Button-primary-outlined--hover");
+$backgroundColor-Button-primary-outlined--active: createThemeVar("backgroundColor-Button-primary-outlined--active");
+$borderColor-Button-primary-outlined--active: createThemeVar("borderColor-Button-primary-outlined--active");
+$textColor-Button-primary-outlined--active: createThemeVar("textColor-Button-primary-outlined--active");
+$backgroundColor-Button-primary-ghost--hover: createThemeVar("backgroundColor-Button-primary-ghost--hover");
+$textColor-Button-primary-ghost--hover: createThemeVar("textColor-Button-primary-ghost--hover");
+$backgroundColor-Button-primary-ghost--active: createThemeVar("backgroundColor-Button-primary-ghost--active");
+$textColor-Button-primary-ghost--active: createThemeVar("textColor-Button-primary-ghost--active");
 $backgroundColor-Button-primary--hover: createThemeVar("backgroundColor-Button-primary--hover");
 $backgroundColor-Button-primary--active: createThemeVar("backgroundColor-Button-primary--active");
 $backgroundColor-Button--disabled: createThemeVar("backgroundColor-Button--disabled");
@@ -331,38 +348,38 @@ $outlineOffset-Button--focus: createThemeVar("outlineOffset-Button--focus");
   }
 
   .solidPrimary:not([disabled]):hover {
-    border-color: var(--xmlui-borderColor-Button-primary-solid--hover);
-    color: var(--xmlui-textColor-Button-primary-solid--hover);
-    background: var(--xmlui-backgroundColor-Button-primary-solid--hover);
+    border-color: var(--xmlui-borderColor-Button-primary-solid--hover, var(--xmlui-borderColor-Button-primary-solid, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button))));
+    color: var(--xmlui-textColor-Button-primary-solid--hover, var(--xmlui-textColor-Button-primary-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button))));
+    background: var(--xmlui-backgroundColor-Button-primary-solid--hover, var(--xmlui-backgroundColor-Button-primary--hover, var(--xmlui-backgroundColor-Button-primary-solid, var(--xmlui-backgroundColor-Button-primary, var(--xmlui-backgroundColor-Button)))));
   }
 
   .outlinedPrimary:not([disabled]):hover {
-    border-color: var(--xmlui-borderColor-Button-primary-outlined--hover);
-    background: var(--xmlui-backgroundColor-Button-primary-outlined--hover);
-    color: var(--xmlui-textColor-Button-primary-outlined--hover);
+    border-color: var(--xmlui-borderColor-Button-primary-outlined--hover, var(--xmlui-borderColor-Button-primary-outlined, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button))));
+    background: var(--xmlui-backgroundColor-Button-primary-outlined--hover, transparent);
+    color: var(--xmlui-textColor-Button-primary-outlined--hover, var(--xmlui-textColor-Button-primary-outlined, var(--xmlui-textColor-Button)));
   }
 
   .ghostPrimary:not([disabled]):hover {
-    background: var(--xmlui-backgroundColor-Button-primary-ghost--hover);
-    color: var(--xmlui-textColor-Button-primary-ghost--hover);
+    background: var(--xmlui-backgroundColor-Button-primary-ghost--hover, transparent);
+    color: var(--xmlui-textColor-Button-primary-ghost--hover, var(--xmlui-textColor-Button-primary-ghost, var(--xmlui-textColor-Button)));
   }
 
   .solidPrimary:not([disabled]):active {
-    border-color: var(--xmlui-borderColor-Button-primary-solid--active);
-    color: var(--xmlui-textColor-Button-primary-solid--active);
+    border-color: var(--xmlui-borderColor-Button-primary-solid--active, var(--xmlui-borderColor-Button-primary-solid, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button))));
+    color: var(--xmlui-textColor-Button-primary-solid--active, var(--xmlui-textColor-Button-primary-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button))));
     box-shadow: var(--xmlui-boxShadow-Button-primary-solid--active);
-    background: var(--xmlui-backgroundColor-Button-primary-solid--active);
+    background: var(--xmlui-backgroundColor-Button-primary-solid--active, var(--xmlui-backgroundColor-Button-primary--active, var(--xmlui-backgroundColor-Button-primary-solid, var(--xmlui-backgroundColor-Button-primary, var(--xmlui-backgroundColor-Button)))));
   }
 
   .outlinedPrimary:not([disabled]):active {
-    border-color: var(--xmlui-borderColor-Button-primary-outlined--active);
-    background: var(--xmlui-backgroundColor-Button-primary-outlined--active);
-    color: var(--xmlui-textColor-Button-primary-outlined--active);
+    border-color: var(--xmlui-borderColor-Button-primary-outlined--active, var(--xmlui-borderColor-Button-primary-outlined, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button))));
+    background: var(--xmlui-backgroundColor-Button-primary-outlined--active, transparent);
+    color: var(--xmlui-textColor-Button-primary-outlined--active, var(--xmlui-textColor-Button-primary-outlined, var(--xmlui-textColor-Button)));
   }
 
   .ghostPrimary:not([disabled]):active {
-    background: var(--xmlui-backgroundColor-Button-primary-ghost--active);
-    color: var(--xmlui-textColor-Button-primary-ghost--active);
+    background: var(--xmlui-backgroundColor-Button-primary-ghost--active, transparent);
+    color: var(--xmlui-textColor-Button-primary-ghost--active, var(--xmlui-textColor-Button-primary-ghost, var(--xmlui-textColor-Button)));
   }
 
   .icon {

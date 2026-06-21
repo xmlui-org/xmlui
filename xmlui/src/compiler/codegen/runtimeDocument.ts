@@ -8,7 +8,17 @@ import type {
   XmluiNodeIr,
 } from "../ir/index";
 import { rawJs, type EmitJsValue } from "./emitter";
-import { generateEventHandlerFunction, generateExpressionFunction } from "./script";
+import {
+  generateEventHandlerFunction,
+  generateExpressionFunction,
+  handlerUsesSharedYield,
+  type SharedYieldHelperOptions,
+} from "./script";
+
+const SHARED_YIELD_HELPER: SharedYieldHelperOptions = {
+  createStateName: "__xmluiCreateYieldState",
+  checkpointName: "__xmluiYieldIfNeeded",
+};
 
 export function emitRuntimeDocumentFromIr(module: XmluiModuleIr): EmitJsValue {
   const root = emitRuntimeNode(module.definition.root);
@@ -154,7 +164,13 @@ function emitRuntimeExpression(
 }
 
 function emitRuntimeEvent(event: XmluiEventIr): EmitJsValue {
-  const generated = generateEventHandlerFunction(event.ir, event.writes);
+  const generated = generateEventHandlerFunction(event.ir, event.writes, {
+    yieldHelper: event.ir.options.executionMode === "sync"
+      ? "none"
+      : handlerUsesSharedYield(event.ir)
+        ? SHARED_YIELD_HELPER
+        : "inline",
+  });
   return {
     source: event.rawSource,
     ast: event.ast,

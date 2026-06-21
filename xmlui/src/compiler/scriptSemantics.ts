@@ -1,5 +1,6 @@
 import { createErrorDiagnostic, type ParserDiagnostic, type ScriptNode } from "../parser";
 import type { SourceSpan } from "../parser";
+import { loopNeedsPacing, statementNeedsCheckpoint } from "./eventHandlerAnalysis";
 import type { XmluiElement } from "./ir";
 
 export type XmluiBindingKind = "local" | "global" | "props" | "special" | "context" | "reference";
@@ -233,7 +234,7 @@ export type XmluiHandlerExecutionMode = "sync" | "async";
 
 export type XmluiHandlerSchedulingPolicy = "parallel" | "drop-while-running" | "queue";
 
-export type XmluiHandlerDirective = "sync" | "async" | "block" | "queue";
+export type XmluiHandlerDirective = "sync" | "async" | "block" | "queue" | "dedicatedYield";
 
 export type XmluiHandlerOptions = {
   directives: XmluiHandlerDirective[];
@@ -688,6 +689,7 @@ export function lowerScriptEventHandler(
       : [node];
   const prologue = extractHandlerDirectivePrologue(bodyNodes, bound);
   const body = prologue.body.map((statement) => lowerHandlerStatement(statement, bound));
+  diagnoseSyncHandlerSafety(prologue.options, body, bound);
 
   return {
     ...bound,
@@ -714,9 +716,17 @@ export function compileXmluiEventHandler(
   dependencies: BoundDependency[] = [],
   writes: BoundWriteTarget[] = [],
 ): CompiledEventHandler {
+  const context = createEventCodegenContext(
+    ir.options.executionMode === "sync",
+    collectHandlerLocalNames(ir.body),
+  );
+  const source = [
+    ...context.prologue,
+    ...ir.body.map((statement) => emitEventStatement(statement, context)),
+  ].join("\n");
   return {
     kind: "eventHandler",
-    source: ir.body.map((statement) => emitEventStatement(statement)).join("\n"),
+    source,
     options: ir.options,
     dependencies,
     writes,
@@ -727,13 +737,50 @@ export function compileXmluiEventHandler(
       .map((write) => ({ kind: write.kind, name: write.name }))),
     execute: async (context) => {
       const lexical: Record<string, unknown> = {};
+      const yieldState = ir.options.executionMode === "sync" ? undefined : createEventYieldState();
       let result: unknown;
       for (const statement of ir.body) {
-        result = await executeEventStatement(statement, context, lexical);
+        result = await executeEventStatement(statement, context, lexical, yieldState);
       }
       return result;
     },
   };
+}
+
+type EventCodegenContext = {
+  prologue: string[];
+  checkpointCall: string;
+  allocateLoopCheckpointName(): string;
+};
+
+function createEventCodegenContext(sync: boolean, userNames: Set<string>): EventCodegenContext {
+  const usedNames = new Set(userNames);
+  let nextLoopCheckpointId = 0;
+  const allocateLoopCheckpointName = () => {
+    while (true) {
+      const name = `__xmluiLoopCheckpoint${nextLoopCheckpointId++}`;
+      if (!usedNames.has(name)) {
+        usedNames.add(name);
+        return name;
+      }
+    }
+  };
+  return sync
+    ? { prologue: [], checkpointCall: "", allocateLoopCheckpointName }
+    : { prologue: eventYieldPrologue(), checkpointCall: "await __xmluiYieldIfNeeded();", allocateLoopCheckpointName };
+}
+
+function eventYieldPrologue(): string[] {
+  return [
+    `const __xmluiNow = () => typeof performance !== "undefined" ? performance.now() : Date.now();`,
+    `let __xmluiLastYield = __xmluiNow();`,
+    `const __xmluiYieldIfNeeded = async () => {`,
+    `const __xmluiElapsed = __xmluiNow() - __xmluiLastYield;`,
+    `if (__xmluiElapsed < 100) return;`,
+    `await ((ctx.yieldIfNeeded ?? (() => new Promise((resolve) => setTimeout(resolve, 0))))(0));`,
+    `__xmluiLastYield = __xmluiNow();`,
+    `};`,
+  ];
 }
 
 function defaultHandlerOptions(): XmluiHandlerOptions {
@@ -790,7 +837,11 @@ function splitHandlerDirective(value: string): string[] {
 }
 
 function isHandlerDirective(value: string): value is XmluiHandlerDirective {
-  return value === "sync" || value === "async" || value === "block" || value === "queue";
+  return value === "sync" ||
+    value === "async" ||
+    value === "block" ||
+    value === "queue" ||
+    value === "dedicatedYield";
 }
 
 function handlerOptionsFromDirectives(
@@ -813,6 +864,16 @@ function handlerOptionsFromDirectives(
       createErrorDiagnostic(
         "XS206",
         "Conflicting XMLUI event handler directives 'sync' and 'async'.",
+        span ?? fallbackSpan(bound.node),
+      ),
+    );
+  }
+
+  if (unique.includes("sync") && unique.includes("dedicatedYield")) {
+    bound.diagnostics.push(
+      createErrorDiagnostic(
+        "XS206",
+        "Conflicting XMLUI event handler directives 'sync' and 'dedicatedYield'.",
         span ?? fallbackSpan(bound.node),
       ),
     );
@@ -1061,12 +1122,124 @@ function eventHandlerIrFromProgram(
   bound: BoundScriptResult,
 ): XmluiEventHandlerIr {
   const prologue = extractHandlerDirectivePrologue(node.body, bound);
+  const body = prologue.body.map((statement) => lowerHandlerStatement(statement, bound));
+  diagnoseSyncHandlerSafety(prologue.options, body, bound);
   return {
     kind: "EventHandler",
     span: node.span,
     options: prologue.options,
-    body: prologue.body.map((statement) => lowerHandlerStatement(statement, bound)),
+    body,
   };
+}
+
+function diagnoseSyncHandlerSafety(
+  options: XmluiHandlerOptions,
+  body: readonly XmluiHandlerStatementIr[],
+  bound: BoundScriptResult,
+): void {
+  if (options.executionMode !== "sync") {
+    return;
+  }
+  for (const statement of body) {
+    const unsafe = findSyncUnsafeStatement(statement);
+    if (!unsafe) {
+      continue;
+    }
+    bound.diagnostics.push(
+      createErrorDiagnostic("XS207", unsafe.message, unsafe.span),
+    );
+  }
+}
+
+function findSyncUnsafeStatement(
+  statement: XmluiHandlerStatementIr,
+): { message: string; span: SourceSpan } | undefined {
+  switch (statement.kind) {
+    case "ExpressionStatement":
+      return expressionContainsSyncUnsafeCall(statement.expression)
+        ? {
+            message: "Sync XMLUI event handlers cannot contain async-capable function calls.",
+            span: statement.expression.span,
+          }
+        : undefined;
+    case "VariableDeclaration": {
+      const declaration = statement.declarations.find((item) =>
+        item.init ? expressionContainsSyncUnsafeCall(item.init) : false,
+      );
+      return declaration?.init
+        ? {
+            message: "Sync XMLUI event handlers cannot contain async-capable function calls.",
+            span: declaration.init.span,
+          }
+        : undefined;
+    }
+    case "BlockStatement":
+      return statement.body.map(findSyncUnsafeStatement).find(Boolean);
+    case "IfStatement":
+      return expressionContainsSyncUnsafeCall(statement.test)
+        ? {
+            message: "Sync XMLUI event handlers cannot contain async-capable function calls.",
+            span: statement.test.span,
+          }
+        : findSyncUnsafeStatement(statement.consequent) ??
+            (statement.alternate ? findSyncUnsafeStatement(statement.alternate) : undefined);
+    case "WhileStatement":
+      return undefined;
+  }
+}
+
+function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
+  switch (expression.kind) {
+    case "CallExpression":
+      return isSyncUnsafeCall(expression) ||
+        expressionContainsSyncUnsafeCall(expression.callee) ||
+        expression.args.some(expressionContainsSyncUnsafeCall);
+    case "MemberRead":
+      return expressionContainsSyncUnsafeCall(expression.object);
+    case "IndexRead":
+      return expressionContainsSyncUnsafeCall(expression.object) ||
+        expressionContainsSyncUnsafeCall(expression.index);
+    case "LogicalExpression":
+    case "BinaryExpression":
+      return expressionContainsSyncUnsafeCall(expression.left) ||
+        expressionContainsSyncUnsafeCall(expression.right);
+    case "UnaryExpression":
+      return expressionContainsSyncUnsafeCall(expression.argument);
+    case "ConditionalExpression":
+      return expressionContainsSyncUnsafeCall(expression.test) ||
+        expressionContainsSyncUnsafeCall(expression.consequent) ||
+        expressionContainsSyncUnsafeCall(expression.alternate);
+    case "ArrayExpression":
+      return expression.elements.some(expressionContainsSyncUnsafeCall);
+    case "ObjectExpression":
+      return expression.properties.some((property) =>
+        expressionContainsSyncUnsafeCall(property.value)
+      );
+    case "ArrowFunctionExpression":
+      return expressionContainsSyncUnsafeCall(expression.body);
+    case "AssignmentExpression":
+      return expressionContainsSyncUnsafeCall(expression.right);
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+    case "LiteralExpression":
+    case "IdentifierRead":
+    case "ScopedMemberRead":
+    case "ExpressionStatement":
+    case "VariableDeclaration":
+    case "BlockStatement":
+    case "IfStatement":
+    case "WhileStatement":
+    case "EventHandler":
+    case "Unsupported":
+      return false;
+  }
+}
+
+function isSyncUnsafeCall(expression: Extract<XmluiScriptIr, { kind: "CallExpression" }>): boolean {
+  return expression.callee.kind === "IdentifierRead" &&
+    (expression.callee.name === "delay" ||
+      expression.callee.name === "emitEvent" ||
+      expression.callee.name === "navigate");
 }
 
 function lowerHandlerStatement(
@@ -1470,18 +1643,25 @@ function emitCallExpression(ir: XmluiCallExpressionIr): string {
   return `(${objectSource})?.[${JSON.stringify(ir.callee.member)}]?.(${args})`;
 }
 
-function emitEventStatement(statement: XmluiHandlerStatementIr): string {
+function emitEventStatement(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
+  const emitted = emitEventStatementBody(statement, context);
+  return context.checkpointCall && statementNeedsCheckpoint(statement)
+    ? `${emitted}\n${context.checkpointCall}`
+    : emitted;
+}
+
+function emitEventStatementBody(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
   switch (statement.kind) {
     case "ExpressionStatement":
       return `${emitEventExpression(statement.expression)};`;
     case "VariableDeclaration":
       return emitVariableDeclaration(statement);
     case "BlockStatement":
-      return emitBlockStatement(statement);
+      return emitBlockStatement(statement, context);
     case "IfStatement":
-      return emitIfStatement(statement);
+      return emitIfStatement(statement, context);
     case "WhileStatement":
-      return emitWhileStatement(statement);
+      return emitWhileStatement(statement, context);
   }
 }
 
@@ -1538,22 +1718,26 @@ function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string 
   return `${statement.declarationKind} ${declarations};`;
 }
 
-function emitBlockStatement(statement: XmluiBlockStatementIr): string {
-  return `{\n${statement.body.map((child) => emitEventStatement(child)).join("\n")}\n}`;
+function emitBlockStatement(statement: XmluiBlockStatementIr, context: EventCodegenContext): string {
+  return `{\n${statement.body.map((child) => emitEventStatement(child, context)).join("\n")}\n}`;
 }
 
-function emitIfStatement(statement: XmluiIfStatementIr): string {
-  const consequent = emitStatementBlock(statement.consequent);
-  const alternate = statement.alternate ? ` else ${emitStatementBlock(statement.alternate)}` : "";
+function emitIfStatement(statement: XmluiIfStatementIr, context: EventCodegenContext): string {
+  const consequent = emitStatementBlock(statement.consequent, context);
+  const alternate = statement.alternate ? ` else ${emitStatementBlock(statement.alternate, context)}` : "";
   return `if (${emitAsyncExpression(statement.test)}) ${consequent}${alternate}`;
 }
 
-function emitWhileStatement(statement: XmluiWhileStatementIr): string {
-  return `{\nlet __xmluiLoopGuard = 0;\nwhile (${emitAsyncExpression(statement.test)}) {\nif (++__xmluiLoopGuard > 10000) throw new Error("XMLUI handler loop guard exceeded.");\nawait ((ctx.yieldIfNeeded ?? ((iteration) => iteration % 100 === 0 ? new Promise((resolve) => setTimeout(resolve, 0)) : undefined))(__xmluiLoopGuard));\n${emitEventStatement(statement.body)}\n}\n}`;
+function emitWhileStatement(statement: XmluiWhileStatementIr, context: EventCodegenContext): string {
+  if (!context.checkpointCall || !loopNeedsPacing(statement)) {
+    return `{\nwhile (${emitAsyncExpression(statement.test)}) {\n${emitEventStatement(statement.body, context)}\n}\n}`;
+  }
+  const checkpointName = context.allocateLoopCheckpointName();
+  return `{\nlet ${checkpointName} = 0;\nwhile (${emitAsyncExpression(statement.test)}) {\n${emitEventStatement(statement.body, context)}\nif (((++${checkpointName}) & 255) === 0) {\n${context.checkpointCall}\n}\n}\n}`;
 }
 
-function emitStatementBlock(statement: XmluiHandlerStatementIr): string {
-  return statement.kind === "BlockStatement" ? emitBlockStatement(statement) : `{\n${emitEventStatement(statement)}\n}`;
+function emitStatementBlock(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
+  return statement.kind === "BlockStatement" ? emitBlockStatement(statement, context) : `{\n${emitEventStatement(statement, context)}\n}`;
 }
 
 function emitAssignmentExpression(expression: XmluiAssignmentExpressionIr): string {
@@ -1912,10 +2096,35 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
-function defaultYieldIfNeeded(iteration: number): Promise<void> | undefined {
-  if (iteration % 100 !== 0) {
-    return undefined;
+type EventYieldState = {
+  lastYield: number;
+};
+
+function createEventYieldState(): EventYieldState {
+  return {
+    lastYield: currentTimestamp(),
+  };
+}
+
+function currentTimestamp(): number {
+  return typeof performance !== "undefined" ? performance.now() : Date.now();
+}
+
+async function yieldAfterStatementIfNeeded(
+  context: CompiledEventContext,
+  state: EventYieldState | undefined,
+): Promise<void> {
+  if (!state) {
+    return;
   }
+  if (currentTimestamp() - state.lastYield < 100) {
+    return;
+  }
+  await (context.yieldIfNeeded ?? defaultYieldIfNeeded)(0);
+  state.lastYield = currentTimestamp();
+}
+
+function defaultYieldIfNeeded(_iteration: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
@@ -1923,6 +2132,20 @@ async function executeEventStatement(
   statement: XmluiHandlerStatementIr,
   context: CompiledEventContext,
   lexical: Record<string, unknown>,
+  yieldState: EventYieldState | undefined,
+): Promise<unknown> {
+  const result = await executeEventStatementBody(statement, context, lexical, yieldState);
+  if (statementNeedsCheckpoint(statement)) {
+    await yieldAfterStatementIfNeeded(context, yieldState);
+  }
+  return result;
+}
+
+async function executeEventStatementBody(
+  statement: XmluiHandlerStatementIr,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+  yieldState: EventYieldState | undefined,
 ): Promise<unknown> {
   switch (statement.kind) {
     case "ExpressionStatement":
@@ -1934,29 +2157,29 @@ async function executeEventStatement(
           : undefined;
       }
       return undefined;
-    case "BlockStatement":
+    case "BlockStatement": {
       const blockLexical = Object.create(lexical) as Record<string, unknown>;
       let blockResult: unknown;
       for (const child of statement.body) {
-        blockResult = await executeEventStatement(child, context, blockLexical);
+        blockResult = await executeEventStatement(child, context, blockLexical, yieldState);
       }
       return blockResult;
+    }
     case "IfStatement":
       if (await executeExpressionIrAsync(statement.test, context, lexical)) {
-        return executeEventStatement(statement.consequent, context, lexical);
+        return executeEventStatement(statement.consequent, context, lexical, yieldState);
       } else if (statement.alternate) {
-        return executeEventStatement(statement.alternate, context, lexical);
+        return executeEventStatement(statement.alternate, context, lexical, yieldState);
       }
       return undefined;
     case "WhileStatement": {
-      let loopGuard = 0;
       let loopResult: unknown;
+      let loopCheckpoint = 0;
       while (await executeExpressionIrAsync(statement.test, context, lexical)) {
-        if (++loopGuard > 10000) {
-          throw new Error("XMLUI handler loop guard exceeded.");
+        loopResult = await executeEventStatement(statement.body, context, lexical, yieldState);
+        if (loopNeedsPacing(statement) && ((++loopCheckpoint) & 255) === 0) {
+          await yieldAfterStatementIfNeeded(context, yieldState);
         }
-        await (context.yieldIfNeeded ?? defaultYieldIfNeeded)(loopGuard);
-        loopResult = await executeEventStatement(statement.body, context, lexical);
       }
       return loopResult;
     }
@@ -2103,6 +2326,35 @@ function executeRead(
     default:
       throw new Error(`Cannot execute unresolved XMLUI identifier '${name}'.`);
   }
+}
+
+function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]): Set<string> {
+  const names = new Set<string>();
+  const visit = (statement: XmluiHandlerStatementIr) => {
+    switch (statement.kind) {
+      case "VariableDeclaration":
+        for (const declaration of statement.declarations) {
+          names.add(declaration.name);
+        }
+        break;
+      case "BlockStatement":
+        statement.body.forEach(visit);
+        break;
+      case "IfStatement":
+        visit(statement.consequent);
+        if (statement.alternate) {
+          visit(statement.alternate);
+        }
+        break;
+      case "WhileStatement":
+        visit(statement.body);
+        break;
+      case "ExpressionStatement":
+        break;
+    }
+  };
+  statements.forEach(visit);
+  return names;
 }
 
 function isEventMutationExpression(ir: XmluiScriptIr): boolean {
