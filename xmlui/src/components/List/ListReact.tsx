@@ -715,6 +715,13 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
   const shouldStickToBottom = useRef(scrollAnchor === "bottom");
+  // virtua's onScroll can't distinguish our own/auto scrolls from genuine user
+  // scrolls. A content-sized (e.g. maxHeight) bottom-anchored list grows from
+  // the top, so when content first overflows, the auto scroll-to-bottom would
+  // otherwise be read as "the user scrolled up" and follow would stop. We set
+  // this flag around our own scrollToIndex calls and ignore onScroll while set,
+  // so only a real user scroll can turn off stick-to-bottom.
+  const programmaticScroll = useRef(false);
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
   const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
     setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
@@ -919,8 +926,12 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
       initiallyScrolledToBottom.current = true;
       requestAnimationFrame(() => {
+        programmaticScroll.current = true;
         virtualizerRef.current?.scrollToIndex(rows.length - 1, {
           align: "end",
+        });
+        requestAnimationFrame(() => {
+          programmaticScroll.current = false;
         });
       });
     }
@@ -930,8 +941,12 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     if (!virtualizerRef.current) return;
     if (!shouldStickToBottom.current) return;
     requestAnimationFrame(() => {
+      programmaticScroll.current = true;
       virtualizerRef.current?.scrollToIndex(rows.length - 1, {
         align: "end",
+      });
+      requestAnimationFrame(() => {
+        programmaticScroll.current = false;
       });
     });
   }, [rows]);
@@ -991,7 +1006,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   const onScroll = useCallback(
     (offset) => {
       if (!virtualizerRef.current) return;
-      if (scrollAnchor === "bottom") {
+      if (scrollAnchor === "bottom" && !programmaticScroll.current) {
         // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
         shouldStickToBottom.current =
           offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
