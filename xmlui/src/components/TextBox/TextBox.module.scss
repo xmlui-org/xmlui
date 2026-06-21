@@ -1,0 +1,300 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-TextBox--disabled: createThemeVar("backgroundColor-TextBox--disabled");
+$borderRadius-TextBox: createThemeVar("borderRadius-TextBox");
+$borderColor-TextBox: createThemeVar("borderColor-TextBox");
+$borderColor-TextBox--error: createThemeVar("borderColor-TextBox--error");
+$borderColor-TextBox--warning: createThemeVar("borderColor-TextBox--warning");
+$borderColor-TextBox--success: createThemeVar("borderColor-TextBox--success");
+$borderWidth-TextBox: createThemeVar("borderWidth-TextBox");
+$borderWidth-TextBox--error: createThemeVar("borderWidth-TextBox--error");
+$borderWidth-TextBox--warning: createThemeVar("borderWidth-TextBox--warning");
+$borderWidth-TextBox--success: createThemeVar("borderWidth-TextBox--success");
+$borderStyle-TextBox: createThemeVar("borderStyle-TextBox");
+$borderStyle-TextBox--error: createThemeVar("borderStyle-TextBox--error");
+$borderStyle-TextBox--warning: createThemeVar("borderStyle-TextBox--warning");
+$borderStyle-TextBox--success: createThemeVar("borderStyle-TextBox--success");
+$fontSize-TextBox: createThemeVar("fontSize-TextBox");
+$fontSize-TextBox--error: createThemeVar("fontSize-TextBox--error");
+$fontSize-TextBox--warning: createThemeVar("fontSize-TextBox--warning");
+$fontSize-TextBox--success: createThemeVar("fontSize-TextBox--success");
+$backgroundColor-TextBox: createThemeVar("backgroundColor-TextBox");
+$backgroundColor-TextBox--error: createThemeVar("backgroundColor-TextBox--error");
+$backgroundColor-TextBox--warning: createThemeVar("backgroundColor-TextBox--warning");
+$backgroundColor-TextBox--success: createThemeVar("backgroundColor-TextBox--success");
+$boxShadow-TextBox: createThemeVar("boxShadow-TextBox");
+$boxShadow-TextBox--error: createThemeVar("boxShadow-TextBox--error");
+$boxShadow-TextBox--warning: createThemeVar("boxShadow-TextBox--warning");
+$boxShadow-TextBox--success: createThemeVar("boxShadow-TextBox--success");
+$textColor-TextBox: createThemeVar("textColor-TextBox");
+$textColor-TextBox--error: createThemeVar("textColor-TextBox--error");
+$textColor-TextBox--warning: createThemeVar("textColor-TextBox--warning");
+$textColor-TextBox--success: createThemeVar("textColor-TextBox--success");
+$borderColor-TextBox--hover: createThemeVar("borderColor-TextBox--hover");
+$borderColor-TextBox--error--hover: createThemeVar("borderColor-TextBox--error--hover");
+$borderColor-TextBox--warning--hover: createThemeVar("borderColor-TextBox--warning--hover");
+$borderColor-TextBox--success--hover: createThemeVar("borderColor-TextBox--success--hover");
+$backgroundColor-TextBox--hover: createThemeVar("backgroundColor-TextBox--hover");
+$backgroundColor-TextBox--error--hover: createThemeVar("backgroundColor-TextBox--error--hover");
+$backgroundColor-TextBox--warning--hover: createThemeVar("backgroundColor-TextBox--warning--hover");
+$backgroundColor-TextBox--success--hover: createThemeVar("backgroundColor-TextBox--success--hover");
+$boxShadow-TextBox--hover: createThemeVar("boxShadow-TextBox--hover");
+$boxShadow-TextBox--error--hover: createThemeVar("boxShadow-TextBox--error--hover");
+$boxShadow-TextBox--warning--hover: createThemeVar("boxShadow-TextBox--warning--hover");
+$boxShadow-TextBox--success--hover: createThemeVar("boxShadow-TextBox--success--hover");
+$textColor-TextBox--hover: createThemeVar("textColor-TextBox--hover");
+$textColor-TextBox--error--hover: createThemeVar("textColor-TextBox--error--hover");
+$textColor-TextBox--warning--hover: createThemeVar("textColor-TextBox--warning--hover");
+$textColor-TextBox--success--hover: createThemeVar("textColor-TextBox--success--hover");
+$borderColor-TextBox--focus: createThemeVar("borderColor-TextBox--focus");
+$backgroundColor-TextBox--focus: createThemeVar("backgroundColor-TextBox--focus");
+$boxShadow-TextBox--focus: createThemeVar("boxShadow-TextBox--focus");
+$textColor-TextBox--focus: createThemeVar("textColor-TextBox--focus");
+$outlineWidth-TextBox--focus: createThemeVar("outlineWidth-TextBox--focus");
+$outlineColor-TextBox--focus: createThemeVar("outlineColor-TextBox--focus");
+$outlineStyle-TextBox--focus: createThemeVar("outlineStyle-TextBox--focus");
+$outlineOffset-TextBox--focus: createThemeVar("outlineOffset-TextBox--focus");
+$textColor-placeholder-TextBox: createThemeVar("textColor-placeholder-TextBox");
+$fontSize-placeholder-TextBox: createThemeVar("fontSize-placeholder-TextBox");
+$color-adornment-TextBox: createThemeVar("color-adornment-TextBox");
+$color-passwordToggle-TextBox: createThemeVar("color-passwordToggle-TextBox");
+$paddingLeft-passwordToggle-TextBox: createThemeVar("paddingLeft-passwordToggle-TextBox");
+$paddingRight-passwordToggle-TextBox: createThemeVar("paddingRight-passwordToggle-TextBox");
+$color-passwordToggle-TextBox--hover: createThemeVar("color-passwordToggle-TextBox--hover");
+$color-passwordToggle-TextBox--focus: createThemeVar("color-passwordToggle-TextBox--focus");
+$minHeight-TextBox: createThemeVar("minHeight-TextBox");
+$gap-adornment-TextBox: createThemeVar("gap-adornment-TextBox");
+$textColor-TextBox--disabled: createThemeVar("textColor-TextBox--disabled");
+$borderColor-TextBox--disabled: createThemeVar("borderColor-TextBox--disabled");
+$paddingHorizontal-TextBox: createThemeVar("paddingHorizontal-TextBox");
+$paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .textBoxLabeledItem {
+    display: flex;
+    align-items: center;
+    gap: var(--xmlui-gap-label-TextBox, var(--xmlui-gap-normal));
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .textBoxLabel {
+    flex: 0 0 auto;
+    color: var(--xmlui-textColor-label-TextBox, var(--xmlui-textColor-primary));
+    font-size: var(--xmlui-fontSize-label-TextBox, inherit);
+    white-space: nowrap;
+  }
+
+  .textBoxLabelBreak {
+    white-space: normal;
+  }
+
+  .textBoxLabelRequired {
+    margin-left: 0.25em;
+  }
+
+  .textBoxLabelPositionStart {
+    flex-direction: row;
+  }
+
+  .textBoxLabelPositionEnd {
+    flex-direction: row-reverse;
+  }
+
+  .textBoxLabelPositionStart[dir="rtl"] {
+    flex-direction: row-reverse;
+  }
+
+  .textBoxLabelPositionEnd[dir="rtl"] {
+    flex-direction: row;
+  }
+
+  .textBoxLabelPositionTop {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .textBoxLabelPositionBottom {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+
+  .textBoxRoot {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--xmlui-runtime-gap-TextBox, #{$gap-adornment-TextBox});
+    width: 100%;
+    height: max-content;
+    min-height: var(--xmlui-minHeight-TextBox);
+    line-height: normal;
+    overflow: hidden;
+    border-radius: var(--xmlui-borderRadius-TextBox);
+    border-color: var(--xmlui-borderColor-TextBox);
+    border-width: var(--xmlui-borderWidth-TextBox);
+    border-style: var(--xmlui-borderStyle-TextBox);
+    font-size: var(--xmlui-fontSize-TextBox);
+    background-color: var(--xmlui-backgroundColor-TextBox);
+    box-shadow: var(--xmlui-boxShadow-TextBox);
+    color: var(--xmlui-textColor-TextBox);
+    padding: var(--xmlui-padding-TextBox, var(--xmlui-paddingVertical-TextBox) var(--xmlui-paddingHorizontal-TextBox));
+    transition: background-color ease-in 0.1s, border-color ease-in 0.1s;
+  }
+
+  .textBoxRoot:hover {
+    border-color: var(--xmlui-borderColor-TextBox--hover);
+    background-color: var(--xmlui-backgroundColor-TextBox--hover);
+    box-shadow: var(--xmlui-boxShadow-TextBox--hover);
+    color: var(--xmlui-textColor-TextBox--hover);
+  }
+
+  .textBoxRoot:focus-within {
+    border-color: var(--xmlui-borderColor-TextBox--focus);
+    background-color: var(--xmlui-backgroundColor-TextBox--focus);
+    box-shadow: var(--xmlui-boxShadow-TextBox--focus);
+    color: var(--xmlui-textColor-TextBox--focus);
+  }
+
+  .textBoxRoot.textBoxError {
+    border-radius: var(--xmlui-borderRadius-TextBox--error);
+    border-color: var(--xmlui-borderColor-TextBox--error);
+    border-width: var(--xmlui-borderWidth-TextBox--error);
+    border-style: var(--xmlui-borderStyle-TextBox--error);
+    font-size: var(--xmlui-fontSize-TextBox--error);
+    background-color: var(--xmlui-backgroundColor-TextBox--error);
+    box-shadow: var(--xmlui-boxShadow-TextBox--error);
+    color: var(--xmlui-textColor-TextBox--error);
+  }
+
+  .textBoxRoot.textBoxWarning {
+    border-radius: var(--xmlui-borderRadius-TextBox--warning);
+    border-color: var(--xmlui-borderColor-TextBox--warning);
+    border-width: var(--xmlui-borderWidth-TextBox--warning);
+    border-style: var(--xmlui-borderStyle-TextBox--warning);
+    font-size: var(--xmlui-fontSize-TextBox--warning);
+    background-color: var(--xmlui-backgroundColor-TextBox--warning);
+    box-shadow: var(--xmlui-boxShadow-TextBox--warning);
+    color: var(--xmlui-textColor-TextBox--warning);
+  }
+
+  .textBoxRoot.textBoxSuccess {
+    border-radius: var(--xmlui-borderRadius-TextBox--success);
+    border-color: var(--xmlui-borderColor-TextBox--success);
+    border-width: var(--xmlui-borderWidth-TextBox--success);
+    border-style: var(--xmlui-borderStyle-TextBox--success);
+    font-size: var(--xmlui-fontSize-TextBox--success);
+    background-color: var(--xmlui-backgroundColor-TextBox--success);
+    box-shadow: var(--xmlui-boxShadow-TextBox--success);
+    color: var(--xmlui-textColor-TextBox--success);
+  }
+
+  .textBoxRoot.textBoxError:hover {
+    border-color: var(--xmlui-borderColor-TextBox--error--hover);
+    background-color: var(--xmlui-backgroundColor-TextBox--error--hover);
+    box-shadow: var(--xmlui-boxShadow-TextBox--error--hover);
+    color: var(--xmlui-textColor-TextBox--error--hover);
+  }
+
+  .textBoxRoot.textBoxWarning:hover {
+    border-color: var(--xmlui-borderColor-TextBox--warning--hover);
+    background-color: var(--xmlui-backgroundColor-TextBox--warning--hover);
+    box-shadow: var(--xmlui-boxShadow-TextBox--warning--hover);
+    color: var(--xmlui-textColor-TextBox--warning--hover);
+  }
+
+  .textBoxRoot.textBoxSuccess:hover {
+    border-color: var(--xmlui-borderColor-TextBox--success--hover);
+    background-color: var(--xmlui-backgroundColor-TextBox--success--hover);
+    box-shadow: var(--xmlui-boxShadow-TextBox--success--hover);
+    color: var(--xmlui-textColor-TextBox--success--hover);
+  }
+
+  .textBoxRoot:has(.textBoxInput:focus-visible) {
+    outline-width: var(--xmlui-outlineWidth-TextBox--focus);
+    outline-color: var(--xmlui-outlineColor-TextBox--focus);
+    outline-style: var(--xmlui-outlineStyle-TextBox--focus);
+    outline-offset: var(--xmlui-outlineOffset-TextBox--focus);
+  }
+
+  .textBoxRoot.textBoxDisabled {
+    cursor: not-allowed;
+    background-color: var(--xmlui-backgroundColor-TextBox--disabled);
+    color: var(--xmlui-textColor-TextBox--disabled);
+    border-color: var(--xmlui-borderColor-TextBox--disabled);
+  }
+
+  .textBoxRoot.textBoxReadOnly {
+    cursor: default;
+  }
+
+  .textBoxInput {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: inherit;
+    color: inherit;
+    border: 0;
+    outline: none !important;
+    background-color: transparent;
+    width: 100%;
+    padding: 0;
+    cursor: inherit;
+  }
+
+  .textBoxInput::placeholder {
+    color: var(--xmlui-textColor-placeholder-TextBox);
+    font-size: var(--xmlui-fontSize-placeholder-TextBox);
+  }
+
+  .textBoxInput::-ms-reveal {
+    display: none;
+  }
+
+  .textBoxInput[type="search"]::-webkit-search-cancel-button,
+  .textBoxInput[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .textBoxAdornment {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    color: var(--xmlui-color-adornment-TextBox);
+  }
+
+  .textBoxIconMarker {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 999px;
+    background-color: currentColor;
+  }
+
+  .textBoxPasswordToggle {
+    cursor: pointer;
+    color: var(--xmlui-color-passwordToggle-TextBox);
+    padding-inline-start: var(--xmlui-paddingLeft-passwordToggle-TextBox);
+    padding-inline-end: var(--xmlui-paddingRight-passwordToggle-TextBox);
+  }
+
+  .textBoxPasswordToggle:hover {
+    color: var(--xmlui-color-passwordToggle-TextBox--hover);
+  }
+
+  .textBoxPasswordToggle:focus {
+    color: var(--xmlui-color-passwordToggle-TextBox--focus);
+  }
+
+  .textBoxConciseFeedback {
+    flex: 0 0 auto;
+  }
+}

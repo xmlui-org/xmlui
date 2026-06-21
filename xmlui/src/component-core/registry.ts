@@ -25,11 +25,13 @@ import { fragmentRenderer } from "../components/Fragment/Fragment";
 import { iconRenderer } from "../components/Icon/Icon";
 import { imageRenderer } from "../components/Image/Image";
 import { iframeRenderer } from "../components/IFrame/IFrame";
+import { linkRenderer } from "../components/Link/Link";
 import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
+import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -45,6 +47,7 @@ const implementedRuntimeNames = [
   "Image",
   "IFrame",
   "Icon",
+  "Link",
   "Logo",
   "NoResult",
   "PageMetaTitle",
@@ -98,6 +101,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Icon: iconRenderer,
   Image: imageRenderer,
   IFrame: iframeRenderer,
+  Link: linkRenderer,
   Logo: logoRenderer,
   NoResult: noResultRenderer,
   PageMetaTitle: pageMetaTitleRenderer,
@@ -111,6 +115,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   H5: h5Renderer,
   H6: h6Renderer,
   Text: textRenderer,
+  TextBox: textBoxRenderer,
+  PasswordInput: passwordInputRenderer,
   ...htmlTagRenderers,
 };
 
@@ -125,6 +131,7 @@ const componentFolderNames: Record<string, string> = {
   H4: "Heading",
   H5: "Heading",
   H6: "Heading",
+  PasswordInput: "TextBox",
 };
 for (const name of htmlTagComponentNames) {
   componentFolderNames[name] = "HtmlTags";
@@ -142,6 +149,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const appTransferred = contract.name === "App";
     const buttonTransferred = contract.name === "Button";
     const textTransferred = contract.name === "Text";
+    const textBoxTransferred = contract.name === "TextBox";
+    const passwordInputTransferred = contract.name === "PasswordInput";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
@@ -149,6 +158,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const imageTransferred = contract.name === "Image";
     const iframeTransferred = contract.name === "IFrame";
     const iconTransferred = contract.name === "Icon";
+    const linkTransferred = contract.name === "Link";
     const logoTransferred = contract.name === "Logo";
     const pageMetaTitleTransferred = contract.name === "PageMetaTitle";
     const qrCodeTransferred = contract.name === "QRCode";
@@ -161,6 +171,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       appTransferred ||
       buttonTransferred ||
       textTransferred ||
+      textBoxTransferred ||
+      passwordInputTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
@@ -168,6 +180,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       imageTransferred ||
       iframeTransferred ||
       iconTransferred ||
+      linkTransferred ||
       logoTransferred ||
       pageMetaTitleTransferred ||
       qrCodeTransferred ||
@@ -184,10 +197,73 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
           ? "Fragment"
           : headingTransferred
             ? "Heading"
+            : passwordInputTransferred
+              ? "TextBox"
             : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
       : sharedComponentFile;
+    const implementationPaths = transferredFolder
+      ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.tsx`]
+      : [];
+    if (appTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppReact.tsx`);
+    } else if (buttonTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ButtonReact.tsx`);
+    } else if (textTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TextReact.tsx`);
+    } else if (textBoxTransferred || passwordInputTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TextBoxReact.tsx`);
+    } else if (headingTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/HeadingReact.tsx`);
+    } else if (imageTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ImageReact.tsx`);
+    } else if (iframeTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/IFrameReact.tsx`);
+    } else if (iconTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/IconReact.tsx`);
+    } else if (linkTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LinkReact.tsx`);
+    } else if (logoTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LogoReact.tsx`);
+    } else if (pageMetaTitleTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/PageMetaTitleReact.tsx`);
+    } else if (qrCodeTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/QRCodeReact.tsx`);
+    } else if (codeBlockTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/CodeBlockReact.tsx`);
+    } else if (contentSeparatorTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ContentSeparatorReact.tsx`);
+    } else if (fallbackTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FallbackReact.tsx`);
+    } else if (noResultTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NoResultReact.tsx`);
+    } else if (spaceFillerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SpaceFillerReact.tsx`);
+    }
+
+    const runnablePaths = componentRunnablePaths({
+      appTransferred,
+      buttonTransferred,
+      textTransferred,
+      textBoxTransferred,
+      passwordInputTransferred,
+      headingTransferred,
+      htmlTagTransferred,
+      brTransferred,
+      fragmentTransferred,
+      imageTransferred,
+      iframeTransferred,
+      iconTransferred,
+      linkTransferred,
+      pageMetaTitleTransferred,
+      qrCodeTransferred,
+      codeBlockTransferred,
+      contentSeparatorTransferred,
+      fallbackTransferred,
+      noResultTransferred,
+      spaceFillerTransferred,
+    });
     return {
       name: contract.name,
       contract,
@@ -200,39 +276,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       sources: {
         oldFolder: `${oldComponentRoot}/${folderName}`,
         rewriteFolder: `xmlui/src/components/${folderName}`,
-        implementation: appTransferred
-          ? [`xmlui/src/components/${folderName}/AppReact.tsx`]
-          : buttonTransferred
-            ? [`xmlui/src/components/${folderName}/ButtonReact.tsx`]
-            : textTransferred
-              ? [`xmlui/src/components/${folderName}/TextReact.tsx`]
-              : headingTransferred
-                ? [`xmlui/src/components/${folderName}/HeadingReact.tsx`]
-                : imageTransferred
-                  ? [`xmlui/src/components/${folderName}/ImageReact.tsx`]
-                  : iframeTransferred
-                    ? [`xmlui/src/components/${folderName}/IFrameReact.tsx`]
-                    : iconTransferred
-                      ? [`xmlui/src/components/${folderName}/IconReact.tsx`]
-                      : logoTransferred
-                        ? [`xmlui/src/components/${folderName}/LogoReact.tsx`]
-                        : pageMetaTitleTransferred
-                          ? [`xmlui/src/components/${folderName}/PageMetaTitleReact.tsx`]
-                          : qrCodeTransferred
-                            ? [`xmlui/src/components/${folderName}/QRCodeReact.tsx`]
-                            : codeBlockTransferred
-                              ? [`xmlui/src/components/${folderName}/CodeBlockReact.tsx`]
-                              : contentSeparatorTransferred
-                                ? [`xmlui/src/components/${folderName}/ContentSeparatorReact.tsx`]
-                                : fallbackTransferred
-                                  ? [`xmlui/src/components/${folderName}/FallbackReact.tsx`]
-                                  : noResultTransferred
-                                    ? [`xmlui/src/components/${folderName}/NoResultReact.tsx`]
-                                    : spaceFillerTransferred
-                                      ? [`xmlui/src/components/${folderName}/SpaceFillerReact.tsx`]
-                : transferredFolder
-                  ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.tsx`]
-                  : [],
+        implementation: implementationPaths,
         renderer: transferredFolder
           ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.tsx`]
           : renderer ? ["xmlui/src/runtime/rendering/builtins.tsx"] : [],
@@ -256,62 +300,113 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
         path: `xmlui/src/components/${folderName}/${docsFile}.md`,
       },
       transferredTests: {
-        runnablePaths: appTransferred
-          ? [
-              "xmlui/src/components/App/App.spec.tsx",
-              "xmlui/src/components/App/App-layout.spec.ts",
-            ]
-          : buttonTransferred
-            ? [
-                "xmlui/src/components/Button/Button.spec.ts",
-                "xmlui/src/components/Button/Button.spec.tsx",
-                "xmlui/src/components/Button/Button-style.spec.ts",
-                "xmlui/tests/e2e/counter-components.spec.ts",
-                "xmlui/tests/e2e/counter-globals.spec.ts",
-              ]
-            : textTransferred
-              ? [
-                    "xmlui/src/components/Text/Text.spec.tsx",
-                    "xmlui/src/components/Text/Text-style.spec.ts",
-                    "xmlui/src/components/Text/Text.spec.ts",
-                  ]
-              : headingTransferred
-                ? [
-                    "xmlui/src/components/Heading/Heading.spec.tsx",
-                    "xmlui/src/components/Heading/Heading-style.spec.ts",
-                    "xmlui/src/components/Heading/Heading.spec.ts",
-                    "xmlui/src/components/Heading/HeadingShortcuts.spec.ts",
-                  ]
-                : htmlTagTransferred
-                  ? ["xmlui/src/components/HtmlTags/HtmlTags.spec.ts"]
-                  : brTransferred
-                    ? ["xmlui/src/components/Br/Br.spec.ts"]
-                    : fragmentTransferred
-                      ? ["xmlui/src/components/Fragment/Fragment.spec.ts"]
-                      : imageTransferred
-                        ? ["xmlui/src/components/Image/Image.spec.ts"]
-                        : iframeTransferred
-                          ? ["xmlui/src/components/IFrame/IFrame.spec.ts"]
-                          : iconTransferred
-                            ? ["xmlui/src/components/Icon/Icon.spec.ts"]
-                            : pageMetaTitleTransferred
-                              ? ["xmlui/src/components/PageMetaTitle/PageMetaTitle.spec.ts"]
-                              : qrCodeTransferred
-                                ? ["xmlui/src/components/QRCode/QRCode.spec.ts"]
-                                : codeBlockTransferred
-                                  ? ["xmlui/src/components/CodeBlock/CodeBlock.spec.ts"]
-                                  : contentSeparatorTransferred
-                                    ? ["xmlui/src/components/ContentSeparator/ContentSeparator.spec.ts"]
-                                    : noResultTransferred
-                                    ? ["xmlui/src/components/NoResult/NoResult.spec.ts"]
-                                      : fallbackTransferred
-                                        ? ["xmlui/src/components/Fallback/Fallback.spec.ts"]
-                                      : spaceFillerTransferred
-                                        ? ["xmlui/src/components/SpaceFiller/SpaceFiller.spec.ts"]
-          : [],
+        runnablePaths,
       },
     } satisfies XmluiComponentTransferModule;
   });
+
+function componentRunnablePaths(flags: {
+  appTransferred: boolean;
+  buttonTransferred: boolean;
+  textTransferred: boolean;
+  textBoxTransferred: boolean;
+  passwordInputTransferred: boolean;
+  headingTransferred: boolean;
+  htmlTagTransferred: boolean;
+  brTransferred: boolean;
+  fragmentTransferred: boolean;
+  imageTransferred: boolean;
+  iframeTransferred: boolean;
+  iconTransferred: boolean;
+  linkTransferred: boolean;
+  pageMetaTitleTransferred: boolean;
+  qrCodeTransferred: boolean;
+  codeBlockTransferred: boolean;
+  contentSeparatorTransferred: boolean;
+  fallbackTransferred: boolean;
+  noResultTransferred: boolean;
+  spaceFillerTransferred: boolean;
+}): string[] {
+  if (flags.appTransferred) {
+    return [
+      "xmlui/src/components/App/App.spec.tsx",
+      "xmlui/src/components/App/App-layout.spec.ts",
+    ];
+  }
+  if (flags.buttonTransferred) {
+    return [
+      "xmlui/src/components/Button/Button.spec.ts",
+      "xmlui/src/components/Button/Button.spec.tsx",
+      "xmlui/src/components/Button/Button-style.spec.ts",
+      "xmlui/tests/e2e/counter-components.spec.ts",
+      "xmlui/tests/e2e/counter-globals.spec.ts",
+    ];
+  }
+  if (flags.textTransferred) {
+    return [
+      "xmlui/src/components/Text/Text.spec.tsx",
+      "xmlui/src/components/Text/Text-style.spec.ts",
+      "xmlui/src/components/Text/Text.spec.ts",
+    ];
+  }
+  if (flags.textBoxTransferred) {
+    return ["xmlui/src/components/TextBox/TextBox.spec.ts"];
+  }
+  if (flags.passwordInputTransferred) {
+    return ["xmlui/src/components/TextBox/TextBox.spec.ts"];
+  }
+  if (flags.headingTransferred) {
+    return [
+      "xmlui/src/components/Heading/Heading.spec.tsx",
+      "xmlui/src/components/Heading/Heading-style.spec.ts",
+      "xmlui/src/components/Heading/Heading.spec.ts",
+      "xmlui/src/components/Heading/HeadingShortcuts.spec.ts",
+    ];
+  }
+  if (flags.htmlTagTransferred) {
+    return ["xmlui/src/components/HtmlTags/HtmlTags.spec.ts"];
+  }
+  if (flags.brTransferred) {
+    return ["xmlui/src/components/Br/Br.spec.ts"];
+  }
+  if (flags.fragmentTransferred) {
+    return ["xmlui/src/components/Fragment/Fragment.spec.ts"];
+  }
+  if (flags.imageTransferred) {
+    return ["xmlui/src/components/Image/Image.spec.ts"];
+  }
+  if (flags.iframeTransferred) {
+    return ["xmlui/src/components/IFrame/IFrame.spec.ts"];
+  }
+  if (flags.iconTransferred) {
+    return ["xmlui/src/components/Icon/Icon.spec.ts"];
+  }
+  if (flags.linkTransferred) {
+    return ["xmlui/src/components/Link/Link.spec.ts"];
+  }
+  if (flags.pageMetaTitleTransferred) {
+    return ["xmlui/src/components/PageMetaTitle/PageMetaTitle.spec.ts"];
+  }
+  if (flags.qrCodeTransferred) {
+    return ["xmlui/src/components/QRCode/QRCode.spec.ts"];
+  }
+  if (flags.codeBlockTransferred) {
+    return ["xmlui/src/components/CodeBlock/CodeBlock.spec.ts"];
+  }
+  if (flags.contentSeparatorTransferred) {
+    return ["xmlui/src/components/ContentSeparator/ContentSeparator.spec.ts"];
+  }
+  if (flags.noResultTransferred) {
+    return ["xmlui/src/components/NoResult/NoResult.spec.ts"];
+  }
+  if (flags.fallbackTransferred) {
+    return ["xmlui/src/components/Fallback/Fallback.spec.ts"];
+  }
+  if (flags.spaceFillerTransferred) {
+    return ["xmlui/src/components/SpaceFiller/SpaceFiller.spec.ts"];
+  }
+  return [];
+}
 
 export const runtimeComponentModules: XmluiRuntimeComponentModule[] = componentTransferModules
   .filter((component): component is XmluiRuntimeComponentModule => typeof component.renderer === "function");

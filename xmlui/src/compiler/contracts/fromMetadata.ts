@@ -1,6 +1,6 @@
 import type { ComponentMetadata, ComponentPropertyMetadata } from "../../component-core/metadata/types";
 import { behaviorPropsForComponent } from "../../component-core/behaviors";
-import { supportedLayoutPropNames } from "../../styling";
+import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
 import type {
   XmluiComponentContract,
   XmluiComponentContractKind,
@@ -51,6 +51,9 @@ function propsFromMetadata(
   const names = new Set(Object.keys(props ?? {}));
   if (includeLayoutProps) {
     for (const name of supportedLayoutPropNames) {
+      names.add(name);
+    }
+    for (const name of supportedResponsiveLayoutPropNames) {
       names.add(name);
     }
   }

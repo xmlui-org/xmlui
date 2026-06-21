@@ -1,0 +1,25 @@
+<App var.name="World" var.search="">
+  <H1>TextBox foundation</H1>
+  <Text>Name: {name}</Text>
+  <TextBox
+    testId="nameInput"
+    label="Name"
+    initialValue="{name}"
+    placeholder="Type a name"
+    startIcon="user"
+    onDidChange="value => name = value" />
+  <Text>Search: {search || 'empty'}</Text>
+  <TextBox
+    testId="searchInput"
+    type="search"
+    placeholder="Search"
+    initialValue="{search}"
+    endText="query"
+    onDidChange="value => search = value" />
+  <TextBox
+    testId="passwordInput"
+    type="password"
+    label="Password"
+    initialValue="secret"
+    showPasswordToggle="{true}" />
+</App>

@@ -61,7 +61,7 @@ export type MountXmluiAppOptions = {
   hydrate?: boolean;
   initialUrl?: string;
   extensions?: Iterable<Extension>;
-  testProbe?: XmluiRuntimeTestProbe;
+  testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
 export type XmluiRuntimeTestProbe = {

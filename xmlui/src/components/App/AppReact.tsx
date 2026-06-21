@@ -27,11 +27,13 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const mergedThemeVariables = mergeThemeVariableLayers([
     collectComponentThemeDefaults(AppMd),
     themeVariables,
+    appThemeVariableProps(adapter.props),
   ]);
 
   const rootAttrs = adapter.rootAttrs();
   const testId = adapter.stringProp("testId");
   const fitContent = adapter.booleanProp("fitContent", defaultProps.fitContent);
+  const appProps = adapter.props;
 
   return (
     <div
@@ -48,12 +50,12 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
       <main
         data-xmlui-component="App"
         data-xmlui-part="content"
-        style={contentAreaStyle(mergedThemeVariables, fitContent)}
+        style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
       >
         <div
           data-xmlui-component="App"
           data-xmlui-part="pageContent"
-          style={pageContentStyle(mergedThemeVariables)}
+          style={pageContentStyle(mergedThemeVariables, appProps)}
         >
           {adapter.renderChildren()}
         </div>
@@ -87,7 +89,11 @@ function appBaselineStyle(themeVariables: Record<string, unknown>): CSSPropertie
   };
 }
 
-function contentAreaStyle(themeVariables: Record<string, unknown>, fitContent: boolean): CSSProperties {
+function contentAreaStyle(
+  themeVariables: Record<string, unknown>,
+  fitContent: boolean,
+  props: Record<string, unknown>,
+): CSSProperties {
   return {
     position: "relative",
     minWidth: 0,
@@ -96,16 +102,19 @@ function contentAreaStyle(themeVariables: Record<string, unknown>, fitContent: b
     display: "flex",
     flexDirection: "column",
     overflow: "auto",
-    backgroundColor: themeValue(themeVariables, CONTENT_THEME_VARS.backgroundColor),
-    borderLeft: themeValue(themeVariables, CONTENT_THEME_VARS.borderLeft),
+    backgroundColor: appContentValue(themeVariables, props, CONTENT_THEME_VARS.backgroundColor),
+    borderLeft: appContentValue(themeVariables, props, CONTENT_THEME_VARS.borderLeft),
   };
 }
 
-function pageContentStyle(themeVariables: Record<string, unknown>): CSSProperties {
-  const paddingHorizontal = themeValue(themeVariables, CONTENT_THEME_VARS.paddingHorizontal);
-  const paddingVertical = themeValue(themeVariables, CONTENT_THEME_VARS.paddingVertical);
+function pageContentStyle(
+  themeVariables: Record<string, unknown>,
+  props: Record<string, unknown>,
+): CSSProperties {
+  const paddingHorizontal = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingHorizontal);
+  const paddingVertical = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingVertical);
   return {
-    maxWidth: themeValue(themeVariables, CONTENT_THEME_VARS.maxWidth),
+    maxWidth: appContentValue(themeVariables, props, CONTENT_THEME_VARS.maxWidth),
     width: "100%",
     margin: "0 auto",
     minHeight: "100%",
@@ -115,8 +124,20 @@ function pageContentStyle(themeVariables: Record<string, unknown>): CSSPropertie
     paddingInlineEnd: paddingHorizontal,
     paddingTop: paddingVertical,
     paddingBottom: paddingVertical,
-    gap: themeValue(themeVariables, CONTENT_THEME_VARS.gap),
+    gap: appContentValue(themeVariables, props, CONTENT_THEME_VARS.gap),
   };
+}
+
+function appContentValue(
+  themeVariables: Record<string, unknown>,
+  props: Record<string, unknown>,
+  name: string,
+): string | undefined {
+  const propValue = props[name];
+  if (propValue !== undefined && propValue !== null && propValue !== "") {
+    return String(resolveThemeReferences(propValue));
+  }
+  return themeValue(themeVariables, name);
 }
 
 function themeValue(themeVariables: Record<string, unknown>, name: string): string | undefined {
@@ -125,4 +146,14 @@ function themeValue(themeVariables: Record<string, unknown>, name: string): stri
     return undefined;
   }
   return String(resolveThemeReferences(value));
+}
+
+function appThemeVariableProps(props: Record<string, unknown>): Record<string, unknown> {
+  const variables: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(props)) {
+    if (/-App(?:-|$)/.test(name)) {
+      variables[name] = value;
+    }
+  }
+  return variables;
 }

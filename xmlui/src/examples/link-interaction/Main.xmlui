@@ -1,0 +1,20 @@
+<App var.clicks="{0}" var.active="{false}">
+  <H1>Link interaction</H1>
+  <Text>Clicks: {clicks}</Text>
+  <Link
+    to="/"
+    icon="search"
+    active="{active}"
+    onClick="clicks++; active = !active">
+    Toggle link state
+  </Link>
+  <Link to="https://example.com" target="_blank" noIndicator="true">
+    External link without indicator
+  </Link>
+  <Link
+    to="/"
+    width="220px"
+    maxLines="1">
+    This is a long link label that demonstrates Link overflow handling.
+  </Link>
+</App>

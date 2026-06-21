@@ -1,0 +1,334 @@
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$padding-Link: createThemeVar("padding-Link");
+$paddingHorizontal-Link: createThemeVar("paddingHorizontal-Link");
+$paddingVertical-Link: createThemeVar("paddingVertical-Link");
+$paddingLeft-Link: createThemeVar("paddingLeft-Link");
+$paddingRight-Link: createThemeVar("paddingRight-Link");
+$paddingTop-Link: createThemeVar("paddingTop-Link");
+$paddingBottom-Link: createThemeVar("paddingBottom-Link");
+$padding-icon-Link: createThemeVar("padding-icon-Link");
+$paddingHorizontal-icon-Link: createThemeVar("paddingHorizontal-icon-Link");
+$paddingVertical-icon-Link: createThemeVar("paddingVertical-icon-Link");
+$paddingLeft-icon-Link: createThemeVar("paddingLeft-icon-Link");
+$paddingRight-icon-Link: createThemeVar("paddingRight-icon-Link");
+$paddingTop-icon-Link: createThemeVar("paddingTop-icon-Link");
+$paddingBottom-icon-Link: createThemeVar("paddingBottom-icon-Link");
+$border-Link: createThemeVar("border-Link");
+$borderHorizontal-Link: createThemeVar("borderHorizontal-Link");
+$borderVertical-Link: createThemeVar("borderVertical-Link");
+$borderLeft-Link: createThemeVar("borderLeft-Link");
+$borderRight-Link: createThemeVar("borderRight-Link");
+$borderTop-Link: createThemeVar("borderTop-Link");
+$borderBottom-Link: createThemeVar("borderBottom-Link");
+$borderWidth-Link: createThemeVar("borderWidth-Link");
+$borderHorizontalWidth-Link: createThemeVar("borderHorizontalWidth-Link");
+$borderVerticalWidth-Link: createThemeVar("borderVerticalWidth-Link");
+$borderLeftWidth-Link: createThemeVar("borderLeftWidth-Link");
+$borderRightWidth-Link: createThemeVar("borderRightWidth-Link");
+$borderTopWidth-Link: createThemeVar("borderTopWidth-Link");
+$borderBottomWidth-Link: createThemeVar("borderBottomWidth-Link");
+$borderStyle-Link: createThemeVar("borderStyle-Link");
+$borderHorizontalStyle-Link: createThemeVar("borderHorizontalStyle-Link");
+$borderVerticalStyle-Link: createThemeVar("borderVerticalStyle-Link");
+$borderLeftStyle-Link: createThemeVar("borderLeftStyle-Link");
+$borderRightStyle-Link: createThemeVar("borderRightStyle-Link");
+$borderTopStyle-Link: createThemeVar("borderTopStyle-Link");
+$borderBottomStyle-Link: createThemeVar("borderBottomStyle-Link");
+$borderColor-Link: createThemeVar("borderColor-Link");
+$borderHorizontalColor-Link: createThemeVar("borderHorizontalColor-Link");
+$borderVerticalColor-Link: createThemeVar("borderVerticalColor-Link");
+$borderLeftColor-Link: createThemeVar("borderLeftColor-Link");
+$borderRightColor-Link: createThemeVar("borderRightColor-Link");
+$borderTopColor-Link: createThemeVar("borderTopColor-Link");
+$borderBottomColor-Link: createThemeVar("borderBottomColor-Link");
+$fontFamily-Link: createThemeVar("fontFamily-Link");
+$fontSize-Link: createThemeVar("fontSize-Link");
+$fontWeight-Link: createThemeVar("fontWeight-Link");
+$fontStyle-Link: createThemeVar("fontStyle-Link");
+$textColor-Link: createThemeVar("textColor-Link");
+$textColor-Link--active: createThemeVar("textColor-Link--active");
+$textColor-Link--hover: createThemeVar("textColor-Link--hover");
+$textColor-Link--hover--active: createThemeVar("textColor-Link--hover--active");
+$fontWeight-Link--active: createThemeVar("fontWeight-Link--active");
+$gap-icon-Link: createThemeVar("gap-icon-Link");
+$textUnderlineOffset-Link: createThemeVar("textUnderlineOffset-Link");
+$textDecorationLine-Link: createThemeVar("textDecorationLine-Link");
+$textDecorationColor-Link: createThemeVar("textDecorationColor-Link");
+$textDecorationColor-Link--hover: createThemeVar("textDecorationColor-Link--hover");
+$textDecorationColor-Link--active: createThemeVar("textDecorationColor-Link--active");
+$textDecorationStyle-Link: createThemeVar("textDecorationStyle-Link");
+$textDecorationThickness-Link: createThemeVar("textDecorationThickness-Link");
+$outlineWidth-Link--focus: createThemeVar("outlineWidth-Link--focus");
+$outlineColor-Link--focus: createThemeVar("outlineColor-Link--focus");
+$outlineStyle-Link--focus: createThemeVar("outlineStyle-Link--focus");
+$outlineOffset-Link--focus: createThemeVar("outlineOffset-Link--focus");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .linkContainer {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
+    width: fit-content;
+    max-width: 100%;
+    max-height: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--xmlui-current-textColor-Link, var(--xmlui-textColor-Link));
+    font-family: var(--xmlui-current-fontFamily-Link, var(--xmlui-fontFamily-Link));
+    font-size: var(--xmlui-current-fontSize-Link, var(--xmlui-fontSize-Link));
+    font-weight: var(--xmlui-current-fontWeight-Link, var(--xmlui-fontWeight-Link));
+    font-style: var(--xmlui-current-fontStyle-Link, var(--xmlui-fontStyle-Link));
+    padding: var(--xmlui-padding-Link, 0);
+    padding-left: var(--xmlui-paddingHorizontal-Link, 0);
+    padding-right: var(--xmlui-paddingHorizontal-Link, 0);
+    padding-top: var(--xmlui-paddingVertical-Link, 0);
+    padding-bottom: var(--xmlui-paddingVertical-Link, 0);
+    padding-left: var(--xmlui-paddingLeft-Link, var(--xmlui-paddingHorizontal-Link, 0));
+    padding-right: var(--xmlui-paddingRight-Link, var(--xmlui-paddingHorizontal-Link, 0));
+    padding-top: var(--xmlui-paddingTop-Link, var(--xmlui-paddingVertical-Link, 0));
+    padding-bottom: var(--xmlui-paddingBottom-Link, var(--xmlui-paddingVertical-Link, 0));
+    border: var(--xmlui-border-Link);
+    border-left: var(--xmlui-borderHorizontal-Link, var(--xmlui-border-Link));
+    border-right: var(--xmlui-borderHorizontal-Link, var(--xmlui-border-Link));
+    border-top: var(--xmlui-borderVertical-Link, var(--xmlui-border-Link));
+    border-bottom: var(--xmlui-borderVertical-Link, var(--xmlui-border-Link));
+    border-left: var(--xmlui-borderLeft-Link, var(--xmlui-borderHorizontal-Link, var(--xmlui-border-Link)));
+    border-right: var(--xmlui-borderRight-Link, var(--xmlui-borderHorizontal-Link, var(--xmlui-border-Link)));
+    border-top: var(--xmlui-borderTop-Link, var(--xmlui-borderVertical-Link, var(--xmlui-border-Link)));
+    border-bottom: var(--xmlui-borderBottom-Link, var(--xmlui-borderVertical-Link, var(--xmlui-border-Link)));
+    border-width: var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link));
+    border-left-width: var(--xmlui-borderHorizontalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link)));
+    border-right-width: var(--xmlui-borderHorizontalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link)));
+    border-top-width: var(--xmlui-borderVerticalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link)));
+    border-bottom-width: var(--xmlui-borderVerticalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link)));
+    border-left-width: var(--xmlui-borderLeftWidth-Link, var(--xmlui-borderHorizontalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link))));
+    border-right-width: var(--xmlui-borderRightWidth-Link, var(--xmlui-borderHorizontalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link))));
+    border-top-width: var(--xmlui-borderTopWidth-Link, var(--xmlui-borderVerticalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link))));
+    border-bottom-width: var(--xmlui-borderBottomWidth-Link, var(--xmlui-borderVerticalWidth-Link, var(--xmlui-current-borderWidth-Link, var(--xmlui-borderWidth-Link))));
+    border-style: var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link));
+    border-left-style: var(--xmlui-borderHorizontalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link)));
+    border-right-style: var(--xmlui-borderHorizontalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link)));
+    border-top-style: var(--xmlui-borderVerticalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link)));
+    border-bottom-style: var(--xmlui-borderVerticalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link)));
+    border-left-style: var(--xmlui-borderLeftStyle-Link, var(--xmlui-borderHorizontalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link))));
+    border-right-style: var(--xmlui-borderRightStyle-Link, var(--xmlui-borderHorizontalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link))));
+    border-top-style: var(--xmlui-borderTopStyle-Link, var(--xmlui-borderVerticalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link))));
+    border-bottom-style: var(--xmlui-borderBottomStyle-Link, var(--xmlui-borderVerticalStyle-Link, var(--xmlui-current-borderStyle-Link, var(--xmlui-borderStyle-Link))));
+    border-color: var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link));
+    border-left-color: var(--xmlui-borderHorizontalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link)));
+    border-right-color: var(--xmlui-borderHorizontalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link)));
+    border-top-color: var(--xmlui-borderVerticalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link)));
+    border-bottom-color: var(--xmlui-borderVerticalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link)));
+    border-left-color: var(--xmlui-borderLeftColor-Link, var(--xmlui-borderHorizontalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link))));
+    border-right-color: var(--xmlui-borderRightColor-Link, var(--xmlui-borderHorizontalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link))));
+    border-top-color: var(--xmlui-borderTopColor-Link, var(--xmlui-borderVerticalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link))));
+    border-bottom-color: var(--xmlui-borderBottomColor-Link, var(--xmlui-borderVerticalColor-Link, var(--xmlui-current-borderColor-Link, var(--xmlui-borderColor-Link))));
+  }
+
+  .linkContainer.linkActive {
+    color: var(--xmlui-textColor-Link--active);
+    font-weight: var(--xmlui-fontWeight-Link--active);
+  }
+
+  .linkContainer.linkDisabled {
+    pointer-events: none;
+  }
+
+  .linkContainer:not(.linkDisabled):hover {
+    color: var(--xmlui-textColor-Link--hover);
+  }
+
+  .linkContainer:not(.linkDisabled):focus-visible {
+    outline-width: var(--xmlui-outlineWidth-Link--focus);
+    outline-color: var(--xmlui-outlineColor-Link--focus);
+    outline-style: var(--xmlui-outlineStyle-Link--focus);
+    outline-offset: var(--xmlui-outlineOffset-Link--focus);
+  }
+
+  .linkContainer:not(.linkDisabled).linkActive:hover {
+    color: var(--xmlui-textColor-Link--hover--active);
+  }
+
+  .linkContainer:not(.linkActive) {
+    text-underline-offset: var(--xmlui-textUnderlineOffset-Link);
+    text-decoration-line: var(--xmlui-textDecorationLine-Link);
+    text-decoration-color: var(--xmlui-textDecorationColor-Link);
+  }
+
+  .linkContainer:not(.linkActive):not(.linkDisabled):hover {
+    text-decoration-color: var(--xmlui-textDecorationColor-Link--hover);
+    text-decoration-style: var(--xmlui-textDecorationStyle-Link);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-Link);
+  }
+
+  .linkContainer:not(.linkActive):not(.linkDisabled):active {
+    text-decoration-color: var(--xmlui-textDecorationColor-Link--active);
+    text-decoration-style: var(--xmlui-textDecorationStyle-Link);
+    text-decoration-thickness: var(--xmlui-textDecorationThickness-Link);
+  }
+
+  .linkContainer.linkNoIndicator {
+    text-decoration: none;
+  }
+
+  .linkJustifyItemsStart {
+    justify-content: flex-start;
+  }
+
+  .linkJustifyItemsCenter {
+    justify-content: center;
+  }
+
+  .linkJustifyItemsStretch {
+    justify-content: stretch;
+  }
+
+  .linkJustifyItemsEnd {
+    justify-content: flex-end;
+  }
+
+  .linkAlignItemsStart {
+    align-items: flex-start;
+  }
+
+  .linkAlignItemsCenter {
+    align-items: center;
+  }
+
+  .linkAlignItemsStretch {
+    align-items: stretch;
+  }
+
+  .linkAlignItemsEnd {
+    align-items: flex-end;
+  }
+
+  .linkAlignItemsBaseline {
+    align-items: baseline;
+  }
+
+  .linkIconWrapper {
+    padding: var(--xmlui-padding-icon-Link, 0);
+    padding-left: var(--xmlui-paddingHorizontal-icon-Link, 0);
+    padding-right: var(--xmlui-paddingHorizontal-icon-Link, 0);
+    padding-top: var(--xmlui-paddingVertical-icon-Link, 0);
+    padding-bottom: var(--xmlui-paddingVertical-icon-Link, 0);
+    padding-left: var(--xmlui-paddingLeft-icon-Link, var(--xmlui-paddingHorizontal-icon-Link, 0));
+    padding-right: var(--xmlui-paddingRight-icon-Link, var(--xmlui-paddingHorizontal-icon-Link, 0));
+    padding-top: var(--xmlui-paddingTop-icon-Link, var(--xmlui-paddingVertical-icon-Link, 0));
+    padding-bottom: var(--xmlui-paddingBottom-icon-Link, var(--xmlui-paddingVertical-icon-Link, 0));
+    padding-inline-end: var(--xmlui-gap-icon-Link);
+    line-height: 0;
+  }
+
+  .linkIconMarker {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    mask: radial-gradient(circle at center, black 45%, transparent 47%);
+  }
+
+  .linkTextOverflowContainer {
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .linkTextSpan {
+    display: block;
+    min-width: 0;
+  }
+
+  .linkTruncateOverflow {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .linkPreserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .linkNoEllipsis {
+    text-overflow: clip;
+  }
+
+  .linkMultiLineClamp {
+    display: -webkit-box;
+    overflow: hidden;
+    white-space: normal;
+    -webkit-line-clamp: var(--xmlui-link-max-lines);
+    -webkit-box-orient: vertical;
+    position: relative;
+  }
+
+  .linkMultiLineClamp::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    height: 2px;
+    background: inherit;
+    pointer-events: none;
+  }
+
+  .linkOverflowNone {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    min-width: 0;
+  }
+
+  .linkOverflowScroll {
+    display: block;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 0;
+  }
+
+  .linkOverflowFlow {
+    display: block;
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-width: 0;
+  }
+}
+
+.linkBreakNormal {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.linkBreakWord {
+  overflow-wrap: break-word;
+}
+
+.linkBreakAnywhere {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.linkBreakKeep {
+  word-break: keep-all;
+}
+
+.linkBreakHyphenate {
+  hyphens: auto;
+  overflow-wrap: break-word;
+}

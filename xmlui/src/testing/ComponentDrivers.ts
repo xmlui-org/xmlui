@@ -35,6 +35,28 @@ export class ComponentDriver {
   getIcons(): Locator {
     return this.component.locator('[data-xmlui-part="icon"], [data-icon], svg');
   }
+
+  getByPartName(part: string): Locator {
+    return this.component.locator(`[data-part-id="${part}"], [data-xmlui-part="${part}"]`).first();
+  }
+}
+
+export class InputComponentDriver extends ComponentDriver {
+  get field(): Locator {
+    return this.getByPartName("input");
+  }
+
+  get label(): Locator {
+    return this.getByPartName("label");
+  }
+
+  get requiredIndicator(): Locator {
+    return this.component.getByText("*");
+  }
+
+  get placeholder(): Promise<string | null> {
+    return this.field.getAttribute("placeholder");
+  }
 }
 
 export class IconDriver extends ComponentDriver {
@@ -89,3 +111,23 @@ export class CodeBlockDriver extends ComponentDriver {
 }
 
 export class NoResultDriver extends ComponentDriver {}
+
+export class LinkDriver extends ComponentDriver {}
+
+export class TextBoxDriver extends InputComponentDriver {
+  get input(): Locator {
+    return this.component.locator("input").first();
+  }
+
+  get startAdornment(): Locator {
+    return this.getByPartName("startAdornment");
+  }
+
+  get endAdornment(): Locator {
+    return this.getByPartName("endAdornment");
+  }
+
+  get button(): Locator {
+    return this.endAdornment;
+  }
+}

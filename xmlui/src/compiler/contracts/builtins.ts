@@ -1,11 +1,13 @@
 import type { XmluiComponentContract } from "./types";
-import { supportedLayoutPropNames } from "../../styling";
+import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
 import { htmlTagDefinitions } from "../../component-core/htmlTags";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
 import { FragmentMd } from "../../components/Fragment/Fragment";
 import { ImageMd } from "../../components/Image/Image";
 import { IFrameMd } from "../../components/IFrame/IFrame";
+import { LinkMd } from "../../components/Link/Link";
+import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
 import { NoResultMd } from "../../components/NoResult/NoResult";
@@ -60,6 +62,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       testId: { name: "testId" },
       useHashBasedRouting: { name: "useHashBasedRouting" },
+      "backgroundColor-content-App": { name: "backgroundColor-content-App" },
+      "borderLeft-content-App": { name: "borderLeft-content-App" },
+      "maxWidth-content-App": { name: "maxWidth-content-App" },
+      "paddingHorizontal-content-App": { name: "paddingHorizontal-content-App" },
+      "paddingVertical-content-App": { name: "paddingVertical-content-App" },
+      "gap-content-App": { name: "gap-content-App" },
     }),
     events: {
       ready: { name: "ready", attributeName: "onReady" },
@@ -202,6 +210,37 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: false,
     includeLayoutProps: false,
     acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(LinkMd, {
+    name: "Link",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
+  contractFromMetadata(TextBoxMd, {
+    name: "TextBox",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(PasswordInputMd, {
+    name: "PasswordInput",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
   }),
   {
     name: "Stack",
@@ -357,24 +396,6 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       $itemIndex: { name: "$itemIndex" },
       $isFirst: { name: "$isFirst" },
       $isLast: { name: "$isLast" },
-    },
-  },
-  {
-    name: "TextBox",
-    kind: "builtin",
-    allowsChildren: false,
-    declarations: {},
-    props: withLayoutProps({
-      initialValue: { name: "initialValue" },
-      placeholder: { name: "placeholder" },
-      enabled: { name: "enabled" },
-      readOnly: { name: "readOnly" },
-      label: { name: "label" },
-    }),
-    events: {
-      didChange: { name: "didChange", attributeName: "onDidChange" },
-      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
-      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
     },
   },
   {
@@ -626,6 +647,9 @@ function withLayoutProps(
   return {
     ...Object.fromEntries(
       supportedLayoutPropNames.map((name) => [name, { name }]),
+    ),
+    ...Object.fromEntries(
+      supportedResponsiveLayoutPropNames.map((name) => [name, { name }]),
     ),
     when: { name: "when" },
     ...props,

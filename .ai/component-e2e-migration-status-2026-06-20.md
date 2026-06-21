@@ -58,6 +58,27 @@ Current status for the components started so far:
   A source-adjacent smoke suite now covers normal children and
   `loadingTemplate` rendering. Loader error propagation remains a later
   compatibility surface when the related data/loader components are migrated.
+- `Link`: original `Link.spec.ts` is migrated.
+  Verification: `npm --workspace xmlui run test:e2e -- src/components/Link/Link.spec.ts`
+  passed 54 tests with 1 old `fixme` skipped. The full migrated E2E suite then
+  passed 803 tests with 7 skipped. The component transfer audit reported
+  850/1764 old component tests accounted for by transferred old E2E specs.
+- `TextBox`: original `TextBox.spec.ts` is copied into the source-adjacent
+  component folder, but TextBox migration is not complete until the deferred
+  form-owned assertions are closed. Verification so far:
+  `npm --workspace xmlui run test -- --run`, `npm --workspace xmlui run
+  check:metadata`, and `npm --workspace xmlui run
+  compatibility:component-transfer` pass. The component E2E audit now reports
+  978/1764 old component tests accounted for. The full copied TextBox suite now
+  runs with `143 passed` and `21 skipped/fixme`. The passing surface includes
+  basic rendering, initial values, input changes, disabled and read-only states,
+  autofocus, native input assistance attributes, core label cases, events,
+  APIs, adornments, `PasswordInput`, TextBox theme variables, validation status
+  theme variables, width/layout behavior, parts, tooltips, animations, and
+  responsive breakpoint width props. Per the 2026-06-20 user decision, the
+  copied Form/FormItem validation, require-label, and `bindTo` E2E groups are
+  marked fixme and should be completed later when `Form` and `FormItem` are
+  migrated.
 - `App`: original `App.spec.ts`, `App-layout.spec.ts`,
   `App-layout-mobile.spec.ts`, `App-navigation-events.spec.ts`, and
   `App-script-imports.spec.ts` are copied, but App migration is not complete.
@@ -242,6 +263,61 @@ Button styling migration rule:
   such as `borderLeft-NoResult` must derive `borderLeftWidth-NoResult`,
   `borderLeftStyle-NoResult`, and `borderLeftColor-NoResult`, just as
   `border-NoResult` derives the base border longhands.
+- The current SCSS loader/test shim emits component classes as global class
+  names. Avoid generic migrated class names such as `truncateOverflow`,
+  `content`, or `icon`; prefix new component classes with the component name
+  until CSS module scoping is fully restored. Link initially used a generic
+  `truncateOverflow` class and broke Heading's `maxLines` E2E behavior.
+- Metadata files imported by compiler contracts can run during Vite config
+  loading. If importing `ComponentName.module.scss?xmlui-theme-vars` or a
+  renderer would pull virtual CSS queries into that config-time path, keep the
+  runtime stylesheet in `main.tsx` or the runtime renderer boundary and use an
+  inline `createThemeVar(...)` source string in metadata as a temporary bridge.
+- Link currently renders a lightweight visible icon marker for old
+  `Link.spec.ts` icon-part assertions instead of importing the full `Icon`
+  runtime. Revisit this when the metadata/runtime import boundary is redesigned
+  so runtime renderers can depend on other component renderers without pulling
+  CSS virtual queries into compiler config loading.
+- Large input suites are cross-component compatibility suites in disguise.
+  `TextBox.spec.ts` covers `TextBox`, `PasswordInput`, `Form`, `FormItem`,
+  `bindTo`, validation summaries, require-label modes, and theme variants.
+  Copy the full old spec to preserve the target, but do not mark the component
+  complete until every old assertion either passes or is explicitly moved to
+  the owning shared-infrastructure slice with a source-linked rationale.
+- `PasswordInput` is not a separate component folder in the old project. It is
+  declared in `TextBox.tsx` as metadata derived from `TextBoxMd` and rendered
+  by forwarding to the themed TextBox renderer with `type="password"`. Preserve
+  that source organization in the rewrite.
+- When a copied input spec includes `Form`/`FormItem` behavior, keep those tests
+  source-adjacent but schedule their completion with the form migration slice
+  when the user explicitly defers them. Do not delete or split them merely to
+  make the input slice look complete.
+- When a component spec is run by path under `src/components`, the Playwright
+  config should start only the Vite dev server. Starting production and SSG
+  servers for source-adjacent component tests couples the component slice to
+  unrelated production-build TypeScript errors.
+- TextBox theme variables must be consumed by SCSS through direct
+  `var(--xmlui-...)` declarations for the migrated raw SCSS runtime/test shim.
+  Sass variable indirection left several old theme assertions reading browser
+  defaults even though the generated CSS variables existed on the element.
+- Responsive layout attributes such as `width-md` are part of the layout
+  contract family. They must be accepted by compiler contracts, filtered from
+  arbitrary DOM passthrough, and merged by the runtime adapter according to the
+  active viewport.
+- Source-adjacent component tests expect the app testbed to start from a
+  full-viewport browser baseline. Import a global reset that removes the
+  default `body` margin; otherwise percentage width assertions use
+  `viewport - 16px`.
+- For labeled input components, old E2E tests expect the `testId` root to own a
+  descendant with `data-part-id="labeledItem"`. The labeled item itself is not
+  the component root in those assertions. Unlabeled inputs, however, expect the
+  styled input container to be the component root.
+- TextBox-like components need generated input ids when no XMLUI `id` is
+  supplied; otherwise clicking a label without an explicit id does not focus
+  the underlying input and the old focus event tests fail.
+- Old input label positions include aliases `before` and `after`, and their
+  visual mapping depends on direction. `before` means label before the input in
+  writing direction, so it maps differently for LTR and RTL.
 
 Component contract boundary:
 

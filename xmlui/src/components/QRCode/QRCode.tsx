@@ -105,7 +105,7 @@ export const qrCodeRenderer = wrapComponent({
         backgroundColor={backgroundColor}
         title={adapter.stringProp("title")}
         style={adapter.style as CSSProperties}
-        onInit={adapter.event("init")}
+        onInit={() => { void adapter.event("init")(); }}
       />
     );
   },

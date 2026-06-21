@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement } from "react";
+import { cloneElement, isValidElement, useState, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -46,13 +46,12 @@ export const tooltipBehavior: Behavior = {
   },
   canAttach: canAttachWhenTriggered("tooltip"),
   attach: (context, node) => (
-    <span
-      data-xmlui-behavior="tooltip"
-      title={stringValue(context.props.tooltip)}
-      data-xmlui-tooltip-markdown={stringValue(context.props.tooltipMarkdown)}
+    <TooltipBehavior
+      tooltip={stringValue(context.props.tooltip)}
+      tooltipMarkdown={stringValue(context.props.tooltipMarkdown)}
     >
       {node}
-    </span>
+    </TooltipBehavior>
   ),
 };
 
@@ -298,6 +297,44 @@ function canAttachWhenTriggered(name: string) {
       hasTriggeredBehaviorProp(metadata, context.props)
     );
   };
+}
+
+function TooltipBehavior({
+  children,
+  tooltip,
+  tooltipMarkdown,
+  ...rest
+}: {
+  children: ReactNode;
+  tooltip?: string;
+  tooltipMarkdown?: string;
+} & Record<string, unknown>) {
+  const [visible, setVisible] = useState(false);
+  const content = tooltipMarkdown || tooltip;
+  return (
+    <span
+      {...rest}
+      data-xmlui-behavior="tooltip"
+      title={tooltip}
+      data-xmlui-tooltip-markdown={tooltipMarkdown}
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+      onFocus={() => setVisible(true)}
+      onBlur={() => setVisible(false)}
+    >
+      {children}
+      {visible && content ? (
+        <span role="tooltip">
+          {tooltipMarkdown ? renderTinyMarkdown(tooltipMarkdown) : content}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function renderTinyMarkdown(markdown: string) {
+  const strongMatch = /^\*\*(.*)\*\*$/.exec(markdown.trim());
+  return strongMatch ? <strong>{strongMatch[1]}</strong> : markdown;
 }
 
 function stringValue(value: unknown): string | undefined {

@@ -66,11 +66,11 @@ describe("App main content layout migration", () => {
     expect(html).toContain("Second item");
   });
 
-  it("does not expose content theme variables as App props", () => {
+  it("exposes content theme variables as App props", () => {
     const appContract = builtInComponentContracts.find((contract) => contract.name === "App");
 
-    expect(appContract?.props["paddingHorizontal-content-App"]).toBeUndefined();
-    expect(appContract?.props["paddingVertical-content-App"]).toBeUndefined();
-    expect(appContract?.props["gap-content-App"]).toBeUndefined();
+    expect(appContract?.props["paddingHorizontal-content-App"]).toBeDefined();
+    expect(appContract?.props["paddingVertical-content-App"]).toBeDefined();
+    expect(appContract?.props["gap-content-App"]).toBeDefined();
   });
 });

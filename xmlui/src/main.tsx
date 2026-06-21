@@ -2,14 +2,17 @@ import { renderXmluiApp } from "./runtime";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import { createXmluiModule } from "./runtime";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
+import "./global.css";
 import "./components/HtmlTags/HtmlTags.module.scss?xmlui-css-module";
 import "./components/IFrame/IFrame.module.scss?xmlui-css-module";
 import "./components/Image/Image.module.scss?xmlui-css-module";
 import "./components/CodeBlock/CodeBlock.module.scss?xmlui-css-module";
 import "./components/ContentSeparator/ContentSeparator.module.scss?xmlui-css-module";
+import "./components/Link/Link.module.scss?xmlui-css-module";
 import "./components/NoResult/NoResult.module.scss?xmlui-css-module";
 import "./components/QRCode/QRCode.module.scss?xmlui-css-module";
 import "./components/SpaceFiller/SpaceFiller.module.scss?xmlui-css-module";
+import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -43,6 +46,7 @@ import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Mai
 import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
+import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
@@ -61,6 +65,7 @@ import styleMutationApp from "./examples/style-mutation/Main.xmlui";
 import themeScopeApp from "./examples/theme-scope/Main.xmlui";
 import themeVarsApp from "./examples/theme-vars/Main.xmlui";
 import textOldCompatibilityApp from "./examples/text-old-compatibility/Main.xmlui";
+import textBoxFoundationApp from "./examples/text-box-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -109,6 +114,7 @@ const examples = {
   htmlTagsFragment: htmlTagsFragmentApp,
   iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
+  linkInteraction: linkInteractionApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,
@@ -127,6 +133,7 @@ const examples = {
   themeScope: themeScopeApp,
   themeVars: themeVarsApp,
   textOldCompatibility: textOldCompatibilityApp,
+  textBoxFoundation: textBoxFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

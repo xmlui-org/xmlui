@@ -1397,91 +1397,564 @@ Visual check:
 
 #### Wave B: Core Interaction and Inputs
 
+Wave B is intentionally split into small slices. Each slice must migrate the
+old source-adjacent component docs and all old component E2E tests for the
+component before the slice is complete.
+
+##### Wave B1: Link Interaction
+
+Status: completed on 2026-06-20.
+
 Components:
 
-- `Button`, `Link`, `TextBox`, `TextArea`, `NumberBox`, `Checkbox`, `Switch`,
-  `Toggle`, `Slider`, `RatingInput`, `ColorPicker`, `DateInput`,
-  `TimeInput`, `DatePicker`, `FileInput`, `FileUploadDropZone`.
+- `Link`.
 
 Compatibility focus:
 
-- value and initial-value semantics, `didChange` payloads, keyboard/focus
-  behavior, validation hooks, form binding, disabled/enabled semantics,
-  imperative APIs, accessibility, and native-browser edge cases.
+- internal and external destinations, disabled links, active/no-indicator
+  styling, label/children/icon content, target/referrer/download HTML anchor
+  props, click events, text overflow options, alignment, theme variables, and
+  source-adjacent E2E parity.
+
+Implementation completed:
+
+- Created the source-adjacent `Link` component folder with metadata,
+  renderer, defaults, SCSS, docs, and the copied old `Link.spec.ts`.
+- Registered `Link` in the compiler built-in contracts, IR lowering
+  built-ins, component registry, component drivers, fixtures, and dev example
+  routing.
+- Preserved old-facing Link theme variables and link interaction semantics for
+  the migrated test surface.
+- Added runtime tooltip popup behavior for `role="tooltip"` compatibility while
+  preserving the existing static `title` attribute compatibility.
+- Prefixed Link SCSS class names to avoid collisions with the current global
+  SCSS test/runtime shim.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250.
+- `npm --workspace xmlui run check:metadata` passed.
+- `npm --workspace xmlui run test:e2e -- src/components/Link/Link.spec.ts`
+  passed 54 tests with 1 old `fixme` skip.
+- `npm --workspace xmlui run test:e2e -- src/components/Heading/Heading.spec.ts -g 'maxLines="2" cuts off long text'`
+  passed, protecting against the Link class-name collision regression.
+- `npm --workspace xmlui run test:e2e` passed 803 tests with 7 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` passed and
+  reported 850/1764 old component tests accounted for.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=linkInteraction`.
+
+##### Wave B2: Text Entry Inputs
+
+Wave B2 is split because the old input suites are large and couple individual
+inputs to shared form, validation, adornment, API, and keyboard infrastructure.
+Each input slice must copy its complete old spec, but a slice is complete only
+when the relevant old tests pass or the plan explicitly records that a failing
+group belongs to a not-yet-migrated shared dependency.
+
+Components:
+
+- `TextBox`;
+- `TextArea`;
+- `NumberBox`.
+
+Compatibility focus:
+
+- value/default value semantics, `didChange` payloads, form binding,
+  validation hooks, keyboard/focus behavior, disabled/read-only behavior,
+  placeholder/autofocus/native input props, and imperative APIs.
+
+###### Wave B2.1: TextBox Foundation
+
+Status: in progress as of 2026-06-20.
+
+Components:
+
+- `TextBox`;
+- `PasswordInput`.
+
+Compatibility focus:
+
+- source-adjacent metadata/defaults/docs/spec migration;
+- text/password/search input rendering;
+- `initialValue`, local value updates, `didChange`, focus/blur events,
+  `focus()`, `value`, and `setValue()`;
+- label, required/read-only/disabled state, native input assistance attributes,
+  start/end text and icon adornment parts, password visibility toggle, tooltip
+  and animation behavior hooks;
+- theme variable preservation for input root, placeholder, focus/hover/disabled
+  states, adornments, and password toggle.
+
+Known dependency boundary:
+
+- The copied old `TextBox.spec.ts` also covers `Form`, `FormItem`, validation
+  summaries, `bindTo`, and require-label modes. Per the 2026-06-20 planning
+  decision, complete those E2E groups later when `Form` and `FormItem` are
+  migrated. Keep the tests copied in place so the gap remains visible.
+
+Implementation progress:
+
+- Created the source-adjacent `TextBox` component folder with metadata,
+  renderer, defaults, SCSS, docs, and the copied old `TextBox.spec.ts`.
+- Registered `TextBox` in compiler contracts, component registry, transferred
+  E2E audit paths, test fixtures, component drivers, runtime stylesheet
+  loading, and dev example routing.
+- Added the `textBoxFoundation` visual example with `TextBox`-driven state
+  updates.
+- Implemented the standalone TextBox foundation for basic rendering,
+  `initialValue`, user updates, `didChange`, focus/blur, label rendering,
+  native input assistance attributes, adornment parts, label click focus,
+  `focus()`, `value`, and `setValue()`.
+- Migrated the old-compatible `PasswordInput` surface in the `TextBox`
+  component folder, matching the old project pattern where `PasswordInput` is a
+  themed TextBox variant rather than a separate component folder.
+- Closed the TextBox-owned E2E failures for direct theme-variable propagation,
+  validation-status theme variables, part selection, percent widths, and
+  responsive breakpoint layout props.
+- Updated the component testbed/runtime baseline so source-adjacent component
+  tests run against the old full-viewport body reset and component-spec runs do
+  not start unrelated production/SSG servers.
+
+Verification so far:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250.
+- `npm --workspace xmlui run check:metadata` passed.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` passed and
+  reported 978/1764 old component tests accounted for.
+- `npm --workspace xmlui run test:e2e -- src/components/TextBox/TextBox.spec.ts -g "Password Input"`
+  passed 8/8, covering the migrated `PasswordInput` subset from the copied old
+  TextBox suite.
+- `npm --workspace xmlui run test:e2e -- src/components/TextBox/TextBox.spec.ts`
+  passed the current TextBox slice with 143 passing tests and 21 skipped/fixme
+  tests. The skipped/fixme tests are the pre-existing variant placeholders plus
+  the Form/FormItem-coupled `bindTo`, require-label, and validation-feedback
+  assertions deferred to the form migration slice.
+
+Remaining before Wave B2.1 is complete:
+
+- Leave Form/FormItem-coupled TextBox assertions copied but deferred until the
+  `Form` and `FormItem` migration slice.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=textBoxFoundation`.
+
+###### Wave B2.2: TextArea Foundation
+
+Components:
+
+- `TextArea`.
+
+Compatibility focus:
+
+- TextArea rendering, multiline value updates, autosize/min/max rows,
+  `enterSubmits`, `escResets`, textarea assistance attributes, APIs, and the
+  form-coupled tests made possible by prior shared input/form work.
+
+###### Wave B2.3: NumberBox Foundation
+
+Components:
+
+- `NumberBox`.
+
+Compatibility focus:
+
+- numeric input parsing/formatting, incomplete number editing states,
+  scientific notation, spinner buttons, integer/positive constraints,
+  adornments, APIs, and the form-coupled tests made possible by prior shared
+  input/form work.
+
+##### Wave B3: Boolean and Toggle Inputs
+
+Components:
+
+- `Checkbox`;
+- `Switch`;
+- `Toggle`.
+
+Compatibility focus:
+
+- checked/value semantics, tri-state behavior where present, labels,
+  keyboard/focus behavior, disabled/read-only behavior, validation/form
+  integration, theme parts, and accessibility.
+
+##### Wave B4: Range and Rating Inputs
+
+Components:
+
+- `Slider`;
+- `RatingInput`.
+
+Compatibility focus:
+
+- numeric value coercion, min/max/step behavior, keyboard interaction, pointer
+  interaction, form binding, did-change semantics, visual parts, and disabled
+  states.
+
+##### Wave B5: Date, Time, and Color Inputs
+
+Components:
+
+- `ColorPicker`;
+- `DateInput`;
+- `TimeInput`;
+- `DatePicker`.
+
+Compatibility focus:
+
+- native/browser value formats, locale-sensitive display where exposed,
+  calendar/picker behavior, validation, clear/reset behavior, keyboard/focus
+  behavior, and form integration.
+
+##### Wave B6: File Inputs
+
+Components:
+
+- `FileInput`;
+- `FileUploadDropZone`.
+
+Compatibility focus:
+
+- file selection payloads, drag/drop behavior, accepted types, multiple files,
+  upload/drop events, disabled states, browser restrictions, and test harness
+  file fixtures.
 
 #### Wave C: Selection and Collection Components
 
+##### Wave C1: Existing Collection Foundation
+
 Components:
 
-- `Items`, `List`, `Select`, `Option`, `AutoComplete`, `RadioGroup`,
-  `SelectionStore`, `Pagination`, `Table`, `Column`, `Tree`, `TreeDisplay`,
-  `TableOfContents`.
+- `Items`;
+- `Select`;
+- `Option`.
 
 Compatibility focus:
 
-- item context variables, templates, selection state, sorting/filtering,
-  paging, option enablement, keyboard navigation, virtual/list rendering where
-  present, table column contracts, and API references.
+- current experimental collection components must be re-closed against old
+  metadata, docs, theme variables, and complete old E2E tests before deeper
+  collection work starts.
+
+##### Wave C2: Choice Collections
+
+Components:
+
+- `AutoComplete`;
+- `RadioGroup`.
+
+Compatibility focus:
+
+- option filtering, selected value semantics, labels, keyboard navigation,
+  disabled option behavior, popover/list behavior, and form integration.
+
+##### Wave C3: List Selection and Paging
+
+Components:
+
+- `List`;
+- `SelectionStore`;
+- `Pagination`.
+
+Compatibility focus:
+
+- item context variables, item templates, selection state, paging state,
+  sorting/filtering hooks where present, and API references.
+
+##### Wave C4: Table Family
+
+Components:
+
+- `Table`;
+- `Column`.
+
+Compatibility focus:
+
+- column definitions, cell/header templates, sorting, selection, paging,
+  loading/empty states, sizing, keyboard behavior, and table APIs.
+
+##### Wave C5: Tree and Table of Contents
+
+Components:
+
+- `Tree`;
+- `TreeDisplay`;
+- `TableOfContents`.
+
+Compatibility focus:
+
+- hierarchy data shape, expand/collapse state, selection, item templates,
+  keyboard navigation, document-heading discovery, and route/hash integration.
 
 #### Wave D: Layout and Container Components
 
+##### Wave D1: Stack and Card Layout Primitives
+
 Components:
 
-- `Stack`, `HStack`, `VStack`, `FlowLayout`, `TileGrid`, `Card`,
-  `ResponsiveBar`, `Splitter`, `ScrollViewer`, `StickyBox`,
-  `StickySection`, `Accordion`, `ExpandableItem`, `Tabs`, `Drawer`,
-  `ModalDialog`, `Tooltip`, `ContextMenu`, `DropdownMenu`, `Menu`,
-  `AppHeader`, `Footer`, `NavPanel`, `NavGroup`,
-  `NavPanelCollapseButton`, `ProfileMenu`.
+- `Stack`;
+- `HStack`;
+- `VStack`;
+- `FlowLayout`;
+- `TileGrid`;
+- `Card`.
 
 Compatibility focus:
 
-- child layout, theme parts, responsive behavior, overlays, portals,
-  z-index/focus trapping, dismissal behavior, keyboard navigation, mobile
-  layout, nested interactive children, and CSS parity.
+- existing experimental layout primitives must be re-closed against old
+  metadata, docs, SCSS, theme variables, layout aliases, and all old E2E
+  tests.
+
+##### Wave D2: Adaptive and Scrolling Layout
+
+Components:
+
+- `ResponsiveBar`;
+- `Splitter`;
+- `ScrollViewer`;
+- `StickyBox`;
+- `StickySection`.
+
+Compatibility focus:
+
+- responsive behavior, splitter sizing, overflow/scroll semantics, sticky
+  positioning, resize events, and nested layout interactions.
+
+##### Wave D3: Disclosure and Tab Containers
+
+Components:
+
+- `Accordion`;
+- `ExpandableItem`;
+- `Tabs`.
+
+Compatibility focus:
+
+- controlled/default selected state, keyboard navigation, disclosure events,
+  lazy/eager children behavior, theme parts, and accessibility.
+
+##### Wave D4: Overlay Foundations
+
+Components:
+
+- `Drawer`;
+- `ModalDialog`;
+- `Tooltip`.
+
+Compatibility focus:
+
+- portals, z-index layers, focus trapping, dismissal, modal/non-modal behavior,
+  positioning, keyboard handling, and accessibility.
+
+##### Wave D5: Menus and Context Overlays
+
+Components:
+
+- `ContextMenu`;
+- `DropdownMenu`;
+- `Menu`.
+
+Compatibility focus:
+
+- trigger behavior, nested menu structure, keyboard navigation, disabled
+  entries, selection events, placement, dismissal, and focus restoration.
+
+##### Wave D6: Shell Navigation Containers
+
+Components:
+
+- `AppHeader`;
+- `Footer`;
+- `NavPanel`;
+- `NavGroup`;
+- `NavPanelCollapseButton`;
+- `ProfileMenu`.
+
+Compatibility focus:
+
+- shell layout regions, responsive/mobile behavior, collapse state, navigation
+  grouping, profile/menu interaction, theme parts, and app-shell integration.
 
 #### Wave E: Forms and Validation Components
 
+##### Wave E1: Form Foundation
+
 Components:
 
-- `Form`, `FormItem`, `FormSegment`, `ValidationSummary`,
-  `ConciseValidationFeedback`, `StepperForm`, `TabsForm`.
+- `Form`;
+- `FormItem`;
+- `FormSegment`.
 
 Compatibility focus:
 
-- value binding, validation lifecycle, submit/reset behavior, labels/help text,
-  disabled/read-only propagation, multi-step state, tabbed forms, error
-  rendering, server validation, and accessibility.
+- value binding, form context, submit/reset lifecycle, disabled/read-only
+  propagation, labels/help text, field-level validation, and API references.
+
+##### Wave E2: Validation Display
+
+Components:
+
+- `ValidationSummary`;
+- `ConciseValidationFeedback`.
+
+Compatibility focus:
+
+- validation message collection, error rendering, field association,
+  accessibility announcements, and form submit timing.
+
+##### Wave E3: Structured Forms
+
+Components:
+
+- `StepperForm`;
+- `TabsForm`.
+
+Compatibility focus:
+
+- step/tab state, validation gating, submit/reset behavior, navigation events,
+  disabled states, and nested form item interaction.
 
 #### Wave F: Data, Side-Effect, and Runtime Service Components
 
+##### Wave F1: Data Providers and Calls
+
 Components:
 
-- `DataSource`, `APICall`, `AppState`, `ChangeListener`, `Lifecycle`,
-  `Timer`, `Queue`, `Toast`, `EventSource`, `WebSocket`, `MessageListener`,
-  `RetryPolicy`, `Bookmark`, `LiveRegion`, `SkipLink`, `FocusScope`,
-  `Animation`, `ToneChangerButton`, `ToneSwitch`, `Theme`, `Part`, `Slot`,
-  `InspectButton`, `Inspector`, `I18n`.
+- `DataSource`;
+- `APICall`;
+- `RetryPolicy`.
 
 Compatibility focus:
 
-- non-visual API registration, lifecycle ordering, retries, polling, streaming,
-  subscriptions, cleanup, app state persistence, accessibility announcements,
-  theme scoping, inspector behavior, and event timing.
+- current experimental data components must be re-closed against old tests;
+  request lifecycle, caching, retries, cancellation, refresh, error state, and
+  API references must match old behavior.
 
-#### Wave G: Routing, App Composition, and Navigation Components
+##### Wave F2: App State and Lifecycle Listeners
 
 Components:
 
-- `App`, `Pages`, `Page`, `NavLink`, `Redirect`, `NestedApp`.
+- `AppState`;
+- `ChangeListener`;
+- `Lifecycle`.
+
+Compatibility focus:
+
+- non-visual API registration, listener ordering, cleanup, app state
+  persistence, initial invocation behavior, and event timing.
+
+##### Wave F3: Scheduling and Queues
+
+Components:
+
+- `Timer`;
+- `Queue`.
+
+Compatibility focus:
+
+- scheduling cadence, cancellation, queue ordering, concurrency behavior,
+  lifecycle cleanup, and event handler interaction.
+
+##### Wave F4: Messaging and Streaming
+
+Components:
+
+- `EventSource`;
+- `WebSocket`;
+- `MessageListener`.
+
+Compatibility focus:
+
+- connection lifecycle, reconnection where present, message payloads,
+  subscription cleanup, errors, and app event dispatch.
+
+##### Wave F5: User Feedback and Accessibility Services
+
+Components:
+
+- `Toast`;
+- `Bookmark`;
+- `LiveRegion`;
+- `SkipLink`;
+- `FocusScope`;
+- `Animation`.
+
+Compatibility focus:
+
+- announcements, focus boundaries, skip targets, bookmark behavior, animation
+  lifecycle, visual feedback, and accessibility semantics.
+
+##### Wave F6: Theme and Inspection Runtime
+
+Components:
+
+- `ToneChangerButton`;
+- `ToneSwitch`;
+- `Theme`;
+- `Part`;
+- `Slot`;
+- `InspectButton`;
+- `Inspector`;
+- `I18n`.
+
+Compatibility focus:
+
+- theme scoping, tone changes, part/slot semantics, inspector visibility and
+  metadata, localization lookup, and runtime service APIs.
+
+#### Wave G: Routing, App Composition, and Navigation Components
+
+##### Wave G1: Remaining App Shell Behavior
+
+Components:
+
+- `App`.
 
 Compatibility focus:
 
 - `App` shell behavior beyond the Wave A main-content layout slice: startup,
   navigation regions, headers, footers, mobile shell, search, index collection,
-  page metadata, and standalone/Vite differences;
+  page metadata, and standalone/Vite differences.
+
+##### Wave G2: Page Routing Core
+
+Components:
+
+- `Pages`;
+- `Page`;
+- `Redirect`.
+
+Compatibility focus:
+
 - page startup, navigation events, route matching, route/query context
-  variables, nested app boundaries, SSG route discovery, and page metadata.
+  variables, redirects, SSG route discovery, and page metadata.
+
+##### Wave G3: Navigation Components
+
+Components:
+
+- `NavLink`.
+
+Compatibility focus:
+
+- active route matching, disabled state, navigation side effects, styling,
+  keyboard/focus behavior, and route/query compatibility.
+
+##### Wave G4: Nested App Boundary
+
+Components:
+
+- `NestedApp`.
+
+Compatibility focus:
+
+- nested app startup, state/theme/router boundaries, package loading,
+  lifecycle cleanup, and standalone/Vite behavior.
 
 Each wave should close components in small batches that can keep
 `compatibility:sweep` useful. If a component requires infrastructure from a

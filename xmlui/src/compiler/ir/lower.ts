@@ -421,6 +421,7 @@ const builtInElementNames = new Set([
   "Icon",
   "Image",
   "IFrame",
+  "Link",
   "Logo",
   "PageMetaTitle",
   "QRCode",
@@ -448,6 +449,7 @@ const builtInElementNames = new Set([
   "Stack",
   "Text",
   "TextBox",
+  "PasswordInput",
   "Theme",
   "VStack",
 ]);

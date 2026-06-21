@@ -5,6 +5,7 @@ import {
   useRef,
   type CSSProperties,
   type ForwardedRef,
+  type HTMLAttributeReferrerPolicy,
   type HTMLAttributes,
 } from "react";
 
@@ -13,7 +14,7 @@ type IFrameProps = {
   srcdoc?: string;
   allow?: string;
   name?: string;
-  referrerPolicy?: string;
+  referrerPolicy?: HTMLAttributeReferrerPolicy;
   sandbox?: string;
   style?: CSSProperties;
   registerApi?: (api: Record<string, unknown>) => void;

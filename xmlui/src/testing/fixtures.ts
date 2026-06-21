@@ -5,7 +5,9 @@ import {
   ComponentDriver,
   ContentSeparatorDriver,
   IconDriver,
+  LinkDriver,
   NoResultDriver,
+  TextBoxDriver,
 } from "./ComponentDrivers";
 
 export type InitTestBedOptions = {
@@ -29,6 +31,8 @@ type Fixtures = {
   createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
+  createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
+  createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createIconDriver: (target: string | Locator) => Promise<IconDriver>;
   createHtmlTagDriver: () => Promise<ComponentDriver>;
   createStackDriver: (testId?: string) => Promise<ComponentDriver>;
@@ -118,6 +122,25 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createLinkDriver: async ({ page }, use) => {
+    await use(async (testId) => new LinkDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="Link"], [data-xmlui-component="a"]').first(),
+      page,
+    }));
+  },
+  createTextBoxDriver: async ({ page }, use) => {
+    await use(async (testId) => new TextBoxDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="TextBox"]').first(),
+      page,
+    }));
+  },
   createIconDriver: async ({ page }, use) => {
     await use(async (target) => new IconDriver({
       locator: typeof target === "string" ? page.getByTestId(target) : target,
@@ -177,11 +200,19 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     return trimmed;
   }
   const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
+  const testBedAppAttributes = {
+    "paddingHorizontal-content-App": "0",
+    "paddingVertical-content-App": "0",
+    "gap-content-App": "0",
+  };
+  const appThemeAttributes = Object.entries(testBedAppAttributes)
+    .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
+    .join(" ");
   const themeAttributes = Object.entries(options.testThemeVars ?? {})
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{null}" ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{null}" ${appThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
 }
 
 function normalizeLegacyTestMarkup(markup: string): string {

@@ -1,3 +1,5 @@
+import type { HTMLAttributeReferrerPolicy } from "react";
+
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
 import { createMetadata } from "../../component-core/metadata/helpers";
@@ -92,7 +94,7 @@ export const iframeRenderer = wrapComponent({
         srcdoc={normalizeSrcDoc(safeOptionalString(adapter.prop("srcdoc")))}
         allow={safeOptionalString(adapter.prop("allow"))}
         name={safeOptionalString(adapter.prop("name"))}
-        referrerPolicy={safeOptionalString(adapter.prop("referrerPolicy"))}
+        referrerPolicy={safeOptionalString(adapter.prop("referrerPolicy")) as HTMLAttributeReferrerPolicy | undefined}
         sandbox={safeOptionalString(adapter.prop("sandbox"))}
         registerApi={adapter.registerApi}
         onLoad={(event) => void adapter.event("load")(event)}

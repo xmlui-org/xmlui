@@ -10,7 +10,14 @@ import React, {
 import { attachBehaviors } from "../../component-core/behaviors";
 import type { ComponentMetadata } from "../../component-core/metadata";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
-import { resolveLayoutStyle, supportedLayoutPropNames } from "../../styling";
+import {
+  COMPONENT_PART_KEY,
+  resolveLayoutStyle,
+  resolveResponsiveLayoutStyles,
+  responsiveBreakpoints,
+  supportedLayoutPropNames,
+  supportedResponsiveLayoutPropNames,
+} from "../../styling";
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
@@ -111,7 +118,11 @@ export function useXmluiComponentAdapter({
   const apiRef = useRef<Record<string, unknown>>({});
   const registeredIdRef = useRef<string>();
   const themeClass = useComponentThemeClass(name, metadata, themeContributors);
-  const layoutStyle = useMemo(() => resolveLayoutStyle(props), [props]);
+  const viewportWidth = useViewportWidth();
+  const layoutStyle = useMemo(
+    () => resolveActiveLayoutStyle(props, viewportWidth),
+    [props, viewportWidth],
+  );
   const registerApi = useCallback((api: Record<string, unknown>) => {
     Object.assign(apiRef.current, api);
     const id = typeof props.id === "string" ? props.id : undefined;
@@ -225,6 +236,45 @@ export function useXmluiComponentAdapter({
   return adapter;
 }
 
+function resolveActiveLayoutStyle(
+  props: Record<string, unknown>,
+  viewportWidth: number | undefined,
+): CSSProperties {
+  const responsive = resolveResponsiveLayoutStyles(props);
+  const componentStyle = responsive[COMPONENT_PART_KEY];
+  if (!componentStyle) {
+    return resolveLayoutStyle(props);
+  }
+
+  const style: CSSProperties = { ...componentStyle.base };
+  if (viewportWidth !== undefined) {
+    for (const [breakpoint, minWidth] of Object.entries(responsiveBreakpoints)) {
+      if (viewportWidth >= minWidth) {
+        Object.assign(style, componentStyle.breakpoints[breakpoint as keyof typeof responsiveBreakpoints]);
+      }
+    }
+  }
+  return style;
+}
+
+function useViewportWidth(): number | undefined {
+  const [width, setWidth] = React.useState(() =>
+    typeof window === "undefined" ? undefined : window.innerWidth,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const updateWidth = () => setWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  return width;
+}
+
 function templateChildren(node: XmluiElement, name: string): XmluiNode[] | undefined {
   const property = node.children.find(
     (child): child is XmluiElement =>
@@ -249,6 +299,7 @@ function arbitraryRootAttrs(
   const knownProps = new Set([
     ...Object.keys(metadata.props ?? {}),
     ...supportedLayoutPropNames,
+    ...supportedResponsiveLayoutPropNames,
     "testId",
     "when",
   ]);
