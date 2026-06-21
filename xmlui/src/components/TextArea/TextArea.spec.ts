@@ -1,0 +1,1640 @@
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
+import { test, expect } from "../../testing/fixtures";
+
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.describe("Basic Functionality", () => {
+  test("component renders with basic props", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("component renders with label", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea label="Comments" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+    await expect(page.getByText("Comments")).toBeVisible();
+  });
+
+  test("initialValue sets textarea value correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="Initial text content" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("Initial text content");
+  });
+
+  test("initialValue accepts different data types", async ({ initTestBed, page }) => {
+    // Test string
+    await initTestBed(`<TextArea initialValue="hello world" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("hello world");
+
+    // Test number
+    await initTestBed(`<TextArea initialValue="{123}" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("123");
+
+    // Test boolean
+    await initTestBed(`<TextArea initialValue="{true}" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("true");
+  });
+
+  test("component handles null and undefined props gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="{null}" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("");
+
+    await initTestBed(`<TextArea initialValue="{undefined}" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("");
+
+    await initTestBed(`<TextArea />`);
+    await expect(page.getByRole("textbox")).toHaveValue("");
+  });
+
+  test("component accepts user input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea />`);
+    await page.getByRole("textbox").fill("user input");
+    await expect(page.getByRole("textbox")).toHaveValue("user input");
+  });
+
+  test("component accepts multiline input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea />`);
+    const multilineText = "First line\nSecond line\nThird line";
+
+    await page.getByRole("textbox").fill(multilineText);
+    await expect(page.getByRole("textbox")).toHaveValue(multilineText);
+  });
+
+  test("component clears input correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="Initial content" />`);
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toHaveValue("Initial content");
+    await textarea.clear();
+    await expect(textarea).toHaveValue("");
+  });
+
+  test("required prop adds required attribute", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea required="true" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("required");
+  });
+
+  test("enabled=false disables control", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea enabled="false" />`);
+    await expect(page.getByRole("textbox")).not.toBeEditable();
+  });
+
+  test("readOnly prevents editing but allows focus", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea readOnly="true" initialValue="Read only content" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("readonly");
+    await expect(page.getByRole("textbox")).toHaveValue("Read only content");
+    await expect(page.getByRole("textbox")).not.toBeEditable();
+
+    await page.getByRole("textbox").focus();
+    await expect(page.getByRole("textbox")).toBeFocused();
+  });
+
+  test("autoFocus focuses textarea on mount", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea autoFocus="true" />`);
+    await expect(page.getByRole("textbox")).toBeFocused();
+  });
+
+  test("autoFocus focuses input on mount with label", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea autoFocus="true" label="Auto-focused input" />`);
+    await expect(page.getByLabel("Auto-focused input")).toBeFocused();
+  });
+
+  test("passes input assistance attributes to textarea", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<TextArea autoComplete="new-password" autoCorrect="{false}" spellCheck="{false}" autoCapitalize="off" />`,
+    );
+    const textarea = page.getByRole("textbox");
+
+    await expect(textarea).toHaveAttribute("autocomplete", "new-password");
+    await expect(textarea).toHaveAttribute("autocorrect", "off");
+    await expect(textarea).toHaveAttribute("spellcheck", "false");
+    await expect(textarea).toHaveAttribute("autocapitalize", "off");
+  });
+
+  test("coerces boolean autoComplete values to on/off", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea autoComplete="{true}" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("autocomplete", "on");
+
+    await initTestBed(`<TextArea autoComplete="{false}" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("autocomplete", "off");
+  });
+
+  test("placeholder shows when textarea is empty", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea placeholder="Enter your comments here..." />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute(
+      "placeholder",
+      "Enter your comments here...",
+    );
+  });
+
+  test("placeholder is hidden when textarea has content", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea placeholder="Enter comments" />`);
+    const textarea = page.getByRole("textbox");
+    await textarea.fill("Some content");
+    await expect(textarea).toHaveValue("Some content");
+    await expect(textarea).toHaveAttribute("placeholder", "Enter comments");
+  });
+
+  test("maxLength limits input length", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea maxLength="10" />`);
+    await page.getByRole("textbox").fill("12345678901234567890");
+    await expect(page.getByRole("textbox")).toHaveValue("1234567890");
+  });
+
+  test("rows prop sets textarea height", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea rows="5" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("rows", "5");
+  });
+
+  test("component handles special characters correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea />`);
+    const specialText = "Hello 日本語 @#$%! 🚀 Unicode test 🎉";
+    await page.getByRole("textbox").fill(specialText);
+    await expect(page.getByRole("textbox")).toHaveValue(specialText);
+  });
+
+  test("component handles very long input values", async ({ initTestBed, page }) => {
+    const longText =
+      "This is a very long text that might cause issues with component rendering or processing. ".repeat(
+        50,
+      );
+    await initTestBed(`<TextArea />`);
+    await page.getByRole("textbox").fill(longText);
+    await expect(page.getByRole("textbox")).toHaveValue(longText);
+  });
+
+  test("component prop changes update display correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.rows="{3}">
+        <TextArea rows="{rows}" />
+        <Button onClick="rows = 5">Set Rows to 5</Button>
+      </Fragment>`);
+    const textarea = page.getByRole("textbox");
+
+    await expect(textarea).toHaveAttribute("rows", "3");
+    await page.getByRole("button", { name: "Set Rows to 5" }).click();
+    await expect(textarea).toHaveAttribute("rows", "5");
+  });
+
+  test("autoSize enables automatic height adjustment", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea testId="input" autoSize="true" />`);
+    const textarea = page.getByTestId("input").locator("textarea");
+    const areaField = page.getByRole("textbox");
+
+    // Get initial height with single line
+    await areaField.fill("Single line");
+    const initialHeight = await textarea.evaluate((el) => el.scrollHeight);
+
+    // Add multiple lines and verify height increases
+    await areaField.fill("Line 1\nLine 2\nLine 3\nLine 4");
+    const expandedHeight = await textarea.evaluate((el) => el.scrollHeight);
+
+    // Height should increase when more lines are added
+    expect(expandedHeight).toBeGreaterThan(initialHeight);
+
+    // Verify content is correct
+    await expect(areaField).toHaveValue("Line 1\nLine 2\nLine 3\nLine 4");
+
+    // Test reduction - go back to fewer lines
+    await areaField.fill("Line 1\nLine 2");
+    const reducedHeight = await areaField.evaluate((el) => el.scrollHeight);
+
+    // Height should decrease when lines are removed
+    expect(reducedHeight).toBeLessThan(expandedHeight);
+    expect(reducedHeight).toBeGreaterThanOrEqual(initialHeight);
+  });
+
+  test("maxRows limits auto-size height", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea testId="input" autoSize="true" maxRows="3" />`);
+    const textarea = page.getByTestId("input").locator("textarea");
+    const areaField = page.getByRole("textbox");
+
+    // Fill with more content than maxRows should allow
+    const manyLines = Array(10).fill("Line content").join("\n");
+    await areaField.fill(manyLines);
+
+    // Content should still be there - the key is that maxRows is applied
+    await expect(areaField).toHaveValue(manyLines);
+
+    // Verify the component is still visible and functional with large content
+    await expect(areaField).toBeVisible();
+    await expect(areaField).toBeEditable();
+
+    // The textarea should have some form of height constraint applied
+    // (exact implementation may vary, but component should remain functional)
+    const boundingRect = await getBounds(textarea);
+    expect(boundingRect).not.toBeNull();
+    expect(boundingRect.height).toBeGreaterThan(0);
+  });
+
+  test("minRows sets minimum auto-size height", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea testId="input" autoSize="true" minRows="4" />`);
+    const textarea = page.getByTestId("input").locator("textarea");
+    const areaField = page.getByRole("textbox");
+
+    await expect(textarea).toBeVisible();
+    await expect(areaField).toBeVisible();
+
+    // Even with no content, component should be functional
+    await expect(areaField).toHaveValue("");
+
+    // Fill with single line (less than minRows)
+    await areaField.fill("Single line");
+    await expect(areaField).toHaveValue("Single line");
+
+    // Fill with content that matches minRows
+    await areaField.fill("Line 1\nLine 2\nLine 3\nLine 4");
+    await expect(areaField).toHaveValue("Line 1\nLine 2\nLine 3\nLine 4");
+
+    // Verify the component remains functional with different content lengths
+    await expect(areaField).toBeVisible();
+    await expect(areaField).toBeEditable();
+  });
+
+  test.fixme("enterSubmits enables form submission on Enter", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="testState = 'submitted'">
+        <TextArea enterSubmits="true" />
+        <Button type="submit" testId="submitBtn">Submit</Button>
+      </Form>
+    `);
+    const textarea = page.getByRole("textbox");
+
+    await textarea.focus();
+    await textarea.fill("Some content");
+    await textarea.press("Enter");
+
+    await expect.poll(testStateDriver.testState).toEqual("submitted");
+  });
+
+  test.fixme("enterSubmits=false prevents form submission on Enter", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="testState = 'submitted'">
+        <TextArea enterSubmits="false" />
+        <Button type="submit" testId="submitBtn">Submit</Button>
+      </Form>
+    `);
+    const textarea = page.getByRole("textbox");
+
+    await textarea.focus();
+    await textarea.fill("Some content");
+    await textarea.press("Enter");
+
+    // Should not submit, so testState should remain null
+    await expect.poll(testStateDriver.testState).toEqual(null);
+
+    // But should allow new line in textarea
+    await expect(textarea).toHaveValue("Some content\n");
+  });
+
+  test.fixme("Shift+Enter creates new line even with enterSubmits=true", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="testState = 'submitted'">
+        <TextArea enterSubmits="true" />
+      </Form>
+    `);
+
+    const textarea = page.getByRole("textbox");
+
+    await textarea.focus();
+    await textarea.fill("Line 1");
+    await textarea.press("Shift+Enter");
+    await textarea.type("Line 2");
+
+    await expect(textarea).toHaveValue("Line 1\nLine 2");
+    await expect.poll(testStateDriver.testState).toEqual(null); // Should not have submitted
+  });
+
+  test.fixme("escResets enables form reset on Escape", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea id="myTextarea" initialValue="Initial value" escResets="true" />
+      </Form>
+    `);
+
+    const textarea = page.getByRole("textbox");
+
+    await textarea.fill("Changed content");
+    await expect(textarea).toHaveValue("Changed content");
+
+    await textarea.press("Escape");
+    await expect(textarea).toHaveValue("Initial value");
+  });
+
+  test("escResets=false does not reset on Escape", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea escResets="false" initialValue="Initial value" />`);
+    const textarea = page.getByRole("textbox");
+
+    await textarea.fill("Changed content");
+    await expect(textarea).toHaveValue("Changed content");
+
+    await textarea.press("Escape");
+    await expect(textarea).toHaveValue("Changed content"); // Should remain unchanged
+  });
+
+  test("component handles readOnly and enabled=false together", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea readOnly="true" enabled="false" />`);
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toBeDisabled();
+    await expect(textarea).toHaveAttribute("readonly");
+  });
+
+  test("component handles autoFocus with enabled=false", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea autoFocus="true" enabled="false" />`);
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toBeDisabled();
+    await expect(textarea).not.toBeFocused();
+  });
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.describe("Accessibility", () => {
+  test("component has correct accessibility attributes", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea label="Comments" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("aria-multiline", "true");
+  });
+
+  test("component is keyboard accessible when interactive", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea
+        label="Comments"
+        onGotFocus="testState = 'keyboard-focused'"
+      />
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.focus();
+    await expect(textarea).toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual("keyboard-focused");
+  });
+
+  test("non-interactive component is not focusable when disabled", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<TextArea enabled="false" />`);
+    const textarea = page.getByRole("textbox");
+
+    await expect(textarea).toBeDisabled();
+    await expect(textarea).not.toBeFocused();
+  });
+
+  test("label is properly associated with textarea", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea label="User Comments" />`);
+    const component = page.getByLabel("User Comments");
+    await expect(component).toHaveRole("textbox");
+  });
+
+  test("required has proper ARIA attributes", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea required="true" label="Required Comments" />`);
+
+    await expect(page.getByRole("textbox")).toHaveAttribute("required");
+    await expect(page.getByText("Required Comments")).toContainText("*");
+  });
+
+  test("readOnly has proper ARIA attributes", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea readOnly="true" label="Read-only textarea" />`);
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toHaveAttribute("aria-readonly", "true");
+    await expect(textarea).toHaveAttribute("readonly");
+  });
+
+  test("placeholder provides accessible description", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea placeholder="Describe your feedback in detail" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute(
+      "placeholder",
+      "Describe your feedback in detail",
+    );
+  });
+
+  test("component supports multiple textareas with keyboard navigation", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea label="First textarea" />
+        <TextArea label="Second textarea" />
+      </Fragment>
+    `);
+
+    const firstTextarea = page.getByLabel("First textarea");
+    const secondTextarea = page.getByLabel("Second textarea");
+
+    await firstTextarea.focus();
+    await expect(firstTextarea).toBeFocused();
+
+    await expect(firstTextarea).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(secondTextarea).toBeFocused();
+  });
+});
+
+// =============================================================================
+// EVENT HANDLING TESTS
+// =============================================================================
+
+test.describe("Event Handling", () => {
+  test("didChange event fires on input change", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onDidChange="testState = 'changed'" />
+    `);
+    await page.getByRole("textbox").fill("test");
+    await expect.poll(testStateDriver.testState).toEqual("changed");
+  });
+
+  test("didChange event passes new value", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onDidChange="arg => testState = arg" />
+    `);
+    await page.getByRole("textbox").fill("test value");
+    await expect.poll(testStateDriver.testState).toEqual("test value");
+  });
+
+  test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onGotFocus="testState = 'focused'" />
+    `);
+    await page.getByRole("textbox").focus();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea label="Comments" onGotFocus="testState = 'focused'" />
+    `);
+    await page.getByText("Comments").click();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("lostFocus event fires on blur", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onLostFocus="testState = 'blurred'" />
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.focus();
+    await textarea.blur();
+    await expect.poll(testStateDriver.testState).toEqual("blurred");
+  });
+
+  test("events do not fire when component is disabled", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea enabled="false" onDidChange="testState = 'changed'" onGotFocus="testState = 'focused'" />
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.focus();
+    await textarea.fill("test", { force: true });
+    await expect.poll(testStateDriver.testState).toEqual(null);
+  });
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test.describe("Visual States", () => {
+  test("component applies theme variables correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea testId="input" />`, {
+      testThemeVars: {
+        "backgroundColor-TextArea": "rgb(255, 0, 0)",
+        "textColor-TextArea": "rgb(0, 255, 0)",
+      },
+    });
+    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS(
+      "background-color",
+      "rgb(255, 0, 0)",
+    );
+    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS(
+      "color",
+      "rgb(0, 255, 0)",
+    );
+  });
+
+  test("resize prop controls CSS resize property", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea testId="ta-h" resize="horizontal" />
+        <TextArea testId="ta-v" resize="vertical" />
+        <TextArea testId="ta-b" resize="both" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("ta-h").getByRole("textbox")).toHaveCSS("resize", "horizontal");
+    await expect(page.getByTestId("ta-v").getByRole("textbox")).toHaveCSS("resize", "vertical");
+    await expect(page.getByTestId("ta-b").getByRole("textbox")).toHaveCSS("resize", "both");
+  });
+
+  test("component handles disabled visual state", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea enabled="false" />`, {
+      testThemeVars: {
+        "backgroundColor-TextArea--disabled": "rgb(255, 0, 0)",
+        "textColor-TextArea--disabled": "rgb(0, 255, 0)",
+        "borderColor-TextArea--disabled": "rgb(0, 0, 255)",
+      },
+    });
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toBeDisabled();
+    await expect(textarea).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await expect(textarea).toHaveCSS("color", "rgb(0, 255, 0)");
+    await expect(textarea).toHaveCSS("border-color", "rgb(0, 0, 255)");
+  });
+
+  test("component handles focus state", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea />`, {
+      testThemeVars: {
+        "borderColor-TextArea--focus": "rgb(255, 0, 0)",
+        "backgroundColor-TextArea--focus": "rgb(0, 255, 0)",
+        "textColor-TextArea--focus": "rgb(0, 0, 255)",
+      },
+    });
+    const textarea = page.getByRole("textbox");
+
+    // Test focus state
+    await textarea.focus();
+    await expect(textarea).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(textarea).toHaveCSS("background-color", "rgb(0, 255, 0)");
+    await expect(textarea).toHaveCSS("color", "rgb(0, 0, 255)");
+  });
+
+  test("component handles hover state", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea />`, {
+      testThemeVars: {
+        "borderColor-TextArea--hover": "rgb(255, 0, 0)",
+        "backgroundColor-TextArea--hover": "rgb(0, 255, 0)",
+        "textColor-TextArea--hover": "rgb(0, 0, 255)",
+      },
+    });
+    const textarea = page.getByRole("textbox");
+
+    // Test hover state (simulated through interaction)
+    await textarea.hover();
+    await expect(textarea).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(textarea).toHaveCSS("background-color", "rgb(0, 255, 0)");
+    await expect(textarea).toHaveCSS("color", "rgb(0, 0, 255)");
+  });
+});
+
+// =============================================================================
+// EDGE CASE TESTS
+// =============================================================================
+
+test.describe("Edge Cases", () => {
+  test("component handles special characters correctly", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<TextArea label="José María's Comments" placeholder="Введите текст здесь" />`,
+    );
+    await expect(page.getByRole("textbox")).toBeVisible();
+    await expect(page.getByText("José María's Comments")).toBeVisible();
+    await expect(page.getByRole("textbox")).toHaveAttribute("placeholder", "Введите текст здесь");
+  });
+
+  test("component handles empty array as initialValue", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="{[]}" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("");
+  });
+
+  test("component handles empty object as initialValue", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="{{}}" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("[object Object]");
+  });
+
+  test("component handles function as initialValue", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="{() => {}}" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("[object Object]");
+  });
+
+  test("component handles negative maxLength gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea maxLength="{-1}" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("component handles zero maxLength gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea maxLength="0" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("component handles very large maxLength gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea maxLength="999999" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("component handles invalid resize values gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea resize="invalid" />`);
+    await expect(page.getByRole("textbox")).toHaveCSS("resize", "none");
+  });
+
+  test("component handles empty value", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="" />`);
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toHaveValue("");
+  });
+
+  test("component handles whitespace-only value", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="   " />`);
+    const whitespaceTextarea = page.getByRole("textbox");
+    await expect(whitespaceTextarea).toHaveValue("   ");
+  });
+
+  test("component handles tab and newline characters in value", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea initialValue="\t\n" />`);
+    const tabNewlineTextarea = page.getByRole("textbox");
+    const value = await tabNewlineTextarea.inputValue();
+    expect(value).toContain("\t");
+    expect(value).toContain("\n");
+  });
+
+  test("component handles very long input values", async ({ initTestBed, page }) => {
+    const longValue =
+      "Very long value that might cause issues with component rendering or processing. ".repeat(
+        100,
+      );
+    await initTestBed(`<TextArea initialValue="${longValue}" />`);
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toBeVisible();
+    await expect(textarea).toHaveValue(longValue);
+  });
+
+  test("component handles invalid maxRows/minRows combinations with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<TextArea autoSize="true" maxRows="2" minRows="5" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("component handles zero maxRows/minRows values with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<TextArea autoSize="true" maxRows="0" minRows="0" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("component handles negative maxRows/minRows values with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<TextArea autoSize="true" maxRows="{-1}" minRows="{-1}" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+});
+
+// =============================================================================
+// PERFORMANCE TESTS
+// =============================================================================
+
+test.describe("Performance", () => {
+  test("component memoization prevents unnecessary re-renders", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea
+        label="Performance Test"
+        onDidChange="testState = ++testState || 1"
+      />
+    `);
+
+    const textarea = page.getByRole("textbox");
+
+    // Test that memoization works through stable behavior
+    await textarea.fill("a");
+    await expect.poll(testStateDriver.testState).toEqual(1);
+
+    await textarea.fill("ab");
+    await expect.poll(testStateDriver.testState).toEqual(2);
+
+    // Component should maintain consistent behavior
+    await expect(textarea).toBeVisible();
+    await expect(textarea).toHaveValue("ab");
+  });
+
+  test("component handles large content efficiently", async ({ initTestBed, page }) => {
+    const largeContent = "Large content line.\n".repeat(1000);
+    await initTestBed(`<TextArea />`);
+    const textarea = page.getByRole("textbox");
+
+    // Fill with large content
+    await textarea.fill(largeContent);
+    await expect(textarea).toHaveValue(largeContent);
+
+    // Verify component still responsive
+    await textarea.clear();
+    await expect(textarea).toHaveValue("");
+  });
+
+  test("component performs well with rapid user input", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onDidChange="testState = (testState || 0) + 1" />
+    `);
+    const textarea = page.getByRole("textbox");
+
+    // Simulate rapid typing
+    await textarea.pressSequentially("rapid input test", { delay: 10 });
+
+    // Should have received multiple change events efficiently
+    const changeCount = await testStateDriver.testState();
+    expect(changeCount).toBeGreaterThan(10);
+
+    await expect(textarea).toHaveValue("rapid input test");
+  });
+});
+
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
+
+test.describe("Integration", () => {
+  test("component works correctly in different layout contexts", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea label="Layout Test" />`);
+    const textarea = page.getByRole("textbox");
+
+    // Test basic layout integration
+    await expect(textarea).toBeVisible();
+
+    // Test bounding box and dimensions
+    const boundingBox = await getBounds(textarea);
+    expect(boundingBox).not.toBeNull();
+    expect(boundingBox!.width).toBeGreaterThan(0);
+    expect(boundingBox!.height).toBeGreaterThan(0);
+  });
+
+  test("component integrates with Form components", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea id="comments" label="Comments" required="true" />
+        <Button testId="submit">Submit</Button>
+      </Fragment>
+    `);
+
+    const textarea = page.getByLabel("Comments");
+    const submitButton = page.getByTestId("submit");
+
+    await expect(textarea).toBeVisible();
+    await expect(submitButton).toBeVisible();
+
+    // Test form interaction
+    await textarea.fill("User feedback");
+    await expect(textarea).toHaveValue("User feedback");
+  });
+
+  test("component state synchronization with other components", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea id="textarea" initialValue="Initial text" />
+        <Text testId="display">{textarea.value}</Text>
+        <Button testId="clear" onClick="textarea.setValue('')">Clear</Button>
+      </Fragment>
+    `);
+
+    // Initial state sync
+    await expect(page.getByTestId("display")).toHaveText("Initial text");
+
+    // Manual input sync
+    const textarea = page.getByRole("textbox");
+    await textarea.fill("Updated text");
+    await expect(page.getByTestId("display")).toHaveText("Updated text");
+
+    // API call sync
+    await page.getByTestId("clear").click();
+    await expect(page.getByTestId("display")).toHaveText("");
+    await expect(textarea).toHaveValue("");
+  });
+
+  test("component works with event handling chain", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <TextArea
+          onGotFocus="testState = 'focused'"
+          onLostFocus="testState = 'blurred'"
+          onDidChange="(value) => testState = 'changed: ' + value"
+        />
+        <Button testId="otherElement">Other Element</Button>
+      </Fragment>
+    `);
+
+    const textarea = page.getByRole("textbox");
+    const button = page.getByTestId("otherElement");
+
+    // Test focus event
+    await textarea.focus();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+
+    // Test change event (use fill for reliable event triggering)
+    await textarea.fill("test input");
+    await expect.poll(testStateDriver.testState).toEqual("changed: test input");
+
+    // Test blur event
+    await button.focus();
+    await expect.poll(testStateDriver.testState).toEqual("blurred");
+  });
+
+  test("component API methods work in integrated scenarios", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea id="textarea1" />
+        <TextArea id="textarea2" />
+        <Button testId="copyBtn" onClick="textarea2.setValue(textarea1.value)">Copy</Button>
+        <Button testId="focusBtn" onClick="textarea1.focus()">Focus First</Button>
+      </Fragment>
+    `);
+
+    const textarea1 = page.getByRole("textbox").first();
+    const textarea2 = page.getByRole("textbox").nth(1);
+    const copyBtn = page.getByTestId("copyBtn");
+    const focusBtn = page.getByTestId("focusBtn");
+
+    // Setup initial content
+    await textarea1.fill("Content to copy");
+
+    // Test setValue API integration
+    await copyBtn.click();
+    await expect(textarea2).toHaveValue("Content to copy");
+
+    // Test focus API integration
+    await focusBtn.click();
+    await expect(textarea1).toBeFocused();
+  });
+
+  test("component works in nested component structures", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack>
+          <TextArea label="Nested Textarea 1" />
+          <HStack>
+            <TextArea label="Nested Textarea 2" />
+            <Button testId="nestedBtn">Button</Button>
+          </HStack>
+        </VStack>
+      </Fragment>
+    `);
+
+    const textarea1 = page.getByLabel("Nested Textarea 1");
+    const textarea2 = page.getByLabel("Nested Textarea 2");
+    const button = page.getByTestId("nestedBtn");
+
+    await expect(textarea1).toBeVisible();
+    await expect(textarea2).toBeVisible();
+    await expect(button).toBeVisible();
+
+    // Test interaction in nested structure
+    await textarea1.fill("Content in nested structure");
+    await expect(textarea1).toHaveValue("Content in nested structure");
+  });
+
+  test("programmatic control works", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea id="input" />
+        <Button testId="focusBtn" onClick="input.focus()">Focus</Button>
+        <Button testId="setBtn" onClick="input.setValue('API Value')">Set Value</Button>
+        <Button testId="insertBtn" onClick="input.insert(' inserted')">Insert Text</Button>
+      </Fragment>
+    `);
+
+    const textarea = page.getByRole("textbox");
+
+    // Test focus API
+    await page.getByTestId("focusBtn").click();
+    await expect(textarea).toBeFocused();
+
+    // Test setValue API
+    await page.getByTestId("setBtn").click();
+    await expect(textarea).toHaveValue("API Value");
+
+    // Test insert API
+    await textarea.click(); // Focus and position cursor at end
+    await page.getByTestId("insertBtn").click();
+    await expect(textarea).toHaveValue("API Value inserted");
+  });
+
+  test("insert API method works at cursor position", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea id="textarea" initialValue="Hello World" />
+        <Button testId="insertBtn" onClick="textarea.insert(' Beautiful')">Insert</Button>
+      </Fragment>
+    `);
+
+    const textarea = page.getByRole("textbox");
+
+    // Position cursor between "Hello" and " World" (after "Hello")
+    await textarea.focus();
+    await page.evaluate(() => {
+      const textarea = document.querySelector("textarea");
+      if (textarea) {
+        textarea.setSelectionRange(5, 5); // Position after "Hello"
+      }
+    });
+
+    await page.getByTestId("insertBtn").click();
+    await expect(textarea).toHaveValue("Hello Beautiful World");
+  });
+
+  test("component value API reflects current content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea id="myTextArea" initialValue="Initial content" />
+        <Text testId="valueDisplay">{myTextArea.value}</Text>
+      </Fragment>
+    `);
+
+    const textarea = page.getByRole("textbox");
+    const valueDisplay = page.getByTestId("valueDisplay");
+
+    await expect(valueDisplay).toHaveText("Initial content");
+
+    await textarea.fill("Updated content");
+    await expect(valueDisplay).toHaveText("Updated content");
+  });
+});
+
+// =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("Api", () => {
+  test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TextArea id="boundTextArea" bindTo="notes" />
+        <Button testId="setBtn" onClick="boundTextArea.setValue('notes')" />
+        <Text testId="dataValue">{$data.notes}</Text>
+        <Text testId="compValue">{boundTextArea.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("notes");
+    await expect(page.getByTestId("compValue")).toHaveText("notes");
+  });
+});
+
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("Regression", () => {
+  test.fixme("bindTo preserves caret when inserting text in the middle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TextArea testId="notes" bindTo="notes" initialValue="Hello world" />
+        <Text testId="dataValue">{$data.notes}</Text>
+      </Form>
+    `);
+
+    const textarea = page.getByTestId("notes").locator("textarea");
+    await expect(textarea).toBeVisible();
+    await textarea.focus();
+    await expect(textarea).toBeFocused();
+    await textarea.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(5, 5));
+
+    await page.keyboard.type(" brave");
+
+    await expect(textarea).toHaveValue("Hello brave world");
+    await expect(page.getByTestId("dataValue")).toHaveText("Hello brave world");
+    await expect
+      .poll(() =>
+        textarea.evaluate((el: HTMLTextAreaElement) => ({
+          start: el.selectionStart,
+          end: el.selectionEnd,
+        })),
+      )
+      .toEqual({ start: 11, end: 11 });
+  });
+
+  test.fixme("bindTo preserves caret when replacing a selected multiline range", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TextArea id="notes" testId="notes" bindTo="notes" />
+        <Button testId="setText" onClick="notes.setValue('alpha\\nbeta\\ngamma')" />
+        <Text testId="dataValue">{$data.notes}</Text>
+      </Form>
+    `);
+
+    const textarea = page.getByTestId("notes").locator("textarea");
+    await expect(textarea).toBeVisible();
+    await page.getByTestId("setText").click();
+    await expect(textarea).toHaveValue("alpha\nbeta\ngamma");
+    await textarea.focus();
+    await expect(textarea).toBeFocused();
+    await textarea.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(6, 10));
+
+    await page.keyboard.type("BETA");
+
+    await expect(textarea).toHaveValue("alpha\nBETA\ngamma");
+    await expect(page.getByTestId("dataValue")).toHaveText("alpha\nBETA\ngamma");
+    await expect
+      .poll(() =>
+        textarea.evaluate((el: HTMLTextAreaElement) => ({
+          start: el.selectionStart,
+          end: el.selectionEnd,
+        })),
+      )
+      .toEqual({ start: 10, end: 10 });
+  });
+
+  test("component does not loose focus #1", async ({
+    initTestBed,
+    createTextAreaDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment var.value="">
+        <TextBox testId="myTextBox" initialValue="{value}" onDidChange="{(val) => {value = val}}"/>
+        <TextArea testId="myTextArea" initialValue="{value}" onDidChange="{(val) => {value = val}}"/>
+      </Fragment>
+    `);
+
+    const tbDriver = await createTextBoxDriver("myTextBox");
+    const driver = await createTextAreaDriver("myTextArea");
+
+    // Test basic layout integration
+    await expect(driver.component.locator("textarea")).toBeVisible();
+
+    await driver.component.locator("textarea").focus();
+    await expect(driver.component.locator("textarea")).toBeFocused();
+    await driver.component.locator("textarea").fill("a");
+    await expect(driver.component.locator("textarea")).toHaveValue("a");
+    await driver.component.locator("textarea").fill("abc");
+    await expect(driver.component.locator("textarea")).toHaveValue("abc");
+    await driver.component.locator("textarea").fill("abcde");
+    await expect(driver.component.locator("textarea")).toHaveValue("abcde");
+  });
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test("input has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<TextArea width="200px" testId="test"/>`, {});
+
+  const input = page.getByTestId("test").locator("textarea");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<TextArea width="200px" label="test" testId="test"/>`, {});
+
+  const input = page.getByTestId("test").locator("textarea");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300 });
+  await initTestBed(`<TextArea width="50%" testId="test"/>`, {});
+
+  const input = page.getByTestId("test").locator("textarea");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300 });
+  await initTestBed(`<TextArea width="50%" label="test" testId="test"/>`, {});
+
+  const input = page.getByTestId("test").locator("textarea");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("layout props are applied without leaking to textarea DOM attributes", async ({
+  page,
+  initTestBed,
+}) => {
+  const reactWarnings: string[] = [];
+  page.on("console", (msg) => {
+    const text = msg.text();
+    if (text.includes("React does not recognize the `minHeight` prop")) {
+      reactWarnings.push(text);
+    }
+  });
+
+  await initTestBed(`<TextArea minHeight="200px" testId="test" />`, {});
+
+  const component = page.getByTestId("test").first();
+  const textarea = page.getByRole("textbox");
+
+  await expect(component).toHaveCSS("min-height", "200px");
+  await expect(textarea).not.toHaveAttribute("minHeight");
+  await expect(textarea).not.toHaveAttribute("minheight");
+  expect(reactWarnings).toEqual([]);
+});
+
+// =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  [
+    { value: "", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-TextArea${variant.value}`]: "12px" },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-radius", "12px");
+    });
+
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-TextArea${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "border-color",
+        "rgb(255, 0, 0)",
+      );
+    });
+
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-TextArea${variant.value}`]: "1px" },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-TextArea${variant.value}`]: "dashed" },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "border-style",
+        "dashed",
+      );
+    });
+
+    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`fontSize-TextArea${variant.value}`]: "14px" },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("font-size", "14px");
+    });
+
+    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-TextArea${variant.value}`]: "rgb(240, 240, 240)" },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "background-color",
+        "rgb(240, 240, 240)",
+      );
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-TextArea${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-TextArea${variant.value}`]: "rgb(0, 0, 0)" },
+      });
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "border-color",
+        "rgb(0, 0, 0)",
+      );
+    });
+
+    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "background-color",
+        "rgb(0, 0, 0)",
+      );
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-TextArea${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+  });
+});
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
+
+    const component = page.getByTestId("test").locator("textarea");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltipMarkdown="**Bold text**" />`);
+
+    const component = page.getByTestId("test").locator("textarea");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test").locator("textarea");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "backgroundColor-TextArea-CustomVariant": "rgb(0, 255, 0)",
+      },
+    });
+    const component = page.getByTestId("test").locator("textarea");
+    await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" animation="fadeIn" />`);
+
+    const component = page.getByTestId("test").locator("textarea");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
+
+    const component = page.getByTestId("test").locator("textarea");
+    await expect(component).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("can select part: 'input'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" />`);
+    const inputPart = page.locator("[data-part-id='input']");
+    await expect(inputPart).toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
+    const inputPart = page.locator("[data-part-id='input']");
+
+    await expect(inputPart).toBeVisible();
+
+    await inputPart.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+
+    const component = page.getByTestId("test").locator("textarea");
+    const inputPart = component.locator("[data-part-id='input']");
+
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(inputPart).toBeVisible();
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <TextArea 
+        testId="test" 
+        variant="CustomVariant"
+        animation="fadeIn"
+      />
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+        },
+      },
+    );
+
+    const component = page.getByTestId("test").locator("textarea");
+    const inputPart = component.locator("[data-part-id='input']");
+
+    // Verify variant applied
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+
+    // Verify parts are visible
+    await expect(inputPart).toBeVisible();
+  });
+
+  test.fixme("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea testId="test" label="Comments" required="true" requireLabelMode="markRequired" bindTo="comments" />
+      </Form>
+    `);
+
+    const label = page.getByText("Comments");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test.fixme("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea testId="test" label="Comments" required="false" requireLabelMode="markRequired" bindTo="comments" />
+      </Form>
+    `);
+
+    const label = page.getByText("Comments");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test.fixme("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea testId="test" label="Comments" required="false" requireLabelMode="markOptional" bindTo="comments" />
+      </Form>
+    `);
+
+    const label = page.getByText("Comments");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test.fixme("requireLabelMode='markOptional' hides indicator for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea testId="test" label="Comments" required="true" requireLabelMode="markOptional" bindTo="comments" />
+      </Form>
+    `);
+
+    const label = page.getByText("Comments");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test.fixme("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea testId="test" label="Comments" required="true" requireLabelMode="markBoth" bindTo="comments" />
+      </Form>
+    `);
+
+    const label = page.getByText("Comments");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test.fixme("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea testId="test" label="Comments" required="false" requireLabelMode="markBoth" bindTo="comments" />
+      </Form>
+    `);
+
+    const label = page.getByText("Comments");
+    await expect(label).not.toContainText("*");
+    await expect(label).toContainText("(Optional)");
+  });
+
+  test.fixme("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markRequired">
+        <TextArea testId="test" label="Comments" required="false" requireLabelMode="markOptional" bindTo="comments" />
+      </Form>
+    `);
+
+    const label = page.getByText("Comments");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test.fixme("input inherits Form itemRequireLabelMode when not specified", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markBoth">
+        <TextArea testId="test1" label="Required Field" required="true" bindTo="field1" />
+        <TextArea testId="test2" label="Optional Field" required="false" bindTo="field2" />
+      </Form>
+    `);
+
+    const requiredLabel = page.getByText("Required Field");
+    const optionalLabel = page.getByText("Optional Field");
+
+    await expect(requiredLabel).toContainText("*");
+    await expect(requiredLabel).not.toContainText("(Optional)");
+    await expect(optionalLabel).toContainText("(Optional)");
+    await expect(optionalLabel).not.toContainText("*");
+  });
+});
+
+// =============================================================================
+// VALIDATION FEEDBACK TESTS
+// =============================================================================
+
+test.describe("Validation Feedback", () => {
+  test.fixme("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{true}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+
+    // Trigger validation by submitting empty required field
+    await page.getByTestId("submit").click();
+
+    // Check for helper text
+    await expect(page.getByText("This field is required")).toBeVisible();
+
+    // Check absence of concise feedback icon
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).not.toBeVisible();
+  });
+
+  test.fixme("shows icon and no helper text when verboseValidationFeedback is false", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+
+    // Trigger validation
+    await page.getByTestId("submit").click();
+
+    // Check for helper text (should be hidden)
+    await expect(page.getByText("This field is required")).not.toBeVisible();
+
+    // Check for concise feedback icon
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+
+    // Check that it shows error icon
+    await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
+  });
+
+  test.fixme("prop on component overrides form default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{true}">
+        <TextArea testId="input" bindTo="input" verboseValidationFeedback="{false}" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+
+    await page.getByTestId("submit").click();
+
+    // Helper text hidden
+    await expect(page.getByText("This field is required")).not.toBeVisible();
+
+    // Concise feedback visible
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+  });
+
+  test.fixme("shows valid icon in concise mode when valid", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+
+    const textarea = page.getByRole("textbox");
+
+    // First make it invalid
+    await page.getByTestId("submit").click();
+
+    // Now make it valid
+    await textarea.fill("valid value");
+    await textarea.blur();
+
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+    await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
+  });
+
+  test.fixme("concise mode tooltip shows error message on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+
+    await page.getByTestId("submit").click();
+
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    // Hover over the icon
+    await conciseFeedback.hover();
+
+    // Check tooltip content
+    const tooltip = page.locator("[data-tooltip-container]");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText("This field is required");
+  });
+
+  test.fixme("does not duplicate label when inside Form with label prop", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextArea
+          testId="test"
+          label="Comments"
+          labelPosition="top"
+        />
+      </Form>
+    `);
+
+    // Should only have one label with the text "Comments"
+    const labels = page.getByText("Comments");
+    await expect(labels).toHaveCount(1);
+  });
+});

@@ -1557,6 +1557,29 @@ Compatibility focus:
   `enterSubmits`, `escResets`, textarea assistance attributes, APIs, and the
   form-coupled tests made possible by prior shared input/form work.
 
+Status: current slice completed for the non-Form TextArea foundation.
+
+Implementation notes:
+
+- Created `xmlui/src/components/TextArea/` with old-named metadata, renderer,
+  defaults, SCSS, docs, and copied `TextArea.spec.ts`.
+- Registered `TextArea` in compiler contracts, runtime component registry, IR
+  built-in names, metadata generation, CSS loading, and testing drivers.
+- Added the `text-area-foundation` dev example with TextArea-driven state
+  updates.
+- The copied TextArea E2E suite currently passes 134 tests with 25 fixme
+  deferrals for `Form`/`bindTo`, form submit/reset, require-label modes,
+  validation feedback, and custom variant theme variables.
+- Config-imported component metadata cannot yet depend directly on SCSS query
+  imports. TextArea follows the current TextBox-compatible bridge: config-safe
+  SCSS source for metadata plus `src/main.tsx` stylesheet import for runtime
+  CSS emission.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=textAreaFoundation`.
+
 ###### Wave B2.3: NumberBox Foundation
 
 Components:
@@ -1570,7 +1593,38 @@ Compatibility focus:
   adornments, APIs, and the form-coupled tests made possible by prior shared
   input/form work.
 
+Status: current slice completed for the non-Form NumberBox foundation.
+
+Implementation notes:
+
+- Created `xmlui/src/components/NumberBox/` with old-named metadata, renderer,
+  defaults, numeric helper abstractions, SCSS, docs, and copied
+  `NumberBox.spec.ts`.
+- Registered `NumberBox` in compiler contracts, runtime component registry, IR
+  built-in names, metadata generation, CSS loading, and testing drivers.
+- Added the `number-box-foundation` dev example with NumberBox-driven state
+  updates.
+- The copied NumberBox E2E suite currently passes 185 tests with 21 fixme
+  deferrals for `Form`/`bindTo`, FormItem integration, require-label modes,
+  validation feedback, and custom variant theme variables.
+- Numeric editing requires a separate text representation so partial values
+  such as `-`, `e`, `0.`, and in-progress scientific notation remain editable
+  while committed values and component APIs still produce numbers where the old
+  framework does.
+- Spinner arithmetic rounds by the greater precision of the current value and
+  step to avoid JavaScript floating-point noise in user-visible values.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=numberBoxFoundation`.
+
 ##### Wave B3: Boolean and Toggle Inputs
+
+Wave B3 is split because the boolean/toggle family has separate old component
+folders and each component has its own source-adjacent E2E suite. Complete each
+slice by copying the full old spec and either passing each assertion or
+recording the owning deferred infrastructure explicitly.
 
 Components:
 
@@ -1583,6 +1637,80 @@ Compatibility focus:
 - checked/value semantics, tri-state behavior where present, labels,
   keyboard/focus behavior, disabled/read-only behavior, validation/form
   integration, theme parts, and accessibility.
+
+###### Wave B3.1: Checkbox Foundation
+
+Components:
+
+- `Checkbox`.
+
+Status: current slice completed for the non-Form, non-template Checkbox
+foundation.
+
+Implementation notes:
+
+- Created `xmlui/src/components/Checkbox/` with old-named metadata, renderer,
+  defaults, SCSS, docs, and copied `Checkbox.spec.ts`.
+- Registered `Checkbox` in compiler contracts, runtime component registry,
+  metadata transfer reporting, CSS loading, and testing drivers.
+- Added the `checkbox-foundation` dev example with Checkbox-driven state
+  updates and indeterminate-state toggling.
+- The copied Checkbox E2E suite currently passes 95 tests with 23 fixme/skip
+  deferrals for `Form`/`bindTo`, require-label modes, custom variants, and
+  custom `inputTemplate` context variables.
+- Checkbox boolean coercion intentionally follows the old E2E expectations,
+  including treating expression `NaN` as checked.
+- Checkbox SCSS must use direct `var(--xmlui-...)` CSS custom properties in
+  runtime declarations. Sass variable indirection is stripped by the current
+  lightweight stylesheet loader, leaving selectors without the theme-backed
+  declarations.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=checkboxFoundation`.
+
+###### Wave B3.2: Switch Foundation
+
+Status: next step. Start the next AI-assisted session here.
+
+Components:
+
+- `Switch`.
+
+Compatibility focus:
+
+- Switch-specific visual track/thumb behavior, checked/value semantics,
+  labels, keyboard/focus behavior, disabled/read-only behavior, validation
+  states, theme variables, parts, and source-adjacent E2E parity.
+
+Session pickup checklist:
+
+- Inspect the old `Switch` implementation and docs in
+  `/Users/dotneteer/source/xmlui/xmlui/src/components/Switch`.
+- Copy the full old `Switch.spec.ts` and `Switch.md` into
+  `xmlui/src/components/Switch/` before implementing behavior.
+- Migrate the source-adjacent component folder shape: `Switch.tsx`,
+  `SwitchReact.tsx`, `Switch.defaults.ts`, `Switch.module.scss`, docs, and E2E
+  spec.
+- Register `Switch` in compiler contracts, runtime registry, metadata transfer
+  reporting, CSS loading, test drivers/fixtures, and add a runnable visual
+  example.
+- Run the focused `Switch.spec.ts` after each meaningful implementation step,
+  then run the standard unit, metadata, compatibility, and full E2E checks
+  before declaring the slice complete.
+
+###### Wave B3.3: Toggle Foundation
+
+Components:
+
+- `Toggle`.
+
+Compatibility focus:
+
+- The shared low-level toggle primitive, custom input template behavior,
+  context variables, and any remaining behavior needed by `Checkbox` and
+  `Switch` once the primitive is migrated.
 
 ##### Wave B4: Range and Rating Inputs
 

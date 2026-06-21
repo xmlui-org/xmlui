@@ -79,6 +79,40 @@ Current status for the components started so far:
   copied Form/FormItem validation, require-label, and `bindTo` E2E groups are
   marked fixme and should be completed later when `Form` and `FormItem` are
   migrated.
+- `TextArea`: original `TextArea.spec.ts` is copied into the source-adjacent
+  component folder. Verification: `npm --workspace xmlui run test -- --run`,
+  `npm --workspace xmlui run check:metadata`,
+  `npm --workspace xmlui run compatibility:component-transfer`,
+  `npm --workspace xmlui run compatibility:component-e2e-audit`, and
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/TextArea/TextArea.spec.ts` pass for the current slice. The
+  copied TextArea suite now runs with 134 passing tests and 25 skipped/fixme.
+  The passing surface includes rendering, labels, initial values including
+  object/function edge cases normalized for current parser limits, multiline
+  editing, autosize/min/max rows, assistance attributes, events, APIs,
+  integration without form binding, layout width, root layout props, component
+  parts, tooltips, animation, and TextArea theme variables across validation
+  statuses. Deferred tests cover `Form`/`bindTo`, enter-submit/reset behavior
+  through `Form`, require-label modes, validation feedback, and custom variant
+  theme variables.
+- `NumberBox`: original `NumberBox.spec.ts` and `NumberBox.md` are copied into
+  the source-adjacent component folder. Verification:
+  `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`,
+  `npm --workspace xmlui run test -- --run`,
+  `npm --workspace xmlui run check:metadata`,
+  `npm --workspace xmlui run compatibility:component-transfer`,
+  `npm --workspace xmlui run compatibility:component-e2e-audit`, and
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/NumberBox/NumberBox.spec.ts` pass for the current slice. The
+  copied NumberBox suite now runs with 185 passing tests and 21 skipped/fixme.
+  The passing surface includes rendering, labels, initial values, disabled and
+  read-only states, autofocus, min/max/step behavior, spinner buttons, arrow
+  keys, integer and zero-positive constraints, scientific notation, partial
+  numeric editing states, paste helper coverage, decimal precision stepping,
+  events, APIs, adornments, layout width, theme variables across validation
+  statuses, parts, tooltips, and animation. Deferred tests cover
+  `Form`/`bindTo`, FormItem integration, require-label modes, validation
+  feedback, and custom variant theme variables.
 - `App`: original `App.spec.ts`, `App-layout.spec.ts`,
   `App-layout-mobile.spec.ts`, `App-navigation-events.spec.ts`, and
   `App-script-imports.spec.ts` are copied, but App migration is not complete.
@@ -318,6 +352,45 @@ Button styling migration rule:
 - Old input label positions include aliases `before` and `after`, and their
   visual mapping depends on direction. `before` means label before the input in
   writing direction, so it maps differently for LTR and RTL.
+- Config-time component metadata cannot safely import new
+  `?xmlui-theme-vars` or `?xmlui-css-module` virtual module paths before the
+  Vite plugins are active. Until the metadata/runtime boundary is redesigned,
+  TextBox-like components may use a config-safe SCSS source string for
+  metadata extraction and import the runtime stylesheet from `src/main.tsx`.
+- The lightweight XMLUI CSS module loader does not compile Sass mixins or
+  `@include` blocks. Component styles consumed through `?xmlui-css-module`
+  should remain plain CSS-compatible after XMLUI theme variable declarations
+  are stripped.
+- For TextArea-like components, do not duplicate `data-part-id="input"` on
+  both the root and the native control. The root should expose
+  `data-part-id="root"` and the textarea/input element should own
+  `data-part-id="input"`.
+- Numeric inputs need a separate editing representation from their committed
+  numeric value. NumberBox must preserve partial values such as `-`, `e`,
+  `0.`, and malformed in-progress scientific notation while typing, normalize
+  replacement/paste input more aggressively, and normalize incomplete decimal
+  or exponent states on blur.
+- NumberBox spinner arithmetic must round according to the greater decimal
+  precision of the current value and step. Plain JavaScript addition exposes
+  floating-point noise such as `-0.010000000000000009`, which violates the old
+  E2E expectations.
+- Checkbox migration status: copied the full old `Checkbox.spec.ts` and
+  `Checkbox.md` into `xmlui/src/components/Checkbox/`. The current foundation
+  passes 95 E2E tests and keeps 23 skipped/fixme tests visible for deferred
+  shared infrastructure: `Form`/`bindTo`, require-label modes, custom variants,
+  and `inputTemplate` context variables (`$checked`, `$setChecked`).
+- Checkbox boolean coercion has an old-suite-specific edge case: expression
+  `NaN` is expected to produce a checked state. Preserve this explicitly even
+  though normal JavaScript truthiness would treat `Boolean(NaN)` as false.
+- Checkbox label tests expect `testId` on the labeled wrapper but on the native
+  input when the component is unlabeled. The wrapper class also needs a
+  lowercase `container` substring because old tests query `[class*=container]`.
+- Checkbox focus theme tests use public variables like `outlineWidth-Checkbox`,
+  not only `outlineWidth-Checkbox--focus`. Keep the non-suffixed variables as
+  public aliases for focus styling.
+- The current lightweight stylesheet loader strips declarations that reference
+  Sass variables. Checkbox theme-backed runtime CSS must use direct
+  `var(--xmlui-...)` declarations, as with the TextBox lesson.
 
 Component contract boundary:
 

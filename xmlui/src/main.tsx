@@ -13,6 +13,9 @@ import "./components/NoResult/NoResult.module.scss?xmlui-css-module";
 import "./components/QRCode/QRCode.module.scss?xmlui-css-module";
 import "./components/SpaceFiller/SpaceFiller.module.scss?xmlui-css-module";
 import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
+import "./components/TextArea/TextArea.module.scss?xmlui-css-module";
+import "./components/NumberBox/NumberBox.module.scss?xmlui-css-module";
+import "./components/Checkbox/Checkbox.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -65,7 +68,10 @@ import styleMutationApp from "./examples/style-mutation/Main.xmlui";
 import themeScopeApp from "./examples/theme-scope/Main.xmlui";
 import themeVarsApp from "./examples/theme-vars/Main.xmlui";
 import textOldCompatibilityApp from "./examples/text-old-compatibility/Main.xmlui";
+import textAreaFoundationApp from "./examples/text-area-foundation/Main.xmlui";
 import textBoxFoundationApp from "./examples/text-box-foundation/Main.xmlui";
+import numberBoxFoundationApp from "./examples/number-box-foundation/Main.xmlui";
+import checkboxFoundationApp from "./examples/checkbox-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -133,7 +139,10 @@ const examples = {
   themeScope: themeScopeApp,
   themeVars: themeVarsApp,
   textOldCompatibility: textOldCompatibilityApp,
+  textAreaFoundation: textAreaFoundationApp,
   textBoxFoundation: textBoxFoundationApp,
+  numberBoxFoundation: numberBoxFoundationApp,
+  checkboxFoundation: checkboxFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

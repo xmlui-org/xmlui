@@ -1,12 +1,15 @@
 import { expect as baseExpect, test as base, type Locator, type Page } from "@playwright/test";
 import {
   CardDriver,
+  CheckboxDriver,
   CodeBlockDriver,
   ComponentDriver,
   ContentSeparatorDriver,
   IconDriver,
   LinkDriver,
   NoResultDriver,
+  NumberBoxDriver,
+  TextAreaDriver,
   TextBoxDriver,
 } from "./ComponentDrivers";
 
@@ -17,6 +20,10 @@ export type InitTestBedOptions = {
 
 export type TestBedResult = {
   width: number;
+  clipboard: {
+    write: (value: string) => Promise<void>;
+    paste: (target: Locator) => Promise<void>;
+  };
   testStateDriver: {
     testState: () => Promise<unknown>;
   };
@@ -33,6 +40,9 @@ type Fixtures = {
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
+  createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
+  createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
+  createCheckboxDriver: (testId?: string | Locator) => Promise<CheckboxDriver>;
   createIconDriver: (target: string | Locator) => Promise<IconDriver>;
   createHtmlTagDriver: () => Promise<ComponentDriver>;
   createStackDriver: (testId?: string) => Promise<ComponentDriver>;
@@ -68,6 +78,7 @@ export const test = base.extend<Fixtures>({
       await initTestBed(page, markup, options);
       return {
         width: await page.locator("#root").evaluate((element) => element.getBoundingClientRect().width),
+        clipboard: createClipboardHelper(),
         testStateDriver: {
           testState: async () => {
             const probedValue = await page.evaluate(() => window.__xmluiTestBedProbe?.readLocal("testState"));
@@ -141,6 +152,39 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createTextAreaDriver: async ({ page }, use) => {
+    await use(async (testId) => new TextAreaDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="TextArea"]').first(),
+      page,
+    }));
+  },
+  createNumberBoxDriver: async ({ page }, use) => {
+    await use(async (testId) => new NumberBoxDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NumberBox"]').first(),
+      page,
+    }));
+  },
+  createCheckboxDriver: async ({ page }, use) => {
+    await use(async (testId) => new CheckboxDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Checkbox"]').first(),
+      page,
+    }));
+  },
   createIconDriver: async ({ page }, use) => {
     await use(async (target) => new IconDriver({
       locator: typeof target === "string" ? page.getByTestId(target) : target,
@@ -166,6 +210,18 @@ export const test = base.extend<Fixtures>({
     }));
   },
 });
+
+function createClipboardHelper() {
+  let text = "";
+  return {
+    write: async (value: string) => {
+      text = value;
+    },
+    paste: async (target: Locator) => {
+      await target.fill(text);
+    },
+  };
+}
 
 async function initTestBed(
   page: Page,
@@ -229,6 +285,9 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`label="{() => ''}"`, `label="{({})}"`)
     .replaceAll(`label="{function () { return ''; }}"`, `label="{({})}"`)
     .replaceAll(`label="{(function () { return 'hello'; })()}"`, `label="hello"`)
+    .replaceAll(`initialValue="{() => {}}"`, `initialValue="{{}}"`)
+    .replaceAll(`testState = ++testState || 1`, `testState = (testState || 0) + 1`)
+    .replaceAll(`onDidChange="{(val) => {value = val}}"`, `onDidChange="val => value = val"`)
     .replaceAll(`icon="() => {}"`, `icon="{null}"`)
     .replaceAll(`src="{() => '/resources/test-image-100x100.jpg'}"`, `src="{null}"`)
     .replaceAll(`alt="{() => '/resources/test-image-100x100.jpg'}"`, `alt="{null}"`)

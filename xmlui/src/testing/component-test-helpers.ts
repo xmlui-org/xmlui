@@ -54,6 +54,12 @@ export async function getBorders(driver: ComponentDriver) {
   };
 }
 
+export async function isIndeterminate(locator: Locator): Promise<boolean> {
+  return locator.evaluate((element) =>
+    element instanceof HTMLInputElement ? element.indeterminate : false,
+  );
+}
+
 export const SKIP_REASON = {
   TEST_NOT_WORKING: (description: string) => ({
     annotation: {

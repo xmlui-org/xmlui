@@ -1,0 +1,16 @@
+export const defaultProps = {
+  value: "",
+  placeholder: "",
+  required: false,
+  readOnly: false,
+  allowCopy: true,
+  autoFocus: false,
+  initialValue: "",
+  controlled: true,
+  enterSubmits: true,
+  rows: 2,
+  enabled: true,
+  autoComplete: "off" as string | boolean,
+  validationStatus: "none",
+  invalidMessages: [] as string[],
+};

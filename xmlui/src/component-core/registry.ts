@@ -32,6 +32,9 @@ import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
+import { textAreaRenderer } from "../components/TextArea/TextArea";
+import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
+import { checkboxRenderer } from "../components/Checkbox/Checkbox";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -75,6 +78,8 @@ const implementedRuntimeNames = [
   "SpaceFiller",
   "Items",
   "TextBox",
+  "TextArea",
+  "NumberBox",
   "Checkbox",
   "Select",
   "Option",
@@ -117,6 +122,9 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Text: textRenderer,
   TextBox: textBoxRenderer,
   PasswordInput: passwordInputRenderer,
+  TextArea: textAreaRenderer,
+  NumberBox: numberBoxRenderer,
+  Checkbox: checkboxRenderer,
   ...htmlTagRenderers,
 };
 
@@ -151,6 +159,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const textTransferred = contract.name === "Text";
     const textBoxTransferred = contract.name === "TextBox";
     const passwordInputTransferred = contract.name === "PasswordInput";
+    const textAreaTransferred = contract.name === "TextArea";
+    const numberBoxTransferred = contract.name === "NumberBox";
+    const checkboxTransferred = contract.name === "Checkbox";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
@@ -173,6 +184,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       textTransferred ||
       textBoxTransferred ||
       passwordInputTransferred ||
+      textAreaTransferred ||
+      numberBoxTransferred ||
+      checkboxTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
@@ -199,6 +213,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
             ? "Heading"
             : passwordInputTransferred
               ? "TextBox"
+              : textAreaTransferred
+                ? "TextArea"
+                : numberBoxTransferred
+                  ? "NumberBox"
+                  : checkboxTransferred
+                    ? "Checkbox"
             : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -214,6 +234,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TextReact.tsx`);
     } else if (textBoxTransferred || passwordInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TextBoxReact.tsx`);
+    } else if (textAreaTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TextAreaReact.tsx`);
+    } else if (numberBoxTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NumberBoxReact.tsx`);
+    } else if (checkboxTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/CheckboxReact.tsx`);
     } else if (headingTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/HeadingReact.tsx`);
     } else if (imageTransferred) {
@@ -248,6 +274,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       textTransferred,
       textBoxTransferred,
       passwordInputTransferred,
+      textAreaTransferred,
+      numberBoxTransferred,
+      checkboxTransferred,
       headingTransferred,
       htmlTagTransferred,
       brTransferred,
@@ -311,6 +340,9 @@ function componentRunnablePaths(flags: {
   textTransferred: boolean;
   textBoxTransferred: boolean;
   passwordInputTransferred: boolean;
+  textAreaTransferred: boolean;
+  numberBoxTransferred: boolean;
+  checkboxTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
   brTransferred: boolean;
@@ -354,6 +386,15 @@ function componentRunnablePaths(flags: {
   }
   if (flags.passwordInputTransferred) {
     return ["xmlui/src/components/TextBox/TextBox.spec.ts"];
+  }
+  if (flags.textAreaTransferred) {
+    return ["xmlui/src/components/TextArea/TextArea.spec.ts"];
+  }
+  if (flags.numberBoxTransferred) {
+    return ["xmlui/src/components/NumberBox/NumberBox.spec.ts"];
+  }
+  if (flags.checkboxTransferred) {
+    return ["xmlui/src/components/Checkbox/Checkbox.spec.ts"];
   }
   if (flags.headingTransferred) {
     return [

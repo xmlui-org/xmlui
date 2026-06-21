@@ -1,0 +1,188 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderRadius-TextArea: createThemeVar("borderRadius-TextArea");
+$borderColor-TextArea: createThemeVar("borderColor-TextArea");
+$borderWidth-TextArea: createThemeVar("borderWidth-TextArea");
+$borderStyle-TextArea: createThemeVar("borderStyle-TextArea");
+$fontSize-TextArea: createThemeVar("fontSize-TextArea");
+$backgroundColor-TextArea: createThemeVar("backgroundColor-TextArea");
+$boxShadow-TextArea: createThemeVar("boxShadow-TextArea");
+$textColor-TextArea: createThemeVar("textColor-TextArea");
+$borderColor-TextArea--hover: createThemeVar("borderColor-TextArea--hover");
+$backgroundColor-TextArea--hover: createThemeVar("backgroundColor-TextArea--hover");
+$boxShadow-TextArea--hover: createThemeVar("boxShadow-TextArea--hover");
+$textColor-TextArea--hover: createThemeVar("textColor-TextArea--hover");
+$borderColor-TextArea--focus: createThemeVar("borderColor-TextArea--focus");
+$backgroundColor-TextArea--focus: createThemeVar("backgroundColor-TextArea--focus");
+$boxShadow-TextArea--focus: createThemeVar("boxShadow-TextArea--focus");
+$textColor-TextArea--focus: createThemeVar("textColor-TextArea--focus");
+$outlineWidth-TextArea--focus: createThemeVar("outlineWidth-TextArea--focus");
+$outlineColor-TextArea--focus: createThemeVar("outlineColor-TextArea--focus");
+$outlineStyle-TextArea--focus: createThemeVar("outlineStyle-TextArea--focus");
+$outlineOffset-TextArea--focus: createThemeVar("outlineOffset-TextArea--focus");
+$textColor-placeholder-TextArea: createThemeVar("textColor-placeholder-TextArea");
+$fontSize-placeholder-TextArea: createThemeVar("fontSize-placeholder-TextArea");
+$backgroundColor-TextArea--disabled: createThemeVar("backgroundColor-TextArea--disabled");
+$textColor-TextArea--disabled: createThemeVar("textColor-TextArea--disabled");
+$borderColor-TextArea--disabled: createThemeVar("borderColor-TextArea--disabled");
+$paddingHorizontal-TextArea: createThemeVar("paddingHorizontal-TextArea");
+$paddingVertical-TextArea: createThemeVar("paddingVertical-TextArea");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .textAreaLabeledItem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--xmlui-gap-label-TextArea, var(--xmlui-gap-normal));
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .textAreaLabel {
+    color: var(--xmlui-textColor-label-TextArea, var(--xmlui-textColor-primary));
+    font-size: var(--xmlui-fontSize-label-TextArea, inherit);
+    white-space: nowrap;
+  }
+
+  .textAreaLabelRequired {
+    margin-left: 0.25em;
+  }
+
+  .textAreaContainer {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+
+  .textAreaInput {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    min-height: 0;
+    line-height: 1.5em;
+    outline: none;
+    resize: none;
+    padding: var(--xmlui-padding-TextArea, var(--xmlui-paddingVertical-TextArea) var(--xmlui-paddingHorizontal-TextArea));
+    transition: background-color ease-in 0.1s, border-color ease-in 0.1s, box-shadow ease-in 0.1s;
+    border-radius: var(--xmlui-borderRadius-TextArea);
+    border-color: var(--xmlui-borderColor-TextArea);
+    border-width: var(--xmlui-borderWidth-TextArea);
+    border-style: var(--xmlui-borderStyle-TextArea);
+    font-size: var(--xmlui-fontSize-TextArea);
+    background-color: var(--xmlui-backgroundColor-TextArea);
+    box-shadow: var(--xmlui-boxShadow-TextArea);
+    color: var(--xmlui-textColor-TextArea);
+  }
+
+  .textAreaInput:hover {
+    border-color: var(--xmlui-borderColor-TextArea--hover);
+    background-color: var(--xmlui-backgroundColor-TextArea--hover);
+    box-shadow: var(--xmlui-boxShadow-TextArea--hover);
+    color: var(--xmlui-textColor-TextArea--hover);
+  }
+
+  .textAreaInput:focus,
+  .textAreaInput:focus-visible {
+    border-color: var(--xmlui-borderColor-TextArea--focus);
+    background-color: var(--xmlui-backgroundColor-TextArea--focus);
+    box-shadow: var(--xmlui-boxShadow-TextArea--focus);
+    color: var(--xmlui-textColor-TextArea--focus);
+    outline-width: var(--xmlui-outlineWidth-TextArea--focus);
+    outline-color: var(--xmlui-outlineColor-TextArea--focus);
+    outline-style: var(--xmlui-outlineStyle-TextArea--focus);
+    outline-offset: var(--xmlui-outlineOffset-TextArea--focus);
+  }
+
+  .textAreaInput::placeholder {
+    color: var(--xmlui-textColor-placeholder-TextArea);
+    font-size: var(--xmlui-fontSize-placeholder-TextArea);
+  }
+
+  .textAreaInput.textAreaError {
+    border-radius: var(--xmlui-borderRadius-TextArea--error);
+    border-color: var(--xmlui-borderColor-TextArea--error);
+    border-width: var(--xmlui-borderWidth-TextArea--error);
+    border-style: var(--xmlui-borderStyle-TextArea--error);
+    font-size: var(--xmlui-fontSize-TextArea--error);
+    background-color: var(--xmlui-backgroundColor-TextArea--error);
+    box-shadow: var(--xmlui-boxShadow-TextArea--error);
+    color: var(--xmlui-textColor-TextArea--error);
+  }
+
+  .textAreaInput.textAreaWarning {
+    border-radius: var(--xmlui-borderRadius-TextArea--warning);
+    border-color: var(--xmlui-borderColor-TextArea--warning);
+    border-width: var(--xmlui-borderWidth-TextArea--warning);
+    border-style: var(--xmlui-borderStyle-TextArea--warning);
+    font-size: var(--xmlui-fontSize-TextArea--warning);
+    background-color: var(--xmlui-backgroundColor-TextArea--warning);
+    box-shadow: var(--xmlui-boxShadow-TextArea--warning);
+    color: var(--xmlui-textColor-TextArea--warning);
+  }
+
+  .textAreaInput.textAreaSuccess {
+    border-radius: var(--xmlui-borderRadius-TextArea--success);
+    border-color: var(--xmlui-borderColor-TextArea--success);
+    border-width: var(--xmlui-borderWidth-TextArea--success);
+    border-style: var(--xmlui-borderStyle-TextArea--success);
+    font-size: var(--xmlui-fontSize-TextArea--success);
+    background-color: var(--xmlui-backgroundColor-TextArea--success);
+    box-shadow: var(--xmlui-boxShadow-TextArea--success);
+    color: var(--xmlui-textColor-TextArea--success);
+  }
+
+  .textAreaInput.textAreaError:hover {
+    border-color: var(--xmlui-borderColor-TextArea--error--hover);
+    background-color: var(--xmlui-backgroundColor-TextArea--error--hover);
+    box-shadow: var(--xmlui-boxShadow-TextArea--error--hover);
+    color: var(--xmlui-textColor-TextArea--error--hover);
+  }
+
+  .textAreaInput.textAreaWarning:hover {
+    border-color: var(--xmlui-borderColor-TextArea--warning--hover);
+    background-color: var(--xmlui-backgroundColor-TextArea--warning--hover);
+    box-shadow: var(--xmlui-boxShadow-TextArea--warning--hover);
+    color: var(--xmlui-textColor-TextArea--warning--hover);
+  }
+
+  .textAreaInput.textAreaSuccess:hover {
+    border-color: var(--xmlui-borderColor-TextArea--success--hover);
+    background-color: var(--xmlui-backgroundColor-TextArea--success--hover);
+    box-shadow: var(--xmlui-boxShadow-TextArea--success--hover);
+    color: var(--xmlui-textColor-TextArea--success--hover);
+  }
+
+  .textAreaInput:is(:disabled) {
+    cursor: not-allowed;
+    background-color: var(--xmlui-backgroundColor-TextArea--disabled);
+    color: var(--xmlui-textColor-TextArea--disabled);
+    border-color: var(--xmlui-borderColor-TextArea--disabled);
+  }
+
+  .textAreaResizeHorizontal {
+    resize: horizontal;
+  }
+
+  .textAreaResizeVertical {
+    resize: vertical;
+  }
+
+  .textAreaResizeBoth {
+    resize: both;
+  }
+
+  .textAreaConciseFeedback {
+    position: absolute;
+    top: 0.5rem;
+    inset-inline-end: 0.5rem;
+    z-index: 1;
+  }
+}

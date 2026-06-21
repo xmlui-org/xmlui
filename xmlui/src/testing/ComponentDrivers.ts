@@ -131,3 +131,51 @@ export class TextBoxDriver extends InputComponentDriver {
     return this.endAdornment;
   }
 }
+
+export class TextAreaDriver extends InputComponentDriver {
+  get textarea(): Locator {
+    return this.component.locator("textarea").first();
+  }
+}
+
+export class NumberBoxDriver extends InputComponentDriver {
+  get input(): Locator {
+    return this.component.getByRole("spinbutton").first();
+  }
+
+  get spinnerUp(): Locator {
+    return this.getByPartName("spinnerUp");
+  }
+
+  get spinnerDown(): Locator {
+    return this.getByPartName("spinnerDown");
+  }
+
+  increment = async () => {
+    if (await this.spinnerUp.isEnabled()) {
+      await this.spinnerUp.click();
+    }
+  };
+
+  decrement = async () => {
+    if (await this.spinnerDown.isEnabled()) {
+      await this.spinnerDown.click();
+    }
+  };
+}
+
+export class CheckboxDriver extends InputComponentDriver {
+  get input(): Locator {
+    return this.component.locator("input").or(this.component).first();
+  }
+
+  get field(): Locator {
+    return this.input;
+  }
+
+  getIndicatorColor(): Promise<string> {
+    return this.input.evaluate((element) =>
+      window.getComputedStyle(element, "::before").color,
+    );
+  }
+}

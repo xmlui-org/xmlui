@@ -1,0 +1,15 @@
+<App var.amount="{5}" var.step="{2}">
+  <H1>NumberBox foundation</H1>
+  <Text>Amount: {amount}</Text>
+  <NumberBox
+    label="Amount"
+    initialValue="{amount}"
+    step="{step}"
+    minValue="{0}"
+    maxValue="{20}"
+    zeroOrPositive="{true}"
+    onDidChange="amount = $event" />
+  <Button onClick="step = step === 2 ? 5 : 2">
+    Toggle step: {step}
+  </Button>
+</App>
