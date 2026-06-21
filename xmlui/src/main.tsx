@@ -16,6 +16,9 @@ import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
 import "./components/TextArea/TextArea.module.scss?xmlui-css-module";
 import "./components/NumberBox/NumberBox.module.scss?xmlui-css-module";
 import "./components/Checkbox/Checkbox.module.scss?xmlui-css-module";
+import "./components/Switch/Switch.module.scss?xmlui-css-module";
+import "./components/RatingInput/RatingInput.module.scss?xmlui-css-module";
+import "./components/Slider/Slider.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -73,6 +76,9 @@ import textAreaFoundationApp from "./examples/text-area-foundation/Main.xmlui";
 import textBoxFoundationApp from "./examples/text-box-foundation/Main.xmlui";
 import numberBoxFoundationApp from "./examples/number-box-foundation/Main.xmlui";
 import checkboxFoundationApp from "./examples/checkbox-foundation/Main.xmlui";
+import switchFoundationApp from "./examples/switch-foundation/Main.xmlui";
+import ratingInputFoundationApp from "./examples/rating-input-foundation/Main.xmlui";
+import sliderFoundationApp from "./examples/slider-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -145,6 +151,9 @@ const examples = {
   textBoxFoundation: textBoxFoundationApp,
   numberBoxFoundation: numberBoxFoundationApp,
   checkboxFoundation: checkboxFoundationApp,
+  switchFoundation: switchFoundationApp,
+  ratingInputFoundation: ratingInputFoundationApp,
+  sliderFoundation: sliderFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

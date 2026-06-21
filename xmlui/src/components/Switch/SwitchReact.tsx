@@ -1,37 +1,36 @@
-import type { CSSProperties, FocusEvent, ReactNode } from "react";
+import type { CSSProperties, FocusEvent } from "react";
 import { forwardRef, memo, useId, useImperativeHandle } from "react";
 
-import { defaultProps } from "./Checkbox.defaults";
-import type { CheckboxValidationStatus } from "./checkbox-abstractions";
+import { defaultProps } from "./Switch.defaults";
+import type { SwitchValidationStatus } from "./switch-abstractions";
 import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
 
 const styles = {
-  checkboxError: "checkboxError",
-  checkboxContainer: "checkboxcontainer",
-  checkboxLabel: "checkboxLabel",
-  checkboxLabelBreak: "checkboxLabelBreak",
-  checkboxLabeledItem: "checkboxLabeledItem",
-  checkboxLabelPositionAfter: "checkboxLabelPositionAfter",
-  checkboxLabelPositionBefore: "checkboxLabelPositionBefore",
-  checkboxLabelPositionBottom: "checkboxLabelPositionBottom",
-  checkboxLabelPositionEnd: "checkboxLabelPositionEnd",
-  checkboxLabelPositionStart: "checkboxLabelPositionStart",
-  checkboxLabelPositionTop: "checkboxLabelPositionTop",
-  checkboxLabelRequired: "checkboxLabelRequired",
-  checkboxRoot: "checkboxRoot",
-  checkboxSuccess: "checkboxSuccess",
-  checkboxTemplateInputContainer: "checkboxTemplateInputContainer",
-  checkboxTemplateLabel: "checkboxTemplateLabel",
-  checkboxWarning: "checkboxWarning",
+  switchContainer: "switchcontainer",
+  switchError: "switchError",
+  switchLabel: "switchLabel",
+  switchLabelBreak: "switchLabelBreak",
+  switchLabeledItem: "switchLabeledItem",
+  switchLabelPositionAfter: "switchLabelPositionAfter",
+  switchLabelPositionBefore: "switchLabelPositionBefore",
+  switchLabelPositionBottom: "switchLabelPositionBottom",
+  switchLabelPositionEnd: "switchLabelPositionEnd",
+  switchLabelPositionStart: "switchLabelPositionStart",
+  switchLabelPositionTop: "switchLabelPositionTop",
+  switchLabelRequired: "switchLabelRequired",
+  switchNoTransition: "switchNoTransition",
+  switchRoot: "switchRoot",
+  switchSuccess: "switchSuccess",
+  switchWarning: "switchWarning",
 } as const;
 
-export type CheckboxApi = {
+export type SwitchApi = {
   focus: () => void;
   setValue: (value: unknown) => void;
   value: boolean;
 };
 
-export type CheckboxProps = {
+export type SwitchProps = {
   id?: string;
   value?: unknown;
   initialValue?: unknown;
@@ -46,10 +45,8 @@ export type CheckboxProps = {
   readOnly?: boolean;
   required?: boolean;
   autoFocus?: boolean;
-  indeterminate?: boolean;
   tabIndex?: number;
-  validationStatus?: CheckboxValidationStatus;
-  inputRenderer?: (contextVars: { $checked: boolean; $setChecked: (value: unknown) => void }, input: ReactNode) => ReactNode;
+  validationStatus?: SwitchValidationStatus;
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => void | Promise<void>;
   onDidChange?: (value: boolean) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
@@ -57,7 +54,7 @@ export type CheckboxProps = {
   "data-testid"?: string;
 };
 
-export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(function CheckboxNative(
+export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function SwitchNative(
   {
     id,
     value,
@@ -73,10 +70,8 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     readOnly,
     required,
     autoFocus,
-    indeterminate = defaultProps.indeterminate,
     tabIndex,
     validationStatus = defaultProps.validationStatus,
-    inputRenderer,
     onClick,
     onDidChange,
     onFocus,
@@ -87,12 +82,12 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
   ref,
 ) {
   const generatedInputId = useId();
-  const { inputRef, checked, updateValue, api } = useToggleController({
+  const { inputRef, checked, suppressTransition, updateValue, api } = useToggleController({
     value,
     initialValue,
     enabled,
     autoFocus,
-    indeterminate: Boolean(indeterminate),
+    suppressInitialTransition: true,
     onDidChange,
   });
 
@@ -107,25 +102,27 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       {...rest}
       id={inputId}
       ref={inputRef}
+      data-component-type="Toggle"
       data-part-id="input"
       data-xmlui-part="input"
-      data-testid={!hasLabel && !inputRenderer ? effectiveTestId : undefined}
+      data-testid={!hasLabel ? effectiveTestId : undefined}
       className={cx(
-        styles.checkboxRoot,
-        validationStatus === "error" ? styles.checkboxError : undefined,
-        validationStatus === "warning" ? styles.checkboxWarning : undefined,
-        validationStatus === "valid" ? styles.checkboxSuccess : undefined,
-        !hasLabel && !inputRenderer ? className : undefined,
+        styles.switchRoot,
+        validationStatus === "error" ? styles.switchError : undefined,
+        validationStatus === "warning" ? styles.switchWarning : undefined,
+        validationStatus === "valid" ? styles.switchSuccess : undefined,
+        suppressTransition ? styles.switchNoTransition : undefined,
+        !hasLabel ? className : undefined,
       )}
-      style={!hasLabel && !inputRenderer ? style : undefined}
+      style={!hasLabel ? style : undefined}
       type="checkbox"
-      role="checkbox"
+      role="switch"
       checked={checked}
       disabled={!enabled}
       readOnly={readOnly}
       required={required}
       tabIndex={enabled ? tabIndex : -1}
-      aria-checked={indeterminate ? "mixed" : checked}
+      aria-checked={checked}
       aria-required={required}
       aria-disabled={!enabled}
       aria-readonly={readOnly}
@@ -143,15 +140,6 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     />
   );
 
-  if (inputRenderer) {
-    return (
-      <label className={cx(styles.checkboxTemplateLabel, className)} style={style}>
-        <span className={styles.checkboxTemplateInputContainer}>{input}</span>
-        {inputRenderer({ $checked: checked, $setChecked: updateValue }, input)}
-      </label>
-    );
-  }
-
   if (!hasLabel) {
     return input;
   }
@@ -161,23 +149,23 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       data-part-id="label"
       data-xmlui-part="label"
       htmlFor={inputId}
-      className={cx(styles.checkboxLabel, labelBreak ? styles.checkboxLabelBreak : undefined)}
+      className={cx(styles.switchLabel, labelBreak ? styles.switchLabelBreak : undefined)}
       style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}
     >
       <span style={labelWidth !== undefined ? { display: "inline-block", width: cssLength(labelWidth) } : undefined}>
         {labelText}
       </span>
-      {required ? <span className={styles.checkboxLabelRequired}>*</span> : null}
+      {required ? <span className={styles.switchLabelRequired}>*</span> : null}
     </label>
   );
 
   return (
     <div
-      data-xmlui-component="Checkbox"
+      data-xmlui-component="Switch"
       data-xmlui-part="input"
       data-xmlui-id={id}
       data-testid={effectiveTestId}
-      className={cx(styles.checkboxContainer, styles.checkboxLabeledItem, labelPositionClass(labelPosition), className)}
+      className={cx(styles.switchContainer, styles.switchLabeledItem, labelPositionClass(labelPosition), className)}
       style={style}
       dir={direction}
     >
@@ -187,21 +175,21 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
   );
 }));
 
-function labelPositionClass(labelPosition: CheckboxProps["labelPosition"]): string {
+function labelPositionClass(labelPosition: SwitchProps["labelPosition"]): string {
   switch (labelPosition) {
     case "start":
-      return styles.checkboxLabelPositionStart;
+      return styles.switchLabelPositionStart;
     case "top":
-      return styles.checkboxLabelPositionTop;
+      return styles.switchLabelPositionTop;
     case "bottom":
-      return styles.checkboxLabelPositionBottom;
+      return styles.switchLabelPositionBottom;
     case "before":
-      return styles.checkboxLabelPositionBefore;
+      return styles.switchLabelPositionBefore;
     case "after":
-      return styles.checkboxLabelPositionAfter;
+      return styles.switchLabelPositionAfter;
     case "end":
     default:
-      return styles.checkboxLabelPositionEnd;
+      return styles.switchLabelPositionEnd;
   }
 }
 

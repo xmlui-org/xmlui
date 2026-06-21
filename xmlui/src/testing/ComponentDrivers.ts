@@ -179,3 +179,47 @@ export class CheckboxDriver extends InputComponentDriver {
     );
   }
 }
+
+export class SliderDriver extends ComponentDriver {
+  private async getActiveThumb(thumbNumber = 0): Promise<Locator> {
+    const thumbs = this.params.page.getByRole("slider");
+    const thumbCount = await thumbs.count();
+    if (thumbCount === 0) {
+      throw new Error("No slider thumb found.");
+    }
+    return thumbs.nth(Math.max(0, Math.min(thumbNumber, thumbCount - 1)));
+  }
+
+  async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber = 0) {
+    const track = this.params.page.locator("[data-track]");
+    await track.waitFor({ state: "visible" });
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.waitFor({ state: "visible" });
+    const trackBox = await track.boundingBox();
+    if (!trackBox) {
+      throw new Error("Could not get slider track bounds.");
+    }
+    const targetX = location === "start"
+      ? trackBox.x
+      : location === "end"
+        ? trackBox.x + trackBox.width
+        : trackBox.x + trackBox.width / 2;
+    const targetY = trackBox.y + trackBox.height / 2;
+    await activeThumb.hover();
+    await this.params.page.mouse.down({ button: "left" });
+    await this.params.page.mouse.move(targetX, targetY);
+    await this.params.page.mouse.up();
+  }
+
+  async stepThumbByKeyboard(
+    key: "ArrowLeft" | "ArrowRight" | "Home" | "End",
+    thumbNumber = 0,
+    repeat = 1,
+  ) {
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.focus();
+    for (let i = 0; i < repeat; i += 1) {
+      await this.params.page.keyboard.press(key);
+    }
+  }
+}

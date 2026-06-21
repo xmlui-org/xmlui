@@ -10,6 +10,8 @@ import { LinkMd } from "../../components/Link/Link";
 import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
 import { TextAreaMd } from "../../components/TextArea/TextArea";
 import { NumberBoxMd } from "../../components/NumberBox/NumberBox";
+import { RatingInputMd } from "../../components/RatingInput/RatingInput";
+import { SliderMd } from "../../components/Slider/Slider";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
 import { NoResultMd } from "../../components/NoResult/NoResult";
@@ -266,6 +268,28 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       lostFocus: "onLostFocus",
     },
   }),
+  contractFromMetadata(RatingInputMd, {
+    name: "RatingInput",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(SliderMd, {
+    name: "Slider",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
   {
     name: "Stack",
     kind: "builtin",
@@ -442,6 +466,40 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       required: { name: "required" },
       autoFocus: { name: "autoFocus" },
       indeterminate: { name: "indeterminate" },
+      validationStatus: { name: "validationStatus" },
+      requireLabelMode: { name: "requireLabelMode" },
+      bindTo: { name: "bindTo" },
+      tooltip: { name: "tooltip" },
+      tooltipMarkdown: { name: "tooltipMarkdown" },
+      animation: { name: "animation" },
+      variant: { name: "variant" },
+    }),
+    events: {
+      click: { name: "click", attributeName: "onClick" },
+      didChange: { name: "didChange", attributeName: "onDidChange" },
+      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
+      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
+    },
+  },
+  {
+    name: "Switch",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
+      initialValue: { name: "initialValue" },
+      value: { name: "value" },
+      label: { name: "label" },
+      labelPosition: { name: "labelPosition" },
+      labelBreak: { name: "labelBreak" },
+      labelWidth: { name: "labelWidth" },
+      direction: { name: "direction" },
+      enabled: { name: "enabled" },
+      readOnly: { name: "readOnly" },
+      required: { name: "required" },
+      autoFocus: { name: "autoFocus" },
       validationStatus: { name: "validationStatus" },
       requireLabelMode: { name: "requireLabelMode" },
       bindTo: { name: "bindTo" },

@@ -9,6 +9,7 @@ import {
   LinkDriver,
   NoResultDriver,
   NumberBoxDriver,
+  SliderDriver,
   TextAreaDriver,
   TextBoxDriver,
 } from "./ComponentDrivers";
@@ -42,6 +43,7 @@ type Fixtures = {
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
+  createSliderDriver: (testId?: string | Locator) => Promise<SliderDriver>;
   createCheckboxDriver: (testId?: string | Locator) => Promise<CheckboxDriver>;
   createIconDriver: (target: string | Locator) => Promise<IconDriver>;
   createHtmlTagDriver: () => Promise<ComponentDriver>;
@@ -174,6 +176,17 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createSliderDriver: async ({ page }, use) => {
+    await use(async (testId) => new SliderDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Slider"]').first(),
+      page,
+    }));
+  },
   createCheckboxDriver: async ({ page }, use) => {
     await use(async (testId) => new CheckboxDriver({
       locator: typeof testId === "string"
@@ -181,7 +194,7 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`[data-xmlui-id="${testId}"]`))
             .or(page.locator(`#${testId}`))
             .first()
-        : testId ?? page.locator('[data-xmlui-component="Checkbox"]').first(),
+        : testId ?? page.locator('[data-xmlui-component="Checkbox"], [data-xmlui-component="Switch"]').first(),
       page,
     }));
   },
