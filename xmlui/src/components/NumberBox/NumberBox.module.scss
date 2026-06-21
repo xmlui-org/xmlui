@@ -1,0 +1,296 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-NumberBox--disabled: createThemeVar("backgroundColor-NumberBox--disabled");
+$borderRadius-NumberBox: createThemeVar("borderRadius-NumberBox");
+$borderColor-NumberBox: createThemeVar("borderColor-NumberBox");
+$borderColor-NumberBox--error: createThemeVar("borderColor-NumberBox--error");
+$borderColor-NumberBox--warning: createThemeVar("borderColor-NumberBox--warning");
+$borderColor-NumberBox--success: createThemeVar("borderColor-NumberBox--success");
+$borderWidth-NumberBox: createThemeVar("borderWidth-NumberBox");
+$borderWidth-NumberBox--error: createThemeVar("borderWidth-NumberBox--error");
+$borderWidth-NumberBox--warning: createThemeVar("borderWidth-NumberBox--warning");
+$borderWidth-NumberBox--success: createThemeVar("borderWidth-NumberBox--success");
+$borderStyle-NumberBox: createThemeVar("borderStyle-NumberBox");
+$borderStyle-NumberBox--error: createThemeVar("borderStyle-NumberBox--error");
+$borderStyle-NumberBox--warning: createThemeVar("borderStyle-NumberBox--warning");
+$borderStyle-NumberBox--success: createThemeVar("borderStyle-NumberBox--success");
+$fontSize-NumberBox: createThemeVar("fontSize-NumberBox");
+$fontSize-NumberBox--error: createThemeVar("fontSize-NumberBox--error");
+$fontSize-NumberBox--warning: createThemeVar("fontSize-NumberBox--warning");
+$fontSize-NumberBox--success: createThemeVar("fontSize-NumberBox--success");
+$backgroundColor-NumberBox: createThemeVar("backgroundColor-NumberBox");
+$backgroundColor-NumberBox--error: createThemeVar("backgroundColor-NumberBox--error");
+$backgroundColor-NumberBox--warning: createThemeVar("backgroundColor-NumberBox--warning");
+$backgroundColor-NumberBox--success: createThemeVar("backgroundColor-NumberBox--success");
+$boxShadow-NumberBox: createThemeVar("boxShadow-NumberBox");
+$boxShadow-NumberBox--error: createThemeVar("boxShadow-NumberBox--error");
+$boxShadow-NumberBox--warning: createThemeVar("boxShadow-NumberBox--warning");
+$boxShadow-NumberBox--success: createThemeVar("boxShadow-NumberBox--success");
+$textColor-NumberBox: createThemeVar("textColor-NumberBox");
+$textColor-NumberBox--error: createThemeVar("textColor-NumberBox--error");
+$textColor-NumberBox--warning: createThemeVar("textColor-NumberBox--warning");
+$textColor-NumberBox--success: createThemeVar("textColor-NumberBox--success");
+$borderColor-NumberBox--hover: createThemeVar("borderColor-NumberBox--hover");
+$backgroundColor-NumberBox--hover: createThemeVar("backgroundColor-NumberBox--hover");
+$boxShadow-NumberBox--hover: createThemeVar("boxShadow-NumberBox--hover");
+$textColor-NumberBox--hover: createThemeVar("textColor-NumberBox--hover");
+$borderColor-NumberBox--error--hover: createThemeVar("borderColor-NumberBox--error--hover");
+$borderColor-NumberBox--warning--hover: createThemeVar("borderColor-NumberBox--warning--hover");
+$borderColor-NumberBox--success--hover: createThemeVar("borderColor-NumberBox--success--hover");
+$backgroundColor-NumberBox--error--hover: createThemeVar("backgroundColor-NumberBox--error--hover");
+$backgroundColor-NumberBox--warning--hover: createThemeVar("backgroundColor-NumberBox--warning--hover");
+$backgroundColor-NumberBox--success--hover: createThemeVar("backgroundColor-NumberBox--success--hover");
+$boxShadow-NumberBox--error--hover: createThemeVar("boxShadow-NumberBox--error--hover");
+$boxShadow-NumberBox--warning--hover: createThemeVar("boxShadow-NumberBox--warning--hover");
+$boxShadow-NumberBox--success--hover: createThemeVar("boxShadow-NumberBox--success--hover");
+$textColor-NumberBox--error--hover: createThemeVar("textColor-NumberBox--error--hover");
+$textColor-NumberBox--warning--hover: createThemeVar("textColor-NumberBox--warning--hover");
+$textColor-NumberBox--success--hover: createThemeVar("textColor-NumberBox--success--hover");
+$borderColor-NumberBox--focus: createThemeVar("borderColor-NumberBox--focus");
+$backgroundColor-NumberBox--focus: createThemeVar("backgroundColor-NumberBox--focus");
+$boxShadow-NumberBox--focus: createThemeVar("boxShadow-NumberBox--focus");
+$textColor-NumberBox--focus: createThemeVar("textColor-NumberBox--focus");
+$outlineWidth-NumberBox--focus: createThemeVar("outlineWidth-NumberBox--focus");
+$outlineColor-NumberBox--focus: createThemeVar("outlineColor-NumberBox--focus");
+$outlineStyle-NumberBox--focus: createThemeVar("outlineStyle-NumberBox--focus");
+$outlineOffset-NumberBox--focus: createThemeVar("outlineOffset-NumberBox--focus");
+$textColor-placeholder-NumberBox: createThemeVar("textColor-placeholder-NumberBox");
+$fontSize-placeholder-NumberBox: createThemeVar("fontSize-placeholder-NumberBox");
+$color-adornment-NumberBox: createThemeVar("color-adornment-NumberBox");
+$minHeight-NumberBox: createThemeVar("minHeight-NumberBox");
+$gap-adornment-NumberBox: createThemeVar("gap-adornment-NumberBox");
+$textColor-NumberBox--disabled: createThemeVar("textColor-NumberBox--disabled");
+$borderColor-NumberBox--disabled: createThemeVar("borderColor-NumberBox--disabled");
+$paddingHorizontal-NumberBox: createThemeVar("paddingHorizontal-NumberBox");
+$paddingVertical-NumberBox: createThemeVar("paddingVertical-NumberBox");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .numberBoxLabeledItem {
+    display: flex;
+    align-items: center;
+    gap: var(--xmlui-gap-label-NumberBox, var(--xmlui-gap-normal));
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .numberBoxLabel {
+    flex: 0 0 auto;
+    color: var(--xmlui-textColor-label-NumberBox, var(--xmlui-textColor-primary));
+    font-size: var(--xmlui-fontSize-label-NumberBox, inherit);
+    white-space: nowrap;
+  }
+
+  .numberBoxLabel > span {
+    display: inline-block;
+  }
+
+  .numberBoxLabelRequired {
+    margin-left: 0.25em;
+  }
+
+  .numberBoxLabelPositionStart {
+    flex-direction: row;
+  }
+
+  .numberBoxLabelPositionEnd {
+    flex-direction: row-reverse;
+  }
+
+  .numberBoxLabelPositionTop {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .numberBoxLabelPositionBottom {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+
+  .numberBoxRoot {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--xmlui-runtime-gap-NumberBox, var(--xmlui-gap-adornment-NumberBox));
+    width: 100%;
+    height: max-content;
+    min-height: var(--xmlui-minHeight-NumberBox);
+    line-height: normal;
+    overflow: hidden;
+    border-radius: var(--xmlui-borderRadius-NumberBox);
+    border-color: var(--xmlui-borderColor-NumberBox);
+    border-width: var(--xmlui-borderWidth-NumberBox);
+    border-style: var(--xmlui-borderStyle-NumberBox);
+    font-size: var(--xmlui-fontSize-NumberBox);
+    background-color: var(--xmlui-backgroundColor-NumberBox);
+    box-shadow: var(--xmlui-boxShadow-NumberBox);
+    color: var(--xmlui-textColor-NumberBox);
+    padding: var(--xmlui-padding-NumberBox, var(--xmlui-paddingVertical-NumberBox) var(--xmlui-paddingHorizontal-NumberBox));
+    transition: background-color ease-in 0.1s, border-color ease-in 0.1s;
+  }
+
+  .numberBoxRoot:hover {
+    border-color: var(--xmlui-borderColor-NumberBox--hover);
+    background-color: var(--xmlui-backgroundColor-NumberBox--hover);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--hover);
+    color: var(--xmlui-textColor-NumberBox--hover);
+  }
+
+  .numberBoxRoot:focus-within {
+    border-color: var(--xmlui-borderColor-NumberBox--focus);
+    background-color: var(--xmlui-backgroundColor-NumberBox--focus);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--focus);
+    color: var(--xmlui-textColor-NumberBox--focus);
+  }
+
+  .numberBoxRoot.numberBoxError {
+    border-radius: var(--xmlui-borderRadius-NumberBox--error);
+    border-color: var(--xmlui-borderColor-NumberBox--error);
+    border-width: var(--xmlui-borderWidth-NumberBox--error);
+    border-style: var(--xmlui-borderStyle-NumberBox--error);
+    font-size: var(--xmlui-fontSize-NumberBox--error);
+    background-color: var(--xmlui-backgroundColor-NumberBox--error);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--error);
+    color: var(--xmlui-textColor-NumberBox--error);
+  }
+
+  .numberBoxRoot.numberBoxWarning {
+    border-radius: var(--xmlui-borderRadius-NumberBox--warning);
+    border-color: var(--xmlui-borderColor-NumberBox--warning);
+    border-width: var(--xmlui-borderWidth-NumberBox--warning);
+    border-style: var(--xmlui-borderStyle-NumberBox--warning);
+    font-size: var(--xmlui-fontSize-NumberBox--warning);
+    background-color: var(--xmlui-backgroundColor-NumberBox--warning);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--warning);
+    color: var(--xmlui-textColor-NumberBox--warning);
+  }
+
+  .numberBoxRoot.numberBoxSuccess {
+    border-radius: var(--xmlui-borderRadius-NumberBox--success);
+    border-color: var(--xmlui-borderColor-NumberBox--success);
+    border-width: var(--xmlui-borderWidth-NumberBox--success);
+    border-style: var(--xmlui-borderStyle-NumberBox--success);
+    font-size: var(--xmlui-fontSize-NumberBox--success);
+    background-color: var(--xmlui-backgroundColor-NumberBox--success);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--success);
+    color: var(--xmlui-textColor-NumberBox--success);
+  }
+
+  .numberBoxRoot.numberBoxError:hover {
+    border-color: var(--xmlui-borderColor-NumberBox--error--hover);
+    background-color: var(--xmlui-backgroundColor-NumberBox--error--hover);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--error--hover);
+    color: var(--xmlui-textColor-NumberBox--error--hover);
+  }
+
+  .numberBoxRoot.numberBoxWarning:hover {
+    border-color: var(--xmlui-borderColor-NumberBox--warning--hover);
+    background-color: var(--xmlui-backgroundColor-NumberBox--warning--hover);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--warning--hover);
+    color: var(--xmlui-textColor-NumberBox--warning--hover);
+  }
+
+  .numberBoxRoot.numberBoxSuccess:hover {
+    border-color: var(--xmlui-borderColor-NumberBox--success--hover);
+    background-color: var(--xmlui-backgroundColor-NumberBox--success--hover);
+    box-shadow: var(--xmlui-boxShadow-NumberBox--success--hover);
+    color: var(--xmlui-textColor-NumberBox--success--hover);
+  }
+
+  .numberBoxRoot:has(.numberBoxInput:focus-visible) {
+    outline-width: var(--xmlui-outlineWidth-NumberBox--focus);
+    outline-color: var(--xmlui-outlineColor-NumberBox--focus);
+    outline-style: var(--xmlui-outlineStyle-NumberBox--focus);
+    outline-offset: var(--xmlui-outlineOffset-NumberBox--focus);
+  }
+
+  .numberBoxRoot.numberBoxDisabled {
+    cursor: not-allowed;
+    background-color: var(--xmlui-backgroundColor-NumberBox--disabled);
+    color: var(--xmlui-textColor-NumberBox--disabled);
+    border-color: var(--xmlui-borderColor-NumberBox--disabled);
+  }
+
+  .numberBoxRoot.numberBoxReadOnly {
+    cursor: default;
+  }
+
+  .numberBoxInput {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: inherit;
+    color: inherit;
+    border: 0;
+    outline: none !important;
+    background-color: transparent;
+    width: 100%;
+    padding: 0;
+    cursor: inherit;
+    -moz-appearance: textfield;
+  }
+
+  .numberBoxInput::-webkit-outer-spin-button,
+  .numberBoxInput::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  .numberBoxInput::placeholder {
+    color: var(--xmlui-textColor-placeholder-NumberBox);
+    font-size: var(--xmlui-fontSize-placeholder-NumberBox);
+  }
+
+  .numberBoxAdornment {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    color: var(--xmlui-color-adornment-NumberBox);
+  }
+
+  .numberBoxIconMarker {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 999px;
+    background-color: currentColor;
+  }
+
+  .numberBoxSpinner {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    margin-block: calc(-1 * var(--xmlui-paddingVertical-NumberBox));
+    margin-inline-end: calc(-1 * var(--xmlui-paddingHorizontal-NumberBox));
+    border-inline-start: 1px solid currentColor;
+  }
+
+  .numberBoxSpinnerButton {
+    appearance: none;
+    border: 0;
+    min-width: 1.6rem;
+    flex: 1 1 0;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .numberBoxSpinnerButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .numberBoxConciseFeedback {
+    flex: 0 0 auto;
+  }
+}

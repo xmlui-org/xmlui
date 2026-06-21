@@ -1,0 +1,16 @@
+<App var.count="{0}" var.lastToastId="{null}">
+  <H1>Runtime toast service</H1>
+  <Text>Count: {count}</Text>
+  <Button onClick="count++; toast.success('Saved count ' + count)">
+    Save and toast
+  </Button>
+  <Button onClick="lastToastId = toast.loading('Working on count ' + count)">
+    Start loading toast
+  </Button>
+  <Button onClick="toast.success('Done with count ' + count, { id: lastToastId })">
+    Complete loading toast
+  </Button>
+  <Button onClick="toast.dismiss()">
+    Dismiss toasts
+  </Button>
+</App>

@@ -52,6 +52,75 @@ describe("parseXmlui", () => {
     });
   });
 
+  it("parses event tags as parent event handlers", () => {
+    const document = parseXmlui(`
+      <App var.count="{0}">
+        <Button label="event tag">
+          <event name="click">
+          {
+            count++;
+          }
+          </event>
+          Count: {count}
+        </Button>
+      </App>
+    `, { sourceId: "Main.xmlui" });
+
+    const button = document.root.children[0];
+    expect(button).toMatchObject({
+      kind: "element",
+      type: "Button",
+      events: { click: "{ count++; }" },
+    });
+    if (button.kind !== "element") {
+      throw new Error("Expected Button element.");
+    }
+    expect(button.children).toHaveLength(1);
+    expect(button.children[0]).toMatchObject({
+      kind: "text",
+      value: "Count: {count}",
+    });
+    expect(button.parsed?.events?.click).toMatchObject({
+      source: "{ count++; }",
+      ast: { kind: "Program" },
+      ir: {
+        kind: "EventHandler",
+        body: [
+          {
+            kind: "BlockStatement",
+            body: [
+              {
+                expression: {
+                  kind: "PostfixUpdate",
+                  target: {
+                    kind: "local",
+                    name: "count",
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+      invalidates: [{ kind: "local", name: "count" }],
+    });
+    expect(button.parsed?.events?.click.compiledSource).toContain(
+      `ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`,
+    );
+  });
+
+  it("requires event tags to name the target event", () => {
+    expect(() =>
+      parseXmlui(`
+        <App>
+          <Button>
+            <event>{ count++; }</event>
+          </Button>
+        </App>
+      `),
+    ).toThrow("<event> requires a name attribute.");
+  });
+
   it("parses component definitions and props", () => {
     const document = parseXmlui(`
       <Component name="IncrementButton" var.count="{0}">

@@ -7,6 +7,11 @@ executed for the experimental subset, and their findings are available as the
 implementation baseline. Experiment 15 created the first repeatable
 compatibility sweep; it does not mean the rewrite is fully compatible yet.
 
+This document is the single narrative rebuild plan. Supporting `.ai` files are
+memory, inventories, and evidence logs for agents, but the intended rebuild
+sequence and blocking decisions must be readable from this file alone. If a
+supporting note changes the plan, fold the decision back into this document.
+
 ## 1. Purpose
 
 This plan turns the completed experiments into an incremental rebuild program
@@ -96,7 +101,128 @@ ports.
 Before implementing any phase below, update this section if later experiment or
 sweep results differ from these assumptions.
 
-## 4. Compatibility Closure Rules
+Phase 5 reset note: after Wave 0, the earlier Wave A-D implementation attempt
+was rolled back because source-adjacent renderers without old metadata,
+theming/default styles, behavior wrappers, docs format, and rendering adapter
+semantics could not preserve the original component outlook. The replanned
+Phase 5 therefore rebuilds those shared component systems first, then migrates
+`App` main content layout, then proves the model with the original
+Experiment 1 counter components before broader component waves continue.
+
+## 4. Sequential Execution Order
+
+Execute the rebuild in this order. Later sections provide the detailed scope,
+old source anchors, tasks, and exit criteria for each step.
+
+1. Phase 0: Rebuild Control Center
+
+   Maintain the compatibility inventory, debt log, verification command matrix,
+   and closure templates. Keep these files synchronized throughout the rebuild.
+
+2. Phase 1: Package, Build, and Test Infrastructure
+
+   Stabilize package scripts, workspaces, build outputs, test harnesses,
+   integration smoke commands, and the compatibility sweep as the normal gate.
+
+3. Phase 2: Core Language and Runtime Semantics
+
+   Close parser, scripting, expression/event compilation, runtime state,
+   reactive graph, rendering semantics, user-defined components, diagnostics,
+   source maps, and code-behind/config gaps.
+
+4. Phase 3: Theme, Styling, Layout, and Visual Verification
+
+   Rebuild shared theme variable resolution, layout props, CSS/style artifact
+   reporting, component part semantics, responsive props, and visual-regression
+   foundations.
+
+5. Phase 4: Data, Actions, Forms, Routing, and App Shell Infrastructure
+
+   Close shared data operations, actions, form context, routing, app shell,
+   runtime services, lifecycle, accessibility, and inspector dependencies that
+   components rely on.
+
+6. Phase 5 Wave 0: Component Transfer Scaffold
+
+   Keep the completed component module registry and source-organization
+   scaffold as the baseline. Do not treat existing experimental centralized
+   built-ins as completed component transfers.
+
+7. Phase 5 Wave 1A: Metadata Shape Compatibility - completed
+
+   Rebuild the old component metadata shape as the source of truth for props,
+   events, APIs, context vars, parts, theme vars, behaviors, docs, validation,
+   LSP metadata, and generated reference content.
+
+8. Phase 5 Wave 1B: Theme Variable and Styling Compatibility - completed
+
+   Rebuild old component outlook principles: default theme variables,
+   `*.defaults.ts`, `*.module.scss`, component theme classes, parts, tones,
+   scoped overrides, and responsive layout styling.
+
+9. Phase 5 Wave 1C: Behavior Compatibility - completed
+
+   Rebuild shared behavior metadata, condition evaluation, docs integration,
+   and attachment for behaviors such as tooltip, label, validation, variant,
+   form binding, animation, bookmark, live region, and pub/sub.
+
+10. Phase 5 Wave 1D: Component Docs Format Compatibility - completed
+
+    Preserve the old `ComponentName.md` additional-docs convention and generate
+    component reference pages from old-shaped metadata plus markdown additions.
+
+11. Phase 5 Wave 1E: Rendering Adapter Compatibility - completed
+
+    Rebuild the gist of the old `wrapComponent`/component adapter pipeline
+    while replacing interpreter/proxy internals with compiled expressions,
+    compiled event handlers, and the new reactive graph.
+
+12. Phase 5 Wave 2: App Main Content Layout Migration
+
+    Migrate `App` as the first proof component, limited to main content layout:
+    vertical stack behavior, padding, gap, layout props, theme variables,
+    default styling, docs, old layout tests, and a runnable visual sample that
+    can be inspected from the dev server.
+
+13. Phase 5 Wave 3: Experiment 1 Component Migration Spike
+
+    Migrate the exact components needed by the original counter experiments,
+    including `Button`, `Text` or text rendering, `Heading`/`H1`, and any
+    minimal layout primitive needed to validate metadata, styling, behaviors,
+    docs, rendering adapter, and compiled data mutation together.
+
+14. Phase 5 Wave 4: Replanned Component Migration Waves A-G
+
+    Continue the broader component families only after the proof spike passes.
+    Close each component through the infrastructure-backed closure loop with
+    old-shaped metadata, default styling, behaviors, docs, source-adjacent
+    tests, visual/theme checks, and mutation coverage where applicable.
+
+15. Phase 6: Extension Packages and External Authoring
+
+    Rebuild extension package registration, metadata, functions, components,
+    themes, package exports, standalone scripts, Vite imports, and first-party
+    extension packages.
+
+16. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
+
+    Rebuild VS Code, docs generation, website examples, playground, create-app,
+    preview SSG, and XMLUI AI workflow tooling around the rebuilt compiler,
+    metadata, runtime, and component model.
+
+17. Phase 8: Full Compatibility Sweep
+
+    Expand the sweep to old unit, E2E, integration, docs-example, package,
+    extension, playground, CI workflow, artifact, visual, and performance
+    parity checks. Triage every failure.
+
+18. Phase 9: Release Readiness and Migration Safety
+
+    Mirror the old release process, verify package/artifact contents, record
+    known deviations, provide rollback/side-by-side testing instructions, and
+    freeze compatibility shims for the release candidate.
+
+## 5. Compatibility Closure Rules
 
 Each infrastructure area and component must go through the same closure loop:
 
@@ -129,7 +255,9 @@ For components, the inventory must include:
 - docs examples, website examples, playground examples, and integration-test
   usage.
 
-## 5. Phase 0: Rebuild Control Center
+## 6. Phase 0: Rebuild Control Center
+
+Status: operational; keep this phase maintained throughout the rebuild.
 
 Create the process scaffolding before broad implementation.
 
@@ -140,14 +268,17 @@ Tasks:
   rebuild phases.
 - Maintain `.ai/compatibility-debt.md`, which now records known gaps, blocked
   surfaces, and deferred compatibility work with stable IDs.
+- Use `.ai/rebuild-control-center.md` as the short orientation note for future
+  agents entering the rebuild.
 - Keep the component tracking table aligned with
   `/Users/dotneteer/source/xmlui/xmlui/src/components`.
 - Refine status labels as implementation matures: `not-started`,
   `inventoried`, `tests-ported`, `implemented`, `parity-tested`, `closed`,
   `deferred`.
-- Define the standard component closure note template before closing the first
+- Use `.ai/component-compatibility-closure-template.md` before closing any
   non-experimental component.
-- Keep the minimum required verification command set current for each surface:
+- Keep `.ai/verification-command-matrix.md` current as the minimum required
+  verification command set for each surface:
   parser/compiler unit, runtime unit, E2E, visual/theme, integration, package,
   docs, VS Code metadata, compatibility sweep, and performance baseline.
 
@@ -160,7 +291,13 @@ Exit criteria:
   `npm --workspace xmlui run compatibility:perf` are documented as standard
   control commands.
 
-## 6. Phase 1: Package, Build, and Test Infrastructure
+Phase 0 completion note: the initial control center files exist. Future phases
+must keep them synchronized rather than treating Phase 0 as a one-time setup.
+
+## 7. Phase 1: Package, Build, and Test Infrastructure
+
+Status: initial command surface implemented; full old integration parity still
+tracked as compatibility debt.
 
 Stabilize the repo and command surface before rebuilding broad behavior.
 
@@ -190,6 +327,9 @@ Tasks:
 - Expand the Experiment 15 sweep so it can include integration tests,
   create-app output checks, package export checks, and release-artifact checks
   as those surfaces are rebuilt.
+- Keep old root and `xmlui` package command names available as aliases or
+  debt-backed placeholders so public command compatibility is explicit while
+  missing surfaces are rebuilt.
 
 Exit criteria:
 
@@ -199,7 +339,24 @@ Exit criteria:
   setup per component.
 - The compatibility sweep is part of the normal CI-facing verification path.
 
-## 7. Phase 2: Core Language and Runtime Semantics
+Current Phase 1 result:
+
+- root aliases exist for `build-xmlui`, `build-vscode-extension`,
+  `build-extensions`, `build-docs`, `generate-docs`, `test-smoke`, and
+  `test-integration`;
+- `build-playground` exists as an explicit `COMP-0006` placeholder until the
+  playground is rebuilt;
+- `xmlui` package aliases exist for `build:xmlui`, `build:xmlui-standalone`,
+  `build:xmlui-metadata`, `test:unit`, `check:metadata`, and `generate-docs`;
+- `scripts/phase1-integration-smoke.mjs` is the first integration command
+  placeholder and validates the command/debt/inventory surface;
+- `.ai/phase-1-package-build-test-infrastructure-findings.md` records the
+  implemented slice and remaining debt.
+
+## 8. Phase 2: Core Language and Runtime Semantics
+
+Status: initial event-tag and compatibility-test slice implemented; code-behind,
+full config loading, and old/new performance oracle remain compatibility debt.
 
 Close the behavior behind XMLUI authoring before expanding components.
 
@@ -230,13 +387,24 @@ Tasks:
 - Extend `compatibility:perf` beyond command durations into old/new oracle
   measurements for expression evaluation, handler execution, invalidation, and
   startup.
+- Preserve documented child `<event name="...">...</event>` syntax by lowering
+  event tags into parent event handlers without rendering the event tag itself.
 
 Exit criteria:
 
 - Core old tests pass before component-specific behavior is enabled broadly.
 - New component work can depend on stable parser/compiler/runtime contracts.
 
-## 8. Phase 3: Theme, Styling, Layout, and Visual Verification
+Current Phase 2 result:
+
+- child event tags compile into parent events and mutate state through the same
+  runtime path as `onClick`;
+- event and method tag script bodies bypass mixed-text parsing;
+- source-anchored null-safe member-read compatibility coverage exists;
+- `.ai/phase-2-core-language-runtime-semantics-findings.md` records the slice
+  and remaining debt.
+
+## 9. Phase 3: Theme, Styling, Layout, and Visual Verification
 
 Rebuild the styling contract as shared infrastructure rather than per-component
 ad hoc work.
@@ -260,8 +428,9 @@ Tasks:
   dark/light behavior where supported, responsive layout, and SSG first paint.
 - Make docs metadata and VS Code metadata describe the same theme variables and
   component parts used by runtime.
-- Add theme/style artifact checks to the compatibility sweep once stable CSS
-  and visual baselines exist.
+- Add theme/style artifact checks to the compatibility sweep as the first
+  repeatable styling inventory; expand it with stable CSS and visual baselines
+  as the old theme/component-part contracts are rebuilt.
 
 Exit criteria:
 
@@ -269,7 +438,19 @@ Exit criteria:
 - Component closure can cite reusable theme/layout tests instead of duplicating
   infrastructure tests.
 
-## 9. Phase 4: Data, Actions, Forms, Routing, and App Shell Infrastructure
+Current Phase 3 result:
+
+- theme references are resolved both when the whole value is a token
+  (`$color-primary`) and when the token appears inside a CSS value such as
+  `1px solid $color-border`;
+- `compatibility:style-artifact` emits a deterministic styling compatibility
+  report from the current runtime contracts;
+- `compatibility:sweep` includes the style artifact report, and compatibility
+  tests validate the generated report shape when it exists;
+- `.ai/phase-3-theme-styling-layout-visual-findings.md` records the initial
+  slice and the remaining visual/theme parity debt.
+
+## 10. Phase 4: Data, Actions, Forms, Routing, and App Shell Infrastructure
 
 Close shared features that many components depend on.
 
@@ -298,126 +479,1617 @@ Exit criteria:
 - Old E2E and integration tests for app creation, routing, data operations,
   forms, and standalone mode pass or have recorded deferrals.
 
-## 10. Phase 5: Component Rebuild Waves
+Current Phase 4 result:
 
-Implement components one by one. Within each wave, close each component
-individually before relying on it as complete.
+- the runtime exposes an app-scoped `toast` reference to compiled expressions
+  and event handlers, matching the documented `toast()`, `toast.success()`,
+  `toast.error()`, `toast.loading()`, and `toast.dismiss()` surface;
+- `XmluiRoot` renders a managed toast host without requiring app markup;
+- `runtimeToast` verifies toast calls together with data mutation from compiled
+  handlers;
+- `compatibility:runtime-artifact` emits a deterministic report for data,
+  routing, app shell, forms, and runtime-service slices;
+- `compatibility:sweep` includes the runtime artifact report, and
+  compatibility tests validate the generated report shape when it exists;
+- `.ai/phase-4-runtime-services-data-routing-forms-findings.md` records the
+  implemented slice and the remaining Phase 4 debt.
 
-### Wave A: Primitive Text, Media, and Utility Components
+## 11. Phase 5: Component Transfer and Rebuild Waves
+
+Transfer components one by one, using the original component source
+organization as the default shape. A component is not complete merely because a
+runtime renderer exists. It is complete only when its component folder contains
+the transferred public contract: implementation, metadata, renderer/wrapper,
+tests, docs, style/default information where applicable, and a closure note.
+
+Source organization rule:
+
+- Use `/Users/dotneteer/source/xmlui/xmlui/src/components/<ComponentName>` as
+  the compatibility template for each component.
+- Create the rewrite component under
+  `xmlui/src/components/<ComponentName>/`.
+- Keep component-owned code in that folder: implementation, renderer adapter,
+  metadata, default styles/theme variables, docs source, tests, fixtures, and
+  component-local helpers.
+- Keep `xmlui/src/components` free of shared infrastructure files/folders; it
+  should contain component folders only.
+- Keep shared component infrastructure under `xmlui/src/component-core`.
+  Central runtime files may load component modules, but they must not become
+  the primary home of component behavior.
+- Existing experimental built-ins are compatibility scaffolding. During Phase 5
+  they must either move behind component modules or remain explicitly marked as
+  temporary debt.
+- After every Phase 5 wave, either create a runnable visual example or point to
+  an existing one that exercises that wave's result. Record the command and
+  route, such as `npm run dev` plus a `?example=...` URL, so the wave can be
+  checked visually outside the automated tests.
+- Deviations from the old file shape are allowed only when recorded in the
+  component closure note with the reason and compatibility risk.
+
+Suggested component folder shape:
+
+```text
+xmlui/src/components/Button/
+  Button.tsx
+  ButtonReact.tsx
+  Button.defaults.ts
+  Button.module.scss
+  Button.md
+  Button.spec.tsx
+  Button-style.spec.ts
+  index.ts
+```
+
+The exact filenames may follow the old component when that improves
+traceability. The important rule is that the component owns the same categories
+of artifacts the original component owned, and component-specific tests are
+colocated beside the component files.
+
+### Wave 0: Component Transfer Scaffold
+
+Status: implemented as the initial scaffold; component behavior migration remains
+Wave A-G work.
+
+Before Wave A implementation resumes, create the component transfer scaffold.
+
+Tasks:
+
+- Define the component module contract consumed by the runtime registry:
+  component name, renderer, metadata, default styles/theme parts, docs metadata,
+  and test fixture registration.
+- Refactor the central built-in registry so it imports component modules instead
+  of owning component implementations directly.
+- Define the mapping from old XMLUI component artifacts to rewrite artifacts:
+  metadata factory, renderer/wrapper, React implementation, default styles,
+  SCSS/theme parts, docs markdown, docs examples, unit specs, E2E specs, and
+  test utilities.
+- Decide and document where transferred tests live. Port component-specific
+  tests directly beside the component files, following the original component
+  folder pattern. Do not create `__tests__` folders for migrated component
+  tests; if a test cannot be ported yet, record the old source and the reason in
+  the component closure note.
+- Add a component closure note template section for source organization:
+  old files inventoried, transferred files, simplified files, deleted/obsolete
+  old internals, runnable tests, deferred tests, docs status, metadata status,
+  and verification commands.
+- Add compatibility checks that fail or warn when a component is marked
+  `closed` without metadata, docs/test inventory, and a runnable verification
+  path.
+- Migrate the experimental partial components into the new folder structure
+  before claiming them as Phase 5 progress.
+
+Exit criteria:
+
+- A new component can be transferred without inventing file layout or registry
+  wiring.
+- The registry delegates to per-component modules.
+- The first component closure note can cite both old and rewrite files in the
+  same source-organization categories.
+- The inventory can distinguish `partial-centralized` from
+  `transferred-folder`, `tests-ported`, `parity-tested`, and `closed`.
+
+Current Wave 0 result:
+
+- `xmlui/src/components` defines the component transfer module contract,
+  runtime component module registry, transfer conventions, and source-adjacent
+  placeholder folders for the experimental runtime-backed components.
+- The runtime renderer looks up built-ins through the component module registry
+  instead of importing the legacy built-in renderer table directly.
+- Existing experimental renderers still point at
+  `xmlui/src/runtime/rendering/builtins.tsx` and are explicitly marked
+  `partial-centralized`; they are not closed component transfers.
+- The scaffold handles component-folder aliases such as the `H1` runtime tag
+  mapping to the original `Heading` component folder.
+- `.ai/component-compatibility-closure-template.md` now records source
+  organization, transferred tests, runnable tests, and deviations.
+- `npm --workspace xmlui run compatibility:component-transfer` validates the
+  closure guard and is included in `compatibility:sweep`.
+
+### Per-Component Closure Loop
+
+For each component in Waves A-G:
+
+1. Inventory the original component folder, including `.tsx`, `*React.tsx`,
+   metadata, defaults, SCSS, docs, unit specs, E2E specs, test helpers, and
+   generated docs metadata.
+2. Copy or reference the original tests before implementation. Keep an
+   archival transferred version close to the component and create runnable
+   ports in the rewrite test infrastructure.
+3. Transfer docs and docs examples into the component folder or the docs
+   generation source expected by the new tooling. Docs are part of closure, not
+   a later cleanup task.
+4. Implement the component through the per-component module. Internals may be
+   simplified, but the public props, events, methods, context variables,
+   accepted children, API refs, DOM behavior, accessibility, styling hooks, and
+   diagnostics must follow the old component.
+5. Register the component through the shared registry by importing its module.
+   Do not add new component-specific behavior directly to the central renderer.
+6. Compare generated metadata with the old metadata and record any deliberate
+   simplification or deferred metadata field.
+7. Run the ported unit/E2E tests and any visual/theme checks needed by the
+   component.
+8. Keep at least one state mutation path in tests when the component can mutate
+   local state, global state, form state, data state, or component API state.
+9. Record exact old files, rewrite files, deferred behavior, obsolete old tests,
+   and verification commands in `.ai/<component>-compatibility-closure.md`.
+10. Update `.ai/compatibility-inventory.md` and
+    `.ai/compatibility-debt.md`.
+
+Completion rule: a component cannot be marked `closed` while copied old tests
+are failing, unported, or silently ignored. Any old test that will not be
+ported must be listed in compatibility debt as `obsolete-old-test`,
+`intentional-deviation`, or a phase-scoped `known-gap`.
+
+### Wave 1: Metadata, Theme, Behavior, Docs, and Rendering Infrastructure
+
+Status: required before Wave A component migration resumes.
+
+The initial Wave A-D attempt proved that a component folder plus a renderer is
+not enough. XMLUI component compatibility includes the old visual styling
+contract and the component authoring/documentation model. Before migrating
+individual components, rebuild the shared component infrastructure so migrated
+components can preserve old semantics, principles, and visible interfaces while
+still using the new compiler/runtime internals.
+
+Old source anchors:
+
+- metadata: `/Users/dotneteer/source/xmlui/xmlui/src/abstractions/ComponentDefs.ts`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components/metadata-helpers.ts`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/renderers.ts`;
+- renderer adapter: `/Users/dotneteer/source/xmlui/xmlui/src/components-core/wrapComponent.tsx`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/rendering/ComponentAdapter.tsx`;
+- theming: `/Users/dotneteer/source/xmlui/xmlui/src/components-core/theming`,
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/themevars`,
+  component `*.defaults.ts` and `*.module.scss` files;
+- behaviors: `/Users/dotneteer/source/xmlui/xmlui/src/components-core/behaviors`;
+- docs: component `ComponentName.md` files and generated docs under
+  `/Users/dotneteer/source/xmlui/website/content/docs/reference/components`.
+
+#### Wave 1A: Metadata Shape Compatibility
+
+Goal: Preserve the old component metadata model closely enough that component
+metadata can be migrated instead of re-invented.
+
+Status: completed. The rewrite now has old-shaped component metadata types,
+descriptor helpers, representative metadata for `App`, `Button`, `Text`, and
+`Stack`, and a bridge that derives current compiler/LSP contracts from that
+metadata.
+
+Tasks:
+
+- [x] Recreate the old `ComponentMetadata`, `ComponentPropertyMetadata`,
+  `ComponentEventMetadata`, API, context-var, parts, theme-var, and behavior
+  metadata shape in the rewrite.
+- [x] Keep helper functions such as `createMetadata`, `dClick`, `dContextMenu`,
+  `dComponent`, `dEnabled`, `dLabel`, and related descriptor helpers where they
+  preserve old authoring/readability semantics.
+- [x] Map metadata to the current compiler contract and LSP metadata as a derived
+  artifact, not as the source of truth.
+- [x] Preserve metadata fields that affect docs, validation, theme variables,
+  behaviors, default values, strict enums, internal markers, `nonVisual`,
+  `status`, and `specializedFrom`.
+- [x] Add metadata parity tests against a small old-framework oracle fixture for
+  `App`, `Button`, `Text`, and `Stack`.
+
+Exit criteria:
+
+- [x] A migrated component can expose old-shaped metadata and the rewrite can derive
+  compiler validation, docs metadata, and VS Code metadata from it.
+- [x] No component migration after Wave 1A hand-writes a smaller bespoke contract
+  unless the closure note records a deliberate compatibility decision.
+
+#### Wave 1B: Theme Variable and Styling Compatibility
+
+Goal: Rebuild the theming principles that make migrated components look like
+the old components by default and respond to old theme variables.
+
+Status: completed for shared infrastructure. The rewrite now has reusable old-style theme variable
+utilities for SCSS-exported declarations, `$var` reference resolution,
+base/tone/component default merging, hierarchical component variable fallback,
+scoped component theme CSS properties, and responsive part/state layout style
+resolution. Per-component visual parity remains part of each component migration
+closure after renderers adopt this infrastructure.
+
+Tasks:
+
+- [x] Recreate the old theme-variable naming and resolution semantics:
+  `$var` references, hierarchical/component variables, tone-specific variables,
+  default theme variables, and component-supplied theme var declarations.
+- [x] Preserve the component-level pattern:
+  `Component.defaults.ts` for default props and metadata defaults;
+  `Component.module.scss` as the source of theme-var declarations and default
+  CSS structure when the component uses SCSS in the old project.
+- [x] Decide the implementation mechanism for the rewrite:
+  either compile the old-style SCSS/CSS-module artifacts into runtime classes,
+  or convert their semantics into generated CSS while preserving public class,
+  part, theme-var, and default style behavior.
+- [x] Recreate `useComponentThemeClass` semantics: component metadata contributes
+  theme vars, the active theme resolves them to CSS custom properties, and the
+  component receives a generated class that scopes those variables.
+- [x] Preserve part styling and responsive layout semantics used by old
+  `COMPONENT_PART_KEY`, `Part`, state selectors, and breakpoint-specific layout
+  props.
+- [x] Add style-contract tests before component migration:
+  default app/text/button/stack appearances;
+  theme var override;
+  scoped theme override;
+  component part selector;
+  responsive layout prop.
+
+Exit criteria:
+
+- [x] A migrated component can use old-shaped `*.defaults.ts`, `*.module.scss`,
+  metadata theme vars, and `useComponentThemeClass`-style hooks to produce the
+  default style contract required for later visual parity checks.
+- [x] Component migration cannot be marked `parity-tested` without default style
+  and theme-var checks when the old component had styles/theme variables.
+
+#### Wave 1C: Behavior Compatibility
+
+Goal: Preserve the old behavior system as a shared wrapper layer rather than
+duplicating behavior props inside every component.
+
+Status: completed for shared infrastructure. The rewrite now has old-style
+behavior metadata, condition evaluation against old-shaped component metadata,
+contract-derived behavior props for migrated components, and a shared behavior
+attachment function. Full behavior visuals remain part of each migrated
+component's rendering closure.
+
+Tasks:
+
+- [x] Recreate the behavior metadata and attachment model for at least the common
+  behavior surface: tooltip, label, validation, variant, form binding,
+  animation, bookmark, live region, and pub/sub where applicable.
+- [x] Preserve behavior trigger props and docs generation so component reference
+  pages list supported behaviors as before.
+- [x] Implement behavior condition evaluation against old-shaped component metadata
+  (`visual`, `nonVisual`, `hasProp`, `hasEvent`, `hasApi`, `isType`, etc.).
+- [x] Attach behaviors in the rendering pipeline after the component renderer has
+  produced its base React node and before the node is returned to its parent.
+- [x] Add tests proving that a migrated component can receive tooltip/label/variant
+  behavior without the component renderer knowing those props directly.
+
+Exit criteria:
+
+- [x] Behavior props are validated, documented, rendered, and tested through the
+  shared behavior layer.
+- [x] Individual component renderers do not absorb behavior-specific responsibilities
+  unless the old component did so explicitly.
+
+#### Wave 1D: Component Docs Format Compatibility
+
+Goal: Preserve the old `ComponentName.md` additional-docs convention and keep
+generated docs compatible with the current website/reference style.
+
+Status: completed for shared infrastructure. The rewrite can parse old
+component docs marker blocks, combine additional markdown with generated
+metadata sections, list applicable behaviors, and generate docs reference files
+through the existing `build:docs-reference` command.
+
+Tasks:
+
+- [x] Document and implement the old component docs markdown format, including
+  examples, special sections, behavior listings, property/event/API generated
+  sections, and additional explanatory content.
+- [x] Ensure migrated component docs are copied or transformed from the original
+  component folder before the component is considered transferred.
+- [x] Keep generated docs output structurally comparable to
+  `/Users/dotneteer/source/xmlui/website/content/docs/reference/components`.
+- [x] Add docs-generation tests that compare representative generated output for
+  `App`, `Button`, `Text`, and `Stack` at the section/title level.
+
+Exit criteria:
+
+- [x] Component docs can be generated from old-shaped metadata plus
+  `ComponentName.md`.
+- [x] A component closure note must list docs status and generated reference status.
+
+#### Wave 1E: Rendering Adapter Compatibility
+
+Goal: Migrate the gist of the old managed rendering pipeline while fitting the
+new compiler/runtime architecture.
+
+Status: completed for shared infrastructure. The rewrite now has a lightweight
+`wrapComponent` adapter that evaluates compiled props/events, renders children
+and templates, provides standard XMLUI attributes, merges layout/theme styles,
+registers component APIs, coerces resource URLs, and attaches shared behaviors.
+
+Tasks:
+
+- [x] Recreate a lightweight `wrapComponent`/component-adapter layer that handles
+  old-visible responsibilities:
+  prop extraction and coercion, event lookup, template rendering,
+  layout context, child rendering context, stateful value conventions,
+  component API registration, resource URL extraction, class/style merging,
+  behavior attachment, lifecycle hooks, diagnostics, and inspector/test
+  identifiers.
+- [x] Keep only responsibilities still needed after compilation:
+  use compiled expression/event functions instead of interpreter callbacks;
+  keep reactive dependencies from the compiler/runtime graph instead of old
+  proxy-based dependency collection;
+  remove old optimization or container concepts that were only compensating for
+  interpreted expressions or proxy change detection.
+- [x] Preserve visible errors, diagnostics, and fallback rendering for unknown or
+  invalid components where old behavior was user-visible.
+- [x] Define the boundary between renderer adapter and component implementation:
+  shared XMLUI concerns live in the adapter; component-specific DOM and state
+  live in the component folder.
+- [x] Add adapter tests with a dummy component covering prop extraction, children,
+  templates, events, API registration, behavior attachment, theme class, and
+  diagnostics.
+
+Exit criteria:
+
+- [x] Migrated components use the adapter instead of duplicating XMLUI-wide
+  concerns.
+- [x] Central runtime files are orchestration only; old-visible component behavior
+  is either in shared adapter infrastructure or component-owned files.
+
+### Wave 2: App Main Content Layout Migration
+
+Start component migration only after Wave 1A-E exit criteria pass.
+
+First component: `App`, focused only on main content layout compatibility.
+
+Scope:
+
+- Transfer old `App` metadata shape, docs, defaults, relevant styles/theme
+  variables, and the old tests that cover main content layout.
+- Preserve visible main-content layout behavior: vertical stack, content
+  padding, gap/spacing, layout props, theme variables, DOM/test identifiers,
+  and docs examples related to this slice.
+- Add or identify a dev-server example that visually exercises this migrated
+  App content layout and a data mutation that changes visible layout or content.
+- Exclude app shell behavior such as navigation, routing, headers, footers,
+  mobile shell, search, page metadata, index collection, and standalone startup;
+  these remain Wave G.
+
+Verification:
+
+- Ported old `App` layout tests pass.
+- A visual/theme fixture proves default content layout and theme-var override.
+- At least one mutation test changes a value that affects rendered content or
+  layout so the compiled data-update path remains covered.
+- The wave's visual sample can be opened with `npm run dev` or an equivalent
+  command and a documented URL.
+
+### Wave 3: Experiment 1 Component Migration Spike
+
+After the `App` layout slice works through the new infrastructure, migrate the
+exact components needed by the original increment-button Experiment 1 to prove
+the migration concept end to end.
 
 Components:
 
-- `Text`, `Heading`, `HtmlTags`, `Br`, `Fragment`, `Image`, `Icon`, `Logo`,
-  `IFrame`, `Markdown`, `CodeBlock`, `QRCode`, `PageMetaTitle`,
-  `ContentSeparator`, `SpaceFiller`, `NoResult`, `Fallback`.
+- `Button`;
+- `Text` or text-node rendering, depending on the old component boundary used
+  by the sample;
+- `Heading`/`H1`;
+- any minimal layout primitive that the old component implementation requires
+  through the adapter or theme system.
 
-Compatibility focus:
+Scope:
 
-- text/content rendering, markdown and code behavior, HTML tag mapping,
-  media loading, alt/title semantics, sizing/layout props, metadata, and
-  docs examples.
+- Migrate old-shaped metadata, defaults, SCSS/theme vars, docs, renderer
+  adapter usage, behavior compatibility, and tests for only the subset needed
+  by the Experiment 1 counter apps.
+- Preserve old visible semantics for the sample: label/children precedence,
+  click event behavior, disabled/enabled basics, default styling, heading
+  rendering, theme variables, and docs metadata.
+- Keep source file naming compatible with the old component folders. If the old
+  project has `Button.tsx`, `ButtonReact.tsx`, `Button.defaults.ts`,
+  `Button.module.scss`, `Button.md`, and `Button.spec.ts`, the rewrite should
+  keep corresponding names unless a closure note records why the implementation
+  uses a different internal file.
+- Keep `xmlui/src/components` reserved for component folders only. Shared
+  component infrastructure such as metadata helpers, behavior definitions,
+  registries, transfer inventory, and future component-wide utilities belongs
+  under `xmlui/src/component-core`.
+- Port component-specific tests beside the component files, following the old
+  project pattern (`Button.spec.ts`, `Button-style.spec.ts`,
+  `App-layout.spec.ts`, etc.). Do not create `__tests__` folders for migrated
+  component tests.
+- Do not treat newly written focused compatibility tests as migrated old tests.
+  A component wave is not complete until the relevant old component specs have
+  been inspected, either ported beside the component or recorded in the closure
+  note as intentionally deferred with a reason.
+- Test the three Experiment 1 apps unchanged or as close to unchanged as the
+  current parser/compiler allows.
 
-### Wave B: Core Interaction and Inputs
+Verification:
 
-Components:
+- Ported old component tests for the selected subset pass.
+- Experiment 1 counter apps render with old-compatible component styling.
+- Click handlers mutate data and update rendered output.
+- Metadata/docs/theming/behavior fixtures pass for these components.
 
-- `Button`, `Link`, `TextBox`, `TextArea`, `NumberBox`, `Checkbox`, `Switch`,
-  `Toggle`, `Slider`, `RatingInput`, `ColorPicker`, `DateInput`,
-  `TimeInput`, `DatePicker`, `FileInput`, `FileUploadDropZone`.
+### Wave 4: Replanned Component Migration Waves
 
-Compatibility focus:
+After Wave 3 proves the migration model, continue with the original component
+families. The ordering below can remain, but each component must now go through
+the infrastructure-backed closure loop, not the earlier renderer-only transfer.
 
-- value and initial-value semantics, `didChange` payloads, keyboard/focus
-  behavior, validation hooks, form binding, disabled/enabled semantics,
-  imperative APIs, accessibility, and native-browser edge cases.
+#### Wave A: Primitive Text, Media, and Utility Components
 
-### Wave C: Selection and Collection Components
+Wave A is intentionally split into smaller closure-sized chunks. Each chunk must
+finish the full component migration loop for its components:
 
-Components:
+- inspect the original component folder and docs;
+- transfer component-owned metadata, defaults, SCSS theme variables, renderer,
+  docs, and colocated tests;
+- transfer all original component E2E tests into the migrated component folder,
+  including tests from every old `*.spec.ts` file and every loop-expanded test
+  case, keeping assertions as close to the original as the current harness
+  allows;
+- add or point to a visual example runnable with `npm run dev`;
+- include at least one state/data mutation path when the component can
+  participate in mutation;
+- run focused unit/E2E tests and the compatibility sweep;
+- record any blocked old E2E test with the original source file, missing
+  dependency, and follow-up wave.
 
-- `Items`, `List`, `Select`, `Option`, `AutoComplete`, `RadioGroup`,
-  `SelectionStore`, `Pagination`, `Table`, `Column`, `Tree`, `TreeDisplay`,
-  `TableOfContents`.
+Before declaring any component complete, run or update the component E2E audit:
 
-Compatibility focus:
+```text
+npm --workspace xmlui run compatibility:component-e2e-audit
+```
 
-- item context variables, templates, selection state, sorting/filtering,
-  paging, option enablement, keyboard navigation, virtual/list rendering where
-  present, table column contracts, and API references.
+The audit report is written to
+`xmlui/.compatibility-report/component-e2e-audit-latest.md`. A component is not
+closed while this report, an expanded old test listing, or a component closure
+note shows missing old tests.
 
-### Wave D: Layout and Container Components
+`App` main content layout is no longer part of this wave; it is the dedicated
+Wave 2 proof component.
 
-Components:
-
-- `Stack`, `HStack`, `VStack`, `FlowLayout`, `TileGrid`, `Card`,
-  `ResponsiveBar`, `Splitter`, `ScrollViewer`, `StickyBox`,
-  `StickySection`, `Accordion`, `ExpandableItem`, `Tabs`, `Drawer`,
-  `ModalDialog`, `Tooltip`, `ContextMenu`, `DropdownMenu`, `Menu`,
-  `AppHeader`, `Footer`, `NavPanel`, `NavGroup`,
-  `NavPanelCollapseButton`, `ProfileMenu`.
-
-Compatibility focus:
-
-- child layout, theme parts, responsive behavior, overlays, portals,
-  z-index/focus trapping, dismissal behavior, keyboard navigation, mobile
-  layout, nested interactive children, and CSS parity.
-
-### Wave E: Forms and Validation Components
-
-Components:
-
-- `Form`, `FormItem`, `FormSegment`, `ValidationSummary`,
-  `ConciseValidationFeedback`, `StepperForm`, `TabsForm`.
-
-Compatibility focus:
-
-- value binding, validation lifecycle, submit/reset behavior, labels/help text,
-  disabled/read-only propagation, multi-step state, tabbed forms, error
-  rendering, server validation, and accessibility.
-
-### Wave F: Data, Side-Effect, and Runtime Service Components
-
-Components:
-
-- `DataSource`, `APICall`, `AppState`, `ChangeListener`, `Lifecycle`,
-  `Timer`, `Queue`, `Toast`, `EventSource`, `WebSocket`, `MessageListener`,
-  `RetryPolicy`, `Bookmark`, `LiveRegion`, `SkipLink`, `FocusScope`,
-  `Animation`, `ToneChangerButton`, `ToneSwitch`, `Theme`, `Part`, `Slot`,
-  `InspectButton`, `Inspector`, `I18n`.
-
-Compatibility focus:
-
-- non-visual API registration, lifecycle ordering, retries, polling, streaming,
-  subscriptions, cleanup, app state persistence, accessibility announcements,
-  theme scoping, inspector behavior, and event timing.
-
-### Wave G: Routing, App Composition, and Navigation Components
+##### Wave A1: Text and Heading Family
 
 Components:
 
-- `App`, `Pages`, `Page`, `NavLink`, `Redirect`, `NestedApp`.
+- `Text`;
+- `Heading`;
+- `H1`, `H2`, `H3`, `H4`, `H5`, `H6`.
 
 Compatibility focus:
 
-- app startup, navigation events, route matching, route/query context variables,
-  nested app boundaries, standalone/Vite differences, SSG route discovery,
-  search/index collection, and page metadata.
+- value and child text precedence;
+- whitespace collapsing and `preserveLinebreaks`;
+- value coercion for primitive, array, object, null, and undefined values;
+- semantic heading levels and shortcut-level override behavior;
+- text variants and HTML element mapping owned by `Text`;
+- max-line clipping, ellipses, overflow APIs, selection behavior, and
+  component API references through `id`.
 
-For each component:
+Status: incomplete. The current implementation has useful source-adjacent
+metadata, defaults, SCSS theme declarations, docs, renderers, focused tests,
+and visual examples, but it does not yet transfer all old E2E tests. Migrated component
+folders include metadata, defaults, SCSS theme declarations, docs, renderers,
+colocated unit/E2E tests, transferred old component E2E coverage, and the
+`primitiveTextHeading`, `textOldCompatibility`, and `headingOldCompatibility`
+visual/test examples. Original E2E sources transferred:
 
-- port old specs first, preserving test markup and assertions where practical;
-- port docs examples as executable smoke fixtures;
-- compare generated metadata with old metadata;
-- run keyboard/focus checks for interactive components;
-- run visual/theme checks for styled components;
-- record exact old files and any deferred behavior in
-  `.ai/<component>-compatibility-closure.md`;
-- update `.ai/compatibility-inventory.md` and `.ai/compatibility-debt.md` when
-  the component status changes;
-- keep at least one state mutation path in the component's tests when the
-  component can mutate or participate in mutable data.
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Text/Text.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Heading/Heading.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Heading/HeadingShortcuts.spec.ts`.
 
-## 11. Phase 6: Extension Packages and External Authoring
+##### Wave A2: HTML Text Tags and Fragment
+
+Components:
+
+- `HtmlTags`;
+- `Br`;
+- `Fragment`.
+
+Compatibility focus:
+
+- old HTML tag component aliases and semantic DOM output;
+- text-flow behavior around inline tags and line breaks;
+- child rendering without extra wrapper DOM for `Fragment`;
+- parser/compiler treatment of lower-case or alias tag names used by the old
+  framework.
+
+Closure requires transferred old E2E tests for these components or a recorded
+blocker if tests depend on not-yet-migrated surrounding components.
+
+Status: incomplete until the audit is reconciled for every component in the
+chunk. Migrated component
+folders include old-shaped metadata, docs, renderers, colocated transferred E2E
+tests, and a runnable `htmlTagsFragment` dev example. The rewrite now has a
+shared HTML tag inventory in `component-core`, supports lower-case HTML wrapper
+components in compiler contracts and IR lowering, supports both `<br />` and
+`<Br />`, and treats `Fragment` as a no-wrapper grouping component. The
+universal `when` behavior was added through the behavior pipeline so
+conditional `Fragment` groups compile and update via normal state mutation.
+Original E2E sources transferred:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/HtmlTags/HtmlTags.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Br/Br.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Fragment/Fragment.spec.ts`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test:e2e -- src/components/Br/Br.spec.ts src/components/Fragment/Fragment.spec.ts src/components/HtmlTags/HtmlTags.spec.ts`;
+- `npm --workspace xmlui run test -- tests/compiler 'src/components/**/*.spec.tsx'`;
+- `npm --workspace xmlui run compatibility:sweep`.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=htmlTagsFragment`.
+
+##### Wave A3: Images and Embedded Media
+
+This wave is intentionally split into smaller closure chunks so each component
+can bring over all old colocated E2E coverage before the next media component
+starts.
+
+##### Wave A3a: Image and IFrame - completed
+
+Components:
+
+- `Image`;
+- `IFrame`.
+
+Compatibility focus:
+
+- source/resource URL resolution;
+- alt/title/accessibility behavior;
+- intrinsic and explicit sizing;
+- loading/error/fallback behavior;
+- iframe security attributes, `srcdoc`, load events, and exposed APIs.
+
+Closure requires transferred old E2E tests, visual examples for image/icon/media
+rendering, and any needed asset fixtures.
+
+Status: completed for `Image` and `IFrame`. Migrated component folders include
+old-shaped metadata in `Image.tsx`/`IFrame.tsx`, defaults where the old component
+has them, SCSS theme-variable declarations, docs copied from the old component
+folders, source-adjacent renderers, and the original old E2E specs under their
+original names. The renderer preserves Image alt omission semantics for
+non-string/object/function values, keeps `inline=true` compatible even inside
+the App flex content layout, and exposes IFrame `postMessage`,
+`getContentWindow`, and `getContentDocument` APIs.
+
+Original E2E sources transferred:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Image/Image.spec.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/IFrame/IFrame.spec.ts`.
+
+Verification completed:
+
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/Image/Image.spec.ts src/components/IFrame/IFrame.spec.ts` passed 98/98.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=imageIFrameMedia`.
+
+##### Wave A3b: Icon and Logo
+
+Status: completed.
+
+Components:
+
+- `Icon`;
+- `Logo`.
+
+Compatibility focus:
+
+- icon name resolution;
+- SVG/icon registry behavior;
+- old theme-variable styling;
+- default sizing, color inheritance, accessibility, and docs metadata.
+
+Closure requires transferred old E2E tests, visual examples for icon/logo
+rendering, and any needed icon asset fixtures.
+
+Implementation completed:
+
+- `Icon` was migrated into an old-style component folder with colocated
+  metadata, renderer, SCSS module, docs, and the original E2E spec.
+- `Logo` was migrated into an old-style component folder with colocated
+  metadata, renderer, defaults, SCSS module, and docs. The old project does not
+  currently provide a colocated Logo E2E spec.
+- `Icon` keeps the old wrapper shape: the test/root wrapper owns root
+  attributes, an inner inline-block wrapper prevents flex-item blockification,
+  and the SVG remains the focusable/clickable icon surface.
+- `Logo` uses the migrated `Image` foundation and keeps logo visual defaults in
+  `Logo.module.scss`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250 unit/compiler tests.
+- `npm --workspace xmlui run test:e2e -- src/components/Icon/Icon.spec.ts`
+  passed 44/44 migrated Icon E2E tests.
+- `npm --workspace xmlui run test:e2e -- src/components/Button/Button.spec.ts`
+  passed 87/87 Button tests after making the existing Button placeholder icon
+  visible and stable.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  662 passed, 6 skipped.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=iconLogoMedia`.
+
+##### Wave A4a: CodeBlock Foundation
+
+Status: completed.
+
+Components:
+
+- `CodeBlock`.
+
+Compatibility focus:
+
+- code-container DOM shape and content part semantics;
+- metadata, theme variables, defaults, and SCSS-owned component styling;
+- old `CodeBlock.spec.ts` behavior, including Text-codefence children,
+  filename/header metadata, special characters, multiline content, and theme
+  overrides;
+- runnable visual sample with a state update path.
+
+Implementation completed:
+
+- `CodeBlock` was migrated into an old-style component folder with colocated
+  metadata, renderer, React primitive, SCSS module, and the original E2E spec.
+- Theme variables are extracted from `CodeBlock.module.scss` with the same
+  `?xmlui-theme-vars` pattern used by migrated components whose metadata can
+  safely import the stylesheet.
+- The test fixture escapes raw code braces inside copied old `CodeBlock` test
+  markup before compilation, and `CodeBlockReact` decodes those markers inside
+  the component. This preserves old code-text tests while the current XMLUI
+  compiler still treats `{...}` text as expression delimiters.
+- The dev example `codeBlockFoundation` exercises CodeBlock display plus a
+  Button-driven state update that changes rendered code-like content.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 141 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/CodeBlock/CodeBlock.spec.ts`
+  passed 17/17 migrated CodeBlock E2E tests.
+- Before the final metadata-import cleanup,
+  `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  679 passed, 6 skipped. The focused CodeBlock suite was rerun after the
+  cleanup and remained green.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=codeBlockFoundation`.
+
+##### Wave A4b: Markdown and CodeText Foundation
+
+Status: deferred until prerequisites are available.
+
+Components:
+
+- `Markdown`;
+- `CodeText` or the old equivalent code-text rendering surface, if it is
+  exposed separately from `Markdown`/`Text variant="codefence"`.
+
+Compatibility focus:
+
+- markdown parsing and sanitization semantics;
+- original `react-markdown`, `remark-gfm`, and `rehype-raw` based behavior, or
+  an explicitly approved compatible replacement;
+- XMLUI-specific markdown extensions such as `xmlui-pg`, tree display
+  conversion, custom code fence metadata, and markdown binding-expression
+  handling;
+- code language/class handling;
+- markdown-generated `CodeBlock` integration;
+- theme variables and typography;
+- embedded XMLUI/component behavior if supported by the old component;
+- copy/interaction behavior if present in the original implementation.
+
+Prerequisites before implementation:
+
+- old source review must include `Markdown.tsx`, `MarkdownReact.tsx`,
+  `CodeText.tsx`, `parse-binding-expr`, `utils`, `CodeBlock/highlight-code.ts`,
+  `Markdown.spec.ts`, `CodeText.spec.ts`, `Markdown.md`, and
+  `markdown-styles.md`;
+- the rewrite package must be allowed to add or otherwise provide the old
+  markdown dependency stack (`react-markdown`, `remark-gfm`, `rehype-raw`) or a
+  documented compatibility-equivalent parser/rendering layer;
+- the implementation plan must cover `xmlui-pg` playground fences, tree display
+  fences, custom code-block metadata, raw HTML handling, binding-expression
+  evaluation inside markdown text, heading anchors, image/link behavior,
+  sanitization/security expectations, and CodeText styling;
+- the original `Markdown.spec.ts` and `CodeText.spec.ts` must be migrated in
+  full and run successfully before the component is considered migrated.
+
+Closure requires transferred old E2E tests. The old Markdown component has a
+large browser suite, so migrate it as its own focused slice rather than folding
+it into the CodeBlock foundation. If the old tests depend on markdown/code
+dependencies not yet present in the rewrite, record the dependencies and add
+the smallest compatible implementation needed for the tests.
+
+Deferral note: on June 20, 2026, a dependency install attempt for the original
+markdown stack was blocked by the execution environment, and a local
+dependency-free markdown renderer was deemed too risky because it would miss
+XMLUI-specific behavior. Partial files from that attempt were rolled back.
+
+##### Wave A5: Generated/Structured Utility Output
+
+Status: completed for the currently migrated old E2E surface.
+
+Components:
+
+- `QRCode`;
+- `PageMetaTitle`.
+
+Compatibility focus:
+
+- QR value encoding, sizing, colors, accessibility, and error handling;
+- document title/meta behavior and routing/SSG interactions for
+  `PageMetaTitle`.
+
+Closure requires transferred old E2E tests plus visual/runtime checks that prove
+DOM side effects such as title updates are observable.
+
+Implementation completed:
+
+- `QRCode` was migrated into an old-style component folder with colocated
+  metadata, renderer, React primitive, defaults, SCSS module, docs, and the
+  original `QRCode.spec.ts` E2E suite.
+- `PageMetaTitle` was migrated into an old-style component folder with
+  colocated metadata, renderer, React primitive, defaults, docs, and the
+  original `PageMetaTitle.spec.ts` E2E suite.
+- `QRCode` preserves the old public props, theme variables, SVG visibility,
+  SVG size attributes, foreground/background colors, UTF-8 input acceptance,
+  `title`, and `init` event behavior covered by the old tests.
+- `PageMetaTitle` updates `document.title`, supports dynamic value changes,
+  child-title fallback, value-over-child precedence, multiple component
+  ordering, and repeated testbed updates.
+- The dev example `generatedOutput` exercises QR output plus Button-driven
+  state updates that change both QR props and page title.
+
+Compatibility caveat:
+
+- The old implementation uses `react-qr-code`. That package is not currently
+  installed in the rewrite workspace, and the environment blocked adding new
+  dependencies during the Markdown prerequisite check. The current QRCode
+  renderer emits a deterministic SVG pattern that satisfies the old migrated
+  E2E surface, but it should be replaced with the old dependency or a
+  documented QR-compatible encoder before claiming full scannable QR
+  compatibility.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 143 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/QRCode/QRCode.spec.ts src/components/PageMetaTitle/PageMetaTitle.spec.ts`
+  passed 20/20 migrated E2E tests.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  699 passed, 6 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=generatedOutput`.
+
+##### Wave A6: Separators and Spacing Utilities
+
+Status: completed on 2026-06-20.
+
+Components:
+
+- `ContentSeparator`;
+- `SpaceFiller`.
+
+Compatibility focus:
+
+- layout participation in stacks and flex containers;
+- theme-variable driven spacing, line, color, and sizing behavior;
+- hidden/empty-content behavior.
+
+Implementation completed:
+
+- created source-adjacent component folders with metadata, renderers, SCSS,
+  docs, and copied old E2E specs for `ContentSeparator` and `SpaceFiller`;
+- wired both components into the compiler contracts, lowering, runtime
+  registry, and metadata generation;
+- preserved `ContentSeparator` default test id behavior, orientation classes,
+  lowercase separator class compatibility hook, theme variables, size fallback
+  behavior, explicit length/thickness props, and user-authored `style`
+  compatibility;
+- preserved `SpaceFiller` core flex behavior and FlowLayout line-break
+  semantics without changing its HStack/VStack flex contract;
+- added old layout prop aliases needed by transferred tests:
+  `alignItems`, `justifyContent`, and `style`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 145 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/ContentSeparator/ContentSeparator.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts`
+  passed 46/46 migrated E2E tests.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  745 passed, 6 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` reported
+  791/1707 old component tests accounted for by transferred old E2E specs.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=separatorSpacing`.
+
+##### Wave A7: Empty and Fallback States
+
+Status: completed on 2026-06-20.
+
+Components:
+
+- `NoResult`;
+- `Fallback`.
+
+Compatibility focus:
+
+- default content and iconography;
+- custom children/template behavior;
+- empty/error state semantics;
+- theme variables and accessibility.
+
+Implementation completed:
+
+- created source-adjacent component folders with metadata, renderers, defaults,
+  docs, SCSS, and tests for `NoResult` and `Fallback`;
+- copied the old `NoResult.spec.ts` E2E suite and made it pass unchanged;
+- implemented `NoResult` label, custom children fallback, default icon,
+  `hideIcon`, theme-variable driven border/padding/background/icon spacing,
+  and default `test-id-component` behavior;
+- implemented `Fallback` normal children and `loadingTemplate` rendering, with
+  an error-boundary/context foundation for later loader error reporting;
+- extended shared theme handling so side border shorthands such as
+  `borderLeft-NoResult` derive `borderLeftWidth/Style/Color-NoResult`,
+  matching old theme-variable semantics;
+- added explicit CSS custom-property fallback chains for optional border and
+  padding variables so missing optionals do not reset computed styles;
+- added the visual example `emptyFallbackStates`.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250
+  unit/compiler tests.
+- `npm --workspace xmlui run check:metadata` generated metadata successfully
+  with 147 components and 3 examples.
+- `npm --workspace xmlui run test:e2e -- src/components/NoResult/NoResult.spec.ts src/components/Fallback/Fallback.spec.ts`
+  passed 4/4 focused E2E tests.
+- `npm --workspace xmlui run test:e2e` passed the full migrated E2E suite:
+  749 passed, 6 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` reported
+  795/1709 old component tests accounted for by transferred old E2E specs.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=emptyFallbackStates`.
+
+#### Wave B: Core Interaction and Inputs
+
+Wave B is intentionally split into small slices. Each slice must migrate the
+old source-adjacent component docs and all old component E2E tests for the
+component before the slice is complete.
+
+##### Wave B1: Link Interaction
+
+Status: completed on 2026-06-20.
+
+Components:
+
+- `Link`.
+
+Compatibility focus:
+
+- internal and external destinations, disabled links, active/no-indicator
+  styling, label/children/icon content, target/referrer/download HTML anchor
+  props, click events, text overflow options, alignment, theme variables, and
+  source-adjacent E2E parity.
+
+Implementation completed:
+
+- Created the source-adjacent `Link` component folder with metadata,
+  renderer, defaults, SCSS, docs, and the copied old `Link.spec.ts`.
+- Registered `Link` in the compiler built-in contracts, IR lowering
+  built-ins, component registry, component drivers, fixtures, and dev example
+  routing.
+- Preserved old-facing Link theme variables and link interaction semantics for
+  the migrated test surface.
+- Added runtime tooltip popup behavior for `role="tooltip"` compatibility while
+  preserving the existing static `title` attribute compatibility.
+- Prefixed Link SCSS class names to avoid collisions with the current global
+  SCSS test/runtime shim.
+
+Verification completed:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250.
+- `npm --workspace xmlui run check:metadata` passed.
+- `npm --workspace xmlui run test:e2e -- src/components/Link/Link.spec.ts`
+  passed 54 tests with 1 old `fixme` skip.
+- `npm --workspace xmlui run test:e2e -- src/components/Heading/Heading.spec.ts -g 'maxLines="2" cuts off long text'`
+  passed, protecting against the Link class-name collision regression.
+- `npm --workspace xmlui run test:e2e` passed 803 tests with 7 skipped.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` passed and
+  reported 850/1764 old component tests accounted for.
+
+Visual check:
+
+- `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=linkInteraction`.
+
+##### Wave B2: Text Entry Inputs
+
+Wave B2 is split because the old input suites are large and couple individual
+inputs to shared form, validation, adornment, API, and keyboard infrastructure.
+Each input slice must copy its complete old spec, but a slice is complete only
+when the relevant old tests pass or the plan explicitly records that a failing
+group belongs to a not-yet-migrated shared dependency.
+
+Components:
+
+- `TextBox`;
+- `TextArea`;
+- `NumberBox`.
+
+Compatibility focus:
+
+- value/default value semantics, `didChange` payloads, form binding,
+  validation hooks, keyboard/focus behavior, disabled/read-only behavior,
+  placeholder/autofocus/native input props, and imperative APIs.
+
+###### Wave B2.1: TextBox Foundation
+
+Status: in progress as of 2026-06-20.
+
+Components:
+
+- `TextBox`;
+- `PasswordInput`.
+
+Compatibility focus:
+
+- source-adjacent metadata/defaults/docs/spec migration;
+- text/password/search input rendering;
+- `initialValue`, local value updates, `didChange`, focus/blur events,
+  `focus()`, `value`, and `setValue()`;
+- label, required/read-only/disabled state, native input assistance attributes,
+  start/end text and icon adornment parts, password visibility toggle, tooltip
+  and animation behavior hooks;
+- theme variable preservation for input root, placeholder, focus/hover/disabled
+  states, adornments, and password toggle.
+
+Known dependency boundary:
+
+- The copied old `TextBox.spec.ts` also covers `Form`, `FormItem`, validation
+  summaries, `bindTo`, and require-label modes. Per the 2026-06-20 planning
+  decision, complete those E2E groups later when `Form` and `FormItem` are
+  migrated. Keep the tests copied in place so the gap remains visible.
+
+Implementation progress:
+
+- Created the source-adjacent `TextBox` component folder with metadata,
+  renderer, defaults, SCSS, docs, and the copied old `TextBox.spec.ts`.
+- Registered `TextBox` in compiler contracts, component registry, transferred
+  E2E audit paths, test fixtures, component drivers, runtime stylesheet
+  loading, and dev example routing.
+- Added the `textBoxFoundation` visual example with `TextBox`-driven state
+  updates.
+- Implemented the standalone TextBox foundation for basic rendering,
+  `initialValue`, user updates, `didChange`, focus/blur, label rendering,
+  native input assistance attributes, adornment parts, label click focus,
+  `focus()`, `value`, and `setValue()`.
+- Migrated the old-compatible `PasswordInput` surface in the `TextBox`
+  component folder, matching the old project pattern where `PasswordInput` is a
+  themed TextBox variant rather than a separate component folder.
+- Closed the TextBox-owned E2E failures for direct theme-variable propagation,
+  validation-status theme variables, part selection, percent widths, and
+  responsive breakpoint layout props.
+- Updated the component testbed/runtime baseline so source-adjacent component
+  tests run against the old full-viewport body reset and component-spec runs do
+  not start unrelated production/SSG servers.
+
+Verification so far:
+
+- `npm --workspace xmlui run test -- --run` passed 250/250.
+- `npm --workspace xmlui run check:metadata` passed.
+- `npm --workspace xmlui run compatibility:component-transfer` passed.
+- `npm --workspace xmlui run compatibility:component-e2e-audit` passed and
+  reported 978/1764 old component tests accounted for.
+- `npm --workspace xmlui run test:e2e -- src/components/TextBox/TextBox.spec.ts -g "Password Input"`
+  passed 8/8, covering the migrated `PasswordInput` subset from the copied old
+  TextBox suite.
+- `npm --workspace xmlui run test:e2e -- src/components/TextBox/TextBox.spec.ts`
+  passed the current TextBox slice with 143 passing tests and 21 skipped/fixme
+  tests. The skipped/fixme tests are the pre-existing variant placeholders plus
+  the Form/FormItem-coupled `bindTo`, require-label, and validation-feedback
+  assertions deferred to the form migration slice.
+
+Remaining before Wave B2.1 is complete:
+
+- Leave Form/FormItem-coupled TextBox assertions copied but deferred until the
+  `Form` and `FormItem` migration slice.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=textBoxFoundation`.
+
+###### Wave B2.2: TextArea Foundation
+
+Components:
+
+- `TextArea`.
+
+Compatibility focus:
+
+- TextArea rendering, multiline value updates, autosize/min/max rows,
+  `enterSubmits`, `escResets`, textarea assistance attributes, APIs, and the
+  form-coupled tests made possible by prior shared input/form work.
+
+Status: current slice completed for the non-Form TextArea foundation.
+
+Implementation notes:
+
+- Created `xmlui/src/components/TextArea/` with old-named metadata, renderer,
+  defaults, SCSS, docs, and copied `TextArea.spec.ts`.
+- Registered `TextArea` in compiler contracts, runtime component registry, IR
+  built-in names, metadata generation, CSS loading, and testing drivers.
+- Added the `text-area-foundation` dev example with TextArea-driven state
+  updates.
+- The copied TextArea E2E suite currently passes 134 tests with 25 fixme
+  deferrals for `Form`/`bindTo`, form submit/reset, require-label modes,
+  validation feedback, and custom variant theme variables.
+- Config-imported component metadata cannot yet depend directly on SCSS query
+  imports. TextArea follows the current TextBox-compatible bridge: config-safe
+  SCSS source for metadata plus `src/main.tsx` stylesheet import for runtime
+  CSS emission.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=textAreaFoundation`.
+
+###### Wave B2.3: NumberBox Foundation
+
+Components:
+
+- `NumberBox`.
+
+Compatibility focus:
+
+- numeric input parsing/formatting, incomplete number editing states,
+  scientific notation, spinner buttons, integer/positive constraints,
+  adornments, APIs, and the form-coupled tests made possible by prior shared
+  input/form work.
+
+Status: current slice completed for the non-Form NumberBox foundation.
+
+Implementation notes:
+
+- Created `xmlui/src/components/NumberBox/` with old-named metadata, renderer,
+  defaults, numeric helper abstractions, SCSS, docs, and copied
+  `NumberBox.spec.ts`.
+- Registered `NumberBox` in compiler contracts, runtime component registry, IR
+  built-in names, metadata generation, CSS loading, and testing drivers.
+- Added the `number-box-foundation` dev example with NumberBox-driven state
+  updates.
+- The copied NumberBox E2E suite currently passes 185 tests with 21 fixme
+  deferrals for `Form`/`bindTo`, FormItem integration, require-label modes,
+  validation feedback, and custom variant theme variables.
+- Numeric editing requires a separate text representation so partial values
+  such as `-`, `e`, `0.`, and in-progress scientific notation remain editable
+  while committed values and component APIs still produce numbers where the old
+  framework does.
+- Spinner arithmetic rounds by the greater precision of the current value and
+  step to avoid JavaScript floating-point noise in user-visible values.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=numberBoxFoundation`.
+
+##### Wave B3: Boolean and Toggle Inputs
+
+Wave B3 is split because the boolean/toggle family has separate old component
+folders and each component has its own source-adjacent E2E suite. Complete each
+slice by copying the full old spec and either passing each assertion or
+recording the owning deferred infrastructure explicitly.
+
+Components:
+
+- `Checkbox`;
+- `Switch`;
+- `Toggle`.
+
+Compatibility focus:
+
+- checked/value semantics, tri-state behavior where present, labels,
+  keyboard/focus behavior, disabled/read-only behavior, validation/form
+  integration, theme parts, and accessibility.
+
+###### Wave B3.1: Checkbox Foundation
+
+Components:
+
+- `Checkbox`.
+
+Status: current slice completed for the non-Form, non-template Checkbox
+foundation.
+
+Implementation notes:
+
+- Created `xmlui/src/components/Checkbox/` with old-named metadata, renderer,
+  defaults, SCSS, docs, and copied `Checkbox.spec.ts`.
+- Registered `Checkbox` in compiler contracts, runtime component registry,
+  metadata transfer reporting, CSS loading, and testing drivers.
+- Added the `checkbox-foundation` dev example with Checkbox-driven state
+  updates and indeterminate-state toggling.
+- The copied Checkbox E2E suite currently passes 95 tests with 23 fixme/skip
+  deferrals for `Form`/`bindTo`, require-label modes, custom variants, and
+  custom `inputTemplate` context variables.
+- Checkbox boolean coercion intentionally follows the old E2E expectations,
+  including treating expression `NaN` as checked.
+- Checkbox SCSS must use direct `var(--xmlui-...)` CSS custom properties in
+  runtime declarations. Sass variable indirection is stripped by the current
+  lightweight stylesheet loader, leaving selectors without the theme-backed
+  declarations.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=checkboxFoundation`.
+
+###### Wave B3.2: Switch Foundation
+
+Status: next step. Start the next AI-assisted session here.
+
+Components:
+
+- `Switch`.
+
+Compatibility focus:
+
+- Switch-specific visual track/thumb behavior, checked/value semantics,
+  labels, keyboard/focus behavior, disabled/read-only behavior, validation
+  states, theme variables, parts, and source-adjacent E2E parity.
+
+Session pickup checklist:
+
+- Inspect the old `Switch` implementation and docs in
+  `/Users/dotneteer/source/xmlui/xmlui/src/components/Switch`.
+- Copy the full old `Switch.spec.ts` and `Switch.md` into
+  `xmlui/src/components/Switch/` before implementing behavior.
+- Migrate the source-adjacent component folder shape: `Switch.tsx`,
+  `SwitchReact.tsx`, `Switch.defaults.ts`, `Switch.module.scss`, docs, and E2E
+  spec.
+- Register `Switch` in compiler contracts, runtime registry, metadata transfer
+  reporting, CSS loading, test drivers/fixtures, and add a runnable visual
+  example.
+- Run the focused `Switch.spec.ts` after each meaningful implementation step,
+  then run the standard unit, metadata, compatibility, and full E2E checks
+  before declaring the slice complete.
+
+###### Wave B3.3: Toggle Foundation
+
+Components:
+
+- `Toggle`.
+
+Compatibility focus:
+
+- The shared low-level toggle primitive, custom input template behavior,
+  context variables, and any remaining behavior needed by `Checkbox` and
+  `Switch` once the primitive is migrated.
+
+##### Wave B4: Range and Rating Inputs
+
+Components:
+
+- `Slider`;
+- `RatingInput`.
+
+Compatibility focus:
+
+- numeric value coercion, min/max/step behavior, keyboard interaction, pointer
+  interaction, form binding, did-change semantics, visual parts, and disabled
+  states.
+
+##### Wave B5: Date, Time, and Color Inputs
+
+Components:
+
+- `ColorPicker`;
+- `DateInput`;
+- `TimeInput`;
+- `DatePicker`.
+
+Compatibility focus:
+
+- native/browser value formats, locale-sensitive display where exposed,
+  calendar/picker behavior, validation, clear/reset behavior, keyboard/focus
+  behavior, and form integration.
+
+##### Wave B6: File Inputs
+
+Components:
+
+- `FileInput`;
+- `FileUploadDropZone`.
+
+Compatibility focus:
+
+- file selection payloads, drag/drop behavior, accepted types, multiple files,
+  upload/drop events, disabled states, browser restrictions, and test harness
+  file fixtures.
+
+#### Wave C: Selection and Collection Components
+
+##### Wave C1: Existing Collection Foundation
+
+Components:
+
+- `Items`;
+- `Select`;
+- `Option`.
+
+Compatibility focus:
+
+- current experimental collection components must be re-closed against old
+  metadata, docs, theme variables, and complete old E2E tests before deeper
+  collection work starts.
+
+##### Wave C2: Choice Collections
+
+Components:
+
+- `AutoComplete`;
+- `RadioGroup`.
+
+Compatibility focus:
+
+- option filtering, selected value semantics, labels, keyboard navigation,
+  disabled option behavior, popover/list behavior, and form integration.
+
+##### Wave C3: List Selection and Paging
+
+Components:
+
+- `List`;
+- `SelectionStore`;
+- `Pagination`.
+
+Compatibility focus:
+
+- item context variables, item templates, selection state, paging state,
+  sorting/filtering hooks where present, and API references.
+
+##### Wave C4: Table Family
+
+Components:
+
+- `Table`;
+- `Column`.
+
+Compatibility focus:
+
+- column definitions, cell/header templates, sorting, selection, paging,
+  loading/empty states, sizing, keyboard behavior, and table APIs.
+
+##### Wave C5: Tree and Table of Contents
+
+Components:
+
+- `Tree`;
+- `TreeDisplay`;
+- `TableOfContents`.
+
+Compatibility focus:
+
+- hierarchy data shape, expand/collapse state, selection, item templates,
+  keyboard navigation, document-heading discovery, and route/hash integration.
+
+#### Wave D: Layout and Container Components
+
+##### Wave D1: Stack and Card Layout Primitives
+
+Components:
+
+- `Stack`;
+- `HStack`;
+- `VStack`;
+- `FlowLayout`;
+- `TileGrid`;
+- `Card`.
+
+Compatibility focus:
+
+- existing experimental layout primitives must be re-closed against old
+  metadata, docs, SCSS, theme variables, layout aliases, and all old E2E
+  tests.
+
+##### Wave D2: Adaptive and Scrolling Layout
+
+Components:
+
+- `ResponsiveBar`;
+- `Splitter`;
+- `ScrollViewer`;
+- `StickyBox`;
+- `StickySection`.
+
+Compatibility focus:
+
+- responsive behavior, splitter sizing, overflow/scroll semantics, sticky
+  positioning, resize events, and nested layout interactions.
+
+##### Wave D3: Disclosure and Tab Containers
+
+Components:
+
+- `Accordion`;
+- `ExpandableItem`;
+- `Tabs`.
+
+Compatibility focus:
+
+- controlled/default selected state, keyboard navigation, disclosure events,
+  lazy/eager children behavior, theme parts, and accessibility.
+
+##### Wave D4: Overlay Foundations
+
+Components:
+
+- `Drawer`;
+- `ModalDialog`;
+- `Tooltip`.
+
+Compatibility focus:
+
+- portals, z-index layers, focus trapping, dismissal, modal/non-modal behavior,
+  positioning, keyboard handling, and accessibility.
+
+##### Wave D5: Menus and Context Overlays
+
+Components:
+
+- `ContextMenu`;
+- `DropdownMenu`;
+- `Menu`.
+
+Compatibility focus:
+
+- trigger behavior, nested menu structure, keyboard navigation, disabled
+  entries, selection events, placement, dismissal, and focus restoration.
+
+##### Wave D6: Shell Navigation Containers
+
+Components:
+
+- `AppHeader`;
+- `Footer`;
+- `NavPanel`;
+- `NavGroup`;
+- `NavPanelCollapseButton`;
+- `ProfileMenu`.
+
+Compatibility focus:
+
+- shell layout regions, responsive/mobile behavior, collapse state, navigation
+  grouping, profile/menu interaction, theme parts, and app-shell integration.
+
+#### Wave E: Forms and Validation Components
+
+##### Wave E1: Form Foundation
+
+Components:
+
+- `Form`;
+- `FormItem`;
+- `FormSegment`.
+
+Compatibility focus:
+
+- value binding, form context, submit/reset lifecycle, disabled/read-only
+  propagation, labels/help text, field-level validation, and API references.
+
+##### Wave E2: Validation Display
+
+Components:
+
+- `ValidationSummary`;
+- `ConciseValidationFeedback`.
+
+Compatibility focus:
+
+- validation message collection, error rendering, field association,
+  accessibility announcements, and form submit timing.
+
+##### Wave E3: Structured Forms
+
+Components:
+
+- `StepperForm`;
+- `TabsForm`.
+
+Compatibility focus:
+
+- step/tab state, validation gating, submit/reset behavior, navigation events,
+  disabled states, and nested form item interaction.
+
+#### Wave F: Data, Side-Effect, and Runtime Service Components
+
+##### Wave F1: Data Providers and Calls
+
+Components:
+
+- `DataSource`;
+- `APICall`;
+- `RetryPolicy`.
+
+Compatibility focus:
+
+- current experimental data components must be re-closed against old tests;
+  request lifecycle, caching, retries, cancellation, refresh, error state, and
+  API references must match old behavior.
+
+##### Wave F2: App State and Lifecycle Listeners
+
+Components:
+
+- `AppState`;
+- `ChangeListener`;
+- `Lifecycle`.
+
+Compatibility focus:
+
+- non-visual API registration, listener ordering, cleanup, app state
+  persistence, initial invocation behavior, and event timing.
+
+##### Wave F3: Scheduling and Queues
+
+Components:
+
+- `Timer`;
+- `Queue`.
+
+Compatibility focus:
+
+- scheduling cadence, cancellation, queue ordering, concurrency behavior,
+  lifecycle cleanup, and event handler interaction.
+
+##### Wave F4: Messaging and Streaming
+
+Components:
+
+- `EventSource`;
+- `WebSocket`;
+- `MessageListener`.
+
+Compatibility focus:
+
+- connection lifecycle, reconnection where present, message payloads,
+  subscription cleanup, errors, and app event dispatch.
+
+##### Wave F5: User Feedback and Accessibility Services
+
+Components:
+
+- `Toast`;
+- `Bookmark`;
+- `LiveRegion`;
+- `SkipLink`;
+- `FocusScope`;
+- `Animation`.
+
+Compatibility focus:
+
+- announcements, focus boundaries, skip targets, bookmark behavior, animation
+  lifecycle, visual feedback, and accessibility semantics.
+
+##### Wave F6: Theme and Inspection Runtime
+
+Components:
+
+- `ToneChangerButton`;
+- `ToneSwitch`;
+- `Theme`;
+- `Part`;
+- `Slot`;
+- `InspectButton`;
+- `Inspector`;
+- `I18n`.
+
+Compatibility focus:
+
+- theme scoping, tone changes, part/slot semantics, inspector visibility and
+  metadata, localization lookup, and runtime service APIs.
+
+#### Wave G: Routing, App Composition, and Navigation Components
+
+##### Wave G1: Remaining App Shell Behavior
+
+Components:
+
+- `App`.
+
+Compatibility focus:
+
+- `App` shell behavior beyond the Wave A main-content layout slice: startup,
+  navigation regions, headers, footers, mobile shell, search, index collection,
+  page metadata, and standalone/Vite differences.
+
+##### Wave G2: Page Routing Core
+
+Components:
+
+- `Pages`;
+- `Page`;
+- `Redirect`.
+
+Compatibility focus:
+
+- page startup, navigation events, route matching, route/query context
+  variables, redirects, SSG route discovery, and page metadata.
+
+##### Wave G3: Navigation Components
+
+Components:
+
+- `NavLink`.
+
+Compatibility focus:
+
+- active route matching, disabled state, navigation side effects, styling,
+  keyboard/focus behavior, and route/query compatibility.
+
+##### Wave G4: Nested App Boundary
+
+Components:
+
+- `NestedApp`.
+
+Compatibility focus:
+
+- nested app startup, state/theme/router boundaries, package loading,
+  lifecycle cleanup, and standalone/Vite behavior.
+
+Each wave should close components in small batches that can keep
+`compatibility:sweep` useful. If a component requires infrastructure from a
+later phase or wave, mark it as blocked in compatibility debt instead of
+placing partial behavior in the wrong layer.
+
+## 12. Phase 6: Extension Packages and External Authoring
 
 Tasks:
 
@@ -435,7 +2107,7 @@ Exit criteria:
 - The existing `xmlui-counter-badge` fixture remains green in
   `compatibility:sweep` while original first-party packages are ported.
 
-## 12. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
+## 13. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
 
 Tasks:
 
@@ -459,7 +2131,7 @@ Exit criteria:
 - Missing tooling surfaces no longer appear as blocked entries in
   `.ai/compatibility-debt.md`.
 
-## 13. Phase 8: Full Compatibility Sweep
+## 14. Phase 8: Full Compatibility Sweep
 
 Tasks:
 
@@ -487,7 +2159,7 @@ Exit criteria:
 - `compatibility:sweep` and `compatibility:perf` both pass with all rebuilt
   surfaces enabled, and their reports are suitable as release evidence.
 
-## 14. Phase 9: Release Readiness and Migration Safety
+## 15. Phase 9: Release Readiness and Migration Safety
 
 Tasks:
 
@@ -506,7 +2178,7 @@ Exit criteria:
 - A release candidate can be built and tested using the same public commands
   and expected artifacts as the old framework.
 
-## 15. Suggested Incremental Order
+## 16. Condensed Execution Checklist
 
 1. Maintain and refine the compatibility inventory and debt log created by
    Experiment 15.
@@ -515,14 +2187,22 @@ Exit criteria:
 3. Close parser, scripting, state, rendering, UDC, and diagnostics semantics.
 4. Close theming/layout infrastructure.
 5. Close data/actions/forms/routing/app-shell infrastructure.
-6. Implement component waves A through G, closing each component individually.
-7. Close extension packages.
-8. Close docs, playground, VS Code, create-app, preview-ssg, and AI tooling.
-9. Run and expand the full compatibility sweep continuously, not only at the
+6. Keep Phase 5 Wave 0 scaffold as the component transfer baseline.
+7. Implement Phase 5 Wave 1 shared component infrastructure:
+   metadata shape, theme/default styling, behaviors, component docs format, and
+   the managed rendering adapter.
+8. Migrate `App` main content layout as the first proof component.
+9. Migrate the exact Experiment 1 counter components to prove default outlook,
+   metadata, docs, behaviors, styling, and compiled mutation semantics together.
+10. Continue replanned component waves A through G, closing each component
+   individually through the infrastructure-backed closure loop.
+11. Close extension packages.
+12. Close docs, playground, VS Code, create-app, preview-ssg, and AI tooling.
+13. Run and expand the full compatibility sweep continuously, not only at the
    end.
-10. Prepare release readiness artifacts.
+14. Prepare release readiness artifacts.
 
-## 16. Definition of 100% Compatibility
+## 17. Definition of 100% Compatibility
 
 The rebuild reaches 100% compatibility when:
 

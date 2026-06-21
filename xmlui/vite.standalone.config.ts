@@ -1,8 +1,10 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [rawScssModulePlugin(), react()],
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
   },

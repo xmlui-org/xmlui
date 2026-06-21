@@ -1,0 +1,33 @@
+// QRCode.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old component metadata pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-QRCode: createThemeVar("backgroundColor-QRCode");
+$color-QRCode: createThemeVar("color-QRCode");
+$padding-QRCode: createThemeVar("padding-QRCode");
+$size-QRCode: createThemeVar("size-QRCode");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .xmluiQRCode {
+    display: inline-flex;
+    width: var(--xmlui-effective-size-QRCode, var(--xmlui-size-QRCode));
+    height: var(--xmlui-effective-size-QRCode, var(--xmlui-size-QRCode));
+    background-color: var(--xmlui-backgroundColor-QRCode);
+    padding: var(--xmlui-padding-QRCode);
+    box-sizing: content-box;
+  }
+
+  .xmluiQRCode svg {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+}

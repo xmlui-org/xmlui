@@ -9,22 +9,31 @@
     "tools/vscode"
   ],
   "scripts": {
+    "setup": "npm install",
     "dev": "npm --workspace xmlui run dev",
     "build": "npm --workspace xmlui run build",
+    "build-xmlui": "npm --workspace xmlui run build",
     "build:production": "npm --workspace xmlui run build:production",
     "build:ssg": "npm --workspace xmlui run build:ssg",
     "build:metadata": "npm --workspace xmlui run build:metadata",
     "build:docs-reference": "npm --workspace xmlui run build:docs-reference",
+    "build-docs": "npm --workspace xmlui run build:docs-reference",
+    "generate-docs": "npm --workspace xmlui run build:docs-reference",
     "inspect:ssg": "npm --workspace xmlui run inspect:ssg",
     "serve:production": "npm --workspace xmlui run serve:production",
     "preview:ssg": "npm --workspace xmlui run preview:ssg",
     "build:vscode": "npm --workspace xmlui-vscode run build",
+    "build-vscode-extension": "npm --workspace xmlui-vscode run build:vsix",
     "test": "npm --workspace xmlui run test",
+    "test-smoke": "npm --workspace xmlui run test:e2e",
+    "test-integration": "node scripts/phase1-integration-smoke.mjs",
     "test:vscode": "npm --workspace xmlui-vscode run test",
     "test:e2e": "npm --workspace xmlui run test:e2e",
     "compatibility:sweep": "npm --workspace xmlui run compatibility:sweep",
     "compatibility:perf": "npm --workspace xmlui run compatibility:perf",
     "build:counter-badge": "npm --workspace xmlui-counter-badge run build",
-    "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata"
+    "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata",
+    "build-extensions": "npm --workspace xmlui-counter-badge run build && npm --workspace xmlui-counter-badge run build:metadata",
+    "build-playground": "node scripts/compatibility-missing.mjs COMP-0006 build-playground"
   }
 }

@@ -1,17 +1,38 @@
 import type { CSSProperties } from "react";
 
-import type { LayoutOrientation } from "./contracts";
+import {
+  responsiveBreakpoints,
+  supportedLayoutPropNames,
+  type LayoutOrientation,
+} from "./contracts";
 import { resolveThemeReferences } from "./theme";
 
 export type LayoutStyleOptions = {
   orientation?: LayoutOrientation;
 };
 
+export const COMPONENT_PART_KEY = "-component";
+
+export type ResponsiveLayoutStyles = Record<
+  string,
+  {
+    base: CSSProperties;
+    breakpoints: Partial<Record<keyof typeof responsiveBreakpoints, CSSProperties>>;
+    states: Record<
+      string,
+      {
+        base: CSSProperties;
+        breakpoints: Partial<Record<keyof typeof responsiveBreakpoints, CSSProperties>>;
+      }
+    >;
+  }
+>;
+
 export function resolveLayoutStyle(
   props: Record<string, unknown>,
   options: LayoutStyleOptions = {},
 ): CSSProperties {
-  const style: CSSProperties = {};
+  const style: CSSProperties = { boxSizing: "border-box" };
   const orientation = options.orientation ?? orientationFromProp(props.orientation);
 
   if (orientation) {
@@ -75,6 +96,8 @@ export function resolveLayoutStyle(
   assign(style, "writingMode", props.writingMode);
   assign(style, "transition", props.transition);
   assign(style, "transform", props.transform);
+  assign(style, "alignItems", props.alignItems);
+  assign(style, "justifyContent", props.justifyContent);
   assign(style, "scrollSnapType", props.scrollSnapType);
   assign(style, "scrollSnapAlign", props.scrollSnapAlign);
   assign(style, "scrollSnapStop", props.scrollSnapStop);
@@ -85,6 +108,7 @@ export function resolveLayoutStyle(
   assignBorder(style, props);
   assignAlignment(style, props, orientation);
   assignFlexBehavior(style, props);
+  assignInlineCss(style, props.style);
 
   return style;
 }
@@ -97,12 +121,64 @@ export function parseStyleSelectorKey(key: string): {
 } {
   const [beforeState, state] = key.split("--", 2);
   const segments = beforeState.split("-").filter(Boolean);
+  const propertyMatch = findLayoutPropertyPrefix(segments);
+  if (!propertyMatch) {
+    return {
+      property: segments[0] ?? key,
+      part: segments.length > 2 ? segments.slice(1, -1).join("-") : segments[1],
+      breakpoint: segments.length > 2 ? segments[segments.length - 1] : undefined,
+      state,
+    };
+  }
+  const rest = segments.slice(propertyMatch.segmentCount);
+  const breakpoint = rest.length > 0 && isBreakpoint(rest[rest.length - 1])
+    ? rest[rest.length - 1]
+    : undefined;
+  const partSegments = breakpoint ? rest.slice(0, -1) : rest;
   return {
-    property: segments[0] ?? key,
-    part: segments.length > 2 ? segments.slice(1, -1).join("-") : segments[1],
-    breakpoint: segments.length > 2 ? segments[segments.length - 1] : undefined,
+    property: propertyMatch.property,
+    part: partSegments.length > 0 ? partSegments.join("-") : undefined,
+    breakpoint,
     state,
   };
+}
+
+export function resolveResponsiveLayoutStyles(
+  props: Record<string, unknown>,
+  options: LayoutStyleOptions = {},
+): ResponsiveLayoutStyles {
+  const styles: ResponsiveLayoutStyles = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (value === undefined || value === null || value === "") {
+      continue;
+    }
+    const selector = parseStyleSelectorKey(key);
+    if (!supportedLayoutPropNames.includes(selector.property as never)) {
+      continue;
+    }
+    const part = selector.part ?? COMPONENT_PART_KEY;
+    const entry = styles[part] ??= { base: {}, breakpoints: {}, states: {} };
+    const style = resolveLayoutStyle({ [selector.property]: value }, options);
+    if (selector.state) {
+      const state = entry.states[selector.state] ??= { base: {}, breakpoints: {} };
+      if (selector.breakpoint && isBreakpoint(selector.breakpoint)) {
+        state.breakpoints[selector.breakpoint] = {
+          ...state.breakpoints[selector.breakpoint],
+          ...style,
+        };
+      } else {
+        Object.assign(state.base, style);
+      }
+    } else if (selector.breakpoint && isBreakpoint(selector.breakpoint)) {
+      entry.breakpoints[selector.breakpoint] = {
+        ...entry.breakpoints[selector.breakpoint],
+        ...style,
+      };
+    } else {
+      Object.assign(entry.base, style);
+    }
+  }
+  return styles;
 }
 
 function assign(
@@ -240,6 +316,28 @@ function normalizeCssValue(value: unknown, pxForNumber = true): string | number 
   return String(resolved);
 }
 
+function assignInlineCss(style: CSSProperties, value: unknown): void {
+  if (typeof value !== "string" || value.trim() === "") {
+    return;
+  }
+  for (const declaration of value.split(";")) {
+    const separatorIndex = declaration.indexOf(":");
+    if (separatorIndex <= 0) {
+      continue;
+    }
+    const name = declaration.slice(0, separatorIndex).trim();
+    const rawValue = declaration.slice(separatorIndex + 1).trim();
+    if (!name || !rawValue) {
+      continue;
+    }
+    (style as Record<string, unknown>)[cssNameToReactName(name)] = resolveThemeReferences(rawValue);
+  }
+}
+
+function cssNameToReactName(name: string): string {
+  return name.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase());
+}
+
 function parseStarSize(value: unknown): { grow: number } | undefined {
   if (typeof value !== "string") {
     return undefined;
@@ -277,10 +375,25 @@ function alignment(value: unknown): CSSProperties["alignItems"] {
   }
 }
 
+function findLayoutPropertyPrefix(
+  segments: string[],
+): { property: string; segmentCount: number } | undefined {
+  for (let count = segments.length; count >= 1; count -= 1) {
+    const property = segments.slice(0, count).join("-");
+    if (supportedLayoutPropNames.includes(property as never)) {
+      return { property, segmentCount: count };
+    }
+  }
+  return undefined;
+}
+
+function isBreakpoint(value: string | undefined): value is keyof typeof responsiveBreakpoints {
+  return value !== undefined && Object.prototype.hasOwnProperty.call(responsiveBreakpoints, value);
+}
+
 function coerceBoolean(value: unknown): boolean {
   if (typeof value === "string") {
     return value === "true";
   }
   return Boolean(value);
 }
-

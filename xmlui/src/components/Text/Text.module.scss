@@ -1,0 +1,246 @@
+// Text.tsx extracts available theme variables from createThemeVar declarations
+// in this file, mirroring the old Text component pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$fontFamily-Text: createThemeVar("fontFamily-Text");
+$fontSize-Text: createThemeVar("fontSize-Text");
+$fontWeight-Text: createThemeVar("fontWeight-Text");
+$fontStyle-Text: createThemeVar("fontStyle-Text");
+$textColor-Text: createThemeVar("textColor-Text");
+$backgroundColor-Text: createThemeVar("backgroundColor-Text");
+$lineHeight-Text: createThemeVar("lineHeight-Text");
+$letterSpacing-Text: createThemeVar("letterSpacing-Text");
+$textTransform-Text: createThemeVar("textTransform-Text");
+$textDecorationLine-Text: createThemeVar("textDecorationLine-Text");
+$borderWidth-Text: createThemeVar("borderWidth-Text");
+$borderStyle-Text: createThemeVar("borderStyle-Text");
+$borderColor-Text: createThemeVar("borderColor-Text");
+$borderRadius-Text: createThemeVar("borderRadius-Text");
+$paddingHorizontal-Text: createThemeVar("paddingHorizontal-Text");
+$paddingVertical-Text: createThemeVar("paddingVertical-Text");
+$marginTop-Text: createThemeVar("marginTop-Text");
+$marginBottom-Text: createThemeVar("marginBottom-Text");
+$marginLeft-Text: createThemeVar("marginLeft-Text");
+$marginRight-Text: createThemeVar("marginRight-Text");
+$verticalAlignment-Text: createThemeVar("verticalAlignment-Text");
+$textColor-Text-secondary: createThemeVar("textColor-Text-secondary");
+$fontSize-Text-secondary: createThemeVar("fontSize-Text-secondary");
+$fontWeight-Text-strong: createThemeVar("fontWeight-Text-strong");
+$fontStyle-Text-em: createThemeVar("fontStyle-Text-em");
+$fontStyle-Text-cite: createThemeVar("fontStyle-Text-cite");
+$fontFamily-Text-mono: createThemeVar("fontFamily-Text-mono");
+$fontFamily-Text-code: createThemeVar("fontFamily-Text-code");
+$fontSize-Text-code: createThemeVar("fontSize-Text-code");
+$borderWidth-Text-code: createThemeVar("borderWidth-Text-code");
+$borderStyle-Text-code: createThemeVar("borderStyle-Text-code");
+$borderRadius-Text-code: createThemeVar("borderRadius-Text-code");
+$paddingHorizontal-Text-code: createThemeVar("paddingHorizontal-Text-code");
+$paddingBottom-Text-code: createThemeVar("paddingBottom-Text-code");
+$backgroundColor-Text-code: createThemeVar("backgroundColor-Text-code");
+$borderColor-Text-code: createThemeVar("borderColor-Text-code");
+$fontWeight-Text-abbr: createThemeVar("fontWeight-Text-abbr");
+$textTransform-Text-abbr: createThemeVar("textTransform-Text-abbr");
+$textDecorationLine-Text-deleted: createThemeVar("textDecorationLine-Text-deleted");
+$textDecorationLine-Text-inserted: createThemeVar("textDecorationLine-Text-inserted");
+$fontFamily-Text-keyboard: createThemeVar("fontFamily-Text-keyboard");
+$fontSize-Text-keyboard: createThemeVar("fontSize-Text-keyboard");
+$fontWeight-Text-keyboard: createThemeVar("fontWeight-Text-keyboard");
+$borderWidth-Text-keyboard: createThemeVar("borderWidth-Text-keyboard");
+$paddingHorizontal-Text-keyboard: createThemeVar("paddingHorizontal-Text-keyboard");
+$backgroundColor-Text-keyboard: createThemeVar("backgroundColor-Text-keyboard");
+$borderColor-Text-keyboard: createThemeVar("borderColor-Text-keyboard");
+$fontSize-Text-title: createThemeVar("fontSize-Text-title");
+$fontSize-Text-subtitle: createThemeVar("fontSize-Text-subtitle");
+$fontSize-Text-small: createThemeVar("fontSize-Text-small");
+$letterSpacing-Text-caption: createThemeVar("letterSpacing-Text-caption");
+$fontSize-Text-placeholder: createThemeVar("fontSize-Text-placeholder");
+$textColor-Text-placeholder: createThemeVar("textColor-Text-placeholder");
+$paddingVertical-Text-paragraph: createThemeVar("paddingVertical-Text-paragraph");
+$fontSize-Text-subheading: createThemeVar("fontSize-Text-subheading");
+$fontWeight-Text-subheading: createThemeVar("fontWeight-Text-subheading");
+$letterSpacing-Text-subheading: createThemeVar("letterSpacing-Text-subheading");
+$textTransform-Text-subheading: createThemeVar("textTransform-Text-subheading");
+$textColor-Text-subheading: createThemeVar("textColor-Text-subheading");
+$textColor-Text-marked: createThemeVar("textColor-Text-marked");
+$backgroundColor-Text-marked: createThemeVar("backgroundColor-Text-marked");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .text {
+    display: inline-block;
+    margin: 0;
+    margin-top: var(--xmlui-current-marginTop-Text, var(--xmlui-marginTop-Text, 0));
+    margin-bottom: var(--xmlui-current-marginBottom-Text, var(--xmlui-marginBottom-Text, 0));
+    margin-inline-start: var(--xmlui-current-marginLeft-Text, var(--xmlui-marginLeft-Text, 0));
+    margin-inline-end: var(--xmlui-current-marginRight-Text, var(--xmlui-marginRight-Text, 0));
+    padding: var(--xmlui-current-paddingVertical-Text, var(--xmlui-current-paddingBottom-Text, var(--xmlui-paddingVertical-Text, var(--xmlui-paddingBottom-Text, 0)))) var(--xmlui-current-paddingHorizontal-Text, var(--xmlui-paddingHorizontal-Text, 0));
+    vertical-align: var(--xmlui-current-verticalAlignment-Text, var(--xmlui-verticalAlignment-Text, baseline));
+    user-select: text;
+    color: var(--xmlui-current-textColor-Text, var(--xmlui-textColor-Text));
+    background-color: var(--xmlui-current-backgroundColor-Text, var(--xmlui-backgroundColor-Text));
+    font-family: var(--xmlui-current-fontFamily-Text, var(--xmlui-fontFamily-Text));
+    font-size: var(--xmlui-current-fontSize-Text, var(--xmlui-fontSize-Text));
+    font-weight: var(--xmlui-current-fontWeight-Text, var(--xmlui-fontWeight-Text));
+    font-style: var(--xmlui-current-fontStyle-Text, var(--xmlui-fontStyle-Text));
+    font-stretch: var(--xmlui-current-fontStretch-Text, var(--xmlui-fontStretch-Text));
+    line-height: var(--xmlui-current-lineHeight-Text, var(--xmlui-lineHeight-Text));
+    letter-spacing: var(--xmlui-current-letterSpacing-Text, var(--xmlui-letterSpacing-Text));
+    word-spacing: var(--xmlui-current-wordSpacing-Text, var(--xmlui-wordSpacing-Text));
+    text-shadow: var(--xmlui-current-textShadow-Text, var(--xmlui-textShadow-Text));
+    text-indent: var(--xmlui-current-textIndent-Text, var(--xmlui-textIndent-Text));
+    text-align: var(--xmlui-current-textAlign-Text, var(--xmlui-textAlign-Text));
+    text-align-last: var(--xmlui-current-textAlignLast-Text, var(--xmlui-textAlignLast-Text));
+    direction: var(--xmlui-current-direction-Text, var(--xmlui-direction-Text));
+    writing-mode: var(--xmlui-current-writingMode-Text, var(--xmlui-writingMode-Text));
+    line-break: var(--xmlui-current-lineBreak-Text, var(--xmlui-lineBreak-Text));
+    text-transform: var(--xmlui-current-textTransform-Text, var(--xmlui-textTransform-Text));
+    text-decoration-line: var(--xmlui-current-textDecorationLine-Text, var(--xmlui-textDecorationLine-Text));
+    text-decoration-color: var(--xmlui-current-textDecorationColor-Text, var(--xmlui-textDecorationColor-Text));
+    text-decoration-style: var(--xmlui-current-textDecorationStyle-Text, var(--xmlui-textDecorationStyle-Text));
+    text-decoration-thickness: var(--xmlui-current-textDecorationThickness-Text, var(--xmlui-textDecorationThickness-Text));
+    text-underline-offset: var(--xmlui-current-textUnderlineOffset-Text, var(--xmlui-textUnderlineOffset-Text));
+    word-break: var(--xmlui-current-wordBreak-Text, var(--xmlui-wordBreak-Text));
+    overflow-wrap: var(--xmlui-current-wordWrap-Text, var(--xmlui-wordWrap-Text));
+    border-width: var(--xmlui-current-borderWidth-Text, var(--xmlui-borderWidth-Text));
+    border-style: var(--xmlui-current-borderStyle-Text, var(--xmlui-borderStyle-Text));
+    border-color: var(--xmlui-current-borderColor-Text, var(--xmlui-borderColor-Text));
+    border-radius: var(--xmlui-current-borderRadius-Text, var(--xmlui-borderRadius-Text));
+  }
+
+  .variant_abbr,
+  .variant_cite,
+  .variant_code,
+  .variant_deleted,
+  .variant_em,
+  .variant_inserted,
+  .variant_keyboard,
+  .variant_marked,
+  .variant_mono,
+  .variant_paragraph,
+  .variant_placeholder,
+  .variant_sample,
+  .variant_secondary,
+  .variant_small,
+  .variant_strong,
+  .variant_subheading,
+  .variant_subtitle,
+  .variant_tableheading,
+  .variant_title {
+    /* Variant classes intentionally activate current variant CSS variables in .text. */
+  }
+
+  .preserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .overflowNone {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  .overflowScroll {
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-overflow: clip;
+  }
+
+  .overflowFlow {
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .overflowEllipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .overflowEllipsis.preserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .overflowMultiLine {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+  }
+
+  .noEllipsis {
+    text-overflow: clip;
+  }
+
+  .breakWord {
+    overflow-wrap: break-word;
+  }
+
+  .breakAnywhere {
+    overflow-wrap: anywhere;
+  }
+
+  .breakKeep {
+    word-break: keep-all;
+  }
+
+  .breakHyphenate {
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
+  .maxLines1 {
+    -webkit-line-clamp: 1;
+  }
+
+  .maxLines2 {
+    -webkit-line-clamp: 2;
+  }
+
+  .maxLines3 {
+    -webkit-line-clamp: 3;
+  }
+
+  .maxLines4 {
+    -webkit-line-clamp: 4;
+  }
+
+  .maxLines5 {
+    -webkit-line-clamp: 5;
+  }
+
+  .maxLines6 {
+    -webkit-line-clamp: 6;
+  }
+
+  .maxLines7 {
+    -webkit-line-clamp: 7;
+  }
+
+  .maxLines8 {
+    -webkit-line-clamp: 8;
+  }
+
+  .maxLines9 {
+    -webkit-line-clamp: 9;
+  }
+
+  .maxLines10 {
+    -webkit-line-clamp: 10;
+  }
+
+  .maxLines11 {
+    -webkit-line-clamp: 11;
+  }
+
+  .maxLines12 {
+    -webkit-line-clamp: 12;
+  }
+}

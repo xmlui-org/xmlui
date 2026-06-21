@@ -11,6 +11,7 @@ import {
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiThemeRoot } from "./rendering/theme";
+import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 
@@ -60,6 +61,12 @@ export type MountXmluiAppOptions = {
   hydrate?: boolean;
   initialUrl?: string;
   extensions?: Iterable<Extension>;
+  testProbe?: (probe: XmluiRuntimeTestProbe) => void;
+};
+
+export type XmluiRuntimeTestProbe = {
+  readLocal(name: string): unknown;
+  readGlobal(name: string): unknown;
 };
 
 export function mountXmluiApp(
@@ -71,10 +78,25 @@ export function mountXmluiApp(
     throw new Error("mountXmluiApp expected an app module.");
   }
   if (options.hydrate) {
-    return hydrateRoot(container, <XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
+    return hydrateRoot(
+      container,
+      <XmluiRoot
+        module={module}
+        initialUrl={options.initialUrl}
+        extensions={options.extensions}
+        testProbe={options.testProbe}
+      />,
+    );
   }
   const root = createRoot(container);
-  root.render(<XmluiRoot module={module} initialUrl={options.initialUrl} extensions={options.extensions} />);
+  root.render(
+    <XmluiRoot
+      module={module}
+      initialUrl={options.initialUrl}
+      extensions={options.extensions}
+      testProbe={options.testProbe}
+    />,
+  );
   return root;
 }
 
@@ -82,14 +104,20 @@ export function XmluiRoot({
   module,
   initialUrl,
   extensions,
+  testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
   initialUrl?: string;
   extensions?: Iterable<Extension>;
+  testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
+  const toastRef = useRef<ToastService>();
+  if (!toastRef.current) {
+    toastRef.current = createToastService();
+  }
   const rootOwnerId = "app:root";
   const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
@@ -104,6 +132,12 @@ export function XmluiRoot({
     [extensions],
   );
   useEffect(() => routingRef.current?.attach(), []);
+  useEffect(() => {
+    testProbe?.({
+      readLocal: (name) => store.readLocal(rootOwnerId, name),
+      readGlobal: (name) => store.readGlobal(name),
+    });
+  }, [store, testProbe]);
 
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
@@ -113,6 +147,7 @@ export function XmluiRoot({
       props: {},
       references: referencesRef.current,
       routing: routingRef.current,
+      toast: toastRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,
@@ -143,6 +178,7 @@ export function XmluiRoot({
       props: {},
       references: referencesRef.current,
       routing: routingRef.current,
+      toast: toastRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,
@@ -161,6 +197,7 @@ export function XmluiRoot({
   return (
     <XmluiThemeRoot>
       <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+      <ToastHost service={toastRef.current} />
     </XmluiThemeRoot>
   );
 }

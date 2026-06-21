@@ -156,6 +156,12 @@ Prefer concise, source-linked notes over long transcripts.
 - Follow the existing style once source code exists.
 - Keep public behavior stable even if internal architecture changes.
 - Add tests for compatibility-sensitive behavior.
+- Component visual styling must live in the component's stylesheet and be
+  applied through CSS classes, following the original XMLUI component pattern.
+  Do not reimplement component visuals with React-computed inline `style`
+  objects. Inline `style` may carry layout props, emitted theme CSS variables,
+  or genuinely dynamic values that cannot reasonably be represented by classes,
+  but those exceptions should remain small and documented.
 - Do not introduce new dependencies, formats, or frameworks without documenting
   why they are needed in `.plans/`.
 - Keep generated files out of the repository unless a plan explicitly calls for

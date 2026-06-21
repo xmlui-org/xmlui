@@ -1,0 +1,20 @@
+<App var.notes="{'First line\nSecond line'}" var.extra="{0}">
+  <H1>TextArea foundation</H1>
+  <Text>Characters: {notes.length}</Text>
+  <TextArea
+    testId="notes"
+    label="Notes"
+    initialValue="{notes}"
+    rows="{4}"
+    autoSize="true"
+    onDidChange="value => notes = value" />
+  <HStack gap="$space-2">
+    <Button onClick="notes = notes + '\nAdded line ' + ++extra">
+      Append line
+    </Button>
+    <Button onClick="notes = ''">
+      Clear
+    </Button>
+  </HStack>
+  <Text preserveLinebreaks="true">{notes}</Text>
+</App>

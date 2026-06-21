@@ -1,9 +1,9 @@
 import React, { type ReactNode } from "react";
 
 import type { XmluiNode, XmluiText } from "../../compiler/ir";
+import { builtInComponentRenderers } from "../../component-core";
 import type { RuntimeScope } from "../state";
-import { renderMixedText } from "./bindings";
-import { builtInRenderers } from "./builtins";
+import { evaluateExpressionOrText, renderMixedText } from "./bindings";
 import { ComponentInstance, ScopedElement } from "./components";
 import { ExtensionComponentInstance } from "./extensionComponent";
 import { useBindingRevision } from "./reactive";
@@ -35,6 +35,9 @@ export function XmluiNodeRenderer({
   if (node.kind === "text") {
     return <XmluiTextRenderer node={node} scope={scope} />;
   }
+  if (Object.prototype.hasOwnProperty.call(node.props, "when")) {
+    return <ConditionalElementRenderer context={context} node={node} scope={scope} />;
+  }
 
   if (Object.keys(node.vars).length > 0 && node.type !== "App") {
     return <ScopedElement context={context} node={node} parentScope={scope} props={scope.props} />;
@@ -43,8 +46,26 @@ export function XmluiNodeRenderer({
   return renderElement(context, node, scope);
 }
 
+function ConditionalElementRenderer({
+  context,
+  node,
+  scope,
+}: {
+  context: RenderContext;
+  node: Extract<XmluiNode, { kind: "element" }>;
+  scope: RuntimeScope;
+}) {
+  const binding = node.parsed?.props?.when;
+  useBindingRevision(binding, scope);
+  const visible = evaluateExpressionOrText(node.props.when, binding, scope, `${node.type}:when`);
+  if (!visible) {
+    return null;
+  }
+  return <>{renderElement(context, node, scope)}</>;
+}
+
 function renderElement(context: RenderContext, node: Extract<XmluiNode, { kind: "element" }>, scope: RuntimeScope) {
-  const renderer = builtInRenderers[node.type];
+  const renderer = builtInComponentRenderers[node.type];
   if (renderer) {
     const BuiltInRenderer = renderer;
     return <BuiltInRenderer context={context} node={node} scope={scope} />;

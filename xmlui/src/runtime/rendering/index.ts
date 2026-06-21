@@ -1,3 +1,4 @@
+export * from "./adapter";
 export * from "./bindings";
 export * from "./builtins";
 export * from "./components";

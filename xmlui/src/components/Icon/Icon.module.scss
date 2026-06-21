@@ -1,0 +1,38 @@
+// Icon.tsx extracts available theme variables from createThemeVar declarations
+// in this file, mirroring the old Icon component pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$size-Icon: createThemeVar("size-Icon");
+
+@layer components {
+  .xmluiIconRoot {
+    display: inline;
+  }
+
+  .xmluiIconWrapper {
+    display: inline-block;
+  }
+
+  .xmluiIcon {
+    display: inline-block;
+    vertical-align: text-bottom;
+    color: inherit;
+    width: max(0px, var(--xmlui-icon-width, var(--xmlui-size-Icon)));
+    height: max(0px, var(--xmlui-icon-height, var(--xmlui-size-Icon)));
+  }
+
+  .xmluiIconClickable {
+    cursor: pointer;
+  }
+
+  .xmluiIcon * {
+    color: inherit !important;
+  }
+}
+
+:export {
+  themeVars: ();
+}

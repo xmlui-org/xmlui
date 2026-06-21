@@ -40,7 +40,7 @@ describe("Managed React contract registry", () => {
       expect.objectContaining({
         name: "Button",
         props: expect.arrayContaining(["backgroundColor", "enabled", "label", "padding"]),
-        events: ["click"],
+        events: ["click", "contextMenu", "gotFocus", "lostFocus"],
         templates: [],
         contextVariables: [],
         apis: [],

@@ -37,9 +37,9 @@ test("nested theme scopes affect only their subtree", async ({ page }) => {
   const inner = page.getByText("Inner scoped text", { exact: true });
   const outerAgain = page.getByText("Outer scoped text again", { exact: true });
 
-  await expect(outer).toHaveCSS("color", "rgb(37, 99, 235)");
+  await expect(outer).toHaveCSS("color", "rgb(32, 107, 196)");
   await expect(inner).toHaveCSS("color", "rgb(4, 120, 87)");
-  await expect(outerAgain).toHaveCSS("color", "rgb(37, 99, 235)");
+  await expect(outerAgain).toHaveCSS("color", "rgb(32, 107, 196)");
 });
 
 test("expression-backed styles update after data mutation", async ({ page }) => {
@@ -51,13 +51,12 @@ test("expression-backed styles update after data mutation", async ({ page }) => 
   await expect(mode).toBeVisible();
   await expect(stack).toHaveCSS("width", "420px");
   await expect(stack).toHaveCSS("gap", "18px");
-  await expect(stack).toHaveCSS("background-color", "rgb(219, 234, 254)");
+  await expect(stack).toHaveCSS("background-color", "rgb(207, 226, 247)");
 
   await page.getByRole("button", { name: "Toggle style" }).click();
 
   await expect(page.getByText("Mode: compact", { exact: true })).toBeVisible();
   await expect(stack).toHaveCSS("width", "260px");
   await expect(stack).toHaveCSS("gap", "4px");
-  await expect(stack).toHaveCSS("background-color", "rgb(243, 244, 246)");
+  await expect(stack).toHaveCSS("background-color", "rgb(232, 238, 243)");
 });
-

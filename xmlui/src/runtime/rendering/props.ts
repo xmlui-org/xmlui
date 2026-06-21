@@ -1,9 +1,15 @@
 import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import type { XmluiElement } from "../../compiler/ir";
 import {
+  COMPONENT_PART_KEY,
   isLayoutPropName,
+  parseStyleSelectorKey,
+  responsiveBreakpoints,
+  resolveResponsiveLayoutStyles,
   resolveLayoutStyle,
+  supportedLayoutPropNames,
   type LayoutOrientation,
 } from "../../styling";
 import type { RuntimeScope } from "../state";
@@ -68,11 +74,12 @@ export function useLayoutStyle(
 ): CSSProperties {
   const props: Record<string, unknown> = {};
   for (const name of Object.keys(node.props)) {
-    if (isLayoutPropName(name)) {
+    if (isLayoutPropName(name) || isResponsiveLayoutPropName(name)) {
       props[name] = useEvaluatedProp(node, scope, name, undefined);
     }
   }
-  return resolveLayoutStyle(props, options);
+  const viewportWidth = useViewportWidth();
+  return resolveActiveLayoutStyle(props, viewportWidth, options);
 }
 
 export function flexStyle(
@@ -91,12 +98,16 @@ export function useThemeOverrideProps(
 ): Record<string, unknown> {
   const variables: Record<string, unknown> = {};
   for (const name of Object.keys(node.props)) {
-    if (isLayoutPropName(name) || name === "name") {
+    if ((isLayoutPropName(name) && name !== "fontSize" && !looksLikeComponentThemeVariable(name)) || name === "name") {
       continue;
     }
     variables[name] = useEvaluatedProp(node, scope, name, undefined);
   }
   return variables;
+}
+
+function looksLikeComponentThemeVariable(name: string): boolean {
+  return /-[A-Z][A-Za-z0-9]*(?:-|$)/.test(name);
 }
 
 export function partAttrs(component: string, part = "root"): Record<string, string> {
@@ -125,3 +136,48 @@ function coerceBoolean(value: unknown, fallback: boolean): boolean {
   return value == null ? fallback : Boolean(value);
 }
 
+function resolveActiveLayoutStyle(
+  props: Record<string, unknown>,
+  viewportWidth: number | undefined,
+  options: { orientation?: LayoutOrientation },
+): CSSProperties {
+  const responsive = resolveResponsiveLayoutStyles(props, options);
+  const componentStyle = responsive[COMPONENT_PART_KEY];
+  if (!componentStyle) {
+    return resolveLayoutStyle(props, options);
+  }
+
+  const style: CSSProperties = { ...componentStyle.base };
+  if (viewportWidth !== undefined) {
+    for (const [breakpoint, minWidth] of Object.entries(responsiveBreakpoints)) {
+      if (viewportWidth >= minWidth) {
+        Object.assign(style, componentStyle.breakpoints[breakpoint as keyof typeof responsiveBreakpoints]);
+      }
+    }
+  }
+  return style;
+}
+
+function isResponsiveLayoutPropName(name: string): boolean {
+  const selector = parseStyleSelectorKey(name);
+  return selector.breakpoint !== undefined &&
+    supportedLayoutPropNames.includes(selector.property as never);
+}
+
+function useViewportWidth(): number | undefined {
+  const [width, setWidth] = useState(() =>
+    typeof window === "undefined" ? undefined : window.innerWidth,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const updateWidth = () => setWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  return width;
+}

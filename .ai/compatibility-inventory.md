@@ -8,6 +8,11 @@ This inventory is the control index for the rebuild program. Each row points to
 the original compatibility contract, the current rewrite surface, status, and
 the rebuild-plan phase that should close the surface.
 
+Until explicit human ownership is introduced, the `Rebuild Phase` or
+`Planned Wave` column is the owner field. When a surface moves from planning
+into implementation, add a specific owner note in the row or in the related
+closure note.
+
 Status labels:
 
 - `not-started`: no meaningful rewrite implementation exists yet;
@@ -22,15 +27,15 @@ Status labels:
 
 | Surface | Original Anchor | Rewrite Anchor | Status | Tests | Rebuild Phase |
 | --- | --- | --- | --- | --- | --- |
-| Root workspace layout | `/Users/dotneteer/source/xmlui/package.json` | `/Users/dotneteer/source/xmlui-rs/package.json` | inventoried | package script checks in sweep | Phase 1 |
-| Framework package exports | `/Users/dotneteer/source/xmlui/xmlui/package.json` | `/Users/dotneteer/source/xmlui-rs/xmlui/package.json` | tests-ported | artifact compatibility tests | Phase 1 |
-| Framework package scripts | `/Users/dotneteer/source/xmlui/xmlui/package.json` | `/Users/dotneteer/source/xmlui-rs/xmlui/package.json` | inventoried | sweep command report | Phase 1 |
-| Build XMLUI command | root `build-xmlui`, xmlui `build:xmlui` | root `build`, xmlui `build` | inventoried | `compatibility:sweep` | Phase 1 |
+| Root workspace layout | `/Users/dotneteer/source/xmlui/package.json` | `/Users/dotneteer/source/xmlui-rs/package.json` | tests-ported | package infrastructure compatibility tests | Phase 1 |
+| Framework package exports | `/Users/dotneteer/source/xmlui/xmlui/package.json` | `/Users/dotneteer/source/xmlui-rs/xmlui/package.json` | tests-ported | artifact compatibility tests; COMP-0002 tracks missing exports | Phase 1 |
+| Framework package scripts | `/Users/dotneteer/source/xmlui/xmlui/package.json` | `/Users/dotneteer/source/xmlui-rs/xmlui/package.json` | tests-ported | package infrastructure compatibility tests | Phase 1 |
+| Build XMLUI command | root `build-xmlui`, xmlui `build:xmlui` | root `build-xmlui`, xmlui `build:xmlui` | tests-ported | package infrastructure compatibility tests; `compatibility:sweep` | Phase 1 |
 | Metadata command | xmlui `build:xmlui-metadata` | xmlui `build:metadata` | tests-ported | metadata artifact checks | Phase 7 |
 | Docs generation | root `generate-docs`, xmlui `generate-docs` | xmlui `build:docs-reference` | inventoried | sweep command report | Phase 7 |
 | VS Code extension build | root `build-vscode-extension` | root `build:vscode`, `tools/vscode` | implemented | VS Code build/test in sweep | Phase 7 |
 | Extension package build | root `build-extensions` | `packages/xmlui-counter-badge` fixture | tests-ported | package build/metadata in sweep | Phase 6 |
-| Integration tests | `/Users/dotneteer/source/xmlui/integration-tests` | missing | deferred | debt entry | Phase 1 |
+| Integration tests | `/Users/dotneteer/source/xmlui/integration-tests` | `scripts/phase1-integration-smoke.mjs` | tests-ported | root `test-integration` smoke; COMP-0007 tracks full old integration parity | Phase 1 |
 | Release workflows | `/Users/dotneteer/source/xmlui/.github/workflows` | missing | deferred | debt entry | Phase 9 |
 
 ## Language and Runtime Surfaces
@@ -39,21 +44,25 @@ Status labels:
 | --- | --- | --- | --- | --- | --- |
 | XMLUI markup parser | `xmlui/src/parsers` | `xmlui/src/parser/markup` | tests-ported | compiler parser tests, compatibility smoke | Phase 2 |
 | Expression parser/compiler | `xmlui/src/components-core/script-runner` and parser sources | `xmlui/src/parser/script`, `xmlui/src/compiler` | tests-ported | compiler tests, perf baseline | Phase 2 |
-| Event handler execution | scripting docs and script-runner sources | `xmlui/src/compiler/scriptSemantics.ts`, runtime scope | tests-ported | async handlers, compatibility smoke | Phase 2 |
+| Event handler execution | scripting docs and script-runner sources | `xmlui/src/compiler/scriptSemantics.ts`, runtime scope | tests-ported | async handlers, event-tag tests, compatibility smoke | Phase 2 |
 | State and scopes | runtime/state sources | `xmlui/src/runtime/state` | tests-ported | runtime state tests, E2E mutation | Phase 2 |
 | Reactive graph | runtime invalidation behavior | `xmlui/src/runtime/rendering/reactive.tsx` | tests-ported | reactive derived tests | Phase 2 |
 | Rendering pipeline | managed React runtime | `xmlui/src/runtime/rendering` | tests-ported | rendering pipeline tests, E2E | Phase 2 |
 | User-defined components | component runtime and docs | compiler/runtime UDC support | tests-ported | UDC E2E | Phase 2 |
 | Diagnostics and source locations | parser/analyzer/language server | parser/compiler/metadata diagnostics | tests-ported | metadata and VS Code tests | Phase 2 |
+| Event tag syntax | `/Users/dotneteer/source/xmlui/website/content/docs/pages/scripting.md` | `xmlui/src/compiler/parseXmlui.ts` | tests-ported | parser test and `event-tags` E2E | Phase 2 |
+| Code-behind modules | `/Users/dotneteer/source/xmlui/xmlui/src/parsers/scripting`, `Globals.xs` docs | missing | debt entry COMP-0013 | Phase 2 |
+| App config loading | `/Users/dotneteer/source/xmlui/website/content/docs/pages/xmlui-config.md` | partial local config-free runtime | debt entry COMP-0014 | Phase 2 / Phase 4 / Phase 7 |
 
 ## Data, Routing, Styling, Tooling
 
 | Surface | Original Anchor | Rewrite Anchor | Status | Tests | Rebuild Phase |
 | --- | --- | --- | --- | --- | --- |
-| Theming/layout/style props | `xmlui/src/components-core/theming`, component SCSS/defaults | runtime rendering/theme and styling compiler | tests-ported | theming/layout E2E | Phase 3 |
+| Theming/layout/style props | `xmlui/src/components-core/theming`, component SCSS/defaults | runtime rendering/theme and styling compiler | tests-ported | theming/layout E2E; style artifact report; embedded theme-token unit coverage | Phase 3 |
 | Data operations | `DataSource`, `APICall`, `Actions` sources | `xmlui/src/runtime/data` | tests-ported | data E2E and compiler tests | Phase 4 |
 | Forms | `Form`, `FormItem`, validators | missing/minimal input slices | deferred | debt entry | Phase 4 |
 | Routing/app shell | `App`, `Pages`, `Page`, navigation sources | runtime routing and app-shell slice | tests-ported | routing E2E, SSG tests | Phase 4 |
+| Runtime services | toast/confirm/modal/lifecycle/runtime docs and sources | `xmlui/src/runtime/services`, app root service wiring | tests-ported | runtime service unit tests; `runtimeToast` E2E; runtime artifact report | Phase 4 |
 | Standalone runtime | old standalone build/startup | `xmlui/src/standalone` | tests-ported | standalone E2E | Phase 1 |
 | Production build | old Vite/package build | `vite.production.config.ts`, production scripts | tests-ported | production E2E and artifact checks | Phase 1 |
 | SSG/hydration | `tools/preview-ssg`, SSG docs/sources | `build:ssg`, `preview:ssg` | tests-ported | SSG E2E and artifact checks | Phase 1 |
@@ -66,6 +75,34 @@ Status labels:
 | AI integrations | `/tools/xmlui-claude`, `/tools/xmlui-codex` | missing | deferred | debt entry | Phase 7 |
 | Extension packages | `/packages/*` | `packages/xmlui-counter-badge` fixture | tests-ported | package tests/builds/E2E | Phase 6 |
 
+## Phase 1 Command Alias Inventory
+
+Old root command names now present in the rewrite:
+
+| Old Command | Rewrite Command | Status | Debt |
+| --- | --- | --- | --- |
+| `setup` | `npm install` | implemented | |
+| `build-xmlui` | `npm --workspace xmlui run build` | implemented | |
+| `build-vscode-extension` | `npm --workspace xmlui-vscode run build:vsix` | implemented | |
+| `build-extensions` | `xmlui-counter-badge` build + metadata fixture | partial | COMP-0009 |
+| `build-docs` | `npm --workspace xmlui run build:docs-reference` | partial | COMP-0005 |
+| `build-playground` | debt-backed placeholder | blocked | COMP-0006 |
+| `generate-docs` | `npm --workspace xmlui run build:docs-reference` | partial | COMP-0005 |
+| `test` | `npm --workspace xmlui run test` | implemented for current subset | COMP-0001 |
+| `test-smoke` | `npm --workspace xmlui run test:e2e` | partial | COMP-0007 |
+| `test-integration` | `node scripts/phase1-integration-smoke.mjs` | partial | COMP-0007 |
+
+Old `xmlui` package command names now present in the rewrite:
+
+| Old Command | Rewrite Command | Status | Debt |
+| --- | --- | --- | --- |
+| `build:xmlui` | `npm run build` | implemented for current subset | COMP-0002 |
+| `build:xmlui-standalone` | `npm run build:standalone` | implemented for current subset | |
+| `build:xmlui-metadata` | `npm run build:metadata` | implemented for current subset | |
+| `test:unit` | `npm run test` | implemented for current subset | COMP-0001 |
+| `check:metadata` | `npm run build:metadata` | partial | COMP-0002 |
+| `generate-docs` | `npm run build:docs-reference` | partial | COMP-0005 |
+
 ## Original Component Inventory
 
 The original component set below was checked against
@@ -75,13 +112,36 @@ Current rewrite support is intentionally partial. Existing implemented slices
 include `App`, headings, `Button`, `Text`, stacks, `Items`, basic inputs,
 selection, data, routing, theming, and the extension fixture. Components not
 implemented yet remain compatibility debt until their rebuild wave closes them.
+Phase 5 Wave 0 added source-adjacent component module scaffolding for the
+runtime-backed experimental slices, but those slices remain
+`partial-centralized` until their implementation, metadata, docs, and tests are
+fully transferred.
+
+Phase 5 source-organization rule: component compatibility is transferred
+through `xmlui/src/components/<ComponentName>/`, following the original
+component folder's artifact categories: implementation, renderer/wrapper,
+metadata, defaults/styles, docs, unit and E2E tests, fixtures, and
+component-local helpers. Central runtime renderer files may register and
+orchestrate components, but they are not the closure location for component
+behavior. Existing partial centralized slices remain compatibility scaffolding
+until they move behind per-component modules and satisfy the transferred-test
+closure loop.
+
+Use these additional Phase 5 status labels when useful:
+
+- `partial-centralized`: behavior exists but is still implemented primarily in
+  runtime scaffolding;
+- `transferred-folder`: the component folder exists with old artifact inventory;
+- `tests-transferred`: original tests have archival copies or direct
+  source-adjacent references;
+- `tests-ported`: runnable rewrite tests cover the transferred old behavior.
 
 | Component | Old Anchor | Rewrite Status | Planned Wave |
 | --- | --- | --- | --- |
 | APICall | `xmlui/src/components/APICall` | partial | Phase 4 / Wave F |
 | Accordion | `xmlui/src/components/Accordion` | not-started | Wave D |
 | Animation | `xmlui/src/components/Animation` | not-started | Wave F |
-| App | `xmlui/src/components/App` | partial | Wave G |
+| App | `xmlui/src/components/App` | partial | Wave A for main-content vertical stack/padding/gap layout; Wave G for app shell, routing, navigation, startup, search, page metadata, and standalone behavior |
 | AppHeader | `xmlui/src/components/AppHeader` | not-started | Wave D |
 | AppState | `xmlui/src/components/AppState` | not-started | Wave F |
 | AutoComplete | `xmlui/src/components/AutoComplete` | not-started | Wave C |
@@ -197,3 +257,10 @@ implemented yet remain compatibility debt until their rebuild wave closes them.
 
 Whenever a surface moves forward, update this inventory and add or close the
 matching entry in `.ai/compatibility-debt.md`.
+
+For component work, create a closure note from
+`.ai/component-compatibility-closure-template.md` before marking a component
+`parity-tested` or `closed`.
+
+For verification, use `.ai/verification-command-matrix.md` to decide which
+commands must pass for the surface being changed.

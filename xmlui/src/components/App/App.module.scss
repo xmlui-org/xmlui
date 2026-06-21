@@ -1,0 +1,53 @@
+// This block mirrors the old component pattern: App.tsx extracts the
+// available theme variables from createThemeVar declarations in this file.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$width-navPanel-App: createThemeVar("width-navPanel-App");
+$width-navPanel-collapsed-App: createThemeVar("width-navPanel-collapsed-App");
+$backgroundColor-navPanel-App: createThemeVar("backgroundColor-navPanel-App");
+$boxShadow-header-App: createThemeVar("boxShadow-header-App");
+$boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
+$backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
+$borderLeft-content-App: createThemeVar("borderLeft-content-App");
+$borderRight-navPanelWrapper-App: createThemeVar("borderRight-navPanelWrapper-App");
+$maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$maxWidth-content-App--withToc: createThemeVar("maxWidth-content-App--withToc");
+$maxWidth-App: createThemeVar("maxWidth-App");
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
+$borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
+$scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
+$paddingHorizontal-content-App: createThemeVar("paddingHorizontal-content-App");
+$paddingVertical-content-App: createThemeVar("paddingVertical-content-App");
+$gap-content-App: createThemeVar("gap-content-App");
+
+.mainContentArea {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background-color: $backgroundColor-content-App;
+  border-left: $borderLeft-content-App;
+}
+
+.pageContentContainer {
+  max-width: $maxWidth-content-App;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-inline-start: $paddingHorizontal-content-App;
+  padding-inline-end: $paddingHorizontal-content-App;
+  padding-top: $paddingVertical-content-App;
+  padding-bottom: $paddingVertical-content-App;
+  gap: $gap-content-App;
+}
+
+:export {
+  themeVars: ();
+}

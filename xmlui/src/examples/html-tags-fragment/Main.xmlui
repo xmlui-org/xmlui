@@ -1,0 +1,45 @@
+<App var.showExtra="{false}">
+  <H1>HTML tags and Fragment</H1>
+  <Text testId="line-text">
+    First line<br testId="lowercase-break" />Second line<Br testId="uppercase-break" />Third line
+  </Text>
+  <Button testId="toggle-extra" onClick="showExtra = !showExtra">
+    Toggle fragment content
+  </Button>
+  <div testId="fragment-container">
+    <Fragment>
+      <Text>Item #1</Text>
+      <Text>Item #2</Text>
+      <Text>Item #3</Text>
+    </Fragment>
+    <Fragment when="{showExtra}">
+      <Text testId="extra-item">Extra item</Text>
+    </Fragment>
+  </div>
+  <Theme width-HtmlTable="100%">
+    <table testId="compat-table">
+      <thead>
+        <tr>
+          <th scope="col">Person</th>
+          <th scope="col">Most interest in</th>
+          <th scope="col">Age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Chris</th>
+          <td>HTML tables</td>
+          <td>22</td>
+        </tr>
+        <tr>
+          <th scope="row">Dennis</th>
+          <td>Web accessibility</td>
+          <td>45</td>
+        </tr>
+      </tbody>
+    </table>
+  </Theme>
+  <Text testId="semantic-inline">
+    <strong>Strong</strong> and <em>emphasized</em> and <code>code</code>
+  </Text>
+</App>

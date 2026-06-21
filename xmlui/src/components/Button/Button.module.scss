@@ -1,0 +1,392 @@
+// Button.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old Button component pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$padding-Button: createThemeVar("padding-Button");
+$paddingHorizontal-Button-xs: createThemeVar("paddingHorizontal-Button-xs");
+$paddingVertical-Button-xs: createThemeVar("paddingVertical-Button-xs");
+$paddingHorizontal-Button-sm: createThemeVar("paddingHorizontal-Button-sm");
+$paddingVertical-Button-sm: createThemeVar("paddingVertical-Button-sm");
+$paddingHorizontal-Button-md: createThemeVar("paddingHorizontal-Button-md");
+$paddingVertical-Button-md: createThemeVar("paddingVertical-Button-md");
+$paddingHorizontal-Button-lg: createThemeVar("paddingHorizontal-Button-lg");
+$paddingVertical-Button-lg: createThemeVar("paddingVertical-Button-lg");
+$fontFamily-Button: createThemeVar("fontFamily-Button");
+$fontSize-Button: createThemeVar("fontSize-Button");
+$fontWeight-Button: createThemeVar("fontWeight-Button");
+$fontStyle-Button: createThemeVar("fontStyle-Button");
+$borderRadius-Button: createThemeVar("borderRadius-Button");
+$borderWidth-Button: createThemeVar("borderWidth-Button");
+$borderColor-Button: createThemeVar("borderColor-Button");
+$borderStyle-Button: createThemeVar("borderStyle-Button");
+$backgroundColor-Button: createThemeVar("backgroundColor-Button");
+$textColor-Button: createThemeVar("textColor-Button");
+$gap-Button: createThemeVar("gap-Button");
+$transition-Button: createThemeVar("transition-Button");
+$width-Button: createThemeVar("width-Button");
+$height-Button: createThemeVar("height-Button");
+$width-Button-vertical: createThemeVar("width-Button-vertical");
+$height-Button-vertical: createThemeVar("height-Button-vertical");
+$gap-Button-vertical: createThemeVar("gap-Button-vertical");
+$backgroundColor-Button-primary: createThemeVar("backgroundColor-Button-primary");
+$borderColor-Button-primary: createThemeVar("borderColor-Button-primary");
+$textColor-Button-solid: createThemeVar("textColor-Button-solid");
+$backgroundColor-Button-primary-solid: createThemeVar("backgroundColor-Button-primary-solid");
+$backgroundColor-Button-secondary-solid: createThemeVar("backgroundColor-Button-secondary-solid");
+$backgroundColor-Button-attention-solid: createThemeVar("backgroundColor-Button-attention-solid");
+$textColor-Button-primary-solid: createThemeVar("textColor-Button-primary-solid");
+$textColor-Button-secondary-solid: createThemeVar("textColor-Button-secondary-solid");
+$textColor-Button-attention-solid: createThemeVar("textColor-Button-attention-solid");
+$textColor-Button-primary-outlined: createThemeVar("textColor-Button-primary-outlined");
+$textColor-Button-secondary-outlined: createThemeVar("textColor-Button-secondary-outlined");
+$textColor-Button-attention-outlined: createThemeVar("textColor-Button-attention-outlined");
+$textColor-Button-primary-ghost: createThemeVar("textColor-Button-primary-ghost");
+$textColor-Button-secondary-ghost: createThemeVar("textColor-Button-secondary-ghost");
+$textColor-Button-attention-ghost: createThemeVar("textColor-Button-attention-ghost");
+$border-Button-primary-solid: createThemeVar("border-Button-primary-solid");
+$border-Button-secondary-solid: createThemeVar("border-Button-secondary-solid");
+$border-Button-attention-solid: createThemeVar("border-Button-attention-solid");
+$border-Button-primary-outlined: createThemeVar("border-Button-primary-outlined");
+$border-Button-secondary-outlined: createThemeVar("border-Button-secondary-outlined");
+$border-Button-attention-outlined: createThemeVar("border-Button-attention-outlined");
+$borderColor-Button-primary-solid: createThemeVar("borderColor-Button-primary-solid");
+$borderColor-Button-secondary-solid: createThemeVar("borderColor-Button-secondary-solid");
+$borderColor-Button-attention-solid: createThemeVar("borderColor-Button-attention-solid");
+$borderColor-Button-primary-outlined: createThemeVar("borderColor-Button-primary-outlined");
+$borderColor-Button-secondary-outlined: createThemeVar("borderColor-Button-secondary-outlined");
+$borderColor-Button-attention-outlined: createThemeVar("borderColor-Button-attention-outlined");
+$borderWidth-Button-primary-solid: createThemeVar("borderWidth-Button-primary-solid");
+$borderWidth-Button-secondary-solid: createThemeVar("borderWidth-Button-secondary-solid");
+$borderWidth-Button-attention-solid: createThemeVar("borderWidth-Button-attention-solid");
+$borderWidth-Button-primary-outlined: createThemeVar("borderWidth-Button-primary-outlined");
+$borderWidth-Button-secondary-outlined: createThemeVar("borderWidth-Button-secondary-outlined");
+$borderWidth-Button-attention-outlined: createThemeVar("borderWidth-Button-attention-outlined");
+$borderWidth-Button-primary-ghost: createThemeVar("borderWidth-Button-primary-ghost");
+$borderWidth-Button-secondary-ghost: createThemeVar("borderWidth-Button-secondary-ghost");
+$borderWidth-Button-attention-ghost: createThemeVar("borderWidth-Button-attention-ghost");
+$borderStyle-Button-primary-solid: createThemeVar("borderStyle-Button-primary-solid");
+$borderStyle-Button-secondary-solid: createThemeVar("borderStyle-Button-secondary-solid");
+$borderStyle-Button-attention-solid: createThemeVar("borderStyle-Button-attention-solid");
+$borderStyle-Button-primary-outlined: createThemeVar("borderStyle-Button-primary-outlined");
+$borderStyle-Button-secondary-outlined: createThemeVar("borderStyle-Button-secondary-outlined");
+$borderStyle-Button-attention-outlined: createThemeVar("borderStyle-Button-attention-outlined");
+$borderRadius-Button-primary-solid: createThemeVar("borderRadius-Button-primary-solid");
+$borderRadius-Button-secondary-solid: createThemeVar("borderRadius-Button-secondary-solid");
+$borderRadius-Button-attention-solid: createThemeVar("borderRadius-Button-attention-solid");
+$borderRadius-Button-primary-outlined: createThemeVar("borderRadius-Button-primary-outlined");
+$borderRadius-Button-secondary-outlined: createThemeVar("borderRadius-Button-secondary-outlined");
+$borderRadius-Button-attention-outlined: createThemeVar("borderRadius-Button-attention-outlined");
+$borderRadius-Button-primary-ghost: createThemeVar("borderRadius-Button-primary-ghost");
+$borderRadius-Button-secondary-ghost: createThemeVar("borderRadius-Button-secondary-ghost");
+$borderRadius-Button-attention-ghost: createThemeVar("borderRadius-Button-attention-ghost");
+$fontFamily-Button-primary-solid: createThemeVar("fontFamily-Button-primary-solid");
+$fontFamily-Button-secondary-solid: createThemeVar("fontFamily-Button-secondary-solid");
+$fontFamily-Button-attention-solid: createThemeVar("fontFamily-Button-attention-solid");
+$fontFamily-Button-primary-outlined: createThemeVar("fontFamily-Button-primary-outlined");
+$fontFamily-Button-secondary-outlined: createThemeVar("fontFamily-Button-secondary-outlined");
+$fontFamily-Button-attention-outlined: createThemeVar("fontFamily-Button-attention-outlined");
+$fontFamily-Button-primary-ghost: createThemeVar("fontFamily-Button-primary-ghost");
+$fontFamily-Button-secondary-ghost: createThemeVar("fontFamily-Button-secondary-ghost");
+$fontFamily-Button-attention-ghost: createThemeVar("fontFamily-Button-attention-ghost");
+$fontSize-Button-primary-solid: createThemeVar("fontSize-Button-primary-solid");
+$fontSize-Button-secondary-solid: createThemeVar("fontSize-Button-secondary-solid");
+$fontSize-Button-attention-solid: createThemeVar("fontSize-Button-attention-solid");
+$fontSize-Button-primary-outlined: createThemeVar("fontSize-Button-primary-outlined");
+$fontSize-Button-secondary-outlined: createThemeVar("fontSize-Button-secondary-outlined");
+$fontSize-Button-attention-outlined: createThemeVar("fontSize-Button-attention-outlined");
+$fontSize-Button-primary-ghost: createThemeVar("fontSize-Button-primary-ghost");
+$fontSize-Button-secondary-ghost: createThemeVar("fontSize-Button-secondary-ghost");
+$fontSize-Button-attention-ghost: createThemeVar("fontSize-Button-attention-ghost");
+$fontWeight-Button-primary-solid: createThemeVar("fontWeight-Button-primary-solid");
+$fontWeight-Button-secondary-solid: createThemeVar("fontWeight-Button-secondary-solid");
+$fontWeight-Button-attention-solid: createThemeVar("fontWeight-Button-attention-solid");
+$fontWeight-Button-primary-outlined: createThemeVar("fontWeight-Button-primary-outlined");
+$fontWeight-Button-secondary-outlined: createThemeVar("fontWeight-Button-secondary-outlined");
+$fontWeight-Button-attention-outlined: createThemeVar("fontWeight-Button-attention-outlined");
+$fontWeight-Button-primary-ghost: createThemeVar("fontWeight-Button-primary-ghost");
+$fontWeight-Button-secondary-ghost: createThemeVar("fontWeight-Button-secondary-ghost");
+$fontWeight-Button-attention-ghost: createThemeVar("fontWeight-Button-attention-ghost");
+$backgroundColor-Button-primary--hover: createThemeVar("backgroundColor-Button-primary--hover");
+$backgroundColor-Button-primary--active: createThemeVar("backgroundColor-Button-primary--active");
+$backgroundColor-Button--disabled: createThemeVar("backgroundColor-Button--disabled");
+$borderColor-Button--disabled: createThemeVar("borderColor-Button--disabled");
+$textColor-Button--disabled: createThemeVar("textColor-Button--disabled");
+$outlineColor-Button--focus: createThemeVar("outlineColor-Button--focus");
+$outlineWidth-Button--focus: createThemeVar("outlineWidth-Button--focus");
+$outlineStyle-Button--focus: createThemeVar("outlineStyle-Button--focus");
+$outlineOffset-Button--focus: createThemeVar("outlineOffset-Button--focus");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .button {
+    width: var(--xmlui-width-Button);
+    height: var(--xmlui-height-Button);
+    min-width: 0;
+    margin: 0;
+    padding: var(--xmlui-padding-Button);
+    border-width: var(--xmlui-borderWidth-Button);
+    border-style: var(--xmlui-borderStyle-Button);
+    border-color: var(--xmlui-borderColor-Button);
+    border-radius: var(--xmlui-borderRadius-Button);
+    background: var(--xmlui-backgroundColor-Button);
+    color: var(--xmlui-textColor-Button);
+    box-shadow: var(--xmlui-boxShadow-Button);
+    font-family: var(--xmlui-fontFamily-Button);
+    font-size: var(--xmlui-fontSize-Button);
+    font-weight: var(--xmlui-fontWeight-Button);
+    font-style: var(--xmlui-fontStyle-Button);
+    line-height: normal;
+    transition: var(--xmlui-transition-Button);
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    gap: var(--xmlui-gap-Button);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .button * {
+    color: inherit;
+  }
+
+  .button:focus-visible {
+    outline-width: var(--xmlui-outlineWidth-Button--focus);
+    outline-color: var(--xmlui-outlineColor-Button--focus);
+    outline-style: var(--xmlui-outlineStyle-Button--focus);
+    outline-offset: var(--xmlui-outlineOffset-Button--focus);
+  }
+
+  .button:disabled {
+    cursor: not-allowed;
+    background: var(--xmlui-backgroundColor-Button--disabled);
+    color: var(--xmlui-textColor-Button--disabled);
+    border-color: var(--xmlui-borderColor-Button--disabled);
+  }
+
+  .buttonHorizontal {
+    flex-direction: row;
+  }
+
+  .buttonVertical {
+    flex-direction: column;
+    gap: var(--xmlui-gap-Button-vertical);
+    width: var(--xmlui-width-Button-vertical);
+    height: var(--xmlui-height-Button-vertical);
+  }
+
+  .xs {
+    padding: var(--xmlui-paddingVertical-Button-xs) var(--xmlui-paddingHorizontal-Button-xs);
+  }
+
+  .sm {
+    padding: var(--xmlui-paddingVertical-Button-sm) var(--xmlui-paddingHorizontal-Button-sm);
+  }
+
+  .md {
+    padding: var(--xmlui-paddingVertical-Button-md) var(--xmlui-paddingHorizontal-Button-md);
+  }
+
+  .lg {
+    padding: var(--xmlui-paddingVertical-Button-lg) var(--xmlui-paddingHorizontal-Button-lg);
+  }
+
+  .alignStart {
+    justify-content: start;
+  }
+
+  .alignEnd {
+    justify-content: end;
+  }
+
+  .solidPrimary {
+    border-color: var(--xmlui-borderColor-Button-primary);
+    background: var(--xmlui-backgroundColor-Button-primary);
+    color: var(--xmlui-textColor-Button-solid);
+    font-family: var(--xmlui-fontFamily-Button-primary-solid, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-primary-solid, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-primary-solid, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-primary-solid, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-primary-solid, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-primary-solid, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-primary-solid, var(--xmlui-borderStyle-Button));
+    background: var(--xmlui-backgroundColor-Button-primary-solid, var(--xmlui-backgroundColor-Button-primary, var(--xmlui-backgroundColor-Button)));
+    color: var(--xmlui-textColor-Button-primary-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button)));
+    box-shadow: var(--xmlui-boxShadow-Button-primary-solid, var(--xmlui-boxShadow-Button));
+    transition: var(--xmlui-transition-Button-primary-solid, var(--xmlui-transition-Button));
+  }
+
+  .solidSecondary {
+    border-color: var(--xmlui-borderColor-Button-secondary);
+    background: var(--xmlui-backgroundColor-Button-secondary);
+    color: var(--xmlui-textColor-Button-solid);
+    font-family: var(--xmlui-fontFamily-Button-secondary-solid, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-secondary-solid, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-secondary-solid, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-secondary-solid, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-secondary-solid, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-secondary-solid, var(--xmlui-borderColor-Button-secondary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-secondary-solid, var(--xmlui-borderStyle-Button));
+    background: var(--xmlui-backgroundColor-Button-secondary-solid, var(--xmlui-backgroundColor-Button-secondary, var(--xmlui-backgroundColor-Button)));
+    color: var(--xmlui-textColor-Button-secondary-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button)));
+    box-shadow: var(--xmlui-boxShadow-Button-secondary-solid, var(--xmlui-boxShadow-Button));
+    transition: var(--xmlui-transition-Button-secondary-solid, var(--xmlui-transition-Button));
+  }
+
+  .solidAttention {
+    border-color: var(--xmlui-borderColor-Button-attention);
+    background: var(--xmlui-backgroundColor-Button-attention);
+    color: var(--xmlui-textColor-Button-solid);
+    font-family: var(--xmlui-fontFamily-Button-attention-solid, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-attention-solid, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-attention-solid, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-attention-solid, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-attention-solid, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-attention-solid, var(--xmlui-borderColor-Button-attention, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-attention-solid, var(--xmlui-borderStyle-Button));
+    background: var(--xmlui-backgroundColor-Button-attention-solid, var(--xmlui-backgroundColor-Button-attention, var(--xmlui-backgroundColor-Button)));
+    color: var(--xmlui-textColor-Button-attention-solid, var(--xmlui-textColor-Button-solid, var(--xmlui-textColor-Button)));
+    box-shadow: var(--xmlui-boxShadow-Button-attention-solid, var(--xmlui-boxShadow-Button));
+    transition: var(--xmlui-transition-Button-attention-solid, var(--xmlui-transition-Button));
+  }
+
+  .outlinedPrimary {
+    background: transparent;
+    font-family: var(--xmlui-fontFamily-Button-primary-outlined, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-primary-outlined, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-primary-outlined, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-primary-outlined, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-primary-outlined, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-primary-outlined, var(--xmlui-borderColor-Button-primary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-primary-outlined, var(--xmlui-borderStyle-Button));
+    color: var(--xmlui-textColor-Button-primary-outlined, var(--xmlui-textColor-Button));
+    box-shadow: var(--xmlui-boxShadow-Button-primary-outlined, var(--xmlui-boxShadow-Button));
+  }
+
+  .outlinedSecondary {
+    background: transparent;
+    font-family: var(--xmlui-fontFamily-Button-secondary-outlined, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-secondary-outlined, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-secondary-outlined, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-secondary-outlined, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-secondary-outlined, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-secondary-outlined, var(--xmlui-borderColor-Button-secondary, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-secondary-outlined, var(--xmlui-borderStyle-Button));
+    color: var(--xmlui-textColor-Button-secondary-outlined, var(--xmlui-textColor-Button));
+    box-shadow: var(--xmlui-boxShadow-Button-secondary-outlined, var(--xmlui-boxShadow-Button));
+  }
+
+  .outlinedAttention {
+    background: transparent;
+    font-family: var(--xmlui-fontFamily-Button-attention-outlined, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-attention-outlined, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-attention-outlined, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-attention-outlined, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-attention-outlined, var(--xmlui-borderWidth-Button));
+    border-color: var(--xmlui-borderColor-Button-attention-outlined, var(--xmlui-borderColor-Button-attention, var(--xmlui-borderColor-Button)));
+    border-style: var(--xmlui-borderStyle-Button-attention-outlined, var(--xmlui-borderStyle-Button));
+    color: var(--xmlui-textColor-Button-attention-outlined, var(--xmlui-textColor-Button));
+    box-shadow: var(--xmlui-boxShadow-Button-attention-outlined, var(--xmlui-boxShadow-Button));
+  }
+
+  .ghostPrimary {
+    background: transparent;
+    border-color: transparent;
+    border-style: solid;
+    font-family: var(--xmlui-fontFamily-Button-primary-ghost, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-primary-ghost, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-primary-ghost, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-primary-ghost, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-primary-ghost, var(--xmlui-borderWidth-Button));
+    color: var(--xmlui-textColor-Button-primary-ghost, var(--xmlui-textColor-Button));
+  }
+
+  .ghostSecondary {
+    background: transparent;
+    border-color: transparent;
+    border-style: solid;
+    font-family: var(--xmlui-fontFamily-Button-secondary-ghost, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-secondary-ghost, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-secondary-ghost, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-secondary-ghost, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-secondary-ghost, var(--xmlui-borderWidth-Button));
+    color: var(--xmlui-textColor-Button-secondary-ghost, var(--xmlui-textColor-Button));
+  }
+
+  .ghostAttention {
+    background: transparent;
+    border-color: transparent;
+    border-style: solid;
+    font-family: var(--xmlui-fontFamily-Button-attention-ghost, var(--xmlui-fontFamily-Button));
+    font-size: var(--xmlui-fontSize-Button-attention-ghost, var(--xmlui-fontSize-Button));
+    font-weight: var(--xmlui-fontWeight-Button-attention-ghost, var(--xmlui-fontWeight-Button));
+    border-radius: var(--xmlui-borderRadius-Button-attention-ghost, var(--xmlui-borderRadius-Button));
+    border-width: var(--xmlui-borderWidth-Button-attention-ghost, var(--xmlui-borderWidth-Button));
+    color: var(--xmlui-textColor-Button-attention-ghost, var(--xmlui-textColor-Button));
+  }
+
+  .solidPrimary:not([disabled]):hover {
+    border-color: var(--xmlui-borderColor-Button-primary-solid--hover);
+    color: var(--xmlui-textColor-Button-primary-solid--hover);
+    background: var(--xmlui-backgroundColor-Button-primary-solid--hover);
+  }
+
+  .outlinedPrimary:not([disabled]):hover {
+    border-color: var(--xmlui-borderColor-Button-primary-outlined--hover);
+    background: var(--xmlui-backgroundColor-Button-primary-outlined--hover);
+    color: var(--xmlui-textColor-Button-primary-outlined--hover);
+  }
+
+  .ghostPrimary:not([disabled]):hover {
+    background: var(--xmlui-backgroundColor-Button-primary-ghost--hover);
+    color: var(--xmlui-textColor-Button-primary-ghost--hover);
+  }
+
+  .solidPrimary:not([disabled]):active {
+    border-color: var(--xmlui-borderColor-Button-primary-solid--active);
+    color: var(--xmlui-textColor-Button-primary-solid--active);
+    box-shadow: var(--xmlui-boxShadow-Button-primary-solid--active);
+    background: var(--xmlui-backgroundColor-Button-primary-solid--active);
+  }
+
+  .outlinedPrimary:not([disabled]):active {
+    border-color: var(--xmlui-borderColor-Button-primary-outlined--active);
+    background: var(--xmlui-backgroundColor-Button-primary-outlined--active);
+    color: var(--xmlui-textColor-Button-primary-outlined--active);
+  }
+
+  .ghostPrimary:not([disabled]):active {
+    background: var(--xmlui-backgroundColor-Button-primary-ghost--active);
+    color: var(--xmlui-textColor-Button-primary-ghost--active);
+  }
+
+  .icon {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    background-color: currentColor;
+    border-radius: 999px;
+    mask: radial-gradient(circle, black 55%, transparent 56%);
+    -webkit-mask: radial-gradient(circle, black 55%, transparent 56%);
+  }
+
+  .visuallyHidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap;
+  }
+}

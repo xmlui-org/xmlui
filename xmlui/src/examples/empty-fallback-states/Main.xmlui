@@ -1,0 +1,18 @@
+<App var.loading="{false}">
+  <H1>Empty and fallback states</H1>
+  <Button onClick="loading = !loading">Toggle loading state</Button>
+  <HStack gap="24px" verticalAlignment="stretch">
+    <Theme border-NoResult="1px solid $color-border">
+      <NoResult label="No matching records" width="260px" height="160px" />
+    </Theme>
+    <NoResult hideIcon="{true}" width="260px" height="160px">
+      Custom empty state text
+    </NoResult>
+  </HStack>
+  <Fallback isLoading="{loading}">
+    <property name="loadingTemplate">
+      <Text>Loading alternative content...</Text>
+    </property>
+    <Text>Normal fallback content</Text>
+  </Fallback>
+</App>

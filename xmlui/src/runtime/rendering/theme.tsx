@@ -1,7 +1,11 @@
 import React, { createContext, useContext, useMemo, type CSSProperties, type ReactNode } from "react";
 
+import type { ComponentMetadata } from "../../component-core/metadata";
 import {
+  createComponentThemeClass,
   defaultThemeVariables,
+  mergeThemeVariableLayers,
+  resolveThemeVariablesWithCssVars,
   themeVariablesToCssProperties,
 } from "../../styling";
 
@@ -19,6 +23,18 @@ export function useThemeVariables(): Record<string, unknown> {
   return useContext(ThemeContext);
 }
 
+export function useComponentThemeClass(
+  componentName: string,
+  metadata: ComponentMetadata,
+  contributors: readonly ComponentMetadata[] = [],
+) {
+  const themeVariables = useThemeVariables();
+  return useMemo(
+    () => createComponentThemeClass(componentName, metadata, themeVariables, contributors),
+    [componentName, metadata, themeVariables, contributors],
+  );
+}
+
 export function ThemeScope({
   variables,
   style,
@@ -29,8 +45,14 @@ export function ThemeScope({
   children: ReactNode;
 }) {
   const parent = useThemeVariables();
-  const nextVariables = useMemo(() => ({ ...parent, ...variables }), [parent, variables]);
-  const cssVariables = useMemo(() => themeVariablesToCssProperties(variables), [variables]);
+  const nextVariables = useMemo(
+    () => mergeThemeVariableLayers([parent, variables]),
+    [parent, variables],
+  );
+  const cssVariables = useMemo(
+    () => themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
+    [variables],
+  );
   return (
     <ThemeContext.Provider value={nextVariables}>
       <div
@@ -43,4 +65,3 @@ export function ThemeScope({
     </ThemeContext.Provider>
   );
 }
-

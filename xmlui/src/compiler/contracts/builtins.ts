@@ -1,16 +1,82 @@
 import type { XmluiComponentContract } from "./types";
-import { supportedLayoutPropNames } from "../../styling";
+import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
+import { htmlTagDefinitions } from "../../component-core/htmlTags";
+import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
+import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
+import { FragmentMd } from "../../components/Fragment/Fragment";
+import { ImageMd } from "../../components/Image/Image";
+import { IFrameMd } from "../../components/IFrame/IFrame";
+import { LinkMd } from "../../components/Link/Link";
+import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
+import { TextAreaMd } from "../../components/TextArea/TextArea";
+import { NumberBoxMd } from "../../components/NumberBox/NumberBox";
+import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
+import { FallbackMd } from "../../components/Fallback/Fallback";
+import { NoResultMd } from "../../components/NoResult/NoResult";
+import { PageMetaTitleMd } from "../../components/PageMetaTitle/PageMetaTitle";
+import { QRCodeMd } from "../../components/QRCode/QRCode";
+import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
+import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
+  ...htmlTagDefinitions.map((definition) =>
+    contractFromMetadata(htmlTagMetadata[definition.name], {
+      name: definition.name,
+      acceptsArbitraryProps: true,
+      includeLayoutProps: true,
+    }),
+  ),
+  contractFromMetadata(BrMd, {
+    name: "br",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(BrCapitalizedMd, {
+    name: "Br",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(FragmentMd, {
+    name: "Fragment",
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(ImageMd, {
+    name: "Image",
+    includeLayoutProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
+  contractFromMetadata(IFrameMd, {
+    name: "IFrame",
+    includeLayoutProps: true,
+    eventAttributes: {
+      load: "onLoad",
+    },
+  }),
   {
     name: "App",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true, global: true },
     props: withLayoutProps({
+      testId: { name: "testId" },
       useHashBasedRouting: { name: "useHashBasedRouting" },
+      "backgroundColor-content-App": { name: "backgroundColor-content-App" },
+      "borderLeft-content-App": { name: "borderLeft-content-App" },
+      "maxWidth-content-App": { name: "maxWidth-content-App" },
+      "paddingHorizontal-content-App": { name: "paddingHorizontal-content-App" },
+      "paddingVertical-content-App": { name: "paddingVertical-content-App" },
+      "gap-content-App": { name: "gap-content-App" },
     }),
-    events: {},
+    events: {
+      ready: { name: "ready", attributeName: "onReady" },
+      messageReceived: { name: "messageReceived", attributeName: "onMessageReceived" },
+      keyDown: { name: "keyDown", attributeName: "onKeyDown" },
+      keyUp: { name: "keyUp", attributeName: "onKeyUp" },
+    },
   },
   {
     name: "AppHeader",
@@ -21,19 +87,199 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {},
   },
   {
-    name: "H1",
+    name: "Heading",
     kind: "builtin",
+    acceptsArbitraryProps: true,
     allowsChildren: true,
     declarations: {},
-    props: withLayoutProps(),
+    props: withLayoutProps({
+      id: { name: "id" },
+      value: { name: "value" },
+      level: { name: "level" },
+      maxLines: { name: "maxLines" },
+      ellipses: { name: "ellipses" },
+      preserveLinebreaks: { name: "preserveLinebreaks" },
+      omitFromToc: { name: "omitFromToc" },
+      showAnchor: { name: "showAnchor" },
+      anchorId: { name: "anchorId" },
+      anchorTemplate: { name: "anchorTemplate" },
+      testId: { name: "testId" },
+    }),
+    events: {},
+    templates: {
+      anchorTemplate: { name: "anchorTemplate" },
+    },
+    contextVariables: {
+      $anchorId: { name: "$anchorId" },
+      $anchorHref: { name: "$anchorHref" },
+    },
+    apis: {
+      scrollIntoView: { name: "scrollIntoView" },
+      hasOverflow: { name: "hasOverflow" },
+    },
+  },
+  ...["H1", "H2", "H3", "H4", "H5", "H6"].map((name): XmluiComponentContract => ({
+    name,
+    kind: "builtin",
+    acceptsArbitraryProps: true,
+    allowsChildren: true,
+    declarations: {},
+    props: withLayoutProps({
+      id: { name: "id" },
+      value: { name: "value" },
+      level: { name: "level" },
+      maxLines: { name: "maxLines" },
+      ellipses: { name: "ellipses" },
+      preserveLinebreaks: { name: "preserveLinebreaks" },
+      omitFromToc: { name: "omitFromToc" },
+      showAnchor: { name: "showAnchor" },
+      anchorId: { name: "anchorId" },
+      anchorTemplate: { name: "anchorTemplate" },
+      testId: { name: "testId" },
+    }),
+    events: {},
+    templates: {
+      anchorTemplate: { name: "anchorTemplate" },
+    },
+    contextVariables: {
+      $anchorId: { name: "$anchorId" },
+      $anchorHref: { name: "$anchorHref" },
+    },
+    apis: {
+      scrollIntoView: { name: "scrollIntoView" },
+      hasOverflow: { name: "hasOverflow" },
+    },
+  })),
+  {
+    name: "Icon",
+    kind: "builtin",
+    allowsChildren: false,
+    acceptsArbitraryProps: true,
+    declarations: {},
+    props: withLayoutProps({
+      fallback: { name: "fallback" },
+      name: { name: "name" },
+      size: { name: "size" },
+      testId: { name: "testId" },
+    }),
+    events: {
+      click: { name: "click", attributeName: "onClick" },
+    },
+  },
+  {
+    name: "Logo",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: withLayoutProps({
+      src: { name: "src" },
+      alt: { name: "alt" },
+      inline: { name: "inline" },
+      testId: { name: "testId" },
+    }),
     events: {},
   },
+  contractFromMetadata(PageMetaTitleMd, {
+    name: "PageMetaTitle",
+    allowsChildren: true,
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(QRCodeMd, {
+    name: "QRCode",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    eventAttributes: {
+      init: "onInit",
+    },
+  }),
+  contractFromMetadata(ContentSeparatorMd, {
+    name: "ContentSeparator",
+    allowsChildren: false,
+    includeLayoutProps: true,
+  }),
+  contractFromMetadata(NoResultMd, {
+    name: "NoResult",
+    allowsChildren: true,
+    includeLayoutProps: true,
+  }),
+  contractFromMetadata(FallbackMd, {
+    name: "Fallback",
+    allowsChildren: true,
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(SpaceFillerMd, {
+    name: "SpaceFiller",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(LinkMd, {
+    name: "Link",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
+  contractFromMetadata(TextBoxMd, {
+    name: "TextBox",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(PasswordInputMd, {
+    name: "PasswordInput",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(TextAreaMd, {
+    name: "TextArea",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(NumberBoxMd, {
+    name: "NumberBox",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
   {
     name: "Stack",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({ testId: { name: "testId" } }),
+    events: {},
+  },
+  {
+    name: "FlowLayout",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({ testId: { name: "testId" } }),
     events: {},
   },
   {
@@ -41,7 +287,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({ testId: { name: "testId" } }),
     events: {},
   },
   {
@@ -49,7 +295,19 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({ testId: { name: "testId" } }),
+    events: {},
+  },
+  {
+    name: "CodeBlock",
+    kind: "builtin",
+    acceptsArbitraryProps: true,
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({
+      meta: { name: "meta" },
+      testId: { name: "testId" },
+    }),
     events: {},
   },
   {
@@ -58,11 +316,56 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     declarations: { local: true },
     props: withLayoutProps({
+      autoFocus: { name: "autoFocus" },
+      busyOnClick: { name: "busyOnClick" },
+      contentPosition: { name: "contentPosition" },
+      contextualLabel: { name: "contextualLabel" },
       label: { name: "label" },
       enabled: { name: "enabled" },
+      icon: { name: "icon" },
+      iconPosition: { name: "iconPosition" },
+      orientation: { name: "orientation" },
+      size: { name: "size" },
+      testId: { name: "testId" },
+      themeColor: { name: "themeColor" },
+      type: { name: "type" },
+      variant: { name: "variant" },
     }),
     events: {
       click: { name: "click", attributeName: "onClick" },
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
+      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
+    },
+  },
+  {
+    name: "Card",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({
+      id: { name: "id" },
+      avatarUrl: { name: "avatarUrl" },
+      showAvatar: { name: "showAvatar" },
+      avatarSize: { name: "avatarSize" },
+      title: { name: "title" },
+      subtitle: { name: "subtitle" },
+      linkTo: { name: "linkTo" },
+      orientation: { name: "orientation" },
+      testId: { name: "testId" },
+    }),
+    events: {
+      click: { name: "click", attributeName: "onClick" },
+      doubleClick: { name: "doubleClick", attributeName: "onDoubleClick" },
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    },
+    apis: {
+      scrollToTop: { name: "scrollToTop" },
+      scrollToBottom: { name: "scrollToBottom" },
+      scrollToLeft: { name: "scrollToLeft" },
+      scrollToRight: { name: "scrollToRight" },
+      scrollToStart: { name: "scrollToStart" },
+      scrollToEnd: { name: "scrollToEnd" },
     },
   },
   {
@@ -71,10 +374,23 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     declarations: { local: true },
     props: withLayoutProps({
+      id: { name: "id" },
       value: { name: "value" },
       variant: { name: "variant" },
+      maxLines: { name: "maxLines" },
+      preserveLinebreaks: { name: "preserveLinebreaks" },
+      ellipses: { name: "ellipses" },
+      overflowMode: { name: "overflowMode" },
+      breakMode: { name: "breakMode" },
+      lang: { name: "lang" },
+      testId: { name: "testId" },
     }),
-    events: {},
+    events: {
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    },
+    apis: {
+      hasOverflow: { name: "hasOverflow" },
+    },
   },
   {
     name: "Theme",
@@ -107,34 +423,32 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     },
   },
   {
-    name: "TextBox",
-    kind: "builtin",
-    allowsChildren: false,
-    declarations: {},
-    props: withLayoutProps({
-      initialValue: { name: "initialValue" },
-      placeholder: { name: "placeholder" },
-      enabled: { name: "enabled" },
-      readOnly: { name: "readOnly" },
-      label: { name: "label" },
-    }),
-    events: {
-      didChange: { name: "didChange", attributeName: "onDidChange" },
-      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
-      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
-    },
-  },
-  {
     name: "Checkbox",
     kind: "builtin",
     allowsChildren: true,
     declarations: {},
     props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
       initialValue: { name: "initialValue" },
+      value: { name: "value" },
       label: { name: "label" },
+      labelPosition: { name: "labelPosition" },
+      labelBreak: { name: "labelBreak" },
+      labelWidth: { name: "labelWidth" },
+      direction: { name: "direction" },
       enabled: { name: "enabled" },
       readOnly: { name: "readOnly" },
+      required: { name: "required" },
+      autoFocus: { name: "autoFocus" },
       indeterminate: { name: "indeterminate" },
+      validationStatus: { name: "validationStatus" },
+      requireLabelMode: { name: "requireLabelMode" },
+      bindTo: { name: "bindTo" },
+      tooltip: { name: "tooltip" },
+      tooltipMarkdown: { name: "tooltipMarkdown" },
+      animation: { name: "animation" },
+      variant: { name: "variant" },
     }),
     events: {
       click: { name: "click", attributeName: "onClick" },
@@ -374,6 +688,10 @@ function withLayoutProps(
     ...Object.fromEntries(
       supportedLayoutPropNames.map((name) => [name, { name }]),
     ),
+    ...Object.fromEntries(
+      supportedResponsiveLayoutPropNames.map((name) => [name, { name }]),
+    ),
+    when: { name: "when" },
     ...props,
   };
 }

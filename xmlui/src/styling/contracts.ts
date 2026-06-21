@@ -120,15 +120,21 @@ export const supportedLayoutPropNames = [
   "writingMode",
   "transition",
   "transform",
+  "alignItems",
+  "justifyContent",
+  "style",
 ] as const;
 
 export type LayoutPropName = (typeof supportedLayoutPropNames)[number];
 export type LayoutOrientation = "horizontal" | "vertical";
 
 export const layoutPropNameSet = new Set<string>(supportedLayoutPropNames);
+export const supportedResponsiveLayoutPropNames = supportedLayoutPropNames.flatMap((name) =>
+  Object.keys(responsiveBreakpoints).map((breakpoint) => `${name}-${breakpoint}`)
+);
 
 export function isLayoutPropName(name: string): name is LayoutPropName {
-  return layoutPropNameSet.has(name);
+  return layoutPropNameSet.has(name) || supportedResponsiveLayoutPropNames.includes(name);
 }
 
 export function themeVarName(name: string): string {
@@ -142,4 +148,3 @@ export function themeVarReference(name: string): string {
 export function themePropNameToCssVarName(name: string): string {
   return name.startsWith("--") ? name : themeVarName(name);
 }
-

@@ -1,0 +1,16 @@
+<App var.count="{0}">
+  <H1>Icon and Logo compatibility</H1>
+  <Text>Icons inherit text color, support size aliases, and can run click handlers.</Text>
+  <HStack gap="$space-4" verticalAlignment="center">
+    <Icon testId="homeIcon" name="home" size="xs" onClick="count++" />
+    <Icon name="trash" size="sm" />
+    <Icon name="info" size="md" />
+    <Icon name="missing-icon" fallback="home" size="lg" />
+    <Text>Icon clicks: {count}</Text>
+  </HStack>
+  <Logo
+    src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMTYwIDQ4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNjAiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjMmY3N2QwIi8+PHRleHQgeD0iMjQiIHk9IjMwIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iNzAwIj5YTUxVSTwvdGV4dD48L3N2Zz4="
+    alt="XMLUI sample logo"
+    inline="true" />
+  <Text>The logo uses the migrated Image foundation while keeping logo-specific defaults in CSS.</Text>
+</App>

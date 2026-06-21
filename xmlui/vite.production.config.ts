@@ -9,6 +9,7 @@ import {
   generateProductionManifest,
   type ProductionBuildFixture,
 } from "./src/production/manifest";
+import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
 
 const productionFixtures: ProductionBuildFixture[] = [
@@ -119,7 +120,12 @@ async function collectAssets(outDir: string): Promise<string[]> {
 
 export default defineConfig({
   base: "./",
-  plugins: [xmluiPlugin({ extensions: [counterBadgeExtension] }), react(), productionArtifactsPlugin()],
+  plugins: [
+    rawScssModulePlugin(),
+    xmluiPlugin({ extensions: [counterBadgeExtension] }),
+    react(),
+    productionArtifactsPlugin(),
+  ],
   build: {
     outDir: "dist-production",
     emptyOutDir: true,

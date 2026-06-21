@@ -339,6 +339,22 @@ export function createXmluiScope(
       span: spanFromRange(sourceId, element.range),
     });
   }
+  if (!scope.specials.has("NaN")) {
+    scope.specials.set("NaN", {
+      kind: "special",
+      name: "NaN",
+      mutable: false,
+      span: spanFromRange(sourceId, element.range),
+    });
+  }
+  if (!scope.specials.has("Infinity")) {
+    scope.specials.set("Infinity", {
+      kind: "special",
+      name: "Infinity",
+      mutable: false,
+      span: spanFromRange(sourceId, element.range),
+    });
+  }
   for (const name of options.specialNames ?? []) {
     if (!scope.specials.has(name)) {
       scope.specials.set(name, {
@@ -1209,6 +1225,11 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "hasOverflow",
+    "scrollToTop",
+    "scrollToBottom",
+    "scrollToStart",
+    "scrollToEnd",
   ].includes(name);
 }
 
@@ -1592,6 +1613,8 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
       return `ctx.readContext?.(${JSON.stringify(name)})`;
     case "reference":
       return `ctx.readReference?.(${JSON.stringify(name)})`;
+    case "special":
+      return name;
     case undefined:
       return name;
     default:
@@ -2067,6 +2090,14 @@ function executeRead(
       return context.readContext?.(name);
     case "reference":
       return context.readReference?.(name);
+    case "special":
+      if (name === "NaN") {
+        return Number.NaN;
+      }
+      if (name === "Infinity") {
+        return Number.POSITIVE_INFINITY;
+      }
+      return lexical[name];
     case undefined:
       return lexical[name];
     default:

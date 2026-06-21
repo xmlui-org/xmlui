@@ -1,0 +1,15 @@
+<App var.vertical="{false}">
+  <H1>Separators and spacing</H1>
+  <Text>Orientation: {vertical ? 'vertical' : 'horizontal'}</Text>
+  <Button onClick="vertical = !vertical">Toggle separator orientation</Button>
+  <HStack height="72px" width="360px" backgroundColor="$color-surface-100">
+    <Text>Start</Text>
+    <SpaceFiller />
+    <ContentSeparator
+      orientation="{vertical ? 'vertical' : 'horizontal'}"
+      thickness="{vertical ? '4px' : '3px'}"
+      length="{vertical ? '48px' : '120px'}" />
+    <SpaceFiller />
+    <Text>End</Text>
+  </HStack>
+</App>

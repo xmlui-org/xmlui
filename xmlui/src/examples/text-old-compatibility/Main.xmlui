@@ -1,0 +1,69 @@
+<App var.dynamicText="short" var.overflowResult="unset">
+  <Text testId="empty" />
+  <Text testId="value" value="test content" />
+  <Text testId="child">test content</Text>
+  <Text testId="valueWins" value="this test text is the value of the heading">
+    This is a child
+  </Text>
+
+  <Text testId="v0" value="{undefined}" />
+  <Text testId="v1" value="abc{undefined}def" />
+  <Text testId="v2" value="{null}" />
+  <Text testId="v3" value="abc{null}def" />
+  <Text testId="v4" value="" />
+  <Text testId="v5" value="test" />
+  <Text testId="v6" value="{1}" />
+  <Text testId="v7" value="{1.2}" />
+  <Text testId="v8" value="{true}" />
+  <Text testId="v9" value="{{}}" />
+  <Text testId="v10" value="{{ a: 1, b: 'hi' }}" />
+  <Text testId="v11" value="{[]}" />
+  <Text testId="v12" value="{[1, 2, 3]}" />
+
+  <Text testId="leading">   {123}</Text>
+  <Text testId="trailing">{123}  </Text>
+  <Text testId="whitespaceValue" value="test        content" />
+  <Text testId="preserveShort">Short</Text>
+  <Text
+    testId="preserveLong"
+    preserveLinebreaks="true"
+    value="Though this long
+text does not fit into a single line,
+please do not break it!" />
+
+  <Text testId="variantStrong" variant="strong">Important text</Text>
+  <Text testId="variantCode" variant="code">const answer = 42;</Text>
+  <Text testId="variantParagraph" variant="paragraph">Paragraph text</Text>
+
+  <Text testId="shortLine" width="200px">Short</Text>
+  <Text testId="ellipsisLine" width="200px" maxLines="{1}">
+    Though this long text does not fit into a single line, please do not break it!
+  </Text>
+  <Text testId="clipLine" width="200px" maxLines="{1}" ellipses="{false}">
+    Though this long text does not fit into a single line, please do not break it!
+  </Text>
+  <Text testId="wrapLine" width="200px">
+    This long text does not fit into a viewport with a 200-pixel width.
+  </Text>
+  <VStack height="40px" width="300px">
+    <Text testId="oversizedText" width="400px">
+      This text sets its size explicitly bigger than its container.
+    </Text>
+  </VStack>
+
+  <Stack width="100px">
+    <Text id="overflowText" testId="apiText" value="{dynamicText}" maxLines="{1}" />
+    <Button testId="checkOverflow" onClick="overflowResult = overflowText.hasOverflow()">
+      Check overflow
+    </Button>
+    <Button testId="makeOverflow" onClick="dynamicText = 'This is a very long text that will definitely overflow the container'">
+      Make overflow
+    </Button>
+    <Text testId="overflowResult">{overflowResult}</Text>
+  </Stack>
+
+  <Text testId="nestedWhitespace">
+      test      content
+          here
+  </Text>
+</App>

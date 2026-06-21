@@ -1,0 +1,16 @@
+<App var.accepted="{false}" var.indeterminate="{true}">
+  <H1>Checkbox foundation</H1>
+  <Text>Accepted: {accepted ? 'yes' : 'no'}</Text>
+  <Checkbox
+    label="Accept terms"
+    initialValue="{accepted}"
+    indeterminate="{indeterminate}"
+    onDidChange="value => accepted = value" />
+  <Button onClick="indeterminate = !indeterminate">
+    Toggle indeterminate
+  </Button>
+  <Checkbox
+    label="Required checked example"
+    required="{true}"
+    initialValue="{true}" />
+</App>

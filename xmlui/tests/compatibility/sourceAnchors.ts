@@ -9,7 +9,7 @@ export const compatibilityAnchors: CompatibilityAnchor[] = [
   {
     id: "counter-local-mutation",
     oldSource: "/Users/dotneteer/source/xmlui/xmlui/src/components/Button/Button.spec.ts",
-    rewriteSource: "xmlui/tests/e2e/counter-local.spec.ts",
+    rewriteSource: "xmlui/src/components/Button/Button-style.spec.ts",
     note: "Button click handlers must mutate XMLUI state and re-render bound text.",
   },
   {
@@ -35,5 +35,11 @@ export const compatibilityAnchors: CompatibilityAnchor[] = [
     oldSource: "/Users/dotneteer/source/xmlui/xmlui/src/components-core/StandaloneExtensionManager.ts",
     rewriteSource: "xmlui/tests/e2e/extensions.spec.ts",
     note: "Extension components can raise events that mutate XMLUI state.",
+  },
+  {
+    id: "event-tag-handler-mutation",
+    oldSource: "/Users/dotneteer/source/xmlui/website/content/docs/pages/scripting.md",
+    rewriteSource: "xmlui/tests/e2e/event-tags.spec.ts",
+    note: "Child <event> tags must compile into parent event handlers and mutate XMLUI state.",
   },
 ];
