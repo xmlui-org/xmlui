@@ -12162,6 +12162,13 @@ export default {
           "item": "The clicked list row item."
         }
       },
+      "scroll": {
+        "description": "This event fires as the user scrolls the list. The handler receives an object describing the current scroll state. It is only fired for user-driven scrolls; the list's own programmatic and auto-follow scrolls do not trigger it. Use it together with the `atEnd` flag and the `scrollToBottom()` method to implement follow-newest and read-pause behavior.",
+        "signature": "scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean }): void",
+        "parameters": {
+          "event": "The scroll state: `scrollTop` (current scroll offset), `scrollHeight` (total scrollable size), `viewportSize` (visible size), and `atEnd` (true when scrolled to within ~1.5px of the bottom)."
+        }
+      },
       "selectionDidChange": {
         "description": "This event is triggered when the list's current selection changes. Its parameter is an array of the selected list row items.",
         "signature": "selectionDidChange(selectedItems: any[]): void",
