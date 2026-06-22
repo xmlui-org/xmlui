@@ -1,0 +1,17 @@
+<App var.timeText="{'14:30'}">
+  <H1>TimeInput foundation</H1>
+  <Text>Selected time: {timeText}</Text>
+  <TimeInput
+    id="timeInput"
+    testId="timeInput"
+    initialValue="{timeText}"
+    clearable="{true}"
+    seconds="{true}"
+    onDidChange="timeText = timeInput.value || '(empty)'" />
+  <Button onClick="timeInput.setValue('09:15:30'); timeText = timeInput.value">
+    Set morning time
+  </Button>
+  <Button onClick="timeInput.setValue(null); timeText = timeInput.value || '(empty)'">
+    Clear with API
+  </Button>
+</App>

@@ -46,9 +46,12 @@ export function emitIdentifier(base: string, used: ReadonlySet<string> = new Set
 export function emitFunctionExpression(
   body: string,
   parameter = "ctx",
-  options: { async?: boolean } = {},
+  options: { async?: boolean; name?: string } = {},
 ): string {
   const asyncKeyword = options.async ? "async " : "";
+  if (options.name) {
+    return `${asyncKeyword}function ${emitIdentifier(options.name)}(${parameter}) {\n${indent(body, 1)}\n}`;
+  }
   return `${asyncKeyword}(${parameter}) => {\n${indent(body, 1)}\n}`;
 }
 

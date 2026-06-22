@@ -1,0 +1,187 @@
+import {
+  createMetadata,
+  dAutoFocus,
+  dClick,
+  dDidChange,
+  dEnabled,
+  dGotFocus,
+  dInitialValue,
+  dLabel,
+  dLostFocus,
+  dReadonly,
+  dRequired,
+} from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../runtime/rendering/adapter";
+import { extractScssThemeVars } from "../../styling/theme";
+import { defaultProps } from "./Switch.defaults";
+import { SwitchNative, type SwitchApi } from "./SwitchReact";
+
+const COMP = "Switch";
+
+const switchStylesSource = `
+$borderColor-Switch--hover: createThemeVar("borderColor-Switch--hover");
+$backgroundColor-Switch--disabled: createThemeVar("backgroundColor-Switch--disabled");
+$borderColor-Switch--disabled: createThemeVar("borderColor-Switch--disabled");
+$borderColor-checked-Switch: createThemeVar("borderColor-checked-Switch");
+$backgroundColor-checked-Switch: createThemeVar("backgroundColor-checked-Switch");
+$borderColor-checked-Switch--error: createThemeVar("borderColor-checked-Switch--error");
+$backgroundColor-checked-Switch--error: createThemeVar("backgroundColor-checked-Switch--error");
+$borderColor-checked-Switch--warning: createThemeVar("borderColor-checked-Switch--warning");
+$backgroundColor-checked-Switch--warning: createThemeVar("backgroundColor-checked-Switch--warning");
+$borderColor-checked-Switch--success: createThemeVar("borderColor-checked-Switch--success");
+$backgroundColor-checked-Switch--success: createThemeVar("backgroundColor-checked-Switch--success");
+$backgroundColor-Switch: createThemeVar("backgroundColor-Switch");
+$borderColor-Switch: createThemeVar("borderColor-Switch");
+$backgroundColor-indicator-Switch: createThemeVar("backgroundColor-indicator-Switch");
+$backgroundColor-indicator-checked-Switch: createThemeVar("backgroundColor-indicator-checked-Switch");
+$backgroundColor-Switch-indicator--disabled: createThemeVar("backgroundColor-Switch-indicator--disabled");
+$outlineWidth-Switch--focus: createThemeVar("outlineWidth-Switch--focus");
+$outlineColor-Switch--focus: createThemeVar("outlineColor-Switch--focus");
+$outlineStyle-Switch--focus: createThemeVar("outlineStyle-Switch--focus");
+$outlineOffset-Switch--focus: createThemeVar("outlineOffset-Switch--focus");
+$outlineWidth-Switch: createThemeVar("outlineWidth-Switch");
+$outlineColor-Switch: createThemeVar("outlineColor-Switch");
+$outlineStyle-Switch: createThemeVar("outlineStyle-Switch");
+$outlineOffset-Switch: createThemeVar("outlineOffset-Switch");
+$borderColor-Switch--error: createThemeVar("borderColor-Switch--error");
+$borderColor-Switch--warning: createThemeVar("borderColor-Switch--warning");
+$borderColor-Switch--success: createThemeVar("borderColor-Switch--success");
+`;
+
+export const SwitchMd = createMetadata({
+  status: "stable",
+  description: "`Switch` enables users to toggle between two states: on and off.",
+  parts: {
+    label: { description: "The label displayed for the switch." },
+    input: { description: "The switch input area." },
+  },
+  defaultPart: "input",
+  props: {
+    id: { description: "The component id.", valueType: "string" },
+    testId: { description: "The test id.", valueType: "string" },
+    label: dLabel(),
+    labelPosition: {
+      description: "Controls the label position.",
+      valueType: "string",
+      availableValues: ["start", "end", "top", "bottom", "before", "after"],
+      defaultValue: "end",
+    },
+    labelBreak: { description: "Allows line breaks in the label.", valueType: "boolean" },
+    labelWidth: { description: "Sets the label width.", valueType: "length" },
+    direction: { description: "Sets the input direction.", valueType: "string" },
+    initialValue: dInitialValue(defaultProps.initialValue, "boolean"),
+    value: { description: "Controlled checked value.", valueType: "boolean" },
+    required: dRequired(),
+    autoFocus: dAutoFocus(),
+    readOnly: dReadonly(),
+    enabled: dEnabled(defaultProps.enabled),
+    validationStatus: { description: "Validation status.", valueType: "string" },
+    tooltip: { description: "The tooltip text.", valueType: "string" },
+    tooltipMarkdown: { description: "The markdown tooltip text.", valueType: "string" },
+    animation: { description: "The animation definition.", valueType: "any" },
+    variant: { description: "The variant value.", valueType: "string" },
+    requireLabelMode: { description: "Controls required/optional label markers.", valueType: "string" },
+    bindTo: { description: "Binds the switch to form data.", valueType: "string" },
+  },
+  events: {
+    click: dClick(COMP),
+    gotFocus: dGotFocus(COMP),
+    lostFocus: dLostFocus(COMP),
+    didChange: dDidChange(COMP),
+  },
+  apis: {
+    focus: {
+      description: "Sets focus on the switch.",
+      signature: "focus(): void",
+    },
+    value: {
+      description: "Returns the current switch value.",
+      signature: "get value(): boolean",
+    },
+    setValue: {
+      description: "Sets the current switch value.",
+      signature: "setValue(value: boolean): void",
+      parameters: {
+        value: "The new value to set.",
+      },
+    },
+  },
+  themeVars: extractScssThemeVars(switchStylesSource),
+  defaultThemeVars: {
+    [`borderColor-${COMP}`]: "$borderColor-Input-default",
+    [`borderWidth-${COMP}`]: "1px",
+    [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
+    [`outlineColor-${COMP}--focus`]: "$outlineColor--focus",
+    [`outlineOffset-${COMP}--focus`]: "$outlineOffset--focus",
+    [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
+    [`outlineWidth-${COMP}`]: "$outlineWidth--focus",
+    [`outlineColor-${COMP}`]: "$outlineColor--focus",
+    [`outlineOffset-${COMP}`]: "$outlineOffset--focus",
+    [`outlineStyle-${COMP}`]: "$outlineStyle--focus",
+    [`borderColor-${COMP}--hover`]: "$borderColor-Input-default--hover",
+    [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
+    [`borderColor-${COMP}--disabled`]: "$borderColor--disabled",
+    [`backgroundColor-${COMP}`]: "$color-surface-0",
+    [`backgroundColor-indicator-${COMP}`]: "$color-surface-400",
+    [`backgroundColor-${COMP}-indicator--disabled`]: "$backgroundColor-primary",
+    [`backgroundColor-indicator-checked-${COMP}`]: "$backgroundColor-primary",
+    [`borderColor-checked-${COMP}`]: "$color-primary-500",
+    [`backgroundColor-checked-${COMP}`]: "$color-primary-500",
+    [`borderColor-${COMP}--error`]: "$borderColor-Input-default--error",
+    [`borderColor-${COMP}--warning`]: "$borderColor-Input-default--warning",
+    [`borderColor-${COMP}--success`]: "$borderColor-Input-default--success",
+    [`borderColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
+    [`backgroundColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
+    [`borderColor-checked-${COMP}--warning`]: `$borderColor-${COMP}--warning`,
+    [`backgroundColor-checked-${COMP}--warning`]: `$borderColor-${COMP}--warning`,
+    [`borderColor-checked-${COMP}--success`]: `$borderColor-${COMP}--success`,
+    [`backgroundColor-checked-${COMP}--success`]: `$borderColor-${COMP}--success`,
+  },
+  compactInlineLabel: true,
+  limitThemeVarsToComponent: true,
+});
+
+export const switchRenderer = wrapComponent({
+  name: COMP,
+  metadata: SwitchMd,
+  defaultPart: "input",
+  renderer: ({ adapter }) => {
+    const apiRef = { current: null as SwitchApi | null };
+    return (
+      <SwitchNative
+        {...adapter.rootAttrs("input")}
+        ref={(api) => {
+          apiRef.current = api;
+          if (api) {
+            adapter.registerApi(api as unknown as Record<string, unknown>);
+          }
+        }}
+        id={adapter.stringProp("id")}
+        value={adapter.prop("value")}
+        initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
+        label={adapter.prop("label")}
+        labelPosition={adapter.stringProp("labelPosition", "end")}
+        labelBreak={adapter.booleanProp("labelBreak", false)}
+        labelWidth={adapter.prop("labelWidth")}
+        direction={adapter.stringProp("direction")}
+        enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
+        readOnly={adapter.booleanProp("readOnly", false)}
+        required={adapter.booleanProp("required", false)}
+        autoFocus={adapter.booleanProp("autoFocus", false)}
+        validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
+        onClick={(event) => {
+          void adapter.event("click")(event);
+        }}
+        onDidChange={(value) => {
+          void adapter.event("didChange")(value);
+        }}
+        onFocus={() => {
+          void adapter.event("gotFocus")();
+        }}
+        onBlur={() => {
+          void adapter.event("lostFocus")();
+        }}
+      />
+    );
+  },
+});

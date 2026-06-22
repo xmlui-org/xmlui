@@ -1672,7 +1672,8 @@ Visual check:
 
 ###### Wave B3.2: Switch Foundation
 
-Status: next step. Start the next AI-assisted session here.
+Status: current slice completed for the non-Form, non-variant Switch
+foundation.
 
 Components:
 
@@ -1686,21 +1687,36 @@ Compatibility focus:
 
 Session pickup checklist:
 
-- Inspect the old `Switch` implementation and docs in
-  `/Users/dotneteer/source/xmlui/xmlui/src/components/Switch`.
-- Copy the full old `Switch.spec.ts` and `Switch.md` into
-  `xmlui/src/components/Switch/` before implementing behavior.
-- Migrate the source-adjacent component folder shape: `Switch.tsx`,
-  `SwitchReact.tsx`, `Switch.defaults.ts`, `Switch.module.scss`, docs, and E2E
-  spec.
-- Register `Switch` in compiler contracts, runtime registry, metadata transfer
-  reporting, CSS loading, test drivers/fixtures, and add a runnable visual
-  example.
-- Run the focused `Switch.spec.ts` after each meaningful implementation step,
-  then run the standard unit, metadata, compatibility, and full E2E checks
-  before declaring the slice complete.
+- Completed: inspected the old `Switch` implementation and docs in
+  `/Users/dotneteer/source/xmlui/xmlui/src/components/Switch` and the shared
+  old `Toggle` primitive that backed its visual behavior.
+- Completed: copied the full old `Switch.spec.ts` and `Switch.md` into
+  `xmlui/src/components/Switch/`.
+- Completed: migrated the source-adjacent component folder shape:
+  `Switch.tsx`, `SwitchReact.tsx`, `Switch.defaults.ts`,
+  `Switch.module.scss`, docs, and E2E spec.
+- Completed: registered `Switch` in compiler contracts, IR static built-ins,
+  runtime registry, metadata transfer reporting, CSS loading, test fixtures,
+  and added a runnable visual example.
+- Verification for the current slice:
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/Switch/Switch.spec.ts` passes with 89 tests and 15 explicit
+  `fixme` deferrals.
+- Deferred: `Form`/`bindTo`, require-label modes, and custom variant behavior
+  remain explicit `fixme`s until the related shared infrastructure is migrated.
+- Learned: the copied Switch tests intentionally expect expression `NaN` to
+  coerce to checked, matching the current Checkbox compatibility suite.
+- Learned: focus outline declarations need literal CSS fallbacks so tests that
+  override only one outline theme variable still produce a visible outline.
+
+Visual check:
+
+- After implementation, `npm run dev` from the repository root, then open
+  `http://127.0.0.1:5173/?example=switchFoundation`.
 
 ###### Wave B3.3: Toggle Foundation
+
+Status: completed as an internal shared primitive slice.
 
 Components:
 
@@ -1712,7 +1728,36 @@ Compatibility focus:
   context variables, and any remaining behavior needed by `Checkbox` and
   `Switch` once the primitive is migrated.
 
+Implementation notes:
+
+- Added `xmlui/src/components/Toggle/Toggle.tsx` and
+  `xmlui/src/components/Toggle/Toggle.defaults.ts` as an internal primitive,
+  not as a public built-in renderer.
+- Extracted shared checked-value coercion, controlled/uncontrolled state,
+  `setValue`, `focus`, autofocus, indeterminate state, and initial Switch
+  transition suppression into `useToggleController`.
+- Updated `CheckboxReact` and `SwitchReact` to use the shared Toggle
+  controller while keeping their component-owned visual declarations in
+  `Checkbox.module.scss` and `Switch.module.scss`.
+- Kept the current explicit deferrals for custom `inputTemplate`, `Form`,
+  `bindTo`, require-label modes, and custom variants. This slice only moves
+  the shared primitive behavior that is already covered by passing copied
+  Checkbox and Switch tests.
+- Verification for the current slice:
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts`
+  passes with 184 tests and 38 existing skips.
+
+Visual check:
+
+- Because `Toggle` is internal, visually check it through:
+  `http://127.0.0.1:5173/?example=checkboxFoundation` and
+  `http://127.0.0.1:5173/?example=switchFoundation`.
+
 ##### Wave B4: Range and Rating Inputs
+
+Status: split into smaller slices because the old `Slider` suite has a much
+larger interaction and theme surface than `RatingInput`.
 
 Components:
 
@@ -1725,7 +1770,92 @@ Compatibility focus:
   interaction, form binding, did-change semantics, visual parts, and disabled
   states.
 
+###### Wave B4.1: RatingInput Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `RatingInput` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, and the copied old `RatingInput.spec.ts`;
+- preserve max-rating normalization, initial value, click updates, placeholder
+  visibility, disabled/read-only behavior, value API, `setValue`, responsive
+  layout props, and old star accessibility labels;
+- add a runnable mutation sample available as
+  `http://127.0.0.1:5173/?example=ratingInputFoundation`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc --noEmit`;
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/RatingInput/RatingInput.spec.ts`.
+
+Implementation notes:
+
+- Migrated `RatingInput` with source-adjacent `RatingInput.tsx`,
+  `RatingInputReact.tsx`, `RatingInput.defaults.ts`, `RatingInput.module.scss`,
+  `RatingInput.md`, and copied old `RatingInput.spec.ts`.
+- Registered `RatingInput` in compiler contracts, IR built-in recognition,
+  runtime component transfer registry, metadata generation, and dev examples.
+- Extended the rendering adapter so root/default-part components can receive
+  part-specific responsive layout props such as `width-input-md`; this preserves
+  the old single-root input-part behavior without weakening copied tests.
+- Added `rating-input-foundation` as a runnable mutation sample.
+- Verification completed:
+  `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`,
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/RatingInput/RatingInput.spec.ts` (16 passed),
+  `npm --workspace xmlui run check:metadata`, and
+  `npm --workspace xmlui run compatibility:component-transfer`.
+  A broad `tsc --noEmit` still reports existing strictness errors in copied
+  component specs unrelated to this slice.
+
+###### Wave B4.2: Slider Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `Slider` separately with its old source-adjacent files and complete
+  old E2E suite;
+- split further if keyboard, pointer/range, theme variables, and form binding
+  prove too large for one verifiable pass.
+
+Implementation notes:
+
+- Migrated `Slider` with source-adjacent `Slider.tsx`,
+  `SliderReact.tsx`, `Slider.defaults.ts`, `Slider.module.scss`, `Slider.md`,
+  and copied old `Slider.spec.ts`.
+- Added a custom renderer for single-value and range sliders, including
+  min/max/step coercion, inverted rendering, keyboard and pointer updates,
+  tooltip values, value formatting, `focus`, `setValue`, and value API support.
+- Added `SliderDriver` to the Playwright fixture layer for the copied old
+  mouse and keyboard tests.
+- Registered `Slider` in compiler contracts, IR built-in recognition, runtime
+  component transfer registry, metadata generation, and dev examples.
+- Kept styles in `Slider.module.scss`, but wrote browser-valid CSS rule bodies
+  because the rewrite's current SCSS module loader does not compile Sass
+  mixins or `$variable` usages in rules.
+- Deferred only the old autofocus fixme and Form/FormItem-dependent `bindTo`
+  and `requireLabelMode` tests. These remain copied in
+  `Slider.spec.ts` and should be re-enabled when Form/FormItem is migrated.
+- Verification completed:
+  `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`,
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/Slider/Slider.spec.ts` (101 passed, 11 skipped),
+  `npm --workspace xmlui run check:metadata`,
+  `npm --workspace xmlui run compatibility:component-transfer`, and
+  `npm --workspace xmlui run test` (258 passed).
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=sliderFoundation`
+
 ##### Wave B5: Date, Time, and Color Inputs
+
+Status: split into smaller slices because `DateInput`, `TimeInput`, and
+`DatePicker` each carry large, interaction-heavy suites.
+
 
 Components:
 
@@ -1739,6 +1869,135 @@ Compatibility focus:
 - native/browser value formats, locale-sensitive display where exposed,
   calendar/picker behavior, validation, clear/reset behavior, keyboard/focus
   behavior, and form integration.
+
+###### Wave B5.1: ColorPicker Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `ColorPicker` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, and the copied old `ColorPicker.spec.ts`;
+- preserve native color input value format, initial value, disabled/read-only
+  behavior, focus/change events, value and `setValue` APIs, validation theme
+  variables, default width/height theme variables, layout widths, and label
+  association;
+- defer only Form/FormItem-dependent `bindTo`, `FormItem type="colorpicker"`,
+  and require-label-mode tests until Form/FormItem migration.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=colorPickerFoundation`
+
+Implementation notes:
+
+- `ColorPicker` now has a source-adjacent component folder with metadata,
+  defaults, renderer, stylesheet, docs, and the copied old E2E spec.
+- The executable copied old tests pass. Only Form/FormItem-dependent coverage is
+  marked `test.fixme` until the shared form migration closes the missing
+  infrastructure.
+- Theme variables are extracted from `ColorPicker.module.scss`, while runtime
+  styling uses plain browser-valid CSS classes and CSS variables.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/ColorPicker/ColorPicker.spec.ts`
+  passed with 59 passed and 11 skipped Form/FormItem-dependent tests.
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test`
+
+###### Wave B5.2: DateInput Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `DateInput` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, and the copied old `DateInput.spec.ts`;
+- preserve the original segmented date entry model, supported date formats,
+  empty placeholders, validation state styling, invalid-field preservation,
+  keyboard navigation, Ctrl+A select-all behavior, clear/reset behavior,
+  focus/change/blur events, and `focus`, `setValue`, `value`, and `isoValue`
+  APIs;
+- defer only the copied tests that require shared Form/FormItem binding or
+  validation-feedback infrastructure, plus the one parser-gap fixture using a
+  zero-argument arrow expression as a prop value.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=dateInputFoundation`
+
+Implementation notes:
+
+- `DateInput` now has a source-adjacent component folder with metadata,
+  defaults, renderer, stylesheet, docs, and the copied old E2E spec.
+- The renderer follows the original segmented input structure rather than using
+  a native browser date input, because the copied old tests and original
+  implementation expose separate month/day/year fields.
+- The testbed clipboard was extended with a browser-level clipboard mock so
+  copied keyboard tests can verify Ctrl+C behavior.
+- The shared style-string parser now preserves CSS custom properties beginning
+  with `--`, matching React's inline style requirements and the old theme
+  variable test patterns.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/DateInput/DateInput.spec.ts`
+  passed with 153 passed and 9 skipped deferred tests.
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test`
+
+###### Wave B5.3: TimeInput Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `TimeInput` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, and the copied old `TimeInput.spec.ts`;
+- preserve the original segmented hour/minute/second entry model, 12-hour and
+  24-hour modes, AM/PM interaction, seconds visibility, empty placeholders,
+  validation state styling, clear/reset behavior, keyboard navigation,
+  focus/change/blur/invalid events, and `focus`, `setValue`, `value`, and
+  `isoValue` APIs;
+- defer only the copied tests that require shared Form/FormItem binding or
+  label integration, plus the one parser-gap fixture using a zero-argument
+  arrow expression as a prop value.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=timeInputFoundation`
+
+Implementation notes:
+
+- `TimeInput` now has a source-adjacent component folder with metadata,
+  defaults, renderer, stylesheet, docs, and the copied old E2E spec.
+- The renderer follows the original segmented input structure and supports
+  direct keyboard navigation between hour, minute, second, and AM/PM parts.
+- The AM/PM part supports click, arrow navigation focus, and `a`/`p` keyboard
+  selection.
+- The copied old testbed handler syntax with a block body is normalized by the
+  test harness until the event parser supports that form directly.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- src/components/TimeInput/TimeInput.spec.ts`
+  passed with 166 passed and 3 skipped deferred tests.
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test`
+
+###### Wave B5.4: DatePicker Foundation
+
+Status: next step.
 
 ##### Wave B6: File Inputs
 

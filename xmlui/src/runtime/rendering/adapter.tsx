@@ -123,6 +123,19 @@ export function useXmluiComponentAdapter({
     () => resolveActiveLayoutStyle(props, viewportWidth),
     [props, viewportWidth],
   );
+  const layoutStyles = useMemo(
+    () => resolveResponsiveLayoutStyles(props),
+    [props],
+  );
+  const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
+    if (part === defaultPart) {
+      return {
+        ...layoutStyle,
+        ...resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth),
+      };
+    }
+    return resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth);
+  }, [defaultPart, layoutStyle, layoutStyles, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
     Object.assign(apiRef.current, api);
     const id = typeof props.id === "string" ? props.id : undefined;
@@ -176,7 +189,7 @@ export function useXmluiComponentAdapter({
       className: themeClass.className,
       style: {
         ...themeClass.style,
-        ...(part === defaultPart ? layoutStyle : undefined),
+        ...layoutStyleForPart(part),
       },
     }),
     prop: <T,>(propName: string, fallback?: T): T =>
@@ -221,7 +234,7 @@ export function useXmluiComponentAdapter({
     context,
     defaultPart,
     events,
-    layoutStyle,
+    layoutStyleForPart,
     metadata,
     themeContributors,
     name,
@@ -246,11 +259,24 @@ function resolveActiveLayoutStyle(
     return resolveLayoutStyle(props);
   }
 
-  const style: CSSProperties = { ...componentStyle.base };
+  return resolveActiveLayoutStyleForPart(responsive, COMPONENT_PART_KEY, viewportWidth) ?? {};
+}
+
+function resolveActiveLayoutStyleForPart(
+  responsive: ReturnType<typeof resolveResponsiveLayoutStyles>,
+  part: string,
+  viewportWidth: number | undefined,
+): CSSProperties | undefined {
+  const partStyle = responsive[part];
+  if (!partStyle) {
+    return undefined;
+  }
+
+  const style: CSSProperties = { ...partStyle.base };
   if (viewportWidth !== undefined) {
     for (const [breakpoint, minWidth] of Object.entries(responsiveBreakpoints)) {
       if (viewportWidth >= minWidth) {
-        Object.assign(style, componentStyle.breakpoints[breakpoint as keyof typeof responsiveBreakpoints]);
+        Object.assign(style, partStyle.breakpoints[breakpoint as keyof typeof responsiveBreakpoints]);
       }
     }
   }

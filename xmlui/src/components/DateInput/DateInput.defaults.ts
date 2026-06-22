@@ -1,0 +1,17 @@
+export const defaultProps = {
+  enabled: true,
+  validationStatus: "none",
+  mode: "single",
+  dateFormat: "MM/dd/yyyy",
+  showWeekNumber: false,
+  weekStartsOn: 0,
+  inline: true,
+  clearable: false,
+  clearToInitialValue: false,
+  required: false,
+  labelPosition: "top",
+  readOnly: false,
+  autoFocus: false,
+  labelBreak: false,
+  emptyCharacter: "-",
+};

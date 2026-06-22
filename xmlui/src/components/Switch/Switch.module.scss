@@ -1,0 +1,190 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderColor-Switch--hover: createThemeVar("borderColor-Switch--hover");
+$backgroundColor-Switch--disabled: createThemeVar("backgroundColor-Switch--disabled");
+$borderColor-Switch--disabled: createThemeVar("borderColor-Switch--disabled");
+$borderColor-checked-Switch: createThemeVar("borderColor-checked-Switch");
+$backgroundColor-checked-Switch: createThemeVar("backgroundColor-checked-Switch");
+$borderColor-checked-Switch--error: createThemeVar("borderColor-checked-Switch--error");
+$backgroundColor-checked-Switch--error: createThemeVar("backgroundColor-checked-Switch--error");
+$borderColor-checked-Switch--warning: createThemeVar("borderColor-checked-Switch--warning");
+$backgroundColor-checked-Switch--warning: createThemeVar("backgroundColor-checked-Switch--warning");
+$borderColor-checked-Switch--success: createThemeVar("borderColor-checked-Switch--success");
+$backgroundColor-checked-Switch--success: createThemeVar("backgroundColor-checked-Switch--success");
+$backgroundColor-Switch: createThemeVar("backgroundColor-Switch");
+$borderColor-Switch: createThemeVar("borderColor-Switch");
+$backgroundColor-indicator-Switch: createThemeVar("backgroundColor-indicator-Switch");
+$backgroundColor-indicator-checked-Switch: createThemeVar("backgroundColor-indicator-checked-Switch");
+$backgroundColor-Switch-indicator--disabled: createThemeVar("backgroundColor-Switch-indicator--disabled");
+$outlineWidth-Switch--focus: createThemeVar("outlineWidth-Switch--focus");
+$outlineColor-Switch--focus: createThemeVar("outlineColor-Switch--focus");
+$outlineStyle-Switch--focus: createThemeVar("outlineStyle-Switch--focus");
+$outlineOffset-Switch--focus: createThemeVar("outlineOffset-Switch--focus");
+$outlineWidth-Switch: createThemeVar("outlineWidth-Switch");
+$outlineColor-Switch: createThemeVar("outlineColor-Switch");
+$outlineStyle-Switch: createThemeVar("outlineStyle-Switch");
+$outlineOffset-Switch: createThemeVar("outlineOffset-Switch");
+$borderColor-Switch--error: createThemeVar("borderColor-Switch--error");
+$borderColor-Switch--warning: createThemeVar("borderColor-Switch--warning");
+$borderColor-Switch--success: createThemeVar("borderColor-Switch--success");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .switchLabeledItem {
+    display: flex;
+    align-items: center;
+    gap: var(--xmlui-gap-label-Switch, var(--xmlui-gap-normal));
+    width: max-content;
+    max-width: 100%;
+  }
+
+  .switchcontainer {
+    box-sizing: border-box;
+  }
+
+  .switchLabelPositionStart,
+  .switchLabelPositionBefore {
+    flex-direction: row;
+  }
+
+  .switchLabelPositionEnd,
+  .switchLabelPositionAfter {
+    flex-direction: row-reverse;
+  }
+
+  .switchLabelPositionTop {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .switchLabelPositionBottom {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+
+  .switchLabel {
+    flex: 0 0 auto;
+    width: max-content;
+    color: var(--xmlui-textColor-label-Switch, var(--xmlui-textColor-primary));
+    font-size: var(--xmlui-fontSize-label-Switch, inherit);
+    white-space: nowrap;
+  }
+
+  .switchLabelBreak {
+    white-space: normal;
+  }
+
+  .switchLabelRequired {
+    margin-left: 0.25em;
+  }
+
+  .switchRoot {
+    --thumb-size: 1em;
+    --thumb-position: 0%;
+    --track-size: calc(var(--thumb-size) * 3);
+    --padding-size: 0.25em;
+
+    display: grid;
+    align-items: center;
+    grid: [track] 1fr / [track] 1fr;
+    width: var(--track-size);
+    min-width: var(--track-size);
+    min-height: var(--thumb-size);
+    margin: 0;
+    padding: var(--padding-size);
+    flex: 0 0 auto;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0.0625em solid var(--xmlui-borderColor-Switch);
+    border-radius: 999em;
+    background-color: var(--xmlui-backgroundColor-Switch);
+    font: inherit;
+  }
+
+  .switchRoot:not([readonly]) {
+    cursor: pointer;
+  }
+
+  .switchRoot:not([readonly]):not(:disabled):hover {
+    border-color: var(--xmlui-borderColor-Switch--hover);
+  }
+
+  .switchRoot:focus,
+  .switchRoot:focus-visible {
+    outline-width: var(--xmlui-outlineWidth-Switch, var(--xmlui-outlineWidth-Switch--focus, 2px));
+    outline-color: var(--xmlui-outlineColor-Switch, var(--xmlui-outlineColor-Switch--focus, currentColor));
+    outline-style: var(--xmlui-outlineStyle-Switch, var(--xmlui-outlineStyle-Switch--focus, solid));
+    outline-offset: var(--xmlui-outlineOffset-Switch, var(--xmlui-outlineOffset-Switch--focus, 2px));
+  }
+
+  .switchRoot::before {
+    content: "";
+    grid-area: track;
+    width: var(--thumb-size);
+    height: var(--thumb-size);
+    border-radius: 50%;
+    background-color: var(--xmlui-backgroundColor-indicator-Switch);
+    transform: translateX(var(--thumb-position));
+    transition: 0.3s transform;
+  }
+
+  .switchNoTransition::before {
+    transition: none;
+  }
+
+  .switchRoot:checked {
+    border-color: var(--xmlui-borderColor-checked-Switch);
+    background-color: var(--xmlui-backgroundColor-checked-Switch);
+  }
+
+  .switchRoot:checked::before {
+    --thumb-position: calc(var(--track-size) - var(--thumb-size) - 2 * var(--padding-size) - 0.125em);
+
+    background-color: var(--xmlui-backgroundColor-indicator-checked-Switch);
+  }
+
+  .switchRoot:checked:disabled,
+  .switchRoot:disabled {
+    cursor: not-allowed;
+    border-color: var(--xmlui-borderColor-Switch--disabled);
+    background-color: var(--xmlui-backgroundColor-Switch--disabled);
+  }
+
+  .switchRoot:disabled::before {
+    background-color: var(--xmlui-backgroundColor-Switch-indicator--disabled);
+  }
+
+  .switchError {
+    border-color: var(--xmlui-borderColor-Switch--error);
+  }
+
+  .switchWarning {
+    border-color: var(--xmlui-borderColor-Switch--warning);
+  }
+
+  .switchSuccess {
+    border-color: var(--xmlui-borderColor-Switch--success);
+  }
+
+  .switchRoot.switchError:checked {
+    border-color: var(--xmlui-borderColor-checked-Switch--error);
+    background-color: var(--xmlui-backgroundColor-checked-Switch--error);
+  }
+
+  .switchRoot.switchWarning:checked {
+    border-color: var(--xmlui-borderColor-checked-Switch--warning);
+    background-color: var(--xmlui-backgroundColor-checked-Switch--warning);
+  }
+
+  .switchRoot.switchSuccess:checked {
+    border-color: var(--xmlui-borderColor-checked-Switch--success);
+    background-color: var(--xmlui-backgroundColor-checked-Switch--success);
+  }
+}

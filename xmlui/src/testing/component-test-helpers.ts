@@ -67,6 +67,12 @@ export const SKIP_REASON = {
       description,
     },
   }),
+  XMLUI_BUG: (description: string) => ({
+    annotation: {
+      type: "skip",
+      description,
+    },
+  }),
 };
 
 async function computedStyles(locator: Locator, names: string[]): Promise<Record<string, string>> {

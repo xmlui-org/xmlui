@@ -1,0 +1,273 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderRadius-TimeInput: createThemeVar("borderRadius-TimeInput");
+$borderColor-TimeInput: createThemeVar("borderColor-TimeInput");
+$borderWidth-TimeInput: createThemeVar("borderWidth-TimeInput");
+$borderStyle-TimeInput: createThemeVar("borderStyle-TimeInput");
+$fontSize-TimeInput: createThemeVar("fontSize-TimeInput");
+$backgroundColor-TimeInput: createThemeVar("backgroundColor-TimeInput");
+$boxShadow-TimeInput: createThemeVar("boxShadow-TimeInput");
+$textColor-TimeInput: createThemeVar("textColor-TimeInput");
+$borderColor-TimeInput--hover: createThemeVar("borderColor-TimeInput--hover");
+$backgroundColor-TimeInput--hover: createThemeVar("backgroundColor-TimeInput--hover");
+$boxShadow-TimeInput--hover: createThemeVar("boxShadow-TimeInput--hover");
+$textColor-TimeInput--hover: createThemeVar("textColor-TimeInput--hover");
+$borderColor-TimeInput--focus: createThemeVar("borderColor-TimeInput--focus");
+$backgroundColor-TimeInput--focus: createThemeVar("backgroundColor-TimeInput--focus");
+$boxShadow-TimeInput--focus: createThemeVar("boxShadow-TimeInput--focus");
+$textColor-TimeInput--focus: createThemeVar("textColor-TimeInput--focus");
+$outlineWidth-TimeInput--focus: createThemeVar("outlineWidth-TimeInput--focus");
+$outlineColor-TimeInput--focus: createThemeVar("outlineColor-TimeInput--focus");
+$outlineStyle-TimeInput--focus: createThemeVar("outlineStyle-TimeInput--focus");
+$outlineOffset-TimeInput--focus: createThemeVar("outlineOffset-TimeInput--focus");
+$borderRadius-TimeInput--error: createThemeVar("borderRadius-TimeInput--error");
+$borderColor-TimeInput--error: createThemeVar("borderColor-TimeInput--error");
+$borderWidth-TimeInput--error: createThemeVar("borderWidth-TimeInput--error");
+$borderStyle-TimeInput--error: createThemeVar("borderStyle-TimeInput--error");
+$fontSize-TimeInput--error: createThemeVar("fontSize-TimeInput--error");
+$backgroundColor-TimeInput--error: createThemeVar("backgroundColor-TimeInput--error");
+$boxShadow-TimeInput--error: createThemeVar("boxShadow-TimeInput--error");
+$textColor-TimeInput--error: createThemeVar("textColor-TimeInput--error");
+$borderColor-TimeInput--error--hover: createThemeVar("borderColor-TimeInput--error--hover");
+$backgroundColor-TimeInput--error--hover: createThemeVar("backgroundColor-TimeInput--error--hover");
+$boxShadow-TimeInput--error--hover: createThemeVar("boxShadow-TimeInput--error--hover");
+$textColor-TimeInput--error--hover: createThemeVar("textColor-TimeInput--error--hover");
+$borderRadius-TimeInput--warning: createThemeVar("borderRadius-TimeInput--warning");
+$borderColor-TimeInput--warning: createThemeVar("borderColor-TimeInput--warning");
+$borderWidth-TimeInput--warning: createThemeVar("borderWidth-TimeInput--warning");
+$borderStyle-TimeInput--warning: createThemeVar("borderStyle-TimeInput--warning");
+$fontSize-TimeInput--warning: createThemeVar("fontSize-TimeInput--warning");
+$backgroundColor-TimeInput--warning: createThemeVar("backgroundColor-TimeInput--warning");
+$boxShadow-TimeInput--warning: createThemeVar("boxShadow-TimeInput--warning");
+$textColor-TimeInput--warning: createThemeVar("textColor-TimeInput--warning");
+$borderColor-TimeInput--warning--hover: createThemeVar("borderColor-TimeInput--warning--hover");
+$backgroundColor-TimeInput--warning--hover: createThemeVar("backgroundColor-TimeInput--warning--hover");
+$boxShadow-TimeInput--warning--hover: createThemeVar("boxShadow-TimeInput--warning--hover");
+$textColor-TimeInput--warning--hover: createThemeVar("textColor-TimeInput--warning--hover");
+$borderRadius-TimeInput--success: createThemeVar("borderRadius-TimeInput--success");
+$borderColor-TimeInput--success: createThemeVar("borderColor-TimeInput--success");
+$borderWidth-TimeInput--success: createThemeVar("borderWidth-TimeInput--success");
+$borderStyle-TimeInput--success: createThemeVar("borderStyle-TimeInput--success");
+$fontSize-TimeInput--success: createThemeVar("fontSize-TimeInput--success");
+$backgroundColor-TimeInput--success: createThemeVar("backgroundColor-TimeInput--success");
+$boxShadow-TimeInput--success: createThemeVar("boxShadow-TimeInput--success");
+$textColor-TimeInput--success: createThemeVar("textColor-TimeInput--success");
+$borderColor-TimeInput--success--hover: createThemeVar("borderColor-TimeInput--success--hover");
+$backgroundColor-TimeInput--success--hover: createThemeVar("backgroundColor-TimeInput--success--hover");
+$boxShadow-TimeInput--success--hover: createThemeVar("boxShadow-TimeInput--success--hover");
+$textColor-TimeInput--success--hover: createThemeVar("textColor-TimeInput--success--hover");
+$color-divider-TimeInput: createThemeVar("color-divider-TimeInput");
+$spacing-divider-TimeInput: createThemeVar("spacing-divider-TimeInput");
+$width-input-TimeInput: createThemeVar("width-input-TimeInput");
+$minWidth-input-TimeInput: createThemeVar("minWidth-input-TimeInput");
+$padding-input-TimeInput: createThemeVar("padding-input-TimeInput");
+$textAlign-input-TimeInput: createThemeVar("textAlign-input-TimeInput");
+$fontSize-input-TimeInput: createThemeVar("fontSize-input-TimeInput");
+$borderRadius-input-TimeInput: createThemeVar("borderRadius-input-TimeInput");
+$backgroundColor-input-TimeInput-invalid: createThemeVar("backgroundColor-input-TimeInput-invalid");
+$padding-button-TimeInput: createThemeVar("padding-button-TimeInput");
+$borderRadius-button-TimeInput: createThemeVar("borderRadius-button-TimeInput");
+$hoverColor-button-TimeInput: createThemeVar("hoverColor-button-TimeInput");
+$disabledColor-button-TimeInput: createThemeVar("disabledColor-button-TimeInput");
+$outlineColor-button-TimeInput--focused: createThemeVar("outlineColor-button-TimeInput--focused");
+$outlineWidth-button-TimeInput--focused: createThemeVar("outlineWidth-button-TimeInput--focused");
+$outlineOffset-button-TimeInput--focused: createThemeVar("outlineOffset-button-TimeInput--focused");
+$minWidth-ampm-TimeInput: createThemeVar("minWidth-ampm-TimeInput");
+$fontSize-ampm-TimeInput: createThemeVar("fontSize-ampm-TimeInput");
+$opacity-TimeInput--disabled: createThemeVar("opacity-TimeInput--disabled");
+$backgroundColor-TimeInput--disabled: createThemeVar("backgroundColor-TimeInput--disabled");
+$textColor-TimeInput--disabled: createThemeVar("textColor-TimeInput--disabled");
+$borderColor-TimeInput--disabled: createThemeVar("borderColor-TimeInput--disabled");
+$minHeight-TimeInput: createThemeVar("minHeight-TimeInput");
+$gap-adornment-TimeInput: createThemeVar("gap-adornment-TimeInput");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .timeInputWrapper {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    min-height: var(--xmlui-minHeight-TimeInput);
+    padding: var(--xmlui-paddingVertical-TimeInput) var(--xmlui-paddingHorizontal-TimeInput);
+    gap: var(--xmlui-gap-adornment-TimeInput);
+    line-height: normal;
+    box-sizing: border-box;
+    border-radius: var(--xmlui-borderRadius-TimeInput);
+    border-color: var(--xmlui-borderColor-TimeInput);
+    border-width: var(--xmlui-borderWidth-TimeInput);
+    border-style: var(--xmlui-borderStyle-TimeInput);
+    background-color: var(--xmlui-backgroundColor-TimeInput);
+    box-shadow: var(--xmlui-boxShadow-TimeInput);
+    color: var(--xmlui-textColor-TimeInput);
+    font-size: var(--xmlui-fontSize-TimeInput);
+  }
+
+  .timeInputWrapper:hover {
+    border-color: var(--xmlui-borderColor-TimeInput--hover);
+    background-color: var(--xmlui-backgroundColor-TimeInput--hover);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--hover);
+    color: var(--xmlui-textColor-TimeInput--hover);
+  }
+
+  .timeInputWrapper:focus-within {
+    border-color: var(--xmlui-borderColor-TimeInput--focus);
+    background-color: var(--xmlui-backgroundColor-TimeInput--focus);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--focus);
+    color: var(--xmlui-textColor-TimeInput--focus);
+    outline-width: var(--xmlui-outlineWidth-TimeInput--focus);
+    outline-color: var(--xmlui-outlineColor-TimeInput--focus);
+    outline-style: var(--xmlui-outlineStyle-TimeInput--focus);
+    outline-offset: var(--xmlui-outlineOffset-TimeInput--focus);
+  }
+
+  .timeInputWrapper[data-xmlui-variant="TestInput"] {
+    border-color: var(--xmlui-borderColor-TimeInput-TestInput);
+  }
+
+  .error {
+    border-radius: var(--xmlui-borderRadius-TimeInput--error);
+    border-color: var(--xmlui-borderColor-TimeInput--error);
+    border-width: var(--xmlui-borderWidth-TimeInput--error);
+    border-style: var(--xmlui-borderStyle-TimeInput--error);
+    background-color: var(--xmlui-backgroundColor-TimeInput--error);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--error);
+    color: var(--xmlui-textColor-TimeInput--error);
+    font-size: var(--xmlui-fontSize-TimeInput--error);
+  }
+
+  .error:hover {
+    border-color: var(--xmlui-borderColor-TimeInput--error--hover);
+    background-color: var(--xmlui-backgroundColor-TimeInput--error--hover);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--error--hover);
+    color: var(--xmlui-textColor-TimeInput--error--hover);
+  }
+
+  .warning {
+    border-radius: var(--xmlui-borderRadius-TimeInput--warning);
+    border-color: var(--xmlui-borderColor-TimeInput--warning);
+    border-width: var(--xmlui-borderWidth-TimeInput--warning);
+    border-style: var(--xmlui-borderStyle-TimeInput--warning);
+    background-color: var(--xmlui-backgroundColor-TimeInput--warning);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--warning);
+    color: var(--xmlui-textColor-TimeInput--warning);
+    font-size: var(--xmlui-fontSize-TimeInput--warning);
+  }
+
+  .warning:hover {
+    border-color: var(--xmlui-borderColor-TimeInput--warning--hover);
+    background-color: var(--xmlui-backgroundColor-TimeInput--warning--hover);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--warning--hover);
+    color: var(--xmlui-textColor-TimeInput--warning--hover);
+  }
+
+  .valid {
+    border-radius: var(--xmlui-borderRadius-TimeInput--success);
+    border-color: var(--xmlui-borderColor-TimeInput--success);
+    border-width: var(--xmlui-borderWidth-TimeInput--success);
+    border-style: var(--xmlui-borderStyle-TimeInput--success);
+    background-color: var(--xmlui-backgroundColor-TimeInput--success);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--success);
+    color: var(--xmlui-textColor-TimeInput--success);
+    font-size: var(--xmlui-fontSize-TimeInput--success);
+  }
+
+  .valid:hover {
+    border-color: var(--xmlui-borderColor-TimeInput--success--hover);
+    background-color: var(--xmlui-backgroundColor-TimeInput--success--hover);
+    box-shadow: var(--xmlui-boxShadow-TimeInput--success--hover);
+    color: var(--xmlui-textColor-TimeInput--success--hover);
+  }
+
+  .disabled {
+    opacity: var(--xmlui-opacity-TimeInput--disabled);
+    background-color: var(--xmlui-backgroundColor-TimeInput--disabled);
+    border-color: var(--xmlui-borderColor-TimeInput--disabled);
+    color: var(--xmlui-textColor-TimeInput--disabled);
+  }
+
+  .wrapper,
+  .inputGroup {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .inputGroup {
+    gap: 0;
+  }
+
+  .input {
+    width: var(--xmlui-width-input-TimeInput);
+    min-width: var(--xmlui-minWidth-input-TimeInput);
+    padding: var(--xmlui-padding-input-TimeInput);
+    border: 0;
+    border-radius: var(--xmlui-borderRadius-input-TimeInput);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--xmlui-fontSize-input-TimeInput);
+    text-align: var(--xmlui-textAlign-input-TimeInput);
+    box-sizing: border-box;
+  }
+
+  .input:focus {
+    outline: none;
+  }
+
+  .input.invalid {
+    background-color: var(--xmlui-backgroundColor-input-TimeInput-invalid);
+  }
+
+  .divider {
+    color: var(--xmlui-color-divider-TimeInput);
+    margin: var(--xmlui-spacing-divider-TimeInput);
+    user-select: none;
+  }
+
+  .ampm,
+  .clearButton {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    border-radius: var(--xmlui-borderRadius-button-TimeInput);
+    padding: var(--xmlui-padding-button-TimeInput);
+    cursor: pointer;
+  }
+
+  .ampm {
+    min-width: var(--xmlui-minWidth-ampm-TimeInput);
+    font-size: var(--xmlui-fontSize-ampm-TimeInput);
+  }
+
+  .clearButton:hover,
+  .ampm:hover {
+    color: var(--xmlui-hoverColor-button-TimeInput);
+  }
+
+  .clearButton:disabled,
+  .ampm:disabled {
+    color: var(--xmlui-disabledColor-button-TimeInput);
+    cursor: default;
+  }
+
+  .clearButton:focus,
+  .ampm:focus {
+    outline-color: var(--xmlui-outlineColor-button-TimeInput--focused);
+    outline-width: var(--xmlui-outlineWidth-button-TimeInput--focused);
+    outline-offset: var(--xmlui-outlineOffset-button-TimeInput--focused);
+    outline-style: solid;
+  }
+
+  .adornment {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--xmlui-gap-adornment-TimeInput);
+  }
+}

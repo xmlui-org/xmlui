@@ -1,0 +1,12 @@
+<App var.selected="{0}">
+  <H1>RatingInput foundation</H1>
+  <Text>Selected rating: {selected || 'none'}</Text>
+  <RatingInput
+    id="ratingInput"
+    initialValue="{selected}"
+    placeholder="Rate this"
+    onDidChange="selected = ratingInput.value" />
+  <Button onClick="ratingInput.setValue(5); selected = ratingInput.value">
+    Set five stars
+  </Button>
+</App>

@@ -1,8 +1,9 @@
 import type { CSSProperties, FocusEvent, ReactNode } from "react";
-import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { forwardRef, memo, useId, useImperativeHandle } from "react";
 
 import { defaultProps } from "./Checkbox.defaults";
 import type { CheckboxValidationStatus } from "./checkbox-abstractions";
+import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
 
 const styles = {
   checkboxError: "checkboxError",
@@ -85,58 +86,17 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
   },
   ref,
 ) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const generatedInputId = useId();
-  const controlled = value !== undefined;
-  const [checked, setChecked] = useState(() => transformToLegitValue(value ?? initialValue));
+  const { inputRef, checked, updateValue, api } = useToggleController({
+    value,
+    initialValue,
+    enabled,
+    autoFocus,
+    indeterminate: Boolean(indeterminate),
+    onDidChange,
+  });
 
-  useEffect(() => {
-    if (controlled) {
-      setChecked(transformToLegitValue(value));
-    }
-  }, [controlled, value]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setChecked(transformToLegitValue(initialValue));
-    }
-  }, [controlled, initialValue]);
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.indeterminate = Boolean(indeterminate);
-    }
-  }, [indeterminate, checked]);
-
-  useEffect(() => {
-    if (!autoFocus || !enabled) {
-      return;
-    }
-    const timeoutId = setTimeout(() => inputRef.current?.focus(), 0);
-    return () => clearTimeout(timeoutId);
-  }, [autoFocus, enabled]);
-
-  const updateValue = useCallback((nextValue: unknown) => {
-    const normalized = transformToLegitValue(nextValue);
-    setChecked((current) => {
-      if (current !== normalized) {
-        void onDidChange?.(normalized);
-      }
-      return normalized;
-    });
-  }, [onDidChange]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        inputRef.current?.focus();
-      }
-    },
-    setValue: updateValue,
-    get value() {
-      return checked;
-    },
-  }), [checked, enabled, updateValue]);
+  useImperativeHandle(ref, () => api, [api]);
 
   const inputId = id ? `${id}__input` : generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
@@ -226,28 +186,6 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     </div>
   );
 }));
-
-export function transformToLegitValue(inp: unknown): boolean {
-  if (typeof inp === "undefined" || inp === null) {
-    return false;
-  }
-  if (typeof inp === "boolean") {
-    return inp;
-  }
-  if (typeof inp === "number") {
-    return Number.isNaN(inp) || Boolean(inp);
-  }
-  if (typeof inp === "string") {
-    return inp.trim() !== "" && inp.toLowerCase() !== "false";
-  }
-  if (Array.isArray(inp)) {
-    return inp.length > 0;
-  }
-  if (typeof inp === "object") {
-    return Object.keys(inp).length > 0;
-  }
-  return false;
-}
 
 function labelPositionClass(labelPosition: CheckboxProps["labelPosition"]): string {
   switch (labelPosition) {

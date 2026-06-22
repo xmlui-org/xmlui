@@ -14,6 +14,9 @@ import { XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
+import { ensureXmluiDebugBridge } from "./debug";
+
+ensureXmluiDebugBridge();
 
 export function createXmluiModule(
   document: XmluiDocumentInput,

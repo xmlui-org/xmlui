@@ -1,6 +1,6 @@
 import type { Plugin } from "vite";
 
-import { compileXmluiModule } from "../compiler/compileXmluiModule";
+import { compileXmluiModuleWithSourceMap } from "../compiler/compileXmluiModule";
 import type { Extension } from "../extensions";
 
 const XMLUI_RE = /\.xmlui$/;
@@ -18,9 +18,14 @@ export function xmluiPlugin(options: XmluiPluginOptions = {}): Plugin {
         return null;
       }
 
+      const compiled = compileXmluiModuleWithSourceMap({
+        id,
+        source,
+        extensions: options.extensions,
+      });
       return {
-        code: compileXmluiModule({ id, source, extensions: options.extensions }),
-        map: { mappings: "" },
+        code: compiled.code,
+        map: compiled.map,
       };
     },
   };

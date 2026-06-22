@@ -1,0 +1,33 @@
+<App var.count="{0}" var.lastAction="{'none'}">
+  <H1>Debug helpers</H1>
+  <Text testId="debug-count" value="{'count: ' + count}" />
+  <Text testId="debug-last-action" value="{'last action: ' + lastAction}" />
+  <Button
+    testId="debug-log-button"
+    onClick="
+      debugWatch('count before log increment', count); 
+      debugLog('before increment', count); 
+      count++; 
+      lastAction = 'debugLog'"
+  >
+    Watch, log, and increment
+  </Button>
+  <Button
+    testId="debug-trace-button"
+    onClick="
+      debugTrace('trace before increment'); 
+      count++; 
+      lastAction = 'debugTrace'"
+  >
+    Trace and increment
+  </Button>
+  <Button
+    testId="debug-break-button"
+    onClick="
+      debugBreak(); 
+      count++; 
+      lastAction = 'debugBreak'"
+  >
+    Break and increment
+  </Button>
+</App>

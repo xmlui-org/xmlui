@@ -1,0 +1,16 @@
+<App var.dateText="{'05/25/2024'}">
+  <H1>DateInput foundation</H1>
+  <Text>Selected date: {dateText}</Text>
+  <DateInput
+    id="dateInput"
+    testId="dateInput"
+    initialValue="{dateText}"
+    clearable="{true}"
+    onDidChange="dateText = dateInput.value || '(empty)'" />
+  <Button onClick="dateInput.setValue('12/31/2024'); dateText = dateInput.value">
+    Set New Year's Eve
+  </Button>
+  <Button onClick="dateInput.setValue(null); dateText = dateInput.value || '(empty)'">
+    Clear with API
+  </Button>
+</App>

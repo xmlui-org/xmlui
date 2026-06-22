@@ -1,0 +1,13 @@
+<App var.volume="{2}">
+  <H1>Slider foundation</H1>
+  <Text>Volume: {volume}</Text>
+  <Slider
+    id="volumeSlider"
+    minValue="0"
+    maxValue="10"
+    initialValue="{volume}"
+    onDidChange="volume = volumeSlider.value" />
+  <Button onClick="volumeSlider.setValue(8); volume = volumeSlider.value">
+    Set volume to 8
+  </Button>
+</App>

@@ -113,6 +113,23 @@ Current status for the components started so far:
   statuses, parts, tooltips, and animation. Deferred tests cover
   `Form`/`bindTo`, FormItem integration, require-label modes, validation
   feedback, and custom variant theme variables.
+- `Switch`: original `Switch.spec.ts` and `Switch.md` are copied into the
+  source-adjacent component folder. Verification:
+  `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`,
+  `npm --workspace xmlui run test -- --run`,
+  `npm --workspace xmlui run check:metadata`,
+  `npm --workspace xmlui run compatibility:component-transfer`,
+  `npm --workspace xmlui run compatibility:component-e2e-audit`, and
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/Switch/Switch.spec.ts` pass for the current slice. The copied
+  Switch suite now runs with 89 passing tests and 15 skipped/fixme. The passing
+  surface includes rendering, labels, checked/value coercion, click/keyboard
+  toggling, disabled/read-only states, autofocus, accessibility attributes,
+  label positions, events, APIs, switch-specific track/thumb styling, theme
+  variables, validation status colors, layout contexts, conditional rendering,
+  parts, tooltips, animation smoke coverage, and responsive breakpoint width
+  props. Deferred tests cover `Form`/`bindTo`, Form integration, require-label
+  modes, and custom variant theme variables.
 - `App`: original `App.spec.ts`, `App-layout.spec.ts`,
   `App-layout-mobile.spec.ts`, `App-navigation-events.spec.ts`, and
   `App-script-imports.spec.ts` are copied, but App migration is not complete.
@@ -218,6 +235,32 @@ Button styling migration rule:
   attributes belong on an outer wrapper, the driver-visible SVG must be a
   descendant, and an inner inline-block wrapper prevents flex-item
   blockification from changing the wrapper display observed by E2E tests.
+- `Switch` currently preserves the old user-visible toggle behavior directly
+  through the migrated internal `Toggle` primitive. Keep the copied Switch E2E
+  suite in place whenever shared Toggle behavior changes so primitive changes
+  cannot regress Switch track/thumb behavior.
+- `Switch` and `Checkbox` copied tests both expect expression `NaN` to coerce
+  to checked. Preserve that expectation unless a later compatibility review
+  deliberately reconciles it with the old low-level `Toggle` helper.
+- Switch focus outline CSS needs explicit literal fallbacks for outline width,
+  color, style, and offset. Some old tests override only one outline theme
+  variable, and missing fallback custom properties can otherwise compute the
+  outline width to `0px`.
+- `Toggle`: the old project has `Toggle.tsx`, `Toggle.defaults.ts`, and
+  `Toggle.module.scss` as a shared low-level primitive for `Checkbox` and
+  `Switch`, but no colocated public E2E suite. In the rewrite, keep Toggle as
+  internal shared behavior rather than a public built-in renderer. Verification
+  for Toggle changes should run the copied `Checkbox.spec.ts` and
+  `Switch.spec.ts` together. Current verification:
+  `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e --
+  src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts`
+  passed with 184 tests and 38 existing skips after extracting shared coercion,
+  state, autofocus, indeterminate, API, and Switch transition suppression into
+  `useToggleController`.
+- Keep component visuals in the public component stylesheets even when sharing
+  Toggle behavior. The migrated Toggle owns behavior; `Checkbox.module.scss`
+  and `Switch.module.scss` own their visible input classes and theme-variable
+  declarations.
 - `Icon` supports both wrapper clicks and direct SVG clicks. The old driver uses
   both patterns, so mouse handling belongs on the root wrapper while keyboard
   handling remains on the focusable SVG.

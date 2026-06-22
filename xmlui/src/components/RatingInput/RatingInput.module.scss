@@ -1,0 +1,89 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$textColor-placeholder-RatingInput: createThemeVar("textColor-placeholder-RatingInput");
+$fontSize-placeholder-RatingInput: createThemeVar("fontSize-placeholder-RatingInput");
+$color-star-RatingInput: createThemeVar("color-star-RatingInput");
+$color-star-RatingInput--active: createThemeVar("color-star-RatingInput--active");
+$fontSize-star-RatingInput: createThemeVar("fontSize-star-RatingInput");
+$gap-RatingInput: createThemeVar("gap-RatingInput");
+$outlineColor-RatingInput--error: createThemeVar("outlineColor-RatingInput--error");
+$outlineWidth-RatingInput--error: createThemeVar("outlineWidth-RatingInput--error");
+$outlineStyle-RatingInput--error: createThemeVar("outlineStyle-RatingInput--error");
+$borderRadius-RatingInput--error: createThemeVar("borderRadius-RatingInput--error");
+$outlineColor-RatingInput--warning: createThemeVar("outlineColor-RatingInput--warning");
+$outlineWidth-RatingInput--warning: createThemeVar("outlineWidth-RatingInput--warning");
+$outlineStyle-RatingInput--warning: createThemeVar("outlineStyle-RatingInput--warning");
+$borderRadius-RatingInput--warning: createThemeVar("borderRadius-RatingInput--warning");
+$outlineColor-RatingInput--valid: createThemeVar("outlineColor-RatingInput--valid");
+$outlineWidth-RatingInput--valid: createThemeVar("outlineWidth-RatingInput--valid");
+$outlineStyle-RatingInput--valid: createThemeVar("outlineStyle-RatingInput--valid");
+$borderRadius-RatingInput--valid: createThemeVar("borderRadius-RatingInput--valid");
+$opacity-RatingInput--disabled: createThemeVar("opacity-RatingInput--disabled");
+$opacity-RatingInput--readOnly: createThemeVar("opacity-RatingInput--readOnly");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .ratingInputRoot {
+    display: inline-flex;
+    align-items: center;
+    gap: $gap-RatingInput;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .ratingInputPlaceholder {
+    color: $textColor-placeholder-RatingInput;
+    font-size: $fontSize-placeholder-RatingInput;
+    margin-inline-end: 4px;
+  }
+
+  .ratingInputStar {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    color: $color-star-RatingInput;
+    cursor: pointer;
+    font: inherit;
+    font-size: $fontSize-star-RatingInput;
+    line-height: 1;
+  }
+
+  .ratingInputStarActive {
+    color: $color-star-RatingInput--active;
+  }
+
+  .ratingInputDisabled {
+    cursor: default;
+    opacity: $opacity-RatingInput--disabled;
+  }
+
+  .ratingInputReadOnly {
+    opacity: $opacity-RatingInput--readOnly;
+  }
+
+  .ratingInputError {
+    outline: $outlineWidth-RatingInput--error $outlineStyle-RatingInput--error $outlineColor-RatingInput--error;
+    border-radius: $borderRadius-RatingInput--error;
+    padding: 2px;
+  }
+
+  .ratingInputWarning {
+    outline: $outlineWidth-RatingInput--warning $outlineStyle-RatingInput--warning $outlineColor-RatingInput--warning;
+    border-radius: $borderRadius-RatingInput--warning;
+    padding: 2px;
+  }
+
+  .ratingInputValid {
+    outline: $outlineWidth-RatingInput--valid $outlineStyle-RatingInput--valid $outlineColor-RatingInput--valid;
+    border-radius: $borderRadius-RatingInput--valid;
+    padding: 2px;
+  }
+}

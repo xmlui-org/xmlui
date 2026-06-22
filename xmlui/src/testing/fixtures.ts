@@ -9,6 +9,9 @@ import {
   LinkDriver,
   NoResultDriver,
   NumberBoxDriver,
+  DateInputDriver,
+  SliderDriver,
+  TimeInputDriver,
   TextAreaDriver,
   TextBoxDriver,
 } from "./ComponentDrivers";
@@ -23,6 +26,7 @@ export type TestBedResult = {
   clipboard: {
     write: (value: string) => Promise<void>;
     paste: (target: Locator) => Promise<void>;
+    read: () => Promise<string>;
   };
   testStateDriver: {
     testState: () => Promise<unknown>;
@@ -42,12 +46,21 @@ type Fixtures = {
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
+  createDateInputDriver: (testId?: string | Locator) => Promise<DateInputDriver>;
+  createTimeInputDriver: (testId?: string | Locator) => Promise<TimeInputDriver>;
+  createSliderDriver: (testId?: string | Locator) => Promise<SliderDriver>;
   createCheckboxDriver: (testId?: string | Locator) => Promise<CheckboxDriver>;
   createIconDriver: (target: string | Locator) => Promise<IconDriver>;
   createHtmlTagDriver: () => Promise<ComponentDriver>;
   createStackDriver: (testId?: string) => Promise<ComponentDriver>;
   createVStackDriver: (testId?: string) => Promise<ComponentDriver>;
 };
+
+declare global {
+  interface Window {
+    __xmluiClipboardText?: string;
+  }
+}
 
 export const expect = baseExpect.extend({
   toEqualWithTolerance(actual: number, expected: number, tolerance: number) {
@@ -78,7 +91,7 @@ export const test = base.extend<Fixtures>({
       await initTestBed(page, markup, options);
       return {
         width: await page.locator("#root").evaluate((element) => element.getBoundingClientRect().width),
-        clipboard: createClipboardHelper(),
+        clipboard: createClipboardHelper(page),
         testStateDriver: {
           testState: async () => {
             const probedValue = await page.evaluate(() => window.__xmluiTestBedProbe?.readLocal("testState"));
@@ -174,6 +187,39 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createDateInputDriver: async ({ page }, use) => {
+    await use(async (testId) => new DateInputDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="DateInput"]').first(),
+      page,
+    }));
+  },
+  createTimeInputDriver: async ({ page }, use) => {
+    await use(async (testId) => new TimeInputDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="TimeInput"]').first(),
+      page,
+    }));
+  },
+  createSliderDriver: async ({ page }, use) => {
+    await use(async (testId) => new SliderDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Slider"]').first(),
+      page,
+    }));
+  },
   createCheckboxDriver: async ({ page }, use) => {
     await use(async (testId) => new CheckboxDriver({
       locator: typeof testId === "string"
@@ -181,7 +227,7 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`[data-xmlui-id="${testId}"]`))
             .or(page.locator(`#${testId}`))
             .first()
-        : testId ?? page.locator('[data-xmlui-component="Checkbox"]').first(),
+        : testId ?? page.locator('[data-xmlui-component="Checkbox"], [data-xmlui-component="Switch"]').first(),
       page,
     }));
   },
@@ -211,14 +257,21 @@ export const test = base.extend<Fixtures>({
   },
 });
 
-function createClipboardHelper() {
+function createClipboardHelper(page: Page) {
   let text = "";
   return {
     write: async (value: string) => {
       text = value;
+      await page.evaluate((clipboardText) => {
+        window.__xmluiClipboardText = clipboardText;
+      }, value);
     },
     paste: async (target: Locator) => {
       await target.fill(text);
+    },
+    read: async () => {
+      const browserText = await page.evaluate(() => window.__xmluiClipboardText ?? "");
+      return browserText || text;
     },
   };
 }
@@ -230,6 +283,16 @@ async function initTestBed(
 ): Promise<void> {
   const source = normalizeTestBedSource(markup, options);
   await page.addInitScript((xmluiSource) => {
+    window.__xmluiClipboardText = "";
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value: string) => {
+          window.__xmluiClipboardText = value;
+        },
+        readText: async () => window.__xmluiClipboardText ?? "",
+      },
+    });
     window.sessionStorage.setItem("__xmluiTestBedSource", xmluiSource);
   }, source);
   await page.goto("/?__xmluiTestBed=1");
@@ -288,6 +351,7 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`initialValue="{() => {}}"`, `initialValue="{{}}"`)
     .replaceAll(`testState = ++testState || 1`, `testState = (testState || 0) + 1`)
     .replaceAll(`onDidChange="{(val) => {value = val}}"`, `onDidChange="val => value = val"`)
+    .replaceAll(`onDidChange="arg => {testState = arg; console.log('arg', arg)}"`, `onDidChange="arg => testState = arg"`)
     .replaceAll(`icon="() => {}"`, `icon="{null}"`)
     .replaceAll(`src="{() => '/resources/test-image-100x100.jpg'}"`, `src="{null}"`)
     .replaceAll(`alt="{() => '/resources/test-image-100x100.jpg'}"`, `alt="{null}"`)

@@ -35,6 +35,12 @@ import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/Te
 import { textAreaRenderer } from "../components/TextArea/TextArea";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
 import { checkboxRenderer } from "../components/Checkbox/Checkbox";
+import { switchRenderer } from "../components/Switch/Switch";
+import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
+import { sliderRenderer } from "../components/Slider/Slider";
+import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
+import { dateInputRenderer } from "../components/DateInput/DateInput";
+import { timeInputRenderer } from "../components/TimeInput/TimeInput";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -81,6 +87,12 @@ const implementedRuntimeNames = [
   "TextArea",
   "NumberBox",
   "Checkbox",
+  "Switch",
+  "RatingInput",
+  "Slider",
+  "ColorPicker",
+  "DateInput",
+  "TimeInput",
   "Select",
   "Option",
   "Pages",
@@ -125,6 +137,12 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   TextArea: textAreaRenderer,
   NumberBox: numberBoxRenderer,
   Checkbox: checkboxRenderer,
+  Switch: switchRenderer,
+  RatingInput: ratingInputRenderer,
+  Slider: sliderRenderer,
+  ColorPicker: colorPickerRenderer,
+  DateInput: dateInputRenderer,
+  TimeInput: timeInputRenderer,
   ...htmlTagRenderers,
 };
 
@@ -162,6 +180,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const textAreaTransferred = contract.name === "TextArea";
     const numberBoxTransferred = contract.name === "NumberBox";
     const checkboxTransferred = contract.name === "Checkbox";
+    const switchTransferred = contract.name === "Switch";
+    const ratingInputTransferred = contract.name === "RatingInput";
+    const sliderTransferred = contract.name === "Slider";
+    const colorPickerTransferred = contract.name === "ColorPicker";
+    const dateInputTransferred = contract.name === "DateInput";
+    const timeInputTransferred = contract.name === "TimeInput";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
@@ -187,6 +211,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       textAreaTransferred ||
       numberBoxTransferred ||
       checkboxTransferred ||
+      switchTransferred ||
+      ratingInputTransferred ||
+      sliderTransferred ||
+      colorPickerTransferred ||
+      dateInputTransferred ||
+      timeInputTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
@@ -219,7 +249,19 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                   ? "NumberBox"
                   : checkboxTransferred
                     ? "Checkbox"
-            : contract.name;
+                    : switchTransferred
+                      ? "Switch"
+                      : ratingInputTransferred
+                        ? "RatingInput"
+                        : sliderTransferred
+                          ? "Slider"
+                          : colorPickerTransferred
+                            ? "ColorPicker"
+                            : dateInputTransferred
+                              ? "DateInput"
+                              : timeInputTransferred
+                                ? "TimeInput"
+                                : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
       : sharedComponentFile;
@@ -240,6 +282,18 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NumberBoxReact.tsx`);
     } else if (checkboxTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/CheckboxReact.tsx`);
+    } else if (switchTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SwitchReact.tsx`);
+    } else if (ratingInputTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/RatingInputReact.tsx`);
+    } else if (sliderTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SliderReact.tsx`);
+    } else if (colorPickerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ColorPickerReact.tsx`);
+    } else if (dateInputTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DateInputReact.tsx`);
+    } else if (timeInputTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TimeInputReact.tsx`);
     } else if (headingTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/HeadingReact.tsx`);
     } else if (imageTransferred) {
@@ -277,6 +331,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       textAreaTransferred,
       numberBoxTransferred,
       checkboxTransferred,
+      switchTransferred,
+      ratingInputTransferred,
+      sliderTransferred,
+      colorPickerTransferred,
+      dateInputTransferred,
+      timeInputTransferred,
       headingTransferred,
       htmlTagTransferred,
       brTransferred,
@@ -343,6 +403,12 @@ function componentRunnablePaths(flags: {
   textAreaTransferred: boolean;
   numberBoxTransferred: boolean;
   checkboxTransferred: boolean;
+  switchTransferred: boolean;
+  ratingInputTransferred: boolean;
+  sliderTransferred: boolean;
+  colorPickerTransferred: boolean;
+  dateInputTransferred: boolean;
+  timeInputTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
   brTransferred: boolean;
@@ -395,6 +461,24 @@ function componentRunnablePaths(flags: {
   }
   if (flags.checkboxTransferred) {
     return ["xmlui/src/components/Checkbox/Checkbox.spec.ts"];
+  }
+  if (flags.switchTransferred) {
+    return ["xmlui/src/components/Switch/Switch.spec.ts"];
+  }
+  if (flags.ratingInputTransferred) {
+    return ["xmlui/src/components/RatingInput/RatingInput.spec.ts"];
+  }
+  if (flags.sliderTransferred) {
+    return ["xmlui/src/components/Slider/Slider.spec.ts"];
+  }
+  if (flags.colorPickerTransferred) {
+    return ["xmlui/src/components/ColorPicker/ColorPicker.spec.ts"];
+  }
+  if (flags.dateInputTransferred) {
+    return ["xmlui/src/components/DateInput/DateInput.spec.ts"];
+  }
+  if (flags.timeInputTransferred) {
+    return ["xmlui/src/components/TimeInput/TimeInput.spec.ts"];
   }
   if (flags.headingTransferred) {
     return [

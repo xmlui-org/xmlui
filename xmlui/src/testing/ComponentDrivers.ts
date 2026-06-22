@@ -164,6 +164,46 @@ export class NumberBoxDriver extends InputComponentDriver {
   };
 }
 
+export class DateInputDriver extends InputComponentDriver {
+  get dayInput(): Locator {
+    return this.getByPartName("day");
+  }
+
+  get monthInput(): Locator {
+    return this.getByPartName("month");
+  }
+
+  get yearInput(): Locator {
+    return this.getByPartName("year");
+  }
+
+  get clearButton(): Locator {
+    return this.getByPartName("clearButton");
+  }
+}
+
+export class TimeInputDriver extends InputComponentDriver {
+  get hourInput(): Locator {
+    return this.getByPartName("hour");
+  }
+
+  get minuteInput(): Locator {
+    return this.getByPartName("minute");
+  }
+
+  get secondInput(): Locator {
+    return this.getByPartName("second");
+  }
+
+  get amPmInput(): Locator {
+    return this.getByPartName("ampm");
+  }
+
+  get clearButton(): Locator {
+    return this.getByPartName("clearButton");
+  }
+}
+
 export class CheckboxDriver extends InputComponentDriver {
   get input(): Locator {
     return this.component.locator("input").or(this.component).first();
@@ -177,5 +217,49 @@ export class CheckboxDriver extends InputComponentDriver {
     return this.input.evaluate((element) =>
       window.getComputedStyle(element, "::before").color,
     );
+  }
+}
+
+export class SliderDriver extends ComponentDriver {
+  private async getActiveThumb(thumbNumber = 0): Promise<Locator> {
+    const thumbs = this.params.page.getByRole("slider");
+    const thumbCount = await thumbs.count();
+    if (thumbCount === 0) {
+      throw new Error("No slider thumb found.");
+    }
+    return thumbs.nth(Math.max(0, Math.min(thumbNumber, thumbCount - 1)));
+  }
+
+  async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber = 0) {
+    const track = this.params.page.locator("[data-track]");
+    await track.waitFor({ state: "visible" });
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.waitFor({ state: "visible" });
+    const trackBox = await track.boundingBox();
+    if (!trackBox) {
+      throw new Error("Could not get slider track bounds.");
+    }
+    const targetX = location === "start"
+      ? trackBox.x
+      : location === "end"
+        ? trackBox.x + trackBox.width
+        : trackBox.x + trackBox.width / 2;
+    const targetY = trackBox.y + trackBox.height / 2;
+    await activeThumb.hover();
+    await this.params.page.mouse.down({ button: "left" });
+    await this.params.page.mouse.move(targetX, targetY);
+    await this.params.page.mouse.up();
+  }
+
+  async stepThumbByKeyboard(
+    key: "ArrowLeft" | "ArrowRight" | "Home" | "End",
+    thumbNumber = 0,
+    repeat = 1,
+  ) {
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.focus();
+    for (let i = 0; i < repeat; i += 1) {
+      await this.params.page.keyboard.press(key);
+    }
   }
 }

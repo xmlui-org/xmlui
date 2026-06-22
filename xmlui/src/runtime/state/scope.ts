@@ -1,5 +1,6 @@
 import type { CompiledEventContext, CompiledExpressionContext } from "../../compiler/scriptSemantics";
 import { managedFetchService } from "../data";
+import { getXmluiDebugBridge } from "../debug";
 import type { RuntimeRoutingStore } from "../routing";
 import type { ToastService } from "../services/toast";
 import type { RuntimeStateStore } from "./store";
@@ -116,6 +117,7 @@ export function createExpressionContext(scope: RuntimeScope | undefined): Compil
     readGlobal: (name) => readGlobal(scope, name),
     readContext: (name) => readContext(scope, name),
     readReference: (name) => readBuiltInReference(scope, name) ?? readReference(scope, name),
+    debug: getXmluiDebugBridge(),
   };
 }
 

@@ -16,6 +16,12 @@ import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
 import "./components/TextArea/TextArea.module.scss?xmlui-css-module";
 import "./components/NumberBox/NumberBox.module.scss?xmlui-css-module";
 import "./components/Checkbox/Checkbox.module.scss?xmlui-css-module";
+import "./components/Switch/Switch.module.scss?xmlui-css-module";
+import "./components/RatingInput/RatingInput.module.scss?xmlui-css-module";
+import "./components/Slider/Slider.module.scss?xmlui-css-module";
+import "./components/ColorPicker/ColorPicker.module.scss?xmlui-css-module";
+import "./components/DateInput/DateInput.module.scss?xmlui-css-module";
+import "./components/TimeInput/TimeInput.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -36,6 +42,7 @@ import separatorSpacingApp from "./examples/separator-spacing/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
 import dataSourceRefetchApp from "./examples/data-source-refetch/Main.xmlui";
+import debugHelpersApp from "./examples/debug-helpers/Main.xmlui";
 import expressionUpdateComponentsApp from "./examples/expression-update-components/Main.xmlui";
 import expressionUpdatesApp from "./examples/expression-updates/Main.xmlui";
 import eventTagHandlerApp from "./examples/event-tag-handler/Main.xmlui";
@@ -73,6 +80,12 @@ import textAreaFoundationApp from "./examples/text-area-foundation/Main.xmlui";
 import textBoxFoundationApp from "./examples/text-box-foundation/Main.xmlui";
 import numberBoxFoundationApp from "./examples/number-box-foundation/Main.xmlui";
 import checkboxFoundationApp from "./examples/checkbox-foundation/Main.xmlui";
+import switchFoundationApp from "./examples/switch-foundation/Main.xmlui";
+import ratingInputFoundationApp from "./examples/rating-input-foundation/Main.xmlui";
+import sliderFoundationApp from "./examples/slider-foundation/Main.xmlui";
+import colorPickerFoundationApp from "./examples/color-picker-foundation/Main.xmlui";
+import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui";
+import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -107,6 +120,7 @@ const examples = {
   components: componentCounterApp,
   dataSourceMock: dataSourceMockApp,
   dataSourceRefetch: dataSourceRefetchApp,
+  debugHelpers: debugHelpersApp,
   expressions: broaderExpressionsApp,
   expressionComponents: expressionUpdateComponentsApp,
   expressionUpdates: expressionUpdatesApp,
@@ -145,6 +159,12 @@ const examples = {
   textBoxFoundation: textBoxFoundationApp,
   numberBoxFoundation: numberBoxFoundationApp,
   checkboxFoundation: checkboxFoundationApp,
+  switchFoundation: switchFoundationApp,
+  ratingInputFoundation: ratingInputFoundationApp,
+  sliderFoundation: sliderFoundationApp,
+  colorPickerFoundation: colorPickerFoundationApp,
+  dateInputFoundation: dateInputFoundationApp,
+  timeInputFoundation: timeInputFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

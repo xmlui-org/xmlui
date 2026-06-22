@@ -1,0 +1,12 @@
+<App var.enabled="{false}" var.required="{true}">
+  <H1>Switch foundation</H1>
+  <Text>Enabled: {enabled ? 'yes' : 'no'}</Text>
+  <Switch
+    label="Enable notifications"
+    initialValue="{enabled}"
+    required="{required}"
+    onDidChange="value => enabled = value" />
+  <Button onClick="required = !required">
+    Toggle required marker
+  </Button>
+</App>

@@ -152,6 +152,9 @@ export function resolveResponsiveLayoutStyles(
     if (value === undefined || value === null || value === "") {
       continue;
     }
+    if (looksLikeComponentThemeVariableName(key)) {
+      continue;
+    }
     const selector = parseStyleSelectorKey(key);
     if (!supportedLayoutPropNames.includes(selector.property as never)) {
       continue;
@@ -335,6 +338,9 @@ function assignInlineCss(style: CSSProperties, value: unknown): void {
 }
 
 function cssNameToReactName(name: string): string {
+  if (name.startsWith("--")) {
+    return name;
+  }
   return name.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase());
 }
 
@@ -385,6 +391,10 @@ function findLayoutPropertyPrefix(
     }
   }
   return undefined;
+}
+
+export function looksLikeComponentThemeVariableName(name: string): boolean {
+  return /-[A-Z][A-Za-z0-9]*(?:-|$)/.test(name);
 }
 
 function isBreakpoint(value: string | undefined): value is keyof typeof responsiveBreakpoints {
