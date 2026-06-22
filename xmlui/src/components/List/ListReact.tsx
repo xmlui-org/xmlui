@@ -948,15 +948,52 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     if (!virtualizerRef.current) return;
     if (!shouldStickToBottom.current) return;
     requestAnimationFrame(() => {
+      const v = virtualizerRef.current;
+      if (!v) return;
       programmaticScroll.current = true;
-      virtualizerRef.current?.scrollToIndex(rows.length - 1, {
-        align: "end",
-      });
+      // Scroll to the absolute bottom of the scrollable content rather than to
+      // the last item's end: while a newly appended item is still measuring
+      // (e.g. async Markdown streaming in), aligning to its current end can land
+      // a hair short of the true bottom. scrollTo(scrollSize) clamps to the real
+      // bottom regardless of item boundaries or trailing space.
+      v.scrollTo(v.scrollSize);
       requestAnimationFrame(() => {
         programmaticScroll.current = false;
       });
     });
   }, [rows]);
+
+  // Re-assert stick-to-bottom when the content GROWS while we are following.
+  // The effect above fires on `rows` (data) changes, but children that lay out
+  // asynchronously — Markdown, images, fold/unfold — keep growing *after* that
+  // scroll, below the fold. virtua's onScroll fires only on real scroll (not on
+  // content-height growth) and virtua does not auto-stick on append, so without
+  // this the list lands "almost" at the bottom and drifts up as late-measuring
+  // content settles. A ResizeObserver on the content wrapper catches exactly
+  // those size changes; we re-scroll only while shouldStickToBottom is set, so a
+  // user who scrolled up to read is never yanked back down.
+  const hasRows = rows.length > 0;
+  useEffect(() => {
+    if (scrollAnchor !== "bottom") return;
+    if (typeof ResizeObserver === "undefined") return;
+    const container = parentRef.current?.querySelector("[data-list-container]");
+    if (!container) return;
+    const observer = new ResizeObserver(() => {
+      if (!shouldStickToBottom.current) return;
+      if (programmaticScroll.current) return;
+      const v = virtualizerRef.current;
+      if (!v) return;
+      programmaticScroll.current = true;
+      // Absolute bottom (see the [rows] effect above) — robust to a still-
+      // measuring trailing item, which is exactly what the observer catches.
+      v.scrollTo(v.scrollSize);
+      requestAnimationFrame(() => {
+        programmaticScroll.current = false;
+      });
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [scrollAnchor, hasRows]);
 
   const isFetchingPrevPage = useRef(false);
   const tryToFetchPrevPage = useCallback(() => {
@@ -1010,19 +1047,35 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     }
   }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
 
+  const lastScrollOffset = useRef(0);
   const handleVirtuaScroll = useCallback(
     (offset) => {
       if (!virtualizerRef.current) return;
       // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
       const atEnd =
         offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
+      const prevOffset = lastScrollOffset.current;
+      lastScrollOffset.current = offset;
+      const movedTowardTop = offset < prevOffset - 0.5;
+      const offsetChanged = Math.abs(offset - prevOffset) > 0.5;
       if (scrollAnchor === "bottom" && !programmaticScroll.current) {
-        shouldStickToBottom.current = atEnd;
+        // Stop following only on a genuine upward user scroll. When appended
+        // content grows below the fold, virtua fires onScroll with the SAME
+        // offset against a larger scrollSize, so atEnd is momentarily false —
+        // that must NOT be read as "the user scrolled up", or follow would die
+        // on every new item. In that case leave the flag unchanged; the
+        // re-stick effect/observer pins us back to the true bottom.
+        if (atEnd) {
+          shouldStickToBottom.current = true;
+        } else if (movedTowardTop) {
+          shouldStickToBottom.current = false;
+        }
       }
-      // Report scroll state to consumers, but only for user-driven scrolls —
-      // the List's own/auto scrolls are guarded by programmaticScroll so they
-      // don't emit spurious user-scroll events.
-      if (!programmaticScroll.current) {
+      // Report scroll state to consumers, but only for genuine user scrolls
+      // (the offset actually moved) and never during our own/auto programmatic
+      // scrolls — so a content-growth tick can't masquerade as the user
+      // leaving the bottom.
+      if (!programmaticScroll.current && offsetChanged) {
         onScroll?.({
           scrollTop: offset,
           scrollHeight: virtualizerRef.current.scrollSize,
