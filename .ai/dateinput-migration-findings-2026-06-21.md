@@ -38,6 +38,16 @@
 - Component theme variable names can look like layout props. Shared layout
   parsing must avoid treating component theme variables as responsive part
   layout props.
+- Validation state selectors must be component-qualified in the current raw
+  stylesheet loader. Generic `.warning`, `.error`, `.valid`, and `.disabled`
+  selectors collide with sibling input components such as TimeInput because the
+  migrated SCSS class names are currently global in browser tests. Use selectors
+  such as `.dateInputWrapper.warning` so DateInput state rules keep their own
+  theme variables and specificity.
+- Validation hover theme variables need explicit default fallback entries for
+  `--error--hover`, `--warning--hover`, and `--success--hover`; otherwise old
+  tests that override only a state hover token may not have a stable fallback
+  chain for the remaining state hover properties.
 
 ## Deferred Coverage
 
