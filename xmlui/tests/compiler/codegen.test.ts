@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   emitGeneratedEventHandler,
@@ -195,6 +195,9 @@ describe("script function generation", () => {
     expect(generated.body).toContain(`ctx.writeLocal("count", (ctx.readLocal("count") + 1));`);
     expect(generated.body).toContain("while (");
     expect(generated.body).not.toContain("XMLUI handler loop guard exceeded");
+    expect(generated.mappings.length).toBeGreaterThanOrEqual(5);
+    expect(generated.mappings[0].generatedLine).toBe(0);
+    expect(generated.mappings.some((mapping) => mapping.generatedLine > 0)).toBe(true);
     expect(generated.invalidates).toEqual([
       { kind: "local", name: "count" },
       { kind: "local", name: "total" },
@@ -234,6 +237,58 @@ describe("script function generation", () => {
     expect(generated.body).toContain("let __xmluiLoopCheckpoint1 = 0;");
     expect(generated.body).toContain("if (((++__xmluiLoopCheckpoint1) & 255) === 0)");
     expect(generated.body).not.toContain("let __xmluiLoopCheckpoint0 = 0;\nwhile");
+  });
+
+  it("generates built-in debug helper calls for event handlers", () => {
+    const event = eventFrom(
+      `<App var.count="{0}" var.label="{''}"><Button onClick="debugWatch('count', count); debugLog('before', count); debugTrace('trace'); debugBreak(); count++; label = 'done'" /></App>`,
+    );
+    const generated = generateEventHandlerFunction(event.ir!, event.writes);
+
+    expect(generated.body).toContain(`ctx.debug?.emit({ kind: "watch", label: __xmluiDebugArgs[0], value: __xmluiDebugArgs[1], args: __xmluiDebugArgs`);
+    expect(generated.body).toContain(`ctx.debug?.emit({ kind: "log", args: __xmluiDebugArgs`);
+    expect(generated.body).toContain(`ctx.debug?.emit({ kind: "trace", args: __xmluiDebugArgs`);
+    expect(generated.body).toContain(`console.log("[xmlui watch]", ...__xmluiDebugArgs);`);
+    expect(generated.body).toContain(`console.log(...__xmluiDebugArgs);`);
+    expect(generated.body).toContain(`console.trace(...__xmluiDebugArgs);`);
+    expect(generated.body).toContain(`ctx.debug?.emit({ kind: "break", args: []`);
+    expect(generated.body).toContain("debugger;");
+    expect(generated.body).toContain("__xmluiResult = undefined;");
+    expect(generated.body).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+  });
+
+  it("emits structured debug events while running generated handlers", async () => {
+    const event = eventFrom(
+      `<App var.count="{0}"><Button onClick="debugWatch('count', count); count++" /></App>`,
+    );
+    const generated = generateEventHandlerFunction(event.ir!, event.writes);
+    const events: unknown[] = [];
+    const locals = { count: 2 };
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    try {
+      await runGeneratedEvent(generated.functionSource, {
+        locals,
+        globals: {},
+        debug: {
+          version: 1,
+          subscribe: () => () => undefined,
+          emit: (event) => events.push(event),
+        },
+      });
+    } finally {
+      log.mockRestore();
+    }
+
+    expect(events).toEqual([
+      expect.objectContaining({
+        kind: "watch",
+        label: "count",
+        value: 2,
+        args: ["count", 2],
+      }),
+    ]);
+    expect(locals.count).toBe(3);
   });
 
   it("generates executable expression functions for broader expression syntax", () => {
@@ -358,12 +413,14 @@ describe("runtime descriptor attachment and module emission", () => {
       },
     });
     expect(button.parsed.events.click.generatedName).toContain("event_");
+    expect(String(button.parsed.events.click.execute)).toContain("async function event_");
     expect(button.parsed.events.click.compiledSource).toContain("__xmluiYieldIfNeeded");
     expect(button.parsed.events.click.compiledSource).toContain(
       `__xmluiResult = ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
     );
     expect(button.parsed.events.click.compiledSource).toContain("return __xmluiResult;");
     expect(text.segments[1].generatedName).toContain("expr_");
+    expect(String(text.segments[1].evaluate)).toContain("function expr_");
     expect(text.segments[1].evaluate(fakeContext({ globals: { count: 3 } }))).toBe(3);
   });
 
@@ -411,7 +468,11 @@ function runGeneratedExpression(
 
 function runGeneratedEvent(
   functionSource: string,
-  options: { locals: Record<string, unknown>; globals: Record<string, unknown> },
+  options: {
+    locals: Record<string, unknown>;
+    globals: Record<string, unknown>;
+    debug?: ReturnType<typeof fakeContext>["debug"];
+  },
 ): Promise<void> {
   const fn = evaluateGeneratedFunction(functionSource) as (ctx: ReturnType<typeof fakeContext>) => Promise<void>;
   return fn(fakeContext(options));
@@ -421,9 +482,20 @@ function fakeContext({
   props = {},
   locals = {},
   globals = {},
-}: { props?: Record<string, unknown>; locals?: Record<string, unknown>; globals?: Record<string, unknown> } = {}) {
+  debug,
+}: {
+  props?: Record<string, unknown>;
+  locals?: Record<string, unknown>;
+  globals?: Record<string, unknown>;
+  debug?: {
+    version: 1;
+    subscribe(listener: (event: any) => void): () => void;
+    emit(event: any): void;
+  };
+} = {}) {
   return {
     props,
+    debug,
     readLocal: (name: string) => locals[name],
     readGlobal: (name: string) => globals[name],
     writeLocal: (name: string, value: unknown) => {

@@ -13,16 +13,25 @@ import type {
   XmluiWhileStatementIr,
 } from "../scriptSemantics";
 import { handlerUsesSharedYield, loopNeedsPacing, statementNeedsCheckpoint } from "../eventHandlerAnalysis";
+import type { SourceSpan } from "../../parser";
 import { emitFunctionExpression } from "./emitter";
+
+export type GeneratedSourceMapping = {
+  generatedLine: number;
+  generatedColumn: number;
+  sourceSpan: SourceSpan;
+};
 
 export type GeneratedExpressionFunctionSource = {
   body: string;
   functionSource: string;
+  mappings: GeneratedSourceMapping[];
 };
 
 export type GeneratedEventFunctionSource = {
   body: string;
   functionSource: string;
+  mappings: GeneratedSourceMapping[];
   invalidates: Array<{ kind: "local" | "global"; name: string }>;
 };
 
@@ -33,13 +42,22 @@ export type SharedYieldHelperOptions = {
 
 export type GenerateEventHandlerFunctionOptions = {
   yieldHelper?: "inline" | "none" | SharedYieldHelperOptions;
+  functionName?: string;
 };
 
-export function generateExpressionFunction(ir: XmluiScriptIr): GeneratedExpressionFunctionSource {
+export type GenerateExpressionFunctionOptions = {
+  functionName?: string;
+};
+
+export function generateExpressionFunction(
+  ir: XmluiScriptIr,
+  options: GenerateExpressionFunctionOptions = {},
+): GeneratedExpressionFunctionSource {
   const body = `return ${emitExpression(ir)};`;
   return {
     body,
-    functionSource: emitFunctionExpression(body),
+    functionSource: emitFunctionExpression(body, "ctx", { name: options.functionName }),
+    mappings: [{ generatedLine: 1, generatedColumn: 2, sourceSpan: ir.span }],
   };
 }
 
@@ -52,22 +70,87 @@ export function generateEventHandlerFunction(
     ir.options.executionMode === "sync" ? "none" : options.yieldHelper ?? "inline",
     collectHandlerLocalNames(ir.body),
   );
-  const body = [
+  const bodyLines = [
     ...context.prologue,
     context.stateDeclaration,
     "let __xmluiResult;",
     ...ir.body.map((statement) => emitEventStatement(statement, context)),
     "return __xmluiResult;",
-  ].join("\n");
+  ];
+  const body = bodyLines.join("\n");
   return {
     body,
-    functionSource: emitFunctionExpression(body, "ctx", { async: true }),
+    functionSource: emitFunctionExpression(body, "ctx", { async: true, name: options.functionName }),
+    mappings: collectEventFunctionMappings(body, ir.body),
     invalidates: dedupeInvalidates(writes
       .filter((write): write is BoundWriteTarget & { kind: "local" | "global" } =>
         write.kind === "local" || write.kind === "global",
       )
       .map((write) => ({ kind: write.kind, name: write.name }))),
   };
+}
+
+function collectEventFunctionMappings(
+  body: string,
+  statements: readonly XmluiHandlerStatementIr[],
+): GeneratedSourceMapping[] {
+  const sourceSpans = collectStatementSourceSpans(statements);
+  const entryMappings = sourceSpans.length > 0
+    ? [{ generatedLine: 0, generatedColumn: 0, sourceSpan: sourceSpans[0] }]
+    : [];
+  const generatedLines = body.split("\n");
+  const executableLines = generatedLines
+    .map((line, index) => ({ line, index }))
+    .filter(({ line }) => isMappableGeneratedEventLine(line));
+  return [
+    ...entryMappings,
+    ...sourceSpans
+    .slice(0, executableLines.length)
+    .map((sourceSpan, index) => ({
+      generatedLine: executableLines[index].index + 1,
+      generatedColumn: 2,
+      sourceSpan,
+    })),
+  ];
+}
+
+function collectStatementSourceSpans(statements: readonly XmluiHandlerStatementIr[]): SourceSpan[] {
+  const spans: SourceSpan[] = [];
+  const visit = (statement: XmluiHandlerStatementIr) => {
+    switch (statement.kind) {
+      case "ExpressionStatement":
+        spans.push(statement.expression.span);
+        break;
+      case "VariableDeclaration":
+        spans.push(statement.span);
+        break;
+      case "IfStatement":
+        spans.push(statement.test.span);
+        visit(statement.consequent);
+        if (statement.alternate) {
+          visit(statement.alternate);
+        }
+        break;
+      case "WhileStatement":
+        spans.push(statement.test.span);
+        visit(statement.body);
+        break;
+      case "BlockStatement":
+        statement.body.forEach(visit);
+        break;
+    }
+  };
+  statements.forEach(visit);
+  return spans;
+}
+
+function isMappableGeneratedEventLine(line: string): boolean {
+  const trimmed = line.trim();
+  return trimmed.startsWith("__xmluiResult =") ||
+    (trimmed.startsWith("let ") && !trimmed.startsWith("let __xmlui")) ||
+    (trimmed.startsWith("const ") && !trimmed.startsWith("const __xmlui")) ||
+    (trimmed.startsWith("if (") && !trimmed.includes("__xmluiLoopCheckpoint")) ||
+    trimmed.startsWith("while (");
 }
 
 type EventCodegenContext = {
@@ -199,6 +282,18 @@ function emitOptionalIndexRead(object: XmluiScriptIr, index: XmluiScriptIr): str
 }
 
 function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" }>): string {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugLog") {
+    return emitDebugHelperCall("log", ir.args.map(emitExpression), "console.log");
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugTrace") {
+    return emitDebugHelperCall("trace", ir.args.map(emitExpression), "console.trace");
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugWatch") {
+    return emitDebugHelperCall("watch", ir.args.map(emitExpression), "console.log", "[xmlui watch]");
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugBreak") {
+    return "undefined";
+  }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot generate unsupported XMLUI expression call target.");
   }
@@ -217,6 +312,9 @@ function emitEventStatement(statement: XmluiHandlerStatementIr, context: EventCo
 function emitEventStatementBody(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
   switch (statement.kind) {
     case "ExpressionStatement":
+      if (isDebugBreakCall(statement.expression)) {
+        return `${emitDebugBreakStatement()}\n__xmluiResult = undefined;`;
+      }
       return `__xmluiResult = ${emitEventExpression(statement.expression)};`;
     case "VariableDeclaration":
       return emitVariableDeclaration(statement);
@@ -250,6 +348,18 @@ function emitAsyncExpression(expression: XmluiScriptIr): string {
 
 function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" }>): string {
   const args = ir.args.map(emitAsyncExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugBreak") {
+    return "undefined";
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugLog") {
+    return emitDebugHelperCall("log", ir.args.map(emitAsyncExpression), "console.log");
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugTrace") {
+    return emitDebugHelperCall("trace", ir.args.map(emitAsyncExpression), "console.trace");
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugWatch") {
+    return emitDebugHelperCall("watch", ir.args.map(emitAsyncExpression), "console.log", "[xmlui watch]");
+  }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "delay") {
     return `await ((ctx.delay ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(${args}))`;
   }
@@ -269,6 +379,36 @@ function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpress
   }
   const objectSource = emitAsyncExpression(ir.callee.object);
   return `await (ctx.complete ?? ((value) => Promise.resolve(value)))(await (ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args}]))`;
+}
+
+function isDebugBreakCall(expression: XmluiScriptIr): boolean {
+  return expression.kind === "CallExpression" &&
+    expression.callee.kind === "IdentifierRead" &&
+    expression.callee.name === "debugBreak";
+}
+
+function emitDebugHelperCall(
+  kind: "watch" | "log" | "trace",
+  args: string[],
+  consoleMethod: "console.log" | "console.trace",
+  consolePrefix?: string,
+): string {
+  const argumentList = args.join(", ");
+  const consoleArgs = consolePrefix
+    ? `${JSON.stringify(consolePrefix)}, ...__xmluiDebugArgs`
+    : "...__xmluiDebugArgs";
+  const eventFields = kind === "watch"
+    ? `kind: "watch", label: __xmluiDebugArgs[0], value: __xmluiDebugArgs[1], args: __xmluiDebugArgs`
+    : `kind: ${JSON.stringify(kind)}, args: __xmluiDebugArgs`;
+  return `((...__xmluiDebugArgs) => { ctx.debug?.emit({ ${eventFields}, metadata: { timestamp: ${debugTimestampExpression()} } }); ${consoleMethod}(${consoleArgs}); return undefined; })(${argumentList})`;
+}
+
+function emitDebugBreakStatement(): string {
+  return `ctx.debug?.emit({ kind: "break", args: [], metadata: { timestamp: ${debugTimestampExpression()} } });\ndebugger;`;
+}
+
+function debugTimestampExpression(): string {
+  return `(typeof performance !== "undefined" ? performance.now() : Date.now())`;
 }
 
 function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string {

@@ -42,6 +42,7 @@ import separatorSpacingApp from "./examples/separator-spacing/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
 import dataSourceRefetchApp from "./examples/data-source-refetch/Main.xmlui";
+import debugHelpersApp from "./examples/debug-helpers/Main.xmlui";
 import expressionUpdateComponentsApp from "./examples/expression-update-components/Main.xmlui";
 import expressionUpdatesApp from "./examples/expression-updates/Main.xmlui";
 import eventTagHandlerApp from "./examples/event-tag-handler/Main.xmlui";
@@ -119,6 +120,7 @@ const examples = {
   components: componentCounterApp,
   dataSourceMock: dataSourceMockApp,
   dataSourceRefetch: dataSourceRefetchApp,
+  debugHelpers: debugHelpersApp,
   expressions: broaderExpressionsApp,
   expressionComponents: expressionUpdateComponentsApp,
   expressionUpdates: expressionUpdatesApp,

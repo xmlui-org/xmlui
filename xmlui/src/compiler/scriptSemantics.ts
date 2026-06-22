@@ -263,6 +263,7 @@ export type CompiledExpressionContext = {
   readGlobal(name: string): unknown;
   readContext?(name: string): unknown;
   readReference?(name: string): unknown;
+  debug?: XmluiDebugBridge;
 };
 
 export type CompiledEventContext = CompiledExpressionContext & {
@@ -275,6 +276,23 @@ export type CompiledEventContext = CompiledExpressionContext & {
   navigate?(target: unknown, queryParams?: Record<string, unknown>): void;
   callFunction?(name: string, args: unknown[]): unknown | Promise<unknown>;
   yieldIfNeeded?(iteration: number): Promise<void> | void;
+};
+
+export type XmluiDebugEvent = {
+  kind: "watch" | "log" | "trace" | "break";
+  label?: unknown;
+  value?: unknown;
+  args?: unknown[];
+  metadata: {
+    timestamp: number;
+  };
+};
+
+export type XmluiDebugBridge = {
+  version: 1;
+  current?: unknown;
+  subscribe(listener: (event: XmluiDebugEvent) => void): () => void;
+  emit(event: XmluiDebugEvent): void;
 };
 
 export type CompiledExpression = {
@@ -535,7 +553,9 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         visit(current.argument);
         return;
       case "CallExpression":
-        visit(current.callee);
+        if (!isDebugHelperCallee(current.callee)) {
+          visit(current.callee);
+        }
         current.args.forEach(visit);
         validateCallExpression(current);
         return;
@@ -1367,6 +1387,9 @@ function isSupportedAssignmentOperator(
 }
 
 function isAllowedCall(callee: ScriptNode, scope?: XmluiScope): boolean {
+  if (isDebugHelperCallee(callee)) {
+    return true;
+  }
   if (callee.kind === "Identifier" && callee.name === "delay") {
     return true;
   }
@@ -1383,6 +1406,14 @@ function isAllowedCall(callee: ScriptNode, scope?: XmluiScope): boolean {
     return true;
   }
   return false;
+}
+
+function isDebugHelperCallee(callee: ScriptNode): boolean {
+  return callee.kind === "Identifier" &&
+    (callee.name === "debugBreak" ||
+      callee.name === "debugLog" ||
+      callee.name === "debugTrace" ||
+      callee.name === "debugWatch");
 }
 
 function isAllowedMethodName(name: string): boolean {
@@ -1653,6 +1684,9 @@ function emitEventStatement(statement: XmluiHandlerStatementIr, context: EventCo
 function emitEventStatementBody(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
   switch (statement.kind) {
     case "ExpressionStatement":
+      if (isDebugBreakCall(statement.expression)) {
+        return `${emitDebugBreakStatement()}\nundefined;`;
+      }
       return `${emitEventExpression(statement.expression)};`;
     case "VariableDeclaration":
       return emitVariableDeclaration(statement);
@@ -1685,26 +1719,67 @@ function emitAsyncExpression(expression: XmluiScriptIr): string {
 }
 
 function emitAsyncCallExpression(ir: XmluiCallExpressionIr): string {
-  const args = ir.args.map(emitAsyncExpression).join(", ");
+  const args = ir.args.map(emitAsyncExpression);
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugBreak") {
+    return "undefined";
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugLog") {
+    return emitDebugHelperCall("log", args, "console.log");
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugTrace") {
+    return emitDebugHelperCall("trace", args, "console.trace");
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugWatch") {
+    return emitDebugHelperCall("watch", args, "console.log", "[xmlui watch]");
+  }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "delay") {
-    return `await ((ctx.delay ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(${args}))`;
+    return `await ((ctx.delay ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(${args.join(", ")}))`;
   }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "emitEvent") {
-    const [name, ...eventArgs] = ir.args.map(emitAsyncExpression);
+    const [name, ...eventArgs] = args;
     return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.emitEvent?.(${name ?? "undefined"}, [${eventArgs.join(", ")}])))`;
   }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
-    const [target, queryParams] = ir.args.map(emitAsyncExpression);
+    const [target, queryParams] = args;
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
   }
   if (ir.callee.kind === "IdentifierRead") {
-    return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])))`;
+    return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args.join(", ")}])))`;
   }
   if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot compile unsupported XMLUI event call target.");
   }
   const objectSource = emitAsyncExpression(ir.callee.object);
-  return `await (ctx.complete ?? ((value) => Promise.resolve(value)))(await (ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args}]))`;
+  return `await (ctx.complete ?? ((value) => Promise.resolve(value)))(await (ctx.call ?? ((target, methodName, args) => target?.[methodName]?.(...args)))(${objectSource}, ${JSON.stringify(ir.callee.member)}, [${args.join(", ")}]))`;
+}
+
+function isDebugBreakCall(expression: XmluiScriptIr): boolean {
+  return expression.kind === "CallExpression" &&
+    expression.callee.kind === "IdentifierRead" &&
+    expression.callee.name === "debugBreak";
+}
+
+function emitDebugHelperCall(
+  kind: "watch" | "log" | "trace",
+  args: string[],
+  consoleMethod: "console.log" | "console.trace",
+  consolePrefix?: string,
+): string {
+  const consoleArgs = consolePrefix
+    ? `${JSON.stringify(consolePrefix)}, ...__xmluiDebugArgs`
+    : "...__xmluiDebugArgs";
+  const eventFields = kind === "watch"
+    ? `kind: "watch", label: __xmluiDebugArgs[0], value: __xmluiDebugArgs[1], args: __xmluiDebugArgs`
+    : `kind: ${JSON.stringify(kind)}, args: __xmluiDebugArgs`;
+  return `((...__xmluiDebugArgs) => { ctx.debug?.emit({ ${eventFields}, metadata: { timestamp: ${debugTimestampExpression()} } }); ${consoleMethod}(${consoleArgs}); return undefined; })(${args.join(", ")})`;
+}
+
+function emitDebugBreakStatement(): string {
+  return `ctx.debug?.emit({ kind: "break", args: [], metadata: { timestamp: ${debugTimestampExpression()} } });\ndebugger;`;
+}
+
+function debugTimestampExpression(): string {
+  return `(typeof performance !== "undefined" ? performance.now() : Date.now())`;
 }
 
 function emitVariableDeclaration(statement: XmluiVariableDeclarationIr): string {
@@ -2032,6 +2107,47 @@ async function executeCallExpressionAsync(
   context: CompiledEventContext,
   lexical: Record<string, unknown>,
 ): Promise<unknown> {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugBreak") {
+    context.debug?.emit({
+      kind: "break",
+      args: [],
+      metadata: { timestamp: debugTimestamp() },
+    });
+    debugger;
+    return undefined;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugLog") {
+    const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    context.debug?.emit({
+      kind: "log",
+      args,
+      metadata: { timestamp: debugTimestamp() },
+    });
+    console.log(...args);
+    return undefined;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugTrace") {
+    const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    context.debug?.emit({
+      kind: "trace",
+      args,
+      metadata: { timestamp: debugTimestamp() },
+    });
+    console.trace(...args);
+    return undefined;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugWatch") {
+    const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    context.debug?.emit({
+      kind: "watch",
+      label: args[0],
+      value: args[1],
+      args,
+      metadata: { timestamp: debugTimestamp() },
+    });
+    console.log("[xmlui watch]", ...args);
+    return undefined;
+  }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "delay") {
     const [ms] = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
     await (context.delay ?? defaultDelay)(Number(ms));
@@ -2061,6 +2177,10 @@ async function executeCallExpressionAsync(
 
 function defaultDelay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function debugTimestamp(): number {
+  return typeof performance !== "undefined" ? performance.now() : Date.now();
 }
 
 function defaultCall(target: unknown, methodName: string, args: unknown[]): unknown {

@@ -170,6 +170,7 @@ function emitRuntimeEvent(event: XmluiEventIr): EmitJsValue {
       : handlerUsesSharedYield(event.ir)
         ? SHARED_YIELD_HELPER
         : "inline",
+    functionName: generatedName("event", event.id),
   });
   return {
     source: event.rawSource,
@@ -191,7 +192,7 @@ function emitGeneratedExpressionFields(
   expression: XmluiExpressionIrRef,
   name: string,
 ): { generatedName: string; compiledSource: string; evaluate: EmitJsValue } {
-  const generated = generateExpressionFunction(expression.ir);
+  const generated = generateExpressionFunction(expression.ir, { functionName: name });
   return {
     generatedName: name,
     compiledSource: generated.body,
