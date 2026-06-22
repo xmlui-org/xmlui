@@ -2365,3 +2365,70 @@ test.describe("groupBy with function", () => {
     await expect(headers.nth(1)).toContainText("Group: fruit");
   });
 });
+
+test.describe("scroll event", () => {
+  // A long, bounded list so the viewport actually scrolls. Built in JS as an
+  // array-literal expression (matching the other tests' `data="{[...]}"`
+  // style) rather than an in-markup Array.from, which the expression engine
+  // doesn't evaluate.
+  const longData =
+    "[" +
+    Array.from({ length: 50 }, (_, i) => `{id:${i},name:'Item ${i}'}`).join(",") +
+    "]";
+
+  test("scroll event fires on user scroll and reports scroll state", async ({
+    initTestBed,
+    createListDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <List height="100px" data="{${longData}}"
+        onScroll="(e) => testState = { atEnd: e.atEnd, st: typeof e.scrollTop, sh: typeof e.scrollHeight, vs: typeof e.viewportSize }">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+
+    // User scroll to the bottom: event fires, atEnd is true, payload fully typed.
+    await driver.scrollTo("bottom");
+    await expect
+      .poll(async () => (await testStateDriver.testState())?.atEnd)
+      .toEqual(true);
+    const atBottom = await testStateDriver.testState();
+    expect(atBottom.st).toEqual("number");
+    expect(atBottom.sh).toEqual("number");
+    expect(atBottom.vs).toEqual("number");
+
+    // User scroll back to the top: atEnd flips to false.
+    await driver.scrollTo("top");
+    await expect
+      .poll(async () => (await testStateDriver.testState())?.atEnd)
+      .toEqual(false);
+  });
+
+  test("scroll event does not fire for the list's own programmatic scroll", async ({
+    initTestBed,
+    createListDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <List height="100px" scrollAnchor="bottom" data="{${longData}}"
+        onScroll="(e) => testState = (testState || 0) + 1">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+
+    // scrollAnchor="bottom" pins to the end on mount — the list's own
+    // programmatic scroll. Confirm it actually landed at the bottom (so this
+    // isn't a vacuous test): the last item is rendered.
+    await expect(driver.component).toContainText("Item 49");
+    // That programmatic auto-follow must NOT have emitted the public event.
+    expect(await testStateDriver.testState()).toEqual(null);
+
+    // A genuine user scroll up DOES emit it. virtua can fire more than one
+    // tick for a single jump, so assert "fired" rather than an exact count.
+    await driver.scrollTo("top");
+    await expect
+      .poll(async () => (await testStateDriver.testState()) !== null)
+      .toBe(true);
+  });
+});
