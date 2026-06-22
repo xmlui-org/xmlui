@@ -202,13 +202,17 @@ old source anchors, tasks, and exit criteria for each step.
 
     Rebuild extension package registration, metadata, functions, components,
     themes, package exports, standalone scripts, Vite imports, and first-party
-    extension packages.
+    extension packages. After Phase 5 component migration is complete, use
+    `.plans/post-component-tooling-website-migration-plan.md` as the detailed
+    execution plan for Phase 6 and the following ecosystem phases.
 
 16. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
 
     Rebuild VS Code, docs generation, website examples, playground, create-app,
     preview SSG, and XMLUI AI workflow tooling around the rebuilt compiler,
-    metadata, runtime, and component model.
+    metadata, runtime, and component model. Use
+    `.plans/post-component-tooling-website-migration-plan.md` for the
+    step-by-step migration order and risk gates.
 
 17. Phase 8: Full Compatibility Sweep
 
@@ -2396,6 +2400,16 @@ placing partial behavior in the wrong layer.
 
 ## 12. Phase 6: Extension Packages and External Authoring
 
+Detailed continuation plan:
+
+- `.plans/post-component-tooling-website-migration-plan.md`
+
+After all Phase 5 components are complete, future AI-assisted work should read
+that plan before executing Phase 6 or later ecosystem migration tasks. It
+breaks this phase into smaller gates for non-component feature inventory,
+scripting/code-behind closure, package exports, CLI/artifact shape, and
+extension compatibility.
+
 Tasks:
 
 - Rebuild extension registration for components, functions, themes, metadata,
@@ -2413,6 +2427,15 @@ Exit criteria:
   `compatibility:sweep` while original first-party packages are ported.
 
 ## 13. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
+
+Detailed continuation plan:
+
+- `.plans/post-component-tooling-website-migration-plan.md`
+
+Future AI-assisted work should use the detailed continuation plan for the exact
+order of create-app, VS Code, docs generation, playground, website,
+preview-SSG, and AI-tooling migration. The list below remains the high-level
+scope.
 
 Tasks:
 
