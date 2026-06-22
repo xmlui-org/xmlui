@@ -1429,6 +1429,8 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "getFields",
+    "getValue",
     "hasOverflow",
     "scrollToTop",
     "scrollToBottom",

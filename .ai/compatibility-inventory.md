@@ -167,7 +167,7 @@ Use these additional Phase 5 status labels when useful:
 | EventSource | `xmlui/src/components/EventSource` | not-started | Wave F |
 | ExpandableItem | `xmlui/src/components/ExpandableItem` | not-started | Wave D |
 | Fallback | `xmlui/src/components/Fallback` | not-started | Wave A |
-| FileInput | `xmlui/src/components/FileInput` | not-started | Wave B |
+| FileInput | `xmlui/src/components/FileInput` | implemented | Wave B6.1 |
 | FileUploadDropZone | `xmlui/src/components/FileUploadDropZone` | not-started | Wave B |
 | FlowLayout | `xmlui/src/components/FlowLayout` | not-started | Wave D |
 | FocusScope | `xmlui/src/components/FocusScope` | not-started | Wave F |

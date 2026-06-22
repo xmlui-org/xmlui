@@ -1,0 +1,18 @@
+<App var.selected="(empty)" var.columns="">
+  <H1>FileInput foundation</H1>
+  <FileInput
+    id="fileInput"
+    testId="fileInput"
+    acceptsFileType="{['.txt', '.csv']}"
+    placeholder="Drop or browse for files"
+    onDidChange="files => selected = files[0].name" />
+  <Text testId="selected">Selected: {selected}</Text>
+
+  <FileInput
+    id="csvInput"
+    testId="csvInput"
+    parseAs="csv"
+    buttonLabel="Import CSV"
+    onDidChange="result => columns = result.parsedData[0].data[0].name" />
+  <Text testId="columns">Columns: {columns}</Text>
+</App>
