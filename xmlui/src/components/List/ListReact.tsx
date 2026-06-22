@@ -263,6 +263,12 @@ type DynamicHeightListProps = {
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
   rowDoubleClick?: (item: any) => void;
+  onScroll?: (event: {
+    scrollTop: number;
+    scrollHeight: number;
+    viewportSize: number;
+    atEnd: boolean;
+  }) => void;
   keyBindings?: Record<string, string>;
 };
 
@@ -691,6 +697,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     onPasteAction,
     onDeleteAction,
     rowDoubleClick,
+    onScroll,
     keyBindings = defaultProps.keyBindings,
     ...rest
   }: DynamicHeightListProps,
@@ -1003,18 +1010,30 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     }
   }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
 
-  const onScroll = useCallback(
+  const handleVirtuaScroll = useCallback(
     (offset) => {
       if (!virtualizerRef.current) return;
+      // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
+      const atEnd =
+        offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
       if (scrollAnchor === "bottom" && !programmaticScroll.current) {
-        // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
-        shouldStickToBottom.current =
-          offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
+        shouldStickToBottom.current = atEnd;
+      }
+      // Report scroll state to consumers, but only for user-driven scrolls —
+      // the List's own/auto scrolls are guarded by programmaticScroll so they
+      // don't emit spurious user-scroll events.
+      if (!programmaticScroll.current) {
+        onScroll?.({
+          scrollTop: offset,
+          scrollHeight: virtualizerRef.current.scrollSize,
+          viewportSize: virtualizerRef.current.viewportSize,
+          atEnd,
+        });
       }
       tryToFetchPrevPage();
       tryToFetchNextPage();
     },
-    [scrollAnchor, tryToFetchNextPage, tryToFetchPrevPage],
+    [scrollAnchor, onScroll, tryToFetchNextPage, tryToFetchPrevPage],
   );
 
   const scrollToBottom = useEvent(() => {
@@ -1107,7 +1126,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
                   ref={virtualizerRef}
                   scrollRef={scrollElementRef}
                   shift={shift}
-                  onScroll={onScroll}
+                  onScroll={handleVirtuaScroll}
                   startMargin={startMargin}
                   item={Item as CustomItemComponent}
                 >

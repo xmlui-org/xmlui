@@ -1904,6 +1904,32 @@ item as its only argument.
 
 %-EVENT-END
 
+%-EVENT-START scroll
+
+This event fires as the user scrolls the list. The handler receives an object describing the
+current scroll state: `scrollTop` (the current scroll offset), `scrollHeight` (the total
+scrollable size), `viewportSize` (the visible size), and `atEnd` (`true` when the list is
+scrolled to within ~1.5px of the bottom).
+
+The event fires only for user-driven scrolls; the list's own programmatic scrolls and its
+`scrollAnchor="bottom"` auto-follow do **not** trigger it. This makes it suitable for
+implementing follow-newest plus read-pause: track `atEnd` from this event, and when new data
+arrives call [`scrollToBottom()`](#scrolltobottom) only while the user is still at the end.
+
+```xmlui copy {4}
+<App var.atBottom="{true}">
+  <Text>At bottom: {atBottom}</Text>
+  <List
+    data='{[...]}'
+    scrollAnchor="bottom"
+    onScroll="(e) => atBottom = e.atEnd">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+%-EVENT-END
+
 %-EVENT-START selectAllAction
 
 ```xmlui copy {4}
