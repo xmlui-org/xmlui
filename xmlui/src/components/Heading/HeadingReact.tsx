@@ -45,8 +45,8 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
   const hasOverflow = useCallback(() => {
     const element = innerRef.current;
     return !!element && (
-      element.scrollWidth > element.clientWidth ||
-      element.scrollHeight > element.clientHeight
+      isOverflowing(element.scrollWidth, element.clientWidth) ||
+      isOverflowing(element.scrollHeight, element.clientHeight)
     );
   }, []);
   const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
@@ -131,6 +131,10 @@ function maxLinesClass(maxLines: number): string | undefined {
   }
   const capped = Math.min(Math.floor(maxLines), 12);
   return styles[`maxLines${capped}`];
+}
+
+function isOverflowing(scrollSize: number, clientSize: number): boolean {
+  return scrollSize - clientSize > 1;
 }
 
 function cx(...classes: Array<string | undefined | false>): string {
