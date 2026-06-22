@@ -154,14 +154,14 @@ Use these additional Phase 5 status labels when useful:
 | ChangeListener | `xmlui/src/components/ChangeListener` | not-started | Wave F |
 | Checkbox | `xmlui/src/components/Checkbox` | partial | Wave B |
 | CodeBlock | `xmlui/src/components/CodeBlock` | not-started | Wave A |
-| ColorPicker | `xmlui/src/components/ColorPicker` | not-started | Wave B |
+| ColorPicker | `xmlui/src/components/ColorPicker` | implemented | Wave B |
 | Column | `xmlui/src/components/Column` | not-started | Wave C |
 | ConciseValidationFeedback | `xmlui/src/components/ConciseValidationFeedback` | not-started | Wave E |
 | ContentSeparator | `xmlui/src/components/ContentSeparator` | not-started | Wave A |
 | ContextMenu | `xmlui/src/components/ContextMenu` | not-started | Wave D |
 | DataSource | `xmlui/src/components/DataSource` | partial | Phase 4 / Wave F |
-| DateInput | `xmlui/src/components/DateInput` | not-started | Wave B |
-| DatePicker | `xmlui/src/components/DatePicker` | not-started | Wave B |
+| DateInput | `xmlui/src/components/DateInput` | implemented | Wave B |
+| DatePicker | `xmlui/src/components/DatePicker` | implemented | Wave B |
 | Drawer | `xmlui/src/components/Drawer` | not-started | Wave D |
 | DropdownMenu | `xmlui/src/components/DropdownMenu` | not-started | Wave D |
 | EventSource | `xmlui/src/components/EventSource` | not-started | Wave F |
@@ -213,7 +213,7 @@ Use these additional Phase 5 status labels when useful:
 | QRCode | `xmlui/src/components/QRCode` | not-started | Wave A |
 | Queue | `xmlui/src/components/Queue` | not-started | Wave F |
 | RadioGroup | `xmlui/src/components/RadioGroup` | not-started | Wave C |
-| RatingInput | `xmlui/src/components/RatingInput` | not-started | Wave B |
+| RatingInput | `xmlui/src/components/RatingInput` | implemented | Wave B |
 | Redirect | `xmlui/src/components/Redirect` | partial | Wave G |
 | ResponsiveBar | `xmlui/src/components/ResponsiveBar` | not-started | Wave D |
 | RetryPolicy | `xmlui/src/components/RetryPolicy` | not-started | Wave F |
@@ -221,7 +221,7 @@ Use these additional Phase 5 status labels when useful:
 | Select | `xmlui/src/components/Select` | partial | Wave C |
 | SelectionStore | `xmlui/src/components/SelectionStore` | not-started | Wave C |
 | SkipLink | `xmlui/src/components/SkipLink` | not-started | Wave F |
-| Slider | `xmlui/src/components/Slider` | not-started | Wave B |
+| Slider | `xmlui/src/components/Slider` | implemented | Wave B |
 | Slot | `xmlui/src/components/Slot` | partial | Wave F |
 | SpaceFiller | `xmlui/src/components/SpaceFiller` | not-started | Wave A |
 | Spinner | `xmlui/src/components/Spinner` | not-started | Wave A |
@@ -241,7 +241,7 @@ Use these additional Phase 5 status labels when useful:
 | TextBox | `xmlui/src/components/TextBox` | partial | Wave B |
 | Theme | `xmlui/src/components/Theme` | not-started | Wave F |
 | TileGrid | `xmlui/src/components/TileGrid` | not-started | Wave D |
-| TimeInput | `xmlui/src/components/TimeInput` | not-started | Wave B |
+| TimeInput | `xmlui/src/components/TimeInput` | implemented | Wave B |
 | Timer | `xmlui/src/components/Timer` | not-started | Wave F |
 | Toast | `xmlui/src/components/Toast` | not-started | Wave F |
 | Toggle | `xmlui/src/components/Toggle` | not-started | Wave B |

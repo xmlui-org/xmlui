@@ -14,6 +14,7 @@ import { RatingInputMd } from "../../components/RatingInput/RatingInput";
 import { SliderMd } from "../../components/Slider/Slider";
 import { ColorPickerMd } from "../../components/ColorPicker/ColorPicker";
 import { DateInputMd } from "../../components/DateInput/DateInput";
+import { DatePickerMd } from "../../components/DatePicker/DatePicker";
 import { TimeInputMd } from "../../components/TimeInput/TimeInput";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
@@ -306,6 +307,17 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   }),
   contractFromMetadata(DateInputMd, {
     name: "DateInput",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      gotFocus: "onGotFocus",
+      lostFocus: "onLostFocus",
+    },
+  }),
+  contractFromMetadata(DatePickerMd, {
+    name: "DatePicker",
     allowsChildren: false,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
