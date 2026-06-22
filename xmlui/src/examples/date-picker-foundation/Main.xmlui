@@ -1,0 +1,12 @@
+<App var.selected="">
+  <H1>DatePicker foundation</H1>
+  <DatePicker
+    id="trip"
+    mode="range"
+    initialValue="{{ from: '05/10/2024', to: '05/14/2024' }}"
+    clearable="true"
+    showPresets="true"
+    numOfMonths="2"
+    onDidChange="(value) => selected = value" />
+  <Text testId="selection">{trip.value}</Text>
+</App>

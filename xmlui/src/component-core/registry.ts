@@ -40,6 +40,7 @@ import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
 import { sliderRenderer } from "../components/Slider/Slider";
 import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
+import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
@@ -92,6 +93,7 @@ const implementedRuntimeNames = [
   "Slider",
   "ColorPicker",
   "DateInput",
+  "DatePicker",
   "TimeInput",
   "Select",
   "Option",
@@ -142,6 +144,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Slider: sliderRenderer,
   ColorPicker: colorPickerRenderer,
   DateInput: dateInputRenderer,
+  DatePicker: datePickerRenderer,
   TimeInput: timeInputRenderer,
   ...htmlTagRenderers,
 };
@@ -185,6 +188,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const sliderTransferred = contract.name === "Slider";
     const colorPickerTransferred = contract.name === "ColorPicker";
     const dateInputTransferred = contract.name === "DateInput";
+    const datePickerTransferred = contract.name === "DatePicker";
     const timeInputTransferred = contract.name === "TimeInput";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
@@ -216,6 +220,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       sliderTransferred ||
       colorPickerTransferred ||
       dateInputTransferred ||
+      datePickerTransferred ||
       timeInputTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
@@ -259,9 +264,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                             ? "ColorPicker"
                             : dateInputTransferred
                               ? "DateInput"
-                              : timeInputTransferred
-                                ? "TimeInput"
-                                : contract.name;
+                              : datePickerTransferred
+                                ? "DatePicker"
+                                : timeInputTransferred
+                                  ? "TimeInput"
+                                  : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
       : sharedComponentFile;
@@ -292,6 +299,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ColorPickerReact.tsx`);
     } else if (dateInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DateInputReact.tsx`);
+    } else if (datePickerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DatePickerReact.tsx`);
     } else if (timeInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TimeInputReact.tsx`);
     } else if (headingTransferred) {
@@ -336,6 +345,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       sliderTransferred,
       colorPickerTransferred,
       dateInputTransferred,
+      datePickerTransferred,
       timeInputTransferred,
       headingTransferred,
       htmlTagTransferred,
@@ -408,6 +418,7 @@ function componentRunnablePaths(flags: {
   sliderTransferred: boolean;
   colorPickerTransferred: boolean;
   dateInputTransferred: boolean;
+  datePickerTransferred: boolean;
   timeInputTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
@@ -476,6 +487,9 @@ function componentRunnablePaths(flags: {
   }
   if (flags.dateInputTransferred) {
     return ["xmlui/src/components/DateInput/DateInput.spec.ts"];
+  }
+  if (flags.datePickerTransferred) {
+    return ["xmlui/src/components/DatePicker/DatePicker.spec.ts"];
   }
   if (flags.timeInputTransferred) {
     return ["xmlui/src/components/TimeInput/TimeInput.spec.ts"];

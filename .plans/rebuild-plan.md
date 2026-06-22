@@ -1997,7 +1997,53 @@ Verification:
 
 ###### Wave B5.4: DatePicker Foundation
 
-Status: next step.
+Status: completed.
+
+Scope:
+
+- migrate `DatePicker` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, focused E2E coverage, registry/compiler wiring, and a visual
+  sample;
+- preserve the foundation public contract for single and range values,
+  supported date formats, popup and inline calendar display, labels,
+  adornments, min/max bounds, disabled-date matchers, simple range presets,
+  confirm-range flow, validation theme hooks, didChange/focus/blur events, and
+  `focus`, `setValue`, `getValue`, and `value` APIs;
+- explicitly defer the old Ark UI renderer's full segmented text editing,
+  day/month/year view switching, desktop positioning details, mobile
+  bottom-sheet behavior, Form/FormItem binding, and the full copied old E2E
+  suite.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=datePickerFoundation`
+
+Implementation notes:
+
+- `DatePicker` now has a source-adjacent component folder with metadata,
+  defaults, renderer, stylesheet, docs, and focused E2E tests.
+- The component is registered in the compiler contract list, IR builtin set,
+  runtime transfer registry, CSS entrypoint, and dev example map.
+- Full parity debt is recorded as `COMP-0029` because the old implementation is
+  Ark UI based and includes interaction surfaces that need a larger follow-up
+  slice.
+
+Verification:
+
+- `npm.cmd --workspace xmlui run check:metadata`
+- `npm.cmd --workspace xmlui run compatibility:component-transfer`
+- `npm.cmd --workspace xmlui run compatibility:component-e2e-audit`
+- `npm.cmd --workspace xmlui run test:e2e -- src/components/DatePicker/DatePicker.spec.ts`
+  executed all DatePicker tests with 6 passing and 1 planned skip, but the
+  Playwright process did not exit before the shell timeout.
+
+Verification caveat:
+
+- `npm.cmd --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  passed before dependency installation. After `npm.cmd install`, the full
+  TypeScript check fails in existing extension integration files due to real
+  path versus sandbox mirror path type identity for extension types; this is
+  not specific to DatePicker.
 
 ##### Wave B6: File Inputs
 

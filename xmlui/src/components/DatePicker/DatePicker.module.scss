@@ -1,0 +1,355 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderRadius-DatePicker: createThemeVar("borderRadius-DatePicker");
+$borderColor-DatePicker: createThemeVar("borderColor-DatePicker");
+$borderWidth-DatePicker: createThemeVar("borderWidth-DatePicker");
+$borderStyle-DatePicker: createThemeVar("borderStyle-DatePicker");
+$backgroundColor-DatePicker: createThemeVar("backgroundColor-DatePicker");
+$boxShadow-DatePicker: createThemeVar("boxShadow-DatePicker");
+$textColor-DatePicker: createThemeVar("textColor-DatePicker");
+$fontSize-DatePicker: createThemeVar("fontSize-DatePicker");
+$minHeight-DatePicker: createThemeVar("minHeight-DatePicker");
+$borderColor-DatePicker--hover: createThemeVar("borderColor-DatePicker--hover");
+$backgroundColor-DatePicker--hover: createThemeVar("backgroundColor-DatePicker--hover");
+$outlineWidth-DatePicker--focus: createThemeVar("outlineWidth-DatePicker--focus");
+$outlineColor-DatePicker--focus: createThemeVar("outlineColor-DatePicker--focus");
+$outlineStyle-DatePicker--focus: createThemeVar("outlineStyle-DatePicker--focus");
+$outlineOffset-DatePicker--focus: createThemeVar("outlineOffset-DatePicker--focus");
+$textColor-placeholder-DatePicker: createThemeVar("textColor-placeholder-DatePicker");
+$color-adornment-DatePicker: createThemeVar("color-adornment-DatePicker");
+$textColor-value-DatePicker: createThemeVar("textColor-value-DatePicker");
+$backgroundColor-DatePicker--disabled: createThemeVar("backgroundColor-DatePicker--disabled");
+$textColor-DatePicker--disabled: createThemeVar("textColor-DatePicker--disabled");
+$borderColor-DatePicker--disabled: createThemeVar("borderColor-DatePicker--disabled");
+$borderColor-DatePicker--error: createThemeVar("borderColor-DatePicker--error");
+$borderColor-DatePicker--warning: createThemeVar("borderColor-DatePicker--warning");
+$borderColor-DatePicker--success: createThemeVar("borderColor-DatePicker--success");
+$boxShadow-menu-DatePicker: createThemeVar("boxShadow-menu-DatePicker");
+$backgroundColor-menu-DatePicker: createThemeVar("backgroundColor-menu-DatePicker");
+$borderColor-menu-DatePicker: createThemeVar("borderColor-menu-DatePicker");
+$borderRadius-menu-DatePicker: createThemeVar("borderRadius-menu-DatePicker");
+$backgroundColor-item-DatePicker--hover: createThemeVar("backgroundColor-item-DatePicker--hover");
+$backgroundColor-day-DatePicker--selected: createThemeVar("backgroundColor-day-DatePicker--selected");
+$textColor-day-DatePicker--selected: createThemeVar("textColor-day-DatePicker--selected");
+$backgroundColor-day-DatePicker--rangeMiddle: createThemeVar("backgroundColor-day-DatePicker--rangeMiddle");
+$textColor-day-DatePicker--rangeMiddle: createThemeVar("textColor-day-DatePicker--rangeMiddle");
+$backgroundColor-day-DatePicker--today: createThemeVar("backgroundColor-day-DatePicker--today");
+$textColor-day-DatePicker--today: createThemeVar("textColor-day-DatePicker--today");
+$borderColor-day-DatePicker--today: createThemeVar("borderColor-day-DatePicker--today");
+$borderWidth-day-DatePicker--today: createThemeVar("borderWidth-day-DatePicker--today");
+$borderStyle-day-DatePicker--today: createThemeVar("borderStyle-day-DatePicker--today");
+$backgroundColor-day-DatePicker--disabled: createThemeVar("backgroundColor-day-DatePicker--disabled");
+$textColor-day-DatePicker--disabled: createThemeVar("textColor-day-DatePicker--disabled");
+$textColor-weekday-DatePicker: createThemeVar("textColor-weekday-DatePicker");
+$borderColor-selectedItem-DatePicker: createThemeVar("borderColor-selectedItem-DatePicker");
+$paddingHorizontal-DatePicker: createThemeVar("paddingHorizontal-DatePicker");
+$paddingVertical-DatePicker: createThemeVar("paddingVertical-DatePicker");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .root {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 220px;
+    max-width: 100%;
+    color: var(--xmlui-textColor-DatePicker);
+    font-size: var(--xmlui-fontSize-DatePicker);
+  }
+
+  .root[data-mode="range"]:not(.fullWidth) {
+    width: max-content;
+  }
+
+  .fullWidth {
+    width: 100%;
+  }
+
+  .autoWidth {
+    width: auto;
+  }
+
+  .label {
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+  }
+
+  .control {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    max-width: 100%;
+    min-height: var(--xmlui-minHeight-DatePicker);
+    gap: 0.5rem;
+    padding: var(--xmlui-paddingVertical-DatePicker) var(--xmlui-paddingHorizontal-DatePicker);
+    border-width: var(--xmlui-borderWidth-DatePicker);
+    border-style: var(--xmlui-borderStyle-DatePicker);
+    border-color: var(--xmlui-borderColor-DatePicker);
+    border-radius: var(--xmlui-borderRadius-DatePicker);
+    background: var(--xmlui-backgroundColor-DatePicker);
+    color: var(--xmlui-textColor-DatePicker);
+    box-shadow: var(--xmlui-boxShadow-DatePicker);
+    box-sizing: border-box;
+  }
+
+  .fullWidth .control {
+    width: 100%;
+  }
+
+  .control:hover {
+    border-color: var(--xmlui-borderColor-DatePicker--hover);
+    background-color: var(--xmlui-backgroundColor-DatePicker--hover);
+  }
+
+  .control:focus-within {
+    outline-width: var(--xmlui-outlineWidth-DatePicker--focus);
+    outline-style: var(--xmlui-outlineStyle-DatePicker--focus);
+    outline-color: var(--xmlui-outlineColor-DatePicker--focus);
+    outline-offset: var(--xmlui-outlineOffset-DatePicker--focus);
+  }
+
+  .root[data-validation-status="error"] .control {
+    border-color: var(--xmlui-borderColor-DatePicker--error);
+  }
+
+  .root[data-validation-status="warning"] .control {
+    border-color: var(--xmlui-borderColor-DatePicker--warning);
+  }
+
+  .root[data-validation-status="valid"] .control {
+    border-color: var(--xmlui-borderColor-DatePicker--success);
+  }
+
+  .root[data-disabled] .control {
+    cursor: not-allowed;
+    border-color: var(--xmlui-borderColor-DatePicker--disabled);
+    background-color: var(--xmlui-backgroundColor-DatePicker--disabled);
+    color: var(--xmlui-textColor-DatePicker--disabled);
+  }
+
+  .input {
+    width: 11ch;
+    min-width: 11ch;
+    border: 0;
+    outline: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--xmlui-textColor-value-DatePicker);
+    font: inherit;
+    text-align: center;
+  }
+
+  .input::placeholder {
+    color: var(--xmlui-textColor-placeholder-DatePicker);
+  }
+
+  .rangeSeparator,
+  .adornment {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--xmlui-color-adornment-DatePicker);
+    flex: 0 0 auto;
+  }
+
+  .trailing {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .clear,
+  .nav,
+  .cellTrigger,
+  .preset,
+  .footerButton {
+    font: inherit;
+  }
+
+  .clear,
+  .nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .clear:hover,
+  .nav:hover {
+    background: var(--xmlui-backgroundColor-item-DatePicker--hover);
+  }
+
+  .positioner {
+    z-index: 1000;
+  }
+
+  .root:not([data-inline]) .positioner {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+  }
+
+  .content {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    width: max-content;
+    max-width: calc(100vw - 1.5rem);
+    padding: 0.625rem;
+    border: 1px solid var(--xmlui-borderColor-menu-DatePicker);
+    border-radius: var(--xmlui-borderRadius-menu-DatePicker);
+    background: var(--xmlui-backgroundColor-menu-DatePicker);
+    color: var(--xmlui-textColor-DatePicker);
+    box-shadow: var(--xmlui-boxShadow-menu-DatePicker);
+  }
+
+  .root[data-inline] .content {
+    box-shadow: none;
+  }
+
+  .quickPresets {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    gap: 0.375rem;
+    padding-right: 0.625rem;
+    border-right: 1px solid var(--xmlui-borderColor-menu-DatePicker);
+  }
+
+  .preset {
+    min-height: 2rem;
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--xmlui-borderColor-DatePicker);
+    border-radius: var(--xmlui-borderRadius-DatePicker);
+    background: var(--xmlui-backgroundColor-DatePicker);
+    color: inherit;
+    cursor: pointer;
+    text-align: start;
+  }
+
+  .preset:hover {
+    background: var(--xmlui-backgroundColor-item-DatePicker--hover);
+  }
+
+  .calendarArea {
+    display: flex;
+    flex-direction: column;
+    min-width: 260px;
+    gap: 0.5rem;
+  }
+
+  .viewControl {
+    display: grid;
+    grid-template-columns: 2rem 1fr 2rem;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .viewTrigger {
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .table {
+    width: 260px;
+    border-collapse: separate;
+    border-spacing: 2px;
+    table-layout: fixed;
+  }
+
+  .weekday,
+  .weekNumber {
+    height: 1.75rem;
+    color: var(--xmlui-textColor-weekday-DatePicker);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .cell {
+    padding: 0;
+  }
+
+  .cellTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 2rem;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .cellTrigger:hover {
+    background: var(--xmlui-backgroundColor-item-DatePicker--hover);
+  }
+
+  .cellTrigger[data-selected],
+  .cellTrigger[data-range-start],
+  .cellTrigger[data-range-end] {
+    background: var(--xmlui-backgroundColor-day-DatePicker--selected);
+    color: var(--xmlui-textColor-day-DatePicker--selected);
+  }
+
+  .cellTrigger[data-in-range] {
+    background: var(--xmlui-backgroundColor-day-DatePicker--rangeMiddle);
+    color: var(--xmlui-textColor-day-DatePicker--rangeMiddle);
+  }
+
+  .cellTrigger[data-today] {
+    background: var(--xmlui-backgroundColor-day-DatePicker--today);
+    color: var(--xmlui-textColor-day-DatePicker--today);
+    box-shadow: inset 0 0 0 var(--xmlui-borderWidth-day-DatePicker--today) var(--xmlui-borderColor-selectedItem-DatePicker);
+  }
+
+  .cellTrigger:disabled {
+    background: var(--xmlui-backgroundColor-day-DatePicker--disabled);
+    color: var(--xmlui-textColor-day-DatePicker--disabled);
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .popupFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--xmlui-borderColor-menu-DatePicker);
+  }
+
+  .footerButton {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--xmlui-borderColor-DatePicker);
+    border-radius: var(--xmlui-borderRadius-DatePicker);
+    background: var(--xmlui-backgroundColor-DatePicker);
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .footerButtonPrimary {
+    border-color: transparent;
+    background: var(--xmlui-backgroundColor-day-DatePicker--selected);
+    color: var(--xmlui-textColor-day-DatePicker--selected);
+  }
+}
