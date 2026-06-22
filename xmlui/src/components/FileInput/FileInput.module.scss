@@ -1,0 +1,209 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderRadius-FileInput--focus: createThemeVar("borderRadius-FileInput--focus");
+$borderColor-FileInput--focus: createThemeVar("borderColor-FileInput--focus");
+$backgroundColor-FileInput--focus: createThemeVar("backgroundColor-FileInput--focus");
+$boxShadow-FileInput--focus: createThemeVar("boxShadow-FileInput--focus");
+$textColor-FileInput--focus: createThemeVar("textColor-FileInput--focus");
+$outlineWidth-FileInput--focus: createThemeVar("outlineWidth-FileInput--focus");
+$outlineColor-FileInput--focus: createThemeVar("outlineColor-FileInput--focus");
+$outlineStyle-FileInput--focus: createThemeVar("outlineStyle-FileInput--focus");
+$outlineOffset-FileInput--focus: createThemeVar("outlineOffset-FileInput--focus");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .fileInputRoot {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--xmlui-gap-FileInput, var(--xmlui-gap-normal, 0.5rem));
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .fileInputButtonStart {
+    flex-direction: row-reverse;
+  }
+
+  .fileInputButtonEnd {
+    flex-direction: row;
+  }
+
+  .fileInputFieldButton {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: var(--xmlui-minHeight-TextBox, 2.5rem);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--xmlui-padding-TextBox, var(--xmlui-paddingVertical-TextBox, 0.5rem) var(--xmlui-paddingHorizontal-TextBox, 0.5rem));
+    border-radius: var(--xmlui-borderRadius-TextBox, var(--xmlui-borderRadius-Input, var(--xmlui-borderRadius, 4px)));
+    border-color: var(--xmlui-borderColor-TextBox, var(--xmlui-borderColor-Input, currentColor));
+    border-width: var(--xmlui-borderWidth-TextBox, var(--xmlui-borderWidth-Input, 1px));
+    border-style: var(--xmlui-borderStyle-TextBox, var(--xmlui-borderStyle-Input, solid));
+    background-color: var(--xmlui-backgroundColor-TextBox, var(--xmlui-backgroundColor-Input, transparent));
+    box-shadow: var(--xmlui-boxShadow-TextBox, none);
+    color: var(--xmlui-textColor-TextBox, var(--xmlui-textColor-Input, currentColor));
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .fileInputFieldButton:hover {
+    border-color: var(--xmlui-borderColor-TextBox--hover, var(--xmlui-borderColor-TextBox, currentColor));
+    background-color: var(--xmlui-backgroundColor-TextBox--hover, var(--xmlui-backgroundColor-TextBox, transparent));
+    box-shadow: var(--xmlui-boxShadow-TextBox--hover, var(--xmlui-boxShadow-TextBox, none));
+    color: var(--xmlui-textColor-TextBox--hover, var(--xmlui-textColor-TextBox, currentColor));
+  }
+
+  .fileInputFieldButton:focus,
+  .fileInputFieldButton:focus-within {
+    border-radius: $borderRadius-FileInput--focus;
+    border-color: $borderColor-FileInput--focus;
+    background-color: $backgroundColor-FileInput--focus;
+    box-shadow: $boxShadow-FileInput--focus;
+    color: $textColor-FileInput--focus;
+    outline-width: $outlineWidth-FileInput--focus;
+    outline-color: $outlineColor-FileInput--focus;
+    outline-style: $outlineStyle-FileInput--focus;
+    outline-offset: $outlineOffset-FileInput--focus;
+  }
+
+  .fileInputFieldButton.fileInputError {
+    border-color: var(--xmlui-borderColor-TextBox--error, var(--xmlui-color-danger-500, #b91c1c));
+  }
+
+  .fileInputFieldButton.fileInputWarning {
+    border-color: var(--xmlui-borderColor-TextBox--warning, var(--xmlui-color-warn-500, #b45309));
+  }
+
+  .fileInputFieldButton.fileInputValid {
+    border-color: var(--xmlui-borderColor-TextBox--success, var(--xmlui-color-success-500, #15803d));
+  }
+
+  .fileInputRoot.fileInputDisabled,
+  .fileInputRoot.fileInputReadOnly {
+    opacity: var(--xmlui-opacity-FileInput--disabled, 0.65);
+  }
+
+  .fileInputRoot.fileInputDisabled .fileInputFieldButton,
+  .fileInputRoot.fileInputDisabled .fileInputBrowseButton {
+    cursor: not-allowed;
+  }
+
+  .fileInputHiddenInput {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .fileInputText {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .fileInputPlaceholder {
+    color: var(--xmlui-textColor-placeholder-TextBox, var(--xmlui-textColor-placeholder-Input, var(--xmlui-textColor-secondary, #6b7280)));
+  }
+
+  .fileInputBrowseButton {
+    flex: 0 0 auto;
+    min-height: var(--xmlui-minHeight-Button, 2.5rem);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0 var(--xmlui-paddingHorizontal-Button, 0.75rem);
+    border-radius: var(--xmlui-borderRadius-Button, var(--xmlui-borderRadius, 4px));
+    border: var(--xmlui-borderWidth-Button, 1px) solid var(--xmlui-borderColor-Button, transparent);
+    background: var(--xmlui-backgroundColor-Button, var(--xmlui-color-primary-500, #2563eb));
+    color: var(--xmlui-textColor-Button, white);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .fileInputBrowseButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  .fileInputBrowseButton[data-size="xs"] {
+    min-height: 1.75rem;
+    padding-inline: 0.45rem;
+    font-size: 0.75rem;
+  }
+
+  .fileInputBrowseButton[data-size="sm"] {
+    min-height: 2rem;
+    padding-inline: 0.6rem;
+    font-size: 0.875rem;
+  }
+
+  .fileInputBrowseButton[data-size="lg"] {
+    min-height: 3rem;
+    padding-inline: 1rem;
+    font-size: 1.05rem;
+  }
+
+  .fileInputBrowseButton[data-size="xl"] {
+    min-height: 3.25rem;
+    padding-inline: 1.15rem;
+    font-size: 1.1rem;
+  }
+
+  .fileInputBrowseButton[data-variant="outlined"] {
+    background: transparent;
+    color: var(--xmlui-textColor-Button-outlined, var(--xmlui-color-primary-600, #1d4ed8));
+    border-color: currentColor;
+  }
+
+  .fileInputBrowseButton[data-variant="ghost"] {
+    background: transparent;
+    color: var(--xmlui-textColor-Button-ghost, var(--xmlui-color-primary-600, #1d4ed8));
+    border-color: transparent;
+  }
+
+  .fileInputBrowseButton[data-theme-color="secondary"] {
+    background: var(--xmlui-backgroundColor-Button-secondary, var(--xmlui-color-secondary-500, #4b5563));
+  }
+
+  .fileInputBrowseButton[data-theme-color="attention"] {
+    background: var(--xmlui-backgroundColor-Button-attention, var(--xmlui-color-danger-500, #dc2626));
+  }
+
+  .fileInputIcon {
+    width: 1em;
+    height: 1em;
+    border-radius: 2px;
+    border: 1px solid currentColor;
+    display: inline-block;
+    position: relative;
+  }
+
+  .fileInputIcon::before {
+    content: "";
+    position: absolute;
+    left: 0.15em;
+    top: -0.2em;
+    width: 0.45em;
+    height: 0.25em;
+    border: 1px solid currentColor;
+    border-bottom: 0;
+    border-radius: 2px 2px 0 0;
+  }
+}

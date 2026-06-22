@@ -457,6 +457,7 @@ const builtInElementNames = new Set([
   "ColorPicker",
   "DateInput",
   "DatePicker",
+  "FileInput",
   "TimeInput",
   "PasswordInput",
   "Theme",

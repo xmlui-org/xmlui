@@ -22,6 +22,7 @@ import "./components/Slider/Slider.module.scss?xmlui-css-module";
 import "./components/ColorPicker/ColorPicker.module.scss?xmlui-css-module";
 import "./components/DateInput/DateInput.module.scss?xmlui-css-module";
 import "./components/DatePicker/DatePicker.module.scss?xmlui-css-module";
+import "./components/FileInput/FileInput.module.scss?xmlui-css-module";
 import "./components/TimeInput/TimeInput.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
@@ -87,6 +88,7 @@ import sliderFoundationApp from "./examples/slider-foundation/Main.xmlui";
 import colorPickerFoundationApp from "./examples/color-picker-foundation/Main.xmlui";
 import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui";
 import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlui";
+import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
@@ -167,6 +169,7 @@ const examples = {
   colorPickerFoundation: colorPickerFoundationApp,
   dateInputFoundation: dateInputFoundationApp,
   datePickerFoundation: datePickerFoundationApp,
+  fileInputFoundation: fileInputFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,

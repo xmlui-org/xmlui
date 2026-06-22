@@ -2051,6 +2051,11 @@ Verification caveat:
 
 ##### Wave B6: File Inputs
 
+Status: split into smaller slices because `FileInput` and
+`FileUploadDropZone` share file payload concerns but expose different user
+surfaces. `FileInput` is a picker/value/parsing component, while
+`FileUploadDropZone` is a drag/drop and optional paste upload surface.
+
 Components:
 
 - `FileInput`;
@@ -2061,6 +2066,125 @@ Compatibility focus:
 - file selection payloads, drag/drop behavior, accepted types, multiple files,
   upload/drop events, disabled states, browser restrictions, and test harness
   file fixtures.
+
+###### Wave B6.1: FileInput Foundation
+
+Status: completed.
+
+Scope:
+
+- migrate `FileInput` with source-adjacent metadata, defaults, SCSS, docs,
+  renderer, focused E2E coverage, registry/compiler wiring, and a visual
+  sample;
+- preserve the foundation public contract for native file browsing, drag/drop
+  onto the input surface, accepted file type filtering, single and multiple
+  file selection, directory-selection attributes where browser-supported,
+  button label/icon/position/size/theme props, placeholder display, disabled
+  and read-only states, validation theme hooks, focus/blur/didChange events,
+  and `focus`, `open`, `setValue`, `getFields`, `inProgress`, and `value`
+  APIs;
+- include test-harness file fixtures for selected file names, multiple files,
+  accepted extensions, drag/drop, focus/blur, disabled/read-only behavior, and
+  API-driven value updates;
+- explicitly defer full Form/FormItem binding, submit serialization, advanced
+  CSV/JSON parsing parity, Papa Parse option parity, parse-error event
+  coverage, large-file progress behavior, and browser-specific directory
+  picker verification until the shared form and file-parsing compatibility
+  slices are ready.
+
+Old sources to inventory:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileInput/FileInput.tsx`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileInput/FileInputReact.tsx`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileInput/FileInput.defaults.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileInput/FileInput.module.scss`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileInput/FileInput.md`;
+- original `FileInput` tests, docs examples, form-upload how-to examples, and
+  parse-as-CSV/JSON examples.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=fileInputFoundation`
+
+Verification target:
+
+- `npm.cmd --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm.cmd --workspace xmlui run check:metadata`
+- `npm.cmd --workspace xmlui run compatibility:component-transfer`
+- `npm.cmd --workspace xmlui run compatibility:component-e2e-audit`
+- `npm.cmd --workspace xmlui run test:e2e -- src/components/FileInput/FileInput.spec.ts`
+
+Implementation notes:
+
+- `FileInput` now has a source-adjacent component folder with metadata,
+  defaults, SCSS, docs, renderer, focused E2E tests, and a runnable visual
+  mutation sample.
+- The foundation uses native browser file input behavior plus explicit
+  drag/drop handling instead of adding the old `react-dropzone` and Papa Parse
+  dependencies in this slice.
+- Basic CSV/JSON parsing exists to exercise `parseAs`, `inProgress`, and
+  `getFields`, but full Papa Parse option parity and parse-error coverage are
+  tracked as `COMP-0030`.
+- The XMLUI method-call whitelist now includes `getFields` and `getValue`, so
+  documented component API reads can be used in expressions where the current
+  codegen supports the call target.
+
+Verification:
+
+- `npm.cmd --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm.cmd --workspace xmlui run check:metadata`
+- `npm.cmd --workspace xmlui run compatibility:component-transfer`
+- `npm.cmd --workspace xmlui run compatibility:component-e2e-audit`
+- `XMLUI_REUSE_DEV_SERVER=0 npm.cmd --workspace xmlui run test:e2e -- src/components/FileInput/FileInput.spec.ts --reporter=line`
+  passed with 9 passed and 1 planned skip.
+- `npm.cmd --workspace xmlui run test` passed with 250 tests after creating
+  the missing `D:\tmp` directory required by existing compiler tests on this
+  Windows shell.
+
+###### Wave B6.2: FileUploadDropZone Foundation
+
+Status: planned after Wave B6.1 unless `FileInput` uncovers shared file-event
+infrastructure that should be factored first.
+
+Scope:
+
+- migrate `FileUploadDropZone` with source-adjacent metadata, defaults, SCSS,
+  docs, renderer, focused E2E coverage, registry/compiler wiring, and a visual
+  sample;
+- preserve the foundation public contract for drag-over/drop state, upload
+  event payloads, accepted MIME type filtering, maximum file count behavior,
+  optional paste uploads, paste suppression from text inputs and editable
+  elements, enabled/disabled state, default icon/text rendering, children
+  rendering where supported, and dropping-state theme variables;
+- include test-harness file fixtures for dropped files, rejected file types,
+  maximum-count handling, disabled drops, paste-enabled uploads, paste-disabled
+  suppression, and upload event payload shape;
+- explicitly defer full upload workflow examples, backend integration examples,
+  Form/FormItem interactions, visual regression across theme packs, and
+  browser/OS clipboard edge cases until the shared file and form surfaces are
+  broader.
+
+Old sources to inventory:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileUploadDropZone/FileUploadDropZone.tsx`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileUploadDropZone/FileUploadDropZoneReact.tsx`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileUploadDropZone/FileUploadDropZone.defaults.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileUploadDropZone/FileUploadDropZone.module.scss`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FileUploadDropZone/FileUploadDropZone.md`;
+- original `FileUploadDropZone` tests, docs examples, form-upload how-to
+  examples, and theme-variable default references.
+
+Visual check:
+
+- `http://127.0.0.1:5173/?example=fileUploadDropZoneFoundation`
+
+Verification target:
+
+- `npm.cmd --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm.cmd --workspace xmlui run check:metadata`
+- `npm.cmd --workspace xmlui run compatibility:component-transfer`
+- `npm.cmd --workspace xmlui run compatibility:component-e2e-audit`
+- `npm.cmd --workspace xmlui run test:e2e -- src/components/FileUploadDropZone/FileUploadDropZone.spec.ts`
 
 #### Wave C: Selection and Collection Components
 
