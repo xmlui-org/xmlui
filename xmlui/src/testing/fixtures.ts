@@ -10,6 +10,8 @@ import {
   NoResultDriver,
   NumberBoxDriver,
   DateInputDriver,
+  FileUploadDropZoneDriver,
+  SelectDriver,
   SliderDriver,
   TimeInputDriver,
   TextAreaDriver,
@@ -47,6 +49,8 @@ type Fixtures = {
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
   createDateInputDriver: (testId?: string | Locator) => Promise<DateInputDriver>;
+  createFileUploadDropZoneDriver: (testId?: string | Locator) => Promise<FileUploadDropZoneDriver>;
+  createSelectDriver: (testId?: string | Locator) => Promise<SelectDriver>;
   createTimeInputDriver: (testId?: string | Locator) => Promise<TimeInputDriver>;
   createSliderDriver: (testId?: string | Locator) => Promise<SliderDriver>;
   createCheckboxDriver: (testId?: string | Locator) => Promise<CheckboxDriver>;
@@ -195,6 +199,28 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="DateInput"]').first(),
+      page,
+    }));
+  },
+  createFileUploadDropZoneDriver: async ({ page }, use) => {
+    await use(async (testId) => new FileUploadDropZoneDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="FileUploadDropZone"]').first(),
+      page,
+    }));
+  },
+  createSelectDriver: async ({ page }, use) => {
+    await use(async (testId) => new SelectDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Select"]').first(),
       page,
     }));
   },

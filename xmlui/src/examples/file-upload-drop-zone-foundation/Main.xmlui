@@ -1,0 +1,19 @@
+<App var.uploads="No uploads yet" var.paste="{false}">
+  <H1>FileUploadDropZone foundation</H1>
+  <Text>Paste support: {paste ? 'enabled' : 'disabled'}</Text>
+  <Button onClick="paste = !paste">Toggle paste support</Button>
+  <FileUploadDropZone
+    id="dropzone"
+    testId="dropzone"
+    height="140px"
+    allowPaste="{paste}"
+    acceptedFileTypes=".txt,.pdf"
+    maxFiles="2"
+    onUpload="(files) => uploads = files.length + ' accepted: ' + files[0].name">
+    <VStack padding="$space-4" gap="$space-2">
+      <Text>Drop up to two .txt or .pdf files here.</Text>
+      <Button onClick="dropzone.open()">Browse files</Button>
+    </VStack>
+  </FileUploadDropZone>
+  <Text testId="uploads">Uploads: {uploads}</Text>
+</App>

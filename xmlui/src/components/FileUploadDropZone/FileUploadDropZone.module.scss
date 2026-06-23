@@ -1,0 +1,106 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderRadius-FileUploadDropZone: createThemeVar("borderRadius-FileUploadDropZone");
+$borderColor-FileUploadDropZone: createThemeVar("borderColor-FileUploadDropZone");
+$borderWidth-FileUploadDropZone: createThemeVar("borderWidth-FileUploadDropZone");
+$borderStyle-FileUploadDropZone: createThemeVar("borderStyle-FileUploadDropZone");
+$backgroundColor-FileUploadDropZone: createThemeVar("backgroundColor-FileUploadDropZone");
+$textColor-FileUploadDropZone: createThemeVar("textColor-FileUploadDropZone");
+$textColor-dropping-FileUploadDropZone: createThemeVar("textColor-dropping-FileUploadDropZone");
+$backgroundColor-dropping-FileUploadDropZone: createThemeVar("backgroundColor-dropping-FileUploadDropZone");
+$opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploadDropZone");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .fileUploadDropZoneRoot {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 6rem;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--xmlui-backgroundColor-FileUploadDropZone);
+    border-radius: var(--xmlui-borderRadius-FileUploadDropZone);
+    border-color: var(--xmlui-borderColor-FileUploadDropZone);
+    border-width: var(--xmlui-borderWidth-FileUploadDropZone);
+    border-style: var(--xmlui-borderStyle-FileUploadDropZone);
+    color: var(--xmlui-textColor-FileUploadDropZone);
+    overflow: hidden;
+  }
+
+  .fileUploadDropZoneRoot[data-drop-enabled="false"] {
+    opacity: var(--xmlui-opacity-FileUploadDropZone--disabled, 0.65);
+  }
+
+  .fileUploadDropZoneInput {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .fileUploadDropZonePlaceholder {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.4rem;
+    color: var(--xmlui-textColor-FileUploadDropZone);
+  }
+
+  .fileUploadDropZonePlaceholder.fileUploadDropZoneDropping {
+    color: var(--xmlui-textColor-dropping-FileUploadDropZone);
+  }
+
+  .fileUploadDropZonePlaceholder.fileUploadDropZoneDropping::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--xmlui-backgroundColor-dropping-FileUploadDropZone);
+    opacity: var(--xmlui-opacity-dropping-FileUploadDropZone);
+  }
+
+  .fileUploadDropZoneIcon {
+    width: 1.4em;
+    height: 1.4em;
+    border: 2px solid currentColor;
+    border-radius: 0.25em;
+    display: inline-block;
+    position: relative;
+  }
+
+  .fileUploadDropZoneIcon::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0.2em;
+    width: 0.45em;
+    height: 0.45em;
+    border-left: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .fileUploadDropZoneIcon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0.25em;
+    height: 0.75em;
+    border-left: 2px solid currentColor;
+    transform: translateX(-50%);
+  }
+}

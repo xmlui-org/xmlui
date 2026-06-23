@@ -38,11 +38,18 @@ The old tests uncovered real compatibility gaps:
 - Transfer all original component E2E tests into the migrated component folder,
   colocated with the implementation. If the old component has multiple spec
   files, migrate all of them.
+- Copy the old component E2E test cases literally: keep the old test names,
+  markup, assertions, and behavioral intent. The test infrastructure, fixtures,
+  and drivers may change to support the rewrite, but the component test cases
+  themselves should not be replaced by smaller focused coverage.
+- Do not collapse several old test cases into one broader new test. A migrated
+  component is not complete until every old component E2E test is either
+  running successfully or explicitly marked as blocked with the reason recorded.
 - Run the migrated component E2E suite successfully before marking that
   component or wave complete. Existing old-suite skip markers may remain only
   when they are inherited deliberately and still documented by the old test.
 - Keep the test intent and assertions as close to the original as the current
-  harness allows.
+  harness allows; prefer fixing the harness over changing the case.
 - If a test cannot yet be transferred because another component or framework
   feature is missing, record the exact missing dependency and source test file
   in `.ai/` and keep it visible in the plan.

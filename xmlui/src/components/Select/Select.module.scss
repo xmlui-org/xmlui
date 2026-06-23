@@ -1,0 +1,41 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-Select: createThemeVar("backgroundColor-Select");
+$textColor-Select: createThemeVar("textColor-Select");
+$borderColor-Select: createThemeVar("borderColor-Select");
+$borderWidth-Select: createThemeVar("borderWidth-Select");
+$borderStyle-Select: createThemeVar("borderStyle-Select");
+$borderRadius-Select: createThemeVar("borderRadius-Select");
+$fontSize-Select: createThemeVar("fontSize-Select");
+$boxShadow-Select: createThemeVar("boxShadow-Select");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .select {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-height: var(--xmlui-height-Select, 2rem);
+    padding: var(--xmlui-paddingVertical-Select, 0.25rem) var(--xmlui-paddingHorizontal-Select, 0.5rem);
+    border-color: var(--xmlui-borderColor-Select);
+    border-width: var(--xmlui-borderWidth-Select);
+    border-style: var(--xmlui-borderStyle-Select);
+    border-radius: var(--xmlui-borderRadius-Select);
+    background-color: var(--xmlui-backgroundColor-Select);
+    color: var(--xmlui-textColor-Select);
+    box-shadow: var(--xmlui-boxShadow-Select);
+    font: inherit;
+    font-size: var(--xmlui-fontSize-Select);
+  }
+
+  .select:disabled {
+    cursor: not-allowed;
+    opacity: var(--xmlui-opacity-Select--disabled, 0.65);
+  }
+}

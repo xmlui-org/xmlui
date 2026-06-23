@@ -23,6 +23,8 @@ import "./components/ColorPicker/ColorPicker.module.scss?xmlui-css-module";
 import "./components/DateInput/DateInput.module.scss?xmlui-css-module";
 import "./components/DatePicker/DatePicker.module.scss?xmlui-css-module";
 import "./components/FileInput/FileInput.module.scss?xmlui-css-module";
+import "./components/FileUploadDropZone/FileUploadDropZone.module.scss?xmlui-css-module";
+import "./components/Select/Select.module.scss?xmlui-css-module";
 import "./components/TimeInput/TimeInput.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
@@ -89,6 +91,7 @@ import colorPickerFoundationApp from "./examples/color-picker-foundation/Main.xm
 import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui";
 import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlui";
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
+import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
@@ -170,6 +173,7 @@ const examples = {
   dateInputFoundation: dateInputFoundationApp,
   datePickerFoundation: datePickerFoundationApp,
   fileInputFoundation: fileInputFoundationApp,
+  fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,

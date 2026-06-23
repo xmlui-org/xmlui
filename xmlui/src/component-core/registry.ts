@@ -25,6 +25,7 @@ import { fragmentRenderer } from "../components/Fragment/Fragment";
 import { iconRenderer } from "../components/Icon/Icon";
 import { imageRenderer } from "../components/Image/Image";
 import { iframeRenderer } from "../components/IFrame/IFrame";
+import { itemsRenderer } from "../components/Items/Items";
 import { linkRenderer } from "../components/Link/Link";
 import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult";
@@ -42,6 +43,9 @@ import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { fileInputRenderer } from "../components/FileInput/FileInput";
+import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone";
+import { optionRenderer } from "../components/Option/Option";
+import { selectRenderer } from "../components/Select/Select";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
@@ -96,6 +100,7 @@ const implementedRuntimeNames = [
   "DateInput",
   "DatePicker",
   "FileInput",
+  "FileUploadDropZone",
   "TimeInput",
   "Select",
   "Option",
@@ -148,6 +153,10 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   DateInput: dateInputRenderer,
   DatePicker: datePickerRenderer,
   FileInput: fileInputRenderer,
+  FileUploadDropZone: fileUploadDropZoneRenderer,
+  Option: optionRenderer,
+  Select: selectRenderer,
+  Items: itemsRenderer,
   TimeInput: timeInputRenderer,
   ...htmlTagRenderers,
 };
@@ -193,6 +202,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const dateInputTransferred = contract.name === "DateInput";
     const datePickerTransferred = contract.name === "DatePicker";
     const fileInputTransferred = contract.name === "FileInput";
+    const fileUploadDropZoneTransferred = contract.name === "FileUploadDropZone";
+    const itemsTransferred = contract.name === "Items";
     const timeInputTransferred = contract.name === "TimeInput";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
@@ -226,6 +237,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       dateInputTransferred ||
       datePickerTransferred ||
       fileInputTransferred ||
+      fileUploadDropZoneTransferred ||
+      itemsTransferred ||
       timeInputTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
@@ -273,9 +286,13 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                 ? "DatePicker"
                                 : fileInputTransferred
                                   ? "FileInput"
-                                  : timeInputTransferred
-                                    ? "TimeInput"
-                                    : contract.name;
+                                  : fileUploadDropZoneTransferred
+                                    ? "FileUploadDropZone"
+                                    : itemsTransferred
+                                      ? "Items"
+                                      : timeInputTransferred
+                                        ? "TimeInput"
+                                        : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
       : sharedComponentFile;
@@ -310,6 +327,10 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DatePickerReact.tsx`);
     } else if (fileInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileInputReact.tsx`);
+    } else if (fileUploadDropZoneTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileUploadDropZoneReact.tsx`);
+    } else if (itemsTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ItemsReact.tsx`);
     } else if (timeInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TimeInputReact.tsx`);
     } else if (headingTransferred) {
@@ -356,6 +377,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       dateInputTransferred,
       datePickerTransferred,
       fileInputTransferred,
+      fileUploadDropZoneTransferred,
+      itemsTransferred,
       timeInputTransferred,
       headingTransferred,
       htmlTagTransferred,
@@ -400,7 +423,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.defaults.ts`]
             : [],
         styles:
-          transferredFolder && !brTransferred && !fragmentTransferred && !pageMetaTitleTransferred
+          transferredFolder && !brTransferred && !fragmentTransferred && !pageMetaTitleTransferred && !itemsTransferred
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.module.scss`]
             : [],
         docs: transferredFolder ? [`xmlui/src/components/${folderName}/${docsFile}.md`] : [],
@@ -430,6 +453,8 @@ function componentRunnablePaths(flags: {
   dateInputTransferred: boolean;
   datePickerTransferred: boolean;
   fileInputTransferred: boolean;
+  fileUploadDropZoneTransferred: boolean;
+  itemsTransferred: boolean;
   timeInputTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
@@ -504,6 +529,12 @@ function componentRunnablePaths(flags: {
   }
   if (flags.fileInputTransferred) {
     return ["xmlui/src/components/FileInput/FileInput.spec.ts"];
+  }
+  if (flags.fileUploadDropZoneTransferred) {
+    return ["xmlui/src/components/FileUploadDropZone/FileUploadDropZone.spec.ts"];
+  }
+  if (flags.itemsTransferred) {
+    return ["xmlui/src/components/Items/Items.spec.ts"];
   }
   if (flags.timeInputTransferred) {
     return ["xmlui/src/components/TimeInput/TimeInput.spec.ts"];

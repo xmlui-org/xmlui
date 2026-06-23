@@ -2143,14 +2143,13 @@ Verification:
 
 ###### Wave B6.2: FileUploadDropZone Foundation
 
-Status: planned after Wave B6.1 unless `FileInput` uncovers shared file-event
-infrastructure that should be factored first.
+Status: completed on 2026-06-23.
 
 Scope:
 
 - migrate `FileUploadDropZone` with source-adjacent metadata, defaults, SCSS,
-  docs, renderer, focused E2E coverage, registry/compiler wiring, and a visual
-  sample;
+  docs, renderer, the full old E2E suite, registry/compiler wiring, and a
+  visual sample;
 - preserve the foundation public contract for drag-over/drop state, upload
   event payloads, accepted MIME type filtering, maximum file count behavior,
   optional paste uploads, paste suppression from text inputs and editable
@@ -2186,21 +2185,90 @@ Verification target:
 - `npm.cmd --workspace xmlui run compatibility:component-e2e-audit`
 - `npm.cmd --workspace xmlui run test:e2e -- src/components/FileUploadDropZone/FileUploadDropZone.spec.ts`
 
+Verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test:e2e -- src/components/FileUploadDropZone/FileUploadDropZone.spec.ts`
+  passed with 37 passed. The suite is the transferred old
+  `FileUploadDropZone.spec.ts`, not a reduced focused replacement.
+
+Notes:
+
+- the visual sample is available at
+  `http://127.0.0.1:5173/?example=fileUploadDropZoneFoundation`;
+- the migrated old tests include upload handlers such as
+  `files => testState = files.map(f => f.name)` and pass in the current E2E
+  path. Broader async-aware callback semantics remain part of the event
+  compiler compatibility backlog, but they do not block this component slice.
+
 #### Wave C: Selection and Collection Components
 
 ##### Wave C1: Existing Collection Foundation
 
 Components:
 
-- `Items`;
-- `Select`;
-- `Option`.
+- `Items` - completed on 2026-06-23 with all 26 old E2E cases migrated;
+  25 pass and one old E2E case is marked `fixme`
+  because it depends on old `<script>` function support that is not yet
+  implemented in the rewrite compiler/testbed;
+- `Select` - foundation slice completed on 2026-06-23. The current native
+  select behavior was moved out of the central builtins renderer and into the
+  source-adjacent component folder with metadata, defaults, SCSS, docs,
+  registry wiring, driver support, and foundation E2E tests. This is not full
+  old-suite closure yet;
+- `Option` - foundation slice completed on 2026-06-23 together with `Select`.
+  The component folder now has source-adjacent metadata/defaults/docs and
+  contributes option descriptors to the native Select foundation. This is not
+  full old-suite closure yet.
 
 Compatibility focus:
 
 - current experimental collection components must be re-closed against old
   metadata, docs, theme variables, and complete old E2E tests before deeper
   collection work starts.
+
+`Items` verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test:e2e -- src/components/Items/Items.spec.ts`
+  passed with 25 passed and 1 `fixme`.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=builtinsItems`.
+
+Next component in Wave C1:
+
+- Full `Select`/`Option` closure remains pending. The next Select/Option slice
+  must migrate the old Radix-style dropdown/option context semantics far enough
+  to start copying the literal old `Select.spec.ts` and `Option.spec.ts` cases
+  instead of relying on the temporary foundation specs.
+
+`Select`/`Option` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Select/Select.foundation.spec.ts src/components/Option/Option.foundation.spec.ts`
+  passed with 5 passed.
+
+`Select`/`Option` compatibility debt:
+
+- the old `Select.spec.ts` suite is large and covers dynamic `Items` options,
+  Form/FormItem integration, validation feedback, searchable and multi-select
+  dropdowns, grouping, clear button parts, overlay/modal z-index behavior,
+  nested dropdown menus, custom templates, label layout, and scroll indicators;
+- the old `Option.spec.ts` suite also covers Select, AutoComplete, and
+  RadioGroup integration. The AutoComplete and RadioGroup-dependent cases must
+  wait until those components exist;
+- future closure must copy those old E2E test cases literally, changing
+  infrastructure/drivers as needed but not replacing the old cases with
+  reduced coverage.
 
 ##### Wave C2: Choice Collections
 

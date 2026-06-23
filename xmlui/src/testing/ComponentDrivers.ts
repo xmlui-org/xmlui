@@ -138,6 +138,128 @@ export class TextAreaDriver extends InputComponentDriver {
   }
 }
 
+export class FileUploadDropZoneDriver extends ComponentDriver {
+  get input(): Locator {
+    return this.component.locator('input[type="file"]').first();
+  }
+
+  getHiddenInput(): Locator {
+    return this.input;
+  }
+
+  get dropPlaceholder(): Locator {
+    return this.getByPartName("dropPlaceholder");
+  }
+
+  getDropPlaceholder(): Locator {
+    return this.dropPlaceholder;
+  }
+
+  getDropIcon(): Locator {
+    return this.component.locator("[data-icon]").first();
+  }
+
+  async isEnabled(): Promise<boolean> {
+    return (await this.component.getAttribute("data-drop-enabled")) === "true";
+  }
+
+  async hasChildren(): Promise<boolean> {
+    const placeholderCount = await this.dropPlaceholder.count();
+    const text = (await this.component.textContent())?.trim() ?? "";
+    return placeholderCount === 0 && text.length > 0;
+  }
+
+  async triggerDragEnter(): Promise<void> {
+    await this.component.evaluate((element) => {
+      const transfer = new DataTransfer();
+      element.dispatchEvent(new DragEvent("dragenter", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: transfer,
+      }));
+    });
+  }
+
+  async triggerDragLeave(): Promise<void> {
+    await this.component.evaluate((element) => {
+      const transfer = new DataTransfer();
+      element.dispatchEvent(new DragEvent("dragleave", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: transfer,
+      }));
+    });
+  }
+
+  async triggerDrop(fileNames: string[]): Promise<void> {
+    await this.component.evaluate((element, names) => {
+      const transfer = new DataTransfer();
+      names.forEach((name) => {
+        transfer.items.add(new File(["test-file"], name, {
+          type: testFileTypeInBrowser(name),
+        }));
+      });
+      element.dispatchEvent(new DragEvent("drop", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: transfer,
+      }));
+      function testFileTypeInBrowser(name: string): string {
+        const lowerName = name.toLowerCase();
+        if (lowerName.endsWith(".pdf")) {
+          return "application/pdf";
+        }
+        if (lowerName.endsWith(".png")) {
+          return "image/png";
+        }
+        if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
+          return "image/jpeg";
+        }
+        if (lowerName.endsWith(".json")) {
+          return "application/json";
+        }
+        return "text/plain";
+      }
+    }, fileNames);
+  }
+
+  async triggerPaste(fileNames: string[], target?: Locator): Promise<void> {
+    const pasteTarget = target ?? this.component;
+    await pasteTarget.evaluate((element, names) => {
+      const transfer = new DataTransfer();
+      names.forEach((name) => {
+        transfer.items.add(new File(["test-file"], name, {
+          type: testFileTypeInBrowser(name),
+        }));
+      });
+      const event = new Event("paste", {
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(event, "clipboardData", {
+        value: transfer,
+      });
+      element.dispatchEvent(event);
+      function testFileTypeInBrowser(name: string): string {
+        const lowerName = name.toLowerCase();
+        if (lowerName.endsWith(".pdf")) {
+          return "application/pdf";
+        }
+        if (lowerName.endsWith(".png")) {
+          return "image/png";
+        }
+        if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
+          return "image/jpeg";
+        }
+        if (lowerName.endsWith(".json")) {
+          return "application/json";
+        }
+        return "text/plain";
+      }
+    }, fileNames);
+  }
+}
+
 export class NumberBoxDriver extends InputComponentDriver {
   get input(): Locator {
     return this.component.getByRole("spinbutton").first();
@@ -217,6 +339,26 @@ export class CheckboxDriver extends InputComponentDriver {
     return this.input.evaluate((element) =>
       window.getComputedStyle(element, "::before").color,
     );
+  }
+}
+
+export class SelectDriver extends ComponentDriver {
+  get select(): Locator {
+    return this.component.locator("select").or(this.component).first();
+  }
+
+  async selectOption(value: string): Promise<void> {
+    await this.select.selectOption(value);
+  }
+
+  async value(): Promise<string | string[]> {
+    return this.select.evaluate((element) => {
+      const select = element as HTMLSelectElement;
+      if (select.multiple) {
+        return Array.from(select.selectedOptions).map((option) => option.value);
+      }
+      return select.value;
+    });
   }
 }
 

@@ -132,36 +132,6 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
     );
     return <>{context.renderChildren(fragment.children, createSlotScope(fragment.scope, contextValues))}</>;
   },
-  Items: ({ context, node, scope }) => {
-    const data = useEvaluatedProp(node, scope, "data", undefined);
-    const internalItems = useEvaluatedProp(node, scope, "items", undefined);
-    const reverse = useBooleanProp(node, scope, "reverse", false);
-    const items = Array.isArray(data) ? data : Array.isArray(internalItems) ? internalItems : [];
-    const renderedItems = reverse ? [...items].reverse() : items;
-    const itemTemplate = templateChildren(node, "itemTemplate") ?? nonPropertyChildren(node.children);
-    return (
-      <div {...partAttrs("Items")} style={useLayoutStyle(node, scope)}>
-        {renderedItems.map((item, index) => {
-          const sourceIndex = reverse ? items.length - index - 1 : index;
-          const itemScope = createRuntimeScope({
-            store: scope.store,
-            parent: scope,
-            props: scope.props,
-            contextValues: {
-              $item: item,
-              $itemIndex: sourceIndex,
-              $isFirst: index === 0,
-              $isLast: index === renderedItems.length - 1,
-            },
-            references: scope.references,
-            slots: scope.slots,
-            emitEvent: scope.emitEvent,
-          });
-          return <React.Fragment key={index}>{context.renderChildren(itemTemplate, itemScope)}</React.Fragment>;
-        })}
-      </div>
-    );
-  },
   TextBox: ({ node, scope }) => {
     const initialValue = useStringProp(node, scope, "initialValue", "");
     const placeholder = useStringProp(node, scope, "placeholder", "");

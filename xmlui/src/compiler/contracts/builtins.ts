@@ -7,6 +7,7 @@ import { FragmentMd } from "../../components/Fragment/Fragment";
 import { ImageMd } from "../../components/Image/Image";
 import { IFrameMd } from "../../components/IFrame/IFrame";
 import { LinkMd } from "../../components/Link/Link";
+import { ItemsMd } from "../../components/Items/Items";
 import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
 import { TextAreaMd } from "../../components/TextArea/TextArea";
 import { NumberBoxMd } from "../../components/NumberBox/NumberBox";
@@ -16,6 +17,7 @@ import { ColorPickerMd } from "../../components/ColorPicker/ColorPicker";
 import { DateInputMd } from "../../components/DateInput/DateInput";
 import { DatePickerMd } from "../../components/DatePicker/DatePicker";
 import { FileInputMd } from "../../components/FileInput/FileInput";
+import { FileUploadDropZoneMd } from "../../components/FileUploadDropZone/FileUploadDropZone";
 import { TimeInputMd } from "../../components/TimeInput/TimeInput";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
@@ -340,6 +342,15 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       parseError: "onParseError",
     },
   }),
+  contractFromMetadata(FileUploadDropZoneMd, {
+    name: "FileUploadDropZone",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      upload: "onUpload",
+    },
+  }),
   contractFromMetadata(TimeInputMd, {
     name: "TimeInput",
     allowsChildren: false,
@@ -487,27 +498,11 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps(),
     events: {},
   },
-  {
+  contractFromMetadata(ItemsMd, {
     name: "Items",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps({
-      items: { name: "items" },
-      data: { name: "data" },
-      reverse: { name: "reverse" },
-    }),
-    events: {},
-    templates: {
-      itemTemplate: { name: "itemTemplate" },
-    },
-    contextVariables: {
-      $item: { name: "$item" },
-      $itemIndex: { name: "$itemIndex" },
-      $isFirst: { name: "$isFirst" },
-      $isLast: { name: "$isLast" },
-    },
-  },
+    includeLayoutProps: false,
+  }),
   {
     name: "Checkbox",
     kind: "builtin",

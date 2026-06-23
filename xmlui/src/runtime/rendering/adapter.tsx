@@ -301,7 +301,7 @@ function useViewportWidth(): number | undefined {
   return width;
 }
 
-function templateChildren(node: XmluiElement, name: string): XmluiNode[] | undefined {
+export function templateChildren(node: XmluiElement, name: string): XmluiNode[] | undefined {
   const property = node.children.find(
     (child): child is XmluiElement =>
       child.kind === "element" &&
@@ -311,7 +311,7 @@ function templateChildren(node: XmluiElement, name: string): XmluiNode[] | undef
   return property?.children;
 }
 
-function nonPropertyChildren(children: XmluiNode[]): XmluiNode[] {
+export function nonPropertyChildren(children: XmluiNode[]): XmluiNode[] {
   return children.filter((child) => !(child.kind === "element" && child.type === "property"));
 }
 
