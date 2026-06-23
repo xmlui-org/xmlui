@@ -59,6 +59,32 @@ export class InputComponentDriver extends ComponentDriver {
   }
 }
 
+export class FormDriver extends ComponentDriver {
+  get submitButton(): Locator {
+    return this.component.getByRole("button", { name: "Save" });
+  }
+
+  get cancelButton(): Locator {
+    return this.component.getByRole("button", { name: "Cancel" });
+  }
+}
+
+export class FormItemDriver extends ComponentDriver {
+  get input(): Locator {
+    return this.getByPartName("input");
+  }
+
+  get label(): Locator {
+    return this.getByPartName("label");
+  }
+
+  get error(): Locator {
+    return this.getByPartName("error");
+  }
+}
+
+export class FormSegmentDriver extends ComponentDriver {}
+
 export class IconDriver extends ComponentDriver {
   get svgIcon() {
     return this.component.locator("svg");

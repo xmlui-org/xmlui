@@ -3521,9 +3521,156 @@ Verified:
   future closure should use App/AppHeader integration tests and user/theme
   runtime tests.
 
-Next explicit step: Phase 5 Wave E1A - migrate `Form` and `FormItem`
-foundation together, because input validation and field binding require their
-shared form context.
+Phase 5 Wave E1A completed: `Form` and `FormItem` foundation.
+
+Implemented in this slice:
+
+- created component folders for `Form` and `FormItem` with metadata, React
+  implementation files, renderer files, SCSS modules, copied old docs, copied
+  old E2E specs, and focused foundation E2E specs;
+- established a minimal shared form context for field registration, form data
+  values, required validation messages, submit, cancel, and enabled-state
+  propagation;
+- added `FormItem` fallback input rendering for childless form items, label
+  association, label width, required indicator, and required validation feedback;
+- wired compiler contracts, IR built-in recognition, runtime registry transfer
+  metadata, test fixtures/drivers, and the Vite example route;
+- added the visual sample at
+  `xmlui/src/examples/form-foundation/Main.xmlui`, runnable with
+  `npm run dev -- --host 127.0.0.1 --port 5173` from `xmlui/` and
+  `?example=formFoundation`;
+- copied the full original `Form` and `FormItem` E2E suites as skipped
+  compatibility trackers. These suites currently collect cleanly but are not
+  executable until the later form waves implement the full old behavior.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed;
+- `npm --workspace xmlui test` passed with 37 files and 263 tests;
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed and
+  lists `FormReact.tsx` and `FormItemReact.tsx` as direct SCSS module imports;
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts`
+  passed with 5 focused E2E tests;
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormItem/FormItemLabelClick.spec.ts --list`
+  collected the copied skipped compatibility suites cleanly;
+- one copied old Form test was run with `--grep` and reported as skipped.
+
+Compatibility debt carried forward after E1A:
+
+- the full original Form/FormItem behavior is still pending, including
+  `$data`, form APIs, `buttonRowTemplate`, submit URL/method,
+  `onWillSubmit`, submit/reset lifecycle, dirty-state behavior, no-submit
+  fields, unmount/remount value preservation, built-in typed form item controls,
+  child-control `bindTo`, validation timing modes, custom/async validations,
+  concise validation feedback, require-label modes, sticky button rows, and full
+  theme-variable parity;
+- this foundation uses local required validation only and does not yet bind
+  existing input components such as `TextBox` directly through `bindTo`;
+- metadata extracts the new component theme variables from a local SCSS-source
+  string to avoid Vite config-time runtime stylesheet imports. When the
+  metadata extraction pipeline can read component SCSS without importing React
+  runtime modules during config loading, switch this to the same direct
+  component stylesheet extraction pattern expected for migrated components.
+
+Phase 5 Wave E1B completed: `FormSegment` foundation.
+
+Implemented in this slice:
+
+- created `FormSegment` with metadata, React implementation, renderer, SCSS
+  module, copied old E2E spec, and focused foundation E2E spec;
+- added runtime scope injection for segment context variables:
+  `$segmentData`, `$segmentValidationIssues`, and
+  `$hasSegmentValidationIssue`;
+- added a minimal dirty-field tracker to the shared Form context so
+  `FormSegment` can expose the `isDirty` API;
+- registered `FormSegment` with the compiler contracts, IR built-in list,
+  runtime registry transfer metadata, test fixtures/drivers, and Vite example
+  routing;
+- added the visual sample at
+  `xmlui/src/examples/form-segment-foundation/Main.xmlui`, runnable with
+  `npm run dev -- --host 127.0.0.1 --port 5173` from `xmlui/` and
+  `?example=formSegmentFoundation`;
+- copied the full original `FormSegment.spec.ts` as a skipped compatibility
+  tracker. It currently collects 38 old test cases and is not executable until
+  later form and validation waves implement the full old behavior.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed;
+- `npm --workspace xmlui test` passed with 37 files and 263 tests;
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed and
+  lists `FormSegmentReact.tsx` as a direct SCSS module import;
+- `npm --workspace xmlui exec -- playwright test src/components/FormSegment/FormSegment.foundation.spec.ts`
+  passed with 3 focused E2E tests;
+- `npm --workspace xmlui exec -- playwright test src/components/FormSegment/FormSegment.spec.ts --list`
+  collected 38 copied skipped compatibility tests;
+- one copied old FormSegment test was run with `--grep` and reported as
+  skipped.
+
+Compatibility debt carried forward after E1B:
+
+- `FormSegment` currently provides foundation `$segmentData`,
+  `$segmentValidationIssues`, `$hasSegmentValidationIssue`, `isValid`,
+  `hasIssues`, and `isDirty` semantics, but not full parity for old validation
+  result shapes, typed child-control `bindTo`, layout transposition through the
+  old implicit Stack model, or all original API timing semantics;
+- the executable foundation tests avoid calling `$hasSegmentValidationIssue`
+  from XMLUI script because the current expression compiler cannot yet call a
+  context-provided function target. The runtime context function is present for
+  compatibility direction, but compiler support must be expanded before old
+  tests using that call shape can run;
+- Form/FormItem still need the broader old form behavior listed after E1A.
+
+Phase 5 Wave E2A completed: `ValidationSummary` and
+`ConciseValidationFeedback` foundation.
+
+Implemented in this slice:
+
+- created migrated component folders for `ValidationSummary` and
+  `ConciseValidationFeedback` with metadata files, React implementation files,
+  renderer files, SCSS modules, and focused foundation E2E specs;
+- `ValidationSummary` can render current `FormContext.errors` after submit and
+  can also render explicit `fieldValidationResults` and
+  `generalValidationResults` props in the old result-shape direction;
+- `ConciseValidationFeedback` can render compact valid/error indicators with
+  accessible error text and hides neutral statuses;
+- wired both components into compiler contracts, IR built-in recognition,
+  runtime registry transfer metadata, and the Vite example route;
+- added the visual sample at
+  `xmlui/src/examples/validation-display-foundation/Main.xmlui`, runnable with
+  `npm run dev -- --host 127.0.0.1 --port 5173` from `xmlui/` and
+  `?example=validationDisplayFoundation`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed;
+- `npm --workspace xmlui test` passed with 37 files and 263 tests;
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed and
+  lists both new React files as direct SCSS module imports;
+- `npm --workspace xmlui exec -- playwright test src/components/ValidationSummary/ValidationSummary.foundation.spec.ts src/components/ConciseValidationFeedback/ConciseValidationFeedback.foundation.spec.ts`
+  passed with 4 focused E2E tests.
+
+Compatibility notes and debt:
+
+- the original project has implementation files for these components but no
+  component-local E2E suites to copy; old compatibility coverage is primarily
+  through `Form` and input component suites;
+- the foundation `ValidationSummary` supports current required-field errors and
+  a simplified version of the old validation result shape, but not full old
+  validation severities, animation behavior, close-button behavior, exact icon
+  rendering, or all theme variables;
+- the foundation `ConciseValidationFeedback` uses accessible text/glyphs rather
+  than the original themed icon and tooltip stack. Replace this with exact
+  `Icon`/`Tooltip` integration when those interactions are ready for full form
+  validation compatibility;
+- full integration into input components such as `TextBox`, `NumberBox`,
+  `DateInput`, `Select`, and `AutoComplete` remains part of later form/input
+  validation closure.
+
+Next explicit step: Phase 5 Wave E3A - inspect and plan the structured form
+components (`StepperForm` and `TabsForm`) against the original implementation,
+then migrate the smallest foundation slice with copied old tests if component
+local suites exist.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 

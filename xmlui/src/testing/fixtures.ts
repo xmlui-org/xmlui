@@ -26,6 +26,9 @@ import {
   DateInputDriver,
   FileUploadDropZoneDriver,
   FooterDriver,
+  FormDriver,
+  FormItemDriver,
+  FormSegmentDriver,
   SelectDriver,
   SliderDriver,
   TimeInputDriver,
@@ -63,6 +66,8 @@ type Fixtures = {
   createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
+  createOptionDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
+  createValidationDisplayDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createResponsiveBarDriver: (testId?: string | Locator) => Promise<ResponsiveBarDriver>;
   createSplitterDriver: (testId?: string | Locator) => Promise<SplitterDriver>;
   createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
@@ -81,6 +86,9 @@ type Fixtures = {
   createDateInputDriver: (testId?: string | Locator) => Promise<DateInputDriver>;
   createFileUploadDropZoneDriver: (testId?: string | Locator) => Promise<FileUploadDropZoneDriver>;
   createFooterDriver: (testId?: string | Locator) => Promise<FooterDriver>;
+  createFormDriver: (testId?: string | Locator) => Promise<FormDriver>;
+  createFormItemDriver: (testId?: string | Locator) => Promise<FormItemDriver>;
+  createFormSegmentDriver: (testId?: string | Locator) => Promise<FormSegmentDriver>;
   createAutoCompleteDriver: (testId?: string | Locator) => Promise<AutoCompleteDriver>;
   createSelectDriver: (testId?: string | Locator) => Promise<SelectDriver>;
   createTimeInputDriver: (testId?: string | Locator) => Promise<TimeInputDriver>;
@@ -206,6 +214,28 @@ export const test = base.extend<Fixtures>({
   createNoResultDriver: async ({ page }, use) => {
     await use(async (testId) => new NoResultDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="NoResult"]').first(),
+      page,
+    }));
+  },
+  createOptionDriver: async ({ page }, use) => {
+    await use(async (testId) => new ComponentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Option"]').first(),
+      page,
+    }));
+  },
+  createValidationDisplayDriver: async ({ page }, use) => {
+    await use(async (testId) => new ComponentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ValidationDisplay"]').first(),
       page,
     }));
   },
@@ -395,6 +425,39 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="Footer"]').first(),
+      page,
+    }));
+  },
+  createFormDriver: async ({ page }, use) => {
+    await use(async (testId) => new FormDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Form"]').first(),
+      page,
+    }));
+  },
+  createFormItemDriver: async ({ page }, use) => {
+    await use(async (testId) => new FormItemDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="FormItem"]').first(),
+      page,
+    }));
+  },
+  createFormSegmentDriver: async ({ page }, use) => {
+    await use(async (testId) => new FormSegmentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="FormSegment"]').first(),
       page,
     }));
   },

@@ -12,6 +12,9 @@ import { IFrameMd } from "../../components/IFrame/IFrame";
 import { LinkMd } from "../../components/Link/Link";
 import { ItemsMd } from "../../components/Items/Items";
 import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
+import { FormMd } from "../../components/Form/Form";
+import { FormItemMd } from "../../components/FormItem/FormItem";
+import { FormSegmentMd } from "../../components/FormSegment/FormSegment";
 import { TextAreaMd } from "../../components/TextArea/TextArea";
 import { NumberBoxMd } from "../../components/NumberBox/NumberBox";
 import { RatingInputMd } from "../../components/RatingInput/RatingInput";
@@ -33,6 +36,8 @@ import { TileGridMd } from "../../components/TileGrid/TileGrid";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
 import { NoResultMd } from "../../components/NoResult/NoResult";
+import { ValidationSummaryMd } from "../../components/ValidationSummary/ValidationSummary";
+import { ConciseValidationFeedbackMd } from "../../components/ConciseValidationFeedback/ConciseValidationFeedback";
 import { PageMetaTitleMd } from "../../components/PageMetaTitle/PageMetaTitle";
 import { QRCodeMd } from "../../components/QRCode/QRCode";
 import { ResponsiveBarMd } from "../../components/ResponsiveBar/ResponsiveBar";
@@ -353,6 +358,18 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: true,
   }),
+  contractFromMetadata(ValidationSummaryMd, {
+    name: "ValidationSummary",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ConciseValidationFeedbackMd, {
+    name: "ConciseValidationFeedback",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
   contractFromMetadata(FallbackMd, {
     name: "Fallback",
     allowsChildren: true,
@@ -372,6 +389,28 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     eventAttributes: {
       click: "onClick",
     },
+  }),
+  contractFromMetadata(FormMd, {
+    name: "Form",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      submit: "onSubmit",
+      cancel: "onCancel",
+    },
+  }),
+  contractFromMetadata(FormItemMd, {
+    name: "FormItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(FormSegmentMd, {
+    name: "FormSegment",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   contractFromMetadata(TextBoxMd, {
     name: "TextBox",

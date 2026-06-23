@@ -89,6 +89,9 @@ import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui"
 import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
 import flowTileFoundationApp from "./examples/flow-tile-foundation/Main.xmlui";
 import footerFoundationApp from "./examples/footer-foundation/Main.xmlui";
+import formFoundationApp from "./examples/form-foundation/Main.xmlui";
+import formSegmentFoundationApp from "./examples/form-segment-foundation/Main.xmlui";
+import validationDisplayFoundationApp from "./examples/validation-display-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import stackFamilyFoundationApp from "./examples/stack-family-foundation/Main.xmlui";
 import tableFoundationApp from "./examples/table-foundation/Main.xmlui";
@@ -195,6 +198,9 @@ const examples = {
   fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
   flowTileFoundation: flowTileFoundationApp,
   footerFoundation: footerFoundationApp,
+  formFoundation: formFoundationApp,
+  formSegmentFoundation: formSegmentFoundationApp,
+  validationDisplayFoundation: validationDisplayFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
   stackFamilyFoundation: stackFamilyFoundationApp,
   tableFoundation: tableFoundationApp,

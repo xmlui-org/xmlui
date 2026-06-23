@@ -7,6 +7,7 @@ import { appHeaderRenderer } from "../components/AppHeader/AppHeader.renderer";
 import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card.renderer";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
+import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
 import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator.renderer";
 import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
@@ -71,6 +72,9 @@ import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
 import { footerRenderer } from "../components/Footer/Footer.renderer";
+import { formRenderer } from "../components/Form/Form.renderer";
+import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
+import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
@@ -84,6 +88,7 @@ import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfCo
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
+import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
 import { navGroupRenderer } from "../components/NavGroup/NavGroup.renderer";
 import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
 import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
@@ -110,6 +115,8 @@ const implementedRuntimeNames = [
   "List",
   "Logo",
   "NoResult",
+  "ValidationSummary",
+  "ConciseValidationFeedback",
   "PageMetaTitle",
   "QRCode",
   "ResponsiveBar",
@@ -166,6 +173,9 @@ const implementedRuntimeNames = [
   "FileInput",
   "FileUploadDropZone",
   "Footer",
+  "Form",
+  "FormItem",
+  "FormSegment",
   "TimeInput",
   "ScrollViewer",
   "Select",
@@ -200,6 +210,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Button: buttonRenderer,
   Card: cardRenderer,
   CodeBlock: codeBlockRenderer,
+  ConciseValidationFeedback: conciseValidationFeedbackRenderer,
   ContentSeparator: contentSeparatorRenderer,
   ExpandableItem: expandableItemRenderer,
   Fallback: fallbackRenderer,
@@ -257,6 +268,9 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   FileInput: fileInputRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
   Footer: footerRenderer,
+  Form: formRenderer,
+  FormItem: formItemRenderer,
+  FormSegment: formSegmentRenderer,
   Option: optionRenderer,
   Pagination: paginationRenderer,
   Table: tableRenderer,
@@ -271,6 +285,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   SelectionStore: selectionStoreRenderer,
   Items: itemsRenderer,
   TimeInput: timeInputRenderer,
+  ValidationSummary: validationSummaryRenderer,
   NavGroup: navGroupRenderer,
   NavLink: navLinkRenderer,
   NavPanelCollapseButton: navPanelCollapseButtonRenderer,
@@ -337,6 +352,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const fileInputTransferred = contract.name === "FileInput";
     const fileUploadDropZoneTransferred = contract.name === "FileUploadDropZone";
     const footerTransferred = contract.name === "Footer";
+    const formTransferred = contract.name === "Form";
+    const formItemTransferred = contract.name === "FormItem";
+    const formSegmentTransferred = contract.name === "FormSegment";
     const itemsTransferred = contract.name === "Items";
     const tableTransferred = contract.name === "Table";
     const columnTransferred = contract.name === "Column";
@@ -370,6 +388,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const expandableItemTransferred = contract.name === "ExpandableItem";
     const fallbackTransferred = contract.name === "Fallback";
     const noResultTransferred = contract.name === "NoResult";
+    const validationSummaryTransferred = contract.name === "ValidationSummary";
+    const conciseValidationFeedbackTransferred = contract.name === "ConciseValidationFeedback";
     const spaceFillerTransferred = contract.name === "SpaceFiller";
     const tabsTransferred = contract.name === "Tabs" || contract.name === "TabItem";
     const stackTransferred = contract.name === "Stack" || contract.name === "HStack" || contract.name === "VStack";
@@ -400,6 +420,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       fileInputTransferred ||
       fileUploadDropZoneTransferred ||
       footerTransferred ||
+      formTransferred ||
+      formItemTransferred ||
+      formSegmentTransferred ||
       itemsTransferred ||
       tableTransferred ||
       columnTransferred ||
@@ -433,6 +456,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       expandableItemTransferred ||
       fallbackTransferred ||
       noResultTransferred ||
+      validationSummaryTransferred ||
+      conciseValidationFeedbackTransferred ||
       spaceFillerTransferred ||
       tabsTransferred ||
       stackTransferred ||
@@ -584,6 +609,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileUploadDropZoneReact.tsx`);
     } else if (footerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FooterReact.tsx`);
+    } else if (formTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FormReact.tsx`);
+    } else if (formItemTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FormItemReact.tsx`);
+    } else if (formSegmentTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FormSegmentReact.tsx`);
     } else if (itemsTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ItemsReact.tsx`);
     } else if (tableTransferred) {
@@ -648,6 +679,10 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FallbackReact.tsx`);
     } else if (noResultTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NoResultReact.tsx`);
+    } else if (validationSummaryTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ValidationSummaryReact.tsx`);
+    } else if (conciseValidationFeedbackTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ConciseValidationFeedbackReact.tsx`);
     } else if (spaceFillerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SpaceFillerReact.tsx`);
     }
@@ -678,6 +713,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       fileInputTransferred,
       fileUploadDropZoneTransferred,
       footerTransferred,
+      formTransferred,
+      formItemTransferred,
+      formSegmentTransferred,
       itemsTransferred,
       tableTransferred,
       columnTransferred,
@@ -709,6 +747,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       expandableItemTransferred,
       fallbackTransferred,
       noResultTransferred,
+      validationSummaryTransferred,
+      conciseValidationFeedbackTransferred,
       spaceFillerTransferred,
       tabsTransferred,
     });
@@ -779,6 +819,9 @@ function componentRunnablePaths(flags: {
   fileInputTransferred: boolean;
   fileUploadDropZoneTransferred: boolean;
   footerTransferred: boolean;
+  formTransferred: boolean;
+  formItemTransferred: boolean;
+  formSegmentTransferred: boolean;
   itemsTransferred: boolean;
   tableTransferred: boolean;
   columnTransferred: boolean;
@@ -810,6 +853,8 @@ function componentRunnablePaths(flags: {
   expandableItemTransferred: boolean;
   fallbackTransferred: boolean;
   noResultTransferred: boolean;
+  validationSummaryTransferred: boolean;
+  conciseValidationFeedbackTransferred: boolean;
   spaceFillerTransferred: boolean;
   tabsTransferred: boolean;
 }): string[] {
@@ -926,6 +971,25 @@ function componentRunnablePaths(flags: {
     return [
       "xmlui/src/components/Footer/Footer.foundation.spec.ts",
       "xmlui/src/components/Footer/Footer.spec.ts",
+    ];
+  }
+  if (flags.formTransferred) {
+    return [
+      "xmlui/src/components/Form/Form.foundation.spec.ts",
+      "xmlui/src/components/Form/Form.spec.ts",
+    ];
+  }
+  if (flags.formItemTransferred) {
+    return [
+      "xmlui/src/components/FormItem/FormItem.foundation.spec.ts",
+      "xmlui/src/components/FormItem/FormItem.spec.ts",
+      "xmlui/src/components/FormItem/FormItemLabelClick.spec.ts",
+    ];
+  }
+  if (flags.formSegmentTransferred) {
+    return [
+      "xmlui/src/components/FormSegment/FormSegment.foundation.spec.ts",
+      "xmlui/src/components/FormSegment/FormSegment.spec.ts",
     ];
   }
   if (flags.itemsTransferred) {
@@ -1080,6 +1144,12 @@ function componentRunnablePaths(flags: {
   }
   if (flags.noResultTransferred) {
     return ["xmlui/src/components/NoResult/NoResult.spec.ts"];
+  }
+  if (flags.validationSummaryTransferred) {
+    return ["xmlui/src/components/ValidationSummary/ValidationSummary.foundation.spec.ts"];
+  }
+  if (flags.conciseValidationFeedbackTransferred) {
+    return ["xmlui/src/components/ConciseValidationFeedback/ConciseValidationFeedback.foundation.spec.ts"];
   }
   if (flags.fallbackTransferred) {
     return ["xmlui/src/components/Fallback/Fallback.spec.ts"];
