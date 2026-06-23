@@ -1,0 +1,21 @@
+<App var.count="{0}" var.expanded="{''}">
+  <H1>Accordion foundation</H1>
+  <Accordion onDisplayDidChange="ids => expanded = ids">
+    <AccordionItem id="intro" header="Intro" initiallyExpanded="true">
+      <Text>The first item starts expanded.</Text>
+    </AccordionItem>
+    <AccordionItem id="counter">
+      <property name="headerTemplate">
+        <HStack gap="$space-2">
+          <Text>Counter item</Text>
+          <Text>({count})</Text>
+        </HStack>
+      </property>
+      <VStack gap="$space-3">
+        <Button onClick="count++">Increment</Button>
+        <Text>Count: {count}</Text>
+      </VStack>
+    </AccordionItem>
+  </Accordion>
+  <Text>Expanded: {expanded || 'none'}</Text>
+</App>

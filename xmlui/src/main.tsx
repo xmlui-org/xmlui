@@ -3,6 +3,7 @@ import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/com
 import { createXmluiModule } from "./runtime";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import "./global.css";
+import "./components/Accordion/Accordion.module.scss?xmlui-css-module";
 import "./components/HtmlTags/HtmlTags.module.scss?xmlui-css-module";
 import "./components/IFrame/IFrame.module.scss?xmlui-css-module";
 import "./components/Image/Image.module.scss?xmlui-css-module";
@@ -15,6 +16,9 @@ import "./components/QRCode/QRCode.module.scss?xmlui-css-module";
 import "./components/ResponsiveBar/ResponsiveBar.module.scss?xmlui-css-module";
 import "./components/ScrollViewer/ScrollViewer.module.scss?xmlui-css-module";
 import "./components/SpaceFiller/SpaceFiller.module.scss?xmlui-css-module";
+import "./components/Splitter/Splitter.module.scss?xmlui-css-module";
+import "./components/StickyBox/StickyBox.module.scss?xmlui-css-module";
+import "./components/StickySection/StickySection.module.scss?xmlui-css-module";
 import "./components/Stack/Stack.module.scss?xmlui-css-module";
 import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
 import "./components/TextArea/TextArea.module.scss?xmlui-css-module";
@@ -47,6 +51,7 @@ import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui"
 import asyncSequenceApp from "./examples/async-sequence/Main.xmlui";
 import componentCounterApp from "./examples/counter-components/Main.xmlui";
 import actionsCallApiApp from "./examples/actions-call-api/Main.xmlui";
+import accordionFoundationApp from "./examples/accordion-foundation/Main.xmlui";
 import apiCallMutationApp from "./examples/api-call-mutation/Main.xmlui";
 import appMainContentLayoutApp from "./examples/app-main-content-layout/Main.xmlui";
 import builtinsInputsApp from "./examples/builtins-inputs/Main.xmlui";
@@ -93,6 +98,8 @@ import routingStateApp from "./examples/routing-state/Main.xmlui";
 import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
 import responsiveBarFoundationApp from "./examples/responsive-bar-foundation/Main.xmlui";
 import scrollViewerFoundationApp from "./examples/scroll-viewer-foundation/Main.xmlui";
+import splitterFoundationApp from "./examples/splitter-foundation/Main.xmlui";
+import stickyFoundationApp from "./examples/sticky-foundation/Main.xmlui";
 import styleMutationApp from "./examples/style-mutation/Main.xmlui";
 import themeScopeApp from "./examples/theme-scope/Main.xmlui";
 import themeVarsApp from "./examples/theme-vars/Main.xmlui";
@@ -132,6 +139,7 @@ declare global {
 
 const examples = {
   actionsCallApi: actionsCallApiApp,
+  accordionFoundation: accordionFoundationApp,
   apiCallMutation: apiCallMutationApp,
   appMainContentLayout: appMainContentLayoutApp,
   asyncDirectives: asyncDirectivesApp,
@@ -182,6 +190,8 @@ const examples = {
   runtimeToast: runtimeToastApp,
   responsiveBarFoundation: responsiveBarFoundationApp,
   scrollViewerFoundation: scrollViewerFoundationApp,
+  splitterFoundation: splitterFoundationApp,
+  stickyFoundation: stickyFoundationApp,
   styleMutation: styleMutationApp,
   themeScope: themeScopeApp,
   themeVars: themeVarsApp,

@@ -118,6 +118,40 @@ export class ResponsiveBarDriver extends ComponentDriver {
   }
 }
 
+export class AccordionDriver extends ComponentDriver {}
+
+export class SplitterDriver extends ComponentDriver {
+  getResizer(): Locator {
+    return this.component.locator('[data-xmlui-part="resizer"], .resizer').first();
+  }
+
+  getFloatingResizer(): Locator {
+    return this.component.locator(".floatingResizer").first();
+  }
+
+  async hoverNearResizer() {
+    const bounds = await this.component.boundingBox();
+    if (!bounds) {
+      return;
+    }
+    await this.params.page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  }
+
+  async dragResizer(deltaX: number, deltaY: number) {
+    const resizer = this.getResizer();
+    const bounds = await resizer.boundingBox();
+    if (!bounds) {
+      return;
+    }
+    const startX = bounds.x + bounds.width / 2;
+    const startY = bounds.y + bounds.height / 2;
+    await this.params.page.mouse.move(startX, startY);
+    await this.params.page.mouse.down();
+    await this.params.page.mouse.move(startX + deltaX, startY + deltaY);
+    await this.params.page.mouse.up();
+  }
+}
+
 export class LinkDriver extends ComponentDriver {}
 
 export class TextBoxDriver extends InputComponentDriver {

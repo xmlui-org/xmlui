@@ -20,7 +20,7 @@ export function rawScssModulePlugin(): Plugin {
       }
       const basedir = importer ? path.dirname(importer) : process.cwd();
       let resolved = path.resolve(basedir, filename);
-      if (!importer && filename.startsWith("src/") && !existsSync(resolved)) {
+      if (filename.startsWith("src/") && !existsSync(resolved)) {
         resolved = path.resolve(process.cwd(), "xmlui", filename);
       }
       const prefix = query.split("&").includes("xmlui-css-module")

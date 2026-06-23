@@ -1,6 +1,7 @@
 import type { XmluiComponentContract } from "./types";
 import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
 import { htmlTagDefinitions } from "../../component-core/htmlTags";
+import { AccordionItemMd, AccordionMd } from "../../components/Accordion/Accordion";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
 import { CardMd } from "../../components/Card/Card";
@@ -30,6 +31,9 @@ import { PageMetaTitleMd } from "../../components/PageMetaTitle/PageMetaTitle";
 import { QRCodeMd } from "../../components/QRCode/QRCode";
 import { ResponsiveBarMd } from "../../components/ResponsiveBar/ResponsiveBar";
 import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
+import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/Splitter";
+import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
+import { StickySectionMd } from "../../components/StickySection/StickySection";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -49,6 +53,21 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   contractFromMetadata(BrCapitalizedMd, {
     name: "Br",
     allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(AccordionMd, {
+    name: "Accordion",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      displayDidChange: "onDisplayDidChange",
+    },
+  }),
+  contractFromMetadata(AccordionItemMd, {
+    name: "AccordionItem",
+    allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
   }),
@@ -411,6 +430,45 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       click: "onClick",
       willOpen: "onWillOpen",
     },
+  }),
+  contractFromMetadata(SplitterMd, {
+    name: "Splitter",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      resize: "onResize",
+    },
+  }),
+  contractFromMetadata(HSplitterMd, {
+    name: "HSplitter",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      resize: "onResize",
+    },
+  }),
+  contractFromMetadata(VSplitterMd, {
+    name: "VSplitter",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      resize: "onResize",
+    },
+  }),
+  contractFromMetadata(StickyBoxMd, {
+    name: "StickyBox",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(StickySectionMd, {
+    name: "StickySection",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   {
     name: "HStack",

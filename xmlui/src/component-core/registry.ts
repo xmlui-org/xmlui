@@ -1,6 +1,7 @@
 import { builtInComponentContracts } from "../compiler/contracts";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
+import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion";
 import { appRenderer } from "../components/App/App";
 import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card";
@@ -34,6 +35,13 @@ import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
+import {
+  hSplitterRenderer,
+  splitterRenderer,
+  vSplitterRenderer,
+} from "../components/Splitter/Splitter";
+import { stickyBoxRenderer } from "../components/StickyBox/StickyBox";
+import { stickySectionRenderer } from "../components/StickySection/StickySection";
 import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { textAreaRenderer } from "../components/TextArea/TextArea";
@@ -71,6 +79,8 @@ import type {
 const oldComponentRoot = "/Users/dotneteer/source/xmlui/xmlui/src/components";
 
 const implementedRuntimeNames = [
+  "Accordion",
+  "AccordionItem",
   "App",
   "AppHeader",
   "AutoComplete",
@@ -85,6 +95,11 @@ const implementedRuntimeNames = [
   "PageMetaTitle",
   "QRCode",
   "ResponsiveBar",
+  "Splitter",
+  "HSplitter",
+  "VSplitter",
+  "StickyBox",
+  "StickySection",
   "Heading",
   "H1",
   "H2",
@@ -144,6 +159,8 @@ const implementedRuntimeNames = [
 const implementedRuntimeNameSet = new Set<string>(implementedRuntimeNames);
 const legacyRuntimeRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = legacyBuiltInRenderers;
 const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
+  Accordion: accordionRenderer,
+  AccordionItem: accordionItemRenderer,
   App: appRenderer,
   br: brRenderer,
   Br: BrRenderer,
@@ -163,6 +180,11 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   PageMetaTitle: pageMetaTitleRenderer,
   QRCode: qrCodeRenderer,
   ResponsiveBar: responsiveBarRenderer,
+  Splitter: splitterRenderer,
+  HSplitter: hSplitterRenderer,
+  VSplitter: vSplitterRenderer,
+  StickyBox: stickyBoxRenderer,
+  StickySection: stickySectionRenderer,
   SpaceFiller: spaceFillerRenderer,
   Heading: headingRenderer,
   H1: h1Renderer,
@@ -208,6 +230,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
 };
 
 const componentFolderNames: Record<string, string> = {
+  AccordionItem: "Accordion",
   br: "Br",
   Br: "Br",
   Fragment: "Fragment",
@@ -221,6 +244,8 @@ const componentFolderNames: Record<string, string> = {
   HStack: "Stack",
   VStack: "Stack",
   PasswordInput: "TextBox",
+  HSplitter: "Splitter",
+  VSplitter: "Splitter",
 };
 for (const name of htmlTagComponentNames) {
   componentFolderNames[name] = "HtmlTags";
@@ -235,6 +260,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const contract = builtInContract;
     const renderer = transferredRenderers[contract.name] ?? legacyRuntimeRenderers[contract.name];
     const folderName = componentFolderName(contract.name);
+    const accordionTransferred = contract.name === "Accordion" || contract.name === "AccordionItem";
     const appTransferred = contract.name === "App";
     const buttonTransferred = contract.name === "Button";
     const textTransferred = contract.name === "Text";
@@ -261,6 +287,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const timeInputTransferred = contract.name === "TimeInput";
     const scrollViewerTransferred = contract.name === "ScrollViewer";
     const responsiveBarTransferred = contract.name === "ResponsiveBar";
+    const splitterTransferred = contract.name === "Splitter" || contract.name === "HSplitter" || contract.name === "VSplitter";
+    const stickyBoxTransferred = contract.name === "StickyBox";
+    const stickySectionTransferred = contract.name === "StickySection";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
@@ -280,6 +309,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const stackTransferred = contract.name === "Stack" || contract.name === "HStack" || contract.name === "VStack";
     const flowLayoutTransferred = contract.name === "FlowLayout";
     const transferredFolder =
+      accordionTransferred ||
       appTransferred ||
       buttonTransferred ||
       textTransferred ||
@@ -306,6 +336,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       timeInputTransferred ||
       scrollViewerTransferred ||
       responsiveBarTransferred ||
+      splitterTransferred ||
+      stickyBoxTransferred ||
+      stickySectionTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
@@ -324,7 +357,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       spaceFillerTransferred ||
       stackTransferred ||
       flowLayoutTransferred;
-    const sharedComponentFile = htmlTagTransferred
+    const sharedComponentFile = accordionTransferred
+      ? "Accordion"
+      : htmlTagTransferred
       ? "HtmlTags"
       : brTransferred
         ? "Br"
@@ -376,6 +411,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                     ? "ScrollViewer"
                                                     : responsiveBarTransferred
                                                       ? "ResponsiveBar"
+                                                      : splitterTransferred
+                                                        ? "Splitter"
+                                                        : stickyBoxTransferred
+                                                          ? "StickyBox"
+                                                          : stickySectionTransferred
+                                                            ? "StickySection"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -385,6 +426,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       : [];
     if (appTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppReact.tsx`);
+    } else if (accordionTransferred) {
+      implementationPaths.splice(
+        0,
+        implementationPaths.length,
+        `xmlui/src/components/${folderName}/${contract.name === "AccordionItem" ? "AccordionItemReact" : "AccordionReact"}.tsx`,
+      );
     } else if (buttonTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ButtonReact.tsx`);
     } else if (textTransferred) {
@@ -431,6 +478,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ScrollViewerReact.tsx`);
     } else if (responsiveBarTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ResponsiveBarReact.tsx`);
+    } else if (splitterTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SplitterReact.tsx`);
+    } else if (stickyBoxTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/StickyBoxReact.tsx`);
+    } else if (stickySectionTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/StickySectionReact.tsx`);
     } else if (headingTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/HeadingReact.tsx`);
     } else if (imageTransferred) {
@@ -460,6 +513,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     }
 
     const runnablePaths = componentRunnablePaths({
+      accordionTransferred,
       appTransferred,
       buttonTransferred,
       textTransferred,
@@ -485,6 +539,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       timeInputTransferred,
       scrollViewerTransferred,
       responsiveBarTransferred,
+      splitterTransferred,
+      stickyBoxTransferred,
+      stickySectionTransferred,
       headingTransferred,
       htmlTagTransferred,
       brTransferred,
@@ -543,6 +600,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
   });
 
 function componentRunnablePaths(flags: {
+  accordionTransferred: boolean;
   appTransferred: boolean;
   buttonTransferred: boolean;
   textTransferred: boolean;
@@ -568,6 +626,9 @@ function componentRunnablePaths(flags: {
   timeInputTransferred: boolean;
   scrollViewerTransferred: boolean;
   responsiveBarTransferred: boolean;
+  splitterTransferred: boolean;
+  stickyBoxTransferred: boolean;
+  stickySectionTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
   brTransferred: boolean;
@@ -584,6 +645,12 @@ function componentRunnablePaths(flags: {
   noResultTransferred: boolean;
   spaceFillerTransferred: boolean;
 }): string[] {
+  if (flags.accordionTransferred) {
+    return [
+      "xmlui/src/components/Accordion/Accordion.foundation.spec.ts",
+      "xmlui/src/components/Accordion/Accordion.spec.ts",
+    ];
+  }
   if (flags.appTransferred) {
     return [
       "xmlui/src/components/App/App.spec.tsx",
@@ -697,6 +764,23 @@ function componentRunnablePaths(flags: {
     return [
       "xmlui/src/components/ResponsiveBar/ResponsiveBar.foundation.spec.ts",
       "xmlui/src/components/ResponsiveBar/ResponsiveBar.spec.ts",
+    ];
+  }
+  if (flags.splitterTransferred) {
+    return [
+      "xmlui/src/components/Splitter/Splitter.foundation.spec.ts",
+      "xmlui/src/components/Splitter/Splitter.spec.ts",
+      "xmlui/src/components/Splitter/HSplitter.spec.ts",
+      "xmlui/src/components/Splitter/VSplitter.spec.ts",
+    ];
+  }
+  if (flags.stickyBoxTransferred) {
+    return ["xmlui/src/components/StickySection/StickySection.foundation.spec.ts"];
+  }
+  if (flags.stickySectionTransferred) {
+    return [
+      "xmlui/src/components/StickySection/StickySection.foundation.spec.ts",
+      "xmlui/src/components/StickySection/StickySection.spec.ts",
     ];
   }
   if (flags.headingTransferred) {

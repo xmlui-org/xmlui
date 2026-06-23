@@ -2747,9 +2747,127 @@ Visual check:
 - a minimal `ResponsiveBarDriver` fixture exists only to keep copied tests
   collectible until old test cases are re-enabled feature-by-feature.
 
-Next explicit step: Phase 5 Wave D2C - migrate `Splitter` foundation,
-including the `HSplitter` and `VSplitter` aliases, against old metadata, SCSS,
-docs, copied old E2E tests, a running foundation test, and a visual sample.
+`Splitter` foundation verification completed on 2026-06-23:
+
+- copied the old `Splitter`, `HSplitter`, and `VSplitter` docs and E2E suites
+  into `xmlui/src/components/Splitter`;
+- added `Splitter`, `HSplitter`, and `VSplitter` metadata, contracts, runtime
+  renderers, SCSS, foundation tests, a test driver fixture, compiler/runtime
+  registry wiring, and a visual sample;
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Splitter` passed with
+  3 passed and 70 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3668 tests in 103
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=splitterFoundation`.
+
+`Splitter` compatibility debt:
+
+- the literal old `Splitter.spec.ts`, `HSplitter.spec.ts`, and
+  `VSplitter.spec.ts` suites are copied but intentionally skipped until full
+  pointer dragging, floating resizer behavior, resize constraints, resize
+  events, and old driver parity are migrated;
+- the foundation slice supports the public component names, forced alias
+  orientation, initial primary size, pane ordering, splitter template rendering,
+  theme-variable names, and state updates inside panes;
+- Splitter currently uses a direct dynamic `flexDirection` style as a layout
+  exception because generated theme classes can override layered orientation
+  rules. Keep visual styling in SCSS and revisit orientation delivery when the
+  style layering strategy is tightened;
+- Splitter metadata currently extracts theme-variable names from a small
+  source string duplicated from the SCSS declarations because config-time Vite
+  bundling cannot load the new SCSS raw/theme-vars query in this path. Restore
+  direct SCSS source extraction when the config-time loader path is fixed.
+
+`StickyBox` and `StickySection` foundation verification completed on
+2026-06-23:
+
+- copied the old `StickyBox` and `StickySection` docs and the old
+  `StickySection` E2E suite into the new component folders;
+- added `StickyBox` and `StickySection` metadata, contracts, runtime renderers,
+  SCSS, foundation tests, compiler/runtime registry wiring, and a visual
+  sample;
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/StickySection` passed
+  with 3 passed and 18 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3689 tests in 105
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=stickyFoundation`.
+
+`StickyBox` and `StickySection` compatibility debt:
+
+- the literal old `StickySection.spec.ts` suite is copied but intentionally
+  skipped until full overlapping sticky section, z-index, and scroll geometry
+  parity is migrated;
+- `StickyBox` had no dedicated old component E2E suite in the old component
+  folder, so its foundation coverage lives in `StickySection.foundation.spec.ts`
+  and should be expanded if old cross-component tests are found later;
+- `StickyBox` foundation uses native `position: sticky` rather than
+  `react-sticky-el`. Revisit if the old fixed-toggle behavior, scroll parent
+  detection, real-background inheritance, or heading scroll-margin adjustment
+  needs exact parity;
+- theme-variable metadata currently uses small source strings duplicated from
+  the SCSS declarations, matching the current workaround used by Splitter.
+  Restore direct SCSS source extraction when the config-time loader path is
+  fixed.
+
+Slice completed: Phase 5 Wave D3A - `Accordion` foundation.
+
+Done:
+
+- copied the old `Accordion` docs and E2E suite into the new component folder;
+- added `Accordion` and `AccordionItem` metadata in `Accordion.tsx`, defaults,
+  context, React renderers, SCSS, compiler/runtime registry wiring, and test
+  drivers;
+- added a foundation E2E suite covering expand/collapse, `initiallyExpanded`,
+  `displayDidChange` state mutation, `headerTemplate`, and state updates inside
+  expanded content;
+- added a visual sample at `xmlui/src/examples/accordion-foundation/Main.xmlui`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Accordion` passed with
+  3 passed and 9 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3701 tests in 107
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=accordionFoundation`.
+
+`Accordion` compatibility debt:
+
+- the literal old `Accordion.spec.ts` suite is copied but intentionally skipped
+  until full API parity, Radix-level keyboard behavior, icon rendering,
+  accessibility details, and theme-variable styling parity are migrated;
+- current icon rendering uses textual icon names as a foundation substitute and
+  must be replaced with the migrated XMLUI icon pipeline;
+- event sample/test code avoids nested/member-call expressions such as
+  `ids.join(",")` inside arrow handlers because the current async event code
+  generator can still emit illegal JavaScript for some nested non-async
+  callback/member-call combinations. Fix the compiler before enabling old tests
+  that rely on those shapes;
+- theme-variable metadata currently uses a small source string duplicated from
+  the SCSS declarations, matching the current workaround used by Splitter and
+  Sticky components. Restore direct SCSS source extraction when the config-time
+  loader path is fixed.
+
+Next explicit step: Phase 5 Wave D3B - migrate `ExpandableItem` foundation
+against old metadata, SCSS, docs, copied old E2E tests, a running foundation
+test, and a visual sample.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 

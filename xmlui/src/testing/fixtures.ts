@@ -1,5 +1,6 @@
 import { expect as baseExpect, test as base, type Locator, type Page } from "@playwright/test";
 import {
+  AccordionDriver,
   AutoCompleteDriver,
   CardDriver,
   CheckboxDriver,
@@ -12,6 +13,7 @@ import {
   NoResultDriver,
   NumberBoxDriver,
   ResponsiveBarDriver,
+  SplitterDriver,
   DateInputDriver,
   FileUploadDropZoneDriver,
   SelectDriver,
@@ -42,6 +44,7 @@ export type TestBedResult = {
 type Fixtures = {
   initTestBed: (markup: string, options?: InitTestBedOptions) => Promise<TestBedResult>;
   createButtonDriver: () => Promise<ComponentDriver>;
+  createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
   createTextDriver: (testId?: string) => Promise<ComponentDriver>;
   createHeadingDriver: (testId?: string) => Promise<ComponentDriver>;
   createCardDriver: (testId?: string) => Promise<CardDriver>;
@@ -49,6 +52,7 @@ type Fixtures = {
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
   createResponsiveBarDriver: (testId?: string | Locator) => Promise<ResponsiveBarDriver>;
+  createSplitterDriver: (testId?: string | Locator) => Promise<SplitterDriver>;
   createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
   createTreeDriver: (testId?: string | Locator) => Promise<TreeDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
@@ -118,6 +122,14 @@ export const test = base.extend<Fixtures>({
   createButtonDriver: async ({ page }, use) => {
     await use(async () => createButtonDriver(page));
   },
+  createAccordionDriver: async ({ page }, use) => {
+    await use(async (testId) => new AccordionDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="Accordion"]').first(),
+      page,
+    }));
+  },
   createTextDriver: async ({ page }, use) => {
     await use(async (testId) => new ComponentDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="Text"]').first(),
@@ -163,6 +175,14 @@ export const test = base.extend<Fixtures>({
       locator: typeof testId === "string"
         ? page.getByTestId(testId)
         : testId ?? page.locator('[data-xmlui-component="ResponsiveBar"]').first(),
+      page,
+    }));
+  },
+  createSplitterDriver: async ({ page }, use) => {
+    await use(async (testId) => new SplitterDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="Splitter"], [data-xmlui-component="HSplitter"], [data-xmlui-component="VSplitter"]').first(),
       page,
     }));
   },

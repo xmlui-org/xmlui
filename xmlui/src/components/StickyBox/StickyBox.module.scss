@@ -1,0 +1,36 @@
+// StickyBox.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old StickyBox component pattern.
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-StickyBox: createThemeVar("backgroundColor-StickyBox");
+
+@layer components {
+  .wrapper {
+    position: sticky;
+    z-index: 1;
+    background-color: var(--xmlui-backgroundColor-StickyBox);
+  }
+
+  .toTop {
+    top: 0;
+  }
+
+  .toBottom {
+    bottom: 0;
+  }
+
+  .sentinel ~ *:has([data-anchor="true"]) {
+    [data-anchor="true"] {
+      scroll-margin-top: calc(
+        var(--my-scroll-margin-top, 0px) + var(--xmlui-scroll-margin-top, 0px)
+      );
+    }
+  }
+}
+
+:export {
+  themeVars: ();
+}

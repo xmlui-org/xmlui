@@ -407,6 +407,8 @@ function isComponentReference(type: string, isDefinitionRoot: boolean): boolean 
 
 const builtInElementNames = new Set([
   ...htmlTagComponentNames,
+  "Accordion",
+  "AccordionItem",
   "App",
   "AppHeader",
   "AutoComplete",
@@ -458,6 +460,11 @@ const builtInElementNames = new Set([
   "SelectionStore",
   "Slot",
   "SpaceFiller",
+  "Splitter",
+  "HSplitter",
+  "VSplitter",
+  "StickyBox",
+  "StickySection",
   "ScrollViewer",
   "Stack",
   "Text",
