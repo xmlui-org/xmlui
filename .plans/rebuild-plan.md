@@ -2274,26 +2274,123 @@ Next component in Wave C1:
 
 Components:
 
-- `AutoComplete`;
-- `RadioGroup`.
+- `AutoComplete` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, registry wiring, and foundation E2E tests. This is not full
+  old-suite closure yet;
+- `RadioGroup` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, registry wiring, and foundation E2E tests. This is not full
+  old-suite closure yet.
 
 Compatibility focus:
 
 - option filtering, selected value semantics, labels, keyboard navigation,
   disabled option behavior, popover/list behavior, and form integration.
 
+`AutoComplete` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/AutoComplete/AutoComplete.foundation.spec.ts`
+  passed with 5 passed.
+
+`AutoComplete` compatibility debt:
+
+- the full old `AutoComplete.spec.ts` suite has not been copied into the
+  rewrite yet. Future closure must copy those old E2E cases literally and make
+  them pass, or record exact blockers;
+- the old implementation uses Radix popover, option context, grouping,
+  templates, validation feedback, form context, multi-select badges, nested
+  overlay behavior, and richer keyboard navigation. The foundation slice uses a
+  native input/listbox while preserving the first visible filtering, selection,
+  disabled-option, and creatable-value semantics.
+
+`RadioGroup` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/RadioGroup/RadioGroup.foundation.spec.ts`
+  passed with 4 passed.
+
+`RadioGroup` compatibility debt:
+
+- the full old `RadioGroup.spec.ts` suite has not been copied into the rewrite
+  yet. Future closure must copy those old E2E cases literally and make them
+  pass, or record exact blockers;
+- the old implementation uses Radix RadioGroup and `OptionTypeProvider`. The
+  foundation slice uses native radio inputs while preserving the first visible
+  semantics, but full closure still needs label-position behavior, form
+  integration, keyboard navigation parity, validation visuals, behavior/part
+  tests, and API parity from the old suite.
+
 ##### Wave C3: List Selection and Paging
 
 Components:
 
-- `List`;
-- `SelectionStore`;
-- `Pagination`.
+- `List` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  registry wiring, API registration, item-template context variables, basic
+  grouping, basic selection, and foundation E2E tests. This is not full
+  old-suite closure yet;
+- `SelectionStore` - foundation slice completed on 2026-06-23. The deprecated,
+  non-visual component now has source-adjacent metadata, defaults, docs,
+  renderer, compiler contract, registry wiring, API registration, selection
+  context, and foundation E2E tests. The old component folder has no old E2E
+  spec file to copy;
+- `Pagination` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, registry wiring, and foundation E2E tests. This is not full
+  old-suite closure yet.
 
 Compatibility focus:
 
 - item context variables, item templates, selection state, paging state,
   sorting/filtering hooks where present, and API references.
+
+`Pagination` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Pagination/Pagination.foundation.spec.ts`
+  passed with 4 passed.
+
+`Pagination` compatibility debt:
+
+- the full old `Pagination.spec.ts` suite has not been copied into the rewrite
+  yet. Future closure must copy those old E2E cases literally and make them
+  pass, or record exact blockers;
+- the old implementation composes XMLUI Button, Text, Icon, Select, Part, and
+  FormItem helper pieces. The foundation slice uses native controls while
+  preserving the first visible page calculation, page change, page-size change,
+  simplified mode, positioning, and API semantics.
+
+`SelectionStore` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/SelectionStore/SelectionStore.foundation.spec.ts`
+  passed with 2 passed.
+
+`SelectionStore` compatibility note:
+
+- the original `SelectionStore` component is deprecated and has no
+  source-adjacent E2E spec file in the old component folder. Later `List` and
+  `Table` closure slices must still verify their SelectionStore integration
+  through their own literal old E2E suites.
+
+`List` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/List/List.foundation.spec.ts`
+  passed with 4 passed.
+
+`List` compatibility debt:
+
+- the full old `List.spec.ts` suite has not been copied into the rewrite yet.
+  Future closure must copy those old E2E cases literally and make them pass, or
+  record exact blockers;
+- the old implementation uses `virtua`, lodash utilities, group header/footer
+  sections, scroll anchoring, pageInfo, SelectionStore integration, keyboard
+  actions, selection checkbox positioning, and extensive virtualization tests.
+  The foundation slice preserves the first visible data/template/context and
+  selection-event semantics only.
 
 ##### Wave C4: Table Family
 

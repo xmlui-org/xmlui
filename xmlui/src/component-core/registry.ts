@@ -26,6 +26,7 @@ import { iconRenderer } from "../components/Icon/Icon";
 import { imageRenderer } from "../components/Image/Image";
 import { iframeRenderer } from "../components/IFrame/IFrame";
 import { itemsRenderer } from "../components/Items/Items";
+import { listRenderer } from "../components/List/List";
 import { linkRenderer } from "../components/Link/Link";
 import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult";
@@ -42,10 +43,14 @@ import { sliderRenderer } from "../components/Slider/Slider";
 import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
+import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRenderer } from "../components/FileInput/FileInput";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone";
 import { optionRenderer } from "../components/Option/Option";
+import { paginationRenderer } from "../components/Pagination/Pagination";
+import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
 import { selectRenderer } from "../components/Select/Select";
+import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
@@ -58,11 +63,13 @@ const oldComponentRoot = "/Users/dotneteer/source/xmlui/xmlui/src/components";
 const implementedRuntimeNames = [
   "App",
   "AppHeader",
+  "AutoComplete",
   "Fragment",
   "Image",
   "IFrame",
   "Icon",
   "Link",
+  "List",
   "Logo",
   "NoResult",
   "PageMetaTitle",
@@ -95,6 +102,7 @@ const implementedRuntimeNames = [
   "Checkbox",
   "Switch",
   "RatingInput",
+  "RadioGroup",
   "Slider",
   "ColorPicker",
   "DateInput",
@@ -103,9 +111,11 @@ const implementedRuntimeNames = [
   "FileUploadDropZone",
   "TimeInput",
   "Select",
+  "SelectionStore",
   "Option",
   "Pages",
   "Page",
+  "Pagination",
   "NavLink",
   "NavPanel",
   "DataSource",
@@ -128,6 +138,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Image: imageRenderer,
   IFrame: iframeRenderer,
   Link: linkRenderer,
+  List: listRenderer,
   Logo: logoRenderer,
   NoResult: noResultRenderer,
   PageMetaTitle: pageMetaTitleRenderer,
@@ -152,10 +163,14 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   ColorPicker: colorPickerRenderer,
   DateInput: dateInputRenderer,
   DatePicker: datePickerRenderer,
+  AutoComplete: autoCompleteRenderer,
   FileInput: fileInputRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
   Option: optionRenderer,
+  Pagination: paginationRenderer,
+  RadioGroup: radioGroupRenderer,
   Select: selectRenderer,
+  SelectionStore: selectionStoreRenderer,
   Items: itemsRenderer,
   TimeInput: timeInputRenderer,
   ...htmlTagRenderers,

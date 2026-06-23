@@ -18,7 +18,7 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
 }
 
 @layer components {
-  .select {
+  .selectRoot {
     box-sizing: border-box;
     max-width: 100%;
     min-height: var(--xmlui-height-Select, 2rem);
@@ -34,7 +34,7 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
     font-size: var(--xmlui-fontSize-Select);
   }
 
-  .select:disabled {
+  .selectRoot:disabled {
     cursor: not-allowed;
     opacity: var(--xmlui-opacity-Select--disabled, 0.65);
   }

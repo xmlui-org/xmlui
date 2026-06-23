@@ -1,0 +1,87 @@
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-AutoComplete: createThemeVar("backgroundColor-AutoComplete");
+$backgroundColor-menu-AutoComplete: createThemeVar("backgroundColor-menu-AutoComplete");
+$boxShadow-menu-AutoComplete: createThemeVar("boxShadow-menu-AutoComplete");
+$borderRadius-menu-AutoComplete: createThemeVar("borderRadius-menu-AutoComplete");
+$borderWidth-menu-AutoComplete: createThemeVar("borderWidth-menu-AutoComplete");
+$borderColor-menu-AutoComplete: createThemeVar("borderColor-menu-AutoComplete");
+$backgroundColor-item-AutoComplete: createThemeVar("backgroundColor-item-AutoComplete");
+$backgroundColor-item-AutoComplete--hover: createThemeVar("backgroundColor-item-AutoComplete--hover");
+$textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-AutoComplete--disabled");
+
+:export {
+  themeVars: ();
+}
+
+@layer components {
+  .autoCompleteRoot {
+    position: relative;
+    box-sizing: border-box;
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--xmlui-gap-AutoComplete, 0.25rem);
+    max-width: 100%;
+    background-color: var(--xmlui-backgroundColor-AutoComplete);
+  }
+
+  .autoCompleteInput {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--xmlui-height-AutoComplete, 2rem);
+    padding: var(--xmlui-paddingVertical-AutoComplete, 0.25rem) var(--xmlui-paddingHorizontal-AutoComplete, 0.5rem);
+    border: var(--xmlui-borderWidth-AutoComplete, 1px) var(--xmlui-borderStyle-AutoComplete, solid) var(--xmlui-borderColor-AutoComplete, var(--xmlui-borderColor-Input-default));
+    border-radius: var(--xmlui-borderRadius-AutoComplete, var(--xmlui-borderRadius));
+    background-color: var(--xmlui-backgroundColor-input-AutoComplete, var(--xmlui-color-surface-0));
+    color: var(--xmlui-textColor-AutoComplete, var(--xmlui-textColor-primary));
+    font: inherit;
+  }
+
+  .autoCompleteInput:disabled {
+    cursor: not-allowed;
+    opacity: var(--xmlui-opacity-AutoComplete--disabled, 0.65);
+  }
+
+  .autoCompleteMenu {
+    z-index: var(--xmlui-zIndex-menu-AutoComplete, 10);
+    box-sizing: border-box;
+    width: 100%;
+    max-height: var(--xmlui-dropdownHeight-AutoComplete, 16rem);
+    overflow: auto;
+    border: var(--xmlui-borderWidth-menu-AutoComplete) solid var(--xmlui-borderColor-menu-AutoComplete);
+    border-radius: var(--xmlui-borderRadius-menu-AutoComplete);
+    background-color: var(--xmlui-backgroundColor-menu-AutoComplete);
+    box-shadow: var(--xmlui-boxShadow-menu-AutoComplete);
+  }
+
+  .autoCompleteItem {
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--xmlui-paddingVertical-item-AutoComplete, 0.5rem) var(--xmlui-paddingHorizontal-item-AutoComplete, 0.5rem);
+    border: 0;
+    background-color: var(--xmlui-backgroundColor-item-AutoComplete);
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .autoCompleteItem:not(:disabled):hover,
+  .autoCompleteItem:not(:disabled):focus {
+    background-color: var(--xmlui-backgroundColor-item-AutoComplete--hover);
+  }
+
+  .autoCompleteItem:disabled {
+    cursor: not-allowed;
+    color: var(--xmlui-textColor-item-AutoComplete--disabled);
+  }
+
+  .autoCompleteEmpty {
+    padding: var(--xmlui-paddingVertical-item-AutoComplete, 0.5rem) var(--xmlui-paddingHorizontal-item-AutoComplete, 0.5rem);
+    color: var(--xmlui-textColor-empty-AutoComplete, var(--xmlui-textColor-secondary));
+  }
+}
