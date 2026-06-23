@@ -17,6 +17,7 @@ import {
   ModalDialogDriver,
   NavGroupDriver,
   NavLinkDriver,
+  NavPanelCollapseButtonDriver,
   NavPanelDriver,
   NoResultDriver,
   NumberBoxDriver,
@@ -72,6 +73,7 @@ type Fixtures = {
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
   createNavGroupDriver: (testId?: string | Locator) => Promise<NavGroupDriver>;
   createNavLinkDriver: (testId?: string | Locator) => Promise<NavLinkDriver>;
+  createNavPanelCollapseButtonDriver: (testId?: string | Locator) => Promise<NavPanelCollapseButtonDriver>;
   createNavPanelDriver: (testId?: string | Locator) => Promise<NavPanelDriver>;
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
@@ -305,6 +307,17 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="NavLink"]').first(),
+      page,
+    }));
+  },
+  createNavPanelCollapseButtonDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavPanelCollapseButtonDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavPanelCollapseButton"]').first(),
       page,
     }));
   },

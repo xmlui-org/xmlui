@@ -31,6 +31,10 @@ $boxShadow-NavPanel: createThemeVar("boxShadow-NavPanel");
   box-shadow: $boxShadow-NavPanel;
 }
 
+.collapsed {
+  width: var(--xmlui-width-navPanel-collapsed-App, 48px);
+}
+
 .content {
   display: flex;
   flex: 1 1 auto;

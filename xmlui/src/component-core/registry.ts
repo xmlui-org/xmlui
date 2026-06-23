@@ -86,6 +86,7 @@ import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
 import { navGroupRenderer } from "../components/NavGroup/NavGroup.renderer";
 import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
+import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
 import { navPanelRenderer } from "../components/NavPanel/NavPanel.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
@@ -181,6 +182,7 @@ const implementedRuntimeNames = [
   "TableOfContents",
   "NavGroup",
   "NavLink",
+  "NavPanelCollapseButton",
   "NavPanel",
   "DataSource",
   "APICall",
@@ -271,6 +273,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   TimeInput: timeInputRenderer,
   NavGroup: navGroupRenderer,
   NavLink: navLinkRenderer,
+  NavPanelCollapseButton: navPanelCollapseButtonRenderer,
   NavPanel: navPanelRenderer,
   ...htmlTagRenderers,
 };
@@ -357,6 +360,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const linkTransferred = contract.name === "Link";
     const navGroupTransferred = contract.name === "NavGroup";
     const navLinkTransferred = contract.name === "NavLink";
+    const navPanelCollapseButtonTransferred = contract.name === "NavPanelCollapseButton";
     const navPanelTransferred = contract.name === "NavPanel";
     const logoTransferred = contract.name === "Logo";
     const pageMetaTitleTransferred = contract.name === "PageMetaTitle";
@@ -419,6 +423,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       linkTransferred ||
       navGroupTransferred ||
       navLinkTransferred ||
+      navPanelCollapseButtonTransferred ||
       navPanelTransferred ||
       logoTransferred ||
       pageMetaTitleTransferred ||
@@ -516,6 +521,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                                 ? "NavGroup"
                                                               : navLinkTransferred
                                                                 ? "NavLink"
+                                                                : navPanelCollapseButtonTransferred
+                                                                  ? "NavPanelCollapseButton"
                                                                 : navPanelTransferred
                                                                   ? "NavPanel"
                                                       : contract.name;
@@ -615,6 +622,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavGroupReact.tsx`);
     } else if (navLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavLinkReact.tsx`);
+    } else if (navPanelCollapseButtonTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelCollapseButtonReact.tsx`);
     } else if (navPanelTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelReact.tsx`);
     } else if (logoTransferred) {
@@ -691,6 +700,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       linkTransferred,
       navGroupTransferred,
       navLinkTransferred,
+      navPanelCollapseButtonTransferred,
       navPanelTransferred,
       pageMetaTitleTransferred,
       qrCodeTransferred,
@@ -791,6 +801,7 @@ function componentRunnablePaths(flags: {
   linkTransferred: boolean;
   navGroupTransferred: boolean;
   navLinkTransferred: boolean;
+  navPanelCollapseButtonTransferred: boolean;
   navPanelTransferred: boolean;
   pageMetaTitleTransferred: boolean;
   qrCodeTransferred: boolean;
@@ -1029,6 +1040,12 @@ function componentRunnablePaths(flags: {
     return [
       "xmlui/src/components/NavLink/NavLink.foundation.spec.ts",
       "xmlui/src/components/NavLink/NavLink.spec.ts",
+    ];
+  }
+  if (flags.navPanelCollapseButtonTransferred) {
+    return [
+      "xmlui/src/components/NavPanelCollapseButton/NavPanelCollapseButton.foundation.spec.ts",
+      "xmlui/src/components/NavPanel/NavPanel.foundation.spec.ts",
     ];
   }
   if (flags.navPanelTransferred) {

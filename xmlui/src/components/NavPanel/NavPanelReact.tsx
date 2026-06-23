@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
 
+import { NavPanelCollapseProvider, useNavPanelCollapseContext } from "../NavPanelCollapseButton/NavPanelCollapseContext";
 import styles from "./NavPanel.module.scss";
 
 export type NavPanelProps = HTMLAttributes<HTMLDivElement> & {
@@ -22,13 +23,45 @@ export const NavPanelComponent = forwardRef<HTMLDivElement, NavPanelProps>(funct
   ref,
 ) {
   return (
+    <NavPanelCollapseProvider>
+      <NavPanelContent
+        {...rest}
+        className={className}
+        footerContent={footerContent}
+        logoContent={logoContent}
+        ref={ref}
+        scrollStyle={scrollStyle}
+      >
+        {children}
+      </NavPanelContent>
+    </NavPanelCollapseProvider>
+  );
+});
+
+const NavPanelContent = forwardRef<HTMLDivElement, NavPanelProps>(function NavPanelContent(
+  {
+    children,
+    className,
+    footerContent,
+    logoContent,
+    scrollStyle = "normal",
+    ...rest
+  },
+  ref,
+) {
+  const collapseContext = useNavPanelCollapseContext();
+  const collapsed = collapseContext?.collapsed ?? false;
+
+  return (
     <nav
       {...rest}
       className={[
         styles.wrapper,
+        collapsed && styles.collapsed,
         scrollStyle !== "normal" && styles.overlayScroll,
         className,
       ].filter(Boolean).join(" ")}
+      data-nav-panel-collapsed={collapsed ? "true" : "false"}
       data-xmlui-component="NavPanel"
       ref={ref}
     >

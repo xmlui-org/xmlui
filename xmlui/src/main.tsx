@@ -44,6 +44,7 @@ import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
 import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
 import navGroupFoundationApp from "./examples/navgroup-foundation/Main.xmlui";
 import navLinkFoundationApp from "./examples/navlink-foundation/Main.xmlui";
+import navPanelCollapseButtonFoundationApp from "./examples/nav-panel-collapse-button-foundation/Main.xmlui";
 import navPanelFoundationApp from "./examples/navpanel-foundation/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
@@ -53,6 +54,7 @@ import reactiveDerivedGlobalsApp from "./examples/reactive-derived-globals/Main.
 import reactiveDerivedOverrideApp from "./examples/reactive-derived-override/Main.xmlui";
 import reactiveDerivedPropsApp from "./examples/reactive-derived-props/Main.xmlui";
 import primitiveTextHeadingApp from "./examples/primitive-text-heading/Main.xmlui";
+import profileMenuFoundationApp from "./examples/profile-menu-foundation/Main.xmlui";
 import responsiveStateBasicsApp from "./examples/responsive-state-basics/Main.xmlui";
 import routingBasicApp from "./examples/routing-basic/Main.xmlui";
 import routingDataApp from "./examples/routing-data/Main.xmlui";
@@ -148,6 +150,7 @@ const examples = {
   linkInteraction: linkInteractionApp,
   navGroupFoundation: navGroupFoundationApp,
   navLinkFoundation: navLinkFoundationApp,
+  navPanelCollapseButtonFoundation: navPanelCollapseButtonFoundationApp,
   navPanelFoundation: navPanelFoundationApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
@@ -157,6 +160,7 @@ const examples = {
   reactiveDerivedOverride: reactiveDerivedOverrideApp,
   reactiveDerivedProps: reactiveDerivedPropsApp,
   primitiveTextHeading: primitiveTextHeadingApp,
+  profileMenuFoundation: profileMenuFoundationApp,
   responsiveStateBasics: responsiveStateBasicsApp,
   routingBasic: routingBasicApp,
   routingData: routingDataApp,

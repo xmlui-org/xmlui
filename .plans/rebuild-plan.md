@@ -3440,8 +3440,90 @@ Verified:
 - this slice implements the direct footer authoring surface and visible
   horizontal footer layout only.
 
-Next explicit step: Phase 5 Wave D6F - migrate `NavPanelCollapseButton`
-foundation with copied old docs/specs, focused tests, and a visual sample.
+Completed: Phase 5 Wave D6F - `NavPanelCollapseButton` foundation.
+
+Implemented:
+
+- migrated `NavPanelCollapseButton` source folder with metadata in
+  `NavPanelCollapseButton.tsx`, `NavPanelCollapseButtonReact.tsx`,
+  `NavPanelCollapseButton.renderer.tsx`, a small local collapse context, and a
+  new documentation stub;
+- confirmed the original component folder has no component-local `.spec.ts`,
+  `.md`, `.defaults.ts`, `.module.scss`, or separate React file to copy;
+- added a minimal `NavPanelCollapseProvider` around migrated `NavPanel`
+  rendering so the button can render inside `NavPanel` and toggle a real
+  collapsed state while preserving the old no-context `null` behavior outside a
+  panel;
+- registered `NavPanelCollapseButton` in compiler contracts, IR runtime
+  allowlist, component registry, transferred-component inventory, and test
+  fixtures;
+- added `createNavPanelCollapseButtonDriver`;
+- added `NavPanelCollapseButton.foundation.spec.ts` for no-context null
+  behavior, rendering inside `NavPanel` footer, aria-label/icon switching,
+  click toggling, keyboard toggling, and `NavPanel` collapsed-state reflection;
+- visual sample available with `npm run dev` at
+  `?example=navPanelCollapseButtonFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavPanelCollapseButton/NavPanelCollapseButton.foundation.spec.ts src/components/NavPanel/NavPanel.foundation.spec.ts`
+  from `xmlui/`: 8 focused tests passed.
+
+`NavPanelCollapseButton` compatibility debt:
+
+- the original component consumes `useAppLayoutContext`; the rewrite currently
+  uses a local `NavPanel` collapse provider until full App shell layout context
+  is restored;
+- collapsed `NavPanel` visual behavior is only represented by a data attribute
+  and basic width class, not by the full old vertical layout/sidebar behavior;
+- no old component-local E2E suite exists to copy, so future closure should use
+  old App/NavPanel integration tests when those shell features are migrated.
+
+Completed: Phase 5 Wave D6G - `ProfileMenu` foundation.
+
+Implemented:
+
+- migrated `ProfileMenu` as an internal native-only React component, preserving
+  the original convention that it is not exposed as a public XMLUI tag;
+- confirmed the original `ProfileMenu` folder has no component-local docs or
+  E2E tests to copy and is documented in the old conventions as native-only;
+- added `ProfileMenuReact.tsx`, `ProfileMenu.module.scss`, and a small
+  `ProfileMenuContext` for the existing public `App loggedInUser` surface;
+- added narrow runtime plumbing so `App` provides `loggedInUser` and
+  `AppHeader` renders the default internal profile menu when no explicit
+  `profileMenuTemplate` is supplied;
+- added compiler contract support for `App loggedInUser`;
+- added `ProfileMenu.foundation.spec.ts` for default rendering from
+  `App loggedInUser`, no-user null behavior, and explicit
+  `profileMenuTemplate` override with state mutation;
+- visual sample available with `npm run dev` at
+  `?example=profileMenuFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/ProfileMenu/ProfileMenu.foundation.spec.ts src/components/AppHeader/AppHeader.foundation.spec.ts`
+  from `xmlui/`: 8 focused tests passed.
+
+`ProfileMenu` compatibility debt:
+
+- the old implementation uses the full theme service to toggle actual light/dark
+  themes; the foundation menu renders the expected theme menu item but does not
+  yet mutate runtime theme state;
+- the old implementation uses the old `Avatar` component; the foundation uses a
+  local initials/avatar trigger until `Avatar` is migrated;
+- because `ProfileMenu` is internal and has no old component-local E2E suite,
+  future closure should use App/AppHeader integration tests and user/theme
+  runtime tests.
+
+Next explicit step: Phase 5 Wave E1A - migrate `Form` and `FormItem`
+foundation together, because input validation and field binding require their
+shared form context.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 

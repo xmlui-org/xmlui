@@ -457,6 +457,7 @@ const builtInElementNames = new Set([
   "TreeDisplay",
   "NavGroup",
   "NavLink",
+  "NavPanelCollapseButton",
   "NavPanel",
   "NoResult",
   "ResponsiveBar",

@@ -193,6 +193,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     declarations: { local: true, global: true },
     props: withLayoutProps({
       testId: { name: "testId" },
+      loggedInUser: { name: "loggedInUser" },
       useHashBasedRouting: { name: "useHashBasedRouting" },
       "backgroundColor-content-App": { name: "backgroundColor-content-App" },
       "borderLeft-content-App": { name: "borderLeft-content-App" },
@@ -1197,6 +1198,21 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {
       click: { name: "click", attributeName: "onClick" },
     },
+  },
+  {
+    name: "NavPanelCollapseButton",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: withLayoutProps({
+      icon: { name: "icon" },
+      iconCollapsed: { name: "iconCollapsed" },
+      "aria-label": { name: "aria-label" },
+      "aria-labelCollapsed": { name: "aria-labelCollapsed" },
+      testId: { name: "testId" },
+      id: { name: "id" },
+    }),
+    events: {},
   },
   {
     name: "NavGroup",

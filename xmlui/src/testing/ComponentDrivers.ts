@@ -290,6 +290,8 @@ export class NavGroupDriver extends ComponentDriver {
 
 export class NavLinkDriver extends ComponentDriver {}
 
+export class NavPanelCollapseButtonDriver extends ComponentDriver {}
+
 export class NavPanelDriver extends ComponentDriver {
   getContent(): Locator {
     return this.getByPartName("content");

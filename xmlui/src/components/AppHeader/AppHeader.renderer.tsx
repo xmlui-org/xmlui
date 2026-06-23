@@ -4,6 +4,8 @@ import type { XmluiNode } from "../../compiler/ir";
 import { AppHeaderMd } from "./AppHeader";
 import { defaultProps } from "./AppHeader.defaults";
 import { AppHeaderComponent } from "./AppHeaderReact";
+import { ProfileMenu } from "../ProfileMenu/ProfileMenuReact";
+import { useLoggedInUser } from "../ProfileMenu/ProfileMenuContext";
 
 const templateNames = new Set(["logoTemplate", "titleTemplate", "profileMenuTemplate"]);
 
@@ -12,12 +14,14 @@ export const appHeaderRenderer = wrapComponent({
   metadata: AppHeaderMd as ComponentMetadata,
   renderer: ({ adapter }) => {
     const children = adapter.node.children.filter((child) => !isTemplateProperty(child));
+    const loggedInUser = useLoggedInUser();
+    const hasProfileTemplate = hasTemplate(adapter.node.children, "profileMenuTemplate");
 
     return (
       <AppHeaderComponent
         {...adapter.rootAttrs()}
         logoContent={hasTemplate(adapter.node.children, "logoTemplate") ? adapter.renderTemplate("logoTemplate") : undefined}
-        profileMenu={hasTemplate(adapter.node.children, "profileMenuTemplate") ? adapter.renderTemplate("profileMenuTemplate") : undefined}
+        profileMenu={hasProfileTemplate ? adapter.renderTemplate("profileMenuTemplate") : <ProfileMenu loggedInUser={loggedInUser} />}
         showLogo={adapter.booleanProp("showLogo", defaultProps.showLogo)}
         title={adapter.stringProp("title")}
         titleContent={hasTemplate(adapter.node.children, "titleTemplate") ? adapter.renderTemplate("titleTemplate") : undefined}
