@@ -1,0 +1,22 @@
+<App var.message="{'Choose a destination'}">
+  <H1>NavPanel foundation</H1>
+  <Text testId="path">Current path: {$pathname}</Text>
+  <Text>{message}</Text>
+  <HStack gap="$space-6" alignItems="start">
+    <NavPanel width="240px" height="280px" scrollStyle="overlay">
+      <property name="logoTemplate">
+        <Text>XMLUI</Text>
+      </property>
+      <NavLink to="/" exact="true" onClick="message = 'Home selected'">Home</NavLink>
+      <NavLink to="/reports" onClick="message = 'Reports selected'">Reports</NavLink>
+      <NavLink to="/settings" onClick="message = 'Settings selected'">Settings</NavLink>
+      <property name="footerTemplate">
+        <Text>Foundation footer</Text>
+      </property>
+    </NavPanel>
+    <VStack gap="$space-2">
+      <Text>The navigation panel hosts migrated NavLink components.</Text>
+      <Text>Click a link to update state and route.</Text>
+    </VStack>
+  </HStack>
+</App>

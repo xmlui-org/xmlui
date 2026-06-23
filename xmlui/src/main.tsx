@@ -11,6 +11,7 @@ import componentCounterApp from "./examples/counter-components/Main.xmlui";
 import actionsCallApiApp from "./examples/actions-call-api/Main.xmlui";
 import accordionFoundationApp from "./examples/accordion-foundation/Main.xmlui";
 import apiCallMutationApp from "./examples/api-call-mutation/Main.xmlui";
+import appHeaderFoundationApp from "./examples/app-header-foundation/Main.xmlui";
 import appMainContentLayoutApp from "./examples/app-main-content-layout/Main.xmlui";
 import builtinsInputsApp from "./examples/builtins-inputs/Main.xmlui";
 import builtinsItemsApp from "./examples/builtins-items/Main.xmlui";
@@ -41,7 +42,9 @@ import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
 import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
+import navGroupFoundationApp from "./examples/navgroup-foundation/Main.xmlui";
 import navLinkFoundationApp from "./examples/navlink-foundation/Main.xmlui";
+import navPanelFoundationApp from "./examples/navpanel-foundation/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
@@ -83,6 +86,7 @@ import cardFoundationApp from "./examples/card-foundation/Main.xmlui";
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
 import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
 import flowTileFoundationApp from "./examples/flow-tile-foundation/Main.xmlui";
+import footerFoundationApp from "./examples/footer-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import stackFamilyFoundationApp from "./examples/stack-family-foundation/Main.xmlui";
 import tableFoundationApp from "./examples/table-foundation/Main.xmlui";
@@ -107,6 +111,7 @@ const examples = {
   actionsCallApi: actionsCallApiApp,
   accordionFoundation: accordionFoundationApp,
   apiCallMutation: apiCallMutationApp,
+  appHeaderFoundation: appHeaderFoundationApp,
   appMainContentLayout: appMainContentLayoutApp,
   asyncDirectives: asyncDirectivesApp,
   asyncResponsiveLoop: asyncResponsiveLoopApp,
@@ -141,7 +146,9 @@ const examples = {
   iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
   linkInteraction: linkInteractionApp,
+  navGroupFoundation: navGroupFoundationApp,
   navLinkFoundation: navLinkFoundationApp,
+  navPanelFoundation: navPanelFoundationApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,
@@ -183,6 +190,7 @@ const examples = {
   fileInputFoundation: fileInputFoundationApp,
   fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
   flowTileFoundation: flowTileFoundationApp,
+  footerFoundation: footerFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
   stackFamilyFoundation: stackFamilyFoundationApp,
   tableFoundation: tableFoundationApp,

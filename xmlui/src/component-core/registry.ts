@@ -3,6 +3,7 @@ import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
 import { appRenderer } from "../components/App/App";
+import { appHeaderRenderer } from "../components/AppHeader/AppHeader.renderer";
 import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card.renderer";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
@@ -69,6 +70,7 @@ import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
+import { footerRenderer } from "../components/Footer/Footer.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
@@ -82,7 +84,9 @@ import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfCo
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
+import { navGroupRenderer } from "../components/NavGroup/NavGroup.renderer";
 import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
+import { navPanelRenderer } from "../components/NavPanel/NavPanel.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -160,6 +164,7 @@ const implementedRuntimeNames = [
   "SubMenuItem",
   "FileInput",
   "FileUploadDropZone",
+  "Footer",
   "TimeInput",
   "ScrollViewer",
   "Select",
@@ -174,6 +179,7 @@ const implementedRuntimeNames = [
   "Tree",
   "TreeDisplay",
   "TableOfContents",
+  "NavGroup",
   "NavLink",
   "NavPanel",
   "DataSource",
@@ -186,6 +192,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Accordion: accordionRenderer,
   AccordionItem: accordionItemRenderer,
   App: appRenderer,
+  AppHeader: appHeaderRenderer,
   br: brRenderer,
   Br: BrRenderer,
   Button: buttonRenderer,
@@ -247,6 +254,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   AutoComplete: autoCompleteRenderer,
   FileInput: fileInputRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
+  Footer: footerRenderer,
   Option: optionRenderer,
   Pagination: paginationRenderer,
   Table: tableRenderer,
@@ -261,7 +269,9 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   SelectionStore: selectionStoreRenderer,
   Items: itemsRenderer,
   TimeInput: timeInputRenderer,
+  NavGroup: navGroupRenderer,
   NavLink: navLinkRenderer,
+  NavPanel: navPanelRenderer,
   ...htmlTagRenderers,
 };
 
@@ -299,6 +309,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const folderName = componentFolderName(contract.name);
     const accordionTransferred = contract.name === "Accordion" || contract.name === "AccordionItem";
     const appTransferred = contract.name === "App";
+    const appHeaderTransferred = contract.name === "AppHeader";
     const buttonTransferred = contract.name === "Button";
     const textTransferred = contract.name === "Text";
     const textBoxTransferred = contract.name === "TextBox";
@@ -322,6 +333,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       contract.name === "SubMenuItem";
     const fileInputTransferred = contract.name === "FileInput";
     const fileUploadDropZoneTransferred = contract.name === "FileUploadDropZone";
+    const footerTransferred = contract.name === "Footer";
     const itemsTransferred = contract.name === "Items";
     const tableTransferred = contract.name === "Table";
     const columnTransferred = contract.name === "Column";
@@ -343,7 +355,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const iframeTransferred = contract.name === "IFrame";
     const iconTransferred = contract.name === "Icon";
     const linkTransferred = contract.name === "Link";
+    const navGroupTransferred = contract.name === "NavGroup";
     const navLinkTransferred = contract.name === "NavLink";
+    const navPanelTransferred = contract.name === "NavPanel";
     const logoTransferred = contract.name === "Logo";
     const pageMetaTitleTransferred = contract.name === "PageMetaTitle";
     const qrCodeTransferred = contract.name === "QRCode";
@@ -359,6 +373,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
+      appHeaderTransferred ||
       buttonTransferred ||
       textTransferred ||
       textBoxTransferred ||
@@ -380,6 +395,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       menuPrimitiveTransferred ||
       fileInputTransferred ||
       fileUploadDropZoneTransferred ||
+      footerTransferred ||
       itemsTransferred ||
       tableTransferred ||
       columnTransferred ||
@@ -401,7 +417,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       iframeTransferred ||
       iconTransferred ||
       linkTransferred ||
+      navGroupTransferred ||
       navLinkTransferred ||
+      navPanelTransferred ||
       logoTransferred ||
       pageMetaTitleTransferred ||
       qrCodeTransferred ||
@@ -416,6 +434,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       flowLayoutTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
+      : appHeaderTransferred
+        ? "AppHeader"
       : htmlTagTransferred
       ? "HtmlTags"
       : brTransferred
@@ -460,6 +480,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                   ? "FileInput"
                                   : fileUploadDropZoneTransferred
                                     ? "FileUploadDropZone"
+                                    : footerTransferred
+                                      ? "Footer"
                                     : itemsTransferred
                                       ? "Items"
                                       : tableTransferred
@@ -490,8 +512,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                             ? "ExpandableItem"
                                                             : tabsTransferred
                                                               ? "Tabs"
+                                                              : navGroupTransferred
+                                                                ? "NavGroup"
                                                               : navLinkTransferred
                                                                 ? "NavLink"
+                                                                : navPanelTransferred
+                                                                  ? "NavPanel"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -501,6 +527,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       : [];
     if (appTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppReact.tsx`);
+    } else if (appHeaderTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppHeaderReact.tsx`);
     } else if (accordionTransferred) {
       implementationPaths.splice(
         0,
@@ -547,6 +575,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileInputReact.tsx`);
     } else if (fileUploadDropZoneTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileUploadDropZoneReact.tsx`);
+    } else if (footerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FooterReact.tsx`);
     } else if (itemsTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ItemsReact.tsx`);
     } else if (tableTransferred) {
@@ -581,8 +611,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/IconReact.tsx`);
     } else if (linkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LinkReact.tsx`);
+    } else if (navGroupTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavGroupReact.tsx`);
     } else if (navLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavLinkReact.tsx`);
+    } else if (navPanelTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelReact.tsx`);
     } else if (logoTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LogoReact.tsx`);
     } else if (pageMetaTitleTransferred) {
@@ -612,6 +646,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const runnablePaths = componentRunnablePaths({
       accordionTransferred,
       appTransferred,
+      appHeaderTransferred,
       buttonTransferred,
       textTransferred,
       textBoxTransferred,
@@ -633,6 +668,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       menuPrimitiveTransferred,
       fileInputTransferred,
       fileUploadDropZoneTransferred,
+      footerTransferred,
       itemsTransferred,
       tableTransferred,
       columnTransferred,
@@ -653,7 +689,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       iframeTransferred,
       iconTransferred,
       linkTransferred,
+      navGroupTransferred,
       navLinkTransferred,
+      navPanelTransferred,
       pageMetaTitleTransferred,
       qrCodeTransferred,
       codeBlockTransferred,
@@ -708,6 +746,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
 function componentRunnablePaths(flags: {
   accordionTransferred: boolean;
   appTransferred: boolean;
+  appHeaderTransferred: boolean;
   buttonTransferred: boolean;
   textTransferred: boolean;
   textBoxTransferred: boolean;
@@ -729,6 +768,7 @@ function componentRunnablePaths(flags: {
   menuPrimitiveTransferred: boolean;
   fileInputTransferred: boolean;
   fileUploadDropZoneTransferred: boolean;
+  footerTransferred: boolean;
   itemsTransferred: boolean;
   tableTransferred: boolean;
   columnTransferred: boolean;
@@ -749,7 +789,9 @@ function componentRunnablePaths(flags: {
   iframeTransferred: boolean;
   iconTransferred: boolean;
   linkTransferred: boolean;
+  navGroupTransferred: boolean;
   navLinkTransferred: boolean;
+  navPanelTransferred: boolean;
   pageMetaTitleTransferred: boolean;
   qrCodeTransferred: boolean;
   codeBlockTransferred: boolean;
@@ -770,6 +812,12 @@ function componentRunnablePaths(flags: {
     return [
       "xmlui/src/components/App/App.spec.tsx",
       "xmlui/src/components/App/App-layout.spec.ts",
+    ];
+  }
+  if (flags.appHeaderTransferred) {
+    return [
+      "xmlui/src/components/AppHeader/AppHeader.foundation.spec.ts",
+      "xmlui/src/components/AppHeader/AppHeader.spec.ts",
     ];
   }
   if (flags.buttonTransferred) {
@@ -862,6 +910,12 @@ function componentRunnablePaths(flags: {
   }
   if (flags.fileUploadDropZoneTransferred) {
     return ["xmlui/src/components/FileUploadDropZone/FileUploadDropZone.spec.ts"];
+  }
+  if (flags.footerTransferred) {
+    return [
+      "xmlui/src/components/Footer/Footer.foundation.spec.ts",
+      "xmlui/src/components/Footer/Footer.spec.ts",
+    ];
   }
   if (flags.itemsTransferred) {
     return ["xmlui/src/components/Items/Items.spec.ts"];
@@ -963,10 +1017,24 @@ function componentRunnablePaths(flags: {
   if (flags.linkTransferred) {
     return ["xmlui/src/components/Link/Link.spec.ts"];
   }
+  if (flags.navGroupTransferred) {
+    return [
+      "xmlui/src/components/NavGroup/NavGroup.foundation.spec.ts",
+      "xmlui/src/components/NavGroup/NavGroup.spec.ts",
+      "xmlui/src/components/NavPanel/NavPanel.foundation.spec.ts",
+      "xmlui/src/components/NavLink/NavLink.foundation.spec.ts",
+    ];
+  }
   if (flags.navLinkTransferred) {
     return [
       "xmlui/src/components/NavLink/NavLink.foundation.spec.ts",
       "xmlui/src/components/NavLink/NavLink.spec.ts",
+    ];
+  }
+  if (flags.navPanelTransferred) {
+    return [
+      "xmlui/src/components/NavPanel/NavPanel.foundation.spec.ts",
+      "xmlui/src/components/NavPanel/NavPanel.spec.ts",
     ];
   }
   if (flags.pageMetaTitleTransferred) {

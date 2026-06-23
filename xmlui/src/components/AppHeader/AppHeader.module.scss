@@ -1,0 +1,135 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$height-AppHeader: createThemeVar("height-AppHeader");
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
+$maxWidth-content-AppHeader: createThemeVar("maxWidth-content-AppHeader");
+$maxWidth-AppHeader: createThemeVar("maxWidth-AppHeader");
+$paddingHorizontal-AppHeader: createThemeVar("paddingHorizontal-AppHeader");
+$paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
+$paddingTop-AppHeader: createThemeVar("paddingTop-AppHeader");
+$paddingRight-AppHeader: createThemeVar("paddingRight-AppHeader");
+$paddingBottom-AppHeader: createThemeVar("paddingBottom-AppHeader");
+$paddingLeft-AppHeader: createThemeVar("paddingLeft-AppHeader");
+$border-AppHeader: createThemeVar("border-AppHeader");
+$borderTop-AppHeader: createThemeVar("borderTop-AppHeader");
+$borderRight-AppHeader: createThemeVar("borderRight-AppHeader");
+$borderBottom-AppHeader: createThemeVar("borderBottom-AppHeader");
+$borderLeft-AppHeader: createThemeVar("borderLeft-AppHeader");
+$borderRadius-AppHeader: createThemeVar("borderRadius-AppHeader");
+$width-logo-AppHeader: createThemeVar("width-logo-AppHeader");
+$paddingHorizontal-logo-AppHeader: createThemeVar("paddingHorizontal-logo-AppHeader");
+$paddingVertical-logo-AppHeader: createThemeVar("paddingVertical-logo-AppHeader");
+$padding-drawerToggle-AppHeader: createThemeVar("padding-drawerToggle-AppHeader");
+$size-drawerToggle-AppHeader: createThemeVar("size-drawerToggle-AppHeader");
+$alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
+
+.header {
+  position: relative;
+  height: $height-AppHeader;
+  box-sizing: content-box;
+  background-color: $backgroundColor-AppHeader;
+  border: $border-AppHeader;
+  border-top: $borderTop-AppHeader;
+  border-right: $borderRight-AppHeader;
+  border-bottom: $borderBottom-AppHeader;
+  border-left: $borderLeft-AppHeader;
+  border-radius: $borderRadius-AppHeader;
+}
+
+.headerInner {
+  height: 100%;
+  flex: 1;
+  gap: var(--xmlui-space-4);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  max-width: $maxWidth-content-AppHeader;
+  padding-inline: $paddingHorizontal-AppHeader;
+  padding-block: $paddingVertical-AppHeader;
+  padding-top: $paddingTop-AppHeader;
+  padding-right: $paddingRight-AppHeader;
+  padding-bottom: $paddingBottom-AppHeader;
+  padding-left: $paddingLeft-AppHeader;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.full {
+  max-width: $maxWidth-AppHeader;
+}
+
+.logoAndTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--xmlui-space-4);
+  height: 100%;
+
+  &:not(:empty) {
+    padding-inline-end: var(--xmlui-space-2);
+  }
+
+  &:empty {
+    display: none;
+  }
+}
+
+.logoContainer {
+  flex-shrink: 0;
+  display: flex;
+  width: $width-logo-AppHeader;
+  height: 100%;
+  align-items: center;
+  padding-inline: $paddingHorizontal-logo-AppHeader;
+  padding-block: $paddingVertical-logo-AppHeader;
+}
+
+.title {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.subNavPanelSlot {
+  display: flex;
+  flex-direction: row;
+}
+
+.childrenWrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+  gap: var(--xmlui-space-2);
+  justify-content: $alignment-content-AppHeader;
+}
+
+.rightItems {
+  gap: var(--xmlui-space-2);
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &:not(:empty) {
+    padding-inline-start: var(--xmlui-space-4);
+  }
+}
+
+.drawerToggle {
+  padding: $padding-drawerToggle-AppHeader;
+  width: $size-drawerToggle-AppHeader;
+  height: $size-drawerToggle-AppHeader;
+  display: none;
+}
+
+:export {
+  themeVars: "";
+}

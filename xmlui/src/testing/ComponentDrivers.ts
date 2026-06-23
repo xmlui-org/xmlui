@@ -120,6 +120,26 @@ export class ResponsiveBarDriver extends ComponentDriver {
 
 export class AccordionDriver extends ComponentDriver {}
 
+export class AppHeaderDriver extends ComponentDriver {
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  getLogo(): Locator {
+    return this.getByPartName("logo");
+  }
+
+  getProfileMenu(): Locator {
+    return this.getByPartName("profileMenu");
+  }
+}
+
+export class FooterDriver extends ComponentDriver {
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+}
+
 export class ModalDialogDriver extends ComponentDriver {
   get titlePart(): Locator {
     return this.getByPartName("title");
@@ -250,7 +270,39 @@ export class SplitterDriver extends ComponentDriver {
 
 export class LinkDriver extends ComponentDriver {}
 
+export class NavGroupDriver extends ComponentDriver {
+  getTrigger(): Locator {
+    return this.component.getByRole("button").first();
+  }
+
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  async toggle(): Promise<void> {
+    await this.getTrigger().click();
+  }
+
+  async isExpanded(): Promise<boolean> {
+    return (await this.getTrigger().getAttribute("aria-expanded")) === "true";
+  }
+}
+
 export class NavLinkDriver extends ComponentDriver {}
+
+export class NavPanelDriver extends ComponentDriver {
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  getLogo(): Locator {
+    return this.getByPartName("logo");
+  }
+
+  getFooter(): Locator {
+    return this.getByPartName("footer");
+  }
+}
 
 export class TextBoxDriver extends InputComponentDriver {
   get input(): Locator {

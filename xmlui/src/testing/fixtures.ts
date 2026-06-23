@@ -1,6 +1,7 @@
 import { expect as baseExpect, test as base, type Locator, type Page } from "@playwright/test";
 import {
   AccordionDriver,
+  AppHeaderDriver,
   AutoCompleteDriver,
   CardDriver,
   CheckboxDriver,
@@ -14,13 +15,16 @@ import {
   LinkDriver,
   ListDriver,
   ModalDialogDriver,
+  NavGroupDriver,
   NavLinkDriver,
+  NavPanelDriver,
   NoResultDriver,
   NumberBoxDriver,
   ResponsiveBarDriver,
   SplitterDriver,
   DateInputDriver,
   FileUploadDropZoneDriver,
+  FooterDriver,
   SelectDriver,
   SliderDriver,
   TimeInputDriver,
@@ -50,6 +54,7 @@ type Fixtures = {
   initTestBed: (markup: string, options?: InitTestBedOptions) => Promise<TestBedResult>;
   createButtonDriver: () => Promise<ComponentDriver>;
   createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
+  createAppHeaderDriver: (testId?: string | Locator) => Promise<AppHeaderDriver>;
   createExpandableItemDriver: (testId?: string | Locator) => Promise<ExpandableItemDriver>;
   createTextDriver: (testId?: string) => Promise<ComponentDriver>;
   createHeadingDriver: (testId?: string) => Promise<ComponentDriver>;
@@ -65,12 +70,15 @@ type Fixtures = {
   createDropdownMenuDriver: (testId?: string | Locator) => Promise<DropdownMenuDriver>;
   createTreeDriver: (testId?: string | Locator) => Promise<TreeDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
+  createNavGroupDriver: (testId?: string | Locator) => Promise<NavGroupDriver>;
   createNavLinkDriver: (testId?: string | Locator) => Promise<NavLinkDriver>;
+  createNavPanelDriver: (testId?: string | Locator) => Promise<NavPanelDriver>;
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
   createDateInputDriver: (testId?: string | Locator) => Promise<DateInputDriver>;
   createFileUploadDropZoneDriver: (testId?: string | Locator) => Promise<FileUploadDropZoneDriver>;
+  createFooterDriver: (testId?: string | Locator) => Promise<FooterDriver>;
   createAutoCompleteDriver: (testId?: string | Locator) => Promise<AutoCompleteDriver>;
   createSelectDriver: (testId?: string | Locator) => Promise<SelectDriver>;
   createTimeInputDriver: (testId?: string | Locator) => Promise<TimeInputDriver>;
@@ -137,6 +145,17 @@ export const test = base.extend<Fixtures>({
       locator: typeof testId === "string"
         ? page.getByTestId(testId)
         : testId ?? page.locator('[data-xmlui-component="Accordion"]').first(),
+      page,
+    }));
+  },
+  createAppHeaderDriver: async ({ page }, use) => {
+    await use(async (testId) => new AppHeaderDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="AppHeader"]').first(),
       page,
     }));
   },
@@ -267,6 +286,17 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createNavGroupDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavGroupDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavGroup"]').first(),
+      page,
+    }));
+  },
   createNavLinkDriver: async ({ page }, use) => {
     await use(async (testId) => new NavLinkDriver({
       locator: typeof testId === "string"
@@ -275,6 +305,17 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="NavLink"]').first(),
+      page,
+    }));
+  },
+  createNavPanelDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavPanelDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavPanel"]').first(),
       page,
     }));
   },
@@ -330,6 +371,17 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="FileUploadDropZone"]').first(),
+      page,
+    }));
+  },
+  createFooterDriver: async ({ page }, use) => {
+    await use(async (testId) => new FooterDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Footer"]').first(),
       page,
     }));
   },

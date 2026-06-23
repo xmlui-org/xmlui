@@ -1,0 +1,11 @@
+<App var.message="{'Ready'}">
+  <H1>Footer foundation</H1>
+  <Text>{message}</Text>
+  <Footer>
+    <Text>© 2026 XMLUI Rewrite</Text>
+    <Button onClick="message = message === 'Ready' ? 'Footer action clicked' : 'Ready'">
+      Toggle footer state
+    </Button>
+    <NavLink to="/footer">Footer link</NavLink>
+  </Footer>
+</App>

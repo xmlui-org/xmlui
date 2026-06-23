@@ -3297,9 +3297,151 @@ Verified:
   components share the old icon pipeline;
 - exact old `NavPanel` and `NavGroup` context behavior is not present yet.
 
-Next explicit step: Phase 5 Wave D6B - migrate `NavPanel` foundation around
-basic shell layout, width/height/scroll container behavior, copied docs/specs,
-focused E2E tests, and a visual sample using the migrated `NavLink`.
+Completed: Phase 5 Wave D6B - `NavPanel` foundation.
+
+Added:
+
+- migrated `NavPanel` source folder with metadata in `NavPanel.tsx`, SCSS
+  module styling, React renderer, copied documentation, copied old E2E suite,
+  and a focused foundation E2E suite;
+- basic shell container layout with `content`, `logo`, and `footer` parts;
+- accepted old surface props for `logoTemplate`, `footerTemplate`, `inDrawer`,
+  `scrollStyle`, `showScrollerFade`, `syncWithContent`,
+  `syncScrollBehavior`, and `syncScrollPosition`;
+- `createNavPanelDriver` fixture for copied and foundation tests;
+- visual sample available with `npm run dev` at
+  `?example=navPanelFoundation`, using the migrated `NavLink` and a
+  state-mutating navigation path.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavPanel/NavPanel.foundation.spec.ts src/components/NavPanel/NavPanel.spec.ts src/components/NavLink/NavLink.foundation.spec.ts src/components/NavLink/NavLink.spec.ts`
+  from `xmlui/`: 7 foundation tests passed, 97 copied old tests skipped.
+
+`NavPanel` compatibility debt:
+
+- the literal old `NavPanel.spec.ts` suite is copied but intentionally skipped
+  until App layout integration, NavGroup discovery, dynamic nav generation,
+  scroller/fade variants, active-link scroll synchronization, collapsed/drawer
+  shell behavior, link-map registration, and complete theme-variable parity are
+  migrated;
+- `logoTemplate` and `footerTemplate` are supported as direct property
+  children, but old App-provided logo content and vertical/horizontal layout
+  context are not restored yet;
+- scroll props are accepted and basic overflow styling exists, but old
+  `ScrollViewer`-backed behavior and fade indicators are not complete.
+
+Completed: Phase 5 Wave D6C - `NavGroup` foundation.
+
+Implemented:
+
+- migrated `NavGroup` source folder with metadata in `NavGroup.tsx`, SCSS
+  module styling, `NavGroupReact.tsx`, `NavGroup.renderer.tsx`, copied
+  `NavGroup.md`, and copied literal old `NavGroup.spec.ts`;
+- `NavGroup` compiler/runtime registration in the built-in contract list,
+  IR runtime-component allowlist, component registry, and transferred-component
+  inventory;
+- class-based inline expandable behavior for `label`, `initiallyExpanded`,
+  `enabled`, and optional header `to` navigation;
+- `createNavGroupDriver` fixture for focused tests;
+- `NavGroup.foundation.spec.ts` covering collapsed/expanded state,
+  `initiallyExpanded`, disabled behavior, and nested `NavLink` navigation with
+  state mutation;
+- visual sample available with `npm run dev` at
+  `?example=navGroupFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavGroup/NavGroup.foundation.spec.ts src/components/NavGroup/NavGroup.spec.ts src/components/NavPanel/NavPanel.foundation.spec.ts src/components/NavLink/NavLink.foundation.spec.ts`
+  from `xmlui/`: 11 foundation tests passed, 31 copied old `NavGroup` tests
+  skipped.
+
+`NavGroup` compatibility debt:
+
+- the literal old `NavGroup.spec.ts` suite is copied but intentionally skipped
+  until App/NavPanel layout context, horizontal/dropdown menu behavior, old
+  menu roles and keyboard behavior, icon variants, active-route auto-expansion,
+  nested level inheritance, drawer interactions, `noIndicator`, expand-icon
+  alignment, and full theme-variable parity are restored;
+- this slice implements only the vertical inline foundation needed by the
+  migrated `NavPanel`/`NavLink` experiment path.
+
+Completed: Phase 5 Wave D6D - `AppHeader` foundation.
+
+Implemented:
+
+- migrated `AppHeader` source folder with metadata in `AppHeader.tsx`, defaults,
+  SCSS module styling, `AppHeaderReact.tsx`, `AppHeader.renderer.tsx`, copied
+  `AppHeader.md`, and copied literal old `AppHeader.spec.ts`;
+- replaced the centralized minimal AppHeader runtime renderer with the
+  transferred component renderer in the component registry;
+- added compiler contract props for `profileMenuTemplate`, `logoTemplate`,
+  `titleTemplate`, `title`, `showLogo`, `testId`, and `id`;
+- added `createAppHeaderDriver` fixture;
+- added `AppHeader.foundation.spec.ts` for banner semantics, title/content
+  rendering, logo/title/profile template placement, keyboard focus inside the
+  header, theme variables, and state mutation from a header action;
+- visual sample available with `npm run dev` at
+  `?example=appHeaderFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/AppHeader/AppHeader.foundation.spec.ts src/components/AppHeader/AppHeader.spec.ts`
+  from `xmlui/`: 5 foundation tests passed, 12 copied old tests skipped.
+
+`AppHeader` compatibility debt:
+
+- the literal old `AppHeader.spec.ts` suite is copied but intentionally skipped
+  until App layout context, drawer/nav-panel integration, default app logo
+  resource behavior, layout-specific visibility, and complete theme-variable
+  parity are restored;
+- this slice implements the direct header authoring surface and visible
+  horizontal header layout only.
+
+Completed: Phase 5 Wave D6E - `Footer` foundation.
+
+Implemented:
+
+- migrated `Footer` source folder with metadata in `Footer.tsx`, defaults,
+  SCSS module styling, `FooterReact.tsx`, `Footer.renderer.tsx`, copied
+  `Footer.md`, and copied literal old `Footer.spec.ts`;
+- registered `Footer` in compiler contracts, IR runtime-component allowlist,
+  component registry, transferred-component inventory, and test fixtures;
+- added `createFooterDriver` fixture;
+- added `Footer.foundation.spec.ts` for content rendering, contentinfo
+  semantics, focusable interactive children, `sticky` attribute reflection,
+  theme variables, and state mutation from a footer action;
+- visual sample available with `npm run dev` at
+  `?example=footerFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/Footer/Footer.foundation.spec.ts src/components/Footer/Footer.spec.ts`
+  from `xmlui/`: 5 foundation tests passed, 20 copied old tests skipped.
+
+`Footer` compatibility debt:
+
+- the literal old `Footer.spec.ts` suite is copied but intentionally skipped
+  until full App shell layout, Pages scrolling containers, sticky layout
+  behavior, layout-specific content width, and complete theme-variable parity
+  are restored;
+- this slice implements the direct footer authoring surface and visible
+  horizontal footer layout only.
+
+Next explicit step: Phase 5 Wave D6F - migrate `NavPanelCollapseButton`
+foundation with copied old docs/specs, focused tests, and a visual sample.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 
