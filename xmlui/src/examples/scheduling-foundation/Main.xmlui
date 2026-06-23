@@ -1,0 +1,14 @@
+<App var.ticks="{0}" var.queueLog="">
+  <Timer id="clock" interval="{1000}" onTick="ticks++" />
+  <Queue
+    id="jobs"
+    onProcess="item => queueLog = queueLog + item + ' processed; '"
+    onComplete="queueLog = queueLog + 'done'" />
+
+  <H1>Scheduling foundation</H1>
+  <Text>Ticks: {ticks}</Text>
+  <Text>Queue: {queueLog || 'empty'}</Text>
+  <Button onClick="clock.pause()">Pause timer</Button>
+  <Button onClick="clock.resume()">Resume timer</Button>
+  <Button onClick="jobs.enqueueItems(['first', 'second'])">Run queue</Button>
+</App>

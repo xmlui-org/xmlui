@@ -53,6 +53,15 @@ import { APICallMd } from "../../components/APICall/APICall";
 import { AppStateMd } from "../../components/AppState/AppState";
 import { ChangeListenerMd } from "../../components/ChangeListener/ChangeListener";
 import { LifecycleMd } from "../../components/Lifecycle/Lifecycle";
+import { TimerMd } from "../../components/Timer/Timer";
+import { QueueMd } from "../../components/Queue/Queue";
+import { MessageListenerMd } from "../../components/MessageListener/MessageListener";
+import { EventSourceMd } from "../../components/EventSource/EventSource";
+import { WebSocketMd } from "../../components/WebSocket/WebSocket";
+import { LiveRegionMd } from "../../components/LiveRegion/LiveRegion";
+import { BookmarkMd } from "../../components/Bookmark/Bookmark";
+import { SkipLinkMd } from "../../components/SkipLink/SkipLink";
+import { ToastMd } from "../../components/Toast/Toast";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -1309,6 +1318,79 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       unmount: "onUnmount",
       error: "onError",
     },
+  }),
+  contractFromMetadata(TimerMd, {
+    name: "Timer",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      tick: "onTick",
+    },
+  }),
+  contractFromMetadata(QueueMd, {
+    name: "Queue",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    eventAttributes: {
+      willProcess: "onWillProcess",
+      process: "onProcess",
+      didProcess: "onDidProcess",
+      processError: "onProcessError",
+      complete: "onComplete",
+    },
+  }),
+  contractFromMetadata(MessageListenerMd, {
+    name: "MessageListener",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    eventAttributes: {
+      messageReceived: "onMessageReceived",
+    },
+  }),
+  contractFromMetadata(EventSourceMd, {
+    name: "EventSource",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      open: "onOpen",
+      message: "onMessage",
+      error: "onError",
+      close: "onClose",
+    },
+  }),
+  contractFromMetadata(WebSocketMd, {
+    name: "WebSocket",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      open: "onOpen",
+      message: "onMessage",
+      error: "onError",
+      close: "onClose",
+    },
+  }),
+  contractFromMetadata(LiveRegionMd, {
+    name: "LiveRegion",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(BookmarkMd, {
+    name: "Bookmark",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(SkipLinkMd, {
+    name: "SkipLink",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ToastMd, {
+    name: "Toast",
+    allowsChildren: true,
+    includeLayoutProps: false,
   }),
   {
     name: "Slot",

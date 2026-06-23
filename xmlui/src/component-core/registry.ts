@@ -100,6 +100,15 @@ import { apiCallRenderer } from "../components/APICall/APICall.renderer";
 import { appStateRenderer } from "../components/AppState/AppState.renderer";
 import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener.renderer";
 import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
+import { timerRenderer } from "../components/Timer/Timer.renderer";
+import { queueRenderer } from "../components/Queue/Queue.renderer";
+import { messageListenerRenderer } from "../components/MessageListener/MessageListener.renderer";
+import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
+import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
+import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
+import { bookmarkRenderer } from "../components/Bookmark/Bookmark.renderer";
+import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
+import { toastRenderer } from "../components/Toast/Toast.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -208,6 +217,15 @@ const implementedRuntimeNames = [
   "AppState",
   "ChangeListener",
   "Lifecycle",
+  "Timer",
+  "Queue",
+  "EventSource",
+  "MessageListener",
+  "WebSocket",
+  "LiveRegion",
+  "Bookmark",
+  "SkipLink",
+  "Toast",
 ] as const;
 
 const implementedRuntimeNameSet = new Set<string>(implementedRuntimeNames);
@@ -309,6 +327,15 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   AppState: appStateRenderer,
   ChangeListener: changeListenerRenderer,
   Lifecycle: lifecycleRenderer,
+  Timer: timerRenderer,
+  Queue: queueRenderer,
+  EventSource: eventSourceRenderer,
+  MessageListener: messageListenerRenderer,
+  WebSocket: webSocketRenderer,
+  LiveRegion: liveRegionRenderer,
+  Bookmark: bookmarkRenderer,
+  SkipLink: skipLinkRenderer,
+  Toast: toastRenderer,
   ...htmlTagRenderers,
 };
 
@@ -419,6 +446,15 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const appStateTransferred = contract.name === "AppState";
     const changeListenerTransferred = contract.name === "ChangeListener";
     const lifecycleTransferred = contract.name === "Lifecycle";
+    const timerTransferred = contract.name === "Timer";
+    const queueTransferred = contract.name === "Queue";
+    const eventSourceTransferred = contract.name === "EventSource";
+    const messageListenerTransferred = contract.name === "MessageListener";
+    const webSocketTransferred = contract.name === "WebSocket";
+    const liveRegionTransferred = contract.name === "LiveRegion";
+    const bookmarkTransferred = contract.name === "Bookmark";
+    const skipLinkTransferred = contract.name === "SkipLink";
+    const toastTransferred = contract.name === "Toast";
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
@@ -492,7 +528,16 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       apiCallTransferred ||
       appStateTransferred ||
       changeListenerTransferred ||
-      lifecycleTransferred;
+      lifecycleTransferred ||
+      timerTransferred ||
+      queueTransferred ||
+      eventSourceTransferred ||
+      messageListenerTransferred ||
+      webSocketTransferred ||
+      liveRegionTransferred ||
+      bookmarkTransferred ||
+      skipLinkTransferred ||
+      toastTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
       : appHeaderTransferred
@@ -591,6 +636,24 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                                         ? "ChangeListener"
                                                                         : lifecycleTransferred
                                                                           ? "Lifecycle"
+                                                                          : timerTransferred
+                                                                            ? "Timer"
+                                                                            : queueTransferred
+                                                                              ? "Queue"
+                                                                              : eventSourceTransferred
+                                                                                ? "EventSource"
+                                                                              : messageListenerTransferred
+                                                                                  ? "MessageListener"
+                                                                                  : webSocketTransferred
+                                                                                    ? "WebSocket"
+                                                                                    : liveRegionTransferred
+                                                                                      ? "LiveRegion"
+                                                                                      : bookmarkTransferred
+                                                                                        ? "Bookmark"
+                                                                                        : skipLinkTransferred
+                                                                                          ? "SkipLink"
+                                                                                          : toastTransferred
+                                                                                            ? "Toast"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -738,6 +801,24 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ChangeListener.renderer.tsx`);
     } else if (lifecycleTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Lifecycle.renderer.tsx`);
+    } else if (timerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Timer.renderer.tsx`);
+    } else if (queueTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Queue.renderer.tsx`);
+    } else if (eventSourceTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/EventSource.renderer.tsx`);
+    } else if (messageListenerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/MessageListener.renderer.tsx`);
+    } else if (webSocketTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/WebSocket.renderer.tsx`);
+    } else if (liveRegionTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LiveRegion.renderer.tsx`);
+    } else if (bookmarkTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Bookmark.renderer.tsx`);
+    } else if (skipLinkTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SkipLink.renderer.tsx`);
+    } else if (toastTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Toast.renderer.tsx`);
     }
 
     const runnablePaths = componentRunnablePaths({
@@ -809,6 +890,15 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       appStateTransferred,
       changeListenerTransferred,
       lifecycleTransferred,
+      timerTransferred,
+      queueTransferred,
+      eventSourceTransferred,
+      messageListenerTransferred,
+      webSocketTransferred,
+      liveRegionTransferred,
+      bookmarkTransferred,
+      skipLinkTransferred,
+      toastTransferred,
     });
     return {
       name: contract.name,
@@ -843,7 +933,16 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
           !apiCallTransferred &&
           !appStateTransferred &&
           !changeListenerTransferred &&
-          !lifecycleTransferred
+          !lifecycleTransferred &&
+          !timerTransferred &&
+          !queueTransferred &&
+          !eventSourceTransferred &&
+          !messageListenerTransferred &&
+          !webSocketTransferred &&
+          !liveRegionTransferred &&
+          !bookmarkTransferred &&
+          !skipLinkTransferred &&
+          !toastTransferred
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.defaults.ts`]
             : [],
         styles:
@@ -856,7 +955,13 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
           !apiCallTransferred &&
           !appStateTransferred &&
           !changeListenerTransferred &&
-          !lifecycleTransferred
+          !lifecycleTransferred &&
+          !timerTransferred &&
+          !queueTransferred &&
+          !eventSourceTransferred &&
+          !messageListenerTransferred &&
+          !webSocketTransferred &&
+          !toastTransferred
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.module.scss`]
             : [],
         docs: transferredFolder ? [`xmlui/src/components/${folderName}/${docsFile}.md`] : [],
@@ -939,6 +1044,15 @@ function componentRunnablePaths(flags: {
   appStateTransferred: boolean;
   changeListenerTransferred: boolean;
   lifecycleTransferred: boolean;
+  timerTransferred: boolean;
+  queueTransferred: boolean;
+  eventSourceTransferred: boolean;
+  messageListenerTransferred: boolean;
+  webSocketTransferred: boolean;
+  liveRegionTransferred: boolean;
+  bookmarkTransferred: boolean;
+  skipLinkTransferred: boolean;
+  toastTransferred: boolean;
 }): string[] {
   if (flags.accordionTransferred) {
     return [
@@ -1259,6 +1373,33 @@ function componentRunnablePaths(flags: {
   }
   if (flags.lifecycleTransferred) {
     return ["xmlui/src/components/Lifecycle/Lifecycle.spec.ts"];
+  }
+  if (flags.timerTransferred) {
+    return ["xmlui/src/components/Timer/Timer.spec.ts"];
+  }
+  if (flags.queueTransferred) {
+    return ["xmlui/src/components/Queue/Queue.spec.ts"];
+  }
+  if (flags.eventSourceTransferred) {
+    return ["xmlui/src/components/EventSource/EventSource.spec.ts"];
+  }
+  if (flags.messageListenerTransferred) {
+    return ["xmlui/src/components/MessageListener/MessageListener.spec.ts"];
+  }
+  if (flags.webSocketTransferred) {
+    return ["xmlui/src/components/WebSocket/WebSocket.spec.ts"];
+  }
+  if (flags.liveRegionTransferred) {
+    return ["xmlui/src/components/LiveRegion/LiveRegion.spec.ts"];
+  }
+  if (flags.bookmarkTransferred) {
+    return ["xmlui/src/components/Bookmark/Bookmark.spec.ts"];
+  }
+  if (flags.skipLinkTransferred) {
+    return ["xmlui/src/components/SkipLink/SkipLink.spec.ts"];
+  }
+  if (flags.toastTransferred) {
+    return ["xmlui/src/components/Toast/Toast.spec.ts"];
   }
   return [];
 }

@@ -1,0 +1,12 @@
+<App var.message="Idle">
+  <SkipLink target="main-content" label="Skip to content" />
+  <Toast id="notify" />
+  <LiveRegion message="{message}" politeness="polite" />
+  <Bookmark id="main-content">
+    <H1>Feedback and accessibility foundation</H1>
+  </Bookmark>
+  <Text>Status: {message}</Text>
+  <Button onClick="message = 'Saved'; notify.success('Saved')">
+    Save and announce
+  </Button>
+</App>

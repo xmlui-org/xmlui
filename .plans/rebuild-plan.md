@@ -3910,6 +3910,23 @@ Compatibility focus:
 - scheduling cadence, cancellation, queue ordering, concurrency behavior,
   lifecycle cleanup, and event handler interaction.
 
+Status:
+
+- Wave F3A completed: inspected original `Timer` and `Queue` implementations
+  and migrated a component-owned foundation slice.
+- Added metadata, docs, non-visual renderers, and focused component-local E2E
+  tests for timer ticks, once mode, pause/resume, queue enqueueing, FIFO
+  processing, removal, will-process gating, and completion.
+- Added runnable example `?example=schedulingFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `Timer.spec.ts` and `Queue.spec.ts` transfer is not complete.
+- Queue progress/result feedback templates, toast integration, and full error
+  handling remain deferred.
+- Some literal old Queue tests require broader event-parser support such as
+  multi-parameter arrow callbacks and local declarations.
+
 ##### Wave F4: Messaging and Streaming
 
 Components:
@@ -3922,6 +3939,26 @@ Compatibility focus:
 
 - connection lifecycle, reconnection where present, message payloads,
   subscription cleanup, errors, and app event dispatch.
+
+Status:
+
+- Wave F4A completed: inspected original `MessageListener`, `EventSource`, and
+  `WebSocket` implementations and migrated a component-owned foundation slice.
+- Added metadata, docs, non-visual renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for all three components.
+- Added focused component-local E2E tests for `MessageListener` window message
+  delivery and child passthrough, `EventSource` open/message/disabled behavior,
+  and `WebSocket` construction while accounting for Vite's HMR socket.
+- Added runnable example `?example=messagingFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `MessageListener.spec.ts` transfer is not complete.
+- `EventSource` close/error/retry behavior needs a real streaming compatibility
+  harness before the old tests can be copied literally.
+- `WebSocket` event delivery, disabled state, close/error, and reconnect tests
+  need the same streaming harness and a careful comparison with the original
+  implementation.
 
 ##### Wave F5: User Feedback and Accessibility Services
 
@@ -3938,6 +3975,38 @@ Compatibility focus:
 
 - announcements, focus boundaries, skip targets, bookmark behavior, animation
   lifecycle, visual feedback, and accessibility semantics.
+
+Status:
+
+- Wave F5A completed: inspected original `Toast`, `Bookmark`, `LiveRegion`,
+  `SkipLink`, `FocusScope`, and `Animation` implementations and migrated the
+  smallest service/accessibility foundation slice.
+- Added metadata, docs, renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for `LiveRegion`, `Bookmark`,
+  `SkipLink`, and `Toast`.
+- Added focused component-local E2E tests for live-region semantics, bookmark
+  anchor/API behavior, keyboard-first skip-link activation, and toast component
+  API exposure.
+- Added runnable example `?example=feedbackAccessibilityFoundation` for
+  `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old E2E suite transfer is not complete for these components.
+- `LiveRegion` global announcement-helper behavior remains deferred.
+- `Bookmark` TableOfContents registration and scroll-container behavior remain
+  deferred.
+- `SkipLink` portal parity and the full keyboard/visual-hidden test suite
+  remain deferred.
+- `Toast` template rendering, update-in-place semantics, and full
+  `react-hot-toast` parity remain deferred.
+- `FocusScope` and `Animation` remain unimplemented and should be migrated with
+  their old utility/runtime behavior.
+
+Next explicit step: Phase 5 Wave F6A - inspect original theme and inspection
+runtime components (`ToneChangerButton`, `ToneSwitch`, `Theme`, `Part`, `Slot`,
+`InspectButton`, `Inspector`, `I18n`), then migrate the smallest theme/slot
+foundation slice with component-local tests and a runnable example.
 
 ##### Wave F6: Theme and Inspection Runtime
 

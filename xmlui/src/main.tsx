@@ -64,6 +64,7 @@ import routingStateApp from "./examples/routing-state/Main.xmlui";
 import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
 import responsiveBarFoundationApp from "./examples/responsive-bar-foundation/Main.xmlui";
 import scrollViewerFoundationApp from "./examples/scroll-viewer-foundation/Main.xmlui";
+import schedulingFoundationApp from "./examples/scheduling-foundation/Main.xmlui";
 import splitterFoundationApp from "./examples/splitter-foundation/Main.xmlui";
 import stickyFoundationApp from "./examples/sticky-foundation/Main.xmlui";
 import styleMutationApp from "./examples/style-mutation/Main.xmlui";
@@ -82,6 +83,8 @@ import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui"
 import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlui";
 import drawerFoundationApp from "./examples/drawer-foundation/Main.xmlui";
 import modalDialogFoundationApp from "./examples/modal-dialog-foundation/Main.xmlui";
+import messagingFoundationApp from "./examples/messaging-foundation/Main.xmlui";
+import feedbackAccessibilityFoundationApp from "./examples/feedback-accessibility-foundation/Main.xmlui";
 import tooltipFoundationApp from "./examples/tooltip-foundation/Main.xmlui";
 import contextMenuFoundationApp from "./examples/context-menu-foundation/Main.xmlui";
 import dropdownMenuFoundationApp from "./examples/dropdown-menu-foundation/Main.xmlui";
@@ -175,6 +178,7 @@ const examples = {
   runtimeToast: runtimeToastApp,
   responsiveBarFoundation: responsiveBarFoundationApp,
   scrollViewerFoundation: scrollViewerFoundationApp,
+  schedulingFoundation: schedulingFoundationApp,
   splitterFoundation: splitterFoundationApp,
   stickyFoundation: stickyFoundationApp,
   styleMutation: styleMutationApp,
@@ -193,6 +197,8 @@ const examples = {
   datePickerFoundation: datePickerFoundationApp,
   drawerFoundation: drawerFoundationApp,
   modalDialogFoundation: modalDialogFoundationApp,
+  messagingFoundation: messagingFoundationApp,
+  feedbackAccessibilityFoundation: feedbackAccessibilityFoundationApp,
   tooltipFoundation: tooltipFoundationApp,
   contextMenuFoundation: contextMenuFoundationApp,
   dropdownMenuFoundation: dropdownMenuFoundationApp,
