@@ -1,8 +1,8 @@
-import { memo } from "react";
+import { memo, type ReactNode } from "react";
 
 export type XmluiOption = {
   value: unknown;
-  label: string;
+  label: ReactNode;
   enabled: boolean;
   keywords?: string[];
   [key: string]: unknown;

@@ -523,8 +523,8 @@ class ScriptParser {
     if (!this.at(ScriptTokenKind.Arrow)) {
       return undefined;
     }
-    if (params.length !== 1) {
-      this.report("XS118", "Only single-parameter arrow callbacks are supported.", open);
+    if (params.length > 1) {
+      this.report("XS118", "Only zero- or single-parameter arrow callbacks are supported.", open);
     }
     return params;
   }

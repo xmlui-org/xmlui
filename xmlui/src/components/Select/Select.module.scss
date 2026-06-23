@@ -20,7 +20,18 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
 @layer components {
   .selectRoot {
     box-sizing: border-box;
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--xmlui-gap-Select, var(--xmlui-space-1));
     max-width: 100%;
+  }
+
+  .selectTrigger {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
     min-height: var(--xmlui-height-Select, 2rem);
     padding: var(--xmlui-paddingVertical-Select, 0.25rem) var(--xmlui-paddingHorizontal-Select, 0.5rem);
     border-color: var(--xmlui-borderColor-Select);
@@ -32,10 +43,66 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
     box-shadow: var(--xmlui-boxShadow-Select);
     font: inherit;
     font-size: var(--xmlui-fontSize-Select);
+    text-align: left;
+    cursor: pointer;
   }
 
-  .selectRoot:disabled {
+  .selectTrigger:disabled {
     cursor: not-allowed;
     opacity: var(--xmlui-opacity-Select--disabled, 0.65);
+  }
+
+  .selectOptions {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+    max-height: var(--xmlui-dropdownHeight-Select, 16rem);
+    overflow: auto;
+    border: var(--xmlui-borderWidth-Select) var(--xmlui-borderStyle-Select) var(--xmlui-borderColor-Select);
+    border-radius: var(--xmlui-borderRadius-Select);
+    background-color: var(--xmlui-backgroundColor-Select);
+    box-shadow: var(--xmlui-boxShadow-Select);
+    z-index: var(--xmlui-zIndex-Select, 10);
+  }
+
+  .selectOption {
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--xmlui-paddingVertical-option-Select, 0.35rem) var(--xmlui-paddingHorizontal-option-Select, 0.5rem);
+    border: 0;
+    background-color: var(--xmlui-backgroundColor-option-Select, transparent);
+    color: var(--xmlui-textColor-Select);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .selectOption:hover,
+  .selectOption:focus,
+  .selectOptionActive {
+    background-color: var(--xmlui-backgroundColor-option-Select--hover, var(--xmlui-color-surface-100));
+  }
+
+  .selectOption:disabled {
+    cursor: not-allowed;
+    opacity: var(--xmlui-opacity-option-Select--disabled, 0.65);
+  }
+
+  .selectOptionSelected {
+    background-color: var(--xmlui-backgroundColor-option-Select--selected, var(--xmlui-color-primary-100));
+  }
+
+  .nativeMirror {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }

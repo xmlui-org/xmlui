@@ -1432,6 +1432,7 @@ function isAllowedMethodName(name: string): boolean {
     "getFields",
     "getValue",
     "hasOverflow",
+    "setValue",
     "scrollToTop",
     "scrollToBottom",
     "scrollToStart",
@@ -1708,6 +1709,11 @@ function emitEventExpression(expression: XmluiScriptIr): string {
     case "PrefixUpdate":
     case "PostfixUpdate":
       return emitUpdateExpression(expression);
+    case "ArrowFunctionExpression":
+      if (expression.params.length === 0) {
+        return emitEventExpression(expression.body);
+      }
+      return emitExpression(expression);
     default:
       return emitAsyncExpression(expression);
   }

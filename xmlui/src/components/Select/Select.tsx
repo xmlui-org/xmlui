@@ -1,7 +1,9 @@
 import { createMetadata, dAutoFocus, dDidChange, dEnabled, dGotFocus, dInitialValue, dLostFocus, dPlaceholder, dReadonly, dRequired } from "../../component-core/metadata/helpers";
+import type { ReactNode } from "react";
 import type { XmluiElement } from "../../compiler/ir";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { wrapComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { createRuntimeScope, type RuntimeScope } from "../../runtime/state";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./Select.defaults";
 import { SelectNative, type SelectApi } from "./SelectReact";
@@ -123,7 +125,7 @@ function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
     const labelField = adapter.stringProp("labelField", "label") ?? "label";
     return data.map((item) => dataOption(item, valueField, labelField));
   }
-  return adapter.node.children.flatMap((child) => optionFromChild(child, adapter.scope));
+  return adapter.node.children.flatMap((child) => optionsFromChild(child, adapter));
 }
 
 function dataOption(item: unknown, valueField: string, labelField: string): XmluiOption {
@@ -136,21 +138,78 @@ function dataOption(item: unknown, valueField: string, labelField: string): Xmlu
   return { value: item, label: String(item ?? ""), enabled: true };
 }
 
-function optionFromChild(
+function optionsFromChild(
   child: XmluiElement["children"][number],
-  scope: XmluiComponentAdapter["scope"],
+  adapter: XmluiComponentAdapter,
+  scope: RuntimeScope = adapter.scope,
 ): XmluiOption[] {
+  if (child.kind === "element" && child.type === "Items") {
+    const items = evaluateExpressionOrText(
+      child.props.items ?? child.props.data,
+      child.parsed?.props?.items ?? child.parsed?.props?.data,
+      scope,
+      "Select:Items:data",
+    );
+    if (!Array.isArray(items)) {
+      return [];
+    }
+    return items.flatMap((item, index) => {
+      const itemScope = createRuntimeScope({
+        store: scope.store,
+        parent: scope,
+        props: scope.props,
+        contextValues: {
+          $item: item,
+          $itemIndex: index,
+          $isFirst: index === 0,
+          $isLast: index === items.length - 1,
+        },
+        references: scope.references,
+        slots: scope.slots,
+        emitEvent: scope.emitEvent,
+      });
+      return child.children.flatMap((itemChild) => optionsFromChild(itemChild, adapter, itemScope));
+    });
+  }
   if (child.kind !== "element" || child.type !== "Option") {
     return [];
   }
-  const value = evaluateExpressionOrText(child.props.value ?? "", child.parsed?.props?.value, scope, "Option:value");
-  const label = Object.prototype.hasOwnProperty.call(child.props, "label")
+  const hasValue = Object.prototype.hasOwnProperty.call(child.props, "value");
+  const hasLabel = Object.prototype.hasOwnProperty.call(child.props, "label");
+  const hasChildren = child.children.length > 0;
+  if (!hasValue && !hasLabel && !hasChildren) {
+    return [];
+  }
+  let value = hasValue
+    ? evaluateExpressionOrText(child.props.value, child.parsed?.props?.value, scope, "Option:value")
+    : undefined;
+  if (
+    hasValue &&
+    (child.props.value === "{null}" || parsedExpressionSource(child.parsed?.props?.value) === "null")
+  ) {
+    value = null;
+  }
+  const label = hasLabel
     ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, scope, "Option:label")
-    : child.children.map((optionChild) => optionChild.kind === "text" ? optionChild.value : "").join(" ");
+    : hasChildren
+      ? adapter.context.renderChildren(child.children, scope)
+      : undefined;
   const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
     ? booleanOptionValue(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, scope, "Option:enabled"))
     : true;
-  return [{ value: value ?? label ?? "", label: String(label ?? value ?? ""), enabled }];
+  return [{
+    value: value ?? label ?? "",
+    label: (label ?? value ?? "") as ReactNode,
+    enabled,
+    __xmluiRawValue: child.props.value,
+    __xmluiParsedValueSource: parsedExpressionSource(child.parsed?.props?.value),
+  }];
+}
+
+function parsedExpressionSource(parsed: unknown): string | undefined {
+  return parsed && typeof parsed === "object" && "source" in parsed
+    ? String((parsed as { source: unknown }).source)
+    : undefined;
 }
 
 function booleanOptionValue(value: unknown): boolean {

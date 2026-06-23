@@ -49,7 +49,7 @@ describe("Managed React contract registry", () => {
     expect(metadata.components).toContainEqual(
       expect.objectContaining({
         name: "Items",
-        props: expect.arrayContaining(["data", "gap", "items", "reverse"]),
+        props: expect.arrayContaining(["data", "items", "itemTemplate", "reverse"]),
         templates: ["itemTemplate"],
         contextVariables: ["$isFirst", "$isLast", "$item", "$itemIndex"],
       }),
@@ -71,7 +71,7 @@ describe("Managed React contract registry", () => {
     expect(metadata.components).toContainEqual(
       expect.objectContaining({
         name: "Option",
-        props: ["enabled", "keywords", "label", "value"],
+        props: ["enabled", "keywords", "label", "testId", "value"],
       }),
     );
     expect(metadata.components).toContainEqual(

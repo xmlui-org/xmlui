@@ -130,7 +130,7 @@ export const paginationRenderer = wrapComponent({
         }}
         id={adapter.stringProp("id")}
         enabled={adapter.booleanProp("enabled", true)}
-        itemCount={adapter.prop("itemCount")}
+        itemCount={optionalNumber(adapter.prop("itemCount"))}
         pageSize={adapter.numberProp("pageSize", defaultProps.pageSize)}
         pageIndex={adapter.numberProp("pageIndex", defaultProps.pageIndex)}
         maxVisiblePages={sanitizedMaxVisiblePages}
@@ -157,6 +157,14 @@ function arrayOfNumbers(value: unknown): number[] | undefined {
     return undefined;
   }
   return value.map((item) => Number(item)).filter((item) => Number.isFinite(item));
+}
+
+function optionalNumber(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function positionProp(value: string | undefined, fallback: Position): Position {

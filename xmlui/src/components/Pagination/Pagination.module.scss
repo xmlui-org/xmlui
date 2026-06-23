@@ -101,6 +101,7 @@ $gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
   }
 
   .selectorContainer {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--xmlui-gap-selector-Pagination, var(--xmlui-space-2));
@@ -118,5 +119,29 @@ $gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
     color: var(--xmlui-textColor-selector-Pagination);
     background-color: var(--xmlui-backgroundColor-selector-Pagination);
     font: inherit;
+  }
+
+  .pageSizeOptions {
+    position: absolute;
+    z-index: 1;
+    top: calc(100% + 2px);
+    right: 0;
+    min-width: 100%;
+    margin: 0;
+    padding: 0.25rem 0;
+    border: 1px solid var(--xmlui-borderColor-Pagination);
+    border-radius: var(--xmlui-borderRadius-selector-Pagination);
+    list-style: none;
+    color: var(--xmlui-textColor-selector-Pagination);
+    background-color: var(--xmlui-backgroundColor-selector-Pagination, var(--xmlui-backgroundColor-Pagination));
+  }
+
+  .pageSizeOption {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+  }
+
+  .pageSizeOption:hover {
+    background-color: var(--xmlui-backgroundColor-option-Pagination--hover, var(--xmlui-color-surface-100));
   }
 }

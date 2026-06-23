@@ -343,22 +343,76 @@ export class CheckboxDriver extends InputComponentDriver {
 }
 
 export class SelectDriver extends ComponentDriver {
+  get clearButton(): Locator {
+    return this.component.locator('[data-part-id="clearButton"], [data-xmlui-part="clearButton"]').first();
+  }
+
   get select(): Locator {
     return this.component.locator("select").or(this.component).first();
   }
 
   async selectOption(value: string): Promise<void> {
-    await this.select.selectOption(value);
+    const nativeSelect = this.component.locator("select").first();
+    if (await nativeSelect.count()) {
+      await nativeSelect.selectOption(value);
+      return;
+    }
+    await this.component
+      .getByRole("option", { name: value })
+      .or(this.params.page.getByRole("option", { name: value }))
+      .first()
+      .click({ force: true });
   }
 
   async value(): Promise<string | string[]> {
-    return this.select.evaluate((element) => {
+    const nativeSelect = this.component.locator("select").first();
+    if (!(await nativeSelect.count())) {
+      const value = await this.component.getAttribute("data-value");
+      return value ?? "";
+    }
+    return nativeSelect.evaluate((element) => {
       const select = element as HTMLSelectElement;
       if (select.multiple) {
         return Array.from(select.selectedOptions).map((option) => option.value);
       }
       return select.value;
     });
+  }
+
+  async toggleOptionsVisibility(): Promise<void> {
+    await this.component.click();
+  }
+
+  async selectLabel(value: string): Promise<void> {
+    await this.component
+      .getByRole("option", { name: value })
+      .or(this.params.page.getByRole("option", { name: value }))
+      .first()
+      .click({ force: true });
+  }
+
+  async searchFor(value: string): Promise<void> {
+    await this.params.page.getByRole("searchbox").fill(value);
+  }
+
+  async chooseIndex(index: number): Promise<void> {
+    await this.component
+      .getByRole("option")
+      .nth(index)
+      .or(this.params.page.getByRole("option").nth(index))
+      .first()
+      .click();
+  }
+
+  async selectFirstLabelPostSearh(label: string): Promise<void> {
+    await this.searchFor(label);
+    await this.chooseIndex(0);
+  }
+
+  async selectMultipleLabels(values: string[]): Promise<void> {
+    for (const value of values) {
+      await this.selectLabel(value);
+    }
   }
 }
 

@@ -28,7 +28,8 @@ test.describe("Pagination foundation", () => {
         pageSizeOptions="{[10, 25, 50]}"
         onPageSizeDidChange="pageSize => testState = pageSize" />
     `);
-    await page.getByLabel("Rows per page").selectOption("25");
+    await page.getByLabel("Items per page").click();
+    await page.getByRole("option", { name: "25" }).click();
     await expect.poll(testStateDriver.testState).toBe(25);
   });
 

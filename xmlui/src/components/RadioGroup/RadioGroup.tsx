@@ -42,6 +42,18 @@ export const RadioGroupMd = createMetadata({
     initialValue: { ...dInitialValue(defaultProps.initialValue, "string"), defaultValue: defaultProps.initialValue },
     value: { description: "Controlled value.", valueType: "any" },
     label: { description: "Radio group label.", valueType: "string" },
+    labelPosition: {
+      description: "Controls where the label is placed relative to the options.",
+      valueType: "string",
+      availableValues: ["start", "end", "top", "bottom"],
+      defaultValue: "top",
+    },
+    direction: {
+      description: "Sets text direction for label placement.",
+      valueType: "string",
+      availableValues: ["ltr", "rtl"],
+      defaultValue: "ltr",
+    },
     autoFocus: dAutoFocus(),
     required: { ...dRequired(), defaultValue: defaultProps.required },
     readOnly: dReadonly(),
@@ -119,6 +131,8 @@ export const radioGroupRenderer = wrapComponent({
         gap={adapter.stringProp("gap")}
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
         label={adapter.stringProp("label")}
+        labelPosition={adapter.stringProp("labelPosition", "top")}
+        direction={adapter.stringProp("direction", "ltr")}
         options={radioOptions(adapter)}
         extraChildren={adapter.renderChildren(nonOptionChildren(adapter.node.children))}
         onDidChange={(value) => void adapter.event("didChange")(value)}
@@ -134,15 +148,19 @@ function radioOptions(adapter: XmluiComponentAdapter): RadioGroupOption[] {
 }
 
 function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): RadioGroupOption[] {
-  if (child.kind !== "element" || child.type !== "Option") {
+  if (child.kind !== "element") {
     return [];
   }
-  const value = Object.prototype.hasOwnProperty.call(child.props, "value")
+  if (child.type !== "Option") {
+    return child.children.flatMap((nestedChild) => optionFromChild(nestedChild, adapter));
+  }
+  const rawValue = Object.prototype.hasOwnProperty.call(child.props, "value")
     ? evaluateExpressionOrText(child.props.value, child.parsed?.props?.value, adapter.scope, "RadioGroup:Option:value")
     : undefined;
-  if (value === undefined) {
+  if (rawValue === undefined) {
     return [];
   }
+  const value = isValidOptionValue(rawValue) ? rawValue : "";
   const label = Object.prototype.hasOwnProperty.call(child.props, "label")
     ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, adapter.scope, "RadioGroup:Option:label")
     : optionLabelFromChildren(child, adapter);
@@ -150,6 +168,15 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Radi
     ? booleanOptionValue(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "RadioGroup:Option:enabled"))
     : true;
   return [{ value, label: renderableLabel(label, value), enabled }];
+}
+
+function isValidOptionValue(value: unknown): boolean {
+  return (
+    typeof value === "string" ||
+    typeof value === "boolean" ||
+    value === null ||
+    (typeof value === "number" && !Number.isNaN(value))
+  );
 }
 
 function optionLabelFromChildren(child: XmluiElement, adapter: XmluiComponentAdapter) {
@@ -164,7 +191,14 @@ function optionLabelFromChildren(child: XmluiElement, adapter: XmluiComponentAda
 }
 
 function nonOptionChildren(children: XmluiNode[]): XmluiNode[] {
-  return children.filter((child) => !(child.kind === "element" && child.type === "Option"));
+  return children.filter((child) => !containsOption(child));
+}
+
+function containsOption(child: XmluiNode): boolean {
+  if (child.kind !== "element") {
+    return false;
+  }
+  return child.type === "Option" || child.children.some(containsOption);
 }
 
 function booleanOptionValue(value: unknown): boolean {

@@ -21,6 +21,10 @@ export const OptionMd = createMetadata({
         "This property defines the value of the option. If `value` is not defined, `Option` uses `label` as the value.",
       valueType: "any",
     },
+    testId: {
+      description: "This property defines the test id for the option.",
+      valueType: "string",
+    },
     enabled: {
       description: "This boolean property indicates whether the option is enabled or disabled.",
       valueType: "boolean",

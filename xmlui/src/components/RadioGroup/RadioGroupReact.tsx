@@ -37,6 +37,8 @@ export type RadioGroupProps = {
   gap?: string;
   validationStatus?: string;
   label?: string;
+  labelPosition?: string;
+  direction?: string;
   className?: string;
   style?: CSSProperties;
   options?: RadioGroupOption[];
@@ -60,6 +62,8 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
     gap,
     validationStatus = defaultProps.validationStatus,
     label,
+    labelPosition = "top",
+    direction = "ltr",
     className,
     style,
     options = [],
@@ -86,6 +90,11 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
     void onDidChange?.(nextValue);
   }, [onDidChange]);
 
+  const focusFirstOption = useCallback(() => {
+    const firstRadio = groupRef.current?.querySelector<HTMLInputElement>('input[type="radio"]');
+    firstRadio?.focus();
+  }, []);
+
   useImperativeHandle(ref, () => ({
     setValue: updateValue,
     get value() {
@@ -110,7 +119,7 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
       <div className={styles.radioOptionContainer} data-radio-item key={`${String(option.value)}:${index}`}>
         <input
           id={inputId}
-          className={styles.radioOption}
+          className={cx(styles.radioOption, statusClass)}
           type="radio"
           role="radio"
           name={id ?? groupId}
@@ -168,13 +177,34 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
     return group;
   }
 
+  const inlineLabel = labelPosition === "start" || labelPosition === "end";
+  const labelBeforeOptions = inlineLabel && (
+    (labelPosition === "start" && direction !== "rtl") ||
+    (labelPosition === "end" && direction === "rtl")
+  );
+
   return (
-    <fieldset className={styles.radioGroupField}>
-      <legend className={styles.radioGroupLabel}>
-        {label}
-        {required ? <span className={styles.requiredIndicator}>*</span> : null}
-      </legend>
-      {group}
+    <fieldset
+      className={styles.radioGroupField}
+    >
+      <div
+        className={cx(
+          inlineLabel ? styles.radioGroupFieldInline : styles.radioGroupFieldStacked,
+          labelBeforeOptions ? styles.radioGroupLabelBefore : styles.radioGroupLabelAfter,
+        )}
+      >
+        <legend
+          className={styles.radioGroupLabel}
+          onClick={() => {
+            focusFirstOption();
+            void onFocus?.();
+          }}
+        >
+          {label}
+          {required ? <span className={styles.requiredIndicator}>*</span> : null}
+        </legend>
+        {group}
+      </div>
     </fieldset>
   );
 }));

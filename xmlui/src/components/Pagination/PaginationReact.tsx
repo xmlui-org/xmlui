@@ -5,6 +5,7 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useState,
   type CSSProperties,
 } from "react";
 import type React from "react";
@@ -85,6 +86,7 @@ export const PaginationNative = memo(forwardRef<PaginationApi, PaginationProps>(
     () => visiblePageNumbers(currentPageNumber, totalPages, maxVisiblePages),
     [currentPageNumber, totalPages, maxVisiblePages],
   );
+  const [pageSizeOpen, setPageSizeOpen] = useState(false);
 
   const changePage = useCallback((newPageIndex: number) => {
     const clamped = hasValidItemCount
@@ -122,15 +124,19 @@ export const PaginationNative = memo(forwardRef<PaginationApi, PaginationProps>(
         <PageButton label="First page" disabled={!enabled || isFirstPage} onClick={() => changePage(0)}>First</PageButton>
         <PageButton label="Previous page" disabled={!enabled || isFirstPage} onClick={() => changePage(currentPage - 1)}>Prev</PageButton>
         {showCurrentPage && visiblePages.map((page) => (
-          <PageButton
-            key={page}
-            label={`Page ${page}`}
-            current={page === currentPageNumber}
-            disabled={!enabled}
-            onClick={() => changePage(page - 1)}
-          >
-            {page}
-          </PageButton>
+          maxVisiblePages === 1
+            ? <li key={page} aria-current={page === currentPageNumber ? "true" : undefined}>{page}</li>
+            : (
+              <PageButton
+                key={page}
+                label={page === currentPageNumber ? `Page ${page} (current)` : `Page ${page}`}
+                current={page === currentPageNumber}
+                disabled={!enabled}
+                onClick={() => changePage(page - 1)}
+              >
+                {page}
+              </PageButton>
+            )
         ))}
         <PageButton label="Next page" disabled={!enabled || isLastPage} onClick={() => changePage(currentPage + 1)}>Next</PageButton>
         <PageButton label="Last page" disabled={!enabled || isLastPage} onClick={() => changePage(totalPages - 1)}>Last</PageButton>
@@ -144,26 +150,67 @@ export const PaginationNative = memo(forwardRef<PaginationApi, PaginationProps>(
     );
 
   const buttonRow = (
-    <ul className={cx(styles.buttonRow, orientation === "vertical" ? styles.paginationListVertical : undefined)} data-xmlui-part="pagination-controls">
+    <ul
+      className={cx(styles.buttonRow, orientation === "vertical" ? styles.paginationListVertical : undefined)}
+      data-xmlui-part="pagination-controls"
+      data-part-id="pagination-controls"
+    >
       {buttons}
     </ul>
   );
   const pageInfo = showPageInfo && hasValidItemCount
-    ? <div className={styles.pageInfo} data-xmlui-part="page-info">Page {currentPageNumber} of {totalPages}</div>
+    ? <div className={styles.pageInfo} data-xmlui-part="page-info" data-part-id="page-info">Page {currentPageNumber} of {totalPages} ({itemCount} items)</div>
     : null;
   const selector = showPageSizeSelector && pageSizeOptions && pageSizeOptions.length > 1
     ? (
-      <label className={styles.selectorContainer} data-xmlui-part="page-size-selector-container">
-        <span className={styles.pageSizeLabel}>Rows per page</span>
-        <select
-          className={styles.pageSizeSelect}
-          disabled={!enabled}
-          value={safePageSize}
-          onChange={(event) => void onPageSizeDidChange?.(Number(event.currentTarget.value))}
+      <div
+        className={styles.selectorContainer}
+        data-xmlui-part="page-size-selector-container"
+        data-part-id="page-size-selector-container"
+      >
+        <span
+          id={`${id ?? "pagination"}-page-size-label`}
+          className={styles.pageSizeLabel}
+          onClick={() => {
+            if (enabled) {
+              setPageSizeOpen(true);
+            }
+          }}
         >
-          {pageSizeOptions.map((size) => <option key={size} value={size}>{size}</option>)}
-        </select>
-      </label>
+          Items per page
+        </span>
+        <button
+          className={styles.pageSizeSelect}
+          type="button"
+          disabled={!enabled}
+          aria-labelledby={`${id ?? "pagination"}-page-size-label`}
+          aria-haspopup="listbox"
+          aria-expanded={pageSizeOpen}
+          onClick={() => setPageSizeOpen((open) => enabled ? !open : open)}
+        >
+          {safePageSize}
+        </button>
+        {pageSizeOpen
+          ? (
+            <ul className={styles.pageSizeOptions} role="listbox">
+              {pageSizeOptions.map((size) => (
+                <li
+                  key={size}
+                  role="option"
+                  aria-selected={size === safePageSize}
+                  className={styles.pageSizeOption}
+                  onClick={() => {
+                    setPageSizeOpen(false);
+                    void onPageSizeDidChange?.(size);
+                  }}
+                >
+                  {size}
+                </li>
+              ))}
+            </ul>
+          )
+          : null}
+      </div>
     )
     : null;
 
@@ -204,7 +251,7 @@ function PageButton({
         type="button"
         disabled={disabled}
         aria-label={label}
-        aria-current={current ? "page" : undefined}
+        aria-current={current ? "true" : undefined}
         onClick={onClick}
       >
         {children}

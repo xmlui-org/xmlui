@@ -578,6 +578,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     declarations: {},
     props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       enabled: { name: "enabled" },
@@ -605,6 +607,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: {
       value: { name: "value" },
       label: { name: "label" },
+      testId: { name: "testId" },
       enabled: { name: "enabled" },
       keywords: { name: "keywords" },
     },
@@ -621,6 +624,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       label: { name: "label" },
+      labelPosition: { name: "labelPosition" },
+      direction: { name: "direction" },
       autoFocus: { name: "autoFocus" },
       required: { name: "required" },
       readOnly: { name: "readOnly" },
@@ -633,6 +638,10 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       didChange: { name: "didChange", attributeName: "onDidChange" },
       gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
       lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
+    },
+    apis: {
+      value: { name: "value" },
+      setValue: { name: "setValue" },
     },
   },
   {
@@ -668,7 +677,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "Pagination",
     kind: "builtin",
     allowsChildren: false,
-    declarations: {},
+    declarations: { local: true },
     props: withLayoutProps({
       id: { name: "id" },
       testId: { name: "testId" },
@@ -691,6 +700,14 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {
       pageDidChange: { name: "pageDidChange", attributeName: "onPageDidChange" },
       pageSizeDidChange: { name: "pageSizeDidChange", attributeName: "onPageSizeDidChange" },
+    },
+    apis: {
+      moveFirst: { name: "moveFirst" },
+      moveLast: { name: "moveLast" },
+      movePrev: { name: "movePrev" },
+      moveNext: { name: "moveNext" },
+      currentPage: { name: "currentPage" },
+      currentPageSize: { name: "currentPageSize" },
     },
   },
   {
