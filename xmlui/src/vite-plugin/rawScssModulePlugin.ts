@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { Plugin } from "vite";
@@ -18,7 +19,10 @@ export function rawScssModulePlugin(): Plugin {
         return null;
       }
       const basedir = importer ? path.dirname(importer) : process.cwd();
-      const resolved = path.resolve(basedir, filename);
+      let resolved = path.resolve(basedir, filename);
+      if (!importer && filename.startsWith("src/") && !existsSync(resolved)) {
+        resolved = path.resolve(process.cwd(), "xmlui", filename);
+      }
       const prefix = query.split("&").includes("xmlui-css-module")
         ? cssVirtualPrefix
         : rawVirtualPrefix;

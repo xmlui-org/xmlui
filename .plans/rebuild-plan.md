@@ -2582,11 +2582,30 @@ Visual check:
 
 Components:
 
-- `Stack`;
-- `HStack`;
-- `VStack`;
-- `FlowLayout`;
-- `TileGrid`;
+- `Stack` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  runtime registry wiring, a dev-server visual sample, and foundation E2E
+  tests. The literal old `Stack.spec.ts`, `HStack.spec.ts`, `VStack.spec.ts`,
+  `CHStack.spec.ts`, and `CVStack.spec.ts` suites have been copied and are
+  temporarily skipped at file level until full Stack-family behavior migration
+  catches up;
+- `HStack` - foundation slice completed on 2026-06-23 through the shared
+  `Stack` component folder and renderer;
+- `VStack` - foundation slice completed on 2026-06-23 through the shared
+  `Stack` component folder and renderer;
+- `FlowLayout` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, IR built-in registration, runtime registry wiring, a dev-server
+  visual sample, and foundation E2E tests. The literal old `FlowLayout.spec.ts`
+  suite has been copied and is temporarily skipped at file level until full
+  responsive wrapping, scroller, non-visual-child, and layout matrix behavior
+  catches up;
+- `TileGrid` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  IR built-in registration, runtime registry wiring, a dev-server visual
+  sample, and foundation E2E tests. The literal old `TileGrid.spec.ts` suite
+  has been copied and is temporarily skipped at file level until full
+  selection, virtualization, keyboard, action, and sync semantics catch up;
 - `Card`.
 
 Compatibility focus:
@@ -2594,6 +2613,66 @@ Compatibility focus:
 - existing experimental layout primitives must be re-closed against old
   metadata, docs, SCSS, theme variables, layout aliases, and all old E2E
   tests.
+
+`Stack`/`HStack`/`VStack` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/Stack` passed with 2
+  passed and 89 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 3376 tests in 90
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=stackFamilyFoundation`.
+
+`Stack`/`HStack`/`VStack` compatibility debt:
+
+- the full old Stack-family suites are copied but intentionally skipped until
+  behavior catches up. Re-enable cases feature-by-feature;
+- remaining Stack closure includes scroller/fade behavior, `scrollStyle`,
+  `showScrollerFade`, dock layout, `itemWidth`, star sizing, RTL/reverse edge
+  cases, `CHStack`/`CVStack` built-in registration, and the full old layout
+  matrix;
+- copied old suites may require support files and fixture compatibility even
+  while skipped. The Stack slice restored the shared `overflows` E2E helper.
+
+`FlowLayout`/`TileGrid` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/FlowLayout src/components/TileGrid`
+  passed with 2 passed and 130 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 3508 tests in 94
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=flowTileFoundation`.
+
+`FlowLayout`/`TileGrid` compatibility debt:
+
+- the full old suites are copied but intentionally skipped until behavior
+  catches up. Re-enable cases feature-by-feature;
+- remaining `FlowLayout` closure includes responsive width inference,
+  `SpaceFiller` line breaks, star sizing, non-visual child elision,
+  scroller/fade behavior, scroll APIs, snapshot parity, and the full old layout
+  matrix;
+- remaining `TileGrid` closure includes virtualization, row grouping,
+  selection, checkboxes, keyboard shortcuts, syncWithVar, refreshOn closure
+  behavior, action events, context-menu item context, and all theme variables;
+- component metadata files that are imported through compiler contracts should
+  avoid `?xmlui-theme-vars` and `?xmlui-css-module` imports unless the Vite
+  config bundling path is known to resolve them. This slice uses explicit
+  theme-var metadata in the component file and lets `main.tsx` load the SCSS
+  for runtime CSS.
+
+Next explicit step: Phase 5 Wave D1C - migrate `Card` foundation/closure
+against old metadata, SCSS, docs, copied old E2E tests, foundation tests, and a
+runnable visual sample.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 

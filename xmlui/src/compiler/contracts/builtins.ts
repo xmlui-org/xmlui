@@ -18,7 +18,9 @@ import { DateInputMd } from "../../components/DateInput/DateInput";
 import { DatePickerMd } from "../../components/DatePicker/DatePicker";
 import { FileInputMd } from "../../components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "../../components/FileUploadDropZone/FileUploadDropZone";
+import { FlowLayoutMd } from "../../components/FlowLayout/FlowLayout";
 import { TimeInputMd } from "../../components/TimeInput/TimeInput";
+import { TileGridMd } from "../../components/TileGrid/TileGrid";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
 import { NoResultMd } from "../../components/NoResult/NoResult";
@@ -351,6 +353,17 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       upload: "onUpload",
     },
   }),
+  contractFromMetadata(TileGridMd, {
+    name: "TileGrid",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      selectionDidChange: "onSelectionDidChange",
+      itemDoubleClick: "onItemDoubleClick",
+      contextMenu: "onContextMenu",
+    },
+  }),
   contractFromMetadata(TimeInputMd, {
     name: "TimeInput",
     allowsChildren: false,
@@ -368,32 +381,33 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
+    props: withLayoutProps(stackProps()),
+    events: stackEvents(),
   },
-  {
+  contractFromMetadata(FlowLayoutMd, {
     name: "FlowLayout",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
-  },
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      contextMenu: "onContextMenu",
+    },
+  }),
   {
     name: "HStack",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
+    props: withLayoutProps(stackProps()),
+    events: stackEvents(),
   },
   {
     name: "VStack",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
+    props: withLayoutProps(stackProps()),
+    events: stackEvents(),
   },
   {
     name: "CodeBlock",
@@ -1077,6 +1091,33 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {},
   },
 ];
+
+function stackProps(): XmluiComponentContract["props"] {
+  return {
+    testId: { name: "testId" },
+    desktopOnly: { name: "desktopOnly" },
+    gap: { name: "gap" },
+    reverse: { name: "reverse" },
+    wrapContent: { name: "wrapContent" },
+    orientation: { name: "orientation" },
+    horizontalAlignment: { name: "horizontalAlignment" },
+    verticalAlignment: { name: "verticalAlignment" },
+    hoverContainer: { name: "hoverContainer" },
+    visibleOnHover: { name: "visibleOnHover" },
+    scrollStyle: { name: "scrollStyle" },
+    showScrollerFade: { name: "showScrollerFade" },
+    itemWidth: { name: "itemWidth" },
+    dock: { name: "dock" },
+  };
+}
+
+function stackEvents(): XmluiComponentContract["events"] {
+  return {
+    click: { name: "click", attributeName: "onClick" },
+    contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    mounted: { name: "mounted", attributeName: "onMounted" },
+  };
+}
 
 function withLayoutProps(
   props: XmluiComponentContract["props"] = {},

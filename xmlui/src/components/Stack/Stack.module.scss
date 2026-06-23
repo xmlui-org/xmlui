@@ -1,0 +1,106 @@
+@use "../../component-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$gap-Stack: createThemeVar("gap-Stack");
+
+@layer components {
+  .base {
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 0;
+    min-width: 0;
+    gap: var(--xmlui-gap-Stack);
+
+    &.hoverContainer {
+      :global(.display-on-hover) {
+        transition: opacity 0.1s;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      &:hover,
+      &:focus-within {
+        :global(.display-on-hover) {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+    }
+
+    &.handlesClick {
+      cursor: pointer;
+    }
+  }
+
+  .vertical {
+    flex-direction: column;
+
+    &.reverse {
+      flex-direction: column-reverse;
+    }
+  }
+
+  .horizontal {
+    flex-direction: row;
+
+    &.reverse {
+      flex-direction: row-reverse;
+    }
+  }
+
+  .wrap {
+    flex-wrap: wrap;
+  }
+
+  .desktopOnly {
+    @include t.withMaxScreenSize(2) {
+      display: none;
+    }
+  }
+
+  .justifyItemsStart {
+    justify-content: flex-start;
+  }
+
+  .justifyItemsCenter {
+    justify-content: center;
+  }
+
+  .justifyItemsStretch {
+    justify-content: stretch;
+  }
+
+  .justifyItemsEnd {
+    justify-content: flex-end;
+  }
+
+  .alignItemsStart {
+    align-items: flex-start;
+  }
+
+  .alignItemsCenter {
+    align-items: center;
+  }
+
+  .alignItemsStretch {
+    align-items: stretch;
+  }
+
+  .alignItemsEnd {
+    align-items: flex-end;
+  }
+
+  .alignItemsBaseline {
+    align-items: baseline;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

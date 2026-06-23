@@ -33,6 +33,7 @@ import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
+import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { textAreaRenderer } from "../components/TextArea/TextArea";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
@@ -46,6 +47,7 @@ import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRenderer } from "../components/FileInput/FileInput";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone";
+import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
@@ -53,6 +55,7 @@ import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { tableRenderer } from "../components/Table/Table";
 import { columnRenderer } from "../components/Column/Column";
+import { tileGridRenderer } from "../components/TileGrid/TileGrid";
 import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfContents";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
@@ -89,6 +92,7 @@ const implementedRuntimeNames = [
   "Stack",
   "HStack",
   "VStack",
+  "FlowLayout",
   "Text",
   "Button",
   "Card",
@@ -123,6 +127,7 @@ const implementedRuntimeNames = [
   "Pagination",
   "Table",
   "Column",
+  "TileGrid",
   "Tree",
   "TreeDisplay",
   "TableOfContents",
@@ -161,6 +166,10 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   H4: h4Renderer,
   H5: h5Renderer,
   H6: h6Renderer,
+  Stack: stackRenderer,
+  HStack: hStackRenderer,
+  VStack: vStackRenderer,
+  FlowLayout: flowLayoutRenderer,
   Text: textRenderer,
   TextBox: textBoxRenderer,
   PasswordInput: passwordInputRenderer,
@@ -180,6 +189,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Pagination: paginationRenderer,
   Table: tableRenderer,
   Column: columnRenderer,
+  TileGrid: tileGridRenderer,
   Tree: treeRenderer,
   TreeDisplay: treeDisplayRenderer,
   TableOfContents: tableOfContentsRenderer,
@@ -202,6 +212,8 @@ const componentFolderNames: Record<string, string> = {
   H4: "Heading",
   H5: "Heading",
   H6: "Heading",
+  HStack: "Stack",
+  VStack: "Stack",
   PasswordInput: "TextBox",
 };
 for (const name of htmlTagComponentNames) {
@@ -236,6 +248,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const itemsTransferred = contract.name === "Items";
     const tableTransferred = contract.name === "Table";
     const columnTransferred = contract.name === "Column";
+    const tileGridTransferred = contract.name === "TileGrid";
     const treeTransferred = contract.name === "Tree";
     const treeDisplayTransferred = contract.name === "TreeDisplay";
     const tableOfContentsTransferred = contract.name === "TableOfContents";
@@ -256,6 +269,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const fallbackTransferred = contract.name === "Fallback";
     const noResultTransferred = contract.name === "NoResult";
     const spaceFillerTransferred = contract.name === "SpaceFiller";
+    const stackTransferred = contract.name === "Stack" || contract.name === "HStack" || contract.name === "VStack";
+    const flowLayoutTransferred = contract.name === "FlowLayout";
     const transferredFolder =
       appTransferred ||
       buttonTransferred ||
@@ -276,6 +291,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       itemsTransferred ||
       tableTransferred ||
       columnTransferred ||
+      tileGridTransferred ||
       treeTransferred ||
       treeDisplayTransferred ||
       tableOfContentsTransferred ||
@@ -295,7 +311,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       contentSeparatorTransferred ||
       fallbackTransferred ||
       noResultTransferred ||
-      spaceFillerTransferred;
+      spaceFillerTransferred ||
+      stackTransferred ||
+      flowLayoutTransferred;
     const sharedComponentFile = htmlTagTransferred
       ? "HtmlTags"
       : brTransferred
@@ -334,15 +352,17 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                         ? "Table"
                                         : columnTransferred
                                           ? "Column"
-                                          : treeTransferred
-                                            ? "Tree"
-                                            : treeDisplayTransferred
-                                              ? "TreeDisplay"
-                                              : tableOfContentsTransferred
-                                                ? "TableOfContents"
-                                                : timeInputTransferred
-                                                  ? "TimeInput"
-                                                  : contract.name;
+                                          : tileGridTransferred
+                                            ? "TileGrid"
+                                            : treeTransferred
+                                              ? "Tree"
+                                              : treeDisplayTransferred
+                                                ? "TreeDisplay"
+                                                : tableOfContentsTransferred
+                                                  ? "TableOfContents"
+                                                  : timeInputTransferred
+                                                    ? "TimeInput"
+                                                    : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
       : sharedComponentFile;

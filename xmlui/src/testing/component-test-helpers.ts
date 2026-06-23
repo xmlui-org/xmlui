@@ -24,6 +24,22 @@ export async function getBounds(locator: Locator): Promise<{
   };
 }
 
+export async function overflows(locator: Locator, direction: "x" | "y" | "both" = "both") {
+  const [width, height, scrollWidth, scrollHeight] = await locator.evaluate((element) => [
+    element.clientWidth,
+    element.clientHeight,
+    element.scrollWidth,
+    element.scrollHeight,
+  ]);
+  if (direction === "x") {
+    return scrollWidth > width;
+  }
+  if (direction === "y") {
+    return scrollHeight > height;
+  }
+  return scrollWidth > width && scrollHeight > height;
+}
+
 export async function getPaddings(locator: Locator) {
   const styles = await computedStyles(locator, [
     "padding-left",

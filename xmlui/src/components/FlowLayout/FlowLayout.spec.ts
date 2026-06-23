@@ -1,0 +1,1797 @@
+import { getBounds, overflows } from "../../testing/component-test-helpers";
+import { test, expect } from "../../testing/fixtures";
+
+const FLOW_LAYOUT_OLD_SUITE_PENDING =
+  "Literal old FlowLayout suite copied for compatibility tracking; full responsive item wrapping, scroller, and visual snapshot semantics are pending in Phase 5 Wave D1B.";
+
+test.beforeEach(() => test.skip(true, FLOW_LAYOUT_OLD_SUITE_PENDING));
+
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.describe("Basic functionality", () => {
+  test("component renders with default props", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Text testId="item1">Item 1</Text>
+        <Text testId="item2">Item 2</Text>
+        <Text testId="item3">Item 3</Text>
+      </FlowLayout>
+    `);
+
+    // Check that the component is visible
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.width).toBeGreaterThan(0);
+    expect(rect2.width).toBeGreaterThan(0);
+    expect(rect3.width).toBeGreaterThan(0);
+    expect(rect1.x).toBe(rect2.x);
+    expect(rect2.x).toBe(rect3.x);
+    expect(rect1.y).toBeLessThan(rect2.y);
+    expect(rect2.y).toBeLessThan(rect3.y);
+  });
+
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<FlowLayout testId="flow" onContextMenu="testState = 'context-menu-fired'">
+        <Text>Item 1</Text>
+      </FlowLayout>`
+    );
+
+    const flow = page.getByTestId("flow");
+    await flow.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
+  test("component renders when widths specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Text testId="item1" width="80px">Item 1</Text>
+        <Text testId="item2" width="80px">Item 2</Text>
+        <Text testId="item3" width="80px">Item 3</Text>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.width).toBeLessThanOrEqual(80);
+    expect(rect2.width).toBeLessThanOrEqual(80);
+    expect(rect3.width).toBeLessThanOrEqual(80);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBe(rect3.y);
+    expect(rect1.x).toBeLessThan(rect2.x);
+    expect(rect2.x).toBeLessThan(rect3.x);
+  });
+
+  test("component wraps items when they exceed container width", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="280px">
+        <Text testId="item1" width="100px">Item 1</Text>
+        <Text testId="item2" width="100px">Item 2</Text>
+        <Text testId="item3" width="100px">Item 3</Text>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBeLessThan(rect3.y);
+    expect(rect1.x).toBeLessThan(rect2.x);
+    expect(rect1.x).toBe(rect3.x);
+  });
+
+  test("component applies gap correctly (#1)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout gap="13px">
+        <Stack testId="item1" width="100px">Item 1</Stack>
+        <Stack testId="item2" width="100px">Item 2</Stack>
+        <Stack testId="item3" width="100px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBe(rect3.y);
+    expect(rect2.x - (rect1.x + rect1.width)).toBe(13);
+    expect(rect3.x - (rect2.x + rect2.width)).toBe(13);
+  });
+
+  test("component applies gap correctly (#2)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout gap="13px">
+        <Stack testId="item1">Item 1</Stack>
+        <Stack testId="item2">Item 2</Stack>
+        <Stack testId="item3">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect2.y - (rect1.y + rect1.height)).toBe(13);
+    expect(rect3.y - (rect2.y + rect2.height)).toBe(13);
+  });
+
+  test("component applies columnGap correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout columnGap="13px" gap="40px">
+        <Stack testId="item1" width="100px">Item 1</Stack>
+        <Stack testId="item2" width="100px">Item 2</Stack>
+        <Stack testId="item3" width="100px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBe(rect3.y);
+    expect(rect2.x - (rect1.x + rect1.width)).toBe(13);
+    expect(rect3.x - (rect2.x + rect2.width)).toBe(13);
+  });
+
+  test("component applies rowGap correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout rowGap="13px" gap="40px">
+        <Stack testId="item1">Item 1</Stack>
+        <Stack testId="item2">Item 2</Stack>
+        <Stack testId="item3">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect2.y - (rect1.y + rect1.height)).toBe(13);
+    expect(rect3.y - (rect2.y + rect2.height)).toBe(13);
+  });
+
+  test("component applies rowGap and columnGap correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="280px" columnGap="13px" rowGap="19px" gap="40px">
+        <Stack testId="item1" width="100px">Item 1</Stack>
+        <Stack testId="item2" width="100px">Item 2</Stack>
+        <Stack testId="item3" width="100px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBeLessThan(rect3.y);
+    expect(rect1.x).toBeLessThan(rect2.x);
+    expect(rect2.x - (rect1.x + rect1.width)).toBe(13);
+    expect(rect3.x).toBe(rect1.x);
+    expect(rect3.y - (rect2.y + rect2.height)).toBe(19);
+  });
+
+  test("verticalAlignment='start' aligns items at the top of row", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout verticalAlignment="start">
+        <Stack testId="item1" width="100px" height="50px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="30px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2 } = await getBounds(page.getByTestId("item2"));
+    const { top: top3 } = await getBounds(page.getByTestId("item3"));
+
+    // All items in the same row should have the same top position with "start" alignment
+    expect(top1).toBe(top2);
+    expect(top2).toBe(top3);
+  });
+
+  test("verticalAlignment='center' centers items vertically in row", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout verticalAlignment="center">
+        <Stack testId="item1" width="100px" height="40px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="40px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1, bottom: bottom1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2, bottom: bottom2 } = await getBounds(page.getByTestId("item2"));
+    const { top: top3, bottom: bottom3 } = await getBounds(page.getByTestId("item3"));
+
+    // Calculate vertical centers
+    const center1 = (top1 + bottom1) / 2;
+    const center2 = (top2 + bottom2) / 2;
+    const center3 = (top3 + bottom3) / 2;
+
+    // All items should be centered vertically relative to each other
+    expect(Math.abs(center1 - center2)).toBeLessThan(1); // Allow for sub-pixel differences
+    expect(Math.abs(center2 - center3)).toBeLessThan(1);
+  });
+
+  test("verticalAlignment='end' aligns items at the bottom of row", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout verticalAlignment="end">
+        <Stack testId="item1" width="100px" height="50px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="30px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { bottom: bottom1 } = await getBounds(page.getByTestId("item1"));
+    const { bottom: bottom2 } = await getBounds(page.getByTestId("item2"));
+    const { bottom: bottom3 } = await getBounds(page.getByTestId("item3"));
+
+    // All items in the same row should have the same bottom position with "end" alignment
+    expect(Math.abs(bottom1 - bottom2)).toBeLessThan(1); // Allow for sub-pixel differences
+    expect(Math.abs(bottom2 - bottom3)).toBeLessThan(1);
+  });
+
+  test("verticalAlignment applies to each row independently", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="250px" verticalAlignment="center">
+        <Stack testId="item1" width="100px" height="40px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="60px">Item 3</Stack>
+        <Stack testId="item4" width="100px" height="40px">Item 4</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1, bottom: bottom1, left: left1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2, bottom: bottom2, left: left2 } = await getBounds(page.getByTestId("item2"));
+    const { top: top3, bottom: bottom3, left: left3 } = await getBounds(page.getByTestId("item3"));
+    const { top: top4, bottom: bottom4, left: left4 } = await getBounds(page.getByTestId("item4"));
+
+    // First row: item1 and item2 should be centered with each other
+    const center1 = (top1 + bottom1) / 2;
+    const center2 = (top2 + bottom2) / 2;
+    expect(Math.abs(center1 - center2)).toBeLessThan(1);
+    expect(left1).toBeLessThan(left2);
+
+    // Second row: item3 and item4 should be centered with each other
+    const center3 = (top3 + bottom3) / 2;
+    const center4 = (top4 + bottom4) / 2;
+    expect(Math.abs(center3 - center4)).toBeLessThan(1);
+    expect(left3).toBeLessThan(left4);
+
+    // Verify items wrapped to different rows
+    expect(top3).toBeGreaterThan(bottom1);
+  });
+
+  test("verticalAlignment handles default value", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Stack testId="item1" width="100px" height="40px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2 } = await getBounds(page.getByTestId("item2"));
+
+    // Default should be "start" alignment
+    expect(top1).toBe(top2);
+  });
+
+  test("Button with width='50%' renders correctly in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="600px">
+        <Button testId="button" width="50%">Hello World</Button>
+      </FlowLayout>
+    `);
+
+    const button = page.getByTestId("button");
+    const layout = page.getByTestId("layout");
+    
+    const buttonBox = await button.boundingBox();
+    const layoutBox = await layout.boundingBox();
+    
+    // The button should take approximately 50% of the container width
+    const expectedWidth = layoutBox.width * 0.5;
+    expect(buttonBox.width).toBeCloseTo(expectedWidth, -1); // Allow 10px tolerance
+  });
+
+  test("FormItem with width='50%' renders correctly in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FlowLayout testId="layout" width="600px" gap="0">
+          <FormItem testId="formitem" width="50%" />
+          <Button testId="button" width="50%">Save</Button>
+        </FlowLayout>
+      </Form>
+    `);
+
+    // Both items should be on the same row
+    const formItem = page.getByTestId("formitem");
+    const button = page.getByTestId("button");
+    const layout = page.getByTestId("layout");
+    
+    const formItemBox = await formItem.boundingBox();
+    const buttonBox = await button.boundingBox();
+    const layoutBox = await layout.boundingBox();
+    
+    // Items should be on the same row (same y position)
+    expect(formItemBox.y).toBe(buttonBox.y);
+    
+    // FormItem should be to the left of Button
+    expect(formItemBox.x).toBeLessThan(buttonBox.x);
+    
+    // Both items together should approximately fill the layout width
+    // (allowing for gaps and padding)
+    const totalItemsWidth = formItemBox.width + buttonBox.width;
+    expect(totalItemsWidth).toBeGreaterThan(layoutBox.width * 0.95);
+  });
+
+  test("width prop is not applied directly to child component", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Button testId="button" width="200px">Click Me</Button>
+      </FlowLayout>
+    `);
+
+    const button = page.getByTestId("button");
+    
+    // The button itself should not have width style applied directly
+    // It should fill its wrapper (which has the 200px width)
+    const computedStyle = await button.evaluate((el) => {
+      return window.getComputedStyle(el).width;
+    });
+    
+    // The button should be close to 200px (filling its wrapper)
+    // but should not be 50% of 200px (which would be 100px)
+    const width = parseFloat(computedStyle);
+    expect(width).toBeGreaterThan(150); // Should be close to 200px
+    expect(width).toBeLessThanOrEqual(200);
+  });
+
+  test("percentage width is not applied twice to child", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="400px">
+        <Stack testId="stack" width="50%" height="50px">
+          <Text>Content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    const stack = page.getByTestId("stack");
+    const stackBox = await stack.boundingBox();
+    
+    // Stack should be approximately 200px (50% of 400px)
+    // NOT 100px (which would be 50% of 50% = 25% of 400px)
+    expect(stackBox.width).toBeGreaterThan(180);
+    expect(stackBox.width).toBeLessThanOrEqual(200);
+  });
+
+  test("minWidth and maxWidth are not applied to child component", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Button testId="button" minWidth="150px" maxWidth="300px">Variable Width Button</Button>
+      </FlowLayout>
+    `);
+
+    const button = page.getByTestId("button");
+    const buttonBox = await button.boundingBox();
+    
+    // The button should respect the constraints through its wrapper
+    expect(buttonBox.width).toBeGreaterThanOrEqual(150);
+    expect(buttonBox.width).toBeLessThanOrEqual(300);
+  });
+
+  test("multiple items with different widths render correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="600px">
+        <Button testId="btn1" width="25%">25%</Button>
+        <Button testId="btn2" width="50%">50%</Button>
+        <Button testId="btn3" width="25%">25%</Button>
+      </FlowLayout>
+    `);
+
+    const btn1 = page.getByTestId("btn1");
+    const btn2 = page.getByTestId("btn2");
+    const btn3 = page.getByTestId("btn3");
+    
+    const box1 = await btn1.boundingBox();
+    const box2 = await btn2.boundingBox();
+    const box3 = await btn3.boundingBox();
+    
+    // All should be on the same row
+    expect(box1.y).toBe(box2.y);
+    expect(box2.y).toBe(box3.y);
+    
+    // Verify approximate widths (accounting for gaps)
+    expect(box1.width).toBeGreaterThan(130); // ~25% of 600 = 150px
+    expect(box1.width).toBeLessThanOrEqual(150);
+    
+    expect(box2.width).toBeGreaterThan(280); // ~50% of 600 = 300px
+    expect(box2.width).toBeLessThanOrEqual(300);
+    
+    expect(box3.width).toBeGreaterThan(130); // ~25% of 600 = 150px
+    expect(box3.width).toBeLessThanOrEqual(150);
+  });
+
+  test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" height="200px" scrollStyle="overlay">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    // Fade overlays should be visible
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" height="200px" scrollStyle="overlay" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    // Fade overlays should exist (top and bottom)
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("bottom fade is visible when not at bottom", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" height="200px" scrollStyle="overlay" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+    
+    // Bottom fade overlay should exist
+    const bottomFade = page.locator("[class*='fadeBottom']");
+    await expect(bottomFade).toBeVisible();
+  });
+
+  test("top fade appears when scrolled down", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" height="200px" scrollStyle="overlay" showScrollerFade="true">
+        <Stack height="500px">
+          <Text testId="content">Tall content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    // Scroll down
+    const layout = page.getByTestId("layout");
+    await layout.evaluate((el) => {
+      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+    });
+
+    // Wait for fade to update
+    await page.waitForTimeout(100);
+
+    // Top fade overlay should exist
+    const topFade = page.locator("[class*='fadeTop']");
+    await expect(topFade).toBeVisible();
+  });
+
+  test("showScrollerFade works with whenMouseOver scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" height="200px" scrollStyle="whenMouseOver" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade works with whenScrolling scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" height="200px" scrollStyle="whenScrolling" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+});
+
+// =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("gap-FlowLayout theme variable controls the default item gap", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <FlowLayout testId="layout" width="200px" itemWidth="50px">
+        <Stack testId="item1" height="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" backgroundColor="blue" />
+      </FlowLayout>
+    `,
+      {
+        testThemeVars: { "gap-FlowLayout": "24px" },
+      },
+    );
+
+    const { right: item1Right } = await getBounds(page.getByTestId("item1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Left - item1Right).toBeCloseTo(24, 0);
+  });
+
+  test("gap-layout theme variable controls FlowLayout default gap", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <FlowLayout testId="layout" width="200px" itemWidth="50px">
+        <Stack testId="item1" height="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" backgroundColor="blue" />
+      </FlowLayout>
+    `,
+      {
+        testThemeVars: { "gap-layout": "28px" },
+      },
+    );
+
+    const { right: item1Right } = await getBounds(page.getByTestId("item1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Left - item1Right).toBeCloseTo(28, 0);
+  });
+
+  test("explicit gap prop overrides FlowLayout theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <FlowLayout testId="layout" width="200px" itemWidth="50px" gap="12px">
+        <Stack testId="item1" height="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" backgroundColor="blue" />
+      </FlowLayout>
+    `,
+      {
+        testThemeVars: { "gap-FlowLayout": "24px", "gap-layout": "28px" },
+      },
+    );
+
+    const { right: item1Right } = await getBounds(page.getByTestId("item1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Left - item1Right).toBeCloseTo(12, 0);
+  });
+});
+
+// =============================================================================
+// TEXT ELLIPSIS TESTS
+// =============================================================================
+
+test.describe("Text ellipsis support", () => {
+  test("Text with overflowMode='ellipsis' shows ellipsis when truncated", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Text
+          testId="text"
+          overflowMode="ellipsis"
+          width="200px"
+        >
+          This is a very long text that should be truncated with ellipsis
+        </Text>
+      </FlowLayout>
+    `);
+
+    const text = page.getByTestId("text");
+
+    // Should have ellipsis styles applied
+    await expect(text).toHaveCSS("text-overflow", "ellipsis");
+    await expect(text).toHaveCSS("overflow", "hidden");
+    await expect(text).toHaveCSS("white-space", "nowrap");
+
+    // Verify text is actually truncated (scrollWidth > clientWidth indicates overflow)
+    const hasOverflow = await text.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(hasOverflow).toBe(true);
+  });
+
+  test("Text ellipsis works with multiple items in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout gap="10px">
+        <Text
+          testId="text1"
+          variant="strong"
+          overflowMode="ellipsis"
+          width="300px"
+        >
+          First item with very long text that should truncate
+        </Text>
+        <Text testId="text2" width="100px">
+          Second
+        </Text>
+        <Text
+          testId="text3"
+          overflowMode="ellipsis"
+          width="200px"
+        >
+          Third item also truncates when needed
+        </Text>
+      </FlowLayout>
+    `);
+
+    const text1 = page.getByTestId("text1");
+    const text3 = page.getByTestId("text3");
+
+    // Both should have ellipsis applied
+    await expect(text1).toHaveCSS("text-overflow", "ellipsis");
+    await expect(text3).toHaveCSS("text-overflow", "ellipsis");
+
+    // Both should be truncated
+    const hasOverflow1 = await text1.evaluate((el) => el.scrollWidth > el.clientWidth);
+    const hasOverflow3 = await text3.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(hasOverflow1).toBe(true);
+    expect(hasOverflow3).toBe(true);
+  });
+
+  test("Text ellipsis in FlowLayout matches HStack behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <VStack gap="20px">
+        <HStack testId="hstack" gap="10px">
+          <Text
+            testId="text-hstack"
+            overflowMode="ellipsis"
+            width="250px"
+          >
+            Lorem ipsum dolor sit amet consectetur adipiscing elit
+          </Text>
+          <Text>Date</Text>
+        </HStack>
+        <FlowLayout testId="flowlayout" gap="10px">
+          <Text
+            testId="text-flow"
+            overflowMode="ellipsis"
+            width="250px"
+          >
+            Lorem ipsum dolor sit amet consectetur adipiscing elit
+          </Text>
+          <Text>Date</Text>
+        </FlowLayout>
+      </VStack>
+    `);
+
+    const textHStack = page.getByTestId("text-hstack");
+    const textFlow = page.getByTestId("text-flow");
+
+    // Both should have identical ellipsis behavior
+    await expect(textHStack).toHaveCSS("text-overflow", "ellipsis");
+    await expect(textFlow).toHaveCSS("text-overflow", "ellipsis");
+
+    await expect(textHStack).toHaveCSS("overflow", "hidden");
+    await expect(textFlow).toHaveCSS("overflow", "hidden");
+
+    await expect(textHStack).toHaveCSS("white-space", "nowrap");
+    await expect(textFlow).toHaveCSS("white-space", "nowrap");
+
+    // Both should be truncated
+    const hasOverflowHStack = await textHStack.evaluate((el) => el.scrollWidth > el.clientWidth);
+    const hasOverflowFlow = await textFlow.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(hasOverflowHStack).toBe(true);
+    expect(hasOverflowFlow).toBe(true);
+  });
+
+  test("Text without ellipsis wraps normally in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Text
+          testId="text"
+          width="200px"
+        >
+          This text will wrap to multiple lines instead of truncating
+        </Text>
+      </FlowLayout>
+    `);
+
+    const text = page.getByTestId("text");
+
+    // Should not have nowrap (text can wrap)
+    await expect(text).not.toHaveCSS("white-space", "nowrap");
+  });
+
+  test("Text ellipsis works with maxLines", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Text
+          testId="text"
+          overflowMode="ellipsis"
+          maxLines="2"
+          width="200px"
+        >
+          This is a very long text that will be truncated to exactly two lines with ellipsis at the end
+        </Text>
+      </FlowLayout>
+    `);
+
+    const text = page.getByTestId("text");
+
+    await expect(text).toHaveCSS("text-overflow", "ellipsis");
+    await expect(text).toHaveCSS("-webkit-line-clamp", "2");
+  });
+});
+
+// =============================================================================
+// EDGE CASE TESTS
+// =============================================================================
+
+test.describe("Edge cases", () => {
+  test("component handles empty content gracefully", async ({ page, initTestBed }) => {
+    await initTestBed(`<FlowLayout testId="flowLayout"></FlowLayout>`);
+
+    const layout = page.getByTestId("flowLayout");
+    await expect(layout).toBeAttached();
+    await expect(layout).toBeEmpty();
+  });
+
+  test("component handles very long items correctly (#1)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="200px">
+        <Text testId="item1">This is a very long item that should wrap to the next line because it's too long</Text>
+        <Text testId="item2">Short item</Text>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+
+    expect(rect2.y).toBeGreaterThan(rect1.y + rect1.height);
+  });
+
+  test("component handles very long items correctly (#2)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="200px">
+        <Text testId="item1">Short item</Text>
+        <Text testId="item2">This is a very long item that should wrap to the next line because it's too long</Text>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+
+    expect(rect2.y).toBeGreaterThan(rect1.y + rect1.height);
+  });
+
+  const PAGE_WIDTH = 1280;
+
+  test("1 item 25% width", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="${PAGE_WIDTH}">
+        <Stack testId="item" backgroundColor="red" height="64px" width="25%"/>
+      </FlowLayout>
+    `);
+    const expectedWidth = PAGE_WIDTH * 0.25;
+    const { width: itemWidth } = await getBounds(page.getByTestId("item"));
+    // With max-width: 100% on flowItem, percentage widths are constrained differently
+    // The item takes 25% but is also constrained by the max-width of its wrapper
+    expect(itemWidth).toBeLessThanOrEqual(expectedWidth);
+    expect(itemWidth).toBeGreaterThan(0);
+  });
+
+  // gap should be ignored because of 1 item
+  test("1 item 25% width + gap", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout gap="26px" width="${PAGE_WIDTH}">
+        <Stack testId="item" backgroundColor="red" height="64px" width="25%"/>
+      </FlowLayout>
+    `);
+
+    const { right } = await getBounds(page.getByTestId("item"));
+    const expectedWidth = PAGE_WIDTH * 0.25;
+    // With max-width: 100% on flowItem, percentage widths are constrained differently
+    expect(right).toBeLessThanOrEqual(expectedWidth);
+    expect(right).toBeGreaterThan(0);
+  });
+
+  // gap should be ignored because of 1 item
+  test("1 item 100% width + gap", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout gap="26px" width="${PAGE_WIDTH}">
+        <Stack testId="item" backgroundColor="red" height="64px" width="100%"/>
+      </FlowLayout>
+    `);
+    const { width } = await getBounds(page.getByTestId("item"));
+    const expectedWidth = PAGE_WIDTH;
+    expect(width).toEqual(expectedWidth);
+  });
+
+  test("4 item 25% width", async ({ page, initTestBed }) => {
+    const layoutWidth = "400px";
+    const itemWidthPercent = "25%";
+    const itemHeight = 64;
+
+    await initTestBed(`
+      <FlowLayout testId="layout" width="${layoutWidth}" backgroundColor="cyan">
+        <Stack backgroundColor="red" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="green" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="blue" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="yellow" height="${itemHeight}px" width="${itemWidthPercent}"/>
+      </FlowLayout>
+    `);
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    expect(layoutHeight).toEqual(itemHeight);
+  });
+
+  test("3 item 25% width, 1 item 25.1% wraps", async ({ page, initTestBed }) => {
+    const itemHeight = 64;
+    const itemWidthPercent = "25%";
+    const itemWidthPercentBigger = "25.1%";
+    await initTestBed(`
+      <FlowLayout testId="layout" width="${PAGE_WIDTH}" gap="0">
+        <Stack backgroundColor="red" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="green" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="blue" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="yellow" height="${itemHeight}px" width="${itemWidthPercentBigger}"/>
+      </FlowLayout>
+    `);
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    const expectedHeight = itemHeight * 2;
+
+    expect(layoutHeight).toEqual(expectedHeight);
+  });
+
+  // When gap is specified and wrapping, a horizontal gap is applied
+  test("wrap with gaps", async ({ page, initTestBed }) => {
+    const layoutWidth = 400;
+    const itemWidthPercent = "25%";
+    const itemWidthPercentBigger = "25.1%";
+    const itemHeight = 64;
+    const gap = 20;
+    await initTestBed(`
+      <FlowLayout testId="layout" width="${layoutWidth}px" backgroundColor="cyan" gap="${gap}px">
+        <Stack backgroundColor="red" height="${itemHeight}px" width="${itemWidthPercentBigger}"/>
+        <Stack backgroundColor="green" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="blue" height="${itemHeight}px" width="${itemWidthPercent}"/>
+        <Stack backgroundColor="yellow" height="${itemHeight}px" width="${itemWidthPercent}"/>
+      </FlowLayout>
+    `);
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    const expectedHeight = gap + itemHeight * 2;
+
+    expect(layoutHeight).toEqual(expectedHeight);
+  });
+
+  test("item with * width fills row", async ({ page, initTestBed }) => {
+    const itemHeight = 64;
+    const itemWidth = "*";
+    await initTestBed(`
+      <FlowLayout testId="layout">
+        <Stack backgroundColor="red" height="${itemHeight}px" width="50"/>
+        <Stack backgroundColor="green" height="${itemHeight}px" width="50"/>
+        <Stack testId="item2" backgroundColor="blue" height="${itemHeight}px" width="${itemWidth}"/>
+      </FlowLayout>
+    `);
+
+    const { height: layoutHeight, right: layoutRight } = await getBounds(
+      page.getByTestId("layout"),
+    );
+    const { right: starItemRight } = await getBounds(page.getByTestId("item2"));
+
+    expect(layoutHeight).toEqual(itemHeight);
+    expect(layoutRight).toEqual(starItemRight);
+  });
+
+  // rowGap applies when wrapping
+  test("wrap with rowGap", async ({ page, initTestBed }) => {
+    const itemHeight = 64;
+    const itemWidthPercent = "50%";
+    const rowGap = 24;
+    await initTestBed(`
+  <FlowLayout testId="layout" rowGap="${rowGap}px">
+    <Stack backgroundColor="red" height="${itemHeight}px" width="${itemWidthPercent}"/>
+    <Stack backgroundColor="green" height="${itemHeight}px" width="${itemWidthPercent}"/>
+    <Stack backgroundColor="blue" height="${itemHeight}px" width="${itemWidthPercent}"/>
+    <Stack backgroundColor="yellow" height="${itemHeight}px" width="${itemWidthPercent}"/>
+  </FlowLayout>
+  `);
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    const expectedHeight = itemHeight * 2 + rowGap;
+
+    expect(layoutHeight).toEqual(expectedHeight);
+  });
+
+  test("wrap with columnGap", async ({ page, initTestBed }) => {
+    const itemWidth = 200;
+    const columnGap = 24;
+    const layoutWidth = itemWidth + columnGap + itemWidth;
+    const itemHeight = 64;
+    await initTestBed(`
+  <FlowLayout testId="layout" width="${layoutWidth}px" columnGap="${columnGap}px">
+    <Stack backgroundColor="red" height="${itemHeight}px" width="${itemWidth}px"/>
+    <Stack backgroundColor="green" height="${itemHeight}px" width="${itemWidth}px"/>
+    <Stack backgroundColor="blue" height="${itemHeight}px" width="${itemWidth}px"/>
+    <Stack backgroundColor="yellow" testId="item3" height="${itemHeight}px" width="${itemWidth}px"/>
+  </FlowLayout>
+  `);
+
+    const { left: item3Left } = await getBounds(page.getByTestId("item3"));
+    const expectedItem3Left = itemWidth + columnGap;
+
+    expect(item3Left).toEqual(expectedItem3Left);
+  });
+
+  // wrapping: columnGap & rowGap overrules gap prop
+  test("columnGap & rowGap overrules gap", async ({ page, initTestBed }) => {
+    const itemWidth = 200;
+    const columnGap = 24;
+    const layoutWidth = itemWidth + columnGap + itemWidth;
+    const itemHeight = 64;
+    const rowGap = 24;
+    const gap = 5;
+    await initTestBed(`
+  <FlowLayout testId="layout" width="${layoutWidth}px" gap="${gap}px" columnGap="${columnGap}px" rowGap="${rowGap}px">
+    <Stack testId="item0" backgroundColor="red" height="${itemHeight}px" width="${itemWidth}px"/>
+    <Stack testId="item1" backgroundColor="green" height="${itemHeight}px" width="${itemWidth}px"/>
+    <Stack testId="item2" backgroundColor="blue" height="${itemHeight}px" width="${itemWidth}px"/>
+    <Stack testId="item3" backgroundColor="yellow" height="${itemHeight}px" width="${itemWidth}px"/>
+  </FlowLayout>
+  `);
+
+    const { left: item3Left } = await getBounds(page.getByTestId("item3"));
+    const expectedItem3Left = itemWidth + columnGap;
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    const expectedLayoutHeight = itemHeight + rowGap + itemHeight;
+
+    expect(item3Left).toEqual(expectedItem3Left);
+    expect(layoutHeight).toEqual(expectedLayoutHeight);
+  });
+
+  // 4 items with 25% each perfectly fit in one row
+  // gaps, borders, margins don't count when breaking into new lines
+  test("no wrap from gap, border, margin", async ({ page, initTestBed }) => {
+    const itemHeight = 64;
+    const width = "25%";
+    const marginInline = 100;
+    await initTestBed(`
+  <FlowLayout testId="layout" gap="26px" >
+    <Stack testId="item0" border="solid 6px black" marginRight="${marginInline}px" marginLeft="${marginInline}px" backgroundColor="red" height="${itemHeight}px" width="${width}px"/>
+    <Stack testId="item1" border="solid 6px black" marginRight="${marginInline}px" marginLeft="${marginInline}px" backgroundColor="green" height="${itemHeight}px" width="${width}px"/>
+    <Stack testId="item2" border="solid 6px black" marginRight="${marginInline}px" marginLeft="${marginInline}px" backgroundColor="blue" height="${itemHeight}px" width="${width}px"/>
+    <Stack testId="item3" border="solid 6px black" marginRight="${marginInline}px" marginLeft="${marginInline}px" backgroundColor="yellow" height="${itemHeight}px" width="${width}px"/>
+  </FlowLayout>
+  `);
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    expect(layoutHeight).toEqual(itemHeight);
+  });
+
+  // Elements will cap at 100% width
+  test("no horizontal overflow", async ({ page, initTestBed }) => {
+    const itemHeight = 64;
+    const bigWidths = { percent: "120%", px: "1000000000px", em: "1000000000em" };
+    await initTestBed(`
+  <FlowLayout testId="layout" gap="0">
+    <Stack testId="item0" height="${itemHeight}px" width="${bigWidths.percent}"/>
+    <Stack testId="item1" height="${itemHeight}px" width="${bigWidths.px}"/>
+    <Stack testId="item2" height="${itemHeight}px" width="${bigWidths.em}"/>
+  </FlowLayout>
+  `);
+
+    const isOverflownItem0 = await overflows(page.getByTestId("item0"), "x");
+    const isOverflownItem1 = await overflows(page.getByTestId("item1"), "x");
+    const isOverflownItem2 = await overflows(page.getByTestId("item2"), "x");
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    const expectedLayoutHeight = itemHeight * 3;
+
+    expect(isOverflownItem0).toStrictEqual(false);
+    expect(isOverflownItem1).toStrictEqual(false);
+    expect(isOverflownItem2).toStrictEqual(false);
+    expect(layoutHeight).toEqual(expectedLayoutHeight);
+  });
+
+  // SpaceFillers can be used to break into new lines
+  test("SpaceFiller adds line break", async ({ page, initTestBed }) => {
+    const itemHeight = 64;
+    const itemWidth = "20%";
+    await initTestBed(`
+  <FlowLayout testId="layout" gap="0">
+    <Stack backgroundColor="red" height="${itemHeight}px" width="${itemWidth}"/>
+    <Stack backgroundColor="blue" height="${itemHeight}px" width="${itemWidth}"/>
+    <SpaceFiller/>
+    <Stack backgroundColor="green" height="${itemHeight}px" width="${itemWidth}"/>
+  </FlowLayout>
+  `);
+
+    const expectedHeight = 2 * itemHeight;
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    expect(layoutHeight).toEqual(expectedHeight);
+  });
+
+  // The layout properly handles overflow on the Y axis
+  // The scrollbar must not overlap the rightmost element
+  test("scrollbar on overflow Y", async ({ page, initTestBed }) => {
+    const itemHeight = 128;
+    await initTestBed(`
+  <FlowLayout testId="layout" height="100px" columnGap="10px" overflowY="auto">
+    <Stack backgroundColor="red" height="${itemHeight}px" border="solid 8px black"/>
+    <Stack backgroundColor="blue" height="${itemHeight}px"/>
+    <Stack backgroundColor="green" height="${itemHeight}px"/>
+  </FlowLayout>
+  `);
+
+    const result = await overflows(page.getByTestId("layout"), "y");
+    expect(result).toEqual(true);
+  });
+
+  // The layout properly handles overflow on the Y axis
+  // The scrollbar must not overlap the rightmost element
+  test("scrollbar on overflow Y multi items", async ({ page, initTestBed }) => {
+    const itemHeight = 128;
+    await initTestBed(`
+  <FlowLayout testId="layout" height="100px" overflowY="auto">
+    <Stack backgroundColor="red" height="${itemHeight}px" border="solid 8px black" width="50%"/>
+    <Stack backgroundColor="blue" height="${itemHeight}px" border="solid 8px black" width="50%"/>
+    <Stack backgroundColor="green" height="${itemHeight}px"/>
+  </FlowLayout>
+  `);
+
+    const result = await overflows(page.getByTestId("layout"), "y");
+
+    expect(result).toEqual(true);
+  });
+
+  test("multiple star sized next to each other doesn't break", async ({ page, initTestBed }) => {
+    await initTestBed(`
+    <FlowLayout testId="layout" width="100px" columnGap="10px">
+      <Stack testId="red" backgroundColor="red" height="10px" width="20px"/>
+      <Stack testId="green" backgroundColor="green" height="10px" width="*"/>
+      <Stack testId="blue" backgroundColor="blue" height="10px" width="2*"/>
+    </FlowLayout>`);
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    const { width: redWidth } = await getBounds(page.getByTestId("red"));
+    const { width: greenWidth } = await getBounds(page.getByTestId("green"));
+    const { width: blueWidth } = await getBounds(page.getByTestId("blue"));
+
+    // red: 20px | 10px gap | green: 20px | 10px gap | blue: 40px
+    expect(layoutHeight).toEqual(10);
+    expect(redWidth).toEqual(20);
+    expect(greenWidth).toEqual(20);
+    expect(blueWidth).toEqual(40);
+  });
+
+  test("SpaceFiller breaks star sized items", async ({ page, initTestBed }) => {
+    await initTestBed(`
+    <FlowLayout testId="layout" width="100px" gap="10px">
+      <Stack testId="red" backgroundColor="red" height="10px" width="20px"/>
+      <Stack testId="green" backgroundColor="green" height="10px" width="*"/>
+      <SpaceFiller/>
+      <Stack testId="blue" backgroundColor="blue" height="10px" width="2*"/>
+    </FlowLayout>`);
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+    const { width: redWidth } = await getBounds(page.getByTestId("red"));
+    const { width: greenWidth } = await getBounds(page.getByTestId("green"));
+    const { width: blueWidth } = await getBounds(page.getByTestId("blue"));
+
+    // red: 20px | 10px gap | green: 70px
+    // gap 10px
+    // blue: 100px
+    expect(layoutHeight).toEqual(30);
+    expect(redWidth).toEqual(20);
+    expect(greenWidth).toEqual(70);
+    expect(blueWidth).toEqual(100);
+  });
+});
+
+// =============================================================================
+// NON-VISUAL COMPONENT TESTS
+// =============================================================================
+
+test.describe("Non-visual components", () => {
+  test("ChangeListener does not create wrapper div or affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <ChangeListener testId="changeListener" onDidChange="testState = 'changed'"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // ChangeListener should not appear in the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+
+    // Verify ChangeListener doesn't create any visible wrapper
+    const changeListenerWrapper = page.getByTestId("changeListener");
+    await expect(changeListenerWrapper).not.toBeAttached();
+  });
+
+  test("ChangeListener still works in layout", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <ChangeListener testId="changeListener" listenTo="{item2}" onDidChange="testState = 'changed'"/>
+        <TextBox id="item2" />
+      </FlowLayout>
+    `);
+    await page.getByRole("textbox").fill("test");
+
+    await expect.poll(testStateDriver.testState).toBe("changed");
+  });
+
+  test("Queue does not create wrapper div or affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="queue" onProcess="testState = 'processed'"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // Queue should not appear in the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+
+    // Verify Queue doesn't create any visible wrapper
+    const queueWrapper = page.getByTestId("queue");
+    await expect(queueWrapper).not.toBeAttached();
+  });
+
+  test("Queue still works in layout", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="queue" onProcess="testState = 'processed'"/>
+        <Button id="item2" backgroundColor="blue" height="64px" width="100px" onClick="queue.enqueueItem(Math.random())"/>
+      </FlowLayout>
+    `);
+    const button = page.getByRole("button");
+    await button.click();
+
+    const queueWrapper = page.getByTestId("queue");
+
+    // Verify Queue doesn't create any visible wrapper
+    await expect.poll(testStateDriver.testState).toBe("processed");
+  });
+
+  test("AppState does not create wrapper div or affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <AppState testId="appState" />
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // AppState should not appear in the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+
+    // Verify AppState doesn't create any visible wrapper
+    const appStateWrapper = page.getByTestId("appState");
+    await expect(appStateWrapper).not.toBeAttached();
+  });
+
+  test("AppState still works in layout", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <AppState id="appState" initialValue="{{ item: 'initial' }}" />
+        <ChangeListener testId="changeListener" listenTo="{appState.value.item}" onDidChange="testState = appState.value.item"/>
+        <Button testId="item2" backgroundColor="blue" height="64px" width="100px" onClick="appState.update({ item: 'clicked' })" />
+      </FlowLayout>
+    `);
+    const button = page.getByTestId("item2");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState).toBe("clicked");
+  });
+
+  test("multiple non-visual components do not affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <ChangeListener listenTo="$var1"/>
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="queue1" onProcess="testState = 'processed'"/>
+        <AppState bucket="bucket1"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+        <ChangeListener listenTo="$var2"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // Multiple non-visual components should not affect the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+  });
+
+  test("non-visual component between items that wrap", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="250px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="150px"/>
+        <ChangeListener listenTo="$var1"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="150px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // Non-visual component should not affect wrapping
+    // item2 should wrap to the next line
+    expect(rect2.y).toBeGreaterThan(rect1.y);
+    expect(rect1.x).toBe(rect2.x);
+    expect(layoutHeight).toBe(138); // 64 + 10 (gap) + 64
+  });
+
+  test("only non-visual components in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <ChangeListener listenTo="$var1"/>
+        <Queue id="queue1"/>
+        <AppState bucket="bucket1"/>
+      </FlowLayout>
+    `);
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // FlowLayout with only non-visual components should have minimal height
+    expect(layoutHeight).toBeLessThan(10);
+  });
+
+  test("non-visual component with visual feedback templates", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="testQueue">
+          <property name="progressFeedback">
+            <Text testId="progress">Processing...</Text>
+          </property>
+        </Queue>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+
+    // Queue with template properties should still not affect layout
+    // (templates only render when queue is active)
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+  });
+});
+
+// =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("Api", () => {
+  test("scrollToTop scrolls to the top of a scrollable FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <FlowLayout id="myLayout" height="200px" overflowY="scroll" testId="layout">
+          <Stack height="300px" width="100%" backgroundColor="lightblue"/>
+          <Stack height="300px" width="100%" backgroundColor="lightgreen"/>
+          <Stack height="300px" width="100%" backgroundColor="lightcoral"/>
+        </FlowLayout>
+        <Button testId="scrollBtn" onClick="myLayout.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const layout = page.getByTestId("layout");
+    
+    // Scroll to bottom first
+    await layout.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Verify we're scrolled down
+    const scrollTopBefore = await layout.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopBefore).toBeGreaterThan(0);
+
+    // Click button to scroll to top
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the top
+    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom scrolls to the bottom of a scrollable FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <FlowLayout id="myLayout" height="200px" overflowY="scroll" testId="layout">
+          <Stack height="300px" width="100%" backgroundColor="lightblue"/>
+          <Stack height="300px" width="100%" backgroundColor="lightgreen"/>
+          <Stack height="300px" width="100%" backgroundColor="lightcoral"/>
+        </FlowLayout>
+        <Button testId="scrollBtn" onClick="myLayout.scrollToBottom()" />
+      </Fragment>
+    `);
+
+    const layout = page.getByTestId("layout");
+    
+    // Verify we start at the top
+    const scrollTopBefore = await layout.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopBefore).toBe(0);
+
+    // Click button to scroll to bottom
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the bottom
+    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
+    const scrollHeight = await layout.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await layout.evaluate((elem) => elem.clientHeight);
+    
+    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+  });
+
+  test("scrollToTop with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <FlowLayout id="myLayout" height="200px" overflowY="scroll" testId="layout">
+          <Stack height="300px" width="100%" backgroundColor="lightblue"/>
+          <Stack height="300px" width="100%" backgroundColor="lightgreen"/>
+          <Stack height="300px" width="100%" backgroundColor="lightcoral"/>
+        </FlowLayout>
+        <Button testId="scrollBtn" onClick="myLayout.scrollToTop('smooth')" />
+      </Fragment>
+    `);
+
+    const layout = page.getByTestId("layout");
+    
+    // Scroll to bottom first
+    await layout.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Click button to scroll to top with smooth behavior
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for smooth scroll to complete
+    await page.waitForTimeout(500);
+
+    // Verify we're at the top
+    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom with default behavior uses instant", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <FlowLayout id="myLayout" height="200px" overflowY="scroll" testId="layout">
+          <Stack height="300px" width="100%" backgroundColor="lightblue"/>
+          <Stack height="300px" width="100%" backgroundColor="lightgreen"/>
+          <Stack height="300px" width="100%" backgroundColor="lightcoral"/>
+        </FlowLayout>
+        <Button testId="scrollBtn" onClick="myLayout.scrollToBottom()" />
+      </Fragment>
+    `);
+
+    const layout = page.getByTestId("layout");
+
+    // Click button to scroll to bottom (default behavior)
+    await page.getByTestId("scrollBtn").click();
+    
+    // With instant behavior, should be immediate
+    await page.waitForTimeout(50);
+
+    // Verify we're at the bottom
+    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
+    const scrollHeight = await layout.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await layout.evaluate((elem) => elem.clientHeight);
+    
+    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+  });
+
+  test("scrollToBottom followed by scrollToTop", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <FlowLayout id="myLayout" height="200px" overflowY="scroll" testId="layout">
+          <Stack height="300px" width="100%" backgroundColor="lightblue"/>
+          <Stack height="300px" width="100%" backgroundColor="lightgreen"/>
+          <Stack height="300px" width="100%" backgroundColor="lightcoral"/>
+        </FlowLayout>
+        <Button testId="scrollBottomBtn" onClick="myLayout.scrollToBottom()" />
+        <Button testId="scrollTopBtn" onClick="myLayout.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const layout = page.getByTestId("layout");
+    
+    // Scroll to bottom
+    await page.getByTestId("scrollBottomBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollHeight = await layout.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await layout.evaluate((elem) => elem.clientHeight);
+    let scrollTop = await layout.evaluate((elem) => elem.scrollTop);
+    
+    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+
+    // Now scroll back to top
+    await page.getByTestId("scrollTopBtn").click();
+    await page.waitForTimeout(100);
+
+    scrollTop = await layout.evaluate((elem) => elem.scrollTop);
+    expect(scrollTop).toBe(0);
+  });
+
+  test("scrolling in FlowLayout with wrapped items", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <FlowLayout id="myLayout" width="200px" height="150px" overflowY="scroll" testId="layout">
+          <Stack width="80px" height="80px" backgroundColor="lightblue"/>
+          <Stack width="80px" height="80px" backgroundColor="lightgreen"/>
+          <Stack width="80px" height="80px" backgroundColor="lightcoral"/>
+          <Stack width="80px" height="80px" backgroundColor="lightyellow"/>
+          <Stack width="80px" height="80px" backgroundColor="lightpink"/>
+          <Stack width="80px" height="80px" backgroundColor="lightgray"/>
+        </FlowLayout>
+        <Button testId="scrollBottomBtn" onClick="myLayout.scrollToBottom()" />
+        <Button testId="scrollTopBtn" onClick="myLayout.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const layout = page.getByTestId("layout");
+    
+    // Scroll to bottom
+    await page.getByTestId("scrollBottomBtn").click();
+    await page.waitForTimeout(100);
+
+    let scrollTop = await layout.evaluate((elem) => elem.scrollTop);
+    expect(scrollTop).toBeGreaterThan(0);
+
+    // Scroll back to top
+    await page.getByTestId("scrollTopBtn").click();
+    await page.waitForTimeout(100);
+
+    scrollTop = await layout.evaluate((elem) => elem.scrollTop);
+    expect(scrollTop).toBe(0);
+  });
+
+  test("Bookmark inside FlowLayout (known limitation: empty bookmark cannot scroll into view)", async ({ page, initTestBed }) => {
+    // Note: This test documents a known limitation. An empty Bookmark (which has no visible height)
+    // cannot be reliably scrolled into view within FlowLayout because the element has zero height.
+    // Solution: Users should either add content to the Bookmark or use Stack elements with specific heights.
+    await initTestBed(`
+      <Fragment>
+        <FlowLayout id="myLayout" height="600px" overflowY="scroll" testId="layout">
+          <Stack height="1200px" backgroundColor="lightblue"/>
+          <Bookmark id="middleBookmark"/>
+          <Stack height="1200px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </FlowLayout>
+        <Button testId="scrollToBookmarkBtn" onClick="middleBookmark.scrollIntoView()" />
+      </Fragment>
+    `);
+
+    const layout = page.getByTestId("layout");
+
+    // Verify that clicking the button doesn't cause an error
+    await page.getByTestId("scrollToBookmarkBtn").click();
+    await page.waitForTimeout(500);
+
+    // Just verify the page is still responsive
+    const button = page.getByTestId("scrollToBookmarkBtn");
+    await expect(button).toBeEnabled();
+  });
+});
+
+// =============================================================================
+// ITEMWIDTH PROPERTY TESTS
+// =============================================================================
+
+test.describe("itemWidth property", () => {
+  test("itemWidth defaults to 100% when not specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: layoutWidth } = await getBounds(page.getByTestId("layout"));
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should take full width (100%) and wrap
+    expect(item1Width).toBeCloseTo(layoutWidth, 0);
+    expect(item2Width).toBeCloseTo(layoutWidth, 0);
+
+    // Items should be stacked vertically
+    const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    expect(item2Top).toBeGreaterThanOrEqual(item1Bottom);
+  });
+
+  test("itemWidth='fit-content' sizes items to content", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px" itemWidth="fit-content">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px" padding="10px">Short</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" padding="10px">Much longer text</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should size to their content (different widths)
+    expect(item1Width).toBeGreaterThan(0);
+    expect(item2Width).toBeGreaterThan(item1Width);
+
+    // Items should be on the same row (fit horizontally)
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    expect(item1Top).toBe(item2Top);
+  });
+
+  test("itemWidth with fixed pixel value", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px" itemWidth="120px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    // All items should have the specified width
+    expect(item1Width).toBeCloseTo(120, 0);
+    expect(item2Width).toBeCloseTo(120, 0);
+    expect(item3Width).toBeCloseTo(120, 0);
+
+    // All items should be on the same row (3 * 120px = 360px < 400px)
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+    expect(item1Top).toBe(item2Top);
+    expect(item2Top).toBe(item3Top);
+  });
+
+  test("itemWidth with percentage value", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px" itemWidth="33%" gap="0">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: layoutWidth } = await getBounds(page.getByTestId("layout"));
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    const expectedWidth = layoutWidth * 0.33;
+
+    // All items should have ~33% width (allowing for rounding)
+    expect(item1Width).toBeCloseTo(expectedWidth, -1);
+    expect(item2Width).toBeCloseTo(expectedWidth, -1);
+    expect(item3Width).toBeCloseTo(expectedWidth, -1);
+
+    // All items should be on the same row
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+    expect(item1Top).toBe(item2Top);
+    expect(item2Top).toBe(item3Top);
+  });
+
+  test("explicit child width overrides itemWidth", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px" itemWidth="100px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Default</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" width="150px">Custom</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Default</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    // Items without explicit width use itemWidth
+    expect(item1Width).toBeCloseTo(100, 0);
+    expect(item3Width).toBeCloseTo(100, 0);
+
+    // Item with explicit width uses its own width
+    expect(item2Width).toBeCloseTo(150, 0);
+  });
+
+  test("itemWidth causes wrapping when items exceed container width", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="250px" itemWidth="120px" gap="0">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    // All items should have the specified width
+    expect(item1Width).toBeCloseTo(120, 0);
+    expect(item2Width).toBeCloseTo(120, 0);
+    expect(item3Width).toBeCloseTo(120, 0);
+
+    // First two items on same row, third wraps
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+    
+    expect(item1Top).toBe(item2Top);
+    expect(item3Top).toBeGreaterThan(item2Top);
+  });
+
+  test("itemWidth with min-content keyword", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px" itemWidth="min-content">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px" padding="10px">Short</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" padding="10px">Longer text here</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should size to minimum content width
+    expect(item1Width).toBeGreaterThan(0);
+    expect(item2Width).toBeGreaterThan(item1Width);
+
+    // Items should be on the same row
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    expect(item1Top).toBe(item2Top);
+  });
+
+  test("itemWidth with max-content keyword", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="600px" itemWidth="max-content">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px" padding="10px">This is a longer piece of text</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" padding="10px">Short</Stack>
+      </FlowLayout>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should size to maximum content width (no wrapping)
+    expect(item1Width).toBeGreaterThan(0);
+    expect(item2Width).toBeGreaterThan(0);
+    expect(item1Width).toBeGreaterThan(item2Width);
+  });
+});

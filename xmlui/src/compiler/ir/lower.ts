@@ -447,6 +447,7 @@ const builtInElementNames = new Set([
   "Table",
   "TableOfContents",
   "Column",
+  "TileGrid",
   "Tree",
   "TreeDisplay",
   "NavLink",
