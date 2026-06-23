@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -43,7 +43,7 @@ $gap-icon-NoResult: createThemeVar("gap-icon-NoResult");
 $size-icon-NoResult: createThemeVar("size-icon-NoResult");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

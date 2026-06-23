@@ -1,9 +1,6 @@
-@use "../../component-core/theming/themes" as t;
-
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
-  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
-  @return t.getThemeVar($themeVars, $componentVariable);
+  @return var(--xmlui-#{$componentVariable});
 }
 
 $gap-Stack: createThemeVar("gap-Stack");
@@ -59,7 +56,7 @@ $gap-Stack: createThemeVar("gap-Stack");
   }
 
   .desktopOnly {
-    @include t.withMaxScreenSize(2) {
+    @container (style(--screenSize: 0) or style(--screenSize: 1) or style(--screenSize: 2)) {
       display: none;
     }
   }
@@ -102,5 +99,5 @@ $gap-Stack: createThemeVar("gap-Stack");
 }
 
 :export {
-  themeVars: t.json-stringify($themeVars);
+  themeVars: "";
 }

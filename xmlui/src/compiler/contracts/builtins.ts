@@ -2,6 +2,7 @@ import type { XmluiComponentContract } from "./types";
 import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
 import { htmlTagDefinitions } from "../../component-core/htmlTags";
 import { AccordionItemMd, AccordionMd } from "../../components/Accordion/Accordion";
+import { ExpandableItemMd } from "../../components/ExpandableItem/ExpandableItem";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
 import { CardMd } from "../../components/Card/Card";
@@ -18,6 +19,8 @@ import { SliderMd } from "../../components/Slider/Slider";
 import { ColorPickerMd } from "../../components/ColorPicker/ColorPicker";
 import { DateInputMd } from "../../components/DateInput/DateInput";
 import { DatePickerMd } from "../../components/DatePicker/DatePicker";
+import { DrawerMd } from "../../components/Drawer/Drawer";
+import { ModalDialogMd } from "../../components/ModalDialog/ModalDialog";
 import { FileInputMd } from "../../components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "../../components/FileUploadDropZone/FileUploadDropZone";
 import { FlowLayoutMd } from "../../components/FlowLayout/FlowLayout";
@@ -34,6 +37,7 @@ import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
 import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/Splitter";
 import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
 import { StickySectionMd } from "../../components/StickySection/StickySection";
+import { TabItemMd, TabsMd } from "../../components/Tabs/Tabs";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -70,6 +74,54 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ExpandableItemMd, {
+    name: "ExpandableItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      expandedChange: "onExpandedChange",
+    },
+  }),
+  contractFromMetadata(TabsMd, {
+    name: "Tabs",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      contextMenu: "onContextMenu",
+    },
+  }),
+  contractFromMetadata(TabItemMd, {
+    name: "TabItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      activated: "onActivated",
+    },
+  }),
+  contractFromMetadata(DrawerMd, {
+    name: "Drawer",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      open: "onOpen",
+      close: "onClose",
+    },
+  }),
+  contractFromMetadata(ModalDialogMd, {
+    name: "ModalDialog",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      open: "onOpen",
+      close: "onClose",
+    },
   }),
   contractFromMetadata(FragmentMd, {
     name: "Fragment",

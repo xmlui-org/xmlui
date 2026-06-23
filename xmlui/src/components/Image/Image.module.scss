@@ -1,6 +1,6 @@
 // Image.tsx extracts available theme variables from createThemeVar declarations
 // in this file, mirroring the old Image component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -41,5 +41,5 @@ $borderColor-Image: createThemeVar("borderColor-Image");
 }
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }

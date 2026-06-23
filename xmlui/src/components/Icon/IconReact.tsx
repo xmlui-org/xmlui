@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 
-import styles from "./Icon.module.scss?xmlui-css-module";
+import styles from "./Icon.module.scss";
 
 export type IconProps = {
   name?: unknown;

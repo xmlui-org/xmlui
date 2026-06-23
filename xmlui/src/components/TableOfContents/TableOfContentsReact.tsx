@@ -1,7 +1,7 @@
 import { memo, useEffect, useState, type CSSProperties } from "react";
 
 import { defaultProps } from "./TableOfContents.defaults";
-import styles from "./TableOfContents.module.scss?xmlui-css-module";
+import styles from "./TableOfContents.module.scss";
 
 export type TocHeading = {
   id: string;

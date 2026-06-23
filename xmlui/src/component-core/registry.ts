@@ -1,12 +1,13 @@
 import { builtInComponentContracts } from "../compiler/contracts";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
-import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion";
+import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
 import { appRenderer } from "../components/App/App";
 import { buttonRenderer } from "../components/Button/Button";
-import { cardRenderer } from "../components/Card/Card";
+import { cardRenderer } from "../components/Card/Card.renderer";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
-import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator";
+import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator.renderer";
+import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import {
   headingRenderer,
@@ -24,52 +25,55 @@ import {
 import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { fragmentRenderer } from "../components/Fragment/Fragment";
 import { iconRenderer } from "../components/Icon/Icon";
-import { imageRenderer } from "../components/Image/Image";
-import { iframeRenderer } from "../components/IFrame/IFrame";
+import { imageRenderer } from "../components/Image/Image.renderer";
+import { iframeRenderer } from "../components/IFrame/IFrame.renderer";
 import { itemsRenderer } from "../components/Items/Items";
 import { listRenderer } from "../components/List/List";
-import { linkRenderer } from "../components/Link/Link";
+import { linkRenderer } from "../components/Link/Link.renderer";
 import { logoRenderer } from "../components/Logo/Logo";
-import { noResultRenderer } from "../components/NoResult/NoResult";
+import { noResultRenderer } from "../components/NoResult/NoResult.renderer";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
-import { qrCodeRenderer } from "../components/QRCode/QRCode";
-import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar";
-import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
+import { qrCodeRenderer } from "../components/QRCode/QRCode.renderer";
+import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
+import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller.renderer";
 import {
   hSplitterRenderer,
   splitterRenderer,
   vSplitterRenderer,
-} from "../components/Splitter/Splitter";
-import { stickyBoxRenderer } from "../components/StickyBox/StickyBox";
-import { stickySectionRenderer } from "../components/StickySection/StickySection";
+} from "../components/Splitter/Splitter.renderer";
+import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
+import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
 import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
-import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
-import { textAreaRenderer } from "../components/TextArea/TextArea";
-import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
-import { checkboxRenderer } from "../components/Checkbox/Checkbox";
-import { switchRenderer } from "../components/Switch/Switch";
-import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
-import { sliderRenderer } from "../components/Slider/Slider";
-import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
-import { dateInputRenderer } from "../components/DateInput/DateInput";
-import { datePickerRenderer } from "../components/DatePicker/DatePicker";
+import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
+import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox.renderer";
+import { textAreaRenderer } from "../components/TextArea/TextArea.renderer";
+import { numberBoxRenderer } from "../components/NumberBox/NumberBox.renderer";
+import { checkboxRenderer } from "../components/Checkbox/Checkbox.renderer";
+import { switchRenderer } from "../components/Switch/Switch.renderer";
+import { ratingInputRenderer } from "../components/RatingInput/RatingInput.renderer";
+import { sliderRenderer } from "../components/Slider/Slider.renderer";
+import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker.renderer";
+import { dateInputRenderer } from "../components/DateInput/DateInput.renderer";
+import { datePickerRenderer } from "../components/DatePicker/DatePicker.renderer";
+import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
+import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
-import { fileInputRenderer } from "../components/FileInput/FileInput";
-import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone";
-import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
+import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
+import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
+import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
-import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer";
+import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer.renderer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { tableRenderer } from "../components/Table/Table";
 import { columnRenderer } from "../components/Column/Column";
-import { tileGridRenderer } from "../components/TileGrid/TileGrid";
+import { tileGridRenderer } from "../components/TileGrid/TileGrid.renderer";
 import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfContents";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
-import { timeInputRenderer } from "../components/TimeInput/TimeInput";
+import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -100,6 +104,8 @@ const implementedRuntimeNames = [
   "VSplitter",
   "StickyBox",
   "StickySection",
+  "Tabs",
+  "TabItem",
   "Heading",
   "H1",
   "H2",
@@ -116,6 +122,7 @@ const implementedRuntimeNames = [
   "Card",
   "CodeBlock",
   "ContentSeparator",
+  "ExpandableItem",
   "Fallback",
   "Br",
   "br",
@@ -134,6 +141,8 @@ const implementedRuntimeNames = [
   "ColorPicker",
   "DateInput",
   "DatePicker",
+  "Drawer",
+  "ModalDialog",
   "FileInput",
   "FileUploadDropZone",
   "TimeInput",
@@ -168,6 +177,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Card: cardRenderer,
   CodeBlock: codeBlockRenderer,
   ContentSeparator: contentSeparatorRenderer,
+  ExpandableItem: expandableItemRenderer,
   Fallback: fallbackRenderer,
   Fragment: fragmentRenderer,
   Icon: iconRenderer,
@@ -185,6 +195,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   VSplitter: vSplitterRenderer,
   StickyBox: stickyBoxRenderer,
   StickySection: stickySectionRenderer,
+  Tabs: tabsRenderer,
+  TabItem: tabItemRenderer,
   SpaceFiller: spaceFillerRenderer,
   Heading: headingRenderer,
   H1: h1Renderer,
@@ -209,6 +221,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   ColorPicker: colorPickerRenderer,
   DateInput: dateInputRenderer,
   DatePicker: datePickerRenderer,
+  Drawer: drawerRenderer,
+  ModalDialog: modalDialogRenderer,
   AutoComplete: autoCompleteRenderer,
   FileInput: fileInputRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
@@ -246,6 +260,7 @@ const componentFolderNames: Record<string, string> = {
   PasswordInput: "TextBox",
   HSplitter: "Splitter",
   VSplitter: "Splitter",
+  TabItem: "Tabs",
 };
 for (const name of htmlTagComponentNames) {
   componentFolderNames[name] = "HtmlTags";
@@ -275,6 +290,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const colorPickerTransferred = contract.name === "ColorPicker";
     const dateInputTransferred = contract.name === "DateInput";
     const datePickerTransferred = contract.name === "DatePicker";
+    const drawerTransferred = contract.name === "Drawer";
+    const modalDialogTransferred = contract.name === "ModalDialog";
     const fileInputTransferred = contract.name === "FileInput";
     const fileUploadDropZoneTransferred = contract.name === "FileUploadDropZone";
     const itemsTransferred = contract.name === "Items";
@@ -303,9 +320,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const qrCodeTransferred = contract.name === "QRCode";
     const codeBlockTransferred = contract.name === "CodeBlock";
     const contentSeparatorTransferred = contract.name === "ContentSeparator";
+    const expandableItemTransferred = contract.name === "ExpandableItem";
     const fallbackTransferred = contract.name === "Fallback";
     const noResultTransferred = contract.name === "NoResult";
     const spaceFillerTransferred = contract.name === "SpaceFiller";
+    const tabsTransferred = contract.name === "Tabs" || contract.name === "TabItem";
     const stackTransferred = contract.name === "Stack" || contract.name === "HStack" || contract.name === "VStack";
     const flowLayoutTransferred = contract.name === "FlowLayout";
     const transferredFolder =
@@ -324,6 +343,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       colorPickerTransferred ||
       dateInputTransferred ||
       datePickerTransferred ||
+      drawerTransferred ||
+      modalDialogTransferred ||
       fileInputTransferred ||
       fileUploadDropZoneTransferred ||
       itemsTransferred ||
@@ -352,9 +373,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       qrCodeTransferred ||
       codeBlockTransferred ||
       contentSeparatorTransferred ||
+      expandableItemTransferred ||
       fallbackTransferred ||
       noResultTransferred ||
       spaceFillerTransferred ||
+      tabsTransferred ||
       stackTransferred ||
       flowLayoutTransferred;
     const sharedComponentFile = accordionTransferred
@@ -385,9 +408,13 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                             ? "ColorPicker"
                             : dateInputTransferred
                               ? "DateInput"
-                              : datePickerTransferred
-                                ? "DatePicker"
-                                : fileInputTransferred
+                            : datePickerTransferred
+                              ? "DatePicker"
+                              : drawerTransferred
+                                ? "Drawer"
+                              : modalDialogTransferred
+                                ? "ModalDialog"
+                              : fileInputTransferred
                                   ? "FileInput"
                                   : fileUploadDropZoneTransferred
                                     ? "FileUploadDropZone"
@@ -411,12 +438,16 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                     ? "ScrollViewer"
                                                     : responsiveBarTransferred
                                                       ? "ResponsiveBar"
-                                                      : splitterTransferred
-                                                        ? "Splitter"
-                                                        : stickyBoxTransferred
-                                                          ? "StickyBox"
-                                                          : stickySectionTransferred
-                                                            ? "StickySection"
+                                                    : splitterTransferred
+                                                      ? "Splitter"
+                                                      : stickyBoxTransferred
+                                                        ? "StickyBox"
+                                                        : stickySectionTransferred
+                                                          ? "StickySection"
+                                                          : expandableItemTransferred
+                                                            ? "ExpandableItem"
+                                                            : tabsTransferred
+                                                              ? "Tabs"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -456,6 +487,10 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DateInputReact.tsx`);
     } else if (datePickerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DatePickerReact.tsx`);
+    } else if (drawerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DrawerReact.tsx`);
+    } else if (modalDialogTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ModalDialogReact.tsx`);
     } else if (fileInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileInputReact.tsx`);
     } else if (fileUploadDropZoneTransferred) {
@@ -504,6 +539,14 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/CodeBlockReact.tsx`);
     } else if (contentSeparatorTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ContentSeparatorReact.tsx`);
+    } else if (expandableItemTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ExpandableItemReact.tsx`);
+    } else if (tabsTransferred) {
+      implementationPaths.splice(
+        0,
+        implementationPaths.length,
+        `xmlui/src/components/${folderName}/${contract.name === "TabItem" ? "TabItemReact" : "TabsReact"}.tsx`,
+      );
     } else if (fallbackTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FallbackReact.tsx`);
     } else if (noResultTransferred) {
@@ -528,6 +571,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       colorPickerTransferred,
       dateInputTransferred,
       datePickerTransferred,
+      drawerTransferred,
+      modalDialogTransferred,
       fileInputTransferred,
       fileUploadDropZoneTransferred,
       itemsTransferred,
@@ -554,9 +599,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       qrCodeTransferred,
       codeBlockTransferred,
       contentSeparatorTransferred,
+      expandableItemTransferred,
       fallbackTransferred,
       noResultTransferred,
       spaceFillerTransferred,
+      tabsTransferred,
     });
     return {
       name: contract.name,
@@ -615,6 +662,8 @@ function componentRunnablePaths(flags: {
   colorPickerTransferred: boolean;
   dateInputTransferred: boolean;
   datePickerTransferred: boolean;
+  drawerTransferred: boolean;
+  modalDialogTransferred: boolean;
   fileInputTransferred: boolean;
   fileUploadDropZoneTransferred: boolean;
   itemsTransferred: boolean;
@@ -641,9 +690,11 @@ function componentRunnablePaths(flags: {
   qrCodeTransferred: boolean;
   codeBlockTransferred: boolean;
   contentSeparatorTransferred: boolean;
+  expandableItemTransferred: boolean;
   fallbackTransferred: boolean;
   noResultTransferred: boolean;
   spaceFillerTransferred: boolean;
+  tabsTransferred: boolean;
 }): string[] {
   if (flags.accordionTransferred) {
     return [
@@ -705,6 +756,18 @@ function componentRunnablePaths(flags: {
   }
   if (flags.datePickerTransferred) {
     return ["xmlui/src/components/DatePicker/DatePicker.spec.ts"];
+  }
+  if (flags.drawerTransferred) {
+    return [
+      "xmlui/src/components/Drawer/Drawer.foundation.spec.ts",
+      "xmlui/src/components/Drawer/Drawer.spec.ts",
+    ];
+  }
+  if (flags.modalDialogTransferred) {
+    return [
+      "xmlui/src/components/ModalDialog/ModalDialog.foundation.spec.ts",
+      "xmlui/src/components/ModalDialog/ModalDialog.spec.ts",
+    ];
   }
   if (flags.fileInputTransferred) {
     return ["xmlui/src/components/FileInput/FileInput.spec.ts"];
@@ -823,6 +886,18 @@ function componentRunnablePaths(flags: {
   }
   if (flags.contentSeparatorTransferred) {
     return ["xmlui/src/components/ContentSeparator/ContentSeparator.spec.ts"];
+  }
+  if (flags.expandableItemTransferred) {
+    return [
+      "xmlui/src/components/ExpandableItem/ExpandableItem.foundation.spec.ts",
+      "xmlui/src/components/ExpandableItem/ExpandableItem.spec.ts",
+    ];
+  }
+  if (flags.tabsTransferred) {
+    return [
+      "xmlui/src/components/Tabs/Tabs.foundation.spec.ts",
+      "xmlui/src/components/Tabs/Tabs.spec.ts",
+    ];
   }
   if (flags.noResultTransferred) {
     return ["xmlui/src/components/NoResult/NoResult.spec.ts"];

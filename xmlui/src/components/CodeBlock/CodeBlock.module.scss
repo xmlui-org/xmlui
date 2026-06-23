@@ -1,6 +1,6 @@
 // CodeBlock.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old component metadata pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -16,7 +16,7 @@ $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-Code
 $paddingHorizontal-content-CodeBlock: createThemeVar("paddingHorizontal-content-CodeBlock");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

@@ -1,7 +1,7 @@
 import { forwardRef, memo, useImperativeHandle, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 
 import { defaultProps } from "./Table.defaults";
-import styles from "./Table.module.scss?xmlui-css-module";
+import styles from "./Table.module.scss";
 import type { TableColumnDefinition } from "../Column/ColumnReact";
 
 export type TableApi = {

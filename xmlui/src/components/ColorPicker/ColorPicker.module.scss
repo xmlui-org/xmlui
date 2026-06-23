@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -45,7 +45,7 @@ $width-ColorPicker: createThemeVar("width-ColorPicker");
 $height-ColorPicker: createThemeVar("height-ColorPicker");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

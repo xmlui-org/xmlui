@@ -2,39 +2,7 @@ import type { CSSProperties, HTMLAttributeReferrerPolicy, MouseEvent, ReactNode 
 import { forwardRef, memo, useMemo } from "react";
 
 import { defaultProps } from "./Link.defaults";
-
-const styles = {
-  active: "linkActive",
-  alignItemsBaseline: "linkAlignItemsBaseline",
-  alignItemsCenter: "linkAlignItemsCenter",
-  alignItemsEnd: "linkAlignItemsEnd",
-  alignItemsStart: "linkAlignItemsStart",
-  alignItemsStretch: "linkAlignItemsStretch",
-  breakAnywhere: "linkBreakAnywhere",
-  breakHyphenate: "linkBreakHyphenate",
-  breakKeep: "linkBreakKeep",
-  breakNormal: "linkBreakNormal",
-  breakWord: "linkBreakWord",
-  container: "linkContainer",
-  disabled: "linkDisabled",
-  iconLink: "linkIconOnly",
-  iconMarker: "linkIconMarker",
-  iconWrapper: "linkIconWrapper",
-  justifyItemsCenter: "linkJustifyItemsCenter",
-  justifyItemsEnd: "linkJustifyItemsEnd",
-  justifyItemsStart: "linkJustifyItemsStart",
-  justifyItemsStretch: "linkJustifyItemsStretch",
-  multiLineClamp: "linkMultiLineClamp",
-  noEllipsis: "linkNoEllipsis",
-  noIndicator: "linkNoIndicator",
-  overflowFlow: "linkOverflowFlow",
-  overflowNone: "linkOverflowNone",
-  overflowScroll: "linkOverflowScroll",
-  preserveLinebreaks: "linkPreserveLinebreaks",
-  textOverflowContainer: "linkTextOverflowContainer",
-  textSpan: "linkTextSpan",
-  truncateOverflow: "linkTruncateOverflow",
-} as const;
+import styles from "./Link.module.scss";
 
 export type LinkProps = {
   to?: unknown;
@@ -101,9 +69,9 @@ export const LinkNative = memo(forwardRef<HTMLElement, LinkProps>(function LinkN
   const textSpanClassName = useMemo(
     () =>
       cx(
-        styles.textSpan,
+        styles.linkTextSpan,
         overflowClasses({ overflowMode, maxLines, ellipses }),
-        preserveLinebreaks ? styles.preserveLinebreaks : undefined,
+        preserveLinebreaks ? styles.linkPreserveLinebreaks : undefined,
         breakModeClass(breakMode),
       ),
     [breakMode, ellipses, maxLines, overflowMode, preserveLinebreaks],
@@ -122,12 +90,12 @@ export const LinkNative = memo(forwardRef<HTMLElement, LinkProps>(function LinkN
     ...rest,
     ref: ref as never,
     className: cx(
-      styles.container,
-      active ? styles.active : undefined,
-      !enabled ? styles.disabled : undefined,
-      noIndicator ? styles.noIndicator : undefined,
-      iconLink ? styles.iconLink : undefined,
-      hasOverflowFeature ? styles.textOverflowContainer : undefined,
+      styles.linkContainer,
+      active ? styles.linkActive : undefined,
+      !enabled ? styles.linkDisabled : undefined,
+      noIndicator ? styles.linkNoIndicator : undefined,
+      iconLink ? styles.linkIconOnly : undefined,
+      hasOverflowFeature ? styles.linkTextOverflowContainer : undefined,
       alignmentClass("justifyItems", horizontalAlignment),
       alignmentClass("alignItems", verticalAlignment),
       className,
@@ -139,8 +107,8 @@ export const LinkNative = memo(forwardRef<HTMLElement, LinkProps>(function LinkN
   const body = (
     <>
       {iconName ? (
-        <span data-part-id="icon" data-xmlui-part="icon" className={styles.iconWrapper}>
-          <span aria-hidden="true" data-icon={iconName} className={styles.iconMarker} />
+        <span data-part-id="icon" data-xmlui-part="icon" className={styles.linkIconWrapper}>
+          <span aria-hidden="true" data-icon={iconName} className={styles.linkIconMarker} />
         </span>
       ) : null}
       {hasOverflowFeature ? (
@@ -212,45 +180,45 @@ function overflowClasses({
   if (!overflowMode) {
     if (maxLines > 1) {
       return cx(
-        styles.multiLineClamp,
-        !ellipses ? styles.noEllipsis : undefined,
+        styles.linkMultiLineClamp,
+        !ellipses ? styles.linkNoEllipsis : undefined,
       );
     }
     return cx(
-      maxLines > 0 ? styles.truncateOverflow : undefined,
-      !ellipses ? styles.noEllipsis : undefined,
+      maxLines > 0 ? styles.linkTruncateOverflow : undefined,
+      !ellipses ? styles.linkNoEllipsis : undefined,
     );
   }
   if (overflowMode === "none") {
-    return styles.overflowNone;
+    return styles.linkOverflowNone;
   }
   if (overflowMode === "scroll") {
-    return styles.overflowScroll;
+    return styles.linkOverflowScroll;
   }
   if (overflowMode === "flow") {
-    return styles.overflowFlow;
+    return styles.linkOverflowFlow;
   }
   return cx(
-    maxLines > 1 ? styles.multiLineClamp : styles.truncateOverflow,
-    !ellipses ? styles.noEllipsis : undefined,
+    maxLines > 1 ? styles.linkMultiLineClamp : styles.linkTruncateOverflow,
+    !ellipses ? styles.linkNoEllipsis : undefined,
   );
 }
 
 function breakModeClass(breakMode?: string): string | undefined {
   if (breakMode === "word") {
-    return styles.breakWord;
+    return styles.linkBreakWord;
   }
   if (breakMode === "anywhere") {
-    return styles.breakAnywhere;
+    return styles.linkBreakAnywhere;
   }
   if (breakMode === "keep") {
-    return styles.breakKeep;
+    return styles.linkBreakKeep;
   }
   if (breakMode === "hyphenate") {
-    return styles.breakHyphenate;
+    return styles.linkBreakHyphenate;
   }
   if (breakMode === "normal") {
-    return styles.breakNormal;
+    return styles.linkBreakNormal;
   }
   return undefined;
 }
@@ -259,7 +227,7 @@ function alignmentClass(prefix: "justifyItems" | "alignItems", value?: string): 
   if (!value) {
     return undefined;
   }
-  const normalized = `${prefix}${value[0]?.toUpperCase() ?? ""}${value.slice(1)}`;
+  const normalized = `link${prefix[0]?.toUpperCase() ?? ""}${prefix.slice(1)}${value[0]?.toUpperCase() ?? ""}${value.slice(1)}`;
   return Object.prototype.hasOwnProperty.call(styles, normalized)
     ? styles[normalized as keyof typeof styles]
     : undefined;

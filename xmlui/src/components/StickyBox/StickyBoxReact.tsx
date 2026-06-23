@@ -2,13 +2,7 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
 
 import { defaultProps } from "./StickyBox.defaults";
-
-const styles = {
-  wrapper: "wrapper",
-  toTop: "toTop",
-  toBottom: "toBottom",
-  sentinel: "sentinel",
-};
+import styles from "./StickyBox.module.scss";
 
 export type StickyBoxProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
   children?: ReactNode;

@@ -2,33 +2,7 @@ import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useRef } from "react";
 
 import { defaultProps } from "./Card.defaults";
-
-const styles = {
-  wrapper: "wrapper",
-  horizontal: "horizontal",
-  vertical: "vertical",
-  isClickable: "isClickable",
-  avatarWrapper: "avatarWrapper",
-  avatar: "avatar",
-  avatarXs: "avatarXs",
-  avatarMd: "avatarMd",
-  avatarLg: "avatarLg",
-  titleWrapper: "titleWrapper",
-  title: "title",
-  subtitle: "subtitle",
-  content: "content",
-  contentVertical: "contentVertical",
-  contentHorizontal: "contentHorizontal",
-  justifyItemsStart: "justifyItemsStart",
-  justifyItemsCenter: "justifyItemsCenter",
-  justifyItemsStretch: "justifyItemsStretch",
-  justifyItemsEnd: "justifyItemsEnd",
-  alignItemsStart: "alignItemsStart",
-  alignItemsCenter: "alignItemsCenter",
-  alignItemsStretch: "alignItemsStretch",
-  alignItemsEnd: "alignItemsEnd",
-  alignItemsBaseline: "alignItemsBaseline",
-};
+import styles from "./Card.module.scss";
 
 export type CardProps = {
   className?: string;

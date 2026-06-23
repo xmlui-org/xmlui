@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -14,7 +14,7 @@ $padding-Pagination: createThemeVar("padding-Pagination");
 $gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

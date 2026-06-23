@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -26,7 +26,7 @@ $opacity-RatingInput--disabled: createThemeVar("opacity-RatingInput--disabled");
 $opacity-RatingInput--readOnly: createThemeVar("opacity-RatingInput--readOnly");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

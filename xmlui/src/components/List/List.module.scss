@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -10,7 +10,7 @@ $backgroundColor-selected-List--hover: createThemeVar("backgroundColor-selected-
 $backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-List--hover");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

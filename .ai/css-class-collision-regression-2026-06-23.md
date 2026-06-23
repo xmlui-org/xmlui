@@ -29,6 +29,38 @@ The component styles should still live in the component's `.module.scss` file
 and be applied through CSS classes. Avoid inline style objects for component
 visuals, but also avoid generic class names that can leak through the cascade.
 
+## Follow-up Finding
+
+The raw SCSS module Vite plugin also needs to scope generic local class names.
+Otherwise old-style `.module.scss` files that contain classes such as `.base`,
+`.vertical`, `.horizontal`, `.trigger`, `.content`, `.item`, or `.button` can
+still collide globally after the stylesheet is injected.
+
+The plugin should scope simple local names deterministically, while preserving
+public-looking or hardcoded component classes that existing renderers and tests
+may rely on. In the current rewrite, the safe rule is:
+
+- Scope generic lowercase class names.
+- Preserve classes starting with `xmlui`.
+- Preserve camelCase/PascalCase class names that are intentionally
+  component-specific.
+
+Some renderer files are imported while Vite config is being bundled, before the
+runtime Vite plugins can resolve `?xmlui-css-module` imports. Adding new raw
+module imports to those files can fail with an unloadable dependency error.
+When a component currently uses hardcoded class strings in such a renderer,
+prefer component-specific camelCase class names in both the renderer and SCSS
+instead of adding a new module import.
+
+It is acceptable to keep generic class names as non-styled test/driver marker
+classes when required for compatibility, provided the actual styling selectors
+use component-specific classes.
+
+Browser-computed CSS values may normalize logical values. For example,
+Chromium reports `justify-content: start` and `justify-content: end` as
+`flex-start` and `flex-end`. E2E assertions may adapt to the computed value
+when the authored behavior remains compatible.
+
 ## Verification
 
 After renaming the new foundation component classes:

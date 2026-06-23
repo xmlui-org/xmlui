@@ -1,9 +1,6 @@
-@use "../../component-core/theming/themes" as t;
-
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
-  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
-  @return t.getThemeVar($themeVars, $componentVariable);
+  @return var(--xmlui-#{$componentVariable});
 }
 
 $gap-FlowLayout: createThemeVar("gap-FlowLayout");
@@ -21,7 +18,7 @@ $rowGap-FlowLayout: createThemeVar("rowGap-FlowLayout");
     row-gap: var(--xmlui-rowGap-FlowLayout);
   }
 
-  .item {
+  .flowLayoutItem {
     box-sizing: border-box;
     flex: 0 0 var(--xmlui-itemWidth-FlowLayout);
     min-width: var(--xmlui-minWidth-FlowLayoutItem, 0);
@@ -33,8 +30,8 @@ $rowGap-FlowLayout: createThemeVar("rowGap-FlowLayout");
     }
   }
 
-  .break,
-  .forceBreak {
+  .flowLayoutBreak,
+  .flowLayoutForceBreak {
     flex-basis: 100%;
     height: 0;
   }
@@ -53,5 +50,5 @@ $rowGap-FlowLayout: createThemeVar("rowGap-FlowLayout");
 }
 
 :export {
-  themeVars: t.json-stringify($themeVars);
+  themeVars: "";
 }

@@ -1,0 +1,165 @@
+// Tabs.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old Tabs component pattern.
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-Tabs: createThemeVar("backgroundColor-Tabs");
+$borderColor-Tabs: createThemeVar("borderColor-Tabs");
+$borderWidth-Tabs: createThemeVar("borderWidth-Tabs");
+$borderColor-active-Tabs: createThemeVar("borderColor-active-Tabs");
+$backgroundColor-trigger-Tabs: createThemeVar("backgroundColor-trigger-Tabs");
+$borderRadius-trigger-Tabs: createThemeVar("borderRadius-trigger-Tabs");
+$border-trigger-Tabs: createThemeVar("border-trigger-Tabs");
+$textColor-trigger-Tabs: createThemeVar("textColor-trigger-Tabs");
+$textColor-trigger-Tabs--active: createThemeVar("textColor-trigger-Tabs--active");
+$textColor-trigger-Tabs--hover: createThemeVar("textColor-trigger-Tabs--hover");
+$backgroundColor-trigger-Tabs--hover: createThemeVar("backgroundColor-trigger-Tabs--hover");
+$backgroundColor-trigger-Tabs--active: createThemeVar("backgroundColor-trigger-Tabs--active");
+$backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
+$borderRadius-list-Tabs: createThemeVar("borderRadius-list-Tabs");
+$border-list-Tabs: createThemeVar("border-list-Tabs");
+$gap-list-Tabs: createThemeVar("gap-list-Tabs");
+$padding-trigger-Tabs: createThemeVar("padding-trigger-Tabs");
+$paddingTop-TabItem: createThemeVar("paddingTop-TabItem");
+
+@layer components {
+  .tabs {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    background-color: var(--xmlui-backgroundColor-Tabs);
+  }
+
+  .horizontal {
+    flex-direction: column;
+  }
+
+  .vertical {
+    flex-direction: row;
+  }
+
+  .accordionView {
+    flex-direction: column;
+  }
+
+  .tabsList {
+    display: flex;
+    flex-shrink: 0;
+    overflow: hidden;
+    gap: var(--xmlui-gap-list-Tabs);
+    background-color: var(--xmlui-backgroundColor-list-Tabs);
+    border-radius: var(--xmlui-borderRadius-list-Tabs);
+    border: var(--xmlui-border-list-Tabs);
+  }
+
+  .tabsList:hover {
+    overflow: auto;
+  }
+
+  .horizontal .tabsList {
+    flex-direction: row;
+  }
+
+  .vertical .tabsList {
+    flex-direction: column;
+  }
+
+  .alignStart {
+    justify-content: flex-start;
+  }
+
+  .alignEnd {
+    justify-content: flex-end;
+  }
+
+  .alignCenter {
+    justify-content: center;
+  }
+
+  .alignStretch {
+    justify-content: stretch;
+  }
+
+  .tabTrigger {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: var(--xmlui-border-trigger-Tabs);
+    border-radius: var(--xmlui-borderRadius-trigger-Tabs);
+    padding: var(--xmlui-padding-trigger-Tabs);
+    color: var(--xmlui-textColor-trigger-Tabs);
+    background-color: var(--xmlui-backgroundColor-trigger-Tabs);
+    font: inherit;
+    line-height: 1;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .tabTrigger:hover {
+    color: var(--xmlui-textColor-trigger-Tabs--hover);
+    background-color: var(--xmlui-backgroundColor-trigger-Tabs--hover);
+  }
+
+  .tabTrigger[aria-selected="true"] {
+    color: var(--xmlui-textColor-trigger-Tabs--active);
+    background-color: var(--xmlui-backgroundColor-trigger-Tabs--active);
+  }
+
+  .horizontal .tabTrigger {
+    border-bottom-width: var(--xmlui-borderWidth-Tabs);
+    border-bottom-style: solid;
+    border-bottom-color: var(--xmlui-borderColor-Tabs);
+  }
+
+  .horizontal .tabTrigger[aria-selected="true"] {
+    border-bottom-color: var(--xmlui-borderColor-active-Tabs);
+  }
+
+  .vertical .tabTrigger {
+    border-right-width: var(--xmlui-borderWidth-Tabs);
+    border-right-style: solid;
+    border-right-color: var(--xmlui-borderColor-Tabs);
+  }
+
+  .vertical .tabTrigger[aria-selected="true"] {
+    border-right-color: var(--xmlui-borderColor-active-Tabs);
+  }
+
+  .distributeEvenly {
+    flex: 1 1 auto;
+  }
+
+  .tabsContent {
+    flex-grow: 1;
+    min-width: 0;
+    outline: none;
+    padding-top: var(--xmlui-paddingTop-TabItem);
+  }
+
+  .hiddenContent {
+    display: none;
+  }
+
+  .accordionItem {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .accordionTrigger {
+    width: 100%;
+    justify-content: flex-start;
+    border-bottom-width: var(--xmlui-borderWidth-Tabs);
+    border-bottom-style: solid;
+    border-bottom-color: var(--xmlui-borderColor-Tabs);
+  }
+}
+
+:export {
+  themeVars: "";
+}

@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -38,7 +38,7 @@ $backgroundColor-checked-Checkbox--success: createThemeVar("backgroundColor-chec
 $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-Checkbox");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {
@@ -50,7 +50,7 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
     max-width: 100%;
   }
 
-  .checkboxcontainer {
+  .container {
     box-sizing: border-box;
   }
 

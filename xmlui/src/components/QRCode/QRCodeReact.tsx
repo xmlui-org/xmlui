@@ -1,6 +1,7 @@
 import { forwardRef, memo, useEffect, type CSSProperties } from "react";
 
 import { defaultProps } from "./QRCode.defaults";
+import styles from "./QRCode.module.scss";
 
 export type QRCodeProps = {
   value: string;
@@ -37,7 +38,7 @@ export const QRCode = memo(forwardRef<HTMLDivElement, QRCodeProps>(function QRCo
     <div
       {...rest}
       ref={ref}
-      className={["xmluiQRCode", className].filter(Boolean).join(" ")}
+      className={[styles.xmluiQRCode, className].filter(Boolean).join(" ")}
       style={{
         ...style,
         "--xmlui-effective-size-QRCode": `${size}px`,

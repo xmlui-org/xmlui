@@ -1,7 +1,7 @@
 import { forwardRef, memo, useImperativeHandle, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 
 import { defaultProps } from "./Tree.defaults";
-import styles from "./TreeComponent.module.scss?xmlui-css-module";
+import styles from "./TreeComponent.module.scss";
 
 export type TreeItem = {
   id: unknown;

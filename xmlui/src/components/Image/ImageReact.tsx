@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { defaultProps } from "./Image.defaults";
+import styles from "./Image.module.scss";
 
 type ImageProps = {
   src?: string;
@@ -75,10 +76,10 @@ export const Image = memo(forwardRef(function Image(
       alt={altText}
       loading={lazyLoad ? "lazy" : "eager"}
       className={cx(
-        "xmlui-imageRoot",
-        inline ? "xmlui-imageInline" : undefined,
-        grayscale ? "xmlui-imageGrayscale" : undefined,
-        onClick ? "xmlui-imageClickable" : undefined,
+        styles["xmlui-imageRoot"],
+        inline ? styles["xmlui-imageInline"] : undefined,
+        grayscale ? styles["xmlui-imageGrayscale"] : undefined,
+        onClick ? styles["xmlui-imageClickable"] : undefined,
         rest.className,
       )}
       style={{
@@ -90,7 +91,7 @@ export const Image = memo(forwardRef(function Image(
   );
 
   return inline ? (
-    <span className="xmlui-imageInlineWrapper">
+    <span className={styles["xmlui-imageInlineWrapper"]}>
       {imageElement}
     </span>
   ) : imageElement;

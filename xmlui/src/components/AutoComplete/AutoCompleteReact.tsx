@@ -11,7 +11,7 @@ import {
 } from "react";
 
 import { defaultProps } from "./AutoComplete.defaults";
-import styles from "./AutoComplete.module.scss?xmlui-css-module";
+import styles from "./AutoComplete.module.scss";
 
 export type AutoCompleteOption = {
   value: unknown;

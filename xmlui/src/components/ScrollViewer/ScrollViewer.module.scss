@@ -1,9 +1,6 @@
-@use "../../component-core/theming/themes" as t;
-
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
-  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
-  @return t.getThemeVar($themeVars, $componentVariable);
+  @return var(--xmlui-#{$componentVariable});
 }
 
 $size-Scroller: createThemeVar("size-Scroller");
@@ -83,5 +80,5 @@ $autoHideDelay-whenScrolling-Scroller: createThemeVar("autoHideDelay-whenScrolli
 }
 
 :export {
-  themeVars: t.json-stringify($themeVars);
+  themeVars: "";
 }

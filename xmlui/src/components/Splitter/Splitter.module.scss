@@ -1,6 +1,6 @@
 // Splitter.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old Splitter component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -111,5 +111,5 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-Split
 }
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }

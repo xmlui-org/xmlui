@@ -1,6 +1,6 @@
 // StickySection.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old StickySection component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -23,5 +23,5 @@ $zIndex-StickySection: createThemeVar("zIndex-StickySection");
 }
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }

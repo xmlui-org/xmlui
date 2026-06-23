@@ -1,6 +1,6 @@
 import { memo, type CSSProperties } from "react";
 
-import styles from "./TreeDisplay.module.scss?xmlui-css-module";
+import styles from "./TreeDisplay.module.scss";
 
 export type TreeDisplayProps = {
   content?: string;

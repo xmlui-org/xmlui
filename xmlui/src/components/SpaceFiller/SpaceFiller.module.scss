@@ -1,10 +1,10 @@
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

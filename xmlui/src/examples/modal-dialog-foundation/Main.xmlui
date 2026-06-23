@@ -1,0 +1,17 @@
+<App var.count="{0}" var.state="{'closed'}">
+  <H1>ModalDialog foundation</H1>
+  <Button onClick="modal.open({ message: 'Hello from open()' })">Open modal</Button>
+  <Text>Modal state: {state}</Text>
+  <ModalDialog
+    id="modal"
+    title="Example modal"
+    onOpen="state = 'open'"
+    onClose="state = 'closed'">
+    <Text>{$param.message}</Text>
+    <Text>Count: {count}</Text>
+    <HStack gap="$space-3">
+      <Button onClick="count++">Increment</Button>
+      <Button onClick="modal.close()">Close modal</Button>
+    </HStack>
+  </ModalDialog>
+</App>

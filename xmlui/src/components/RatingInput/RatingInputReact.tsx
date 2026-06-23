@@ -2,18 +2,7 @@ import type { CSSProperties, FocusEvent } from "react";
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./RatingInput.defaults";
-
-const styles = {
-  ratingInputDisabled: "ratingInputDisabled",
-  ratingInputError: "ratingInputError",
-  ratingInputPlaceholder: "ratingInputPlaceholder",
-  ratingInputReadOnly: "ratingInputReadOnly",
-  ratingInputRoot: "ratingInputRoot",
-  ratingInputStar: "ratingInputStar",
-  ratingInputStarActive: "ratingInputStarActive",
-  ratingInputValid: "ratingInputValid",
-  ratingInputWarning: "ratingInputWarning",
-} as const;
+import styles from "./RatingInput.module.scss";
 
 export type RatingInputApi = {
   focus: () => void;

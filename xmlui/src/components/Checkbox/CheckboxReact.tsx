@@ -4,26 +4,7 @@ import { forwardRef, memo, useId, useImperativeHandle } from "react";
 import { defaultProps } from "./Checkbox.defaults";
 import type { CheckboxValidationStatus } from "./checkbox-abstractions";
 import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
-
-const styles = {
-  checkboxError: "checkboxError",
-  checkboxContainer: "checkboxcontainer",
-  checkboxLabel: "checkboxLabel",
-  checkboxLabelBreak: "checkboxLabelBreak",
-  checkboxLabeledItem: "checkboxLabeledItem",
-  checkboxLabelPositionAfter: "checkboxLabelPositionAfter",
-  checkboxLabelPositionBefore: "checkboxLabelPositionBefore",
-  checkboxLabelPositionBottom: "checkboxLabelPositionBottom",
-  checkboxLabelPositionEnd: "checkboxLabelPositionEnd",
-  checkboxLabelPositionStart: "checkboxLabelPositionStart",
-  checkboxLabelPositionTop: "checkboxLabelPositionTop",
-  checkboxLabelRequired: "checkboxLabelRequired",
-  checkboxRoot: "checkboxRoot",
-  checkboxSuccess: "checkboxSuccess",
-  checkboxTemplateInputContainer: "checkboxTemplateInputContainer",
-  checkboxTemplateLabel: "checkboxTemplateLabel",
-  checkboxWarning: "checkboxWarning",
-} as const;
+import styles from "./Checkbox.module.scss";
 
 export type CheckboxApi = {
   focus: () => void;
@@ -177,7 +158,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       data-xmlui-part="input"
       data-xmlui-id={id}
       data-testid={effectiveTestId}
-      className={cx(styles.checkboxContainer, styles.checkboxLabeledItem, labelPositionClass(labelPosition), className)}
+      className={cx(styles.container, styles.checkboxLabeledItem, labelPositionClass(labelPosition), className)}
       style={style}
       dir={direction}
     >

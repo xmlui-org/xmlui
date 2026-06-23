@@ -1,7 +1,7 @@
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { defaultProps } from "./List.defaults";
-import styles from "./List.module.scss?xmlui-css-module";
+import styles from "./List.module.scss";
 
 export type ListApi = {
   scrollToTop: () => void;

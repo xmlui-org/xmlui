@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -14,7 +14,7 @@ $fontSize-Select: createThemeVar("fontSize-Select");
 $boxShadow-Select: createThemeVar("boxShadow-Select");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

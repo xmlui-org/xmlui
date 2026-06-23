@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -32,7 +32,7 @@ $outlineStyle-RadioGroupOption--focus: createThemeVar("Input:outlineStyle-RadioG
 $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-RadioGroupOption--focus");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

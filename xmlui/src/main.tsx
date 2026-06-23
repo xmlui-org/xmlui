@@ -3,48 +3,6 @@ import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/com
 import { createXmluiModule } from "./runtime";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import "./global.css";
-import "./components/Accordion/Accordion.module.scss?xmlui-css-module";
-import "./components/HtmlTags/HtmlTags.module.scss?xmlui-css-module";
-import "./components/IFrame/IFrame.module.scss?xmlui-css-module";
-import "./components/Image/Image.module.scss?xmlui-css-module";
-import "./components/CodeBlock/CodeBlock.module.scss?xmlui-css-module";
-import "./components/ContentSeparator/ContentSeparator.module.scss?xmlui-css-module";
-import "./components/List/List.module.scss?xmlui-css-module";
-import "./components/Link/Link.module.scss?xmlui-css-module";
-import "./components/NoResult/NoResult.module.scss?xmlui-css-module";
-import "./components/QRCode/QRCode.module.scss?xmlui-css-module";
-import "./components/ResponsiveBar/ResponsiveBar.module.scss?xmlui-css-module";
-import "./components/ScrollViewer/ScrollViewer.module.scss?xmlui-css-module";
-import "./components/SpaceFiller/SpaceFiller.module.scss?xmlui-css-module";
-import "./components/Splitter/Splitter.module.scss?xmlui-css-module";
-import "./components/StickyBox/StickyBox.module.scss?xmlui-css-module";
-import "./components/StickySection/StickySection.module.scss?xmlui-css-module";
-import "./components/Stack/Stack.module.scss?xmlui-css-module";
-import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
-import "./components/TextArea/TextArea.module.scss?xmlui-css-module";
-import "./components/NumberBox/NumberBox.module.scss?xmlui-css-module";
-import "./components/Checkbox/Checkbox.module.scss?xmlui-css-module";
-import "./components/Switch/Switch.module.scss?xmlui-css-module";
-import "./components/RatingInput/RatingInput.module.scss?xmlui-css-module";
-import "./components/Slider/Slider.module.scss?xmlui-css-module";
-import "./components/ColorPicker/ColorPicker.module.scss?xmlui-css-module";
-import "./components/DateInput/DateInput.module.scss?xmlui-css-module";
-import "./components/DatePicker/DatePicker.module.scss?xmlui-css-module";
-import "./components/AutoComplete/AutoComplete.module.scss?xmlui-css-module";
-import "./components/Card/Card.module.scss?xmlui-css-module";
-import "./components/FileInput/FileInput.module.scss?xmlui-css-module";
-import "./components/FileUploadDropZone/FileUploadDropZone.module.scss?xmlui-css-module";
-import "./components/FlowLayout/FlowLayout.module.scss?xmlui-css-module";
-import "./components/Pagination/Pagination.module.scss?xmlui-css-module";
-import "./components/RadioGroup/RadioGroup.module.scss?xmlui-css-module";
-import "./components/Select/Select.module.scss?xmlui-css-module";
-import "./components/Stack/Stack.module.scss?xmlui-css-module";
-import "./components/Table/Table.module.scss?xmlui-css-module";
-import "./components/TableOfContents/TableOfContents.module.scss?xmlui-css-module";
-import "./components/TileGrid/TileGrid.module.scss?xmlui-css-module";
-import "./components/TimeInput/TimeInput.module.scss?xmlui-css-module";
-import "./components/Tree/TreeComponent.module.scss?xmlui-css-module";
-import "./components/TreeDisplay/TreeDisplay.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -62,6 +20,7 @@ import buttonCompatibilityApp from "./examples/button-compatibility/Main.xmlui";
 import codeBlockFoundationApp from "./examples/code-block-foundation/Main.xmlui";
 import generatedOutputApp from "./examples/generated-output/Main.xmlui";
 import emptyFallbackStatesApp from "./examples/empty-fallback-states/Main.xmlui";
+import expandableItemFoundationApp from "./examples/expandable-item-foundation/Main.xmlui";
 import separatorSpacingApp from "./examples/separator-spacing/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
@@ -114,6 +73,8 @@ import sliderFoundationApp from "./examples/slider-foundation/Main.xmlui";
 import colorPickerFoundationApp from "./examples/color-picker-foundation/Main.xmlui";
 import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui";
 import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlui";
+import drawerFoundationApp from "./examples/drawer-foundation/Main.xmlui";
+import modalDialogFoundationApp from "./examples/modal-dialog-foundation/Main.xmlui";
 import cardFoundationApp from "./examples/card-foundation/Main.xmlui";
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
 import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
@@ -121,6 +82,7 @@ import flowTileFoundationApp from "./examples/flow-tile-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import stackFamilyFoundationApp from "./examples/stack-family-foundation/Main.xmlui";
 import tableFoundationApp from "./examples/table-foundation/Main.xmlui";
+import tabsFoundationApp from "./examples/tabs-foundation/Main.xmlui";
 import treeFamilyFoundationApp from "./examples/tree-family-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
@@ -153,6 +115,7 @@ const examples = {
   codeBlockFoundation: codeBlockFoundationApp,
   generatedOutput: generatedOutputApp,
   emptyFallbackStates: emptyFallbackStatesApp,
+  expandableItemFoundation: expandableItemFoundationApp,
   separatorSpacing: separatorSpacingApp,
   components: componentCounterApp,
   dataSourceMock: dataSourceMockApp,
@@ -206,6 +169,8 @@ const examples = {
   colorPickerFoundation: colorPickerFoundationApp,
   dateInputFoundation: dateInputFoundationApp,
   datePickerFoundation: datePickerFoundationApp,
+  drawerFoundation: drawerFoundationApp,
+  modalDialogFoundation: modalDialogFoundationApp,
   cardFoundation: cardFoundationApp,
   fileInputFoundation: fileInputFoundationApp,
   fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
@@ -213,6 +178,7 @@ const examples = {
   timeInputFoundation: timeInputFoundationApp,
   stackFamilyFoundation: stackFamilyFoundationApp,
   tableFoundation: tableFoundationApp,
+  tabsFoundation: tabsFoundationApp,
   treeFamilyFoundation: treeFamilyFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,

@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -15,7 +15,7 @@ $backgroundColor-item-AutoComplete--hover: createThemeVar("backgroundColor-item-
 $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-AutoComplete--disabled");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

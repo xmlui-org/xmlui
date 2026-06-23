@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -15,7 +15,7 @@ $backgroundColor-dropping-FileUploadDropZone: createThemeVar("backgroundColor-dr
 $opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploadDropZone");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

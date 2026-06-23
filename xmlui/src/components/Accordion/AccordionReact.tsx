@@ -2,11 +2,8 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 
 import { AccordionContext } from "./AccordionContext";
+import styles from "./Accordion.module.scss";
 import { defaultProps } from "./Accordion.defaults";
-
-const styles = {
-  root: "root",
-};
 
 export type AccordionProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
   children?: ReactNode;

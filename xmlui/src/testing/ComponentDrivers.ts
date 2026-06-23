@@ -120,6 +120,58 @@ export class ResponsiveBarDriver extends ComponentDriver {
 
 export class AccordionDriver extends ComponentDriver {}
 
+export class ModalDialogDriver extends ComponentDriver {
+  get titlePart(): Locator {
+    return this.getByPartName("title");
+  }
+}
+
+export class ExpandableItemDriver extends ComponentDriver {
+  getSummary(): Locator {
+    return this.getByPartName("summary");
+  }
+
+  getSummaryContent(): Locator {
+    return this.component.locator(".summaryContent").first();
+  }
+
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  getIcon(): Locator {
+    return this.component.locator(".icon svg, .icon").first();
+  }
+
+  getSwitch(): Locator {
+    return this.component.getByRole("switch").or(this.component.locator(".switchControl")).first();
+  }
+
+  async isExpanded(): Promise<boolean> {
+    return this.getContent().isVisible();
+  }
+
+  async isDisabled(): Promise<boolean> {
+    return this.component.evaluate((element) => String(element.className).includes("disabled"));
+  }
+
+  async expand() {
+    if (!(await this.isExpanded())) {
+      await this.getSummary().click();
+    }
+  }
+
+  async collapse() {
+    if (await this.isExpanded()) {
+      await this.getSummary().click();
+    }
+  }
+
+  async toggle() {
+    await this.getSummary().click();
+  }
+}
+
 export class SplitterDriver extends ComponentDriver {
   getResizer(): Locator {
     return this.component.locator('[data-xmlui-part="resizer"], .resizer').first();

@@ -2865,9 +2865,174 @@ Visual check:
   Sticky components. Restore direct SCSS source extraction when the config-time
   loader path is fixed.
 
-Next explicit step: Phase 5 Wave D3B - migrate `ExpandableItem` foundation
-against old metadata, SCSS, docs, copied old E2E tests, a running foundation
-test, and a visual sample.
+Slice completed: Phase 5 Wave D3B - `ExpandableItem` foundation.
+
+Done:
+
+- copied the old `ExpandableItem` docs and E2E suite into the new component
+  folder;
+- added `ExpandableItem` metadata in `ExpandableItem.tsx`, defaults, React
+  renderer, SCSS, compiler/runtime registry wiring, and test driver support;
+- added a foundation E2E suite covering summary click toggling,
+  `expandedChange` state mutation, summary property templates, and updates
+  inside expanded content;
+- added a visual sample at
+  `xmlui/src/examples/expandable-item-foundation/Main.xmlui`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/ExpandableItem`
+  passed with 3 passed and 59 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3763 tests in 109
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=expandableItemFoundation`.
+
+`ExpandableItem` compatibility debt:
+
+- the literal old `ExpandableItem.spec.ts` suite is copied but intentionally
+  skipped until full icon, switch, API, theme-variable, layout, form, behavior,
+  and accessibility parity is migrated;
+- current icon rendering uses textual icon names as a foundation substitute and
+  must be replaced with the migrated XMLUI icon pipeline;
+- current `withSwitch` rendering uses a minimal visual switch substitute rather
+  than the old `Toggle` component. Revisit after `Toggle` is migrated;
+- `contentWidth` is emitted as a dynamic inline layout style, matching the old
+  component's dynamic width behavior. Keep visual styling in SCSS and revisit
+  only if a class-based theme-part solution becomes available;
+- theme-variable metadata currently uses a small source string duplicated from
+  the SCSS declarations, matching the current workaround used by other migrated
+  components. Restore direct SCSS source extraction when the config-time loader
+  path is fixed.
+
+Slice completed: Phase 5 Wave D3C - `Tabs` foundation.
+
+Done:
+
+- copied the old `Tabs` and `TabItem` docs and the old `Tabs` E2E suite into
+  the new component folder;
+- added `Tabs` and `TabItem` metadata in `Tabs.tsx`, defaults, context, React
+  renderers, SCSS, compiler/runtime registry wiring, and dev-server sample
+  wiring;
+- added a foundation E2E suite covering tab switching, `didChange` state
+  mutation, `TabItem` `headerTemplate`, and data updates inside active tab
+  content;
+- added a visual sample at `xmlui/src/examples/tabs-foundation/Main.xmlui`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Tabs` passed with
+  3 passed and 68 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3834 tests in 111
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=tabsFoundation`.
+
+`Tabs` compatibility debt:
+
+- the literal old `Tabs.spec.ts` suite is copied but intentionally skipped
+  until Radix-level keyboard navigation, roving focus, dynamic tab lists,
+  accordion view ordering, global `headerTemplate` with `$header` context,
+  `keepMounted` defaults inside `Form`, full APIs, theme-variable coverage,
+  and context-menu parity are migrated;
+- `TabsForm` is intentionally not part of this slice. It remains listed in the
+  form-related wave;
+- this foundation uses native React state and ARIA roles rather than
+  `@radix-ui/react-tabs`. Revisit whether to keep this implementation or
+  restore Radix-compatible behavior before re-enabling the old suite;
+- tab order currently follows child registration order, which is enough for
+  static TabItem children. Dynamic `Items`-generated tabs need explicit parity
+  work before the old dynamic tab tests are enabled;
+- theme-variable metadata currently uses a small source string duplicated from
+  the SCSS declarations, matching the current workaround used by other migrated
+  components. Restore direct SCSS source extraction when the config-time loader
+  path is fixed.
+
+Completed: Phase 5 Wave D4A - `Drawer` foundation.
+
+Added:
+
+- migrated `Drawer` source folder with metadata in `Drawer.tsx`, defaults,
+  SCSS module, React renderer, copied documentation, copied old E2E suite, and
+  a focused foundation E2E suite;
+- compiler/runtime wiring for the `Drawer` component, including event
+  attributes (`open`, `close`) and component APIs (`open`, `close`, `isOpen`);
+- a visual sample available with `npm run dev` at
+  `?example=drawerFoundation`.
+
+Verified:
+
+- focused `Drawer` E2E suite passes with foundation coverage and the copied old
+  compatibility suite intentionally skipped until full overlay parity lands;
+- unit tests, TypeScript build checks, and E2E test discovery should remain
+  part of every overlay slice.
+
+`Drawer` compatibility debt:
+
+- the literal old `Drawer.spec.ts` suite is copied but intentionally skipped
+  until Radix Dialog parity, portal stacking, focus trapping/restoration,
+  animation, click-away details, child portal behavior, scroll/overflow lock,
+  and complete theme-variable coverage are migrated;
+- this foundation uses a local fixed-position overlay rather than the old
+  Radix-backed dialog pipeline. Revisit the implementation before re-enabling
+  the old suite;
+- the close affordance is a simple accessible button. Replace it with the
+  migrated icon pipeline when icon/button visual parity is complete;
+- header templates are supported for static property children, but advanced
+  template context behavior still needs old-suite-driven migration.
+
+Completed: Phase 5 Wave D4B - `ModalDialog` foundation.
+
+Added:
+
+- migrated `ModalDialog` source folder with metadata in `ModalDialog.tsx`,
+  defaults, SCSS module, React renderer, copied documentation, copied old E2E
+  suite, and a focused foundation E2E suite;
+- compiler/runtime wiring for the `ModalDialog` component, including event
+  attributes (`open`, `close`) and component APIs (`open`, `close`, `isOpen`);
+- a visual sample available with `npm run dev` at
+  `?example=modalDialogFoundation`;
+- a `createModalDialogDriver` test fixture so copied old tests can be collected
+  literally while intentionally skipped.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npx playwright test src/components/ModalDialog/ModalDialog.foundation.spec.ts src/components/ModalDialog/ModalDialog.spec.ts`
+  from `xmlui/`: 4 foundation tests passed, 31 copied old tests skipped.
+
+`ModalDialog` compatibility debt:
+
+- the literal old `ModalDialog.spec.ts` suite is copied but intentionally
+  skipped until Radix Dialog parity, portal stacking, focus trapping,
+  restoration, animation, click-away behavior, child portal behavior,
+  Form integration, `onClose` cancellation semantics, direct-child
+  `var`/`$param` context behavior, and complete theme-variable coverage are
+  migrated;
+- this foundation uses a local fixed-position overlay rather than the old
+  Radix-backed dialog pipeline. Revisit the implementation before re-enabling
+  the old suite;
+- the close affordance is a simple accessible button. Replace it with the
+  migrated icon/button visual pipeline when icon/button visual parity is
+  complete;
+- `when` currently relies on the generic conditional renderer to open the modal
+  on first mount. Old declarative open/close parity must be restored before
+  enabling the copied declarative tests.
+
+Next explicit step: Phase 5 Wave D4C - migrate `Tooltip` foundation against old
+metadata, SCSS, docs, copied old E2E tests, a running foundation test, and a
+visual sample.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 
@@ -3229,6 +3394,202 @@ Exit criteria:
   and expected artifacts as the old framework.
 
 ## 16. Condensed Execution Checklist
+
+### CSS Module Import Pattern Restoration
+
+The original XMLUI component renderers import their stylesheet modules directly,
+for example `import styles from "./Button.module.scss"`. The rewrite's interim
+literal class-name maps are compatibility debt: they increase the risk of class
+collisions, hide missing CSS-module build behavior, and make component files
+visually drift from the original source organization.
+
+Pause normal component-wave migration here and restore the direct SCSS module
+import pattern before continuing with the next rebuild step. Use a frugal,
+script-assisted process so the work is mostly mechanical and reviewable.
+
+Known E2E baseline before starting this repair:
+
+- `Slider.spec.ts`: disabled theme-variable test fails.
+- `StickySection.foundation.spec.ts`: native sticky positioning test fails.
+- `TimeInput.spec.ts`: 33 theme-variable tests fail across warning, error, and
+  success validation states.
+
+Do not count those failures as regressions introduced by this repair unless
+their failure shape changes. Any new failing E2E test introduced by a style
+import batch must be fixed before moving to the next batch.
+
+Repair execution plan:
+
+1. Create a dry-run audit script.
+
+   The script must inspect `xmlui/src/components/**/**React.tsx` and classify
+   each renderer into:
+
+   - direct import: already uses `import styles from "./Component.module.scss"`;
+   - custom query import: uses `?xmlui-css-module`;
+   - literal map: uses `const styles = { ... }`;
+   - no stylesheet import;
+   - unsafe/manual: ambiguous style usage.
+
+   The script must also compare literal-map values with class selectors present
+   in the component SCSS file and report whether the conversion can be
+   automatic. It must not modify files in this step.
+
+   Verification after Step 1:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite and confirms the only failures are the
+     known baseline failures listed above.
+
+2. Add a safe apply mode to the script.
+
+   The apply mode may only:
+
+   - rewrite `import styles from "./Component.module.scss?xmlui-css-module"` to
+     `import styles from "./Component.module.scss"`;
+   - replace a literal `const styles = { ... }` map with a direct SCSS import
+     when every referenced class exists in the component SCSS module;
+   - leave all ambiguous components untouched and report them.
+
+   The script must write a concise report listing converted, skipped, and
+   manually-required components. The report can be temporary unless a useful
+   finding belongs in `.ai/`.
+
+   Verification after Step 2:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite and confirms no new failures beyond the
+     known baseline failures.
+
+3. Apply Batch A: custom-query import components.
+
+   Target components:
+
+   - `AutoComplete`, `Icon`, `List`, `Logo`, `Pagination`, `RadioGroup`,
+     `Select`, `Stack`, `Table`, `TableOfContents`, `Text`, `Tree`,
+     `TreeDisplay`.
+
+   These already import a style object, but through the rewrite-only
+   `?xmlui-css-module` bridge. They should be the lowest-risk broad batch after
+   `Button` and `Heading`.
+
+   Verification after Batch A:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - If failures appear outside the known baseline, fix them before continuing.
+
+4. Apply Batch B: simple visual/no-data components.
+
+   Target components when the audit says they are safe:
+
+   - `ContentSeparator`, `IFrame`, `Image`, `NoResult`, `QRCode`,
+     `SpaceFiller`, and any other simple component whose literal map exactly
+     matches its SCSS module.
+
+   June 23, 2026 note: an initial attempt to convert these six components
+   showed that their SCSS files are Sass-heavy and were reachable during
+   config/test startup through metadata imports. The fix was to keep metadata
+   in `Component.tsx`, move runtime renderer exports into source-adjacent
+   `Component.renderer.tsx` files, and update the runtime registry to import
+   renderers from those files. After that boundary split, Batch B converted
+   successfully.
+
+   Verification after Batch B:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Fix any new failures before continuing.
+
+5. Apply Batch C: layout components.
+
+   Target components when the audit says they are safe:
+
+   - `Card`, `FlowLayout`, `ScrollViewer`, `Splitter`, `StickyBox`,
+     `StickySection`, `TileGrid`.
+
+   This batch may affect geometry-sensitive tests. Run focused layout E2E tests
+   before the full suite if a failure is suspected, but the full suite remains
+   required before closing the batch.
+
+   Verification after Batch C:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Fix any new failures before continuing.
+
+6. Fix compiler/config-time renderer reachability.
+
+   Before converting form/input/data components, ensure compiler metadata and
+   Vite config loading do not pull renderer files that import SCSS. Prefer a
+   metadata-only import boundary that still preserves the old component source
+   organization as much as possible. The goal is that normal Vite CSS-module
+   handling, not config bundling, owns `*.module.scss` imports.
+
+   Verification after Step 6:
+
+   - Run TypeScript/unit tests.
+   - Run focused smoke E2E for `DateInput` and another form/input component.
+   - The user runs the full E2E suite.
+
+7. Apply Batch D: form/input/data components.
+
+   Target components:
+
+   - `Checkbox`, `ColorPicker`, `DateInput`, `DatePicker`, `FileInput`,
+     `FileUploadDropZone`, `NumberBox`, `RatingInput`, `Slider`, `Switch`,
+     `TextArea`, `TextBox`, `TimeInput`, plus `AutoComplete`, `RadioGroup`,
+     `Select`, and `Option` if not already converted safely in Batch A.
+
+   This batch must include the existing known failures in its acceptance
+   criteria. If the style import repair also fixes the `Slider` or `TimeInput`
+   baseline failures, update this baseline and record the finding.
+
+   Verification after Batch D:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - No failing style/theme tests may be left untriaged.
+
+8. Apply Batch E: composite/overlay/navigation components.
+
+   Target components:
+
+   - `Accordion`, `Drawer`, `ExpandableItem`, `ResponsiveBar`, `Tabs`, and the
+     next overlay/navigation components as they are migrated.
+
+   Verification after Batch E:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Fix any new failures before resuming normal component-wave migration.
+
+9. Remove obsolete bridge usage.
+
+   After all migrated components use direct SCSS module imports:
+
+   - remove now-unused `?xmlui-css-module` runtime imports from `main.tsx`;
+   - remove or narrow the `rawScssModulePlugin` CSS-module behavior if it is no
+     longer needed for runtime component styling;
+   - keep theme-variable extraction support only where metadata generation
+     still requires raw SCSS source;
+   - update `.ai/` notes with the final convention.
+
+   Final verification:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Resume the next explicit rebuild step only after the style import repair
+     has no untriaged E2E regressions.
+
+Trial evidence on June 23, 2026:
+
+- `Button` smoke E2E passed with direct `Button.module.scss` import.
+- `Heading` smoke E2E passed with direct `Heading.module.scss` import.
+- `DateInput` direct import was attempted and intentionally backed out because
+  the compiler/config import graph still reaches `DateInputReact.tsx`; the
+  component remains on the deferred form/input list until that boundary is
+  corrected.
 
 1. Maintain and refine the compatibility inventory and debt log created by
    Experiment 15.

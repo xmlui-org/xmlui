@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { defaultProps } from "./Text.defaults";
-import styles from "./Text.module.scss?xmlui-css-module";
+import styles from "./Text.module.scss";
 
 export const textVariantElement = {
   abbr: "abbr",

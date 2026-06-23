@@ -1,6 +1,6 @@
 // Accordion.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old Accordion component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -109,5 +109,5 @@ $height-icon-Accordion: createThemeVar("height-icon-Accordion");
 }
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }

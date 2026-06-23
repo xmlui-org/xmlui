@@ -2,14 +2,7 @@ import type { ClipboardEvent, CSSProperties, DragEvent, ReactNode } from "react"
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { defaultProps } from "./FileUploadDropZone.defaults";
-
-const styles = {
-  fileUploadDropZoneDropping: "fileUploadDropZoneDropping",
-  fileUploadDropZoneIcon: "fileUploadDropZoneIcon",
-  fileUploadDropZoneInput: "fileUploadDropZoneInput",
-  fileUploadDropZonePlaceholder: "fileUploadDropZonePlaceholder",
-  fileUploadDropZoneRoot: "fileUploadDropZoneRoot",
-} as const;
+import styles from "./FileUploadDropZone.module.scss";
 
 export type FileUploadDropZoneApi = {
   open: () => void;

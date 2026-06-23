@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -107,7 +107,7 @@ $minHeight-DateInput: createThemeVar("minHeight-DateInput");
 $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {
@@ -153,7 +153,7 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     border-color: var(--xmlui-borderColor-DateInput-CustomVariant);
   }
 
-  .dateInputWrapper.error {
+  .dateInputWrapper.dateInputError {
     border-radius: var(--xmlui-borderRadius-DateInput--error);
     border-color: var(--xmlui-borderColor-DateInput--error);
     border-width: var(--xmlui-borderWidth-DateInput--error);
@@ -164,14 +164,14 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     font-size: var(--xmlui-fontSize-DateInput--error);
   }
 
-  .dateInputWrapper.error:hover {
+  .dateInputWrapper.dateInputError:hover {
     border-color: var(--xmlui-borderColor-DateInput--error--hover);
     background-color: var(--xmlui-backgroundColor-DateInput--error--hover);
     box-shadow: var(--xmlui-boxShadow-DateInput--error--hover);
     color: var(--xmlui-textColor-DateInput--error--hover);
   }
 
-  .dateInputWrapper.error:focus-within {
+  .dateInputWrapper.dateInputError:focus-within {
     border-color: var(--xmlui-borderColor-DateInput--error--focus);
     background-color: var(--xmlui-backgroundColor-DateInput--error--focus);
     box-shadow: var(--xmlui-boxShadow-DateInput--error--focus);
@@ -182,7 +182,7 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     outline-offset: var(--xmlui-outlineOffset-DateInput--error--focus);
   }
 
-  .dateInputWrapper.warning {
+  .dateInputWrapper.dateInputWarning {
     border-radius: var(--xmlui-borderRadius-DateInput--warning);
     border-color: var(--xmlui-borderColor-DateInput--warning);
     border-width: var(--xmlui-borderWidth-DateInput--warning);
@@ -193,14 +193,14 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     font-size: var(--xmlui-fontSize-DateInput--warning);
   }
 
-  .dateInputWrapper.warning:hover {
+  .dateInputWrapper.dateInputWarning:hover {
     border-color: var(--xmlui-borderColor-DateInput--warning--hover);
     background-color: var(--xmlui-backgroundColor-DateInput--warning--hover);
     box-shadow: var(--xmlui-boxShadow-DateInput--warning--hover);
     color: var(--xmlui-textColor-DateInput--warning--hover);
   }
 
-  .dateInputWrapper.warning:focus-within {
+  .dateInputWrapper.dateInputWarning:focus-within {
     border-color: var(--xmlui-borderColor-DateInput--warning--focus);
     background-color: var(--xmlui-backgroundColor-DateInput--warning--focus);
     box-shadow: var(--xmlui-boxShadow-DateInput--warning--focus);
@@ -211,7 +211,7 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     outline-offset: var(--xmlui-outlineOffset-DateInput--warning--focus);
   }
 
-  .dateInputWrapper.valid {
+  .dateInputWrapper.dateInputValid {
     border-radius: var(--xmlui-borderRadius-DateInput--success);
     border-color: var(--xmlui-borderColor-DateInput--success);
     border-width: var(--xmlui-borderWidth-DateInput--success);
@@ -222,14 +222,14 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     font-size: var(--xmlui-fontSize-DateInput--success);
   }
 
-  .dateInputWrapper.valid:hover {
+  .dateInputWrapper.dateInputValid:hover {
     border-color: var(--xmlui-borderColor-DateInput--success--hover);
     background-color: var(--xmlui-backgroundColor-DateInput--success--hover);
     box-shadow: var(--xmlui-boxShadow-DateInput--success--hover);
     color: var(--xmlui-textColor-DateInput--success--hover);
   }
 
-  .dateInputWrapper.valid:focus-within {
+  .dateInputWrapper.dateInputValid:focus-within {
     border-color: var(--xmlui-borderColor-DateInput--success--focus);
     background-color: var(--xmlui-backgroundColor-DateInput--success--focus);
     box-shadow: var(--xmlui-boxShadow-DateInput--success--focus);
@@ -240,7 +240,7 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     outline-offset: var(--xmlui-outlineOffset-DateInput--success--focus);
   }
 
-  .dateInputWrapper.disabled {
+  .dateInputWrapper.dateInputDisabled {
     opacity: var(--xmlui-opacity-DateInput--disabled);
     background-color: var(--xmlui-backgroundColor-DateInput--disabled);
     color: var(--xmlui-textColor-DateInput--disabled);
@@ -248,15 +248,19 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     pointer-events: none;
   }
 
-  .wrapper,
-  .inputGroup {
+  .dateInputWrapper.dateInputReadOnly {
+    cursor: default;
+  }
+
+  .dateInputInnerWrapper,
+  .dateInputInputGroup {
     display: inline-flex;
     align-items: center;
     flex: 0 0 auto;
     min-width: 0;
   }
 
-  .divider {
+  .dateInputDivider {
     display: inline-block;
     padding: var(--xmlui-spacing-divider-DateInput);
     color: var(--xmlui-color-divider-DateInput);
@@ -264,7 +268,7 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     white-space: pre;
   }
 
-  .input {
+  .dateInputInput {
     min-width: var(--xmlui-minWidth-input-DateInput);
     height: 100%;
     padding: var(--xmlui-padding-input-DateInput);
@@ -278,33 +282,33 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     appearance: textfield;
   }
 
-  .input:focus {
+  .dateInputInput:focus {
     outline: none;
   }
 
-  .input.day,
-  .input.month {
+  .dateInputInput.dateInputDay,
+  .dateInputInput.dateInputMonth {
     width: 2.5ch;
     min-width: 2.5ch;
     max-width: 2.5ch;
   }
 
-  .input.year {
+  .dateInputInput.dateInputYear {
     width: 4.5ch;
     min-width: 4.5ch;
     max-width: 4.5ch;
   }
 
-  .input.invalid {
+  .dateInputInput.dateInputInvalid {
     background-color: var(--xmlui-backgroundColor-input-DateInput-invalid);
   }
 
-  .selectAllActive .input {
+  .dateInputSelectAllActive .dateInputInput {
     background-color: Highlight;
     color: HighlightText;
   }
 
-  .clearButton {
+  .dateInputClearButton {
     border: 0;
     padding: var(--xmlui-padding-button-DateInput);
     border-radius: var(--xmlui-borderRadius-button-DateInput);
@@ -313,24 +317,24 @@ $gap-adornment-DateInput: createThemeVar("gap-adornment-DateInput");
     cursor: pointer;
   }
 
-  .clearButton:hover {
+  .dateInputClearButton:hover {
     color: var(--xmlui-hoverColor-button-DateInput);
   }
 
-  .clearButton:focus {
+  .dateInputClearButton:focus {
     outline-style: solid;
     outline-width: var(--xmlui-outlineWidth-button-DateInput--focused);
     outline-color: var(--xmlui-outlineColor-button-DateInput--focused);
     outline-offset: var(--xmlui-outlineOffset-button-DateInput--focused);
   }
 
-  .clearButton:disabled {
+  .dateInputClearButton:disabled {
     color: var(--xmlui-disabledColor-button-DateInput);
     cursor: not-allowed;
   }
 
-  .adornment,
-  .conciseValidationFeedback {
+  .dateInputAdornment,
+  .dateInputConciseValidationFeedback {
     display: inline-flex;
     align-items: center;
   }

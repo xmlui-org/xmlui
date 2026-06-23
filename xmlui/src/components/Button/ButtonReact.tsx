@@ -2,7 +2,7 @@ import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import { forwardRef, useEffect, useRef } from "react";
 
 import { defaultProps } from "./Button.defaults";
-import styles from "./Button.module.scss?xmlui-css-module";
+import styles from "./Button.module.scss";
 
 export type ButtonProps = {
   id?: string;

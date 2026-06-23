@@ -2,22 +2,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useMemo } from "react";
 
 import { defaultProps, type SplitterResizeMode } from "./Splitter.defaults";
+import styles from "./Splitter.module.scss";
 import { parseSize } from "./utils";
-
-const styles = {
-  splitter: "splitter",
-  splitterHorizontal: "splitterHorizontal",
-  splitterVertical: "splitterVertical",
-  panel: "panel",
-  primaryPanel: "primaryPanel",
-  secondaryPanel: "secondaryPanel",
-  splitterResizer: "splitterResizer",
-  resizerHorizontal: "resizerHorizontal",
-  resizerVertical: "resizerVertical",
-  floatingResizer: "floatingResizer",
-  floatingResizerHorizontal: "floatingResizerHorizontal",
-  floatingResizerVertical: "floatingResizerVertical",
-};
 
 type SplitterProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   children?: ReactNode;

@@ -2,18 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useRef } from "react";
 
 import { defaultProps, type ScrollStyle } from "./ScrollViewer.defaults";
-
-const styles = {
-  wrapper: "wrapper",
-  headerFooterWrapper: "headerFooterWrapper",
-  stickyHeader: "stickyHeader",
-  stickyFooter: "stickyFooter",
-  scrollerFlex: "scrollerFlex",
-  overlay: "overlay",
-  whenMouseOver: "whenMouseOver",
-  whenScrolling: "whenScrolling",
-  showScrollerFade: "showScrollerFade",
-};
+import styles from "./ScrollViewer.module.scss";
 
 export type ScrollViewerProps = {
   className?: string;

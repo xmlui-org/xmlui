@@ -2,7 +2,7 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useRef } from "react";
 
 import { defaultProps } from "./Stack.defaults";
-import styles from "./Stack.module.scss?xmlui-css-module";
+import styles from "./Stack.module.scss";
 
 type StackProps = Omit<HTMLAttributes<HTMLDivElement>, "onClick" | "onContextMenu"> & {
   orientation?: string;

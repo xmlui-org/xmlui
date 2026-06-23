@@ -1,6 +1,6 @@
 // Button.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old Button component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -137,7 +137,7 @@ $outlineStyle-Button--focus: createThemeVar("outlineStyle-Button--focus");
 $outlineOffset-Button--focus: createThemeVar("outlineOffset-Button--focus");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

@@ -11,7 +11,7 @@ import {
 import type React from "react";
 
 import { defaultProps, type PageNumber, type Position } from "./Pagination.defaults";
-import styles from "./Pagination.module.scss?xmlui-css-module";
+import styles from "./Pagination.module.scss";
 
 export type PaginationApi = {
   moveFirst: () => void;

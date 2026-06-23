@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { defaultProps } from "./Heading.defaults";
-import styles from "./Heading.module.scss?xmlui-css-module";
+import styles from "./Heading.module.scss";
 
 export type HeadingLevel = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 

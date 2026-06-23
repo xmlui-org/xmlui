@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -68,7 +68,7 @@ $outlineStyle-Link--focus: createThemeVar("outlineStyle-Link--focus");
 $outlineOffset-Link--focus: createThemeVar("outlineOffset-Link--focus");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {
@@ -229,6 +229,10 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-Link--focus");
     padding-bottom: var(--xmlui-paddingBottom-icon-Link, var(--xmlui-paddingVertical-icon-Link, 0));
     padding-inline-end: var(--xmlui-gap-icon-Link);
     line-height: 0;
+  }
+
+  .linkIconOnly {
+    width: fit-content;
   }
 
   .linkIconMarker {

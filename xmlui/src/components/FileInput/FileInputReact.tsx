@@ -2,23 +2,7 @@ import type { ChangeEvent, CSSProperties, DragEvent, FocusEvent } from "react";
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./FileInput.defaults";
-
-const styles = {
-  fileInputBrowseButton: "fileInputBrowseButton",
-  fileInputButtonEnd: "fileInputButtonEnd",
-  fileInputButtonStart: "fileInputButtonStart",
-  fileInputDisabled: "fileInputDisabled",
-  fileInputError: "fileInputError",
-  fileInputFieldButton: "fileInputFieldButton",
-  fileInputHiddenInput: "fileInputHiddenInput",
-  fileInputIcon: "fileInputIcon",
-  fileInputPlaceholder: "fileInputPlaceholder",
-  fileInputReadOnly: "fileInputReadOnly",
-  fileInputRoot: "fileInputRoot",
-  fileInputText: "fileInputText",
-  fileInputValid: "fileInputValid",
-  fileInputWarning: "fileInputWarning",
-} as const;
+import styles from "./FileInput.module.scss";
 
 export type FileParseResult = {
   file: File;

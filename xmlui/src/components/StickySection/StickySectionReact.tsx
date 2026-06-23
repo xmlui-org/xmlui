@@ -2,12 +2,7 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useEffect, useRef } from "react";
 
 import { defaultProps } from "./StickySection.defaults";
-
-const styles = {
-  stickySection: "stickySection",
-  stickToTop: "stickToTop",
-  stickToBottom: "stickToBottom",
-};
+import styles from "./StickySection.module.scss";
 
 const DATA_ATTR_TOP = "data-sticky-section-top";
 const DATA_ATTR_BOTTOM = "data-sticky-section-bottom";

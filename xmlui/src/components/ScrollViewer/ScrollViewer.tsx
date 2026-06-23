@@ -1,10 +1,5 @@
-import type { CSSProperties } from "react";
-
 import { createMetadata, dComponent } from "../../component-core/metadata/helpers";
-import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import { defaultProps, type ScrollStyle } from "./ScrollViewer.defaults";
-import { ScrollViewer } from "./ScrollViewerReact";
+import { defaultProps } from "./ScrollViewer.defaults";
 
 const COMP = "ScrollViewer";
 const SCROLLER = "Scroller";
@@ -111,23 +106,3 @@ export const ScrollViewerMd = createMetadata({
   },
 });
 
-export const scrollViewerRenderer = wrapComponent({
-  name: COMP,
-  metadata: ScrollViewerMd as ComponentMetadata,
-  renderer: ({ adapter }) => {
-    const rootAttrs = adapter.rootAttrs();
-    return (
-      <ScrollViewer
-        {...rootAttrs}
-        style={rootAttrs.style as CSSProperties}
-        scrollStyle={adapter.stringProp("scrollStyle", defaultProps.scrollStyle) as ScrollStyle}
-        showScrollerFade={adapter.booleanProp("showScrollerFade", defaultProps.showScrollerFade)}
-        header={adapter.renderTemplate("headerTemplate")}
-        footer={adapter.renderTemplate("footerTemplate")}
-        registerComponentApi={adapter.registerApi}
-      >
-        {adapter.renderChildren()}
-      </ScrollViewer>
-    );
-  },
-});

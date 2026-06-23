@@ -1,11 +1,6 @@
-import type { CSSProperties } from "react";
-
 import { createMetadata } from "../../component-core/metadata/helpers";
-import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./StickyBox.defaults";
-import { StickyBox } from "./StickyBoxReact";
 
 const COMP = "StickyBox";
 const stickyBoxStylesSource = `
@@ -34,20 +29,3 @@ export const StickyBoxMd = createMetadata({
   },
 });
 
-export const stickyBoxRenderer = wrapComponent({
-  name: COMP,
-  metadata: StickyBoxMd as ComponentMetadata,
-  renderer: ({ adapter }) => {
-    const rootAttrs = adapter.rootAttrs();
-    const to = adapter.stringProp("to", defaultProps.to);
-    return (
-      <StickyBox
-        {...rootAttrs}
-        style={rootAttrs.style as CSSProperties}
-        to={to === "bottom" ? "bottom" : "top"}
-      >
-        {adapter.renderChildren()}
-      </StickyBox>
-    );
-  },
-});

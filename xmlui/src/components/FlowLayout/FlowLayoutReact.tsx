@@ -1,16 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
 import { defaultProps } from "./FlowLayout.defaults";
-
-const styles = {
-  flowLayout: "flowLayout",
-  item: "item",
-  break: "break",
-  forceBreak: "forceBreak",
-  alignItemsStart: "alignItemsStart",
-  alignItemsCenter: "alignItemsCenter",
-  alignItemsEnd: "alignItemsEnd",
-};
+import styles from "./FlowLayout.module.scss";
 
 export type FlowLayoutProps = {
   className?: string;
@@ -68,7 +59,7 @@ export function FlowItemWrapper({
 }: FlowItemWrapperProps) {
   return (
     <div
-      className={styles.item}
+      className={styles.flowLayoutItem}
       style={{
         "--xmlui-itemWidth-FlowLayout": width ?? itemWidth,
         "--xmlui-minWidth-FlowLayoutItem": minWidth,
@@ -81,7 +72,7 @@ export function FlowItemWrapper({
 }
 
 export function FlowItemBreak() {
-  return <div className={cx(styles.break, styles.forceBreak)} />;
+  return <div className={cx(styles.flowLayoutBreak, styles.flowLayoutForceBreak)} />;
 }
 
 function alignmentClass(value: string): string | undefined {

@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -15,7 +15,7 @@ $outlineStyle-FileInput--focus: createThemeVar("outlineStyle-FileInput--focus");
 $outlineOffset-FileInput--focus: createThemeVar("outlineOffset-FileInput--focus");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

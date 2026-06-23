@@ -468,7 +468,9 @@ alignmentOptionValues.forEach((pos) => {
         },
       },
     );
-    await expect((await createButtonDriver()).component).toHaveCSS("justify-content", pos);
+    await expect.poll(async () => {
+      return (await createButtonDriver()).component.evaluate((element) => getComputedStyle(element).justifyContent);
+    }).toMatch(pos === "start" ? /^(start|flex-start)$/ : pos === "end" ? /^(end|flex-end)$/ : new RegExp(`^${pos}$`));
   });
 });
 

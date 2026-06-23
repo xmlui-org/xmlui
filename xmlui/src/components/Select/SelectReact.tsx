@@ -12,7 +12,7 @@ import {
 } from "react";
 
 import { defaultProps } from "./Select.defaults";
-import styles from "./Select.module.scss?xmlui-css-module";
+import styles from "./Select.module.scss";
 import type { XmluiOption } from "../Option/OptionReact";
 
 export type SelectValue = string | number | Array<string | number> | undefined | null;

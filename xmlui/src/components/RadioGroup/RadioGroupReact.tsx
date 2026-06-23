@@ -12,7 +12,7 @@ import {
 } from "react";
 
 import { defaultProps } from "./RadioGroup.defaults";
-import styles from "./RadioGroup.module.scss?xmlui-css-module";
+import styles from "./RadioGroup.module.scss";
 
 export type RadioGroupOption = {
   value: unknown;

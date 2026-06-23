@@ -2,17 +2,8 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useEffect, useMemo } from "react";
 
 import { useAccordionContext } from "./AccordionContext";
+import styles from "./Accordion.module.scss";
 import { defaultProps } from "./AccordionItem.defaults";
-
-const styles = {
-  item: "item",
-  header: "header",
-  trigger: "trigger",
-  triggerStart: "triggerStart",
-  contentWrapper: "contentWrapper",
-  content: "content",
-  chevron: "chevron",
-};
 
 export type AccordionItemProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "content"> & {
   content?: ReactNode;

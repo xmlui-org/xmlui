@@ -7,9 +7,11 @@ import {
   CodeBlockDriver,
   ComponentDriver,
   ContentSeparatorDriver,
+  ExpandableItemDriver,
   IconDriver,
   LinkDriver,
   ListDriver,
+  ModalDialogDriver,
   NoResultDriver,
   NumberBoxDriver,
   ResponsiveBarDriver,
@@ -45,6 +47,7 @@ type Fixtures = {
   initTestBed: (markup: string, options?: InitTestBedOptions) => Promise<TestBedResult>;
   createButtonDriver: () => Promise<ComponentDriver>;
   createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
+  createExpandableItemDriver: (testId?: string | Locator) => Promise<ExpandableItemDriver>;
   createTextDriver: (testId?: string) => Promise<ComponentDriver>;
   createHeadingDriver: (testId?: string) => Promise<ComponentDriver>;
   createCardDriver: (testId?: string) => Promise<CardDriver>;
@@ -54,6 +57,7 @@ type Fixtures = {
   createResponsiveBarDriver: (testId?: string | Locator) => Promise<ResponsiveBarDriver>;
   createSplitterDriver: (testId?: string | Locator) => Promise<SplitterDriver>;
   createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
+  createModalDialogDriver: (testId?: string | Locator) => Promise<ModalDialogDriver>;
   createTreeDriver: (testId?: string | Locator) => Promise<TreeDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
@@ -130,6 +134,14 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createExpandableItemDriver: async ({ page }, use) => {
+    await use(async (testId) => new ExpandableItemDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="ExpandableItem"]').first(),
+      page,
+    }));
+  },
   createTextDriver: async ({ page }, use) => {
     await use(async (testId) => new ComponentDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="Text"]').first(),
@@ -194,6 +206,17 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="List"]').first(),
+      page,
+    }));
+  },
+  createModalDialogDriver: async ({ page }, use) => {
+    await use(async (testId) => new ModalDialogDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ModalDialog"]').first(),
       page,
     }));
   },

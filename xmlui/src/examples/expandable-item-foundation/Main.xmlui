@@ -1,0 +1,22 @@
+<App var.count="{0}" var.expanded="{false}">
+  <H1>ExpandableItem foundation</H1>
+  <ExpandableItem
+    summary="Click to reveal the counter"
+    initiallyExpanded="{true}"
+    onExpandedChange="value => expanded = value">
+    <VStack gap="$space-3">
+      <Text>Expanded: {expanded}</Text>
+      <Button onClick="count++">Increment</Button>
+      <Text>Count: {count}</Text>
+    </VStack>
+  </ExpandableItem>
+  <ExpandableItem fullWidthSummary="true">
+    <property name="summary">
+      <HStack gap="$space-2">
+        <Text>Templated summary</Text>
+        <Text>({count})</Text>
+      </HStack>
+    </property>
+    <Text>This item uses the summary property template.</Text>
+  </ExpandableItem>
+</App>

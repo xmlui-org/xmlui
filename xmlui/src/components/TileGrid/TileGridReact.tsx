@@ -1,14 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
 import { defaultProps } from "./TileGrid.defaults";
-
-const styles = {
-  tileGrid: "tileGrid",
-  fixedTiles: "fixedTiles",
-  loading: "loading",
-  tile: "tile",
-  selected: "selected",
-};
+import styles from "./TileGrid.module.scss";
 
 export type TileGridItem = {
   key: string | number;

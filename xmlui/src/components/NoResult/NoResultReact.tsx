@@ -1,6 +1,7 @@
 import { forwardRef, memo, type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
 
 import { defaultProps } from "./NoResult.defaults";
+import styles from "./NoResult.module.scss";
 
 export type NoResultProps = {
   label: ReactNode;
@@ -24,7 +25,7 @@ export const NoResult = memo(forwardRef<HTMLDivElement, NoResultProps>(function 
     <div
       {...rest}
       ref={ref}
-      className={["xmluiNoResult", className].filter(Boolean).join(" ")}
+      className={[styles.xmluiNoResult, className].filter(Boolean).join(" ")}
     >
       {!hideIcon && <NoResultIcon name={icon} />}
       {label}
@@ -35,7 +36,7 @@ export const NoResult = memo(forwardRef<HTMLDivElement, NoResultProps>(function 
 function NoResultIcon({ name }: { name: string }) {
   return (
     <svg
-      className="xmluiNoResultIcon"
+      className={styles.xmluiNoResultIcon}
       data-xmlui-part="icon"
       data-icon={name}
       viewBox="0 0 64 64"

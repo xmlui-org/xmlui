@@ -1,25 +1,8 @@
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect } from "react";
 
-export const defaultResponsiveBarProps = {
-  overflowIcon: "ellipsisHorizontal:ResponsiveBar",
-  dropdownText: "More options",
-  gap: 0,
-  orientation: "horizontal" as const,
-  reverse: false,
-};
-
-const styles = {
-  responsiveBar: "responsiveBar",
-  horizontal: "horizontal",
-  vertical: "vertical",
-  reverseHorizontal: "reverseHorizontal",
-  reverseVertical: "reverseVertical",
-  visibleItems: "visibleItems",
-  visibleItemsHorizontal: "visibleItemsHorizontal",
-  visibleItemsVertical: "visibleItemsVertical",
-  overflowDropdown: "overflowDropdown",
-};
+import { defaultResponsiveBarProps } from "./ResponsiveBar.defaults";
+import styles from "./ResponsiveBar.module.scss";
 
 export type ResponsiveBarProps = {
   className?: string;
