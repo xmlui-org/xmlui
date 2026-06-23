@@ -3667,10 +3667,48 @@ Compatibility notes and debt:
   `DateInput`, `Select`, and `AutoComplete` remains part of later form/input
   validation closure.
 
-Next explicit step: Phase 5 Wave E3A - inspect and plan the structured form
-components (`StepperForm` and `TabsForm`) against the original implementation,
-then migrate the smallest foundation slice with copied old tests if component
-local suites exist.
+Phase 5 Wave E3A completed: `StepperForm` and `TabsForm` structured form
+foundation.
+
+Implemented in this slice:
+
+- inspected the original `StepperForm` and `TabsForm` component folders and
+  component-local E2E suites;
+- added source-adjacent rewrite folders for both components with metadata,
+  renderer, React implementation, docs, and component-local E2E specs;
+- registered both components in the compiler contracts, IR lowerer built-in
+  set, and runtime component registry;
+- extended `Form` with forwarded APIs (`reset`, `update`, `getData`,
+  `validate`) and `submitFailed` notification so structured forms can expose
+  the same API surface through their inner Form;
+- implemented `TabsForm` as a composition of the current `Form`, `Tabs`, and
+  `TabItem` components;
+- implemented `StepperForm` as a local foundation because the standalone old
+  `Stepper` component has not been migrated yet;
+- added `structuredFormsFoundation` as a runnable visual example for
+  `npm run dev`.
+
+Verification for this slice:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui test`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui exec -- playwright test src/components/TabsForm/TabsForm.spec.ts src/components/StepperForm/StepperForm.spec.ts`
+  passed with 10 enabled tests and 6 explicit `test.fixme` deferrals.
+
+Remaining structured-form debt:
+
+- `StepperForm` must be re-closed after the old `Stepper`/`Step` component
+  semantics are migrated;
+- invalid-segment navigation gating, completion/error indicators, and old
+  stacked-label Stepper markup are deferred;
+- `TabsForm` submit-failure jump-to-first-invalid-tab is deferred until the full
+  Form/FormItem validation lifecycle is closed.
+
+Next explicit step: Phase 5 Wave F1A - inspect the original data-provider and
+API-call components (`DataSource`, `APICall`, and related runtime services),
+then migrate the smallest data-provider foundation slice with copied
+component-local tests and a runnable example.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 
@@ -3797,6 +3835,32 @@ Compatibility focus:
   request lifecycle, caching, retries, cancellation, refresh, error state, and
   API references must match old behavior.
 
+Status:
+
+- Wave F1A completed: inspected the original `DataSource` and `APICall`
+  metadata/spec files and moved the current rewrite's foundation behavior from
+  centralized builtins into component-owned metadata and renderer modules.
+- Added component-local foundation E2E tests for `mockData`, scripted fetch
+  context variables, `refetch`, result selection/transformation, `execute`,
+  `beforeRequest` cancellation, and `invalidates`-driven data refresh.
+- Existing runnable examples remain available through `npm run dev` with
+  `?example=dataSourceMock`, `?example=dataSourceRefetch`,
+  `?example=apiCallMutation`, and `?example=actionsCallApi`.
+
+Deferred compatibility work:
+
+- Literal old `DataSource.spec.ts` and `APICall.spec.ts` transfer is not
+  complete. The original suites depend on old API interception, notifications,
+  confirmation/deferred call behavior, optimistic updates, paging selectors,
+  CSV/SQL response handling, structural sharing, and richer runtime services.
+- Do not mark F1 complete until those old test cases are either running
+  successfully or explicitly mapped to later runtime/tooling slices.
+
+Next explicit step: Phase 5 Wave F2A - inspect the original app-state and
+lifecycle listener components (`AppState`, `ChangeListener`, `Lifecycle`, and
+related runtime services), then migrate the smallest listener/state foundation
+slice with component-local tests and a runnable example.
+
 ##### Wave F2: App State and Lifecycle Listeners
 
 Components:
@@ -3809,6 +3873,30 @@ Compatibility focus:
 
 - non-visual API registration, listener ordering, cleanup, app state
   persistence, initial invocation behavior, and event timing.
+
+Status:
+
+- Wave F2A completed: inspected original `AppState`, `ChangeListener`, and
+  `Lifecycle` implementations and migrated a component-owned foundation slice.
+- Added metadata, docs, non-visual renderers, and focused component-local E2E
+  tests for bucket state, state mutation, list helpers, change-listener
+  payloads, debounce behavior, mount/unmount, and key-value lifecycle rearming.
+- Added runnable example `?example=appStateListeners` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `AppState.spec.ts` and `ChangeListener.spec.ts` transfer is not
+  complete.
+- `Lifecycle.onError` coverage is deferred until script throw/error expression
+  support can reliably trigger handler failures in markup.
+- Existing `FlowLayout` non-visual compatibility tests for `AppState` and
+  `ChangeListener` are currently skipped by their compatibility gating and
+  should be re-enabled when that suite is reopened.
+
+Next explicit step: Phase 5 Wave F3A - inspect the original scheduling and
+queue components (`Timer`, `Queue`, and related runtime services), then migrate
+the smallest scheduling foundation slice with component-local tests and a
+runnable example.
 
 ##### Wave F3: Scheduling and Queues
 

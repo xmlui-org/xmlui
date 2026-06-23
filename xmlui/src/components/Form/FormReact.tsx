@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -24,7 +25,9 @@ export type FormProps = {
   enableSubmit?: boolean;
   children?: ReactNode;
   onSubmit?: (values: FormValues) => void | Promise<unknown>;
+  onSubmitFailed?: (errors: Record<string, string>) => void | Promise<unknown>;
   onCancel?: () => void | Promise<unknown>;
+  registerComponentApi?: (api: Record<string, unknown>) => void;
 } & Record<string, unknown>;
 
 export function Form({
@@ -38,7 +41,9 @@ export function Form({
   enableSubmit = true,
   children,
   onSubmit,
+  onSubmitFailed,
   onCancel,
+  registerComponentApi,
   ...rest
 }: FormProps) {
   const initialValues = useMemo(() => normalizeValues(data), [data]);
@@ -74,7 +79,7 @@ export function Form({
     };
   }, []);
 
-  const submit = useCallback(async () => {
+  const validate = useCallback(() => {
     const nextErrors: Record<string, string> = {};
     for (const item of itemsRef.current.values()) {
       if (item.required && isEmpty(values[item.name])) {
@@ -83,11 +88,17 @@ export function Form({
       }
     }
     setErrors(nextErrors);
+    return nextErrors;
+  }, [values]);
+
+  const submit = useCallback(async () => {
+    const nextErrors = validate();
     if (Object.keys(nextErrors).length > 0) {
+      await onSubmitFailed?.(nextErrors);
       return;
     }
     await onSubmit?.(values);
-  }, [onSubmit, values]);
+  }, [onSubmit, onSubmitFailed, validate, values]);
 
   const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -99,6 +110,37 @@ export function Form({
     setDirtyFields(new Set());
     void onCancel?.();
   }, [initialValues, onCancel]);
+  const reset = useCallback(() => {
+    setValues(initialValues);
+    setErrors({});
+    setDirtyFields(new Set());
+  }, [initialValues]);
+  const update = useCallback((data: Record<string, unknown>) => {
+    setValues((current) => ({ ...current, ...data }));
+    setDirtyFields((current) => {
+      const next = new Set(current);
+      Object.keys(data).forEach((key) => next.add(key));
+      return next;
+    });
+  }, []);
+  const getData = useCallback(() => ({ ...values }), [values]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      reset,
+      update,
+      getData,
+      validate: () => {
+        const nextErrors = validate();
+        return {
+          isValid: Object.keys(nextErrors).length === 0,
+          data: { ...values },
+          errors: Object.entries(nextErrors).map(([field, message]) => ({ field, message })),
+          warnings: [],
+        };
+      },
+    });
+  }, [getData, registerComponentApi, reset, update, validate, values]);
 
   return (
     <form

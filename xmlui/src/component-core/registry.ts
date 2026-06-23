@@ -75,6 +75,8 @@ import { footerRenderer } from "../components/Footer/Footer.renderer";
 import { formRenderer } from "../components/Form/Form.renderer";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
+import { stepperFormRenderer } from "../components/StepperForm/StepperForm.renderer";
+import { tabsFormRenderer } from "../components/TabsForm/TabsForm.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
@@ -93,6 +95,11 @@ import { navGroupRenderer } from "../components/NavGroup/NavGroup.renderer";
 import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
 import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
 import { navPanelRenderer } from "../components/NavPanel/NavPanel.renderer";
+import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
+import { apiCallRenderer } from "../components/APICall/APICall.renderer";
+import { appStateRenderer } from "../components/AppState/AppState.renderer";
+import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener.renderer";
+import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -176,6 +183,8 @@ const implementedRuntimeNames = [
   "Form",
   "FormItem",
   "FormSegment",
+  "StepperForm",
+  "TabsForm",
   "TimeInput",
   "ScrollViewer",
   "Select",
@@ -196,6 +205,9 @@ const implementedRuntimeNames = [
   "NavPanel",
   "DataSource",
   "APICall",
+  "AppState",
+  "ChangeListener",
+  "Lifecycle",
 ] as const;
 
 const implementedRuntimeNameSet = new Set<string>(implementedRuntimeNames);
@@ -271,6 +283,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Form: formRenderer,
   FormItem: formItemRenderer,
   FormSegment: formSegmentRenderer,
+  StepperForm: stepperFormRenderer,
+  TabsForm: tabsFormRenderer,
   Option: optionRenderer,
   Pagination: paginationRenderer,
   Table: tableRenderer,
@@ -290,6 +304,11 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   NavLink: navLinkRenderer,
   NavPanelCollapseButton: navPanelCollapseButtonRenderer,
   NavPanel: navPanelRenderer,
+  DataSource: dataSourceRenderer,
+  APICall: apiCallRenderer,
+  AppState: appStateRenderer,
+  ChangeListener: changeListenerRenderer,
+  Lifecycle: lifecycleRenderer,
   ...htmlTagRenderers,
 };
 
@@ -355,6 +374,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const formTransferred = contract.name === "Form";
     const formItemTransferred = contract.name === "FormItem";
     const formSegmentTransferred = contract.name === "FormSegment";
+    const structuredFormTransferred = contract.name === "StepperForm" || contract.name === "TabsForm";
     const itemsTransferred = contract.name === "Items";
     const tableTransferred = contract.name === "Table";
     const columnTransferred = contract.name === "Column";
@@ -394,6 +414,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const tabsTransferred = contract.name === "Tabs" || contract.name === "TabItem";
     const stackTransferred = contract.name === "Stack" || contract.name === "HStack" || contract.name === "VStack";
     const flowLayoutTransferred = contract.name === "FlowLayout";
+    const dataSourceTransferred = contract.name === "DataSource";
+    const apiCallTransferred = contract.name === "APICall";
+    const appStateTransferred = contract.name === "AppState";
+    const changeListenerTransferred = contract.name === "ChangeListener";
+    const lifecycleTransferred = contract.name === "Lifecycle";
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
@@ -423,6 +448,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       formTransferred ||
       formItemTransferred ||
       formSegmentTransferred ||
+      structuredFormTransferred ||
       itemsTransferred ||
       tableTransferred ||
       columnTransferred ||
@@ -461,7 +487,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       spaceFillerTransferred ||
       tabsTransferred ||
       stackTransferred ||
-      flowLayoutTransferred;
+      flowLayoutTransferred ||
+      dataSourceTransferred ||
+      apiCallTransferred ||
+      appStateTransferred ||
+      changeListenerTransferred ||
+      lifecycleTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
       : appHeaderTransferred
@@ -550,6 +581,16 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                                   ? "NavPanelCollapseButton"
                                                                 : navPanelTransferred
                                                                   ? "NavPanel"
+                                                                : dataSourceTransferred
+                                                                  ? "DataSource"
+                                                                  : apiCallTransferred
+                                                                    ? "APICall"
+                                                                    : appStateTransferred
+                                                                      ? "AppState"
+                                                                      : changeListenerTransferred
+                                                                        ? "ChangeListener"
+                                                                        : lifecycleTransferred
+                                                                          ? "Lifecycle"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -615,6 +656,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FormItemReact.tsx`);
     } else if (formSegmentTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FormSegmentReact.tsx`);
+    } else if (structuredFormTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/${contract.name}React.tsx`);
     } else if (itemsTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ItemsReact.tsx`);
     } else if (tableTransferred) {
@@ -685,6 +728,16 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ConciseValidationFeedbackReact.tsx`);
     } else if (spaceFillerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SpaceFillerReact.tsx`);
+    } else if (dataSourceTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DataSource.renderer.tsx`);
+    } else if (apiCallTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/APICall.renderer.tsx`);
+    } else if (appStateTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.renderer.tsx`);
+    } else if (changeListenerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ChangeListener.renderer.tsx`);
+    } else if (lifecycleTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Lifecycle.renderer.tsx`);
     }
 
     const runnablePaths = componentRunnablePaths({
@@ -751,6 +804,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       conciseValidationFeedbackTransferred,
       spaceFillerTransferred,
       tabsTransferred,
+      dataSourceTransferred,
+      apiCallTransferred,
+      appStateTransferred,
+      changeListenerTransferred,
+      lifecycleTransferred,
     });
     return {
       name: contract.name,
@@ -775,11 +833,30 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
             ]
           : ["xmlui/src/compiler/contracts/builtins.ts"],
         defaults:
-          transferredFolder && !htmlTagTransferred && !brTransferred && !fragmentTransferred && !iconTransferred && !spaceFillerTransferred
+          transferredFolder &&
+          !htmlTagTransferred &&
+          !brTransferred &&
+          !fragmentTransferred &&
+          !iconTransferred &&
+          !spaceFillerTransferred &&
+          !dataSourceTransferred &&
+          !apiCallTransferred &&
+          !appStateTransferred &&
+          !changeListenerTransferred &&
+          !lifecycleTransferred
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.defaults.ts`]
             : [],
         styles:
-          transferredFolder && !brTransferred && !fragmentTransferred && !pageMetaTitleTransferred && !itemsTransferred
+          transferredFolder &&
+          !brTransferred &&
+          !fragmentTransferred &&
+          !pageMetaTitleTransferred &&
+          !itemsTransferred &&
+          !dataSourceTransferred &&
+          !apiCallTransferred &&
+          !appStateTransferred &&
+          !changeListenerTransferred &&
+          !lifecycleTransferred
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.module.scss`]
             : [],
         docs: transferredFolder ? [`xmlui/src/components/${folderName}/${docsFile}.md`] : [],
@@ -857,6 +934,11 @@ function componentRunnablePaths(flags: {
   conciseValidationFeedbackTransferred: boolean;
   spaceFillerTransferred: boolean;
   tabsTransferred: boolean;
+  dataSourceTransferred: boolean;
+  apiCallTransferred: boolean;
+  appStateTransferred: boolean;
+  changeListenerTransferred: boolean;
+  lifecycleTransferred: boolean;
 }): string[] {
   if (flags.accordionTransferred) {
     return [
@@ -1156,6 +1238,27 @@ function componentRunnablePaths(flags: {
   }
   if (flags.spaceFillerTransferred) {
     return ["xmlui/src/components/SpaceFiller/SpaceFiller.spec.ts"];
+  }
+  if (flags.dataSourceTransferred) {
+    return [
+      "xmlui/src/components/DataSource/DataSource.spec.ts",
+      "xmlui/tests/e2e/data-operations.spec.ts",
+    ];
+  }
+  if (flags.apiCallTransferred) {
+    return [
+      "xmlui/src/components/APICall/APICall.spec.ts",
+      "xmlui/tests/e2e/data-operations.spec.ts",
+    ];
+  }
+  if (flags.appStateTransferred) {
+    return ["xmlui/src/components/AppState/AppState.spec.ts"];
+  }
+  if (flags.changeListenerTransferred) {
+    return ["xmlui/src/components/ChangeListener/ChangeListener.spec.ts"];
+  }
+  if (flags.lifecycleTransferred) {
+    return ["xmlui/src/components/Lifecycle/Lifecycle.spec.ts"];
   }
   return [];
 }

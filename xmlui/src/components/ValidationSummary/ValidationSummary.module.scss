@@ -15,13 +15,13 @@ $textColor-ValidationDisplay-warning: createThemeVar("textColor-ValidationDispla
 .summary {
   display: flex;
   flex-direction: column;
-  gap: var($gap-ValidationSummary);
+  gap: $gap-ValidationSummary;
 }
 
 .display {
   position: relative;
-  padding: var($padding-ValidationDisplay);
-  padding-left: calc(var($padding-ValidationDisplay) + 0.75rem);
+  padding: $padding-ValidationDisplay;
+  padding-left: calc(#{$padding-ValidationDisplay} + 0.75rem);
 }
 
 .display::before {
@@ -35,21 +35,21 @@ $textColor-ValidationDisplay-warning: createThemeVar("textColor-ValidationDispla
 }
 
 .error {
-  color: var($textColor-ValidationDisplay-error);
-  background-color: var($backgroundColor-ValidationDisplay-error);
+  color: $textColor-ValidationDisplay-error;
+  background-color: $backgroundColor-ValidationDisplay-error;
 }
 
 .error::before {
-  background-color: var($color-accent-ValidationDisplay-error);
+  background-color: $color-accent-ValidationDisplay-error;
 }
 
 .warning {
-  color: var($textColor-ValidationDisplay-warning);
-  background-color: var($backgroundColor-ValidationDisplay-warning);
+  color: $textColor-ValidationDisplay-warning;
+  background-color: $backgroundColor-ValidationDisplay-warning;
 }
 
 .warning::before {
-  background-color: var($color-accent-ValidationDisplay-warning);
+  background-color: $color-accent-ValidationDisplay-warning;
 }
 
 .heading {
@@ -69,4 +69,3 @@ $textColor-ValidationDisplay-warning: createThemeVar("textColor-ValidationDispla
 .field {
   font-weight: 700;
 }
-

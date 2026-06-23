@@ -15,14 +15,14 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 .formItem {
   display: flex;
   flex-direction: column;
-  gap: var($gap-FormItem);
+  gap: $gap-FormItem;
 }
 
 .row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var($gap-label-FormItem);
+  gap: $gap-label-FormItem;
 }
 
 .labelTop {
@@ -42,15 +42,15 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 }
 
 .label {
-  color: var($textColor-label-FormItem);
-  font-weight: var($fontWeight-label-FormItem);
+  color: $textColor-label-FormItem;
+  font-weight: $fontWeight-label-FormItem;
 }
 
 .labelStart .label,
 .labelBefore .label,
 .labelEnd .label,
 .labelAfter .label {
-  width: var($width-label-FormItem);
+  width: $width-label-FormItem;
 }
 
 .requiredIndicator {
@@ -67,11 +67,10 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 }
 
 .errorInput {
-  border-color: var($borderColor-input-FormItem--error);
+  border-color: $borderColor-input-FormItem--error;
 }
 
 .error {
-  color: var($textColor-error-FormItem);
-  font-size: var($fontSize-error-FormItem);
+  color: $textColor-error-FormItem;
+  font-size: $fontSize-error-FormItem;
 }
-

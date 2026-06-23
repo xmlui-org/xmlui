@@ -1,0 +1,30 @@
+<App var.mode="{'tabs'}" var.testState="{''}">
+  <H1>Structured forms foundation</H1>
+  <Text>Mode: {mode}</Text>
+  <Button onClick="mode = mode === 'tabs' ? 'stepper' : 'tabs'">
+    Toggle structured form
+  </Button>
+  <TabsForm
+    when="{mode === 'tabs'}"
+    data="{{ name: '', email: '' }}"
+    onSubmit="(d) => testState = d.name + ' / ' + d.email">
+    <FormSegment label="Profile">
+      <FormItem label="Name" bindTo="name" />
+    </FormSegment>
+    <FormSegment label="Contact">
+      <FormItem label="Email" bindTo="email" />
+    </FormSegment>
+  </TabsForm>
+  <StepperForm
+    when="{mode === 'stepper'}"
+    data="{{ name: '', email: '' }}"
+    onSubmit="(d) => testState = d.name + ' / ' + d.email">
+    <FormSegment label="Profile">
+      <FormItem label="Name" bindTo="name" />
+    </FormSegment>
+    <FormSegment label="Contact">
+      <FormItem label="Email" bindTo="email" />
+    </FormSegment>
+  </StepperForm>
+  <Text>Submitted: {testState || 'none'}</Text>
+</App>

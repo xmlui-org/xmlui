@@ -11,10 +11,10 @@ $borderRadius-FormSegment: createThemeVar("borderRadius-FormSegment");
 .segment {
   display: flex;
   flex-direction: column;
-  gap: var($gap-FormSegment);
-  padding: var($padding-FormSegment);
-  background-color: var($backgroundColor-FormSegment);
-  border-radius: var($borderRadius-FormSegment);
+  gap: $gap-FormSegment;
+  padding: $padding-FormSegment;
+  background-color: $backgroundColor-FormSegment;
+  border-radius: $borderRadius-FormSegment;
 }
 
 .horizontal {
@@ -24,4 +24,3 @@ $borderRadius-FormSegment: createThemeVar("borderRadius-FormSegment");
 .vertical {
   flex-direction: column;
 }
-

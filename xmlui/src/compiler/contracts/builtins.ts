@@ -15,6 +15,8 @@ import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
 import { FormMd } from "../../components/Form/Form";
 import { FormItemMd } from "../../components/FormItem/FormItem";
 import { FormSegmentMd } from "../../components/FormSegment/FormSegment";
+import { StepperFormMd } from "../../components/StepperForm/StepperForm";
+import { TabsFormMd } from "../../components/TabsForm/TabsForm";
 import { TextAreaMd } from "../../components/TextArea/TextArea";
 import { NumberBoxMd } from "../../components/NumberBox/NumberBox";
 import { RatingInputMd } from "../../components/RatingInput/RatingInput";
@@ -46,6 +48,11 @@ import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/
 import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
 import { StickySectionMd } from "../../components/StickySection/StickySection";
 import { TabItemMd, TabsMd } from "../../components/Tabs/Tabs";
+import { DataSourceMd } from "../../components/DataSource/DataSource";
+import { APICallMd } from "../../components/APICall/APICall";
+import { AppStateMd } from "../../components/AppState/AppState";
+import { ChangeListenerMd } from "../../components/ChangeListener/ChangeListener";
+import { LifecycleMd } from "../../components/Lifecycle/Lifecycle";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -411,6 +418,28 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(TabsFormMd, {
+    name: "TabsForm",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      submit: "onSubmit",
+      submitFailed: "onSubmitFailed",
+      cancel: "onCancel",
+    },
+  }),
+  contractFromMetadata(StepperFormMd, {
+    name: "StepperForm",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      submit: "onSubmit",
+      submitFailed: "onSubmitFailed",
+      cancel: "onCancel",
+    },
   }),
   contractFromMetadata(TextBoxMd, {
     name: "TextBox",
@@ -1121,48 +1150,16 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
     },
   },
-  {
+  contractFromMetadata(DataSourceMd, {
     name: "DataSource",
-    kind: "builtin",
     allowsChildren: false,
-    declarations: {},
-    props: {
-      id: { name: "id" },
-      method: { name: "method" },
-      url: { name: "url" },
-      mockData: { name: "mockData" },
-      body: { name: "body" },
-      rawBody: { name: "rawBody" },
-      queryParams: { name: "queryParams" },
-      headers: { name: "headers" },
-      credentials: { name: "credentials" },
-      pollIntervalInSeconds: { name: "pollIntervalInSeconds" },
-      resultSelector: { name: "resultSelector" },
-      transformResult: { name: "transformResult" },
-      dataType: { name: "dataType" },
-      structuralSharing: { name: "structuralSharing" },
+    includeLayoutProps: false,
+    eventAttributes: {
+      loaded: "onLoaded",
+      error: "onError",
+      fetch: "onFetch",
     },
-    events: {
-      loaded: { name: "loaded", attributeName: "onLoaded" },
-      error: { name: "error", attributeName: "onError" },
-      fetch: { name: "fetch", attributeName: "onFetch" },
-    },
-    contextVariables: {
-      $url: { name: "$url" },
-      $method: { name: "$method" },
-      $queryParams: { name: "$queryParams" },
-      $requestBody: { name: "$requestBody" },
-      $requestHeaders: { name: "$requestHeaders" },
-    },
-    apis: {
-      value: { name: "value" },
-      inProgress: { name: "inProgress" },
-      isRefetching: { name: "isRefetching" },
-      loaded: { name: "loaded" },
-      refetch: { name: "refetch" },
-      responseHeaders: { name: "responseHeaders" },
-    },
-  },
+  }),
   {
     name: "Pages",
     kind: "builtin",
@@ -1276,45 +1273,43 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     }),
     events: {},
   },
-  {
+  contractFromMetadata(APICallMd, {
     name: "APICall",
-    kind: "builtin",
     allowsChildren: false,
-    declarations: {},
-    props: {
-      id: { name: "id" },
-      method: { name: "method" },
-      url: { name: "url" },
-      body: { name: "body" },
-      rawBody: { name: "rawBody" },
-      queryParams: { name: "queryParams" },
-      headers: { name: "headers" },
-      credentials: { name: "credentials" },
-      invalidates: { name: "invalidates" },
-      updates: { name: "updates" },
+    includeLayoutProps: false,
+    eventAttributes: {
+      beforeRequest: "onBeforeRequest",
+      success: "onSuccess",
+      error: "onError",
+      mockExecute: "onMockExecute",
     },
-    events: {
-      beforeRequest: { name: "beforeRequest", attributeName: "onBeforeRequest" },
-      success: { name: "success", attributeName: "onSuccess" },
-      error: { name: "error", attributeName: "onError" },
-      mockExecute: { name: "mockExecute", attributeName: "onMockExecute" },
+  }),
+  contractFromMetadata(AppStateMd, {
+    name: "AppState",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      didUpdate: "onDidUpdate",
     },
-    contextVariables: {
-      $param: { name: "$param" },
-      $params: { name: "$params" },
-      $queryParams: { name: "$queryParams" },
-      $requestBody: { name: "$requestBody" },
-      $requestHeaders: { name: "$requestHeaders" },
+  }),
+  contractFromMetadata(ChangeListenerMd, {
+    name: "ChangeListener",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      didChange: "onDidChange",
     },
-    apis: {
-      execute: { name: "execute" },
-      inProgress: { name: "inProgress" },
-      loaded: { name: "loaded" },
-      lastResult: { name: "lastResult" },
-      lastError: { name: "lastError" },
-      lastResponseHeaders: { name: "lastResponseHeaders" },
+  }),
+  contractFromMetadata(LifecycleMd, {
+    name: "Lifecycle",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      mount: "onMount",
+      unmount: "onUnmount",
+      error: "onError",
     },
-  },
+  }),
   {
     name: "Slot",
     kind: "builtin",

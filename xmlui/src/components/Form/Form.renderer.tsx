@@ -19,7 +19,9 @@ export const formRenderer = wrapComponent({
         className={adapter.className}
         style={adapter.style}
         onSubmit={(values) => adapter.event("submit")(values)}
+        onSubmitFailed={(errors) => adapter.event("submitFailed")(errors)}
         onCancel={() => adapter.event("cancel")()}
+        registerComponentApi={adapter.registerApi}
       >
         {adapter.renderChildren()}
       </Form>

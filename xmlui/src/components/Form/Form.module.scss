@@ -11,24 +11,24 @@ $textColor-error-Form: createThemeVar("textColor-error-Form");
 .form {
   display: flex;
   flex-direction: column;
-  gap: var($gap-Form);
+  gap: $gap-Form;
   width: 100%;
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: var($gap-Form);
+  gap: $gap-Form;
 }
 
 .buttonRow {
   display: flex;
   flex-direction: row;
-  gap: var($gap-buttonRow-Form);
+  gap: $gap-buttonRow-Form;
   align-items: center;
-  margin-top: var($marginTop-buttonRow-Form);
+  margin-top: $marginTop-buttonRow-Form;
 }
 
 .validationSummary {
-  color: var($textColor-error-Form);
+  color: $textColor-error-Form;
 }

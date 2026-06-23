@@ -17,11 +17,11 @@ $textColor-ConciseValidationFeedback-valid: createThemeVar("textColor-ConciseVal
 }
 
 .error {
-  color: var($textColor-ConciseValidationFeedback-error);
+  color: $textColor-ConciseValidationFeedback-error;
 }
 
 .valid {
-  color: var($textColor-ConciseValidationFeedback-valid);
+  color: $textColor-ConciseValidationFeedback-valid;
 }
 
 .message {
@@ -35,4 +35,3 @@ $textColor-ConciseValidationFeedback-valid: createThemeVar("textColor-ConciseVal
   white-space: nowrap;
   border: 0;
 }
-

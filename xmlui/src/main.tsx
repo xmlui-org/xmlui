@@ -13,6 +13,7 @@ import accordionFoundationApp from "./examples/accordion-foundation/Main.xmlui";
 import apiCallMutationApp from "./examples/api-call-mutation/Main.xmlui";
 import appHeaderFoundationApp from "./examples/app-header-foundation/Main.xmlui";
 import appMainContentLayoutApp from "./examples/app-main-content-layout/Main.xmlui";
+import appStateListenersApp from "./examples/app-state-listeners/Main.xmlui";
 import builtinsInputsApp from "./examples/builtins-inputs/Main.xmlui";
 import builtinsItemsApp from "./examples/builtins-items/Main.xmlui";
 import builtinsLayoutApp from "./examples/builtins-layout/Main.xmlui";
@@ -91,6 +92,7 @@ import flowTileFoundationApp from "./examples/flow-tile-foundation/Main.xmlui";
 import footerFoundationApp from "./examples/footer-foundation/Main.xmlui";
 import formFoundationApp from "./examples/form-foundation/Main.xmlui";
 import formSegmentFoundationApp from "./examples/form-segment-foundation/Main.xmlui";
+import structuredFormsFoundationApp from "./examples/structured-forms-foundation/Main.xmlui";
 import validationDisplayFoundationApp from "./examples/validation-display-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import stackFamilyFoundationApp from "./examples/stack-family-foundation/Main.xmlui";
@@ -118,6 +120,7 @@ const examples = {
   apiCallMutation: apiCallMutationApp,
   appHeaderFoundation: appHeaderFoundationApp,
   appMainContentLayout: appMainContentLayoutApp,
+  appStateListeners: appStateListenersApp,
   asyncDirectives: asyncDirectivesApp,
   asyncResponsiveLoop: asyncResponsiveLoopApp,
   asyncSequence: asyncSequenceApp,
@@ -200,6 +203,7 @@ const examples = {
   footerFoundation: footerFoundationApp,
   formFoundation: formFoundationApp,
   formSegmentFoundation: formSegmentFoundationApp,
+  structuredFormsFoundation: structuredFormsFoundationApp,
   validationDisplayFoundation: validationDisplayFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
   stackFamilyFoundation: stackFamilyFoundationApp,
