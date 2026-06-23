@@ -21,6 +21,9 @@ import { DateInputMd } from "../../components/DateInput/DateInput";
 import { DatePickerMd } from "../../components/DatePicker/DatePicker";
 import { DrawerMd } from "../../components/Drawer/Drawer";
 import { ModalDialogMd } from "../../components/ModalDialog/ModalDialog";
+import { TooltipMd } from "../../components/Tooltip/Tooltip";
+import { ContextMenuMd } from "../../components/ContextMenu/ContextMenu";
+import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "../../components/DropdownMenu/DropdownMenu";
 import { FileInputMd } from "../../components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "../../components/FileUploadDropZone/FileUploadDropZone";
 import { FlowLayoutMd } from "../../components/FlowLayout/FlowLayout";
@@ -122,6 +125,48 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       open: "onOpen",
       close: "onClose",
     },
+  }),
+  contractFromMetadata(TooltipMd, {
+    name: "Tooltip",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ContextMenuMd, {
+    name: "ContextMenu",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(DropdownMenuMd, {
+    name: "DropdownMenu",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      willOpen: "onWillOpen",
+    },
+  }),
+  contractFromMetadata(MenuItemMd, {
+    name: "MenuItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
+  contractFromMetadata(MenuSeparatorMd, {
+    name: "MenuSeparator",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(SubMenuItemMd, {
+    name: "SubMenuItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   contractFromMetadata(FragmentMd, {
     name: "Fragment",
@@ -1115,6 +1160,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       icon: { name: "icon" },
       iconAlignment: { name: "iconAlignment" },
       level: { name: "level" },
+      testId: { name: "testId" },
+      id: { name: "id" },
     }),
     events: {
       click: { name: "click", attributeName: "onClick" },

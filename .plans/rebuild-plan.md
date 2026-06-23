@@ -3030,9 +3030,276 @@ Verified:
   on first mount. Old declarative open/close parity must be restored before
   enabling the copied declarative tests.
 
-Next explicit step: Phase 5 Wave D4C - migrate `Tooltip` foundation against old
-metadata, SCSS, docs, copied old E2E tests, a running foundation test, and a
-visual sample.
+Completed: Phase 5 Wave D4C - `Tooltip` foundation.
+
+Added:
+
+- migrated `Tooltip` source folder with metadata in `Tooltip.tsx`, defaults,
+  SCSS module, React renderer, copied documentation, copied old E2E suite, and
+  a focused foundation E2E suite;
+- compiler/runtime wiring for the `Tooltip` component and the IR built-in-name
+  list;
+- a visual sample available with `npm run dev` at
+  `?example=tooltipFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/Tooltip/Tooltip.foundation.spec.ts src/components/Tooltip/Tooltip.spec.ts`
+  from `xmlui/`: 4 foundation tests passed, 19 copied old tests skipped.
+
+`Tooltip` compatibility debt:
+
+- the literal old `Tooltip.spec.ts` suite is copied but intentionally skipped
+  until Radix Tooltip parity, portal/root integration, precise
+  side/align/offset/collision positioning, full Markdown component rendering,
+  multi-child trigger semantics, behavior integration, and complete
+  theme-variable coverage are migrated;
+- this foundation uses local fixed positioning and a wrapper trigger instead of
+  the old Radix-backed `asChild` trigger/portal pipeline. Revisit the
+  implementation before re-enabling the old positioning and accessibility
+  cases;
+- the tiny markdown renderer only covers the foundation cases. Do not treat it
+  as a migrated `Markdown` component replacement.
+
+Completed: Phase 5 Wave D5A - `ContextMenu` foundation.
+
+Added:
+
+- migrated `ContextMenu` source folder with metadata in `ContextMenu.tsx`,
+  SCSS module, React renderer, copied documentation, copied old E2E suite, and
+  a focused foundation E2E suite;
+- added minimal `MenuItem` and `MenuSeparator` primitives in the old
+  `DropdownMenu` folder because the original `ContextMenu` contract consumes
+  those menu primitives;
+- compiler/runtime wiring for `ContextMenu`, `MenuItem`, and `MenuSeparator`,
+  including `ContextMenu.openAt(event, context?)` and `$context` propagation;
+- added `open`, `close`, `isOpen`, and `openAt` to the compiled/generated
+  event-handler method allowlists so component APIs used by overlays compile
+  consistently;
+- a visual sample available with `npm run dev` at
+  `?example=contextMenuFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/ContextMenu/ContextMenu.foundation.spec.ts src/components/ContextMenu/ContextMenu.spec.ts`
+  from `xmlui/`: 2 foundation tests passed, 28 copied old tests skipped.
+
+`ContextMenu` compatibility debt:
+
+- the literal old `ContextMenu.spec.ts` suite is copied but intentionally
+  skipped until Radix DropdownMenu parity, full menu primitive migration,
+  separator filtering, keyboard navigation, viewport collision positioning,
+  multiple menu coordination, UDC `$context` edge cases, submenu behavior, and
+  complete theme-variable coverage are migrated;
+- the current `MenuItem` and `MenuSeparator` are foundation primitives only.
+  Full `DropdownMenu`, `SubMenuItem`, icon, navigation, active/disabled, and
+  separator semantics must be completed in the following D5 slices;
+- the current `ContextMenu` uses local fixed positioning and a simple outside
+  pointer handler rather than the old Radix-backed portal/content pipeline.
+  Revisit before re-enabling old positioning, accessibility, and keyboard tests.
+
+Completed: Phase 5 Wave D5B - `DropdownMenu` foundation.
+
+Added:
+
+- expanded the migrated `DropdownMenu` source folder with old-compatible
+  metadata in `DropdownMenu.tsx`, SCSS module styling, React renderer, copied
+  documentation, copied old E2E suite, and a focused foundation E2E suite;
+- compiler/runtime wiring for the `DropdownMenu` component, including
+  `willOpen` event-handler mapping and component APIs (`open`, `close`,
+  `isOpen`);
+- a `createDropdownMenuDriver` test fixture used by copied old tests and the
+  new foundation tests;
+- a visual sample available with `npm run dev` at
+  `?example=dropdownMenuFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts`
+  from `xmlui/`: 2 foundation tests passed, 36 copied old tests skipped.
+
+`DropdownMenu` compatibility debt:
+
+- the literal old `DropdownMenu.spec.ts` suite is copied but intentionally
+  skipped until Radix DropdownMenu parity, submenu support, icon/navigation
+  semantics, separator filtering, keyboard navigation, modal layering, Select
+  integration, z-index behavior, and complete theme-variable coverage are
+  migrated;
+- `MenuItem` and `MenuSeparator` remain foundation primitives. Full active,
+  disabled, navigation, icon, separator-filtering, and nested-menu behavior
+  must be completed before old menu suites are re-enabled;
+- `SubMenuItem` is documented and present in the copied old suite, but it is
+  not implemented yet. Keep it as the next D5 slice so submenu behavior can be
+  tested independently;
+- this foundation uses local fixed positioning rather than the old Radix-backed
+  portal/content pipeline. Revisit before enabling old positioning,
+  accessibility, keyboard, and layering cases.
+
+Completed: Phase 5 Wave D5C - `SubMenuItem` and menu primitive parity
+foundation.
+
+Added:
+
+- `SubMenuItem` metadata in the old `DropdownMenu` folder, including
+  old-compatible props (`label`, `icon`, `iconPosition`, `triggerTemplate`) and
+  theme-variable defaults;
+- class-based SCSS module styling for submenu trigger/content parts;
+- a lightweight `SubMenuItemComponent` that supports hover/focus/click opening
+  and nested children;
+- compiler/runtime wiring for `SubMenuItem` as a transferred menu primitive;
+- a foundation E2E case proving nested submenu display and nested menu-item
+  state mutation;
+- the `dropdownMenuFoundation` visual sample now includes submenu actions.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts`
+  from `xmlui/`: 3 foundation tests passed, 36 copied old tests skipped.
+
+`SubMenuItem` and menu primitive compatibility debt:
+
+- the literal old `DropdownMenu.spec.ts` suite remains copied but skipped.
+  Submenu icon placement, trigger-template override, separator filtering,
+  keyboard navigation, Radix focus behavior, portal layering, Select/ModalDialog
+  integration, and theme-variable parity are still incomplete;
+- the foundation submenu is intentionally local and simple. It does not yet
+  implement Radix `Sub`, portal-based `SubContent`, collision handling, looped
+  keyboard navigation, inspector logging, or full accessibility behavior;
+- `MenuItem.to` navigation and icon rendering are still not migrated.
+
+Completed: Phase 5 Wave D5D - `Menu` compatibility surface.
+
+Findings:
+
+- the old XMLUI project does not have a standalone `Menu.tsx` or
+  `MenuReact.tsx` component;
+- old `src/components/Menu/Menu.module.scss` is a shared menu styling/theming
+  layer imported by `DropdownMenu.module.scss` and `ContextMenu.module.scss`;
+- the user-facing authoring surface is `DropdownMenu`, `ContextMenu`,
+  `MenuItem`, `SubMenuItem`, and `MenuSeparator`.
+
+Added:
+
+- documented that `Menu` in Wave D5 means shared menu primitives and shared
+  styling/theming semantics, not a new `<Menu>` tag;
+- added static separator filtering in the migrated `DropdownMenu` renderer so
+  leading, trailing, and adjacent `MenuSeparator` nodes collapse before
+  rendering;
+- added SCSS-module fallback selectors for the old shared menu behavior where
+  DOM-adjacent separators are hidden in dropdown and submenu content;
+- added focused foundation E2E coverage for top-level and nested separator
+  collapse.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts`
+  from `xmlui/`: 5 foundation tests passed, 36 copied old tests skipped.
+
+`Menu` compatibility debt:
+
+- full condition-aware separator filtering, including `when` expressions that
+  depend on `$context`, is not complete. The old helper treats unknown/null
+  context-dependent visibility as visible and filters after value extraction;
+- the shared old `Menu.module.scss` also defines full theme-variable extraction
+  for `Menu`, `MenuItem`, and `MenuSeparator`. The migrated menu primitives use
+  compatible variables locally, but the exact shared stylesheet/mixin structure
+  is not yet migrated;
+- copied old DropdownMenu and ContextMenu separator tests remain skipped until
+  full Radix menu behavior, conditional filtering, and keyboard/focus parity
+  are migrated.
+
+Completed: Phase 5 Wave D5E - close Wave D5 menu overlay foundation.
+
+Findings:
+
+- the copied old `DropdownMenu.spec.ts` and `ContextMenu.spec.ts` suites are
+  still valuable as literal compatibility checklists, but their top-level
+  suite skips should remain for now because many tests assume the old
+  Radix-backed portal, focus, keyboard, positioning, icon, and theme-variable
+  behavior;
+- small now-supported old behaviors were promoted into running foundation
+  tests instead of partially unskipping brittle copied suites.
+
+Added:
+
+- running `ContextMenu` foundation coverage for outside-click dismissal,
+  Escape dismissal, repeated `openAt` context payload refresh, and separator
+  collapse;
+- shared separator fallback selectors in `ContextMenu.module.scss`;
+- corrected the menu separator fallback to match the old predecessor-hiding
+  rule. Adjacent separator runs should leave the separator closest to the next
+  real content visible rather than hiding both separators.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts src/components/ContextMenu/ContextMenu.foundation.spec.ts src/components/ContextMenu/ContextMenu.spec.ts`
+  from `xmlui/`: 10 foundation tests passed, 64 copied old tests skipped.
+
+Remaining D5 debt:
+
+- copied old `DropdownMenu`/`ContextMenu` suites remain skipped until Radix menu
+  behavior, portal layering, focus management, keyboard navigation,
+  collision-aware positioning, icon rendering, navigation via `MenuItem.to`,
+  condition-aware separator filtering, and full theme-variable parity are
+  migrated;
+- do not leave knowingly failing E2E tests. Enable old copied cases only when
+  the corresponding behavior is implemented and the focused run is green.
+
+Completed: Phase 5 Wave D6A - `NavLink` foundation.
+
+Added:
+
+- migrated `NavLink` source folder with metadata in `NavLink.tsx`, SCSS module
+  styling, React renderer, copied documentation, copied old E2E suite, and a
+  focused foundation E2E suite;
+- runtime routing behavior for internal links through the existing XMLUI
+  routing store, including active-state detection and `exact` matching;
+- disabled-link behavior as a disabled button, following the old component's
+  basic semantic split;
+- `createNavLinkDriver` fixture for copied and foundation tests;
+- visual sample available with `npm run dev` at
+  `?example=navLinkFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavLink/NavLink.foundation.spec.ts src/components/NavLink/NavLink.spec.ts`
+  from `xmlui/`: 3 foundation tests passed, 41 copied old tests skipped.
+
+`NavLink` compatibility debt:
+
+- the literal old `NavLink.spec.ts` suite is copied but intentionally skipped
+  until the full theme-variable matrix, React Router active semantics,
+  component-specific icon rendering, `NavGroup` level inheritance, tooltip
+  behavior, shell layout integration, and style parity are migrated;
+- the current foundation supports only an `iconTemplate` slot, not the old
+  `icon` name rendering path. Complete icon migration when the shell/nav
+  components share the old icon pipeline;
+- exact old `NavPanel` and `NavGroup` context behavior is not present yet.
+
+Next explicit step: Phase 5 Wave D6B - migrate `NavPanel` foundation around
+basic shell layout, width/height/scroll container behavior, copied docs/specs,
+focused E2E tests, and a visual sample using the migrated `NavLink`.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 

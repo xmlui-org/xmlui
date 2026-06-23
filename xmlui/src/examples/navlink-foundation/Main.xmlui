@@ -1,0 +1,11 @@
+<App var.message="{'Choose a link'}">
+  <H1>NavLink foundation</H1>
+  <Text testId="path">Current path: {$pathname}</Text>
+  <Text testId="message">{message}</Text>
+  <HStack gap="$space-2">
+    <NavLink to="/" exact="true" onClick="message = 'Home clicked'">Home</NavLink>
+    <NavLink to="/reports" onClick="message = 'Reports clicked'">Reports</NavLink>
+    <NavLink to="/settings" onClick="message = 'Settings clicked'" vertical="true">Settings</NavLink>
+    <NavLink to="/disabled" enabled="false">Disabled</NavLink>
+  </HStack>
+</App>

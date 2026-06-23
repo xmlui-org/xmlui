@@ -41,6 +41,7 @@ import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
 import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
+import navLinkFoundationApp from "./examples/navlink-foundation/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
@@ -75,6 +76,9 @@ import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui"
 import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlui";
 import drawerFoundationApp from "./examples/drawer-foundation/Main.xmlui";
 import modalDialogFoundationApp from "./examples/modal-dialog-foundation/Main.xmlui";
+import tooltipFoundationApp from "./examples/tooltip-foundation/Main.xmlui";
+import contextMenuFoundationApp from "./examples/context-menu-foundation/Main.xmlui";
+import dropdownMenuFoundationApp from "./examples/dropdown-menu-foundation/Main.xmlui";
 import cardFoundationApp from "./examples/card-foundation/Main.xmlui";
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
 import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
@@ -137,6 +141,7 @@ const examples = {
   iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
   linkInteraction: linkInteractionApp,
+  navLinkFoundation: navLinkFoundationApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,
@@ -171,6 +176,9 @@ const examples = {
   datePickerFoundation: datePickerFoundationApp,
   drawerFoundation: drawerFoundationApp,
   modalDialogFoundation: modalDialogFoundationApp,
+  tooltipFoundation: tooltipFoundationApp,
+  contextMenuFoundation: contextMenuFoundationApp,
+  dropdownMenuFoundation: dropdownMenuFoundationApp,
   cardFoundation: cardFoundationApp,
   fileInputFoundation: fileInputFoundationApp,
   fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,

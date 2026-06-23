@@ -57,6 +57,14 @@ import { dateInputRenderer } from "../components/DateInput/DateInput.renderer";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker.renderer";
 import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
 import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
+import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
+import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu.renderer";
+import {
+  dropdownMenuRenderer,
+  menuItemRenderer,
+  menuSeparatorRenderer,
+  subMenuItemRenderer,
+} from "../components/DropdownMenu/DropdownMenu.renderer";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
@@ -74,6 +82,7 @@ import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfCo
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
+import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -143,6 +152,12 @@ const implementedRuntimeNames = [
   "DatePicker",
   "Drawer",
   "ModalDialog",
+  "Tooltip",
+  "ContextMenu",
+  "DropdownMenu",
+  "MenuItem",
+  "MenuSeparator",
+  "SubMenuItem",
   "FileInput",
   "FileUploadDropZone",
   "TimeInput",
@@ -223,6 +238,12 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   DatePicker: datePickerRenderer,
   Drawer: drawerRenderer,
   ModalDialog: modalDialogRenderer,
+  Tooltip: tooltipRenderer,
+  ContextMenu: contextMenuRenderer,
+  DropdownMenu: dropdownMenuRenderer,
+  MenuItem: menuItemRenderer,
+  MenuSeparator: menuSeparatorRenderer,
+  SubMenuItem: subMenuItemRenderer,
   AutoComplete: autoCompleteRenderer,
   FileInput: fileInputRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
@@ -240,6 +261,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   SelectionStore: selectionStoreRenderer,
   Items: itemsRenderer,
   TimeInput: timeInputRenderer,
+  NavLink: navLinkRenderer,
   ...htmlTagRenderers,
 };
 
@@ -292,6 +314,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const datePickerTransferred = contract.name === "DatePicker";
     const drawerTransferred = contract.name === "Drawer";
     const modalDialogTransferred = contract.name === "ModalDialog";
+    const tooltipTransferred = contract.name === "Tooltip";
+    const contextMenuTransferred = contract.name === "ContextMenu";
+    const dropdownMenuTransferred = contract.name === "DropdownMenu";
+    const menuPrimitiveTransferred = contract.name === "MenuItem" ||
+      contract.name === "MenuSeparator" ||
+      contract.name === "SubMenuItem";
     const fileInputTransferred = contract.name === "FileInput";
     const fileUploadDropZoneTransferred = contract.name === "FileUploadDropZone";
     const itemsTransferred = contract.name === "Items";
@@ -315,6 +343,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const iframeTransferred = contract.name === "IFrame";
     const iconTransferred = contract.name === "Icon";
     const linkTransferred = contract.name === "Link";
+    const navLinkTransferred = contract.name === "NavLink";
     const logoTransferred = contract.name === "Logo";
     const pageMetaTitleTransferred = contract.name === "PageMetaTitle";
     const qrCodeTransferred = contract.name === "QRCode";
@@ -345,6 +374,10 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       datePickerTransferred ||
       drawerTransferred ||
       modalDialogTransferred ||
+      tooltipTransferred ||
+      contextMenuTransferred ||
+      dropdownMenuTransferred ||
+      menuPrimitiveTransferred ||
       fileInputTransferred ||
       fileUploadDropZoneTransferred ||
       itemsTransferred ||
@@ -368,6 +401,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       iframeTransferred ||
       iconTransferred ||
       linkTransferred ||
+      navLinkTransferred ||
       logoTransferred ||
       pageMetaTitleTransferred ||
       qrCodeTransferred ||
@@ -414,6 +448,14 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                 ? "Drawer"
                               : modalDialogTransferred
                                 ? "ModalDialog"
+                              : tooltipTransferred
+                                ? "Tooltip"
+                              : contextMenuTransferred
+                                ? "ContextMenu"
+                              : dropdownMenuTransferred
+                                ? "DropdownMenu"
+                              : menuPrimitiveTransferred
+                                ? "DropdownMenu"
                               : fileInputTransferred
                                   ? "FileInput"
                                   : fileUploadDropZoneTransferred
@@ -448,6 +490,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                             ? "ExpandableItem"
                                                             : tabsTransferred
                                                               ? "Tabs"
+                                                              : navLinkTransferred
+                                                                ? "NavLink"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -491,6 +535,14 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DrawerReact.tsx`);
     } else if (modalDialogTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ModalDialogReact.tsx`);
+    } else if (tooltipTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TooltipReact.tsx`);
+    } else if (contextMenuTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ContextMenuReact.tsx`);
+    } else if (dropdownMenuTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenuReact.tsx`);
+    } else if (menuPrimitiveTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenuReact.tsx`);
     } else if (fileInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileInputReact.tsx`);
     } else if (fileUploadDropZoneTransferred) {
@@ -529,6 +581,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/IconReact.tsx`);
     } else if (linkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LinkReact.tsx`);
+    } else if (navLinkTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavLinkReact.tsx`);
     } else if (logoTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LogoReact.tsx`);
     } else if (pageMetaTitleTransferred) {
@@ -573,6 +627,10 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       datePickerTransferred,
       drawerTransferred,
       modalDialogTransferred,
+      tooltipTransferred,
+      contextMenuTransferred,
+      dropdownMenuTransferred,
+      menuPrimitiveTransferred,
       fileInputTransferred,
       fileUploadDropZoneTransferred,
       itemsTransferred,
@@ -595,6 +653,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       iframeTransferred,
       iconTransferred,
       linkTransferred,
+      navLinkTransferred,
       pageMetaTitleTransferred,
       qrCodeTransferred,
       codeBlockTransferred,
@@ -664,6 +723,10 @@ function componentRunnablePaths(flags: {
   datePickerTransferred: boolean;
   drawerTransferred: boolean;
   modalDialogTransferred: boolean;
+  tooltipTransferred: boolean;
+  contextMenuTransferred: boolean;
+  dropdownMenuTransferred: boolean;
+  menuPrimitiveTransferred: boolean;
   fileInputTransferred: boolean;
   fileUploadDropZoneTransferred: boolean;
   itemsTransferred: boolean;
@@ -686,6 +749,7 @@ function componentRunnablePaths(flags: {
   iframeTransferred: boolean;
   iconTransferred: boolean;
   linkTransferred: boolean;
+  navLinkTransferred: boolean;
   pageMetaTitleTransferred: boolean;
   qrCodeTransferred: boolean;
   codeBlockTransferred: boolean;
@@ -767,6 +831,30 @@ function componentRunnablePaths(flags: {
     return [
       "xmlui/src/components/ModalDialog/ModalDialog.foundation.spec.ts",
       "xmlui/src/components/ModalDialog/ModalDialog.spec.ts",
+    ];
+  }
+  if (flags.tooltipTransferred) {
+    return [
+      "xmlui/src/components/Tooltip/Tooltip.foundation.spec.ts",
+      "xmlui/src/components/Tooltip/Tooltip.spec.ts",
+    ];
+  }
+  if (flags.contextMenuTransferred) {
+    return [
+      "xmlui/src/components/ContextMenu/ContextMenu.foundation.spec.ts",
+      "xmlui/src/components/ContextMenu/ContextMenu.spec.ts",
+    ];
+  }
+  if (flags.dropdownMenuTransferred) {
+    return [
+      "xmlui/src/components/DropdownMenu/DropdownMenu.foundation.spec.ts",
+      "xmlui/src/components/DropdownMenu/DropdownMenu.spec.ts",
+    ];
+  }
+  if (flags.menuPrimitiveTransferred) {
+    return [
+      "xmlui/src/components/ContextMenu/ContextMenu.foundation.spec.ts",
+      "xmlui/src/components/DropdownMenu/DropdownMenu.foundation.spec.ts",
     ];
   }
   if (flags.fileInputTransferred) {
@@ -874,6 +962,12 @@ function componentRunnablePaths(flags: {
   }
   if (flags.linkTransferred) {
     return ["xmlui/src/components/Link/Link.spec.ts"];
+  }
+  if (flags.navLinkTransferred) {
+    return [
+      "xmlui/src/components/NavLink/NavLink.foundation.spec.ts",
+      "xmlui/src/components/NavLink/NavLink.spec.ts",
+    ];
   }
   if (flags.pageMetaTitleTransferred) {
     return ["xmlui/src/components/PageMetaTitle/PageMetaTitle.spec.ts"];

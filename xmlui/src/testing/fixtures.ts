@@ -7,11 +7,14 @@ import {
   CodeBlockDriver,
   ComponentDriver,
   ContentSeparatorDriver,
+  ContextMenuDriver,
+  DropdownMenuDriver,
   ExpandableItemDriver,
   IconDriver,
   LinkDriver,
   ListDriver,
   ModalDialogDriver,
+  NavLinkDriver,
   NoResultDriver,
   NumberBoxDriver,
   ResponsiveBarDriver,
@@ -58,8 +61,11 @@ type Fixtures = {
   createSplitterDriver: (testId?: string | Locator) => Promise<SplitterDriver>;
   createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
   createModalDialogDriver: (testId?: string | Locator) => Promise<ModalDialogDriver>;
+  createContextMenuDriver: (testId?: string | Locator) => Promise<ContextMenuDriver>;
+  createDropdownMenuDriver: (testId?: string | Locator) => Promise<DropdownMenuDriver>;
   createTreeDriver: (testId?: string | Locator) => Promise<TreeDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
+  createNavLinkDriver: (testId?: string | Locator) => Promise<NavLinkDriver>;
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
@@ -220,6 +226,28 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createContextMenuDriver: async ({ page }, use) => {
+    await use(async (testId) => new ContextMenuDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ContextMenu"]').first(),
+      page,
+    }));
+  },
+  createDropdownMenuDriver: async ({ page }, use) => {
+    await use(async (testId) => new DropdownMenuDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="DropdownMenu"]').first(),
+      page,
+    }));
+  },
   createTreeDriver: async ({ page }, use) => {
     await use(async (testId) => new TreeDriver({
       locator: typeof testId === "string"
@@ -236,6 +264,17 @@ export const test = base.extend<Fixtures>({
       locator: typeof testId === "string"
         ? page.getByTestId(testId)
         : testId ?? page.locator('[data-xmlui-component="Link"], [data-xmlui-component="a"]').first(),
+      page,
+    }));
+  },
+  createNavLinkDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavLinkDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavLink"]').first(),
       page,
     }));
   },

@@ -1,0 +1,17 @@
+<App var.count="{0}">
+  <H1>Tooltip foundation</H1>
+  <Text>Count: {count}</Text>
+  <Tooltip
+    text="This tooltip opens on hover"
+    side="bottom"
+    delayDuration="{0}"
+    showArrow="{true}">
+    <Button onClick="count++">Hover and click</Button>
+  </Tooltip>
+  <Tooltip defaultOpen="{true}">
+    <property name="tooltipTemplate">
+      <Text>Template count: {count}</Text>
+    </property>
+    <Button onClick="count++">Template tooltip trigger</Button>
+  </Tooltip>
+</App>

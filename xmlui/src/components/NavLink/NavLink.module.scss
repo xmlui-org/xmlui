@@ -1,0 +1,113 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-NavLink: createThemeVar("backgroundColor-NavLink");
+$backgroundColor-NavLink-hover: createThemeVar("backgroundColor-NavLink--hover");
+$backgroundColor-NavLink-active: createThemeVar("backgroundColor-NavLink--active");
+$textColor-NavLink: createThemeVar("textColor-NavLink");
+$textColor-NavLink-hover: createThemeVar("textColor-NavLink--hover");
+$textColor-NavLink-active: createThemeVar("textColor-NavLink--active");
+$fontFamily-NavLink: createThemeVar("fontFamily-NavLink");
+$fontSize-NavLink: createThemeVar("fontSize-NavLink");
+$fontWeight-NavLink: createThemeVar("fontWeight-NavLink");
+$paddingVertical-NavLink: createThemeVar("paddingVertical-NavLink");
+$paddingHorizontal-NavLink: createThemeVar("paddingHorizontal-NavLink");
+$borderRadius-NavLink: createThemeVar("borderRadius-NavLink");
+$thickness-indicator-NavLink: createThemeVar("thickness-indicator-NavLink");
+$color-indicator-NavLink-active: createThemeVar("color-indicator-NavLink--active");
+$gap-icon-NavLink: createThemeVar("gap-icon-NavLink");
+$color-icon-NavLink: createThemeVar("color-icon-NavLink");
+
+.content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: $gap-icon-NavLink;
+  padding: $paddingVertical-NavLink $paddingHorizontal-NavLink;
+  border: 0;
+  border-radius: $borderRadius-NavLink;
+  color: $textColor-NavLink;
+  background-color: $backgroundColor-NavLink;
+  font-family: $fontFamily-NavLink;
+  font-size: $fontSize-NavLink;
+  font-weight: $fontWeight-NavLink;
+  line-height: 1.4;
+  text-align: start;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.content:hover,
+.content:focus-visible {
+  color: $textColor-NavLink-hover;
+  background-color: $backgroundColor-NavLink-hover;
+}
+
+.active {
+  color: $textColor-NavLink-active;
+  background-color: $backgroundColor-NavLink-active;
+}
+
+.active::after {
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0;
+  left: 0.25rem;
+  height: $thickness-indicator-NavLink;
+  border-radius: $thickness-indicator-NavLink;
+  background-color: $color-indicator-NavLink-active;
+  content: "";
+}
+
+.vertical::after {
+  top: 0.25rem;
+  right: auto;
+  bottom: 0.25rem;
+  left: 0;
+  width: $thickness-indicator-NavLink;
+  height: auto;
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.noIndicator::after {
+  display: none;
+}
+
+.icon {
+  display: inline-flex;
+  color: $color-icon-NavLink;
+}
+
+.innerContent {
+  display: inline-flex;
+  align-items: center;
+  gap: $gap-icon-NavLink;
+}
+
+.iconAlignStart {
+  align-items: flex-start;
+}
+
+.iconAlignCenter {
+  align-items: center;
+}
+
+.iconAlignEnd {
+  align-items: flex-end;
+}
+
+.iconAlignBaseline {
+  align-items: baseline;
+}
+
+:export {
+  themeVars: "";
+}

@@ -1,0 +1,103 @@
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$component: "Tooltip";
+
+$paddingTop-Tooltip: createThemeVar("paddingTop-#{$component}");
+$paddingRight-Tooltip: createThemeVar("paddingRight-#{$component}");
+$paddingBottom-Tooltip: createThemeVar("paddingBottom-#{$component}");
+$paddingLeft-Tooltip: createThemeVar("paddingLeft-#{$component}");
+$border-Tooltip: createThemeVar("border-#{$component}");
+$borderRadius-Tooltip: createThemeVar("borderRadius-#{$component}");
+$backgroundColor-Tooltip: createThemeVar("backgroundColor-#{$component}");
+$textColor-Tooltip: createThemeVar("textColor-#{$component}");
+$fontSize-Tooltip: createThemeVar("fontSize-#{$component}");
+$lineHeight-Tooltip: createThemeVar("lineHeight-#{$component}");
+$boxShadow-Tooltip: createThemeVar("boxShadow-#{$component}");
+$fill-arrow-Tooltip: createThemeVar("fill-arrow-#{$component}");
+$stroke-arrow-Tooltip: createThemeVar("stroke-arrow-#{$component}");
+$strokeWidth-arrow-Tooltip: createThemeVar("strokeWidth-arrow-#{$component}");
+$animationDuration-Tooltip: createThemeVar("animationDuration-#{$component}");
+$animation-Tooltip: createThemeVar("animation-#{$component}");
+
+.root {
+  display: contents;
+}
+
+.trigger {
+  display: inline-flex;
+}
+
+.content {
+  position: fixed;
+  z-index: 9999;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: $paddingTop-Tooltip $paddingRight-Tooltip $paddingBottom-Tooltip $paddingLeft-Tooltip;
+  border: $border-Tooltip;
+  border-radius: $borderRadius-Tooltip;
+  font-size: $fontSize-Tooltip;
+  line-height: $lineHeight-Tooltip;
+  color: $textColor-Tooltip;
+  background-color: $backgroundColor-Tooltip;
+  box-shadow: $boxShadow-Tooltip;
+  user-select: none;
+  pointer-events: none;
+  animation-duration: $animationDuration-Tooltip;
+  animation-timing-function: $animation-Tooltip;
+}
+
+.content[data-side="top"] {
+  transform: translate(-50%, calc(-100% - var(--xmlui-tooltip-side-offset, 4px)));
+}
+
+.content[data-side="bottom"] {
+  transform: translate(-50%, var(--xmlui-tooltip-side-offset, 4px));
+}
+
+.content[data-side="left"] {
+  transform: translate(calc(-100% - var(--xmlui-tooltip-side-offset, 4px)), -50%);
+}
+
+.content[data-side="right"] {
+  transform: translate(var(--xmlui-tooltip-side-offset, 4px), -50%);
+}
+
+.arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  fill: $fill-arrow-Tooltip;
+  stroke: $stroke-arrow-Tooltip;
+  stroke-width: $strokeWidth-arrow-Tooltip;
+}
+
+.content[data-side="top"] .arrow {
+  left: calc(50% - 4px);
+  bottom: -4px;
+  transform: rotate(45deg);
+}
+
+.content[data-side="bottom"] .arrow {
+  left: calc(50% - 4px);
+  top: -4px;
+  transform: rotate(45deg);
+}
+
+.content[data-side="left"] .arrow {
+  right: -4px;
+  top: calc(50% - 4px);
+  transform: rotate(45deg);
+}
+
+.content[data-side="right"] .arrow {
+  left: -4px;
+  top: calc(50% - 4px);
+  transform: rotate(45deg);
+}
+
+:export {
+  themeVars: "";
+}

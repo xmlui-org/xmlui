@@ -126,6 +126,50 @@ export class ModalDialogDriver extends ComponentDriver {
   }
 }
 
+export class ContextMenuDriver extends ComponentDriver {
+  getMenuItems(): Locator {
+    return this.params.page.getByRole("menuitem");
+  }
+
+  getMenuItem(text: string): Locator {
+    return this.params.page.getByRole("menuitem", { name: text });
+  }
+
+  async clickMenuItem(text: string): Promise<void> {
+    await this.getMenuItem(text).click();
+  }
+}
+
+export class DropdownMenuDriver extends ComponentDriver {
+  getTrigger(): Locator {
+    return this.params.page.getByRole("button").first();
+  }
+
+  async open(): Promise<void> {
+    await this.getTrigger().click();
+  }
+
+  async close(): Promise<void> {
+    await this.params.page.keyboard.press("Escape");
+  }
+
+  getMenuItems(): Locator {
+    return this.params.page.getByRole("menuitem");
+  }
+
+  getMenuItem(text: string): Locator {
+    return this.params.page.getByRole("menuitem", { name: text });
+  }
+
+  async clickMenuItem(text: string): Promise<void> {
+    await this.getMenuItem(text).click();
+  }
+
+  async isOpen(): Promise<boolean> {
+    return this.getMenuItems().first().isVisible();
+  }
+}
+
 export class ExpandableItemDriver extends ComponentDriver {
   getSummary(): Locator {
     return this.getByPartName("summary");
@@ -205,6 +249,8 @@ export class SplitterDriver extends ComponentDriver {
 }
 
 export class LinkDriver extends ComponentDriver {}
+
+export class NavLinkDriver extends ComponentDriver {}
 
 export class TextBoxDriver extends InputComponentDriver {
   get input(): Locator {

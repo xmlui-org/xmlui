@@ -1,0 +1,18 @@
+<App var.message="{'Right-click the card'}">
+  <H1>ContextMenu foundation</H1>
+  <Card
+    testId="target"
+    title="Right-click target"
+    onContextMenu="ev => menu.openAt(ev, { fileName: 'report.pdf' })">
+    <Text>{message}</Text>
+  </Card>
+  <ContextMenu id="menu">
+    <MenuItem onClick="message = 'Opened ' + $context.fileName">
+      Open {$context.fileName}
+    </MenuItem>
+    <MenuSeparator />
+    <MenuItem onClick="message = 'Deleted ' + $context.fileName">
+      Delete {$context.fileName}
+    </MenuItem>
+  </ContextMenu>
+</App>
