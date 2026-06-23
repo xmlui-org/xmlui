@@ -29,7 +29,11 @@ import "./components/FileUploadDropZone/FileUploadDropZone.module.scss?xmlui-css
 import "./components/Pagination/Pagination.module.scss?xmlui-css-module";
 import "./components/RadioGroup/RadioGroup.module.scss?xmlui-css-module";
 import "./components/Select/Select.module.scss?xmlui-css-module";
+import "./components/Table/Table.module.scss?xmlui-css-module";
+import "./components/TableOfContents/TableOfContents.module.scss?xmlui-css-module";
 import "./components/TimeInput/TimeInput.module.scss?xmlui-css-module";
+import "./components/Tree/TreeComponent.module.scss?xmlui-css-module";
+import "./components/TreeDisplay/TreeDisplay.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -97,6 +101,8 @@ import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlu
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
 import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
+import tableFoundationApp from "./examples/table-foundation/Main.xmlui";
+import treeFamilyFoundationApp from "./examples/tree-family-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -179,6 +185,8 @@ const examples = {
   fileInputFoundation: fileInputFoundationApp,
   fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
+  tableFoundation: tableFoundationApp,
+  treeFamilyFoundation: treeFamilyFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

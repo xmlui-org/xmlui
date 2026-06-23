@@ -416,6 +416,62 @@ export class SelectDriver extends ComponentDriver {
   }
 }
 
+export class AutoCompleteDriver extends ComponentDriver {
+  get input(): Locator {
+    return this.component.getByRole("combobox").or(this.component.locator("input")).first();
+  }
+
+  click = async (): Promise<void> => {
+    await this.input.click();
+  };
+
+  async selectLabel(value: string): Promise<void> {
+    await this.params.page.getByRole("option", { name: value }).first().click({ force: true });
+  }
+
+  async searchFor(value: string): Promise<void> {
+    await this.input.fill(value);
+  }
+
+  async chooseIndex(index: number): Promise<void> {
+    await this.params.page.getByRole("option").nth(index).click();
+  }
+}
+
+export class ListDriver extends ComponentDriver {
+  get rows(): Locator {
+    return this.component.locator("[data-list-index]");
+  }
+
+  get rowCheckboxes(): Locator {
+    return this.component.locator('input[type="checkbox"]');
+  }
+}
+
+export class TreeDriver extends ComponentDriver {
+  get items(): Locator {
+    return this.component.getByRole("treeitem");
+  }
+
+  get expandButtons(): Locator {
+    return this.component.getByRole("button", { name: /Expand|Collapse/ });
+  }
+
+  async expandItem(label: string): Promise<void> {
+    const item = this.component.getByRole("treeitem", { name: new RegExp(label) }).first();
+    await item.getByRole("button", { name: "Expand" }).click();
+  }
+
+  async collapseItem(label: string): Promise<void> {
+    const item = this.component.getByRole("treeitem", { name: new RegExp(label) }).first();
+    await item.getByRole("button", { name: "Collapse" }).click();
+  }
+
+  async selectItem(label: string): Promise<void> {
+    await this.component.getByRole("treeitem", { name: new RegExp(label) }).first().click();
+  }
+}
+
 export class SliderDriver extends ComponentDriver {
   private async getActiveThumb(thumbNumber = 0): Promise<Locator> {
     const thumbs = this.params.page.getByRole("slider");

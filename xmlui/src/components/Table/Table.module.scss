@@ -1,0 +1,65 @@
+.root {
+  width: 100%;
+  overflow: auto;
+  color: var(--xmlui-textColor-Table);
+  background: var(--xmlui-backgroundColor-Table);
+  border: var(--xmlui-border-Table);
+  border-radius: var(--xmlui-borderRadius-Table);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: inherit;
+}
+
+.headerCell {
+  height: var(--xmlui-headerHeight-Table);
+  padding: var(--xmlui-padding-TableCell);
+  color: var(--xmlui-textColor-header-Table);
+  background: var(--xmlui-backgroundColor-header-Table);
+  border-bottom: var(--xmlui-borderBottom-header-Table);
+  font-weight: 600;
+  text-align: left;
+  user-select: var(--xmlui-userSelectHeading-Table);
+}
+
+.sortableHeader {
+  cursor: pointer;
+}
+
+.row {
+  height: var(--xmlui-rowHeight-Table);
+  background: var(--xmlui-backgroundColor-row-Table);
+  user-select: var(--xmlui-userSelectRow-Table);
+}
+
+.row:nth-child(even) {
+  background: var(--xmlui-backgroundColor-row-Table--even);
+}
+
+.row:hover {
+  background: var(--xmlui-backgroundColor-row-Table--hover);
+}
+
+.rowSelected {
+  background: var(--xmlui-backgroundColor-selected-Table);
+}
+
+.cell {
+  padding: var(--xmlui-padding-TableCell);
+  border-bottom: var(--xmlui-borderBottom-row-Table);
+  vertical-align: middle;
+  user-select: var(--xmlui-userSelectCell-Table);
+}
+
+.selectionCell {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.empty {
+  padding: var(--xmlui-padding-TableCell);
+  color: var(--xmlui-textColor-empty-Table);
+  text-align: center;
+}

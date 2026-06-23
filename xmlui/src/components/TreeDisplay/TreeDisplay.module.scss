@@ -1,0 +1,18 @@
+.root {
+  padding: var(--xmlui-padding-TreeDisplay);
+  padding-left: var(--xmlui-paddingLeft-TreeDisplay);
+  color: var(--xmlui-color-TreeDisplay);
+  background: var(--xmlui-backgroundColor-TreeDisplay);
+  border: var(--xmlui-border-TreeDisplay);
+  border-radius: var(--xmlui-borderRadius-TreeDisplay);
+  box-shadow: var(--xmlui-boxShadow-TreeDisplay);
+  font-family: var(--xmlui-fontFamily-TreeDisplay);
+  font-size: var(--xmlui-fontSize-TreeDisplay);
+  font-weight: var(--xmlui-fontWeight-TreeDisplay);
+}
+
+.item {
+  position: relative;
+  min-height: var(--xmlui-itemHeight-TreeDisplay);
+  white-space: pre;
+}

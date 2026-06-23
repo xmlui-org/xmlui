@@ -1,5 +1,6 @@
 import { expect as baseExpect, test as base, type Locator, type Page } from "@playwright/test";
 import {
+  AutoCompleteDriver,
   CardDriver,
   CheckboxDriver,
   CodeBlockDriver,
@@ -7,6 +8,7 @@ import {
   ContentSeparatorDriver,
   IconDriver,
   LinkDriver,
+  ListDriver,
   NoResultDriver,
   NumberBoxDriver,
   DateInputDriver,
@@ -16,6 +18,7 @@ import {
   TimeInputDriver,
   TextAreaDriver,
   TextBoxDriver,
+  TreeDriver,
 } from "./ComponentDrivers";
 
 export type InitTestBedOptions = {
@@ -44,12 +47,15 @@ type Fixtures = {
   createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
+  createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
+  createTreeDriver: (testId?: string | Locator) => Promise<TreeDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
   createDateInputDriver: (testId?: string | Locator) => Promise<DateInputDriver>;
   createFileUploadDropZoneDriver: (testId?: string | Locator) => Promise<FileUploadDropZoneDriver>;
+  createAutoCompleteDriver: (testId?: string | Locator) => Promise<AutoCompleteDriver>;
   createSelectDriver: (testId?: string | Locator) => Promise<SelectDriver>;
   createTimeInputDriver: (testId?: string | Locator) => Promise<TimeInputDriver>;
   createSliderDriver: (testId?: string | Locator) => Promise<SliderDriver>;
@@ -150,6 +156,28 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createListDriver: async ({ page }, use) => {
+    await use(async (testId) => new ListDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="List"]').first(),
+      page,
+    }));
+  },
+  createTreeDriver: async ({ page }, use) => {
+    await use(async (testId) => new TreeDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Tree"]').first(),
+      page,
+    }));
+  },
   createLinkDriver: async ({ page }, use) => {
     await use(async (testId) => new LinkDriver({
       locator: typeof testId === "string"
@@ -210,6 +238,17 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="FileUploadDropZone"]').first(),
+      page,
+    }));
+  },
+  createAutoCompleteDriver: async ({ page }, use) => {
+    await use(async (testId) => new AutoCompleteDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="AutoComplete"]').first(),
       page,
     }));
   },

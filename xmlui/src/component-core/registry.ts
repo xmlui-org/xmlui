@@ -51,6 +51,11 @@ import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
+import { tableRenderer } from "../components/Table/Table";
+import { columnRenderer } from "../components/Column/Column";
+import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfContents";
+import { treeRenderer } from "../components/Tree/Tree";
+import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
@@ -116,6 +121,11 @@ const implementedRuntimeNames = [
   "Pages",
   "Page",
   "Pagination",
+  "Table",
+  "Column",
+  "Tree",
+  "TreeDisplay",
+  "TableOfContents",
   "NavLink",
   "NavPanel",
   "DataSource",
@@ -168,6 +178,11 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   FileUploadDropZone: fileUploadDropZoneRenderer,
   Option: optionRenderer,
   Pagination: paginationRenderer,
+  Table: tableRenderer,
+  Column: columnRenderer,
+  Tree: treeRenderer,
+  TreeDisplay: treeDisplayRenderer,
+  TableOfContents: tableOfContentsRenderer,
   RadioGroup: radioGroupRenderer,
   Select: selectRenderer,
   SelectionStore: selectionStoreRenderer,
@@ -219,6 +234,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const fileInputTransferred = contract.name === "FileInput";
     const fileUploadDropZoneTransferred = contract.name === "FileUploadDropZone";
     const itemsTransferred = contract.name === "Items";
+    const tableTransferred = contract.name === "Table";
+    const columnTransferred = contract.name === "Column";
+    const treeTransferred = contract.name === "Tree";
+    const treeDisplayTransferred = contract.name === "TreeDisplay";
+    const tableOfContentsTransferred = contract.name === "TableOfContents";
     const timeInputTransferred = contract.name === "TimeInput";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
@@ -254,6 +274,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       fileInputTransferred ||
       fileUploadDropZoneTransferred ||
       itemsTransferred ||
+      tableTransferred ||
+      columnTransferred ||
+      treeTransferred ||
+      treeDisplayTransferred ||
+      tableOfContentsTransferred ||
       timeInputTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
@@ -305,9 +330,19 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                     ? "FileUploadDropZone"
                                     : itemsTransferred
                                       ? "Items"
-                                      : timeInputTransferred
-                                        ? "TimeInput"
-                                        : contract.name;
+                                      : tableTransferred
+                                        ? "Table"
+                                        : columnTransferred
+                                          ? "Column"
+                                          : treeTransferred
+                                            ? "Tree"
+                                            : treeDisplayTransferred
+                                              ? "TreeDisplay"
+                                              : tableOfContentsTransferred
+                                                ? "TableOfContents"
+                                                : timeInputTransferred
+                                                  ? "TimeInput"
+                                                  : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
       : sharedComponentFile;
@@ -346,6 +381,16 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileUploadDropZoneReact.tsx`);
     } else if (itemsTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ItemsReact.tsx`);
+    } else if (tableTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TableReact.tsx`);
+    } else if (columnTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ColumnReact.tsx`);
+    } else if (treeTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TreeReact.tsx`);
+    } else if (treeDisplayTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TreeDisplayReact.tsx`);
+    } else if (tableOfContentsTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TableOfContentsReact.tsx`);
     } else if (timeInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TimeInputReact.tsx`);
     } else if (headingTransferred) {
@@ -394,6 +439,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       fileInputTransferred,
       fileUploadDropZoneTransferred,
       itemsTransferred,
+      tableTransferred,
+      columnTransferred,
+      treeTransferred,
+      treeDisplayTransferred,
+      tableOfContentsTransferred,
       timeInputTransferred,
       headingTransferred,
       htmlTagTransferred,
@@ -470,6 +520,11 @@ function componentRunnablePaths(flags: {
   fileInputTransferred: boolean;
   fileUploadDropZoneTransferred: boolean;
   itemsTransferred: boolean;
+  tableTransferred: boolean;
+  columnTransferred: boolean;
+  treeTransferred: boolean;
+  treeDisplayTransferred: boolean;
+  tableOfContentsTransferred: boolean;
   timeInputTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
@@ -550,6 +605,42 @@ function componentRunnablePaths(flags: {
   }
   if (flags.itemsTransferred) {
     return ["xmlui/src/components/Items/Items.spec.ts"];
+  }
+  if (flags.tableTransferred) {
+    return [
+      "xmlui/src/components/Table/Table.spec.ts",
+      "xmlui/src/components/Table/TableCellTextOverflow.spec.ts",
+      "xmlui/src/components/Table/Table.foundation.spec.ts",
+    ];
+  }
+  if (flags.columnTransferred) {
+    return ["xmlui/src/components/Table/Table.foundation.spec.ts"];
+  }
+  if (flags.treeTransferred) {
+    return [
+      "xmlui/src/components/Tree/Tree.foundation.spec.ts",
+      "xmlui/src/components/Tree/Tree.spec.ts",
+      "xmlui/src/components/Tree/Tree-autoLoadAfter-field.spec.ts",
+      "xmlui/src/components/Tree/Tree-dynamic-field.spec.ts",
+      "xmlui/src/components/Tree/Tree-dynamic-integration.spec.ts",
+      "xmlui/src/components/Tree/Tree-dynamic.spec.ts",
+      "xmlui/src/components/Tree/Tree-icons.spec.ts",
+      "xmlui/src/components/Tree/Tree-loaded-field.spec.ts",
+      "xmlui/src/components/Tree/Tree-replace-apis.spec.ts",
+      "xmlui/src/components/Tree/Tree-spinnerDelay.spec.ts",
+    ];
+  }
+  if (flags.treeDisplayTransferred) {
+    return [
+      "xmlui/src/components/TreeDisplay/TreeDisplay.foundation.spec.ts",
+      "xmlui/src/components/TreeDisplay/TreeDisplay.spec.ts",
+    ];
+  }
+  if (flags.tableOfContentsTransferred) {
+    return [
+      "xmlui/src/components/TableOfContents/TableOfContents.foundation.spec.ts",
+      "xmlui/src/components/TableOfContents/TableOfContents.spec.ts",
+    ];
   }
   if (flags.timeInputTransferred) {
     return ["xmlui/src/components/TimeInput/TimeInput.spec.ts"];

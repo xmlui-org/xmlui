@@ -1,0 +1,17 @@
+<App var.selected="{0}">
+  <H1>Table foundation</H1>
+  <Text>Selected rows: {selected}</Text>
+  <Table
+    testId="table"
+    rowsSelectable="true"
+    onSelectionDidChange="items => selected = items.length"
+    data="{[
+      { id: 1, name: 'Ada', role: 'Compiler', score: 98 },
+      { id: 2, name: 'Grace', role: 'Runtime', score: 96 },
+      { id: 3, name: 'Linus', role: 'Kernel', score: 94 }
+    ]}">
+    <Column bindTo="name" header="Name" width="180px" />
+    <Column bindTo="role" header="Role" />
+    <Column bindTo="score" header="Score" />
+  </Table>
+</App>
