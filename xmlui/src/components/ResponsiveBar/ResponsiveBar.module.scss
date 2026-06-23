@@ -1,0 +1,71 @@
+@use "../../component-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-ResponsiveBar: createThemeVar("backgroundColor-ResponsiveBar");
+$padding-ResponsiveBar: createThemeVar("padding-ResponsiveBar");
+$margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
+
+@layer components {
+  .responsiveBar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+    background-color: #{$backgroundColor-ResponsiveBar};
+    padding: #{$padding-ResponsiveBar};
+    margin: #{$margin-ResponsiveBar};
+  }
+
+  .horizontal {
+    flex-direction: row;
+    height: auto;
+  }
+
+  .vertical {
+    flex-direction: column;
+    width: auto;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .reverseHorizontal {
+    flex-direction: row-reverse;
+  }
+
+  .reverseVertical {
+    flex-direction: column-reverse;
+  }
+
+  .visibleItems {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: stretch;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .visibleItemsHorizontal {
+    flex-direction: row;
+  }
+
+  .visibleItemsVertical {
+    flex-direction: column;
+  }
+
+  .overflowDropdown {
+    display: none;
+    flex: 0 0 auto;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

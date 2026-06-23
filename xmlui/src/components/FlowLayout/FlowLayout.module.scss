@@ -24,13 +24,19 @@ $rowGap-FlowLayout: createThemeVar("rowGap-FlowLayout");
   .item {
     box-sizing: border-box;
     flex: 0 0 var(--xmlui-itemWidth-FlowLayout);
-    min-width: 0;
-    max-width: 100%;
+    min-width: var(--xmlui-minWidth-FlowLayoutItem, 0);
+    max-width: var(--xmlui-maxWidth-FlowLayoutItem, 100%);
 
     & > * {
       width: 100%;
       min-width: 0;
     }
+  }
+
+  .break,
+  .forceBreak {
+    flex-basis: 100%;
+    height: 0;
   }
 
   .alignItemsStart {

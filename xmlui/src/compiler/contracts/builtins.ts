@@ -3,6 +3,7 @@ import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "..
 import { htmlTagDefinitions } from "../../component-core/htmlTags";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
+import { CardMd } from "../../components/Card/Card";
 import { FragmentMd } from "../../components/Fragment/Fragment";
 import { ImageMd } from "../../components/Image/Image";
 import { IFrameMd } from "../../components/IFrame/IFrame";
@@ -19,6 +20,7 @@ import { DatePickerMd } from "../../components/DatePicker/DatePicker";
 import { FileInputMd } from "../../components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "../../components/FileUploadDropZone/FileUploadDropZone";
 import { FlowLayoutMd } from "../../components/FlowLayout/FlowLayout";
+import { ScrollViewerMd } from "../../components/ScrollViewer/ScrollViewer";
 import { TimeInputMd } from "../../components/TimeInput/TimeInput";
 import { TileGridMd } from "../../components/TileGrid/TileGrid";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
@@ -26,6 +28,7 @@ import { FallbackMd } from "../../components/Fallback/Fallback";
 import { NoResultMd } from "../../components/NoResult/NoResult";
 import { PageMetaTitleMd } from "../../components/PageMetaTitle/PageMetaTitle";
 import { QRCodeMd } from "../../components/QRCode/QRCode";
+import { ResponsiveBarMd } from "../../components/ResponsiveBar/ResponsiveBar";
 import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
 import { contractFromMetadata } from "./fromMetadata";
 
@@ -393,6 +396,22 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       contextMenu: "onContextMenu",
     },
   }),
+  contractFromMetadata(ScrollViewerMd, {
+    name: "ScrollViewer",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ResponsiveBarMd, {
+    name: "ResponsiveBar",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+      willOpen: "onWillOpen",
+    },
+  }),
   {
     name: "HStack",
     kind: "builtin",
@@ -449,36 +468,17 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
     },
   },
-  {
+  contractFromMetadata(CardMd, {
     name: "Card",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps({
-      id: { name: "id" },
-      avatarUrl: { name: "avatarUrl" },
-      showAvatar: { name: "showAvatar" },
-      avatarSize: { name: "avatarSize" },
-      title: { name: "title" },
-      subtitle: { name: "subtitle" },
-      linkTo: { name: "linkTo" },
-      orientation: { name: "orientation" },
-      testId: { name: "testId" },
-    }),
-    events: {
-      click: { name: "click", attributeName: "onClick" },
-      doubleClick: { name: "doubleClick", attributeName: "onDoubleClick" },
-      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+      doubleClick: "onDoubleClick",
+      contextMenu: "onContextMenu",
     },
-    apis: {
-      scrollToTop: { name: "scrollToTop" },
-      scrollToBottom: { name: "scrollToBottom" },
-      scrollToLeft: { name: "scrollToLeft" },
-      scrollToRight: { name: "scrollToRight" },
-      scrollToStart: { name: "scrollToStart" },
-      scrollToEnd: { name: "scrollToEnd" },
-    },
-  },
+  }),
   {
     name: "Text",
     kind: "builtin",

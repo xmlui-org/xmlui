@@ -2606,7 +2606,12 @@ Components:
   sample, and foundation E2E tests. The literal old `TileGrid.spec.ts` suite
   has been copied and is temporarily skipped at file level until full
   selection, virtualization, keyboard, action, and sync semantics catch up;
-- `Card`.
+- `Card` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract
+  derived from metadata, runtime registry wiring, a dev-server visual sample,
+  and foundation E2E tests. The literal old `Card.spec.ts` suite has been
+  copied and is temporarily skipped at file level until full avatar, link,
+  click/double-click, scroll API, theme, and driver parity catches up.
 
 Compatibility focus:
 
@@ -2658,9 +2663,9 @@ Visual check:
 - the full old suites are copied but intentionally skipped until behavior
   catches up. Re-enable cases feature-by-feature;
 - remaining `FlowLayout` closure includes responsive width inference,
-  `SpaceFiller` line breaks, star sizing, non-visual child elision,
-  scroller/fade behavior, scroll APIs, snapshot parity, and the full old layout
-  matrix;
+  star sizing, non-visual child elision, scroller/fade behavior, scroll APIs,
+  snapshot parity, and the full old layout matrix. Basic `SpaceFiller`
+  line-break behavior is restored in the active `SpaceFiller.spec.ts` suite;
 - remaining `TileGrid` closure includes virtualization, row grouping,
   selection, checkboxes, keyboard shortcuts, syncWithVar, refreshOn closure
   behavior, action events, context-menu item context, and all theme variables;
@@ -2670,9 +2675,81 @@ Visual check:
   theme-var metadata in the component file and lets `main.tsx` load the SCSS
   for runtime CSS.
 
-Next explicit step: Phase 5 Wave D1C - migrate `Card` foundation/closure
-against old metadata, SCSS, docs, copied old E2E tests, foundation tests, and a
-runnable visual sample.
+`Card` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/Card` passed with 1
+  passed and 27 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 3509 tests in 95
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=cardFoundation`.
+
+`Card` compatibility debt:
+
+- the full old suite is copied but intentionally skipped until behavior
+  catches up. Re-enable cases feature-by-feature;
+- remaining Card closure includes full Avatar/Link/Heading/Text composition,
+  `createCardDriver` parity, click versus double-click edge behavior, link
+  navigation interaction, scroll APIs, full theme-variable coverage, title and
+  subtitle part selection, and visual parity with the old SCSS defaults;
+- Card visuals have been moved out of React inline styles and into
+  `Card.module.scss`; continue this convention for later migrated components.
+
+`ScrollViewer` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/ScrollViewer` passed
+  with 2 passed and 46 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3557 tests in 97
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=scrollViewerFoundation`.
+
+`ScrollViewer` compatibility debt:
+
+- the literal old `ScrollViewer.spec.ts` suite is copied but intentionally
+  skipped until overlay scrollbar parity, fade indicators, mobile/touch
+  fallback, scroller theme variable assertions, snapshots, and deeper
+  header/footer positioning cases are migrated;
+- the foundation slice uses native scrolling with the old public props,
+  templates, metadata shape, and theme-variable names. Full
+  `overlayscrollbars-react`-style behavior remains a closure task.
+
+`ResponsiveBar` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/ResponsiveBar` passed
+  with 2 passed and 36 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3595 tests in 99
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=responsiveBarFoundation`.
+
+`ResponsiveBar` compatibility debt:
+
+- the literal old `ResponsiveBar.spec.ts` suite is copied but intentionally
+  skipped until overflow measurement, DropdownMenu/MenuItem integration,
+  trigger templates, `$overflow` context, `willOpen` cancellation, dropdown
+  alignment, and full driver parity are migrated;
+- a minimal `ResponsiveBarDriver` fixture exists only to keep copied tests
+  collectible until old test cases are re-enabled feature-by-feature.
+
+Next explicit step: Phase 5 Wave D2C - migrate `Splitter` foundation,
+including the `HSplitter` and `VSplitter` aliases, against old metadata, SCSS,
+docs, copied old E2E tests, a running foundation test, and a visual sample.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 

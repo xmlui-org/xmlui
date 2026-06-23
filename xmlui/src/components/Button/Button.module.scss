@@ -172,6 +172,12 @@ $outlineOffset-Button--focus: createThemeVar("outlineOffset-Button--focus");
     color: inherit;
   }
 
+  .button > [data-xmlui-component] {
+    width: auto;
+    max-width: 100%;
+    flex: 0 1 auto;
+  }
+
   .button:focus-visible {
     outline-width: var(--xmlui-outlineWidth-Button--focus);
     outline-color: var(--xmlui-outlineColor-Button--focus);

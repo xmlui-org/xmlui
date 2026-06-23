@@ -1,0 +1,13 @@
+<App var.horizontal="{false}" var.clicked="{0}">
+  <H1>Card foundation</H1>
+  <Button onClick="horizontal = !horizontal">Toggle orientation</Button>
+  <Card
+    testId="card-demo"
+    title="Account summary"
+    subtitle="Clicks: {clicked}"
+    showAvatar="true"
+    orientation="{horizontal ? 'horizontal' : 'vertical'}"
+    onClick="clicked++">
+    <Text>Card content uses migrated Card layout and theme variables.</Text>
+  </Card>
+</App>

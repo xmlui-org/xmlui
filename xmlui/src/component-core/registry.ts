@@ -32,6 +32,7 @@ import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
+import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
@@ -51,6 +52,7 @@ import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
+import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { tableRenderer } from "../components/Table/Table";
@@ -82,6 +84,7 @@ const implementedRuntimeNames = [
   "NoResult",
   "PageMetaTitle",
   "QRCode",
+  "ResponsiveBar",
   "Heading",
   "H1",
   "H2",
@@ -119,6 +122,7 @@ const implementedRuntimeNames = [
   "FileInput",
   "FileUploadDropZone",
   "TimeInput",
+  "ScrollViewer",
   "Select",
   "SelectionStore",
   "Option",
@@ -158,6 +162,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   NoResult: noResultRenderer,
   PageMetaTitle: pageMetaTitleRenderer,
   QRCode: qrCodeRenderer,
+  ResponsiveBar: responsiveBarRenderer,
   SpaceFiller: spaceFillerRenderer,
   Heading: headingRenderer,
   H1: h1Renderer,
@@ -194,6 +199,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   TreeDisplay: treeDisplayRenderer,
   TableOfContents: tableOfContentsRenderer,
   RadioGroup: radioGroupRenderer,
+  ScrollViewer: scrollViewerRenderer,
   Select: selectRenderer,
   SelectionStore: selectionStoreRenderer,
   Items: itemsRenderer,
@@ -253,6 +259,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const treeDisplayTransferred = contract.name === "TreeDisplay";
     const tableOfContentsTransferred = contract.name === "TableOfContents";
     const timeInputTransferred = contract.name === "TimeInput";
+    const scrollViewerTransferred = contract.name === "ScrollViewer";
+    const responsiveBarTransferred = contract.name === "ResponsiveBar";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
@@ -296,6 +304,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       treeDisplayTransferred ||
       tableOfContentsTransferred ||
       timeInputTransferred ||
+      scrollViewerTransferred ||
+      responsiveBarTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
@@ -362,7 +372,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                   ? "TableOfContents"
                                                   : timeInputTransferred
                                                     ? "TimeInput"
-                                                    : contract.name;
+                                                  : scrollViewerTransferred
+                                                    ? "ScrollViewer"
+                                                    : responsiveBarTransferred
+                                                      ? "ResponsiveBar"
+                                                      : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
       : sharedComponentFile;
@@ -413,6 +427,10 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TableOfContentsReact.tsx`);
     } else if (timeInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TimeInputReact.tsx`);
+    } else if (scrollViewerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ScrollViewerReact.tsx`);
+    } else if (responsiveBarTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ResponsiveBarReact.tsx`);
     } else if (headingTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/HeadingReact.tsx`);
     } else if (imageTransferred) {
@@ -465,6 +483,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       treeDisplayTransferred,
       tableOfContentsTransferred,
       timeInputTransferred,
+      scrollViewerTransferred,
+      responsiveBarTransferred,
       headingTransferred,
       htmlTagTransferred,
       brTransferred,
@@ -546,6 +566,8 @@ function componentRunnablePaths(flags: {
   treeDisplayTransferred: boolean;
   tableOfContentsTransferred: boolean;
   timeInputTransferred: boolean;
+  scrollViewerTransferred: boolean;
+  responsiveBarTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
   brTransferred: boolean;
@@ -664,6 +686,18 @@ function componentRunnablePaths(flags: {
   }
   if (flags.timeInputTransferred) {
     return ["xmlui/src/components/TimeInput/TimeInput.spec.ts"];
+  }
+  if (flags.scrollViewerTransferred) {
+    return [
+      "xmlui/src/components/ScrollViewer/ScrollViewer.foundation.spec.ts",
+      "xmlui/src/components/ScrollViewer/ScrollViewer.spec.ts",
+    ];
+  }
+  if (flags.responsiveBarTransferred) {
+    return [
+      "xmlui/src/components/ResponsiveBar/ResponsiveBar.foundation.spec.ts",
+      "xmlui/src/components/ResponsiveBar/ResponsiveBar.spec.ts",
+    ];
   }
   if (flags.headingTransferred) {
     return [

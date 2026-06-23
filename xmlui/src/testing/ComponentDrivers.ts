@@ -112,6 +112,12 @@ export class CodeBlockDriver extends ComponentDriver {
 
 export class NoResultDriver extends ComponentDriver {}
 
+export class ResponsiveBarDriver extends ComponentDriver {
+  getMenuItems(): Locator {
+    return this.params.page.locator('[role="menuitem"], [data-xmlui-component="MenuItem"]');
+  }
+}
+
 export class LinkDriver extends ComponentDriver {}
 
 export class TextBoxDriver extends InputComponentDriver {

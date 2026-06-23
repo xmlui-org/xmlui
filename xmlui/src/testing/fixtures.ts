@@ -11,6 +11,7 @@ import {
   ListDriver,
   NoResultDriver,
   NumberBoxDriver,
+  ResponsiveBarDriver,
   DateInputDriver,
   FileUploadDropZoneDriver,
   SelectDriver,
@@ -47,6 +48,7 @@ type Fixtures = {
   createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
+  createResponsiveBarDriver: (testId?: string | Locator) => Promise<ResponsiveBarDriver>;
   createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
   createTreeDriver: (testId?: string | Locator) => Promise<TreeDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
@@ -153,6 +155,14 @@ export const test = base.extend<Fixtures>({
   createNoResultDriver: async ({ page }, use) => {
     await use(async (testId) => new NoResultDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="NoResult"]').first(),
+      page,
+    }));
+  },
+  createResponsiveBarDriver: async ({ page }, use) => {
+    await use(async (testId) => new ResponsiveBarDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="ResponsiveBar"]').first(),
       page,
     }));
   },

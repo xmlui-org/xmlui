@@ -12,6 +12,8 @@ import "./components/List/List.module.scss?xmlui-css-module";
 import "./components/Link/Link.module.scss?xmlui-css-module";
 import "./components/NoResult/NoResult.module.scss?xmlui-css-module";
 import "./components/QRCode/QRCode.module.scss?xmlui-css-module";
+import "./components/ResponsiveBar/ResponsiveBar.module.scss?xmlui-css-module";
+import "./components/ScrollViewer/ScrollViewer.module.scss?xmlui-css-module";
 import "./components/SpaceFiller/SpaceFiller.module.scss?xmlui-css-module";
 import "./components/Stack/Stack.module.scss?xmlui-css-module";
 import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
@@ -25,6 +27,7 @@ import "./components/ColorPicker/ColorPicker.module.scss?xmlui-css-module";
 import "./components/DateInput/DateInput.module.scss?xmlui-css-module";
 import "./components/DatePicker/DatePicker.module.scss?xmlui-css-module";
 import "./components/AutoComplete/AutoComplete.module.scss?xmlui-css-module";
+import "./components/Card/Card.module.scss?xmlui-css-module";
 import "./components/FileInput/FileInput.module.scss?xmlui-css-module";
 import "./components/FileUploadDropZone/FileUploadDropZone.module.scss?xmlui-css-module";
 import "./components/FlowLayout/FlowLayout.module.scss?xmlui-css-module";
@@ -88,6 +91,8 @@ import routingDataApp from "./examples/routing-data/Main.xmlui";
 import routingQueryApp from "./examples/routing-query/Main.xmlui";
 import routingStateApp from "./examples/routing-state/Main.xmlui";
 import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
+import responsiveBarFoundationApp from "./examples/responsive-bar-foundation/Main.xmlui";
+import scrollViewerFoundationApp from "./examples/scroll-viewer-foundation/Main.xmlui";
 import styleMutationApp from "./examples/style-mutation/Main.xmlui";
 import themeScopeApp from "./examples/theme-scope/Main.xmlui";
 import themeVarsApp from "./examples/theme-vars/Main.xmlui";
@@ -102,6 +107,7 @@ import sliderFoundationApp from "./examples/slider-foundation/Main.xmlui";
 import colorPickerFoundationApp from "./examples/color-picker-foundation/Main.xmlui";
 import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui";
 import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlui";
+import cardFoundationApp from "./examples/card-foundation/Main.xmlui";
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
 import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
 import flowTileFoundationApp from "./examples/flow-tile-foundation/Main.xmlui";
@@ -174,6 +180,8 @@ const examples = {
   routingQuery: routingQueryApp,
   routingState: routingStateApp,
   runtimeToast: runtimeToastApp,
+  responsiveBarFoundation: responsiveBarFoundationApp,
+  scrollViewerFoundation: scrollViewerFoundationApp,
   styleMutation: styleMutationApp,
   themeScope: themeScopeApp,
   themeVars: themeVarsApp,
@@ -188,6 +196,7 @@ const examples = {
   colorPickerFoundation: colorPickerFoundationApp,
   dateInputFoundation: dateInputFoundationApp,
   datePickerFoundation: datePickerFoundationApp,
+  cardFoundation: cardFoundationApp,
   fileInputFoundation: fileInputFoundationApp,
   fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
   flowTileFoundation: flowTileFoundationApp,
