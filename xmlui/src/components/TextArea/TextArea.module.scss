@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -33,7 +33,7 @@ $paddingHorizontal-TextArea: createThemeVar("paddingHorizontal-TextArea");
 $paddingVertical-TextArea: createThemeVar("paddingVertical-TextArea");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

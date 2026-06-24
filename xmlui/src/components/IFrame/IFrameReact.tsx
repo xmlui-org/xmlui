@@ -9,6 +9,8 @@ import {
   type HTMLAttributes,
 } from "react";
 
+import styles from "./IFrame.module.scss";
+
 type IFrameProps = {
   src?: string;
   srcdoc?: string;
@@ -65,7 +67,7 @@ export const IFrame = memo(forwardRef(function IFrame(
       name={name}
       referrerPolicy={referrerPolicy}
       sandbox={sandbox}
-      className={cx("xmlui-iframeRoot", rest.className)}
+      className={cx(styles["xmlui-iframeRoot"], rest.className)}
       style={style}
       onLoad={onLoad}
     />

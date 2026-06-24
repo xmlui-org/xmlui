@@ -1,0 +1,162 @@
+// ExpandableItem.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old ExpandableItem component pattern.
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-ExpandableItem: createThemeVar("backgroundColor-ExpandableItem");
+$backgroundColor-ExpandableItem--hover: createThemeVar("backgroundColor-ExpandableItem--hover");
+$backgroundColor-ExpandableItem--active: createThemeVar("backgroundColor-ExpandableItem--active");
+$backgroundColor-summary-ExpandableItem: createThemeVar("backgroundColor-summary-ExpandableItem");
+$backgroundColor-summary-ExpandableItem--hover: createThemeVar("backgroundColor-summary-ExpandableItem--hover");
+$backgroundColor-summary-ExpandableItem--active: createThemeVar("backgroundColor-summary-ExpandableItem--active");
+$borderRadius-summary-ExpandableItem: createThemeVar("borderRadius-summary-ExpandableItem");
+$color-ExpandableItem: createThemeVar("color-ExpandableItem");
+$color-ExpandableItem--disabled: createThemeVar("color-ExpandableItem--disabled");
+$fontFamily-ExpandableItem: createThemeVar("fontFamily-ExpandableItem");
+$fontSize-ExpandableItem: createThemeVar("fontSize-ExpandableItem");
+$fontWeight-ExpandableItem: createThemeVar("fontWeight-ExpandableItem");
+$borderColor-ExpandableItem: createThemeVar("borderColor-ExpandableItem");
+$borderWidth-ExpandableItem: createThemeVar("borderWidth-ExpandableItem");
+$borderBottomWidth-ExpandableItem: createThemeVar("borderBottomWidth-ExpandableItem");
+$borderStyle-ExpandableItem: createThemeVar("borderStyle-ExpandableItem");
+$borderRadius-ExpandableItem: createThemeVar("borderRadius-ExpandableItem");
+$paddingTop-ExpandableItem: createThemeVar("paddingTop-ExpandableItem");
+$paddingBottom-ExpandableItem: createThemeVar("paddingBottom-ExpandableItem");
+$paddingLeft-ExpandableItem: createThemeVar("paddingLeft-ExpandableItem");
+$paddingRight-ExpandableItem: createThemeVar("paddingRight-ExpandableItem");
+$padding-summary-ExpandableItem: createThemeVar("padding-summary-ExpandableItem");
+$paddingVertical-summary-ExpandableItem: createThemeVar("paddingVertical-summary-ExpandableItem");
+$paddingHorizontal-summary-ExpandableItem: createThemeVar("paddingHorizontal-summary-ExpandableItem");
+$paddingLeft-content-ExpandableItem: createThemeVar("paddingLeft-content-ExpandableItem");
+$paddingRight-content-ExpandableItem: createThemeVar("paddingRight-content-ExpandableItem");
+$paddingVertical-content-ExpandableItem: createThemeVar("paddingVertical-content-ExpandableItem");
+$gap-ExpandableItem: createThemeVar("gap-ExpandableItem");
+$transition-summary-ExpandableItem: createThemeVar("transition-summary-ExpandableItem");
+$animation-content-ExpandableItem: createThemeVar("animation-content-ExpandableItem");
+$animationDuration-content-ExpandableItem: createThemeVar("animationDuration-content-ExpandableItem");
+
+@layer components {
+  .expandableItem {
+    box-sizing: border-box;
+    min-width: 0;
+    color: var(--xmlui-color-ExpandableItem);
+    font-family: var(--xmlui-fontFamily-ExpandableItem);
+    font-size: var(--xmlui-fontSize-ExpandableItem);
+    font-weight: var(--xmlui-fontWeight-ExpandableItem);
+    background-color: var(--xmlui-backgroundColor-ExpandableItem);
+    border-color: var(--xmlui-borderColor-ExpandableItem);
+    border-style: var(--xmlui-borderStyle-ExpandableItem);
+    border-width: var(--xmlui-borderWidth-ExpandableItem);
+    border-bottom-width: var(--xmlui-borderBottomWidth-ExpandableItem);
+    border-radius: var(--xmlui-borderRadius-ExpandableItem);
+    padding: var(--xmlui-paddingTop-ExpandableItem) var(--xmlui-paddingRight-ExpandableItem) var(--xmlui-paddingBottom-ExpandableItem) var(--xmlui-paddingLeft-ExpandableItem);
+  }
+
+  .disabled {
+    color: var(--xmlui-color-ExpandableItem--disabled);
+    cursor: not-allowed;
+  }
+
+  .summary {
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    gap: var(--xmlui-gap-ExpandableItem);
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--xmlui-backgroundColor-summary-ExpandableItem);
+    border-radius: var(--xmlui-borderRadius-summary-ExpandableItem);
+    padding: var(--xmlui-padding-summary-ExpandableItem, var(--xmlui-paddingVertical-summary-ExpandableItem) var(--xmlui-paddingHorizontal-summary-ExpandableItem));
+    transition: var(--xmlui-transition-summary-ExpandableItem);
+  }
+
+  .summary:hover {
+    background-color: var(--xmlui-backgroundColor-summary-ExpandableItem--hover);
+  }
+
+  .summary:active {
+    background-color: var(--xmlui-backgroundColor-summary-ExpandableItem--active);
+  }
+
+  .disabled .summary {
+    cursor: not-allowed;
+  }
+
+  .iconStart {
+    flex-direction: row;
+  }
+
+  .iconEnd {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+
+  .fullWidth {
+    display: flex;
+    width: 100%;
+  }
+
+  .icon,
+  .switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .switchControl {
+    width: 2rem;
+    height: 1rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    background: transparent;
+    position: relative;
+  }
+
+  .switchControl::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: calc(1rem - 6px);
+    height: calc(1rem - 6px);
+    border-radius: 999px;
+    background: currentColor;
+    transition: transform 0.15s ease;
+  }
+
+  .open .switchControl::after {
+    transform: translateX(1rem);
+  }
+
+  .summaryContent {
+    flex: 1;
+  }
+
+  .content {
+    box-sizing: border-box;
+    min-width: 0;
+    padding: var(--xmlui-paddingVertical-content-ExpandableItem) var(--xmlui-paddingRight-content-ExpandableItem) var(--xmlui-paddingVertical-content-ExpandableItem) var(--xmlui-paddingLeft-content-ExpandableItem);
+    animation: expandableItemSlideIn var(--xmlui-animationDuration-content-ExpandableItem) var(--xmlui-animation-content-ExpandableItem);
+  }
+
+  .contentHidden {
+    display: none;
+  }
+
+  @keyframes expandableItemSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+:export {
+  themeVars: "";
+}

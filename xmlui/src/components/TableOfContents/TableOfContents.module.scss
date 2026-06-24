@@ -1,0 +1,47 @@
+.root {
+  height: var(--xmlui-height-TableOfContents);
+  padding: var(--xmlui-padding-TableOfContents);
+  overflow: auto;
+}
+
+.item {
+  display: block;
+  padding-top: var(--xmlui-paddingVertical-TableOfContentsItem);
+  padding-bottom: var(--xmlui-paddingVertical-TableOfContentsItem);
+  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem);
+  color: var(--xmlui-textColor-TableOfContentsItem);
+  font-size: var(--xmlui-fontSize-TableOfContentsItem);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem);
+  text-decoration: none;
+  word-wrap: var(--xmlui-wordWrap-TableOfContentsItem);
+}
+
+.item:hover {
+  color: var(--xmlui-textColor-TableOfContentsItem--hover);
+}
+
+.level2 {
+  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-2);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-2);
+}
+
+.level3 {
+  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-3);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-3);
+}
+
+.level4 {
+  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-4);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-4);
+}
+
+.level5 {
+  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-5);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-5);
+}
+
+.level6 {
+  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-6);
+  font-style: var(--xmlui-fontStyle-TableOfContentsItem-level-6);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-6);
+}

@@ -1,0 +1,27 @@
+<App var.message="{'Choose a link'}">
+  <H1>NavLink foundation</H1>
+  <Text testId="path">Current path: {$pathname}</Text>
+  <Text testId="message">{message}</Text>
+  <HStack gap="$space-2">
+    <NavLink to="/" exact="true" onClick="message = 'Home clicked'">Home</NavLink>
+    <NavLink to="/reports" onClick="message = 'Reports clicked'">Reports</NavLink>
+    <NavLink to="/reports/detail?tab=api" onClick="message = 'Detail clicked'">Report API</NavLink>
+    <NavLink to="/settings" onClick="message = 'Settings clicked'" vertical="true">Settings</NavLink>
+    <NavLink to="https://example.com" target="_blank">External</NavLink>
+    <NavLink to="/disabled" enabled="false">Disabled</NavLink>
+  </HStack>
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <Text testId="page">Home page</Text>
+    </Page>
+    <Page url="/reports">
+      <Text testId="page">Reports page</Text>
+    </Page>
+    <Page url="/reports/detail">
+      <Text testId="page">Report detail tab: {$queryParams.tab}</Text>
+    </Page>
+    <Page url="/settings">
+      <Text testId="page">Settings page</Text>
+    </Page>
+  </Pages>
+</App>

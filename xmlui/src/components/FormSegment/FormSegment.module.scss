@@ -1,0 +1,26 @@
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$gap-FormSegment: createThemeVar("gap-FormSegment");
+$padding-FormSegment: createThemeVar("padding-FormSegment");
+$backgroundColor-FormSegment: createThemeVar("backgroundColor-FormSegment");
+$borderRadius-FormSegment: createThemeVar("borderRadius-FormSegment");
+
+.segment {
+  display: flex;
+  flex-direction: column;
+  gap: $gap-FormSegment;
+  padding: $padding-FormSegment;
+  background-color: $backgroundColor-FormSegment;
+  border-radius: $borderRadius-FormSegment;
+}
+
+.horizontal {
+  flex-direction: row;
+}
+
+.vertical {
+  flex-direction: column;
+}

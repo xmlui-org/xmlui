@@ -1,0 +1,140 @@
+@layer components {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: var(--xmlui-padding-Card);
+    border: var(--xmlui-border-Card);
+    border-radius: var(--xmlui-borderRadius-Card);
+    box-shadow: var(--xmlui-boxShadow-Card);
+    background-color: var(--xmlui-backgroundColor-Card);
+    gap: var(--xmlui-gap-Card);
+
+    &:hover {
+      background-color: var(--xmlui-backgroundColor-Card--hover);
+    }
+  }
+
+  .horizontal {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .vertical {
+    flex-direction: column;
+  }
+
+  .isClickable {
+    cursor: pointer;
+  }
+
+  .avatarWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: var(--xmlui-verticalAlignment-title-Card);
+    gap: var(--xmlui-gap-avatar-Card);
+    min-width: 0;
+  }
+
+  .avatar {
+    align-items: center;
+    background-color: var(--xmlui-color-surface-200);
+    border-radius: 50%;
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 32px;
+    justify-content: center;
+    object-fit: cover;
+    width: 32px;
+  }
+
+  .avatarXs {
+    height: 24px;
+    width: 24px;
+  }
+
+  .avatarMd {
+    height: 40px;
+    width: 40px;
+  }
+
+  .avatarLg {
+    height: 48px;
+    width: 48px;
+  }
+
+  .titleWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: var(--xmlui-horizontalAlignment-title-Card);
+    width: 100%;
+    gap: var(--xmlui-gap-title-Card);
+    min-width: 0;
+  }
+
+  .title {
+    font-size: var(--xmlui-fontSize-lg);
+    font-weight: var(--xmlui-fontWeight-bold);
+    line-height: 1.25;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .subtitle {
+    color: var(--xmlui-textColor-secondary);
+  }
+
+  .content {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    gap: var(--xmlui-gap-Card);
+  }
+
+  .contentVertical {
+    flex-direction: column;
+  }
+
+  .contentHorizontal {
+    flex-direction: row;
+  }
+
+  .justifyItemsStart {
+    justify-content: flex-start;
+  }
+
+  .justifyItemsCenter {
+    justify-content: center;
+  }
+
+  .justifyItemsStretch {
+    justify-content: stretch;
+  }
+
+  .justifyItemsEnd {
+    justify-content: flex-end;
+  }
+
+  .alignItemsStart {
+    align-items: flex-start;
+  }
+
+  .alignItemsCenter {
+    align-items: center;
+  }
+
+  .alignItemsStretch {
+    align-items: stretch;
+  }
+
+  .alignItemsEnd {
+    align-items: flex-end;
+  }
+
+  .alignItemsBaseline {
+    align-items: baseline;
+  }
+}

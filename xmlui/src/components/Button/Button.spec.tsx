@@ -45,7 +45,12 @@ describe("Button migration", () => {
     );
 
     expect(html).toContain('data-xmlui-component="Button"');
-    expect(html).toContain('class="button buttonHorizontal sm solidPrimary xmlui-Button"');
+    expect(html).toContain("buttonHorizontal");
+    expect(html).toContain("solidPrimary");
+    expect(html).toContain("xmlui-Button");
+    expect(html).toContain('data-xmlui-button-variant="solid"');
+    expect(html).toContain('data-xmlui-button-theme-color="primary"');
+    expect(html).toContain('data-xmlui-button-size="sm"');
     expect(html).toContain("--xmlui-width-Button:fit-content");
     expect(html).toContain("--xmlui-backgroundColor-Button-primary:var(--xmlui-color-primary-500)");
     expect(html).toContain("--xmlui-backgroundColor-Button-primary-solid--hover:var(--xmlui-color-primary-400)");

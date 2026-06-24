@@ -1,0 +1,15 @@
+.inputLabel {
+  cursor: pointer;
+  color: var(--xmlui-textColor-subtitle, var(--xmlui-color-surface-700));
+  padding-bottom: var(--xmlui-space-1, 0.25rem);
+}
+
+.disabled {
+  cursor: not-allowed;
+  color: var(--xmlui-textColor--disabled, var(--xmlui-color-surface-500));
+}
+
+.required {
+  color: var(--xmlui-textColor-InputLabel-required, var(--xmlui-color-danger-500));
+}
+

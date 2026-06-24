@@ -1,0 +1,38 @@
+<App var.wide="{false}" var.extra="{false}">
+  <H1>FlowLayout and TileGrid foundation</H1>
+  <HStack gap="8px">
+    <Button onClick="wide = !wide">Toggle item width</Button>
+    <Button onClick="extra = !extra">Toggle extra tile</Button>
+  </HStack>
+  <FlowLayout
+    testId="flow-demo"
+    width="340px"
+    itemWidth="{wide ? '150px' : '96px'}"
+    gap="10px"
+    backgroundColor="$color-surface-100"
+    padding="$space-3">
+    <Text backgroundColor="$color-primary-100" padding="$space-2">First</Text>
+    <Text backgroundColor="$color-primary-200" padding="$space-2">Second</Text>
+    <Text backgroundColor="$color-primary-300" padding="$space-2">Third</Text>
+  </FlowLayout>
+  <TileGrid
+    testId="tile-demo"
+    data="{extra ? [
+      { id: 'a', label: 'Alpha' },
+      { id: 'b', label: 'Beta' },
+      { id: 'c', label: 'Gamma' },
+      { id: 'd', label: 'Delta' }
+    ] : [
+      { id: 'a', label: 'Alpha' },
+      { id: 'b', label: 'Beta' },
+      { id: 'c', label: 'Gamma' }
+    ]}"
+    itemWidth="{wide ? '140px' : '100px'}"
+    itemHeight="52px"
+    gap="8px"
+    stretchItems="false">
+    <Text padding="$space-2" backgroundColor="$color-surface-100">
+      {$itemIndex + 1}. {$item.label}
+    </Text>
+  </TileGrid>
+</App>

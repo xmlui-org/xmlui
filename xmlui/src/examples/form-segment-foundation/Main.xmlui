@@ -1,0 +1,17 @@
+<App var.step="{1}" var.segmentInfo="{''}">
+  <H1>FormSegment foundation</H1>
+  <Text>Step: {step}</Text>
+  <Text>Segment info: {segmentInfo || 'not read yet'}</Text>
+  <Form data="{{ name: 'Ada', email: 'ada@example.com' }}" hideButtonRow="{true}">
+    <FormSegment when="{step === 1}" fields="name" gap="12px">
+      <FormItem bindTo="name" label="Name" required="{true}" requiredInvalidMessage="Name is required" />
+      <Button onClick="segmentInfo = $segmentData.name">Read name segment</Button>
+    </FormSegment>
+    <FormSegment when="{step === 2}" fields="email" gap="12px">
+      <FormItem bindTo="email" label="Email" type="email" />
+      <Button onClick="segmentInfo = $segmentData.email">Read email segment</Button>
+    </FormSegment>
+    <Button onClick="step = step === 1 ? 2 : 1">Toggle step</Button>
+  </Form>
+</App>
+

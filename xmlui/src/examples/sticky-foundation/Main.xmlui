@@ -1,0 +1,28 @@
+<App var.count="{0}">
+  <H1>Sticky foundation</H1>
+  <ScrollViewer height="360px" width="640px" showScrollerFade="false" border="1px solid $color-border">
+    <StickyBox to="top" backgroundColor="$color-primary-100" padding="$space-3">
+      <HStack gap="$space-3" verticalAlignment="center">
+        <Text>Sticky box</Text>
+        <Button onClick="count++">Increment</Button>
+        <Text>Count: {count}</Text>
+      </HStack>
+    </StickyBox>
+    <Items data="{[1,2,3,4,5,6,7,8]}">
+      <Stack height="52px" padding="$space-2" borderBottom="1px solid $color-border">
+        <Text>Before section row {$item}</Text>
+      </Stack>
+    </Items>
+    <StickySection stickTo="top" backgroundColor="$color-surface-100" padding="$space-3">
+      <Text>Sticky section header</Text>
+    </StickySection>
+    <Items data="{[1,2,3,4,5,6,7,8,9,10]}">
+      <Stack height="52px" padding="$space-2" borderBottom="1px solid $color-border">
+        <Text>Scrollable row {$item}</Text>
+      </Stack>
+    </Items>
+    <StickySection stickTo="bottom" backgroundColor="$color-surface-200" padding="$space-3">
+      <Text>Sticky section footer</Text>
+    </StickySection>
+  </ScrollViewer>
+</App>

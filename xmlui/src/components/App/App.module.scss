@@ -1,6 +1,6 @@
 // This block mirrors the old component pattern: App.tsx extracts the
 // available theme variables from createThemeVar declarations in this file.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -49,5 +49,5 @@ $gap-content-App: createThemeVar("gap-content-App");
 }
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }

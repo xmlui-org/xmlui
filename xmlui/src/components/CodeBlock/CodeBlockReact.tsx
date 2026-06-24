@@ -10,6 +10,7 @@ import {
   useEffect,
   useRef,
 } from "react";
+import styles from "./CodeBlock.module.scss";
 
 export type CodeBlockMeta = {
   filename?: string;
@@ -62,15 +63,15 @@ export const CodeBlock = memo(forwardRef<HTMLDivElement, CodeBlockProps>(functio
           ref.current = node;
         }
       }}
-      className={["xmluiCodeBlock", "global-codeBlock", className].filter(Boolean).join(" ")}
+      className={[styles.xmluiCodeBlock, "global-codeBlock", className].filter(Boolean).join(" ")}
       style={style}
     >
       {normalizedMeta?.filename ? (
-        <div data-xmlui-part="header" className="xmluiCodeBlockHeader">
+        <div data-xmlui-part="header" className={styles.xmluiCodeBlockHeader}>
           {normalizedMeta.filename}
         </div>
       ) : null}
-      <div data-xmlui-part="content" className="xmluiCodeBlockContent">
+      <div data-xmlui-part="content" className={styles.xmluiCodeBlockContent}>
         {normalizedChildren}
       </div>
     </div>

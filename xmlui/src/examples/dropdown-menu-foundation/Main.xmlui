@@ -1,0 +1,14 @@
+<App var.message="{'Choose an action'}">
+  <H1>DropdownMenu foundation</H1>
+  <Text>{message}</Text>
+  <DropdownMenu label="Actions">
+    <MenuItem onClick="message = 'Opened item'">Open</MenuItem>
+    <MenuSeparator />
+    <SubMenuItem label="More actions">
+      <MenuItem onClick="message = 'Archived from submenu'">Archive</MenuItem>
+      <MenuItem onClick="message = 'Duplicated from submenu'">Duplicate</MenuItem>
+    </SubMenuItem>
+    <MenuSeparator />
+    <MenuItem onClick="message = 'Deleted item'">Delete</MenuItem>
+  </DropdownMenu>
+</App>

@@ -1,0 +1,69 @@
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$size-Spinner: createThemeVar("size-Spinner");
+$thickness-Spinner: createThemeVar("thickness-Spinner");
+$borderColor-Spinner: createThemeVar("borderColor-Spinner");
+$current-borderColor-Spinner: var(--xmlui-current-borderColor-Spinner, #{$borderColor-Spinner});
+
+:export {
+  themeVars: "";
+}
+
+@layer components {
+  .spinner {
+    display: inline-block;
+    position: relative;
+    width: $size-Spinner;
+    height: $size-Spinner;
+    border-color: $current-borderColor-Spinner;
+  }
+
+  .spinnerSegment {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    margin: 10%;
+    border-width: $thickness-Spinner;
+    border-style: solid;
+    border-radius: 50%;
+    animation: spinner-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: $current-borderColor-Spinner transparent transparent transparent;
+  }
+
+  .spinnerSegment:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+
+  .spinnerSegment:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+
+  .spinnerSegment:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+
+  @keyframes spinner-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .fullScreenSpinnerWrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

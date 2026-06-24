@@ -36,7 +36,7 @@ describe("Heading migration", () => {
     );
 
     expect(html).toContain("<h2");
-    expect(html).toContain('class="heading h2');
+    expect(html).toContain('data-xmlui-heading-level="h2"');
     expect(html).toContain('id="my-heading"');
     expect(html).toContain('href="#my-heading"');
   });

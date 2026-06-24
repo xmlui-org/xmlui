@@ -1,0 +1,75 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$paddingVertical-NavGroup: createThemeVar("paddingVertical-NavGroup");
+$paddingHorizontal-NavGroup: createThemeVar("paddingHorizontal-NavGroup");
+$marginTop-items-NavGroup: createThemeVar("marginTop-items-NavGroup");
+$marginBottom-items-NavGroup: createThemeVar("marginBottom-items-NavGroup");
+$backgroundColor-NavGroup: createThemeVar("backgroundColor-NavGroup");
+$backgroundColor-NavGroup-hover: createThemeVar("backgroundColor-NavGroup--hover");
+$textColor-NavGroup: createThemeVar("textColor-NavGroup");
+$textColor-NavGroup-hover: createThemeVar("textColor-NavGroup--hover");
+$fontFamily-NavGroup: createThemeVar("fontFamily-NavGroup");
+$fontSize-NavGroup: createThemeVar("fontSize-NavGroup");
+$borderRadius-NavGroup: createThemeVar("borderRadius-NavGroup");
+$gap-NavGroup: createThemeVar("gap-NavGroup");
+
+.group {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: $gap-NavGroup;
+  width: 100%;
+  padding: $paddingVertical-NavGroup $paddingHorizontal-NavGroup;
+  border: 0;
+  border-radius: $borderRadius-NavGroup;
+  color: $textColor-NavGroup;
+  background-color: $backgroundColor-NavGroup;
+  font-family: $fontFamily-NavGroup;
+  font-size: $fontSize-NavGroup;
+  text-align: start;
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  color: $textColor-NavGroup-hover;
+  background-color: $backgroundColor-NavGroup-hover;
+}
+
+.trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.label {
+  flex: 1 1 auto;
+}
+
+.indicator {
+  flex: 0 0 auto;
+}
+
+.content {
+  display: none;
+  flex-direction: column;
+  margin-top: $marginTop-items-NavGroup;
+  margin-bottom: $marginBottom-items-NavGroup;
+  padding-inline-start: 1rem;
+}
+
+.expanded {
+  display: flex;
+}
+
+:export {
+  themeVars: "";
+}

@@ -1,6 +1,6 @@
 // Text.tsx extracts available theme variables from createThemeVar declarations
 // in this file, mirroring the old Text component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -68,7 +68,7 @@ $textColor-Text-marked: createThemeVar("textColor-Text-marked");
 $backgroundColor-Text-marked: createThemeVar("backgroundColor-Text-marked");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

@@ -1,13 +1,24 @@
 import type { XmluiComponentContract } from "./types";
 import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
 import { htmlTagDefinitions } from "../../component-core/htmlTags";
+import { AccordionItemMd, AccordionMd } from "../../components/Accordion/Accordion";
+import { AvatarMd } from "../../components/Avatar/Avatar";
+import { BadgeMd } from "../../components/Badge/Badge";
+import { ExpandableItemMd } from "../../components/ExpandableItem/ExpandableItem";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
+import { CardMd } from "../../components/Card/Card";
 import { FragmentMd } from "../../components/Fragment/Fragment";
 import { ImageMd } from "../../components/Image/Image";
 import { IFrameMd } from "../../components/IFrame/IFrame";
 import { LinkMd } from "../../components/Link/Link";
+import { ItemsMd } from "../../components/Items/Items";
 import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
+import { FormMd } from "../../components/Form/Form";
+import { FormItemMd } from "../../components/FormItem/FormItem";
+import { FormSegmentMd } from "../../components/FormSegment/FormSegment";
+import { StepperFormMd } from "../../components/StepperForm/StepperForm";
+import { TabsFormMd } from "../../components/TabsForm/TabsForm";
 import { TextAreaMd } from "../../components/TextArea/TextArea";
 import { NumberBoxMd } from "../../components/NumberBox/NumberBox";
 import { RatingInputMd } from "../../components/RatingInput/RatingInput";
@@ -15,14 +26,55 @@ import { SliderMd } from "../../components/Slider/Slider";
 import { ColorPickerMd } from "../../components/ColorPicker/ColorPicker";
 import { DateInputMd } from "../../components/DateInput/DateInput";
 import { DatePickerMd } from "../../components/DatePicker/DatePicker";
+import { DrawerMd } from "../../components/Drawer/Drawer";
+import { ModalDialogMd } from "../../components/ModalDialog/ModalDialog";
+import { TooltipMd } from "../../components/Tooltip/Tooltip";
+import { ContextMenuMd } from "../../components/ContextMenu/ContextMenu";
+import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "../../components/DropdownMenu/DropdownMenu";
 import { FileInputMd } from "../../components/FileInput/FileInput";
+import { FileUploadDropZoneMd } from "../../components/FileUploadDropZone/FileUploadDropZone";
+import { FocusScopeMd } from "../../components/FocusScope/FocusScope";
+import { FlowLayoutMd } from "../../components/FlowLayout/FlowLayout";
+import { ScrollViewerMd } from "../../components/ScrollViewer/ScrollViewer";
 import { TimeInputMd } from "../../components/TimeInput/TimeInput";
+import { TileGridMd } from "../../components/TileGrid/TileGrid";
 import { ContentSeparatorMd } from "../../components/ContentSeparator/ContentSeparator";
 import { FallbackMd } from "../../components/Fallback/Fallback";
 import { NoResultMd } from "../../components/NoResult/NoResult";
+import { ValidationSummaryMd } from "../../components/ValidationSummary/ValidationSummary";
+import { ConciseValidationFeedbackMd } from "../../components/ConciseValidationFeedback/ConciseValidationFeedback";
 import { PageMetaTitleMd } from "../../components/PageMetaTitle/PageMetaTitle";
+import { ProgressBarMd } from "../../components/ProgressBar/ProgressBar";
 import { QRCodeMd } from "../../components/QRCode/QRCode";
+import { ResponsiveBarMd } from "../../components/ResponsiveBar/ResponsiveBar";
 import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
+import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/Splitter";
+import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
+import { StickySectionMd } from "../../components/StickySection/StickySection";
+import { SpinnerMd } from "../../components/Spinner/Spinner";
+import { StepMd, StepperMd } from "../../components/Stepper/Stepper";
+import { TabItemMd, TabsMd } from "../../components/Tabs/Tabs";
+import { DataSourceMd } from "../../components/DataSource/DataSource";
+import { APICallMd } from "../../components/APICall/APICall";
+import { AppStateMd } from "../../components/AppState/AppState";
+import { ChangeListenerMd } from "../../components/ChangeListener/ChangeListener";
+import { LifecycleMd } from "../../components/Lifecycle/Lifecycle";
+import { TimerMd } from "../../components/Timer/Timer";
+import { QueueMd } from "../../components/Queue/Queue";
+import { MessageListenerMd } from "../../components/MessageListener/MessageListener";
+import { EventSourceMd } from "../../components/EventSource/EventSource";
+import { WebSocketMd } from "../../components/WebSocket/WebSocket";
+import { LiveRegionMd } from "../../components/LiveRegion/LiveRegion";
+import { BookmarkMd } from "../../components/Bookmark/Bookmark";
+import { SkipLinkMd } from "../../components/SkipLink/SkipLink";
+import { ToastMd } from "../../components/Toast/Toast";
+import { ThemeMd } from "../../components/Theme/Theme";
+import { SlotMd } from "../../components/Slot/Slot";
+import { ToneSwitchMd } from "../../components/ToneSwitch/ToneSwitch";
+import { ToneChangerButtonMd } from "../../components/ToneChangerButton/ToneChangerButton";
+import { PageMd, PagesMd } from "../../components/Pages/Pages";
+import { RedirectMd } from "../../components/Redirect/Redirect";
+import { NestedAppMd } from "../../components/NestedApp/NestedApp";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -42,6 +94,148 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   contractFromMetadata(BrCapitalizedMd, {
     name: "Br",
     allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(AccordionMd, {
+    name: "Accordion",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      displayDidChange: "onDisplayDidChange",
+    },
+  }),
+  contractFromMetadata(AccordionItemMd, {
+    name: "AccordionItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(AvatarMd, {
+    name: "Avatar",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+      contextMenu: "onContextMenu",
+    },
+  }),
+  contractFromMetadata(BadgeMd, {
+    name: "Badge",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      contextMenu: "onContextMenu",
+    },
+  }),
+  contractFromMetadata(ExpandableItemMd, {
+    name: "ExpandableItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      expandedChange: "onExpandedChange",
+    },
+  }),
+  contractFromMetadata(TabsMd, {
+    name: "Tabs",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+      contextMenu: "onContextMenu",
+    },
+  }),
+  contractFromMetadata(StepperMd, {
+    name: "Stepper",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+    },
+  }),
+  contractFromMetadata(StepMd, {
+    name: "Step",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      activated: "onActivated",
+    },
+  }),
+  contractFromMetadata(TabItemMd, {
+    name: "TabItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      activated: "onActivated",
+    },
+  }),
+  contractFromMetadata(DrawerMd, {
+    name: "Drawer",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      open: "onOpen",
+      close: "onClose",
+    },
+  }),
+  contractFromMetadata(ModalDialogMd, {
+    name: "ModalDialog",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      open: "onOpen",
+      close: "onClose",
+    },
+  }),
+  contractFromMetadata(TooltipMd, {
+    name: "Tooltip",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ContextMenuMd, {
+    name: "ContextMenu",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(DropdownMenuMd, {
+    name: "DropdownMenu",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      willOpen: "onWillOpen",
+    },
+  }),
+  contractFromMetadata(MenuItemMd, {
+    name: "MenuItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
+  contractFromMetadata(MenuSeparatorMd, {
+    name: "MenuSeparator",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(SubMenuItemMd, {
+    name: "SubMenuItem",
+    allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
   }),
@@ -70,6 +264,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     declarations: { local: true, global: true },
     props: withLayoutProps({
       testId: { name: "testId" },
+      loggedInUser: { name: "loggedInUser" },
       useHashBasedRouting: { name: "useHashBasedRouting" },
       "backgroundColor-content-App": { name: "backgroundColor-content-App" },
       "borderLeft-content-App": { name: "borderLeft-content-App" },
@@ -90,7 +285,27 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({
+      profileMenuTemplate: { name: "profileMenuTemplate" },
+      logoTemplate: { name: "logoTemplate" },
+      titleTemplate: { name: "titleTemplate" },
+      title: { name: "title" },
+      showLogo: { name: "showLogo" },
+      testId: { name: "testId" },
+      id: { name: "id" },
+    }),
+    events: {},
+  },
+  {
+    name: "Footer",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({
+      sticky: { name: "sticky" },
+      testId: { name: "testId" },
+      id: { name: "id" },
+    }),
     events: {},
   },
   {
@@ -191,6 +406,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: false,
   }),
+  contractFromMetadata(ProgressBarMd, {
+    name: "ProgressBar",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
   contractFromMetadata(QRCodeMd, {
     name: "QRCode",
     allowsChildren: false,
@@ -208,6 +429,18 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "NoResult",
     allowsChildren: true,
     includeLayoutProps: true,
+  }),
+  contractFromMetadata(ValidationSummaryMd, {
+    name: "ValidationSummary",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ConciseValidationFeedbackMd, {
+    name: "ConciseValidationFeedback",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   contractFromMetadata(FallbackMd, {
     name: "Fallback",
@@ -227,6 +460,50 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     acceptsArbitraryProps: true,
     eventAttributes: {
       click: "onClick",
+    },
+  }),
+  contractFromMetadata(FormMd, {
+    name: "Form",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      submit: "onSubmit",
+      cancel: "onCancel",
+    },
+  }),
+  contractFromMetadata(FormItemMd, {
+    name: "FormItem",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(FormSegmentMd, {
+    name: "FormSegment",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(TabsFormMd, {
+    name: "TabsForm",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      submit: "onSubmit",
+      submitFailed: "onSubmitFailed",
+      cancel: "onCancel",
+    },
+  }),
+  contractFromMetadata(StepperFormMd, {
+    name: "StepperForm",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      submit: "onSubmit",
+      submitFailed: "onSubmitFailed",
+      cancel: "onCancel",
     },
   }),
   contractFromMetadata(TextBoxMd, {
@@ -340,6 +617,32 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       parseError: "onParseError",
     },
   }),
+  contractFromMetadata(FileUploadDropZoneMd, {
+    name: "FileUploadDropZone",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      upload: "onUpload",
+    },
+  }),
+  contractFromMetadata(FocusScopeMd, {
+    name: "FocusScope",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(TileGridMd, {
+    name: "TileGrid",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      selectionDidChange: "onSelectionDidChange",
+      itemDoubleClick: "onItemDoubleClick",
+      contextMenu: "onContextMenu",
+    },
+  }),
   contractFromMetadata(TimeInputMd, {
     name: "TimeInput",
     allowsChildren: false,
@@ -357,32 +660,94 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
+    props: withLayoutProps(stackProps()),
+    events: stackEvents(),
   },
-  {
+  contractFromMetadata(FlowLayoutMd, {
     name: "FlowLayout",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
-  },
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      contextMenu: "onContextMenu",
+    },
+  }),
+  contractFromMetadata(ScrollViewerMd, {
+    name: "ScrollViewer",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ResponsiveBarMd, {
+    name: "ResponsiveBar",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+      willOpen: "onWillOpen",
+    },
+  }),
+  contractFromMetadata(SplitterMd, {
+    name: "Splitter",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      resize: "onResize",
+    },
+  }),
+  contractFromMetadata(HSplitterMd, {
+    name: "HSplitter",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      resize: "onResize",
+    },
+  }),
+  contractFromMetadata(VSplitterMd, {
+    name: "VSplitter",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      resize: "onResize",
+    },
+  }),
+  contractFromMetadata(StickyBoxMd, {
+    name: "StickyBox",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(StickySectionMd, {
+    name: "StickySection",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(SpinnerMd, {
+    name: "Spinner",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
   {
     name: "HStack",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
+    props: withLayoutProps(stackProps()),
+    events: stackEvents(),
   },
   {
     name: "VStack",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps({ testId: { name: "testId" } }),
-    events: {},
+    props: withLayoutProps(stackProps()),
+    events: stackEvents(),
   },
   {
     name: "CodeBlock",
@@ -424,36 +789,17 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
     },
   },
-  {
+  contractFromMetadata(CardMd, {
     name: "Card",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps({
-      id: { name: "id" },
-      avatarUrl: { name: "avatarUrl" },
-      showAvatar: { name: "showAvatar" },
-      avatarSize: { name: "avatarSize" },
-      title: { name: "title" },
-      subtitle: { name: "subtitle" },
-      linkTo: { name: "linkTo" },
-      orientation: { name: "orientation" },
-      testId: { name: "testId" },
-    }),
-    events: {
-      click: { name: "click", attributeName: "onClick" },
-      doubleClick: { name: "doubleClick", attributeName: "onDoubleClick" },
-      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+      doubleClick: "onDoubleClick",
+      contextMenu: "onContextMenu",
     },
-    apis: {
-      scrollToTop: { name: "scrollToTop" },
-      scrollToBottom: { name: "scrollToBottom" },
-      scrollToLeft: { name: "scrollToLeft" },
-      scrollToRight: { name: "scrollToRight" },
-      scrollToStart: { name: "scrollToStart" },
-      scrollToEnd: { name: "scrollToEnd" },
-    },
-  },
+  }),
   {
     name: "Text",
     kind: "builtin",
@@ -478,36 +824,17 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       hasOverflow: { name: "hasOverflow" },
     },
   },
-  {
+  contractFromMetadata(ThemeMd, {
     name: "Theme",
-    kind: "builtin",
     acceptsArbitraryProps: true,
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps(),
-    events: {},
-  },
-  {
+    includeLayoutProps: true,
+  }),
+  contractFromMetadata(ItemsMd, {
     name: "Items",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps({
-      items: { name: "items" },
-      data: { name: "data" },
-      reverse: { name: "reverse" },
-    }),
-    events: {},
-    templates: {
-      itemTemplate: { name: "itemTemplate" },
-    },
-    contextVariables: {
-      $item: { name: "$item" },
-      $itemIndex: { name: "$itemIndex" },
-      $isFirst: { name: "$isFirst" },
-      $isLast: { name: "$isLast" },
-    },
-  },
+    includeLayoutProps: false,
+  }),
   {
     name: "Checkbox",
     kind: "builtin",
@@ -583,6 +910,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     declarations: {},
     props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       enabled: { name: "enabled" },
@@ -610,90 +939,341 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: {
       value: { name: "value" },
       label: { name: "label" },
+      testId: { name: "testId" },
       enabled: { name: "enabled" },
       keywords: { name: "keywords" },
     },
     events: {},
   },
   {
-    name: "DataSource",
+    name: "RadioGroup",
     kind: "builtin",
-    allowsChildren: false,
+    allowsChildren: true,
     declarations: {},
-    props: {
+    props: withLayoutProps({
       id: { name: "id" },
-      method: { name: "method" },
-      url: { name: "url" },
-      mockData: { name: "mockData" },
-      body: { name: "body" },
-      rawBody: { name: "rawBody" },
-      queryParams: { name: "queryParams" },
-      headers: { name: "headers" },
-      credentials: { name: "credentials" },
-      pollIntervalInSeconds: { name: "pollIntervalInSeconds" },
-      resultSelector: { name: "resultSelector" },
-      transformResult: { name: "transformResult" },
-      dataType: { name: "dataType" },
-      structuralSharing: { name: "structuralSharing" },
-    },
+      testId: { name: "testId" },
+      initialValue: { name: "initialValue" },
+      value: { name: "value" },
+      label: { name: "label" },
+      labelPosition: { name: "labelPosition" },
+      direction: { name: "direction" },
+      autoFocus: { name: "autoFocus" },
+      required: { name: "required" },
+      readOnly: { name: "readOnly" },
+      enabled: { name: "enabled" },
+      validationStatus: { name: "validationStatus" },
+      orientation: { name: "orientation" },
+      gap: { name: "gap" },
+    }),
     events: {
-      loaded: { name: "loaded", attributeName: "onLoaded" },
-      error: { name: "error", attributeName: "onError" },
-      fetch: { name: "fetch", attributeName: "onFetch" },
-    },
-    contextVariables: {
-      $url: { name: "$url" },
-      $method: { name: "$method" },
-      $queryParams: { name: "$queryParams" },
-      $requestBody: { name: "$requestBody" },
-      $requestHeaders: { name: "$requestHeaders" },
+      didChange: { name: "didChange", attributeName: "onDidChange" },
+      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
+      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
     },
     apis: {
       value: { name: "value" },
-      inProgress: { name: "inProgress" },
-      isRefetching: { name: "isRefetching" },
-      loaded: { name: "loaded" },
-      refetch: { name: "refetch" },
-      responseHeaders: { name: "responseHeaders" },
+      setValue: { name: "setValue" },
     },
   },
   {
-    name: "Pages",
+    name: "AutoComplete",
     kind: "builtin",
     allowsChildren: true,
+    declarations: {},
+    props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
+      placeholder: { name: "placeholder" },
+      initialValue: { name: "initialValue" },
+      value: { name: "value" },
+      maxLength: { name: "maxLength" },
+      autoFocus: { name: "autoFocus" },
+      required: { name: "required" },
+      readOnly: { name: "readOnly" },
+      enabled: { name: "enabled" },
+      initiallyOpen: { name: "initiallyOpen" },
+      creatable: { name: "creatable" },
+      validationStatus: { name: "validationStatus" },
+      dropdownHeight: { name: "dropdownHeight" },
+      multi: { name: "multi" },
+    }),
+    events: {
+      didChange: { name: "didChange", attributeName: "onDidChange" },
+      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
+      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
+      itemCreated: { name: "itemCreated", attributeName: "onItemCreated" },
+    },
+  },
+  {
+    name: "Pagination",
+    kind: "builtin",
+    allowsChildren: false,
     declarations: { local: true },
     props: withLayoutProps({
-      fallbackPath: { name: "fallbackPath" },
-      defaultScrollRestoration: { name: "defaultScrollRestoration" },
+      id: { name: "id" },
+      testId: { name: "testId" },
+      enabled: { name: "enabled" },
+      itemCount: { name: "itemCount" },
+      pageSize: { name: "pageSize" },
+      pageIndex: { name: "pageIndex" },
+      maxVisiblePages: { name: "maxVisiblePages" },
+      showPageInfo: { name: "showPageInfo" },
+      showPageSizeSelector: { name: "showPageSizeSelector" },
+      showCurrentPage: { name: "showCurrentPage" },
+      pageSizeOptions: { name: "pageSizeOptions" },
+      hasPrevPage: { name: "hasPrevPage" },
+      hasNextPage: { name: "hasNextPage" },
+      orientation: { name: "orientation" },
+      pageSizeSelectorPosition: { name: "pageSizeSelectorPosition" },
+      pageInfoPosition: { name: "pageInfoPosition" },
+      buttonRowPosition: { name: "buttonRowPosition" },
     }),
+    events: {
+      pageDidChange: { name: "pageDidChange", attributeName: "onPageDidChange" },
+      pageSizeDidChange: { name: "pageSizeDidChange", attributeName: "onPageSizeDidChange" },
+    },
+    apis: {
+      moveFirst: { name: "moveFirst" },
+      moveLast: { name: "moveLast" },
+      movePrev: { name: "movePrev" },
+      moveNext: { name: "moveNext" },
+      currentPage: { name: "currentPage" },
+      currentPageSize: { name: "currentPageSize" },
+    },
+  },
+  {
+    name: "SelectionStore",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: {},
+    props: {
+      id: { name: "id" },
+      idKey: { name: "idKey" },
+      value: { name: "value" },
+    },
     events: {},
   },
   {
-    name: "Page",
+    name: "List",
     kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
+    declarations: {},
+    props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
+      data: { name: "data" },
+      items: { name: "items" },
+      loading: { name: "loading" },
+      limit: { name: "limit" },
+      groupBy: { name: "groupBy" },
+      orderBy: { name: "orderBy" },
+      itemTemplate: { name: "itemTemplate" },
+      emptyListTemplate: { name: "emptyListTemplate" },
+      groupHeaderTemplate: { name: "groupHeaderTemplate" },
+      groupFooterTemplate: { name: "groupFooterTemplate" },
+      idKey: { name: "idKey" },
+      rowsSelectable: { name: "rowsSelectable" },
+      enableMultiRowSelection: { name: "enableMultiRowSelection" },
+      initiallySelected: { name: "initiallySelected" },
+      hideSelectionCheckboxes: { name: "hideSelectionCheckboxes" },
+    }),
+    events: {
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+      rowDoubleClick: { name: "rowDoubleClick", attributeName: "onRowDoubleClick" },
+      selectionDidChange: { name: "selectionDidChange", attributeName: "onSelectionDidChange" },
+    },
+  },
+  {
+    name: "Table",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: {},
+    props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
+      data: { name: "data" },
+      items: { name: "items" },
+      idKey: { name: "idKey" },
+      isPaginated: { name: "isPaginated" },
+      loading: { name: "loading" },
+      rowsSelectable: { name: "rowsSelectable" },
+      enableMultiRowSelection: { name: "enableMultiRowSelection" },
+      initiallySelected: { name: "initiallySelected" },
+      hideHeader: { name: "hideHeader" },
+      hideSelectionCheckboxes: { name: "hideSelectionCheckboxes" },
+      noDataTemplate: { name: "noDataTemplate" },
+    }),
+    events: {
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+      rowClick: { name: "rowClick", attributeName: "onRowClick" },
+      rowDoubleClick: { name: "rowDoubleClick", attributeName: "onRowDoubleClick" },
+      selectionDidChange: { name: "selectionDidChange", attributeName: "onSelectionDidChange" },
+    },
+    templates: {
+      noDataTemplate: { name: "noDataTemplate" },
+    },
+    contextVariables: {
+      $item: { name: "$item" },
+      $itemIndex: { name: "$itemIndex" },
+      $cell: { name: "$cell" },
+      $colIndex: { name: "$colIndex" },
+      $row: { name: "$row" },
+      $rowIndex: { name: "$rowIndex" },
+    },
+    apis: {
+      getSelectedIds: { name: "getSelectedIds" },
+      getSelectedItems: { name: "getSelectedItems" },
+      clearSelection: { name: "clearSelection" },
+      selectAll: { name: "selectAll" },
+    },
+  },
+  {
+    name: "Column",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: {},
     props: {
-      url: { name: "url" },
-      searchIndexable: { name: "searchIndexable" },
-      navLabel: { name: "navLabel" },
-      queryParams: { name: "queryParams" },
-      guard: { name: "guard" },
+      id: { name: "id" },
+      bindTo: { name: "bindTo" },
+      header: { name: "header" },
+      width: { name: "width" },
+      minWidth: { name: "minWidth" },
+      maxWidth: { name: "maxWidth" },
+      canSort: { name: "canSort" },
+      pinTo: { name: "pinTo" },
+      canResize: { name: "canResize" },
     },
     events: {},
     contextVariables: {
-      $pathname: { name: "$pathname" },
-      $routeParams: { name: "$routeParams" },
-      $queryParams: { name: "$queryParams" },
-      $queryString: { name: "$queryString" },
+      $item: { name: "$item" },
+      $cell: { name: "$cell" },
+      $itemIndex: { name: "$itemIndex" },
+      $colIndex: { name: "$colIndex" },
+      $row: { name: "$row" },
+      $rowIndex: { name: "$rowIndex" },
     },
   },
+  {
+    name: "Tree",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: {},
+    props: withLayoutProps({
+      id: { name: "id" },
+      testId: { name: "testId" },
+      data: { name: "data" },
+      dataFormat: { name: "dataFormat" },
+      idField: { name: "idField" },
+      nameField: { name: "nameField" },
+      parentIdField: { name: "parentIdField" },
+      childrenField: { name: "childrenField" },
+      selectableField: { name: "selectableField" },
+      selectedValue: { name: "selectedValue" },
+      selectedId: { name: "selectedId" },
+      defaultExpanded: { name: "defaultExpanded" },
+      itemClickExpands: { name: "itemClickExpands" },
+      itemTemplate: { name: "itemTemplate" },
+    }),
+    events: {
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+      itemClick: { name: "itemClick", attributeName: "onItemClick" },
+      selectionDidChange: { name: "selectionDidChange", attributeName: "onSelectionDidChange" },
+    },
+    templates: {
+      itemTemplate: { name: "itemTemplate" },
+    },
+    contextVariables: {
+      $item: { name: "$item" },
+    },
+    apis: {
+      selectedId: { name: "selectedId" },
+      expandAll: { name: "expandAll" },
+      collapseAll: { name: "collapseAll" },
+      selectId: { name: "selectId" },
+    },
+  },
+  {
+    name: "TreeDisplay",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: withLayoutProps({
+      testId: { name: "testId" },
+      content: { name: "content" },
+      itemHeight: { name: "itemHeight" },
+    }),
+    events: {
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    },
+  },
+  {
+    name: "TableOfContents",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: withLayoutProps({
+      testId: { name: "testId" },
+      smoothScrolling: { name: "smoothScrolling" },
+      maxHeadingLevel: { name: "maxHeadingLevel" },
+      omitH1: { name: "omitH1" },
+      scrollStyle: { name: "scrollStyle" },
+      showScrollerFade: { name: "showScrollerFade" },
+    }),
+    events: {
+      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    },
+  },
+  contractFromMetadata(DataSourceMd, {
+    name: "DataSource",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      loaded: "onLoaded",
+      error: "onError",
+      fetch: "onFetch",
+    },
+  }),
+  contractFromMetadata(PagesMd, {
+    name: "Pages",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(PageMd, {
+    name: "Page",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(RedirectMd, {
+    name: "Redirect",
+    allowsChildren: false,
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(NestedAppMd, {
+    name: "NestedApp",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
   {
     name: "NavPanel",
     kind: "builtin",
     allowsChildren: true,
     declarations: { local: true },
-    props: withLayoutProps(),
+    props: withLayoutProps({
+      logoTemplate: { name: "logoTemplate" },
+      footerTemplate: { name: "footerTemplate" },
+      inDrawer: { name: "inDrawer" },
+      scrollStyle: { name: "scrollStyle" },
+      showScrollerFade: { name: "showScrollerFade" },
+      syncWithContent: { name: "syncWithContent" },
+      syncScrollBehavior: { name: "syncScrollBehavior" },
+      syncScrollPosition: { name: "syncScrollPosition" },
+      testId: { name: "testId" },
+      id: { name: "id" },
+    }),
     events: {},
   },
   {
@@ -714,61 +1294,185 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       icon: { name: "icon" },
       iconAlignment: { name: "iconAlignment" },
       level: { name: "level" },
+      testId: { name: "testId" },
+      id: { name: "id" },
     }),
     events: {
       click: { name: "click", attributeName: "onClick" },
     },
   },
   {
-    name: "APICall",
+    name: "NavPanelCollapseButton",
     kind: "builtin",
     allowsChildren: false,
     declarations: {},
-    props: {
+    props: withLayoutProps({
+      icon: { name: "icon" },
+      iconCollapsed: { name: "iconCollapsed" },
+      "aria-label": { name: "aria-label" },
+      "aria-labelCollapsed": { name: "aria-labelCollapsed" },
+      testId: { name: "testId" },
       id: { name: "id" },
-      method: { name: "method" },
-      url: { name: "url" },
-      body: { name: "body" },
-      rawBody: { name: "rawBody" },
-      queryParams: { name: "queryParams" },
-      headers: { name: "headers" },
-      credentials: { name: "credentials" },
-      invalidates: { name: "invalidates" },
-      updates: { name: "updates" },
-    },
-    events: {
-      beforeRequest: { name: "beforeRequest", attributeName: "onBeforeRequest" },
-      success: { name: "success", attributeName: "onSuccess" },
-      error: { name: "error", attributeName: "onError" },
-      mockExecute: { name: "mockExecute", attributeName: "onMockExecute" },
-    },
-    contextVariables: {
-      $param: { name: "$param" },
-      $params: { name: "$params" },
-      $queryParams: { name: "$queryParams" },
-      $requestBody: { name: "$requestBody" },
-      $requestHeaders: { name: "$requestHeaders" },
-    },
-    apis: {
-      execute: { name: "execute" },
-      inProgress: { name: "inProgress" },
-      loaded: { name: "loaded" },
-      lastResult: { name: "lastResult" },
-      lastError: { name: "lastError" },
-      lastResponseHeaders: { name: "lastResponseHeaders" },
-    },
-  },
-  {
-    name: "Slot",
-    kind: "builtin",
-    allowsChildren: true,
-    declarations: {},
-    acceptsArbitraryProps: true,
-    props: {
-      name: { name: "name" },
-    },
+    }),
     events: {},
   },
+  {
+    name: "NavGroup",
+    kind: "builtin",
+    allowsChildren: true,
+    declarations: { local: true },
+    props: withLayoutProps({
+      label: { name: "label" },
+      initiallyExpanded: { name: "initiallyExpanded" },
+      enabled: { name: "enabled" },
+      to: { name: "to" },
+      icon: { name: "icon" },
+      iconHorizontalExpanded: { name: "iconHorizontalExpanded" },
+      iconVerticalExpanded: { name: "iconVerticalExpanded" },
+      iconHorizontalCollapsed: { name: "iconHorizontalCollapsed" },
+      iconVerticalCollapsed: { name: "iconVerticalCollapsed" },
+      noIndicator: { name: "noIndicator" },
+      iconAlignment: { name: "iconAlignment" },
+      expandIconAlignment: { name: "expandIconAlignment" },
+      testId: { name: "testId" },
+      id: { name: "id" },
+    }),
+    events: {},
+  },
+  contractFromMetadata(APICallMd, {
+    name: "APICall",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      beforeRequest: "onBeforeRequest",
+      success: "onSuccess",
+      error: "onError",
+      mockExecute: "onMockExecute",
+    },
+  }),
+  contractFromMetadata(AppStateMd, {
+    name: "AppState",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      didUpdate: "onDidUpdate",
+    },
+  }),
+  contractFromMetadata(ChangeListenerMd, {
+    name: "ChangeListener",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      didChange: "onDidChange",
+    },
+  }),
+  contractFromMetadata(LifecycleMd, {
+    name: "Lifecycle",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      mount: "onMount",
+      unmount: "onUnmount",
+      error: "onError",
+    },
+  }),
+  contractFromMetadata(TimerMd, {
+    name: "Timer",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      tick: "onTick",
+    },
+  }),
+  contractFromMetadata(QueueMd, {
+    name: "Queue",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    eventAttributes: {
+      willProcess: "onWillProcess",
+      process: "onProcess",
+      didProcess: "onDidProcess",
+      processError: "onProcessError",
+      complete: "onComplete",
+    },
+  }),
+  contractFromMetadata(MessageListenerMd, {
+    name: "MessageListener",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    eventAttributes: {
+      messageReceived: "onMessageReceived",
+    },
+  }),
+  contractFromMetadata(EventSourceMd, {
+    name: "EventSource",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      open: "onOpen",
+      message: "onMessage",
+      error: "onError",
+      close: "onClose",
+    },
+  }),
+  contractFromMetadata(WebSocketMd, {
+    name: "WebSocket",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    eventAttributes: {
+      open: "onOpen",
+      message: "onMessage",
+      error: "onError",
+      close: "onClose",
+    },
+  }),
+  contractFromMetadata(LiveRegionMd, {
+    name: "LiveRegion",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(BookmarkMd, {
+    name: "Bookmark",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(SkipLinkMd, {
+    name: "SkipLink",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ToastMd, {
+    name: "Toast",
+    allowsChildren: true,
+    includeLayoutProps: false,
+  }),
+  contractFromMetadata(SlotMd, {
+    name: "Slot",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(ToneSwitchMd, {
+    name: "ToneSwitch",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+    },
+  }),
+  contractFromMetadata(ToneChangerButtonMd, {
+    name: "ToneChangerButton",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
   {
     name: "property",
     kind: "builtin",
@@ -800,6 +1504,33 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {},
   },
 ];
+
+function stackProps(): XmluiComponentContract["props"] {
+  return {
+    testId: { name: "testId" },
+    desktopOnly: { name: "desktopOnly" },
+    gap: { name: "gap" },
+    reverse: { name: "reverse" },
+    wrapContent: { name: "wrapContent" },
+    orientation: { name: "orientation" },
+    horizontalAlignment: { name: "horizontalAlignment" },
+    verticalAlignment: { name: "verticalAlignment" },
+    hoverContainer: { name: "hoverContainer" },
+    visibleOnHover: { name: "visibleOnHover" },
+    scrollStyle: { name: "scrollStyle" },
+    showScrollerFade: { name: "showScrollerFade" },
+    itemWidth: { name: "itemWidth" },
+    dock: { name: "dock" },
+  };
+}
+
+function stackEvents(): XmluiComponentContract["events"] {
+  return {
+    click: { name: "click", attributeName: "onClick" },
+    contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
+    mounted: { name: "mounted", attributeName: "onMounted" },
+  };
+}
 
 function withLayoutProps(
   props: XmluiComponentContract["props"] = {},

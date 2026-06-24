@@ -12,21 +12,7 @@ import {
 } from "react";
 
 import { defaultProps } from "./TextArea.defaults";
-
-const styles = {
-  textAreaConciseFeedback: "textAreaConciseFeedback",
-  textAreaContainer: "textAreaContainer",
-  textAreaError: "textAreaError",
-  textAreaInput: "textAreaInput",
-  textAreaLabel: "textAreaLabel",
-  textAreaLabeledItem: "textAreaLabeledItem",
-  textAreaLabelRequired: "textAreaLabelRequired",
-  textAreaResizeBoth: "textAreaResizeBoth",
-  textAreaResizeHorizontal: "textAreaResizeHorizontal",
-  textAreaResizeVertical: "textAreaResizeVertical",
-  textAreaSuccess: "textAreaSuccess",
-  textAreaWarning: "textAreaWarning",
-} as const;
+import styles from "./TextArea.module.scss";
 
 export type TextAreaProps = {
   id?: string;

@@ -1,0 +1,12 @@
+<App>
+  <H1>NavPanelCollapseButton foundation</H1>
+  <NavPanel width="220px">
+    <NavLink to="/" exact="true">Home</NavLink>
+    <NavLink to="/docs">Docs</NavLink>
+    <property name="footerTemplate">
+      <NavPanelCollapseButton
+        aria-label="Collapse navigation"
+        aria-labelCollapsed="Expand navigation" />
+    </property>
+  </NavPanel>
+</App>

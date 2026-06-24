@@ -38,7 +38,7 @@
   <Button
     testId="run-sync-benchmark"
     onClick="
-      'block';
+      'sync';
       syncStatus = 'running'; 
       let start = now(); 
       let sum = 0; 

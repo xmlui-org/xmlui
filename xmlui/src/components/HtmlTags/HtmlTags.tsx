@@ -75,8 +75,8 @@ function createHtmlTagRenderer(definition: HtmlTagDefinition): XmluiBuiltInRende
       const attrs = htmlAttributes(adapter);
       const rootAttrs = adapter.rootAttrs();
       const style = {
-        ...(rootAttrs.style as CSSProperties | undefined),
         ...htmlTagCssVariables(definition),
+        ...(rootAttrs.style as CSSProperties | undefined),
         ...inlineStyle(adapter.props.style),
       };
       const children = definition.voidElement ? undefined : adapter.renderChildren();
@@ -107,6 +107,7 @@ function htmlAttributes(adapter: XmluiComponentAdapter): Record<string, unknown>
 function htmlTagCssVariables(definition: HtmlTagDefinition): CSSProperties {
   return {
     "--xmlui-current-width-HtmlTag": `var(--xmlui-width-${definition.metadataName})`,
+    width: `var(--xmlui-width-${definition.metadataName})`,
   } as CSSProperties;
 }
 

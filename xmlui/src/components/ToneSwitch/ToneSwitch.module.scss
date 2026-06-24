@@ -1,0 +1,25 @@
+.toneSwitch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--xmlui-gap-ToneSwitch, var(--xmlui-space-2));
+  width: fit-content;
+  padding: 2px;
+  border: 1px solid var(--xmlui-borderColor-ToneSwitch, var(--xmlui-color-surface-300));
+  border-radius: 999px;
+  background: var(--xmlui-backgroundColor-ToneSwitch, var(--xmlui-color-surface-100));
+}
+
+.button {
+  min-width: 2.25rem;
+  min-height: 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--xmlui-textColor-ToneSwitch, var(--xmlui-textColor));
+  cursor: pointer;
+}
+
+.active {
+  background: var(--xmlui-backgroundColor-indicator-ToneSwitch, var(--xmlui-color-surface-0));
+  box-shadow: var(--xmlui-boxShadow-indicator-ToneSwitch, 0 2px 4px rgba(0, 0, 0, 0.1));
+}

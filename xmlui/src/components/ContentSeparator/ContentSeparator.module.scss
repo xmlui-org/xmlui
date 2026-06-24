@@ -1,6 +1,6 @@
 // ContentSeparator.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old component metadata pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -22,7 +22,7 @@ $paddingRight-ContentSeparator: createThemeVar("paddingRight-ContentSeparator");
 $paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSeparator");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {
@@ -40,22 +40,22 @@ $paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSe
     padding-inline-end: var(--xmlui-paddingRight-ContentSeparator, var(--xmlui-paddingHorizontal-ContentSeparator));
   }
 
-  .xmluiContentSeparator.horizontal {
+  .xmluiContentSeparator.contentSeparatorHorizontal {
     height: var(--xmlui-effective-thickness-ContentSeparator, var(--xmlui-thickness-ContentSeparator));
     width: var(--xmlui-effective-length-ContentSeparator, var(--xmlui-length-ContentSeparator));
   }
 
-  .xmluiContentSeparator.horizontal.stretchToFit {
+  .xmluiContentSeparator.contentSeparatorHorizontal.contentSeparatorStretchToFit {
     width: auto;
     align-self: stretch;
   }
 
-  .xmluiContentSeparator.vertical {
+  .xmluiContentSeparator.contentSeparatorVertical {
     width: var(--xmlui-effective-thickness-ContentSeparator, var(--xmlui-thickness-ContentSeparator));
     height: var(--xmlui-effective-length-ContentSeparator, var(--xmlui-length-ContentSeparator));
   }
 
-  .xmluiContentSeparator.vertical.stretchToFit {
+  .xmluiContentSeparator.contentSeparatorVertical.contentSeparatorStretchToFit {
     height: auto;
     min-height: var(--xmlui-effective-thickness-ContentSeparator, var(--xmlui-thickness-ContentSeparator));
     align-self: stretch;

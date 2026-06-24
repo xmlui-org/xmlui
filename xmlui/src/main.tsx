@@ -3,35 +3,17 @@ import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/com
 import { createXmluiModule } from "./runtime";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import "./global.css";
-import "./components/HtmlTags/HtmlTags.module.scss?xmlui-css-module";
-import "./components/IFrame/IFrame.module.scss?xmlui-css-module";
-import "./components/Image/Image.module.scss?xmlui-css-module";
-import "./components/CodeBlock/CodeBlock.module.scss?xmlui-css-module";
-import "./components/ContentSeparator/ContentSeparator.module.scss?xmlui-css-module";
-import "./components/Link/Link.module.scss?xmlui-css-module";
-import "./components/NoResult/NoResult.module.scss?xmlui-css-module";
-import "./components/QRCode/QRCode.module.scss?xmlui-css-module";
-import "./components/SpaceFiller/SpaceFiller.module.scss?xmlui-css-module";
-import "./components/TextBox/TextBox.module.scss?xmlui-css-module";
-import "./components/TextArea/TextArea.module.scss?xmlui-css-module";
-import "./components/NumberBox/NumberBox.module.scss?xmlui-css-module";
-import "./components/Checkbox/Checkbox.module.scss?xmlui-css-module";
-import "./components/Switch/Switch.module.scss?xmlui-css-module";
-import "./components/RatingInput/RatingInput.module.scss?xmlui-css-module";
-import "./components/Slider/Slider.module.scss?xmlui-css-module";
-import "./components/ColorPicker/ColorPicker.module.scss?xmlui-css-module";
-import "./components/DateInput/DateInput.module.scss?xmlui-css-module";
-import "./components/DatePicker/DatePicker.module.scss?xmlui-css-module";
-import "./components/FileInput/FileInput.module.scss?xmlui-css-module";
-import "./components/TimeInput/TimeInput.module.scss?xmlui-css-module";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
 import asyncSequenceApp from "./examples/async-sequence/Main.xmlui";
 import componentCounterApp from "./examples/counter-components/Main.xmlui";
 import actionsCallApiApp from "./examples/actions-call-api/Main.xmlui";
+import accordionFoundationApp from "./examples/accordion-foundation/Main.xmlui";
 import apiCallMutationApp from "./examples/api-call-mutation/Main.xmlui";
+import appHeaderFoundationApp from "./examples/app-header-foundation/Main.xmlui";
 import appMainContentLayoutApp from "./examples/app-main-content-layout/Main.xmlui";
+import appStateListenersApp from "./examples/app-state-listeners/Main.xmlui";
 import builtinsInputsApp from "./examples/builtins-inputs/Main.xmlui";
 import builtinsItemsApp from "./examples/builtins-items/Main.xmlui";
 import builtinsLayoutApp from "./examples/builtins-layout/Main.xmlui";
@@ -40,6 +22,7 @@ import buttonCompatibilityApp from "./examples/button-compatibility/Main.xmlui";
 import codeBlockFoundationApp from "./examples/code-block-foundation/Main.xmlui";
 import generatedOutputApp from "./examples/generated-output/Main.xmlui";
 import emptyFallbackStatesApp from "./examples/empty-fallback-states/Main.xmlui";
+import expandableItemFoundationApp from "./examples/expandable-item-foundation/Main.xmlui";
 import separatorSpacingApp from "./examples/separator-spacing/Main.xmlui";
 import broaderExpressionsApp from "./examples/broader-expressions/Main.xmlui";
 import dataSourceMockApp from "./examples/data-source-mock/Main.xmlui";
@@ -60,6 +43,10 @@ import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
 import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
+import navGroupFoundationApp from "./examples/navgroup-foundation/Main.xmlui";
+import navLinkFoundationApp from "./examples/navlink-foundation/Main.xmlui";
+import navPanelCollapseButtonFoundationApp from "./examples/nav-panel-collapse-button-foundation/Main.xmlui";
+import navPanelFoundationApp from "./examples/navpanel-foundation/Main.xmlui";
 import layoutCoreApp from "./examples/layout-core/Main.xmlui";
 import localCounterApp from "./examples/counter-local/Main.xmlui";
 import reactiveDerivedBasicApp from "./examples/reactive-derived-basic/Main.xmlui";
@@ -68,12 +55,18 @@ import reactiveDerivedGlobalsApp from "./examples/reactive-derived-globals/Main.
 import reactiveDerivedOverrideApp from "./examples/reactive-derived-override/Main.xmlui";
 import reactiveDerivedPropsApp from "./examples/reactive-derived-props/Main.xmlui";
 import primitiveTextHeadingApp from "./examples/primitive-text-heading/Main.xmlui";
+import profileMenuFoundationApp from "./examples/profile-menu-foundation/Main.xmlui";
 import responsiveStateBasicsApp from "./examples/responsive-state-basics/Main.xmlui";
 import routingBasicApp from "./examples/routing-basic/Main.xmlui";
 import routingDataApp from "./examples/routing-data/Main.xmlui";
 import routingQueryApp from "./examples/routing-query/Main.xmlui";
 import routingStateApp from "./examples/routing-state/Main.xmlui";
 import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
+import responsiveBarFoundationApp from "./examples/responsive-bar-foundation/Main.xmlui";
+import scrollViewerFoundationApp from "./examples/scroll-viewer-foundation/Main.xmlui";
+import schedulingFoundationApp from "./examples/scheduling-foundation/Main.xmlui";
+import splitterFoundationApp from "./examples/splitter-foundation/Main.xmlui";
+import stickyFoundationApp from "./examples/sticky-foundation/Main.xmlui";
 import styleMutationApp from "./examples/style-mutation/Main.xmlui";
 import themeScopeApp from "./examples/theme-scope/Main.xmlui";
 import themeVarsApp from "./examples/theme-vars/Main.xmlui";
@@ -88,8 +81,34 @@ import sliderFoundationApp from "./examples/slider-foundation/Main.xmlui";
 import colorPickerFoundationApp from "./examples/color-picker-foundation/Main.xmlui";
 import dateInputFoundationApp from "./examples/date-input-foundation/Main.xmlui";
 import datePickerFoundationApp from "./examples/date-picker-foundation/Main.xmlui";
+import drawerFoundationApp from "./examples/drawer-foundation/Main.xmlui";
+import modalDialogFoundationApp from "./examples/modal-dialog-foundation/Main.xmlui";
+import messagingFoundationApp from "./examples/messaging-foundation/Main.xmlui";
+import missingVisualComponentsFoundationApp from "./examples/missing-visual-components-foundation/Main.xmlui";
+import feedbackAccessibilityFoundationApp from "./examples/feedback-accessibility-foundation/Main.xmlui";
+import themeSlotFoundationApp from "./examples/theme-slot-foundation/Main.xmlui";
+import appShellFoundationApp from "./examples/app-shell-foundation/Main.xmlui";
+import pageRoutingFoundationApp from "./examples/page-routing-foundation/Main.xmlui";
+import nestedAppFoundationApp from "./examples/nested-app-foundation/Main.xmlui";
+import tooltipFoundationApp from "./examples/tooltip-foundation/Main.xmlui";
+import contextMenuFoundationApp from "./examples/context-menu-foundation/Main.xmlui";
+import dropdownMenuFoundationApp from "./examples/dropdown-menu-foundation/Main.xmlui";
+import cardFoundationApp from "./examples/card-foundation/Main.xmlui";
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
+import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
+import focusScopeFoundationApp from "./examples/focus-scope-foundation/Main.xmlui";
+import flowTileFoundationApp from "./examples/flow-tile-foundation/Main.xmlui";
+import footerFoundationApp from "./examples/footer-foundation/Main.xmlui";
+import formFoundationApp from "./examples/form-foundation/Main.xmlui";
+import formSegmentFoundationApp from "./examples/form-segment-foundation/Main.xmlui";
+import structuredFormsFoundationApp from "./examples/structured-forms-foundation/Main.xmlui";
+import validationDisplayFoundationApp from "./examples/validation-display-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
+import stackFamilyFoundationApp from "./examples/stack-family-foundation/Main.xmlui";
+import stepperFoundationApp from "./examples/stepper-foundation/Main.xmlui";
+import tableFoundationApp from "./examples/table-foundation/Main.xmlui";
+import tabsFoundationApp from "./examples/tabs-foundation/Main.xmlui";
+import treeFamilyFoundationApp from "./examples/tree-family-foundation/Main.xmlui";
 import udcCombinedApp from "./examples/udc-combined/Main.xmlui";
 import udcDefaultChildrenApp from "./examples/udc-default-children/Main.xmlui";
 import udcEventEmissionApp from "./examples/udc-event-emission/Main.xmlui";
@@ -107,8 +126,11 @@ declare global {
 
 const examples = {
   actionsCallApi: actionsCallApiApp,
+  accordionFoundation: accordionFoundationApp,
   apiCallMutation: apiCallMutationApp,
+  appHeaderFoundation: appHeaderFoundationApp,
   appMainContentLayout: appMainContentLayoutApp,
+  appStateListeners: appStateListenersApp,
   asyncDirectives: asyncDirectivesApp,
   asyncResponsiveLoop: asyncResponsiveLoopApp,
   asyncSequence: asyncSequenceApp,
@@ -120,6 +142,7 @@ const examples = {
   codeBlockFoundation: codeBlockFoundationApp,
   generatedOutput: generatedOutputApp,
   emptyFallbackStates: emptyFallbackStatesApp,
+  expandableItemFoundation: expandableItemFoundationApp,
   separatorSpacing: separatorSpacingApp,
   components: componentCounterApp,
   dataSourceMock: dataSourceMockApp,
@@ -141,6 +164,10 @@ const examples = {
   iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
   linkInteraction: linkInteractionApp,
+  navGroupFoundation: navGroupFoundationApp,
+  navLinkFoundation: navLinkFoundationApp,
+  navPanelCollapseButtonFoundation: navPanelCollapseButtonFoundationApp,
+  navPanelFoundation: navPanelFoundationApp,
   layoutCore: layoutCoreApp,
   local: localCounterApp,
   reactiveDerivedBasic: reactiveDerivedBasicApp,
@@ -149,12 +176,18 @@ const examples = {
   reactiveDerivedOverride: reactiveDerivedOverrideApp,
   reactiveDerivedProps: reactiveDerivedPropsApp,
   primitiveTextHeading: primitiveTextHeadingApp,
+  profileMenuFoundation: profileMenuFoundationApp,
   responsiveStateBasics: responsiveStateBasicsApp,
   routingBasic: routingBasicApp,
   routingData: routingDataApp,
   routingQuery: routingQueryApp,
   routingState: routingStateApp,
   runtimeToast: runtimeToastApp,
+  responsiveBarFoundation: responsiveBarFoundationApp,
+  scrollViewerFoundation: scrollViewerFoundationApp,
+  schedulingFoundation: schedulingFoundationApp,
+  splitterFoundation: splitterFoundationApp,
+  stickyFoundation: stickyFoundationApp,
   styleMutation: styleMutationApp,
   themeScope: themeScopeApp,
   themeVars: themeVarsApp,
@@ -169,8 +202,34 @@ const examples = {
   colorPickerFoundation: colorPickerFoundationApp,
   dateInputFoundation: dateInputFoundationApp,
   datePickerFoundation: datePickerFoundationApp,
+  drawerFoundation: drawerFoundationApp,
+  modalDialogFoundation: modalDialogFoundationApp,
+  messagingFoundation: messagingFoundationApp,
+  missingVisualComponentsFoundation: missingVisualComponentsFoundationApp,
+  feedbackAccessibilityFoundation: feedbackAccessibilityFoundationApp,
+  themeSlotFoundation: themeSlotFoundationApp,
+  appShellFoundation: appShellFoundationApp,
+  pageRoutingFoundation: pageRoutingFoundationApp,
+  nestedAppFoundation: nestedAppFoundationApp,
+  tooltipFoundation: tooltipFoundationApp,
+  contextMenuFoundation: contextMenuFoundationApp,
+  dropdownMenuFoundation: dropdownMenuFoundationApp,
+  cardFoundation: cardFoundationApp,
   fileInputFoundation: fileInputFoundationApp,
+  fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
+  focusScopeFoundation: focusScopeFoundationApp,
+  flowTileFoundation: flowTileFoundationApp,
+  footerFoundation: footerFoundationApp,
+  formFoundation: formFoundationApp,
+  formSegmentFoundation: formSegmentFoundationApp,
+  structuredFormsFoundation: structuredFormsFoundationApp,
+  validationDisplayFoundation: validationDisplayFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
+  stackFamilyFoundation: stackFamilyFoundationApp,
+  stepperFoundation: stepperFoundationApp,
+  tableFoundation: tableFoundationApp,
+  tabsFoundation: tabsFoundationApp,
+  treeFamilyFoundation: treeFamilyFoundationApp,
   udcCombined: udcCombinedApp,
   udcDefaultChildren: udcDefaultChildrenApp,
   udcEventEmission: udcEventEmissionApp,

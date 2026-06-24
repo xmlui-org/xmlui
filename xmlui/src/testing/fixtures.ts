@@ -1,19 +1,43 @@
 import { expect as baseExpect, test as base, type Locator, type Page } from "@playwright/test";
 import {
+  AccordionDriver,
+  AppHeaderDriver,
+  AvatarDriver,
+  BadgeDriver,
+  AutoCompleteDriver,
   CardDriver,
   CheckboxDriver,
   CodeBlockDriver,
   ComponentDriver,
   ContentSeparatorDriver,
+  ContextMenuDriver,
+  DropdownMenuDriver,
+  ExpandableItemDriver,
   IconDriver,
   LinkDriver,
+  ListDriver,
+  ModalDialogDriver,
+  NavGroupDriver,
+  NavLinkDriver,
+  NavPanelCollapseButtonDriver,
+  NavPanelDriver,
   NoResultDriver,
   NumberBoxDriver,
+  ProgressBarDriver,
+  ResponsiveBarDriver,
+  SplitterDriver,
   DateInputDriver,
+  FileUploadDropZoneDriver,
+  FooterDriver,
+  FormDriver,
+  FormItemDriver,
+  FormSegmentDriver,
+  SelectDriver,
   SliderDriver,
   TimeInputDriver,
   TextAreaDriver,
   TextBoxDriver,
+  TreeDriver,
 } from "./ComponentDrivers";
 
 export type InitTestBedOptions = {
@@ -36,17 +60,43 @@ export type TestBedResult = {
 type Fixtures = {
   initTestBed: (markup: string, options?: InitTestBedOptions) => Promise<TestBedResult>;
   createButtonDriver: () => Promise<ComponentDriver>;
+  createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
+  createAppHeaderDriver: (testId?: string | Locator) => Promise<AppHeaderDriver>;
+  createAvatarDriver: (testId?: string | Locator) => Promise<AvatarDriver>;
+  createBadgeDriver: (testId?: string | Locator) => Promise<BadgeDriver>;
+  createExpandableItemDriver: (testId?: string | Locator) => Promise<ExpandableItemDriver>;
   createTextDriver: (testId?: string) => Promise<ComponentDriver>;
   createHeadingDriver: (testId?: string) => Promise<ComponentDriver>;
   createCardDriver: (testId?: string) => Promise<CardDriver>;
   createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
+  createOptionDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
+  createValidationDisplayDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
+  createResponsiveBarDriver: (testId?: string | Locator) => Promise<ResponsiveBarDriver>;
+  createProgressBarDriver: (testId?: string | Locator) => Promise<ProgressBarDriver>;
+  createSplitterDriver: (testId?: string | Locator) => Promise<SplitterDriver>;
+  createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
+  createModalDialogDriver: (testId?: string | Locator) => Promise<ModalDialogDriver>;
+  createContextMenuDriver: (testId?: string | Locator) => Promise<ContextMenuDriver>;
+  createDropdownMenuDriver: (testId?: string | Locator) => Promise<DropdownMenuDriver>;
+  createTreeDriver: (testId?: string | Locator) => Promise<TreeDriver>;
   createLinkDriver: (testId?: string | Locator) => Promise<LinkDriver>;
+  createNavGroupDriver: (testId?: string | Locator) => Promise<NavGroupDriver>;
+  createNavLinkDriver: (testId?: string | Locator) => Promise<NavLinkDriver>;
+  createNavPanelCollapseButtonDriver: (testId?: string | Locator) => Promise<NavPanelCollapseButtonDriver>;
+  createNavPanelDriver: (testId?: string | Locator) => Promise<NavPanelDriver>;
   createTextBoxDriver: (testId?: string | Locator) => Promise<TextBoxDriver>;
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
   createDateInputDriver: (testId?: string | Locator) => Promise<DateInputDriver>;
+  createFileUploadDropZoneDriver: (testId?: string | Locator) => Promise<FileUploadDropZoneDriver>;
+  createFooterDriver: (testId?: string | Locator) => Promise<FooterDriver>;
+  createFormDriver: (testId?: string | Locator) => Promise<FormDriver>;
+  createFormItemDriver: (testId?: string | Locator) => Promise<FormItemDriver>;
+  createFormSegmentDriver: (testId?: string | Locator) => Promise<FormSegmentDriver>;
+  createAutoCompleteDriver: (testId?: string | Locator) => Promise<AutoCompleteDriver>;
+  createSelectDriver: (testId?: string | Locator) => Promise<SelectDriver>;
   createTimeInputDriver: (testId?: string | Locator) => Promise<TimeInputDriver>;
   createSliderDriver: (testId?: string | Locator) => Promise<SliderDriver>;
   createCheckboxDriver: (testId?: string | Locator) => Promise<CheckboxDriver>;
@@ -106,6 +156,55 @@ export const test = base.extend<Fixtures>({
   createButtonDriver: async ({ page }, use) => {
     await use(async () => createButtonDriver(page));
   },
+  createAccordionDriver: async ({ page }, use) => {
+    await use(async (testId) => new AccordionDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="Accordion"]').first(),
+      page,
+    }));
+  },
+  createAppHeaderDriver: async ({ page }, use) => {
+    await use(async (testId) => new AppHeaderDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="AppHeader"]').first(),
+      page,
+    }));
+  },
+  createAvatarDriver: async ({ page }, use) => {
+    await use(async (testId) => new AvatarDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Avatar"]').first(),
+      page,
+    }));
+  },
+  createBadgeDriver: async ({ page }, use) => {
+    await use(async (testId) => new BadgeDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Badge"]').first(),
+      page,
+    }));
+  },
+  createExpandableItemDriver: async ({ page }, use) => {
+    await use(async (testId) => new ExpandableItemDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="ExpandableItem"]').first(),
+      page,
+    }));
+  },
   createTextDriver: async ({ page }, use) => {
     await use(async (testId) => new ComponentDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="Text"]').first(),
@@ -146,11 +245,159 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createOptionDriver: async ({ page }, use) => {
+    await use(async (testId) => new ComponentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Option"]').first(),
+      page,
+    }));
+  },
+  createValidationDisplayDriver: async ({ page }, use) => {
+    await use(async (testId) => new ComponentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ValidationDisplay"]').first(),
+      page,
+    }));
+  },
+  createResponsiveBarDriver: async ({ page }, use) => {
+    await use(async (testId) => new ResponsiveBarDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="ResponsiveBar"]').first(),
+      page,
+    }));
+  },
+  createProgressBarDriver: async ({ page }, use) => {
+    await use(async (testId) => new ProgressBarDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ProgressBar"]').first(),
+      page,
+    }));
+  },
+  createSplitterDriver: async ({ page }, use) => {
+    await use(async (testId) => new SplitterDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="Splitter"], [data-xmlui-component="HSplitter"], [data-xmlui-component="VSplitter"]').first(),
+      page,
+    }));
+  },
+  createListDriver: async ({ page }, use) => {
+    await use(async (testId) => new ListDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="List"]').first(),
+      page,
+    }));
+  },
+  createModalDialogDriver: async ({ page }, use) => {
+    await use(async (testId) => new ModalDialogDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ModalDialog"]').first(),
+      page,
+    }));
+  },
+  createContextMenuDriver: async ({ page }, use) => {
+    await use(async (testId) => new ContextMenuDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ContextMenu"]').first(),
+      page,
+    }));
+  },
+  createDropdownMenuDriver: async ({ page }, use) => {
+    await use(async (testId) => new DropdownMenuDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="DropdownMenu"]').first(),
+      page,
+    }));
+  },
+  createTreeDriver: async ({ page }, use) => {
+    await use(async (testId) => new TreeDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Tree"]').first(),
+      page,
+    }));
+  },
   createLinkDriver: async ({ page }, use) => {
     await use(async (testId) => new LinkDriver({
       locator: typeof testId === "string"
         ? page.getByTestId(testId)
         : testId ?? page.locator('[data-xmlui-component="Link"], [data-xmlui-component="a"]').first(),
+      page,
+    }));
+  },
+  createNavGroupDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavGroupDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavGroup"]').first(),
+      page,
+    }));
+  },
+  createNavLinkDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavLinkDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavLink"]').first(),
+      page,
+    }));
+  },
+  createNavPanelCollapseButtonDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavPanelCollapseButtonDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavPanelCollapseButton"]').first(),
+      page,
+    }));
+  },
+  createNavPanelDriver: async ({ page }, use) => {
+    await use(async (testId) => new NavPanelDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="NavPanel"]').first(),
       page,
     }));
   },
@@ -195,6 +442,83 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="DateInput"]').first(),
+      page,
+    }));
+  },
+  createFileUploadDropZoneDriver: async ({ page }, use) => {
+    await use(async (testId) => new FileUploadDropZoneDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="FileUploadDropZone"]').first(),
+      page,
+    }));
+  },
+  createFooterDriver: async ({ page }, use) => {
+    await use(async (testId) => new FooterDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Footer"]').first(),
+      page,
+    }));
+  },
+  createFormDriver: async ({ page }, use) => {
+    await use(async (testId) => new FormDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Form"]').first(),
+      page,
+    }));
+  },
+  createFormItemDriver: async ({ page }, use) => {
+    await use(async (testId) => new FormItemDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="FormItem"]').first(),
+      page,
+    }));
+  },
+  createFormSegmentDriver: async ({ page }, use) => {
+    await use(async (testId) => new FormSegmentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="FormSegment"]').first(),
+      page,
+    }));
+  },
+  createAutoCompleteDriver: async ({ page }, use) => {
+    await use(async (testId) => new AutoCompleteDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="AutoComplete"]').first(),
+      page,
+    }));
+  },
+  createSelectDriver: async ({ page }, use) => {
+    await use(async (testId) => new SelectDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Select"]').first(),
       page,
     }));
   },
@@ -350,6 +674,7 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`label="{(function () { return 'hello'; })()}"`, `label="hello"`)
     .replaceAll(`initialValue="{() => {}}"`, `initialValue="{{}}"`)
     .replaceAll(`testState = ++testState || 1`, `testState = (testState || 0) + 1`)
+    .replaceAll(`testState = clicked`, `testState = 'clicked'`)
     .replaceAll(`onDidChange="{(val) => {value = val}}"`, `onDidChange="val => value = val"`)
     .replaceAll(`onDidChange="arg => {testState = arg; console.log('arg', arg)}"`, `onDidChange="arg => testState = arg"`)
     .replaceAll(`icon="() => {}"`, `icon="{null}"`)

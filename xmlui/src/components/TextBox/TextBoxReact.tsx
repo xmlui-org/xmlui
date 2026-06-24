@@ -2,28 +2,7 @@ import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "reac
 import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./TextBox.defaults";
-
-const styles = {
-  textBoxAdornment: "textBoxAdornment",
-  textBoxConciseFeedback: "textBoxConciseFeedback",
-  textBoxDisabled: "textBoxDisabled",
-  textBoxError: "textBoxError",
-  textBoxIconMarker: "textBoxIconMarker",
-  textBoxInput: "textBoxInput",
-  textBoxLabel: "textBoxLabel",
-  textBoxLabeledItem: "textBoxLabeledItem",
-  textBoxLabelPositionBottom: "textBoxLabelPositionBottom",
-  textBoxLabelPositionEnd: "textBoxLabelPositionEnd",
-  textBoxLabelPositionStart: "textBoxLabelPositionStart",
-  textBoxLabelPositionTop: "textBoxLabelPositionTop",
-  textBoxLabelBreak: "textBoxLabelBreak",
-  textBoxLabelRequired: "textBoxLabelRequired",
-  textBoxPasswordToggle: "textBoxPasswordToggle",
-  textBoxReadOnly: "textBoxReadOnly",
-  textBoxRoot: "textBoxRoot",
-  textBoxSuccess: "textBoxSuccess",
-  textBoxWarning: "textBoxWarning",
-} as const;
+import styles from "./TextBox.module.scss";
 
 export type TextBoxProps = {
   id?: string;

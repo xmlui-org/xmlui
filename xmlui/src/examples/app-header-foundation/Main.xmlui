@@ -1,0 +1,18 @@
+<App var.message="{'Ready'}">
+  <AppHeader title="XMLUI Rewrite">
+    <property name="logoTemplate">
+      <Text>XMLUI</Text>
+    </property>
+    <NavLink to="/" exact="true">Home</NavLink>
+    <NavLink to="/reports">Reports</NavLink>
+    <Button onClick="message = message === 'Ready' ? 'Header action clicked' : 'Ready'">
+      Toggle header state
+    </Button>
+    <property name="profileMenuTemplate">
+      <Button variant="ghost">Profile</Button>
+    </property>
+  </AppHeader>
+  <H1>AppHeader foundation</H1>
+  <Text>{message}</Text>
+  <Text>Current path: {$pathname}</Text>
+</App>

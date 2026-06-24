@@ -1,0 +1,84 @@
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$gap-FormItem: createThemeVar("gap-FormItem");
+$gap-label-FormItem: createThemeVar("gap-label-FormItem");
+$width-label-FormItem: createThemeVar("width-label-FormItem");
+$textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
+$fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
+$textColor-error-FormItem: createThemeVar("textColor-error-FormItem");
+$fontSize-error-FormItem: createThemeVar("fontSize-error-FormItem");
+$borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--error");
+
+.formItem {
+  display: flex;
+  flex-direction: column;
+  gap: $gap-FormItem;
+}
+
+.noLabel {
+  width: fit-content;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $gap-label-FormItem;
+}
+
+.labelTop {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.labelStart,
+.labelBefore {
+  flex-direction: row;
+}
+
+.labelEnd,
+.labelAfter {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.label {
+  color: $textColor-label-FormItem;
+  font-weight: $fontWeight-label-FormItem;
+}
+
+.labelStart .label,
+.labelBefore .label,
+.labelEnd .label,
+.labelAfter .label {
+  width: $width-label-FormItem;
+}
+
+.requiredIndicator {
+  margin-left: 0.125rem;
+}
+
+.optionalIndicator {
+  margin-left: 0.25rem;
+}
+
+.control {
+  min-width: 0;
+}
+
+.input {
+  box-sizing: border-box;
+  min-width: 16rem;
+}
+
+.errorInput {
+  border-color: $borderColor-input-FormItem--error;
+}
+
+.error {
+  color: $textColor-error-FormItem;
+  font-size: $fontSize-error-FormItem;
+}

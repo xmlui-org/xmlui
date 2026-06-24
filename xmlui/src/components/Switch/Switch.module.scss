@@ -1,4 +1,4 @@
-$themeVars: ();
+$themeVars: "";
 
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
@@ -33,7 +33,7 @@ $borderColor-Switch--warning: createThemeVar("borderColor-Switch--warning");
 $borderColor-Switch--success: createThemeVar("borderColor-Switch--success");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {
@@ -45,7 +45,7 @@ $borderColor-Switch--success: createThemeVar("borderColor-Switch--success");
     max-width: 100%;
   }
 
-  .switchcontainer {
+  .container {
     box-sizing: border-box;
   }
 

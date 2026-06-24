@@ -1,0 +1,190 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-MenuItem: createThemeVar("backgroundColor-MenuItem");
+$backgroundColor-MenuItem-hover: createThemeVar("backgroundColor-MenuItem--hover");
+$backgroundColor-MenuItem-active: createThemeVar("backgroundColor-MenuItem--active");
+$color-MenuItem: createThemeVar("color-MenuItem");
+$color-MenuItem-hover: createThemeVar("color-MenuItem--hover");
+$color-MenuItem-active: createThemeVar("color-MenuItem--active");
+$color-MenuItem-disabled: createThemeVar("color-MenuItem--disabled");
+$fontFamily-MenuItem: createThemeVar("fontFamily-MenuItem");
+$fontSize-MenuItem: createThemeVar("fontSize-MenuItem");
+$paddingVertical-MenuItem: createThemeVar("paddingVertical-MenuItem");
+$paddingHorizontal-MenuItem: createThemeVar("paddingHorizontal-MenuItem");
+$gap-MenuItem: createThemeVar("gap-MenuItem");
+$maxWidth-MenuItem: createThemeVar("maxWidth-MenuItem");
+
+$backgroundColor-SubMenuItem: createThemeVar("backgroundColor-SubMenuItem");
+$backgroundColor-SubMenuItem-hover: createThemeVar("backgroundColor-SubMenuItem--hover");
+$color-SubMenuItem: createThemeVar("color-SubMenuItem");
+$color-SubMenuItem-hover: createThemeVar("color-SubMenuItem--hover");
+$fontFamily-SubMenuItem: createThemeVar("fontFamily-SubMenuItem");
+$fontSize-SubMenuItem: createThemeVar("fontSize-SubMenuItem");
+$paddingVertical-SubMenuItem: createThemeVar("paddingVertical-SubMenuItem");
+$paddingHorizontal-SubMenuItem: createThemeVar("paddingHorizontal-SubMenuItem");
+$gap-SubMenuItem: createThemeVar("gap-SubMenuItem");
+
+$marginTop-MenuSeparator: createThemeVar("marginTop-MenuSeparator");
+$marginBottom-MenuSeparator: createThemeVar("marginBottom-MenuSeparator");
+$marginHorizontal-MenuSeparator: createThemeVar("marginHorizontal-MenuSeparator");
+$width-MenuSeparator: createThemeVar("width-MenuSeparator");
+$height-MenuSeparator: createThemeVar("height-MenuSeparator");
+$color-MenuSeparator: createThemeVar("color-MenuSeparator");
+
+$backgroundColor-DropdownMenu: createThemeVar("backgroundColor-DropdownMenu");
+$borderRadius-DropdownMenu: createThemeVar("borderRadius-DropdownMenu");
+$boxShadow-DropdownMenu: createThemeVar("boxShadow-DropdownMenu");
+$borderColor-DropdownMenu-content: createThemeVar("borderColor-DropdownMenu-content");
+$borderWidth-DropdownMenu-content: createThemeVar("borderWidth-DropdownMenu-content");
+$borderStyle-DropdownMenu-content: createThemeVar("borderStyle-DropdownMenu-content");
+$minWidth-DropdownMenu: createThemeVar("minWidth-DropdownMenu");
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 32px;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--xmlui-borderColor, #d0d7de);
+  border-radius: var(--xmlui-borderRadius, 4px);
+  color: var(--xmlui-textColor-primary, inherit);
+  background: var(--xmlui-color-surface-raised, #fff);
+  font: inherit;
+  cursor: pointer;
+}
+
+.trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.content {
+  position: fixed;
+  z-index: 9999;
+  min-width: $minWidth-DropdownMenu;
+  padding: 4px;
+  border: $borderWidth-DropdownMenu-content $borderStyle-DropdownMenu-content $borderColor-DropdownMenu-content;
+  border-radius: $borderRadius-DropdownMenu;
+  background-color: $backgroundColor-DropdownMenu;
+  box-shadow: $boxShadow-DropdownMenu;
+}
+
+.content > .menuSeparator:first-child,
+.content > .menuSeparator:last-child {
+  display: none;
+}
+
+.content > .menuSeparator:has(+ .menuSeparator) {
+  display: none;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: $gap-MenuItem;
+  max-width: $maxWidth-MenuItem;
+  padding: $paddingVertical-MenuItem $paddingHorizontal-MenuItem;
+  border: 0;
+  outline: none;
+  color: $color-MenuItem;
+  background: $backgroundColor-MenuItem;
+  font-family: $fontFamily-MenuItem;
+  font-size: $fontSize-MenuItem;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+}
+
+.menuItem:hover,
+.menuItem:focus {
+  color: $color-MenuItem-hover;
+  background: $backgroundColor-MenuItem-hover;
+}
+
+.menuItemActive {
+  color: $color-MenuItem-active;
+  background: $backgroundColor-MenuItem-active;
+}
+
+.menuItemDisabled {
+  color: $color-MenuItem-disabled;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.menuSeparator {
+  width: $width-MenuSeparator;
+  height: $height-MenuSeparator;
+  margin: $marginTop-MenuSeparator $marginHorizontal-MenuSeparator $marginBottom-MenuSeparator;
+  background: $color-MenuSeparator;
+}
+
+.subMenuItem {
+  position: relative;
+}
+
+.subMenuTrigger {
+  display: flex;
+  align-items: center;
+  gap: $gap-SubMenuItem;
+  width: 100%;
+  padding: $paddingVertical-SubMenuItem $paddingHorizontal-SubMenuItem;
+  border: 0;
+  outline: none;
+  color: $color-SubMenuItem;
+  background: $backgroundColor-SubMenuItem;
+  font-family: $fontFamily-SubMenuItem;
+  font-size: $fontSize-SubMenuItem;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+}
+
+.subMenuTrigger:hover,
+.subMenuTrigger:focus {
+  color: $color-SubMenuItem-hover;
+  background: $backgroundColor-SubMenuItem-hover;
+}
+
+.subMenuLabel {
+  flex: 1 1 auto;
+}
+
+.subMenuIndicator {
+  margin-left: auto;
+  font-size: 0.75em;
+}
+
+.subMenuContent {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 2px);
+  min-width: $minWidth-DropdownMenu;
+  padding: 4px;
+  border: $borderWidth-DropdownMenu-content $borderStyle-DropdownMenu-content $borderColor-DropdownMenu-content;
+  border-radius: $borderRadius-DropdownMenu;
+  background-color: $backgroundColor-DropdownMenu;
+  box-shadow: $boxShadow-DropdownMenu;
+}
+
+.subMenuContent > .menuSeparator:first-child,
+.subMenuContent > .menuSeparator:last-child {
+  display: none;
+}
+
+.subMenuContent > .menuSeparator:has(+ .menuSeparator) {
+  display: none;
+}
+
+:export {
+  themeVars: "";
+}

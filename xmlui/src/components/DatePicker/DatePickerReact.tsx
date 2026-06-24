@@ -1,49 +1,9 @@
 import type { CSSProperties, FocusEvent } from "react";
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
+import { dateFormats, type DateFormat } from "./DatePicker.constants";
 import { defaultProps } from "./DatePicker.defaults";
-
-const styles = {
-  adornment: "adornment",
-  autoWidth: "autoWidth",
-  calendarArea: "calendarArea",
-  cell: "cell",
-  cellTrigger: "cellTrigger",
-  clear: "clear",
-  content: "content",
-  control: "control",
-  footerButton: "footerButton",
-  footerButtonPrimary: "footerButtonPrimary",
-  fullWidth: "fullWidth",
-  input: "input",
-  label: "label",
-  nav: "nav",
-  positioner: "positioner",
-  preset: "preset",
-  popupFooter: "popupFooter",
-  quickPresets: "quickPresets",
-  rangeSeparator: "rangeSeparator",
-  root: "root",
-  table: "table",
-  trailing: "trailing",
-  viewControl: "viewControl",
-  viewTrigger: "viewTrigger",
-  weekday: "weekday",
-  weekNumber: "weekNumber",
-} as const;
-
-export const dateFormats = [
-  "MM/dd/yyyy",
-  "MM-dd-yyyy",
-  "yyyy/MM/dd",
-  "yyyy-MM-dd",
-  "dd/MM/yyyy",
-  "dd-MM-yyyy",
-  "yyyyMMdd",
-  "MMddyyyy",
-] as const;
-
-export type DateFormat = (typeof dateFormats)[number];
+import styles from "./DatePicker.module.scss";
 type Mode = "single" | "range";
 type ValidationStatus = "none" | "error" | "warning" | "valid";
 type DateParts = { year: number; month: number; day: number };
@@ -351,24 +311,24 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
       data-disabled={!enabled ? "" : undefined}
       data-open={isOpen ? "" : undefined}
       data-testid={dataTestId}
-      className={cx(styles.root, widthClass(width), className)}
+      className={cx(styles.datePickerRoot, widthClass(width), className)}
       style={rootStyle}
       onFocusCapture={handleFocusCapture}
       onBlurCapture={handleBlurCapture}
     >
       {!inline && hasLabel ? (
-        <label className={styles.label} onClick={focus}>
+        <label className={styles.datePickerLabel} onClick={focus}>
           {String(label)}
         </label>
       ) : null}
 
       {!inline ? (
-        <div className={styles.control} data-part-id="input" data-xmlui-part="input">
+        <div className={styles.datePickerControl} data-part-id="input" data-xmlui-part="input">
           <Adornment text={startText} icon={startIcon} />
           <input
             ref={firstInputRef}
             id={id}
-            className={styles.input}
+            className={styles.datePickerInput}
             value={inputValues[0]}
             placeholder={placeholder ?? placeholderFor(normalizedFormat)}
             aria-label={hasLabel ? String(label) : "Date"}
@@ -384,9 +344,9 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
           />
           {mode === "range" ? (
             <>
-              <span className={styles.rangeSeparator}>-</span>
+              <span className={styles.datePickerRangeSeparator}>-</span>
               <input
-                className={styles.input}
+                className={styles.datePickerInput}
                 value={inputValues[1] ?? ""}
                 placeholder={placeholderFor(normalizedFormat)}
                 aria-label="End date"
@@ -402,7 +362,7 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
               />
             </>
           ) : null}
-          <div className={styles.trailing}>
+          <div className={styles.datePickerTrailing}>
             {!verboseValidationFeedback && validationStatus !== "none" ? (
               <span
                 data-part-id="conciseValidationFeedback"
@@ -415,7 +375,7 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
             {clearable ? (
               <button
                 type="button"
-                className={styles.clear}
+                className={styles.datePickerClear}
                 data-part-id="clearButton"
                 data-xmlui-part="clearButton"
                 aria-label="Clear date"
@@ -431,15 +391,15 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
       ) : null}
 
       {(inline || isOpen) ? (
-        <div className={styles.positioner}>
-          <div className={styles.content} data-part-id="calendar" data-xmlui-part="calendar">
+        <div className={styles.datePickerPositioner}>
+          <div className={styles.datePickerContent} data-part-id="calendar" data-xmlui-part="calendar">
             {presetItems.length > 0 ? (
-              <div className={styles.quickPresets}>
+              <div className={styles.datePickerQuickPresets}>
                 {presetItems.map((preset) => (
                   <button
                     key={preset.key}
                     type="button"
-                    className={styles.preset}
+                    className={styles.datePickerPreset}
                     onClick={() => {
                       publish(preset.range, !inline);
                       setVisibleMonth(monthStart(preset.range[0]));
@@ -450,7 +410,7 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
                 ))}
               </div>
             ) : null}
-            <div className={styles.calendarArea}>
+            <div className={styles.datePickerCalendarArea}>
               {Array.from({ length: visibleMonthCount }, (_, offset) => addMonths(visibleMonth, offset)).map((month, index) => (
                 <CalendarMonth
                   key={`${month.year}-${month.month}`}
@@ -470,11 +430,11 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
                 />
               ))}
               {confirmRangeSelection && draftRange.length ? (
-                <div className={styles.popupFooter}>
-                  <button type="button" className={styles.footerButton} onClick={cancelRange}>
+                <div className={styles.datePickerPopupFooter}>
+                  <button type="button" className={styles.datePickerFooterButton} onClick={cancelRange}>
                     Cancel
                   </button>
-                  <button type="button" className={cx(styles.footerButton, styles.footerButtonPrimary)} onClick={proceedRange}>
+                  <button type="button" className={cx(styles.datePickerFooterButton, styles.datePickerFooterButtonPrimary)} onClick={proceedRange}>
                     Proceed
                   </button>
                 </div>
@@ -521,39 +481,39 @@ function CalendarMonth({
   const today = todayParts();
   return (
     <div>
-      <div className={styles.viewControl}>
+      <div className={styles.datePickerViewControl}>
         {showNav ? (
-          <button type="button" className={styles.nav} aria-label="Previous month" onClick={onPrevious}>
+          <button type="button" className={styles.datePickerNav} aria-label="Previous month" onClick={onPrevious}>
             {"<"}
           </button>
         ) : <span />}
-        <div className={styles.viewTrigger}>{monthLabel(month, locale)}</div>
+        <div className={styles.datePickerViewTrigger}>{monthLabel(month, locale)}</div>
         {showNav ? (
-          <button type="button" className={styles.nav} aria-label="Next month" onClick={onNext}>
+          <button type="button" className={styles.datePickerNav} aria-label="Next month" onClick={onNext}>
             {">"}
           </button>
         ) : <span />}
       </div>
-      <table className={styles.table}>
+      <table className={styles.datePickerTable}>
         <thead>
           <tr>
-            {showWeekNumbers ? <th className={styles.weekNumber}>#</th> : null}
-            {weekdays.map((day) => <th key={day} className={styles.weekday}>{day}</th>)}
+            {showWeekNumbers ? <th className={styles.datePickerWeekNumber}>#</th> : null}
+            {weekdays.map((day) => <th key={day} className={styles.datePickerWeekday}>{day}</th>)}
           </tr>
         </thead>
         <tbody>
           {weeks.map((week, weekIndex) => (
             <tr key={weekIndex}>
-              {showWeekNumbers ? <td className={styles.weekNumber}>{weekNumber(week[0])}</td> : null}
+              {showWeekNumbers ? <td className={styles.datePickerWeekNumber}>{weekNumber(week[0])}</td> : null}
               {week.map((day) => {
                 const disabled = day.month !== month.month || isUnavailable(day, minDate, maxDate, disabledDates, dateFormat);
                 const selectedIndex = selected.findIndex((item) => isSameDay(item, day));
                 const inRange = selected.length > 1 && compareParts(selected[0], day) < 0 && compareParts(day, selected[1]) < 0;
                 return (
-                  <td key={toIso(day)} className={styles.cell}>
+                  <td key={toIso(day)} className={styles.datePickerCell}>
                     <button
                       type="button"
-                      className={styles.cellTrigger}
+                      className={styles.datePickerCellTrigger}
                       disabled={disabled}
                       data-selected={selected.length === 1 && selectedIndex === 0 ? "" : undefined}
                       data-range-start={selected.length > 1 && selectedIndex === 0 ? "" : undefined}
@@ -580,7 +540,7 @@ function Adornment({ text, icon }: { text?: unknown; icon?: unknown }) {
     return null;
   }
   return (
-    <span className={styles.adornment}>
+    <span className={styles.datePickerAdornment}>
       {icon !== undefined ? <span role="img" aria-label={String(icon)} data-icon={String(icon)}>{String(icon)}</span> : null}
       {text !== undefined ? <span>{String(text)}</span> : null}
     </span>
@@ -602,10 +562,10 @@ function placeholderFor(format: DateFormat) {
 function widthClass(value: unknown): string | undefined {
   const normalized = String(value ?? "").trim().toLowerCase();
   if (normalized === "100%" || normalized === "*" || normalized === "full") {
-    return styles.fullWidth;
+    return styles.datePickerFullWidth;
   }
   if (normalized === "auto") {
-    return styles.autoWidth;
+    return styles.datePickerAutoWidth;
   }
   return undefined;
 }

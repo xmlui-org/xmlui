@@ -2,23 +2,7 @@ import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "reac
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./TimeInput.defaults";
-
-const styles = {
-  adornment: "adornment",
-  ampm: "ampm",
-  clearButton: "clearButton",
-  disabled: "disabled",
-  divider: "divider",
-  error: "error",
-  input: "input",
-  inputGroup: "inputGroup",
-  invalid: "invalid",
-  readOnly: "readOnly",
-  timeInputWrapper: "timeInputWrapper",
-  valid: "valid",
-  warning: "warning",
-  wrapper: "wrapper",
-} as const;
+import styles from "./TimeInput.module.scss";
 
 export type TimeInputApi = {
   focus: () => void;
@@ -306,9 +290,9 @@ export const TimeInputNative = memo(forwardRef<TimeInputApi, TimeInputProps>(fun
       aria-label={ariaLabel}
       className={cx(
         styles.timeInputWrapper,
-        validationStatus === "error" ? styles.error : undefined,
-        validationStatus === "warning" ? styles.warning : undefined,
-        validationStatus === "valid" ? styles.valid : undefined,
+        validationStatus === "error" ? styles.timeInputError : undefined,
+        validationStatus === "warning" ? styles.timeInputWarning : undefined,
+        validationStatus === "valid" ? styles.timeInputValid : undefined,
         !enabled ? styles.disabled : undefined,
         readOnly ? styles.readOnly : undefined,
         className,

@@ -1,6 +1,7 @@
 import { forwardRef, memo, type CSSProperties } from "react";
 
 import { defaultProps } from "./ContentSeparator.defaults";
+import styles from "./ContentSeparator.module.scss";
 
 export type ContentSeparatorProps = {
   thickness?: string;
@@ -25,15 +26,20 @@ export const ContentSeparator = memo(forwardRef<HTMLDivElement, ContentSeparator
     ref,
   ) => {
     const normalizedOrientation = orientation === "vertical" ? "vertical" : "horizontal";
+    const orientationClass = normalizedOrientation === "vertical"
+      ? styles.contentSeparatorVertical
+      : styles.contentSeparatorHorizontal;
     return (
       <div
         {...rest}
         ref={ref}
         className={[
-          "xmluiContentSeparator",
+          styles.xmluiContentSeparator,
           "separator",
           normalizedOrientation,
+          orientationClass,
           !hasExplicitLength ? "stretchToFit" : undefined,
+          !hasExplicitLength ? styles.contentSeparatorStretchToFit : undefined,
           className,
         ].filter(Boolean).join(" ")}
         style={{

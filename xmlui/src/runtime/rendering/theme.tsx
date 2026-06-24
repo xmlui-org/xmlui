@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, type CSSProperties, type ReactNode } from "react";
+import React, { createContext, useContext, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata";
 import {
@@ -7,19 +7,44 @@ import {
   mergeThemeVariableLayers,
   resolveThemeVariablesWithCssVars,
   themeVariablesToCssProperties,
+  type ThemeTone,
 } from "../../styling";
 
-const ThemeContext = createContext<Record<string, unknown>>(defaultThemeVariables);
+export type ThemeRuntimeContext = {
+  variables: Record<string, unknown>;
+  tone: ThemeTone;
+  setTone: (tone: ThemeTone) => void;
+};
+
+const noopSetTone = () => undefined;
+const ThemeContext = createContext<ThemeRuntimeContext>({
+  variables: defaultThemeVariables,
+  tone: "light",
+  setTone: noopSetTone,
+});
 
 export function XmluiThemeRoot({ children }: { children: ReactNode }) {
+  const [tone, setTone] = useState<ThemeTone>("light");
+  const variables = useMemo(
+    () => mergeThemeVariableLayers([defaultThemeVariables], tone),
+    [tone],
+  );
+  const value = useMemo<ThemeRuntimeContext>(
+    () => ({ variables, tone, setTone }),
+    [tone, variables],
+  );
   return (
-    <ThemeContext.Provider value={defaultThemeVariables}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
 export function useThemeVariables(): Record<string, unknown> {
+  return useContext(ThemeContext).variables;
+}
+
+export function useThemeRuntime(): ThemeRuntimeContext {
   return useContext(ThemeContext);
 }
 
@@ -39,25 +64,36 @@ export function ThemeScope({
   variables,
   style,
   children,
+  tone,
 }: {
   variables: Record<string, unknown>;
   style?: CSSProperties;
   children: ReactNode;
+  tone?: ThemeTone;
 }) {
-  const parent = useThemeVariables();
+  const parent = useThemeRuntime();
   const nextVariables = useMemo(
-    () => mergeThemeVariableLayers([parent, variables]),
-    [parent, variables],
+    () => mergeThemeVariableLayers([parent.variables, variables], tone ?? parent.tone),
+    [parent.tone, parent.variables, tone, variables],
   );
   const cssVariables = useMemo(
     () => themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
     [variables],
   );
+  const value = useMemo<ThemeRuntimeContext>(
+    () => ({
+      variables: nextVariables,
+      tone: tone ?? parent.tone,
+      setTone: parent.setTone,
+    }),
+    [nextVariables, parent.setTone, parent.tone, tone],
+  );
   return (
-    <ThemeContext.Provider value={nextVariables}>
+    <ThemeContext.Provider value={value}>
       <div
         data-xmlui-component="Theme"
         data-xmlui-part="root"
+        data-xmlui-tone={tone ?? parent.tone}
         style={{ ...cssVariables, ...style }}
       >
         {children}

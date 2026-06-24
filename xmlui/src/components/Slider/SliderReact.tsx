@@ -2,28 +2,7 @@ import type { CSSProperties, FocusEvent, KeyboardEvent, PointerEvent } from "rea
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./Slider.defaults";
-
-const styles = {
-  disabled: "disabled",
-  readOnly: "readOnly",
-  sliderContainer: "sliderContainer",
-  sliderLabel: "sliderLabel",
-  sliderLabelBreak: "sliderLabelBreak",
-  sliderLabelPositionBottom: "sliderLabelPositionBottom",
-  sliderLabelPositionEnd: "sliderLabelPositionEnd",
-  sliderLabelPositionStart: "sliderLabelPositionStart",
-  sliderLabelPositionTop: "sliderLabelPositionTop",
-  sliderLabelRequired: "sliderLabelRequired",
-  sliderLabeledItem: "sliderLabeledItem",
-  sliderRange: "sliderRange",
-  sliderRoot: "sliderRoot",
-  sliderThumb: "sliderThumb",
-  sliderTooltip: "sliderTooltip",
-  sliderTrack: "sliderTrack",
-  sliderTrackError: "sliderTrackError",
-  sliderTrackSuccess: "sliderTrackSuccess",
-  sliderTrackWarning: "sliderTrackWarning",
-} as const;
+import styles from "./Slider.module.scss";
 
 export type SliderApi = {
   focus: () => void;

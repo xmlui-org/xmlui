@@ -1,0 +1,71 @@
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$gap-ValidationSummary: createThemeVar("gap-ValidationSummary");
+$padding-ValidationDisplay: createThemeVar("padding-ValidationDisplay");
+$backgroundColor-ValidationDisplay-error: createThemeVar("backgroundColor-ValidationDisplay-error");
+$backgroundColor-ValidationDisplay-warning: createThemeVar("backgroundColor-ValidationDisplay-warning");
+$color-accent-ValidationDisplay-error: createThemeVar("color-accent-ValidationDisplay-error");
+$color-accent-ValidationDisplay-warning: createThemeVar("color-accent-ValidationDisplay-warning");
+$textColor-ValidationDisplay-error: createThemeVar("textColor-ValidationDisplay-error");
+$textColor-ValidationDisplay-warning: createThemeVar("textColor-ValidationDisplay-warning");
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: $gap-ValidationSummary;
+}
+
+.display {
+  position: relative;
+  padding: $padding-ValidationDisplay;
+  padding-left: calc(#{$padding-ValidationDisplay} + 0.75rem);
+}
+
+.display::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 2px;
+  height: 100%;
+  content: "";
+}
+
+.error {
+  color: $textColor-ValidationDisplay-error;
+  background-color: $backgroundColor-ValidationDisplay-error;
+}
+
+.error::before {
+  background-color: $color-accent-ValidationDisplay-error;
+}
+
+.warning {
+  color: $textColor-ValidationDisplay-warning;
+  background-color: $backgroundColor-ValidationDisplay-warning;
+}
+
+.warning::before {
+  background-color: $color-accent-ValidationDisplay-warning;
+}
+
+.heading {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.entry {
+  margin: 0.125rem 0;
+}
+
+.field {
+  font-weight: 700;
+}

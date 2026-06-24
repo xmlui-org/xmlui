@@ -2143,14 +2143,13 @@ Verification:
 
 ###### Wave B6.2: FileUploadDropZone Foundation
 
-Status: planned after Wave B6.1 unless `FileInput` uncovers shared file-event
-infrastructure that should be factored first.
+Status: completed on 2026-06-23.
 
 Scope:
 
 - migrate `FileUploadDropZone` with source-adjacent metadata, defaults, SCSS,
-  docs, renderer, focused E2E coverage, registry/compiler wiring, and a visual
-  sample;
+  docs, renderer, the full old E2E suite, registry/compiler wiring, and a
+  visual sample;
 - preserve the foundation public contract for drag-over/drop state, upload
   event payloads, accepted MIME type filtering, maximum file count behavior,
   optional paste uploads, paste suppression from text inputs and editable
@@ -2186,15 +2185,44 @@ Verification target:
 - `npm.cmd --workspace xmlui run compatibility:component-e2e-audit`
 - `npm.cmd --workspace xmlui run test:e2e -- src/components/FileUploadDropZone/FileUploadDropZone.spec.ts`
 
+Verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test:e2e -- src/components/FileUploadDropZone/FileUploadDropZone.spec.ts`
+  passed with 37 passed. The suite is the transferred old
+  `FileUploadDropZone.spec.ts`, not a reduced focused replacement.
+
+Notes:
+
+- the visual sample is available at
+  `http://127.0.0.1:5173/?example=fileUploadDropZoneFoundation`;
+- the migrated old tests include upload handlers such as
+  `files => testState = files.map(f => f.name)` and pass in the current E2E
+  path. Broader async-aware callback semantics remain part of the event
+  compiler compatibility backlog, but they do not block this component slice.
+
 #### Wave C: Selection and Collection Components
 
 ##### Wave C1: Existing Collection Foundation
 
 Components:
 
-- `Items`;
-- `Select`;
-- `Option`.
+- `Items` - completed on 2026-06-23 with all 26 old E2E cases migrated;
+  25 pass and one old E2E case is marked `fixme`
+  because it depends on old `<script>` function support that is not yet
+  implemented in the rewrite compiler/testbed;
+- `Select` - foundation slice completed on 2026-06-23. The current native
+  select behavior was moved out of the central builtins renderer and into the
+  source-adjacent component folder with metadata, defaults, SCSS, docs,
+  registry wiring, driver support, and foundation E2E tests. This is not full
+  old-suite closure yet;
+- `Option` - foundation slice completed on 2026-06-23 together with `Select`.
+  The component folder now has source-adjacent metadata/defaults/docs and
+  contributes option descriptors to the native Select foundation. This is not
+  full old-suite closure yet.
 
 Compatibility focus:
 
@@ -2202,55 +2230,351 @@ Compatibility focus:
   metadata, docs, theme variables, and complete old E2E tests before deeper
   collection work starts.
 
+`Items` verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run compatibility:component-transfer`
+- `npm --workspace xmlui run compatibility:component-e2e-audit`
+- `npm --workspace xmlui run test:e2e -- src/components/Items/Items.spec.ts`
+  passed with 25 passed and 1 `fixme`.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=builtinsItems`.
+
+Next component in Wave C1:
+
+- Full `Select`/`Option` closure remains pending. The next Select/Option slice
+  must migrate the old Radix-style dropdown/option context semantics far enough
+  to start copying the literal old `Select.spec.ts` and `Option.spec.ts` cases
+  instead of relying on the temporary foundation specs.
+
+`Select`/`Option` old-suite closure progress on 2026-06-23:
+
+- copied the literal old `Select.spec.ts` and `Option.spec.ts` into the
+  source-adjacent component folders;
+- replaced the native Select foundation with a lightweight combobox/listbox
+  renderer that starts matching the old DOM and interaction contract;
+- added old Select driver helpers to the current E2E harness;
+- closed Option cases for label/value defaults, disabled options, text and rich
+  children, Select selection, AutoComplete selection, numeric/boolean/empty
+  string/null values, Items-generated options, object labels, disabled Select
+  selection, and basic Select keyboard navigation;
+- current literal old `Option.spec.ts` result is 35 passed when run together
+  with the current `RadioGroup` foundation checks. The previous
+  RadioGroup-dependent nested-option/keyboard failures were closed by making
+  RadioGroup collect nested `Option` descendants such as
+  `RadioGroup > VStack > Option`;
+- the full old `Select.spec.ts` suite is copied but not closed. It remains the
+  next major Select compatibility target.
+- after `test:e2e` reported 118 known failures from the copied old
+  `Select.spec.ts`, the file was marked skipped at suite level. This is a
+  temporary quarantine for an imported compatibility target, not evidence that
+  Select migration is complete. Re-enable old Select cases feature-by-feature
+  as each capability is implemented.
+
+`Select`/`Option` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Select/Select.foundation.spec.ts src/components/Option/Option.foundation.spec.ts`
+  passed with 5 passed.
+
+`Select`/`Option` compatibility debt:
+
+- the old `Select.spec.ts` suite is large and covers dynamic `Items` options,
+  Form/FormItem integration, validation feedback, searchable and multi-select
+  dropdowns, grouping, clear button parts, overlay/modal z-index behavior,
+  nested dropdown menus, custom templates, label layout, and scroll indicators;
+- the copied old Select cases currently remain skipped to keep the normal E2E
+  command clean while those capabilities are pending;
+- the copied `Nested DropdownMenu and Select` block is explicitly skipped until
+  `DropdownMenu`, `MenuItem`, `ModalDialog`, and their drivers are migrated in
+  the later menu/dialog waves. Re-enable those tests during that migration;
+- the old `Option.spec.ts` suite also covers Select, AutoComplete, and
+  RadioGroup integration. The AutoComplete and RadioGroup-dependent cases must
+  wait until those components exist;
+- future closure must copy those old E2E test cases literally, changing
+  infrastructure/drivers as needed but not replacing the old cases with
+  reduced coverage.
+
 ##### Wave C2: Choice Collections
 
 Components:
 
-- `AutoComplete`;
-- `RadioGroup`.
+- `AutoComplete` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, registry wiring, and foundation E2E tests. The literal old suite
+  has also been copied and is temporarily skipped at file level until the full
+  AutoComplete behavior is migrated;
+- `RadioGroup` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, registry wiring, and foundation E2E tests. The literal old suite
+  has also been copied and the non-Form-dependent failures are closed.
 
 Compatibility focus:
 
 - option filtering, selected value semantics, labels, keyboard navigation,
   disabled option behavior, popover/list behavior, and form integration.
 
+`AutoComplete` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/AutoComplete/AutoComplete.foundation.spec.ts`
+  passed with 5 passed.
+
+`AutoComplete` old-suite intake completed on 2026-06-23:
+
+- copied the literal old `AutoComplete.spec.ts` into the source-adjacent
+  component folder;
+- added `AutoCompleteDriver` and `createAutoCompleteDriver` to the E2E harness
+  so the old test cases can keep their original driver shape;
+- restored `SKIP_REASON.OTHER(...)` compatibility for copied old tests;
+- marked the nested `DropdownMenu`/`ModalDialog` block skipped because those
+  components and drivers are migrated in later waves;
+- marked the copied old AutoComplete suite skipped at file level because the
+  current foundation implementation does not yet support the old suite's
+  label/Form integration, multi-select badges, templates, grouping, validation
+  feedback, theme variants, and overlay behavior.
+
+`AutoComplete` compatibility debt:
+
+- the full old `AutoComplete.spec.ts` suite is copied but intentionally skipped
+  until full behavior migration catches up. Re-enable cases feature-by-feature;
+- the old implementation uses Radix popover, option context, grouping,
+  templates, validation feedback, form context, multi-select badges, nested
+  overlay behavior, and richer keyboard navigation. The foundation slice uses a
+  native input/listbox while preserving the first visible filtering, selection,
+  disabled-option, and creatable-value semantics.
+
+`RadioGroup` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/RadioGroup/RadioGroup.foundation.spec.ts`
+  passed with 4 passed.
+
+`RadioGroup` old-suite closure progress on 2026-06-23:
+
+- copied the literal old `RadioGroup.spec.ts` into the source-adjacent component
+  folder;
+- closed copied old cases for direct and nested `Option` children, invalid
+  option values, strict initial value matching, read-only/disabled behavior,
+  didChange/focus/blur events, validation border colors, label rendering,
+  label-position geometry, `value`, `setValue`, orientation, gap, and keyboard
+  navigation;
+- added compatibility support for zero-argument arrow expressions used as whole
+  event handlers, because copied old component tests use handlers such as
+  `onClick="() => radioGroup.setValue('1')"`;
+- the 10 copied old `RadioGroup.spec.ts` cases that compile-fail on missing
+  `Form` are marked as skipped/fixme-style deferrals rather than left knowingly
+  red. Re-enable them during the `Form`/`FormItem` and input behavior layer
+  migration.
+
+`RadioGroup` compatibility debt:
+
+- the old implementation uses Radix RadioGroup and `OptionTypeProvider`. The
+  current migrated slice uses native radio inputs while preserving the copied
+  old non-Form semantics. Full closure still needs Form integration,
+  `requireLabelMode`, `itemRequireLabelMode`, `bindTo`, and duplicate-label
+  behavior from the remaining old tests.
+
 ##### Wave C3: List Selection and Paging
 
 Components:
 
-- `List`;
-- `SelectionStore`;
-- `Pagination`.
+- `List` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  registry wiring, API registration, item-template context variables, basic
+  grouping, basic selection, and foundation E2E tests. The literal old suite
+  has also been copied and is temporarily skipped at file level until the full
+  List behavior is migrated;
+- `SelectionStore` - foundation slice completed on 2026-06-23. The deprecated,
+  non-visual component now has source-adjacent metadata, defaults, docs,
+  renderer, compiler contract, registry wiring, API registration, selection
+  context, and foundation E2E tests. The old component folder has no old E2E
+  spec file to copy;
+- `Pagination` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, registry wiring, and foundation E2E tests. The literal old suite
+  has also been copied and the Pagination-owned failures are closed.
 
 Compatibility focus:
 
 - item context variables, item templates, selection state, paging state,
   sorting/filtering hooks where present, and API references.
 
+`Pagination` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Pagination/Pagination.foundation.spec.ts`
+  passed with 4 passed.
+
+`Pagination` old-suite closure progress on 2026-06-23:
+
+- copied the literal old `Pagination.spec.ts` into the source-adjacent component
+  folder;
+- closed copied old cases for numeric prop coercion, page info text, simplified
+  mode, page size selector label/dropdown behavior, part selectors,
+  positioning, current-page accessibility, local state declarations,
+  user interactions, APIs, and edge cases;
+- current full old `Pagination.spec.ts` result is 90 passed and 9 skipped;
+- the skipped tests are explicit deferrals for array-spread parser support in
+  two API boundary handlers and for shared tooltip/variant/animation behavior
+  migration. Re-enable them when those shared capabilities exist.
+
+`Pagination` compatibility debt:
+
+- the old implementation composes XMLUI Button, Text, Icon, Select, Part, and
+  FormItem helper pieces. The current migrated slice preserves the old visible
+  semantics without reintroducing those full internals. Remaining closure is
+  limited to shared behavior and parser capabilities noted above.
+
+`SelectionStore` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/SelectionStore/SelectionStore.foundation.spec.ts`
+  passed with 2 passed.
+
+`SelectionStore` compatibility note:
+
+- the original `SelectionStore` component is deprecated and has no
+  source-adjacent E2E spec file in the old component folder. Later `List` and
+  `Table` closure slices must still verify their SelectionStore integration
+  through their own literal old E2E suites.
+
+`List` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/List/List.foundation.spec.ts`
+  passed with 4 passed.
+
+`List` old-suite intake completed on 2026-06-23:
+
+- copied the literal old `List.spec.ts` into the source-adjacent component
+  folder;
+- added `ListDriver` and `createListDriver` to the E2E harness so the old test
+  cases can keep their original driver shape;
+- a raw run reached 19 passing old cases but exposed known incompatibilities in
+  root visibility without item templates, custom group header/footer templates,
+  `defaultGroups`, `groupsInitiallyExpanded`, `borderCollapse`, `scrollAnchor`,
+  loading/empty templates, old driver helper APIs, and virtualization-style
+  scroll behavior;
+- marked the copied old List suite skipped at file level to keep normal E2E
+  runs clean while preserving the literal compatibility target.
+
+`List` compatibility debt:
+
+- the full old `List.spec.ts` suite is copied but intentionally skipped until
+  full behavior migration catches up. Re-enable cases feature-by-feature;
+- the old implementation uses `virtua`, lodash utilities, group header/footer
+  sections, scroll anchoring, pageInfo, SelectionStore integration, keyboard
+  actions, selection checkbox positioning, and extensive virtualization tests.
+  The foundation slice preserves the first visible data/template/context and
+  selection-event semantics only.
+
 ##### Wave C4: Table Family
 
 Components:
 
-- `Table`;
-- `Column`.
+- `Table` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  IR built-in registration, runtime registry wiring, a visual sample, and
+  foundation E2E tests. The literal old `Table.spec.ts` and
+  `TableCellTextOverflow.spec.ts` suites have been copied and are temporarily
+  skipped at file level until full behavior migration catches up;
+- `Column` - foundation slice completed on 2026-06-23. The non-visual component
+  now has source-adjacent metadata, defaults, docs, renderer, compiler contract,
+  IR built-in registration, and runtime registry wiring. It contributes static
+  column definitions to the Table foundation.
 
 Compatibility focus:
 
 - column definitions, cell/header templates, sorting, selection, paging,
   loading/empty states, sizing, keyboard behavior, and table APIs.
 
+`Table`/`Column` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/Table/Table.foundation.spec.ts src/components/Table/Table.spec.ts src/components/Table/TableCellTextOverflow.spec.ts`
+  passed with 2 passed and 203 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 2973 tests in 70
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=tableFoundation`.
+
+`Table`/`Column` compatibility debt:
+
+- the full old `Table.spec.ts` and `TableCellTextOverflow.spec.ts` suites are
+  copied but intentionally skipped until the table engine catches up. Re-enable
+  cases feature-by-feature;
+- remaining closure includes old column templates, pagination, advanced row
+  selection, selection synchronization, keyboard shortcuts, virtualization,
+  disabled/unselectable row predicates, context menu and row events, text
+  overflow layout context, striped rows, full theme variable coverage, parts,
+  behaviors, and old table APIs;
+- adding a built-in component requires both the managed-react contract entry and
+  the IR lowerer's built-in element registration. The Table slice fixed this for
+  `Table` and `Column`.
+
 ##### Wave C5: Tree and Table of Contents
 
 Components:
 
-- `Tree`;
-- `TreeDisplay`;
-- `TableOfContents`.
+- `Tree` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  IR built-in registration, runtime registry wiring, test-driver support, a
+  visual sample, and foundation E2E tests. The literal old `Tree/*.spec.ts`
+  suites and `testData.ts` have been copied and are temporarily skipped at file
+  level until full behavior migration catches up;
+- `TreeDisplay` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, IR built-in registration, runtime registry wiring, and foundation
+  E2E tests. The literal old suite has been copied and is temporarily skipped;
+- `TableOfContents` - foundation slice completed on 2026-06-23. The component
+  now has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, IR built-in registration, runtime registry wiring, and foundation
+  E2E tests. The literal old suite has been copied and is temporarily skipped.
 
 Compatibility focus:
 
 - hierarchy data shape, expand/collapse state, selection, item templates,
   keyboard navigation, document-heading discovery, and route/hash integration.
+
+`Tree`/`TreeDisplay`/`TableOfContents` foundation verification completed on
+2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/Tree src/components/TreeDisplay src/components/TableOfContents`
+  passed with 4 passed and 308 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 3285 tests in 84
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=treeFamilyFoundation`.
+
+`Tree`/`TreeDisplay`/`TableOfContents` compatibility debt:
+
+- the full old Tree-family suites are copied but intentionally skipped until
+  behavior catches up. Re-enable cases feature-by-feature;
+- remaining Tree closure includes dynamic loading, `loadedField`,
+  `dynamicField`, `autoLoadAfter`, spinner delay, async child loading, API
+  mutation methods, keyboard navigation, focus handling, scroll styling,
+  virtualized visibility APIs, context menus, node events, icon fields, and
+  theme variable coverage;
+- remaining `TableOfContents` closure includes Bookmark/indexer integration,
+  active item tracking, smooth-scroll details, route/hash behavior, scroller
+  behavior, and full theme variables;
+- copied old suites may require support files and fixture compatibility even
+  while skipped. The Tree slice copied `testData.ts`, added
+  `createTreeDriver`, and restored `SKIP_REASON.TO_BE_IMPLEMENTED`.
 
 #### Wave D: Layout and Container Components
 
@@ -2258,18 +2582,1133 @@ Compatibility focus:
 
 Components:
 
-- `Stack`;
-- `HStack`;
-- `VStack`;
-- `FlowLayout`;
-- `TileGrid`;
-- `Card`.
+- `Stack` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  runtime registry wiring, a dev-server visual sample, and foundation E2E
+  tests. The literal old `Stack.spec.ts`, `HStack.spec.ts`, `VStack.spec.ts`,
+  `CHStack.spec.ts`, and `CVStack.spec.ts` suites have been copied and are
+  temporarily skipped at file level until full Stack-family behavior migration
+  catches up;
+- `HStack` - foundation slice completed on 2026-06-23 through the shared
+  `Stack` component folder and renderer;
+- `VStack` - foundation slice completed on 2026-06-23 through the shared
+  `Stack` component folder and renderer;
+- `FlowLayout` - foundation slice completed on 2026-06-23. The component now
+  has source-adjacent metadata, defaults, SCSS, docs, renderer, compiler
+  contract, IR built-in registration, runtime registry wiring, a dev-server
+  visual sample, and foundation E2E tests. The literal old `FlowLayout.spec.ts`
+  suite has been copied and is temporarily skipped at file level until full
+  responsive wrapping, scroller, non-visual-child, and layout matrix behavior
+  catches up;
+- `TileGrid` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract,
+  IR built-in registration, runtime registry wiring, a dev-server visual
+  sample, and foundation E2E tests. The literal old `TileGrid.spec.ts` suite
+  has been copied and is temporarily skipped at file level until full
+  selection, virtualization, keyboard, action, and sync semantics catch up;
+- `Card` - foundation slice completed on 2026-06-23. The component now has
+  source-adjacent metadata, defaults, SCSS, docs, renderer, compiler contract
+  derived from metadata, runtime registry wiring, a dev-server visual sample,
+  and foundation E2E tests. The literal old `Card.spec.ts` suite has been
+  copied and is temporarily skipped at file level until full avatar, link,
+  click/double-click, scroll API, theme, and driver parity catches up.
 
 Compatibility focus:
 
 - existing experimental layout primitives must be re-closed against old
   metadata, docs, SCSS, theme variables, layout aliases, and all old E2E
   tests.
+
+`Stack`/`HStack`/`VStack` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/Stack` passed with 2
+  passed and 89 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 3376 tests in 90
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=stackFamilyFoundation`.
+
+`Stack`/`HStack`/`VStack` compatibility debt:
+
+- the full old Stack-family suites are copied but intentionally skipped until
+  behavior catches up. Re-enable cases feature-by-feature;
+- remaining Stack closure includes scroller/fade behavior, `scrollStyle`,
+  `showScrollerFade`, dock layout, `itemWidth`, star sizing, RTL/reverse edge
+  cases, `CHStack`/`CVStack` built-in registration, and the full old layout
+  matrix;
+- copied old suites may require support files and fixture compatibility even
+  while skipped. The Stack slice restored the shared `overflows` E2E helper.
+
+`FlowLayout`/`TileGrid` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/FlowLayout src/components/TileGrid`
+  passed with 2 passed and 130 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 3508 tests in 94
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=flowTileFoundation`.
+
+`FlowLayout`/`TileGrid` compatibility debt:
+
+- the full old suites are copied but intentionally skipped until behavior
+  catches up. Re-enable cases feature-by-feature;
+- remaining `FlowLayout` closure includes responsive width inference,
+  star sizing, non-visual child elision, scroller/fade behavior, scroll APIs,
+  snapshot parity, and the full old layout matrix. Basic `SpaceFiller`
+  line-break behavior is restored in the active `SpaceFiller.spec.ts` suite;
+- remaining `TileGrid` closure includes virtualization, row grouping,
+  selection, checkboxes, keyboard shortcuts, syncWithVar, refreshOn closure
+  behavior, action events, context-menu item context, and all theme variables;
+- component metadata files that are imported through compiler contracts should
+  avoid `?xmlui-theme-vars` and `?xmlui-css-module` imports unless the Vite
+  config bundling path is known to resolve them. This slice uses explicit
+  theme-var metadata in the component file and lets `main.tsx` load the SCSS
+  for runtime CSS.
+
+`Card` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- src/components/Card` passed with 1
+  passed and 27 skipped.
+- `npm --workspace xmlui run test:e2e -- --list` collected 3509 tests in 95
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=cardFoundation`.
+
+`Card` compatibility debt:
+
+- the full old suite is copied but intentionally skipped until behavior
+  catches up. Re-enable cases feature-by-feature;
+- remaining Card closure includes full Avatar/Link/Heading/Text composition,
+  `createCardDriver` parity, click versus double-click edge behavior, link
+  navigation interaction, scroll APIs, full theme-variable coverage, title and
+  subtitle part selection, and visual parity with the old SCSS defaults;
+- Card visuals have been moved out of React inline styles and into
+  `Card.module.scss`; continue this convention for later migrated components.
+
+`ScrollViewer` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/ScrollViewer` passed
+  with 2 passed and 46 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3557 tests in 97
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=scrollViewerFoundation`.
+
+`ScrollViewer` compatibility debt:
+
+- the literal old `ScrollViewer.spec.ts` suite is copied but intentionally
+  skipped until overlay scrollbar parity, fade indicators, mobile/touch
+  fallback, scroller theme variable assertions, snapshots, and deeper
+  header/footer positioning cases are migrated;
+- the foundation slice uses native scrolling with the old public props,
+  templates, metadata shape, and theme-variable names. Full
+  `overlayscrollbars-react`-style behavior remains a closure task.
+
+`ResponsiveBar` foundation verification completed on 2026-06-23:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/ResponsiveBar` passed
+  with 2 passed and 36 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3595 tests in 99
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=responsiveBarFoundation`.
+
+`ResponsiveBar` compatibility debt:
+
+- the literal old `ResponsiveBar.spec.ts` suite is copied but intentionally
+  skipped until overflow measurement, DropdownMenu/MenuItem integration,
+  trigger templates, `$overflow` context, `willOpen` cancellation, dropdown
+  alignment, and full driver parity are migrated;
+- a minimal `ResponsiveBarDriver` fixture exists only to keep copied tests
+  collectible until old test cases are re-enabled feature-by-feature.
+
+`Splitter` foundation verification completed on 2026-06-23:
+
+- copied the old `Splitter`, `HSplitter`, and `VSplitter` docs and E2E suites
+  into `xmlui/src/components/Splitter`;
+- added `Splitter`, `HSplitter`, and `VSplitter` metadata, contracts, runtime
+  renderers, SCSS, foundation tests, a test driver fixture, compiler/runtime
+  registry wiring, and a visual sample;
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Splitter` passed with
+  3 passed and 70 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3668 tests in 103
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=splitterFoundation`.
+
+`Splitter` compatibility debt:
+
+- the literal old `Splitter.spec.ts`, `HSplitter.spec.ts`, and
+  `VSplitter.spec.ts` suites are copied but intentionally skipped until full
+  pointer dragging, floating resizer behavior, resize constraints, resize
+  events, and old driver parity are migrated;
+- the foundation slice supports the public component names, forced alias
+  orientation, initial primary size, pane ordering, splitter template rendering,
+  theme-variable names, and state updates inside panes;
+- Splitter currently uses a direct dynamic `flexDirection` style as a layout
+  exception because generated theme classes can override layered orientation
+  rules. Keep visual styling in SCSS and revisit orientation delivery when the
+  style layering strategy is tightened;
+- Splitter metadata currently extracts theme-variable names from a small
+  source string duplicated from the SCSS declarations because config-time Vite
+  bundling cannot load the new SCSS raw/theme-vars query in this path. Restore
+  direct SCSS source extraction when the config-time loader path is fixed.
+
+`StickyBox` and `StickySection` foundation verification completed on
+2026-06-23:
+
+- copied the old `StickyBox` and `StickySection` docs and the old
+  `StickySection` E2E suite into the new component folders;
+- added `StickyBox` and `StickySection` metadata, contracts, runtime renderers,
+  SCSS, foundation tests, compiler/runtime registry wiring, and a visual
+  sample;
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/StickySection` passed
+  with 3 passed and 18 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3689 tests in 105
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=stickyFoundation`.
+
+`StickyBox` and `StickySection` compatibility debt:
+
+- the literal old `StickySection.spec.ts` suite is copied but intentionally
+  skipped until full overlapping sticky section, z-index, and scroll geometry
+  parity is migrated;
+- `StickyBox` had no dedicated old component E2E suite in the old component
+  folder, so its foundation coverage lives in `StickySection.foundation.spec.ts`
+  and should be expanded if old cross-component tests are found later;
+- `StickyBox` foundation uses native `position: sticky` rather than
+  `react-sticky-el`. Revisit if the old fixed-toggle behavior, scroll parent
+  detection, real-background inheritance, or heading scroll-margin adjustment
+  needs exact parity;
+- theme-variable metadata currently uses small source strings duplicated from
+  the SCSS declarations, matching the current workaround used by Splitter.
+  Restore direct SCSS source extraction when the config-time loader path is
+  fixed.
+
+Slice completed: Phase 5 Wave D3A - `Accordion` foundation.
+
+Done:
+
+- copied the old `Accordion` docs and E2E suite into the new component folder;
+- added `Accordion` and `AccordionItem` metadata in `Accordion.tsx`, defaults,
+  context, React renderers, SCSS, compiler/runtime registry wiring, and test
+  drivers;
+- added a foundation E2E suite covering expand/collapse, `initiallyExpanded`,
+  `displayDidChange` state mutation, `headerTemplate`, and state updates inside
+  expanded content;
+- added a visual sample at `xmlui/src/examples/accordion-foundation/Main.xmlui`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Accordion` passed with
+  3 passed and 9 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3701 tests in 107
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=accordionFoundation`.
+
+`Accordion` compatibility debt:
+
+- the literal old `Accordion.spec.ts` suite is copied but intentionally skipped
+  until full API parity, Radix-level keyboard behavior, icon rendering,
+  accessibility details, and theme-variable styling parity are migrated;
+- current icon rendering uses textual icon names as a foundation substitute and
+  must be replaced with the migrated XMLUI icon pipeline;
+- event sample/test code avoids nested/member-call expressions such as
+  `ids.join(",")` inside arrow handlers because the current async event code
+  generator can still emit illegal JavaScript for some nested non-async
+  callback/member-call combinations. Fix the compiler before enabling old tests
+  that rely on those shapes;
+- theme-variable metadata currently uses a small source string duplicated from
+  the SCSS declarations, matching the current workaround used by Splitter and
+  Sticky components. Restore direct SCSS source extraction when the config-time
+  loader path is fixed.
+
+Slice completed: Phase 5 Wave D3B - `ExpandableItem` foundation.
+
+Done:
+
+- copied the old `ExpandableItem` docs and E2E suite into the new component
+  folder;
+- added `ExpandableItem` metadata in `ExpandableItem.tsx`, defaults, React
+  renderer, SCSS, compiler/runtime registry wiring, and test driver support;
+- added a foundation E2E suite covering summary click toggling,
+  `expandedChange` state mutation, summary property templates, and updates
+  inside expanded content;
+- added a visual sample at
+  `xmlui/src/examples/expandable-item-foundation/Main.xmlui`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/ExpandableItem`
+  passed with 3 passed and 59 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3763 tests in 109
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=expandableItemFoundation`.
+
+`ExpandableItem` compatibility debt:
+
+- the literal old `ExpandableItem.spec.ts` suite is copied but intentionally
+  skipped until full icon, switch, API, theme-variable, layout, form, behavior,
+  and accessibility parity is migrated;
+- current icon rendering uses textual icon names as a foundation substitute and
+  must be replaced with the migrated XMLUI icon pipeline;
+- current `withSwitch` rendering uses a minimal visual switch substitute rather
+  than the old `Toggle` component. Revisit after `Toggle` is migrated;
+- `contentWidth` is emitted as a dynamic inline layout style, matching the old
+  component's dynamic width behavior. Keep visual styling in SCSS and revisit
+  only if a class-based theme-part solution becomes available;
+- theme-variable metadata currently uses a small source string duplicated from
+  the SCSS declarations, matching the current workaround used by other migrated
+  components. Restore direct SCSS source extraction when the config-time loader
+  path is fixed.
+
+Slice completed: Phase 5 Wave D3C - `Tabs` foundation.
+
+Done:
+
+- copied the old `Tabs` and `TabItem` docs and the old `Tabs` E2E suite into
+  the new component folder;
+- added `Tabs` and `TabItem` metadata in `Tabs.tsx`, defaults, context, React
+  renderers, SCSS, compiler/runtime registry wiring, and dev-server sample
+  wiring;
+- added a foundation E2E suite covering tab switching, `didChange` state
+  mutation, `TabItem` `headerTemplate`, and data updates inside active tab
+  content;
+- added a visual sample at `xmlui/src/examples/tabs-foundation/Main.xmlui`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run test:e2e -- src/components/Tabs` passed with
+  3 passed and 68 skipped.
+- `npm test`
+- `npm --workspace xmlui run test:e2e -- --list` collected 3834 tests in 111
+  files.
+
+Visual check:
+
+- use `npm run dev` or `npm --workspace xmlui run dev`, then open
+  `http://127.0.0.1:5173/?example=tabsFoundation`.
+
+`Tabs` compatibility debt:
+
+- the literal old `Tabs.spec.ts` suite is copied but intentionally skipped
+  until Radix-level keyboard navigation, roving focus, dynamic tab lists,
+  accordion view ordering, global `headerTemplate` with `$header` context,
+  `keepMounted` defaults inside `Form`, full APIs, theme-variable coverage,
+  and context-menu parity are migrated;
+- `TabsForm` is intentionally not part of this slice. It remains listed in the
+  form-related wave;
+- this foundation uses native React state and ARIA roles rather than
+  `@radix-ui/react-tabs`. Revisit whether to keep this implementation or
+  restore Radix-compatible behavior before re-enabling the old suite;
+- tab order currently follows child registration order, which is enough for
+  static TabItem children. Dynamic `Items`-generated tabs need explicit parity
+  work before the old dynamic tab tests are enabled;
+- theme-variable metadata currently uses a small source string duplicated from
+  the SCSS declarations, matching the current workaround used by other migrated
+  components. Restore direct SCSS source extraction when the config-time loader
+  path is fixed.
+
+Completed: Phase 5 Wave D4A - `Drawer` foundation.
+
+Added:
+
+- migrated `Drawer` source folder with metadata in `Drawer.tsx`, defaults,
+  SCSS module, React renderer, copied documentation, copied old E2E suite, and
+  a focused foundation E2E suite;
+- compiler/runtime wiring for the `Drawer` component, including event
+  attributes (`open`, `close`) and component APIs (`open`, `close`, `isOpen`);
+- a visual sample available with `npm run dev` at
+  `?example=drawerFoundation`.
+
+Verified:
+
+- focused `Drawer` E2E suite passes with foundation coverage and the copied old
+  compatibility suite intentionally skipped until full overlay parity lands;
+- unit tests, TypeScript build checks, and E2E test discovery should remain
+  part of every overlay slice.
+
+`Drawer` compatibility debt:
+
+- the literal old `Drawer.spec.ts` suite is copied but intentionally skipped
+  until Radix Dialog parity, portal stacking, focus trapping/restoration,
+  animation, click-away details, child portal behavior, scroll/overflow lock,
+  and complete theme-variable coverage are migrated;
+- this foundation uses a local fixed-position overlay rather than the old
+  Radix-backed dialog pipeline. Revisit the implementation before re-enabling
+  the old suite;
+- the close affordance is a simple accessible button. Replace it with the
+  migrated icon pipeline when icon/button visual parity is complete;
+- header templates are supported for static property children, but advanced
+  template context behavior still needs old-suite-driven migration.
+
+Completed: Phase 5 Wave D4B - `ModalDialog` foundation.
+
+Added:
+
+- migrated `ModalDialog` source folder with metadata in `ModalDialog.tsx`,
+  defaults, SCSS module, React renderer, copied documentation, copied old E2E
+  suite, and a focused foundation E2E suite;
+- compiler/runtime wiring for the `ModalDialog` component, including event
+  attributes (`open`, `close`) and component APIs (`open`, `close`, `isOpen`);
+- a visual sample available with `npm run dev` at
+  `?example=modalDialogFoundation`;
+- a `createModalDialogDriver` test fixture so copied old tests can be collected
+  literally while intentionally skipped.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npx playwright test src/components/ModalDialog/ModalDialog.foundation.spec.ts src/components/ModalDialog/ModalDialog.spec.ts`
+  from `xmlui/`: 4 foundation tests passed, 31 copied old tests skipped.
+
+`ModalDialog` compatibility debt:
+
+- the literal old `ModalDialog.spec.ts` suite is copied but intentionally
+  skipped until Radix Dialog parity, portal stacking, focus trapping,
+  restoration, animation, click-away behavior, child portal behavior,
+  Form integration, `onClose` cancellation semantics, direct-child
+  `var`/`$param` context behavior, and complete theme-variable coverage are
+  migrated;
+- this foundation uses a local fixed-position overlay rather than the old
+  Radix-backed dialog pipeline. Revisit the implementation before re-enabling
+  the old suite;
+- the close affordance is a simple accessible button. Replace it with the
+  migrated icon/button visual pipeline when icon/button visual parity is
+  complete;
+- `when` currently relies on the generic conditional renderer to open the modal
+  on first mount. Old declarative open/close parity must be restored before
+  enabling the copied declarative tests.
+
+Completed: Phase 5 Wave D4C - `Tooltip` foundation.
+
+Added:
+
+- migrated `Tooltip` source folder with metadata in `Tooltip.tsx`, defaults,
+  SCSS module, React renderer, copied documentation, copied old E2E suite, and
+  a focused foundation E2E suite;
+- compiler/runtime wiring for the `Tooltip` component and the IR built-in-name
+  list;
+- a visual sample available with `npm run dev` at
+  `?example=tooltipFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/Tooltip/Tooltip.foundation.spec.ts src/components/Tooltip/Tooltip.spec.ts`
+  from `xmlui/`: 4 foundation tests passed, 19 copied old tests skipped.
+
+`Tooltip` compatibility debt:
+
+- the literal old `Tooltip.spec.ts` suite is copied but intentionally skipped
+  until Radix Tooltip parity, portal/root integration, precise
+  side/align/offset/collision positioning, full Markdown component rendering,
+  multi-child trigger semantics, behavior integration, and complete
+  theme-variable coverage are migrated;
+- this foundation uses local fixed positioning and a wrapper trigger instead of
+  the old Radix-backed `asChild` trigger/portal pipeline. Revisit the
+  implementation before re-enabling the old positioning and accessibility
+  cases;
+- the tiny markdown renderer only covers the foundation cases. Do not treat it
+  as a migrated `Markdown` component replacement.
+
+Completed: Phase 5 Wave D5A - `ContextMenu` foundation.
+
+Added:
+
+- migrated `ContextMenu` source folder with metadata in `ContextMenu.tsx`,
+  SCSS module, React renderer, copied documentation, copied old E2E suite, and
+  a focused foundation E2E suite;
+- added minimal `MenuItem` and `MenuSeparator` primitives in the old
+  `DropdownMenu` folder because the original `ContextMenu` contract consumes
+  those menu primitives;
+- compiler/runtime wiring for `ContextMenu`, `MenuItem`, and `MenuSeparator`,
+  including `ContextMenu.openAt(event, context?)` and `$context` propagation;
+- added `open`, `close`, `isOpen`, and `openAt` to the compiled/generated
+  event-handler method allowlists so component APIs used by overlays compile
+  consistently;
+- a visual sample available with `npm run dev` at
+  `?example=contextMenuFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/ContextMenu/ContextMenu.foundation.spec.ts src/components/ContextMenu/ContextMenu.spec.ts`
+  from `xmlui/`: 2 foundation tests passed, 28 copied old tests skipped.
+
+`ContextMenu` compatibility debt:
+
+- the literal old `ContextMenu.spec.ts` suite is copied but intentionally
+  skipped until Radix DropdownMenu parity, full menu primitive migration,
+  separator filtering, keyboard navigation, viewport collision positioning,
+  multiple menu coordination, UDC `$context` edge cases, submenu behavior, and
+  complete theme-variable coverage are migrated;
+- the current `MenuItem` and `MenuSeparator` are foundation primitives only.
+  Full `DropdownMenu`, `SubMenuItem`, icon, navigation, active/disabled, and
+  separator semantics must be completed in the following D5 slices;
+- the current `ContextMenu` uses local fixed positioning and a simple outside
+  pointer handler rather than the old Radix-backed portal/content pipeline.
+  Revisit before re-enabling old positioning, accessibility, and keyboard tests.
+
+Completed: Phase 5 Wave D5B - `DropdownMenu` foundation.
+
+Added:
+
+- expanded the migrated `DropdownMenu` source folder with old-compatible
+  metadata in `DropdownMenu.tsx`, SCSS module styling, React renderer, copied
+  documentation, copied old E2E suite, and a focused foundation E2E suite;
+- compiler/runtime wiring for the `DropdownMenu` component, including
+  `willOpen` event-handler mapping and component APIs (`open`, `close`,
+  `isOpen`);
+- a `createDropdownMenuDriver` test fixture used by copied old tests and the
+  new foundation tests;
+- a visual sample available with `npm run dev` at
+  `?example=dropdownMenuFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts`
+  from `xmlui/`: 2 foundation tests passed, 36 copied old tests skipped.
+
+`DropdownMenu` compatibility debt:
+
+- the literal old `DropdownMenu.spec.ts` suite is copied but intentionally
+  skipped until Radix DropdownMenu parity, submenu support, icon/navigation
+  semantics, separator filtering, keyboard navigation, modal layering, Select
+  integration, z-index behavior, and complete theme-variable coverage are
+  migrated;
+- `MenuItem` and `MenuSeparator` remain foundation primitives. Full active,
+  disabled, navigation, icon, separator-filtering, and nested-menu behavior
+  must be completed before old menu suites are re-enabled;
+- `SubMenuItem` is documented and present in the copied old suite, but it is
+  not implemented yet. Keep it as the next D5 slice so submenu behavior can be
+  tested independently;
+- this foundation uses local fixed positioning rather than the old Radix-backed
+  portal/content pipeline. Revisit before enabling old positioning,
+  accessibility, keyboard, and layering cases.
+
+Completed: Phase 5 Wave D5C - `SubMenuItem` and menu primitive parity
+foundation.
+
+Added:
+
+- `SubMenuItem` metadata in the old `DropdownMenu` folder, including
+  old-compatible props (`label`, `icon`, `iconPosition`, `triggerTemplate`) and
+  theme-variable defaults;
+- class-based SCSS module styling for submenu trigger/content parts;
+- a lightweight `SubMenuItemComponent` that supports hover/focus/click opening
+  and nested children;
+- compiler/runtime wiring for `SubMenuItem` as a transferred menu primitive;
+- a foundation E2E case proving nested submenu display and nested menu-item
+  state mutation;
+- the `dropdownMenuFoundation` visual sample now includes submenu actions.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts`
+  from `xmlui/`: 3 foundation tests passed, 36 copied old tests skipped.
+
+`SubMenuItem` and menu primitive compatibility debt:
+
+- the literal old `DropdownMenu.spec.ts` suite remains copied but skipped.
+  Submenu icon placement, trigger-template override, separator filtering,
+  keyboard navigation, Radix focus behavior, portal layering, Select/ModalDialog
+  integration, and theme-variable parity are still incomplete;
+- the foundation submenu is intentionally local and simple. It does not yet
+  implement Radix `Sub`, portal-based `SubContent`, collision handling, looped
+  keyboard navigation, inspector logging, or full accessibility behavior;
+- `MenuItem.to` navigation and icon rendering are still not migrated.
+
+Completed: Phase 5 Wave D5D - `Menu` compatibility surface.
+
+Findings:
+
+- the old XMLUI project does not have a standalone `Menu.tsx` or
+  `MenuReact.tsx` component;
+- old `src/components/Menu/Menu.module.scss` is a shared menu styling/theming
+  layer imported by `DropdownMenu.module.scss` and `ContextMenu.module.scss`;
+- the user-facing authoring surface is `DropdownMenu`, `ContextMenu`,
+  `MenuItem`, `SubMenuItem`, and `MenuSeparator`.
+
+Added:
+
+- documented that `Menu` in Wave D5 means shared menu primitives and shared
+  styling/theming semantics, not a new `<Menu>` tag;
+- added static separator filtering in the migrated `DropdownMenu` renderer so
+  leading, trailing, and adjacent `MenuSeparator` nodes collapse before
+  rendering;
+- added SCSS-module fallback selectors for the old shared menu behavior where
+  DOM-adjacent separators are hidden in dropdown and submenu content;
+- added focused foundation E2E coverage for top-level and nested separator
+  collapse.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts`
+  from `xmlui/`: 5 foundation tests passed, 36 copied old tests skipped.
+
+`Menu` compatibility debt:
+
+- full condition-aware separator filtering, including `when` expressions that
+  depend on `$context`, is not complete. The old helper treats unknown/null
+  context-dependent visibility as visible and filters after value extraction;
+- the shared old `Menu.module.scss` also defines full theme-variable extraction
+  for `Menu`, `MenuItem`, and `MenuSeparator`. The migrated menu primitives use
+  compatible variables locally, but the exact shared stylesheet/mixin structure
+  is not yet migrated;
+- copied old DropdownMenu and ContextMenu separator tests remain skipped until
+  full Radix menu behavior, conditional filtering, and keyboard/focus parity
+  are migrated.
+
+Completed: Phase 5 Wave D5E - close Wave D5 menu overlay foundation.
+
+Findings:
+
+- the copied old `DropdownMenu.spec.ts` and `ContextMenu.spec.ts` suites are
+  still valuable as literal compatibility checklists, but their top-level
+  suite skips should remain for now because many tests assume the old
+  Radix-backed portal, focus, keyboard, positioning, icon, and theme-variable
+  behavior;
+- small now-supported old behaviors were promoted into running foundation
+  tests instead of partially unskipping brittle copied suites.
+
+Added:
+
+- running `ContextMenu` foundation coverage for outside-click dismissal,
+  Escape dismissal, repeated `openAt` context payload refresh, and separator
+  collapse;
+- shared separator fallback selectors in `ContextMenu.module.scss`;
+- corrected the menu separator fallback to match the old predecessor-hiding
+  rule. Adjacent separator runs should leave the separator closest to the next
+  real content visible rather than hiding both separators.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts src/components/ContextMenu/ContextMenu.foundation.spec.ts src/components/ContextMenu/ContextMenu.spec.ts`
+  from `xmlui/`: 10 foundation tests passed, 64 copied old tests skipped.
+
+Remaining D5 debt:
+
+- copied old `DropdownMenu`/`ContextMenu` suites remain skipped until Radix menu
+  behavior, portal layering, focus management, keyboard navigation,
+  collision-aware positioning, icon rendering, navigation via `MenuItem.to`,
+  condition-aware separator filtering, and full theme-variable parity are
+  migrated;
+- do not leave knowingly failing E2E tests. Enable old copied cases only when
+  the corresponding behavior is implemented and the focused run is green.
+
+Completed: Phase 5 Wave D6A - `NavLink` foundation.
+
+Added:
+
+- migrated `NavLink` source folder with metadata in `NavLink.tsx`, SCSS module
+  styling, React renderer, copied documentation, copied old E2E suite, and a
+  focused foundation E2E suite;
+- runtime routing behavior for internal links through the existing XMLUI
+  routing store, including active-state detection and `exact` matching;
+- disabled-link behavior as a disabled button, following the old component's
+  basic semantic split;
+- `createNavLinkDriver` fixture for copied and foundation tests;
+- visual sample available with `npm run dev` at
+  `?example=navLinkFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavLink/NavLink.foundation.spec.ts src/components/NavLink/NavLink.spec.ts`
+  from `xmlui/`: 3 foundation tests passed, 41 copied old tests skipped.
+
+`NavLink` compatibility debt:
+
+- the literal old `NavLink.spec.ts` suite is copied but intentionally skipped
+  until the full theme-variable matrix, React Router active semantics,
+  component-specific icon rendering, `NavGroup` level inheritance, tooltip
+  behavior, shell layout integration, and style parity are migrated;
+- the current foundation supports only an `iconTemplate` slot, not the old
+  `icon` name rendering path. Complete icon migration when the shell/nav
+  components share the old icon pipeline;
+- exact old `NavPanel` and `NavGroup` context behavior is not present yet.
+
+Completed: Phase 5 Wave D6B - `NavPanel` foundation.
+
+Added:
+
+- migrated `NavPanel` source folder with metadata in `NavPanel.tsx`, SCSS
+  module styling, React renderer, copied documentation, copied old E2E suite,
+  and a focused foundation E2E suite;
+- basic shell container layout with `content`, `logo`, and `footer` parts;
+- accepted old surface props for `logoTemplate`, `footerTemplate`, `inDrawer`,
+  `scrollStyle`, `showScrollerFade`, `syncWithContent`,
+  `syncScrollBehavior`, and `syncScrollPosition`;
+- `createNavPanelDriver` fixture for copied and foundation tests;
+- visual sample available with `npm run dev` at
+  `?example=navPanelFoundation`, using the migrated `NavLink` and a
+  state-mutating navigation path.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavPanel/NavPanel.foundation.spec.ts src/components/NavPanel/NavPanel.spec.ts src/components/NavLink/NavLink.foundation.spec.ts src/components/NavLink/NavLink.spec.ts`
+  from `xmlui/`: 7 foundation tests passed, 97 copied old tests skipped.
+
+`NavPanel` compatibility debt:
+
+- the literal old `NavPanel.spec.ts` suite is copied but intentionally skipped
+  until App layout integration, NavGroup discovery, dynamic nav generation,
+  scroller/fade variants, active-link scroll synchronization, collapsed/drawer
+  shell behavior, link-map registration, and complete theme-variable parity are
+  migrated;
+- `logoTemplate` and `footerTemplate` are supported as direct property
+  children, but old App-provided logo content and vertical/horizontal layout
+  context are not restored yet;
+- scroll props are accepted and basic overflow styling exists, but old
+  `ScrollViewer`-backed behavior and fade indicators are not complete.
+
+Completed: Phase 5 Wave D6C - `NavGroup` foundation.
+
+Implemented:
+
+- migrated `NavGroup` source folder with metadata in `NavGroup.tsx`, SCSS
+  module styling, `NavGroupReact.tsx`, `NavGroup.renderer.tsx`, copied
+  `NavGroup.md`, and copied literal old `NavGroup.spec.ts`;
+- `NavGroup` compiler/runtime registration in the built-in contract list,
+  IR runtime-component allowlist, component registry, and transferred-component
+  inventory;
+- class-based inline expandable behavior for `label`, `initiallyExpanded`,
+  `enabled`, and optional header `to` navigation;
+- `createNavGroupDriver` fixture for focused tests;
+- `NavGroup.foundation.spec.ts` covering collapsed/expanded state,
+  `initiallyExpanded`, disabled behavior, and nested `NavLink` navigation with
+  state mutation;
+- visual sample available with `npm run dev` at
+  `?example=navGroupFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavGroup/NavGroup.foundation.spec.ts src/components/NavGroup/NavGroup.spec.ts src/components/NavPanel/NavPanel.foundation.spec.ts src/components/NavLink/NavLink.foundation.spec.ts`
+  from `xmlui/`: 11 foundation tests passed, 31 copied old `NavGroup` tests
+  skipped.
+
+`NavGroup` compatibility debt:
+
+- the literal old `NavGroup.spec.ts` suite is copied but intentionally skipped
+  until App/NavPanel layout context, horizontal/dropdown menu behavior, old
+  menu roles and keyboard behavior, icon variants, active-route auto-expansion,
+  nested level inheritance, drawer interactions, `noIndicator`, expand-icon
+  alignment, and full theme-variable parity are restored;
+- this slice implements only the vertical inline foundation needed by the
+  migrated `NavPanel`/`NavLink` experiment path.
+
+Completed: Phase 5 Wave D6D - `AppHeader` foundation.
+
+Implemented:
+
+- migrated `AppHeader` source folder with metadata in `AppHeader.tsx`, defaults,
+  SCSS module styling, `AppHeaderReact.tsx`, `AppHeader.renderer.tsx`, copied
+  `AppHeader.md`, and copied literal old `AppHeader.spec.ts`;
+- replaced the centralized minimal AppHeader runtime renderer with the
+  transferred component renderer in the component registry;
+- added compiler contract props for `profileMenuTemplate`, `logoTemplate`,
+  `titleTemplate`, `title`, `showLogo`, `testId`, and `id`;
+- added `createAppHeaderDriver` fixture;
+- added `AppHeader.foundation.spec.ts` for banner semantics, title/content
+  rendering, logo/title/profile template placement, keyboard focus inside the
+  header, theme variables, and state mutation from a header action;
+- visual sample available with `npm run dev` at
+  `?example=appHeaderFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/AppHeader/AppHeader.foundation.spec.ts src/components/AppHeader/AppHeader.spec.ts`
+  from `xmlui/`: 5 foundation tests passed, 12 copied old tests skipped.
+
+`AppHeader` compatibility debt:
+
+- the literal old `AppHeader.spec.ts` suite is copied but intentionally skipped
+  until App layout context, drawer/nav-panel integration, default app logo
+  resource behavior, layout-specific visibility, and complete theme-variable
+  parity are restored;
+- this slice implements the direct header authoring surface and visible
+  horizontal header layout only.
+
+Completed: Phase 5 Wave D6E - `Footer` foundation.
+
+Implemented:
+
+- migrated `Footer` source folder with metadata in `Footer.tsx`, defaults,
+  SCSS module styling, `FooterReact.tsx`, `Footer.renderer.tsx`, copied
+  `Footer.md`, and copied literal old `Footer.spec.ts`;
+- registered `Footer` in compiler contracts, IR runtime-component allowlist,
+  component registry, transferred-component inventory, and test fixtures;
+- added `createFooterDriver` fixture;
+- added `Footer.foundation.spec.ts` for content rendering, contentinfo
+  semantics, focusable interactive children, `sticky` attribute reflection,
+  theme variables, and state mutation from a footer action;
+- visual sample available with `npm run dev` at
+  `?example=footerFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/Footer/Footer.foundation.spec.ts src/components/Footer/Footer.spec.ts`
+  from `xmlui/`: 5 foundation tests passed, 20 copied old tests skipped.
+
+`Footer` compatibility debt:
+
+- the literal old `Footer.spec.ts` suite is copied but intentionally skipped
+  until full App shell layout, Pages scrolling containers, sticky layout
+  behavior, layout-specific content width, and complete theme-variable parity
+  are restored;
+- this slice implements the direct footer authoring surface and visible
+  horizontal footer layout only.
+
+Completed: Phase 5 Wave D6F - `NavPanelCollapseButton` foundation.
+
+Implemented:
+
+- migrated `NavPanelCollapseButton` source folder with metadata in
+  `NavPanelCollapseButton.tsx`, `NavPanelCollapseButtonReact.tsx`,
+  `NavPanelCollapseButton.renderer.tsx`, a small local collapse context, and a
+  new documentation stub;
+- confirmed the original component folder has no component-local `.spec.ts`,
+  `.md`, `.defaults.ts`, `.module.scss`, or separate React file to copy;
+- added a minimal `NavPanelCollapseProvider` around migrated `NavPanel`
+  rendering so the button can render inside `NavPanel` and toggle a real
+  collapsed state while preserving the old no-context `null` behavior outside a
+  panel;
+- registered `NavPanelCollapseButton` in compiler contracts, IR runtime
+  allowlist, component registry, transferred-component inventory, and test
+  fixtures;
+- added `createNavPanelCollapseButtonDriver`;
+- added `NavPanelCollapseButton.foundation.spec.ts` for no-context null
+  behavior, rendering inside `NavPanel` footer, aria-label/icon switching,
+  click toggling, keyboard toggling, and `NavPanel` collapsed-state reflection;
+- visual sample available with `npm run dev` at
+  `?example=navPanelCollapseButtonFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/NavPanelCollapseButton/NavPanelCollapseButton.foundation.spec.ts src/components/NavPanel/NavPanel.foundation.spec.ts`
+  from `xmlui/`: 8 focused tests passed.
+
+`NavPanelCollapseButton` compatibility debt:
+
+- the original component consumes `useAppLayoutContext`; the rewrite currently
+  uses a local `NavPanel` collapse provider until full App shell layout context
+  is restored;
+- collapsed `NavPanel` visual behavior is only represented by a data attribute
+  and basic width class, not by the full old vertical layout/sidebar behavior;
+- no old component-local E2E suite exists to copy, so future closure should use
+  old App/NavPanel integration tests when those shell features are migrated.
+
+Completed: Phase 5 Wave D6G - `ProfileMenu` foundation.
+
+Implemented:
+
+- migrated `ProfileMenu` as an internal native-only React component, preserving
+  the original convention that it is not exposed as a public XMLUI tag;
+- confirmed the original `ProfileMenu` folder has no component-local docs or
+  E2E tests to copy and is documented in the old conventions as native-only;
+- added `ProfileMenuReact.tsx`, `ProfileMenu.module.scss`, and a small
+  `ProfileMenuContext` for the existing public `App loggedInUser` surface;
+- added narrow runtime plumbing so `App` provides `loggedInUser` and
+  `AppHeader` renders the default internal profile menu when no explicit
+  `profileMenuTemplate` is supplied;
+- added compiler contract support for `App loggedInUser`;
+- added `ProfileMenu.foundation.spec.ts` for default rendering from
+  `App loggedInUser`, no-user null behavior, and explicit
+  `profileMenuTemplate` override with state mutation;
+- visual sample available with `npm run dev` at
+  `?example=profileMenuFoundation`.
+
+Verified:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui test`: 263 unit tests passed;
+- `npx playwright test src/components/ProfileMenu/ProfileMenu.foundation.spec.ts src/components/AppHeader/AppHeader.foundation.spec.ts`
+  from `xmlui/`: 8 focused tests passed.
+
+`ProfileMenu` compatibility debt:
+
+- the old implementation uses the full theme service to toggle actual light/dark
+  themes; the foundation menu renders the expected theme menu item but does not
+  yet mutate runtime theme state;
+- the old implementation uses the old `Avatar` component; the foundation uses a
+  local initials/avatar trigger until `Avatar` is migrated;
+- because `ProfileMenu` is internal and has no old component-local E2E suite,
+  future closure should use App/AppHeader integration tests and user/theme
+  runtime tests.
+
+Phase 5 Wave E1A completed: `Form` and `FormItem` foundation.
+
+Implemented in this slice:
+
+- created component folders for `Form` and `FormItem` with metadata, React
+  implementation files, renderer files, SCSS modules, copied old docs, copied
+  old E2E specs, and focused foundation E2E specs;
+- established a minimal shared form context for field registration, form data
+  values, required validation messages, submit, cancel, and enabled-state
+  propagation;
+- added `FormItem` fallback input rendering for childless form items, label
+  association, label width, required indicator, and required validation feedback;
+- wired compiler contracts, IR built-in recognition, runtime registry transfer
+  metadata, test fixtures/drivers, and the Vite example route;
+- added the visual sample at
+  `xmlui/src/examples/form-foundation/Main.xmlui`, runnable with
+  `npm run dev -- --host 127.0.0.1 --port 5173` from `xmlui/` and
+  `?example=formFoundation`;
+- copied the full original `Form` and `FormItem` E2E suites as skipped
+  compatibility trackers. These suites currently collect cleanly but are not
+  executable until the later form waves implement the full old behavior.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed;
+- `npm --workspace xmlui test` passed with 37 files and 263 tests;
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed and
+  lists `FormReact.tsx` and `FormItemReact.tsx` as direct SCSS module imports;
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts`
+  passed with 5 focused E2E tests;
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormItem/FormItemLabelClick.spec.ts --list`
+  collected the copied skipped compatibility suites cleanly;
+- one copied old Form test was run with `--grep` and reported as skipped.
+
+Compatibility debt carried forward after E1A:
+
+- the full original Form/FormItem behavior is still pending, including
+  `$data`, form APIs, `buttonRowTemplate`, submit URL/method,
+  `onWillSubmit`, submit/reset lifecycle, dirty-state behavior, no-submit
+  fields, unmount/remount value preservation, built-in typed form item controls,
+  child-control `bindTo`, validation timing modes, custom/async validations,
+  concise validation feedback, require-label modes, sticky button rows, and full
+  theme-variable parity;
+- this foundation uses local required validation only and does not yet bind
+  existing input components such as `TextBox` directly through `bindTo`;
+- metadata extracts the new component theme variables from a local SCSS-source
+  string to avoid Vite config-time runtime stylesheet imports. When the
+  metadata extraction pipeline can read component SCSS without importing React
+  runtime modules during config loading, switch this to the same direct
+  component stylesheet extraction pattern expected for migrated components.
+
+Phase 5 Wave E1B completed: `FormSegment` foundation.
+
+Implemented in this slice:
+
+- created `FormSegment` with metadata, React implementation, renderer, SCSS
+  module, copied old E2E spec, and focused foundation E2E spec;
+- added runtime scope injection for segment context variables:
+  `$segmentData`, `$segmentValidationIssues`, and
+  `$hasSegmentValidationIssue`;
+- added a minimal dirty-field tracker to the shared Form context so
+  `FormSegment` can expose the `isDirty` API;
+- registered `FormSegment` with the compiler contracts, IR built-in list,
+  runtime registry transfer metadata, test fixtures/drivers, and Vite example
+  routing;
+- added the visual sample at
+  `xmlui/src/examples/form-segment-foundation/Main.xmlui`, runnable with
+  `npm run dev -- --host 127.0.0.1 --port 5173` from `xmlui/` and
+  `?example=formSegmentFoundation`;
+- copied the full original `FormSegment.spec.ts` as a skipped compatibility
+  tracker. It currently collects 38 old test cases and is not executable until
+  later form and validation waves implement the full old behavior.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed;
+- `npm --workspace xmlui test` passed with 37 files and 263 tests;
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed and
+  lists `FormSegmentReact.tsx` as a direct SCSS module import;
+- `npm --workspace xmlui exec -- playwright test src/components/FormSegment/FormSegment.foundation.spec.ts`
+  passed with 3 focused E2E tests;
+- `npm --workspace xmlui exec -- playwright test src/components/FormSegment/FormSegment.spec.ts --list`
+  collected 38 copied skipped compatibility tests;
+- one copied old FormSegment test was run with `--grep` and reported as
+  skipped.
+
+Compatibility debt carried forward after E1B:
+
+- `FormSegment` currently provides foundation `$segmentData`,
+  `$segmentValidationIssues`, `$hasSegmentValidationIssue`, `isValid`,
+  `hasIssues`, and `isDirty` semantics, but not full parity for old validation
+  result shapes, typed child-control `bindTo`, layout transposition through the
+  old implicit Stack model, or all original API timing semantics;
+- the executable foundation tests avoid calling `$hasSegmentValidationIssue`
+  from XMLUI script because the current expression compiler cannot yet call a
+  context-provided function target. The runtime context function is present for
+  compatibility direction, but compiler support must be expanded before old
+  tests using that call shape can run;
+- Form/FormItem still need the broader old form behavior listed after E1A.
+
+Phase 5 Wave E2A completed: `ValidationSummary` and
+`ConciseValidationFeedback` foundation.
+
+Implemented in this slice:
+
+- created migrated component folders for `ValidationSummary` and
+  `ConciseValidationFeedback` with metadata files, React implementation files,
+  renderer files, SCSS modules, and focused foundation E2E specs;
+- `ValidationSummary` can render current `FormContext.errors` after submit and
+  can also render explicit `fieldValidationResults` and
+  `generalValidationResults` props in the old result-shape direction;
+- `ConciseValidationFeedback` can render compact valid/error indicators with
+  accessible error text and hides neutral statuses;
+- wired both components into compiler contracts, IR built-in recognition,
+  runtime registry transfer metadata, and the Vite example route;
+- added the visual sample at
+  `xmlui/src/examples/validation-display-foundation/Main.xmlui`, runnable with
+  `npm run dev -- --host 127.0.0.1 --port 5173` from `xmlui/` and
+  `?example=validationDisplayFoundation`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed;
+- `npm --workspace xmlui test` passed with 37 files and 263 tests;
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed and
+  lists both new React files as direct SCSS module imports;
+- `npm --workspace xmlui exec -- playwright test src/components/ValidationSummary/ValidationSummary.foundation.spec.ts src/components/ConciseValidationFeedback/ConciseValidationFeedback.foundation.spec.ts`
+  passed with 4 focused E2E tests.
+
+Compatibility notes and debt:
+
+- the original project has implementation files for these components but no
+  component-local E2E suites to copy; old compatibility coverage is primarily
+  through `Form` and input component suites;
+- the foundation `ValidationSummary` supports current required-field errors and
+  a simplified version of the old validation result shape, but not full old
+  validation severities, animation behavior, close-button behavior, exact icon
+  rendering, or all theme variables;
+- the foundation `ConciseValidationFeedback` uses accessible text/glyphs rather
+  than the original themed icon and tooltip stack. Replace this with exact
+  `Icon`/`Tooltip` integration when those interactions are ready for full form
+  validation compatibility;
+- full integration into input components such as `TextBox`, `NumberBox`,
+  `DateInput`, `Select`, and `AutoComplete` remains part of later form/input
+  validation closure.
+
+Phase 5 Wave E3A completed: `StepperForm` and `TabsForm` structured form
+foundation.
+
+Implemented in this slice:
+
+- inspected the original `StepperForm` and `TabsForm` component folders and
+  component-local E2E suites;
+- added source-adjacent rewrite folders for both components with metadata,
+  renderer, React implementation, docs, and component-local E2E specs;
+- registered both components in the compiler contracts, IR lowerer built-in
+  set, and runtime component registry;
+- extended `Form` with forwarded APIs (`reset`, `update`, `getData`,
+  `validate`) and `submitFailed` notification so structured forms can expose
+  the same API surface through their inner Form;
+- implemented `TabsForm` as a composition of the current `Form`, `Tabs`, and
+  `TabItem` components;
+- implemented `StepperForm` as a local foundation because the standalone old
+  `Stepper` component has not been migrated yet;
+- added `structuredFormsFoundation` as a runnable visual example for
+  `npm run dev`.
+
+Verification for this slice:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`;
+- `npm --workspace xmlui test`;
+- `npm --workspace xmlui run compatibility:css-module-import-audit`;
+- `npm --workspace xmlui exec -- playwright test src/components/TabsForm/TabsForm.spec.ts src/components/StepperForm/StepperForm.spec.ts`
+  passed with 10 enabled tests and 6 explicit `test.fixme` deferrals.
+
+Remaining structured-form debt:
+
+- `StepperForm` must be re-closed after the old `Stepper`/`Step` component
+  semantics are migrated;
+- invalid-segment navigation gating, completion/error indicators, and old
+  stacked-label Stepper markup are deferred;
+- `TabsForm` submit-failure jump-to-first-invalid-tab is deferred until the full
+  Form/FormItem validation lifecycle is closed.
+
+Next explicit step: Phase 5 Wave F1A - inspect the original data-provider and
+API-call components (`DataSource`, `APICall`, and related runtime services),
+then migrate the smallest data-provider foundation slice with copied
+component-local tests and a runnable example.
 
 ##### Wave D2: Adaptive and Scrolling Layout
 
@@ -2396,6 +3835,32 @@ Compatibility focus:
   request lifecycle, caching, retries, cancellation, refresh, error state, and
   API references must match old behavior.
 
+Status:
+
+- Wave F1A completed: inspected the original `DataSource` and `APICall`
+  metadata/spec files and moved the current rewrite's foundation behavior from
+  centralized builtins into component-owned metadata and renderer modules.
+- Added component-local foundation E2E tests for `mockData`, scripted fetch
+  context variables, `refetch`, result selection/transformation, `execute`,
+  `beforeRequest` cancellation, and `invalidates`-driven data refresh.
+- Existing runnable examples remain available through `npm run dev` with
+  `?example=dataSourceMock`, `?example=dataSourceRefetch`,
+  `?example=apiCallMutation`, and `?example=actionsCallApi`.
+
+Deferred compatibility work:
+
+- Literal old `DataSource.spec.ts` and `APICall.spec.ts` transfer is not
+  complete. The original suites depend on old API interception, notifications,
+  confirmation/deferred call behavior, optimistic updates, paging selectors,
+  CSV/SQL response handling, structural sharing, and richer runtime services.
+- Do not mark F1 complete until those old test cases are either running
+  successfully or explicitly mapped to later runtime/tooling slices.
+
+Next explicit step: Phase 5 Wave F2A - inspect the original app-state and
+lifecycle listener components (`AppState`, `ChangeListener`, `Lifecycle`, and
+related runtime services), then migrate the smallest listener/state foundation
+slice with component-local tests and a runnable example.
+
 ##### Wave F2: App State and Lifecycle Listeners
 
 Components:
@@ -2409,6 +3874,30 @@ Compatibility focus:
 - non-visual API registration, listener ordering, cleanup, app state
   persistence, initial invocation behavior, and event timing.
 
+Status:
+
+- Wave F2A completed: inspected original `AppState`, `ChangeListener`, and
+  `Lifecycle` implementations and migrated a component-owned foundation slice.
+- Added metadata, docs, non-visual renderers, and focused component-local E2E
+  tests for bucket state, state mutation, list helpers, change-listener
+  payloads, debounce behavior, mount/unmount, and key-value lifecycle rearming.
+- Added runnable example `?example=appStateListeners` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `AppState.spec.ts` and `ChangeListener.spec.ts` transfer is not
+  complete.
+- `Lifecycle.onError` coverage is deferred until script throw/error expression
+  support can reliably trigger handler failures in markup.
+- Existing `FlowLayout` non-visual compatibility tests for `AppState` and
+  `ChangeListener` are currently skipped by their compatibility gating and
+  should be re-enabled when that suite is reopened.
+
+Next explicit step: Phase 5 Wave F3A - inspect the original scheduling and
+queue components (`Timer`, `Queue`, and related runtime services), then migrate
+the smallest scheduling foundation slice with component-local tests and a
+runnable example.
+
 ##### Wave F3: Scheduling and Queues
 
 Components:
@@ -2420,6 +3909,23 @@ Compatibility focus:
 
 - scheduling cadence, cancellation, queue ordering, concurrency behavior,
   lifecycle cleanup, and event handler interaction.
+
+Status:
+
+- Wave F3A completed: inspected original `Timer` and `Queue` implementations
+  and migrated a component-owned foundation slice.
+- Added metadata, docs, non-visual renderers, and focused component-local E2E
+  tests for timer ticks, once mode, pause/resume, queue enqueueing, FIFO
+  processing, removal, will-process gating, and completion.
+- Added runnable example `?example=schedulingFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `Timer.spec.ts` and `Queue.spec.ts` transfer is not complete.
+- Queue progress/result feedback templates, toast integration, and full error
+  handling remain deferred.
+- Some literal old Queue tests require broader event-parser support such as
+  multi-parameter arrow callbacks and local declarations.
 
 ##### Wave F4: Messaging and Streaming
 
@@ -2433,6 +3939,26 @@ Compatibility focus:
 
 - connection lifecycle, reconnection where present, message payloads,
   subscription cleanup, errors, and app event dispatch.
+
+Status:
+
+- Wave F4A completed: inspected original `MessageListener`, `EventSource`, and
+  `WebSocket` implementations and migrated a component-owned foundation slice.
+- Added metadata, docs, non-visual renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for all three components.
+- Added focused component-local E2E tests for `MessageListener` window message
+  delivery and child passthrough, `EventSource` open/message/disabled behavior,
+  and `WebSocket` construction while accounting for Vite's HMR socket.
+- Added runnable example `?example=messagingFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `MessageListener.spec.ts` transfer is not complete.
+- `EventSource` close/error/retry behavior needs a real streaming compatibility
+  harness before the old tests can be copied literally.
+- `WebSocket` event delivery, disabled state, close/error, and reconnect tests
+  need the same streaming harness and a careful comparison with the original
+  implementation.
 
 ##### Wave F5: User Feedback and Accessibility Services
 
@@ -2449,6 +3975,38 @@ Compatibility focus:
 
 - announcements, focus boundaries, skip targets, bookmark behavior, animation
   lifecycle, visual feedback, and accessibility semantics.
+
+Status:
+
+- Wave F5A completed: inspected original `Toast`, `Bookmark`, `LiveRegion`,
+  `SkipLink`, `FocusScope`, and `Animation` implementations and migrated the
+  smallest service/accessibility foundation slice.
+- Added metadata, docs, renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for `LiveRegion`, `Bookmark`,
+  `SkipLink`, and `Toast`.
+- Added focused component-local E2E tests for live-region semantics, bookmark
+  anchor/API behavior, keyboard-first skip-link activation, and toast component
+  API exposure.
+- Added runnable example `?example=feedbackAccessibilityFoundation` for
+  `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old E2E suite transfer is not complete for these components.
+- `LiveRegion` global announcement-helper behavior remains deferred.
+- `Bookmark` TableOfContents registration and scroll-container behavior remain
+  deferred.
+- `SkipLink` portal parity and the full keyboard/visual-hidden test suite
+  remain deferred.
+- `Toast` template rendering, update-in-place semantics, and full
+  `react-hot-toast` parity remain deferred.
+- `FocusScope` and `Animation` remain unimplemented and should be migrated with
+  their old utility/runtime behavior.
+
+Next explicit step: Phase 5 Wave F6A - inspect original theme and inspection
+runtime components (`ToneChangerButton`, `ToneSwitch`, `Theme`, `Part`, `Slot`,
+`InspectButton`, `Inspector`, `I18n`), then migrate the smallest theme/slot
+foundation slice with component-local tests and a runnable example.
 
 ##### Wave F6: Theme and Inspection Runtime
 
@@ -2468,6 +4026,31 @@ Compatibility focus:
 - theme scoping, tone changes, part/slot semantics, inspector visibility and
   metadata, localization lookup, and runtime service APIs.
 
+Status:
+
+- Wave F6A completed: inspected original theme, slot, tone, inspector, and I18n
+  component sources and migrated the smallest theme/slot foundation slice.
+- Added metadata, docs, renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for `Theme`, `Slot`, `ToneSwitch`,
+  and `ToneChangerButton`.
+- Extended the runtime theme context with `tone` and `setTone` while preserving
+  the existing `useThemeVariables()` surface.
+- Added focused component-local E2E tests for scoped theme variables, scoped
+  tone attributes, Slot fallback rendering, and tone mutation events.
+- Added runnable example `?example=themeSlotFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old E2E suite transfer is not complete for these components.
+- `Theme` named theme selection, root style injection, notification settings,
+  `disableInlineStyle`, strict theming behavior, and exact generated CSS
+  behavior remain deferred.
+- `Slot` injected child and context-variable behavior remains deferred to the
+  user-defined component slot closure.
+- `ToneSwitch` and `ToneChangerButton` visual parity with the old Toggle,
+  Button, and Icon implementations remains deferred.
+- `Part`, `InspectButton`, `Inspector`, and `I18n` remain unimplemented.
+
 #### Wave G: Routing, App Composition, and Navigation Components
 
 ##### Wave G1: Remaining App Shell Behavior
@@ -2482,6 +4065,27 @@ Compatibility focus:
   navigation regions, headers, footers, mobile shell, search, index collection,
   page metadata, and standalone/Vite differences.
 
+Status:
+
+- Wave G1A completed: inspected original `App` shell sources and migrated the
+  first lifecycle/input shell behavior slice.
+- Added runtime support for `onReady`, `onMessageReceived`, `onKeyDown`, and
+  `onKeyUp` in the migrated `App`.
+- Added focused component-local E2E tests proving `ready` fires once,
+  `messageReceived` receives posted data, and keyboard events update rendered
+  state.
+- Added runnable example `?example=appShellFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `App` E2E suite transfer is not complete.
+- `onMessageReceived(data, event)` runtime passes the second argument, but
+  literal XMLUI tests are deferred until the event parser supports
+  multi-parameter arrow callbacks.
+- Header/footer/nav-panel extraction, drawer/mobile shell, app navigation
+  events, search/index collection, page metadata, direction/locale/scheduler,
+  theme persistence, and error handling remain deferred.
+
 ##### Wave G2: Page Routing Core
 
 Components:
@@ -2495,6 +4099,24 @@ Compatibility focus:
 - page startup, navigation events, route matching, route/query context
   variables, redirects, SSG route discovery, and page metadata.
 
+Status:
+
+- Wave G2A completed: inspected original `Pages`, `Page`, and `Redirect`
+  sources and migrated the first route matching and redirect foundation slice.
+- Added metadata, docs, renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for `Pages`, `Page`, and `Redirect`.
+- Added focused component-local E2E tests for page matching, fallback routing,
+  route/query context variables, and redirect behavior.
+- Added runnable example `?example=pageRoutingFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `Pages` and `Redirect` E2E suite transfer is not complete.
+- Route guards, canonical URL policies, query validation, scroll restoration,
+  search indexing, app navigation events, page metadata, and SSG route discovery
+  remain deferred.
+- Exact `Redirect.replace` history semantics remain deferred.
+
 ##### Wave G3: Navigation Components
 
 Components:
@@ -2506,6 +4128,29 @@ Compatibility focus:
 - active route matching, disabled state, navigation side effects, styling,
   keyboard/focus behavior, and route/query compatibility.
 
+Status:
+
+- Wave G3A completed: inspected original `NavLink` sources and tightened the
+  first navigation link compatibility slice.
+- Preserved the public `xmlui-navlink-active` active-class contract, nested vs.
+  exact route matching, disabled-as-button behavior, internal router
+  navigation, click event dispatch, and external URL/target preservation.
+- Added focused component-local E2E tests for these foundation behaviors.
+- Expanded runnable example `?example=navLinkFoundation` for `npm run dev` so
+  route changes, query parameters, disabled links, external links, and click
+  mutation can be visually checked.
+
+Deferred compatibility work:
+
+- The literal old `NavLink.spec.ts` suite is copied but still globally skipped.
+- Full theme-variable matrix, icon rendering parity, keyboard/focus behavior,
+  NavGroup/NavPanel inheritance details, tooltip/shell integration, and deeper
+  React Router parity remain deferred.
+
+Next explicit step: Phase 5 Wave G4A - inspect original `NestedApp` boundary
+behavior, then migrate the smallest nested app boundary slice with
+component-local tests and a runnable example.
+
 ##### Wave G4: Nested App Boundary
 
 Components:
@@ -2516,6 +4161,64 @@ Compatibility focus:
 
 - nested app startup, state/theme/router boundaries, package loading,
   lifecycle cleanup, and standalone/Vite behavior.
+
+Status:
+
+- Wave G4A completed: inspected original `NestedApp` sources and migrated the
+  smallest nested app runtime boundary.
+- Added source-adjacent `NestedApp` metadata, renderer, React implementation,
+  stylesheet, documentation, and component-local E2E tests.
+- Registered `NestedApp` as a built-in in compiler contracts, IR lowering, and
+  runtime renderer discovery.
+- The foundation slice compiles the `app` source property through the current
+  compiler/runtime path, renders it with an isolated runtime root/state store,
+  applies `height`, and reports invalid nested source inside the nested app
+  boundary.
+- Added runnable example `?example=nestedAppFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Shadow DOM isolation, stylesheet cloning/adoption, nested portal root,
+  `isNested` global prop propagation, and old App nested-layout class behavior
+  remain deferred.
+- Playground frame, split view, reset controls, splash screen, lazy viewport
+  activation, `AppWithCodeView`, and Markdown playground integration remain
+  deferred.
+- `api`, `components`, `config`, `activeTheme`, and `activeTone` remain
+  metadata-only in this slice.
+- Old tone-specific `dark` default theme vars remain deferred until the current
+  metadata shape supports tone-specific default theme-var blocks.
+
+Next explicit step: Phase 5 Wave P2A - continue Form Core by activating the
+copied-old `Form.spec.ts` inherited item label setting groups:
+`itemLabelPosition`, `itemLabelWidth`, `itemLabelBreak`, and
+`itemRequireLabelMode`, while keeping the rest of the copied Form suite
+explicitly skipped by feature area.
+H1A is complete: `Spinner`, `ProgressBar`,
+`Avatar`, and `Badge` have copied old docs/defaults/specs, compiler/runtime
+registration, the combined `?example=missingVisualComponentsFoundation` route,
+and passing focused old E2E suites. H1B is complete: `Stepper` and `Step` have
+copied old docs/defaults/specs, compiler/runtime registration, the
+`?example=stepperFoundation` route, and all 62 copied old `Stepper` E2E tests
+passing. H2A focus core is complete: `FocusScope` has copied old
+docs/defaults/specs, compiler/runtime registration, the
+`?example=focusScopeFoundation` route, 4 copied old FocusScope E2E tests
+passing, and 1 copied old Markdown/xmlui-pg prerequisite test explicitly
+skipped until Markdown migration. H2B input internals is complete:
+`InputLabel`, `InputAdornment`, `InputDivider`, and `PartialInput` were
+migrated as internal shared primitives with SCSS modules and unit smoke
+coverage; no public `Input` component contract was added, and consumer adoption
+is deferred to focused input-family parity slices. P2A has started:
+`FormItem.spec.ts` Basic Functionality, `FormSegment.spec.ts` Basic Rendering,
+and `Form.spec.ts` initial render/button, `hideButtonRow`, core
+`hideButtonRowUntilDirty`, `enableSubmit`, and `data property` groups are
+active and passing, with the remaining copied-old form groups explicitly
+skipped by feature area. The preceding P0B VS Code SCSS bundling unblock is
+complete.
+
+Detailed missing-component continuation plan:
+
+- `.plans/missing-component-migration-plan.md`
 
 Each wave should close components in small batches that can keep
 `compatibility:sweep` useful. If a component requires infrastructure from a
@@ -2631,6 +4334,202 @@ Exit criteria:
   and expected artifacts as the old framework.
 
 ## 16. Condensed Execution Checklist
+
+### CSS Module Import Pattern Restoration
+
+The original XMLUI component renderers import their stylesheet modules directly,
+for example `import styles from "./Button.module.scss"`. The rewrite's interim
+literal class-name maps are compatibility debt: they increase the risk of class
+collisions, hide missing CSS-module build behavior, and make component files
+visually drift from the original source organization.
+
+Pause normal component-wave migration here and restore the direct SCSS module
+import pattern before continuing with the next rebuild step. Use a frugal,
+script-assisted process so the work is mostly mechanical and reviewable.
+
+Known E2E baseline before starting this repair:
+
+- `Slider.spec.ts`: disabled theme-variable test fails.
+- `StickySection.foundation.spec.ts`: native sticky positioning test fails.
+- `TimeInput.spec.ts`: 33 theme-variable tests fail across warning, error, and
+  success validation states.
+
+Do not count those failures as regressions introduced by this repair unless
+their failure shape changes. Any new failing E2E test introduced by a style
+import batch must be fixed before moving to the next batch.
+
+Repair execution plan:
+
+1. Create a dry-run audit script.
+
+   The script must inspect `xmlui/src/components/**/**React.tsx` and classify
+   each renderer into:
+
+   - direct import: already uses `import styles from "./Component.module.scss"`;
+   - custom query import: uses `?xmlui-css-module`;
+   - literal map: uses `const styles = { ... }`;
+   - no stylesheet import;
+   - unsafe/manual: ambiguous style usage.
+
+   The script must also compare literal-map values with class selectors present
+   in the component SCSS file and report whether the conversion can be
+   automatic. It must not modify files in this step.
+
+   Verification after Step 1:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite and confirms the only failures are the
+     known baseline failures listed above.
+
+2. Add a safe apply mode to the script.
+
+   The apply mode may only:
+
+   - rewrite `import styles from "./Component.module.scss?xmlui-css-module"` to
+     `import styles from "./Component.module.scss"`;
+   - replace a literal `const styles = { ... }` map with a direct SCSS import
+     when every referenced class exists in the component SCSS module;
+   - leave all ambiguous components untouched and report them.
+
+   The script must write a concise report listing converted, skipped, and
+   manually-required components. The report can be temporary unless a useful
+   finding belongs in `.ai/`.
+
+   Verification after Step 2:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite and confirms no new failures beyond the
+     known baseline failures.
+
+3. Apply Batch A: custom-query import components.
+
+   Target components:
+
+   - `AutoComplete`, `Icon`, `List`, `Logo`, `Pagination`, `RadioGroup`,
+     `Select`, `Stack`, `Table`, `TableOfContents`, `Text`, `Tree`,
+     `TreeDisplay`.
+
+   These already import a style object, but through the rewrite-only
+   `?xmlui-css-module` bridge. They should be the lowest-risk broad batch after
+   `Button` and `Heading`.
+
+   Verification after Batch A:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - If failures appear outside the known baseline, fix them before continuing.
+
+4. Apply Batch B: simple visual/no-data components.
+
+   Target components when the audit says they are safe:
+
+   - `ContentSeparator`, `IFrame`, `Image`, `NoResult`, `QRCode`,
+     `SpaceFiller`, and any other simple component whose literal map exactly
+     matches its SCSS module.
+
+   June 23, 2026 note: an initial attempt to convert these six components
+   showed that their SCSS files are Sass-heavy and were reachable during
+   config/test startup through metadata imports. The fix was to keep metadata
+   in `Component.tsx`, move runtime renderer exports into source-adjacent
+   `Component.renderer.tsx` files, and update the runtime registry to import
+   renderers from those files. After that boundary split, Batch B converted
+   successfully.
+
+   Verification after Batch B:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Fix any new failures before continuing.
+
+5. Apply Batch C: layout components.
+
+   Target components when the audit says they are safe:
+
+   - `Card`, `FlowLayout`, `ScrollViewer`, `Splitter`, `StickyBox`,
+     `StickySection`, `TileGrid`.
+
+   This batch may affect geometry-sensitive tests. Run focused layout E2E tests
+   before the full suite if a failure is suspected, but the full suite remains
+   required before closing the batch.
+
+   Verification after Batch C:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Fix any new failures before continuing.
+
+6. Fix compiler/config-time renderer reachability.
+
+   Before converting form/input/data components, ensure compiler metadata and
+   Vite config loading do not pull renderer files that import SCSS. Prefer a
+   metadata-only import boundary that still preserves the old component source
+   organization as much as possible. The goal is that normal Vite CSS-module
+   handling, not config bundling, owns `*.module.scss` imports.
+
+   Verification after Step 6:
+
+   - Run TypeScript/unit tests.
+   - Run focused smoke E2E for `DateInput` and another form/input component.
+   - The user runs the full E2E suite.
+
+7. Apply Batch D: form/input/data components.
+
+   Target components:
+
+   - `Checkbox`, `ColorPicker`, `DateInput`, `DatePicker`, `FileInput`,
+     `FileUploadDropZone`, `NumberBox`, `RatingInput`, `Slider`, `Switch`,
+     `TextArea`, `TextBox`, `TimeInput`, plus `AutoComplete`, `RadioGroup`,
+     `Select`, and `Option` if not already converted safely in Batch A.
+
+   This batch must include the existing known failures in its acceptance
+   criteria. If the style import repair also fixes the `Slider` or `TimeInput`
+   baseline failures, update this baseline and record the finding.
+
+   Verification after Batch D:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - No failing style/theme tests may be left untriaged.
+
+8. Apply Batch E: composite/overlay/navigation components.
+
+   Target components:
+
+   - `Accordion`, `Drawer`, `ExpandableItem`, `ResponsiveBar`, `Tabs`, and the
+     next overlay/navigation components as they are migrated.
+
+   Verification after Batch E:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Fix any new failures before resuming normal component-wave migration.
+
+9. Remove obsolete bridge usage.
+
+   After all migrated components use direct SCSS module imports:
+
+   - remove now-unused `?xmlui-css-module` runtime imports from `main.tsx`;
+   - remove or narrow the `rawScssModulePlugin` CSS-module behavior if it is no
+     longer needed for runtime component styling;
+   - keep theme-variable extraction support only where metadata generation
+     still requires raw SCSS source;
+   - update `.ai/` notes with the final convention.
+
+   Final verification:
+
+   - Run TypeScript/unit tests.
+   - The user runs the full E2E suite.
+   - Resume the next explicit rebuild step only after the style import repair
+     has no untriaged E2E regressions.
+
+Trial evidence on June 23, 2026:
+
+- `Button` smoke E2E passed with direct `Button.module.scss` import.
+- `Heading` smoke E2E passed with direct `Heading.module.scss` import.
+- `DateInput` direct import was attempted and intentionally backed out because
+  the compiler/config import graph still reaches `DateInputReact.tsx`; the
+  component remains on the deferred form/input list until that boundary is
+  corrected.
 
 1. Maintain and refine the compatibility inventory and debt log created by
    Experiment 15.

@@ -1,0 +1,12 @@
+<App var.submittedName="{''}" var.cancelled="{false}">
+  <H1>Form foundation</H1>
+  <Text>Submitted name: {submittedName || 'not submitted yet'}</Text>
+  <Text>Cancelled: {cancelled ? 'yes' : 'no'}</Text>
+  <Form
+    data="{{ name: 'Ada', email: 'ada@example.com' }}"
+    onSubmit="data => submittedName = data.name"
+    onCancel="cancelled = true">
+    <FormItem bindTo="name" label="Name" required="{true}" requiredInvalidMessage="Name is required" />
+    <FormItem bindTo="email" label="Email" type="email" />
+  </Form>
+</App>

@@ -1,0 +1,20 @@
+<App var.open="{false}" var.mode="trap">
+  <H1>FocusScope foundation</H1>
+  <Text>Mode: {mode}</Text>
+  <Button label="Open editor" onClick="open = true" />
+  <Button
+    label="Toggle trap"
+    onClick="mode = mode == 'trap' ? 'free' : 'trap'" />
+  <FocusScope when="{open}" trap="{mode == 'trap'}" restore="true" autoFocus="true">
+    <VStack padding="$space-4" gap="$space-3" border="1px solid $borderColor">
+      <H3>Edit customer</H3>
+      <TextBox label="Name" initialValue="Ada Lovelace" />
+      <HStack>
+        <Button label="Cancel" onClick="open = false" />
+        <Button label="Save" onClick="open = false" />
+      </HStack>
+    </VStack>
+  </FocusScope>
+  <Button label="Outside scope" />
+</App>
+

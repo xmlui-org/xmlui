@@ -1,0 +1,16 @@
+<App var.showErrors="{false}">
+  <H1>Validation display foundation</H1>
+  <Text>Status: {showErrors ? 'showing errors' : 'ready'}</Text>
+  <Button onClick="showErrors = !showErrors">Toggle direct feedback</Button>
+  <Form hideButtonRow="{false}">
+    <FormItem bindTo="name" label="Name" required="{true}" requiredInvalidMessage="Name is required" />
+    <ValidationSummary />
+  </Form>
+  <HStack gap="8px">
+    <Text>Direct concise feedback:</Text>
+    <ConciseValidationFeedback
+      validationStatus="{showErrors ? 'error' : 'valid'}"
+      invalidMessages="{['Direct validation message']}" />
+  </HStack>
+</App>
+

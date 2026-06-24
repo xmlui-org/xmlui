@@ -9,28 +9,7 @@ import {
   normalizeNumberInput,
   toUsableNumber,
 } from "./numberbox-abstractions";
-
-const styles = {
-  numberBoxAdornment: "numberBoxAdornment",
-  numberBoxConciseFeedback: "numberBoxConciseFeedback",
-  numberBoxDisabled: "numberBoxDisabled",
-  numberBoxError: "numberBoxError",
-  numberBoxIconMarker: "numberBoxIconMarker",
-  numberBoxInput: "numberBoxInput",
-  numberBoxLabel: "numberBoxLabel",
-  numberBoxLabeledItem: "numberBoxLabeledItem",
-  numberBoxLabelPositionBottom: "numberBoxLabelPositionBottom",
-  numberBoxLabelPositionEnd: "numberBoxLabelPositionEnd",
-  numberBoxLabelPositionStart: "numberBoxLabelPositionStart",
-  numberBoxLabelPositionTop: "numberBoxLabelPositionTop",
-  numberBoxLabelRequired: "numberBoxLabelRequired",
-  numberBoxReadOnly: "numberBoxReadOnly",
-  numberBoxRoot: "numberBoxRoot",
-  numberBoxSpinner: "numberBoxSpinner",
-  numberBoxSpinnerButton: "numberBoxSpinnerButton",
-  numberBoxSuccess: "numberBoxSuccess",
-  numberBoxWarning: "numberBoxWarning",
-} as const;
+import styles from "./NumberBox.module.scss";
 
 export type NumberBoxProps = {
   id?: string;

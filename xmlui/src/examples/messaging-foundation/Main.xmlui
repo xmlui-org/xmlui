@@ -1,0 +1,6 @@
+<App var.message="none">
+  <MessageListener onMessageReceived="data => message = data" />
+  <H1>Messaging foundation</H1>
+  <Text>Message: {message}</Text>
+  <Button onClick="message = 'local fallback'">Set local fallback</Button>
+</App>

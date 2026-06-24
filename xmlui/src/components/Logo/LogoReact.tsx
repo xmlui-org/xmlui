@@ -2,7 +2,7 @@ import { forwardRef, memo, type CSSProperties, type ForwardedRef } from "react";
 
 import { Image } from "../Image/ImageReact";
 import { defaultProps } from "./Logo.defaults";
-import styles from "./Logo.module.scss?xmlui-css-module";
+import styles from "./Logo.module.scss";
 
 export type LogoProps = {
   src?: string;

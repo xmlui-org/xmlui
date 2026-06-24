@@ -1,0 +1,20 @@
+<App var.horizontal="{true}" var.reverse="{false}">
+  <H1>Stack family foundation</H1>
+  <Text>Mode: {horizontal ? 'horizontal' : 'vertical'}, order: {reverse ? 'reversed' : 'normal'}</Text>
+  <HStack gap="8px" verticalAlignment="center">
+    <Button onClick="horizontal = !horizontal">Toggle orientation</Button>
+    <Button onClick="reverse = !reverse">Toggle order</Button>
+  </HStack>
+  <Stack
+    testId="stack-demo"
+    orientation="{horizontal ? 'horizontal' : 'vertical'}"
+    reverse="{reverse}"
+    gap="12px"
+    wrapContent="true"
+    backgroundColor="$color-surface-100"
+    padding="$space-4">
+    <Text backgroundColor="$color-primary-100" padding="$space-2">First</Text>
+    <Text backgroundColor="$color-primary-200" padding="$space-2">Second</Text>
+    <Text backgroundColor="$color-primary-300" padding="$space-2">Third</Text>
+  </Stack>
+</App>

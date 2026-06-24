@@ -1,6 +1,6 @@
 // Heading.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old Heading component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -93,7 +93,7 @@ $textDecorationThickness-H6: createThemeVar("Heading:textDecorationThickness-H6"
 $textUnderlineOffset-H6: createThemeVar("Heading:textUnderlineOffset-H6");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

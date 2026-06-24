@@ -1,0 +1,113 @@
+// Accordion.tsx extracts available theme variables from createThemeVar
+// declarations in this file, mirroring the old Accordion component pattern.
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$borderRadius-Accordion: createThemeVar("borderRadius-Accordion");
+$border-Accordion: createThemeVar("border-Accordion");
+$padding-Accordion: createThemeVar("padding-Accordion");
+$paddingHorizontal-header-Accordion: createThemeVar("paddingHorizontal-header-Accordion");
+$paddingVertical-header-Accordion: createThemeVar("paddingVertical-header-Accordion");
+$verticalAlignment-header-Accordion: createThemeVar("verticalAlignment-header-Accordion");
+$fontSize-header-Accordion: createThemeVar("fontSize-header-Accordion");
+$fontWeight-header-Accordion: createThemeVar("fontWeight-header-Accordion");
+$fontFamily-header-Accordion: createThemeVar("fontFamily-header-Accordion");
+$fontStyle-header-Accordion: createThemeVar("fontStyle-header-Accordion");
+$backgroundColor-header-Accordion: createThemeVar("backgroundColor-header-Accordion");
+$backgroundColor-header-Accordion-hover: createThemeVar("backgroundColor-header-Accordion-hover");
+$color-header-Accordion: createThemeVar("color-header-Accordion");
+$color-content-Accordion: createThemeVar("color-content-Accordion");
+$backgroundColor-content-Accordion: createThemeVar("backgroundColor-content-Accordion");
+$color-icon-Accordion: createThemeVar("color-icon-Accordion");
+$padding-content-Accordion: createThemeVar("padding-content-Accordion");
+$width-icon-Accordion: createThemeVar("width-icon-Accordion");
+$height-icon-Accordion: createThemeVar("height-icon-Accordion");
+
+@layer components {
+  .root {
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+    border: var(--xmlui-border-Accordion);
+    padding: var(--xmlui-padding-Accordion);
+  }
+
+  .item {
+    overflow: hidden;
+    margin-top: 1px;
+    box-sizing: border-box;
+  }
+
+  .item:first-child {
+    margin-top: 0;
+    border-top-left-radius: var(--xmlui-borderRadius-Accordion);
+    border-top-right-radius: var(--xmlui-borderRadius-Accordion);
+  }
+
+  .item:last-child {
+    border-bottom-left-radius: var(--xmlui-borderRadius-Accordion);
+    border-bottom-right-radius: var(--xmlui-borderRadius-Accordion);
+  }
+
+  .header {
+    display: flex;
+    margin: 0;
+  }
+
+  .trigger {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--xmlui-fontFamily-header-Accordion);
+    flex: 1;
+    display: inline-flex;
+    align-items: var(--xmlui-verticalAlignment-header-Accordion);
+    justify-content: space-between;
+    line-height: 1;
+    box-sizing: border-box;
+    font-size: var(--xmlui-fontSize-header-Accordion);
+    font-weight: var(--xmlui-fontWeight-header-Accordion);
+    font-style: var(--xmlui-fontStyle-header-Accordion);
+    padding: var(--xmlui-paddingVertical-header-Accordion) var(--xmlui-paddingHorizontal-header-Accordion);
+    background-color: var(--xmlui-backgroundColor-header-Accordion);
+    color: var(--xmlui-color-header-Accordion);
+    width: 100%;
+    text-align: left;
+  }
+
+  .trigger:hover {
+    background-color: var(--xmlui-backgroundColor-header-Accordion-hover);
+  }
+
+  .triggerStart {
+    flex-direction: row-reverse;
+  }
+
+  .contentWrapper {
+    overflow: hidden;
+    color: var(--xmlui-color-content-Accordion);
+    background-color: var(--xmlui-backgroundColor-content-Accordion);
+  }
+
+  .contentWrapper[hidden] {
+    display: none;
+  }
+
+  .content {
+    padding: var(--xmlui-padding-content-Accordion);
+  }
+
+  .chevron {
+    display: inline-flex;
+    width: var(--xmlui-width-icon-Accordion);
+    height: var(--xmlui-height-icon-Accordion);
+    color: var(--xmlui-color-icon-Accordion);
+    transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  }
+}
+
+:export {
+  themeVars: "";
+}

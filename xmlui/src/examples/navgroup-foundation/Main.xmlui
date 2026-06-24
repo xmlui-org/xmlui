@@ -1,0 +1,14 @@
+<App var.message="{'Choose a page'}">
+  <H1>NavGroup foundation</H1>
+  <NavPanel width="280px">
+    <NavGroup label="Pages" initiallyExpanded="true">
+      <NavLink to="/" exact="true" onClick="message = 'Home selected'">Home</NavLink>
+      <NavLink to="/reports" onClick="message = 'Reports selected'">Reports</NavLink>
+    </NavGroup>
+    <NavGroup label="Disabled" enabled="false">
+      <NavLink to="/disabled">Disabled child</NavLink>
+    </NavGroup>
+  </NavPanel>
+  <Text>{message}</Text>
+  <Text>Current path: {$pathname}</Text>
+</App>

@@ -1,0 +1,37 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-ContextMenu: createThemeVar("backgroundColor-ContextMenu");
+$borderRadius-ContextMenu: createThemeVar("borderRadius-ContextMenu");
+$boxShadow-ContextMenu: createThemeVar("boxShadow-ContextMenu");
+$borderColor-ContextMenu-content: createThemeVar("borderColor-ContextMenu-content");
+$borderWidth-ContextMenu-content: createThemeVar("borderWidth-ContextMenu-content");
+$borderStyle-ContextMenu-content: createThemeVar("borderStyle-ContextMenu-content");
+$minWidth-ContextMenu: createThemeVar("minWidth-ContextMenu");
+
+.content {
+  position: fixed;
+  z-index: 9999;
+  min-width: $minWidth-ContextMenu;
+  padding: 4px;
+  border: $borderWidth-ContextMenu-content $borderStyle-ContextMenu-content $borderColor-ContextMenu-content;
+  border-radius: $borderRadius-ContextMenu;
+  background-color: $backgroundColor-ContextMenu;
+  box-shadow: $boxShadow-ContextMenu;
+}
+
+.content > [data-xmlui-component="MenuSeparator"]:first-child,
+.content > [data-xmlui-component="MenuSeparator"]:last-child {
+  display: none;
+}
+
+.content > [data-xmlui-component="MenuSeparator"]:has(+ [data-xmlui-component="MenuSeparator"]) {
+  display: none;
+}
+
+:export {
+  themeVars: "";
+}

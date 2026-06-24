@@ -1,0 +1,12 @@
+<App var.tone="light">
+  <Theme textColor-Text="rgb(10, 20, 30)">
+    <H1>Theme and slot foundation</H1>
+    <Text testId="themedText">Scoped text color</Text>
+  </Theme>
+  <ToneSwitch testId="toneSwitch" onDidChange="next => tone = next" />
+  <ToneChangerButton testId="toneButton" onClick="next => tone = next" />
+  <Text>Current tone: {tone}</Text>
+  <Slot>
+    <Text>Fallback slot content</Text>
+  </Slot>
+</App>

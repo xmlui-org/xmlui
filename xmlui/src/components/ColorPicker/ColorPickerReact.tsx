@@ -2,15 +2,7 @@ import type { ChangeEvent, CSSProperties, FocusEvent } from "react";
 import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 
 import { defaultProps } from "./ColorPicker.defaults";
-
-const styles = {
-  colorPickerError: "colorPickerError",
-  colorPickerInput: "colorPickerInput",
-  colorPickerLabel: "colorPickerLabel",
-  colorPickerLabeledItem: "colorPickerLabeledItem",
-  colorPickerSuccess: "colorPickerSuccess",
-  colorPickerWarning: "colorPickerWarning",
-} as const;
+import styles from "./ColorPicker.module.scss";
 
 export type ColorPickerApi = {
   focus: () => void;

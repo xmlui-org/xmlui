@@ -1,0 +1,66 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-NavPanel: createThemeVar("backgroundColor-NavPanel");
+$borderColor-NavPanel: createThemeVar("borderColor-NavPanel");
+$borderWidth-NavPanel: createThemeVar("borderWidth-NavPanel");
+$borderStyle-NavPanel: createThemeVar("borderStyle-NavPanel");
+$paddingVertical-NavPanel: createThemeVar("paddingVertical-NavPanel");
+$paddingHorizontal-NavPanel: createThemeVar("paddingHorizontal-NavPanel");
+$paddingVertical-logo-NavPanel: createThemeVar("paddingVertical-logo-NavPanel");
+$paddingHorizontal-logo-NavPanel: createThemeVar("paddingHorizontal-logo-NavPanel");
+$marginBottom-logo-NavPanel: createThemeVar("marginBottom-logo-NavPanel");
+$paddingVertical-footer-NavPanel: createThemeVar("paddingVertical-footer-NavPanel");
+$paddingHorizontal-footer-NavPanel: createThemeVar("paddingHorizontal-footer-NavPanel");
+$borderColor-footer-NavPanel: createThemeVar("borderColor-footer-NavPanel");
+$boxShadow-NavPanel: createThemeVar("boxShadow-NavPanel");
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: $paddingVertical-NavPanel $paddingHorizontal-NavPanel;
+  border: $borderWidth-NavPanel $borderStyle-NavPanel $borderColor-NavPanel;
+  background-color: $backgroundColor-NavPanel;
+  box-shadow: $boxShadow-NavPanel;
+}
+
+.collapsed {
+  width: var(--xmlui-width-navPanel-collapsed-App, 48px);
+}
+
+.content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+.logo {
+  display: flex;
+  flex-shrink: 0;
+  padding: $paddingVertical-logo-NavPanel $paddingHorizontal-logo-NavPanel;
+  margin-bottom: $marginBottom-logo-NavPanel;
+}
+
+.footer {
+  display: flex;
+  flex-shrink: 0;
+  padding: $paddingVertical-footer-NavPanel $paddingHorizontal-footer-NavPanel;
+  border-top: 1px solid $borderColor-footer-NavPanel;
+}
+
+.overlayScroll {
+  scrollbar-width: thin;
+}
+
+:export {
+  themeVars: "";
+}

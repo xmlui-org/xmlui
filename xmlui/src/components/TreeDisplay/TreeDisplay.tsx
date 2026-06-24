@@ -1,0 +1,59 @@
+import { createMetadata, dContextMenu } from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../runtime/rendering/adapter";
+import { extractScssThemeVars } from "../../styling/theme";
+import { defaultProps } from "./TreeDisplay.defaults";
+import { TreeDisplayNative } from "./TreeDisplayReact";
+
+const COMP = "TreeDisplay";
+
+const treeDisplayStylesSource = `
+$backgroundColor-TreeDisplay: createThemeVar("backgroundColor-TreeDisplay");
+$border-TreeDisplay: createThemeVar("border-TreeDisplay");
+$borderRadius-TreeDisplay: createThemeVar("borderRadius-TreeDisplay");
+$boxShadow-TreeDisplay: createThemeVar("boxShadow-TreeDisplay");
+$color-TreeDisplay: createThemeVar("color-TreeDisplay");
+$fontFamily-TreeDisplay: createThemeVar("fontFamily-TreeDisplay");
+$fontSize-TreeDisplay: createThemeVar("fontSize-TreeDisplay");
+$fontWeight-TreeDisplay: createThemeVar("fontWeight-TreeDisplay");
+$itemHeight-TreeDisplay: createThemeVar("itemHeight-TreeDisplay");
+$padding-TreeDisplay: createThemeVar("padding-TreeDisplay");
+$paddingLeft-TreeDisplay: createThemeVar("paddingLeft-TreeDisplay");
+`;
+
+export const TreeDisplayMd = createMetadata({
+  status: "experimental",
+  description: "`TreeDisplay` displays indented text as a tree structure.",
+  props: {
+    content: { description: "Indented text content.", valueType: "string", defaultValue: defaultProps.content },
+    itemHeight: { description: "Item height in pixels.", valueType: "number", defaultValue: defaultProps.itemHeight },
+  },
+  events: {
+    contextMenu: dContextMenu(COMP),
+  },
+  themeVars: extractScssThemeVars(treeDisplayStylesSource),
+  defaultThemeVars: {
+    "backgroundColor-TreeDisplay": "$backgroundColor-CodeBlock",
+    "border-TreeDisplay": "0.5px solid $borderColor",
+    "borderRadius-TreeDisplay": "8px",
+    "boxShadow-TreeDisplay": "none",
+    "color-TreeDisplay": "$textColor-primary",
+    "fontFamily-TreeDisplay": "$fontFamily-monospace",
+    "fontSize-TreeDisplay": "$fontSize-code",
+    "fontWeight-TreeDisplay": "$fontWeight-normal",
+    "itemHeight-TreeDisplay": `${defaultProps.itemHeight}px`,
+    "padding-TreeDisplay": "$space-4",
+    "paddingLeft-TreeDisplay": "$space-2",
+  },
+});
+
+export const treeDisplayRenderer = wrapComponent({
+  name: COMP,
+  metadata: TreeDisplayMd,
+  renderer: ({ adapter }) => (
+    <TreeDisplayNative
+      {...adapter.rootAttrs()}
+      content={adapter.stringProp("content", defaultProps.content)}
+      itemHeight={adapter.numberProp("itemHeight", defaultProps.itemHeight)}
+    />
+  ),
+});

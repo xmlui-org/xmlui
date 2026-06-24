@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 
 import {
   collectComponentThemeDefaults,
@@ -10,6 +10,7 @@ import {
 } from "../../styling/theme";
 import type { XmluiAdapterRendererProps } from "../../runtime/rendering/adapter";
 import { useThemeVariables } from "../../runtime/rendering/theme";
+import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
 import { AppMd } from "./App";
 import { defaultProps } from "./App.defaults";
 
@@ -33,35 +34,76 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const rootAttrs = adapter.rootAttrs();
   const testId = adapter.stringProp("testId");
   const fitContent = adapter.booleanProp("fitContent", defaultProps.fitContent);
+  const loggedInUser = adapter.prop("loggedInUser", null);
   const appProps = adapter.props;
+  const readyFiredRef = useRef(false);
+
+  useEffect(() => {
+    if (readyFiredRef.current) {
+      return;
+    }
+    readyFiredRef.current = true;
+    void adapter.event("ready")();
+  }, [adapter]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      void adapter.event("messageReceived")(event.data, event);
+    };
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [adapter]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      void adapter.event("keyDown")(event);
+    };
+    const handleKeyUp = (event: KeyboardEvent) => {
+      void adapter.event("keyUp")(event);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [adapter]);
 
   return (
-    <div
-      {...rootAttrs}
-      data-testid={testId}
-      data-xmlui-app-fit-content={fitContent ? "true" : undefined}
-      style={{
-        ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
-        ...appBaselineStyle(mergedThemeVariables),
-        ...appContainerStyle(fitContent),
-        ...adapter.style,
-      }}
-    >
-      <main
-        data-xmlui-component="App"
-        data-xmlui-part="content"
-        style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
+    <ProfileMenuProvider loggedInUser={normalizeLoggedInUser(loggedInUser)}>
+      <div
+        {...rootAttrs}
+        data-testid={testId}
+        data-xmlui-app-fit-content={fitContent ? "true" : undefined}
+        style={{
+          ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
+          ...appBaselineStyle(mergedThemeVariables),
+          ...appContainerStyle(fitContent),
+          ...adapter.style,
+        }}
       >
-        <div
+        <main
           data-xmlui-component="App"
-          data-xmlui-part="pageContent"
-          style={pageContentStyle(mergedThemeVariables, appProps)}
+          data-xmlui-part="content"
+          style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
         >
-          {adapter.renderChildren()}
-        </div>
-      </main>
-    </div>
+          <div
+            data-xmlui-component="App"
+            data-xmlui-part="pageContent"
+            style={pageContentStyle(mergedThemeVariables, appProps)}
+          >
+            {adapter.renderChildren()}
+          </div>
+        </main>
+      </div>
+    </ProfileMenuProvider>
   );
+}
+
+function normalizeLoggedInUser(value: unknown) {
+  return value && typeof value === "object" ? value as Record<string, string> : null;
 }
 
 function appContainerStyle(fitContent: boolean): CSSProperties {

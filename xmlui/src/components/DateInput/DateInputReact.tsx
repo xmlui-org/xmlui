@@ -1,53 +1,9 @@
 import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
+import { dateFormats, type DateFormat, DateInputModeValues, type DateInputMode, WeekDays } from "./DateInput.constants";
 import { defaultProps } from "./DateInput.defaults";
-
-const styles = {
-  adornment: "adornment",
-  clearButton: "clearButton",
-  conciseValidationFeedback: "conciseValidationFeedback",
-  dateInputWrapper: "dateInputWrapper",
-  day: "day",
-  disabled: "disabled",
-  divider: "divider",
-  error: "error",
-  input: "input",
-  inputGroup: "inputGroup",
-  invalid: "invalid",
-  month: "month",
-  readOnly: "readOnly",
-  selectAllActive: "selectAllActive",
-  valid: "valid",
-  warning: "warning",
-  wrapper: "wrapper",
-  year: "year",
-} as const;
-
-export const dateFormats = [
-  "MM/dd/yyyy",
-  "MM-dd-yyyy",
-  "yyyy/MM/dd",
-  "yyyy-MM-dd",
-  "dd/MM/yyyy",
-  "dd-MM-yyyy",
-  "yyyyMMdd",
-  "MMddyyyy",
-] as const;
-
-export type DateFormat = (typeof dateFormats)[number];
-export const DateInputModeValues = ["single", "range"] as const;
-export type DateInputMode = (typeof DateInputModeValues)[number];
-
-export const enum WeekDays {
-  Sunday = 0,
-  Monday = 1,
-  Tuesday = 2,
-  Wednesday = 3,
-  Thursday = 4,
-  Friday = 5,
-  Saturday = 6,
-}
+import styles from "./DateInput.module.scss";
 
 export type DateInputApi = {
   focus: () => void;
@@ -329,9 +285,9 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
       data-testid={hasLabel ? undefined : dataTestId}
       className={cx(
         styles.dateInputWrapper,
-        validationStatus === "error" ? styles.error : undefined,
-        validationStatus === "warning" ? styles.warning : undefined,
-        validationStatus === "valid" ? styles.valid : undefined,
+        validationStatus === "error" ? styles.dateInputError : undefined,
+        validationStatus === "warning" ? styles.dateInputWarning : undefined,
+        validationStatus === "valid" ? styles.dateInputValid : undefined,
         !enabled ? styles.disabled : undefined,
         readOnly ? styles.readOnly : undefined,
         className,
@@ -355,7 +311,7 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
                 aria-label={field}
                 autoComplete="off"
                 autoFocus={autoFocus && index === 0}
-                className={cx(styles.input, styles[field], invalidFields[field] ? styles.invalid : undefined)}
+                className={cx(styles.input, styles[field], invalidFields[field] ? cx(styles.invalid, "invalid") : undefined)}
                 disabled={!enabled}
                 inputMode="numeric"
                 maxLength={field === "year" ? 4 : 2}

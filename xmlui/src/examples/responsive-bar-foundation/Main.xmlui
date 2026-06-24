@@ -1,0 +1,15 @@
+<App var.count="{0}" var.vertical="{false}">
+  <H1>ResponsiveBar foundation</H1>
+  <Button testId="toggle" onClick="vertical = !vertical">
+    Orientation: {vertical ? 'vertical' : 'horizontal'}
+  </Button>
+  <ResponsiveBar
+    testId="bar"
+    orientation="{vertical ? 'vertical' : 'horizontal'}"
+    gap="{8}"
+    height="{vertical ? '180px' : 'auto'}">
+    <Button testId="one" onClick="count++">One: {count}</Button>
+    <Button testId="two">Two</Button>
+    <Button testId="three">Three</Button>
+  </ResponsiveBar>
+</App>

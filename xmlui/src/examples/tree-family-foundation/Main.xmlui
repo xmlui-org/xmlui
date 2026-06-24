@@ -1,0 +1,20 @@
+<App var.selected="{'none'}">
+  <H1>Tree family foundation</H1>
+  <Text>Selected tree item: {selected}</Text>
+  <Tree
+    testId="tree"
+    defaultExpanded="all"
+    onSelectionDidChange="item => selected = item.name"
+    data="{[
+      { id: 'root', name: 'Root' },
+      { id: 'child-a', parentId: 'root', name: 'Child A' },
+      { id: 'child-b', parentId: 'root', name: 'Child B' }
+    ]}" />
+  <TreeDisplay
+    testId="display"
+    content="Root
+  Child A
+  Child B" />
+  <TableOfContents testId="toc" maxHeadingLevel="2" />
+  <H2 id="tree-section">Tree Section</H2>
+</App>

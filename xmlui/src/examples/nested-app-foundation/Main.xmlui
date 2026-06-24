@@ -1,0 +1,9 @@
+<App var.outerCount="{10}">
+  <H1>NestedApp foundation</H1>
+  <Text testId="outer-count">Outer count: {outerCount}</Text>
+  <Button testId="outer-button" onClick="outerCount++">Increment outer</Button>
+  <NestedApp
+    testId="nested"
+    height="220px"
+    app="{'&lt;App var.count=&quot;{0}&quot;&gt;&lt;H1&gt;Nested counter&lt;/H1&gt;&lt;Text testId=&quot;nested-count&quot;&gt;Nested count: {count}&lt;/Text&gt;&lt;Button testId=&quot;nested-button&quot; onClick=&quot;count++&quot;&gt;Increment nested&lt;/Button&gt;&lt;/App&gt;'}" />
+</App>

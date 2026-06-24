@@ -1,0 +1,7 @@
+<App loggedInUser="{{ name: 'Joe User', email: 'joe@example.com' }}">
+  <AppHeader title="Profile menu foundation">
+    <NavLink to="/" exact="true">Home</NavLink>
+  </AppHeader>
+  <H1>ProfileMenu foundation</H1>
+  <Text>Open the profile trigger in the header.</Text>
+</App>

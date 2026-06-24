@@ -1,6 +1,6 @@
 // QRCode.tsx extracts available theme variables from createThemeVar
 // declarations in this file, mirroring the old component metadata pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -11,7 +11,7 @@ $padding-QRCode: createThemeVar("padding-QRCode");
 $size-QRCode: createThemeVar("size-QRCode");
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }
 
 @layer components {

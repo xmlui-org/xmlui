@@ -1,0 +1,21 @@
+<App var.count="{0}">
+  <H1>Splitter foundation</H1>
+  <Splitter height="240px" width="640px" orientation="horizontal" initialPrimarySize="42%">
+    <VStack backgroundColor="$color-primary-100" padding="$space-4" gap="$space-3">
+      <Text>Primary pane</Text>
+      <Button onClick="count++">Increment from pane</Button>
+    </VStack>
+    <VStack backgroundColor="$color-surface-100" padding="$space-4" gap="$space-3">
+      <Text>Secondary pane</Text>
+      <Text>Count: {count}</Text>
+    </VStack>
+  </Splitter>
+  <HSplitter height="120px" width="640px">
+    <Text>HSplitter primary</Text>
+    <Text>HSplitter secondary</Text>
+  </HSplitter>
+  <VSplitter height="160px" width="640px">
+    <Text>VSplitter primary</Text>
+    <Text>VSplitter secondary</Text>
+  </VSplitter>
+</App>

@@ -1,0 +1,29 @@
+<App
+  var.delayed="{false}"
+  var.progress="{0.25}"
+  var.avatarName="Ada Lovelace"
+  var.badgeStatus="ready"
+  var.badgeColors="{{ ready: { label: 'white', background: 'rgb(0, 128, 0)' }, blocked: { label: 'white', background: 'rgb(255, 0, 0)' } }}">
+  <H1>Missing visual components foundation</H1>
+  <Text>Spinner mode: {delayed ? 'delayed' : 'instant'}</Text>
+  <Button onClick="delayed = !delayed">
+    Toggle spinner delay
+  </Button>
+  <Spinner
+    testId="foundation-spinner"
+    delay="{delayed ? 500 : 0}"
+    width="{delayed ? '48px' : '32px'}"
+    height="{delayed ? '48px' : '32px'}" />
+  <Text>Progress: {progress * 100}%</Text>
+  <ProgressBar testId="foundation-progress" value="{progress}" />
+  <Button onClick="progress = progress >= 1 ? 0 : progress + 0.25">
+    Advance progress
+  </Button>
+  <Avatar testId="foundation-avatar" name="{avatarName}" size="md" onClick="avatarName = avatarName == 'Ada Lovelace' ? 'Grace Hopper' : 'Ada Lovelace'" />
+  <Text>Avatar name: {avatarName}</Text>
+  <Badge testId="foundation-badge" value="{badgeStatus}" colorMap="{badgeColors}" onContextMenu="badgeStatus = badgeStatus == 'ready' ? 'blocked' : 'ready'" />
+  <Button onClick="badgeStatus = badgeStatus == 'ready' ? 'blocked' : 'ready'">
+    Toggle badge status
+  </Button>
+  <Text>The visual components above are migrated from the original component surface.</Text>
+</App>

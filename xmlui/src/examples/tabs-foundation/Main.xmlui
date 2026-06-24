@@ -1,0 +1,18 @@
+<App var.count="{0}" var.active="{0}">
+  <H1>Tabs foundation</H1>
+  <Tabs onDidChange="index => active = index">
+    <TabItem label="Counter">
+      <property name="headerTemplate">
+        <Text>Counter ({count})</Text>
+      </property>
+      <VStack gap="$space-3">
+        <Text>Active tab: {active}</Text>
+        <Button onClick="count++">Increment</Button>
+        <Text>Count: {count}</Text>
+      </VStack>
+    </TabItem>
+    <TabItem label="Details">
+      <Text>This panel proves normal tab switching.</Text>
+    </TabItem>
+  </Tabs>
+</App>

@@ -1,6 +1,6 @@
 // Icon.tsx extracts available theme variables from createThemeVar declarations
 // in this file, mirroring the old Icon component pattern.
-$themeVars: ();
+$themeVars: "";
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -34,5 +34,5 @@ $size-Icon: createThemeVar("size-Icon");
 }
 
 :export {
-  themeVars: ();
+  themeVars: "";
 }

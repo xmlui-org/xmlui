@@ -297,7 +297,6 @@ describe("built-in renderer registry", () => {
       "H1",
       "HStack",
       "Icon",
-      "Items",
       "NavLink",
       "NavPanel",
       "Option",

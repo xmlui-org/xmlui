@@ -1,0 +1,22 @@
+<App var.count="{0}">
+  <H1>ScrollViewer foundation</H1>
+  <Button testId="increment" onClick="count++">Increment: {count}</Button>
+  <ScrollViewer testId="viewer" height="220px" width="360px" border="1px solid $color-border" padding="$space-3">
+    <property name="headerTemplate">
+      <Text testId="header">Sticky header, count: {count}</Text>
+    </property>
+    <VStack gap="$space-3">
+      <Text>Scrollable row 1</Text>
+      <Text>Scrollable row 2</Text>
+      <Text>Scrollable row 3</Text>
+      <Text>Scrollable row 4</Text>
+      <Text>Scrollable row 5</Text>
+      <Text>Scrollable row 6</Text>
+      <Text>Scrollable row 7</Text>
+      <Text>Scrollable row 8</Text>
+    </VStack>
+    <property name="footerTemplate">
+      <Text testId="footer">Footer remains outside the scrollable body</Text>
+    </property>
+  </ScrollViewer>
+</App>

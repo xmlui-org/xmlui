@@ -43,7 +43,11 @@ export class ComponentDriver {
 
 export class InputComponentDriver extends ComponentDriver {
   get field(): Locator {
-    return this.getByPartName("input");
+    return this.component
+      .locator(
+        "xpath=self::*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea] | .//*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea]",
+      )
+      .first();
   }
 
   get label(): Locator {
@@ -58,6 +62,36 @@ export class InputComponentDriver extends ComponentDriver {
     return this.field.getAttribute("placeholder");
   }
 }
+
+export class FormDriver extends ComponentDriver {
+  get submitButton(): Locator {
+    return this.component.getByRole("button", { name: "Save" });
+  }
+
+  get cancelButton(): Locator {
+    return this.component.getByRole("button", { name: "Cancel" });
+  }
+}
+
+export class FormItemDriver extends ComponentDriver {
+  get input(): Locator {
+    return this.getByPartName("input");
+  }
+
+  get textBox(): Locator {
+    return this.input;
+  }
+
+  get label(): Locator {
+    return this.getByPartName("label");
+  }
+
+  get error(): Locator {
+    return this.getByPartName("error");
+  }
+}
+
+export class FormSegmentDriver extends ComponentDriver {}
 
 export class IconDriver extends ComponentDriver {
   get svgIcon() {
@@ -112,7 +146,218 @@ export class CodeBlockDriver extends ComponentDriver {
 
 export class NoResultDriver extends ComponentDriver {}
 
+export class ResponsiveBarDriver extends ComponentDriver {
+  getMenuItems(): Locator {
+    return this.params.page.locator('[role="menuitem"], [data-xmlui-component="MenuItem"]');
+  }
+}
+
+export class ProgressBarDriver extends ComponentDriver {
+  get bar(): Locator {
+    return this.component.locator("> div");
+  }
+
+  async getProgressRatio(): Promise<number> {
+    const style = await this.bar.getAttribute("style");
+    if (!style) {
+      return 0;
+    }
+    const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
+    return widthMatch ? Number.parseFloat(widthMatch[1]) / 100 : 0;
+  }
+}
+
+export class AccordionDriver extends ComponentDriver {}
+
+export class AppHeaderDriver extends ComponentDriver {
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  getLogo(): Locator {
+    return this.getByPartName("logo");
+  }
+
+  getProfileMenu(): Locator {
+    return this.getByPartName("profileMenu");
+  }
+}
+
+export class AvatarDriver extends ComponentDriver {}
+
+export class BadgeDriver extends ComponentDriver {}
+
+export class FooterDriver extends ComponentDriver {
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+}
+
+export class ModalDialogDriver extends ComponentDriver {
+  get titlePart(): Locator {
+    return this.getByPartName("title");
+  }
+}
+
+export class ContextMenuDriver extends ComponentDriver {
+  getMenuItems(): Locator {
+    return this.params.page.getByRole("menuitem");
+  }
+
+  getMenuItem(text: string): Locator {
+    return this.params.page.getByRole("menuitem", { name: text });
+  }
+
+  async clickMenuItem(text: string): Promise<void> {
+    await this.getMenuItem(text).click();
+  }
+}
+
+export class DropdownMenuDriver extends ComponentDriver {
+  getTrigger(): Locator {
+    return this.params.page.getByRole("button").first();
+  }
+
+  async open(): Promise<void> {
+    await this.getTrigger().click();
+  }
+
+  async close(): Promise<void> {
+    await this.params.page.keyboard.press("Escape");
+  }
+
+  getMenuItems(): Locator {
+    return this.params.page.getByRole("menuitem");
+  }
+
+  getMenuItem(text: string): Locator {
+    return this.params.page.getByRole("menuitem", { name: text });
+  }
+
+  async clickMenuItem(text: string): Promise<void> {
+    await this.getMenuItem(text).click();
+  }
+
+  async isOpen(): Promise<boolean> {
+    return this.getMenuItems().first().isVisible();
+  }
+}
+
+export class ExpandableItemDriver extends ComponentDriver {
+  getSummary(): Locator {
+    return this.getByPartName("summary");
+  }
+
+  getSummaryContent(): Locator {
+    return this.component.locator(".summaryContent").first();
+  }
+
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  getIcon(): Locator {
+    return this.component.locator(".icon svg, .icon").first();
+  }
+
+  getSwitch(): Locator {
+    return this.component.getByRole("switch").or(this.component.locator(".switchControl")).first();
+  }
+
+  async isExpanded(): Promise<boolean> {
+    return this.getContent().isVisible();
+  }
+
+  async isDisabled(): Promise<boolean> {
+    return this.component.evaluate((element) => String(element.className).includes("disabled"));
+  }
+
+  async expand() {
+    if (!(await this.isExpanded())) {
+      await this.getSummary().click();
+    }
+  }
+
+  async collapse() {
+    if (await this.isExpanded()) {
+      await this.getSummary().click();
+    }
+  }
+
+  async toggle() {
+    await this.getSummary().click();
+  }
+}
+
+export class SplitterDriver extends ComponentDriver {
+  getResizer(): Locator {
+    return this.component.locator('[data-xmlui-part="resizer"], .resizer').first();
+  }
+
+  getFloatingResizer(): Locator {
+    return this.component.locator(".floatingResizer").first();
+  }
+
+  async hoverNearResizer() {
+    const bounds = await this.component.boundingBox();
+    if (!bounds) {
+      return;
+    }
+    await this.params.page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  }
+
+  async dragResizer(deltaX: number, deltaY: number) {
+    const resizer = this.getResizer();
+    const bounds = await resizer.boundingBox();
+    if (!bounds) {
+      return;
+    }
+    const startX = bounds.x + bounds.width / 2;
+    const startY = bounds.y + bounds.height / 2;
+    await this.params.page.mouse.move(startX, startY);
+    await this.params.page.mouse.down();
+    await this.params.page.mouse.move(startX + deltaX, startY + deltaY);
+    await this.params.page.mouse.up();
+  }
+}
+
 export class LinkDriver extends ComponentDriver {}
+
+export class NavGroupDriver extends ComponentDriver {
+  getTrigger(): Locator {
+    return this.component.getByRole("button").first();
+  }
+
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  async toggle(): Promise<void> {
+    await this.getTrigger().click();
+  }
+
+  async isExpanded(): Promise<boolean> {
+    return (await this.getTrigger().getAttribute("aria-expanded")) === "true";
+  }
+}
+
+export class NavLinkDriver extends ComponentDriver {}
+
+export class NavPanelCollapseButtonDriver extends ComponentDriver {}
+
+export class NavPanelDriver extends ComponentDriver {
+  getContent(): Locator {
+    return this.getByPartName("content");
+  }
+
+  getLogo(): Locator {
+    return this.getByPartName("logo");
+  }
+
+  getFooter(): Locator {
+    return this.getByPartName("footer");
+  }
+}
 
 export class TextBoxDriver extends InputComponentDriver {
   get input(): Locator {
@@ -135,6 +380,128 @@ export class TextBoxDriver extends InputComponentDriver {
 export class TextAreaDriver extends InputComponentDriver {
   get textarea(): Locator {
     return this.component.locator("textarea").first();
+  }
+}
+
+export class FileUploadDropZoneDriver extends ComponentDriver {
+  get input(): Locator {
+    return this.component.locator('input[type="file"]').first();
+  }
+
+  getHiddenInput(): Locator {
+    return this.input;
+  }
+
+  get dropPlaceholder(): Locator {
+    return this.getByPartName("dropPlaceholder");
+  }
+
+  getDropPlaceholder(): Locator {
+    return this.dropPlaceholder;
+  }
+
+  getDropIcon(): Locator {
+    return this.component.locator("[data-icon]").first();
+  }
+
+  async isEnabled(): Promise<boolean> {
+    return (await this.component.getAttribute("data-drop-enabled")) === "true";
+  }
+
+  async hasChildren(): Promise<boolean> {
+    const placeholderCount = await this.dropPlaceholder.count();
+    const text = (await this.component.textContent())?.trim() ?? "";
+    return placeholderCount === 0 && text.length > 0;
+  }
+
+  async triggerDragEnter(): Promise<void> {
+    await this.component.evaluate((element) => {
+      const transfer = new DataTransfer();
+      element.dispatchEvent(new DragEvent("dragenter", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: transfer,
+      }));
+    });
+  }
+
+  async triggerDragLeave(): Promise<void> {
+    await this.component.evaluate((element) => {
+      const transfer = new DataTransfer();
+      element.dispatchEvent(new DragEvent("dragleave", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: transfer,
+      }));
+    });
+  }
+
+  async triggerDrop(fileNames: string[]): Promise<void> {
+    await this.component.evaluate((element, names) => {
+      const transfer = new DataTransfer();
+      names.forEach((name) => {
+        transfer.items.add(new File(["test-file"], name, {
+          type: testFileTypeInBrowser(name),
+        }));
+      });
+      element.dispatchEvent(new DragEvent("drop", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: transfer,
+      }));
+      function testFileTypeInBrowser(name: string): string {
+        const lowerName = name.toLowerCase();
+        if (lowerName.endsWith(".pdf")) {
+          return "application/pdf";
+        }
+        if (lowerName.endsWith(".png")) {
+          return "image/png";
+        }
+        if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
+          return "image/jpeg";
+        }
+        if (lowerName.endsWith(".json")) {
+          return "application/json";
+        }
+        return "text/plain";
+      }
+    }, fileNames);
+  }
+
+  async triggerPaste(fileNames: string[], target?: Locator): Promise<void> {
+    const pasteTarget = target ?? this.component;
+    await pasteTarget.evaluate((element, names) => {
+      const transfer = new DataTransfer();
+      names.forEach((name) => {
+        transfer.items.add(new File(["test-file"], name, {
+          type: testFileTypeInBrowser(name),
+        }));
+      });
+      const event = new Event("paste", {
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(event, "clipboardData", {
+        value: transfer,
+      });
+      element.dispatchEvent(event);
+      function testFileTypeInBrowser(name: string): string {
+        const lowerName = name.toLowerCase();
+        if (lowerName.endsWith(".pdf")) {
+          return "application/pdf";
+        }
+        if (lowerName.endsWith(".png")) {
+          return "image/png";
+        }
+        if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
+          return "image/jpeg";
+        }
+        if (lowerName.endsWith(".json")) {
+          return "application/json";
+        }
+        return "text/plain";
+      }
+    }, fileNames);
   }
 }
 
@@ -217,6 +584,136 @@ export class CheckboxDriver extends InputComponentDriver {
     return this.input.evaluate((element) =>
       window.getComputedStyle(element, "::before").color,
     );
+  }
+}
+
+export class SelectDriver extends ComponentDriver {
+  get clearButton(): Locator {
+    return this.component.locator('[data-part-id="clearButton"], [data-xmlui-part="clearButton"]').first();
+  }
+
+  get select(): Locator {
+    return this.component.locator("select").or(this.component).first();
+  }
+
+  async selectOption(value: string): Promise<void> {
+    const nativeSelect = this.component.locator("select").first();
+    if (await nativeSelect.count()) {
+      await nativeSelect.selectOption(value);
+      return;
+    }
+    await this.component
+      .getByRole("option", { name: value })
+      .or(this.params.page.getByRole("option", { name: value }))
+      .first()
+      .click({ force: true });
+  }
+
+  async value(): Promise<string | string[]> {
+    const nativeSelect = this.component.locator("select").first();
+    if (!(await nativeSelect.count())) {
+      const value = await this.component.getAttribute("data-value");
+      return value ?? "";
+    }
+    return nativeSelect.evaluate((element) => {
+      const select = element as HTMLSelectElement;
+      if (select.multiple) {
+        return Array.from(select.selectedOptions).map((option) => option.value);
+      }
+      return select.value;
+    });
+  }
+
+  async toggleOptionsVisibility(): Promise<void> {
+    await this.component.click();
+  }
+
+  async selectLabel(value: string): Promise<void> {
+    await this.component
+      .getByRole("option", { name: value })
+      .or(this.params.page.getByRole("option", { name: value }))
+      .first()
+      .click({ force: true });
+  }
+
+  async searchFor(value: string): Promise<void> {
+    await this.params.page.getByRole("searchbox").fill(value);
+  }
+
+  async chooseIndex(index: number): Promise<void> {
+    await this.component
+      .getByRole("option")
+      .nth(index)
+      .or(this.params.page.getByRole("option").nth(index))
+      .first()
+      .click();
+  }
+
+  async selectFirstLabelPostSearh(label: string): Promise<void> {
+    await this.searchFor(label);
+    await this.chooseIndex(0);
+  }
+
+  async selectMultipleLabels(values: string[]): Promise<void> {
+    for (const value of values) {
+      await this.selectLabel(value);
+    }
+  }
+}
+
+export class AutoCompleteDriver extends ComponentDriver {
+  get input(): Locator {
+    return this.component.getByRole("combobox").or(this.component.locator("input")).first();
+  }
+
+  click = async (): Promise<void> => {
+    await this.input.click();
+  };
+
+  async selectLabel(value: string): Promise<void> {
+    await this.params.page.getByRole("option", { name: value }).first().click({ force: true });
+  }
+
+  async searchFor(value: string): Promise<void> {
+    await this.input.fill(value);
+  }
+
+  async chooseIndex(index: number): Promise<void> {
+    await this.params.page.getByRole("option").nth(index).click();
+  }
+}
+
+export class ListDriver extends ComponentDriver {
+  get rows(): Locator {
+    return this.component.locator("[data-list-index]");
+  }
+
+  get rowCheckboxes(): Locator {
+    return this.component.locator('input[type="checkbox"]');
+  }
+}
+
+export class TreeDriver extends ComponentDriver {
+  get items(): Locator {
+    return this.component.getByRole("treeitem");
+  }
+
+  get expandButtons(): Locator {
+    return this.component.getByRole("button", { name: /Expand|Collapse/ });
+  }
+
+  async expandItem(label: string): Promise<void> {
+    const item = this.component.getByRole("treeitem", { name: new RegExp(label) }).first();
+    await item.getByRole("button", { name: "Expand" }).click();
+  }
+
+  async collapseItem(label: string): Promise<void> {
+    const item = this.component.getByRole("treeitem", { name: new RegExp(label) }).first();
+    await item.getByRole("button", { name: "Collapse" }).click();
+  }
+
+  async selectItem(label: string): Promise<void> {
+    await this.component.getByRole("treeitem", { name: new RegExp(label) }).first().click();
   }
 }
 

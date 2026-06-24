@@ -1,0 +1,68 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-Footer: createThemeVar("backgroundColor-Footer");
+$textColor-Footer: createThemeVar("textColor-Footer");
+$height-Footer: createThemeVar("height-Footer");
+$fontSize-Footer: createThemeVar("fontSize-Footer");
+$verticalAlignment-Footer: createThemeVar("verticalAlignment-Footer");
+$maxWidth-content-Footer: createThemeVar("maxWidth-content-Footer");
+$gap-Footer: createThemeVar("gap-Footer");
+$maxWidth-App: createThemeVar("maxWidth-App");
+$margin-Footer: createThemeVar("margin-Footer");
+$padding-Footer: createThemeVar("padding-Footer");
+$paddingHorizontal-Footer: createThemeVar("paddingHorizontal-Footer");
+$paddingVertical-Footer: createThemeVar("paddingVertical-Footer");
+$paddingTop-Footer: createThemeVar("paddingTop-Footer");
+$paddingRight-Footer: createThemeVar("paddingRight-Footer");
+$paddingBottom-Footer: createThemeVar("paddingBottom-Footer");
+$paddingLeft-Footer: createThemeVar("paddingLeft-Footer");
+$border-Footer: createThemeVar("border-Footer");
+$borderTop-Footer: createThemeVar("borderTop-Footer");
+$borderRight-Footer: createThemeVar("borderRight-Footer");
+$borderBottom-Footer: createThemeVar("borderBottom-Footer");
+$borderLeft-Footer: createThemeVar("borderLeft-Footer");
+$borderRadius-Footer: createThemeVar("borderRadius-Footer");
+
+.outerWrapper {
+  background-color: $backgroundColor-Footer;
+  color: $textColor-Footer;
+  height: $height-Footer;
+  border: $border-Footer;
+  border-top: $borderTop-Footer;
+  border-right: $borderRight-Footer;
+  border-bottom: $borderBottom-Footer;
+  border-left: $borderLeft-Footer;
+  border-radius: $borderRadius-Footer;
+}
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: row;
+  gap: $gap-Footer;
+  padding: $padding-Footer;
+  padding-inline: $paddingHorizontal-Footer;
+  padding-block: $paddingVertical-Footer;
+  padding-top: $paddingTop-Footer;
+  padding-right: $paddingRight-Footer;
+  padding-bottom: $paddingBottom-Footer;
+  padding-left: $paddingLeft-Footer;
+  font-size: $fontSize-Footer;
+  align-items: $verticalAlignment-Footer;
+  max-width: $maxWidth-content-Footer;
+  margin: $margin-Footer;
+}
+
+.full {
+  max-width: $maxWidth-App;
+}
+
+:export {
+  themeVars: "";
+}

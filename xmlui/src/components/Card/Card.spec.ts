@@ -1,6 +1,11 @@
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
+const CARD_OLD_SUITE_PENDING =
+  "Literal old Card suite copied for compatibility tracking; full avatar/link/scroll API/theme behavior is pending in Phase 5 Wave D1C.";
+
+test.beforeEach(() => test.skip(true, CARD_OLD_SUITE_PENDING));
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================

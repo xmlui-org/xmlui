@@ -1,0 +1,22 @@
+<App var.changeLog="" var.lifecycleLog="">
+  <AppState id="sharedState" initialValue="{{ count: 0, selected: [] }}" />
+  <Lifecycle
+    keyValue="{sharedState.value.count}"
+    onMount="lifecycleLog = (lifecycleLog || '') + 'M' + sharedState.value.count"
+    onUnmount="lifecycleLog = (lifecycleLog || '') + 'U' + sharedState.value.count" />
+  <ChangeListener
+    listenTo="{sharedState.value.count}"
+    onDidChange="chg => changeLog = chg.prevValue + '>' + chg.newValue" />
+
+  <H1>App state and listeners</H1>
+  <Text>Count: {sharedState.value.count}</Text>
+  <Text>Change: {changeLog || 'none'}</Text>
+  <Text>Lifecycle: {lifecycleLog || 'none'}</Text>
+  <Text>Selected: {sharedState.value.selected.join(', ') || 'none'}</Text>
+  <Button onClick="sharedState.update({ count: sharedState.value.count + 1 })">
+    Increment shared state
+  </Button>
+  <Button onClick="sharedState.appendToList('selected', sharedState.value.count)">
+    Remember count
+  </Button>
+</App>

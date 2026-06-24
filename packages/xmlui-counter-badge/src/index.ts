@@ -1,5 +1,23 @@
 import React from "react";
-import type { Extension } from "xmlui";
+
+type Extension = {
+  namespace?: string;
+  themeNamespacePrefix?: string;
+  functions?: Record<string, (...args: any[]) => any>;
+  themes?: Array<{
+    id: string;
+    name?: string;
+    variables?: Record<string, string>;
+  }>;
+  components?: Array<{
+    name: string;
+    description?: string;
+    props?: string[];
+    events?: string[];
+    allowsChildren?: boolean;
+    component: (props: any) => React.ReactNode;
+  }>;
+};
 
 export const counterBadgeExtension: Extension = {
   namespace: "XMLUIExtensions",

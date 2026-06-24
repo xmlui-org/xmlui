@@ -1,0 +1,23 @@
+@layer components {
+  .nestedAppContainer {
+    width: 100%;
+    height: fit-content;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .nestedAppContent {
+    width: 100%;
+    min-height: 0;
+  }
+
+  .error {
+    padding: 12px;
+    border: 1px solid var(--xmlui-color-danger-500, #c62828);
+    color: var(--xmlui-color-danger-700, #8e0000);
+    background: var(--xmlui-color-danger-50, #fff5f5);
+    white-space: pre-wrap;
+  }
+}

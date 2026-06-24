@@ -1,0 +1,19 @@
+<App var.count="{0}" var.state="{'closed'}">
+  <H1>Drawer foundation</H1>
+  <Button onClick="drawer.open()">Open drawer</Button>
+  <Text>Drawer state: {state}</Text>
+  <Drawer
+    id="drawer"
+    position="right"
+    onOpen="state = 'open'"
+    onClose="state = 'closed'">
+    <property name="headerTemplate">
+      <Text>Drawer header</Text>
+    </property>
+    <VStack gap="$space-3">
+      <Text>Count: {count}</Text>
+      <Button onClick="count++">Increment</Button>
+      <Button onClick="drawer.close()">Close drawer</Button>
+    </VStack>
+  </Drawer>
+</App>

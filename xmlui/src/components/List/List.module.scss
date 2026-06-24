@@ -1,0 +1,71 @@
+$themeVars: "";
+
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-List: createThemeVar("backgroundColor-List");
+$backgroundColor-selected-List: createThemeVar("backgroundColor-selected-List");
+$backgroundColor-selected-List--hover: createThemeVar("backgroundColor-selected-List--hover");
+$backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-List--hover");
+
+:export {
+  themeVars: "";
+}
+
+@layer components {
+  .outerListWrapper {
+    overflow: auto;
+    overflow-anchor: none;
+    background-color: var(--xmlui-backgroundColor-List);
+  }
+
+  .innerListWrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .loadingWrapper,
+  .noRows {
+    width: 100%;
+    padding: var(--xmlui-padding-empty-List, var(--xmlui-space-4));
+    text-align: center;
+  }
+
+  .listRow {
+    box-sizing: border-box;
+  }
+
+  .listRow.listRowSelectable {
+    cursor: pointer;
+  }
+
+  .listRow.listRowSelectable:hover {
+    background-color: var(--xmlui-backgroundColor-row-List--hover);
+  }
+
+  .listRow.listRowSelected {
+    background-color: var(--xmlui-backgroundColor-selected-List);
+  }
+
+  .listRow.listRowSelected:hover {
+    background-color: var(--xmlui-backgroundColor-selected-List--hover);
+  }
+
+  .listRow.listRowHasCheckboxes {
+    display: flex;
+    align-items: center;
+    gap: var(--xmlui-gap-selectionCheckbox-List, var(--xmlui-space-2));
+  }
+
+  .listCheckboxWrapper {
+    flex: 0 0 auto;
+  }
+
+  .listGroupHeader,
+  .listGroupFooter {
+    font-weight: 700;
+    padding: var(--xmlui-padding-groupHeader-List, var(--xmlui-space-2));
+  }
+}

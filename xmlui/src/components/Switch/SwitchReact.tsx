@@ -2,27 +2,9 @@ import type { CSSProperties, FocusEvent } from "react";
 import { forwardRef, memo, useId, useImperativeHandle } from "react";
 
 import { defaultProps } from "./Switch.defaults";
+import styles from "./Switch.module.scss";
 import type { SwitchValidationStatus } from "./switch-abstractions";
 import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
-
-const styles = {
-  switchContainer: "switchcontainer",
-  switchError: "switchError",
-  switchLabel: "switchLabel",
-  switchLabelBreak: "switchLabelBreak",
-  switchLabeledItem: "switchLabeledItem",
-  switchLabelPositionAfter: "switchLabelPositionAfter",
-  switchLabelPositionBefore: "switchLabelPositionBefore",
-  switchLabelPositionBottom: "switchLabelPositionBottom",
-  switchLabelPositionEnd: "switchLabelPositionEnd",
-  switchLabelPositionStart: "switchLabelPositionStart",
-  switchLabelPositionTop: "switchLabelPositionTop",
-  switchLabelRequired: "switchLabelRequired",
-  switchNoTransition: "switchNoTransition",
-  switchRoot: "switchRoot",
-  switchSuccess: "switchSuccess",
-  switchWarning: "switchWarning",
-} as const;
 
 export type SwitchApi = {
   focus: () => void;
@@ -165,7 +147,7 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
       data-xmlui-part="input"
       data-xmlui-id={id}
       data-testid={effectiveTestId}
-      className={cx(styles.switchContainer, styles.switchLabeledItem, labelPositionClass(labelPosition), className)}
+      className={cx(styles.container, styles.switchLabeledItem, labelPositionClass(labelPosition), className)}
       style={style}
       dir={direction}
     >

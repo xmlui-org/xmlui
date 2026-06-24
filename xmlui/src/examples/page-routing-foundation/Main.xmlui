@@ -1,0 +1,21 @@
+<App>
+  <HStack gap="8px">
+    <Button onClick="Actions.navigate('/')">Home</Button>
+    <Button onClick="Actions.navigate('/user/42?tab=profile')">User</Button>
+    <Button onClick="Actions.navigate('/redirect')">Redirect</Button>
+  </HStack>
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <H1>Home</H1>
+      <Text>Current path: {$pathname}</Text>
+    </Page>
+    <Page url="/user/:id">
+      <H1>User {$routeParams.id}</H1>
+      <Text>Tab: {$queryParams.tab}</Text>
+    </Page>
+    <Page url="/redirect">
+      <Redirect to="/user/99?tab=redirected" />
+      <Text>Redirecting...</Text>
+    </Page>
+  </Pages>
+</App>
