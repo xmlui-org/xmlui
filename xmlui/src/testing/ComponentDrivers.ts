@@ -144,6 +144,21 @@ export class ResponsiveBarDriver extends ComponentDriver {
   }
 }
 
+export class ProgressBarDriver extends ComponentDriver {
+  get bar(): Locator {
+    return this.component.locator("> div");
+  }
+
+  async getProgressRatio(): Promise<number> {
+    const style = await this.bar.getAttribute("style");
+    if (!style) {
+      return 0;
+    }
+    const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
+    return widthMatch ? Number.parseFloat(widthMatch[1]) / 100 : 0;
+  }
+}
+
 export class AccordionDriver extends ComponentDriver {}
 
 export class AppHeaderDriver extends ComponentDriver {
@@ -159,6 +174,8 @@ export class AppHeaderDriver extends ComponentDriver {
     return this.getByPartName("profileMenu");
   }
 }
+
+export class AvatarDriver extends ComponentDriver {}
 
 export class FooterDriver extends ComponentDriver {
   getContent(): Locator {

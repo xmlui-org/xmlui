@@ -2,6 +2,7 @@ import { expect as baseExpect, test as base, type Locator, type Page } from "@pl
 import {
   AccordionDriver,
   AppHeaderDriver,
+  AvatarDriver,
   AutoCompleteDriver,
   CardDriver,
   CheckboxDriver,
@@ -21,6 +22,7 @@ import {
   NavPanelDriver,
   NoResultDriver,
   NumberBoxDriver,
+  ProgressBarDriver,
   ResponsiveBarDriver,
   SplitterDriver,
   DateInputDriver,
@@ -59,6 +61,7 @@ type Fixtures = {
   createButtonDriver: () => Promise<ComponentDriver>;
   createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
   createAppHeaderDriver: (testId?: string | Locator) => Promise<AppHeaderDriver>;
+  createAvatarDriver: (testId?: string | Locator) => Promise<AvatarDriver>;
   createExpandableItemDriver: (testId?: string | Locator) => Promise<ExpandableItemDriver>;
   createTextDriver: (testId?: string) => Promise<ComponentDriver>;
   createHeadingDriver: (testId?: string) => Promise<ComponentDriver>;
@@ -69,6 +72,7 @@ type Fixtures = {
   createOptionDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createValidationDisplayDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createResponsiveBarDriver: (testId?: string | Locator) => Promise<ResponsiveBarDriver>;
+  createProgressBarDriver: (testId?: string | Locator) => Promise<ProgressBarDriver>;
   createSplitterDriver: (testId?: string | Locator) => Promise<SplitterDriver>;
   createListDriver: (testId?: string | Locator) => Promise<ListDriver>;
   createModalDialogDriver: (testId?: string | Locator) => Promise<ModalDialogDriver>;
@@ -169,6 +173,17 @@ export const test = base.extend<Fixtures>({
       page,
     }));
   },
+  createAvatarDriver: async ({ page }, use) => {
+    await use(async (testId) => new AvatarDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Avatar"]').first(),
+      page,
+    }));
+  },
   createExpandableItemDriver: async ({ page }, use) => {
     await use(async (testId) => new ExpandableItemDriver({
       locator: typeof testId === "string"
@@ -244,6 +259,17 @@ export const test = base.extend<Fixtures>({
       locator: typeof testId === "string"
         ? page.getByTestId(testId)
         : testId ?? page.locator('[data-xmlui-component="ResponsiveBar"]').first(),
+      page,
+    }));
+  },
+  createProgressBarDriver: async ({ page }, use) => {
+    await use(async (testId) => new ProgressBarDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="ProgressBar"]').first(),
       page,
     }));
   },

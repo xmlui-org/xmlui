@@ -139,9 +139,9 @@ polish one leaf component while shared test debt remains blocked.
 Components:
 
 - `Spinner` - completed on 2026-06-24.
-- `ProgressBar` - next.
-- `Avatar`
-- `Badge`
+- `ProgressBar` - completed on 2026-06-24.
+- `Avatar` - completed on 2026-06-24.
+- `Badge` - next.
 
 Goal:
 
@@ -157,6 +157,19 @@ Implementation notes:
   source-adjacent runtime files, registered the component in compiler/runtime
   metadata, added the combined runnable example, and passed its focused copied
   old E2E suite.
+- `ProgressBar` migration copied the old docs/defaults/spec, added the
+  compatible E2E driver fixture, implemented the source-adjacent runtime files,
+  registered compiler/runtime metadata, extended the combined runnable example
+  with a state-mutating progress path, and passed its focused copied old E2E
+  suite.
+- `Avatar` migration copied the old docs/defaults/spec, added the compatible
+  E2E driver fixture, implemented source-adjacent runtime files, registered
+  compiler/runtime metadata, extended the combined runnable example with a
+  state-mutating avatar path, and passed all 97 copied old E2E tests. The old
+  shorthand border theme variables stay in the SCSS module; decomposed
+  color/style/width border theme variables are applied as a selective dynamic
+  compatibility bridge from the renderer so the two old theme-variable families
+  do not override each other accidentally.
 - These components should be good candidates for direct migration because they
   are stable visual components with old direct specs.
 - Add a single combined runnable example:
@@ -175,7 +188,7 @@ Verification:
 - Manual visual check with `npm run dev` and
   `?example=missingVisualComponentsFoundation`.
 
-Next explicit step: continue H1A with `ProgressBar`, including copied old docs,
+Next explicit step: continue H1A with `Badge`, including copied old docs,
 defaults, metadata, SCSS module styling, renderer registration, compiler
 contract, old E2E suite, and the combined
 `?example=missingVisualComponentsFoundation` route.

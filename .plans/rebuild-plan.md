@@ -4190,10 +4190,11 @@ Deferred compatibility work:
   metadata shape supports tone-specific default theme-var blocks.
 
 Next explicit step: Phase 5 Wave H1A - continue the missing-component migration
-plan with `ProgressBar`. `Spinner` is complete with copied old docs/defaults/
-spec, compiler/runtime registration, the combined
-`?example=missingVisualComponentsFoundation` route, and a passing focused old
-E2E suite. The preceding P0B VS Code SCSS bundling unblock is complete.
+plan with `Badge`. `Spinner`, `ProgressBar`, and `Avatar` are complete with
+copied old docs/defaults/specs, compiler/runtime registration, the combined
+`?example=missingVisualComponentsFoundation` route, and passing focused old E2E
+suites. `Avatar` passes all 97 copied old E2E tests. The preceding P0B VS Code
+SCSS bundling unblock is complete.
 
 Detailed missing-component continuation plan:
 

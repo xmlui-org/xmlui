@@ -2,6 +2,7 @@ import type { XmluiComponentContract } from "./types";
 import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
 import { htmlTagDefinitions } from "../../component-core/htmlTags";
 import { AccordionItemMd, AccordionMd } from "../../components/Accordion/Accordion";
+import { AvatarMd } from "../../components/Avatar/Avatar";
 import { ExpandableItemMd } from "../../components/ExpandableItem/ExpandableItem";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
@@ -41,6 +42,7 @@ import { NoResultMd } from "../../components/NoResult/NoResult";
 import { ValidationSummaryMd } from "../../components/ValidationSummary/ValidationSummary";
 import { ConciseValidationFeedbackMd } from "../../components/ConciseValidationFeedback/ConciseValidationFeedback";
 import { PageMetaTitleMd } from "../../components/PageMetaTitle/PageMetaTitle";
+import { ProgressBarMd } from "../../components/ProgressBar/ProgressBar";
 import { QRCodeMd } from "../../components/QRCode/QRCode";
 import { ResponsiveBarMd } from "../../components/ResponsiveBar/ResponsiveBar";
 import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
@@ -106,6 +108,16 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(AvatarMd, {
+    name: "Avatar",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+      contextMenu: "onContextMenu",
+    },
   }),
   contractFromMetadata(ExpandableItemMd, {
     name: "ExpandableItem",
@@ -363,6 +375,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "PageMetaTitle",
     allowsChildren: true,
     includeLayoutProps: false,
+  }),
+  contractFromMetadata(ProgressBarMd, {
+    name: "ProgressBar",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   contractFromMetadata(QRCodeMd, {
     name: "QRCode",

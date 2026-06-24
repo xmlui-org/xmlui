@@ -4,6 +4,7 @@ import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
 import { appRenderer } from "../components/App/App";
 import { appHeaderRenderer } from "../components/AppHeader/AppHeader.renderer";
+import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
 import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card.renderer";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
@@ -35,6 +36,7 @@ import { linkRenderer } from "../components/Link/Link.renderer";
 import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult.renderer";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
+import { progressBarRenderer } from "../components/ProgressBar/ProgressBar.renderer";
 import { qrCodeRenderer } from "../components/QRCode/QRCode.renderer";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller.renderer";
@@ -130,6 +132,7 @@ const implementedRuntimeNames = [
   "AccordionItem",
   "App",
   "AppHeader",
+  "Avatar",
   "AutoComplete",
   "Fragment",
   "Image",
@@ -142,6 +145,7 @@ const implementedRuntimeNames = [
   "ValidationSummary",
   "ConciseValidationFeedback",
   "PageMetaTitle",
+  "ProgressBar",
   "QRCode",
   "ResponsiveBar",
   "Splitter",
@@ -248,6 +252,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   AccordionItem: accordionItemRenderer,
   App: appRenderer,
   AppHeader: appHeaderRenderer,
+  Avatar: avatarRenderer,
   br: brRenderer,
   Br: BrRenderer,
   Button: buttonRenderer,
@@ -266,6 +271,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Logo: logoRenderer,
   NoResult: noResultRenderer,
   PageMetaTitle: pageMetaTitleRenderer,
+  ProgressBar: progressBarRenderer,
   QRCode: qrCodeRenderer,
   ResponsiveBar: responsiveBarRenderer,
   Splitter: splitterRenderer,
@@ -396,6 +402,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const accordionTransferred = contract.name === "Accordion" || contract.name === "AccordionItem";
     const appTransferred = contract.name === "App";
     const appHeaderTransferred = contract.name === "AppHeader";
+    const avatarTransferred = contract.name === "Avatar";
     const buttonTransferred = contract.name === "Button";
     const textTransferred = contract.name === "Text";
     const textBoxTransferred = contract.name === "TextBox";
@@ -452,6 +459,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const navPanelTransferred = contract.name === "NavPanel";
     const logoTransferred = contract.name === "Logo";
     const pageMetaTitleTransferred = contract.name === "PageMetaTitle";
+    const progressBarTransferred = contract.name === "ProgressBar";
     const qrCodeTransferred = contract.name === "QRCode";
     const codeBlockTransferred = contract.name === "CodeBlock";
     const contentSeparatorTransferred = contract.name === "ContentSeparator";
@@ -489,6 +497,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       accordionTransferred ||
       appTransferred ||
       appHeaderTransferred ||
+      avatarTransferred ||
       buttonTransferred ||
       textTransferred ||
       textBoxTransferred ||
@@ -543,6 +552,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       navPanelTransferred ||
       logoTransferred ||
       pageMetaTitleTransferred ||
+      progressBarTransferred ||
       qrCodeTransferred ||
       codeBlockTransferred ||
       contentSeparatorTransferred ||
@@ -580,6 +590,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       ? "Accordion"
       : appHeaderTransferred
         ? "AppHeader"
+        : avatarTransferred
+          ? "Avatar"
       : htmlTagTransferred
       ? "HtmlTags"
       : brTransferred
@@ -665,7 +677,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                                 : navPanelCollapseButtonTransferred
                                                                   ? "NavPanelCollapseButton"
                                                                 : navPanelTransferred
-                                                                  ? "NavPanel"
+                                                                ? "NavPanel"
+                                                                : progressBarTransferred
+                                                                  ? "ProgressBar"
                                                                 : dataSourceTransferred
                                                                   ? "DataSource"
                                                                   : apiCallTransferred
@@ -719,6 +733,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppReact.tsx`);
     } else if (appHeaderTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppHeaderReact.tsx`);
+    } else if (avatarTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AvatarReact.tsx`);
     } else if (accordionTransferred) {
       implementationPaths.splice(
         0,
@@ -823,6 +839,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LogoReact.tsx`);
     } else if (pageMetaTitleTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/PageMetaTitleReact.tsx`);
+    } else if (progressBarTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ProgressBarReact.tsx`);
     } else if (qrCodeTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/QRCodeReact.tsx`);
     } else if (codeBlockTransferred) {
@@ -895,6 +913,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       accordionTransferred,
       appTransferred,
       appHeaderTransferred,
+      avatarTransferred,
       buttonTransferred,
       textTransferred,
       textBoxTransferred,
@@ -946,6 +965,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       navPanelCollapseButtonTransferred,
       navPanelTransferred,
       pageMetaTitleTransferred,
+      progressBarTransferred,
       qrCodeTransferred,
       codeBlockTransferred,
       contentSeparatorTransferred,
@@ -1067,6 +1087,7 @@ function componentRunnablePaths(flags: {
   accordionTransferred: boolean;
   appTransferred: boolean;
   appHeaderTransferred: boolean;
+  avatarTransferred: boolean;
   buttonTransferred: boolean;
   textTransferred: boolean;
   textBoxTransferred: boolean;
@@ -1118,6 +1139,7 @@ function componentRunnablePaths(flags: {
   navPanelCollapseButtonTransferred: boolean;
   navPanelTransferred: boolean;
   pageMetaTitleTransferred: boolean;
+  progressBarTransferred: boolean;
   qrCodeTransferred: boolean;
   codeBlockTransferred: boolean;
   contentSeparatorTransferred: boolean;
@@ -1167,6 +1189,9 @@ function componentRunnablePaths(flags: {
       "xmlui/src/components/AppHeader/AppHeader.foundation.spec.ts",
       "xmlui/src/components/AppHeader/AppHeader.spec.ts",
     ];
+  }
+  if (flags.avatarTransferred) {
+    return ["xmlui/src/components/Avatar/Avatar.spec.ts"];
   }
   if (flags.buttonTransferred) {
     return [
@@ -1415,6 +1440,9 @@ function componentRunnablePaths(flags: {
   }
   if (flags.pageMetaTitleTransferred) {
     return ["xmlui/src/components/PageMetaTitle/PageMetaTitle.spec.ts"];
+  }
+  if (flags.progressBarTransferred) {
+    return ["xmlui/src/components/ProgressBar/ProgressBar.spec.ts"];
   }
   if (flags.qrCodeTransferred) {
     return ["xmlui/src/components/QRCode/QRCode.spec.ts"];

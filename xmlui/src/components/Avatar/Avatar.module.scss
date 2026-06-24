@@ -1,0 +1,95 @@
+$themeVars: "";
+@function createThemeVar($componentVariable) {
+  @return var(--xmlui-#{$componentVariable});
+}
+
+$backgroundColor-Avatar: createThemeVar("backgroundColor-Avatar");
+$boxShadow-Avatar: createThemeVar("boxShadow-Avatar");
+$textColor-Avatar: createThemeVar("textColor-Avatar");
+$fontWeight-Avatar: createThemeVar("fontWeight-Avatar");
+$borderRadius-Avatar: createThemeVar("borderRadius-Avatar");
+$border-Avatar: createThemeVar("border-Avatar");
+$borderHorizontal-Avatar: createThemeVar("borderHorizontal-Avatar");
+$borderVertical-Avatar: createThemeVar("borderVertical-Avatar");
+$borderTop-Avatar: createThemeVar("borderTop-Avatar");
+$borderRight-Avatar: createThemeVar("borderRight-Avatar");
+$borderBottom-Avatar: createThemeVar("borderBottom-Avatar");
+$borderLeft-Avatar: createThemeVar("borderLeft-Avatar");
+$borderColor-Avatar: createThemeVar("borderColor-Avatar");
+$borderHorizontalColor-Avatar: createThemeVar("borderHorizontalColor-Avatar");
+$borderVerticalColor-Avatar: createThemeVar("borderVerticalColor-Avatar");
+$borderTopColor-Avatar: createThemeVar("borderTopColor-Avatar");
+$borderRightColor-Avatar: createThemeVar("borderRightColor-Avatar");
+$borderBottomColor-Avatar: createThemeVar("borderBottomColor-Avatar");
+$borderLeftColor-Avatar: createThemeVar("borderLeftColor-Avatar");
+$borderStyle-Avatar: createThemeVar("borderStyle-Avatar");
+$borderTopStyle-Avatar: createThemeVar("borderTopStyle-Avatar");
+$borderRightStyle-Avatar: createThemeVar("borderRightStyle-Avatar");
+$borderBottomStyle-Avatar: createThemeVar("borderBottomStyle-Avatar");
+$borderLeftStyle-Avatar: createThemeVar("borderLeftStyle-Avatar");
+$borderWidth-Avatar: createThemeVar("borderWidth-Avatar");
+$borderHorizontalWidth-Avatar: createThemeVar("borderHorizontalWidth-Avatar");
+$borderVerticalWidth-Avatar: createThemeVar("borderVerticalWidth-Avatar");
+$borderTopWidth-Avatar: createThemeVar("borderTopWidth-Avatar");
+$borderRightWidth-Avatar: createThemeVar("borderRightWidth-Avatar");
+$borderBottomWidth-Avatar: createThemeVar("borderBottomWidth-Avatar");
+$borderLeftWidth-Avatar: createThemeVar("borderLeftWidth-Avatar");
+
+:export {
+  themeVars: "";
+}
+
+@layer components {
+  .container {
+    aspect-ratio: 1 / 1;
+    background-color: $backgroundColor-Avatar;
+    color: $textColor-Avatar;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: $fontWeight-Avatar;
+    white-space: nowrap;
+    user-select: none;
+    box-shadow: $boxShadow-Avatar;
+    border-radius: $borderRadius-Avatar;
+    border: $border-Avatar;
+    border-left: var(--xmlui-borderHorizontal-Avatar, #{$border-Avatar});
+    border-right: var(--xmlui-borderHorizontal-Avatar, #{$border-Avatar});
+    border-top: var(--xmlui-borderVertical-Avatar, #{$border-Avatar});
+    border-bottom: var(--xmlui-borderVertical-Avatar, #{$border-Avatar});
+    border-left: var(--xmlui-borderLeft-Avatar, var(--xmlui-borderHorizontal-Avatar, #{$border-Avatar}));
+    border-right: var(--xmlui-borderRight-Avatar, var(--xmlui-borderHorizontal-Avatar, #{$border-Avatar}));
+    border-top: var(--xmlui-borderTop-Avatar, var(--xmlui-borderVertical-Avatar, #{$border-Avatar}));
+    border-bottom: var(--xmlui-borderBottom-Avatar, var(--xmlui-borderVertical-Avatar, #{$border-Avatar}));
+  }
+
+  .xs {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .sm {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .md {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+  }
+
+  .lg {
+    width: 96px;
+    height: 96px;
+    font-size: 32px;
+  }
+
+  .clickable {
+    cursor: pointer;
+  }
+}
