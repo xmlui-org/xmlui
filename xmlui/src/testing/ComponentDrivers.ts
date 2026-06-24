@@ -177,6 +177,8 @@ export class AppHeaderDriver extends ComponentDriver {
 
 export class AvatarDriver extends ComponentDriver {}
 
+export class BadgeDriver extends ComponentDriver {}
+
 export class FooterDriver extends ComponentDriver {
   getContent(): Locator {
     return this.getByPartName("content");

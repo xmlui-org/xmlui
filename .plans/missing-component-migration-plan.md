@@ -141,7 +141,7 @@ Components:
 - `Spinner` - completed on 2026-06-24.
 - `ProgressBar` - completed on 2026-06-24.
 - `Avatar` - completed on 2026-06-24.
-- `Badge` - next.
+- `Badge` - completed on 2026-06-24.
 
 Goal:
 
@@ -170,6 +170,12 @@ Implementation notes:
   color/style/width border theme variables are applied as a selective dynamic
   compatibility bridge from the renderer so the two old theme-variable families
   do not override each other accidentally.
+- `Badge` migration copied the old docs/defaults/spec, added the compatible
+  E2E driver fixture, implemented source-adjacent runtime files, registered
+  compiler/runtime metadata, extended the combined runnable example with a
+  state-mutating status path, and passed all 24 copied old E2E tests. Metadata
+  is intentionally decoupled from `BadgeReact.tsx` so metadata generation does
+  not import the SCSS module through the React implementation.
 - These components should be good candidates for direct migration because they
   are stable visual components with old direct specs.
 - Add a single combined runnable example:
@@ -188,17 +194,14 @@ Verification:
 - Manual visual check with `npm run dev` and
   `?example=missingVisualComponentsFoundation`.
 
-Next explicit step: continue H1A with `Badge`, including copied old docs,
-defaults, metadata, SCSS module styling, renderer registration, compiler
-contract, old E2E suite, and the combined
-`?example=missingVisualComponentsFoundation` route.
+H1A is complete.
 
 ### H1B: Stepper Foundation
 
 Components:
 
-- `Stepper`
-- `Step`
+- `Stepper` - completed on 2026-06-24.
+- `Step` - completed on 2026-06-24.
 
 Goal:
 
@@ -212,11 +215,31 @@ Implementation notes:
   the runtime state approach.
 - Add a runnable example `?example=stepperFoundation` with user-visible state
   mutation.
+- Copied the old `Stepper.spec.ts`, defaults, and docs; added source-adjacent
+  metadata, renderer, React implementation, SCSS module styling, compiler
+  contract, runtime registry entries, and the `?example=stepperFoundation`
+  route.
+- The `didChange` old suite required multi-parameter arrow callback support
+  such as `(idx, id) => ...`; the script parser now preserves multiple
+  arrow-parameter identifiers and the existing IR/codegen path handles them.
+- Stepper API methods (`next`, `prev`, `reset`, `setActiveStep`, `activeStep`)
+  use a stable registered API object and emit `didChange` outside React state
+  updater callbacks to avoid render-time runtime invalidation warnings.
 
 Verification:
 
-- Focused `Stepper` E2E.
-- Typecheck, unit tests, CSS import audit.
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run build:metadata`
+- `npm --workspace xmlui exec -- playwright test src/components/Stepper/Stepper.spec.ts`
+  passed all 62 copied old E2E tests.
+- CSS import audit remains covered by the broader Phase 5 audit pass.
+
+H1B is complete.
+
+Next explicit step: start H2A with `FocusScope`, including copied old docs,
+metadata, SCSS module styling if applicable, renderer/runtime registration,
+compiler contract only if needed, copied old E2E suite, and representative
+overlay regression checks.
 
 ### H2A: Focus Management
 

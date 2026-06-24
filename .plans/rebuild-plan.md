@@ -4189,12 +4189,14 @@ Deferred compatibility work:
 - Old tone-specific `dark` default theme vars remain deferred until the current
   metadata shape supports tone-specific default theme-var blocks.
 
-Next explicit step: Phase 5 Wave H1A - continue the missing-component migration
-plan with `Badge`. `Spinner`, `ProgressBar`, and `Avatar` are complete with
-copied old docs/defaults/specs, compiler/runtime registration, the combined
-`?example=missingVisualComponentsFoundation` route, and passing focused old E2E
-suites. `Avatar` passes all 97 copied old E2E tests. The preceding P0B VS Code
-SCSS bundling unblock is complete.
+Next explicit step: Phase 5 Wave H2A - start `FocusScope` from the
+missing-component migration plan. H1A is complete: `Spinner`, `ProgressBar`,
+`Avatar`, and `Badge` have copied old docs/defaults/specs, compiler/runtime
+registration, the combined `?example=missingVisualComponentsFoundation` route,
+and passing focused old E2E suites. H1B is complete: `Stepper` and `Step` have
+copied old docs/defaults/specs, compiler/runtime registration, the
+`?example=stepperFoundation` route, and all 62 copied old `Stepper` E2E tests
+passing. The preceding P0B VS Code SCSS bundling unblock is complete.
 
 Detailed missing-component continuation plan:
 

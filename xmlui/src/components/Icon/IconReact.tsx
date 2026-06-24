@@ -195,4 +195,26 @@ const icons: Record<string, IconDefinition> = {
       </>
     ),
   },
+  error: {
+    viewBox: "0 0 24 24",
+    children: (
+      <>
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
+        <path d="M12 7v7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="12" cy="17" r="1" fill="currentColor" />
+      </>
+    ),
+  },
+  checkmark: {
+    viewBox: "0 0 24 24",
+    children: (
+      <path d="m5 12 4 4 10-9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+  },
+  star: {
+    viewBox: "0 0 24 24",
+    children: (
+      <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    ),
+  },
 };

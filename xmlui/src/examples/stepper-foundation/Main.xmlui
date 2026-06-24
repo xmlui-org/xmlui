@@ -1,0 +1,26 @@
+<App var.mode="horizontal" var.status="Draft">
+  <H1>Stepper foundation</H1>
+  <Text>Mode: {mode}</Text>
+  <Text>Status: {status}</Text>
+  <Button onClick="mode = mode == 'horizontal' ? 'vertical' : 'horizontal'">
+    Toggle orientation
+  </Button>
+  <Stepper
+    id="wizard"
+    orientation="{mode}"
+    nonLinear="true"
+    onDidChange="(idx) => status = idx == 0 ? 'Draft' : idx == 1 ? 'Review' : 'Done'">
+    <Step label="Draft" description="Collect details">
+      <Text>Draft content</Text>
+    </Step>
+    <Step label="Review" description="Check the data" icon="star">
+      <Text>Review content</Text>
+    </Step>
+    <Step label="Done" completed="{status == 'Done'}">
+      <Text>Done content</Text>
+    </Step>
+  </Stepper>
+  <Button onClick="wizard.prev()">Previous step</Button>
+  <Button onClick="wizard.next()">Next step</Button>
+  <Button onClick="wizard.reset()">Reset stepper</Button>
+</App>

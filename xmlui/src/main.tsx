@@ -104,6 +104,7 @@ import structuredFormsFoundationApp from "./examples/structured-forms-foundation
 import validationDisplayFoundationApp from "./examples/validation-display-foundation/Main.xmlui";
 import timeInputFoundationApp from "./examples/time-input-foundation/Main.xmlui";
 import stackFamilyFoundationApp from "./examples/stack-family-foundation/Main.xmlui";
+import stepperFoundationApp from "./examples/stepper-foundation/Main.xmlui";
 import tableFoundationApp from "./examples/table-foundation/Main.xmlui";
 import tabsFoundationApp from "./examples/tabs-foundation/Main.xmlui";
 import treeFamilyFoundationApp from "./examples/tree-family-foundation/Main.xmlui";
@@ -223,6 +224,7 @@ const examples = {
   validationDisplayFoundation: validationDisplayFoundationApp,
   timeInputFoundation: timeInputFoundationApp,
   stackFamilyFoundation: stackFamilyFoundationApp,
+  stepperFoundation: stepperFoundationApp,
   tableFoundation: tableFoundationApp,
   tabsFoundation: tabsFoundationApp,
   treeFamilyFoundation: treeFamilyFoundationApp,

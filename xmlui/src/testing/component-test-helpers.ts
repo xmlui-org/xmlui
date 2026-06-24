@@ -24,6 +24,28 @@ export async function getBounds(locator: Locator): Promise<{
   };
 }
 
+export function getStyles(
+  locator: Locator,
+  style: string | string[],
+  pseudoElement?: string,
+): Promise<Record<string, string>> {
+  const styleNames = Array.isArray(style) ? style : [style];
+  return locator.evaluate(
+    (element, options) =>
+      Object.fromEntries(
+        options.styleNames.map((styleName) => [
+          styleName
+            .trim()
+            .split("-")
+            .map((part, index) => (index === 0 ? part : part[0].toUpperCase() + part.slice(1)))
+            .join(""),
+          window.getComputedStyle(element, options.pseudoElement).getPropertyValue(styleName),
+        ]),
+      ),
+    { styleNames, pseudoElement },
+  );
+}
+
 export async function overflows(locator: Locator, direction: "x" | "y" | "both" = "both") {
   const [width, height, scrollWidth, scrollHeight] = await locator.evaluate((element) => [
     element.clientWidth,

@@ -3,6 +3,7 @@ import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "..
 import { htmlTagDefinitions } from "../../component-core/htmlTags";
 import { AccordionItemMd, AccordionMd } from "../../components/Accordion/Accordion";
 import { AvatarMd } from "../../components/Avatar/Avatar";
+import { BadgeMd } from "../../components/Badge/Badge";
 import { ExpandableItemMd } from "../../components/ExpandableItem/ExpandableItem";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
@@ -50,6 +51,7 @@ import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/
 import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
 import { StickySectionMd } from "../../components/StickySection/StickySection";
 import { SpinnerMd } from "../../components/Spinner/Spinner";
+import { StepMd, StepperMd } from "../../components/Stepper/Stepper";
 import { TabItemMd, TabsMd } from "../../components/Tabs/Tabs";
 import { DataSourceMd } from "../../components/DataSource/DataSource";
 import { APICallMd } from "../../components/APICall/APICall";
@@ -119,6 +121,15 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       contextMenu: "onContextMenu",
     },
   }),
+  contractFromMetadata(BadgeMd, {
+    name: "Badge",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      contextMenu: "onContextMenu",
+    },
+  }),
   contractFromMetadata(ExpandableItemMd, {
     name: "ExpandableItem",
     allowsChildren: true,
@@ -136,6 +147,24 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     eventAttributes: {
       didChange: "onDidChange",
       contextMenu: "onContextMenu",
+    },
+  }),
+  contractFromMetadata(StepperMd, {
+    name: "Stepper",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
+    },
+  }),
+  contractFromMetadata(StepMd, {
+    name: "Step",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      activated: "onActivated",
     },
   }),
   contractFromMetadata(TabItemMd, {

@@ -3,6 +3,7 @@ import {
   AccordionDriver,
   AppHeaderDriver,
   AvatarDriver,
+  BadgeDriver,
   AutoCompleteDriver,
   CardDriver,
   CheckboxDriver,
@@ -62,6 +63,7 @@ type Fixtures = {
   createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
   createAppHeaderDriver: (testId?: string | Locator) => Promise<AppHeaderDriver>;
   createAvatarDriver: (testId?: string | Locator) => Promise<AvatarDriver>;
+  createBadgeDriver: (testId?: string | Locator) => Promise<BadgeDriver>;
   createExpandableItemDriver: (testId?: string | Locator) => Promise<ExpandableItemDriver>;
   createTextDriver: (testId?: string) => Promise<ComponentDriver>;
   createHeadingDriver: (testId?: string) => Promise<ComponentDriver>;
@@ -181,6 +183,17 @@ export const test = base.extend<Fixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="Avatar"]').first(),
+      page,
+    }));
+  },
+  createBadgeDriver: async ({ page }, use) => {
+    await use(async (testId) => new BadgeDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="Badge"]').first(),
       page,
     }));
   },

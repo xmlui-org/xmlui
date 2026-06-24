@@ -5,6 +5,7 @@ import { accordionItemRenderer, accordionRenderer } from "../components/Accordio
 import { appRenderer } from "../components/App/App";
 import { appHeaderRenderer } from "../components/AppHeader/AppHeader.renderer";
 import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
+import { badgeRenderer } from "../components/Badge/Badge.renderer";
 import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card.renderer";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
@@ -48,6 +49,7 @@ import {
 import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
 import { spinnerRenderer } from "../components/Spinner/Spinner.renderer";
+import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
 import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
 import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox.renderer";
@@ -133,6 +135,7 @@ const implementedRuntimeNames = [
   "App",
   "AppHeader",
   "Avatar",
+  "Badge",
   "AutoComplete",
   "Fragment",
   "Image",
@@ -154,6 +157,8 @@ const implementedRuntimeNames = [
   "StickyBox",
   "StickySection",
   "Spinner",
+  "Stepper",
+  "Step",
   "Tabs",
   "TabItem",
   "Heading",
@@ -253,6 +258,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   App: appRenderer,
   AppHeader: appHeaderRenderer,
   Avatar: avatarRenderer,
+  Badge: badgeRenderer,
   br: brRenderer,
   Br: BrRenderer,
   Button: buttonRenderer,
@@ -280,6 +286,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   StickyBox: stickyBoxRenderer,
   StickySection: stickySectionRenderer,
   Spinner: spinnerRenderer,
+  Stepper: stepperRenderer,
+  Step: stepRenderer,
   Tabs: tabsRenderer,
   TabItem: tabItemRenderer,
   SpaceFiller: spaceFillerRenderer,
@@ -385,6 +393,7 @@ const componentFolderNames: Record<string, string> = {
   HSplitter: "Splitter",
   VSplitter: "Splitter",
   TabItem: "Tabs",
+  Step: "Stepper",
 };
 for (const name of htmlTagComponentNames) {
   componentFolderNames[name] = "HtmlTags";
@@ -403,6 +412,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const appTransferred = contract.name === "App";
     const appHeaderTransferred = contract.name === "AppHeader";
     const avatarTransferred = contract.name === "Avatar";
+    const badgeTransferred = contract.name === "Badge";
     const buttonTransferred = contract.name === "Button";
     const textTransferred = contract.name === "Text";
     const textBoxTransferred = contract.name === "TextBox";
@@ -445,6 +455,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const stickyBoxTransferred = contract.name === "StickyBox";
     const stickySectionTransferred = contract.name === "StickySection";
     const spinnerTransferred = contract.name === "Spinner";
+    const stepperTransferred = contract.name === "Stepper" || contract.name === "Step";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
@@ -498,6 +509,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       appTransferred ||
       appHeaderTransferred ||
       avatarTransferred ||
+      badgeTransferred ||
       buttonTransferred ||
       textTransferred ||
       textBoxTransferred ||
@@ -538,6 +550,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       stickyBoxTransferred ||
       stickySectionTransferred ||
       spinnerTransferred ||
+      stepperTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
@@ -592,6 +605,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
         ? "AppHeader"
         : avatarTransferred
           ? "Avatar"
+          : badgeTransferred
+            ? "Badge"
       : htmlTagTransferred
       ? "HtmlTags"
       : brTransferred
@@ -666,6 +681,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                           ? "StickySection"
                                                           : spinnerTransferred
                                                             ? "Spinner"
+                                                            : stepperTransferred
+                                                              ? "Stepper"
                                                           : expandableItemTransferred
                                                             ? "ExpandableItem"
                                                             : tabsTransferred
@@ -735,6 +752,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppHeaderReact.tsx`);
     } else if (avatarTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AvatarReact.tsx`);
+    } else if (badgeTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/BadgeReact.tsx`);
     } else if (accordionTransferred) {
       implementationPaths.splice(
         0,
@@ -817,6 +836,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/StickySectionReact.tsx`);
     } else if (spinnerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SpinnerReact.tsx`);
+    } else if (stepperTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/${contract.name === "Step" ? "StepReact" : "StepperReact"}.tsx`);
     } else if (headingTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/HeadingReact.tsx`);
     } else if (imageTransferred) {
@@ -914,6 +935,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       appTransferred,
       appHeaderTransferred,
       avatarTransferred,
+      badgeTransferred,
       buttonTransferred,
       textTransferred,
       textBoxTransferred,
@@ -952,6 +974,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       stickyBoxTransferred,
       stickySectionTransferred,
       spinnerTransferred,
+      stepperTransferred,
       headingTransferred,
       htmlTagTransferred,
       brTransferred,
@@ -1088,6 +1111,7 @@ function componentRunnablePaths(flags: {
   appTransferred: boolean;
   appHeaderTransferred: boolean;
   avatarTransferred: boolean;
+  badgeTransferred: boolean;
   buttonTransferred: boolean;
   textTransferred: boolean;
   textBoxTransferred: boolean;
@@ -1126,6 +1150,7 @@ function componentRunnablePaths(flags: {
   stickyBoxTransferred: boolean;
   stickySectionTransferred: boolean;
   spinnerTransferred: boolean;
+  stepperTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
   brTransferred: boolean;
@@ -1192,6 +1217,9 @@ function componentRunnablePaths(flags: {
   }
   if (flags.avatarTransferred) {
     return ["xmlui/src/components/Avatar/Avatar.spec.ts"];
+  }
+  if (flags.badgeTransferred) {
+    return ["xmlui/src/components/Badge/Badge.spec.ts"];
   }
   if (flags.buttonTransferred) {
     return [
@@ -1382,6 +1410,9 @@ function componentRunnablePaths(flags: {
   }
   if (flags.spinnerTransferred) {
     return ["xmlui/src/components/Spinner/Spinner.spec.ts"];
+  }
+  if (flags.stepperTransferred) {
+    return ["xmlui/src/components/Stepper/Stepper.spec.ts"];
   }
   if (flags.headingTransferred) {
     return [
