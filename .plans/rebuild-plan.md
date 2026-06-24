@@ -4026,6 +4026,31 @@ Compatibility focus:
 - theme scoping, tone changes, part/slot semantics, inspector visibility and
   metadata, localization lookup, and runtime service APIs.
 
+Status:
+
+- Wave F6A completed: inspected original theme, slot, tone, inspector, and I18n
+  component sources and migrated the smallest theme/slot foundation slice.
+- Added metadata, docs, renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for `Theme`, `Slot`, `ToneSwitch`,
+  and `ToneChangerButton`.
+- Extended the runtime theme context with `tone` and `setTone` while preserving
+  the existing `useThemeVariables()` surface.
+- Added focused component-local E2E tests for scoped theme variables, scoped
+  tone attributes, Slot fallback rendering, and tone mutation events.
+- Added runnable example `?example=themeSlotFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old E2E suite transfer is not complete for these components.
+- `Theme` named theme selection, root style injection, notification settings,
+  `disableInlineStyle`, strict theming behavior, and exact generated CSS
+  behavior remain deferred.
+- `Slot` injected child and context-variable behavior remains deferred to the
+  user-defined component slot closure.
+- `ToneSwitch` and `ToneChangerButton` visual parity with the old Toggle,
+  Button, and Icon implementations remains deferred.
+- `Part`, `InspectButton`, `Inspector`, and `I18n` remain unimplemented.
+
 #### Wave G: Routing, App Composition, and Navigation Components
 
 ##### Wave G1: Remaining App Shell Behavior
@@ -4040,6 +4065,27 @@ Compatibility focus:
   navigation regions, headers, footers, mobile shell, search, index collection,
   page metadata, and standalone/Vite differences.
 
+Status:
+
+- Wave G1A completed: inspected original `App` shell sources and migrated the
+  first lifecycle/input shell behavior slice.
+- Added runtime support for `onReady`, `onMessageReceived`, `onKeyDown`, and
+  `onKeyUp` in the migrated `App`.
+- Added focused component-local E2E tests proving `ready` fires once,
+  `messageReceived` receives posted data, and keyboard events update rendered
+  state.
+- Added runnable example `?example=appShellFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `App` E2E suite transfer is not complete.
+- `onMessageReceived(data, event)` runtime passes the second argument, but
+  literal XMLUI tests are deferred until the event parser supports
+  multi-parameter arrow callbacks.
+- Header/footer/nav-panel extraction, drawer/mobile shell, app navigation
+  events, search/index collection, page metadata, direction/locale/scheduler,
+  theme persistence, and error handling remain deferred.
+
 ##### Wave G2: Page Routing Core
 
 Components:
@@ -4052,6 +4098,28 @@ Compatibility focus:
 
 - page startup, navigation events, route matching, route/query context
   variables, redirects, SSG route discovery, and page metadata.
+
+Status:
+
+- Wave G2A completed: inspected original `Pages`, `Page`, and `Redirect`
+  sources and migrated the first route matching and redirect foundation slice.
+- Added metadata, docs, renderers, runtime registry mappings, built-in
+  contracts, and IR lowering registrations for `Pages`, `Page`, and `Redirect`.
+- Added focused component-local E2E tests for page matching, fallback routing,
+  route/query context variables, and redirect behavior.
+- Added runnable example `?example=pageRoutingFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Literal old `Pages` and `Redirect` E2E suite transfer is not complete.
+- Route guards, canonical URL policies, query validation, scroll restoration,
+  search indexing, app navigation events, page metadata, and SSG route discovery
+  remain deferred.
+- Exact `Redirect.replace` history semantics remain deferred.
+
+Next explicit step: Phase 5 Wave G3A - inspect original `NavLink` navigation
+behavior, then migrate the smallest navigation component slice with
+component-local tests and a runnable example.
 
 ##### Wave G3: Navigation Components
 

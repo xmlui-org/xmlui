@@ -62,6 +62,12 @@ import { LiveRegionMd } from "../../components/LiveRegion/LiveRegion";
 import { BookmarkMd } from "../../components/Bookmark/Bookmark";
 import { SkipLinkMd } from "../../components/SkipLink/SkipLink";
 import { ToastMd } from "../../components/Toast/Toast";
+import { ThemeMd } from "../../components/Theme/Theme";
+import { SlotMd } from "../../components/Slot/Slot";
+import { ToneSwitchMd } from "../../components/ToneSwitch/ToneSwitch";
+import { ToneChangerButtonMd } from "../../components/ToneChangerButton/ToneChangerButton";
+import { PageMd, PagesMd } from "../../components/Pages/Pages";
+import { RedirectMd } from "../../components/Redirect/Redirect";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -756,15 +762,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       hasOverflow: { name: "hasOverflow" },
     },
   },
-  {
+  contractFromMetadata(ThemeMd, {
     name: "Theme",
-    kind: "builtin",
     acceptsArbitraryProps: true,
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps(),
-    events: {},
-  },
+    includeLayoutProps: true,
+  }),
   contractFromMetadata(ItemsMd, {
     name: "Items",
     allowsChildren: true,
@@ -1169,37 +1172,23 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       fetch: "onFetch",
     },
   }),
-  {
+  contractFromMetadata(PagesMd, {
     name: "Pages",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: withLayoutProps({
-      fallbackPath: { name: "fallbackPath" },
-      defaultScrollRestoration: { name: "defaultScrollRestoration" },
-    }),
-    events: {},
-  },
-  {
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(PageMd, {
     name: "Page",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: { local: true },
-    props: {
-      url: { name: "url" },
-      searchIndexable: { name: "searchIndexable" },
-      navLabel: { name: "navLabel" },
-      queryParams: { name: "queryParams" },
-      guard: { name: "guard" },
-    },
-    events: {},
-    contextVariables: {
-      $pathname: { name: "$pathname" },
-      $routeParams: { name: "$routeParams" },
-      $queryParams: { name: "$queryParams" },
-      $queryString: { name: "$queryString" },
-    },
-  },
+    includeLayoutProps: false,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(RedirectMd, {
+    name: "Redirect",
+    allowsChildren: false,
+    includeLayoutProps: false,
+  }),
   {
     name: "NavPanel",
     kind: "builtin",
@@ -1392,17 +1381,30 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: false,
   }),
-  {
+  contractFromMetadata(SlotMd, {
     name: "Slot",
-    kind: "builtin",
     allowsChildren: true,
-    declarations: {},
+    includeLayoutProps: false,
     acceptsArbitraryProps: true,
-    props: {
-      name: { name: "name" },
+  }),
+  contractFromMetadata(ToneSwitchMd, {
+    name: "ToneSwitch",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      didChange: "onDidChange",
     },
-    events: {},
-  },
+  }),
+  contractFromMetadata(ToneChangerButtonMd, {
+    name: "ToneChangerButton",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      click: "onClick",
+    },
+  }),
   {
     name: "property",
     kind: "builtin",

@@ -85,6 +85,9 @@ import drawerFoundationApp from "./examples/drawer-foundation/Main.xmlui";
 import modalDialogFoundationApp from "./examples/modal-dialog-foundation/Main.xmlui";
 import messagingFoundationApp from "./examples/messaging-foundation/Main.xmlui";
 import feedbackAccessibilityFoundationApp from "./examples/feedback-accessibility-foundation/Main.xmlui";
+import themeSlotFoundationApp from "./examples/theme-slot-foundation/Main.xmlui";
+import appShellFoundationApp from "./examples/app-shell-foundation/Main.xmlui";
+import pageRoutingFoundationApp from "./examples/page-routing-foundation/Main.xmlui";
 import tooltipFoundationApp from "./examples/tooltip-foundation/Main.xmlui";
 import contextMenuFoundationApp from "./examples/context-menu-foundation/Main.xmlui";
 import dropdownMenuFoundationApp from "./examples/dropdown-menu-foundation/Main.xmlui";
@@ -199,6 +202,9 @@ const examples = {
   modalDialogFoundation: modalDialogFoundationApp,
   messagingFoundation: messagingFoundationApp,
   feedbackAccessibilityFoundation: feedbackAccessibilityFoundationApp,
+  themeSlotFoundation: themeSlotFoundationApp,
+  appShellFoundation: appShellFoundationApp,
+  pageRoutingFoundation: pageRoutingFoundationApp,
   tooltipFoundation: tooltipFoundationApp,
   contextMenuFoundation: contextMenuFoundationApp,
   dropdownMenuFoundation: dropdownMenuFoundationApp,

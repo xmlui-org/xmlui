@@ -1,0 +1,16 @@
+<App
+  var.readyCount="{0}"
+  var.lastMessage="none"
+  var.lastKey="none"
+  onReady="readyCount++"
+  onMessageReceived="msg => lastMessage = msg.text || msg"
+  onKeyDown="event => lastKey = 'down:' + event.key"
+  onKeyUp="event => lastKey = 'up:' + event.key">
+  <H1>App shell foundation</H1>
+  <Text>Ready count: {readyCount}</Text>
+  <Text>Last message: {lastMessage}</Text>
+  <Text>Last key: {lastKey}</Text>
+  <Button onClick="lastMessage = 'local update'">
+    Update shell state
+  </Button>
+</App>

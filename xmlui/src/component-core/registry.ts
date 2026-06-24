@@ -109,6 +109,12 @@ import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark.renderer";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
+import { themeRenderer } from "../components/Theme/Theme.renderer";
+import { slotRenderer } from "../components/Slot/Slot.renderer";
+import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
+import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
+import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
+import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -226,6 +232,9 @@ const implementedRuntimeNames = [
   "Bookmark",
   "SkipLink",
   "Toast",
+  "ToneSwitch",
+  "ToneChangerButton",
+  "Redirect",
 ] as const;
 
 const implementedRuntimeNameSet = new Set<string>(implementedRuntimeNames);
@@ -336,6 +345,13 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Bookmark: bookmarkRenderer,
   SkipLink: skipLinkRenderer,
   Toast: toastRenderer,
+  Theme: themeRenderer,
+  Slot: slotRenderer,
+  ToneSwitch: toneSwitchRenderer,
+  ToneChangerButton: toneChangerButtonRenderer,
+  Pages: pagesRenderer,
+  Page: pageRenderer,
+  Redirect: redirectRenderer,
   ...htmlTagRenderers,
 };
 
@@ -455,6 +471,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const bookmarkTransferred = contract.name === "Bookmark";
     const skipLinkTransferred = contract.name === "SkipLink";
     const toastTransferred = contract.name === "Toast";
+    const themeTransferred = contract.name === "Theme";
+    const slotTransferred = contract.name === "Slot";
+    const toneSwitchTransferred = contract.name === "ToneSwitch";
+    const toneChangerButtonTransferred = contract.name === "ToneChangerButton";
+    const pagesTransferred = contract.name === "Pages" || contract.name === "Page";
+    const redirectTransferred = contract.name === "Redirect";
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
@@ -537,7 +559,13 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       liveRegionTransferred ||
       bookmarkTransferred ||
       skipLinkTransferred ||
-      toastTransferred;
+      toastTransferred ||
+      themeTransferred ||
+      slotTransferred ||
+      toneSwitchTransferred ||
+      toneChangerButtonTransferred ||
+      pagesTransferred ||
+      redirectTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
       : appHeaderTransferred
@@ -654,6 +682,18 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                                                           ? "SkipLink"
                                                                                           : toastTransferred
                                                                                             ? "Toast"
+                                                                                            : themeTransferred
+                                                                                              ? "Theme"
+                                                                                              : slotTransferred
+                                                                                                ? "Slot"
+                                                                                                : toneSwitchTransferred
+                                                                                                  ? "ToneSwitch"
+                                                                                                  : toneChangerButtonTransferred
+                                                                                                    ? "ToneChangerButton"
+                                                                                                    : pagesTransferred
+                                                                                                      ? "Pages"
+                                                                                                      : redirectTransferred
+                                                                                                        ? "Redirect"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -819,6 +859,18 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SkipLink.renderer.tsx`);
     } else if (toastTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Toast.renderer.tsx`);
+    } else if (themeTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Theme.renderer.tsx`);
+    } else if (slotTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Slot.renderer.tsx`);
+    } else if (toneSwitchTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneSwitch.renderer.tsx`);
+    } else if (toneChangerButtonTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneChangerButton.renderer.tsx`);
+    } else if (pagesTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Pages.renderer.tsx`);
+    } else if (redirectTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Redirect.renderer.tsx`);
     }
 
     const runnablePaths = componentRunnablePaths({
@@ -899,6 +951,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       bookmarkTransferred,
       skipLinkTransferred,
       toastTransferred,
+      themeTransferred,
+      slotTransferred,
+      toneSwitchTransferred,
+      toneChangerButtonTransferred,
+      pagesTransferred,
+      redirectTransferred,
     });
     return {
       name: contract.name,
@@ -942,7 +1000,13 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
           !liveRegionTransferred &&
           !bookmarkTransferred &&
           !skipLinkTransferred &&
-          !toastTransferred
+          !toastTransferred &&
+          !themeTransferred &&
+          !slotTransferred &&
+          !toneSwitchTransferred &&
+          !toneChangerButtonTransferred &&
+          !pagesTransferred &&
+          !redirectTransferred
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.defaults.ts`]
             : [],
         styles:
@@ -961,7 +1025,12 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
           !eventSourceTransferred &&
           !messageListenerTransferred &&
           !webSocketTransferred &&
-          !toastTransferred
+          !toastTransferred &&
+          !themeTransferred &&
+          !slotTransferred &&
+          !toneChangerButtonTransferred &&
+          !pagesTransferred &&
+          !redirectTransferred
             ? [`xmlui/src/components/${folderName}/${sharedComponentFile}.module.scss`]
             : [],
         docs: transferredFolder ? [`xmlui/src/components/${folderName}/${docsFile}.md`] : [],
@@ -1053,6 +1122,12 @@ function componentRunnablePaths(flags: {
   bookmarkTransferred: boolean;
   skipLinkTransferred: boolean;
   toastTransferred: boolean;
+  themeTransferred: boolean;
+  slotTransferred: boolean;
+  toneSwitchTransferred: boolean;
+  toneChangerButtonTransferred: boolean;
+  pagesTransferred: boolean;
+  redirectTransferred: boolean;
 }): string[] {
   if (flags.accordionTransferred) {
     return [
@@ -1400,6 +1475,24 @@ function componentRunnablePaths(flags: {
   }
   if (flags.toastTransferred) {
     return ["xmlui/src/components/Toast/Toast.spec.ts"];
+  }
+  if (flags.themeTransferred) {
+    return ["xmlui/src/components/Theme/Theme.spec.ts"];
+  }
+  if (flags.slotTransferred) {
+    return ["xmlui/src/components/Slot/Slot.spec.ts"];
+  }
+  if (flags.toneSwitchTransferred) {
+    return ["xmlui/src/components/ToneSwitch/ToneSwitch.spec.ts"];
+  }
+  if (flags.toneChangerButtonTransferred) {
+    return ["xmlui/src/components/ToneChangerButton/ToneChangerButton.spec.ts"];
+  }
+  if (flags.pagesTransferred) {
+    return ["xmlui/src/components/Pages/Pages.spec.ts"];
+  }
+  if (flags.redirectTransferred) {
+    return ["xmlui/src/components/Redirect/Redirect.spec.ts"];
   }
   return [];
 }
