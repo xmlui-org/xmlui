@@ -47,6 +47,7 @@ import { SpaceFillerMd } from "../../components/SpaceFiller/SpaceFiller";
 import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/Splitter";
 import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
 import { StickySectionMd } from "../../components/StickySection/StickySection";
+import { SpinnerMd } from "../../components/Spinner/Spinner";
 import { TabItemMd, TabsMd } from "../../components/Tabs/Tabs";
 import { DataSourceMd } from "../../components/DataSource/DataSource";
 import { APICallMd } from "../../components/APICall/APICall";
@@ -68,6 +69,7 @@ import { ToneSwitchMd } from "../../components/ToneSwitch/ToneSwitch";
 import { ToneChangerButtonMd } from "../../components/ToneChangerButton/ToneChangerButton";
 import { PageMd, PagesMd } from "../../components/Pages/Pages";
 import { RedirectMd } from "../../components/Redirect/Redirect";
+import { NestedAppMd } from "../../components/NestedApp/NestedApp";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -671,6 +673,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
   }),
+  contractFromMetadata(SpinnerMd, {
+    name: "Spinner",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
   {
     name: "HStack",
     kind: "builtin",
@@ -1188,6 +1196,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "Redirect",
     allowsChildren: false,
     includeLayoutProps: false,
+  }),
+  contractFromMetadata(NestedAppMd, {
+    name: "NestedApp",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   {
     name: "NavPanel",

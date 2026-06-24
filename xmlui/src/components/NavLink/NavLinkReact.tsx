@@ -45,6 +45,7 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
     const classes = [
       styles.content,
       active && displayActive && styles.active,
+      active && "xmlui-navlink-active",
       vertical && styles.vertical,
       disabled && styles.disabled,
       noIndicator && styles.noIndicator,

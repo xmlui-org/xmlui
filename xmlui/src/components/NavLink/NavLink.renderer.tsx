@@ -24,7 +24,7 @@ export const navLinkRenderer = wrapComponent({
       () => routing?.getSnapshot() ?? { pathname: "/", search: "", hash: "", queryParams: {}, revision: 0 },
       () => ({ pathname: "/", search: "", hash: "", queryParams: {}, revision: 0 }),
     );
-    const href = to ? routing?.href(to) ?? to : undefined;
+    const href = to ? isExternalUrl(to) ? to : routing?.href(to) ?? to : undefined;
     const active = forceActive || isActivePath(snapshot.pathname, to, exact);
     const hasIconTemplate = adapter.node.children.some(
       (child) => child.kind === "element" &&

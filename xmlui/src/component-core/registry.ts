@@ -45,6 +45,7 @@ import {
 } from "../components/Splitter/Splitter.renderer";
 import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
+import { spinnerRenderer } from "../components/Spinner/Spinner.renderer";
 import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
 import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox.renderer";
@@ -115,6 +116,7 @@ import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer
 import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
 import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
 import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
+import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -147,6 +149,7 @@ const implementedRuntimeNames = [
   "VSplitter",
   "StickyBox",
   "StickySection",
+  "Spinner",
   "Tabs",
   "TabItem",
   "Heading",
@@ -235,6 +238,7 @@ const implementedRuntimeNames = [
   "ToneSwitch",
   "ToneChangerButton",
   "Redirect",
+  "NestedApp",
 ] as const;
 
 const implementedRuntimeNameSet = new Set<string>(implementedRuntimeNames);
@@ -269,6 +273,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   VSplitter: vSplitterRenderer,
   StickyBox: stickyBoxRenderer,
   StickySection: stickySectionRenderer,
+  Spinner: spinnerRenderer,
   Tabs: tabsRenderer,
   TabItem: tabItemRenderer,
   SpaceFiller: spaceFillerRenderer,
@@ -352,6 +357,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Pages: pagesRenderer,
   Page: pageRenderer,
   Redirect: redirectRenderer,
+  NestedApp: nestedAppRenderer,
   ...htmlTagRenderers,
 };
 
@@ -431,6 +437,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const splitterTransferred = contract.name === "Splitter" || contract.name === "HSplitter" || contract.name === "VSplitter";
     const stickyBoxTransferred = contract.name === "StickyBox";
     const stickySectionTransferred = contract.name === "StickySection";
+    const spinnerTransferred = contract.name === "Spinner";
     const headingTransferred = contract.name === "Heading" || /^H[1-6]$/.test(contract.name);
     const htmlTagTransferred = htmlTagComponentNames.includes(contract.name);
     const brTransferred = contract.name === "br" || contract.name === "Br";
@@ -477,6 +484,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const toneChangerButtonTransferred = contract.name === "ToneChangerButton";
     const pagesTransferred = contract.name === "Pages" || contract.name === "Page";
     const redirectTransferred = contract.name === "Redirect";
+    const nestedAppTransferred = contract.name === "NestedApp";
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
@@ -520,6 +528,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       splitterTransferred ||
       stickyBoxTransferred ||
       stickySectionTransferred ||
+      spinnerTransferred ||
       headingTransferred ||
       htmlTagTransferred ||
       brTransferred ||
@@ -565,7 +574,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       toneSwitchTransferred ||
       toneChangerButtonTransferred ||
       pagesTransferred ||
-      redirectTransferred;
+      redirectTransferred ||
+      nestedAppTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
       : appHeaderTransferred
@@ -642,6 +652,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                         ? "StickyBox"
                                                         : stickySectionTransferred
                                                           ? "StickySection"
+                                                          : spinnerTransferred
+                                                            ? "Spinner"
                                                           : expandableItemTransferred
                                                             ? "ExpandableItem"
                                                             : tabsTransferred
@@ -694,6 +706,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                                                                                       ? "Pages"
                                                                                                       : redirectTransferred
                                                                                                         ? "Redirect"
+                                                                                                        : nestedAppTransferred
+                                                                                                          ? "NestedApp"
                                                       : contract.name;
     const docsFile = headingTransferred && /^H[1-6]$/.test(contract.name)
       ? contract.name
@@ -785,6 +799,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/StickyBoxReact.tsx`);
     } else if (stickySectionTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/StickySectionReact.tsx`);
+    } else if (spinnerTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SpinnerReact.tsx`);
     } else if (headingTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/HeadingReact.tsx`);
     } else if (imageTransferred) {
@@ -871,6 +887,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Pages.renderer.tsx`);
     } else if (redirectTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Redirect.renderer.tsx`);
+    } else if (nestedAppTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NestedAppReact.tsx`);
     }
 
     const runnablePaths = componentRunnablePaths({
@@ -914,6 +932,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       splitterTransferred,
       stickyBoxTransferred,
       stickySectionTransferred,
+      spinnerTransferred,
       headingTransferred,
       htmlTagTransferred,
       brTransferred,
@@ -1085,6 +1104,7 @@ function componentRunnablePaths(flags: {
   splitterTransferred: boolean;
   stickyBoxTransferred: boolean;
   stickySectionTransferred: boolean;
+  spinnerTransferred: boolean;
   headingTransferred: boolean;
   htmlTagTransferred: boolean;
   brTransferred: boolean;
@@ -1128,6 +1148,7 @@ function componentRunnablePaths(flags: {
   toneChangerButtonTransferred: boolean;
   pagesTransferred: boolean;
   redirectTransferred: boolean;
+  nestedAppTransferred?: boolean;
 }): string[] {
   if (flags.accordionTransferred) {
     return [
@@ -1333,6 +1354,9 @@ function componentRunnablePaths(flags: {
       "xmlui/src/components/StickySection/StickySection.foundation.spec.ts",
       "xmlui/src/components/StickySection/StickySection.spec.ts",
     ];
+  }
+  if (flags.spinnerTransferred) {
+    return ["xmlui/src/components/Spinner/Spinner.spec.ts"];
   }
   if (flags.headingTransferred) {
     return [

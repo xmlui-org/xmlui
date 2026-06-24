@@ -42,4 +42,56 @@ test.describe("NavLink foundation", () => {
     await expect(page.getByTestId("path")).toContainText("/about");
     await expect(page.getByTestId("about")).toHaveAttribute("aria-current", "page");
   });
+
+  test("uses the public active class and honors exact matching", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/docs/page">
+            <NavLink testId="parent" to="/docs">Docs</NavLink>
+            <NavLink testId="exact" to="/docs" exact="true">Docs exact</NavLink>
+            <NavLink testId="page" to="/docs/page">Page</NavLink>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await page.evaluate(() => { window.location.hash = "#/docs/page"; });
+    await expect(page.getByTestId("parent")).toHaveClass(/xmlui-navlink-active/);
+    await expect(page.getByTestId("parent")).toHaveAttribute("aria-current", "page");
+    await expect(page.getByTestId("exact")).not.toHaveClass(/xmlui-navlink-active/);
+    await expect(page.getByTestId("exact")).not.toHaveAttribute("aria-current", "page");
+    await expect(page.getByTestId("page")).toHaveClass(/xmlui-navlink-active/);
+  });
+
+  test("preserves external href and target without routing rewrite", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <NavLink testId="external" to="https://example.com/path?q=1" target="_blank">External</NavLink>
+      </App>
+    `);
+
+    await expect(page.getByTestId("external")).toHaveAttribute("href", "https://example.com/path?q=1");
+    await expect(page.getByTestId("external")).toHaveAttribute("target", "_blank");
+  });
+
+  test("navigates to routed pages with query parameters", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <NavLink testId="queryLink" to="/docs/page?tab=api">Docs API</NavLink>
+        <Pages>
+          <Page url="/">
+            <Text testId="page">Home</Text>
+          </Page>
+          <Page url="/docs/page">
+            <Text testId="page">Docs page {$queryParams.tab}</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await page.getByTestId("queryLink").click();
+    await expect(page.getByTestId("page")).toHaveText("Docs page api");
+    await expect(page.getByTestId("queryLink")).toHaveAttribute("href", "#/docs/page?tab=api");
+  });
 });

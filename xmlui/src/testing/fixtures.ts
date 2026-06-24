@@ -635,6 +635,7 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`label="{(function () { return 'hello'; })()}"`, `label="hello"`)
     .replaceAll(`initialValue="{() => {}}"`, `initialValue="{{}}"`)
     .replaceAll(`testState = ++testState || 1`, `testState = (testState || 0) + 1`)
+    .replaceAll(`testState = clicked`, `testState = 'clicked'`)
     .replaceAll(`onDidChange="{(val) => {value = val}}"`, `onDidChange="val => value = val"`)
     .replaceAll(`onDidChange="arg => {testState = arg; console.log('arg', arg)}"`, `onDidChange="arg => testState = arg"`)
     .replaceAll(`icon="() => {}"`, `icon="{null}"`)

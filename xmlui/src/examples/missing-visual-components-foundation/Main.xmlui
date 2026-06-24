@@ -1,0 +1,13 @@
+<App var.delayed="{false}">
+  <H1>Missing visual components foundation</H1>
+  <Text>Spinner mode: {delayed ? 'delayed' : 'instant'}</Text>
+  <Button onClick="delayed = !delayed">
+    Toggle spinner delay
+  </Button>
+  <Spinner
+    testId="foundation-spinner"
+    delay="{delayed ? 500 : 0}"
+    width="{delayed ? '48px' : '32px'}"
+    height="{delayed ? '48px' : '32px'}" />
+  <Text>The spinner above is migrated from the original component surface.</Text>
+</App>

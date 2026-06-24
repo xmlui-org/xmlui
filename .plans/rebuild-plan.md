@@ -4117,10 +4117,6 @@ Deferred compatibility work:
   remain deferred.
 - Exact `Redirect.replace` history semantics remain deferred.
 
-Next explicit step: Phase 5 Wave G3A - inspect original `NavLink` navigation
-behavior, then migrate the smallest navigation component slice with
-component-local tests and a runnable example.
-
 ##### Wave G3: Navigation Components
 
 Components:
@@ -4132,6 +4128,29 @@ Compatibility focus:
 - active route matching, disabled state, navigation side effects, styling,
   keyboard/focus behavior, and route/query compatibility.
 
+Status:
+
+- Wave G3A completed: inspected original `NavLink` sources and tightened the
+  first navigation link compatibility slice.
+- Preserved the public `xmlui-navlink-active` active-class contract, nested vs.
+  exact route matching, disabled-as-button behavior, internal router
+  navigation, click event dispatch, and external URL/target preservation.
+- Added focused component-local E2E tests for these foundation behaviors.
+- Expanded runnable example `?example=navLinkFoundation` for `npm run dev` so
+  route changes, query parameters, disabled links, external links, and click
+  mutation can be visually checked.
+
+Deferred compatibility work:
+
+- The literal old `NavLink.spec.ts` suite is copied but still globally skipped.
+- Full theme-variable matrix, icon rendering parity, keyboard/focus behavior,
+  NavGroup/NavPanel inheritance details, tooltip/shell integration, and deeper
+  React Router parity remain deferred.
+
+Next explicit step: Phase 5 Wave G4A - inspect original `NestedApp` boundary
+behavior, then migrate the smallest nested app boundary slice with
+component-local tests and a runnable example.
+
 ##### Wave G4: Nested App Boundary
 
 Components:
@@ -4142,6 +4161,43 @@ Compatibility focus:
 
 - nested app startup, state/theme/router boundaries, package loading,
   lifecycle cleanup, and standalone/Vite behavior.
+
+Status:
+
+- Wave G4A completed: inspected original `NestedApp` sources and migrated the
+  smallest nested app runtime boundary.
+- Added source-adjacent `NestedApp` metadata, renderer, React implementation,
+  stylesheet, documentation, and component-local E2E tests.
+- Registered `NestedApp` as a built-in in compiler contracts, IR lowering, and
+  runtime renderer discovery.
+- The foundation slice compiles the `app` source property through the current
+  compiler/runtime path, renders it with an isolated runtime root/state store,
+  applies `height`, and reports invalid nested source inside the nested app
+  boundary.
+- Added runnable example `?example=nestedAppFoundation` for `npm run dev`.
+
+Deferred compatibility work:
+
+- Shadow DOM isolation, stylesheet cloning/adoption, nested portal root,
+  `isNested` global prop propagation, and old App nested-layout class behavior
+  remain deferred.
+- Playground frame, split view, reset controls, splash screen, lazy viewport
+  activation, `AppWithCodeView`, and Markdown playground integration remain
+  deferred.
+- `api`, `components`, `config`, `activeTheme`, and `activeTone` remain
+  metadata-only in this slice.
+- Old tone-specific `dark` default theme vars remain deferred until the current
+  metadata shape supports tone-specific default theme-var blocks.
+
+Next explicit step: Phase 5 Wave H1A - continue the missing-component migration
+plan with `ProgressBar`. `Spinner` is complete with copied old docs/defaults/
+spec, compiler/runtime registration, the combined
+`?example=missingVisualComponentsFoundation` route, and a passing focused old
+E2E suite. The preceding P0B VS Code SCSS bundling unblock is complete.
+
+Detailed missing-component continuation plan:
+
+- `.plans/missing-component-migration-plan.md`
 
 Each wave should close components in small batches that can keep
 `compatibility:sweep` useful. If a component requires infrastructure from a
