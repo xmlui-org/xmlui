@@ -6,7 +6,7 @@
   "workspaces": [
     "xmlui",
     "packages/*",
-    "tools/vscode",
+    "tools/*",
     "website"
   ],
   "scripts": {

@@ -3,6 +3,8 @@ export {
   mountXmluiApp,
   renderXmluiApp,
   startApp,
+  XmluiRoot,
+  type MountXmluiAppOptions,
   type XmluiDocumentInput,
   type XmluiModule,
 } from "./runtime";

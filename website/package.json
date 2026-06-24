@@ -6,9 +6,13 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
+    "preview-ssg": "preview-ssg dist-ssg",
     "build": "xmlui build"
   },
   "dependencies": {
     "xmlui": "*"
+  },
+  "devDependencies": {
+    "preview-ssg": "*"
   }
 }

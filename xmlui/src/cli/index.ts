@@ -2,6 +2,7 @@
 
 import { build } from "./build";
 import { preview } from "./preview";
+import { ssg } from "./ssg";
 import { start } from "./start";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
@@ -43,6 +44,13 @@ interface BuildArgs {
 interface PreviewArgs {
   port?: number;
   proxy?: string;
+}
+
+interface SsgArgs {
+  outDir?: string;
+  fallback?: string;
+  debug?: boolean;
+  contentDir?: string;
 }
 
 interface StartArgs {
@@ -124,6 +132,43 @@ async function run() {
       async (argv) => {
         const { port, proxy } = argv;
         await preview({ port, proxy });
+      },
+    )
+    .command<SsgArgs>(
+      "ssg",
+      "Generate static pages",
+      (yargs) => {
+        return yargs
+          .option("outDir", {
+            type: "string",
+            default: "dist-ssg",
+            description: "SSG output directory",
+          })
+          .option("fallback", {
+            type: "string",
+            default: "200",
+            description:
+              "Base name for the fallback HTML file served for unknown routes",
+          })
+          .option("debug", {
+            type: "boolean",
+            description: "Preserve intermediate SSR files for debugging",
+            hidden: true,
+          })
+          .option("contentDir", {
+            type: "string",
+            default: "content",
+            description: "Content directory for file based routing",
+          });
+      },
+      async (argv) => {
+        const { outDir, fallback, debug, contentDir } = argv;
+        await ssg({
+          outDir: getStringArg(outDir, "dist-ssg"),
+          fallbackFile: getStringArg(fallback, "200"),
+          debug: getBoolArg(debug, false),
+          contentDir: getStringArg(contentDir, "content"),
+        });
       },
     )
     .command<StartArgs>(
