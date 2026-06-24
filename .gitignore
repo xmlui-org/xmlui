@@ -15,3 +15,6 @@ test-results/
 playwright-report/
 *.vsix
 .DS_Store
+
+
+.turbo

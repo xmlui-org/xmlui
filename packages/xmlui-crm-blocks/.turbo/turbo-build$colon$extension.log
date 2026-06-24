@@ -1,0 +1,19 @@
+
+
+> xmlui-crm-blocks@0.0.1 build:extension
+> xmlui build-lib
+
+[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
+[2Ktransforming (22) [2m../../node_modules/react-remove-scroll/dist/es[2Ktransforming (68) [2msrc/components/TableSelect.module.scss[0m[2K[32m✓[39m 68 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[36mxmlui-crm-blocks.js  [39m[2m[1m73.54 kB[0m[0m[2m │ gzip: 25.19 kB[0m
+
+[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
+[39m
+[2Ktransforming (37) [2m../../node_modules/use-sidecar/dist/es2015/exp[2K[32m✓[39m 68 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[35mindex.css             [39m[2m[1m 3.74 kB[0m[0m[2m │ gzip:  0.99 kB[0m
+[2mdist/[0m[36mxmlui-crm-blocks.mjs  [39m[2m[1m91.90 kB[0m[0m[2m │ gzip: 27.89 kB[0m
+
+[32m✓ built in 1.10s[39m
+[1G[0K⠙[1G[0K

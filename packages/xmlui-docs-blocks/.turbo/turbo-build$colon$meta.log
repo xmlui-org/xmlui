@@ -1,0 +1,11 @@
+
+
+> xmlui-docs-blocks@0.0.3 build:meta
+> xmlui build-lib --mode=metadata
+
+[1G[0K[36mvite v7.1.12 [32mbuilding for production...[36m[39m
+[2K[1Gtransforming (1) [2mmeta/componentsMetadata.ts[2K[1G[32m✓[39m 1 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1G[2mdist/[22m[36mxmlui-docs-blocks-metadata.js  [39m[1m[2m0.16 kB[22m[1m[22m[2m │ gzip: 0.14 kB[22m
+[2K[1Grendering chunks (1)...[2K[1G[2K[1Gcomputing gzip size (1)...[2K[1G[2mdist/[22m[36mxmlui-docs-blocks-metadata.umd.cjs  [39m[1m[2m0.44 kB[22m[1m[22m[2m │ gzip: 0.30 kB[22m
+[32m✓ built in 64ms[39m
+[1G[0K⠙[1G[0K

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I {} git show {}:xmlui/package.json)",
+      "Bash(npm run *)",
+      "Bash(ls *)",
+      "Bash(npm ls *)",
+      "Bash(awk '{print $NF}')",
+      "Bash(git -C /home/ez/code/work/xmlui show 562743c7 --stat)",
+      "Bash(git *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('type:', d.get\\('type','not set'\\)\\); print\\('workspaces:', d.get\\('workspaces', []\\)[:5]\\)\")",
+      "Bash(node -e \"const d=JSON.parse\\(require\\('fs'\\).readFileSync\\('/home/ez/code/work/xmlui/package.json','utf8'\\)\\); console.log\\('type:',d.type\\); console.log\\('workspaces:',d.workspaces?.slice\\(0,5\\)\\)\")",
+      "Bash(node -e \"const d=JSON.parse\\(require\\('fs'\\).readFileSync\\('/home/ez/code/work/xmlui/package.json','utf8'\\)\\); console.log\\(JSON.stringify\\(d.workspaces, null, 2\\)\\)\")",
+      "Bash(node --input-type=module)",
+      "Bash(find /home/ez/code/work/xmlui/packages/xmlui-* -maxdepth 2 -name \"index.*\" -type f)",
+      "Bash(grep -E \"\\\\.\\(d\\\\.ts|js\\)$\")",
+      "mcp__chrome-devtools-mcp__evaluate_script",
+      "mcp__chrome-devtools-mcp__navigate_page",
+      "mcp__chrome-devtools-mcp__take_snapshot",
+      "mcp__chrome-devtools-mcp__list_pages",
+      "mcp__chrome-devtools-mcp__take_screenshot",
+      "Bash(curl -s http://localhost:5173/)",
+      "mcp__chrome-devtools-mcp__list_console_messages",
+      "mcp__chrome-devtools-mcp__list_network_requests",
+      "Bash(grep -v \"^\\\\.$\")",
+      "Bash(grep -v \"^\\\\.\\\\.$\")"
+    ]
+  }
+}

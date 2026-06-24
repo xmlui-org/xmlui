@@ -1,0 +1,89 @@
+
+> ssg
+> xmlui ssg
+
+[xmlui ssg] starting in /home/ez/code/work/xmlui/integration-tests/test-app
+[xmlui ssg] cleaning output directory /home/ez/code/work/xmlui/integration-tests/test-app/dist-ssg
+[xmlui ssg] building project assets
+Building with options: {
+  buildMode: 'INLINE_ALL',
+  flatDist: false,
+  withMock: true,
+  withHostingMetaFiles: false,
+  withRelativeRoot: false
+}
+vite v8.0.9 building client environment for production...
+[plugin vite:transform-xmlui] [xmlui:a11y] /Main.xmlui: [missing-skip-link] <App> contains navigation but no <SkipLink>. Keyboard users need a fast path to main content. Suggestion: Add `<SkipLink target="main" />` before the navigation region.
+[plugin vite:transform-xmlui] [xmlui:type-contract] /components/Home.xmlui: [id-unknown-prop] <TextBox> has unknown prop "value".
+[plugin vite:transform-xmlui] [xmlui:a11y] Build complete — accessibility diagnostics:
+  1 warning(s)
+  Run with accessibility="strict" to fail the build on must-have violations.
+[plugin vite:transform-xmlui] [xmlui:type-contract] Build complete — 1 type-contract diagnostic(s):
+  1 warning(s)
+  id-unknown-prop: 1
+  Run with typeContracts="strict" to fail the build on contract violations.
+[2Ktransforming...✓ 2147 modules transformed.
+rendering chunks...
+[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+1  |  ..._iframe_18e2r_64{border:none;flex:1;width:100%;height:100%}:export{themeVars:"{\"color-icon-Inspector\": \"var(--x...
+   |                                                                 ^
+2  |  @layer components{._testComponent_1hw1z_14{background-color:var(--xmlui-backgroundColor-TestComponent);color:var(--xm...
+3  |  
+computing gzip size...
+dist/index.html                                                     0.39 kB │ gzip:     0.25 kB
+dist/internal/chunks/vite-entrypoint.fWfF-BzM.css                 526.32 kB │ gzip:    56.65 kB
+dist/internal/chunks/preload-helper.BH00m2Ip.js                     1.19 kB │ gzip:     0.68 kB
+dist/internal/index.DMCsHCao.js                                     1.20 kB │ gzip:     0.63 kB
+dist/internal/chunks/isArray.DlUWBLV5.js                            1.74 kB │ gzip:     0.75 kB
+dist/internal/chunks/matchRequestUrl.CN5Hy7HX.js                   12.72 kB │ gzip:     5.28 kB
+dist/internal/chunks/initMock-DtwJBTG9.CujrgPPi.js                 96.03 kB │ gzip:    32.92 kB
+dist/internal/chunks/statementUtils-_hQq9uWZ.D9gavKLv.js          211.99 kB │ gzip:    58.01 kB
+dist/internal/chunks/apiInterceptorWorker-Cv5_Bw-d.C8hBPO27.js    387.98 kB │ gzip:   133.27 kB
+dist/internal/chunks/vite-entrypoint.Biu4csmv.js                4,579.62 kB │ gzip: 1,080.01 kB
+
+✓ built in 1.54s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[xmlui ssg] copying dist to /home/ez/code/work/xmlui/integration-tests/test-app/dist-ssg
+[xmlui ssg] injecting 1 CSS link(s) into shell HTML
+[xmlui ssg] discovered 2 route(s)
+[xmlui ssg] route: /
+[xmlui ssg] route: /about
+[xmlui ssg] detected extensions: xmlui-test-extension
+[xmlui ssg] creating SSR module
+[xmlui ssg] building SSR module
+vite v8.0.9 building ssr environment for production...
+
+ WARN  inlineDynamicImports option is deprecated, please use codeSplitting: false instead.
+
+[plugin vite:transform-xmlui] [xmlui:a11y] /Main.xmlui: [missing-skip-link] <App> contains navigation but no <SkipLink>. Keyboard users need a fast path to main content. Suggestion: Add `<SkipLink target="main" />` before the navigation region.
+[plugin vite:transform-xmlui] [xmlui:type-contract] /components/Home.xmlui: [id-unknown-prop] <TextBox> has unknown prop "value".
+[plugin vite:transform-xmlui] [xmlui:a11y] Build complete — accessibility diagnostics:
+  1 warning(s)
+  Run with accessibility="strict" to fail the build on must-have violations.
+[plugin vite:transform-xmlui] [xmlui:type-contract] Build complete — 1 type-contract diagnostic(s):
+  1 warning(s)
+  id-unknown-prop: 1
+  Run with typeContracts="strict" to fail the build on contract violations.
+[2Ktransforming...✓ 19 modules transformed.
+[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+1  |  ..._iframe_18e2r_64{border:none;flex:1;width:100%;height:100%}:export{themeVars:"{\"color-icon-Inspector\": \"var(--x...
+   |                                                                 ^
+2  |  @layer components{._testComponent_1hw1z_14{background-color:var(--xmlui-backgroundColor-TestComponent);color:var(--xm...
+3  |  
+rendering chunks...
+computing gzip size...
+.xmlui-ssg-ssr/render.mjs  4,441.19 kB │ gzip: 896.26 kB
+
+✓ built in 639ms
+[xmlui ssg] rendering /
+[xmlui ssg] rendering /about
+[xmlui ssg] wrote /home/ez/code/work/xmlui/integration-tests/test-app/dist-ssg/about/index.html
+[xmlui ssg] wrote /home/ez/code/work/xmlui/integration-tests/test-app/dist-ssg/index.html
+[xmlui ssg] wrote search index with 2 entries to /home/ez/code/work/xmlui/integration-tests/test-app/dist-ssg/__xmlui-search-index.json
+[xmlui ssg] rendering fallback shell at synthetic route /200
+[xmlui ssg] wrote /home/ez/code/work/xmlui/integration-tests/test-app/dist-ssg/200.html
+[xmlui ssg] completed. static files are in /home/ez/code/work/xmlui/integration-tests/test-app/dist-ssg

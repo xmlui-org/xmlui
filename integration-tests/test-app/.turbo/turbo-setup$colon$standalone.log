@@ -1,0 +1,5 @@
+
+> setup:standalone
+> node scripts/setup-standalone.mjs
+
+Standalone and extension UMD files copied.

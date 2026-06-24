@@ -1,0 +1,19 @@
+
+
+> xmlui-playground@0.0.3 build:extension
+> xmlui build-lib
+
+[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
+[2Ktransforming (52) [2m../node_modules/file-saver[2Ktransforming (55) [2m../node_modules/@radix-ui/[2Ktransforming (54) [2m../node_modules/react-remo[2Ktransforming (56) [2m../packages/xmlui-devtools[2Ktransforming (53) [2m../xmlui/src/syntax/monaco[2Ktransforming (593) [2m../node_modules/lodash-es[2Ktransforming (594) [2m../node_modules/lodash-es[2Ktransforming (1055) [2m../node_modules/motion-d[2Ktransforming (1054) [2m../node_modules/lodash-e[2Ktransforming (1164) [2msrc/extension/playground[2Ktransforming (1165) [2msrc/extension/providers/[2K[32m✓[39m 1175 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[36mxmlui-playground.js  [39m[2m[1m211.35 kB[0m[0m[2m │ gzip: 65.26 kB[0m
+
+[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
+[39m
+[2Ktransforming (730) [2m../node_modules/use-callb[2Ktransforming (733) [2m../node_modules/use-callb[2Ktransforming (732) [2m../node_modules/react-rem[2Ktransforming (734) [2m../node_modules/use-callb[2Ktransforming (731) [2m../node_modules/use-callb[2Ktransforming (1169) [2m../node_modules/framer-m[2K[32m✓[39m 1175 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[35mindex.css             [39m[2m[1m  4.49 kB[0m[0m[2m │ gzip:  1.48 kB[0m
+[2mdist/[0m[36mxmlui-playground.mjs  [39m[2m[1m275.98 kB[0m[0m[2m │ gzip: 72.41 kB[0m
+
+[32m✓ built in 1.26s[39m
+[1G[0K⠙[1G[0K

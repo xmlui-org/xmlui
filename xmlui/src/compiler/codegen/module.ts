@@ -16,7 +16,7 @@ export type EmitXmluiModuleOptions = {
 export function emitXmluiModule({
   compilerIr,
   imports = [],
-  runtimeSpecifier = "/src/runtime/index.tsx",
+  runtimeSpecifier = "xmlui",
 }: EmitXmluiModuleOptions): string {
   const documentSource = emitValue(emitRuntimeDocumentFromIr(compilerIr));
   const componentArray = imports.map((item) => item.localName).join(", ");

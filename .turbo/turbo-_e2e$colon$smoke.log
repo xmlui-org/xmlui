@@ -1,0 +1,175 @@
+
+
+> xmlui-root@1.0.0 _e2e:smoke
+> cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke
+
+[1G[0K[1A[2K[2m[WebServer] [22m(node:71730) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[2m[WebServer] [22m(Use `node --trace-deprecation ...` to show where the warning was created)
+
+
+[2mRunning [22m103[2m tests using [22m9[2m workers[22m
+
+[1A[2K[1/103] …pec.ts:13:5 › smoke tests › HtmlTag 'h3' is rendered @smoke
+[1A[2K[2m…eading.spec.ts:13:5 › smoke tests › HtmlTag 'h3' is rendered @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2/103] …pec.ts:13:5 › smoke tests › HtmlTag 'h6' is rendered @smoke
+[1A[2K[3/103] …pec.ts:13:5 › smoke tests › HtmlTag 'h1' is rendered @smoke
+[1A[2K[2m…eading.spec.ts:13:5 › smoke tests › HtmlTag 'h6' is rendered @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[4/103] …pec.ts:13:5 › smoke tests › HtmlTag 'h2' is rendered @smoke
+[1A[2K[5/103] … smoke tests › component with Text codefence renders @smoke
+[1A[2K[2m…eading.spec.ts:13:5 › smoke tests › HtmlTag 'h1' is rendered @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…eading.spec.ts:13:5 › smoke tests › HtmlTag 'h2' is rendered @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…:203:3 › smoke tests › component with Text codefence renders @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[6/103] …lock.spec.ts:198:3 › smoke tests › component renders @smoke
+[1A[2K[7/103] …pec.ts:13:5 › smoke tests › HtmlTag 'h4' is rendered @smoke
+[1A[2K[2m…ck/CodeBlock.spec.ts:198:3 › smoke tests › component renders @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[8/103] …pec.ts:13:5 › smoke tests › HtmlTag 'h5' is rendered @smoke
+[1A[2K[2m…eading.spec.ts:13:5 › smoke tests › HtmlTag 'h4' is rendered @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…eading.spec.ts:13:5 › smoke tests › HtmlTag 'h5' is rendered @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[9/103] …ding.spec.ts:6:3 › smoke tests › Heading is rendered @smoke
+[1A[2K[2m…ding/Heading.spec.ts:6:3 › smoke tests › Heading is rendered @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[10/103] … setting value to various types sets value of field @smoke
+[1A[2K[11/103] ….spec.ts:72:3 › smoke tests › child overrides value @smoke
+[1A[2K[12/103] …s › setting value prop has no whitespace collapsing @smoke
+[1A[2K[13/103] … smoke tests › H1 is the same as Heading level='h1' @smoke
+[1A[2K[14/103] … smoke tests › heading sizes decrease from h1 to h6 @smoke
+[1A[2K[15/103] … smoke tests › H2 is the same as Heading level='h2' @smoke
+[1A[2K[16/103] … smoke tests › H4 is the same as Heading level='h4' @smoke
+[1A[2K[17/103] … smoke tests › H3 is the same as Heading level='h3' @smoke
+[1A[2K[18/103] … smoke tests › H5 is the same as Heading level='h5' @smoke
+[1A[2K[19/103] … smoke tests › H6 is the same as Heading level='h6' @smoke
+[1A[2K[20/103] …8:3 › smoke tests › maxLines="2" cuts off long text @smoke
+[1A[2K[21/103] ….spec.ts:178:3 › smoke tests › preserve line breaks @smoke
+[1A[2K[22/103] …spec.ts:201:3 › smoke tests › ellipses in long text @smoke
+[1A[2K[23/103] …spec.ts:220:3 › smoke tests › no ellipses long text @smoke
+[1A[2K[24/103] …3 › smoke tests › nested text whitespace collapsing @smoke
+[1A[2K[25/103] …s.spec.ts:5:3 › smoke tests › htmlTable is rendered @smoke
+[1A[2K[26/103] …/Link.spec.ts:5:3 › smoke tests › component renders @smoke
+[1A[2K[27/103] …ec.ts:13:3 › smoke tests › HtmlTag link is rendered @smoke
+[1A[2K[28/103] …mlTag 'a' accepts custom props not immediately used @smoke
+[1A[2K[29/103] …rkdown.spec.ts:8:3 › smoke tests › Markdown renders @smoke
+[1A[2K[30/103] …:3 › smoke tests › handles empty binding expression @smoke
+[1A[2K[31/103] …tests › does not detect escaped empty expression #1 @smoke
+[1A[2K[32/103] …tests › does not detect escaped empty expression #2 @smoke
+[1A[2K[33/103] …smoke tests › does not detect escaped expression #1 @smoke
+[1A[2K[34/103] …smoke tests › does not detect escaped expression #2 @smoke
+[1A[2K[35/103] …moke tests › handles only spaces binding expression @smoke
+[1A[2K[36/103] ….ts:49:3 › smoke tests › handles binding expression @smoke
+[1A[2K[37/103] …moke tests › handles objects in binding expressions @smoke
+[1A[2K[38/103] …smoke tests › handles arrays in binding expressions @smoke
+[1A[2K[39/103] …ke tests › handles functions in binding expressions @smoke
+[1A[2K[40/103] …sts › handles nested objects in binding expressions @smoke
+[1A[2K[41/103] … functions nested in objects in binding expressions @smoke
+[1A[2K[42/103] …les arrays nested in objects in binding expressions @smoke
+[1A[2K[43/103] …s arrays nested in functions in binding expressions @smoke
+[1A[2K[44/103] …s:114:3 › smoke tests › handles complex expressions @smoke
+[1A[2K[45/103] …2:5 › smoke tests › can render anchor link for 'h1' @smoke
+[1A[2K[46/103] …2:5 › smoke tests › can render anchor link for 'h2' @smoke
+[1A[2K[47/103] …2:5 › smoke tests › can render anchor link for 'h3' @smoke
+[1A[2K[48/103] …2:5 › smoke tests › can render anchor link for 'h4' @smoke
+[1A[2K[49/103] …2:5 › smoke tests › can render anchor link for 'h5' @smoke
+[1A[2K[50/103] …2:5 › smoke tests › can render anchor link for 'h6' @smoke
+[1A[2K[51/103] …ts:140:3 › smoke tests › show implicit anchor links @smoke
+[1A[2K[52/103] …ts:147:3 › smoke tests › show explicit anchor links @smoke
+[1A[2K[53/103] … › smoke tests › don't render implicit anchor links @smoke
+[1A[2K[54/103] … › smoke tests › don't render explicit anchor links @smoke
+[1A[2K[55/103] …e tests › component trigger has correct aria labels @smoke
+[1A[2K[56/103] …:4:3 › smoke tests › displays menuitems after click @smoke
+[1A[2K[57/103] …s:26:3 › smoke tests › disabled navgroup can't open @smoke
+[1A[2K[58/103] …ded in vertical layout to show link of current page @smoke
+[1A[2K[59/103] …unctionality › clicking label brings up the options @smoke
+[1A[2K[60/103] …ty › Option without label and value is not rendered @smoke
+[1A[2K[61/103] …asic Functionality › Option value defaults to label @smoke
+[1A[2K[62/103] …ty › Option label defaults to value in SimpleSelect @smoke
+[1A[2K[63/103] …Option label defaults to value in searchable Select @smoke
+[1A[2K[64/103] …ity › Option label defaults to value in multiSelect @smoke
+[1A[2K[65/103] … › searchable select › search filters option labels @smoke
+[1A[2K[66/103] …:765:3 › multiSelect › initialValue='{[0,1]}' works @smoke
+[1A[2K[67/103] … multiSelect › clicking label brings up the options @smoke
+[1A[2K[68/103] …iselect › searching for and selecting 2 items works @smoke
+[1A[2K[69/103] …:3 › Delay Behavior › component respects delay prop @smoke
+[1A[2K[70/103] …s › delayed fullScreen spinner spans viewport width @smoke
+[1A[2K[71/103] …› button behind fullScreen spinner can't be clicked @smoke
+[1A[2K[72/103] …pper.spec.ts:8:3 › smoke tests › renders with steps @smoke
+[1A[2K[73/103] …er.spec.ts:18:3 › smoke tests › renders step labels @smoke
+[1A[2K[74/103] …shows only active step's content in horizontal mode @smoke
+[1A[2K[75/103] …tep per FormSegment with auto-generated nav buttons @smoke
+[1A[2K[76/103] …b per FormSegment with the standard form button row @smoke
+[1A[2K[77/103] …s:20:3 › smoke tests › renders tab labels correctly @smoke
+[1A[2K[78/103] …/Tabs.spec.ts:9:3 › smoke tests › component renders @smoke
+[1A[2K[79/103] … › smoke tests › shows first tab content by default @smoke
+[1A[2K[80/103] …ext.spec.ts:2194:3 › smoke tests › basic smoke test @smoke
+[1A[2K[81/103] … smoke tests › renders correct number of bar series @smoke
+[1A[2K[82/103] …:73:3 › smoke tests › handles empty data gracefully @smoke
+[1A[2K[2m…ts:45:3 › smoke tests › renders correct number of bar series @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[83/103] … › smoke tests › component renders with basic props @smoke
+[1A[2K[84/103] …c.ts:87:3 › smoke tests › handles single data point @smoke
+[1A[2K[2m…t.spec.ts:73:3 › smoke tests › handles empty data gracefully @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[85/103] … › smoke tests › component renders with basic props @smoke
+[1A[2K[2m…c.ts:49:3 › smoke tests › component renders with basic props @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…Chart.spec.ts:87:3 › smoke tests › handles single data point @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…c.ts:31:3 › smoke tests › component renders with basic props @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[86/103] …ke tests › renders correct number of chart elements @smoke
+[1A[2K[2m…8:3 › smoke tests › renders correct number of chart elements @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[87/103] … › smoke tests › component renders with basic props @smoke
+[1A[2K[2m…c.ts:44:3 › smoke tests › component renders with basic props @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[88/103] … tests › renders donut chart with correct structure @smoke
+[1A[2K[2m…3 › smoke tests › renders donut chart with correct structure @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[89/103] …smoke tests › renders donut sectors for data points @smoke
+[1A[2K[2m…s:63:3 › smoke tests › renders donut sectors for data points @smoke[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[90/103] …sts › renders with default innerRadius (donut hole) @smoke
+[1A[2K[91/103] …lity › smoke tests › Legend renders within PieChart @smoke
+[1A[2K[92/103] …lity › smoke tests › Legend renders within BarChart @smoke
+[1A[2K[93/103] … › smoke tests › component renders with basic props @smoke
+[1A[2K[94/103] …smoke tests › renders correct number of line series @smoke
+[1A[2K[95/103] … › smoke tests › component renders with basic props @smoke
+[1A[2K[96/103] …› smoke tests › renders pie sectors for data points @smoke
+[1A[2K[97/103] …ke tests › renders pie chart with correct structure @smoke
+[1A[2K[98/103] … › smoke tests › component renders with basic props @smoke
+[1A[2K[99/103] …ke tests › renders correct number of radar elements @smoke
+[1A[2K[100/103] …77:3 › smoke tests › handles empty data gracefully @smoke
+[1A[2K[101/103] ….ts:91:3 › smoke tests › handles single data point @smoke
+[1A[2K[102/103] …ests › TooltipContent renders in PieChart on hover @smoke
+[1A[2K[103/103] …ests › TooltipContent renders in BarChart on hover @smoke
+[1A[2K[32m  103 passed[39m[2m (18.3s)[22m
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m
+[1G[0K⠙[1G[0K

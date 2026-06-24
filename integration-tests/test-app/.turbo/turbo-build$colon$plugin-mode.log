@@ -1,0 +1,39 @@
+
+> build:plugin-mode
+> vite build --config vite.plugin-mode.config.ts
+
+vite v8.0.9 building client environment for production...
+[plugin vite:transform-xmlui] [xmlui:type-contract] /components/Home.xmlui: [id-unknown-prop] <TextBox> has unknown prop "value".
+[plugin vite:transform-xmlui] [xmlui:a11y] /Main.xmlui: [missing-skip-link] <App> contains navigation but no <SkipLink>. Keyboard users need a fast path to main content. Suggestion: Add `<SkipLink target="main" />` before the navigation region.
+[plugin vite:transform-xmlui] [xmlui:a11y] Build complete — accessibility diagnostics:
+  1 warning(s)
+  Run with accessibility="strict" to fail the build on must-have violations.
+[plugin vite:transform-xmlui] [xmlui:type-contract] Build complete — 1 type-contract diagnostic(s):
+  1 warning(s)
+  id-unknown-prop: 1
+  Run with typeContracts="strict" to fail the build on contract violations.
+[2Ktransforming...✓ 2146 modules transformed.
+[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+1  |  ..._iframe_18e2r_64{border:none;flex:1;width:100%;height:100%}:export{themeVars:"{\"color-icon-Inspector\": \"var(--x...
+   |                                                                 ^
+2  |  @layer components{._testComponent_1hw1z_14{background-color:var(--xmlui-backgroundColor-TestComponent);color:var(--xm...
+3  |  
+rendering chunks...
+computing gzip size...
+dist-vite-plugin/index.html                                            0.31 kB │ gzip:     0.20 kB
+[plugin builtin:vite-reporter] 
+dist-vite-plugin/assets/vite-entrypoint-fWfF-BzM.css                 526.27 kB │ gzip:    56.62 kB
+dist-vite-plugin/assets/index-CdTn99ea.js                              1.14 kB │ gzip:     0.62 kB
+dist-vite-plugin/assets/preload-helper-DSXbuxSR.js                     1.19 kB │ gzip:     0.68 kB
+(!) Some chunks are larger than 500 kB after minification. Consider:
+dist-vite-plugin/assets/isArray-kO2zz1t8.js                            1.74 kB │ gzip:     0.75 kB
+dist-vite-plugin/assets/matchRequestUrl-lzvPf13R.js                   12.72 kB │ gzip:     5.28 kB
+dist-vite-plugin/assets/initMock-DtwJBTG9-BBELeWPl.js                 96.03 kB │ gzip:    32.92 kB
+dist-vite-plugin/assets/statementUtils-_hQq9uWZ-UeV39HxH.js          211.99 kB │ gzip:    58.01 kB
+- Using dynamic import() to code-split the application
+dist-vite-plugin/assets/apiInterceptorWorker-Cv5_Bw-d-Cn55wdeT.js    387.98 kB │ gzip:   133.26 kB
+dist-vite-plugin/assets/vite-entrypoint-PGYpQ5bF.js                4,603.44 kB │ gzip: 1,087.99 kB
+
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+✓ built in 1.55s
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

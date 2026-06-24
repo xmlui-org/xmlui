@@ -1,0 +1,107 @@
+
+
+> xmlui@0.12.29 build:xmlui-test-bed
+> cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock
+
+[1G[0KBuilding with options: {
+  buildMode: [32m'INLINE_ALL'[39m,
+  flatDist: [33mfalse[39m,
+  withMock: [33mtrue[39m,
+  withHostingMetaFiles: [33mtrue[39m,
+  withRelativeRoot: [33mfalse[39m
+}
+[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
+[2Ktransforming (6) [2m../../../../node_modules/react-dom/client.js[0[2Ktransforming (7) [2m../../../../node_modules/react-hot-toast/dist/i[2Ktransforming (8) [2m../../components-core/theming/StyleRegistry.ts[2Ktransforming (127) [2m../../components/Button/ButtonReact.tsx[0m[2Ktransforming (617) [2m../../../../node_modules/lodash-es/_copyArray[2Ktransforming (703) [2m../../../../packages/xmlui-docs-blocks/src/la[2Ktransforming (1038) [2m../../components/APICall/APICall.tsx[0m[2Ktransforming (1358) [2m../../../../node_modules/is-arrayish/index.j[2Ktransforming (1359) [2m../../components/ModalDialog/Dialog.tsx[0m[2K[1G[33m[plugin rolldown:vite-resolve] Module "fs" has been externalized for browser compatibility, imported by "/home/ez/code/work/xmlui/xmlui/src/components-core/udc-sandbox/manifest.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+[2K[1G[33m[plugin rolldown:vite-resolve] Module "path" has been externalized for browser compatibility, imported by "/home/ez/code/work/xmlui/xmlui/src/components-core/udc-sandbox/manifest.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+[2Ktransforming (1929) [2m../../../../node_modules/micromark-extension[2Ktransforming (1930) [2m../../../../node_modules/micromark-extension[2Ktransforming (2686) [2m../../../../node_modules/micromark-extension[2Ktransforming (2687) [2m../../../../node_modules/lodash-es/_getValue[2Ktransforming (2688) [2m../../../../node_modules/micromark-extension[2Ktransforming (3360) [2m../../../../node_modules/react-smooth/es6/An[2Ktransforming (4054) [2m../../../../node_modules/motion-dom/dist/es/[2Ktransforming (4614) [2m../../../../node_modules/d3-shape/src/curve/[2Ktransforming (4615) [2m../../../../node_modules/dom-helpers/esm/hyp[2Ktransforming (4616) [2m../../../../node_modules/react-pdf/dist/Ref.[2Ktransforming (4853) [2m../../components-core/errors/index.ts[0m[2Ktransforming (4854) [2m../../../../node_modules/d3-shape/src/noop.j[2Ktransforming (4855) [2m../../../../node_modules/lodash/_hasPath.js[2Ktransforming (4856) [2m../../../../node_modules/lodash/_MapCache.js[2Ktransforming (4857) [2m../../../../node_modules/@internationalized/[2Ktransforming (4858) [2m../../../../node_modules/zrender/lib/tool/tr[2Ktransforming (4859) [2m../../../../node_modules/@zag-js/dismissable[2Ktransforming (4860) [2m../../../../node_modules/@zag-js/react/dist/[2Ktransforming (5132) [2m../../../../node_modules/lodash/_mapCacheCle[2Ktransforming (5211) [2m../../../../node_modules/pako/lib/zlib/defla[2Ktransforming (5251) [2m../../../../node_modules/@zag-js/dismissable[2Ktransforming (5257) [2m../../../../node_modules/lodash/_hashClear.j[2Ktransforming (5280) [2m../../../../packages/xmlui-recharts/src/BarC[2Ktransforming (5334) [2m../../../../node_modules/d3-color/src/math.j[2Ktransforming (5360) [2m../../components/FormItem/HelperText.module.[2Ktransforming (5367) [2m../../../../node_modules/smart-webcomponents[2K[32m✓[39m 5485 modules transformed.
+[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+8651 |      z-index: 1;
+8652 |    }
+8653 |    :export {
+     |     ^
+8654 |      themeVars: '{"backgroundColor-List": "var(--xmlui-backgroundColor-List)", "backgroundColor-selected-List": "var(-...
+8655 |    }[39m
+[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+13066 |      background: var(--xmlui-color-primary-500);
+13067 |    }
+13068 |    :export {
+      |     ^
+13069 |      themeVars: "[]";
+13070 |    }[39m
+[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+13138 |      height: 100%;
+13139 |    }
+13140 |    :export {
+      |     ^
+13141 |      themeVars: '{"color-icon-Inspector": "var(--xmlui-color-icon-Inspector)", "backgroundColor-dialog-Inspector": "va...
+13142 |    }[39m
+[2Krendering chunks (1)...[2Krendering chunks (2)...[2Krendering chunks (3)...[2Krendering chunks (4)...[2Krendering chunks (5)...[2Krendering chunks (6)...[2Krendering chunks (7)...[2Krendering chunks (8)...[2Krendering chunks (9)...[2Krendering chunks (10)...[2Krendering chunks (11)...[2Krendering chunks (12)...[2Krendering chunks (13)...[2Krendering chunks (14)...[2Krendering chunks (15)...[2Krendering chunks (16)...[2Krendering chunks (17)...[2Krendering chunks (18)...[2Krendering chunks (19)...[2Krendering chunks (20)...[2Krendering chunks (21)...[2Krendering chunks (22)...[2Krendering chunks (23)...[2Krendering chunks (24)...[2Krendering chunks (25)...[2Krendering chunks (26)...[2Krendering chunks (27)...[2Krendering chunks (28)...[2Krendering chunks (29)...[2Krendering chunks (30)...[2Krendering chunks (31)...[2Krendering chunks (32)...[2Krendering chunks (33)...[2Krendering chunks (34)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[32mindex.html                                         [39m[2m[1m    1.70 kB[0m[0m[2m │ gzip:     0.57 kB[0m
+[2mdist/[0m[32minternal/chunks/smart-icons.CbzY-XZ_.woff2         [39m[2m[1m   25.64 kB[0m[0m
+[2mdist/[0m[32minternal/chunks/smart-icons.DW6niJfE.woff          [39m[2m[1m   31.10 kB[0m[0m
+[2mdist/[0m[32minternal/chunks/smart-icons.jg-CxCYJ.ttf           [39m[2m[1m   55.73 kB[0m[0m
+[2mdist/[0m[32minternal/chunks/smart-icons.B9xU0Yqi.eot           [39m[2m[1m   55.90 kB[0m[0m
+[2mdist/[0m[32minternal/img/flags.41zgeiS_.png                    [39m[2m[1m   70.85 kB[0m[0m
+[2mdist/[0m[32minternal/chunks/react-grid-layout.min.DnmsySel.js  [39m[2m[1m   82.44 kB[0m[0m
+[2mdist/[0m[32minternal/chunks/pdf.worker.min.qwK7q_zL.mjs        [39m[2m[1m1,046.21 kB[0m[0m
+[2mdist/[0m[35minternal/chunks/themeVars.x1XGuNl0.css             [39m[2m[1m    0.05 kB[0m[0m[2m │ gzip:     0.07 kB[0m
+[2mdist/[0m[35minternal/chunks/src.DpE3dSb3.css                   [39m[2m[1m    0.12 kB[0m[0m[2m │ gzip:     0.12 kB[0m
+[2mdist/[0m[35minternal/chunks/dist.CsW7sCm_.css                  [39m[2m[1m    0.33 kB[0m[0m[2m │ gzip:     0.21 kB[0m
+[2mdist/[0m[35minternal/chunks/src.DYJbqBrv.css                   [39m[2m[1m    1.14 kB[0m[0m[2m │ gzip:     0.56 kB[0m
+[2mdist/[0m[35minternal/chunks/Pdf.yCDB25ft.css                   [39m[2m[1m    1.21 kB[0m[0m[2m │ gzip:     0.40 kB[0m
+[2mdist/[0m[35minternal/chunks/src.CsvgStCm.css                   [39m[2m[1m    3.66 kB[0m[0m[2m │ gzip:     0.98 kB[0m
+[2mdist/[0m[35minternal/chunks/src.BKxcl5n8.css                   [39m[2m[1m    3.79 kB[0m[0m[2m │ gzip:     1.03 kB[0m
+[2mdist/[0m[35minternal/chunks/src.B3xFM4Us.css                   [39m[2m[1m    7.17 kB[0m[0m[2m │ gzip:     1.89 kB[0m
+[2mdist/[0m[35minternal/chunks/src.nsdIXnyr.css                   [39m[2m[1m   10.87 kB[0m[0m[2m │ gzip:     2.52 kB[0m
+[2mdist/[0m[35minternal/chunks/src.BdZFdPGL.css                   [39m[2m[1m   14.85 kB[0m[0m[2m │ gzip:     2.13 kB[0m
+[2mdist/[0m[35minternal/chunks/src.nl0DU5pX.css                   [39m[2m[1m   15.94 kB[0m[0m[2m │ gzip:     3.04 kB[0m
+[2mdist/[0m[35minternal/chunks/PdfReact.C3BXoyHP.css              [39m[2m[1m   17.78 kB[0m[0m[2m │ gzip:     3.90 kB[0m
+[2mdist/[0m[35minternal/index.CyXKm0L5.css                        [39m[2m[1m  514.73 kB[0m[0m[2m │ gzip:    55.88 kB[0m
+[2mdist/[0m[35minternal/chunks/src.CkvenR-B.css                   [39m[2m[1m1,477.26 kB[0m[0m[2m │ gzip:   173.03 kB[0m
+[2mdist/[0m[36minternal/chunks/isArray.BYmIPnCb.js                [39m[2m[1m    0.03 kB[0m[0m[2m │ gzip:     0.05 kB[0m
+[2mdist/[0m[36minternal/chunks/themeVars.y-l254DF.js              [39m[2m[1m    0.46 kB[0m[0m[2m │ gzip:     0.29 kB[0m
+[2mdist/[0m[36minternal/chunks/tiny-invariant.DZl0tytX.js         [39m[2m[1m    0.52 kB[0m[0m[2m │ gzip:     0.31 kB[0m
+[2mdist/[0m[36minternal/chunks/warning.DnLS9jOp.js                [39m[2m[1m    0.57 kB[0m[0m[2m │ gzip:     0.38 kB[0m
+[2mdist/[0m[36minternal/chunks/jsx-runtime.EsJTcX0V.js            [39m[2m[1m    0.70 kB[0m[0m[2m │ gzip:     0.45 kB[0m
+[2mdist/[0m[36minternal/chunks/classnames.Dp16kUnK.js             [39m[2m[1m    0.74 kB[0m[0m[2m │ gzip:     0.43 kB[0m
+[2mdist/[0m[36minternal/chunks/chunk.Bes_eHIs.js                  [39m[2m[1m    1.08 kB[0m[0m[2m │ gzip:     0.62 kB[0m
+[2mdist/[0m[36minternal/chunks/Pdf.module.BB1qYWHH.js             [39m[2m[1m    1.31 kB[0m[0m[2m │ gzip:     0.35 kB[0m
+[2mdist/[0m[36minternal/chunks/src.CI2sT9g_.js                    [39m[2m[1m    2.73 kB[0m[0m[2m │ gzip:     1.34 kB[0m
+[2mdist/[0m[36minternal/chunks/src.BWUT7OdV.js                    [39m[2m[1m    4.37 kB[0m[0m[2m │ gzip:     1.84 kB[0m
+[2mdist/[0m[36minternal/chunks/src.uf5-_oSt.js                    [39m[2m[1m    4.96 kB[0m[0m[2m │ gzip:     2.20 kB[0m
+[2mdist/[0m[36minternal/chunks/react.g9DCz8sd.js                  [39m[2m[1m    6.48 kB[0m[0m[2m │ gzip:     2.55 kB[0m
+[2mdist/[0m[36minternal/chunks/src.BCtnl0-j.js                    [39m[2m[1m   11.13 kB[0m[0m[2m │ gzip:     3.74 kB[0m
+[2mdist/[0m[36minternal/chunks/metadata-helpers.smgITuKo.js       [39m[2m[1m   11.83 kB[0m[0m[2m │ gzip:     3.56 kB[0m
+[2mdist/[0m[36minternal/chunks/src.DzF7ZK1U.js                    [39m[2m[1m   21.56 kB[0m[0m[2m │ gzip:     6.20 kB[0m
+[2mdist/[0m[36minternal/chunks/matchRequestUrl.ozTthWuc.js        [39m[2m[1m   23.31 kB[0m[0m[2m │ gzip:     8.74 kB[0m
+[2mdist/[0m[36minternal/chunks/isPlainObject.B1DOhcKV.js          [39m[2m[1m   24.80 kB[0m[0m[2m │ gzip:     8.17 kB[0m
+[2mdist/[0m[36minternal/chunks/misc.BOsF7iye.js                   [39m[2m[1m   26.96 kB[0m[0m[2m │ gzip:     9.84 kB[0m
+[2mdist/[0m[36minternal/chunks/dist.C3OkIMoA.js                   [39m[2m[1m   32.14 kB[0m[0m[2m │ gzip:    11.28 kB[0m
+[2mdist/[0m[36minternal/chunks/src.Dtf_1Jvq.js                    [39m[2m[1m   53.90 kB[0m[0m[2m │ gzip:    18.92 kB[0m
+[2mdist/[0m[36minternal/chunks/src.BhoxB9O5.js                    [39m[2m[1m   55.89 kB[0m[0m[2m │ gzip:    16.39 kB[0m
+[2mdist/[0m[36minternal/chunks/src.CX96k2Jy.js                    [39m[2m[1m   64.38 kB[0m[0m[2m │ gzip:    18.07 kB[0m
+[2mdist/[0m[36minternal/chunks/wrapComponent.CGggUm2U.js          [39m[2m[1m   67.22 kB[0m[0m[2m │ gzip:    22.94 kB[0m
+[2mdist/[0m[36minternal/chunks/initMock.CVoV1mOJ.js               [39m[2m[1m   90.58 kB[0m[0m[2m │ gzip:    30.97 kB[0m
+[2mdist/[0m[36minternal/chunks/react-dom.DjYvZXmZ.js              [39m[2m[1m  132.76 kB[0m[0m[2m │ gzip:    43.09 kB[0m
+[2mdist/[0m[36minternal/chunks/src.Df6s3p-_.js                    [39m[2m[1m  149.72 kB[0m[0m[2m │ gzip:    46.24 kB[0m
+[2mdist/[0m[36minternal/chunks/apiInterceptorWorker.BryiECgh.js   [39m[2m[1m  220.12 kB[0m[0m[2m │ gzip:    75.21 kB[0m
+[2mdist/[0m[36minternal/chunks/src.YQa5xSUN.js                    [39m[2m[1m  441.38 kB[0m[0m[2m │ gzip:   109.69 kB[0m
+[2mdist/[0m[36minternal/chunks/smart.gauge.Bq3me9Vd.js            [39m[2m[1m  463.64 kB[0m[0m[2m │ gzip:   136.56 kB[0m
+[2mdist/[0m[36minternal/chunks/src.DX0EkN8O.js                    [39m[33m[1m  508.05 kB[0m[39m[2m │ gzip:   171.35 kB[0m
+[2mdist/[0m[36minternal/chunks/PdfReact.Bl_qAZ9f.js               [39m[33m[1m  867.17 kB[0m[39m[2m │ gzip:   307.05 kB[0m
+[2mdist/[0m[36minternal/chunks/src.D2vFVB-_.js                    [39m[33m[1m  882.35 kB[0m[39m[2m │ gzip:   146.36 kB[0m
+[2mdist/[0m[36minternal/chunks/src.CFVnOEh3.js                    [39m[33m[1m1,049.29 kB[0m[39m[2m │ gzip:   344.02 kB[0m
+[2mdist/[0m[36minternal/index.BdwFAfYm.js                         [39m[33m[1m4,362.00 kB[0m[39m[2m │ gzip: 1,003.07 kB[0m
+
+[2K[1G[33m[plugin builtin:vite-reporter] [33m[1m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[0m[33m[39m
+[2K[1G[33m[33m[EVAL] Warning:[0m Use of direct `eval` function is strongly discouraged as it poses security risks and may cause issues with minification.
+ - Use of direct `eval` here. in ../../../../node_modules/smart-webcomponents-react/source/modules/smart.gauge.js at 152251..152255
+ [38;5;240m │[0m 
+ [38;5;240m │[0m [38;5;115mHelp[0m: Consider using indirect eval. For more information, check the documentation: https://rolldown.rs/guide/troubleshooting#avoiding-direct-eval
+[39m
+[32m✓ built in 16.87s[39m
+[1G[0K⠙[1G[0K

@@ -1,0 +1,25 @@
+
+
+> xmlui-vscode@0.12.21 build:vsix
+> vsce package
+
+[1G[0K[104m[30m INFO [39m[49m [1m[34mFiles included in the VSIX:[39m[22m
+[1m[34m[39m[22m[1mxmlui-vscode-0.12.21.vsix[22m
+├─ [Content_Types].xml 
+├─ extension.vsixmanifest 
+└─ [1mextension/[22m
+   ├─ LICENSE.md [90m[1.03 KB][39m
+   ├─ changelog.md 
+   ├─ package.json [90m[2.26 KB][39m
+   ├─ readme.md 
+   ├─ [1mdist/[22m
+   │  ├─ extension.js [90m[346.63 KB][39m
+   │  └─ server.js [33m[1.37 MB][39m
+   ├─ [1mresources/[22m
+   │  ├─ xmlui-logo.png [90m[1.67 KB][39m
+   │  └─ xmlui-markup-syntax-highlighting.png [90m[128.75 KB][39m
+   └─ [1msyntaxes/[22m
+      └─ xmlui.tmLanguage.json [90m[11.33 KB][39m
+
+[42m[30m DONE [39m[49m Packaged: /home/ez/code/work/xmlui/tools/vscode/xmlui-vscode-0.12.21.vsix [1m(11 files, 437.06 KB)[22m
+[1G[0K⠙[1G[0K

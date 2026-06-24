@@ -1,0 +1,19 @@
+
+
+> xmlui-echart@0.1.4 build:extension
+> xmlui build-lib
+
+[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
+[2Ktransforming (7) [2m../../node_modules/echarts-for-react/esm/index.[2Ktransforming (32) [2m../../node_modules/echarts/lib/view/Component.[2Ktransforming (397) [2m../../node_modules/echarts/lib/coord/calendar[2Ktransforming (578) [2msrc/EChart.module.scss[0m[2K[32m✓[39m 578 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[36mxmlui-echart.js  [39m[33m[1m1,073.68 kB[0m[39m[2m │ gzip: 353.78 kB[0m
+
+[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
+[39m
+[2Ktransforming (226) [2m../../node_modules/echarts/lib/chart/helper/c[2Ktransforming (534) [2m../../node_modules/zrender/lib/contain/cubic.[2Ktransforming (578) [2msrc/EChart.module.scss[0m[2K[32m✓[39m 578 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[35mindex.css         [39m[2m[1m    0.07 kB[0m[0m[2m │ gzip:   0.08 kB[0m
+[2mdist/[0m[36mxmlui-echart.mjs  [39m[33m[1m1,413.81 kB[0m[39m[2m │ gzip: 400.62 kB[0m
+
+[32m✓ built in 3.52s[39m
+[1G[0K⠙[1G[0K

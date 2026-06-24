@@ -1,0 +1,663 @@
+
+
+> xmlui-root@1.0.0 _test:e2e:with-unit-tests
+> playwright test
+
+[1G[0K[1A[2K[2m[WebServer] [22m[31m(!) Failed to run dependency scan. Skipping dependency pre-bundling. Error: [31m  Failed to scan for dependencies from entries:
+[2m[WebServer] [22m  /home/ez/code/work/xmlui/xmlui/src/testing/infrastructure/index.html
+[2m[WebServer] [22m
+[2m[WebServer] [22m  [31mBuild failed with 15 errors:
+[2m[WebServer] [22m
+[2m[WebServer] [22m[31m[PARSE_ERROR] Error:[0m Unexpected JSX expression
+[2m[WebServer] [22m   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m ../../../../packages/xmlui-docs-blocks/src/docs/SectionHeader.xmlui:1:1 [38;5;246m][0m
+[2m[WebServer] [22m   [38;5;246m│[0m
+[2m[WebServer] [22m [38;5;246m1 │[0m ╭─▶ <Component name="SectionHeader">
+[2m[WebServer] [22m [38;5;240m  ┆[0m ┆   
+[2m[WebServer] [22m [38;5;246m5 │[0m ├─▶ </Component>
+[2m[WebServer] [22m [38;5;240m  │[0m │                  
+[2m[WebServer] [22m [38;5;240m  │[0m ╰────────────────── 
+[2m[WebServer] [22m [38;5;240m  │[0m 
+[2m[WebServer] [22m [38;5;240m  │[0m [38;5;115mHelp[0m: JSX syntax is disabled and should be enabled via the parser options
+[2m[WebServer] [22m[38;5;246m───╯[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22m[31m[PARSE_ERROR] Error:[0m Unexpected JSX expression
+[2m[WebServer] [22m     [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m ../../../../packages/xmlui-docs-blocks/src/layouts/FeaturedWithTabsLayout.xmlui:1:1 [38;5;246m][0m
+[2m[WebServer] [22m     [38;5;246m│[0m
+[2m[WebServer] [22m [38;5;246m  1 │[0m ╭─▶ <Component name="FeaturedWithTabsLayout">
+[2m[WebServer] [22m [38;5;240m    ┆[0m ┆   
+[2m[WebServer] [22m [38;5;246m207 │[0m ├─▶ </Component>
+[2m[WebServer] [22m [38;5;240m    │[0m │                 
+[2m[WebServer] [22m [38;5;240m    │[0m ╰───────────────── 
+[2m[WebServer] [22m [38;5;240m    │[0m 
+[2m[WebServer] [22m [38;5;240m    │[0m [38;5;115mHelp[0m: JSX syntax is disabled and should be enabled via the parser options
+[2m[WebServer] [22m[38;5;246m─────╯[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22m[31m[PARSE_ERROR] Error:[0m Unexpected JSX expression
+[2m[WebServer] [22m    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m ../../../../packages/xmlui-docs-blocks/src/docs/LinkButton.xmlui:1:1 [38;5;246m][0m
+[2m[WebServer] [22m    [38;5;246m│[0m
+[2m[WebServer] [22m [38;5;246m 1 │[0m ╭─▶ <Component name="LinkButton">
+[2m[WebServer] [22m [38;5;240m   ┆[0m ┆   
+[2m[WebServer] [22m [38;5;246m17 │[0m ├─▶ </Component>
+[2m[WebServer] [22m [38;5;240m   │[0m │                  
+[2m[WebServer] [22m [38;5;240m   │[0m ╰────────────────── 
+[2m[WebServer] [22m [38;5;240m   │[0m 
+[2m[WebServer] [22m [38;5;240m   │[0m [38;5;115mHelp[0m: JSX syntax is disabled and should be enabled via the parser options
+[2m[WebServer] [22m[38;5;246m────╯[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22m[31m[PARSE_ERROR] Error:[0m Unexpected token
+[2m[WebServer] [22m   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m ../../../../packages/xmlui-docs-blocks/src/docs/ReleaseList.xmlui:1:1 [38;5;246m][0m
+[2m[WebServer] [22m   [38;5;246m│[0m
+[2m[WebServer] [22m [38;5;246m1 │[0m <[38;5;249mC[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249me[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249mn[0m[38;5;249ma[0m[38;5;249mm[0m[38;5;249me[0m[38;5;249m=[0m[38;5;249m"[0m[38;5;249mR[0m[38;5;249me[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249ma[0m[38;5;249ms[0m[38;5;249me[0m[38;5;249mL[0m[38;5;249mi[0m[38;5;249ms[0m[38;5;249mt[0m[38;5;249m"[0m[38;5;249m>[0m
+[2m[WebServer] [22m [38;5;240m  │[0m ┬  
+[2m[WebServer] [22m [38;5;240m  │[0m ╰── 
+[2m[WebServer] [22m[38;5;246m───╯[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22m[31m[PARSE_ERROR] Error:[0m Unexpected JSX expression
+[2m[WebServer] [22m    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m ../../../../packages/xmlui-docs-blocks/src/layouts/BasicLayout.xmlui:1:1 [38;5;246m][0m
+[2m[WebServer] [22m    [38;5;246m│[0m
+[2m[WebServer] [22m [38;5;246m 1 │[0m ╭─▶ <Component name="BasicLayout">
+[2m[WebServer] [22m [38;5;240m   ┆[0m ┆   
+[2m[WebServer] [22m [38;5;246m50 │[0m ├─▶ </Component>
+[2m[WebServer] [22m [38;5;240m   │[0m │                 
+[2m[WebServer] [22m [38;5;240m   │[0m ╰───────────────── 
+[2m[WebServer] [22m [38;5;240m   │[0m 
+[2m[WebServer] [22m [38;5;240m   │[0m [38;5;115mHelp[0m: JSX syntax is disabled and should be enabled via the parser options
+[2m[WebServer] [22m[38;5;246m────╯[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22m...
+[2m[WebServer] [22m    at aggregateBindingErrorsIntoJsError (file:///home/ez/code/work/xmlui/node_modules/vite/node_modules/rolldown/dist/shared/error-DAA7ncC5.mjs:48:18)
+[2m[WebServer] [22m    at unwrapBindingResult (file:///home/ez/code/work/xmlui/node_modules/vite/node_modules/rolldown/dist/shared/error-DAA7ncC5.mjs:18:128)
+[2m[WebServer] [22m    at scan (file:///home/ez/code/work/xmlui/node_modules/vite/node_modules/rolldown/dist/experimental-index.mjs:176:3)
+[2m[WebServer] [22m    at async Object.build (/home/ez/code/work/xmlui/node_modules/vite/dist/node/chunks/node.js:30691:3)
+[2m[WebServer] [22m    at async scan (/home/ez/code/work/xmlui/node_modules/vite/dist/node/chunks/node.js:30636:4)
+[2m[WebServer] [22m    at async <anonymous> (/home/ez/code/work/xmlui/node_modules/vite/dist/node/chunks/node.js:23199:15)[39m
+
+
+[2mRunning [22m6218[2m tests using [22m9[2m workers[22m
+
+[1A[2K[1/6218] …/Accordion.spec.ts:751:1 › applies padding theme variables
+[1A[2K[2/6218] …:54:1 › AccordionItem has correct accessibility attributes
+[1A[2K[3/6218] …92:1 › applies border-side and combination theme variables
+[1A[2K[4/6218] …on/Accordion.spec.ts:906:1 › expanded treats null as false
+[1A[2K[5/6218] …rdion.spec.ts:337:1 › applies border-color theme variables
+[1A[2K[6/6218] …ccordion.spec.ts:13:1 › clicking on header expands content
+[1A[2K[7/6218] …on.spec.ts:70:1 › pressing enter on header expands content
+[1A[2K[8/6218] …:1 › applies border-style and border-width theme variables
+[1A[2K[2m…n.spec.ts:54:1 › AccordionItem has correct accessibility attributes[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…s/Accordion/Accordion.spec.ts:906:1 › expanded treats null as false[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…dion/Accordion.spec.ts:337:1 › applies border-color theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[9/6218] …› component renders custom header with headerTemplate prop
+[1A[2K[2m….spec.ts:92:1 › applies border-side and combination theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…n/Accordion.spec.ts:70:1 › pressing enter on header expands content[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…ec.ts:521:1 › applies border-style and border-width theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…Accordion/Accordion.spec.ts:751:1 › applies padding theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m….ts:28:1 › component renders custom header with headerTemplate prop[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m…cordion/Accordion.spec.ts:13:1 › clicking on header expands content[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[10/6218] …nctionality › component renders and initializes correctly
+[1A[2K[11/6218] … Functionality › component executes with basic properties
+[1A[2K[12/6218] …y › HTTP method property › executes GET request correctly
+[1A[2K[13/6218] … › HTTP method property › executes POST request correctly
+[1A[2K[14/6218] …y › HTTP method property › executes PUT request correctly
+[1A[2K[15/6218] …es border-side and combination theme variables[33m (retry #1)[39m
+[1A[2K[16/6218] … border-style and border-width theme variables[33m (retry #1)[39m
+[1A[2K[2m…ec.ts:521:1 › applies border-style and border-width theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2m….spec.ts:92:1 › applies border-side and combination theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[17/6218] …pec.ts:751:1 › applies padding theme variables[33m (retry #1)[39m
+[1A[2K[2m…Accordion/Accordion.spec.ts:751:1 › applies padding theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[18/6218] …s:337:1 › applies border-color theme variables[33m (retry #1)[39m
+[1A[2K[2m…dion/Accordion.spec.ts:337:1 › applies border-color theme variables[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[19/6218] … › component renders and initializes correctly[33m (retry #1)[39m
+[1A[2K[2m…› Basic Functionality › component renders and initializes correctly[22m
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[31m  1) [xmlui-nonsmoke] › xmlui/src/components/Accordion/Accordion.spec.ts:521:1 › applies border-style and border-width theme variables [39m
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation
+
+    [90m   at [39mxmlui/src/testing/fixtures.ts:490
+
+    [0m [90m 488 |[39m       [90m// so that deferred React effects (useEffect, scheduled via MessageChannel)[39m
+     [90m 489 |[39m       [90m// and browser style/layout computation finish before the test starts.[39m
+    [31m[1m>[22m[39m[90m 490 |[39m       [36mawait[39m page[33m.[39mevaluate(() [33m=>[39m
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 491 |[39m         document[33m.[39mfonts[33m.[39mready[33m.[39mthen(
+     [90m 492 |[39m           () [33m=>[39m [36mnew[39m [33mPromise[39m[33m<[39m[36mvoid[39m[33m>[39m(resolve [33m=>[39m {
+     [90m 493 |[39m             requestAnimationFrame(() [33m=>[39m setTimeout(resolve[33m,[39m [35m0[39m))[33m;[39m[0m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/testing/fixtures.ts:490:18[22m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/Accordion/Accordion.spec.ts:619:3[22m
+
+
+[1A[2K[20/6218] … HTTP method property › executes DELETE request correctly
+[1A[2K[31m  2) [xmlui-nonsmoke] › xmlui/src/components/Accordion/Accordion.spec.ts:92:1 › applies border-side and combination theme variables [39m
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation
+
+    [90m   at [39mxmlui/src/testing/fixtures.ts:490
+
+    [0m [90m 488 |[39m       [90m// so that deferred React effects (useEffect, scheduled via MessageChannel)[39m
+     [90m 489 |[39m       [90m// and browser style/layout computation finish before the test starts.[39m
+    [31m[1m>[22m[39m[90m 490 |[39m       [36mawait[39m page[33m.[39mevaluate(() [33m=>[39m
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 491 |[39m         document[33m.[39mfonts[33m.[39mready[33m.[39mthen(
+     [90m 492 |[39m           () [33m=>[39m [36mnew[39m [33mPromise[39m[33m<[39m[36mvoid[39m[33m>[39m(resolve [33m=>[39m {
+     [90m 493 |[39m             requestAnimationFrame(() [33m=>[39m setTimeout(resolve[33m,[39m [35m0[39m))[33m;[39m[0m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/testing/fixtures.ts:490:18[22m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/Accordion/Accordion.spec.ts:186:3[22m
+
+
+[1A[2K[21/6218] …od property › supports additional HTTP methods like PATCH
+[1A[2K[31m  3) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:156:3 › Basic Functionality › component renders and initializes correctly [39m
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+    [0m [90m 161 |[39m     [90m// APICall is non-visual, so we check for proper registration by checking if it exists in context[39m
+     [90m 162 |[39m     [36mconst[39m component [33m=[39m page[33m.[39mgetByTestId([32m"test-id-component"[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 163 |[39m     expect([36mawait[39m component[33m.[39mcount())[33m.[39mtoBe([35m0[39m)[33m;[39m [90m// Non-visual component[39m
+     [90m     |[39m                                     [31m[1m^[22m[39m
+     [90m 164 |[39m   })[33m;[39m
+     [90m 165 |[39m
+     [90m 166 |[39m   test([32m"component executes with basic properties"[39m[33m,[39m [36masync[39m ({ initTestBed[33m,[39m createButtonDriver }) [33m=>[39m {[0m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/APICall/APICall.spec.ts:163:37[22m
+
+[2m    Error Context: test-results/src-components-APICall-API-0a849-s-and-initializes-correctly-xmlui-nonsmoke/error-context.md[22m
+
+
+[1A[2K[22/6218] …thod property › defaults to GET method when not specified
+[1A[2K[23/6218] … HTTP method property › handles invalid method gracefully
+[1A[2K[2m[WebServer] [22m[2m3:16:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: Error: Bad Request
+[2m[WebServer] [22m[2m3:16:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: Error: Bad Request
+[2m[WebServer] [22m[2m3:16:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[xmlui] Bad Request
+
+[1A[2K[24/6218] …asic Functionality › url property › handles absolute URLs
+[1A[2K[2m[WebServer] [22m[2m3:16:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mError[22m: Bad Request
+[2m[WebServer] [22m[39m > RestApiProxy.raiseError ../../components-core/RestApiProxy.ts:750:13
+[2m[WebServer] [22m    748 |  
+[2m[WebServer] [22m    749 |      if (response?.statusText || response?.status) {
+[2m[WebServer] [22m    750 |        return new GenericBackendError(response.statusText, response.status);
+[2m[WebServer] [22m        |               ^
+[2m[WebServer] [22m    751 |      }
+[2m[WebServer] [22m    752 |  
+[2m[WebServer] [22m > RestApiProxy.executeOperation ../../components-core/RestApiProxy.ts:668:14
+[2m[WebServer] [22m > RestApiProxy.execute ../../components-core/RestApiProxy.ts:350:11
+[2m[WebServer] [22m > callApi ../../components-core/action/APICall.tsx:440:15
+[2m[WebServer] [22m > ../../components/APICall/APICallReact.tsx:556:23
+[2m[WebServer] [22m > completePromiseInternal ../../components-core/script-runner/eval-tree-async.ts:836:22
+[2m[WebServer] [22m > evalFunctionInvocationAsync ../../components-core/script-runner/eval-tree-async.ts:594:20
+[2m[WebServer] [22m > evalBindingExpressionTreeAsync ../../components-core/script-runner/eval-tree-async.ts:217:15
+[2m[WebServer] [22m > evalBindingAsync ../../components-core/script-runner/eval-tree-async.ts:101:9
+[2m[WebServer] [22m > processStatementAsync ../../components-core/script-runner/process-statement-async.ts:306:10
+[2m[WebServer] [22m
+
+[1A[2K[25/6218] …asic Functionality › url property › handles relative URLs
+[1A[2K[26/6218] …lity › url property › handles URL with special characters
+[1A[2K[27/6218] …Functionality › body property › sends JSON body correctly
+[1A[2K[31m  4) [xmlui-nonsmoke] › xmlui/src/components/Accordion/Accordion.spec.ts:337:1 › applies border-color theme variables [39m
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCSS[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('test-id-component')
+    Expected: [32m"5px"[39m
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveCSS" with timeout 10000ms[22m
+    [2m  - waiting for getByTestId('test-id-component')[22m
+    [2m    - waiting for navigation to finish...[22m
+    [2m    - navigated to "http://localhost:3211/"[22m
+
+
+    [0m [90m 428 |[39m   [36mawait[39m expect(component)[33m.[39mtoHaveCSS([32m"border-bottom-style"[39m[33m,[39m [33mEXPECTED_STYLE[39m)[33m;[39m
+     [90m 429 |[39m   [36mawait[39m expect(component)[33m.[39mtoHaveCSS([32m"border-left-color"[39m[33m,[39m [33mUPDATED[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 430 |[39m   [36mawait[39m expect(component)[33m.[39mtoHaveCSS([32m"border-left-width"[39m[33m,[39m [33mEXPECTED_WIDTH[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 431 |[39m   [36mawait[39m expect(component)[33m.[39mtoHaveCSS([32m"border-left-style"[39m[33m,[39m [33mEXPECTED_STYLE[39m)[33m;[39m
+     [90m 432 |[39m
+     [90m 433 |[39m   [90m// borderRightColor overrides border color[39m[0m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/Accordion/Accordion.spec.ts:430:27[22m
+
+
+[1A[2K[28/6218] … Basic Functionality › body property › handles empty body
+[1A[2K[29/6218] … › body property › handles complex nested objects in body
+[1A[2K[31m  5) [xmlui-nonsmoke] › xmlui/src/components/Accordion/Accordion.spec.ts:751:1 › applies padding theme variables [39m
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('test-id-component')
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByTestId('test-id-component')[22m
+
+
+    [0m [90m 805 |[39m   })[33m;[39m
+     [90m 806 |[39m   component [33m=[39m ([36mawait[39m createAccordionDriver())[33m.[39mcomponent[33m;[39m
+    [31m[1m>[22m[39m[90m 807 |[39m   [36mawait[39m expect(component)[33m.[39mtoBeVisible()[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 808 |[39m   [36mawait[39m expect(component)[33m.[39mtoHaveCSS([32m"padding-top"[39m[33m,[39m [33mEXPECTED[39m)[33m;[39m
+     [90m 809 |[39m   [36mawait[39m expect(component)[33m.[39mnot[33m.[39mtoHaveCSS([32m"padding-right"[39m[33m,[39m [33mEXPECTED[39m)[33m;[39m
+     [90m 810 |[39m   [36mawait[39m expect(component)[33m.[39mtoHaveCSS([32m"padding-bottom"[39m[33m,[39m [33mEXPECTED[39m)[33m;[39m[0m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/Accordion/Accordion.spec.ts:807:27[22m
+
+
+[1A[2K[30/6218] … Functionality › rawBody property › sends raw string body
+[1A[2K[31/6218] …y › rawBody property › rawBody takes precedence over body
+[1A[2K[32/6218] …› queryParams property › sends query parameters correctly
+[1A[2K[33/6218] …y › queryParams property › handles empty query parameters
+[1A[2K[34/6218] …property › handles special characters in query parameters
+[1A[2K[35/6218] …ality › headers property › sends custom headers correctly
+[1A[2K[36/6218] … Functionality › headers property › handles empty headers
+[1A[2K[37/6218] …› shows confirmation dialog with custom title and message
+[1A[2K[38/6218] …perties › API call proceeds when confirmation is accepted
+[1A[2K[2m[WebServer] [22m[2m3:16:33 PM[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[1A[2K[39/6218] …ies › API call is cancelled when confirmation is rejected
+[1A[2K[40/6218] …PI call is cancelled when custom cancel button is clicked
+[1A[2K[41/6218] …nctionality › credentials property › accepts 'omit' value
+[1A[2K[2m[WebServer] [22m[2m3:16:34 PM[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[1A[2K[2m[WebServer] [22m[2m3:16:34 PM[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[1A[2K[2m[WebServer] [22m[2m3:16:34 PM[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mWarning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+
+[1A[2K[42/6218] …lity › credentials property › accepts 'same-origin' value
+[1A[2K[43/6218] …ionality › credentials property › accepts 'include' value
+[1A[2K[44/6218] …y › works without credentials property (default behavior)
+[1A[2K[45/6218] …ls property › credentials property works with POST method
+[1A[2K[46/6218] …roperty › credentials property works with form submission
+[1A[2K[47/6218] … properties › shows progress notification during API call
+[1A[2K[48/6218] … properties › shows success notification with result data
+[1A[2K[49/6218] …n message properties › shows error notification: code 400
+[1A[2K[50/6218] …ties › shows error notification and onError show the same
+[1A[2K[51/6218] …n message properties › shows error notification: code 500
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mTypeError[22m: Cannot read properties of undefined (reading 'url')
+[2m[WebServer] [22m[39m > ../../../../node_modules/msw/lib/browser/index.mjs:1110:21
+[2m[WebServer] [22m > ServiceWorkerContainer.<anonymous> ../../../../node_modules/msw/lib/browser/index.mjs:2734:14
+[2m[WebServer] [22m
+
+[1A[2K[52/6218] … properties › shows error notification with error details
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mA 'throw' statement executed:
+[2m[WebServer] [22m
+[2m[WebServer] [22mBad request
+[2m[WebServer] [22m
+[2m[WebServer] [22mError: Bad request
+
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError: Bad request
+[2m[WebServer] [22m    at processStatementAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:493:10)
+[2m[WebServer] [22m    at async processStatementQueueAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:43:14)
+[2m[WebServer] [22m    at async runEventHandlerCode (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/utils/statementUtils.ts:182:9)
+[2m[WebServer] [22m    at async Backend.runFn (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:118:3)
+[2m[WebServer] [22m    at async Backend.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:74:10)
+[2m[WebServer] [22m    at async ApiInterceptor.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/ApiInterceptor.ts:133:16)
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/apiInterceptorWorker.ts:15:12
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:207:20
+[2m[WebServer] [22m    at async HttpHandler.run (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:186:26)
+[2m[WebServer] [22m    at async executeHandlers (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:255:12)
+
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mA 'throw' statement executed:
+[2m[WebServer] [22m
+[2m[WebServer] [22mBad request
+[2m[WebServer] [22m
+[2m[WebServer] [22mError: Bad request
+
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError: Bad request
+[2m[WebServer] [22m    at processStatementAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:493:10)
+[2m[WebServer] [22m    at async processStatementQueueAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:43:14)
+[2m[WebServer] [22m    at async runEventHandlerCode (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/utils/statementUtils.ts:182:9)
+[2m[WebServer] [22m    at async Backend.runFn (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:118:3)
+[2m[WebServer] [22m    at async Backend.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:74:10)
+[2m[WebServer] [22m    at async ApiInterceptor.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/ApiInterceptor.ts:133:16)
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/apiInterceptorWorker.ts:15:12
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:207:20
+[2m[WebServer] [22m    at async HttpHandler.run (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:186:26)
+[2m[WebServer] [22m    at async executeHandlers (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:255:12)
+
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mA 'throw' statement executed:
+[2m[WebServer] [22m
+[2m[WebServer] [22mInternal server error
+[2m[WebServer] [22m
+[2m[WebServer] [22mError: Internal server error
+
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError: Internal server error
+[2m[WebServer] [22m    at processStatementAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:493:10)
+[2m[WebServer] [22m    at async processStatementQueueAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:43:14)
+[2m[WebServer] [22m    at async runEventHandlerCode (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/utils/statementUtils.ts:182:9)
+[2m[WebServer] [22m    at async Backend.runFn (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:118:3)
+[2m[WebServer] [22m    at async Backend.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:74:10)
+[2m[WebServer] [22m    at async ApiInterceptor.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/ApiInterceptor.ts:133:16)
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/apiInterceptorWorker.ts:15:12
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:207:20
+[2m[WebServer] [22m    at async HttpHandler.run (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:186:26)
+[2m[WebServer] [22m    at async executeHandlers (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:255:12)
+
+[1A[2K[53/6218] … shows not found error notification on incorrect endpoint
+[1A[2K[54/6218] …ion message properties › shows unknown error notification
+[1A[2K[55/6218] … Basic Functionality › execute method › triggers API call
+[1A[2K[56/6218] …Basic Functionality › execute method › accepts parameters
+[1A[2K[57/6218] …› execute method › provides access to multiple parameters
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mA 'throw' statement executed:
+[2m[WebServer] [22m
+[2m[WebServer] [22mBad request
+[2m[WebServer] [22m
+[2m[WebServer] [22mError: Bad request
+
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError: Bad request
+[2m[WebServer] [22m    at processStatementAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:493:10)
+[2m[WebServer] [22m    at async processStatementQueueAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:43:14)
+[2m[WebServer] [22m    at async runEventHandlerCode (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/utils/statementUtils.ts:182:9)
+[2m[WebServer] [22m    at async Backend.runFn (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:118:3)
+[2m[WebServer] [22m    at async Backend.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:74:10)
+[2m[WebServer] [22m    at async ApiInterceptor.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/ApiInterceptor.ts:133:16)
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/apiInterceptorWorker.ts:15:12
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:207:20
+[2m[WebServer] [22m    at async HttpHandler.run (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:186:26)
+[2m[WebServer] [22m    at async executeHandlers (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:255:12)
+
+[1A[2K[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mA 'throw' statement executed:
+[2m[WebServer] [22m
+[2m[WebServer] [22mError without message
+[2m[WebServer] [22m
+[2m[WebServer] [22m[object Object]
+[2m[WebServer] [22m[2m3:16:35 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError: Error without message
+[2m[WebServer] [22m    at processStatementAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:493:10)
+[2m[WebServer] [22m    at async processStatementQueueAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:43:14)
+[2m[WebServer] [22m    at async runEventHandlerCode (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/utils/statementUtils.ts:182:9)
+[2m[WebServer] [22m    at async Backend.runFn (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:118:3)
+[2m[WebServer] [22m    at async Backend.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:74:10)
+[2m[WebServer] [22m    at async ApiInterceptor.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/ApiInterceptor.ts:133:16)
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/apiInterceptorWorker.ts:15:12
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:207:20
+[2m[WebServer] [22m    at async HttpHandler.run (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:186:26)
+[2m[WebServer] [22m    at async executeHandlers (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:255:12)
+
+[1A[2K[58/6218] …tionality › execute method › can be called multiple times
+[1A[2K[59/6218] …ext variables › $param provides access to first parameter
+[1A[2K[60/6218] …ext variables › $params provides access to all parameters
+[1A[2K[61/6218] …text variables › $result provides access to response data
+[1A[2K[62/6218] …t variables › $error provides access to error information
+[1A[2K[63/6218] … Cases › handles null and undefined parameters gracefully
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mTypeError[22m: Cannot read properties of undefined (reading 'url')
+[2m[WebServer] [22m[39m > ../../../../node_modules/msw/lib/browser/index.mjs:1110:21
+[2m[WebServer] [22m > ServiceWorkerContainer.<anonymous> ../../../../node_modules/msw/lib/browser/index.mjs:2734:14
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mTypeError[22m: Cannot read properties of undefined (reading 'url')
+[2m[WebServer] [22m[39m > ../../../../node_modules/msw/lib/browser/index.mjs:1110:21
+[2m[WebServer] [22m > ServiceWorkerContainer.<anonymous> ../../../../node_modules/msw/lib/browser/index.mjs:2734:14
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mTypeError[22m: Cannot read properties of undefined (reading 'url')
+[2m[WebServer] [22m[39m > ../../../../node_modules/msw/lib/browser/index.mjs:1110:21
+[2m[WebServer] [22m > ServiceWorkerContainer.<anonymous> ../../../../node_modules/msw/lib/browser/index.mjs:2734:14
+[2m[WebServer] [22m
+
+[1A[2K[64/6218] …1:3 › Other Edge Cases › handles undefined URL gracefully
+[1A[2K[65/6218] …er Edge Cases › handles malformed JSON in body gracefully
+[1A[2K[66/6218] … › Other Edge Cases › handles very large request payloads
+[1A[2K[67/6218] …r Edge Cases › handles special Unicode characters in data
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mA 'throw' statement executed:
+[2m[WebServer] [22m
+[2m[WebServer] [22mBad request
+[2m[WebServer] [22m
+[2m[WebServer] [22mError: Bad request
+[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError: Bad request
+[2m[WebServer] [22m    at processStatementAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:493:10)
+[2m[WebServer] [22m    at async processStatementQueueAsync (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/script-runner/process-statement-async.ts:43:14)
+[2m[WebServer] [22m    at async runEventHandlerCode (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/utils/statementUtils.ts:182:9)
+[2m[WebServer] [22m    at async Backend.runFn (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:118:3)
+[2m[WebServer] [22m    at async Backend.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/Backend.ts:74:10)
+[2m[WebServer] [22m    at async ApiInterceptor.executeOperation (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/ApiInterceptor.ts:133:16)
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/src/components-core/interception/apiInterceptorWorker.ts:15:12
+[2m[WebServer] [22m    at async http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:207:20
+[2m[WebServer] [22m    at async HttpHandler.run (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:186:26)
+[2m[WebServer] [22m    at async executeHandlers (http://localhost:3211/@fs/home/ez/code/work/xmlui/xmlui/node_modules/.vite/deps/getTimestamp-BEicqqZK.js?v=f528313c:255:12)
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: Error: Bad request
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: Error: Bad request
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[xmlui] Bad request
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mError[22m: Bad request
+[2m[WebServer] [22m[39m > RestApiProxy.raiseError ../../components-core/RestApiProxy.ts:738:15
+[2m[WebServer] [22m    736 |  
+[2m[WebServer] [22m    737 |        if (hasParsedBody) {
+[2m[WebServer] [22m    738 |          return new GenericBackendError(
+[2m[WebServer] [22m        |                 ^
+[2m[WebServer] [22m    739 |            this.config.errorResponseTransform
+[2m[WebServer] [22m    740 |              ? this.extractParam(true, this.config.errorResponseTransform, {
+[2m[WebServer] [22m > RestApiProxy.executeOperation ../../components-core/RestApiProxy.ts:668:14
+[2m[WebServer] [22m > RestApiProxy.execute ../../components-core/RestApiProxy.ts:350:11
+[2m[WebServer] [22m > callApi ../../components-core/action/APICall.tsx:440:15
+[2m[WebServer] [22m > ../../components/APICall/APICallReact.tsx:556:23
+[2m[WebServer] [22m > completePromiseInternal ../../components-core/script-runner/eval-tree-async.ts:836:22
+[2m[WebServer] [22m > evalFunctionInvocationAsync ../../components-core/script-runner/eval-tree-async.ts:594:20
+[2m[WebServer] [22m > evalBindingExpressionTreeAsync ../../components-core/script-runner/eval-tree-async.ts:217:15
+[2m[WebServer] [22m > evalBindingAsync ../../components-core/script-runner/eval-tree-async.ts:101:9
+[2m[WebServer] [22m > processStatementAsync ../../components-core/script-runner/process-statement-async.ts:306:10
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: TypeError: Cannot read properties of undefined (reading 'startsWith')
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: TypeError: Cannot read properties of undefined (reading 'startsWith')
+[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[xmlui] Cannot read properties of undefined (reading 'startsWith')
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mTypeError[22m: Cannot read properties of undefined (reading 'startsWith')
+[2m[WebServer] [22m[39m > RestApiProxy.generateFullApiUrl ../../components-core/RestApiProxy.ts:722:17
+[2m[WebServer] [22m    720 |      }
+[2m[WebServer] [22m    721 |  
+[2m[WebServer] [22m    722 |      if (basePath.startsWith("http://") || basePath.startsWith("https://")) {
+[2m[WebServer] [22m        |                   ^
+[2m[WebServer] [22m    723 |        return `${basePath}${queryString}`;
+[2m[WebServer] [22m    724 |      }
+[2m[WebServer] [22m > RestApiProxy.executeOperation ../../components-core/RestApiProxy.ts:594:19
+[2m[WebServer] [22m > RestApiProxy.execute ../../components-core/RestApiProxy.ts:350:22
+[2m[WebServer] [22m > callApi ../../components-core/action/APICall.tsx:440:63
+[2m[WebServer] [22m > ../../components/APICall/APICallReact.tsx:556:23
+[2m[WebServer] [22m > completePromiseInternal ../../components-core/script-runner/eval-tree-async.ts:836:22
+[2m[WebServer] [22m > evalFunctionInvocationAsync ../../components-core/script-runner/eval-tree-async.ts:594:20
+[2m[WebServer] [22m > evalBindingExpressionTreeAsync ../../components-core/script-runner/eval-tree-async.ts:217:15
+[2m[WebServer] [22m > evalBindingAsync ../../components-core/script-runner/eval-tree-async.ts:101:9
+[2m[WebServer] [22m > processStatementAsync ../../components-core/script-runner/process-statement-async.ts:306:10
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: Error: Unclosed expression: '{ invalid json }'
+[2m[WebServer] [22m' invalid json }'
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mError while executing code: Error: Unclosed expression: '{ invalid json }'
+[2m[WebServer] [22m' invalid json }'
+[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[xmlui] Unclosed expression: '{ invalid json }'
+[2m[WebServer] [22m' invalid json }'
+
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mError[22m: Unclosed expression: '{ invalid json }'
+[2m[WebServer] [22m' invalid json }'
+[2m[WebServer] [22m[39m > parseParameterString ../../components-core/script-runner/ParameterParser.ts:68:16
+[2m[WebServer] [22m    66 |          if (!tail || tail.trim().length < 1 || tail.trim()[0] !== "}") {
+[2m[WebServer] [22m    67 |            // --- Unclosed expression, back to its beginning
+[2m[WebServer] [22m    68 |            throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
+[2m[WebServer] [22m       |                  ^
+[2m[WebServer] [22m    69 |          } else {
+[2m[WebServer] [22m    70 |            // --- Successfully parsed expression
+[2m[WebServer] [22m > extractParam ../../components-core/utils/extractParam.ts:32:26
+[2m[WebServer] [22m > RestApiProxy.extractParam ../../components-core/RestApiProxy.ts:510:13
+[2m[WebServer] [22m > RestApiProxy.executeOperation ../../components-core/RestApiProxy.ts:550:16
+[2m[WebServer] [22m > RestApiProxy.execute ../../components-core/RestApiProxy.ts:350:22
+[2m[WebServer] [22m > callApi ../../components-core/action/APICall.tsx:440:63
+[2m[WebServer] [22m > ../../components/APICall/APICallReact.tsx:556:23
+[2m[WebServer] [22m > completePromiseInternal ../../components-core/script-runner/eval-tree-async.ts:836:22
+[2m[WebServer] [22m > evalFunctionInvocationAsync ../../components-core/script-runner/eval-tree-async.ts:594:20
+[2m[WebServer] [22m > evalBindingExpressionTreeAsync ../../components-core/script-runner/eval-tree-async.ts:217:15
+[2m[WebServer] [22m
+
+[1A[2K[68/6218] … › Other Edge Cases › handles component cleanup correctly
+[1A[2K[2m[WebServer] [22m[2m3:16:36 PM[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mUnrecognised property 'if' on component 'Fragment'.
+
+[1A[2K[69/6218] … Edge Cases › handles when condition preventing execution
+[1A[2K[70/6218] …e Tracking › exposes inProgress during API call execution
+[1A[2K[71/6218] …e Tracking › stores lastResult after successful execution
+[1A[2K[72/6218] … State Tracking › stores lastError after failed execution
+[1A[2K[2m[WebServer] [22m[2m3:16:37 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mTypeError[22m: Cannot read properties of undefined (reading 'url')
+[2m[WebServer] [22m[39m > ../../../../node_modules/msw/lib/browser/index.mjs:1110:21
+[2m[WebServer] [22m > ServiceWorkerContainer.<anonymous> ../../../../node_modules/msw/lib/browser/index.mjs:2734:14
+[2m[WebServer] [22m
+
+[1A[2K[31m  6) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:193:7 › Basic Functionality › HTTP method property › executes PUT request correctly [39m
+
+    [31mTest was interrupted.[39m
+
+    Error: locator.click: Target page, context or browser has been closed
+    Call log:
+    [2m  - waiting for getByTestId('trigger')[22m
+
+
+    [90m   at [39mxmlui/src/testing/ComponentDrivers.ts:68
+
+    [0m [90m 66 |[39m
+     [90m 67 |[39m   click [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m [33mClickOption[39m) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mawait[39m [36mthis[39m[33m.[39mlocator[33m.[39mclick(options)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 69 |[39m   }[33m;[39m
+     [90m 70 |[39m
+     [90m 71 |[39m   dblclick [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m { timeout[33m?[39m[33m:[39m number }) [33m=>[39m {[0m
+    [2m    at ButtonDriver.click (/home/ez/code/work/xmlui/xmlui/src/testing/ComponentDrivers.ts:68:24)[22m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/APICall/APICall.spec.ts:216:22[22m
+
+
+[1A[2K[31m  7) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:1531:3 › Other Edge Cases › handles special Unicode characters in data [39m
+
+    [31mTest was interrupted.[39m
+
+
+[1A[2K[31m  8) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:193:7 › Basic Functionality › HTTP method property › executes POST request correctly [39m
+
+    [31mTest was interrupted.[39m
+
+    Error: locator.click: Target page, context or browser has been closed
+    Call log:
+    [2m  - waiting for getByTestId('trigger')[22m
+
+
+    [90m   at [39mxmlui/src/testing/ComponentDrivers.ts:68
+
+    [0m [90m 66 |[39m
+     [90m 67 |[39m   click [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m [33mClickOption[39m) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mawait[39m [36mthis[39m[33m.[39mlocator[33m.[39mclick(options)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 69 |[39m   }[33m;[39m
+     [90m 70 |[39m
+     [90m 71 |[39m   dblclick [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m { timeout[33m?[39m[33m:[39m number }) [33m=>[39m {[0m
+    [2m    at ButtonDriver.click (/home/ez/code/work/xmlui/xmlui/src/testing/ComponentDrivers.ts:68:24)[22m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/APICall/APICall.spec.ts:216:22[22m
+
+
+[1A[2K[31m  9) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:1674:3 › State Tracking › stores lastResult after successful execution [39m
+
+    [31mTest was interrupted.[39m
+
+
+[1A[2K[31m  10) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:1635:3 › State Tracking › exposes inProgress during API call execution [39m
+
+    [31mTest was interrupted.[39m
+
+
+[1A[2K[31m  11) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:193:7 › Basic Functionality › HTTP method property › executes GET request correctly [39m
+
+    [31mTest was interrupted.[39m
+
+    Error: locator.click: Target page, context or browser has been closed
+    Call log:
+    [2m  - waiting for getByTestId('trigger')[22m
+
+
+    [90m   at [39mxmlui/src/testing/ComponentDrivers.ts:68
+
+    [0m [90m 66 |[39m
+     [90m 67 |[39m   click [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m [33mClickOption[39m) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mawait[39m [36mthis[39m[33m.[39mlocator[33m.[39mclick(options)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 69 |[39m   }[33m;[39m
+     [90m 70 |[39m
+     [90m 71 |[39m   dblclick [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m { timeout[33m?[39m[33m:[39m number }) [33m=>[39m {[0m
+    [2m    at ButtonDriver.click (/home/ez/code/work/xmlui/xmlui/src/testing/ComponentDrivers.ts:68:24)[22m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/APICall/APICall.spec.ts:216:22[22m
+
+
+[1A[2K[31m  12) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:166:3 › Basic Functionality › component executes with basic properties [39m
+
+    [31mTest was interrupted.[39m
+
+    Error: locator.click: Target page, context or browser has been closed
+    Call log:
+    [2m  - waiting for getByTestId('trigger')[22m
+
+
+    [90m   at [39mxmlui/src/testing/ComponentDrivers.ts:68
+
+    [0m [90m 66 |[39m
+     [90m 67 |[39m   click [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m [33mClickOption[39m) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mawait[39m [36mthis[39m[33m.[39mlocator[33m.[39mclick(options)[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 69 |[39m   }[33m;[39m
+     [90m 70 |[39m
+     [90m 71 |[39m   dblclick [33m=[39m [36masync[39m (options[33m?[39m[33m:[39m { timeout[33m?[39m[33m:[39m number }) [33m=>[39m {[0m
+    [2m    at ButtonDriver.click (/home/ez/code/work/xmlui/xmlui/src/testing/ComponentDrivers.ts:68:24)[22m
+    [2m    at /home/ez/code/work/xmlui/xmlui/src/components/APICall/APICall.spec.ts:180:18[22m
+
+
+[1A[2K[31m  13) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:1704:3 › State Tracking › stores lastError after failed execution [39m
+
+    [31mTest was interrupted.[39m
+
+
+[1A[2K[31m  14) [xmlui-nonsmoke] › xmlui/src/components/APICall/APICall.spec.ts:1506:3 › Other Edge Cases › handles very large request payloads [39m
+
+    [31mTest was interrupted.[39m
+
+    Error: locator.textContent: Target page, context or browser has been closed
+
+    [90m   at [39mxmlui/src/testing/ComponentDrivers.ts:116
+
+    [0m [90m 114 |[39m   [36mget[39m testState() {
+     [90m 115 |[39m     [36mreturn[39m [36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 116 |[39m       [36mconst[39m text [33m=[39m [36mawait[39m [36mthis[39m[33m.[39mtestStateLocator[33m.[39mtextContent()[33m;[39m
+     [90m     |[39m                                                [31m[1m^[22m[39m
+     [90m 117 |[39m       [36mconst[39m testState [33m=[39m text [33m===[39m [32m"undefined"[39m [33m?[39m undefined [33m:[39m [33mJSON[39m[33m.[39mparse(text[33m![39m)[33m;[39m
+     [90m 118 |[39m       [36mreturn[39m testState[33m;[39m
+     [90m 119 |[39m     }[33m;[39m[0m
+    [2m    at Object.generator (/home/ez/code/work/xmlui/xmlui/src/testing/ComponentDrivers.ts:116:48)[22m
+
+

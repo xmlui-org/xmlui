@@ -1,0 +1,5 @@
+{
+  "env": {
+    "CHROME_PATH": "/run/current-system/sw/bin/chromium"
+  }
+}

@@ -1,0 +1,818 @@
+[
+  {
+    "status": "experimental",
+    "description": "HeroSection",
+    "parts": {
+      "header": {
+        "description": "The header section containing all text content and CTA button"
+      },
+      "content": {
+        "description": "The content section containing image and children"
+      },
+      "headingSection": {
+        "description": "The heading section containing preamble, headline, and subheadline"
+      },
+      "preamble": {
+        "description": "The preamble text for the hero section"
+      },
+      "headline": {
+        "description": "The headline text for the hero section"
+      },
+      "subheadline": {
+        "description": "The subheadline text for the hero section"
+      },
+      "mainText": {
+        "description": "The main text content for the hero section"
+      },
+      "ctaButton": {
+        "description": "The call-to-action button for the hero section"
+      },
+      "image": {
+        "description": "The image for the hero section"
+      },
+      "background": {
+        "description": "The background template area of the hero section"
+      }
+    },
+    "props": {
+      "headerAlignment": {
+        "description": "Alignment of the header content",
+        "type": "string",
+        "defaultValue": "center",
+        "options": [
+          "start",
+          "center",
+          "end"
+        ],
+        "descriptionRef": "HeroSection.md?headerAlignment"
+      },
+      "contentPlacement": {
+        "description": "Position of the content area relative to the header",
+        "type": "string",
+        "defaultValue": "bottom",
+        "options": [
+          "left",
+          "right",
+          "bottom"
+        ],
+        "descriptionRef": "HeroSection.md?contentPlacement"
+      },
+      "contentAlignment": {
+        "description": "Horizontal alignment of the content within its area",
+        "type": "string",
+        "defaultValue": "center",
+        "options": [
+          "start",
+          "center",
+          "end"
+        ],
+        "descriptionRef": "HeroSection.md?contentAlignment"
+      },
+      "headerWidth": {
+        "description": "Width of the header section in horizontal layouts",
+        "type": "string",
+        "defaultValue": "50%",
+        "descriptionRef": "HeroSection.md?headerWidth"
+      },
+      "contentWidth": {
+        "description": "Width of the hero content (header + content sections)",
+        "type": "string",
+        "defaultValue": "$maxWidth-content",
+        "descriptionRef": "HeroSection.md?contentWidth"
+      },
+      "gap": {
+        "description": "Gap between header and content sections",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?gap"
+      },
+      "preamble": {
+        "description": "The preamble text for the hero section",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?preamble"
+      },
+      "headline": {
+        "description": "The headline text for the hero section",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?headline"
+      },
+      "subheadline": {
+        "description": "The subheadline text for the hero section",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?subheadline"
+      },
+      "mainText": {
+        "description": "The main text content for the hero section",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?mainText"
+      },
+      "mainTextTemplate": {
+        "description": "The template for the text content in the hero section",
+        "valueType": "ComponentDef",
+        "descriptionRef": "HeroSection.md?mainTextTemplate"
+      },
+      "ctaButtonIcon": {
+        "description": "The icon for the call-to-action button",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?ctaButtonIcon"
+      },
+      "ctaButtonText": {
+        "description": "The text for the call-to-action button",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?ctaButtonText"
+      },
+      "ctaButtonTemplate": {
+        "description": "The template for the call-to-action button",
+        "valueType": "ComponentDef",
+        "descriptionRef": "HeroSection.md?ctaButtonTemplate"
+      },
+      "fullWidthBackground": {
+        "description": "Whether the background should span the full width of the viewport",
+        "type": "boolean",
+        "defaultValue": true,
+        "descriptionRef": "HeroSection.md?fullWidthBackground"
+      },
+      "image": {
+        "description": "The image for the hero section",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?image"
+      },
+      "imageWidth": {
+        "description": "The width of the image",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?imageWidth"
+      },
+      "imageHeight": {
+        "description": "The height of the image",
+        "type": "string",
+        "descriptionRef": "HeroSection.md?imageHeight"
+      },
+      "backgroundTemplate": {
+        "description": "The template for the background of the hero section",
+        "valueType": "ComponentDef",
+        "descriptionRef": "HeroSection.md?backgroundTemplate"
+      },
+      "headerTone": {
+        "description": "The tone for the header section, affecting text colors",
+        "type": "string",
+        "options": [
+          "light",
+          "dark",
+          "reverse"
+        ],
+        "defaultValue": "dark",
+        "descriptionRef": "HeroSection.md?headerTone"
+      },
+      "contentTone": {
+        "description": "The tone for the content section, affecting text colors",
+        "type": "string",
+        "options": [
+          "light",
+          "dark",
+          "reverse"
+        ],
+        "defaultValue": "dark",
+        "descriptionRef": "HeroSection.md?contentTone"
+      },
+      "className": {
+        "description": "Additional CSS class names to apply to the hero section",
+        "valueType": "string",
+        "descriptionRef": "HeroSection.md?className"
+      }
+    },
+    "events": {
+      "ctaClick": {
+        "description": "Triggered when the call-to-action button is clicked",
+        "descriptionRef": "HeroSection.md?ctaClick"
+      }
+    },
+    "themeVars": {
+      "padding-HeroSection": "var(--xmlui-padding-HeroSection)",
+      "paddingHorizontal-HeroSection": "var(--xmlui-paddingHorizontal-HeroSection, var(--xmlui-padding-HeroSection))",
+      "paddingVertical-HeroSection": "var(--xmlui-paddingVertical-HeroSection, var(--xmlui-padding-HeroSection))",
+      "paddingLeft-HeroSection": "var(--xmlui-paddingLeft-HeroSection, var(--xmlui-paddingHorizontal-HeroSection, var(--xmlui-padding-HeroSection)))",
+      "paddingRight-HeroSection": "var(--xmlui-paddingRight-HeroSection, var(--xmlui-paddingHorizontal-HeroSection, var(--xmlui-padding-HeroSection)))",
+      "paddingTop-HeroSection": "var(--xmlui-paddingTop-HeroSection, var(--xmlui-paddingVertical-HeroSection, var(--xmlui-padding-HeroSection)))",
+      "paddingBottom-HeroSection": "var(--xmlui-paddingBottom-HeroSection, var(--xmlui-paddingVertical-HeroSection, var(--xmlui-padding-HeroSection)))",
+      "textColor-headline-HeroSection": "var(--xmlui-textColor-headline-HeroSection)",
+      "fontFamily-headline-HeroSection": "var(--xmlui-fontFamily-headline-HeroSection)",
+      "fontSize-headline-HeroSection": "var(--xmlui-fontSize-headline-HeroSection)",
+      "fontStyle-headline-HeroSection": "var(--xmlui-fontStyle-headline-HeroSection)",
+      "fontVariant-headline-HeroSection": "var(--xmlui-fontVariant-headline-HeroSection)",
+      "fontWeight-headline-HeroSection": "var(--xmlui-fontWeight-headline-HeroSection)",
+      "fontStretch-headline-HeroSection": "var(--xmlui-fontStretch-headline-HeroSection)",
+      "textDecorationLine-headline-HeroSection": "var(--xmlui-textDecorationLine-headline-HeroSection)",
+      "textDecorationColor-headline-HeroSection": "var(--xmlui-textDecorationColor-headline-HeroSection)",
+      "textDecorationStyle-headline-HeroSection": "var(--xmlui-textDecorationStyle-headline-HeroSection)",
+      "textDecorationThickness-headline-HeroSection": "var(--xmlui-textDecorationThickness-headline-HeroSection)",
+      "textUnderlineOffset-headline-HeroSection": "var(--xmlui-textUnderlineOffset-headline-HeroSection)",
+      "lineHeight-headline-HeroSection": "var(--xmlui-lineHeight-headline-HeroSection)",
+      "backgroundColor-headline-HeroSection": "var(--xmlui-backgroundColor-headline-HeroSection)",
+      "textTransform-headline-HeroSection": "var(--xmlui-textTransform-headline-HeroSection)",
+      "letterSpacing-headline-HeroSection": "var(--xmlui-letterSpacing-headline-HeroSection)",
+      "wordSpacing-headline-HeroSection": "var(--xmlui-wordSpacing-headline-HeroSection)",
+      "textShadow-headline-HeroSection": "var(--xmlui-textShadow-headline-HeroSection)",
+      "textIndent-headline-HeroSection": "var(--xmlui-textIndent-headline-HeroSection)",
+      "textAlign-headline-HeroSection": "var(--xmlui-textAlign-headline-HeroSection)",
+      "textAlignLast-headline-HeroSection": "var(--xmlui-textAlignLast-headline-HeroSection)",
+      "wordBreak-headline-HeroSection": "var(--xmlui-wordBreak-headline-HeroSection)",
+      "wordWrap-headline-HeroSection": "var(--xmlui-wordWrap-headline-HeroSection)",
+      "direction-headline-HeroSection": "var(--xmlui-direction-headline-HeroSection)",
+      "writingMode-headline-HeroSection": "var(--xmlui-writingMode-headline-HeroSection)",
+      "lineBreak-headline-HeroSection": "var(--xmlui-lineBreak-headline-HeroSection)",
+      "textColor-subheadline-HeroSection": "var(--xmlui-textColor-subheadline-HeroSection)",
+      "fontFamily-subheadline-HeroSection": "var(--xmlui-fontFamily-subheadline-HeroSection)",
+      "fontSize-subheadline-HeroSection": "var(--xmlui-fontSize-subheadline-HeroSection)",
+      "fontStyle-subheadline-HeroSection": "var(--xmlui-fontStyle-subheadline-HeroSection)",
+      "fontVariant-subheadline-HeroSection": "var(--xmlui-fontVariant-subheadline-HeroSection)",
+      "fontWeight-subheadline-HeroSection": "var(--xmlui-fontWeight-subheadline-HeroSection)",
+      "fontStretch-subheadline-HeroSection": "var(--xmlui-fontStretch-subheadline-HeroSection)",
+      "textDecorationLine-subheadline-HeroSection": "var(--xmlui-textDecorationLine-subheadline-HeroSection)",
+      "textDecorationColor-subheadline-HeroSection": "var(--xmlui-textDecorationColor-subheadline-HeroSection)",
+      "textDecorationStyle-subheadline-HeroSection": "var(--xmlui-textDecorationStyle-subheadline-HeroSection)",
+      "textDecorationThickness-subheadline-HeroSection": "var(--xmlui-textDecorationThickness-subheadline-HeroSection)",
+      "textUnderlineOffset-subheadline-HeroSection": "var(--xmlui-textUnderlineOffset-subheadline-HeroSection)",
+      "lineHeight-subheadline-HeroSection": "var(--xmlui-lineHeight-subheadline-HeroSection)",
+      "backgroundColor-subheadline-HeroSection": "var(--xmlui-backgroundColor-subheadline-HeroSection)",
+      "textTransform-subheadline-HeroSection": "var(--xmlui-textTransform-subheadline-HeroSection)",
+      "letterSpacing-subheadline-HeroSection": "var(--xmlui-letterSpacing-subheadline-HeroSection)",
+      "wordSpacing-subheadline-HeroSection": "var(--xmlui-wordSpacing-subheadline-HeroSection)",
+      "textShadow-subheadline-HeroSection": "var(--xmlui-textShadow-subheadline-HeroSection)",
+      "textIndent-subheadline-HeroSection": "var(--xmlui-textIndent-subheadline-HeroSection)",
+      "textAlign-subheadline-HeroSection": "var(--xmlui-textAlign-subheadline-HeroSection)",
+      "textAlignLast-subheadline-HeroSection": "var(--xmlui-textAlignLast-subheadline-HeroSection)",
+      "wordBreak-subheadline-HeroSection": "var(--xmlui-wordBreak-subheadline-HeroSection)",
+      "wordWrap-subheadline-HeroSection": "var(--xmlui-wordWrap-subheadline-HeroSection)",
+      "direction-subheadline-HeroSection": "var(--xmlui-direction-subheadline-HeroSection)",
+      "writingMode-subheadline-HeroSection": "var(--xmlui-writingMode-subheadline-HeroSection)",
+      "lineBreak-subheadline-HeroSection": "var(--xmlui-lineBreak-subheadline-HeroSection)",
+      "textColor-preamble-HeroSection": "var(--xmlui-textColor-preamble-HeroSection)",
+      "fontFamily-preamble-HeroSection": "var(--xmlui-fontFamily-preamble-HeroSection)",
+      "fontSize-preamble-HeroSection": "var(--xmlui-fontSize-preamble-HeroSection)",
+      "fontStyle-preamble-HeroSection": "var(--xmlui-fontStyle-preamble-HeroSection)",
+      "fontVariant-preamble-HeroSection": "var(--xmlui-fontVariant-preamble-HeroSection)",
+      "fontWeight-preamble-HeroSection": "var(--xmlui-fontWeight-preamble-HeroSection)",
+      "fontStretch-preamble-HeroSection": "var(--xmlui-fontStretch-preamble-HeroSection)",
+      "textDecorationLine-preamble-HeroSection": "var(--xmlui-textDecorationLine-preamble-HeroSection)",
+      "textDecorationColor-preamble-HeroSection": "var(--xmlui-textDecorationColor-preamble-HeroSection)",
+      "textDecorationStyle-preamble-HeroSection": "var(--xmlui-textDecorationStyle-preamble-HeroSection)",
+      "textDecorationThickness-preamble-HeroSection": "var(--xmlui-textDecorationThickness-preamble-HeroSection)",
+      "textUnderlineOffset-preamble-HeroSection": "var(--xmlui-textUnderlineOffset-preamble-HeroSection)",
+      "lineHeight-preamble-HeroSection": "var(--xmlui-lineHeight-preamble-HeroSection)",
+      "backgroundColor-preamble-HeroSection": "var(--xmlui-backgroundColor-preamble-HeroSection)",
+      "textTransform-preamble-HeroSection": "var(--xmlui-textTransform-preamble-HeroSection)",
+      "letterSpacing-preamble-HeroSection": "var(--xmlui-letterSpacing-preamble-HeroSection)",
+      "wordSpacing-preamble-HeroSection": "var(--xmlui-wordSpacing-preamble-HeroSection)",
+      "textShadow-preamble-HeroSection": "var(--xmlui-textShadow-preamble-HeroSection)",
+      "textIndent-preamble-HeroSection": "var(--xmlui-textIndent-preamble-HeroSection)",
+      "textAlign-preamble-HeroSection": "var(--xmlui-textAlign-preamble-HeroSection)",
+      "textAlignLast-preamble-HeroSection": "var(--xmlui-textAlignLast-preamble-HeroSection)",
+      "wordBreak-preamble-HeroSection": "var(--xmlui-wordBreak-preamble-HeroSection)",
+      "wordWrap-preamble-HeroSection": "var(--xmlui-wordWrap-preamble-HeroSection)",
+      "direction-preamble-HeroSection": "var(--xmlui-direction-preamble-HeroSection)",
+      "writingMode-preamble-HeroSection": "var(--xmlui-writingMode-preamble-HeroSection)",
+      "lineBreak-preamble-HeroSection": "var(--xmlui-lineBreak-preamble-HeroSection)",
+      "textColor-mainText-HeroSection": "var(--xmlui-textColor-mainText-HeroSection)",
+      "fontFamily-mainText-HeroSection": "var(--xmlui-fontFamily-mainText-HeroSection)",
+      "fontSize-mainText-HeroSection": "var(--xmlui-fontSize-mainText-HeroSection)",
+      "fontStyle-mainText-HeroSection": "var(--xmlui-fontStyle-mainText-HeroSection)",
+      "fontVariant-mainText-HeroSection": "var(--xmlui-fontVariant-mainText-HeroSection)",
+      "fontWeight-mainText-HeroSection": "var(--xmlui-fontWeight-mainText-HeroSection)",
+      "fontStretch-mainText-HeroSection": "var(--xmlui-fontStretch-mainText-HeroSection)",
+      "textDecorationLine-mainText-HeroSection": "var(--xmlui-textDecorationLine-mainText-HeroSection)",
+      "textDecorationColor-mainText-HeroSection": "var(--xmlui-textDecorationColor-mainText-HeroSection)",
+      "textDecorationStyle-mainText-HeroSection": "var(--xmlui-textDecorationStyle-mainText-HeroSection)",
+      "textDecorationThickness-mainText-HeroSection": "var(--xmlui-textDecorationThickness-mainText-HeroSection)",
+      "textUnderlineOffset-mainText-HeroSection": "var(--xmlui-textUnderlineOffset-mainText-HeroSection)",
+      "lineHeight-mainText-HeroSection": "var(--xmlui-lineHeight-mainText-HeroSection)",
+      "backgroundColor-mainText-HeroSection": "var(--xmlui-backgroundColor-mainText-HeroSection)",
+      "textTransform-mainText-HeroSection": "var(--xmlui-textTransform-mainText-HeroSection)",
+      "letterSpacing-mainText-HeroSection": "var(--xmlui-letterSpacing-mainText-HeroSection)",
+      "wordSpacing-mainText-HeroSection": "var(--xmlui-wordSpacing-mainText-HeroSection)",
+      "textShadow-mainText-HeroSection": "var(--xmlui-textShadow-mainText-HeroSection)",
+      "textIndent-mainText-HeroSection": "var(--xmlui-textIndent-mainText-HeroSection)",
+      "textAlign-mainText-HeroSection": "var(--xmlui-textAlign-mainText-HeroSection)",
+      "textAlignLast-mainText-HeroSection": "var(--xmlui-textAlignLast-mainText-HeroSection)",
+      "wordBreak-mainText-HeroSection": "var(--xmlui-wordBreak-mainText-HeroSection)",
+      "wordWrap-mainText-HeroSection": "var(--xmlui-wordWrap-mainText-HeroSection)",
+      "direction-mainText-HeroSection": "var(--xmlui-direction-mainText-HeroSection)",
+      "writingMode-mainText-HeroSection": "var(--xmlui-writingMode-mainText-HeroSection)",
+      "lineBreak-mainText-HeroSection": "var(--xmlui-lineBreak-mainText-HeroSection)",
+      "maxWidth-content": "var(--xmlui-maxWidth-content)",
+      "gap-preamble-HeroSection": "var(--xmlui-gap-preamble-HeroSection)",
+      "gap-headline-HeroSection": "var(--xmlui-gap-headline-HeroSection)",
+      "gap-subheadline-HeroSection": "var(--xmlui-gap-subheadline-HeroSection)",
+      "gap-mainText-HeroSection": "var(--xmlui-gap-mainText-HeroSection)"
+    },
+    "defaultThemeVars": {
+      "paddingTop-HeroSection": "$space-12",
+      "paddingBottom-HeroSection": "$space-12",
+      "paddingHorizontal-HeroSection": "$space-12",
+      "fontSize-headline-HeroSection": "3em",
+      "fontWeight-headline-HeroSection": "$fontWeight-bold",
+      "lineHeight-headline-HeroSection": "1.4em",
+      "gap-headline-HeroSection": "$space-8",
+      "fontSize-subheadline-HeroSection": "2em",
+      "lineHeight-subheadline-HeroSection": "1.1em",
+      "fontWeight-subheadline-HeroSection": "$fontWeight-bold",
+      "gap-subheadline-HeroSection": "$space-4",
+      "fontSize-mainText-HeroSection": "1.4em",
+      "lineHeight-mainText-HeroSection": "1.1em",
+      "gap-mainText-HeroSection": "$space-4",
+      "textColor-preamble-HeroSection": "$textColor-primary",
+      "textColor-headline-HeroSection": "$textColor-primary",
+      "textColor-subheadline-HeroSection": "$textColor-primary",
+      "textColor-mainText-HeroSection": "$textColor-primary"
+    },
+    "displayName": "HeroSection",
+    "descriptionRef": "HeroSection/HeroSection.md",
+    "folderPath": "HeroSection"
+  },
+  {
+    "status": "experimental",
+    "description": "A floating button that scrolls the page to the top when clicked",
+    "parts": {
+      "icon": {
+        "description": "The icon displayed inside the scroll to top button"
+      }
+    },
+    "props": {
+      "position": {
+        "description": "Horizontal position of the button at the bottom of the screen",
+        "type": "string",
+        "defaultValue": "end",
+        "options": [
+          "start",
+          "center",
+          "end"
+        ],
+        "descriptionRef": "ScrollToTop.md?position"
+      },
+      "visible": {
+        "description": "Whether the button is visible",
+        "type": "boolean",
+        "defaultValue": true,
+        "descriptionRef": "ScrollToTop.md?visible"
+      },
+      "threshold": {
+        "description": "Scroll position threshold (in pixels) after which the button becomes visible",
+        "type": "number",
+        "defaultValue": 300,
+        "descriptionRef": "ScrollToTop.md?threshold"
+      },
+      "icon": {
+        "description": "Name of the icon to display in the button",
+        "type": "string",
+        "defaultValue": "chevronup",
+        "descriptionRef": "ScrollToTop.md?icon"
+      },
+      "behavior": {
+        "description": "Scroll behavior when scrolling to top",
+        "type": "string",
+        "defaultValue": "smooth",
+        "options": [
+          "smooth",
+          "instant",
+          "auto"
+        ],
+        "descriptionRef": "ScrollToTop.md?behavior"
+      }
+    },
+    "events": {
+      "click": {
+        "description": "Triggered when the scroll to top button is clicked",
+        "descriptionRef": "ScrollToTop.md?click"
+      }
+    },
+    "themeVars": {
+      "backgroundColor-ScrollToTop": "var(--xmlui-backgroundColor-ScrollToTop)",
+      "borderColor-ScrollToTop": "var(--xmlui-borderColor-ScrollToTop)",
+      "color-ScrollToTop": "var(--xmlui-color-ScrollToTop)",
+      "size-ScrollToTop": "var(--xmlui-size-ScrollToTop)",
+      "size-ScrollToTop-xs": "var(--xmlui-size-ScrollToTop-xs)",
+      "size-ScrollToTop-sm": "var(--xmlui-size-ScrollToTop-sm)",
+      "size-ScrollToTop-md": "var(--xmlui-size-ScrollToTop-md)",
+      "size-ScrollToTop-lg": "var(--xmlui-size-ScrollToTop-lg)",
+      "borderRadius-ScrollToTop": "var(--xmlui-borderRadius-ScrollToTop)",
+      "shadow-ScrollToTop": "var(--xmlui-shadow-ScrollToTop)",
+      "bottom-ScrollToTop": "var(--xmlui-bottom-ScrollToTop)",
+      "bottom-ScrollToTop-xs": "var(--xmlui-bottom-ScrollToTop-xs)",
+      "bottom-ScrollToTop-sm": "var(--xmlui-bottom-ScrollToTop-sm)",
+      "bottom-ScrollToTop-md": "var(--xmlui-bottom-ScrollToTop-md)",
+      "bottom-ScrollToTop-lg": "var(--xmlui-bottom-ScrollToTop-lg)",
+      "horizontalSpacing-ScrollToTop": "var(--xmlui-horizontalSpacing-ScrollToTop)",
+      "horizontalSpacing-ScrollToTop-xs": "var(--xmlui-horizontalSpacing-ScrollToTop-xs)",
+      "horizontalSpacing-ScrollToTop-sm": "var(--xmlui-horizontalSpacing-ScrollToTop-sm)",
+      "horizontalSpacing-ScrollToTop-md": "var(--xmlui-horizontalSpacing-ScrollToTop-md)",
+      "horizontalSpacing-ScrollToTop-lg": "var(--xmlui-horizontalSpacing-ScrollToTop-lg)",
+      "zIndex-ScrollToTop": "var(--xmlui-zIndex-ScrollToTop)"
+    },
+    "defaultThemeVars": {
+      "backgroundColor-ScrollToTop": "$color-primary",
+      "borderColor-ScrollToTop": "$color-primary-dark",
+      "color-ScrollToTop": "$color-surface-0",
+      "size-ScrollToTop-xs": "38px",
+      "size-ScrollToTop-sm": "42px",
+      "size-ScrollToTop-md": "42px",
+      "size-ScrollToTop-lg": "48px",
+      "horizontalSpacing-ScrollToTop-xs": "$space-6",
+      "horizontalSpacing-ScrollToTop-sm": "$space-8",
+      "horizontalSpacing-ScrollToTop-md": "$space-10",
+      "horizontalSpacing-ScrollToTop-lg": "$space-12",
+      "bottom-ScrollToTop-xs": "$space-10",
+      "bottom-ScrollToTop-sm": "$space-12",
+      "bottom-ScrollToTop-md": "$space-14",
+      "bottom-ScrollToTop-lg": "$space-16",
+      "borderRadius-ScrollToTop": "$space-24",
+      "shadow-ScrollToTop": "$shadow-lg",
+      "zIndex-ScrollToTop": "1000"
+    },
+    "displayName": "ScrollToTop",
+    "descriptionRef": "ScrollToTop/ScrollToTop.md",
+    "folderPath": "ScrollToTop"
+  },
+  {
+    "status": "stable",
+    "description": "This component displays a slideshow by cycling through elements (images, text, or custom slides) like a carousel.",
+    "props": {
+      "orientation": {
+        "description": "This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.",
+        "availableValues": [
+          "horizontal",
+          "vertical"
+        ],
+        "valueType": "string",
+        "defaultValue": "horizontal",
+        "descriptionRef": "Carousel.md?orientation"
+      },
+      "indicators": {
+        "description": "Display the individual slides as buttons (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true,
+        "descriptionRef": "Carousel.md?indicators"
+      },
+      "controls": {
+        "description": "Display the previous/next controls (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true,
+        "descriptionRef": "Carousel.md?controls"
+      },
+      "autoplay": {
+        "description": "Start scrolling the carousel automatically (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": false,
+        "descriptionRef": "Carousel.md?autoplay"
+      },
+      "loop": {
+        "description": "Sets whether the carousel should loop back to the start/end when it reaches the last/first slide.",
+        "valueType": "boolean",
+        "defaultValue": false,
+        "descriptionRef": "Carousel.md?loop"
+      },
+      "startIndex": {
+        "description": "The index of the first slide to display.",
+        "valueType": "number",
+        "defaultValue": 0,
+        "descriptionRef": "Carousel.md?startIndex"
+      },
+      "transitionDuration": {
+        "description": "The duration of the transition between slides.",
+        "valueType": "number",
+        "defaultValue": 25,
+        "descriptionRef": "Carousel.md?transitionDuration"
+      },
+      "autoplayInterval": {
+        "description": "Specifies the interval between autoplay transitions.",
+        "valueType": "number",
+        "defaultValue": 5000,
+        "descriptionRef": "Carousel.md?autoplayInterval"
+      },
+      "stopAutoplayOnInteraction": {
+        "description": "This property indicates whether autoplay stops on user interaction.",
+        "valueType": "boolean",
+        "defaultValue": true,
+        "descriptionRef": "Carousel.md?stopAutoplayOnInteraction"
+      },
+      "prevIcon": {
+        "description": "The icon to display for the previous control.",
+        "valueType": "string",
+        "descriptionRef": "Carousel.md?prevIcon"
+      },
+      "nextIcon": {
+        "description": "The icon to display for the next control.",
+        "valueType": "string",
+        "descriptionRef": "Carousel.md?nextIcon"
+      }
+    },
+    "events": {
+      "displayDidChange": {
+        "description": "This event is fired when the displayed content of the CarouselNew changes.",
+        "descriptionRef": "Carousel.md?displayDidChange"
+      }
+    },
+    "apis": {
+      "canScrollPrev": {
+        "description": "This method returns `true` if the carousel can scroll to the previous slide.",
+        "signature": "canScrollPrev(): boolean",
+        "descriptionRef": "Carousel.md?canScrollPrev"
+      },
+      "canScrollNext": {
+        "description": "This method returns `true` if the carousel can scroll to the next slide.",
+        "signature": "canScrollNext(): boolean",
+        "descriptionRef": "Carousel.md?canScrollNext"
+      },
+      "scrollTo": {
+        "description": "This method scrolls the carousel to the specified slide index.",
+        "signature": "scrollTo(index: number): void",
+        "parameters": {
+          "index": "The index of the slide to scroll to."
+        },
+        "descriptionRef": "Carousel.md?scrollTo"
+      },
+      "scrollPrev": {
+        "signature": "scrollPrev(): void",
+        "description": "This method scrolls the carousel to the previous slide.",
+        "descriptionRef": "Carousel.md?scrollPrev"
+      },
+      "scrollNext": {
+        "signature": "scrollNext(): void",
+        "description": "This method scrolls the carousel to the next slide.",
+        "descriptionRef": "Carousel.md?scrollNext"
+      }
+    },
+    "themeVars": {
+      "width-Carousel": "var(--xmlui-width-Carousel)",
+      "height-Carousel": "var(--xmlui-height-Carousel)",
+      "height-control-Carousel": "var(--xmlui-height-control-Carousel)",
+      "width-control-Carousel": "var(--xmlui-width-control-Carousel)",
+      "textColor-control-Carousel": "var(--xmlui-textColor-control-Carousel)",
+      "backgroundColor-control-Carousel": "var(--xmlui-backgroundColor-control-Carousel)",
+      "borderRadius-control-Carousel": "var(--xmlui-borderRadius-control-Carousel)",
+      "backgroundColor-control-hover-Carousel": "var(--xmlui-backgroundColor-control-hover-Carousel)",
+      "textColor-control-hover-Carousel": "var(--xmlui-textColor-control-hover-Carousel)",
+      "backgroundColor-control-active-Carousel": "var(--xmlui-backgroundColor-control-active-Carousel)",
+      "textColor-control-active-Carousel": "var(--xmlui-textColor-control-active-Carousel)",
+      "textColor-control-disabled-Carousel": "var(--xmlui-textColor-control-disabled-Carousel)",
+      "backgroundColor-control-disabled-Carousel": "var(--xmlui-backgroundColor-control-disabled-Carousel)",
+      "width-indicator-Carousel": "var(--xmlui-width-indicator-Carousel)",
+      "height-indicator-Carousel": "var(--xmlui-height-indicator-Carousel)",
+      "textColor-indicator-Carousel": "var(--xmlui-textColor-indicator-Carousel)",
+      "backgroundColor-indicator-Carousel": "var(--xmlui-backgroundColor-indicator-Carousel)",
+      "backgroundColor-indicator-hover-Carousel": "var(--xmlui-backgroundColor-indicator-hover-Carousel)",
+      "textColor-indicator-hover-Carousel": "var(--xmlui-textColor-indicator-hover-Carousel)",
+      "backgroundColor-indicator-active-Carousel": "var(--xmlui-backgroundColor-indicator-active-Carousel)",
+      "textColor-indicator-active-Carousel": "var(--xmlui-textColor-indicator-active-Carousel)"
+    },
+    "defaultThemeVars": {
+      "backgroundColor-control-CarouselNew": "$color-primary",
+      "textColor-control-CarouselNew": "$textColor",
+      "backgroundColor-control-hover-CarouselNew": "$color-primary",
+      "textColor-control-hover-CarouselNew": "$textColor",
+      "backgroundColor-control-active-CarouselNew": "$color-primary",
+      "backgroundColor-control-disabled-CarouselNew": "$color-surface-200",
+      "textColor-control-disabled-CarouselNew": "$textColor-disabled",
+      "textColor-control-active-CarouselNew": "$color-primary",
+      "backgroundColor-indicator-CarouselNew": "$color-surface-200",
+      "backgroundColor-indicator-active-CarouselNew": "$color-primary",
+      "textColor-indicator-CarouselNew": "$color-primary",
+      "textColor-indicator-active-CarouselNew": "$color-primary",
+      "backgroundColor-indicator-hover-CarouselNew": "$color-surface-200",
+      "textColor-indicator-hover-CarouselNew": "$color-primary",
+      "width-indicator-CarouselNew": "25px",
+      "height-indicator-CarouselNew": "6px",
+      "height-control-CarouselNew": "36px",
+      "width-control-CarouselNew": "36px",
+      "borderRadius-control-CarouselNew": "50%",
+      "height-CarouselNew": "100%",
+      "width-CarouselNew": "100%"
+    },
+    "displayName": "Carousel",
+    "descriptionRef": "Carousel/Carousel.md",
+    "folderPath": "Carousel"
+  },
+  {
+    "status": "experimental",
+    "description": "`FancyButton` is an enhanced interactive component for triggering actions with advanced styling options. It provides rounded and square variants for different design aesthetics while maintaining all standard button functionality.",
+    "props": {
+      "autoFocus": {
+        "description": "Indicates if the button should receive focus when the page loads.",
+        "isRequired": false,
+        "type": "boolean",
+        "defaultValue": false,
+        "descriptionRef": "FancyButton.md?autoFocus"
+      },
+      "variant": {
+        "description": "The button variant determines the visual style and corner treatment.",
+        "isRequired": false,
+        "type": "string",
+        "availableValues": [
+          {
+            "value": "rounded",
+            "description": "Rounded variant with soft corners"
+          },
+          {
+            "value": "square",
+            "description": "Square variant with sharp corners"
+          },
+          {
+            "value": "pill",
+            "description": "Pill variant with fully rounded edges"
+          },
+          {
+            "value": "outlinedPill",
+            "description": "Outlined pill variant with fully rounded edges"
+          }
+        ],
+        "defaultValue": "rounded",
+        "descriptionRef": "FancyButton.md?variant"
+      },
+      "size": {
+        "description": "Sets the size of the button.",
+        "isRequired": false,
+        "type": "string",
+        "availableValues": [
+          {
+            "value": "xs",
+            "description": "Extra small"
+          },
+          {
+            "value": "sm",
+            "description": "Small"
+          },
+          {
+            "value": "md",
+            "description": "Medium"
+          },
+          {
+            "value": "lg",
+            "description": "Large"
+          },
+          {
+            "value": "xl",
+            "description": "Extra large"
+          }
+        ],
+        "defaultValue": "md",
+        "descriptionRef": "FancyButton.md?size"
+      },
+      "label": {
+        "description": "This property is an optional string to set a label for the FancyButton. If no label is specified and an icon is set, the FancyButton will modify its styling to look like a small icon button. When the FancyButton has nested children, it will display them and ignore the value of the `label` prop.",
+        "type": "string",
+        "descriptionRef": "FancyButton.md?label"
+      },
+      "type": {
+        "description": "This optional string describes how the FancyButton appears in an HTML context. You rarely need to set this property explicitly.",
+        "availableValues": [
+          {
+            "value": "button",
+            "description": "Regular behavior that only executes logic if explicitly determined."
+          },
+          {
+            "value": "submit",
+            "description": "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component."
+          },
+          {
+            "value": "reset",
+            "description": "Resets all the controls to their initial values. Using it is ill advised for UX reasons."
+          }
+        ],
+        "valueType": "string",
+        "defaultValue": "button",
+        "descriptionRef": "FancyButton.md?type"
+      },
+      "enabled": {
+        "description": "The value of this property indicates whether the button accepts actions (`true`) or does not react to them (`false`).",
+        "type": "boolean",
+        "defaultValue": true,
+        "descriptionRef": "FancyButton.md?enabled"
+      },
+      "icon": {
+        "description": "This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon by its name. If no label is specified and an icon is set, the FancyButton displays only that icon.",
+        "type": "string",
+        "descriptionRef": "FancyButton.md?icon"
+      },
+      "iconPosition": {
+        "description": "This optional string determines the location of the icon in the FancyButton.",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "The icon will appear at the start (left side when the left-to-right direction is set)"
+          },
+          {
+            "value": "end",
+            "description": "The icon will appear at the end (right side when the left-to-right direction is set)"
+          }
+        ],
+        "type": "string",
+        "defaultValue": "start",
+        "descriptionRef": "FancyButton.md?iconPosition"
+      },
+      "contentPosition": {
+        "description": "This optional value determines how the label and icon (or nested children) should be placedinside the FancyButton component.",
+        "availableValues": [
+          {
+            "value": "center",
+            "description": "Place the content in the middle"
+          },
+          {
+            "value": "start",
+            "description": "Justify the content to the left (to the right if in right-to-left)"
+          },
+          {
+            "value": "end",
+            "description": "Justify the content to the right (to the left if in right-to-left)"
+          }
+        ],
+        "type": "string",
+        "defaultValue": "center",
+        "descriptionRef": "FancyButton.md?contentPosition"
+      },
+      "contextualLabel": {
+        "description": "This optional value is used to provide an accessible name for the FancyButton in the context of its usage.",
+        "type": "string",
+        "descriptionRef": "FancyButton.md?contextualLabel"
+      }
+    },
+    "events": {
+      "click": {
+        "description": "This event is triggered when the FancyButton is clicked.",
+        "signature": "click(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        },
+        "descriptionRef": "FancyButton.md?click"
+      },
+      "gotFocus": {
+        "description": "This event is triggered when the FancyButton has received the focus.",
+        "signature": "gotFocus(): void",
+        "parameters": {},
+        "descriptionRef": "FancyButton.md?gotFocus"
+      },
+      "lostFocus": {
+        "description": "This event is triggered when the FancyButton has lost the focus.",
+        "signature": "lostFocus(): void",
+        "parameters": {},
+        "descriptionRef": "FancyButton.md?lostFocus"
+      }
+    },
+    "defaultThemeVars": {
+      "fontSize-FancyButton": "$fontSize-sm",
+      "fontWeight-FancyButton": "$fontWeight-medium",
+      "gap-FancyButton": "$space-2",
+      "backgroundColor-FancyButton--disabled": "$backgroundColor--disabled",
+      "borderColor-FancyButton--disabled": "$borderColor--disabled",
+      "borderStyle-FancyButton": "solid",
+      "textColor-FancyButton--disabled": "$textColor--disabled",
+      "outlineColor-FancyButton--focus": "$outlineColor--focus",
+      "borderWidth-FancyButton": "1px",
+      "outlineWidth-FancyButton--focus": "$outlineWidth--focus",
+      "outlineStyle-FancyButton--focus": "$outlineStyle--focus",
+      "outlineOffset-FancyButton--focus": "$outlineOffset--focus",
+      "paddingHorizontal-FancyButton-xs": "$space-3",
+      "paddingVertical-FancyButton-xs": "$space-1_5",
+      "fontSize-FancyButton-xs": "$fontSize-xs",
+      "gap-FancyButton-xs": "$space-2",
+      "paddingHorizontal-FancyButton-sm": "$space-4",
+      "paddingVertical-FancyButton-sm": "$space-2",
+      "fontSize-FancyButton-sm": "$fontSize-sm",
+      "gap-FancyButton-sm": "$space-2_5",
+      "paddingHorizontal-FancyButton-md": "$space-5",
+      "paddingVertical-FancyButton-md": "$space-2_5",
+      "fontSize-FancyButton-md": "$fontSize-xl",
+      "gap-FancyButton-md": "$space-3",
+      "paddingHorizontal-FancyButton-lg": "$space-8",
+      "paddingVertical-FancyButton-lg": "$space-3",
+      "fontSize-FancyButton-lg": "$fontSize-2xl",
+      "gap-FancyButton-lg": "$space-4",
+      "paddingHorizontal-FancyButton-xl": "$space-10",
+      "paddingVertical-FancyButton-xl": "$space-4",
+      "fontSize-FancyButton-xl": "$fontSize-4xl",
+      "gap-FancyButton-xl": "$space-5",
+      "backgroundColor-FancyButton": "$color-primary-500",
+      "backgroundColor-FancyButton--hover": "$color-primary-400",
+      "backgroundColor-FancyButton--active": "$color-primary-600",
+      "textColor-FancyButton": "$const-color-surface-50",
+      "borderColor-FancyButton": "$color-primary-500",
+      "borderColor-FancyButton--hover": "$color-primary-400",
+      "borderRadius-FancyButton-rounded-xs": "6px",
+      "borderRadius-FancyButton-rounded-sm": "8px",
+      "borderRadius-FancyButton-rounded-md": "12px",
+      "borderRadius-FancyButton-rounded-lg": "16px",
+      "borderRadius-FancyButton-rounded-xl": "24px",
+      "borderRadius-FancyButton-square": "$space-0",
+      "borderRadius-FancyButton-pill": "9999px",
+      "backgroundColor-FancyButton-outlinedPill": "transparent",
+      "backgroundColor-FancyButton-outlinedPill--hover": "transparent",
+      "borderRadius-FancyButton-outlinedPill": "9999px",
+      "borderColor-FancyButton-outlinedPill--hover": "red",
+      "textColor-FancyButton-outlinedPill": "$textColor-primary",
+      "borderWidth-FancyButton-outlinedPill-xs": "1.5px",
+      "borderWidth-FancyButton-outlinedPill-sm": "2px",
+      "borderWidth-FancyButton-outlinedPill-md": "2.5px",
+      "borderWidth-FancyButton-outlinedPill-lg": "4px",
+      "borderWidth-FancyButton-outlinedPill-xl": "5px"
+    },
+    "displayName": "FancyButton",
+    "descriptionRef": "FancyButton/FancyButton.md",
+    "folderPath": "FancyButton"
+  }
+]

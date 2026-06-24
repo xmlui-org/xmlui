@@ -1,0 +1,93 @@
+
+
+> xmlui@0.12.27 build:xmlui-metadata
+> vite build --mode metadata
+
+[1G[0K[36mvite v8.0.9 [32mbuilding client environment for metadata...[36m[39m
+[2Ktransforming (75) [2msrc/components/ContentSepa[2Ktransforming (203) [2msrc/components/ProgressBa[2Ktransforming (311) [2msrc/components/TableOfCon[2Ktransforming (364) [2msrc/components/TextArea/u[2Ktransforming (400) [2msrc/components-core/inter[2Ktransforming (588) [2msrc/components-core/inter[2Ktransforming (665) [2msrc/components-core/lifec[2Ktransforming (666) [2msrc/components-core/state[2Ktransforming (678) [2msrc/components-core/inspe[2Ktransforming (837) [2msrc/components-core/concu[2Ktransforming (840) [2msrc/components/ConciseVal[2Ktransforming (841) [2msrc/components/QRCode/QRC[2Ktransforming (878) [2msrc/components/InspectBut[2K[32m✓[39m 888 modules transformed.
+[2Krendering chunks (1)...[2Krendering chunks (2)...[2Krendering chunks (3)...[2Krendering chunks (4)...[2Krendering chunks (5)...[2Krendering chunks (6)...[2Krendering chunks (7)...[2Krendering chunks (8)...[2Krendering chunks (9)...[2Krendering chunks (10)...[2Krendering chunks (11)...[2Krendering chunks (12)...[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+8335 |      z-index: 1;
+8336 |    }
+8337 |    :export {
+     |     ^
+8338 |      themeVars: '{"backgroundColor-List": "var(--xmlui-backgroundColor-List)", "backgroundColor-selected-List": "var(-...
+8339 |    }[39m
+[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+12416 |      background: var(--xmlui-color-primary-500);
+12417 |    }
+12418 |    :export {
+      |     ^
+12419 |      themeVars: "[]";
+12420 |    }[39m
+[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+12488 |      height: 100%;
+12489 |    }
+12490 |    :export {
+      |     ^
+12491 |      themeVars: '{"color-icon-Inspector": "var(--xmlui-color-icon-Inspector)", "backgroundColor-dialog-Inspector": "va...
+12492 |    }[39m
+[2Kcomputing gzip size...
+[2K[2mdist/metadata/[0m[35mxmlui.css                         [39m[2m[1m  515.48 kB[0m[0m[2m │ gzip:  55.32 kB[0m
+[2mdist/metadata/[0m[36mbehaviors.js                      [39m[2m[1m    0.44 kB[0m[0m[2m │ gzip:   0.27 kB[0m[2m │ map:     1.04 kB[0m
+[2mdist/metadata/[0m[36mbehavior-evaluator.js             [39m[2m[1m    1.27 kB[0m[0m[2m │ gzip:   0.44 kB[0m[2m │ map:     4.97 kB[0m
+[2mdist/metadata/[0m[36mchunk-3e0lkp8x.js                 [39m[2m[1m    1.38 kB[0m[0m[2m │ gzip:   0.74 kB[0m
+[2mdist/metadata/[0m[36mmetadata-utils.js                 [39m[2m[1m    2.87 kB[0m[0m[2m │ gzip:   1.07 kB[0m[2m │ map:     7.71 kB[0m
+[2mdist/metadata/[0m[36micons.js                          [39m[2m[1m    3.55 kB[0m[0m[2m │ gzip:   1.72 kB[0m[2m │ map:     6.07 kB[0m
+[2mdist/metadata/[0m[36mxmlui-metadata.js                 [39m[2m[1m   13.13 kB[0m[0m[2m │ gzip:   4.96 kB[0m[2m │ map:    25.83 kB[0m
+[2mdist/metadata/[0m[36minitMock-K-QNtndM.js              [39m[2m[1m   18.89 kB[0m[0m[2m │ gzip:   5.68 kB[0m[2m │ map:    51.79 kB[0m
+[2mdist/metadata/[0m[36mtransform-oFwtbFM_.js             [39m[2m[1m   47.32 kB[0m[0m[2m │ gzip:  13.43 kB[0m[2m │ map:   174.11 kB[0m
+[2mdist/metadata/[0m[36mstatementUtils-yh6R4BAa.js        [39m[2m[1m   53.29 kB[0m[0m[2m │ gzip:  15.15 kB[0m[2m │ map:   199.64 kB[0m
+[2mdist/metadata/[0m[36mParser-UQbHWtve.js                [39m[2m[1m   84.08 kB[0m[0m[2m │ gzip:  15.83 kB[0m[2m │ map:   253.49 kB[0m
+[2mdist/metadata/[0m[36mapiInterceptorWorker-Cw7K9ZKO.js  [39m[2m[1m  254.71 kB[0m[0m[2m │ gzip:  80.34 kB[0m[2m │ map:   629.65 kB[0m
+[2mdist/metadata/[0m[36mTextBox-D2MQ-C-E.js               [39m[33m[1m2,180.18 kB[0m[39m[2m │ gzip: 473.96 kB[0m[2m │ map: 5,230.51 kB[0m
+
+[2K[1G[33m[33m[PLUGIN_TIMINGS] Warning:[0m Your build spent significant time in plugins. Here is a breakdown:
+  - vite:css (46%)
+  - vite:asset (43%)
+  - vite:transform-xmlui (10%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+[39m
+[2Ktransforming (201) [2msrc/components/Icon/Warni[2Ktransforming (200) [2msrc/components/Markdown/p[2Ktransforming (202) [2msrc/components/Theme/Them[2Ktransforming (593) [2m../node_modules/msw/lib/c[2Ktransforming (594) [2m../node_modules/msw/lib/c[2Ktransforming (592) [2m../node_modules/msw/lib/c[2Ktransforming (631) [2m../node_modules/msw/lib/c[2Ktransforming (632) [2m../node_modules/@mswjs/in[2Ktransforming (633) [2msrc/components-core/rende[2Ktransforming (645) [2m../node_modules/@mswjs/in[2Ktransforming (862) [2msrc/components-core/concu[2Ktransforming (863) [2msrc/components-core/Loade[2Ktransforming (885) [2msrc/components/ContextMen[2K[32m✓[39m 888 modules transformed.
+[2Krendering chunks (1)...[2Krendering chunks (2)...[2Krendering chunks (3)...[2Krendering chunks (4)...[2Krendering chunks (5)...[2Krendering chunks (6)...[2Krendering chunks (7)...[2Krendering chunks (8)...[2Krendering chunks (9)...[2Krendering chunks (10)...[2Krendering chunks (11)...[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+8335 |      z-index: 1;
+8336 |    }
+8337 |    :export {
+     |     ^
+8338 |      themeVars: '{"backgroundColor-List": "var(--xmlui-backgroundColor-List)", "backgroundColor-selected-List": "var(-...
+8339 |    }[39m
+[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+12416 |      background: var(--xmlui-color-primary-500);
+12417 |    }
+12418 |    :export {
+      |     ^
+12419 |      themeVars: "[]";
+12420 |    }[39m
+[33m[lightningcss minify] 'export' is not recognized as a valid pseudo-class. Did you mean '::export' (pseudo-element) or is this a typo?
+12488 |      height: 100%;
+12489 |    }
+12490 |    :export {
+      |     ^
+12491 |      themeVars: '{"color-icon-Inspector": "var(--xmlui-color-icon-Inspector)", "backgroundColor-dialog-Inspector": "va...
+12492 |    }[39m
+[2Kcomputing gzip size...
+[2K[2mdist/metadata/[0m[35mxmlui.css                          [39m[2m[1m  515.48 kB[0m[0m[2m │ gzip:  55.32 kB[0m
+[2mdist/metadata/[0m[36mbehaviors.cjs                      [39m[2m[1m    0.35 kB[0m[0m[2m │ gzip:   0.24 kB[0m[2m │ map:     1.07 kB[0m
+[2mdist/metadata/[0m[36mbehavior-evaluator.cjs             [39m[2m[1m    1.10 kB[0m[0m[2m │ gzip:   0.42 kB[0m[2m │ map:     4.97 kB[0m
+[2mdist/metadata/[0m[36mmetadata-utils.cjs                 [39m[2m[1m    2.39 kB[0m[0m[2m │ gzip:   0.98 kB[0m[2m │ map:     7.72 kB[0m
+[2mdist/metadata/[0m[36micons.cjs                          [39m[2m[1m    3.08 kB[0m[0m[2m │ gzip:   1.66 kB[0m[2m │ map:     6.08 kB[0m
+[2mdist/metadata/[0m[36mxmlui-metadata.cjs                 [39m[2m[1m    9.93 kB[0m[0m[2m │ gzip:   3.94 kB[0m[2m │ map:    26.96 kB[0m
+[2mdist/metadata/[0m[36minitMock-CzBJI4UZ.cjs              [39m[2m[1m   15.26 kB[0m[0m[2m │ gzip:   5.13 kB[0m[2m │ map:    51.70 kB[0m
+[2mdist/metadata/[0m[36mtransform-CgYq-aI0.cjs             [39m[2m[1m   40.71 kB[0m[0m[2m │ gzip:  12.30 kB[0m[2m │ map:   173.86 kB[0m
+[2mdist/metadata/[0m[36mstatementUtils-CwxnCWOZ.cjs        [39m[2m[1m   45.82 kB[0m[0m[2m │ gzip:  13.36 kB[0m[2m │ map:   199.76 kB[0m
+[2mdist/metadata/[0m[36mParser-D4OtBgfU.cjs                [39m[2m[1m   70.45 kB[0m[0m[2m │ gzip:  14.72 kB[0m[2m │ map:   252.52 kB[0m
+[2mdist/metadata/[0m[36mapiInterceptorWorker-Cj18AtSS.cjs  [39m[2m[1m  226.10 kB[0m[0m[2m │ gzip:  75.63 kB[0m[2m │ map:   627.38 kB[0m
+[2mdist/metadata/[0m[36mTextBox-xhia7BOs.cjs               [39m[33m[1m1,895.28 kB[0m[39m[2m │ gzip: 429.21 kB[0m[2m │ map: 5,266.50 kB[0m
+
+[2K[1G[33m[33m[PLUGIN_TIMINGS] Warning:[0m Your build spent significant time in plugins. Here is a breakdown:
+  - vite:asset (51%)
+  - vite:css (38%)
+  - vite:transform-xmlui (11%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+[39m
+[32m✓ built in 16.70s[39m
+[1G[0K⠙[1G[0K

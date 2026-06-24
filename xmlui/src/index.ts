@@ -2,6 +2,7 @@ export {
   createXmluiModule,
   mountXmluiApp,
   renderXmluiApp,
+  startApp,
   type XmluiDocumentInput,
   type XmluiModule,
 } from "./runtime";
@@ -19,4 +20,3 @@ export {
   type XmluiExtensionComponent,
   type XmluiExtensionComponentProps,
 } from "./extensions";
-

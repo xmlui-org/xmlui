@@ -1,0 +1,8 @@
+
+
+> xmlui-vscode@0.12.21 build
+> node esbuild.js --production
+
+[1G[0K[watch] build started
+[watch] build finished
+[1G[0K⠙[1G[0K

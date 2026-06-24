@@ -207,6 +207,8 @@ export function XmluiRoot({
 
 export type { XmluiDocumentInput, XmluiModule } from "./types";
 
+export { startApp } from "./startApp";
+
 function routeModeFromApp(value: string | undefined): RoutingMode {
   if (value === "false" || value === "{false}") {
     return "history";

@@ -1,0 +1,163 @@
+
+> xmlui@0.12.21 test:e2e:smoke
+> playwright test -c .. --project=*-smoke
+
+[1A[2K[2m[WebServer] [22m(node:65392) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[2m[WebServer] [22m(Use `node --trace-deprecation ...` to show where the warning was created)
+
+
+Running 98 tests using 9 workers
+
+[1A[2K[1/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h3' is rendered @smoke
+
+[1A[2K[xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h3' is rendered @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[2/98] [xmlui-smoke] › src/components/CodeBlock/CodeBlock.spec.ts:203:3 › smoke tests › component with Text codefence renders @smoke
+
+[1A[2K[xmlui-smoke] › src/components/CodeBlock/CodeBlock.spec.ts:203:3 › smoke tests › component with Text codefence renders @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[3/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h1' is rendered @smoke
+
+[1A[2K[xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h1' is rendered @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[4/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h4' is rendered @smoke
+[1A[2K[5/98] [xmlui-smoke] › src/components/CodeBlock/CodeBlock.spec.ts:198:3 › smoke tests › component renders @smoke
+[1A[2K[6/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h2' is rendered @smoke
+[1A[2K[xmlui-smoke] › src/components/CodeBlock/CodeBlock.spec.ts:198:3 › smoke tests › component renders @smoke
+
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h2' is rendered @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+
+[1A[2K[xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h4' is rendered @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[7/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:6:3 › smoke tests › Heading is rendered @smoke
+[1A[2K[xmlui-smoke] › src/components/Heading/Heading.spec.ts:6:3 › smoke tests › Heading is rendered @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[8/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h5' is rendered @smoke
+[1A[2K[9/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h6' is rendered @smoke
+[1A[2K[xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h5' is rendered @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+
+[1A[2K[xmlui-smoke] › src/components/Heading/Heading.spec.ts:13:5 › smoke tests › HtmlTag 'h6' is rendered @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[10/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:23:3 › smoke tests › setting value to various types sets value of field @smoke
+[1A[2K[11/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:72:3 › smoke tests › child overrides value @smoke
+[1A[2K[12/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:137:5 › smoke tests › H1 is the same as Heading level='h1' @smoke
+[1A[2K[13/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:61:3 › smoke tests › setting value prop has no whitespace collapsing @smoke
+[1A[2K[14/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:137:5 › smoke tests › H2 is the same as Heading level='h2' @smoke
+[1A[2K[15/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:115:3 › smoke tests › heading sizes decrease from h1 to h6 @smoke
+[1A[2K[16/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:137:5 › smoke tests › H3 is the same as Heading level='h3' @smoke
+[1A[2K[17/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:137:5 › smoke tests › H4 is the same as Heading level='h4' @smoke
+[1A[2K[18/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:137:5 › smoke tests › H5 is the same as Heading level='h5' @smoke
+[1A[2K[19/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:137:5 › smoke tests › H6 is the same as Heading level='h6' @smoke
+[1A[2K[20/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:158:3 › smoke tests › maxLines="2" cuts off long text @smoke
+[1A[2K[21/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:178:3 › smoke tests › preserve line breaks @smoke
+[1A[2K[22/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:201:3 › smoke tests › ellipses in long text @smoke
+[1A[2K[23/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:220:3 › smoke tests › no ellipses long text @smoke
+[1A[2K[24/98] [xmlui-smoke] › src/components/Heading/Heading.spec.ts:241:3 › smoke tests › nested text whitespace collapsing @smoke
+[1A[2K[25/98] [xmlui-smoke] › src/components/HtmlTags/HtmlTags.spec.ts:5:3 › smoke tests › htmlTable is rendered @smoke
+[1A[2K[26/98] [xmlui-smoke] › src/components/Link/Link.spec.ts:5:3 › smoke tests › component renders @smoke
+[1A[2K[27/98] [xmlui-smoke] › src/components/Link/Link.spec.ts:13:3 › smoke tests › HtmlTag link is rendered @smoke
+[1A[2K[28/98] [xmlui-smoke] › src/components/Link/Link.spec.ts:20:3 › smoke tests › HtmlTag 'a' accepts custom props not immediately used @smoke
+[1A[2K[29/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:8:3 › smoke tests › Markdown renders @smoke
+[1A[2K[30/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:13:3 › smoke tests › handles empty binding expression @smoke
+[1A[2K[31/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:18:3 › smoke tests › does not detect escaped empty expression #1 @smoke
+[1A[2K[32/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:26:3 › smoke tests › does not detect escaped empty expression #2 @smoke
+[1A[2K[33/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:34:3 › smoke tests › does not detect escaped expression #1 @smoke
+[1A[2K[34/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:39:3 › smoke tests › does not detect escaped expression #2 @smoke
+[1A[2K[35/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:49:3 › smoke tests › handles binding expression @smoke
+[1A[2K[36/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:44:3 › smoke tests › handles only spaces binding expression @smoke
+[1A[2K[37/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:54:3 › smoke tests › handles objects in binding expressions @smoke
+[1A[2K[38/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:60:3 › smoke tests › handles arrays in binding expressions @smoke
+[1A[2K[39/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:66:3 › smoke tests › handles functions in binding expressions @smoke
+[1A[2K[40/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:76:3 › smoke tests › handles nested objects in binding expressions @smoke
+[1A[2K[41/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:85:3 › smoke tests › handles functions nested in objects in binding expressions @smoke
+[1A[2K[42/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:95:3 › smoke tests › handles arrays nested in objects in binding expressions @smoke
+[1A[2K[43/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:104:3 › smoke tests › handles arrays nested in functions in binding expressions @smoke
+[1A[2K[44/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:114:3 › smoke tests › handles complex expressions @smoke
+[1A[2K[45/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:132:5 › smoke tests › can render anchor link for 'h1' @smoke
+[1A[2K[46/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:132:5 › smoke tests › can render anchor link for 'h2' @smoke
+[1A[2K[47/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:132:5 › smoke tests › can render anchor link for 'h3' @smoke
+[1A[2K[48/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:132:5 › smoke tests › can render anchor link for 'h4' @smoke
+[1A[2K[49/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:132:5 › smoke tests › can render anchor link for 'h5' @smoke
+[1A[2K[50/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:132:5 › smoke tests › can render anchor link for 'h6' @smoke
+[1A[2K[51/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:140:3 › smoke tests › show implicit anchor links @smoke
+[1A[2K[52/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:147:3 › smoke tests › show explicit anchor links @smoke
+[1A[2K[53/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:154:3 › smoke tests › don't render implicit anchor links @smoke
+[1A[2K[54/98] [xmlui-smoke] › src/components/Markdown/Markdown.spec.ts:161:3 › smoke tests › don't render explicit anchor links @smoke
+[1A[2K[55/98] [xmlui-smoke] › src/components/NavGroup/NavGroup.spec.ts:4:3 › smoke tests › displays menuitems after click @smoke
+[1A[2K[56/98] [xmlui-smoke] › src/components/NavGroup/NavGroup.spec.ts:26:3 › smoke tests › disabled navgroup can't open @smoke
+[1A[2K[57/98] [xmlui-smoke] › src/components/NavGroup/NavGroup.spec.ts:46:3 › smoke tests › component trigger has correct aria labels @smoke
+[1A[2K[58/98] [xmlui-smoke] › src/components/NavGroup/NavGroup.spec.ts:55:3 › smoke tests › expanded in vertical layout to show link of current page @smoke
+[1A[2K[59/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:199:3 › Basic Functionality › clicking label brings up the options @smoke
+[1A[2K[60/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:306:3 › Basic Functionality › Option without label and value is not rendered @smoke
+[1A[2K[61/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:323:3 › Basic Functionality › Option value defaults to label @smoke
+[1A[2K[62/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:344:3 › Basic Functionality › Option label defaults to value in SimpleSelect @smoke
+[1A[2K[63/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:373:3 › Basic Functionality › Option label defaults to value in searchable Select @smoke
+[1A[2K[64/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:402:3 › Basic Functionality › Option label defaults to value in multiSelect @smoke
+[1A[2K[65/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:673:3 › searchable select › search filters option labels @smoke
+[1A[2K[66/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:803:3 › multiSelect › clicking label brings up the options @smoke
+[1A[2K[67/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:765:3 › multiSelect › initialValue='{[0,1]}' works @smoke
+[1A[2K[68/98] [xmlui-smoke] › src/components/Select/Select.spec.ts:950:3 › searchable multiselect › searching for and selecting 2 items works @smoke
+[1A[2K[69/98] [xmlui-smoke] › src/components/Spinner/Spinner.spec.ts:60:3 › Delay Behavior › component respects delay prop @smoke
+[1A[2K[70/98] [xmlui-smoke] › src/components/Spinner/Spinner.spec.ts:159:3 › Edge Cases › delayed fullScreen spinner spans viewport width @smoke
+[1A[2K[71/98] [xmlui-smoke] › src/components/Spinner/Spinner.spec.ts:176:3 › Edge Cases › button behind fullScreen spinner can't be clicked @smoke
+[1A[2K[72/98] [xmlui-smoke] › src/components/Tabs/Tabs.spec.ts:9:3 › smoke tests › component renders @smoke
+[1A[2K[73/98] [xmlui-smoke] › src/components/Tabs/Tabs.spec.ts:20:3 › smoke tests › renders tab labels correctly @smoke
+[1A[2K[74/98] [xmlui-smoke] › src/components/Tabs/Tabs.spec.ts:34:3 › smoke tests › shows first tab content by default @smoke
+[1A[2K[75/98] [xmlui-smoke] › src/components/Text/Text.spec.ts:2194:3 › smoke tests › basic smoke test @smoke
+[1A[2K[76/98] [extensions-smoke] › ../packages/xmlui-recharts/src/BarChart/BarChart.spec.ts:31:3 › smoke tests › component renders with basic props @smoke
+[1A[2K[77/98] [extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:90:3 › smoke tests › handles single data point @smoke
+[1A[2K[78/98] [extensions-smoke] › ../packages/xmlui-recharts/src/BarChart/BarChart.spec.ts:46:3 › smoke tests › renders correct number of bar series @smoke
+[1A[2K[79/98] [extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:59:3 › smoke tests › renders correct number of chart elements @smoke
+[1A[2K[80/98] [extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:75:3 › smoke tests › handles empty data gracefully @smoke
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/BarChart/BarChart.spec.ts:31:3 › smoke tests › component renders with basic props @smoke
+
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[81/98] [extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:44:3 › smoke tests › component renders with basic props @smoke
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:90:3 › smoke tests › handles single data point @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:75:3 › smoke tests › handles empty data gracefully @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/BarChart/BarChart.spec.ts:46:3 › smoke tests › renders correct number of bar series @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:59:3 › smoke tests › renders correct number of chart elements @smoke
+
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/AreaChart/AreaChart.spec.ts:44:3 › smoke tests › component renders with basic props @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[82/98] [extensions-smoke] › ../packages/xmlui-recharts/src/DonutChart/DonutChart.spec.ts:49:3 › smoke tests › component renders with basic props @smoke
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/DonutChart/DonutChart.spec.ts:49:3 › smoke tests › component renders with basic props @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[83/98] [extensions-smoke] › ../packages/xmlui-recharts/src/DonutChart/DonutChart.spec.ts:80:3 › smoke tests › renders donut chart with correct structure @smoke
+[1A[2K[84/98] [extensions-smoke] › ../packages/xmlui-recharts/src/DonutChart/DonutChart.spec.ts:64:3 › smoke tests › renders donut sectors for data points @smoke
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/DonutChart/DonutChart.spec.ts:80:3 › smoke tests › renders donut chart with correct structure @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+
+[1A[2K[extensions-smoke] › ../packages/xmlui-recharts/src/DonutChart/DonutChart.spec.ts:64:3 › smoke tests › renders donut sectors for data points @smoke
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+[1A[2K[85/98] [extensions-smoke] › ../packages/xmlui-recharts/src/DonutChart/DonutChart.spec.ts:96:3 › smoke tests › renders with default innerRadius (donut hole) @smoke
+[1A[2K[86/98] [extensions-smoke] › ../packages/xmlui-recharts/src/Legend/Legend.spec.ts:45:5 › Basic Functionality › smoke tests › Legend renders within PieChart @smoke
+[1A[2K[87/98] [extensions-smoke] › ../packages/xmlui-recharts/src/Legend/Legend.spec.ts:63:5 › Basic Functionality › smoke tests › Legend renders within BarChart @smoke
+[1A[2K[88/98] [extensions-smoke] › ../packages/xmlui-recharts/src/LineChart/LineChart.spec.ts:46:3 › smoke tests › renders correct number of line series @smoke
+[1A[2K[89/98] [extensions-smoke] › ../packages/xmlui-recharts/src/LineChart/LineChart.spec.ts:31:3 › smoke tests › component renders with basic props @smoke
+[1A[2K[90/98] [extensions-smoke] › ../packages/xmlui-recharts/src/PieChart/PieChart.spec.ts:39:3 › smoke tests › component renders with basic props @smoke
+[1A[2K[91/98] [extensions-smoke] › ../packages/xmlui-recharts/src/PieChart/PieChart.spec.ts:54:3 › smoke tests › renders pie sectors for data points @smoke
+[1A[2K[92/98] [extensions-smoke] › ../packages/xmlui-recharts/src/PieChart/PieChart.spec.ts:70:3 › smoke tests › renders pie chart with correct structure @smoke
+[1A[2K[93/98] [extensions-smoke] › ../packages/xmlui-recharts/src/RadarChart/RadarChart.spec.ts:48:3 › smoke tests › component renders with basic props @smoke
+[1A[2K[94/98] [extensions-smoke] › ../packages/xmlui-recharts/src/RadarChart/RadarChart.spec.ts:79:3 › smoke tests › handles empty data gracefully @smoke
+[1A[2K[95/98] [extensions-smoke] › ../packages/xmlui-recharts/src/RadarChart/RadarChart.spec.ts:94:3 › smoke tests › handles single data point @smoke
+[1A[2K[96/98] [extensions-smoke] › ../packages/xmlui-recharts/src/RadarChart/RadarChart.spec.ts:63:3 › smoke tests › renders correct number of radar elements @smoke
+[1A[2K[97/98] [extensions-smoke] › ../packages/xmlui-recharts/src/Tooltip/TooltipContent.spec.ts:40:5 › Basic Functionality › smoke tests › TooltipContent renders in PieChart on hover @smoke
+[1A[2K[98/98] [extensions-smoke] › ../packages/xmlui-recharts/src/Tooltip/TooltipContent.spec.ts:63:5 › Basic Functionality › smoke tests › TooltipContent renders in BarChart on hover @smoke
+[1A[2K  98 passed (13.7s)

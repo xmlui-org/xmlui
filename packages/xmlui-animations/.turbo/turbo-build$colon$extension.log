@@ -1,0 +1,18 @@
+
+
+> xmlui-animations@0.1.16 build:extension
+> xmlui build-lib
+
+[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
+[2K[32m✓[39m 16 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[36mxmlui-animations.js  [39m[2m[1m54.88 kB[0m[0m[2m │ gzip: 19.25 kB[0m
+
+[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
+[39m
+[2K[32m✓[39m 16 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[36mxmlui-animations.mjs  [39m[2m[1m68.85 kB[0m[0m[2m │ gzip: 21.09 kB[0m
+
+[32m✓ built in 312ms[39m
+[1G[0K⠙[1G[0K

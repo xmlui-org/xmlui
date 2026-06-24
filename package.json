@@ -6,7 +6,8 @@
   "workspaces": [
     "xmlui",
     "packages/*",
-    "tools/vscode"
+    "tools/vscode",
+    "website"
   ],
   "scripts": {
     "setup": "npm install",
