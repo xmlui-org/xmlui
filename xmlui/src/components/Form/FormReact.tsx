@@ -22,6 +22,7 @@ export type FormProps = {
   saveLabel?: string;
   cancelLabel?: string;
   hideButtonRow?: boolean;
+  hideButtonRowUntilDirty?: boolean;
   enableSubmit?: boolean;
   children?: ReactNode;
   onSubmit?: (values: FormValues) => void | Promise<unknown>;
@@ -38,6 +39,7 @@ export function Form({
   saveLabel = "Save",
   cancelLabel = "Cancel",
   hideButtonRow = false,
+  hideButtonRowUntilDirty = false,
   enableSubmit = true,
   children,
   onSubmit,
@@ -124,6 +126,8 @@ export function Form({
     });
   }, []);
   const getData = useCallback(() => ({ ...values }), [values]);
+  const isDirty = dirtyFields.size > 0;
+  const shouldShowButtonRow = !hideButtonRow && (!hideButtonRowUntilDirty || isDirty);
 
   useEffect(() => {
     registerComponentApi?.({
@@ -154,7 +158,7 @@ export function Form({
         <div className={styles.content} data-xmlui-part="content">
           {children}
         </div>
-        {!hideButtonRow && (
+        {shouldShowButtonRow && (
           <div className={styles.buttonRow} data-xmlui-part="buttonRow">
             <Button type="submit" disabled={!enabled || !enableSubmit}>
               {saveLabel}

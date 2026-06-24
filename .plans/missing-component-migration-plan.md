@@ -662,6 +662,14 @@ P2A progress note, 2026-06-24:
 
 - Activated the copied-old `FormItem.spec.ts` **Basic Functionality** group.
 - Activated the copied-old `FormSegment.spec.ts` **Basic Rendering** group.
+- Activated the copied-old `Form.spec.ts` initial **Basic Functionality**
+  render/button-label/order tests and the **hideButtonRow property** group.
+- Activated the copied-old `Form.spec.ts` core
+  **hideButtonRowUntilDirty property** tests. The custom `buttonRowTemplate`
+  and typed-control cases in that group remain explicitly skipped until those
+  slices are active.
+- Activated the copied-old `Form.spec.ts` **enableSubmit property** group.
+- Activated the copied-old `Form.spec.ts` **data property** group.
 - Kept later copied-old FormItem/FormSegment groups explicitly skipped by
   feature area rather than hiding them behind whole-file skips.
 - Fixed the compatibility gaps exposed by those groups:
@@ -675,14 +683,29 @@ Verification:
 
 - `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
   passed 30 active tests with 122 explicit copied-suite skips.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  passed 45 active tests with 334 explicit copied-suite skips after enabling
+  the Form render/button and `hideButtonRow` groups.
+- The same combined P2A focused command passed 54 active tests after adding
+  `hideButtonRowUntilDirty` support.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "enableSubmit property"`
+  passed 11 copied-old `enableSubmit` tests.
+- The same combined P2A focused command passed 65 active tests with 314
+  explicit copied-suite skips after activating `enableSubmit`.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "data property"`
+  passed 4 copied-old `data` tests; the grep also reported 4 skipped API tests
+  whose names contain "data property".
+- The same combined P2A focused command passed 69 active tests with 310
+  explicit copied-suite skips after activating `data property`.
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - `npm --workspace xmlui test`
 - `npm --workspace xmlui run build:metadata`
 - `npm --workspace xmlui run compatibility:css-module-import-audit`
 
 Next explicit step: continue P2A by activating the copied-old `Form.spec.ts`
-Basic Functionality group feature-by-feature, starting with the simple render
-and button-row cases before submit/cancel/data semantics.
+inherited item label setting groups: `itemLabelPosition`,
+`itemLabelWidth`, `itemLabelBreak`, and `itemRequireLabelMode`. Keep the rest
+of `Form.spec.ts` explicitly skipped until each feature group is made green.
 
 ### P2B: Structured Form Controls
 

@@ -15,6 +15,7 @@ export const formRenderer = wrapComponent({
         saveLabel={adapter.stringProp("saveLabel", "Save")}
         cancelLabel={adapter.stringProp("cancelLabel", "Cancel")}
         hideButtonRow={adapter.booleanProp("hideButtonRow", false)}
+        hideButtonRowUntilDirty={adapter.booleanProp("hideButtonRowUntilDirty", false)}
         enableSubmit={adapter.booleanProp("enableSubmit", true)}
         className={adapter.className}
         style={adapter.style}

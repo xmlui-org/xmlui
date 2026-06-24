@@ -33,6 +33,11 @@ export const FormMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    hideButtonRowUntilDirty: {
+      description: "Hides the built-in submit and cancel button row until a field value changes.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
     enableSubmit: {
       description: "Enables the built-in submit button.",
       valueType: "boolean",

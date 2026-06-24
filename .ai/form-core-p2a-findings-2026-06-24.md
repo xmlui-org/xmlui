@@ -7,6 +7,12 @@ groups instead of keeping the entire old suites skipped.
 
 Activated copied-old coverage:
 
+- `xmlui/src/components/Form/Form.spec.ts`
+  - initial `Basic Functionality` render/button-label/order tests
+  - `hideButtonRow property`
+  - core `hideButtonRowUntilDirty property` tests
+  - `enableSubmit property`
+  - `data property`
 - `xmlui/src/components/FormItem/FormItem.spec.ts`
   - `Basic Functionality`
 - `xmlui/src/components/FormSegment/FormSegment.spec.ts`
@@ -14,6 +20,11 @@ Activated copied-old coverage:
 
 Kept later groups explicitly skipped:
 
+- Form inherited label settings, event/API/context, validation, persistence,
+  sticky button row, and legacy integration groups.
+- Form `hideButtonRowUntilDirty` tests that require custom `buttonRowTemplate`
+  or typed FormItem controls (`checkbox`, `slider`) remain skipped until those
+  feature slices are active.
 - FormItem type matrix, validation properties, event validation,
   accessibility, theme variables, edge cases, phone pattern, regex validation.
 - FormSegment scoped data, validation issue contexts, field discovery,
@@ -36,6 +47,21 @@ Kept later groups explicitly skipped:
 
 - `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
   passed 30 active tests with 122 explicit copied-suite skips.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  passed 45 active tests with 334 explicit copied-suite skips after enabling
+  the Form render/button and `hideButtonRow` groups.
+- The same combined P2A focused command passed 54 active tests after adding
+  `hideButtonRowUntilDirty` metadata/renderer/runtime support, with the
+  custom-button-template and typed-control cases explicitly skipped.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "enableSubmit property"`
+  passed 11 copied-old `enableSubmit` tests.
+- The same combined P2A focused command passed 65 active tests with 314
+  explicit copied-suite skips after activating `enableSubmit`.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "data property"`
+  passed 4 copied-old `data` tests; the grep also reported 4 skipped API tests
+  whose names contain "data property".
+- The same combined P2A focused command passed 69 active tests with 310
+  explicit copied-suite skips after activating `data property`.
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - `npm --workspace xmlui test`
 - `npm --workspace xmlui run build:metadata`
@@ -43,6 +69,6 @@ Kept later groups explicitly skipped:
 
 ## Next Work
 
-Continue P2A by activating the copied-old `Form.spec.ts` basic functionality
-group feature-by-feature. Expect submit/cancel/button-row behavior and form
-data semantics to expose the next real compatibility gaps.
+Continue P2A by activating the copied-old `Form.spec.ts`
+inherited item label setting groups: `itemLabelPosition`,
+`itemLabelWidth`, `itemLabelBreak`, and `itemRequireLabelMode`.

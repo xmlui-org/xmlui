@@ -4,8 +4,6 @@ import { getBounds } from "../../testing/component-test-helpers";
 type ApiInterceptorDefinition = Record<string, unknown>;
 const labelPositionValues = ["top", "start", "end", "bottom", "before", "after"] as const;
 
-test.skip(true, "Copied from the original XMLUI Form suite; full submit, API, persistence, validation, and layout compatibility is tracked for later Form waves.");
-
 // Test data constants
 const errorDisplayInterceptor: ApiInterceptorDefinition = {
   initialize: `
@@ -338,7 +336,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test("hides custom button row template until dirty", async ({
+    test.skip("hides custom button row template until dirty", async ({
       initTestBed,
       page,
       createFormItemDriver,
@@ -413,7 +411,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test("button row appears when checkbox is checked", async ({ initTestBed, page }) => {
+    test.skip("button row appears when checkbox is checked", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form hideButtonRowUntilDirty="true">
           <FormItem label="Accept Terms" bindTo="terms" type="checkbox" />
@@ -431,7 +429,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test("button row appears when slider value changes", async ({ initTestBed, page }) => {
+    test.skip("button row appears when slider value changes", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form hideButtonRowUntilDirty="true">
           <FormItem label="Volume" bindTo="volume" type="slider" testId="volumeField" />
@@ -615,7 +613,7 @@ test.describe("Basic Functionality", () => {
   // ITEM LABEL POSITION TESTS
   // =============================================================================
 
-  test.describe("itemLabelPosition property", () => {
+  test.describe.skip("itemLabelPosition property", () => {
     labelPositionValues.forEach((position) => {
       test(`sets item label position to ${position}`, async ({
         initTestBed,
@@ -646,7 +644,7 @@ test.describe("Basic Functionality", () => {
   // ITEM LABEL WIDTH TESTS
   // =============================================================================
 
-  test.describe("itemLabelWidth property", () => {
+  test.describe.skip("itemLabelWidth property", () => {
     test("sets custom label width", async ({ initTestBed, createFormItemDriver }) => {
       await initTestBed(`
         <Form itemLabelWidth="200px">
@@ -695,7 +693,7 @@ test.describe("Basic Functionality", () => {
   // ITEM LABEL WIDTH INHERITANCE FOR LABEL BEHAVIOR (NO BINDTO)
   // =============================================================================
 
-  test.describe("itemLabelWidth inheritance without bindTo", () => {
+  test.describe.skip("itemLabelWidth inheritance without bindTo", () => {
     test("applies form itemLabelWidth to components with label but no bindTo", async ({
       initTestBed,
       page,
@@ -794,7 +792,7 @@ test.describe("Basic Functionality", () => {
   // ITEM LABEL BREAK TESTS
   // =============================================================================
 
-  test.describe("itemLabelBreak property", () => {
+  test.describe.skip("itemLabelBreak property", () => {
     test("enables label line breaking", async ({ initTestBed, createFormItemDriver }) => {
       await initTestBed(`
         <Form itemLabelBreak="true">
@@ -822,7 +820,7 @@ test.describe("Basic Functionality", () => {
   // ITEM REQUIRED/OPTIONAL INDICATOR TESTS
   // =============================================================================
 
-  test.describe("itemRequireLabelMode property", () => {
+  test.describe.skip("itemRequireLabelMode property", () => {
     test("sets 'markRequired' indicator mode showing asterisk for required fields", async ({
       initTestBed,
       createFormItemDriver,
@@ -959,7 +957,7 @@ test.describe("Basic Functionality", () => {
   // ENABLED PROPERTY TESTS
   // =============================================================================
 
-  test.describe("enabled property", () => {
+  test.describe.skip("enabled property", () => {
     test("disables save button when enabled is false", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form enabled="false">
@@ -990,7 +988,7 @@ test.describe("Basic Functionality", () => {
   // BUTTON ROW TEMPLATE TESTS
   // =============================================================================
 
-  test.describe("buttonRowTemplate property", () => {
+  test.describe.skip("buttonRowTemplate property", () => {
     test("supports custom button row template", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form>
@@ -1011,7 +1009,7 @@ test.describe("Basic Functionality", () => {
   // EVENT TESTS
   // =============================================================================
 
-  test.describe("Events", () => {
+  test.describe.skip("Events", () => {
     test("onSubmit event fires with form data", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <Form data="{{ name: 'John', email: 'john@example.com' }}" onSubmit="data => testState = data">
@@ -1475,7 +1473,7 @@ test.describe("Basic Functionality", () => {
   // API TESTS
   // =============================================================================
 
-  test.describe("APIs", () => {
+  test.describe.skip("APIs", () => {
     test("update method updates form data", async ({
       initTestBed,
       page,
@@ -1712,7 +1710,7 @@ test.describe("Basic Functionality", () => {
   // CONTEXT VARIABLE TESTS
   // =============================================================================
 
-  test.describe("Context Variables", () => {
+  test.describe.skip("Context Variables", () => {
     test("$data context variable provides access to form data", async ({
       initTestBed,
       page,
@@ -1761,7 +1759,7 @@ test.describe("Basic Functionality", () => {
   // ONVALIDATE INTEGRATION TESTS
   // =============================================================================
 
-  test.describe("onValidate Integration", () => {
+  test.describe.skip("onValidate Integration", () => {
     test("multiple fields with onValidate all show validation messages on form submit", async ({
       initTestBed,
       createFormDriver,
@@ -2298,7 +2296,7 @@ test.describe("Basic Functionality", () => {
   // SUBMIT URL AND METHOD TESTS
   // =============================================================================
 
-  test.describe("Submit URL and Method", () => {
+  test.describe.skip("Submit URL and Method", () => {
     test("submits to custom URL with POST method (new date)", async ({
       initTestBed,
       createFormDriver,
@@ -2383,7 +2381,7 @@ test.describe("Basic Functionality", () => {
 // ACCESSIBILITY TESTS
 // =============================================================================
 
-test.describe("Accessibility", () => {
+test.describe.skip("Accessibility", () => {
   test("form has correct semantic role", async ({ initTestBed, page }) => {
     await initTestBed(`<Form/>`);
     await expect(page.locator("form")).toBeVisible();
@@ -2450,7 +2448,7 @@ test.describe("Accessibility", () => {
 // THEME VARIABLE TESTS
 // =============================================================================
 
-test.describe("Theme Variables", () => {
+test.describe.skip("Theme Variables", () => {
   test("applies custom gap theme variable", async ({ initTestBed, createFormDriver }) => {
     await initTestBed(`<Form testId="form"/>`, {
       testThemeVars: {
@@ -2504,7 +2502,7 @@ test.describe("Theme Variables", () => {
 // EDGE CASES TESTS
 // =============================================================================
 
-test.describe("Edge Cases", () => {
+test.describe.skip("Edge Cases", () => {
   test("handles form without any form items", async ({ initTestBed, createFormDriver }) => {
     await initTestBed(`<Form testId="form"/>`);
     const driver = await createFormDriver("form");
@@ -2695,6 +2693,7 @@ test.describe("Edge Cases", () => {
 // ORIGINAL TEST SUITE (LEGACY TESTS)
 // =============================================================================
 
+test.describe.skip("Original legacy form integration tests", () => {
 test("mock service responds", async ({ initTestBed, createFormDriver }) => {
   await initTestBed(
     `
@@ -3552,12 +3551,13 @@ test("can submit with invisible required field", async ({
 
   await expect.poll(testStateDriver.testState).toEqual(true);
 });
+});
 
 // =============================================================================
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================
 
-test.describe("Behaviors and Parts", () => {
+test.describe.skip("Behaviors and Parts", () => {
   test("can select part: 'cancelButton'", async ({ page, initTestBed }) => {
     await initTestBed(`<Form testId="test" />`);
     const cancelButton = page.locator("[data-part-id='cancelButton']");
@@ -3596,7 +3596,7 @@ test.describe("Behaviors and Parts", () => {
 // API TESTS
 // =============================================================================
 
-test.describe("Api", () => {
+test.describe.skip("Api", () => {
   test("getData returns a copy of current form data", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
@@ -4073,7 +4073,7 @@ test.describe("Api", () => {
 // FORM PERSISTENCE (persist / storageKey / doNotPersistFields / keepOnCancel)
 // =============================================================================
 
-test.describe("Form persistence — localStorage temporary save", () => {
+test.describe.skip("Form persistence — localStorage temporary save", () => {
   test("persist saves form data to localStorage as user types", async ({
     page,
     initTestBed,
@@ -4253,7 +4253,7 @@ test.describe("Form persistence — localStorage temporary save", () => {
 // dataAfterSubmit PROPERTY
 // =============================================================================
 
-test.describe("dataAfterSubmit property", () => {
+test.describe.skip("dataAfterSubmit property", () => {
   test('"keep" (default) preserves submitted data in the form', async ({
     page,
     initTestBed,
@@ -4343,7 +4343,7 @@ test.describe("dataAfterSubmit property", () => {
 // STICKY BUTTON ROW TESTS
 // =============================================================================
 
-test.describe("stickyButtonRow property", () => {
+test.describe.skip("stickyButtonRow property", () => {
   test("button row does not have sticky positioning by default", async ({
     initTestBed,
     createFormDriver,
@@ -4621,7 +4621,7 @@ test.describe("stickyButtonRow property", () => {
 // VALUE PRESERVATION ACROSS UNMOUNT/REMOUNT
 // =============================================================================
 
-test.describe("Value preservation across unmount/remount", () => {
+test.describe.skip("Value preservation across unmount/remount", () => {
   test("typed value is preserved when FormItem unmounts via `when` and remounts", async ({
     initTestBed,
     page,
@@ -4839,6 +4839,7 @@ test.describe("Value preservation across unmount/remount", () => {
 
 // --- FormItem type="items" with UDC children
 
+test.describe.skip("FormItem type='items' with UDC children", () => {
 test(`bindTo inside a UDC rendered inside FormItem type='items' reads item data`, async ({
   initTestBed,
   page,
@@ -4894,4 +4895,5 @@ test(`submit with UDC bindTo inside FormItem type='items' collects correct data`
   await expect.poll(testStateDriver.testState).toStrictEqual({
     items: [{ name: "Alice" }, { name: "Bob" }],
   });
+});
 });
