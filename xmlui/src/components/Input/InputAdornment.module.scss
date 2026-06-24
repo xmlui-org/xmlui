@@ -1,0 +1,30 @@
+.wrapper {
+  display: flex;
+  gap: var(--xmlui-space-2, 0.5rem);
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--xmlui-textColor-subtitle, var(--xmlui-color-surface-700));
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  opacity: 0.8;
+}
+
+.clickable:focus {
+  outline: none;
+}
+
+.text {
+  display: flex;
+  user-select: none;
+}
+
+.textContent {
+  font-size: inherit;
+}
+

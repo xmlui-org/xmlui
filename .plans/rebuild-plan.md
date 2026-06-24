@@ -4189,14 +4189,28 @@ Deferred compatibility work:
 - Old tone-specific `dark` default theme vars remain deferred until the current
   metadata shape supports tone-specific default theme-var blocks.
 
-Next explicit step: Phase 5 Wave H2A - start `FocusScope` from the
-missing-component migration plan. H1A is complete: `Spinner`, `ProgressBar`,
+Next explicit step: Phase 5 Wave P2A - continue Form Core by activating the
+copied-old `Form.spec.ts` Basic Functionality group feature-by-feature,
+starting with simple render and button-row cases before submit/cancel/data
+semantics. H1A is complete: `Spinner`, `ProgressBar`,
 `Avatar`, and `Badge` have copied old docs/defaults/specs, compiler/runtime
 registration, the combined `?example=missingVisualComponentsFoundation` route,
 and passing focused old E2E suites. H1B is complete: `Stepper` and `Step` have
 copied old docs/defaults/specs, compiler/runtime registration, the
 `?example=stepperFoundation` route, and all 62 copied old `Stepper` E2E tests
-passing. The preceding P0B VS Code SCSS bundling unblock is complete.
+passing. H2A focus core is complete: `FocusScope` has copied old
+docs/defaults/specs, compiler/runtime registration, the
+`?example=focusScopeFoundation` route, 4 copied old FocusScope E2E tests
+passing, and 1 copied old Markdown/xmlui-pg prerequisite test explicitly
+skipped until Markdown migration. H2B input internals is complete:
+`InputLabel`, `InputAdornment`, `InputDivider`, and `PartialInput` were
+migrated as internal shared primitives with SCSS modules and unit smoke
+coverage; no public `Input` component contract was added, and consumer adoption
+is deferred to focused input-family parity slices. P2A has started:
+`FormItem.spec.ts` Basic Functionality and `FormSegment.spec.ts` Basic
+Rendering are active and passing, with the remaining copied-old FormItem and
+FormSegment groups explicitly skipped by feature area. The preceding P0B VS
+Code SCSS bundling unblock is complete.
 
 Detailed missing-component continuation plan:
 

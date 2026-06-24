@@ -35,6 +35,12 @@ export const FormItemMd = createMetadata({
     },
     labelWidth: { description: "Sets the label width.", valueType: "length" },
     labelBreak: { description: "Allows label line breaks.", valueType: "boolean" },
+    requireLabelMode: {
+      description: "Controls whether required and optional markers are shown next to the label.",
+      valueType: "string",
+      availableValues: ["markRequired", "markOptional", "markBoth"],
+      defaultValue: "markRequired",
+    },
     enabled: dEnabled(true),
     autoFocus: dAutoFocus(),
     type: {

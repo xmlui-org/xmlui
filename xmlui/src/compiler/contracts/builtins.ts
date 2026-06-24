@@ -33,6 +33,7 @@ import { ContextMenuMd } from "../../components/ContextMenu/ContextMenu";
 import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "../../components/DropdownMenu/DropdownMenu";
 import { FileInputMd } from "../../components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "../../components/FileUploadDropZone/FileUploadDropZone";
+import { FocusScopeMd } from "../../components/FocusScope/FocusScope";
 import { FlowLayoutMd } from "../../components/FlowLayout/FlowLayout";
 import { ScrollViewerMd } from "../../components/ScrollViewer/ScrollViewer";
 import { TimeInputMd } from "../../components/TimeInput/TimeInput";
@@ -624,6 +625,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     eventAttributes: {
       upload: "onUpload",
     },
+  }),
+  contractFromMetadata(FocusScopeMd, {
+    name: "FocusScope",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   contractFromMetadata(TileGridMd, {
     name: "TileGrid",

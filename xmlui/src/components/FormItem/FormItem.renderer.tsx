@@ -19,6 +19,7 @@ export const formItemRenderer = wrapComponent({
         type={adapter.stringProp("type", "text")}
         initialValue={adapter.prop("initialValue")}
         required={adapter.booleanProp("required", false)}
+        requireLabelMode={adapter.stringProp("requireLabelMode", "markRequired")}
         requiredInvalidMessage={adapter.stringProp("requiredInvalidMessage")}
         className={adapter.className}
         style={adapter.style}

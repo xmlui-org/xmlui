@@ -465,6 +465,7 @@ const builtInElementNames = new Set([
   "Checkbox",
   "Switch",
   "Fragment",
+  "FocusScope",
   "FlowLayout",
   "Fallback",
   "HStack",

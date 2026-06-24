@@ -236,16 +236,13 @@ Verification:
 
 H1B is complete.
 
-Next explicit step: start H2A with `FocusScope`, including copied old docs,
-metadata, SCSS module styling if applicable, renderer/runtime registration,
-compiler contract only if needed, copied old E2E suite, and representative
-overlay regression checks.
-
 ### H2A: Focus Management
 
 Components:
 
-- `FocusScope`
+- `FocusScope` - focus core completed on 2026-06-24; one copied old
+  Markdown/xmlui-pg prerequisite test remains explicitly skipped until
+  `Markdown` is migrated.
 
 Goal:
 
@@ -258,12 +255,55 @@ Implementation notes:
   this component may expose framework-wide focus assumptions.
 - Keep implementation browser-driven; unit tests are not enough for focus trap
   behavior.
+- Copied old docs/defaults/spec and migrated the old focus-scope stack/hook
+  into `xmlui/src/component-core/accessibility`.
+- Added source-adjacent metadata, renderer, React implementation, SCSS module,
+  compiler/runtime registration, and `?example=focusScopeFoundation`.
+- Preserved the old real wrapper `div` with `tabIndex=-1`; do not replace it
+  with `display: contents`, because focus trapping depends on normal DOM focus
+  and event semantics.
+- The old nested `Markdown`/`xmlui-pg` FocusScope test is marked `test.fixme`
+  with an explicit reason until the Markdown component migration reaches that
+  feature.
 
 Verification:
 
-- Focused `FocusScope` E2E.
-- Run representative `ModalDialog`, `Drawer`, and `DropdownMenu` focused E2E
-  after migration because focus behavior can regress overlay components.
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run build:metadata`
+- `npm --workspace xmlui test`
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+- `npm --workspace xmlui exec -- playwright test src/components/FocusScope/FocusScope.spec.ts`
+  passed 4 copied old tests with 1 explicit Markdown prerequisite skip.
+- `npm --workspace xmlui exec -- playwright test src/components/ModalDialog/ModalDialog.foundation.spec.ts src/components/Drawer/Drawer.foundation.spec.ts src/components/DropdownMenu/DropdownMenu.foundation.spec.ts`
+  passed all 12 representative overlay foundation tests.
+
+H2B completion note, 2026-06-24:
+
+- Added the internal `Input` folder with migrated `InputLabel`,
+  `InputAdornment`, `InputDivider`, and `PartialInput` primitives plus SCSS
+  modules and focused unit smoke coverage.
+- Kept `Input` internal. It has no public component contract, renderer,
+  metadata, or component-folder barrel because the old folder is shared
+  infrastructure rather than a user-facing XMLUI component.
+- Added the missing `search` icon used by old input-adornment examples/tests.
+- Attempted broad `TextBox`/`NumberBox` adoption and rolled it back after
+  focused E2E showed component-specific adornment visibility, positioning, and
+  theme-variable semantics were not preserved. Future adoption must happen
+  component-by-component inside the relevant input-family parity slices.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui run build:metadata`
+- `npm --workspace xmlui test`
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+- `npm --workspace xmlui exec -- playwright test src/components/TextBox/TextBox.spec.ts src/components/NumberBox/NumberBox.spec.ts`
+  passed 328 tests with 42 explicit skips.
+
+P2A is now in progress; see the P2A progress note below for the current next
+explicit step. Use the completed H2B primitives as available infrastructure,
+but do not retrofit them into existing input components without focused old E2E
+coverage for that component.
 
 ### H2B: Shared Input Internals
 
@@ -617,6 +657,32 @@ Verification:
 - Focused form E2E plus a representative input matrix:
   `TextBox`, `TextArea`, `NumberBox`, `Checkbox`, `Switch`, `DateInput`,
   `TimeInput`, `ColorPicker`, `FileInput`, `Select`.
+
+P2A progress note, 2026-06-24:
+
+- Activated the copied-old `FormItem.spec.ts` **Basic Functionality** group.
+- Activated the copied-old `FormSegment.spec.ts` **Basic Rendering** group.
+- Kept later copied-old FormItem/FormSegment groups explicitly skipped by
+  feature area rather than hiding them behind whole-file skips.
+- Fixed the compatibility gaps exposed by those groups:
+  - `FormItem` metadata and renderer now pass `requireLabelMode`.
+  - `FormItemReact` renders old-compatible required and optional label markers.
+  - unlabeled FormItems use the old `width: fit-content` behavior.
+  - test drivers accept both wrapper and direct-input targets for input
+    controls, and `FormItemDriver.textBox` is available for old layout tests.
+
+Verification:
+
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  passed 30 active tests with 122 explicit copied-suite skips.
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- `npm --workspace xmlui test`
+- `npm --workspace xmlui run build:metadata`
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+
+Next explicit step: continue P2A by activating the copied-old `Form.spec.ts`
+Basic Functionality group feature-by-feature, starting with the simple render
+and button-row cases before submit/cancel/data semantics.
 
 ### P2B: Structured Form Controls
 

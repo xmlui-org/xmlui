@@ -18,6 +18,10 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
   gap: $gap-FormItem;
 }
 
+.noLabel {
+  width: fit-content;
+}
+
 .row {
   display: flex;
   flex-direction: row;
@@ -55,6 +59,10 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 
 .requiredIndicator {
   margin-left: 0.125rem;
+}
+
+.optionalIndicator {
+  margin-left: 0.25rem;
 }
 
 .control {

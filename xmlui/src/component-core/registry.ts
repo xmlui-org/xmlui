@@ -75,6 +75,7 @@ import {
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
+import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
 import { footerRenderer } from "../components/Footer/Footer.renderer";
 import { formRenderer } from "../components/Form/Form.renderer";
@@ -206,6 +207,7 @@ const implementedRuntimeNames = [
   "SubMenuItem",
   "FileInput",
   "FileUploadDropZone",
+  "FocusScope",
   "Footer",
   "Form",
   "FormItem",
@@ -325,6 +327,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   AutoComplete: autoCompleteRenderer,
   FileInput: fileInputRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
+  FocusScope: focusScopeRenderer,
   Footer: footerRenderer,
   Form: formRenderer,
   FormItem: formItemRenderer,
@@ -436,6 +439,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       contract.name === "SubMenuItem";
     const fileInputTransferred = contract.name === "FileInput";
     const fileUploadDropZoneTransferred = contract.name === "FileUploadDropZone";
+    const focusScopeTransferred = contract.name === "FocusScope";
     const footerTransferred = contract.name === "Footer";
     const formTransferred = contract.name === "Form";
     const formItemTransferred = contract.name === "FormItem";
@@ -531,6 +535,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       menuPrimitiveTransferred ||
       fileInputTransferred ||
       fileUploadDropZoneTransferred ||
+      focusScopeTransferred ||
       footerTransferred ||
       formTransferred ||
       formItemTransferred ||
@@ -651,6 +656,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
                                   ? "FileInput"
                                   : fileUploadDropZoneTransferred
                                     ? "FileUploadDropZone"
+                                    : focusScopeTransferred
+                                      ? "FocusScope"
                                     : footerTransferred
                                       ? "Footer"
                                     : itemsTransferred
@@ -800,6 +807,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileInputReact.tsx`);
     } else if (fileUploadDropZoneTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileUploadDropZoneReact.tsx`);
+    } else if (focusScopeTransferred) {
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FocusScopeReact.tsx`);
     } else if (footerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FooterReact.tsx`);
     } else if (formTransferred) {
@@ -957,6 +966,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       menuPrimitiveTransferred,
       fileInputTransferred,
       fileUploadDropZoneTransferred,
+      focusScopeTransferred,
       footerTransferred,
       formTransferred,
       formItemTransferred,
@@ -1133,6 +1143,7 @@ function componentRunnablePaths(flags: {
   menuPrimitiveTransferred: boolean;
   fileInputTransferred: boolean;
   fileUploadDropZoneTransferred: boolean;
+  focusScopeTransferred: boolean;
   footerTransferred: boolean;
   formTransferred: boolean;
   formItemTransferred: boolean;
@@ -1311,6 +1322,9 @@ function componentRunnablePaths(flags: {
   }
   if (flags.fileUploadDropZoneTransferred) {
     return ["xmlui/src/components/FileUploadDropZone/FileUploadDropZone.spec.ts"];
+  }
+  if (flags.focusScopeTransferred) {
+    return ["xmlui/src/components/FocusScope/FocusScope.spec.ts"];
   }
   if (flags.footerTransferred) {
     return [

@@ -43,7 +43,11 @@ export class ComponentDriver {
 
 export class InputComponentDriver extends ComponentDriver {
   get field(): Locator {
-    return this.getByPartName("input");
+    return this.component
+      .locator(
+        "xpath=self::*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea] | .//*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea]",
+      )
+      .first();
   }
 
   get label(): Locator {
@@ -72,6 +76,10 @@ export class FormDriver extends ComponentDriver {
 export class FormItemDriver extends ComponentDriver {
   get input(): Locator {
     return this.getByPartName("input");
+  }
+
+  get textBox(): Locator {
+    return this.input;
   }
 
   get label(): Locator {

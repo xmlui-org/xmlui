@@ -1,0 +1,45 @@
+.partialInput {
+  height: 100%;
+  position: relative;
+  border: 0;
+  background: none;
+  color: currentColor;
+  font: inherit;
+  box-sizing: border-box;
+  text-align: start;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.partialInput::-webkit-outer-spin-button,
+.partialInput::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
+.partialInput[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+.partialInput:focus {
+  outline: none;
+}
+
+.partialInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.partialInput[readonly] {
+  cursor: default;
+}
+
+.partialInput::placeholder {
+  opacity: 0.6;
+}
+

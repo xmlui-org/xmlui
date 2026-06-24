@@ -22,6 +22,7 @@ export type FormItemProps = {
   type?: string;
   initialValue?: unknown;
   required?: boolean;
+  requireLabelMode?: string;
   requiredInvalidMessage?: string;
   children?: ReactNode;
 };
@@ -39,6 +40,7 @@ export function FormItem({
   type = "text",
   initialValue,
   required = false,
+  requireLabelMode = "markRequired",
   requiredInvalidMessage,
   children,
   ...rest
@@ -51,6 +53,10 @@ export function FormItem({
   const itemEnabled = enabled && formEnabled;
   const value = form?.getValue(fieldName) ?? initialValue ?? "";
   const error = form?.errors[fieldName];
+  const showRequiredIndicator =
+    required && (requireLabelMode === "markRequired" || requireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (requireLabelMode === "markOptional" || requireLabelMode === "markBoth");
 
   useEffect(() => {
     if (!form || form.getValue(fieldName) !== undefined || initialValue === undefined) {
@@ -91,7 +97,7 @@ export function FormItem({
   return (
     <div
       {...rest}
-      className={cx(styles.formItem, className)}
+      className={cx(styles.formItem, !label ? styles.noLabel : undefined, className)}
       style={style}
       data-xmlui-form-field={fieldName}
     >
@@ -99,7 +105,8 @@ export function FormItem({
         {label && (
           <label className={styles.label} data-xmlui-part="label" htmlFor={inputId} style={labelStyle}>
             {label}
-            {required && <span className={styles.requiredIndicator}>*</span>}
+            {showRequiredIndicator && <span className={styles.requiredIndicator}>*</span>}
+            {showOptionalIndicator && <span className={styles.optionalIndicator}>(Optional)</span>}
           </label>
         )}
         <div className={styles.control} data-xmlui-part="control">
@@ -142,4 +149,3 @@ function stringify(value: unknown): string {
 function cx(...classes: Array<string | undefined | false>): string {
   return classes.filter(Boolean).join(" ");
 }
-

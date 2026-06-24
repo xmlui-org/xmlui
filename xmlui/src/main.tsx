@@ -96,6 +96,7 @@ import dropdownMenuFoundationApp from "./examples/dropdown-menu-foundation/Main.
 import cardFoundationApp from "./examples/card-foundation/Main.xmlui";
 import fileInputFoundationApp from "./examples/file-input-foundation/Main.xmlui";
 import fileUploadDropZoneFoundationApp from "./examples/file-upload-drop-zone-foundation/Main.xmlui";
+import focusScopeFoundationApp from "./examples/focus-scope-foundation/Main.xmlui";
 import flowTileFoundationApp from "./examples/flow-tile-foundation/Main.xmlui";
 import footerFoundationApp from "./examples/footer-foundation/Main.xmlui";
 import formFoundationApp from "./examples/form-foundation/Main.xmlui";
@@ -216,6 +217,7 @@ const examples = {
   cardFoundation: cardFoundationApp,
   fileInputFoundation: fileInputFoundationApp,
   fileUploadDropZoneFoundation: fileUploadDropZoneFoundationApp,
+  focusScopeFoundation: focusScopeFoundationApp,
   flowTileFoundation: flowTileFoundationApp,
   footerFoundation: footerFoundationApp,
   formFoundation: formFoundationApp,
