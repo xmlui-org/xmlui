@@ -665,19 +665,107 @@ P2A progress note, 2026-06-24:
 - Activated the copied-old `Form.spec.ts` initial **Basic Functionality**
   render/button-label/order tests and the **hideButtonRow property** group.
 - Activated the copied-old `Form.spec.ts` core
-  **hideButtonRowUntilDirty property** tests. The custom `buttonRowTemplate`
-  and typed-control cases in that group remain explicitly skipped until those
-  slices are active.
+  **hideButtonRowUntilDirty property** tests. The typed-control cases in that
+  group remain explicitly skipped until those input slices are active.
 - Activated the copied-old `Form.spec.ts` **enableSubmit property** group.
 - Activated the copied-old `Form.spec.ts` **data property** group.
+- Activated the copied-old `Form.spec.ts` inherited item label setting groups:
+  **itemLabelPosition**, **itemLabelWidth**, **itemLabelBreak**, and
+  **itemRequireLabelMode**.
+- Activated the copied-old `Form.spec.ts` **enabled property** group.
+- Activated the copied-old `Form.spec.ts` **buttonRowTemplate property** group
+  plus the related `hideButtonRow` and `hideButtonRowUntilDirty` custom-template
+  cases.
+- Activated the copied-old `Form.spec.ts` basic local **Events** subset:
+  `submit`, `cancel`, `reset`, and primitive/pass-through `willSubmit`
+  behavior. Event cases that require submit URL/method, `noSubmit` filtering,
+  nested modal form boundaries, or event-parser support for concise
+  object-literal arrow returns remain explicitly skipped.
+- Activated the copied-old `Form.spec.ts` local **APIs** subset: `update`,
+  `reset`, and `validate`. The later old `Api` block around `getData` deep
+  clone/filtering remains explicitly skipped until the deeper data-shaping and
+  `noSubmit` slices are active.
+- Activated the copied-old `Form.spec.ts` **Context Variables** group:
+  `$data` reads current form data reactively and `$data.update(...)` updates
+  form state from child event handlers.
+- Activated the first copied-old `Form.spec.ts` **onValidate Integration**
+  submit-time case: multiple FormItems run custom `onValidate` handlers during
+  form submit and display their validation messages alongside required-field
+  errors. The real-time `validationMode="onChanged"` and debounce cases are
+  tracked separately below; async pending-state and built-in/custom validation
+  ordering cases remain in an explicit skipped subgroup.
+- Activated the copied-old `Form.spec.ts` `validationMode="onChanged"`
+  custom-validation case: FormItems validate and update displayed messages as
+  bound fallback input values change. Async pending-state and built-in/custom
+  validation ordering cases remain explicitly skipped.
+- Activated the copied-old `Form.spec.ts` `customValidationsDebounce`
+  custom-validation case: change-time custom validation is delayed by the
+  configured debounce interval before showing the validation message.
+- Activated the copied-old `Form.spec.ts` async submit-time custom-validation
+  case: form submission awaits custom `onValidate` results and remains blocked
+  when validation returns an error.
+- Activated the copied-old `Form.spec.ts` async pending-state case: field
+  edits with custom async validation disable the built-in Save button and show
+  the old `Validating...` label while validation is in flight.
+- Activated the copied-old `Form.spec.ts` async failure case: when an async
+  custom validator resolves to an error, the cached validation result blocks
+  submit and the form does not raise `submit`.
 - Kept later copied-old FormItem/FormSegment groups explicitly skipped by
   feature area rather than hiding them behind whole-file skips.
 - Fixed the compatibility gaps exposed by those groups:
   - `FormItem` metadata and renderer now pass `requireLabelMode`.
   - `FormItemReact` renders old-compatible required and optional label markers.
   - unlabeled FormItems use the old `width: fit-content` behavior.
+  - `Form` propagates inherited item label settings through form context.
+  - `FormItem` and labeled `TextBox` inherit those settings only when their
+    own prop is absent.
+  - label width values resolve `$...` tokens through the active theme map, so
+    local `<Theme>` overrides affect inherited label widths.
+  - the root spacing scale includes `space-10`.
+  - `FormItem` labels expose the old `data-part-id="label"` marker.
   - test drivers accept both wrapper and direct-input targets for input
-    controls, and `FormItemDriver.textBox` is available for old layout tests.
+  controls, and `FormItemDriver.textBox` is available for old layout tests.
+  - `Form` raises local `willSubmit`, `submit`, `cancel`, `reset`, `success`,
+    `saved`, and `submitFailed` events through the renderer; `saved` is kept
+    as an old-compatible successful-submit alias for copied tests, `willSubmit`
+    can cancel submission with `false`, and the runtime path is ready to accept
+    transformed plain-object data once the event parser supports the old
+    concise object-literal arrow syntax.
+  - `Form.validate()` returns the copied-old validation result shape for the
+    local API subset, including `validationResults`.
+  - `FormItem` numeric/integer edits are stored as numbers for cleaned form
+    validation/API data.
+  - default required validation uses the old-compatible
+    `"This field is required"` message.
+  - `Form` advertises the `$data` context variable in metadata and renders its
+    children in a child runtime scope carrying live form data plus the
+    `update(...)` helper.
+  - native `FormItem type="checkbox"` now binds through `checked` and stores
+    boolean values in form data instead of treating the checkbox as a text
+    value.
+  - `FormItemDriver.checkbox` again matches the old driver shape by returning
+    a Locator.
+  - `FormItem` metadata/renderer/runtime wiring now exposes the old
+    `onValidate` event as a submit-time custom validator.
+  - `Form` now exposes a field-level `validateField(...)` context function and
+    `FormItem validationMode="onChanged"` uses it after value changes for
+    immediate custom validation feedback.
+  - `Form` tracks in-flight field validation, exposes `validatingFields` in
+    form context, disables built-in submit while validation is pending, supports
+    `savePendingLabel` / `submitFeedbackDelay`, and reuses the latest
+    unchanged field validation result on submit.
+  - `FormItem` starts change-time custom validation whenever `onValidate` is
+    present, matching the old partial async validation behavior that exists
+    independently of visible validation timing.
+  - `FormItem` metadata, renderer, and React runtime now support
+    `customValidationsDebounce`; `validationMode="onChanged"` uses a
+    cancellable timer and clears pending validation on unmount.
+  - The script parser accepts old block-bodied arrow validator shapes including
+    `value => { return ... }` and `value => { delay(...); return ... }`; both
+    script emitters wrap object-returning arrow expression bodies and emit async
+    block-bodied arrows for statement-plus-return validators.
+  - `FormDriver.submitForm()` is available as an old-compatible driver alias
+    for copied tests.
 
 Verification:
 
@@ -697,15 +785,73 @@ Verification:
   whose names contain "data property".
 - The same combined P2A focused command passed 69 active tests with 310
   explicit copied-suite skips after activating `data property`.
-- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
-- `npm --workspace xmlui test`
-- `npm --workspace xmlui run build:metadata`
-- `npm --workspace xmlui run compatibility:css-module-import-audit`
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "itemLabelPosition property|itemLabelWidth property|itemLabelWidth inheritance without bindTo|itemLabelBreak property|itemRequireLabelMode property"`
+  passed 25 copied-old inherited item label setting tests.
+- The same combined P2A focused command passed 94 active tests with 285
+  explicit copied-suite skips after activating the inherited label setting
+  groups.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "enabled property"`
+  passed 2 copied-old `enabled` tests.
+- The same combined P2A focused command passed 96 active tests with 283
+  explicit copied-suite skips after activating `enabled`.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "custom button row template|buttonRowTemplate property"`
+  passed 3 copied-old custom button row/template tests.
+- The same combined P2A focused command passed 98 active tests with 281
+  explicit copied-suite skips after activating `buttonRowTemplate` and the
+  related custom-template button-row cases.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "Events"`
+  passed 11 active copied-old local event tests with 10 explicit skips.
+- The same combined P2A focused command passed 108 active tests with 271
+  explicit copied-suite skips after activating the basic local `Events` subset.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "APIs"`
+  passed 8 active copied-old local API tests.
+- The same combined P2A focused command passed 116 active tests with 263
+  explicit copied-suite skips after activating the local `APIs` subset.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "Context Variables"`
+  passed 2 copied-old context variable tests.
+- The same combined P2A focused command passed 118 active tests with 261
+  explicit copied-suite skips after activating `Context Variables`.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "multiple fields with onValidate"`
+  passed the first copied-old submit-time `onValidate Integration` case, with
+  the remaining deferred onValidate subgroup skipped.
+- The same combined P2A focused command passed 119 active tests with 260
+  explicit copied-suite skips after activating the first submit-time
+  `onValidate Integration` case.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "onValidate runs with validationMode=onChanged"`
+  passed the copied-old real-time `onValidate` case.
+- The same combined P2A focused command passed 120 active tests with 259
+  explicit copied-suite skips after activating the real-time `onChanged`
+  custom-validation case.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "async onValidate with customValidationsDebounce"`
+  passed the copied-old debounce custom-validation case.
+- The same combined P2A focused command passed 121 active tests with 258
+  explicit copied-suite skips after activating the debounce custom-validation
+  case.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "form submission waits for all async onValidate before submitting"`
+  passed the copied-old async submit-time custom-validation case.
+- The same combined P2A focused command passed 122 active tests with 257
+  explicit copied-suite skips after activating the async submit-time
+  custom-validation case.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "form blocks submission while async onValidate is still in-flight"`
+  passed the copied-old async pending-state case.
+- The same combined P2A focused command passed 123 active tests with 256
+  explicit copied-suite skips after activating the async pending-state case.
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts --grep "form does not submit after async validation fails"`
+  passed the copied-old async failure case.
+- The same combined P2A focused command passed 124 active tests with 255
+  explicit copied-suite skips after activating the async failure case.
+- `npm --workspace xmlui test` passed 267 unit tests.
+- `npm --workspace xmlui run build:metadata` passed.
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed.
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed
+  after restoring missing npm dependencies, adding `@types/yargs` to the
+  `xmlui` workspace, and recording the macOS Rolldown native binding as an
+  optional root dependency.
 
-Next explicit step: continue P2A by activating the copied-old `Form.spec.ts`
-inherited item label setting groups: `itemLabelPosition`,
-`itemLabelWidth`, `itemLabelBreak`, and `itemRequireLabelMode`. Keep the rest
-of `Form.spec.ts` explicitly skipped until each feature group is made green.
+Next explicit step: continue P2A with the copied-old `Form.spec.ts`
+**onValidate Integration** deferred timing/order subgroup. Start with
+`onValidate validation messages appear in correct timing order`, then continue
+through built-in/custom validation ordering cases.
 
 ### P2B: Structured Form Controls
 

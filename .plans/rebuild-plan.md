@@ -4189,11 +4189,10 @@ Deferred compatibility work:
 - Old tone-specific `dark` default theme vars remain deferred until the current
   metadata shape supports tone-specific default theme-var blocks.
 
-Next explicit step: Phase 5 Wave P2A - continue Form Core by activating the
-copied-old `Form.spec.ts` inherited item label setting groups:
-`itemLabelPosition`, `itemLabelWidth`, `itemLabelBreak`, and
-`itemRequireLabelMode`, while keeping the rest of the copied Form suite
-explicitly skipped by feature area.
+Next explicit step: Phase 5 Wave P2A - continue Form Core with the copied-old
+`Form.spec.ts` `onValidate Integration` deferred timing/order subset. Start
+with `onValidate validation messages appear in correct timing order`, then
+continue through built-in/custom validation ordering cases.
 H1A is complete: `Spinner`, `ProgressBar`,
 `Avatar`, and `Badge` have copied old docs/defaults/specs, compiler/runtime
 registration, the combined `?example=missingVisualComponentsFoundation` route,
@@ -4211,14 +4210,21 @@ coverage; no public `Input` component contract was added, and consumer adoption
 is deferred to focused input-family parity slices. P2A has started:
 `FormItem.spec.ts` Basic Functionality, `FormSegment.spec.ts` Basic Rendering,
 and `Form.spec.ts` initial render/button, `hideButtonRow`, core
-`hideButtonRowUntilDirty`, `enableSubmit`, and `data property` groups are
-active and passing, with the remaining copied-old form groups explicitly
-skipped by feature area. The preceding P0B VS Code SCSS bundling unblock is
-complete.
+`hideButtonRowUntilDirty`, `enableSubmit`, `data property`, inherited item
+label setting groups, `enabled property`, `buttonRowTemplate`, local `Events`,
+local `APIs`, `Context Variables`, the first submit-time `onValidate
+Integration` case, and the first real-time `validationMode="onChanged"`
+custom-validation case, plus the `customValidationsDebounce` delayed
+change-time validation case and the first async submit-time `onValidate` case
+and async pending-state/failure cases are active and passing, with the
+remaining copied-old form groups explicitly skipped by feature area. The
+preceding P0B VS Code SCSS bundling unblock is complete.
 
 Detailed missing-component continuation plan:
 
 - `.plans/missing-component-migration-plan.md`
+- `.ai/session-handoff-rebuild-plan-2026-06-25.md` contains the current
+  resume handoff for a fresh AI-assisted session.
 
 Each wave should close components in small batches that can keep
 `compatibility:sweep` useful. If a component requires infrastructure from a

@@ -112,6 +112,10 @@ class ScriptParser {
 
   private parseBlockStatement(): BlockStatementNode {
     const open = this.consume(ScriptTokenKind.OpenBrace);
+    return this.parseBlockStatementAfterOpen(open);
+  }
+
+  private parseBlockStatementAfterOpen(open: ScriptToken): BlockStatementNode {
     const body: ScriptNode[] = [];
     while (!this.at(ScriptTokenKind.EndOfFile) && !this.at(ScriptTokenKind.CloseBrace)) {
       body.push(this.parseStatement());
@@ -292,7 +296,7 @@ class ScriptParser {
     if (this.at(ScriptTokenKind.Identifier) && this.peekNonTriviaKind(1) === ScriptTokenKind.Arrow) {
       const param = this.createIdentifier(this.consume());
       const arrow = this.consume(ScriptTokenKind.Arrow);
-      return this.createArrowFunctionExpression([param], arrow, this.parseExpression());
+      return this.createArrowFunctionExpression([param], arrow, this.parseArrowBodyExpression());
     }
 
     if (this.at(ScriptTokenKind.OpenParen)) {
@@ -300,12 +304,70 @@ class ScriptParser {
       const params = this.tryParseArrowParams();
       if (params) {
         const arrow = this.consume(ScriptTokenKind.Arrow);
-        return this.createArrowFunctionExpression(params, arrow, this.parseExpression());
+        return this.createArrowFunctionExpression(params, arrow, this.parseArrowBodyExpression());
       }
       this.offset = checkpoint;
     }
 
     return this.parsePrefixExpression();
+  }
+
+  private parseArrowBodyExpression(): ScriptNode {
+    if (!this.at(ScriptTokenKind.OpenBrace)) {
+      return this.parseExpression();
+    }
+    const open = this.consume(ScriptTokenKind.OpenBrace);
+    if (this.at(ScriptTokenKind.CloseBrace)) {
+      const close = this.consume(ScriptTokenKind.CloseBrace);
+      return this.node("Literal", open, close, [], {
+        raw: "undefined",
+        value: undefined,
+      }) as LiteralNode;
+    }
+    const statements: ScriptNode[] = [];
+    while (!this.at(ScriptTokenKind.EndOfFile) &&
+      !this.at(ScriptTokenKind.CloseBrace) &&
+      !this.at(ScriptTokenKind.ReturnKeyword)) {
+      statements.push(this.parseStatement());
+      if (this.at(ScriptTokenKind.Semicolon)) {
+        this.consume();
+      }
+    }
+    if (!this.at(ScriptTokenKind.ReturnKeyword)) {
+      this.report("XS124", "Expected 'return' in block-bodied arrow expression.", this.current());
+      return this.parseBlockStatementAfterOpen(open);
+    }
+    this.consume(ScriptTokenKind.ReturnKeyword);
+    const expression = this.parseExpression();
+    if (statements.length > 0) {
+      statements.push(this.createExpressionStatement(expression));
+      if (this.at(ScriptTokenKind.Semicolon)) {
+        this.consume();
+      }
+      const close = this.at(ScriptTokenKind.CloseBrace)
+        ? this.consume(ScriptTokenKind.CloseBrace)
+        : this.current();
+      if (close.kind !== ScriptTokenKind.CloseBrace) {
+        this.report("XS125", "Expected '}' after arrow function return expression.", this.current());
+      }
+      return this.node("BlockStatement", open, close, statements, {
+        body: statements,
+      }) as ScriptNode;
+    }
+    if (this.at(ScriptTokenKind.Semicolon)) {
+      this.consume();
+    }
+    if (this.at(ScriptTokenKind.CloseBrace)) {
+      const close = this.consume(ScriptTokenKind.CloseBrace);
+      return {
+        ...expression,
+        span: this.span(open, close),
+        startToken: open,
+        endToken: close,
+      };
+    }
+    this.report("XS125", "Expected '}' after arrow function return expression.", this.current());
+    return expression;
   }
 
   private parsePrefixExpression(): ScriptNode {

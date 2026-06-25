@@ -160,7 +160,7 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Radi
   if (rawValue === undefined) {
     return [];
   }
-  const value = isValidOptionValue(rawValue) ? rawValue : "";
+  const value = rawValue;
   const label = Object.prototype.hasOwnProperty.call(child.props, "label")
     ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, adapter.scope, "RadioGroup:Option:label")
     : optionLabelFromChildren(child, adapter);

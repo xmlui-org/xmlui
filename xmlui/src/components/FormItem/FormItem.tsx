@@ -54,6 +54,21 @@ export const FormItemMd = createMetadata({
       description: "Validation message used when a required field is empty.",
       valueType: "string",
     },
+    validationMode: {
+      description: "Controls when field validation feedback is shown.",
+      valueType: "string",
+      availableValues: ["onChanged", "onLostFocus", "errorLate"],
+    },
+    customValidationsDebounce: {
+      description: "Debounces custom validation after value changes by the specified number of milliseconds.",
+      valueType: "number",
+      defaultValue: 0,
+    },
+  },
+  events: {
+    validate: {
+      description: "This event is used to define a custom validation function.",
+    },
   },
   themeVars: extractScssThemeVars(formItemStylesSource),
   defaultThemeVars: {

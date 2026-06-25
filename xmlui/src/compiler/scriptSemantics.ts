@@ -773,6 +773,14 @@ type EventCodegenContext = {
   allocateLoopCheckpointName(): string;
 };
 
+function createArrowBlockCodegenContext(): EventCodegenContext {
+  return {
+    prologue: [],
+    checkpointCall: "",
+    allocateLoopCheckpointName: () => "__xmluiLoopCheckpoint",
+  };
+}
+
 function createEventCodegenContext(sync: boolean, userNames: Set<string>): EventCodegenContext {
   const usedNames = new Set(userNames);
   let nextLoopCheckpointId = 0;
@@ -1130,6 +1138,11 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       };
     case "ExpressionStatement":
       return lowerExpressionStatement(node, bound);
+    case "BlockStatement":
+    case "IfStatement":
+    case "WhileStatement":
+    case "VariableDeclaration":
+      return lowerHandlerStatement(node, bound);
     case "Program":
       return eventHandlerIrFromProgram(node, bound);
     default:
@@ -1239,16 +1252,26 @@ function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
       return expressionContainsSyncUnsafeCall(expression.body);
     case "AssignmentExpression":
       return expressionContainsSyncUnsafeCall(expression.right);
+    case "ExpressionStatement":
+      return expressionContainsSyncUnsafeCall(expression.expression);
+    case "VariableDeclaration":
+      return expression.declarations.some((declaration) =>
+        declaration.init ? expressionContainsSyncUnsafeCall(declaration.init) : false
+      );
+    case "BlockStatement":
+      return expression.body.some((statement) => findSyncUnsafeStatement(statement) !== undefined);
+    case "IfStatement":
+      return expressionContainsSyncUnsafeCall(expression.test) ||
+        findSyncUnsafeStatement(expression.consequent) !== undefined ||
+        (expression.alternate ? findSyncUnsafeStatement(expression.alternate) !== undefined : false);
+    case "WhileStatement":
+      return expressionContainsSyncUnsafeCall(expression.test) ||
+        findSyncUnsafeStatement(expression.body) !== undefined;
     case "PrefixUpdate":
     case "PostfixUpdate":
     case "LiteralExpression":
     case "IdentifierRead":
     case "ScopedMemberRead":
-    case "ExpressionStatement":
-    case "VariableDeclaration":
-    case "BlockStatement":
-    case "IfStatement":
-    case "WhileStatement":
     case "EventHandler":
     case "Unsupported":
       return false;
@@ -1645,7 +1668,10 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "CallExpression":
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
-      return `(${ir.params.join(", ")}) => ${emitExpression(ir.body)}`;
+      if (ir.body.kind === "BlockStatement") {
+        return `async (${ir.params.join(", ")}) => {\nlet __xmluiResult;\n${emitBlockStatement(ir.body, createArrowBlockCodegenContext())}\nreturn __xmluiResult;\n}`;
+      }
+      return `(${ir.params.join(", ")}) => (${emitExpression(ir.body)})`;
     case "AssignmentExpression":
       return emitAssignmentExpression(ir);
     case "PrefixUpdate":
@@ -1715,6 +1741,9 @@ function emitEventExpression(expression: XmluiScriptIr): string {
       return emitUpdateExpression(expression);
     case "ArrowFunctionExpression":
       if (expression.params.length === 0) {
+        if (expression.body.kind === "BlockStatement") {
+          return emitExpression(expression);
+        }
         return emitEventExpression(expression.body);
       }
       return emitExpression(expression);
@@ -1953,6 +1982,9 @@ function executeExpressionIr(
         ir.params.forEach((param, index) => {
           nextLexical[param] = args[index];
         });
+        if (ir.body.kind === "BlockStatement") {
+          return executeEventStatement(ir.body, context as CompiledEventContext, nextLexical, undefined);
+        }
         if (isEventMutationExpression(ir.body)) {
           return executeExpressionIrAsync(ir.body, context as CompiledEventContext, nextLexical);
         }
@@ -2516,6 +2548,17 @@ function isEventMutationExpression(ir: XmluiScriptIr): boolean {
       return isEventMutationExpression(ir.object) || isEventMutationExpression(ir.index);
     case "ArrowFunctionExpression":
       return isEventMutationExpression(ir.body);
+    case "ExpressionStatement":
+      return isEventMutationExpression(ir.expression);
+    case "VariableDeclaration":
+      return ir.declarations.some((declaration) =>
+        declaration.init ? isEventMutationExpression(declaration.init) : false
+      );
+    case "BlockStatement":
+      return true;
+    case "IfStatement":
+    case "WhileStatement":
+      return true;
     default:
       return false;
   }

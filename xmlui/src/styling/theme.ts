@@ -30,6 +30,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "space-5": "calc(5 * var(--xmlui-space-base))",
   "space-6": "calc(6 * var(--xmlui-space-base))",
   "space-8": "calc(8 * var(--xmlui-space-base))",
+  "space-10": "calc(10 * var(--xmlui-space-base))",
   "space-11": "calc(11 * var(--xmlui-space-base))",
   "space-64": "calc(64 * var(--xmlui-space-base))",
 
