@@ -1,7 +1,9 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { defaultProps } from "./ModalDialog.defaults";
+import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import styles from "./ModalDialog.module.scss";
 
 export type ModalDialogApi = {
@@ -69,13 +71,52 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [close, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || typeof document === "undefined") {
+      return;
+    }
+    const hiddenSiblings: Array<[Element, string | null]> = [];
+    const isModalPortal = (element: Element) =>
+      element.getAttribute("data-xmlui-component") === "ModalDialogPortal";
+
+    for (const child of Array.from(document.body.children)) {
+      if (isModalPortal(child)) {
+        continue;
+      }
+      hiddenSiblings.push([child, child.getAttribute("aria-hidden")]);
+      child.setAttribute("aria-hidden", "true");
+    }
+
+    return () => {
+      for (const [child, previousValue] of hiddenSiblings) {
+        if (previousValue === null) {
+          child.removeAttribute("aria-hidden");
+        } else {
+          child.setAttribute("aria-hidden", previousValue);
+        }
+      }
+    };
+  }, [isOpen]);
+
   const renderedChildren = useMemo(() => children?.(openParams), [children, openParams]);
+  const registeredFormsRef = useRef(new Set<string>());
+  const modalVisibilityContextValue = useMemo(() => ({
+    registerForm: (id: string) => {
+      registeredFormsRef.current.add(id);
+    },
+    unRegisterForm: (id: string) => {
+      registeredFormsRef.current.delete(id);
+    },
+    amITheSingleForm: (id: string) =>
+      registeredFormsRef.current.size === 1 && registeredFormsRef.current.has(id),
+    requestClose: close,
+  }), [close]);
 
   if (!isOpen) {
     return null;
   }
 
-  return (
+  const modal = (
     <div className={styles.portal} data-xmlui-component="ModalDialogPortal">
       <div aria-hidden="true" className={styles.overlayBackground} />
       <div className={cx(styles.overlay, fullScreen && styles.fullScreenOverlay)}>
@@ -95,7 +136,9 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
             </header>
           ) : null}
           <div className={styles.innerContent} data-xmlui-part="content">
-            {renderedChildren}
+            <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
+              {renderedChildren}
+            </ModalVisibilityContext.Provider>
           </div>
           {closeButtonVisible ? (
             <button aria-label="Close" className={styles.closeButton} onClick={close} type="button">
@@ -106,6 +149,8 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
       </div>
     </div>
   );
+
+  return typeof document === "undefined" ? modal : createPortal(modal, document.body);
 });
 
 function cx(...classes: Array<string | undefined | false>): string {

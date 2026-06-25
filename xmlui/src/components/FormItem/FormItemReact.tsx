@@ -14,6 +14,7 @@ import {
 import { FormProvider, useFormContext, type FormContextValue } from "../Form/FormContext";
 import { SelectNative } from "../Select/SelectReact";
 import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
+import { SliderNative } from "../Slider/SliderReact";
 import type { XmluiOption } from "../Option/OptionReact";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
@@ -358,6 +359,22 @@ function renderControl({
         autoFocus={autoFocus}
         validationStatus={error ? "error" : undefined}
         options={(options ?? optionsFromChildren(children)) as RadioGroupOption[]}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+      />
+    );
+  }
+  if (type === "slider") {
+    return (
+      <SliderNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
         onDidChange={(nextValue) => {
           form?.setValue(fieldName, nextValue);
           scheduleChangedValidation(nextValue);

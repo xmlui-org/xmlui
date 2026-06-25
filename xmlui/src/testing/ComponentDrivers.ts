@@ -49,7 +49,7 @@ export class InputComponentDriver extends ComponentDriver {
   get field(): Locator {
     return this.component
       .locator(
-        "xpath=self::*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea] | .//*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea]",
+        "xpath=self::input | self::textarea | self::select | self::*[@contenteditable='true'] | .//input | .//textarea | .//select | .//*[@contenteditable='true']",
       )
       .first();
   }
@@ -69,11 +69,15 @@ export class InputComponentDriver extends ComponentDriver {
 
 export class FormDriver extends ComponentDriver {
   get submitButton(): Locator {
-    return this.component.getByRole("button", { name: /^(Save|Submit)$/ });
+    return this.getByPartName("submitButton").or(
+      this.component.getByRole("button", { name: /^(Save|Submit)$/ }),
+    );
   }
 
   get cancelButton(): Locator {
-    return this.component.getByRole("button", { name: /^(Cancel|Abort)$/ });
+    return this.getByPartName("cancelButton").or(
+      this.component.getByRole("button", { name: /^(Cancel|Abort)$/ }),
+    );
   }
 
   async submitForm(mode: "click" | "keypress" = "click") {

@@ -411,7 +411,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test.skip("button row appears when checkbox is checked", async ({ initTestBed, page }) => {
+    test("button row appears when checkbox is checked", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form hideButtonRowUntilDirty="true">
           <FormItem label="Accept Terms" bindTo="terms" type="checkbox" />
@@ -429,7 +429,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test.skip("button row appears when slider value changes", async ({ initTestBed, page }) => {
+    test("button row appears when slider value changes", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form hideButtonRowUntilDirty="true">
           <FormItem label="Volume" bindTo="volume" type="slider" testId="volumeField" />
@@ -1038,7 +1038,7 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual("cancelled");
     });
 
-    test.skip("onSuccess event fires on successful submission", async ({
+    test("onSuccess event fires on successful submission", async ({
       initTestBed,
       page,
       createFormDriver,
@@ -1188,7 +1188,7 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual(null);
     });
 
-    test.skip("onWillSubmit submits modified data when returning a plain object", async ({
+    test("onWillSubmit submits modified data when returning a plain object", async ({
       initTestBed,
       page,
     }) => {
@@ -1211,7 +1211,7 @@ test.describe("Basic Functionality", () => {
       });
     });
 
-    test.skip("onWillSubmit can add fields to submission data", async ({ initTestBed, page }) => {
+    test("onWillSubmit can add fields to submission data", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <Form
           data="{{ name: 'User' }}"
@@ -1230,7 +1230,7 @@ test.describe("Basic Functionality", () => {
       });
     });
 
-    test.skip("onWillSubmit can remove fields from submission data", async ({ initTestBed, page }) => {
+    test("onWillSubmit can remove fields from submission data", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <Form
           data="{{ name: 'User', password: 'secret', email: 'user@test.com' }}"
@@ -1266,7 +1266,7 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual({ name: "Test" });
     });
 
-    test.skip("onWillSubmit with complex object transformation", async ({ initTestBed, page }) => {
+    test("onWillSubmit with complex object transformation", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <Form
           data="{{ firstName: 'John', lastName: 'Doe', age: 30 }}"
@@ -1286,7 +1286,7 @@ test.describe("Basic Functionality", () => {
       });
     });
 
-    test.skip("onWillSubmit first arg excludes noSubmit fields, second arg includes them", async ({
+    test("onWillSubmit first arg excludes noSubmit fields, second arg includes them", async ({
       initTestBed,
       page,
     }) => {
@@ -1313,7 +1313,7 @@ test.describe("Basic Functionality", () => {
       });
     });
 
-    test.skip("onSubmit does not receive noSubmit fields when onWillSubmit passes through", async ({
+    test("onSubmit does not receive noSubmit fields when onWillSubmit passes through", async ({
       initTestBed,
       page,
     }) => {
@@ -1337,7 +1337,7 @@ test.describe("Basic Functionality", () => {
       });
     });
 
-    test.skip("nested form submit does not trigger parent form submit", async ({
+    test("nested form submit does not trigger parent form submit", async ({
       initTestBed,
       page,
     }) => {
@@ -1381,7 +1381,7 @@ test.describe("Basic Functionality", () => {
       expect(result.outer).toBeUndefined();
     });
 
-    test.skip("nested form in modal can access parent form data via context variable", async ({
+    test("nested form in modal can access parent form data via context variable", async ({
       initTestBed,
       page,
     }) => {
@@ -1428,7 +1428,7 @@ test.describe("Basic Functionality", () => {
       });
     });
 
-    test.skip("parent form submit works after modal with nested form closes", async ({
+    test("parent form submit works after modal with nested form closes", async ({
       initTestBed,
       page,
     }) => {
@@ -3579,7 +3579,7 @@ test("can submit with invisible required field", async ({
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================
 
-test.describe.skip("Behaviors and Parts", () => {
+test.describe("Behaviors and Parts", () => {
   test("can select part: 'cancelButton'", async ({ page, initTestBed }) => {
     await initTestBed(`<Form testId="test" />`);
     const cancelButton = page.locator("[data-part-id='cancelButton']");
@@ -4095,7 +4095,7 @@ test.describe("Api", () => {
 // FORM PERSISTENCE (persist / storageKey / doNotPersistFields / keepOnCancel)
 // =============================================================================
 
-test.describe.skip("Form persistence — localStorage temporary save", () => {
+test.describe("Form persistence — localStorage temporary save", () => {
   test("persist saves form data to localStorage as user types", async ({
     page,
     initTestBed,
@@ -4275,7 +4275,7 @@ test.describe.skip("Form persistence — localStorage temporary save", () => {
 // dataAfterSubmit PROPERTY
 // =============================================================================
 
-test.describe.skip("dataAfterSubmit property", () => {
+test.describe("dataAfterSubmit property", () => {
   test('"keep" (default) preserves submitted data in the form', async ({
     page,
     initTestBed,
@@ -4365,7 +4365,7 @@ test.describe.skip("dataAfterSubmit property", () => {
 // STICKY BUTTON ROW TESTS
 // =============================================================================
 
-test.describe.skip("stickyButtonRow property", () => {
+test.describe("stickyButtonRow property", () => {
   test("button row does not have sticky positioning by default", async ({
     initTestBed,
     createFormDriver,
@@ -4643,7 +4643,7 @@ test.describe.skip("stickyButtonRow property", () => {
 // VALUE PRESERVATION ACROSS UNMOUNT/REMOUNT
 // =============================================================================
 
-test.describe.skip("Value preservation across unmount/remount", () => {
+test.describe("Value preservation across unmount/remount", () => {
   test("typed value is preserved when FormItem unmounts via `when` and remounts", async ({
     initTestBed,
     page,

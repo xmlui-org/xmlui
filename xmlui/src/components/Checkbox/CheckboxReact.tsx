@@ -1,8 +1,9 @@
 import type { CSSProperties, FocusEvent, ReactNode } from "react";
-import { forwardRef, memo, useId, useImperativeHandle } from "react";
+import { forwardRef, memo, useEffect, useId, useImperativeHandle } from "react";
 
 import { defaultProps } from "./Checkbox.defaults";
 import type { CheckboxValidationStatus } from "./checkbox-abstractions";
+import { useFormContext } from "../Form/FormContext";
 import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
 import styles from "./Checkbox.module.scss";
 
@@ -14,6 +15,7 @@ export type CheckboxApi = {
 
 export type CheckboxProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   className?: string;
@@ -22,6 +24,7 @@ export type CheckboxProps = {
   labelPosition?: "start" | "end" | "top" | "bottom" | "before" | "after" | string;
   labelBreak?: boolean;
   labelWidth?: string | number;
+  requireLabelMode?: string;
   direction?: string;
   enabled?: boolean;
   readOnly?: boolean;
@@ -41,6 +44,7 @@ export type CheckboxProps = {
 export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(function CheckboxNative(
   {
     id,
+    bindTo,
     value,
     initialValue = defaultProps.initialValue,
     className,
@@ -49,6 +53,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     labelPosition = "end",
     labelBreak = false,
     labelWidth,
+    requireLabelMode,
     direction,
     enabled = defaultProps.enabled,
     readOnly,
@@ -68,21 +73,54 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
   ref,
 ) {
   const generatedInputId = useId();
+  const form = useFormContext();
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = form && fieldName !== undefined ? form.getValue(fieldName) : undefined;
+  const effectiveValue = formValue ?? value;
   const { inputRef, checked, updateValue, api } = useToggleController({
-    value,
+    value: effectiveValue,
     initialValue,
     enabled,
     autoFocus,
     indeterminate: Boolean(indeterminate),
-    onDidChange,
+    onDidChange: (nextValue) => {
+      if (form && fieldName !== undefined) {
+        form.setValue(fieldName, nextValue);
+      }
+      void onDidChange?.(nextValue);
+    },
   });
 
   useImperativeHandle(ref, () => api, [api]);
+
+  useEffect(() => {
+    if (!form || fieldName === undefined || form.getValue(fieldName) != null || initialValue === undefined) {
+      return;
+    }
+    form.setValue(fieldName, transformToLegitValue(initialValue));
+  }, [fieldName, form, initialValue]);
 
   const inputId = id ? `${id}__input` : generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
   const effectiveTestId = dataTestId ?? id;
   const labelText = stringifyLabel(label);
+  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const showRequiredIndicator =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
+
+  useEffect(() => {
+    if (!form || fieldName === undefined) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      label: labelText,
+      required,
+    });
+  }, [fieldName, form, labelText, required]);
+
   const input = (
     <input
       {...rest}
@@ -145,10 +183,13 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       className={cx(styles.checkboxLabel, labelBreak ? styles.checkboxLabelBreak : undefined)}
       style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}
     >
-      <span style={labelWidth !== undefined ? { display: "inline-block", width: cssLength(labelWidth) } : undefined}>
-        {labelText}
-      </span>
-      {required ? <span className={styles.checkboxLabelRequired}>*</span> : null}
+      {labelWidth !== undefined ? (
+        <span style={{ display: "inline-block", width: cssLength(labelWidth) }}>{labelText}</span>
+      ) : (
+        labelText
+      )}
+      {showRequiredIndicator ? <span className={styles.checkboxLabelRequired}>*</span> : null}
+      {showOptionalIndicator ? <span className={styles.checkboxLabelOptional}>(Optional)</span> : null}
     </label>
   );
 
@@ -198,6 +239,13 @@ function cssLength(value: string | number): string {
     return `${value}px`;
   }
   return value;
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function cx(...parts: Array<string | undefined | false>): string {

@@ -578,6 +578,7 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "log",
     "getFields",
     "getData",
     "getValue",

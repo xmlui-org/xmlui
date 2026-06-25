@@ -21,6 +21,7 @@ export const sliderRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}
         initialValue={adapter.prop("initialValue")}
         min={adapter.prop("minValue", defaultProps.min)}
@@ -32,6 +33,7 @@ export const sliderRenderer = wrapComponent({
         labelPosition={adapter.stringProp("labelPosition", "top")}
         labelBreak={adapter.booleanProp("labelBreak", false)}
         labelWidth={adapter.prop("labelWidth")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
         readOnly={adapter.booleanProp("readOnly", false)}
         required={adapter.booleanProp("required", false)}

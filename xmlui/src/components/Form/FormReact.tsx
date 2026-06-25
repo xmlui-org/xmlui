@@ -5,11 +5,15 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type Dispatch,
   type FormEvent,
+  type MutableRefObject,
   type ReactNode,
+  type SetStateAction,
 } from "react";
 
 import { Button } from "../Button/ButtonReact";
+import { useModalFormClose } from "../ModalDialog/ModalVisibilityContext";
 import { ValidationSummary } from "../ValidationSummary/ValidationSummaryReact";
 import {
   FormProvider,
@@ -32,9 +36,15 @@ export type FormProps = {
   swapCancelAndSave?: boolean;
   hideButtonRow?: boolean;
   hideButtonRowUntilDirty?: boolean;
+  stickyButtonRow?: boolean;
+  persist?: boolean;
+  storageKey?: string;
+  doNotPersistFields?: string[];
+  keepOnCancel?: boolean;
   enableSubmit?: boolean;
   submitUrl?: string;
   submitMethod?: string;
+  dataAfterSubmit?: "keep" | "reset" | "clear" | string;
   itemLabelPosition?: string;
   itemLabelWidth?: string | number;
   itemLabelBreak?: boolean;
@@ -57,6 +67,7 @@ export type FormDataContext = FormValues & {
 };
 
 export function Form({
+  id,
   className,
   style,
   data,
@@ -68,9 +79,15 @@ export function Form({
   swapCancelAndSave = false,
   hideButtonRow = false,
   hideButtonRowUntilDirty = false,
+  stickyButtonRow = false,
+  persist = false,
+  storageKey,
+  doNotPersistFields,
+  keepOnCancel = false,
   enableSubmit = true,
   submitUrl,
   submitMethod,
+  dataAfterSubmit = "keep",
   itemLabelPosition,
   itemLabelWidth,
   itemLabelBreak,
@@ -90,9 +107,12 @@ export function Form({
 }: FormProps) {
   const normalizedInputValues = useMemo(() => normalizeValues(data), [data]);
   const effectiveSubmitUrl = submitUrl ?? (isDataUrl(data) ? data : undefined);
+  const persistKey = persist ? storageKey || id || "form-data" : undefined;
   const itemsRef = useRef(new Map<string, FormItemRegistration>());
+  const knownItemsRef = useRef(new Map<string, FormItemRegistration>());
   const validationRunsRef = useRef(new Map<string, number>());
   const validationCacheRef = useRef(new Map<string, { value: unknown; message?: string }>());
+  const requestModalFormClose = useModalFormClose();
   const [initialValues, setInitialValues] = useState<FormValues>(normalizedInputValues);
   const [values, setValues] = useState<FormValues>(normalizedInputValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -131,6 +151,29 @@ export function Form({
     };
   }, [data]);
 
+  useEffect(() => {
+    if (!persistKey) {
+      return;
+    }
+    const savedValues = readPersistedValues(persistKey);
+    if (!savedValues) {
+      return;
+    }
+    setInitialValues(savedValues);
+    setValues(savedValues);
+    setErrors({});
+    setIssues([]);
+    setDirtyFields(new Set());
+    validationCacheRef.current.clear();
+  }, [persistKey]);
+
+  useEffect(() => {
+    if (!persistKey) {
+      return;
+    }
+    writePersistedValues(persistKey, values, doNotPersistFields);
+  }, [doNotPersistFields, persistKey, values]);
+
   const getValue = useCallback((name: string) => getPathValue(values, name), [values]);
   const setValue = useCallback((name: string, value: unknown) => {
     setValues((current) => setPathValue(current, name, value));
@@ -152,6 +195,7 @@ export function Form({
   }, []);
   const registerItem = useCallback((registration: FormItemRegistration) => {
     itemsRef.current.set(registration.name, registration);
+    knownItemsRef.current.set(registration.name, registration);
     return () => {
       const current = itemsRef.current.get(registration.name);
       if (current === registration) {
@@ -250,7 +294,7 @@ export function Form({
       await onSubmitFailed?.(nextErrors);
       return;
     }
-    let dataToSubmit = cleanedSubmitValues(values, itemsRef.current);
+    let dataToSubmit = cleanedSubmitValues(values, knownItemsRef.current);
     const allData = { ...values };
     const willSubmitResult = await onWillSubmit?.(dataToSubmit, allData);
     if (willSubmitResult === false) {
@@ -271,12 +315,17 @@ export function Form({
     }
     setIssues([]);
     setErrors({});
+    if (persistKey) {
+      deletePersistedValues(persistKey);
+    }
+    applyDataAfterSubmit(dataAfterSubmit, initialValues, setValues, setDirtyFields, validationCacheRef);
     await onSuccess?.(result);
     await onSaved?.(result);
-  }, [data, effectiveSubmitUrl, onSaved, onSubmit, onSubmitFailed, onSuccess, onWillSubmit, submitMethod, validate, validatingFields.size, values]);
+  }, [data, dataAfterSubmit, effectiveSubmitUrl, initialValues, onSaved, onSubmit, onSubmitFailed, onSuccess, onWillSubmit, persistKey, submitMethod, validate, validatingFields.size, values]);
 
   const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    event.stopPropagation();
     void submit();
   }, [submit]);
   const handleCancel = useCallback(() => {
@@ -286,8 +335,12 @@ export function Form({
     setDirtyFields(new Set());
     setValidatingFields(new Set());
     validationCacheRef.current.clear();
+    if (persistKey && !keepOnCancel) {
+      deletePersistedValues(persistKey);
+    }
     void onCancel?.();
-  }, [initialValues, onCancel]);
+    void requestModalFormClose();
+  }, [initialValues, keepOnCancel, onCancel, persistKey, requestModalFormClose]);
   const reset = useCallback(() => {
     setValues(initialValues);
     setErrors({});
@@ -310,10 +363,11 @@ export function Form({
     ...values,
     update,
   }), [update, values]);
-  const getData = useCallback(() => cleanedSubmitValues(values, itemsRef.current), [values]);
+  const getData = useCallback(() => cleanedSubmitValues(values, knownItemsRef.current), [values]);
   const isDirty = dirtyFields.size > 0;
   const isValidating = validatingFields.size > 0;
   const shouldShowButtonRow = !hideButtonRow && (!hideButtonRowUntilDirty || isDirty);
+  const shouldShowCancelButton = cancelLabel !== "";
 
   useEffect(() => {
     if (!isValidating) {
@@ -348,10 +402,37 @@ export function Form({
     });
   }, [getData, registerComponentApi, reset, update, validate]);
 
+  const submitButton = (
+    <Button
+      key="submit"
+      type="submit"
+      data-part-id="submitButton"
+      data-xmlui-part="submitButton"
+      disabled={!enabled || !enableSubmit || isValidating}
+    >
+      {showValidatingLabel ? savePendingLabel : saveLabel}
+    </Button>
+  );
+
+  const cancelButton = shouldShowCancelButton ? (
+    <Button
+      key="cancel"
+      type="button"
+      variant="outlined"
+      data-part-id="cancelButton"
+      data-xmlui-part="cancelButton"
+      disabled={!enabled}
+      onClick={handleCancel}
+    >
+      {cancelLabel}
+    </Button>
+  ) : null;
+
   return (
     <form
       {...rest}
-      className={cx(styles.form, className)}
+      id={id}
+      className={cx(styles.form, stickyButtonRow && styles.stickyForm, className)}
       style={style}
       onSubmit={handleSubmit}
       noValidate
@@ -378,24 +459,13 @@ export function Form({
         {issues.length > 0 && <ValidationSummary />}
         {shouldShowButtonRow && (
           buttonRowTemplate ?? (
-            <div className={styles.buttonRow} data-xmlui-part="buttonRow">
+            <div
+              className={cx(styles.buttonRow, stickyButtonRow && styles.stickyButtonRow)}
+              data-xmlui-part="buttonRow"
+            >
               {swapCancelAndSave
-                ? [
-                  <Button key="submit" type="submit" disabled={!enabled || !enableSubmit || isValidating}>
-                    {showValidatingLabel ? savePendingLabel : saveLabel}
-                  </Button>,
-                  <Button key="cancel" type="button" variant="outlined" disabled={!enabled} onClick={handleCancel}>
-                    {cancelLabel}
-                  </Button>,
-                ]
-                : [
-                  <Button key="cancel" type="button" variant="outlined" disabled={!enabled} onClick={handleCancel}>
-                    {cancelLabel}
-                  </Button>,
-                  <Button key="submit" type="submit" disabled={!enabled || !enableSubmit || isValidating}>
-                    {showValidatingLabel ? savePendingLabel : saveLabel}
-                  </Button>,
-                ]}
+                ? [submitButton, cancelButton]
+                : [cancelButton, submitButton]}
             </div>
           )
         )}
@@ -409,6 +479,60 @@ function normalizeValues(data: unknown): FormValues {
     return { ...(data as FormValues) };
   }
   return {};
+}
+
+function readPersistedValues(key: string): FormValues | undefined {
+  try {
+    const stored = globalThis.localStorage?.getItem(key);
+    if (!stored) {
+      return undefined;
+    }
+    return normalizeValues(JSON.parse(stored));
+  } catch {
+    return undefined;
+  }
+}
+
+function writePersistedValues(
+  key: string,
+  values: FormValues,
+  doNotPersistFields: string[] | undefined,
+) {
+  try {
+    const excluded = new Set(doNotPersistFields ?? []);
+    const dataToSave = Object.fromEntries(
+      Object.entries(values).filter(([field]) => !excluded.has(field)),
+    );
+    globalThis.localStorage?.setItem(key, JSON.stringify(dataToSave));
+  } catch {
+    // Persistence is best-effort compatibility behavior.
+  }
+}
+
+function deletePersistedValues(key: string) {
+  try {
+    globalThis.localStorage?.removeItem(key);
+  } catch {
+    // Persistence is best-effort compatibility behavior.
+  }
+}
+
+function applyDataAfterSubmit(
+  mode: string | undefined,
+  initialValues: FormValues,
+  setValues: Dispatch<SetStateAction<FormValues>>,
+  setDirtyFields: Dispatch<SetStateAction<Set<string>>>,
+  validationCacheRef: MutableRefObject<Map<string, { value: unknown; message?: string }>>,
+) {
+  if (mode === "reset") {
+    setValues(initialValues);
+  } else if (mode === "clear") {
+    setValues({});
+  } else {
+    return;
+  }
+  setDirtyFields(new Set());
+  validationCacheRef.current.clear();
 }
 
 function isDataUrl(data: unknown): data is string {

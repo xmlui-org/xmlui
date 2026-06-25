@@ -110,6 +110,10 @@ $boxShadow-thumb-Slider--active: createThemeVar("boxShadow-thumb-Slider--active"
     margin-left: 0.25em;
   }
 
+  .sliderLabelOptional {
+    margin-left: 0.25em;
+  }
+
   .sliderRoot {
     position: relative;
     display: flex;

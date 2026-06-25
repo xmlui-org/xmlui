@@ -19,6 +19,8 @@ export type ButtonProps = {
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
+  "data-part-id"?: string;
+  "data-xmlui-part"?: string;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   onContextMenu?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;

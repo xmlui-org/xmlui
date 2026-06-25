@@ -90,6 +90,10 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
     margin-left: 0.25em;
   }
 
+  .checkboxLabelOptional {
+    margin-left: 0.25em;
+  }
+
   .checkboxRoot {
     display: inline-grid;
     place-content: center;

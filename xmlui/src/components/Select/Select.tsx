@@ -31,6 +31,7 @@ export const SelectMd = createMetadata({
     id: { description: "The component id.", valueType: "string" },
     testId: { description: "The test id.", valueType: "string" },
     placeholder: { ...dPlaceholder(), defaultValue: defaultProps.placeholder },
+    bindTo: { description: "Form field name to bind this Select to.", valueType: "string" },
     initialValue: { ...dInitialValue(), valueType: "any" },
     value: { description: "The controlled value.", valueType: "any" },
     autoFocus: { ...dAutoFocus(), defaultValue: defaultProps.autoFocus },
@@ -95,6 +96,7 @@ export const selectRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         initialValue={adapter.prop("initialValue")}
         value={adapter.prop("value")}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}

@@ -843,6 +843,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       id: { name: "id" },
       testId: { name: "testId" },
+      bindTo: { name: "bindTo" },
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       label: { name: "label" },
@@ -857,7 +858,6 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       indeterminate: { name: "indeterminate" },
       validationStatus: { name: "validationStatus" },
       requireLabelMode: { name: "requireLabelMode" },
-      bindTo: { name: "bindTo" },
       tooltip: { name: "tooltip" },
       tooltipMarkdown: { name: "tooltipMarkdown" },
       animation: { name: "animation" },
@@ -878,6 +878,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       id: { name: "id" },
       testId: { name: "testId" },
+      bindTo: { name: "bindTo" },
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       label: { name: "label" },
@@ -891,7 +892,6 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       autoFocus: { name: "autoFocus" },
       validationStatus: { name: "validationStatus" },
       requireLabelMode: { name: "requireLabelMode" },
-      bindTo: { name: "bindTo" },
       tooltip: { name: "tooltip" },
       tooltipMarkdown: { name: "tooltipMarkdown" },
       animation: { name: "animation" },
@@ -912,6 +912,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       id: { name: "id" },
       testId: { name: "testId" },
+      bindTo: { name: "bindTo" },
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       enabled: { name: "enabled" },

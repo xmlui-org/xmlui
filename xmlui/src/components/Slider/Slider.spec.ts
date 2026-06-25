@@ -510,7 +510,7 @@ test.describe("Api", () => {
     await expect(page.getByTestId("setBtn")).toHaveText("5");
   });
 
-  test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <Slider id="boundSlider" bindTo="volume" />
@@ -833,11 +833,6 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Behaviors and Parts", () => {
-  test.fixme(
-    true,
-    "Deferred until Form/FormItem requireLabelMode and bindTo infrastructure is migrated.",
-  );
-
   test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>

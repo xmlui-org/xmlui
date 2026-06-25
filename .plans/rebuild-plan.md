@@ -9,6 +9,34 @@ completed work terse and keeps remaining work ordered. Supporting `.ai` notes
 may contain evidence and session history, but they are not required to choose
 the next step.
 
+## Status Dashboard
+
+Legend:
+
+- `[done]` completed and verified enough to move on.
+- `[current]` the next executable step. Start here when asked to continue.
+- `[remaining]` planned but not yet started in this closure sequence.
+
+Immediate status:
+
+| Status | Area | What It Means |
+| --- | --- | --- |
+| `[done]` | Foundations and waves through H2B | Infrastructure, runtime semantics, styling, core components, app/routing foundations, services inspection, and shared input internals are complete at foundation level. |
+| `[done]` | P2A Form Core | `Form.spec.ts` has no remaining skipped/fixme tests; Form dirty tracking, submit, events, persistence, sticky rows, parts, APIs, and copied-old Form core coverage are active. |
+| `[current]` | P2A FormItem Closure | Continue with direct input/FormItem parity, now focused on variants/parts and remaining type parity for FormItem-dependent inputs. |
+| `[remaining]` | FormSegment Closure | Finish scoped context, discovery, layout, APIs, and dirty-state parity after the FormItem/input closure work. |
+| `[remaining]` | P2B and later phases | Structured forms, inputs, overlays, menus, navigation, data operations, routing, collections, tooling, docs, extensions, sweeps, and release readiness remain ordered below. |
+
+Current next marker:
+
+`NEXT: P2A FormItem Closure - Input Variants, Parts, and Remaining Type Parity`
+
+Current verification baseline:
+
+- P2A Form cluster: 257 passed, 122 skipped.
+- Full E2E: 2865 passed, 2079 skipped.
+- TypeScript, unit tests, metadata build, and CSS module audit: passed.
+
 ## Compatibility Contract
 
 - Preserve existing XMLUI syntax, runtime semantics, component behavior, public
@@ -24,9 +52,10 @@ the next step.
   verification. As of June 25, 2026, this E2E command has been optimized in a
   parallel session and is expected to take about 90 seconds.
 
-## Completed Work
+## Completed Foundations
 
-Only titles are kept here so the plan stays readable.
+These foundation and migration waves are complete. Only titles are kept here so
+the plan stays readable.
 
 1. Experiments 1-15 baseline.
 2. Phase 0: Rebuild Control Center.
@@ -114,9 +143,9 @@ Only titles are kept here so the plan stays readable.
 81. H2B: Shared Input Internals (`InputLabel`, `InputAdornment`,
     `InputDivider`, `PartialInput`).
 
-## Current Status
+## Detailed Current Status
 
-### P2A: Form Core - In Progress
+### P2A: Form Core - Done
 
 Active copied-old coverage:
 
@@ -137,6 +166,12 @@ Active copied-old coverage:
   slice is active: submit with object child fields, submit with empty nested
   `bindTo`, nested label width/position, default/custom `gap-Form` spacing,
   and user-defined component children inside item rows.
+  `dataAfterSubmit` is active for `keep`, `reset`, and `clear`, and value
+  preservation across unmount/remount is active for conditional fields and
+  multi-step `FormSegment` flows. Form persistence and sticky button row
+  coverage is active: localStorage autosave/restore/submit/cancel cleanup,
+  `doNotPersistFields`, non-persisted storage keys, scroll-container sticky
+  rows, and ModalDialog sticky row positioning.
 
 Current `onValidate Integration` active cases:
 
@@ -211,12 +246,53 @@ Compatibility support added during this step:
   including scoped `FormItem type="items"` row prefixes used by UDC children.
 - TextBox legacy `data-part-id="input"` now lands on the native input instead
   of the input wrapper, matching copied-old selectors.
+- Form metadata, renderer, and submit handling support `dataAfterSubmit` with
+  copied-old `keep`, `reset`, and `clear` behavior after successful submit.
+- Form remembers registered field metadata for cleaned `getData()` and submit
+  payload construction across conditional unmount/remount while validation
+  still considers only currently mounted fields.
+- Direct `TextBox bindTo` controls register with the enclosing Form so cleaned
+  submit data includes those fields even without a `FormItem` wrapper.
+- Test `InputComponentDriver.field` resolves native input, textarea, select,
+  and contenteditable controls whether the component root is the field itself
+  or a wrapper.
+- Form supports copied-old `persist`, `storageKey`, `doNotPersistFields`, and
+  `keepOnCancel` behavior using localStorage temporary saves.
+- Form supports `stickyButtonRow` with original-style `stickyForm` and
+  `stickyButtonRow` stylesheet classes plus button-row background/padding theme
+  variables.
+- Built-in Form buttons expose `submitButton` and `cancelButton` part hooks, so
+  copied-old drivers can find custom-labeled save/cancel buttons.
+- Select metadata, compiler contract, renderer, and native control accept
+  direct `bindTo` and bridge values into the current Form context, matching
+  copied-old direct Select usage in Form/ModalDialog tests.
+- Built-in Form buttons also expose copied-old `data-part-id` hooks, and the
+  cancel button is omitted when `cancelLabel=""`.
+- Form event coverage is active for `onSuccess`, `onWillSubmit` object
+  transformations, `noSubmit` filtering, and nested ModalDialog form submit
+  behavior.
+- Form submit handling stops propagation so nested form submits do not trigger
+  enclosing forms.
+- ModalDialog renders through a React portal, hides background siblings from
+  accessibility queries while open, and provides ModalDialog/Form integration
+  so a single Form cancel inside the dialog requests modal close.
+- XMLUI script method-call compatibility includes `console.log(...)`, matching
+  copied-old handlers and examples that use console logging in event handlers.
+- Checkbox and Slider direct `bindTo` controls read/write through the current
+  Form context and register with the Form, including component API `setValue`.
+- `FormItem type="slider"` renders the real Slider control, so
+  `hideButtonRowUntilDirty` dirty tracking works for Slider keyboard changes.
+- Direct Checkbox and Slider labels honor `requireLabelMode`, inherit
+  `Form itemRequireLabelMode`, and avoid duplicated labels when rendered inside
+  a Form.
 
 Latest verified P2A state:
 
+- `npm --workspace xmlui exec -- playwright test src/components/Checkbox/Checkbox.spec.ts src/components/Slider/Slider.spec.ts -g "requireLabelMode|does not duplicate label"`
+  - 18 passed
 - `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
-  - 212 passed
-  - 167 skipped
+  - 257 passed
+  - 122 skipped
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
   - passed
 - `npm --workspace xmlui test`
@@ -226,24 +302,24 @@ Latest verified P2A state:
 - `npm --workspace xmlui run compatibility:css-module-import-audit`
   - passed
 - `npm --workspace xmlui run test:e2e`
-  - 2800 passed
-  - 2144 skipped
+  - 2865 passed
+  - 2079 skipped
 
 ## Next Step
 
-### NEXT: P2A Form Core - Form Persistence, dataAfterSubmit, Sticky Rows, and Value Preservation
+### NEXT: P2A FormItem Closure - Input Variants, Parts, and Remaining Type Parity
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: P2A Form Core - Form
-> Persistence, dataAfterSubmit, Sticky Rows, and Value Preservation**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: P2A FormItem Closure -
+> Input Variants, Parts, and Remaining Type Parity**.
 
 Current handoff state:
 
 - This is the next executable step. A new session receiving "Go on with the
   next step" should start here.
-- Do not restart earlier Form work. The latest verified P2A state above is the
-  baseline.
+- Do not restart earlier Form work. `Form.spec.ts` has no remaining
+  skipped/fixme tests; the latest verified P2A state above is the baseline.
 - There are unrelated dirty worktree files, including standalone sample
   `xmlui-latest.js` outputs and prior component/runtime edits. Do not revert
   files unless the user explicitly asks.
@@ -252,35 +328,51 @@ Current handoff state:
 
 Completed immediately before this marker:
 
-- Activated the copied-old `FormItem type="items"` follow-up slice:
-  `submit with type 'items'`, `submit with type 'items', empty bindTo`,
-  nested `labelWidth`, nested `labelPosition`, default/custom `gap-Form`
-  spacing, and UDC children with scoped row `bindTo`.
-- Added the `type="items"` row API/rendering path, array-preserving form path
-  writes, testbed UDC registration, TextBox scoped direct `bindTo`, and the app
-  baseline font-size compatibility fix required by default row spacing.
+- Activated the final two Form dirty-visibility tests:
+  Checkbox and Slider changes now reveal `hideButtonRowUntilDirty` button rows.
+- Activated direct `bindTo syncs $data and value` tests for Checkbox and
+  Slider.
+- Added direct Checkbox/Slider Form-context binding and registration, and
+  routed `FormItem type="slider"` through the real Slider control.
+- Activated direct Checkbox/Slider `requireLabelMode` tests, including
+  explicit input override, Form-level `itemRequireLabelMode` inheritance,
+  required and optional label indicators, and no duplicate labels inside Forms.
 
 Step goal:
 
-Activate the next coherent copied-old Form subgroup after the completed
-`type="items"` follow-ups. Recommended order:
+Move into the broader FormItem/input closure group now that local Form core
+coverage is closed.
 
-1. Inspect copied-old persistence, `dataAfterSubmit`, sticky button row, and
-   value-preservation cases.
-2. Choose one narrow prerequisite subgroup and activate only tests covered by
-   that subgroup.
-3. Keep unrelated FormItem/FormSegment closure work deferred.
+Known remaining skipped/fixme candidates in this closure group:
+
+- `Checkbox.spec.ts`: custom `inputTemplate` block and four variant/parts
+  fixmes (`handles variant`, variant theme variables, variant parts, combined
+  behaviors with parts).
+- `Slider.spec.ts`: one remaining fixme near auto-focus behavior.
+- `FormItem.spec.ts`: skipped Type, Validation, Template, Event,
+  Validation Behavior, Accessibility, Theme Variable, Edge Case, Phone Pattern,
+  and Regex blocks.
+
+1. Inspect remaining skipped/fixme tests in `FormItem.spec.ts`,
+   `Checkbox.spec.ts`, and `Slider.spec.ts`, especially variant/parts and
+   type-parity cases that depend on Form/FormItem integration.
+2. Compare with the original source/tests for FormItem and the affected input
+   components before activating each subgroup.
+3. Choose a narrow coherent subgroup, preferably Checkbox/Slider variant and
+   part parity now that direct input label-mode inheritance is active.
 
 Task checklist:
 
-1. Inspect the remaining skipped copied-old tests in
-   `xmlui/src/components/Form/Form.spec.ts`, especially persistence,
-   `dataAfterSubmit`, sticky button row, and value preservation.
-2. Compare with the original test/source under
-   `/Users/dotneteer/source/xmlui/xmlui/src/components/Form`.
-3. Choose one narrow, coherent prerequisite subgroup and activate only the tests
-   covered by that subgroup.
-4. Preserve unrelated deferred Form tests until their prerequisites are
+1. Inspect remaining copied-old skipped/fixme tests in
+   `xmlui/src/components/FormItem/FormItem.spec.ts`,
+   `xmlui/src/components/Checkbox/Checkbox.spec.ts`, and
+   `xmlui/src/components/Slider/Slider.spec.ts`.
+2. Compare with original tests/source under
+   `/Users/dotneteer/source/xmlui/xmlui/src/components/FormItem`,
+   `/Users/dotneteer/source/xmlui/xmlui/src/components/Checkbox`, and
+   `/Users/dotneteer/source/xmlui/xmlui/src/components/Slider`.
+3. Pick one prerequisite subgroup and activate only the tests covered by it.
+4. Preserve unrelated FormSegment deferred tests until their prerequisites are
    implemented.
 5. Make the smallest compatibility change required.
 6. Run focused Playwright for the activated test.
@@ -292,25 +384,28 @@ Task checklist:
 Likely files:
 
 - `xmlui/src/components/Form/Form.spec.ts`
-- `xmlui/src/components/Form/FormReact.tsx`
 - `xmlui/src/components/Form/FormContext.tsx`
-- `xmlui/src/components/App/AppReact.tsx`
-- `xmlui/src/components/TextBox/TextBoxReact.tsx`
-- `xmlui/src/components/TextBox/TextBox.renderer.tsx`
+- `xmlui/src/components/FormItem/FormItem.spec.ts`
+- `xmlui/src/components/FormItem/FormItemReact.tsx`
+- `xmlui/src/components/Checkbox/CheckboxReact.tsx`
+- `xmlui/src/components/Checkbox/Checkbox.renderer.tsx`
+- `xmlui/src/components/Checkbox/Checkbox.spec.ts`
+- `xmlui/src/components/Slider/SliderReact.tsx`
+- `xmlui/src/components/Slider/Slider.renderer.tsx`
+- `xmlui/src/components/Slider/Slider.spec.ts`
 - `xmlui/src/testing/ComponentDrivers.ts`
 - `xmlui/src/testing/fixtures.ts`
 
 Original-reference paths:
 
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/Form`
 - `/Users/dotneteer/source/xmlui/xmlui/src/components/FormItem`
-- `/Users/dotneteer/source/xmlui/xmlui/src/parsers`
-- `/Users/dotneteer/source/xmlui/xmlui/src/components-core`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Checkbox`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Slider`
 
 Verification commands:
 
 - Focused Playwright for each activated test, for example:
-  `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts -g "Form persistence|dataAfterSubmit|stickyButtonRow|Value preservation"`
+  `npm --workspace xmlui exec -- playwright test src/components/Checkbox/Checkbox.spec.ts src/components/Slider/Slider.spec.ts -g "variant|parts"`
 - P2A Form cluster:
   `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
 - TypeScript:
@@ -324,9 +419,9 @@ Verification commands:
 - Full E2E after the completed step:
   `npm --workspace xmlui run test:e2e`
 
-## Remaining Work In Sequence
+## Roadmap By Status
 
-### 1. Finish P2A: Form Core
+### 1. [done] P2A: Form Core
 
 Completed in this P2A phase:
 
@@ -345,15 +440,53 @@ Completed in this P2A phase:
   and repeated `getData()` calls.
 - First `FormItem type="items"` slice: add/submit, empty nested `bindTo`,
   nested label inheritance, default/custom gap spacing, and UDC children.
+- `dataAfterSubmit` and value preservation across conditional unmount/remount.
+- Form persistence and sticky button row.
+- Form events/onWillSubmit/nested ModalDialog submit behavior and
+  `Behaviors and Parts`.
+- Final Form dirty-visibility tail for Checkbox and Slider changes.
+- Direct Checkbox and Slider `bindTo` API/data synchronization.
+- Direct Checkbox and Slider `requireLabelMode` inheritance/override label
+  parity.
 
-Continue activating copied-old Form/FormItem/FormSegment tests by feature group:
+Next P2A closure group:
 
-1. Persistence, `dataAfterSubmit`, sticky button row, and value preservation.
-3. Remaining FormItem validation/type/accessibility/theme/edge cases.
-4. Remaining FormSegment scoped context, discovery, layout, APIs, and dirty
-    state.
+1. `[current]` FormItem/input validation, type, accessibility, and
+   variant/parts cases.
 
-### 2. P2B: Structured Form Controls
+### 2. [current] P2A: FormItem/Input Closure
+
+Components:
+
+- `FormItem`
+- direct-bound input controls used inside forms, starting with `Checkbox` and
+  `Slider`
+
+Goal:
+
+- Close remaining FormItem/input validation, type, accessibility, and
+  variant/parts cases.
+- Keep this step focused on copied-old tests whose prerequisites are already
+  satisfied by Form core and direct input binding.
+
+Verification:
+
+- Focused copied-old tests for each activated FormItem/input subgroup.
+- P2A Form cluster, TypeScript, unit tests, metadata, CSS audit, and full E2E
+  after each completed subgroup.
+
+### 3. [remaining] P2A: FormSegment Closure
+
+Component:
+
+- `FormSegment`
+
+Goal:
+
+- Close scoped context, field discovery, layout props, APIs, and dirty-state
+  parity after the FormItem/input closure work.
+
+### 4. [remaining] P2B: Structured Form Controls
 
 Components:
 
@@ -372,7 +505,7 @@ Verification:
 - Focused copied-old E2E for `StepperForm`, `TabsForm`, `FormSegment`, and
   `Stepper`.
 
-### 3. P3A: Text-Like Input Parity
+### 5. [remaining] P3A: Text-Like Input Parity
 
 Components:
 
@@ -386,7 +519,7 @@ Goal:
 - Close value editing, caret behavior, form binding, validation, variants,
   parts, behaviors, and labels.
 
-### 4. P3B: Boolean, Rating, Slider, Date/Time, and Color Inputs
+### 6. [remaining] P3B: Boolean, Rating, Slider, Date/Time, and Color Inputs
 
 Components:
 
@@ -404,7 +537,7 @@ Goal:
 - Close form binding, validation, theme-variable state matrix,
   keyboard/mobile behavior, and picker parity.
 
-### 5. P4A: Overlay and Focus Infrastructure
+### 7. [remaining] P4A: Overlay and Focus Infrastructure
 
 Components and services:
 
@@ -418,7 +551,7 @@ Goal:
 - Close portal behavior, focus trapping/restoration, escape/outside-click,
   stacking, keyboard behavior, and overlay accessibility.
 
-### 6. P3C: File and Selection Inputs
+### 8. [remaining] P3C: File and Selection Inputs
 
 Components:
 
@@ -431,7 +564,7 @@ Goal:
 - Close file handling, dropdown behavior, selection state, form binding,
   validation, keyboard navigation, and overlay integration.
 
-### 7. P4B: Menu Family Closure
+### 9. [remaining] P4B: Menu Family Closure
 
 Components:
 
@@ -445,7 +578,7 @@ Goal:
 - Close trigger behavior, keyboard navigation, focus handling, nested menus,
   context positioning, and styling parity.
 
-### 8. P4C: Navigation Shell Components
+### 10. [remaining] P4C: Navigation Shell Components
 
 Components:
 
@@ -462,7 +595,7 @@ Goal:
 - Close app-shell navigation, active route state, collapse/expand behavior,
   profile menu behavior, and responsive shell layout.
 
-### 9. H3A: Runtime Markup Inclusion
+### 11. [remaining] H3A: Runtime Markup Inclusion
 
 Component:
 
@@ -473,7 +606,7 @@ Goal:
 - Close runtime markup loading, compilation boundary behavior, error handling,
   state updates, and examples.
 
-### 10. H3B: Markdown and CodeText
+### 12. [remaining] H3B: Markdown and CodeText
 
 Components:
 
@@ -485,7 +618,7 @@ Goal:
 - Close markdown rendering, XMLUI code fences, syntax highlighting, runtime
   examples, and old Markdown/FocusScope prerequisite tests.
 
-### 11. H4A: Inspector and Inspect Button
+### 13. [remaining] H4A: Inspector and Inspect Button
 
 Components:
 
@@ -497,7 +630,7 @@ Goal:
 - Close runtime inspection UI, debug metadata, modal integration, and relevant
   examples.
 
-### 12. H4B: Internationalization Surface
+### 14. [remaining] H4B: Internationalization Surface
 
 Component:
 
@@ -507,7 +640,7 @@ Goal:
 
 - Close translation lookup, formatting, fallback behavior, and update paths.
 
-### 13. H4C: Data Policy Helper
+### 15. [remaining] H4C: Data Policy Helper
 
 Component:
 
@@ -517,7 +650,7 @@ Goal:
 
 - Close retry policy integration for data/request components.
 
-### 14. P5A: Data Operations Closure
+### 16. [remaining] P5A: Data Operations Closure
 
 Components and services:
 
@@ -531,7 +664,7 @@ Goal:
 - Close old data operation suites, cancellation, mock data, polling, retry, and
   request status behavior.
 
-### 15. P5B: App State and Change Listening
+### 17. [remaining] P5B: App State and Change Listening
 
 Components and services:
 
@@ -543,7 +676,7 @@ Goal:
 
 - Close app-level state synchronization, event ordering, and update behavior.
 
-### 16. P5C: Scheduling, Messaging, and Streaming
+### 18. [remaining] P5C: Scheduling, Messaging, and Streaming
 
 Components and services:
 
@@ -557,7 +690,7 @@ Goal:
 - Close delayed work, repeated work, queue processing, messaging, streaming,
   cancellation, and update paths.
 
-### 17. P5D: Accessibility and Runtime Services
+### 19. [remaining] P5D: Accessibility and Runtime Services
 
 Components and services:
 
@@ -571,7 +704,7 @@ Goal:
 - Close runtime service accessibility, announcements, and user-visible update
   paths.
 
-### 18. P6A: App, Routing, and Page Closure
+### 20. [remaining] P6A: App, Routing, and Page Closure
 
 Components:
 
@@ -586,7 +719,7 @@ Goal:
 - Close routing, guards, redirects, active route state, page metadata, and app
   shell integration.
 
-### 19. P6B: Nested App Closure
+### 21. [remaining] P6B: Nested App Closure
 
 Component:
 
@@ -597,7 +730,7 @@ Goal:
 - Close nested app isolation, route/base behavior, style/theme boundaries, and
   global prop propagation.
 
-### 20. P7A: Collection Display Closure
+### 22. [remaining] P7A: Collection Display Closure
 
 Components:
 
@@ -610,7 +743,7 @@ Goal:
 - Close collection rendering, empty/loading/error states, selection/update
   behavior, virtualization where applicable, and old templates.
 
-### 21. P7B: Table and Column Closure
+### 23. [remaining] P7B: Table and Column Closure
 
 Components:
 
@@ -622,7 +755,7 @@ Goal:
 - Close sorting, selection, editing/update paths, column templates,
   responsive behavior, and old table APIs.
 
-### 22. P7C: Tree and Table Of Contents Closure
+### 24. [remaining] P7C: Tree and Table Of Contents Closure
 
 Components:
 
@@ -635,7 +768,7 @@ Goal:
 - Close hierarchical rendering, expansion/selection, async loading, keyboard
   behavior, and scroll/heading tracking.
 
-### 23. P7D: Layout Container Closure
+### 25. [remaining] P7D: Layout Container Closure
 
 Components:
 
@@ -656,7 +789,7 @@ Goal:
 - Close layout props, responsive behavior, scroll/sticky behavior, splitter
   state, and visual parity.
 
-### 24. P1A: Primitive and Text Closure
+### 26. [remaining] P1A: Primitive and Text Closure
 
 Components:
 
@@ -679,7 +812,7 @@ Goal:
 - Close old suites for primitives and presentational components not already
   completed through previous waves.
 
-### 25. H5A: Behavior and Internal Part Helpers
+### 27. [remaining] H5A: Behavior and Internal Part Helpers
 
 Components/helpers:
 
@@ -691,7 +824,7 @@ Goal:
 - Close remaining behavior helpers and internal part/theming semantics required
   by old suites.
 
-### 26. H5B: Menu Styling Reconciliation
+### 28. [remaining] H5B: Menu Styling Reconciliation
 
 Component/helper:
 
@@ -702,14 +835,14 @@ Goal:
 - Reconcile old internal menu styling/helper contracts with the completed menu
   family.
 
-### 27. P8A: Theme, Slots, Tone, Behaviors, and Parts Sweep
+### 29. [remaining] P8A: Theme, Slots, Tone, Behaviors, and Parts Sweep
 
 Goal:
 
 - Close cross-cutting theme variables, tone-specific defaults, slots,
   behaviors, parts, and docs metadata after component suites are mostly active.
 
-### 28. Phase 6: Extension Packages and External Authoring
+### 30. [remaining] Phase 6: Extension Packages and External Authoring
 
 Goal:
 
@@ -717,7 +850,7 @@ Goal:
   themes, package exports, standalone scripts, Vite imports, and first-party
   extension packages.
 
-### 29. Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
+### 31. [remaining] Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
 
 Goal:
 
@@ -725,7 +858,7 @@ Goal:
   preview SSG, and XMLUI AI workflow tooling around the rebuilt compiler,
   metadata, runtime, and component model.
 
-### 30. Phase 8: Full Compatibility Sweep
+### 32. [remaining] Phase 8: Full Compatibility Sweep
 
 Goal:
 
@@ -733,7 +866,7 @@ Goal:
   docs/examples, package artifacts, extension flows, playground, CI workflows,
   visual checks, and performance checks.
 
-### 31. Phase 9: Release Readiness and Migration Safety
+### 33. [remaining] Phase 9: Release Readiness and Migration Safety
 
 Goal:
 

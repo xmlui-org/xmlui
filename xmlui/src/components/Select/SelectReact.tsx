@@ -14,6 +14,7 @@ import {
 import { defaultProps } from "./Select.defaults";
 import styles from "./Select.module.scss";
 import type { XmluiOption } from "../Option/OptionReact";
+import { useFormContext } from "../Form/FormContext";
 
 export type SelectValue = string | number | Array<string | number> | undefined | null;
 
@@ -26,6 +27,7 @@ export type SelectApi = {
 
 export type SelectProps = {
   id?: string;
+  bindTo?: string;
   initialValue?: SelectValue;
   value?: SelectValue;
   enabled?: boolean;
@@ -46,6 +48,7 @@ export type SelectProps = {
 export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function SelectNative(
   {
     id,
+    bindTo,
     initialValue,
     value: controlledValue,
     enabled = defaultProps.enabled,
@@ -65,12 +68,22 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
   },
   ref,
 ) {
+  const form = useFormContext();
+  const fieldName = useMemo(() => {
+    if (!bindTo) {
+      return undefined;
+    }
+    return form?.fieldPrefix ? `${form.fieldPrefix}.${bindTo}` : bindTo;
+  }, [bindTo, form?.fieldPrefix]);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const normalizedInitialValue = normalizeValue(initialValue, multiSelect);
   const [internalValue, setInternalValue] = useState<SelectValue>(normalizedInitialValue);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const currentValue = controlledValue === undefined
+  const formValue = fieldName !== undefined ? form?.getValue(fieldName) as SelectValue : undefined;
+  const currentValue = formValue !== undefined
+    ? normalizeValue(formValue, multiSelect)
+    : controlledValue === undefined
     ? internalValue
     : normalizeValue(controlledValue, multiSelect);
 
@@ -78,10 +91,24 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
     setInternalValue(normalizedInitialValue);
   }, [normalizedInitialValue]);
 
+  useEffect(() => {
+    if (!form || fieldName === undefined) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, form, required]);
+
   const updateValue = useCallback((nextValue: SelectValue) => {
     setInternalValue(nextValue);
+    if (form && fieldName !== undefined) {
+      form.setValue(fieldName, nextValue);
+      void form.validateField(fieldName, nextValue);
+    }
     void onDidChange?.(nextValue);
-  }, [onDidChange]);
+  }, [fieldName, form, onDidChange]);
 
   useImperativeHandle(ref, () => ({
     focus: () => triggerRef.current?.focus(),

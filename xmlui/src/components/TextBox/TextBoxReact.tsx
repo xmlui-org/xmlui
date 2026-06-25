@@ -168,6 +168,18 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
   const inputId = id ? `${id}__input` : generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
   const labelText = stringifyLabel(label);
+
+  useEffect(() => {
+    if (!form || fieldName === undefined) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      label: labelText,
+      required,
+    });
+  }, [fieldName, form, labelText, required]);
+
   const labelNode = hasLabel ? (
     <label
       data-part-id="label"
