@@ -89,14 +89,15 @@ Minimum shared shapes needed by the client:
 - `AiRunStatus`
 - `AiToolCall`
 - `AiApprovalRequest`
-- `AiSession`
-- `XmluiMicroAppArtifact`
 - `XmluiGenerationState`
-- `XmluiPreviewState`
 - `AgentRequest`
 - `AgentEvent`
 - `XmluiAgentResponseEnvelope`
 - `RequestDirectives`
+
+Preview state, session lists, and persistable micro-app artifacts should stay local to
+`xmlui-ai-blocks` or host recipes until Tier 2 proves the shape is reusable across
+more than one component.
 
 ## Headless Components
 
@@ -288,7 +289,7 @@ These should be documented as XMLUI markup recipes before becoming components:
 - Connection status: compose with `Badge`, `Spinner`, `Tooltip`, and host health state.
 - Workspace panel: compose from `Tabs`, `XmluiCodeView`, `XmluiPreviewPane`, and host-owned status controls.
 - Preview toolbar: compose from `Button`, `Select`, `Tabs`, `Slider`, and host preview state.
-- Saved micro-app list: host-owned persistence recipe, likely built from `List`, `Card`, `Badge`, and the stored `XmluiMicroAppArtifact` metadata.
+- Saved micro-app list: host-owned persistence recipe, likely built from `List`, `Card`, `Badge`, and future stored micro-app metadata.
 
 ### Promotion Gate
 

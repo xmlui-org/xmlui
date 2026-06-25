@@ -36,10 +36,10 @@ The contract can live in `xmlui` initially because XMLUI is both the target lang
 
 Shared responsibilities:
 
-- Type definitions for messages, runs, tool calls, approvals, sessions, generated XMLUI, preview state, persistable micro-apps, requests, and events.
+- Type definitions for messages, runs, tool calls, approvals, generated XMLUI, requests, and prototype stream events.
 - XMLUI generation response envelope.
 - Request directives such as `allowFullReplacement`, `allowMockData`, and future policy hints.
-- Event names and payload schemas.
+- Compact event names and payload schemas for the first reducers.
 - Basic XMLUI generation validation helpers that are safe to share across client and server.
 
 Initial shared shapes:
@@ -74,11 +74,8 @@ type XmluiAgentResponseEnvelope =
       code: string;
       metadata?: {
         title?: string;
-        notes?: string[];
-        changedFiles?: string[];
         componentsUsed?: string[];
         dataSourcesUsed?: string[];
-        mcpEvidence?: Array<{ tool: string; query: string }>;
         assumptions?: string[];
       };
     }
@@ -87,43 +84,43 @@ type XmluiAgentResponseEnvelope =
       question: string;
       choices?: string[];
       reason?: string;
+    }
+  | {
+      kind: "error";
+      message: string;
+      code?: string;
     };
 ```
 
-Canonical event families are the top-level namespaces for normalized `AgentEvent.type` values. They are not UI components; they are the contract vocabulary that lets the bridge stream progress while `xmlui-ai-blocks` reducers update thread, generation, preview, approval, and persistence state.
+Canonical event families are the top-level namespaces for normalized `AgentEvent.type` values. They are not UI components; they are the compact Tier 1 vocabulary that lets the bridge stream progress while `xmlui-ai-blocks` reducers update thread, generation, tool, approval, and error state.
 
-- `run.*`
-- `message.*`
-- `tool.*`
-- `approval.*`
-- `artifact.*`
-- `preview.*`
-- `generation.*`
-- `persistence.*`
+- `run`
+- `message`
+- `tool`
+- `approval`
+- `generation`
+- `error`
 
 Initial event family meanings:
 
-- `run.*`: lifecycle of one assistant turn or bridge job, such as `run.started`, `run.status`, `run.completed`, `run.failed`, and `run.cancelled`.
-- `message.*`: transcript changes, including user messages, assistant text deltas, clarification questions, reasoning summaries, sources, and message-level errors.
-- `tool.*`: tool-call lifecycle, including requested/running/succeeded/failed/cancelled states plus input/output summaries safe for display.
-- `approval.*`: human decision points produced by bridge policy, including approval requested, approved, rejected, edited, expired, or failed.
-- `generation.*`: XMLUI-generation state, including generated code deltas or replacements, summaries, validation results, diagnostics, accepted output, and current/last-working revision metadata.
-- `preview.*`: browser preview state, including compile status, runtime errors, warnings, route/viewport state, selected preview revision, and whether the displayed preview is current, last-working, or last-accepted.
-- `artifact.*`: portable XMLUI micro-app payload lifecycle only. This does not imply artifact chip/card UI or a multi-file workspace; the current target is one generated XMLUI micro-app represented by source, metadata, validation status, and provenance.
-- `persistence.*`: optional host-owned save/reuse lifecycle, such as save requested/completed/failed, fork, publish, restore, or archive. The harness defines payloads and events, but not a database or storage policy.
+- `run`: lifecycle snapshot of one assistant turn or bridge job.
+- `message`: transcript changes, including full message updates and assistant text deltas.
+- `tool`: tool-call lifecycle snapshots with display-safe input/output summaries.
+- `approval`: human decision points produced by bridge policy.
+- `generation`: XMLUI-generation state, including generated code, summaries, validation results, and diagnostics.
+- `error`: structured failures that do not belong to a specific message or generation update.
 
-Implementation agents should define concrete event names and payload schemas under these families before wiring bridge streams to reducers. Event reducers in `xmlui-ai-blocks` should tolerate unknown future event names by ignoring them or surfacing a nonfatal diagnostic.
+The initial concrete event names are `run.updated`, `message.updated`, `message.delta`, `tool.updated`, `approval.updated`, `generation.updated`, and `error`. Event reducers in `xmlui-ai-blocks` should tolerate unknown future event names by ignoring them or surfacing a nonfatal diagnostic.
 
 ### Persistable Micro-Apps
 
 Generated XMLUI is interpreted source, so an accepted result can be stored and reused later. Persistence is host-owned because the host controls users, tenancy, auth, database schema, deployment, versioning, and lifecycle.
 
-The shared contract should still make persistence easy by defining portable payloads and events:
+The shared contract should eventually make persistence easy by defining portable payloads and events, but these are deferred until the Tier 2 save/reuse workflow proves the shape:
 
 - `XmluiMicroAppArtifact`: generated XMLUI source plus metadata such as title, summary, version, dependencies, theme expectations, created/updated timestamps, and provenance.
-- `generation.accepted`: bridge/client event indicating that generated XMLUI passed validation and is suitable for saving.
-- `persistence.requested`: optional client event asking the host to save, fork, publish, or update a stored micro-app.
-- `persistence.completed` / `persistence.failed`: optional host events that let UI components show saved/reusable status.
+- accepted-generation event metadata indicating that generated XMLUI passed validation and is suitable for saving.
+- optional host persistence events for save, fork, publish, restore, and archive workflows.
 
 The harness should not require a database, but it should make the save/reuse path explicit enough that a host can persist generated apps in SQL, document stores, local files, CMS records, CRM metadata, or any other app-owned storage.
 
@@ -211,7 +208,7 @@ This plan is implementable only if the builder agent keeps the package boundarie
 - Treat `AiThread` as the primary client-side controller; `XmluiGenerationSession` may be separate or an `AiThread` mode, but do not introduce a second public conversation abstraction.
 - Keep chat, workspace, model selection, status bars, revision selectors, and saved-app browsing as XMLUI recipes unless the lower-level `plan.md` Promotion Gate is satisfied.
 - Preserve the current-vs-last-working revision model. Broken current generations must remain inspectable with diagnostics; the UI may offer last-working as a selector, not as a silent replacement.
-- Interpret `artifact.*` and `XmluiMicroAppArtifact` as a portable single-app persistence contract, not as a requirement for artifact card/chip UI or multi-file workspaces.
+- Treat future artifact and persistence contract work as a portable single-app persistence layer, not as a requirement for artifact card/chip UI or multi-file workspaces.
 - Keep bridge-owned work in `xmlui-ai-bridge`: provider credentials, trusted tool execution, policy enforcement, final validation, repair, logging, and usage accounting.
 - Keep browser package tests fixture-driven. Do not require real provider calls or external services to validate the contract reducers.
 

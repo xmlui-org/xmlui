@@ -132,6 +132,34 @@ import { MemoizedItem } from "./components/container-helpers";
 import { HiddenOption } from "./components/Select/HiddenOption";
 import OptionTypeProvider from "./components/Option/OptionTypeProvider";
 import type { Option } from "./components/abstractions";
+export type {
+  AgentEvent,
+  AgentEventFamily,
+  AgentEventType,
+  AgentRequest,
+  AiApprovalRequest,
+  AiApprovalRequestStatus,
+  AiMessage,
+  AiMessagePart,
+  AiMessageRole,
+  AiMessageStatus,
+  AiRun,
+  AiRunStatus,
+  AiToolCall,
+  AiToolCallStatus,
+  RequestDirectives,
+  XmluiAgentResponseEnvelope,
+  XmluiGenerationState,
+  XmluiGenerationStatus,
+  XmluiValidationIssue,
+  XmluiValidationResult,
+} from "./abstractions/AgentContractDefs";
+export { AGENT_EVENT_FAMILIES } from "./abstractions/AgentContractDefs";
+export {
+  isXmluiAgentResponseEnvelope,
+  parseXmluiAgentResponseEnvelope,
+  validateGeneratedXmluiSource,
+} from "./abstractions/AgentContract";
 
 export type {
   ThemeDefinition,

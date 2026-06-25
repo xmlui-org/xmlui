@@ -45,7 +45,7 @@ Candidate runtime pieces to move or redesign:
 
 The bridge should start as a reusable version of the A2XMLUI backend, not as a large agent framework.
 
-Persistence note: accepted generated XMLUI should be emitted as a persistable micro-app artifact, but durable storage remains host-owned. The bridge can provide payloads and optional callbacks; it should not require a particular database.
+Persistence note: accepted generated XMLUI should eventually be representable as a persistable micro-app artifact, but that payload is deferred until the client package proves the storage/reuse workflow. Durable storage remains host-owned.
 
 ## Trusted Responsibilities
 
@@ -77,12 +77,12 @@ Persistence note: accepted generated XMLUI should be emitted as a persistable mi
 - Compile generated XMLUI server-side when XMLUI runtime is available.
 - Run one or two hidden repair turns with exact validation/compile errors.
 - Return only a compiled app, a clarification, or a structured failure.
-- Emit accepted generated XMLUI as a persistable artifact that hosts may save for later reuse.
+- Defer persistable artifact events until the save/reuse workflow is implemented.
 
 ### Policy And Approval
 
 - Classify sensitive operations such as file writes, command execution, external network calls, preview server changes, and destructive actions.
-- Emit `approval.requested` events when policy requires user consent.
+- Emit `approval.updated` events with requested status when policy requires user consent.
 - Consume `approval.resolved` decisions from the client.
 - Keep final enforcement in the bridge, not in UI components.
 
@@ -91,7 +91,7 @@ Persistence note: accepted generated XMLUI should be emitted as a persistable mi
 - Accept the shared `AgentRequest`.
 - Stream shared `AgentEvent` objects.
 - Optionally support AI SDK UI message streams through an adapter while the contract settles.
-- Include run, message, tool, approval, artifact, preview, completion, and failure events.
+- Include run, message, tool, approval, generation, and failure events. Preview and persistence state stay client/host-owned in the first pass.
 
 ## Initial Endpoint Shape
 
@@ -112,17 +112,13 @@ Response should be a stream of normalized events:
 
 ```ts
 type AgentEvent =
-  | { type: "run.started"; runId: string }
-  | { type: "message.created"; runId: string; message: AiMessage }
-  | { type: "message.delta"; runId: string; messageId: string; delta: string }
-  | { type: "tool.started"; runId: string; toolCall: AiToolCall }
-  | { type: "tool.completed"; runId: string; toolCallId: string; result?: unknown }
-  | { type: "approval.requested"; runId: string; request: AiApprovalRequest }
-  | { type: "artifact.created"; runId: string; artifact: AiArtifact }
-  | { type: "generation.accepted"; runId: string; artifact: XmluiMicroAppArtifact }
-  | { type: "preview.updated"; runId: string; preview: XmluiPreviewState }
-  | { type: "run.completed"; runId: string }
-  | { type: "run.failed"; runId: string; error: string };
+  | { type: "run.updated"; run: AiRun }
+  | { type: "message.updated"; message: AiMessage }
+  | { type: "message.delta"; messageId: string; text: string }
+  | { type: "tool.updated"; toolCall: AiToolCall }
+  | { type: "approval.updated"; request: AiApprovalRequest }
+  | { type: "generation.updated"; generation: XmluiGenerationState }
+  | { type: "error"; message: string; code?: string };
 ```
 
 ## Implementation Phases
