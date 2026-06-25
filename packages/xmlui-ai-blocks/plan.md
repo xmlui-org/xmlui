@@ -1,635 +1,461 @@
-# xmlui-ai-blocks Implementation Plan
+# xmlui-ai-blocks Plan
 
-`xmlui-ai-blocks` will provide the UI and orchestration primitives for building AI-assisted XMLUI authoring tools: chat clients, project copilots, model pickers, run logs, artifact previews, and approval flows. The package should stay provider-neutral at the component layer while allowing apps to connect their own subscription, API gateway, or local agent runtime.
+`xmlui-ai-blocks` is the client-side XMLUI package for AI-assisted app-building interfaces. It owns headless browser-side controllers and the small set of AI-specific UI primitives that normal XMLUI markup cannot cover well. It does not own provider credentials, filesystem access, MCP processes, model policy, trusted tool execution, or a fixed chat/workspace shell.
 
-The initial package intentionally ships only one placeholder component, `AiConversation`. It is a visual anchor for demos and early layout work, not a production AI client.
+The near-term reference implementation is `D:\Projects\albacrm\a2xmlui`. In that project, the useful client-side shape is the XMLUI extension `AgentChat`: it is headless, talks to a configurable chat endpoint, tracks generated XMLUI code, exposes state through `value`, and lets XMLUI markup render the chat/preview/code UI however it wants. `xmlui-ai-blocks` should generalize that pattern.
 
-## Product Shape
+Related plans:
 
-The target application is an XMLUI app-building agent with three major panes:
+- [agent-harness-plan.md](./agent-harness-plan.md): overall contract and three-tier architecture.
+- [xmlui-ai-bridge-plan.md](./xmlui-ai-bridge-plan.md): trusted Node/runtime bridge plan.
 
-- Sessions panel: lists projects, conversations, branches, or tasks.
-- Chat panel: sends user instructions, streams assistant responses, shows tool calls, and collects approvals.
-- Preview pane: renders the XMLUI app currently being built and exposes refresh, route, viewport, and inspection controls.
+## Package Boundary
 
-The extension should make these panes easy to compose without forcing a single application shell. Apps may use the blocks as a full client, a narrow embedded assistant, or a project-specific command surface.
+This package contains:
+
+- XMLUI extension components for AI thread state, normalized stream handling, message-part rendering, approval affordances, code view, and XMLUI preview.
+- Headless client controllers such as `AiThread` that expose XMLUI-native state, APIs, and events.
+- Client-side transport adapters that call host-provided endpoints and consume normalized stream events.
+- Browser-side state machines for messages, active runs, generated code, pending approvals, selected provider/model, selected session, and preview status.
+- Pure client reducers for applying contract events to UI state.
+
+This package does not contain:
+
+- OpenAI, Anthropic, or other provider secrets.
+- Node server code.
+- MCP stdio process management.
+- Server-side validation and repair loops.
+- Trusted policy enforcement for commands, file writes, or external tools.
+- Host-specific auth, billing, quota, logging, or deployment code.
 
 ## Design Principles
 
-- Provider-neutral: components should not bake in OpenAI, Anthropic, local, or custom gateway specifics.
-- App-owned secrets: API keys and subscription tokens should be handled by the host app or backend, not stored inside visual components.
-- Streaming-first: message rendering, response state, and tool-call surfaces should assume partial output.
-- Inspectable operations: every model call, tool call, file change, command, and preview update should have a visible status.
-- XMLUI-native data flow: components expose state, events, and APIs that work naturally with `bindTo`, `DataSource`, `APICall`, and expression bindings.
-- Safe by default: destructive operations, external commands, and file writes should be represented as approval requests unless the host app explicitly configures otherwise.
+- Provider-neutral: the components render and orchestrate, but do not bake in a provider.
+- XMLUI-native: state is exposed through `value`, context variables, APIs, events, and normal XMLUI bindings.
+- Headless first: the harness logic must be usable without the bundled visual components.
+- XMLUI-composed UI: built-in XMLUI components should create most chat, preview, code, session, and approval screens.
+- Minimal visual surface: add a visual component only when the missing behavior is AI-specific, stateful, accessibility-sensitive, or hard to express repeatedly in XMLUI markup.
+- Swappable surface: host apps can replace every visible piece independently.
+- Streaming-first: partial assistant text, tool progress, generated code, and preview updates are first-class states.
+- Inspectable: model calls, tool calls, approvals, file changes, preview updates, and errors have visible state.
+- Safe by default: sensitive operations appear as approval requests unless the trusted bridge says otherwise.
 
-## Placeholder Component
+## Relationship To A2XMLUI
 
-### `AiConversation`
+Candidate client-side pieces to extract or redesign from `a2xmlui`:
 
-Current status: implemented as a placeholder.
+- `xmlui-app/src/extensions/AgentChat/AgentChat.tsx`: source for the first headless `AiThread` / XMLUI generation controller.
+- `xmlui-app/src/extensions/XmluiPreview/XmluiPreview.tsx`: source for `XmluiPreviewPane`, including compile errors, runtime errors, preview revision handling, and theme integration.
+- `xmlui/src/components/Markdown/MarkdownReact.tsx` and `xmlui/src/components/NestedApp/AppWithCodeViewReact.tsx`: source for the first `XmluiCodeView` shape. The existing `NestedAppAndCodeViewReact` path already proves a read-only XMLUI code view can be built from Markdown code rendering and the nested-app UI/XML toggle.
+- `xmlui-app/src/extensions/CodeView/CodeView.tsx`: secondary source for a basic XMLUI code viewer if A2XMLUI has behavior not covered by the core Markdown/NestedApp path.
+- `xmlui-app/src/components/ChatPane.xmlui`: reference markup proving the UI can be replaced while keeping the controller.
+- `src/agent/xmluiAgentContract.ts`: contract ideas only; shared schemas should move into `xmlui` or a common contract module, not stay app-specific.
 
-Role:
-- Provides a stable visual target for app shell layouts.
-- Displays title, provider, model, status, empty chat area, and disabled composer.
-- Lets early demos look like the intended chat panel while the real primitives are designed.
+Avoid copying the A2XMLUI shell wholesale. The package should preserve the harness behavior and expose better primitives.
 
-Planned evolution:
-- Either become the high-level composed chat surface, or remain as a demo wrapper around lower-level blocks such as `AiThread`, `AiMessageList`, and `AiComposer`.
+## Component Scope Audit
 
-## Planned Components
+The first pass should deliberately avoid recreating a full [AI Elements](https://elements.ai-sdk.dev/components)-style visual kit. AI Elements is useful as a feature checklist, not as a target component count. Its current component index groups needs into chatbot UI, code/agent UI, voice, workflow, and utilities; for XMLUI app generation the relevant gaps are mostly chatbot state, generated-code/preview state, streaming, sources, reasoning, tools, and approvals.
 
-### Connection And Model Selection
+XMLUI already has enough general-purpose components to build the visible shell:
 
-#### `AiProviderConfig`
+- Layout and chrome: `Stack`, `HStack`, `VStack`, `Card`, `Splitter`, `Tabs`, `Drawer`, `ModalDialog`, `ScrollViewer`, `StickyBox`.
+- Basic conversation UI: `Items`, `Text`, `Markdown`, `Avatar`, `Badge`, `Spinner`, `ProgressBar`, `Button`, `Tooltip`, `LiveRegion`.
+- Composer and controls: `Form`, `TextArea`, `TextBox`, `Select`, `Option`, `Switch`, `FileInput`, `FileUploadDropZone`.
+- Data and operation lists: `List`, `Table`, `Tree`, `Accordion`, `ExpandableItem`, `CodeBlock`.
+- Preview surfaces: `NestedApp`, `IFrame`, `EventSource`, `WebSocket`, `Toast`.
 
-Non-visual or minimally visual component that describes available providers and connection modes.
+`ChatPane.xmlui` in A2XMLUI proves that a usable chat interface can be composed from these primitives. It covers transcript layout, role-based bubbles, model selection, busy state, errors, full-replacement confirmation, and send/stop composer controls without custom visual React.
 
-Responsibilities:
-- Register provider labels, supported auth modes, model catalogs, default model, and feature flags.
-- Accept static config or load config from a host-provided endpoint.
-- Expose provider availability and selected provider state to children.
+What XMLUI does not cover by itself is the AI-specific interpretation layer:
 
-Important props:
-- `providers`
-- `selectedProvider`
-- `modelCatalog`
-- `capabilities`
-- `authMode`
+- Streaming event reduction from provider or bridge streams into stable XMLUI state.
+- Message-part normalization across text, reasoning, tool calls, sources, attachments, clarifications, summaries, and errors.
+- Accessible live updates for partial assistant output and long-running runs.
+- Tool-call, approval, generation, and preview lifecycle semantics.
+- XMLUI preview compilation, runtime-error isolation, current-vs-last-working revision handling, diagnostics display, and generated-source formatting.
 
-Events:
-- `didSelectProvider`
-- `didLoadCatalog`
-- `didFailConnection`
+The rule for this package: build components for those gaps, then express the UI around them as XMLUI recipes. Promote a recipe into a bundled visual component only after it repeats enough to justify a stable abstraction.
 
-#### `AiModelSelect`
+## Core Contract Dependency
 
-Model picker with provider-aware grouping and capability hints.
+For now, shared AI contract types can live in `xmlui` because XMLUI is the medium the builder targets. `xmlui-ai-blocks` should import or mirror those contract types rather than inventing private shapes.
 
-Responsibilities:
-- Display models grouped by provider or family.
-- Show context window, pricing tier labels, tool-use support, vision support, and reasoning mode.
-- Emit selected provider and model.
+Minimum shared shapes needed by the client:
 
-Important props:
-- `providers`
-- `models`
-- `value`
-- `showCapabilities`
-- `filterByCapability`
+- `AiMessage`
+- `AiMessagePart`
+- `AiRun`
+- `AiRunStatus`
+- `AiToolCall`
+- `AiApprovalRequest`
+- `AiSession`
+- `XmluiMicroAppArtifact`
+- `XmluiGenerationState`
+- `XmluiPreviewState`
+- `AgentRequest`
+- `AgentEvent`
+- `XmluiAgentResponseEnvelope`
+- `RequestDirectives`
 
-Events:
-- `didChange`
+## Headless Components
 
-APIs:
-- `setValue(provider, model)`
-- `focus()`
+### `AiThread`
 
-#### `AiConnectionStatus`
-
-Compact status indicator for subscription, provider gateway, or local agent availability.
-
-Responsibilities:
-- Show disconnected, connecting, ready, rate-limited, degraded, or error states.
-- Provide optional retry action.
-
-Important props:
-- `state`
-- `message`
-- `lastCheckedAt`
-
-Events:
-- `retry`
-
-### Conversation
-
-#### `AiThread`
-
-Stateful conversation container that coordinates messages, selected model, request state, streaming state, and tool calls.
+Primary browser-side controller. Generalizes the A2XMLUI `AgentChat` pattern.
 
 Responsibilities:
-- Hold the canonical thread state.
-- Provide context variables to children, including current messages, active run, selected provider, selected model, and pending approvals.
-- Connect visual blocks to host-provided send/cancel/resume functions.
+
+- Hold canonical client thread state.
+- Submit prompts to a host-provided endpoint or callback.
+- Consume normalized contract events.
+- Track active run, messages, tool calls, approvals, generated XMLUI state, preview state, and errors.
+- Expose APIs such as `send`, `cancel`, `appendMessage`, `clear`, `approve`, and `reject`.
+- Publish `value` for XMLUI bindings.
+- Emit lifecycle events for host markup.
 
 Important props:
+
 - `threadId`
 - `messages`
 - `provider`
 - `model`
-- `temperature`
-- `systemPrompt`
 - `sendAction`
 - `cancelAction`
 - `resumeAction`
-- `stream`
+- `transport`
+- `currentCode`
+- `requestDirectives`
+- `autoRepairStatus`
 
-Events:
-- `didStartRun`
-- `didReceiveDelta`
-- `didReceiveMessage`
-- `didFinishRun`
-- `didFailRun`
-- `didRequestApproval`
+Exposed `value`:
 
-Context variables:
-- `$thread`
-- `$messages`
-- `$activeRun`
-- `$provider`
-- `$model`
-- `$isRunning`
-- `$pendingApprovals`
-
-APIs:
-- `send(message)`
-- `cancel()`
-- `appendMessage(message)`
-- `setMessages(messages)`
-- `clear()`
-
-#### `AiMessageList`
-
-Scrollable transcript renderer.
-
-Responsibilities:
-- Render user, assistant, system, tool, and approval messages.
-- Support streaming text, markdown, code blocks, diffs, citations, and hidden reasoning summaries if the host exposes them.
-- Auto-scroll while respecting manual scroll position.
-
-Important props:
 - `messages`
-- `streamingMessage`
-- `emptyText`
-- `showToolCalls`
-- `showTimestamps`
-
-Events:
-- `didSelectMessage`
-- `didCopyMessage`
-- `didRetryMessage`
-
-#### `AiMessage`
-
-Single message renderer for advanced customization.
-
-Responsibilities:
-- Render role, avatar, content, metadata, status, and actions.
-- Allow templated content for custom transcript layouts.
-
-Important props:
-- `message`
-- `role`
+- `activeRun`
+- `isRunning`
 - `status`
-- `parts`
-
-Events:
-- `retry`
-- `copy`
-- `inspect`
-
-#### `AiComposer`
-
-Prompt input with send controls.
-
-Responsibilities:
-- Multi-line text entry.
-- Optional attachments.
-- Submit on configured keyboard gesture.
-- Disable or switch to cancel mode while a run is active.
-
-Important props:
-- `value`
-- `placeholder`
-- `disabled`
-- `running`
-- `attachments`
-- `submitShortcut`
-
-Events:
-- `didChange`
-- `send`
-- `cancel`
-- `attach`
-
-APIs:
-- `focus()`
-- `setValue(value)`
-- `clear()`
-
-### Sessions
-
-#### `AiSessionList`
-
-Conversation/project/session navigator.
-
-Responsibilities:
-- Display sessions with title, status, last message, last update, model, branch, or project path.
-- Support selected session, pinned sessions, search, and grouping.
-
-Important props:
-- `sessions`
-- `selectedSessionId`
-- `groupBy`
-- `searchable`
-
-Events:
-- `didSelectSession`
-- `didCreateSession`
-- `didRenameSession`
-- `didDeleteSession`
-- `didArchiveSession`
-
-#### `AiSessionItem`
-
-Template-friendly row renderer for custom session lists.
-
-Responsibilities:
-- Render status, title, subtitle, unread/run indicators, and quick actions.
-
-### Tool Calls And Approvals
-
-#### `AiToolCallList`
-
-Timeline of tool calls issued by the agent.
-
-Responsibilities:
-- Show command/file/API/browser/preview operations.
-- Represent queued, running, succeeded, failed, skipped, and awaiting-approval states.
-- Group related calls under an assistant response.
-
-Important props:
+- `error`
+- `pendingApprovals`
+- `generation`
+- `preview`
 - `toolCalls`
-- `compact`
-- `groupByRun`
+- `provider`
+- `model`
 
-Events:
-- `inspect`
-- `approve`
-- `reject`
-- `retry`
+### `XmluiGenerationSession`
 
-#### `AiToolCall`
-
-Single tool-call renderer.
+Specialized headless controller for XMLUI app generation.
 
 Responsibilities:
-- Display tool name, arguments summary, result summary, duration, and error details.
-- Defer full raw payloads to an inspect action.
 
-#### `AiApprovalRequest`
+- Track `currentCode`, `lastWorkingCode`, selected preview revision, generated summary, and generated diagnostics.
+- Handle "modify current" vs "create new app" confirmation state.
+- Accept generated-code events from `AiThread`.
+- Represent accepted generated XMLUI as a persistable micro-app artifact for host-owned storage.
+- Keep preview and code view in sync while allowing users to inspect a broken current generation and switch back to the last working version.
+- Stay client-side; server-side validation/repair belongs to `xmlui-ai-bridge`.
 
-Explicit approval UI for sensitive actions.
+This may be a mode of `AiThread` instead of a separate component if the implementation stays simple.
 
-Responsibilities:
-- Render the requested action, risk summary, affected files, and available decisions.
-- Provide approve/reject/edit controls.
+### `AiProviderConfig`
 
-Important props:
-- `request`
-- `mode`
-- `expiresAt`
-
-Events:
-- `approve`
-- `reject`
-- `edit`
-
-### XMLUI App Preview
-
-#### `XmluiPreviewPane`
-
-Preview surface for the app being built.
+Optional headless/minimal component for provider and model catalog state.
 
 Responsibilities:
-- Render an iframe, local preview route, or host-provided preview target.
-- Provide refresh, hard reload, viewport selection, route selection, zoom, and open-external actions.
-- Surface build/runtime errors.
 
-Important props:
-- `src`
-- `route`
-- `viewport`
-- `zoom`
-- `status`
-- `errors`
+- Receive static catalogs or fetch them from a host endpoint.
+- Track selected provider/model.
+- Expose connection status and capabilities to children.
 
-Events:
-- `refresh`
-- `routeChange`
-- `viewportChange`
-- `openExternal`
+## Visual Component Strategy
 
-APIs:
-- `refresh()`
-- `setRoute(route)`
-- `setViewport(viewport)`
+The visual surface should stay intentionally small. `ChatPane.xmlui` should remain the reference for building a complete chat/workspace UI from XMLUI primitives, with `xmlui-ai-blocks` supplying only the pieces that carry AI-specific semantics.
 
-#### `XmluiPreviewToolbar`
+### Must Build
 
-Toolbar for preview controls that can be placed inside or outside `XmluiPreviewPane`.
+- `AiMessageParts`: renders normalized message parts, including streaming text, markdown, generated XMLUI summaries, reasoning summaries, sources, attachments, tool-call references, and errors. This is the main replacement for generic `Text` bubbles when the message is no longer simple text.
+- `AiApprovalRequest`: compact approve/reject/edit surface for bridge-generated approval requests. Approval UX is policy-sensitive enough to deserve a stable component. It provides user feedback for system/bridge events and actions when a human decision is required, but it does not decide whether approval is required.
+- `AiToolCall`: status renderer for a single normalized tool call, with pending/running/succeeded/failed/cancelled states and optional input/output disclosure. It provides user feedback about system/tool progress and results, but it does not execute tools, retry tools, or decide whether a tool is allowed to run.
+- `XmluiPreviewPane`: preview generated XMLUI code or a host-provided preview URL, preserving compile errors, runtime errors, selectable current/last-working rendering, warnings, theme, and tone behavior.
+- `XmluiCodeView`: read-only XMLUI source formatting and syntax highlighting, based first on the existing `NestedAppAndCodeViewReact` code-view behavior and only then on A2XMLUI `CodeView` if it adds missing behavior.
 
-Responsibilities:
-- Viewport presets.
-- Route picker.
-- Reload controls.
-- Error badge.
-
-### Artifacts And Project State
-
-#### `AiArtifactPanel`
-
-Displays files, patches, screenshots, command outputs, generated docs, and structured artifacts produced by the agent.
-
-Responsibilities:
-- List artifacts by run or session.
-- Preview text, markdown, image, diff, and JSON artifacts.
-- Emit open/apply/revert/download actions.
-
-#### `AiPatchViewer`
-
-Diff-focused viewer for pending or applied file changes.
-
-Responsibilities:
-- Show changed files.
-- Show additions/deletions.
-- Support approve/reject/apply per file or hunk when the host supports it.
-
-#### `AiRunTimeline`
-
-Operational timeline for a single agent run.
-
-Responsibilities:
-- Combine assistant text, tool calls, approvals, file changes, commands, and preview updates into a chronological view.
-
-## Host Integration Model
-
-The package should not directly own provider credentials. A host XMLUI app should be able to connect these blocks through one of three patterns:
-
-1. Backend proxy: XMLUI app calls its own backend, which handles provider credentials and streams events.
-2. Local agent bridge: XMLUI app talks to a local service that can read/write the project and manage preview servers.
-3. Bring-your-own callbacks: advanced host apps provide `sendAction`, `cancelAction`, and event handlers directly.
-
-For streaming, prefer a normalized event format:
-
-```json
-{
-  "type": "message.delta",
-  "runId": "run_123",
-  "messageId": "msg_456",
-  "delta": "Create a Stack with..."
-}
-```
-
-Recommended event types:
-
-- `run.started`
-- `message.created`
-- `message.delta`
-- `message.completed`
-- `tool.started`
-- `tool.delta`
-- `tool.completed`
-- `tool.failed`
-- `approval.requested`
-- `approval.resolved`
-- `artifact.created`
-- `preview.updated`
-- `run.completed`
-- `run.failed`
-
-## Suggested Data Shapes
-
-### Message
-
-```json
-{
-  "id": "msg_1",
-  "role": "assistant",
-  "status": "completed",
-  "createdAt": "2026-05-13T10:00:00Z",
-  "parts": [
-    { "type": "text", "text": "I created the first XMLUI screen." },
-    { "type": "artifactRef", "artifactId": "artifact_1" }
-  ]
-}
-```
-
-### Session
-
-```json
-{
-  "id": "session_1",
-  "title": "Inventory dashboard",
-  "projectPath": "/work/inventory-app",
-  "selectedModel": "gpt-5.2",
-  "status": "idle",
-  "updatedAt": "2026-05-13T10:00:00Z"
-}
-```
-
-### Tool Call
-
-```json
-{
-  "id": "tool_1",
-  "runId": "run_1",
-  "kind": "file.write",
-  "title": "Update Main.xmlui",
-  "status": "awaitingApproval",
-  "summary": "Write the app shell layout.",
-  "affectedFiles": ["Main.xmlui"]
-}
-```
-
-## XMLUI Markup Snippets
-
-### Current Placeholder In A Three-Pane Agent App
+Proposed XMLUI-facing shapes:
 
 ```xml
-<HStack height="100vh" gap="0">
-  <VStack width="280px" borderRight="1px solid $borderColor" padding="0.75rem">
-    <Text variant="strong">Sessions</Text>
-    <List data="{sessions}">
-      <Text>{$item.title}</Text>
-    </List>
-  </VStack>
-
-  <VStack width="minmax(420px, 1fr)" padding="1rem">
-    <AiConversation
-      title="XMLUI app builder"
-      provider="{selectedProvider}"
-      model="{selectedModel}"
-      status="Planning"
-      placeholder="Ask the assistant to create or modify the XMLUI app."
-    />
-  </VStack>
-
-  <VStack width="42vw" borderLeft="1px solid $borderColor">
-    <Text padding="0.75rem" variant="strong">Preview</Text>
-    <iframe src="{previewUrl}" style="width: 100%; height: 100%; border: 0" />
-  </VStack>
-</HStack>
+<!-- Render a full normalized message, including text deltas, clarification
+     text, summary text, reasoning, source links, tool references, and errors.
+     Generated code itself is shown in XmluiPreviewPane and XmluiCodeView. -->
+<AiMessageParts
+  message="{$item}"
+  streaming="{agent.value.streamingMessageId === $item.id}"
+  collapseReasoning="true"
+  showMetadata="false"
+  onOpenSource="sources.open($event.sourceId)" />
 ```
 
-### Future Composed Conversation
+```xml
+<!-- Render one bridge approval request. The host still owns the decision
+     policy; this component only presents and emits the user's choice. -->
+<AiApprovalRequest
+  request="{$item}"
+  running="{agent.value.isRunning}"
+  onApprove="agent.approve($event.requestId, $event.decisionPayload)"
+  onReject="agent.reject($event.requestId, $event.reason)"
+  onEdit="agent.approve($event.requestId, $event.editedPayload)" />
+```
+
+`AiApprovalRequest` should render both pending and resolved approval states. Pending requests show the reason, requested operation, impact/risk summary, optional editable fields, and approve/reject actions. Resolved requests show approved/rejected/expired status so the transcript or timeline remains understandable after the decision.
+
+Callback payload names are provisional and should be finalized with the shared contract:
+
+- `onApprove`: emits `{ requestId, decisionPayload? }`.
+- `onReject`: emits `{ requestId, reason? }`.
+- `onEdit`: emits `{ requestId, editedPayload }`; hosts may treat this as approve-with-edits or route it through a separate bridge action.
 
 ```xml
-<AiThread
-  id="thread"
-  threadId="{selectedSession.id}"
-  provider="{selectedProvider}"
-  model="{selectedModel}"
-  messages="{messages}"
-  sendAction="/api/agent/send"
-  cancelAction="/api/agent/cancel"
-  onDidReceiveMessage="messages = [...messages, $event.message]"
->
-  <AiMessageList messages="{thread.messages}" showToolCalls="true" />
+<!-- Render one normalized tool call. Use inside recipe timelines or message
+     parts when the host wants tool activity visible. -->
+<AiToolCall
+  toolCall="{$item}"
+  defaultOpen="{$item.status === 'running' || $item.status === 'failed'}"
+  showInput="summary"
+  showOutput="summary" />
+```
 
-  <AiComposer
-    placeholder="Describe the XMLUI app you want to build..."
-    running="{thread.isRunning}"
-    onSend="thread.send($event.text)"
-    onCancel="thread.cancel()"
-  />
+`AiToolCall` should stay compact by default and expand only when the user needs detail. Typical rows include XMLUI docs search, examples lookup, public API discovery, XMLUI validation, preview compilation, and repair attempts. It may show input/output summaries and errors, but execution, retry, cancellation, and policy enforcement stay in `AiThread` and `xmlui-ai-bridge`.
+
+```xml
+<!-- In-process XMLUI preview, with state exposed through preview.value for
+     recipe-composed toolbar and error displays. -->
+<XmluiPreviewPane
+  id="preview"
+  code="{builder.value.code}"
+  lastWorkingCode="{builder.value.lastWorkingCode}"
+  selectedRevision="{builder.value.selectedPreviewRevision}"
+  previewUrl="{builder.value.previewUrl}"
+  mode="{builder.value.previewUrl ? 'url' : 'code'}"
+  activeTheme="{appGlobals.activeTheme}"
+  activeTone="{appGlobals.activeTone}"
+  showDiagnostics="true"
+  onPreviewStateChange="builder.setPreviewState($event)" />
+```
+
+`XmluiPreviewPane` should delegate in-process rendering to `NestedApp` rather than reimplement XMLUI rendering. Its value is the AI-builder lifecycle around `NestedApp`: compile/runtime diagnostics, warning display, selected preview revision, and safe defaults for generated code.
+
+Do not silently hide a broken current generation by always rendering the last working app. The user must be able to inspect the current generated state and its errors. The default view may auto-select `current` when new code arrives, show diagnostics if it fails, and offer a simple revision selector such as:
+
+- `Current generation`
+- `Last working`
+- `Last accepted` if host persistence provides it
+
+When `selectedRevision` is `current`, the preview attempts to render `code` and shows compile/runtime issues inline. When `selectedRevision` is `lastWorking`, it renders `lastWorkingCode` and should clearly label that the preview is not showing the current generated code.
+
+```xml
+<!-- Generated XMLUI source view. Host-owned actions such as save/copy are
+     triggered through events rather than owned by the code viewer. -->
+<XmluiCodeView
+  code="{builder.value.selectedPreviewRevision === 'lastWorking' ? builder.value.lastWorkingCode : builder.value.code}"
+  language="xmlui"
+  readOnly="true"
+  showLineNumbers="true"
+  highlightLines="{builder.value.changedLines}"
+  onCopy="toast('Code copied')"
+  onSelectionChange="workspace.setSelectedCodeRange($event.range)" />
+```
+
+For the first implementation, `XmluiCodeView` should stay a viewer, not an editor. The existing `NestedAppAndCodeViewReact` code display is sufficient as the baseline: show generated XMLUI with syntax highlighting, copy affordance, line numbers if practical, selected-line highlighting, and clear status when the displayed source is not the current generation.
+
+Later editing support should be additive and explicit, not assumed by the viewer:
+
+- `readOnly="false"` or `editable="true"` enables editing.
+- `value` / `initialValue` / `onDidChange` follow normal XMLUI input-style conventions.
+- `onApply` can hand edited code back to `XmluiGenerationSession` for validation and preview.
+- Editing must preserve the revision model: editing last-working code should create a new current draft rather than mutating the stored last-working revision in place.
+- Rich editor dependencies, formatting, diagnostics gutters, undo/redo, and multi-file editing are deferred until a real host workflow needs them.
+
+### Conditional
+
+- `AiComposer` or `AiPromptInput`: build only if it adds real behavior beyond `Form` + `TextArea`: enter-to-submit consistency, send/cancel switching, attachment collection, composition events, and accessibility details. Otherwise keep it as a recipe.
+
+### Recipe First
+
+These should be documented as XMLUI markup recipes before becoming components:
+
+- Transcript: use `ScrollViewer`/`VStack`/`Items` plus `AiMessageParts`.
+- Run timeline: compose `Items`, `Accordion`, `AiToolCall`, `AiApprovalRequest`, and normal XMLUI status components.
+- Session list: compose with `List`, `Items`, `Button`, `Badge`, and host-owned data.
+- Model selector: compose with `Select`/`Option` unless provider capability filtering becomes complex enough to centralize.
+- Connection status: compose with `Badge`, `Spinner`, `Tooltip`, and host health state.
+- Workspace panel: compose from `Tabs`, `XmluiCodeView`, `XmluiPreviewPane`, and host-owned status controls.
+- Preview toolbar: compose from `Button`, `Select`, `Tabs`, `Slider`, and host preview state.
+- Saved micro-app list: host-owned persistence recipe, likely built from `List`, `Card`, `Badge`, and the stored `XmluiMicroAppArtifact` metadata.
+
+### Promotion Gate
+
+Default rule for implementation agents: do not turn recipe-first items into React/XMLUI extension components during the initial implementation. Build recipe XMLUI files and fixture coverage first.
+
+A recipe may be promoted to a component only when all of these are true:
+
+- The same UI pattern appears in at least 3 independent demos, recipes, or host integration sketches, or the same 40+ lines of XMLUI markup are duplicated in at least 2 places.
+- The repeated pattern has at least 2 hard-to-compose concerns, such as coordinated keyboard behavior, accessible live-region behavior, focus management, nontrivial state derivation, repeated event payload shaping, complex theme variables, or cross-part rendering rules.
+- The component can expose a small stable prop/API surface without owning host policy, persistence, provider selection, or application layout.
+- The component can still be bypassed by using `AiThread` state and normal XMLUI markup directly.
+- The promotion decision is recorded in this plan or a follow-up design note before implementation.
+
+If these conditions are not met, keep the item as a recipe even if a component would be convenient.
+
+### Defer Or Avoid
+
+- Voice components such as speech input, transcription, personas, mic/voice selectors, and audio players.
+- Workflow/canvas components such as nodes, edges, panels, connections, and generic toolbars.
+- General coding-agent views such as commit cards, environment variable editors, package info, terminal emulators, test-result dashboards, stack traces, sandbox managers, and file trees, unless XMLUI generation needs a focused subset later.
+- Artifact chip/card components for generated files or multi-file workspaces. The current target is a single generated XMLUI micro-app shown through preview/code state, not a file-artifact gallery.
+- Generic prompt suggestions, shimmer effects, queues, and plan/task/checkpoint cards where normal XMLUI markup can express the state.
+
+## Initial Markup Target
+
+The important goal is that apps can compose a full AI UI around `AiThread` with normal XMLUI markup:
+
+```xml
+<AiThread id="agent" sendAction="{appGlobals.chatApiUrl}">
+  <ScrollViewer height="*">
+    <Items data="{agent.value.messages}">
+      <AiMessageParts message="{$item}" streaming="{agent.value.streamingMessageId === $item.id}" />
+    </Items>
+  </ScrollViewer>
+
+  <Form onSubmit="agent.send(prompt.value); prompt.setValue('')">
+    <TextArea id="prompt" rows="4" enterSubmits="true" enabled="{!agent.value.isRunning}" />
+    <property name="buttonRowTemplate">
+      <HStack horizontalAlignment="end" gap="$space-2">
+        <Button type="button" label="Stop" when="{agent.value.isRunning}" onClick="agent.cancel()" />
+        <Button type="submit" label="Send" when="{!agent.value.isRunning}" />
+      </HStack>
+    </property>
+  </Form>
 </AiThread>
 ```
 
-### Future Provider And Model Selection
+Or replace all visible pieces:
 
 ```xml
-<HStack verticalAlignment="center" gap="0.5rem">
-  <AiConnectionStatus state="{connection.state}" message="{connection.message}" onRetry="checkConnection()" />
+<AiThread id="agent" sendAction="{appGlobals.chatApiUrl}" />
 
-  <AiModelSelect
-    providers="{providers}"
-    models="{models}"
-    value="{selectedModel}"
-    showCapabilities="true"
-    onDidChange="
-      selectedProvider = $event.provider;
-      selectedModel = $event.model;
-    "
-  />
-</HStack>
+<CustomChatPanel thread="{agent}" />
+<CustomWorkspace code="{agent.value.currentCode}" />
 ```
 
-### Future Sessions Plus Chat Plus Preview Layout
+For XMLUI generation:
 
 ```xml
-<HStack height="100vh" gap="0">
-  <AiSessionList
-    width="300px"
-    sessions="{sessions}"
-    selectedSessionId="{selectedSessionId}"
-    searchable="true"
-    onDidSelectSession="selectedSessionId = $event.sessionId"
-    onDidCreateSession="createSession()"
-  />
+<XmluiGenerationSession id="builder" thread="{agent}" />
 
-  <VStack width="1fr">
-    <AiThread
-      id="agent"
-      threadId="{selectedSessionId}"
-      provider="{selectedProvider}"
-      model="{selectedModel}"
-      messages="{messages}"
-      sendAction="/api/agent/send"
-      cancelAction="/api/agent/cancel"
-    >
-      <AiRunTimeline run="{agent.activeRun}" />
-      <AiMessageList messages="{agent.messages}" />
-      <AiComposer running="{agent.isRunning}" onSend="agent.send($event.text)" />
-    </AiThread>
-  </VStack>
-
-  <XmluiPreviewPane
-    width="44vw"
-    src="{preview.src}"
-    route="{preview.route}"
-    viewport="{preview.viewport}"
-    status="{preview.status}"
-    errors="{preview.errors}"
-    onRefresh="refreshPreview()"
-  />
-</HStack>
+<ChatPane chat="{builder}" />
+<Select initialValue="{builder.value.selectedPreviewRevision}" onDidChange="builder.selectPreviewRevision($event)">
+  <Option value="current" label="Current generation" />
+  <Option value="lastWorking" label="Last working" enabled="{!!builder.value.lastWorkingCode}" />
+</Select>
+<XmluiPreviewPane
+  code="{builder.value.code}"
+  lastWorkingCode="{builder.value.lastWorkingCode}"
+  selectedRevision="{builder.value.selectedPreviewRevision}" />
+<XmluiCodeView
+  code="{builder.value.selectedPreviewRevision === 'lastWorking' ? builder.value.lastWorkingCode : builder.value.code}" />
 ```
 
-### Future Approval Flow
+The first shipped demo should use a `ChatPane.xmlui`-style recipe backed by `AiThread`. Do not add a conversation wrapper as a public architectural layer; it would hide the main extension point without adding meaningful capability.
 
-```xml
-<VStack>
-  <AiToolCallList
-    toolCalls="{agent.activeRun.toolCalls}"
-    onInspect="selectedToolCall = $event.toolCall"
-    onApprove="resolveApproval($event.toolCall.id, 'approve')"
-    onReject="resolveApproval($event.toolCall.id, 'reject')"
-  />
+## Builder Agent Handoff Constraints
 
-  <ModalDialog when="{agent.pendingApprovals.length > 0}">
-    <AiApprovalRequest
-      request="{agent.pendingApprovals[0]}"
-      onApprove="agent.approve($event.requestId)"
-      onReject="agent.reject($event.requestId)"
-      onEdit="agent.editApproval($event.requestId, $event.patch)"
-    />
-  </ModalDialog>
-</VStack>
-```
+Use these constraints when handing this plan to an implementation agent:
+
+- Implement only the Must Build components and headless controllers needed by the current phase. Do not add recipe-first components unless the Promotion Gate is explicitly satisfied and recorded.
+- Treat `AiThread` as the primary client-side architecture. Do not introduce `AiConversation` or another conversation wrapper as a public layer unless this plan is updated first.
+- Keep visible chat, workspace, session, model-picker, status, and toolbar layouts as XMLUI recipes composed from existing XMLUI primitives.
+- Do not add artifact chip/card components. The current target is a single generated XMLUI micro-app represented through generation state, preview state, and code view state.
+- Keep `XmluiCodeView` read-only for the first implementation. Editing support must be added later as an explicit mode with XMLUI-style value/change/apply events.
+- `XmluiPreviewPane` must not silently replace a broken current generation with the last working app. It should show current diagnostics and offer a clear selector for current vs last-working revisions.
+- Keep provider credentials, trusted bridge execution, server-side validation/repair, persistence, billing, auth, and host policy outside this package.
+- Add fixture-driven tests before real provider integrations. Package tests should not call real AI providers or external services.
 
 ## Implementation Phases
 
-### Phase 1: Package Foundation
+### Phase 1: Rework Foundation
 
-- Keep `AiConversation` as the placeholder.
-- Build metadata and theme variable support.
-- Add demo markup that resembles the future three-pane app.
-- Validate extension build and metadata build.
+- Treat the existing conversation placeholder as temporary scaffolding; replace the demo anchor with `AiThread` as soon as the controller exists.
+- Add this plan and link to bridge/overall plans.
+- Define the first shared contract import strategy from `xmlui`.
+- Create local fixture data for messages, runs, approvals, tool calls, generated code, clarification responses, and preview state.
+- Add fixture cases based on the AI Elements gap checklist: streaming text, reasoning, sources, attachments, tool calls, approvals, generated XMLUI summaries, clarification responses, preview errors, and cancellation.
+- Validate extension build still works.
 
-### Phase 2: Stateless Visual Blocks
+### Phase 2: AI-Specific Visual Primitives
 
-- Implement `AiMessage`, `AiMessageList`, `AiComposer`, `AiModelSelect`, `AiConnectionStatus`, and `AiSessionList`.
-- Keep data and events host-owned.
-- Add focused unit and component tests for rendering, accessibility, keyboard behavior, and event payloads.
+- Implement `AiMessageParts`.
+- Implement `AiToolCall` and `AiApprovalRequest`.
+- Decide whether `AiComposer` adds enough behavior beyond `Form` + `TextArea`; if not, ship it as a documented recipe instead of a component.
+- Keep all data host-owned through props/events.
+- Add component tests for empty, loading, streaming, partial markdown, reasoning, sources, tool states, approval decisions, errors, keyboard, and accessibility states.
 
-### Phase 3: Conversation State Container
+### Phase 3: Headless Thread Controller
 
 - Implement `AiThread`.
-- Normalize message/run/tool-call state.
-- Support streaming event application.
-- Expose component APIs for `send`, `cancel`, `appendMessage`, and `clear`.
+- Add normalized event application for messages, runs, tool calls, approvals, generated code, preview state, and errors.
+- Expose XMLUI APIs for `send`, `cancel`, `appendMessage`, `setMessages`, `clear`, `approve`, and `reject`.
+- Provide a fake transport for tests and demo.
 
-### Phase 4: Tools, Approvals, And Artifacts
+### Phase 4: XMLUI Generation Client State
 
-- Implement `AiToolCallList`, `AiToolCall`, `AiApprovalRequest`, `AiArtifactPanel`, and `AiPatchViewer`.
-- Define event payload contracts for approvals and artifact actions.
-- Add snapshot-like tests for event normalization and edge states.
+- Implement `XmluiGenerationSession` or equivalent `AiThread` mode.
+- Port the client-side pieces of A2XMLUI `AgentChat`: generated code state, last working code, selected preview revision, replacement confirmation, status labels, diagnostics, and XMLUI state exposure.
+- Keep repair orchestration server-owned, but display repair progress and final validation results.
+- Port `XmluiCodeView`.
+- Keep model selection, status badges, and replacement confirmation as XMLUI recipe markup unless they need centralized behavior.
 
-### Phase 5: XMLUI Preview Blocks
+### Phase 5: Preview And Workspace
 
-- Implement `XmluiPreviewPane` and `XmluiPreviewToolbar`.
-- Support iframe preview, viewport presets, route changes, refresh APIs, and error display.
-- Add Playwright coverage for responsive preview controls.
+- Port `XmluiPreviewPane` from A2XMLUI.
+- Support direct code preview first.
+- Add optional iframe/URL preview mode later.
+- Preserve compile error, runtime error, warnings, theme, and tone behavior.
+- Add current-vs-last-working preview selection so users can inspect broken generated code and quickly return to the last working app.
+- Add recipe markup for preview toolbar, route/viewport controls, revision selector, diagnostics display, and code/preview tabs instead of dedicated components.
 
-### Phase 6: Provider Adapters Or Recipes
+### Phase 6: Recipes And Promotion Review
 
-- Decide whether provider-specific wiring belongs in this package or in separate packages such as `xmlui-ai-openai`.
-- Provide recipes for backend proxy, local agent bridge, and custom callback integration.
+- Build recipe XMLUI files for transcript, run timeline, session list, model selector, connection status, workspace panel, and saved micro-app list.
+- Wire recipes to contract event shapes through `AiThread` fixture data.
+- Evaluate recipes against the Promotion Gate. Do not promote a recipe unless it satisfies every gate condition.
+- Add tests for approval states, event payloads, and recipe smoke coverage.
+
+### Phase 7: Demos
+
+- Add demo XMLUI apps showing:
+  - `AiThread` with recipe-composed chat,
+  - custom chat with headless controller,
+  - XMLUI generation with preview and code view,
+  - fake bridge events,
+  - approval flow.
 
 ## Open Questions
 
-- Should `AiThread` own network streaming, or should it only consume normalized events supplied by a host `DataSource` or callback?
-- Should model catalogs be static props, extension functions, or fetched through `DataSource`?
-- How should XMLUI represent streaming server-sent events in markup-friendly APIs?
-- Should preview controls be generic iframe blocks or XMLUI-specific app preview blocks?
-- What is the minimum approval model needed for file writes and command execution?
-- Should tool-call payloads be fully visible by default, or hidden behind inspection controls?
+- Should `XmluiGenerationSession` be separate, or should `AiThread` own generation-specific fields through a mode?
+- Should the client accept AI SDK UI message streams directly, normalized contract streams, or both through adapters?
+- How much local XMLUI compile validation belongs in the browser after server-side validation exists?
+- Should `XmluiPreviewPane` default to in-process `StandaloneApp` preview or iframe preview?
+- Should preview revision selection live entirely in `XmluiGenerationSession`, or should `XmluiPreviewPane` own a small local selected-revision state when uncontrolled?
+- Where should shared contract exports live inside `xmlui` while they are incubating?
+- What client events should represent save/reuse of accepted micro-apps without owning the host database?
+- Should saved micro-app browsing ever become a first-class component, or should it remain a host-owned recipe built from micro-app metadata and host data?
+- Are the Promotion Gate thresholds too strict or too loose after the first host integration?
+- Should `AiComposer` be a real component, or should the package only document a `Form` + `TextArea` recipe?
+- What exact `onApprove`, `onReject`, and `onEdit` payload signatures should `AiApprovalRequest` expose once `AiApprovalRequest` contract fields settle?
 
 ## Testing Strategy
 
-- Unit tests for pure event normalization and reducers.
-- Component tests for keyboard navigation, focus management, empty/error/loading states, and event payloads.
-- Accessibility checks for message lists, model selection, session navigation, composer, and approval dialogs.
-- Demo app smoke tests that compose sessions, chat, and preview panes.
-- Provider integration tests should use fake local endpoints rather than real AI provider calls.
+- Unit tests for event reducers and controller state transitions.
+- Component tests for the AI-specific visual primitives: message parts, tool calls, approvals, code view, and preview.
+- Recipe smoke tests for transcript, composer, session list, model picker, connection status, workspace panel, and preview toolbar.
+- Accessibility checks for streaming transcript updates, composer controls, approvals, tool-call disclosure, code view, and preview errors.
+- Demo smoke tests using fake bridge events and no provider calls.
+- No real provider calls in package tests.
