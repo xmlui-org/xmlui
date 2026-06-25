@@ -75,6 +75,17 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
   min-width: 0;
 }
 
+.itemsStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xmlui-gap-Form);
+  width: 100%;
+}
+
+.validationStatusIndicator {
+  display: none;
+}
+
 .input {
   box-sizing: border-box;
   min-width: 16rem;

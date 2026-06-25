@@ -20,6 +20,9 @@ the next step.
   reason.
 - Verify each meaningful change with focused tests and the relevant build or
   metadata command.
+- After each completed step, include `npm --workspace xmlui run test:e2e` in
+  verification. As of June 25, 2026, this E2E command has been optimized in a
+  parallel session and is expected to take about 90 seconds.
 
 ## Completed Work
 
@@ -122,8 +125,18 @@ Active copied-old coverage:
 - `Form.spec.ts`: initial Basic Functionality, `hideButtonRow`, core
   `hideButtonRowUntilDirty`, `enableSubmit`, `data`, inherited item label
   settings, `enabled`, `buttonRowTemplate`, local Events subset, local APIs
-  subset, Context Variables, and the currently active `onValidate Integration`
-  subset.
+  subset, Context Variables, `onValidate Integration`, Submit URL and Method,
+  Accessibility, Theme Variables, Edge Cases, and the initial Original legacy
+  form integration slice. The first deferred legacy integration subgroup is
+  also active: button-row templates, primitive/object/empty-array data inputs,
+  labels/order, REST submit requests, client-side submit blocking, and invisible
+  required fields, backend validation summaries, smart CRUD create submit, and
+  modal-context data URL. The Form API `getData` subgroup is active, including
+  copied-old deep-clone cases that use object spread, `delete`, local
+  declarations, and repeated API calls. The first `FormItem type="items"`
+  slice is active: submit with object child fields, submit with empty nested
+  `bindTo`, nested label width/position, default/custom `gap-Form` spacing,
+  and user-defined component children inside item rows.
 
 Current `onValidate Integration` active cases:
 
@@ -134,18 +147,76 @@ Current `onValidate Integration` active cases:
 - submit is blocked while async validation is in flight and the Save button
   shows `Validating...`;
 - async validation failure blocks submit;
-- validation messages appear in the correct timing order.
+- validation messages appear in the correct timing order;
+- built-in required, length, and pattern validations run before custom
+  `onValidate`;
+- submit-time validation waits for all copied-old multi-field `onValidate`
+  handlers;
+- change-time validation re-runs `onValidate` for each value change;
+- validation state persists independently across fields.
 
 Compatibility support added during this step:
 
 - XMLUI script assignment supports member targets such as
   `testState.sequence = ...`, matching copied-old handler behavior.
+- FormItem forwards length and pattern validation props into form registration;
+  Form validates required, length, and pattern constraints before custom
+  `onValidate`.
+- Form accepts `submitUrl` and `submitMethod`; URL submission defaults to
+  `POST` for new/null data and `PUT` for existing object data.
+- Form metadata and renderer expose `submitUrl`/`submitMethod`, including
+  copied-old lowercase compatibility spellings.
+- Test-bed fixtures include a minimal `apiInterceptor.operations` route
+  shim; `FormDriver` includes `waitForSubmitResponse`.
+- Form values support dot-path `bindTo` reads/writes while preserving flat field
+  names.
+- `FormItem type="select"` and `type="radioGroup"` reuse the Select/RadioGroup
+  option extraction path and preserve copied-old option test IDs.
+- Copied-old malformed Form `data="{invalidJson}"` is normalized in the testbed
+  legacy markup shim so production unresolved-identifier diagnostics remain
+  intact.
+- Runtime XMLUI references include `JSON`, so copied-old handlers such as
+  `args => output = JSON.stringify(args)` work through the normal event path.
+- `swapCancelAndSave` now matches the original built-in button order:
+  Cancel/Save by default, Save/Cancel when swapped.
+- Test `FormDriver` supports legacy label-aware button lookup, Enter-submit
+  from the first form control, and `getSubmitRequest`.
+- `getData()` and `validate().data` return cleaned deep-cloned form data,
+  excluding `noSubmit`, `undefined`, and `__UNBOUND_FIELD__` values.
+- URL string `data` values fetch relative endpoints, populate form values, and
+  reset the dirty/error/cache baseline after load.
+- Backend submit validation responses normalize `issues` into Form summary and
+  field validation status state, including warning severity.
+- The testbed API interceptor supports old-suite `Errors.HttpError`,
+  initialized `$state`, `$requestBody`, `$pathParams`, arrow handlers, and
+  path-parameter route patterns.
+- URL-backed Form `data` is used as the built-in submit URL fallback when
+  `submitUrl` is omitted, matching the original internal `_data_url` behavior.
+- FormItem `initialValue` fills both `undefined` and `null` loaded field values.
+- XMLUI script syntax supports object spread in object literals and unary
+  `delete`; `getData()` is allowed as a compiled expression method call so
+  copied-old Form API handlers can build and mutate cloned data objects.
+- `FormItem type="items"` exposes `addItem`/`removeItem`, renders row children
+  with `$item`/`$itemIndex` context, scopes nested FormItem `bindTo` paths into
+  array items, preserves empty nested `bindTo` as the row value, and uses the
+  component stylesheet `itemsStack` class for item-row spacing.
+- Form dot-path writes preserve and create arrays for numeric path segments
+  such as `arrayItems.0.name`.
+- The App baseline no longer applies the hyphenated `font-size` theme token as
+  the app root CSS `font-size`, preserving copied-old `$space-4`/`gap-Form`
+  behavior under XMLUI's default theme.
+- The testbed fixture supports copied-old `components` sources and compiles
+  them as user-defined components for focused component tests.
+- TextBox direct `bindTo` reads and writes through the current Form context,
+  including scoped `FormItem type="items"` row prefixes used by UDC children.
+- TextBox legacy `data-part-id="input"` now lands on the native input instead
+  of the input wrapper, matching copied-old selectors.
 
 Latest verified P2A state:
 
 - `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
-  - 125 passed
-  - 254 skipped
+  - 212 passed
+  - 167 skipped
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
   - passed
 - `npm --workspace xmlui test`
@@ -154,31 +225,68 @@ Latest verified P2A state:
   - passed
 - `npm --workspace xmlui run compatibility:css-module-import-audit`
   - passed
+- `npm --workspace xmlui run test:e2e`
+  - 2800 passed
+  - 2144 skipped
 
 ## Next Step
 
-### NEXT: P2A Form Core - Built-In/Custom `onValidate` Order
+### NEXT: P2A Form Core - Form Persistence, dataAfterSubmit, Sticky Rows, and Value Preservation
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: P2A Form Core -
-> Built-In/Custom `onValidate` Order**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: P2A Form Core - Form
+> Persistence, dataAfterSubmit, Sticky Rows, and Value Preservation**.
 
-Task:
+Current handoff state:
 
-1. Inspect the copied-old test in
-   `xmlui/src/components/Form/Form.spec.ts`:
-   `onValidate with built-in validations run in correct order for multiple
-   fields`.
+- This is the next executable step. A new session receiving "Go on with the
+  next step" should start here.
+- Do not restart earlier Form work. The latest verified P2A state above is the
+  baseline.
+- There are unrelated dirty worktree files, including standalone sample
+  `xmlui-latest.js` outputs and prior component/runtime edits. Do not revert
+  files unless the user explicitly asks.
+- Playwright/E2E may need unsandboxed execution because local dev-server
+  binding can fail in the sandbox.
+
+Completed immediately before this marker:
+
+- Activated the copied-old `FormItem type="items"` follow-up slice:
+  `submit with type 'items'`, `submit with type 'items', empty bindTo`,
+  nested `labelWidth`, nested `labelPosition`, default/custom `gap-Form`
+  spacing, and UDC children with scoped row `bindTo`.
+- Added the `type="items"` row API/rendering path, array-preserving form path
+  writes, testbed UDC registration, TextBox scoped direct `bindTo`, and the app
+  baseline font-size compatibility fix required by default row spacing.
+
+Step goal:
+
+Activate the next coherent copied-old Form subgroup after the completed
+`type="items"` follow-ups. Recommended order:
+
+1. Inspect copied-old persistence, `dataAfterSubmit`, sticky button row, and
+   value-preservation cases.
+2. Choose one narrow prerequisite subgroup and activate only tests covered by
+   that subgroup.
+3. Keep unrelated FormItem/FormSegment closure work deferred.
+
+Task checklist:
+
+1. Inspect the remaining skipped copied-old tests in
+   `xmlui/src/components/Form/Form.spec.ts`, especially persistence,
+   `dataAfterSubmit`, sticky button row, and value preservation.
 2. Compare with the original test/source under
    `/Users/dotneteer/source/xmlui/xmlui/src/components/Form`.
-3. Activate only that test or a narrowly named subgroup around it.
-4. Preserve the remaining deferred `onValidate` tests until their prerequisites
-   are implemented.
+3. Choose one narrow, coherent prerequisite subgroup and activate only the tests
+   covered by that subgroup.
+4. Preserve unrelated deferred Form tests until their prerequisites are
+   implemented.
 5. Make the smallest compatibility change required.
 6. Run focused Playwright for the activated test.
 7. Run the P2A Form cluster.
-8. Run TypeScript, unit tests, metadata build, and CSS module import audit.
+8. Run TypeScript, unit tests, metadata build, CSS module import audit, and
+   `npm --workspace xmlui run test:e2e`.
 9. Update this plan with the result and move this NEXT marker forward.
 
 Likely files:
@@ -186,32 +294,63 @@ Likely files:
 - `xmlui/src/components/Form/Form.spec.ts`
 - `xmlui/src/components/Form/FormReact.tsx`
 - `xmlui/src/components/Form/FormContext.tsx`
-- `xmlui/src/components/FormItem/FormItemReact.tsx`
-- `xmlui/src/compiler/scriptSemantics.ts`
-- `xmlui/src/compiler/codegen/script.ts`
-- `xmlui/src/parser/script/parser.ts`
+- `xmlui/src/components/App/AppReact.tsx`
+- `xmlui/src/components/TextBox/TextBoxReact.tsx`
+- `xmlui/src/components/TextBox/TextBox.renderer.tsx`
+- `xmlui/src/testing/ComponentDrivers.ts`
+- `xmlui/src/testing/fixtures.ts`
+
+Original-reference paths:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Form`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FormItem`
+- `/Users/dotneteer/source/xmlui/xmlui/src/parsers`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components-core`
+
+Verification commands:
+
+- Focused Playwright for each activated test, for example:
+  `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts -g "Form persistence|dataAfterSubmit|stickyButtonRow|Value preservation"`
+- P2A Form cluster:
+  `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+- TypeScript:
+  `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+- Unit tests:
+  `npm --workspace xmlui test`
+- Metadata:
+  `npm --workspace xmlui run build:metadata`
+- CSS audit:
+  `npm --workspace xmlui run compatibility:css-module-import-audit`
+- Full E2E after the completed step:
+  `npm --workspace xmlui run test:e2e`
 
 ## Remaining Work In Sequence
 
 ### 1. Finish P2A: Form Core
 
+Completed in this P2A phase:
+
+- Submit URL and method.
+- Accessibility.
+- Theme variables and validation display styling.
+- Edge cases.
+- Original legacy form integration initial slice.
+- Deferred original legacy form integration active subgroup.
+- Form API `getData` deep clone/filtering and `noSubmit`.
+- Async URL-backed Form `data` and undefined/null field initialization.
+- Backend validation summary mapping.
+- Smart CRUD create submit response.
+- Modal-context data URL and data URL submit fallback.
+- Copied-old Form API script syntax prerequisites for object spread, `delete`,
+  and repeated `getData()` calls.
+- First `FormItem type="items"` slice: add/submit, empty nested `bindTo`,
+  nested label inheritance, default/custom gap spacing, and UDC children.
+
 Continue activating copied-old Form/FormItem/FormSegment tests by feature group:
 
-1. `onValidate with built-in validations run in correct order for multiple
-   fields`.
-2. `multiple fields with onValidate complete before form submission completes`.
-3. `changing field value re-triggers onValidate in real-time`.
-4. `onValidate validation state persists across field changes`.
-5. Submit URL and method.
-6. Accessibility.
-7. Theme variables and validation display styling.
-8. Edge cases.
-9. Original legacy form integration tests.
-10. Form API `getData` deep clone/filtering and `noSubmit`.
-11. Persistence, `dataAfterSubmit`, sticky button row, value preservation, and
-    `type="items"` UDC cases.
-12. Remaining FormItem validation/type/accessibility/theme/edge cases.
-13. Remaining FormSegment scoped context, discovery, layout, APIs, and dirty
+1. Persistence, `dataAfterSubmit`, sticky button row, and value preservation.
+3. Remaining FormItem validation/type/accessibility/theme/edge cases.
+4. Remaining FormSegment scoped context, discovery, layout, APIs, and dirty
     state.
 
 ### 2. P2B: Structured Form Controls

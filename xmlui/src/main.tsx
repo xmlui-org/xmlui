@@ -259,19 +259,60 @@ if (params.has("__xmluiTestBed")) {
   let testBedRenderKey = 0;
 
   const compileTestBedModule = (source: string): Extract<XmluiModule, { kind: "app" }> => {
+    const componentSources = readTestBedComponentSources();
+    const knownComponents = componentSources.map((componentSource, index) => {
+      const compiled = compileXmluiSource({
+        id: `testbed-component-${index}.xmlui`,
+        source: componentSource,
+        extensions: [counterBadgeExtension],
+        validateComponentReferences: false,
+      });
+      if (compiled.runtimeDocument.kind !== "component") {
+        throw new Error("Test bed component sources must compile to component modules.");
+      }
+      return compiled.runtimeDocument.name;
+    });
+    const components = componentSources.map((componentSource, index) => {
+      const compiled = compileXmluiSource({
+        id: `testbed-component-${index}.xmlui`,
+        source: componentSource,
+        knownComponents,
+        extensions: [counterBadgeExtension],
+      });
+      throwFirstCompilerDiagnostic(compiled);
+      return createXmluiModule(compiled.runtimeDocument, [], {
+        extensions: [counterBadgeExtension],
+      });
+    });
     const compiled = compileXmluiSource({
       id: "testbed.xmlui",
       source,
+      knownComponents,
       extensions: [counterBadgeExtension],
     });
     throwFirstCompilerDiagnostic(compiled);
-    const module = createXmluiModule(compiled.runtimeDocument, [], {
+    const module = createXmluiModule(compiled.runtimeDocument, components, {
       extensions: [counterBadgeExtension],
     });
     if (module.kind !== "app") {
       throw new Error("Test bed source must compile to an app module.");
     }
     return module;
+  };
+
+  const readTestBedComponentSources = (): string[] => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedComponents");
+    if (!raw) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((item): item is string => typeof item === "string")
+        : [];
+    } catch {
+      return [];
+    }
   };
 
   const showTestBedError = (error: unknown): void => {

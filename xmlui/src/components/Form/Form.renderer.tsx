@@ -28,6 +28,8 @@ export const formRenderer = wrapComponent({
         hideButtonRow={adapter.booleanProp("hideButtonRow", false)}
         hideButtonRowUntilDirty={adapter.booleanProp("hideButtonRowUntilDirty", false)}
         enableSubmit={adapter.booleanProp("enableSubmit", true)}
+        submitUrl={adapter.stringProp("submitUrl") ?? adapter.stringProp("submiturl")}
+        submitMethod={adapter.stringProp("submitMethod") ?? adapter.stringProp("submitmethod")}
         itemLabelPosition={adapter.stringProp("itemLabelPosition")}
         itemLabelWidth={adapter.prop("itemLabelWidth")}
         itemLabelBreak={
@@ -36,6 +38,7 @@ export const formRenderer = wrapComponent({
             : undefined
         }
         itemRequireLabelMode={adapter.stringProp("itemRequireLabelMode")}
+        swapCancelAndSave={adapter.booleanProp("swapCancelAndSave", false)}
         buttonRowTemplate={buttonRowTemplate}
         className={adapter.className}
         style={adapter.style}

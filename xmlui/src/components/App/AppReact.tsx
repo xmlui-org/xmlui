@@ -124,7 +124,7 @@ function appBaselineStyle(themeVariables: Record<string, unknown>): CSSPropertie
     color: themeValue(themeVariables, "textColor") ?? themeValue(themeVariables, "textColor-primary"),
     fontFamily: themeValue(themeVariables, "fontFamily"),
     fontFeatureSettings: themeValue(themeVariables, "font-feature-settings"),
-    fontSize: themeValue(themeVariables, "font-size") ?? themeValue(themeVariables, "fontSize"),
+    fontSize: themeValue(themeVariables, "fontSize"),
     fontWeight: themeValue(themeVariables, "fontWeight"),
     letterSpacing: themeValue(themeVariables, "letterSpacing"),
     lineHeight: themeValue(themeVariables, "lineHeight"),

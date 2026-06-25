@@ -2088,221 +2088,227 @@ test.describe("Basic Functionality", () => {
       });
     });
 
-    test.describe.skip("deferred onValidate built-in validation cases", () => {
+    test.describe("onValidate built-in validation order", () => {
       test("onValidate with built-in validations run in correct order for multiple fields", async ({
         initTestBed,
         createFormDriver,
         createFormItemDriver,
       }) => {
         await initTestBed(`
-        <Form>
-          <FormItem
-            testId="field1"
-            label="Field 1"
-            bindTo="field1"
-            required="true"
-            requiredInvalidMessage="Field 1 required"
-            minLength="5"
-            lengthInvalidMessage="Field 1 too short"
-            validationMode="onChanged"
-            onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 1 needs test', severity: 'error' })"
-          />
-          <FormItem
-            testId="field2"
-            label="Field 2"
-            bindTo="field2"
-            required="true"
-            requiredInvalidMessage="Field 2 required"
-            pattern="email"
-            patternInvalidMessage="Field 2 needs valid email"
-            validationMode="onChanged"
-            onValidate="value => ({ isValid: value && value.endsWith('.com'), invalidMessage: 'Field 2 needs .com', severity: 'error' })"
-          />
-        </Form>
-      `);
+          <Form>
+            <FormItem
+              testId="field1"
+              label="Field 1"
+              bindTo="field1"
+              required="true"
+              requiredInvalidMessage="Field 1 required"
+              minLength="5"
+              lengthInvalidMessage="Field 1 too short"
+              validationMode="onChanged"
+              onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 1 needs test', severity: 'error' })"
+            />
+            <FormItem
+              testId="field2"
+              label="Field 2"
+              bindTo="field2"
+              required="true"
+              requiredInvalidMessage="Field 2 required"
+              pattern="email"
+              patternInvalidMessage="Field 2 needs valid email"
+              validationMode="onChanged"
+              onValidate="value => ({ isValid: value && value.endsWith('.com'), invalidMessage: 'Field 2 needs .com', severity: 'error' })"
+            />
+          </Form>
+        `);
 
-      const formDriver = await createFormDriver();
-      const field1Driver = await createFormItemDriver("field1");
-      const field2Driver = await createFormItemDriver("field2");
+        const formDriver = await createFormDriver();
+        const field1Driver = await createFormItemDriver("field1");
+        const field2Driver = await createFormItemDriver("field2");
 
-      // Submit with empty fields - should show required errors only
-      await formDriver.submitForm();
-      await expect(field1Driver.component).toContainText("Field 1 required");
-      await expect(field2Driver.component).toContainText("Field 2 required");
+        // Submit with empty fields - should show required errors only
+        await formDriver.submitForm();
+        await expect(field1Driver.component).toContainText("Field 1 required");
+        await expect(field2Driver.component).toContainText("Field 2 required");
 
-      // Fill field1 with short value - should show length error
-      await field1Driver.textBox.fill("abc");
-      await expect(field1Driver.component).toContainText("Field 1 too short");
+        // Fill field1 with short value - should show length error
+        await field1Driver.textBox.fill("abc");
+        await expect(field1Driver.component).toContainText("Field 1 too short");
 
-      // Fill field1 with long value without 'test' - should show custom validation error
-      await field1Driver.textBox.fill("abcdef");
-      await expect(field1Driver.component).not.toContainText("Field 1 too short");
-      await expect(field1Driver.component).toContainText("Field 1 needs test");
+        // Fill field1 with long value without 'test' - should show custom validation error
+        await field1Driver.textBox.fill("abcdef");
+        await expect(field1Driver.component).not.toContainText("Field 1 too short");
+        await expect(field1Driver.component).toContainText("Field 1 needs test");
 
-      // Fill field2 with invalid email - should show pattern error
-      await field2Driver.textBox.fill("notanemail");
-      await expect(field2Driver.component).toContainText("Field 2 needs valid email");
+        // Fill field2 with invalid email - should show pattern error
+        await field2Driver.textBox.fill("notanemail");
+        await expect(field2Driver.component).toContainText("Field 2 needs valid email");
 
-      // Fill field2 with valid email without .com - should show custom validation error
-      await field2Driver.textBox.fill("test@example.org");
-      await expect(field2Driver.component).not.toContainText("Field 2 needs valid email");
-      await expect(field2Driver.component).toContainText("Field 2 needs .com");
+        // Fill field2 with valid email without .com - should show custom validation error
+        await field2Driver.textBox.fill("test@example.org");
+        await expect(field2Driver.component).not.toContainText("Field 2 needs valid email");
+        await expect(field2Driver.component).toContainText("Field 2 needs .com");
+      });
     });
 
-    test("multiple fields with onValidate complete before form submission completes", async ({
-      initTestBed,
-      createFormDriver,
-    }) => {
-      const { testStateDriver } = await initTestBed(`
-        <Form
-          data="{{ field1: 'valid1', field2: 'valid2', field3: 'valid3' }}">
-          <FormItem
-            testId="field1"
-            label="Field 1"
-            bindTo="field1"
-            customValidationsDebounce="100"
-            onValidate="value => {
-              if (testState === null) {
-                testState = { field1Done: false, field2Done: false, field3Done: false };
-              }
-              testState.field1Done = true;
-              return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field1', severity: 'error' }
-            }"
-          />
-          <FormItem
-            testId="field2"
-            label="Field 2"
-            bindTo="field2"
-            customValidationsDebounce="100"
-            onValidate="value => {
-              if (testState === null) {
-                testState = { field1Done: false, field2Done: false, field3Done: false };
-              }
-              testState.field2Done = true;
-              return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field2', severity: 'error' }
-            }"
-          />
-          <FormItem
-            testId="field3"
-            label="Field 3"
-            bindTo="field3"
-            customValidationsDebounce="100"
-            onValidate="value => {
-              if (testState === null) {
-                testState = { field1Done: false, field2Done: false, field3Done: false };
-              }
-              testState.field3Done = true;
-              return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field3', severity: 'error' }
-            }"
-          />
-        </Form>
-      `);
+    test.describe("onValidate multi-field async completion", () => {
+      test("multiple fields with onValidate complete before form submission completes", async ({
+        initTestBed,
+        createFormDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'valid1', field2: 'valid2', field3: 'valid3' }}">
+            <FormItem
+              testId="field1"
+              label="Field 1"
+              bindTo="field1"
+              customValidationsDebounce="100"
+              onValidate="value => {
+                if (testState === null) {
+                  testState = { field1Done: false, field2Done: false, field3Done: false };
+                }
+                testState.field1Done = true;
+                return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field1', severity: 'error' }
+              }"
+            />
+            <FormItem
+              testId="field2"
+              label="Field 2"
+              bindTo="field2"
+              customValidationsDebounce="100"
+              onValidate="value => {
+                if (testState === null) {
+                  testState = { field1Done: false, field2Done: false, field3Done: false };
+                }
+                testState.field2Done = true;
+                return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field2', severity: 'error' }
+              }"
+            />
+            <FormItem
+              testId="field3"
+              label="Field 3"
+              bindTo="field3"
+              customValidationsDebounce="100"
+              onValidate="value => {
+                if (testState === null) {
+                  testState = { field1Done: false, field2Done: false, field3Done: false };
+                }
+                testState.field3Done = true;
+                return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field3', severity: 'error' }
+              }"
+            />
+          </Form>
+        `);
 
-      const formDriver = await createFormDriver();
+        const formDriver = await createFormDriver();
 
-      // Submit form
-      await formDriver.submitForm();
+        // Submit form
+        await formDriver.submitForm();
 
-      // Wait for all validations to complete and form to save
-      await expect
-        .poll(
-          async () => {
-            const state = await testStateDriver.testState();
-            return state?.field1Done && state?.field2Done && state?.field3Done;
-          },
-          { timeout: 2000 },
-        )
-        .toBe(true);
+        // Wait for all validations to complete and form to save
+        await expect
+          .poll(
+            async () => {
+              const state = await testStateDriver.testState();
+              return state?.field1Done && state?.field2Done && state?.field3Done;
+            },
+            { timeout: 2000 },
+          )
+          .toBe(true);
+      });
     });
 
-    test("changing field value re-triggers onValidate in real-time", async ({
-      initTestBed,
-      createFormItemDriver,
-      createTextBoxDriver,
-    }) => {
-      const { testStateDriver } = await initTestBed(`
-        <Form>
-          <FormItem
-            testId="field1"
-            label="Field 1"
-            bindTo="field1"
-            validationMode="onChanged"
-            onValidate="value => {
-              if (testState === null) {
-                testState = { validationCount: 0, lastValue: null };
-              }
-              testState.validationCount = testState.validationCount + 1;
-              testState.lastValue = value;
-              return { isValid: value && value.length >= 3, invalidMessage: 'Too short', severity: 'error' };
-            }"
-          />
-        </Form>
-      `);
+    test.describe("onValidate real-time re-trigger", () => {
+      test("changing field value re-triggers onValidate in real-time", async ({
+        initTestBed,
+        createFormItemDriver,
+        createTextBoxDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form>
+            <FormItem
+              testId="field1"
+              label="Field 1"
+              bindTo="field1"
+              validationMode="onChanged"
+              onValidate="value => {
+                if (testState === null) {
+                  testState = { validationCount: 0, lastValue: null };
+                }
+                testState.validationCount = testState.validationCount + 1;
+                testState.lastValue = value;
+                return { isValid: value && value.length >= 3, invalidMessage: 'Too short', severity: 'error' };
+              }"
+            />
+          </Form>
+        `);
 
-      const field1Driver = await createFormItemDriver("field1");
-      const input1 = await createTextBoxDriver(field1Driver.input);
+        const field1Driver = await createFormItemDriver("field1");
+        const input1 = await createTextBoxDriver(field1Driver.input);
 
-      // Type multiple times
-      await input1.field.fill("a");
-      await expect.poll(async () => (await testStateDriver.testState())?.lastValue).toEqual("a");
+        // Type multiple times
+        await input1.field.fill("a");
+        await expect.poll(async () => (await testStateDriver.testState())?.lastValue).toEqual("a");
 
-      await input1.field.fill("ab");
-      await expect.poll(async () => (await testStateDriver.testState())?.lastValue).toEqual("ab");
+        await input1.field.fill("ab");
+        await expect.poll(async () => (await testStateDriver.testState())?.lastValue).toEqual("ab");
 
-      await input1.field.fill("abc");
-      await expect.poll(async () => (await testStateDriver.testState())?.lastValue).toEqual("abc");
+        await input1.field.fill("abc");
+        await expect.poll(async () => (await testStateDriver.testState())?.lastValue).toEqual("abc");
 
-      // Validation should have run multiple times
-      const state = await testStateDriver.testState();
-      expect(state?.validationCount).toBeGreaterThan(2);
+        // Validation should have run multiple times
+        const state = await testStateDriver.testState();
+        expect(state?.validationCount).toBeGreaterThan(2);
+      });
     });
 
-    test("onValidate validation state persists across field changes", async ({
-      initTestBed,
-      createFormItemDriver,
-      createTextBoxDriver,
-    }) => {
-      await initTestBed(`
-        <Form>
-          <FormItem
-            testId="field1"
-            label="Field 1"
-            bindTo="field1"
-            validationMode="onChanged"
-            onValidate="value => ({ isValid: value && value.length >= 5, invalidMessage: 'Field 1: minimum 5 chars', severity: 'error' })"
-          />
-          <FormItem
-            testId="field2"
-            label="Field 2"
-            bindTo="field2"
-            validationMode="onChanged"
-            onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 2: must contain test', severity: 'error' })"
-          />
-        </Form>
-      `);
+    test.describe("onValidate state persistence", () => {
+      test("onValidate validation state persists across field changes", async ({
+        initTestBed,
+        createFormItemDriver,
+        createTextBoxDriver,
+      }) => {
+        await initTestBed(`
+          <Form>
+            <FormItem
+              testId="field1"
+              label="Field 1"
+              bindTo="field1"
+              validationMode="onChanged"
+              onValidate="value => ({ isValid: value && value.length >= 5, invalidMessage: 'Field 1: minimum 5 chars', severity: 'error' })"
+            />
+            <FormItem
+              testId="field2"
+              label="Field 2"
+              bindTo="field2"
+              validationMode="onChanged"
+              onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 2: must contain test', severity: 'error' })"
+            />
+          </Form>
+        `);
 
-      const field1Driver = await createFormItemDriver("field1");
-      const field2Driver = await createFormItemDriver("field2");
-      const input1 = await createTextBoxDriver(field1Driver.input);
-      const input2 = await createTextBoxDriver(field2Driver.input);
+        const field1Driver = await createFormItemDriver("field1");
+        const field2Driver = await createFormItemDriver("field2");
+        const input1 = await createTextBoxDriver(field1Driver.input);
+        const input2 = await createTextBoxDriver(field2Driver.input);
 
-      // Make field1 invalid
-      await input1.field.fill("abc");
-      await expect(field1Driver.component).toContainText("Field 1: minimum 5 chars");
+        // Make field1 invalid
+        await input1.field.fill("abc");
+        await expect(field1Driver.component).toContainText("Field 1: minimum 5 chars");
 
-      // Make field2 invalid
-      await input2.field.fill("xyz");
-      await expect(field2Driver.component).toContainText("Field 2: must contain test");
+        // Make field2 invalid
+        await input2.field.fill("xyz");
+        await expect(field2Driver.component).toContainText("Field 2: must contain test");
 
-      // Both errors should persist
-      await expect(field1Driver.component).toContainText("Field 1: minimum 5 chars");
-      await expect(field2Driver.component).toContainText("Field 2: must contain test");
+        // Both errors should persist
+        await expect(field1Driver.component).toContainText("Field 1: minimum 5 chars");
+        await expect(field2Driver.component).toContainText("Field 2: must contain test");
 
-      // Fix field1, field2 error should still show
-      await input1.field.fill("abcdef");
-      await expect(field1Driver.component).not.toContainText("Field 1: minimum 5 chars");
-      await expect(field2Driver.component).toContainText("Field 2: must contain test");
-    });
+        // Fix field1, field2 error should still show
+        await input1.field.fill("abcdef");
+        await expect(field1Driver.component).not.toContainText("Field 1: minimum 5 chars");
+        await expect(field2Driver.component).toContainText("Field 2: must contain test");
+      });
     });
   });
 
@@ -2310,7 +2316,7 @@ test.describe("Basic Functionality", () => {
   // SUBMIT URL AND METHOD TESTS
   // =============================================================================
 
-  test.describe.skip("Submit URL and Method", () => {
+  test.describe("Submit URL and Method", () => {
     test("submits to custom URL with POST method (new date)", async ({
       initTestBed,
       createFormDriver,
@@ -2395,7 +2401,7 @@ test.describe("Basic Functionality", () => {
 // ACCESSIBILITY TESTS
 // =============================================================================
 
-test.describe.skip("Accessibility", () => {
+test.describe("Accessibility", () => {
   test("form has correct semantic role", async ({ initTestBed, page }) => {
     await initTestBed(`<Form/>`);
     await expect(page.locator("form")).toBeVisible();
@@ -2462,7 +2468,7 @@ test.describe.skip("Accessibility", () => {
 // THEME VARIABLE TESTS
 // =============================================================================
 
-test.describe.skip("Theme Variables", () => {
+test.describe("Theme Variables", () => {
   test("applies custom gap theme variable", async ({ initTestBed, createFormDriver }) => {
     await initTestBed(`<Form testId="form"/>`, {
       testThemeVars: {
@@ -2516,7 +2522,7 @@ test.describe.skip("Theme Variables", () => {
 // EDGE CASES TESTS
 // =============================================================================
 
-test.describe.skip("Edge Cases", () => {
+test.describe("Edge Cases", () => {
   test("handles form without any form items", async ({ initTestBed, createFormDriver }) => {
     await initTestBed(`<Form testId="form"/>`);
     const driver = await createFormDriver("form");
@@ -2707,7 +2713,7 @@ test.describe.skip("Edge Cases", () => {
 // ORIGINAL TEST SUITE (LEGACY TESTS)
 // =============================================================================
 
-test.describe.skip("Original legacy form integration tests", () => {
+test.describe("Original legacy form integration tests", () => {
 test("mock service responds", async ({ initTestBed, createFormDriver }) => {
   await initTestBed(
     `
@@ -2809,6 +2815,7 @@ test("submit with unbound fields", async ({ page, initTestBed, createFormDriver 
   await expect(page.getByTestId("text")).toHaveText('{"firstname":"James"}');
 });
 
+test.describe("deferred legacy Form integration cases", () => {
 test(`submit with type 'items'`, async ({
   initTestBed,
   createFormDriver,
@@ -3380,7 +3387,7 @@ test("field-related errors map to correct FormItems", async ({
   );
 });
 
-test.skip("field-related errors disappear if user updates FormItems", async ({
+test("field-related errors disappear if user updates FormItems", async ({
   initTestBed,
   page,
   createFormItemDriver,
@@ -3388,7 +3395,7 @@ test.skip("field-related errors disappear if user updates FormItems", async ({
   await initTestBed(
     `
       <Form testId="form">
-        <FormItem testId="testField" bindTo="test" label="test" required />
+        <FormItem testId="testField" bindTo="test" label="test" required="true" />
         <FormItem testId="testField2" bindTo="test2" label="test2" />
       </Form>`,
   );
@@ -3566,6 +3573,7 @@ test("can submit with invisible required field", async ({
   await expect.poll(testStateDriver.testState).toEqual(true);
 });
 });
+});
 
 // =============================================================================
 // BEHAVIORS AND PARTS TESTS
@@ -3610,7 +3618,7 @@ test.describe.skip("Behaviors and Parts", () => {
 // API TESTS
 // =============================================================================
 
-test.describe.skip("Api", () => {
+test.describe("Api", () => {
   test("getData returns a copy of current form data", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
@@ -4853,7 +4861,7 @@ test.describe.skip("Value preservation across unmount/remount", () => {
 
 // --- FormItem type="items" with UDC children
 
-test.describe.skip("FormItem type='items' with UDC children", () => {
+test.describe("FormItem type='items' with UDC children", () => {
 test(`bindTo inside a UDC rendered inside FormItem type='items' reads item data`, async ({
   initTestBed,
   page,

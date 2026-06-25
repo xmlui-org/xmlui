@@ -1,4 +1,7 @@
-import { wrapComponent } from "../../runtime/rendering/adapter";
+import { wrapComponent, nonPropertyChildren } from "../../runtime/rendering/adapter";
+import { createRuntimeScope } from "../../runtime/state";
+import { radioOptions } from "../RadioGroup/RadioGroup";
+import { selectOptions } from "../Select/Select";
 import { FormItemMd } from "./FormItem";
 import { FormItem } from "./FormItemReact";
 
@@ -6,6 +9,8 @@ export const formItemRenderer = wrapComponent({
   name: "FormItem",
   metadata: FormItemMd,
   renderer({ adapter }) {
+    const type = adapter.stringProp("type", "text");
+    const itemTemplate = nonPropertyChildren(adapter.node.children);
     return (
       <FormItem
         {...adapter.rootAttrs()}
@@ -21,18 +26,50 @@ export const formItemRenderer = wrapComponent({
         }
         enabled={adapter.booleanProp("enabled", true)}
         autoFocus={adapter.booleanProp("autoFocus", false)}
-        type={adapter.stringProp("type", "text")}
+        type={type}
         initialValue={adapter.prop("initialValue")}
         required={adapter.booleanProp("required", false)}
         requireLabelMode={adapter.stringProp("requireLabelMode")}
         requiredInvalidMessage={adapter.stringProp("requiredInvalidMessage")}
+        minLength={adapter.numberProp("minLength")}
+        lengthInvalidMessage={adapter.stringProp("lengthInvalidMessage")}
+        pattern={adapter.stringProp("pattern")}
+        patternInvalidMessage={adapter.stringProp("patternInvalidMessage")}
+        noSubmit={adapter.booleanProp("noSubmit", false)}
         validationMode={adapter.stringProp("validationMode")}
         customValidationsDebounce={adapter.numberProp("customValidationsDebounce", 0)}
         onValidate={(value) => adapter.event("validate")(value)}
+        options={
+          type === "select"
+            ? selectOptions(adapter)
+            : type === "radioGroup"
+              ? radioOptions(adapter)
+              : undefined
+        }
+        registerComponentApi={adapter.registerApi}
+        renderItemTemplate={
+          type === "items"
+            ? (contextVars) => {
+                const itemScope = createRuntimeScope({
+                  store: adapter.scope.store,
+                  parent: adapter.scope,
+                  props: adapter.scope.props,
+                  contextValues: contextVars,
+                  references: adapter.scope.references,
+                  slots: adapter.scope.slots,
+                  routing: adapter.scope.routing,
+                  toast: adapter.scope.toast,
+                  emitEvent: adapter.scope.emitEvent,
+                  extensionFunctions: adapter.scope.extensionFunctions,
+                });
+                return adapter.context.renderChildren(itemTemplate, itemScope);
+              }
+            : undefined
+        }
         className={adapter.className}
         style={adapter.style}
       >
-        {adapter.node.children.length > 0 ? adapter.renderChildren() : undefined}
+        {type !== "items" && adapter.node.children.length > 0 ? adapter.renderChildren() : undefined}
       </FormItem>
     );
   },

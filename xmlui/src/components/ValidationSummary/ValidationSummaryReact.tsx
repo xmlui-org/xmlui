@@ -27,7 +27,7 @@ export function ValidationSummary({
 }: ValidationSummaryProps) {
   const form = useFormContext();
   const issues = [
-    ...issuesFromFormErrors(form?.errors),
+    ...(form?.issues.length ? form.issues : issuesFromFormErrors(form?.errors)),
     ...issuesFromFieldValidationResults(fieldValidationResults),
     ...issuesFromGeneralValidationResults(generalValidationResults),
   ];
@@ -135,4 +135,3 @@ function normalizeValidationResult(value: unknown, field?: string): ValidationIs
 function cx(...classes: Array<string | undefined | false>): string {
   return classes.filter(Boolean).join(" ");
 }
-

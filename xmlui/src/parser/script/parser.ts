@@ -17,6 +17,7 @@ import {
   type MemberExpressionNode,
   type ObjectExpressionNode,
   type ObjectPropertyNode,
+  type ObjectSpreadPropertyNode,
   type ParseScriptOptions,
   type ParseScriptResult,
   type PostfixExpressionNode,
@@ -393,6 +394,7 @@ class ScriptParser {
       case ScriptTokenKind.Exclamation:
       case ScriptTokenKind.Plus:
       case ScriptTokenKind.Minus:
+      case ScriptTokenKind.DeleteKeyword:
         return this.createUnaryExpression(this.consume(), this.parseExpression(10));
       case ScriptTokenKind.PlusPlus:
       case ScriptTokenKind.MinusMinus:
@@ -454,7 +456,7 @@ class ScriptParser {
 
   private parseObjectExpression(): ObjectExpressionNode {
     const open = this.consume(ScriptTokenKind.OpenBrace);
-    const properties: ObjectPropertyNode[] = [];
+    const properties: Array<ObjectPropertyNode | ObjectSpreadPropertyNode> = [];
 
     while (!this.at(ScriptTokenKind.EndOfFile) && !this.at(ScriptTokenKind.CloseBrace)) {
       properties.push(this.parseObjectProperty());
@@ -480,7 +482,15 @@ class ScriptParser {
     }) as ObjectExpressionNode;
   }
 
-  private parseObjectProperty(): ObjectPropertyNode {
+  private parseObjectProperty(): ObjectPropertyNode | ObjectSpreadPropertyNode {
+    if (this.at(ScriptTokenKind.Ellipsis)) {
+      const spread = this.consume();
+      const argument = this.parseExpression();
+      return this.node("ObjectSpreadProperty", spread, argument.endToken, [argument], {
+        argument,
+      }) as ObjectSpreadPropertyNode;
+    }
+
     const key = this.parseObjectKey();
     if (this.at(ScriptTokenKind.Colon)) {
       this.consume();

@@ -134,7 +134,7 @@ export type XmluiBinaryExpressionIr = XmluiScriptIrBase & {
 
 export type XmluiUnaryExpressionIr = XmluiScriptIrBase & {
   kind: "UnaryExpression";
-  operator: "!" | "+" | "-";
+  operator: "!" | "+" | "-" | "delete";
   argument: XmluiScriptIr;
 };
 
@@ -152,11 +152,18 @@ export type XmluiArrayExpressionIr = XmluiScriptIrBase & {
 
 export type XmluiObjectExpressionIr = XmluiScriptIrBase & {
   kind: "ObjectExpression";
-  properties: Array<{
-    key: string;
-    value: XmluiScriptIr;
-    shorthand?: boolean;
-  }>;
+  properties: Array<
+    | {
+        kind: "property";
+        key: string;
+        value: XmluiScriptIr;
+        shorthand?: boolean;
+      }
+    | {
+        kind: "spread";
+        argument: XmluiScriptIr;
+      }
+  >;
 };
 
 export type XmluiCallExpressionIr = XmluiScriptIrBase & {
@@ -525,6 +532,9 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         } else if (current.value.kind === "Identifier") {
           bindIdentifierRead(current.value.name, current.value.span);
         }
+        return;
+      case "ObjectSpreadProperty":
+        visit(current.argument);
         return;
       case "ConditionalExpression":
         visit(current.test);
@@ -1087,11 +1097,19 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       return {
         kind: "ObjectExpression",
         span: node.span,
-        properties: node.properties.map((property) => ({
-          key: objectKeyName(property.key),
-          value: lowerNode(property.value, bound),
-          ...(property.shorthand ? { shorthand: true } : {}),
-        })),
+        properties: node.properties.map((property) =>
+          property.kind === "ObjectSpreadProperty"
+            ? {
+                kind: "spread",
+                argument: lowerNode(property.argument, bound),
+              }
+            : {
+                kind: "property",
+                key: objectKeyName(property.key),
+                value: lowerNode(property.value, bound),
+                ...(property.shorthand ? { shorthand: true } : {}),
+              }
+        ),
       };
     case "ConditionalExpression":
       return {
@@ -1122,7 +1140,7 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       }
       return unsupported(node);
     case "UnaryExpression":
-      if (node.operator === "!" || node.operator === "+" || node.operator === "-") {
+      if (node.operator === "!" || node.operator === "+" || node.operator === "-" || node.operator === "delete") {
         return {
           kind: "UnaryExpression",
           span: node.span,
@@ -1284,7 +1302,7 @@ function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
       return expression.elements.some(expressionContainsSyncUnsafeCall);
     case "ObjectExpression":
       return expression.properties.some((property) =>
-        expressionContainsSyncUnsafeCall(property.value)
+        expressionContainsSyncUnsafeCall(property.kind === "spread" ? property.argument : property.value)
       );
     case "ArrowFunctionExpression":
       return expressionContainsSyncUnsafeCall(expression.body);
@@ -1491,6 +1509,7 @@ function isAllowedMethodName(name: string): boolean {
     "startsWith",
     "endsWith",
     "getFields",
+    "getData",
     "getValue",
     "hasOverflow",
     "open",
@@ -1696,13 +1715,20 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "BinaryExpression":
       return `(${emitExpression(ir.left)} ${ir.operator} ${emitExpression(ir.right)})`;
     case "UnaryExpression":
+      if (ir.operator === "delete") {
+        return emitDeleteExpression(ir.argument);
+      }
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
     case "ArrayExpression":
       return `[${ir.elements.map(emitExpression).join(", ")}]`;
     case "ObjectExpression":
-      return `{${ir.properties.map((property) => `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`).join(", ")}}`;
+      return `{${ir.properties.map((property) =>
+        property.kind === "spread"
+          ? `...${emitExpression(property.argument)}`
+          : `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`
+      ).join(", ")}}`;
     case "CallExpression":
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
@@ -1718,6 +1744,16 @@ function emitExpression(ir: XmluiScriptIr): string {
     default:
       throw new Error(`Cannot compile ${ir.kind} as an XMLUI expression.`);
   }
+}
+
+function emitDeleteExpression(argument: XmluiScriptIr): string {
+  if (argument.kind === "MemberRead") {
+    return `(delete (${emitExpression(argument.object)})[${JSON.stringify(argument.member)}])`;
+  }
+  if (argument.kind === "IndexRead") {
+    return `(delete (${emitExpression(argument.object)})[${emitExpression(argument.index)}])`;
+  }
+  return `(delete (${emitExpression(argument)}))`;
 }
 
 function emitOptionalMemberRead(object: XmluiScriptIr, member: string): string {
@@ -1998,6 +2034,9 @@ function executeExpressionIr(
     case "BinaryExpression":
       return executeBinaryExpression(ir, context, lexical);
     case "UnaryExpression": {
+      if (ir.operator === "delete") {
+        return executeDeleteExpression(ir.argument, context, lexical);
+      }
       const argument = executeExpressionIr(ir.argument, context, lexical);
       if (ir.operator === "!") {
         return !argument;
@@ -2014,12 +2053,13 @@ function executeExpressionIr(
     case "ArrayExpression":
       return ir.elements.map((element) => executeExpressionIr(element, context, lexical));
     case "ObjectExpression":
-      return Object.fromEntries(
-        ir.properties.map((property) => [
-          property.key,
-          executeExpressionIr(property.value, context, lexical),
-        ]),
-      );
+      return ir.properties.reduce<Record<string, unknown>>((result, property) => {
+        if (property.kind === "spread") {
+          return Object.assign(result, executeExpressionIr(property.argument, context, lexical));
+        }
+        result[property.key] = executeExpressionIr(property.value, context, lexical);
+        return result;
+      }, {});
     case "ArrowFunctionExpression":
       return (...args: unknown[]) => {
         const nextLexical = { ...lexical };
@@ -2122,6 +2162,9 @@ async function executeExpressionIrAsync(
     case "BinaryExpression":
       return executeBinaryExpressionAsync(ir, context, lexical);
     case "UnaryExpression": {
+      if (ir.operator === "delete") {
+        return executeDeleteExpressionAsync(ir.argument, context, lexical);
+      }
       const argument = await executeExpressionIrAsync(ir.argument, context, lexical);
       if (ir.operator === "!") {
         return !argument;
@@ -2138,13 +2181,15 @@ async function executeExpressionIrAsync(
     case "ArrayExpression":
       return Promise.all(ir.elements.map((element) => executeExpressionIrAsync(element, context, lexical)));
     case "ObjectExpression": {
-      const entries = await Promise.all(
-        ir.properties.map(async (property) => [
-          property.key,
-          await executeExpressionIrAsync(property.value, context, lexical),
-        ] as const),
-      );
-      return Object.fromEntries(entries);
+      const result: Record<string, unknown> = {};
+      for (const property of ir.properties) {
+        if (property.kind === "spread") {
+          Object.assign(result, await executeExpressionIrAsync(property.argument, context, lexical));
+        } else {
+          result[property.key] = await executeExpressionIrAsync(property.value, context, lexical);
+        }
+      }
+      return result;
     }
     case "CallExpression":
       return executeCallExpressionAsync(ir, context, lexical);
@@ -2410,6 +2455,40 @@ async function executeEventExpression(
   }
 }
 
+function executeDeleteExpression(
+  argument: XmluiScriptIr,
+  context: CompiledExpressionContext,
+  lexical: Record<string, unknown>,
+): boolean {
+  if (argument.kind === "MemberRead") {
+    const object = executeExpressionIr(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    return delete object[argument.member];
+  }
+  if (argument.kind === "IndexRead") {
+    const object = executeExpressionIr(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    const index = executeExpressionIr(argument.index, context, lexical) as PropertyKey;
+    return delete object[index];
+  }
+  return true;
+}
+
+async function executeDeleteExpressionAsync(
+  argument: XmluiScriptIr,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): Promise<boolean> {
+  if (argument.kind === "MemberRead") {
+    const object = await executeExpressionIrAsync(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    return delete object[argument.member];
+  }
+  if (argument.kind === "IndexRead") {
+    const object = await executeExpressionIrAsync(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    const index = await executeExpressionIrAsync(argument.index, context, lexical) as PropertyKey;
+    return delete object[index];
+  }
+  return true;
+}
+
 async function executeAssignmentExpression(
   expression: XmluiAssignmentExpressionIr,
   context: CompiledEventContext,
@@ -2595,7 +2674,9 @@ function isEventMutationExpression(ir: XmluiScriptIr): boolean {
     case "ArrayExpression":
       return ir.elements.some(isEventMutationExpression);
     case "ObjectExpression":
-      return ir.properties.some((property) => isEventMutationExpression(property.value));
+      return ir.properties.some((property) =>
+        isEventMutationExpression(property.kind === "spread" ? property.argument : property.value)
+      );
     case "CallExpression":
       return ir.args.some(isEventMutationExpression);
     case "MemberRead":

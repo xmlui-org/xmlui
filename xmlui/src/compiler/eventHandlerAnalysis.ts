@@ -25,7 +25,9 @@ export function expressionContainsCall(expression: XmluiScriptIr): boolean {
     case "ArrayExpression":
       return expression.elements.some(expressionContainsCall);
     case "ObjectExpression":
-      return expression.properties.some((property) => expressionContainsCall(property.value));
+      return expression.properties.some((property) =>
+        expressionContainsCall(property.kind === "spread" ? property.argument : property.value)
+      );
     case "ArrowFunctionExpression":
       return expressionContainsCall(expression.body);
     case "AssignmentExpression":

@@ -16,6 +16,10 @@ export class ComponentDriver {
     return this.component.evaluate((element) => element.tagName.toLowerCase());
   }
 
+  getText(): Promise<string> {
+    return this.component.textContent().then((text) => text ?? "");
+  }
+
   click = async (options?: Parameters<Locator["click"]>[0]) => {
     await this.component.click(options);
   };
@@ -65,15 +69,47 @@ export class InputComponentDriver extends ComponentDriver {
 
 export class FormDriver extends ComponentDriver {
   get submitButton(): Locator {
-    return this.component.getByRole("button", { name: "Save" });
+    return this.component.getByRole("button", { name: /^(Save|Submit)$/ });
   }
 
   get cancelButton(): Locator {
-    return this.component.getByRole("button", { name: "Cancel" });
+    return this.component.getByRole("button", { name: /^(Cancel|Abort)$/ });
   }
 
-  async submitForm(_mode: "click" | "keypress" = "click") {
+  async submitForm(mode: "click" | "keypress" = "click") {
+    if (mode === "keypress") {
+      await this.component
+        .locator("input, textarea, select, button")
+        .first()
+        .focus({ timeout: 1000 })
+        .catch(() => this.component.focus());
+      await this.params.page.keyboard.press("Enter");
+      return;
+    }
     await this.submitButton.click();
+  }
+
+  waitForSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
+    return this.params.page.waitForResponse(
+      (response) => response.url().includes(endpoint) && response.status() === responseStatus,
+      { timeout },
+    );
+  }
+
+  getValidationSummary(): Locator {
+    return this.params.page.locator("[data-validation-summary]").first();
+  }
+
+  getValidationDisplaysBySeverity(severity: "error" | "warning"): Locator {
+    return this.params.page.locator(`[data-validation-display-severity="${severity}"]`).first();
+  }
+
+  async getSubmitRequest(endpoint: string, method: string, mode: "click" | "keypress" = "click") {
+    const requestPromise = this.params.page.waitForRequest((request) =>
+      request.url().includes(endpoint) && request.method().toLowerCase() === method.toLowerCase()
+    );
+    await this.submitForm(mode);
+    return requestPromise;
   }
 }
 
@@ -96,6 +132,14 @@ export class FormItemDriver extends ComponentDriver {
 
   get error(): Locator {
     return this.getByPartName("error");
+  }
+
+  get validationStatusIndicator(): Locator {
+    return this.getByPartName("validationStatusIndicator");
+  }
+
+  get validationStatusTag(): string {
+    return "data-validation-status";
   }
 }
 

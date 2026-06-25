@@ -4,6 +4,7 @@ export type XmluiOption = {
   value: unknown;
   label: ReactNode;
   enabled: boolean;
+  testId?: string;
   keywords?: string[];
   [key: string]: unknown;
 };

@@ -199,38 +199,6 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
       >
         {displayText}
       </button>
-      {open || readOnly ? (
-        <div
-          id={id ? `${id}__options` : undefined}
-          role="listbox"
-          aria-multiselectable={multiSelect || undefined}
-          className={styles.selectOptions}
-        >
-          {options.map((option, index) => {
-            const optionValue = String(option.value ?? "");
-            const selected = selectedValues.includes(optionValue);
-            return (
-              <button
-                key={`${optionValue}:${index}`}
-                type="button"
-                role="option"
-                aria-selected={selected}
-                aria-disabled={!option.enabled || undefined}
-                disabled={!option.enabled}
-                className={cx(
-                  styles.selectOption,
-                  selected ? styles.selectOptionSelected : undefined,
-                  index === activeIndex ? styles.selectOptionActive : undefined,
-                )}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => selectOption(option)}
-              >
-                {renderOptionLabel(option)}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
       <select
         aria-hidden="true"
         tabIndex={-1}
@@ -253,6 +221,39 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
           </option>
         ))}
       </select>
+      {open || readOnly ? (
+        <div
+          id={id ? `${id}__options` : undefined}
+          role="listbox"
+          aria-multiselectable={multiSelect || undefined}
+          className={styles.selectOptions}
+        >
+          {options.map((option, index) => {
+            const optionValue = String(option.value ?? "");
+            const selected = selectedValues.includes(optionValue);
+            return (
+              <button
+                key={`${optionValue}:${index}`}
+                data-testid={option.testId}
+                type="button"
+                role="option"
+                aria-selected={selected}
+                aria-disabled={!option.enabled || undefined}
+                disabled={!option.enabled}
+                className={cx(
+                  styles.selectOption,
+                  selected ? styles.selectOptionSelected : undefined,
+                  index === activeIndex ? styles.selectOptionActive : undefined,
+                )}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => selectOption(option)}
+              >
+                {renderOptionLabel(option)}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }));

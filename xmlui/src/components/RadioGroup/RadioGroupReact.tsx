@@ -19,6 +19,7 @@ export type RadioGroupOption = {
   value: unknown;
   label: ReactNode;
   enabled: boolean;
+  testId?: string;
 };
 
 export type RadioGroupApi = {
@@ -118,7 +119,12 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
     const checked = Object.is(option.value, currentValue);
     const statusClass = checked ? validationStatusClass(validationStatus) : undefined;
     return (
-      <div className={styles.radioOptionContainer} data-radio-item key={`${String(option.value)}:${index}`}>
+      <div
+        className={styles.radioOptionContainer}
+        data-radio-item
+        data-testid={option.testId}
+        key={`${String(option.value)}:${index}`}
+      >
         <input
           id={inputId}
           className={cx(styles.radioOption, statusClass)}

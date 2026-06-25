@@ -56,6 +56,14 @@ export const FormMd = createMetadata({
       valueType: "boolean",
       defaultValue: true,
     },
+    submitUrl: {
+      description: "URL to submit valid form data to.",
+      valueType: "string",
+    },
+    submitMethod: {
+      description: "HTTP method used when submitting to submitUrl.",
+      valueType: "string",
+    },
     itemLabelPosition: { description: "Default label position for form items.", valueType: "string" },
     itemLabelWidth: { description: "Default label width for form items.", valueType: "length" },
     itemLabelBreak: { description: "Default label break behavior for form items.", valueType: "boolean" },

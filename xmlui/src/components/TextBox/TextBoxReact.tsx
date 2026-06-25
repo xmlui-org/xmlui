@@ -9,6 +9,7 @@ import styles from "./TextBox.module.scss";
 
 export type TextBoxProps = {
   id?: string;
+  bindTo?: string;
   type?: "text" | "password" | "search" | "email" | string;
   value?: unknown;
   initialValue?: unknown;
@@ -56,6 +57,7 @@ export type TextBoxApi = {
 export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function TextBoxNative(
   {
     id,
+    bindTo,
     type = defaultProps.type,
     value,
     initialValue = defaultProps.initialValue,
@@ -103,21 +105,31 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
   const effectiveLabelBreak = labelBreak ?? form?.itemLabelBreak ?? false;
   const effectiveLabelWidth = labelWidth ?? form?.itemLabelWidth;
   const generatedInputId = useId();
-  const controlled = value !== undefined;
-  const [localValue, setLocalValue] = useState(() => stringifyInputValue(value ?? initialValue));
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = form && fieldName !== undefined ? form.getValue(fieldName) : undefined;
+  const effectiveValue = formValue ?? value;
+  const controlled = effectiveValue !== undefined;
+  const [localValue, setLocalValue] = useState(() => stringifyInputValue(effectiveValue ?? initialValue));
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   useEffect(() => {
     if (controlled) {
-      setLocalValue(stringifyInputValue(value));
+      setLocalValue(stringifyInputValue(effectiveValue));
     }
-  }, [controlled, value]);
+  }, [controlled, effectiveValue]);
 
   useEffect(() => {
     if (!controlled) {
       setLocalValue(stringifyInputValue(initialValue));
     }
   }, [controlled, initialValue]);
+
+  useEffect(() => {
+    if (!form || fieldName === undefined || form.getValue(fieldName) != null || initialValue === undefined) {
+      return;
+    }
+    form.setValue(fieldName, initialValue);
+  }, [fieldName, form, initialValue]);
 
   useEffect(() => {
     if (!autoFocus || !enabled) {
@@ -129,9 +141,12 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
 
   const updateValue = useCallback((nextValue: unknown) => {
     const normalized = stringifyInputValue(nextValue);
+    if (form && fieldName !== undefined) {
+      form.setValue(fieldName, normalized);
+    }
     setLocalValue(normalized);
     void onDidChange?.(normalized);
-  }, [onDidChange]);
+  }, [fieldName, form, onDidChange]);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -168,7 +183,6 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
   const inputRoot = (
     <div
       {...(!hasLabel ? rest : undefined)}
-      data-part-id="input"
       data-xmlui-part="input"
       className={cx(
         styles.textBoxRoot,
@@ -333,6 +347,13 @@ function resolveThemeValue(value: string | number, themeVariables: Record<string
     return value;
   }
   return themeVariables[value.slice(1)] as string | number | undefined ?? value;
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function labelPositionClass(value: string, direction?: string): string {

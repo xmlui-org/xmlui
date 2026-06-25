@@ -259,13 +259,20 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "BinaryExpression":
       return `(${emitExpression(ir.left)} ${ir.operator} ${emitExpression(ir.right)})`;
     case "UnaryExpression":
+      if (ir.operator === "delete") {
+        return emitDeleteExpression(ir.argument);
+      }
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
     case "ArrayExpression":
       return `[${ir.elements.map(emitExpression).join(", ")}]`;
     case "ObjectExpression":
-      return `{${ir.properties.map((property) => `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`).join(", ")}}`;
+      return `{${ir.properties.map((property) =>
+        property.kind === "spread"
+          ? `...${emitExpression(property.argument)}`
+          : `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`
+      ).join(", ")}}`;
     case "CallExpression":
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
@@ -281,6 +288,16 @@ function emitExpression(ir: XmluiScriptIr): string {
     default:
       throw new Error(`Cannot generate ${ir.kind} as an XMLUI expression.`);
   }
+}
+
+function emitDeleteExpression(argument: XmluiScriptIr): string {
+  if (argument.kind === "MemberRead") {
+    return `(delete (${emitExpression(argument.object)})[${JSON.stringify(argument.member)}])`;
+  }
+  if (argument.kind === "IndexRead") {
+    return `(delete (${emitExpression(argument.object)})[${emitExpression(argument.index)}])`;
+  }
+  return `(delete (${emitExpression(argument)}))`;
 }
 
 function emitOptionalMemberRead(object: XmluiScriptIr, member: string): string {
@@ -562,6 +579,7 @@ function isAllowedMethodName(name: string): boolean {
     "startsWith",
     "endsWith",
     "getFields",
+    "getData",
     "getValue",
     "hasOverflow",
     "open",

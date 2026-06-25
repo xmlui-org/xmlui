@@ -143,7 +143,7 @@ export const radioGroupRenderer = wrapComponent({
   },
 });
 
-function radioOptions(adapter: XmluiComponentAdapter): RadioGroupOption[] {
+export function radioOptions(adapter: XmluiComponentAdapter): RadioGroupOption[] {
   return adapter.node.children.flatMap((child) => optionFromChild(child, adapter));
 }
 
@@ -167,7 +167,7 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Radi
   const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
     ? booleanOptionValue(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "RadioGroup:Option:enabled"))
     : true;
-  return [{ value, label: renderableLabel(label, value), enabled }];
+  return [{ value, label: renderableLabel(label, value), enabled, testId: child.props.testId }];
 }
 
 function isValidOptionValue(value: unknown): boolean {

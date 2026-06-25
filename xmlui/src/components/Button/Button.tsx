@@ -196,7 +196,7 @@ function stringifyButtonLabel(value: unknown): string {
     return "null";
   }
   if (value === undefined) {
-    return "undefined";
+    return "";
   }
   if (typeof value === "function") {
     return "[object Object]";

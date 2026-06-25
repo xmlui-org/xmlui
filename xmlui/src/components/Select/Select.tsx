@@ -118,7 +118,7 @@ export const selectRenderer = wrapComponent({
   },
 });
 
-function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
+export function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
   const data = adapter.prop<unknown>("data");
   if (Array.isArray(data)) {
     const valueField = adapter.stringProp("valueField", "value") ?? "value";
@@ -201,6 +201,7 @@ function optionsFromChild(
     value: value ?? label ?? "",
     label: (label ?? value ?? "") as ReactNode,
     enabled,
+    testId: child.props.testId,
     __xmluiRawValue: child.props.value,
     __xmluiParsedValueSource: parsedExpressionSource(child.parsed?.props?.value),
   }];

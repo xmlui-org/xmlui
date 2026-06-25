@@ -49,7 +49,17 @@ import {
 
 export type InitTestBedOptions = {
   testThemeVars?: Record<string, unknown>;
+  components?: string[];
   resources?: Record<string, string>;
+  apiInterceptor?: {
+    initialize?: string;
+    operations?: Record<string, {
+      url: string;
+      method?: string;
+      handler?: string;
+      status?: number;
+    }>;
+  };
 };
 
 export type TestBedResult = {
@@ -674,7 +684,12 @@ async function initTestBed(
   options: InitTestBedOptions,
 ): Promise<void> {
   const source = normalizeTestBedSource(markup, options);
-  const installTestBedSource = (xmluiSource: string) => {
+  const testBedPayload = {
+    source,
+    components: options.components ?? [],
+  };
+  await installApiInterceptor(page, options.apiInterceptor);
+  const installTestBedSource = (payload: { source: string; components: string[] }) => {
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -685,22 +700,23 @@ async function initTestBed(
         readText: async () => window.__xmluiClipboardText ?? "",
       },
     });
-    window.sessionStorage.setItem("__xmluiTestBedSource", xmluiSource);
+    window.sessionStorage.setItem("__xmluiTestBedSource", payload.source);
+    window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
     await replayInitScripts(page);
-    await page.evaluate(installTestBedSource, source);
+    await page.evaluate(installTestBedSource, testBedPayload);
     try {
       await page.evaluate(async (xmluiSource) => {
         await window.__xmluiTestBedReinit?.(xmluiSource);
       }, source);
     } catch {
-      await page.addInitScript(installTestBedSource, source);
+      await page.addInitScript(installTestBedSource, testBedPayload);
       await page.goto("/?__xmluiTestBed=1");
     }
   } else {
-    await page.addInitScript(installTestBedSource, source);
+    await page.addInitScript(installTestBedSource, testBedPayload);
     await page.goto("/?__xmluiTestBed=1");
   }
   const error = page.getByTestId("xmlui-testbed-error");
@@ -719,6 +735,109 @@ async function initTestBed(
     ),
   );
   await page.keyboard.press("Shift");
+}
+
+async function installApiInterceptor(
+  page: Page,
+  apiInterceptor: InitTestBedOptions["apiInterceptor"],
+): Promise<void> {
+  const operations = apiInterceptor?.operations;
+  if (!operations) {
+    return;
+  }
+  const state: Record<string, unknown> = {};
+  if (apiInterceptor?.initialize) {
+    runApiHandler(apiInterceptor.initialize, { $state: state });
+  }
+  for (const operation of Object.values(operations)) {
+    await page.route(`**${routeGlob(operation.url)}`, async (route) => {
+      let body: unknown = { success: true };
+      let status = operation.status ?? 200;
+      if (operation.handler) {
+        try {
+          body = runApiHandler(operation.handler, {
+            $state: state,
+            $requestBody: requestBody(route.request()),
+            $pathParams: pathParams(operation.url, new URL(route.request().url()).pathname),
+          });
+        } catch (error) {
+          if (isHttpError(error)) {
+            status = error.status;
+            body = error.body;
+          } else {
+            throw error;
+          }
+        }
+      }
+      await route.fulfill({
+        status,
+        contentType: "application/json",
+        body: JSON.stringify(body),
+      });
+    });
+  }
+}
+
+function routeGlob(pattern: string): string {
+  return pattern.replace(/:[^/]+/g, "*");
+}
+
+function runApiHandler(source: string, context: Record<string, unknown>): unknown {
+  const handler = createApiHandler(source);
+  return handler(
+    context.$state,
+    context.$requestBody,
+    context.$pathParams,
+    {
+      HttpError: (status: number, body: unknown) => {
+        throw { __xmluiHttpError: true, status, body };
+      },
+    },
+  );
+}
+
+function createApiHandler(source: string): Function {
+  const trimmed = source.trim();
+  if (trimmed.startsWith("(") || trimmed.includes("=>")) {
+    return new Function(
+      "$state",
+      "$requestBody",
+      "$pathParams",
+      "Errors",
+      `return (${source})();`,
+    );
+  }
+  return new Function("$state", "$requestBody", "$pathParams", "Errors", source);
+}
+
+function requestBody(request: import("@playwright/test").Request): unknown {
+  const text = request.postData();
+  if (!text) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+function pathParams(pattern: string, pathname: string): Record<string, string> {
+  const patternParts = pattern.split("/").filter(Boolean);
+  const pathParts = pathname.split("/").filter(Boolean);
+  return Object.fromEntries(
+    patternParts.flatMap((part, index) =>
+      part.startsWith(":") ? [[part.slice(1), pathParts[index] ?? ""]] : [],
+    ),
+  );
+}
+
+function isHttpError(error: unknown): error is { status: number; body: unknown } {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      (error as { __xmluiHttpError?: unknown }).__xmluiHttpError === true,
+  );
 }
 
 async function replayInitScripts(page: Page): Promise<void> {
@@ -789,6 +908,7 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`testState = clicked`, `testState = 'clicked'`)
     .replaceAll(`onDidChange="{(val) => {value = val}}"`, `onDidChange="val => value = val"`)
     .replaceAll(`onDidChange="arg => {testState = arg; console.log('arg', arg)}"`, `onDidChange="arg => testState = arg"`)
+    .replaceAll(`data="{invalidJson}"`, `data="invalidJson"`)
     .replaceAll(`icon="() => {}"`, `icon="{null}"`)
     .replaceAll(`src="{() => '/resources/test-image-100x100.jpg'}"`, `src="{null}"`)
     .replaceAll(`alt="{() => '/resources/test-image-100x100.jpg'}"`, `alt="{null}"`)

@@ -93,6 +93,10 @@ export class ScriptScanner {
       this.input.advance(2);
       return this.createToken(ScriptTokenKind.Arrow, start, this.input.position);
     }
+    if (this.input.startsWith("...")) {
+      this.input.advance(3);
+      return this.createToken(ScriptTokenKind.Ellipsis, start, this.input.position);
+    }
     if (this.input.startsWith("===")) {
       this.input.advance(3);
       return this.createToken(ScriptTokenKind.EqualEqualEqual, start, this.input.position);
@@ -364,6 +368,7 @@ function classifyScriptToken(kind: ScriptTokenKind): TokenClassification {
     case ScriptTokenKind.WhileKeyword:
     case ScriptTokenKind.ForKeyword:
     case ScriptTokenKind.ReturnKeyword:
+    case ScriptTokenKind.DeleteKeyword:
       return "keyword";
     case ScriptTokenKind.NumberLiteral:
     case ScriptTokenKind.StringLiteral:
@@ -432,6 +437,8 @@ function keywordKind(text: string): ScriptTokenKind {
       return ScriptTokenKind.ForKeyword;
     case "return":
       return ScriptTokenKind.ReturnKeyword;
+    case "delete":
+      return ScriptTokenKind.DeleteKeyword;
     default:
       return ScriptTokenKind.Identifier;
   }
