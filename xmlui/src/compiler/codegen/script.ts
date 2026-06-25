@@ -492,6 +492,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "handlerLocal") {
     return target.name;
   }
+  if (target.kind === "member" && target.object) {
+    return emitOptionalMemberRead(target.object, target.name);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
   }
@@ -500,6 +503,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 }
 
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
+  if (target.kind === "member" && target.object) {
+    return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
   }

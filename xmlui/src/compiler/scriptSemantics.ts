@@ -39,12 +39,13 @@ export type BoundDependency = {
 };
 
 export type BoundWriteTarget = {
-  kind: "local" | "global" | "handlerLocal" | "unresolved" | "invalid";
+  kind: "local" | "global" | "handlerLocal" | "member" | "unresolved" | "invalid";
   name: string;
   path: string[];
   operator: "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=";
   span: SourceSpan;
   binding?: XmluiBinding;
+  object?: XmluiScriptIr;
 };
 
 export type BoundScriptResult = {
@@ -989,6 +990,17 @@ function bindWriteTarget(
     return write;
   }
 
+  if (target.kind === "MemberExpression" && target.property.kind === "Identifier") {
+    return {
+      kind: "member",
+      name: target.property.name,
+      path: [target.property.name],
+      operator: operator as BoundWriteTarget["operator"],
+      span: target.span,
+      object: lowerWriteTargetObject(target.object, scope, findLexicalBinding, result),
+    };
+  }
+
   result.diagnostics.push(
     createErrorDiagnostic("XS203", "Invalid XMLUI script write target.", target.span),
   );
@@ -999,6 +1011,32 @@ function bindWriteTarget(
     operator: operator as BoundWriteTarget["operator"],
     span: target.span,
   };
+}
+
+function lowerWriteTargetObject(
+  object: ScriptNode,
+  scope: XmluiScope,
+  findLexicalBinding: (name: string) => { mutable: boolean; span: SourceSpan } | undefined,
+  result: BoundScriptResult,
+): XmluiScriptIr {
+  if (object.kind !== "Identifier" || findLexicalBinding(object.name)) {
+    return lowerNode(object, result);
+  }
+  const binding = resolveXmluiIdentifier(scope, object.name);
+  if (!binding || binding.kind === "special") {
+    return lowerNode(object, result);
+  }
+  return identifierReadIr({
+    kind: "IdentifierRead",
+    span: object.span,
+    name: object.name,
+  }, {
+    kind: binding.kind,
+    name: object.name,
+    path: [object.name],
+    span: object.span,
+    binding,
+  });
 }
 
 function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
@@ -1884,6 +1922,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "handlerLocal") {
     return target.name;
   }
+  if (target.kind === "member" && target.object) {
+    return emitOptionalMemberRead(target.object, target.name);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
@@ -1892,6 +1933,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 }
 
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
+  if (target.kind === "member" && target.object) {
+    return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
@@ -2399,6 +2443,10 @@ function executeTargetRead(
   if (target.kind === "handlerLocal") {
     return lexical[target.name];
   }
+  if (target.kind === "member" && target.object) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
+    return object == null ? undefined : object[target.name];
+  }
   if (target.kind === "local") {
     return context.readLocal(target.name);
   }
@@ -2416,6 +2464,14 @@ function executeTargetWrite(
 ): void {
   if (target.kind === "handlerLocal") {
     writeLexical(lexical, target.name, value);
+    return;
+  }
+  if (target.kind === "member" && target.object) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
+    if (object == null) {
+      throw new Error(`Cannot write XMLUI script member '${target.name}' on null or undefined.`);
+    }
+    object[target.name] = value;
     return;
   }
   if (target.kind === "local") {

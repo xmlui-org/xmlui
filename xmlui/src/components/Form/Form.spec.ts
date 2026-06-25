@@ -1981,119 +1981,120 @@ test.describe("Basic Functionality", () => {
 
     test.describe("onValidate async failure handling", () => {
       test("form does not submit after async validation fails", async ({ initTestBed, page }) => {
-      const { testStateDriver } = await initTestBed(`
-        <Form
-          data="{{ username: '' }}"
-          onSubmit="data => testState = 'submitted'">
-          <FormItem
-            label="Username"
-            bindTo="username"
-            onValidate="value => {
-              delay(500);
-              return 'Username is already taken';
-            }"
-          />
-        </Form>
-      `);
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ username: '' }}"
+            onSubmit="data => testState = 'submitted'">
+            <FormItem
+              label="Username"
+              bindTo="username"
+              onValidate="value => {
+                delay(500);
+                return 'Username is already taken';
+              }"
+            />
+          </Form>
+        `);
 
-      // Fill the field to trigger async validation (delay 500ms, returns error)
-      await page.getByRole("textbox").fill("alice");
-      await page.waitForTimeout(100);
+        // Fill the field to trigger async validation (delay 500ms, returns error)
+        await page.getByRole("textbox").fill("alice");
+        await page.waitForTimeout(100);
 
-      // While async validation is in-flight, Save button shows "Validating..." and is disabled
-      await expect(page.getByRole("button", { name: "Validating..." })).toBeDisabled();
+        // While async validation is in-flight, Save button shows "Validating..." and is disabled
+        await expect(page.getByRole("button", { name: "Validating..." })).toBeDisabled();
 
-      // Once validation settles and returns an error, the Save button re-enables
-      // but the form will show a validation error
-      await expect(page.getByRole("button", { name: "Save" })).toBeEnabled({ timeout: 3000 });
+        // Once validation settles and returns an error, the Save button re-enables
+        // but the form will show a validation error
+        await expect(page.getByRole("button", { name: "Save" })).toBeEnabled({ timeout: 3000 });
 
-      // Clicking Save with a validation error must not submit the form
-      await page.getByRole("button", { name: "Save" }).click();
-      await page.waitForTimeout(500);
-      const state = await testStateDriver.testState();
-      expect(state).not.toEqual("submitted");
-    });
-    });
-
-    test.describe.skip("deferred onValidate timing and built-in validation cases", () => {
-
-    test("onValidate validation messages appear in correct timing order", async ({
-      initTestBed,
-      createFormItemDriver,
-      createTextBoxDriver,
-    }) => {
-      const { testStateDriver } = await initTestBed(`
-        <Form>
-          <FormItem
-            testId="field1"
-            label="Field 1"
-            bindTo="field1"
-            type="text"
-            validationMode="onChanged"
-            onValidate="value => {
-              if (testState === null) {
-                testState = { sequence: [] };
-              }
-              testState.sequence = testState.sequence.concat(['field1']);
-              return { isValid: value && value.length >= 3, invalidMessage: 'Field 1 error', severity: 'error' }
-            }"
-          />
-          <FormItem
-            testId="field2"
-            label="Field 2"
-            bindTo="field2"
-            type="text"
-            validationMode="onChanged"
-            onValidate="value => {
-              if (testState === null) {
-                testState = { sequence: [] };
-              }
-              testState.sequence = testState.sequence.concat(['field2']);
-              return { isValid: value && value.includes('@'), invalidMessage: 'Field 2 error', severity: 'error' }
-            }"
-          />
-        </Form>
-      `);
-
-      const field1Driver = await createFormItemDriver("field1");
-      const field2Driver = await createFormItemDriver("field2");
-      const input1 = await createTextBoxDriver(field1Driver.input);
-      const input2 = await createTextBoxDriver(field2Driver.input);
-
-      // Type in first field
-      await input1.field.fill("ab");
-      await expect
-        .poll(async () => {
-          const state = await testStateDriver.testState();
-          return state?.sequence && state.sequence.includes("field1");
-        })
-        .toBe(true);
-
-      // Type in second field
-      await input2.field.fill("test");
-      await expect
-        .poll(async () => {
-          const state = await testStateDriver.testState();
-          return state?.sequence && state.sequence.includes("field2");
-        })
-        .toBe(true);
-
-      // Both validations should have run
-      const state = await testStateDriver.testState();
-      expect(state?.sequence).toContain("field1");
-      expect(state?.sequence).toContain("field2");
-
-      // Both error messages should be visible
-      await expect(field1Driver.component).toContainText("Field 1 error");
-      await expect(field2Driver.component).toContainText("Field 2 error");
+        // Clicking Save with a validation error must not submit the form
+        await page.getByRole("button", { name: "Save" }).click();
+        await page.waitForTimeout(500);
+        const state = await testStateDriver.testState();
+        expect(state).not.toEqual("submitted");
+      });
     });
 
-    test("onValidate with built-in validations run in correct order for multiple fields", async ({
-      initTestBed,
-      createFormDriver,
-      createFormItemDriver,
-    }) => {
-      await initTestBed(`
+    test.describe("onValidate timing order", () => {
+      test("onValidate validation messages appear in correct timing order", async ({
+        initTestBed,
+        createFormItemDriver,
+        createTextBoxDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form>
+            <FormItem
+              testId="field1"
+              label="Field 1"
+              bindTo="field1"
+              type="text"
+              validationMode="onChanged"
+              onValidate="value => {
+                if (testState === null) {
+                  testState = { sequence: [] };
+                }
+                testState.sequence = testState.sequence.concat(['field1']);
+                return { isValid: value && value.length >= 3, invalidMessage: 'Field 1 error', severity: 'error' }
+              }"
+            />
+            <FormItem
+              testId="field2"
+              label="Field 2"
+              bindTo="field2"
+              type="text"
+              validationMode="onChanged"
+              onValidate="value => {
+                if (testState === null) {
+                  testState = { sequence: [] };
+                }
+                testState.sequence = testState.sequence.concat(['field2']);
+                return { isValid: value && value.includes('@'), invalidMessage: 'Field 2 error', severity: 'error' }
+              }"
+            />
+          </Form>
+        `);
+
+        const field1Driver = await createFormItemDriver("field1");
+        const field2Driver = await createFormItemDriver("field2");
+        const input1 = await createTextBoxDriver(field1Driver.input);
+        const input2 = await createTextBoxDriver(field2Driver.input);
+
+        // Type in first field
+        await input1.field.fill("ab");
+        await expect
+          .poll(async () => {
+            const state = await testStateDriver.testState();
+            return state?.sequence && state.sequence.includes("field1");
+          })
+          .toBe(true);
+
+        // Type in second field
+        await input2.field.fill("test");
+        await expect
+          .poll(async () => {
+            const state = await testStateDriver.testState();
+            return state?.sequence && state.sequence.includes("field2");
+          })
+          .toBe(true);
+
+        // Both validations should have run
+        const state = await testStateDriver.testState();
+        expect(state?.sequence).toContain("field1");
+        expect(state?.sequence).toContain("field2");
+
+        // Both error messages should be visible
+        await expect(field1Driver.component).toContainText("Field 1 error");
+        await expect(field2Driver.component).toContainText("Field 2 error");
+      });
+    });
+
+    test.describe.skip("deferred onValidate built-in validation cases", () => {
+      test("onValidate with built-in validations run in correct order for multiple fields", async ({
+        initTestBed,
+        createFormDriver,
+        createFormItemDriver,
+      }) => {
+        await initTestBed(`
         <Form>
           <FormItem
             testId="field1"
