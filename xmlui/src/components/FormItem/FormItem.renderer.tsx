@@ -1,4 +1,4 @@
-import { wrapComponent, nonPropertyChildren } from "../../runtime/rendering/adapter";
+import { wrapComponent, nonPropertyChildren, templateChildren } from "../../runtime/rendering/adapter";
 import { createRuntimeScope } from "../../runtime/state";
 import { radioOptions } from "../RadioGroup/RadioGroup";
 import { selectOptions } from "../Select/Select";
@@ -10,6 +10,7 @@ export const formItemRenderer = wrapComponent({
   metadata: FormItemMd,
   renderer({ adapter }) {
     const type = adapter.stringProp("type", "text");
+    const inputTemplate = templateChildren(adapter.node, "inputTemplate") ?? [];
     const itemTemplate = nonPropertyChildren(adapter.node.children);
     return (
       <FormItem
@@ -35,16 +36,41 @@ export const formItemRenderer = wrapComponent({
         lengthInvalidMessage={adapter.stringProp("lengthInvalidMessage")}
         pattern={adapter.stringProp("pattern")}
         patternInvalidMessage={adapter.stringProp("patternInvalidMessage")}
+        patternInvalidSeverity={adapter.stringProp("patternInvalidSeverity")}
+        regex={adapter.stringProp("regex")}
+        regexInvalidMessage={adapter.stringProp("regexInvalidMessage")}
+        regexInvalidSeverity={adapter.stringProp("regexInvalidSeverity")}
+        matchValue={adapter.prop("matchValue")}
+        matchInvalidMessage={adapter.stringProp("matchInvalidMessage")}
         noSubmit={adapter.booleanProp("noSubmit", false)}
         validationMode={adapter.stringProp("validationMode")}
         customValidationsDebounce={adapter.numberProp("customValidationsDebounce", 0)}
-        onValidate={(value) => adapter.event("validate")(value)}
+        onValidate={adapter.node.events.validate ? (value) => adapter.event("validate")(value) : undefined}
         options={
           type === "select"
             ? selectOptions(adapter)
             : type === "radioGroup"
               ? radioOptions(adapter)
               : undefined
+        }
+        inputRenderer={
+          inputTemplate.length > 0
+            ? (contextVars) => {
+                const inputScope = createRuntimeScope({
+                  store: adapter.scope.store,
+                  parent: adapter.scope,
+                  props: adapter.scope.props,
+                  contextValues: contextVars,
+                  references: adapter.scope.references,
+                  slots: adapter.scope.slots,
+                  routing: adapter.scope.routing,
+                  toast: adapter.scope.toast,
+                  emitEvent: adapter.scope.emitEvent,
+                  extensionFunctions: adapter.scope.extensionFunctions,
+                });
+                return adapter.context.renderChildren(inputTemplate, inputScope);
+              }
+            : undefined
         }
         registerComponentApi={adapter.registerApi}
         renderItemTemplate={
@@ -69,7 +95,7 @@ export const formItemRenderer = wrapComponent({
         className={adapter.className}
         style={adapter.style}
       >
-        {type !== "items" && adapter.node.children.length > 0 ? adapter.renderChildren() : undefined}
+        {type !== "items" && itemTemplate.length > 0 ? adapter.context.renderChildren(itemTemplate, adapter.scope) : undefined}
       </FormItem>
     );
   },

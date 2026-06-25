@@ -210,6 +210,9 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   if (name === "JSON") {
     return JSON;
   }
+  if (name === "Object") {
+    return Object;
+  }
   if (name === "Actions") {
     return createActionsReference();
   }

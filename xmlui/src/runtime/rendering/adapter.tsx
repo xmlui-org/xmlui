@@ -117,7 +117,8 @@ export function useXmluiComponentAdapter({
   );
   const apiRef = useRef<Record<string, unknown>>({});
   const registeredIdRef = useRef<string>();
-  const themeClass = useComponentThemeClass(name, metadata, themeContributors);
+  const variant = typeof props.variant === "string" ? props.variant : undefined;
+  const themeClass = useComponentThemeClass(name, metadata, themeContributors, variant);
   const viewportWidth = useViewportWidth();
   const layoutStyle = useMemo(
     () => resolveActiveLayoutStyle(props, viewportWidth),

@@ -15,6 +15,7 @@ import { FormProvider, useFormContext, type FormContextValue } from "../Form/For
 import { SelectNative } from "../Select/SelectReact";
 import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
 import { SliderNative } from "../Slider/SliderReact";
+import { NumberBoxNative } from "../NumberBox/NumberBoxReact";
 import type { XmluiOption } from "../Option/OptionReact";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
@@ -40,12 +41,19 @@ export type FormItemProps = {
   lengthInvalidMessage?: string;
   pattern?: string;
   patternInvalidMessage?: string;
+  patternInvalidSeverity?: "error" | "warning" | string;
+  regex?: string;
+  regexInvalidMessage?: string;
+  regexInvalidSeverity?: "error" | "warning" | string;
+  matchValue?: unknown;
+  matchInvalidMessage?: string;
   noSubmit?: boolean;
   validationMode?: string;
   customValidationsDebounce?: number;
   onValidate?: (value: unknown) => unknown | Promise<unknown>;
   options?: XmluiOption[];
   children?: ReactNode;
+  inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
   renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
   registerComponentApi?: (api: Record<string, unknown>) => void;
 };
@@ -70,12 +78,19 @@ export function FormItem({
   lengthInvalidMessage,
   pattern,
   patternInvalidMessage,
+  patternInvalidSeverity,
+  regex,
+  regexInvalidMessage,
+  regexInvalidSeverity,
+  matchValue,
+  matchInvalidMessage,
   noSubmit = false,
   validationMode,
   customValidationsDebounce = 0,
   onValidate,
   options,
   children,
+  inputRenderer,
   renderItemTemplate,
   registerComponentApi,
   ...rest
@@ -84,7 +99,11 @@ export function FormItem({
   const inputId = id ? `${id}-input` : generatedId;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const validationTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const validateRef = useRef(onValidate);
   const form = useFormContext();
+  const registerFormItem = form?.registerItem;
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
   const themeVariables = useThemeVariables();
   const effectiveLabelPosition = labelPosition ?? form?.itemLabelPosition ?? "top";
   const effectiveLabelWidth = labelWidth ?? form?.itemLabelWidth;
@@ -97,24 +116,30 @@ export function FormItem({
   const error = form?.errors[fieldName];
   const fieldIssue = form?.issues.find((issue) => issue.field === fieldName);
   const validationStatus = fieldIssue?.severity ?? (error ? "error" : undefined);
-  const validationMessage = fieldIssue?.message ?? error;
+  const validationMessage = error ?? fieldIssue?.message;
   const showRequiredIndicator =
     required && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
   const showOptionalIndicator =
     !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
 
   useEffect(() => {
-    if (!form || form.getValue(fieldName) != null || initialValue === undefined) {
-      return;
-    }
-    form.setValue(fieldName, initialValue);
-  }, [fieldName, form, initialValue]);
+    validateRef.current = onValidate;
+  }, [onValidate]);
+
+  const validateRegisteredItem = useCallback((value: unknown) => validateRef.current?.(value), []);
 
   useEffect(() => {
-    if (!form) {
+    if (!getFormValue || !setFormValue || getFormValue(fieldName) != null || initialValue === undefined) {
       return;
     }
-    return form.registerItem({
+    setFormValue(fieldName, initialValue);
+  }, [fieldName, getFormValue, initialValue, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem) {
+      return;
+    }
+    return registerFormItem({
       name: fieldName,
       label,
       required,
@@ -123,21 +148,33 @@ export function FormItem({
       lengthInvalidMessage,
       pattern,
       patternInvalidMessage,
+      patternInvalidSeverity,
+      regex,
+      regexInvalidMessage,
+      regexInvalidSeverity,
+      matchValue,
+      matchInvalidMessage,
       noSubmit: noSubmit || bindTo === undefined,
-      validate: onValidate,
+      validate: validateRegisteredItem,
     });
   }, [
     fieldName,
-    form,
     label,
     lengthInvalidMessage,
+    matchInvalidMessage,
+    matchValue,
     minLength,
-    onValidate,
     pattern,
     patternInvalidMessage,
+    patternInvalidSeverity,
+    regex,
+    regexInvalidMessage,
+    regexInvalidSeverity,
     noSubmit,
     required,
     requiredInvalidMessage,
+    registerFormItem,
+    validateRegisteredItem,
   ]);
 
   useEffect(() => () => {
@@ -147,16 +184,16 @@ export function FormItem({
   }, []);
 
   const addItem = useCallback((item: unknown = {}) => {
-    const currentValue = form?.getValue(fieldName);
+    const currentValue = getFormValue?.(fieldName);
     const currentItems = Array.isArray(currentValue) ? currentValue : [];
-    form?.setValue(fieldName, [...currentItems, item]);
-  }, [fieldName, form]);
+    setFormValue?.(fieldName, [...currentItems, item]);
+  }, [fieldName, getFormValue, setFormValue]);
 
   const removeItem = useCallback((index: number) => {
-    const currentValue = form?.getValue(fieldName);
+    const currentValue = getFormValue?.(fieldName);
     const currentItems = Array.isArray(currentValue) ? currentValue : [];
-    form?.setValue(fieldName, currentItems.filter((_, itemIndex) => itemIndex !== index));
-  }, [fieldName, form]);
+    setFormValue?.(fieldName, currentItems.filter((_, itemIndex) => itemIndex !== index));
+  }, [fieldName, getFormValue, setFormValue]);
 
   useEffect(() => {
     if (type !== "items") {
@@ -171,7 +208,11 @@ export function FormItem({
   const itemArray = useMemo(() => Array.isArray(value) ? value : [], [value]);
 
   const scheduleChangedValidation = (nextValue: unknown) => {
-    if (validationMode !== "onChanged" && !onValidate) {
+    const shouldValidate =
+      validationMode === "onChanged" ||
+      Boolean(onValidate) ||
+      (validationMode === "errorLate" && Boolean(error));
+    if (!shouldValidate) {
       return;
     }
     if (validationTimerRef.current) {
@@ -187,6 +228,11 @@ export function FormItem({
     }
     void form?.validateField(fieldName, nextValue);
   };
+  const handleBlurValidation = () => {
+    if (validationMode === "onLostFocus" || validationMode === "errorLate" || required) {
+      void form?.validateField(fieldName);
+    }
+  };
 
   const labelStyle = effectiveLabelWidth ? { width: cssLength(effectiveLabelWidth, themeVariables) } : undefined;
   const control = renderControl({
@@ -197,11 +243,13 @@ export function FormItem({
     fieldName,
     form,
     inputId,
+    inputRenderer,
     options,
     parentForm: form,
     renderItemTemplate,
     required,
     scheduleChangedValidation,
+    handleBlurValidation,
     type,
     value,
     itemArray,
@@ -223,6 +271,7 @@ export function FormItem({
         form?.setValue(fieldName, nextValue);
         scheduleChangedValidation(nextValue);
       }}
+      onBlur={handleBlurValidation}
     />
   );
 
@@ -286,12 +335,14 @@ function renderControl({
   fieldName,
   form,
   inputId,
+  inputRenderer,
   itemArray,
   options,
   parentForm,
   renderItemTemplate,
   required,
   scheduleChangedValidation,
+  handleBlurValidation,
   type,
   value,
 }: {
@@ -302,15 +353,27 @@ function renderControl({
   fieldName: string;
   form: ReturnType<typeof useFormContext>;
   inputId: string;
+  inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
   itemArray: unknown[];
   options?: XmluiOption[];
   parentForm: ReturnType<typeof useFormContext>;
   renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
   required: boolean;
   scheduleChangedValidation: (nextValue: unknown) => void;
+  handleBlurValidation: () => void;
   type: string;
   value: unknown;
 }): ReactNode | undefined {
+  if (inputRenderer && type !== "items") {
+    return inputRenderer({
+      $value: value,
+      $setValue: (nextValue: unknown) => {
+        form?.setValue(fieldName, nextValue);
+        scheduleChangedValidation(nextValue);
+      },
+      $validationResult: error ? { isValid: false, invalidMessage: error, severity: "error" } : undefined,
+    });
+  }
   if (type === "items") {
     return (
       <div className={styles.itemsStack}>
@@ -380,6 +443,50 @@ function renderControl({
           scheduleChangedValidation(nextValue);
         }}
       />
+    );
+  }
+  if (type === "number" || type === "integer") {
+    return (
+      <NumberBoxNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        inputMode="numeric"
+        integersOnly={type === "integer"}
+        hasSpinBox={false}
+        validationStatus={error ? "error" : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+      />
+    );
+  }
+  if (type === "textarea") {
+    return (
+      <div
+        data-part-id="input"
+        data-xmlui-part="input"
+      >
+        <textarea
+          id={inputId}
+          className={cx(styles.input, error ? styles.errorInput : undefined)}
+          value={stringify(value)}
+          required={required}
+          disabled={!enabled}
+          autoFocus={autoFocus}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${inputId}-error` : undefined}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+            const nextValue = event.currentTarget.value;
+            form?.setValue(fieldName, nextValue);
+            scheduleChangedValidation(nextValue);
+          }}
+          onBlur={handleBlurValidation}
+        />
+      </div>
     );
   }
   return children;

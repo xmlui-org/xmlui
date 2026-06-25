@@ -18,6 +18,7 @@ import { ValidationSummary } from "../ValidationSummary/ValidationSummaryReact";
 import {
   FormProvider,
   type FormItemRegistration,
+  type FormContextValue,
   type FormValidationIssue,
   type FormValues,
 } from "./FormContext";
@@ -111,7 +112,7 @@ export function Form({
   const itemsRef = useRef(new Map<string, FormItemRegistration>());
   const knownItemsRef = useRef(new Map<string, FormItemRegistration>());
   const validationRunsRef = useRef(new Map<string, number>());
-  const validationCacheRef = useRef(new Map<string, { value: unknown; message?: string }>());
+  const validationCacheRef = useRef(new Map<string, { value: unknown; issues: FormValidationIssue[] }>());
   const requestModalFormClose = useModalFormClose();
   const [initialValues, setInitialValues] = useState<FormValues>(normalizedInputValues);
   const [values, setValues] = useState<FormValues>(normalizedInputValues);
@@ -120,6 +121,7 @@ export function Form({
   const [dirtyFields, setDirtyFields] = useState<Set<string>>(() => new Set());
   const [validatingFields, setValidatingFields] = useState<Set<string>>(() => new Set());
   const [showValidatingLabel, setShowValidatingLabel] = useState(false);
+  const [registrationVersion, setRegistrationVersion] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -194,12 +196,16 @@ export function Form({
     validationCacheRef.current.delete(name);
   }, []);
   const registerItem = useCallback((registration: FormItemRegistration) => {
-    itemsRef.current.set(registration.name, registration);
-    knownItemsRef.current.set(registration.name, registration);
+    const activeRegistration = mergeFormItemRegistration(itemsRef.current.get(registration.name), registration);
+    const knownRegistration = mergeFormItemRegistration(knownItemsRef.current.get(registration.name), registration);
+    itemsRef.current.set(registration.name, activeRegistration);
+    knownItemsRef.current.set(registration.name, knownRegistration);
+    setRegistrationVersion((version) => version + 1);
     return () => {
       const current = itemsRef.current.get(registration.name);
-      if (current === registration) {
+      if (current === activeRegistration) {
         itemsRef.current.delete(registration.name);
+        setRegistrationVersion((version) => version + 1);
       }
     };
   }, []);
@@ -207,19 +213,41 @@ export function Form({
   const validateItem = useCallback(async (
     item: FormItemRegistration,
     value: unknown,
-  ): Promise<string | undefined> => {
+  ): Promise<FormValidationIssue[]> => {
+    const itemIssues: FormValidationIssue[] = [];
     if (item.required && isEmpty(value)) {
-      return item.requiredInvalidMessage || "This field is required";
+      itemIssues.push(validationIssue(item.name, item.requiredInvalidMessage || "This field is required"));
     }
     if (item.minLength !== undefined && !isEmpty(value) && String(value).length < item.minLength) {
-      return item.lengthInvalidMessage || `Input should be at least ${item.minLength} characters`;
+      itemIssues.push(validationIssue(
+        item.name,
+        item.lengthInvalidMessage || `Input should be at least ${item.minLength} characters`,
+      ));
     }
     if (item.pattern && !isEmpty(value) && !matchesPattern(String(value), item.pattern)) {
-      return item.patternInvalidMessage || "Invalid input";
+      itemIssues.push(validationIssue(
+        item.name,
+        item.patternInvalidMessage || defaultPatternInvalidMessage(item.pattern),
+        item.patternInvalidSeverity,
+      ));
+    }
+    if (item.regex && !isEmpty(value) && !matchesRegex(String(value), item.regex)) {
+      itemIssues.push(validationIssue(
+        item.name,
+        item.regexInvalidMessage || "Invalid input",
+        item.regexInvalidSeverity,
+      ));
+    }
+    if (item.matchValue !== undefined && !Object.is(value, item.matchValue)) {
+      itemIssues.push(validationIssue(item.name, item.matchInvalidMessage || "Input does not match"));
     }
     const customResults = normalizeValidationResults(await item.validate?.(value));
-    const firstInvalid = customResults.find((result) => !result.isValid);
-    return firstInvalid ? firstInvalid.invalidMessage || "Invalid input" : undefined;
+    itemIssues.push(
+      ...customResults
+        .filter((result) => !result.isValid)
+        .map((result) => validationIssue(item.name, result.invalidMessage || "Invalid input", result.severity)),
+    );
+    return itemIssues;
   }, []);
 
   const validateField = useCallback(async (name: string, value?: unknown) => {
@@ -237,11 +265,12 @@ export function Form({
       });
     }
     const currentValue = value ?? getPathValue(values, name);
-    const message = await validateItem(item, currentValue);
+    const fieldIssues = await validateItem(item, currentValue);
+    const message = messageFromIssues(fieldIssues);
     if (validationRunsRef.current.get(name) !== runId) {
       return message;
     }
-    validationCacheRef.current.set(name, { value: currentValue, message });
+    validationCacheRef.current.set(name, { value: currentValue, issues: fieldIssues });
     setErrors((current) => {
       const next = { ...current };
       if (message) {
@@ -251,6 +280,10 @@ export function Form({
       }
       return next;
     });
+    setIssues((current) => [
+      ...current.filter((issue) => issue.field !== name),
+      ...fieldIssues,
+    ]);
     setValidatingFields((current) => {
       if (!current.has(name)) {
         return current;
@@ -261,27 +294,34 @@ export function Form({
     });
     return message;
   }, [validateItem, values]);
+  const isFieldValid = useCallback((name: string) => {
+    if (errors[name]) {
+      return false;
+    }
+    const item = itemsRef.current.get(name);
+    if (!item) {
+      return true;
+    }
+    return validateItemSync(item, getPathValue(values, name)).length === 0;
+  }, [errors, values]);
 
   const validate = useCallback(async () => {
     const nextErrors: Record<string, string> = {};
+    const nextIssues: FormValidationIssue[] = [];
     for (const item of itemsRef.current.values()) {
       const value = getPathValue(values, item.name);
       const cached = validationCacheRef.current.get(item.name);
-      const message = cached && Object.is(cached.value, value)
-        ? cached.message
+      const itemIssues = cached && Object.is(cached.value, value)
+        ? cached.issues
         : await validateItem(item, value);
+      const message = messageFromIssues(itemIssues);
       if (message) {
         nextErrors[item.name] = message;
       }
+      nextIssues.push(...itemIssues);
     }
     setErrors(nextErrors);
-    setIssues(
-      Object.entries(nextErrors).map(([field, message]) => ({
-        field,
-        message,
-        severity: "error",
-      })),
-    );
+    setIssues(nextIssues);
     return nextErrors;
   }, [validateItem, values]);
 
@@ -368,6 +408,40 @@ export function Form({
   const isValidating = validatingFields.size > 0;
   const shouldShowButtonRow = !hideButtonRow && (!hideButtonRowUntilDirty || isDirty);
   const shouldShowCancelButton = cancelLabel !== "";
+  const formContextValue = useMemo<FormContextValue>(() => ({
+    values,
+    errors,
+    issues,
+    dirtyFields,
+    validatingFields,
+    enabled,
+    itemLabelPosition,
+    itemLabelWidth,
+    itemLabelBreak,
+    itemRequireLabelMode,
+    getValue,
+    setValue,
+    isFieldValid,
+    validateField,
+    registerItem,
+  }), [
+    dirtyFields,
+    enabled,
+    errors,
+    getValue,
+    isFieldValid,
+    issues,
+    itemLabelBreak,
+    itemLabelPosition,
+    itemLabelWidth,
+    itemRequireLabelMode,
+    registerItem,
+    registrationVersion,
+    setValue,
+    validateField,
+    validatingFields,
+    values,
+  ]);
 
   useEffect(() => {
     if (!isValidating) {
@@ -437,26 +511,11 @@ export function Form({
       onSubmit={handleSubmit}
       noValidate
     >
-      <FormProvider value={{
-        values,
-        errors,
-        issues,
-        dirtyFields,
-        validatingFields,
-        enabled,
-        itemLabelPosition,
-        itemLabelWidth,
-        itemLabelBreak,
-        itemRequireLabelMode,
-        getValue,
-        setValue,
-        validateField,
-        registerItem,
-      }}>
+      <FormProvider value={formContextValue}>
         <div className={styles.content} data-xmlui-part="content">
           {renderContent ? renderContent(dataContext) : children}
         </div>
-        {issues.length > 0 && <ValidationSummary />}
+        {issues.length > 0 && Object.keys(errors).length !== issues.length && <ValidationSummary />}
         {shouldShowButtonRow && (
           buttonRowTemplate ?? (
             <div
@@ -479,6 +538,19 @@ function normalizeValues(data: unknown): FormValues {
     return { ...(data as FormValues) };
   }
   return {};
+}
+
+function mergeFormItemRegistration(
+  existing: FormItemRegistration | undefined,
+  registration: FormItemRegistration,
+): FormItemRegistration {
+  if (!existing) {
+    return registration;
+  }
+  return {
+    ...registration,
+    noSubmit: existing.noSubmit || registration.noSubmit,
+  };
 }
 
 function readPersistedValues(key: string): FormValues | undefined {
@@ -623,6 +695,40 @@ function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || value === "";
 }
 
+function validateItemSync(
+  item: FormItemRegistration,
+  value: unknown,
+): FormValidationIssue[] {
+  const itemIssues: FormValidationIssue[] = [];
+  if (item.required && isEmpty(value)) {
+    itemIssues.push(validationIssue(item.name, item.requiredInvalidMessage || "This field is required"));
+  }
+  if (item.minLength !== undefined && !isEmpty(value) && String(value).length < item.minLength) {
+    itemIssues.push(validationIssue(
+      item.name,
+      item.lengthInvalidMessage || `Input should be at least ${item.minLength} characters`,
+    ));
+  }
+  if (item.pattern && !isEmpty(value) && !matchesPattern(String(value), item.pattern)) {
+    itemIssues.push(validationIssue(
+      item.name,
+      item.patternInvalidMessage || defaultPatternInvalidMessage(item.pattern),
+      item.patternInvalidSeverity,
+    ));
+  }
+  if (item.regex && !isEmpty(value) && !matchesRegex(String(value), item.regex)) {
+    itemIssues.push(validationIssue(
+      item.name,
+      item.regexInvalidMessage || "Invalid input",
+      item.regexInvalidSeverity,
+    ));
+  }
+  if (item.matchValue !== undefined && !Object.is(value, item.matchValue)) {
+    itemIssues.push(validationIssue(item.name, item.matchInvalidMessage || "Input does not match"));
+  }
+  return itemIssues;
+}
+
 type SubmitValidationFailure = {
   ok: false;
   error: unknown;
@@ -718,11 +824,61 @@ function matchesPattern(value: string, pattern: string): boolean {
   if (pattern === "email") {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
+  if (pattern === "phone") {
+    return /\d/.test(value);
+  }
+  if (pattern === "url") {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
   try {
     return new RegExp(pattern).test(value);
   } catch {
     return true;
   }
+}
+
+function matchesRegex(value: string, regex: string): boolean {
+  try {
+    return stringToRegex(regex).test(value);
+  } catch {
+    return true;
+  }
+}
+
+function stringToRegex(value: string): RegExp {
+  const match = value.match(/^([/~@;%#'])(.*?)\1([gimsuy]*)$/);
+  return match ? new RegExp(match[2], match[3]) : new RegExp(value);
+}
+
+function defaultPatternInvalidMessage(pattern: string): string {
+  if (pattern === "phone") {
+    return "Not a valid phone number";
+  }
+  if (pattern === "email") {
+    return "Not a valid email address";
+  }
+  return "Invalid input";
+}
+
+function validationIssue(
+  field: string,
+  message: string,
+  severity: string | undefined = "error",
+): FormValidationIssue {
+  return {
+    field,
+    message,
+    severity: severity === "warning" ? "warning" : "error",
+  };
+}
+
+function messageFromIssues(issues: FormValidationIssue[]): string | undefined {
+  return issues.length > 0 ? issues.map((issue) => issue.message).join("\n") : undefined;
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

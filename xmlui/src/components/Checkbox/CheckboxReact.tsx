@@ -33,6 +33,7 @@ export type CheckboxProps = {
   indeterminate?: boolean;
   tabIndex?: number;
   validationStatus?: CheckboxValidationStatus;
+  variant?: string;
   inputRenderer?: (contextVars: { $checked: boolean; $setChecked: (value: unknown) => void }, input: ReactNode) => ReactNode;
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => void | Promise<void>;
   onDidChange?: (value: boolean) => void | Promise<void>;
@@ -62,6 +63,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     indeterminate = defaultProps.indeterminate,
     tabIndex,
     validationStatus = defaultProps.validationStatus,
+    variant,
     inputRenderer,
     onClick,
     onDidChange,
@@ -104,6 +106,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
   const hasLabel = label !== undefined && label !== null && label !== "";
   const effectiveTestId = dataTestId ?? id;
   const labelText = stringifyLabel(label);
+  const needsVariantWrapper = !hasLabel && !inputRenderer && variant !== undefined;
   const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
   const showRequiredIndicator =
     Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
@@ -128,15 +131,15 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       ref={inputRef}
       data-part-id="input"
       data-xmlui-part="input"
-      data-testid={!hasLabel && !inputRenderer ? effectiveTestId : undefined}
+      data-testid={!hasLabel && !inputRenderer && !needsVariantWrapper ? effectiveTestId : undefined}
       className={cx(
         styles.checkboxRoot,
         validationStatus === "error" ? styles.checkboxError : undefined,
         validationStatus === "warning" ? styles.checkboxWarning : undefined,
         validationStatus === "valid" ? styles.checkboxSuccess : undefined,
-        !hasLabel && !inputRenderer ? className : undefined,
+        !hasLabel && !inputRenderer && !needsVariantWrapper ? className : undefined,
       )}
-      style={!hasLabel && !inputRenderer ? style : undefined}
+      style={!hasLabel && !inputRenderer && !needsVariantWrapper ? style : undefined}
       type="checkbox"
       role="checkbox"
       checked={checked}
@@ -172,6 +175,19 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
   }
 
   if (!hasLabel) {
+    if (needsVariantWrapper) {
+      return (
+        <span
+          {...rest}
+          data-testid={effectiveTestId}
+          className={cx(styles.checkboxVariantWrapper, className)}
+          style={style}
+          dir={direction}
+        >
+          {input}
+        </span>
+      );
+    }
     return input;
   }
 

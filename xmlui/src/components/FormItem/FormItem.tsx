@@ -1,6 +1,7 @@
 import {
   createMetadata,
   dAutoFocus,
+  dComponent,
   dEnabled,
   dRequired,
 } from "../../component-core/metadata/helpers";
@@ -12,7 +13,14 @@ $gap-FormItem: createThemeVar("gap-FormItem");
 $gap-label-FormItem: createThemeVar("gap-label-FormItem");
 $width-label-FormItem: createThemeVar("width-label-FormItem");
 $textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
+$textColor-label-formItem: createThemeVar("textColor-label-formItem");
+$fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
 $fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
+$fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
+$fontStyle-label-formItem: createThemeVar("fontStyle-label-formItem");
+$textTransform-label-formItem: createThemeVar("textTransform-label-formItem");
+$textColor-requiredMark-formItem: createThemeVar("textColor-requiredMark-formItem");
+$textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem");
 $textColor-error-FormItem: createThemeVar("textColor-error-FormItem");
 $fontSize-error-FormItem: createThemeVar("fontSize-error-FormItem");
 $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--error");
@@ -54,6 +62,42 @@ export const FormItemMd = createMetadata({
       description: "Validation message used when a required field is empty.",
       valueType: "string",
     },
+    minLength: {
+      description: "Minimum allowed string length.",
+      valueType: "number",
+    },
+    lengthInvalidMessage: {
+      description: "Validation message displayed when length validation fails.",
+      valueType: "string",
+    },
+    pattern: {
+      description: "Predefined pattern validator name or regular expression.",
+      valueType: "string",
+    },
+    patternInvalidMessage: {
+      description: "Validation message displayed when pattern validation fails.",
+      valueType: "string",
+    },
+    patternInvalidSeverity: {
+      description: "Severity level applied to pattern validation failures.",
+      valueType: "string",
+      availableValues: ["error", "warning"],
+      defaultValue: "error",
+    },
+    regex: {
+      description: "Regular expression used to validate the field value.",
+      valueType: "string",
+    },
+    regexInvalidMessage: {
+      description: "Validation message displayed when regex validation fails.",
+      valueType: "string",
+    },
+    regexInvalidSeverity: {
+      description: "Severity level applied to regex validation failures.",
+      valueType: "string",
+      availableValues: ["error", "warning"],
+      defaultValue: "error",
+    },
     validationMode: {
       description: "Controls when field validation feedback is shown.",
       valueType: "string",
@@ -63,6 +107,15 @@ export const FormItemMd = createMetadata({
       description: "Debounces custom validation after value changes by the specified number of milliseconds.",
       valueType: "number",
       defaultValue: 0,
+    },
+    inputTemplate: dComponent("This property is used to define a custom input template."),
+    matchValue: {
+      description: "The value this field must match.",
+      valueType: "any",
+    },
+    matchInvalidMessage: {
+      description: "Validation message displayed when the field value does not match `matchValue`.",
+      valueType: "string",
     },
   },
   events: {
@@ -76,7 +129,14 @@ export const FormItemMd = createMetadata({
     [`gap-label-${COMP}`]: "$space-2",
     [`width-label-${COMP}`]: "12rem",
     [`textColor-label-${COMP}`]: "$textColor",
+    "textColor-label-formItem": "$textColor",
+    "fontSize-label-formItem": "$fontSize-base",
     [`fontWeight-label-${COMP}`]: "$fontWeight-semibold",
+    "fontWeight-label-formItem": "$fontWeight-semibold",
+    "fontStyle-label-formItem": "normal",
+    "textTransform-label-formItem": "none",
+    "textColor-requiredMark-formItem": "$color-danger-500",
+    "textColor-optionalTag-formItem": "$textColor-secondary",
     [`textColor-error-${COMP}`]: "$color-danger-500",
     [`fontSize-error-${COMP}`]: "$fontSize-sm",
     [`borderColor-input-${COMP}--error`]: "$color-danger-500",

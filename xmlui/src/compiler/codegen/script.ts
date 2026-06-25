@@ -262,6 +262,9 @@ function emitExpression(ir: XmluiScriptIr): string {
       if (ir.operator === "delete") {
         return emitDeleteExpression(ir.argument);
       }
+      if (ir.operator === "typeof") {
+        return `(typeof ${emitExpression(ir.argument)})`;
+      }
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
@@ -323,11 +326,14 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugBreak") {
     return "undefined";
   }
+  const args = ir.args.map(emitExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
+  }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot generate unsupported XMLUI expression call target.");
   }
   const objectSource = emitExpression(ir.callee.object);
-  const args = ir.args.map(emitExpression).join(", ");
   return `(${objectSource})?.[${JSON.stringify(ir.callee.member)}]?.(${args})`;
 }
 
@@ -407,6 +413,9 @@ function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpress
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
     const [target, queryParams] = ir.args.map(emitAsyncExpression);
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `await (async (__xmluiContextFn) => typeof __xmluiContextFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiContextFn(${args}))) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
   }
   if (ir.callee.kind === "IdentifierRead") {
     return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])))`;

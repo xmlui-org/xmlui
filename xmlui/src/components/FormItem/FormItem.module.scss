@@ -7,7 +7,14 @@ $gap-FormItem: createThemeVar("gap-FormItem");
 $gap-label-FormItem: createThemeVar("gap-label-FormItem");
 $width-label-FormItem: createThemeVar("width-label-FormItem");
 $textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
+$textColor-label-formItem: createThemeVar("textColor-label-formItem");
+$fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
 $fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
+$fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
+$fontStyle-label-formItem: createThemeVar("fontStyle-label-formItem");
+$textTransform-label-formItem: createThemeVar("textTransform-label-formItem");
+$textColor-requiredMark-formItem: createThemeVar("textColor-requiredMark-formItem");
+$textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem");
 $textColor-error-FormItem: createThemeVar("textColor-error-FormItem");
 $fontSize-error-FormItem: createThemeVar("fontSize-error-FormItem");
 $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--error");
@@ -47,8 +54,11 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 
 .label {
   flex-shrink: 0;
-  color: $textColor-label-FormItem;
-  font-weight: $fontWeight-label-FormItem;
+  color: var(--xmlui-textColor-label-formItem, #{$textColor-label-FormItem});
+  font-size: $fontSize-label-formItem;
+  font-weight: var(--xmlui-fontWeight-label-formItem, #{$fontWeight-label-FormItem});
+  font-style: $fontStyle-label-formItem;
+  text-transform: $textTransform-label-formItem;
   white-space: nowrap;
 }
 
@@ -65,10 +75,12 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 
 .requiredIndicator {
   margin-left: 0.125rem;
+  color: $textColor-requiredMark-formItem;
 }
 
 .optionalIndicator {
   margin-left: 0.25rem;
+  color: $textColor-optionalTag-formItem;
 }
 
 .control {
@@ -83,7 +95,11 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 }
 
 .validationStatusIndicator {
-  display: none;
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: currentColor;
 }
 
 .input {

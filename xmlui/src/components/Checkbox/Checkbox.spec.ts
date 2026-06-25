@@ -812,7 +812,7 @@ test.describe("Api", () => {
 // CUSTOM INPUT TEMPLATE TESTS
 // =============================================================================
 
-test.describe.skip("Custom inputTemplate", () => {
+test.describe("Custom inputTemplate", () => {
   test("inputTemplate renders custom input", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Checkbox>
@@ -1099,7 +1099,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test.fixme("handles variant", async ({ page, initTestBed }) => {
+  test("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<Checkbox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-Checkbox-CustomVariant": "rgb(255, 0, 0)",
@@ -1109,7 +1109,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`<Checkbox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "backgroundColor-Checkbox-CustomVariant": "rgb(0, 255, 0)",
@@ -1157,7 +1157,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`<Checkbox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-Checkbox-CustomVariant": "rgb(255, 0, 0)",
@@ -1171,7 +1171,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(inputPart).toBeVisible();
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Checkbox 
         testId="test" 

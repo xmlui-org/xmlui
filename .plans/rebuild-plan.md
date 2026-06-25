@@ -23,19 +23,38 @@ Immediate status:
 | --- | --- | --- |
 | `[done]` | Foundations and waves through H2B | Infrastructure, runtime semantics, styling, core components, app/routing foundations, services inspection, and shared input internals are complete at foundation level. |
 | `[done]` | P2A Form Core | `Form.spec.ts` has no remaining skipped/fixme tests; Form dirty tracking, submit, events, persistence, sticky rows, parts, APIs, and copied-old Form core coverage are active. |
-| `[current]` | P2A FormItem Closure | Continue with direct input/FormItem parity, now focused on variants/parts and remaining type parity for FormItem-dependent inputs. |
-| `[remaining]` | FormSegment Closure | Finish scoped context, discovery, layout, APIs, and dirty-state parity after the FormItem/input closure work. |
-| `[remaining]` | P2B and later phases | Structured forms, inputs, overlays, menus, navigation, data operations, routing, collections, tooling, docs, extensions, sweeps, and release readiness remain ordered below. |
+| `[done]` | P2A FormItem/Input Closure | FormItem copied-old local blocks and the Slider auto-focus fixme are active. |
+| `[done]` | P2A FormSegment Closure | `FormSegment.spec.ts` is fully active; scoped context, discovery, layout, APIs, dirty state, and scoping parity are closed. |
+| `[current]` | P2B Structured Form Controls | StepperForm copied-old local coverage is closed; continue with TabsForm invalid-tab routing, then accordion mode. |
 
 Current next marker:
 
-`NEXT: P2A FormItem Closure - Input Variants, Parts, and Remaining Type Parity`
+`NEXT: P2B Structured Form Controls - TabsForm Invalid Tab Routing`
 
 Current verification baseline:
 
-- P2A Form cluster: 257 passed, 122 skipped.
-- Full E2E: 2865 passed, 2079 skipped.
+- P2A Form cluster: 379 passed, 0 skipped.
+- Checkbox spec: 118 passed, 0 skipped.
+- FormItem spec: 106 passed, 0 skipped.
+- FormSegment spec: 38 passed, 0 skipped.
+- Slider spec: 112 passed, 0 skipped.
+- StepperForm spec: 8 passed, 0 skipped.
+- Structured-form focused bundle: 75 passed, 3 skipped.
+- Full E2E: 3004 passed, 1940 skipped.
 - TypeScript, unit tests, metadata build, and CSS module audit: passed.
+
+## Handoff Status
+
+Use this table as the quick source of truth for the next session.
+
+| Status | Step | Notes |
+| --- | --- | --- |
+| `[done]` | P2A Form Core | `Form.spec.ts` has no remaining skipped/fixme tests. |
+| `[done]` | Checkbox/Form direct input prerequisites | Checkbox spec is fully active: 118 passed, 0 skipped. |
+| `[done]` | FormItem Type, Validation Properties, Template, Events, Validation Behavior, Accessibility, Phone Pattern, Regex, Theme Variables, and Edge Cases | `FormItem.spec.ts` is fully active: 106 passed, 0 skipped. |
+| `[done]` | Slider Auto-Focus Parity | The remaining Slider auto-focus fixme is active; `Slider.spec.ts` is fully active: 112 passed, 0 skipped. |
+| `[done]` | FormSegment Closure | `FormSegment.spec.ts` is fully active: 38 passed, 0 skipped. |
+| `[current]` | P2B Structured Form Controls | Start here. Remaining local markers are TabsForm invalid-tab routing and accordion mode. |
 
 ## Compatibility Contract
 
@@ -285,41 +304,106 @@ Compatibility support added during this step:
 - Direct Checkbox and Slider labels honor `requireLabelMode`, inherit
   `Form itemRequireLabelMode`, and avoid duplicated labels when rendered inside
   a Form.
+- Component theme resolution maps active `variant` props to variant-suffixed
+  theme variables, and Checkbox variant/parts behavior is active.
+- Checkbox `inputTemplate` metadata, renderer support, and context variables
+  are active. Template children can read `$checked`, call `$setChecked(...)`,
+  and fire `didChange`; `$...` context function calls are supported by the
+  XMLUI expression compiler/interpreter and generated code paths.
+- FormItem Type and Validation Properties blocks are active. FormItem now
+  renders NumberBox-compatible controls for `type="number"` and
+  `type="integer"`, renders an actual textarea for `type="textarea"`, keeps
+  textarea layout props on the FormItem root, and keeps generated number
+  controls from exposing spinner buttons that collide with form action labels.
+- FormItem Phone Pattern and Regex Validation blocks are active. Form
+  validation now carries structured field issues with severity, preserves
+  combined visible messages, supports `pattern="phone"` with the copied-old
+  default message, and supports literal `regex` validation including brace
+  quantifiers passed through expression strings.
+- FormItem Theme Variables and Other Edge Cases blocks are active. FormItem
+  exposes copied-old lower-case label, required-mark, and optional-tag theme
+  variables; validation indicators are visible for status-bearing fields; direct
+  duplicate registrations preserve `noSubmit`; custom `onValidate` is wired only
+  when authored; and required/default blur validation matches copied-old timing.
+- Slider auto-focus coverage is active. The rewrite keeps its Radix thumb focus
+  shim and the copied-old fixme is now a passing test.
+- FormSegment context, discovery, layout, API, dirty-state, and scoping blocks
+  are active. Segment-scoped `$segmentData`, `$segmentValidationIssues`,
+  `$hasSegmentValidationIssue`, `isValid`, `hasIssues`, and `isDirty` now match
+  copied-old behavior, including independent segment scopes and explicit
+  `fields` overrides.
+- XMLUI script compatibility includes the `Object` built-in reference and the
+  `typeof` unary operator in parser, interpreter, and generated-code paths, so
+  copied-old handlers such as `Object.keys(...)` and `typeof $segmentData`
+  work normally.
 
 Latest verified P2A state:
 
 - `npm --workspace xmlui exec -- playwright test src/components/Checkbox/Checkbox.spec.ts src/components/Slider/Slider.spec.ts -g "requireLabelMode|does not duplicate label"`
   - 18 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Checkbox/Checkbox.spec.ts -g "handles variant|variant applies custom theme variables|parts are present when variant is added|all behaviors combined with parts"`
+  - 4 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Checkbox/Checkbox.spec.ts`
+  - 118 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Checkbox/Checkbox.spec.ts -g "Custom inputTemplate"`
+  - 9 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts -g "Type Property|Validation Properties"`
+  - 12 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts -g "Template Properties|Event Handling"`
+  - 16 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts -g "Validation Behavior|Accessibility"`
+  - 12 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts -g "Phone Pattern Validation|Regex Validation"`
+  - 7 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts`
+  - 106 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts -g "Theme Variables"`
+  - 6 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts -g "Other Edge Cases"`
+  - 34 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Slider/Slider.spec.ts -g "autoFocus"`
+  - 1 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormItem/FormItem.spec.ts src/components/Slider/Slider.spec.ts`
+  - 218 passed
+- `npm --workspace xmlui exec -- playwright test src/components/FormSegment/FormSegment.spec.ts`
+  - 38 passed
+  - 0 skipped
 - `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
-  - 257 passed
-  - 122 skipped
+  - 379 passed
+  - 0 skipped
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
   - passed
-- `npm --workspace xmlui test`
+- `npm --workspace xmlui run test`
   - 267 passed
 - `npm --workspace xmlui run build:metadata`
   - passed
 - `npm --workspace xmlui run compatibility:css-module-import-audit`
   - passed
 - `npm --workspace xmlui run test:e2e`
-  - 2865 passed
-  - 2079 skipped
+  - 3001 passed
+  - 1943 skipped
 
 ## Next Step
 
-### NEXT: P2A FormItem Closure - Input Variants, Parts, and Remaining Type Parity
+### NEXT: P2B Structured Form Controls - TabsForm Invalid Tab Routing
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: P2A FormItem Closure -
-> Input Variants, Parts, and Remaining Type Parity**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: P2B Structured Form Controls -
+> TabsForm Invalid Tab Routing**.
 
 Current handoff state:
 
 - This is the next executable step. A new session receiving "Go on with the
   next step" should start here.
-- Do not restart earlier Form work. `Form.spec.ts` has no remaining
-  skipped/fixme tests; the latest verified P2A state above is the baseline.
+- Do not restart earlier P2A Form work. `Form.spec.ts`, `FormItem.spec.ts`,
+  `FormSegment.spec.ts`, `Checkbox.spec.ts`, and `Slider.spec.ts` are fully
+  active. The latest verified P2A state above is the baseline.
+- StepperForm copied-old local coverage is closed: invalid-segment gating and
+  `stepperStackedLabel` markup parity are active. The remaining P2B local
+  fixmes are in `TabsForm.spec.ts`.
 - There are unrelated dirty worktree files, including standalone sample
   `xmlui-latest.js` outputs and prior component/runtime edits. Do not revert
   files unless the user explicitly asks.
@@ -328,6 +412,24 @@ Current handoff state:
 
 Completed immediately before this marker:
 
+- Activated the copied-old StepperForm `stepperStackedLabel=true stacks icon
+  and label with old Stepper markup` test.
+- StepperForm horizontal headers now use Stepper-compatible icon, label block,
+  connector, and `headerItemInner` markup/classes so `stepperStackedLabel`
+  applies the same stacked CSS contract as the standalone Stepper.
+- Activated the two copied-old StepperForm invalid-segment gating tests:
+  `Next is disabled while the active FormSegment is invalid` and `Submit is
+  disabled while the last FormSegment is invalid`.
+- Added segment field discovery for StepperForm segments using explicit
+  `fields` props or nested `bindTo` fields, matching the FormSegment discovery
+  rule for this structured-form use.
+- Added internal `FormContextValue.isFieldValid(name)` so structured form
+  controls can synchronously gate navigation from registered FormItem built-in
+  validation state without surfacing validation messages early.
+- Memoized the Form provider value and added a registration-version refresh so
+  structured-form consumers update when FormItems register. Stabilized
+  FormItem, TextBox, and Select registration effects around specific Form
+  context methods to avoid registration render loops.
 - Activated the final two Form dirty-visibility tests:
   Checkbox and Slider changes now reveal `hideButtonRowUntilDirty` button rows.
 - Activated direct `bindTo syncs $data and value` tests for Checkbox and
@@ -337,87 +439,148 @@ Completed immediately before this marker:
 - Activated direct Checkbox/Slider `requireLabelMode` tests, including
   explicit input override, Form-level `itemRequireLabelMode` inheritance,
   required and optional label indicators, and no duplicate labels inside Forms.
+- Activated Checkbox variant/parts tests and added generic variant-suffixed
+  theme-variable aliasing for component theme classes. Checkbox now wraps
+  variant-decorated unlabeled controls so the component root can expose the
+  `input` part without changing the plain unlabeled input path.
+- Activated the full Checkbox `inputTemplate` copied-old block. Checkbox now
+  exposes `inputTemplate` metadata, renders template children in a template
+  scope with `$checked` and `$setChecked`, and supports callable `$...`
+  context variables in the script compiler and generated code.
+- Activated FormItem `Type Property` and `Validation Properties` copied-old
+  blocks. FormItem now maps number/integer to NumberBox-compatible controls,
+  maps textarea to a real textarea without leaking layout props, and the test
+  driver distinguishes the FormItem `input` part from its native editable field.
+- Activated FormItem `Template Properties` and `Event Handling` copied-old
+  blocks. FormItem now exposes `inputTemplate` metadata, renders explicit
+  `inputTemplate` property children in a scoped `inputRenderer` with `$value`,
+  `$setValue`, and `$validationResult`, and keeps ordinary select/radio children
+  available as options. Form validation now runs custom `onValidate` handlers
+  alongside built-in checks and joins multiple invalid messages for display.
+- Activated FormItem `Validation Behavior` and `Accessibility` copied-old
+  blocks. Form and direct-bound TextBox/PasswordInput registrations now support
+  `matchValue`/`matchInvalidMessage`, direct TextBox controls render form
+  validation feedback, and client-side field validation no longer duplicates
+  messages through the automatic Form validation summary.
+- Activated FormItem `Phone Pattern Validation` and `Regex Validation`
+  copied-old blocks. FormItem now forwards regex and validation severity props;
+  Form validation preserves severity-aware issues, keeps combined field
+  messages visible, recognizes copied-old `pattern="phone"`, and validates
+  regex strings including expression-wrapped brace quantifiers.
+- Activated FormItem `Theme Variables` and `Other Edge Cases` copied-old
+  blocks. FormItem now exposes copied-old lower-case label, required-mark, and
+  optional-tag theme variable hooks, shows validation status indicators,
+  preserves `noSubmit` across duplicate direct registrations, wires custom
+  `onValidate` only when authored, and matches copied-old blur validation
+  timing for required/default fields.
+- Activated the Slider auto-focus copied-old fixme as a passing test. FormItem,
+  Checkbox, and Slider copied-old local specs are now fully active.
+- Activated all FormSegment copied-old local blocks. FormSegment now exposes
+  segment-scoped data and validation context, field discovery, layout prop
+  behavior, `isValid`/`hasIssues`/`isDirty` APIs, and independent segment
+  scoping. Added `Object` and `typeof` script compatibility required by those
+  copied-old handlers.
 
 Step goal:
 
-Move into the broader FormItem/input closure group now that local Form core
-coverage is closed.
+Move into P2B structured form controls now that P2A Form, FormItem, direct
+input, and FormSegment local copied-old coverage is closed.
 
 Known remaining skipped/fixme candidates in this closure group:
 
-- `Checkbox.spec.ts`: custom `inputTemplate` block and four variant/parts
-  fixmes (`handles variant`, variant theme variables, variant parts, combined
-  behaviors with parts).
-- `Slider.spec.ts`: one remaining fixme near auto-focus behavior.
-- `FormItem.spec.ts`: skipped Type, Validation, Template, Event,
-  Validation Behavior, Accessibility, Theme Variable, Edge Case, Phone Pattern,
-  and Regex blocks.
+- `TabsForm.spec.ts`: submit jumps back to the first invalid tab and cancels
+  submission.
+- `TabsForm.spec.ts`: submit jumps to the second tab when only it is invalid.
+- `TabsForm.spec.ts`: `tabsAccordionView=true` stacks tabs in accordion mode
+  with old parity.
 
-1. Inspect remaining skipped/fixme tests in `FormItem.spec.ts`,
-   `Checkbox.spec.ts`, and `Slider.spec.ts`, especially variant/parts and
-   type-parity cases that depend on Form/FormItem integration.
-2. Compare with the original source/tests for FormItem and the affected input
-   components before activating each subgroup.
-3. Choose a narrow coherent subgroup, preferably Checkbox/Slider variant and
-   part parity now that direct input label-mode inheritance is active.
+1. Inspect the two TabsForm invalid-submit routing fixmes first. They should
+   build on the same registered-field validation used by StepperForm gating.
+2. Compare with the original TabsForm implementation/tests before activating
+   either invalid-tab routing test.
+3. Keep `tabsAccordionView=true` deferred until invalid-tab routing is closed.
 
 Task checklist:
 
 1. Inspect remaining copied-old skipped/fixme tests in
-   `xmlui/src/components/FormItem/FormItem.spec.ts`,
-   `xmlui/src/components/Checkbox/Checkbox.spec.ts`, and
-   `xmlui/src/components/Slider/Slider.spec.ts`.
+   `xmlui/src/components/TabsForm/TabsForm.spec.ts`.
 2. Compare with original tests/source under
-   `/Users/dotneteer/source/xmlui/xmlui/src/components/FormItem`,
-   `/Users/dotneteer/source/xmlui/xmlui/src/components/Checkbox`, and
-   `/Users/dotneteer/source/xmlui/xmlui/src/components/Slider`.
-3. Pick one prerequisite subgroup and activate only the tests covered by it.
-4. Preserve unrelated FormSegment deferred tests until their prerequisites are
-   implemented.
+   `/Users/dotneteer/source/xmlui/xmlui/src/components/TabsForm`, and related
+   `Tabs`, `Form`, and `FormSegment` files.
+3. Pick the TabsForm invalid-tab routing subgroup and activate only the tests
+   covered by it.
+4. Preserve unrelated deferred tests until their prerequisites are implemented.
 5. Make the smallest compatibility change required.
 6. Run focused Playwright for the activated test.
-7. Run the P2A Form cluster.
+7. Run the structured-form focused specs and the P2A Form cluster if shared
+   form behavior changes.
 8. Run TypeScript, unit tests, metadata build, CSS module import audit, and
    `npm --workspace xmlui run test:e2e`.
 9. Update this plan with the result and move this NEXT marker forward.
 
 Likely files:
 
-- `xmlui/src/components/Form/Form.spec.ts`
 - `xmlui/src/components/Form/FormContext.tsx`
-- `xmlui/src/components/FormItem/FormItem.spec.ts`
-- `xmlui/src/components/FormItem/FormItemReact.tsx`
-- `xmlui/src/components/Checkbox/CheckboxReact.tsx`
-- `xmlui/src/components/Checkbox/Checkbox.renderer.tsx`
-- `xmlui/src/components/Checkbox/Checkbox.spec.ts`
-- `xmlui/src/components/Slider/SliderReact.tsx`
-- `xmlui/src/components/Slider/Slider.renderer.tsx`
-- `xmlui/src/components/Slider/Slider.spec.ts`
+- `xmlui/src/components/Form/FormReact.tsx`
+- `xmlui/src/components/FormSegment/FormSegmentReact.tsx`
+- `xmlui/src/components/FormSegment/FormSegment.renderer.tsx`
+- `xmlui/src/components/TabsForm/TabsForm.spec.ts`
+- `xmlui/src/components/TabsForm/TabsForm.tsx`
+- `xmlui/src/components/TabsForm/TabsFormReact.tsx`
 - `xmlui/src/testing/ComponentDrivers.ts`
 - `xmlui/src/testing/fixtures.ts`
 
 Original-reference paths:
 
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/FormItem`
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/Checkbox`
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/Slider`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/TabsForm`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FormSegment`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Form`
 
 Verification commands:
 
-- Focused Playwright for each activated test, for example:
-  `npm --workspace xmlui exec -- playwright test src/components/Checkbox/Checkbox.spec.ts src/components/Slider/Slider.spec.ts -g "variant|parts"`
+- Focused Playwright for each activated structured-form subgroup, for example:
+  `npm --workspace xmlui exec -- playwright test src/components/TabsForm/TabsForm.spec.ts -g "submit jumps"`
+- Structured-form focused specs:
+  `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts src/components/TabsForm/TabsForm.spec.ts src/components/Stepper/Stepper.spec.ts`
 - P2A Form cluster:
   `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
 - TypeScript:
   `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - Unit tests:
-  `npm --workspace xmlui test`
+  `npm --workspace xmlui run test`
 - Metadata:
   `npm --workspace xmlui run build:metadata`
 - CSS audit:
   `npm --workspace xmlui run compatibility:css-module-import-audit`
 - Full E2E after the completed step:
   `npm --workspace xmlui run test:e2e`
+
+Latest verification for the completed StepperForm stacked-label step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts -g "stepperStackedLabel"`
+  - 1 passed
+- `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts`
+  - 8 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts src/components/TabsForm/TabsForm.spec.ts src/components/Stepper/Stepper.spec.ts`
+  - 75 passed
+  - 3 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3004 passed
+  - 1940 skipped
 
 ## Roadmap By Status
 
@@ -448,13 +611,27 @@ Completed in this P2A phase:
 - Direct Checkbox and Slider `bindTo` API/data synchronization.
 - Direct Checkbox and Slider `requireLabelMode` inheritance/override label
   parity.
+- Checkbox variant/parts parity and generic component variant theme-variable
+  aliasing.
+- Checkbox `inputTemplate` parity, including `$checked` and callable
+  `$setChecked(...)` template context support.
+- FormItem Type Property and Validation Properties parity.
+- FormItem Template Properties and Event Handling parity.
+- FormItem Validation Behavior and Accessibility parity.
+- FormItem Phone Pattern and Regex Validation parity.
+- FormItem Theme Variables and Other Edge Cases parity.
+- Slider auto-focus parity.
+- FormSegment scoped context variables, field discovery, layout props, APIs,
+  dirty state, and context scoping parity.
 
-Next P2A closure group:
+Next closure group:
 
-1. `[current]` FormItem/input validation, type, accessibility, and
-   variant/parts cases.
+1. `[current]` P2B Structured Form Controls, continuing with TabsForm
+   invalid-tab routing after StepperForm local copied-old coverage closed.
 
-### 2. [current] P2A: FormItem/Input Closure
+### 2. [done] P2A: FormItem/Input Closure
+
+This umbrella step is complete at local copied-old spec level.
 
 Components:
 
@@ -464,9 +641,9 @@ Components:
 
 Goal:
 
-- Close remaining FormItem/input validation, type, accessibility, and
-  variant/parts cases.
-- Keep this step focused on copied-old tests whose prerequisites are already
+- Closed remaining FormItem theme-variable, edge-case, and Slider auto-focus
+  cases.
+- Kept this step focused on copied-old tests whose prerequisites were already
   satisfied by Form core and direct input binding.
 
 Verification:
@@ -475,7 +652,7 @@ Verification:
 - P2A Form cluster, TypeScript, unit tests, metadata, CSS audit, and full E2E
   after each completed subgroup.
 
-### 3. [remaining] P2A: FormSegment Closure
+### 3. [done] P2A: FormSegment Closure
 
 Component:
 
@@ -483,10 +660,10 @@ Component:
 
 Goal:
 
-- Close scoped context, field discovery, layout props, APIs, and dirty-state
+- Closed scoped context, field discovery, layout props, APIs, and dirty-state
   parity after the FormItem/input closure work.
 
-### 4. [remaining] P2B: Structured Form Controls
+### 4. [current] P2B: Structured Form Controls
 
 Components:
 

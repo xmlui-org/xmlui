@@ -69,6 +69,10 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
   ref,
 ) {
   const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const validateFormField = form?.validateField;
+  const registerFormItem = form?.registerItem;
   const fieldName = useMemo(() => {
     if (!bindTo) {
       return undefined;
@@ -80,7 +84,7 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
   const [internalValue, setInternalValue] = useState<SelectValue>(normalizedInitialValue);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const formValue = fieldName !== undefined ? form?.getValue(fieldName) as SelectValue : undefined;
+  const formValue = fieldName !== undefined ? getFormValue?.(fieldName) as SelectValue : undefined;
   const currentValue = formValue !== undefined
     ? normalizeValue(formValue, multiSelect)
     : controlledValue === undefined
@@ -92,23 +96,23 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
   }, [normalizedInitialValue]);
 
   useEffect(() => {
-    if (!form || fieldName === undefined) {
+    if (!registerFormItem || fieldName === undefined) {
       return;
     }
-    return form.registerItem({
+    return registerFormItem({
       name: fieldName,
       required,
     });
-  }, [fieldName, form, required]);
+  }, [fieldName, registerFormItem, required]);
 
   const updateValue = useCallback((nextValue: SelectValue) => {
     setInternalValue(nextValue);
-    if (form && fieldName !== undefined) {
-      form.setValue(fieldName, nextValue);
-      void form.validateField(fieldName, nextValue);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, nextValue);
+      void validateFormField?.(fieldName, nextValue);
     }
     void onDidChange?.(nextValue);
-  }, [fieldName, form, onDidChange]);
+  }, [fieldName, onDidChange, setFormValue, validateFormField]);
 
   useImperativeHandle(ref, () => ({
     focus: () => triggerRef.current?.focus(),

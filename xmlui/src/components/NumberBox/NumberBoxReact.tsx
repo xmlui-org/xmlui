@@ -28,6 +28,7 @@ export type NumberBoxProps = {
   required?: boolean;
   autoFocus?: boolean;
   tabIndex?: number;
+  inputMode?: "numeric" | "decimal";
   startText?: unknown;
   startIcon?: unknown;
   endText?: unknown;
@@ -73,6 +74,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     required,
     autoFocus,
     tabIndex,
+    inputMode,
     startText,
     startIcon,
     endText,
@@ -213,7 +215,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
         className={styles.numberBoxInput}
         type="text"
         role="spinbutton"
-        inputMode={integersOnly ? "numeric" : "decimal"}
+        inputMode={inputMode ?? (integersOnly ? "numeric" : "decimal")}
         value={localValue}
         placeholder={placeholder}
         maxLength={maxLength}

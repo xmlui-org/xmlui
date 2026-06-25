@@ -1,4 +1,5 @@
-import { wrapComponent } from "../../runtime/rendering/adapter";
+import { wrapComponent, nonPropertyChildren, templateChildren } from "../../runtime/rendering/adapter";
+import { createRuntimeScope } from "../../runtime/state";
 import { CheckboxMd } from "./Checkbox";
 import { defaultProps } from "./Checkbox.defaults";
 import { CheckboxNative, type CheckboxApi } from "./CheckboxReact";
@@ -11,6 +12,7 @@ export const checkboxRenderer = wrapComponent({
   defaultPart: "input",
   renderer: ({ adapter }) => {
     const apiRef = { current: null as CheckboxApi | null };
+    const inputTemplate = templateChildren(adapter.node, "inputTemplate") ?? nonPropertyChildren(adapter.node.children);
     return (
       <CheckboxNative
         {...adapter.rootAttrs("input")}
@@ -36,6 +38,26 @@ export const checkboxRenderer = wrapComponent({
         autoFocus={adapter.booleanProp("autoFocus", false)}
         indeterminate={adapter.booleanProp("indeterminate", defaultProps.indeterminate)}
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
+        variant={adapter.stringProp("variant")}
+        inputRenderer={
+          inputTemplate.length > 0
+            ? (contextVars) => {
+                const templateScope = createRuntimeScope({
+                  store: adapter.scope.store,
+                  parent: adapter.scope,
+                  props: adapter.scope.props,
+                  contextValues: contextVars,
+                  references: adapter.scope.references,
+                  slots: adapter.scope.slots,
+                  routing: adapter.scope.routing,
+                  toast: adapter.scope.toast,
+                  emitEvent: adapter.scope.emitEvent,
+                  extensionFunctions: adapter.scope.extensionFunctions,
+                });
+                return adapter.context.renderChildren(inputTemplate, templateScope);
+              }
+            : undefined
+        }
         onClick={(event) => {
           void adapter.event("click")(event);
         }}

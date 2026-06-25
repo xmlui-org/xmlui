@@ -134,7 +134,7 @@ export type XmluiBinaryExpressionIr = XmluiScriptIrBase & {
 
 export type XmluiUnaryExpressionIr = XmluiScriptIrBase & {
   kind: "UnaryExpression";
-  operator: "!" | "+" | "-" | "delete";
+  operator: "!" | "+" | "-" | "delete" | "typeof";
   argument: XmluiScriptIr;
 };
 
@@ -1140,7 +1140,13 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       }
       return unsupported(node);
     case "UnaryExpression":
-      if (node.operator === "!" || node.operator === "+" || node.operator === "-" || node.operator === "delete") {
+      if (
+        node.operator === "!" ||
+        node.operator === "+" ||
+        node.operator === "-" ||
+        node.operator === "delete" ||
+        node.operator === "typeof"
+      ) {
         return {
           kind: "UnaryExpression",
           span: node.span,
@@ -1481,6 +1487,9 @@ function isAllowedCall(callee: ScriptNode, scope?: XmluiScope): boolean {
   if (callee.kind === "Identifier" && scope?.specials.has(callee.name)) {
     return true;
   }
+  if (callee.kind === "Identifier" && scope && resolveXmluiIdentifier(scope, callee.name)?.kind === "context") {
+    return true;
+  }
   if (callee.kind === "MemberExpression") {
     return true;
   }
@@ -1719,6 +1728,9 @@ function emitExpression(ir: XmluiScriptIr): string {
       if (ir.operator === "delete") {
         return emitDeleteExpression(ir.argument);
       }
+      if (ir.operator === "typeof") {
+        return `(typeof ${emitExpression(ir.argument)})`;
+      }
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
@@ -1768,10 +1780,13 @@ function emitOptionalIndexRead(object: XmluiScriptIr, index: XmluiScriptIr): str
 }
 
 function emitCallExpression(ir: XmluiCallExpressionIr): string {
+  const args = ir.args.map(emitExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
+  }
   if (ir.callee.kind !== "MemberRead" && ir.callee.kind !== "ScopedMemberRead") {
     throw new Error("Cannot compile unsupported XMLUI expression call target.");
   }
-  const args = ir.args.map(emitExpression).join(", ");
   if (ir.callee.kind === "ScopedMemberRead") {
     throw new Error("Cannot compile unsupported XMLUI expression call target.");
   }
@@ -1858,6 +1873,9 @@ function emitAsyncCallExpression(ir: XmluiCallExpressionIr): string {
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
     const [target, queryParams] = args;
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `await (async (__xmluiContextFn) => typeof __xmluiContextFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiContextFn(${args.join(", ")}))) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
   }
   if (ir.callee.kind === "IdentifierRead") {
     return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args.join(", ")}])))`;
@@ -2039,6 +2057,9 @@ function executeExpressionIr(
         return executeDeleteExpression(ir.argument, context, lexical);
       }
       const argument = executeExpressionIr(ir.argument, context, lexical);
+      if (ir.operator === "typeof") {
+        return typeof argument;
+      }
       if (ir.operator === "!") {
         return !argument;
       }
@@ -2124,6 +2145,13 @@ function executeCallExpression(
   context: CompiledExpressionContext,
   lexical: Record<string, unknown>,
 ): unknown {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    const target = context.readContext?.(ir.callee.name);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    return target(...ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
+  }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot execute unsupported XMLUI expression call target.");
   }
@@ -2167,6 +2195,9 @@ async function executeExpressionIrAsync(
         return executeDeleteExpressionAsync(ir.argument, context, lexical);
       }
       const argument = await executeExpressionIrAsync(ir.argument, context, lexical);
+      if (ir.operator === "typeof") {
+        return typeof argument;
+      }
       if (ir.operator === "!") {
         return !argument;
       }
@@ -2295,6 +2326,14 @@ async function executeCallExpressionAsync(
     const [target, queryParams] = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
     context.navigate?.(target, queryParams as Record<string, unknown> | undefined);
     return undefined;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    const target = context.readContext?.(ir.callee.name);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    return (context.complete ?? completeValue)(await target(...args));
   }
   if (ir.callee.kind === "IdentifierRead") {
     const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));

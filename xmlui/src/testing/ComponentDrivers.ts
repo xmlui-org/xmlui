@@ -123,7 +123,11 @@ export class FormItemDriver extends ComponentDriver {
   }
 
   get textBox(): Locator {
-    return this.input;
+    return this.input
+      .locator(
+        "xpath=self::input | self::textarea | self::select | self::*[@contenteditable='true'] | .//input | .//textarea | .//select | .//*[@contenteditable='true']",
+      )
+      .first();
   }
 
   get checkbox(): Locator {

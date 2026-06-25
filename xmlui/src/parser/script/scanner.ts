@@ -439,6 +439,8 @@ function keywordKind(text: string): ScriptTokenKind {
       return ScriptTokenKind.ReturnKeyword;
     case "delete":
       return ScriptTokenKind.DeleteKeyword;
+    case "typeof":
+      return ScriptTokenKind.TypeofKeyword;
     default:
       return ScriptTokenKind.Identifier;
   }

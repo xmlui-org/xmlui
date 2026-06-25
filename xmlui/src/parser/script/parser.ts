@@ -395,6 +395,7 @@ class ScriptParser {
       case ScriptTokenKind.Plus:
       case ScriptTokenKind.Minus:
       case ScriptTokenKind.DeleteKeyword:
+      case ScriptTokenKind.TypeofKeyword:
         return this.createUnaryExpression(this.consume(), this.parseExpression(10));
       case ScriptTokenKind.PlusPlus:
       case ScriptTokenKind.MinusMinus:

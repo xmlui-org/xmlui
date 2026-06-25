@@ -52,11 +52,12 @@ export function useComponentThemeClass(
   componentName: string,
   metadata: ComponentMetadata,
   contributors: readonly ComponentMetadata[] = [],
+  variant?: string,
 ) {
   const themeVariables = useThemeVariables();
   return useMemo(
-    () => createComponentThemeClass(componentName, metadata, themeVariables, contributors),
-    [componentName, metadata, themeVariables, contributors],
+    () => createComponentThemeClass(componentName, metadata, themeVariables, contributors, variant),
+    [componentName, metadata, themeVariables, contributors, variant],
   );
 }
 

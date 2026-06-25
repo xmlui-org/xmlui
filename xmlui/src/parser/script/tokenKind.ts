@@ -20,6 +20,7 @@ export const ScriptTokenKind = {
   ForKeyword: "ForKeyword",
   ReturnKeyword: "ReturnKeyword",
   DeleteKeyword: "DeleteKeyword",
+  TypeofKeyword: "TypeofKeyword",
   Dollar: "Dollar",
   Dot: "Dot",
   Ellipsis: "Ellipsis",

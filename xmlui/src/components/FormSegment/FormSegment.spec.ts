@@ -49,7 +49,7 @@ test.describe("Basic Rendering", () => {
 // $segmentData CONTEXT VARIABLE
 // =============================================================================
 
-test.describe.skip("$segmentData context variable", () => {
+test.describe("$segmentData context variable", () => {
   test("contains only the segment's fields", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form data="{{ name: 'Alice', email: 'alice@example.com' }}" hideButtonRow="true">
@@ -108,7 +108,7 @@ test.describe.skip("$segmentData context variable", () => {
 // $segmentValidationIssues CONTEXT VARIABLE
 // =============================================================================
 
-test.describe.skip("$segmentValidationIssues context variable", () => {
+test.describe("$segmentValidationIssues context variable", () => {
   test("is empty when no validation issues exist", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form data="{{ name: 'Bob' }}" hideButtonRow="true">
@@ -153,7 +153,7 @@ test.describe.skip("$segmentValidationIssues context variable", () => {
 // $hasSegmentValidationIssue CONTEXT VARIABLE
 // =============================================================================
 
-test.describe.skip("$hasSegmentValidationIssue context variable", () => {
+test.describe("$hasSegmentValidationIssue context variable", () => {
   test("returns false when no segment field has issues", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form data="{{ name: 'Bob' }}" hideButtonRow="true">
@@ -256,7 +256,7 @@ test.describe.skip("$hasSegmentValidationIssue context variable", () => {
 // FIELD DISCOVERY
 // =============================================================================
 
-test.describe.skip("Field discovery", () => {
+test.describe("Field discovery", () => {
   test("auto-discovers bindTo fields from direct children", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form data="{{ first: 'Alice', last: 'Smith' }}" hideButtonRow="true">
@@ -316,7 +316,7 @@ test.describe.skip("Field discovery", () => {
 // ORIENTATION AND LAYOUT PROPERTIES
 // =============================================================================
 
-test.describe.skip("Orientation and layout properties", () => {
+test.describe("Orientation and layout properties", () => {
   test("defaults to vertical orientation (VStack)", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
@@ -416,7 +416,7 @@ test.describe.skip("Orientation and layout properties", () => {
 // API: isValid AND hasIssues
 // =============================================================================
 
-test.describe.skip("APIs: isValid and hasIssues", () => {
+test.describe("APIs: isValid and hasIssues", () => {
   test("isValid returns true when all segment fields are valid", async ({
     initTestBed,
     page,
@@ -571,7 +571,7 @@ test.describe.skip("APIs: isValid and hasIssues", () => {
 // API: isDirty
 // =============================================================================
 
-test.describe.skip("API: isDirty", () => {
+test.describe("API: isDirty", () => {
   test("returns false initially when no field has been touched", async ({
     initTestBed,
     page,
@@ -756,7 +756,7 @@ test.describe.skip("API: isDirty", () => {
 // CONTEXT VARIABLE SCOPING
 // =============================================================================
 
-test.describe.skip("Context variable scoping", () => {
+test.describe("Context variable scoping", () => {
   test("each segment has independent $segmentData", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form data="{{ a: '1', b: '2' }}" hideButtonRow="true">
