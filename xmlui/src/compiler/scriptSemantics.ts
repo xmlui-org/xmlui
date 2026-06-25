@@ -39,12 +39,13 @@ export type BoundDependency = {
 };
 
 export type BoundWriteTarget = {
-  kind: "local" | "global" | "handlerLocal" | "unresolved" | "invalid";
+  kind: "local" | "global" | "handlerLocal" | "member" | "unresolved" | "invalid";
   name: string;
   path: string[];
   operator: "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=";
   span: SourceSpan;
   binding?: XmluiBinding;
+  object?: XmluiScriptIr;
 };
 
 export type BoundScriptResult = {
@@ -773,6 +774,14 @@ type EventCodegenContext = {
   allocateLoopCheckpointName(): string;
 };
 
+function createArrowBlockCodegenContext(): EventCodegenContext {
+  return {
+    prologue: [],
+    checkpointCall: "",
+    allocateLoopCheckpointName: () => "__xmluiLoopCheckpoint",
+  };
+}
+
 function createEventCodegenContext(sync: boolean, userNames: Set<string>): EventCodegenContext {
   const usedNames = new Set(userNames);
   let nextLoopCheckpointId = 0;
@@ -981,6 +990,17 @@ function bindWriteTarget(
     return write;
   }
 
+  if (target.kind === "MemberExpression" && target.property.kind === "Identifier") {
+    return {
+      kind: "member",
+      name: target.property.name,
+      path: [target.property.name],
+      operator: operator as BoundWriteTarget["operator"],
+      span: target.span,
+      object: lowerWriteTargetObject(target.object, scope, findLexicalBinding, result),
+    };
+  }
+
   result.diagnostics.push(
     createErrorDiagnostic("XS203", "Invalid XMLUI script write target.", target.span),
   );
@@ -991,6 +1011,32 @@ function bindWriteTarget(
     operator: operator as BoundWriteTarget["operator"],
     span: target.span,
   };
+}
+
+function lowerWriteTargetObject(
+  object: ScriptNode,
+  scope: XmluiScope,
+  findLexicalBinding: (name: string) => { mutable: boolean; span: SourceSpan } | undefined,
+  result: BoundScriptResult,
+): XmluiScriptIr {
+  if (object.kind !== "Identifier" || findLexicalBinding(object.name)) {
+    return lowerNode(object, result);
+  }
+  const binding = resolveXmluiIdentifier(scope, object.name);
+  if (!binding || binding.kind === "special") {
+    return lowerNode(object, result);
+  }
+  return identifierReadIr({
+    kind: "IdentifierRead",
+    span: object.span,
+    name: object.name,
+  }, {
+    kind: binding.kind,
+    name: object.name,
+    path: [object.name],
+    span: object.span,
+    binding,
+  });
 }
 
 function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
@@ -1130,6 +1176,11 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       };
     case "ExpressionStatement":
       return lowerExpressionStatement(node, bound);
+    case "BlockStatement":
+    case "IfStatement":
+    case "WhileStatement":
+    case "VariableDeclaration":
+      return lowerHandlerStatement(node, bound);
     case "Program":
       return eventHandlerIrFromProgram(node, bound);
     default:
@@ -1239,16 +1290,26 @@ function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
       return expressionContainsSyncUnsafeCall(expression.body);
     case "AssignmentExpression":
       return expressionContainsSyncUnsafeCall(expression.right);
+    case "ExpressionStatement":
+      return expressionContainsSyncUnsafeCall(expression.expression);
+    case "VariableDeclaration":
+      return expression.declarations.some((declaration) =>
+        declaration.init ? expressionContainsSyncUnsafeCall(declaration.init) : false
+      );
+    case "BlockStatement":
+      return expression.body.some((statement) => findSyncUnsafeStatement(statement) !== undefined);
+    case "IfStatement":
+      return expressionContainsSyncUnsafeCall(expression.test) ||
+        findSyncUnsafeStatement(expression.consequent) !== undefined ||
+        (expression.alternate ? findSyncUnsafeStatement(expression.alternate) !== undefined : false);
+    case "WhileStatement":
+      return expressionContainsSyncUnsafeCall(expression.test) ||
+        findSyncUnsafeStatement(expression.body) !== undefined;
     case "PrefixUpdate":
     case "PostfixUpdate":
     case "LiteralExpression":
     case "IdentifierRead":
     case "ScopedMemberRead":
-    case "ExpressionStatement":
-    case "VariableDeclaration":
-    case "BlockStatement":
-    case "IfStatement":
-    case "WhileStatement":
     case "EventHandler":
     case "Unsupported":
       return false;
@@ -1645,7 +1706,10 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "CallExpression":
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
-      return `(${ir.params.join(", ")}) => ${emitExpression(ir.body)}`;
+      if (ir.body.kind === "BlockStatement") {
+        return `async (${ir.params.join(", ")}) => {\nlet __xmluiResult;\n${emitBlockStatement(ir.body, createArrowBlockCodegenContext())}\nreturn __xmluiResult;\n}`;
+      }
+      return `(${ir.params.join(", ")}) => (${emitExpression(ir.body)})`;
     case "AssignmentExpression":
       return emitAssignmentExpression(ir);
     case "PrefixUpdate":
@@ -1715,6 +1779,9 @@ function emitEventExpression(expression: XmluiScriptIr): string {
       return emitUpdateExpression(expression);
     case "ArrowFunctionExpression":
       if (expression.params.length === 0) {
+        if (expression.body.kind === "BlockStatement") {
+          return emitExpression(expression);
+        }
         return emitEventExpression(expression.body);
       }
       return emitExpression(expression);
@@ -1855,6 +1922,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "handlerLocal") {
     return target.name;
   }
+  if (target.kind === "member" && target.object) {
+    return emitOptionalMemberRead(target.object, target.name);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
@@ -1863,6 +1933,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 }
 
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
+  if (target.kind === "member" && target.object) {
+    return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
@@ -1953,6 +2026,9 @@ function executeExpressionIr(
         ir.params.forEach((param, index) => {
           nextLexical[param] = args[index];
         });
+        if (ir.body.kind === "BlockStatement") {
+          return executeEventStatement(ir.body, context as CompiledEventContext, nextLexical, undefined);
+        }
         if (isEventMutationExpression(ir.body)) {
           return executeExpressionIrAsync(ir.body, context as CompiledEventContext, nextLexical);
         }
@@ -2367,6 +2443,10 @@ function executeTargetRead(
   if (target.kind === "handlerLocal") {
     return lexical[target.name];
   }
+  if (target.kind === "member" && target.object) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
+    return object == null ? undefined : object[target.name];
+  }
   if (target.kind === "local") {
     return context.readLocal(target.name);
   }
@@ -2384,6 +2464,14 @@ function executeTargetWrite(
 ): void {
   if (target.kind === "handlerLocal") {
     writeLexical(lexical, target.name, value);
+    return;
+  }
+  if (target.kind === "member" && target.object) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
+    if (object == null) {
+      throw new Error(`Cannot write XMLUI script member '${target.name}' on null or undefined.`);
+    }
+    object[target.name] = value;
     return;
   }
   if (target.kind === "local") {
@@ -2516,6 +2604,17 @@ function isEventMutationExpression(ir: XmluiScriptIr): boolean {
       return isEventMutationExpression(ir.object) || isEventMutationExpression(ir.index);
     case "ArrowFunctionExpression":
       return isEventMutationExpression(ir.body);
+    case "ExpressionStatement":
+      return isEventMutationExpression(ir.expression);
+    case "VariableDeclaration":
+      return ir.declarations.some((declaration) =>
+        declaration.init ? isEventMutationExpression(declaration.init) : false
+      );
+    case "BlockStatement":
+      return true;
+    case "IfStatement":
+    case "WhileStatement":
+      return true;
     default:
       return false;
   }

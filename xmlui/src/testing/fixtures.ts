@@ -1,4 +1,11 @@
-import { expect as baseExpect, test as base, type Locator, type Page } from "@playwright/test";
+import {
+  devices,
+  expect as baseExpect,
+  test as base,
+  type BrowserContext,
+  type Locator,
+  type Page,
+} from "@playwright/test";
 import {
   AccordionDriver,
   AppHeaderDriver,
@@ -106,9 +113,16 @@ type Fixtures = {
   createVStackDriver: (testId?: string) => Promise<ComponentDriver>;
 };
 
+type WorkerFixtures = {
+  _sharedContext: BrowserContext;
+  _sharedPage: Page;
+};
+
 declare global {
   interface Window {
     __xmluiClipboardText?: string;
+    __xmluiTestBedReady?: boolean;
+    __xmluiTestBedReinit?: (source: string) => Promise<void>;
   }
 }
 
@@ -135,7 +149,61 @@ export const expect = baseExpect.extend({
   },
 });
 
-export const test = base.extend<Fixtures>({
+export const test = base.extend<Fixtures, WorkerFixtures>({
+  _sharedContext: [
+    async ({ browser }, use) => {
+      const context = await browser.newContext({
+        ...devices["Desktop Chrome"],
+        baseURL: "http://127.0.0.1:5173/",
+        permissions: ["clipboard-read", "clipboard-write"],
+      });
+      await use(context);
+      await context.close();
+    },
+    { scope: "worker" },
+  ],
+  _sharedPage: [
+    async ({ _sharedContext }, use) => {
+      const page = await _sharedContext.newPage();
+      await use(page);
+    },
+    { scope: "worker" },
+  ],
+  page: async ({ _sharedPage, viewport }, use) => {
+    if (viewport) {
+      await _sharedPage.setViewportSize(viewport);
+    }
+
+    const initScriptQueue: Array<{ fn: Function; arg?: unknown }> = [];
+    const originalAddInitScript = (_sharedPage.addInitScript as Function).bind(_sharedPage);
+    (_sharedPage as any).addInitScript = async (fn: any, arg?: any) => {
+      if (typeof fn === "function") {
+        initScriptQueue.push({ fn, arg });
+      }
+      return originalAddInitScript(fn, arg);
+    };
+    (_sharedPage as any).__xmluiInitScriptQueue = initScriptQueue;
+
+    await use(_sharedPage);
+
+    (_sharedPage as any).addInitScript = originalAddInitScript;
+    (_sharedPage as any).__xmluiInitScriptQueue = undefined;
+    try {
+      await _sharedPage.unrouteAll({ behavior: "ignoreErrors" });
+      await _sharedPage.evaluate(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.scrollTo(0, 0);
+        if ((window as any).__originalMatchMedia) {
+          window.matchMedia = (window as any).__originalMatchMedia;
+          delete (window as any).__originalMatchMedia;
+        }
+      });
+      await _sharedPage.mouse.move(0, 0);
+    } catch {
+      // The shared page can already be gone after a hard test failure.
+    }
+  },
   initTestBed: async ({ page }, use) => {
     await use(async (markup, options = {}) => {
       await initTestBed(page, markup, options);
@@ -606,7 +674,7 @@ async function initTestBed(
   options: InitTestBedOptions,
 ): Promise<void> {
   const source = normalizeTestBedSource(markup, options);
-  await page.addInitScript((xmluiSource) => {
+  const installTestBedSource = (xmluiSource: string) => {
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -618,12 +686,56 @@ async function initTestBed(
       },
     });
     window.sessionStorage.setItem("__xmluiTestBedSource", xmluiSource);
-  }, source);
-  await page.goto("/?__xmluiTestBed=1");
+  };
+  const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
+  if (isReady) {
+    await replayInitScripts(page);
+    await page.evaluate(installTestBedSource, source);
+    try {
+      await page.evaluate(async (xmluiSource) => {
+        await window.__xmluiTestBedReinit?.(xmluiSource);
+      }, source);
+    } catch {
+      await page.addInitScript(installTestBedSource, source);
+      await page.goto("/?__xmluiTestBed=1");
+    }
+  } else {
+    await page.addInitScript(installTestBedSource, source);
+    await page.goto("/?__xmluiTestBed=1");
+  }
   const error = page.getByTestId("xmlui-testbed-error");
   if (await error.count()) {
     throw new Error(await error.textContent() ?? "XMLUI testbed failed to compile.");
   }
+  if (source.includes(`testId="__xmlui-test-state"`)) {
+    await page.getByTestId("__xmlui-test-state").waitFor({ state: "attached" });
+  }
+  await page.evaluate(() =>
+    document.fonts.ready.then(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => setTimeout(resolve, 0));
+        }),
+    ),
+  );
+  await page.keyboard.press("Shift");
+}
+
+async function replayInitScripts(page: Page): Promise<void> {
+  const initScriptQueue: Array<{ fn: Function; arg?: unknown }> =
+    (page as any).__xmluiInitScriptQueue ?? [];
+  for (const { fn, arg } of initScriptQueue) {
+    try {
+      if (arg === undefined) {
+        await page.evaluate(fn as any);
+      } else {
+        await page.evaluate(fn as any, arg);
+      }
+    } catch {
+      // Playwright accepts init scripts that cannot be replayed via evaluate.
+    }
+  }
+  initScriptQueue.length = 0;
 }
 
 function createButtonDriver(page: Page): ComponentDriver {

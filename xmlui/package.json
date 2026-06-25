@@ -45,13 +45,13 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.0",
+    "dotenv": "^16.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "sass": "^1.93.0",
+    "tsx": "^4.20.0",
     "typescript": "^5.7.3",
     "vite": "^8.0.0",
-    "sass": "^1.93.0",
-    "dotenv": "^16.3.1",
-    "tsx": "^4.20.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
@@ -59,6 +59,7 @@
     "@types/node": "^22.18.13",
     "@types/react": "18.2.23",
     "@types/react-dom": "18.2.8",
+    "@types/yargs": "^17.0.35",
     "sass": "^1.93.3",
     "vitest": "^4.1.0"
   }

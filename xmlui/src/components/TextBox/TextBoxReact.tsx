@@ -2,6 +2,9 @@ import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "reac
 import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./TextBox.defaults";
+import { useFormContext } from "../Form/FormContext";
+import { useThemeVariables } from "../../runtime/rendering/theme";
+import { resolveThemeReferences } from "../../styling/theme";
 import styles from "./TextBox.module.scss";
 
 export type TextBoxProps = {
@@ -59,8 +62,8 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
     className,
     style,
     label,
-    labelPosition = "top",
-    labelBreak = false,
+    labelPosition,
+    labelBreak,
     labelWidth,
     direction,
     placeholder,
@@ -94,6 +97,11 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
   ref,
 ) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const form = useFormContext();
+  const themeVariables = useThemeVariables();
+  const effectiveLabelPosition = labelPosition ?? form?.itemLabelPosition ?? "top";
+  const effectiveLabelBreak = labelBreak ?? form?.itemLabelBreak ?? false;
+  const effectiveLabelWidth = labelWidth ?? form?.itemLabelWidth;
   const generatedInputId = useId();
   const controlled = value !== undefined;
   const [localValue, setLocalValue] = useState(() => stringifyInputValue(value ?? initialValue));
@@ -150,8 +158,8 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
       data-part-id="label"
       data-xmlui-part="label"
       htmlFor={inputId}
-      className={cx(styles.textBoxLabel, labelBreak ? styles.textBoxLabelBreak : undefined)}
-      style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}
+      className={cx(styles.textBoxLabel, effectiveLabelBreak ? styles.textBoxLabelBreak : undefined)}
+      style={effectiveLabelWidth !== undefined ? { width: cssLength(effectiveLabelWidth, themeVariables) } : undefined}
     >
       <span>{labelText}</span>
       {required ? <span className={styles.textBoxLabelRequired}>*</span> : null}
@@ -253,7 +261,7 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
       <div
       className={cx(
         styles.textBoxLabeledItem,
-        labelPositionClass(labelPosition, direction),
+        labelPositionClass(effectiveLabelPosition, direction),
       )}
       data-part-id="labeledItem"
       data-xmlui-part="labeledItem"
@@ -315,8 +323,16 @@ function normalizeAutoComplete(value: string | boolean | undefined): string | un
   return typeof value === "boolean" ? normalizeOnOff(value) : value;
 }
 
-function cssLength(value: string | number): string {
-  return typeof value === "number" ? `${value}px` : value;
+function cssLength(value: string | number, themeVariables: Record<string, unknown>): string {
+  const normalized = resolveThemeReferences(resolveThemeValue(value, themeVariables));
+  return typeof normalized === "number" ? `${normalized}px` : String(normalized);
+}
+
+function resolveThemeValue(value: string | number, themeVariables: Record<string, unknown>): string | number {
+  if (typeof value !== "string" || !value.startsWith("$")) {
+    return value;
+  }
+  return themeVariables[value.slice(1)] as string | number | undefined ?? value;
 }
 
 function labelPositionClass(value: string, direction?: string): string {

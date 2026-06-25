@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { defaultProps } from "./RadioGroup.defaults";
+import { convertOptionValue } from "../Option/OptionReact";
 import styles from "./RadioGroup.module.scss";
 
 export type RadioGroupOption = {
@@ -78,12 +79,13 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
 ) {
   const groupId = useId();
   const groupRef = useRef<HTMLDivElement | null>(null);
-  const [internalValue, setInternalValue] = useState<unknown>(initialValue ?? "");
+  const normalizedInitialValue = convertOptionValue(initialValue ?? "");
+  const [internalValue, setInternalValue] = useState<unknown>(normalizedInitialValue);
   const currentValue = controlledValue === undefined ? internalValue : controlledValue;
 
   useEffect(() => {
-    setInternalValue(initialValue ?? "");
-  }, [initialValue]);
+    setInternalValue(normalizedInitialValue);
+  }, [normalizedInitialValue]);
 
   const updateValue = useCallback((nextValue: unknown) => {
     setInternalValue(nextValue);

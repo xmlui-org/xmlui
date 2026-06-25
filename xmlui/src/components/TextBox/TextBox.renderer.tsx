@@ -23,8 +23,12 @@ export const textBoxRenderer = wrapComponent({
         value={adapter.prop("value")}
         initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
         label={adapter.prop("label")}
-        labelPosition={adapter.stringProp("labelPosition", "top")}
-        labelBreak={adapter.booleanProp("labelBreak", false)}
+        labelPosition={adapter.stringProp("labelPosition")}
+        labelBreak={
+          Object.prototype.hasOwnProperty.call(adapter.props, "labelBreak")
+            ? adapter.booleanProp("labelBreak", false)
+            : undefined
+        }
         labelWidth={adapter.prop("labelWidth")}
         direction={adapter.stringProp("direction")}
         placeholder={adapter.stringProp("placeholder")}
@@ -76,8 +80,12 @@ export const passwordInputRenderer = wrapComponent({
         value={adapter.prop("value")}
         initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
         label={adapter.prop("label")}
-        labelPosition={adapter.stringProp("labelPosition", "top")}
-        labelBreak={adapter.booleanProp("labelBreak", false)}
+        labelPosition={adapter.stringProp("labelPosition")}
+        labelBreak={
+          Object.prototype.hasOwnProperty.call(adapter.props, "labelBreak")
+            ? adapter.booleanProp("labelBreak", false)
+            : undefined
+        }
         labelWidth={adapter.prop("labelWidth")}
         direction={adapter.stringProp("direction")}
         placeholder={adapter.stringProp("placeholder")}

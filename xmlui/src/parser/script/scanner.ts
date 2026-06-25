@@ -363,6 +363,7 @@ function classifyScriptToken(kind: ScriptTokenKind): TokenClassification {
     case ScriptTokenKind.ElseKeyword:
     case ScriptTokenKind.WhileKeyword:
     case ScriptTokenKind.ForKeyword:
+    case ScriptTokenKind.ReturnKeyword:
       return "keyword";
     case ScriptTokenKind.NumberLiteral:
     case ScriptTokenKind.StringLiteral:
@@ -429,6 +430,8 @@ function keywordKind(text: string): ScriptTokenKind {
       return ScriptTokenKind.WhileKeyword;
     case "for":
       return ScriptTokenKind.ForKeyword;
+    case "return":
+      return ScriptTokenKind.ReturnKeyword;
     default:
       return ScriptTokenKind.Identifier;
   }

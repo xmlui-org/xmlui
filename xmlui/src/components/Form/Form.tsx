@@ -1,4 +1,4 @@
-import { createMetadata, dEnabled } from "../../component-core/metadata/helpers";
+import { createMetadata, dComponent, dEnabled } from "../../component-core/metadata/helpers";
 import { extractScssThemeVars } from "../../styling/theme";
 
 const COMP = "Form";
@@ -16,12 +16,25 @@ export const FormMd = createMetadata({
   props: {
     id: { description: "The component id.", valueType: "string" },
     testId: { description: "The test id.", valueType: "string" },
+    buttonRowTemplate: dComponent(
+      "This property allows defining a custom component to display the buttons at the bottom of the form.",
+    ),
     data: { description: "Initial form data object.", valueType: "any" },
     enabled: dEnabled(true),
     saveLabel: {
       description: "The label of the submit button.",
       valueType: "string",
       defaultValue: "Save",
+    },
+    savePendingLabel: {
+      description: "The label of the submit button while async field validation is in progress.",
+      valueType: "string",
+      defaultValue: "Validating...",
+    },
+    submitFeedbackDelay: {
+      description: "Delay in milliseconds before showing submit/validation feedback labels.",
+      valueType: "number",
+      defaultValue: 100,
     },
     cancelLabel: {
       description: "The label of the cancel button.",
@@ -46,14 +59,38 @@ export const FormMd = createMetadata({
     itemLabelPosition: { description: "Default label position for form items.", valueType: "string" },
     itemLabelWidth: { description: "Default label width for form items.", valueType: "length" },
     itemLabelBreak: { description: "Default label break behavior for form items.", valueType: "boolean" },
+    itemRequireLabelMode: {
+      description: "Default required/optional label indicator mode for form items.",
+      valueType: "string",
+      availableValues: ["markRequired", "markOptional", "markBoth"],
+      defaultValue: "markRequired",
+    },
   },
   events: {
+    willSubmit: {
+      description: "This event is triggered before the form submits and may cancel or transform submitted data.",
+    },
     submit: {
       description: "This event is triggered when the form validates and submits.",
+    },
+    submitFailed: {
+      description: "This event is triggered when form validation prevents submission.",
     },
     cancel: {
       description: "This event is triggered when the user cancels the form.",
     },
+    reset: {
+      description: "This event is triggered when the form is reset.",
+    },
+    success: {
+      description: "This event is triggered after the form submits successfully.",
+    },
+    saved: {
+      description: "Compatibility alias triggered after the form submits successfully.",
+    },
+  },
+  contextVars: {
+    $data: dComponent("The current form data object, including an update method for changing form values."),
   },
   themeVars: extractScssThemeVars(formStylesSource),
   defaultThemeVars: {

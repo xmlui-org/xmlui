@@ -71,6 +71,10 @@ export class FormDriver extends ComponentDriver {
   get cancelButton(): Locator {
     return this.component.getByRole("button", { name: "Cancel" });
   }
+
+  async submitForm(_mode: "click" | "keypress" = "click") {
+    await this.submitButton.click();
+  }
 }
 
 export class FormItemDriver extends ComponentDriver {
@@ -80,6 +84,10 @@ export class FormItemDriver extends ComponentDriver {
 
   get textBox(): Locator {
     return this.input;
+  }
+
+  get checkbox(): Locator {
+    return this.input.getByRole("checkbox").or(this.component.getByRole("checkbox")).first();
   }
 
   get label(): Locator {

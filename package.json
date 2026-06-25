@@ -36,5 +36,9 @@
     "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata",
     "build-extensions": "npm --workspace xmlui-counter-badge run build && npm --workspace xmlui-counter-badge run build:metadata",
     "build-playground": "node scripts/compatibility-missing.mjs COMP-0006 build-playground"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-darwin-arm64": "^1.1.3",
+    "lightningcss-darwin-arm64": "^1.32.0"
   }
 }

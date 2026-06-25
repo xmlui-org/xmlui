@@ -1,6 +1,14 @@
-import { renderXmluiApp } from "./runtime";
+import { createElement } from "react";
+import type { Root } from "react-dom/client";
+import {
+  createXmluiModule,
+  mountXmluiApp,
+  renderXmluiApp,
+  XmluiRoot,
+  type MountXmluiAppOptions,
+  type XmluiModule,
+} from "./runtime";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
-import { createXmluiModule } from "./runtime";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import "./global.css";
 
@@ -121,6 +129,8 @@ declare global {
       readLocal(name: string): unknown;
       readGlobal(name: string): unknown;
     };
+    __xmluiTestBedReady?: boolean;
+    __xmluiTestBedReinit?: (source: string) => Promise<void>;
   }
 }
 
@@ -245,24 +255,62 @@ if (!root) {
 
 const params = new URLSearchParams(window.location.search);
 if (params.has("__xmluiTestBed")) {
-  const source = window.sessionStorage.getItem("__xmluiTestBedSource") ?? "<App />";
-  try {
+  let testBedRoot: Root | undefined;
+  let testBedRenderKey = 0;
+
+  const compileTestBedModule = (source: string): Extract<XmluiModule, { kind: "app" }> => {
     const compiled = compileXmluiSource({
       id: "testbed.xmlui",
       source,
       extensions: [counterBadgeExtension],
     });
     throwFirstCompilerDiagnostic(compiled);
-    renderXmluiApp(createXmluiModule(compiled.runtimeDocument, [], {
+    const module = createXmluiModule(compiled.runtimeDocument, [], {
       extensions: [counterBadgeExtension],
-    }), root, {
-      extensions: [counterBadgeExtension],
-      testProbe: (probe) => {
-        window.__xmluiTestBedProbe = probe;
-      },
     });
-  } catch (error) {
+    if (module.kind !== "app") {
+      throw new Error("Test bed source must compile to an app module.");
+    }
+    return module;
+  };
+
+  const showTestBedError = (error: unknown): void => {
     root.innerHTML = `<pre data-testid="xmlui-testbed-error">${escapeHtml(error instanceof Error ? error.message : String(error))}</pre>`;
+  };
+
+  const renderTestBedModule = (module: Extract<XmluiModule, { kind: "app" }>): void => {
+    const key = testBedRenderKey++;
+    const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
+      window.__xmluiTestBedProbe = probe;
+    };
+    if (!testBedRoot) {
+      testBedRoot = mountXmluiApp(module, root, {
+        extensions: [counterBadgeExtension],
+        testProbe,
+      });
+      return;
+    }
+    testBedRoot.render(createElement(XmluiRoot, {
+      key,
+      module,
+      extensions: [counterBadgeExtension],
+      testProbe,
+    }));
+  };
+
+  window.__xmluiTestBedReinit = async (source: string) => {
+    const module = compileTestBedModule(source);
+    history.replaceState(null, "", "/?__xmluiTestBed=1");
+    window.scrollTo(0, 0);
+    renderTestBedModule(module);
+  };
+
+  try {
+    const source = window.sessionStorage.getItem("__xmluiTestBedSource") ?? "<App />";
+    renderTestBedModule(compileTestBedModule(source));
+    window.__xmluiTestBedReady = true;
+  } catch (error) {
+    showTestBedError(error);
   }
 } else {
   const example = params.get("example") ?? "globals";

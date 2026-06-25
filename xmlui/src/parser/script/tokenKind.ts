@@ -18,6 +18,7 @@ export const ScriptTokenKind = {
   ElseKeyword: "ElseKeyword",
   WhileKeyword: "WhileKeyword",
   ForKeyword: "ForKeyword",
+  ReturnKeyword: "ReturnKeyword",
   Dollar: "Dollar",
   Dot: "Dot",
   OpenParen: "OpenParen",

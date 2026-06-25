@@ -160,6 +160,15 @@ type EventCodegenContext = {
   allocateLoopCheckpointName(): string;
 };
 
+function createArrowBlockCodegenContext(): EventCodegenContext {
+  return {
+    prologue: [],
+    stateDeclaration: "",
+    checkpointCall: "",
+    allocateLoopCheckpointName: () => "__xmluiLoopCheckpoint",
+  };
+}
+
 export function emitSharedYieldHelperSource({
   createStateName,
   checkpointName,
@@ -260,7 +269,10 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "CallExpression":
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
-      return `(${ir.params.join(", ")}) => ${emitExpression(ir.body)}`;
+      if (ir.body.kind === "BlockStatement") {
+        return `async (${ir.params.join(", ")}) => {\nlet __xmluiResult;\n${emitBlockStatement(ir.body, createArrowBlockCodegenContext())}\nreturn __xmluiResult;\n}`;
+      }
+      return `(${ir.params.join(", ")}) => (${emitExpression(ir.body)})`;
     case "AssignmentExpression":
       return emitAssignmentExpression(ir);
     case "PrefixUpdate":
@@ -336,6 +348,9 @@ function emitEventExpression(expression: XmluiScriptIr): string {
       return emitUpdateExpression(expression);
     case "ArrowFunctionExpression":
       if (expression.params.length === 0) {
+        if (expression.body.kind === "BlockStatement") {
+          return emitExpression(expression);
+        }
         return emitEventExpression(expression.body);
       }
       return emitExpression(expression);
@@ -477,6 +492,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "handlerLocal") {
     return target.name;
   }
+  if (target.kind === "member" && target.object) {
+    return emitOptionalMemberRead(target.object, target.name);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
   }
@@ -485,6 +503,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 }
 
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
+  if (target.kind === "member" && target.object) {
+    return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
   }

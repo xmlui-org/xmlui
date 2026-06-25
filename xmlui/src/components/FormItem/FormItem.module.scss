@@ -46,8 +46,14 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
 }
 
 .label {
+  flex-shrink: 0;
   color: $textColor-label-FormItem;
   font-weight: $fontWeight-label-FormItem;
+  white-space: nowrap;
+}
+
+.labelBreak {
+  white-space: normal;
 }
 
 .labelStart .label,
