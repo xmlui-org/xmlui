@@ -35,11 +35,16 @@ const fullWebServers = [
 ];
 
 export default defineConfig({
+  fullyParallel: true,
   testDir: ".",
   testMatch: [
     "tests/e2e/**/*.spec.ts",
     "src/components/**/*.spec.ts",
   ],
+  workers: process.env.CI ? "80%" : "75%",
+  forbidOnly: !!process.env.CI,
+  reporter: process.env.CI ? [["github"], ["html"]] : [["html", { open: "never" }]],
+  expect: { timeout: 10_000 },
   testIgnore: includeIncompleteCompatibility
     ? []
     : [
