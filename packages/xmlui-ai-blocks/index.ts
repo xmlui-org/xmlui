@@ -1,7 +1,7 @@
 import { startApp } from "xmlui";
 import aiBlocks from "./src";
 
-export const runtime = import.meta.glob(`/demo/**`, { eager: true });
+export const runtime = import.meta.glob("./demo/**/*.xmlui", { eager: true });
 startApp(runtime, aiBlocks);
 
 if (import.meta.hot) {

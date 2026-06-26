@@ -1,0 +1,181 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-XmluiBuilderFrame: createThemeVar("backgroundColor-XmluiBuilderFrame");
+$borderColor-XmluiBuilderFrame: createThemeVar("borderColor-XmluiBuilderFrame");
+$borderRadius-XmluiBuilderFrame: createThemeVar("borderRadius-XmluiBuilderFrame");
+$boxShadow-XmluiBuilderFrame: createThemeVar("boxShadow-XmluiBuilderFrame");
+$minHeight-XmluiBuilderFrame: createThemeVar("minHeight-XmluiBuilderFrame");
+$gap-XmluiBuilderFrame: createThemeVar("gap-XmluiBuilderFrame");
+$padding-XmluiBuilderFrame: createThemeVar("padding-XmluiBuilderFrame");
+$padding-panel-XmluiBuilderFrame: createThemeVar("padding-panel-XmluiBuilderFrame");
+$padding-toolbar-XmluiBuilderFrame: createThemeVar("padding-toolbar-XmluiBuilderFrame");
+$padding-status-XmluiBuilderFrame: createThemeVar("padding-status-XmluiBuilderFrame");
+$padding-tabs-XmluiBuilderFrame: createThemeVar("padding-tabs-XmluiBuilderFrame");
+$padding-tab-XmluiBuilderFrame: createThemeVar("padding-tab-XmluiBuilderFrame");
+$gap-panel-XmluiBuilderFrame: createThemeVar("gap-panel-XmluiBuilderFrame");
+$backgroundColor-toolbar-XmluiBuilderFrame: createThemeVar("backgroundColor-toolbar-XmluiBuilderFrame");
+$backgroundColor-status-XmluiBuilderFrame: createThemeVar("backgroundColor-status-XmluiBuilderFrame");
+$backgroundColor-panel-XmluiBuilderFrame: createThemeVar("backgroundColor-panel-XmluiBuilderFrame");
+$backgroundColor-tabs-XmluiBuilderFrame: createThemeVar("backgroundColor-tabs-XmluiBuilderFrame");
+$backgroundColor-tab-XmluiBuilderFrame: createThemeVar("backgroundColor-tab-XmluiBuilderFrame");
+$backgroundColor-tab-XmluiBuilderFrame--active: createThemeVar("backgroundColor-tab-XmluiBuilderFrame--active");
+$borderColor-tab-XmluiBuilderFrame: createThemeVar("borderColor-tab-XmluiBuilderFrame");
+$borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-XmluiBuilderFrame--active");
+
+@layer components {
+  .root {
+    min-height: $minHeight-XmluiBuilderFrame;
+    background: $backgroundColor-XmluiBuilderFrame;
+    border: 1px solid $borderColor-XmluiBuilderFrame;
+    border-radius: $borderRadius-XmluiBuilderFrame;
+    box-shadow: $boxShadow-XmluiBuilderFrame;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .shell {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $gap-XmluiBuilderFrame;
+    padding: $padding-XmluiBuilderFrame;
+  }
+
+  .toolbar,
+  .status {
+    border-radius: calc($borderRadius-XmluiBuilderFrame / 1.5);
+    padding: $padding-toolbar-XmluiBuilderFrame;
+    background: $backgroundColor-toolbar-XmluiBuilderFrame;
+  }
+
+  .status {
+    background: $backgroundColor-status-XmluiBuilderFrame;
+  }
+
+  .topTabs,
+  .workspaceTabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    padding: $padding-tabs-XmluiBuilderFrame;
+    border-radius: calc($borderRadius-XmluiBuilderFrame / 1.5);
+    background: $backgroundColor-tabs-XmluiBuilderFrame;
+  }
+
+  .tabButton {
+    appearance: none;
+    border: 1px solid $borderColor-tab-XmluiBuilderFrame;
+    background: $backgroundColor-tab-XmluiBuilderFrame;
+    color: inherit;
+    border-radius: calc($borderRadius-XmluiBuilderFrame / 2.2);
+    padding: $padding-tab-XmluiBuilderFrame;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .tabButtonActive {
+    background: $backgroundColor-tab-XmluiBuilderFrame--active;
+    border-color: $borderColor-tab-XmluiBuilderFrame--active;
+    font-weight: 600;
+  }
+
+  .stackLayout,
+  .tabsLayout {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $gap-panel-XmluiBuilderFrame;
+  }
+
+  .splitLayout {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+    gap: $gap-panel-XmluiBuilderFrame;
+  }
+
+  .chatPane,
+  .workspacePane,
+  .panel,
+  .auxiliaryPanel {
+    min-width: 0;
+    min-height: 0;
+    border-radius: calc($borderRadius-XmluiBuilderFrame / 1.5);
+    background: $backgroundColor-panel-XmluiBuilderFrame;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chatPaneSplit {
+    flex: 0 0 auto;
+    overflow: hidden;
+  }
+
+  .chatPane {
+    gap: $gap-panel-XmluiBuilderFrame;
+    padding: $padding-panel-XmluiBuilderFrame;
+  }
+
+  .workspacePane,
+  .panel,
+  .auxiliaryPanel {
+    gap: $gap-panel-XmluiBuilderFrame;
+  }
+
+  .workspaceViewport {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $gap-panel-XmluiBuilderFrame;
+  }
+
+  .panelScroll {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: $gap-panel-XmluiBuilderFrame;
+  }
+
+  .workspaceSplit {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: $gap-panel-XmluiBuilderFrame;
+  }
+
+  .timelinePanel {
+    flex: 0 0 auto;
+  }
+
+  .splitHandle {
+    width: 0.5rem;
+    cursor: col-resize;
+    border-radius: 999px;
+    background: color-mix(in srgb, $borderColor-XmluiBuilderFrame 60%, transparent);
+    align-self: stretch;
+    flex: 0 0 auto;
+  }
+
+  .chatPaneHidden {
+    display: none;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
