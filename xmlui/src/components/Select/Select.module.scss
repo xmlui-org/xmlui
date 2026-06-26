@@ -237,7 +237,7 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
 
   .selectPopover {
     position: relative;
-    z-index: var(--xmlui-zIndex-Select, 10);
+    min-width: 100%;
   }
 
   .selectOptions {

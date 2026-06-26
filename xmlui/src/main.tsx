@@ -11,6 +11,8 @@ import {
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import "./global.css";
+import "./components/Inspector/Inspector.scss";
+import "./components/InspectButton/InspectButton.scss";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -50,7 +52,10 @@ import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Mai
 import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
+import includeMarkupFoundationApp from "./examples/include-markup-foundation/Main.xmlui";
+import inspectorFoundationApp from "./examples/inspector-foundation/Main.xmlui";
 import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
+import markdownFoundationApp from "./examples/markdown-foundation/Main.xmlui";
 import navGroupFoundationApp from "./examples/navgroup-foundation/Main.xmlui";
 import navLinkFoundationApp from "./examples/navlink-foundation/Main.xmlui";
 import navPanelCollapseButtonFoundationApp from "./examples/nav-panel-collapse-button-foundation/Main.xmlui";
@@ -173,7 +178,10 @@ const examples = {
   htmlTagsFragment: htmlTagsFragmentApp,
   iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
+  includeMarkupFoundation: includeMarkupFoundationApp,
+  inspectorFoundation: inspectorFoundationApp,
   linkInteraction: linkInteractionApp,
+  markdownFoundation: markdownFoundationApp,
   navGroupFoundation: navGroupFoundationApp,
   navLinkFoundation: navLinkFoundationApp,
   navPanelCollapseButtonFoundation: navPanelCollapseButtonFoundationApp,

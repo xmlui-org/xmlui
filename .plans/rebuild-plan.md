@@ -59,11 +59,14 @@ Immediate status:
 | `[done]` | P3C File and Selection Inputs | FileInput, FileUploadDropZone, RadioGroup, Select, and AutoComplete-owned slices are closed; the nested DropdownMenu/ModalDialog overlay handoff tests are active after P4B closure. |
 | `[done]` | P4B Menu Family Closure | DropdownMenu and ContextMenu copied/foundation coverage is active, SubMenuItem icon tests are active, nested Select/AutoComplete overlay handoff tests are active, and the focused P4B bundle passes with no skips. |
 | `[done]` | P4C Navigation Shell Components | Navigation-shell closure is complete for this pass; remaining skips are explicit broader theme/layout/dropdown-matrix debt. |
-| `[current]` | H3A Runtime Markup Inclusion | Start here next. |
+| `[done]` | H3A Runtime Markup Inclusion | IncludeMarkup runtime fetch/parse/render behavior, events, stateful included fragments, and runnable example coverage are closed. |
+| `[done]` | H3B Markdown and CodeText | Markdown and internal CodeText rendering, legacy `@{}` binding replacement, code fences, heading anchors, table/list/inline-code basics, `xmlui-pg` nested app rendering, and runnable foundation coverage are active. |
+| `[done]` | H4A Inspector and Inspect Button | Inspector trigger/dialog/API, debug event capture, shared InspectButton inspect-mode state, runnable foundation example, and focused/full E2E coverage are active. |
+| `[current]` | H4B Internationalization Surface | Start here next. |
 
 Current next marker:
 
-`NEXT: H3A Runtime Markup Inclusion`
+`NEXT: H4B Internationalization Surface`
 
 Current verification baseline:
 
@@ -132,7 +135,10 @@ Use this table as the quick source of truth for the next session.
 | `[done]` | P3C File and Selection Inputs | FileInput, FileUploadDropZone, RadioGroup, Select, and AutoComplete-owned slices are closed; nested DropdownMenu/ModalDialog overlay handoff tests are active after P4B closure. |
 | `[done]` | P4B Menu Family Closure | DropdownMenu and ContextMenu copied/foundation coverage is active, nested Select/AutoComplete overlay handoff tests are active, and the focused P4B bundle passes with no skips. |
 | `[done]` | P4C Navigation Shell Components | Navigation-shell closure is complete for this pass; focused bundle is 63 passed, 133 explicit skips, and the ignored-App layout/drawer sweep is 12 passed. |
-| `[current]` | H3A Runtime Markup Inclusion | Start here next. |
+| `[done]` | H3A Runtime Markup Inclusion | IncludeMarkup runtime fetch/parse/render behavior, events, stateful included fragments, and runnable example coverage are closed. |
+| `[done]` | H3B Markdown and CodeText | Markdown and internal CodeText rendering, legacy `@{}` binding replacement, code fences, heading anchors, table/list/inline-code basics, `xmlui-pg` nested app rendering, and runnable foundation coverage are active. |
+| `[done]` | H4A Inspector and Inspect Button | Inspector trigger/dialog/API, debug event capture, shared InspectButton inspect-mode state, runnable foundation example, and focused/full E2E coverage are active. |
+| `[current]` | H4B Internationalization Surface | Start here next. |
 
 ## Compatibility Contract
 
@@ -460,21 +466,21 @@ Latest verified P2A state:
 - `npm --workspace xmlui run compatibility:css-module-import-audit`
   - passed
 - `npm --workspace xmlui run test:e2e`
-  - 3001 passed
-  - 1943 skipped
+  - 3606 passed
+  - 1390 skipped
 
 ## Next Step
 
-### NEXT: H3A Runtime Markup Inclusion
+### NEXT: H4B Internationalization Surface
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: H3A Runtime Markup Inclusion**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: H4B Internationalization Surface**.
 
 Current handoff state:
 
 - This is the next executable step. A new session receiving "Go on with the
-  next step" should start with H3A runtime markup inclusion.
+  next step" should start with H4B Internationalization Surface.
 - Do not restart earlier P2A Form work. `Form.spec.ts`, `FormItem.spec.ts`,
   `FormSegment.spec.ts`, `Checkbox.spec.ts`, and `Slider.spec.ts` are fully
   active. The latest verified P2A state above is the baseline.
@@ -1142,7 +1148,7 @@ Verification commands:
   The latest focused P3C result before P4B was 115 passed and 2 skipped; the
   nested DropdownMenu/ModalDialog overlay handoff tests are now active and pass
   after P4B closure.
-- Next focused commands should move into H3A runtime markup inclusion.
+- Next focused commands should move into H3B Markdown and CodeText.
 - TypeScript:
   `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - Unit tests:
@@ -1605,7 +1611,10 @@ Completed in this P2A phase:
 
 Next closure group:
 
-1. `[current]` H3A Runtime Markup Inclusion.
+1. `[done]` H3A Runtime Markup Inclusion.
+2. `[done]` H3B Markdown and CodeText.
+3. `[done]` H4A Inspector and Inspect Button.
+4. `[current]` H4B Internationalization Surface.
 
 ### 2. [done] P2A: FormItem/Input Closure
 
@@ -1887,7 +1896,7 @@ Latest focused verification:
 - `env XMLUI_INCLUDE_INCOMPLETE_COMPAT=1 npm --workspace xmlui exec -- playwright test src/components/App/App.spec.ts --grep "renders with vertical layout|renders with vertical-sticky layout|renders with vertical-full-header layout|desktop layout renders with header and footer|desktop layout works without header|desktop layout works without footer|desktop layout works with only content|Drawer displayed if NavPanel|Drawer not displayed if NavPanel" --reporter=list --workers=2`
   - 12 passed
 
-### 11. [current] H3A: Runtime Markup Inclusion
+### 11. [done] H3A: Runtime Markup Inclusion
 
 Component:
 
@@ -1898,7 +1907,81 @@ Goal:
 - Close runtime markup loading, compilation boundary behavior, error handling,
   state updates, and examples.
 
-### 12. [remaining] H3B: Markdown and CodeText
+Completed:
+
+- Added `IncludeMarkup` runtime component, compiler/registry/lowerer wiring,
+  copied-old compatibility E2E coverage, and `includeMarkupFoundation`.
+- Preserved fragment/component fetched-markup behavior, loadingContent,
+  didLoad/didFail, re-fetch on URL changes, transparent bare fragments, and
+  stateful included fragments.
+- Fixed adjacent Select mirror/dropdown layering regressions surfaced by the
+  required full E2E gate.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui exec -- playwright test src/components/IncludeMarkup/IncludeMarkup.spec.ts --reporter=list --workers=1`
+  - 11 passed
+- `npm --workspace xmlui exec -- playwright test tests/e2e/include-markup.spec.ts --reporter=list --workers=1`
+  - 1 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.spec.ts:2640 src/components/Form/Form.spec.ts:3543 src/components/Option/Option.foundation.spec.ts:4 src/components/Select/Select.foundation.spec.ts:17 src/components/Select/Select.foundation.spec.ts:29 src/components/Select/Select.spec.ts:343 src/components/Select/Select.spec.ts:372 src/components/Select/Select.spec.ts:401 src/components/Select/Select.spec.ts:1218 src/components/Select/Select.spec.ts:2802 src/components/DropdownMenu/DropdownMenu.spec.ts:642 src/components/DropdownMenu/DropdownMenu.spec.ts:721 src/components/Select/Select.spec.ts:1719 src/components/Select/Select.spec.ts:1798 --reporter=list --workers=2`
+  - 14 passed
+- `npm --workspace xmlui run test:e2e`
+  - 3582 passed
+  - 1390 skipped
+- H3B focused Markdown/CodeText/example bundle:
+  `npm --workspace xmlui exec -- playwright test src/components/Markdown/Markdown.spec.ts src/components/Markdown/CodeText.spec.ts tests/e2e/markdown.spec.ts --reporter=list --workers=2`
+  - 24 passed
+- H3B NestedApp prerequisite focus:
+  `npm --workspace xmlui exec -- playwright test src/components/NestedApp/NestedApp.spec.ts --reporter=list --workers=2`
+  - 3 passed
+- H3B non-browser verification:
+  - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed
+  - `npm --workspace xmlui run test` passed, 267 tests
+  - `npm --workspace xmlui run check:metadata` passed
+  - `npm --workspace xmlui run compatibility:css-module-import-audit` passed
+- H3B full E2E completion gate:
+  `npm --workspace xmlui run test:e2e`
+  - 3606 passed
+  - 1390 skipped
+
+Completed H4A:
+
+- Added experimental `Inspector` and `InspectButton` runtime components with
+  compiler contracts, lowerer/registry wiring, metadata, defaults, and
+  stylesheet-backed visuals.
+- Preserved the original Inspector surface: trigger button, portal dialog,
+  iframe `src`, `tooltip`, `dialogTitle`, `dialogWidth`, `dialogHeight`, and
+  `open`/`close` APIs. The rewrite also exposes `isOpen` for deterministic
+  local tests.
+- Added shared InspectButton inspect-mode state so multiple buttons reflect the
+  same on/off state.
+- Connected Inspector to the existing XMLUI debug bridge and rendered recent
+  debug events inside the dialog.
+- Added the runnable `inspectorFoundation` example and E2E coverage for opening
+  the inspector, capturing debug events, and toggling inspect mode.
+- Inspector/InspectButton styles are component-owned stylesheets loaded from
+  the app entrypoint for now. The CSS module import audit passes, but reports
+  Inspector under "no stylesheet usage" because the renderer does not import a
+  CSS module directly.
+
+Verification:
+
+- H4A focused Inspector/InspectButton/example bundle:
+  `npm --workspace xmlui exec -- playwright test src/components/Inspector/Inspector.spec.ts src/components/InspectButton/InspectButton.spec.ts tests/e2e/inspector.spec.ts --reporter=list --workers=2`
+  - 5 passed
+- H4A non-browser verification:
+  - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed
+  - `npm --workspace xmlui run test` passed, 267 tests
+  - `npm --workspace xmlui run check:metadata` passed
+  - `npm --workspace xmlui run compatibility:css-module-import-audit` passed
+- H4A full E2E completion gate:
+  `npm --workspace xmlui run test:e2e`
+  - 3611 passed
+  - 1390 skipped
+
+### 12. [done] H3B: Markdown and CodeText
 
 Components:
 
@@ -1910,7 +1993,7 @@ Goal:
 - Close markdown rendering, XMLUI code fences, syntax highlighting, runtime
   examples, and old Markdown/FocusScope prerequisite tests.
 
-### 13. [remaining] H4A: Inspector and Inspect Button
+### 13. [done] H4A: Inspector and Inspect Button
 
 Components:
 
@@ -1922,7 +2005,7 @@ Goal:
 - Close runtime inspection UI, debug metadata, modal integration, and relevant
   examples.
 
-### 14. [remaining] H4B: Internationalization Surface
+### 14. [current] H4B: Internationalization Surface
 
 Component:
 

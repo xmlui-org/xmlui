@@ -1,0 +1,16 @@
+.codeText {
+  margin: 0;
+  padding: var(--xmlui-padding-CodeText, var(--xmlui-space-3, 0.75rem));
+  overflow-x: auto;
+  user-select: text;
+  background: var(--xmlui-backgroundColor-CodeText, transparent);
+  border-radius: var(--xmlui-borderRadius-CodeText, 0);
+}
+
+.codeText > code {
+  display: block;
+  padding-left: var(--xmlui-paddingLeft-CodeText-code, var(--xmlui-space-2, 0.5rem));
+  color: var(--xmlui-textColor-Text-codefence, var(--xmlui-textColor, inherit));
+  font-family: var(--xmlui-fontFamily-Text-codefence, var(--xmlui-fontFamily-Text-code, var(--xmlui-fontFamily-monospace, monospace)));
+  white-space: pre;
+}

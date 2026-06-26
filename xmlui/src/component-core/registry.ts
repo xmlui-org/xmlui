@@ -122,6 +122,10 @@ import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneC
 import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
 import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
+import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
+import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
+import { inspectorRenderer } from "../components/Inspector/Inspector";
+import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -141,6 +145,10 @@ const implementedRuntimeNames = [
   "Fragment",
   "Image",
   "IFrame",
+  "IncludeMarkup",
+  "Inspector",
+  "InspectButton",
+  "Markdown",
   "Icon",
   "Link",
   "List",
@@ -375,6 +383,10 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Page: pageRenderer,
   Redirect: redirectRenderer,
   NestedApp: nestedAppRenderer,
+  IncludeMarkup: includeMarkupRenderer,
+  Markdown: markdownRenderer,
+  Inspector: inspectorRenderer,
+  InspectButton: inspectButtonRenderer,
   ...htmlTagRenderers,
 };
 
@@ -508,6 +520,10 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const pagesTransferred = contract.name === "Pages" || contract.name === "Page";
     const redirectTransferred = contract.name === "Redirect";
     const nestedAppTransferred = contract.name === "NestedApp";
+    const includeMarkupTransferred = contract.name === "IncludeMarkup";
+    const markdownTransferred = contract.name === "Markdown";
+    const inspectorTransferred = contract.name === "Inspector";
+    const inspectButtonTransferred = contract.name === "InspectButton";
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
@@ -603,7 +619,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       toneChangerButtonTransferred ||
       pagesTransferred ||
       redirectTransferred ||
-      nestedAppTransferred;
+      nestedAppTransferred ||
+      includeMarkupTransferred ||
+      markdownTransferred ||
+      inspectorTransferred ||
+      inspectButtonTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
       : appHeaderTransferred

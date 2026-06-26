@@ -75,6 +75,10 @@ import { ToneChangerButtonMd } from "../../components/ToneChangerButton/ToneChan
 import { PageMd, PagesMd } from "../../components/Pages/Pages";
 import { RedirectMd } from "../../components/Redirect/Redirect";
 import { NestedAppMd } from "../../components/NestedApp/NestedApp";
+import { IncludeMarkupMd } from "../../components/IncludeMarkup/IncludeMarkup";
+import { MarkdownMd } from "../../components/Markdown/Markdown";
+import { InspectorMd } from "../../components/Inspector/Inspector";
+import { InspectButtonMd } from "../../components/InspectButton/InspectButton";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -459,6 +463,33 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "Fallback",
     allowsChildren: true,
     includeLayoutProps: false,
+  }),
+  contractFromMetadata(IncludeMarkupMd, {
+    name: "IncludeMarkup",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    eventAttributes: {
+      didLoad: "onDidLoad",
+      didFail: "onDidFail",
+    },
+  }),
+  contractFromMetadata(MarkdownMd, {
+    name: "Markdown",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(InspectorMd, {
+    name: "Inspector",
+    allowsChildren: false,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(InspectButtonMd, {
+    name: "InspectButton",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
   }),
   contractFromMetadata(SpaceFillerMd, {
     name: "SpaceFiller",

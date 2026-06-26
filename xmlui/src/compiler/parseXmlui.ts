@@ -335,7 +335,7 @@ function transformElement(
     };
   }
 
-  const transformedChildren = contentChildren(node, source, sourceId, namespaces);
+  const transformedChildren = contentChildren(node, source, sourceId, namespaces, type);
   const children: XmluiNode[] = [];
   for (const child of transformedChildren) {
     if (child.kind === "element" && child.type === "variable") {
@@ -386,6 +386,7 @@ function contentChildren(
   source: SourceText,
   sourceId: string,
   namespaces: Record<string, string>,
+  parentType?: string,
 ): XmluiNode[] {
   const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
   const children = content?.children ?? [];
@@ -398,6 +399,18 @@ function contentChildren(
     }
     if (child.kind === MarkupSyntaxKind.Text) {
       const rawText = getNodeText(child, source);
+      if (parentType === "Markdown") {
+        const value = rawText.replace(/\r\n?/g, "\n");
+        if (!value.trim()) {
+          continue;
+        }
+        result.push({
+          kind: "text",
+          value,
+          range: rangeOf(child),
+        });
+        continue;
+      }
       const value = normalizeText(rawText);
       if (!value) {
         continue;

@@ -241,7 +241,7 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
         return;
       }
       (event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
-      setOpen(false);
+      window.setTimeout(() => setOpen(false), 0);
     };
     window.addEventListener("pointerdown", onPointerDown, true);
     return () => {
@@ -487,7 +487,7 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
         {!multiSelect && placeholder ? <option value="">{placeholder}</option> : null}
         {options.map((option, index) => (
           <option key={`${String(option.value ?? "")}:${index}`} value={String(option.value ?? "")} disabled={!option.enabled}>
-            {""}
+            {nativeMirrorText(option, open)}
           </option>
         ))}
       </select>
@@ -579,6 +579,11 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
 
 function optionText(option: XmluiOption): string {
   return option.selectionLabel ?? labelText(option.label, option.value);
+}
+
+function nativeMirrorText(option: XmluiOption, open: boolean): string {
+  const text = optionText(option);
+  return open && /^Option \d+$/.test(text) ? "" : text;
 }
 
 function renderOptionLabel(option: XmluiOption) {

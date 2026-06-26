@@ -87,6 +87,7 @@ type Fixtures = {
   createCardDriver: (testId?: string) => Promise<CardDriver>;
   createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
+  createMarkdownDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
   createOptionDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createValidationDisplayDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
@@ -314,6 +315,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   createCodeBlockDriver: async ({ page }, use) => {
     await use(async (testId) => new CodeBlockDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="CodeBlock"]').first(),
+      page,
+    }));
+  },
+  createMarkdownDriver: async ({ page }, use) => {
+    await use(async (testId) => new ComponentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="Markdown"]').first(),
       page,
     }));
   },

@@ -1,0 +1,41 @@
+.markdown {
+  color: var(--xmlui-textColor-Markdown, var(--xmlui-textColor, inherit));
+  font-family: var(--xmlui-fontFamily-Markdown, var(--xmlui-fontFamily, inherit));
+  font-size: var(--xmlui-fontSize-Markdown, var(--xmlui-fontSize, inherit));
+  line-height: var(--xmlui-lineHeight-Markdown, var(--xmlui-lineHeight, inherit));
+  user-select: text;
+}
+
+.markdown :where(h1, h2, h3, h4, h5, h6, p, li, td, th, pre, code) {
+  user-select: text;
+}
+
+.markdown :where(h1, h2, h3, h4, h5, h6) {
+  margin-block: var(--xmlui-marginVertical-heading-Markdown, 0.67em);
+}
+
+.markdown p {
+  margin-block: var(--xmlui-marginVertical-paragraph-Markdown, 1em);
+}
+
+.markdown table {
+  border-collapse: collapse;
+}
+
+.markdown :where(th, td) {
+  border: var(--xmlui-border-tableCell-Markdown, 1px solid var(--xmlui-borderColor, #d0d7de));
+  padding: var(--xmlui-padding-tableCell-Markdown, 0.35rem 0.5rem);
+}
+
+.markdown :where(a) {
+  color: var(--xmlui-textColor-Link, var(--xmlui-color-primary, currentColor));
+}
+
+.headingAnchor {
+  margin-left: 0.35em;
+  text-decoration: none;
+}
+
+.playground {
+  margin-block: var(--xmlui-marginVertical-playground-Markdown, 1rem);
+}
