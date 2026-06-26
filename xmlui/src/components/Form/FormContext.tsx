@@ -38,6 +38,7 @@ export type FormContextValue = {
   itemLabelWidth?: string | number;
   itemLabelBreak?: boolean;
   itemRequireLabelMode?: string;
+  verboseValidationFeedback?: boolean;
   fieldPrefix?: string;
   getValue: (name: string) => unknown;
   setValue: (name: string, value: unknown) => void;

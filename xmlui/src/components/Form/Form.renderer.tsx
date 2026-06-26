@@ -44,6 +44,11 @@ export const formRenderer = wrapComponent({
             : undefined
         }
         itemRequireLabelMode={adapter.stringProp("itemRequireLabelMode")}
+        verboseValidationFeedback={
+          Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+            ? adapter.booleanProp("verboseValidationFeedback", true)
+            : undefined
+        }
         swapCancelAndSave={adapter.booleanProp("swapCancelAndSave", false)}
         buttonRowTemplate={buttonRowTemplate}
         className={adapter.className}

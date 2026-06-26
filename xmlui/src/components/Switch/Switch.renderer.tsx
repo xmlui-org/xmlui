@@ -21,18 +21,21 @@ export const switchRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}
         initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
         label={adapter.prop("label")}
         labelPosition={adapter.stringProp("labelPosition", "end")}
         labelBreak={adapter.booleanProp("labelBreak", false)}
         labelWidth={adapter.prop("labelWidth")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         direction={adapter.stringProp("direction")}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
         readOnly={adapter.booleanProp("readOnly", false)}
         required={adapter.booleanProp("required", false)}
         autoFocus={adapter.booleanProp("autoFocus", false)}
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
+        variant={adapter.stringProp("variant")}
         onClick={(event) => {
           void adapter.event("click")(event);
         }}

@@ -19,11 +19,13 @@ export const numberBoxRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}
         initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
         label={adapter.prop("label")}
         labelPosition={adapter.stringProp("labelPosition", "top")}
         labelWidth={adapter.prop("labelWidth")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         direction={adapter.stringProp("direction")}
         placeholder={adapter.stringProp("placeholder")}
         maxLength={adapter.prop("maxLength") as number | undefined}
@@ -44,7 +46,11 @@ export const numberBoxRenderer = wrapComponent({
         zeroOrPositive={adapter.booleanProp("zeroOrPositive", defaultProps.zeroOrPositive)}
         min={adapter.prop("minValue", defaultProps.min) as number}
         max={adapter.prop("maxValue", defaultProps.max) as number}
-        verboseValidationFeedback={adapter.booleanProp("verboseValidationFeedback", true)}
+        verboseValidationFeedback={
+          Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+            ? adapter.booleanProp("verboseValidationFeedback", true)
+            : undefined
+        }
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
         invalidMessages={adapter.prop("invalidMessages", defaultProps.invalidMessages)}
         style={adapter.style}

@@ -121,7 +121,71 @@ test.describe("TabsForm foundation", () => {
 });
 
 test.describe("TabsForm old suite deferred cases", () => {
-  test.fixme("submit jumps back to the first invalid tab and cancels submission", async () => {});
-  test.fixme("submit jumps to the second tab when only it is invalid", async () => {});
-  test.fixme("tabsAccordionView=true stacks tabs in accordion mode with old parity", async () => {});
+  test("submit jumps back to the first invalid tab and cancels submission", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TabsForm
+        data="{{ name: '', email: '' }}"
+        onSubmit="(d) => testState = 'submitted'">
+        <FormSegment label="Alpha">
+          <FormItem label="Name" bindTo="name" required="true" />
+        </FormSegment>
+        <FormSegment label="Beta">
+          <FormItem label="Email" bindTo="email" />
+        </FormSegment>
+      </TabsForm>
+    `);
+    await page.getByRole("tab", { name: "Beta" }).click();
+    await expect(page.getByRole("tab", { name: "Alpha" })).not.toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByRole("tab", { name: "Alpha" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect.poll(testStateDriver.testState, { timeout: 2_000 }).not.toBe("submitted");
+  });
+
+  test("submit jumps to the second tab when only it is invalid", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TabsForm data="{{ name: 'Alice', email: '' }}">
+        <FormSegment label="Alpha">
+          <FormItem label="Name" bindTo="name" required="true" />
+        </FormSegment>
+        <FormSegment label="Beta">
+          <FormItem label="Email" bindTo="email" required="true" />
+        </FormSegment>
+      </TabsForm>
+    `);
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByRole("tab", { name: "Beta" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
+  test("tabsAccordionView=true stacks tabs in accordion mode with old parity", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TabsForm data="{{ name: '' }}" tabsAccordionView="true">
+        <FormSegment label="Alpha"><Text>Alpha body</Text></FormSegment>
+        <FormSegment label="Beta"><Text>Beta body</Text></FormSegment>
+      </TabsForm>
+    `);
+
+    await expect(page.getByText("Alpha", { exact: true })).toBeVisible();
+    await expect(page.getByText("Beta", { exact: true })).toBeVisible();
+    await expect(page.getByText("Alpha body")).toBeVisible();
+  });
 });

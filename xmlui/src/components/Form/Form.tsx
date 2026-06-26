@@ -106,6 +106,11 @@ export const FormMd = createMetadata({
       availableValues: ["markRequired", "markOptional", "markBoth"],
       defaultValue: "markRequired",
     },
+    verboseValidationFeedback: {
+      description: "Controls whether form fields render verbose helper text or concise validation feedback by default.",
+      valueType: "boolean",
+      defaultValue: true,
+    },
   },
   events: {
     willSubmit: {

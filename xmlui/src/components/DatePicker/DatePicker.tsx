@@ -79,6 +79,7 @@ export const DatePickerMd = createMetadata({
   props: {
     id: { description: "The component id.", valueType: "string" },
     testId: { description: "The test id.", valueType: "string" },
+    bindTo: { description: "Binds the picker to form data.", valueType: "string" },
     placeholder: dPlaceholder(),
     value: { description: "Controlled value. In single mode, a date string; in range mode, a `{ from, to }` object." },
     initialValue: dInitialValue(null, "string"),
@@ -193,4 +194,3 @@ export const DatePickerMd = createMetadata({
   },
   limitThemeVarsToComponent: true,
 });
-

@@ -479,7 +479,7 @@ test.describe("Api", () => {
     await expect(driver.input).toHaveValue("api value");
   });
 
-  test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <TextBox id="boundTextBox" bindTo="boundValue" />
@@ -494,7 +494,7 @@ test.describe("Api", () => {
     await expect(page.getByTestId("compValue")).toHaveText("hello");
   });
 
-  test.fixme("bindTo syncs $data and value for PasswordInput", async ({ initTestBed, page }) => {
+  test("bindTo syncs $data and value for PasswordInput", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <PasswordInput id="boundPassword" bindTo="passwordValue" />
@@ -1033,7 +1033,7 @@ test.describe("Integration", () => {
     expect(height).toBeGreaterThan(0);
   });
 
-  test.fixme("component integrates with forms correctly", async ({
+  test("component integrates with forms correctly", async ({
     initTestBed,
     createTextBoxDriver,
   }) => {
@@ -1144,7 +1144,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test.fixme("handles variant", async ({ page, initTestBed }) => {
+  test("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<TextBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-TextBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1154,7 +1154,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`<TextBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "backgroundColor-TextBox-CustomVariant": "rgb(0, 255, 0)",
@@ -1237,7 +1237,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`<TextBox testId="test" variant="CustomVariant" endText="USD" />`, {
       testThemeVars: {
         "borderColor-TextBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1253,7 +1253,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(endAdornment).toBeVisible();
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <TextBox 
@@ -1285,7 +1285,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(endAdornment).toBeVisible();
   });
 
-  test.fixme("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1300,7 +1300,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1315,7 +1315,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1330,7 +1330,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("requireLabelMode='markOptional' hides indicator for required fields", async ({
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1345,7 +1345,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1360,7 +1360,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1375,7 +1375,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).toContainText("(Optional)");
   });
 
-  test.fixme("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({
     page,
     initTestBed,
   }) => {
@@ -1392,7 +1392,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("input inherits Form itemRequireLabelMode when not specified", async ({
+  test("input inherits Form itemRequireLabelMode when not specified", async ({
     page,
     initTestBed,
   }) => {
@@ -1418,7 +1418,7 @@ test.describe("Behaviors and Parts", () => {
 // VALIDATION FEEDBACK TESTS
 // =============================================================================
 
-test.describe.fixme("Validation Feedback", () => {
+test.describe("Validation Feedback", () => {
   test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
     initTestBed,
     page,

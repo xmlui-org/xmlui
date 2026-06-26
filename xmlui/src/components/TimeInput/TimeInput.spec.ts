@@ -108,7 +108,6 @@ test.describe("Basic Functionality", () => {
       initTestBed,
       createTimeInputDriver,
     }) => {
-      test.fixme(true, "Deferred until the expression parser supports zero-argument arrow prop values.");
       await initTestBed(`
         <Fragment>
           <TimeInput testId="bad0" initialValue="{null}" />
@@ -1434,7 +1433,6 @@ test.describe("API", () => {
   });
 
   test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
-    test.fixme(true, "Deferred until Form/FormItem bindTo infrastructure is migrated.");
     await initTestBed(`
       <Form hideButtonRow="true">
         <TimeInput id="boundTimeInput" bindTo="timeValue" />
@@ -1678,7 +1676,6 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
-    test.fixme(true, "Deferred until Form/FormItem label integration is migrated.");
     await initTestBed(`
       <Form>
         <TimeInput

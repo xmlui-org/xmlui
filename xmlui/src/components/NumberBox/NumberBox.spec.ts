@@ -517,7 +517,7 @@ test.describe("API", () => {
     await expect.poll(testStateDriver.testState).toBe(456);
   });
 
-  test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <NumberBox id="boundNumberBox" bindTo="quantity" />
@@ -1463,7 +1463,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test.fixme("handles variant", async ({ page, initTestBed }) => {
+  test("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<NumberBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-NumberBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1473,7 +1473,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`<NumberBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "backgroundColor-NumberBox-CustomVariant": "rgb(0, 255, 0)",
@@ -1560,7 +1560,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`<NumberBox testId="test" variant="CustomVariant" endText="USD" />`, {
       testThemeVars: {
         "borderColor-NumberBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1578,7 +1578,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(spinnerDown).toBeVisible();
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <NumberBox 
         testId="test" 
@@ -1611,7 +1611,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(spinnerDown).toBeVisible();
   });
 
-  test.fixme("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
         <NumberBox testId="test" label="Age" required="true" requireLabelMode="markRequired" bindTo="age" />
@@ -1623,7 +1623,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
         <NumberBox testId="test" label="Age" required="false" requireLabelMode="markRequired" bindTo="age" />
@@ -1635,7 +1635,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
         <NumberBox testId="test" label="Age" required="false" requireLabelMode="markOptional" bindTo="age" />
@@ -1647,7 +1647,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
         <NumberBox testId="test" label="Age" required="true" requireLabelMode="markOptional" bindTo="age" />
@@ -1659,7 +1659,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
         <NumberBox testId="test" label="Age" required="true" requireLabelMode="markBoth" bindTo="age" />
@@ -1671,7 +1671,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
         <NumberBox testId="test" label="Age" required="false" requireLabelMode="markBoth" bindTo="age" />
@@ -1683,7 +1683,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).toContainText("(Optional)");
   });
 
-  test.fixme("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markRequired">
         <NumberBox testId="test" label="Age" required="false" requireLabelMode="markOptional" bindTo="age" />
@@ -1695,7 +1695,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markBoth">
         <NumberBox testId="test1" label="Required Field" required="true" bindTo="field1" />
@@ -1717,7 +1717,7 @@ test.describe("Behaviors and Parts", () => {
 // INTEGRATION TESTS
 // =============================================================================
 
-test.describe.fixme("Integration Tests", () => {
+test.describe("Integration Tests", () => {
   test("NumberBox returns number type in Form", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form data="{{ 'age': 0 }}" onSubmit="data => testState = data.age" enableSubmit="true" saveLabel="Submit">
@@ -1751,7 +1751,7 @@ test.describe.fixme("Integration Tests", () => {
 // VALIDATION FEEDBACK TESTS
 // =============================================================================
 
-test.describe.fixme("Validation Feedback", () => {
+test.describe("Validation Feedback", () => {
   test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">

@@ -330,6 +330,9 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
   }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+  }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot generate unsupported XMLUI expression call target.");
   }
@@ -587,6 +590,7 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "now",
     "log",
     "getFields",
     "getData",
@@ -602,6 +606,10 @@ function isAllowedMethodName(name: string): boolean {
     "scrollToStart",
     "scrollToEnd",
   ].includes(name);
+}
+
+function isAllowedBuiltInCallName(name: string): boolean {
+  return name === "getDate" || name === "Symbol" || name === "BigInt";
 }
 
 function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]): Set<string> {

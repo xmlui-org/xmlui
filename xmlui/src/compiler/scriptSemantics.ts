@@ -437,6 +437,13 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
   if (scope.specials.has(name)) {
     return scope.specials.get(name);
   }
+  if (isBuiltInReferenceName(name)) {
+    return {
+      kind: "reference",
+      name,
+      mutable: false,
+    };
+  }
   if (name === "$self") {
     return {
       kind: "reference",
@@ -1484,6 +1491,9 @@ function isAllowedCall(callee: ScriptNode, scope?: XmluiScope): boolean {
   if (callee.kind === "Identifier" && callee.name === "navigate") {
     return true;
   }
+  if (callee.kind === "Identifier" && isAllowedBuiltInCallName(callee.name)) {
+    return true;
+  }
   if (callee.kind === "Identifier" && scope?.specials.has(callee.name)) {
     return true;
   }
@@ -1517,6 +1527,7 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "now",
     "log",
     "getFields",
     "getData",
@@ -1532,6 +1543,14 @@ function isAllowedMethodName(name: string): boolean {
     "scrollToStart",
     "scrollToEnd",
   ].includes(name);
+}
+
+function isAllowedBuiltInCallName(name: string): boolean {
+  return name === "getDate" || name === "Symbol" || name === "BigInt";
+}
+
+function isBuiltInReferenceName(name: string): boolean {
+  return name === "Date" || name === "getDate" || name === "Symbol" || name === "BigInt";
 }
 
 function resolveParentLocal(scope: XmluiScope, name: string): XmluiBinding | undefined {
@@ -1783,6 +1802,9 @@ function emitCallExpression(ir: XmluiCallExpressionIr): string {
   const args = ir.args.map(emitExpression).join(", ");
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
   }
   if (ir.callee.kind !== "MemberRead" && ir.callee.kind !== "ScopedMemberRead") {
     throw new Error("Cannot compile unsupported XMLUI expression call target.");
@@ -2147,6 +2169,13 @@ function executeCallExpression(
 ): unknown {
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     const target = context.readContext?.(ir.callee.name);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    return target(...ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
+  }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    const target = context.readReference?.(ir.callee.name);
     if (typeof target !== "function") {
       return undefined;
     }

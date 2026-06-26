@@ -21,9 +21,11 @@ export const colorPickerRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}
         initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
         label={adapter.prop("label")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
         readOnly={adapter.booleanProp("readOnly", false)}
         required={adapter.booleanProp("required", false)}

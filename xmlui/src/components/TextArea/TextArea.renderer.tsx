@@ -19,9 +19,11 @@ export const textAreaRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}
         initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
         label={adapter.prop("label")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         placeholder={adapter.stringProp("placeholder", defaultProps.placeholder)}
         maxLength={adapter.prop("maxLength") as number | undefined}
         rows={adapter.prop("rows", defaultProps.rows) as number | undefined}
@@ -39,7 +41,11 @@ export const textAreaRenderer = wrapComponent({
         autoCapitalize={adapter.stringProp("autoCapitalize")}
         enterSubmits={adapter.booleanProp("enterSubmits", defaultProps.enterSubmits)}
         escResets={adapter.booleanProp("escResets", false)}
-        verboseValidationFeedback={adapter.booleanProp("verboseValidationFeedback", true)}
+        verboseValidationFeedback={
+          Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+            ? adapter.booleanProp("verboseValidationFeedback", true)
+            : undefined
+        }
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
         invalidMessages={adapter.prop("invalidMessages", defaultProps.invalidMessages)}
         style={adapter.style}

@@ -9,10 +9,12 @@ import {
   normalizeNumberInput,
   toUsableNumber,
 } from "./numberbox-abstractions";
+import { useFormContext } from "../Form/FormContext";
 import styles from "./NumberBox.module.scss";
 
 export type NumberBoxProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   className?: string;
@@ -20,6 +22,7 @@ export type NumberBoxProps = {
   label?: unknown;
   labelPosition?: "start" | "end" | "top" | "bottom" | string;
   labelWidth?: string | number;
+  requireLabelMode?: string;
   direction?: string;
   placeholder?: string;
   maxLength?: number;
@@ -59,6 +62,7 @@ export type NumberBoxApi = {
 export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(function NumberBoxNative(
   {
     id,
+    bindTo,
     value,
     initialValue = defaultProps.initialValue,
     className,
@@ -66,6 +70,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     label,
     labelPosition = "top",
     labelWidth,
+    requireLabelMode,
     direction,
     placeholder,
     maxLength,
@@ -88,7 +93,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     zeroOrPositive = defaultProps.zeroOrPositive,
     min = zeroOrPositive ? 0 : defaultProps.min,
     max = defaultProps.max,
-    verboseValidationFeedback = true,
+    verboseValidationFeedback,
     validationStatus = defaultProps.validationStatus,
     invalidMessages = defaultProps.invalidMessages,
     onDidChange,
@@ -99,20 +104,41 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
   ref,
 ) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const validateFormField = form?.validateField;
+  const registerFormItem = form?.registerItem;
   const generatedInputId = useId();
-  const controlled = value !== undefined;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
+  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
+  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
+  const effectiveValue = formValue ?? value;
+  const controlled = effectiveValue !== undefined;
   const boundedMin = Math.max(zeroOrPositive ? 0 : defaultProps.min, Number(min));
   const boundedMax = Math.min(defaultProps.max, Number(max));
   const parsedStep = parseStep(step);
   const [localValue, setLocalValue] = useState(() =>
-    normalizeInitialValue(controlled ? value : initialValue, integersOnly, boundedMin, boundedMax),
+    normalizeInitialValue(controlled ? effectiveValue : initialValue, integersOnly, boundedMin, boundedMax),
   );
+  const [hadValidationError, setHadValidationError] = useState(false);
+  const [showValidFeedback, setShowValidFeedback] = useState(false);
+  const [conciseTooltipVisible, setConciseTooltipVisible] = useState(false);
 
   useEffect(() => {
     if (controlled) {
-      setLocalValue(normalizeInitialValue(value, integersOnly, boundedMin, boundedMax));
+      setLocalValue(normalizeInitialValue(effectiveValue, integersOnly, boundedMin, boundedMax));
     }
-  }, [boundedMax, boundedMin, controlled, integersOnly, value]);
+  }, [boundedMax, boundedMin, controlled, effectiveValue, integersOnly]);
+
+  useEffect(() => {
+    if (formError) {
+      setHadValidationError(true);
+      setShowValidFeedback(false);
+    }
+  }, [formError]);
 
   useEffect(() => {
     if (!controlled) {
@@ -127,6 +153,19 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     const timeoutId = setTimeout(() => inputRef.current?.focus(), 0);
     return () => clearTimeout(timeoutId);
   }, [autoFocus, enabled]);
+
+  useEffect(() => {
+    if (
+      !getFormValue ||
+      !setFormValue ||
+      fieldName === undefined ||
+      getFormValue(fieldName) != null ||
+      initialValue === undefined
+    ) {
+      return;
+    }
+    setFormValue(fieldName, emitInitialValue(initialValue, integersOnly, boundedMin, boundedMax));
+  }, [boundedMax, boundedMin, fieldName, getFormValue, initialValue, integersOnly, setFormValue]);
 
   const emitValue = useCallback((representation: string) => {
     const usable = toUsableNumber(representation, integersOnly);
@@ -143,9 +182,13 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
       inputType,
       localValue,
     );
+    setShowValidFeedback(false);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, emitValue(next));
+    }
     setLocalValue(next);
     void onDidChange?.(emitValue(next));
-  }, [boundedMax, boundedMin, emitValue, integersOnly, localValue, onDidChange, zeroOrPositive]);
+  }, [boundedMax, boundedMin, emitValue, fieldName, integersOnly, localValue, onDidChange, setFormValue, zeroOrPositive]);
 
   const stepBy = useCallback((direction: 1 | -1) => {
     if (!enabled || readOnly) {
@@ -177,6 +220,28 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
   const inputId = id ? `${id}__input` : generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
   const labelText = stringifyValue(label);
+  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const showRequiredIndicator =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
+  const effectiveValidationStatus = formError
+    ? "error"
+    : !effectiveVerboseValidationFeedback && showValidFeedback
+      ? "valid"
+      : validationStatus;
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      label: labelText,
+      required,
+    });
+  }, [fieldName, labelText, registerFormItem, required]);
+
   const labelNode = hasLabel ? (
     <label
       data-part-id="label"
@@ -186,7 +251,8 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     >
       <span style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}>
         {labelText}
-        {required ? <span className={styles.numberBoxLabelRequired}>*</span> : null}
+        {showRequiredIndicator ? <span className={styles.numberBoxLabelRequired}>*</span> : null}
+        {showOptionalIndicator ? <span className={styles.numberBoxLabelOptional}>(Optional)</span> : null}
       </span>
     </label>
   ) : null;
@@ -199,9 +265,9 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
         styles.numberBoxRoot,
         !enabled ? styles.numberBoxDisabled : undefined,
         readOnly ? styles.numberBoxReadOnly : undefined,
-        validationStatus === "error" ? styles.numberBoxError : undefined,
-        validationStatus === "warning" ? styles.numberBoxWarning : undefined,
-        validationStatus === "valid" ? styles.numberBoxSuccess : undefined,
+        effectiveValidationStatus === "error" ? styles.numberBoxError : undefined,
+        effectiveValidationStatus === "warning" ? styles.numberBoxWarning : undefined,
+        effectiveValidationStatus === "valid" ? styles.numberBoxSuccess : undefined,
         !hasLabel ? className : undefined,
       )}
       style={!hasLabel ? rootStyle : undefined}
@@ -234,10 +300,19 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
         onBlur={(_event: FocusEvent<HTMLInputElement>) => {
           const next = normalizeBlurRepresentation(localValue, integersOnly, zeroOrPositive, boundedMin, boundedMax);
           if (next !== localValue) {
+            if (setFormValue && fieldName !== undefined) {
+              setFormValue(fieldName, emitValue(next));
+            }
             setLocalValue(next);
             void onDidChange?.(emitValue(next));
           }
           void onBlur?.();
+          if (!validateFormField || fieldName === undefined || !hadValidationError) {
+            return;
+          }
+          void validateFormField(fieldName, emitValue(next)).then((message) => {
+            setShowValidFeedback(!message);
+          });
         }}
         onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
           if (event.key === "ArrowUp") {
@@ -287,21 +362,45 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
           </button>
         </span>
       ) : null}
-      {!verboseValidationFeedback && validationStatus && validationStatus !== "none" ? (
+      {!effectiveVerboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
         <span
           data-part-id="conciseValidationFeedback"
           data-xmlui-part="conciseValidationFeedback"
           className={styles.numberBoxConciseFeedback}
-          title={invalidMessages?.join("\n")}
+          onMouseEnter={() => setConciseTooltipVisible(true)}
+          onMouseLeave={() => setConciseTooltipVisible(false)}
+          onFocus={() => setConciseTooltipVisible(true)}
+          onBlur={() => setConciseTooltipVisible(false)}
+          tabIndex={-1}
         >
-          <span data-icon-name={validationStatus === "valid" ? "checkmark" : "error"} />
+          <span
+            data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
+            className={styles.numberBoxIconMarker}
+          />
+          {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
+            <span data-tooltip-container role="tooltip" className={styles.numberBoxConciseTooltip}>
+              {effectiveInvalidMessages.join("\n")}
+            </span>
+          ) : null}
         </span>
       ) : null}
     </div>
   );
+  const validationFeedback = effectiveVerboseValidationFeedback && effectiveInvalidMessages?.length ? (
+    <div data-xmlui-part="error">
+      {effectiveInvalidMessages.map((message, index) => (
+        <div key={index}>{message}</div>
+      ))}
+    </div>
+  ) : null;
 
   if (!hasLabel) {
-    return inputRoot;
+    return (
+      <>
+        {inputRoot}
+        {validationFeedback}
+      </>
+    );
   }
 
   return (
@@ -315,6 +414,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
         {labelNode}
         {inputRoot}
       </div>
+      {validationFeedback}
     </div>
   );
 }));
@@ -347,6 +447,12 @@ function normalizeInitialValue(value: unknown, integerOnly: boolean, min: number
     return "";
   }
   return String(clamp(usable, min, max));
+}
+
+function emitInitialValue(value: unknown, integerOnly: boolean, min: number, max: number): number | string | null {
+  const representation = normalizeInitialValue(value, integerOnly, min, max);
+  const usable = toUsableNumber(representation, integerOnly);
+  return representation === "" || representation === "-" ? null : usable ?? representation;
 }
 
 function normalizeRepresentation(
@@ -440,6 +546,13 @@ function stringifyValue(value: unknown): string {
 
 function cssLength(value: string | number): string {
   return typeof value === "number" ? `${value}px` : value;
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function labelPositionClass(value: string, direction?: string): string {

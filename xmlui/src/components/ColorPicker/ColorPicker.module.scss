@@ -157,4 +157,9 @@ $height-ColorPicker: createThemeVar("height-ColorPicker");
     color: var(--xmlui-textColor-label-ColorPicker, var(--xmlui-textColor-primary));
     font-size: var(--xmlui-fontSize-label-ColorPicker, inherit);
   }
+
+  .colorPickerLabelRequired,
+  .colorPickerLabelOptional {
+    margin-left: 0.25em;
+  }
 }

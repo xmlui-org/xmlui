@@ -16,6 +16,10 @@ import { SelectNative } from "../Select/SelectReact";
 import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
 import { SliderNative } from "../Slider/SliderReact";
 import { NumberBoxNative } from "../NumberBox/NumberBoxReact";
+import { ColorPickerNative } from "../ColorPicker/ColorPickerReact";
+import { DateInputNative } from "../DateInput/DateInputReact";
+import { DatePickerNative } from "../DatePicker/DatePickerReact";
+import { TimeInputNative } from "../TimeInput/TimeInputReact";
 import type { XmluiOption } from "../Option/OptionReact";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
@@ -461,6 +465,76 @@ function renderControl({
           form?.setValue(fieldName, nextValue);
           scheduleChangedValidation(nextValue);
         }}
+      />
+    );
+  }
+  if (type === "colorpicker" || type === "colorPicker" || type === "color") {
+    return (
+      <ColorPickerNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
+      />
+    );
+  }
+  if (type === "dateinput" || type === "dateInput" || type === "date") {
+    return (
+      <DateInputNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        invalidMessages={error ? error.split("\n") : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
+      />
+    );
+  }
+  if (type === "datepicker" || type === "datePicker") {
+    return (
+      <DatePickerNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        invalidMessages={error ? error.split("\n") : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
+      />
+    );
+  }
+  if (type === "timeinput" || type === "timeInput" || type === "time") {
+    return (
+      <TimeInputNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
       />
     );
   }

@@ -116,6 +116,12 @@ export const TextBoxMd = createMetadata({
     },
     labelBreak: { description: "Allows line breaks in the label.", valueType: "boolean" },
     labelWidth: { description: "Sets the label width.", valueType: "length" },
+    requireLabelMode: {
+      description: "Controls required/optional label markers.",
+      valueType: "string",
+      availableValues: ["markRequired", "markOptional", "markBoth"],
+      defaultValue: "markRequired",
+    },
     direction: { description: "Sets the input direction.", valueType: "string" },
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(defaultProps.initialValue, "string"),
@@ -272,4 +278,3 @@ export const PasswordInputMd = createMetadata({
     },
   },
 });
-

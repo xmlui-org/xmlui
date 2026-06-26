@@ -19,6 +19,7 @@ export type TextBoxProps = {
   labelPosition?: "start" | "end" | "top" | "bottom" | string;
   labelBreak?: boolean;
   labelWidth?: string | number;
+  requireLabelMode?: string;
   direction?: string;
   placeholder?: string;
   maxLength?: number;
@@ -71,6 +72,7 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
     labelPosition,
     labelBreak,
     labelWidth,
+    requireLabelMode,
     direction,
     placeholder,
     maxLength,
@@ -95,7 +97,7 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
     passwordHiddenIcon = defaultProps.passwordHiddenIcon,
-    verboseValidationFeedback = true,
+    verboseValidationFeedback,
     validationStatus = defaultProps.validationStatus,
     invalidMessages = defaultProps.invalidMessages,
     onDidChange,
@@ -120,18 +122,28 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
   const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
   const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
   const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const effectiveValidationStatus = formError ? "error" : validationStatus;
   const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
+  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
   const effectiveValue = formValue ?? value;
   const controlled = effectiveValue !== undefined;
   const [localValue, setLocalValue] = useState(() => stringifyInputValue(effectiveValue ?? initialValue));
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [hadValidationError, setHadValidationError] = useState(false);
+  const [showValidFeedback, setShowValidFeedback] = useState(false);
+  const [conciseTooltipVisible, setConciseTooltipVisible] = useState(false);
 
   useEffect(() => {
     if (controlled) {
       setLocalValue(stringifyInputValue(effectiveValue));
     }
   }, [controlled, effectiveValue]);
+
+  useEffect(() => {
+    if (formError) {
+      setHadValidationError(true);
+      setShowValidFeedback(false);
+    }
+  }, [formError]);
 
   useEffect(() => {
     if (!controlled) {
@@ -162,15 +174,30 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
 
   const updateValue = useCallback((nextValue: unknown) => {
     const normalized = stringifyInputValue(nextValue);
+    setShowValidFeedback(false);
     if (setFormValue && fieldName !== undefined) {
       setFormValue(fieldName, normalized);
       if (validationMode === "onChanged" || matchValue !== undefined) {
-        void validateFormField?.(fieldName, normalized);
+        void validateFormField?.(fieldName, normalized).then((message) => {
+          if (!message && hadValidationError) {
+            setShowValidFeedback(true);
+          }
+        });
       }
     }
     setLocalValue(normalized);
     void onDidChange?.(normalized);
-  }, [fieldName, matchValue, onDidChange, setFormValue, validateFormField, validationMode]);
+  }, [fieldName, hadValidationError, matchValue, onDidChange, setFormValue, validateFormField, validationMode]);
+
+  const handleBlur = useCallback(() => {
+    void onBlur?.();
+    if (!validateFormField || fieldName === undefined || !hadValidationError) {
+      return;
+    }
+    void validateFormField(fieldName, inputRef.current?.value).then((message) => {
+      setShowValidFeedback(!message);
+    });
+  }, [fieldName, hadValidationError, onBlur, validateFormField]);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -192,6 +219,16 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
   const inputId = id ? `${id}__input` : generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
   const labelText = stringifyLabel(label);
+  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const showRequiredIndicator =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
+  const effectiveValidationStatus = formError
+    ? "error"
+    : !effectiveVerboseValidationFeedback && showValidFeedback
+      ? "valid"
+      : validationStatus;
 
   useEffect(() => {
     if (!registerFormItem || fieldName === undefined) {
@@ -223,8 +260,9 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
       className={cx(styles.textBoxLabel, effectiveLabelBreak ? styles.textBoxLabelBreak : undefined)}
       style={effectiveLabelWidth !== undefined ? { width: cssLength(effectiveLabelWidth, themeVariables) } : undefined}
     >
-      <span>{labelText}</span>
-      {required ? <span className={styles.textBoxLabelRequired}>*</span> : null}
+      {labelText}
+      {showRequiredIndicator ? <span className={styles.textBoxLabelRequired}>*</span> : null}
+      {showOptionalIndicator ? <span className={styles.textBoxLabelOptional}>(Optional)</span> : null}
     </label>
   ) : null;
   const inputRoot = (
@@ -263,7 +301,7 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
         autoCapitalize={autoCapitalize}
         onChange={(event: ChangeEvent<HTMLInputElement>) => updateValue(event.currentTarget.value)}
         onFocus={(_event: FocusEvent<HTMLInputElement>) => void onFocus?.()}
-        onBlur={(_event: FocusEvent<HTMLInputElement>) => void onBlur?.()}
+        onBlur={(_event: FocusEvent<HTMLInputElement>) => handleBlur()}
         onKeyDown={(event) => void onKeyDown?.(event)}
       />
       {type === "search" && enabled && !readOnly && localValue ? (
@@ -296,19 +334,31 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
       ) : (
         <Adornment partId="endAdornment" text={endText} icon={endIcon} />
       )}
-      {!verboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
+      {!effectiveVerboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
         <span
           data-part-id="conciseValidationFeedback"
           data-xmlui-part="conciseValidationFeedback"
           className={styles.textBoxConciseFeedback}
-          title={effectiveInvalidMessages?.join("\n")}
+          onMouseEnter={() => setConciseTooltipVisible(true)}
+          onMouseLeave={() => setConciseTooltipVisible(false)}
+          onFocus={() => setConciseTooltipVisible(true)}
+          onBlur={() => setConciseTooltipVisible(false)}
+          tabIndex={-1}
         >
-          <span data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"} />
+          <span
+            data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
+            className={styles.textBoxIconMarker}
+          />
+          {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
+            <span data-tooltip-container role="tooltip" className={styles.textBoxConciseTooltip}>
+              {effectiveInvalidMessages.join("\n")}
+            </span>
+          ) : null}
         </span>
       ) : null}
     </div>
   );
-  const validationFeedback = verboseValidationFeedback && effectiveInvalidMessages?.length ? (
+  const validationFeedback = effectiveVerboseValidationFeedback && effectiveInvalidMessages?.length ? (
     <div data-xmlui-part="error">
       {effectiveInvalidMessages.map((message, index) => (
         <div key={index}>{message}</div>

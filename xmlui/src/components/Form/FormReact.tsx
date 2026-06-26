@@ -50,6 +50,7 @@ export type FormProps = {
   itemLabelWidth?: string | number;
   itemLabelBreak?: boolean;
   itemRequireLabelMode?: string;
+  verboseValidationFeedback?: boolean;
   buttonRowTemplate?: ReactNode;
   children?: ReactNode;
   renderContent?: (dataContext: FormDataContext) => ReactNode;
@@ -93,6 +94,7 @@ export function Form({
   itemLabelWidth,
   itemLabelBreak,
   itemRequireLabelMode,
+  verboseValidationFeedback,
   buttonRowTemplate,
   children,
   renderContent,
@@ -419,6 +421,7 @@ export function Form({
     itemLabelWidth,
     itemLabelBreak,
     itemRequireLabelMode,
+    verboseValidationFeedback,
     getValue,
     setValue,
     isFieldValid,
@@ -441,6 +444,7 @@ export function Form({
     validateField,
     validatingFields,
     values,
+    verboseValidationFeedback,
   ]);
 
   useEffect(() => {

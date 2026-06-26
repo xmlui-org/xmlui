@@ -18,6 +18,7 @@ export const dateInputRenderer = wrapComponent({
         }
       }}
       id={adapter.stringProp("id")}
+      bindTo={adapter.stringProp("bindTo")}
       value={adapter.prop("value")}
       initialValue={adapter.prop("initialValue")}
       label={adapter.prop("label")}
@@ -43,7 +44,11 @@ export const dateInputRenderer = wrapComponent({
       endText={adapter.prop("endText")}
       endIcon={adapter.prop("endIcon")}
       gap={adapter.stringProp("gap")}
-      verboseValidationFeedback={adapter.booleanProp("verboseValidationFeedback", true)}
+      verboseValidationFeedback={
+        Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+          ? adapter.booleanProp("verboseValidationFeedback", true)
+          : undefined
+      }
       validationIconSuccess={adapter.stringProp("validationIconSuccess")}
       validationIconError={adapter.stringProp("validationIconError")}
       invalidMessages={adapter.prop("invalidMessages") as string[] | undefined}

@@ -1,9 +1,10 @@
 import type { CSSProperties, FocusEvent } from "react";
-import { forwardRef, memo, useId, useImperativeHandle } from "react";
+import { forwardRef, memo, useEffect, useId, useImperativeHandle } from "react";
 
 import { defaultProps } from "./Switch.defaults";
 import styles from "./Switch.module.scss";
 import type { SwitchValidationStatus } from "./switch-abstractions";
+import { useFormContext } from "../Form/FormContext";
 import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
 
 export type SwitchApi = {
@@ -14,6 +15,7 @@ export type SwitchApi = {
 
 export type SwitchProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   className?: string;
@@ -22,6 +24,7 @@ export type SwitchProps = {
   labelPosition?: "start" | "end" | "top" | "bottom" | "before" | "after" | string;
   labelBreak?: boolean;
   labelWidth?: string | number;
+  requireLabelMode?: string;
   direction?: string;
   enabled?: boolean;
   readOnly?: boolean;
@@ -29,6 +32,7 @@ export type SwitchProps = {
   autoFocus?: boolean;
   tabIndex?: number;
   validationStatus?: SwitchValidationStatus;
+  variant?: string;
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => void | Promise<void>;
   onDidChange?: (value: boolean) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
@@ -39,6 +43,7 @@ export type SwitchProps = {
 export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function SwitchNative(
   {
     id,
+    bindTo,
     value,
     initialValue = defaultProps.initialValue,
     className,
@@ -47,6 +52,7 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
     labelPosition = "end",
     labelBreak = false,
     labelWidth,
+    requireLabelMode,
     direction,
     enabled = defaultProps.enabled,
     readOnly,
@@ -54,6 +60,7 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
     autoFocus,
     tabIndex,
     validationStatus = defaultProps.validationStatus,
+    variant,
     onClick,
     onDidChange,
     onFocus,
@@ -64,21 +71,43 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
   ref,
 ) {
   const generatedInputId = useId();
+  const form = useFormContext();
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = form && fieldName !== undefined ? form.getValue(fieldName) : undefined;
+  const effectiveValue = formValue ?? value;
   const { inputRef, checked, suppressTransition, updateValue, api } = useToggleController({
-    value,
+    value: effectiveValue,
     initialValue,
     enabled,
     autoFocus,
     suppressInitialTransition: true,
-    onDidChange,
+    onDidChange: (nextValue) => {
+      if (form && fieldName !== undefined) {
+        form.setValue(fieldName, nextValue);
+      }
+      void onDidChange?.(nextValue);
+    },
   });
 
   useImperativeHandle(ref, () => api, [api]);
+
+  useEffect(() => {
+    if (!form || fieldName === undefined || form.getValue(fieldName) != null || initialValue === undefined) {
+      return;
+    }
+    form.setValue(fieldName, transformToLegitValue(initialValue));
+  }, [fieldName, form, initialValue]);
 
   const inputId = id ? `${id}__input` : generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
   const effectiveTestId = dataTestId ?? id;
   const labelText = stringifyLabel(label);
+  const needsVariantWrapper = !hasLabel && variant !== undefined;
+  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const showRequiredIndicator =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
   const input = (
     <input
       {...rest}
@@ -87,16 +116,16 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
       data-component-type="Toggle"
       data-part-id="input"
       data-xmlui-part="input"
-      data-testid={!hasLabel ? effectiveTestId : undefined}
+      data-testid={!hasLabel && !needsVariantWrapper ? effectiveTestId : undefined}
       className={cx(
         styles.switchRoot,
         validationStatus === "error" ? styles.switchError : undefined,
         validationStatus === "warning" ? styles.switchWarning : undefined,
         validationStatus === "valid" ? styles.switchSuccess : undefined,
         suppressTransition ? styles.switchNoTransition : undefined,
-        !hasLabel ? className : undefined,
+        !hasLabel && !needsVariantWrapper ? className : undefined,
       )}
-      style={!hasLabel ? style : undefined}
+      style={!hasLabel && !needsVariantWrapper ? style : undefined}
       type="checkbox"
       role="switch"
       checked={checked}
@@ -123,6 +152,19 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
   );
 
   if (!hasLabel) {
+    if (needsVariantWrapper) {
+      return (
+        <span
+          {...rest}
+          data-testid={effectiveTestId}
+          className={cx(styles.switchVariantWrapper, className)}
+          style={style}
+          dir={direction}
+        >
+          {input}
+        </span>
+      );
+    }
     return input;
   }
 
@@ -134,10 +176,13 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
       className={cx(styles.switchLabel, labelBreak ? styles.switchLabelBreak : undefined)}
       style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}
     >
-      <span style={labelWidth !== undefined ? { display: "inline-block", width: cssLength(labelWidth) } : undefined}>
-        {labelText}
-      </span>
-      {required ? <span className={styles.switchLabelRequired}>*</span> : null}
+      {labelWidth !== undefined ? (
+        <span style={{ display: "inline-block", width: cssLength(labelWidth) }}>{labelText}</span>
+      ) : (
+        labelText
+      )}
+      {showRequiredIndicator ? <span className={styles.switchLabelRequired}>*</span> : null}
+      {showOptionalIndicator ? <span className={styles.switchLabelOptional}>(Optional)</span> : null}
     </label>
   );
 
@@ -187,6 +232,13 @@ function cssLength(value: string | number): string {
     return `${value}px`;
   }
   return value;
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function cx(...parts: Array<string | undefined | false>): string {

@@ -9,6 +9,33 @@ completed work terse and keeps remaining work ordered. Supporting `.ai` notes
 may contain evidence and session history, but they are not required to choose
 the next step.
 
+## Execution Approach Change
+
+**Changed on June 25, 2026:** remaining component migration now follows a
+component-by-component closure model instead of the previous tiny
+behavior-slice model.
+
+The previous approach activated a small behavior subgroup, often only 2-10
+tests, then ran the full verification ladder. That was useful while shared
+Form/Input infrastructure was uncertain, but it is now too slow relative to the
+remaining work. From this point forward, each step should close one component
+as completely as practical:
+
+1. Inventory all skipped/fixme copied-old tests for the component.
+2. Compare the whole component against `/Users/dotneteer/source/xmlui`.
+3. Implement all low-risk compatibility gaps for that component in one batch.
+4. Activate every copied-old test that is compatible with the current
+   foundation.
+5. Leave only genuinely blocked tests skipped/fixme-marked with a current
+   reason.
+6. Run focused component verification, the full component spec, affected shared
+   clusters, TypeScript, unit tests, metadata, CSS audit, and full E2E once for
+   the completed component batch.
+
+Do not split a component into separate direct-binding, label-mode, variant, and
+parts handoffs unless the component reveals a real blocker or a risky shared
+architecture change. Batch the repetitive input compatibility patterns.
+
 ## Status Dashboard
 
 Legend:
@@ -25,11 +52,14 @@ Immediate status:
 | `[done]` | P2A Form Core | `Form.spec.ts` has no remaining skipped/fixme tests; Form dirty tracking, submit, events, persistence, sticky rows, parts, APIs, and copied-old Form core coverage are active. |
 | `[done]` | P2A FormItem/Input Closure | FormItem copied-old local blocks and the Slider auto-focus fixme are active. |
 | `[done]` | P2A FormSegment Closure | `FormSegment.spec.ts` is fully active; scoped context, discovery, layout, APIs, dirty state, and scoping parity are closed. |
-| `[current]` | P2B Structured Form Controls | StepperForm copied-old local coverage is closed; continue with TabsForm invalid-tab routing, then accordion mode. |
+| `[done]` | P2B Structured Form Controls | StepperForm, TabsForm, and Stepper local structured-form coverage is closed; TabsForm has no remaining skipped/fixme tests. |
+| `[done]` | P3A Text-Like Input Parity | TextBox/PasswordInput, TextArea, and NumberBox copied-old local parity are fully active with no remaining skipped/fixme tests. |
+| `[done]` | P3B Boolean, Rating, Slider, Date/Time, and Color Inputs | Component-by-component closure is complete for this phase, including the Date/Time/Rating re-sweep. DatePicker keeps one explicit Ark/mobile shell skip. |
+| `[current]` | P4A Overlay and Focus Infrastructure | Tooltip copied-old local coverage is fully active. Continue component-by-component with Drawer or ModalDialog, plus shared portal/focus primitives as needed. |
 
 Current next marker:
 
-`NEXT: P2B Structured Form Controls - TabsForm Invalid Tab Routing`
+`NEXT: P4A Overlay and Focus Infrastructure`
 
 Current verification baseline:
 
@@ -39,8 +69,21 @@ Current verification baseline:
 - FormSegment spec: 38 passed, 0 skipped.
 - Slider spec: 112 passed, 0 skipped.
 - StepperForm spec: 8 passed, 0 skipped.
-- Structured-form focused bundle: 75 passed, 3 skipped.
-- Full E2E: 3004 passed, 1940 skipped.
+- TabsForm spec: 8 passed, 0 skipped.
+- TextBox spec: 164 passed, 0 skipped.
+- TextArea spec: 159 passed, 0 skipped.
+- NumberBox spec: 206 passed, 0 skipped.
+- Switch spec: 104 passed, 0 skipped.
+- ColorPicker spec: 70 passed, 0 skipped.
+- DateInput spec: 162 passed, 0 skipped.
+- TimeInput spec: 169 passed, 0 skipped.
+- RatingInput spec: 16 passed, 0 skipped.
+- DatePicker spec: 16 passed, 1 skipped.
+- P3B Date/Time/Rating re-sweep bundle: 363 passed, 1 skipped.
+- Tooltip spec: 19 passed, 0 skipped.
+- P4A focused overlay/focus bundle: 34 passed, 63 skipped.
+- Structured-form focused bundle: 78 passed, 0 skipped.
+- Full E2E: 3141 passed, 1813 skipped.
 - TypeScript, unit tests, metadata build, and CSS module audit: passed.
 
 ## Handoff Status
@@ -54,7 +97,15 @@ Use this table as the quick source of truth for the next session.
 | `[done]` | FormItem Type, Validation Properties, Template, Events, Validation Behavior, Accessibility, Phone Pattern, Regex, Theme Variables, and Edge Cases | `FormItem.spec.ts` is fully active: 106 passed, 0 skipped. |
 | `[done]` | Slider Auto-Focus Parity | The remaining Slider auto-focus fixme is active; `Slider.spec.ts` is fully active: 112 passed, 0 skipped. |
 | `[done]` | FormSegment Closure | `FormSegment.spec.ts` is fully active: 38 passed, 0 skipped. |
-| `[current]` | P2B Structured Form Controls | Start here. Remaining local markers are TabsForm invalid-tab routing and accordion mode. |
+| `[done]` | P2B Structured Form Controls | `StepperForm.spec.ts`, `TabsForm.spec.ts`, and the structured Stepper bundle are fully active: 78 passed, 0 skipped. |
+| `[done]` | P3A Text-Like Input Parity | TextBox/PasswordInput, TextArea, and NumberBox local copied-old coverage are fully active. |
+| `[done]` | P3B Component Closure - ColorPicker | `ColorPicker.spec.ts` is fully active: 70 passed, 0 skipped. |
+| `[done]` | P3B Component Closure - DateInput | `DateInput.spec.ts` is fully active: 162 passed, 0 skipped. |
+| `[done]` | P3B Component Closure - TimeInput | `TimeInput.spec.ts` is fully active: 169 passed, 0 skipped. |
+| `[done]` | P3B Component Closure - DatePicker | `DatePicker.spec.ts` has 16 passed and 1 explicit skip for the blocked Ark/mobile shell work. |
+| `[done]` | P3B Re-sweep Date/Time/Rating Inputs | Re-sweep found no DateInput, TimeInput, or RatingInput skipped/fixme leftovers. It fixed one DateInput invalid-combination normalization regression and verified the bundle at 363 passed, 1 known DatePicker skip. |
+| `[done]` | P4A Component Closure - Tooltip | `Tooltip.spec.ts` is fully active: 19 passed, 0 skipped. The copied-old fixture was adjusted from unavailable `CVStack`/`email` icon triggers to migrated `Stack`/`home` fixtures without changing Tooltip behavior assertions. |
+| `[current]` | P4A Overlay and Focus Infrastructure | Start here. Continue with Drawer or ModalDialog copied-old closure, leaving only current portal/focus blockers skipped. |
 
 ## Compatibility Contract
 
@@ -387,12 +438,12 @@ Latest verified P2A state:
 
 ## Next Step
 
-### NEXT: P2B Structured Form Controls - TabsForm Invalid Tab Routing
+### NEXT: P4A Overlay and Focus Infrastructure
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: P2B Structured Form Controls -
-> TabsForm Invalid Tab Routing**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: P4A Overlay and Focus
+> Infrastructure**.
 
 Current handoff state:
 
@@ -401,9 +452,35 @@ Current handoff state:
 - Do not restart earlier P2A Form work. `Form.spec.ts`, `FormItem.spec.ts`,
   `FormSegment.spec.ts`, `Checkbox.spec.ts`, and `Slider.spec.ts` are fully
   active. The latest verified P2A state above is the baseline.
-- StepperForm copied-old local coverage is closed: invalid-segment gating and
-  `stepperStackedLabel` markup parity are active. The remaining P2B local
-  fixmes are in `TabsForm.spec.ts`.
+- StepperForm and TabsForm copied-old local coverage is closed. `TabsForm.spec.ts`
+  now has no remaining skipped/fixme tests, and the structured-form focused
+  bundle is fully active at 78 passed, 0 skipped.
+- TextBox/PasswordInput copied-old local coverage is fully active:
+  `TextBox.spec.ts` has 164 passed and 0 skipped.
+- TextArea copied-old local coverage is fully active: `TextArea.spec.ts` has
+  159 passed and 0 skipped.
+- NumberBox copied-old local coverage is fully active: `NumberBox.spec.ts` has
+  206 passed and 0 skipped.
+- **Approach change:** continue component-by-component, not behavior-slice by
+  behavior-slice. P3B input closure is complete; start the next overlay/focus
+  component batch.
+- Checkbox, Slider, Switch, and ColorPicker local copied-old coverage are fully active.
+  `Switch.spec.ts` now has 104 passed and 0 skipped. RatingInput currently has
+  no copied-old skipped/fixme candidates in this sweep.
+- `ColorPicker.spec.ts` is now fully active at 70 passed and 0 skipped.
+- `DateInput.spec.ts` is now fully active at 162 passed and 0 skipped.
+- `TimeInput.spec.ts` is now fully active at 169 passed and 0 skipped.
+- `DatePicker.spec.ts` now has 16 passed and 1 explicit skip. The old broad
+  DatePicker deferred marker was replaced by active coverage for inline mode,
+  range confirmation/cancel, presets, clearable, concise validation feedback,
+  direct `bindTo`, `initialValue` form seeding, and `FormItem type="datePicker"`.
+- The remaining DatePicker skip is intentionally narrow: mobile drawer and Ark
+  month/year view switching remain blocked until the rewrite DatePicker shell
+  matches the original Ark UI structure.
+- Tooltip copied-old local coverage is fully active: 19 passed, 0 skipped.
+- Next target remains P4A overlay/focus infrastructure, continuing with Drawer
+  or ModalDialog and any shared popover/portal/focus primitives needed for that
+  component batch.
 - There are unrelated dirty worktree files, including standalone sample
   `xmlui-latest.js` outputs and prior component/runtime edits. Do not revert
   files unless the user explicitly asks.
@@ -412,6 +489,316 @@ Current handoff state:
 
 Completed immediately before this marker:
 
+- Closed the Tooltip component batch. Removed the broad copied-old Tooltip
+  skip, leaving the full local Tooltip suite active.
+- The old Tooltip fixtures used `CVStack` and `Icon name="email"`, which are
+  not currently migrated in this rewrite. The fixture was updated to use
+  migrated `Stack` and supported `Icon name="home"` triggers while preserving
+  the same Tooltip side, offset, align, markdown, template, accessibility,
+  theme-variable, and empty-content assertions.
+- P4A skip inventory after this closure:
+  - `Tooltip.spec.ts`: 19 passed, 0 skipped.
+  - `Drawer.spec.ts`: broad copied-old skip remains.
+  - `ModalDialog.spec.ts`: broad copied-old skip remains, with local variant
+    fixmes still present under the skipped suite.
+  - `FocusScope.spec.ts`: one xmlui-pg/Markdown fixme remains blocked by the
+    Markdown/xmlui-pg component migration.
+- Verification for the completed Tooltip closure:
+  - `npx playwright test xmlui/src/components/Tooltip/Tooltip.spec.ts`
+    - first run after unskipping exposed fixture drift (`CVStack` and
+      unsupported `email` icon); rerun after fixture update passed
+    - 19 passed
+  - `npx playwright test xmlui/src/components/Tooltip/Tooltip.spec.ts xmlui/src/components/Tooltip/Tooltip.foundation.spec.ts xmlui/src/components/FocusScope/FocusScope.spec.ts xmlui/src/components/Drawer/Drawer.spec.ts xmlui/src/components/Drawer/Drawer.foundation.spec.ts xmlui/src/components/ModalDialog/ModalDialog.spec.ts xmlui/src/components/ModalDialog/ModalDialog.foundation.spec.ts`
+    - 34 passed
+    - 63 skipped
+  - `npx tsc -p xmlui/tsconfig.build.json --noEmit`
+    - passed
+  - `npm --workspace xmlui run build:xmlui`
+    - passed
+  - `npm --workspace xmlui run test:unit`
+    - 267 passed
+  - `npm --prefix xmlui run check:metadata`
+    - Components: 224
+    - Examples: 3
+  - `npm --workspace xmlui run compatibility:css-module-import-audit`
+    - direct import: 73
+    - no stylesheet usage: 10
+    - manual review: 0
+  - `npm --workspace xmlui run test:e2e`
+    - 3141 passed
+    - 1813 skipped
+- Completed the P3B Date/Time/Rating re-sweep. DateInput, TimeInput, and
+  RatingInput have no local skipped/fixme leftovers; DatePicker retains only
+  the explicit Ark/mobile shell skip.
+- Fixed DateInput invalid date-combination normalization so completed invalid
+  dates such as `02/30/2024` preserve the typed day, keep cross-field invalid
+  state, and make `isoValue()` return `null` instead of silently becoming a
+  different valid date.
+- Verification for the completed P3B re-sweep:
+  - `npx playwright test xmlui/src/components/DateInput/DateInput.spec.ts -g "isoValue\\(\\) method returns null for invalid date"`
+    - 1 passed
+  - `npx playwright test xmlui/src/components/DateInput/DateInput.spec.ts -g "preserves field values|does not clear all fields|isoValue\\(\\) method returns null for invalid date|handles very large numbers|handles negative numbers|handles special characters"`
+    - 6 passed
+  - `npx playwright test xmlui/src/components/DateInput/DateInput.spec.ts xmlui/src/components/TimeInput/TimeInput.spec.ts xmlui/src/components/RatingInput/RatingInput.spec.ts xmlui/src/components/DatePicker/DatePicker.spec.ts`
+    - 363 passed
+    - 1 skipped
+  - `npx tsc -p xmlui/tsconfig.build.json --noEmit`
+    - passed
+  - `npm --workspace xmlui run build:xmlui`
+    - passed
+  - `npm --workspace xmlui run test:unit`
+    - 267 passed
+  - `npm --prefix xmlui run check:metadata`
+    - Components: 224
+    - Examples: 3
+  - `npm --workspace xmlui run compatibility:css-module-import-audit`
+    - direct import: 73
+    - no stylesheet usage: 10
+    - manual review: 0
+  - `npm --workspace xmlui run test:e2e`
+    - 3122 passed
+    - 1832 skipped
+- Closed the DatePicker component batch. DatePicker now accepts direct
+  `bindTo`, reads/writes the enclosing Form context with field-prefix support,
+  seeds Form data from `initialValue`, registers bound fields for required
+  validation, consumes Form errors for validation status, and preserves
+  omitted-vs-explicit `verboseValidationFeedback`.
+- `DatePicker.renderer.tsx` passes `bindTo` and preserves the omitted
+  `verboseValidationFeedback` state; `DatePicker.tsx` metadata documents
+  `bindTo`.
+- `FormItem type="datepicker"` and `type="datePicker"` now route through
+  `DatePickerNative`, so FormItem date-picker fields use the real DatePicker
+  behavior and update Form data.
+- DatePicker gained compatibility DOM markers used by copied-old selectors
+  (`data-state="open"`, `data-part="control"`, `content`, `view-trigger`,
+  `table`, and `table-cell-trigger`) without changing the existing
+  `data-part-id`/`data-xmlui-part` hooks.
+- Activated DatePicker copied-old-compatible tests for inline rendering and API
+  updates, confirmed range Proceed/Cancel, custom presets, clearable reset,
+  concise validation feedback, direct `bindTo`, initial form seeding, and
+  FormItem routing.
+- Verification for the completed DatePicker closure:
+  - `npx playwright test xmlui/src/components/DatePicker/DatePicker.spec.ts`
+    - 16 passed
+    - 1 skipped
+  - `npx playwright test xmlui/src/components/Form/Form.spec.ts xmlui/src/components/Form/Form.foundation.spec.ts xmlui/src/components/FormItem/FormItem.spec.ts xmlui/src/components/FormItem/FormItemLabelClick.spec.ts xmlui/src/components/DatePicker/DatePicker.spec.ts`
+    - 352 passed
+    - 34 skipped
+  - `npx tsc -p xmlui/tsconfig.build.json --noEmit`
+    - passed
+  - `npm --workspace xmlui run build:xmlui`
+    - passed
+  - `npm --workspace xmlui run test:unit`
+    - 267 passed
+  - `npm --prefix xmlui run check:metadata`
+    - Components: 224
+    - Examples: 3
+  - `npm --workspace xmlui run compatibility:css-module-import-audit`
+    - direct import: 73
+    - no stylesheet usage: 10
+    - manual review: 0
+  - `npm --workspace xmlui run test:e2e`
+    - 3122 passed
+    - 1832 skipped
+- `npm --workspace xmlui run typecheck` does not exist in this workspace. The
+  broad `npx tsc -p xmlui/tsconfig.json --noEmit` still reports unrelated
+  pre-existing spec typing errors across many components, so use
+  `tsconfig.build.json`/`build:xmlui` as the current production TypeScript gate.
+- Activated the TimeInput copied-old non-time `initialValue` test, direct
+  `bindTo syncs $data and value` test, and duplicate-label prevention test
+  inside Forms.
+- TimeInput now accepts direct `bindTo`, the renderer passes it through, and
+  direct-bound TimeInput controls read/write the enclosing Form context with
+  segment field-prefix support while preserving the existing split-field API
+  behavior.
+- TimeInput seeds direct-bound Form values from `initialValue` and registers
+  bound fields with the Form.
+- `FormItem type="timeinput"`, `type="timeInput"`, and `type="time"` now route
+  through `TimeInputNative`, so FormItem time fields use the same native split
+  time input behavior as direct TimeInput controls.
+- Script compatibility now exposes the `getDate`, `Symbol`, and `BigInt`
+  built-ins as references and permits direct calls to those copied-old global
+  helpers in compiled expressions, matching TimeInput's non-string initial
+  value coverage.
+- Activated the DateInput copied-old invalid/non-date `initialValue` test,
+  direct `bindTo syncs $data and value` test, combined behaviors/parts test,
+  and the full Validation Feedback block including concise error/valid
+  feedback, component override of Form `verboseValidationFeedback`, tooltip
+  content, and duplicate-label prevention inside Forms.
+- DateInput now accepts direct `bindTo`, the renderer passes it through, and
+  direct-bound DateInput controls read/write the enclosing Form context with
+  segment field-prefix support while preserving component API behavior.
+- DateInput seeds direct-bound Form values from `initialValue`, registers bound
+  fields with the Form, consumes Form validation errors, preserves
+  omitted-vs-explicit `verboseValidationFeedback`, renders verbose feedback,
+  and shows concise validation icons/tooltips.
+- `FormItem type="dateinput"`, `type="dateInput"`, and `type="date"` now route
+  through `DateInputNative`, so FormItem date fields use the same native split
+  date input behavior as direct DateInput controls.
+- Script compatibility now exposes the `Date` built-in and permits `Date.now()`
+  in compiled expressions, matching the copied-old DateInput initial-value
+  coverage.
+- Activated the ColorPicker copied-old form-context test and direct
+  `bindTo syncs $data and value` test.
+- Removed the ColorPicker Behaviors and Parts gate, activating the nine
+  copied-old label-mode and duplicate-label tests covering `requireLabelMode`,
+  Form-level `itemRequireLabelMode` inheritance, explicit component override,
+  required/optional markers, and no duplicate label inside Forms.
+- ColorPicker now accepts direct `bindTo`, the renderer passes it through, and
+  direct-bound ColorPicker controls read/write the enclosing Form context with
+  segment field-prefix support.
+- ColorPicker seeds direct-bound Form values from `initialValue`, registers
+  bound fields with the Form, and renders required/optional label markers from
+  stylesheet classes.
+- `FormItem type="colorpicker"`, `type="colorPicker"`, and `type="color"` now
+  route through `ColorPickerNative`, so FormItem color fields use the same
+  native color input behavior as direct ColorPicker controls.
+- A focused rerun initially exposed a Form registration render loop warning.
+  ColorPicker now depends on stable Form callbacks (`getValue`, `setValue`,
+  `registerItem`) instead of the whole Form context object, and local state
+  updates are conditional to avoid redundant render work.
+- Activated the nine copied-old Switch label-mode tests covering
+  `requireLabelMode`, Form-level `itemRequireLabelMode` inheritance, explicit
+  Switch override, and duplicate-label prevention inside Forms.
+- Switch renderer now passes `requireLabelMode`; Switch label rendering follows
+  Checkbox's effective marker rules where the component prop overrides the Form
+  default, otherwise `markRequired` is used.
+- Switch label text now uses the Checkbox-compatible direct text-node shape
+  unless `labelWidth` requires an inline span, so copied-old label locators see
+  the marker text on the full label.
+- Activated the four copied-old Switch variant/parts tests: `handles variant`,
+  `variant applies custom theme variables`, `parts are present when variant is
+  added`, and `all behaviors combined with parts`.
+- Switch now accepts the renderer `variant` prop and wraps only unlabeled
+  variant switches so the component root carries variant theme classes while
+  preserving the native input as the `input` part.
+- Added a stylesheet-backed `switchVariantWrapper` root using Switch border and
+  background theme variables so generic variant-suffixed aliases apply to the
+  tested component root.
+- Activated the copied-old Switch `component integrates with forms correctly`
+  test.
+- No runtime change was required for this subgroup; the existing Form-wrapped
+  labeled Switch rendering already shows the switch and submit button visibly.
+- Activated the copied-old Switch `bindTo syncs $data and value` test.
+- Switch now accepts direct `bindTo`, the renderer passes it through, and
+  direct-bound Switch controls read/write the enclosing Form context with
+  segment field-prefix support while preserving the existing Toggle controller
+  behavior and API `setValue`/`value` semantics.
+- Activated the six copied-old NumberBox Validation Feedback tests covering
+  verbose helper feedback, concise error feedback, component override of Form
+  `verboseValidationFeedback`, concise valid feedback after correction,
+  concise error tooltip content, and duplicate-label prevention inside Forms.
+- NumberBox now consumes direct-bound Form validation errors, preserves
+  omitted-vs-explicit `verboseValidationFeedback` so Form defaults can flow
+  through, renders verbose field feedback outside the input root, and uses a
+  local concise feedback icon/tooltip path matching TextBox/TextArea behavior.
+- Activated the copied-old NumberBox Integration Tests:
+  `NumberBox returns number type in Form` and `NumberBox returns correct value
+  in Form`.
+- No runtime change was required for this subgroup; the FormItem
+  number/integer path already routes through `NumberBoxNative` and stores the
+  NumberBox emitted numeric value in Form data.
+- Activated the eight copied-old NumberBox `requireLabelMode` tests covering
+  required/optional indicators, explicit input override, and Form-level
+  `itemRequireLabelMode` inheritance.
+- NumberBox now exposes and renders `requireLabelMode`; component-level
+  `requireLabelMode` overrides Form `itemRequireLabelMode`, otherwise the Form
+  default flows through. Required and optional markers use NumberBox stylesheet
+  classes instead of inline visual styling.
+- Activated the four copied-old NumberBox variant/parts tests: `handles
+  variant`, `variant applies custom theme variables`, `parts are present when
+  variant is added`, and `all behaviors combined with parts`.
+- No runtime change was required for this subgroup; existing generic variant
+  theme-variable aliasing and NumberBox root/part structure already matched the
+  copied-old expectations.
+- Activated the copied-old NumberBox `bindTo syncs $data and value` test.
+- NumberBox now accepts and metadata-exposes `bindTo`, the renderer passes it
+  through, and direct-bound NumberBox controls read/write the enclosing Form
+  context with segment field-prefix support.
+- NumberBox direct binding stores the emitted numeric API value in Form data,
+  keeps rendered value/API state synchronized through typing and blur
+  normalization, seeds the Form value from `initialValue`, and registers
+  direct-bound fields for Form validation/discovery.
+- Activated the six copied-old TextArea validation-feedback tests covering
+  Form-level `verboseValidationFeedback`, component override, concise error and
+  valid feedback icons, concise error tooltip content, and duplicate-label
+  prevention inside Forms.
+- TextArea now registers direct `bindTo` fields with the enclosing Form,
+  consumes Form validation errors, preserves omitted-vs-explicit
+  `verboseValidationFeedback`, renders verbose field feedback, and shows
+  concise feedback icons/tooltips through TextArea stylesheet classes.
+- Activated the eight copied-old TextArea `requireLabelMode` tests covering
+  required/optional indicators, explicit input override, and Form-level
+  `itemRequireLabelMode` inheritance.
+- TextArea renderer now passes `requireLabelMode`; TextArea label rendering
+  follows TextBox's effective marker rules, where component
+  `requireLabelMode` overrides Form `itemRequireLabelMode`, otherwise the Form
+  default flows through. Required and optional markers use TextArea stylesheet
+  classes instead of inline visual styling.
+- Activated the four TextArea variant/parts tests covering custom variant
+  theme-variable aliases and part presence with variant plus animation behavior.
+- No runtime change was required for TextArea variant styling; the existing
+  generic variant theme-variable aliasing and TextArea `input` root attributes
+  already applied the custom variant variables. The activated parts assertions
+  were adjusted to look up the `input` part from the component root instead of
+  inside the native `<textarea>`, which cannot contain descendant part nodes.
+- Activated the three copied-old TextArea binding/caret tests covering direct
+  `bindTo` Form synchronization, caret preservation while inserting in the
+  middle, and caret preservation while replacing a selected multiline range.
+- TextArea now accepts `bindTo`, reads and writes the enclosing Form context
+  value with segment field-prefix support, seeds the Form value from
+  `initialValue`, and keeps local controlled text synchronized without moving
+  the active textarea caret during normal typing.
+- TextArea API `setValue` and `insert` now normalize old handler-style escaped
+  newline, carriage-return, and tab sequences so API-provided multiline values
+  match original XMLUI behavior while ordinary typed text remains literal.
+- Activated the four copied-old TextArea keyboard submit/reset tests covering
+  `enterSubmits`, `enterSubmits=false`, Shift+Enter newline preservation, and
+  `escResets`.
+- No runtime change was required for this TextArea subgroup; the current
+  `TextAreaReact` key handling already matched the original behavior for
+  Enter submit, Shift+Enter multiline editing, and Escape reset.
+- Activated the six copied-old TextBox validation-feedback tests covering
+  Form-level `verboseValidationFeedback`, component override, concise error and
+  valid feedback icons, concise error tooltip content, and duplicate-label
+  prevention inside Forms.
+- Form context now exposes `verboseValidationFeedback`; TextBox/PasswordInput
+  preserve omitted-vs-explicit `verboseValidationFeedback` so Form defaults can
+  flow through. TextBox concise feedback shows visible error/valid markers,
+  validates after a previously invalid field blurs, and uses a local
+  `data-tooltip-container` feedback tooltip without interfering with the
+  generic tooltip behavior.
+- Activated the eight copied-old TextBox `requireLabelMode` tests covering
+  required/optional indicators, explicit input override, and Form-level
+  `itemRequireLabelMode` inheritance.
+- TextBox and PasswordInput renderers now pass `requireLabelMode`; TextBox
+  metadata exposes the prop; TextBox label rendering follows the same effective
+  marker rules as direct Checkbox/Slider controls while preserving the
+  TextBox-specific labeled layout.
+- Activated the four copied-old TextBox variant/parts tests: `handles variant`,
+  `variant applies custom theme variables`, `parts are present when variant is
+  added`, and `all behaviors combined with parts`.
+- No runtime change was required for the variant/parts subgroup; the existing
+  component theme-class variant aliasing and TextBox root/part structure
+  already matched the copied-old expectations.
+- Activated the three copied-old TextBox direct binding tests:
+  `bindTo syncs $data and value`, `bindTo syncs $data and value for
+  PasswordInput`, and `component integrates with forms correctly`.
+- No runtime change was required for the binding subgroup; TextBox and
+  PasswordInput already route `bindTo` through the Form context and expose
+  `setValue`/`value` through the component API.
+- Activated the copied-old TabsForm `tabsAccordionView=true stacks tabs in
+  accordion mode with old parity` test. No runtime change was required because
+  TabsForm already forwards `tabsAccordionView` to the inner Tabs component, and
+  the shared Tabs accordion suite already covers the stricter interleaved
+  header/content ordering.
+- Activated the two copied-old TabsForm invalid-submit routing tests:
+  `submit jumps back to the first invalid tab and cancels submission` and
+  `submit jumps to the second tab when only it is invalid`.
+- TabsForm now discovers segment fields from explicit `fields` props or nested
+  `bindTo` fields, keeps its controlled active tab in sync with user tab
+  clicks, and selects the first invalid segment from `Form onSubmitFailed`
+  while still forwarding `submitFailed`.
 - Activated the copied-old StepperForm `stepperStackedLabel=true stacks icon
   and label with old Stepper markup` test.
 - StepperForm horizontal headers now use Stepper-compatible icon, label block,
@@ -483,67 +870,67 @@ Completed immediately before this marker:
 
 Step goal:
 
-Move into P2B structured form controls now that P2A Form, FormItem, direct
-input, and FormSegment local copied-old coverage is closed.
+Close the first P4A overlay/focus component batch component-by-component,
+starting from evidence in the original XMLUI implementation. Prefer a complete
+component closure over another behavior-slice handoff unless the component
+reveals a real shared portal/focus blocker.
 
 Known remaining skipped/fixme candidates in this closure group:
 
-- `TabsForm.spec.ts`: submit jumps back to the first invalid tab and cancels
-  submission.
-- `TabsForm.spec.ts`: submit jumps to the second tab when only it is invalid.
-- `TabsForm.spec.ts`: `tabsAccordionView=true` stacks tabs in accordion mode
-  with old parity.
-
-1. Inspect the two TabsForm invalid-submit routing fixmes first. They should
-   build on the same registered-field validation used by StepperForm gating.
-2. Compare with the original TabsForm implementation/tests before activating
-   either invalid-tab routing test.
-3. Keep `tabsAccordionView=true` deferred until invalid-tab routing is closed.
+- Inspect Drawer, ModalDialog, and shared overlay/focus primitive specs for
+  current `test.skip`, `test.fixme`, and `describe.fixme` markers before
+  editing. Tooltip is already fully active.
+- Compare the current rewrite shell with original overlay behavior in
+  `/Users/dotneteer/source/xmlui`, including portal placement, focus
+  trapping/restoration, escape handling, outside-click behavior, stacking,
+  accessibility attributes, and theme/part hooks.
+- Leave only genuinely blocked tests skipped/fixme-marked with current,
+  component-specific reasons.
 
 Task checklist:
 
-1. Inspect remaining copied-old skipped/fixme tests in
-   `xmlui/src/components/TabsForm/TabsForm.spec.ts`.
+1. Inspect remaining copied-old skipped/fixme tests in `Drawer`,
+   `ModalDialog`, and shared overlay/focus primitive specs.
 2. Compare with original tests/source under
-   `/Users/dotneteer/source/xmlui/xmlui/src/components/TabsForm`, and related
-   `Tabs`, `Form`, and `FormSegment` files.
-3. Pick the TabsForm invalid-tab routing subgroup and activate only the tests
-   covered by it.
-4. Preserve unrelated deferred tests until their prerequisites are implemented.
-5. Make the smallest compatibility change required.
-6. Run focused Playwright for the activated test.
-7. Run the structured-form focused specs and the P2A Form cluster if shared
-   form behavior changes.
+   `/Users/dotneteer/source/xmlui/xmlui/src/components`, especially the matching
+   original component directories and shared overlay primitives.
+3. Pick the first feasible component closure batch and activate all compatible
+   copied-old tests for that component.
+4. Preserve deferred tests only when a real portal/focus/Ark-shell prerequisite
+   is still missing.
+5. Make the smallest compatibility changes required by the selected component
+   closure.
+6. Run focused Playwright for any activated leftover tests.
+7. Run affected overlay/focus clusters if shared primitives change.
 8. Run TypeScript, unit tests, metadata build, CSS module import audit, and
    `npm --workspace xmlui run test:e2e`.
-9. Update this plan with the result and move this NEXT marker forward.
+9. Update this plan with the result and move this NEXT marker to the next
+   remaining phase.
 
 Likely files:
 
-- `xmlui/src/components/Form/FormContext.tsx`
-- `xmlui/src/components/Form/FormReact.tsx`
-- `xmlui/src/components/FormSegment/FormSegmentReact.tsx`
-- `xmlui/src/components/FormSegment/FormSegment.renderer.tsx`
-- `xmlui/src/components/TabsForm/TabsForm.spec.ts`
-- `xmlui/src/components/TabsForm/TabsForm.tsx`
-- `xmlui/src/components/TabsForm/TabsFormReact.tsx`
-- `xmlui/src/testing/ComponentDrivers.ts`
-- `xmlui/src/testing/fixtures.ts`
+- `xmlui/src/components/ModalDialog/ModalDialog.spec.ts`
+- `xmlui/src/components/ModalDialog/ModalDialogReact.tsx`
+- `xmlui/src/components/Drawer/Drawer.spec.ts`
+- `xmlui/src/components/Drawer/DrawerReact.tsx`
+- `xmlui/src/components/FocusScope/FocusScopeReact.tsx`
+- shared runtime/rendering utilities used by portals, overlays, and focus
 
 Original-reference paths:
 
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/TabsForm`
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/FormSegment`
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/Form`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/ModalDialog`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Drawer`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/FocusScope`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components-core`
 
 Verification commands:
 
-- Focused Playwright for each activated structured-form subgroup, for example:
-  `npm --workspace xmlui exec -- playwright test src/components/TabsForm/TabsForm.spec.ts -g "submit jumps"`
-- Structured-form focused specs:
-  `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts src/components/TabsForm/TabsForm.spec.ts src/components/Stepper/Stepper.spec.ts`
-- P2A Form cluster:
-  `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+- Focused Playwright for activated leftovers, with the `-g` filter chosen after
+  inspection.
+- Full affected component specs, likely:
+  `npm --workspace xmlui exec -- playwright test src/components/ModalDialog/ModalDialog.spec.ts src/components/Drawer/Drawer.spec.ts`
+- Include FocusScope if shared focus primitives are touched:
+  `npm --workspace xmlui exec -- playwright test src/components/FocusScope/FocusScope.spec.ts src/components/ModalDialog/ModalDialog.spec.ts src/components/Drawer/Drawer.spec.ts`
 - TypeScript:
   `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - Unit tests:
@@ -555,16 +942,19 @@ Verification commands:
 - Full E2E after the completed step:
   `npm --workspace xmlui run test:e2e`
 
-Latest verification for the completed StepperForm stacked-label step:
+Latest verification for the completed TimeInput component closure:
 
-- `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts -g "stepperStackedLabel"`
-  - 1 passed
-- `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts`
-  - 8 passed
+- `npm --workspace xmlui exec -- playwright test src/components/TimeInput/TimeInput.spec.ts -g "non-time initialValues|bindTo syncs|does not duplicate label"`
+  - first focused run exposed missing semantic binding for the copied-old
+    `getDate()` global helper; rerun after adding built-in reference
+    compatibility passed
+  - 3 passed
+- `npm --workspace xmlui exec -- playwright test src/components/TimeInput/TimeInput.spec.ts`
+  - 169 passed
   - 0 skipped
-- `npm --workspace xmlui exec -- playwright test src/components/StepperForm/StepperForm.spec.ts src/components/TabsForm/TabsForm.spec.ts src/components/Stepper/Stepper.spec.ts`
-  - 75 passed
-  - 3 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
   - passed
 - `npm --workspace xmlui run test`
@@ -579,8 +969,385 @@ Latest verification for the completed StepperForm stacked-label step:
   - no stylesheet usage: 10
   - manual review: 0
 - `npm --workspace xmlui run test:e2e`
-  - 3004 passed
-  - 1940 skipped
+  - 3112 passed
+  - 1832 skipped
+
+Previous verification for the completed DateInput component closure:
+
+- `npm --workspace xmlui exec -- playwright test src/components/DateInput/DateInput.spec.ts -g "invalid and non-date|bindTo syncs|all behaviors combined|Validation Feedback"`
+  - first focused run exposed the inherited `verboseValidationFeedback`
+    default and missing `Date.now()` expression compatibility; rerun after the
+    fixes passed
+  - 9 passed
+- `npm --workspace xmlui exec -- playwright test src/components/DateInput/DateInput.spec.ts`
+  - 162 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3109 passed
+  - 1835 skipped
+
+Previous verification for the completed ColorPicker component closure:
+
+- `npm --workspace xmlui exec -- playwright test src/components/ColorPicker/ColorPicker.spec.ts -g "form context|bindTo syncs|requireLabelMode|itemRequireLabelMode|does not duplicate label"`
+  - first rerun exposed a Form registration render loop warning; rerun after
+    stabilizing Form callback dependencies passed quietly
+  - 11 passed
+- `npm --workspace xmlui exec -- playwright test src/components/ColorPicker/ColorPicker.spec.ts`
+  - 70 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3100 passed
+  - 1844 skipped
+
+Previous verification for the completed Switch label-mode step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts -g "requireLabelMode|itemRequireLabelMode|does not duplicate label"`
+  - first focused run exposed the stale always-wrapped Switch label text shape;
+    rerun after aligning label markup with Checkbox passed
+  - 9 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts`
+  - 104 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3089 passed
+  - 1855 skipped
+
+Previous verification for the completed Switch variant/parts step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts -g "handles variant|variant applies|parts are present when variant|all behaviors combined"`
+  - 4 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts`
+  - 95 passed
+  - 9 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3080 passed
+  - 1864 skipped
+
+Previous verification for the completed Switch Form integration step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts -g "component integrates with forms correctly"`
+  - sandboxed run failed before test execution with `listen EPERM: operation
+    not permitted 127.0.0.1:5173`; escalated rerun passed
+  - 1 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts`
+  - 91 passed
+  - 13 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3076 passed
+  - 1868 skipped
+
+Previous verification for the completed Switch direct-binding step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts -g "bindTo syncs"`
+  - sandboxed run failed before test execution with `listen EPERM: operation
+    not permitted 127.0.0.1:5173`; escalated rerun passed
+  - 1 passed
+- `npm --workspace xmlui exec -- playwright test src/components/Switch/Switch.spec.ts`
+  - 90 passed
+  - 14 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3075 passed
+  - 1869 skipped
+
+Previous verification for the completed NumberBox validation-feedback step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts -g "Validation Feedback"`
+  - sandboxed run failed before test execution with `listen EPERM: operation
+    not permitted 127.0.0.1:5173`; escalated rerun passed
+  - 6 passed
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts`
+  - 206 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3074 passed
+  - 1870 skipped
+
+Previous verification for the completed NumberBox Form integration step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts -g "NumberBox returns"`
+  - 2 passed
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts`
+  - 200 passed
+  - 6 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3068 passed
+  - 1876 skipped
+
+Previous verification for the completed NumberBox label-mode step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts -g "requireLabelMode|itemRequireLabelMode"`
+  - 8 passed
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts`
+  - 198 passed
+  - 8 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3066 passed
+  - 1878 skipped
+
+Previous verification for the completed NumberBox variant/parts step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts -g "handles variant|variant applies|parts are present when variant|all behaviors combined"`
+  - 4 passed
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts`
+  - 190 passed
+  - 16 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3058 passed
+  - 1886 skipped
+
+Previous verification for the completed NumberBox direct-binding step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts -g "bindTo syncs"`
+  - 1 passed
+- `npm --workspace xmlui exec -- playwright test src/components/NumberBox/NumberBox.spec.ts`
+  - 186 passed
+  - 20 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3054 passed
+  - 1890 skipped
+
+Previous verification for the completed TextArea validation-feedback step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/TextArea/TextArea.spec.ts -g "Validation Feedback"`
+  - first focused run exposed the inherited `verboseValidationFeedback` default
+    and invisible concise icon marker; rerun after the fix passed
+  - 6 passed
+- `npm --workspace xmlui exec -- playwright test src/components/TextArea/TextArea.spec.ts`
+  - 159 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Form/Form.foundation.spec.ts src/components/FormItem/FormItem.foundation.spec.ts src/components/FormSegment/FormSegment.foundation.spec.ts src/components/Form/Form.spec.ts src/components/FormItem/FormItem.spec.ts src/components/FormSegment/FormSegment.spec.ts`
+  - 379 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3053 passed
+  - 1891 skipped
+
+Previous verification for the completed TextArea label-mode step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/TextArea/TextArea.spec.ts -g "requireLabelMode|itemRequireLabelMode"`
+  - 8 passed
+- `npm --workspace xmlui exec -- playwright test src/components/TextArea/TextArea.spec.ts`
+  - 153 passed
+  - 6 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3047 passed
+  - 1897 skipped
+
+Previous verification for the completed TextArea variant/parts step:
+
+- `npm --workspace xmlui exec -- playwright test src/components/TextArea/TextArea.spec.ts -g "handles variant|variant applies|parts are present when variant|all behaviors combined"`
+  - first sandboxed run failed before test execution with `listen EPERM:
+    operation not permitted 127.0.0.1:5173`; escalated rerun passed
+  - initial escalated run passed the two variant style checks and exposed a
+    stale impossible descendant-part locator in the two parts checks; rerun
+    after adjusting those assertions to use the component root passed
+  - 4 passed
+- `npm --workspace xmlui exec -- playwright test src/components/TextArea/TextArea.spec.ts`
+  - 145 passed
+  - 14 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run build:metadata`
+  - passed
+  - Components: 224
+  - Examples: 3
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+  - direct import: 73
+  - no stylesheet usage: 10
+  - manual review: 0
+- `npm --workspace xmlui run test:e2e`
+  - 3039 passed
+  - 1905 skipped
 
 ## Roadmap By Status
 
@@ -626,8 +1393,8 @@ Completed in this P2A phase:
 
 Next closure group:
 
-1. `[current]` P2B Structured Form Controls, continuing with TabsForm
-   invalid-tab routing after StepperForm local copied-old coverage closed.
+1. `[current]` P4A Overlay and Focus Infrastructure, continuing with Drawer or
+   ModalDialog after Tooltip closure.
 
 ### 2. [done] P2A: FormItem/Input Closure
 
@@ -663,7 +1430,7 @@ Goal:
 - Closed scoped context, field discovery, layout props, APIs, and dirty-state
   parity after the FormItem/input closure work.
 
-### 4. [current] P2B: Structured Form Controls
+### 4. [done] P2B: Structured Form Controls
 
 Components:
 
@@ -674,15 +1441,17 @@ Components:
 
 Goal:
 
-- Close structured form navigation, invalid-segment routing, submit/reset
-  semantics, and old stacked/accordion visual modes.
+- Closed structured form navigation, invalid-segment routing, submit/reset
+  semantics, and old stacked/accordion visual modes at local copied-old spec
+  level.
 
 Verification:
 
 - Focused copied-old E2E for `StepperForm`, `TabsForm`, `FormSegment`, and
   `Stepper`.
+- Final structured-form focused bundle: 78 passed, 0 skipped.
 
-### 5. [remaining] P3A: Text-Like Input Parity
+### 5. [done] P3A: Text-Like Input Parity
 
 Components:
 
@@ -693,10 +1462,16 @@ Components:
 
 Goal:
 
-- Close value editing, caret behavior, form binding, validation, variants,
-  parts, behaviors, and labels.
+- Closed value editing, caret behavior, form binding, validation, variants,
+  parts, behaviors, and labels at local copied-old spec level.
 
-### 6. [remaining] P3B: Boolean, Rating, Slider, Date/Time, and Color Inputs
+Verification:
+
+- `TextBox.spec.ts`: 164 passed, 0 skipped.
+- `TextArea.spec.ts`: 159 passed, 0 skipped.
+- `NumberBox.spec.ts`: 206 passed, 0 skipped.
+
+### 6. [done] P3B: Boolean, Rating, Slider, Date/Time, and Color Inputs
 
 Components:
 
@@ -714,7 +1489,24 @@ Goal:
 - Close form binding, validation, theme-variable state matrix,
   keyboard/mobile behavior, and picker parity.
 
-### 7. [remaining] P4A: Overlay and Focus Infrastructure
+Execution approach:
+
+- Use component-by-component closure for the rest of this phase. Do not create
+  new handoffs for small behavior slices such as "bindTo only" or
+  "label-mode only" unless a real blocker is found.
+- A component is closed when all feasible copied-old local tests for that
+  component are active, any remaining deferred tests have current blocker
+  reasons, and the component's focused/full specs plus shared verification
+  ladder have passed.
+
+Component closure order:
+
+1. `[done]` `Checkbox`, `Slider`, `Switch`, `ColorPicker`, `DateInput`,
+   `TimeInput`, and `DatePicker`.
+2. `[done]` Re-sweep `DateInput`, `TimeInput`, `RatingInput`, and P3B specs
+   for any copied-old tests added or still skipped after the picker closures.
+
+### 7. [current] P4A: Overlay and Focus Infrastructure
 
 Components and services:
 
@@ -727,6 +1519,12 @@ Goal:
 
 - Close portal behavior, focus trapping/restoration, escape/outside-click,
   stacking, keyboard behavior, and overlay accessibility.
+
+Component closure order:
+
+1. `[done]` `Tooltip`.
+2. `[current]` Continue with `Drawer` or `ModalDialog`, plus shared
+   portal/focus primitives if the selected component requires them.
 
 ### 8. [remaining] P3C: File and Selection Inputs
 

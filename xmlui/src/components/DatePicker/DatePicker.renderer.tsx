@@ -18,6 +18,7 @@ export const datePickerRenderer = wrapComponent({
         }
       }}
       id={adapter.stringProp("id")}
+      bindTo={adapter.stringProp("bindTo")}
       value={adapter.prop("value")}
       initialValue={adapter.prop("initialValue")}
       mode={adapter.stringProp("mode", defaultProps.mode)}
@@ -50,7 +51,11 @@ export const datePickerRenderer = wrapComponent({
       showPresets={adapter.booleanProp("showPresets", defaultProps.showPresets)}
       disabledDates={adapter.prop("disabledDates")}
       confirmRangeSelection={adapter.booleanProp("confirmRangeSelection", defaultProps.confirmRangeSelection)}
-      verboseValidationFeedback={adapter.booleanProp("verboseValidationFeedback", true)}
+      verboseValidationFeedback={
+        Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+          ? adapter.booleanProp("verboseValidationFeedback", true)
+          : undefined
+      }
       validationIconSuccess={adapter.stringProp("validationIconSuccess")}
       validationIconError={adapter.stringProp("validationIconError")}
       invalidMessages={adapter.prop("invalidMessages") as string[] | undefined}

@@ -213,6 +213,18 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   if (name === "Object") {
     return Object;
   }
+  if (name === "Date") {
+    return Date;
+  }
+  if (name === "getDate") {
+    return getDate;
+  }
+  if (name === "Symbol") {
+    return Symbol;
+  }
+  if (name === "BigInt") {
+    return BigInt;
+  }
   if (name === "Actions") {
     return createActionsReference();
   }
@@ -220,6 +232,10 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
     return scope?.toast?.reference;
   }
   return undefined;
+}
+
+function getDate(date?: string | number | Date): Date {
+  return date ? new Date(date) : new Date();
 }
 
 function readRouteContext(scope: RuntimeScope, name: string): unknown {

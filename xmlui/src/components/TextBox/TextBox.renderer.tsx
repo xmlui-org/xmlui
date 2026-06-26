@@ -31,6 +31,7 @@ export const textBoxRenderer = wrapComponent({
             : undefined
         }
         labelWidth={adapter.prop("labelWidth")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         direction={adapter.stringProp("direction")}
         placeholder={adapter.stringProp("placeholder")}
         maxLength={adapter.prop("maxLength") as number | undefined}
@@ -54,7 +55,11 @@ export const textBoxRenderer = wrapComponent({
         showPasswordToggle={adapter.booleanProp("showPasswordToggle", false)}
         passwordVisibleIcon={adapter.stringProp("passwordVisibleIcon", defaultProps.passwordVisibleIcon)}
         passwordHiddenIcon={adapter.stringProp("passwordHiddenIcon", defaultProps.passwordHiddenIcon)}
-        verboseValidationFeedback={adapter.booleanProp("verboseValidationFeedback", true)}
+        verboseValidationFeedback={
+          Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+            ? adapter.booleanProp("verboseValidationFeedback", true)
+            : undefined
+        }
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
         invalidMessages={adapter.prop("invalidMessages", defaultProps.invalidMessages)}
         style={adapter.style}
@@ -93,6 +98,7 @@ export const passwordInputRenderer = wrapComponent({
             : undefined
         }
         labelWidth={adapter.prop("labelWidth")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         direction={adapter.stringProp("direction")}
         placeholder={adapter.stringProp("placeholder")}
         maxLength={adapter.prop("maxLength") as number | undefined}
@@ -116,7 +122,11 @@ export const passwordInputRenderer = wrapComponent({
         showPasswordToggle={adapter.booleanProp("showPasswordToggle", false)}
         passwordVisibleIcon={adapter.stringProp("passwordVisibleIcon", defaultProps.passwordVisibleIcon)}
         passwordHiddenIcon={adapter.stringProp("passwordHiddenIcon", defaultProps.passwordHiddenIcon)}
-        verboseValidationFeedback={adapter.booleanProp("verboseValidationFeedback", true)}
+        verboseValidationFeedback={
+          Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+            ? adapter.booleanProp("verboseValidationFeedback", true)
+            : undefined
+        }
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
         invalidMessages={adapter.prop("invalidMessages", defaultProps.invalidMessages)}
         style={adapter.style}

@@ -171,7 +171,7 @@ test.describe("initialValue property", () => {
     await expect(iv5.dayInput).toHaveValue("30");
   });
 
-  test.fixme("handles invalid and non-date initialValues gracefully", async ({
+  test("handles invalid and non-date initialValues gracefully", async ({
     initTestBed,
     createDateInputDriver,
   }) => {
@@ -813,7 +813,7 @@ test.describe("API Methods", () => {
     await expect(driver.yearInput).toHaveValue("2024");
   });
 
-  test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <DateInput id="boundDateInput" bindTo="dateValue" />
@@ -1434,7 +1434,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <DateInput 
         testId="test" 
@@ -1477,11 +1477,6 @@ test.describe("Behaviors and Parts", () => {
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test.fixme(
-    true,
-    "Deferred until Form/FormItem validation feedback infrastructure is migrated.",
-  );
-
   test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">
@@ -1585,7 +1580,7 @@ test.describe("Validation Feedback", () => {
     await expect(tooltip).toContainText("This field is required");
   });
 
-  test.fixme("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
         <DateInput

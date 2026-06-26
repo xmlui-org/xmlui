@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Form, type FormProps } from "../Form/FormReact";
 import { TabItemComponent } from "../Tabs/TabItemReact";
@@ -7,6 +8,7 @@ import { TabsComponent } from "../Tabs/TabsReact";
 export type StructuredFormSegment = {
   key: string;
   label: string;
+  fields: string[];
   content: ReactNode;
 };
 
@@ -52,6 +54,22 @@ export function TabsForm({
   registerComponentApi,
   ...rest
 }: TabsFormProps) {
+  const [activeTab, setActiveTab] = useState(tabsActiveTab);
+
+  useEffect(() => {
+    setActiveTab(tabsActiveTab);
+  }, [tabsActiveTab]);
+
+  const handleSubmitFailed = useCallback(async (errors: Record<string, string>) => {
+    const firstInvalidIndex = segments.findIndex((segment) =>
+      segment.fields.some((field) => Object.prototype.hasOwnProperty.call(errors, field)),
+    );
+    if (firstInvalidIndex >= 0) {
+      setActiveTab(firstInvalidIndex);
+    }
+    await onSubmitFailed?.(errors);
+  }, [onSubmitFailed, segments]);
+
   return (
     <Form
       {...rest}
@@ -64,12 +82,13 @@ export function TabsForm({
       hideButtonRow={hideButtonRow}
       enableSubmit={enableSubmit}
       onSubmit={onSubmit}
-      onSubmitFailed={onSubmitFailed}
+      onSubmitFailed={handleSubmitFailed}
       onCancel={onCancel}
       registerComponentApi={registerComponentApi}
     >
       <TabsComponent
-        activeTab={tabsActiveTab}
+        activeTab={activeTab}
+        onDidChange={(index) => setActiveTab(index)}
         orientation={tabsOrientation}
         tabAlignment={tabsTabAlignment}
         accordionView={tabsAccordionView}

@@ -3,6 +3,7 @@ import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, u
 
 import { defaultProps } from "./ColorPicker.defaults";
 import styles from "./ColorPicker.module.scss";
+import { useFormContext } from "../Form/FormContext";
 
 export type ColorPickerApi = {
   focus: () => void;
@@ -12,6 +13,7 @@ export type ColorPickerApi = {
 
 export type ColorPickerProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   enabled?: boolean;
@@ -20,6 +22,7 @@ export type ColorPickerProps = {
   autoFocus?: boolean;
   tabIndex?: number;
   label?: unknown;
+  requireLabelMode?: string;
   validationStatus?: string;
   className?: string;
   style?: CSSProperties;
@@ -32,6 +35,7 @@ export type ColorPickerProps = {
 export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProps>(function ColorPickerNative(
   {
     id,
+    bindTo,
     value,
     initialValue = defaultProps.initialValue,
     enabled = defaultProps.enabled,
@@ -40,6 +44,7 @@ export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProp
     autoFocus,
     tabIndex = 0,
     label,
+    requireLabelMode,
     validationStatus = defaultProps.validationStatus,
     className,
     style,
@@ -53,30 +58,35 @@ export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProp
 ) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const generatedInputId = useId();
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const registerFormItem = form?.registerItem;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const effectiveValue = formValue ?? value;
   const inputId = id ?? generatedInputId;
-  const controlled = value !== undefined;
+  const controlled = effectiveValue !== undefined;
   const [localValue, setLocalValue] = useState(() =>
-    normalizeColor(controlled ? value : initialValue),
+    normalizeColor(controlled ? effectiveValue : initialValue),
   );
-  const currentValue = controlled ? normalizeColor(value) : localValue;
-
-  useEffect(() => {
-    if (controlled) {
-      setLocalValue(normalizeColor(value));
-    }
-  }, [controlled, value]);
+  const currentValue = controlled ? normalizeColor(effectiveValue) : localValue;
 
   useEffect(() => {
     if (!controlled) {
-      setLocalValue(normalizeColor(initialValue));
+      const normalizedInitialValue = normalizeColor(initialValue);
+      setLocalValue((previousValue) => previousValue === normalizedInitialValue ? previousValue : normalizedInitialValue);
     }
   }, [controlled, initialValue]);
 
   const updateValue = useCallback((nextValue: unknown) => {
     const color = normalizeColor(nextValue);
-    setLocalValue(color);
+    setLocalValue((previousValue) => previousValue === color ? previousValue : color);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, color);
+    }
     void onDidChange?.(color);
-  }, [onDidChange]);
+  }, [fieldName, onDidChange, setFormValue]);
 
   useImperativeHandle(ref, () => ({
     focus: () => inputRef.current?.focus(),
@@ -85,6 +95,37 @@ export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProp
       return currentValue;
     },
   }), [currentValue, updateValue]);
+
+  useEffect(() => {
+    if (
+      !getFormValue ||
+      !setFormValue ||
+      fieldName === undefined ||
+      getFormValue(fieldName) != null ||
+      initialValue === undefined
+    ) {
+      return;
+    }
+    setFormValue(fieldName, normalizeColor(initialValue));
+  }, [fieldName, getFormValue, initialValue, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      label: stringifyLabel(label),
+      required,
+    });
+  }, [fieldName, label, registerFormItem, required]);
+
+  const labelText = stringifyLabel(label);
+  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const showRequiredIndicator =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
 
   const input = (
     <input
@@ -116,7 +157,6 @@ export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProp
     />
   );
 
-  const labelText = stringifyLabel(label);
   if (!labelText) {
     return input;
   }
@@ -133,6 +173,8 @@ export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProp
       <div data-part-id="labeledItem" data-xmlui-part="labeledItem" className={styles.colorPickerLabeledItem}>
         <label htmlFor={inputId} className={styles.colorPickerLabel}>
           {labelText}
+          {showRequiredIndicator ? <span className={styles.colorPickerLabelRequired}>*</span> : null}
+          {showOptionalIndicator ? <span className={styles.colorPickerLabelOptional}>(Optional)</span> : null}
         </label>
         {input}
       </div>
@@ -150,6 +192,13 @@ function normalizeColor(value: unknown): string {
 
 function stringifyLabel(value: unknown): string {
   return value === undefined || value === null ? "" : String(value);
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function cx(...values: Array<string | undefined | false>): string {

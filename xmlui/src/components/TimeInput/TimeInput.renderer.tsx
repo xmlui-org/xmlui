@@ -18,6 +18,7 @@ export const timeInputRenderer = wrapComponent({
         }
       }}
       id={adapter.stringProp("id")}
+      bindTo={adapter.stringProp("bindTo")}
       value={adapter.prop("value")}
       initialValue={adapter.prop("initialValue")}
       label={adapter.prop("label")}
