@@ -6,6 +6,9 @@ import { defaultProps } from "./ModalDialog.defaults";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import styles from "./ModalDialog.module.scss";
 
+type CloseResult = boolean | void;
+type RenderTitle = ReactNode | ((params: unknown[]) => ReactNode);
+
 export type ModalDialogApi = {
   open: (...params: unknown[]) => void;
   close: () => void;
@@ -17,10 +20,12 @@ export type ModalDialogProps = Omit<HTMLAttributes<HTMLDivElement>, "children" |
   closeButtonVisible?: boolean;
   fullScreen?: boolean;
   initiallyOpen?: boolean;
-  onClose?: () => void | Promise<void>;
+  onClose?: () => CloseResult | Promise<CloseResult>;
   onOpen?: (...params: unknown[]) => void | Promise<void>;
   registerComponentApi?: (api: ModalDialogApi) => void;
-  title?: ReactNode;
+  title?: RenderTitle;
+  tooltip?: string;
+  tooltipMarkdown?: string;
 };
 
 export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>(function ModalDialogComponent(
@@ -35,12 +40,15 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
     registerComponentApi,
     style,
     title,
+    tooltip,
+    tooltipMarkdown,
     ...rest
   },
   ref,
 ) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
   const [openParams, setOpenParams] = useState<unknown[]>([]);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const open = useCallback((...params: unknown[]) => {
     setOpenParams(params);
@@ -49,8 +57,13 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
   }, [onOpen]);
 
   const close = useCallback(() => {
-    setIsOpen(false);
-    void onClose?.();
+    void (async () => {
+      const closeResult = await onClose?.();
+      if (closeResult === false) {
+        return;
+      }
+      setIsOpen(false);
+    })();
   }, [onClose]);
 
   const isOpenApi = useCallback(() => isOpen, [isOpen]);
@@ -99,6 +112,10 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
   }, [isOpen]);
 
   const renderedChildren = useMemo(() => children?.(openParams), [children, openParams]);
+  const renderedTitle = useMemo(
+    () => typeof title === "function" ? title(openParams) : title,
+    [openParams, title],
+  );
   const registeredFormsRef = useRef(new Set<string>());
   const modalVisibilityContextValue = useMemo(() => ({
     registerForm: (id: string) => {
@@ -115,30 +132,58 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
   if (!isOpen) {
     return null;
   }
+  const tooltipContent = tooltipMarkdown || tooltip;
+
+  const dialogAttrs = { ...rest } as HTMLAttributes<HTMLDivElement> & Record<string, unknown>;
+  if (dialogAttrs["data-testid"] == null && typeof dialogAttrs["data-xmlui-id"] === "string") {
+    dialogAttrs["data-testid"] = dialogAttrs["data-xmlui-id"];
+  }
 
   const modal = (
     <div className={styles.portal} data-xmlui-component="ModalDialogPortal">
       <div aria-hidden="true" className={styles.overlayBackground} />
       <div className={cx(styles.overlay, fullScreen && styles.fullScreenOverlay)}>
         <div
-          {...rest}
+          {...dialogAttrs}
           ref={ref}
-          aria-labelledby={title ? "modal-dialog-title" : undefined}
+          aria-labelledby={renderedTitle ? "modal-dialog-title" : undefined}
           aria-modal="true"
           className={cx(styles.content, fullScreen && styles.fullScreenContent, className)}
           data-state="open"
           role="dialog"
           style={style as CSSProperties}
         >
-          {title ? (
-            <header className={styles.title} data-xmlui-part="title" id="modal-dialog-title">
-              {title}
+          {renderedTitle ? (
+            <header
+              aria-level={2}
+              className={styles.title}
+              data-part-id="title"
+              data-xmlui-part="title"
+              id="modal-dialog-title"
+              role="heading"
+            >
+              {renderedTitle}
             </header>
           ) : null}
-          <div className={styles.innerContent} data-xmlui-part="content">
+          <div
+            className={styles.innerContent}
+            data-part-id="content"
+            data-xmlui-part="content"
+            data-xmlui-tooltip-markdown={tooltipMarkdown}
+            onBlur={() => setTooltipVisible(false)}
+            onFocus={() => setTooltipVisible(true)}
+            onMouseEnter={() => setTooltipVisible(true)}
+            onMouseLeave={() => setTooltipVisible(false)}
+            title={tooltip}
+          >
             <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
               {renderedChildren}
             </ModalVisibilityContext.Provider>
+            {tooltipVisible && tooltipContent ? (
+              <span role="tooltip">
+                {tooltipMarkdown ? renderTinyMarkdown(tooltipMarkdown) : tooltipContent}
+              </span>
+            ) : null}
           </div>
           {closeButtonVisible ? (
             <button aria-label="Close" className={styles.closeButton} onClick={close} type="button">
@@ -155,4 +200,9 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
 
 function cx(...classes: Array<string | undefined | false>): string {
   return classes.filter(Boolean).join(" ");
+}
+
+function renderTinyMarkdown(markdown: string): ReactNode {
+  const strongMatch = /^\*\*(.*)\*\*$/.exec(markdown.trim());
+  return strongMatch ? <strong>{strongMatch[1]}</strong> : markdown;
 }

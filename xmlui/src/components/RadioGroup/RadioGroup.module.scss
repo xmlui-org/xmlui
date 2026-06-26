@@ -82,6 +82,10 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
     margin-left: 0.25em;
   }
 
+  .optionalIndicator {
+    margin-left: 0.25em;
+  }
+
   .radioGroupContainer {
     display: flex;
     flex-direction: column;

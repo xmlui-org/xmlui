@@ -338,6 +338,19 @@ function transformElement(
   const transformedChildren = contentChildren(node, source, sourceId, namespaces);
   const children: XmluiNode[] = [];
   for (const child of transformedChildren) {
+    if (child.kind === "element" && child.type === "variable") {
+      const variableName = child.props.name;
+      if (variableName) {
+        vars[variableName] = child.props.value ?? "";
+        const parsedValue = child.parsed?.props?.value;
+        if (parsedValue) {
+          const parsedVars = (parsed.vars ??= {});
+          parsedVars[variableName] = parsedValue;
+        }
+      }
+      children.push(child);
+      continue;
+    }
     if (child.kind === "element" && child.type === "event") {
       const eventName = child.props.name;
       if (!eventName) {

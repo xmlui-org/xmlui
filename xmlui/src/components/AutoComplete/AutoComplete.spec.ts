@@ -4,8 +4,33 @@ import { expect, test } from "../../testing/fixtures";
 const AUTOCOMPLETE_OLD_SUITE_PENDING =
   "The literal old AutoComplete suite is copied for compatibility tracking, but the full AutoComplete migration is not complete yet. Re-enable cases feature-by-feature as label/form integration, multi-select badges, templates, grouping, validation feedback, theme variants, and overlay behavior are migrated.";
 
-test.beforeEach(() => {
-  test.skip(true, AUTOCOMPLETE_OLD_SUITE_PENDING);
+const ACTIVE_AUTOCOMPLETE_TESTS = new Set([
+  "renders with default props",
+  "displays placeholder text",
+  "initialValue sets the selected option",
+  "opens dropdown when clicked",
+  "selects an option when clicked",
+  "disabled option cannot be selected",
+  "searching filters options",
+  "emptyListTemplate is shown when no options match",
+  "optionTemplate customizes option appearance",
+  "readOnly prevents changing selection",
+  "disabled state prevents interaction",
+  "didChange event fires when option is selected",
+  "gotFocus and lostFocus events work correctly",
+  "setValue API works correctly",
+  "bindTo syncs $data and value",
+  "focus API brings focus to the component",
+  "autoFocus brings focus to the component on load",
+  "creates new option when typing non-existing value",
+  "has appropriate ARIA attributes",
+  "supports keyboard navigation with arrow keys",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_AUTOCOMPLETE_TESTS.has(testInfo.title)) {
+    test.skip(true, AUTOCOMPLETE_OLD_SUITE_PENDING);
+  }
 });
 
 // =============================================================================

@@ -726,8 +726,8 @@ export class AutoCompleteDriver extends ComponentDriver {
     return this.component.getByRole("combobox").or(this.component.locator("input")).first();
   }
 
-  click = async (): Promise<void> => {
-    await this.input.click();
+  click = async (options?: Parameters<Locator["click"]>[0]): Promise<void> => {
+    await this.input.click(options);
   };
 
   async selectLabel(value: string): Promise<void> {

@@ -590,6 +590,7 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "stringify",
     "now",
     "log",
     "getFields",

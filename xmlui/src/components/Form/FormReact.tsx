@@ -684,6 +684,12 @@ function cleanedSubmitValues(
 }
 
 function deepClone<T>(value: T): T {
+  if (
+    (typeof File !== "undefined" && value instanceof File) ||
+    (typeof Blob !== "undefined" && value instanceof Blob)
+  ) {
+    return value;
+  }
   if (Array.isArray(value)) {
     return value.map((item) => deepClone(item)) as T;
   }

@@ -934,13 +934,18 @@ function normalizeLegacyVariableDeclarations(markup: string): {
   declarations: string[];
 } {
   const declarations: string[] = [];
-  const normalizedMarkup = markup.replace(
+  const modalBlocks: string[] = [];
+  const protectedMarkup = markup.replace(/<ModalDialog\b[\s\S]*?<\/ModalDialog>/g, (block) => {
+    const index = modalBlocks.push(block) - 1;
+    return `__XMLUI_MODAL_BLOCK_${index}__`;
+  });
+  const normalizedMarkup = protectedMarkup.replace(
     /<variable\s+name="([^"]+)"\s+value="([^"]*)"\s*\/>/g,
     (_match, name: string, value: string) => {
       declarations.push(`var.${name}="${value}"`);
       return "";
     },
-  );
+  ).replace(/__XMLUI_MODAL_BLOCK_(\d+)__/g, (_match, index: string) => modalBlocks[Number(index)] ?? "");
   return { markup: normalizedMarkup, declarations };
 }
 

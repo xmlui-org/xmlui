@@ -6,11 +6,13 @@ import {
   useMemo,
   useRef,
   useState,
+  useCallback,
   type CSSProperties,
   type ReactNode,
 } from "react";
 
 import { defaultProps } from "./AutoComplete.defaults";
+import { useFormContext } from "../Form/FormContext";
 import styles from "./AutoComplete.module.scss";
 
 export type AutoCompleteOption = {
@@ -28,6 +30,7 @@ export type AutoCompleteApi = {
 
 export type AutoCompleteProps = {
   id?: string;
+  bindTo?: string;
   initialValue?: unknown;
   value?: unknown;
   enabled?: boolean;
@@ -51,6 +54,7 @@ export type AutoCompleteProps = {
 export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteProps>(function AutoCompleteNative(
   {
     id,
+    bindTo,
     initialValue,
     value: controlledValue,
     enabled = defaultProps.enabled,
@@ -73,15 +77,41 @@ export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteP
   },
   ref,
 ) {
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const validateFormField = form?.validateField;
+  const registerFormItem = form?.registerItem;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [internalValue, setInternalValue] = useState<unknown>(initialValue ?? "");
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(initiallyOpen);
-  const currentValue = controlledValue === undefined ? internalValue : controlledValue;
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const effectiveControlledValue = formValue ?? controlledValue;
+  const currentValue = effectiveControlledValue === undefined ? internalValue : effectiveControlledValue;
 
   useEffect(() => {
     setInternalValue(initialValue ?? "");
   }, [initialValue]);
+
+  useEffect(() => {
+    if (!getFormValue || !setFormValue || fieldName === undefined || getFormValue(fieldName) != null || initialValue === undefined) {
+      return;
+    }
+    setFormValue(fieldName, initialValue ?? "");
+  }, [fieldName, getFormValue, initialValue, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, registerFormItem, required]);
 
   useEffect(() => {
     const selected = options.find((option) => Object.is(option.value, currentValue));
@@ -90,16 +120,24 @@ export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteP
     }
   }, [currentValue, options]);
 
+  const updateValue = useCallback((nextValue: unknown) => {
+    setInternalValue(nextValue);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, nextValue);
+      void validateFormField?.(fieldName, nextValue);
+    }
+    void onDidChange?.(nextValue);
+  }, [fieldName, onDidChange, setFormValue, validateFormField]);
+
   useImperativeHandle(ref, () => ({
     focus: () => inputRef.current?.focus(),
     setValue: (nextValue) => {
-      setInternalValue(nextValue);
-      void onDidChange?.(nextValue);
+      updateValue(nextValue);
     },
     get value() {
       return currentValue;
     },
-  }), [currentValue, onDidChange]);
+  }), [currentValue, updateValue]);
 
   const filteredOptions = useMemo(() => {
     const term = inputValue.trim().toLowerCase();
@@ -120,15 +158,44 @@ export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteP
     inputValue.trim() !== "" &&
     !options.some((option) => String(option.value) === inputValue || labelText(option.label) === inputValue);
 
+  const createValue = () => {
+    if (!showCreatable || readOnly || !enabled) {
+      return;
+    }
+    const value = inputValue.trim();
+    updateValue(value);
+    setOpen(false);
+    setActiveIndex(-1);
+    void onItemCreated?.(value);
+  };
+
   const selectValue = (value: unknown, label: ReactNode) => {
     if (readOnly || !enabled) {
       return;
     }
-    setInternalValue(value);
+    updateValue(value);
     setInputValue(labelText(label));
     setOpen(false);
-    void onDidChange?.(value);
+    setActiveIndex(-1);
   };
+
+  const moveActive = useCallback((offset: number) => {
+    if (readOnly || !enabled) {
+      return;
+    }
+    setOpen(true);
+    const enabledIndexes = filteredOptions
+      .map((option, index) => option.enabled ? index : -1)
+      .filter((index) => index >= 0);
+    if (enabledIndexes.length === 0) {
+      return;
+    }
+    const currentEnabledPosition = enabledIndexes.indexOf(activeIndex);
+    const nextPosition = currentEnabledPosition < 0
+      ? 0
+      : Math.max(0, Math.min(enabledIndexes.length - 1, currentEnabledPosition + offset));
+    setActiveIndex(enabledIndexes[nextPosition]);
+  }, [activeIndex, enabled, filteredOptions, readOnly]);
 
   return (
     <div
@@ -154,7 +221,9 @@ export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteP
         autoFocus={autoFocus}
         value={inputValue}
         onFocus={() => {
-          setOpen(true);
+          if (enabled && !readOnly) {
+            setOpen(true);
+          }
           void onFocus?.();
         }}
         onBlur={() => {
@@ -162,16 +231,55 @@ export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteP
         }}
         onChange={(event) => {
           setInputValue(event.currentTarget.value);
-          setOpen(true);
+          setActiveIndex(-1);
+          if (enabled && !readOnly) {
+            setOpen(true);
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            moveActive(1);
+            return;
+          }
+          if (event.key === "ArrowUp") {
+            event.preventDefault();
+            moveActive(-1);
+            return;
+          }
+          if (event.key === "Enter" && activeIndex >= 0 && filteredOptions[activeIndex]) {
+            event.preventDefault();
+            const option = filteredOptions[activeIndex];
+            if (option.enabled) {
+              selectValue(option.value, option.label);
+            }
+            return;
+          }
+          if (event.key === "Enter" && !open && enabled && !readOnly) {
+            event.preventDefault();
+            setOpen(true);
+            return;
+          }
+          if (event.key === "Enter" && showCreatable) {
+            event.preventDefault();
+            createValue();
+          }
         }}
       />
-      {open && enabled ? (
-        <div className={styles.autoCompleteMenu} role="listbox" data-xmlui-part="listWrapper">
+      <div
+        className={styles.autoCompleteMenu}
+        role="listbox"
+        data-xmlui-part="listWrapper"
+        data-part-id="listWrapper"
+        aria-expanded={open}
+        hidden={!open || !enabled}
+      >
           {filteredOptions.map((option, index) => (
             <button
               key={`${String(option.value)}:${index}`}
               type="button"
               role="option"
+              aria-selected={index === activeIndex}
               className={styles.autoCompleteItem}
               disabled={!option.enabled}
               onMouseDown={(event) => event.preventDefault()}
@@ -190,13 +298,7 @@ export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteP
               role="option"
               className={styles.autoCompleteItem}
               onMouseDown={(event) => event.preventDefault()}
-              onClick={() => {
-                const value = inputValue.trim();
-                setInternalValue(value);
-                setOpen(false);
-                void onItemCreated?.(value);
-                void onDidChange?.(value);
-              }}
+              onClick={createValue}
             >
               {inputValue.trim()}
             </button>
@@ -204,8 +306,7 @@ export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteP
           {filteredOptions.length === 0 && !showCreatable ? (
             <div className={styles.autoCompleteEmpty}>{emptyListTemplate ?? "No options"}</div>
           ) : null}
-        </div>
-      ) : null}
+      </div>
     </div>
   );
 }));
@@ -219,4 +320,8 @@ function labelText(label: ReactNode): string {
 
 function cx(...parts: Array<string | undefined | false>): string {
   return parts.filter(Boolean).join(" ");
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  return fieldPrefix ? `${fieldPrefix}.${bindTo}` : bindTo;
 }

@@ -18,6 +18,7 @@ export const fileInputRenderer = wrapComponent({
         }
       }}
       id={adapter.stringProp("id")}
+      bindTo={adapter.stringProp("bindTo")}
       value={adapter.prop("value")}
       initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
       acceptsFileType={adapter.prop("acceptsFileType")}

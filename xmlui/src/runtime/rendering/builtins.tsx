@@ -111,6 +111,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
       {context.renderChildren(node.children, scope)}
     </ThemeScope>
   ),
+  variable: () => null,
   Slot: ({ context, node, scope }) => {
     const nameBinding = node.parsed?.props?.name;
     useBindingRevision(nameBinding, scope);

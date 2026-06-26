@@ -243,6 +243,18 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "Fragment",
     includeLayoutProps: false,
   }),
+  {
+    name: "variable",
+    kind: "builtin",
+    acceptsArbitraryProps: false,
+    allowsChildren: false,
+    declarations: {},
+    props: {
+      name: { name: "name" },
+      value: { name: "value" },
+    },
+    events: {},
+  },
   contractFromMetadata(ImageMd, {
     name: "Image",
     includeLayoutProps: true,
@@ -954,10 +966,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       id: { name: "id" },
       testId: { name: "testId" },
+      bindTo: { name: "bindTo" },
       initialValue: { name: "initialValue" },
       value: { name: "value" },
       label: { name: "label" },
       labelPosition: { name: "labelPosition" },
+      requireLabelMode: { name: "requireLabelMode" },
       direction: { name: "direction" },
       autoFocus: { name: "autoFocus" },
       required: { name: "required" },
@@ -985,6 +999,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       id: { name: "id" },
       testId: { name: "testId" },
+      bindTo: { name: "bindTo" },
+      label: { name: "label" },
       placeholder: { name: "placeholder" },
       initialValue: { name: "initialValue" },
       value: { name: "value" },
@@ -998,6 +1014,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       validationStatus: { name: "validationStatus" },
       dropdownHeight: { name: "dropdownHeight" },
       multi: { name: "multi" },
+      optionTemplate: { name: "optionTemplate" },
+      emptyListTemplate: { name: "emptyListTemplate" },
     }),
     events: {
       didChange: { name: "didChange", attributeName: "onDidChange" },

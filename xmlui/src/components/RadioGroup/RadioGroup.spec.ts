@@ -597,7 +597,7 @@ test("setValue input value", async ({ initTestBed, page }) => {
   await expect(valueDisplay).toHaveText("1");
 });
 
-test.skip("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
   await initTestBed(`
     <Form hideButtonRow="true">
       <RadioGroup id="boundRadioGroup" bindTo="choice">
@@ -619,7 +619,7 @@ test.skip("bindTo syncs $data and value", async ({ initTestBed, page }) => {
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================
 
-test.describe.skip("Behaviors and Parts", () => {
+test.describe("Behaviors and Parts", () => {
   test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>

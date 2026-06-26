@@ -106,6 +106,9 @@ class ScriptParser {
       case ScriptTokenKind.LetKeyword:
       case ScriptTokenKind.ConstKeyword:
         return this.parseVariableDeclaration();
+      case ScriptTokenKind.ReturnKeyword:
+        this.consume();
+        return this.createExpressionStatement(this.parseExpression());
       default:
         return this.createExpressionStatement(this.parseExpression());
     }

@@ -309,6 +309,7 @@ describe("built-in renderer registry", () => {
       "TextBox",
       "Theme",
       "VStack",
+      "variable",
     ]);
   });
 

@@ -4,8 +4,28 @@ import { expect, test } from "../../testing/fixtures";
 const SELECT_OLD_SUITE_PENDING =
   "The literal old Select suite is copied for compatibility tracking, but the full Select migration is not complete yet. Re-enable cases feature-by-feature as Form/FormItem integration, searchable and multi-select behavior, clear buttons, grouping, validation feedback, theme variants, scroll indicators, and overlay behavior are migrated.";
 
-test.beforeEach(() => {
-  test.skip(true, SELECT_OLD_SUITE_PENDING);
+const ACTIVE_SELECT_TESTS = new Set([
+  "dynamic options displayed with Items component",
+  "changing selected option in form",
+  "initialValue set to first valid value",
+  "initialValue set to non-existant option",
+  "disabled Select cannot be opened",
+  "disabled Option cannot be selected",
+  "label displayed for selected numeric value",
+  "placeholder is shown",
+  "gotFocus event fires on focus",
+  "lostFocus event fires on blur",
+  "initialValue honored when used within Form",
+  "bindTo syncs $data and value",
+  "renders options from data array using default valueField and labelField",
+  "renders options from data array using custom valueField and labelField",
+  "selection works with data prop",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_SELECT_TESTS.has(testInfo.title)) {
+    test.skip(true, SELECT_OLD_SUITE_PENDING);
+  }
 });
 
 // =============================================================================
@@ -67,8 +87,8 @@ test.describe("Basic Functionality", () => {
     </Fragment>
   `);
     await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
-    await expect(page.getByText("Zero", { exact: true })).toBeVisible();
-    await expect(page.getByText("One", { exact: true })).not.toBeVisible();
+    await expect(page.getByRole("combobox")).toHaveText("Zero");
+    await expect(page.getByRole("combobox")).not.toHaveText("One");
   });
 
   test("initialValue set to non-existant option", async ({ page, initTestBed }) => {
@@ -229,7 +249,7 @@ test.describe("Basic Functionality", () => {
       </Select>
     </Fragment>
   `);
-    await expect(page.getByText("Zero")).toBeVisible();
+    await expect(page.getByRole("combobox")).toHaveText("Zero");
   });
 
   // --- autoFocus prop
@@ -307,7 +327,7 @@ test.describe("Basic Functionality", () => {
         <Option value="opt3" label="third"/>
       </Select>
     `);
-    await expect(page.getByText("Please select an item")).toBeVisible();
+    await expect(page.getByRole("combobox")).toHaveText("Please select an item");
   });
 
   test(
@@ -702,6 +722,10 @@ test.describe("Label", () => {
 // =============================================================================
 
 test.describe("searchable select", () => {
+  test.beforeEach(() => {
+    test.skip(true, SELECT_OLD_SUITE_PENDING);
+  });
+
   test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
       <Select searchable placeholder="Please select an item">

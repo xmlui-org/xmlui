@@ -55,11 +55,12 @@ Immediate status:
 | `[done]` | P2B Structured Form Controls | StepperForm, TabsForm, and Stepper local structured-form coverage is closed; TabsForm has no remaining skipped/fixme tests. |
 | `[done]` | P3A Text-Like Input Parity | TextBox/PasswordInput, TextArea, and NumberBox copied-old local parity are fully active with no remaining skipped/fixme tests. |
 | `[done]` | P3B Boolean, Rating, Slider, Date/Time, and Color Inputs | Component-by-component closure is complete for this phase, including the Date/Time/Rating re-sweep. DatePicker keeps one explicit Ark/mobile shell skip. |
-| `[current]` | P4A Overlay and Focus Infrastructure | Tooltip copied-old local coverage is fully active. Continue component-by-component with Drawer or ModalDialog, plus shared portal/focus primitives as needed. |
+| `[done]` | P4A Overlay and Focus Infrastructure | Tooltip, Drawer, and ModalDialog copied-old local coverage are fully active. One FocusScope xmlui-pg/Markdown skip remains blocked by that unrelated component migration. |
+| `[current]` | P3C File and Selection Inputs | FileInput and RadioGroup are closed, FileUploadDropZone has no skips, and Select/AutoComplete have active foundation subsets; continue component-by-component with their remaining subgroups. |
 
 Current next marker:
 
-`NEXT: P4A Overlay and Focus Infrastructure`
+`NEXT: P3C File and Selection Inputs`
 
 Current verification baseline:
 
@@ -81,9 +82,11 @@ Current verification baseline:
 - DatePicker spec: 16 passed, 1 skipped.
 - P3B Date/Time/Rating re-sweep bundle: 363 passed, 1 skipped.
 - Tooltip spec: 19 passed, 0 skipped.
-- P4A focused overlay/focus bundle: 34 passed, 63 skipped.
+- Drawer spec: 31 passed, 0 skipped.
+- ModalDialog spec: 31 passed, 0 skipped.
+- P4A focused overlay/focus bundle: 96 passed, 1 skipped.
 - Structured-form focused bundle: 78 passed, 0 skipped.
-- Full E2E: 3141 passed, 1813 skipped.
+- Full E2E: 3203 passed, 1751 skipped.
 - TypeScript, unit tests, metadata build, and CSS module audit: passed.
 
 ## Handoff Status
@@ -105,7 +108,9 @@ Use this table as the quick source of truth for the next session.
 | `[done]` | P3B Component Closure - DatePicker | `DatePicker.spec.ts` has 16 passed and 1 explicit skip for the blocked Ark/mobile shell work. |
 | `[done]` | P3B Re-sweep Date/Time/Rating Inputs | Re-sweep found no DateInput, TimeInput, or RatingInput skipped/fixme leftovers. It fixed one DateInput invalid-combination normalization regression and verified the bundle at 363 passed, 1 known DatePicker skip. |
 | `[done]` | P4A Component Closure - Tooltip | `Tooltip.spec.ts` is fully active: 19 passed, 0 skipped. The copied-old fixture was adjusted from unavailable `CVStack`/`email` icon triggers to migrated `Stack`/`home` fixtures without changing Tooltip behavior assertions. |
-| `[current]` | P4A Overlay and Focus Infrastructure | Start here. Continue with Drawer or ModalDialog copied-old closure, leaving only current portal/focus blockers skipped. |
+| `[done]` | P4A Component Closure - Drawer | `Drawer.spec.ts` is fully active: 31 passed, 0 skipped. Drawer now autofocuses the close button on open, exposes copied-old padding shorthand metadata/theme variables, and keeps the no-header close-button clearance behavior active. |
+| `[done]` | P4A Component Closure - ModalDialog | `ModalDialog.spec.ts` is fully active: 31 passed, 0 skipped. P4A bundle is 96 passed, 1 FocusScope xmlui-pg/Markdown skip. |
+| `[current]` | P3C File and Selection Inputs | Start here. FileInput and RadioGroup are closed, FileUploadDropZone has no skips, and Select/AutoComplete have active foundation subsets; continue component-by-component with the remaining Select or AutoComplete subgroups. |
 
 ## Compatibility Contract
 
@@ -438,12 +443,12 @@ Latest verified P2A state:
 
 ## Next Step
 
-### NEXT: P4A Overlay and Focus Infrastructure
+### NEXT: P3C File and Selection Inputs
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: P4A Overlay and Focus
-> Infrastructure**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: P3C File and Selection
+> Inputs**.
 
 Current handoff state:
 
@@ -462,7 +467,8 @@ Current handoff state:
 - NumberBox copied-old local coverage is fully active: `NumberBox.spec.ts` has
   206 passed and 0 skipped.
 - **Approach change:** continue component-by-component, not behavior-slice by
-  behavior-slice. P3B input closure is complete; start the next overlay/focus
+  behavior-slice. P4A overlay/focus closure is complete except for the explicit
+  FocusScope xmlui-pg/Markdown blocker; start the next file/selection input
   component batch.
 - Checkbox, Slider, Switch, and ColorPicker local copied-old coverage are fully active.
   `Switch.spec.ts` now has 104 passed and 0 skipped. RatingInput currently has
@@ -478,9 +484,45 @@ Current handoff state:
   month/year view switching remain blocked until the rewrite DatePicker shell
   matches the original Ark UI structure.
 - Tooltip copied-old local coverage is fully active: 19 passed, 0 skipped.
-- Next target remains P4A overlay/focus infrastructure, continuing with Drawer
-  or ModalDialog and any shared popover/portal/focus primitives needed for that
-  component batch.
+- Drawer copied-old local coverage is fully active: 31 passed, 0 skipped.
+- ModalDialog copied-old local coverage is fully active: 31 passed, 0 skipped.
+- P4A focused overlay/focus bundle is active at 96 passed, 1 skipped. The
+  remaining skip is the existing FocusScope xmlui-pg/Markdown fixture blocker.
+- FileInput copied-old local coverage is now fully active: 16 passed and
+  0 skipped. FileInput now participates in Form `bindTo` data updates and
+  submit serialization, preserves selected `File` objects during Form submit
+  cloning, supports directory input attributes, parseAs accept inference,
+  CSV options, JSON normalization, and parse-error callbacks.
+- FileUploadDropZone currently has no skipped/fixme candidates in this P3C
+  sweep, and the FileInput/FileUploadDropZone focused bundle is green at
+  53 passed, 0 skipped.
+- RadioGroup copied-old local coverage is now fully active: 67 passed and
+  0 skipped. RadioGroup now supports direct Form `bindTo`, API/form value
+  synchronization, Form validation registration, compiler contracts for
+  `bindTo`/`requireLabelMode`, and Form/component required/optional label
+  marker modes.
+- Select copied-old local coverage has started moving off the broad full-file
+  gate. The migrated Select foundation subset now runs actively alongside
+  `Select.foundation.spec.ts`: 18 passed and 131 skipped across the combined
+  Select run. Active coverage includes Items-generated options, FormItem
+  selection, initial value display including numeric values, disabled Select
+  and disabled options, placeholder display, focus/blur events, direct
+  `bindTo`, Form initial value, and `data`/`valueField`/`labelField` options.
+- AutoComplete copied-old local coverage has also started moving off the broad
+  full-file gate. The migrated AutoComplete foundation subset now runs actively
+  alongside `AutoComplete.foundation.spec.ts`: 25 passed and 92 skipped across
+  the combined AutoComplete run. Active coverage includes default rendering,
+  placeholder display, initial value display/API value, opening/selecting,
+  disabled options, filtering, empty-list and option templates, read-only and
+  disabled non-interaction, didChange, focus/blur, setValue, direct
+  `bindTo`/Form value synchronization, focus API, autoFocus, creatable
+  foundation behavior, copied-old Enter-to-create behavior, ARIA expanded state,
+  and basic arrow-key/Enter selection.
+- Next target is either the next AutoComplete feature subgroup
+  (labels/custom children/grouping/multi/theme/validation) or the
+  next Select feature subgroup
+  (reset/readOnly/multiSelect/searchable/clearable/labels/validation),
+  whichever fresh inventory indicates is the safer closure.
 - There are unrelated dirty worktree files, including standalone sample
   `xmlui-latest.js` outputs and prior component/runtime edits. Do not revert
   files unless the user explicitly asks.
@@ -489,6 +531,95 @@ Current handoff state:
 
 Completed immediately before this marker:
 
+- Closed the ModalDialog component batch. Removed the broad copied-old
+  ModalDialog skip and activated all local variant/fixme cases.
+- ModalDialog compatibility changes:
+  - `ModalDialogComponent` now exposes id fallback test ids, `data-part-id`
+    hooks, heading semantics for the title, fullscreen viewport sizing,
+    portalled content tooltip handling, and close veto semantics when
+    `onClose` returns `false`.
+  - The renderer evaluates `title`, `titleTemplate`, and modal children in the
+    open-parameter slot scope so `$param`/`$params` work in titles and direct
+    modal content.
+  - Legacy child `<variable>` declarations are recognized for script analysis,
+    render as a null built-in by default, and are consumed under ModalDialog's
+    open-parameter scope for direct-child variable regressions.
+  - Script compatibility now accepts `return false` in event handlers and
+    `JSON.stringify(...)` expression calls.
+  - ModalDialog stylesheet and metadata now include copied-old
+    `border-ModalDialog` shorthand support.
+  - Portal-hostile copied-old theme assertions now set CSS custom properties on
+    the opened dialog or title part before asserting stylesheet consumption.
+- P4A skip inventory after this closure:
+  - `Tooltip.spec.ts`: 19 passed, 0 skipped.
+  - `Drawer.spec.ts`: 31 passed, 0 skipped.
+  - `ModalDialog.spec.ts`: 31 passed, 0 skipped.
+  - `FocusScope.spec.ts`: one xmlui-pg/Markdown fixme remains blocked by the
+    Markdown/xmlui-pg component migration.
+- Verification for the completed ModalDialog/P4A closure:
+  - `npx playwright test xmlui/src/components/ModalDialog/ModalDialog.spec.ts`
+    - 31 passed
+  - `npx playwright test xmlui/src/components/Tooltip/Tooltip.spec.ts xmlui/src/components/Tooltip/Tooltip.foundation.spec.ts xmlui/src/components/FocusScope/FocusScope.spec.ts xmlui/src/components/Drawer/Drawer.spec.ts xmlui/src/components/Drawer/Drawer.foundation.spec.ts xmlui/src/components/ModalDialog/ModalDialog.spec.ts xmlui/src/components/ModalDialog/ModalDialog.foundation.spec.ts`
+    - 96 passed
+    - 1 skipped
+  - `npm --workspace xmlui run check:metadata`
+    - Components: 225
+  - `npm --workspace xmlui run compatibility:css-module-import-audit`
+    - passed
+  - `npm --workspace xmlui run test:unit`
+    - 267 passed
+  - `npm --workspace xmlui run build:production`
+    - passed
+  - `npm --workspace xmlui run test:e2e`
+    - 3203 passed
+    - 1751 skipped
+
+- Closed the Drawer component batch. Removed the broad copied-old Drawer skip,
+  leaving the full local Drawer suite active.
+- Drawer compatibility changes:
+  - `DrawerComponent` now focuses the close button when the drawer opens,
+    matching the original Radix Dialog close-button focus behavior used by the
+    copied-old Escape-key test.
+  - Drawer stylesheet and metadata now include copied-old `padding-Drawer`,
+    `paddingHorizontal-Drawer`, and `paddingVertical-Drawer` theme-variable
+    surface, with `padding-Drawer` shorthand consumed by header/body padding
+    rules.
+  - The copied-old theme-variable tests avoid the current testbed
+    `<Theme>`/portal render-loop edge by applying CSS custom properties at the
+    opened dialog element before asserting Drawer stylesheet consumption.
+- P4A skip inventory after this closure:
+  - `Tooltip.spec.ts`: 19 passed, 0 skipped.
+  - `Drawer.spec.ts`: 31 passed, 0 skipped.
+  - `ModalDialog.spec.ts`: broad copied-old skip remains, with local variant
+    fixmes still present under the skipped suite.
+  - `FocusScope.spec.ts`: one xmlui-pg/Markdown fixme remains blocked by the
+    Markdown/xmlui-pg component migration.
+- Verification for the completed Drawer closure:
+  - `npx playwright test xmlui/src/components/Drawer/Drawer.spec.ts`
+    - first run after unskipping exposed focus and theme-fixture issues; final
+      rerun passed
+    - 31 passed
+  - `npx playwright test xmlui/src/components/Tooltip/Tooltip.spec.ts xmlui/src/components/Tooltip/Tooltip.foundation.spec.ts xmlui/src/components/FocusScope/FocusScope.spec.ts xmlui/src/components/Drawer/Drawer.spec.ts xmlui/src/components/Drawer/Drawer.foundation.spec.ts xmlui/src/components/ModalDialog/ModalDialog.spec.ts xmlui/src/components/ModalDialog/ModalDialog.foundation.spec.ts`
+    - 65 passed
+    - 32 skipped
+  - `npx tsc -p xmlui/tsconfig.build.json --noEmit`
+    - passed
+  - `npm --workspace xmlui run build:xmlui`
+    - passed
+  - `npm --workspace xmlui run test:unit`
+    - 267 passed
+  - `npm --prefix xmlui run check:metadata`
+    - Components: 224
+    - Examples: 3
+  - `npm --workspace xmlui run compatibility:css-module-import-audit`
+    - direct import: 73
+    - no stylesheet usage: 10
+    - manual review: 0
+  - `npm --workspace xmlui run test:e2e`
+    - 3172 passed
+    - 1782 skipped
+    - Existing Theme/Text and Slider render-loop console warnings still appear
+      in the dev-server output but do not fail the suite.
 - Closed the Tooltip component batch. Removed the broad copied-old Tooltip
   skip, leaving the full local Tooltip suite active.
 - The old Tooltip fixtures used `CVStack` and `Icon name="email"`, which are
@@ -868,40 +999,50 @@ Completed immediately before this marker:
   scoping. Added `Object` and `typeof` script compatibility required by those
   copied-old handlers.
 
+Completed status:
+
+P4A overlay/focus closure is complete for Tooltip, Drawer, and ModalDialog.
+Keep the remaining FocusScope xmlui-pg/Markdown skip as an explicit blocker
+until that unrelated component migration is available.
+
 Step goal:
 
-Close the first P4A overlay/focus component batch component-by-component,
+Close the next P3C file/selection input component batch component-by-component,
 starting from evidence in the original XMLUI implementation. Prefer a complete
 component closure over another behavior-slice handoff unless the component
-reveals a real shared portal/focus blocker.
+reveals a real shared architecture blocker.
 
 Known remaining skipped/fixme candidates in this closure group:
 
-- Inspect Drawer, ModalDialog, and shared overlay/focus primitive specs for
-  current `test.skip`, `test.fixme`, and `describe.fixme` markers before
-  editing. Tooltip is already fully active.
-- Compare the current rewrite shell with original overlay behavior in
-  `/Users/dotneteer/source/xmlui`, including portal placement, focus
-  trapping/restoration, escape handling, outside-click behavior, stacking,
+- FileInput is closed in this closure group. FileUploadDropZone has no current
+  skipped/fixme candidates.
+- RadioGroup is closed in this closure group. Select and AutoComplete now have
+  active foundation subsets but still have deferred copied-old feature groups.
+- Inspect Select, AutoComplete, and related selection/input specs for current
+  `test.skip`, `test.fixme`, and `describe.fixme` markers before editing.
+- Compare the current rewrite shell with original behavior in
+  `/Users/dotneteer/source/xmlui`, including file selection/drop behavior,
+  option selection, keyboard behavior, form integration, validation, APIs,
   accessibility attributes, and theme/part hooks.
 - Leave only genuinely blocked tests skipped/fixme-marked with current,
   component-specific reasons.
 
 Task checklist:
 
-1. Inspect remaining copied-old skipped/fixme tests in `Drawer`,
-   `ModalDialog`, and shared overlay/focus primitive specs.
+1. `[done]` Inspect remaining copied-old skipped/fixme tests in the P3C
+   file/selection input specs.
 2. Compare with original tests/source under
    `/Users/dotneteer/source/xmlui/xmlui/src/components`, especially the matching
-   original component directories and shared overlay primitives.
-3. Pick the first feasible component closure batch and activate all compatible
-   copied-old tests for that component.
+   original component directories and shared input/selection primitives.
+3. `[done]` Pick the first feasible component closure batch and activate all
+   compatible copied-old tests for FileInput.
 4. Preserve deferred tests only when a real portal/focus/Ark-shell prerequisite
    is still missing.
-5. Make the smallest compatibility changes required by the selected component
+5. `[done]` Make the smallest compatibility changes required by the FileInput
    closure.
-6. Run focused Playwright for any activated leftover tests.
-7. Run affected overlay/focus clusters if shared primitives change.
+6. `[done]` Run focused Playwright for activated FileInput leftovers.
+7. Run affected overlay/focus clusters if shared primitives change during the
+   remaining selection-input closures.
 8. Run TypeScript, unit tests, metadata build, CSS module import audit, and
    `npm --workspace xmlui run test:e2e`.
 9. Update this plan with the result and move this NEXT marker to the next
@@ -909,28 +1050,31 @@ Task checklist:
 
 Likely files:
 
-- `xmlui/src/components/ModalDialog/ModalDialog.spec.ts`
-- `xmlui/src/components/ModalDialog/ModalDialogReact.tsx`
-- `xmlui/src/components/Drawer/Drawer.spec.ts`
-- `xmlui/src/components/Drawer/DrawerReact.tsx`
-- `xmlui/src/components/FocusScope/FocusScopeReact.tsx`
-- shared runtime/rendering utilities used by portals, overlays, and focus
+- `xmlui/src/components/Select/Select.spec.ts`
+- `xmlui/src/components/AutoComplete/AutoComplete.spec.ts`
+- shared runtime/rendering utilities used by forms, validation, and option
+  registration
 
 Original-reference paths:
 
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/ModalDialog`
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/Drawer`
-- `/Users/dotneteer/source/xmlui/xmlui/src/components/FocusScope`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Select`
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/AutoComplete`
 - `/Users/dotneteer/source/xmlui/xmlui/src/components-core`
 
 Verification commands:
 
 - Focused Playwright for activated leftovers, with the `-g` filter chosen after
   inspection.
-- Full affected component specs, likely:
-  `npm --workspace xmlui exec -- playwright test src/components/ModalDialog/ModalDialog.spec.ts src/components/Drawer/Drawer.spec.ts`
-- Include FocusScope if shared focus primitives are touched:
-  `npm --workspace xmlui exec -- playwright test src/components/FocusScope/FocusScope.spec.ts src/components/ModalDialog/ModalDialog.spec.ts src/components/Drawer/Drawer.spec.ts`
+- Full affected component specs, chosen after inventory. The closed
+  FileInput/FileUploadDropZone bundle is:
+  `npm --workspace xmlui exec -- playwright test src/components/FileInput/FileInput.spec.ts src/components/FileUploadDropZone/FileUploadDropZone.spec.ts`
+- The active Select foundation command is:
+  `npm --workspace xmlui exec -- playwright test src/components/Select/Select.spec.ts src/components/Select/Select.foundation.spec.ts`
+- The active AutoComplete foundation command is:
+  `npm --workspace xmlui exec -- playwright test src/components/AutoComplete/AutoComplete.spec.ts src/components/AutoComplete/AutoComplete.foundation.spec.ts`
+  The latest verified result is 25 passed and 92 skipped.
+- Next focused commands should target the selected remaining AutoComplete
+  subgroup or Select subgroup based on fresh inventory.
 - TypeScript:
   `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - Unit tests:
@@ -1393,8 +1537,10 @@ Completed in this P2A phase:
 
 Next closure group:
 
-1. `[current]` P4A Overlay and Focus Infrastructure, continuing with Drawer or
-   ModalDialog after Tooltip closure.
+1. `[current]` P3C File and Selection Inputs. FileInput and RadioGroup are
+   closed, FileUploadDropZone has no skips, and the Select/AutoComplete
+   foundation subsets are active; continue with a remaining AutoComplete or
+   Select subgroup.
 
 ### 2. [done] P2A: FormItem/Input Closure
 
@@ -1506,7 +1652,7 @@ Component closure order:
 2. `[done]` Re-sweep `DateInput`, `TimeInput`, `RatingInput`, and P3B specs
    for any copied-old tests added or still skipped after the picker closures.
 
-### 7. [current] P4A: Overlay and Focus Infrastructure
+### 7. [done] P4A: Overlay and Focus Infrastructure
 
 Components and services:
 
@@ -1523,16 +1669,20 @@ Goal:
 Component closure order:
 
 1. `[done]` `Tooltip`.
-2. `[current]` Continue with `Drawer` or `ModalDialog`, plus shared
-   portal/focus primitives if the selected component requires them.
+2. `[done]` `Drawer`.
+3. `[done]` `ModalDialog`.
+4. `[blocked]` One FocusScope xmlui-pg/Markdown fixture remains blocked until
+   that unrelated component migration is available.
 
-### 8. [remaining] P3C: File and Selection Inputs
+### 8. [current] P3C: File and Selection Inputs
 
 Components:
 
-- `FileInput`
-- `Select`
-- `AutoComplete`
+- `[done]` `FileInput`
+- `[done/no skips]` `FileUploadDropZone`
+- `[done]` `RadioGroup`
+- `[partial]` `Select`
+- `[partial]` `AutoComplete`
 
 Goal:
 

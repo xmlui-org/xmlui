@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 
-import { createMetadata, dAutoFocus, dDidChange, dEnabled, dGotFocus, dInitialValue, dLostFocus, dPlaceholder, dReadonly, dRequired } from "../../component-core/metadata/helpers";
+import { createMetadata, dAutoFocus, dComponent, dDidChange, dEnabled, dGotFocus, dInitialValue, dLabel, dLostFocus, dPlaceholder, dReadonly, dRequired } from "../../component-core/metadata/helpers";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
-import { wrapComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { createRuntimeScope } from "../../runtime/state";
+import { templateChildren, wrapComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./AutoComplete.defaults";
@@ -29,6 +30,8 @@ export const AutoCompleteMd = createMetadata({
   props: {
     id: { description: "The component id.", valueType: "string" },
     testId: { description: "The test id.", valueType: "string" },
+    bindTo: { description: "Name of the Form data field this component binds to.", valueType: "string" },
+    label: dLabel(),
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     value: { description: "Controlled value.", valueType: "any" },
@@ -61,6 +64,12 @@ export const AutoCompleteMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.multi,
     },
+    optionTemplate: dComponent(
+      "This property enables customization of list items. Use the `$item` context variable to access the option.",
+    ),
+    emptyListTemplate: dComponent(
+      "This property defines the template to display when the list of options is empty.",
+    ),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -110,6 +119,7 @@ export const autoCompleteRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         initialValue={adapter.prop("initialValue")}
         value={adapter.prop("value")}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
@@ -120,6 +130,9 @@ export const autoCompleteRenderer = wrapComponent({
         initiallyOpen={adapter.booleanProp("initiallyOpen", defaultProps.initiallyOpen)}
         creatable={adapter.booleanProp("creatable", defaultProps.creatable)}
         options={autoCompleteOptions(adapter)}
+        emptyListTemplate={hasTemplate(adapter, "emptyListTemplate")
+          ? adapter.renderTemplate("emptyListTemplate")
+          : undefined}
         onDidChange={(value) => void adapter.event("didChange")(value)}
         onFocus={() => void adapter.event("gotFocus")()}
         onBlur={() => void adapter.event("lostFocus")()}
@@ -146,10 +159,31 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Auto
   const label = Object.prototype.hasOwnProperty.call(child.props, "label")
     ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, adapter.scope, "AutoComplete:Option:label")
     : optionLabelFromChildren(child, adapter);
+  const optionTemplate = templateChildren(adapter.node, "optionTemplate");
+  const renderedLabel = optionTemplate
+    ? adapter.context.renderChildren(optionTemplate, createRuntimeScope({
+      store: adapter.scope.store,
+      parent: adapter.scope,
+      props: adapter.scope.props,
+      contextValues: {
+        $item: {
+          value,
+          label: renderableLabel(label, value),
+        },
+      },
+      references: adapter.scope.references,
+      slots: adapter.scope.slots,
+      emitEvent: adapter.scope.emitEvent,
+    }))
+    : renderableLabel(label, value);
   const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
     ? booleanOptionValue(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "AutoComplete:Option:enabled"))
     : true;
-  return [{ value, label: renderableLabel(label, value), enabled }];
+  return [{ value, label: renderedLabel, enabled }];
+}
+
+function hasTemplate(adapter: XmluiComponentAdapter, name: string): boolean {
+  return !!templateChildren(adapter.node, name);
 }
 
 function optionLabelFromChildren(child: XmluiElement, adapter: XmluiComponentAdapter) {

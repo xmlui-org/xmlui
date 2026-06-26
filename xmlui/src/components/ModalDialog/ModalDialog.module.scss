@@ -11,6 +11,7 @@ $paddingBottom-ModalDialog: createThemeVar("paddingBottom-ModalDialog");
 $paddingLeft-ModalDialog: createThemeVar("paddingLeft-ModalDialog");
 $backgroundColor-ModalDialog: createThemeVar("backgroundColor-ModalDialog");
 $backgroundColor-overlay-ModalDialog: createThemeVar("backgroundColor-overlay-ModalDialog");
+$border-ModalDialog: createThemeVar("border-ModalDialog");
 $borderRadius-ModalDialog: createThemeVar("borderRadius-ModalDialog");
 $borderColor-ModalDialog: createThemeVar("borderColor-ModalDialog");
 $borderWidth-ModalDialog: createThemeVar("borderWidth-ModalDialog");
@@ -75,9 +76,10 @@ $zIndex-ModalDialog: createThemeVar("zIndex-ModalDialog");
     padding-right: var(--xmlui-paddingRight-ModalDialog, var(--xmlui-padding-ModalDialog));
     padding-bottom: var(--xmlui-paddingBottom-ModalDialog, var(--xmlui-padding-ModalDialog));
     padding-left: var(--xmlui-paddingLeft-ModalDialog, var(--xmlui-padding-ModalDialog));
-    border-color: var(--xmlui-borderColor-ModalDialog);
-    border-width: var(--xmlui-borderWidth-ModalDialog);
-    border-style: var(--xmlui-borderStyle-ModalDialog);
+    border: var(
+      --xmlui-border-ModalDialog,
+      var(--xmlui-borderWidth-ModalDialog) var(--xmlui-borderStyle-ModalDialog) var(--xmlui-borderColor-ModalDialog)
+    );
     border-radius: var(--xmlui-borderRadius-ModalDialog);
     background-color: var(--xmlui-backgroundColor-ModalDialog);
     box-shadow: var(--xmlui-boxShadow-ModalDialog);
@@ -95,8 +97,8 @@ $zIndex-ModalDialog: createThemeVar("zIndex-ModalDialog");
   }
 
   .fullScreenContent {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     max-width: 100%;
     max-height: 100%;
     min-width: 0;

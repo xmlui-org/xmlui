@@ -9,6 +9,9 @@ $backgroundColor-Drawer: createThemeVar("backgroundColor-Drawer");
 $backgroundColor-backdrop-Drawer: createThemeVar("backgroundColor-backdrop-Drawer");
 $borderRadius-Drawer: createThemeVar("borderRadius-Drawer");
 $boxShadow-Drawer: createThemeVar("boxShadow-Drawer");
+$padding-Drawer: createThemeVar("padding-Drawer");
+$paddingHorizontal-Drawer: createThemeVar("paddingHorizontal-Drawer");
+$paddingVertical-Drawer: createThemeVar("paddingVertical-Drawer");
 $paddingTop-Drawer: createThemeVar("paddingTop-Drawer");
 $paddingRight-Drawer: createThemeVar("paddingRight-Drawer");
 $paddingBottom-Drawer: createThemeVar("paddingBottom-Drawer");
@@ -89,7 +92,11 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-Drawer");
 
   .header {
     flex-shrink: 0;
-    padding: var(--xmlui-paddingTop-Drawer) var(--xmlui-paddingRight-Drawer) 0 var(--xmlui-paddingLeft-Drawer);
+    padding:
+      var(--xmlui-padding-Drawer, var(--xmlui-paddingTop-Drawer))
+      var(--xmlui-padding-Drawer, var(--xmlui-paddingRight-Drawer))
+      0
+      var(--xmlui-padding-Drawer, var(--xmlui-paddingLeft-Drawer));
   }
 
   .headerContent {
@@ -100,12 +107,16 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-Drawer");
     flex: 1;
     overflow: auto;
     margin-top: var(--xmlui-gap-Drawer);
-    padding: 0 var(--xmlui-paddingRight-Drawer) var(--xmlui-paddingBottom-Drawer) var(--xmlui-paddingLeft-Drawer);
+    padding:
+      0
+      var(--xmlui-padding-Drawer, var(--xmlui-paddingRight-Drawer))
+      var(--xmlui-padding-Drawer, var(--xmlui-paddingBottom-Drawer))
+      var(--xmlui-padding-Drawer, var(--xmlui-paddingLeft-Drawer));
   }
 
   .bodyNoHeader {
     margin-top: 0;
-    padding-top: calc(var(--xmlui-top-closeButton-Drawer) + var(--xmlui-paddingTop-Drawer) + 0.75rem);
+    padding-top: calc(var(--xmlui-top-closeButton-Drawer) + var(--xmlui-padding-Drawer, var(--xmlui-paddingTop-Drawer)) + 0.75rem);
   }
 
   .closeButton {

@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 
 import { defaultProps } from "./Drawer.defaults";
 import styles from "./Drawer.module.scss";
@@ -36,6 +36,7 @@ export const DrawerComponent = forwardRef<HTMLDivElement, DrawerProps>(function 
   ref,
 ) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const open = useCallback(() => {
     if (!isOpen) {
@@ -69,6 +70,12 @@ export const DrawerComponent = forwardRef<HTMLDivElement, DrawerProps>(function 
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [close, isOpen]);
 
+  useEffect(() => {
+    if (isOpen && closeButtonVisible) {
+      closeButtonRef.current?.focus();
+    }
+  }, [closeButtonVisible, isOpen]);
+
   if (!isOpen) {
     return null;
   }
@@ -96,7 +103,13 @@ export const DrawerComponent = forwardRef<HTMLDivElement, DrawerProps>(function 
         style={style as CSSProperties}
       >
         {closeButtonVisible ? (
-          <button aria-label="Close" className={styles.closeButton} onClick={close} type="button">
+          <button
+            ref={closeButtonRef}
+            aria-label="Close"
+            className={styles.closeButton}
+            onClick={close}
+            type="button"
+          >
             x
           </button>
         ) : null}

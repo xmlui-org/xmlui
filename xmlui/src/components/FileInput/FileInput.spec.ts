@@ -141,5 +141,130 @@ test.describe("FileInput foundation", () => {
     await expect(inputPart).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test.fixme("Form/FormItem binding, submit serialization, advanced Papa Parse options, and directory picker parity are deferred to follow-up slices", async () => {});
+  test("bindTo syncs selected files into Form data", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <FileInput id="files" testId="files" bindTo="documents" />
+        <Text testId="dataValue">{$data.documents.length}</Text>
+        <Text testId="apiValue">{files.value.length}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
+      name: "contract.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("contract"),
+    });
+
+    await expect(page.getByTestId("dataValue")).toHaveText("1");
+    await expect(page.getByTestId("apiValue")).toHaveText("1");
+  });
+
+  test("submit serializes the selected file array", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data.documents[0].name">
+        <FileInput testId="files" bindTo="documents" />
+      </Form>
+    `);
+
+    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
+      name: "invoice.pdf",
+      mimeType: "application/pdf",
+      buffer: Buffer.from("pdf"),
+    });
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect.poll(testStateDriver.testState).toBe("invoice.pdf");
+  });
+
+  test("directory mode enables directory and multiple-file picking", async ({ initTestBed, page }) => {
+    await initTestBed(`<FileInput testId="files" directory="true" multiple="false" />`);
+
+    const hiddenInput = page.getByTestId("files").locator("input[type='file']");
+    await expect(hiddenInput).toHaveAttribute("multiple", "");
+    await expect(hiddenInput).toHaveAttribute("webkitdirectory", "true");
+  });
+
+  test("parseAs infers accepted file extensions and allows explicit override", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack>
+        <FileInput testId="csv" parseAs="csv" />
+        <FileInput testId="json" parseAs="json" />
+        <FileInput testId="override" parseAs="csv" acceptsFileType=".txt,.csv" />
+      </VStack>
+    `);
+
+    await expect(page.getByTestId("csv").locator("input[type='file']")).toHaveAttribute("accept", ".csv");
+    await expect(page.getByTestId("json").locator("input[type='file']")).toHaveAttribute("accept", ".json");
+    await expect(page.getByTestId("override").locator("input[type='file']")).toHaveAttribute("accept", ".txt,.csv");
+  });
+
+  test("csvOptions support custom delimiter, dynamic typing, and no-header rows", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        testId="files"
+        parseAs="csv"
+        csvOptions="{{ delimiter: ';', dynamicTyping: true, header: false }}"
+        onDidChange="result => testState = {
+          rowCount: result.parsedData[0].data.length,
+          firstName: result.parsedData[0].data[0][0],
+          priceType: typeof result.parsedData[0].data[0][1]
+        }" />
+    `);
+
+    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
+      name: "products.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("Hat;12\nCoat;40\n"),
+    });
+
+    await expect.poll(async () => (await testStateDriver.testState())?.rowCount).toBe(2);
+    const parsed = await testStateDriver.testState();
+    expect(parsed.firstName).toBe("Hat");
+    expect(parsed.priceType).toBe("number");
+  });
+
+  test("JSON parsing normalizes object and array documents", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        testId="files"
+        parseAs="json"
+        multiple="true"
+        onDidChange="result => testState = result.parsedData.map(entry => entry.data.length).join(',')" />
+    `);
+
+    await page.getByTestId("files").locator("input[type='file']").setInputFiles([
+      {
+        name: "single.json",
+        mimeType: "application/json",
+        buffer: Buffer.from('{"name":"Hat"}'),
+      },
+      {
+        name: "array.json",
+        mimeType: "application/json",
+        buffer: Buffer.from('[{"name":"Hat"},{"name":"Coat"}]'),
+      },
+    ]);
+
+    await expect.poll(testStateDriver.testState).toBe("1,2");
+  });
+
+  test("parseError receives the parsing error and source file", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        testId="files"
+        parseAs="json"
+        onParseError="(error, file) => testState = { hasError: !!error, fileName: file.name }" />
+    `);
+
+    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
+      name: "broken.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{"),
+    });
+
+    await expect.poll(async () => (await testStateDriver.testState())?.hasError).toBe(true);
+    const parseError = await testStateDriver.testState();
+    expect(parseError.fileName).toBe("broken.json");
+  });
 });

@@ -8,6 +8,9 @@ const drawerStylesSource = `
   createThemeVar("backgroundColor-backdrop-Drawer");
   createThemeVar("borderRadius-Drawer");
   createThemeVar("boxShadow-Drawer");
+  createThemeVar("padding-Drawer");
+  createThemeVar("paddingHorizontal-Drawer");
+  createThemeVar("paddingVertical-Drawer");
   createThemeVar("paddingTop-Drawer");
   createThemeVar("paddingRight-Drawer");
   createThemeVar("paddingBottom-Drawer");
@@ -81,10 +84,13 @@ export const DrawerMd = createMetadata({
     [`backgroundColor-backdrop-${COMP}`]: "rgba(0, 0, 0, 0.4)",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`boxShadow-${COMP}`]: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
-    [`paddingTop-${COMP}`]: "$space-4",
-    [`paddingRight-${COMP}`]: "$space-4",
-    [`paddingBottom-${COMP}`]: "$space-4",
-    [`paddingLeft-${COMP}`]: "$space-4",
+    [`paddingTop-${COMP}`]: `$paddingVertical-${COMP}`,
+    [`paddingRight-${COMP}`]: `$paddingHorizontal-${COMP}`,
+    [`paddingBottom-${COMP}`]: `$paddingVertical-${COMP}`,
+    [`paddingLeft-${COMP}`]: `$paddingHorizontal-${COMP}`,
+    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`paddingVertical-${COMP}`]: "$space-4",
+    [`padding-${COMP}`]: "",
     [`gap-${COMP}`]: "$space-4",
     [`width-${COMP}`]: "320px",
     [`maxWidth-${COMP}`]: "80%",
@@ -97,4 +103,3 @@ export const DrawerMd = createMetadata({
     [`right-closeButton-${COMP}`]: "$space-3",
   },
 });
-
