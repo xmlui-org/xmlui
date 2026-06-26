@@ -609,6 +609,8 @@ function isAllowedMethodName(name: string): boolean {
     "open",
     "close",
     "isOpen",
+    "setLocale",
+    "translate",
     "openAt",
     "setValue",
     "scrollToTop",

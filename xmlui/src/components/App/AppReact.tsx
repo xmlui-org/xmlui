@@ -41,6 +41,11 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const showDrawerToggle = hasVisibleNavPanel(adapter.node.children);
   const readyFiredRef = useRef(false);
 
+  adapter.scope.i18n?.setConfig({
+    locale: adapter.stringProp("locale"),
+    bundles: adapter.prop("localeBundles"),
+  });
+
   useEffect(() => {
     if (readyFiredRef.current) {
       return;

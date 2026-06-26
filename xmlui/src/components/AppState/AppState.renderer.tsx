@@ -32,13 +32,6 @@ export const appStateRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
       scope.references[id] = apiRef.current!;
       registerBucketReference(scope.store, bucket, id);
       scope.store.invalidateReference(id);
-      return () => {
-        if (scope.references[id] === apiRef.current) {
-          delete scope.references[id];
-          unregisterBucketReference(scope.store, bucket, id);
-          scope.store.invalidateReference(id);
-        }
-      };
   }, [bucket, id, scope]);
 
   useEffect(() => {
@@ -155,15 +148,6 @@ function registerBucketReference(
   const references = state.references.get(bucket) ?? new Set<string>();
   references.add(id);
   state.references.set(bucket, references);
-}
-
-function unregisterBucketReference(
-  store: Parameters<XmluiBuiltInRenderer>[0]["scope"]["store"],
-  bucket: string,
-  id: string,
-): void {
-  const references = getBucketState(store).references.get(bucket);
-  references?.delete(id);
 }
 
 function invalidateBucket(

@@ -53,6 +53,7 @@ import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
 import includeMarkupFoundationApp from "./examples/include-markup-foundation/Main.xmlui";
+import i18nFoundationApp from "./examples/i18n-foundation/Main.xmlui";
 import inspectorFoundationApp from "./examples/inspector-foundation/Main.xmlui";
 import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
 import markdownFoundationApp from "./examples/markdown-foundation/Main.xmlui";
@@ -75,6 +76,7 @@ import routingDataApp from "./examples/routing-data/Main.xmlui";
 import routingQueryApp from "./examples/routing-query/Main.xmlui";
 import routingStateApp from "./examples/routing-state/Main.xmlui";
 import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
+import retryPolicyFoundationApp from "./examples/retry-policy-foundation/Main.xmlui";
 import responsiveBarFoundationApp from "./examples/responsive-bar-foundation/Main.xmlui";
 import scrollViewerFoundationApp from "./examples/scroll-viewer-foundation/Main.xmlui";
 import schedulingFoundationApp from "./examples/scheduling-foundation/Main.xmlui";
@@ -179,6 +181,7 @@ const examples = {
   iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
   includeMarkupFoundation: includeMarkupFoundationApp,
+  i18nFoundation: i18nFoundationApp,
   inspectorFoundation: inspectorFoundationApp,
   linkInteraction: linkInteractionApp,
   markdownFoundation: markdownFoundationApp,
@@ -201,6 +204,7 @@ const examples = {
   routingQuery: routingQueryApp,
   routingState: routingStateApp,
   runtimeToast: runtimeToastApp,
+  retryPolicyFoundation: retryPolicyFoundationApp,
   responsiveBarFoundation: responsiveBarFoundationApp,
   scrollViewerFoundation: scrollViewerFoundationApp,
   schedulingFoundation: schedulingFoundationApp,

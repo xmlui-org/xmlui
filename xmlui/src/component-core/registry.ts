@@ -126,6 +126,8 @@ import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
 import { inspectorRenderer } from "../components/Inspector/Inspector";
 import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
+import { i18nRenderer } from "../components/I18n/I18n";
+import { retryPolicyRenderer } from "../components/RetryPolicy/RetryPolicy";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -148,7 +150,9 @@ const implementedRuntimeNames = [
   "IncludeMarkup",
   "Inspector",
   "InspectButton",
+  "I18n",
   "Markdown",
+  "RetryPolicy",
   "Icon",
   "Link",
   "List",
@@ -387,6 +391,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Markdown: markdownRenderer,
   Inspector: inspectorRenderer,
   InspectButton: inspectButtonRenderer,
+  I18n: i18nRenderer,
+  RetryPolicy: retryPolicyRenderer,
   ...htmlTagRenderers,
 };
 
@@ -524,6 +530,8 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const markdownTransferred = contract.name === "Markdown";
     const inspectorTransferred = contract.name === "Inspector";
     const inspectButtonTransferred = contract.name === "InspectButton";
+    const i18nTransferred = contract.name === "I18n";
+    const retryPolicyTransferred = contract.name === "RetryPolicy";
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
@@ -623,7 +631,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       includeMarkupTransferred ||
       markdownTransferred ||
       inspectorTransferred ||
-      inspectButtonTransferred;
+      inspectButtonTransferred ||
+      i18nTransferred ||
+      retryPolicyTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
       : appHeaderTransferred

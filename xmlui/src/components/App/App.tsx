@@ -59,6 +59,15 @@ export const AppMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    locale: {
+      description: "Sets the active locale used by App.translate and I18n.",
+      valueType: "string",
+      defaultValue: "en",
+    },
+    localeBundles: {
+      description: "Locale message bundles used by App.translate and I18n.",
+      valueType: "any",
+    },
     testId: {
       description: "Adds a test identifier to the app root element.",
       valueType: "string",

@@ -22,6 +22,7 @@ export const changeListenerRenderer: XmluiBuiltInRenderer = ({ node, scope }) =>
   const timerRef = useRef<number | undefined>(undefined);
   const lastThrottleRef = useRef(0);
   const latestChangeRef = useRef<unknown>(undefined);
+  const warnedAboutDuplicateSourcesRef = useRef(false);
 
   const emitChange = useMemo(() => {
     return (change: unknown) => {
@@ -56,6 +57,15 @@ export const changeListenerRenderer: XmluiBuiltInRenderer = ({ node, scope }) =>
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (hasListenTo && hasListenToSources && !warnedAboutDuplicateSourcesRef.current) {
+      console.warn(
+        "[XMLUI] ChangeListener cannot use both listenTo and listenToSources; listenToSources will be used.",
+      );
+      warnedAboutDuplicateSourcesRef.current = true;
+    }
+  }, [hasListenTo, hasListenToSources]);
 
   useEffect(() => {
     if (!mountedRef.current) {

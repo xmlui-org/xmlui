@@ -1537,6 +1537,8 @@ function isAllowedMethodName(name: string): boolean {
     "open",
     "close",
     "isOpen",
+    "setLocale",
+    "translate",
     "openAt",
     "setValue",
     "scrollToTop",
@@ -1551,7 +1553,12 @@ function isAllowedBuiltInCallName(name: string): boolean {
 }
 
 function isBuiltInReferenceName(name: string): boolean {
-  return name === "Date" || name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
+  return name === "App" ||
+    name === "Date" ||
+    name === "getDate" ||
+    name === "confirm" ||
+    name === "Symbol" ||
+    name === "BigInt";
 }
 
 function resolveParentLocal(scope: XmluiScope, name: string): XmluiBinding | undefined {

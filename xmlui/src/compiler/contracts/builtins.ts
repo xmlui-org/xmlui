@@ -79,6 +79,8 @@ import { IncludeMarkupMd } from "../../components/IncludeMarkup/IncludeMarkup";
 import { MarkdownMd } from "../../components/Markdown/Markdown";
 import { InspectorMd } from "../../components/Inspector/Inspector";
 import { InspectButtonMd } from "../../components/InspectButton/InspectButton";
+import { I18nMd } from "../../components/I18n/I18n";
+import { RetryPolicyMd } from "../../components/RetryPolicy/RetryPolicy";
 import { contractFromMetadata } from "./fromMetadata";
 
 export const builtInComponentContracts: XmluiComponentContract[] = [
@@ -283,6 +285,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       layout: { name: "layout" },
       loggedInUser: { name: "loggedInUser" },
       useHashBasedRouting: { name: "useHashBasedRouting" },
+      locale: { name: "locale" },
+      localeBundles: { name: "localeBundles" },
       "backgroundColor-content-App": { name: "backgroundColor-content-App" },
       "borderLeft-content-App": { name: "borderLeft-content-App" },
       "maxWidth-content-App": { name: "maxWidth-content-App" },
@@ -490,6 +494,18 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(I18nMd, {
+    name: "I18n",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(RetryPolicyMd, {
+    name: "RetryPolicy",
+    allowsChildren: true,
+    includeLayoutProps: false,
+    acceptsArbitraryProps: false,
   }),
   contractFromMetadata(SpaceFillerMd, {
     name: "SpaceFiller",

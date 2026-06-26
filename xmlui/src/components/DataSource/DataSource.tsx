@@ -59,10 +59,18 @@ export const DataSourceMd = createMetadata({
       description: "Transforms the selected result before publishing it.",
       valueType: "any",
     },
+    prevPageSelector: {
+      description: "Selects previous-page information from the response.",
+      valueType: "string",
+    },
+    nextPageSelector: {
+      description: "Selects next-page information from the response.",
+      valueType: "string",
+    },
     dataType: {
       description: "The expected response data type.",
       valueType: "string",
-      availableValues: ["json", "text"],
+      availableValues: ["json", "text", "csv", "sql"],
       defaultValue: "json",
     },
     structuralSharing: {
@@ -105,6 +113,10 @@ export const DataSourceMd = createMetadata({
     isRefetching: { description: "Indicates that a refetch is currently running." },
     loaded: { description: "Indicates that the data source has loaded successfully." },
     responseHeaders: { description: "Response headers from the latest request." },
+    prevPage: { description: "Previous-page information selected from the latest response." },
+    nextPage: { description: "Next-page information selected from the latest response." },
+    hasPrevPage: { description: "Indicates whether previous-page information is available." },
+    hasNextPage: { description: "Indicates whether next-page information is available." },
     refetch: { description: "Starts a forced reload.", signature: "refetch(): Promise<void>" },
   },
 });

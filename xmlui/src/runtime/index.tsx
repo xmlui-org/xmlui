@@ -13,6 +13,7 @@ import {
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
+import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
@@ -123,6 +124,10 @@ export function XmluiRoot({
   if (!toastRef.current) {
     toastRef.current = createToastService();
   }
+  const i18nRef = useRef<RuntimeI18n>();
+  if (!i18nRef.current) {
+    i18nRef.current = createRuntimeI18n();
+  }
   const rootOwnerId = "app:root";
   const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
@@ -162,6 +167,7 @@ export function XmluiRoot({
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
+      i18n: i18nRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,
@@ -193,6 +199,7 @@ export function XmluiRoot({
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
+      i18n: i18nRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,

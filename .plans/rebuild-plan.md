@@ -62,11 +62,16 @@ Immediate status:
 | `[done]` | H3A Runtime Markup Inclusion | IncludeMarkup runtime fetch/parse/render behavior, events, stateful included fragments, and runnable example coverage are closed. |
 | `[done]` | H3B Markdown and CodeText | Markdown and internal CodeText rendering, legacy `@{}` binding replacement, code fences, heading anchors, table/list/inline-code basics, `xmlui-pg` nested app rendering, and runnable foundation coverage are active. |
 | `[done]` | H4A Inspector and Inspect Button | Inspector trigger/dialog/API, debug event capture, shared InspectButton inspect-mode state, runnable foundation example, and focused/full E2E coverage are active. |
-| `[current]` | H4B Internationalization Surface | Start here next. |
+| `[done]` | H4B Internationalization Surface | I18n, App locale bundles, App.translate/App.setLocale, ICU formatting, missing-key fallback, inline slots, and runnable foundation coverage are active. |
+| `[done]` | H4C Data Policy Helper | RetryPolicy provider semantics, retry executor, DataSource/APICall integration, runnable foundation coverage, and full E2E coverage are active. |
+| `[done]` | P5A Data Operations Closure | DataSource CSV/text/sql parsing, page selectors, structural sharing, APICall confirmation/notifications/deferred/cancel, and Actions.callApi invalidation coverage are active. |
+| `[done]` | P5B App State and Change Listening | AppState bucket/reference persistence and ChangeListener source/timing compatibility coverage are active. |
+| `[done]` | P5C Scheduling, Messaging, and Streaming | Timer, Queue, MessageListener, Toast, EventSource, and WebSocket scheduling/messaging/streaming coverage is active. |
+| `[current]` | P5D Accessibility and Runtime Services | Start here next. |
 
 Current next marker:
 
-`NEXT: H4B Internationalization Surface`
+`NEXT: P5D Accessibility and Runtime Services`
 
 Current verification baseline:
 
@@ -108,7 +113,10 @@ Current verification baseline:
   ProfileMenu foundation and copied smoke coverage plus App shell event
   coverage. A focused ignored-App compatibility sweep for layouts/drawer hooks
   passes with 12 passed.
-- Full E2E: 3203 passed, 1751 skipped.
+- P5A DataSource/APICall focused bundle after closure: 23 passed.
+- P5B AppState/ChangeListener closure bundle: 17 passed, 0 skipped.
+- P5C scheduling/messaging/streaming closure bundle: 34 passed.
+- Full E2E: 3661 passed, 1380 skipped.
 - TypeScript, unit tests, metadata build, and CSS module audit: passed.
 
 ## Handoff Status
@@ -138,7 +146,12 @@ Use this table as the quick source of truth for the next session.
 | `[done]` | H3A Runtime Markup Inclusion | IncludeMarkup runtime fetch/parse/render behavior, events, stateful included fragments, and runnable example coverage are closed. |
 | `[done]` | H3B Markdown and CodeText | Markdown and internal CodeText rendering, legacy `@{}` binding replacement, code fences, heading anchors, table/list/inline-code basics, `xmlui-pg` nested app rendering, and runnable foundation coverage are active. |
 | `[done]` | H4A Inspector and Inspect Button | Inspector trigger/dialog/API, debug event capture, shared InspectButton inspect-mode state, runnable foundation example, and focused/full E2E coverage are active. |
-| `[current]` | H4B Internationalization Surface | Start here next. |
+| `[done]` | H4B Internationalization Surface | I18n, App locale bundles, App.translate/App.setLocale, ICU formatting, missing-key fallback, inline slots, and runnable foundation coverage are active. |
+| `[done]` | H4C Data Policy Helper | RetryPolicy provider semantics, retry executor, DataSource/APICall integration, runnable foundation coverage, and full E2E coverage are active. |
+| `[done]` | P5A Data Operations Closure | DataSource CSV/text/sql parsing, page selectors, structural sharing, APICall confirmation/notifications/deferred/cancel, and Actions.callApi invalidation coverage are active. |
+| `[done]` | P5B App State and Change Listening | AppState bucket/reference persistence and ChangeListener source/timing compatibility coverage are active. |
+| `[done]` | P5C Scheduling, Messaging, and Streaming | Timer, Queue, MessageListener, Toast, EventSource, and WebSocket scheduling/messaging/streaming coverage is active. |
+| `[current]` | P5D Accessibility and Runtime Services | Start here next. |
 
 ## Compatibility Contract
 
@@ -466,21 +479,21 @@ Latest verified P2A state:
 - `npm --workspace xmlui run compatibility:css-module-import-audit`
   - passed
 - `npm --workspace xmlui run test:e2e`
-  - 3606 passed
+  - 3619 passed
   - 1390 skipped
 
 ## Next Step
 
-### NEXT: H4B Internationalization Surface
+### NEXT: P5D Accessibility and Runtime Services
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: H4B Internationalization Surface**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: P5D Accessibility and Runtime Services**.
 
 Current handoff state:
 
 - This is the next executable step. A new session receiving "Go on with the
-  next step" should start with H4B Internationalization Surface.
+  next step" should start with P5D Accessibility and Runtime Services.
 - Do not restart earlier P2A Form work. `Form.spec.ts`, `FormItem.spec.ts`,
   `FormSegment.spec.ts`, `Checkbox.spec.ts`, and `Slider.spec.ts` are fully
   active. The latest verified P2A state above is the baseline.
@@ -598,6 +611,10 @@ Current handoff state:
 - There are unrelated dirty worktree files, including standalone sample
   `xmlui-latest.js` outputs and prior component/runtime edits. Do not revert
   files unless the user explicitly asks.
+- H4C RetryPolicy is closed. RetryPolicy now provides a non-visual retry-policy
+  context, DataSource/APICall execute through it, and the runnable
+  retry-policy foundation example verifies a flaky DataSource retries before
+  rendering success.
 - Playwright/E2E may need unsandboxed execution because local dev-server
   binding can fail in the sandbox.
 
@@ -1614,7 +1631,12 @@ Next closure group:
 1. `[done]` H3A Runtime Markup Inclusion.
 2. `[done]` H3B Markdown and CodeText.
 3. `[done]` H4A Inspector and Inspect Button.
-4. `[current]` H4B Internationalization Surface.
+4. `[done]` H4B Internationalization Surface.
+5. `[done]` H4C Data Policy Helper.
+6. `[done]` P5A Data Operations Closure.
+7. `[done]` P5B App State and Change Listening.
+8. `[done]` P5C Scheduling, Messaging, and Streaming.
+9. `[current]` P5D Accessibility and Runtime Services.
 
 ### 2. [done] P2A: FormItem/Input Closure
 
@@ -1981,6 +2003,36 @@ Verification:
   - 3611 passed
   - 1390 skipped
 
+Completed H4B:
+
+- Added the experimental `I18n` runtime component with compiler contracts,
+  lowerer/registry wiring, metadata, inline wrapper rendering, arbitrary ICU
+  variable props, missing-key fallback, and translated `<slotName/>`
+  placeholder replacement through XMLUI property children.
+- Added a compact runtime i18n service with App-level `localeBundles`,
+  locale state, `App.setLocale(...)`, and `App.translate(...)` support in both
+  interpreted and generated script paths.
+- Added ICU-style variable, plural, select, number, date, and time formatting
+  support needed by the documented I18n examples.
+- Added the runnable `i18nFoundation` example with visible state updates,
+  locale switching, plural/select messages, inline slots, fallback rendering,
+  and imperative App.translate usage.
+
+Verification:
+
+- H4B focused I18n/example bundle:
+  `npm --workspace xmlui exec -- playwright test src/components/I18n/I18n.spec.ts tests/e2e/i18n.spec.ts --reporter=list --workers=2`
+  - 4 passed
+- H4B non-browser verification:
+  - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed
+  - `npm --workspace xmlui run test` passed, 267 tests
+  - `npm --workspace xmlui run check:metadata` passed
+  - `npm --workspace xmlui run compatibility:css-module-import-audit` passed
+- H4B full E2E completion gate:
+  `npm --workspace xmlui run test:e2e`
+  - 3615 passed
+  - 1390 skipped
+
 ### 12. [done] H3B: Markdown and CodeText
 
 Components:
@@ -2005,7 +2057,7 @@ Goal:
 - Close runtime inspection UI, debug metadata, modal integration, and relevant
   examples.
 
-### 14. [current] H4B: Internationalization Surface
+### 14. [done] H4B: Internationalization Surface
 
 Component:
 
@@ -2015,7 +2067,7 @@ Goal:
 
 - Close translation lookup, formatting, fallback behavior, and update paths.
 
-### 15. [remaining] H4C: Data Policy Helper
+### 15. [done] H4C: Data Policy Helper
 
 Component:
 
@@ -2025,7 +2077,27 @@ Goal:
 
 - Close retry policy integration for data/request components.
 
-### 16. [remaining] P5A: Data Operations Closure
+Completed H4C:
+
+- Added the non-visual `RetryPolicy` component and runtime retry-policy
+  context, matching the original provider-style behavior.
+- Added retry executor support for HTTP category classification, retryable
+  categories, fixed/linear/exponential backoff, jitter, Retry-After data,
+  timeout, and per-provider circuit breaker state.
+- Integrated retry execution into `DataSource` and `APICall`.
+- Added focused `RetryPolicy` component coverage and a runnable E2E foundation
+  example that retries a flaky `DataSource`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit` passed.
+- `npm --workspace xmlui exec -- playwright test src/components/RetryPolicy/RetryPolicy.spec.ts tests/e2e/retry-policy.spec.ts --reporter=list --workers=2` passed: 4 passed.
+- `npm --workspace xmlui run test` passed: 267 passed.
+- `npm --workspace xmlui run check:metadata` passed.
+- `npm --workspace xmlui run compatibility:css-module-import-audit` passed.
+- `npm --workspace xmlui run test:e2e` passed: 3619 passed, 1390 skipped.
+
+### 16. [done] P5A: Data Operations Closure
 
 Components and services:
 
@@ -2039,7 +2111,61 @@ Goal:
 - Close old data operation suites, cancellation, mock data, polling, retry, and
   request status behavior.
 
-### 17. [remaining] P5B: App State and Change Listening
+P5A slices:
+
+1. `[done]` DataSource request lifecycle/status/error/refetch basics.
+2. `[done]` DataSource request building and fetch-context parity.
+3. `[done]` DataSource polling and stale-response/cancellation protection.
+4. `[done]` DataSource paging, CSV/text, SQL, and structural-sharing
+   copied-old cases.
+5. `[done]` APICall request lifecycle, confirmation, notifications, and
+   error status behavior.
+6. `[done]` APICall optimistic update, deferred/polling, cancellation,
+   and invalidation edge cases.
+7. `[done]` Actions.callApi parity and cross-service closure.
+
+Completed P5A slices 1-3:
+
+- `DataSource.refetch()` now returns the active load promise.
+- DataSource load completions are sequence-guarded so an older in-flight load
+  cannot overwrite a newer refetch result.
+- Added active browser coverage for remote load lifecycle state, response
+  headers, loaded/error events, HTTP error state, request method/query/header/body
+  construction, polling refetch, and stale in-flight result protection.
+- Removed the local DataSource/APICall transfer-debt placeholders after closing
+  the executable P5A foundation coverage.
+
+Completed P5A slices 4-7:
+
+- Added managed-fetch parsing for `dataType="csv"` and `dataType="sql"` along
+  with existing JSON/text paths.
+- Added DataSource `prevPageSelector`/`nextPageSelector` support and API values
+  for `prevPage`, `nextPage`, `hasPrevPage`, and `hasNextPage`.
+- Added simple structural sharing for unchanged DataSource result values.
+- Extended APICall with confirmation prompts, optimistic DataSource updates,
+  start/success/error toast notifications, remote response headers, deferred
+  status polling, local cancellation, cancelUrl calls, polling status APIs, and
+  status/polling events.
+- Extended `Actions.callApi` with confirmation, notifications, and DataSource
+  invalidation support.
+
+Verification:
+
+- `npm --workspace xmlui exec -- playwright test src/components/DataSource/DataSource.spec.ts src/components/APICall/APICall.spec.ts --reporter=list`
+  - 23 passed
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run check:metadata`
+  - passed
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+- `npm --workspace xmlui run test:e2e`
+  - 3634 passed
+  - 1390 skipped
+
+### 17. [done] P5B: App State and Change Listening
 
 Components and services:
 
@@ -2051,7 +2177,67 @@ Goal:
 
 - Close app-level state synchronization, event ordering, and update behavior.
 
-### 18. [remaining] P5C: Scheduling, Messaging, and Streaming
+P5B slices:
+
+1. `[done]` AppState old-suite behavior transfer:
+   - default and named bucket initialization;
+   - merged initial values across shared buckets;
+   - undefined initial values;
+   - nested state updates;
+   - state/reference persistence after conditional AppState unmount.
+2. `[done]` ChangeListener payload/source behavior transfer:
+   - `listenToSources` precedence over `listenTo`;
+   - object and array source diffs;
+   - aggregate `listenTo` payload shape for array/object values;
+   - inactive listeners and identical primitive values;
+   - null/undefined transitions, multiple listeners, and conditional rendering.
+3. `[done]` ChangeListener timing and warning behavior:
+   - debounce reset behavior;
+   - previous/new payload preservation through debounce;
+   - debounce precedence over throttle;
+   - duplicate `listenTo`/`listenToSources` compatibility warning.
+4. `[done]` P5B closure:
+   - remove local old-suite transfer-debt placeholders;
+   - run focused AppState/ChangeListener coverage after debt removal;
+   - run TypeScript/unit/metadata/CSS checks as needed;
+   - run `npm --workspace xmlui run test:e2e`;
+   - mark P5B done and P5C current.
+
+Completed P5B:
+
+- Preserved AppState bucket references after conditional unmount so the
+  id-based API remains readable after the non-visual component leaves the tree,
+  matching the original AppState behavior.
+- Added executable AppState coverage for default/named buckets, shared bucket
+  initial-value merging, undefined initial values, nested updates, and
+  conditional unmount persistence.
+- Added executable ChangeListener coverage for source precedence, source-level
+  diffs, aggregate payload shapes, inactive/identical-value cases, null and
+  undefined transitions, multiple listeners, conditional rendering, debounce
+  reset/payload behavior, debounce-over-throttle precedence, and duplicate
+  source warnings.
+- Added the original duplicate-source warning when both `listenTo` and
+  `listenToSources` are provided.
+- Removed the local AppState and ChangeListener transfer-debt placeholders
+  after the focused compatibility coverage was active.
+
+Verification:
+
+- `npm --workspace xmlui exec -- playwright test src/components/AppState/AppState.spec.ts src/components/ChangeListener/ChangeListener.spec.ts --reporter=list`
+  - 17 passed
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run check:metadata`
+  - passed
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+- `npm --workspace xmlui run test:e2e`
+  - 3643 passed
+  - 1388 skipped
+
+### 18. [done] P5C: Scheduling, Messaging, and Streaming
 
 Components and services:
 
@@ -2065,7 +2251,82 @@ Goal:
 - Close delayed work, repeated work, queue processing, messaging, streaming,
   cancellation, and update paths.
 
-### 19. [remaining] P5D: Accessibility and Runtime Services
+P5C slices:
+
+1. `[done]` Timer timing/control behavior:
+   - hidden diagnostic state;
+   - interval and once ticks;
+   - initial-delay timing;
+   - pause/resume and enabled toggling;
+   - non-overlapping delayed tick handlers.
+2. `[done]` Queue API and sequential processing behavior:
+   - enqueue APIs and generated ids;
+   - FIFO processing;
+   - `willProcess=false` skip behavior;
+   - pending item removal;
+   - didProcess result reporting;
+   - completion after skipped and successful items.
+3. `[done]` MessageListener and Toast host behavior:
+   - multiple and nested postMessage listeners;
+   - wrapperless MessageListener layout preservation;
+   - Toast component options forwarding;
+   - update-in-place by toast id;
+   - single/all dismiss behavior;
+   - duration auto-dismiss and loading persistence.
+4. `[done]` EventSource streaming behavior:
+   - open/message/error/close event coverage;
+   - disabled state and cleanup;
+   - credentials/options;
+   - JSON/text payload parsing and malformed payload behavior.
+5. `[done]` WebSocket streaming and P5C closure:
+   - enabled/disabled connection lifecycle;
+   - message/error/close delivery;
+   - reconnect behavior;
+   - remove remaining local transfer-debt placeholders;
+   - run focused streaming bundle and full `test:e2e`;
+   - mark P5C done and P5D current.
+
+Completed P5C:
+
+- Expanded Timer focused coverage for initial delay, enabled toggling, pause
+  reset, and non-overlap behavior, then removed the local Timer transfer-debt
+  placeholder.
+- Expanded Queue focused coverage for mixed enqueue calls, id uniqueness,
+  result reporting, skipped entries, pending item removal, and completion after
+  mixed skipped/successful queues, then removed the local Queue transfer-debt
+  placeholder.
+- Expanded MessageListener focused coverage for sequential/nested messages and
+  Stack gap preservation, then removed the local MessageListener transfer-debt
+  placeholder.
+- Extended the Toast component API so `show`, `success`, `error`, and `loading`
+  forward toast options, added `dismiss`, and covered update-in-place,
+  single/all dismiss, auto-dismiss duration, and loading persistence.
+- Expanded EventSource focused coverage for JSON/text payload parsing,
+  malformed JSON pass-through, `withCredentials`, disabled cleanup, non-closing
+  errors, explicit close, and closed-source close delivery, then removed the
+  local EventSource transfer-debt placeholder.
+- Expanded WebSocket focused coverage for disabled lifecycle, close-on-disable,
+  open/message/error/close delivery, JSON/text payload parsing, reconnect
+  after close, and serial fake-WebSocket isolation, then removed the local
+  WebSocket transfer-debt placeholder.
+
+Verification after closure:
+
+- `npm --workspace xmlui exec -- playwright test src/components/Timer/Timer.spec.ts src/components/Queue/Queue.spec.ts src/components/MessageListener/MessageListener.spec.ts src/components/Toast/Toast.spec.ts src/components/EventSource/EventSource.spec.ts src/components/WebSocket/WebSocket.spec.ts --reporter=list`
+  - 34 passed
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui run check:metadata`
+  - passed
+- `npm --workspace xmlui run compatibility:css-module-import-audit`
+  - passed
+- `npm --workspace xmlui run test`
+  - 267 passed
+- `npm --workspace xmlui run test:e2e`
+  - 3661 passed
+  - 1380 skipped
+
+### 19. [current] P5D: Accessibility and Runtime Services
 
 Components and services:
 

@@ -18,6 +18,7 @@ export function createSlotScope(baseScope: RuntimeScope, contextValues: Record<s
     parent: baseScope,
     props: baseScope.props,
     contextValues,
+    i18n: baseScope.i18n,
   });
 }
 
@@ -44,6 +45,7 @@ export function ScopedElement({
       props,
       references: parentScope.references,
       slots: parentScope.slots,
+      i18n: parentScope.i18n,
       emitEvent: parentScope.emitEvent,
     });
     parentScope.store.createLocalOwner(ownerId);
@@ -74,6 +76,7 @@ export function ScopedElement({
         props,
         references: parentScope.references,
         slots: parentScope.slots,
+        i18n: parentScope.i18n,
         emitEvent: parentScope.emitEvent,
       }),
     [ownerId, parentScope, props],
@@ -128,6 +131,7 @@ export function ComponentInstance({
       localOwnerId: ownerId,
       props,
       references: componentReferences,
+      i18n: scope.i18n,
     });
     scope.store.createLocalOwner(ownerId);
     initializeStateValuesIntoStore({
@@ -147,6 +151,7 @@ export function ComponentInstance({
       localOwnerId: ownerId,
       props,
       references: componentReferences,
+      i18n: scope.i18n,
     });
     for (const [name, value] of Object.entries(component.root.vars)) {
       const parsed = component.root.parsed?.vars?.[name];
@@ -175,6 +180,7 @@ export function ComponentInstance({
         props,
         references: componentReferences,
         slots: createSlots(node, scope),
+        i18n: scope.i18n,
         emitEvent: (eventName, args) => runEvent(node.parsed?.events?.[eventName], scope, args),
       }),
     [componentReferences, node, ownerId, props, scope],

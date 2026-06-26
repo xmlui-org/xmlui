@@ -9,10 +9,15 @@ export const toastRenderer = wrapComponent({
   renderer: ({ adapter }) => {
     useEffect(() => {
       adapter.registerApi({
-        show: (context: unknown) => adapter.scope.toast?.show("info", renderContext(context)),
-        success: (context: unknown) => adapter.scope.toast?.show("success", renderContext(context)),
-        error: (context: unknown) => adapter.scope.toast?.show("error", renderContext(context)),
-        loading: (context: unknown) => adapter.scope.toast?.show("loading", renderContext(context)),
+        show: (context: unknown, options?: Record<string, unknown>) =>
+          adapter.scope.toast?.show("info", renderContext(context), normalizeToastOptions(options)),
+        success: (context: unknown, options?: Record<string, unknown>) =>
+          adapter.scope.toast?.show("success", renderContext(context), normalizeToastOptions(options)),
+        error: (context: unknown, options?: Record<string, unknown>) =>
+          adapter.scope.toast?.show("error", renderContext(context), normalizeToastOptions(options)),
+        loading: (context: unknown, options?: Record<string, unknown>) =>
+          adapter.scope.toast?.show("loading", renderContext(context), normalizeToastOptions(options)),
+        dismiss: (id?: string) => adapter.scope.toast?.dismiss(id),
       });
     }, [adapter]);
 
@@ -28,4 +33,14 @@ function renderContext(context: unknown): string {
     return context;
   }
   return JSON.stringify(context);
+}
+
+function normalizeToastOptions(options: Record<string, unknown> | undefined) {
+  if (!options) {
+    return undefined;
+  }
+  return {
+    id: typeof options.id === "string" ? options.id : undefined,
+    duration: typeof options.duration === "number" ? options.duration : undefined,
+  };
 }
