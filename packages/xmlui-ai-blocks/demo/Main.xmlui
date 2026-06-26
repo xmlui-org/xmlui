@@ -1,18 +1,89 @@
 <App
+  var.activePanel="'preview'"
   var.fixture='{
     {
-      activePanel: "preview",
       layoutMode: "auto",
       workspaceMode: "auto",
       compactBreakpoint: "980px",
       messages: [
-        { role: "user", text: "Build a CRM dashboard with XMLUI." },
-        { role: "assistant", text: "I am arranging the first workspace shell." },
-        { role: "assistant", text: "Preview, code, and status surfaces are all wired from fixtures." },
+        {
+          id: "msg_user_1",
+          role: "user",
+          status: "complete",
+          parts: [{ kind: "text", text: "Build a CRM dashboard with XMLUI." }],
+        },
+        {
+          id: "msg_assistant_1",
+          role: "assistant",
+          status: "streaming",
+          parts: [
+            { kind: "reasoning", text: "I am arranging the first workspace shell.", summary: true },
+            { kind: "text", text: "I have the builder frame, transcript, and preview surface wired." },
+            {
+              kind: "source",
+              title: "Layout reference",
+              url: "https://xmlui.dev/",
+            },
+          ],
+        },
+        {
+          id: "msg_assistant_2",
+          role: "assistant",
+          status: "complete",
+          parts: [
+            { kind: "text", text: "The generated XMLUI is ready for preview, but the current revision has one compile issue." },
+            { kind: "tool-call", toolCallId: "tool_preview_1" },
+            {
+              kind: "clarification",
+              question: "Should the workspace default to split or tabs on smaller screens?",
+              reason: "The frame supports both, but the host chooses the default behavior.",
+              choices: ["Split on desktop", "Tabs on compact screens"],
+            },
+          ],
+        },
       ],
-      previewNotes: [
-        "Preview placeholder: render the generated app here once Phase 6 lands.",
-        "Workspace placeholder: the frame should stay usable even when preview and code are missing.",
+      toolCalls: [
+        {
+          id: "tool_docs_1",
+          name: "Docs search",
+          status: "succeeded",
+          inputSummary: "Search XMLUI builder frame patterns and transcript recipes.",
+          outputSummary: "Collected candidate references for the frame demo.",
+        },
+        {
+          id: "tool_preview_1",
+          name: "Preview compile",
+          status: "failed",
+          inputSummary: "Compile the current XMLUI generation.",
+          outputSummary: "The preview compiler hit a parse error in the current revision.",
+          error: "Unexpected closing tag near the generated layout section.",
+        },
+      ],
+      pendingApprovals: [
+        {
+          id: "approval_1",
+          status: "requested",
+          title: "Replace the current workspace shell",
+          reason: "The generated workspace wants to swap the placeholder preview with a real XMLUI app.",
+          details: "The host still owns the decision policy and persistence.",
+          decisionPayload: { operation: "replace-current" },
+        },
+      ],
+      resolvedApprovals: [
+        {
+          id: "approval_2",
+          status: "rejected",
+          title: "Write to protected folder",
+          reason: "The host refused the requested file operation.",
+          details: "Resolved approvals stay in the chat flow so the user can audit what happened.",
+        },
+      ],
+      previewIssues: [
+        {
+          severity: "error",
+          title: "Unexpected closing tag",
+          detail: "The current generated layout closes a section that was not opened.",
+        },
       ],
       code: `<App>
   <VStack gap="$space-4">
@@ -20,78 +91,117 @@
     <Text>Welcome back, the pipeline is healthy.</Text>
   </VStack>
 </App>`,
-      status: "Layout scaffold ready",
-      toolbarItems: ["Split", "Tabs", "Stack"],
-      eventSummaries: [
-        "Desktop split: chat and workspace panels share the same shell.",
-        "Compact tabs: the same content collapses into a single panel selector.",
-        "Stack fallback: one or two supplied regions still render cleanly.",
-      ],
+      status: "Demo generation running",
     }
   }'>
   <XmluiBuilderFrame
     maxWidth="1200px"
-    height="100%"
+    height="calc(100vh - 32px)"
+    minHeight="620px"
     layout="{fixture.layoutMode}"
     chatPlacement="start"
-    workspaceMode="{fixture.workspaceMode}"
-    activePanel="{fixture.activePanel}"
-    compactBreakpoint="{fixture.compactBreakpoint}">
+    workspaceMode="{activePanel}"
+    activePanel="{activePanel}"
+    compactBreakpoint="{fixture.compactBreakpoint}"
+    onPanelChange="(event) => activePanel = event.panel">
     <property name="toolbarTemplate">
-      <HStack gap="$space-3">
-        <Text>Toolbar placeholder</Text>
+      <HStack gap="$space-2" verticalAlignment="center" wrapContent="false">
+        <Badge value="{fixture.status}" />
         <SpaceFiller />
-        <Text>{fixture.status}</Text>
+        <Button
+          label="Preview"
+          variant="{activePanel === 'preview' ? 'solid' : 'outlined'}"
+          onClick="activePanel = 'preview'" />
+        <Button
+          label="Code"
+          variant="{activePanel === 'code' ? 'solid' : 'outlined'}"
+          onClick="activePanel = 'code'" />
       </HStack>
     </property>
     <property name="statusTemplate">
-      <Text>Status template: {fixture.status}</Text>
+      <HStack gap="$space-2" verticalAlignment="center">
+        <Text variant="secondary">Workspace panel:</Text>
+        <Badge value="{activePanel}" />
+      </HStack>
     </property>
     <property name="chatTemplate">
-      <VStack gap="$space-3">
-        <Card title="Transcript" subtitle="Placeholder chat">
-          <VStack gap="$space-2">
-            <Items data="{fixture.messages}">
-              <Text>{$item.role}: {$item.text}</Text>
+      <VStack height="100%" minHeight="0" gap="0">
+        <ScrollViewer dock="stretch" height="*" showScrollerFade="{false}">
+          <VStack gap="$space-3">
+            <Items data="{fixture.messages}" gap="$space-2">
+              <AiMessageParts
+                message="{$item}"
+                streaming="{$item.status === 'streaming'}"
+                collapseReasoning="true" />
             </Items>
+            <VStack gap="$space-2">
+              <Text variant="secondary">Tool activity</Text>
+              <Items data="{fixture.toolCalls}">
+                <AiToolCall
+                  toolCall="{$item}"
+                  defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
+                  showInput="summary"
+                  showOutput="summary" />
+              </Items>
+            </VStack>
+            <VStack gap="$space-2">
+              <Text variant="secondary">Resolved approvals</Text>
+              <Items data="{fixture.resolvedApprovals}">
+                <AiApprovalRequest request="{$item}" running="{false}" />
+              </Items>
+            </VStack>
           </VStack>
+          <StickySection stickTo="bottom" backgroundColor="$color-surface-0">
+            <Card title="{fixture.pendingApprovals.length} approval pending">
+              <VStack gap="$space-2">
+                <Items data="{fixture.pendingApprovals}">
+                  <AiApprovalRequest
+                    request="{$item}"
+                    running="true"
+                    onApprove="toast('Approved ' + $event.requestId)"
+                    onReject="toast('Rejected ' + $event.requestId)" />
+                </Items>
+              </VStack>
+            </Card>
+          </StickySection>
+        </ScrollViewer>
+        <Card dock="bottom">
+          <Form>
+            <TextArea id="prompt" rows="3" placeholder="Describe the app you want to build" />
+          </Form>
         </Card>
       </VStack>
     </property>
-    <property name="composerTemplate">
-      <Card title="Composer" subtitle="Plain XMLUI form">
-        <Form>
-          <TextArea id="prompt" rows="4" placeholder="Describe the app you want to build" />
-        </Form>
-      </Card>
-    </property>
     <property name="previewTemplate">
-      <Card title="Preview placeholder" subtitle="Before XmluiPreviewPane">
-        <VStack gap="$space-2">
-          <Items data="{fixture.previewNotes}">
-            <Text>{$item}</Text>
-          </Items>
-        </VStack>
-      </Card>
+      <VStack height="100%" width="100%" minHeight="0" gap="$space-3">
+        <Card dock="top">
+          <ExpandableItem initiallyExpanded="{false}" fullWidthSummary="{true}" iconPosition="end">
+            <property name="summary">
+              <HStack gap="$space-2" verticalAlignment="center" wrapContent="true">
+                <Badge value="{fixture.previewIssues.length + ' issue found'}" />
+                <Text variant="secondary">Preview compile</Text>
+              </HStack>
+            </property>
+            <VStack gap="$space-2">
+              <Items data="{fixture.previewIssues}">
+                <VStack gap="$space-1">
+                  <Text variant="strong">{$item.title}</Text>
+                  <Text variant="secondary">{$item.detail}</Text>
+                </VStack>
+              </Items>
+            </VStack>
+          </ExpandableItem>
+        </Card>
+        <CVStack dock="stretch" height="100%" gap="$space-2">
+          <Text variant="title">Preview placeholder</Text>
+          <Text variant="secondary">Generated XMLUI preview will render here.</Text>
+        </CVStack>
+      </VStack>
     </property>
     <property name="codeTemplate">
-      <Card title="Code placeholder" subtitle="Before XmluiCodeView">
+      <VStack height="100%" minHeight="0">
         <CodeBlock>{fixture.code}</CodeBlock>
-      </Card>
-    </property>
-    <property name="timelineTemplate">
-      <Card title="Timeline placeholder">
-        <VStack gap="$space-2">
-          <Items data="{fixture.eventSummaries}">
-            <Text>{$item}</Text>
-          </Items>
-        </VStack>
-      </Card>
-    </property>
-    <property name="auxiliaryTemplate">
-      <Card title="Auxiliary surface">
-        <Text>This slot is reserved for alerts, approvals, or extra context.</Text>
-      </Card>
+      </VStack>
     </property>
   </XmluiBuilderFrame>
 </App>

@@ -1,0 +1,132 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-AiToolCall: createThemeVar("backgroundColor-AiToolCall");
+$borderColor-AiToolCall: createThemeVar("borderColor-AiToolCall");
+$backgroundColor-AiToolCall--requested: createThemeVar("backgroundColor-AiToolCall--requested");
+$backgroundColor-AiToolCall--running: createThemeVar("backgroundColor-AiToolCall--running");
+$backgroundColor-AiToolCall--succeeded: createThemeVar("backgroundColor-AiToolCall--succeeded");
+$backgroundColor-AiToolCall--failed: createThemeVar("backgroundColor-AiToolCall--failed");
+$backgroundColor-AiToolCall--cancelled: createThemeVar("backgroundColor-AiToolCall--cancelled");
+$backgroundColor-AiToolCallBadge: createThemeVar("backgroundColor-AiToolCallBadge");
+$backgroundColor-AiToolCallBadge--active: createThemeVar("backgroundColor-AiToolCallBadge--active");
+$textColor-AiToolCallBadge--active: createThemeVar("textColor-AiToolCallBadge--active");
+$borderColor-AiToolCall--failed: createThemeVar("borderColor-AiToolCall--failed");
+
+@layer components {
+  .root {
+    min-width: 0;
+    border-radius: t.$space-3;
+    border: 1px solid $borderColor-AiToolCall;
+    background: $backgroundColor-AiToolCall;
+  }
+
+  .root[data-status="requested"] {
+    background: $backgroundColor-AiToolCall--requested;
+  }
+
+  .root[data-status="running"] {
+    background: $backgroundColor-AiToolCall--running;
+  }
+
+  .root[data-status="succeeded"] {
+    background: $backgroundColor-AiToolCall--succeeded;
+  }
+
+  .root[data-status="failed"] {
+    background: $backgroundColor-AiToolCall--failed;
+    border-color: $borderColor-AiToolCall--failed;
+  }
+
+  .root[data-status="cancelled"] {
+    background: $backgroundColor-AiToolCall--cancelled;
+  }
+
+  .summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: t.$space-2;
+    padding: t.$space-3;
+  }
+
+  .summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .name {
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .statusBadge,
+  .metaLabel,
+  .sectionLabel {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: t.$space-1 t.$space-2;
+    font-size: 0.8125rem;
+    line-height: 1.1;
+    background: $backgroundColor-AiToolCallBadge;
+  }
+
+  .root[data-status="running"] .statusBadge {
+    background: $backgroundColor-AiToolCallBadge--active;
+    color: $textColor-AiToolCallBadge--active;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: t.$space-2;
+    padding: 0 t.$space-3 t.$space-3;
+  }
+
+  .metaRow,
+  .section,
+  .errorSection {
+    display: flex;
+    flex-direction: column;
+    gap: t.$space-1;
+    padding: t.$space-2;
+    border-radius: t.$space-2;
+    background: color-mix(
+      in srgb,
+      $backgroundColor-AiToolCall 88%,
+      var(--xmlui-color-surface-100, #f4f4f5)
+    );
+  }
+
+  .metaValue,
+  .sectionValue,
+  .errorValue {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .errorSection {
+    background: color-mix(
+      in srgb,
+      var(--xmlui-color-danger-100, #fee2e2) 45%,
+      transparent
+    );
+  }
+
+  .errorValue {
+    font-weight: 500;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

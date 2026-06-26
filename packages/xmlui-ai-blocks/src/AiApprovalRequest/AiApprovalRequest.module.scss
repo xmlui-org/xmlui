@@ -1,0 +1,166 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-AiApprovalRequest: createThemeVar("backgroundColor-AiApprovalRequest");
+$borderColor-AiApprovalRequest: createThemeVar("borderColor-AiApprovalRequest");
+$backgroundColor-AiApprovalRequest--requested: createThemeVar("backgroundColor-AiApprovalRequest--requested");
+$backgroundColor-AiApprovalRequest--approved: createThemeVar("backgroundColor-AiApprovalRequest--approved");
+$backgroundColor-AiApprovalRequest--rejected: createThemeVar("backgroundColor-AiApprovalRequest--rejected");
+$backgroundColor-AiApprovalRequest--edited: createThemeVar("backgroundColor-AiApprovalRequest--edited");
+$backgroundColor-AiApprovalRequest--expired: createThemeVar("backgroundColor-AiApprovalRequest--expired");
+$backgroundColor-AiApprovalRequest--failed: createThemeVar("backgroundColor-AiApprovalRequest--failed");
+$backgroundColor-AiApprovalRequestBadge: createThemeVar("backgroundColor-AiApprovalRequestBadge");
+$backgroundColor-AiApprovalRequestBadge--active: createThemeVar("backgroundColor-AiApprovalRequestBadge--active");
+$textColor-AiApprovalRequestBadge--active: createThemeVar("textColor-AiApprovalRequestBadge--active");
+$backgroundColor-AiApprovalRequestApprove: createThemeVar("backgroundColor-AiApprovalRequestApprove");
+$backgroundColor-AiApprovalRequestApprove--hover: createThemeVar("backgroundColor-AiApprovalRequestApprove--hover");
+$backgroundColor-AiApprovalRequestReject: createThemeVar("backgroundColor-AiApprovalRequestReject");
+$backgroundColor-AiApprovalRequestReject--hover: createThemeVar("backgroundColor-AiApprovalRequestReject--hover");
+
+@layer components {
+  .root {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: t.$space-3;
+    border-radius: t.$space-3;
+    border: 1px solid $borderColor-AiApprovalRequest;
+    background: $backgroundColor-AiApprovalRequest;
+    padding: t.$space-3;
+  }
+
+  .root[data-status="requested"] {
+    background: $backgroundColor-AiApprovalRequest--requested;
+  }
+
+  .root[data-status="approved"] {
+    background: $backgroundColor-AiApprovalRequest--approved;
+  }
+
+  .root[data-status="rejected"] {
+    background: $backgroundColor-AiApprovalRequest--rejected;
+  }
+
+  .root[data-status="edited"] {
+    background: $backgroundColor-AiApprovalRequest--edited;
+  }
+
+  .root[data-status="expired"] {
+    background: $backgroundColor-AiApprovalRequest--expired;
+  }
+
+  .root[data-status="failed"] {
+    background: $backgroundColor-AiApprovalRequest--failed;
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: t.$space-1;
+  }
+
+  .titleRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: t.$space-2;
+  }
+
+  .title {
+    font-weight: 700;
+  }
+
+  .statusBadge,
+  .sectionLabel {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: t.$space-1 t.$space-2;
+    font-size: 0.8125rem;
+    line-height: 1.1;
+    background: $backgroundColor-AiApprovalRequestBadge;
+  }
+
+  .root[data-status="requested"] .statusBadge {
+    background: $backgroundColor-AiApprovalRequestBadge--active;
+    color: $textColor-AiApprovalRequestBadge--active;
+  }
+
+  .subtitle {
+    opacity: 0.78;
+    font-size: 0.875rem;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: t.$space-2;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: t.$space-1;
+    padding: t.$space-2;
+    border-radius: t.$space-2;
+    background: color-mix(
+      in srgb,
+      $backgroundColor-AiApprovalRequest 88%,
+      var(--xmlui-color-surface-100, #f4f4f5)
+    );
+  }
+
+  .sectionValue,
+  .resolvedNote {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .resolvedNote {
+    opacity: 0.85;
+    font-style: italic;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: t.$space-2;
+    justify-content: flex-end;
+  }
+
+  .approveButton,
+  .rejectButton {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    padding: t.$space-2 t.$space-3;
+    color: var(--xmlui-color-surface-0, #ffffff);
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .approveButton {
+    background: $backgroundColor-AiApprovalRequestApprove;
+  }
+
+  .approveButton:hover {
+    background: $backgroundColor-AiApprovalRequestApprove--hover;
+  }
+
+  .rejectButton {
+    background: $backgroundColor-AiApprovalRequestReject;
+  }
+
+  .rejectButton:hover {
+    background: $backgroundColor-AiApprovalRequestReject--hover;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
