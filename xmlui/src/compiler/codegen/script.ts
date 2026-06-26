@@ -331,7 +331,10 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
     return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
   }
   if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
-    return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+    const builtInSource = ir.callee.name === "confirm"
+      ? `ctx.readReference?.("confirm")`
+      : emitRead(ir.callee.dependency, ir.callee.name);
+    return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${builtInSource})`;
   }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot generate unsupported XMLUI expression call target.");
@@ -419,6 +422,12 @@ function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpress
   }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     return `await (async (__xmluiContextFn) => typeof __xmluiContextFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiContextFn(${args}))) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    const builtInSource = ir.callee.name === "confirm"
+      ? `ctx.readReference?.("confirm")`
+      : emitRead(ir.callee.dependency, ir.callee.name);
+    return `await (async (__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiBuiltInFn(${args}))) : undefined)(${builtInSource})`;
   }
   if (ir.callee.kind === "IdentifierRead") {
     return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])))`;
@@ -610,7 +619,7 @@ function isAllowedMethodName(name: string): boolean {
 }
 
 function isAllowedBuiltInCallName(name: string): boolean {
-  return name === "getDate" || name === "Symbol" || name === "BigInt";
+  return name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
 }
 
 function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]): Set<string> {

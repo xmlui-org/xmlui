@@ -6,6 +6,8 @@ export type XmluiOption = {
   enabled: boolean;
   testId?: string;
   keywords?: string[];
+  selectionLabel?: string;
+  searchText?: string;
   [key: string]: unknown;
 };
 

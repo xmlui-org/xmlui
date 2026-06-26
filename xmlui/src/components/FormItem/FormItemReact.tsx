@@ -56,6 +56,10 @@ export type FormItemProps = {
   customValidationsDebounce?: number;
   onValidate?: (value: unknown) => unknown | Promise<unknown>;
   options?: XmluiOption[];
+  searchable?: boolean;
+  groupBy?: string;
+  groupHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
+  ungroupedHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
   children?: ReactNode;
   inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
   renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
@@ -93,6 +97,10 @@ export function FormItem({
   customValidationsDebounce = 0,
   onValidate,
   options,
+  searchable,
+  groupBy,
+  groupHeaderTemplateRenderer,
+  ungroupedHeaderTemplateRenderer,
   children,
   inputRenderer,
   renderItemTemplate,
@@ -249,6 +257,10 @@ export function FormItem({
     inputId,
     inputRenderer,
     options,
+    searchable,
+    groupBy,
+    groupHeaderTemplateRenderer,
+    ungroupedHeaderTemplateRenderer,
     parentForm: form,
     renderItemTemplate,
     required,
@@ -342,6 +354,10 @@ function renderControl({
   inputRenderer,
   itemArray,
   options,
+  searchable,
+  groupBy,
+  groupHeaderTemplateRenderer,
+  ungroupedHeaderTemplateRenderer,
   parentForm,
   renderItemTemplate,
   required,
@@ -360,6 +376,10 @@ function renderControl({
   inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
   itemArray: unknown[];
   options?: XmluiOption[];
+  searchable?: boolean;
+  groupBy?: string;
+  groupHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
+  ungroupedHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
   parentForm: ReturnType<typeof useFormContext>;
   renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
   required: boolean;
@@ -409,6 +429,10 @@ function renderControl({
         required={required}
         autoFocus={autoFocus}
         options={options ?? optionsFromChildren(children)}
+        searchable={searchable}
+        groupBy={groupBy}
+        groupHeaderTemplateRenderer={groupHeaderTemplateRenderer}
+        ungroupedHeaderTemplateRenderer={ungroupedHeaderTemplateRenderer}
         onDidChange={(nextValue) => {
           form?.setValue(fieldName, nextValue);
           scheduleChangedValidation(nextValue);

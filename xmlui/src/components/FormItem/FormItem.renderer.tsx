@@ -53,6 +53,18 @@ export const formItemRenderer = wrapComponent({
               ? radioOptions(adapter)
               : undefined
         }
+        groupBy={type === "select" ? adapter.stringProp("groupBy") : undefined}
+        searchable={type === "select" ? adapter.booleanProp("searchable", false) : undefined}
+        groupHeaderTemplateRenderer={
+          type === "select" && templateChildren(adapter.node, "groupHeaderTemplate")
+            ? createScopedTemplateRenderer(adapter, "groupHeaderTemplate")
+            : undefined
+        }
+        ungroupedHeaderTemplateRenderer={
+          type === "select" && templateChildren(adapter.node, "ungroupedHeaderTemplate")
+            ? createScopedTemplateRenderer(adapter, "ungroupedHeaderTemplate")
+            : undefined
+        }
         inputRenderer={
           inputTemplate.length > 0
             ? (contextVars) => {
@@ -100,3 +112,25 @@ export const formItemRenderer = wrapComponent({
     );
   },
 });
+
+function createScopedTemplateRenderer(
+  adapter: Parameters<Parameters<typeof wrapComponent>[0]["renderer"]>[0]["adapter"],
+  templateName: string,
+) {
+  const template = templateChildren(adapter.node, templateName) ?? [];
+  return (contextValues: Record<string, unknown>) => {
+    const templateScope = createRuntimeScope({
+      store: adapter.scope.store,
+      parent: adapter.scope,
+      props: adapter.scope.props,
+      contextValues,
+      references: adapter.scope.references,
+      slots: adapter.scope.slots,
+      routing: adapter.scope.routing,
+      toast: adapter.scope.toast,
+      emitEvent: adapter.scope.emitEvent,
+      extensionFunctions: adapter.scope.extensionFunctions,
+    });
+    return adapter.context.renderChildren(template, templateScope);
+  };
+}

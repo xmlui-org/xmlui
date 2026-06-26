@@ -1,10 +1,27 @@
 import { getBounds } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old Footer suite is copied for compatibility tracking, but full App shell layout, Pages scrolling containers, sticky layout behavior, and complete theme-variable parity are not complete yet. Re-enable cases feature-by-feature.",
-);
+const FOOTER_OLD_SUITE_PENDING =
+  "The literal old Footer suite is copied for compatibility tracking, but full App shell layout, Pages scrolling containers, sticky layout behavior, and complete theme-variable parity are not complete yet. Re-enable cases feature-by-feature.";
+
+const ACTIVE_FOOTER_TESTS = new Set([
+  "component renders with basic content",
+  "component renders multiple items correctly",
+  "component has correct accessibility attributes",
+  "component allows interactive elements within it to be focusable",
+  "component handles empty content gracefully",
+  "component handles long content correctly",
+  "component applies theme variables correctly",
+  "bg-color",
+  "fontSize",
+  "vertical-alignment",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_FOOTER_TESTS.has(testInfo.title)) {
+    test.skip(true, FOOTER_OLD_SUITE_PENDING);
+  }
+});
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS

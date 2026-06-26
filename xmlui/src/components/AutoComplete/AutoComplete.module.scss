@@ -5,6 +5,13 @@ $themeVars: "";
 }
 
 $backgroundColor-AutoComplete: createThemeVar("backgroundColor-AutoComplete");
+$textColor-AutoComplete: createThemeVar("textColor-AutoComplete");
+$borderColor-AutoComplete: createThemeVar("borderColor-AutoComplete");
+$borderWidth-AutoComplete: createThemeVar("borderWidth-AutoComplete");
+$borderStyle-AutoComplete: createThemeVar("borderStyle-AutoComplete");
+$borderRadius-AutoComplete: createThemeVar("borderRadius-AutoComplete");
+$fontSize-AutoComplete: createThemeVar("fontSize-AutoComplete");
+$boxShadow-AutoComplete: createThemeVar("boxShadow-AutoComplete");
 $backgroundColor-menu-AutoComplete: createThemeVar("backgroundColor-menu-AutoComplete");
 $boxShadow-menu-AutoComplete: createThemeVar("boxShadow-menu-AutoComplete");
 $borderRadius-menu-AutoComplete: createThemeVar("borderRadius-menu-AutoComplete");
@@ -26,7 +33,21 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-AutoCompl
     flex-direction: column;
     gap: var(--xmlui-gap-AutoComplete, 0.25rem);
     max-width: 100%;
+    border-color: var(--xmlui-borderColor-AutoComplete);
+    border-width: var(--xmlui-borderWidth-AutoComplete);
+    border-style: var(--xmlui-borderStyle-AutoComplete);
+    border-radius: var(--xmlui-borderRadius-AutoComplete);
     background-color: var(--xmlui-backgroundColor-AutoComplete);
+    color: var(--xmlui-textColor-AutoComplete);
+    box-shadow: var(--xmlui-boxShadow-AutoComplete);
+    font-size: var(--xmlui-fontSize-AutoComplete);
+  }
+
+  .autoCompleteRoot:hover {
+    border-color: var(--xmlui-borderColor-AutoComplete--hover, var(--xmlui-borderColor-AutoComplete));
+    background-color: var(--xmlui-backgroundColor-AutoComplete--hover, var(--xmlui-backgroundColor-AutoComplete));
+    color: var(--xmlui-textColor-AutoComplete--hover, var(--xmlui-textColor-AutoComplete));
+    box-shadow: var(--xmlui-boxShadow-AutoComplete--hover, var(--xmlui-boxShadow-AutoComplete));
   }
 
   .autoCompleteInput {
@@ -39,11 +60,189 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-AutoCompl
     background-color: var(--xmlui-backgroundColor-input-AutoComplete, var(--xmlui-color-surface-0));
     color: var(--xmlui-textColor-AutoComplete, var(--xmlui-textColor-primary));
     font: inherit;
+    font-size: var(--xmlui-fontSize-AutoComplete);
+  }
+
+  .autoCompleteInput::placeholder,
+  .autoCompleteMultiInput::placeholder {
+    color: var(--xmlui-textColor-placeholder-AutoComplete);
+    font-size: var(--xmlui-fontSize-placeholder-AutoComplete--default, inherit);
   }
 
   .autoCompleteInput:disabled {
     cursor: not-allowed;
     opacity: var(--xmlui-opacity-AutoComplete--disabled, 0.65);
+  }
+
+  .autoCompleteMultiTrigger {
+    box-sizing: border-box;
+    display: inline-flex;
+    width: 100%;
+    height: var(--xmlui-height-AutoComplete, 2rem);
+    min-height: var(--xmlui-height-AutoComplete, 2rem);
+    align-items: center;
+    gap: var(--xmlui-gap-badge-AutoComplete, 0.25rem);
+    overflow: hidden;
+    padding: var(--xmlui-paddingVertical-AutoComplete, 0.25rem) var(--xmlui-paddingHorizontal-AutoComplete, 0.5rem);
+    border: var(--xmlui-borderWidth-AutoComplete, 1px) var(--xmlui-borderStyle-AutoComplete, solid) var(--xmlui-borderColor-AutoComplete, var(--xmlui-borderColor-Input-default));
+    border-radius: var(--xmlui-borderRadius-AutoComplete, var(--xmlui-borderRadius));
+    background-color: var(--xmlui-backgroundColor-input-AutoComplete, var(--xmlui-color-surface-0));
+    color: var(--xmlui-textColor-AutoComplete, var(--xmlui-textColor-primary));
+    cursor: text;
+  }
+
+  .autoCompleteValidationWarning {
+    border-color: var(--xmlui-borderColor-AutoComplete--warning, var(--xmlui-borderColor-AutoComplete));
+    border-width: var(--xmlui-borderWidth-AutoComplete--warning, var(--xmlui-borderWidth-AutoComplete));
+    border-style: var(--xmlui-borderStyle-AutoComplete--warning, var(--xmlui-borderStyle-AutoComplete));
+    border-radius: var(--xmlui-borderRadius-AutoComplete--warning, var(--xmlui-borderRadius-AutoComplete));
+    background-color: var(--xmlui-backgroundColor-AutoComplete--warning, var(--xmlui-backgroundColor-AutoComplete));
+    color: var(--xmlui-textColor-AutoComplete--warning, var(--xmlui-textColor-AutoComplete));
+    box-shadow: var(--xmlui-boxShadow-AutoComplete--warning, var(--xmlui-boxShadow-AutoComplete));
+    font-size: var(--xmlui-fontSize-AutoComplete--warning, var(--xmlui-fontSize-AutoComplete));
+  }
+
+  .autoCompleteValidationError {
+    border-color: var(--xmlui-borderColor-AutoComplete--error, var(--xmlui-borderColor-AutoComplete));
+    border-width: var(--xmlui-borderWidth-AutoComplete--error, var(--xmlui-borderWidth-AutoComplete));
+    border-style: var(--xmlui-borderStyle-AutoComplete--error, var(--xmlui-borderStyle-AutoComplete));
+    border-radius: var(--xmlui-borderRadius-AutoComplete--error, var(--xmlui-borderRadius-AutoComplete));
+    background-color: var(--xmlui-backgroundColor-AutoComplete--error, var(--xmlui-backgroundColor-AutoComplete));
+    color: var(--xmlui-textColor-AutoComplete--error, var(--xmlui-textColor-AutoComplete));
+    box-shadow: var(--xmlui-boxShadow-AutoComplete--error, var(--xmlui-boxShadow-AutoComplete));
+    font-size: var(--xmlui-fontSize-AutoComplete--error, var(--xmlui-fontSize-AutoComplete));
+  }
+
+  .autoCompleteValidationSuccess {
+    border-color: var(--xmlui-borderColor-AutoComplete--success, var(--xmlui-borderColor-AutoComplete));
+    border-width: var(--xmlui-borderWidth-AutoComplete--success, var(--xmlui-borderWidth-AutoComplete));
+    border-style: var(--xmlui-borderStyle-AutoComplete--success, var(--xmlui-borderStyle-AutoComplete));
+    border-radius: var(--xmlui-borderRadius-AutoComplete--success, var(--xmlui-borderRadius-AutoComplete));
+    background-color: var(--xmlui-backgroundColor-AutoComplete--success, var(--xmlui-backgroundColor-AutoComplete));
+    color: var(--xmlui-textColor-AutoComplete--success, var(--xmlui-textColor-AutoComplete));
+    box-shadow: var(--xmlui-boxShadow-AutoComplete--success, var(--xmlui-boxShadow-AutoComplete));
+    font-size: var(--xmlui-fontSize-AutoComplete--success, var(--xmlui-fontSize-AutoComplete));
+  }
+
+  .autoCompleteValidationWarning:hover {
+    border-color: var(--xmlui-borderColor-AutoComplete--warning--hover, var(--xmlui-borderColor-AutoComplete--hover, var(--xmlui-borderColor-AutoComplete--warning, var(--xmlui-borderColor-AutoComplete))));
+    background-color: var(--xmlui-backgroundColor-AutoComplete--warning--hover, var(--xmlui-backgroundColor-AutoComplete--hover, var(--xmlui-backgroundColor-AutoComplete--warning, var(--xmlui-backgroundColor-AutoComplete))));
+    color: var(--xmlui-textColor-AutoComplete--warning--hover, var(--xmlui-textColor-AutoComplete--hover, var(--xmlui-textColor-AutoComplete--warning, var(--xmlui-textColor-AutoComplete))));
+    box-shadow: var(--xmlui-boxShadow-AutoComplete--warning--hover, var(--xmlui-boxShadow-AutoComplete--hover, var(--xmlui-boxShadow-AutoComplete--warning, var(--xmlui-boxShadow-AutoComplete))));
+  }
+
+  .autoCompleteValidationError:hover {
+    border-color: var(--xmlui-borderColor-AutoComplete--error--hover, var(--xmlui-borderColor-AutoComplete--hover, var(--xmlui-borderColor-AutoComplete--error, var(--xmlui-borderColor-AutoComplete))));
+    background-color: var(--xmlui-backgroundColor-AutoComplete--error--hover, var(--xmlui-backgroundColor-AutoComplete--hover, var(--xmlui-backgroundColor-AutoComplete--error, var(--xmlui-backgroundColor-AutoComplete))));
+    color: var(--xmlui-textColor-AutoComplete--error--hover, var(--xmlui-textColor-AutoComplete--hover, var(--xmlui-textColor-AutoComplete--error, var(--xmlui-textColor-AutoComplete))));
+    box-shadow: var(--xmlui-boxShadow-AutoComplete--error--hover, var(--xmlui-boxShadow-AutoComplete--hover, var(--xmlui-boxShadow-AutoComplete--error, var(--xmlui-boxShadow-AutoComplete))));
+  }
+
+  .autoCompleteValidationSuccess:hover {
+    border-color: var(--xmlui-borderColor-AutoComplete--success--hover, var(--xmlui-borderColor-AutoComplete--hover, var(--xmlui-borderColor-AutoComplete--success, var(--xmlui-borderColor-AutoComplete))));
+    background-color: var(--xmlui-backgroundColor-AutoComplete--success--hover, var(--xmlui-backgroundColor-AutoComplete--hover, var(--xmlui-backgroundColor-AutoComplete--success, var(--xmlui-backgroundColor-AutoComplete))));
+    color: var(--xmlui-textColor-AutoComplete--success--hover, var(--xmlui-textColor-AutoComplete--hover, var(--xmlui-textColor-AutoComplete--success, var(--xmlui-textColor-AutoComplete))));
+    box-shadow: var(--xmlui-boxShadow-AutoComplete--success--hover, var(--xmlui-boxShadow-AutoComplete--hover, var(--xmlui-boxShadow-AutoComplete--success, var(--xmlui-boxShadow-AutoComplete))));
+  }
+
+  .autoCompleteConciseValidationFeedback {
+    position: absolute;
+    right: var(--xmlui-space-1, 0.25rem);
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    width: 1rem;
+    height: 1rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--xmlui-color-danger-500);
+  }
+
+  .autoCompleteConciseValidationFeedback [data-icon-name="error"]::before {
+    content: "!";
+  }
+
+  .autoCompleteConciseValidationFeedback [data-icon-name="checkmark"]::before {
+    content: "✓";
+    color: var(--xmlui-color-success-500);
+  }
+
+  .autoCompleteValidationTooltip {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    z-index: calc(var(--xmlui-zIndex-AutoComplete, 10) + 2);
+    white-space: nowrap;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--xmlui-borderRadius);
+    background: var(--xmlui-color-surface-900);
+    color: var(--xmlui-color-surface-0);
+  }
+
+  .autoCompleteValidationMessage {
+    color: var(--xmlui-textColor-error-FormItem, var(--xmlui-color-danger-500));
+    font-size: var(--xmlui-fontSize-error-FormItem, var(--xmlui-fontSize-sm));
+  }
+
+  .autoCompleteMultiInput {
+    box-sizing: border-box;
+    flex: 1 1 100px;
+    min-width: 100px;
+    height: 100%;
+    min-height: calc(var(--xmlui-height-AutoComplete, 2rem) - (2 * var(--xmlui-paddingVertical-AutoComplete, 0.25rem)));
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .autoCompleteMultiInput:disabled {
+    cursor: not-allowed;
+  }
+
+  .autoCompleteBadge,
+  .autoCompleteMoreChip {
+    box-sizing: border-box;
+    display: inline-flex;
+    flex: 0 0 auto;
+    max-width: 9rem;
+    align-items: center;
+    gap: 0.25rem;
+    overflow: hidden;
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--xmlui-borderRadius-badge-AutoComplete, 999px);
+    background-color: var(--xmlui-backgroundColor-badge-AutoComplete, var(--xmlui-color-surface-100));
+    color: var(--xmlui-textColor-badge-AutoComplete, var(--xmlui-textColor-primary));
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .autoCompleteMoreChip {
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .autoCompleteMoreChip svg {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+
+  .autoCompleteGhostBadge {
+    display: none;
+  }
+
+  .autoCompleteLabel {
+    font: inherit;
+    color: var(--xmlui-textColor-label-AutoComplete, var(--xmlui-textColor-primary));
+  }
+
+  .requiredIndicator,
+  .optionalIndicator {
+    margin-left: var(--xmlui-gap-labelIndicator-AutoComplete, 0.25rem);
   }
 
   .autoCompleteMenu {
@@ -78,6 +277,13 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-AutoCompl
   .autoCompleteItem:disabled {
     cursor: not-allowed;
     color: var(--xmlui-textColor-item-AutoComplete--disabled);
+  }
+
+  .autoCompleteGroupHeader {
+    padding: var(--xmlui-paddingTop-groupHeader-AutoComplete, 0.5rem) var(--xmlui-paddingHorizontal-groupHeader-AutoComplete, 0.5rem) var(--xmlui-paddingBottom-groupHeader-AutoComplete, 0.25rem);
+    color: var(--xmlui-textColor-groupHeader-AutoComplete, var(--xmlui-textColor-secondary));
+    font-size: var(--xmlui-fontSize-groupHeader-AutoComplete, 0.75rem);
+    font-weight: var(--xmlui-fontWeight-groupHeader-AutoComplete, 700);
   }
 
   .autoCompleteEmpty {

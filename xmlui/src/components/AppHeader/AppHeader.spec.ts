@@ -1,9 +1,27 @@
 import { test, expect } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old AppHeader suite is copied for compatibility tracking, but App layout context integration, drawer/nav-panel interaction, complete logo/resource behavior, and full theme-variable parity are not complete yet. Re-enable cases feature-by-feature.",
-);
+const APPHEADER_OLD_SUITE_PENDING =
+  "The literal old AppHeader suite is copied for compatibility tracking, but App layout context integration, drawer/nav-panel interaction, complete logo/resource behavior, and full theme-variable parity are not complete yet. Re-enable cases feature-by-feature.";
+
+const ACTIVE_APPHEADER_TESTS = new Set([
+  "renders with basic props",
+  "renders with title prop",
+  "renders with custom logo content",
+  "has correct accessibility structure",
+  "properly handles focus management",
+  "applies background color theme variable correctly",
+  "applies height theme variable correctly",
+  "borderLeft",
+  "handles undefined props gracefully",
+  "handles special characters in title prop",
+  "handles empty child components",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_APPHEADER_TESTS.has(testInfo.title)) {
+    test.skip(true, APPHEADER_OLD_SUITE_PENDING);
+  }
+});
 
 const CODE = `
   <AppHeader>

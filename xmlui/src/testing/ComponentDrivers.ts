@@ -271,11 +271,36 @@ export class ContextMenuDriver extends ComponentDriver {
   async clickMenuItem(text: string): Promise<void> {
     await this.getMenuItem(text).click();
   }
+
+  async openSubMenu(submenuText: string): Promise<void> {
+    await this.params.page.getByText(submenuText).hover();
+  }
+
+  getMenuSeparators(): Locator {
+    return this.params.page.locator('[data-xmlui-component="MenuSeparator"]:visible');
+  }
+
+  getMenuContent(): Locator {
+    return this.params.page.locator('[data-xmlui-component="ContextMenu"]');
+  }
+
+  async isOpen(): Promise<boolean> {
+    return this.getMenuContent().isVisible();
+  }
+
+  async close(): Promise<void> {
+    await this.params.page.keyboard.press("Escape");
+  }
 }
 
 export class DropdownMenuDriver extends ComponentDriver {
   getTrigger(): Locator {
-    return this.params.page.getByRole("button").first();
+    return this.component
+      .locator("xpath=self::*[@data-xmlui-component='DropdownMenuTrigger']")
+      .or(this.component.locator("xpath=self::button | .//button"))
+      .or(this.params.page.locator('[data-xmlui-component="DropdownMenuTrigger"]').getByRole("button"))
+      .or(this.params.page.getByRole("button"))
+      .first();
   }
 
   async open(): Promise<void> {
@@ -298,8 +323,28 @@ export class DropdownMenuDriver extends ComponentDriver {
     await this.getMenuItem(text).click();
   }
 
+  async openSubMenu(submenuText: string): Promise<void> {
+    await this.params.page.getByText(submenuText).hover();
+  }
+
+  getMenuSeparators(): Locator {
+    return this.params.page.locator('[data-xmlui-component="MenuSeparator"]:visible');
+  }
+
+  getMenuContent(): Locator {
+    return this.params.page.locator('[data-xmlui-component="DropdownMenuContent"]');
+  }
+
   async isOpen(): Promise<boolean> {
-    return this.getMenuItems().first().isVisible();
+    return this.getMenuContent().isVisible();
+  }
+
+  async waitForOpen(): Promise<void> {
+    await this.getMenuContent().waitFor({ state: "visible" });
+  }
+
+  async waitForClose(): Promise<void> {
+    await this.getMenuContent().waitFor({ state: "hidden" });
   }
 }
 
@@ -658,8 +703,19 @@ export class SelectDriver extends ComponentDriver {
 
   async selectOption(value: string): Promise<void> {
     const nativeSelect = this.component.locator("select").first();
-    if (await nativeSelect.count()) {
+    if (await nativeSelect.count() && await nativeSelect.isVisible()) {
       await nativeSelect.selectOption(value);
+      return;
+    }
+    if (!(await this.component.getByRole("option").count())) {
+      await this.toggleOptionsVisibility();
+    }
+    const valueOption = this.component
+      .locator(`[role="option"][data-value="${cssEscape(value)}"]`)
+      .or(this.params.page.locator(`[role="option"][data-value="${cssEscape(value)}"]`))
+      .first();
+    if (await valueOption.count()) {
+      await valueOption.click({ force: true });
       return;
     }
     await this.component
@@ -685,7 +741,7 @@ export class SelectDriver extends ComponentDriver {
   }
 
   async toggleOptionsVisibility(): Promise<void> {
-    await this.component.click();
+    await this.component.getByRole("combobox").or(this.component.locator("button")).first().click({ force: true });
   }
 
   async selectLabel(value: string): Promise<void> {
@@ -719,6 +775,10 @@ export class SelectDriver extends ComponentDriver {
       await this.selectLabel(value);
     }
   }
+}
+
+function cssEscape(value: string): string {
+  return value.replace(/["\\]/g, "\\$&");
 }
 
 export class AutoCompleteDriver extends ComponentDriver {

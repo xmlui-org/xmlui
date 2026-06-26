@@ -103,6 +103,16 @@ export const FormItemMd = createMetadata({
       valueType: "string",
       availableValues: ["onChanged", "onLostFocus", "errorLate"],
     },
+    searchable: {
+      description: "Pass-through option for select-like FormItem controls.",
+      valueType: "boolean",
+    },
+    groupBy: {
+      description: "Pass-through option for grouped select-like FormItem controls.",
+      valueType: "string",
+    },
+    groupHeaderTemplate: dComponent("Template rendered for grouped select headers."),
+    ungroupedHeaderTemplate: dComponent("Template rendered before ungrouped select options."),
     customValidationsDebounce: {
       description: "Debounces custom validation after value changes by the specified number of milliseconds.",
       valueType: "number",

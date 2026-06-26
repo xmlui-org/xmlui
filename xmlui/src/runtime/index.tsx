@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
@@ -117,6 +118,7 @@ export function XmluiRoot({
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
+  const [confirmDialog, setConfirmDialog] = useState<{ title: string; message?: string; okLabel?: string } | undefined>();
   const toastRef = useRef<ToastService>();
   if (!toastRef.current) {
     toastRef.current = createToastService();
@@ -135,6 +137,15 @@ export function XmluiRoot({
     [extensions],
   );
   useEffect(() => routingRef.current?.attach(), []);
+  const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown) => {
+    setConfirmDialog({
+      title: String(title ?? "Confirm"),
+      message: message == null ? undefined : String(message),
+      okLabel: okLabel == null ? undefined : String(okLabel),
+    });
+    return true;
+  }, []);
+  referencesRef.current.confirm = confirm;
   useEffect(() => {
     testProbe?.({
       readLocal: (name) => store.readLocal(rootOwnerId, name),
@@ -200,9 +211,58 @@ export function XmluiRoot({
   return (
     <XmluiThemeRoot>
       <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+      {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
       <ToastHost service={toastRef.current} />
     </XmluiThemeRoot>
   );
+}
+
+function renderConfirmDialog(
+  confirmDialog: { title: string; message?: string; okLabel?: string } | undefined,
+  close: () => void,
+) {
+  if (!confirmDialog) {
+    return null;
+  }
+  const dialog = (
+    <div
+      data-xmlui-confirm-layer=""
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 10000,
+        background: "rgba(0, 0, 0, 0.2)",
+      }}
+      onMouseDown={(event) => {
+        event.stopPropagation();
+        close();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-label={confirmDialog.title}
+        style={{
+          position: "fixed",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          minWidth: "18rem",
+          padding: "1rem",
+          borderRadius: "4px",
+          background: "var(--xmlui-color-surface-0, #fff)",
+          boxShadow: "var(--xmlui-boxShadow-md, 0 8px 24px rgba(0, 0, 0, 0.18))",
+        }}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div>{confirmDialog.title}</div>
+        {confirmDialog.message ? <div>{confirmDialog.message}</div> : null}
+        <button type="button" onClick={close}>
+          {confirmDialog.okLabel ?? "OK"}
+        </button>
+      </div>
+    </div>
+  );
+  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }
 
 export type { XmluiDocumentInput, XmluiModule } from "./types";

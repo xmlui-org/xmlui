@@ -115,7 +115,6 @@ $minWidth-DropdownMenu: createThemeVar("minWidth-DropdownMenu");
 
 .menuItemDisabled {
   color: $color-MenuItem-disabled;
-  pointer-events: none;
   opacity: 0.65;
 }
 

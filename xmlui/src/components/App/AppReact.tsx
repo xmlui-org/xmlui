@@ -9,9 +9,11 @@ import {
   themeVariablesToCssProperties,
 } from "../../styling/theme";
 import type { XmluiAdapterRendererProps } from "../../runtime/rendering/adapter";
+import type { XmluiNode } from "../../compiler/ir";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
 import { AppMd } from "./App";
+import { AppShellProvider } from "./AppShellContext";
 import { defaultProps } from "./App.defaults";
 
 const CONTENT_THEME_VARS = {
@@ -36,6 +38,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const fitContent = adapter.booleanProp("fitContent", defaultProps.fitContent);
   const loggedInUser = adapter.prop("loggedInUser", null);
   const appProps = adapter.props;
+  const showDrawerToggle = hasVisibleNavPanel(adapter.node.children);
   const readyFiredRef = useRef(false);
 
   useEffect(() => {
@@ -73,31 +76,33 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
 
   return (
     <ProfileMenuProvider loggedInUser={normalizeLoggedInUser(loggedInUser)}>
-      <div
-        {...rootAttrs}
-        data-testid={testId}
-        data-xmlui-app-fit-content={fitContent ? "true" : undefined}
-        style={{
-          ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
-          ...appBaselineStyle(mergedThemeVariables),
-          ...appContainerStyle(fitContent),
-          ...adapter.style,
-        }}
-      >
-        <main
-          data-xmlui-component="App"
-          data-xmlui-part="content"
-          style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
+      <AppShellProvider showDrawerToggle={showDrawerToggle}>
+        <div
+          {...rootAttrs}
+          data-testid={testId}
+          data-xmlui-app-fit-content={fitContent ? "true" : undefined}
+          style={{
+            ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
+            ...appBaselineStyle(mergedThemeVariables),
+            ...appContainerStyle(fitContent),
+            ...adapter.style,
+          }}
         >
-          <div
+          <main
             data-xmlui-component="App"
-            data-xmlui-part="pageContent"
-            style={pageContentStyle(mergedThemeVariables, appProps)}
+            data-xmlui-part="content"
+            style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
           >
-            {adapter.renderChildren()}
-          </div>
-        </main>
-      </div>
+            <div
+              data-xmlui-component="App"
+              data-xmlui-part="pageContent"
+              style={pageContentStyle(mergedThemeVariables, appProps)}
+            >
+              {adapter.renderChildren()}
+            </div>
+          </main>
+        </div>
+      </AppShellProvider>
     </ProfileMenuProvider>
   );
 }
@@ -198,4 +203,20 @@ function appThemeVariableProps(props: Record<string, unknown>): Record<string, u
     }
   }
   return variables;
+}
+
+function hasVisibleNavPanel(children: XmluiNode[]): boolean {
+  return children.some((child) => {
+    if (child.kind !== "element" || child.type !== "NavPanel") {
+      return false;
+    }
+    const when = child.props.when as unknown;
+    const parsedWhen = child.parsed?.props?.when;
+    const parsedWhenValue = Array.isArray(parsedWhen) ? undefined : literalIrValue(parsedWhen?.ir);
+    return when !== false && when !== "false" && when !== "{false}" && parsedWhenValue !== false;
+  });
+}
+
+function literalIrValue(ir: unknown): unknown {
+  return ir && typeof ir === "object" && "value" in ir ? ir.value : undefined;
 }

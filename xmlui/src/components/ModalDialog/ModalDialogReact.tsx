@@ -142,7 +142,15 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
   const modal = (
     <div className={styles.portal} data-xmlui-component="ModalDialogPortal">
       <div aria-hidden="true" className={styles.overlayBackground} />
-      <div className={cx(styles.overlay, fullScreen && styles.fullScreenOverlay)}>
+      <div
+        className={cx(styles.overlay, fullScreen && styles.fullScreenOverlay)}
+        onPointerDown={(event) => {
+          if ((event.nativeEvent as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled) {
+            return;
+          }
+          close();
+        }}
+      >
         <div
           {...dialogAttrs}
           ref={ref}
@@ -152,6 +160,7 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
           data-state="open"
           role="dialog"
           style={style as CSSProperties}
+          onPointerDown={(event) => event.stopPropagation()}
         >
           {renderedTitle ? (
             <header

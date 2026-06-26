@@ -1,9 +1,17 @@
 import { test, expect } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old NavPanel suite is copied for compatibility tracking, but App layout integration, NavGroup discovery, scroller variants, link-map registration, responsive/collapsed shell behavior, and full theme-variable parity are not complete yet. Re-enable cases feature-by-feature.",
-);
+const NAVPANEL_OLD_SUITE_PENDING =
+  "The literal old NavPanel suite is copied for compatibility tracking, but App layout integration, NavGroup discovery, scroller variants, link-map registration, responsive/collapsed shell behavior, and full theme-variable parity are not complete yet. Re-enable cases feature-by-feature.";
+
+const ACTIVE_NAVPANEL_TESTS = new Set([
+  "Nested NavGroups and NavLinks show in NavPanel",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_NAVPANEL_TESTS.has(testInfo.title)) {
+    test.skip(true, NAVPANEL_OLD_SUITE_PENDING);
+  }
+});
 
 const CODE = `<NavPanel><NavLink to="/">Hello</NavLink></NavPanel>`;
 

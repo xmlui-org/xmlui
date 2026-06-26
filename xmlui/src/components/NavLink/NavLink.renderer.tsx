@@ -3,6 +3,7 @@ import { useSyncExternalStore } from "react";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { normalizePathname } from "../../runtime/routing";
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { useIsNavGroupItem } from "../NavGroup/NavGroupContext";
 import { NavLinkMd, defaultNavLinkProps } from "./NavLink";
 import { NavLinkComponent } from "./NavLinkReact";
 
@@ -16,6 +17,7 @@ export const navLinkRenderer = wrapComponent({
     const forceActive = adapter.booleanProp("active", defaultNavLinkProps.active);
     const displayActive = adapter.booleanProp("displayActive", defaultNavLinkProps.displayActive);
     const noIndicator = adapter.booleanProp("noIndicator", defaultNavLinkProps.noIndicator);
+    const isNavGroupItem = useIsNavGroupItem();
     const label = adapter.prop("label");
     const target = adapter.stringProp("target");
     const routing = adapter.scope.routing;
@@ -46,6 +48,7 @@ export const navLinkRenderer = wrapComponent({
         iconAlignment={adapter.stringProp("iconAlignment", defaultNavLinkProps.iconAlignment) as "baseline" | "start" | "center" | "end"}
         level={adapter.numberProp("level", 0)}
         noIndicator={noIndicator}
+        role={isNavGroupItem ? "menuitem" : undefined}
         target={target}
         to={to}
         vertical={adapter.booleanProp("vertical", false)}

@@ -1547,11 +1547,11 @@ function isAllowedMethodName(name: string): boolean {
 }
 
 function isAllowedBuiltInCallName(name: string): boolean {
-  return name === "getDate" || name === "Symbol" || name === "BigInt";
+  return name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
 }
 
 function isBuiltInReferenceName(name: string): boolean {
-  return name === "Date" || name === "getDate" || name === "Symbol" || name === "BigInt";
+  return name === "Date" || name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
 }
 
 function resolveParentLocal(scope: XmluiScope, name: string): XmluiBinding | undefined {

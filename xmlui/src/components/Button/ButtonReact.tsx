@@ -129,13 +129,19 @@ function normalizeIcon(icon: ReactNode): string | undefined {
 
 function ButtonIcon({ icon }: { icon: string }) {
   return (
-    <span
+    <svg
       aria-hidden="true"
       data-icon={icon}
       data-xmlui-component="Button"
       data-xmlui-part="icon"
       className={styles.icon}
-    />
+      focusable="false"
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+    >
+      <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
   );
 }
 

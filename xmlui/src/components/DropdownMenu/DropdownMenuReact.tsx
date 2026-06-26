@@ -1,7 +1,8 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { createContext, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
+import type { CSSProperties, HTMLAttributes, MutableRefObject, ReactNode, Ref } from "react";
+import { Children, createContext, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import styles from "./DropdownMenu.module.scss";
+import { isTopLayer, registerLayer } from "../layerStack";
 
 export type MenuContextValue = {
   closeMenu?: () => void;
@@ -56,12 +57,20 @@ export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProp
   ref,
 ) {
   const triggerRef = useRef<HTMLButtonElement | HTMLSpanElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const layerIdRef = useRef<symbol>(Symbol("DropdownMenu"));
   const [openState, setOpenState] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0 });
+  const hasContent = Children.count(children) > 0;
+  const dataTestId = (rest as { "data-testid"?: string })["data-testid"];
 
   const close = useCallback(() => setOpenState(false), []);
   const open = useCallback(async () => {
     if (disabled) {
+      return;
+    }
+    if (!hasContent) {
+      setOpenState(false);
       return;
     }
     const willOpenResult = await onWillOpen?.();
@@ -78,7 +87,7 @@ export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProp
       setPosition({ left, top: rect.bottom + 4 });
     }
     setOpenState(true);
-  }, [alignment, disabled, onWillOpen]);
+  }, [alignment, disabled, hasContent, onWillOpen]);
 
   useEffect(() => {
     registerComponentApi?.({ open, close });
@@ -88,16 +97,39 @@ export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProp
     if (!openState) {
       return;
     }
-    const onPointerDown = () => close();
+    const unregisterLayer = registerLayer(layerIdRef.current);
+    const onPointerDown = (event: PointerEvent) => {
+      if (!isTopLayer(layerIdRef.current)) {
+        return;
+      }
+      if ((event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled) {
+        return;
+      }
+      if ((event.target as Element | null)?.closest("[data-xmlui-confirm-layer]")) {
+        return;
+      }
+      const target = event.target as Node;
+      if (triggerRef.current?.contains(target) || contentRef.current?.contains(target)) {
+        return;
+      }
+      (event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
+      close();
+    };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         close();
+        return;
+      }
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        focusMenuItem(contentRef.current, event.key === "ArrowDown" ? 1 : -1);
       }
     };
-    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointerdown", onPointerDown, true);
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
+      unregisterLayer();
+      window.removeEventListener("pointerdown", onPointerDown, true);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [close, openState]);
@@ -106,6 +138,7 @@ export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProp
     <MenuContext.Provider value={{ closeMenu: close }}>
       {triggerTemplate ? (
         <span
+          data-testid={dataTestId}
           data-xmlui-component="DropdownMenuTrigger"
           onClick={(event) => {
             event.stopPropagation();
@@ -118,6 +151,8 @@ export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProp
       ) : (
         <button
           className={styles.trigger}
+          aria-expanded={openState}
+          aria-haspopup="menu"
           data-xmlui-component="DropdownMenu"
           disabled={disabled}
           onClick={(event) => {
@@ -130,13 +165,13 @@ export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProp
           {label || "Menu"}
         </button>
       )}
-      {openState ? (
+      {openState && hasContent ? (
         <div
           {...rest}
-          className={[styles.content, contentClassName, className].filter(Boolean).join(" ")}
+          className={[styles.content, "DropdownMenuContent", contentClassName, className].filter(Boolean).join(" ")}
           data-xmlui-component="DropdownMenuContent"
           data-xmlui-part="content"
-          ref={ref}
+          ref={mergeRefs(ref, contentRef)}
           role="menu"
           style={{
             ...(style as CSSProperties),
@@ -209,9 +244,9 @@ export const MenuItemComponent = forwardRef<HTMLDivElement, MenuItemProps>(funct
         }
       }}
     >
-      {icon && iconPosition !== "end" ? icon : null}
+      {icon && iconPosition !== "end" ? <MenuIcon icon={icon} /> : null}
       <span>{content}</span>
-      {icon && iconPosition === "end" ? icon : null}
+      {icon && iconPosition === "end" ? <MenuIcon icon={icon} /> : null}
     </div>
   );
 });
@@ -287,20 +322,80 @@ export const SubMenuItemComponent = forwardRef<HTMLDivElement, SubMenuItemProps>
       >
         {triggerTemplate ?? (
           <>
-            {icon && iconPosition !== "end" ? icon : null}
+            {icon && iconPosition !== "end" ? <MenuIcon icon={icon} /> : null}
             <span className={styles.subMenuLabel}>{label}</span>
-            {icon && iconPosition === "end" ? icon : null}
-            <span aria-hidden="true" className={styles.subMenuIndicator}>
-              &rsaquo;
-            </span>
+            {icon && iconPosition === "end" ? <MenuIcon icon={icon} /> : null}
+            <ChevronIcon />
           </>
         )}
       </div>
       {openState ? (
-        <div className={styles.subMenuContent} data-xmlui-component="SubMenuContent" role="menu">
+        <div className={[styles.subMenuContent, "DropdownMenuSubContent"].join(" ")} data-xmlui-component="SubMenuContent" role="menu">
           {children}
         </div>
       ) : null}
     </div>
   );
 });
+
+export function focusMenuItem(container: HTMLElement | null, direction: 1 | -1): void {
+  const items = Array.from(
+    container?.querySelectorAll<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])') ?? [],
+  );
+  if (items.length === 0) {
+    return;
+  }
+  const activeIndex = items.indexOf(document.activeElement as HTMLElement);
+  const nextIndex = activeIndex < 0
+    ? direction === 1 ? 0 : items.length - 1
+    : (activeIndex + direction + items.length) % items.length;
+  items[nextIndex]?.focus();
+}
+
+function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
+  return (value: T | null) => {
+    refs.forEach((ref) => {
+      if (!ref) {
+        return;
+      }
+      if (typeof ref === "function") {
+        ref(value);
+        return;
+      }
+      (ref as MutableRefObject<T | null>).current = value;
+    });
+  };
+}
+
+function MenuIcon({ icon }: { icon: ReactNode }) {
+  if (!icon) {
+    return null;
+  }
+  return (
+    <svg
+      aria-hidden="true"
+      data-icon={typeof icon === "string" ? icon : undefined}
+      focusable="false"
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+    >
+      <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className={styles.subMenuIndicator}
+      focusable="false"
+      viewBox="0 0 16 16"
+      width="12"
+      height="12"
+    >
+      <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

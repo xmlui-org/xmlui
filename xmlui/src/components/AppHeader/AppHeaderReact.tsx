@@ -6,6 +6,7 @@ import styles from "./AppHeader.module.scss";
 
 export type AppHeaderProps = HTMLAttributes<HTMLElement> & {
   children?: ReactNode;
+  drawerToggle?: ReactNode;
   logoContent?: ReactNode;
   profileMenu?: ReactNode;
   showLogo?: boolean;
@@ -17,6 +18,7 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
   {
     children,
     className,
+    drawerToggle,
     logoContent,
     profileMenu,
     showLogo = defaultProps.showLogo,
@@ -41,6 +43,11 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
       role="banner"
     >
       <div className={[styles.headerInner, styles.full].join(" ")}>
+        {drawerToggle ? (
+          <div className={styles.drawerToggle} data-xmlui-part="drawerToggle">
+            {drawerToggle}
+          </div>
+        ) : null}
         <div className={styles.logoAndTitle}>
           {showLogo && logoContent ? (
             <div className={styles.logoContainer} data-xmlui-part="logo">

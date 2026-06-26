@@ -1,9 +1,17 @@
 import { test, expect } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old NavLink suite is copied for compatibility tracking, but full theme-variable matrix, React Router active semantics, icon rendering, NavGroup level inheritance, tooltip behavior, and shell integration are not complete yet. Re-enable cases feature-by-feature.",
-);
+const NAVLINK_OLD_SUITE_PENDING =
+  "The literal old NavLink suite is copied for compatibility tracking, but full theme-variable matrix, React Router active semantics, icon rendering, NavGroup level inheritance, tooltip behavior, and shell integration are not complete yet. Re-enable cases feature-by-feature.";
+
+const ACTIVE_NAVLINK_TESTS = new Set([
+  "link with exact=true is active on exact path",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_NAVLINK_TESTS.has(testInfo.title)) {
+    test.skip(true, NAVLINK_OLD_SUITE_PENDING);
+  }
+});
 
 const CODE = `<NavLink to="/">Hello</NavLink>`;
 

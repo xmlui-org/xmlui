@@ -1,4 +1,3 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 const AUTOCOMPLETE_OLD_SUITE_PENDING =
@@ -18,6 +17,7 @@ const ACTIVE_AUTOCOMPLETE_TESTS = new Set([
   "disabled state prevents interaction",
   "didChange event fires when option is selected",
   "gotFocus and lostFocus events work correctly",
+  "gotFocus and lostFocus events by clicking on label work correctly",
   "setValue API works correctly",
   "bindTo syncs $data and value",
   "focus API brings focus to the component",
@@ -25,10 +25,67 @@ const ACTIVE_AUTOCOMPLETE_TESTS = new Set([
   "creates new option when typing non-existing value",
   "has appropriate ARIA attributes",
   "supports keyboard navigation with arrow keys",
+  "custom Option children are preserved while filtering",
+  "requireLabelMode='markRequired' shows asterisk for required fields",
+  "requireLabelMode='markRequired' hides indicator for optional fields",
+  "requireLabelMode='markOptional' shows optional tag for optional fields",
+  "requireLabelMode='markOptional' hides indicator for required fields",
+  "requireLabelMode='markBoth' shows asterisk for required fields",
+  "requireLabelMode='markBoth' shows optional tag for optional fields",
+  "input requireLabelMode overrides Form itemRequireLabelMode",
+  "input inherits Form itemRequireLabelMode when not specified",
+  "multi mode allows selecting multiple options",
+  "multi mode keeps badge measurer hidden from users",
+  "group header shifts to next visible option when filtering",
+  "groupBy without groupHeaderTemplate renders plain group name",
+  "all badges stay visible when they fit in the trigger",
+  "multi-select truncates with +N more chip when badges overflow trigger width",
+  "+N more chip opens the dropdown on click",
+  "+N more chip close icon deselects only the overflow items",
+  "multi-select supports arrow-key navigation when search term is empty",
+  "input has correct width in px",
+  "input with label has correct width in px",
+  "input has correct width in %",
+  "input with label has correct width in %",
+  "applies correct textColor to placeholder",
+  "applies correct fontSize to placeholder",
+  "handles tooltip",
+  "handles variant",
+  "can select part: 'listWrapper'",
+  "can select part: 'input'",
+  "parts are present when tooltip is added",
+  "parts are present when variant is added",
+  "variant applies custom theme variables",
+  "tooltip with markdown content",
+  "animation behavior",
+  "combined tooltip and animation",
+  "all behaviors combined with parts",
+  "shows helper text and no icon when verboseValidationFeedback is true (default)",
+  "shows icon and no helper text when verboseValidationFeedback is false",
+  "prop on component overrides form default",
+  "shows valid icon in concise mode when valid",
+  "concise mode tooltip shows error message on hover",
+  "does not duplicate label when inside Form with label prop",
+  "ModalDialog > DropdownMenu > AutoComplete",
+  "ModalDialog > AutoComplete > DropdownMenu",
 ]);
 
+const ACTIVE_AUTOCOMPLETE_PREFIXES = [
+  "applies correct borderRadius",
+  "applies correct borderColor",
+  "applies correct borderWidth",
+  "applies correct borderStyle",
+  "applies correct fontSize",
+  "applies correct backgroundColor",
+  "applies correct boxShadow",
+  "applies correct textColor",
+];
+
 test.beforeEach(({}, testInfo) => {
-  if (!ACTIVE_AUTOCOMPLETE_TESTS.has(testInfo.title)) {
+  if (
+    !ACTIVE_AUTOCOMPLETE_TESTS.has(testInfo.title) &&
+    !ACTIVE_AUTOCOMPLETE_PREFIXES.some((prefix) => testInfo.title.startsWith(prefix))
+  ) {
     test.skip(true, AUTOCOMPLETE_OLD_SUITE_PENDING);
   }
 });
@@ -927,7 +984,7 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<AutoComplete width="200px" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test").locator('[data-part-id="listWrapper"]');
+  const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -945,7 +1002,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<AutoComplete width="50%" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test").locator('[data-part-id="listWrapper"]');
+  const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -1074,10 +1131,7 @@ test.describe("Theme Variables", () => {
     expect(placeholderColor).toBe("rgb(0, 0, 0)");
   });
 
-  test.fixme(
-    "applies correct fontSize to placeholder",
-    SKIP_REASON.OTHER("Does AutoComplete apply the correct css for the placeholder?"),
-    async ({ initTestBed, page }) => {
+  test("applies correct fontSize to placeholder", async ({ initTestBed, page }) => {
       await initTestBed(`<AutoComplete testId="test" placeholder="Search..." />`, {
         testThemeVars: { "fontSize-placeholder-AutoComplete--default": "20px" },
       });
@@ -1086,8 +1140,7 @@ test.describe("Theme Variables", () => {
         return window.getComputedStyle(input, "::placeholder").fontSize;
       });
       expect(placeholderFontSize).toBe("20px");
-    },
-  );
+  });
 });
 
 // =============================================================================
@@ -1120,6 +1173,7 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(
       `<AutoComplete testId="test"><Option value="1" label="Test" /></AutoComplete>`,
     );
+    await page.getByRole("combobox").click();
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
   });
@@ -1139,6 +1193,7 @@ test.describe("Behaviors and Parts", () => {
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const inputPart = page.locator("[data-part-id='input']");
 
+    await page.getByRole("combobox").click();
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
 
@@ -1163,6 +1218,7 @@ test.describe("Behaviors and Parts", () => {
     const inputPart = page.locator("[data-part-id='input']");
 
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await page.getByRole("combobox").click();
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
   });
@@ -1208,7 +1264,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <AutoComplete 
@@ -1235,6 +1291,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
 
     // Verify parts are visible
+    await page.getByRole("combobox").click();
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
   });
@@ -1363,11 +1420,12 @@ test.describe("Behaviors and Parts", () => {
 // Z-INDEX AND MODAL LAYERING TESTS
 // =============================================================================
 
-test.describe.skip("Nested DropdownMenu and AutoComplete", () => {
+test.describe("Nested DropdownMenu and AutoComplete", () => {
   test("ModalDialog > DropdownMenu > AutoComplete", async ({
     initTestBed,
     page,
     createAutoCompleteDriver,
+    createDropdownMenuDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
@@ -1395,10 +1453,7 @@ test.describe.skip("Nested DropdownMenu and AutoComplete", () => {
       </Fragment>
     `);
 
-    const createDropdownMenuDriver = async () => {
-      throw new Error("Deferred until DropdownMenu driver migration.");
-    };
-    const dropdownDriver = await createDropdownMenuDriver();
+    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
 
     await page.getByTestId("openBtn").click();
 
@@ -1422,7 +1477,7 @@ test.describe.skip("Nested DropdownMenu and AutoComplete", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    await page.getByText("Confirm action").nth(1).click();
+    await page.getByText("Confirm action").first().click();
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
@@ -1449,6 +1504,7 @@ test.describe.skip("Nested DropdownMenu and AutoComplete", () => {
     initTestBed,
     page,
     createAutoCompleteDriver,
+    createDropdownMenuDriver,
   }) => {
     await initTestBed(`
       <Fragment>
@@ -1490,10 +1546,7 @@ test.describe.skip("Nested DropdownMenu and AutoComplete", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    const createDropdownMenuDriver = async () => {
-      throw new Error("Deferred until DropdownMenu driver migration.");
-    };
-    const dropdownDriver = await createDropdownMenuDriver();
+    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
     await dropdownDriver.open();
     await page.waitForTimeout(100);
 

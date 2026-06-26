@@ -56,11 +56,14 @@ Immediate status:
 | `[done]` | P3A Text-Like Input Parity | TextBox/PasswordInput, TextArea, and NumberBox copied-old local parity are fully active with no remaining skipped/fixme tests. |
 | `[done]` | P3B Boolean, Rating, Slider, Date/Time, and Color Inputs | Component-by-component closure is complete for this phase, including the Date/Time/Rating re-sweep. DatePicker keeps one explicit Ark/mobile shell skip. |
 | `[done]` | P4A Overlay and Focus Infrastructure | Tooltip, Drawer, and ModalDialog copied-old local coverage are fully active. One FocusScope xmlui-pg/Markdown skip remains blocked by that unrelated component migration. |
-| `[current]` | P3C File and Selection Inputs | FileInput and RadioGroup are closed, FileUploadDropZone has no skips, and Select/AutoComplete have active foundation subsets; continue component-by-component with their remaining subgroups. |
+| `[done]` | P3C File and Selection Inputs | FileInput, FileUploadDropZone, RadioGroup, Select, and AutoComplete-owned slices are closed; the nested DropdownMenu/ModalDialog overlay handoff tests are active after P4B closure. |
+| `[done]` | P4B Menu Family Closure | DropdownMenu and ContextMenu copied/foundation coverage is active, SubMenuItem icon tests are active, nested Select/AutoComplete overlay handoff tests are active, and the focused P4B bundle passes with no skips. |
+| `[done]` | P4C Navigation Shell Components | Navigation-shell closure is complete for this pass; remaining skips are explicit broader theme/layout/dropdown-matrix debt. |
+| `[current]` | H3A Runtime Markup Inclusion | Start here next. |
 
 Current next marker:
 
-`NEXT: P3C File and Selection Inputs`
+`NEXT: H3A Runtime Markup Inclusion`
 
 Current verification baseline:
 
@@ -86,6 +89,22 @@ Current verification baseline:
 - ModalDialog spec: 31 passed, 0 skipped.
 - P4A focused overlay/focus bundle: 96 passed, 1 skipped.
 - Structured-form focused bundle: 78 passed, 0 skipped.
+- AutoComplete nested overlay handoff bundle: 2 passed, 0 skipped.
+- Select nested overlay handoff bundle: 2 passed, 0 skipped.
+- P4B menu-family focused bundle: 74 passed, 0 skipped. Active coverage
+  includes DropdownMenu and ContextMenu foundation/copied specs, MenuItem,
+  MenuSeparator, SubMenuItem, keyboard/focus, positioning/theme, edge cases,
+  icon support, and nested Select overlay cases.
+- P4C first-five navigation-shell bundle: 22 passed, 120 skipped. Active
+  coverage includes NavLink/NavPanel/NavGroup foundation specs, NavLink exact
+  active-state copied smoke, NavPanel direct nested discovery copied smoke, and
+  NavGroup copied smoke for expansion, disabled state, active-descendant
+  expansion, menuitem roles, and `initiallyExpanded`.
+- P4C navigation-shell focused bundle: 63 passed, 133 skipped. Active coverage
+  includes NavLink/NavPanel/NavGroup/AppHeader/Footer/NavPanelCollapseButton/
+  ProfileMenu foundation and copied smoke coverage plus App shell event
+  coverage. A focused ignored-App compatibility sweep for layouts/drawer hooks
+  passes with 12 passed.
 - Full E2E: 3203 passed, 1751 skipped.
 - TypeScript, unit tests, metadata build, and CSS module audit: passed.
 
@@ -110,7 +129,10 @@ Use this table as the quick source of truth for the next session.
 | `[done]` | P4A Component Closure - Tooltip | `Tooltip.spec.ts` is fully active: 19 passed, 0 skipped. The copied-old fixture was adjusted from unavailable `CVStack`/`email` icon triggers to migrated `Stack`/`home` fixtures without changing Tooltip behavior assertions. |
 | `[done]` | P4A Component Closure - Drawer | `Drawer.spec.ts` is fully active: 31 passed, 0 skipped. Drawer now autofocuses the close button on open, exposes copied-old padding shorthand metadata/theme variables, and keeps the no-header close-button clearance behavior active. |
 | `[done]` | P4A Component Closure - ModalDialog | `ModalDialog.spec.ts` is fully active: 31 passed, 0 skipped. P4A bundle is 96 passed, 1 FocusScope xmlui-pg/Markdown skip. |
-| `[current]` | P3C File and Selection Inputs | Start here. FileInput and RadioGroup are closed, FileUploadDropZone has no skips, and Select/AutoComplete have active foundation subsets; continue component-by-component with the remaining Select or AutoComplete subgroups. |
+| `[done]` | P3C File and Selection Inputs | FileInput, FileUploadDropZone, RadioGroup, Select, and AutoComplete-owned slices are closed; nested DropdownMenu/ModalDialog overlay handoff tests are active after P4B closure. |
+| `[done]` | P4B Menu Family Closure | DropdownMenu and ContextMenu copied/foundation coverage is active, nested Select/AutoComplete overlay handoff tests are active, and the focused P4B bundle passes with no skips. |
+| `[done]` | P4C Navigation Shell Components | Navigation-shell closure is complete for this pass; focused bundle is 63 passed, 133 explicit skips, and the ignored-App layout/drawer sweep is 12 passed. |
+| `[current]` | H3A Runtime Markup Inclusion | Start here next. |
 
 ## Compatibility Contract
 
@@ -443,17 +465,16 @@ Latest verified P2A state:
 
 ## Next Step
 
-### NEXT: P3C File and Selection Inputs
+### NEXT: H3A Runtime Markup Inclusion
 
 Fresh-session handoff prompt:
 
-> Continue `.plans/rebuild-plan.md` from **NEXT: P3C File and Selection
-> Inputs**.
+> Continue `.plans/rebuild-plan.md` from **NEXT: H3A Runtime Markup Inclusion**.
 
 Current handoff state:
 
 - This is the next executable step. A new session receiving "Go on with the
-  next step" should start here.
+  next step" should start with H3A runtime markup inclusion.
 - Do not restart earlier P2A Form work. `Form.spec.ts`, `FormItem.spec.ts`,
   `FormSegment.spec.ts`, `Checkbox.spec.ts`, and `Slider.spec.ts` are fully
   active. The latest verified P2A state above is the baseline.
@@ -501,28 +522,73 @@ Current handoff state:
   synchronization, Form validation registration, compiler contracts for
   `bindTo`/`requireLabelMode`, and Form/component required/optional label
   marker modes.
-- Select copied-old local coverage has started moving off the broad full-file
-  gate. The migrated Select foundation subset now runs actively alongside
-  `Select.foundation.spec.ts`: 18 passed and 131 skipped across the combined
-  Select run. Active coverage includes Items-generated options, FormItem
-  selection, initial value display including numeric values, disabled Select
-  and disabled options, placeholder display, focus/blur events, direct
-  `bindTo`, Form initial value, and `data`/`valueField`/`labelField` options.
-- AutoComplete copied-old local coverage has also started moving off the broad
-  full-file gate. The migrated AutoComplete foundation subset now runs actively
-  alongside `AutoComplete.foundation.spec.ts`: 25 passed and 92 skipped across
-  the combined AutoComplete run. Active coverage includes default rendering,
+- Select copied-old local coverage is closed for the Select-owned slices. The
+  broad active-test gate has been removed, and the normal combined Select run is
+  146 passed and 3 explicit skips alongside `Select.foundation.spec.ts`. Active
+  coverage includes basic options, option defaults/templates, labels and
+  autofocus, clearable single/multi behavior, searchable and searchable
+  multi-select behavior, grouping and group templates, invalid value/Form
+  synchronization, validation feedback, visual width/dropdown-height stability,
+  scroll indicators, theme variables, tooltip/variant/animation behaviors,
+  parts, custom height, data/valueField/labelField, and option updates. The
+  remaining skips are not the old broad migration gate: two nested
+  DropdownMenu/ModalDialog cases remain deferred to DropdownMenu closure, and
+  one combined-parts copied case remains as an explicit fixme.
+- AutoComplete copied-old local coverage is closed for AutoComplete-owned
+  slices. The migrated AutoComplete subset now runs actively alongside
+  `AutoComplete.foundation.spec.ts`: 115 passed and 2 skipped across the
+  combined AutoComplete run. Active coverage includes default rendering,
   placeholder display, initial value display/API value, opening/selecting,
   disabled options, filtering, empty-list and option templates, read-only and
   disabled non-interaction, didChange, focus/blur, setValue, direct
   `bindTo`/Form value synchronization, focus API, autoFocus, creatable
   foundation behavior, copied-old Enter-to-create behavior, ARIA expanded state,
-  and basic arrow-key/Enter selection.
-- Next target is either the next AutoComplete feature subgroup
-  (labels/custom children/grouping/multi/theme/validation) or the
-  next Select feature subgroup
-  (reset/readOnly/multiSelect/searchable/clearable/labels/validation),
-  whichever fresh inventory indicates is the safer closure.
+  basic arrow-key/Enter selection, and custom `Option` children preserved while
+  filtering. Label rendering now focuses the input on label click and preserves
+  gotFocus/lostFocus behavior. AutoComplete also supports component and
+  Form-inherited `requireLabelMode` required/optional marker modes. Basic
+  `groupBy` headers are active, including custom `groupHeaderTemplate` and
+  filtered visible-option header shifts. Multi mode is now active for array
+  values, visible badges, hidden badge measurer, deterministic overflow into a
+  `+N more` chip, overflow-chip removal, no vertical layout shift on overflow,
+  empty-search keyboard navigation, grouped multi filtering, and px/percent
+  width with and without labels. `dropdownHeight` now reaches the native menu.
+  Theme variables are active for root border/background/text/font/shadow,
+  validation-status variants, hover states, and placeholder color/font size.
+  Tooltip, tooltipMarkdown, variant, animation, root/list/input parts, and the
+  combined behavior/parts case are active. Verbose and concise validation
+  feedback are active, including concise icons, error tooltip text, component
+  override of the Form default, valid feedback, and the no-duplicate-label
+  Form case.
+- Remaining P3C Select slices: none. Select-owned work is closed; nested
+  DropdownMenu/ModalDialog verification is tracked with the later menu-family
+  closure.
+- Remaining P3C AutoComplete slices:
+  1. `[done]` AutoComplete multi core: multiple selection, value array,
+     selected badges.
+  2. `[done]` AutoComplete multi overflow/layout: badge measurer, truncation,
+     `+N more`, overflow removal, and vertical layout stability.
+  3. `[done]` AutoComplete multi keyboard/search: arrow navigation and
+     selection in multi mode, including empty search-term behavior.
+  4. `[done]` AutoComplete remaining grouping: grouped multi filtering and
+     group-header fallback behavior.
+  5. `[done]` AutoComplete width/layout: px/percent input width with and
+     without label.
+  6. `[done]` AutoComplete theme variables: border/background/text/hover/placeholder
+     variables.
+  7. `[done]` AutoComplete behaviors and parts: tooltip, variant, animation, and part
+     selectors.
+  8. `[done]` AutoComplete validation feedback: verbose/concise validation UI, icons,
+     tooltips, and no duplicate labels.
+  9. `[blocked/deferred]` AutoComplete nested overlay cases:
+     ModalDialog/DropdownMenu combinations. These copied-old tests still sit
+     under a skipped DropdownMenu describe block with a throwing local
+     DropdownMenu driver stub, so they should move with P4B menu-family
+     closure rather than AutoComplete local closure.
+- Next target should move past AutoComplete-owned work. Either finish the
+  remaining P3C bookkeeping around the deferred nested overlay status, or start
+  P4B menu-family closure where the DropdownMenu driver/overlay dependency can
+  be addressed directly.
 - There are unrelated dirty worktree files, including standalone sample
   `xmlui-latest.js` outputs and prior component/runtime edits. Do not revert
   files unless the user explicitly asks.
@@ -1070,11 +1136,13 @@ Verification commands:
   `npm --workspace xmlui exec -- playwright test src/components/FileInput/FileInput.spec.ts src/components/FileUploadDropZone/FileUploadDropZone.spec.ts`
 - The active Select foundation command is:
   `npm --workspace xmlui exec -- playwright test src/components/Select/Select.spec.ts src/components/Select/Select.foundation.spec.ts`
+  The latest verified result is 146 passed and 3 explicit skips.
 - The active AutoComplete foundation command is:
   `npm --workspace xmlui exec -- playwright test src/components/AutoComplete/AutoComplete.spec.ts src/components/AutoComplete/AutoComplete.foundation.spec.ts`
-  The latest verified result is 25 passed and 92 skipped.
-- Next focused commands should target the selected remaining AutoComplete
-  subgroup or Select subgroup based on fresh inventory.
+  The latest focused P3C result before P4B was 115 passed and 2 skipped; the
+  nested DropdownMenu/ModalDialog overlay handoff tests are now active and pass
+  after P4B closure.
+- Next focused commands should move into H3A runtime markup inclusion.
 - TypeScript:
   `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - Unit tests:
@@ -1537,10 +1605,7 @@ Completed in this P2A phase:
 
 Next closure group:
 
-1. `[current]` P3C File and Selection Inputs. FileInput and RadioGroup are
-   closed, FileUploadDropZone has no skips, and the Select/AutoComplete
-   foundation subsets are active; continue with a remaining AutoComplete or
-   Select subgroup.
+1. `[current]` H3A Runtime Markup Inclusion.
 
 ### 2. [done] P2A: FormItem/Input Closure
 
@@ -1674,22 +1739,25 @@ Component closure order:
 4. `[blocked]` One FocusScope xmlui-pg/Markdown fixture remains blocked until
    that unrelated component migration is available.
 
-### 8. [current] P3C: File and Selection Inputs
+### 8. [done] P3C: File and Selection Inputs
 
 Components:
 
 - `[done]` `FileInput`
 - `[done/no skips]` `FileUploadDropZone`
 - `[done]` `RadioGroup`
-- `[partial]` `Select`
-- `[partial]` `AutoComplete`
+- `[done]` `Select`
+- `[done]` `AutoComplete` - AutoComplete-owned slices are
+  active: multi, grouping, keyboard/search, width/layout, theme variables,
+  behaviors/parts, validation feedback, and nested DropdownMenu/ModalDialog
+  overlay handoff tests.
 
 Goal:
 
 - Close file handling, dropdown behavior, selection state, form binding,
   validation, keyboard navigation, and overlay integration.
 
-### 9. [remaining] P4B: Menu Family Closure
+### 9. [done] P4B: Menu Family Closure
 
 Components:
 
@@ -1703,7 +1771,53 @@ Goal:
 - Close trigger behavior, keyboard navigation, focus handling, nested menus,
   context positioning, and styling parity.
 
-### 10. [remaining] P4C: Navigation Shell Components
+Current slice state:
+
+1. `[done]` Inventory and reference: `.ai/p4b-menu-family-inventory.md`
+   records the old implementation/drivers, current rewrite surface, and copied
+   suite state.
+2. `[done]` Test gate and drivers: `DropdownMenu.spec.ts` and
+   `ContextMenu.spec.ts` now use active-test gates instead of file-level skips;
+   menu drivers expose copied-suite helpers for trigger lookup, menu content,
+   separators, submenu hover, and open-state checks.
+3. `[done]` DropdownMenu basics: copied-old tests are active for basic
+   rendering, rendering items, open/close, and menu item click/close behavior.
+4. `[done]` MenuItem core: disabled MenuItem behavior is active for
+   DropdownMenu and ContextMenu copied tests, with disabled clicks ignored while
+   remaining targetable by copied-driver interactions.
+5. `[done]` MenuSeparator filtering: copied top-level DropdownMenu and
+   ContextMenu separator filtering is active, and submenu separator filtering
+   is active for DropdownMenu. ContextMenu now shares the DOM-level separator
+   filter instead of relying only on CSS hiding.
+6. `[done]` SubMenuItem core: copied basic submenu hover/open behavior is
+   active for DropdownMenu and ContextMenu. SubMenuItem icon support remains a
+   later explicit copied subgroup.
+7. `[done]` DropdownMenu positioning and alignment: copied start/end alignment
+   and trigger-to-menu positioning tests are active.
+8. `[done]` Keyboard and focus: copied DropdownMenu and ContextMenu arrow-key
+   focus navigation plus Enter activation tests are active; DropdownMenu
+   trigger ARIA expanded/haspopup state is active.
+9. `[done]` ContextMenu basics and `$context`: copied `openAt`, right-click
+   open, close behavior, API close, multiple open targets, UDC `$context`
+   propagation, and repeated-open context refresh tests are active.
+10. `[done]` Shared menu styling and parts: copied DropdownMenu and ContextMenu
+    theme-variable, class/part selector, empty-content, special-character, and
+    positioning tests are active.
+11. `[done]` Deferred overlay unlock: nested DropdownMenu/ModalDialog overlay
+    cases deferred from Select and AutoComplete are active and pass.
+
+Latest focused verification:
+
+- `npm --workspace xmlui exec -- playwright test src/components/DropdownMenu/DropdownMenu.spec.ts src/components/DropdownMenu/DropdownMenu.foundation.spec.ts src/components/ContextMenu/ContextMenu.spec.ts src/components/ContextMenu/ContextMenu.foundation.spec.ts --reporter=list --workers=2`
+  - 74 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/Select/Select.spec.ts src/components/AutoComplete/AutoComplete.spec.ts --grep "ModalDialog > (DropdownMenu > (Select|AutoComplete)|(Select|AutoComplete) > DropdownMenu)" --reporter=list --workers=2`
+  - 4 passed
+  - 0 skipped
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+
+### 10. [done] P4C: Navigation Shell Components
 
 Components:
 
@@ -1720,7 +1834,60 @@ Goal:
 - Close app-shell navigation, active route state, collapse/expand behavior,
   profile menu behavior, and responsive shell layout.
 
-### 11. [remaining] H3A: Runtime Markup Inclusion
+Current slice state:
+
+1. `[done]` Inventory and plan bookkeeping:
+   `.ai/p4c-navigation-shell-inventory.md` records the old/rewrite source
+   targets and slice breakdown.
+2. `[done]` Replace file-level skips with active-test gates for P4C copied
+   suites. NavLink, NavPanel, and NavGroup copied-old suites now use explicit
+   active-test gates instead of file-level skips.
+3. `[done]` NavLink foundation/copy-smoke activation. Foundation coverage and
+   copied exact-route active-state smoke are active.
+4. `[done]` NavPanel foundation/copy-smoke activation. Foundation coverage and
+   direct nested NavGroup/NavLink discovery smoke are active. Compound
+   component and dynamic `Items` discovery remain gated for later shared
+   discovery/runtime work.
+5. `[done]` NavGroup foundation/copy-smoke activation. Foundation coverage and
+   copied expansion, disabled, menuitem-role, active-descendant expansion, and
+   `initiallyExpanded` smoke coverage are active. Nested initially-expanded
+   dropdown ordering remains gated because the rewrite currently has inline
+   NavGroup rendering only; original XMLUI orders non-vertical nested submenu
+   content after sibling top-level items.
+6. `[done]` AppHeader copied basics and accessibility. AppHeader foundation
+   plus copied basic, title, logo template, accessibility, focus, direct theme,
+   border-left, and edge cases are active. The remaining copied shorthand border
+   case stays gated with the broader theme-matrix debt.
+7. `[done]` Footer copied basics and accessibility. Footer foundation plus
+   copied basic content, multiple items, contentinfo role, interactive child
+   focus, empty/long content, and direct visual theme variables are active.
+   Sticky layout matrix and shorthand/decomposed border/padding/height matrix
+   stay gated for the broader App layout/theme pass.
+8. `[done]` NavPanelCollapseButton plus ProfileMenu closure. Existing
+   foundation coverage is active for collapse context absence, collapse
+   toggling, custom labels/icons, keyboard activation, default ProfileMenu from
+   `loggedInUser`, absent user, and profile template override.
+9. `[done]` App shell integration sweep: active route, drawer/mobile,
+   collapse/layout interactions. The focused ignored-App compatibility sweep is
+   active on demand and now passes for vertical layouts, desktop header/footer
+   combinations, and condensed mobile drawer-toggle visibility for
+   `NavPanel when` true/false forms. AppHeader renders the legacy
+   `data-part-id="hamburger"` hook when App detects a visible direct NavPanel.
+
+Latest focused verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  - passed
+- `npm --workspace xmlui exec -- playwright test src/components/NavLink/NavLink.foundation.spec.ts src/components/NavLink/NavLink.spec.ts src/components/NavPanel/NavPanel.foundation.spec.ts src/components/NavPanel/NavPanel.spec.ts src/components/NavGroup/NavGroup.foundation.spec.ts src/components/NavGroup/NavGroup.spec.ts --reporter=list --workers=2`
+  - 22 passed
+  - 120 skipped
+- `npm --workspace xmlui exec -- playwright test src/components/NavLink/NavLink.foundation.spec.ts src/components/NavLink/NavLink.spec.ts src/components/NavPanel/NavPanel.foundation.spec.ts src/components/NavPanel/NavPanel.spec.ts src/components/NavGroup/NavGroup.foundation.spec.ts src/components/NavGroup/NavGroup.spec.ts src/components/AppHeader/AppHeader.foundation.spec.ts src/components/AppHeader/AppHeader.spec.ts src/components/Footer/Footer.foundation.spec.ts src/components/Footer/Footer.spec.ts src/components/NavPanelCollapseButton/NavPanelCollapseButton.foundation.spec.ts src/components/ProfileMenu/ProfileMenu.foundation.spec.ts src/components/App/App-shell.spec.ts --reporter=list --workers=2`
+  - 63 passed
+  - 133 skipped
+- `env XMLUI_INCLUDE_INCOMPLETE_COMPAT=1 npm --workspace xmlui exec -- playwright test src/components/App/App.spec.ts --grep "renders with vertical layout|renders with vertical-sticky layout|renders with vertical-full-header layout|desktop layout renders with header and footer|desktop layout works without header|desktop layout works without footer|desktop layout works with only content|Drawer displayed if NavPanel|Drawer not displayed if NavPanel" --reporter=list --workers=2`
+  - 12 passed
+
+### 11. [current] H3A: Runtime Markup Inclusion
 
 Component:
 

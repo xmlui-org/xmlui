@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { createMetadata, dAutoFocus, dComponent, dDidChange, dEnabled, dGotFocus, dInitialValue, dLabel, dLostFocus, dPlaceholder, dReadonly, dRequired } from "../../component-core/metadata/helpers";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import { createRuntimeScope } from "../../runtime/state";
-import { templateChildren, wrapComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { nonPropertyChildren, templateChildren, wrapComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./AutoComplete.defaults";
@@ -13,6 +13,13 @@ const COMP = "AutoComplete";
 
 const autoCompleteStylesSource = `
 $backgroundColor-AutoComplete: createThemeVar("backgroundColor-AutoComplete");
+$textColor-AutoComplete: createThemeVar("textColor-AutoComplete");
+$borderColor-AutoComplete: createThemeVar("borderColor-AutoComplete");
+$borderWidth-AutoComplete: createThemeVar("borderWidth-AutoComplete");
+$borderStyle-AutoComplete: createThemeVar("borderStyle-AutoComplete");
+$borderRadius-AutoComplete: createThemeVar("borderRadius-AutoComplete");
+$fontSize-AutoComplete: createThemeVar("fontSize-AutoComplete");
+$boxShadow-AutoComplete: createThemeVar("boxShadow-AutoComplete");
 $backgroundColor-menu-AutoComplete: createThemeVar("backgroundColor-menu-AutoComplete");
 $boxShadow-menu-AutoComplete: createThemeVar("boxShadow-menu-AutoComplete");
 $borderRadius-menu-AutoComplete: createThemeVar("borderRadius-menu-AutoComplete");
@@ -32,12 +39,16 @@ export const AutoCompleteMd = createMetadata({
     testId: { description: "The test id.", valueType: "string" },
     bindTo: { description: "Name of the Form data field this component binds to.", valueType: "string" },
     label: dLabel(),
+    labelPosition: { description: "Sets the label position.", valueType: "string" },
+    labelBreak: { description: "Allows the label to wrap.", valueType: "boolean" },
+    labelWidth: { description: "Sets the label width.", valueType: "length" },
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     value: { description: "Controlled value.", valueType: "any" },
     maxLength: { description: "Maximum input length.", valueType: "number" },
     autoFocus: { ...dAutoFocus(), defaultValue: defaultProps.autoFocus },
     required: { ...dRequired(), defaultValue: defaultProps.required },
+    requireLabelMode: { description: "Controls required/optional label markers.", valueType: "string" },
     readOnly: { ...dReadonly(), defaultValue: defaultProps.readOnly },
     enabled: { ...dEnabled(), defaultValue: defaultProps.enabled },
     initiallyOpen: {
@@ -45,6 +56,7 @@ export const AutoCompleteMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.initiallyOpen,
     },
+    modal: { description: "Legacy overlay modal compatibility flag.", valueType: "boolean" },
     creatable: {
       description: "Allows users to create new options that are not present in the list.",
       valueType: "boolean",
@@ -55,6 +67,14 @@ export const AutoCompleteMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.validationStatus,
     },
+    verboseValidationFeedback: {
+      description: "Controls whether validation messages are rendered as helper text or concise icons.",
+      valueType: "boolean",
+    },
+    validationMode: {
+      description: "Controls when validation feedback is shown.",
+      valueType: "string",
+    },
     dropdownHeight: {
       description: "Sets the height of the dropdown list.",
       valueType: "length",
@@ -64,6 +84,13 @@ export const AutoCompleteMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.multi,
     },
+    groupBy: {
+      description: "Option property name used to group AutoComplete options.",
+      valueType: "string",
+    },
+    groupHeaderTemplate: dComponent(
+      "Customizes the section header rendered above each group. Use the `$group` context variable.",
+    ),
     optionTemplate: dComponent(
       "This property enables customization of list items. Use the `$item` context variable to access the option.",
     ),
@@ -93,6 +120,13 @@ export const AutoCompleteMd = createMetadata({
   themeVars: extractScssThemeVars(autoCompleteStylesSource),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",
+    [`textColor-${COMP}`]: "$textColor-primary",
+    [`borderColor-${COMP}`]: "$borderColor-Input-default",
+    [`borderWidth-${COMP}`]: "1px",
+    [`borderStyle-${COMP}`]: "solid",
+    [`borderRadius-${COMP}`]: "$borderRadius",
+    [`fontSize-${COMP}`]: "$fontSize",
+    [`boxShadow-${COMP}`]: "none",
     [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
@@ -120,6 +154,7 @@ export const autoCompleteRenderer = wrapComponent({
         }}
         id={adapter.stringProp("id")}
         bindTo={adapter.stringProp("bindTo")}
+        label={adapter.stringProp("label")}
         initialValue={adapter.prop("initialValue")}
         value={adapter.prop("value")}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
@@ -127,9 +162,20 @@ export const autoCompleteRenderer = wrapComponent({
         autoFocus={adapter.booleanProp("autoFocus", defaultProps.autoFocus)}
         readOnly={adapter.booleanProp("readOnly", defaultProps.readOnly)}
         required={adapter.booleanProp("required", defaultProps.required)}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
+        validationStatus={adapter.stringProp("validationStatus")}
+        verboseValidationFeedback={
+          Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+            ? adapter.booleanProp("verboseValidationFeedback", true)
+            : undefined
+        }
+        validationMode={adapter.stringProp("validationMode")}
+        multi={adapter.booleanProp("multi", defaultProps.multi)}
+        dropdownHeight={adapter.prop("dropdownHeight")}
         initiallyOpen={adapter.booleanProp("initiallyOpen", defaultProps.initiallyOpen)}
         creatable={adapter.booleanProp("creatable", defaultProps.creatable)}
         options={autoCompleteOptions(adapter)}
+        popupChildren={autoCompletePopupChildren(adapter)}
         emptyListTemplate={hasTemplate(adapter, "emptyListTemplate")
           ? adapter.renderTemplate("emptyListTemplate")
           : undefined}
@@ -146,6 +192,13 @@ function autoCompleteOptions(adapter: XmluiComponentAdapter): AutoCompleteOption
   return adapter.node.children.flatMap((child) => optionFromChild(child, adapter));
 }
 
+function autoCompletePopupChildren(adapter: XmluiComponentAdapter): ReactNode {
+  const children = nonPropertyChildren(adapter.node.children).filter(
+    (child) => !(child.kind === "element" && child.type === "Option"),
+  );
+  return children.length > 0 ? adapter.renderChildren(children) : undefined;
+}
+
 function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): AutoCompleteOption[] {
   if (child.kind !== "element" || child.type !== "Option") {
     return [];
@@ -159,6 +212,10 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Auto
   const label = Object.prototype.hasOwnProperty.call(child.props, "label")
     ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, adapter.scope, "AutoComplete:Option:label")
     : optionLabelFromChildren(child, adapter);
+  const textLabel = renderableLabel(label, value);
+  const optionChildren = child.children.length > 0
+    ? adapter.context.renderChildren(child.children, adapter.scope)
+    : undefined;
   const optionTemplate = templateChildren(adapter.node, "optionTemplate");
   const renderedLabel = optionTemplate
     ? adapter.context.renderChildren(optionTemplate, createRuntimeScope({
@@ -168,18 +225,47 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Auto
       contextValues: {
         $item: {
           value,
-          label: renderableLabel(label, value),
+          label: textLabel,
         },
       },
       references: adapter.scope.references,
       slots: adapter.scope.slots,
       emitEvent: adapter.scope.emitEvent,
     }))
-    : renderableLabel(label, value);
+    : optionChildren ?? textLabel;
   const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
     ? booleanOptionValue(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "AutoComplete:Option:enabled"))
     : true;
-  return [{ value, label: renderedLabel, enabled }];
+  const groupBy = adapter.stringProp("groupBy");
+  const groupValue = groupBy && Object.prototype.hasOwnProperty.call(child.props, groupBy)
+    ? evaluateExpressionOrText(child.props[groupBy], child.parsed?.props?.[groupBy], adapter.scope, `AutoComplete:Option:${groupBy}`)
+    : undefined;
+  const group = groupValue === undefined || groupValue === null ? undefined : String(groupValue);
+  const groupTemplate = templateChildren(adapter.node, "groupHeaderTemplate");
+  const groupHeader = group && groupTemplate
+    ? adapter.context.renderChildren(groupTemplate, createRuntimeScope({
+      store: adapter.scope.store,
+      parent: adapter.scope,
+      props: adapter.scope.props,
+      contextValues: { $group: group },
+      references: adapter.scope.references,
+      slots: adapter.scope.slots,
+      emitEvent: adapter.scope.emitEvent,
+    }))
+    : undefined;
+  const keywords = Object.prototype.hasOwnProperty.call(child.props, "keywords")
+    ? keywordsValue(evaluateExpressionOrText(child.props.keywords, child.parsed?.props?.keywords, adapter.scope, "AutoComplete:Option:keywords"))
+    : undefined;
+  return [{
+    value,
+    label: renderedLabel,
+    searchText: typeof textLabel === "string" ? textLabel : String(value ?? ""),
+    selectionLabel: typeof textLabel === "string" ? textLabel : String(value ?? ""),
+    group,
+    groupHeader,
+    keywords,
+    enabled,
+  }];
 }
 
 function hasTemplate(adapter: XmluiComponentAdapter, name: string): boolean {
@@ -205,6 +291,16 @@ function booleanOptionValue(value: unknown): boolean {
     return value !== "false";
   }
   return Boolean(value);
+}
+
+function keywordsValue(value: unknown): string[] | undefined {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item));
+  }
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  return [String(value)];
 }
 
 function renderableLabel(label: unknown, value: unknown): ReactNode {
