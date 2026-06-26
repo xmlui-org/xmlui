@@ -1,9 +1,173 @@
-<VStack padding="2rem" gap="1rem">
-  <AiConversation
-    title="XMLUI app builder"
-    provider="OpenAI"
-    model="gpt-5.2"
-    status="Design stub"
-    placeholder="The real component will show a project-aware conversation here."
-  />
-</VStack>
+<App
+  var.demoState='{
+    {
+      activeRun: { id: "run_1", status: "running", provider: "openai", model: "gpt-5.2" },
+      messages: [
+        {
+          id: "msg_user_1",
+          role: "user",
+          status: "complete",
+          parts: [{ kind: "text", text: "Build a CRM dashboard with XMLUI." }],
+        },
+        {
+          id: "msg_assistant_1",
+          role: "assistant",
+          status: "streaming",
+          parts: [
+            { kind: "text", text: "Building the dashboard...", streaming: true },
+            {
+              kind: "reasoning",
+              text: "I am outlining the sections that can be composed from stock XMLUI blocks.",
+              summary: true,
+            },
+            { kind: "source", title: "XMLUI data docs", url: "https://xmlui.dev/docs/data" },
+            { kind: "tool-call", toolCallId: "tool_docs_1" },
+          ],
+        },
+        {
+          id: "msg_assistant_2",
+          role: "assistant",
+          status: "complete",
+          parts: [
+            {
+              kind: "clarification",
+              question: "Should the dashboard prioritize pipeline health or account activity?",
+              choices: ["Pipeline health", "Account activity"],
+              reason: "The first layout decision affects the summary cards and the chart focus.",
+            },
+          ],
+        },
+      ],
+      toolCalls: [
+        {
+          id: "tool_docs_1",
+          name: "xmlui_search",
+          status: "running",
+          inputSummary: "Search XMLUI docs for DataSource and Table examples",
+        },
+        {
+          id: "tool_validate_1",
+          name: "xmlui_validate",
+          status: "succeeded",
+          inputSummary: "Validate the generated XMLUI preview",
+          outputSummary: "The preview compiled and rendered successfully.",
+        },
+      ],
+      approvals: [
+        {
+          id: "approval_1",
+          status: "requested",
+          title: "Replace the current XMLUI page",
+          reason: "The agent wants to replace the current page markup with a generated dashboard layout.",
+          details: "This will overwrite the current draft, but the last working version is still available for comparison.",
+        },
+      ],
+      generation: {
+        status: "accepted",
+        summary: "Created a starter app.",
+        code: `<App>
+  <VStack gap="$space-4">
+    <Text variant="title">CRM dashboard</Text>
+    <Text>Welcome back, the pipeline is healthy.</Text>
+  </VStack>
+</App>`,
+      },
+    }
+  }'
+  var.demoEventSummaries='{
+    [
+      "Happy path: run=running, messages=3, tools=2, approvals=1, generation=accepted",
+      "Clarification: run=awaiting-approval, messages=2, tools=0, approvals=2, generation=generating",
+      "Error recovery: run=failed, messages=1, tools=1, approvals=1, generation=failed",
+    ]
+  }'>
+  <VStack padding="2rem" gap="1.5rem" maxWidth="1120px">
+    <Card title="Phase 1 fixture-backed state" subtitle="xmlui-ai-blocks">
+      <VStack gap="$space-3">
+        <Text>
+          This is the seed state for the later AI thread and preview phases. It is built
+          from local fixtures only.
+        </Text>
+
+        <VStack gap="$space-1">
+          <Text>Run: {demoState.activeRun.id}</Text>
+          <Text>Status: {demoState.activeRun.status}</Text>
+          <Text>Messages: {demoState.messages.length}</Text>
+          <Text>Tools: {demoState.toolCalls.length}</Text>
+          <Text>Approvals: {demoState.approvals.length}</Text>
+        </VStack>
+      </VStack>
+    </Card>
+
+    <Card title="Messages" subtitle="Normalized thread transcript">
+      <VStack gap="$space-3">
+        <Items data="{ demoState.messages }">
+          <Card>
+            <VStack gap="$space-2">
+              <Text variant="strong">{$item.role} - {$item.status} - {$item.id}</Text>
+              <Items data="{ $item.parts }">
+                <Text>
+                  {$item.kind === "text"
+                    ? ($item.streaming ? "Text (streaming): " : "Text: ") + $item.text
+                    : $item.kind === "reasoning"
+                      ? "Reasoning" + ($item.summary ? " summary" : "") + ": " + $item.text
+                      : $item.kind === "source"
+                        ? "Source: " + ($item.title ?? $item.url ?? "untitled") + ($item.url ? " (" + $item.url + ")" : "")
+                        : $item.kind === "tool-call"
+                          ? "Tool call reference: " + $item.toolCallId
+                          : $item.kind === "clarification"
+                            ? "Clarification: " + $item.question +
+                              ($item.choices && $item.choices.length > 0 ? " Choices: " + $item.choices.join(", ") : "") +
+                              ($item.reason ? " Reason: " + $item.reason : "")
+                            : $item.kind === "error"
+                              ? "Error: " + $item.message + ($item.code ? " [" + $item.code + "]" : "")
+                              : "Unknown part kind"}
+                </Text>
+              </Items>
+            </VStack>
+          </Card>
+        </Items>
+      </VStack>
+    </Card>
+
+    <Card title="Tool calls" subtitle="Lifecycle snapshots">
+      <Items data="{ demoState.toolCalls }">
+        <Card>
+          <VStack gap="$space-2">
+            <Text variant="strong">{$item.name} - {$item.status}</Text>
+            <Text>
+              Input: {$item.inputSummary ?? $item.outputSummary ?? "No summary available."}
+              {$item.outputSummary ? " Output: " + $item.outputSummary : ""}
+              {$item.error ? " Error: " + $item.error : ""}
+            </Text>
+          </VStack>
+        </Card>
+      </Items>
+    </Card>
+
+    <Card title="Approvals" subtitle="Human decision surfaces">
+      <Items data="{ demoState.approvals }">
+        <Card>
+          <VStack gap="$space-2">
+            <Text variant="strong">{$item.title ?? $item.id}</Text>
+            <Text>{$item.status}</Text>
+            <Text>{$item.reason ?? $item.details ?? "No additional context."}</Text>
+          </VStack>
+        </Card>
+      </Items>
+    </Card>
+
+    <Card title="Generated XMLUI" subtitle="Current fixture code">
+      <VStack gap="$space-3">
+        <Text>{demoState.generation.summary ?? "No generation summary available."}</Text>
+        <CodeBlock>{demoState.generation.code ?? "No generated code yet."}</CodeBlock>
+      </VStack>
+    </Card>
+
+    <Card title="Events" subtitle="Fake bridge sequence">
+      <Items data="{ demoEventSummaries }">
+        <Text>{$item}</Text>
+      </Items>
+    </Card>
+  </VStack>
+</App>

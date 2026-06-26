@@ -146,6 +146,7 @@ Key components:
 - `AiApprovalRequest`
 - `XmluiPreviewPane`
 - `XmluiCodeView`
+- `XmluiBuilderFrame`
 
 Recipe-first UI patterns:
 
@@ -156,6 +157,7 @@ Recipe-first UI patterns:
 - Connection status
 - Run timeline
 - Workspace panel
+- Builder frame usage
 - Saved micro-app list
 
 This package can perform client-side validation for fast feedback, but final acceptance of generated XMLUI belongs to the bridge.
@@ -206,7 +208,7 @@ Host XMLUI app
 This plan is implementable only if the builder agent keeps the package boundaries strict:
 
 - Treat `AiThread` as the primary client-side controller; `XmluiGenerationSession` may be separate or an `AiThread` mode, but do not introduce a second public conversation abstraction.
-- Keep chat, workspace, model selection, status bars, revision selectors, and saved-app browsing as XMLUI recipes unless the lower-level `plan.md` Promotion Gate is satisfied.
+- Keep chat, model selection, status bars, revision selectors, and saved-app browsing as XMLUI recipes unless the lower-level `plan.md` Promotion Gate is satisfied. The planned `XmluiBuilderFrame` may arrange chat/workspace regions, but it should not replace transcript/composer recipes with a fixed `ChatPane` or `AiChatPane` component.
 - Preserve the current-vs-last-working revision model. Broken current generations must remain inspectable with diagnostics; the UI may offer last-working as a selector, not as a silent replacement.
 - Treat future artifact and persistence contract work as a portable single-app persistence layer, not as a requirement for artifact card/chip UI or multi-file workspaces.
 - Keep bridge-owned work in `xmlui-ai-bridge`: provider credentials, trusted tool execution, policy enforcement, final validation, repair, logging, and usage accounting.
@@ -224,6 +226,9 @@ This plan is implementable only if the builder agent keeps the package boundarie
 ### Step 2: Client Harness
 
 - Rework `xmlui-ai-blocks` around `AiThread`.
+- Add `XmluiBuilderFrame` early so transcript, preview, code, toolbar, and status
+  surfaces can be validated against the host frame before smaller visual component
+  APIs settle.
 - Add `AiMessageParts`, tool-call, and approval primitives.
 - Port generated-code state from A2XMLUI `AgentChat`.
 - Port `XmluiPreviewPane` and `XmluiCodeView`.
