@@ -45,10 +45,57 @@ test.describe("Pages foundation", () => {
     await expect(page).toHaveURL(/#\/$/);
     await expect(page.getByText("Home Page")).toBeVisible();
   });
-});
 
-test.describe("Pages old-suite transfer debt", () => {
-  test("copy literal old route guards, canonical URL, scroll restoration, and search-index tests", async () => {
-    test.fixme(true, "Full Pages/Page suite is deferred to routing closure");
+  test("prefers the most specific route and decodes params", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/files/:id">
+            <Text testId="page">Param {$routeParams.id}</Text>
+          </Page>
+          <Page url="/files/new">
+            <Text testId="page">New file</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await page.evaluate(() => { window.location.hash = "#/files/new"; });
+    await expect(page.getByTestId("page")).toHaveText("New file");
+
+    await page.evaluate(() => { window.location.hash = "#/files/a%20b"; });
+    await expect(page.getByTestId("page")).toHaveText("Param a b");
+  });
+
+  test("navigate supports query params and query-only updates", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/docs/start">
+            <Button testId="next" onClick="navigate('/docs/next', { tab: 'api' })">Next</Button>
+            <Button testId="query" onClick="navigate('?tab=guide')">Query</Button>
+            <Text testId="route">{$pathname}:{$queryParams.tab}:{$queryString}</Text>
+          </Page>
+          <Page url="/docs/next">
+            <Text testId="route">{$pathname}:{$queryParams.tab}:{$queryString}</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await page.evaluate(() => { window.location.hash = "#/docs/start"; });
+    await expect(page.getByTestId("route")).toHaveText("/docs/start::");
+    await page.getByTestId("next").click();
+    await expect(page).toHaveURL(/#\/docs\/next\?tab=api/);
+    await expect(page.getByTestId("route")).toHaveText("/docs/next:api:?tab=api");
+
+    await page.evaluate(() => { window.location.hash = "#/docs/start"; });
+    await expect(page.getByTestId("route")).toHaveText("/docs/start::");
+    await page.getByTestId("query").click();
+    await expect(page).toHaveURL(/#\/docs\/start\?tab=guide$/);
+    await expect(page.getByTestId("route")).toHaveText("/docs/start:guide:?tab=guide");
   });
 });

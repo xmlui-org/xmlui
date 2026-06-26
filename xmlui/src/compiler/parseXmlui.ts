@@ -394,6 +394,9 @@ function contentChildren(
 
   for (const child of children) {
     if (child.kind === MarkupSyntaxKind.Element) {
+      if (tagName(child, source) === "script") {
+        continue;
+      }
       result.push(transformElement(child, source, sourceId, namespaces));
       continue;
     }

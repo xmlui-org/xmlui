@@ -13,6 +13,7 @@ import {
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
+import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
@@ -219,6 +220,7 @@ export function XmluiRoot({
     <XmluiThemeRoot>
       <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
       {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+      <GlobalLiveRegion />
       <ToastHost service={toastRef.current} />
     </XmluiThemeRoot>
   );

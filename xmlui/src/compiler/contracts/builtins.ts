@@ -283,7 +283,11 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       testId: { name: "testId" },
       layout: { name: "layout" },
+      name: { name: "name" },
       loggedInUser: { name: "loggedInUser" },
+      scrollWholePage: { name: "scrollWholePage" },
+      noScrollbarGutters: { name: "noScrollbarGutters" },
+      fitContent: { name: "fitContent" },
       useHashBasedRouting: { name: "useHashBasedRouting" },
       locale: { name: "locale" },
       localeBundles: { name: "localeBundles" },
@@ -297,6 +301,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {
       ready: { name: "ready", attributeName: "onReady" },
       messageReceived: { name: "messageReceived", attributeName: "onMessageReceived" },
+      willNavigate: { name: "willNavigate", attributeName: "onWillNavigate" },
+      didNavigate: { name: "didNavigate", attributeName: "onDidNavigate" },
       keyDown: { name: "keyDown", attributeName: "onKeyDown" },
       keyUp: { name: "keyUp", attributeName: "onKeyUp" },
     },

@@ -86,6 +86,23 @@ export const AppMd = createMetadata({
         data: "The data sent from the other window via postMessage.",
       },
     },
+    willNavigate: {
+      description:
+        "This event fires before programmatic navigation. Return false to cancel navigation.",
+      signature: "willNavigate(to: string, queryParams?: any): boolean | void",
+      parameters: {
+        to: "The target path or history delta to navigate to.",
+        queryParams: "Optional query parameters passed to the navigation request.",
+      },
+    },
+    didNavigate: {
+      description: "This event fires after the current route changes.",
+      signature: "didNavigate(to: string, queryParams?: any): void",
+      parameters: {
+        to: "The path navigated to.",
+        queryParams: "The query parameters for the current route.",
+      },
+    },
     keyDown: {
       description: "This event fires when a key is pressed at the app level.",
       signature: "keyDown(event: KeyboardEvent): void",
@@ -113,6 +130,10 @@ export const AppMd = createMetadata({
     $queryParams: {
       description: "The current query parameters.",
       valueType: "any",
+    },
+    $queryString: {
+      description: "The current query string.",
+      valueType: "string",
     },
   },
   themeVars: extractScssThemeVars(appStylesSource),

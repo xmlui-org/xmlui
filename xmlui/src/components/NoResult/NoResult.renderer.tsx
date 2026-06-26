@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { Children, type CSSProperties, type ReactNode } from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent } from "../../runtime/rendering/adapter";
@@ -30,7 +30,7 @@ function labelFor(label: unknown, children: ReactNode): ReactNode {
   if (label !== undefined && label !== null) {
     return String(label);
   }
-  if (children !== undefined && children !== null && children !== "") {
+  if (children !== undefined && children !== null && children !== "" && Children.count(children) > 0) {
     return children;
   }
   return "No results found";

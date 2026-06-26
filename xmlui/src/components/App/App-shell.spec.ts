@@ -49,11 +49,22 @@ test.describe("App shell foundation", () => {
 });
 
 test.describe("App shell old-suite transfer debt", () => {
-  test("messageReceived passes the MessageEvent as the second argument", async () => {
-    test.fixme(true, "Current event parser supports only zero- or single-parameter arrow callbacks");
-  });
+  test("messageReceived passes the MessageEvent as the second argument", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App
+        var.eventInfo="none"
+        onMessageReceived="(msg, ev) => eventInfo = msg.text + ':' + ev.type">
+        <Text testId="eventInfo">{eventInfo}</Text>
+      </App>
+    `);
 
-  test("copy literal remaining App shell, layout, navigation, and script-import tests", async () => {
-    test.fixme(true, "Full App shell compatibility is deferred to Wave G1 closure");
+    await page.evaluate(() => {
+      window.postMessage({ text: "hello-app-event" }, "*");
+    });
+
+    await expect(page.getByTestId("eventInfo")).toHaveText("hello-app-event:message");
   });
 });

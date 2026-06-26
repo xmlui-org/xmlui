@@ -879,23 +879,83 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     normalizeLegacyTestMarkup(markup.trim()),
   );
   const trimmed = normalizedMarkup;
-  if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
-    return trimmed;
-  }
-  const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
   const testBedAppAttributes = {
     "paddingHorizontal-content-App": "0",
     "paddingVertical-content-App": "0",
     "gap-content-App": "0",
   };
-  const appThemeAttributes = Object.entries(testBedAppAttributes)
+  const appThemeAttributeEntries = Object.entries({
+    ...testBedAppAttributes,
+    ...(options.testThemeVars ?? {}),
+  })
+    .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`);
+  if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
+    const injectedAttributes = [
+      ...appThemeAttributeEntries,
+      ...declarations,
+      trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{null}"` : "",
+    ].filter(Boolean);
+    return injectAppAttributes(trimmed, injectedAttributes);
+  }
+  const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
+  const defaultAppThemeAttributes = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themeAttributes = Object.entries(options.testThemeVars ?? {})
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{null}" ${appThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{null}" ${defaultAppThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+}
+
+function injectAppAttributes(markup: string, attributes: string[]): string {
+  if (attributes.length === 0) {
+    return markup;
+  }
+  const end = findOpeningAppTagEnd(markup);
+  if (end < 0) {
+    return markup;
+  }
+  const openTag = markup.slice(0, end + 1);
+  const selfClosing = /\/\s*>$/.test(openTag);
+  const existing = selfClosing
+    ? openTag.slice(4, openTag.lastIndexOf("/"))
+    : openTag.slice(4, -1);
+  const names = new Set([...existing.matchAll(/\s([^\s=]+)=/g)].map((match) => match[1]));
+  const filtered = attributes
+    .filter((entry) => {
+      const name = entry.split("=")[0];
+      return name && !names.has(name);
+    })
+    .join(" ");
+  if (!filtered) {
+    return markup;
+  }
+  const rebuilt = selfClosing
+    ? `<App${existing} ${filtered} />`
+    : `<App${existing} ${filtered}>`;
+  return `${rebuilt}${markup.slice(end + 1)}`;
+}
+
+function findOpeningAppTagEnd(markup: string): number {
+  let quote: string | undefined;
+  for (let index = 4; index < markup.length; index++) {
+    const char = markup[index];
+    if (quote) {
+      if (char === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === `"` || char === `'`) {
+      quote = char;
+      continue;
+    }
+    if (char === ">") {
+      return index;
+    }
+  }
+  return -1;
 }
 
 function normalizeLegacyTestMarkup(markup: string): string {

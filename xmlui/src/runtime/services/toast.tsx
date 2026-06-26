@@ -1,5 +1,7 @@
 import React, { useSyncExternalStore } from "react";
 
+import { announceLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
+
 export type ToastKind = "info" | "success" | "error" | "loading";
 
 export type ToastEntry = {
@@ -57,6 +59,7 @@ export class ToastService {
       ? this.toasts.map((toast) => toast.id === id ? entry : toast)
       : [...this.toasts, entry];
     this.scheduleDismiss(kind, id, options.duration);
+    announceLiveRegion(entry.message, kind === "error" ? "assertive" : "polite");
     this.notify();
     return id;
   }

@@ -8,6 +8,7 @@ test.describe("Navigation Events", () => {
   test("didNavigate fires after Link click", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <App
+        var.testState="{null}"
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to, queryParams }"
       >
         <NavPanel>
@@ -36,6 +37,7 @@ test.describe("Navigation Events", () => {
   test("willNavigate fires on programmatic navigation", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <App
+        var.testState="{null}"
         onWillNavigate="(to, queryParams) => testState = { event: 'willNavigate', to, queryParams }"
       >
         <Pages>
@@ -60,6 +62,7 @@ test.describe("Navigation Events", () => {
   test("didNavigate fires after programmatic navigation", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <App
+        var.testState="{null}"
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to, queryParams }"
       >
         <Pages>
@@ -90,6 +93,7 @@ test.describe("Navigation Events", () => {
   }) => {
     await initTestBed(`
       <App
+        var.testState="{null}"
         onWillNavigate="(to, queryParams) => to === '/about' ? false : undefined"
       >
         <Pages>
@@ -124,6 +128,7 @@ test.describe("Navigation Events", () => {
   }) => {
     await initTestBed(`
       <App
+        var.testState="{null}"
         onWillNavigate="(to, queryParams) => undefined"
       >
         <Pages>
@@ -154,20 +159,20 @@ test.describe("Navigation Events", () => {
     page,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <Fragment var.events="{[]}">
-        <App
-          onWillNavigate="(to, queryParams) => { events.push('willNavigate'); testState = events; }"
-          onDidNavigate="(to, queryParams) => { events.push('didNavigate'); testState = events; }"
-        >
-          <Pages>
-            <Page url="/">
-              Home
-              <Button testId="navBtn" onClick="Actions.navigate('/about')">Go to About</Button>
-            </Page>
-            <Page url="/about">About</Page>
-          </Pages>
-        </App>
-      </Fragment>
+      <App
+        var.testState="{null}"
+        var.events="{[]}"
+        onWillNavigate="(to, queryParams) => { events.push('willNavigate'); return testState = events; }"
+        onDidNavigate="(to, queryParams) => { events.push('didNavigate'); return testState = events; }"
+      >
+        <Pages>
+          <Page url="/">
+            Home
+            <Button testId="navBtn" onClick="Actions.navigate('/about')">Go to About</Button>
+          </Page>
+          <Page url="/about">About</Page>
+        </Pages>
+      </App>
     `);
 
     const navBtn = page.getByTestId("navBtn");
@@ -193,20 +198,20 @@ test.describe("Navigation Events", () => {
     page,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <Fragment var.events="{[]}">
-        <App
-          onWillNavigate="(to, queryParams) => { events.push('willNavigate'); testState = events; return to === '/about' ? false : undefined; }"
-          onDidNavigate="(to, queryParams) => { events.push('didNavigate'); testState = events; }"
-        >
-          <Pages>
-            <Page url="/">
-              Home Page
-              <Button testId="navBtn" onClick="Actions.navigate('/about')">Go to About</Button>
-            </Page>
-            <Page url="/about">About Page</Page>
-          </Pages>
-        </App>
-      </Fragment>
+      <App
+        var.testState="{null}"
+        var.events="{[]}"
+        onWillNavigate="(to, queryParams) => { events.push('willNavigate'); testState = events; return to === '/about' ? false : undefined; }"
+        onDidNavigate="(to, queryParams) => { events.push('didNavigate'); return testState = events; }"
+      >
+        <Pages>
+          <Page url="/">
+            Home Page
+            <Button testId="navBtn" onClick="Actions.navigate('/about')">Go to About</Button>
+          </Page>
+          <Page url="/about">About Page</Page>
+        </Pages>
+      </App>
     `);
 
     const navBtn = page.getByTestId("navBtn");
@@ -227,6 +232,7 @@ test.describe("Navigation Events", () => {
   test("didNavigate fires on browser back button", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <App
+        var.testState="{null}"
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to }"
       >
         <Pages>
@@ -263,6 +269,7 @@ test.describe("Navigation Events", () => {
   test("didNavigate fires on browser forward button", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <App
+        var.testState="{null}"
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to }"
       >
         <Pages>
@@ -305,24 +312,24 @@ test.describe("Navigation Events", () => {
     page,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <Fragment var.navigationLog="{[]}">
-        <App
-          onWillNavigate="(to, queryParams) => { navigationLog.push({ event: 'will', to }); testState = navigationLog; }"
-          onDidNavigate="(to, queryParams) => { navigationLog.push({ event: 'did', to }); testState = navigationLog; }"
-        >
-          <Pages>
-            <Page url="/">
-              Home
-              <Button testId="productsBtn" onClick="Actions.navigate('/products')">Go to Products</Button>
-            </Page>
-            <Page url="/products">
-              Products
-              <Button testId="detailBtn" onClick="Actions.navigate('/products/123')">View Detail</Button>
-            </Page>
-            <Page url="/products/:id">Product Detail</Page>
-          </Pages>
-        </App>
-      </Fragment>
+      <App
+        var.testState="{null}"
+        var.navigationLog="{[]}"
+        onWillNavigate="(to, queryParams) => { navigationLog.push({ event: 'will', to }); return testState = navigationLog; }"
+        onDidNavigate="(to, queryParams) => { navigationLog.push({ event: 'did', to }); return testState = navigationLog; }"
+      >
+        <Pages>
+          <Page url="/">
+            Home
+            <Button testId="productsBtn" onClick="Actions.navigate('/products')">Go to Products</Button>
+          </Page>
+          <Page url="/products">
+            Products
+            <Button testId="detailBtn" onClick="Actions.navigate('/products/123')">View Detail</Button>
+          </Page>
+          <Page url="/products/:id">Product Detail</Page>
+        </Pages>
+      </App>
     `);
 
     // Navigate to products

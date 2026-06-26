@@ -203,6 +203,8 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 function createActionsReference(scope?: RuntimeScope) {
   return {
+    navigate: (target: unknown, queryParams?: Record<string, unknown>) =>
+      scope?.routing?.navigate(target, queryParams),
     callApi: async (input: Record<string, unknown>) => {
       if (requiresActionConfirmation(input) && !window.confirm(actionConfirmationMessage(input))) {
         return undefined;

@@ -16,6 +16,11 @@ test("toast service renders notifications from compiled handlers and preserves d
   await page.getByRole("button", { name: "Complete loading toast" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Done with count 1" })).toBeVisible();
   await expect(page.getByRole("status").filter({ hasText: "Working on count 1" })).toHaveCount(0);
+  await expect(page.locator("[aria-live='polite'][aria-label='Done with count 1']")).toBeAttached();
+
+  await page.getByRole("button", { name: "Error toast" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Failed count 1" })).toBeVisible();
+  await expect(page.locator("[aria-live='assertive'][aria-label='Failed count 1']")).toBeAttached();
 
   await page.getByRole("button", { name: "Dismiss toasts" }).click();
   await expect(page.getByRole("status")).toHaveCount(0);

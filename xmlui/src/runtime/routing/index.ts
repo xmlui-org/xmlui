@@ -19,10 +19,17 @@ type RouteSegment =
   | { kind: "param"; name: string };
 
 type RouteListener = () => void;
+type NavigationHandler = (to: string | number, queryParams?: Record<string, unknown>) => unknown | Promise<unknown>;
+
+export type RuntimeNavigationHandlers = {
+  onWillNavigate?: NavigationHandler;
+  onDidNavigate?: NavigationHandler;
+};
 
 export class RuntimeRoutingStore {
   private snapshot: RouteSnapshot;
   private listeners = new Set<RouteListener>();
+  private navigationHandlers: RuntimeNavigationHandlers = {};
 
   constructor(
     readonly mode: RoutingMode = "hash",
@@ -43,6 +50,10 @@ export class RuntimeRoutingStore {
     };
   }
 
+  setNavigationHandlers(handlers: RuntimeNavigationHandlers): void {
+    this.navigationHandlers = handlers;
+  }
+
   attach(): () => void {
     if (typeof window === "undefined") {
       return () => undefined;
@@ -57,22 +68,27 @@ export class RuntimeRoutingStore {
     };
   }
 
-  navigate(target: unknown, queryParams?: Record<string, unknown>): void {
+  async navigate(target: unknown, queryParams?: Record<string, unknown>): Promise<boolean> {
     if (typeof window === "undefined") {
-      return;
+      return false;
     }
     if (typeof target === "number") {
       window.history.go(target);
-      return;
+      return true;
     }
     const url = this.createUrl(String(target ?? "/"), queryParams);
+    const willResult = await this.navigationHandlers.onWillNavigate?.(String(target ?? "/"), queryParams);
+    if (willResult === false) {
+      return false;
+    }
     if (this.mode === "hash") {
       window.location.hash = url;
       this.syncFromBrowser();
-      return;
+      return true;
     }
     window.history.pushState({}, "", url);
     this.syncFromBrowser();
+    return true;
   }
 
   href(target: string, queryParams?: Record<string, unknown>): string {
@@ -94,6 +110,7 @@ export class RuntimeRoutingStore {
     for (const listener of this.listeners) {
       listener();
     }
+    void this.navigationHandlers.onDidNavigate?.(snapshotToUrl(next), next.queryParams);
   }
 
   private createUrl(target: string, queryParams?: Record<string, unknown>): string {
@@ -124,6 +141,10 @@ export class RuntimeRoutingStore {
     }
     return `${pathname}${search}${hash}`;
   }
+}
+
+function snapshotToUrl(snapshot: RouteSnapshot): string {
+  return `${snapshot.pathname}${snapshot.search}${snapshot.hash}`;
 }
 
 export function compileRoutePattern(pattern: string): CompiledRoutePattern {
