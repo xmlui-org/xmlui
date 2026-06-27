@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { type HTMLAttributes, useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import dayjs from "dayjs";
 import classnames from "classnames";
@@ -39,7 +39,16 @@ export function CalendarRender({
   className,
   registerComponentApi,
   onNativeEvent,
-}: any) {
+  ...rest
+}: HTMLAttributes<HTMLDivElement> & {
+  events?: unknown;
+  view?: string;
+  date?: string;
+  height?: string;
+  width?: string;
+  registerComponentApi?: (api: Record<string, unknown>) => void;
+  onNativeEvent?: (event: Record<string, unknown>) => void;
+}) {
   const [currentView, setCurrentView] = useState(viewProp);
   const [currentDate, setCurrentDate] = useState(dateProp ? new Date(dateProp) : new Date());
   const { getThemeVar, root } = useTheme();
@@ -198,6 +207,7 @@ export function CalendarRender({
 
   return (
     <div
+      {...rest}
       className={classnames(styles.calendarContainer, scopeId, className)}
       style={{ width, height }}
     >

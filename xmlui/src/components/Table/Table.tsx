@@ -360,17 +360,23 @@ function columnNodes(tableNode: XmluiElement): XmluiElement[] {
 }
 
 function collectColumns(tableNode: XmluiElement): TableColumnDefinition[] {
-  return columnNodes(tableNode).map((column, index) => ({
-    id: column.props.id ?? column.props.bindTo ?? `column-${index}`,
-    bindTo: column.props.bindTo,
-    header: column.props.header,
-    width: column.props.width,
-    minWidth: column.props.minWidth,
-    maxWidth: column.props.maxWidth,
-    canSort: column.props.canSort === undefined ? true : column.props.canSort !== "false",
-    canResize: column.props.canResize === undefined ? false : column.props.canResize !== "false",
-    cellStyle: columnCellStyle(column),
-  }));
+  const seenIds = new Map<string, number>();
+  return columnNodes(tableNode).map((column, index) => {
+    const baseId = column.props.id ?? column.props.bindTo ?? `column-${index}`;
+    const seenCount = seenIds.get(baseId) ?? 0;
+    seenIds.set(baseId, seenCount + 1);
+    return {
+      id: seenCount === 0 ? baseId : `${baseId}-${seenCount}`,
+      bindTo: column.props.bindTo,
+      header: column.props.header,
+      width: column.props.width,
+      minWidth: column.props.minWidth,
+      maxWidth: column.props.maxWidth,
+      canSort: column.props.canSort === undefined ? true : column.props.canSort !== "false",
+      canResize: column.props.canResize === undefined ? false : column.props.canResize !== "false",
+      cellStyle: columnCellStyle(column),
+    };
+  });
 }
 
 function arrayValue(value: unknown): unknown[] {

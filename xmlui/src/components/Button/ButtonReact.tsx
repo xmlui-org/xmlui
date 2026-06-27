@@ -1,4 +1,4 @@
-import type { CSSProperties, MouseEvent, ReactNode } from "react";
+import { isValidElement, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 import { forwardRef, useEffect, useRef } from "react";
 
 import { defaultProps } from "./Button.defaults";
@@ -65,6 +65,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const normalizedThemeColor = validThemeColor(themeColor);
   const normalizedSize = validSize(size);
   const normalizedOrientation = validOrientation(orientation);
+  const iconAccessibleLabel =
+    contextualLabel ?? (typeof normalizedIcon === "string" ? normalizedIcon : undefined);
 
   return (
     <button
@@ -96,8 +98,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     >
       {normalizedIcon && iconToLeft ? <ButtonIcon icon={normalizedIcon} /> : null}
       {children}
-      {normalizedIcon && !hasChildren ? (
-        <span className={styles.visuallyHidden}>{contextualLabel ?? normalizedIcon}</span>
+      {normalizedIcon && !hasChildren && iconAccessibleLabel ? (
+        <span className={styles.visuallyHidden}>{iconAccessibleLabel}</span>
       ) : null}
       {normalizedIcon && !iconToLeft ? <ButtonIcon icon={normalizedIcon} /> : null}
     </button>
@@ -124,15 +126,18 @@ function normalizeButtonType(value: string): "button" | "submit" | "reset" {
   return value === "submit" || value === "reset" ? value : "button";
 }
 
-function normalizeIcon(icon: ReactNode): string | undefined {
+function normalizeIcon(icon: ReactNode): ReactNode | undefined {
   if (typeof icon !== "string") {
-    return undefined;
+    return isValidElement(icon) ? icon : undefined;
   }
   const trimmed = icon.trim();
   return trimmed !== "" && trimmed !== "_" && !trimmed.startsWith("() =>") ? icon : undefined;
 }
 
-function ButtonIcon({ icon }: { icon: string }) {
+function ButtonIcon({ icon }: { icon: ReactNode }) {
+  if (typeof icon !== "string") {
+    return icon;
+  }
   return (
     <svg
       aria-hidden="true"

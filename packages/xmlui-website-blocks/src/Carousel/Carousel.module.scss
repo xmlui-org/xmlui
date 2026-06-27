@@ -38,6 +38,7 @@ $textColor-indicator-active-Carousel: createThemeVar("textColor-indicator-active
     overflow: hidden;
     width: $width-Carousel;
     height: $height-Carousel;
+    min-height: 1px;
     justify-content: center;
     align-items: center;
   }
@@ -99,6 +100,11 @@ $textColor-indicator-active-Carousel: createThemeVar("textColor-indicator-active
   }
 
   .controlButton:active {
+    background-color: $backgroundColor-control-active-Carousel;
+    color: $textColor-control-active-Carousel;
+  }
+
+  .controlButton:hover:active {
     background-color: $backgroundColor-control-active-Carousel;
     color: $textColor-control-active-Carousel;
   }

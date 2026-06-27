@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useCallback, useMemo } from "react";
+import React, { memo, useState, useEffect, useCallback, useMemo, type HTMLAttributes } from "react";
 import * as ReactDOM from "react-dom";
 import reactGridLayoutUrl from "react-grid-layout/dist/react-grid-layout.min.js?url";
 import "react-grid-layout/css/styles.css";
@@ -143,7 +143,8 @@ export const GridLayoutRender = memo(function GridLayoutRender({
   draggableCancel,
   onNativeEvent,
   children,
-}: {
+  ...rest
+}: HTMLAttributes<HTMLDivElement> & {
   layout?: any[];
   columns?: number;
   rowHeight?: number;
@@ -228,47 +229,51 @@ export const GridLayoutRender = memo(function GridLayoutRender({
   // Ensure each child div has a key and data-grid matching the layout.
   if (!ResponsiveGridLayout) {
     return (
-      <div className={className}>
-        {flatChildren.map((child, i) => {
-          const layoutItem = currentLayout[i];
-          const key = layoutItem?.i ?? `_gl_${i}`;
-          return (
-            <div key={key} style={{ overflow: "auto", marginBottom: resolvedGap }}>
-              {child}
-            </div>
-          );
-        })}
+      <div {...rest}>
+        <div className={className}>
+          {flatChildren.map((child, i) => {
+            const layoutItem = currentLayout[i];
+            const key = layoutItem?.i ?? `_gl_${i}`;
+            return (
+              <div key={key} style={{ overflow: "auto", marginBottom: resolvedGap }}>
+                {child}
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   }
 
   return (
-    <ResponsiveGridLayout
-      className={className}
-      layouts={{ lg: currentLayout }}
-      breakpoints={defaultBreakpoints}
-      cols={defaultCols}
-      rowHeight={rowHeight}
-      margin={[resolvedGap, resolvedGap]}
-      isDraggable={draggable}
-      isResizable={resizable}
-      compactType={compactType as any}
-      onLayoutChange={handleLayoutChange}
-      draggableHandle={draggableHandle || ""}
-      draggableCancel={draggableCancel || ""}
-      onDragStop={handleDragStop}
-      onResizeStop={handleResizeStop}
-    >
-      {flatChildren.map((child, i) => {
-        const layoutItem = currentLayout[i];
-        const key = layoutItem?.i ?? `_gl_${i}`;
-        const dataGrid = layoutItem || { i: key, x: 0, y: Infinity, w: 6, h: 4 };
-        return (
-          <div key={key} data-grid={dataGrid} style={{ overflow: "auto" }}>
-            {child}
-          </div>
-        );
-      })}
-    </ResponsiveGridLayout>
+    <div {...rest}>
+      <ResponsiveGridLayout
+        className={className}
+        layouts={{ lg: currentLayout }}
+        breakpoints={defaultBreakpoints}
+        cols={defaultCols}
+        rowHeight={rowHeight}
+        margin={[resolvedGap, resolvedGap]}
+        isDraggable={draggable}
+        isResizable={resizable}
+        compactType={compactType as any}
+        onLayoutChange={handleLayoutChange}
+        draggableHandle={draggableHandle || ""}
+        draggableCancel={draggableCancel || ""}
+        onDragStop={handleDragStop}
+        onResizeStop={handleResizeStop}
+      >
+        {flatChildren.map((child, i) => {
+          const layoutItem = currentLayout[i];
+          const key = layoutItem?.i ?? `_gl_${i}`;
+          const dataGrid = layoutItem || { i: key, x: 0, y: Infinity, w: 6, h: 4 };
+          return (
+            <div key={key} data-grid={dataGrid} style={{ overflow: "auto" }}>
+              {child}
+            </div>
+          );
+        })}
+      </ResponsiveGridLayout>
+    </div>
   );
 });

@@ -211,6 +211,12 @@ const icons: Record<string, IconDefinition> = {
       <path d="m5 12 4 4 10-9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     ),
   },
+  chevronright: {
+    viewBox: "0 0 24 24",
+    children: (
+      <path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+  },
   star: {
     viewBox: "0 0 24 24",
     children: (

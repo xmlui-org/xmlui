@@ -37,7 +37,11 @@
     "compatibility:perf": "npm --workspace xmlui run compatibility:perf",
     "build:counter-badge": "npm --workspace xmlui-counter-badge run build",
     "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata",
-    "build-extensions": "npm --workspace xmlui-counter-badge run build && npm --workspace xmlui-counter-badge run build:metadata",
+    "build:website-extensions": "npm --workspace xmlui-docs-blocks run build && npm --workspace xmlui-website-blocks run build && npm --workspace xmlui-search run build && npm --workspace xmlui-masonry run build && npm --workspace xmlui-gauge run build && npm --workspace xmlui-echart run build && npm --workspace xmlui-calendar run build && npm --workspace xmlui-grid-layout run build && npm --workspace xmlui-tiptap-editor run build",
+    "build:website-extensions:metadata": "npm --workspace xmlui-docs-blocks run build:metadata && npm --workspace xmlui-website-blocks run build:metadata && npm --workspace xmlui-search run build:metadata && npm --workspace xmlui-masonry run build:metadata && npm --workspace xmlui-gauge run build:metadata && npm --workspace xmlui-echart run build:metadata && npm --workspace xmlui-calendar run build:metadata && npm --workspace xmlui-grid-layout run build:metadata && npm --workspace xmlui-tiptap-editor run build:metadata",
+    "verify:website-extensions": "npm run build:website-extensions && npm run build:website-extensions:metadata && npm run test:extensions:e2e",
+    "build-extensions": "npm --workspace xmlui-counter-badge run build && npm --workspace xmlui-counter-badge run build:metadata && npm run build:website-extensions && npm run build:website-extensions:metadata",
+    "verify:website": "npm --workspace xmlui-website run build && npm --workspace xmlui-website run build-ssg && npm --workspace xmlui-website run verify:preview-ssg && npm run test:website:e2e",
     "build-playground": "node scripts/compatibility-missing.mjs COMP-0006 build-playground"
   },
   "optionalDependencies": {

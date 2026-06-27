@@ -1,4 +1,5 @@
-import { expect, test } from "xmlui/testing";
+import { expect } from "@playwright/test";
+import { test } from "../../../xmlui/src/testing";
 
 // Three uncategorized items used by most tests.
 // "ut" matches Button (B**ut**ton) and Input (Inp**ut**) but not Table.

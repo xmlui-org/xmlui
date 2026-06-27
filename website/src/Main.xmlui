@@ -1,19 +1,5 @@
 <App
   layout="vertical-full-header"
-  var.searchData="{[
-    {
-      path: '/',
-      title: 'XMLUI home',
-      content: 'Build reactive user interfaces with XML markup and familiar web primitives.',
-      category: 'docs'
-    },
-    {
-      path: '/docs',
-      title: 'Documentation quick check',
-      content: 'A first migrated documentation route for visually checking XMLUI behavior.',
-      category: 'docs'
-    }
-  ]}"
   var.docsText="'# Documentation quick check\n\nThis migrated route exercises the website shell, search package, docs blocks, and markdown rendering. It is intentionally small so regressions are easy to see while the remaining website packages are migrated.'"
   var.updateCount="{0}"
   var.chartBoost="{0}"
@@ -28,12 +14,14 @@
       <NavLink label="Home" to="/" exact="true" />
       <NavLink label="Docs" to="/docs" active="{$pathname.startsWith('/docs')}" />
       <NavLink label="Blog" to="/blog" active="{$pathname.startsWith('/blog')}" />
+      <NavLink label="Components" to="/docs/reference/components" active="{$pathname.startsWith('/docs/reference/components')}" />
+      <NavLink label="Extensions" to="/docs/reference/extensions" active="{$pathname.startsWith('/docs/reference/extensions')}" />
     </HStack>
     <SpaceFiller />
     <Search
       collapsible="true"
-      mode="inline"
-      data="{searchData}"
+      mode="overlay"
+      data="{$appGlobals.staticSearchData}"
       placeholder="Search on site..."
       suggestedQueries="{['docs', 'home', 'XMLUI']}"
       noResultsMessage="No results found on this site."
@@ -46,12 +34,12 @@
       <Stack gap="$space-8" padding="$space-8">
         <HeroSection
           preamble="XMLUI website"
-          headline="Visual regression shell"
-          subheadline="The first migrated website slice is rendering from the rewrite workspace."
-          mainText="This page uses the migrated website blocks and search extension packages. The next slices can replace this focused shell with the full old website route by route."
-          ctaButtonText="Open docs check"
+          headline="XMLUI"
+          subheadline="Build apps with XML markup, reactive data, and managed React."
+          mainText="This migrated home route renders copied website content together with the migrated website blocks and extension packages."
+          ctaButtonText="Get Started"
           ctaButtonIcon="arrowright"
-          onCtaClick="Actions.navigate('/docs')"
+          onCtaClick="Actions.navigate('/get-started')"
           contentPlacement="right"
           contentAlignment="center"
         >
@@ -71,7 +59,30 @@
             </Stack>
           </Card>
         </HeroSection>
+        <FlowLayout itemWidth="360px" gap="$space-5">
+          <Card>
+            <Markdown content="{$appGlobals.prefetchedContent['/pages/why-simple.md']}" data="/pages/why-simple.md" />
+          </Card>
+          <Card>
+            <Markdown content="{$appGlobals.prefetchedContent['/pages/why-reactive.md']}" data="/pages/why-reactive.md" />
+          </Card>
+        </FlowLayout>
       </Stack>
+    </Page>
+
+    <Page url="/get-started">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Get Started' }
+            ]}"
+          />
+          <Markdown content="{$appGlobals.prefetchedContent['/pages/get-started.md']}" data="/pages/get-started.md" />
+        </Stack>
+        <TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" />
+      </HStack>
     </Page>
 
     <Page url="/docs">
@@ -85,137 +96,146 @@
         <H1>Documentation quick check</H1>
         <ReadingTime content="{docsText}" />
         <Markdown>{docsText}</Markdown>
-        <H2>Masonry extension check</H2>
-        <Masonry
-          columns="3"
-          minColumnWidth="180px"
-          gap="$space-3"
-        >
-          <Card>
-            <Stack gap="$space-2">
-              <Text variant="strong">Masonry item 1</Text>
-              <Text>Alpha</Text>
-            </Stack>
-          </Card>
-          <Card>
-            <Stack gap="$space-2">
-              <Text variant="strong">Masonry item 2</Text>
-              <Text>Beta</Text>
-            </Stack>
-          </Card>
-          <Card>
-            <Stack gap="$space-2">
-              <Text variant="strong">Masonry item 3</Text>
-              <Text>Gamma</Text>
-            </Stack>
-          </Card>
-          <Card>
-            <Stack gap="$space-2">
-              <Text variant="strong">Masonry item 4</Text>
-              <Text>Delta</Text>
-            </Stack>
-          </Card>
-        </Masonry>
-        <H2>Gauge extension check</H2>
-        <HStack gap="$space-4" verticalAlignment="center">
-          <Gauge
-            id="websiteGauge"
-            initialValue="42"
-            minValue="0"
-            maxValue="100"
-            digitalDisplay="true"
-            showUnit="true"
-            unit="%"
-            width="220px"
-            height="220px"
-          />
-          <Stack gap="$space-2">
-            <Text>Gauge value: {websiteGauge.value}</Text>
-            <Button onClick="websiteGauge.setValue(72)">Set gauge to 72</Button>
-          </Stack>
+        <HStack gap="$space-2">
+          <Button onClick="Actions.navigate('/docs/intro')">Open copied intro page</Button>
+          <Button onClick="Actions.navigate('/docs/reactive-intro')">Open reactive data page</Button>
+          <Button onClick="Actions.navigate('/docs/components-intro')">Open components page</Button>
+          <Button onClick="Actions.navigate('/docs/guides')">Open guides page</Button>
+          <Button onClick="Actions.navigate('/docs/app-structure')">Open copied app structure page</Button>
         </HStack>
-        <H2>EChart extension check</H2>
-        <EChart
-          width="100%"
-          height="260px"
-          renderer="svg"
-          option="{{
-            title: { text: 'Package migration smoke' },
-            tooltip: {},
-            xAxis: { type: 'category', data: ['Docs', 'Blocks', 'Search', 'Charts'] },
-            yAxis: { type: 'value' },
-            series: [{
-              type: 'bar',
-              data: [12 + chartBoost, 18, 9, 14 + chartBoost]
-            }]
-          }}"
-        />
-        <Text>Chart boost: {chartBoost}</Text>
-        <Button onClick="chartBoost += 5">Boost chart data</Button>
-        <H2>Calendar extension check</H2>
-        <BigCalendar
-          width="100%"
-          height="420px"
-          view="month"
-          date="2026-03-01T00:00:00"
-          events="{[
-            {
-              title: 'Migration Standup',
-              start: '2026-03-09T09:00:00',
-              end: '2026-03-09T09:30:00'
-            },
-            {
-              title: 'Visual Check ' + calendarShift,
-              start: '2026-03-18T13:00:00',
-              end: '2026-03-18T14:00:00'
-            }
-          ]}"
-        />
-        <Text>Calendar shift: {calendarShift}</Text>
-        <Button onClick="calendarShift += 1">Advance calendar smoke</Button>
-        <H2>GridLayout extension check</H2>
-        <GridLayout
-          columns="{12}"
-          rowHeight="{70}"
-          gap="$space-3"
-          draggable="false"
-          resizable="false"
-          layout="{[
-            { i: '0', x: 0, y: 0, w: 6, h: 2 },
-            { i: '1', x: 6, y: 0, w: 6, h: 2 },
-            { i: '2', x: 0, y: 2, w: 12, h: 2 }
-          ]}"
-        >
-          <Card padding="$space-3" backgroundColor="$color-primary-50">
-            <Stack gap="$space-1">
-              <Text variant="strong">Grid metric A</Text>
-              <Text>Layout tile: {gridShift}</Text>
+        <Fragment when="{!$appGlobals.isSsg}">
+          <H2>Masonry extension check</H2>
+          <Masonry
+            columns="3"
+            minColumnWidth="180px"
+            gap="$space-3"
+          >
+            <Card>
+              <Stack gap="$space-2">
+                <Text variant="strong">Masonry item 1</Text>
+                <Text>Alpha</Text>
+              </Stack>
+            </Card>
+            <Card>
+              <Stack gap="$space-2">
+                <Text variant="strong">Masonry item 2</Text>
+                <Text>Beta</Text>
+              </Stack>
+            </Card>
+            <Card>
+              <Stack gap="$space-2">
+                <Text variant="strong">Masonry item 3</Text>
+                <Text>Gamma</Text>
+              </Stack>
+            </Card>
+            <Card>
+              <Stack gap="$space-2">
+                <Text variant="strong">Masonry item 4</Text>
+                <Text>Delta</Text>
+              </Stack>
+            </Card>
+          </Masonry>
+          <H2>Gauge extension check</H2>
+          <HStack gap="$space-4" verticalAlignment="center">
+            <Gauge
+              id="websiteGauge"
+              initialValue="42"
+              minValue="0"
+              maxValue="100"
+              digitalDisplay="true"
+              showUnit="true"
+              unit="%"
+              width="220px"
+              height="220px"
+            />
+            <Stack gap="$space-2">
+              <Text>Gauge value: {websiteGauge.value}</Text>
+              <Button onClick="websiteGauge.setValue(72)">Set gauge to 72</Button>
             </Stack>
-          </Card>
-          <Card padding="$space-3" backgroundColor="$color-success-50">
-            <Stack gap="$space-1">
-              <Text variant="strong">Grid metric B</Text>
-              <Text>Fixed tile renders</Text>
-            </Stack>
-          </Card>
-          <Card padding="$space-3">
-            <Stack gap="$space-1">
-              <Text variant="strong">Grid detail</Text>
-              <Text>React grid layout mounted</Text>
-            </Stack>
-          </Card>
-        </GridLayout>
-        <Text>Grid shift: {gridShift}</Text>
-        <Button onClick="gridShift += 1">Advance grid layout smoke</Button>
-        <H2>TiptapEditor extension check</H2>
-        <TiptapEditor
-          id="websiteEditor"
-          initialValue="Initial rich text"
-          toolbar="false"
-          height="150px"
-        />
-        <Text>Editor value: {websiteEditor.value}</Text>
-        <Button onClick="websiteEditor.setValue('Updated rich text')">Update editor content</Button>
+          </HStack>
+          <H2>EChart extension check</H2>
+          <EChart
+            width="100%"
+            height="260px"
+            renderer="svg"
+            option="{{
+              title: { text: 'Package migration smoke' },
+              tooltip: {},
+              xAxis: { type: 'category', data: ['Docs', 'Blocks', 'Search', 'Charts'] },
+              yAxis: { type: 'value' },
+              series: [{
+                type: 'bar',
+                data: [12 + chartBoost, 18, 9, 14 + chartBoost]
+              }]
+            }}"
+          />
+          <Text>Chart boost: {chartBoost}</Text>
+          <Button onClick="chartBoost += 5">Boost chart data</Button>
+          <H2>Calendar extension check</H2>
+          <BigCalendar
+            width="100%"
+            height="420px"
+            view="month"
+            date="2026-03-01T00:00:00"
+            events="{[
+              {
+                title: 'Migration Standup',
+                start: '2026-03-09T09:00:00',
+                end: '2026-03-09T09:30:00'
+              },
+              {
+                title: 'Visual Check ' + calendarShift,
+                start: '2026-03-18T13:00:00',
+                end: '2026-03-18T14:00:00'
+              }
+            ]}"
+          />
+          <Text>Calendar shift: {calendarShift}</Text>
+          <Button onClick="calendarShift += 1">Advance calendar smoke</Button>
+          <H2>GridLayout extension check</H2>
+          <GridLayout
+            columns="{12}"
+            rowHeight="{70}"
+            gap="$space-3"
+            draggable="false"
+            resizable="false"
+            layout="{[
+              { i: '0', x: 0, y: 0, w: 6, h: 2 },
+              { i: '1', x: 6, y: 0, w: 6, h: 2 },
+              { i: '2', x: 0, y: 2, w: 12, h: 2 }
+            ]}"
+          >
+            <Card padding="$space-3" backgroundColor="$color-primary-50">
+              <Stack gap="$space-1">
+                <Text variant="strong">Grid metric A</Text>
+                <Text>Layout tile: {gridShift}</Text>
+              </Stack>
+            </Card>
+            <Card padding="$space-3" backgroundColor="$color-success-50">
+              <Stack gap="$space-1">
+                <Text variant="strong">Grid metric B</Text>
+                <Text>Fixed tile renders</Text>
+              </Stack>
+            </Card>
+            <Card padding="$space-3">
+              <Stack gap="$space-1">
+                <Text variant="strong">Grid detail</Text>
+                <Text>React grid layout mounted</Text>
+              </Stack>
+            </Card>
+          </GridLayout>
+          <Text>Grid shift: {gridShift}</Text>
+          <Button onClick="gridShift += 1">Advance grid layout smoke</Button>
+          <H2>TiptapEditor extension check</H2>
+          <TiptapEditor
+            id="websiteEditor"
+            initialValue="Initial rich text"
+            toolbar="false"
+            height="150px"
+          />
+          <Text>Editor value: {websiteEditor.value}</Text>
+          <Button onClick="websiteEditor.setValue('Updated rich text')">Update editor content</Button>
+        </Fragment>
         <HStack gap="$space-2">
           <Button onClick="Actions.navigate('/')">Back home</Button>
           <Button onClick="updateCount++">Update docs state</Button>
@@ -244,6 +264,1711 @@
           omitH1="true"
           maxHeadingLevel="3"
         />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/reactive-intro">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Reactive data binding' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContent['pages/reactive-intro.md']}"
+            data="/pages/reactive-intro.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/components-intro">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Components' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContent['pages/components-intro.md']}"
+            data="/pages/components-intro.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/themes-intro">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Themes' }
+            ]}"
+          />
+          <H1>Themes</H1>
+          <Text>XMLUI themes define the visual language of an app through theme variables, palettes, and component-specific styling defaults.</Text>
+          <FlowLayout itemWidth="260px" gap="$space-3">
+            <Card padding="$space-4">
+              <Stack gap="$space-2">
+                <Link to="/docs/styles-and-themes/theme-variables">
+                  <Text variant="strong">Theme Variables</Text>
+                </Link>
+                <Text>Understand the token names and lookup rules used by XMLUI themes.</Text>
+              </Stack>
+            </Card>
+            <Card padding="$space-4">
+              <Stack gap="$space-2">
+                <Link to="/docs/styles-and-themes/theme-variable-defaults">
+                  <Text variant="strong">Default Theme Variables</Text>
+                </Link>
+                <Text>Browse the default values available to components and apps.</Text>
+              </Stack>
+            </Card>
+            <Card padding="$space-4">
+              <Stack gap="$space-2">
+                <Link to="/docs/palettes">
+                  <Text variant="strong">Palettes</Text>
+                </Link>
+                <Text>Inspect the migrated palette route used by the old website.</Text>
+              </Stack>
+            </Card>
+          </FlowLayout>
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/learn">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs', to: '/docs' },
+            { label: 'Learn XMLUI' }
+          ]}"
+        />
+        <H1>Learn XMLUI</H1>
+        <Text>Start with the introduction, then follow the invoice tutorial and practical guides.</Text>
+        <FlowLayout itemWidth="260px" gap="$space-3">
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/intro">
+                <Text variant="strong">Introduction</Text>
+              </Link>
+              <Text>Declarative UI, data binding, routing, and components.</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/tutorial">
+                <Text variant="strong">Tutorial</Text>
+              </Link>
+              <Text>Build the XMLUI Invoice demo step by step.</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/guides">
+                <Text variant="strong">Guides</Text>
+              </Link>
+              <Text>Focused explanations of XMLUI authoring patterns.</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/howto">
+                <Text variant="strong">How-to articles</Text>
+              </Link>
+              <Text>Task-oriented recipes copied from the old website content.</Text>
+            </Stack>
+          </Card>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/tutorial">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs', to: '/docs' },
+            { label: 'Tutorial' }
+          ]}"
+        />
+        <H1>Tutorial</H1>
+        <Text>Build XMLUI Invoice through twelve copied tutorial chapters.</Text>
+        <FlowLayout itemWidth="240px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'XMLUI Invoice', to: '/docs/tutorial-01' },
+              { label: 'Layout', to: '/docs/tutorial-02' },
+              { label: 'Navigation', to: '/docs/tutorial-03' },
+              { label: 'Dashboard', to: '/docs/tutorial-04' },
+              { label: 'Invoices', to: '/docs/tutorial-05' },
+              { label: 'Customers', to: '/docs/tutorial-06' },
+              { label: 'Products', to: '/docs/tutorial-07' },
+              { label: 'Forms', to: '/docs/tutorial-08' },
+              { label: 'Details', to: '/docs/tutorial-09' },
+              { label: 'Reports', to: '/docs/tutorial-10' },
+              { label: 'Users', to: '/docs/tutorial-11' },
+              { label: 'Settings', to: '/docs/tutorial-12' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/tutorial-01">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'XMLUI Invoice' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-01.md']}" data="/pages/tutorial-01.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-02">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 02' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-02.md']}" data="/pages/tutorial-02.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-03">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 03' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-03.md']}" data="/pages/tutorial-03.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-04">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 04' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-04.md']}" data="/pages/tutorial-04.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-05">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 05' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-05.md']}" data="/pages/tutorial-05.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-06">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 06' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-06.md']}" data="/pages/tutorial-06.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-07">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 07' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-07.md']}" data="/pages/tutorial-07.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-08">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 08' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-08.md']}" data="/pages/tutorial-08.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-09">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 09' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-09.md']}" data="/pages/tutorial-09.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-10">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 10' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-10.md']}" data="/pages/tutorial-10.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-11">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Tutorial 11' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-11.md']}" data="/pages/tutorial-11.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/tutorial-12">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Tutorial', to: '/docs/tutorial' }, { label: 'Settings' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/tutorial-12.md']}" data="/pages/tutorial-12.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContent['pages/guides.md']}"
+            data="/pages/guides.md"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/app-structure">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Structure of an XMLUI app' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContent['pages/app-structure.md']}"
+            data="/pages/app-structure.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/app-structure">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Structure of an XMLUI app' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContent['pages/app-structure.md']}"
+            data="/pages/app-structure.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/markup">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'XML Markup' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContent['pages/markup.md']}"
+            data="/pages/markup.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/scripting">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'XMLUI Scripting' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/scripting.md']}"
+            data="/pages/scripting.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/scoping">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Scoping' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/scoping.md']}"
+            data="/pages/scoping.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/visibility">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Visibility and Responsive Display' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/visibility.md']}"
+            data="/pages/visibility.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/layout">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Layout' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/layout.md']}"
+            data="/pages/layout.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/working-with-text">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Working with Text' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/working-with-text.md']}"
+            data="/pages/working-with-text.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/working-with-markdown">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Working with Markdown' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/working-with-markdown.md']}"
+            data="/pages/working-with-markdown.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/routing-and-links">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Routing and Links' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/routing-and-links.md']}"
+            data="/pages/routing-and-links.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/forms">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Forms' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/forms.md']}"
+            data="/pages/forms.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/modal-dialogs">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Modal Dialogs' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/modal-dialogs.md']}"
+            data="/pages/modal-dialogs.md"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/user-defined-components">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'User-defined components' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/user-defined-components.md']}"
+            data="/pages/user-defined-components.md"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/refactoring">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'Refactoring XMLUI' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/refactoring.md']}"
+            data="/pages/refactoring.md"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/playground-and-codefence">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Guides', to: '/docs/guides' },
+              { label: 'XMLUI codefences and playgrounds' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/playground-and-codefence.md']}"
+            data="/pages/playground-and-codefence.md"
+          />
+        </Stack>
+        <TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="2" />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/styles-and-themes/layout-props">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Styles and Themes' },
+              { label: 'Layout Properties' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/styles-and-themes/layout-props.md']}"
+            data="/pages/styles-and-themes/layout-props.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/styles-and-themes/theme-variables">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Styles and Themes' },
+              { label: 'Theme Variables' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/styles-and-themes/theme-variables.md']}"
+            data="/pages/styles-and-themes/theme-variables.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/styles-and-themes/theme-variable-defaults">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Styles and Themes' },
+              { label: 'Default Theme Variables' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/styles-and-themes/theme-variable-defaults.md']}"
+            data="/pages/styles-and-themes/theme-variable-defaults.md"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/styles-and-themes/common-units">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Styles and Themes' },
+              { label: 'Common Visual Property Units' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/styles-and-themes/common-units.md']}"
+            data="/pages/styles-and-themes/common-units.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/context-variables">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Context variables' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/context-variables.md']}"
+            data="/pages/context-variables.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/context-variables2">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Context Variables Summary' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/context-variables2.md']}"
+            data="/pages/context-variables2.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/behaviors">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Behaviors' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/behaviors.md']}"
+            data="/pages/behaviors.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/globals">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Global Functions and Variables' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/globals.md']}"
+            data="/pages/globals.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/app-globals">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'App Globals' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/app-globals.md']}"
+            data="/pages/app-globals.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/xmlui-config">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'XMLUI Config Reference' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/xmlui-config.md']}"
+            data="/pages/xmlui-config.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/helper-tags">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Helper Tags' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/helper-tags.md']}"
+            data="/pages/helper-tags.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/core-properties">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Core Properties' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/core-properties.md']}"
+            data="/pages/core-properties.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/template-properties">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Template Properties' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/template-properties.md']}"
+            data="/pages/template-properties.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/glossary">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Glossary' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/glossary.md']}"
+            data="/pages/glossary.md"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/reference">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs', to: '/docs' },
+            { label: 'Reference' }
+          ]}"
+        />
+        <H1>Reference</H1>
+        <Text>Reference pages from the migrated website are available by category.</Text>
+        <FlowLayout itemWidth="260px" gap="$space-3">
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/reference/components">
+                <Text variant="strong">Components</Text>
+              </Link>
+              <Text>Built-in XMLUI component reference entries.</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/reference/extensions">
+                <Text variant="strong">Extensions</Text>
+              </Link>
+              <Text>Extension package reference entries used by the website.</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/reference/themes">
+                <Text variant="strong">Themes</Text>
+              </Link>
+              <Text>Theme and palette reference entry points.</Text>
+            </Stack>
+          </Card>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/reference/themes">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Reference', to: '/docs/reference' }, { label: 'Themes' }]}" />
+        <H1>Themes</H1>
+        <Text>The migrated theme reference route points to the theme-variable and palette docs while the old custom overview component is rebuilt.</Text>
+        <FlowLayout itemWidth="260px" gap="$space-3">
+          <Card padding="$space-4">
+            <Link to="/docs/styles-and-themes/theme-variables">
+              <Text variant="strong">Theme Variables</Text>
+            </Link>
+          </Card>
+          <Card padding="$space-4">
+            <Link to="/docs/styles-and-themes/theme-variable-defaults">
+              <Text variant="strong">Default Theme Variables</Text>
+            </Link>
+          </Card>
+          <Card padding="$space-4">
+            <Link to="/docs/palettes">
+              <Text variant="strong">Palettes</Text>
+            </Link>
+          </Card>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/resources">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Resources' }]}" />
+        <H1>Resources</H1>
+        <Text>Useful XMLUI resources and reference entry points from the migrated website shell.</Text>
+        <FlowLayout itemWidth="260px" gap="$space-3">
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/reference/components"><Text variant="strong">Component reference</Text></Link>
+              <Text>Browse copied component metadata.</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/docs/guides/playground-and-codefence"><Text variant="strong">Codefences and playgrounds</Text></Link>
+              <Text>Author XMLUI examples for documentation and regressions.</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-4">
+            <Stack gap="$space-2">
+              <Link to="/blog"><Text variant="strong">Blog</Text></Link>
+              <Text>Copied website posts available in the migrated blog route.</Text>
+            </Stack>
+          </Card>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/icons">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Icons' }]}" />
+        <H1>Icons</H1>
+        <Text>The migrated icon route verifies that local SVG icons are loaded into the website config.</Text>
+        <FlowLayout itemWidth="180px" gap="$space-3">
+          <Card padding="$space-4"><HStack gap="$space-2" verticalAlignment="center"><Icon name="markdown" /><Text>markdown</Text></HStack></Card>
+          <Card padding="$space-4"><HStack gap="$space-2" verticalAlignment="center"><Icon name="markup" /><Text>markup</Text></HStack></Card>
+          <Card padding="$space-4"><HStack gap="$space-2" verticalAlignment="center"><Icon name="details" /><Text>details</Text></HStack></Card>
+          <Card padding="$space-4"><HStack gap="$space-2" verticalAlignment="center"><Icon name="behavior" /><Text>behavior</Text></HStack></Card>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/palettes">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Palettes' }]}" />
+        <H1>Palettes</H1>
+        <Text>The migrated palette route displays representative theme color tokens while the old palette browser is rebuilt.</Text>
+        <FlowLayout itemWidth="180px" gap="$space-3">
+          <Card padding="$space-4" backgroundColor="$color-primary-100"><Text variant="strong">Primary</Text></Card>
+          <Card padding="$space-4" backgroundColor="$color-secondary-100"><Text variant="strong">Secondary</Text></Card>
+          <Card padding="$space-4" backgroundColor="$color-success-100"><Text variant="strong">Success</Text></Card>
+          <Card padding="$space-4" backgroundColor="$color-danger-100"><Text variant="strong">Danger</Text></Card>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Guides', to: '/docs/guides' }, { label: 'Wrapping and Theming' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/_overview.md']}" data="/pages/wrap-component/_overview.md" />
+        </Stack>
+        <TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" />
+      </HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/wrap-component-fn">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'wrapComponent' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/wrap-component-fn.md']}" data="/pages/wrap-component/wrap-component-fn.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/wrap-compound-fn">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'wrapCompound' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/wrap-compound-fn.md']}" data="/pages/wrap-component/wrap-compound-fn.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/prop-forwarding">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'Prop forwarding' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/prop-forwarding.md']}" data="/pages/wrap-component/prop-forwarding.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/free-tracing">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'Free tracing' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/free-tracing.md']}" data="/pages/wrap-component/free-tracing.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/file-objects">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'File objects' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/file-objects.md']}" data="/pages/wrap-component/file-objects.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/bigcalendar">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'BigCalendar' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/bigcalendar.md']}" data="/pages/wrap-component/bigcalendar.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/gauge-theme">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'Gauge theme' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/gauge-theme.md']}" data="/pages/wrap-component/gauge-theme.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/calendar-theme">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'Calendar theme' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/calendar-theme.md']}" data="/pages/wrap-component/calendar-theme.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/masonry">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'Masonry' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/masonry.md']}" data="/pages/wrap-component/masonry.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/echarts">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'ECharts' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/echarts.md']}" data="/pages/wrap-component/echarts.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/tiptap">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'Tiptap' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/tiptap.md']}" data="/pages/wrap-component/tiptap.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/guides/wrap-component/extension-packaging">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Wrapping and Theming', to: '/docs/guides/wrap-component' }, { label: 'Extension packaging' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/wrap-component/extension-packaging.md']}" data="/pages/wrap-component/extension-packaging.md" /></Stack><TableOfContents width="$space-64" omitH1="true" maxHeadingLevel="3" /></HStack>
+    </Page>
+
+    <Page url="/docs/howto">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to' }]}" />
+        <H1>How-to</H1>
+        <Text>Task-oriented XMLUI recipes. This display slice starts with component methods, data transformation, grouping, and safe fetch lifecycle patterns.</Text>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Expose a method from a component', to: '/docs/howto/expose-a-method-from-a-component' },
+              { label: 'Delegate a method', to: '/docs/howto/delegate-a-method' },
+              { label: 'Buffer a reactive edit', to: '/docs/howto/buffer-a-reactive-edit' },
+              { label: 'Modify a value reported in a column', to: '/docs/howto/modify-a-value-reported-in-a-column' },
+              { label: 'Filter and transform data from an API', to: '/docs/howto/filter-and-transform-data-from-an-api' },
+              { label: 'Group items in List by a property', to: '/docs/howto/group-items-in-list-by-a-property' },
+              { label: 'Delay a DataSource until another DataSource is ready', to: '/docs/howto/delay-a-datasource-until-another-datasource-is-ready' },
+              { label: 'Prevent undefined requests in chained DataSources', to: '/docs/howto/prevent-undefined-requests-in-chained-datasources' },
+              { label: 'Hide an element until its DataSource is ready', to: '/docs/howto/hide-an-element-until-its-datasource-is-ready' },
+              { label: 'Use fetched data safely in when', to: '/docs/howto/use-fetched-data-safely-in-when' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Forms and modal basics</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Use built-in form validation', to: '/docs/howto/use-built-in-form-validation' },
+              { label: 'Do custom form validation', to: '/docs/howto/do-custom-form-validation' },
+              { label: 'Use a custom FormItem control', to: '/docs/howto/use-a-custom-formitem' },
+              { label: 'Set the initial value of a Select from fetched data', to: '/docs/howto/set-the-initial-value-of-a-select-from-fetched-data' },
+              { label: 'Pass data to a Modal Dialog', to: '/docs/howto/pass-data-to-a-modal-dialog' },
+              { label: 'Share a ModalDialog across components', to: '/docs/howto/share-a-modaldialog-across-components' },
+              { label: 'Use the same ModalDialog to add or edit', to: '/docs/howto/use-the-same-modaldialog-to-add-or-edit' },
+              { label: 'Copy billing address to shipping address', to: '/docs/howto/copy-billing-to-shipping' },
+              { label: 'Arrange form fields side by side', to: '/docs/howto/arrange-form-fields-side-by-side' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Layout, i18n, and accessibility</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Assign a complex JSON literal to a variable', to: '/docs/howto/assign-a-complex-json-literal-to-a-component-variable' },
+              { label: 'Use accessors to simplify complex expressions', to: '/docs/howto/use-accessors-to-simplify-complex-expressions' },
+              { label: 'Make a set of equal-width cards', to: '/docs/howto/make-a-set-of-equal-width-cards' },
+              { label: 'Wrap items across multiple rows', to: '/docs/howto/wrap-items-across-multiple-rows' },
+              { label: 'Align items to opposite ends of a row', to: '/docs/howto/align-items-to-row-ends-with-spacefiller' },
+              { label: 'Control item spacing with gap', to: '/docs/howto/control-item-spacing-with-gap' },
+              { label: 'Switch locale with inline bundles', to: '/docs/howto/switch-locale-with-inline-bundles' },
+              { label: 'Render ICU plurals and selects', to: '/docs/howto/render-icu-plurals-and-selects' },
+              { label: 'Add a skip link to main content', to: '/docs/howto/add-a-skip-link-to-main-content' },
+              { label: 'Announce status changes with LiveRegion', to: '/docs/howto/announce-status-changes-with-liveregion' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Runtime state and async</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Paginate a List', to: '/docs/howto/paginate-a-list' },
+              { label: 'Chain a DataSource refetch', to: '/docs/howto/chain-a-refetch' },
+              { label: 'Invalidate related data after a write', to: '/docs/howto/control-cache-invalidation' },
+              { label: 'Track a long-running server task', to: '/docs/howto/handle-background-operations' },
+              { label: 'Update UI optimistically', to: '/docs/howto/update-ui-optimistically' },
+              { label: 'Toggle multiple items with shared state', to: '/docs/howto/toggle-multiple-items-with-shared-state' },
+              { label: 'Make a Table responsive', to: '/docs/howto/make-a-table-responsive' },
+              { label: 'Debounce user input for API calls', to: '/docs/howto/debounce-user-input-for-api-calls' },
+              { label: 'Keep a ModalDialog reopenable with onClose', to: '/docs/howto/use-modal-dialog-onclose' },
+              { label: 'Implement an authentication gate', to: '/docs/howto/implement-an-authentication-gate' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Advanced forms</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Add custom icons', to: '/docs/howto/add-custom-icons' },
+              { label: 'Validate dependent fields together', to: '/docs/howto/validate-dependent-fields-together' },
+              { label: 'Validate a field inline with onValidate', to: '/docs/howto/validate-a-field-inline-with-onvalidate' },
+              { label: 'Transform form data before submission', to: '/docs/howto/transform-form-data-before-submission' },
+              { label: 'Build a multi-step wizard form', to: '/docs/howto/build-a-multi-step-wizard-form' },
+              { label: 'Reset a form after submission', to: '/docs/howto/reset-a-form-after-submission' },
+              { label: 'Persist form drafts across sessions', to: '/docs/howto/persist-form-drafts-across-sessions' },
+              { label: 'Prefill a form from an API response', to: '/docs/howto/prefill-a-form-from-an-api-response' },
+              { label: 'Check uniqueness with an API', to: '/docs/howto/add-an-async-uniqueness-check' },
+              { label: 'Submit a form with file uploads', to: '/docs/howto/submit-a-form-with-file-uploads' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>API operations</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Poll an API at regular intervals', to: '/docs/howto/poll-an-api-at-regular-intervals' },
+              { label: 'Retry a failed API call', to: '/docs/howto/retry-a-failed-api-call' },
+              { label: 'Send custom headers per request', to: '/docs/howto/send-custom-headers-per-request' },
+              { label: 'Use mock data during development', to: '/docs/howto/use-mock-data-during-development' },
+              { label: 'Download a file from an API', to: '/docs/howto/download-a-file-from-an-api' },
+              { label: 'Cancel a deferred API operation', to: '/docs/howto/cancel-a-deferred-api-operation' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Tables, lists, and trees</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Auto-size column widths with star', to: '/docs/howto/auto-size-column-widths-with-star' },
+              { label: 'Enable multi-row selection in a Table', to: '/docs/howto/enable-multi-row-selection-in-a-table' },
+              { label: 'Highlight rows conditionally', to: '/docs/howto/highlight-rows-conditionally' },
+              { label: 'Render a custom cell with components', to: '/docs/howto/render-a-custom-cell-with-components' },
+              { label: 'Pin columns in a wide Table', to: '/docs/howto/pin-columns-in-a-wide-table' },
+              { label: 'Add row actions with a context menu', to: '/docs/howto/add-row-actions-with-a-context-menu' },
+              { label: 'Configure Tree data format and mapping', to: '/docs/howto/configure-tree-data-format-and-mapping' },
+              { label: 'Lazy-load Tree children on expand', to: '/docs/howto/lazy-load-tree-children-on-expand' },
+              { label: 'Pre-select a Tree node on load', to: '/docs/howto/pre-select-a-tree-node-on-load' },
+              { label: 'Add drag-and-drop reordering to a List', to: '/docs/howto/add-drag-and-drop-reordering-to-a-list' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Routing and layout UI</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Navigate programmatically', to: '/docs/howto/navigate-programmatically' },
+              { label: 'Protect navigation with willNavigate', to: '/docs/howto/protect-a-page-with-a-route-guard' },
+              { label: 'Validate query parameters in a Page route', to: '/docs/howto/validate-query-parameters-in-a-page-route' },
+              { label: 'Add breadcrumb navigation', to: '/docs/howto/add-breadcrumb-navigation' },
+              { label: 'Deep-link to a Tab or section', to: '/docs/howto/deep-link-to-a-tab-or-section' },
+              { label: 'Build a master-detail layout', to: '/docs/howto/build-a-master-detail-layout' },
+              { label: 'Build a holy-grail layout', to: '/docs/howto/build-a-holy-grail-layout' },
+              { label: 'Create a resizable Splitter view', to: '/docs/howto/create-a-resizable-split-view' },
+              { label: 'Show different content per breakpoint', to: '/docs/howto/show-different-content-per-breakpoint' },
+              { label: 'Make a sticky header in a scroll area', to: '/docs/howto/make-a-sticky-header-in-a-scroll-area' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Dialogs, themes, and user components</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Open a confirmation before delete', to: '/docs/howto/open-a-confirmation-before-delete' },
+              { label: 'Build a fullscreen ModalDialog', to: '/docs/howto/build-a-fullscreen-modal-dialog' },
+              { label: 'Choose imperative or state-driven ModalDialogs', to: '/docs/howto/choose-between-imperative-and-state-driven-modal-dialogs' },
+              { label: 'Show toast notifications from code', to: '/docs/howto/show-toast-notifications-from-code' },
+              { label: 'Show a slide-in settings drawer', to: '/docs/howto/show-a-slide-in-settings-drawer' },
+              { label: 'Create a reusable component', to: '/docs/howto/create-a-reusable-component' },
+              { label: 'Compose components with nesting', to: '/docs/howto/compose-components-with-nesting' },
+              { label: 'Pass a template slot to a component', to: '/docs/howto/pass-a-template-slot-to-a-component' },
+              { label: 'Communicate between sibling components', to: '/docs/howto/communicate-between-sibling-components' },
+              { label: 'Emit a custom event from a component', to: '/docs/howto/emit-a-custom-event-from-a-component' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Lifecycle, errors, menus, and content</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Run a one-time action on page load', to: '/docs/howto/run-a-one-time-action-on-page-load' },
+              { label: 'Rerun a lifecycle effect when a value changes', to: '/docs/howto/rerun-a-lifecycle-effect-when-a-value-changes' },
+              { label: 'Clean up when a panel closes', to: '/docs/howto/clean-up-when-a-panel-closes' },
+              { label: 'Handle lifecycle errors with onError', to: '/docs/howto/handle-lifecycle-errors-with-onerror' },
+              { label: 'Collect global errors with App onError', to: '/docs/howto/collect-global-errors-with-app-onerror' },
+              { label: 'Add a dropdown menu to a button', to: '/docs/howto/add-a-dropdown-menu-to-a-button' },
+              { label: 'Create a multi-level submenu', to: '/docs/howto/create-a-multi-level-submenu' },
+              { label: 'Render Markdown content as a page', to: '/docs/howto/render-markdown-content-as-a-page' },
+              { label: 'Display an empty state illustration', to: '/docs/howto/display-an-empty-state-illustration' },
+              { label: 'Lazy-load images for performance', to: '/docs/howto/lazy-load-images-for-performance' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Theming recipes</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Create a custom color theme', to: '/docs/howto/create-a-custom-color-theme' },
+              { label: 'Implement a dark mode toggle', to: '/docs/howto/implement-a-dark-mode-toggle' },
+              { label: 'Override a component theme vars', to: '/docs/howto/override-a-components-theme-vars' },
+              { label: 'Scope a theme to a card or section', to: '/docs/howto/scope-a-theme-to-a-card-or-section' },
+              { label: 'Theme Button variant and color combos', to: '/docs/howto/theme-button-variant-color-combos' },
+              { label: 'Theme form inputs for all states', to: '/docs/howto/theme-form-inputs-for-all-states' },
+              { label: 'Theme Badge colors and sizes', to: '/docs/howto/theme-badge-colors-and-sizes' },
+              { label: 'Theme DatePicker calendar items', to: '/docs/howto/theme-datepicker-calendar-items' },
+              { label: 'Theme ExpandableItem transitions', to: '/docs/howto/theme-expandableitem-transitions' },
+              { label: 'Customize Tooltip appearance', to: '/docs/howto/customize-tooltip-appearance' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+        <H2>Advanced components, charts, and media</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'Use ECharts for advanced charting', to: '/docs/howto/use-echarts-for-advanced-charting' },
+              { label: 'Generate a QR code from user input', to: '/docs/howto/generate-a-qr-code-from-user-input' },
+              { label: 'Embed an external site in an IFrame', to: '/docs/howto/embed-an-external-site-in-an-iframe' },
+              { label: 'Receive postMessage from an IFrame', to: '/docs/howto/receive-postmessage-from-an-iframe' },
+              { label: 'Parse uploaded files as CSV or JSON', to: '/docs/howto/parse-uploaded-files-as-csv-or-json' },
+              { label: 'Render a flat List with custom cards', to: '/docs/howto/render-a-flat-list-with-custom-cards' },
+              { label: 'Build a responsive card grid', to: '/docs/howto/build-a-responsive-card-grid' },
+              { label: 'Sync TileGrid selection across grids', to: '/docs/howto/sync-tilegrid-selection-across-grids' },
+              { label: 'Use negative maxPrimarySize in Splitter', to: '/docs/howto/use-negative-maxprimarysize-in-splitter' },
+              { label: 'Handle ContentSeparator orientation', to: '/docs/howto/handle-contentseparator-orientation' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/howto/expose-a-method-from-a-component">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Expose a method from a component' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/expose-a-method-from-a-component.md']}" data="/pages/howto/expose-a-method-from-a-component.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/delegate-a-method">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Delegate a method' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/delegate-a-method.md']}" data="/pages/howto/delegate-a-method.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/buffer-a-reactive-edit">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Buffer a reactive edit' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/buffer-a-reactive-edit.md']}" data="/pages/howto/buffer-a-reactive-edit.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/modify-a-value-reported-in-a-column">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Modify a value reported in a column' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/modify-a-value-reported-in-a-column.md']}" data="/pages/howto/modify-a-value-reported-in-a-column.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/filter-and-transform-data-from-an-api">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Filter and transform data from an API' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/filter-and-transform-data-from-an-api.md']}" data="/pages/howto/filter-and-transform-data-from-an-api.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/group-items-in-list-by-a-property">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Group items in List by a property' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/group-items-in-list-by-a-property.md']}" data="/pages/howto/group-items-in-list-by-a-property.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/delay-a-datasource-until-another-datasource-is-ready">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Delay a DataSource until another DataSource is ready' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/delay-a-datasource-until-another-datasource-is-ready.md']}" data="/pages/howto/delay-a-datasource-until-another-datasource-is-ready.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/prevent-undefined-requests-in-chained-datasources">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Prevent undefined requests in chained DataSources' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/prevent-undefined-requests-in-chained-datasources.md']}" data="/pages/howto/prevent-undefined-requests-in-chained-datasources.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/hide-an-element-until-its-datasource-is-ready">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Hide an element until its DataSource is ready' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/hide-an-element-until-its-datasource-is-ready.md']}" data="/pages/howto/hide-an-element-until-its-datasource-is-ready.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/use-fetched-data-safely-in-when">
+      <HStack gap="$space-5" padding="$space-8"><Stack gap="$space-4" width="*" maxWidth="920px"><Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'How-to', to: '/docs/howto' }, { label: 'Use fetched data safely in when' }]}" /><Markdown content="{$appGlobals.docsContentStaticCode['pages/howto/use-fetched-data-safely-in-when.md']}" data="/pages/howto/use-fetched-data-safely-in-when.md" /></Stack></HStack>
+    </Page>
+
+    <Page url="/docs/howto/:slug">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'How-to', to: '/docs/howto' },
+              { label: $routeParams.slug }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/howto/' + $routeParams.slug + '.md']}"
+            data="{'/pages/howto/' + $routeParams.slug + '.md'}"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/hosted-deployment">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Hosted deployment' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/hosted-deployment.md']}" data="/pages/hosted-deployment.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/mcp">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'MCP' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/mcp.md']}" data="/pages/mcp.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/vscode">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'VS Code' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/vscode.md']}" data="/pages/vscode.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/news-and-reviews">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'News and reviews' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/news-and-reviews.md']}" data="/pages/news-and-reviews.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/styles-and-themes/themes">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Themes' }]}" />
+          <Markdown content="{$appGlobals.docsContentStaticCode['pages/styles-and-themes/themes.md']}" data="/pages/styles-and-themes/themes.md" />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/managed-react">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs defaultItems="{[{ label: 'Home', to: '/' }, { label: 'Docs', to: '/docs' }, { label: 'Managed React' }]}" />
+        <Markdown content="{$appGlobals.docsContentStaticCode['pages/managed-react/overview.md']}" data="/pages/managed-react/overview.md" />
+        <H2>Managed React topics</H2>
+        <FlowLayout itemWidth="280px" gap="$space-3">
+          <Items
+            data="{[
+              { label: 'DOM API Isolation', to: '/docs/managed-react/dom-api-isolation' },
+              { label: 'Defended Routing', to: '/docs/managed-react/defended-routing' },
+              { label: 'Fetch Lifecycle', to: '/docs/managed-react/fetch-lifecycle' },
+              { label: 'Forms Validation Discipline', to: '/docs/managed-react/forms-validation-discipline' },
+              { label: 'Reactive Cycle Detection', to: '/docs/managed-react/reactive-cycle-detection' },
+              { label: 'Structured Exception Model', to: '/docs/managed-react/structured-exception-model' },
+              { label: 'XSS Protection', to: '/docs/managed-react/xss-protection' },
+              { label: 'Verified Type Contracts', to: '/docs/managed-react/verified-type-contracts' }
+            ]}"
+          >
+            <Card padding="$space-4">
+              <Link to="{$item.to}">
+                <Text variant="strong">{$item.label}</Text>
+              </Link>
+            </Card>
+          </Items>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/managed-react/:slug">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Managed React', to: '/docs/managed-react' },
+              { label: $routeParams.slug }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['pages/managed-react/' + $routeParams.slug + '.md']}"
+            data="{'/pages/managed-react/' + $routeParams.slug + '.md'}"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/reference/components">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs', to: '/docs' },
+            { label: 'Components' }
+          ]}"
+        />
+        <H1>Components</H1>
+        <Text>Browse all built-in XMLUI components.</Text>
+        <Text>Reference entries loaded: {$appGlobals.navSections.components.items[0].children.length}</Text>
+        <FlowLayout itemWidth="220px" gap="$space-3">
+          <Items data="{$appGlobals.navSections.components.items[0].children}">
+            <Card padding="$space-4">
+              <Stack gap="$space-2">
+                <Link to="{$item.to}">
+                  <Text variant="strong">{$item.label}</Text>
+                </Link>
+                <Text>Built-in component reference</Text>
+              </Stack>
+            </Card>
+          </Items>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/reference/components/Button">
+      <Stack gap="$space-4" padding="$space-8" maxWidth="920px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs', to: '/docs' },
+            { label: 'Components', to: '/docs/reference/components' },
+            { label: 'Button' }
+          ]}"
+        />
+        <H1>Button</H1>
+        <Text>The Button component is available in the migrated component reference route.</Text>
+        <Button onClick="updateCount++">Increment reference counter</Button>
+        <Text>Reference counter: {updateCount}</Text>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/reference/components/:componentName">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Components', to: '/docs/reference/components' },
+              { label: $routeParams.componentName }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['reference/components/' + $routeParams.componentName]}"
+            data="{'/reference/components/' + $routeParams.componentName}"
+          />
+        </Stack>
+      </HStack>
+    </Page>
+
+    <Page url="/docs/reference/extensions">
+      <Stack gap="$space-5" padding="$space-8" maxWidth="1040px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs', to: '/docs' },
+            { label: 'Extensions' }
+          ]}"
+        />
+        <H1>Extensions</H1>
+        <Text>Browse extension packages used by the migrated website.</Text>
+        <Text>Extension packages loaded: {$appGlobals.navSections.extensions.items[0].children.length}</Text>
+        <FlowLayout itemWidth="260px" gap="$space-3">
+          <Items data="{$appGlobals.navSections.extensions.items[0].children}">
+            <Card padding="$space-4">
+              <Stack gap="$space-2">
+                <Link to="{$item.to}">
+                  <Text variant="strong">{$item.label}</Text>
+                </Link>
+                <Text>Components in package: {$item.children.length}</Text>
+              </Stack>
+            </Card>
+          </Items>
+        </FlowLayout>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/reference/extensions/xmlui-gauge/Gauge">
+      <Stack gap="$space-4" padding="$space-8" maxWidth="920px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs', to: '/docs' },
+            { label: 'Extensions', to: '/docs/reference/extensions' },
+            { label: 'xmlui-gauge' },
+            { label: 'Gauge' }
+          ]}"
+        />
+        <H1>Gauge</H1>
+        <Text>The Gauge extension is available in the migrated extension reference route.</Text>
+        <HStack gap="$space-4" verticalAlignment="center">
+          <Gauge
+            id="referenceGauge"
+            initialValue="25"
+            minValue="0"
+            maxValue="100"
+            digitalDisplay="true"
+            width="180px"
+            height="180px"
+          />
+          <Stack gap="$space-2">
+            <Text>Reference gauge value: {referenceGauge.value}</Text>
+            <Button onClick="referenceGauge.setValue(55)">Set reference gauge</Button>
+          </Stack>
+        </HStack>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/reference/extensions/:packageName/:entryName">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Extensions', to: '/docs/reference/extensions' },
+              { label: $routeParams.packageName },
+              { label: $routeParams.entryName }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContentStaticCode['reference/extensions/' + $routeParams.packageName + '/' + $routeParams.entryName]}"
+            data="{'/reference/extensions/' + $routeParams.packageName + '/' + $routeParams.entryName}"
+          />
+        </Stack>
       </HStack>
     </Page>
 

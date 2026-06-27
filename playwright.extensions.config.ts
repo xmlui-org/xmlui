@@ -4,7 +4,22 @@ const reuseExistingServer = process.env.XMLUI_REUSE_EXISTING_SERVER !== "0";
 
 export default defineConfig({
   testDir: ".",
-  testMatch: "packages/**/*.e2e.spec.ts",
+  testMatch: [
+    "packages/**/*.e2e.spec.ts",
+    "packages/xmlui-search/src/Search.spec.ts",
+    "packages/xmlui-website-blocks/src/Backdrop/Backdrop.spec.ts",
+    "packages/xmlui-website-blocks/src/Breakout/Breakout.spec.ts",
+    "packages/xmlui-website-blocks/src/Carousel/Carousel.spec.ts",
+    "packages/xmlui-website-blocks/src/HeroSection/HeroSection.spec.ts",
+    "packages/xmlui-docs-blocks/src/blog/Share.spec.ts",
+    "packages/xmlui-docs-blocks/src/docs/DocsBlocks.spec.ts",
+    "packages/xmlui-gauge/src/Gauge.spec.ts",
+    "packages/xmlui-echart/src/EChart.spec.ts",
+    "packages/xmlui-masonry/src/Masonry.spec.ts",
+    "packages/xmlui-tiptap-editor/src/TiptapEditor.spec.ts",
+    "packages/xmlui-calendar/src/Calendar.spec.ts",
+    "packages/xmlui-grid-layout/src/GridLayout.spec.ts",
+  ],
   fullyParallel: false,
   workers: 1,
   reporter: process.env.CI ? [["github"], ["html"]] : [["html", { open: "never" }]],

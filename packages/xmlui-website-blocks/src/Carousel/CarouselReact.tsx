@@ -19,6 +19,8 @@ type CarouselApi = UseEmblaCarouselType[1];
 
 export type CarouselProps = {
   style?: CSSProperties;
+  width?: string;
+  height?: string;
   className?: string;
   classes?: Record<string, string>;
   orientation?: OrientationOptions;
@@ -32,6 +34,7 @@ export type CarouselProps = {
   nextIcon?: string;
   onDisplayDidChange?: (activeSlide: number) => void;
   registerComponentApi?: RegisterComponentApiFn;
+  registerApi?: RegisterComponentApiFn;
   transitionDuration?: number;
   autoplayInterval?: number;
   stopAutoplayOnInteraction?: boolean;
@@ -66,6 +69,8 @@ export const CarouselComponent = memo(
     orientation = defaultProps.orientation,
     children,
     style,
+    width,
+    height,
     className,
     classes,
     indicators = defaultProps.indicators,
@@ -80,6 +85,7 @@ export const CarouselComponent = memo(
     autoplayInterval = defaultProps.autoplayInterval,
     stopAutoplayOnInteraction = defaultProps.stopAutoplayOnInteraction,
     registerComponentApi,
+    registerApi: _registerApi,
     ...rest
   }: CarouselProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -229,7 +235,7 @@ export const CarouselComponent = memo(
     <CarouselContext.Provider value={carouselContextValue}>
       <div
         {...rest}
-        style={style}
+        style={{ width, height, ...style }}
         ref={ref}
         className={classnames(styles.carousel, classes?.[COMPONENT_PART_KEY], className)}
         role="region"

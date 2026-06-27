@@ -2,6 +2,7 @@ import React, { type ComponentType, type CSSProperties, type ReactNode } from "r
 
 import { createMetadata, type ComponentMetadata } from "./component-core/metadata";
 import type { ComponentExtension, XmluiExtensionComponentProps } from "./extensions";
+import type { XmluiElement, XmluiNode } from "./compiler/ir";
 import { Button } from "./components/Button/ButtonReact";
 import { Icon } from "./components/Icon/IconReact";
 import { LinkNative } from "./components/Link/LinkReact";
@@ -123,6 +124,7 @@ export function wrapComponent(
     allowsChildren: true,
     component: (runtimeProps) => {
       const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
+      Object.assign(normalizedProps, templateProps(runtimeProps, metadata));
       const themeClass = useRuntimeComponentThemeClass(name, metadata);
       const registerApiProp = options.exposeRegisterApi
         ? (() => {
@@ -146,7 +148,7 @@ export function wrapComponent(
           className={themeClass.className}
           style={themeClass.style}
         >
-          {runtimeProps.children}
+          {renderNonPropertyChildren(runtimeProps)}
         </Component>
       );
     },
@@ -403,6 +405,10 @@ function normalizeProps(
   metadata?: ComponentMetadata,
 ): Record<string, unknown> {
   const normalized = { ...props };
+  if (normalized.testId !== undefined && normalized.testId !== null) {
+    normalized["data-testid"] = String(normalized.testId);
+    delete normalized.testId;
+  }
   for (const [sourceName, targetName] of Object.entries(options.rename ?? {})) {
     if (sourceName in normalized) {
       normalized[targetName] = normalized[sourceName];
@@ -422,12 +428,49 @@ function normalizeProps(
     }
   }
   for (const name of booleanProps) {
-    normalized[name] = booleanValue(normalized[name]);
+    if (name in normalized) {
+      normalized[name] = booleanValue(normalized[name]);
+    }
   }
   for (const name of numberProps) {
-    normalized[name] = numberValue(normalized[name]);
+    if (name in normalized) {
+      normalized[name] = numberValue(normalized[name]);
+    }
   }
   return normalized;
+}
+
+function templateProps(
+  runtimeProps: XmluiExtensionComponentProps,
+  metadata?: ComponentMetadata,
+): Record<string, ReactNode> {
+  const result: Record<string, ReactNode> = {};
+  for (const [propName, propMetadata] of Object.entries(metadata?.props ?? {})) {
+    if ((propMetadata as { valueType?: unknown }).valueType !== "ComponentDef") {
+      continue;
+    }
+    const property = findPropertyChild(runtimeProps.node, propName);
+    if (property) {
+      result[propName] = runtimeProps.context.renderChildren(property.children, runtimeProps.scope);
+    }
+  }
+  return result;
+}
+
+function renderNonPropertyChildren(runtimeProps: XmluiExtensionComponentProps): ReactNode {
+  const children = runtimeProps.node.children.filter(
+    (child) => !(child.kind === "element" && child.type === "property"),
+  );
+  return runtimeProps.context.renderChildren(children, runtimeProps.scope);
+}
+
+function findPropertyChild(node: XmluiElement, propName: string): XmluiElement | undefined {
+  return node.children.find(
+    (child: XmluiNode): child is XmluiElement =>
+      child.kind === "element" &&
+      child.type === "property" &&
+      child.props.name === propName,
+  );
 }
 
 function withoutKeys<T extends Record<string, unknown>>(props: T, keys: string[]): Record<string, unknown> {

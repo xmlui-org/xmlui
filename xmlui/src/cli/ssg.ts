@@ -10,12 +10,14 @@
  * core and let them run in parallel.
  */
 
-import { build } from "./build";
+import { build, loadXmluiPluginOptions } from "./build";
 import { discoverRoutes } from "../ssg/discoverRoutes";
 import { getSsgEntrySource } from "../ssg/ssgEntry";
 import { build as viteBuild, type InlineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { xmluiPlugin } from "../vite-plugin/xmluiPlugin";
+import { rawPackageXmluiSourcePlugin } from "../vite-plugin/rawXmluiSourcePlugin";
+import { rawScssModulePlugin } from "../vite-plugin/rawScssModulePlugin";
 import { readFile, writeFile, rm, mkdir, cp, stat } from "node:fs/promises";
 import { Worker } from "node:worker_threads";
 import { availableParallelism } from "node:os";
@@ -118,6 +120,7 @@ export const ssg = async ({
   const ssrBundlePath = path.join(ssrBuildPath, "render.mjs");
   const tempEntryPath = path.resolve(cwd, TEMP_ENTRY_FILE_NAME);
   const workerScriptPath = path.resolve(cwd, WORKER_SCRIPT_NAME);
+  const extensionNames = await loadSsgExtensionNames(cwd);
 
   log(`starting in ${cwd}`);
   log(`cleaning output directory ${outPath}`);
@@ -182,17 +185,17 @@ export const ssg = async ({
 
   // Create temporary SSR entry
   log("creating SSR module");
-  await writeFile(tempEntryPath, getSsgEntrySource(), "utf-8");
+  await writeFile(tempEntryPath, getSsgEntrySource(extensionNames), "utf-8");
 
   // Build SSR bundle
   try {
     log("building SSR module");
     await rm(ssrBuildPath, { recursive: true, force: true });
 
-    const xmlui = xmluiPlugin();
+    const xmlui = xmluiPlugin(await loadXmluiPluginOptions());
 
     await viteBuild({
-      plugins: [xmlui, react()],
+      plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), xmlui, react()],
       resolve: {
         extensions: [
           ".js",
@@ -270,13 +273,16 @@ export const ssg = async ({
       for (const err of errors) {
         log(`  ${err}`);
       }
+      throw new Error(`${errors.length} route(s) failed to render during SSG.`);
     }
 
     // Write rendered HTML files (preserving route order)
+    const missingRoutes: string[] = [];
     for (const route of pathsToRender) {
       const html = resultMap.get(route);
       if (!html) {
         log(`WARNING: no render output for ${route}, skipping`);
+        missingRoutes.push(route);
         continue;
       }
 
@@ -286,6 +292,9 @@ export const ssg = async ({
       await mkdir(dir, { recursive: true });
       await writeFile(outputFile, finalHtml, "utf-8");
       log(`  wrote ${outputFile}`);
+    }
+    if (missingRoutes.length > 0) {
+      throw new Error(`${missingRoutes.length} discovered route(s) produced no rendered HTML during SSG.`);
     }
 
     // Render fallback
@@ -373,4 +382,17 @@ function applyRenderToShell(shellHtml: string, renderedMarkup: string): string {
 
   // Fallback: insert before </body>
   return shellHtml.replace(/<\/body>/i, `${renderedMarkup}</body>`);
+}
+
+async function loadSsgExtensionNames(cwd: string): Promise<string[]> {
+  try {
+    const raw = await readFile(path.join(cwd, "xmlui.config.json"), "utf-8");
+    const config = JSON.parse(raw);
+    if (!Array.isArray(config.extensions)) {
+      return [];
+    }
+    return config.extensions.filter((name: unknown): name is string => typeof name === "string");
+  } catch {
+    return [];
+  }
 }

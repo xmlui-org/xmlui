@@ -68,6 +68,14 @@ export const CarouselMd = createMetadata({
       description: "The icon to display for the next control.",
       valueType: "string",
     },
+    width: {
+      description: "Sets the carousel width.",
+      valueType: "string",
+    },
+    height: {
+      description: "Sets the carousel height.",
+      valueType: "string",
+    },
   },
   events: {
     displayDidChange: {

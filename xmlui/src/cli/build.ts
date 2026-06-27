@@ -24,7 +24,7 @@ export type BuildOptions = {
   withRelativeRoot?: boolean;
 };
 
-async function loadXmluiPluginOptions(): Promise<XmluiPluginOptions> {
+export async function loadXmluiPluginOptions(): Promise<XmluiPluginOptions> {
   try {
     const rawConfig = await readFile(
       path.join(process.cwd(), "xmlui.config.json"),

@@ -4,7 +4,8 @@ const reuseExistingServer = process.env.XMLUI_REUSE_EXISTING_SERVER !== "0";
 
 export default defineConfig({
   testDir: "tests/e2e",
-  fullyParallel: true,
+  fullyParallel: false,
+  workers: 1,
   reporter: process.env.CI ? [["github"], ["html"]] : [["html", { open: "never" }]],
   expect: { timeout: 10_000 },
   webServer: {

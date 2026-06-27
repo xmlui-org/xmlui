@@ -1,4 +1,5 @@
-import { test, expect } from "xmlui/testing";
+import { expect } from "@playwright/test";
+import { test } from "../../../../xmlui/src/testing";
 
 test("renders HeroSection", async ({ initTestBed, page }) => {
   // const src = `

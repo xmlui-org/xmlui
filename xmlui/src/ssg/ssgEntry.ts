@@ -10,25 +10,31 @@
  * StaticRouter, HelmetProvider, StyleProvider, etc.
  */
 
-export function getSsgEntrySource(): string {
+export function getSsgEntrySource(extensionNames: string[] = []): string {
+  const extensionImports = extensionNames
+    .map((name, index) => `import extension${index} from ${JSON.stringify(name)};`)
+    .join("\n");
+  const loadedExtensions = extensionNames.map((_, index) => `extension${index}`).join(", ");
+
   return `
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { XmluiRoot } from "xmlui";
 import type { XmluiModule, Extension } from "xmlui";
+${extensionImports}
 
 const runtime = import.meta.glob([
-  "./**/*.xmlui",
-  "./**/*.xs",
-  "./**/config.ts",
-  "./**/config.js",
-  "./**/api.ts",
-  "./**/api.js",
-  "./**/themes/**/*.ts",
-  "./**/themes/**/*.js",
+  "./src/**/*.xmlui",
+  "./src/**/*.xs",
+  "./src/**/config.ts",
+  "./src/**/config.js",
+  "./src/**/api.ts",
+  "./src/**/api.js",
+  "./src/**/themes/**/*.ts",
+  "./src/**/themes/**/*.js",
 ], { eager: true });
 
-const loadedExtensions: Extension[] = [];
+const loadedExtensions: Extension[] = [${loadedExtensions}];
 
 function findAppModule(): XmluiModule & { kind: "app" } {
   for (const value of Object.values(runtime)) {
@@ -43,6 +49,7 @@ function findAppModule(): XmluiModule & { kind: "app" } {
 }
 
 const appModule = findAppModule();
+const appConfig = findAppConfig();
 
 export function renderPath(pathname: string) {
   return renderToString(
@@ -50,8 +57,19 @@ export function renderPath(pathname: string) {
       module: appModule,
       initialUrl: pathname,
       extensions: loadedExtensions,
+      appGlobals: { ...(appConfig?.appGlobals ?? {}), isSsg: true },
     })
   );
+}
+
+function findAppConfig(): { appGlobals?: Record<string, unknown> } | undefined {
+  for (const value of Object.values(runtime)) {
+    const config = (value as any)?.default;
+    if (config && typeof config === "object" && config.appGlobals && typeof config.appGlobals === "object") {
+      return config as { appGlobals?: Record<string, unknown> };
+    }
+  }
+  return undefined;
 }
 `;
 }

@@ -992,13 +992,7 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.component).toContainText("Group: fruit");
     await expect(driver.component).toContainText("Apple");
 
-    // Note: Implementation may still show items from filtered groups
-    const hasVegetableGroup =
-      (await driver.component.textContent())?.includes("Group: vegetable") ?? false;
-    if (!hasVegetableGroup) {
-      // This documents expected behavior - vegetable group header should be filtered
-      console.log("availableGroups correctly filters group headers");
-    }
+    await expect(driver.component).not.toContainText("Group: vegetable");
   });
 
   test("idKey set to nonexistent attribute handles gracefully", async ({

@@ -7,6 +7,13 @@ import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
 
 export default defineConfig({
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ["if-function"],
+      },
+    },
+  },
   plugins: [
     rawScssModulePlugin(),
     exampleApiMocksPlugin(),

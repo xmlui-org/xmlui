@@ -1,4 +1,5 @@
-import { expect, test } from "xmlui/testing";
+import { expect } from "@playwright/test";
+import { test } from "../../../../xmlui/src/testing";
 
 const EXT = { extensionIds: "xmlui-docs-blocks" };
 

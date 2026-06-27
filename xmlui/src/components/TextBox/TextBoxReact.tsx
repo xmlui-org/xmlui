@@ -1,4 +1,4 @@
-import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
+import type { AriaAttributes, CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
 import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./TextBox.defaults";
@@ -51,6 +51,9 @@ export type TextBoxProps = {
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void | Promise<void>;
+  "aria-autocomplete"?: AriaAttributes["aria-autocomplete"];
+  "aria-controls"?: AriaAttributes["aria-controls"];
+  "aria-activedescendant"?: AriaAttributes["aria-activedescendant"];
 };
 
 export type TextBoxApi = {
@@ -104,6 +107,9 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
     onFocus,
     onBlur,
     onKeyDown,
+    "aria-autocomplete": ariaAutocomplete,
+    "aria-controls": ariaControls,
+    "aria-activedescendant": ariaActiveDescendant,
     ...rest
   },
   ref,
@@ -299,6 +305,9 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
         autoCorrect={normalizeOnOff(autoCorrect)}
         spellCheck={spellCheck}
         autoCapitalize={autoCapitalize}
+        aria-autocomplete={ariaAutocomplete}
+        aria-controls={ariaControls}
+        aria-activedescendant={ariaActiveDescendant}
         onChange={(event: ChangeEvent<HTMLInputElement>) => updateValue(event.currentTarget.value)}
         onFocus={(_event: FocusEvent<HTMLInputElement>) => void onFocus?.()}
         onBlur={(_event: FocusEvent<HTMLInputElement>) => handleBlur()}

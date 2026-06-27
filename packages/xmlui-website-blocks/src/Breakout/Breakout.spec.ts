@@ -1,4 +1,5 @@
-import { test, expect } from "xmlui/testing";
+import { expect } from "@playwright/test";
+import { test } from "../../../../xmlui/src/testing";
 import type { Locator } from "@playwright/test";
 
 const EXT = { extensionIds: "xmlui-website-blocks" };

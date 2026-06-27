@@ -134,6 +134,11 @@ type WorkerFixtures = {
 declare global {
   interface Window {
     __xmluiClipboardText?: string;
+    __xmluiTestBedProbe?: {
+      hasLocal(name: string): boolean;
+      readLocal(name: string): unknown;
+      readGlobal(name: string): unknown;
+    };
     __xmluiTestBedReady?: boolean;
     __xmluiTestBedReinit?: (source: string) => Promise<void>;
   }

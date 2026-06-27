@@ -106,6 +106,17 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 }
 
+.inlineContainer {
+  display: inline-block;
+  position: relative;
+}
+
+.inlineListPanel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+}
+
 .list {
   background-color: $backgroundColor-Search;
   max-height: $maxHeight-SearchList;

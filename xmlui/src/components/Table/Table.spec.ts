@@ -4199,11 +4199,16 @@ test.describe("Column width theme variables", () => {
     const firstHeader = page.locator("thead th").nth(0);
     await expect(firstHeader).toBeVisible();
 
-    const headerBox = await firstHeader.boundingBox();
-    expect(headerBox).not.toBeNull();
-    // 3rem * 16px = 48px; allow ~4px tolerance across environments
-    expect(headerBox!.width).toBeGreaterThanOrEqual(44);
-    expect(headerBox!.width).toBeLessThanOrEqual(52);
+    await expect
+      .poll(
+        async () => {
+          const headerBox = await firstHeader.boundingBox();
+          const width = headerBox?.width ?? 0;
+          return width >= 44 && width <= 52;
+        },
+        { timeout: 10000 },
+      )
+      .toBe(true);
   });
 
   test("column width is consistent whether specified as px or equivalent em theme var", async ({

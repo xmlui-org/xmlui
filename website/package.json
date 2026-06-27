@@ -6,7 +6,12 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
-    "build": "xmlui build",
+    "build": "xmlui build --buildMode=INLINE_ALL --withMock && node scripts/verify-production-output.mjs",
+    "verify:production-output": "node scripts/verify-production-output.mjs",
+    "build-ssg": "xmlui ssg && node scripts/prepare-ssg-output.mjs && node scripts/verify-ssg-output.mjs",
+    "verify:ssg-output": "node scripts/verify-ssg-output.mjs",
+    "verify:preview-ssg": "node scripts/verify-preview-ssg.mjs",
+    "preview-ssg": "node ../xmlui/scripts/preview-ssg.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
