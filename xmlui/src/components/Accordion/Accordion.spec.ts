@@ -1,10 +1,5 @@
 import { test, expect } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old Accordion suite is copied for compatibility tracking, but full Radix behavior, API parity, icon rendering, and theme variable coverage are not complete yet. Re-enable cases feature-by-feature.",
-);
-
 const CODE = `
   <Accordion>
     <AccordionItem>Hello</AccordionItem>
@@ -94,7 +89,7 @@ test("pressing enter on header expands content", async ({ initTestBed, page }) =
 // VISUAL STATE TESTS
 // =============================================================================
 
-test("applies border-side and combination theme variables", async ({
+test.skip("applies border-side and combination theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {
@@ -339,7 +334,7 @@ test("applies border-side and combination theme variables", async ({
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("applies border-color theme variables", async ({
+test.skip("applies border-color theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {
@@ -523,7 +518,7 @@ test("applies border-color theme variables", async ({
   await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
-test("applies border-style and border-width theme variables", async ({
+test.skip("applies border-style and border-width theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {
@@ -753,7 +748,7 @@ test("applies border-style and border-width theme variables", async ({
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("applies padding theme variables", async ({
+test.skip("applies padding theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {

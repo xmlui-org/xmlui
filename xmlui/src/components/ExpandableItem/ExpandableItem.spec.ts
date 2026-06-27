@@ -1,10 +1,21 @@
 import { test, expect } from "../../testing/fixtures";
 import { ExpandableItemDriver } from "../../testing/ComponentDrivers";
 
-test.skip(
-  true,
-  "The literal old ExpandableItem suite is copied for compatibility tracking, but full icon, switch, API, theme variable, layout, form, and behavior parity is not complete yet. Re-enable cases feature-by-feature.",
-);
+const EXPANDABLE_ITEM_OLD_SUITE_PENDING =
+  "The literal old ExpandableItem suite is copied for compatibility tracking, but full icon, switch, API, theme variable, layout, form, and behavior parity is not complete yet. Re-enable cases feature-by-feature.";
+
+const ACTIVE_EXPANDABLE_ITEM_TESTS = new Set([
+  "component renders with basic props",
+  "component displays summary content correctly",
+  "component handles initiallyExpanded prop",
+  "component toggles on summary click",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_EXPANDABLE_ITEM_TESTS.has(testInfo.title)) {
+    test.skip(true, EXPANDABLE_ITEM_OLD_SUITE_PENDING);
+  }
+});
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -19,7 +30,7 @@ test.describe("Basic Functionality", () => {
     const driver = await createExpandableItemDriver();
 
     await expect(driver.component).toBeVisible();
-    await expect(driver.getSummaryContent()).toContainText("Test Summary");
+    await expect(driver.getSummary()).toContainText("Test Summary");
     await expect(driver.getContent()).not.toBeVisible(); // Initially collapsed
   });
 
@@ -30,7 +41,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`<ExpandableItem summary="My Summary">Content</ExpandableItem>`, {});
     const driver = await createExpandableItemDriver();
 
-    await expect(driver.getSummaryContent()).toContainText("My Summary");
+    await expect(driver.getSummary()).toContainText("My Summary");
     await expect(driver.getSummary()).toBeVisible();
   });
 

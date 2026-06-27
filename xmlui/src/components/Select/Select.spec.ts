@@ -1529,7 +1529,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(listWrapper).toBeVisible();
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <Select
@@ -1558,10 +1558,14 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
 
     // Verify parts are visible
+    await component.click();
     await expect(listWrapper).toBeVisible();
     await expect(clearButton).toBeVisible();
 
-    await component.hover();
+    await page.getByRole("combobox").press("Escape");
+    await expect(listWrapper).not.toBeVisible();
+
+    await page.getByRole("combobox").hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");

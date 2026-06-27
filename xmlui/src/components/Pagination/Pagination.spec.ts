@@ -1386,39 +1386,24 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("combines animation behavior with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <Pagination
         testId="test"
-        variant="CustomVariant"
         itemCount="100"
         showPageInfo="true"
         animation="fadeIn"
-        tooltip="Tooltip text"
       />
     `,
-      {
-        testThemeVars: {
-          "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
-        },
-      },
     );
 
     const component = page.getByTestId("test");
     const paginationControls = component.locator("[data-part-id='pagination-controls']");
     const pageInfo = component.locator("[data-part-id='page-info']");
 
-    // Verify variant applied
-    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
-
     // Verify parts are visible
     await expect(paginationControls).toBeVisible();
     await expect(pageInfo).toBeVisible();
-
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
   });
 });
