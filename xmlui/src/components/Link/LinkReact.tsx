@@ -29,6 +29,7 @@ export type LinkProps = {
   className?: string;
   style?: CSSProperties;
   onClick?: (event: MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => void | Promise<void>;
+  onContextMenu?: (event: MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => void | Promise<void>;
 };
 
 export const LinkNative = memo(forwardRef<HTMLElement, LinkProps>(function LinkNative(
@@ -57,6 +58,7 @@ export const LinkNative = memo(forwardRef<HTMLElement, LinkProps>(function LinkN
     className,
     style,
     onClick,
+    onContextMenu,
     ...rest
   },
   ref,
@@ -101,7 +103,13 @@ export const LinkNative = memo(forwardRef<HTMLElement, LinkProps>(function LinkN
       className,
     ),
     style: mergedStyle,
-    onClick: enabled ? onClick : undefined,
+    onClick: enabled ? (event: MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => {
+      if (onClick) {
+        event.preventDefault();
+        void onClick(event);
+      }
+    } : undefined,
+    onContextMenu: enabled ? onContextMenu : undefined,
   };
 
   const body = (

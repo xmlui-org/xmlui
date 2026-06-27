@@ -37,6 +37,7 @@ export function TileGridNative({
   return (
     <div
       {...rest}
+      role="grid"
       className={cx(styles.tileGrid, !stretchItems ? styles.fixedTiles : undefined, loading ? styles.loading : undefined, className)}
       style={{
         ...style,
@@ -48,6 +49,8 @@ export function TileGridNative({
       {loading ? null : items.map((item) => (
         <div
           key={item.key}
+          role="gridcell"
+          aria-selected={item.selected ? "true" : "false"}
           className={cx(styles.tile, item.selected ? styles.selected : undefined)}
           tabIndex={0}
           onClick={() => void item.onClick?.()}

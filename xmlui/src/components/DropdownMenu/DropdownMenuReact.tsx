@@ -153,6 +153,7 @@ export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProp
           className={styles.trigger}
           aria-expanded={openState}
           aria-haspopup="menu"
+          data-testid={dataTestId}
           data-xmlui-component="DropdownMenu"
           disabled={disabled}
           onClick={(event) => {
@@ -214,7 +215,7 @@ export const MenuItemComponent = forwardRef<HTMLDivElement, MenuItemProps>(funct
   ref,
 ) {
   const menu = useMenuContext();
-  const content = children ?? label;
+  const content = Children.count(children) > 0 ? children : label;
   return (
     <div
       {...rest}

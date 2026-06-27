@@ -1,12 +1,11 @@
 import { expect, test } from "../../testing/fixtures";
-
-const TREE_FAMILY_OLD_SUITE_PENDING =
-  "The literal old Tree-family suite is copied for compatibility tracking, but the full Tree/TreeDisplay/TableOfContents migration is not complete yet. Re-enable cases feature-by-feature as hierarchy behavior, dynamic loading, APIs, scrolling, heading indexing, route integration, parts, and behaviors are migrated.";
-
-test.beforeEach(() => {
-  test.skip(true, TREE_FAMILY_OLD_SUITE_PENDING);
-});
-import { flatTreeData, flatTreeDataWithIcons1, flatTreeDataWithIcons2, flatTreeDataWithIconsAndAlias1 } from "./testData";
+import {
+  flatTreeData,
+  flatTreeDataWithIcons1,
+  flatTreeDataWithIcons2,
+  flatTreeDataWithIconsAndAlias1,
+  flatTreeDataWithIconsAndAlias2,
+} from "./testData";
 
 test("default collapsed icon appears", async ({ initTestBed, createTreeDriver }) => {
   await initTestBed(`
@@ -216,7 +215,7 @@ test("iconCollapsed fields (with alias) are used", async ({ initTestBed, page, c
           id="tree"
           iconCollapsedField="iconColl"
           defaultExpanded="none"
-          data='{${JSON.stringify(flatTreeDataWithIcons2)}}' />
+          data='{${JSON.stringify(flatTreeDataWithIconsAndAlias2)}}' />
         <Button testId="expand1" onClick="tree.expandNode(1)">Expand Node 1</Button>
         <Button testId="expand2" onClick="tree.expandNode(2)">Expand Node 2</Button>
       </VStack>

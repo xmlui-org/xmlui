@@ -226,4 +226,37 @@ const icons: Record<string, IconDefinition> = {
       </>
     ),
   },
+  phone: {
+    viewBox: "0 0 24 24",
+    children: (
+      <path d="M6.5 4.5 9 4l2 4-1.5 1.5a10 10 0 0 0 5 5L16 13l4 2-.5 2.5c-.2 1-1 1.7-2 1.7A13.7 13.7 0 0 1 4.8 6.5c0-1 .7-1.8 1.7-2Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+  },
+  email: {
+    viewBox: "0 0 24 24",
+    children: (
+      <>
+        <rect x="4" y="6" width="16" height="12" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
+        <path d="m5 8 7 5 7-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </>
+    ),
+  },
+  folder: {
+    viewBox: "0 0 24 24",
+    children: (
+      <path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H9l2 2h7.5A2.5 2.5 0 0 1 21 8.5v7A2.5 2.5 0 0 1 18.5 18h-13A2.5 2.5 0 0 1 3 15.5Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    ),
+  },
+  "folder-open": {
+    viewBox: "0 0 24 24",
+    children: (
+      <path d="M3 8.5A2.5 2.5 0 0 1 5.5 6H9l2 2h7.5A2.5 2.5 0 0 1 21 10.5v1H7l-2 6H3Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    ),
+  },
+  "folder-closed": {
+    viewBox: "0 0 24 24",
+    children: (
+      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v6A2.5 2.5 0 0 1 18.5 18h-13A2.5 2.5 0 0 1 3 15.5Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    ),
+  },
 };

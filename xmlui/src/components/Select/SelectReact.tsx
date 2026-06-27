@@ -132,6 +132,10 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
     [initialValue, multiSelect],
   );
   const normalizedInitialValueKey = stableValueKey(normalizedInitialValue);
+  const optionsKey = useMemo(
+    () => options.map((option) => `${String(option.value ?? "")}:${option.enabled === false ? "0" : "1"}`).join("\u0000"),
+    [options],
+  );
   const [internalValue, setInternalValue] = useState<SelectValue>(normalizedInitialValue);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -157,8 +161,13 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
     return registerFormItem({
       name: fieldName,
       required,
+      sanitizeSubmitValue: (submittedValue) => sanitizeSelectSubmitValue(
+        submittedValue as SelectValue,
+        options,
+        multiSelect,
+      ),
     });
-  }, [fieldName, registerFormItem, required]);
+  }, [fieldName, multiSelect, optionsKey, registerFormItem, required]);
 
   useEffect(() => {
     if (!setFormValue || fieldName === undefined) {
@@ -186,14 +195,15 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
       }
       return;
     }
-    if (formValue !== undefined) {
-      setFormValue(fieldName, undefined);
+    if (formValue !== null) {
+      setFormValue(fieldName, null);
     }
   }, [
     fieldName,
     formValue,
     multiSelect,
     normalizedInitialValue,
+    optionsKey,
     options,
     setFormValue,
   ]);
@@ -602,6 +612,22 @@ function selectValueForOption(option: XmluiOption): SelectValue {
     return null;
   }
   return (option.value === "" ? optionText(option) : option.value) as SelectValue;
+}
+
+function sanitizeSelectSubmitValue(
+  value: SelectValue,
+  options: XmluiOption[],
+  multiSelect: boolean,
+): SelectValue {
+  const validOptionValues = new Set(options.map((option) => String(option.value ?? "")));
+  if (multiSelect) {
+    const filtered = normalizeArrayValue(value).filter((item) => validOptionValues.has(String(item)));
+    return filtered.length > 0 ? filtered : undefined;
+  }
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+  return validOptionValues.has(String(value)) ? value : null;
 }
 
 type GroupedVisibleItem =

@@ -115,6 +115,11 @@ export function useXmluiComponentAdapter({
     ])),
     [node.events, node.parsed?.events, scope],
   );
+  const rootPart =
+    typeof props.__xmluiPartId === "string" && props.__xmluiPartId.length > 0
+      ? props.__xmluiPartId
+      : defaultPart;
+  const explicitRootPart = typeof props.__xmluiPartId === "string" && props.__xmluiPartId.length > 0;
   const apiRef = useRef<Record<string, unknown>>({});
   const registeredIdRef = useRef<string>();
   const variant = typeof props.variant === "string" ? props.variant : undefined;
@@ -129,14 +134,14 @@ export function useXmluiComponentAdapter({
     [props],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
-    if (part === defaultPart) {
+    if (part === defaultPart || part === rootPart) {
       return {
         ...layoutStyle,
         ...resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth),
       };
     }
     return resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth);
-  }, [defaultPart, layoutStyle, layoutStyles, viewportWidth]);
+  }, [defaultPart, layoutStyle, layoutStyles, rootPart, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
     Object.assign(apiRef.current, api);
     const id = typeof props.id === "string" ? props.id : undefined;
@@ -181,10 +186,11 @@ export function useXmluiComponentAdapter({
       ...themeClass.style,
       ...layoutStyle,
     },
-    rootAttrs: (part = defaultPart) => ({
+    rootAttrs: (part = rootPart) => ({
       ...arbitraryRootAttrs(metadata, props),
       "data-xmlui-component": name,
       "data-xmlui-part": part,
+      "data-part-id": explicitRootPart ? part : undefined,
       "data-xmlui-id": props.id,
       "data-testid": props.testId,
       className: themeClass.className,
@@ -233,8 +239,8 @@ export function useXmluiComponentAdapter({
     resourceUrl: (value) => value == null || value === "" ? undefined : String(value),
   }), [
     context,
-    defaultPart,
     events,
+    explicitRootPart,
     layoutStyleForPart,
     metadata,
     themeContributors,
@@ -242,6 +248,7 @@ export function useXmluiComponentAdapter({
     node,
     props,
     registerApi,
+    rootPart,
     scope,
     themeClass.className,
     themeClass.style,

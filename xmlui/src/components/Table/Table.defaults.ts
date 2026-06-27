@@ -33,5 +33,12 @@ export const defaultProps = {
   userSelectRow: "auto",
   userSelectHeading: "none",
   alwaysShowHeader: false,
+  keyBindings: {
+    selectAll: "ControlOrMeta+A",
+    copy: "ControlOrMeta+C",
+    cut: "ControlOrMeta+X",
+    paste: "ControlOrMeta+V",
+    delete: "Delete",
+  } as Record<string, string>,
   striped: false,
 };

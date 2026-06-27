@@ -98,9 +98,15 @@ test.describe("MessageListener foundation", () => {
       .poll(async () =>
         page.getByTestId("one").evaluate((element) => {
           const parent = element.parentElement;
-          return parent ? getComputedStyle(parent).rowGap : "";
+          if (!parent) {
+            return false;
+          }
+          const one = element.getBoundingClientRect();
+          const two = document.querySelector('[data-testid="two"]')?.getBoundingClientRect();
+          const rowGap = Number.parseFloat(getComputedStyle(parent).rowGap);
+          return !!two && rowGap > 0 && Math.abs(two.top - one.bottom - rowGap) < 1;
         }),
       )
-      .toBe("32px");
+      .toBe(true);
   });
 });

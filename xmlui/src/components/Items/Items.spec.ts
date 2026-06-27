@@ -458,7 +458,7 @@ test.describe("Other Edge Cases", () => {
 // =============================================================================
 
 test.describe("Function dependency tracking across containers", () => {
-  test.fixme("script function calls in Items children re-evaluate when parent variable changes", async ({
+  test("script function calls in Items children re-evaluate when parent variable changes", async ({
     initTestBed,
     page,
   }) => {

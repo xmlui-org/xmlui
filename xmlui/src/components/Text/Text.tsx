@@ -73,6 +73,10 @@ export const TextMd = createMetadata({
     },
   },
   events: {
+    click: {
+      description: "Fired when the text is clicked.",
+      signature: "click(): void",
+    },
     contextMenu: dContextMenu(COMP),
   },
   apis: {
@@ -162,6 +166,7 @@ export const textRenderer = wrapComponent({
           ...(rootAttrs.style as CSSProperties | undefined),
           ...currentVariantCssVariables(variant, mergedThemeVariables),
         }}
+        onClick={() => void adapter.event("click")()}
         onContextMenu={() => void adapter.event("contextMenu")()}
         registerApi={adapter.registerApi}
       >

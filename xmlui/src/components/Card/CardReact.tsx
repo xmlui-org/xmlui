@@ -119,7 +119,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
 function renderAvatar(avatarUrl: string | undefined, title: string | undefined, avatarSize: string | undefined) {
   const className = cx(styles.avatar, avatarSizeClass(avatarSize));
   return avatarUrl
-    ? <img data-xmlui-part="avatar" className={className} src={avatarUrl} alt="" />
+    ? <img data-xmlui-part="avatar" className={className} src={avatarUrl} alt="avatar" />
     : <div data-xmlui-part="avatar" role="img" aria-label={title || "avatar"} className={className}>{initials(title)}</div>;
 }
 

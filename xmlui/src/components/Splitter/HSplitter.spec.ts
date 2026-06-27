@@ -1,11 +1,6 @@
 import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old HSplitter suite is copied for compatibility tracking, but full Splitter alias resize and resizer behavior parity is not complete yet. Re-enable cases feature-by-feature.",
-);
-
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -99,7 +94,7 @@ test.describe("Basic Functionality", () => {
 // EVENT TESTS
 // =============================================================================
 
-test.describe("resize event", () => {
+test.describe.skip("resize event", () => {
   test("emits primary size as pixels when initialPrimarySize uses percent", async ({
     initTestBed,
     page,

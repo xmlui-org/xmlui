@@ -338,8 +338,15 @@ class ScriptParser {
       }
     }
     if (!this.at(ScriptTokenKind.ReturnKeyword)) {
-      this.report("XS124", "Expected 'return' in block-bodied arrow expression.", this.current());
-      return this.parseBlockStatementAfterOpen(open);
+      const close = this.at(ScriptTokenKind.CloseBrace)
+        ? this.consume(ScriptTokenKind.CloseBrace)
+        : this.current();
+      if (close.kind !== ScriptTokenKind.CloseBrace) {
+        this.report("XS125", "Expected '}' after arrow function body.", this.current());
+      }
+      return this.node("BlockStatement", open, close, statements, {
+        body: statements,
+      }) as ScriptNode;
     }
     this.consume(ScriptTokenKind.ReturnKeyword);
     const expression = this.parseExpression();

@@ -1,10 +1,5 @@
 import { test, expect } from "../../testing/fixtures";
 
-const STACK_OLD_SUITE_PENDING =
-  "Literal old CVStack suite copied for compatibility tracking; CVStack registration and full Stack-family semantics are pending in Phase 5 Wave D.";
-
-test.beforeEach(() => test.skip(true, STACK_OLD_SUITE_PENDING));
-
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================

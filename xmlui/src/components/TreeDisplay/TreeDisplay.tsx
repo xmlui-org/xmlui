@@ -49,11 +49,24 @@ export const TreeDisplayMd = createMetadata({
 export const treeDisplayRenderer = wrapComponent({
   name: COMP,
   metadata: TreeDisplayMd,
-  renderer: ({ adapter }) => (
-    <TreeDisplayNative
-      {...adapter.rootAttrs()}
-      content={adapter.stringProp("content", defaultProps.content)}
-      itemHeight={adapter.numberProp("itemHeight", defaultProps.itemHeight)}
-    />
-  ),
+  renderer: ({ adapter }) => {
+    const content = adapter.stringProp("content");
+    return (
+      <TreeDisplayNative
+        {...adapter.rootAttrs()}
+        content={content ?? directTextContent(adapter.node.children) ?? defaultProps.content}
+        itemHeight={adapter.numberProp("itemHeight", defaultProps.itemHeight)}
+        onContextMenu={adapter.node.events.contextMenu ? ((event) => void adapter.event("contextMenu")(event)) : undefined}
+      />
+    );
+  },
 });
+
+function directTextContent(children: unknown[]): string | undefined {
+  const text = children
+    .map((child) => child && typeof child === "object" && (child as { kind?: unknown }).kind === "text"
+      ? String((child as { value?: unknown }).value ?? "")
+      : "")
+    .join("");
+  return text.trim().length > 0 ? text : undefined;
+}

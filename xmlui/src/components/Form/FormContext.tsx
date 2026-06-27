@@ -18,6 +18,7 @@ export type FormItemRegistration = {
   matchValue?: unknown;
   matchInvalidMessage?: string;
   noSubmit?: boolean;
+  sanitizeSubmitValue?: (value: unknown) => unknown;
   validate?: (value: unknown) => unknown | Promise<unknown>;
 };
 

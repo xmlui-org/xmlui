@@ -74,7 +74,11 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
   );
 };
 
-export const pageRenderer: XmluiBuiltInRenderer = () => null;
+export const pageRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) => (
+  <div className="xmlui-page-root" data-xmlui-component="Page" data-xmlui-part="root">
+    {context.renderChildren(node.children, scope)}
+  </div>
+);
 
 function useRouteSnapshot(scope: Parameters<XmluiBuiltInRenderer>[0]["scope"]): RouteSnapshot {
   const fallback = {

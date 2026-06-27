@@ -76,7 +76,7 @@ export type TestBedResult = {
 
 type Fixtures = {
   initTestBed: (markup: string, options?: InitTestBedOptions) => Promise<TestBedResult>;
-  createButtonDriver: () => Promise<ComponentDriver>;
+  createButtonDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
   createAppHeaderDriver: (testId?: string | Locator) => Promise<AppHeaderDriver>;
   createAvatarDriver: (testId?: string | Locator) => Promise<AvatarDriver>;
@@ -223,17 +223,24 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
         clipboard: createClipboardHelper(page),
         testStateDriver: {
           testState: async () => {
-            const probedValue = await page.evaluate(() => window.__xmluiTestBedProbe?.readLocal("testState"));
-            return probedValue === undefined
-              ? parseTestState(await page.getByTestId("__xmlui-test-state").textContent())
-              : probedValue;
+            const probed = await page.evaluate(() => {
+              const probe = window.__xmluiTestBedProbe;
+              return {
+                hasLocal: probe?.hasLocal?.("testState") ?? false,
+                value: probe?.readLocal("testState"),
+              };
+            });
+            if (probed.hasLocal) {
+              return probed.value;
+            }
+            return parseTestState(await page.getByTestId("__xmlui-test-state").textContent());
           },
         },
       };
     });
   },
   createButtonDriver: async ({ page }, use) => {
-    await use(async () => createButtonDriver(page));
+    await use(async (testId) => createButtonDriver(page, testId));
   },
   createAccordionDriver: async ({ page }, use) => {
     await use(async (testId) => new AccordionDriver({
@@ -763,18 +770,24 @@ async function installApiInterceptor(
       let body: unknown = { success: true };
       let status = operation.status ?? 200;
       if (operation.handler) {
-        try {
-          body = runApiHandler(operation.handler, {
-            $state: state,
-            $requestBody: requestBody(route.request()),
-            $pathParams: pathParams(operation.url, new URL(route.request().url()).pathname),
-          });
-        } catch (error) {
+	        try {
+	          const apiContext = {
+	            $state: state,
+	            $requestBody: requestBody(route.request()),
+	            $pathParams: pathParams(operation.url, new URL(route.request().url()).pathname),
+	            $delayMs: 0,
+	          };
+	          body = runApiHandler(operation.handler, apiContext);
+	          if (apiContext.$delayMs > 0) {
+	            await new Promise((resolve) => setTimeout(resolve, apiContext.$delayMs));
+	          }
+	        } catch (error) {
           if (isHttpError(error)) {
             status = error.status;
             body = error.body;
           } else {
-            throw error;
+            status = 500;
+            body = { error: String(error) };
           }
         }
       }
@@ -793,13 +806,17 @@ function routeGlob(pattern: string): string {
 
 function runApiHandler(source: string, context: Record<string, unknown>): unknown {
   const handler = createApiHandler(source);
-  return handler(
-    context.$state,
-    context.$requestBody,
-    context.$pathParams,
-    {
-      HttpError: (status: number, body: unknown) => {
-        throw { __xmluiHttpError: true, status, body };
+	  return handler(
+	    context.$state,
+	    context.$requestBody,
+	    context.$pathParams,
+	    context.$pathParams,
+	    (ms: number) => {
+	      context.$delayMs = Math.max(Number(context.$delayMs) || 0, Math.max(0, Number(ms) || 0));
+	    },
+	    {
+	      HttpError: (status: number, body: unknown) => {
+	        throw { __xmluiHttpError: true, status, body };
       },
     },
   );
@@ -809,14 +826,16 @@ function createApiHandler(source: string): Function {
   const trimmed = source.trim();
   if (trimmed.startsWith("(") || trimmed.includes("=>")) {
     return new Function(
-      "$state",
-      "$requestBody",
-      "$pathParams",
-      "Errors",
-      `return (${source})();`,
-    );
-  }
-  return new Function("$state", "$requestBody", "$pathParams", "Errors", source);
+	      "$state",
+	      "$requestBody",
+	      "$pathParams",
+	      "$params",
+	      "delay",
+	      "Errors",
+	      `return (${source})();`,
+	    );
+	  }
+	  return new Function("$state", "$requestBody", "$pathParams", "$params", "delay", "Errors", source);
 }
 
 function requestBody(request: import("@playwright/test").Request): unknown {
@@ -866,8 +885,10 @@ async function replayInitScripts(page: Page): Promise<void> {
   initScriptQueue.length = 0;
 }
 
-function createButtonDriver(page: Page): ComponentDriver {
-  const component = page.getByRole("button").first();
+function createButtonDriver(page: Page, testId?: string | Locator): ComponentDriver {
+  const component = typeof testId === "string"
+    ? page.getByTestId(testId).or(page.locator(`[data-xmlui-id="${testId}"]`)).or(page.locator(`#${testId}`)).first()
+    : testId ?? page.getByRole("button").first();
   return new ComponentDriver({
     locator: component,
     page,
@@ -884,18 +905,15 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     "paddingVertical-content-App": "0",
     "gap-content-App": "0",
   };
-  const appThemeAttributeEntries = Object.entries({
-    ...testBedAppAttributes,
-    ...(options.testThemeVars ?? {}),
-  })
+  const appThemeAttributeEntries = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`);
   if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
     const injectedAttributes = [
       ...appThemeAttributeEntries,
       ...declarations,
-      trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{null}"` : "",
+      trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{${implicitTestStateInitialValue(trimmed)}}"` : "",
     ].filter(Boolean);
-    return injectAppAttributes(trimmed, injectedAttributes);
+    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), options.testThemeVars);
   }
   const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
   const defaultAppThemeAttributes = Object.entries(testBedAppAttributes)
@@ -905,7 +923,14 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{null}" ${defaultAppThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+}
+
+function implicitTestStateInitialValue(markup: string): "null" | "undefined" {
+  if (markup.includes("selectionFired") || markup.includes("testState = testState || {}")) {
+    return "null";
+  }
+  return /<Tree\b|<TreeDisplay\b|<TableOfContents\b/.test(markup) ? "undefined" : "null";
 }
 
 function injectAppAttributes(markup: string, attributes: string[]): string {
@@ -937,6 +962,22 @@ function injectAppAttributes(markup: string, attributes: string[]): string {
   return `${rebuilt}${markup.slice(end + 1)}`;
 }
 
+function wrapRootAppTheme(markup: string, themeVars: Record<string, unknown> | undefined): string {
+  const entries = Object.entries(themeVars ?? {});
+  if (entries.length === 0) {
+    return markup;
+  }
+  const openEnd = findOpeningAppTagEnd(markup);
+  const closeStart = markup.lastIndexOf("</App>");
+  if (openEnd < 0 || closeStart < 0) {
+    return markup;
+  }
+  const themeAttributes = entries
+    .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
+    .join(" ");
+  return `${markup.slice(0, openEnd + 1)}<Theme ${themeAttributes}>${markup.slice(openEnd + 1, closeStart)}</Theme>${markup.slice(closeStart)}`;
+}
+
 function findOpeningAppTagEnd(markup: string): number {
   let quote: string | undefined;
   for (let index = 4; index < markup.length; index++) {
@@ -959,13 +1000,14 @@ function findOpeningAppTagEnd(markup: string): number {
 }
 
 function normalizeLegacyTestMarkup(markup: string): string {
-  return markup
+  return stripLegacyTryCatchBlocks(escapeGtInQuotedAttributes(stripLegacyIframePostMessageScript(markup)))
     .replace(/(<CodeBlock\b[^>]*>)([\s\S]*?)(<\/CodeBlock>)/g, (_match, open, content, close) =>
       `${open}${content.replaceAll("{", "&#123;").replaceAll("}", "&#125;")}${close}`
     )
-    .replaceAll("&nbsp;", "\u00a0")
-    .replaceAll("&amp;", "&")
-    .replace(/\sboolean(?=[\s>])/g, ` boolean="true"`)
+	    .replaceAll("&nbsp;", "\u00a0")
+	    .replaceAll("&amp;", "&")
+	    .replace(/\sboolean(?=[\s>])/g, ` boolean="true"`)
+	    .replace(/\s(itemClickExpands)(?=[\s>])/g, ` $1="true"`)
     .replace(/^<Heading(?=[\s/>])/, (match) =>
       markup.includes("testId=") ? match : `<Heading testId="test-id-component"`)
     .replaceAll(`onDoubleClick="() => {}"`, `onDoubleClick="testState = testState"`)
@@ -977,8 +1019,10 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`testState = clicked`, `testState = 'clicked'`)
     .replaceAll(`onDidChange="{(val) => {value = val}}"`, `onDidChange="val => value = val"`)
     .replaceAll(`onDidChange="arg => {testState = arg; console.log('arg', arg)}"`, `onDidChange="arg => testState = arg"`)
+    .replaceAll(`await delay(`, `delay(`)
+    .replace(/testState\.loadCount(?!\s*=)/g, `(testState || {}).loadCount`)
     .replaceAll(`data="{invalidJson}"`, `data="invalidJson"`)
-    .replaceAll(`icon="() => {}"`, `icon="{null}"`)
+    .replace(/icon="\(\)\s*(?:=>|=&gt;)\s*\{\s*\}"/g, `icon="{null}"`)
     .replaceAll(`src="{() => '/resources/test-image-100x100.jpg'}"`, `src="{null}"`)
     .replaceAll(`alt="{() => '/resources/test-image-100x100.jpg'}"`, `alt="{null}"`)
     .replaceAll("Special chars: <>&", "Special chars: &lt;&gt;&amp;")
@@ -995,7 +1039,119 @@ function normalizeLegacyTestMarkup(markup: string): string {
       "isDocument: true",
     )
     .replaceAll("\\{", "&#123;")
-    .replaceAll("\\}", "&#125;");
+	    .replaceAll("\\}", "&#125;");
+}
+
+function stripLegacyIframePostMessageScript(markup: string): string {
+  return markup.replace(
+    /<script>\s*window\.addEventListener\('message', \(event\) => \{\s*window\.parent\.postMessage\(\{ received: event\.data \}, '\*'\);\s*\}\);\s*<\/script>\s*<h1>Test IFrame<\/h1>/g,
+    "<h1>Test IFrame</h1>",
+  );
+}
+
+function stripLegacyTryCatchBlocks(markup: string): string {
+  let output = "";
+  let index = 0;
+  while (index < markup.length) {
+    const tryIndex = markup.indexOf("try", index);
+    if (tryIndex < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    const before = markup[tryIndex - 1];
+    const after = markup[tryIndex + 3];
+    if ((before && /[\w$]/.test(before)) || (after && /[\w$]/.test(after))) {
+      output += markup.slice(index, tryIndex + 3);
+      index = tryIndex + 3;
+      continue;
+    }
+    const openTry = markup.indexOf("{", tryIndex + 3);
+    if (openTry < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    const closeTry = findMatchingBrace(markup, openTry);
+    if (closeTry < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    const catchMatch = /^\s*catch\s*\([^)]*\)\s*\{/.exec(markup.slice(closeTry + 1));
+    if (!catchMatch) {
+      output += markup.slice(index, closeTry + 1);
+      index = closeTry + 1;
+      continue;
+    }
+    const openCatch = closeTry + 1 + catchMatch[0].lastIndexOf("{");
+    const closeCatch = findMatchingBrace(markup, openCatch);
+    if (closeCatch < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    output += markup.slice(index, tryIndex);
+    output += markup.slice(openTry + 1, closeTry);
+    index = closeCatch + 1;
+  }
+  return output;
+}
+
+function findMatchingBrace(source: string, openIndex: number): number {
+  let depth = 0;
+  let quote: string | undefined;
+  for (let index = openIndex; index < source.length; index++) {
+    const char = source[index];
+    if (quote) {
+      if (char === "\\" && index + 1 < source.length) {
+        index++;
+      } else if (char === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === `"` || char === `'` || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (char === "{") {
+      depth++;
+    } else if (char === "}") {
+      depth--;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+  return -1;
+}
+
+function escapeGtInQuotedAttributes(markup: string): string {
+  let quote: string | undefined;
+  let inTag = false;
+  let escaped = "";
+  for (let index = 0; index < markup.length; index++) {
+    const char = markup[index];
+    if (quote) {
+      if (char === quote) {
+        quote = undefined;
+        escaped += char;
+      } else {
+        escaped += char === ">" ? "&gt;" : char;
+      }
+      continue;
+    }
+    if (char === "<") {
+      inTag = true;
+    }
+    if (char === ">" && inTag) {
+      inTag = false;
+      escaped += char;
+      continue;
+    }
+    if (inTag && (char === `"` || char === `'`)) {
+      quote = char;
+    }
+    escaped += char;
+  }
+  return escaped;
 }
 
 function normalizeLegacyVariableDeclarations(markup: string): {

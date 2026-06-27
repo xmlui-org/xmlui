@@ -22,10 +22,52 @@ test.describe("Theme foundation", () => {
 
     await expect(page.locator('[data-xmlui-component="Theme"]')).toHaveAttribute("data-xmlui-tone", "dark");
   });
-});
 
-test.describe("Theme old-suite transfer debt", () => {
-  test("copy literal named-theme, root, notification, and inline-style tests", async () => {
-    test.fixme(true, "Full Theme suite is deferred to theme runtime closure");
+  test("does not apply theme variables or wrapper when applyIf is false", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme textColor-Text="rgb(255, 0, 0)" applyIf="false">
+        <Text testId="inside">Inside</Text>
+      </Theme>
+    `);
+
+    await expect(page.getByTestId("inside")).toBeVisible();
+    await expect(page.getByTestId("inside")).not.toHaveCSS("color", "rgb(255, 0, 0)");
+    await expect(page.locator('[data-xmlui-component="Theme"]')).toHaveCount(0);
+  });
+
+  test("does not insert a wrapper for an empty no-op Theme", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack testId="row">
+        <Theme>
+          <Text testId="inside">Inside</Text>
+        </Theme>
+        <Text testId="sibling">Sibling</Text>
+      </HStack>
+    `);
+
+    await expect(page.locator('[data-xmlui-component="Theme"]')).toHaveCount(0);
+    await expect
+      .poll(async () =>
+        page.getByTestId("inside").evaluate((element) => {
+          const sibling = document.querySelector('[data-testid="sibling"]');
+          return element.parentElement === sibling?.parentElement;
+        }),
+      )
+      .toBe(true);
+  });
+
+  test("reacts to dynamic applyIf changes", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.applyTheme="{false}">
+        <Button testId="toggle" onClick="applyTheme = !applyTheme">Toggle</Button>
+        <Theme textColor-Text="rgb(255, 0, 0)" applyIf="{applyTheme}">
+          <Text testId="inside">Inside</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("inside")).not.toHaveCSS("color", "rgb(255, 0, 0)");
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("inside")).toHaveCSS("color", "rgb(255, 0, 0)");
   });
 });

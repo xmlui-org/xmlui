@@ -10,13 +10,6 @@
 
 import { expect, test } from "../../testing/fixtures";
 
-const TABLE_TEXT_OVERFLOW_OLD_SUITE_PENDING =
-  "The literal old Table cell text overflow suite is copied for compatibility tracking, but full Table layout-context and text-overflow compatibility is not complete yet. Re-enable these cases when the Table cell layout context and overflow behavior are migrated.";
-
-test.beforeEach(() => {
-  test.skip(true, TABLE_TEXT_OVERFLOW_OLD_SUITE_PENDING);
-});
-
 const longTextData = JSON.stringify([
   { id: 1, name: "Short" },
   {

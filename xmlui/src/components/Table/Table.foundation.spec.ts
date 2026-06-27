@@ -39,7 +39,7 @@ test.describe("Table foundation", () => {
     await page.getByRole("columnheader", { name: "Name" }).click();
     await expect(page.getByRole("row").nth(1)).toContainText("Alpha");
 
-    await page.getByRole("checkbox").first().check();
+    await page.locator("tbody input[type='checkbox']").first().check();
     await expect(page.getByTestId("selected")).toHaveText("Selected: 1");
   });
 });

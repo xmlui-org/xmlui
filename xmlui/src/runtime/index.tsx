@@ -18,6 +18,7 @@ import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
+import type { ThemeTone } from "../styling";
 
 ensureXmluiDebugBridge();
 
@@ -66,11 +67,14 @@ export function renderXmluiApp(
 export type MountXmluiAppOptions = {
   hydrate?: boolean;
   initialUrl?: string;
+  isolateRouting?: boolean;
+  defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
 export type XmluiRuntimeTestProbe = {
+  hasLocal(name: string): boolean;
   readLocal(name: string): unknown;
   readGlobal(name: string): unknown;
 };
@@ -89,6 +93,8 @@ export function mountXmluiApp(
       <XmluiRoot
         module={module}
         initialUrl={options.initialUrl}
+        isolateRouting={options.isolateRouting}
+        defaultTone={options.defaultTone}
         extensions={options.extensions}
         testProbe={options.testProbe}
       />,
@@ -99,6 +105,8 @@ export function mountXmluiApp(
     <XmluiRoot
       module={module}
       initialUrl={options.initialUrl}
+      isolateRouting={options.isolateRouting}
+      defaultTone={options.defaultTone}
       extensions={options.extensions}
       testProbe={options.testProbe}
     />,
@@ -109,11 +117,15 @@ export function mountXmluiApp(
 export function XmluiRoot({
   module,
   initialUrl,
+  isolateRouting = false,
+  defaultTone,
   extensions,
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
   initialUrl?: string;
+  isolateRouting?: boolean;
+  defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
@@ -133,7 +145,12 @@ export function XmluiRoot({
   const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
   if (!routingRef.current) {
-    routingRef.current = new RuntimeRoutingStore(routeMode, () => store.invalidateRoute(), initialUrl);
+    routingRef.current = new RuntimeRoutingStore(
+      routeMode,
+      () => store.invalidateRoute(),
+      initialUrl,
+      isolateRouting,
+    );
   }
   const normalizedExtensions = useMemo(
     () => normalizeExtensions([
@@ -154,6 +171,7 @@ export function XmluiRoot({
   referencesRef.current.confirm = confirm;
   useEffect(() => {
     testProbe?.({
+      hasLocal: (name) => store.hasLocal(rootOwnerId, name),
       readLocal: (name) => store.readLocal(rootOwnerId, name),
       readGlobal: (name) => store.readGlobal(name),
     });
@@ -217,7 +235,7 @@ export function XmluiRoot({
   );
 
   return (
-    <XmluiThemeRoot>
+    <XmluiThemeRoot tone={defaultTone}>
       <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
       {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
       <GlobalLiveRegion />

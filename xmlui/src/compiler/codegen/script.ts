@@ -336,6 +336,12 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
       : emitRead(ir.callee.dependency, ir.callee.name);
     return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${builtInSource})`;
   }
+  if (
+    ir.callee.kind === "IdentifierRead" &&
+    (ir.callee.dependency?.kind === "local" || ir.callee.dependency?.kind === "global")
+  ) {
+    return `((__xmluiLocalFn) => typeof __xmluiLocalFn === "function" ? __xmluiLocalFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+  }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot generate unsupported XMLUI expression call target.");
   }
@@ -533,6 +539,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "member" && target.object) {
     return emitOptionalMemberRead(target.object, target.name);
   }
+  if (target.kind === "index" && target.object && target.index) {
+    return emitOptionalIndexRead(target.object, target.index);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
   }
@@ -543,6 +552,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
   if (target.kind === "member" && target.object) {
     return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
+  if (target.kind === "index" && target.object && target.index) {
+    return `((${emitExpression(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
   }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
@@ -591,6 +603,7 @@ function isAllowedMethodName(name: string): boolean {
     "map",
     "filter",
     "find",
+    "from",
     "some",
     "every",
     "includes",
@@ -602,6 +615,7 @@ function isAllowedMethodName(name: string): boolean {
     "stringify",
     "now",
     "log",
+    "callApi",
     "getFields",
     "getData",
     "getValue",
@@ -617,6 +631,22 @@ function isAllowedMethodName(name: string): boolean {
     "scrollToBottom",
     "scrollToStart",
     "scrollToEnd",
+    "getVisibleItems",
+    "getExpandedNodes",
+    "getSelectedNode",
+    "getNodeById",
+    "scrollIntoView",
+    "appendNode",
+    "removeNode",
+    "removeChildren",
+    "insertNodeBefore",
+    "insertNodeAfter",
+    "refreshData",
+    "getDynamic",
+    "getNodeLoadingState",
+    "getExpandedTimestamp",
+    "getAutoLoadAfter",
+    "getNodeAutoLoadAfter",
   ].includes(name);
 }
 

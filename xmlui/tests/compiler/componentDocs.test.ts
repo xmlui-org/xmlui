@@ -139,6 +139,10 @@ function component(name: string): XmluiComponentMetadata {
     templates: [],
     contextVariables: [],
     apis: [],
+    parts: [],
+    themeVars: [],
+    defaultThemeVars: {},
+    toneSpecificThemeVars: {},
     layoutProps: true,
     examples: [],
   };

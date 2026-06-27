@@ -1,10 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
 
-const TILE_GRID_OLD_SUITE_PENDING =
-  "Literal old TileGrid suite copied for compatibility tracking; full selection, virtualization, keyboard, and action semantics are pending in Phase 5 Wave D1B.";
-
-test.beforeEach(() => test.skip(true, TILE_GRID_OLD_SUITE_PENDING));
-
 // =============================================================================
 // STEP 1: Basic Functionality — scaffold, rendering, template context variables
 // =============================================================================
@@ -161,7 +156,7 @@ test.describe("Theme Variables", () => {
     await expect(tile).toHaveCSS("border-radius", "12px");
   });
 
-  test("applies fontSize-checkbox-TileGrid theme variable", async ({ initTestBed, page }) => {
+  test.skip("applies fontSize-checkbox-TileGrid theme variable", async ({ initTestBed, page }) => {
     await initTestBed(
       `
         <TileGrid
@@ -186,7 +181,7 @@ test.describe("Theme Variables", () => {
 // =============================================================================
 
 test.describe("Grid Layout", () => {
-  test("items are grouped into row elements", async ({ initTestBed, page }) => {
+  test.skip("items are grouped into row elements", async ({ initTestBed, page }) => {
     await initTestBed(`
       <TileGrid
         data="{[{id:1},{id:2},{id:3},{id:4},{id:5},{id:6}]}"
@@ -274,7 +269,7 @@ test.describe("Grid Layout", () => {
 // STEP 3: Virtualization — only visible rows rendered, large datasets
 // =============================================================================
 
-test.describe("Virtualization", () => {
+test.describe.skip("Virtualization", () => {
   test("renders a large dataset without errors", async ({ initTestBed, page }) => {
     // Build data expression using single-quoted strings to stay XML-attribute-safe
     const itemsExpr = Array.from({ length: 80 }, (_, i) => `{id: ${i}, name: 'Tile${i}'}`).join(",");
@@ -329,7 +324,7 @@ test.describe("Virtualization", () => {
 // STEP 4 & 5: Selection + Checkboxes
 // =============================================================================
 
-test.describe("Selection", () => {
+test.describe.skip("Selection", () => {
   const selectionMarkup = `
     <TileGrid
       data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
@@ -426,7 +421,7 @@ test.describe("Selection", () => {
 // hideSelectionCheckboxes property
 // =============================================================================
 
-test.describe("hideSelectionCheckboxes property", () => {
+test.describe.skip("hideSelectionCheckboxes property", () => {
   test("hides checkboxes when true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <TileGrid
@@ -508,7 +503,7 @@ test.describe("hideSelectionCheckboxes property", () => {
 // STEP 6: Keyboard Shortcuts + Double-click
 // =============================================================================
 
-test.describe("Keyboard Shortcuts", () => {
+test.describe.skip("Keyboard Shortcuts", () => {
   const selectableMarkup = `
     <TileGrid
       data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
@@ -586,7 +581,7 @@ test.describe("Keyboard Shortcuts", () => {
 // STEP 7: syncWithVar
 // =============================================================================
 
-test.describe("syncWithVar property", () => {
+test.describe.skip("syncWithVar property", () => {
   const syncData = `[{id: 1, name: 'Apple'},{id: 2, name: 'Banana'},{id: 3, name: 'Carrot'}]`;
 
   const tileTemplate = `<Text>{$item.name}</Text>`;
@@ -722,7 +717,7 @@ test.describe("syncWithVar property", () => {
 // stretchItems property
 // =============================================================================
 
-test.describe("stretchItems property", () => {
+test.describe.skip("stretchItems property", () => {
   test("default is false — tile width equals itemWidth", async ({ initTestBed, page }) => {
     await initTestBed(`
       <TileGrid
@@ -781,7 +776,7 @@ test.describe("stretchItems property", () => {
 // toggleSelectionOnClick property
 // =============================================================================
 
-test.describe("toggleSelectionOnClick property", () => {
+test.describe.skip("toggleSelectionOnClick property", () => {
   const toggleMarkup = `
     <TileGrid
       data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
@@ -855,7 +850,7 @@ test.describe("toggleSelectionOnClick property", () => {
 // STEP 10: onContextMenu event
 // =============================================================================
 
-test.describe("onContextMenu event", () => {
+test.describe.skip("onContextMenu event", () => {
   const sampleData = [
     { id: 1, name: "Apple", category: "Fruit" },
     { id: 2, name: "Banana", category: "Fruit" },
@@ -931,7 +926,7 @@ test.describe("onContextMenu event", () => {
 // refreshOn
 // =============================================================================
 
-test.describe("refreshOn Property", () => {
+test.describe.skip("refreshOn Property", () => {
   test("updates event handler closures when refreshOn changes", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <VStack var.parentValue="1">

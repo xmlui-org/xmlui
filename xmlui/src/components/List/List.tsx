@@ -23,18 +23,43 @@ export const ListMd = createMetadata({
   },
   props: {
     id: { description: "The component id.", valueType: "string" },
+    invalidProp: dInternal("Compatibility-only prop ignored by List."),
     testId: { description: "The test id.", valueType: "string" },
     data: { description: "The list data to display.", valueType: "any" },
     items: dInternal("Alias for the `data` property. When both are provided, `items` has priority."),
     loading: { description: "Shows loading state when true and no items are available.", valueType: "boolean" },
     limit: { description: "Limits the number of displayed items.", valueType: "number" },
-    groupBy: { description: "Field name used to group list items.", valueType: "any" },
-    orderBy: { description: "Field name used to sort list items.", valueType: "string" },
+    scrollAnchor: {
+      description: "Pins the initial scroll position to the top or bottom of the list.",
+      valueType: "string",
+      defaultValue: defaultProps.scrollAnchor,
+    },
+    fixedItemSize: { description: "Compatibility hint for virtualized lists.", valueType: "boolean" },
+    groupBy: { description: "Field name or function used to group list items.", valueType: "any" },
+    orderBy: { description: "Field name or descriptor used to sort list items.", valueType: "any" },
+    availableGroups: { description: "Optional list of group names to display.", valueType: "string[]" },
     itemTemplate: dComponent("Template used to render each item."),
     emptyListTemplate: dComponent("Template displayed when the list is empty."),
     groupHeaderTemplate: dComponent("Template used to render a group header."),
     groupFooterTemplate: dComponent("Template used to render a group footer."),
+    pageInfo: { description: "Pagination state used by fetch-page events.", valueType: "any" },
     idKey: { description: "Item field used as row ID.", valueType: "string", defaultValue: defaultProps.idKey },
+    groupsInitiallyExpanded: {
+      description: "Whether grouped sections are initially expanded.",
+      valueType: "boolean",
+      defaultValue: defaultProps.groupsInitiallyExpanded,
+    },
+    defaultGroups: { description: "Default group names and order.", valueType: "string[]" },
+    hideEmptyGroups: {
+      description: "Hides default groups that have no items.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideEmptyGroups,
+    },
+    borderCollapse: {
+      description: "Collapses adjacent row borders.",
+      valueType: "boolean",
+      defaultValue: defaultProps.borderCollapse,
+    },
     rowsSelectable: { description: "Whether rows can be selected.", valueType: "boolean", defaultValue: defaultProps.rowsSelectable },
     enableMultiRowSelection: {
       description: "Whether multiple rows can be selected.",
@@ -47,6 +72,31 @@ export const ListMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.hideSelectionCheckboxes,
     },
+    rowUnselectablePredicate: { description: "Predicate that disables selection for matching rows.", valueType: "any" },
+    selectionCheckboxPosition: {
+      description: "Places row selection checkboxes before content or as an overlay.",
+      valueType: "string",
+      availableValues: ["before", "overlay"],
+      defaultValue: defaultProps.selectionCheckboxPosition,
+    },
+    selectionCheckboxAnchor: {
+      description: "Anchor used for overlay selection checkboxes.",
+      valueType: "string",
+      availableValues: ["top-left", "top-right", "bottom-left", "bottom-right", "center-left", "center-right"],
+      defaultValue: defaultProps.selectionCheckboxAnchor,
+    },
+    selectionCheckboxOffsetX: {
+      description: "Horizontal overlay checkbox offset.",
+      valueType: "string",
+      defaultValue: defaultProps.selectionCheckboxOffsetX,
+    },
+    selectionCheckboxOffsetY: {
+      description: "Vertical overlay checkbox offset.",
+      valueType: "string",
+      defaultValue: defaultProps.selectionCheckboxOffsetY,
+    },
+    selectionCheckboxSize: { description: "CSS size for selection checkboxes.", valueType: "string" },
+    keyBindings: { description: "Keyboard shortcuts for list actions.", valueType: "any" },
   },
   childrenAsTemplate: "itemTemplate",
   events: {
@@ -59,6 +109,19 @@ export const ListMd = createMetadata({
       description: "Fired when selection changes.",
       signature: "selectionDidChange(selectedItems: any[]): void",
     },
+    requestFetchPrevPage: {
+      description: "Fired when the list requests the previous page.",
+      signature: "requestFetchPrevPage(): void",
+    },
+    requestFetchNextPage: {
+      description: "Fired when the list requests the next page.",
+      signature: "requestFetchNextPage(): void",
+    },
+    selectAllAction: { description: "Fired for the select-all keyboard action." },
+    cutAction: { description: "Fired for the cut keyboard action." },
+    copyAction: { description: "Fired for the copy keyboard action." },
+    pasteAction: { description: "Fired for the paste keyboard action." },
+    deleteAction: { description: "Fired for the delete keyboard action." },
   },
   apis: {
     scrollToTop: { description: "Scrolls to the top.", signature: "scrollToTop(): void" },
@@ -93,6 +156,7 @@ export const listRenderer = wrapComponent({
   renderer: ({ adapter }) => {
     const items = adapter.prop("items") ?? adapter.prop("data");
     const itemTemplate = templateChildren(adapter.node, "itemTemplate") ?? nonPropertyChildren(adapter.node.children);
+    const hasItemTemplate = Array.isArray(itemTemplate) ? itemTemplate.length > 0 : !!itemTemplate;
     const emptyTemplate = templateChildren(adapter.node, "emptyListTemplate");
     const groupHeaderTemplate = templateChildren(adapter.node, "groupHeaderTemplate");
     const groupFooterTemplate = templateChildren(adapter.node, "groupFooterTemplate");
@@ -122,33 +186,51 @@ export const listRenderer = wrapComponent({
         items={Array.isArray(items) ? items : []}
         loading={adapter.booleanProp("loading", false)}
         limit={adapter.numberProp("limit", 0)}
-        groupBy={adapter.stringProp("groupBy")}
-        orderBy={adapter.stringProp("orderBy")}
+        scrollAnchor={adapter.stringProp("scrollAnchor", defaultProps.scrollAnchor)}
+        fixedItemSize={adapter.booleanProp("fixedItemSize", false)}
+        groupBy={adapter.prop("groupBy")}
+        orderBy={adapter.prop("orderBy")}
+        availableGroups={arrayValue(adapter.prop("availableGroups")).map(String)}
+        pageInfo={adapter.prop("pageInfo")}
         idKey={adapter.stringProp("idKey", defaultProps.idKey)}
+        groupsInitiallyExpanded={adapter.booleanProp("groupsInitiallyExpanded", defaultProps.groupsInitiallyExpanded)}
+        defaultGroups={arrayValue(adapter.prop("defaultGroups")).map(String)}
+        hideEmptyGroups={adapter.booleanProp("hideEmptyGroups", defaultProps.hideEmptyGroups)}
+        borderCollapse={adapter.booleanProp("borderCollapse", defaultProps.borderCollapse)}
         rowsSelectable={adapter.booleanProp("rowsSelectable", defaultProps.rowsSelectable)}
         enableMultiRowSelection={adapter.booleanProp("enableMultiRowSelection", defaultProps.enableMultiRowSelection)}
         initiallySelected={arrayValue(adapter.prop("initiallySelected"))}
         hideSelectionCheckboxes={adapter.booleanProp("hideSelectionCheckboxes", defaultProps.hideSelectionCheckboxes)}
+        rowUnselectablePredicate={functionValue(adapter.prop("rowUnselectablePredicate"))}
+        selectionCheckboxPosition={adapter.stringProp("selectionCheckboxPosition", defaultProps.selectionCheckboxPosition)}
+        selectionCheckboxAnchor={adapter.stringProp("selectionCheckboxAnchor", defaultProps.selectionCheckboxAnchor)}
+        selectionCheckboxOffsetX={adapter.stringProp("selectionCheckboxOffsetX", defaultProps.selectionCheckboxOffsetX)}
+        selectionCheckboxOffsetY={adapter.stringProp("selectionCheckboxOffsetY", defaultProps.selectionCheckboxOffsetY)}
+        selectionCheckboxSize={adapter.stringProp("selectionCheckboxSize")}
+        keyBindings={objectValue(adapter.prop("keyBindings"))}
         emptyListTemplate={emptyTemplate ? renderWithContext({}, emptyTemplate) : undefined}
-        renderItem={(item, index, count, isSelected) =>
+        renderItem={hasItemTemplate ? ((item, index, count, isSelected) =>
           renderWithContext({
             $item: item,
             $itemIndex: index,
             $isFirst: index === 0,
             $isLast: index === count - 1,
             $isSelected: isSelected,
-          })}
+          })) : undefined}
         renderGroupHeader={(group, groupItems) =>
-          groupHeaderTemplate
-            ? renderWithContext({ $item: { group, items: groupItems }, $group: group }, groupHeaderTemplate)
-            : undefined}
+          groupHeaderTemplate ? renderWithContext(groupContext(group, groupItems), groupHeaderTemplate) : undefined}
         renderGroupFooter={(group, groupItems) =>
-          groupFooterTemplate
-            ? renderWithContext({ $item: { group, items: groupItems }, $group: group }, groupFooterTemplate)
-            : undefined}
+          groupFooterTemplate ? renderWithContext(groupContext(group, groupItems), groupFooterTemplate) : undefined}
         onContextMenu={() => void adapter.event("contextMenu")()}
         onRowDoubleClick={(item) => void adapter.event("rowDoubleClick")(item)}
         onSelectionDidChange={(selectedItems) => void adapter.event("selectionDidChange")(selectedItems)}
+        onRequestFetchPrevPage={() => void adapter.event("requestFetchPrevPage")()}
+        onRequestFetchNextPage={() => void adapter.event("requestFetchNextPage")()}
+        onSelectAllAction={(row, items, ids) => void adapter.event("selectAllAction")(row, items, ids)}
+        onCutAction={(row, items, ids) => void adapter.event("cutAction")(row, items, ids)}
+        onCopyAction={(row, items, ids) => void adapter.event("copyAction")(row, items, ids)}
+        onPasteAction={(row, items, ids) => void adapter.event("pasteAction")(row, items, ids)}
+        onDeleteAction={(row, items, ids) => void adapter.event("deleteAction")(row, items, ids)}
       />
     );
   },
@@ -156,4 +238,19 @@ export const listRenderer = wrapComponent({
 
 function arrayValue(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
+}
+
+function functionValue(value: unknown): ((item: unknown) => unknown) | undefined {
+  return typeof value === "function" ? value as (item: unknown) => unknown : undefined;
+}
+
+function objectValue(value: unknown): Record<string, string> | undefined {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, string>
+    : undefined;
+}
+
+function groupContext(group: string, items: unknown[]): Record<string, unknown> {
+  const groupInfo = { id: group, key: group, items };
+  return { $item: groupInfo, $group: groupInfo };
 }

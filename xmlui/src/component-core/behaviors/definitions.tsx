@@ -2,6 +2,11 @@ import { cloneElement, isValidElement, useState, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
+import {
+  Animation,
+  parseAnimation,
+  parseAnimationOptions,
+} from "../../components/Animation/AnimationReact";
 
 export const whenBehavior: Behavior = {
   metadata: {
@@ -147,22 +152,37 @@ export const variantBehavior: Behavior = {
   },
 };
 
-export const animationBehavior = simpleWrapperBehavior({
-  name: "animation",
-  friendlyName: "Animation",
-  description: "Adds animation functionality to components with an `animation` prop.",
-  triggerProps: ["animation"],
-  props: {
-    animation: {
-      valueType: "any",
-      description: "The animation definition.",
+export const animationBehavior: Behavior = {
+  metadata: {
+    name: "animation",
+    friendlyName: "Animation",
+    description: "Adds animation functionality to components with an `animation` prop.",
+    triggerProps: ["animation"],
+    props: {
+      animation: {
+        valueType: "any",
+        description: "The animation definition.",
+      },
+      animationOptions: {
+        valueType: "any",
+        description: "Options for configuring the animation behavior.",
+      },
     },
-    animationOptions: {
-      valueType: "any",
-      description: "Options for configuring the animation behavior.",
-    },
+    condition: { type: "visual" },
   },
-});
+  canAttach: (context) =>
+    canBehaviorAttachToComponent(animationBehavior.metadata, context.metadata, context.componentName) &&
+    hasTriggeredBehaviorProp(animationBehavior.metadata, context.props),
+  attach: (context, node) => {
+    const animation = parseAnimation(context.props.animation);
+    const options = parseAnimationOptions(context.props.animationOptions);
+    return (
+      <Animation animation={animation} {...options}>
+        {node}
+      </Animation>
+    );
+  },
+};
 
 export const bookmarkBehavior = simpleWrapperBehavior({
   name: "bookmark",

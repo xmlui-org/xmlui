@@ -50,7 +50,13 @@ import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
 import { spinnerRenderer } from "../components/Spinner/Spinner.renderer";
 import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
-import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
+import {
+  chStackRenderer,
+  cvStackRenderer,
+  hStackRenderer,
+  stackRenderer,
+  vStackRenderer,
+} from "../components/Stack/Stack";
 import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox.renderer";
 import { textAreaRenderer } from "../components/TextArea/TextArea.renderer";
@@ -117,6 +123,7 @@ import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
 import { themeRenderer } from "../components/Theme/Theme.renderer";
 import { slotRenderer } from "../components/Slot/Slot.renderer";
+import { partRenderer } from "../components/Part/Part";
 import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
 import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
 import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
@@ -196,6 +203,7 @@ const implementedRuntimeNames = [
   "br",
   "Theme",
   "Slot",
+  "Part",
   "SpaceFiller",
   "Items",
   "TextBox",
@@ -315,6 +323,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Stack: stackRenderer,
   HStack: hStackRenderer,
   VStack: vStackRenderer,
+  CHStack: chStackRenderer,
+  CVStack: cvStackRenderer,
   FlowLayout: flowLayoutRenderer,
   Text: textRenderer,
   TextBox: textBoxRenderer,
@@ -381,6 +391,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Toast: toastRenderer,
   Theme: themeRenderer,
   Slot: slotRenderer,
+  Part: partRenderer,
   ToneSwitch: toneSwitchRenderer,
   ToneChangerButton: toneChangerButtonRenderer,
   Pages: pagesRenderer,
@@ -410,6 +421,8 @@ const componentFolderNames: Record<string, string> = {
   H6: "Heading",
   HStack: "Stack",
   VStack: "Stack",
+  CHStack: "Stack",
+  CVStack: "Stack",
   PasswordInput: "TextBox",
   HSplitter: "Splitter",
   VSplitter: "Splitter",
@@ -521,6 +534,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const toastTransferred = contract.name === "Toast";
     const themeTransferred = contract.name === "Theme";
     const slotTransferred = contract.name === "Slot";
+    const partTransferred = contract.name === "Part";
     const toneSwitchTransferred = contract.name === "ToneSwitch";
     const toneChangerButtonTransferred = contract.name === "ToneChangerButton";
     const pagesTransferred = contract.name === "Pages" || contract.name === "Page";
@@ -623,6 +637,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       toastTransferred ||
       themeTransferred ||
       slotTransferred ||
+      partTransferred ||
       toneSwitchTransferred ||
       toneChangerButtonTransferred ||
       pagesTransferred ||

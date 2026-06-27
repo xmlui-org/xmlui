@@ -13,18 +13,25 @@ describe("XMLUI unified metadata", () => {
   it("generates deterministic component metadata from contracts", () => {
     const metadata = generateXmluiMetadata();
     const button = metadata.components.find((component) => component.name === "Button");
+    const card = metadata.components.find((component) => component.name === "Card");
     const dataSource = metadata.components.find((component) => component.name === "DataSource");
+    const dropdownMenu = metadata.components.find((component) => component.name === "DropdownMenu");
     const page = metadata.components.find((component) => component.name === "Page");
 
     expect(metadata.schemaVersion).toBe(1);
     expect(metadata.generatedAt).toBe("1970-01-01T00:00:00.000Z");
     expect(validateXmluiMetadataArtifact(metadata)).toEqual([]);
     expect(button?.props.map((prop) => prop.name)).toEqual(expect.arrayContaining(["label", "enabled"]));
+    expect(card?.parts.map((part) => part.name)).toEqual(["avatar", "subtitle", "title"]);
+    expect(card?.themeVars.map((themeVar) => themeVar.name)).toEqual(expect.arrayContaining(["backgroundColor-Card"]));
+    expect(card?.defaultThemeVars).toHaveProperty("backgroundColor-Card", "$color-surface-raised");
+    expect(card?.toneSpecificThemeVars).toEqual({});
     expect(button?.events).toContainEqual(expect.objectContaining({
       name: "click",
       attributeName: "onClick",
       async: true,
     }));
+    expect(dropdownMenu?.parts.map((part) => part.name)).toEqual(["content"]);
     expect(dataSource?.apis.map((api) => api.name)).toEqual(expect.arrayContaining(["value", "refetch"]));
     expect(page?.contextVariables.map((item) => item.name)).toEqual(expect.arrayContaining(["$routeParams"]));
     expect(metadata.examples.every((example) => example.demonstratesMutation)).toBe(true);
@@ -84,4 +91,3 @@ describe("XMLUI unified metadata", () => {
     ]);
   });
 });
-

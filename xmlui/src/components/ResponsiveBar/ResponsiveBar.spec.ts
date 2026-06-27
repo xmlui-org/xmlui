@@ -1,11 +1,6 @@
 import { expect, test } from "../../testing/fixtures";
 import { getBounds } from "../../testing/component-test-helpers";
 
-test.skip(
-  true,
-  "The literal old ResponsiveBar suite is copied for compatibility tracking, but full overflow measurement, DropdownMenu integration, trigger templates, and driver parity are not complete yet. Re-enable cases feature-by-feature.",
-);
-
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -32,7 +27,7 @@ test.describe("Basic Functionality", () => {
     await expect(overflow).not.toBeVisible();
   });
 
-  test("moves overflowing items to dropdown when container is too narrow", async ({
+  test.skip("moves overflowing items to dropdown when container is too narrow", async ({
     initTestBed,
     createResponsiveBarDriver,
   }) => {
@@ -91,7 +86,7 @@ test.describe("Basic Functionality", () => {
 // DROPDOWNTEXT PROPERTY TESTS
 // =============================================================================
 
-test.describe("dropdownText property", () => {
+test.describe.skip("dropdownText property", () => {
   test("displays default 'More options' text in dropdown trigger", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -287,7 +282,7 @@ test.describe("dropdownText property", () => {
 // REVERSE PROPERTY TESTS
 // =============================================================================
 
-test.describe("reverse property", () => {
+test.describe.skip("reverse property", () => {
   test("renders children in reverse order horizontally (right to left)", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -468,7 +463,7 @@ test.describe("reverse property", () => {
 // DROPDOWNALIGNMENT PROPERTY TESTS
 // =============================================================================
 
-test.describe("dropdownAlignment property", () => {
+test.describe.skip("dropdownAlignment property", () => {
   test("alignment='start' aligns dropdown menu to the left", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -674,7 +669,7 @@ test.describe("dropdownAlignment property", () => {
 // WILLOPEN EVENT TESTS
 // =============================================================================
 
-test.describe("willOpen event", () => {
+test.describe.skip("willOpen event", () => {
   test("fires willOpen event when overflow dropdown opens", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -792,7 +787,7 @@ test.describe("willOpen event", () => {
 // API METHODS TESTS
 // =============================================================================
 
-test.describe("API methods", () => {
+test.describe.skip("API methods", () => {
   test("open() API method opens the overflow dropdown", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -1011,7 +1006,7 @@ test.describe("API methods", () => {
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================
 
-test.describe("Behaviors and Parts", () => {
+test.describe.skip("Behaviors and Parts", () => {
   test("can select ResponsiveBarDropdown", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Stack width="300px">

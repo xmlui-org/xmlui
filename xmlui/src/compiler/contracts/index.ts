@@ -16,5 +16,6 @@ export type {
   XmluiContractRegistry,
   XmluiDeclarationPermission,
   XmluiEventContract,
+  XmluiPartContract,
   XmluiPropContract,
 } from "./types";

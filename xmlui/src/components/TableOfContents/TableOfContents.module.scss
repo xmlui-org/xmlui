@@ -1,14 +1,29 @@
 .root {
+  width: var(--xmlui-width-TableOfContents, auto);
   height: var(--xmlui-height-TableOfContents);
   padding: var(--xmlui-padding-TableOfContents);
+  background: var(--xmlui-backgroundColor-TableOfContents, transparent);
+  border-width: var(--xmlui-borderWidth-TableOfContents, 0);
+  border-color: var(--xmlui-borderColor-TableOfContents, transparent);
+  border-style: var(--xmlui-borderStyle-TableOfContents, none);
   overflow: auto;
+}
+
+.itemWrapper {
+  background: transparent;
+}
+
+.itemWrapper:hover {
+  background: var(--xmlui-backgroundColor-TableOfContentsItem--hover, transparent);
+}
+
+.active {
+  background-color: var(--xmlui-backgroundColor-TableOfContentsItem--active, rgb(150, 150, 255));
 }
 
 .item {
   display: block;
-  padding-top: var(--xmlui-paddingVertical-TableOfContentsItem);
-  padding-bottom: var(--xmlui-paddingVertical-TableOfContentsItem);
-  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem);
+  padding: var(--xmlui-padding-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem) 0 var(--xmlui-paddingVertical-TableOfContentsItem) var(--xmlui-paddingLeft-TableOfContentsItem));
   color: var(--xmlui-textColor-TableOfContentsItem);
   font-size: var(--xmlui-fontSize-TableOfContentsItem);
   font-weight: var(--xmlui-fontWeight-TableOfContentsItem);
@@ -18,30 +33,53 @@
 
 .item:hover {
   color: var(--xmlui-textColor-TableOfContentsItem--hover);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem--hover, var(--xmlui-fontWeight-TableOfContentsItem));
+}
+
+.active .item {
+  color: var(--xmlui-textColor-TableOfContentsItem--active, rgb(50, 50, 150));
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem--active, 700);
+}
+
+.level1 {
+  padding: var(--xmlui-padding-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem) 0 var(--xmlui-paddingVertical-TableOfContentsItem) var(--xmlui-paddingLeft-TableOfContentsItem)));
+  color: var(--xmlui-textColor-TableOfContentsItem-level-1, var(--xmlui-textColor-TableOfContentsItem));
+  font-size: var(--xmlui-fontSize-TableOfContentsItem-level-1, var(--xmlui-fontSize-TableOfContentsItem));
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-1, var(--xmlui-fontWeight-TableOfContentsItem));
 }
 
 .level2 {
-  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-2);
-  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-2);
+  padding: var(--xmlui-padding-TableOfContentsItem-level-2, var(--xmlui-padding-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem) 0 var(--xmlui-paddingVertical-TableOfContentsItem) var(--xmlui-paddingLeft-TableOfContentsItem-level-2)));
+  color: var(--xmlui-textColor-TableOfContentsItem-level-2, var(--xmlui-textColor-TableOfContentsItem));
+  font-size: var(--xmlui-fontSize-TableOfContentsItem-level-2, var(--xmlui-fontSize-TableOfContentsItem));
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-2, var(--xmlui-fontWeight-TableOfContentsItem));
 }
 
 .level3 {
-  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-3);
-  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-3);
+  padding: var(--xmlui-padding-TableOfContentsItem-level-3, var(--xmlui-padding-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem) 0 var(--xmlui-paddingVertical-TableOfContentsItem) var(--xmlui-paddingLeft-TableOfContentsItem-level-3)));
+  color: var(--xmlui-textColor-TableOfContentsItem-level-3, var(--xmlui-textColor-TableOfContentsItem));
+  font-size: var(--xmlui-fontSize-TableOfContentsItem-level-3, var(--xmlui-fontSize-TableOfContentsItem));
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-3, var(--xmlui-fontWeight-TableOfContentsItem));
 }
 
 .level4 {
-  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-4);
-  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-4);
+  padding: var(--xmlui-padding-TableOfContentsItem-level-4, var(--xmlui-padding-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem) 0 var(--xmlui-paddingVertical-TableOfContentsItem) var(--xmlui-paddingLeft-TableOfContentsItem-level-4)));
+  color: var(--xmlui-textColor-TableOfContentsItem-level-4, var(--xmlui-textColor-TableOfContentsItem));
+  font-size: var(--xmlui-fontSize-TableOfContentsItem-level-4, var(--xmlui-fontSize-TableOfContentsItem));
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-4, var(--xmlui-fontWeight-TableOfContentsItem));
 }
 
 .level5 {
-  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-5);
-  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-5);
+  padding: var(--xmlui-padding-TableOfContentsItem-level-5, var(--xmlui-padding-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem) 0 var(--xmlui-paddingVertical-TableOfContentsItem) var(--xmlui-paddingLeft-TableOfContentsItem-level-5)));
+  color: var(--xmlui-textColor-TableOfContentsItem-level-5, var(--xmlui-textColor-TableOfContentsItem));
+  font-size: var(--xmlui-fontSize-TableOfContentsItem-level-5, var(--xmlui-fontSize-TableOfContentsItem));
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-5, var(--xmlui-fontWeight-TableOfContentsItem));
 }
 
 .level6 {
-  padding-left: var(--xmlui-paddingLeft-TableOfContentsItem-level-6);
+  padding: var(--xmlui-padding-TableOfContentsItem-level-6, var(--xmlui-padding-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem) 0 var(--xmlui-paddingVertical-TableOfContentsItem) var(--xmlui-paddingLeft-TableOfContentsItem-level-6)));
+  color: var(--xmlui-textColor-TableOfContentsItem-level-6, var(--xmlui-textColor-TableOfContentsItem));
+  font-size: var(--xmlui-fontSize-TableOfContentsItem-level-6, var(--xmlui-fontSize-TableOfContentsItem));
   font-style: var(--xmlui-fontStyle-TableOfContentsItem-level-6);
-  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-6);
+  font-weight: var(--xmlui-fontWeight-TableOfContentsItem-level-6, var(--xmlui-fontWeight-TableOfContentsItem));
 }

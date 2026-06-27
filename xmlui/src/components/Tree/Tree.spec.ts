@@ -1,12 +1,4 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-
-const TREE_FAMILY_OLD_SUITE_PENDING =
-  "The literal old Tree-family suite is copied for compatibility tracking, but the full Tree/TreeDisplay/TableOfContents migration is not complete yet. Re-enable cases feature-by-feature as hierarchy behavior, dynamic loading, APIs, scrolling, heading indexing, route integration, parts, and behaviors are migrated.";
-
-test.beforeEach(() => {
-  test.skip(true, TREE_FAMILY_OLD_SUITE_PENDING);
-});
 
 import {
   apiStyleData,
@@ -2009,10 +2001,7 @@ test.describe("Basic Functionality", () => {
       await expect(tree.getByTestId("4")).not.toBeVisible();
     });
 
-    test(
-      "supports expansion toggle by chevron click",
-      SKIP_REASON.TO_BE_IMPLEMENTED("Redundant with existing expand icon tests"),
-      async ({ initTestBed, createTreeDriver, page }) => {
+    test("supports expansion toggle by chevron click", async ({ initTestBed, createTreeDriver, page }) => {
         await initTestBed(`
         <VStack height="400px">
           <Tree
@@ -2050,8 +2039,7 @@ test.describe("Basic Functionality", () => {
         // Children should be hidden again
         await expect(tree.getByTestId("2")).not.toBeVisible();
         await expect(tree.getByTestId("3")).not.toBeVisible();
-      },
-    );
+    });
 
     test("supports expansion toggle by item click when enabled", async ({
       initTestBed,

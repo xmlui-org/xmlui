@@ -375,7 +375,7 @@ function stringifyTextAreaValue(value: unknown): string {
     return "";
   }
   if (typeof value === "function") {
-    return "";
+    return "[object Object]";
   }
   if (typeof value === "object") {
     return String(value);

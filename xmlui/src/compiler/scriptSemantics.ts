@@ -39,13 +39,14 @@ export type BoundDependency = {
 };
 
 export type BoundWriteTarget = {
-  kind: "local" | "global" | "handlerLocal" | "member" | "unresolved" | "invalid";
+  kind: "local" | "global" | "handlerLocal" | "member" | "index" | "unresolved" | "invalid";
   name: string;
   path: string[];
   operator: "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=";
   span: SourceSpan;
   binding?: XmluiBinding;
   object?: XmluiScriptIr;
+  index?: XmluiScriptIr;
 };
 
 export type BoundScriptResult = {
@@ -1018,6 +1019,18 @@ function bindWriteTarget(
     };
   }
 
+  if (target.kind === "IndexExpression") {
+    return {
+      kind: "index",
+      name: "[]",
+      path: [],
+      operator: operator as BoundWriteTarget["operator"],
+      span: target.span,
+      object: lowerWriteTargetObject(target.object, scope, findLexicalBinding, result),
+      index: lowerNode(target.index, result),
+    };
+  }
+
   result.diagnostics.push(
     createErrorDiagnostic("XS203", "Invalid XMLUI script write target.", target.span),
   );
@@ -1500,6 +1513,12 @@ function isAllowedCall(callee: ScriptNode, scope?: XmluiScope): boolean {
   if (callee.kind === "Identifier" && scope && resolveXmluiIdentifier(scope, callee.name)?.kind === "context") {
     return true;
   }
+  if (callee.kind === "Identifier" && scope) {
+    const binding = resolveXmluiIdentifier(scope, callee.name);
+    if (binding?.kind === "local" || binding?.kind === "global") {
+      return true;
+    }
+  }
   if (callee.kind === "MemberExpression") {
     return true;
   }
@@ -1519,6 +1538,7 @@ function isAllowedMethodName(name: string): boolean {
     "map",
     "filter",
     "find",
+    "from",
     "some",
     "every",
     "includes",
@@ -1530,6 +1550,7 @@ function isAllowedMethodName(name: string): boolean {
     "stringify",
     "now",
     "log",
+    "callApi",
     "getFields",
     "getData",
     "getValue",
@@ -1545,6 +1566,22 @@ function isAllowedMethodName(name: string): boolean {
     "scrollToBottom",
     "scrollToStart",
     "scrollToEnd",
+    "getVisibleItems",
+    "getExpandedNodes",
+    "getSelectedNode",
+    "getNodeById",
+    "scrollIntoView",
+    "appendNode",
+    "removeNode",
+    "removeChildren",
+    "insertNodeBefore",
+    "insertNodeAfter",
+    "refreshData",
+    "getDynamic",
+    "getNodeLoadingState",
+    "getExpandedTimestamp",
+    "getAutoLoadAfter",
+    "getNodeAutoLoadAfter",
   ].includes(name);
 }
 
@@ -1554,6 +1591,7 @@ function isAllowedBuiltInCallName(name: string): boolean {
 
 function isBuiltInReferenceName(name: string): boolean {
   return name === "App" ||
+    name === "Array" ||
     name === "Date" ||
     name === "getDate" ||
     name === "confirm" ||
@@ -1814,6 +1852,12 @@ function emitCallExpression(ir: XmluiCallExpressionIr): string {
   if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
     return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
   }
+  if (
+    ir.callee.kind === "IdentifierRead" &&
+    (ir.callee.dependency?.kind === "local" || ir.callee.dependency?.kind === "global")
+  ) {
+    return `((__xmluiLocalFn) => typeof __xmluiLocalFn === "function" ? __xmluiLocalFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+  }
   if (ir.callee.kind !== "MemberRead" && ir.callee.kind !== "ScopedMemberRead") {
     throw new Error("Cannot compile unsupported XMLUI expression call target.");
   }
@@ -2010,6 +2054,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "member" && target.object) {
     return emitOptionalMemberRead(target.object, target.name);
   }
+  if (target.kind === "index" && target.object && target.index) {
+    return emitOptionalIndexRead(target.object, target.index);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
@@ -2020,6 +2067,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
   if (target.kind === "member" && target.object) {
     return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
+  if (target.kind === "index" && target.object && target.index) {
+    return `((${emitExpression(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
   }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
@@ -2184,6 +2234,16 @@ function executeCallExpression(
   }
   if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
     const target = context.readReference?.(ir.callee.name);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    return target(...ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
+  }
+  if (
+    ir.callee.kind === "IdentifierRead" &&
+    (ir.callee.dependency?.kind === "local" || ir.callee.dependency?.kind === "global")
+  ) {
+    const target = executeRead(ir.callee.dependency, ir.callee.name, context, lexical);
     if (typeof target !== "function") {
       return undefined;
     }
@@ -2603,6 +2663,11 @@ function executeTargetRead(
     const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
     return object == null ? undefined : object[target.name];
   }
+  if (target.kind === "index" && target.object && target.index) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
+    const index = executeExpressionIr(target.index, context, lexical) as PropertyKey;
+    return object == null ? undefined : object[index];
+  }
   if (target.kind === "local") {
     return context.readLocal(target.name);
   }
@@ -2628,6 +2693,15 @@ function executeTargetWrite(
       throw new Error(`Cannot write XMLUI script member '${target.name}' on null or undefined.`);
     }
     object[target.name] = value;
+    return;
+  }
+  if (target.kind === "index" && target.object && target.index) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
+    const index = executeExpressionIr(target.index, context, lexical) as PropertyKey;
+    if (object == null) {
+      throw new Error("Cannot write XMLUI script index on null or undefined.");
+    }
+    object[index] = value;
     return;
   }
   if (target.kind === "local") {

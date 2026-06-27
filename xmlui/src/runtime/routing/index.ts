@@ -35,6 +35,7 @@ export class RuntimeRoutingStore {
     readonly mode: RoutingMode = "hash",
     private readonly onChange?: () => void,
     initialUrl?: string,
+    private readonly localOnly = false,
   ) {
     this.snapshot = initialUrl ? snapshotFromUrl(initialUrl, 0) : readBrowserSnapshot(mode, 0);
   }
@@ -55,6 +56,9 @@ export class RuntimeRoutingStore {
   }
 
   attach(): () => void {
+    if (this.localOnly) {
+      return () => undefined;
+    }
     if (typeof window === "undefined") {
       return () => undefined;
     }
@@ -69,10 +73,13 @@ export class RuntimeRoutingStore {
   }
 
   async navigate(target: unknown, queryParams?: Record<string, unknown>): Promise<boolean> {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" && !this.localOnly) {
       return false;
     }
     if (typeof target === "number") {
+      if (this.localOnly) {
+        return false;
+      }
       window.history.go(target);
       return true;
     }
@@ -80,6 +87,15 @@ export class RuntimeRoutingStore {
     const willResult = await this.navigationHandlers.onWillNavigate?.(String(target ?? "/"), queryParams);
     if (willResult === false) {
       return false;
+    }
+    if (this.localOnly) {
+      this.snapshot = snapshotFromUrl(url, this.snapshot.revision + 1);
+      this.onChange?.();
+      for (const listener of this.listeners) {
+        listener();
+      }
+      void this.navigationHandlers.onDidNavigate?.(snapshotToUrl(this.snapshot), this.snapshot.queryParams);
+      return true;
     }
     if (this.mode === "hash") {
       window.location.hash = url;

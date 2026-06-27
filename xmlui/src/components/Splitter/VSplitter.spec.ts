@@ -1,11 +1,6 @@
 import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old VSplitter suite is copied for compatibility tracking, but full Splitter alias resize and resizer behavior parity is not complete yet. Re-enable cases feature-by-feature.",
-);
-
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================

@@ -30,6 +30,10 @@ export type XmluiComponentMetadata = {
   templates: XmluiMemberMetadata[];
   contextVariables: XmluiMemberMetadata[];
   apis: XmluiMemberMetadata[];
+  parts: XmluiMemberMetadata[];
+  themeVars: XmluiMemberMetadata[];
+  defaultThemeVars: Record<string, string | number | boolean>;
+  toneSpecificThemeVars: Record<string, Record<string, string>>;
   layoutProps: boolean;
   source?: {
     id: string;
@@ -87,4 +91,3 @@ export type XmluiUnifiedDiagnostic = {
   endLine: number;
   endCharacter: number;
 };
-

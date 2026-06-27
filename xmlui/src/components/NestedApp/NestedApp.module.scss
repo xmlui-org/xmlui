@@ -8,6 +8,55 @@
     overflow: hidden;
   }
 
+  .framed {
+    border: var(--xmlui-border-NestedApp, 0.5px solid var(--xmlui-borderColor, #d4d4d8));
+    border-radius: var(--xmlui-borderRadius-NestedApp, 8px);
+    background: var(--xmlui-backgroundColor-frame-NestedApp, var(--xmlui-color-surface-100, #f4f4f5));
+    box-shadow: var(--xmlui-boxShadow-NestedApp, 0 0 32px 0 rgba(0, 0, 0, 0.05));
+  }
+
+  .header {
+    min-height: 40px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: var(--xmlui-borderBottom-header-NestedApp, 0.5px solid var(--xmlui-borderColor, #d4d4d8));
+    background: var(--xmlui-backgroundColor-header-NestedApp, var(--xmlui-color-surface-100, #f4f4f5));
+  }
+
+  .title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--xmlui-fontWeight-header-NestedApp, 600);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .controls button {
+    min-width: 48px;
+    height: 24px;
+    padding: 1px 8px;
+    border: 1px solid var(--xmlui-borderColor-button-splitView-NestedApp, transparent);
+    border-radius: var(--xmlui-borderRadius-button-splitView-NestedApp, 4px);
+    background: transparent;
+    color: var(--xmlui-color-button-splitView-NestedApp, var(--xmlui-color-surface-600, #52525b));
+    cursor: pointer;
+  }
+
+  .controls .activeControl {
+    background: var(--xmlui-backgroundColor-button-splitView-NestedApp--active, var(--xmlui-color-surface-0, #fff));
+    color: var(--xmlui-color-button-splitView-NestedApp--active, var(--xmlui-color-primary, #2563eb));
+  }
+
   .nestedAppContent {
     width: 100%;
     min-height: 0;
@@ -18,6 +67,16 @@
     border: 1px solid var(--xmlui-color-danger-500, #c62828);
     color: var(--xmlui-color-danger-700, #8e0000);
     background: var(--xmlui-color-danger-50, #fff5f5);
+    white-space: pre-wrap;
+  }
+
+  .code {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 12px;
+    overflow: auto;
+    background: var(--xmlui-backgroundColor-code-splitView-NestedApp, var(--xmlui-color-surface-0, #fff));
     white-space: pre-wrap;
   }
 }

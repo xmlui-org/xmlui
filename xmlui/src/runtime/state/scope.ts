@@ -283,6 +283,9 @@ function readActionPath(value: unknown, path: string): unknown {
 }
 
 function readBuiltInReference(scope: RuntimeScope | undefined, name: string): unknown {
+  if (name === "Array") {
+    return Array;
+  }
   if (name === "JSON") {
     return JSON;
   }

@@ -58,6 +58,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
   }, [hasOverflow, registerApi, scrollIntoView]);
 
   const resolvedAnchorId = useMemo(() => anchorId || textFromChildren(children), [anchorId, children]);
+  const elementId = id || resolvedAnchorId;
 
   return (
     <Element
@@ -70,7 +71,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
           forwardedRef.current = node;
         }
       }}
-      id={id}
+      id={elementId}
       className={cx(
         styles.heading,
         styles[normalizedLevel],
@@ -83,8 +84,9 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
       )}
       style={style}
       data-xmlui-heading-level={normalizedLevel}
+      data-xmlui-omit-from-toc={String(_omitFromToc)}
     >
-      {resolvedAnchorId ? (
+      {resolvedAnchorId && resolvedAnchorId !== elementId ? (
         <span id={resolvedAnchorId} data-anchor="true" className={styles.anchorRef} />
       ) : null}
       {children}

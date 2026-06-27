@@ -320,6 +320,8 @@ function transformElement(
     setParsedValue(parsed, "props", attr.name, attr, sourceId);
   }
 
+  applyScriptDeclarations(node, source, sourceId, vars, parsed);
+
   if (type === "event" || type === "method") {
     return {
       kind: "element",
@@ -379,6 +381,146 @@ function transformElement(
     range: rangeOf(node),
     ...(hasParsedBindings(parsed) ? { parsed } : {}),
   };
+}
+
+type ScriptDeclaration = {
+  name: string;
+  value: string;
+  range: SourceRange;
+};
+
+function applyScriptDeclarations(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  sourceId: string,
+  vars: Record<string, string>,
+  parsed: XmluiParsedBindings,
+): void {
+  for (const block of scriptBlocks(node, source)) {
+    const declarations = scriptFunctionDeclarations(block.value, block.range);
+    const sourceWithoutFunctions = declarations.reduce(
+      (current, declaration) => blankRange(current, declaration.range.start - block.range.start, declaration.range.end - block.range.start),
+      block.value,
+    );
+
+    for (const declaration of declarations) {
+      vars[declaration.name] = declaration.value;
+      setParsedValue(parsed, "vars", declaration.name, declarationAttribute(declaration, sourceId), sourceId);
+    }
+    for (const declaration of scriptVariableDeclarations(sourceWithoutFunctions, block.range)) {
+      vars[declaration.name] = declaration.value;
+      setParsedValue(parsed, "vars", declaration.name, declarationAttribute(declaration, sourceId), sourceId);
+    }
+  }
+}
+
+function scriptBlocks(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+): ScriptDeclaration[] {
+  const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
+  const children = content?.children ?? [];
+  return children.flatMap((child) => {
+    if (child.kind !== MarkupSyntaxKind.Element || tagName(child, source) !== "script") {
+      return [];
+    }
+    const text = rawScriptChildren(child, source)
+      .map((scriptChild) => scriptChild.kind === "text" ? scriptChild.value : "")
+      .join("\n");
+    return [{
+      name: "script",
+      value: text,
+      range: rangeOf(child),
+    }];
+  });
+}
+
+function scriptFunctionDeclarations(script: string, blockRange: SourceRange): ScriptDeclaration[] {
+  const declarations: ScriptDeclaration[] = [];
+  const pattern = /\bfunction\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)\s*\{/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(script))) {
+    const openBraceIndex = pattern.lastIndex - 1;
+    const closeBraceIndex = findMatchingBrace(script, openBraceIndex);
+    if (closeBraceIndex < 0) {
+      continue;
+    }
+    const name = match[1];
+    const params = match[2].trim();
+    const body = script.slice(openBraceIndex + 1, closeBraceIndex).trim();
+    const arrowBody = /\breturn\b/.test(body) ? body : `${body}\nreturn undefined;`;
+    declarations.push({
+      name,
+      value: `{(${params}) => {\n${arrowBody}\n}}`,
+      range: {
+        start: blockRange.start + match.index,
+        end: blockRange.start + closeBraceIndex + 1,
+      },
+    });
+    pattern.lastIndex = closeBraceIndex + 1;
+  }
+  return declarations;
+}
+
+function scriptVariableDeclarations(script: string, blockRange: SourceRange): ScriptDeclaration[] {
+  const declarations: ScriptDeclaration[] = [];
+  const pattern = /\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*(?:=\s*([^;]+))?;/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(script))) {
+    declarations.push({
+      name: match[1],
+      value: `{${match[2]?.trim() || "undefined"}}`,
+      range: {
+        start: blockRange.start + match.index,
+        end: blockRange.start + pattern.lastIndex,
+      },
+    });
+  }
+  return declarations;
+}
+
+function declarationAttribute(declaration: ScriptDeclaration, sourceId: string): AttributeInfo {
+  return {
+    name: declaration.name,
+    value: declaration.value,
+    nameRange: declaration.range,
+    valueRange: {
+      start: declaration.range.start,
+      end: declaration.range.end,
+    },
+  };
+}
+
+function findMatchingBrace(source: string, openBraceIndex: number): number {
+  let depth = 0;
+  let quote: string | undefined;
+  for (let index = openBraceIndex; index < source.length; index++) {
+    const char = source[index];
+    const previous = source[index - 1];
+    if (quote) {
+      if (char === quote && previous !== "\\") {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === "\"" || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (char === "{") {
+      depth++;
+    } else if (char === "}") {
+      depth--;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+  return -1;
+}
+
+function blankRange(value: string, start: number, end: number): string {
+  return value.slice(0, start) + " ".repeat(Math.max(0, end - start)) + value.slice(end);
 }
 
 function contentChildren(
@@ -677,10 +819,39 @@ function stripQuotes(value: string): string {
 
 function unwrapExpression(value: string): string | undefined {
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+  if (trimmed.startsWith("{") && trimmed.endsWith("}") && matchingExpressionBrace(trimmed, 0) === trimmed.length - 1) {
     return trimmed.slice(1, -1).trim();
   }
   return undefined;
+}
+
+function matchingExpressionBrace(value: string, openIndex: number): number {
+  let depth = 0;
+  let quote: string | undefined;
+  for (let index = openIndex; index < value.length; index++) {
+    const char = value[index];
+    if (quote) {
+      if (char === "\\" && index + 1 < value.length) {
+        index++;
+      } else if (char === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === `"` || char === `'` || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (char === "{") {
+      depth++;
+    } else if (char === "}") {
+      depth--;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+  return -1;
 }
 
 function expressionInnerRange(value: string, range: SourceRange): SourceRange {

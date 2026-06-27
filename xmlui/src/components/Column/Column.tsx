@@ -46,6 +46,20 @@ export const ColumnMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.canResize,
     },
+    horizontalAlignment: {
+      description: "Horizontal alignment for cell content in this column.",
+      valueType: "string",
+      availableValues: ["start", "center", "end"],
+    },
+    verticalAlignment: {
+      description: "Vertical alignment for cell content in this column.",
+      valueType: "string",
+      availableValues: ["start", "center", "end", "top", "bottom"],
+    },
+    backgroundColor: {
+      description: "Background color applied to cells in this column.",
+      valueType: "string",
+    },
   },
   contextVars: {
     $item: { description: "The complete data row object being rendered." },

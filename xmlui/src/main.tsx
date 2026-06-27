@@ -133,6 +133,7 @@ import udcSlotContextApp from "./examples/udc-slot-context/Main.xmlui";
 declare global {
   interface Window {
     __xmluiTestBedProbe?: {
+      hasLocal(name: string): boolean;
       readLocal(name: string): unknown;
       readGlobal(name: string): unknown;
     };

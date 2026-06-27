@@ -554,6 +554,7 @@ function mergeFormItemRegistration(
   return {
     ...registration,
     noSubmit: existing.noSubmit || registration.noSubmit,
+    sanitizeSubmitValue: registration.sanitizeSubmitValue ?? existing.sanitizeSubmitValue,
   };
 }
 
@@ -674,7 +675,8 @@ function cleanedSubmitValues(
     if (item.noSubmit || item.name.endsWith("__UNBOUND_FIELD__")) {
       continue;
     }
-    const value = getPathValue(values, item.name);
+    const rawValue = getPathValue(values, item.name);
+    const value = item.sanitizeSubmitValue ? item.sanitizeSubmitValue(rawValue) : rawValue;
     if (value === undefined) {
       continue;
     }

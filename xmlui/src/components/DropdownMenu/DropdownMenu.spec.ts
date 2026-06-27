@@ -402,6 +402,32 @@ test("applies theme variables correctly", async ({ initTestBed, createDropdownMe
   await expect(menuContent).toHaveCSS("min-width", "200px");
 });
 
+test("applies shared MenuItem active hover theme variables", async ({ initTestBed, page }) => {
+  await initTestBed(
+    `<DropdownMenu label="Themed Menu">
+      <MenuItem active="true">Active item</MenuItem>
+    </DropdownMenu>`,
+    {
+      testThemeVars: {
+        "backgroundColor-MenuItem--active": "rgb(0, 0, 255)",
+        "backgroundColor-MenuItem--active--hover": "rgb(255, 0, 0)",
+        "color-MenuItem--active": "rgb(255, 255, 255)",
+        "color-MenuItem--active--hover": "rgb(0, 255, 0)",
+      },
+    },
+  );
+
+  await page.getByRole("button", { name: "Themed Menu" }).click();
+  const item = page.getByRole("menuitem", { name: "Active item" });
+
+  await expect(item).toHaveCSS("background-color", "rgb(0, 0, 255)");
+  await expect(item).toHaveCSS("color", "rgb(255, 255, 255)");
+
+  await item.hover();
+  await expect(item).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  await expect(item).toHaveCSS("color", "rgb(0, 255, 0)");
+});
+
 // =============================================================================
 // EDGE CASE TESTS
 // =============================================================================

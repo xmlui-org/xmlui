@@ -26,6 +26,10 @@ export const ButtonMd = createMetadata({
     },
   },
   props: {
+    id: {
+      description: "Defines a component instance identifier.",
+      valueType: "string",
+    },
     autoFocus: dAutoFocus(),
     variant: {
       description: "The button variant determines the level of emphasis the button should possess.",
@@ -169,6 +173,8 @@ export const buttonRenderer = wrapComponent({
     return (
       <Button
         {...adapter.rootAttrs()}
+        id={adapter.stringProp("id")}
+        data-testid={adapter.stringProp("testId") ?? adapter.stringProp("id")}
         type={adapter.stringProp("type", defaultProps.type)}
         variant={adapter.stringProp("variant", defaultProps.variant)}
         themeColor={adapter.stringProp("themeColor", defaultProps.themeColor)}

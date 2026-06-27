@@ -71,6 +71,24 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
   VStack: ({ context, node, scope }) => (
     <div {...partAttrs("VStack")} data-testid={useStringProp(node, scope, "testId", "") || undefined} style={flexStyle("column", node, scope)}>{context.renderChildren(node.children, scope)}</div>
   ),
+  CHStack: ({ context, node, scope }) => (
+    <div
+      {...partAttrs("CHStack")}
+      data-testid={useStringProp(node, scope, "testId", "") || undefined}
+      style={{ ...flexStyle("row", node, scope), justifyContent: "center", alignItems: "center" }}
+    >
+      {context.renderChildren(node.children, scope)}
+    </div>
+  ),
+  CVStack: ({ context, node, scope }) => (
+    <div
+      {...partAttrs("CVStack")}
+      data-testid={useStringProp(node, scope, "testId", "") || undefined}
+      style={{ ...flexStyle("column", node, scope), justifyContent: "center", alignItems: "center" }}
+    >
+      {context.renderChildren(node.children, scope)}
+    </div>
+  ),
   Text: ({ context, node, scope }) => {
     const value = useEvaluatedProp(node, scope, "value", undefined);
     const variant = useStringProp(node, scope, "variant", "");

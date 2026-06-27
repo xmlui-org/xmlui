@@ -1,11 +1,6 @@
 import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "The literal old StickySection suite is copied for compatibility tracking, but full overlapping sticky section, z-index, and scroll geometry parity is not complete yet. Re-enable cases feature-by-feature.",
-);
-
 // =============================================================================
 // MARKUP HELPERS
 // =============================================================================

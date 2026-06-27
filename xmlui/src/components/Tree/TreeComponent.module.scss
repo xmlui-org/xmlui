@@ -1,5 +1,8 @@
 .root {
+  position: relative;
   width: 100%;
+  height: 100%;
+  min-height: 0;
   overflow: auto;
   color: var(--xmlui-textColor-Tree);
   background: var(--xmlui-backgroundColor-Tree);
@@ -11,7 +14,7 @@
 .item {
   display: flex;
   align-items: center;
-  min-height: var(--xmlui-itemHeight-Tree);
+  min-height: var(--xmlui-tree-item-height, var(--xmlui-itemHeight-Tree));
   gap: 6px;
   padding: 2px 6px;
   border-radius: var(--xmlui-borderRadius-item-Tree);
@@ -19,12 +22,22 @@
 }
 
 .item:hover {
-  background: var(--xmlui-backgroundColor-item-Tree--hover);
+  color: var(--xmlui-textColor-Tree--hover, var(--xmlui-textColor-Tree));
+  background: var(--xmlui-backgroundColor-Tree-row--hover, var(--xmlui-backgroundColor-item-Tree--hover));
 }
 
 .selected {
-  color: var(--xmlui-textColor-selected-Tree);
-  background: var(--xmlui-backgroundColor-selected-Tree);
+  color: var(--xmlui-textColor-Tree--selected, var(--xmlui-textColor-selected-Tree));
+  background: var(--xmlui-backgroundColor-Tree-row--selected, var(--xmlui-backgroundColor-selected-Tree));
+}
+
+.selected:hover {
+  color: var(--xmlui-textColor-Tree--selected, var(--xmlui-textColor-selected-Tree));
+  background: var(--xmlui-backgroundColor-Tree-row--selected, var(--xmlui-backgroundColor-selected-Tree));
+}
+
+.focused {
+  box-shadow: var(--xmlui-outlineColor-Tree--focus) 0 0 0 2px inset;
 }
 
 .toggle {
@@ -34,6 +47,41 @@
   background: transparent;
   color: inherit;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleIcon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleIconFallback {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  line-height: 16px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: xmlui-tree-spin 0.8s linear infinite;
+}
+
+@keyframes xmlui-tree-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .togglePlaceholder {
@@ -44,4 +92,34 @@
 .label {
   flex: 1;
   min-width: 0;
+}
+
+.withFade {
+  overflow: auto;
+}
+
+.fadeOverlay {
+  position: sticky;
+  left: 0;
+  right: 0;
+  height: 18px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
+
+.fadeTop {
+  top: 0;
+  margin-bottom: -18px;
+  background: linear-gradient(var(--xmlui-backgroundColor-Tree), transparent);
+}
+
+.fadeBottom {
+  bottom: 0;
+  margin-top: -18px;
+  background: linear-gradient(transparent, var(--xmlui-backgroundColor-Tree));
+}
+
+.fadeVisible {
+  opacity: 1;
 }

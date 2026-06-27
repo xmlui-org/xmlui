@@ -23,7 +23,7 @@ $outlineOffset-item-TileGrid--focus: createThemeVar("outlineOffset-item-#{$compo
     gap: var(--xmlui-gap-TileGrid);
     overflow: auto;
     min-width: 0;
-    min-height: 0;
+    min-height: var(--xmlui-itemHeight-TileGrid);
   }
 
   .fixedTiles {

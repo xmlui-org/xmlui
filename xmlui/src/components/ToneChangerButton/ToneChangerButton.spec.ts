@@ -13,10 +13,27 @@ test.describe("ToneChangerButton foundation", () => {
     await expect(page.getByTestId("changer")).toHaveAttribute("data-tone", "dark");
     await expect(page.getByTestId("result")).toHaveText("dark");
   });
-});
 
-test.describe("ToneChangerButton old-suite transfer debt", () => {
-  test("copy literal old icon and Button-composition tests", async () => {
-    test.fixme(true, "Full ToneChangerButton suite is deferred to tone visual parity");
+  test("uses custom labels while toggling in both directions", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.tone="light">
+        <ToneChangerButton
+          testId="changer"
+          lightToDarkIcon="Go dark"
+          darkToLightIcon="Go light"
+          onClick="next => tone = next"
+        />
+        <Text testId="result">{tone}</Text>
+      </App>
+    `);
+
+    await expect(page.getByTestId("changer")).toHaveText("Go dark");
+    await page.getByTestId("changer").click();
+    await expect(page.getByTestId("changer")).toHaveText("Go light");
+    await expect(page.getByTestId("result")).toHaveText("dark");
+
+    await page.getByTestId("changer").click();
+    await expect(page.getByTestId("changer")).toHaveText("Go dark");
+    await expect(page.getByTestId("result")).toHaveText("light");
   });
 });

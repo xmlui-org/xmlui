@@ -811,6 +811,38 @@ export class ListDriver extends ComponentDriver {
   get rowCheckboxes(): Locator {
     return this.component.locator('input[type="checkbox"]');
   }
+
+  get emptyState(): Locator {
+    return this.component.locator("[class*='noRows']").first();
+  }
+
+  async isEmpty(): Promise<boolean> {
+    return (await this.rows.count()) === 0;
+  }
+
+  async isLoading(): Promise<boolean> {
+    return (await this.component.locator("[class*='loadingWrapper']").count()) > 0;
+  }
+
+  getVisibleItemCount(): Promise<number> {
+    return this.rows.count();
+  }
+
+  async getVisibleItemTexts(): Promise<string[]> {
+    return this.rows.allTextContents();
+  }
+
+  async scrollTo(position: "top" | "bottom" | number): Promise<void> {
+    await this.component.evaluate((element, target) => {
+      if (target === "top") {
+        element.scrollTop = 0;
+      } else if (target === "bottom") {
+        element.scrollTop = element.scrollHeight;
+      } else {
+        element.scrollTop = target;
+      }
+    }, position);
+  }
 }
 
 export class TreeDriver extends ComponentDriver {
@@ -834,6 +866,26 @@ export class TreeDriver extends ComponentDriver {
 
   async selectItem(label: string): Promise<void> {
     await this.component.getByRole("treeitem", { name: new RegExp(label) }).first().click();
+  }
+
+  getNodeWrapperByTestId(testId: string): Locator {
+    return this.component.getByTestId(testId).locator("xpath=ancestor-or-self::*[@role='treeitem'][1]");
+  }
+
+  getNodeWrapperByMarker(testId: string): Locator {
+    return this.getNodeWrapperByTestId(testId);
+  }
+
+  getByTestId(testId: string): Locator {
+    return this.component.getByTestId(testId).first();
+  }
+
+  getIconByName(name: string): Locator {
+    return this.component.locator(`[data-icon="${name}"], [data-xmlui-icon="${name}"], [data-icon-name="${name}"], svg[data-icon="${name}"]`).first();
+  }
+
+  getIconsByName(name: string): Locator {
+    return this.component.locator(`[data-tree-expand-icon][data-icon-name="${name}"]`);
   }
 }
 

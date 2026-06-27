@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata";
 import {
@@ -23,8 +23,11 @@ const ThemeContext = createContext<ThemeRuntimeContext>({
   setTone: noopSetTone,
 });
 
-export function XmluiThemeRoot({ children }: { children: ReactNode }) {
-  const [tone, setTone] = useState<ThemeTone>("light");
+export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { children: ReactNode; tone?: ThemeTone }) {
+  const [tone, setTone] = useState<ThemeTone>(initialTone);
+  useEffect(() => {
+    setTone(initialTone);
+  }, [initialTone]);
   const variables = useMemo(
     () => mergeThemeVariableLayers([defaultThemeVariables], tone),
     [tone],
