@@ -1,0 +1,273 @@
+{
+  "items": [
+    {
+      "label": "Extensions",
+      "icon": "puzzle",
+      "to": "/docs/reference/extensions/",
+      "children": [
+        {
+          "label": "Xmlui Animations",
+          "to": "/docs/reference/extensions/xmlui-animations/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-animations/_overview"
+            },
+            {
+              "label": "Animation",
+              "to": "/docs/reference/extensions/xmlui-animations/Animation"
+            },
+            {
+              "label": "FadeAnimation",
+              "to": "/docs/reference/extensions/xmlui-animations/FadeAnimation"
+            },
+            {
+              "label": "FadeInAnimation",
+              "to": "/docs/reference/extensions/xmlui-animations/FadeInAnimation"
+            },
+            {
+              "label": "FadeOutAnimation",
+              "to": "/docs/reference/extensions/xmlui-animations/FadeOutAnimation"
+            },
+            {
+              "label": "ScaleAnimation",
+              "to": "/docs/reference/extensions/xmlui-animations/ScaleAnimation"
+            },
+            {
+              "label": "SlideInAnimation",
+              "to": "/docs/reference/extensions/xmlui-animations/SlideInAnimation"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Docs Blocks",
+          "to": "/docs/reference/extensions/xmlui-docs-blocks/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/_overview"
+            },
+            {
+              "label": "BasicLayout",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/BasicLayout"
+            },
+            {
+              "label": "Breadcrumbs",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Breadcrumbs"
+            },
+            {
+              "label": "DocumentLinks",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/DocumentLinks"
+            },
+            {
+              "label": "DocumentPage",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/DocumentPage"
+            },
+            {
+              "label": "DocumentPageNoTOC",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/DocumentPageNoTOC"
+            },
+            {
+              "label": "FeaturedWithTabsLayout",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/FeaturedWithTabsLayout"
+            },
+            {
+              "label": "LinkButton",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/LinkButton"
+            },
+            {
+              "label": "Overview",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Overview"
+            },
+            {
+              "label": "OverviewCard",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/OverviewCard"
+            },
+            {
+              "label": "PageNotFound",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/PageNotFound"
+            },
+            {
+              "label": "ReadingTime",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/ReadingTime"
+            },
+            {
+              "label": "ReleaseList",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/ReleaseList"
+            },
+            {
+              "label": "SectionHeader",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/SectionHeader"
+            },
+            {
+              "label": "Separator",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Separator"
+            },
+            {
+              "label": "Share",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/Share"
+            },
+            {
+              "label": "TBD",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/TBD"
+            },
+            {
+              "label": "TwoColumnCode",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/TwoColumnCode"
+            },
+            {
+              "label": "CustomSyntaxHighlighters",
+              "to": "/docs/reference/extensions/xmlui-docs-blocks/CustomSyntaxHighlighters"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Echart",
+          "to": "/docs/reference/extensions/xmlui-echart/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-echart/_overview"
+            },
+            {
+              "label": "EChart",
+              "to": "/docs/reference/extensions/xmlui-echart/EChart"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Gauge",
+          "to": "/docs/reference/extensions/xmlui-gauge/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-gauge/_overview"
+            },
+            {
+              "label": "Gauge",
+              "to": "/docs/reference/extensions/xmlui-gauge/Gauge"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Masonry",
+          "to": "/docs/reference/extensions/xmlui-masonry/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-masonry/_overview"
+            },
+            {
+              "label": "Masonry",
+              "to": "/docs/reference/extensions/xmlui-masonry/Masonry"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Pdf",
+          "to": "/docs/reference/extensions/xmlui-pdf/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-pdf/_overview"
+            },
+            {
+              "label": "Pdf",
+              "to": "/docs/reference/extensions/xmlui-pdf/Pdf"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Recharts",
+          "to": "/docs/reference/extensions/xmlui-recharts/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-recharts/_overview"
+            },
+            {
+              "label": "AreaChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/AreaChart"
+            },
+            {
+              "label": "BarChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/BarChart"
+            },
+            {
+              "label": "DonutChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/DonutChart"
+            },
+            {
+              "label": "LabelList",
+              "to": "/docs/reference/extensions/xmlui-recharts/LabelList"
+            },
+            {
+              "label": "Legend",
+              "to": "/docs/reference/extensions/xmlui-recharts/Legend"
+            },
+            {
+              "label": "LineChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/LineChart"
+            },
+            {
+              "label": "PieChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/PieChart"
+            },
+            {
+              "label": "RadarChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/RadarChart"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Tiptap Editor",
+          "to": "/docs/reference/extensions/xmlui-tiptap-editor/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-tiptap-editor/_overview"
+            },
+            {
+              "label": "TiptapEditor",
+              "to": "/docs/reference/extensions/xmlui-tiptap-editor/TiptapEditor"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Website Blocks",
+          "to": "/docs/reference/extensions/xmlui-website-blocks/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/_overview"
+            },
+            {
+              "label": "Backdrop",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Backdrop"
+            },
+            {
+              "label": "Breakout",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Breakout"
+            },
+            {
+              "label": "Carousel",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Carousel"
+            },
+            {
+              "label": "FancyButton",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/FancyButton"
+            },
+            {
+              "label": "HeroSection",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/HeroSection"
+            },
+            {
+              "label": "ScrollToTop",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/ScrollToTop"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

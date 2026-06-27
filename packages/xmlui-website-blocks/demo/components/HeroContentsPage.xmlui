@@ -1,0 +1,246 @@
+<Component name="HeroContentsPage">
+  <H1>
+    Hero Section with image contents
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+    image="/resources/xmlui-logo.svg"
+  />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  image="/resources/xmlui-logo.svg"
+/>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero Section with sized image contents
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+    image="/resources/xmlui-logo.svg"
+    imageWidth="50%"
+    imageHeight="50%"
+  />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  image="/resources/xmlui-logo.svg"
+/>
+```        
+        ]]>
+  </Markdown>
+
+
+  <H1>
+    Hero Section with arbitrary contents
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  >
+    <VStack horizontalAlignment="center">
+      <Button label="Visit the source code" />
+      <Stack backgroundColor="purple" width="120px" height="24px" />
+      <Avatar url="https://i.pravatar.cc/100" size="lg" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+>
+  <VStack horizontalAlignment="center">
+    <Button label="Visit the source code" />
+    <Stack backgroundColor="purple" width="120px" height="24px" />
+    <Avatar url="https://i.pravatar.cc/100" size="lg" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero Section with arbitrary contents
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  >
+    <VStack horizontalAlignment="center">
+      <Button label="Visit the source code" />
+      <Stack backgroundColor="purple" width="120px" height="24px" />
+      <Avatar url="https://i.pravatar.cc/100" size="lg" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+>
+  <VStack horizontalAlignment="center">
+    <Button label="Visit the source code" />
+    <Stack backgroundColor="purple" width="120px" height="24px" />
+    <Avatar url="https://i.pravatar.cc/100" size="lg" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero Section with content placement (left)
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    contentPlacement="left"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  >
+    <VStack horizontalAlignment="center">
+      <Button label="Visit the source code" />
+      <Stack backgroundColor="purple" width="120px" height="24px" />
+      <Avatar url="https://i.pravatar.cc/100" size="lg" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  contentPlacement="left"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+>
+  <VStack horizontalAlignment="center">
+    <Button label="Visit the source code" />
+    <Stack backgroundColor="purple" width="120px" height="24px" />
+    <Avatar url="https://i.pravatar.cc/100" size="lg" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero Section with content placement (right)
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    contentPlacement="right"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  >
+    <VStack horizontalAlignment="center">
+      <Button label="Visit the source code" />
+      <Stack backgroundColor="purple" width="120px" height="24px" />
+      <Avatar url="https://i.pravatar.cc/100" size="lg" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  contentPlacement="right"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+>
+  <VStack horizontalAlignment="center">
+    <Button label="Visit the source code" />
+    <Stack backgroundColor="purple" width="120px" height="24px" />
+    <Avatar url="https://i.pravatar.cc/100" size="lg" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero Section content with layout settings
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    contentPlacement="right"
+    headerAlignment="end"
+    contentAlignment="left"
+    headerWidth="75%"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  >
+    <VStack horizontalAlignment="center">
+      <Button label="Visit the source code" />
+      <Stack backgroundColor="purple" width="120px" height="24px" />
+      <Avatar url="https://i.pravatar.cc/100" size="lg" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  contentPlacement="right"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+>
+  <VStack horizontalAlignment="center">
+    <Button label="Visit the source code" />
+    <Stack backgroundColor="purple" width="120px" height="24px" />
+    <Avatar url="https://i.pravatar.cc/100" size="lg" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+</Component>

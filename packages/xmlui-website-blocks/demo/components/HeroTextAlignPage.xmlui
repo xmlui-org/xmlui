@@ -1,0 +1,74 @@
+<Component name="HeroTextAlignPage">
+  <H1>
+    Hero Section with "start" alignment
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headerAlignment="start"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headerAlignment="start"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows."
+/>
+```        
+        ]]>
+  </Markdown>
+  <H1>
+    Hero Section with "end" alignment
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headerAlignment="end"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headerAlignment="end"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows."
+/>
+```        
+        ]]>
+  </Markdown>
+  <H1>
+    Hero Section with "center" alignment (default)
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headerAlignment="center"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headerAlignment="center"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows."
+/>
+```        
+        ]]>
+  </Markdown>
+</Component>

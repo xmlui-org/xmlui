@@ -1,0 +1,947 @@
+@use "sass:string";
+@use "sass:meta";
+@use "sass:map";
+@use "sass:list";
+
+/*
+ * This file contains all CSS variables AppEngine uses for styling the UI, including individual visual components.
+ *
+ * We use a subset of these CSS variables in themes.
+ */
+
+// =====================================================================================================================
+// We index all theme variables with this prefix to make a distinction from variables defined in other custom themes.
+$THEME-VAR-PREFIX: xmlui;
+
+// Global variables for theme composition functions
+$tmp: null;
+$tmpAll: null;
+$tmpHorizontal: null;
+$tmpVertical: null;
+$tmpThickness: null;
+$tmpThicknessHorizontal: null;
+$tmpThicknessVertical: null;
+$tmpStyle: null;
+$tmpStyleHorizontal: null;
+$tmpStyleVertical: null;
+$tmpColor: null;
+$tmpColorHorizontal: null;
+$tmpColorVertical: null;
+$tmpRadius: null;
+$tmpRadiusAll: null;
+
+/*
+ * This function creates a CSS variable name by combining the prefix and the argument variable name
+ */
+@function createVar($componentVariable) {
+  @return var(--#{$THEME-VAR-PREFIX}-#{$componentVariable});
+}
+
+@function createVarWithDefault($componentVariable, $defaultValue) {
+  @return var(--#{$THEME-VAR-PREFIX}-#{$componentVariable}, $defaultValue);
+}
+
+@function countSubstring($string, $delimiter: null) {
+  @if (meta.type-of($string) != "string") {
+    @return -1;
+  }
+  $list: ();
+  $length: string.length($string);
+
+  $count: 0;
+
+  $index: string.index($string, $delimiter);
+
+  $temp: $string;
+  @while $index != null {
+    $count: $count + 1;
+    $temp: string.slice($temp, $index + 1);
+    $index: string.index($temp, $delimiter);
+  }
+
+  @return $count;
+}
+
+/*
+ * This function allows other CSS modules to get the value of the CSS variable specified in $componentVariable.
+ Optionally, you can provide a $fallbackValue to set the variable's value if that is not defined.
+ */
+@function useVarInner($componentVariable, $fallbackValue: false) {
+  @if $fallbackValue {
+    $num: countSubstring($componentVariable, "var(");
+    @if ($num <= 1) {
+      @return var(#{string.slice($componentVariable, 5, -2)}, #{$fallbackValue});
+    }
+    //we offset with the number of 'vars' in the $componentVariable, because we have to offset backwards for the closing parenthesis
+    // typically when in a useVar we have a hVar as the first argument
+    $offset: -2;
+    @if ($num > 1) {
+      $offset: (-1 * $num) - 1;
+    }
+    //@if(string.index(#{$fallbackValue}, 'fontSize-sm')) {
+    //  @debug 'original: ' + #{$componentVariable} + ", varcount: " + $num;
+    //  @debug 'concatet:' + var(#{string.slice($componentVariable, 5, -2)}, #{$fallbackValue});
+    //  @debug 'concat 2:' + var(#{string.slice($componentVariable, 5, $offset)}, #{$fallbackValue});
+    //}
+    @return string.unquote(
+      "var(#{string.slice($componentVariable, 5, $offset)}, #{$fallbackValue}#{string.slice($componentVariable, $offset + 1)})"
+    );
+  } @else {
+    @return $componentVariable;
+  }
+}
+
+@function reverse($list, $recursive: false) {
+  $result: ();
+
+  @for $i from list.length($list) * -1 through -1 {
+    @if meta.type-of(list.nth($list, abs($i))) == list and $recursive {
+      $result: list.append($result, reverse(list.nth($list, abs($i)), $recursive));
+    } @else {
+      $result: list.append($result, list.nth($list, abs($i)));
+    }
+  }
+
+  @return $result;
+}
+
+@function useVar($vars...) {
+  $ret: false;
+  @each $var in reverse($vars) {
+    $ret: useVarInner($var, $ret);
+  }
+  @return $ret;
+}
+
+@function remove-nth($list, $index) {
+  $result: null;
+
+  @if meta.type-of($index) != number {
+    @warn "$index: #{string.quote($index)} is not a number for `remove-nth`.";
+  } @else if $index == 0 {
+    @warn "List index 0 must be a non-zero integer for `remove-nth`.";
+  } @else if abs($index) > list.length($list) {
+    @warn "List index is #{$index} but list is only #{list.length($list)} item long for `remove-nth`.";
+  } @else {
+    $result: ();
+    $index: if($index < 0, list.length($list) + $index + 1, $index);
+
+    @for $i from 1 through list.length($list) {
+      @if $i != $index {
+        $result: list.append($result, list.nth($list, $i));
+      }
+    }
+  }
+
+  @return $result;
+}
+
+@function generate-combinations($list, $used: ()) {
+  $result: ();
+
+  @each $item in $list {
+    @if not list.index($used, $item) {
+      $result: list.append($result, $item, comma);
+      $used: list.append($used, $item, comma);
+
+      @if list.length($list) > 1 {
+        $rest: remove-nth($list, list.index($list, $item));
+        $combinations: generate-combinations($rest, $used);
+
+        @each $combination in $combinations {
+          $result: list.append($result, list.join($item, $combination), comma);
+        }
+      }
+    }
+  }
+
+  @return $result;
+}
+
+@function compare($string-a, $string-b) {
+  @return string.length($string-a) > string.length($string-b);
+}
+
+@function quick-sort($list) {
+  $less: ();
+  $equal: ();
+  $large: ();
+
+  @if length($list) > 1 {
+    $seed: nth($list, ceil(calc(length($list) / 2)));
+
+    @each $item in $list {
+      @if $item == $seed {
+        $equal: append($equal, $item, list-separator($list));
+      } @else if compare($item, $seed) {
+        $less: append($less, $item, list-separator($list));
+      } @else if not compare($item, $seed) {
+        $large: append($large, $item, list-separator($list));
+      }
+    }
+
+    @return join(join(quick-sort($less), $equal), quick-sort($large));
+  }
+
+  @return $list;
+}
+
+@function capitalize($string) {
+  @return string.to-upper-case(string.slice($string, 1, 1)) + string.slice($string, 2);
+}
+
+@function createHVar($attribute, $component, $traits: (), $states: (), $fallback: false) {
+  $stateCombinations: generate-combinations($states);
+  $sortedStateCombinations: ();
+  @each $stateComb in $stateCombinations {
+    $result: "";
+    @each $st in $stateComb {
+      $result: #{$result}--#{$st};
+    }
+    $sortedStateCombinations: append($sortedStateCombinations, $result);
+  }
+  $sortedStateCombinations: append($sortedStateCombinations, "");
+  $sortedStateCombinations: quick-sort($sortedStateCombinations);
+
+  $traitCombinations: generate-combinations($traits);
+  $sortedTraitCombinations: ();
+  @each $traitComb in $traitCombinations {
+    $result: "";
+    @each $st in $traitComb {
+      $result: #{$result}-#{$st};
+    }
+    $sortedTraitCombinations: append($sortedTraitCombinations, $result);
+  }
+  $sortedTraitCombinations: append($sortedTraitCombinations, "");
+  $sortedTraitCombinations: quick-sort($sortedTraitCombinations);
+
+  //@debug "trait combs: #{$sortedTraitCombinations}";
+  //@debug "state combs: #{$sortedStateCombinations}";
+
+  $base: #{$attribute}-#{capitalize($component)};
+  $vars: ();
+
+  @each $stateComb in $sortedStateCombinations {
+    @each $traitComb in $sortedTraitCombinations {
+      $vars: append($vars, createVar(#{$base}#{$traitComb}#{$stateComb}));
+    }
+  }
+  @if ($fallback != false) {
+    $vars: append($vars, $fallback);
+  }
+
+  @return useVar($vars...);
+}
+
+@function str-split($string, $separator) {
+  // empty array/list
+  $split-arr: ();
+  // first index of separator in string
+  $index: string.index($string, $separator);
+  // loop through string
+  @while $index != null {
+    // get the substring from the first character to the separator
+    $item: string.slice($string, 1, $index - 1);
+    // push item to array
+    $split-arr: list.append($split-arr, $item);
+    // remove item and separator from string
+    $string: string.slice($string, $index + 1);
+    // find new index of separator
+    $index: string.index($string, $separator);
+  }
+  // add the remaining string to list (the last item)
+  $split-arr: list.append($split-arr, $string);
+
+  @return $split-arr;
+}
+
+@function appendThemeVar($themeVars, $componentVariable) {
+  $split: str-split($componentVariable, ":");
+  $varName: list.nth($split, -1);
+  $cssVar: createVar($varName);
+  $themeVars: map.set($themeVars, #{$componentVariable}, $cssVar);
+  @return $themeVars;
+}
+
+@function appendThemeVarWithDefault($themeVars, $componentVariable, $defaultValue) {
+  $split: str-split($componentVariable, ":");
+  $varName: list.nth($split, -1);
+  $cssVar: createVarWithDefault($varName, $defaultValue);
+  $themeVars: map.set($themeVars, #{$componentVariable}, $cssVar);
+  @return $themeVars;
+}
+
+@function appendThemeVarWithFallback($themeVars, $componentVariable, $fallbackVar) {
+  $split: str-split($componentVariable, ":");
+  $varName: list.nth($split, -1);
+  $fallbackSplit: str-split($fallbackVar, ":");
+  $fallbackVarName: list.nth($fallbackSplit, -1);
+  $defaultValue: createVar($fallbackVarName);
+  $cssVar: createVarWithDefault($varName, $defaultValue);
+  $themeVars: map.set($themeVars, #{$componentVariable}, $cssVar);
+  @return $themeVars;
+}
+
+@function getThemeVar($themeVars, $componentVariable) {
+  @return map.get($themeVars, $componentVariable);
+}
+
+@function json-stringify($var) {
+  $var-type: meta.type-of($var);
+  $encode-func-name: "_encode-#{$var-type}";
+
+  @if (meta.function-exists($encode-func-name)) {
+    $encode-func: meta.get-function($encode-func-name);
+
+    @return meta.call($encode-func, $var);
+  }
+
+  @return $var; // strings and booleans don't need to be modified
+}
+
+@function stringify($var) {
+  @return '"#{$var}"';
+}
+
+@function _encode-string($string) {
+  @return stringify($string);
+}
+
+@function _encode-number($number) {
+  @if (unitless($number)) {
+    @return $number;
+  }
+
+  @return stringify($number);
+}
+
+@function _encode-null($string) {
+  @return "null";
+}
+
+@function _encode-color($color) {
+  @return stringify($color);
+}
+
+@function _encode-list($list) {
+  @return _encode-iterable($list);
+}
+
+@function _encode-map($map) {
+  @return _encode-iterable($map);
+}
+
+@function _encode-iterable($iterable) {
+  $is-list: meta.type-of($iterable) == "list";
+  $is-map: meta.type-of($iterable) == "map";
+
+  $str: "";
+  $opening-bracket: if($is-list, "[", "{");
+  $closing-bracket: if($is-list, "]", "}");
+
+  @each $key, $value in $iterable {
+    $entry-string: "";
+
+    @if ($is-list) {
+      $entry-string: json-stringify($key);
+    } @else if ($is-map) {
+      $entry-string: stringify($key) + ": " + json-stringify($value);
+    }
+
+    $str: $str + ", " + $entry-string;
+  }
+
+  $str: string.slice($str, 3); // remove leading ', ' from ', entry1, entry2'
+
+  @return $opening-bracket + $str + $closing-bracket;
+}
+
+// =====================================================================================================================
+// Helper functions for theme variables
+
+// This function composes padding variables for a given subject taking into
+// account all possible padding directions
+@function composePaddingVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "padding-#{$subject}") !global;
+  $tmpAll: getThemeVar($tmp, "padding-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "paddingHorizontal-#{$subject}", $tmpAll) !global;
+  $tmpHorizontal: getThemeVar($tmp, "paddingHorizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "paddingVertical-#{$subject}", $tmpAll) !global;
+  $tmpVertical: getThemeVar($tmp, "paddingVertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "paddingLeft-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "paddingRight-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "paddingTop-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "paddingBottom-#{$subject}", $tmpVertical) !global;
+  @return $tmp;
+}
+
+// This mixin applies padding variables to a given subject
+@mixin paddingVars($themeVars, $subject) {
+  padding: getThemeVar($themeVars, "padding-#{$subject}");
+  padding-left: getThemeVar($themeVars, "paddingLeft-#{$subject}");
+  padding-right: getThemeVar($themeVars, "paddingRight-#{$subject}");
+  padding-top: getThemeVar($themeVars, "paddingTop-#{$subject}");
+  padding-bottom: getThemeVar($themeVars, "paddingBottom-#{$subject}");
+}
+
+// This function composes margin variables for a given subject taking into
+// account all possible margin directions
+@function composeMarginVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "margin-#{$subject}") !global;
+  $tmpAll: getThemeVar($tmp, "margin-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "marginHorizontal-#{$subject}", $tmpAll) !global;
+  $tmpHorizontal: getThemeVar($tmp, "marginHorizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "marginVertical-#{$subject}", $tmpAll) !global;
+  $tmpVertical: getThemeVar($tmp, "marginVertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "marginLeft-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "marginRight-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "marginTop-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "marginBottom-#{$subject}", $tmpVertical) !global;
+  @return $tmp;
+}
+
+// This mixin applies margin variables to a given subject
+@mixin marginVars($themeVars, $subject) {
+  margin: getThemeVar($themeVars, "margin-#{$subject}");
+  margin-left: getThemeVar($themeVars, "marginLeft-#{$subject}");
+  margin-right: getThemeVar($themeVars, "marginRight-#{$subject}");
+  margin-top: getThemeVar($themeVars, "marginTop-#{$subject}");
+  margin-bottom: getThemeVar($themeVars, "marginBottom-#{$subject}");
+}
+
+// This function composes padding variables for a given subject taking into
+// account all possible padding directions
+@function composeBorderVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "border-#{$subject}") !global;
+  $tmpAll: getThemeVar($tmp, "border-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderHorizontal-#{$subject}", $tmpAll) !global;
+  $tmpHorizontal: getThemeVar($tmp, "borderHorizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderVertical-#{$subject}", $tmpAll) !global;
+  $tmpVertical: getThemeVar($tmp, "borderVertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderLeft-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderRight-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderTop-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderBottom-#{$subject}", $tmpVertical) !global;
+
+  $tmp: appendThemeVar($tmp, "borderWidth-#{$subject}") !global;
+  $tmpThickness: getThemeVar($tmp, "borderWidth-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderHorizontalWidth-#{$subject}", $tmpThickness) !global;
+  $tmpThicknessHorizontal: getThemeVar($tmp, "borderHorizontalWidth-#{$subject}");
+  $tmp: appendThemeVarWithDefault(
+    $tmp,
+    "borderLeftWidth-#{$subject}",
+    $tmpThicknessHorizontal
+  ) !global;
+  $tmp: appendThemeVarWithDefault(
+    $tmp,
+    "borderRightWidth-#{$subject}",
+    $tmpThicknessHorizontal
+  ) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderVerticalWidth-#{$subject}", $tmpThickness) !global;
+  $tmpThicknessVertical: getThemeVar($tmp, "borderVerticalWidth-#{$subject}");
+  $tmp: appendThemeVarWithDefault(
+    $tmp,
+    "borderTopWidth-#{$subject}",
+    $tmpThicknessVertical
+  ) !global;
+  $tmp: appendThemeVarWithDefault(
+    $tmp,
+    "borderBottomWidth-#{$subject}",
+    $tmpThicknessVertical
+  ) !global;
+
+  $tmp: appendThemeVar($tmp, "borderStyle-#{$subject}") !global;
+  $tmpStyle: getThemeVar($tmp, "borderStyle-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderHorizontalStyle-#{$subject}", $tmpStyle) !global;
+  $tmpStyleHorizontal: getThemeVar($tmp, "borderHorizontalStyle-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderLeftStyle-#{$subject}", $tmpStyleHorizontal) !global;
+  $tmp: appendThemeVarWithDefault(
+    $tmp,
+    "borderRightStyle-#{$subject}",
+    $tmpStyleHorizontal
+  ) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderVerticalStyle-#{$subject}", $tmpStyle) !global;
+  $tmpStyleVertical: getThemeVar($tmp, "borderVerticalStyle-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderTopStyle-#{$subject}", $tmpStyleVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderBottomStyle-#{$subject}", $tmpStyleVertical) !global;
+
+  $tmp: appendThemeVar($tmp, "borderColor-#{$subject}") !global;
+  $tmpColor: getThemeVar($tmp, "borderColor-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderHorizontalColor-#{$subject}", $tmpColor) !global;
+  $tmpColorHorizontal: getThemeVar($tmp, "borderHorizontalColor-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderLeftColor-#{$subject}", $tmpColorHorizontal) !global;
+  $tmp: appendThemeVarWithDefault(
+    $tmp,
+    "borderRightColor-#{$subject}",
+    $tmpColorHorizontal
+  ) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderVerticalColor-#{$subject}", $tmpColor) !global;
+  $tmpColorVertical: getThemeVar($tmp, "borderVerticalColor-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "borderTopColor-#{$subject}", $tmpColorVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderBottomColor-#{$subject}", $tmpColorVertical) !global;
+
+  $tmpRadius: appendThemeVar($tmp, "borderRadius-#{$subject}") !global;
+  $tmpRadiusAll: getThemeVar($tmpRadius, "borderRadius-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault(
+    $tmp,
+    "borderStartStartRadius-#{$subject}",
+    $tmpRadiusAll
+  ) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderStartEndRadius-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderEndStartRadius-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderEndEndRadius-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVar($tmp, "borderStyle-#{$subject}") !global;
+  @return $tmp;
+}
+
+// This mixin applies padding variables to a given subject
+@mixin borderVars($themeVars, $subject) {
+  border-left: getThemeVar($themeVars, "borderLeft-#{$subject}");
+  border-right: getThemeVar($themeVars, "borderRight-#{$subject}");
+  border-top: getThemeVar($themeVars, "borderTop-#{$subject}");
+  border-bottom: getThemeVar($themeVars, "borderBottom-#{$subject}");
+  border-left-style: getThemeVar($themeVars, "borderLeftStyle-#{$subject}");
+  border-right-style: getThemeVar($themeVars, "borderRightStyle-#{$subject}");
+  border-top-style: getThemeVar($themeVars, "borderTopStyle-#{$subject}");
+  border-bottom-style: getThemeVar($themeVars, "borderBottomStyle-#{$subject}");
+  border-left-width: getThemeVar($themeVars, "borderLeftWidth-#{$subject}");
+  border-right-width: getThemeVar($themeVars, "borderRightWidth-#{$subject}");
+  border-top-width: getThemeVar($themeVars, "borderTopWidth-#{$subject}");
+  border-bottom-width: getThemeVar($themeVars, "borderBottomWidth-#{$subject}");
+  border-left-color: getThemeVar($themeVars, "borderLeftColor-#{$subject}");
+  border-right-color: getThemeVar($themeVars, "borderRightColor-#{$subject}");
+  border-top-color: getThemeVar($themeVars, "borderTopColor-#{$subject}");
+  border-bottom-color: getThemeVar($themeVars, "borderBottomColor-#{$subject}");
+  border-radius: getThemeVar($themeVars, "borderRadius-#{$subject}");
+  border-start-start-radius: getThemeVar($themeVars, "borderStartStartRadius-#{$subject}");
+  border-start-end-radius: getThemeVar($themeVars, "borderStartEndRadius-#{$subject}");
+  border-end-start-radius: getThemeVar($themeVars, "borderEndStartRadius-#{$subject}");
+  border-end-end-radius: getThemeVar($themeVars, "borderEndEndRadius-#{$subject}");
+}
+
+// This function composes style variables for setting styles of text elements
+@function composeTextVars($themeVars, $subject, $default: false) {
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($themeVars, "textColor-#{$subject}", "textColor"),
+    appendThemeVar($themeVars, "textColor-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "fontFamily-#{$subject}", "fontFamily"),
+    appendThemeVar($tmp, "fontFamily-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVar($tmp, "fontSize-#{$subject}"),
+    appendThemeVar($tmp, "fontSize-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "fontStyle-#{$subject}", "fontStyle-#{$default}"),
+    appendThemeVar($tmp, "fontStyle-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "fontVariant-#{$subject}", "fontVariant-#{$default}"),
+    appendThemeVar($tmp, "fontVariant-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "fontWeight-#{$subject}", "fontWeight-#{$default}"),
+    appendThemeVar($tmp, "fontWeight-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "fontStretch-#{$subject}", "fontStretch-#{$default}"),
+    appendThemeVar($tmp, "fontStretch-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback(
+      $tmp,
+      "textDecorationLine-#{$subject}",
+      "textDecorationLine-#{$default}"
+    ),
+    appendThemeVar($tmp, "textDecorationLine-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback(
+      $tmp,
+      "textDecorationColor-#{$subject}",
+      "textDecorationColor-#{$default}"
+    ),
+    appendThemeVar($tmp, "textDecorationColor-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback(
+      $tmp,
+      "textDecorationStyle-#{$subject}",
+      "textDecorationStyle-#{$default}"
+    ),
+    appendThemeVar($tmp, "textDecorationStyle-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback(
+      $tmp,
+      "textDecorationThickness-#{$subject}",
+      "textDecorationThickness-#{$default}"
+    ),
+    appendThemeVar($tmp, "textDecorationThickness-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback(
+      $tmp,
+      "textUnderlineOffset-#{$subject}",
+      "textUnderlineOffset-#{$default}"
+    ),
+    appendThemeVar($tmp, "textUnderlineOffset-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVar($tmp, "lineHeight-#{$subject}"),
+    appendThemeVar($tmp, "lineHeight-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "backgroundColor-#{$subject}", "backgroundColor-#{$default}"),
+    appendThemeVar($tmp, "backgroundColor-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "textTransform-#{$subject}", "textTransform-#{$default}"),
+    appendThemeVar($tmp, "textTransform-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "letterSpacing-#{$subject}", "letterSpacing"),
+    appendThemeVar($tmp, "letterSpacing-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "wordSpacing-#{$subject}", "wordSpacing-#{$default}"),
+    appendThemeVar($tmp, "wordSpacing-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "textShadow-#{$subject}", "textShadow-#{$default}"),
+    appendThemeVar($tmp, "textShadow-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "textIndent-#{$subject}", "textIndent-#{$default}"),
+    appendThemeVar($tmp, "textIndent-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "textAlign-#{$subject}", "textAlign-#{$default}"),
+    appendThemeVar($tmp, "textAlign-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "textAlignLast-#{$subject}", "textAlignLast-#{$default}"),
+    appendThemeVar($tmp, "textAlignLast-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "wordBreak-#{$subject}", "wordBreak-#{$default}"),
+    appendThemeVar($tmp, "wordBreak-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "wordWrap-#{$subject}", "wordWrap-#{$default}"),
+    appendThemeVar($tmp, "wordWrap-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "direction-#{$subject}", "direction-#{$default}"),
+    appendThemeVar($tmp, "direction-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "writingMode-#{$subject}", "writingMode-#{$default}"),
+    appendThemeVar($tmp, "writingMode-#{$subject}")
+  ) !global;
+  $tmp: if(
+    $default,
+    appendThemeVarWithFallback($tmp, "lineBreak-#{$subject}", "lineBreak-#{$default}"),
+    appendThemeVar($tmp, "lineBreak-#{$subject}")
+  ) !global;
+  @return $tmp;
+}
+
+@mixin textVars($themeVars, $subject) {
+  color: getThemeVar($themeVars, "textColor-#{$subject}");
+  font-family: getThemeVar($themeVars, "fontFamily-#{$subject}");
+  font-size: getThemeVar($themeVars, "fontSize-#{$subject}");
+  font-style: getThemeVar($themeVars, "fontStyle-#{$subject}");
+  font-weight: getThemeVar($themeVars, "fontWeight-#{$subject}");
+  font-stretch: getThemeVar($themeVars, "fontStretch-#{$subject}");
+  text-decoration-line: getThemeVar($themeVars, "textDecorationLine-#{$subject}");
+  text-decoration-color: getThemeVar($themeVars, "textDecorationColor-#{$subject}");
+  text-decoration-style: getThemeVar($themeVars, "textDecorationStyle-#{$subject}");
+  text-decoration-thickness: getThemeVar($themeVars, "textDecorationThickness-#{$subject}");
+  text-underline-offset: getThemeVar($themeVars, "textUnderlineOffset-#{$subject}");
+  line-height: getThemeVar($themeVars, "lineHeight-#{$subject}");
+  background-color: getThemeVar($themeVars, "backgroundColor-#{$subject}");
+  text-transform: getThemeVar($themeVars, "textTransform-#{$subject}");
+  letter-spacing: getThemeVar($themeVars, "letterSpacing-#{$subject}");
+  word-spacing: getThemeVar($themeVars, "wordSpacing-#{$subject}");
+  text-shadow: getThemeVar($themeVars, "textShadow-#{$subject}");
+  text-indent: getThemeVar($themeVars, "textIndent-#{$subject}");
+  text-align: getThemeVar($themeVars, "textAlign-#{$subject}");
+  text-align-last: getThemeVar($themeVars, "textAlignLast-#{$subject}");
+  word-break: getThemeVar($themeVars, "wordBreak-#{$subject}");
+  word-wrap: getThemeVar($themeVars, "wordWrap-#{$subject}");
+  direction: getThemeVar($themeVars, "direction-#{$subject}");
+  writing-mode: getThemeVar($themeVars, "writingMode-#{$subject}");
+  line-break: getThemeVar($themeVars, "lineBreak-#{$subject}");
+}
+
+@mixin ignoreTextVars() {
+  color: inherit !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-style: inherit !important;
+  font-weight: inherit !important;
+  font-stretch: inherit !important;
+  text-decoration-line: inherit !important;
+  text-decoration-color: inherit !important;
+  text-decoration-style: inherit !important;
+  text-decoration-thickness: inherit !important;
+  text-underline-offset: inherit !important;
+  line-height: inherit !important;
+  background-color: inherit !important;
+  text-transform: inherit !important;
+  letter-spacing: inherit !important;
+  word-spacing: inherit !important;
+  text-shadow: inherit !important;
+  text-indent: inherit !important;
+  text-align: inherit !important;
+  text-align-last: inherit !important;
+  word-break: inherit !important;
+  word-wrap: inherit !important;
+  direction: inherit !important;
+  writing-mode: inherit !important;
+  line-break: inherit !important;
+}
+
+@mixin withMaxScreenSize($maxScreenSize) {
+  $query: "";
+  @for $i from 0 through $maxScreenSize {
+    @if $query == "" {
+      $query: "style(--screenSize: #{$i})";
+    } @else {
+      $query: "#{$query} or style(--screenSize: #{$i})";
+    }
+  }
+
+  @container (#{$query}) {
+    @content;
+  }
+}
+
+// =====================================================================================================================
+// CSS variables for miscellaneous shadows
+$boxShadow:
+  0 1px 3px 0 rgba(0, 0, 0, 0.1),
+  0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$boxShadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$boxShadow-xxl:
+  0 8px 17px 0 rgba(0, 0, 0, 0.2),
+  0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+$boxShadow-spread: 0px 0px 30px rgba(0, 0, 0, 0.1);
+$boxShadow-spread-2: -6px -4px 40px 10px rgba(0, 0, 0, 0.1);
+$boxShadow-spread-2-xl: -6px -4px 40px 18px rgba(0, 0, 0, 0.1);
+
+// CSS variables describing spacing between UI elements
+$space-0: createVar(space-0);
+$space-0_5: createVar(space-0_5);
+$space-1: createVar(space-1);
+$space-1_5: createVar(space-1_5);
+$space-2: createVar(space-2);
+$space-2_5: createVar(space-2_5);
+$space-3: createVar(space-3);
+$space-3_5: createVar(space-3_5);
+$space-4: createVar(space-4);
+$space-5: createVar(space-5);
+$space-6: createVar(space-6);
+$space-7: createVar(space-7);
+$space-8: createVar(space-8);
+$space-9: createVar(space-9);
+$space-10: createVar(space-10);
+$space-11: createVar(space-11);
+$space-12: createVar(space-12);
+$space-14: createVar(space-14);
+$space-16: createVar(space-16);
+$space-20: createVar(space-20);
+$space-24: createVar(space-24);
+$space-28: createVar(space-28);
+$space-32: createVar(space-32);
+$space-36: createVar(space-36);
+$space-40: createVar(space-40);
+$space-44: createVar(space-44);
+$space-48: createVar(space-48);
+$space-52: createVar(space-52);
+$space-56: createVar(space-56);
+$space-60: createVar(space-60);
+$space-64: createVar(space-64);
+$space-72: createVar(space-72);
+$space-80: createVar(space-80);
+$space-96: createVar(space-96);
+
+// CSS variables describing bbotstrap column sizes
+$col-1: createVar(col-1);
+$col-2: createVar(col-2);
+$col-3: createVar(col-3);
+$col-4: createVar(col-4);
+$col-5: createVar(col-5);
+$col-6: createVar(col-6);
+$col-7: createVar(col-7);
+$col-8: createVar(col-8);
+$col-9: createVar(col-9);
+$col-10: createVar(col-10);
+$col-11: createVar(col-11);
+$col-12: createVar(col-12);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Generic style variables
+
+$textColor: createVar(textColor);
+$textColor-primary: createVar(textColor);
+$textColor-attention: createVar(textColor-attention);
+$backgroundColor-attention: createVar(backgroundColor-attention);
+$textColor-subtitle: createVar(textColor-subtitle);
+$backgroundColor-primary: createVar(backgroundColor-primary);
+$backgroundColor-secondary: createVar(backgroundColor-secondary);
+$backgroundColor-Input-default: createVar(backgroundColor-Input-default);
+$textColor--disabled: createVar(textColor--disabled);
+$backgroundColor--disabled: createVar(backgroundColor--disabled);
+$borderColor--disabled: createVar(borderColor--disabled);
+$backgroundColor--selected: createVar(backgroundColor--selected);
+
+$fontFamily: createVar(fontFamily);
+$fontSize-tiny: createVar(fontSize-tiny);
+
+$fontSize-xs: createVar(fontSize-xs);
+$fontSize-code: createVar(fontSize-code);
+$fontSize-sm: createVar(fontSize-sm);
+$fontSize-base: createVar(fontSize-base);
+$fontSize-lg: createVar(fontSize-lg);
+$fontSize-xl: createVar(fontSize-xl);
+$fontSize-2xl: createVar(fontSize-2xl);
+$fontSize-3xl: createVar(fontSize-3xl);
+$fontSize-4xl: createVar(fontSize-4xl);
+$fontSize-5xl: createVar(fontSize-5xl);
+$fontSize-6xl: createVar(fontSize-6xl);
+$fontSize-7xl: createVar(fontSize-7xl);
+$fontSize-8xl: createVar(fontSize-8xl);
+$fontSize-9xl: createVar(fontSize-9xl);
+$fontSize: createVar(fontSize);
+
+$lineHeight-none: createVar(lineHeight-none);
+$lineHeight-tight: createVar(lineHeight-tight);
+$lineHeight-snug: createVar(lineHeight-snug);
+$lineHeight-normal: createVar(lineHeight-normal);
+$lineHeight-relaxed: createVar(lineHeight-relaxed);
+$lineHeight-loose: createVar(lineHeight-loose);
+$lineHeight: createVar(lineHeight);
+
+$letterSpacing-tighter: createVar(letterSpacing-tighter);
+$letterSpacing-tight: createVar(letterSpacing-tight);
+$letterSpacing-normal: createVar(letterSpacing-normal);
+$letterSpacing-wide: createVar(letterSpacing-wide);
+$letterSpacing-wider: createVar(letterSpacing-wider);
+$letterSpacing-widest: createVar(letterSpacing-widest);
+$letterSpacing: createVar(letterSpacing);
+
+$backgroundColor-overlay: createVar(backgroundColor-overlay);
+$color-info: createVar(color-info);
+$color-valid: createVar(color-valid);
+$color-warning: createVar(color-warning);
+$color-error: createVar(color-error);
+
+$borderColor: createVar(borderColor);
+
+// Semantic "outlined" border color tokens — shared between outlined Button variants
+// and the `variant="outlined"` flavour of form inputs (Select, TextBox, ...).
+$borderColor-outlined: createVar(borderColor-outlined);
+$borderColor-outlined--hover: createVar(borderColor-outlined--hover);
+$borderColor-outlined--active: createVar(borderColor-outlined--active);
+$borderColor-outlined--focus: createVar(borderColor-outlined--focus);
+
+$maxWidth-content: createVar(maxWidth-content);
+$direction: createVar(direction);
+
+$font-feature-settings: createVar(font-feature-settings);
+
+$outlineColor--focus: createVar(outlineColor--focus);
+$outlineWidth--focus: createVar(outlineWidth--focus);
+$outlineStyle--focus: createVar(outlineStyle--focus);
+$outlineOffset--focus: createVar(outlineOffset--focus);
+$focus-outline: $outlineWidth--focus $outlineStyle--focus $outlineColor--focus;
+
+$media-max-width-phone: createVar(media-max-width-phone);
+$media-max-width-tablet: createVar(media-max-width-tablet);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Dropdown style variables
+
+$backgroundColor-dropdown-item: createVar(backgroundColor-dropdown-item);
+$backgroundColor-dropdown-item--active: createVar(backgroundColor-dropdown-item--active);
+$borderColor-dropdown-item: createVar(borderColor-dropdown-item);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Tree style variables
+$backgroundColor-tree-row--selected--before: createVar(backgroundColor-tree-row--selected--before);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Input border style variables
+
+$borderColor-Input-default: createVar(borderColor-Input-default);
+$borderColor-Input-default--hover: createVar(borderColor-Input-default--hover);
+$borderColor-Input-default--success: createVar(borderColor-Input-default--success);
+$borderColor-Input-default--warning: createVar(borderColor-Input-default--warning);
+$borderColor-Input-default--error: createVar(borderColor-Input-default--error);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// InputLabel style variables
+
+$textColor-InputLabel-required: createVar(textColor-InputLabel-required);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// formItem style variables
+$textColor-label-formItem: createVar(textColor-label-formItem);
+$textColor-label-formItem--required: createVar(textColor-label-formItem--required);
+$fontSize-label-formItem: createVar(fontSize-label-formItem);
+$fontSize-label-formItem--required: createVar(fontSize-label-formItem--required);
+$fontWeight-label-formItem: createVar(fontWeight-label-formItem);
+$fontWeight-label-formItem--required: createVar(fontWeight-label-formItem--required);
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Tab style variables
+
+$color-primary-500: createVar(color-primary-500);
+$color-danger-500: createVar(color-danger-500);
+
+$backgroundColor: createVar(backgroundColor);
+
+$textColor-secondary: createVar(textColor-secondary);
+
+$fontWeight-light: createVar(fontWeight-light);
+$fontWeight-normal: createVar(fontWeight-normal);
+$fontWeight-medium: createVar(fontWeight-medium);
+$fontWeight-bold: createVar(fontWeight-bold);
+
+$borderRadius: createVar(borderRadius);
+
+// body
+$fontWeight: createVar(fontWeight);

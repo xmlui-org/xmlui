@@ -6,13 +6,19 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
-    "preview-ssg": "preview-ssg dist-ssg",
-    "build": "xmlui build"
+    "build": "xmlui build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "xmlui": "*"
-  },
-  "devDependencies": {
-    "preview-ssg": "*"
+    "xmlui": "*",
+    "xmlui-search": "*",
+    "xmlui-website-blocks": "*",
+    "xmlui-docs-blocks": "*",
+    "xmlui-masonry": "*",
+    "xmlui-gauge": "*",
+    "xmlui-echart": "*",
+    "xmlui-calendar": "*",
+    "xmlui-grid-layout": "*",
+    "xmlui-tiptap-editor": "*"
   }
 }

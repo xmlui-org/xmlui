@@ -1,0 +1,10 @@
+<App xmlns:Extensions="component-ns:XMLUIExtensions" xmlns:My="app-ns" var.results="{[]}">
+  <Extensions:Search />
+  <!-- -->
+  <!--
+  <Extensions:Search2 id="searchEngine" />
+  <TextBox id="searchBox" onDidChange="(val) => searchEngine.setValue(val)" />
+  <Button label="Search" onClick="results = searchEngine.getResults()" />
+  <List data="{results}" />
+  -->
+</App>

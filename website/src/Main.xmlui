@@ -1,3 +1,258 @@
-<App>
-    <Button>website </Button>
+<App
+  layout="vertical-full-header"
+  var.searchData="{[
+    {
+      path: '/',
+      title: 'XMLUI home',
+      content: 'Build reactive user interfaces with XML markup and familiar web primitives.',
+      category: 'docs'
+    },
+    {
+      path: '/docs',
+      title: 'Documentation quick check',
+      content: 'A first migrated documentation route for visually checking XMLUI behavior.',
+      category: 'docs'
+    }
+  ]}"
+  var.docsText="'# Documentation quick check\n\nThis migrated route exercises the website shell, search package, docs blocks, and markdown rendering. It is intentionally small so regressions are easy to see while the remaining website packages are migrated.'"
+  var.updateCount="{0}"
+  var.chartBoost="{0}"
+  var.calendarShift="{0}"
+  var.gridShift="{0}"
+>
+  <AppHeader>
+    <Link to="/" height="100%">
+      <Logo height="$space-8" />
+    </Link>
+    <HStack gap="0" paddingLeft="$space-4">
+      <NavLink label="Home" to="/" exact="true" />
+      <NavLink label="Docs" to="/docs" active="{$pathname.startsWith('/docs')}" />
+      <NavLink label="Blog" to="/blog" active="{$pathname.startsWith('/blog')}" />
+    </HStack>
+    <SpaceFiller />
+    <Search
+      collapsible="true"
+      mode="inline"
+      data="{searchData}"
+      placeholder="Search on site..."
+      suggestedQueries="{['docs', 'home', 'XMLUI']}"
+      noResultsMessage="No results found on this site."
+      pageSize="8"
+    />
+  </AppHeader>
+
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <Stack gap="$space-8" padding="$space-8">
+        <HeroSection
+          preamble="XMLUI website"
+          headline="Visual regression shell"
+          subheadline="The first migrated website slice is rendering from the rewrite workspace."
+          mainText="This page uses the migrated website blocks and search extension packages. The next slices can replace this focused shell with the full old website route by route."
+          ctaButtonText="Open docs check"
+          ctaButtonIcon="arrowright"
+          onCtaClick="Actions.navigate('/docs')"
+          contentPlacement="right"
+          contentAlignment="center"
+        >
+          <Card width="min(420px, 100%)">
+            <Stack gap="$space-4">
+              <H2>Display milestone</H2>
+              <Text>Home route: visible</Text>
+              <Text>Website blocks: loaded</Text>
+              <Text>Search package: loaded</Text>
+              <Text>Masonry package: loaded</Text>
+              <Text>Gauge package: loaded</Text>
+              <Text>EChart package: loaded</Text>
+              <Text>Calendar package: loaded</Text>
+              <Text>Grid layout package: loaded</Text>
+              <Text>Tiptap editor package: loaded</Text>
+              <Button onClick="Actions.navigate('/docs')">Check docs route</Button>
+            </Stack>
+          </Card>
+        </HeroSection>
+      </Stack>
+    </Page>
+
+    <Page url="/docs">
+      <Stack gap="$space-4" padding="$space-8" maxWidth="920px">
+        <Breadcrumbs
+          defaultItems="{[
+            { label: 'Home', to: '/' },
+            { label: 'Docs' }
+          ]}"
+        />
+        <H1>Documentation quick check</H1>
+        <ReadingTime content="{docsText}" />
+        <Markdown>{docsText}</Markdown>
+        <H2>Masonry extension check</H2>
+        <Masonry
+          columns="3"
+          minColumnWidth="180px"
+          gap="$space-3"
+        >
+          <Card>
+            <Stack gap="$space-2">
+              <Text variant="strong">Masonry item 1</Text>
+              <Text>Alpha</Text>
+            </Stack>
+          </Card>
+          <Card>
+            <Stack gap="$space-2">
+              <Text variant="strong">Masonry item 2</Text>
+              <Text>Beta</Text>
+            </Stack>
+          </Card>
+          <Card>
+            <Stack gap="$space-2">
+              <Text variant="strong">Masonry item 3</Text>
+              <Text>Gamma</Text>
+            </Stack>
+          </Card>
+          <Card>
+            <Stack gap="$space-2">
+              <Text variant="strong">Masonry item 4</Text>
+              <Text>Delta</Text>
+            </Stack>
+          </Card>
+        </Masonry>
+        <H2>Gauge extension check</H2>
+        <HStack gap="$space-4" verticalAlignment="center">
+          <Gauge
+            id="websiteGauge"
+            initialValue="42"
+            minValue="0"
+            maxValue="100"
+            digitalDisplay="true"
+            showUnit="true"
+            unit="%"
+            width="220px"
+            height="220px"
+          />
+          <Stack gap="$space-2">
+            <Text>Gauge value: {websiteGauge.value}</Text>
+            <Button onClick="websiteGauge.setValue(72)">Set gauge to 72</Button>
+          </Stack>
+        </HStack>
+        <H2>EChart extension check</H2>
+        <EChart
+          width="100%"
+          height="260px"
+          renderer="svg"
+          option="{{
+            title: { text: 'Package migration smoke' },
+            tooltip: {},
+            xAxis: { type: 'category', data: ['Docs', 'Blocks', 'Search', 'Charts'] },
+            yAxis: { type: 'value' },
+            series: [{
+              type: 'bar',
+              data: [12 + chartBoost, 18, 9, 14 + chartBoost]
+            }]
+          }}"
+        />
+        <Text>Chart boost: {chartBoost}</Text>
+        <Button onClick="chartBoost += 5">Boost chart data</Button>
+        <H2>Calendar extension check</H2>
+        <BigCalendar
+          width="100%"
+          height="420px"
+          view="month"
+          date="2026-03-01T00:00:00"
+          events="{[
+            {
+              title: 'Migration Standup',
+              start: '2026-03-09T09:00:00',
+              end: '2026-03-09T09:30:00'
+            },
+            {
+              title: 'Visual Check ' + calendarShift,
+              start: '2026-03-18T13:00:00',
+              end: '2026-03-18T14:00:00'
+            }
+          ]}"
+        />
+        <Text>Calendar shift: {calendarShift}</Text>
+        <Button onClick="calendarShift += 1">Advance calendar smoke</Button>
+        <H2>GridLayout extension check</H2>
+        <GridLayout
+          columns="{12}"
+          rowHeight="{70}"
+          gap="$space-3"
+          draggable="false"
+          resizable="false"
+          layout="{[
+            { i: '0', x: 0, y: 0, w: 6, h: 2 },
+            { i: '1', x: 6, y: 0, w: 6, h: 2 },
+            { i: '2', x: 0, y: 2, w: 12, h: 2 }
+          ]}"
+        >
+          <Card padding="$space-3" backgroundColor="$color-primary-50">
+            <Stack gap="$space-1">
+              <Text variant="strong">Grid metric A</Text>
+              <Text>Layout tile: {gridShift}</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-3" backgroundColor="$color-success-50">
+            <Stack gap="$space-1">
+              <Text variant="strong">Grid metric B</Text>
+              <Text>Fixed tile renders</Text>
+            </Stack>
+          </Card>
+          <Card padding="$space-3">
+            <Stack gap="$space-1">
+              <Text variant="strong">Grid detail</Text>
+              <Text>React grid layout mounted</Text>
+            </Stack>
+          </Card>
+        </GridLayout>
+        <Text>Grid shift: {gridShift}</Text>
+        <Button onClick="gridShift += 1">Advance grid layout smoke</Button>
+        <H2>TiptapEditor extension check</H2>
+        <TiptapEditor
+          id="websiteEditor"
+          initialValue="Initial rich text"
+          toolbar="false"
+          height="150px"
+        />
+        <Text>Editor value: {websiteEditor.value}</Text>
+        <Button onClick="websiteEditor.setValue('Updated rich text')">Update editor content</Button>
+        <HStack gap="$space-2">
+          <Button onClick="Actions.navigate('/')">Back home</Button>
+          <Button onClick="updateCount++">Update docs state</Button>
+        </HStack>
+        <Text>Docs state updates: {updateCount}</Text>
+      </Stack>
+    </Page>
+
+    <Page url="/docs/intro">
+      <HStack gap="$space-5" padding="$space-8">
+        <Stack gap="$space-4" width="*" maxWidth="920px">
+          <Breadcrumbs
+            defaultItems="{[
+              { label: 'Home', to: '/' },
+              { label: 'Docs', to: '/docs' },
+              { label: 'Introduction' }
+            ]}"
+          />
+          <Markdown
+            content="{$appGlobals.docsContent['pages/intro.md']}"
+            data="/pages/intro.md"
+          />
+        </Stack>
+        <TableOfContents
+          width="$space-64"
+          omitH1="true"
+          maxHeadingLevel="3"
+        />
+      </HStack>
+    </Page>
+
+    <Page url="/blog">
+      <Blog />
+    </Page>
+
+    <Page url="/blog/:slug">
+      <Blog />
+    </Page>
+  </Pages>
 </App>

@@ -1,0 +1,20 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "BigCalendar";
+
+@layer components {
+  .calendarContainer {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

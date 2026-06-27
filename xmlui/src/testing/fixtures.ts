@@ -50,6 +50,8 @@ import {
 export type InitTestBedOptions = {
   testThemeVars?: Record<string, unknown>;
   components?: string[];
+  extensionIds?: string | string[];
+  mainXs?: string;
   resources?: Record<string, string>;
   apiInterceptor?: {
     initialize?: string;
@@ -703,9 +705,10 @@ async function initTestBed(
   const testBedPayload = {
     source,
     components: options.components ?? [],
+    extensionIds: normalizeExtensionIds(options.extensionIds),
   };
   await installApiInterceptor(page, options.apiInterceptor);
-  const installTestBedSource = (payload: { source: string; components: string[] }) => {
+  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[] }) => {
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -718,6 +721,7 @@ async function initTestBed(
     });
     window.sessionStorage.setItem("__xmluiTestBedSource", payload.source);
     window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
+    window.sessionStorage.setItem("__xmluiTestBedExtensionIds", JSON.stringify(payload.extensionIds));
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
@@ -751,6 +755,13 @@ async function initTestBed(
     ),
   );
   await page.keyboard.press("Shift");
+}
+
+function normalizeExtensionIds(extensionIds: string | string[] | undefined): string[] {
+  if (!extensionIds) {
+    return [];
+  }
+  return Array.isArray(extensionIds) ? extensionIds : [extensionIds];
 }
 
 async function installApiInterceptor(
@@ -899,6 +910,7 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
   const { markup: normalizedMarkup, declarations } = normalizeLegacyVariableDeclarations(
     normalizeLegacyTestMarkup(markup.trim()),
   );
+  const mainXsDeclarations = normalizeLegacyMainXsDeclarations(options.mainXs);
   const trimmed = normalizedMarkup;
   const testBedAppAttributes = {
     "paddingHorizontal-content-App": "0",
@@ -910,6 +922,7 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
   if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
     const injectedAttributes = [
       ...appThemeAttributeEntries,
+      ...mainXsDeclarations,
       ...declarations,
       trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{${implicitTestStateInitialValue(trimmed)}}"` : "",
     ].filter(Boolean);
@@ -923,7 +936,19 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${mainXsDeclarations.join(" ")} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+}
+
+function normalizeLegacyMainXsDeclarations(mainXs: string | undefined): string[] {
+  if (!mainXs) {
+    return [];
+  }
+  const declarations: string[] = [];
+  const variablePattern = /\bvar\s+([A-Za-z_$][\w$]*)\s*=\s*([\s\S]*?);(?=\s*(?:var\b|$))/g;
+  for (const match of mainXs.matchAll(variablePattern)) {
+    declarations.push(`var.${match[1]}="{${match[2].trim()}}"`);
+  }
+  return declarations;
 }
 
 function implicitTestStateInitialValue(markup: string): "null" | "undefined" {

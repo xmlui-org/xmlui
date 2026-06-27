@@ -91,14 +91,19 @@ Code, diagnostics, and package tooling.
 ## Extension Packages
 
 ```text
+npm run test:extensions:e2e
 npm --workspace xmlui-counter-badge run test
 npm --workspace xmlui-counter-badge run build
 npm --workspace xmlui-counter-badge run build:metadata
 npm --workspace xmlui run compatibility:sweep
 ```
 
-As old first-party packages are ported, add each package's test/build/metadata
-commands here.
+For migrated website extension packages, `npm run test:extensions:e2e` runs
+package-level Playwright smoke coverage for `xmlui-docs-blocks`,
+`xmlui-website-blocks`, `xmlui-search`, `xmlui-masonry`, `xmlui-gauge`,
+`xmlui-echart`, `xmlui-calendar`, `xmlui-grid-layout`, and
+`xmlui-tiptap-editor`. As old first-party packages are ported, add each
+package's test/build/metadata commands here.
 
 ## Tooling, Website, Playground, Integration, and Release
 

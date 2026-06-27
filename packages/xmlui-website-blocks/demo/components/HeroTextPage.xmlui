@@ -1,0 +1,65 @@
+<Component name="HeroTextPage">
+  <H1>
+    Hero Section with all text features
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows."
+/>
+```        
+        ]]>
+  </Markdown>
+  <H1>
+    Hero Section with partial text features (#1) and line break in the headline
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headline="Modern Project Management 
+You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headline="Modern Project Management 
+You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+/>
+
+```        
+        ]]>
+  </Markdown>
+  <H1>
+    Hero Section with partial text features (#2) and line break in the main text
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headline="Modern Project Management You Truly Own"
+    mainText="Manage your projects, tasks, and teams with ease using our open-source 
+project management tool. Enjoy full control over your data and workflows." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headline="Modern Project Management You Truly Own"
+  mainText="Manage your projects, tasks, and teams with ease using our open-source 
+project management tool. Enjoy full control over your data and workflows."
+/>
+```        
+        ]]>
+  </Markdown>
+</Component>

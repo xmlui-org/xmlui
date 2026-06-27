@@ -1,0 +1,469 @@
+# DataSource [#datasource]
+
+`DataSource` fetches and caches data from API endpoints, versus [`APICall`](/docs/reference/components/APICall) which creates, updates or deletes data.
+
+**Key characteristics:**
+- **Conditional loading**: Use `when` property to prevent fetching until dependent data is ready
+- **Built-in caching**: Prevents unnecessary requests and provides instant data access
+- **Polling support**: Automatically refetch data at specified intervals
+- **Data transformation**: Process and filter responses before components use the data
+
+## Preventing the `DataSource` from Executing [#preventing-the-datasource-from-executing]
+
+Prevent the `DataSource` from executing until the specified condition in the `when` attribute is true.
+
+```xmlui
+<DataSource
+  id="userProfile"
+  url="/api/users/{selectedUserId}/profile"
+  when="{selectedUserId}" />
+```
+
+On a `DataSource`, `when` controls whether the request runs. On visual components, `when` controls whether the component subtree is rendered. Both are reactive, but they affect different things.
+
+When one `DataSource` depends on another, guard the dependent request with explicit state from the first source:
+
+```xmlui
+<DataSource id="user" url="/api/users/me" />
+
+<DataSource
+  id="orders"
+  url="/api/orders/{user.value.id}"
+  when="{user.loaded && user.value.id}"
+/>
+```
+
+For simple one-off visibility checks, read the fetched payload directly in `when`. For reused or business-specific decisions, store a named boolean in `onLoaded` and bind UI visibility to that boolean.
+
+## Structural Sharing [#structural-sharing]
+
+`DataSource` uses a technique called "structural sharing" to ensure that as many data references as possible will be kept intact and not cause extra UI refresh. If data is fetched from an API endpoint, you'll usually get a completely new reference by json parsing the response. However, `DataSource` will keep the original reference if *nothing* has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts.
+
+When you initiate the refetching of data (e.g., with the `refetch` method or setting the `pollIntervalInSeconds` property) and you retrieve data structurally equal with the cached data instance, `DataSource` will not fire the `loaded` event.
+
+By default, structural sharing is turned on. If you do not need this behavior, set the `structuralSharing` property to `false`.
+
+## Reading values: wrapper vs `.value` [#reading-values-wrapper-vs-value]
+
+When reading a `DataSource` in code, distinguish the reactive wrapper from the fetched data:
+
+- `userData` — the reactive wrapper object, including `value`, `loaded`, `inProgress`, `isRefetching`, and `error`.
+- `userData.value` — the raw payload returned by the request.
+
+Logging or rendering `userData` shows the wrapper's metadata; `userData.value` shows the data itself. This is a common gotcha when debugging — `console.log(userData)` displays the wrapper, while `console.log(userData.value)` displays what came back from the server.
+
+The wrapper's status properties and `value` are reactive reads. Before the first successful load, `userData.value` is usually `undefined`. XMLUI member access is optional by default, so `userData.value.profile.name` evaluates to `undefined` if an intermediate segment is missing. Use `userData.loaded` to model the fetch lifecycle, not to prevent a JavaScript-style null-reference error:
+
+```xmlui
+<Text when="{userData.loaded}">
+  {userData.value.name}
+</Text>
+```
+
+Deep paths can be used directly in `when`; missing segments simply make the expression falsy:
+
+```xmlui
+<Card when="{userData.loaded && userData.value.billing.address}">
+  ...
+</Card>
+```
+
+Structural sharing may preserve references for unchanged parts of the payload during refetches. If a visibility decision is reused or has business meaning, store that decision as its own `var` in `onLoaded` instead of repeating a long payload path in multiple `when` expressions:
+
+```xmlui
+<App var.showBillingPanel="{false}">
+  <DataSource
+    id="userData"
+    url="/api/users/me"
+    onLoaded="data => showBillingPanel = !!data.billing.address"
+  />
+
+  <Card when="{showBillingPanel}">
+    ...
+  </Card>
+</App>
+```
+
+Use this pattern to name the decision, not to make deep member access safe; XMLUI's `.` member access is already optional by default.
+
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | `variant` |
+
+## Properties [#properties]
+
+### `body` [#body]
+
+Set the optional request body. The object you pass is serialized as a JSON string.
+
+### `completedNotificationMessage` [#completednotificationmessage]
+
+Set the message to display when the data fetch completes.If the property value is not set, no completion message is displayed.
+
+This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
+
+```xmlui copy
+ <DataSource
+  id="ds"
+  url="/api/shopping-list"
+  completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
+```
+
+### `credentials` [#credentials]
+
+Controls whether cookies and other credentials are sent with the request. Set to `"include"` to send credentials in cross-origin requests (requires `Access-Control-Allow-Credentials: true` header on the server).
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `omit` | Never send credentials |
+| `same-origin` | Send credentials only for same-origin requests (default browser behavior) |
+| `include` | Always send credentials, even for cross-origin requests |
+
+**Important**: When using `credentials="include"` for cross-origin requests, the server must respond with the `Access-Control-Allow-Credentials: true` header, and the `Access-Control-Allow-Origin` header cannot be `*` (it must be a specific origin).
+
+**Example**: Fetching user authentication status with credentials
+
+```xmlui copy
+<DataSource 
+  id="authStatus"
+  url="https://api.example.com/auth/status"
+  credentials="include"
+/>
+<Text>{authStatus.value.authenticated ? 'Logged in' : 'Not logged in'}</Text>
+```
+
+### `dataType` [#datatype]
+
+Type of data to fetch. When set to `"text"`, the response is returned as a raw string without JSON parsing. When set to `"csv"`, the response is parsed as CSV.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `json` | Parse response as JSON (default) |
+| `text` | Return response as raw text |
+| `csv` | Parse response as CSV |
+| `sql` | Execute SQL query |
+
+### `errorNotificationMessage` [#errornotificationmessage]
+
+This property customizes the message displayed in a toast when the API invocation results in an error. Use the `$error` context object to get the error code (`$error.statusCode`) optional message (`$error.message`), or details coming from the response body (`$error.details`). For example, you can use the following code snippet to display the status code and the details:
+
+```xmlui copy
+ <DataSource
+  id="ds"
+  url="/api/shopping-list"
+  errorNotificationMessage="${error.statusCode}, ${error.message} {JSON.stringify($error.details)}" />
+```
+
+**NOTE:** While we support Microsoft/Google-style and RFC 7807 errors, not all response shapes can be accounted for.
+Because of this, there is an attribute available in the `configuration` file called `errorResponseTransform` under `xmluiConfig`. This exposes the error response using the `$response` context variable.
+Here is an example on how to use it (note that this is evaluated as a `binding expression`):
+
+Error looks the following coming from the backend:
+
+```js
+{
+  code: number,
+  error: string
+}
+```
+
+This is how to transform it in config:
+
+```json
+{
+  "xmluiConfig": {
+    "errorResponseTransform": "{{ statusCode: $response.code, message: $response.error }}"
+  }
+}
+```
+
+### `headers` [#headers]
+
+Set request headers. Pass an object whose keys are header names and values are header values.
+
+### `id` [#id]
+
+> [!DEF]  This property is required.
+
+Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.When no `id` is set, the component cannot be used programmatically.
+
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
+
+Set the message to display when the data fetch is in progress. If the property value is not set, no progress message is displayed.
+
+### `method` [#method]
+
+> [!DEF]  default: **"get"**
+
+Set the HTTP method.
+
+Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
+
+### `mockData` [#mockdata]
+
+Provide data directly instead of fetching from a URL. When set, the component resolves immediately with this value — no network request is made. Intended for development and testing. Supports reactive expressions: when the bound value changes, the DataSource re-resolves with the updated data.
+
+### `nextPageSelector` [#nextpageselector]
+
+When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
+
+### `omitTransactionId` [#omittransactionid]
+
+> [!DEF]  default: **"false"**
+
+When set to `true`, the `x-ue-client-tx-id` request header will not be added to outgoing requests. Use this when the target API does not allow custom request headers (e.g. third-party APIs with strict CORS `Access-Control-Allow-Headers`).
+
+### `pollIntervalInSeconds` [#pollintervalinseconds]
+
+Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. If not set or set to zero, the component does not poll for data.
+
+### `prevPageSelector` [#prevpageselector]
+
+When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the previous page information from the response deserialized to an object.
+
+### `queryParams` [#queryparams]
+
+Append optional key-value pairs to the URL.
+
+### `rawBody` [#rawbody]
+
+Set the request body with no serialization. Use it to send a payload  that has already been serialized to a JSON string.
+
+### `resultSelector` [#resultselector]
+
+Set an optional object key to extract a subset of the response data. If this value is not set, the entire response body is considered the result.
+
+The selector can be a simple dot notation path (e.g., `value.results`) or a JavaScript expression that processes the data (e.g., `results.filter(item => item.type === 'active')`). The selector has access to standard JavaScript functions like `map` and `filter`, and operates on the full response body.
+
+Here is a sample response from the HubSpot API.
+
+```json
+{
+    "results": [
+        {
+            "id": "88903258744",
+            "properties": {
+                "company": "HubSpot",
+                "createdate": "2025-01-03T23:38:47.449Z",
+                "custom_notes": "Nice guy!",
+                "email": "bh@hubspot.com",
+                "firstname": "Brian",
+                "hs_object_id": "88903258744",
+                "lastmodifieddate": "2025-02-18T23:13:34.759Z",
+                "lastname": "Halligan (Sample Contact)"
+            },
+            "createdAt": "2025-01-03T23:38:47.449Z",
+            "updatedAt": "2025-02-18T23:13:34.759Z",
+            "archived": false
+        },
+        {
+            "id": "88918034480",
+            "properties": {
+                "company": "HubSpot",
+                "createdate": "2025-01-03T23:38:47.008Z",
+                "custom_notes": null,
+                "email": "emailmaria@hubspot.com",
+                "firstname": "Maria",
+                "hs_object_id": "88918034480",
+                "lastmodifieddate": "2025-01-03T23:38:59.001Z",
+                "lastname": "Johnson (Sample Contact)"
+            },
+            "createdAt": "2025-01-03T23:38:47.008Z",
+            "updatedAt": "2025-01-03T23:38:59.001Z",
+            "archived": false
+        }
+    ]
+}
+```
+
+This `resultSelector` builds an array of the `properties` objects.
+
+```xmlui copy
+<DataSource
+  id="contacts"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  resultSelector="results.map(item => item.properties )"
+  headers='{{"Authorization":"Bearer not-a-real-token"}}'
+```
+
+This `List` uses the array.
+
+```xmlui copy
+<List data="{contacts}" title="Hubspot Contacts">
+  <Card gap="0" width="20em">
+    <Text fontWeight="bold">
+      {$item.firstname} {$item.lastname}
+    </Text>
+    <Text>
+      {$item.company}
+    </Text>
+    <Text>
+      {$item.email}
+    </Text>
+    <Text>
+      {$item.custom_notes}
+    </Text>
+  </Card>
+</List>
+```
+
+This `resultSelector` filters the array of the `properties` objects to include only contacts with non-null `custom_notes`.
+
+```xmlui copy
+<DataSource
+  id="contacts"
+  resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  headers='{{"Authorization":"Bearer not-a-real-token"}}'
+  />
+````
+
+This `Table` uses the filtered array.
+
+```xmlui copy
+<Table title="HubSpot contacts" data="{contacts}">
+  <Column bindTo="firstname" />
+  <Column bindTo="lastname" />
+  <Column bindTo="company" />
+  <Column bindTo="email" />
+  <Column bindTo="custom_notes" />
+</Table>
+```
+
+### `structuralSharing` [#structuralsharing]
+
+> [!DEF]  default: **true**
+
+This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
+
+### `transformResult` [#transformresult]
+
+Set an optional function to perform a final transformation of the response data. If this value is not set, the result is not transformed.
+
+### `url` [#url]
+
+Set the URL. Required unless `mockData` is provided, in which case the component returns the mock data directly without making a network request.
+
+## Events [#events]
+
+### `error` [#error]
+
+This event fires when a request results in an error.
+
+**Signature**: `error(error: Error): void`
+
+- `error`: The error object that occurred during the request.
+
+### `fetch` [#fetch]
+
+When defined, this event handler replaces the default fetch logic. The handler receives the resolved request properties as context variables: `$url`, `$method`, `$queryParams`, `$requestBody`, `$requestHeaders`, and `$pageParams` (when paging). The return value of the handler becomes the data result. Caching, polling, the `loaded`/`error` events, `resultSelector`, `transformResult`, and the `refetch()` method continue to work normally because the handler runs inside the same query function that powers the default fetch.
+
+**Signature**: `fetch(): any`
+
+When the `fetch` event is defined, its handler fully replaces the default
+network fetch. The handler runs inside the same query function used by the
+default fetch, so all of the surrounding behavior — caching, polling, the
+`refetch()` method, the `loaded` and `error` events, `resultSelector`, and
+`transformResult` — continues to work the same way.
+
+The handler receives the resolved request properties as context variables:
+
+| Variable | Description |
+| --- | --- |
+| `$url` | Resolved `url` value |
+| `$method` | Resolved HTTP `method` |
+| `$queryParams` | Resolved `queryParams` object |
+| `$requestBody` | Resolved request body (`rawBody` if set, otherwise `body`) |
+| `$requestHeaders` | Resolved `headers` object |
+| `$pageParams` | The current page parameters (only when paging is enabled) |
+
+The return value of the handler becomes the data result that downstream
+components see through the `value` property.
+
+`fetch` is the `DataSource` counterpart of the `mockExecute` event on
+[`APICall`](/components/APICall): use it to substitute custom logic
+(local computation, an alternative transport, a synthetic response for
+testing, etc.) without losing the rest of the `DataSource` machinery.
+
+```xmlui-pg copy display name="Example: replacing the fetch with custom logic"
+<App var.callCount="{0}">
+  <DataSource
+    id="ds"
+    url="/api/items"
+    onFetch="() => {
+      callCount = callCount + 1;
+      return { items: ['apple', 'banana', 'cherry'], fetchedAt: callCount };
+    }" />
+  <Text>Items: {ds.value.items.join(', ')}</Text>
+  <Text>Handler invocations: {ds.value.fetchedAt}</Text>
+  <Button label="Refetch" onClick="ds.refetch()" />
+</App>
+```
+
+Because the handler runs inside the cached query, mounting two
+`DataSource` instances with the same `url` (and `queryParams`/`body`)
+calls the handler once and shares the result across consumers. Calling
+`refetch()` invalidates that cache entry and re-invokes the handler.
+
+### `loaded` [#loaded]
+
+The component triggers this event when the fetch operation has been completed and the data is loaded. The event has two arguments. The first is the data loaded; the second indicates if the event is a result of a refetch.
+
+**Signature**: `loaded(data: any, isRefetch: boolean): void`
+
+- `data`: The data loaded from the fetch operation.
+- `isRefetch`: Indicates whether this is a result of a refetch operation.
+
+## Exposed Methods [#exposed-methods]
+
+### `inProgress` [#inprogress]
+
+This property indicates if the data is being fetched.
+
+**Signature**: `get inProgress(): boolean`
+
+### `isRefetching` [#isrefetching]
+
+This property indicates if the data is being re-fetched.
+
+**Signature**: `get isRefetching(): boolean`
+
+### `loaded` [#loaded]
+
+This property indicates if the data has been loaded.
+
+**Signature**: `get loaded(): boolean`
+
+### `refetch` [#refetch]
+
+This method requests the re-fetch of the data.
+
+**Signature**: `refetch(): void`
+
+### `responseHeaders` [#responseheaders]
+
+This property retrieves the HTTP response headers from the last successful fetch. Returns an object whose keys are header names and values are header values, or `undefined` if no fetch has completed yet.
+
+**Signature**: `get responseHeaders(): Record<string, string> | undefined`
+
+### `value` [#value]
+
+This property retrieves the data queried from the source after optional transformations.
+
+**Signature**: `get value(): any`
+
+## Styling [#styling]
+
+This component does not have any styles.

@@ -23,10 +23,15 @@ export function startApp(
   extensions: Extension[] = [],
 ): Root {
   const appModule = findAppModule(runtime);
-  return renderApp(appModule, extensions);
+  const appConfig = findAppConfig(runtime);
+  return renderApp(appModule, extensions, appConfig?.appGlobals);
 }
 
-function renderApp(appModule: XmluiModule & { kind: "app" }, extensions: Extension[]): Root {
+function renderApp(
+  appModule: XmluiModule & { kind: "app" },
+  extensions: Extension[],
+  appGlobals: Record<string, unknown> = {},
+): Root {
   const rootElement = ensureRootElement();
 
   if (!contentRoot) {
@@ -38,10 +43,21 @@ function renderApp(appModule: XmluiModule & { kind: "app" }, extensions: Extensi
       key: hmrKey++,
       module: appModule,
       extensions,
+      appGlobals,
     }),
   );
 
   return contentRoot;
+}
+
+function findAppConfig(runtime: Record<string, unknown>): { appGlobals?: Record<string, unknown> } | undefined {
+  for (const value of Object.values(runtime)) {
+    const config = (value as any)?.default;
+    if (config && typeof config === "object" && config.appGlobals && typeof config.appGlobals === "object") {
+      return config as { appGlobals?: Record<string, unknown> };
+    }
+  }
+  return undefined;
 }
 
 function findAppModule(

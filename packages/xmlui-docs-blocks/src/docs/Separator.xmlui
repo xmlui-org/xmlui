@@ -1,0 +1,3 @@
+<Component name="Separator">
+    <ContentSeparator length="$space-3_5" orientation="vertical" />
+</Component>

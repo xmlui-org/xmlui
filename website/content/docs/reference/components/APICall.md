@@ -1,0 +1,557 @@
+# APICall [#apicall]
+
+`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/docs/reference/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. See also [Actions.callAPI](/docs/globals#actionscallapi).
+
+**Key characteristics:**
+- **Manual execution**: Call `execute()` method to trigger the API request
+- **Form integration**: Commonly used in `<event name="submit">` handlers for forms
+- **Parameter passing**: Pass data to the API call via `execute()` parameters
+- **Built-in notifications**: Supports automatic progress, success, and error messages
+
+**Context variables available during execution:**
+
+- `$attempts`: Number of status polls made in deferred mode
+- `$cookies`: Request cookies (available in `mockExecute`)
+- `$elapsed`: Time elapsed since polling started in milliseconds
+- `$error`: Error details (available in `errorNotificationMessage`)
+- `$param`: The first parameter passed to `execute()` method
+- `$params`: Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)
+- `$pathParams`: Path parameters extracted from the request URL (available in `mockExecute`)
+- `$polling`: Boolean indicating if polling is currently active in deferred mode
+- `$progress`: Current progress 0-100 when in deferred mode (extracted via progressExtractor expression)
+- `$queryParams`: Resolved query parameters (available in `mockExecute`)
+- `$requestBody`: Resolved request body (available in `mockExecute`)
+- `$requestHeaders`: Resolved request headers (available in `mockExecute`)
+- `$result`: Response data (available in `completedNotificationMessage`)
+- `$statusData`: Latest status response data when in deferred mode (available in event handlers and notifications)
+
+## Behaviors [#behaviors]
+
+No behaviors are applicable to this component.
+
+## Properties [#properties]
+
+### `body` [#body]
+
+This optional property sets the request body. Use to pass an object that will be serialized as a JSON string. If you have an object that is already serialized as a JSON string, use `rawBody` instead.
+
+### `cancelBody` [#cancelbody]
+
+Optional body to send with the cancel request. Can use $result context from initial response.
+
+### `cancelButtonLabel` [#cancelbuttonlabel]
+
+This optional string property enables the customization of the cancel button in the confirmation dialog that is displayed before the `APICall` is executed.
+
+### `cancelMethod` [#cancelmethod]
+
+> [!DEF]  default: **"post"**
+
+HTTP method for cancel requests. Defaults to 'post'.
+
+Available values: `get`, `post` **(default)**, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
+
+### `cancelUrl` [#cancelurl]
+
+URL to call when cancelling the deferred operation. Can use $result context from initial response (e.g., '/api/cancel/{$result.operationId}'). If not provided, cancel() will only stop polling without notifying the server.
+
+### `completedNotificationMessage` [#completednotificationmessage]
+
+Message to show in toast notification when deferred operation completes successfully. Can include {$statusData.property} and other context variables from the final status.
+
+This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
+
+```xmlui copy
+ <APICall
+  id="api"
+  method="post"
+  url="/api/shopping-list" 
+  completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
+```
+
+### `completionCondition` [#completioncondition]
+
+Expression that returns true when the deferred operation is complete. Can access $statusData context variable containing the latest status response.
+
+### `confirmButtonLabel` [#confirmbuttonlabel]
+
+This optional string property enables the customization of the submit button in the confirmation dialog that is displayed before the `APICall` is executed.
+
+### `confirmMessage` [#confirmmessage]
+
+This optional string sets the message in the confirmation dialog that is displayed before the `APICall` is executed.
+
+### `confirmTitle` [#confirmtitle]
+
+This optional string sets the title in the confirmation dialog that is displayed before the `APICall` is executed.
+
+### `credentials` [#credentials]
+
+Controls whether cookies and other credentials are sent with the request. Set to `"include"` to send credentials in cross-origin requests (requires `Access-Control-Allow-Credentials: true` header on the server).
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `omit` | Never send credentials |
+| `same-origin` | Send credentials only for same-origin requests (default browser behavior) |
+| `include` | Always send credentials, even for cross-origin requests |
+
+**Important**: When using `credentials="include"` for cross-origin requests, the server must respond with the `Access-Control-Allow-Credentials: true` header, and the `Access-Control-Allow-Origin` header cannot be `*` (it must be a specific origin).
+
+**Example**: Submitting a form with authentication
+
+```xmlui copy
+<Form>
+  <TextBox id="message" label="Message" />
+  <event name="submit">
+    <APICall 
+      url="https://api.example.com/messages"
+      method="post"
+      body='{{"message": message.value}}'
+      credentials="include"
+    />
+  </event>
+</Form>
+```
+
+### `deferredMode` [#deferredmode]
+
+> [!DEF]  default: **false**
+
+Enable deferred operation mode for long-running operations that return **202 Accepted**. When enabled, the component will automatically poll a status endpoint to track operation progress. (Experimental feature)
+
+First, `APICall` executes the initial request, then `statusUrl` polls until completion or failure.
+
+Use `statusUrl` to define the polling endpoint. If you need query parameters for status checks, include them directly in the URL template.
+
+```xmlui-pg name="Example: deferredMode with statusUrl and status query params"
+---app copy display {7,8}
+<App>
+  <APICall
+    id="startExport"
+    method="post"
+    url="/api/exports"
+    body="{{ format: 'csv' }}"
+    deferredMode="true"
+    statusUrl="/api/exports/{$result.jId}/status?tenant={$result.tId}&includeProgress=true"
+    statusMethod="get"
+    pollingInterval="1000"
+    maxPollingDuration="60000"
+    completionCondition="{$statusData.state === 'completed'}"
+    errorCondition="{$statusData.state === 'failed'}"
+    progressExtractor="{$statusData.progress}"
+    inProgressNotificationMessage="Preparing export: {$progress}%"
+    completedNotificationMessage="Export is ready"
+    errorNotificationMessage="Export failed: {$statusData.message}"
+  />
+
+  <Button label="Start export" onClick="startExport.execute()" />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.exportJobs = {}",
+  "operations": {
+    "start-export": {
+      "url": "/exports",
+      "method": "post",
+      "handler": "const id = 'job-' + Date.now(); $state.exportJobs[id] = { progress: 0, state: 'running', message: 'Export in progress' }; return { jId: id, tId: 'tenant-a' };"
+    },
+    "get-export-status": {
+      "url": "/exports/:jId/status",
+      "method": "get",
+      "pathParamTypes": { "jId": "string" },
+      "handler": "const job = $state.exportJobs[$pathParams.jId]; if (!job) return { state: 'failed', progress: 0, message: 'Job not found' }; if (job.state === 'running') { job.progress = Math.min(100, job.progress + 25); if (job.progress >= 100) { job.state = 'completed'; job.message = 'Export completed'; } } return { state: job.state, progress: job.progress, message: job.message, tenant: $queryParams.tenant, includeProgress: $queryParams.includeProgress };"
+    }
+  }
+}
+```
+
+### `errorCondition` [#errorcondition]
+
+Expression that returns true when the deferred operation has failed. Can access $statusData context variable containing the latest status response.
+
+### `errorNotificationMessage` [#errornotificationmessage]
+
+Message to show in toast notification when deferred operation fails. Can include {$statusData.property} and other context variables from the error status.
+
+This property customizes the message displayed in a toast when the API invocation results in an error. Use the `$error` context object to get the error code (`$error.statusCode`) optional message (`$error.message`), or details coming from the response body (`$error.details`). For example, you can use the following code snippet to display the status code and the details:
+
+```xmlui copy
+ <APICall
+  id="api"
+  method="post"
+  url="/api/shopping-list"
+  errorNotificationMessage="
+    ${error.statusCode}, ${error.message} {JSON.stringify($error.details)}
+  " />
+```
+
+**Error handling in try/catch blocks**: When calling `Actions.callApi()`, you can catch errors and access their properties directly:
+
+```xmlui-pg name="Example: Error handling with Actions.callApi"
+---app copy display 
+<App>
+  <Button onClick="
+    try {
+      Actions.callApi({
+        url: '/api/create-file',
+        method: 'post',
+        body: { name: 'file.txt' }
+      });
+      toast.success('File created');
+    } catch (error) {
+      if (error.statusCode === 409) {
+        toast.error('File already exists');
+      } else if (error.statusCode === 400) {
+        toast.error('Invalid request: ' + error.message);
+      } else {
+        toast.error(error.message);
+      }
+    }
+  ">
+    Create File
+  </Button>
+</App>
+---api display
+{
+  "apiUrl": "/api",
+  "operations": {
+    "create-file": {
+      "url": "/create-file",
+      "method": "post",
+      "handler": "throw Errors.HttpError(409, { message: 'File already exists', details: { fileName: $requestBody.name, conflictReason: 'Duplicate entry' }, customField: 'customValue' });"
+    }
+  }
+}
+```
+
+The error object provides:
+- `error.statusCode` - HTTP status code (e.g., 400, 404, 500)
+- `error.message` - Extracted error message
+- `error.details` - Extracted error details object
+- `error.response` - Full original response body (includes custom fields)
+
+**NOTE:** While we support Microsoft/Google-style and RFC 7807 errors, not all response shapes can be accounted for.
+Because of this, there is an attribute available in the `configuration` file called `errorResponseTransform` under `xmluiConfig`. This exposes the error response using the `$response` context variable.
+Here is an example on how to use it (note that this is evaluated as a `binding expression`):
+
+Error looks the following coming from the backend:
+
+```js
+{
+  code: number,
+  error: string
+}
+```
+
+This is how to transform it in config:
+
+```json
+{
+  "xmluiConfig": {
+    "errorResponseTransform": "{{ statusCode: $response.code, message: $response.error }}"
+  }
+}
+```
+
+### `headers` [#headers]
+
+You can optionally define request header values as key-value pairs, where the key is the ID of the particular header and the value is that header's corresponding value.
+
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
+
+Message to show in toast notification during deferred operation polling. Can include {$progress}, {$statusData.property}, and other context variables. Notification will update on each poll with current values.
+
+### `maxPollingDuration` [#maxpollingduration]
+
+> [!DEF]  default: **300000**
+
+Maximum time to poll before timing out, in milliseconds.
+
+### `maxPollingInterval` [#maxpollinginterval]
+
+> [!DEF]  default: **30000**
+
+Maximum interval between polls when using backoff strategies, in milliseconds.
+
+### `method` [#method]
+
+> [!DEF]  default: **"get"**
+
+The method of data manipulation can be done via setting this property.
+
+Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
+
+### `pollingBackoff` [#pollingbackoff]
+
+> [!DEF]  default: **"none"**
+
+Strategy for increasing polling interval over time. Options: 'none' (fixed interval), 'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.
+
+Available values: `none` **(default)**, `linear`, `exponential`
+
+### `pollingInterval` [#pollinginterval]
+
+> [!DEF]  default: **2000**
+
+Controls how often status checks run in deferred mode (in milliseconds).
+
+Combine it with `pollingBackoff` to reduce server load for long-running tasks.
+
+Note how in this example, the progress toast shows up less frequently as polling time is increased from the preset one.
+
+```xmlui-pg name="Example: pollingInterval with pollingBackoff"
+---app copy display {8,9}
+<App>
+  <APICall
+    id="rebuildSearch"
+    method="post"
+    url="/api/search/rebuild"
+    deferredMode="true"
+    statusUrl="/api/search/rebuild/{$result.operationId}/status"
+    pollingInterval="1000"
+    pollingBackoff="exponential"
+    maxPollingInterval="10000"
+    maxPollingDuration="180000"
+    completionCondition="{$statusData.done === true}"
+    errorCondition="{$statusData.failed === true}"
+    progressExtractor="{$statusData.percent}"
+    inProgressNotificationMessage="Rebuilding index: {$progress}%"
+  />
+
+  <Button label="Rebuild search index" onClick="rebuildSearch.execute()" />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.rebuildOps = {}",
+  "operations": {
+    "start-rebuild": {
+      "url": "/search/rebuild",
+      "method": "post",
+      "handler": "const id = 'op-' + Date.now(); $state.rebuildOps[id] = { percent: 0, done: false, failed: false }; return { operationId: id };"
+    },
+    "get-rebuild-status": {
+      "url": "/search/rebuild/:operationId/status",
+      "method": "get",
+      "pathParamTypes": { "operationId": "string" },
+      "handler": "const op = $state.rebuildOps[$pathParams.operationId]; if (!op) return { percent: 0, done: false, failed: true }; if (!op.done && !op.failed) { op.percent = Math.min(100, op.percent + 20); if (op.percent >= 100) op.done = true; } return { percent: op.percent, done: op.done, failed: op.failed };"
+    }
+  }
+}
+```
+
+### `progressExtractor` [#progressextractor]
+
+Expression to extract progress value (0-100) from the status response. Can access $statusData context variable. If not specified, no progress tracking.
+
+### `queryParams` [#queryparams]
+
+This optional property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the request URL. You can specify key and value pairs where the key is the name of a particular query parameter and the value is that parameter's value.
+
+### `rawBody` [#rawbody]
+
+This optional property sets the request body to the value provided here without any conversion. Use the * `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.
+
+### `statusMethod` [#statusmethod]
+
+> [!DEF]  default: **"get"**
+
+HTTP method for status requests. Defaults to 'get'.
+
+Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
+
+### `statusUrl` [#statusurl]
+
+The URL to poll for status updates when deferredMode is enabled. Can use $result context from initial response (e.g., '/api/status/{$result.operationId}'). Required when deferredMode is true.
+
+### `url` [#url]
+
+> [!DEF]  This property is required.
+
+Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.
+
+## Events [#events]
+
+### `beforeRequest` [#beforerequest]
+
+This event fires before the request is sent. Returning an explicit boolean`false` value will prevent the request from being sent.
+
+**Signature**: `() => boolean | void`
+
+### `error` [#error]
+
+This event fires when a request results in an error.
+
+**Signature**: `(error: any) => void`
+
+- `error`: The error object containing details about what went wrong with the API request.
+
+### `mockExecute` [#mockexecute]
+
+When defined, this event handler replaces the actual API request. The handler receives the resolved request properties as context variables: `$pathParams`, `$queryParams`, `$requestBody`, `$cookies`, `$requestHeaders`. When triggered via the `execute()` method, `$param` and `$params` are also available. The return value of the handler becomes the result of the API call.
+
+**Signature**: `() => any`
+
+When this event is defined, it **replaces the real HTTP request** entirely. The handler's return value becomes the result of the API call — `onSuccess` still fires with it, `lastResult` is updated, and query invalidation still runs as normal. No network request is made.
+
+This is the `APICall` counterpart to [`DataSource`'s `mockData`](/docs/reference/components/DataSource) property: use it during development and testing to simulate backend mutations without a real server.
+
+**Context variables available in the handler:**
+
+| Variable | Description |
+|---|---|
+| `$requestBody` | Resolved request body (`body` / `rawBody`) |
+| `$queryParams` | Resolved query parameters |
+| `$requestHeaders` | Resolved request headers |
+| `$pathParams` | Path parameters (empty object for client-side mocks) |
+| `$cookies` | Request cookies (empty object for client-side mocks) |
+| `$param` | First argument passed to `execute()` |
+| `$params` | Array of all arguments passed to `execute()` |
+
+```xmlui-pg name="Example: mockExecute — building a mock CRUD list"
+---app copy display
+<App var.users="{[
+  { id: 1, name: 'Alice' },
+  { id: 2, name: 'Bob' }
+]}">
+  <DataSource id="userList" url="/api/users" mockData="{users}" />
+  <Button>
+    <event name="click">
+      <APICall
+        url="/api/users"
+        method="post"
+        invalidates="/api/users"
+        onMockExecute="() => {
+          const newUser = { id: users.length + 1, name: 'New User' };
+          users = [...users, newUser];
+          return newUser;
+        }"
+      />
+    </event>
+    Add user
+  </Button>
+  <List data="{userList}">
+    <HStack>
+      <Text value="{$item.id}." width="24px"/>
+      <Text value="{$item.name}" />
+    </HStack>
+  </List>
+</App>
+```
+
+### `pollingComplete` [#pollingcomplete]
+
+Fires when polling stops in deferred mode (success, failure, timeout, or manual stop).
+
+**Signature**: `(finalStatus: any, reason: string) => void`
+
+- `finalStatus`: The final status data.
+- `reason`: Reason for completion: 'completed', 'failed', 'timeout', or 'manual'.
+
+### `pollingStart` [#pollingstart]
+
+Fires when polling begins in deferred mode.
+
+**Signature**: `(initialResult: any) => void`
+
+- `initialResult`: The result from the initial API call that returned 202.
+
+### `statusUpdate` [#statusupdate]
+
+Fires on each poll when in deferred mode. Passes the status data and current progress.
+
+**Signature**: `(statusData: any, progress: number) => void`
+
+- `statusData`: The latest status response data from polling.
+- `progress`: Current progress value 0-100.
+
+### `success` [#success]
+
+This event fires when a request results in a success. Returning an explicit `false` value suppresses automatic query invalidation, giving you full control over which cached data gets refreshed after the call.
+
+**Signature**: `(result: any) => false | void`
+
+- `result`: The response data returned from the successful API request.
+
+### `timeout` [#timeout]
+
+Fires if max polling duration is exceeded in deferred mode.
+
+**Signature**: `() => void`
+
+## Exposed Methods [#exposed-methods]
+
+### `cancel` [#cancel]
+
+Cancel the deferred operation on the server and stop polling. Requires cancelUrl to be configured.
+
+**Signature**: `cancel(): Promise<void>`
+
+### `execute` [#execute]
+
+This method triggers the invocation of the API. You can pass an arbitrary number of parameters to the method. In the `APICall` instance, you can access those with the `$param` and `$params` context values.
+
+**Signature**: `execute(...params: any[])`
+
+- `params`: An arbitrary number of parameters that can be used in the API call.
+
+### `getStatus` [#getstatus]
+
+Get the current status data in deferred mode.
+
+**Signature**: `getStatus(): any`
+
+### `inProgress` [#inprogress]
+
+Boolean flag indicating whether the API call is currently in progress.
+
+**Signature**: `inProgress: boolean`
+
+### `isPolling` [#ispolling]
+
+Check if polling is currently active in deferred mode.
+
+**Signature**: `isPolling(): boolean`
+
+### `lastError` [#lasterror]
+
+The error from the most recent failed API call execution.
+
+**Signature**: `lastError: any`
+
+### `lastResponseHeaders` [#lastresponseheaders]
+
+This property retrieves the HTTP response headers from the last successful API call execution, or `undefined` if no successful call has completed yet.
+
+**Signature**: `get lastResponseHeaders(): Record<string, string> | undefined`
+
+### `lastResult` [#lastresult]
+
+The result from the most recent successful API call execution.
+
+**Signature**: `lastResult: any`
+
+### `loaded` [#loaded]
+
+Boolean flag indicating whether at least one successful API call has completed.
+
+**Signature**: `loaded: boolean`
+
+### `resumePolling` [#resumepolling]
+
+Resume polling in deferred mode after it was manually stopped.
+
+**Signature**: `resumePolling(): void`
+
+### `stopPolling` [#stoppolling]
+
+Manually stop polling in deferred mode. The operation continues on the server.
+
+**Signature**: `stopPolling(): void`
+
+## Styling [#styling]
+
+This component does not have any styles.

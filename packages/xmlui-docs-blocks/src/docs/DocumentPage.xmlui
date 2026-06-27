@@ -1,0 +1,25 @@
+<Component name="DocumentPage">
+    <HStack gap="$space-5">
+        <VStack width="*">
+            <HStack width="100%" verticalAlignment="center">
+                <Breadcrumbs />
+                <SpaceFiller />
+                <Inspector when="{$props.showInspector}" />
+            </HStack>
+            <Markdown
+                content="{$props.content}"
+                data="{$props.url}"
+                enablePlaygroundTracing="{$props.showInspector}" />
+            <Slot />
+            <DocumentLinks />
+        </VStack>
+        <TableOfContents
+            scrollStyle="whenScrolling"
+            showScrollerFade="true"
+            width="$space-64"
+            omitH1
+            when-lg
+            maxHeadingLevel="{$props.maxHeadingLevel ? $props.maxHeadingLevel : 3}" />
+    </HStack>
+</Component>
+    

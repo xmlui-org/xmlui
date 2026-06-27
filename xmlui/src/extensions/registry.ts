@@ -113,13 +113,14 @@ function normalizeComponent(
 }
 
 function componentContract(component: ComponentExtension): XmluiComponentContract {
+  const commonProps = ["id", "testId"];
   return {
     name: component.name,
     kind: "extension",
     acceptsArbitraryProps: component.acceptsArbitraryProps,
     allowsChildren: component.allowsChildren ?? true,
     declarations: { local: true },
-    props: Object.fromEntries((component.props ?? []).map((name) => [name, { name }])),
+    props: Object.fromEntries([...commonProps, ...(component.props ?? [])].map((name) => [name, { name }])),
     events: Object.fromEntries((component.events ?? []).map((name) => [name, {
       name,
       attributeName: `on${name.slice(0, 1).toUpperCase()}${name.slice(1)}`,
@@ -129,4 +130,3 @@ function componentContract(component: ComponentExtension): XmluiComponentContrac
     apis: Object.fromEntries((component.apis ?? []).map((name) => [name, { name }])),
   };
 }
-

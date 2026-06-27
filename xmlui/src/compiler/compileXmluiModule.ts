@@ -19,6 +19,7 @@ import type {
 } from "./ir/index";
 import { createMappedSourceMap, type RawSourceMap, type SourceMapMapping } from "./sourceMap";
 import type { Extension } from "../extensions";
+import type { XmluiComponentContract } from "./contracts";
 
 const SHARED_YIELD_HELPER: SharedYieldHelperOptions = {
   createStateName: "__xmluiCreateYieldState",
@@ -29,6 +30,7 @@ export type CompileXmluiModuleOptions = {
   id: string;
   source: string;
   extensions?: Iterable<Extension>;
+  extensionComponents?: Iterable<XmluiComponentContract>;
 };
 
 export type CompiledXmluiModule = {
@@ -44,12 +46,14 @@ export function compileXmluiModuleWithSourceMap({
   id,
   source,
   extensions = [],
+  extensionComponents = [],
 }: CompileXmluiModuleOptions): CompiledXmluiModule {
   const initial = compileXmluiSource({
     id,
     source,
     validateComponentReferences: false,
     extensions,
+    extensionComponents,
   });
   const imports = initial.document.kind === "app" ? siblingComponentImports(id) : [];
   const userComponents = new Set(imports.map((item) => item.componentName));
@@ -62,6 +66,7 @@ export function compileXmluiModuleWithSourceMap({
     knownComponents: userComponents,
     validateComponentReferences: true,
     extensions,
+    extensionComponents,
   });
   throwFirstCompilerDiagnostic(compiled);
   const code = emitXmluiModule({ compilerIr: compiled.compilerIr, imports });

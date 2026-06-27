@@ -1,0 +1,172 @@
+<Component name="HeroTonesPage">
+  <H1>
+    Hero Section with reverse header tone
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headerTone="reverse"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+    <VStack
+      horizontalAlignment="center"
+      width="600px"
+      backgroundColor="$backgroundColor"
+      padding="$space-8">
+      <ProgressBar value="{0.25}" />
+      <ProgressBar value="{0.50}" />
+      <ProgressBar value="{0.75}" />
+      <ProgressBar value="{1.0}" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headerTone="reverse"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+  <VStack
+    horizontalAlignment="center"
+    width="600px"
+    backgroundColor="$backgroundColor"
+    padding="$space-8">
+    <ProgressBar value="{0.25}" />
+    <ProgressBar value="{0.50}" />
+    <ProgressBar value="{0.75}" />
+    <ProgressBar value="{1.0}" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero Section with dark background image
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headerTone="dark"
+    fullWidthBackground="false"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+  >
+    <property name="backgroundTemplate">
+      <Image src="/resources/building.jpg" height="200%" fit="cover" />
+    </property>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headerTone="dark"
+  fullWidthBackground="false"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+>
+  <property name="backgroundTemplate">
+    <Image src="/resources/building.jpg" height="200%" fit="cover" />
+  </property>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero Section with reverse content tone
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    contentTone="reverse"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+    <VStack
+      horizontalAlignment="center"
+      width="600px"
+      backgroundColor="$backgroundColor"
+      padding="$space-8">
+      <ProgressBar value="{0.25}" />
+      <ProgressBar value="{0.50}" />
+      <ProgressBar value="{0.75}" />
+      <ProgressBar value="{1.0}" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  contentTone="reverse"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+  <VStack
+    horizontalAlignment="center"
+    width="600px"
+    backgroundColor="$backgroundColor"
+    padding="$space-8">
+    <ProgressBar value="{0.25}" />
+    <ProgressBar value="{0.50}" />
+    <ProgressBar value="{0.75}" />
+    <ProgressBar value="{1.0}" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+  <H1>
+    Hero Section with header and content tone reversed
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    headerTone="reverse"
+    contentTone="reverse"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+    <VStack
+      horizontalAlignment="center"
+      width="600px"
+      backgroundColor="$backgroundColor"
+      padding="$space-8">
+      <ProgressBar value="{0.25}" />
+      <ProgressBar value="{0.50}" />
+      <ProgressBar value="{0.75}" />
+      <ProgressBar value="{1.0}" />
+    </VStack>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  headerTone="reverse"
+  contentPlacement="right"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+>
+  <VStack horizontalAlignment="center">
+    <Button label="Visit the source code" />
+    <Stack backgroundColor="purple" width="120px" height="24px" />
+    <Avatar url="https://i.pravatar.cc/100" size="lg" />
+  </VStack>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+</Component>

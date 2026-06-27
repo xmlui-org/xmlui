@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "username": "Coder Gal",
+    "email": "ava.davis@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?u=ava.davis@example.com",
+    "status": "active"
+  },
+  {
+    "id": 2,
+    "username": "Tech Ninja",
+    "email": "liam.miller@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?u=liam.miller@example.com",
+    "status": "active"
+  },
+  {
+    "id": 3,
+    "username": "Design Diva",
+    "email": "olivia.wilson@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?u=olivia.wilson@example.com",
+    "status": "pending"
+  },
+  {
+    "id": 4,
+    "username": "Data King",
+    "email": "noah.jones@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?u=noah.jones@example.com",
+    "status": "pending"
+  }
+]

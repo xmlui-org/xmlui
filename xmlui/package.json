@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts",
+    "./themes.scss": "./src/components-core/theming/_themes.scss",
+    "./syntax/textmate": "./src/syntax/textmate.ts"
   },
   "scripts": {
     "dev": "vite",

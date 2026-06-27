@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { build } from "./build";
+import { buildLib } from "./buildLib";
 import { preview } from "./preview";
 import { ssg } from "./ssg";
 import { start } from "./start";
@@ -39,6 +40,11 @@ interface BuildArgs {
   withMock?: boolean;
   withHostingMetaFiles?: boolean;
   withRelativeRoot?: boolean;
+}
+
+interface BuildLibArgs {
+  mode?: string;
+  watch?: boolean;
 }
 
 interface PreviewArgs {
@@ -132,6 +138,28 @@ async function run() {
       async (argv) => {
         const { port, proxy } = argv;
         await preview({ port, proxy });
+      },
+    )
+    .command<BuildLibArgs>(
+      "build-lib",
+      "Build an XMLUI extension package",
+      (yargs) => {
+        return yargs
+          .option("mode", {
+            type: "string",
+            description: "Build mode. Use 'metadata' to emit extension metadata.",
+          })
+          .option("watch", {
+            type: "boolean",
+            description: "Watch source files and rebuild extension artifacts.",
+          });
+      },
+      async (argv) => {
+        const { mode, watch } = argv;
+        await buildLib({
+          mode: getStringArg(mode, undefined),
+          watch: getBoolArg(watch, false),
+        });
       },
     )
     .command<SsgArgs>(

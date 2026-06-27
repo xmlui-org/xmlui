@@ -1,0 +1,58 @@
+[
+  {
+    "date": "2026-01-12",
+    "title": "AI-assisted XMLUI refactoring",
+    "url": "https://thenewstack.io/how-to-use-llms-for-continuous-creative-code-refactoring/",
+    "source": "thenewstack.io",
+    "slug": "Tools built to generate vast amounts of code can, paradoxically, help us write less of it."
+  },  
+  {
+    "date": "2025-12-10",
+    "title": "How XMLUI puts the business developer back in control",
+    "url": "https://sdtimes.com/softwaredev/the-antidote-to-the-javascript-industrial-complex-how-xmlui-puts-the-business-developer-back-in-control/",
+    "source": "sdtimes.com",
+    "slug": "For too long, the barrier to entry for building even basic business applications has been artificially high."
+  },
+  {
+    "date": "2025-10-07",
+    "title": "XMLUI: A modern web development tool based on a component model",
+    "url": "https://sdtimes.com/softwaredev/xmlui-a-modern-web-development-tool-based-on-a-component-model/",
+    "source": "sdtimes.com",
+    "slug": "It aims to bring the feel of Visual Basic to the modern web, leveraging the React-based component ecosystem."
+  },
+  {
+    "date": "2025-09-08",
+    "title": "How To Upgrade Your MCP Server With Context Engineering",
+    "url": "https://thenewstack.io/how-to-upgrade-your-mcp-server-with-context-engineering/",
+    "source": "thenewstack.io",
+    "slug": "Context engineering anchors AI agents to ground truth. So here's how to upgrade an MCP server to help agents find legit and sourced patterns."
+  },
+  {
+    "date": "2025-07-23",
+    "title": "XMLUI builds React-based UIs with simple markup",
+    "url": "https://www.infoworld.com/article/4026889/xmlui-builds-react-based-uis-with-simple-markup.html",
+    "source": "infoworld.com",
+    "slug": "Open-source framework wraps React and CSS and provides a catalog of components and a theme system for composing user interfaces declaratively."
+  },
+  {
+    "date": "2025-07-22",
+    "title": "Make React Components With XMLUI, a Visual Basic for the AI Era",
+    "url": "https://thenewstack.io/make-react-components-with-xmlui-a-visual-basic-for-the-ai-era/",
+    "source": "thenewstack.io",
+    "slug": "XMLUI is a new components builder that takes its inspiration from Visual Basic in the 1990s, except it's for React components and modern CSS."
+  },
+  {
+    "date": "2025-07-21",
+    "title": "Components for Web Apps",
+    "url": "https://www.windley.com/archives/2025/07/components_for_web_apps.shtml",
+    "source": "windley.com",
+    "slug": "XMLUI brings a fresh, declarative approach to building web interfaces using native, composable components—no heavy frameworks required. It's a promising path toward giving Picos the ability to serve their users."
+  },
+  {
+    "date": "2025-07-18",
+    "title": "Introducing XMLUI",
+    "url": "https://blog.jonudell.net/2025/07/18/introducing-xmlui/",
+    "source": "blog.jonudell.net",
+    "slug": "In the mid-1990s you could create useful software without being an ace coder. You had Visual Basic, you had a rich ecosystem of components, you could wire them together to create apps. XMLUI revives that idea for the modern web."
+  }
+]

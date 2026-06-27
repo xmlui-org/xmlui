@@ -11,6 +11,7 @@ import {
   useRuntimeStateStore,
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
+import { XmluiAppContextProvider } from "./appContext";
 import { XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
@@ -70,6 +71,7 @@ export type MountXmluiAppOptions = {
   isolateRouting?: boolean;
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
+  appGlobals?: Record<string, unknown>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
@@ -96,6 +98,7 @@ export function mountXmluiApp(
         isolateRouting={options.isolateRouting}
         defaultTone={options.defaultTone}
         extensions={options.extensions}
+        appGlobals={options.appGlobals}
         testProbe={options.testProbe}
       />,
     );
@@ -108,6 +111,7 @@ export function mountXmluiApp(
       isolateRouting={options.isolateRouting}
       defaultTone={options.defaultTone}
       extensions={options.extensions}
+      appGlobals={options.appGlobals}
       testProbe={options.testProbe}
     />,
   );
@@ -120,6 +124,7 @@ export function XmluiRoot({
   isolateRouting = false,
   defaultTone,
   extensions,
+  appGlobals = {},
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
@@ -127,6 +132,7 @@ export function XmluiRoot({
   isolateRouting?: boolean;
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
+  appGlobals?: Record<string, unknown>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
@@ -142,7 +148,7 @@ export function XmluiRoot({
     i18nRef.current = createRuntimeI18n();
   }
   const rootOwnerId = "app:root";
-  const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
+  const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting, appGlobals.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
   if (!routingRef.current) {
     routingRef.current = new RuntimeRoutingStore(
@@ -179,10 +185,12 @@ export function XmluiRoot({
 
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
+    store.setInitialGlobalValue("appGlobals", appGlobals);
     const initialScope = createRuntimeScope({
       store,
       localOwnerId: rootOwnerId,
       props: {},
+      contextValues: { appGlobals, $appGlobals: appGlobals },
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -215,6 +223,7 @@ export function XmluiRoot({
       store,
       localOwnerId: rootOwnerId,
       props: {},
+      contextValues: { appGlobals, $appGlobals: appGlobals },
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -235,12 +244,14 @@ export function XmluiRoot({
   );
 
   return (
-    <XmluiThemeRoot tone={defaultTone}>
-      <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
-      {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
-      <GlobalLiveRegion />
-      <ToastHost service={toastRef.current} />
-    </XmluiThemeRoot>
+    <XmluiAppContextProvider value={{ appGlobals, mediaSize: { sizeIndex: 4 } }}>
+      <XmluiThemeRoot tone={defaultTone}>
+        <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+        {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+        <GlobalLiveRegion />
+        <ToastHost service={toastRef.current} />
+      </XmluiThemeRoot>
+    </XmluiAppContextProvider>
   );
 }
 
@@ -296,8 +307,8 @@ export type { XmluiDocumentInput, XmluiModule } from "./types";
 
 export { startApp } from "./startApp";
 
-function routeModeFromApp(value: string | undefined): RoutingMode {
-  if (value === "false" || value === "{false}") {
+function routeModeFromApp(value: string | undefined, configValue: unknown): RoutingMode {
+  if (value === "false" || value === "{false}" || configValue === false) {
     return "history";
   }
   return "hash";

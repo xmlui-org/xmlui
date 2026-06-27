@@ -2,5 +2,16 @@
   "analyze": "off",
   "reactiveCycles": "off",
   "accessibility": "off",
-  "typeContracts": "off"
+  "typeContracts": "off",
+  "extensions": [
+    "xmlui-search",
+    "xmlui-website-blocks",
+    "xmlui-docs-blocks",
+    "xmlui-masonry",
+    "xmlui-gauge",
+    "xmlui-echart",
+    "xmlui-calendar",
+    "xmlui-grid-layout",
+    "xmlui-tiptap-editor"
+  ]
 }

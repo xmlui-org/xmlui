@@ -459,6 +459,13 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
       mutable: false,
     };
   }
+  if (name === "appGlobals") {
+    return {
+      kind: "context",
+      name,
+      mutable: false,
+    };
+  }
   if (scope.allowImplicitGlobals && isImplicitGlobalCandidate(name)) {
     return {
       kind: "global",

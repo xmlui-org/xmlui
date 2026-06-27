@@ -1,0 +1,54 @@
+{
+  "name": "xmlui-website-blocks",
+  "version": "0.1.6",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build": "xmlui build-lib",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "build:metadata": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
+  },
+  "dependencies": {
+    "@radix-ui/react-compose-refs": "1.1.2",
+    "@react-spring/web": "^9.7.5",
+    "classnames": "2.5.1",
+    "embla-carousel-autoplay": "^8.3.0",
+    "embla-carousel-react": "^8.3.0",
+    "immer": "9.0.16"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.23",
+    "typescript": "^5.7.3",
+    "vite": "^8.0.0",
+    "xmlui": "*"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-website-blocks.mjs",
+          "require": "./dist/xmlui-website-blocks.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
+  }
+}
