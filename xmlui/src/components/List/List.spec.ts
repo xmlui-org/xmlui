@@ -1,12 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
 
-const LIST_OLD_SUITE_PENDING =
-  "The literal old List suite is copied for compatibility tracking, but the full List migration is not complete yet. Re-enable cases feature-by-feature as group templates, default groups, collapsible groups, orderBy semantics, loading/empty templates, scroll anchoring, virtualization-style APIs, fetch events, selection behavior, and shared behavior/part support are migrated.";
-
-test.beforeEach(() => {
-  test.skip(true, LIST_OLD_SUITE_PENDING);
-});
-
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================

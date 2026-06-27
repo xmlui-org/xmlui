@@ -55,6 +55,7 @@ export const linkRenderer = wrapComponent({
           ...currentVariantCssVariables(variant, mergedThemeVariables),
         }}
         onClick={(event) => void adapter.event("click")(event)}
+        onContextMenu={(event) => void adapter.event("contextMenu")(event)}
       >
         {adapter.renderChildren()}
       </LinkNative>
@@ -70,6 +71,7 @@ const currentVariantThemeProps = [
   "fontSize",
   "fontWeight",
   "fontStyle",
+  "backgroundColor",
   "textColor",
 ] as const;
 

@@ -2,6 +2,11 @@ import { cloneElement, isValidElement, useState, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
+import {
+  Animation,
+  parseAnimation,
+  parseAnimationOptions,
+} from "../../components/Animation/AnimationReact";
 
 export const whenBehavior: Behavior = {
   metadata: {
@@ -147,22 +152,37 @@ export const variantBehavior: Behavior = {
   },
 };
 
-export const animationBehavior = simpleWrapperBehavior({
-  name: "animation",
-  friendlyName: "Animation",
-  description: "Adds animation functionality to components with an `animation` prop.",
-  triggerProps: ["animation"],
-  props: {
-    animation: {
-      valueType: "any",
-      description: "The animation definition.",
+export const animationBehavior: Behavior = {
+  metadata: {
+    name: "animation",
+    friendlyName: "Animation",
+    description: "Adds animation functionality to components with an `animation` prop.",
+    triggerProps: ["animation"],
+    props: {
+      animation: {
+        valueType: "any",
+        description: "The animation definition.",
+      },
+      animationOptions: {
+        valueType: "any",
+        description: "Options for configuring the animation behavior.",
+      },
     },
-    animationOptions: {
-      valueType: "any",
-      description: "Options for configuring the animation behavior.",
-    },
+    condition: { type: "visual" },
   },
-});
+  canAttach: (context) =>
+    canBehaviorAttachToComponent(animationBehavior.metadata, context.metadata, context.componentName) &&
+    hasTriggeredBehaviorProp(animationBehavior.metadata, context.props),
+  attach: (context, node) => {
+    const animation = parseAnimation(context.props.animation);
+    const options = parseAnimationOptions(context.props.animationOptions);
+    return (
+      <Animation animation={animation} {...options}>
+        {node}
+      </Animation>
+    );
+  },
+};
 
 export const bookmarkBehavior = simpleWrapperBehavior({
   name: "bookmark",
@@ -177,18 +197,52 @@ export const bookmarkBehavior = simpleWrapperBehavior({
   },
 });
 
-export const liveRegionBehavior = simpleWrapperBehavior({
-  name: "liveRegion",
-  friendlyName: "Live Region",
-  description: "Adds live-region accessibility behavior.",
-  triggerProps: ["liveRegion"],
-  props: {
-    liveRegion: {
-      valueType: "string",
-      description: "The ARIA live-region mode.",
+export const liveRegionBehavior: Behavior = {
+  metadata: {
+    name: "liveRegion",
+    friendlyName: "Live Region",
+    description: "Adds live-region accessibility behavior.",
+    triggerProps: ["withLiveRegion", "liveRegion"],
+    props: {
+      withLiveRegion: {
+        valueType: "boolean",
+        description: "If true, adds a hidden live region that announces component value updates.",
+      },
+      liveRegion: {
+        valueType: "string",
+        description: "Legacy alias for the ARIA live-region mode.",
+      },
+      liveRegionMessage: {
+        valueType: "string",
+        description: "Overrides the message announced by the hidden live region.",
+      },
+      liveRegionPoliteness: {
+        valueType: "string",
+        availableValues: ["polite", "assertive"],
+        isStrictEnum: true,
+        description: "Controls whether updates are announced politely or assertively.",
+      },
     },
+    condition: { type: "visual" },
   },
-});
+  canAttach: (context) =>
+    canBehaviorAttachToComponent(liveRegionBehavior.metadata, context.metadata, context.componentName) &&
+    (isTruthyWhenValue(context.props.withLiveRegion) || context.props.liveRegion !== undefined),
+  attach: (context, node) => (
+    <>
+      {node}
+      <span
+        data-xmlui-behavior="liveRegion"
+        role={liveRegionPoliteness(context.props) === "assertive" ? "alert" : "status"}
+        aria-live={liveRegionPoliteness(context.props)}
+        aria-atomic="true"
+        style={hiddenLiveRegionStyle}
+      >
+        {liveRegionMessage(context)}
+      </span>
+    </>
+  ),
+};
 
 export const pubSubBehavior = simpleWrapperBehavior({
   name: "pubSub",
@@ -342,4 +396,35 @@ function stringValue(value: unknown): string | undefined {
     return undefined;
   }
   return String(value);
+}
+
+const hiddenLiveRegionStyle = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0,
+} as const;
+
+function liveRegionPoliteness(props: Record<string, unknown>): "polite" | "assertive" {
+  const explicit = stringValue(props.liveRegionPoliteness) ?? stringValue(props.liveRegion);
+  return explicit === "assertive" ? "assertive" : "polite";
+}
+
+function liveRegionMessage(context: BehaviorAttachContext): string {
+  const explicit = stringValue(context.props.liveRegionMessage);
+  if (explicit !== undefined) {
+    return explicit;
+  }
+  for (const name of ["value", "label", "message", "title"]) {
+    const value = stringValue(context.props[name]);
+    if (value !== undefined) {
+      return value;
+    }
+  }
+  return "";
 }

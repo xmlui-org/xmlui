@@ -2,6 +2,7 @@ import {
   createMetadata,
   dAutoFocus,
   dClick,
+  dComponent,
   dDidChange,
   dEnabled,
   dGotFocus,
@@ -87,6 +88,12 @@ export const CheckboxMd = createMetadata({
     variant: { description: "The variant value.", valueType: "string" },
     requireLabelMode: { description: "Controls required/optional label markers.", valueType: "string" },
     bindTo: { description: "Binds the checkbox to form data.", valueType: "string" },
+    inputTemplate: dComponent("This property is used to define a custom checkbox input template."),
+  },
+  childrenAsTemplate: "inputTemplate",
+  contextVars: {
+    $checked: dComponent("The current checked state."),
+    $setChecked: dComponent("Sets the current checked state."),
   },
   events: {
     click: dClick(COMP),
@@ -149,4 +156,3 @@ export const CheckboxMd = createMetadata({
   compactInlineLabel: true,
   limitThemeVarsToComponent: true,
 });
-

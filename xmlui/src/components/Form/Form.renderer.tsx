@@ -27,7 +27,15 @@ export const formRenderer = wrapComponent({
         cancelLabel={adapter.stringProp("cancelLabel", "Cancel")}
         hideButtonRow={adapter.booleanProp("hideButtonRow", false)}
         hideButtonRowUntilDirty={adapter.booleanProp("hideButtonRowUntilDirty", false)}
+        stickyButtonRow={adapter.booleanProp("stickyButtonRow", false)}
+        persist={adapter.booleanProp("persist", false)}
+        storageKey={adapter.stringProp("storageKey")}
+        doNotPersistFields={adapter.prop("doNotPersistFields")}
+        keepOnCancel={adapter.booleanProp("keepOnCancel", false)}
         enableSubmit={adapter.booleanProp("enableSubmit", true)}
+        submitUrl={adapter.stringProp("submitUrl") ?? adapter.stringProp("submiturl")}
+        submitMethod={adapter.stringProp("submitMethod") ?? adapter.stringProp("submitmethod")}
+        dataAfterSubmit={adapter.stringProp("dataAfterSubmit", "keep")}
         itemLabelPosition={adapter.stringProp("itemLabelPosition")}
         itemLabelWidth={adapter.prop("itemLabelWidth")}
         itemLabelBreak={
@@ -36,6 +44,12 @@ export const formRenderer = wrapComponent({
             : undefined
         }
         itemRequireLabelMode={adapter.stringProp("itemRequireLabelMode")}
+        verboseValidationFeedback={
+          Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+            ? adapter.booleanProp("verboseValidationFeedback", true)
+            : undefined
+        }
+        swapCancelAndSave={adapter.booleanProp("swapCancelAndSave", false)}
         buttonRowTemplate={buttonRowTemplate}
         className={adapter.className}
         style={adapter.style}

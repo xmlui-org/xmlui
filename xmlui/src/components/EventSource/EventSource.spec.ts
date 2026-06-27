@@ -31,15 +31,79 @@ test.describe("EventSource foundation", () => {
     await initTestBed(`<EventSource url="/stream" enabled="{false}" />`);
     await expect.poll(() => page.evaluate(() => (window as any).__fakeEventSources.length)).toBe(0);
   });
-});
 
-test.describe("EventSource old-suite transfer debt", () => {
-  test("close event path is re-closed with real streaming fixtures", async () => {
-    test.fixme(true, "EventSource close behavior needs the streaming compatibility harness");
+  test("passes text payloads and malformed JSON through unchanged", async ({
+    initTestBed,
+    page,
+  }) => {
+    await installFakeEventSource(page);
+    await initTestBed(`
+      <App var.log="">
+        <EventSource
+          url="/stream"
+          onMessage="data => log = log + data + '|'" />
+        <Text testId="log">{log}</Text>
+      </App>
+    `);
+
+    await expect.poll(() => page.evaluate(() =>
+      Boolean((window as any).__fakeEventSources[0]?.listeners?.message?.length),
+    )).toBe(true);
+    await page.evaluate(() => {
+      const source = (window as any).__fakeEventSources[0];
+      source.emit("message", { data: "plain" });
+    });
+    await expect(page.getByTestId("log")).toHaveText("plain|");
+    await page.evaluate(() => {
+      const source = (window as any).__fakeEventSources[0];
+      source.emit("message", { data: "{broken" });
+    });
+    await expect(page.getByTestId("log")).toHaveText("plain|{broken|");
   });
 
-  test("copy literal network/retry/error tests when streaming test services exist", async () => {
-    test.fixme(true, "full old EventSource suite is deferred");
+  test("uses withCredentials and closes source on unmount", async ({ initTestBed, page }) => {
+    await installFakeEventSource(page);
+    await initTestBed(`
+      <App var.enabled="{true}">
+        <EventSource url="/stream" enabled="{enabled}" withCredentials="{true}" />
+        <Button testId="disable" onClick="enabled = false">Disable</Button>
+      </App>
+    `);
+
+    await expect.poll(() => page.evaluate(() => (window as any).__fakeEventSources.length)).toBe(1);
+    await expect.poll(() => page.evaluate(() => (window as any).__fakeEventSources[0].withCredentials)).toBe(true);
+    await page.getByTestId("disable").click();
+    await expect.poll(() => page.evaluate(() => (window as any).__fakeEventSources[0].closed)).toBe(true);
+  });
+
+  test("fires error for non-closing errors and close for closed sources", async ({
+    initTestBed,
+    page,
+  }) => {
+    await installFakeEventSource(page);
+    await initTestBed(`
+      <App var.log="">
+        <EventSource
+          url="/stream"
+          onError="log = log + 'error|'"
+          onClose="log = log + 'close|'" />
+        <Text testId="log">{log}</Text>
+      </App>
+    `);
+
+    await expect.poll(() => page.evaluate(() =>
+      Boolean((window as any).__fakeEventSources[0]?.listeners?.error?.length),
+    )).toBe(true);
+    await page.evaluate(() => {
+      const source = (window as any).__fakeEventSources[0];
+      source.readyState = 1;
+      source.emit("error", {});
+      source.readyState = 2;
+      source.emit("error", {});
+      source.emit("close", {});
+    });
+
+    await expect(page.getByTestId("log")).toHaveText("error|close|close|");
   });
 });
 
@@ -52,6 +116,7 @@ async function installFakeEventSource(page: { addInitScript: (script: () => void
       url: string;
       withCredentials: boolean;
       readyState = 0;
+      closed = false;
       listeners: Record<string, Array<(event: any) => void>> = {};
       constructor(url: string, options?: EventSourceInit) {
         this.url = url;
@@ -62,6 +127,7 @@ async function installFakeEventSource(page: { addInitScript: (script: () => void
         this.listeners[name] = [...(this.listeners[name] ?? []), listener];
       }
       close() {
+        this.closed = true;
         this.readyState = 2;
       }
       emit(name: string, event: any) {

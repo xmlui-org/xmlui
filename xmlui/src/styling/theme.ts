@@ -543,10 +543,12 @@ export function createComponentThemeClass(
   metadata: ComponentMetadata,
   themeVariables: ThemeVariableMap,
   contributors: readonly ComponentMetadata[] = [],
+  variant?: string,
 ): ComponentThemeClass {
   const baseThemeVariables = mergeThemeVariableLayers([
     collectComponentThemeDefaults(metadata, contributors),
     themeVariables,
+    variant ? componentVariantThemeVariables(metadata, themeVariables, contributors, variant) : {},
   ]);
   const mergedThemeVariables = mergeThemeVariableLayers([
     generateButtonTones(baseThemeVariables),
@@ -568,6 +570,28 @@ export function createComponentThemeClass(
       ]),
     ),
   };
+}
+
+function componentVariantThemeVariables(
+  metadata: ComponentMetadata,
+  themeVariables: ThemeVariableMap,
+  contributors: readonly ComponentMetadata[],
+  variant: string,
+): ThemeVariableMap {
+  const aliases: ThemeVariableMap = {};
+  for (const descriptor of [metadata, ...contributors]) {
+    const keys = new Set([
+      ...Object.keys(descriptor.themeVars ?? {}),
+      ...Object.keys(descriptor.defaultThemeVars ?? {}),
+    ]);
+    for (const key of keys) {
+      const variantKey = `${key}-${variant}`;
+      if (themeVariables[variantKey] !== undefined) {
+        aliases[key] = themeVariables[variantKey];
+      }
+    }
+  }
+  return aliases;
 }
 
 export function generateButtonTones(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {

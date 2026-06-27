@@ -1,0 +1,21 @@
+<App var.count="{1}">
+  <Markdown testId="markdown-foundation">
+    # Markdown Foundation
+
+    Count: @{count}
+
+    `inline code`
+
+    ```js
+    const doubled = @{count} * 2;
+    ```
+
+    ```xmlui-pg height="140px"
+    &lt;App var.nested="{0}"&gt;
+      &lt;Text testId="nested-markdown-count"&gt;Nested: {nested}&lt;/Text&gt;
+      &lt;Button testId="nested-markdown-button" onClick="nested++"&gt;Increment nested&lt;/Button&gt;
+    &lt;/App&gt;
+    ```
+  </Markdown>
+  <Button testId="markdown-button" onClick="count++">Increment count</Button>
+</App>

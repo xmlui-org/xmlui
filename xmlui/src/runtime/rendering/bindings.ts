@@ -120,10 +120,16 @@ export function evaluateProps(
   scope: RuntimeScope,
 ): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(props).map(([key, value]) => [
-      key,
-      evaluateExpressionOrText(value, parsed?.[key], scope, `prop:${key}`),
-    ]),
+    Object.entries(props).map(([key, value]) => {
+      try {
+        return [
+          key,
+          evaluateExpressionOrText(value, parsed?.[key], scope, `prop:${key}`),
+        ];
+      } catch {
+        return [key, value];
+      }
+    }),
   );
 }
 

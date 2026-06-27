@@ -37,7 +37,20 @@ $backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-List--hove
     box-sizing: border-box;
   }
 
+  .row {
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  .borderCollapse + .borderCollapse {
+    margin-top: -1px;
+  }
+
   .listRow.listRowSelectable {
+    cursor: pointer;
+  }
+
+  .selectable {
     cursor: pointer;
   }
 
@@ -46,6 +59,10 @@ $backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-List--hove
   }
 
   .listRow.listRowSelected {
+    background-color: var(--xmlui-backgroundColor-selected-List);
+  }
+
+  .selected {
     background-color: var(--xmlui-backgroundColor-selected-List);
   }
 
@@ -59,13 +76,37 @@ $backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-List--hove
     gap: var(--xmlui-gap-selectionCheckbox-List, var(--xmlui-space-2));
   }
 
+  .hasCheckboxes {
+    display: flex;
+    align-items: center;
+    gap: var(--xmlui-gap-selectionCheckbox-List, var(--xmlui-space-2));
+  }
+
+  .hasOverlayCheckbox {
+    position: relative;
+  }
+
   .listCheckboxWrapper {
     flex: 0 0 auto;
+  }
+
+  .checkboxWrapper {
+    flex: 0 0 auto;
+  }
+
+  .checkboxOverlay {
+    position: absolute;
+    z-index: 1;
   }
 
   .listGroupHeader,
   .listGroupFooter {
     font-weight: 700;
     padding: var(--xmlui-padding-groupHeader-List, var(--xmlui-space-2));
+  }
+
+  .section,
+  .sectionFooter {
+    box-sizing: border-box;
   }
 }

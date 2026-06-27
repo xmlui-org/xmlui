@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { createSlotScope } from "../../runtime/rendering/components";
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { filterMenuSeparators } from "../DropdownMenu/DropdownMenu.renderer";
 import { ContextMenuMd } from "./ContextMenu";
 import { ContextMenuComponent } from "./ContextMenuReact";
 
@@ -21,7 +22,7 @@ export const contextMenuRenderer = wrapComponent({
         registerComponentApi={adapter.registerApi}
       >
         {(context) => adapter.context.renderChildren(
-          adapter.node.children,
+          filterMenuSeparators(adapter.node.children),
           createSlotScope(adapter.scope, { $context: context }),
         )}
       </ContextMenuComponent>

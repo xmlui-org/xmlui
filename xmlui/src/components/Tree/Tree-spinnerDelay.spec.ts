@@ -1,11 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
 
-const TREE_FAMILY_OLD_SUITE_PENDING =
-  "The literal old Tree-family suite is copied for compatibility tracking, but the full Tree/TreeDisplay/TableOfContents migration is not complete yet. Re-enable cases feature-by-feature as hierarchy behavior, dynamic loading, APIs, scrolling, heading indexing, route integration, parts, and behaviors are migrated.";
-
-test.beforeEach(() => {
-  test.skip(true, TREE_FAMILY_OLD_SUITE_PENDING);
-});
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 
 // =============================================================================

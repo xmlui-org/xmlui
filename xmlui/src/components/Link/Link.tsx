@@ -64,6 +64,7 @@ $fontFamily-Link: createThemeVar("fontFamily-Link");
 $fontSize-Link: createThemeVar("fontSize-Link");
 $fontWeight-Link: createThemeVar("fontWeight-Link");
 $fontStyle-Link: createThemeVar("fontStyle-Link");
+$backgroundColor-Link: createThemeVar("backgroundColor-Link");
 $textColor-Link: createThemeVar("textColor-Link");
 $textColor-Link--active: createThemeVar("textColor-Link--active");
 $textColor-Link--hover: createThemeVar("textColor-Link--hover");
@@ -180,6 +181,13 @@ export const LinkMd = createMetadata({
         event: "The mouse event that triggered the click.",
       },
     },
+    contextMenu: {
+      description: "This event is triggered when the link is right-clicked.",
+      signature: "contextMenu(event: MouseEvent): void",
+      parameters: {
+        event: "The mouse event that triggered the context menu.",
+      },
+    },
   },
   themeVars: extractScssThemeVars(linkStylesSource),
   themeVarDescriptions: {
@@ -209,10 +217,10 @@ export const LinkMd = createMetadata({
     [`fontSize-${COMP}`]: "inherit",
     [`fontWeight-${COMP}`]: "inherit",
     [`fontStyle-${COMP}`]: "inherit",
+    [`backgroundColor-${COMP}`]: "transparent",
     [`fontWeight-${COMP}--active`]: "$fontWeight-bold",
     [`gap-icon-${COMP}`]: "$gap-tight",
     [`padding-${COMP}`]: "0",
     [`padding-icon-${COMP}`]: "$space-0_5",
   },
 });
-

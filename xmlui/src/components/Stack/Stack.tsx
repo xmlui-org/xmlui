@@ -142,27 +142,66 @@ export const HStackMd = {
   description: "This component represents a stack rendering its contents horizontally.",
 };
 
+export const CVStackMd = {
+  ...StackMd,
+  specializedFrom: COMP,
+  description:
+    "This component represents a stack rendering its contents vertically and aligning it in the center along both axes.",
+};
+
+export const CHStackMd = {
+  ...StackMd,
+  specializedFrom: COMP,
+  description:
+    "This component represents a stack rendering its contents horizontally and aligning it in the center along both axes.",
+};
+
 export const stackRenderer = createStackRenderer("Stack", StackMd as ComponentMetadata);
 export const hStackRenderer = createStackRenderer("HStack", HStackMd as ComponentMetadata, "horizontal");
 export const vStackRenderer = createStackRenderer("VStack", VStackMd as ComponentMetadata, "vertical");
+export const chStackRenderer = createStackRenderer(
+  "CHStack",
+  CHStackMd as ComponentMetadata,
+  "horizontal",
+  "center",
+  "center",
+);
+export const cvStackRenderer = createStackRenderer(
+  "CVStack",
+  CVStackMd as ComponentMetadata,
+  "vertical",
+  "center",
+  "center",
+);
 
-function createStackRenderer(name: string, metadata: ComponentMetadata, orientation?: string) {
+function createStackRenderer(
+  name: string,
+  metadata: ComponentMetadata,
+  orientation?: string,
+  fixedHorizontalAlignment?: string,
+  fixedVerticalAlignment?: string,
+) {
   return wrapComponent({
     name,
     metadata,
     renderer: ({ adapter }) => {
       const rootAttrs = adapter.rootAttrs();
       const gap = adapter.stringProp("gap");
+      const style = { ...(rootAttrs.style as CSSProperties | undefined) };
+      if (orientation) {
+        delete style.display;
+        delete style.flexDirection;
+      }
       return (
         <Stack
           {...rootAttrs}
           style={{
-            ...(rootAttrs.style as CSSProperties | undefined),
+            ...style,
             ...(gap ? { "--xmlui-gap-Stack": gap } : undefined),
           } as CSSProperties}
           orientation={orientation ?? adapter.stringProp("orientation", defaultProps.orientation)}
-          horizontalAlignment={adapter.stringProp("horizontalAlignment")}
-          verticalAlignment={adapter.stringProp("verticalAlignment")}
+          horizontalAlignment={fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment")}
+          verticalAlignment={fixedVerticalAlignment ?? adapter.stringProp("verticalAlignment")}
           reverse={adapter.booleanProp("reverse", defaultProps.reverse)}
           wrapContent={adapter.booleanProp("wrapContent", false)}
           hoverContainer={adapter.booleanProp("hoverContainer", defaultProps.hoverContainer)}

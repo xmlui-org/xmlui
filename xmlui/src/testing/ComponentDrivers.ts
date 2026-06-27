@@ -16,6 +16,10 @@ export class ComponentDriver {
     return this.component.evaluate((element) => element.tagName.toLowerCase());
   }
 
+  getText(): Promise<string> {
+    return this.component.textContent().then((text) => text ?? "");
+  }
+
   click = async (options?: Parameters<Locator["click"]>[0]) => {
     await this.component.click(options);
   };
@@ -45,7 +49,7 @@ export class InputComponentDriver extends ComponentDriver {
   get field(): Locator {
     return this.component
       .locator(
-        "xpath=self::*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea] | .//*[@data-part-id='input' or @data-xmlui-part='input' or self::input or self::textarea]",
+        "xpath=self::input | self::textarea | self::select | self::*[@contenteditable='true'] | .//input | .//textarea | .//select | .//*[@contenteditable='true']",
       )
       .first();
   }
@@ -65,15 +69,51 @@ export class InputComponentDriver extends ComponentDriver {
 
 export class FormDriver extends ComponentDriver {
   get submitButton(): Locator {
-    return this.component.getByRole("button", { name: "Save" });
+    return this.getByPartName("submitButton").or(
+      this.component.getByRole("button", { name: /^(Save|Submit)$/ }),
+    );
   }
 
   get cancelButton(): Locator {
-    return this.component.getByRole("button", { name: "Cancel" });
+    return this.getByPartName("cancelButton").or(
+      this.component.getByRole("button", { name: /^(Cancel|Abort)$/ }),
+    );
   }
 
-  async submitForm(_mode: "click" | "keypress" = "click") {
+  async submitForm(mode: "click" | "keypress" = "click") {
+    if (mode === "keypress") {
+      await this.component
+        .locator("input, textarea, select, button")
+        .first()
+        .focus({ timeout: 1000 })
+        .catch(() => this.component.focus());
+      await this.params.page.keyboard.press("Enter");
+      return;
+    }
     await this.submitButton.click();
+  }
+
+  waitForSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
+    return this.params.page.waitForResponse(
+      (response) => response.url().includes(endpoint) && response.status() === responseStatus,
+      { timeout },
+    );
+  }
+
+  getValidationSummary(): Locator {
+    return this.params.page.locator("[data-validation-summary]").first();
+  }
+
+  getValidationDisplaysBySeverity(severity: "error" | "warning"): Locator {
+    return this.params.page.locator(`[data-validation-display-severity="${severity}"]`).first();
+  }
+
+  async getSubmitRequest(endpoint: string, method: string, mode: "click" | "keypress" = "click") {
+    const requestPromise = this.params.page.waitForRequest((request) =>
+      request.url().includes(endpoint) && request.method().toLowerCase() === method.toLowerCase()
+    );
+    await this.submitForm(mode);
+    return requestPromise;
   }
 }
 
@@ -83,7 +123,11 @@ export class FormItemDriver extends ComponentDriver {
   }
 
   get textBox(): Locator {
-    return this.input;
+    return this.input
+      .locator(
+        "xpath=self::input | self::textarea | self::select | self::*[@contenteditable='true'] | .//input | .//textarea | .//select | .//*[@contenteditable='true']",
+      )
+      .first();
   }
 
   get checkbox(): Locator {
@@ -96,6 +140,14 @@ export class FormItemDriver extends ComponentDriver {
 
   get error(): Locator {
     return this.getByPartName("error");
+  }
+
+  get validationStatusIndicator(): Locator {
+    return this.getByPartName("validationStatusIndicator");
+  }
+
+  get validationStatusTag(): string {
+    return "data-validation-status";
   }
 }
 
@@ -219,11 +271,36 @@ export class ContextMenuDriver extends ComponentDriver {
   async clickMenuItem(text: string): Promise<void> {
     await this.getMenuItem(text).click();
   }
+
+  async openSubMenu(submenuText: string): Promise<void> {
+    await this.params.page.getByText(submenuText).hover();
+  }
+
+  getMenuSeparators(): Locator {
+    return this.params.page.locator('[data-xmlui-component="MenuSeparator"]:visible');
+  }
+
+  getMenuContent(): Locator {
+    return this.params.page.locator('[data-xmlui-component="ContextMenu"]');
+  }
+
+  async isOpen(): Promise<boolean> {
+    return this.getMenuContent().isVisible();
+  }
+
+  async close(): Promise<void> {
+    await this.params.page.keyboard.press("Escape");
+  }
 }
 
 export class DropdownMenuDriver extends ComponentDriver {
   getTrigger(): Locator {
-    return this.params.page.getByRole("button").first();
+    return this.component
+      .locator("xpath=self::*[@data-xmlui-component='DropdownMenuTrigger']")
+      .or(this.component.locator("xpath=self::button | .//button"))
+      .or(this.params.page.locator('[data-xmlui-component="DropdownMenuTrigger"]').getByRole("button"))
+      .or(this.params.page.getByRole("button"))
+      .first();
   }
 
   async open(): Promise<void> {
@@ -246,8 +323,28 @@ export class DropdownMenuDriver extends ComponentDriver {
     await this.getMenuItem(text).click();
   }
 
+  async openSubMenu(submenuText: string): Promise<void> {
+    await this.params.page.getByText(submenuText).hover();
+  }
+
+  getMenuSeparators(): Locator {
+    return this.params.page.locator('[data-xmlui-component="MenuSeparator"]:visible');
+  }
+
+  getMenuContent(): Locator {
+    return this.params.page.locator('[data-xmlui-component="DropdownMenuContent"]');
+  }
+
   async isOpen(): Promise<boolean> {
-    return this.getMenuItems().first().isVisible();
+    return this.getMenuContent().isVisible();
+  }
+
+  async waitForOpen(): Promise<void> {
+    await this.getMenuContent().waitFor({ state: "visible" });
+  }
+
+  async waitForClose(): Promise<void> {
+    await this.getMenuContent().waitFor({ state: "hidden" });
   }
 }
 
@@ -606,8 +703,19 @@ export class SelectDriver extends ComponentDriver {
 
   async selectOption(value: string): Promise<void> {
     const nativeSelect = this.component.locator("select").first();
-    if (await nativeSelect.count()) {
+    if (await nativeSelect.count() && await nativeSelect.isVisible()) {
       await nativeSelect.selectOption(value);
+      return;
+    }
+    if (!(await this.component.getByRole("option").count())) {
+      await this.toggleOptionsVisibility();
+    }
+    const valueOption = this.component
+      .locator(`[role="option"][data-value="${cssEscape(value)}"]`)
+      .or(this.params.page.locator(`[role="option"][data-value="${cssEscape(value)}"]`))
+      .first();
+    if (await valueOption.count()) {
+      await valueOption.click({ force: true });
       return;
     }
     await this.component
@@ -633,7 +741,7 @@ export class SelectDriver extends ComponentDriver {
   }
 
   async toggleOptionsVisibility(): Promise<void> {
-    await this.component.click();
+    await this.component.getByRole("combobox").or(this.component.locator("button")).first().click({ force: true });
   }
 
   async selectLabel(value: string): Promise<void> {
@@ -669,13 +777,17 @@ export class SelectDriver extends ComponentDriver {
   }
 }
 
+function cssEscape(value: string): string {
+  return value.replace(/["\\]/g, "\\$&");
+}
+
 export class AutoCompleteDriver extends ComponentDriver {
   get input(): Locator {
     return this.component.getByRole("combobox").or(this.component.locator("input")).first();
   }
 
-  click = async (): Promise<void> => {
-    await this.input.click();
+  click = async (options?: Parameters<Locator["click"]>[0]): Promise<void> => {
+    await this.input.click(options);
   };
 
   async selectLabel(value: string): Promise<void> {
@@ -698,6 +810,38 @@ export class ListDriver extends ComponentDriver {
 
   get rowCheckboxes(): Locator {
     return this.component.locator('input[type="checkbox"]');
+  }
+
+  get emptyState(): Locator {
+    return this.component.locator("[class*='noRows']").first();
+  }
+
+  async isEmpty(): Promise<boolean> {
+    return (await this.rows.count()) === 0;
+  }
+
+  async isLoading(): Promise<boolean> {
+    return (await this.component.locator("[class*='loadingWrapper']").count()) > 0;
+  }
+
+  getVisibleItemCount(): Promise<number> {
+    return this.rows.count();
+  }
+
+  async getVisibleItemTexts(): Promise<string[]> {
+    return this.rows.allTextContents();
+  }
+
+  async scrollTo(position: "top" | "bottom" | number): Promise<void> {
+    await this.component.evaluate((element, target) => {
+      if (target === "top") {
+        element.scrollTop = 0;
+      } else if (target === "bottom") {
+        element.scrollTop = element.scrollHeight;
+      } else {
+        element.scrollTop = target;
+      }
+    }, position);
   }
 }
 
@@ -722,6 +866,26 @@ export class TreeDriver extends ComponentDriver {
 
   async selectItem(label: string): Promise<void> {
     await this.component.getByRole("treeitem", { name: new RegExp(label) }).first().click();
+  }
+
+  getNodeWrapperByTestId(testId: string): Locator {
+    return this.component.getByTestId(testId).locator("xpath=ancestor-or-self::*[@role='treeitem'][1]");
+  }
+
+  getNodeWrapperByMarker(testId: string): Locator {
+    return this.getNodeWrapperByTestId(testId);
+  }
+
+  getByTestId(testId: string): Locator {
+    return this.component.getByTestId(testId).first();
+  }
+
+  getIconByName(name: string): Locator {
+    return this.component.locator(`[data-icon="${name}"], [data-xmlui-icon="${name}"], [data-icon-name="${name}"], svg[data-icon="${name}"]`).first();
+  }
+
+  getIconsByName(name: string): Locator {
+    return this.component.locator(`[data-tree-expand-icon][data-icon-name="${name}"]`);
   }
 }
 

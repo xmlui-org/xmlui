@@ -88,9 +88,14 @@ export function flexStyle(
   node: XmluiElement,
   scope: RuntimeScope,
 ): CSSProperties {
-  return useLayoutStyle(node, scope, {
+  const style = useLayoutStyle(node, scope, {
     orientation: direction === "row" ? "horizontal" : direction === "column" ? "vertical" : undefined,
   });
+  if (direction) {
+    style.display = "flex";
+    style.flexDirection = direction;
+  }
+  return style;
 }
 
 export function useThemeOverrideProps(

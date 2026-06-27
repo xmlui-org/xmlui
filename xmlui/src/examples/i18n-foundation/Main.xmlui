@@ -1,0 +1,44 @@
+<App
+  var.name="Ada"
+  var.count="{1}"
+  var.status="ready"
+  var.message=""
+  localeBundles="{{
+    en: {
+      welcome: 'Welcome, {name}!',
+      cart: '{count, plural, one {# item} other {# items}} in cart',
+      status: '{status, select, ready {Ready to ship} delayed {Delayed by weather} other {Status unknown}}',
+      terms: 'Read the <termsLink/> before continuing.',
+      translated: 'Translated by API for {name}'
+    },
+    de: {
+      welcome: 'Willkommen, {name}!',
+      cart: '{count, plural, one {# Artikel} other {# Artikel}} im Warenkorb',
+      status: '{status, select, ready {Versandbereit} delayed {Durch Wetter verzogert} other {Status unbekannt}}',
+      terms: 'Lies die <termsLink/>, bevor du fortfahrst.',
+      translated: 'Per API ubersetzt fur {name}'
+    }
+  }}">
+  <H1>I18n Foundation</H1>
+  <HStack>
+    <Button testId="locale-en" onClick="App.setLocale('en')">English</Button>
+    <Button testId="locale-de" onClick="App.setLocale('de')">Deutsch</Button>
+    <Button testId="five-items" onClick="count = 5">Five items</Button>
+    <Button testId="delayed" onClick="status = 'delayed'">Delayed</Button>
+    <Button testId="api-translate" onClick="message = App.translate('translated', { name: name })">API translate</Button>
+  </HStack>
+  <VStack>
+    <Text testId="welcome"><I18n key="welcome" name="{name}" /></Text>
+    <Text testId="cart"><I18n key="cart" count="{count}" /></Text>
+    <Text testId="status"><I18n key="status" status="{status}" /></Text>
+    <Text testId="terms">
+      <I18n key="terms">
+        <property name="termsLink">
+          <Link to="/terms">terms of service</Link>
+        </property>
+      </I18n>
+    </Text>
+    <Text testId="fallback"><I18n key="missing.key" /></Text>
+    <Text testId="api-message" value="{message}" />
+  </VStack>
+</App>

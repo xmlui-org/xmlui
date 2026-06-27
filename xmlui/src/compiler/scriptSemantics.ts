@@ -39,13 +39,14 @@ export type BoundDependency = {
 };
 
 export type BoundWriteTarget = {
-  kind: "local" | "global" | "handlerLocal" | "member" | "unresolved" | "invalid";
+  kind: "local" | "global" | "handlerLocal" | "member" | "index" | "unresolved" | "invalid";
   name: string;
   path: string[];
   operator: "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=";
   span: SourceSpan;
   binding?: XmluiBinding;
   object?: XmluiScriptIr;
+  index?: XmluiScriptIr;
 };
 
 export type BoundScriptResult = {
@@ -134,7 +135,7 @@ export type XmluiBinaryExpressionIr = XmluiScriptIrBase & {
 
 export type XmluiUnaryExpressionIr = XmluiScriptIrBase & {
   kind: "UnaryExpression";
-  operator: "!" | "+" | "-";
+  operator: "!" | "+" | "-" | "delete" | "typeof";
   argument: XmluiScriptIr;
 };
 
@@ -152,11 +153,18 @@ export type XmluiArrayExpressionIr = XmluiScriptIrBase & {
 
 export type XmluiObjectExpressionIr = XmluiScriptIrBase & {
   kind: "ObjectExpression";
-  properties: Array<{
-    key: string;
-    value: XmluiScriptIr;
-    shorthand?: boolean;
-  }>;
+  properties: Array<
+    | {
+        kind: "property";
+        key: string;
+        value: XmluiScriptIr;
+        shorthand?: boolean;
+      }
+    | {
+        kind: "spread";
+        argument: XmluiScriptIr;
+      }
+  >;
 };
 
 export type XmluiCallExpressionIr = XmluiScriptIrBase & {
@@ -430,6 +438,13 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
   if (scope.specials.has(name)) {
     return scope.specials.get(name);
   }
+  if (isBuiltInReferenceName(name)) {
+    return {
+      kind: "reference",
+      name,
+      mutable: false,
+    };
+  }
   if (name === "$self") {
     return {
       kind: "reference",
@@ -525,6 +540,9 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         } else if (current.value.kind === "Identifier") {
           bindIdentifierRead(current.value.name, current.value.span);
         }
+        return;
+      case "ObjectSpreadProperty":
+        visit(current.argument);
         return;
       case "ConditionalExpression":
         visit(current.test);
@@ -1001,6 +1019,18 @@ function bindWriteTarget(
     };
   }
 
+  if (target.kind === "IndexExpression") {
+    return {
+      kind: "index",
+      name: "[]",
+      path: [],
+      operator: operator as BoundWriteTarget["operator"],
+      span: target.span,
+      object: lowerWriteTargetObject(target.object, scope, findLexicalBinding, result),
+      index: lowerNode(target.index, result),
+    };
+  }
+
   result.diagnostics.push(
     createErrorDiagnostic("XS203", "Invalid XMLUI script write target.", target.span),
   );
@@ -1087,11 +1117,19 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       return {
         kind: "ObjectExpression",
         span: node.span,
-        properties: node.properties.map((property) => ({
-          key: objectKeyName(property.key),
-          value: lowerNode(property.value, bound),
-          ...(property.shorthand ? { shorthand: true } : {}),
-        })),
+        properties: node.properties.map((property) =>
+          property.kind === "ObjectSpreadProperty"
+            ? {
+                kind: "spread",
+                argument: lowerNode(property.argument, bound),
+              }
+            : {
+                kind: "property",
+                key: objectKeyName(property.key),
+                value: lowerNode(property.value, bound),
+                ...(property.shorthand ? { shorthand: true } : {}),
+              }
+        ),
       };
     case "ConditionalExpression":
       return {
@@ -1122,7 +1160,13 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       }
       return unsupported(node);
     case "UnaryExpression":
-      if (node.operator === "!" || node.operator === "+" || node.operator === "-") {
+      if (
+        node.operator === "!" ||
+        node.operator === "+" ||
+        node.operator === "-" ||
+        node.operator === "delete" ||
+        node.operator === "typeof"
+      ) {
         return {
           kind: "UnaryExpression",
           span: node.span,
@@ -1284,7 +1328,7 @@ function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
       return expression.elements.some(expressionContainsSyncUnsafeCall);
     case "ObjectExpression":
       return expression.properties.some((property) =>
-        expressionContainsSyncUnsafeCall(property.value)
+        expressionContainsSyncUnsafeCall(property.kind === "spread" ? property.argument : property.value)
       );
     case "ArrowFunctionExpression":
       return expressionContainsSyncUnsafeCall(expression.body);
@@ -1460,8 +1504,20 @@ function isAllowedCall(callee: ScriptNode, scope?: XmluiScope): boolean {
   if (callee.kind === "Identifier" && callee.name === "navigate") {
     return true;
   }
+  if (callee.kind === "Identifier" && isAllowedBuiltInCallName(callee.name)) {
+    return true;
+  }
   if (callee.kind === "Identifier" && scope?.specials.has(callee.name)) {
     return true;
+  }
+  if (callee.kind === "Identifier" && scope && resolveXmluiIdentifier(scope, callee.name)?.kind === "context") {
+    return true;
+  }
+  if (callee.kind === "Identifier" && scope) {
+    const binding = resolveXmluiIdentifier(scope, callee.name);
+    if (binding?.kind === "local" || binding?.kind === "global") {
+      return true;
+    }
   }
   if (callee.kind === "MemberExpression") {
     return true;
@@ -1482,6 +1538,7 @@ function isAllowedMethodName(name: string): boolean {
     "map",
     "filter",
     "find",
+    "from",
     "some",
     "every",
     "includes",
@@ -1490,19 +1547,56 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "stringify",
+    "now",
+    "log",
+    "callApi",
     "getFields",
+    "getData",
     "getValue",
     "hasOverflow",
     "open",
     "close",
     "isOpen",
+    "setLocale",
+    "translate",
     "openAt",
     "setValue",
     "scrollToTop",
     "scrollToBottom",
     "scrollToStart",
     "scrollToEnd",
+    "getVisibleItems",
+    "getExpandedNodes",
+    "getSelectedNode",
+    "getNodeById",
+    "scrollIntoView",
+    "appendNode",
+    "removeNode",
+    "removeChildren",
+    "insertNodeBefore",
+    "insertNodeAfter",
+    "refreshData",
+    "getDynamic",
+    "getNodeLoadingState",
+    "getExpandedTimestamp",
+    "getAutoLoadAfter",
+    "getNodeAutoLoadAfter",
   ].includes(name);
+}
+
+function isAllowedBuiltInCallName(name: string): boolean {
+  return name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
+}
+
+function isBuiltInReferenceName(name: string): boolean {
+  return name === "App" ||
+    name === "Array" ||
+    name === "Date" ||
+    name === "getDate" ||
+    name === "confirm" ||
+    name === "Symbol" ||
+    name === "BigInt";
 }
 
 function resolveParentLocal(scope: XmluiScope, name: string): XmluiBinding | undefined {
@@ -1696,13 +1790,23 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "BinaryExpression":
       return `(${emitExpression(ir.left)} ${ir.operator} ${emitExpression(ir.right)})`;
     case "UnaryExpression":
+      if (ir.operator === "delete") {
+        return emitDeleteExpression(ir.argument);
+      }
+      if (ir.operator === "typeof") {
+        return `(typeof ${emitExpression(ir.argument)})`;
+      }
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
     case "ArrayExpression":
       return `[${ir.elements.map(emitExpression).join(", ")}]`;
     case "ObjectExpression":
-      return `{${ir.properties.map((property) => `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`).join(", ")}}`;
+      return `{${ir.properties.map((property) =>
+        property.kind === "spread"
+          ? `...${emitExpression(property.argument)}`
+          : `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`
+      ).join(", ")}}`;
     case "CallExpression":
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
@@ -1720,6 +1824,16 @@ function emitExpression(ir: XmluiScriptIr): string {
   }
 }
 
+function emitDeleteExpression(argument: XmluiScriptIr): string {
+  if (argument.kind === "MemberRead") {
+    return `(delete (${emitExpression(argument.object)})[${JSON.stringify(argument.member)}])`;
+  }
+  if (argument.kind === "IndexRead") {
+    return `(delete (${emitExpression(argument.object)})[${emitExpression(argument.index)}])`;
+  }
+  return `(delete (${emitExpression(argument)}))`;
+}
+
 function emitOptionalMemberRead(object: XmluiScriptIr, member: string): string {
   const objectSource = emitExpression(object);
   return `(${objectSource} == null ? undefined : ${objectSource}[${JSON.stringify(member)}])`;
@@ -1731,10 +1845,22 @@ function emitOptionalIndexRead(object: XmluiScriptIr, index: XmluiScriptIr): str
 }
 
 function emitCallExpression(ir: XmluiCallExpressionIr): string {
+  const args = ir.args.map(emitExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+  }
+  if (
+    ir.callee.kind === "IdentifierRead" &&
+    (ir.callee.dependency?.kind === "local" || ir.callee.dependency?.kind === "global")
+  ) {
+    return `((__xmluiLocalFn) => typeof __xmluiLocalFn === "function" ? __xmluiLocalFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+  }
   if (ir.callee.kind !== "MemberRead" && ir.callee.kind !== "ScopedMemberRead") {
     throw new Error("Cannot compile unsupported XMLUI expression call target.");
   }
-  const args = ir.args.map(emitExpression).join(", ");
   if (ir.callee.kind === "ScopedMemberRead") {
     throw new Error("Cannot compile unsupported XMLUI expression call target.");
   }
@@ -1821,6 +1947,9 @@ function emitAsyncCallExpression(ir: XmluiCallExpressionIr): string {
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
     const [target, queryParams] = args;
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `await (async (__xmluiContextFn) => typeof __xmluiContextFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiContextFn(${args.join(", ")}))) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
   }
   if (ir.callee.kind === "IdentifierRead") {
     return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args.join(", ")}])))`;
@@ -1925,6 +2054,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "member" && target.object) {
     return emitOptionalMemberRead(target.object, target.name);
   }
+  if (target.kind === "index" && target.object && target.index) {
+    return emitOptionalIndexRead(target.object, target.index);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
@@ -1935,6 +2067,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
   if (target.kind === "member" && target.object) {
     return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
+  if (target.kind === "index" && target.object && target.index) {
+    return `((${emitExpression(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
   }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
@@ -1998,7 +2133,13 @@ function executeExpressionIr(
     case "BinaryExpression":
       return executeBinaryExpression(ir, context, lexical);
     case "UnaryExpression": {
+      if (ir.operator === "delete") {
+        return executeDeleteExpression(ir.argument, context, lexical);
+      }
       const argument = executeExpressionIr(ir.argument, context, lexical);
+      if (ir.operator === "typeof") {
+        return typeof argument;
+      }
       if (ir.operator === "!") {
         return !argument;
       }
@@ -2014,12 +2155,13 @@ function executeExpressionIr(
     case "ArrayExpression":
       return ir.elements.map((element) => executeExpressionIr(element, context, lexical));
     case "ObjectExpression":
-      return Object.fromEntries(
-        ir.properties.map((property) => [
-          property.key,
-          executeExpressionIr(property.value, context, lexical),
-        ]),
-      );
+      return ir.properties.reduce<Record<string, unknown>>((result, property) => {
+        if (property.kind === "spread") {
+          return Object.assign(result, executeExpressionIr(property.argument, context, lexical));
+        }
+        result[property.key] = executeExpressionIr(property.value, context, lexical);
+        return result;
+      }, {});
     case "ArrowFunctionExpression":
       return (...args: unknown[]) => {
         const nextLexical = { ...lexical };
@@ -2083,6 +2225,30 @@ function executeCallExpression(
   context: CompiledExpressionContext,
   lexical: Record<string, unknown>,
 ): unknown {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    const target = context.readContext?.(ir.callee.name);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    return target(...ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
+  }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    const target = context.readReference?.(ir.callee.name);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    return target(...ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
+  }
+  if (
+    ir.callee.kind === "IdentifierRead" &&
+    (ir.callee.dependency?.kind === "local" || ir.callee.dependency?.kind === "global")
+  ) {
+    const target = executeRead(ir.callee.dependency, ir.callee.name, context, lexical);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    return target(...ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
+  }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot execute unsupported XMLUI expression call target.");
   }
@@ -2122,7 +2288,13 @@ async function executeExpressionIrAsync(
     case "BinaryExpression":
       return executeBinaryExpressionAsync(ir, context, lexical);
     case "UnaryExpression": {
+      if (ir.operator === "delete") {
+        return executeDeleteExpressionAsync(ir.argument, context, lexical);
+      }
       const argument = await executeExpressionIrAsync(ir.argument, context, lexical);
+      if (ir.operator === "typeof") {
+        return typeof argument;
+      }
       if (ir.operator === "!") {
         return !argument;
       }
@@ -2138,13 +2310,15 @@ async function executeExpressionIrAsync(
     case "ArrayExpression":
       return Promise.all(ir.elements.map((element) => executeExpressionIrAsync(element, context, lexical)));
     case "ObjectExpression": {
-      const entries = await Promise.all(
-        ir.properties.map(async (property) => [
-          property.key,
-          await executeExpressionIrAsync(property.value, context, lexical),
-        ] as const),
-      );
-      return Object.fromEntries(entries);
+      const result: Record<string, unknown> = {};
+      for (const property of ir.properties) {
+        if (property.kind === "spread") {
+          Object.assign(result, await executeExpressionIrAsync(property.argument, context, lexical));
+        } else {
+          result[property.key] = await executeExpressionIrAsync(property.value, context, lexical);
+        }
+      }
+      return result;
     }
     case "CallExpression":
       return executeCallExpressionAsync(ir, context, lexical);
@@ -2249,6 +2423,14 @@ async function executeCallExpressionAsync(
     const [target, queryParams] = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
     context.navigate?.(target, queryParams as Record<string, unknown> | undefined);
     return undefined;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    const target = context.readContext?.(ir.callee.name);
+    if (typeof target !== "function") {
+      return undefined;
+    }
+    const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    return (context.complete ?? completeValue)(await target(...args));
   }
   if (ir.callee.kind === "IdentifierRead") {
     const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
@@ -2410,6 +2592,40 @@ async function executeEventExpression(
   }
 }
 
+function executeDeleteExpression(
+  argument: XmluiScriptIr,
+  context: CompiledExpressionContext,
+  lexical: Record<string, unknown>,
+): boolean {
+  if (argument.kind === "MemberRead") {
+    const object = executeExpressionIr(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    return delete object[argument.member];
+  }
+  if (argument.kind === "IndexRead") {
+    const object = executeExpressionIr(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    const index = executeExpressionIr(argument.index, context, lexical) as PropertyKey;
+    return delete object[index];
+  }
+  return true;
+}
+
+async function executeDeleteExpressionAsync(
+  argument: XmluiScriptIr,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): Promise<boolean> {
+  if (argument.kind === "MemberRead") {
+    const object = await executeExpressionIrAsync(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    return delete object[argument.member];
+  }
+  if (argument.kind === "IndexRead") {
+    const object = await executeExpressionIrAsync(argument.object, context, lexical) as Record<PropertyKey, unknown>;
+    const index = await executeExpressionIrAsync(argument.index, context, lexical) as PropertyKey;
+    return delete object[index];
+  }
+  return true;
+}
+
 async function executeAssignmentExpression(
   expression: XmluiAssignmentExpressionIr,
   context: CompiledEventContext,
@@ -2447,6 +2663,11 @@ function executeTargetRead(
     const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
     return object == null ? undefined : object[target.name];
   }
+  if (target.kind === "index" && target.object && target.index) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
+    const index = executeExpressionIr(target.index, context, lexical) as PropertyKey;
+    return object == null ? undefined : object[index];
+  }
   if (target.kind === "local") {
     return context.readLocal(target.name);
   }
@@ -2472,6 +2693,15 @@ function executeTargetWrite(
       throw new Error(`Cannot write XMLUI script member '${target.name}' on null or undefined.`);
     }
     object[target.name] = value;
+    return;
+  }
+  if (target.kind === "index" && target.object && target.index) {
+    const object = executeExpressionIr(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
+    const index = executeExpressionIr(target.index, context, lexical) as PropertyKey;
+    if (object == null) {
+      throw new Error("Cannot write XMLUI script index on null or undefined.");
+    }
+    object[index] = value;
     return;
   }
   if (target.kind === "local") {
@@ -2595,7 +2825,9 @@ function isEventMutationExpression(ir: XmluiScriptIr): boolean {
     case "ArrayExpression":
       return ir.elements.some(isEventMutationExpression);
     case "ObjectExpression":
-      return ir.properties.some((property) => isEventMutationExpression(property.value));
+      return ir.properties.some((property) =>
+        isEventMutationExpression(property.kind === "spread" ? property.argument : property.value)
+      );
     case "CallExpression":
       return ir.args.some(isEventMutationExpression);
     case "MemberRead":

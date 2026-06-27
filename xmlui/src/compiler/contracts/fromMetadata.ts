@@ -41,6 +41,10 @@ export function contractFromMetadata(
     templates: Object.keys(templates).length > 0 ? templates : undefined,
     contextVariables: entriesFromMetadata(metadata.contextVars),
     apis: entriesFromMetadata(metadata.apis),
+    parts: entriesFromMetadata(metadata.parts),
+    themeVars: entriesFromMetadata(metadata.themeVars),
+    defaultThemeVars: metadata.defaultThemeVars,
+    toneSpecificThemeVars: metadata.toneSpecificThemeVars,
   };
 }
 

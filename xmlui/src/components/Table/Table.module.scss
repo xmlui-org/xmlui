@@ -9,33 +9,57 @@
 
 .table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   font: inherit;
+  table-layout: fixed;
 }
 
 .headerCell {
+  position: relative;
+  box-sizing: border-box;
   height: var(--xmlui-headerHeight-Table);
   padding: var(--xmlui-padding-TableCell);
   color: var(--xmlui-textColor-header-Table);
-  background: var(--xmlui-backgroundColor-header-Table);
+  background: var(--xmlui-backgroundColor-heading-Table, var(--xmlui-backgroundColor-header-Table));
   border-bottom: var(--xmlui-borderBottom-header-Table);
   font-weight: 600;
   text-align: left;
-  user-select: var(--xmlui-userSelectHeading-Table);
+  user-select: var(--xmlui-userSelect-heading-Table, var(--xmlui-userSelectHeading-Table));
 }
 
 .sortableHeader {
   cursor: pointer;
 }
 
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.orderIndicator {
+  visibility: hidden;
+}
+
+.sortButton:hover .orderIndicator,
+.orderIndicatorVisible {
+  visibility: visible;
+}
+
 .row {
   height: var(--xmlui-rowHeight-Table);
   background: var(--xmlui-backgroundColor-row-Table);
-  user-select: var(--xmlui-userSelectRow-Table);
-}
-
-.row:nth-child(even) {
-  background: var(--xmlui-backgroundColor-row-Table--even);
+  user-select: var(--xmlui-userSelect-row-Table, var(--xmlui-userSelectRow-Table));
+  border-bottom: var(--xmlui-borderBottom-row-Table, 1px solid var(--xmlui-color-border, currentColor)) !important;
 }
 
 .row:hover {
@@ -46,20 +70,102 @@
   background: var(--xmlui-backgroundColor-selected-Table);
 }
 
+.evenRow {
+  background: var(--xmlui-backgroundColor-evenRow-Table, var(--xmlui-backgroundColor-row-Table--even));
+}
+
+.oddRow {
+  background: var(--xmlui-backgroundColor-oddRow-Table, var(--xmlui-backgroundColor-row-Table));
+}
+
+.disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 .cell {
+  box-sizing: border-box;
   padding: var(--xmlui-padding-TableCell);
-  border-bottom: var(--xmlui-borderBottom-row-Table);
+  border-bottom: 0;
   vertical-align: middle;
-  user-select: var(--xmlui-userSelectCell-Table);
+  user-select: var(--xmlui-userSelect-cell-Table, var(--xmlui-userSelectCell-Table));
+  overflow: hidden;
+}
+
+.cellContent {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cellContent > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cellContent :global(a),
+.cellContent :global([data-xmlui-component="Link"]) {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
 }
 
 .selectionCell {
-  width: 1%;
+  width: 42px;
+  min-width: 42px;
   white-space: nowrap;
+  font-size: var(--xmlui-fontSize-checkbox-Table);
+}
+
+.selectionCell input {
+  font-size: inherit;
+}
+
+.showSelectionCheckbox {
+  visibility: visible;
 }
 
 .empty {
   padding: var(--xmlui-padding-TableCell);
   color: var(--xmlui-textColor-empty-Table);
   text-align: center;
+}
+
+.alignTop {
+  vertical-align: top;
+}
+
+.alignCenter {
+  vertical-align: middle;
+}
+
+.alignBottom {
+  vertical-align: bottom;
+}
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.virtualSpacer {
+  pointer-events: none;
+}
+
+.virtualSpacer td {
+  padding: 0;
+  border: 0;
 }

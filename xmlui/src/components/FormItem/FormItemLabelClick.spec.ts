@@ -1,7 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
 
-test.skip(true, "Copied from the original XMLUI FormItem label-click suite; child control id forwarding and full binding compatibility is tracked for later Form waves.");
-
 // Regression: clicking a FormItem's label must focus the actual input element.
 //
 // Previously (see https://... label-click bug) the label's `htmlFor` attribute
@@ -13,6 +11,36 @@ test.skip(true, "Copied from the original XMLUI FormItem label-click suite; chil
 // wired to a focusable DOM element and clicking it focuses (or toggles) that
 // element — no matter whether the input is declared as a `<FormItem type="...">`
 // shorthand or as a nested child template `<FormItem><TextBox/></FormItem>`.
+
+const FORM_ITEM_LABEL_CLICK_PENDING =
+  "Copied-old FormItem label-click coverage remains useful, but child-template id forwarding and several shorthand/direct wrapper cases still need compatibility work. Re-enable cases feature-by-feature.";
+
+const ACTIVE_FORM_ITEM_LABEL_CLICK_TESTS = new Set([
+  "type=checkbox label click toggles the checkbox",
+  "type=text (built-in, no child template) still works",
+  "type=password focuses the password input",
+  "type=textarea focuses the textarea",
+  "type=datePicker focuses the input on label click",
+  "type=slider wires label to the slider thumb",
+  "type=colorpicker focuses the color input on label click",
+  "TextBox bindTo + label",
+  "Select bindTo + label opens dropdown",
+  "NumberBox bindTo + label",
+  "TextArea bindTo + label",
+  "Checkbox bindTo + label toggles the checkbox",
+  "Switch bindTo + label toggles the switch",
+  "TextBox type=password bindTo + label focuses the password input",
+  "NumberBox integersOnly bindTo + label focuses the input",
+  "RadioGroup bindTo + label legend click focuses the first radio option",
+  "AutoComplete bindTo + label focuses the autocomplete input",
+  "ColorPicker bindTo + label focuses the color input",
+]);
+
+test.beforeEach(({}, testInfo) => {
+  if (!ACTIVE_FORM_ITEM_LABEL_CLICK_TESTS.has(testInfo.title)) {
+    test.skip(true, FORM_ITEM_LABEL_CLICK_PENDING);
+  }
+});
 
 test.describe("FormItem label click focuses the input", () => {
   test("child-template TextBox", async ({ initTestBed, page }) => {

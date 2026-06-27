@@ -50,7 +50,13 @@ import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
 import { spinnerRenderer } from "../components/Spinner/Spinner.renderer";
 import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
-import { hStackRenderer, stackRenderer, vStackRenderer } from "../components/Stack/Stack";
+import {
+  chStackRenderer,
+  cvStackRenderer,
+  hStackRenderer,
+  stackRenderer,
+  vStackRenderer,
+} from "../components/Stack/Stack";
 import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox.renderer";
 import { textAreaRenderer } from "../components/TextArea/TextArea.renderer";
@@ -117,11 +123,18 @@ import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
 import { themeRenderer } from "../components/Theme/Theme.renderer";
 import { slotRenderer } from "../components/Slot/Slot.renderer";
+import { partRenderer } from "../components/Part/Part";
 import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
 import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
 import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
 import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
+import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
+import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
+import { inspectorRenderer } from "../components/Inspector/Inspector";
+import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
+import { i18nRenderer } from "../components/I18n/I18n";
+import { retryPolicyRenderer } from "../components/RetryPolicy/RetryPolicy";
 import { htmlTagComponentNames } from "./htmlTags";
 import type {
   XmluiComponentTransferModule,
@@ -141,6 +154,12 @@ const implementedRuntimeNames = [
   "Fragment",
   "Image",
   "IFrame",
+  "IncludeMarkup",
+  "Inspector",
+  "InspectButton",
+  "I18n",
+  "Markdown",
+  "RetryPolicy",
   "Icon",
   "Link",
   "List",
@@ -184,6 +203,7 @@ const implementedRuntimeNames = [
   "br",
   "Theme",
   "Slot",
+  "Part",
   "SpaceFiller",
   "Items",
   "TextBox",
@@ -303,6 +323,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Stack: stackRenderer,
   HStack: hStackRenderer,
   VStack: vStackRenderer,
+  CHStack: chStackRenderer,
+  CVStack: cvStackRenderer,
   FlowLayout: flowLayoutRenderer,
   Text: textRenderer,
   TextBox: textBoxRenderer,
@@ -369,12 +391,19 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Toast: toastRenderer,
   Theme: themeRenderer,
   Slot: slotRenderer,
+  Part: partRenderer,
   ToneSwitch: toneSwitchRenderer,
   ToneChangerButton: toneChangerButtonRenderer,
   Pages: pagesRenderer,
   Page: pageRenderer,
   Redirect: redirectRenderer,
   NestedApp: nestedAppRenderer,
+  IncludeMarkup: includeMarkupRenderer,
+  Markdown: markdownRenderer,
+  Inspector: inspectorRenderer,
+  InspectButton: inspectButtonRenderer,
+  I18n: i18nRenderer,
+  RetryPolicy: retryPolicyRenderer,
   ...htmlTagRenderers,
 };
 
@@ -392,6 +421,8 @@ const componentFolderNames: Record<string, string> = {
   H6: "Heading",
   HStack: "Stack",
   VStack: "Stack",
+  CHStack: "Stack",
+  CVStack: "Stack",
   PasswordInput: "TextBox",
   HSplitter: "Splitter",
   VSplitter: "Splitter",
@@ -503,11 +534,18 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     const toastTransferred = contract.name === "Toast";
     const themeTransferred = contract.name === "Theme";
     const slotTransferred = contract.name === "Slot";
+    const partTransferred = contract.name === "Part";
     const toneSwitchTransferred = contract.name === "ToneSwitch";
     const toneChangerButtonTransferred = contract.name === "ToneChangerButton";
     const pagesTransferred = contract.name === "Pages" || contract.name === "Page";
     const redirectTransferred = contract.name === "Redirect";
     const nestedAppTransferred = contract.name === "NestedApp";
+    const includeMarkupTransferred = contract.name === "IncludeMarkup";
+    const markdownTransferred = contract.name === "Markdown";
+    const inspectorTransferred = contract.name === "Inspector";
+    const inspectButtonTransferred = contract.name === "InspectButton";
+    const i18nTransferred = contract.name === "I18n";
+    const retryPolicyTransferred = contract.name === "RetryPolicy";
     const transferredFolder =
       accordionTransferred ||
       appTransferred ||
@@ -599,11 +637,18 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
       toastTransferred ||
       themeTransferred ||
       slotTransferred ||
+      partTransferred ||
       toneSwitchTransferred ||
       toneChangerButtonTransferred ||
       pagesTransferred ||
       redirectTransferred ||
-      nestedAppTransferred;
+      nestedAppTransferred ||
+      includeMarkupTransferred ||
+      markdownTransferred ||
+      inspectorTransferred ||
+      inspectButtonTransferred ||
+      i18nTransferred ||
+      retryPolicyTransferred;
     const sharedComponentFile = accordionTransferred
       ? "Accordion"
       : appHeaderTransferred

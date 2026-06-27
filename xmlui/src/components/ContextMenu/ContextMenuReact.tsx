@@ -1,7 +1,7 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useState } from "react";
+import type { CSSProperties, HTMLAttributes, MutableRefObject, ReactNode } from "react";
+import { Children, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 
-import { MenuContext } from "../DropdownMenu/DropdownMenuReact";
+import { focusMenuItem, MenuContext } from "../DropdownMenu/DropdownMenuReact";
 import styles from "./ContextMenu.module.scss";
 
 export type ContextMenuApi = {
@@ -29,6 +29,7 @@ export const ContextMenuComponent = forwardRef<HTMLDivElement, ContextMenuProps>
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [context, setContext] = useState<unknown>(undefined);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -54,6 +55,11 @@ export const ContextMenuComponent = forwardRef<HTMLDivElement, ContextMenuProps>
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         close();
+        return;
+      }
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        focusMenuItem(contentRef.current, event.key === "ArrowDown" ? 1 : -1);
       }
     };
     window.addEventListener("pointerdown", onPointerDown);
@@ -68,14 +74,26 @@ export const ContextMenuComponent = forwardRef<HTMLDivElement, ContextMenuProps>
     return null;
   }
 
+  const renderedChildren = children?.(context);
+  if (Children.count(renderedChildren) === 0) {
+    return null;
+  }
+
   return (
     <MenuContext.Provider value={{ closeMenu: close }}>
       <div
         {...rest}
-        className={[styles.content, className].filter(Boolean).join(" ")}
+        className={[styles.content, "ContextMenuContent", className].filter(Boolean).join(" ")}
         data-xmlui-component="ContextMenu"
         data-xmlui-part="content"
-        ref={ref}
+        ref={(node) => {
+          contentRef.current = node;
+          if (typeof ref === "function") {
+            ref(node);
+          } else if (ref) {
+            (ref as MutableRefObject<HTMLDivElement | null>).current = node;
+          }
+        }}
         role="menu"
         style={{
           ...(style as CSSProperties),
@@ -85,7 +103,7 @@ export const ContextMenuComponent = forwardRef<HTMLDivElement, ContextMenuProps>
         }}
         onPointerDown={(event) => event.stopPropagation()}
       >
-        {children?.(context)}
+        {renderedChildren}
       </div>
     </MenuContext.Provider>
   );

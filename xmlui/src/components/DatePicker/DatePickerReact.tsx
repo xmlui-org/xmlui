@@ -4,6 +4,7 @@ import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo,
 import { dateFormats, type DateFormat } from "./DatePicker.constants";
 import { defaultProps } from "./DatePicker.defaults";
 import styles from "./DatePicker.module.scss";
+import { useFormContext } from "../Form/FormContext";
 type Mode = "single" | "range";
 type ValidationStatus = "none" | "error" | "warning" | "valid";
 type DateParts = { year: number; month: number; day: number };
@@ -19,6 +20,7 @@ export type DatePickerApi = {
 
 export type DatePickerProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   mode?: Mode | string;
@@ -75,6 +77,7 @@ const dayMs = 86_400_000;
 export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(function DatePickerNative(
   {
     id,
+    bindTo,
     value,
     initialValue,
     mode: rawMode = defaultProps.mode,
@@ -121,12 +124,23 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
   },
   ref,
 ) {
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const registerFormItem = form?.registerItem;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
+  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
+  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
+  const effectiveValidationStatus = formError ? "error" : validationStatus;
+  const effectiveValue = formValue ?? value;
   const mode = normalizeMode(rawMode);
   const normalizedFormat = normalizeDateFormat(dateFormat);
-  const controlled = value !== undefined;
+  const controlled = effectiveValue !== undefined;
   const initialValues = useMemo(
-    () => toDateParts(controlled ? value : initialValue, mode, normalizedFormat),
-    [controlled, initialValue, mode, normalizedFormat, value],
+    () => toDateParts(controlled ? effectiveValue : initialValue, mode, normalizedFormat),
+    [controlled, effectiveValue, initialValue, mode, normalizedFormat],
   );
   const [selected, setSelected] = useState<DateParts[]>(initialValues);
   const [draftRange, setDraftRange] = useState<DateParts[]>([]);
@@ -139,13 +153,13 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
 
   useEffect(() => {
     if (controlled) {
-      const next = toDateParts(value, mode, normalizedFormat);
+      const next = toDateParts(effectiveValue, mode, normalizedFormat);
       setSelected(next);
       if (next[0]) {
         setVisibleMonth(monthStart(next[0]));
       }
     }
-  }, [controlled, mode, normalizedFormat, value]);
+  }, [controlled, effectiveValue, mode, normalizedFormat]);
 
   useEffect(() => {
     if (!controlled) {
@@ -162,6 +176,30 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
       return () => clearTimeout(timeoutId);
     }
   }, [autoFocus, enabled]);
+
+  useEffect(() => {
+    if (
+      !getFormValue ||
+      !setFormValue ||
+      fieldName === undefined ||
+      getFormValue(fieldName) != null ||
+      initialValue === undefined
+    ) {
+      return;
+    }
+    setFormValue(fieldName, toPayload(toDateParts(initialValue, mode, normalizedFormat), mode, normalizedFormat));
+  }, [fieldName, getFormValue, initialValue, mode, normalizedFormat, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      label: stringifyLabel(label),
+      required,
+    });
+  }, [fieldName, label, registerFormItem, required]);
 
   const currentValue = useMemo(
     () => toPayload(selected, mode, normalizedFormat),
@@ -194,11 +232,14 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
     setDraftRange([]);
     setSelected(nextSelected);
     const nextPayload = toPayload(nextSelected, mode, normalizedFormat);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, nextPayload);
+    }
     void onDidChange?.(nextPayload);
     if (!inline && !keepOpen) {
       setIsOpen(false);
     }
-  }, [inline, mode, normalizedFormat, onDidChange]);
+  }, [fieldName, inline, mode, normalizedFormat, onDidChange, setFormValue]);
 
   const setValue = useCallback((nextValue: unknown) => {
     const nextSelected = toDateParts(nextValue, mode, normalizedFormat);
@@ -306,10 +347,11 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
       ref={rootRef}
       data-xmlui-component="DatePicker"
       data-mode={mode}
-      data-validation-status={validationStatus}
+      data-validation-status={effectiveValidationStatus}
       data-inline={inline ? "" : undefined}
       data-disabled={!enabled ? "" : undefined}
       data-open={isOpen ? "" : undefined}
+      data-state={isOpen ? "open" : undefined}
       data-testid={dataTestId}
       className={cx(styles.datePickerRoot, widthClass(width), className)}
       style={rootStyle}
@@ -323,7 +365,7 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
       ) : null}
 
       {!inline ? (
-        <div className={styles.datePickerControl} data-part-id="input" data-xmlui-part="input">
+        <div className={styles.datePickerControl} data-part="control" data-part-id="input" data-xmlui-part="input">
           <Adornment text={startText} icon={startIcon} />
           <input
             ref={firstInputRef}
@@ -363,13 +405,13 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
             </>
           ) : null}
           <div className={styles.datePickerTrailing}>
-            {!verboseValidationFeedback && validationStatus !== "none" ? (
+            {!effectiveVerboseValidationFeedback && effectiveValidationStatus !== "none" ? (
               <span
                 data-part-id="conciseValidationFeedback"
                 data-xmlui-part="conciseValidationFeedback"
-                title={invalidMessages?.join("\n")}
+                title={effectiveInvalidMessages?.join("\n")}
               >
-                {validationStatus === "valid" ? validationIconSuccess : validationIconError}
+                {effectiveValidationStatus === "valid" ? validationIconSuccess : validationIconError}
               </span>
             ) : null}
             {clearable ? (
@@ -392,7 +434,7 @@ export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(
 
       {(inline || isOpen) ? (
         <div className={styles.datePickerPositioner}>
-          <div className={styles.datePickerContent} data-part-id="calendar" data-xmlui-part="calendar">
+          <div className={styles.datePickerContent} data-part="content" data-part-id="calendar" data-xmlui-part="calendar">
             {presetItems.length > 0 ? (
               <div className={styles.datePickerQuickPresets}>
                 {presetItems.map((preset) => (
@@ -487,14 +529,14 @@ function CalendarMonth({
             {"<"}
           </button>
         ) : <span />}
-        <div className={styles.datePickerViewTrigger}>{monthLabel(month, locale)}</div>
+        <div className={styles.datePickerViewTrigger} data-part="view-trigger">{monthLabel(month, locale)}</div>
         {showNav ? (
           <button type="button" className={styles.datePickerNav} aria-label="Next month" onClick={onNext}>
             {">"}
           </button>
         ) : <span />}
       </div>
-      <table className={styles.datePickerTable}>
+      <table className={styles.datePickerTable} data-part="table">
         <thead>
           <tr>
             {showWeekNumbers ? <th className={styles.datePickerWeekNumber}>#</th> : null}
@@ -514,6 +556,7 @@ function CalendarMonth({
                     <button
                       type="button"
                       className={styles.datePickerCellTrigger}
+                      data-part="table-cell-trigger"
                       disabled={disabled}
                       data-selected={selected.length === 1 && selectedIndex === 0 ? "" : undefined}
                       data-range-start={selected.length > 1 && selectedIndex === 0 ? "" : undefined}
@@ -568,6 +611,17 @@ function widthClass(value: unknown): string | undefined {
     return styles.datePickerAutoWidth;
   }
   return undefined;
+}
+
+function stringifyLabel(value: unknown): string {
+  return value === undefined || value === null ? "" : String(value);
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function toDateParts(raw: unknown, mode: Mode, format: DateFormat): DateParts[] {

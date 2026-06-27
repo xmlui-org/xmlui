@@ -13,12 +13,14 @@ import {
 
 import { defaultProps } from "./RadioGroup.defaults";
 import { convertOptionValue } from "../Option/OptionReact";
+import { useFormContext } from "../Form/FormContext";
 import styles from "./RadioGroup.module.scss";
 
 export type RadioGroupOption = {
   value: unknown;
   label: ReactNode;
   enabled: boolean;
+  testId?: string;
 };
 
 export type RadioGroupApi = {
@@ -28,6 +30,7 @@ export type RadioGroupApi = {
 
 export type RadioGroupProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   enabled?: boolean;
@@ -39,6 +42,7 @@ export type RadioGroupProps = {
   validationStatus?: string;
   label?: string;
   labelPosition?: string;
+  requireLabelMode?: string;
   direction?: string;
   className?: string;
   style?: CSSProperties;
@@ -53,6 +57,7 @@ export type RadioGroupProps = {
 export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(function RadioGroupNative(
   {
     id,
+    bindTo,
     value: controlledValue,
     initialValue = defaultProps.initialValue,
     enabled = defaultProps.enabled,
@@ -64,6 +69,7 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
     validationStatus = defaultProps.validationStatus,
     label,
     labelPosition = "top",
+    requireLabelMode,
     direction = "ltr",
     className,
     style,
@@ -79,18 +85,50 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
 ) {
   const groupId = useId();
   const groupRef = useRef<HTMLDivElement | null>(null);
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const validateFormField = form?.validateField;
+  const registerFormItem = form?.registerItem;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
   const normalizedInitialValue = convertOptionValue(initialValue ?? "");
   const [internalValue, setInternalValue] = useState<unknown>(normalizedInitialValue);
-  const currentValue = controlledValue === undefined ? internalValue : controlledValue;
+  const effectiveControlledValue = formValue ?? controlledValue;
+  const currentValue = effectiveControlledValue === undefined ? internalValue : effectiveControlledValue;
+  const effectiveValidationStatus = formError ? "error" : validationStatus;
 
   useEffect(() => {
     setInternalValue(normalizedInitialValue);
   }, [normalizedInitialValue]);
 
+  useEffect(() => {
+    if (!getFormValue || !setFormValue || fieldName === undefined || getFormValue(fieldName) != null || initialValue === undefined) {
+      return;
+    }
+    setFormValue(fieldName, normalizedInitialValue);
+  }, [fieldName, getFormValue, initialValue, normalizedInitialValue, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      label,
+      required,
+    });
+  }, [fieldName, label, registerFormItem, required]);
+
   const updateValue = useCallback((nextValue: unknown) => {
     setInternalValue(nextValue);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, nextValue);
+      void validateFormField?.(fieldName, nextValue);
+    }
     void onDidChange?.(nextValue);
-  }, [onDidChange]);
+  }, [fieldName, onDidChange, setFormValue, validateFormField]);
 
   const focusFirstOption = useCallback(() => {
     const firstRadio = groupRef.current?.querySelector<HTMLInputElement>('input[type="radio"]');
@@ -116,9 +154,14 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
     const inputId = `${id ?? groupId}__option_${index}`;
     const optionDisabled = !enabled || !option.enabled;
     const checked = Object.is(option.value, currentValue);
-    const statusClass = checked ? validationStatusClass(validationStatus) : undefined;
+    const statusClass = checked ? validationStatusClass(effectiveValidationStatus) : undefined;
     return (
-      <div className={styles.radioOptionContainer} data-radio-item key={`${String(option.value)}:${index}`}>
+      <div
+        className={styles.radioOptionContainer}
+        data-radio-item
+        data-testid={option.testId}
+        key={`${String(option.value)}:${index}`}
+      >
         <input
           id={inputId}
           className={cx(styles.radioOption, statusClass)}
@@ -184,6 +227,11 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
     (labelPosition === "start" && direction !== "rtl") ||
     (labelPosition === "end" && direction === "rtl")
   );
+  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const showRequiredIndicator =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
 
   return (
     <fieldset
@@ -203,13 +251,21 @@ export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(
           }}
         >
           {label}
-          {required ? <span className={styles.requiredIndicator}>*</span> : null}
+          {showRequiredIndicator ? <span className={styles.requiredIndicator}>*</span> : null}
+          {showOptionalIndicator ? <span className={styles.optionalIndicator}>(Optional)</span> : null}
         </legend>
         {group}
       </div>
     </fieldset>
   );
 }));
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
+}
 
 function validationStatusClass(status: string | undefined): string | undefined {
   switch (status) {

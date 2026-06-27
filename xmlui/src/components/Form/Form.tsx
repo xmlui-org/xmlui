@@ -6,6 +6,9 @@ const formStylesSource = `
 $gap-Form: createThemeVar("gap-Form");
 $gap-buttonRow-Form: createThemeVar("gap-buttonRow-Form");
 $marginTop-buttonRow-Form: createThemeVar("marginTop-buttonRow-Form");
+$paddingTop-buttonRow-Form: createThemeVar("paddingTop-buttonRow-Form");
+$backgroundColor-Form: createThemeVar("backgroundColor-Form");
+$backgroundColor-buttonRow-Form: createThemeVar("backgroundColor-buttonRow-Form");
 $textColor-error-Form: createThemeVar("textColor-error-Form");
 `;
 
@@ -51,10 +54,48 @@ export const FormMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    stickyButtonRow: {
+      description:
+        "When set to true, the button row sticks to the bottom of the scrollable content area.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    persist: {
+      description: "Saves temporary form data to localStorage while the user edits.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    storageKey: {
+      description: "localStorage key used when persist is enabled.",
+      valueType: "string",
+    },
+    doNotPersistFields: {
+      description: "Field names excluded from the persisted temporary form data.",
+      valueType: "any",
+    },
+    keepOnCancel: {
+      description: "Keeps persisted temporary form data when the user cancels.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
     enableSubmit: {
       description: "Enables the built-in submit button.",
       valueType: "boolean",
       defaultValue: true,
+    },
+    submitUrl: {
+      description: "URL to submit valid form data to.",
+      valueType: "string",
+    },
+    submitMethod: {
+      description: "HTTP method used when submitting to submitUrl.",
+      valueType: "string",
+    },
+    dataAfterSubmit: {
+      description: "Controls what form data remains after a successful submit.",
+      valueType: "string",
+      availableValues: ["keep", "reset", "clear"],
+      defaultValue: "keep",
     },
     itemLabelPosition: { description: "Default label position for form items.", valueType: "string" },
     itemLabelWidth: { description: "Default label width for form items.", valueType: "length" },
@@ -64,6 +105,11 @@ export const FormMd = createMetadata({
       valueType: "string",
       availableValues: ["markRequired", "markOptional", "markBoth"],
       defaultValue: "markRequired",
+    },
+    verboseValidationFeedback: {
+      description: "Controls whether form fields render verbose helper text or concise validation feedback by default.",
+      valueType: "boolean",
+      defaultValue: true,
     },
   },
   events: {
@@ -97,6 +143,9 @@ export const FormMd = createMetadata({
     [`gap-${COMP}`]: "$space-4",
     [`gap-buttonRow-${COMP}`]: "$space-2",
     [`marginTop-buttonRow-${COMP}`]: "$space-2",
+    [`paddingTop-buttonRow-${COMP}`]: "0",
+    [`backgroundColor-${COMP}`]: "transparent",
+    [`backgroundColor-buttonRow-${COMP}`]: "transparent",
     [`textColor-error-${COMP}`]: "$color-danger-500",
   },
 });

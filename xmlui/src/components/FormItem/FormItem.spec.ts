@@ -316,7 +316,7 @@ test.describe("Basic Functionality", () => {
   });
 });
 
-test.describe.skip("Type Property", () => {
+test.describe("Type Property", () => {
   test("renders correct input for each type variant", async ({
     initTestBed,
     createFormItemDriver,
@@ -402,7 +402,7 @@ test.describe.skip("Type Property", () => {
   });
 });
 
-test.describe.skip("Validation Properties", () => {
+test.describe("Validation Properties", () => {
   test("renders with minLength property", async ({ initTestBed, createFormItemDriver }) => {
     await initTestBed(`
       <Form>
@@ -526,7 +526,7 @@ test.describe.skip("Validation Properties", () => {
   });
 });
 
-test.describe.skip("Template Properties", () => {
+test.describe("Template Properties", () => {
   test("renders with custom inputTemplate", async ({ initTestBed, createFormItemDriver }) => {
     await initTestBed(`
       <Form>
@@ -542,7 +542,7 @@ test.describe.skip("Template Properties", () => {
   });
 });
 
-test.describe.skip("Event Handling", () => {
+test.describe("Event Handling", () => {
   test("fires onValidate event with valid input", async ({
     initTestBed,
     createFormItemDriver,
@@ -956,7 +956,7 @@ test.describe.skip("Event Handling", () => {
 // VALIDATION BEHAVIOR TESTS
 // =============================================================================
 
-test.describe.skip("Validation Behavior", () => {
+test.describe("Validation Behavior", () => {
   test("matchValue validates FormItem confirmation fields", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form data="{{ password: '', confirmPassword: '' }}">
@@ -1055,7 +1055,7 @@ test.describe.skip("Validation Behavior", () => {
 // ACCESSIBILITY TESTS
 // =============================================================================
 
-test.describe.skip("Accessibility", () => {
+test.describe("Accessibility", () => {
   test("associates label with input using proper labeling", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
@@ -1202,7 +1202,7 @@ test.describe.skip("Accessibility", () => {
 // THEME VARIABLE TESTS
 // =============================================================================
 
-test.describe.skip("Theme Variables", () => {
+test.describe("Theme Variables", () => {
   test("applies textColor-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
@@ -1335,7 +1335,7 @@ test.describe.skip("Theme Variables", () => {
 // OTHER EDGE CASE TESTS
 // =============================================================================
 
-test.describe.skip("Other Edge Cases", () => {
+test.describe("Other Edge Cases", () => {
   test("handles null and undefined properties gracefully", async ({
     initTestBed,
     createFormItemDriver,
@@ -2005,7 +2005,7 @@ test.describe.skip("Other Edge Cases", () => {
 // PHONE PATTERN VALIDATION TESTS
 // =============================================================================
 
-test.describe.skip("Phone Pattern Validation", () => {
+test.describe("Phone Pattern Validation", () => {
   test("shows warning for phone number without digits", async ({
     initTestBed,
     page,
@@ -2108,7 +2108,7 @@ test.describe.skip("Phone Pattern Validation", () => {
 // REGEX VALIDATION TESTS
 // =============================================================================
 
-test.describe.skip("Regex Validation", () => {
+test.describe("Regex Validation", () => {
   test("shows error for value not matching regex", async ({
     initTestBed,
     page,

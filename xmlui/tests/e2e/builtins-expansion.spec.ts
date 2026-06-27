@@ -1,4 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function selectComboboxOption(page: Page, label: string) {
+  await page.getByRole("combobox").click();
+  await page.getByRole("option", { name: label }).click();
+}
 
 test("layout built-ins compose children and preserve button updates", async ({ page }) => {
   await page.goto("/?example=builtinsLayout");
@@ -32,7 +37,7 @@ test("input built-ins emit didChange payloads into XMLUI state", async ({ page }
 
   await page.getByPlaceholder("Name").fill("Ada");
   await page.getByLabel("Enabled").check();
-  await page.locator("select").selectOption("closed");
+  await selectComboboxOption(page, "Closed");
 
   await expect(page.getByText("Name: Ada", { exact: true })).toBeVisible();
   await expect(page.getByText("Enabled: yes", { exact: true })).toBeVisible();
@@ -51,7 +56,7 @@ test("combined built-in task filter reacts to text, checkbox, and select state",
   await expect(page.getByText("Write notes", { exact: true })).not.toBeVisible();
   await expect(page.getByText("Review plan", { exact: true })).toBeVisible();
 
-  await page.locator("select").selectOption("all");
+  await selectComboboxOption(page, "All");
   await page.getByPlaceholder("Search tasks").fill("archive");
   await expect(page.getByText("Archive draft", { exact: true })).toBeVisible();
 

@@ -38,8 +38,14 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
     }
   }, [fallbackPath, matched, scope.routing, snapshot.pathname]);
 
-  const pageContent = matched
-    ? context.renderChildren(
+  const pageContent = matched ? (
+    <div
+      className="xmlui-page-root"
+      data-xmlui-component="Page"
+      data-xmlui-part="root"
+      data-xmlui-page-url={matched.url}
+    >
+      {context.renderChildren(
         matched.page.children,
         createRuntimeScope({
           store: scope.store,
@@ -56,8 +62,9 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
           },
           emitEvent: scope.emitEvent,
         }),
-      )
-    : null;
+      )}
+    </div>
+  ) : null;
 
   return (
     <>
@@ -67,7 +74,11 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
   );
 };
 
-export const pageRenderer: XmluiBuiltInRenderer = () => null;
+export const pageRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) => (
+  <div className="xmlui-page-root" data-xmlui-component="Page" data-xmlui-part="root">
+    {context.renderChildren(node.children, scope)}
+  </div>
+);
 
 function useRouteSnapshot(scope: Parameters<XmluiBuiltInRenderer>[0]["scope"]): RouteSnapshot {
   const fallback = {

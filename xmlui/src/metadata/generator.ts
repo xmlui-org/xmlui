@@ -52,6 +52,14 @@ export function generateXmluiMetadata(
     name: component.name,
     props: component.props.map((prop) => prop.name),
     events: component.events.map((event) => event.attributeName),
+    parts: component.parts.map((part) => part.name),
+    themeVars: component.themeVars.map((themeVar) => themeVar.name),
+    defaultThemeVars: Object.keys(component.defaultThemeVars).sort(),
+    toneSpecificThemeVars: Object.fromEntries(
+      Object.entries(component.toneSpecificThemeVars)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([tone, values]) => [tone, Object.keys(values).sort()]),
+    ),
   }))));
 
   return {
@@ -151,6 +159,10 @@ function contractToMetadata(
     templates: Object.keys(contract.templates ?? {}).sort().map((name) => member(name, "template")),
     contextVariables: Object.keys(contract.contextVariables ?? {}).sort().map((name) => member(name, "context")),
     apis: Object.keys(contract.apis ?? {}).sort().map((name) => member(name, "api")),
+    parts: Object.keys(contract.parts ?? {}).sort().map((name) => member(name, "part")),
+    themeVars: Object.keys(contract.themeVars ?? {}).sort().map((name) => member(name, "theme variable")),
+    defaultThemeVars: contract.defaultThemeVars ?? {},
+    toneSpecificThemeVars: contract.toneSpecificThemeVars ?? {},
     layoutProps: propNames.some((name) => layoutPropNameSet.has(name)),
     examples: examples
       .filter((example) => example.components.includes(contract.name))
@@ -196,6 +208,10 @@ function extractUserComponentMetadata(
       templates: [],
       contextVariables: [],
       apis: Object.keys(document.root.methods).sort().map((name) => member(name, "api")),
+      parts: [],
+      themeVars: [],
+      defaultThemeVars: {},
+      toneSpecificThemeVars: {},
       layoutProps: false,
       source: { id: source.id, start: document.root.range.start, end: document.root.range.end },
       examples: [],

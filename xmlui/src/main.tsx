@@ -11,6 +11,8 @@ import {
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import "./global.css";
+import "./components/Inspector/Inspector.scss";
+import "./components/InspectButton/InspectButton.scss";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -50,7 +52,11 @@ import headingOldCompatibilityApp from "./examples/heading-old-compatibility/Mai
 import htmlTagsFragmentApp from "./examples/html-tags-fragment/Main.xmlui";
 import iconLogoMediaApp from "./examples/icon-logo-media/Main.xmlui";
 import imageIFrameMediaApp from "./examples/image-iframe-media/Main.xmlui";
+import includeMarkupFoundationApp from "./examples/include-markup-foundation/Main.xmlui";
+import i18nFoundationApp from "./examples/i18n-foundation/Main.xmlui";
+import inspectorFoundationApp from "./examples/inspector-foundation/Main.xmlui";
 import linkInteractionApp from "./examples/link-interaction/Main.xmlui";
+import markdownFoundationApp from "./examples/markdown-foundation/Main.xmlui";
 import navGroupFoundationApp from "./examples/navgroup-foundation/Main.xmlui";
 import navLinkFoundationApp from "./examples/navlink-foundation/Main.xmlui";
 import navPanelCollapseButtonFoundationApp from "./examples/nav-panel-collapse-button-foundation/Main.xmlui";
@@ -70,6 +76,7 @@ import routingDataApp from "./examples/routing-data/Main.xmlui";
 import routingQueryApp from "./examples/routing-query/Main.xmlui";
 import routingStateApp from "./examples/routing-state/Main.xmlui";
 import runtimeToastApp from "./examples/runtime-toast/Main.xmlui";
+import retryPolicyFoundationApp from "./examples/retry-policy-foundation/Main.xmlui";
 import responsiveBarFoundationApp from "./examples/responsive-bar-foundation/Main.xmlui";
 import scrollViewerFoundationApp from "./examples/scroll-viewer-foundation/Main.xmlui";
 import schedulingFoundationApp from "./examples/scheduling-foundation/Main.xmlui";
@@ -126,6 +133,7 @@ import udcSlotContextApp from "./examples/udc-slot-context/Main.xmlui";
 declare global {
   interface Window {
     __xmluiTestBedProbe?: {
+      hasLocal(name: string): boolean;
       readLocal(name: string): unknown;
       readGlobal(name: string): unknown;
     };
@@ -173,7 +181,11 @@ const examples = {
   htmlTagsFragment: htmlTagsFragmentApp,
   iconLogoMedia: iconLogoMediaApp,
   imageIFrameMedia: imageIFrameMediaApp,
+  includeMarkupFoundation: includeMarkupFoundationApp,
+  i18nFoundation: i18nFoundationApp,
+  inspectorFoundation: inspectorFoundationApp,
   linkInteraction: linkInteractionApp,
+  markdownFoundation: markdownFoundationApp,
   navGroupFoundation: navGroupFoundationApp,
   navLinkFoundation: navLinkFoundationApp,
   navPanelCollapseButtonFoundation: navPanelCollapseButtonFoundationApp,
@@ -193,6 +205,7 @@ const examples = {
   routingQuery: routingQueryApp,
   routingState: routingStateApp,
   runtimeToast: runtimeToastApp,
+  retryPolicyFoundation: retryPolicyFoundationApp,
   responsiveBarFoundation: responsiveBarFoundationApp,
   scrollViewerFoundation: scrollViewerFoundationApp,
   schedulingFoundation: schedulingFoundationApp,
@@ -259,19 +272,60 @@ if (params.has("__xmluiTestBed")) {
   let testBedRenderKey = 0;
 
   const compileTestBedModule = (source: string): Extract<XmluiModule, { kind: "app" }> => {
+    const componentSources = readTestBedComponentSources();
+    const knownComponents = componentSources.map((componentSource, index) => {
+      const compiled = compileXmluiSource({
+        id: `testbed-component-${index}.xmlui`,
+        source: componentSource,
+        extensions: [counterBadgeExtension],
+        validateComponentReferences: false,
+      });
+      if (compiled.runtimeDocument.kind !== "component") {
+        throw new Error("Test bed component sources must compile to component modules.");
+      }
+      return compiled.runtimeDocument.name;
+    });
+    const components = componentSources.map((componentSource, index) => {
+      const compiled = compileXmluiSource({
+        id: `testbed-component-${index}.xmlui`,
+        source: componentSource,
+        knownComponents,
+        extensions: [counterBadgeExtension],
+      });
+      throwFirstCompilerDiagnostic(compiled);
+      return createXmluiModule(compiled.runtimeDocument, [], {
+        extensions: [counterBadgeExtension],
+      });
+    });
     const compiled = compileXmluiSource({
       id: "testbed.xmlui",
       source,
+      knownComponents,
       extensions: [counterBadgeExtension],
     });
     throwFirstCompilerDiagnostic(compiled);
-    const module = createXmluiModule(compiled.runtimeDocument, [], {
+    const module = createXmluiModule(compiled.runtimeDocument, components, {
       extensions: [counterBadgeExtension],
     });
     if (module.kind !== "app") {
       throw new Error("Test bed source must compile to an app module.");
     }
     return module;
+  };
+
+  const readTestBedComponentSources = (): string[] => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedComponents");
+    if (!raw) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((item): item is string => typeof item === "string")
+        : [];
+    } catch {
+      return [];
+    }
   };
 
   const showTestBedError = (error: unknown): void => {

@@ -10,6 +10,9 @@
   <Button onClick="toast.success('Done with count ' + count, { id: lastToastId })">
     Complete loading toast
   </Button>
+  <Button onClick="toast.error('Failed count ' + count)">
+    Error toast
+  </Button>
   <Button onClick="toast.dismiss()">
     Dismiss toasts
   </Button>

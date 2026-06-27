@@ -291,6 +291,8 @@ describe("built-in renderer registry", () => {
       "App",
       "AppHeader",
       "Button",
+      "CHStack",
+      "CVStack",
       "Checkbox",
       "DataSource",
       "FlowLayout",
@@ -309,6 +311,7 @@ describe("built-in renderer registry", () => {
       "TextBox",
       "Theme",
       "VStack",
+      "variable",
     ]);
   });
 

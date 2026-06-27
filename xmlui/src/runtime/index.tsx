@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
@@ -12,9 +13,12 @@ import {
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
+import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
+import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
+import type { ThemeTone } from "../styling";
 
 ensureXmluiDebugBridge();
 
@@ -63,11 +67,14 @@ export function renderXmluiApp(
 export type MountXmluiAppOptions = {
   hydrate?: boolean;
   initialUrl?: string;
+  isolateRouting?: boolean;
+  defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
 export type XmluiRuntimeTestProbe = {
+  hasLocal(name: string): boolean;
   readLocal(name: string): unknown;
   readGlobal(name: string): unknown;
 };
@@ -86,6 +93,8 @@ export function mountXmluiApp(
       <XmluiRoot
         module={module}
         initialUrl={options.initialUrl}
+        isolateRouting={options.isolateRouting}
+        defaultTone={options.defaultTone}
         extensions={options.extensions}
         testProbe={options.testProbe}
       />,
@@ -96,6 +105,8 @@ export function mountXmluiApp(
     <XmluiRoot
       module={module}
       initialUrl={options.initialUrl}
+      isolateRouting={options.isolateRouting}
+      defaultTone={options.defaultTone}
       extensions={options.extensions}
       testProbe={options.testProbe}
     />,
@@ -106,26 +117,40 @@ export function mountXmluiApp(
 export function XmluiRoot({
   module,
   initialUrl,
+  isolateRouting = false,
+  defaultTone,
   extensions,
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
   initialUrl?: string;
+  isolateRouting?: boolean;
+  defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
+  const [confirmDialog, setConfirmDialog] = useState<{ title: string; message?: string; okLabel?: string } | undefined>();
   const toastRef = useRef<ToastService>();
   if (!toastRef.current) {
     toastRef.current = createToastService();
+  }
+  const i18nRef = useRef<RuntimeI18n>();
+  if (!i18nRef.current) {
+    i18nRef.current = createRuntimeI18n();
   }
   const rootOwnerId = "app:root";
   const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
   if (!routingRef.current) {
-    routingRef.current = new RuntimeRoutingStore(routeMode, () => store.invalidateRoute(), initialUrl);
+    routingRef.current = new RuntimeRoutingStore(
+      routeMode,
+      () => store.invalidateRoute(),
+      initialUrl,
+      isolateRouting,
+    );
   }
   const normalizedExtensions = useMemo(
     () => normalizeExtensions([
@@ -135,8 +160,18 @@ export function XmluiRoot({
     [extensions],
   );
   useEffect(() => routingRef.current?.attach(), []);
+  const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown) => {
+    setConfirmDialog({
+      title: String(title ?? "Confirm"),
+      message: message == null ? undefined : String(message),
+      okLabel: okLabel == null ? undefined : String(okLabel),
+    });
+    return true;
+  }, []);
+  referencesRef.current.confirm = confirm;
   useEffect(() => {
     testProbe?.({
+      hasLocal: (name) => store.hasLocal(rootOwnerId, name),
       readLocal: (name) => store.readLocal(rootOwnerId, name),
       readGlobal: (name) => store.readGlobal(name),
     });
@@ -151,6 +186,7 @@ export function XmluiRoot({
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
+      i18n: i18nRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,
@@ -182,6 +218,7 @@ export function XmluiRoot({
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
+      i18n: i18nRef.current,
       extensionFunctions: {
         ...(module.extensionFunctions ?? {}),
         ...normalizedExtensions.functions,
@@ -198,11 +235,61 @@ export function XmluiRoot({
   );
 
   return (
-    <XmluiThemeRoot>
+    <XmluiThemeRoot tone={defaultTone}>
       <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+      {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+      <GlobalLiveRegion />
       <ToastHost service={toastRef.current} />
     </XmluiThemeRoot>
   );
+}
+
+function renderConfirmDialog(
+  confirmDialog: { title: string; message?: string; okLabel?: string } | undefined,
+  close: () => void,
+) {
+  if (!confirmDialog) {
+    return null;
+  }
+  const dialog = (
+    <div
+      data-xmlui-confirm-layer=""
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 10000,
+        background: "rgba(0, 0, 0, 0.2)",
+      }}
+      onMouseDown={(event) => {
+        event.stopPropagation();
+        close();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-label={confirmDialog.title}
+        style={{
+          position: "fixed",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          minWidth: "18rem",
+          padding: "1rem",
+          borderRadius: "4px",
+          background: "var(--xmlui-color-surface-0, #fff)",
+          boxShadow: "var(--xmlui-boxShadow-md, 0 8px 24px rgba(0, 0, 0, 0.18))",
+        }}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div>{confirmDialog.title}</div>
+        {confirmDialog.message ? <div>{confirmDialog.message}</div> : null}
+        <button type="button" onClick={close}>
+          {confirmDialog.okLabel ?? "OK"}
+        </button>
+      </div>
+    </div>
+  );
+  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }
 
 export type { XmluiDocumentInput, XmluiModule } from "./types";

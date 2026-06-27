@@ -1,12 +1,5 @@
 import { test, expect } from "../../testing/fixtures";
 
-const TREE_FAMILY_OLD_SUITE_PENDING =
-  "The literal old Tree-family suite is copied for compatibility tracking, but the full Tree/TreeDisplay/TableOfContents migration is not complete yet. Re-enable cases feature-by-feature as hierarchy behavior, dynamic loading, APIs, scrolling, heading indexing, route integration, parts, and behaviors are migrated.";
-
-test.beforeEach(() => {
-  test.skip(true, TREE_FAMILY_OLD_SUITE_PENDING);
-});
-
 // =============================================================================
 // DYNAMIC FIELD BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -98,7 +91,7 @@ test.describe("Dynamic Field - Basic Functionality", () => {
           data="{[
             { id: 1, name: 'Node Without Dynamic Field' }
           ]}"
-          dynamic
+          dynamic="{true}"
         >
           <property name="itemTemplate">
             <HStack testId="{$item.id}">
@@ -154,7 +147,7 @@ test.describe("Dynamic Field - Basic Functionality", () => {
             { id: 1, name: 'Static Override', dynamic: false },
             { id: 2, name: 'Uses Default' }
           ]}"
-          dynamic
+          dynamic="{true}"
         >
           <property name="itemTemplate">
             <HStack testId="{$item.id}">

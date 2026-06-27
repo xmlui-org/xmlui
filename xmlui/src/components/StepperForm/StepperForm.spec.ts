@@ -107,7 +107,67 @@ test.describe("StepperForm foundation", () => {
 });
 
 test.describe("StepperForm old suite deferred cases", () => {
-  test.fixme("Next is disabled while the active FormSegment is invalid", async () => {});
-  test.fixme("Submit is disabled while the last FormSegment is invalid", async () => {});
-  test.fixme("stepperStackedLabel=true stacks icon and label with old Stepper markup", async () => {});
+  test("Next is disabled while the active FormSegment is invalid", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <StepperForm data="{{ name: '' }}">
+        <FormSegment label="Alpha">
+          <FormItem label="Name" bindTo="name" required="true" testId="nameField" />
+        </FormSegment>
+        <FormSegment label="Beta"><Text>Beta body</Text></FormSegment>
+      </StepperForm>
+    `);
+    const next = page.getByRole("button", { name: "Next" });
+    await expect(next).toBeDisabled();
+
+    const formItem = await createFormItemDriver("nameField");
+    const input = await createTextBoxDriver(formItem.input);
+    await input.field.fill("Alice");
+    await expect(next).toBeEnabled();
+  });
+
+  test("Submit is disabled while the last FormSegment is invalid", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <StepperForm data="{{ name: '', email: '' }}">
+        <FormSegment label="Alpha">
+          <FormItem label="Name" bindTo="name" />
+        </FormSegment>
+        <FormSegment label="Beta">
+          <FormItem label="Email" bindTo="email" required="true" testId="emailField" />
+        </FormSegment>
+      </StepperForm>
+    `);
+    await page.getByRole("button", { name: "Next" }).click();
+    const submit = page.getByRole("button", { name: "Submit" });
+    await expect(submit).toBeDisabled();
+
+    const formItem = await createFormItemDriver("emailField");
+    const input = await createTextBoxDriver(formItem.input);
+    await input.field.fill("a@b.com");
+    await expect(submit).toBeEnabled();
+  });
+
+  test("stepperStackedLabel=true stacks icon and label with old Stepper markup", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <StepperForm data="{{ name: '' }}" stepperStackedLabel="true">
+        <FormSegment label="Alpha"><Text>Alpha body</Text></FormSegment>
+        <FormSegment label="Beta"><Text>Beta body</Text></FormSegment>
+      </StepperForm>
+    `);
+    const headerItem = page.getByRole("listitem").first();
+    const inner = headerItem.locator("> *").first();
+    await expect(inner).toHaveCSS("flex-direction", "column");
+  });
 });

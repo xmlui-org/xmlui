@@ -27,10 +27,50 @@ test.describe("Bookmark foundation", () => {
     await page.getByTestId("scroll").click();
     await expect(page.getByTestId("result")).toHaveText("scrolled");
   });
-});
 
-test.describe("Bookmark old-suite transfer debt", () => {
-  test("copy literal table-of-contents registration and scroll-container tests", async () => {
-    test.fixme(true, "Full Bookmark suite depends on the reopened TableOfContents compatibility harness");
+  test("marks omitted bookmarks and preserves empty titles for TableOfContents discovery", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Bookmark id="hidden" testId="bookmark" title="" level="{3}" omitFromToc="{true}">
+        <Text>Hidden section</Text>
+      </Bookmark>
+    `);
+
+    const bookmark = page.getByTestId("bookmark");
+    await expect(bookmark).toHaveAttribute("id", "hidden");
+    await expect(bookmark).toHaveAttribute("data-bookmark-level", "3");
+    await expect(bookmark).not.toHaveAttribute("data-bookmark-title");
+    await expect(bookmark).toHaveAttribute("data-bookmark-omit-from-toc", "true");
+  });
+
+  test("scrollIntoView accepts options and calls the DOM target", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.result="waiting">
+        <Bookmark id="target" testId="bookmark">Target</Bookmark>
+        <Button
+          testId="scroll"
+          onClick="target.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' }); result = 'scrolled'">
+          Scroll
+        </Button>
+        <Text testId="result">{result}</Text>
+      </App>
+    `);
+
+    await page.getByTestId("bookmark").evaluate((element) => {
+      (element as HTMLElement).scrollIntoView = (options?: boolean | ScrollIntoViewOptions) => {
+        (window as any).__bookmarkScrollOptions = options;
+      };
+    });
+
+    await page.getByTestId("scroll").click();
+
+    await expect(page.getByTestId("result")).toHaveText("scrolled");
+    await expect.poll(() => page.evaluate(() => (window as any).__bookmarkScrollOptions)).toEqual({
+      behavior: "instant",
+      block: "center",
+      inline: "nearest",
+    });
   });
 });

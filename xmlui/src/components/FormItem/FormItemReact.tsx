@@ -1,13 +1,26 @@
 import {
+  Children,
+  useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
+  isValidElement,
   type ChangeEvent,
   type CSSProperties,
   type ReactNode,
 } from "react";
 
-import { useFormContext } from "../Form/FormContext";
+import { FormProvider, useFormContext, type FormContextValue } from "../Form/FormContext";
+import { SelectNative } from "../Select/SelectReact";
+import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
+import { SliderNative } from "../Slider/SliderReact";
+import { NumberBoxNative } from "../NumberBox/NumberBoxReact";
+import { ColorPickerNative } from "../ColorPicker/ColorPickerReact";
+import { DateInputNative } from "../DateInput/DateInputReact";
+import { DatePickerNative } from "../DatePicker/DatePickerReact";
+import { TimeInputNative } from "../TimeInput/TimeInputReact";
+import type { XmluiOption } from "../Option/OptionReact";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
 import styles from "./FormItem.module.scss";
@@ -28,10 +41,29 @@ export type FormItemProps = {
   required?: boolean;
   requireLabelMode?: string;
   requiredInvalidMessage?: string;
+  minLength?: number;
+  lengthInvalidMessage?: string;
+  pattern?: string;
+  patternInvalidMessage?: string;
+  patternInvalidSeverity?: "error" | "warning" | string;
+  regex?: string;
+  regexInvalidMessage?: string;
+  regexInvalidSeverity?: "error" | "warning" | string;
+  matchValue?: unknown;
+  matchInvalidMessage?: string;
+  noSubmit?: boolean;
   validationMode?: string;
   customValidationsDebounce?: number;
   onValidate?: (value: unknown) => unknown | Promise<unknown>;
+  options?: XmluiOption[];
+  searchable?: boolean;
+  groupBy?: string;
+  groupHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
+  ungroupedHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
   children?: ReactNode;
+  inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
+  renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
+  registerComponentApi?: (api: Record<string, unknown>) => void;
 };
 
 export function FormItem({
@@ -50,50 +82,112 @@ export function FormItem({
   required = false,
   requireLabelMode,
   requiredInvalidMessage,
+  minLength,
+  lengthInvalidMessage,
+  pattern,
+  patternInvalidMessage,
+  patternInvalidSeverity,
+  regex,
+  regexInvalidMessage,
+  regexInvalidSeverity,
+  matchValue,
+  matchInvalidMessage,
+  noSubmit = false,
   validationMode,
   customValidationsDebounce = 0,
   onValidate,
+  options,
+  searchable,
+  groupBy,
+  groupHeaderTemplateRenderer,
+  ungroupedHeaderTemplateRenderer,
   children,
+  inputRenderer,
+  renderItemTemplate,
+  registerComponentApi,
   ...rest
 }: FormItemProps) {
   const generatedId = useId();
   const inputId = id ? `${id}-input` : generatedId;
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const validationTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const validateRef = useRef(onValidate);
   const form = useFormContext();
+  const registerFormItem = form?.registerItem;
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
   const themeVariables = useThemeVariables();
   const effectiveLabelPosition = labelPosition ?? form?.itemLabelPosition ?? "top";
   const effectiveLabelWidth = labelWidth ?? form?.itemLabelWidth;
   const effectiveLabelBreak = labelBreak ?? form?.itemLabelBreak ?? false;
   const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const fieldName = bindTo || id || generatedId;
+  const fieldName = resolveFieldName(bindTo, id, generatedId, form?.fieldPrefix);
   const formEnabled = form?.enabled ?? true;
   const itemEnabled = enabled && formEnabled;
   const value = form?.getValue(fieldName) ?? initialValue ?? "";
   const error = form?.errors[fieldName];
+  const fieldIssue = form?.issues.find((issue) => issue.field === fieldName);
+  const validationStatus = fieldIssue?.severity ?? (error ? "error" : undefined);
+  const validationMessage = error ?? fieldIssue?.message;
   const showRequiredIndicator =
     required && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
   const showOptionalIndicator =
     !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
 
   useEffect(() => {
-    if (!form || form.getValue(fieldName) !== undefined || initialValue === undefined) {
-      return;
-    }
-    form.setValue(fieldName, initialValue);
-  }, [fieldName, form, initialValue]);
+    validateRef.current = onValidate;
+  }, [onValidate]);
+
+  const validateRegisteredItem = useCallback((value: unknown) => validateRef.current?.(value), []);
 
   useEffect(() => {
-    if (!form) {
+    if (!getFormValue || !setFormValue || getFormValue(fieldName) != null || initialValue === undefined) {
       return;
     }
-    return form.registerItem({
+    setFormValue(fieldName, initialValue);
+  }, [fieldName, getFormValue, initialValue, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem) {
+      return;
+    }
+    return registerFormItem({
       name: fieldName,
       label,
       required,
       requiredInvalidMessage,
-      validate: onValidate,
+      minLength,
+      lengthInvalidMessage,
+      pattern,
+      patternInvalidMessage,
+      patternInvalidSeverity,
+      regex,
+      regexInvalidMessage,
+      regexInvalidSeverity,
+      matchValue,
+      matchInvalidMessage,
+      noSubmit: noSubmit || bindTo === undefined,
+      validate: validateRegisteredItem,
     });
-  }, [fieldName, form, label, onValidate, required, requiredInvalidMessage]);
+  }, [
+    fieldName,
+    label,
+    lengthInvalidMessage,
+    matchInvalidMessage,
+    matchValue,
+    minLength,
+    pattern,
+    patternInvalidMessage,
+    patternInvalidSeverity,
+    regex,
+    regexInvalidMessage,
+    regexInvalidSeverity,
+    noSubmit,
+    required,
+    requiredInvalidMessage,
+    registerFormItem,
+    validateRegisteredItem,
+  ]);
 
   useEffect(() => () => {
     if (validationTimerRef.current) {
@@ -101,8 +195,36 @@ export function FormItem({
     }
   }, []);
 
+  const addItem = useCallback((item: unknown = {}) => {
+    const currentValue = getFormValue?.(fieldName);
+    const currentItems = Array.isArray(currentValue) ? currentValue : [];
+    setFormValue?.(fieldName, [...currentItems, item]);
+  }, [fieldName, getFormValue, setFormValue]);
+
+  const removeItem = useCallback((index: number) => {
+    const currentValue = getFormValue?.(fieldName);
+    const currentItems = Array.isArray(currentValue) ? currentValue : [];
+    setFormValue?.(fieldName, currentItems.filter((_, itemIndex) => itemIndex !== index));
+  }, [fieldName, getFormValue, setFormValue]);
+
+  useEffect(() => {
+    if (type !== "items") {
+      return;
+    }
+    registerComponentApi?.({
+      addItem,
+      removeItem,
+    });
+  }, [addItem, registerComponentApi, removeItem, type]);
+
+  const itemArray = useMemo(() => Array.isArray(value) ? value : [], [value]);
+
   const scheduleChangedValidation = (nextValue: unknown) => {
-    if (validationMode !== "onChanged" && !onValidate) {
+    const shouldValidate =
+      validationMode === "onChanged" ||
+      Boolean(onValidate) ||
+      (validationMode === "errorLate" && Boolean(error));
+    if (!shouldValidate) {
       return;
     }
     if (validationTimerRef.current) {
@@ -118,9 +240,36 @@ export function FormItem({
     }
     void form?.validateField(fieldName, nextValue);
   };
+  const handleBlurValidation = () => {
+    if (validationMode === "onLostFocus" || validationMode === "errorLate" || required) {
+      void form?.validateField(fieldName);
+    }
+  };
 
   const labelStyle = effectiveLabelWidth ? { width: cssLength(effectiveLabelWidth, themeVariables) } : undefined;
-  const control = children ?? (
+  const control = renderControl({
+    autoFocus,
+    children,
+    enabled: itemEnabled,
+    error,
+    fieldName,
+    form,
+    inputId,
+    inputRenderer,
+    options,
+    searchable,
+    groupBy,
+    groupHeaderTemplateRenderer,
+    ungroupedHeaderTemplateRenderer,
+    parentForm: form,
+    renderItemTemplate,
+    required,
+    scheduleChangedValidation,
+    handleBlurValidation,
+    type,
+    value,
+    itemArray,
+  }) ?? (
     <input
       id={inputId}
       className={cx(styles.input, error ? styles.errorInput : undefined)}
@@ -138,15 +287,26 @@ export function FormItem({
         form?.setValue(fieldName, nextValue);
         scheduleChangedValidation(nextValue);
       }}
+      onBlur={handleBlurValidation}
     />
   );
 
   return (
     <div
       {...rest}
+      ref={rootRef}
       className={cx(styles.formItem, !label ? styles.noLabel : undefined, className)}
       style={style}
       data-xmlui-form-field={fieldName}
+      onClick={(event) => {
+        if (type !== "select") {
+          return;
+        }
+        if ((event.target as HTMLElement).closest("button")) {
+          return;
+        }
+        rootRef.current?.querySelector<HTMLButtonElement>('button[role="combobox"]')?.click();
+      }}
     >
       <div className={cx(styles.row, labelPositionClass(effectiveLabelPosition))}>
         {label && (
@@ -165,14 +325,325 @@ export function FormItem({
         <div className={styles.control} data-xmlui-part="control">
           {control}
         </div>
+        {validationStatus && (
+          <span
+            className={styles.validationStatusIndicator}
+            data-validation-status={validationStatus}
+            data-xmlui-part="validationStatusIndicator"
+            aria-hidden="true"
+          />
+        )}
       </div>
-      {error && (
+      {validationMessage && (
         <div id={`${inputId}-error`} className={styles.error} data-xmlui-part="error">
-          {error}
+          {validationMessage}
         </div>
       )}
     </div>
   );
+}
+
+function renderControl({
+  autoFocus,
+  children,
+  enabled,
+  error,
+  fieldName,
+  form,
+  inputId,
+  inputRenderer,
+  itemArray,
+  options,
+  searchable,
+  groupBy,
+  groupHeaderTemplateRenderer,
+  ungroupedHeaderTemplateRenderer,
+  parentForm,
+  renderItemTemplate,
+  required,
+  scheduleChangedValidation,
+  handleBlurValidation,
+  type,
+  value,
+}: {
+  autoFocus: boolean;
+  children?: ReactNode;
+  enabled: boolean;
+  error?: string;
+  fieldName: string;
+  form: ReturnType<typeof useFormContext>;
+  inputId: string;
+  inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
+  itemArray: unknown[];
+  options?: XmluiOption[];
+  searchable?: boolean;
+  groupBy?: string;
+  groupHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
+  ungroupedHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
+  parentForm: ReturnType<typeof useFormContext>;
+  renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
+  required: boolean;
+  scheduleChangedValidation: (nextValue: unknown) => void;
+  handleBlurValidation: () => void;
+  type: string;
+  value: unknown;
+}): ReactNode | undefined {
+  if (inputRenderer && type !== "items") {
+    return inputRenderer({
+      $value: value,
+      $setValue: (nextValue: unknown) => {
+        form?.setValue(fieldName, nextValue);
+        scheduleChangedValidation(nextValue);
+      },
+      $validationResult: error ? { isValid: false, invalidMessage: error, severity: "error" } : undefined,
+    });
+  }
+  if (type === "items") {
+    return (
+      <div className={styles.itemsStack}>
+        {itemArray.map((item, index) => {
+          const itemForm = parentForm ? scopedFormContext(parentForm, `${fieldName}.${index}`) : undefined;
+          const contextVars = {
+            $item: item,
+            $itemIndex: index,
+            $isFirst: index === 0,
+            $isLast: index === itemArray.length - 1,
+          };
+          return (
+            <div key={index}>
+              {itemForm
+                ? <FormProvider value={itemForm}>{renderItemTemplate?.(contextVars, index) ?? children}</FormProvider>
+                : renderItemTemplate?.(contextVars, index) ?? children}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+  if (type === "select") {
+    return (
+      <SelectNative
+        id={inputId}
+        value={value as any}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        options={options ?? optionsFromChildren(children)}
+        searchable={searchable}
+        groupBy={groupBy}
+        groupHeaderTemplateRenderer={groupHeaderTemplateRenderer}
+        ungroupedHeaderTemplateRenderer={ungroupedHeaderTemplateRenderer}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+      />
+    );
+  }
+  if (type === "radioGroup") {
+    return (
+      <RadioGroupNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        options={(options ?? optionsFromChildren(children)) as RadioGroupOption[]}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+      />
+    );
+  }
+  if (type === "slider") {
+    return (
+      <SliderNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+      />
+    );
+  }
+  if (type === "number" || type === "integer") {
+    return (
+      <NumberBoxNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        inputMode="numeric"
+        integersOnly={type === "integer"}
+        hasSpinBox={false}
+        validationStatus={error ? "error" : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+      />
+    );
+  }
+  if (type === "colorpicker" || type === "colorPicker" || type === "color") {
+    return (
+      <ColorPickerNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
+      />
+    );
+  }
+  if (type === "dateinput" || type === "dateInput" || type === "date") {
+    return (
+      <DateInputNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        invalidMessages={error ? error.split("\n") : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
+      />
+    );
+  }
+  if (type === "datepicker" || type === "datePicker") {
+    return (
+      <DatePickerNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        invalidMessages={error ? error.split("\n") : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
+      />
+    );
+  }
+  if (type === "timeinput" || type === "timeInput" || type === "time") {
+    return (
+      <TimeInputNative
+        id={inputId}
+        value={value}
+        enabled={enabled}
+        required={required}
+        autoFocus={autoFocus}
+        validationStatus={error ? "error" : undefined}
+        onDidChange={(nextValue) => {
+          form?.setValue(fieldName, nextValue);
+          scheduleChangedValidation(nextValue);
+        }}
+        onBlur={handleBlurValidation}
+      />
+    );
+  }
+  if (type === "textarea") {
+    return (
+      <div
+        data-part-id="input"
+        data-xmlui-part="input"
+      >
+        <textarea
+          id={inputId}
+          className={cx(styles.input, error ? styles.errorInput : undefined)}
+          value={stringify(value)}
+          required={required}
+          disabled={!enabled}
+          autoFocus={autoFocus}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${inputId}-error` : undefined}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+            const nextValue = event.currentTarget.value;
+            form?.setValue(fieldName, nextValue);
+            scheduleChangedValidation(nextValue);
+          }}
+          onBlur={handleBlurValidation}
+        />
+      </div>
+    );
+  }
+  return children;
+}
+
+function scopedFormContext(parent: FormContextValue, fieldPrefix: string): FormContextValue {
+  return {
+    ...parent,
+    fieldPrefix,
+    getValue: parent.getValue,
+    setValue: parent.setValue,
+    validateField: parent.validateField,
+    registerItem: parent.registerItem,
+  };
+}
+
+function resolveFieldName(
+  bindTo: string | undefined,
+  id: string | undefined,
+  generatedId: string,
+  fieldPrefix: string | undefined,
+): string {
+  if (fieldPrefix !== undefined) {
+    return prefixFieldName(fieldPrefix, bindTo ?? id ?? generatedId);
+  }
+  if (bindTo === undefined || bindTo === "") {
+    return id || generatedId;
+  }
+  return bindTo;
+}
+
+function prefixFieldName(prefix: string, name: string | undefined): string {
+  return name ? `${prefix}.${name}` : prefix;
+}
+
+function optionsFromChildren(children: ReactNode): XmluiOption[] {
+  return Children.toArray(children).flatMap((child) => {
+    if (!isValidElement(child)) {
+      return [];
+    }
+    const props = child.props as Partial<XmluiOption>;
+    const label = props.label ?? props.children ?? props.value;
+    return [{
+      value: props.value,
+      label: isReactNode(label) ? label : String(label ?? ""),
+      enabled: props.enabled !== false,
+      ...props,
+    }];
+  });
+}
+
+function isReactNode(value: unknown): value is ReactNode {
+  return value === undefined ||
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    isValidElement(value) ||
+    Array.isArray(value);
 }
 
 function labelPositionClass(value: string): string {

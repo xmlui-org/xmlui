@@ -1,3 +1,5 @@
+@use "../Menu/Menu.module.scss" as menu;
+
 $themeVars: "";
 
 @function createThemeVar($componentVariable) {
@@ -64,6 +66,7 @@ $minWidth-DropdownMenu: createThemeVar("minWidth-DropdownMenu");
 }
 
 .content {
+  @include menu.menuContent;
   position: fixed;
   z-index: 9999;
   min-width: $minWidth-DropdownMenu;
@@ -74,38 +77,8 @@ $minWidth-DropdownMenu: createThemeVar("minWidth-DropdownMenu");
   box-shadow: $boxShadow-DropdownMenu;
 }
 
-.content > .menuSeparator:first-child,
-.content > .menuSeparator:last-child {
-  display: none;
-}
-
-.content > .menuSeparator:has(+ .menuSeparator) {
-  display: none;
-}
-
 .menuItem {
-  display: flex;
-  align-items: center;
-  gap: $gap-MenuItem;
-  max-width: $maxWidth-MenuItem;
-  padding: $paddingVertical-MenuItem $paddingHorizontal-MenuItem;
-  border: 0;
-  outline: none;
-  color: $color-MenuItem;
-  background: $backgroundColor-MenuItem;
-  font-family: $fontFamily-MenuItem;
-  font-size: $fontSize-MenuItem;
-  line-height: 1.2;
-  text-align: left;
-  white-space: nowrap;
-  cursor: default;
-  user-select: none;
-}
-
-.menuItem:hover,
-.menuItem:focus {
-  color: $color-MenuItem-hover;
-  background: $backgroundColor-MenuItem-hover;
+  @include menu.menuItem;
 }
 
 .menuItemActive {
@@ -113,17 +86,19 @@ $minWidth-DropdownMenu: createThemeVar("minWidth-DropdownMenu");
   background: $backgroundColor-MenuItem-active;
 }
 
+.menuItemActive:hover,
+.menuItemActive:focus {
+  color: var(--xmlui-color-MenuItem--active--hover);
+  background: var(--xmlui-backgroundColor-MenuItem--active--hover);
+}
+
 .menuItemDisabled {
   color: $color-MenuItem-disabled;
-  pointer-events: none;
   opacity: 0.65;
 }
 
 .menuSeparator {
-  width: $width-MenuSeparator;
-  height: $height-MenuSeparator;
-  margin: $marginTop-MenuSeparator $marginHorizontal-MenuSeparator $marginBottom-MenuSeparator;
-  background: $color-MenuSeparator;
+  @include menu.menuSeparator;
 }
 
 .subMenuItem {
@@ -165,6 +140,7 @@ $minWidth-DropdownMenu: createThemeVar("minWidth-DropdownMenu");
 }
 
 .subMenuContent {
+  @include menu.menuContent;
   position: absolute;
   top: 0;
   left: calc(100% + 2px);
@@ -174,15 +150,6 @@ $minWidth-DropdownMenu: createThemeVar("minWidth-DropdownMenu");
   border-radius: $borderRadius-DropdownMenu;
   background-color: $backgroundColor-DropdownMenu;
   box-shadow: $boxShadow-DropdownMenu;
-}
-
-.subMenuContent > .menuSeparator:first-child,
-.subMenuContent > .menuSeparator:last-child {
-  display: none;
-}
-
-.subMenuContent > .menuSeparator:has(+ .menuSeparator) {
-  display: none;
 }
 
 :export {

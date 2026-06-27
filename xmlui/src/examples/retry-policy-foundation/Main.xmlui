@@ -1,0 +1,8 @@
+<App>
+  <RetryPolicy attempts="3" delayMs="1" jitter="{false}">
+    <DataSource id="flaky" url="/api/retry-policy-foundation" />
+  </RetryPolicy>
+  <H1>RetryPolicy Foundation</H1>
+  <Text testId="retry-message">{flaky.value.message}</Text>
+  <Text testId="retry-attempts">Attempts: {flaky.value.attempts}</Text>
+</App>

@@ -49,7 +49,17 @@ import {
 
 export type InitTestBedOptions = {
   testThemeVars?: Record<string, unknown>;
+  components?: string[];
   resources?: Record<string, string>;
+  apiInterceptor?: {
+    initialize?: string;
+    operations?: Record<string, {
+      url: string;
+      method?: string;
+      handler?: string;
+      status?: number;
+    }>;
+  };
 };
 
 export type TestBedResult = {
@@ -66,7 +76,7 @@ export type TestBedResult = {
 
 type Fixtures = {
   initTestBed: (markup: string, options?: InitTestBedOptions) => Promise<TestBedResult>;
-  createButtonDriver: () => Promise<ComponentDriver>;
+  createButtonDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createAccordionDriver: (testId?: string | Locator) => Promise<AccordionDriver>;
   createAppHeaderDriver: (testId?: string | Locator) => Promise<AppHeaderDriver>;
   createAvatarDriver: (testId?: string | Locator) => Promise<AvatarDriver>;
@@ -77,6 +87,7 @@ type Fixtures = {
   createCardDriver: (testId?: string) => Promise<CardDriver>;
   createContentSeparatorDriver: (testId?: string) => Promise<ContentSeparatorDriver>;
   createCodeBlockDriver: (testId?: string) => Promise<CodeBlockDriver>;
+  createMarkdownDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createNoResultDriver: (testId?: string) => Promise<NoResultDriver>;
   createOptionDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
   createValidationDisplayDriver: (testId?: string | Locator) => Promise<ComponentDriver>;
@@ -212,17 +223,24 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
         clipboard: createClipboardHelper(page),
         testStateDriver: {
           testState: async () => {
-            const probedValue = await page.evaluate(() => window.__xmluiTestBedProbe?.readLocal("testState"));
-            return probedValue === undefined
-              ? parseTestState(await page.getByTestId("__xmlui-test-state").textContent())
-              : probedValue;
+            const probed = await page.evaluate(() => {
+              const probe = window.__xmluiTestBedProbe;
+              return {
+                hasLocal: probe?.hasLocal?.("testState") ?? false,
+                value: probe?.readLocal("testState"),
+              };
+            });
+            if (probed.hasLocal) {
+              return probed.value;
+            }
+            return parseTestState(await page.getByTestId("__xmlui-test-state").textContent());
           },
         },
       };
     });
   },
   createButtonDriver: async ({ page }, use) => {
-    await use(async () => createButtonDriver(page));
+    await use(async (testId) => createButtonDriver(page, testId));
   },
   createAccordionDriver: async ({ page }, use) => {
     await use(async (testId) => new AccordionDriver({
@@ -304,6 +322,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   createCodeBlockDriver: async ({ page }, use) => {
     await use(async (testId) => new CodeBlockDriver({
       locator: testId ? page.getByTestId(testId) : page.locator('[data-xmlui-component="CodeBlock"]').first(),
+      page,
+    }));
+  },
+  createMarkdownDriver: async ({ page }, use) => {
+    await use(async (testId) => new ComponentDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+        : testId ?? page.locator('[data-xmlui-component="Markdown"]').first(),
       page,
     }));
   },
@@ -674,7 +700,12 @@ async function initTestBed(
   options: InitTestBedOptions,
 ): Promise<void> {
   const source = normalizeTestBedSource(markup, options);
-  const installTestBedSource = (xmluiSource: string) => {
+  const testBedPayload = {
+    source,
+    components: options.components ?? [],
+  };
+  await installApiInterceptor(page, options.apiInterceptor);
+  const installTestBedSource = (payload: { source: string; components: string[] }) => {
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -685,22 +716,23 @@ async function initTestBed(
         readText: async () => window.__xmluiClipboardText ?? "",
       },
     });
-    window.sessionStorage.setItem("__xmluiTestBedSource", xmluiSource);
+    window.sessionStorage.setItem("__xmluiTestBedSource", payload.source);
+    window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
     await replayInitScripts(page);
-    await page.evaluate(installTestBedSource, source);
+    await page.evaluate(installTestBedSource, testBedPayload);
     try {
       await page.evaluate(async (xmluiSource) => {
         await window.__xmluiTestBedReinit?.(xmluiSource);
       }, source);
     } catch {
-      await page.addInitScript(installTestBedSource, source);
+      await page.addInitScript(installTestBedSource, testBedPayload);
       await page.goto("/?__xmluiTestBed=1");
     }
   } else {
-    await page.addInitScript(installTestBedSource, source);
+    await page.addInitScript(installTestBedSource, testBedPayload);
     await page.goto("/?__xmluiTestBed=1");
   }
   const error = page.getByTestId("xmlui-testbed-error");
@@ -721,6 +753,121 @@ async function initTestBed(
   await page.keyboard.press("Shift");
 }
 
+async function installApiInterceptor(
+  page: Page,
+  apiInterceptor: InitTestBedOptions["apiInterceptor"],
+): Promise<void> {
+  const operations = apiInterceptor?.operations;
+  if (!operations) {
+    return;
+  }
+  const state: Record<string, unknown> = {};
+  if (apiInterceptor?.initialize) {
+    runApiHandler(apiInterceptor.initialize, { $state: state });
+  }
+  for (const operation of Object.values(operations)) {
+    await page.route(`**${routeGlob(operation.url)}`, async (route) => {
+      let body: unknown = { success: true };
+      let status = operation.status ?? 200;
+      if (operation.handler) {
+	        try {
+	          const apiContext = {
+	            $state: state,
+	            $requestBody: requestBody(route.request()),
+	            $pathParams: pathParams(operation.url, new URL(route.request().url()).pathname),
+	            $delayMs: 0,
+	          };
+	          body = runApiHandler(operation.handler, apiContext);
+	          if (apiContext.$delayMs > 0) {
+	            await new Promise((resolve) => setTimeout(resolve, apiContext.$delayMs));
+	          }
+	        } catch (error) {
+          if (isHttpError(error)) {
+            status = error.status;
+            body = error.body;
+          } else {
+            status = 500;
+            body = { error: String(error) };
+          }
+        }
+      }
+      await route.fulfill({
+        status,
+        contentType: "application/json",
+        body: JSON.stringify(body),
+      });
+    });
+  }
+}
+
+function routeGlob(pattern: string): string {
+  return pattern.replace(/:[^/]+/g, "*");
+}
+
+function runApiHandler(source: string, context: Record<string, unknown>): unknown {
+  const handler = createApiHandler(source);
+	  return handler(
+	    context.$state,
+	    context.$requestBody,
+	    context.$pathParams,
+	    context.$pathParams,
+	    (ms: number) => {
+	      context.$delayMs = Math.max(Number(context.$delayMs) || 0, Math.max(0, Number(ms) || 0));
+	    },
+	    {
+	      HttpError: (status: number, body: unknown) => {
+	        throw { __xmluiHttpError: true, status, body };
+      },
+    },
+  );
+}
+
+function createApiHandler(source: string): Function {
+  const trimmed = source.trim();
+  if (trimmed.startsWith("(") || trimmed.includes("=>")) {
+    return new Function(
+	      "$state",
+	      "$requestBody",
+	      "$pathParams",
+	      "$params",
+	      "delay",
+	      "Errors",
+	      `return (${source})();`,
+	    );
+	  }
+	  return new Function("$state", "$requestBody", "$pathParams", "$params", "delay", "Errors", source);
+}
+
+function requestBody(request: import("@playwright/test").Request): unknown {
+  const text = request.postData();
+  if (!text) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+function pathParams(pattern: string, pathname: string): Record<string, string> {
+  const patternParts = pattern.split("/").filter(Boolean);
+  const pathParts = pathname.split("/").filter(Boolean);
+  return Object.fromEntries(
+    patternParts.flatMap((part, index) =>
+      part.startsWith(":") ? [[part.slice(1), pathParts[index] ?? ""]] : [],
+    ),
+  );
+}
+
+function isHttpError(error: unknown): error is { status: number; body: unknown } {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      (error as { __xmluiHttpError?: unknown }).__xmluiHttpError === true,
+  );
+}
+
 async function replayInitScripts(page: Page): Promise<void> {
   const initScriptQueue: Array<{ fn: Function; arg?: unknown }> =
     (page as any).__xmluiInitScriptQueue ?? [];
@@ -738,8 +885,10 @@ async function replayInitScripts(page: Page): Promise<void> {
   initScriptQueue.length = 0;
 }
 
-function createButtonDriver(page: Page): ComponentDriver {
-  const component = page.getByRole("button").first();
+function createButtonDriver(page: Page, testId?: string | Locator): ComponentDriver {
+  const component = typeof testId === "string"
+    ? page.getByTestId(testId).or(page.locator(`[data-xmlui-id="${testId}"]`)).or(page.locator(`#${testId}`)).first()
+    : testId ?? page.getByRole("button").first();
   return new ComponentDriver({
     locator: component,
     page,
@@ -751,33 +900,114 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     normalizeLegacyTestMarkup(markup.trim()),
   );
   const trimmed = normalizedMarkup;
-  if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
-    return trimmed;
-  }
-  const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
   const testBedAppAttributes = {
     "paddingHorizontal-content-App": "0",
     "paddingVertical-content-App": "0",
     "gap-content-App": "0",
   };
-  const appThemeAttributes = Object.entries(testBedAppAttributes)
+  const appThemeAttributeEntries = Object.entries(testBedAppAttributes)
+    .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`);
+  if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
+    const injectedAttributes = [
+      ...appThemeAttributeEntries,
+      ...declarations,
+      trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{${implicitTestStateInitialValue(trimmed)}}"` : "",
+    ].filter(Boolean);
+    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), options.testThemeVars);
+  }
+  const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
+  const defaultAppThemeAttributes = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themeAttributes = Object.entries(options.testThemeVars ?? {})
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{null}" ${appThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+}
+
+function implicitTestStateInitialValue(markup: string): "null" | "undefined" {
+  if (markup.includes("selectionFired") || markup.includes("testState = testState || {}")) {
+    return "null";
+  }
+  return /<Tree\b|<TreeDisplay\b|<TableOfContents\b/.test(markup) ? "undefined" : "null";
+}
+
+function injectAppAttributes(markup: string, attributes: string[]): string {
+  if (attributes.length === 0) {
+    return markup;
+  }
+  const end = findOpeningAppTagEnd(markup);
+  if (end < 0) {
+    return markup;
+  }
+  const openTag = markup.slice(0, end + 1);
+  const selfClosing = /\/\s*>$/.test(openTag);
+  const existing = selfClosing
+    ? openTag.slice(4, openTag.lastIndexOf("/"))
+    : openTag.slice(4, -1);
+  const names = new Set([...existing.matchAll(/\s([^\s=]+)=/g)].map((match) => match[1]));
+  const filtered = attributes
+    .filter((entry) => {
+      const name = entry.split("=")[0];
+      return name && !names.has(name);
+    })
+    .join(" ");
+  if (!filtered) {
+    return markup;
+  }
+  const rebuilt = selfClosing
+    ? `<App${existing} ${filtered} />`
+    : `<App${existing} ${filtered}>`;
+  return `${rebuilt}${markup.slice(end + 1)}`;
+}
+
+function wrapRootAppTheme(markup: string, themeVars: Record<string, unknown> | undefined): string {
+  const entries = Object.entries(themeVars ?? {});
+  if (entries.length === 0) {
+    return markup;
+  }
+  const openEnd = findOpeningAppTagEnd(markup);
+  const closeStart = markup.lastIndexOf("</App>");
+  if (openEnd < 0 || closeStart < 0) {
+    return markup;
+  }
+  const themeAttributes = entries
+    .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
+    .join(" ");
+  return `${markup.slice(0, openEnd + 1)}<Theme ${themeAttributes}>${markup.slice(openEnd + 1, closeStart)}</Theme>${markup.slice(closeStart)}`;
+}
+
+function findOpeningAppTagEnd(markup: string): number {
+  let quote: string | undefined;
+  for (let index = 4; index < markup.length; index++) {
+    const char = markup[index];
+    if (quote) {
+      if (char === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === `"` || char === `'`) {
+      quote = char;
+      continue;
+    }
+    if (char === ">") {
+      return index;
+    }
+  }
+  return -1;
 }
 
 function normalizeLegacyTestMarkup(markup: string): string {
-  return markup
+  return stripLegacyTryCatchBlocks(escapeGtInQuotedAttributes(stripLegacyIframePostMessageScript(markup)))
     .replace(/(<CodeBlock\b[^>]*>)([\s\S]*?)(<\/CodeBlock>)/g, (_match, open, content, close) =>
       `${open}${content.replaceAll("{", "&#123;").replaceAll("}", "&#125;")}${close}`
     )
-    .replaceAll("&nbsp;", "\u00a0")
-    .replaceAll("&amp;", "&")
-    .replace(/\sboolean(?=[\s>])/g, ` boolean="true"`)
+	    .replaceAll("&nbsp;", "\u00a0")
+	    .replaceAll("&amp;", "&")
+	    .replace(/\sboolean(?=[\s>])/g, ` boolean="true"`)
+	    .replace(/\s(itemClickExpands)(?=[\s>])/g, ` $1="true"`)
     .replace(/^<Heading(?=[\s/>])/, (match) =>
       markup.includes("testId=") ? match : `<Heading testId="test-id-component"`)
     .replaceAll(`onDoubleClick="() => {}"`, `onDoubleClick="testState = testState"`)
@@ -789,7 +1019,10 @@ function normalizeLegacyTestMarkup(markup: string): string {
     .replaceAll(`testState = clicked`, `testState = 'clicked'`)
     .replaceAll(`onDidChange="{(val) => {value = val}}"`, `onDidChange="val => value = val"`)
     .replaceAll(`onDidChange="arg => {testState = arg; console.log('arg', arg)}"`, `onDidChange="arg => testState = arg"`)
-    .replaceAll(`icon="() => {}"`, `icon="{null}"`)
+    .replaceAll(`await delay(`, `delay(`)
+    .replace(/testState\.loadCount(?!\s*=)/g, `(testState || {}).loadCount`)
+    .replaceAll(`data="{invalidJson}"`, `data="invalidJson"`)
+    .replace(/icon="\(\)\s*(?:=>|=&gt;)\s*\{\s*\}"/g, `icon="{null}"`)
     .replaceAll(`src="{() => '/resources/test-image-100x100.jpg'}"`, `src="{null}"`)
     .replaceAll(`alt="{() => '/resources/test-image-100x100.jpg'}"`, `alt="{null}"`)
     .replaceAll("Special chars: <>&", "Special chars: &lt;&gt;&amp;")
@@ -806,7 +1039,119 @@ function normalizeLegacyTestMarkup(markup: string): string {
       "isDocument: true",
     )
     .replaceAll("\\{", "&#123;")
-    .replaceAll("\\}", "&#125;");
+	    .replaceAll("\\}", "&#125;");
+}
+
+function stripLegacyIframePostMessageScript(markup: string): string {
+  return markup.replace(
+    /<script>\s*window\.addEventListener\('message', \(event\) => \{\s*window\.parent\.postMessage\(\{ received: event\.data \}, '\*'\);\s*\}\);\s*<\/script>\s*<h1>Test IFrame<\/h1>/g,
+    "<h1>Test IFrame</h1>",
+  );
+}
+
+function stripLegacyTryCatchBlocks(markup: string): string {
+  let output = "";
+  let index = 0;
+  while (index < markup.length) {
+    const tryIndex = markup.indexOf("try", index);
+    if (tryIndex < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    const before = markup[tryIndex - 1];
+    const after = markup[tryIndex + 3];
+    if ((before && /[\w$]/.test(before)) || (after && /[\w$]/.test(after))) {
+      output += markup.slice(index, tryIndex + 3);
+      index = tryIndex + 3;
+      continue;
+    }
+    const openTry = markup.indexOf("{", tryIndex + 3);
+    if (openTry < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    const closeTry = findMatchingBrace(markup, openTry);
+    if (closeTry < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    const catchMatch = /^\s*catch\s*\([^)]*\)\s*\{/.exec(markup.slice(closeTry + 1));
+    if (!catchMatch) {
+      output += markup.slice(index, closeTry + 1);
+      index = closeTry + 1;
+      continue;
+    }
+    const openCatch = closeTry + 1 + catchMatch[0].lastIndexOf("{");
+    const closeCatch = findMatchingBrace(markup, openCatch);
+    if (closeCatch < 0) {
+      output += markup.slice(index);
+      break;
+    }
+    output += markup.slice(index, tryIndex);
+    output += markup.slice(openTry + 1, closeTry);
+    index = closeCatch + 1;
+  }
+  return output;
+}
+
+function findMatchingBrace(source: string, openIndex: number): number {
+  let depth = 0;
+  let quote: string | undefined;
+  for (let index = openIndex; index < source.length; index++) {
+    const char = source[index];
+    if (quote) {
+      if (char === "\\" && index + 1 < source.length) {
+        index++;
+      } else if (char === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === `"` || char === `'` || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (char === "{") {
+      depth++;
+    } else if (char === "}") {
+      depth--;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+  return -1;
+}
+
+function escapeGtInQuotedAttributes(markup: string): string {
+  let quote: string | undefined;
+  let inTag = false;
+  let escaped = "";
+  for (let index = 0; index < markup.length; index++) {
+    const char = markup[index];
+    if (quote) {
+      if (char === quote) {
+        quote = undefined;
+        escaped += char;
+      } else {
+        escaped += char === ">" ? "&gt;" : char;
+      }
+      continue;
+    }
+    if (char === "<") {
+      inTag = true;
+    }
+    if (char === ">" && inTag) {
+      inTag = false;
+      escaped += char;
+      continue;
+    }
+    if (inTag && (char === `"` || char === `'`)) {
+      quote = char;
+    }
+    escaped += char;
+  }
+  return escaped;
 }
 
 function normalizeLegacyVariableDeclarations(markup: string): {
@@ -814,13 +1159,18 @@ function normalizeLegacyVariableDeclarations(markup: string): {
   declarations: string[];
 } {
   const declarations: string[] = [];
-  const normalizedMarkup = markup.replace(
+  const modalBlocks: string[] = [];
+  const protectedMarkup = markup.replace(/<ModalDialog\b[\s\S]*?<\/ModalDialog>/g, (block) => {
+    const index = modalBlocks.push(block) - 1;
+    return `__XMLUI_MODAL_BLOCK_${index}__`;
+  });
+  const normalizedMarkup = protectedMarkup.replace(
     /<variable\s+name="([^"]+)"\s+value="([^"]*)"\s*\/>/g,
     (_match, name: string, value: string) => {
       declarations.push(`var.${name}="${value}"`);
       return "";
     },
-  );
+  ).replace(/__XMLUI_MODAL_BLOCK_(\d+)__/g, (_match, index: string) => modalBlocks[Number(index)] ?? "");
   return { markup: normalizedMarkup, declarations };
 }
 

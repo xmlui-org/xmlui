@@ -58,6 +58,14 @@ $gap-NavGroup: createThemeVar("gap-NavGroup");
   flex: 0 0 auto;
 }
 
+.indicator::before {
+  content: ">";
+}
+
+.trigger[aria-expanded="true"] .indicator::before {
+  content: "v";
+}
+
 .content {
   display: none;
   flex-direction: column;

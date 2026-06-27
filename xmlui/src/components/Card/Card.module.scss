@@ -89,6 +89,7 @@
 
   .content {
     display: flex;
+    flex: 0 0 auto;
     min-width: 0;
     min-height: 0;
     gap: var(--xmlui-gap-Card);

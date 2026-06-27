@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { LiveRegionMd, defaultProps } from "./LiveRegion";
-import styles from "./LiveRegion.module.scss";
+import { LiveRegion } from "./LiveRegionReact";
 
 export const liveRegionRenderer = wrapComponent({
   name: "LiveRegion",
@@ -9,17 +9,12 @@ export const liveRegionRenderer = wrapComponent({
     const politeness = adapter.stringProp("politeness", defaultProps.politeness) === "assertive"
       ? "assertive"
       : "polite";
-    const message = adapter.stringProp("message", "") ?? "";
     return (
-      <div
+      <LiveRegion
         {...adapter.rootAttrs()}
-        className={`${adapter.className} ${styles.liveRegion}`}
-        role={politeness === "assertive" ? "alert" : "status"}
-        aria-live={politeness}
-        aria-atomic="true"
-      >
-        {message}
-      </div>
+        message={adapter.stringProp("message", "") ?? ""}
+        politeness={politeness}
+      />
     );
   },
 });

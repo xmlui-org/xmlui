@@ -24,6 +24,76 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
     flex-direction: column;
     gap: var(--xmlui-gap-Select, var(--xmlui-space-1));
     max-width: 100%;
+    position: relative;
+    border-color: var(--xmlui-borderColor-Select);
+    border-width: var(--xmlui-borderWidth-Select);
+    border-style: var(--xmlui-borderStyle-Select);
+    border-radius: var(--xmlui-borderRadius-Select);
+    background-color: var(--xmlui-backgroundColor-Select);
+    color: var(--xmlui-textColor-Select);
+    box-shadow: var(--xmlui-boxShadow-Select);
+    font-size: var(--xmlui-fontSize-Select);
+  }
+
+  .selectRoot:hover {
+    border-color: var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select));
+    background-color: var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select));
+    color: var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select));
+    box-shadow: var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select));
+  }
+
+  .selectRoot:hover .selectTrigger {
+    border-color: var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select));
+    background-color: var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select));
+    color: var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select));
+    box-shadow: var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select));
+  }
+
+  .selectRootWithLabel {
+    align-items: stretch;
+  }
+
+  .selectLabel {
+    box-sizing: border-box;
+    color: var(--xmlui-textColor-label-Select, var(--xmlui-textColor-primary));
+    font: inherit;
+  }
+
+  .selectRequiredIndicator {
+    color: var(--xmlui-textColor-requiredMark-formItem, var(--xmlui-color-danger-500));
+    margin-left: 0.125rem;
+  }
+
+  .selectOptionalIndicator {
+    color: var(--xmlui-textColor-optionalTag-formItem, var(--xmlui-textColor-secondary));
+    margin-left: 0.25rem;
+  }
+
+  .selectLabelTop {
+    flex-direction: column;
+  }
+
+  .selectLabelBottom {
+    flex-direction: column-reverse;
+  }
+
+  .selectLabelStart,
+  .selectLabelEnd {
+    display: inline-grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .selectLabelEnd {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .selectLabelEnd .selectLabel {
+    order: 2;
+  }
+
+  .selectLabelBreak .selectLabel {
+    white-space: normal;
   }
 
   .selectTrigger {
@@ -47,9 +117,127 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
     cursor: pointer;
   }
 
+  .selectValidationWarning .selectTrigger {
+    border-color: var(--xmlui-borderColor-Select--warning, var(--xmlui-borderColor-Select));
+    border-width: var(--xmlui-borderWidth-Select--warning, var(--xmlui-borderWidth-Select));
+    border-style: var(--xmlui-borderStyle-Select--warning, var(--xmlui-borderStyle-Select));
+    border-radius: var(--xmlui-borderRadius-Select--warning, var(--xmlui-borderRadius-Select));
+    background-color: var(--xmlui-backgroundColor-Select--warning, var(--xmlui-backgroundColor-Select));
+    color: var(--xmlui-textColor-Select--warning, var(--xmlui-textColor-Select));
+    box-shadow: var(--xmlui-boxShadow-Select--warning, var(--xmlui-boxShadow-Select));
+    font-size: var(--xmlui-fontSize-Select--warning, var(--xmlui-fontSize-Select));
+  }
+
+  .selectValidationError .selectTrigger {
+    border-color: var(--xmlui-borderColor-Select--error, var(--xmlui-borderColor-Select));
+    border-width: var(--xmlui-borderWidth-Select--error, var(--xmlui-borderWidth-Select));
+    border-style: var(--xmlui-borderStyle-Select--error, var(--xmlui-borderStyle-Select));
+    border-radius: var(--xmlui-borderRadius-Select--error, var(--xmlui-borderRadius-Select));
+    background-color: var(--xmlui-backgroundColor-Select--error, var(--xmlui-backgroundColor-Select));
+    color: var(--xmlui-textColor-Select--error, var(--xmlui-textColor-Select));
+    box-shadow: var(--xmlui-boxShadow-Select--error, var(--xmlui-boxShadow-Select));
+    font-size: var(--xmlui-fontSize-Select--error, var(--xmlui-fontSize-Select));
+  }
+
+  .selectValidationSuccess .selectTrigger {
+    border-color: var(--xmlui-borderColor-Select--success, var(--xmlui-borderColor-Select));
+    border-width: var(--xmlui-borderWidth-Select--success, var(--xmlui-borderWidth-Select));
+    border-style: var(--xmlui-borderStyle-Select--success, var(--xmlui-borderStyle-Select));
+    border-radius: var(--xmlui-borderRadius-Select--success, var(--xmlui-borderRadius-Select));
+    background-color: var(--xmlui-backgroundColor-Select--success, var(--xmlui-backgroundColor-Select));
+    color: var(--xmlui-textColor-Select--success, var(--xmlui-textColor-Select));
+    box-shadow: var(--xmlui-boxShadow-Select--success, var(--xmlui-boxShadow-Select));
+    font-size: var(--xmlui-fontSize-Select--success, var(--xmlui-fontSize-Select));
+  }
+
+  .selectValidationWarning .selectTrigger:hover {
+    border-color: var(--xmlui-borderColor-Select--warning--hover, var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select--warning, var(--xmlui-borderColor-Select))));
+    background-color: var(--xmlui-backgroundColor-Select--warning--hover, var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select--warning, var(--xmlui-backgroundColor-Select))));
+    color: var(--xmlui-textColor-Select--warning--hover, var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select--warning, var(--xmlui-textColor-Select))));
+    box-shadow: var(--xmlui-boxShadow-Select--warning--hover, var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select--warning, var(--xmlui-boxShadow-Select))));
+  }
+
+  .selectValidationError .selectTrigger:hover {
+    border-color: var(--xmlui-borderColor-Select--error--hover, var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select--error, var(--xmlui-borderColor-Select))));
+    background-color: var(--xmlui-backgroundColor-Select--error--hover, var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select--error, var(--xmlui-backgroundColor-Select))));
+    color: var(--xmlui-textColor-Select--error--hover, var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select--error, var(--xmlui-textColor-Select))));
+    box-shadow: var(--xmlui-boxShadow-Select--error--hover, var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select--error, var(--xmlui-boxShadow-Select))));
+  }
+
+  .selectValidationSuccess .selectTrigger:hover {
+    border-color: var(--xmlui-borderColor-Select--success--hover, var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select--success, var(--xmlui-borderColor-Select))));
+    background-color: var(--xmlui-backgroundColor-Select--success--hover, var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select--success, var(--xmlui-backgroundColor-Select))));
+    color: var(--xmlui-textColor-Select--success--hover, var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select--success, var(--xmlui-textColor-Select))));
+    box-shadow: var(--xmlui-boxShadow-Select--success--hover, var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select--success, var(--xmlui-boxShadow-Select))));
+  }
+
+  .selectValueTemplate {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .selectClearButton {
+    position: absolute;
+    right: var(--xmlui-space-1, 0.25rem);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: var(--xmlui-textColor-Select);
+    cursor: pointer;
+    font: inherit;
+    line-height: 1;
+    padding: 0 var(--xmlui-space-1, 0.25rem);
+    z-index: calc(var(--xmlui-zIndex-Select, 10) + 1);
+  }
+
+  .selectConciseValidationFeedback {
+    position: absolute;
+    right: var(--xmlui-space-1, 0.25rem);
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    width: 1rem;
+    height: 1rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--xmlui-color-danger-500);
+  }
+
+  .selectConciseValidationFeedback [data-icon-name="error"]::before {
+    content: "!";
+  }
+
+  .selectConciseValidationFeedback [data-icon-name="checkmark"]::before {
+    content: "✓";
+    color: var(--xmlui-color-success-500);
+  }
+
+  .selectValidationTooltip {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    z-index: calc(var(--xmlui-zIndex-Select, 10) + 2);
+    white-space: nowrap;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--xmlui-borderRadius);
+    background: var(--xmlui-color-surface-900);
+    color: var(--xmlui-color-surface-0);
+  }
+
+  .selectValidationMessage {
+    color: var(--xmlui-textColor-error-FormItem, var(--xmlui-color-danger-500));
+    font-size: var(--xmlui-fontSize-error-FormItem, var(--xmlui-fontSize-sm));
+  }
+
   .selectTrigger:disabled {
     cursor: not-allowed;
     opacity: var(--xmlui-opacity-Select--disabled, 0.65);
+  }
+
+  .selectPopover {
+    position: relative;
+    min-width: 100%;
   }
 
   .selectOptions {
@@ -64,6 +252,35 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
     background-color: var(--xmlui-backgroundColor-Select);
     box-shadow: var(--xmlui-boxShadow-Select);
     z-index: var(--xmlui-zIndex-Select, 10);
+  }
+
+  .selectSearch {
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--xmlui-paddingVertical-Select, 0.25rem) var(--xmlui-paddingHorizontal-Select, 0.5rem);
+    border: 0;
+    border-bottom: var(--xmlui-borderWidth-Select) var(--xmlui-borderStyle-Select) var(--xmlui-borderColor-Select);
+    font: inherit;
+  }
+
+  .selectStatus,
+  .selectEmpty,
+  .selectGroupHeader {
+    padding: var(--xmlui-paddingVertical-option-Select, 0.35rem) var(--xmlui-paddingHorizontal-option-Select, 0.5rem);
+    color: var(--xmlui-textColor-Select);
+  }
+
+  .selectGroupHeader {
+    font-weight: var(--xmlui-fontWeight-groupHeader-Select, 600);
+    background-color: var(--xmlui-backgroundColor-groupHeader-Select, var(--xmlui-color-surface-100));
+  }
+
+  .selectScrollUpButton,
+  .selectScrollDownButton {
+    flex: 0 0 0.5rem;
+    min-height: 0.5rem;
+    background-color: var(--xmlui-backgroundColor-scrollIndicator-Select, transparent);
+    pointer-events: none;
   }
 
   .selectOption {
@@ -94,15 +311,6 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
   }
 
   .nativeMirror {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    border: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
+    display: none;
   }
 }

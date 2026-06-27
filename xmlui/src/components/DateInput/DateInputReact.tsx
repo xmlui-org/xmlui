@@ -4,6 +4,7 @@ import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo,
 import { dateFormats, type DateFormat, DateInputModeValues, type DateInputMode, WeekDays } from "./DateInput.constants";
 import { defaultProps } from "./DateInput.defaults";
 import styles from "./DateInput.module.scss";
+import { useFormContext } from "../Form/FormContext";
 
 export type DateInputApi = {
   focus: () => void;
@@ -14,6 +15,7 @@ export type DateInputApi = {
 
 export type DateInputProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   enabled?: boolean;
@@ -60,6 +62,7 @@ const emptyParts: DateParts = { month: "", day: "", year: "" };
 export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(function DateInputNative(
   {
     id,
+    bindTo,
     value,
     initialValue,
     enabled = defaultProps.enabled,
@@ -84,7 +87,7 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
-    verboseValidationFeedback = true,
+    verboseValidationFeedback,
     validationIconSuccess = "checkmark",
     validationIconError = "close",
     invalidMessages,
@@ -100,13 +103,27 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
   },
   ref,
 ) {
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const validateFormField = form?.validateField;
+  const registerFormItem = form?.registerItem;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
+  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
+  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
+  const effectiveValue = formValue ?? value;
   const normalizedFormat = normalizeDateFormat(dateFormat);
-  const controlled = value !== undefined;
-  const initialString = stringifyDateValue(controlled ? value : initialValue);
+  const controlled = effectiveValue !== undefined;
+  const initialString = stringifyDateValue(controlled ? effectiveValue : initialValue);
   const [parts, setParts] = useState<DateParts>(() => parseDateParts(initialString, normalizedFormat) ?? emptyParts);
   const [invalidFields, setInvalidFields] = useState<Partial<Record<FieldName, boolean>>>({});
   const [hasFocusInside, setHasFocusInside] = useState(false);
   const [selectAllActive, setSelectAllActive] = useState(false);
+  const [hadValidationError, setHadValidationError] = useState(false);
+  const [showValidFeedback, setShowValidFeedback] = useState(false);
+  const [conciseTooltipVisible, setConciseTooltipVisible] = useState(false);
   const selectAllActiveRef = useRef(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const inputRefs = {
@@ -122,9 +139,9 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
 
   useEffect(() => {
     if (controlled) {
-      setParts(parseDateParts(stringifyDateValue(value), normalizedFormat) ?? emptyParts);
+      setParts(parseDateParts(stringifyDateValue(effectiveValue), normalizedFormat) ?? emptyParts);
     }
-  }, [controlled, normalizedFormat, value]);
+  }, [controlled, effectiveValue, normalizedFormat]);
 
   useEffect(() => {
     if (!controlled) {
@@ -139,11 +156,47 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
     }
   }, [autoFocus, enabled, orderedFields]);
 
+  useEffect(() => {
+    if (formError) {
+      setHadValidationError(true);
+      setShowValidFeedback(false);
+    }
+  }, [formError]);
+
+  useEffect(() => {
+    if (
+      !getFormValue ||
+      !setFormValue ||
+      fieldName === undefined ||
+      getFormValue(fieldName) != null ||
+      initialValue === undefined
+    ) {
+      return;
+    }
+    const initial = formatDateParts(parseDateParts(stringifyDateValue(initialValue), normalizedFormat) ?? emptyParts, normalizedFormat);
+    setFormValue(fieldName, initial);
+  }, [fieldName, getFormValue, initialValue, normalizedFormat, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      label: stringifyLabel(label),
+      required,
+    });
+  }, [fieldName, label, registerFormItem, required]);
+
   const emitParts = useCallback((nextParts: DateParts) => {
     setParts(nextParts);
     const nextValue = formatDateParts(nextParts, normalizedFormat);
+    setShowValidFeedback(false);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, nextValue);
+    }
     void onDidChange?.(nextValue);
-  }, [normalizedFormat, onDidChange]);
+  }, [fieldName, normalizedFormat, onDidChange, setFormValue]);
 
   const updateField = useCallback((field: FieldName, rawValue: string) => {
     if (!interactive) {
@@ -173,13 +226,19 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
     const raw = parts[field];
     const normalized = normalizeFieldValue(field, raw, parts);
     const nextParts = { ...parts, [field]: normalized };
-    const invalid = normalized !== "" && isFieldInvalid(field, normalized, nextParts);
-    setInvalidFields((current) => ({ ...current, [field]: invalid }));
-    if (invalid) {
+    const nextValue = formatDateParts(nextParts, normalizedFormat);
+    const nextInvalidFields = computeInvalidFields(nextParts);
+    setInvalidFields(nextInvalidFields);
+    if (Object.values(nextInvalidFields).some(Boolean)) {
       void onInvalidChange?.();
     }
     emitParts(nextParts);
-  }, [emitParts, onInvalidChange, parts]);
+    if (validateFormField && fieldName !== undefined && hadValidationError) {
+      void validateFormField(fieldName, nextValue).then((message) => {
+        setShowValidFeedback(!message);
+      });
+    }
+  }, [emitParts, fieldName, hadValidationError, normalizedFormat, onInvalidChange, parts, validateFormField]);
 
   const setValue = useCallback((nextValue: unknown) => {
     const nextParts = parseDateParts(stringifyDateValue(nextValue), normalizedFormat) ?? emptyParts;
@@ -221,8 +280,13 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
       setSelectAllActive(false);
       selectAllActiveRef.current = false;
       void onBlur?.();
+      if (validateFormField && fieldName !== undefined && hadValidationError) {
+        void validateFormField(fieldName, formatDateParts(parts, normalizedFormat)).then((message) => {
+          setShowValidFeedback(!message);
+        });
+      }
     }
-  }, [onBlur]);
+  }, [fieldName, hadValidationError, normalizedFormat, onBlur, parts, validateFormField]);
 
   const handleKeyDown = useCallback((field: FieldName, event: KeyboardEvent<HTMLInputElement>) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
@@ -268,6 +332,11 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
   }, [currentValue, emitParts, inputRefs, orderedFields]);
 
   const hasLabel = label !== undefined && label !== null && label !== "";
+  const effectiveValidationStatus = formError
+    ? "error"
+    : !effectiveVerboseValidationFeedback && showValidFeedback
+      ? "valid"
+      : validationStatus;
   const rootStyle = useMemo<CSSProperties>(() => ({
     ...(hasLabel ? undefined : style),
     ...(gap ? { "--xmlui-runtime-gap-DateInput": gap } as CSSProperties : undefined),
@@ -281,13 +350,13 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
       {...rest}
       ref={rootRef}
       data-xmlui-component="DateInput"
-      data-validation-status={validationStatus}
+      data-validation-status={effectiveValidationStatus}
       data-testid={hasLabel ? undefined : dataTestId}
       className={cx(
         styles.dateInputWrapper,
-        validationStatus === "error" ? styles.dateInputError : undefined,
-        validationStatus === "warning" ? styles.dateInputWarning : undefined,
-        validationStatus === "valid" ? styles.dateInputValid : undefined,
+        effectiveValidationStatus === "error" ? styles.dateInputError : undefined,
+        effectiveValidationStatus === "warning" ? styles.dateInputWarning : undefined,
+        effectiveValidationStatus === "valid" ? styles.dateInputValid : undefined,
         !enabled ? styles.disabled : undefined,
         readOnly ? styles.readOnly : undefined,
         className,
@@ -348,22 +417,47 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
           </button>
         ) : null}
       </div>
-      {!verboseValidationFeedback && validationStatus !== "none" ? (
+      {!effectiveVerboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
         <span
           data-part-id="conciseValidationFeedback"
           data-xmlui-part="conciseValidationFeedback"
           className={styles.conciseValidationFeedback}
-          title={invalidMessages?.join("\n")}
+          onMouseEnter={() => setConciseTooltipVisible(true)}
+          onMouseLeave={() => setConciseTooltipVisible(false)}
+          onFocus={() => setConciseTooltipVisible(true)}
+          onBlur={() => setConciseTooltipVisible(false)}
+          tabIndex={-1}
         >
-          {validationStatus === "valid" ? validationIconSuccess : validationIconError}
+          <span
+            data-icon-name={effectiveValidationStatus === "valid" ? validationIconSuccess : "error"}
+          >
+            {effectiveValidationStatus === "valid" ? validationIconSuccess : validationIconError}
+          </span>
+          {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
+            <span data-tooltip-container role="tooltip" className={styles.dateInputConciseTooltip}>
+              {effectiveInvalidMessages.join("\n")}
+            </span>
+          ) : null}
         </span>
       ) : null}
       <Adornment text={endText} icon={endIcon} />
     </div>
   );
+  const validationFeedback = effectiveVerboseValidationFeedback && effectiveInvalidMessages?.length ? (
+    <div data-xmlui-part="error">
+      {effectiveInvalidMessages.map((message, index) => (
+        <div key={index}>{message}</div>
+      ))}
+    </div>
+  ) : null;
 
   if (!hasLabel) {
-    return inputRoot;
+    return (
+      <>
+        {inputRoot}
+        {validationFeedback}
+      </>
+    );
   }
 
   return (
@@ -377,6 +471,7 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
       <div data-part-id="labeledItem" data-xmlui-part="labeledItem" style={labeledItemStyle}>
         {inputRoot}
       </div>
+      {validationFeedback}
     </div>
   );
 }));
@@ -409,6 +504,17 @@ function normalizeDateFormat(format: unknown): DateFormat {
 
 function stringifyDateValue(value: unknown): string | null {
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function stringifyLabel(value: unknown): string {
+  return value === undefined || value === null ? "" : String(value);
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function parseDateParts(value: string | null, format: DateFormat): DateParts | null {
@@ -529,6 +635,9 @@ function normalizeFieldValue(field: FieldName, value: string, parts: DateParts):
   const maxDay = parts.month && parts.year ? new Date(Number(parts.year), Number(parts.month), 0).getDate() : 31;
   if (numberValue >= 1 && numberValue <= maxDay) {
     return pad2(numberValue);
+  }
+  if (parts.month && parts.year && numberValue > maxDay) {
+    return value;
   }
   const normalized = numberValue % 10;
   return pad2(normalized === 0 ? 1 : normalized);

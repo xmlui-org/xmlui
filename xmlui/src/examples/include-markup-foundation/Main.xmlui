@@ -1,0 +1,9 @@
+<App>
+  <H1>IncludeMarkup foundation</H1>
+  <IncludeMarkup
+    url="data:text/plain;charset=utf-8,%3CFragment%20var.count%3D%22%7B0%7D%22%3E%3CText%20testId%3D%22included-count%22%3EIncluded%20count%3A%20%7Bcount%7D%3C%2FText%3E%3CButton%20testId%3D%22included-button%22%20onClick%3D%22count%2B%2B%22%3EIncrement%20included%3C%2FButton%3E%3C%2FFragment%3E">
+    <property name="loadingContent">
+      <Text testId="include-loading">Loading include</Text>
+    </property>
+  </IncludeMarkup>
+</App>

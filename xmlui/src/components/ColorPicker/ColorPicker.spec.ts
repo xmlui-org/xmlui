@@ -370,7 +370,7 @@ test("component handles rapid value changes efficiently", async ({ page, initTes
 // INTEGRATION TESTS
 // =============================================================================
 
-test.fixme("component works correctly in a form context", async ({ page, initTestBed }) => {
+test("component works correctly in a form context", async ({ page, initTestBed }) => {
   const { testStateDriver } = await initTestBed(`
     <Form onSubmit="(data) => testState = data.testField" data="{{ testField: '#0000ff' }}">
       <FormItem type="colorpicker" label="Choose Color" bindTo="testField" />
@@ -413,7 +413,7 @@ test("component setValue API works", async ({ page, initTestBed }) => {
   await expect(colorInput).toHaveValue("#00ff00");
 });
 
-test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
   await initTestBed(`
     <Form hideButtonRow="true">
       <ColorPicker id="boundColorPicker" bindTo="colorValue" />
@@ -489,11 +489,6 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Behaviors and Parts", () => {
-  test.fixme(
-    true,
-    "Deferred until Form/FormItem requireLabelMode and bindTo infrastructure is migrated.",
-  );
-
   test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>

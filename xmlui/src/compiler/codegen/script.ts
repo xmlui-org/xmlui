@@ -259,13 +259,23 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "BinaryExpression":
       return `(${emitExpression(ir.left)} ${ir.operator} ${emitExpression(ir.right)})`;
     case "UnaryExpression":
+      if (ir.operator === "delete") {
+        return emitDeleteExpression(ir.argument);
+      }
+      if (ir.operator === "typeof") {
+        return `(typeof ${emitExpression(ir.argument)})`;
+      }
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
     case "ArrayExpression":
       return `[${ir.elements.map(emitExpression).join(", ")}]`;
     case "ObjectExpression":
-      return `{${ir.properties.map((property) => `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`).join(", ")}}`;
+      return `{${ir.properties.map((property) =>
+        property.kind === "spread"
+          ? `...${emitExpression(property.argument)}`
+          : `${JSON.stringify(property.key)}: ${emitExpression(property.value)}`
+      ).join(", ")}}`;
     case "CallExpression":
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
@@ -281,6 +291,16 @@ function emitExpression(ir: XmluiScriptIr): string {
     default:
       throw new Error(`Cannot generate ${ir.kind} as an XMLUI expression.`);
   }
+}
+
+function emitDeleteExpression(argument: XmluiScriptIr): string {
+  if (argument.kind === "MemberRead") {
+    return `(delete (${emitExpression(argument.object)})[${JSON.stringify(argument.member)}])`;
+  }
+  if (argument.kind === "IndexRead") {
+    return `(delete (${emitExpression(argument.object)})[${emitExpression(argument.index)}])`;
+  }
+  return `(delete (${emitExpression(argument)}))`;
 }
 
 function emitOptionalMemberRead(object: XmluiScriptIr, member: string): string {
@@ -306,11 +326,26 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "debugBreak") {
     return "undefined";
   }
+  const args = ir.args.map(emitExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    const builtInSource = ir.callee.name === "confirm"
+      ? `ctx.readReference?.("confirm")`
+      : emitRead(ir.callee.dependency, ir.callee.name);
+    return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${builtInSource})`;
+  }
+  if (
+    ir.callee.kind === "IdentifierRead" &&
+    (ir.callee.dependency?.kind === "local" || ir.callee.dependency?.kind === "global")
+  ) {
+    return `((__xmluiLocalFn) => typeof __xmluiLocalFn === "function" ? __xmluiLocalFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+  }
   if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
     throw new Error("Cannot generate unsupported XMLUI expression call target.");
   }
   const objectSource = emitExpression(ir.callee.object);
-  const args = ir.args.map(emitExpression).join(", ");
   return `(${objectSource})?.[${JSON.stringify(ir.callee.member)}]?.(${args})`;
 }
 
@@ -390,6 +425,15 @@ function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpress
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
     const [target, queryParams] = ir.args.map(emitAsyncExpression);
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
+    return `await (async (__xmluiContextFn) => typeof __xmluiContextFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiContextFn(${args}))) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
+    const builtInSource = ir.callee.name === "confirm"
+      ? `ctx.readReference?.("confirm")`
+      : emitRead(ir.callee.dependency, ir.callee.name);
+    return `await (async (__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiBuiltInFn(${args}))) : undefined)(${builtInSource})`;
   }
   if (ir.callee.kind === "IdentifierRead") {
     return `await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])))`;
@@ -495,6 +539,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
   if (target.kind === "member" && target.object) {
     return emitOptionalMemberRead(target.object, target.name);
   }
+  if (target.kind === "index" && target.object && target.index) {
+    return emitOptionalIndexRead(target.object, target.index);
+  }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
   }
@@ -505,6 +552,9 @@ function emitTargetRead(target: BoundWriteTarget): string {
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
   if (target.kind === "member" && target.object) {
     return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+  }
+  if (target.kind === "index" && target.object && target.index) {
+    return `((${emitExpression(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
   }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
@@ -553,6 +603,7 @@ function isAllowedMethodName(name: string): boolean {
     "map",
     "filter",
     "find",
+    "from",
     "some",
     "every",
     "includes",
@@ -561,19 +612,46 @@ function isAllowedMethodName(name: string): boolean {
     "toUpperCase",
     "startsWith",
     "endsWith",
+    "stringify",
+    "now",
+    "log",
+    "callApi",
     "getFields",
+    "getData",
     "getValue",
     "hasOverflow",
     "open",
     "close",
     "isOpen",
+    "setLocale",
+    "translate",
     "openAt",
     "setValue",
     "scrollToTop",
     "scrollToBottom",
     "scrollToStart",
     "scrollToEnd",
+    "getVisibleItems",
+    "getExpandedNodes",
+    "getSelectedNode",
+    "getNodeById",
+    "scrollIntoView",
+    "appendNode",
+    "removeNode",
+    "removeChildren",
+    "insertNodeBefore",
+    "insertNodeAfter",
+    "refreshData",
+    "getDynamic",
+    "getNodeLoadingState",
+    "getExpandedTimestamp",
+    "getAutoLoadAfter",
+    "getNodeAutoLoadAfter",
   ].includes(name);
+}
+
+function isAllowedBuiltInCallName(name: string): boolean {
+  return name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
 }
 
 function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]): Set<string> {

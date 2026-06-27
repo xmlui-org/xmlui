@@ -8,7 +8,7 @@ export type ManagedRequestInput = {
   queryParams?: unknown;
   headers?: unknown;
   credentials?: RequestCredentials;
-  dataType?: "json" | "text";
+  dataType?: "json" | "text" | "csv" | "sql";
 };
 
 export type ManagedRequest = {
@@ -19,7 +19,7 @@ export type ManagedRequest = {
   queryParams?: Record<string, unknown>;
   headers: Record<string, string>;
   credentials?: RequestCredentials;
-  dataType: "json" | "text";
+  dataType: "json" | "text" | "csv" | "sql";
 };
 
 export type ManagedResponse = {
@@ -241,7 +241,7 @@ async function defaultFetchAdapter(request: ManagedRequest, signal: AbortSignal)
     signal,
   });
   const headers = Object.fromEntries(response.headers.entries());
-  const data = request.dataType === "text" ? await response.text() : await parseJsonResponse(response);
+  const data = await parseResponseData(response, request.dataType);
   if (!response.ok) {
     throw new ManagedFetchError(response.statusText || `HTTP ${response.status}`, response.status, data);
   }
@@ -251,6 +251,66 @@ async function defaultFetchAdapter(request: ManagedRequest, signal: AbortSignal)
 async function parseJsonResponse(response: Response): Promise<unknown> {
   const text = await response.text();
   return text ? JSON.parse(text) : undefined;
+}
+
+async function parseResponseData(
+  response: Response,
+  dataType: ManagedRequest["dataType"],
+): Promise<unknown> {
+  if (dataType === "text" || dataType === "sql") {
+    return response.text();
+  }
+  if (dataType === "csv") {
+    return parseCsv(await response.text());
+  }
+  return parseJsonResponse(response);
+}
+
+function parseCsv(text: string): Record<string, string>[] {
+  const rows = parseCsvRows(text.trim());
+  if (rows.length === 0) {
+    return [];
+  }
+  const [headers, ...records] = rows;
+  return records.map((record) => Object.fromEntries(
+    headers.map((header, index) => [header, record[index] ?? ""]),
+  ));
+}
+
+function parseCsvRows(text: string): string[][] {
+  if (!text) {
+    return [];
+  }
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") {
+        index += 1;
+      }
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+  row.push(cell);
+  rows.push(row);
+  return rows;
 }
 
 function serializeBody(body: unknown): BodyInit | undefined {

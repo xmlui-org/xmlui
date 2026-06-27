@@ -1,12 +1,4 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-
-const TREE_FAMILY_OLD_SUITE_PENDING =
-  "The literal old Tree-family suite is copied for compatibility tracking, but the full Tree/TreeDisplay/TableOfContents migration is not complete yet. Re-enable cases feature-by-feature as hierarchy behavior, dynamic loading, APIs, scrolling, heading indexing, route integration, parts, and behaviors are migrated.";
-
-test.beforeEach(() => {
-  test.skip(true, TREE_FAMILY_OLD_SUITE_PENDING);
-});
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -528,7 +520,7 @@ test.describe("Theme Variables", () => {
     ]);
   });
 
-  test.skip("applies item base theme variables", async ({ initTestBed, page }) => {
+  test("applies item base theme variables", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(
       `

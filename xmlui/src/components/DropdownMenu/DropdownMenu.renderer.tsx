@@ -49,6 +49,7 @@ export const menuItemRenderer = wrapComponent({
       {...adapter.rootAttrs()}
       active={adapter.booleanProp("active", false)}
       enabled={adapter.booleanProp("enabled", true)}
+      icon={adapter.stringProp("icon")}
       iconPosition={adapter.stringProp("iconPosition", "start") as "start" | "end"}
       label={adapter.stringProp("label")}
       onClick={() => { void adapter.event("click")(); }}
@@ -79,6 +80,7 @@ export const subMenuItemRenderer = wrapComponent({
     return (
       <SubMenuItemComponent
         {...adapter.rootAttrs()}
+        icon={adapter.stringProp("icon")}
         iconPosition={adapter.stringProp("iconPosition", "start") as "start" | "end"}
         label={adapter.stringProp("label")}
         triggerTemplate={hasTriggerTemplate ? adapter.renderTemplate("triggerTemplate") : undefined}
@@ -89,7 +91,7 @@ export const subMenuItemRenderer = wrapComponent({
   },
 });
 
-function filterMenuSeparators(children: XmluiNode[]): XmluiNode[] {
+export function filterMenuSeparators(children: XmluiNode[]): XmluiNode[] {
   const filtered: XmluiNode[] = [];
   let lastVisibleWasSeparator = true;
 

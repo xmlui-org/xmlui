@@ -8,6 +8,7 @@ export type TableColumnDefinition = {
   minWidth?: string | number;
   maxWidth?: string | number;
   canSort?: boolean;
+  canResize?: boolean;
   cellStyle?: CSSProperties;
   children?: ReactNode;
 };

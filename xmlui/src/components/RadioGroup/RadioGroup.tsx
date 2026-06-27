@@ -39,9 +39,15 @@ export const RadioGroupMd = createMetadata({
   props: {
     id: { description: "The component id.", valueType: "string" },
     testId: { description: "The test id.", valueType: "string" },
+    bindTo: { description: "Binds the radio group to form data.", valueType: "string" },
     initialValue: { ...dInitialValue(defaultProps.initialValue, "string"), defaultValue: defaultProps.initialValue },
     value: { description: "Controlled value.", valueType: "any" },
     label: { description: "Radio group label.", valueType: "string" },
+    requireLabelMode: {
+      description: "Controls required/optional label indicators for this radio group.",
+      valueType: "string",
+      availableValues: ["markRequired", "markOptional", "markBoth"],
+    },
     labelPosition: {
       description: "Controls where the label is placed relative to the options.",
       valueType: "string",
@@ -121,6 +127,7 @@ export const radioGroupRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
+        bindTo={adapter.stringProp("bindTo")}
         initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
         value={adapter.prop("value")}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
@@ -132,6 +139,7 @@ export const radioGroupRenderer = wrapComponent({
         validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
         label={adapter.stringProp("label")}
         labelPosition={adapter.stringProp("labelPosition", "top")}
+        requireLabelMode={adapter.stringProp("requireLabelMode")}
         direction={adapter.stringProp("direction", "ltr")}
         options={radioOptions(adapter)}
         extraChildren={adapter.renderChildren(nonOptionChildren(adapter.node.children))}
@@ -143,7 +151,7 @@ export const radioGroupRenderer = wrapComponent({
   },
 });
 
-function radioOptions(adapter: XmluiComponentAdapter): RadioGroupOption[] {
+export function radioOptions(adapter: XmluiComponentAdapter): RadioGroupOption[] {
   return adapter.node.children.flatMap((child) => optionFromChild(child, adapter));
 }
 
@@ -167,7 +175,7 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Radi
   const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
     ? booleanOptionValue(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "RadioGroup:Option:enabled"))
     : true;
-  return [{ value, label: renderableLabel(label, value), enabled }];
+  return [{ value, label: renderableLabel(label, value), enabled, testId: child.props.testId }];
 }
 
 function isValidOptionValue(value: unknown): boolean {

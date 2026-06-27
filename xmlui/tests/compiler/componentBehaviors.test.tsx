@@ -11,6 +11,7 @@ import {
   createMetadata,
   dEnabled,
 } from "../../src/component-core";
+import { PartMd } from "../../src/components/Part/Part";
 
 describe("component behavior metadata compatibility", () => {
   it("evaluates old behavior conditions against component metadata", () => {
@@ -74,6 +75,35 @@ describe("component behavior metadata compatibility", () => {
     expect(contract.props).toHaveProperty("label");
     expect(contract.props).not.toHaveProperty("labelPosition");
     expect(appContract.props).not.toHaveProperty("tooltip");
+  });
+
+  it("keeps visual behavior props off non-visual component contracts", () => {
+    const contract = contractFromMetadata(PartMd, {
+      name: "Part",
+    });
+
+    expect(contract.props).toHaveProperty("when");
+    expect(contract.props).not.toHaveProperty("tooltip");
+    expect(contract.props).not.toHaveProperty("label");
+    expect(contract.props).not.toHaveProperty("variant");
+  });
+
+  it("attaches only condition behaviors to non-visual metadata", () => {
+    expect(canBehaviorAttachToComponent(
+      collectedBehaviorMetadata.when,
+      PartMd,
+      "Part",
+    )).toBe(true);
+    expect(canBehaviorAttachToComponent(
+      collectedBehaviorMetadata.tooltip,
+      PartMd,
+      "Part",
+    )).toBe(false);
+    expect(canBehaviorAttachToComponent(
+      collectedBehaviorMetadata.animation,
+      PartMd,
+      "Part",
+    )).toBe(false);
   });
 });
 

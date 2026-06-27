@@ -1,0 +1,25 @@
+.xmluiInspectButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--xmlui-gap-InspectButton, var(--xmlui-space-1, 0.25rem));
+  width: fit-content;
+  padding: var(--xmlui-padding-InspectButton, var(--xmlui-space-2, 0.5rem) var(--xmlui-space-4, 1rem));
+  border: 1px solid var(--xmlui-borderColor-InspectButton, var(--xmlui-borderColor, #d0d7de));
+  border-radius: var(--xmlui-borderRadius-InspectButton, var(--xmlui-borderRadius, 4px));
+  background: var(--xmlui-backgroundColor-InspectButton, transparent);
+  color: var(--xmlui-textColor-InspectButton, currentColor);
+  cursor: pointer;
+}
+
+.xmluiInspectButtonIcon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  font-size: var(--xmlui-fontSize-InspectButton-icon, 1rem);
+}
+
+.xmluiInspectButton[data-inspect-mode="on"] {
+  background: var(--xmlui-backgroundColor-InspectButton--active, var(--xmlui-color-primary-500, #2563eb));
+  color: var(--xmlui-textColor-InspectButton--active, white);
+}

@@ -4,7 +4,10 @@ export type XmluiOption = {
   value: unknown;
   label: ReactNode;
   enabled: boolean;
+  testId?: string;
   keywords?: string[];
+  selectionLabel?: string;
+  searchText?: string;
   [key: string]: unknown;
 };
 

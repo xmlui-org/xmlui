@@ -59,6 +59,15 @@ export const AppMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    locale: {
+      description: "Sets the active locale used by App.translate and I18n.",
+      valueType: "string",
+      defaultValue: "en",
+    },
+    localeBundles: {
+      description: "Locale message bundles used by App.translate and I18n.",
+      valueType: "any",
+    },
     testId: {
       description: "Adds a test identifier to the app root element.",
       valueType: "string",
@@ -75,6 +84,23 @@ export const AppMd = createMetadata({
       signature: "messageReceived(data: any): void",
       parameters: {
         data: "The data sent from the other window via postMessage.",
+      },
+    },
+    willNavigate: {
+      description:
+        "This event fires before programmatic navigation. Return false to cancel navigation.",
+      signature: "willNavigate(to: string, queryParams?: any): boolean | void",
+      parameters: {
+        to: "The target path or history delta to navigate to.",
+        queryParams: "Optional query parameters passed to the navigation request.",
+      },
+    },
+    didNavigate: {
+      description: "This event fires after the current route changes.",
+      signature: "didNavigate(to: string, queryParams?: any): void",
+      parameters: {
+        to: "The path navigated to.",
+        queryParams: "The query parameters for the current route.",
       },
     },
     keyDown: {
@@ -104,6 +130,10 @@ export const AppMd = createMetadata({
     $queryParams: {
       description: "The current query parameters.",
       valueType: "any",
+    },
+    $queryString: {
+      description: "The current query string.",
+      valueType: "string",
     },
   },
   themeVars: extractScssThemeVars(appStylesSource),

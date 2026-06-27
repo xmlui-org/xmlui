@@ -19,6 +19,9 @@ export type ButtonProps = {
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
+  "data-part-id"?: string;
+  "data-xmlui-part"?: string;
+  "data-testid"?: string;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   onContextMenu?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
@@ -122,18 +125,28 @@ function normalizeButtonType(value: string): "button" | "submit" | "reset" {
 }
 
 function normalizeIcon(icon: ReactNode): string | undefined {
-  return typeof icon === "string" && icon !== "" && icon !== "_" ? icon : undefined;
+  if (typeof icon !== "string") {
+    return undefined;
+  }
+  const trimmed = icon.trim();
+  return trimmed !== "" && trimmed !== "_" && !trimmed.startsWith("() =>") ? icon : undefined;
 }
 
 function ButtonIcon({ icon }: { icon: string }) {
   return (
-    <span
+    <svg
       aria-hidden="true"
       data-icon={icon}
       data-xmlui-component="Button"
       data-xmlui-part="icon"
       className={styles.icon}
-    />
+      focusable="false"
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+    >
+      <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
   );
 }
 

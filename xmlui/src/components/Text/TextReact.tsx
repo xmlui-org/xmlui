@@ -43,6 +43,7 @@ export type TextProps = {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
+  onClick?: () => void | Promise<void>;
   onContextMenu?: () => void | Promise<void>;
   registerApi?: (api: Record<string, unknown>) => void;
 };
@@ -59,6 +60,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
     className,
     style,
     children,
+    onClick,
     onContextMenu,
     registerApi,
     ...rest
@@ -111,6 +113,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
         className,
       )}
       style={style}
+      onClick={onClick}
       onContextMenu={onContextMenu}
       data-xmlui-text-variant={variant}
     >

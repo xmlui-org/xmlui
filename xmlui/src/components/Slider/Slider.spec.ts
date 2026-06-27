@@ -246,14 +246,10 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("slider-value")).toHaveText("0"); // Value should remain unchanged
   });
 
-  test.fixme(
-    "autoFocus focuses slider on mount",
-    SKIP_REASON.XMLUI_BUG("autoFocus does not seem to work with radix-ui, need to double-check"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider autoFocus="true" />`);
-      await expect(page.getByRole("slider")).toBeFocused();
-    },
-  );
+  test("autoFocus focuses slider on mount", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider autoFocus="true" />`);
+    await expect(page.getByRole("slider")).toBeFocused();
+  });
 
   test("required shows visual indicator", async ({ initTestBed, page }) => {
     await initTestBed(`<Slider required="true" label="Required slider" />`);
@@ -510,7 +506,7 @@ test.describe("Api", () => {
     await expect(page.getByTestId("setBtn")).toHaveText("5");
   });
 
-  test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <Slider id="boundSlider" bindTo="volume" />
@@ -833,11 +829,6 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Behaviors and Parts", () => {
-  test.fixme(
-    true,
-    "Deferred until Form/FormItem requireLabelMode and bindTo infrastructure is migrated.",
-  );
-
   test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>

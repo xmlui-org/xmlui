@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { defaultProps } from "./FlowLayout.defaults";
 import styles from "./FlowLayout.module.scss";
@@ -11,6 +12,7 @@ export type FlowLayoutProps = {
   itemWidth?: string;
   verticalAlignment?: string;
   onContextMenu?: () => void | Promise<void>;
+  registerComponentApi?: (api: Record<string, unknown>) => void;
   children?: ReactNode;
 };
 
@@ -30,12 +32,26 @@ export function FlowLayout({
   itemWidth = defaultProps.itemWidth,
   verticalAlignment = defaultProps.verticalAlignment,
   onContextMenu,
+  registerComponentApi,
   children,
   ...rest
 }: FlowLayoutProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const scrollToTop = useCallback((behavior: ScrollBehavior = "instant") => {
+    rootRef.current?.scrollTo({ top: 0, behavior });
+  }, []);
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "instant") => {
+    rootRef.current?.scrollTo({ top: rootRef.current.scrollHeight, behavior });
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({ scrollToTop, scrollToBottom });
+  }, [registerComponentApi, scrollToBottom, scrollToTop]);
+
   return (
     <div
       {...rest}
+      ref={rootRef}
       className={cx(styles.flowLayout, alignmentClass(verticalAlignment), className)}
       style={{
         ...style,

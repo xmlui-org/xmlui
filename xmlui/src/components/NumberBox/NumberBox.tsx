@@ -106,6 +106,12 @@ export const NumberBoxMd = createMetadata({
       defaultValue: "top",
     },
     labelWidth: { description: "Sets the label width.", valueType: "length" },
+    requireLabelMode: {
+      description: "Controls required/optional label markers.",
+      valueType: "string",
+      availableValues: ["markRequired", "markOptional", "markBoth"],
+      defaultValue: "markRequired",
+    },
     direction: { description: "Sets the input direction.", valueType: "string" },
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(defaultProps.initialValue, "number"),
@@ -135,6 +141,7 @@ export const NumberBoxMd = createMetadata({
     tooltipMarkdown: { description: "The markdown tooltip text.", valueType: "string" },
     animation: { description: "The animation definition.", valueType: "any" },
     variant: { description: "The variant value.", valueType: "string" },
+    bindTo: { description: "Binds the number box value to form data.", valueType: "string" },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -245,4 +252,3 @@ export const NumberBoxMd = createMetadata({
     [`textColor-${COMP}--success--hover`]: `$textColor-${COMP}--success`,
   },
 });
-

@@ -1,0 +1,20 @@
+<App var.count="{0}" var.lastAction="{'none'}">
+  <H1>Inspector Foundation</H1>
+  <Inspector id="inspector" testId="inspector-trigger" src="/xmlui/xs-diff.html" dialogTitle="XMLUI Inspector" dialogWidth="70vw" dialogHeight="70vh" />
+  <InspectButton testId="inspect-mode-button">Inspect mode</InspectButton>
+  <Text testId="inspect-count">Count: {count}</Text>
+  <Text testId="inspect-last-action">Last action: {lastAction}</Text>
+  <Button
+    testId="debug-watch-button"
+    onClick="
+      debugWatch('count', count);
+      debugLog('clicked', count);
+      count++;
+      lastAction = 'debugged'
+    "
+  >
+    Emit debug event
+  </Button>
+  <Button testId="open-inspector-button" onClick="inspector.open()">Open Inspector</Button>
+  <Button testId="close-inspector-button" onClick="inspector.close()">Close Inspector</Button>
+</App>

@@ -2,6 +2,7 @@ import type { CSSProperties, FocusEvent, KeyboardEvent, PointerEvent } from "rea
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./Slider.defaults";
+import { useFormContext } from "../Form/FormContext";
 import styles from "./Slider.module.scss";
 
 export type SliderApi = {
@@ -12,6 +13,7 @@ export type SliderApi = {
 
 export type SliderProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   min?: unknown;
@@ -28,6 +30,7 @@ export type SliderProps = {
   labelPosition?: "start" | "end" | "top" | "bottom" | string;
   labelBreak?: boolean;
   labelWidth?: string | number;
+  requireLabelMode?: string;
   validationStatus?: string;
   showValues?: boolean;
   valueFormat?: unknown;
@@ -45,6 +48,7 @@ export type SliderProps = {
 export const SliderNative = memo(forwardRef<SliderApi, SliderProps>(function SliderNative(
   {
     id,
+    bindTo,
     value,
     initialValue,
     min = defaultProps.min,
@@ -61,6 +65,7 @@ export const SliderNative = memo(forwardRef<SliderApi, SliderProps>(function Sli
     labelPosition = "top",
     labelBreak,
     labelWidth,
+    requireLabelMode,
     validationStatus = defaultProps.validationStatus,
     showValues = defaultProps.showValues,
     valueFormat,
@@ -79,28 +84,39 @@ export const SliderNative = memo(forwardRef<SliderApi, SliderProps>(function Sli
 ) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const thumbRefs = useRef<Array<HTMLSpanElement | null>>([]);
-  const controlled = value !== undefined;
+  const form = useFormContext();
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = form && fieldName !== undefined ? form.getValue(fieldName) : undefined;
+  const effectiveValue = formValue ?? value;
+  const controlled = effectiveValue !== undefined;
   const bounds = useMemo(() => normalizeBounds(min, max), [max, min]);
   const normalizedStep = normalizePositiveNumber(step, defaultProps.step);
   const normalizedGap = Math.max(0, normalizePositiveNumber(minStepsBetweenThumbs, defaultProps.minStepsBetweenThumbs)) * normalizedStep;
   const [localValue, setLocalValue] = useState<number[]>(() =>
-    normalizeValue(controlled ? value : initialValue, bounds.min, bounds.max),
+    normalizeValue(controlled ? effectiveValue : initialValue, bounds.min, bounds.max),
   );
-  const currentValue = controlled ? normalizeValue(value, bounds.min, bounds.max) : localValue;
+  const currentValue = controlled ? normalizeValue(effectiveValue, bounds.min, bounds.max) : localValue;
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const interactive = enabled && !readOnly;
 
   useEffect(() => {
     if (controlled) {
-      setLocalValue(normalizeValue(value, bounds.min, bounds.max));
+      setLocalValue(normalizeValue(effectiveValue, bounds.min, bounds.max));
     }
-  }, [bounds.max, bounds.min, controlled, value]);
+  }, [bounds.max, bounds.min, controlled, effectiveValue]);
 
   useEffect(() => {
     if (!controlled) {
       setLocalValue(normalizeValue(initialValue, bounds.min, bounds.max));
     }
   }, [bounds.max, bounds.min, controlled, initialValue]);
+
+  useEffect(() => {
+    if (!form || fieldName === undefined || form.getValue(fieldName) != null || initialValue === undefined) {
+      return;
+    }
+    form.setValue(fieldName, toPublicValue(normalizeValue(initialValue, bounds.min, bounds.max)));
+  }, [bounds.max, bounds.min, fieldName, form, initialValue]);
 
   useEffect(() => {
     if (autoFocus && enabled) {
@@ -113,8 +129,11 @@ export const SliderNative = memo(forwardRef<SliderApi, SliderProps>(function Sli
     const normalized = normalizeRangeOrder(enforceThumbGap(next, currentValue, -1, bounds.min, bounds.max, normalizedGap));
     setLocalValue(normalized);
     const publicValue = toPublicValue(normalized);
+    if (form && fieldName !== undefined) {
+      form.setValue(fieldName, publicValue);
+    }
     void onDidChange?.(publicValue);
-  }, [bounds.max, bounds.min, currentValue, normalizedGap, onDidChange]);
+  }, [bounds.max, bounds.min, currentValue, fieldName, form, normalizedGap, onDidChange]);
 
   const updateThumb = useCallback((index: number, nextNumber: number) => {
     if (!interactive) {
@@ -190,6 +209,23 @@ export const SliderNative = memo(forwardRef<SliderApi, SliderProps>(function Sli
 
   const labelText = stringifyLabel(label);
   const hasLabel = labelText !== "";
+  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const showRequiredIndicator =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalIndicator =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
+
+  useEffect(() => {
+    if (!form || fieldName === undefined) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      label: labelText,
+      required,
+    });
+  }, [fieldName, form, labelText, required]);
+
   const slider = (
     <div
       {...(!hasLabel ? rest : undefined)}
@@ -298,7 +334,8 @@ export const SliderNative = memo(forwardRef<SliderApi, SliderProps>(function Sli
           }}
         >
           {labelText}
-          {required ? <span className={styles.sliderLabelRequired}>*</span> : null}
+          {showRequiredIndicator ? <span className={styles.sliderLabelRequired}>*</span> : null}
+          {showOptionalIndicator ? <span className={styles.sliderLabelOptional}>(Optional)</span> : null}
         </label>
         {slider}
       </div>
@@ -439,6 +476,13 @@ function cssLength(value: string | number): string {
 
 function stringifyLabel(value: unknown): string {
   return value === undefined || value === null ? "" : String(value);
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function truthy(value: unknown): boolean {

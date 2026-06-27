@@ -1,6 +1,22 @@
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("AppState foundation", () => {
+  test("initializes with default props and bucket-specific initial values", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <AppState id="empty" />
+      <AppState id="settings" bucket="settings" initialValue="{{ mode: true }}" />
+      <AppState id="settingsMore" bucket="settings" initialValue="{{ otherMode: 123 }}" />
+      <Text testId="empty">|{JSON.stringify(empty.value)}|</Text>
+      <Text testId="settings">|{settings.value.mode}|{settingsMore.value.otherMode}|</Text>
+    `);
+
+    await expect(page.getByTestId("empty")).toHaveText("||");
+    await expect(page.getByTestId("settings")).toHaveText("|true|123|");
+  });
+
   test("initializes and updates shared default bucket state", async ({ initTestBed, page }) => {
     await initTestBed(`
       <AppState id="stateOne" initialValue="{{ counter: 0 }}" />
@@ -58,10 +74,51 @@ test.describe("AppState foundation", () => {
     await page.getByTestId("inc").click();
     await expect.poll(testStateDriver.testState).toEqual("default:0>1");
   });
-});
 
-test.describe("AppState old-suite transfer debt", () => {
-  test("copy the remaining literal old AppState tests after the full app-state context semantics are closed", async () => {
-    test.fixme(true, "old AppState suite transfer is deferred");
+  test("handles undefined initialValue and complex nested updates", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <AppState id="empty" bucket="empty-bucket" initialValue="{undefined}" />
+      <AppState
+        id="profile"
+        initialValue="{{ user: { name: 'John', profile: { age: 30, roles: ['admin'] } } }}" />
+      <Button
+        testId="age"
+        onClick="profile.update({ user: { ...profile.value.user, profile: { ...profile.value.user.profile, age: 31 } } })">
+        Update
+      </Button>
+      <Text testId="empty">|{JSON.stringify(empty.value)}|</Text>
+      <Text testId="profile">{JSON.stringify(profile.value)}</Text>
+    `);
+
+    await expect(page.getByTestId("empty")).toHaveText("||");
+    await expect(page.getByTestId("profile")).toContainText('"age":30');
+    await page.getByTestId("age").click();
+    await expect(page.getByTestId("profile")).toContainText('"age":31');
+    await expect(page.getByTestId("profile")).toContainText('"name":"John"');
+    await expect(page.getByTestId("profile")).toContainText('"roles":["admin"]');
+  });
+
+  test("preserves bucket state across conditional AppState unmount", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.showState="{false}">
+        <Fragment when="{showState}">
+          <AppState id="state" initialValue="{{ visible: true }}" />
+        </Fragment>
+        <Button testId="toggle" onClick="showState = !showState">Toggle</Button>
+        <Text testId="status">{state.value.visible ? 'Visible' : 'Hidden'}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("status")).toHaveText("Hidden");
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("status")).toHaveText("Visible");
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("status")).toHaveText("Visible");
   });
 });

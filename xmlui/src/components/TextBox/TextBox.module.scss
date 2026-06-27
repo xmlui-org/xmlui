@@ -101,6 +101,10 @@ $paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
     margin-left: 0.25em;
   }
 
+  .textBoxLabelOptional {
+    margin-left: 0.25em;
+  }
+
   .textBoxLabelPositionStart {
     flex-direction: row;
   }
@@ -295,6 +299,22 @@ $paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
   }
 
   .textBoxConciseFeedback {
+    position: relative;
     flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .textBoxConciseTooltip {
+    position: absolute;
+    z-index: 1000;
+    inset-block-start: calc(100% + 0.25rem);
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    border-radius: var(--xmlui-borderRadius-tooltip, var(--xmlui-borderRadius));
+    background: var(--xmlui-backgroundColor-tooltip, #1f2937);
+    color: var(--xmlui-textColor-tooltip, #fff);
+    padding: var(--xmlui-paddingVertical-tooltip, 0.25rem) var(--xmlui-paddingHorizontal-tooltip, 0.5rem);
+    white-space: nowrap;
   }
 }

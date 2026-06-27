@@ -54,6 +54,16 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
     box-sizing: border-box;
   }
 
+  .checkboxVariantWrapper {
+    box-sizing: border-box;
+    display: inline-flex;
+    width: max-content;
+    max-width: 100%;
+    border: 0 solid var(--xmlui-borderColor-Checkbox);
+    border-radius: var(--xmlui-borderRadius-Checkbox);
+    background-color: var(--xmlui-backgroundColor-Checkbox);
+  }
+
   .checkboxLabelPositionStart,
   .checkboxLabelPositionBefore {
     flex-direction: row;
@@ -87,6 +97,10 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
   }
 
   .checkboxLabelRequired {
+    margin-left: 0.25em;
+  }
+
+  .checkboxLabelOptional {
     margin-left: 0.25em;
   }
 

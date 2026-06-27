@@ -20,6 +20,9 @@ export const NestedAppMd = createMetadata({
       description: "Optional list of components to be used with the nested app.",
       defaultValue: defaultProps.components,
     },
+    refreshVersion: {
+      description: "Forces the nested app to remount when the value changes.",
+    },
     config: {
       description: "Optional configuration for the nested app.",
       valueType: "hash",
@@ -31,6 +34,35 @@ export const NestedAppMd = createMetadata({
     activeTone: {
       description: "The active tone for the nested app.",
       valueType: "string",
+    },
+    title: {
+      description: "Optional title displayed when the nested app frame is enabled.",
+      valueType: "string",
+    },
+    withFrame: {
+      description: "Displays a lightweight frame around the nested app.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    allowReset: {
+      description: "Displays a reset control when the nested app frame is enabled.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    splitView: {
+      description: "Displays app/code view controls when the nested app frame is enabled.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    initiallyShowCode: {
+      description: "Shows the nested app source first when split view controls are enabled.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    noHeader: {
+      description: "Hides the nested app frame header.",
+      valueType: "boolean",
+      defaultValue: false,
     },
     height: {
       description: "The height of the nested app.",

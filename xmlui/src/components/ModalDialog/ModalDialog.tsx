@@ -11,6 +11,7 @@ const modalDialogStylesSource = `
   createThemeVar("paddingLeft-ModalDialog");
   createThemeVar("backgroundColor-ModalDialog");
   createThemeVar("backgroundColor-overlay-ModalDialog");
+  createThemeVar("border-ModalDialog");
   createThemeVar("borderRadius-ModalDialog");
   createThemeVar("borderColor-ModalDialog");
   createThemeVar("borderWidth-ModalDialog");

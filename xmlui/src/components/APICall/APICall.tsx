@@ -46,6 +46,66 @@ export const APICallMd = createMetadata({
       description: "A data source id or list of ids to refetch after a successful call.",
       valueType: "any",
     },
+    optimisticValue: {
+      description: "A temporary value applied to invalidated DataSource refs while the request is in progress.",
+      valueType: "any",
+    },
+    confirmTitle: {
+      description: "Title text used for a confirmation prompt before execution.",
+      valueType: "string",
+    },
+    confirmMessage: {
+      description: "Message text used for a confirmation prompt before execution.",
+      valueType: "string",
+    },
+    confirmButtonLabel: {
+      description: "Compatibility label for the confirmation accept action.",
+      valueType: "string",
+    },
+    cancelButtonLabel: {
+      description: "Compatibility label for the confirmation cancel action.",
+      valueType: "string",
+    },
+    inProgressNotificationMessage: {
+      description: "Toast message shown when execution starts.",
+      valueType: "string",
+    },
+    completedNotificationMessage: {
+      description: "Toast message shown when execution completes successfully.",
+      valueType: "string",
+    },
+    errorNotificationMessage: {
+      description: "Toast message shown when execution fails.",
+      valueType: "string",
+    },
+    deferredMode: {
+      description: "When true, poll a status endpoint after the initial request.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    statusUrl: {
+      description: "Status endpoint URL for deferred execution.",
+      valueType: "string",
+    },
+    statusMethod: {
+      description: "HTTP method for status requests.",
+      valueType: "string",
+      defaultValue: "get",
+    },
+    pollIntervalInMilliseconds: {
+      description: "Deferred status polling interval.",
+      valueType: "number",
+      defaultValue: 250,
+    },
+    cancelUrl: {
+      description: "Endpoint called when cancelling a deferred operation.",
+      valueType: "string",
+    },
+    cancelMethod: {
+      description: "HTTP method for cancellation requests.",
+      valueType: "string",
+      defaultValue: "post",
+    },
     updates: {
       description: "Compatibility placeholder for update rules handled by the original runtime.",
       valueType: "any",
@@ -74,6 +134,18 @@ export const APICallMd = createMetadata({
       description: "Overrides the default request with XMLUI script.",
       signature: "mockExecute(...args: any[]): any",
     },
+    statusUpdate: {
+      description: "This event fires for each deferred status response.",
+      signature: "statusUpdate(statusData: any, progress: number): void",
+    },
+    pollingStart: {
+      description: "This event fires when deferred status polling starts.",
+      signature: "pollingStart(result: any): void",
+    },
+    pollingComplete: {
+      description: "This event fires when deferred status polling stops.",
+      signature: "pollingComplete(statusData: any, reason: string): void",
+    },
   },
   contextVars: {
     $param: { description: "The first execute argument." },
@@ -89,6 +161,11 @@ export const APICallMd = createMetadata({
     lastResult: { description: "The latest successful result." },
     lastError: { description: "The latest execution error." },
     lastResponseHeaders: { description: "Response headers from the latest request." },
+    isPolling: { description: "Indicates that deferred status polling is active." },
+    pollAttempts: { description: "Number of deferred status polls made." },
+    statusData: { description: "Latest deferred status response." },
+    cancel: { description: "Cancels deferred polling and optionally calls cancelUrl.", signature: "cancel(): Promise<void>" },
+    stopPolling: { description: "Stops deferred status polling locally.", signature: "stopPolling(): void" },
   },
 });
 

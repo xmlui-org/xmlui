@@ -37,6 +37,10 @@ export type XmluiApiContract = {
   name: string;
 };
 
+export type XmluiPartContract = {
+  name: string;
+};
+
 export type XmluiComponentContract = {
   name: string;
   kind: XmluiComponentContractKind;
@@ -48,6 +52,10 @@ export type XmluiComponentContract = {
   templates?: Record<string, XmluiTemplateContract>;
   contextVariables?: Record<string, XmluiContextVariableContract>;
   apis?: Record<string, XmluiApiContract>;
+  parts?: Record<string, XmluiPartContract>;
+  themeVars?: Record<string, XmluiPropContract>;
+  defaultThemeVars?: Record<string, string | number | boolean>;
+  toneSpecificThemeVars?: Record<string, Record<string, string>>;
 };
 
 export type XmluiContractRegistry = {

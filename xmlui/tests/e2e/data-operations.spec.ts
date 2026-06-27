@@ -28,7 +28,7 @@ test("APICall execute mutates data and invalidates a DataSource", async ({ page 
   await expect(page.getByText("Last result: none", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Add task" }).click();
-  await expect(page.getByText("Ship runtime", { exact: true })).toBeVisible();
+  await expect(page.getByText("Ship runtime", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Last result: Ship runtime", { exact: true })).toBeVisible();
 });
 

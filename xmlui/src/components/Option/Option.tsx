@@ -45,6 +45,7 @@ export const optionRenderer = wrapComponent({
       value={adapter.prop("value")}
       label={adapter.stringProp("label") ?? ""}
       enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
+      testId={adapter.stringProp("testId")}
     />
   ),
 });

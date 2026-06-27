@@ -25,6 +25,7 @@ export type ScriptNodeKind =
   | "ArrayExpression"
   | "ObjectExpression"
   | "ObjectProperty"
+  | "ObjectSpreadProperty"
   | "Error";
 
 export type ScriptNodeBase = {
@@ -164,9 +165,14 @@ export type ObjectPropertyNode = ScriptNodeBase & {
   shorthand?: boolean;
 };
 
+export type ObjectSpreadPropertyNode = ScriptNodeBase & {
+  kind: "ObjectSpreadProperty";
+  argument: ScriptNode;
+};
+
 export type ObjectExpressionNode = ScriptNodeBase & {
   kind: "ObjectExpression";
-  properties: ObjectPropertyNode[];
+  properties: Array<ObjectPropertyNode | ObjectSpreadPropertyNode>;
 };
 
 export type ErrorNode = ScriptNodeBase & {
@@ -195,6 +201,7 @@ export type ScriptNode =
   | PostfixExpressionNode
   | ArrayExpressionNode
   | ObjectPropertyNode
+  | ObjectSpreadPropertyNode
   | ObjectExpressionNode
   | ErrorNode;
 

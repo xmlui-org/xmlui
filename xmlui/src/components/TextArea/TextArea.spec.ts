@@ -251,7 +251,7 @@ test.describe("Basic Functionality", () => {
     await expect(areaField).toBeEditable();
   });
 
-  test.fixme("enterSubmits enables form submission on Enter", async ({ initTestBed, page }) => {
+  test("enterSubmits enables form submission on Enter", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form onSubmit="testState = 'submitted'">
         <TextArea enterSubmits="true" />
@@ -267,7 +267,7 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toEqual("submitted");
   });
 
-  test.fixme("enterSubmits=false prevents form submission on Enter", async ({ initTestBed, page }) => {
+  test("enterSubmits=false prevents form submission on Enter", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form onSubmit="testState = 'submitted'">
         <TextArea enterSubmits="false" />
@@ -287,7 +287,7 @@ test.describe("Basic Functionality", () => {
     await expect(textarea).toHaveValue("Some content\n");
   });
 
-  test.fixme("Shift+Enter creates new line even with enterSubmits=true", async ({
+  test("Shift+Enter creates new line even with enterSubmits=true", async ({
     initTestBed,
     page,
   }) => {
@@ -308,7 +308,7 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toEqual(null); // Should not have submitted
   });
 
-  test.fixme("escResets enables form reset on Escape", async ({ initTestBed, page }) => {
+  test("escResets enables form reset on Escape", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
         <TextArea id="myTextarea" initialValue="Initial value" escResets="true" />
@@ -955,7 +955,7 @@ test.describe("Integration", () => {
 // =============================================================================
 
 test.describe("Api", () => {
-  test.fixme("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <TextArea id="boundTextArea" bindTo="notes" />
@@ -976,7 +976,7 @@ test.describe("Api", () => {
 // =============================================================================
 
 test.describe("Regression", () => {
-  test.fixme("bindTo preserves caret when inserting text in the middle", async ({ initTestBed, page }) => {
+  test("bindTo preserves caret when inserting text in the middle", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form hideButtonRow="true">
         <TextArea testId="notes" bindTo="notes" initialValue="Hello world" />
@@ -1004,7 +1004,7 @@ test.describe("Regression", () => {
       .toEqual({ start: 11, end: 11 });
   });
 
-  test.fixme("bindTo preserves caret when replacing a selected multiline range", async ({
+  test("bindTo preserves caret when replacing a selected multiline range", async ({
     initTestBed,
     page,
   }) => {
@@ -1284,7 +1284,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test.fixme("handles variant", async ({ page, initTestBed }) => {
+  test("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
@@ -1294,7 +1294,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "backgroundColor-TextArea-CustomVariant": "rgb(0, 255, 0)",
@@ -1341,21 +1341,22 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
       },
     });
 
-    const component = page.getByTestId("test").locator("textarea");
+    const component = page.getByTestId("test");
+    const textarea = component.locator("textarea");
     const inputPart = component.locator("[data-part-id='input']");
 
-    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(textarea).toHaveCSS("border-color", "rgb(255, 0, 0)");
     await expect(inputPart).toBeVisible();
   });
 
-  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <TextArea 
@@ -1371,17 +1372,18 @@ test.describe("Behaviors and Parts", () => {
       },
     );
 
-    const component = page.getByTestId("test").locator("textarea");
+    const component = page.getByTestId("test");
+    const textarea = component.locator("textarea");
     const inputPart = component.locator("[data-part-id='input']");
 
     // Verify variant applied
-    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await expect(textarea).toHaveCSS("background-color", "rgb(255, 0, 0)");
 
     // Verify parts are visible
     await expect(inputPart).toBeVisible();
   });
 
-  test.fixme("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1396,7 +1398,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1411,7 +1413,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1426,7 +1428,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("requireLabelMode='markOptional' hides indicator for required fields", async ({
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1441,7 +1443,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1456,7 +1458,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test.fixme("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
     page,
     initTestBed,
   }) => {
@@ -1471,7 +1473,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).toContainText("(Optional)");
   });
 
-  test.fixme("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({
     page,
     initTestBed,
   }) => {
@@ -1486,7 +1488,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test.fixme("input inherits Form itemRequireLabelMode when not specified", async ({
+  test("input inherits Form itemRequireLabelMode when not specified", async ({
     page,
     initTestBed,
   }) => {
@@ -1512,7 +1514,7 @@ test.describe("Behaviors and Parts", () => {
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test.fixme("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
     initTestBed,
     page,
   }) => {
@@ -1534,7 +1536,7 @@ test.describe("Validation Feedback", () => {
     await expect(conciseFeedback).not.toBeVisible();
   });
 
-  test.fixme("shows icon and no helper text when verboseValidationFeedback is false", async ({
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({
     initTestBed,
     page,
   }) => {
@@ -1559,7 +1561,7 @@ test.describe("Validation Feedback", () => {
     await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
   });
 
-  test.fixme("prop on component overrides form default", async ({ initTestBed, page }) => {
+  test("prop on component overrides form default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">
         <TextArea testId="input" bindTo="input" verboseValidationFeedback="{false}" required="{true}" />
@@ -1577,7 +1579,7 @@ test.describe("Validation Feedback", () => {
     await expect(conciseFeedback).toBeVisible();
   });
 
-  test.fixme("shows valid icon in concise mode when valid", async ({ initTestBed, page }) => {
+  test("shows valid icon in concise mode when valid", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <TextArea testId="input" bindTo="input" required="{true}" />
@@ -1599,7 +1601,7 @@ test.describe("Validation Feedback", () => {
     await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
   });
 
-  test.fixme("concise mode tooltip shows error message on hover", async ({ initTestBed, page }) => {
+  test("concise mode tooltip shows error message on hover", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <TextArea testId="input" bindTo="input" required="{true}" />
@@ -1619,7 +1621,7 @@ test.describe("Validation Feedback", () => {
     await expect(tooltip).toContainText("This field is required");
   });
 
-  test.fixme("does not duplicate label when inside Form with label prop", async ({
+  test("does not duplicate label when inside Form with label prop", async ({
     initTestBed,
     page,
   }) => {

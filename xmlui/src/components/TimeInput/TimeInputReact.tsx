@@ -3,6 +3,7 @@ import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo,
 
 import { defaultProps } from "./TimeInput.defaults";
 import styles from "./TimeInput.module.scss";
+import { useFormContext } from "../Form/FormContext";
 
 export type TimeInputApi = {
   focus: () => void;
@@ -13,6 +14,7 @@ export type TimeInputApi = {
 
 export type TimeInputProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   enabled?: boolean;
@@ -60,6 +62,7 @@ const emptyParts: TimeParts = { hour: "", minute: "", second: "", ampm: null };
 export const TimeInputNative = memo(forwardRef<TimeInputApi, TimeInputProps>(function TimeInputNative(
   {
     id,
+    bindTo,
     value,
     initialValue,
     enabled = defaultProps.enabled,
@@ -95,8 +98,15 @@ export const TimeInputNative = memo(forwardRef<TimeInputApi, TimeInputProps>(fun
   },
   ref,
 ) {
-  const controlled = value !== undefined;
-  const [parts, setParts] = useState<TimeParts>(() => parseTimeParts(controlled ? value : initialValue, hour24, seconds));
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const registerFormItem = form?.registerItem;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const effectiveValue = formValue ?? value;
+  const controlled = effectiveValue !== undefined;
+  const [parts, setParts] = useState<TimeParts>(() => parseTimeParts(controlled ? effectiveValue : initialValue, hour24, seconds));
   const [invalidFields, setInvalidFields] = useState<Partial<Record<FieldName, boolean>>>({});
   const [hasFocusInside, setHasFocusInside] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -114,10 +124,10 @@ export const TimeInputNative = memo(forwardRef<TimeInputApi, TimeInputProps>(fun
 
   useEffect(() => {
     if (controlled) {
-      setParts(parseTimeParts(value, hour24, seconds));
+      setParts(parseTimeParts(effectiveValue, hour24, seconds));
       setInvalidFields({});
     }
-  }, [controlled, hour24, seconds, value]);
+  }, [controlled, effectiveValue, hour24, seconds]);
 
   useEffect(() => {
     if (!controlled) {
@@ -133,11 +143,38 @@ export const TimeInputNative = memo(forwardRef<TimeInputApi, TimeInputProps>(fun
     }
   }, [autoFocus, enabled, inputRefs.hour]);
 
+  useEffect(() => {
+    if (
+      !getFormValue ||
+      !setFormValue ||
+      fieldName === undefined ||
+      getFormValue(fieldName) != null ||
+      initialValue === undefined
+    ) {
+      return;
+    }
+    setFormValue(fieldName, formatTimeParts(parseTimeParts(initialValue, hour24, seconds), hour24, seconds));
+  }, [fieldName, getFormValue, hour24, initialValue, seconds, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      label: stringifyLabel(label),
+      required,
+    });
+  }, [fieldName, label, registerFormItem, required]);
+
   const emitParts = useCallback((nextParts: TimeParts) => {
     setParts(nextParts);
     const nextValue = formatTimeParts(nextParts, hour24, seconds);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, nextValue);
+    }
     void onDidChange?.(nextValue);
-  }, [hour24, onDidChange, seconds]);
+  }, [fieldName, hour24, onDidChange, seconds, setFormValue]);
 
   const updateField = useCallback((field: FieldName, rawValue: string) => {
     if (!interactive) {
@@ -446,6 +483,17 @@ function stringifyTimeValue(value: unknown): string | null {
     return value;
   }
   return null;
+}
+
+function stringifyLabel(value: unknown): string {
+  return value === undefined || value === null ? "" : String(value);
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function formatTimeParts(parts: TimeParts, hour24: boolean, seconds: boolean): string | null {

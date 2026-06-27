@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
 import {
@@ -185,6 +187,7 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
     metadata,
     themeContributors: fixedLevel ? [HeadingMd] : [],
     renderer: ({ adapter }) => {
+      const rootAttrs = adapter.rootAttrs();
       const hasValue = Object.prototype.hasOwnProperty.call(adapter.node.props, "value");
       const value = adapter.prop("value");
       const children = hasValue ? displayText(value) : adapter.renderChildren();
@@ -192,7 +195,7 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
 
       return (
         <Heading
-          {...adapter.rootAttrs()}
+          {...rootAttrs}
           id={adapter.stringProp("id")}
           anchorId={adapter.stringProp("anchorId")}
           level={level}
@@ -201,6 +204,7 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
           ellipses={adapter.booleanProp("ellipses", defaultProps.ellipses)}
           omitFromToc={adapter.booleanProp("omitFromToc", defaultProps.omitFromToc)}
           showAnchor={adapter.booleanProp("showAnchor", defaultProps.showAnchor)}
+          style={rootAttrs.style as CSSProperties | undefined}
           registerApi={adapter.registerApi}
         >
           {children}

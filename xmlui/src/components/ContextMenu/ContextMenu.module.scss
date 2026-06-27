@@ -1,3 +1,5 @@
+@use "../Menu/Menu.module.scss" as menu;
+
 $themeVars: "";
 
 @function createThemeVar($componentVariable) {
@@ -13,6 +15,7 @@ $borderStyle-ContextMenu-content: createThemeVar("borderStyle-ContextMenu-conten
 $minWidth-ContextMenu: createThemeVar("minWidth-ContextMenu");
 
 .content {
+  @include menu.menuContent;
   position: fixed;
   z-index: 9999;
   min-width: $minWidth-ContextMenu;
@@ -21,15 +24,7 @@ $minWidth-ContextMenu: createThemeVar("minWidth-ContextMenu");
   border-radius: $borderRadius-ContextMenu;
   background-color: $backgroundColor-ContextMenu;
   box-shadow: $boxShadow-ContextMenu;
-}
-
-.content > [data-xmlui-component="MenuSeparator"]:first-child,
-.content > [data-xmlui-component="MenuSeparator"]:last-child {
-  display: none;
-}
-
-.content > [data-xmlui-component="MenuSeparator"]:has(+ [data-xmlui-component="MenuSeparator"]) {
-  display: none;
+  animation-duration: 200ms;
 }
 
 :export {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 
 import {
   collectComponentThemeDefaults,
@@ -10,8 +10,11 @@ import {
 } from "../../styling/theme";
 import type { XmluiAdapterRendererProps } from "../../runtime/rendering/adapter";
 import { useThemeVariables } from "../../runtime/rendering/theme";
+import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
+import { useBindingRevision } from "../../runtime/rendering/reactive";
 import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
 import { AppMd } from "./App";
+import { AppShellProvider } from "./AppShellContext";
 import { defaultProps } from "./App.defaults";
 
 const CONTENT_THEME_VARS = {
@@ -36,7 +39,25 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const fitContent = adapter.booleanProp("fitContent", defaultProps.fitContent);
   const loggedInUser = adapter.prop("loggedInUser", null);
   const appProps = adapter.props;
+  const layout = normalizeLayout(adapter.stringProp("layout"));
+  const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
+  const showDrawerToggle = useVisibleNavPanel(adapter);
+  const children = layout.value === "desktop"
+    ? adapter.node.children.filter((child) => child.kind !== "element" || child.type !== "NavPanel")
+    : adapter.node.children;
   const readyFiredRef = useRef(false);
+
+  adapter.scope.i18n?.setConfig({
+    locale: adapter.stringProp("locale"),
+    bundles: adapter.prop("localeBundles"),
+  });
+
+  useEffect(() => {
+    const name = adapter.stringProp("name");
+    if (name) {
+      document.title = name;
+    }
+  }, [adapter]);
 
   useEffect(() => {
     if (readyFiredRef.current) {
@@ -44,6 +65,16 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     }
     readyFiredRef.current = true;
     void adapter.event("ready")();
+  }, [adapter]);
+
+  useEffect(() => {
+    adapter.scope.routing?.setNavigationHandlers({
+      onWillNavigate: (to, queryParams) => adapter.event("willNavigate")(to, queryParams),
+      onDidNavigate: (to, queryParams) => adapter.event("didNavigate")(to, queryParams),
+    });
+    return () => {
+      adapter.scope.routing?.setNavigationHandlers({});
+    };
   }, [adapter]);
 
   useEffect(() => {
@@ -73,31 +104,35 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
 
   return (
     <ProfileMenuProvider loggedInUser={normalizeLoggedInUser(loggedInUser)}>
-      <div
-        {...rootAttrs}
-        data-testid={testId}
-        data-xmlui-app-fit-content={fitContent ? "true" : undefined}
-        style={{
-          ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
-          ...appBaselineStyle(mergedThemeVariables),
-          ...appContainerStyle(fitContent),
-          ...adapter.style,
-        }}
-      >
-        <main
-          data-xmlui-component="App"
-          data-xmlui-part="content"
-          style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
+      <AppShellProvider showDrawerToggle={showDrawerToggle}>
+        <div
+          {...rootAttrs}
+          data-testid={testId}
+          data-xmlui-app-fit-content={fitContent ? "true" : undefined}
+          className={[rootAttrs.className, ...layout.classNames, scrollWholePage && "scrollWholePage"].filter(Boolean).join(" ")}
+          style={{
+            ...(rootAttrs.style as CSSProperties | undefined),
+            ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
+            ...appBaselineStyle(mergedThemeVariables),
+            ...appContainerStyle(fitContent),
+            ...adapter.style,
+          }}
         >
-          <div
+          <main
             data-xmlui-component="App"
-            data-xmlui-part="pageContent"
-            style={pageContentStyle(mergedThemeVariables, appProps)}
+            data-xmlui-part="content"
+            style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
           >
-            {adapter.renderChildren()}
-          </div>
-        </main>
-      </div>
+            <div
+              data-xmlui-component="App"
+              data-xmlui-part="pageContent"
+              style={pageContentStyle(mergedThemeVariables, appProps)}
+            >
+              {adapter.renderChildren(children)}
+            </div>
+          </main>
+        </div>
+      </AppShellProvider>
     </ProfileMenuProvider>
   );
 }
@@ -124,7 +159,7 @@ function appBaselineStyle(themeVariables: Record<string, unknown>): CSSPropertie
     color: themeValue(themeVariables, "textColor") ?? themeValue(themeVariables, "textColor-primary"),
     fontFamily: themeValue(themeVariables, "fontFamily"),
     fontFeatureSettings: themeValue(themeVariables, "font-feature-settings"),
-    fontSize: themeValue(themeVariables, "font-size") ?? themeValue(themeVariables, "fontSize"),
+    fontSize: themeValue(themeVariables, "fontSize"),
     fontWeight: themeValue(themeVariables, "fontWeight"),
     letterSpacing: themeValue(themeVariables, "letterSpacing"),
     lineHeight: themeValue(themeVariables, "lineHeight"),
@@ -198,4 +233,65 @@ function appThemeVariableProps(props: Record<string, unknown>): Record<string, u
     }
   }
   return variables;
+}
+
+function useVisibleNavPanel(adapter: XmluiAdapterRendererProps["adapter"]): boolean {
+  const dependencies = useMemo(() => adapter.node.children.flatMap((child) => {
+    if (child.kind !== "element" || child.type !== "NavPanel") {
+      return [];
+    }
+    const parsedWhen = child.parsed?.props?.when;
+    return Array.isArray(parsedWhen) ? [] : parsedWhen?.dependencies ?? [];
+  }), [adapter.node.children]);
+  useBindingRevision(dependencies, adapter.scope);
+  return adapter.node.children.some((child) => {
+    if (child.kind !== "element" || child.type !== "NavPanel") {
+      return false;
+    }
+    const when = child.props.when as unknown;
+    const parsedWhen = child.parsed?.props?.when;
+    if (parsedWhen && !Array.isArray(parsedWhen)) {
+      const source = typeof when === "string" ? when : String(when ?? "");
+      return Boolean(evaluateExpressionOrText(source, parsedWhen, adapter.scope, "App:NavPanel:when"));
+    }
+    return when !== false && when !== "false" && when !== "{false}";
+  });
+}
+
+function normalizeLayout(value: string | undefined): { value: string; classNames: string[] } {
+  const raw = (value ?? "condensed-sticky")
+    .replace(/[\u2011\u2013\u2014]/g, "-")
+    .trim();
+  const supported = new Set([
+    "horizontal",
+    "horizontal-sticky",
+    "condensed",
+    "condensed-sticky",
+    "vertical",
+    "vertical-sticky",
+    "vertical-full-header",
+    "desktop",
+  ]);
+  const normalized = supported.has(raw) ? raw : "condensed-sticky";
+  if (raw && !supported.has(raw)) {
+    console.warn(`App layout type not supported: ${raw}`);
+  }
+  const classNames = ["xmlui-App"];
+  if (normalized === "desktop") {
+    classNames.push("desktop");
+  } else if (normalized.startsWith("vertical")) {
+    classNames.push("vertical");
+  } else {
+    classNames.push("horizontal");
+  }
+  if (normalized.includes("condensed")) {
+    classNames.push("condensed");
+  }
+  if (normalized.includes("sticky")) {
+    classNames.push("sticky");
+  }
+  if (normalized === "vertical-full-header") {
+    classNames.push("verticalFullHeader");
+  }
+  return { value: normalized, classNames };
 }

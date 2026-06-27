@@ -22,7 +22,10 @@ export function rawScssModulePlugin(): Plugin {
       const basedir = importer ? path.dirname(importer) : process.cwd();
       let resolved = path.resolve(basedir, filename);
       if (filename.startsWith("src/") && !existsSync(resolved)) {
-        resolved = path.resolve(process.cwd(), "xmlui", filename);
+        const workspaceResolved = path.resolve(process.cwd(), filename);
+        resolved = existsSync(workspaceResolved)
+          ? workspaceResolved
+          : path.resolve(process.cwd(), "xmlui", filename);
       }
       const prefix = query.split("&").includes("xmlui-css-module")
         ? cssVirtualPrefix

@@ -1,6 +1,7 @@
 import type { CompiledEventContext, CompiledExpressionContext } from "../../compiler/scriptSemantics";
 import { managedFetchService } from "../data";
 import { getXmluiDebugBridge } from "../debug";
+import type { RuntimeI18n } from "../i18n";
 import type { RuntimeRoutingStore } from "../routing";
 import type { ToastService } from "../services/toast";
 import type { RuntimeStateStore } from "./store";
@@ -16,6 +17,7 @@ export type RuntimeScope = {
   slots: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
   toast?: ToastService;
+  i18n?: RuntimeI18n;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
   extensionFunctions: Record<string, (...args: unknown[]) => unknown>;
 };
@@ -30,6 +32,7 @@ export function createRuntimeScope({
   slots = {},
   routing,
   toast,
+  i18n,
   emitEvent,
   extensionFunctions,
 }: {
@@ -42,6 +45,7 @@ export function createRuntimeScope({
   slots?: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
   toast?: ToastService;
+  i18n?: RuntimeI18n;
   emitEvent?: (name: string, args: unknown[]) => unknown | Promise<unknown>;
   extensionFunctions?: Record<string, (...args: unknown[]) => unknown>;
 }): RuntimeScope {
@@ -55,6 +59,7 @@ export function createRuntimeScope({
     slots,
     routing,
     toast: toast ?? parent?.toast,
+    i18n: i18n ?? parent?.i18n,
     emitEvent,
     extensionFunctions: extensionFunctions ?? parent?.extensionFunctions ?? {},
   };
@@ -196,24 +201,126 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
-function createActionsReference() {
+function createActionsReference(scope?: RuntimeScope) {
   return {
+    navigate: (target: unknown, queryParams?: Record<string, unknown>) =>
+      scope?.routing?.navigate(target, queryParams),
     callApi: async (input: Record<string, unknown>) => {
+      if (requiresActionConfirmation(input) && !window.confirm(actionConfirmationMessage(input))) {
+        return undefined;
+      }
+      showActionToast(scope, "loading", input.inProgressNotificationMessage, {});
       const request = managedFetchService.buildRequest(input);
-      const response = await managedFetchService.execute(request);
-      return response.data;
+      try {
+        const response = await managedFetchService.execute(request);
+        invalidateActionDataSources(scope, input.invalidates);
+        showActionToast(scope, "success", input.completedNotificationMessage, { result: response.data });
+        return response.data;
+      } catch (error) {
+        showActionToast(scope, "error", input.errorNotificationMessage, { error });
+        throw error;
+      }
     },
   };
 }
 
+function requiresActionConfirmation(input: Record<string, unknown>): boolean {
+  return Boolean(
+    input.confirmTitle ||
+    input.confirmMessage ||
+    input.confirmButtonLabel ||
+    input.cancelButtonLabel,
+  );
+}
+
+function actionConfirmationMessage(input: Record<string, unknown>): string {
+  return [input.confirmTitle, input.confirmMessage].filter(Boolean).map(String).join("\n") || "Confirm";
+}
+
+function invalidateActionDataSources(scope: RuntimeScope | undefined, invalidates: unknown): void {
+  const names = Array.isArray(invalidates)
+    ? invalidates
+    : typeof invalidates === "string"
+      ? invalidates.split(",").map((name) => name.trim()).filter(Boolean)
+      : [];
+  for (const name of names) {
+    const api = readReference(scope, String(name)) as { refetch?: () => unknown } | undefined;
+    void api?.refetch?.();
+  }
+}
+
+function showActionToast(
+  scope: RuntimeScope | undefined,
+  kind: "loading" | "success" | "error",
+  message: unknown,
+  context: Record<string, unknown>,
+): void {
+  if (!message) {
+    return;
+  }
+  const reference = scope?.toast?.reference as Record<string, unknown> | undefined;
+  const fn = reference?.[kind];
+  if (typeof fn === "function") {
+    fn.call(reference, interpolateActionTemplate(String(message), context));
+  }
+}
+
+function interpolateActionTemplate(template: string, context: Record<string, unknown>): string {
+  return template.replace(/\{\$([a-zA-Z0-9_]+)(?:\.([^}]+))?\}/g, (_match, name: string, path: string) => {
+    const root = context[name];
+    const value = path ? readActionPath(root, path) : root;
+    return value == null ? "" : String(value);
+  });
+}
+
+function readActionPath(value: unknown, path: string): unknown {
+  return path.split(".").reduce((current, part) => {
+    if (current == null) {
+      return undefined;
+    }
+    return (current as Record<string, unknown>)[part];
+  }, value);
+}
+
 function readBuiltInReference(scope: RuntimeScope | undefined, name: string): unknown {
+  if (name === "Array") {
+    return Array;
+  }
+  if (name === "JSON") {
+    return JSON;
+  }
+  if (name === "Object") {
+    return Object;
+  }
+  if (name === "Date") {
+    return Date;
+  }
+  if (name === "getDate") {
+    return getDate;
+  }
+  if (name === "confirm") {
+    return readReference(scope, "confirm");
+  }
+  if (name === "Symbol") {
+    return Symbol;
+  }
+  if (name === "BigInt") {
+    return BigInt;
+  }
   if (name === "Actions") {
-    return createActionsReference();
+    return createActionsReference(scope);
+  }
+  if (name === "App") {
+    return scope?.i18n?.reference;
   }
   if (name === "toast") {
     return scope?.toast?.reference;
   }
   return undefined;
+}
+
+function getDate(date?: string | number | Date): Date {
+  return date ? new Date(date) : new Date();
 }
 
 function readRouteContext(scope: RuntimeScope, name: string): unknown {

@@ -2,6 +2,7 @@ import type { ChangeEvent, CSSProperties, DragEvent, FocusEvent } from "react";
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { defaultProps } from "./FileInput.defaults";
+import { useFormContext } from "../Form/FormContext";
 import styles from "./FileInput.module.scss";
 
 export type FileParseResult = {
@@ -28,6 +29,7 @@ export type FileInputApi = {
 
 export type FileInputProps = {
   id?: string;
+  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   acceptsFileType?: string | string[];
@@ -59,6 +61,7 @@ export type FileInputProps = {
 export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(function FileInputNative(
   {
     id,
+    bindTo,
     value,
     initialValue = defaultProps.initialValue,
     acceptsFileType,
@@ -92,21 +95,31 @@ export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(fun
   const inputRef = useRef<HTMLInputElement | null>(null);
   const fieldButtonRef = useRef<HTMLButtonElement | null>(null);
   const browseButtonRef = useRef<HTMLButtonElement | null>(null);
-  const controlled = value !== undefined;
-  const [localValue, setLocalValue] = useState<FileInputValue>(() => normalizeValue(value ?? initialValue));
+  const form = useFormContext();
+  const getFormValue = form?.getValue;
+  const setFormValue = form?.setValue;
+  const validateFormField = form?.validateField;
+  const registerFormItem = form?.registerItem;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
+  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
+  const effectivePropValue = formValue ?? value;
+  const controlled = effectivePropValue !== undefined;
+  const [localValue, setLocalValue] = useState<FileInputValue>(() => normalizeValue(effectivePropValue ?? initialValue));
   const [fields, setFields] = useState<string[] | undefined>();
   const fieldsRef = useRef<string[] | undefined>();
   const [inProgress, setInProgress] = useState(false);
-  const effectiveValue = controlled ? normalizeValue(value) : localValue;
+  const effectiveValue = controlled ? normalizeValue(effectivePropValue) : localValue;
   const displayedFiles = filesFromValue(effectiveValue);
   const interactive = enabled && !readOnly;
   const accept = normalizeAcceptsFileType(acceptsFileType, parseAs);
+  const effectiveValidationStatus = formError ? "error" : validationStatus;
 
   useEffect(() => {
     if (controlled) {
-      setLocalValue(normalizeValue(value));
+      setLocalValue(normalizeValue(effectivePropValue));
     }
-  }, [controlled, value]);
+  }, [controlled, effectivePropValue]);
 
   useEffect(() => {
     if (!controlled) {
@@ -115,12 +128,38 @@ export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(fun
   }, [controlled, initialValue]);
 
   useEffect(() => {
+    if (!getFormValue || !setFormValue || fieldName === undefined || getFormValue(fieldName) != null || initialValue === undefined) {
+      return;
+    }
+    setFormValue(fieldName, normalizeValue(initialValue));
+  }, [fieldName, getFormValue, initialValue, setFormValue]);
+
+  useEffect(() => {
+    if (!registerFormItem || fieldName === undefined) {
+      return;
+    }
+    return registerFormItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, registerFormItem, required]);
+
+  useEffect(() => {
     if (!autoFocus || !enabled) {
       return;
     }
     const timeoutId = setTimeout(() => browseButtonRef.current?.focus(), 0);
     return () => clearTimeout(timeoutId);
   }, [autoFocus, enabled]);
+
+  const commitValue = useCallback((nextValue: FileInputValue) => {
+    setLocalValue(nextValue);
+    if (setFormValue && fieldName !== undefined) {
+      setFormValue(fieldName, nextValue);
+      void validateFormField?.(fieldName, nextValue);
+    }
+    void onDidChange?.(nextValue);
+  }, [fieldName, onDidChange, setFormValue, validateFormField]);
 
   const commitFiles = useCallback(async (incomingFiles: File[]) => {
     if (!interactive) {
@@ -146,8 +185,7 @@ export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(fun
           }
         }
         const nextValue = { files: nextFiles, parsedData };
-        setLocalValue(nextValue);
-        void onDidChange?.(nextValue);
+        commitValue(nextValue);
       } finally {
         setInProgress(false);
       }
@@ -156,9 +194,8 @@ export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(fun
 
     setFields(undefined);
     fieldsRef.current = undefined;
-    setLocalValue(nextFiles);
-    void onDidChange?.(nextFiles);
-  }, [accept, csvOptions, directory, interactive, multiple, onDidChange, onParseError, parseAs]);
+    commitValue(nextFiles);
+  }, [accept, commitValue, csvOptions, directory, interactive, multiple, onParseError, parseAs]);
 
   const open = useCallback(() => {
     if (interactive) {
@@ -178,8 +215,7 @@ export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(fun
       const nextValue = multiple || directory ? nextFiles : nextFiles.slice(0, 1);
       fieldsRef.current = undefined;
       setFields(undefined);
-      setLocalValue(nextValue);
-      void onDidChange?.(nextValue);
+      commitValue(nextValue);
     },
     getFields: () => fieldsRef.current ?? fields,
     get inProgress() {
@@ -188,7 +224,7 @@ export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(fun
     get value() {
       return effectiveValue;
     },
-  }), [directory, effectiveValue, enabled, fields, inProgress, multiple, onDidChange, open]);
+  }), [commitValue, directory, effectiveValue, enabled, fields, inProgress, multiple, open]);
 
   const onInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     void commitFiles(Array.from(event.currentTarget.files ?? []));
@@ -255,9 +291,9 @@ export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(fun
         data-xmlui-part="input"
         className={cx(
           styles.fileInputFieldButton,
-          validationStatus === "error" ? styles.fileInputError : undefined,
-          validationStatus === "warning" ? styles.fileInputWarning : undefined,
-          validationStatus === "valid" ? styles.fileInputValid : undefined,
+          effectiveValidationStatus === "error" ? styles.fileInputError : undefined,
+          effectiveValidationStatus === "warning" ? styles.fileInputWarning : undefined,
+          effectiveValidationStatus === "valid" ? styles.fileInputValid : undefined,
         )}
         disabled={!enabled}
         aria-readonly={readOnly || undefined}
@@ -316,6 +352,13 @@ function normalizeValue(value: unknown): FileInputValue {
 
 function normalizeFileArray(value: unknown): File[] {
   return isFileArray(value) ? value : [];
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
 function filesFromValue(value: FileInputValue): File[] {
