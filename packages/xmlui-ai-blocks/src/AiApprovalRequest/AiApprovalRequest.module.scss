@@ -27,11 +27,11 @@ $backgroundColor-AiApprovalRequestReject--hover: createThemeVar("backgroundColor
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: t.$space-3;
-    border-radius: t.$space-3;
+    gap: t.$space-2;
+    border-radius: t.$space-2;
     border: 1px solid $borderColor-AiApprovalRequest;
     background: $backgroundColor-AiApprovalRequest;
-    padding: t.$space-3;
+    padding: t.$space-2;
   }
 
   .root[data-status="requested"] {
@@ -110,7 +110,7 @@ $backgroundColor-AiApprovalRequestReject--hover: createThemeVar("backgroundColor
     border-radius: t.$space-2;
     background: color-mix(
       in srgb,
-      $backgroundColor-AiApprovalRequest 88%,
+      $backgroundColor-AiApprovalRequest 92%,
       var(--xmlui-color-surface-100, #f4f4f5)
     );
   }
@@ -138,7 +138,7 @@ $backgroundColor-AiApprovalRequestReject--hover: createThemeVar("backgroundColor
     appearance: none;
     border: 0;
     border-radius: 999px;
-    padding: t.$space-2 t.$space-3;
+    padding: t.$space-2 t.$space-2;
     color: var(--xmlui-color-surface-0, #ffffff);
     cursor: pointer;
     font: inherit;

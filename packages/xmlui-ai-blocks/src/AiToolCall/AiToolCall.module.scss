@@ -21,7 +21,7 @@ $borderColor-AiToolCall--failed: createThemeVar("borderColor-AiToolCall--failed"
 @layer components {
   .root {
     min-width: 0;
-    border-radius: t.$space-3;
+    border-radius: t.$space-2;
     border: 1px solid $borderColor-AiToolCall;
     background: $backgroundColor-AiToolCall;
   }
@@ -53,7 +53,7 @@ $borderColor-AiToolCall--failed: createThemeVar("borderColor-AiToolCall--failed"
     display: flex;
     align-items: center;
     gap: t.$space-2;
-    padding: t.$space-3;
+    padding: t.$space-2;
   }
 
   .summary::-webkit-details-marker {
@@ -89,7 +89,7 @@ $borderColor-AiToolCall--failed: createThemeVar("borderColor-AiToolCall--failed"
     display: flex;
     flex-direction: column;
     gap: t.$space-2;
-    padding: 0 t.$space-3 t.$space-3;
+    padding: 0 t.$space-2 t.$space-2;
   }
 
   .metaRow,
@@ -102,7 +102,7 @@ $borderColor-AiToolCall--failed: createThemeVar("borderColor-AiToolCall--failed"
     border-radius: t.$space-2;
     background: color-mix(
       in srgb,
-      $backgroundColor-AiToolCall 88%,
+      $backgroundColor-AiToolCall 92%,
       var(--xmlui-color-surface-100, #f4f4f5)
     );
   }

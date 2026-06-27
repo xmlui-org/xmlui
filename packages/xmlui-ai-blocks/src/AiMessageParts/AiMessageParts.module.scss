@@ -27,8 +27,8 @@ $textColor-AiMessagePartsBadge--active: createThemeVar("textColor-AiMessageParts
     display: flex;
     flex-direction: column;
     gap: t.$space-2;
-    padding: t.$space-3;
-    border-radius: t.$space-3;
+    padding: t.$space-2;
+    border-radius: t.$space-2;
     border: 1px solid $borderColor-AiMessageParts;
     background: $backgroundColor-AiMessageParts;
     color: $textColor-AiMessageParts;
@@ -114,14 +114,14 @@ $textColor-AiMessagePartsBadge--active: createThemeVar("textColor-AiMessageParts
     padding: t.$space-2 t.$space-3;
     background: color-mix(
       in srgb,
-      $backgroundColor-AiMessageParts 88%,
+      $backgroundColor-AiMessageParts 92%,
       var(--xmlui-color-surface-100, #f4f4f5)
     );
     border: 1px solid color-mix(in srgb, $borderColor-AiMessageParts 70%, transparent);
   }
 
   .reasoningDisclosure {
-    padding-inline: t.$space-3;
+    padding-inline: t.$space-2;
   }
 
   .reasoningSummary {

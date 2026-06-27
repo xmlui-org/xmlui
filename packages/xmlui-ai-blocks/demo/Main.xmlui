@@ -1,5 +1,5 @@
 <App
-  var.activePanel="'preview'"
+  var.workspacePanel="preview"
   var.fixture='{
     {
       layoutMode: "auto",
@@ -100,102 +100,103 @@
     minHeight="620px"
     layout="{fixture.layoutMode}"
     chatPlacement="start"
-    workspaceMode="{activePanel}"
-    activePanel="{activePanel}"
+    workspaceMode="tabs"
+    activePanel="{workspacePanel}"
     compactBreakpoint="{fixture.compactBreakpoint}"
-    onPanelChange="(event) => activePanel = event.panel">
+    onPanelChange="(event) => workspacePanel = event.panel">
     <property name="toolbarTemplate">
       <HStack gap="$space-2" verticalAlignment="center" wrapContent="false">
         <Badge value="{fixture.status}" />
         <SpaceFiller />
         <Button
           label="Preview"
-          variant="{activePanel === 'preview' ? 'solid' : 'outlined'}"
-          onClick="activePanel = 'preview'" />
+          themeColor="secondary"
+          variant="{workspacePanel === 'preview' ? 'solid' : 'outlined'}"
+          onClick="workspacePanel = 'preview'" />
         <Button
           label="Code"
-          variant="{activePanel === 'code' ? 'solid' : 'outlined'}"
-          onClick="activePanel = 'code'" />
+          themeColor="secondary"
+          variant="{workspacePanel === 'code' ? 'solid' : 'outlined'}"
+          onClick="workspacePanel = 'code'" />
       </HStack>
     </property>
     <property name="statusTemplate">
-      <HStack gap="$space-2" verticalAlignment="center">
-        <Text variant="secondary">Workspace panel:</Text>
-        <Badge value="{activePanel}" />
-      </HStack>
     </property>
     <property name="chatTemplate">
-      <VStack height="100%" minHeight="0" gap="0">
-        <ScrollViewer dock="stretch" height="*" showScrollerFade="{false}">
-          <VStack gap="$space-3">
-            <Items data="{fixture.messages}" gap="$space-2">
-              <AiMessageParts
-                message="{$item}"
-                streaming="{$item.status === 'streaming'}"
-                collapseReasoning="true" />
-            </Items>
-            <VStack gap="$space-2">
-              <Text variant="secondary">Tool activity</Text>
-              <Items data="{fixture.toolCalls}">
-                <AiToolCall
-                  toolCall="{$item}"
-                  defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
-                  showInput="summary"
-                  showOutput="summary" />
-              </Items>
-            </VStack>
-            <VStack gap="$space-2">
-              <Text variant="secondary">Resolved approvals</Text>
-              <Items data="{fixture.resolvedApprovals}">
-                <AiApprovalRequest request="{$item}" running="{false}" />
-              </Items>
-            </VStack>
-          </VStack>
-          <StickySection stickTo="bottom" backgroundColor="$color-surface-0">
-            <Card title="{fixture.pendingApprovals.length} approval pending">
-              <VStack gap="$space-2">
-                <Items data="{fixture.pendingApprovals}">
-                  <AiApprovalRequest
-                    request="{$item}"
-                    running="true"
-                    onApprove="toast('Approved ' + $event.requestId)"
-                    onReject="toast('Rejected ' + $event.requestId)" />
-                </Items>
-              </VStack>
-            </Card>
-          </StickySection>
-        </ScrollViewer>
-        <Card dock="bottom">
-          <Form>
+      <VStack gap="$space-3">
+        <VStack gap="$space-2">
+          <HStack gap="$space-2" verticalAlignment="center">
+            <Text variant="secondary">Transcript</Text>
+            <Badge value="{fixture.messages.length + ' messages'}" />
+          </HStack>
+          <Items data="{fixture.messages}" gap="$space-2">
+            <AiMessageParts
+              message="{$item}"
+              streaming="{$item.status === 'streaming'}"
+              collapseReasoning="true" />
+          </Items>
+        </VStack>
+
+        <VStack gap="$space-2">
+          <HStack gap="$space-2" verticalAlignment="center">
+            <Text variant="secondary">Tool activity</Text>
+            <Badge value="{fixture.toolCalls.length + ' tools'}" />
+          </HStack>
+          <Items data="{fixture.toolCalls}">
+            <AiToolCall
+              toolCall="{$item}"
+              defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
+              showInput="summary"
+              showOutput="summary" />
+          </Items>
+        </VStack>
+
+        <VStack gap="$space-2">
+          <HStack gap="$space-2" verticalAlignment="center">
+            <Text variant="secondary">Approvals</Text>
+            <Badge value="{fixture.pendingApprovals.length + ' pending'}" />
+          </HStack>
+          <Items data="{fixture.resolvedApprovals}">
+            <AiApprovalRequest request="{$item}" running="{false}" />
+          </Items>
+          <Items data="{fixture.pendingApprovals}">
+            <AiApprovalRequest
+              request="{$item}"
+              running="true"
+              onApprove="toast('Approved ' + $event.requestId)"
+              onReject="toast('Rejected ' + $event.requestId)" />
+          </Items>
+        </VStack>
+      </VStack>
+    </property>
+    <property name="composerTemplate">
+      <VStack gap="$space-2">
+        <Form>
+          <VStack gap="$space-2">
             <TextArea id="prompt" rows="3" placeholder="Describe the app you want to build" />
-          </Form>
-        </Card>
+          </VStack>
+        </Form>
       </VStack>
     </property>
     <property name="previewTemplate">
       <VStack height="100%" width="100%" minHeight="0" gap="$space-3">
-        <Card dock="top">
-          <ExpandableItem initiallyExpanded="{false}" fullWidthSummary="{true}" iconPosition="end">
-            <property name="summary">
-              <HStack gap="$space-2" verticalAlignment="center" wrapContent="true">
-                <Badge value="{fixture.previewIssues.length + ' issue found'}" />
-                <Text variant="secondary">Preview compile</Text>
-              </HStack>
-            </property>
-            <VStack gap="$space-2">
-              <Items data="{fixture.previewIssues}">
-                <VStack gap="$space-1">
-                  <Text variant="strong">{$item.title}</Text>
-                  <Text variant="secondary">{$item.detail}</Text>
-                </VStack>
-              </Items>
+        <HStack gap="$space-2" verticalAlignment="center">
+          <Badge value="{fixture.previewIssues.length + ' issues'}" />
+          <Text variant="secondary">Current generation preview</Text>
+        </HStack>
+        <VStack gap="$space-2">
+          <Text variant="strong">Preview diagnostics</Text>
+          <Items data="{fixture.previewIssues}">
+            <VStack gap="$space-1">
+              <Text variant="strong">{$item.title}</Text>
+              <Text variant="secondary">{$item.detail}</Text>
             </VStack>
-          </ExpandableItem>
-        </Card>
-        <CVStack dock="stretch" height="100%" gap="$space-2">
+          </Items>
+        </VStack>
+        <VStack height="100%" minHeight="0" gap="$space-2">
           <Text variant="title">Preview placeholder</Text>
           <Text variant="secondary">Generated XMLUI preview will render here.</Text>
-        </CVStack>
+        </VStack>
       </VStack>
     </property>
     <property name="codeTemplate">

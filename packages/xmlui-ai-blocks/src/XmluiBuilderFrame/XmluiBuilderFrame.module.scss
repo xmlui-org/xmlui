@@ -54,6 +54,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     border-radius: calc($borderRadius-XmluiBuilderFrame / 1.5);
     padding: $padding-toolbar-XmluiBuilderFrame;
     background: $backgroundColor-toolbar-XmluiBuilderFrame;
+    border: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 55%, transparent);
   }
 
   .status {
@@ -69,6 +70,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     padding: $padding-tabs-XmluiBuilderFrame;
     border-radius: calc($borderRadius-XmluiBuilderFrame / 1.5);
     background: $backgroundColor-tabs-XmluiBuilderFrame;
+    border: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 55%, transparent);
   }
 
   .tabButton {
@@ -80,6 +82,11 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     padding: $padding-tab-XmluiBuilderFrame;
     cursor: pointer;
     font: inherit;
+  }
+
+  .tabButton:focus-visible {
+    outline: 2px solid color-mix(in srgb, $borderColor-tab-XmluiBuilderFrame--active 70%, transparent);
+    outline-offset: 2px;
   }
 
   .tabButtonActive {
@@ -111,10 +118,16 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
   .auxiliaryPanel {
     min-width: 0;
     min-height: 0;
-    border-radius: calc($borderRadius-XmluiBuilderFrame / 1.5);
+    border-radius: calc($borderRadius-XmluiBuilderFrame / 1.6);
     background: $backgroundColor-panel-XmluiBuilderFrame;
     display: flex;
     flex-direction: column;
+    border: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 50%, transparent);
+  }
+
+  .workspacePane {
+    flex: 1 1 auto;
+    overflow: hidden;
   }
 
   .chatPaneSplit {
@@ -127,6 +140,22 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     padding: $padding-panel-XmluiBuilderFrame;
   }
 
+  .chatTranscript {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .chatComposer {
+    flex: 0 0 auto;
+    padding: $padding-panel-XmluiBuilderFrame;
+    border-top: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 55%, transparent);
+    background: color-mix(in srgb, $backgroundColor-panel-XmluiBuilderFrame 94%, var(--xmlui-color-surface-100, #f4f4f5));
+    border-radius: calc($borderRadius-XmluiBuilderFrame / 1.8);
+  }
+
   .workspacePane,
   .panel,
   .auxiliaryPanel {
@@ -134,11 +163,12 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
   }
 
   .workspaceViewport {
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
     display: flex;
     flex-direction: column;
     gap: $gap-panel-XmluiBuilderFrame;
+    overflow: hidden;
   }
 
   .panelScroll {
@@ -151,11 +181,18 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
   }
 
   .workspaceSplit {
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: $gap-panel-XmluiBuilderFrame;
+    overflow: hidden;
+  }
+
+  .panel,
+  .auxiliaryPanel {
+    flex: 1 1 auto;
+    overflow: hidden;
   }
 
   .timelinePanel {
@@ -163,12 +200,25 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
   }
 
   .splitHandle {
-    width: 0.5rem;
+    width: 0.75rem;
+    min-width: 0.75rem;
     cursor: col-resize;
     border-radius: 999px;
-    background: color-mix(in srgb, $borderColor-XmluiBuilderFrame 60%, transparent);
+    background: linear-gradient(
+      to right,
+      transparent 0,
+      color-mix(in srgb, $borderColor-XmluiBuilderFrame 35%, transparent) 25%,
+      color-mix(in srgb, $borderColor-XmluiBuilderFrame 55%, transparent) 50%,
+      color-mix(in srgb, $borderColor-XmluiBuilderFrame 35%, transparent) 75%,
+      transparent 100%
+    );
     align-self: stretch;
     flex: 0 0 auto;
+  }
+
+  .splitHandle:focus-visible {
+    outline: 2px solid color-mix(in srgb, $borderColor-tab-XmluiBuilderFrame--active 70%, transparent);
+    outline-offset: 2px;
   }
 
   .chatPaneHidden {

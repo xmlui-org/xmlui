@@ -55,6 +55,48 @@ Candidate client-side pieces to extract or redesign from `a2xmlui`:
 
 Avoid copying the A2XMLUI shell wholesale. The package should preserve the harness behavior and expose better primitives.
 
+### XMLUI Studio Migration Notes
+
+The separate XMLUI Studio app at
+`D:\Projects\albacrm\xmlui-studio\packages\a2xmlui\xmlui-app` is useful as
+reference source material for the same extraction path, but it should not become
+the package UI. Migrate behavior and layout lessons selectively:
+
+- `src/extensions/AgentChat/AgentChat.tsx` proves the headless controller shape:
+  message projection, busy/status labels, generated code, last-successful code,
+  queued steering, full-replacement confirmation, and imperative APIs. Port these
+  ideas into `AiThread` and generation state, but do not port its provider calls,
+  AI SDK transport coupling, repair prompts, diagnostics posting, host save
+  implementation, or local-storage persistence into browser visual components.
+- `src/extensions/XmluiPreview/XmluiPreview.tsx` is good source material for
+  compile diagnostics, runtime error isolation, theme/tone forwarding, sandbox
+  globals, and bounded preview scrolling. Do not copy its silent fallback behavior:
+  `XmluiPreviewPane` must render the selected revision and keep broken current
+  generations inspectable unless the user explicitly selects `lastWorking`.
+- `src/extensions/CodeView/CodeView.tsx` is a useful secondary reference for a
+  lightweight XMLUI formatter, line-number gutter, tone-aware token colors, and
+  scroll isolation. Keep `XmluiCodeView` read-only in the first pass and expose
+  copy/selection through events or recipe chrome rather than turning it into an
+  editor.
+- `src/extensions/PromptInput/PromptInput.tsx` contains real hard-to-compose
+  composer behavior: auto-resize, Enter-to-submit, ArrowUp recall, queue/stop
+  mode, drag/drop attachments, file validation, portal positioning, searchable
+  grouped model selection, and persisted selection. Treat this as evidence for a
+  possible future `AiPromptInput`, not as an immediate component. It must pass
+  the Promotion Gate before being added.
+- `src/extensions/ChainOfThought` and `src/extensions/ReasoningBlock` should be
+  consolidated into the existing message/timeline strategy. Simple reasoning
+  belongs in `AiMessageParts`; structured run progress belongs in a run timeline
+  recipe unless repeated host integrations justify a dedicated component.
+- `src/components/ChatPane.xmlui`, the workspace header, save dialog, model
+  selector, preview toolbar, status messages, and saved-app workflow are recipe
+  source material only. They contain host copy, policy, persistence, and shell
+  decisions that must remain swappable.
+- `src/themes/*` should inform the default frame tone only at the level of
+  restrained product styling: thin borders, stable scroll regions, compact
+  controls, minimal shadow, and panel radii no larger than 8px by default. Do not
+  copy the Studio brand palette into `xmlui-ai-blocks` defaults.
+
 ## Component Scope Audit
 
 The first pass should deliberately avoid recreating a full [AI Elements](https://elements.ai-sdk.dev/components)-style visual kit. AI Elements is useful as a feature checklist, not as a target component count. Its current component index groups needs into chatbot UI, code/agent UI, voice, workflow, and utilities; for XMLUI app generation the relevant gaps are mostly chatbot state, generated-code/preview state, streaming, sources, reasoning, tools, and approvals.
@@ -314,6 +356,29 @@ Later editing support should be additive and explicit, not assumed by the viewer
 
 `XmluiBuilderFrame` should solve layout-level concerns that are awkward to repeat in every host: desktop split view, mobile tab/stack behavior, stable scroll containment, panel resizing defaults, preview/code placement, and consistent status/toolbar anchoring. It may expose named templates or named child-region components, whichever best matches XMLUI component conventions at implementation time.
 
+Studio-informed frame behavior:
+
+- Chat and composer must be separate vertical regions. The transcript/chat region
+  scrolls; `composerTemplate` stays anchored at the bottom of the chat column in
+  split and stack layouts. Do not put both templates inside one shared scroll
+  container.
+- Workspace, preview, code, timeline, and auxiliary regions each need explicit
+  `min-height: 0`, `min-width: 0`, and stable overflow ownership so nested
+  previews and code views do not force the whole frame to scroll.
+- Tabs should behave like tabs, not only styled buttons: `role="tablist"`,
+  `role="tab"`, associated `tabpanel` regions, selected state, keyboard
+  left/right or up/down navigation, and focus treatment belong to the frame
+  because the frame owns panel switching.
+- If the split handle is interactive, it should be keyboard-accessible and expose
+  separator semantics. If that is too much for the first pass, make resizing opt-in
+  or keep the handle visually simple until the accessible behavior is implemented.
+- Default styling should be quiet and product-oriented: thin border, no large
+  shadow, radius no larger than 8px, toolbar/status as bands, and panels that feel
+  like bounded work regions rather than nested cards.
+- The demo should avoid placing `Card` chrome inside every frame region. Use flat
+  XMLUI primitives inside the frame unless the child content is a genuinely
+  repeated item, modal, or standalone tool.
+
 The frame must remain a host, not a controller:
 
 - It accepts child content, templates, or component children; it should not create an `AiThread` internally.
@@ -346,6 +411,11 @@ Promotion remains possible later, but only through the normal Promotion Gate. A 
 ### Conditional
 
 - `AiComposer` or `AiPromptInput`: build only if it adds real behavior beyond `Form` + `TextArea`: enter-to-submit consistency, send/cancel switching, attachment collection, composition events, and accessibility details. Otherwise keep it as a recipe.
+- XMLUI Studio's `PromptInput` is the reference for what would justify promotion:
+  auto-resizing text input, ArrowUp recall, queue-while-running behavior,
+  attachment validation and previews, drag/drop handling, and an accessible
+  searchable model picker. Do not promote it only to bundle model selection or
+  app-specific composer styling.
 
 ### Recipe First
 
@@ -590,9 +660,22 @@ Builder rules:
   `AiApprovalRequest`, `XmluiCodeView`, and `XmluiPreviewPane` exist.
 - Do not introduce `ChatPane` or `AiChatPane`; the chat region is transcript and
   composer recipe content hosted by the frame.
+- Render `chatTemplate` and `composerTemplate` as separate frame regions. The chat
+  transcript area owns scrolling; the composer is anchored and remains visible.
+- Keep all frame-owned regions bounded with `min-height: 0`, `min-width: 0`, and
+  explicit overflow rules so `XmluiPreviewPane`, `XmluiCodeView`, and long
+  transcripts can scroll internally without resizing the shell.
+- Implement tab semantics and keyboard navigation for frame-owned top-level and
+  workspace tabs.
+- Make the resize handle accessible if it is enabled by default; otherwise defer
+  enabled resizing until separator semantics and keyboard resizing are present.
 - Support a useful degraded layout when only one or two regions are supplied.
 - Keep route/viewport controls as recipes unless they need component-owned behavior.
-- Keep styles compact and theme-variable based.
+- Keep styles compact, theme-variable based, and visually quiet: thin borders,
+  minimal or no shadow, radius at or below 8px, and toolbar/status bands rather
+  than nested card-like chrome.
+- Keep the demo flat. Avoid wrapping every region in `Card`; use cards only for
+  repeated items, modals, or genuinely framed child tools.
 
 Recommended `XmluiBuilderFrame` props:
 
@@ -660,6 +743,9 @@ Tests and checks:
 
 - Frame tests for missing optional regions, desktop split layout, compact tab/stack
   layout, panel-change events, and stable scroll containment.
+- Frame tests that the composer remains visible while transcript content scrolls.
+- Keyboard/a11y tests for frame-owned tabs and, if enabled, the split resize
+  handle.
 - Demo smoke test with placeholder region content.
 - `npm --prefix packages/xmlui-ai-blocks run build:extension`
 - `npm --prefix packages/xmlui-ai-blocks run build:meta` if metadata changed.
@@ -670,8 +756,33 @@ Exit criteria:
   primitives exist.
 - The frame proves how transcript/composer, tool timeline, preview, code, toolbar,
   and status regions are expected to fit together.
+- The frame layout can host Studio-derived preview and code surfaces without
+  introducing nested scroll bugs or hiding extension points.
 - No frame behavior owns transport, policy, persistence, generation state, or
   preview state.
+
+#### Current Component Update Handoff
+
+Use this handoff when updating the current `XmluiBuilderFrame`,
+`AiMessageParts`, `AiToolCall`, `AiApprovalRequest`, and demo implementation:
+
+1. Update `XmluiBuilderFrameNative` so chat and composer are separate structural
+   regions. The chat transcript region scrolls; the composer remains anchored.
+2. Revise `XmluiBuilderFrame.module.scss` defaults to the quiet product frame
+   style described above: thin border, little/no shadow, radius no larger than
+   8px, bounded regions, toolbar/status bands, and no card-inside-card feel.
+3. Add proper tab/tabpanel semantics and keyboard navigation for both top-level
+   compact tabs and workspace tabs. Keep `onPanelChange` payload unchanged.
+4. Either make the split handle accessible with separator semantics and keyboard
+   resizing, or switch the default `resizable` behavior to a noninteractive/static
+   split until that accessibility work is complete.
+5. Update the demo to use flatter region content and the existing visual
+   primitives without promoting `ChatPane`, `PromptInput`, model selection, or
+   save/publish UI into package components.
+6. Leave `AiMessageParts`, `AiToolCall`, and `AiApprovalRequest` focused on their
+   current AI-specific rendering responsibilities. Only adjust spacing, borders,
+   and tone as needed so they fit the quieter frame; do not add transport,
+   provider, persistence, or layout ownership.
 
 Owner questions before implementation:
 
@@ -915,6 +1026,10 @@ Builder rules:
 - Do not add persistence, save buttons, publish flows, or artifact cards.
 - Do not make `XmluiCodeView` an editor.
 - Do not silently copy `lastWorkingCode` over broken current code.
+- When mining XMLUI Studio `CodeView`, keep only viewer concerns: formatting,
+  line numbers, tone-aware token styling, scroll isolation, displayed-code
+  updates, and optional copy/selection events. Do not port workspace header,
+  save/copy buttons, or file naming chrome as component-owned UI.
 
 Recommended local generation value:
 
@@ -997,6 +1112,10 @@ Builder rules:
 - Keep route/viewport controls as recipes unless they need component-owned behavior.
 - Do not expand `XmluiBuilderFrame` beyond layout to make preview/code integration
   work; preview lifecycle stays in `XmluiPreviewPane` and generation/session state.
+- When mining XMLUI Studio `XmluiPreview`, keep compile diagnostics, runtime error
+  boundary behavior, sandbox globals, theme/tone forwarding, bounded scrolling,
+  and warning reporting. Replace its silent `lastSuccessfulCode` fallback with
+  explicit `selectedRevision` handling.
 
 Recommended props:
 

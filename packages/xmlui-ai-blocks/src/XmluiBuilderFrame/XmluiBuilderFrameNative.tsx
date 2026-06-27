@@ -1,10 +1,12 @@
 import React, {
   type CSSProperties,
+  type KeyboardEvent,
   type ReactNode,
   forwardRef,
   memo,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -37,6 +39,17 @@ export type XmluiBuilderFrameProps = {
   onPanelChange?: (value: { panel: XmluiBuilderPanel }) => void;
 };
 
+type BuilderTabStripProps = {
+  ariaLabel: string;
+  idPrefix: string;
+  panels: XmluiBuilderPanel[];
+  selectedPanel: XmluiBuilderPanel;
+  className?: string;
+  tabClassName?: string;
+  activeTabClassName?: string;
+  onSelect: (panel: XmluiBuilderPanel) => void;
+};
+
 export const defaultProps = {
   layout: "auto" as const,
   chatPlacement: "start" as const,
@@ -51,6 +64,106 @@ function normalizePanel(panel: XmluiBuilderPanel | undefined, available: XmluiBu
     return panel;
   }
   return available[0];
+}
+
+function panelLabel(panel: XmluiBuilderPanel) {
+  switch (panel) {
+    case "chat":
+      return "Chat";
+    case "preview":
+      return "Preview";
+    case "code":
+      return "Code";
+    case "timeline":
+      return "Timeline";
+  }
+}
+
+function BuilderTabStrip({
+  ariaLabel,
+  idPrefix,
+  panels,
+  selectedPanel,
+  className,
+  tabClassName,
+  activeTabClassName,
+  onSelect,
+}: BuilderTabStripProps) {
+  const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const focusTab = useCallback((panel: XmluiBuilderPanel) => {
+    const index = panels.indexOf(panel);
+    if (index >= 0) {
+      buttonRefs.current[index]?.focus();
+    }
+  }, [panels]);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
+      if (!panels.length) return;
+
+      let nextIndex = currentIndex;
+
+      switch (event.key) {
+        case "ArrowLeft":
+        case "ArrowUp":
+          nextIndex = (currentIndex - 1 + panels.length) % panels.length;
+          break;
+        case "ArrowRight":
+        case "ArrowDown":
+          nextIndex = (currentIndex + 1) % panels.length;
+          break;
+        case "Home":
+          nextIndex = 0;
+          break;
+        case "End":
+          nextIndex = panels.length - 1;
+          break;
+        default:
+          return;
+      }
+
+      event.preventDefault();
+      const nextPanel = panels[nextIndex];
+      onSelect(nextPanel);
+      focusTab(nextPanel);
+    },
+    [focusTab, onSelect, panels],
+  );
+
+  if (!panels.length) {
+    return null;
+  }
+
+  return (
+    <div className={className} role="tablist" aria-label={ariaLabel} aria-orientation="horizontal">
+      {panels.map((panel, index) => {
+        const isActive = selectedPanel === panel;
+        const tabId = `${idPrefix}-tab-${panel}`;
+        const panelId = `${idPrefix}-panel-${panel}`;
+
+        return (
+          <button
+            key={panel}
+            ref={(element) => {
+              buttonRefs.current[index] = element;
+            }}
+            id={tabId}
+            type="button"
+            className={classnames(tabClassName, isActive ? activeTabClassName : undefined)}
+            aria-controls={panelId}
+            aria-selected={isActive}
+            role="tab"
+            tabIndex={isActive ? 0 : -1}
+            onClick={() => onSelect(panel)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
+          >
+            {panelLabel(panel)}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function parseLengthToPixels(value?: string) {
@@ -140,6 +253,7 @@ export const XmluiBuilderFrameNative = memo(
     const [internalPanel, setInternalPanel] = useState<XmluiBuilderPanel>(
       activePanel ?? defaultProps.activePanel,
     );
+    const frameId = useId().replace(/:/g, "");
     const containerWidth = useContainerWidth(rootRef);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -241,19 +355,26 @@ export const XmluiBuilderFrameNative = memo(
       };
     }, [isDragging]);
 
-    const chatSection = hasChat ? (
-      <section
-        className={classnames(styles.chatPane, classes?.chat, {
-          [styles.chatPaneHidden]: chatPlacement === "hidden",
-        })}
-        data-region="chat"
-      >
-        <div className={styles.panelScroll}>
-          {chatTemplate}
-          {composerTemplate}
-        </div>
-      </section>
-    ) : null;
+    const renderChatSection = (split = false) =>
+      hasChat ? (
+        <section
+          className={classnames(styles.chatPane, classes?.chat, {
+            [styles.chatPaneHidden]: chatPlacement === "hidden",
+            [styles.chatPaneSplit]: split,
+          })}
+          style={split ? { flexBasis: `${Math.round(splitRatio * 100)}%` } : undefined}
+          data-region="chat"
+        >
+          <div className={classnames(styles.chatTranscript, classes?.panel)} data-region="chat-transcript">
+            <div className={styles.panelScroll}>{chatTemplate}</div>
+          </div>
+          {composerTemplate ? (
+            <div className={classnames(styles.chatComposer, classes?.panel)} data-region="composer">
+              {composerTemplate}
+            </div>
+          ) : null}
+        </section>
+      ) : null;
 
     const previewNode = previewTemplate;
     const codeNode = codeTemplate;
@@ -281,49 +402,18 @@ export const XmluiBuilderFrameNative = memo(
 
       return (
         <section className={classnames(styles.workspacePane, classes?.workspace)} data-region="workspace">
-          {resolvedLayout !== "tabs" && (workspaceMode === "tabs" || (workspaceMode === "auto" && compact && workspaceTabs)) ? (
-            <div className={classnames(styles.workspaceTabs, classes?.tabs)} role="tablist" aria-label="Workspace panels">
-              {workspacePanels.includes("preview") && (
-                <button
-                  type="button"
-                  className={classnames(styles.tabButton, classes?.tab, {
-                    [styles.tabButtonActive]: selectedWorkspace === "preview",
-                  })}
-                  aria-selected={selectedWorkspace === "preview"}
-                  role="tab"
-                  onClick={() => setPanel("preview")}
-                >
-                  Preview
-                </button>
-              )}
-              {workspacePanels.includes("code") && (
-                <button
-                  type="button"
-                  className={classnames(styles.tabButton, classes?.tab, {
-                    [styles.tabButtonActive]: selectedWorkspace === "code",
-                  })}
-                  aria-selected={selectedWorkspace === "code"}
-                  role="tab"
-                  onClick={() => setPanel("code")}
-                >
-                  Code
-                </button>
-              )}
-              {workspacePanels.includes("timeline") && (
-                <button
-                  type="button"
-                  className={classnames(styles.tabButton, classes?.tab, {
-                    [styles.tabButtonActive]: selectedWorkspace === "timeline",
-                  })}
-                  aria-selected={selectedWorkspace === "timeline"}
-                  role="tab"
-                  onClick={() => setPanel("timeline")}
-                >
-                  Timeline
-                </button>
-              )}
-            </div>
-          ) : null}
+          {/* {resolvedLayout !== "tabs" && (workspaceMode === "tabs" || (workspaceMode === "auto" && compact && workspaceTabs)) ? (
+            <BuilderTabStrip
+              ariaLabel="Workspace panels"
+              idPrefix={`${frameId}-workspace`}
+              panels={workspacePanels}
+              selectedPanel={selectedWorkspace}
+              className={classnames(styles.workspaceTabs, classes?.tabs)}
+              tabClassName={classnames(styles.tabButton, classes?.tab)}
+              activeTabClassName={styles.tabButtonActive}
+              onSelect={setPanel}
+            />
+          ) : null} */}
 
           <div className={styles.workspaceViewport}>
             {workspaceMode === "split" && previewNode && codeNode ? (
@@ -336,7 +426,22 @@ export const XmluiBuilderFrameNative = memo(
                 </div>
               </div>
             ) : (
-              <div className={classnames(styles.panel, classes?.panel)} data-region={selectedWorkspace}>
+              <div
+                className={classnames(styles.panel, classes?.panel)}
+                data-region={selectedWorkspace}
+                role={workspaceMode === "tabs" || (workspaceMode === "auto" && compact && workspaceTabs) ? "tabpanel" : undefined}
+                aria-labelledby={
+                  workspaceMode === "tabs" || (workspaceMode === "auto" && compact && workspaceTabs)
+                    ? `${frameId}-workspace-tab-${selectedWorkspace}`
+                    : undefined
+                }
+                id={
+                  workspaceMode === "tabs" || (workspaceMode === "auto" && compact && workspaceTabs)
+                    ? `${frameId}-workspace-panel-${selectedWorkspace}`
+                    : undefined
+                }
+                tabIndex={workspaceMode === "tabs" || (workspaceMode === "auto" && compact && workspaceTabs) ? 0 : undefined}
+              >
                 <div className={styles.panelScroll}>{singlePanel}</div>
               </div>
             )}
@@ -361,30 +466,24 @@ export const XmluiBuilderFrameNative = memo(
       if (resolvedLayout !== "tabs" || availablePanels.length <= 1) return null;
 
       return (
-        <div className={classnames(styles.topTabs, classes?.tabs)} role="tablist" aria-label="Builder panels">
-          {availablePanels.map((panel) => (
-            <button
-              key={panel}
-              type="button"
-              className={classnames(styles.tabButton, classes?.tab, {
-                [styles.tabButtonActive]: tabSelection === panel,
-              })}
-              aria-selected={tabSelection === panel}
-              role="tab"
-              onClick={() => setPanel(panel)}
-            >
-              {panel === "chat" ? "Chat" : panel === "preview" ? "Preview" : panel === "code" ? "Code" : "Timeline"}
-            </button>
-          ))}
-        </div>
+        <BuilderTabStrip
+          ariaLabel="Builder panels"
+          idPrefix={`${frameId}-builder`}
+          panels={availablePanels}
+          selectedPanel={tabSelection}
+          className={classnames(styles.topTabs, classes?.tabs)}
+          tabClassName={classnames(styles.tabButton, classes?.tab)}
+          activeTabClassName={styles.tabButtonActive}
+          onSelect={setPanel}
+        />
       );
     };
 
     const renderStackLayout = () => (
       <div className={classnames(styles.stackLayout, classes?.shell)}>
-        {chatPlacement === "end" ? null : chatPlacement !== "hidden" ? chatSection : null}
+        {chatPlacement === "end" ? null : chatPlacement !== "hidden" ? renderChatSection() : null}
         {renderWorkspaceContent()}
-        {chatPlacement === "end" ? chatSection : null}
+        {chatPlacement === "end" ? renderChatSection() : null}
         {chatPlacement === "hidden" && !hasWorkspace && auxiliaryNode ? auxiliaryNode : null}
       </div>
     );
@@ -393,22 +492,35 @@ export const XmluiBuilderFrameNative = memo(
       <div ref={splitRef} className={classnames(styles.splitLayout, classes?.shell)}>
         {chatPlacement !== "end" ? (
           <>
-            {chatSection && (
-              <section
-                className={classnames(styles.chatPane, styles.chatPaneSplit, classes?.chat)}
-                style={{ flexBasis: `${Math.round(splitRatio * 100)}%` }}
-                data-region="chat"
-              >
-                <div className={styles.panelScroll}>
-                  {chatTemplate}
-                  {composerTemplate}
-                </div>
-              </section>
-            )}
+            {renderChatSection(true)}
             {resizable && chatVisible && hasWorkspace ? (
               <div
                 className={styles.splitHandle}
-                aria-hidden="true"
+                role="separator"
+                aria-label="Adjust chat and workspace width"
+                aria-orientation="vertical"
+                aria-valuemin={22}
+                aria-valuemax={68}
+                aria-valuenow={Math.round(splitRatio * 100)}
+                aria-valuetext={`${Math.round(splitRatio * 100)} percent chat width`}
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  let nextRatio = splitRatio;
+                  if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+                    nextRatio -= 0.03;
+                  } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+                    nextRatio += 0.03;
+                  } else if (event.key === "Home") {
+                    nextRatio = 0.22;
+                  } else if (event.key === "End") {
+                    nextRatio = 0.68;
+                  } else {
+                    return;
+                  }
+
+                  event.preventDefault();
+                  setSplitRatio(Math.min(0.68, Math.max(0.22, nextRatio)));
+                }}
                 onPointerDown={(event) => {
                   if (event.button !== 0) return;
                   event.preventDefault();
@@ -424,7 +536,31 @@ export const XmluiBuilderFrameNative = memo(
             {resizable && chatVisible && hasWorkspace ? (
               <div
                 className={styles.splitHandle}
-                aria-hidden="true"
+                role="separator"
+                aria-label="Adjust workspace and chat width"
+                aria-orientation="vertical"
+                aria-valuemin={22}
+                aria-valuemax={68}
+                aria-valuenow={Math.round(splitRatio * 100)}
+                aria-valuetext={`${Math.round(splitRatio * 100)} percent workspace width`}
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  let nextRatio = splitRatio;
+                  if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+                    nextRatio += 0.03;
+                  } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+                    nextRatio -= 0.03;
+                  } else if (event.key === "Home") {
+                    nextRatio = 0.68;
+                  } else if (event.key === "End") {
+                    nextRatio = 0.22;
+                  } else {
+                    return;
+                  }
+
+                  event.preventDefault();
+                  setSplitRatio(Math.min(0.68, Math.max(0.22, nextRatio)));
+                }}
                 onPointerDown={(event) => {
                   if (event.button !== 0) return;
                   event.preventDefault();
@@ -432,18 +568,7 @@ export const XmluiBuilderFrameNative = memo(
                 }}
               />
             ) : null}
-            {chatSection && (
-              <section
-                className={classnames(styles.chatPane, styles.chatPaneSplit, classes?.chat)}
-                style={{ flexBasis: `${Math.round(splitRatio * 100)}%` }}
-                data-region="chat"
-              >
-                <div className={styles.panelScroll}>
-                  {chatTemplate}
-                  {composerTemplate}
-                </div>
-              </section>
-            )}
+            {renderChatSection(true)}
           </>
         )}
       </div>
@@ -452,10 +577,12 @@ export const XmluiBuilderFrameNative = memo(
     const renderTabsLayout = () => {
       if (availablePanels.length === 0) return null;
       const selected = tabSelection ?? availablePanels[0];
+      const tabId = `${frameId}-builder-tab-${selected}`;
+      const panelId = `${frameId}-builder-panel-${selected}`;
 
       const panelNode =
         selected === "chat"
-          ? chatSection
+          ? renderChatSection()
           : selected === "preview"
             ? previewNode
             : selected === "code"
@@ -464,8 +591,15 @@ export const XmluiBuilderFrameNative = memo(
 
       return (
         <div className={classnames(styles.tabsLayout, classes?.shell)}>
-          <div className={classnames(styles.panel, classes?.panel)} data-region={selected}>
-            <div className={styles.panelScroll}>{panelNode}</div>
+          <div
+            className={classnames(styles.panel, classes?.panel)}
+            data-region={selected}
+            role="tabpanel"
+            aria-labelledby={tabId}
+            id={panelId}
+            tabIndex={0}
+          >
+            {selected === "chat" ? panelNode : <div className={styles.panelScroll}>{panelNode}</div>}
           </div>
           {auxiliaryNode ? (
             <div className={classnames(styles.auxiliaryPanel, classes?.auxiliary)} data-region="auxiliary">
@@ -501,7 +635,7 @@ export const XmluiBuilderFrameNative = memo(
             </div>
           ) : null}
 
-          {renderTopLevelTabs()}
+          {/* renderTopLevelTabs() */}
 
           {content}
 
