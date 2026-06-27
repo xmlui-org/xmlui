@@ -15,6 +15,7 @@ export type XmluiComponentModule = {
   kind: "component";
   name: string;
   root: XmluiElement;
+  components?: Record<string, XmluiComponentModule>;
 };
 
 export type XmluiDocumentInput = XmluiDocument;

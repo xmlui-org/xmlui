@@ -5,10 +5,15 @@ test("home route renders the migrated website shell", async ({ page }) => {
 
   await page.goto("/");
 
-  await expect(page.getByText("XMLUI", { exact: true }).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Display milestone" })).toBeVisible();
-  await expect(page.getByText("Website blocks: loaded")).toBeVisible();
-  await expect(page.getByText("Search package: loaded")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Docs" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Blog" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Get started" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "News & Reviews" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Open search" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Practical User Interfaces" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Built Simply" })).toBeVisible();
+  await expect(page.getByText("Define your UI in any text editor.")).toBeVisible();
+  await expect(page.getByText("Create clean modern apps.")).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -16,8 +21,14 @@ test("home content and public website artifacts render copied assets", async ({ 
   const errors = trackBrowserErrors(page);
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Simple" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Reactive" })).toBeVisible();
+  await expect(page.getByText("Simple.")).toBeVisible();
+  await expect(page.getByText("No CSS or React expertise required.")).toBeVisible();
+  await expect(page.getByText("Semantic.")).toBeVisible();
+  await expect(page.getByText("Humans and AIs can reason together.")).toBeVisible();
+  await expect(page.getByText("Connected.")).toBeVisible();
+  await expect(page.getByText("Use APIs with little or no scripting.")).toBeVisible();
+  await expect(page.getByText("Deployable.")).toBeVisible();
+  await expect(page.getByText("Drop files onto a static webserver.")).toBeVisible();
 
   await page.goto("/get-started");
   await expect(page.getByRole("heading", { name: "Get Started" })).toBeVisible();

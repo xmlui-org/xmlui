@@ -11,6 +11,7 @@ export type RenderContext = {
   extensionRenderers: Record<string, XmluiExtensionComponent>;
   renderElement(node: XmluiElement, scope: RuntimeScope): ReactNode;
   renderChildren(children: XmluiNode[], scope: RuntimeScope): ReactNode;
+  withComponents(components: Record<string, XmluiComponentModule>): RenderContext;
 };
 
 export type XmluiRendererProps = {

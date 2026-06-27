@@ -1,4 +1,4 @@
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { emitXmluiModule, type XmluiModuleImport } from "./codegen";
@@ -55,7 +55,7 @@ export function compileXmluiModuleWithSourceMap({
     extensions,
     extensionComponents,
   });
-  const imports = initial.document.kind === "app" ? siblingComponentImports(id) : [];
+  const imports = componentImports(id, initial.document.kind, initial.referencedComponents);
   const userComponents = new Set(imports.map((item) => item.componentName));
   if (initial.document.kind === "component") {
     userComponents.add(initial.document.name);
@@ -230,16 +230,79 @@ function generatedName(prefix: string, value: string | { sourceId: string; span:
   return `${prefix}_${source.replace(/[^A-Za-z0-9_$]/g, "_")}`;
 }
 
-function siblingComponentImports(
+function componentImports(
   id: string,
+  documentKind: XmluiModuleIr["document"]["kind"],
+  referencedComponents: readonly string[],
 ): XmluiModuleImport[] {
+  const imports = siblingComponentImports(id, referencedComponents);
+  if (documentKind === "app") {
+    imports.push(...appComponentImports(id, imports, referencedComponents));
+  }
+  return imports;
+}
+
+function siblingComponentImports(id: string, referencedComponents: readonly string[]): XmluiModuleImport[] {
   const dir = path.dirname(id);
-  return readdirSync(dir)
+  const referenced = new Set(referencedComponents);
+  return xmluiFilesInDirectory(dir)
     .filter((file) => file.endsWith(".xmlui") && file !== path.basename(id))
+    .filter((file) => referenced.has(path.basename(file, ".xmlui")))
     .sort()
     .map((file, index) => ({
       localName: `component${index}`,
       componentName: path.basename(file, ".xmlui"),
       specifier: `./${file}`,
     }));
+}
+
+function appComponentImports(
+  id: string,
+  existing: readonly XmluiModuleImport[],
+  referencedComponents: readonly string[],
+): XmluiModuleImport[] {
+  const srcDir = path.dirname(id);
+  const componentsDir = path.join(srcDir, "components");
+  if (!existsSync(componentsDir) || !statSync(componentsDir).isDirectory()) {
+    return [];
+  }
+  const usedComponentNames = new Set(existing.map((item) => item.componentName));
+  const referenced = new Set(referencedComponents);
+  const files = recursiveXmluiFiles(componentsDir)
+    .filter((file) => file.endsWith(".xmlui"))
+    .sort();
+  const imports: XmluiModuleImport[] = [];
+  files.forEach((file) => {
+    const componentName = path.basename(file, ".xmlui");
+    if (!referenced.has(componentName)) {
+      return;
+    }
+    if (usedComponentNames.has(componentName)) {
+      return;
+    }
+    usedComponentNames.add(componentName);
+    const relative = path.relative(srcDir, file).replaceAll(path.sep, "/");
+    imports.push({
+      localName: `appComponent${imports.length}`,
+      componentName,
+      specifier: relative.startsWith(".") ? relative : `./${relative}`,
+    });
+  });
+  return imports;
+}
+
+function recursiveXmluiFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      return recursiveXmluiFiles(fullPath);
+    }
+    return entry.isFile() && entry.name.endsWith(".xmlui") ? [fullPath] : [];
+  });
+}
+
+function xmluiFilesInDirectory(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".xmlui"))
+    .map((entry) => entry.name);
 }

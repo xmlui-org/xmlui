@@ -42,6 +42,19 @@ export const AppMd = createMetadata({
       valueType: "boolean",
       defaultValue: true,
     },
+    noScrollbarGutters: {
+      description: "Controls whether the app reserves scrollbar gutter space.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    "width-navPanel-App": {
+      description: "Overrides the App navigation panel width theme variable.",
+      valueType: "string",
+    },
+    "borderRight-navPanelWrapper-App": {
+      description: "Overrides the App navigation panel wrapper right border theme variable.",
+      valueType: "string",
+    },
     defaultTone: {
       description: "This property sets the app's default tone.",
       valueType: "string",

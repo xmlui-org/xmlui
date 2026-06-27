@@ -467,7 +467,7 @@ function splitTableRow(row: string): string[] {
 
 function parsePlaygroundApp(content: string): string {
   const source = content.replace(/(?<!`)````(?!`)/g, "```").trim();
-  const appSegment = source.match(/(?:^|\n)---app[^\n]*\n([\s\S]*)$/);
+  const appSegment = source.match(/(?:^|\n)---app[^\n]*\n([\s\S]*?)(?=\n---[a-zA-Z]|$)/);
   return (appSegment?.[1] ?? source).trim();
 }
 

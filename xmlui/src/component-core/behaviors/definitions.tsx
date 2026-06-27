@@ -8,6 +8,33 @@ import {
   parseAnimationOptions,
 } from "../../components/Animation/AnimationReact";
 
+const responsiveWhenProps = {
+  "when-xs": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the xs breakpoint and above.",
+  },
+  "when-sm": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the sm breakpoint and above.",
+  },
+  "when-md": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the md breakpoint and above.",
+  },
+  "when-lg": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the lg breakpoint and above.",
+  },
+  "when-xl": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the xl breakpoint and above.",
+  },
+  "when-xxl": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the xxl breakpoint and above.",
+  },
+} satisfies BehaviorMetadata["props"];
+
 export const whenBehavior: Behavior = {
   metadata: {
     name: "when",
@@ -19,6 +46,7 @@ export const whenBehavior: Behavior = {
         valueType: "boolean",
         description: "If false, the component is not rendered.",
       },
+      ...responsiveWhenProps,
     },
   },
   canAttach: (context) => Object.prototype.hasOwnProperty.call(context.props, "when"),

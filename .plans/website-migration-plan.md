@@ -6,6 +6,12 @@ Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`
 Primary goal: display the migrated website as soon as possible, then tighten
 package and website parity with focused tests.
 
+Update: the display-first milestone proved the website plumbing, but it is not
+the final visual compatibility target. Continue website visual parity work from
+`.plans/website-original-structure-reuse-plan.md`, which treats the old
+website's own XMLUI markup, component tree, themes, content, and assets as the
+source to copy and run with only compatibility shims.
+
 ## Scope
 
 Migrate the old XMLUI website into this workspace as a visual regression

@@ -28,19 +28,20 @@ export function createXmluiModule(
   components: XmluiModule[] = [],
   options: { extensions?: Iterable<Extension> } = {},
 ): XmluiModule {
-  if (document.kind === "component") {
-    return {
-      kind: "component",
-      name: document.name,
-      root: document.root,
-    };
-  }
-
   const componentMap: Record<string, XmluiComponentModule> = {};
   for (const component of components) {
     if (component.kind === "component") {
       componentMap[component.name] = component;
     }
+  }
+
+  if (document.kind === "component") {
+    return {
+      kind: "component",
+      name: document.name,
+      root: document.root,
+      components: componentMap,
+    };
   }
 
   const normalizedExtensions = normalizeExtensions(options.extensions ?? []);

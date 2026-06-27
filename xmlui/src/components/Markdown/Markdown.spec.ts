@@ -140,4 +140,30 @@ test.describe("Markdown foundation", () => {
     await page.getByTestId("pg-button").click();
     await expect(page.getByTestId("pg-count")).toHaveText("Count: 1");
   });
+
+  test("xmlui-pg playground extracts only the app section", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Markdown>
+          \`\`\`xmlui-pg height="120px"
+          ---config
+          {
+            "defaultTheme": "xmlui-hero-theme"
+          }
+          ---app display
+          &lt;App&gt;
+            &lt;Text testId="pg-section"&gt;Section app&lt;/Text&gt;
+          &lt;/App&gt;
+          ---api
+          {
+            "apiUrl": "/api"
+          }
+          \`\`\`
+        </Markdown>
+      </App>
+    `);
+
+    await expect(page.getByTestId("pg-section")).toHaveText("Section app");
+    await expect(page.getByText("---api")).toHaveCount(0);
+  });
 });

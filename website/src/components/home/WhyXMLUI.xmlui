@@ -1,0 +1,4 @@
+<Component name="WhyXMLUI">
+    <Markdown content="{appGlobals.prefetchedContent['/pages/why-simple.md']}" />
+    <Markdown content="{appGlobals.prefetchedContent['/pages/why-reactive.md']}" />
+</Component>

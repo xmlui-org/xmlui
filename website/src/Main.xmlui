@@ -1,73 +1,378 @@
 <App
   layout="vertical-full-header"
+  noScrollbarGutters="false"
+  width-navPanel-App="{$pathname.startsWith('/docs') ? '280px' : '0px' }"
+  borderRight-navPanelWrapper-App="{$pathname.startsWith('/docs') ? '1px' : '0px' }"
+  var.appTitle="{
+    ($pathname === '/') ? 'Home':
+    $pathname.startsWith('/docs/reference/extensions') ? 'Extensions | XMLUI Documentation':
+    $pathname.startsWith('/docs/reference/components') ? 'Components | XMLUI Documentation':
+    $pathname.startsWith('/docs') ? 'Documentation':
+    $pathname.startsWith('/blog') ? 'Blog':
+    $pathname.startsWith('/get-started') ? 'Get Started':
+    $pathname.startsWith('/news') ? 'News':
+    'Home'
+  }"
   var.docsText="'# Documentation quick check\n\nThis migrated route exercises the website shell, search package, docs blocks, and markdown rendering. It is intentionally small so regressions are easy to see while the remaining website packages are migrated.'"
   var.updateCount="{0}"
   var.chartBoost="{0}"
   var.calendarShift="{0}"
   var.gridShift="{0}"
 >
+  <PageMetaTitle
+    value="{appTitle}"
+    noSuffix="{appTitle.includes(' | ')}"
+  />
   <AppHeader>
-    <Link to="/" height="100%">
-      <Logo height="$space-8" />
-    </Link>
-    <HStack gap="0" paddingLeft="$space-4">
-      <NavLink label="Home" to="/" exact="true" />
-      <NavLink label="Docs" to="/docs" active="{$pathname.startsWith('/docs')}" />
-      <NavLink label="Blog" to="/blog" active="{$pathname.startsWith('/blog')}" />
-      <NavLink label="Components" to="/docs/reference/components" active="{$pathname.startsWith('/docs/reference/components')}" />
-      <NavLink label="Extensions" to="/docs/reference/extensions" active="{$pathname.startsWith('/docs/reference/extensions')}" />
-    </HStack>
+    <property name="logoTemplate">
+      <Link to="/" height="100%">
+        <Logo height="$space-8" />
+      </Link>
+    </property>
+    <Stack when-md="{true}">
+      <Theme backgroundColor-NavLink--active="transparent">
+        <HStack gap="0">
+          <NavLink
+            noIndicator="{true}"
+            label="Docs"
+            to="/docs"
+            active="{$pathname.startsWith('/docs')}"
+          />
+          <NavLink
+            noIndicator="{true}"
+            label="Blog"
+            to="/blog"
+            active="{$pathname.startsWith('/blog')}"
+          />
+          <NavLink
+            noIndicator="{true}"
+            label="Get started"
+            to="/get-started"
+            active="{$pathname.startsWith('/get-started')}"
+          />
+          <NavLink
+            noIndicator="{true}"
+            to="/news"
+            label="News & Reviews"
+            active="{$pathname.startsWith('/news')}"
+          />
+        </HStack>
+      </Theme>
+    </Stack>
     <SpaceFiller />
     <Search
       collapsible="true"
-      mode="overlay"
-      data="{$appGlobals.staticSearchData}"
+      mode="inline"
+      when-sm="{true}"
+      data="{appGlobals.staticSearchData}"
       placeholder="Search on site..."
-      suggestedQueries="{['docs', 'home', 'XMLUI']}"
+      suggestedQueries="{['components', 'tutorial', 'themes', 'scripting', 'forms']}"
       noResultsMessage="No results found on this site."
-      pageSize="8"
+      showPreviewMetadata="true"
+      defaultSortOrder="relevance"
+      pageSize="10"
+      enableSpellCorrection="true"
     />
   </AppHeader>
 
+  <NavPanel
+    when="{true}"
+    when-md="{$pathname.startsWith('/docs')}"
+    scrollStyle="whenScrolling"
+    showScrollerFade="true"
+    paddingHorizontal-md="$paddingHorizontal-md-NavPanel"
+    syncWithContent="true"
+    syncScrollBehavior="instant"
+  >
+    <property name="logoTemplate">
+      <HStack
+        horizontalAlignment="start"
+        width="100%"
+        paddingVertical="0"
+      >
+        <Link
+          to="/"
+          height="100%"
+          when-lg="false"
+        >
+          <Logo height="$space-8" />
+        </Link>
+      </HStack>
+    </property>
+    <Stack padding="$space-4" when-md="false">
+      <Search
+        marginTop="0"
+        data="{appGlobals.staticSearchData}"
+        placeholder="Search on site..."
+        suggestedQueries="{['components', 'tutorial', 'themes', 'scripting', 'forms']}"
+        noResultsMessage="No results found on this site."
+        showPreviewMetadata="false"
+        pageSize="8"
+        enableSpellCorrection="true"
+        mode="inline"
+      />
+    </Stack>
+    <Stack
+      gap="0"
+      paddingTop-lg="$space-4"
+      paddingTop="0"
+    >
+      <NavLink
+        when-xs="{true}"
+        when-md="false"
+        label="Home"
+        to="/"
+        active="{$pathname === '/'}"
+      />
+      <NavLink
+        when-xs="{true}"
+        when-md="false"
+        label="Blog"
+        to="/blog"
+        active="{$pathname.startsWith('/blog')}"
+      />
+      <NavLink
+        when-xs="{true}"
+        when-md="false"
+        label="Get started"
+        to="/get-started"
+        active="{$pathname.startsWith('/get-started')}"
+      />
+      <NavLink
+        when-xs="{true}"
+        when-md="false"
+        to="/news"
+        label="News & Reviews"
+        target="_self"
+      />
+      <NavGroup
+        initiallyExpanded="{true}"
+        label="Learn XMLUI"
+        to="/docs/learn"
+      >
+        <NavLink
+          icon="school"
+          label="Introduction"
+          to="/docs"
+          exact="true"
+        />
+        <NavLink
+          icon="arrow-shuffle"
+          label="Reactive Data"
+          to="/docs/reactive-intro"
+        />
+        <NavLink
+          icon="component"
+          label="Components"
+          to="/docs/components-intro"
+        />
+        <NavLink
+          icon="theme"
+          label="Themes"
+          to="/docs/themes-intro"
+        />
+      </NavGroup>
+      <NavGroup
+        label="Guides"
+        to="/docs/guides"
+      >
+        <NavLink
+          icon="hierarchy"
+          label="App Structure"
+          to="/docs/guides/app-structure"
+        />
+        <NavLink
+          icon="markup"
+          label="Markup"
+          to="/docs/guides/markup"
+        />
+        <NavLink
+          icon="bolt"
+          label="Scripting"
+          to="/docs/guides/scripting"
+        />
+        <NavLink
+          icon="boundary"
+          label="Scoping"
+          to="/docs/guides/scoping"
+        />
+        <NavLink
+          icon="eye"
+          label="Visibility"
+          to="/docs/guides/visibility"
+        />
+        <NavLink
+          icon="layout"
+          label="Layout"
+          to="/docs/guides/layout"
+        />
+        <NavLink
+          icon="typography"
+          label="Working with Text"
+          to="/docs/guides/working-with-text"
+        />
+        <NavLink
+          icon="markdown"
+          label="Working with Markdown"
+          to="/docs/guides/working-with-markdown"
+        />
+        <NavLink
+          icon="link"
+          label="Routing and Links"
+          to="/docs/guides/routing-and-links"
+        />
+        <NavLink
+          icon="form"
+          label="Forms"
+          to="/docs/guides/forms"
+        />
+        <NavLink
+          icon="dialog"
+          label="Modal Dialogs"
+          to="/docs/guides/modal-dialogs"
+        />
+        <NavLink
+          icon="component"
+          label="User-defined Components"
+          to="/docs/guides/user-defined-components"
+        />
+        <NavLink
+          icon="refactor"
+          label="Refactoring"
+          to="/docs/guides/refactoring"
+        />
+        <NavLink
+          icon="playground"
+          label="Codefences and playgrounds"
+          to="/docs/guides/playground-and-codefence"
+        />
+      </NavGroup>
+      <NavGroup
+        label="Reference"
+        to="/docs/reference"
+      >
+        <NavLink
+          icon="component"
+          label="Components"
+          to="/docs/reference/components"
+        />
+        <NavLink
+          icon="build"
+          label="Extensions"
+          to="/docs/reference/extensions"
+        />
+        <NavGroup
+          icon="theme"
+          label="Themes"
+          to="/docs/reference/themes"
+        >
+          <NavLink
+            label="Layout Properties"
+            to="/docs/styles-and-themes/layout-props"
+          />
+          <NavLink
+            label="Theme Variables"
+            to="/docs/styles-and-themes/theme-variables"
+          />
+          <NavLink
+            label="Theme Variable Defaults"
+            to="/docs/styles-and-themes/theme-variable-defaults"
+          />
+          <NavLink
+            label="Common Units"
+            to="/docs/styles-and-themes/common-units"
+          />
+        </NavGroup>
+        <NavLink
+          icon="behavior"
+          label="Behaviors"
+          to="/docs/behaviors"
+        />
+        <NavLink
+          icon="context"
+          label="Context Variables"
+          to="/docs/context-variables"
+        />
+        <NavLink
+          icon="globals"
+          label="Globals"
+          to="/docs/globals"
+        />
+        <NavLink
+          icon="helper-tags"
+          label="Helper Tags"
+          to="/docs/helper-tags"
+        />
+        <NavLink
+          icon="table-properties"
+          label="Core Properties"
+          to="/docs/core-properties"
+        />
+        <NavLink
+          icon="template-props"
+          label="Template Properties"
+          to="/docs/template-properties"
+        />
+        <NavLink
+          icon="palette"
+          label="Palettes"
+          to="/docs/palettes"
+        />
+        <NavLink
+          icon="icons"
+          label="Icons"
+          to="/docs/icons"
+        />
+        <NavLink
+          icon="settings"
+          label="App Globals"
+          to="/docs/app-globals"
+        />
+        <NavLink
+          icon="settings"
+          label="XMLUI Config"
+          to="/docs/xmlui-config"
+        />
+        <NavLink
+          icon="glossary"
+          label="Glossary"
+          to="/docs/glossary"
+        />
+      </NavGroup>
+      <NavLink
+        icon="mcp"
+        label="Model Context Protocol"
+        to="/docs/mcp"
+      />
+      <NavLink
+        icon="vscode-extension"
+        label="VSCode extension"
+        to="/docs/vscode"
+      />
+      <NavLink
+        icon="logs"
+        label="Change Log"
+        to="/docs/change-log"
+      />
+    </Stack>
+    <VStack
+      paddingBottom="$space-4"
+      when-lg="false"
+      gap="0"
+    >
+      <NavLink
+        to="https://github.com/xmlui-org/xmlui"
+        icon="github"
+        label="GitHub"
+        noIndicator="{true}"
+        target="_blank"
+      />
+    </VStack>
+  </NavPanel>
+
   <Pages fallbackPath="/">
     <Page url="/">
-      <Stack gap="$space-8" padding="$space-8">
-        <HeroSection
-          preamble="XMLUI website"
-          headline="XMLUI"
-          subheadline="Build apps with XML markup, reactive data, and managed React."
-          mainText="This migrated home route renders copied website content together with the migrated website blocks and extension packages."
-          ctaButtonText="Get Started"
-          ctaButtonIcon="arrowright"
-          onCtaClick="Actions.navigate('/get-started')"
-          contentPlacement="right"
-          contentAlignment="center"
-        >
-          <Card width="min(420px, 100%)">
-            <Stack gap="$space-4">
-              <H2>Display milestone</H2>
-              <Text>Home route: visible</Text>
-              <Text>Website blocks: loaded</Text>
-              <Text>Search package: loaded</Text>
-              <Text>Masonry package: loaded</Text>
-              <Text>Gauge package: loaded</Text>
-              <Text>EChart package: loaded</Text>
-              <Text>Calendar package: loaded</Text>
-              <Text>Grid layout package: loaded</Text>
-              <Text>Tiptap editor package: loaded</Text>
-              <Button onClick="Actions.navigate('/docs')">Check docs route</Button>
-            </Stack>
-          </Card>
-        </HeroSection>
-        <FlowLayout itemWidth="360px" gap="$space-5">
-          <Card>
-            <Markdown content="{$appGlobals.prefetchedContent['/pages/why-simple.md']}" data="/pages/why-simple.md" />
-          </Card>
-          <Card>
-            <Markdown content="{$appGlobals.prefetchedContent['/pages/why-reactive.md']}" data="/pages/why-reactive.md" />
-          </Card>
-        </FlowLayout>
-      </Stack>
+      <HomePage />
     </Page>
 
     <Page url="/get-started">
@@ -1980,4 +2285,39 @@
       <Blog />
     </Page>
   </Pages>
+  <ScrollToTop marginBottom="$space-4" />
+  <Footer
+    sticky="{false}"
+    paddingVertical="$space-4"
+  >
+    <Text fontWeight="400">
+      This site is an
+      <Text variant="strong">
+        XMLUI™
+      </Text>
+      app.
+    </Text>
+    <SpaceFiller />
+    <HStack verticalAlignment="center">
+      <Stack desktopOnly="{true}">
+        <CHStack>
+          <Link
+            noIndicator="{true}"
+            to="/docs/change-log"
+            label="Changelog"
+          />
+          <ContentSeparator length="$space-3_5" orientation="vertical" />
+          <Link
+            noIndicator="{true}"
+            to="https://github.com/xmlui-org/xmlui"
+            icon="github"
+            label="GitHub"
+            target="_blank"
+          />
+          <ContentSeparator length="$space-3_5" orientation="vertical" />
+        </CHStack>
+      </Stack>
+      <ToneSwitch />
+    </HStack>
+  </Footer>
 </App>

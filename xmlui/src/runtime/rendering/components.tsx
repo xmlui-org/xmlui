@@ -187,6 +187,13 @@ export function ComponentInstance({
   );
   componentReferences.$self = api;
   componentScopeRef.current = componentScope;
+  const componentContext = useMemo(
+    () =>
+      component.components && Object.keys(component.components).length > 0
+        ? context.withComponents(component.components)
+        : context,
+    [component.components, context],
+  );
 
   useEffect(() => {
     const id = typeof props.id === "string" ? props.id : undefined;
@@ -201,7 +208,7 @@ export function ComponentInstance({
     };
   }, [api, props.id, scope.references]);
 
-  return <>{context.renderChildren(component.root.children, componentScope)}</>;
+  return <>{componentContext.renderChildren(component.root.children, componentScope)}</>;
 }
 
 function createSlots(node: XmluiElement, scope: RuntimeScope): Record<string, RenderFragment> {

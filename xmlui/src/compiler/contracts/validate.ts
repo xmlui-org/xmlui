@@ -14,6 +14,19 @@ import type {
   XmluiContractRegistry,
 } from "./types";
 
+const universalFrameworkProps = new Set([
+  "when",
+  "when-xs",
+  "when-sm",
+  "when-md",
+  "when-lg",
+  "when-xl",
+  "when-xxl",
+  "tooltip",
+  "tooltipMarkdown",
+  "tooltipOptions",
+]);
+
 export function validateManagedReactContracts(
   module: XmluiModuleIr,
   registry: XmluiContractRegistry,
@@ -81,7 +94,7 @@ function validateBindings(
 ): void {
   for (const binding of bindings) {
     if (binding.kind === "prop") {
-      if (!contract.acceptsArbitraryProps && !contract.props[binding.name]) {
+      if (!contract.acceptsArbitraryProps && !contract.props[binding.name] && !universalFrameworkProps.has(binding.name)) {
         diagnostics.push(
           diagnostic(
             "XC002",

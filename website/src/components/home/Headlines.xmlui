@@ -1,0 +1,47 @@
+<Component name="Headlines">
+    <VStack
+        horizontalAlignment="center"
+        gap="$gap-tight"
+        paddingTop="$paddingTop-Headlines"
+        paddingTop-md="$paddingTop-md-Headlines"
+        paddingBottom="$space-12"
+    >
+        <CVStack gap="0" marginBottom="$space-4">
+            <H1
+                fontSize="$fontSize-heading-Headlines"
+                fontSize-md="$fontSize-md-heading-Headlines"
+                textAlign="center"
+                lineHeight="$lineHeight-heading-Headlines"
+                showAnchor="false"
+            >
+                Practical User Interfaces
+            </H1>
+            <H1
+                marginTop="0"
+                fontSize="$fontSize-heading-Headlines"
+                fontSize-md="$fontSize-md-heading-Headlines"
+                textAlign="center"
+                lineHeight="$lineHeight-heading-Headlines"
+                showAnchor="false"
+            >
+                Built Simply
+            </H1>
+        </CVStack>
+        <VStack gap="$space-1" horizontalAlignment="center">
+            <Text
+                fontSize="$fontSize-sub-Headlines"
+                lineHeight="$lineHeight-sub-Headlines"
+                textAlign="center"
+            >
+                Define your UI in any text editor.
+            </Text>
+            <Text
+                fontSize="$fontSize-sub-Headlines"
+                lineHeight="$lineHeight-sub-Headlines"
+                textAlign="center"
+            >
+                Create clean modern apps.
+            </Text>
+        </VStack>
+    </VStack>
+</Component>

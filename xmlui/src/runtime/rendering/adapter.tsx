@@ -336,6 +336,15 @@ function arbitraryRootAttrs(
     ...supportedResponsiveLayoutPropNames,
     "testId",
     "when",
+    "when-xs",
+    "when-sm",
+    "when-md",
+    "when-lg",
+    "when-xl",
+    "when-xxl",
+    "tooltip",
+    "tooltipMarkdown",
+    "tooltipOptions",
   ]);
   return Object.fromEntries(
     Object.entries(props).filter(([name, value]) =>
