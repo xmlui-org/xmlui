@@ -1,5 +1,5 @@
 <App
-  var.workspacePanel="'preview'"
+  var.workspacePanel="preview"
   var.fixture='{
     {
       layoutMode: "auto",

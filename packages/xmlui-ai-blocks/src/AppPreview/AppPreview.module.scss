@@ -49,6 +49,12 @@
   background: var(--xmlui-backgroundColor-Card, #ffffff) !important;
 }
 
+.nestedApp {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
 .issue {
   margin: 16px;
   border: 1px solid var(--xmlui-color-danger-200, #ffb0a8);

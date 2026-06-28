@@ -1,11 +1,9 @@
 import { Component, useEffect, useMemo, useState, type ErrorInfo, type ReactNode } from "react";
 import {
-  StandaloneApp,
-  ThemeDefinition,
+  NestedApp,
   useTheme,
   useThemes,
   xmlUiMarkupToComponent,
-  type StandaloneAppDescription,
   type ThemeTone,
 } from "xmlui";
 import styles from "./AppPreview.module.scss";
@@ -38,12 +36,12 @@ function createCodeRevision(code: string) {
   return `${code.length}-${hash.toString(16)}`;
 }
 
-function compileXmluiPreview(code: string, themes: unknown[], activeTheme?: string, activeTone?: ThemeTone) {
+function compileXmluiPreview(code: string) {
   const { errors, warnings, component } = xmlUiMarkupToComponent(code, "Main.xmlui");
 
   if (errors.length > 0) {
     return {
-      appDef: null,
+      renderable: false,
       error: errors.map((error) => `[${error.code}] ${error.message}`).join("\n"),
       warnings,
     };
@@ -51,29 +49,14 @@ function compileXmluiPreview(code: string, themes: unknown[], activeTheme?: stri
 
   if (!component) {
     return {
-      appDef: null,
+      renderable: false,
       error: "The XMLUI parser did not return an entry point component.",
       warnings,
     };
   }
 
-  const appDef: StandaloneAppDescription = {
-    name: "Xmlui app builder",
-    version: createCodeRevision(code),
-    entryPoint: component,
-    themes: themes as ThemeDefinition[],
-    defaultTheme: activeTheme,
-    defaultTone: activeTone,
-    resources: {},
-    appGlobals: {
-      strictDomSandbox: true,
-      allowConsole: false,
-      silentConsole: true,
-    },
-  };
-
   return {
-    appDef,
+    renderable: true,
     error: null,
     warnings,
   };
@@ -147,24 +130,32 @@ export function AppPreview({
   const effectiveTheme = activeTheme || activeThemeId;
   const effectiveTone = activeTone || activeThemeTone;
   const allThemes = useMemo(() => [...(themes || [])], [themes]);
-  const preview = useMemo(
-    () => compileXmluiPreview(code, allThemes, effectiveTheme, effectiveTone),
-    [code, allThemes, effectiveTheme, effectiveTone],
-  );
-  const fallbackPreview = useMemo(
-    () => compileXmluiPreview(lastRenderableCode, allThemes, effectiveTheme, effectiveTone),
-    [lastRenderableCode, allThemes, effectiveTheme, effectiveTone],
-  );
-  const hasCurrentPreview = Boolean(preview.appDef && !preview.error);
+  const preview = useMemo(() => compileXmluiPreview(code), [code]);
+  const fallbackPreview = useMemo(() => compileXmluiPreview(lastRenderableCode), [lastRenderableCode]);
+  const hasCurrentPreview = Boolean(preview.renderable && !preview.error);
   const canUseFallback =
     !hasCurrentPreview &&
     lastRenderableCode !== code &&
-    Boolean(fallbackPreview.appDef && !fallbackPreview.error);
+    Boolean(fallbackPreview.renderable && !fallbackPreview.error);
   const activePreview = canUseFallback ? fallbackPreview : preview;
   const activeCode = canUseFallback ? lastRenderableCode : code;
   const sourceKey = useMemo(() => createCodeRevision(activeCode), [activeCode]);
   const warnings = activePreview.warnings.map((warning) => String(warning));
   const isRepairing = status === "generating";
+  const nestedConfig = useMemo(
+    () => ({
+      name: "Xmlui app builder",
+      themes: allThemes,
+      defaultTheme: effectiveTheme,
+      defaultTone: effectiveTone,
+      appGlobals: {
+        strictDomSandbox: true,
+        allowConsole: false,
+        silentConsole: true,
+      },
+    }),
+    [allThemes, effectiveTheme, effectiveTone],
+  );
 
   useEffect(() => {
     if (hasCurrentPreview) {
@@ -185,11 +176,11 @@ export function AppPreview({
   return (
     <div className={styles.root} aria-label="Generated app preview">
       <div className={styles.scroller}>
-        {isRepairing && (activePreview.error || !activePreview.appDef) ? (
+        {isRepairing && (activePreview.error || !activePreview.renderable) ? (
           <div className={styles.repair} role="status">
             Repairing generated app...
           </div>
-        ) : activePreview.error || !activePreview.appDef ? (
+        ) : activePreview.error || !activePreview.renderable ? (
           <PreviewIssue
             title="Compile error"
             message={activePreview.error ?? "Unable to compile the generated XMLUI source."}
@@ -197,11 +188,15 @@ export function AppPreview({
           />
         ) : (
           <PreviewErrorBoundary sourceKey={sourceKey} key={sourceKey}>
-            <StandaloneApp
+            <NestedApp
               key={sourceKey}
-              appDef={activePreview.appDef}
-              decorateComponentsWithTestId
-              debugEnabled={false}
+              app={activeCode}
+              config={nestedConfig}
+              activeTheme={effectiveTheme}
+              activeTone={effectiveTone}
+              height="100%"
+              style={{ width: "100%", height: "100%" }}
+              className={styles.nestedApp}
             />
           </PreviewErrorBoundary>
         )}

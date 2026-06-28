@@ -13,7 +13,6 @@
   box-sizing: border-box;
   background: var(--xmlui-backgroundColor-CodeBlock, #f0edea);
   color: var(--xmlui-textColor-Text, #544f4b);
-  font-family: var(--xmlui-fontFamily-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace);
   font-size: 12px;
   line-height: 1.7;
 }
@@ -25,6 +24,7 @@
 .pre {
   min-width: max-content;
   margin: 0;
+  font-family: var(--xmlui-fontFamily-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace);
 }
 
 .code {
