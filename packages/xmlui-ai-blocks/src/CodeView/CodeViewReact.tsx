@@ -1,4 +1,4 @@
-import { useCallback, useMemo, type WheelEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTheme } from "xmlui";
 import styles from "./CodeView.module.scss";
 
@@ -77,11 +77,12 @@ function tokenizeXmluiLine(line: string) {
 
 export function CodeView({ code = "" }: CodeViewProps) {
   const lines = useMemo(() => formatXmluiSource(code).split("\n"), [code]);
+  const rootRef = useRef<HTMLDivElement>(null);
   // Follow the builder's active tone (light/dark) so the code view re-themes
   // alongside the rest of the app and the live preview.
   const { activeThemeTone } = useTheme();
-  const handleWheel = useCallback((event: WheelEvent<HTMLDivElement>) => {
-    const target = event.currentTarget;
+  const handleWheel = useCallback((event: WheelEvent) => {
+    const target = event.currentTarget as HTMLDivElement;
     const nextTop = target.scrollTop + event.deltaY;
     const nextLeft = target.scrollLeft + event.deltaX;
     const canScrollY = target.scrollHeight > target.clientHeight;
@@ -97,14 +98,28 @@ export function CodeView({ code = "" }: CodeViewProps) {
     event.stopPropagation();
   }, []);
 
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root) {
+      return;
+    }
+
+    root.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      root.removeEventListener("wheel", handleWheel);
+    };
+  }, [handleWheel]);
+
   return (
     <div
+      ref={rootRef}
       className={styles.root}
       data-tone={activeThemeTone}
       aria-label="Generated XMLUI code"
       role="region"
       tabIndex={0}
-      onWheel={handleWheel}
     >
       <pre className={styles.pre}>
         <code className={styles.code}>
