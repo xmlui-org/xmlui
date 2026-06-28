@@ -22,7 +22,7 @@
             {
               kind: "source",
               title: "Layout reference",
-              url: "https://xmlui.dev/",
+              url: "https://xmlui.org/",
             },
           ],
         },
@@ -96,7 +96,6 @@
   }'>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
-    <NavLink label="Components" to="/components" />
   </NavPanel>
   <Pages>
     <Page url="/">
@@ -137,45 +136,7 @@
         </property>
         <property name="chatTemplate">
           <VStack gap="$space-3">
-            <VStack gap="$space-2">
-              <Items data="{(agent.value && agent.value.messages && agent.value.messages.length > 0) ? agent.value.messages : fixture.messages}" gap="$space-2">
-                <AiMessageParts
-                  message="{$item}"
-                  streaming="{$item.status === 'streaming'}"
-                  collapseReasoning="true" />
-              </Items>
-            </VStack>
-
-            <VStack gap="$space-2">
-              <HStack gap="$space-2" verticalAlignment="center">
-                <Text variant="secondary">Tool activity</Text>
-                <Badge value="{((agent.value && agent.value.toolCalls) ? agent.value.toolCalls.length : fixture.toolCalls.length) + ' tools'}" />
-              </HStack>
-              <Items data="{(agent.value && agent.value.toolCalls && agent.value.toolCalls.length > 0) ? agent.value.toolCalls : fixture.toolCalls}">
-                <AiToolCall
-                  toolCall="{$item}"
-                  defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
-                  showInput="summary"
-                  showOutput="summary" />
-              </Items>
-            </VStack>
-
-            <VStack gap="$space-2">
-              <HStack gap="$space-2" verticalAlignment="center">
-                <Text variant="secondary">Approvals</Text>
-                <Badge value="{((agent.value && agent.value.pendingApprovals) ? agent.value.pendingApprovals.length : fixture.pendingApprovals.length) + ' pending'}" />
-              </HStack>
-              <Items data="{fixture.resolvedApprovals}">
-                <AiApprovalRequest request="{$item}" running="{false}" />
-              </Items>
-              <Items data="{(agent.value && agent.value.pendingApprovals && agent.value.pendingApprovals.length > 0) ? agent.value.pendingApprovals : fixture.pendingApprovals}">
-                <AiApprovalRequest
-                  request="{$item}"
-                  running="true"
-                  onApprove="toast('Approved ' + $event.requestId)"
-                  onReject="toast('Rejected ' + $event.requestId)" />
-              </Items>
-            </VStack>
+            <!-- We will place the actual message stream here, need to figure out how -->
           </VStack>
         </property>
         <property name="composerTemplate">
@@ -205,9 +166,53 @@
           </VStack>
         </property>
       </XmluiBuilderFrame>
-    </Page>
-    <Page url="/components">
-      <Text>hello</Text>
+      <VStack gap="$space-4" maxWidth="1200px" padding="$space-4">
+        <Text variant="title">AI block component gallery</Text>
+
+        <VStack gap="$space-2">
+          <HStack gap="$space-2" verticalAlignment="center">
+            <Text variant="subtitle">AiMessageParts</Text>
+            <Badge value="{fixture.messages.length + ' messages'}" />
+          </HStack>
+          <Items data="{fixture.messages}" gap="$space-2">
+            <AiMessageParts
+              message="{$item}"
+              streaming="{$item.status === 'streaming'}"
+              collapseReasoning="true" />
+          </Items>
+        </VStack>
+
+        <VStack gap="$space-2">
+          <HStack gap="$space-2" verticalAlignment="center">
+            <Text variant="subtitle">AiToolCall</Text>
+            <Badge value="{fixture.toolCalls.length + ' tool calls'}" />
+          </HStack>
+          <Items data="{fixture.toolCalls}" gap="$space-2">
+            <AiToolCall
+              toolCall="{$item}"
+              defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
+              showInput="summary"
+              showOutput="summary" />
+          </Items>
+        </VStack>
+
+        <VStack gap="$space-2">
+          <HStack gap="$space-2" verticalAlignment="center">
+            <Text variant="subtitle">AiApprovalRequest</Text>
+            <Badge value="{(fixture.pendingApprovals.length + fixture.resolvedApprovals.length) + ' requests'}" />
+          </HStack>
+          <Items data="{fixture.resolvedApprovals}" gap="$space-2">
+            <AiApprovalRequest request="{$item}" running="{false}" />
+          </Items>
+          <Items data="{fixture.pendingApprovals}" gap="$space-2">
+            <AiApprovalRequest
+              request="{$item}"
+              running="true"
+              onApprove="toast('Approved ' + $event.requestId)"
+              onReject="toast('Rejected ' + $event.requestId)" />
+          </Items>
+        </VStack>
+      </VStack>
     </Page>
   </Pages>
 </App>

@@ -1,8 +1,11 @@
-import React, { forwardRef, memo, type CSSProperties } from "react";
+import { forwardRef, memo, type CSSProperties, type ReactNode } from "react";
 import classnames from "classnames";
+import { Markdown, Text } from "xmlui";
 
 import styles from "./AiMessageParts.module.scss";
 import type { AiMessage, AiMessagePart } from "../contract";
+
+type SourcePart = Extract<AiMessagePart, { kind: "source" }>;
 
 export type AiMessagePartsNativeProps = {
   message: AiMessage;
@@ -33,7 +36,36 @@ function roleLabel(role: AiMessage["role"]) {
   return role === "assistant" ? "Assistant" : titleCase(role);
 }
 
-function renderPart(part: AiMessagePart, showSources: boolean, collapseReasoning: boolean) {
+function escapeMarkdownLabel(value: string) {
+  return value.replace(/([\\[\]])/g, "\\$1");
+}
+
+function escapeMarkdownUrl(value: string) {
+  return value.replace(/\)/g, "%29");
+}
+
+function getSourceListItem(part: SourcePart) {
+  const label = escapeMarkdownLabel(part.title ?? part.url ?? "Source");
+  return part.url ? `[${label}](${escapeMarkdownUrl(part.url)})` : label;
+}
+
+function renderSourcePart(part: SourcePart) {
+  return (
+    <div key={`source-${part.title ?? part.url ?? "source"}`} className={styles.sourcePart}>
+      <Markdown openLinkInNewTab>{`Sources\n\n- ${getSourceListItem(part)}`}</Markdown>
+    </div>
+  );
+}
+
+function renderSourceParts(parts: SourcePart[], key: string) {
+  return (
+    <div key={key} className={styles.sourcePart}>
+      <Markdown openLinkInNewTab>{`Sources\n\n${parts.map((part) => `- ${getSourceListItem(part)}`).join("\n")}`}</Markdown>
+    </div>
+  );
+}
+
+function renderPart(part: AiMessagePart, showSources: boolean) {
   switch (part.kind) {
     case "text":
       return (
@@ -42,35 +74,18 @@ function renderPart(part: AiMessagePart, showSources: boolean, collapseReasoning
         </div>
       );
     case "reasoning":
-      return collapseReasoning ? (
-        <details key={`reasoning-${part.text}`} className={styles.reasoningDisclosure}>
-          <summary className={styles.reasoningSummary}>{part.summary ? "Reasoning summary" : "Reasoning"}</summary>
-          <div className={styles.reasoningBody}>{part.text}</div>
-        </details>
-      ) : (
-        <div key={`reasoning-${part.text}`} className={styles.reasoningPart}>
-          <div className={styles.partLabel}>{part.summary ? "Reasoning summary" : "Reasoning"}</div>
-          <div className={styles.reasoningBody}>{part.text}</div>
+      return (
+        <div className={styles.reasoningContainer}>
+          <Markdown>
+  {`> [!DETAILS] Reasoning
+>
+${part.text.split("\n").map((line) => `> ${line}`).join("\n")}`}
+        </Markdown>
         </div>
       );
     case "source":
       if (!showSources) return null;
-      return (
-        <div key={`source-${part.title ?? part.url ?? "source"}`} className={styles.sourcePart}>
-          {part.url ? (
-            <a
-              className={styles.sourceLink}
-              href={part.url}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {part.title ?? part.url}
-            </a>
-          ) : (
-            <span className={styles.sourceText}>{part.title ?? "Source"}</span>
-          )}
-        </div>
-      );
+      return renderSourcePart(part);
     case "tool-call":
       return (
         <div key={`tool-${part.toolCallId}`} className={styles.toolReference}>
@@ -80,8 +95,15 @@ function renderPart(part: AiMessagePart, showSources: boolean, collapseReasoning
     case "clarification":
       return (
         <div key={`clarification-${part.question}`} className={styles.clarificationPart}>
-          <div className={styles.partLabel}>Clarification requested</div>
-          <div className={styles.clarificationQuestion}>{part.question}</div>
+          <Text variant="subheading">Clarification requested</Text>
+          <Markdown>
+            {`
+${part.question}
+${!!part.reason ? part.reason : null}
+${part.choices?.length ? part.choices.map((choice) => `- ${choice}`).join("\n") : null}
+            `}
+          </Markdown>
+          {/* <div className={styles.clarificationQuestion}>{part.question}</div>
           {part.reason ? <div className={styles.clarificationReason}>{part.reason}</div> : null}
           {part.choices?.length ? (
             <ul className={styles.choiceList}>
@@ -91,7 +113,7 @@ function renderPart(part: AiMessagePart, showSources: boolean, collapseReasoning
                 </li>
               ))}
             </ul>
-          ) : null}
+          ) : null} */}
         </div>
       );
     case "error":
@@ -107,9 +129,36 @@ function renderPart(part: AiMessagePart, showSources: boolean, collapseReasoning
   }
 }
 
+function renderMessageParts(parts: AiMessagePart[], showSources: boolean) {
+  const renderedParts: ReactNode[] = [];
+  let sourceParts: SourcePart[] = [];
+
+  const flushSourceParts = () => {
+    if (!sourceParts.length) return;
+    renderedParts.push(renderSourceParts(sourceParts, `sources-${renderedParts.length}`));
+    sourceParts = [];
+  };
+
+  parts.forEach((part) => {
+    if (part.kind === "source" && showSources) {
+      sourceParts.push(part);
+      return;
+    }
+
+    flushSourceParts();
+    const renderedPart = renderPart(part, showSources);
+    if (renderedPart) {
+      renderedParts.push(renderedPart);
+    }
+  });
+
+  flushSourceParts();
+  return renderedParts;
+}
+
 export const AiMessagePartsNative = memo(
   forwardRef<HTMLElement, AiMessagePartsNativeProps>(function AiMessagePartsNative(
-    { message, streaming, collapseReasoning = defaultProps.collapseReasoning, showSources = defaultProps.showSources, className, classes, style },
+    { message, streaming, showSources = defaultProps.showSources, className, classes, style },
     ref,
   ) {
     const resolvedStreaming = streaming ?? message.status === "streaming";
@@ -125,14 +174,14 @@ export const AiMessagePartsNative = memo(
         data-streaming={resolvedStreaming ? "true" : "false"}
         aria-live={resolvedStreaming ? "polite" : undefined}
       >
-        <header className={classnames(styles.header, classes?.header)}>
+        {/* <header className={classnames(styles.header, classes?.header)}>
           <span className={classnames(styles.roleBadge, classes?.badge)}>{roleLabel(message.role)}</span>
           <span className={classnames(styles.statusBadge, classes?.badge)}>{resolvedStatus}</span>
-        </header>
+        </header> */}
 
         <div className={classnames(styles.content, classes?.content)}>
           {message.parts?.length ? (
-            message.parts.map((part) => renderPart(part, showSources, collapseReasoning))
+            renderMessageParts(message.parts, showSources)
           ) : (
             <div className={styles.emptyState}>No message content</div>
           )}

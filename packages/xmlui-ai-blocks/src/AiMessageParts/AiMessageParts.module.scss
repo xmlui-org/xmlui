@@ -9,6 +9,7 @@ $themeVars: ();
 $backgroundColor-AiMessageParts: createThemeVar("backgroundColor-AiMessageParts");
 $borderColor-AiMessageParts: createThemeVar("borderColor-AiMessageParts");
 $textColor-AiMessageParts: createThemeVar("textColor-AiMessageParts");
+$backgroundColor-reasoning-AiMessageParts: createThemeVar("backgroundColor-reasoning-AiMessageParts");
 $backgroundColor-AiMessageParts--assistant: createThemeVar("backgroundColor-AiMessageParts--assistant");
 $backgroundColor-AiMessageParts--user: createThemeVar("backgroundColor-AiMessageParts--user");
 $backgroundColor-AiMessageParts--system: createThemeVar("backgroundColor-AiMessageParts--system");
@@ -23,23 +24,31 @@ $textColor-AiMessagePartsBadge--active: createThemeVar("textColor-AiMessageParts
 
 @layer components {
   .root {
+    width: fit-content;
+    max-width: min(48rem, 100%);
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: t.$space-2;
-    padding: t.$space-2;
-    border-radius: t.$space-2;
-    border: 1px solid $borderColor-AiMessageParts;
+    align-self: flex-start;
+    gap: t.$space-1;
+    padding: t.$space-3;
+    border-radius: calc(t.$space-2 + t.$space-1);
+    border: 1px solid color-mix(in srgb, $borderColor-AiMessageParts 55%, transparent);
     background: $backgroundColor-AiMessageParts;
     color: $textColor-AiMessageParts;
   }
 
   .root[data-role="assistant"] {
+    width: 100%;
+    padding-inline: 0;
+    border-color: transparent;
     background: $backgroundColor-AiMessageParts--assistant;
   }
 
   .root[data-role="user"] {
+    align-self: flex-end;
     background: $backgroundColor-AiMessageParts--user;
+    border-color: transparent;
   }
 
   .root[data-role="system"] {
@@ -50,46 +59,53 @@ $textColor-AiMessagePartsBadge--active: createThemeVar("textColor-AiMessageParts
     background: $backgroundColor-AiMessageParts--tool;
   }
 
-  .root[data-streaming="true"] {
-    border-color: $borderColor-AiMessageParts--streaming;
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, $borderColor-AiMessageParts--streaming 35%, transparent);
+  .reasoningContainer {
+    background-color: $backgroundColor-reasoning-AiMessageParts;
   }
+
+  /* .root[data-streaming="true"] {
+  } */
 
   .header {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: t.$space-2;
+    gap: t.$space-1;
+    color: color-mix(in srgb, $textColor-AiMessageParts 72%, transparent);
   }
 
   .badge,
   .partLabel {
     display: inline-flex;
     align-items: center;
-    border-radius: 999px;
-    padding: t.$space-1 t.$space-2;
-    background: $backgroundColor-AiMessagePartsBadge;
-    font-size: 0.8125rem;
+    border-radius: t.$space-1;
+    padding: 0.125rem t.$space-1;
+    background: transparent;
+    font-size: 0.75rem;
+    font-weight: 600;
     line-height: 1.1;
   }
 
+  .roleBadge {
+    padding-inline-start: 0;
+  }
+
   .statusBadge {
-    background: color-mix(
-      in srgb,
-      $backgroundColor-AiMessagePartsBadge 74%,
-      var(--xmlui-color-surface-200, #e5e7eb)
-    );
+    color: color-mix(in srgb, $textColor-AiMessageParts 58%, transparent);
+    font-weight: 500;
   }
 
   .root[data-streaming="true"] .statusBadge {
     background: $backgroundColor-AiMessagePartsBadge--active;
     color: $textColor-AiMessagePartsBadge--active;
+    padding-inline: t.$space-1;
   }
 
   .content {
     display: flex;
     flex-direction: column;
     gap: t.$space-2;
+    line-height: 1.55;
   }
 
   .textPart,
@@ -110,39 +126,69 @@ $textColor-AiMessagePartsBadge--active: createThemeVar("textColor-AiMessageParts
   .clarificationPart,
   .errorPart,
   .toolReference {
-    border-radius: t.$space-2;
+    border-radius: t.$space-1;
     padding: t.$space-2 t.$space-3;
     background: color-mix(
       in srgb,
-      $backgroundColor-AiMessageParts 92%,
+      $backgroundColor-AiMessageParts 84%,
       var(--xmlui-color-surface-100, #f4f4f5)
     );
-    border: 1px solid color-mix(in srgb, $borderColor-AiMessageParts 70%, transparent);
+    border: 1px solid color-mix(in srgb, $borderColor-AiMessageParts 42%, transparent);
+  }
+
+  .clarificationPart {
+    > h6 {
+      padding-bottom: t.$space-4;
+    }
   }
 
   .reasoningDisclosure {
-    padding-inline: t.$space-2;
+    padding-inline: t.$space-3;
+    color: color-mix(in srgb, $textColor-AiMessageParts 78%, transparent);
   }
 
   .reasoningSummary {
     cursor: pointer;
     font-weight: 600;
+    color: color-mix(in srgb, $textColor-AiMessageParts 70%, transparent);
   }
 
   .sourcePart {
-    display: flex;
-    align-items: center;
+    display: block;
+    padding-block: t.$space-1;
   }
 
-  .sourceLink {
-    color: inherit;
-    text-decoration: underline;
+  .sourcePart :where(p) {
+    margin-block: 0 t.$space-1;
+    font-weight: 600;
+  }
+
+  .sourcePart :where(ul) {
+    margin-block: 0;
+    padding-inline-start: t.$space-4;
+  }
+
+  .sourcePart :where(li) {
+    margin-block: 0;
+  }
+
+  .sourcePart :where(a) {
     text-underline-offset: 0.15em;
+  }
+
+  .root[data-role="user"] .reasoningDisclosure,
+  .root[data-role="user"] .reasoningPart,
+  .root[data-role="user"] .sourcePart,
+  .root[data-role="user"] .clarificationPart,
+  .root[data-role="user"] .toolReference {
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
   }
 
   .choiceList {
     margin: t.$space-2 0 0;
-    padding-inline-start: t.$space-6;
+    padding-inline-start: t.$space-4;
     display: grid;
     gap: t.$space-1;
   }
