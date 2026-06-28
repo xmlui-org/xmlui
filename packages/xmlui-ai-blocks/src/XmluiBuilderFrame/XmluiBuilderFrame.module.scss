@@ -114,8 +114,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
 
   .chatPane,
   .workspacePane,
-  .panel,
-  .auxiliaryPanel {
+  .panel {
     min-width: 0;
     min-height: 0;
     border-radius: calc($borderRadius-XmluiBuilderFrame / 1.6);
@@ -157,8 +156,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
   }
 
   .workspacePane,
-  .panel,
-  .auxiliaryPanel {
+  .panel {
     gap: $gap-panel-XmluiBuilderFrame;
   }
 
@@ -189,8 +187,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     overflow: hidden;
   }
 
-  .panel,
-  .auxiliaryPanel {
+  .panel {
     flex: 1 1 auto;
     overflow: hidden;
   }

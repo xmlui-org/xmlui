@@ -451,12 +451,6 @@ export const XmluiBuilderFrameNative = memo(
                 <div className={styles.panelScroll}>{timelineNode}</div>
               </div>
             ) : null}
-
-            {auxiliaryNode ? (
-              <div className={classnames(styles.auxiliaryPanel, classes?.auxiliary)} data-region="auxiliary">
-                <div className={styles.panelScroll}>{auxiliaryNode}</div>
-              </div>
-            ) : null}
           </div>
         </section>
       );
@@ -601,11 +595,6 @@ export const XmluiBuilderFrameNative = memo(
           >
             {selected === "chat" ? panelNode : <div className={styles.panelScroll}>{panelNode}</div>}
           </div>
-          {auxiliaryNode ? (
-            <div className={classnames(styles.auxiliaryPanel, classes?.auxiliary)} data-region="auxiliary">
-              <div className={styles.panelScroll}>{auxiliaryNode}</div>
-            </div>
-          ) : null}
         </div>
       );
     };

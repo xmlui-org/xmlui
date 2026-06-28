@@ -4,4 +4,3 @@ export const componentMetadata = {
   description: "AI-focused component blocks for XMLUI applications.",
   metadata: {},
 };
-

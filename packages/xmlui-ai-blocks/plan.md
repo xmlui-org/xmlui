@@ -8,6 +8,7 @@ Related plans:
 
 - [agent-harness-plan.md](./agent-harness-plan.md): overall contract and three-tier architecture.
 - [xmlui-ai-bridge-plan.md](./xmlui-ai-bridge-plan.md): trusted Node/runtime bridge plan.
+- [a2xmlui-compat-contract-plan.md](./a2xmlui-compat-contract-plan.md): temporary compatibility plan for the original XMLUI Studio / A2XMLUI prototype contract while the preferred streaming backend is still pending.
 
 ## Package Boundary
 
@@ -795,6 +796,8 @@ Owner questions before implementation:
 
 ### Phase 3: AI-Specific Visual Primitives
 
+Status: done.
+
 Goal: implement the smallest visual components that cannot be expressed cleanly with
 generic XMLUI primitives, using the Phase 2 frame demo to validate how they fit in
 the host workspace.
@@ -899,7 +902,197 @@ Owner questions before implementation:
 - Decision: render tool input/output summaries as text only. Do not add JSON
   disclosure fallback in the first pass.
 
-### Phase 4: Headless Thread Controller
+### Phase 4: XmluiCodeView And XmluiPreviewPane Migration
+
+Goal: make the code and preview panels from XMLUI Studio / A2XMLUI available in
+`xmlui-ai-blocks` immediately after the completed Phase 3 visual primitives, before
+the remaining headless-thread and workspace work.
+
+Migration source material:
+
+- Primary preview reference:
+  `D:\Projects\albacrm\xmlui-studio\packages\a2xmlui\xmlui-app\src\extensions\XmluiPreview\XmluiPreview.tsx`.
+- Primary Studio code-view reference:
+  `D:\Projects\albacrm\xmlui-studio\packages\a2xmlui\xmlui-app\src\extensions\CodeView\CodeView.tsx`.
+- Core XMLUI code-view reference:
+  `xmlui/src/components/NestedApp/AppWithCodeViewReact.tsx` and
+  `xmlui/src/components/Markdown/MarkdownReact.tsx`.
+- Shared issue shape:
+  `xmlui/src/abstractions/AgentContractDefs.ts`, re-exported through
+  `packages/xmlui-ai-blocks/src/contract.ts`.
+
+Deliverables:
+
+- `XmluiCodeView` as a registered read-only XMLUI source viewer.
+- `XmluiPreviewPane` as a registered XMLUI preview surface for direct code preview.
+- Metadata, defaults, SCSS modules, extension registration, and demo examples for
+  both components.
+- Demo wiring that shows the two components side-by-side and inside the existing
+  `XmluiBuilderFrame` templates without requiring `AiThread`.
+
+Builder rules:
+
+- Keep `XmluiCodeView` read-only. Do not add editing, file naming, save/publish
+  controls, or workspace header chrome.
+- Keep copy and selection affordances either as narrow component events or as recipe
+  chrome; do not turn the viewer into an IDE panel.
+- Prefer existing XMLUI rendering primitives for preview, especially `NestedApp`.
+  Do not reimplement XMLUI rendering.
+- Implement direct code preview first. Defer iframe/URL preview mode unless the
+  owner explicitly asks for it during implementation.
+- Do not silently replace a broken current generation with the last working app.
+  `XmluiPreviewPane` must render the selected revision and surface diagnostics.
+- Keep route, viewport, refresh, save, deploy, and repair controls as recipe-owned
+  workspace chrome.
+- Do not expand `XmluiBuilderFrame` beyond layout to make preview/code integration
+  work. Preview lifecycle stays in `XmluiPreviewPane`; source display stays in
+  `XmluiCodeView`.
+- When mining XMLUI Studio `XmluiPreview`, keep compile diagnostics, runtime error
+  isolation, theme/tone forwarding, sandbox globals, bounded preview scrolling, and
+  warning reporting. Replace its silent `lastSuccessfulCode` fallback with explicit
+  `selectedRevision` handling.
+- When mining XMLUI Studio `CodeView`, keep formatting, line-number gutter,
+  tone-aware token colors, scroll isolation, displayed-code updates, and optional
+  copy/selection events.
+
+Recommended `XmluiCodeView` props:
+
+```ts
+code?: string;
+language?: "xmlui" | "xml" | "text";
+showLineNumbers?: boolean;
+selectedLine?: number;
+emptyText?: string;
+```
+
+Recommended `XmluiCodeView` events:
+
+```ts
+onCopy -> { code: string }
+onLineSelect -> { line: number }
+```
+
+Recommended `XmluiPreviewPane` props:
+
+```ts
+code?: string;
+lastWorkingCode?: string;
+selectedRevision?: "current" | "lastWorking";
+activeTheme?: string;
+activeTone?: string;
+showDiagnostics?: boolean;
+```
+
+Recommended `XmluiPreviewPane` value/event:
+
+```ts
+value: {
+  status: "idle" | "compiling" | "ready" | "warning" | "error";
+  selectedRevision: "current" | "lastWorking";
+  diagnostics: XmluiValidationIssue[];
+  runtimeError?: string;
+};
+
+onPreviewStateChange -> value
+```
+
+Example standalone recipe:
+
+```xml
+<Tabs>
+  <TabItem label="Preview">
+    <XmluiPreviewPane
+      id="preview"
+      code="{builder.value.code}"
+      lastWorkingCode="{builder.value.lastWorkingCode}"
+      selectedRevision="{builder.value.selectedPreviewRevision}"
+      showDiagnostics="true"
+      onPreviewStateChange="builder.setPreviewState($event)" />
+  </TabItem>
+  <TabItem label="Code">
+    <XmluiCodeView
+      code="{builder.value.selectedPreviewRevision === 'lastWorking'
+        ? builder.value.lastWorkingCode
+        : builder.value.code}"
+      language="xmlui"
+      showLineNumbers="true" />
+  </TabItem>
+</Tabs>
+```
+
+Example frame usage:
+
+```xml
+<XmluiBuilderFrame
+  layout="auto"
+  activePanel="{workspace.value.activePanel}"
+  onPanelChange="workspace.setActivePanel($event.panel)">
+  <property name="previewTemplate">
+    <XmluiPreviewPane
+      code="{builder.value.code}"
+      lastWorkingCode="{builder.value.lastWorkingCode}"
+      selectedRevision="{builder.value.selectedPreviewRevision}" />
+  </property>
+  <property name="codeTemplate">
+    <XmluiCodeView
+      code="{builder.value.selectedPreviewRevision === 'lastWorking'
+        ? builder.value.lastWorkingCode
+        : builder.value.code}"
+      showLineNumbers="true" />
+  </property>
+</XmluiBuilderFrame>
+```
+
+Migration execution plan:
+
+1. Audit the Studio preview and code-view components plus the core XMLUI
+   `NestedApp`/Markdown code-view path. Record which behavior is reusable, which
+   is host-specific, and which must be replaced by XMLUI recipes.
+2. Add `XmluiCodeView` first, because it is isolated: metadata, native renderer,
+   SCSS module, package export/registration, demo fixture, and focused render tests.
+3. Add `XmluiPreviewPane` on top of existing XMLUI rendering primitives: metadata,
+   native renderer, preview state value, diagnostics display, runtime-error
+   isolation, theme/tone forwarding, package export/registration, and demo fixture.
+4. Wire both components into the `xmlui-ai-blocks` demo in standalone tabs and in
+   the existing `XmluiBuilderFrame` preview/code templates.
+5. Run package checks and update generated metadata snapshots if component
+   metadata changes.
+
+Tests and checks:
+
+- `XmluiCodeView` tests for empty code, line numbering, selected-line rendering,
+  copy event, and displayed-code changes.
+- `XmluiPreviewPane` tests for empty code, valid XMLUI, parse/compile diagnostics,
+  current-vs-last-working selection, and runtime error display if practical.
+- Visual/demo smoke covering a broken current generation and a selectable
+  last-working revision.
+- `npm --prefix packages/xmlui-ai-blocks run build:extension`
+- `npm --prefix packages/xmlui-ai-blocks run build:meta` if metadata changed.
+
+Exit criteria:
+
+- Hosts can use `XmluiCodeView` and `XmluiPreviewPane` immediately without
+  adopting `AiThread`.
+- A broken current generation remains inspectable in both preview diagnostics and
+  code view.
+- The Phase 2 builder frame can host real preview and code surfaces without taking
+  over preview revision state.
+
+Owner decisions already made:
+
+- Move `XmluiCodeView` and `XmluiPreviewPane` from the later workspace phase to
+  immediately after Phase 3.
+- Implement direct code preview before iframe/URL preview.
+- Keep `XmluiCodeView` as a viewer, not an editor.
+
+Open owner questions before implementation:
+
+- Should `XmluiPreviewPane` own uncontrolled revision selection when no
+  `selectedRevision` prop is provided, or require the host/controller to own it?
+- What should count as "last working": parse success, render success, or bridge
+  accepted status?
+
+### Phase 5: Headless Thread Controller
 
 Goal: replace the placeholder conversation with `AiThread`, the primary headless
 controller for browser-side AI thread state.
@@ -923,7 +1116,8 @@ Builder rules:
 - Unknown event names should be ignored and optionally recorded as nonfatal
   diagnostics in local state.
 - Keep preview-specific state out of the shared contract. Local value may include
-  `generation.code`; preview revision selection belongs to Phase 5/6.
+  `generation.code`; preview revision selection belongs to the generation/workspace
+  phases.
 
 Recommended local value shape:
 
@@ -1000,7 +1194,7 @@ Owner questions before implementation:
 - Should `cancel()` only stop local fake replay in this phase, or call a supplied
   `cancelAction` when present?
 
-### Phase 5: XMLUI Generation Client State
+### Phase 6: XMLUI Generation Client State
 
 Goal: add XMLUI-generation state around `AiThread` without turning the package into
 a full IDE.
@@ -1017,19 +1211,14 @@ Deliverables:
 - Selected preview revision: `current` and `lastWorking` first; defer
   `lastAccepted` until persistence exists.
 - Replacement confirmation state for destructive full replacement requests.
-- `XmluiCodeView` as a read-only source viewer.
 - Recipe markup for generation status and replacement confirmation.
 
 Builder rules:
 
 - Server-side repair orchestration remains outside this package.
 - Do not add persistence, save buttons, publish flows, or artifact cards.
-- Do not make `XmluiCodeView` an editor.
+- Use the Phase 4 `XmluiCodeView`; do not make it an editor.
 - Do not silently copy `lastWorkingCode` over broken current code.
-- When mining XMLUI Studio `CodeView`, keep only viewer concerns: formatting,
-  line numbers, tone-aware token styling, scroll isolation, displayed-code
-  updates, and optional copy/selection events. Do not port workspace header,
-  save/copy buttons, or file naming chrome as component-owned UI.
 
 Recommended local generation value:
 
@@ -1068,78 +1257,42 @@ Tests and checks:
 
 - Reducer/state tests for accepted generation, failed generation, repair status,
   replacement confirmation, and revision selection.
-- `XmluiCodeView` tests for empty code, line numbering, copy event, and displayed
-  code changes.
 - `npm --prefix packages/xmlui-ai-blocks run build:extension`
 
 Exit criteria:
 
-- Fixture events can produce generated XMLUI code visible in `XmluiCodeView`.
+- Fixture events can produce generated XMLUI code visible in the Phase 4
+  `XmluiCodeView`.
 - A broken current generation can remain selected and inspectable.
 
 Owner questions before implementation:
 
-- Should `XmluiGenerationSession` be a real component in Phase 5, or should
+- Should `XmluiGenerationSession` be a real component in Phase 6, or should
   `AiThread` expose enough generation state for now?
 - Should `lastWorkingCode` update only after local preview succeeds, or immediately
   when the bridge sends `generation.status === "accepted"`?
 - Should replacement confirmation live in headless state, or entirely in XMLUI
   recipe markup?
 
-### Phase 6: Preview And Workspace
+### Phase 7: Workspace Integration
 
-Goal: render generated XMLUI safely while preserving the current-vs-last-working
-inspection model, then plug the preview and code surfaces into the frame introduced
-in Phase 2.
+Goal: integrate the already available preview and code surfaces into higher-level
+workspace recipes and generation state without moving preview ownership into the
+frame.
 
 Deliverables:
 
-- `XmluiPreviewPane` with direct code preview first.
-- Local preview state: `idle`, `compiling`, `ready`, `warning`, `error`.
-- Compile diagnostics and runtime error display.
-- Hooks/events for preview state changes so `lastWorkingCode` can update outside
-  the component.
 - Recipe markup for workspace tabs and preview toolbar.
 - Update the Phase 2 `XmluiBuilderFrame` demo to use `XmluiPreviewPane` and
   `XmluiCodeView` together.
 
 Builder rules:
 
-- Prefer existing XMLUI rendering primitives, especially `NestedApp`; do not
-  reimplement XMLUI rendering.
-- Do not add iframe/URL mode in the first pass unless owner explicitly asks.
+- Use the Phase 4 `XmluiPreviewPane` and `XmluiCodeView` components.
 - Do not auto-switch to last-working when current fails. Show the current failure.
 - Keep route/viewport controls as recipes unless they need component-owned behavior.
 - Do not expand `XmluiBuilderFrame` beyond layout to make preview/code integration
   work; preview lifecycle stays in `XmluiPreviewPane` and generation/session state.
-- When mining XMLUI Studio `XmluiPreview`, keep compile diagnostics, runtime error
-  boundary behavior, sandbox globals, theme/tone forwarding, bounded scrolling,
-  and warning reporting. Replace its silent `lastSuccessfulCode` fallback with
-  explicit `selectedRevision` handling.
-
-Recommended props:
-
-```ts
-code?: string;
-lastWorkingCode?: string;
-selectedRevision?: "current" | "lastWorking";
-activeTheme?: string;
-activeTone?: string;
-showDiagnostics?: boolean;
-```
-
-Recommended value/event:
-
-```ts
-value: {
-  status: "idle" | "compiling" | "ready" | "warning" | "error";
-  selectedRevision: "current" | "lastWorking";
-  diagnostics: XmluiValidationIssue[];
-  runtimeError?: string;
-};
-
-onPreviewStateChange -> value
-```
 
 Example workspace recipe:
 
@@ -1196,8 +1349,6 @@ Example frame usage:
 
 Tests and checks:
 
-- Preview tests for valid XMLUI, parse errors, runtime errors if practical, empty
-  code, and revision selection.
 - Visual smoke demo with current failure and last-working selection, both in the
   standalone workspace recipe and inside `XmluiBuilderFrame`.
 - `npm --prefix packages/xmlui-ai-blocks run build:extension`
@@ -1205,20 +1356,17 @@ Tests and checks:
 Exit criteria:
 
 - The user can inspect broken generated code and manually switch to last-working.
-- Preview status is available to XMLUI recipes through value/events.
+- Preview status from `XmluiPreviewPane` is available to XMLUI recipes through
+  value/events.
 - The existing `XmluiBuilderFrame` can host real preview and code surfaces without
   taking over preview revision state.
 
 Owner questions before implementation:
 
-- Should `XmluiPreviewPane` own uncontrolled revision selection when no
-  `selectedRevision` prop is provided, or require the host/controller to own it?
 - Should iframe/URL preview be explicitly deferred, or implemented behind
   `mode="url"` in the same component now?
-- What should count as "last working": parse success, render success, or bridge
-  accepted status?
 
-### Phase 7: Recipes And Promotion Review
+### Phase 8: Recipes And Promotion Review
 
 Goal: prove that the package stays composable by shipping recipes before promoting
 more components.
@@ -1283,7 +1431,7 @@ Owner questions before implementation:
 - Is saved micro-app browsing important enough to include as a fake-data recipe now,
   or should it wait for persistence design?
 
-### Phase 8: Demos
+### Phase 9: Demos
 
 Goal: provide clear, fake-data demos that exercise the package integration paths
 without requiring a bridge server or provider keys.

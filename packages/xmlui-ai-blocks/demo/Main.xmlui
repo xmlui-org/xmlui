@@ -96,14 +96,20 @@
   }'>
   <XmluiBuilderFrame
     maxWidth="1200px"
-    height="calc(100vh - 32px)"
+    height="calc(100vh - 42px)"
     minHeight="620px"
     layout="{fixture.layoutMode}"
     chatPlacement="start"
     workspaceMode="tabs"
     activePanel="{workspacePanel}"
     compactBreakpoint="{fixture.compactBreakpoint}"
-    onPanelChange="(event) => workspacePanel = event.panel">
+    onPanelChange="workspacePanel = event.panel">
+    <AiThread
+      id="agent"
+      contract="a2xmlui"
+      currentCode="{fixture.code}"
+      selectedAgent="demo-agent"
+      selectedModel="demo-model" />
     <property name="toolbarTemplate">
       <HStack gap="$space-2" verticalAlignment="center" wrapContent="false">
         <Badge value="{fixture.status}" />
@@ -125,10 +131,6 @@
     <property name="chatTemplate">
       <VStack gap="$space-3">
         <VStack gap="$space-2">
-          <HStack gap="$space-2" verticalAlignment="center">
-            <Text variant="secondary">Transcript</Text>
-            <Badge value="{fixture.messages.length + ' messages'}" />
-          </HStack>
           <Items data="{fixture.messages}" gap="$space-2">
             <AiMessageParts
               message="{$item}"
@@ -180,19 +182,6 @@
     </property>
     <property name="previewTemplate">
       <VStack height="100%" width="100%" minHeight="0" gap="$space-3">
-        <HStack gap="$space-2" verticalAlignment="center">
-          <Badge value="{fixture.previewIssues.length + ' issues'}" />
-          <Text variant="secondary">Current generation preview</Text>
-        </HStack>
-        <VStack gap="$space-2">
-          <Text variant="strong">Preview diagnostics</Text>
-          <Items data="{fixture.previewIssues}">
-            <VStack gap="$space-1">
-              <Text variant="strong">{$item.title}</Text>
-              <Text variant="secondary">{$item.detail}</Text>
-            </VStack>
-          </Items>
-        </VStack>
         <VStack height="100%" minHeight="0" gap="$space-2">
           <Text variant="title">Preview placeholder</Text>
           <Text variant="secondary">Generated XMLUI preview will render here.</Text>

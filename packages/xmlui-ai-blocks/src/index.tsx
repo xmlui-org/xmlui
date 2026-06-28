@@ -2,11 +2,13 @@ import { xmluiBuilderFrameComponentRenderer } from "./XmluiBuilderFrame/XmluiBui
 import { aiMessagePartsComponentRenderer } from "./AiMessageParts/AiMessageParts";
 import { aiToolCallComponentRenderer } from "./AiToolCall/AiToolCall";
 import { aiApprovalRequestComponentRenderer } from "./AiApprovalRequest/AiApprovalRequest";
+import { aiThreadComponentRenderer } from "./AiThread/AiThread";
 
 const aiBlocksExtension = {
   namespace: "XMLUIExtensions",
   themeNamespacePrefix: "AiBlocks",
   components: [
+    aiThreadComponentRenderer,
     aiMessagePartsComponentRenderer,
     aiToolCallComponentRenderer,
     aiApprovalRequestComponentRenderer,
@@ -19,4 +21,5 @@ export default aiBlocksExtension;
 export { aiMessagePartsComponentRenderer } from "./AiMessageParts/AiMessageParts";
 export { aiToolCallComponentRenderer } from "./AiToolCall/AiToolCall";
 export { aiApprovalRequestComponentRenderer } from "./AiApprovalRequest/AiApprovalRequest";
+export { aiThreadComponentRenderer } from "./AiThread/AiThread";
 export { xmluiBuilderFrameComponentRenderer } from "./XmluiBuilderFrame/XmluiBuilderFrame";
