@@ -112,6 +112,9 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
   }
 
   .splitterHost {
+    --xmlui-backgroundColor-resizer-Splitter: transparent;
+    --xmlui-thickness-resizer-Splitter: 9px;
+
     flex: 1;
     min-width: 0;
     min-height: 0;
@@ -121,6 +124,52 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     border: 0;
     border-radius: 0;
     box-shadow: none;
+
+    & :global([class*="resizer"]) {
+      position: relative;
+      background: transparent;
+
+      &::before {
+        content: "";
+        position: absolute;
+        background: color-mix(in srgb, $borderColor-XmluiBuilderFrame 68%, transparent);
+        transition:
+          background-color 0.16s ease,
+          opacity 0.16s ease,
+          width 0.16s ease,
+          height 0.16s ease;
+      }
+
+      &:global([class*="horizontal"])::before {
+        inset-block: 0;
+        left: 50%;
+        width: 1px;
+        transform: translateX(-50%);
+      }
+
+      &:global([class*="vertical"])::before {
+        inset-inline: 0;
+        top: 50%;
+        height: 1px;
+        transform: translateY(-50%);
+      }
+
+      &:hover::before {
+        background: var(--xmlui-color-primary-500, #3b82f6);
+      }
+
+      &:global([class*="horizontal"]):hover::before {
+        width: 2px;
+      }
+
+      &:global([class*="vertical"]):hover::before {
+        height: 2px;
+      }
+    }
+
+    &:global([class*="dragging"]) :global([class*="resizer"])::before {
+      background: var(--xmlui-color-primary-500, #3b82f6);
+    }
   }
 
   .splitterReadOnly {
