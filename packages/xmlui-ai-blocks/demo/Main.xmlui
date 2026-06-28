@@ -139,19 +139,18 @@
           </VStack>
         </property>
         <property name="composerTemplate">
-          <VStack gap="$space-2">
-            <Form onSubmit="agent.submit(prompt.value)">
-              <property name="buttonRowTemplate">
-                <HStack gap="$space-2" verticalAlignment="center" horizontalAlignment="end">
-                  <Button label="Stop" variant="ghost" onClick="agent.stop()" enabled="{agent.value && agent.value.isRunning}" />
-                  <Button label="Send" type="submit" enabled="{!agent.value || !agent.value.isRunning}" />
-                </HStack>
-              </property>
-              <VStack gap="$space-2">
-                <TextArea id="prompt" rows="3" placeholder="Describe the app you want to build" />
-              </VStack>
-            </Form>
-          </VStack>
+          <AiPromptInput
+            id="prompt"
+            placeholder="Describe the app you want to build"
+            models="{[
+              { value: 'demo-model', label: 'Demo model' },
+              { value: 'fast-model', label: 'Fast model' },
+              { value: 'balanced-model', label: 'Balanced model' },
+            ]}"
+            initialModel="demo-model"
+            running="{agent.value && agent.value.isRunning}"
+            onSubmit="agent.submit($event.value)"
+            onStop="agent.stop()" />
         </property>
         <property name="previewTemplate">
           <XmluiPreview
