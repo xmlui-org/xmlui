@@ -108,8 +108,25 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     flex: 1;
     min-height: 0;
     display: flex;
-    flex-direction: row;
-    gap: $gap-panel-XmluiBuilderFrame;
+    flex-direction: column;
+  }
+
+  .splitterHost {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .splitterReadOnly {
+    & :global([class*="resizer"]) {
+      display: none;
+    }
   }
 
   .chatPane,
@@ -117,6 +134,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
   .panel {
     min-width: 0;
     min-height: 0;
+    height: 100%;
     border-radius: calc($borderRadius-XmluiBuilderFrame / 1.6);
     background: $backgroundColor-panel-XmluiBuilderFrame;
     display: flex;
@@ -126,11 +144,6 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
 
   .workspacePane {
     flex: 1 1 auto;
-    overflow: hidden;
-  }
-
-  .chatPaneSplit {
-    flex: 0 0 auto;
     overflow: hidden;
   }
 
@@ -178,15 +191,6 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     gap: $gap-panel-XmluiBuilderFrame;
   }
 
-  .workspaceSplit {
-    flex: 1 1 auto;
-    min-height: 0;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: $gap-panel-XmluiBuilderFrame;
-    overflow: hidden;
-  }
-
   .panel {
     flex: 1 1 auto;
     overflow: hidden;
@@ -194,28 +198,6 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
 
   .timelinePanel {
     flex: 0 0 auto;
-  }
-
-  .splitHandle {
-    width: 1px;
-    min-width: 0.75rem;
-    cursor: col-resize;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      transparent 0,
-      color-mix(in srgb, $borderColor-XmluiBuilderFrame 35%, transparent) 25%,
-      color-mix(in srgb, $borderColor-XmluiBuilderFrame 55%, transparent) 50%,
-      color-mix(in srgb, $borderColor-XmluiBuilderFrame 35%, transparent) 75%,
-      transparent 100%
-    );
-    align-self: stretch;
-    flex: 0 0 auto;
-  }
-
-  .splitHandle:focus-visible {
-    outline: 2px solid color-mix(in srgb, $borderColor-tab-XmluiBuilderFrame--active 70%, transparent);
-    outline-offset: 2px;
   }
 
   .chatPaneHidden {

@@ -12,6 +12,7 @@ import React, {
   useState,
 } from "react";
 import classnames from "classnames";
+import { Splitter } from "xmlui";
 
 import styles from "./XmluiBuilderFrame.module.scss";
 
@@ -248,14 +249,13 @@ export const XmluiBuilderFrameNative = memo(
     forwardedRef,
   ) {
     const rootRef = useRef<HTMLDivElement | null>(null);
-    const splitRef = useRef<HTMLDivElement | null>(null);
-    const [splitRatio, setSplitRatio] = useState(0.38);
+    const splitterRef = useRef<HTMLDivElement | null>(null);
+    const [splitRatio, setSplitRatio] = useState(0.36);
     const [internalPanel, setInternalPanel] = useState<XmluiBuilderPanel>(
       activePanel ?? defaultProps.activePanel,
     );
     const frameId = useId().replace(/:/g, "");
     const containerWidth = useContainerWidth(rootRef);
-    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
       if (activePanel) {
@@ -325,44 +325,31 @@ export const XmluiBuilderFrameNative = memo(
       [forwardedRef],
     );
 
-    useEffect(() => {
-      if (!isDragging) return undefined;
+    const handleSplitResize = useCallback(
+      (primarySize: number) => {
+        const splitterWidth = splitterRef.current?.getBoundingClientRect().width ?? 0;
+        if (splitterWidth <= 0) {
+          return;
+        }
 
-      const handlePointerMove = (event: PointerEvent) => {
-        const element = splitRef.current;
-        if (!element) return;
-        const rect = element.getBoundingClientRect();
-        if (rect.width <= 0) return;
-        const nextRatio = (event.clientX - rect.left) / rect.width;
-        setSplitRatio(Math.min(0.68, Math.max(0.22, nextRatio)));
-      };
+        const primaryRatio = Math.min(1, Math.max(0, primarySize / splitterWidth));
+        const chatRatio = chatPlacement === "end" ? 1 - primaryRatio : primaryRatio;
+        setSplitRatio(Math.min(0.68, Math.max(0.22, chatRatio)));
+      },
+      [chatPlacement],
+    );
 
-      const handlePointerUp = () => {
-        setIsDragging(false);
-        window.removeEventListener("pointermove", handlePointerMove);
-        window.removeEventListener("pointerup", handlePointerUp);
-        window.removeEventListener("pointercancel", handlePointerUp);
-      };
+    const chatPrimaryRatio = chatPlacement === "end" ? 1 - splitRatio : splitRatio;
+    const initialPrimarySize = `${Math.round(chatPrimaryRatio * 100)}%`;
+    const minPrimarySize = chatPlacement === "end" ? "32%" : "22%";
+    const maxPrimarySize = chatPlacement === "end" ? "78%" : "68%";
 
-      window.addEventListener("pointermove", handlePointerMove);
-      window.addEventListener("pointerup", handlePointerUp);
-      window.addEventListener("pointercancel", handlePointerUp);
-
-      return () => {
-        window.removeEventListener("pointermove", handlePointerMove);
-        window.removeEventListener("pointerup", handlePointerUp);
-        window.removeEventListener("pointercancel", handlePointerUp);
-      };
-    }, [isDragging]);
-
-    const renderChatSection = (split = false) =>
+    const renderChatSection = () =>
       hasChat ? (
         <section
           className={classnames(styles.chatPane, classes?.chat, {
             [styles.chatPaneHidden]: chatPlacement === "hidden",
-            [styles.chatPaneSplit]: split,
           })}
-          style={split ? { flexBasis: `${Math.round(splitRatio * 100)}%` } : undefined}
           data-region="chat"
         >
           <div className={classnames(styles.chatTranscript, classes?.panel)} data-region="chat-transcript">
@@ -482,91 +469,25 @@ export const XmluiBuilderFrameNative = memo(
       </div>
     );
 
-    const renderSplitLayout = () => (
-      <div ref={splitRef} className={classnames(styles.splitLayout, classes?.shell)}>
-        {chatPlacement !== "end" ? (
-          <>
-            {renderChatSection(true)}
-            {resizable && chatVisible && hasWorkspace ? (
-              <div
-                className={styles.splitHandle}
-                role="separator"
-                aria-label="Adjust chat and workspace width"
-                aria-orientation="vertical"
-                aria-valuemin={22}
-                aria-valuemax={68}
-                aria-valuenow={Math.round(splitRatio * 100)}
-                aria-valuetext={`${Math.round(splitRatio * 100)} percent chat width`}
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  let nextRatio = splitRatio;
-                  if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-                    nextRatio -= 0.03;
-                  } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-                    nextRatio += 0.03;
-                  } else if (event.key === "Home") {
-                    nextRatio = 0.22;
-                  } else if (event.key === "End") {
-                    nextRatio = 0.68;
-                  } else {
-                    return;
-                  }
-
-                  event.preventDefault();
-                  setSplitRatio(Math.min(0.68, Math.max(0.22, nextRatio)));
-                }}
-                onPointerDown={(event) => {
-                  if (event.button !== 0) return;
-                  event.preventDefault();
-                  setIsDragging(true);
-                }}
-              />
-            ) : null}
+    const renderSplitLayout = () =>
+      hasChat && hasWorkspace ? (
+        <div className={classnames(styles.splitLayout, classes?.shell)}>
+          <Splitter
+            ref={splitterRef}
+            className={classnames(styles.splitterHost, !resizable ? styles.splitterReadOnly : undefined)}
+            orientation="horizontal"
+            swapped={chatPlacement === "end"}
+            initialPrimarySize={initialPrimarySize}
+            minPrimarySize={minPrimarySize}
+            maxPrimarySize={maxPrimarySize}
+            resize={resizable ? handleSplitResize : undefined}
+            visibleChildCount={2}
+          >
+            {renderChatSection()}
             {renderWorkspaceContent()}
-          </>
-        ) : (
-          <>
-            {renderWorkspaceContent()}
-            {resizable && chatVisible && hasWorkspace ? (
-              <div
-                className={styles.splitHandle}
-                role="separator"
-                aria-label="Adjust workspace and chat width"
-                aria-orientation="vertical"
-                aria-valuemin={22}
-                aria-valuemax={68}
-                aria-valuenow={Math.round(splitRatio * 100)}
-                aria-valuetext={`${Math.round(splitRatio * 100)} percent workspace width`}
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  let nextRatio = splitRatio;
-                  if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-                    nextRatio += 0.03;
-                  } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-                    nextRatio -= 0.03;
-                  } else if (event.key === "Home") {
-                    nextRatio = 0.68;
-                  } else if (event.key === "End") {
-                    nextRatio = 0.22;
-                  } else {
-                    return;
-                  }
-
-                  event.preventDefault();
-                  setSplitRatio(Math.min(0.68, Math.max(0.22, nextRatio)));
-                }}
-                onPointerDown={(event) => {
-                  if (event.button !== 0) return;
-                  event.preventDefault();
-                  setIsDragging(true);
-                }}
-              />
-            ) : null}
-            {renderChatSection(true)}
-          </>
-        )}
-      </div>
-    );
+          </Splitter>
+        </div>
+      ) : null;
 
     const renderTabsLayout = () => {
       if (availablePanels.length === 0) return null;

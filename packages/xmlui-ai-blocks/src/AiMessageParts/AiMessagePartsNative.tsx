@@ -52,7 +52,7 @@ function getSourceListItem(part: SourcePart) {
 function renderSourcePart(part: SourcePart) {
   return (
     <div key={`source-${part.title ?? part.url ?? "source"}`} className={styles.sourcePart}>
-      <Markdown openLinkInNewTab>{`Sources\n\n- ${getSourceListItem(part)}`}</Markdown>
+      <Markdown openLinkInNewTab>{`Sources:\n\n- ${getSourceListItem(part)}`}</Markdown>
     </div>
   );
 }
@@ -60,7 +60,7 @@ function renderSourcePart(part: SourcePart) {
 function renderSourceParts(parts: SourcePart[], key: string) {
   return (
     <div key={key} className={styles.sourcePart}>
-      <Markdown openLinkInNewTab>{`Sources\n\n${parts.map((part) => `- ${getSourceListItem(part)}`).join("\n")}`}</Markdown>
+      <Markdown openLinkInNewTab>{`Sources:\n\n${parts.map((part) => `- ${getSourceListItem(part)}`).join("\n")}`}</Markdown>
     </div>
   );
 }
