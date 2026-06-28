@@ -94,109 +94,120 @@
       status: "Demo generation running",
     }
   }'>
-  <XmluiBuilderFrame
-    maxWidth="1200px"
-    height="calc(100vh - 42px)"
-    minHeight="620px"
-    layout="{fixture.layoutMode}"
-    chatPlacement="start"
-    workspaceMode="tabs"
-    activePanel="{workspacePanel}"
-    compactBreakpoint="{fixture.compactBreakpoint}"
-    onPanelChange="workspacePanel = $event.panel">
-    <AiThread
-      id="agent"
-      contract="a2xmlui"
-      currentCode="{fixture.code}"
-      requestDirectives="{ { allowFullReplacement: false } }"
-      selectedAgent="demo-agent"
-      selectedModel="demo-model" />
-    <property name="toolbarTemplate">
-      <HStack gap="$space-2" verticalAlignment="center" wrapContent="false">
-        <Badge value="{(agent.value && agent.value.codeStatus) || fixture.status}" />
-        <SpaceFiller />
-        <Button
-          label="Preview"
-          themeColor="secondary"
-          variant="{workspacePanel === 'preview' ? 'solid' : 'outlined'}"
-          onClick="workspacePanel = 'preview'" />
-        <Button
-          label="Code"
-          themeColor="secondary"
-          variant="{workspacePanel === 'code' ? 'solid' : 'outlined'}"
-          onClick="workspacePanel = 'code'" />
-      </HStack>
-    </property>
-    <property name="statusTemplate">
-    </property>
-    <property name="chatTemplate">
-      <VStack gap="$space-3">
-        <VStack gap="$space-2">
-          <Items data="{(agent.value && agent.value.messages && agent.value.messages.length > 0) ? agent.value.messages : fixture.messages}" gap="$space-2">
-            <AiMessageParts
-              message="{$item}"
-              streaming="{$item.status === 'streaming'}"
-              collapseReasoning="true" />
-          </Items>
-        </VStack>
-
-        <VStack gap="$space-2">
-          <HStack gap="$space-2" verticalAlignment="center">
-            <Text variant="secondary">Tool activity</Text>
-            <Badge value="{((agent.value && agent.value.toolCalls) ? agent.value.toolCalls.length : fixture.toolCalls.length) + ' tools'}" />
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Components" to="/components" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <XmluiBuilderFrame
+        maxWidth="1200px"
+        height="calc(100vh - 42px)"
+        minHeight="620px"
+        layout="{fixture.layoutMode}"
+        chatPlacement="start"
+        workspaceMode="tabs"
+        activePanel="{workspacePanel}"
+        compactBreakpoint="{fixture.compactBreakpoint}"
+        onPanelChange="workspacePanel = $event.panel">
+        <AiThread
+          id="agent"
+          contract="a2xmlui"
+          currentCode="{fixture.code}"
+          requestDirectives="{ { allowFullReplacement: false } }"
+          selectedAgent="demo-agent"
+          selectedModel="demo-model" />
+        <property name="toolbarTemplate">
+          <HStack gap="$space-2" verticalAlignment="center" wrapContent="false">
+            <Badge value="{(agent.value && agent.value.codeStatus) || fixture.status}" />
+            <SpaceFiller />
+            <Button
+              label="Preview"
+              themeColor="secondary"
+              variant="{workspacePanel === 'preview' ? 'solid' : 'outlined'}"
+              onClick="workspacePanel = 'preview'" />
+            <Button
+              label="Code"
+              themeColor="secondary"
+              variant="{workspacePanel === 'code' ? 'solid' : 'outlined'}"
+              onClick="workspacePanel = 'code'" />
           </HStack>
-          <Items data="{(agent.value && agent.value.toolCalls && agent.value.toolCalls.length > 0) ? agent.value.toolCalls : fixture.toolCalls}">
-            <AiToolCall
-              toolCall="{$item}"
-              defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
-              showInput="summary"
-              showOutput="summary" />
-          </Items>
-        </VStack>
+        </property>
+        <property name="statusTemplate">
+        </property>
+        <property name="chatTemplate">
+          <VStack gap="$space-3">
+            <VStack gap="$space-2">
+              <Items data="{(agent.value && agent.value.messages && agent.value.messages.length > 0) ? agent.value.messages : fixture.messages}" gap="$space-2">
+                <AiMessageParts
+                  message="{$item}"
+                  streaming="{$item.status === 'streaming'}"
+                  collapseReasoning="true" />
+              </Items>
+            </VStack>
 
-        <VStack gap="$space-2">
-          <HStack gap="$space-2" verticalAlignment="center">
-            <Text variant="secondary">Approvals</Text>
-            <Badge value="{((agent.value && agent.value.pendingApprovals) ? agent.value.pendingApprovals.length : fixture.pendingApprovals.length) + ' pending'}" />
-          </HStack>
-          <Items data="{fixture.resolvedApprovals}">
-            <AiApprovalRequest request="{$item}" running="{false}" />
-          </Items>
-          <Items data="{(agent.value && agent.value.pendingApprovals && agent.value.pendingApprovals.length > 0) ? agent.value.pendingApprovals : fixture.pendingApprovals}">
-            <AiApprovalRequest
-              request="{$item}"
-              running="true"
-              onApprove="toast('Approved ' + $event.requestId)"
-              onReject="toast('Rejected ' + $event.requestId)" />
-          </Items>
-        </VStack>
-      </VStack>
-    </property>
-    <property name="composerTemplate">
-      <VStack gap="$space-2">
-        <Form onSubmit="agent.submit(prompt.value)">
-          <property name="buttonRowTemplate">
-            <HStack gap="$space-2" verticalAlignment="center" horizontalAlignment="end">
-              <Button label="Stop" variant="ghost" onClick="agent.stop()" enabled="{agent.value && agent.value.isRunning}" />
-              <Button label="Send" type="submit" enabled="{!agent.value || !agent.value.isRunning}" />
-            </HStack>
-          </property>
-          <VStack gap="$space-2">
-            <TextArea id="prompt" rows="3" placeholder="Describe the app you want to build" />
+            <VStack gap="$space-2">
+              <HStack gap="$space-2" verticalAlignment="center">
+                <Text variant="secondary">Tool activity</Text>
+                <Badge value="{((agent.value && agent.value.toolCalls) ? agent.value.toolCalls.length : fixture.toolCalls.length) + ' tools'}" />
+              </HStack>
+              <Items data="{(agent.value && agent.value.toolCalls && agent.value.toolCalls.length > 0) ? agent.value.toolCalls : fixture.toolCalls}">
+                <AiToolCall
+                  toolCall="{$item}"
+                  defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
+                  showInput="summary"
+                  showOutput="summary" />
+              </Items>
+            </VStack>
+
+            <VStack gap="$space-2">
+              <HStack gap="$space-2" verticalAlignment="center">
+                <Text variant="secondary">Approvals</Text>
+                <Badge value="{((agent.value && agent.value.pendingApprovals) ? agent.value.pendingApprovals.length : fixture.pendingApprovals.length) + ' pending'}" />
+              </HStack>
+              <Items data="{fixture.resolvedApprovals}">
+                <AiApprovalRequest request="{$item}" running="{false}" />
+              </Items>
+              <Items data="{(agent.value && agent.value.pendingApprovals && agent.value.pendingApprovals.length > 0) ? agent.value.pendingApprovals : fixture.pendingApprovals}">
+                <AiApprovalRequest
+                  request="{$item}"
+                  running="true"
+                  onApprove="toast('Approved ' + $event.requestId)"
+                  onReject="toast('Rejected ' + $event.requestId)" />
+              </Items>
+            </VStack>
           </VStack>
-        </Form>
-      </VStack>
-    </property>
-    <property name="previewTemplate">
-      <XmluiPreview
-        code="{(agent.value && agent.value.code) || fixture.code}"
-        lastSuccessfulCode="{(agent.value && agent.value.lastSuccessfulCode) || fixture.code}"
-        status="{agent.value && agent.value.generation && agent.value.generation.status}" />
-    </property>
-    <property name="codeTemplate">
-      <VStack height="100%" minHeight="0">
-        <CodeView code="{(agent.value && agent.value.code) || fixture.code}" />
-      </VStack>
-    </property>
-  </XmluiBuilderFrame>
+        </property>
+        <property name="composerTemplate">
+          <VStack gap="$space-2">
+            <Form onSubmit="agent.submit(prompt.value)">
+              <property name="buttonRowTemplate">
+                <HStack gap="$space-2" verticalAlignment="center" horizontalAlignment="end">
+                  <Button label="Stop" variant="ghost" onClick="agent.stop()" enabled="{agent.value && agent.value.isRunning}" />
+                  <Button label="Send" type="submit" enabled="{!agent.value || !agent.value.isRunning}" />
+                </HStack>
+              </property>
+              <VStack gap="$space-2">
+                <TextArea id="prompt" rows="3" placeholder="Describe the app you want to build" />
+              </VStack>
+            </Form>
+          </VStack>
+        </property>
+        <property name="previewTemplate">
+          <XmluiPreview
+            code="{(agent.value && agent.value.code) || fixture.code}"
+            lastSuccessfulCode="{(agent.value && agent.value.lastSuccessfulCode) || fixture.code}"
+            status="{agent.value && agent.value.generation && agent.value.generation.status}" />
+        </property>
+        <property name="codeTemplate">
+          <VStack height="100%" minHeight="0">
+            <CodeView code="{(agent.value && agent.value.code) || fixture.code}" />
+          </VStack>
+        </property>
+      </XmluiBuilderFrame>
+    </Page>
+    <Page url="/components">
+      <Text>hello</Text>
+    </Page>
+  </Pages>
 </App>
