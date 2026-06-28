@@ -33,7 +33,28 @@ $outlineStyle-AiPromptInput--focus: createThemeVar("Input:outlineStyle-#{$compon
 $outlineOffset-AiPromptInput--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
 $backgroundColor-control-AiPromptInput: createThemeVar("backgroundColor-control-AiPromptInput");
 $backgroundColor-control-AiPromptInput--hover: createThemeVar("backgroundColor-control-AiPromptInput--hover");
+$backgroundColor-control-AiPromptInput--focus: createThemeVar("backgroundColor-control-AiPromptInput--focus");
+$backgroundColor-control-AiPromptInput--disabled: createThemeVar("backgroundColor-control-AiPromptInput--disabled");
 $borderColor-control-AiPromptInput: createThemeVar("borderColor-control-AiPromptInput");
+$borderColor-control-AiPromptInput--hover: createThemeVar("borderColor-control-AiPromptInput--hover");
+$borderColor-control-AiPromptInput--focus: createThemeVar("borderColor-control-AiPromptInput--focus");
+$borderColor-control-AiPromptInput--disabled: createThemeVar("borderColor-control-AiPromptInput--disabled");
+$borderRadius-control-AiPromptInput: createThemeVar("borderRadius-control-AiPromptInput");
+$borderWidth-control-AiPromptInput: createThemeVar("borderWidth-control-AiPromptInput");
+$borderStyle-control-AiPromptInput: createThemeVar("borderStyle-control-AiPromptInput");
+$textColor-control-AiPromptInput: createThemeVar("textColor-control-AiPromptInput");
+$textColor-control-AiPromptInput--hover: createThemeVar("textColor-control-AiPromptInput--hover");
+$textColor-control-AiPromptInput--focus: createThemeVar("textColor-control-AiPromptInput--focus");
+$textColor-control-AiPromptInput--disabled: createThemeVar("textColor-control-AiPromptInput--disabled");
+$minHeight-control-AiPromptInput: createThemeVar("minHeight-control-AiPromptInput");
+$minWidth-control-AiPromptInput: createThemeVar("minWidth-control-AiPromptInput");
+$boxShadow-control-AiPromptInput: createThemeVar("boxShadow-control-AiPromptInput");
+$boxShadow-control-AiPromptInput--hover: createThemeVar("boxShadow-control-AiPromptInput--hover");
+$boxShadow-control-AiPromptInput--focus: createThemeVar("boxShadow-control-AiPromptInput--focus");
+$outlineWidth-control-AiPromptInput--focus: createThemeVar("outlineWidth-control-AiPromptInput--focus");
+$outlineColor-control-AiPromptInput--focus: createThemeVar("outlineColor-control-AiPromptInput--focus");
+$outlineStyle-control-AiPromptInput--focus: createThemeVar("outlineStyle-control-AiPromptInput--focus");
+$outlineOffset-control-AiPromptInput--focus: createThemeVar("outlineOffset-control-AiPromptInput--focus");
 $backgroundColor-send-AiPromptInput: createThemeVar("backgroundColor-send-AiPromptInput");
 $backgroundColor-send-AiPromptInput--hover: createThemeVar("backgroundColor-send-AiPromptInput--hover");
 $textColor-send-AiPromptInput: createThemeVar("textColor-send-AiPromptInput");
@@ -135,7 +156,6 @@ $minHeight-input-AiPromptInput: createThemeVar("minHeight-input-AiPromptInput");
     justify-content: flex-end;
   }
 
-  .modelSelect,
   .sendButton,
   .stopButton {
     min-height: 2rem;
@@ -149,16 +169,53 @@ $minHeight-input-AiPromptInput: createThemeVar("minHeight-input-AiPromptInput");
   }
 
   .modelSelect {
-    max-width: 14rem;
-    min-width: 0;
-    padding: 0 t.$space-3;
+    max-width: 100%;
+    min-width: $minWidth-control-AiPromptInput;
+    min-height: $minHeight-control-AiPromptInput;
+    padding: t.$space-2 !important;
+    border-width: $borderWidth-control-AiPromptInput;
+    border-style: $borderStyle-control-AiPromptInput;
+    border-color: $borderColor-control-AiPromptInput;
+    border-radius: $borderRadius-control-AiPromptInput;
     background: $backgroundColor-control-AiPromptInput;
-    color: inherit;
+    color: $textColor-control-AiPromptInput;
+    box-shadow: $boxShadow-control-AiPromptInput;
+    font: inherit;
+    line-height: normal;
     cursor: pointer;
+    transition:
+      border-color 0.16s ease,
+      background-color 0.16s ease,
+      box-shadow 0.16s ease,
+      color 0.16s ease;
   }
 
-  .modelSelect:hover {
+  .modelSelect:not(:disabled):hover {
+    border-color: $borderColor-control-AiPromptInput--hover;
     background: $backgroundColor-control-AiPromptInput--hover;
+    box-shadow: $boxShadow-control-AiPromptInput--hover;
+    color: $textColor-control-AiPromptInput--hover;
+  }
+
+  .modelSelect:not(:disabled):active,
+  .modelSelect:focus-visible {
+    border-color: $borderColor-control-AiPromptInput--focus;
+    background: $backgroundColor-control-AiPromptInput--focus;
+    box-shadow: $boxShadow-control-AiPromptInput--focus;
+    color: $textColor-control-AiPromptInput--focus;
+  }
+
+  .modelSelect:focus-visible {
+    outline-width: $outlineWidth-control-AiPromptInput--focus;
+    outline-color: $outlineColor-control-AiPromptInput--focus;
+    outline-style: $outlineStyle-control-AiPromptInput--focus;
+    outline-offset: $outlineOffset-control-AiPromptInput--focus;
+  }
+
+  .modelSelect:disabled {
+    border-color: $borderColor-control-AiPromptInput--disabled;
+    background: $backgroundColor-control-AiPromptInput--disabled;
+    color: $textColor-control-AiPromptInput--disabled;
   }
 
   .sendButton,
