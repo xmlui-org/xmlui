@@ -45,20 +45,52 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: $gap-XmluiBuilderFrame;
-    padding: $padding-XmluiBuilderFrame;
+    gap: 0;
+    padding: 0;
   }
 
   .toolbar,
   .status {
-    border-radius: calc($borderRadius-XmluiBuilderFrame / 1.5);
     padding: $padding-toolbar-XmluiBuilderFrame;
     background: $backgroundColor-toolbar-XmluiBuilderFrame;
-    border: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 55%, transparent);
+  }
+
+  .toolbar {
+    min-height: 3.125rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $gap-XmluiBuilderFrame;
+    border-bottom: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 75%, transparent);
+  }
+
+  .brandMark {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    color: #2f6fdb;
+    border: 1px solid #cfdcf5;
+    border-radius: 2px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .toolbarActions {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   .status {
     background: $backgroundColor-status-XmluiBuilderFrame;
+    border-top: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 55%, transparent);
   }
 
   .topTabs,
@@ -102,6 +134,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     display: flex;
     flex-direction: column;
     gap: $gap-panel-XmluiBuilderFrame;
+    padding: $padding-XmluiBuilderFrame;
   }
 
   .splitLayout {
@@ -109,6 +142,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     min-height: 0;
     display: flex;
     flex-direction: column;
+    padding: $padding-XmluiBuilderFrame;
   }
 
   .splitterHost {
@@ -132,7 +166,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
       &::before {
         content: "";
         position: absolute;
-        background: color-mix(in srgb, $borderColor-XmluiBuilderFrame 68%, transparent);
+        background: $borderColor-XmluiBuilderFrame;
         transition:
           background-color 0.16s ease,
           opacity 0.16s ease,
@@ -188,7 +222,7 @@ $borderColor-tab-XmluiBuilderFrame--active: createThemeVar("borderColor-tab-Xmlu
     background: $backgroundColor-panel-XmluiBuilderFrame;
     display: flex;
     flex-direction: column;
-    border: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 50%, transparent);
+    /* border: 1px solid color-mix(in srgb, $borderColor-XmluiBuilderFrame 50%, transparent); */
   }
 
   .workspacePane {

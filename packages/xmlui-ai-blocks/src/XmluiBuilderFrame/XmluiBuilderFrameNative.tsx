@@ -541,7 +541,10 @@ export const XmluiBuilderFrameNative = memo(
         <div className={classnames(styles.shell, classes?.shell)}>
           {toolbarTemplate ? (
             <div className={classnames(styles.toolbar, classes?.toolbar)} data-region="toolbar">
-              {toolbarTemplate}
+              <div className={styles.brandMark} aria-label="XMLUI">
+                ui
+              </div>
+              <div className={styles.toolbarActions}>{toolbarTemplate}</div>
             </div>
           ) : null}
 

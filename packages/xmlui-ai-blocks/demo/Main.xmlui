@@ -101,7 +101,7 @@
     <Page url="/">
       <XmluiBuilderFrame
         maxWidth="1200px"
-        height="calc(100vh - 42px)"
+        height="500px"
         minHeight="620px"
         layout="{fixture.layoutMode}"
         chatPlacement="start"
@@ -118,7 +118,6 @@
           selectedModel="demo-model" />
         <property name="toolbarTemplate">
           <HStack gap="$space-2" verticalAlignment="center" wrapContent="false">
-            <Badge value="{(agent.value && agent.value.codeStatus) || fixture.status}" />
             <SpaceFiller />
             <Button
               label="Preview"
