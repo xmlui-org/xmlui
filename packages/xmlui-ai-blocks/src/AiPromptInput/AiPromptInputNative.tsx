@@ -120,11 +120,13 @@ export const AiPromptInputNative = memo(
     ref,
   ) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const stateSyncTimerRef = useRef<number | undefined>(undefined);
+    const [draftValue, setDraftValue] = useState(value ?? initialValue ?? "");
     const [focused, setFocused] = useState(false);
     const modelOptions = models?.map(normalizeModel) ?? [];
     const selectedModel = model ?? resolveInitialModel(models, initialModel);
     const disabled = !enabled;
-    const canSubmit = !disabled && !readOnly && !running && Boolean(value?.trim());
+    const canSubmit = !disabled && !readOnly && !running && Boolean(draftValue.trim());
 
     useEffect(() => {
       updateState?.(
@@ -137,6 +139,10 @@ export const AiPromptInputNative = memo(
     }, [initialModel, initialValue, models, updateState]);
 
     useEffect(() => {
+      setDraftValue(value ?? "");
+    }, [value]);
+
+    useEffect(() => {
       if (autoFocus) {
         window.setTimeout(() => textareaRef.current?.focus(), 0);
       }
@@ -144,28 +150,79 @@ export const AiPromptInputNative = memo(
 
     const updateValue = useCallback(
       (nextValue: string) => {
+        if (stateSyncTimerRef.current !== undefined) {
+          window.clearTimeout(stateSyncTimerRef.current);
+          stateSyncTimerRef.current = undefined;
+        }
+        setDraftValue(nextValue);
         updateState?.({ value: nextValue, model: selectedModel });
         onDidChange?.(nextValue);
       },
       [onDidChange, selectedModel, updateState],
     );
 
+    const updateDraftValue = useCallback(
+      (nextValue: string) => {
+        setDraftValue(nextValue);
+        onDidChange?.(nextValue);
+      },
+      [onDidChange],
+    );
+
+    const syncDraftValue = useCallback(() => {
+      if (stateSyncTimerRef.current !== undefined) {
+        window.clearTimeout(stateSyncTimerRef.current);
+        stateSyncTimerRef.current = undefined;
+      }
+      updateState?.({ value: draftValue, model: selectedModel });
+    }, [draftValue, selectedModel, updateState]);
+
+    useEffect(() => {
+      if (!focused) return undefined;
+      if (stateSyncTimerRef.current !== undefined) {
+        window.clearTimeout(stateSyncTimerRef.current);
+      }
+      stateSyncTimerRef.current = window.setTimeout(() => {
+        stateSyncTimerRef.current = undefined;
+        updateState?.({ value: draftValue, model: selectedModel });
+      }, 300);
+
+      return () => {
+        if (stateSyncTimerRef.current !== undefined) {
+          window.clearTimeout(stateSyncTimerRef.current);
+          stateSyncTimerRef.current = undefined;
+        }
+      };
+    }, [draftValue, focused, selectedModel, updateState]);
+
     const updateModel = useCallback(
       (nextModel: string | undefined) => {
-        updateState?.({ value: value ?? "", model: nextModel });
+        updateState?.({ value: draftValue, model: nextModel });
         onModelChange?.({ model: nextModel });
       },
-      [onModelChange, updateState, value],
+      [draftValue, onModelChange, updateState],
     );
 
     const submit = useCallback(() => {
-      const trimmed = value?.trim() ?? "";
+      const trimmed = draftValue.trim();
       if (!trimmed || running || disabled || readOnly) return;
-      onSubmit?.({ value: value ?? "", model: selectedModel });
+      onSubmit?.({ value: draftValue, model: selectedModel });
       if (clearOnSubmit) {
         updateValue("");
+      } else {
+        syncDraftValue();
       }
-    }, [clearOnSubmit, disabled, onSubmit, readOnly, running, selectedModel, updateValue, value]);
+    }, [
+      clearOnSubmit,
+      disabled,
+      draftValue,
+      onSubmit,
+      readOnly,
+      running,
+      selectedModel,
+      syncDraftValue,
+      updateValue,
+    ]);
 
     useEffect(() => {
       registerComponentApi?.({
@@ -181,7 +238,7 @@ export const AiPromptInputNative = memo(
     }, [onStop, registerComponentApi, submit, updateModel, updateValue]);
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-      updateValue(event.target.value);
+      updateDraftValue(event.target.value);
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -202,10 +259,11 @@ export const AiPromptInputNative = memo(
         <TextareaAutosize
           ref={textareaRef}
           className={classnames(styles.textarea, classes?.input)}
-          value={value ?? ""}
+          value={draftValue}
           placeholder={placeholder}
           minRows={minRows ?? rows}
           maxRows={maxRows}
+          cacheMeasurements
           maxLength={maxLength}
           disabled={disabled}
           readOnly={readOnly}
@@ -214,7 +272,10 @@ export const AiPromptInputNative = memo(
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onBlur={() => {
+            setFocused(false);
+            syncDraftValue();
+          }}
         />
 
         <div className={classnames(styles.footer, classes?.footer)}>
