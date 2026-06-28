@@ -1,4 +1,13 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata";
 import {
@@ -32,6 +41,30 @@ export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { chil
     () => mergeThemeVariableLayers([defaultThemeVariables], tone),
     [tone],
   );
+  const cssVariables = useMemo(
+    () => themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
+    [variables],
+  );
+  useLayoutEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+    const root = document.documentElement;
+    const previous = new Map<string, string>();
+    for (const [name, value] of Object.entries(cssVariables)) {
+      previous.set(name, root.style.getPropertyValue(name));
+      root.style.setProperty(name, String(value));
+    }
+    return () => {
+      for (const [name, value] of previous) {
+        if (value) {
+          root.style.setProperty(name, value);
+        } else {
+          root.style.removeProperty(name);
+        }
+      }
+    };
+  }, [cssVariables]);
   const value = useMemo<ThemeRuntimeContext>(
     () => ({ variables, tone, setTone }),
     [tone, variables],

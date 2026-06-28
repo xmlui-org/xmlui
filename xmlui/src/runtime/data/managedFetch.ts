@@ -229,7 +229,11 @@ export function appendQueryParams(url: string, queryParams: Record<string, unkno
     }
     base.searchParams.set(key, String(value));
   }
-  return base.pathname + base.search + base.hash;
+  return isAbsoluteUrl(url) ? base.href : base.pathname + base.search + base.hash;
+}
+
+function isAbsoluteUrl(url: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(url);
 }
 
 async function defaultFetchAdapter(request: ManagedRequest, signal: AbortSignal): Promise<ManagedResponse> {

@@ -141,6 +141,7 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
   const [activeIndex, setActiveIndex] = useState(-1);
   const [searchTerm, setSearchTerm] = useState("");
   const [validationTooltipVisible, setValidationTooltipVisible] = useState(false);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
   const formValue = fieldName !== undefined ? getFormValue?.(fieldName) as SelectValue : undefined;
   const currentValue = formValue !== undefined
     ? normalizeValue(formValue, multiSelect)
@@ -427,28 +428,33 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
         onFocus={() => void onFocus?.()}
         onBlur={() => void onBlur?.()}
       >
-        {selectedOptions.length > 0 && valueTemplateRenderer
-          ? selectedOptions.map((option, index) => (
-            <span key={`${String(option.value ?? "")}:${index}`} className={styles.selectValueTemplate}>
-              {valueTemplateRenderer({
-                $item: option,
-                $itemIndex: index,
-                $itemContext: {
-                  removeItem: () => {
-                    if (multiSelect) {
-                      const next = normalizeArrayValue(currentValueRef.current)
-                        .map(String)
-                        .filter((value) => value !== String(option.value ?? ""));
-                      updateValue(next);
-                    } else {
-                      updateValue(null);
-                    }
+        <span className={selectedOptions.length > 0 ? styles.selectValue : styles.selectPlaceholder}>
+          {selectedOptions.length > 0 && valueTemplateRenderer
+            ? selectedOptions.map((option, index) => (
+              <span key={`${String(option.value ?? "")}:${index}`} className={styles.selectValueTemplate}>
+                {valueTemplateRenderer({
+                  $item: option,
+                  $itemIndex: index,
+                  $itemContext: {
+                    removeItem: () => {
+                      if (multiSelect) {
+                        const next = normalizeArrayValue(currentValueRef.current)
+                          .map(String)
+                          .filter((value) => value !== String(option.value ?? ""));
+                        updateValue(next);
+                      } else {
+                        updateValue(null);
+                      }
+                    },
                   },
-                },
-              }, index)}
-            </span>
-          ))
-          : displayText}
+                }, index)}
+              </span>
+            ))
+            : displayText}
+        </span>
+        <span className={styles.selectActions} aria-hidden="true">
+          <span className={styles.selectChevron} />
+        </span>
       </button>
       {showClearButton ? (
         <button
@@ -512,10 +518,14 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
           data-state="open"
           data-part-id="listWrapper"
           data-xmlui-part="listWrapper"
-          data-radix-select-viewport=""
           aria-multiselectable={multiSelect || undefined}
           className={styles.selectOptions}
-          style={dropdownHeight !== undefined ? { maxHeight: cssLength(dropdownHeight) } : undefined}
+          style={dropdownHeight !== undefined
+            ? {
+              maxHeight: cssLength(dropdownHeight),
+              "--xmlui-dropdownHeight-Select": cssLength(dropdownHeight),
+            } as CSSProperties
+            : undefined}
         >
           {searchable ? (
             <input
@@ -536,44 +546,65 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
             emptyListTemplate ? <div className={styles.selectEmpty}>{emptyListTemplate}</div> : null
           ) : null}
           {scrollIndicators && visibleOptions.length > 5 ? (
-            <div className={styles.selectScrollUpButton} aria-hidden="true" />
+            <button
+              type="button"
+              className={styles.selectScrollUpButton}
+              aria-hidden="true"
+              tabIndex={-1}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => viewportRef.current?.scrollBy({ top: -80, behavior: "smooth" })}
+            >
+              <span className={styles.selectScrollChevronUp} />
+            </button>
           ) : null}
-          {groupedVisibleItems.map((item, index) => {
-            if (item.kind === "header") {
+          <div ref={viewportRef} className={styles.selectViewport} data-radix-select-viewport="">
+            {groupedVisibleItems.map((item, index) => {
+              if (item.kind === "header") {
+                return (
+                  <div key={`header:${item.key}:${index}`} className={styles.selectGroupHeader}>
+                    {item.content}
+                  </div>
+                );
+              }
+              const option = item.option;
+              const optionValue = String(option.value ?? "");
+              const selected = selectedValues.includes(optionValue);
               return (
-                <div key={`header:${item.key}:${index}`} className={styles.selectGroupHeader}>
-                  {item.content}
-                </div>
+                <button
+                  key={`${optionValue}:${index}`}
+                  data-testid={option.testId}
+                  data-value={optionValue}
+                  type="button"
+                  role="option"
+                  aria-selected={selected}
+                  aria-disabled={!option.enabled || undefined}
+                  disabled={!option.enabled}
+                  className={cx(
+                    styles.selectOption,
+                    selected ? styles.selectOptionSelected : undefined,
+                    index === activeIndex ? styles.selectOptionActive : undefined,
+                  )}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => selectOption(option)}
+                >
+                  <span className={styles.selectOptionLabel}>{renderOptionLabel(option)}</span>
+                  {selected ? <span className={styles.selectOptionIndicator} aria-hidden="true">✓</span> : null}
+                </button>
               );
-            }
-            const option = item.option;
-            const optionValue = String(option.value ?? "");
-            const selected = selectedValues.includes(optionValue);
-            return (
-              <button
-                key={`${optionValue}:${index}`}
-                data-testid={option.testId}
-                data-value={optionValue}
-                type="button"
-                role="option"
-                aria-selected={selected}
-                aria-disabled={!option.enabled || undefined}
-                disabled={!option.enabled}
-                className={cx(
-                  styles.selectOption,
-                  selected ? styles.selectOptionSelected : undefined,
-                  index === activeIndex ? styles.selectOptionActive : undefined,
-                )}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => selectOption(option)}
-              >
-                {renderOptionLabel(option)}
-              </button>
-            );
-          })}
-          {popupChildren}
+            })}
+            {popupChildren}
+          </div>
           {scrollIndicators && visibleOptions.length > 5 ? (
-            <div className={styles.selectScrollDownButton} aria-hidden="true" />
+            <button
+              type="button"
+              className={styles.selectScrollDownButton}
+              aria-hidden="true"
+              tabIndex={-1}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => viewportRef.current?.scrollBy({ top: 80, behavior: "smooth" })}
+            >
+              <span className={styles.selectScrollChevronDown} />
+            </button>
           ) : null}
         </div>
         </div>

@@ -1,0 +1,14 @@
+{
+  "name": "xmlui-sample",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "build": "xmlui build --buildMode=INLINE_ALL --withMock",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "xmlui": "*"
+  }
+}

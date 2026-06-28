@@ -7,7 +7,8 @@
     "xmlui",
     "packages/*",
     "tools/*",
-    "website"
+    "website",
+    "sample"
   ],
   "scripts": {
     "setup": "npm install",

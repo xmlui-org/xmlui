@@ -63,6 +63,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
   }
 
   const transformedRoot = transformElement(root, parsed.source, sourceId);
+  const referenceNames = collectReferenceNames(transformedRoot);
 
   if (transformedRoot.type === "Component") {
     const name = transformedRoot.props.name;
@@ -74,6 +75,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
       sourceId,
       allowImplicitGlobals: true,
       extensionFunctions: options.extensionFunctions,
+      referenceNames,
     });
     return {
       kind: "component",
@@ -92,6 +94,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     sourceId,
     allowImplicitGlobals: false,
     extensionFunctions: options.extensionFunctions,
+    referenceNames,
   });
 
   return {
@@ -104,6 +107,7 @@ type AnalyzeOptions = {
   sourceId: string;
   allowImplicitGlobals: boolean;
   extensionFunctions?: Iterable<string>;
+  referenceNames?: Iterable<string>;
 };
 
 function analyzeElementScripts(
@@ -117,6 +121,7 @@ function analyzeElementScripts(
         sourceId: options.sourceId,
         allowImplicitGlobals: options.allowImplicitGlobals,
         specialNames: options.extensionFunctions,
+        referenceNames: options.referenceNames,
       });
 
   analyzeParsedBindings(element.parsed, scope);
@@ -156,6 +161,29 @@ function analyzeParsedBindings(parsed: XmluiParsedBindings | undefined, scope: X
     }
   }
   validateReactiveCycles(parsed);
+}
+
+function collectReferenceNames(element: XmluiElement): string[] {
+  const names = new Set<string>();
+  const visit = (current: XmluiElement) => {
+    for (const propName of ["id", "uid"]) {
+      const value = current.props[propName];
+      if (value && validIdentifier(value)) {
+        names.add(value);
+      }
+    }
+    for (const child of current.children) {
+      if (child.kind === "element") {
+        visit(child);
+      }
+    }
+  };
+  visit(element);
+  return Array.from(names);
+}
+
+function validIdentifier(value: string): boolean {
+  return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(value);
 }
 
 function analyzeTextSegments(segments: MixedTextSegment[] | undefined, scope: XmluiScope): void {

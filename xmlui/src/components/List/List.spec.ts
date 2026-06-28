@@ -50,6 +50,52 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toContainText("Cherry");
   });
 
+  test("fetches items when data is a url string", async ({ initTestBed, page, createListDriver }) => {
+    await page.route("https://api.example.test/lines", async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify([
+          { name: "Bakerloo", status: "Good Service" },
+          { name: "Central", status: "Minor Delays" },
+        ]),
+      });
+    });
+
+    await initTestBed(`
+      <List data="https://api.example.test/lines">
+        <Text>{$item.name}: {$item.status}</Text>
+      </List>
+    `);
+
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Bakerloo: Good Service");
+    await expect(driver.component).toContainText("Central: Minor Delays");
+    await expect(driver.component).not.toContainText("No data");
+  });
+
+  test("plain text rows keep old baseline spacing", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <List data="{[
+        { id: 'bakerloo', name: 'Bakerloo', status: 'Good Service' },
+        { id: 'central', name: 'Central', status: 'Minor Delays' },
+        { id: 'circle', name: 'Circle', status: 'Minor Delays' }
+      ]}">
+        <Text>{$item.name}: {$item.status}</Text>
+      </List>
+    `);
+
+    await expect(page.getByText("Bakerloo: Good Service")).toBeVisible();
+    const rowTopDelta = await page.evaluate(() => {
+      const rows = Array.from(document.querySelectorAll('[data-list-item-type="ITEM"]'));
+      if (rows.length < 2) {
+        return 0;
+      }
+      return rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().top;
+    });
+    expect(rowTopDelta).toBeCloseTo(27.1875, 2);
+  });
+
   test("handles empty data gracefully", async ({ initTestBed, createListDriver }) => {
     await initTestBed(`<List data="{[]}"/>`);
     const driver = await createListDriver();

@@ -64,6 +64,23 @@ test.describe("Basic Functionality", () => {
     await expect(page.locator("td").filter({ hasText: "Fruit" }).first()).toBeVisible();
   });
 
+  test("accepts DataSource component id as table data", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <DataSource id="tubeStations" mockData="{[
+        { id: 'station-1', name: 'Baker Street', modes: ['tube'] },
+        { id: 'station-2', name: 'Oxford Circus', modes: ['tube', 'bus'] }
+      ]}" />
+      <Table data="{tubeStations}" testId="table">
+        <Column bindTo="name" />
+        <Column bindTo="modes" />
+      </Table>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Baker Street" }).first()).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Oxford Circus" }).first()).toBeVisible();
+  });
+
   test("invokes onRowDoubleClick when row is double-clicked", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' testId="table" onRowDoubleClick="(item) => testState = item.name">

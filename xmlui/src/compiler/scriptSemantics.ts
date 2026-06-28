@@ -19,6 +19,7 @@ export type XmluiScope = {
   locals: Map<string, XmluiBinding>;
   globals: Map<string, XmluiBinding>;
   specials: Map<string, XmluiBinding>;
+  references: Map<string, XmluiBinding>;
 };
 
 export type CreateXmluiScopeOptions = {
@@ -26,6 +27,7 @@ export type CreateXmluiScopeOptions = {
   parent?: XmluiScope;
   allowImplicitGlobals?: boolean;
   specialNames?: Iterable<string>;
+  referenceNames?: Iterable<string>;
 };
 
 export type DependencyKind = XmluiBindingKind | "unresolved";
@@ -333,6 +335,7 @@ export function createXmluiScope(
     locals: new Map(),
     globals: new Map(options.parent?.globals),
     specials: new Map(options.parent?.specials),
+    references: new Map(options.parent?.references),
   };
 
   if (!scope.specials.has("$props")) {
@@ -393,6 +396,16 @@ export function createXmluiScope(
       });
     }
   }
+  for (const name of options.referenceNames ?? []) {
+    if (!scope.references.has(name)) {
+      scope.references.set(name, {
+        kind: "reference",
+        name,
+        mutable: false,
+        span: spanFromRange(sourceId, element.range),
+      });
+    }
+  }
 
   for (const name of Object.keys(element.globals)) {
     scope.globals.set(name, {
@@ -437,6 +450,9 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
   }
   if (scope.specials.has(name)) {
     return scope.specials.get(name);
+  }
+  if (scope.references.has(name)) {
+    return scope.references.get(name);
   }
   if (isBuiltInReferenceName(name)) {
     return {

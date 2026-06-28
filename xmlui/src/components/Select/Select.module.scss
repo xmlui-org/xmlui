@@ -1,5 +1,7 @@
 $themeVars: "";
 
+@layer reset, base, components, themes, dynamic;
+
 @function createThemeVar($componentVariable) {
   @return var(--xmlui-#{$componentVariable});
 }
@@ -17,7 +19,7 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
   themeVars: "";
 }
 
-@layer components {
+@layer dynamic {
   .selectRoot {
     box-sizing: border-box;
     display: inline-flex;
@@ -25,21 +27,8 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
     gap: var(--xmlui-gap-Select, var(--xmlui-space-1));
     max-width: 100%;
     position: relative;
-    border-color: var(--xmlui-borderColor-Select);
-    border-width: var(--xmlui-borderWidth-Select);
-    border-style: var(--xmlui-borderStyle-Select);
-    border-radius: var(--xmlui-borderRadius-Select);
-    background-color: var(--xmlui-backgroundColor-Select);
-    color: var(--xmlui-textColor-Select);
-    box-shadow: var(--xmlui-boxShadow-Select);
-    font-size: var(--xmlui-fontSize-Select);
-  }
-
-  .selectRoot:hover {
-    border-color: var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select));
-    background-color: var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select));
-    color: var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select));
-    box-shadow: var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select));
+    color: var(--xmlui-textColor-Select, var(--xmlui-textColor-Input, var(--xmlui-textColor-primary)));
+    font-size: var(--xmlui-fontSize-Select, inherit);
   }
 
   .selectRoot:hover .selectTrigger {
@@ -98,23 +87,40 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
 
   .selectTrigger {
     box-sizing: border-box;
-    display: inline-flex;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-start;
+    gap: 0;
     width: 100%;
-    min-height: var(--xmlui-height-Select, 2rem);
-    padding: var(--xmlui-paddingVertical-Select, 0.25rem) var(--xmlui-paddingHorizontal-Select, 0.5rem);
-    border-color: var(--xmlui-borderColor-Select);
-    border-width: var(--xmlui-borderWidth-Select);
-    border-style: var(--xmlui-borderStyle-Select);
-    border-radius: var(--xmlui-borderRadius-Select);
-    background-color: var(--xmlui-backgroundColor-Select);
-    color: var(--xmlui-textColor-Select);
-    box-shadow: var(--xmlui-boxShadow-Select);
+    height: max-content;
+    min-width: var(--xmlui-minWidth-Select, var(--xmlui-space-16));
+    min-height: var(--xmlui-minHeight-Select, var(--xmlui-height-Select, 2.5rem));
+    padding-top: var(--xmlui-paddingTop-Select, var(--xmlui-paddingVertical-Select, var(--xmlui-space-2)));
+    padding-right: var(--xmlui-paddingRight-Select, var(--xmlui-paddingHorizontal-Select, var(--xmlui-space-2)));
+    padding-bottom: var(--xmlui-paddingBottom-Select, var(--xmlui-paddingVertical-Select, var(--xmlui-space-2)));
+    padding-left: var(--xmlui-paddingLeft-Select, var(--xmlui-paddingHorizontal-Select, var(--xmlui-space-2)));
+    border-color: var(--xmlui-borderColor-Select, var(--xmlui-borderColor-Input, var(--xmlui-borderColor)));
+    border-width: var(--xmlui-borderWidth-Select, var(--xmlui-borderWidth-Input, 1px));
+    border-style: var(--xmlui-borderStyle-Select, var(--xmlui-borderStyle-Input, solid));
+    border-radius: var(--xmlui-borderRadius-Select, var(--xmlui-borderRadius-Input, var(--xmlui-borderRadius)));
+    background-color: var(--xmlui-backgroundColor-Select, var(--xmlui-backgroundColor-Input, transparent));
+    color: var(--xmlui-textColor-Select, var(--xmlui-textColor-Input, var(--xmlui-textColor-primary)));
+    box-shadow: var(--xmlui-boxShadow-Select, none);
     font: inherit;
     font-size: var(--xmlui-fontSize-Select);
+    line-height: normal;
     text-align: left;
     cursor: pointer;
+    outline: none;
+  }
+
+  .selectTrigger:focus-visible,
+  .selectTrigger:focus {
+    outline-width: var(--xmlui-outlineWidth-Select--focus, var(--xmlui-outlineWidth-Input--focus, 1px));
+    outline-color: var(--xmlui-outlineColor-Select--focus, var(--xmlui-outlineColor-Input--focus, var(--xmlui-borderColor-Select)));
+    outline-style: var(--xmlui-outlineStyle-Select--focus, var(--xmlui-outlineStyle-Input--focus, solid));
+    outline-offset: var(--xmlui-outlineOffset-Select--focus, var(--xmlui-outlineOffset-Input--focus, 0));
   }
 
   .selectValidationWarning .selectTrigger {
@@ -174,6 +180,50 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
   .selectValueTemplate {
     display: inline-flex;
     align-items: center;
+  }
+
+  .selectValue,
+  .selectPlaceholder {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    outline: none;
+    background-color: transparent;
+  }
+
+  .selectPlaceholder {
+    justify-content: start;
+    color: var(--xmlui-textColor-placeholder-Select, var(--xmlui-textColor-secondary));
+  }
+
+  .selectTrigger > span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow: hidden;
+  }
+
+  .selectActions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--xmlui-space-1_5, 0.375rem);
+    color: var(--xmlui-textColor-indicator-Select, currentColor);
+  }
+
+  .selectChevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-0.125rem) rotate(45deg);
   }
 
   .selectClearButton {
@@ -236,8 +286,12 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
   }
 
   .selectPopover {
-    position: relative;
+    position: absolute;
+    top: calc(100% + 0.15rem);
+    left: 0;
+    right: 0;
     min-width: 100%;
+    z-index: var(--xmlui-zIndex-Select, 10);
   }
 
   .selectOptions {
@@ -245,13 +299,25 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
     display: flex;
     flex-direction: column;
     min-width: 100%;
-    max-height: var(--xmlui-dropdownHeight-Select, 16rem);
+    max-height: var(--xmlui-dropdownHeight-Select, 280px);
+    overflow: hidden;
+    border: var(--xmlui-borderWidth-menu-Select, var(--xmlui-borderWidth-Select, 1px)) var(--xmlui-borderStyle-Select, solid) var(--xmlui-borderColor-menu-Select, var(--xmlui-borderColor-Select, var(--xmlui-borderColor)));
+    border-radius: var(--xmlui-borderRadius-menu-Select, var(--xmlui-borderRadius-Select, var(--xmlui-borderRadius)));
+    background-color: var(--xmlui-backgroundColor-menu-Select, var(--xmlui-backgroundColor-Select));
+    box-shadow: var(--xmlui-boxShadow-menu-Select, var(--xmlui-boxShadow-Select));
+  }
+
+  .selectViewport {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    max-height: var(--xmlui-dropdownHeight-Select, 280px);
     overflow: auto;
-    border: var(--xmlui-borderWidth-Select) var(--xmlui-borderStyle-Select) var(--xmlui-borderColor-Select);
-    border-radius: var(--xmlui-borderRadius-Select);
-    background-color: var(--xmlui-backgroundColor-Select);
-    box-shadow: var(--xmlui-boxShadow-Select);
-    z-index: var(--xmlui-zIndex-Select, 10);
+    scrollbar-width: none;
+  }
+
+  .selectViewport::-webkit-scrollbar {
+    display: none;
   }
 
   .selectSearch {
@@ -266,7 +332,10 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
   .selectStatus,
   .selectEmpty,
   .selectGroupHeader {
-    padding: var(--xmlui-paddingVertical-option-Select, 0.35rem) var(--xmlui-paddingHorizontal-option-Select, 0.5rem);
+    padding-top: var(--xmlui-paddingTop-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-space-2)));
+    padding-right: var(--xmlui-paddingRight-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-space-2)));
+    padding-bottom: var(--xmlui-paddingBottom-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-space-2)));
+    padding-left: var(--xmlui-paddingLeft-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-space-2)));
     color: var(--xmlui-textColor-Select);
   }
 
@@ -277,37 +346,95 @@ $boxShadow-Select: createThemeVar("boxShadow-Select");
 
   .selectScrollUpButton,
   .selectScrollDownButton {
-    flex: 0 0 0.5rem;
-    min-height: 0.5rem;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border: 0;
     background-color: var(--xmlui-backgroundColor-scrollIndicator-Select, transparent);
-    pointer-events: none;
+    color: var(--xmlui-textColor-indicator-Select, currentColor);
+    cursor: default;
+    font: inherit;
+    line-height: 1;
+  }
+
+  .selectScrollChevronUp,
+  .selectScrollChevronDown {
+    display: inline-flex;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+  }
+
+  .selectScrollChevronUp {
+    transform: translateY(0.125rem) rotate(225deg);
+  }
+
+  .selectScrollChevronDown {
+    transform: translateY(-0.125rem) rotate(45deg);
   }
 
   .selectOption {
     box-sizing: border-box;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--xmlui-space-1, 0.25rem);
     width: 100%;
-    padding: var(--xmlui-paddingVertical-option-Select, 0.35rem) var(--xmlui-paddingHorizontal-option-Select, 0.5rem);
+    min-height: var(--xmlui-minHeight-item-Select, var(--xmlui-space-7));
+    padding-top: var(--xmlui-paddingTop-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-space-2)));
+    padding-right: var(--xmlui-paddingRight-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-space-2)));
+    padding-bottom: var(--xmlui-paddingBottom-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-space-2)));
+    padding-left: var(--xmlui-paddingLeft-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-space-2)));
     border: 0;
-    background-color: var(--xmlui-backgroundColor-option-Select, transparent);
+    background-color: var(--xmlui-backgroundColor-item-Select, var(--xmlui-backgroundColor-option-Select, transparent));
     color: var(--xmlui-textColor-Select);
     font: inherit;
+    line-height: inherit;
     text-align: left;
     cursor: pointer;
+    user-select: none;
+    outline: none;
+    transition: background-color 0.2s ease;
   }
 
   .selectOption:hover,
   .selectOption:focus,
   .selectOptionActive {
-    background-color: var(--xmlui-backgroundColor-option-Select--hover, var(--xmlui-color-surface-100));
+    background-color: var(--xmlui-backgroundColor-item-Select--hover, var(--xmlui-backgroundColor-option-Select--hover, var(--xmlui-color-surface-100)));
   }
 
   .selectOption:disabled {
+    pointer-events: none;
     cursor: not-allowed;
-    opacity: var(--xmlui-opacity-option-Select--disabled, 0.65);
+    color: var(--xmlui-textColor-item-Select--disabled, var(--xmlui-textColor--disabled));
+    opacity: var(--xmlui-opacity-text-item-Select--disabled, var(--xmlui-opacity-option-Select--disabled, 0.5));
+    font-style: italic;
   }
 
   .selectOptionSelected {
-    background-color: var(--xmlui-backgroundColor-option-Select--selected, var(--xmlui-color-primary-100));
+    background-color: var(--xmlui-backgroundColor-item-Select--active, var(--xmlui-backgroundColor-option-Select--selected, var(--xmlui-color-surface-50)));
+  }
+
+  .selectOptionLabel {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .selectOptionIndicator {
+    display: flex;
+    flex-shrink: 0;
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-inline-end: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--xmlui-textColor-indicator-Select, currentColor);
   }
 
   .nativeMirror {

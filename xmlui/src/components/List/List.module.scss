@@ -42,10 +42,6 @@ $backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-List--hove
     position: relative;
   }
 
-  .borderCollapse + .borderCollapse {
-    margin-top: -1px;
-  }
-
   .listRow.listRowSelectable {
     cursor: pointer;
   }

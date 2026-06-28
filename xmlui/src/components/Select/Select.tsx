@@ -1,6 +1,7 @@
 import { createMetadata, dAutoFocus, dDidChange, dEnabled, dGotFocus, dInitialValue, dLostFocus, dPlaceholder, dReadonly, dRequired } from "../../component-core/metadata/helpers";
-import type { ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { XmluiElement } from "../../compiler/ir";
+import { managedFetchService } from "../../runtime/data/managedFetch";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { nonPropertyChildren, templateChildren, wrapComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { createRuntimeScope, type RuntimeScope } from "../../runtime/state";
@@ -13,13 +14,48 @@ const COMP = "Select";
 
 const selectStylesSource = `
 $backgroundColor-Select: createThemeVar("backgroundColor-Select");
+$backgroundColor-Select--disabled: createThemeVar("backgroundColor-Select--disabled");
 $textColor-Select: createThemeVar("textColor-Select");
+$textColor-Select--disabled: createThemeVar("textColor-Select--disabled");
 $borderColor-Select: createThemeVar("borderColor-Select");
+$borderColor-Select--hover: createThemeVar("borderColor-Select--hover");
+$borderColor-Select--disabled: createThemeVar("borderColor-Select--disabled");
 $borderWidth-Select: createThemeVar("borderWidth-Select");
 $borderStyle-Select: createThemeVar("borderStyle-Select");
 $borderRadius-Select: createThemeVar("borderRadius-Select");
 $fontSize-Select: createThemeVar("fontSize-Select");
 $boxShadow-Select: createThemeVar("boxShadow-Select");
+$textColor-placeholder-Select: createThemeVar("textColor-placeholder-Select");
+$outlineColor-Select--focus: createThemeVar("outlineColor-Select--focus");
+$outlineWidth-Select--focus: createThemeVar("outlineWidth-Select--focus");
+$outlineStyle-Select--focus: createThemeVar("outlineStyle-Select--focus");
+$outlineOffset-Select--focus: createThemeVar("outlineOffset-Select--focus");
+$minHeight-Select: createThemeVar("minHeight-Select");
+$minWidth-Select: createThemeVar("minWidth-Select");
+$paddingHorizontal-Select: createThemeVar("paddingHorizontal-Select");
+$paddingVertical-Select: createThemeVar("paddingVertical-Select");
+$paddingLeft-Select: createThemeVar("paddingLeft-Select");
+$paddingRight-Select: createThemeVar("paddingRight-Select");
+$paddingTop-Select: createThemeVar("paddingTop-Select");
+$paddingBottom-Select: createThemeVar("paddingBottom-Select");
+$backgroundColor-menu-Select: createThemeVar("backgroundColor-menu-Select");
+$borderRadius-menu-Select: createThemeVar("borderRadius-menu-Select");
+$boxShadow-menu-Select: createThemeVar("boxShadow-menu-Select");
+$borderWidth-menu-Select: createThemeVar("borderWidth-menu-Select");
+$borderColor-menu-Select: createThemeVar("borderColor-menu-Select");
+$paddingHorizontal-item-Select: createThemeVar("paddingHorizontal-item-Select");
+$paddingVertical-item-Select: createThemeVar("paddingVertical-item-Select");
+$paddingLeft-item-Select: createThemeVar("paddingLeft-item-Select");
+$paddingRight-item-Select: createThemeVar("paddingRight-item-Select");
+$paddingTop-item-Select: createThemeVar("paddingTop-item-Select");
+$paddingBottom-item-Select: createThemeVar("paddingBottom-item-Select");
+$backgroundColor-item-Select: createThemeVar("backgroundColor-item-Select");
+$backgroundColor-item-Select--active: createThemeVar("backgroundColor-item-Select--active");
+$backgroundColor-item-Select--hover: createThemeVar("backgroundColor-item-Select--hover");
+$textColor-item-Select--disabled: createThemeVar("textColor-item-Select--disabled");
+$opacity-text-item-Select--disabled: createThemeVar("opacity-text-item-Select--disabled");
+$textColor-indicator-Select: createThemeVar("textColor-indicator-Select");
+$minHeight-item-Select: createThemeVar("minHeight-item-Select");
 `;
 
 export const SelectMd = createMetadata({
@@ -96,14 +132,71 @@ export const SelectMd = createMetadata({
   },
   themeVars: extractScssThemeVars(selectStylesSource),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$color-surface-0",
-    [`textColor-${COMP}`]: "$textColor-primary",
-    [`borderColor-${COMP}`]: "$borderColor-Input-default",
-    [`borderWidth-${COMP}`]: "1px",
-    [`borderStyle-${COMP}`]: "solid",
-    [`borderRadius-${COMP}`]: "$borderRadius",
-    [`fontSize-${COMP}`]: "$fontSize",
+    "backgroundColor-Input": "transparent",
+    "borderRadius-Input": "$borderRadius",
+    "textColor-Input": "$textColor-primary",
+    "backgroundColor-Input--disabled": "$backgroundColor--disabled",
+    "borderWidth-Input": "1px",
+    "minHeight-Input": "2.5rem",
+    "borderStyle-Input": "solid",
+    "borderColor-Input--disabled": "$borderColor--disabled",
+    "textColor-Input--disabled": "$textColor--disabled",
+    "borderColor-Input": "$borderColor-Input-default",
+    "borderColor-Input--hover": "$borderColor-Input-default--hover",
+    "borderColor-Input--error": "$borderColor-Input-default--error",
+    "borderColor-Input--warning": "$borderColor-Input-default--warning",
+    "borderColor-Input--success": "$borderColor-Input-default--success",
+    "textColor-placeholder-Input": "$textColor-subtitle",
+    "outlineColor-Input--focus": "$outlineColor--focus",
+    "outlineWidth-Input--focus": "$outlineWidth--focus",
+    "outlineStyle-Input--focus": "$outlineStyle--focus",
+    "outlineOffset-Input--focus": "$outlineOffset--focus",
+    [`backgroundColor-${COMP}`]: "$backgroundColor-Input",
+    [`backgroundColor-${COMP}--disabled`]: "$backgroundColor-Input--disabled",
+    [`borderRadius-${COMP}`]: "$borderRadius-Input",
+    [`borderColor-${COMP}`]: "$borderColor-Input",
+    [`borderWidth-${COMP}`]: "$borderWidth-Input",
+    [`borderStyle-${COMP}`]: "$borderStyle-Input",
+    [`fontSize-${COMP}`]: "inherit",
     [`boxShadow-${COMP}`]: "none",
+    [`textColor-${COMP}`]: "$textColor-Input",
+    [`borderColor-${COMP}--hover`]: "$borderColor-Input--hover",
+    [`backgroundColor-${COMP}--hover`]: "$backgroundColor-Input",
+    [`boxShadow-${COMP}--hover`]: "none",
+    [`textColor-${COMP}--hover`]: "$textColor-Input",
+    [`outlineColor-${COMP}--focus`]: "$outlineColor-Input--focus",
+    [`outlineWidth-${COMP}--focus`]: "$outlineWidth-Input--focus",
+    [`outlineStyle-${COMP}--focus`]: "$outlineStyle-Input--focus",
+    [`outlineOffset-${COMP}--focus`]: "$outlineOffset-Input--focus",
+    [`textColor-placeholder-${COMP}`]: "$textColor-placeholder-Input",
+    [`minHeight-${COMP}`]: "$minHeight-Input",
+    [`minWidth-${COMP}`]: "$space-16",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
+    [`paddingVertical-${COMP}`]: "$space-2",
+    [`paddingLeft-${COMP}`]: "$space-2",
+    [`paddingRight-${COMP}`]: "$space-2",
+    [`paddingTop-${COMP}`]: "$space-2",
+    [`paddingBottom-${COMP}`]: "$space-2",
+    [`textColor-${COMP}--disabled`]: "$textColor-Input--disabled",
+    [`borderColor-${COMP}--disabled`]: "$borderColor-Input--disabled",
+    [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
+    [`borderRadius-menu-${COMP}`]: "$borderRadius",
+    [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
+    [`borderWidth-menu-${COMP}`]: "1px",
+    [`borderColor-menu-${COMP}`]: "$borderColor",
+    [`paddingHorizontal-item-${COMP}`]: "$space-2",
+    [`paddingVertical-item-${COMP}`]: "$space-2",
+    [`paddingLeft-item-${COMP}`]: "$space-2",
+    [`paddingRight-item-${COMP}`]: "$space-2",
+    [`paddingTop-item-${COMP}`]: "$space-2",
+    [`paddingBottom-item-${COMP}`]: "$space-2",
+    [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
+    [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
+    [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
+    [`textColor-item-${COMP}--disabled`]: "$color-surface-300",
+    [`opacity-text-item-${COMP}--disabled`]: "0.5",
+    [`textColor-indicator-${COMP}`]: `$textColor-${COMP}`,
+    [`minHeight-item-${COMP}`]: "$space-7",
   },
 });
 
@@ -112,6 +205,7 @@ export const selectRenderer = wrapComponent({
   metadata: SelectMd,
   renderer: ({ adapter }) => {
     const apiRef = { current: null as SelectApi | null };
+    const remoteItemsByChildIndex = useRemoteSelectItems(adapter);
     return (
       <SelectNative
         {...adapter.rootAttrs()}
@@ -151,7 +245,7 @@ export const selectRenderer = wrapComponent({
         dropdownHeight={adapter.prop("dropdownHeight")}
         groupBy={adapter.stringProp("groupBy")}
         scrollIndicators={adapter.booleanProp("scrollIndicators", true)}
-        options={selectOptions(adapter)}
+        options={selectOptions(adapter, remoteItemsByChildIndex)}
         popupChildren={selectPopupChildren(adapter)}
         valueTemplateRenderer={templateChildren(adapter.node, "valueTemplate")
           ? createScopedTemplateRenderer(adapter, "valueTemplate")
@@ -179,14 +273,18 @@ export const selectRenderer = wrapComponent({
   },
 });
 
-export function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
+export function selectOptions(
+  adapter: XmluiComponentAdapter,
+  remoteItemsByChildIndex = new Map<number, unknown[]>(),
+): XmluiOption[] {
   const data = adapter.prop<unknown>("data");
   if (Array.isArray(data)) {
     const valueField = adapter.stringProp("valueField", "value") ?? "value";
     const labelField = adapter.stringProp("labelField", "label") ?? "label";
     return data.map((item) => dataOption(item, valueField, labelField));
   }
-  return adapter.node.children.flatMap((child) => optionsFromChild(child, adapter));
+  return adapter.node.children.flatMap((child, index) =>
+    optionsFromChild(child, adapter, adapter.scope, remoteItemsByChildIndex.get(index)));
 }
 
 function selectPopupChildren(adapter: XmluiComponentAdapter): ReactNode {
@@ -210,14 +308,16 @@ function optionsFromChild(
   child: XmluiElement["children"][number],
   adapter: XmluiComponentAdapter,
   scope: RuntimeScope = adapter.scope,
+  remoteItems?: unknown[],
 ): XmluiOption[] {
   if (child.kind === "element" && child.type === "Items") {
-    const items = evaluateExpressionOrText(
+    const evaluatedItems = evaluateExpressionOrText(
       child.props.items ?? child.props.data,
       child.parsed?.props?.items ?? child.parsed?.props?.data,
       scope,
       "Select:Items:data",
     );
+    const items = Array.isArray(evaluatedItems) ? evaluatedItems : remoteItems;
     if (!Array.isArray(items)) {
       return [];
     }
@@ -287,6 +387,69 @@ function optionsFromChild(
     __xmluiRawValue: child.props.value,
     __xmluiParsedValueSource: parsedExpressionSource(child.parsed?.props?.value),
   }];
+}
+
+function useRemoteSelectItems(adapter: XmluiComponentAdapter): Map<number, unknown[]> {
+  const specs = useMemo(() => remoteItemSpecs(adapter), [adapter]);
+  const specsKey = useMemo(
+    () => specs.map((spec) => `${spec.childIndex}:${spec.url}`).join("\u0000"),
+    [specs],
+  );
+  const [remoteItems, setRemoteItems] = useState<Map<number, unknown[]>>(new Map());
+
+  useEffect(() => {
+    if (specs.length === 0) {
+      setRemoteItems(new Map());
+      return;
+    }
+    let cancelled = false;
+    setRemoteItems(new Map());
+    specs.forEach((spec) => {
+      const request = managedFetchService.buildRequest({ url: spec.url });
+      void managedFetchService.load(request)
+        .then((entry) => {
+          if (cancelled) {
+            return;
+          }
+          setRemoteItems((current) => {
+            const next = new Map(current);
+            next.set(spec.childIndex, Array.isArray(entry.value) ? entry.value : []);
+            return next;
+          });
+        })
+        .catch(() => {
+          if (cancelled) {
+            return;
+          }
+          setRemoteItems((current) => {
+            const next = new Map(current);
+            next.set(spec.childIndex, []);
+            return next;
+          });
+        });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [specsKey]);
+
+  return remoteItems;
+}
+
+function remoteItemSpecs(adapter: XmluiComponentAdapter): Array<{ childIndex: number; url: string }> {
+  return adapter.node.children.flatMap((child, childIndex) => {
+    if (child.kind !== "element" || child.type !== "Items") {
+      return [];
+    }
+    const items = evaluateExpressionOrText(
+      child.props.items ?? child.props.data,
+      child.parsed?.props?.items ?? child.parsed?.props?.data,
+      adapter.scope,
+      "Select:Items:data",
+    );
+    const url = typeof items === "string" ? items.trim() : "";
+    return url ? [{ childIndex, url }] : [];
+  });
 }
 
 function optionLabelFromChildren(

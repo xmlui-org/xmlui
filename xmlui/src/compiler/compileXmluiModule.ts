@@ -13,6 +13,7 @@ import type {
   XmluiBindingIr,
   XmluiEventIr,
   XmluiExpressionIrRef,
+  XmluiIrKind,
   XmluiIrTextSegment,
   XmluiModuleIr,
   XmluiNodeIr,
@@ -232,7 +233,7 @@ function generatedName(prefix: string, value: string | { sourceId: string; span:
 
 function componentImports(
   id: string,
-  documentKind: XmluiModuleIr["document"]["kind"],
+  documentKind: XmluiIrKind,
   referencedComponents: readonly string[],
 ): XmluiModuleImport[] {
   const imports = siblingComponentImports(id, referencedComponents);

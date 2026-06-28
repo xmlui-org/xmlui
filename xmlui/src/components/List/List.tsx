@@ -1,4 +1,6 @@
+import { useEffect, useMemo, useState } from "react";
 import { createMetadata, dComponent, dContextMenu, dInternal } from "../../component-core/metadata/helpers";
+import { managedFetchService } from "../../runtime/data/managedFetch";
 import { createRuntimeScope } from "../../runtime/state";
 import { nonPropertyChildren, templateChildren, wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
@@ -154,7 +156,9 @@ export const listRenderer = wrapComponent({
   name: COMP,
   metadata: ListMd,
   renderer: ({ adapter }) => {
-    const items = adapter.prop("items") ?? adapter.prop("data");
+    const items = adapter.prop("items");
+    const data = adapter.prop("data");
+    const listData = useListData(items, data);
     const itemTemplate = templateChildren(adapter.node, "itemTemplate") ?? nonPropertyChildren(adapter.node.children);
     const hasItemTemplate = Array.isArray(itemTemplate) ? itemTemplate.length > 0 : !!itemTemplate;
     const emptyTemplate = templateChildren(adapter.node, "emptyListTemplate");
@@ -183,8 +187,8 @@ export const listRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
-        items={Array.isArray(items) ? items : []}
-        loading={adapter.booleanProp("loading", false)}
+        items={listData.items}
+        loading={adapter.booleanProp("loading", false) || listData.loading}
         limit={adapter.numberProp("limit", 0)}
         scrollAnchor={adapter.stringProp("scrollAnchor", defaultProps.scrollAnchor)}
         fixedItemSize={adapter.booleanProp("fixedItemSize", false)}
@@ -238,6 +242,59 @@ export const listRenderer = wrapComponent({
 
 function arrayValue(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
+}
+
+function useListData(items: unknown, data: unknown): { items: unknown[]; loading: boolean } {
+  const url = typeof data === "string" && data.trim() ? data.trim() : "";
+  const request = useMemo(
+    () => (items === undefined && url ? managedFetchService.buildRequest({ url }) : undefined),
+    [items, url],
+  );
+  const requestKey = useMemo(
+    () => (request ? managedFetchService.requestKey(request) : ""),
+    [request],
+  );
+  const [remote, setRemote] = useState<{ items: unknown[]; loading: boolean }>({
+    items: [],
+    loading: false,
+  });
+
+  useEffect(() => {
+    if (!request) {
+      setRemote({ items: [], loading: false });
+      return;
+    }
+    let cancelled = false;
+    setRemote((current) => ({ ...current, loading: true }));
+    void managedFetchService.load(request)
+      .then((entry) => {
+        if (!cancelled) {
+          setRemote({ items: arrayValue(entry.value), loading: false });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRemote({ items: [], loading: false });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [request, requestKey]);
+
+  if (Array.isArray(items)) {
+    return { items, loading: false };
+  }
+  if (items !== undefined) {
+    return { items: [], loading: false };
+  }
+  if (Array.isArray(data)) {
+    return { items: data, loading: false };
+  }
+  if (request) {
+    return remote;
+  }
+  return { items: [], loading: false };
 }
 
 function functionValue(value: unknown): ((item: unknown) => unknown) | undefined {

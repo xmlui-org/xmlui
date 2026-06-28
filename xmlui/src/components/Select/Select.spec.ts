@@ -26,6 +26,106 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("option", { name: "Three" })).toBeVisible();
   });
 
+  test("remote Items preserve old Select trigger and overlay behavior", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await page.route("https://api.example.test/line/mode/tube/status", async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify([
+          { id: "bakerloo", name: "Bakerloo" },
+          { id: "central", name: "Central" },
+          { id: "district", name: "District" },
+          { id: "jubilee", name: "Jubilee" },
+        ]),
+      });
+    });
+
+    await initTestBed(`
+      <VStack>
+        <Select testId="lines" initialValue="district">
+          <Items data="https://api.example.test/line/mode/tube/status">
+            <Option value="{$item.id}" label="{$item.name}" />
+          </Items>
+        </Select>
+        <Text testId="below">Below select</Text>
+      </VStack>
+    `);
+
+    const driver = await createSelectDriver("lines");
+    const trigger = driver.component.getByRole("combobox");
+    await expect(trigger).toHaveText(/District/);
+
+    const belowTopBefore = await page.getByTestId("below").boundingBox().then((box) => box?.y ?? 0);
+    await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option", { name: "Bakerloo" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "District" })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("option", { name: "District" })).toContainText("✓");
+
+    const belowTopAfter = await page.getByTestId("below").boundingBox().then((box) => box?.y ?? 0);
+    expect(belowTopAfter).toBeCloseTo(belowTopBefore, 1);
+  });
+
+  test("defines Select input theme variables for the trigger", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Select testId="theme-select" initialValue="one">
+        <Option value="one" label="One" />
+      </Select>
+    `);
+
+    const select = page.getByTestId("theme-select");
+    const trigger = select.getByRole("combobox");
+    const borderColorVar = await select.evaluate((element) =>
+      getComputedStyle(element).getPropertyValue("--xmlui-borderColor-Select").trim(),
+    );
+
+    expect(borderColorVar).not.toBe("");
+    await expect(trigger).not.toHaveCSS("border-color", "rgb(0, 0, 0)");
+  });
+
+  test("preserves old Select trigger and option spacing styles", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="styled-select" initialValue="one">
+        <Option value="one" label="One" />
+        <Option value="two" label="Two" enabled="{false}" />
+      </Select>
+    `, {
+      testThemeVars: {
+        "borderColor-Select": "rgb(10, 20, 30)",
+        "borderColor-Select--hover": "rgb(40, 50, 60)",
+      },
+    });
+
+    const driver = await createSelectDriver("styled-select");
+    const trigger = driver.component.getByRole("combobox");
+    await page.mouse.move(1000, 1000);
+    await expect(trigger).toHaveCSS("padding-top", "8px");
+    await expect(trigger).toHaveCSS("padding-right", "8px");
+    await expect(trigger).toHaveCSS("padding-bottom", "8px");
+    await expect(trigger).toHaveCSS("padding-left", "8px");
+    await expect(trigger).toHaveCSS("border-color", "rgb(10, 20, 30)");
+
+    await trigger.hover();
+    await expect(trigger).toHaveCSS("border-color", "rgb(40, 50, 60)");
+
+    await driver.toggleOptionsVisibility();
+    const selectedOption = page.getByRole("option", { name: "One" });
+    await expect(selectedOption).toHaveCSS("min-height", "28px");
+    await expect(selectedOption).toHaveCSS("padding-top", "8px");
+    await expect(selectedOption).toHaveCSS("padding-left", "8px");
+
+    const disabledOption = page.getByRole("option", { name: "Two" });
+    await expect(disabledOption).toHaveCSS("font-style", "italic");
+    await expect(disabledOption).toHaveCSS("opacity", "0.5");
+  });
+
   test("changing selected option in form", async ({ initTestBed, createSelectDriver, page }) => {
     await initTestBed(`
     <Form data="{{sel: 'opt1'}}">
@@ -1202,10 +1302,9 @@ test.describe("Visual State", () => {
     const multiDropdown = page.locator("[data-state='open'][role='listbox']").first();
     const { height: multiHeight } = await multiDropdown.boundingBox();
 
-    // All dropdowns should have approximately the same height
-    // Allow small variance for padding/borders
-    expect(Math.abs(simpleHeight - searchableHeight)).toBeLessThan(40);
-    expect(Math.abs(searchableHeight - multiHeight)).toBeLessThan(40);
+    // Searchable Select includes the search input row; simple and multi-select should still align.
+    expect(Math.abs(simpleHeight - searchableHeight)).toBeLessThan(48);
+    expect(Math.abs(searchableHeight - multiHeight)).toBeLessThan(48);
     expect(Math.abs(simpleHeight - multiHeight)).toBeLessThan(5);
   });
 });
@@ -1294,6 +1393,7 @@ test.describe("Theme Variables", () => {
           [`${themeVarPrefix}-Select${variant.value}${hover ? "--hover" : ""}`]: expected,
         },
       });
+      await page.mouse.move(1000, 1000);
       if (hover) {
         await page.getByTestId("test").hover();
       }
@@ -1420,7 +1520,8 @@ test.describe("Behaviors and Parts", () => {
       },
     );
     const component = page.getByTestId("test");
-    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await page.mouse.move(1000, 1000);
+    await expect(component.getByRole("combobox")).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
   test("variant applies custom theme variables", async ({ page, initTestBed }) => {
@@ -1433,7 +1534,8 @@ test.describe("Behaviors and Parts", () => {
       },
     );
     const component = page.getByTestId("test");
-    await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
+    await page.mouse.move(1000, 1000);
+    await expect(component.getByRole("combobox")).toHaveCSS("background-color", "rgb(0, 255, 0)");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {
@@ -1521,10 +1623,12 @@ test.describe("Behaviors and Parts", () => {
     );
 
     const component = page.getByTestId("test");
+    const trigger = component.getByRole("combobox");
+    await page.mouse.move(1000, 1000);
 
-    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(trigger).toHaveCSS("border-color", "rgb(255, 0, 0)");
 
-    await component.click(); // Open dropdown
+    await trigger.click(); // Open dropdown
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
   });
@@ -1551,14 +1655,16 @@ test.describe("Behaviors and Parts", () => {
     );
 
     const component = page.getByTestId("test");
+    const trigger = component.getByRole("combobox");
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const clearButton = page.locator("[data-part-id='clearButton']");
 
     // Verify variant applied
-    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await page.mouse.move(1000, 1000);
+    await expect(trigger).toHaveCSS("background-color", "rgb(255, 0, 0)");
 
     // Verify parts are visible
-    await component.click();
+    await trigger.click();
     await expect(listWrapper).toBeVisible();
     await expect(clearButton).toBeVisible();
 
@@ -3322,17 +3428,19 @@ test.describe("scrollIndicators property", () => {
     });
     await page.waitForTimeout(100);
 
-    const upVisible = await page.evaluate(() => {
-      const btns = document.querySelectorAll("[data-radix-popper-content-wrapper] button, [data-radix-popper-content-wrapper] [role='button'], [data-radix-popper-content-wrapper] > div > *");
-      // Find elements rendered by ScrollUpButton / ScrollDownButton via their position
-      const content = document.querySelector("[data-radix-popper-content-wrapper] > *:first-child") as HTMLElement | null;
-      if (!content) return false;
-      const children = Array.from(content.children) as HTMLElement[];
-      // Up button is the first child with non-zero height when scrolled
-      return children.some(c => c.offsetHeight > 0 && c !== content.querySelector("[data-radix-select-viewport]"));
-    });
+    const upButton = page.locator("[class*='selectScrollUpButton']");
+    const downButton = page.locator("[class*='selectScrollDownButton']");
+    await expect(upButton).toBeVisible();
+    await expect(downButton).toBeVisible();
 
-    expect(upVisible).toBe(true);
+    const arrowsHaveSize = await page.evaluate(() => {
+      const arrows = document.querySelectorAll("[class*='selectScrollChevron']");
+      return Array.from(arrows).length === 2 && Array.from(arrows).every((arrow) => {
+        const rect = (arrow as HTMLElement).getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+    });
+    expect(arrowsHaveSize).toBe(true);
   });
 
   test("scroll indicator arrows are hidden when scrollIndicators is false", async ({

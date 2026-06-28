@@ -170,7 +170,7 @@ export const tableRenderer = wrapComponent({
   name: COMP,
   metadata: TableMd,
   renderer: ({ adapter }) => {
-    const items = adapter.prop("items") ?? adapter.prop("data");
+    const items = tableItems(adapter.prop("items") ?? adapter.prop("data"));
     const columns = collectColumns(adapter.node);
     const noDataTemplate = templateChildren(adapter.node, "noDataTemplate");
     const noDataTemplateProp = adapter.prop("noDataTemplate");
@@ -250,7 +250,7 @@ export const tableRenderer = wrapComponent({
           }
         }}
         id={adapter.stringProp("id")}
-        items={Array.isArray(items) ? items : []}
+        items={items}
         columns={columns}
         idKey={idKey}
         loading={adapter.booleanProp("loading", defaultProps.loading)}
@@ -381,6 +381,19 @@ function collectColumns(tableNode: XmluiElement): TableColumnDefinition[] {
 
 function arrayValue(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
+}
+
+function tableItems(value: unknown): unknown[] {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (value && typeof value === "object") {
+    const dataSourceValue = (value as { value?: unknown }).value;
+    if (Array.isArray(dataSourceValue)) {
+      return dataSourceValue;
+    }
+  }
+  return [];
 }
 
 function functionValue(value: unknown): ((item: unknown) => unknown) | undefined {
