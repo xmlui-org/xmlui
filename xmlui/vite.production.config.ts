@@ -10,6 +10,7 @@ import {
   type ProductionBuildFixture,
 } from "./src/production/manifest";
 import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
 
 const productionFixtures: ProductionBuildFixture[] = [
@@ -122,6 +123,7 @@ export default defineConfig({
   base: "./",
   plugins: [
     rawScssModulePlugin(),
+    svgReactPlugin(),
     xmluiPlugin({ extensions: [counterBadgeExtension] }),
     react(),
     productionArtifactsPlugin(),

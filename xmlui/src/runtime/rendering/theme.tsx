@@ -11,8 +11,13 @@ import React, {
 
 import type { ComponentMetadata } from "../../component-core/metadata";
 import {
+  buildDefaultThemeVariables,
   createComponentThemeClass,
   defaultThemeVariables,
+  generateBaseSpacings,
+  generateBaseTones,
+  generateBorderSegments,
+  generatePaddingSegments,
   mergeThemeVariableLayers,
   resolveThemeVariablesWithCssVars,
   themeVariablesToCssProperties,
@@ -38,7 +43,7 @@ export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { chil
     setTone(initialTone);
   }, [initialTone]);
   const variables = useMemo(
-    () => mergeThemeVariableLayers([defaultThemeVariables], tone),
+    () => buildDefaultThemeVariables(tone),
     [tone],
   );
   const cssVariables = useMemo(
@@ -110,12 +115,33 @@ export function ThemeScope({
 }) {
   const parent = useThemeRuntime();
   const nextVariables = useMemo(
-    () => mergeThemeVariableLayers([parent.variables, variables], tone ?? parent.tone),
+    () => {
+      const activeTone = tone ?? parent.tone;
+      const rawVariables = mergeThemeVariableLayers([parent.variables, variables], activeTone);
+      return mergeThemeVariableLayers([
+        parent.variables,
+        generateBaseSpacings(rawVariables),
+        generatePaddingSegments(rawVariables),
+        generateBorderSegments(rawVariables),
+        generateBaseTones(rawVariables),
+        variables,
+      ], activeTone);
+    },
     [parent.tone, parent.variables, tone, variables],
   );
   const cssVariables = useMemo(
-    () => themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
-    [variables],
+    () => {
+      const activeTone = tone ?? parent.tone;
+      const rawVariables = mergeThemeVariableLayers([parent.variables, variables], activeTone);
+      const scopedVariables = mergeThemeVariableLayers([
+        generateBaseSpacings(rawVariables),
+        generatePaddingSegments(rawVariables),
+        generateBorderSegments(rawVariables),
+        variables,
+      ], activeTone);
+      return themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(scopedVariables));
+    },
+    [parent.tone, parent.variables, tone, variables],
   );
   const value = useMemo<ThemeRuntimeContext>(
     () => ({
@@ -131,7 +157,7 @@ export function ThemeScope({
         data-xmlui-component="Theme"
         data-xmlui-part="root"
         data-xmlui-tone={tone ?? parent.tone}
-        style={{ ...cssVariables, ...style }}
+        style={{ ...cssVariables, ...style, display: "contents" }}
       >
         {children}
       </div>

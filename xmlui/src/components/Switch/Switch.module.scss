@@ -37,11 +37,24 @@ $borderColor-Switch--success: createThemeVar("borderColor-Switch--success");
 }
 
 @layer components {
+  .switchItemWithLabel {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .switchItemWithLabelCompact {
+    width: fit-content;
+    align-self: flex-start;
+  }
+
   .switchLabeledItem {
     display: flex;
     align-items: center;
-    gap: var(--xmlui-gap-label-Switch, var(--xmlui-gap-normal));
-    width: max-content;
+    gap: var(--xmlui-gap-label-Switch, 0.5em);
+    width: 100%;
     max-width: 100%;
   }
 
@@ -62,28 +75,41 @@ $borderColor-Switch--success: createThemeVar("borderColor-Switch--success");
   .switchLabelPositionStart,
   .switchLabelPositionBefore {
     flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: fit-content;
+    align-self: flex-start;
   }
 
   .switchLabelPositionEnd,
   .switchLabelPositionAfter {
     flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-start;
+    width: fit-content;
+    align-self: flex-start;
   }
 
   .switchLabelPositionTop {
     flex-direction: column;
     align-items: flex-start;
+    justify-content: center;
   }
 
   .switchLabelPositionBottom {
     flex-direction: column-reverse;
     align-items: flex-start;
+    justify-content: center;
   }
 
   .switchLabel {
     flex: 0 0 auto;
     width: max-content;
-    color: var(--xmlui-textColor-label-Switch, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-Switch, inherit);
+    color: var(--xmlui-textColor-label-Switch, var(--xmlui-textColor-label-formItem, var(--xmlui-textColor)));
+    font-size: var(--xmlui-fontSize-label-Switch, var(--xmlui-fontSize-label-formItem, var(--xmlui-fontSize-sm)));
+    font-weight: var(--xmlui-fontWeight-label-Switch, var(--xmlui-fontWeight-label-formItem, var(--xmlui-fontWeight-medium)));
+    font-style: var(--xmlui-fontStyle-label-Switch, var(--xmlui-fontStyle-label-formItem, normal));
+    text-transform: var(--xmlui-textTransform-label-Switch, var(--xmlui-textTransform-label-formItem, none));
     white-space: nowrap;
   }
 

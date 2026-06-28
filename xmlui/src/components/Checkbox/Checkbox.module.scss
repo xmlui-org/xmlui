@@ -42,11 +42,24 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
 }
 
 @layer components {
+  .checkboxItemWithLabel {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .checkboxItemWithLabelCompact {
+    width: fit-content;
+    align-self: flex-start;
+  }
+
   .checkboxLabeledItem {
     display: flex;
     align-items: center;
-    gap: var(--xmlui-gap-label-Checkbox, var(--xmlui-gap-normal));
-    width: max-content;
+    gap: var(--xmlui-gap-label-Checkbox, 0.5em);
+    width: 100%;
     max-width: 100%;
   }
 
@@ -67,28 +80,41 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
   .checkboxLabelPositionStart,
   .checkboxLabelPositionBefore {
     flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: fit-content;
+    align-self: flex-start;
   }
 
   .checkboxLabelPositionEnd,
   .checkboxLabelPositionAfter {
     flex-direction: row-reverse;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: fit-content;
+    align-self: flex-start;
   }
 
   .checkboxLabelPositionTop {
     flex-direction: column;
     align-items: flex-start;
+    justify-content: center;
   }
 
   .checkboxLabelPositionBottom {
     flex-direction: column-reverse;
     align-items: flex-start;
+    justify-content: center;
   }
 
   .checkboxLabel {
     flex: 0 0 auto;
     width: max-content;
-    color: var(--xmlui-textColor-label-Checkbox, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-Checkbox, inherit);
+    color: var(--xmlui-textColor-label-Checkbox, var(--xmlui-textColor-label-formItem, var(--xmlui-textColor)));
+    font-size: var(--xmlui-fontSize-label-Checkbox, var(--xmlui-fontSize-label-formItem, var(--xmlui-fontSize-sm)));
+    font-weight: var(--xmlui-fontWeight-label-Checkbox, var(--xmlui-fontWeight-label-formItem, var(--xmlui-fontWeight-medium)));
+    font-style: var(--xmlui-fontStyle-label-Checkbox, var(--xmlui-fontStyle-label-formItem, normal));
+    text-transform: var(--xmlui-textTransform-label-Checkbox, var(--xmlui-textTransform-label-formItem, none));
     white-space: nowrap;
   }
 

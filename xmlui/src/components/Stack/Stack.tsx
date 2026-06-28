@@ -200,8 +200,8 @@ function createStackRenderer(
             ...(gap ? { "--xmlui-gap-Stack": gap } : undefined),
           } as CSSProperties}
           orientation={orientation ?? adapter.stringProp("orientation", defaultProps.orientation)}
-          horizontalAlignment={fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment")}
-          verticalAlignment={fixedVerticalAlignment ?? adapter.stringProp("verticalAlignment")}
+          horizontalAlignment={fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment", "start")}
+          verticalAlignment={fixedVerticalAlignment ?? adapter.stringProp("verticalAlignment", "start")}
           reverse={adapter.booleanProp("reverse", defaultProps.reverse)}
           wrapContent={adapter.booleanProp("wrapContent", false)}
           hoverContainer={adapter.booleanProp("hoverContainer", defaultProps.hoverContainer)}

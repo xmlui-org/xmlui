@@ -1,18 +1,12 @@
 <App>
-  <Select id="lines" initialValue="bakerloo">
-    <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
-        <Option value="{$item.id}" label="{$item.name}" />
-    </Items>
-  </Select>
-
-  <DataSource
-    id="tubeStations"
-    when="{lines.value}"
-    url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
-    resultSelector="stations"/>
-
-  <Table data="{tubeStations}" height="280px">
-    <Column bindTo="name" />
-    <Column bindTo="modes" />
-  </Table>
+  <Theme 
+    textColor-Text-brandTitle="rgb(41, 128, 185)"
+    fontSize-Text-brandTitle="28px"
+    fontWeight-Text-brandTitle="bold"
+    letterSpacing-Text-brandTitle="2px"
+  >
+    <Text variant="brandTitle">
+      Welcome to Our Application
+    </Text>
+  </Theme>
 </App>

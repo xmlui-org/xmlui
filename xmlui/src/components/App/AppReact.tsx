@@ -35,6 +35,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   ]);
 
   const rootAttrs = adapter.rootAttrs();
+  const rootStyle = appShellStyle(rootAttrs.style as CSSProperties | undefined);
   const testId = adapter.stringProp("testId");
   const fitContent = adapter.booleanProp("fitContent", defaultProps.fitContent);
   const loggedInUser = adapter.prop("loggedInUser", null);
@@ -111,11 +112,11 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
           data-xmlui-app-fit-content={fitContent ? "true" : undefined}
           className={[rootAttrs.className, ...layout.classNames, scrollWholePage && "scrollWholePage"].filter(Boolean).join(" ")}
           style={{
-            ...(rootAttrs.style as CSSProperties | undefined),
+            ...rootStyle,
             ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
             ...appBaselineStyle(mergedThemeVariables),
             ...appContainerStyle(fitContent),
-            ...adapter.style,
+            ...appShellStyle(adapter.style),
           }}
         >
           <main
@@ -135,6 +136,14 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
       </AppShellProvider>
     </ProfileMenuProvider>
   );
+}
+
+function appShellStyle(style: CSSProperties | undefined): CSSProperties | undefined {
+  if (!style) {
+    return undefined;
+  }
+  const { alignItems, justifyContent, ...rest } = style;
+  return rest;
 }
 
 function normalizeLoggedInUser(value: unknown) {

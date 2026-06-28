@@ -30,6 +30,10 @@ import {
   lowerScriptExpression,
   type XmluiScope,
 } from "./scriptSemantics";
+import {
+  createXmluiAppContextObject,
+  type XmluiAppContextObject,
+} from "../runtime/appContextObject";
 
 type AttributeInfo = {
   name: string;
@@ -41,6 +45,7 @@ type AttributeInfo = {
 export type ParseXmluiOptions = {
   sourceId?: string;
   extensionFunctions?: Iterable<string>;
+  appContext?: XmluiAppContextObject;
 };
 
 export class XmluiParseError extends Error {
@@ -52,6 +57,7 @@ export class XmluiParseError extends Error {
 
 export function parseXmlui(source: string, options: ParseXmluiOptions = {}): XmluiDocument {
   const sourceId = options.sourceId ?? "anonymous.xmlui";
+  const appContext = options.appContext ?? createXmluiAppContextObject();
   const parsed = parseMarkup(source, sourceId);
   if (parsed.diagnostics.length > 0) {
     throw diagnosticToError(parsed.diagnostics[0]);
@@ -76,6 +82,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
       allowImplicitGlobals: true,
       extensionFunctions: options.extensionFunctions,
       referenceNames,
+      appContext,
     });
     return {
       kind: "component",
@@ -95,6 +102,7 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     allowImplicitGlobals: false,
     extensionFunctions: options.extensionFunctions,
     referenceNames,
+    appContext,
   });
 
   return {
@@ -108,6 +116,7 @@ type AnalyzeOptions = {
   allowImplicitGlobals: boolean;
   extensionFunctions?: Iterable<string>;
   referenceNames?: Iterable<string>;
+  appContext?: XmluiAppContextObject;
 };
 
 function analyzeElementScripts(
@@ -122,6 +131,7 @@ function analyzeElementScripts(
         allowImplicitGlobals: options.allowImplicitGlobals,
         specialNames: options.extensionFunctions,
         referenceNames: options.referenceNames,
+        appContext: options.appContext,
       });
 
   analyzeParsedBindings(element.parsed, scope);

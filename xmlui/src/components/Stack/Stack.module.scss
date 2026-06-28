@@ -41,6 +41,10 @@ $gap-Stack: createThemeVar("gap-Stack");
     &.reverse {
       flex-direction: column-reverse;
     }
+
+    > * {
+      flex-shrink: 0;
+    }
   }
 
   .horizontal {

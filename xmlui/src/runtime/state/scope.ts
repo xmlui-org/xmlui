@@ -2,6 +2,7 @@ import type { CompiledEventContext, CompiledExpressionContext } from "../../comp
 import { managedFetchService } from "../data";
 import { getXmluiDebugBridge } from "../debug";
 import type { RuntimeI18n } from "../i18n";
+import { hasXmluiAppContextProperty, type XmluiAppContextObject } from "../appContextObject";
 import type { RuntimeRoutingStore } from "../routing";
 import type { ToastService } from "../services/toast";
 import type { RuntimeStateStore } from "./store";
@@ -13,6 +14,7 @@ export type RuntimeScope = {
   parent?: RuntimeScope;
   props: Record<string, unknown>;
   contextValues: Record<string, unknown>;
+  appContext: XmluiAppContextObject;
   references: Record<string, unknown>;
   slots: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
@@ -28,6 +30,7 @@ export function createRuntimeScope({
   parent,
   props = {},
   contextValues = {},
+  appContext,
   references = {},
   slots = {},
   routing,
@@ -41,6 +44,7 @@ export function createRuntimeScope({
   parent?: RuntimeScope;
   props?: Record<string, unknown>;
   contextValues?: Record<string, unknown>;
+  appContext?: XmluiAppContextObject;
   references?: Record<string, unknown>;
   slots?: Record<string, unknown>;
   routing?: RuntimeRoutingStore;
@@ -55,6 +59,7 @@ export function createRuntimeScope({
     parent,
     props,
     contextValues,
+    appContext: appContext ?? parent?.appContext ?? {},
     references,
     slots,
     routing,
@@ -158,6 +163,9 @@ export function readContext(scope: RuntimeScope | undefined, name: string): unkn
   }
   if (Object.prototype.hasOwnProperty.call(scope.contextValues, name)) {
     return scope.contextValues[name];
+  }
+  if (hasXmluiAppContextProperty(scope.appContext, name)) {
+    return scope.appContext[name];
   }
   const routeValue = readRouteContext(scope, name);
   if (routeValue !== undefined) {

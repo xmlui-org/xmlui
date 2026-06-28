@@ -12,9 +12,11 @@ import {
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiAppContextProvider } from "./appContext";
+import { createXmluiAppContextObject } from "./appContextObject";
 import { XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
+import { IconProvider } from "../components/IconProvider";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
@@ -176,6 +178,16 @@ export function XmluiRoot({
     return true;
   }, []);
   referencesRef.current.confirm = confirm;
+  const appContextObject = useMemo(
+    () => createXmluiAppContextObject({
+      appGlobals,
+      mediaSize: { sizeIndex: 4 },
+      toast: toastRef.current,
+      confirm,
+      routing: routingRef.current,
+    }),
+    [appGlobals, confirm],
+  );
   useEffect(() => {
     testProbe?.({
       hasLocal: (name) => store.hasLocal(rootOwnerId, name),
@@ -192,6 +204,7 @@ export function XmluiRoot({
       localOwnerId: rootOwnerId,
       props: {},
       contextValues: { appGlobals, $appGlobals: appGlobals },
+      appContext: appContextObject,
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -225,6 +238,7 @@ export function XmluiRoot({
       localOwnerId: rootOwnerId,
       props: {},
       contextValues: { appGlobals, $appGlobals: appGlobals },
+      appContext: appContextObject,
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -234,7 +248,7 @@ export function XmluiRoot({
         ...normalizedExtensions.functions,
       },
     }),
-    [module.extensionFunctions, normalizedExtensions.functions, store],
+    [appContextObject, module.extensionFunctions, normalizedExtensions.functions, store],
   );
   const context = useMemo(
     () => createRenderContext(module.components, {
@@ -244,16 +258,30 @@ export function XmluiRoot({
     [module.components, module.extensionRenderers, normalizedExtensions.renderers],
   );
 
+  const iconResources = useMemo(() => normalizeIconResources(appGlobals.resources), [appGlobals.resources]);
+
   return (
     <XmluiAppContextProvider value={{ appGlobals, mediaSize: { sizeIndex: 4 } }}>
-      <XmluiThemeRoot tone={defaultTone}>
-        <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
-        {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
-        <GlobalLiveRegion />
-        <ToastHost service={toastRef.current} />
-      </XmluiThemeRoot>
+      <IconProvider icons={iconResources}>
+        <XmluiThemeRoot tone={defaultTone}>
+          <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+          {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+          <GlobalLiveRegion />
+          <ToastHost service={toastRef.current} />
+        </XmluiThemeRoot>
+      </IconProvider>
     </XmluiAppContextProvider>
   );
+}
+
+function normalizeIconResources(resources: unknown): Record<string, string> {
+  if (!resources || typeof resources !== "object") {
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(resources as Record<string, unknown>)
+      .filter(([name, value]) => name.startsWith("icon.") && typeof value === "string"),
+  ) as Record<string, string>;
 }
 
 function renderConfirmDialog(

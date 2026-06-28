@@ -1,3 +1,5 @@
+import "./global.css";
+
 import { createElement } from "react";
 import type { Root } from "react-dom/client";
 import {
@@ -11,7 +13,6 @@ import {
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import type { Extension } from "./extensions";
-import "./global.css";
 import "./components/Inspector/Inspector.scss";
 import "./components/InspectButton/InspectButton.scss";
 
@@ -393,12 +394,16 @@ if (params.has("__xmluiTestBed")) {
   const renderTestBedModule = async (module: Extract<XmluiModule, { kind: "app" }>): Promise<void> => {
     const key = testBedRenderKey++;
     const extensions = await readTestBedExtensions();
+    const appGlobals = {
+      resources: readTestBedResources(),
+    };
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
     };
     if (!testBedRoot) {
       testBedRoot = mountXmluiApp(module, root, {
         extensions,
+        appGlobals,
         testProbe,
       });
       return;
@@ -407,8 +412,27 @@ if (params.has("__xmluiTestBed")) {
       key,
       module,
       extensions,
+      appGlobals,
       testProbe,
     }));
+  };
+
+  const readTestBedResources = (): Record<string, string> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedResources");
+    if (!raw) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? Object.fromEntries(
+          Object.entries(parsed).filter((entry): entry is [string, string] =>
+            typeof entry[0] === "string" && typeof entry[1] === "string"),
+        )
+        : {};
+    } catch {
+      return {};
+    }
   };
 
   window.__xmluiTestBedReinit = async (source: string) => {

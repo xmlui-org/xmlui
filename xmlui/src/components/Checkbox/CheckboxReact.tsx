@@ -4,7 +4,7 @@ import { forwardRef, memo, useEffect, useId, useImperativeHandle } from "react";
 import { defaultProps } from "./Checkbox.defaults";
 import type { CheckboxValidationStatus } from "./checkbox-abstractions";
 import { useFormContext } from "../Form/FormContext";
-import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
+import { transformToLegitValue, useToggleController } from "../Toggle/ToggleController";
 import styles from "./Checkbox.module.scss";
 
 export type CheckboxApi = {

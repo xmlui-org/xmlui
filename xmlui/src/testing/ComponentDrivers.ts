@@ -155,7 +155,7 @@ export class FormSegmentDriver extends ComponentDriver {}
 
 export class IconDriver extends ComponentDriver {
   get svgIcon() {
-    return this.component.locator("svg");
+    return this.component.locator(":scope:is(svg), svg").first();
   }
 }
 
@@ -686,9 +686,11 @@ export class CheckboxDriver extends InputComponentDriver {
   }
 
   getIndicatorColor(): Promise<string> {
-    return this.input.evaluate((element) =>
-      window.getComputedStyle(element, "::before").color,
-    );
+    return this.input.evaluate((element) => {
+      const beforeStyle = window.getComputedStyle(element, "::before");
+      const boxShadowColor = beforeStyle.boxShadow.match(/rgba?\([^)]+\)/)?.[0];
+      return boxShadowColor ?? beforeStyle.color;
+    });
   }
 }
 

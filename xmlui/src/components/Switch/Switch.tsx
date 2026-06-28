@@ -108,10 +108,10 @@ export const SwitchMd = createMetadata({
   defaultThemeVars: {
     [`borderColor-${COMP}`]: "$borderColor-Input-default",
     [`borderWidth-${COMP}`]: "1px",
-    [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
-    [`outlineColor-${COMP}--focus`]: "$outlineColor--focus",
-    [`outlineOffset-${COMP}--focus`]: "$outlineOffset--focus",
-    [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
+    [`outlineWidth-${COMP}--focus`]: `$outlineWidth-${COMP}`,
+    [`outlineColor-${COMP}--focus`]: `$outlineColor-${COMP}`,
+    [`outlineOffset-${COMP}--focus`]: `$outlineOffset-${COMP}`,
+    [`outlineStyle-${COMP}--focus`]: `$outlineStyle-${COMP}`,
     [`outlineWidth-${COMP}`]: "$outlineWidth--focus",
     [`outlineColor-${COMP}`]: "$outlineColor--focus",
     [`outlineOffset-${COMP}`]: "$outlineOffset--focus",
@@ -138,4 +138,3 @@ export const SwitchMd = createMetadata({
   compactInlineLabel: true,
   limitThemeVarsToComponent: true,
 });
-

@@ -71,6 +71,56 @@ describe("XMLUI script scope model", () => {
       name: "count",
     });
   });
+
+  it("resolves default app-context functions as context bindings", () => {
+    const document = parseXmlui(
+      `<App><Button onClick="toast('Saved')" /></App>`,
+      { sourceId: "Main.xmlui" },
+    );
+    const button = document.root.children[0] as XmluiElement;
+    const bound = button.parsed?.events?.click;
+
+    expect(bound?.dependencies).toEqual([
+      expect.objectContaining({
+        kind: "context",
+        name: "toast",
+        path: ["toast"],
+      }),
+    ]);
+  });
+
+  it("uses the injected app-context object as the semantic source of truth", async () => {
+    const calls: unknown[][] = [];
+    const appContext = {
+      notify: (...args: unknown[]) => {
+        calls.push(args);
+      },
+    };
+    const document = parseXmlui(
+      `<App><Button onClick="notify('Saved')" /></App>`,
+      {
+        sourceId: "Main.xmlui",
+        appContext,
+      },
+    );
+    const button = document.root.children[0] as XmluiElement;
+    const bound = button.parsed?.events?.click;
+
+    expect(bound?.dependencies).toEqual([
+      expect.objectContaining({
+        kind: "context",
+        name: "notify",
+        path: ["notify"],
+      }),
+    ]);
+
+    if (!bound) {
+      throw new Error("Expected parsed click event.");
+    }
+    const compiled = compileXmluiEventHandler(bound.ir, bound.dependencies, bound.writes);
+    await compiled.execute(testContext({ context: appContext }));
+    expect(calls).toEqual([["Saved"]]);
+  });
 });
 
 describe("XMLUI script event write analysis", () => {
@@ -884,11 +934,13 @@ function testContext({
   locals = {},
   globals = {},
   props = {},
+  context = {},
   navigate,
 }: {
   locals?: Record<string, unknown>;
   globals?: Record<string, unknown>;
   props?: Record<string, unknown>;
+  context?: Record<string, unknown>;
   navigate?: CompiledEventContext["navigate"];
 } = {}): CompiledEventContext & {
   locals: Record<string, unknown>;
@@ -900,6 +952,7 @@ function testContext({
     props,
     readLocal: (name: string) => locals[name],
     readGlobal: (name: string) => globals[name],
+    readContext: (name: string) => context[name],
     writeLocal: (name: string, value: unknown) => {
       locals[name] = value;
     },

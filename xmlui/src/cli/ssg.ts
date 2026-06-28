@@ -18,6 +18,7 @@ import react from "@vitejs/plugin-react";
 import { xmluiPlugin } from "../vite-plugin/xmluiPlugin";
 import { rawPackageXmluiSourcePlugin } from "../vite-plugin/rawXmluiSourcePlugin";
 import { rawScssModulePlugin } from "../vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "../vite-plugin/svgReactPlugin";
 import { readFile, writeFile, rm, mkdir, cp, stat } from "node:fs/promises";
 import { Worker } from "node:worker_threads";
 import { availableParallelism } from "node:os";
@@ -195,7 +196,7 @@ export const ssg = async ({
     const xmlui = xmluiPlugin(await loadXmluiPluginOptions());
 
     await viteBuild({
-      plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), xmlui, react()],
+      plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), svgReactPlugin(), xmlui, react()],
       resolve: {
         extensions: [
           ".js",

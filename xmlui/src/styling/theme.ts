@@ -411,10 +411,27 @@ export const xmluiThemeVariables: ThemeVariableLayer = {
   },
 };
 
-export const defaultThemeVariables = mergeThemeVariableLayers([
-  rootThemeVariables,
-  xmluiThemeVariables,
-]);
+const borderSides = ["Left", "Right", "Top", "Bottom"] as const;
+const borderParts = ["Width", "Style", "Color"] as const;
+type BorderSide = (typeof borderSides)[number];
+type BorderPart = (typeof borderParts)[number];
+
+export function buildDefaultThemeVariables(tone: ThemeTone = "light"): ThemeVariableMap {
+  const rawThemeVariables = mergeThemeVariableLayers([
+    rootThemeVariables,
+    xmluiThemeVariables,
+  ], tone);
+  return mergeThemeVariableLayers([
+    rootThemeVariables,
+    generateBaseSpacings(rawThemeVariables),
+    generatePaddingSegments(rawThemeVariables),
+    generateBorderSegments(rawThemeVariables),
+    generateBaseTones(rawThemeVariables),
+    xmluiThemeVariables,
+  ], tone);
+}
+
+export const defaultThemeVariables = buildDefaultThemeVariables();
 
 export function resolveThemeReferences(value: unknown): unknown {
   if (typeof value !== "string") {
@@ -516,6 +533,302 @@ export function mergeThemeVariableLayers(
   return merged;
 }
 
+export function generateBaseTones(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
+  if (!themeVariables) {
+    return {};
+  }
+  const resolvedThemeVariables = resolveThemeVariableMap(themeVariables);
+  return {
+    ...generateBaseTonesForColor("color-primary", resolvedThemeVariables),
+    ...generateBaseTonesForColor("color-secondary", resolvedThemeVariables),
+    ...generateBaseTonesForColor("color-info", resolvedThemeVariables),
+    ...generateBaseTonesForColor("color-success", resolvedThemeVariables),
+    ...generateBaseTonesForColor("color-warn", resolvedThemeVariables),
+    ...generateBaseTonesForColor("color-danger", resolvedThemeVariables),
+    ...generateBaseTonesForColor("color-surface", resolvedThemeVariables, { distributeEven: true }),
+  };
+}
+
+export function generateBaseSpacings(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
+  if (!themeVariables) {
+    return {};
+  }
+  const resolvedThemeVariables = resolveThemeVariableMap(themeVariables);
+  const base = resolvedThemeVariables["space-base"];
+  if (!base || typeof base !== "string") {
+    return {};
+  }
+  let baseTrimmed = base.trim();
+  if (baseTrimmed.startsWith(".")) {
+    baseTrimmed = `0${baseTrimmed}`;
+  }
+  const baseNum = parseFloat(baseTrimmed);
+  if (Number.isNaN(baseNum)) {
+    return {};
+  }
+  const baseUnit = baseTrimmed.replace(String(baseNum), "") || "px";
+  const scale = [
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
+  ];
+  return Object.fromEntries(
+    scale.map((step) => [
+      `space-${String(step).replace(".", "_")}`,
+      `${step * baseNum}${baseUnit}`,
+    ]),
+  );
+}
+
+export function generatePaddingSegments(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
+  if (!themeVariables) {
+    return {};
+  }
+  const result: ThemeVariableMap = {};
+  for (const [key, value] of Object.entries(themeVariables)) {
+    if (value === null || value === undefined || value === "") {
+      continue;
+    }
+    const stringValue = String(value);
+    let match = /^paddingHorizontal-(.+)$/.exec(key);
+    if (match) {
+      const suffix = match[1];
+      result[`paddingLeft-${suffix}`] ??= stringValue;
+      result[`paddingRight-${suffix}`] ??= stringValue;
+      continue;
+    }
+    match = /^paddingVertical-(.+)$/.exec(key);
+    if (match) {
+      const suffix = match[1];
+      result[`paddingTop-${suffix}`] ??= stringValue;
+      result[`paddingBottom-${suffix}`] ??= stringValue;
+      continue;
+    }
+    match = /^padding-(.+)$/.exec(key);
+    if (!match) {
+      continue;
+    }
+    const suffix = match[1];
+    const horizontal = themeVariables[`paddingHorizontal-${suffix}`];
+    const vertical = themeVariables[`paddingVertical-${suffix}`];
+    const segments = stringValue.trim().replace(/ +/g, " ").split(" ");
+    if (segments.length < 1 || segments.length > 4) {
+      continue;
+    }
+    const [top, right = top, bottom = top, left = right] = segments;
+    result[`paddingTop-${suffix}`] ??= vertical ?? top;
+    result[`paddingRight-${suffix}`] ??= horizontal ?? right;
+    result[`paddingBottom-${suffix}`] ??= vertical ?? bottom;
+    result[`paddingLeft-${suffix}`] ??= horizontal ?? left;
+  }
+  return result;
+}
+
+export function generateBorderSegments(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
+  if (!themeVariables) {
+    return {};
+  }
+  const generated: ThemeVariableMap = {};
+  const entries = Object.entries(themeVariables).filter(([, value]) =>
+    value !== undefined && value !== null && value !== "",
+  );
+
+  for (const [name, value] of entries) {
+    const suffix = themeVarSuffix(name, "border");
+    if (!suffix) {
+      continue;
+    }
+    const parsed = parseBorderShorthand(String(resolveThemeReferences(value)));
+    setBorderSide(generated, "Left", suffix, value, parsed);
+    setBorderSide(generated, "Right", suffix, value, parsed);
+    setBorderSide(generated, "Top", suffix, value, parsed);
+    setBorderSide(generated, "Bottom", suffix, value, parsed);
+    setBorderParts(generated, "", suffix, parsed);
+  }
+
+  for (const [name, value] of entries) {
+    setAxisBorder(generated, name, value, "Horizontal", ["Left", "Right"]);
+    setAxisBorder(generated, name, value, "Vertical", ["Top", "Bottom"]);
+  }
+
+  for (const [name, value] of entries) {
+    for (const side of borderSides) {
+      const suffix = themeVarSuffix(name, `border${side}`);
+      if (!suffix) {
+        continue;
+      }
+      const parsed = parseBorderShorthand(String(resolveThemeReferences(value)));
+      setBorderSide(generated, side, suffix, value, parsed);
+    }
+  }
+
+  for (const part of borderParts) {
+    for (const [name, value] of entries) {
+      const suffix = themeVarSuffix(name, `border${part}`);
+      if (!suffix) {
+        continue;
+      }
+      for (const side of borderSides) {
+        generated[`border${side}${part}-${suffix}`] = value;
+      }
+    }
+  }
+
+  for (const part of borderParts) {
+    for (const [name, value] of entries) {
+      setAxisBorderPart(generated, name, value, "Horizontal", part, ["Left", "Right"]);
+      setAxisBorderPart(generated, name, value, "Vertical", part, ["Top", "Bottom"]);
+    }
+  }
+
+  for (const part of borderParts) {
+    for (const [name, value] of entries) {
+      for (const side of borderSides) {
+        const suffix = themeVarSuffix(name, `border${side}${part}`);
+        if (suffix) {
+          generated[`border${side}${part}-${suffix}`] = value;
+        }
+      }
+    }
+  }
+
+  return generated;
+}
+
+function setAxisBorder(
+  generated: ThemeVariableMap,
+  name: string,
+  value: unknown,
+  axis: "Horizontal" | "Vertical",
+  sides: readonly BorderSide[],
+): void {
+  const suffix = themeVarSuffix(name, `border${axis}`);
+  if (!suffix) {
+    return;
+  }
+  const parsed = parseBorderShorthand(String(resolveThemeReferences(value)));
+  for (const side of sides) {
+    setBorderSide(generated, side, suffix, value, parsed);
+  }
+}
+
+function setAxisBorderPart(
+  generated: ThemeVariableMap,
+  name: string,
+  value: unknown,
+  axis: "Horizontal" | "Vertical",
+  part: BorderPart,
+  sides: readonly BorderSide[],
+): void {
+  const suffix = themeVarSuffix(name, `border${axis}${part}`);
+  if (!suffix) {
+    return;
+  }
+  for (const side of sides) {
+    generated[`border${side}${part}-${suffix}`] = value;
+  }
+}
+
+function setBorderSide(
+  generated: ThemeVariableMap,
+  side: BorderSide,
+  suffix: string,
+  value: unknown,
+  parsed: ReturnType<typeof parseBorderShorthand>,
+): void {
+  generated[`border${side}-${suffix}`] = value;
+  setBorderParts(generated, side, suffix, parsed);
+}
+
+function setBorderParts(
+  generated: ThemeVariableMap,
+  side: "" | BorderSide,
+  suffix: string,
+  parsed: ReturnType<typeof parseBorderShorthand>,
+): void {
+  const prefix = side ? `border${side}` : "border";
+  if (parsed?.width) {
+    generated[`${prefix}Width-${suffix}`] = parsed.width;
+  }
+  if (parsed?.style) {
+    generated[`${prefix}Style-${suffix}`] = parsed.style;
+  }
+  if (parsed?.color) {
+    generated[`${prefix}Color-${suffix}`] = parsed.color;
+  }
+}
+
+function themeVarSuffix(name: string, prefix: string): string | undefined {
+  const match = new RegExp(`^${prefix}-(.+)$`).exec(name);
+  return match?.[1];
+}
+
+function resolveThemeVariableMap(themeVariables: ThemeVariableMap): Record<string, string> {
+  const resolved: Record<string, string> = {};
+  for (const name of Object.keys(themeVariables)) {
+    const value = resolveThemeVariableValue(name, themeVariables);
+    if (value !== undefined && value !== null && value !== "") {
+      resolved[name] = String(value);
+    }
+  }
+  return resolved;
+}
+
+function resolveThemeVariableValue(
+  name: string,
+  themeVariables: ThemeVariableMap,
+  visited = new Set<string>(),
+): unknown {
+  const normalized = name.startsWith("$") ? name.slice(1) : name;
+  if (visited.has(normalized)) {
+    return undefined;
+  }
+  visited.add(normalized);
+  const value = themeVariables[normalized];
+  if (typeof value === "string" && value.startsWith("$")) {
+    return resolveThemeVariableValue(value, themeVariables, visited);
+  }
+  return value;
+}
+
+function generateBaseTonesForColor(
+  varName: string,
+  themeVariables: Record<string, string>,
+  options: { distributeEven?: boolean } = {},
+): ThemeVariableMap {
+  const color = parseColor(themeVariables[varName]);
+  if (!color) {
+    return {};
+  }
+
+  const baseLightness = labLightness(color);
+  const darkStep = baseLightness / 5;
+  const lightStep = (100 - baseLightness) / 5;
+  const lightnessValues = options.distributeEven
+    ? [100, 98, 95, 83, 75, 63, 52, 40, 32, 27, 16, 13, 9]
+    : [
+        100,
+        baseLightness + lightStep * 4.5,
+        baseLightness + lightStep * 4,
+        baseLightness + lightStep * 3,
+        baseLightness + lightStep * 2,
+        baseLightness + lightStep,
+        baseLightness,
+        baseLightness - darkStep,
+        baseLightness - darkStep * 2,
+        baseLightness - darkStep * 3,
+        baseLightness - darkStep * 4,
+        baseLightness - darkStep * 4.5,
+        baseLightness - darkStep * 5,
+      ];
+  const names = ["0", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950", "1000"];
+  return Object.fromEntries(
+    names.map((name, index) => [
+      `const-${varName}-${name}`,
+      hslString(color.h, color.s, lightnessValues[index]),
+    ]),
+  );
+}
+
 export function collectComponentThemeDefaults(
   metadata: ComponentMetadata,
   contributors: readonly ComponentMetadata[] = [],
@@ -567,20 +880,42 @@ export function createComponentThemeClass(
   contributors: readonly ComponentMetadata[] = [],
   variant?: string,
 ): ComponentThemeClass {
-  const baseThemeVariables = mergeThemeVariableLayers([
-    collectComponentThemeDefaults(metadata, contributors),
+  const defaultThemeVariables = collectComponentThemeDefaults(metadata, contributors);
+  const variantThemeVariables = variant
+    ? componentVariantThemeVariables(metadata, themeVariables, contributors, variant)
+    : {};
+  const rawThemeVariables = mergeThemeVariableLayers([
+    defaultThemeVariables,
     themeVariables,
-    variant ? componentVariantThemeVariables(metadata, themeVariables, contributors, variant) : {},
+    variantThemeVariables,
+  ]);
+  const baseThemeVariables = mergeThemeVariableLayers([
+    defaultThemeVariables,
+    generatePaddingSegments(rawThemeVariables),
+    generateBorderSegments(rawThemeVariables),
+    themeVariables,
+    variantThemeVariables,
+  ]);
+  const rawExplicitThemeVariables = mergeThemeVariableLayers([
+    themeVariables,
+    variantThemeVariables,
+  ]);
+  const explicitThemeVariables = mergeThemeVariableLayers([
+    generatePaddingSegments(rawExplicitThemeVariables),
+    generateBorderSegments(rawExplicitThemeVariables),
+    rawExplicitThemeVariables,
   ]);
   const mergedThemeVariables = mergeThemeVariableLayers([
-    generateButtonTones(baseThemeVariables),
+    generatePaddingSegments(baseThemeVariables),
+    generateBorderSegments(baseThemeVariables),
     baseThemeVariables,
+    generateButtonTones(baseThemeVariables, explicitThemeVariables),
   ]);
   const style = componentThemeVariablesToCssProperties(
     metadata,
     mergedThemeVariables,
     contributors,
-    themeVariables,
+    explicitThemeVariables,
   );
   return {
     className: `xmlui-${componentName}`,
@@ -616,38 +951,135 @@ function componentVariantThemeVariables(
   return aliases;
 }
 
-export function generateButtonTones(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
+export function generateButtonTones(
+  themeVariables: ThemeVariableMap | undefined,
+  explicitThemeVariables: ThemeVariableMap = themeVariables ?? {},
+): ThemeVariableMap {
   if (!themeVariables) {
     return {};
   }
   const generated: ThemeVariableMap = {};
+  const explicitValue = (...names: string[]) => firstThemeReference(explicitThemeVariables, names);
+  const themeValue = (...names: string[]) => firstThemeReference(themeVariables, names);
   for (const themeColor of ["primary", "secondary", "attention"]) {
     const tone = buttonToneReferences(themeColor, themeVariables);
+    const solidBackground = themeValue(`backgroundColor-Button-${themeColor}-solid`) ?? tone.base;
+    const solidBorder = themeValue(`borderColor-Button-${themeColor}-solid`) ?? tone.base;
+    const solidText = themeValue(
+      `textColor-Button-${themeColor}-solid`,
+      "textColor-Button-solid",
+    ) ?? tone.contrast;
+    const solidBorderStyle = themeValue(
+      `borderStyle-Button-${themeColor}-solid`,
+      "borderStyle-Button",
+    ) ?? "solid";
+    const outlinedBackground = themeValue(`backgroundColor-Button-${themeColor}-outlined`);
+    const outlinedBorder = themeValue(`borderColor-Button-${themeColor}-outlined`) ?? tone.base;
+    const outlinedBorderStyle = themeValue(
+      `borderStyle-Button-${themeColor}-outlined`,
+      "borderStyle-Button",
+    ) ?? "solid";
+    const outlinedText = themeValue(`textColor-Button-${themeColor}-outlined`) ?? tone.base;
+    const ghostBackground = themeValue(`backgroundColor-Button-${themeColor}-ghost`);
+    const ghostText = themeValue(`textColor-Button-${themeColor}-ghost`) ?? tone.base;
+    const ghostBorderStyle = themeValue(
+      `borderStyle-Button-${themeColor}-ghost`,
+      "borderStyle-Button",
+    ) ?? "solid";
     Object.assign(generated, {
-      [`backgroundColor-Button-${themeColor}-solid`]: tone.base,
-      [`backgroundColor-Button-${themeColor}-solid--hover`]: tone.hover,
-      [`backgroundColor-Button-${themeColor}-solid--active`]: tone.active,
-      [`borderColor-Button-${themeColor}-solid`]: tone.base,
-      [`borderColor-Button-${themeColor}-solid--hover`]: tone.base,
-      [`borderColor-Button-${themeColor}-solid--active`]: tone.base,
-      [`textColor-Button-${themeColor}-solid`]: tone.contrast,
-      [`textColor-Button-${themeColor}-solid--hover`]: tone.contrast,
-      [`textColor-Button-${themeColor}-solid--active`]: tone.contrast,
+      [`backgroundColor-Button-${themeColor}-solid`]: solidBackground,
+      [`backgroundColor-Button-${themeColor}-solid--hover`]:
+        explicitValue(`backgroundColor-Button-${themeColor}-solid--hover`) ??
+        explicitValue(`backgroundColor-Button-${themeColor}-solid`) ??
+        themeValue(`backgroundColor-Button-${themeColor}-solid--hover`) ??
+        solidBackground,
+      [`backgroundColor-Button-${themeColor}-solid--active`]:
+        explicitValue(`backgroundColor-Button-${themeColor}-solid--active`) ??
+        explicitValue(`backgroundColor-Button-${themeColor}-solid`) ??
+        themeValue(`backgroundColor-Button-${themeColor}-solid--active`) ??
+        solidBackground,
+      [`borderColor-Button-${themeColor}-solid`]: solidBorder,
+      [`borderColor-Button-${themeColor}-solid--hover`]:
+        explicitValue(`borderColor-Button-${themeColor}-solid--hover`) ??
+        explicitValue(`borderColor-Button-${themeColor}-solid`) ??
+        themeValue(`borderColor-Button-${themeColor}-solid--hover`) ??
+        solidBorder,
+      [`borderColor-Button-${themeColor}-solid--active`]:
+        explicitValue(`borderColor-Button-${themeColor}-solid--active`) ??
+        explicitValue(`borderColor-Button-${themeColor}-solid`) ??
+        themeValue(`borderColor-Button-${themeColor}-solid--active`) ??
+        solidBorder,
+      [`borderStyle-Button-${themeColor}-solid`]: solidBorderStyle,
+      [`textColor-Button-${themeColor}-solid`]: solidText,
+      [`textColor-Button-${themeColor}-solid--hover`]:
+        explicitValue(`textColor-Button-${themeColor}-solid--hover`) ??
+        explicitValue(`textColor-Button-${themeColor}-solid`, "textColor-Button-solid") ??
+        themeValue(`textColor-Button-${themeColor}-solid--hover`) ??
+        solidText,
+      [`textColor-Button-${themeColor}-solid--active`]:
+        explicitValue(`textColor-Button-${themeColor}-solid--active`) ??
+        explicitValue(`textColor-Button-${themeColor}-solid`, "textColor-Button-solid") ??
+        themeValue(`textColor-Button-${themeColor}-solid--active`) ??
+        solidText,
 
-      [`backgroundColor-Button-${themeColor}-outlined--hover`]: tone.alphaHover,
-      [`backgroundColor-Button-${themeColor}-outlined--active`]: tone.alphaActive,
-      [`borderColor-Button-${themeColor}-outlined`]: tone.base,
-      [`borderColor-Button-${themeColor}-outlined--hover`]: tone.hover,
-      [`borderColor-Button-${themeColor}-outlined--active`]: tone.active,
-      [`textColor-Button-${themeColor}-outlined`]: tone.base,
-      [`textColor-Button-${themeColor}-outlined--hover`]: tone.hover,
-      [`textColor-Button-${themeColor}-outlined--active`]: tone.active,
+      [`backgroundColor-Button-${themeColor}-outlined`]: outlinedBackground,
+      [`backgroundColor-Button-${themeColor}-outlined--hover`]:
+        explicitValue(`backgroundColor-Button-${themeColor}-outlined--hover`) ??
+        explicitValue(`backgroundColor-Button-${themeColor}-outlined`) ??
+        themeValue(`backgroundColor-Button-${themeColor}-outlined--hover`) ??
+        outlinedBackground ?? tone.alphaHover,
+      [`backgroundColor-Button-${themeColor}-outlined--active`]:
+        explicitValue(`backgroundColor-Button-${themeColor}-outlined--active`) ??
+        explicitValue(`backgroundColor-Button-${themeColor}-outlined`) ??
+        themeValue(`backgroundColor-Button-${themeColor}-outlined--active`) ??
+        outlinedBackground ?? tone.alphaActive,
+      [`borderColor-Button-${themeColor}-outlined`]: outlinedBorder,
+      [`borderColor-Button-${themeColor}-outlined--hover`]:
+        explicitValue(`borderColor-Button-${themeColor}-outlined--hover`) ??
+        explicitValue(`borderColor-Button-${themeColor}-outlined`) ??
+        themeValue(`borderColor-Button-${themeColor}-outlined--hover`) ??
+        outlinedBorder,
+      [`borderColor-Button-${themeColor}-outlined--active`]:
+        explicitValue(`borderColor-Button-${themeColor}-outlined--active`) ??
+        explicitValue(`borderColor-Button-${themeColor}-outlined`) ??
+        themeValue(`borderColor-Button-${themeColor}-outlined--active`) ??
+        outlinedBorder,
+      [`borderStyle-Button-${themeColor}-outlined`]: outlinedBorderStyle,
+      [`textColor-Button-${themeColor}-outlined`]: outlinedText,
+      [`textColor-Button-${themeColor}-outlined--hover`]:
+        explicitValue(`textColor-Button-${themeColor}-outlined--hover`) ??
+        explicitValue(`textColor-Button-${themeColor}-outlined`) ??
+        themeValue(`textColor-Button-${themeColor}-outlined--hover`) ??
+        outlinedText,
+      [`textColor-Button-${themeColor}-outlined--active`]:
+        explicitValue(`textColor-Button-${themeColor}-outlined--active`) ??
+        explicitValue(`textColor-Button-${themeColor}-outlined`) ??
+        themeValue(`textColor-Button-${themeColor}-outlined--active`) ??
+        outlinedText,
 
-      [`backgroundColor-Button-${themeColor}-ghost--hover`]: tone.alphaHover,
-      [`backgroundColor-Button-${themeColor}-ghost--active`]: tone.alphaActive,
-      [`textColor-Button-${themeColor}-ghost`]: tone.base,
-      [`textColor-Button-${themeColor}-ghost--hover`]: tone.hover,
-      [`textColor-Button-${themeColor}-ghost--active`]: tone.active,
+      [`backgroundColor-Button-${themeColor}-ghost`]: ghostBackground,
+      [`backgroundColor-Button-${themeColor}-ghost--hover`]:
+        explicitValue(`backgroundColor-Button-${themeColor}-ghost--hover`) ??
+        explicitValue(`backgroundColor-Button-${themeColor}-ghost`) ??
+        themeValue(`backgroundColor-Button-${themeColor}-ghost--hover`) ??
+        ghostBackground ?? tone.alphaHover,
+      [`backgroundColor-Button-${themeColor}-ghost--active`]:
+        explicitValue(`backgroundColor-Button-${themeColor}-ghost--active`) ??
+        explicitValue(`backgroundColor-Button-${themeColor}-ghost`) ??
+        themeValue(`backgroundColor-Button-${themeColor}-ghost--active`) ??
+        ghostBackground ?? tone.alphaActive,
+      [`textColor-Button-${themeColor}-ghost`]: ghostText,
+      [`borderStyle-Button-${themeColor}-ghost`]: ghostBorderStyle,
+      [`textColor-Button-${themeColor}-ghost--hover`]:
+        explicitValue(`textColor-Button-${themeColor}-ghost--hover`) ??
+        explicitValue(`textColor-Button-${themeColor}-ghost`) ??
+        themeValue(`textColor-Button-${themeColor}-ghost--hover`) ??
+        ghostText,
+      [`textColor-Button-${themeColor}-ghost--active`]:
+        explicitValue(`textColor-Button-${themeColor}-ghost--active`) ??
+        explicitValue(`textColor-Button-${themeColor}-ghost`) ??
+        themeValue(`textColor-Button-${themeColor}-ghost--active`) ??
+        ghostText,
     });
   }
   return generated;
@@ -704,12 +1136,142 @@ function firstThemeReference(
     if (value !== undefined && value !== null && value !== "") {
       return typeof value === "string" ? value : String(value);
     }
+    for (const fallbackName of themeVariableFallbackNames(name)) {
+      if (fallbackName === name) {
+        continue;
+      }
+      const fallbackValue = themeVariables[fallbackName];
+      if (fallbackValue !== undefined && fallbackValue !== null && fallbackValue !== "") {
+        return typeof fallbackValue === "string" ? fallbackValue : String(fallbackValue);
+      }
+    }
   }
   return undefined;
 }
 
 function alphaThemeColor(value: string, alpha: number): string {
   return `rgb(from ${resolveThemeReferences(value)} r g b / ${alpha})`;
+}
+
+type ParsedColor = {
+  h: number;
+  s: number;
+  l: number;
+  r: number;
+  g: number;
+  b: number;
+};
+
+function parseColor(value: string | undefined): ParsedColor | undefined {
+  if (!value || value.startsWith("$")) {
+    return undefined;
+  }
+  const source = value.trim().toLowerCase();
+  const hslMatch = /^hsl\(\s*([-.\d]+)(?:deg)?\s*,\s*([-.\d]+)%\s*,\s*([-.\d]+)%\s*\)$/.exec(source);
+  if (hslMatch) {
+    const h = Number(hslMatch[1]);
+    const s = Number(hslMatch[2]);
+    const l = Number(hslMatch[3]);
+    const rgb = hslToRgb(h, s, l);
+    return { h, s, l, ...rgb };
+  }
+  const hexMatch = /^#([0-9a-f]{3}|[0-9a-f]{6})$/.exec(source);
+  if (hexMatch) {
+    const hex = hexMatch[1].length === 3
+      ? hexMatch[1].split("").map((part) => part + part).join("")
+      : hexMatch[1];
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return { ...rgbToHsl(r, g, b), r, g, b };
+  }
+  if (source === "white") {
+    return { h: 0, s: 0, l: 100, r: 255, g: 255, b: 255 };
+  }
+  if (source === "black") {
+    return { h: 0, s: 0, l: 0, r: 0, g: 0, b: 0 };
+  }
+  return undefined;
+}
+
+function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+  const normalizedHue = ((h % 360) + 360) % 360 / 360;
+  const saturation = clamp(s, 0, 100) / 100;
+  const lightness = clamp(l, 0, 100) / 100;
+  if (saturation === 0) {
+    const channel = lightness * 255;
+    return { r: channel, g: channel, b: channel };
+  }
+  const q = lightness < 0.5
+    ? lightness * (1 + saturation)
+    : lightness + saturation - lightness * saturation;
+  const p = 2 * lightness - q;
+  return {
+    r: hueToRgb(p, q, normalizedHue + 1 / 3) * 255,
+    g: hueToRgb(p, q, normalizedHue) * 255,
+    b: hueToRgb(p, q, normalizedHue - 1 / 3) * 255,
+  };
+}
+
+function hueToRgb(p: number, q: number, hue: number): number {
+  let value = hue;
+  if (value < 0) value += 1;
+  if (value > 1) value -= 1;
+  if (value < 1 / 6) return p + (q - p) * 6 * value;
+  if (value < 1 / 2) return q;
+  if (value < 2 / 3) return p + (q - p) * (2 / 3 - value) * 6;
+  return p;
+}
+
+function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  const red = r / 255;
+  const green = g / 255;
+  const blue = b / 255;
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  const l = (max + min) / 2;
+  if (max === min) {
+    return { h: 0, s: 0, l: l * 100 };
+  }
+  const delta = max - min;
+  const s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+  let h = 0;
+  if (max === red) {
+    h = (green - blue) / delta + (green < blue ? 6 : 0);
+  } else if (max === green) {
+    h = (blue - red) / delta + 2;
+  } else {
+    h = (red - green) / delta + 4;
+  }
+  return { h: h * 60, s: s * 100, l: l * 100 };
+}
+
+function labLightness(color: ParsedColor): number {
+  const y = linearRgb(color.r / 255) * 0.2126
+    + linearRgb(color.g / 255) * 0.7152
+    + linearRgb(color.b / 255) * 0.0722;
+  return y <= 216 / 24389
+    ? y * (24389 / 27)
+    : 116 * Math.cbrt(y) - 16;
+}
+
+function linearRgb(channel: number): number {
+  return channel <= 0.04045
+    ? channel / 12.92
+    : ((channel + 0.055) / 1.055) ** 2.4;
+}
+
+function hslString(h: number, s: number, l: number): string {
+  return `hsl(${formatCssNumber(h)}, ${formatCssNumber(s)}%, ${formatCssNumber(clamp(l, 0, 100))}%)`;
+}
+
+function formatCssNumber(value: number): string {
+  const rounded = Math.round(value * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }
 
 export function themeVariableFallbackNames(name: string): string[] {
@@ -770,6 +1332,14 @@ function themeVariableValue(
     const value = themeVariables[sourceName];
     if (value !== undefined) {
       return value;
+    }
+  }
+  for (const sourceName of sourceNames ?? [name]) {
+    for (const fallbackName of themeVariableFallbackNames(sourceName)) {
+      const value = themeVariables[fallbackName];
+      if (value !== undefined) {
+        return value;
+      }
     }
   }
   return themeVariables[name];

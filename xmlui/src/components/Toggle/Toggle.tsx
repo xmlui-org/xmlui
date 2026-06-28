@@ -1,117 +1,53 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode } from "react";
+import { memo, useMemo } from "react";
+import React, {
+  type ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import classnames from "classnames";
 
-export type ToggleApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  value: boolean;
-};
+import styles from "./Toggle.module.scss";
 
-export type ToggleControllerOptions = {
-  value?: unknown;
-  initialValue?: unknown;
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
+import { defaultProps } from "./Toggle.defaults";
+import { PART_INPUT } from "../../components-core/parts";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+
+type ToggleProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange" | "readOnly" | "onClick" | "onFocus" | "onBlur"
+> & {
+  initialValue?: boolean;
+  value?: boolean;
   enabled?: boolean;
-  autoFocus?: boolean;
+  readOnly?: boolean;
+  validationStatus?: ValidationStatus;
+  updateState?: UpdateStateFn;
+  onClick?: (event: React.MouseEvent) => void;
+  onDidChange?: (newValue: boolean) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  variant?: "checkbox" | "switch";
   indeterminate?: boolean;
-  suppressInitialTransition?: boolean;
-  onDidChange?: (value: boolean) => void | Promise<void>;
+  classes?: Record<string, string>;
+  registerComponentApi?: RegisterComponentApiFn;
+  inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
+  "aria-label"?: string;
+  invalidMessages?: string[];
+  validationResult?: ReactNode;
+  validationInProgress?: boolean;
 };
 
-export type ToggleController = {
-  inputRef: React.MutableRefObject<HTMLInputElement | null>;
-  checked: boolean;
-  suppressTransition: boolean;
-  updateValue: (value: unknown) => void;
-  focus: () => void;
-  api: ToggleApi;
-};
-
-export function useToggleController({
-  value,
-  initialValue,
-  enabled = true,
-  autoFocus,
-  indeterminate,
-  suppressInitialTransition = false,
-  onDidChange,
-}: ToggleControllerOptions): ToggleController {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const controlled = value !== undefined;
-  const initialChecked = transformToLegitValue(value ?? initialValue);
-  const [checked, setChecked] = useState(() => initialChecked);
-  const [suppressTransition, setSuppressTransition] = useState(
-    () => suppressInitialTransition && initialChecked,
-  );
-
-  useEffect(() => {
-    if (controlled) {
-      setChecked(transformToLegitValue(value));
-    }
-  }, [controlled, value]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setChecked(transformToLegitValue(initialValue));
-    }
-  }, [controlled, initialValue]);
-
-  useEffect(() => {
-    if (inputRef.current && typeof indeterminate === "boolean") {
-      inputRef.current.indeterminate = indeterminate;
-    }
-  }, [indeterminate, checked]);
-
-  useEffect(() => {
-    if (!suppressTransition) {
-      return;
-    }
-    const first = requestAnimationFrame(() => {
-      const second = requestAnimationFrame(() => setSuppressTransition(false));
-      return () => cancelAnimationFrame(second);
-    });
-    return () => cancelAnimationFrame(first);
-  }, [suppressTransition]);
-
-  useEffect(() => {
-    if (!autoFocus || !enabled) {
-      return;
-    }
-    const timeoutId = setTimeout(() => inputRef.current?.focus(), 0);
-    return () => clearTimeout(timeoutId);
-  }, [autoFocus, enabled]);
-
-  const updateValue = useCallback((nextValue: unknown) => {
-    const normalized = transformToLegitValue(nextValue);
-    setChecked((current) => {
-      if (current !== normalized) {
-        void onDidChange?.(normalized);
-      }
-      return normalized;
-    });
-  }, [onDidChange]);
-
-  const focus = useCallback(() => {
-    if (enabled) {
-      inputRef.current?.focus();
-    }
-  }, [enabled]);
-
-  return {
-    inputRef,
-    checked,
-    suppressTransition,
-    updateValue,
-    focus,
-    api: {
-      focus,
-      setValue: updateValue,
-      get value() {
-        return checked;
-      },
-    },
-  };
-}
-
-export function transformToLegitValue(inp: unknown): boolean {
+function transformToLegitValue(inp: unknown): boolean {
   if (typeof inp === "undefined" || inp === null) {
     return false;
   }
@@ -119,7 +55,7 @@ export function transformToLegitValue(inp: unknown): boolean {
     return inp;
   }
   if (typeof inp === "number") {
-    return Number.isNaN(inp) || Boolean(inp);
+    return !isNaN(inp) && !!inp;
   }
   if (typeof inp === "string") {
     return inp.trim() !== "" && inp.toLowerCase() !== "false";
@@ -132,3 +68,195 @@ export function transformToLegitValue(inp: unknown): boolean {
   }
   return false;
 }
+
+export const Toggle = memo(forwardRef(function Toggle(
+  {
+    id: idProp,
+    initialValue = defaultProps.initialValue,
+    value = defaultProps.value,
+    enabled = defaultProps.enabled,
+    style,
+    readOnly,
+    validationStatus = defaultProps.validationStatus,
+    updateState = noop,
+    onClick = noop,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    variant = "checkbox",
+    indeterminate = defaultProps.indeterminate,
+    classes,
+    className,
+    required,
+    autoFocus,
+    registerComponentApi,
+    inputRenderer,
+    tabIndex,
+    "aria-label": ariaLabel,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    invalidMessages: _invalidMessages,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    validationResult: _validationResult,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    validationInProgress: _validationInProgress,
+    ...rest
+  }: ToggleProps,
+  forwardedRef: ForwardedRef<HTMLInputElement>,
+) {
+  const id = useFormItemInputId(idProp);
+  const innerRef = React.useRef<HTMLInputElement | null>(null);
+  const composedRef = useComposedRefs(forwardedRef, innerRef);
+
+  const initialCycleRef = React.useRef(true);
+  const [suppressTransition, setSuppressTransition] = useState(() => transformToLegitValue(initialValue));
+
+  useEffect(() => {
+    const legitInitial = transformToLegitValue(initialValue);
+    updateState({ value: legitInitial }, { initial: true });
+    if (initialCycleRef.current) {
+      initialCycleRef.current = false;
+      if (legitInitial) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setSuppressTransition(false);
+          });
+        });
+      }
+    }
+  }, [initialValue, updateState]);
+
+  const updateValue = useCallback(
+    (value: boolean) => {
+      if (innerRef.current?.checked === value) return;
+      updateState({ value });
+      onDidChange(value);
+    },
+    [onDidChange, updateState],
+  );
+
+  const onInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (readOnly) {
+        return;
+      }
+      updateState({ value: event.target.checked });
+      onDidChange(event.target.checked);
+    },
+    [onDidChange, readOnly, updateState],
+  );
+
+  const handleOnFocus = useCallback(() => {
+    onFocus?.();
+  }, [onFocus]);
+
+  const handleOnBlur = useCallback(() => {
+    onBlur?.();
+  }, [onBlur]);
+
+  useEffect(() => {
+    if (typeof indeterminate === "boolean" && innerRef.current) {
+      innerRef.current.indeterminate = indeterminate;
+    }
+  }, [indeterminate]);
+
+  const focus = useCallback(() => {
+    innerRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (innerRef.current && autoFocus) {
+      setTimeout(() => focus(), 0);
+    }
+  }, [focus, autoFocus]);
+
+  const setValue = useEvent((newValue) => {
+    updateValue(transformToLegitValue(newValue));
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+    });
+  }, [focus, registerComponentApi, setValue]);
+
+  const input = useMemo(() => {
+    const legitValue = transformToLegitValue(value);
+    return (
+      <Part partId={PART_INPUT}>
+        <input
+          {...rest}
+          data-component-type="Toggle"
+          id={id}
+          ref={composedRef}
+          type="checkbox"
+          role={variant}
+          checked={legitValue}
+          disabled={!enabled}
+          tabIndex={tabIndex}
+          aria-label={ariaLabel}
+          required={required}
+          readOnly={readOnly}
+          aria-readonly={readOnly}
+          aria-checked={indeterminate ? "mixed" : legitValue}
+          aria-required={required}
+          aria-disabled={!enabled}
+          onClick={onClick}
+          onChange={onInputChange}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          autoFocus={autoFocus}
+          style={style}
+          className={classnames(
+            !inputRenderer ? classes?.[COMPONENT_PART_KEY] : undefined,
+            className,
+            styles.resetAppearance,
+            {
+              [styles.checkbox]: variant === "checkbox",
+              [styles.switch]: variant === "switch",
+              [styles.error]: validationStatus === "error",
+              [styles.warning]: validationStatus === "warning",
+              [styles.valid]: validationStatus === "valid",
+              [styles.noTransition]: suppressTransition,
+            },
+          )}
+        />
+      </Part>
+    );
+  }, [
+    rest,
+    classes,
+    className,
+    inputRenderer,
+    composedRef,
+    style,
+    id,
+    enabled,
+    tabIndex,
+    ariaLabel,
+    handleOnBlur,
+    handleOnFocus,
+    onInputChange,
+    onClick,
+    readOnly,
+    required,
+    validationStatus,
+    value,
+    variant,
+    indeterminate,
+    autoFocus,
+    suppressTransition,
+  ]);
+
+  return inputRenderer ? (
+    <label className={classnames(styles.label, classes?.[COMPONENT_PART_KEY])}>
+      <div className={styles.inputContainer}>{input}</div>
+      {inputRenderer({
+        $checked: transformToLegitValue(value),
+        $setChecked: setValue,
+      })}
+    </label>
+  ) : (
+    input
+  );
+}));

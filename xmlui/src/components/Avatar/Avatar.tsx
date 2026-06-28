@@ -4,40 +4,46 @@ import { sizeValues } from "../abstractions";
 import { defaultProps } from "./Avatar.defaults";
 
 const COMP = "Avatar";
-
 const avatarStylesSource = `
 $backgroundColor-Avatar: createThemeVar("backgroundColor-Avatar");
 $boxShadow-Avatar: createThemeVar("boxShadow-Avatar");
 $textColor-Avatar: createThemeVar("textColor-Avatar");
 $fontWeight-Avatar: createThemeVar("fontWeight-Avatar");
-$borderRadius-Avatar: createThemeVar("borderRadius-Avatar");
-$border-Avatar: createThemeVar("border-Avatar");
-$borderHorizontal-Avatar: createThemeVar("borderHorizontal-Avatar");
-$borderVertical-Avatar: createThemeVar("borderVertical-Avatar");
-$borderTop-Avatar: createThemeVar("borderTop-Avatar");
-$borderRight-Avatar: createThemeVar("borderRight-Avatar");
-$borderBottom-Avatar: createThemeVar("borderBottom-Avatar");
-$borderLeft-Avatar: createThemeVar("borderLeft-Avatar");
-$borderColor-Avatar: createThemeVar("borderColor-Avatar");
-$borderHorizontalColor-Avatar: createThemeVar("borderHorizontalColor-Avatar");
-$borderVerticalColor-Avatar: createThemeVar("borderVerticalColor-Avatar");
-$borderTopColor-Avatar: createThemeVar("borderTopColor-Avatar");
-$borderRightColor-Avatar: createThemeVar("borderRightColor-Avatar");
-$borderBottomColor-Avatar: createThemeVar("borderBottomColor-Avatar");
-$borderLeftColor-Avatar: createThemeVar("borderLeftColor-Avatar");
-$borderStyle-Avatar: createThemeVar("borderStyle-Avatar");
-$borderTopStyle-Avatar: createThemeVar("borderTopStyle-Avatar");
-$borderRightStyle-Avatar: createThemeVar("borderRightStyle-Avatar");
-$borderBottomStyle-Avatar: createThemeVar("borderBottomStyle-Avatar");
-$borderLeftStyle-Avatar: createThemeVar("borderLeftStyle-Avatar");
-$borderWidth-Avatar: createThemeVar("borderWidth-Avatar");
-$borderHorizontalWidth-Avatar: createThemeVar("borderHorizontalWidth-Avatar");
-$borderVerticalWidth-Avatar: createThemeVar("borderVerticalWidth-Avatar");
-$borderTopWidth-Avatar: createThemeVar("borderTopWidth-Avatar");
-$borderRightWidth-Avatar: createThemeVar("borderRightWidth-Avatar");
-$borderBottomWidth-Avatar: createThemeVar("borderBottomWidth-Avatar");
-$borderLeftWidth-Avatar: createThemeVar("borderLeftWidth-Avatar");
 `;
+const borderThemeParts = [
+  "border",
+  "borderWidth",
+  "borderStyle",
+  "borderColor",
+] as const;
+const borderThemeAxes = ["Horizontal", "Vertical"] as const;
+const borderThemeSides = ["Left", "Right", "Top", "Bottom"] as const;
+const borderRadiusThemeVars = [
+  "borderRadius",
+  "borderStartStartRadius",
+  "borderStartEndRadius",
+  "borderEndStartRadius",
+  "borderEndEndRadius",
+] as const;
+
+const avatarThemeVars = {
+  ...extractScssThemeVars(avatarStylesSource),
+  ...Object.fromEntries(borderThemeParts.flatMap((part) => [
+    [`${part}-${COMP}`, `Theme variable declared by ${part}-${COMP}.`],
+    ...borderThemeAxes.map((axis) => [
+      `border${axis}${part.replace("border", "")}-${COMP}`,
+      `Theme variable declared by border${axis}${part.replace("border", "")}-${COMP}.`,
+    ]),
+    ...borderThemeSides.map((side) => [
+      `border${side}${part.replace("border", "")}-${COMP}`,
+      `Theme variable declared by border${side}${part.replace("border", "")}-${COMP}.`,
+    ]),
+  ])),
+  ...Object.fromEntries(borderRadiusThemeVars.map((name) => [
+    `${name}-${COMP}`,
+    `Theme variable declared by ${name}-${COMP}.`,
+  ])),
+};
 
 export const AvatarMd = createMetadata({
   status: "stable",
@@ -69,7 +75,7 @@ export const AvatarMd = createMetadata({
     click: dClick(COMP),
     contextMenu: dContextMenu(COMP),
   },
-  themeVars: extractScssThemeVars(avatarStylesSource),
+  themeVars: avatarThemeVars,
   defaultThemeVars: {
     [`borderRadius-${COMP}`]: "4px",
     [`boxShadow-${COMP}`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",

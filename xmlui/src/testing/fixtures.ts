@@ -711,9 +711,14 @@ async function initTestBed(
     source,
     components: options.components ?? [],
     extensionIds: normalizeExtensionIds(options.extensionIds),
+    resources: options.resources ?? {},
   };
   await installApiInterceptor(page, options.apiInterceptor);
-  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[] }) => {
+  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => {
+    const documentElement = document.documentElement;
+    if (documentElement) {
+      documentElement.style.fontSize = "";
+    }
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -727,6 +732,7 @@ async function initTestBed(
     window.sessionStorage.setItem("__xmluiTestBedSource", payload.source);
     window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
     window.sessionStorage.setItem("__xmluiTestBedExtensionIds", JSON.stringify(payload.extensionIds));
+    window.sessionStorage.setItem("__xmluiTestBedResources", JSON.stringify(payload.resources));
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {

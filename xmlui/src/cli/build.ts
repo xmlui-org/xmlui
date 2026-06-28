@@ -5,6 +5,7 @@ import * as dotenv from "dotenv";
 import { xmluiPlugin } from "../vite-plugin/xmluiPlugin";
 import { rawScssModulePlugin } from "../vite-plugin/rawScssModulePlugin";
 import { rawPackageXmluiSourcePlugin } from "../vite-plugin/rawXmluiSourcePlugin";
+import { svgReactPlugin } from "../vite-plugin/svgReactPlugin";
 import type { XmluiPluginOptions } from "../vite-plugin/xmluiPlugin";
 import * as path from "node:path";
 import { readFile } from "node:fs/promises";
@@ -119,7 +120,7 @@ export async function build({
   const flatDistUiPrefix = "ui_";
 
   await viteBuild({
-    plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), xmlui, react()],
+    plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), svgReactPlugin(), xmlui, react()],
     base: withRelativeRoot ? "" : undefined,
     resolve: {
       extensions: [

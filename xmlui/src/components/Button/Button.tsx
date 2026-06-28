@@ -1,3 +1,5 @@
+import React from "react";
+
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
 import {
@@ -13,6 +15,8 @@ import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { Button } from "./ButtonReact";
 import buttonStylesSource from "./Button.module.scss?xmlui-theme-vars";
 import { defaultProps } from "./Button.defaults";
+import { ThemedIcon } from "../Icon/Icon";
+import { COMPONENT_PART_KEY } from "../../styling";
 
 const COMP = "Button";
 
@@ -103,7 +107,10 @@ export const ButtonMd = createMetadata({
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
   },
-  themeVars: extractScssThemeVars(buttonStylesSource),
+  themeVars: {
+    ...extractScssThemeVars(buttonStylesSource),
+    ...buttonVariantThemeVars(),
+  },
   defaultThemeVars: {
     [`padding-${COMP}`]: "$space-2 $space-4",
     [`gap-${COMP}`]: "$space-2",
@@ -154,6 +161,20 @@ export const ButtonMd = createMetadata({
     [`textColor-${COMP}-primary-outlined--active`]: "$color-primary-900",
     [`backgroundColor-${COMP}-primary-ghost--hover`]: "$color-primary-50",
     [`backgroundColor-${COMP}-primary-ghost--active`]: "$color-primary-100",
+    [`borderColor-${COMP}-secondary`]: "$color-secondary-100",
+    [`backgroundColor-${COMP}-secondary`]: "$color-secondary-500",
+    [`backgroundColor-${COMP}-secondary--hover`]: "$color-secondary-400",
+    [`backgroundColor-${COMP}-secondary--active`]: "$color-secondary-500",
+    [`backgroundColor-${COMP}-secondary-outlined--hover`]: "$color-secondary-50",
+    [`backgroundColor-${COMP}-secondary-outlined--active`]: "$color-secondary-100",
+    [`backgroundColor-${COMP}-secondary-ghost--hover`]: "$color-secondary-100",
+    [`backgroundColor-${COMP}-secondary-ghost--active`]: "$color-secondary-100",
+    [`backgroundColor-${COMP}-attention--hover`]: "$color-danger-400",
+    [`backgroundColor-${COMP}-attention--active`]: "$color-danger-500",
+    [`backgroundColor-${COMP}-attention-outlined--hover`]: "$color-danger-50",
+    [`backgroundColor-${COMP}-attention-outlined--active`]: "$color-danger-100",
+    [`backgroundColor-${COMP}-attention-ghost--hover`]: "$color-danger-50",
+    [`backgroundColor-${COMP}-attention-ghost--active`]: "$color-danger-100",
   },
 });
 
@@ -169,31 +190,35 @@ export const buttonRenderer = wrapComponent({
       : !hasLabelProp
         ? undefined
         : stringifyButtonLabel(label);
+    const iconName = buttonIconValue(adapter.prop("icon"));
+    const rootAttrs = adapter.rootAttrs();
+    const className = typeof rootAttrs.className === "string" ? rootAttrs.className : "";
+    const buttonProps = {
+      ...rootAttrs,
+      id: adapter.stringProp("id"),
+      "data-testid": adapter.stringProp("testId") ?? adapter.stringProp("id"),
+      type: normalizeButtonType(adapter.stringProp("type", defaultProps.type)),
+      variant: normalizeButtonVariant(adapter.stringProp("variant", defaultProps.variant)),
+      themeColor: normalizeButtonThemeColor(adapter.stringProp("themeColor", defaultProps.themeColor)),
+      size: normalizeButtonSize(adapter.stringProp("size", defaultProps.size)),
+      iconPosition: normalizeIconPosition(adapter.stringProp("iconPosition", defaultProps.iconPosition)),
+      contentPosition: normalizeContentPosition(adapter.stringProp("contentPosition", defaultProps.contentPosition)),
+      orientation: normalizeOrientation(adapter.stringProp("orientation", defaultProps.orientation)),
+      contextualLabel: adapter.stringProp("contextualLabel"),
+      icon: iconName ? <ThemedIcon name={iconName} aria-hidden /> : undefined,
+      autoFocus: adapter.booleanProp("autoFocus", defaultProps.autoFocus),
+      disabled: !enabled,
+      classes: { [COMPONENT_PART_KEY]: className },
+      onClick: (event: React.MouseEvent<HTMLButtonElement>) => adapter.event("click")(event),
+      onContextMenu: (event: React.MouseEvent<HTMLButtonElement>) => adapter.event("contextMenu")(event),
+      onFocus: () => adapter.event("gotFocus")(),
+      onBlur: () => adapter.event("lostFocus")(),
+    };
+    const busyOnClick = adapter.booleanProp("busyOnClick", false);
 
-    return (
-      <Button
-        {...adapter.rootAttrs()}
-        id={adapter.stringProp("id")}
-        data-testid={adapter.stringProp("testId") ?? adapter.stringProp("id")}
-        type={adapter.stringProp("type", defaultProps.type)}
-        variant={adapter.stringProp("variant", defaultProps.variant)}
-        themeColor={adapter.stringProp("themeColor", defaultProps.themeColor)}
-        size={adapter.stringProp("size", defaultProps.size)}
-        iconPosition={adapter.stringProp("iconPosition", defaultProps.iconPosition)}
-        contentPosition={adapter.stringProp("contentPosition", defaultProps.contentPosition)}
-        orientation={adapter.stringProp("orientation", defaultProps.orientation)}
-        contextualLabel={adapter.stringProp("contextualLabel")}
-        icon={buttonIconValue(adapter.prop("icon"))}
-        autoFocus={adapter.booleanProp("autoFocus", defaultProps.autoFocus)}
-        disabled={!enabled}
-        onClick={(event) => void adapter.event("click")(event)}
-        onContextMenu={(event) => void adapter.event("contextMenu")(event)}
-        onFocus={() => void adapter.event("gotFocus")()}
-        onBlur={() => void adapter.event("lostFocus")()}
-      >
-        {children}
-      </Button>
-    );
+    return busyOnClick
+      ? <BusyButtonShell buttonProps={buttonProps} enabled={enabled}>{children}</BusyButtonShell>
+      : <Button {...buttonProps}>{children}</Button>;
   },
 });
 
@@ -226,4 +251,108 @@ function buttonIconValue(value: unknown): string | undefined {
     return undefined;
   }
   return value;
+}
+
+function normalizeButtonType(value: string | undefined) {
+  return value === "submit" || value === "reset" || value === "button" ? value : defaultProps.type;
+}
+
+function normalizeButtonVariant(value: string | undefined) {
+  return value === "outlined" || value === "ghost" || value === "solid" ? value : defaultProps.variant;
+}
+
+function normalizeButtonThemeColor(value: string | undefined) {
+  return value === "primary" || value === "secondary" || value === "attention" ? value : defaultProps.themeColor;
+}
+
+function normalizeButtonSize(value: string | undefined) {
+  return value === "xs" || value === "sm" || value === "md" || value === "lg" ? value : defaultProps.size;
+}
+
+function normalizeIconPosition(value: string | undefined) {
+  if (value === "right") {
+    return "end";
+  }
+  if (value === "left") {
+    return "start";
+  }
+  return value === "end" || value === "start" ? value : defaultProps.iconPosition;
+}
+
+function normalizeContentPosition(value: string | undefined) {
+  return value === "start" || value === "center" || value === "end" ? value : defaultProps.contentPosition;
+}
+
+function normalizeOrientation(value: string | undefined) {
+  return value === "vertical" || value === "horizontal" ? value : defaultProps.orientation;
+}
+
+function buttonVariantThemeVars(): Record<string, string> {
+  const vars: Record<string, string> = {};
+  const themeColors = ["attention", "primary", "secondary"];
+  const variants = ["solid", "outlined", "ghost"];
+  const states = ["", "--hover", "--active", "--focus"];
+  const properties = [
+    "fontFamily",
+    "fontSize",
+    "fontWeight",
+    "fontStyle",
+    "borderRadius",
+    "borderWidth",
+    "borderColor",
+    "borderStyle",
+    "backgroundColor",
+    "textColor",
+    "boxShadow",
+    "transition",
+    "outlineWidth",
+    "outlineColor",
+    "outlineStyle",
+    "outlineOffset",
+    "border",
+  ];
+  for (const themeColor of themeColors) {
+    for (const variant of variants) {
+      for (const property of properties) {
+        for (const state of states) {
+          const name = `${property}-${COMP}-${themeColor}-${variant}${state}`;
+          vars[name] = `Theme variable declared by ${name}.`;
+        }
+      }
+    }
+  }
+  return vars;
+}
+
+type BusyButtonShellProps = {
+  buttonProps: React.ComponentProps<typeof Button>;
+  enabled: boolean;
+  children: React.ReactNode;
+};
+
+function BusyButtonShell({ buttonProps, enabled, children }: BusyButtonShellProps) {
+  const [busy, setBusy] = React.useState(false);
+  const originalOnClick = buttonProps.onClick;
+  const onClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (busy) {
+        return;
+      }
+      const result = originalOnClick?.(event);
+      if (result && typeof (result as Promise<unknown>).then === "function") {
+        setBusy(true);
+        (result as Promise<unknown>).finally(() => setBusy(false));
+      }
+    },
+    [busy, originalOnClick],
+  );
+  return (
+    <Button
+      {...buttonProps}
+      disabled={!enabled || busy}
+      onClick={onClick}
+    >
+      {children}
+    </Button>
+  );
 }

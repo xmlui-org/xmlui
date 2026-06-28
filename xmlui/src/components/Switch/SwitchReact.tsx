@@ -5,7 +5,7 @@ import { defaultProps } from "./Switch.defaults";
 import styles from "./Switch.module.scss";
 import type { SwitchValidationStatus } from "./switch-abstractions";
 import { useFormContext } from "../Form/FormContext";
-import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
+import { transformToLegitValue, useToggleController } from "../Toggle/ToggleController";
 
 export type SwitchApi = {
   focus: () => void;

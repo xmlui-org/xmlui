@@ -1,7 +1,13 @@
+import { useCallback, useRef, useState, type CSSProperties } from "react";
+
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { COMPONENT_PART_KEY } from "../../styling";
+import { useFormContext } from "../Form/FormContext";
+import { Toggle } from "../Toggle/Toggle";
+import type { ValidationStatus } from "../abstractions";
 import { SwitchMd } from "./Switch";
 import { defaultProps } from "./Switch.defaults";
-import { SwitchNative, type SwitchApi } from "./SwitchReact";
+import styles from "./Switch.module.scss";
 
 const COMP = "Switch";
 
@@ -10,32 +16,114 @@ export const switchRenderer = wrapComponent({
   metadata: SwitchMd,
   defaultPart: "input",
   renderer: ({ adapter }) => {
-    const apiRef = { current: null as SwitchApi | null };
-    return (
-      <SwitchNative
-        {...adapter.rootAttrs("input")}
-        ref={(api) => {
-          apiRef.current = api;
-          if (api) {
-            adapter.registerApi(api as unknown as Record<string, unknown>);
-          }
-        }}
+    const [state, setState] = useState<Record<string, unknown>>({});
+    const form = useFormContext();
+    const adapterRef = useRef(adapter);
+    const formRef = useRef(form);
+    const fieldNameRef = useRef<string | undefined>(undefined);
+    const currentValueRef = useRef(state.value);
+    const rawRootAttrs = adapter.rootAttrs("input");
+    const rootAttrs: Record<string, unknown> = {
+      ...rawRootAttrs,
+      "data-testid": rawRootAttrs["data-testid"] ?? adapter.stringProp("id"),
+    };
+    const label = adapter.prop("label");
+    const hasLabel = label !== undefined && label !== null && label !== "";
+    const labelPosition = adapter.stringProp("labelPosition");
+    const labelBreak = adapter.booleanProp("labelBreak", false);
+    const labelWidth = adapter.prop("labelWidth");
+    const required = adapter.booleanProp("required", false);
+    const requireLabelMode = adapter.stringProp(
+      "requireLabelMode",
+      form?.itemRequireLabelMode ?? "markRequired",
+    );
+    const bindTo = adapter.stringProp("bindTo");
+    const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
+    const formValue = form && fieldName !== undefined ? form.getValue(fieldName) : undefined;
+    const hasExplicitValue = Object.prototype.hasOwnProperty.call(adapter.node.props, "value");
+    const isCompactLabelPosition =
+      labelPosition === "start" ||
+      labelPosition === "end" ||
+      labelPosition === "before" ||
+      labelPosition === "after";
+
+    adapterRef.current = adapter;
+    formRef.current = form;
+    fieldNameRef.current = fieldName;
+    currentValueRef.current = formValue ?? state.value;
+    const hasVariantWrapper = !hasLabel && adapter.prop("variant") !== undefined;
+
+    const labeledRootAttrs = hasLabel
+      ? {
+          ...rootAttrs,
+          "data-xmlui-part": "input",
+          "data-testid": rootAttrs["data-testid"],
+          className: [
+            styles.container,
+            styles.switchItemWithLabel,
+            isCompactLabelPosition ? styles.switchItemWithLabelCompact : undefined,
+            rootAttrs.className as string | undefined,
+          ].filter(Boolean).join(" "),
+        }
+      : undefined;
+    const toggleAttrs: Record<string, unknown> = {
+      ...(hasLabel || hasVariantWrapper
+        ? { ...rootAttrs, "data-testid": undefined, className: undefined, style: undefined }
+        : rootAttrs),
+      "data-part-id": "input",
+    };
+
+    const updateState = useCallback((componentState: Record<string, unknown>, options?: unknown) => {
+      if (Object.prototype.hasOwnProperty.call(componentState, "value")) {
+        currentValueRef.current = componentState.value;
+        adapterRef.current.registerApi({
+          value: currentValueRef.current,
+        });
+      }
+      setState((current) => ({ ...current, ...componentState }));
+      const currentForm = formRef.current;
+      const currentFieldName = fieldNameRef.current;
+      if (
+        currentForm &&
+        currentFieldName !== undefined &&
+        Object.prototype.hasOwnProperty.call(componentState, "value") &&
+        !(typeof options === "object" && options !== null && "initial" in options)
+      ) {
+        currentForm.setValue(currentFieldName, componentState.value);
+      }
+    }, []);
+
+    const registerComponentApi = useCallback((api: Record<string, unknown>) => {
+      adapterRef.current.registerApi({
+        ...api,
+        value: currentValueRef.current,
+      });
+    }, []);
+
+    const toggle = (
+      <Toggle
+        {...toggleAttrs}
         id={adapter.stringProp("id")}
-        bindTo={adapter.stringProp("bindTo")}
-        value={adapter.prop("value")}
-        initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
-        label={adapter.prop("label")}
-        labelPosition={adapter.stringProp("labelPosition", "end")}
-        labelBreak={adapter.booleanProp("labelBreak", false)}
-        labelWidth={adapter.prop("labelWidth")}
-        requireLabelMode={adapter.stringProp("requireLabelMode")}
-        direction={adapter.stringProp("direction")}
+        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+        style={toggleAttrs.style as CSSProperties | undefined}
+        className={toggleAttrs.className as string | undefined}
+        value={normalizeToggleBoundaryValue(
+          hasExplicitValue ? adapter.prop("value") : formValue ?? state.value,
+        ) as any}
+        initialValue={normalizeToggleBoundaryValue(
+          adapter.prop("initialValue", defaultProps.initialValue),
+        ) as any}
         enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
         readOnly={adapter.booleanProp("readOnly", false)}
-        required={adapter.booleanProp("required", false)}
+        required={required}
         autoFocus={adapter.booleanProp("autoFocus", false)}
-        validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
-        variant={adapter.stringProp("variant")}
+        validationStatus={adapter.stringProp(
+          "validationStatus",
+          defaultProps.validationStatus,
+        ) as ValidationStatus}
+        updateState={updateState}
+        registerComponentApi={registerComponentApi}
+        variant="switch"
         onClick={(event) => {
           void adapter.event("click")(event);
         }}
@@ -50,5 +138,92 @@ export const switchRenderer = wrapComponent({
         }}
       />
     );
+
+    if (hasVariantWrapper) {
+      return (
+        <span
+          {...rootAttrs}
+          className={[
+            styles.switchVariantWrapper,
+            rootAttrs.className as string | undefined,
+          ].filter(Boolean).join(" ")}
+        >
+          {toggle}
+        </span>
+      );
+    }
+
+    if (!hasLabel) {
+      return toggle;
+    }
+
+    const labelStyle = labelWidth !== undefined
+      ? { width: typeof labelWidth === "number" ? `${labelWidth}px` : String(labelWidth) }
+      : undefined;
+    const showRequiredIndicator =
+      required && (requireLabelMode === "markRequired" || requireLabelMode === "markBoth");
+    const showOptionalIndicator =
+      !required && (requireLabelMode === "markOptional" || requireLabelMode === "markBoth");
+    const labeledClassName = [
+      styles.switchLabeledItem,
+      labelPositionClass(labelPosition),
+    ].filter(Boolean).join(" ");
+
+    return (
+      <div {...labeledRootAttrs}>
+        <label
+          className={labeledClassName}
+          dir={adapter.stringProp("direction")}
+        >
+          <span
+            data-part-id="label"
+            data-xmlui-part="label"
+            className={[
+              styles.switchLabel,
+              labelBreak ? styles.switchLabelBreak : undefined,
+            ].filter(Boolean).join(" ")}
+            style={labelStyle}
+          >
+            {String(label)}
+            {showRequiredIndicator ? <span className={styles.switchLabelRequired}>*</span> : null}
+            {showOptionalIndicator ? <span className={styles.switchLabelOptional}>(Optional)</span> : null}
+          </span>
+          {toggle}
+        </label>
+      </div>
+    );
   },
 });
+
+function normalizeToggleBoundaryValue(value: unknown): boolean | string | number | object | undefined {
+  if (typeof value === "number" && Number.isNaN(value)) {
+    return "NaN";
+  }
+  return value as boolean | string | number | object | undefined;
+}
+
+function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
+  if (!fieldPrefix) {
+    return bindTo;
+  }
+  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
+}
+
+function labelPositionClass(labelPosition: string | undefined): string {
+  switch (labelPosition) {
+    case "start":
+      return styles.switchLabelPositionBefore;
+    case "top":
+      return styles.switchLabelPositionTop;
+    case "bottom":
+      return styles.switchLabelPositionBottom;
+    case "before":
+      return styles.switchLabelPositionBefore;
+    case "after":
+      return styles.switchLabelPositionAfter;
+    case "end":
+      return styles.switchLabelPositionEnd;
+    default:
+      return styles.switchLabelPositionTop;
+  }
+}

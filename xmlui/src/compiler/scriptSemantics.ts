@@ -1,5 +1,6 @@
 import { createErrorDiagnostic, type ParserDiagnostic, type ScriptNode } from "../parser";
 import type { SourceSpan } from "../parser";
+import { hasXmluiAppContextProperty, type XmluiAppContextObject } from "../runtime/appContextObject";
 import { loopNeedsPacing, statementNeedsCheckpoint } from "./eventHandlerAnalysis";
 import type { XmluiElement } from "./ir";
 
@@ -20,6 +21,7 @@ export type XmluiScope = {
   globals: Map<string, XmluiBinding>;
   specials: Map<string, XmluiBinding>;
   references: Map<string, XmluiBinding>;
+  appContext: XmluiAppContextObject;
 };
 
 export type CreateXmluiScopeOptions = {
@@ -28,6 +30,7 @@ export type CreateXmluiScopeOptions = {
   allowImplicitGlobals?: boolean;
   specialNames?: Iterable<string>;
   referenceNames?: Iterable<string>;
+  appContext?: XmluiAppContextObject;
 };
 
 export type DependencyKind = XmluiBindingKind | "unresolved";
@@ -336,6 +339,7 @@ export function createXmluiScope(
     globals: new Map(options.parent?.globals),
     specials: new Map(options.parent?.specials),
     references: new Map(options.parent?.references),
+    appContext: options.appContext ?? options.parent?.appContext ?? {},
   };
 
   if (!scope.specials.has("$props")) {
@@ -476,6 +480,13 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
     };
   }
   if (name === "appGlobals") {
+    return {
+      kind: "context",
+      name,
+      mutable: false,
+    };
+  }
+  if (hasXmluiAppContextProperty(scope.appContext, name)) {
     return {
       kind: "context",
       name,
