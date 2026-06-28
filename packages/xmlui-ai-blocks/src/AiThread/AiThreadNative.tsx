@@ -218,12 +218,13 @@ export const AiThreadNative = memo(function AiThreadNative({
     }
 
     const current = stateRef.current;
+    const effectiveCurrentCode = current.generation.code?.trim() || props.currentCode?.trim() || undefined;
     const allowFullReplacement =
       overrides?.allowFullReplacement ??
       props.requestDirectives?.allowFullReplacement ??
-      (props.currentCode ? undefined : true);
+      (effectiveCurrentCode ? undefined : true);
 
-    if (allowFullReplacement === undefined && props.currentCode) {
+    if (allowFullReplacement === undefined && effectiveCurrentCode) {
       setState((next) => ({
         ...next,
         pendingPrompt: submission.text,
@@ -242,7 +243,7 @@ export const AiThreadNative = memo(function AiThreadNative({
     const userState = enqueueUserMessage(current, submission);
     const requestMessages = userState.state.messages;
     const requestBody = buildA2XmluiRequestBody(requestMessages, {
-      currentCode: props.currentCode?.trim() ? props.currentCode : undefined,
+      currentCode: effectiveCurrentCode,
       runtimeContext: props.runtimeContext,
       requestDirectives: {
         allowFullReplacement: allowFullReplacement ?? false,
@@ -353,10 +354,9 @@ export const AiThreadNative = memo(function AiThreadNative({
         resolve(
           JSON.stringify({
             kind: "code",
-            operation: props.currentCode ? "modify" : "create",
+            operation: stateRef.current.generation.code ? "modify" : "create",
             summary: `Mocked XMLUI response for: ${submission.text.slice(0, 80)}`,
             code:
-              props.currentCode?.trim() ||
               `<VStack gap="$space-3">
   <Text value="${escapeXml(submission.text.slice(0, 60) || "Generated XMLUI")}" />
 </VStack>`,

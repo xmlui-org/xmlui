@@ -1,0 +1,106 @@
+.root {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  border-bottom-right-radius: var(--xmlui-borderRadius-Card, 16px);
+  border-bottom-left-radius: var(--xmlui-borderRadius-Card, 16px);
+  clip-path: inset(0 round 0 0 var(--xmlui-borderRadius-Card, 16px) var(--xmlui-borderRadius-Card, 16px));
+  contain: paint;
+  box-sizing: border-box;
+  background: var(--xmlui-backgroundColor-CodeBlock, #f0edea);
+  color: var(--xmlui-textColor-Text, #544f4b);
+  font-family: var(--xmlui-fontFamily-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.root:focus {
+  outline: none;
+}
+
+.pre {
+  min-width: max-content;
+  margin: 0;
+}
+
+.code {
+  display: block;
+  min-width: max-content;
+  padding: 14px 0;
+  white-space: pre;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  min-height: 22px;
+}
+
+.lineNumber {
+  padding: 0 14px;
+  color: var(--xmlui-textColor-subtitle, #76716d);
+  text-align: right;
+  user-select: none;
+  opacity: 0.72;
+}
+
+.source {
+  padding-right: 20px;
+}
+
+/* ---- Light tone token palette (default) ---- */
+.tag {
+  color: #357773;
+}
+
+.attribute {
+  color: #7c5408;
+}
+
+.string {
+  color: #9c2f22;
+}
+
+.expression {
+  color: #2a5f5b;
+}
+
+.punctuation,
+.text {
+  color: var(--xmlui-textColor-Text, #544f4b);
+}
+
+/* ---- Dark tone token palette ---- */
+.root[data-tone="dark"] {
+  background: var(--xmlui-backgroundColor-CodeBlock, #14181c);
+  color: var(--xmlui-textColor-Text-secondary, #e0dcd7);
+}
+
+.root[data-tone="dark"] .lineNumber {
+  color: #9d9893;
+}
+
+.root[data-tone="dark"] .tag {
+  color: #7ab8ae;
+}
+
+.root[data-tone="dark"] .attribute {
+  color: #f4ae45;
+}
+
+.root[data-tone="dark"] .string {
+  color: #ff9485;
+}
+
+.root[data-tone="dark"] .expression {
+  color: #a7d0c9;
+}
+
+.root[data-tone="dark"] .punctuation,
+.root[data-tone="dark"] .text {
+  color: var(--xmlui-textColor-Text-secondary, #e0dcd7);
+}

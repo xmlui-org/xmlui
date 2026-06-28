@@ -1,0 +1,86 @@
+.root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  /* The card chrome (border + radius) lives here, and overflow:hidden clips both
+     the rounded corners AND the inner scroller's scrollbar so it cannot poke past
+     the rounded corners. Scrolling itself happens on .scroller below.
+     No box-shadow: this card fills the whole pane, so a drop shadow only smudges
+     the corners in light tone. */
+  overflow: hidden;
+  border: 1px solid var(--xmlui-borderColor, rgb(0 0 0 / 0.1));
+  border-radius: var(--xmlui-borderRadius-Card, 16px);
+  background: var(--xmlui-backgroundColor-Card, #ffffff);
+}
+
+/* Inner scroller: a generated app taller than the pane scrolls here. The
+   scrollbar lives on this element and is clipped to the rounded corners by the
+   parent's overflow:hidden, so it never overhangs the border radius. */
+.scroller {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  background: var(--xmlui-backgroundColor-Card, #ffffff);
+}
+
+/* The embedded StandaloneApp assumes it owns the viewport: its layout containers
+   use height:100% / 100dvh + overflow:hidden, so a generated app taller than the
+   bounded preview pane would be clipped with no scrollbar. Let those containers
+   grow to their content height (keeping the top one at min-height:100% so short
+   apps still fill the pane) and hand the scrolling to .scroller above. */
+.scroller [class*="appContainer"] {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+  background: var(--xmlui-backgroundColor-Card, #ffffff) !important;
+}
+
+.scroller [class*="mainContentArea"],
+.scroller [class*="pagesContainer"],
+.scroller [class*="pageContentContainer"] {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  background: var(--xmlui-backgroundColor-Card, #ffffff) !important;
+}
+
+.issue {
+  margin: 16px;
+  border: 1px solid var(--xmlui-color-danger-200, #ffb0a8);
+  border-radius: var(--xmlui-borderRadius-Input, 6px);
+  padding: 14px;
+  background: var(--xmlui-backgroundColor-status-error, #FFCFCB);
+  color: var(--xmlui-textColor-status-error, #9c2f22);
+}
+
+.issueTitle {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.issueDetail {
+  margin: 0 0 10px;
+}
+
+.issueMessage {
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.repair {
+  margin: 16px;
+  border: 1px solid var(--xmlui-color-primary-200, #b9c8e8);
+  border-radius: var(--xmlui-borderRadius-Input, 6px);
+  padding: 14px;
+  background: var(--xmlui-backgroundColor-status-info, #eef4fb);
+  color: var(--xmlui-textColor-primary, #314f7a);
+}
