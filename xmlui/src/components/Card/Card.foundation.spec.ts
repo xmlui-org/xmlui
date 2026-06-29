@@ -30,4 +30,41 @@ test.describe("Card foundation", () => {
     await page.getByTestId("toggle").click();
     await expect(card).toHaveCSS("flex-direction", "row");
   });
+
+  test("direct children keep explicit sizes so scroll APIs have real overflow", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Card id="cardApi" testId="card" height="100px" overflowY="scroll">
+        <Stack height="160px" backgroundColor="lightblue" />
+        <Stack height="160px" backgroundColor="lightgreen" />
+      </Card>
+      <Button testId="scroll" onClick="cardApi.scrollToBottom()" />
+    `);
+
+    const card = page.getByTestId("card");
+    await expect.poll(async () =>
+      card.evaluate((element) => element.scrollHeight > element.clientHeight),
+    ).toBe(true);
+
+    await page.getByTestId("scroll").click();
+    await expect.poll(async () => card.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  });
+
+  test("subtitle uses secondary Text variant styling", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Card testId="card" title="Example Title" subtitle="Predefined subtitle">
+        <HStack verticalAlignment="center">
+          <Icon name="info" />
+          This is a card
+        </HStack>
+      </Card>
+    `);
+
+    const subtitle = page.getByTestId("card").getByText("Predefined subtitle");
+    const title = page.getByTestId("card").getByRole("heading", { name: "Example Title" });
+
+    await expect(subtitle).toHaveCSS("font-size", "14px");
+    await expect(subtitle).not.toHaveCSS("color", await title.evaluate((element) =>
+      window.getComputedStyle(element).color,
+    ));
+  });
 });

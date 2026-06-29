@@ -202,7 +202,7 @@ export const animationBehavior: Behavior = {
     canBehaviorAttachToComponent(animationBehavior.metadata, context.metadata, context.componentName) &&
     hasTriggeredBehaviorProp(animationBehavior.metadata, context.props),
   attach: (context, node) => {
-    const animation = parseAnimation(context.props.animation);
+    const animation = parseAnimation(context.props.animation as string | object);
     const options = parseAnimationOptions(context.props.animationOptions);
     return (
       <Animation animation={animation} {...options}>

@@ -1,6 +1,7 @@
 import React from "react";
 
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { useComponentThemeClass } from "../../runtime/rendering/theme";
 import { extractScssThemeVars } from "../../styling/theme";
 import { useComponentStyle } from "../../components-core/theming/StyleContext";
 import { toCssVar } from "../../components-core/theming/layout-resolver";
@@ -211,14 +212,28 @@ export const TextMd = createMetadata({
 
 type ThemedTextProps = React.ComponentProps<typeof Text> & { className?: string };
 export const ThemedText = React.forwardRef<HTMLElement, ThemedTextProps>(function ThemedText(
-  { className, classes, ...props }: ThemedTextProps,
+  { className, classes, style, variant, ...props }: ThemedTextProps,
   ref,
 ) {
+  const themeClass = useComponentThemeClass(COMP, TextMd as ComponentMetadata, [], variant);
+  const variantClassName = useComponentStyle(createVariantStyle(variant));
   const mergedClasses = {
     ...classes,
-    [COMPONENT_PART_KEY]: [classes?.[COMPONENT_PART_KEY], className].filter(Boolean).join(" "),
+    [COMPONENT_PART_KEY]: [
+      themeClass.className,
+      classes?.[COMPONENT_PART_KEY],
+    ].filter(Boolean).join(" "),
   };
-  return <Text {...props} classes={mergedClasses} ref={ref} />;
+  return (
+    <Text
+      {...props}
+      variant={variant}
+      classes={mergedClasses}
+      className={[variantClassName, className].filter(Boolean).join(" ")}
+      style={{ ...themeClass.style, ...style }}
+      ref={ref}
+    />
+  );
 });
 
 export const textRenderer = wrapComponent({

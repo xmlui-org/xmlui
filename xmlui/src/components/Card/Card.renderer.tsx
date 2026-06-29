@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { wrapComponent } from "../../runtime/rendering/adapter";
+import type { XmluiNode } from "../../compiler/ir";
+import { nonPropertyChildren, wrapComponent } from "../../runtime/rendering/adapter";
 import { CardMd } from "./Card";
 import { defaultProps } from "./Card.defaults";
 import { Card } from "./CardReact";
@@ -31,8 +32,24 @@ export const cardRenderer = wrapComponent({
         onContextMenu={(event) => void adapter.event("contextMenu")(event)}
         registerComponentApi={adapter.registerApi}
       >
-        {adapter.renderChildren()}
+        {adapter.context.renderChildren(
+          nonPropertyChildren(adapter.node.children).map(withCardChildLayout),
+          adapter.scope,
+        )}
       </Card>
     );
   },
 });
+
+function withCardChildLayout(child: XmluiNode): XmluiNode {
+  if (child.kind !== "element" || child.props.canShrink !== undefined) {
+    return child;
+  }
+  return {
+    ...child,
+    props: {
+      ...child.props,
+      canShrink: "false",
+    },
+  };
+}

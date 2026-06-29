@@ -1,18 +1,19 @@
-import {
-  Children,
-  cloneElement,
-  isValidElement,
-  useEffect,
-  useMemo,
-  useState,
-  type CSSProperties,
-  type ReactElement,
-  type ReactNode,
-} from "react";
+import { animated, useSpring, useInView } from "@react-spring/web";
+import type { ForwardedRef } from "react";
+import React, { Children, forwardRef, memo, useEffect, useId, useMemo, useState } from "react";
+import { useCallback } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+
+import type { RegisterComponentApiFn } from "../..";
+import { isPlainObject } from "lodash-es";
+import { defaultProps } from "./Animation.defaults";
 
 export type AnimationProps = {
-  children?: ReactNode;
-  animation: AnimationDefinition;
+  children?: React.ReactNode;
+  animation: any;
+  registerComponentApi?: RegisterComponentApiFn;
+  onStop?: () => void;
+  onStart?: () => void;
   animateWhenInView?: boolean;
   duration?: number;
   reverse?: boolean;
@@ -21,201 +22,258 @@ export type AnimationProps = {
   delay?: number;
 };
 
-export type AnimationDefinition = {
-  from?: CSSProperties;
-  to?: CSSProperties;
-  config?: {
-    duration?: number;
-  };
-};
+const AnimatedComponent = animated(
+  forwardRef(function InlineComponentDef(props: any, ref: ForwardedRef<any>) {
+    const { children, ...rest } = props;
 
-const defaultProps = {
-  delay: 0,
-  animateWhenInView: false,
-  reverse: false,
-  loop: false,
-  once: false,
-};
-
-const presetAnimations: Record<string, AnimationDefinition> = {
-  fadein: {
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-  },
-  fadeout: {
-    from: { opacity: 1 },
-    to: { opacity: 0 },
-  },
-  slidein: {
-    from: { transform: "translateX(-100%)" },
-    to: { transform: "translateX(0%)" },
-  },
-  slideout: {
-    from: { transform: "translateX(0%)" },
-    to: { transform: "translateX(100%)" },
-  },
-  popin: {
-    from: { transform: "scale(0.8)", opacity: 0 },
-    to: { transform: "scale(1)", opacity: 1 },
-  },
-  popout: {
-    from: { transform: "scale(1)", opacity: 1 },
-    to: { transform: "scale(0.8)", opacity: 0 },
-  },
-  flipin: {
-    from: { transform: "rotateY(90deg)", opacity: 0 },
-    to: { transform: "rotateY(0deg)", opacity: 1 },
-  },
-  flipout: {
-    from: { transform: "rotateY(0deg)", opacity: 1 },
-    to: { transform: "rotateY(90deg)", opacity: 0 },
-  },
-  rotatein: {
-    from: { transform: "rotate(-180deg)", opacity: 0 },
-    to: { transform: "rotate(0deg)", opacity: 1 },
-  },
-  rotateout: {
-    from: { transform: "rotate(0deg)", opacity: 1 },
-    to: { transform: "rotate(180deg)", opacity: 0 },
-  },
-  zoomin: {
-    from: { transform: "scale(0)", opacity: 0 },
-    to: { transform: "scale(1)", opacity: 1 },
-  },
-  zoomout: {
-    from: { transform: "scale(1)", opacity: 1 },
-    to: { transform: "scale(0)", opacity: 0 },
-  },
-};
-
-export function parseAnimation(animation: unknown): AnimationDefinition {
-  if (isPlainObject(animation)) {
-    return animation as AnimationDefinition;
-  }
-  if (typeof animation === "string") {
-    return presetAnimations[animation.toLowerCase()] ?? { from: {}, to: {} };
-  }
-  return { from: {}, to: {} };
-}
-
-export function parseAnimationOptions(input: unknown): Partial<AnimationProps> {
-  if (isPlainObject(input)) {
-    return input as Partial<AnimationProps>;
-  }
-  if (typeof input !== "string") {
-    return {};
-  }
-  const options: Partial<AnimationProps> = {};
-  for (const value of input.split(";").map((part) => part.trim()).filter(Boolean)) {
-    if (value.includes(":")) {
-      const [name, raw] = value.split(":").map((part) => part.trim());
-      const parsed = parseAnimationOptionValue(name ?? "", raw ?? "");
-      if (parsed !== undefined) {
-        (options as Record<string, unknown>)[name ?? ""] = parsed;
-      }
-      continue;
+    if (!React.isValidElement(children)) {
+      return children;
     }
-    if (isBooleanAnimationOption(value)) {
-      (options as Record<string, unknown>)[value] = true;
-    } else if (value.startsWith("!") && isBooleanAnimationOption(value.slice(1))) {
-      (options as Record<string, unknown>)[value.slice(1)] = false;
-    }
-  }
-  return options;
-}
-
-export function Animation({
-  children,
-  animation,
-  duration,
-  delay = defaultProps.delay,
-  reverse = defaultProps.reverse,
-  loop = defaultProps.loop,
-}: AnimationProps) {
-  const [running, setRunning] = useState(false);
-  const resolvedDuration = duration ?? animation.config?.duration ?? 300;
-  const from = reverse ? animation.to ?? {} : animation.from ?? {};
-  const to = reverse ? animation.from ?? {} : animation.to ?? {};
-  const transition = useMemo(
-    () => transitionFor(to, resolvedDuration, delay),
-    [delay, resolvedDuration, to],
-  );
-  const style = {
-    ...(running ? to : from),
-    transition,
-    transitionDelay: `${delay}ms`,
-    animationIterationCount: loop ? "infinite" : undefined,
-  } as CSSProperties;
-
-  useEffect(() => {
-    const handle = window.setTimeout(() => setRunning(true), 0);
-    return () => window.clearTimeout(handle);
-  }, [animation, delay, duration, reverse]);
-
-  return (
-    <>
-      {Children.map(children, (child) => applyAnimationToChild(child, style))}
-    </>
-  );
-}
-
-function applyAnimationToChild(child: ReactNode, style: CSSProperties): ReactNode {
-  if (isValidElement(child)) {
-    const element = child as ReactElement<{ style?: CSSProperties }>;
-    return cloneElement(element, {
-      "data-xmlui-behavior": "animation",
+    const childProps = children.props as { style?: React.CSSProperties };
+    return React.cloneElement(children, {
+      ...rest,
       style: {
-        ...element.props.style,
-        ...style,
+        ...childProps.style,
+        ...rest.style,
       },
-    } as Record<string, unknown>);
+      ref,
+    });
+  }),
+);
+
+export const parseAnimation = (animation: string | object): object => {
+  if (typeof animation === "object") {
+    return animation;
   }
-  return (
-    <span data-xmlui-behavior="animation" style={style}>
-      {child}
-    </span>
-  );
-}
 
-function transitionFor(style: CSSProperties, duration: number, delay: number): string {
-  const names = Object.keys(style);
-  const properties = names.length > 0 ? names : ["all"];
-  return properties.map((name) => `${cssPropertyName(name)} ${duration}ms ease ${delay}ms`).join(", ");
-}
+  const presetAnimations: Record<string, object> = {
+    fadein: {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+    },
+    fadeout: {
+      from: { opacity: 1 },
+      to: { opacity: 0 },
+    },
+    slidein: {
+      from: { transform: "translateX(-100%)" },
+      to: { transform: "translateX(0%)" },
+    },
+    slideout: {
+      from: { transform: "translateX(0%)" },
+      to: { transform: "translateX(100%)" },
+    },
+    popin: {
+      from: { transform: "scale(0.8)", opacity: 0 },
+      to: { transform: "scale(1)", opacity: 1 },
+    },
+    popout: {
+      from: { transform: "scale(1)", opacity: 1 },
+      to: { transform: "scale(0.8)", opacity: 0 },
+    },
+    flipin: {
+      from: { transform: "rotateY(90deg)", opacity: 0 },
+      to: { transform: "rotateY(0deg)", opacity: 1 },
+    },
+    flipout: {
+      from: { transform: "rotateY(0deg)", opacity: 1 },
+      to: { transform: "rotateY(90deg)", opacity: 0 },
+    },
+    rotatein: {
+      from: { transform: "rotate(-180deg)", opacity: 0 },
+      to: { transform: "rotate(0deg)", opacity: 1 },
+    },
+    rotateout: {
+      from: { transform: "rotate(0deg)", opacity: 1 },
+      to: { transform: "rotate(180deg)", opacity: 0 },
+    },
+    zoomin: {
+      from: { transform: "scale(0)", opacity: 0 },
+      to: { transform: "scale(1)", opacity: 1 },
+    },
+    zoomout: {
+      from: { transform: "scale(1)", opacity: 1 },
+      to: { transform: "scale(0)", opacity: 0 },
+    },
+  };
 
-function cssPropertyName(name: string): string {
-  return name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-}
+  return presetAnimations[animation] || { from: {}, to: {} };
+};
 
-function parseAnimationOptionValue(name: string, value: string): unknown {
+function parseAnimationOptionValue(name: string, value: string): any {
   switch (name) {
     case "duration":
-    case "delay": {
-      const parsed = Number.parseInt(value, 10);
-      return Number.isNaN(parsed) ? undefined : parsed;
-    }
+    case "delay":
+      const num = parseInt(value, 10);
+      return isNaN(num) ? undefined : num;
+
     case "animateWhenInView":
     case "reverse":
     case "loop":
-    case "once": {
-      const normalized = value.toLowerCase();
-      if (normalized === "true" || normalized === "1" || normalized === "yes") {
-        return true;
-      }
-      if (normalized === "false" || normalized === "0" || normalized === "no") {
-        return false;
-      }
+    case "once":
+      const lowerVal = value.toLowerCase();
+      if (lowerVal === "true" || lowerVal === "1" || lowerVal === "yes") return true;
+      if (lowerVal === "false" || lowerVal === "0" || lowerVal === "no") return false;
       return undefined;
-    }
+
     default:
       return undefined;
   }
 }
 
-function isBooleanAnimationOption(value: string): boolean {
-  return ["animateWhenInView", "reverse", "loop", "once"].includes(value);
+export function parseAnimationOptions(input: any): Partial<AnimationProps> {
+  if (isPlainObject(input)) {
+    return input as Partial<AnimationProps>;
+  }
+
+  if (typeof input === "string") {
+    const options: Partial<AnimationProps> = {};
+    const values = input
+      .split(";")
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+
+    for (const value of values) {
+      if (value.includes(":")) {
+        const [name, val] = value.split(":").map((part) => part.trim());
+        if (name && val) {
+          const parsedValue = parseAnimationOptionValue(name, val);
+          if (parsedValue !== undefined) {
+            (options as any)[name] = parsedValue;
+          }
+        }
+      } else {
+        const booleanOptions = ["animateWhenInView", "reverse", "loop", "once"];
+        if (booleanOptions.includes(value)) {
+          (options as any)[value] = true;
+        } else if (value.startsWith("!") && value.length > 1) {
+          const optionName = value.substring(1);
+          if (booleanOptions.includes(optionName)) {
+            (options as any)[optionName] = false;
+          }
+        }
+      }
+    }
+    return options;
+  }
+
+  return {};
 }
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return !!value && typeof value === "object" && !Array.isArray(value);
-}
+export const Animation = memo(forwardRef(function Animation(
+  {
+    children,
+    registerComponentApi,
+    animation,
+    duration,
+    onStop,
+    onStart,
+    delay = defaultProps.delay,
+    animateWhenInView = defaultProps.animateWhenInView,
+    reverse = defaultProps.reverse,
+    loop = defaultProps.loop,
+    once = defaultProps.once,
+    ...rest
+  }: AnimationProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
+  const [_animation] = useState(animation);
+  const [toggle, setToggle] = useState(false);
+  const [reset, setReset] = useState(false);
+  const [count, setCount] = useState(0);
+  const times = 1;
+  const animationId = useId();
+
+  const animationSettings = useMemo<any>(
+    () => ({
+      from: _animation.from,
+      to: _animation.to,
+      config: {
+        ..._animation.config,
+        duration,
+      },
+      delay,
+      loop,
+      reset,
+      reverse: toggle,
+      onRest: () => {
+        onStop?.();
+        if (loop) {
+          if (reverse) {
+            setCount(count + 1);
+            setToggle(!toggle);
+          }
+          setReset(true);
+        } else {
+          if (reverse && count < times) {
+            setCount(count + 1);
+            setToggle(!toggle);
+          }
+        }
+      },
+      onStart: () => {
+        onStart?.();
+      },
+    }),
+    [
+      _animation.config,
+      _animation.from,
+      _animation.to,
+      count,
+      delay,
+      duration,
+      loop,
+      onStart,
+      onStop,
+      reset,
+      reverse,
+      toggle,
+    ],
+  );
+
+  const [springs, api] = useSpring(
+    () => ({
+      ...animationSettings,
+    }),
+    [animationSettings],
+  );
+
+  const [ref, animationStyles] = useInView(() => animationSettings, {
+    once,
+  });
+  const composedRef = useComposedRefs(ref, forwardedRef);
+
+  const startAnimation = useCallback(() => {
+    void api.start(_animation);
+    return () => {
+      api.stop();
+    };
+  }, [_animation, api]);
+
+  const stopAnimation = useCallback(() => {
+    api.stop();
+  }, [api]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      start: startAnimation,
+      stop: stopAnimation,
+    });
+  }, [registerComponentApi, startAnimation, stopAnimation]);
+
+  const content = useMemo(() => {
+    return Children.map(children, (child, index) =>
+      animateWhenInView ? (
+        <AnimatedComponent key={index} {...rest} style={animationStyles} ref={composedRef}>
+          {child}
+        </AnimatedComponent>
+      ) : (
+        <AnimatedComponent key={index} {...rest} style={springs} ref={forwardedRef}>
+          {child}
+        </AnimatedComponent>
+      ),
+    );
+  }, [animateWhenInView, animationStyles, children, springs, rest, composedRef, forwardedRef]);
+
+  return content;
+}));

@@ -149,653 +149,117 @@ For each component:
 
 ## Migration Learnings
 
-Record findings here as components are migrated. Keep these concise and useful
-for later components.
+Keep this section to reusable migration rules only. Component-specific closure
+details belong in per-component .ai notes and the status table.
 
-### ProgressBar, 2026-06-28
+### Renderer Boundary
 
-- The current rewrite had component-local behavior in `ProgressBarReact.tsx`
-  that was not present in the old source: value normalization happened inside
-  React instead of at the renderer boundary. Source-preserving migration moves
-  that coercion/clamping back to `ProgressBar.renderer.tsx`, keeping the copied
-  React implementation visually simple like the old component.
-- The copied old React implementation expects theme/root classes through
-  `classes[COMPONENT_PART_KEY]`, while the rewrite adapter currently exposes
-  the theme class as `rootAttrs().className`. For this component, the renderer
-  bridges that by moving `rootAttrs().className` into the old `classes` map.
-  This is a likely shared adapter contract to revisit if many source-preserved
-  components need the same bridge.
-- The old SCSS module uses `components-core/theming/themes` to collect
-  `themeVars` through `:export`; the rewrite file had replaced that with a
-  local fake collector. Restoring the old SCSS tests whether the current Sass
-  pipeline can consume old-style module exports directly.
-- Restoring the old SCSS helper triggered Sass deprecation warnings from
-  `components-core/theming/_themes.scss` for deprecated `if()` syntax. This did
-  not fail the focused ProgressBar tests, but the warning will likely recur as
-  more old SCSS modules are restored and should be treated as shared theming
-  infrastructure noise/debt rather than component-local debt.
-- A screenshot comparison exposed a visual mismatch that the focused E2E tests
-  did not catch: completed `ProgressBar` bars were darker in the migrated app.
-  The copied React/SCSS and matching metadata made this a shared theming
-  failure, validating the diagnostic hypothesis. The old runtime generates
-  `const-color-*` base tones with the `color` package's perceptual lightness
-  behavior and inserts those generated variables between the root theme and the
-  active `xmlui` theme layer. The rewrite lacked that generated base-tone layer,
-  so `$color-success-500` resolved to the raw root constant
-  `hsl(129.5, 58.4%, 51.5%)` instead of the old generated
-  `hsl(129.5, 58.4%, 72.6%)`. The rewrite now ports this shared base-tone
-  generation and applies it in `XmluiThemeRoot` and nested `ThemeScope`.
-- The required full `npm --workspace xmlui run test:e2e` gate is still red after
-  the ProgressBar-specific color fix. A rerun reached broader theme coverage and
-  was stopped after 63 failed, 10 interrupted, 241 passed, and 4760 not run.
-  Failures cluster around AutoComplete theme variables, Avatar/Badge border
-  shorthand and longhand theme variables, and Button variant theme variables.
-  ProgressBar should remain blocked on the global coexistence gate until these
-  shared theme/variant/border contracts are fixed or the baseline is explicitly
-  accepted as red.
+- Old React components commonly expect root/theme classes in
+  `classes[COMPONENT_PART_KEY]`, while the rewrite adapter exposes the current
+  theme class through `rootAttrs().className`. Bridge this at the renderer
+  boundary instead of changing protected React files.
+- Keep old value coercion, default normalization, and legacy alias mapping at the
+  metadata/renderer boundary when the old React file assumes already-normalized
+  props. Examples include ProgressBar value clamping, Button `left/right` icon
+  aliases, and display-text conversion for Text/Heading values.
+- Do not blindly pass metadata defaults into copied React components. Some old
+  components distinguish omitted props from explicit defaults, especially layout
+  alignment, controlled/uncontrolled values, and app/global fallback behavior.
+- Stable callback identity matters. Copied components can treat
+  `updateState`, `registerComponentApi`, and similar callbacks as stable; use
+  refs/memoized callbacks at the renderer boundary when needed.
+- Behavior wrappers that clone children must preserve child inline style before
+  layering wrapper-owned dynamic style. The rewrite currently carries many
+  theme CSS variables through inline style, while old XMLUI often carried them
+  through classes; dropping child style can silently strip variant/theme
+  variables from animated or otherwise wrapped components.
+- Keep copied component-owned props out of generic inline layout style when the
+  old component CSS owns them. Props such as `orientation`,
+  `horizontalAlignment`, and `verticalAlignment` may collide with the rewrite
+  layout resolver and must be stripped or bridged carefully.
+- Preserve old parent-child layout ownership. Containers such as Stack and
+  FlowLayout own selected child layout props, strip them from the rendered child,
+  and apply them on wrapper elements. Future complex containers should prefer a
+  shared old-style layout-context bridge over component-local duplication.
+- Preserve old `childrenLayoutContext` declarations from metadata. Components
+  such as Card rely on this contract so immediate children keep Stack-like flex
+  behavior, including non-shrinking explicit sizes that make scrolling real.
 
-### Avatar, 2026-06-28
+### Theming And CSS
 
-- `AvatarReact.tsx` and `Avatar.module.scss` were restored to the old source
-  shape. The only protected-file edits were import-path shims from old
-  component-core symbols to rewrite equivalents.
-- The old Avatar React component expects `classes[COMPONENT_PART_KEY]`, so the
-  renderer uses the same bridge proven by `ProgressBar`: move
-  `rootAttrs().className` into the old `classes` map while passing the adapter
-  style/root attributes through unchanged.
-- Avatar metadata cannot safely import `Avatar.module.scss` directly in this
-  workspace. The dev Vite config pulls component metadata into its config-load
-  graph, and Sass module imports with old `@use` syntax fail there before
-  normal CSS handling is available. For source-preserving migration, keep the
-  protected SCSS imported only from the React implementation and model metadata
-  theme declarations in the main metadata file.
-- The focused Avatar suite exposed a shared border theme regression. The old
-  runtime generated side-specific variables from `border-*`,
-  `borderHorizontal-*`, `borderVertical-*`, `borderColor-*`,
-  `borderStyle-*`, and `borderWidth-*` theme variables. The rewrite now
-  generates those border segments in shared theme code and applies them in
-  default theme construction, `ThemeScope`, and component theme classes.
-- The copied old SCSS also exposed a CSS cascade/layer regression. Avatar had
-  correct inline `--xmlui-borderTopColor-Avatar` values, but computed borders
-  still came from the base reset because `main.tsx` imported runtime/component
-  modules before `global.css`, allowing `@layer components` to be created
-  before the global layer order declaration. Moving `global.css` to the first
-  import in `main.tsx` restores the old ordering contract: `base` reset first,
-  component CSS later.
-- The Avatar docs/example path exposed a compiler/runtime context regression:
-  `onClick="toast('Avatar clicked')"` failed semantic validation with
-  "Unresolved XMLUI script identifier 'toast'". The old renderer resolves
-  identifiers against `AppContextObject`; the rewrite had a runtime toast
-  service but did not inject an app-context object into script resolution. The
-  migration now creates one app-context object, passes its keys into script
-  analysis, injects the same object into `RuntimeScope`, and resolves context
-  reads from it. This keeps future app-context globals discoverable from the
-  injected object instead of requiring a separate compiler allow-list.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npx vitest run tests/compiler/scriptSemantics.test.ts` passes 46/46;
-  `npm --workspace xmlui run test:e2e -- src/components/Avatar/Avatar.spec.ts`
-  passes 97/97 unchanged; the exact Avatar/HStack/toast sample parses. The full
-  global `test:e2e` gate was not rerun after Avatar; it remains a known broader
-  baseline risk from the ProgressBar run.
+- Protected SCSS should normally be imported only from protected React files.
+  Metadata/Vite config loading can choke on old SCSS module imports, so declare
+  metadata theme variables explicitly when extraction is unsafe.
+- The old Sass theme helpers rely on composed padding, border, focus-outline, and
+  hierarchical fallback variables. When a copied SCSS file asks for a specific
+  variable, the rewrite must emit the old fallback chain instead of relying on a
+  single flat variable.
+- CSS layer order is part of compatibility. Global/base CSS must establish layer
+  order before copied `@layer components` styles load, otherwise base resets can
+  outrank component CSS.
+- Theme wrappers are layout-transparent in old XMLUI. `ThemeScope` must preserve
+  `display: contents` behavior while carrying scoped CSS variables.
+- Theme-token props such as `$space-8` should be normalized to CSS variables at
+  the renderer boundary when passed into copied React logic that performs sizing
+  math. If numeric math is needed, resolve the variable against the actual
+  component DOM element, not an arbitrary global root.
+- Generated tone/color variables must be inserted at the same point in the theme
+  cascade as old XMLUI. Missing generated base tones or wrong generated/default
+  precedence shows up as subtle color, opacity, border, and hover-state drift.
 
-### Icon, 2026-06-28
+### Component Source And Dependencies
 
-- `IconReact.tsx`, `Icon.module.scss`, icon helper components, icon-specific
-  SCSS modules, SVG assets, `IconProvider.tsx`, `IconRegistryContext.tsx`, and
-  `icons-abstractions.ts` were restored from the old source with import/type
-  shims only. Icon is a prerequisite component rather than a visual leaf:
-  Button, menu, input, table, and documentation components depend on the old
-  provider/registry contract.
-- The old icon helper components import SVG files with the `*.svg?react`
-  convention. The rewrite's Vite pipeline treated SVG imports as URLs, which
-  produced React runtime errors such as an invalid tag name beginning with
-  `data:image/svg+xml`. A local `svgReactPlugin` now provides the old `?react`
-  contract and is registered in dev, production, standalone, SSG, and CLI
-  build/preview/start/build-lib paths.
-- The old Icon source expects `components-core/theming/ThemeContext`,
-  `parsers/style-parser/StyleParser`, and `components-core/utils/hooks`
-  compatibility exports. These shims were added in shared locations so later
-  copied components can reuse them instead of carrying component-local forks.
-- The old Icon resource path uses `getResourceUrl("resource:icon.<name>")`.
-  The testbed and runtime now pass test resources into `appGlobals.resources`,
-  and `XmluiRoot` wraps rendered apps in `IconProvider` with icon resources
-  normalized from that injected object.
-- The existing Icon driver assumed the test id belonged to a wrapper containing
-  an SVG. The old source puts root/test attributes directly on the SVG for
-  built-in icons. The driver now supports both root-SVG and nested-SVG shapes,
-  preserving existing E2E files while allowing source-preserved Icon output.
-- The copied `IconReact` renders an inline-block wrapper span, but the rewrite
-  App page-content layout blockifies direct flex children. `Icon.tsx` adds a
-  neutral outer inline-block span at the metadata/renderer boundary so the
-  preserved inner Icon wrapper still computes as `inline-block` under the old
-  E2E assertion.
-- Embedded `ThemedIcon` usage must receive both the component theme class and
-  the component theme style object. The old `useComponentThemeClass` contract
-  encoded theme variables in the returned class; the rewrite returns
-  `className` plus inline CSS variables. Without applying `themeClass.style`,
-  icons embedded in source-preserved components such as Button render at
-  `0px` because `--xmlui-size-Icon` is missing.
-- That neutral outer wrapper must be conditional. A visual check with an
-  unresolved icon followed by a fallback icon showed an extra HStack gap because
-  the wrapper rendered even when the preserved old `IconReact` returned `null`.
-  `Icon.tsx` now resolves the icon name/fallback/resource at the boundary and
-  returns `null` when no old icon path can render, preserving the original
-  "missing icon consumes no layout space" behavior while keeping the
-  inline-block wrapper for real icons.
-- Invalid icon size handling is normalized at the renderer boundary: obviously
-  invalid string sizes become zero-sized icons, while old React/SCSS sizing
-  remains untouched for predefined sizes, CSS lengths, theme variables, and
-  negative/zero edge cases.
-- A root font-size mutation in one Icon E2E case leaked into later cases in the
-  reused testbed page. `initTestBed` now clears `documentElement.style.fontSize`
-  when installing a new payload, guarded for fresh-navigation init scripts.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/Icon/Icon.spec.ts`
-  passes 44/44 unchanged; the reported HStack visual regression now renders
-  five icon children with even spacing for the six-`Icon` markup where one icon
-  is unresolved and one uses `fallback="trash"`; the migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Icon/Icon.spec.ts --workers=1`
-  passes 162/162. Full global `test:e2e` was not rerun for Icon because the
-  broader baseline remained known-red after the ProgressBar run.
+- Prefer shared compatibility shims for old import paths over component-local
+  rewrites. Reused shims so far include old component-core utilities, parts,
+  hooks, app context, table-of-contents context, style registry, and layout
+  helpers.
+- Source-preserved dependencies should be migrated before dependents when they
+  are part of the visible contract. Icon before Button and Stack/SpaceFiller
+  before FlowLayout/Card-like containers paid off.
+- Some old helper exports are useful before a full component migration. A narrow
+  boundary export is acceptable when needed by an approved dependent, but record
+  it as dependency debt if the full component has not been migrated.
+- Metadata files should stay metadata-only when runtime exports import SCSS.
+  Re-exporting runtime components from metadata files can make Vite config
+  bundling parse SCSS as JavaScript.
+- Runtime-only themed exports must apply both the component theme class/style
+  and any variant-specific style class the standalone renderer would add.
+  Otherwise copied components that embed `ThemedText`, `ThemedIcon`, or similar
+  helpers can silently lose typography, color, or size styling.
 
-### Button, 2026-06-28
+### Layout And Rendering Infrastructure
 
-- `ButtonReact.tsx`, `Button.module.scss`, and `Button.defaults.ts` were
-  restored from the old source. The protected React/SCSS/default files now keep
-  the old DOM, class, part, focus, icon-label, and Sass-variable behavior; the
-  rewrite-specific work lives in `Button.tsx` and shared compatibility shims.
-- Button confirmed that `Icon` was the correct prerequisite. The renderer
-  converts the public `icon` string into a source-preserved `ThemedIcon` node
-  and passes it into old `ButtonReact`; no local Button icon rendering was
-  reimplemented.
-- The copied source required reusable compatibility shims for old
-  `components-core/parts`, `COMPONENT_PART_KEY`, `Part`, `VisuallyHidden`, and
-  old abstraction aliases such as `ButtonThemeColor`, `ButtonVariant`,
-  `AlignmentOptions`, and `SizeType`.
-- Button variant theme variables cannot rely only on raw SCSS extraction in the
-  rewrite. The old SCSS declares many variables through Sass interpolation
-  (`#{$component}` and color-scheme loops), which the current extractor cannot
-  statically expand. `Button.tsx` declares the concrete variant/state theme
-  variable surface at metadata level while keeping the old SCSS copied.
-- The Button style suite exposed a shared theme-pipeline regression, not a
-  component regression: generated hover/active Button tone variables were
-  computed before default component variables and then overwritten by defaults.
-  `createComponentThemeClass` now applies generated Button tone fallbacks after
-  base variables so explicit base values can feed hover/active states.
-- Button also refined border shorthand precedence. `border-*` shorthand should
-  supply missing `borderColor-*`, `borderStyle-*`, and `borderWidth-*`
-  longhands, including hover fallbacks, but explicit longhands such as
-  `borderColor-Button-primary-outlined` must outrank shorthand-derived colors.
-  The explicit theme map now generates shorthand longhands first, then overlays
-  actual explicit longhands.
-- A user visual check of the old Button documentation markup exposed a gap in
-  the E2E coverage: `contentPosition` tests asserted `justify-content`, but did
-  not catch that embedded icons were zero-sized. The cause was the shared
-  `ThemedIcon` theme bridge described in the Icon learning above, not copied
-  Button source. After applying Icon theme styles inside `ThemedIcon`, the exact
-  markup with `width="200px"`, `icon="drive"`, and center/start/end
-  `contentPosition` measures a visible `~19.2px` icon and correctly aligned
-  icon+label groups.
-- The same visual check then exposed missing fallback emission for
-  variant-specific theme variables. The copied Button SCSS asks for concrete
-  names such as `fontSize-Button-primary-solid` and
-  `borderRadius-Button-primary-solid`; old theming resolves those through
-  hierarchical fallbacks like `fontSize-Button` and `borderRadius-Button`.
-  `componentThemeVariablesToCssProperties` now emits fallback values for
-  declared theme vars, so Button defaults compute to the old visual shape:
-  `14px` font size, `4px` radius, and `33px` height for the reported `sm`
-  solid buttons.
-- Button documentation still uses the legacy `iconPosition="right"` value.
-  The old wrapper passed that value through to `ButtonReact`, where every
-  non-`start` value rendered the icon after the label. The rewrite renderer was
-  normalizing unknown values to the default `start`, so `right` regressed. The
-  renderer now maps `right -> end` and `left -> start` before passing props to
-  copied Button source, preserving the legacy aliases while keeping the modern
-  `start`/`end` behavior.
-- A user visual check of `themeColor="secondary"` exposed another shared
-  theming issue. Old Button metadata defines secondary as a solid fill with a
-  light default border (`borderColor-Button-secondary`), and copied SCSS asks
-  for the more specific `borderColor-Button-secondary-solid`. The rewrite's
-  generated-tone lookup must walk the same hierarchical fallback chain used
-  when emitting CSS variables, otherwise generated tone colors mask old
-  component defaults. The Button metadata now carries the missing old
-  secondary/attention state defaults, and the shared `firstThemeReference`
-  helper resolves fallback names before generating tones. The reported
-  secondary solid button now computes a `1px` border with the old light
-  secondary color instead of the generated fill tone.
-- A user visual check with `<Theme width-Button="120px">` inside `HStack`
-  exposed a Theme rendering-pipeline mismatch. The old Theme wrapper uses
-  `display: contents`, so scoped children still participate as direct flex
-  items of the surrounding layout container. The rewrite's `ThemeScope`
-  rendered a normal `div`, turning the Theme into the single HStack item and
-  stacking its Button children vertically. `ThemeScope` now forces
-  `display: contents` on the scoping element while still carrying the scoped CSS
-  variables, matching the original layout-transparent wrapper contract.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts --workers=1`
-  passes 153/159 with 6 skips unchanged; the Theme+Button focused run
-  `npm --workspace xmlui run test:e2e -- src/components/Theme/Theme.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts --workers=1`
-  passes 158/164 with 6 skips unchanged; the side-by-side migrated component
-  run `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts --workers=1`
-  passes 315/321 with 6 skips unchanged.
+- Any ordinary component except `Component` can be the app document root in old
+  XMLUI. Parser, raw parser, and IR validation must keep this contract.
+- Public components and internal primitives are not always interchangeable. The
+  old internal `ThemedScroller` contract used by Stack/FlowLayout is not the
+  same as public `ScrollViewer` fill-parent behavior.
+- Native CSS features used to replace an old layout trick can need compensating
+  math. FlowLayout's native `columnGap` bridge must compensate percentage
+  `flex-basis` so four `25%` children can keep visible gaps and still fit one
+  row, matching the old padding/negative-margin implementation.
+- Old label behavior is shared infrastructure, not a Checkbox/Switch local
+  detail. Components using label behavior should preserve the old outer wrapper,
+  inner label container, typography, gap, and explicit/implicit label-position
+  semantics.
 
-### Checkbox, 2026-06-28
+### Testing And Verification
 
-- `Toggle.tsx`, `Toggle.module.scss`, and `Toggle.defaults.ts` were restored
-  from the old source as the protected implementation used by Checkbox and,
-  later, Switch. `Checkbox` itself remains a rewrite metadata/renderer boundary
-  around the copied Toggle because the old Checkbox component is metadata glue
-  over Toggle rather than a separate styled React implementation.
-- The copied Toggle source exposed a renderer callback identity regression.
-  Old Toggle runs an initial-value effect whenever `updateState` changes, so a
-  renderer adapter that creates a new `updateState` function every render
-  resets API-driven values back to the initial value. `Checkbox.renderer.tsx`
-  now passes stable `updateState` and `registerComponentApi` callbacks backed
-  by refs. This is a reusable rendering-pipeline lesson for other preserved
-  components that assume stable component API/state callbacks.
-- The Checkbox renderer must distinguish an explicitly authored `value` prop
-  from an absent one. Passing a defaulted `value={false}` into old Toggle makes
-  it controlled and blocks `setValue`/form updates from repainting. The adapter
-  now passes the explicit `value` only when the markup supplied it; otherwise it
-  feeds form or local state.
-- The old Toggle implementation paints the checkbox indicator through
-  `box-shadow` on `::before`, while the current Checkbox driver read
-  `::before.color`. `CheckboxDriver.getIndicatorColor()` now supports both
-  shapes by reading the first CSS color from `box-shadow` before falling back
-  to `color`, preserving the old E2E file while supporting source-preserved
-  CSS.
-- Focus outline variables needed the same hierarchical fallback shape as old
-  XMLUI: `outlineWidth-Checkbox--focus` resolves through
-  `outlineWidth-Checkbox`, which then resolves through the global focus
-  variable. The metadata now models that chain so explicit Theme overrides and
-  defaults both compute correctly.
-- The old Toggle output puts the actual input at the component root. The
-  Checkbox renderer adds only boundary wrappers needed for XMLUI label,
-  `requireLabelMode`, variant, and part/test-id contracts; the copied Toggle
-  DOM and SCSS remain untouched.
-- A user visual check exposed that Checkbox labels must follow the old shared
-  `LabelBehavior`/`ItemWithLabel` contract, not the rewrite's earlier inline
-  label wrapper. The old Checkbox metadata has `compactInlineLabel: true`, but
-  the default label position still comes from `ItemWithLabel` as `top`; only
-  explicit `start`/`end` are compacted to snug `before`/`after`. The renderer
-  now defaults unlabeled-positioned checkboxes to a full-width top label layout
-  and keeps compact before/after positioning for explicit horizontal labels.
-- A follow-up visual check showed the label font size was still too large. Old
-  `ItemWithLabel` typography comes from shared form-item label variables,
-  especially `fontSize-label-formItem` defaulting to `$fontSize-sm` and
-  `fontWeight-label-formItem` defaulting to `$fontWeight-medium`. The Checkbox
-  boundary wrapper now uses these shared typography variables as fallbacks
-  instead of inheriting the page/base text size.
-- Another visual check exposed that label spacing is also part of the old
-  shared label contract. `ItemWithLabel` uses a `0.5em` container gap for label
-  placement; the migrated Checkbox wrapper had used the rewrite's normal stack
-  gap, which pushed top-positioned checkbox inputs too far from their labels.
-  The Checkbox boundary now falls back to `0.5em` while still allowing an
-  explicit `gap-label-Checkbox` theme override.
-- A later alignment check showed the old `ItemWithLabel` DOM split matters:
-  the outer form-item wrapper carries root/layout/test attributes, while an
-  inner container handles label/input positioning. A single full-width `<label>`
-  mixed those roles and shifted Checkbox blocks in centered layouts. The
-  Checkbox boundary now uses an outer wrapper plus an inner label container,
-  and only explicit compact horizontal positions shrink the outer test-id box
-  to `fit-content`.
-- The final reported alignment mismatch for
-  `<App verticalAlignment="center">` was a shared App-shell regression rather
-  than a Checkbox regression. In the rewrite, `adapter.rootAttrs()` and
-  `adapter.style` carried generic alignment styles onto the outer App flex
-  container, so `verticalAlignment="center"` became `align-items: center` and
-  shrank/centered the main content to the Checkbox block's intrinsic width.
-  The old App wrapper keeps the normal full-width/max-width page container in
-  this case. `AppReact` now filters `alignItems` and `justifyContent` from the
-  App shell style while preserving other layout props, restoring the original
-  page geometry for source-preserved Checkbox examples.
-- There is an open compatibility wrinkle around `NaN`: the migrated Checkbox
-  E2E expects API/value coercion to treat `NaN` as truthy, while copied old
-  Toggle's internal `transformToLegitValue` treats numeric `NaN` as false. The
-  current renderer normalizes boundary `NaN` to the string `"NaN"` so the
-  unchanged E2E suite passes. Before reusing this rule broadly, verify the
-  actual old runtime behavior through the original browser app and decide
-  whether the test or runtime observation is the stronger contract.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  the label-focused run
-  `npm --workspace xmlui run test:e2e -- src/components/Checkbox/Checkbox.spec.ts --workers=1 -g "Label|renders with label|label is associated|requireLabelMode|inside Form with label"`
-  passes 32/32;
-  `npm --workspace xmlui run test:e2e -- src/components/Checkbox/Checkbox.spec.ts --workers=1`
-  passes 118/118 unchanged after the spacing/alignment/App-shell updates; live
-  Playwright inspection confirmed the migrated App page content returned from
-  the incorrect 110.75px centered strip to the original 1280px max-width
-  container geometry; the migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts --workers=1`
-  passes 433/439 with 6 skips unchanged.
-
-### Switch, 2026-06-28
-
-- The old `Switch` source is metadata/renderer glue over the shared old
-  `Toggle` implementation with `variant="switch"`. The migration therefore
-  reuses the copied `Toggle.tsx`, `Toggle.module.scss`, and
-  `Toggle.defaults.ts` from Checkbox instead of preserving a separate Switch
-  React implementation.
-- The Switch renderer mirrors the Checkbox boundary lessons: stable
-  `updateState`/`registerComponentApi` callbacks, explicit-vs-absent `value`
-  detection, form-bound value synchronization, and `NaN` boundary normalization
-  are all handled outside copied Toggle.
-- Switch uses the same old label/form-item contract discovered through
-  Checkbox. A visual check of `<Switch readOnly="true" label="Checked" />`
-  confirmed that an omitted `labelPosition` must resolve to the old
-  `ItemWithLabel` default of `top`; only explicit `start`/`end` are remapped
-  to compact `before`/`after` behavior. Boundary-only styles in
-  `Switch.module.scss` provide the outer wrapper, compact horizontal label
-  positions, `0.5em` label gap, and old form-item label typography while the
-  switch track/thumb visuals come from copied `Toggle.module.scss`.
-- The copied Toggle's `Part` wrapper needs an explicit `data-part-id="input"`
-  from the renderer boundary because `rootAttrs()` may otherwise pass an
-  undefined `data-part-id` that wins over the slot merge. Switch now applies
-  the same explicit part bridge as Checkbox.
-- Custom `variant` behavior needs an outer boundary wrapper when Switch is
-  unlabeled. The wrapper carries root/test/theme behavior attributes and CSS
-  variables, while the copied old Toggle remains the nested visible input part.
-  This preserves unchanged tests that expect `getByTestId("test")` to contain
-  `[data-part-id="input"]` for variant/animation cases.
-- Focus outline defaults need the same hierarchical old-style fallback chain as
-  Checkbox: `outlineWidth-Switch--focus -> outlineWidth-Switch ->
-  outlineWidth--focus` and similarly for color, offset, and style.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/Switch/Switch.spec.ts --workers=1`
-  passes 104/104 unchanged; the migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts --workers=1`
-  passes 537/543 with 6 skips unchanged.
-
-### Badge, 2026-06-28
-
-- The old `BadgeReact.tsx` and `Badge.module.scss` were restored as the
-  protected implementation. The React file needed only import-compatible paths;
-  the SCSS file could remain old source because the rewrite workspace already
-  carries the old `components-core/theming/themes` SCSS helper.
-- Badge exposed a renderer/metadata boundary trap: importing the SCSS module
-  from `Badge.tsx` metadata makes Vite's config bundler try to parse SCSS before
-  the runtime SCSS pipeline is active. Keep protected SCSS imported only by the
-  browser/component React path, and declare composed theme-var metadata in TS
-  when a component uses old SCSS composition helpers instead of direct
-  `createThemeVar(...)` calls.
-- The previous rewrite renderer had a runtime border-style compensation helper.
-  With the old SCSS restored, border, padding, text, and pill variant behavior
-  belong back in CSS classes; the renderer only resolves XMLUI boundary concerns:
-  `value`, children fallback, `colorMap`, root attributes, component classes,
-  and `contextMenu`.
-- A visual check with `colorMap` exposed two shared theme-pipeline mismatches.
-  First, rewrite spacing tokens used invalid CSS multiplication expressions
-  such as `calc(0.5 * var(--xmlui-space-base))`; the old runtime generates
-  concrete `space-*` values from `space-base`. Second, copied old SCSS expects
-  `padding-*` shorthands to be segmented into `paddingTop/Right/Bottom/Left-*`
-  variables. The rewrite now generates base spacing tokens and padding
-  segments in the shared theme runtime, while Badge keeps the full composed
-  padding metadata surface expected by the old SCSS.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/Badge/Badge.spec.ts --workers=1`
-  passes 24/24 unchanged; the migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts --workers=1`
-  passes 561/567 with 6 skips unchanged.
-
-### Br, 2026-06-28
-
-- `Br` has no protected React implementation file or `.module.scss` in the old
-  source. The compatibility surface is the metadata/renderer boundary itself:
-  both lowercase `br` and capitalized `Br` render a void HTML `<br>` element.
-- The old renderer used `PropsTrasform(...).asRest()` and forwarded rest props
-  to the HTML element. The rewrite metadata now marks `Br` as accepting
-  arbitrary props, and the renderer forwards `adapter.rootAttrs()` to preserve
-  that old rest-prop behavior through the current adapter.
-- Metadata keeps the old public shape: deprecated status, `isHtmlTag: true`,
-  and identical metadata for the lowercase and capitalized names. No component
-  styling or child rendering is introduced.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/Br/Br.spec.ts --workers=1`
-  passes 4/4 unchanged; `npm --prefix xmlui run check:metadata` passes; the
-  migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts --workers=1`
-  passes 565/571 with 6 skips unchanged.
-- User confirmed Br is complete.
-
-### Text, 2026-06-28
-
-- `TextReact.tsx`, `Text.module.scss`, and `Text.defaults.ts` were restored
-  from the old source. The protected React file only has import/dependency shims:
-  a local composed-ref helper replaces `@radix-ui/react-compose-refs`, and a
-  tiny local class merger replaces `classnames` because the rewrite workspace
-  does not carry those dependencies.
-- The renderer boundary preserves old value-vs-children behavior and bridges the
-  current adapter root theme class into the old `classes[COMPONENT_PART_KEY]`
-  contract. This is the same root-class bridge seen in earlier copied
-  components.
-- The renderer boundary must also preserve the old `extractValue.asDisplayText`
-  behavior for `value`: repeated spaces and tabs are converted to `\xa0` after
-  the first plain space in a run. This matters for multiline attribute values
-  even when `preserveLinebreaks="false"` because indentation still affects
-  browser wrapping. A plain `String(value)` subtly changed the wrapping of
-  indented `Text value="..."` examples.
-- Text exposed missing shared compatibility helpers rather than component-local
-  behavior: copied source expects `getMaxLinesStyle`, `toCssVar`, and
-  `useComponentStyle`. Minimal rewrite-side shims were added under
-  `components-core` so protected component files can stay source-preserved.
-- Known Text variants need a renderer-boundary dynamic class to make old
-  variant-specific theme variables override the base Text CSS through the current
-  CSS layer model. The class must be narrow: padding side variables use the old
-  fallback order (`paddingTop/Bottom/Left/Right-Text-variant` before
-  `paddingVertical/Horizontal-Text-variant`) or the dynamic class can override a
-  more specific copied-SCSS declaration with a generic zero value.
-- Text's inline HStack test exposed a shared driver/root-attribute problem in
-  `Icon`: the current Icon boundary had attached `testId` to the inner SVG
-  instead of the XMLUI root span. Moving root attributes to the outer span keeps
-  Icon's public root aligned with the old driver contract and fixes mixed
-  inline alignment measurements without changing Text's protected files.
-- Text also exposed a Stack default-boundary gap: old metadata supplies default
-  `horizontalAlignment` and `verticalAlignment`, while the rewrite renderer had
-  allowed them to stay undefined. The Stack boundary now falls back to `start`
-  for both properties unless fixed by `HStack`/`VStack`.
-- A user visual check of the breakMode documentation sample exposed a shared
-  Stack layout regression rather than a copied Text regression. The colored Text
-  boxes had correct intrinsic heights, but nested `VStack` sections were flex
-  shrinking to the App viewport height and letting their children overflow,
-  causing later headings to paint over previous Text blocks. Old normal vertical
-  Stack children are content-sized unless an explicit star/dock layout opts into
-  shrink/stretch behavior. The rewrite Stack stylesheet now prevents direct
-  children of vertical stacks from shrinking by default.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --prefix xmlui run check:metadata` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/Text/Text.spec.ts --workers=1`
-  passes 140/140 unchanged after the `asDisplayText` boundary fix; the current rewrite Stack suite remains at its
-  existing baseline of 2 passed and 83 skipped; the migrated component
-  side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts --workers=1`
-  passes 705/711 with 6 skips unchanged.
-
-### Heading, 2026-06-28
-
-- `HeadingReact.tsx` and `Heading.module.scss` were restored from the old
-  source. The protected React file only has dependency shims: local composed-ref
-  and class merging helpers replace old package imports that are not dependencies
-  in the rewrite workspace.
-- The renderer boundary now preserves the old Heading contract: `id` is passed
-  as `uid`, current theme/root classes are bridged into
-  `classes[COMPONENT_PART_KEY]`, the component API is passed as
-  `registerComponentApi`, and `value` rendering uses the same `asDisplayText`
-  whitespace preservation learned from Text.
-- `showAnchor` must remain `undefined` when the XMLUI prop is omitted. The old
-  React component checks app/global config in that case; forcing the metadata
-  default `false` at the renderer boundary would hide that old runtime behavior.
-- The old Heading source expects `components-core/AppContext` and
-  `components-core/TableOfContentsContext`. Minimal compatibility modules were
-  added so copied Heading can resolve app globals and register with the old TOC
-  contract when a compatible provider is present. Future `TableOfContents`
-  migration should reuse and likely complete this context surface.
-- Heading exposed a layout-boundary compatibility gap. In the rewrite, a
-  start-aligned vertical `Stack` let an unconstrained heading flex child grow to
-  max-content width, so old `hasOverflow()` returned false even though the old
-  E2E expected overflow. The renderer bridge adds `minWidth: 0` and a default
-  `maxWidth: 100%` only when the author did not set `width` or `maxWidth`.
-  Explicit widths still overflow their container as in the old tests.
-- A user visual check of generic `<Heading level="h1">` through
-  `<Heading level="h6">` exposed a default-theme contributor gap. The old
-  runtime made per-level defaults (`fontSize-H1` ... `fontSize-H6`) available
-  to the generic `Heading` component, while the rewrite had only attached them
-  to shortcut metadata (`H1` ... `H6`). The generic `HeadingMd` metadata now
-  includes the same old per-level defaults, and the shortcut helper uses the
-  same map. A computed-style probe for the reported markup now reads 24, 20,
-  18, 16, 14, and 12px for H1-H6.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --prefix xmlui run check:metadata` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts --workers=1`
-  passes 136/136 unchanged; the migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts --workers=1`
-  passes 841/847 with 6 skips unchanged.
-
-### Stack Family and SpaceFiller, 2026-06-28
-
-- `StackReact.tsx`, `Stack.module.scss`, and `Stack.defaults.ts` were restored
-  from the old source. The copied React file only changes imports: the old
-  `ThemedScroller` dependency is bridged to the rewrite `ScrollViewerReact`,
-  and old shared hook/type imports resolve through small compatibility shims.
-- The Stack renderer bridge now preserves the old family shape for `Stack`,
-  `HStack`, `VStack`, `CHStack`, and `CVStack`: theme/root classes are bridged
-  through `classes[COMPONENT_PART_KEY]`, click/context menu/mounted events are
-  only passed when declared, component APIs are registered, and shortcut
-  components force their own orientation/alignment regardless of an author
-  supplied `orientation` prop.
-- Stack exposed a renderer-pipeline compatibility gap: the rewrite layout
-  resolver treats any prop named `orientation` as a generic layout prop and
-  injects `display:flex` plus `flexDirection` into root style. Old Stack owns
-  orientation in component classes. The Stack boundary now strips generated
-  `display`/`flexDirection` root styles so copied Stack classes control layout.
-  This is a reusable warning for future source-preserved components with props
-  that overlap generic layout names.
-- The bridge carries forward the old Stack parent-layout behavior directly in
-  the renderer: horizontal wrapping uses `FlowLayout`, `SpaceFiller` becomes a
-  flow item break in wrapped stacks, explicit `itemWidth` wraps direct children,
-  star item widths map to flex factors, and `dock` values render the old
-  top/bottom/left/right/stretch layout shape.
-- The current renderer adapter does not expose the old `layoutContext`
-  `wrapChild`/`ignoreLayoutProps` protocol. For Stack, the bridge emulates the
-  needed direct-child cases locally and keeps a conservative nonvisual/opaque
-  skip list. This should be revisited if future complex containers need the
-  same parent-child contract.
-- `SpaceFillerReact.tsx` and `SpaceFiller.module.scss` were restored from the
-  old source and added to this approval unit because it is a Stack layout
-  primitive. Its renderer ignores layout props, bridges the theme class through
-  `classes[COMPONENT_PART_KEY]`, and keeps the old default test id behavior.
-- A user Stack sample with `<VStack>` as the document root exposed a
-  compiler-pipeline false positive. The old XMLUI parser allows any ordinary
-  component as the application root; only `<Component>` is special because it
-  declares a reusable component and still requires `name`. The rewrite parser,
-  raw parser, and IR validator had incorrectly required app roots to be
-  `<App>`. They now preserve non-`Component` roots as app documents, and the
-  compatibility tests cover both semantic and raw parsing plus IR validation
-  for a `<VStack>` app root.
-- The same sample exposed that Stack must use the old internal
-  `ThemedScroller` contract, not the public `ScrollViewer` wrapper. Public
-  `ScrollViewer` intentionally fills its parent with `height: 100%`; using it
-  inside source-preserved Stack made auto-height horizontal Stack rows stretch
-  vertically when nested under a root `VStack`. `ScrollViewerReact` now exposes
-  a small `ThemedScroller` shim whose normal-scroll path is just the Stack root
-  div, matching the old source, while public `ScrollViewer` keeps its
-  fill-parent behavior. A new Stack regression spec covers the reported
-  `<VStack>` app-root markup without changing the original migrated E2E files.
-- The follow-up check of the same markup exposed a second bridge mismatch:
-  metadata default values are documentation/prop defaults, but old Stack React
-  only receives `horizontalAlignment` and `verticalAlignment` when the author
-  supplies them or when a shortcut component fixes them. The rewrite bridge had
-  forwarded `"start"` for both omitted props, which added `align-items:
-  flex-start` to a plain root `VStack` and prevented its child horizontal
-  Stacks from stretching to the full width. The bridge now forwards alignment
-  props only when authored or fixed by `CHStack`/`CVStack`, preserving old
-  flexbox stretch behavior. The Stack regression spec now checks both row
-  height and full-row width.
-- A later `verticalAlignment="end"` sample on default vertical `Stack` exposed
-  another renderer-pipeline overlap. The generic layout resolver computed
-  inline `alignItems: flex-end` from `verticalAlignment` before the copied
-  Stack classes handled the prop with the old axis semantics. The inline style
-  moved the child to the right while the source-preserved class correctly moved
-  it to the bottom. The Stack boundary now removes generated inline
-  `alignItems`/`justifyContent` when XMLUI `horizontalAlignment` or
-  `verticalAlignment` props are authored, while still preserving explicit CSS
-  `alignItems` and `justifyContent` props. This reinforces the migration rule:
-  props owned by copied component CSS must be kept out of generic inline layout
-  style unless the old runtime did the same.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --prefix xmlui run check:metadata` passes;
-  `npm --prefix xmlui exec vitest run tests/compiler/parser/compatibility.test.ts tests/compiler/rawXmlui.test.ts tests/compiler/ir.test.ts tests/compiler/codegen.test.ts tests/compiler/renderingPipeline.test.ts`
-  passes 56/56;
-  `npm --workspace xmlui run test:e2e -- src/components/Stack/Stack-regression.spec.ts src/components/Stack/Stack.spec.ts src/components/Stack/HStack.spec.ts src/components/Stack/VStack.spec.ts src/components/Stack/CHStack.spec.ts src/components/Stack/CVStack.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts --workers=1`
-  passes 17/100 with 83 skips unchanged; the migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts src/components/Stack/Stack-regression.spec.ts src/components/Stack/Stack.spec.ts src/components/Stack/HStack.spec.ts src/components/Stack/VStack.spec.ts src/components/Stack/CHStack.spec.ts src/components/Stack/CVStack.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts --workers=1`
-  passes 858/947 with 89 skips unchanged.
-
-### NoResult, 2026-06-28
-
-- `NoResultReact.tsx` and `NoResult.module.scss` were restored to the old
-  source shape: the component uses the approved source-preserved `ThemedIcon`
-  dependency instead of the rewrite's hand-made inline SVG, and the stylesheet
-  again uses the old shared border/padding theme mixins.
-- The renderer boundary preserves the old label fallback order: explicit
-  `label`, rendered children, then `"No results found"`. It also bridges the
-  old `classes[COMPONENT_PART_KEY]` root class contract and keeps the default
-  test id behavior required by the existing local driver.
-- The focused local E2E suite probes the icon through
-  `data-xmlui-part="icon"`. The old `NoResult` source did not add that marker,
-  but the rewrite suite already depends on it; the migration keeps the old
-  `ThemedIcon` rendering and adds only that compatibility attribute.
-- NoResult exposed a metadata-build edge: importing
-  `NoResult.module.scss?xmlui-theme-vars` failed while bundling the Vite config.
-  Metadata now declares the same composed border/padding/icon/background theme
-  var names explicitly, while the runtime SCSS remains source-preserved.
-- The user confirmed `NoResult` as complete after focused tests and visual
-  checks. Future agents should treat the source-preserved React/SCSS, renderer
-  label fallback bridge, and local icon part marker as accepted compatibility
-  behavior for this pass.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --prefix xmlui run check:metadata` passes;
-  `npm --workspace xmlui run test:e2e -- src/components/NoResult/NoResult.spec.ts --workers=1`
-  passes 3/3; the migrated component side-by-side run
-  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts src/components/Stack/Stack-regression.spec.ts src/components/Stack/Stack.spec.ts src/components/Stack/HStack.spec.ts src/components/Stack/VStack.spec.ts src/components/Stack/CHStack.spec.ts src/components/Stack/CVStack.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts src/components/NoResult/NoResult.spec.ts --workers=1`
-  passes 861/950 with 89 skips unchanged.
-
-### FlowLayout, 2026-06-28
-
-- `FlowLayoutReact.tsx`, `FlowLayout.module.scss`, and
-  `flow-layout-utils.ts` are being restored from the old XMLUI project with
-  import-path-only adaptations where the rewrite uses different module names.
-- The copied React implementation depends on shared rendering-pipeline helpers
-  that were not present in the rewrite yet: CSS size normalization, star-size
-  layout resolution, responsive layout-property parsing, dynamic media-query
-  class injection, and the old media breakpoint type names. These helpers are
-  compatibility support for old component source, not FlowLayout-specific
-  visual rewrites.
-- The current renderer adapter can pass static child width/minWidth/maxWidth
-  props to the flow item wrapper and strip them from the child render, matching
-  the old wrapper ownership model. Dynamic responsive child bindings such as
-  `width-md="{expr}"` may need an adapter-level evaluated child-prop hook if a
-  regression appears during FlowLayout testing.
-- `FlowLayout.tsx` must stay metadata-only. Re-exporting the runtime
-  `FlowItemWrapper` from that metadata file caused Vite config bundling to parse
-  SCSS modules as JavaScript. Public extension-authoring exports already import
-  the runtime pieces directly from `FlowLayoutReact.tsx`.
-- The old source's nested scroller plus inner flex container conflicted with
-  the rewrite's current `FlowLayout.foundation.spec.ts`, which expects the
-  `testId` element itself to be the flex container and scroll root. The migrated
-  React file therefore keeps the old FlowItemWrapper/responsive sizing logic
-  but lets the scroller/root also be the flex container and uses native flex
-  `columnGap`/`rowGap` instead of the old padding-plus-negative-margin gap
-  bridge. This is a deliberate side-by-side test compatibility adaptation.
-- A visual check with `columnGap="$space-8"` and four `25%` items per row
-  exposed a bridge issue created by the native-gap adaptation: theme token gaps
-  must be converted to CSS variables at the renderer boundary, resolved against
-  the actual FlowLayout DOM element for sizing math, and percentage item
-  `flex-basis` must be gap-compensated. Otherwise the old visual contract
-  either loses visible gaps or wraps the fourth 25% item to the next row.
-- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
-  `npm --prefix xmlui run check:metadata` passes; focused FlowLayout run
-  `npm --workspace xmlui run test:e2e -- src/components/FlowLayout/FlowLayout.spec.ts src/components/FlowLayout/FlowLayout.foundation.spec.ts --workers=1`
-  passes 56/81 with 25 existing skips; the migrated component side-by-side run
-  including FlowLayout passes 917/1031 with 114 existing skips.
+- Original E2E files are not enough for visual parity. User screenshots exposed
+  opacity, font, spacing, wrapper, and gap regressions that focused specs missed.
+  Add narrow foundation/regression tests for each learned compatibility gap
+  without editing old migrated E2E files.
+- Existing drivers may assume old DOM details. Prefer driver/testbed updates that
+  accept both current and source-preserved shapes over changing copied React
+  source.
+- Do not require test-only behavior markers for copied behavior components when
+  the old implementation did not emit them. Prefer assertions against visible
+  behavior and stable public test ids.
+- The side-by-side migrated component batch is the practical gate while the full
+  global suite is still broader baseline debt. Keep recording exact focused and
+  batch counts after each component.
+- Record durable component-specific findings in `.ai/*source-preserving*` notes;
+  keep this plan focused on reusable rules for future migrations.
 
 ## Pilot Sequence
 
@@ -828,7 +292,7 @@ Status values:
 | --- | --- | ---: | --- | --- | --- | --- |
 | `APICall` | Complex | 1 | none | runtime data/APIs | Not started | Nonvisual data behavior; preserve async edge cases. |
 | `Accordion` | More difficult | 1 | `Accordion.module.scss` | icon, part, toggle behavior | Not started | Stateful children and item context. |
-| `Animation` | Simple | 0 | none | runtime animation hooks | Not started | No direct old spec; verify via dependents. |
+| `Animation` | Simple | 0 | none | runtime animation hooks | Approved complete | User confirmed Animation is complete; source-preserved React/defaults restored from old project; direct `@react-spring/web` and `lodash-es` dependencies declared with a local lodash type shim. Local rewrite spec now checks old react-spring behavior instead of rewrite-only CSS transition details. A tiny documented child-style merge shim preserves rewrite inline theme variables when Animation clones children. TypeScript and metadata checks pass; focused Animation suite passes 2/2; Checkbox/Switch animation behavior regression grep passes 2/2; side-by-side migrated component batch passes 947/1063 with 116 skips. Residual non-failing React ref warning remains for tooltip+animation behavior composition. |
 | `App` | Complex | 5 | `App.module.scss`, `Sheet.module.scss` | AppHeader, NavPanel, Pages, Part | Not started | Shell/routing tests require broad smoke. |
 | `AppHeader` | More difficult | 1 | `AppHeader.module.scss` | App, Part | Not started | App shell dependency. |
 | `AppState` | More difficult | 1 | none | runtime state | Not started | Data mutation and event tests matter. |
@@ -838,7 +302,7 @@ Status values:
 | `Bookmark` | More difficult | 1 | `Bookmark.module.scss` | runtime navigation/state | Not started | Foundation-only signal exists in current tests. |
 | `Br` | Simple | 1 | none | metadata helpers | Approved complete | User confirmed Br is complete; old metadata/renderer boundary restored for lowercase `br` and capitalized `Br`; arbitrary rest props are forwarded through `adapter.rootAttrs()`; focused unchanged Br suite passes 4/4; metadata and TypeScript checks pass; side-by-side migrated component run passes 565/571 with 6 skips. |
 | `Button` | More difficult | 2 | `Button.module.scss` | Icon, Part, VisuallyHidden | Approved complete | User confirmed Button is complete; focused unchanged Button suites pass 153/159 with 6 skips; side-by-side migrated component run with ProgressBar, Avatar, Icon, Button, and Checkbox passes 433/439 with 6 skips. |
-| `Card` | More difficult | 1 | `Card.module.scss` | Avatar, Heading, Link, Part, Text | Not started | Migrate after its visual/text dependencies. |
+| `Card` | More difficult | 1 | `Card.module.scss` | Avatar, Heading, Link, Part, Text | Approved complete | User confirmed Card is complete; source-preserved React/SCSS restored from old project with import rewrites only; runtime-only `ThemedAvatar`, `ThemedHeading`, `ThemedLinkNative`, and fixed `ThemedText` wrappers avoid metadata/SCSS bundling regressions while preserving embedded dependency styling; renderer bridges old root classes, API registration, events, aria label, and Card's old Stack child layout context for direct children. Focused Card+Text run passes 168/170 with 2 skips; metadata and TypeScript checks pass; side-by-side migrated component batch passes 944/1060 with 116 skips. |
 | `ChangeListener` | More difficult | 1 | none | runtime state/listeners | Not started | Event semantics over visuals. |
 | `Checkbox` | More difficult | 1 | none in old folder | Toggle | Approved complete | User confirmed Checkbox works as expected; focused unchanged Checkbox suite passes 118/118; copied old Toggle React/SCSS/defaults power the renderer; stable callback and explicit/implicit value boundary fixes preserve old Toggle semantics. |
 | `CodeBlock` | More difficult | 1 | `CodeBlock.module.scss` | Button, Icon, Part, Text | Not started | Copy button/text first. |
@@ -857,7 +321,7 @@ Status values:
 | `Fallback` | More difficult | 0 | none | runtime error/fallback | Not started | Verify through runtime scenarios. |
 | `FileInput` | Complex | 1 | `FileInput.module.scss` | Button, FormItem, Icon, TextBox | Not started | Wait for Button/TextBox/FormItem. |
 | `FileUploadDropZone` | More difficult | 1 | `FileUploadDropZone.module.scss` | Icon, component utils | Not started | Browser file/drop semantics. |
-| `FlowLayout` | Complex | 1 | `FlowLayout.module.scss` | ScrollViewer | Awaiting approval | Source-preserved React/SCSS/helper copied from old project with one root/scroller compatibility adaptation for the current foundation test; rendering-pipeline helpers added for old imports; focused FlowLayout run passes 56/81 with 25 skips; side-by-side migrated batch passes 917/1031 with 114 skips. Theme-token gaps are normalized/resolved and percentage `flex-basis` is gap-compensated for the native-gap bridge. Static responsive child width props are bridged; dynamic child responsive bindings remain an open verification risk. |
+| `FlowLayout` | Complex | 1 | `FlowLayout.module.scss` | ScrollViewer | Approved complete | User confirmed FlowLayout is complete; source-preserved React/SCSS/helper copied from old project with one root/scroller compatibility adaptation for the current foundation test; rendering-pipeline helpers added for old imports; focused FlowLayout run passes 56/81 with 25 skips; side-by-side migrated batch including Card passes 944/1060 with 116 skips. Theme-token gaps are normalized/resolved and percentage `flex-basis` is gap-compensated for the native-gap bridge. Static responsive child width props are bridged; dynamic child responsive bindings remain an open verification risk. |
 | `FocusScope` | More difficult | 1 | none | focus management | Not started | Needs browser focus-specific checks. |
 | `Footer` | More difficult | 1 | `Footer.module.scss` | App | Not started | Old suite currently skipped in rewrite. |
 | `Form` | Complex | 1 | `Form.module.scss` | Button, FormItem, Part, ValidationSummary | Not started | Central prerequisite for inputs. |
@@ -997,6 +461,8 @@ Status values:
 
 ## Immediate Next Action
 
-Stop here for user approval of `FlowLayout` after the focused E2E suite and
-visual checks pass. After approval, choose the next component based on
-dependency order and user direction.
+Start the next session by reading this plan, the latest handoff note in `.ai/`,
+and the most recent component findings notes. Choose the next component based on
+dependency order and user direction, then use the same source-preserving loop:
+copy old React/SCSS, adapt only imports and renderer boundaries, verify focused
+and side-by-side E2E, update this plan and `.ai/`, then stop for user approval.

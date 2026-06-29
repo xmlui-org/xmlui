@@ -1,12 +1,9 @@
 <App>
-  <FlowLayout rowGap="2px">
-    <Stack width="25%" height="32px" backgroundColor="red" />
-    <Stack width="25%" height="32px" backgroundColor="blue" />
-    <Stack width="25%" height="32px" backgroundColor="green" />
-    <Stack width="25%" height="32px" backgroundColor="yellow" />
-    <Stack width="25%" height="32px" backgroundColor="maroon" />
-    <Stack width="25%" height="32px" backgroundColor="teal" />
-    <Stack width="25%" height="32px" backgroundColor="seagreen" />
-    <Stack width="25%" height="32px" backgroundColor="olive" />
-  </FlowLayout>
+  <Card maxWidth="300px" onDoubleClick="toast('Double-clicked!')">
+    <HStack verticalAlignment="center">
+      <Icon name="info" />
+      <Text value="Double-click me" variant="strong" />
+    </HStack>
+    <Text value="This is an example text" />
+  </Card>
 </App>
