@@ -1,12 +1,13 @@
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import type { XmluiNode } from "../../compiler/ir";
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { ThemedIcon } from "../Icon/Icon";
 import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "./DropdownMenu";
 import {
-  DropdownMenuComponent,
-  MenuItemComponent,
-  MenuSeparatorComponent,
-  SubMenuItemComponent,
+  DropdownMenu,
+  MenuItem,
+  MenuSeparator,
+  SubMenuItem,
 } from "./DropdownMenuReact";
 
 export const dropdownMenuRenderer = wrapComponent({
@@ -22,21 +23,27 @@ export const dropdownMenuRenderer = wrapComponent({
       !(child.kind === "element" && child.type === "property"),
     ));
     return (
-      <DropdownMenuComponent
+      <DropdownMenu
         {...adapter.rootAttrs("content")}
         alignment={adapter.stringProp("alignment", "start") as "start" | "center" | "end"}
         disabled={!adapter.booleanProp("enabled", true)}
+        hasContent={children.length > 0}
         label={adapter.stringProp("label")}
         menuWidth={adapter.stringProp("menuWidth")}
+        modal={adapter.booleanProp("modal", false)}
         onWillOpen={async () => {
           const result = await adapter.event("willOpen")();
           return typeof result === "boolean" ? result : undefined;
         }}
         registerComponentApi={adapter.registerApi}
+        triggerButtonIcon={adapter.stringProp("triggerButtonIcon")}
+        triggerButtonIconPosition={adapter.stringProp("triggerButtonIconPosition", "end") as "start" | "end"}
+        triggerButtonThemeColor={adapter.stringProp("triggerButtonThemeColor")}
+        triggerButtonVariant={adapter.stringProp("triggerButtonVariant")}
         triggerTemplate={hasTriggerTemplate ? adapter.renderTemplate("triggerTemplate") : undefined}
       >
         {adapter.renderChildren(children)}
-      </DropdownMenuComponent>
+      </DropdownMenu>
     );
   },
 });
@@ -44,25 +51,35 @@ export const dropdownMenuRenderer = wrapComponent({
 export const menuItemRenderer = wrapComponent({
   name: "MenuItem",
   metadata: MenuItemMd as ComponentMetadata,
-  renderer: ({ adapter }) => (
-    <MenuItemComponent
-      {...adapter.rootAttrs()}
-      active={adapter.booleanProp("active", false)}
-      enabled={adapter.booleanProp("enabled", true)}
-      icon={adapter.stringProp("icon")}
-      iconPosition={adapter.stringProp("iconPosition", "start") as "start" | "end"}
-      label={adapter.stringProp("label")}
-      onClick={() => { void adapter.event("click")(); }}
-    >
-      {adapter.renderChildren()}
-    </MenuItemComponent>
-  ),
+  renderer: ({ adapter }) => {
+    const iconName = adapter.stringProp("icon");
+    const to = adapter.stringProp("to");
+    const hasClickHandler = Object.prototype.hasOwnProperty.call(adapter.node.events, "click");
+    const onClick = hasClickHandler
+      ? () => { void adapter.event("click")(); }
+      : to
+        ? () => { void adapter.scope.routing?.navigate(to); }
+        : undefined;
+    return (
+      <MenuItem
+        {...adapter.rootAttrs()}
+        active={adapter.booleanProp("active", false)}
+        enabled={adapter.booleanProp("enabled", true)}
+        icon={iconName ? <ThemedIcon name={iconName} fallback={iconName} /> : undefined}
+        iconPosition={adapter.stringProp("iconPosition", "start") as "start" | "end"}
+        label={adapter.stringProp("label")}
+        onClick={onClick}
+      >
+        {adapter.renderChildren()}
+      </MenuItem>
+    );
+  },
 });
 
 export const menuSeparatorRenderer = wrapComponent({
   name: "MenuSeparator",
   metadata: MenuSeparatorMd as ComponentMetadata,
-  renderer: ({ adapter }) => <MenuSeparatorComponent {...adapter.rootAttrs()} />,
+  renderer: ({ adapter }) => <MenuSeparator {...adapter.rootAttrs()} />,
 });
 
 export const subMenuItemRenderer = wrapComponent({
@@ -77,16 +94,17 @@ export const subMenuItemRenderer = wrapComponent({
     const children = filterMenuSeparators(adapter.node.children.filter((child) =>
       !(child.kind === "element" && child.type === "property"),
     ));
+    const iconName = adapter.stringProp("icon");
     return (
-      <SubMenuItemComponent
+      <SubMenuItem
         {...adapter.rootAttrs()}
-        icon={adapter.stringProp("icon")}
+        icon={iconName ? <ThemedIcon name={iconName} fallback={iconName} /> : undefined}
         iconPosition={adapter.stringProp("iconPosition", "start") as "start" | "end"}
         label={adapter.stringProp("label")}
         triggerTemplate={hasTriggerTemplate ? adapter.renderTemplate("triggerTemplate") : undefined}
       >
         {adapter.renderChildren(children)}
-      </SubMenuItemComponent>
+      </SubMenuItem>
     );
   },
 });

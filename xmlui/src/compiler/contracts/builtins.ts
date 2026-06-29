@@ -447,6 +447,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "QRCode",
     allowsChildren: false,
     includeLayoutProps: true,
+    acceptsArbitraryProps: true,
     eventAttributes: {
       init: "onInit",
     },

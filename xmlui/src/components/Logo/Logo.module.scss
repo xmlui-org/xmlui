@@ -2,5 +2,9 @@
   .logo {
     width: auto;
     box-shadow: none;
+
+    &.inline {
+      display: inline !important;
+    }
   }
 }

@@ -1,178 +1,161 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
 
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "AppHeader";
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$height-AppHeader: createThemeVar("height-AppHeader");
-$backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
-$maxWidth-content-AppHeader: createThemeVar("maxWidth-content-AppHeader");
-$maxWidth-AppHeader: createThemeVar("maxWidth-AppHeader");
-$paddingHorizontal-AppHeader: createThemeVar("paddingHorizontal-AppHeader");
-$paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
-$paddingTop-AppHeader: createThemeVar("paddingTop-AppHeader");
-$paddingRight-AppHeader: createThemeVar("paddingRight-AppHeader");
-$paddingBottom-AppHeader: createThemeVar("paddingBottom-AppHeader");
-$paddingLeft-AppHeader: createThemeVar("paddingLeft-AppHeader");
-$border-AppHeader: createThemeVar("border-AppHeader");
-$borderTop-AppHeader: createThemeVar("borderTop-AppHeader");
-$borderRight-AppHeader: createThemeVar("borderRight-AppHeader");
-$borderBottom-AppHeader: createThemeVar("borderBottom-AppHeader");
-$borderLeft-AppHeader: createThemeVar("borderLeft-AppHeader");
-$borderRadius-AppHeader: createThemeVar("borderRadius-AppHeader");
-$width-logo-AppHeader: createThemeVar("width-logo-AppHeader");
-$paddingHorizontal-logo-AppHeader: createThemeVar("paddingHorizontal-logo-AppHeader");
-$paddingVertical-logo-AppHeader: createThemeVar("paddingVertical-logo-AppHeader");
-$padding-drawerToggle-AppHeader: createThemeVar("padding-drawerToggle-AppHeader");
-$size-drawerToggle-AppHeader: createThemeVar("size-drawerToggle-AppHeader");
-$alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
+// --- Theme vars for paddings and borders
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
 
-.header {
-  position: relative;
-  height: $height-AppHeader;
-  box-sizing: content-box;
-  background-color: $backgroundColor-AppHeader;
-  border: $border-AppHeader;
-  border-top: $borderTop-AppHeader;
-  border-right: $borderRight-AppHeader;
-  border-bottom: $borderBottom-AppHeader;
-  border-left: $borderLeft-AppHeader;
-  border-radius: $borderRadius-AppHeader;
-}
+// --- Other
+$width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
+$alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
 
-.headerInner {
-  height: 100%;
-  flex: 1;
-  gap: var(--xmlui-space-4);
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  max-width: $maxWidth-content-AppHeader;
-  padding-inline: $paddingHorizontal-AppHeader;
-  padding-block: $paddingVertical-AppHeader;
-  padding-top: $paddingTop-AppHeader;
-  padding-right: $paddingRight-AppHeader;
-  padding-bottom: $paddingBottom-AppHeader;
-  padding-left: $paddingLeft-AppHeader;
-  width: 100%;
-  margin: 0 auto;
-}
+// Variables for @layer section
+$height-AppHeader: createThemeVar("height-#{$component}");
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-#{$component}");
+$maxWidth-content-AppHeader: createThemeVar("maxWidth-content-#{$component}");
+$maxWidth-AppHeader: createThemeVar("maxWidth-#{$component}");
+$padding-drawerToggle-AppHeader: createThemeVar("padding-drawerToggle-#{$component}");
+$size-drawerToggle-AppHeader: createThemeVar("size-drawerToggle-#{$component}");
 
-.full {
-  max-width: $maxWidth-AppHeader;
-}
-
-.logoAndTitle {
-  display: flex;
-  align-items: center;
-  gap: var(--xmlui-space-4);
-  height: 100%;
-
-  &:not(:empty) {
-    padding-inline-end: var(--xmlui-space-2);
+@layer components {
+  .header {
+    position: relative;
+    height: $height-AppHeader;
+    box-sizing: content-box;
+    background-color: $backgroundColor-AppHeader;
+    @include t.borderVars($themeVars, $component);
   }
 
-  &:empty {
-    display: none;
-  }
-}
-
-.logoContainer {
-  flex-shrink: 0;
-  display: flex;
-  width: $width-logo-AppHeader;
-  height: 100%;
-  align-items: center;
-  padding-inline: $paddingHorizontal-logo-AppHeader;
-  padding-block: $paddingVertical-logo-AppHeader;
-}
-
-.title {
-  color: inherit;
-  text-decoration: none;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.subNavPanelSlot {
-  display: flex;
-  flex-direction: row;
-}
-
-.childrenWrapper {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  align-items: center;
-  gap: var(--xmlui-space-2);
-  justify-content: $alignment-content-AppHeader;
-}
-
-.rightItems {
-  gap: var(--xmlui-space-2);
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  &:not(:empty) {
-    padding-inline-start: var(--xmlui-space-4);
-  }
-}
-
-.drawerToggle {
-  padding: $padding-drawerToggle-AppHeader;
-  width: $size-drawerToggle-AppHeader;
-  height: $size-drawerToggle-AppHeader;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+  .headerInner {
     height: 100%;
-    border: 0;
-    background: transparent;
-    color: inherit;
+    flex: 1;
+    gap: t.$space-4;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    max-width: $maxWidth-content-AppHeader;
+    padding-inline: t.getThemeVar($themeVars, "paddingHorizontal-#{$component}");
+    @include t.paddingVars($themeVars, $component);
+
+    &.full {
+      max-width: $maxWidth-AppHeader;
+    }
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .childrenWrapper {
+    --stack-gap-default: #{t.$space-2};
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    align-items: center;
+    gap: var(--stack-gap-default);
+    justify-content: $alignment-content-AppHeader;
+  }
+
+  .subNavPanelSlot{
+    display: flex;
+    flex-direction: row;
+  }
+
+  .logoAndTitle {
+    display: flex;
+    align-items: center;
+    gap: t.$space-4;
+    height: 100%;
+
+    &:not(:empty) {
+      padding-inline-end: t.$space-2;
+    }
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .logoContainer:not(:empty) {
+    flex-shrink: 0;
+    display: flex;
+    width: $width-logo-AppHeader;
+    height: 100%;
+    align-items: center;
+    @include t.paddingVars($themeVars, "logo-#{$component}");
+  }
+
+  .customLogoContainer {
+    display: flex;
+    height: 100%;
+    align-items: center;
+
+    & > img {
+      height: 100%;
+    }
+  }
+
+  .rightItems {
+    --stack-gap-default: #{t.$space-2};
+    gap: var(--stack-gap-default);
+    height: 100%;
+
+    &:not(:empty) {
+      padding-inline-start: t.$space-4;
+    }
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .appHub {
+    text-decoration: none;
+    margin-inline-end: t.$space-4;
+    width: 40px;
+    padding: t.$space-2;
+    color: t.$textColor-subtitle;
     cursor: pointer;
+
+    &:hover {
+      color: t.$textColor-secondary;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .drawerToggle.drawerToggle{
+    padding: $padding-drawerToggle-AppHeader !important;
+    width: $size-drawerToggle-AppHeader !important;
+    height: $size-drawerToggle-AppHeader !important;
+    display: none;
+    @include t.withMaxScreenSize(2) {
+      display: block;
+    }
+  }
+
+  .logoLink{
+    padding: 0;
+    height: 100%;
+    &>:first-child {
+      height: 100%;
+    }
   }
 }
 
-.hamburgerIcon,
-.hamburgerIcon::before,
-.hamburgerIcon::after {
-  display: block;
-  width: 1rem;
-  height: 2px;
-  border-radius: 1px;
-  background: currentColor;
-}
-
-.hamburgerIcon {
-  position: relative;
-}
-
-.hamburgerIcon::before,
-.hamburgerIcon::after {
-  content: "";
-  position: absolute;
-  left: 0;
-}
-
-.hamburgerIcon::before {
-  top: -5px;
-}
-
-.hamburgerIcon::after {
-  top: 5px;
-}
-
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

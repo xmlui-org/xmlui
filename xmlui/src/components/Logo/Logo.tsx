@@ -3,6 +3,7 @@ import { createMetadata } from "../../component-core/metadata/helpers";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { Logo } from "./LogoReact";
 import { defaultProps } from "./Logo.defaults";
+import { COMPONENT_PART_KEY } from "../../styling";
 
 const COMP = "Logo";
 
@@ -37,13 +38,34 @@ export const LogoMd = createMetadata({
 export const logoRenderer = wrapComponent({
   name: COMP,
   metadata: LogoMd as ComponentMetadata,
-  renderer: ({ adapter }) => (
-    <Logo
-      {...adapter.rootAttrs()}
-      data-testid={adapter.stringProp("testId", "test-id-component")}
-      src={adapter.resourceUrl(adapter.prop("src"))}
-      alt={adapter.stringProp("alt", defaultProps.alt)}
-      inline={adapter.booleanProp("inline", defaultProps.inline)}
-    />
-  ),
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const { className, ...restRootAttrs } = rootAttrs;
+    return (
+      <Logo
+        {...restRootAttrs}
+        classes={{ [COMPONENT_PART_KEY]: typeof className === "string" ? className : "" }}
+        data-testid={adapter.stringProp("testId", "test-id-component")}
+        src={adapter.resourceUrl(adapter.prop("src"))}
+        alt={adapter.stringProp("alt", defaultProps.alt)}
+        inline={toBoolean(
+          adapter.prop("inline") ?? rootAttrs.inline ?? adapter.node.props.inline,
+          defaultProps.inline,
+        )}
+      />
+    );
+  },
 });
+
+function toBoolean(value: unknown, fallback: boolean): boolean {
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    return value.toLowerCase() === "true";
+  }
+  return Boolean(value);
+}

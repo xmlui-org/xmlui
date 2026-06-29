@@ -3,8 +3,11 @@ import { useSyncExternalStore } from "react";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { normalizePathname } from "../../runtime/routing";
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { COMPONENT_PART_KEY } from "../../styling";
 import { useIsNavGroupItem } from "../NavGroup/NavGroupContext";
+import { ThemedIcon } from "../Icon/Icon";
 import { NavLinkMd, defaultNavLinkProps } from "./NavLink";
+import styles from "./NavLink.module.scss";
 import { NavLinkComponent } from "./NavLinkReact";
 
 export const navLinkRenderer = wrapComponent({
@@ -19,6 +22,7 @@ export const navLinkRenderer = wrapComponent({
     const noIndicator = adapter.booleanProp("noIndicator", defaultNavLinkProps.noIndicator);
     const isNavGroupItem = useIsNavGroupItem();
     const label = adapter.prop("label");
+    const iconName = adapter.stringProp("icon");
     const target = adapter.stringProp("target");
     const routing = adapter.scope.routing;
     const snapshot = useSyncExternalStore(
@@ -37,14 +41,21 @@ export const navLinkRenderer = wrapComponent({
       !(child.kind === "element" && child.type === "property"),
     );
 
+    const rootAttrs = adapter.rootAttrs();
+    const { className, ...restRootAttrs } = rootAttrs;
     return (
       <NavLinkComponent
-        {...adapter.rootAttrs()}
+        {...restRootAttrs}
         active={active}
+        classes={{ [COMPONENT_PART_KEY]: typeof className === "string" ? className : "" }}
         disabled={!enabled}
         displayActive={displayActive}
         href={href}
-        icon={hasIconTemplate ? adapter.renderTemplate("iconTemplate") : undefined}
+        icon={hasIconTemplate
+          ? adapter.renderTemplate("iconTemplate")
+          : iconName
+            ? <ThemedIcon name={iconName} className={styles.icon} />
+            : undefined}
         iconAlignment={adapter.stringProp("iconAlignment", defaultNavLinkProps.iconAlignment) as "baseline" | "start" | "center" | "end"}
         level={adapter.numberProp("level", 0)}
         noIndicator={noIndicator}

@@ -1,8 +1,11 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
+import classnames from "classnames";
 
 import { NavPanelCollapseProvider, useNavPanelCollapseContext } from "../NavPanelCollapseButton/NavPanelCollapseContext";
 import styles from "./NavPanel.module.scss";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { getAppLayoutOrientation } from "../App/AppReact";
 
 export type NavPanelProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
@@ -50,30 +53,41 @@ const NavPanelContent = forwardRef<HTMLDivElement, NavPanelProps>(function NavPa
   ref,
 ) {
   const collapseContext = useNavPanelCollapseContext();
-  const collapsed = collapseContext?.collapsed ?? false;
+  const appLayoutContext = useAppLayoutContext();
+  const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
+  const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
+  const vertical = appLayoutContext?.layout?.startsWith("vertical");
+  const collapsed = (collapseContext?.collapsed ?? appLayoutContext?.navPanelCollapsed) && vertical;
+  const hasFooter = !!footerContent;
 
   return (
     <nav
       {...rest}
-      className={[
+      className={classnames(
         styles.wrapper,
-        collapsed && styles.collapsed,
-        scrollStyle !== "normal" && styles.overlayScroll,
+        {
+          [styles.horizontal]: horizontal,
+          [styles.vertical]: vertical,
+          [styles.condensed]: isCondensed,
+          [styles.hasFooter]: hasFooter,
+          [styles.collapsed]: collapsed,
+          [styles.overlayScroll]: scrollStyle !== "normal",
+        },
         className,
-      ].filter(Boolean).join(" ")}
+      )}
       data-nav-panel-collapsed={collapsed ? "true" : "false"}
       data-xmlui-component="NavPanel"
       ref={ref}
     >
       {logoContent ? (
-        <div className={styles.logo} data-xmlui-part="logo">
+        <div className={styles.logoWrapper} data-xmlui-part="logo">
           {logoContent}
         </div>
       ) : null}
-      <div className={styles.content} data-xmlui-part="content">
+      <div className={styles.wrapperInner} data-xmlui-part="content">
         {children}
       </div>
-      {footerContent ? (
+      {hasFooter ? (
         <div className={styles.footer} data-xmlui-part="footer">
           {footerContent}
         </div>

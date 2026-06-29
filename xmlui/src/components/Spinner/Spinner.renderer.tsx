@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { useThemeVariables } from "../../runtime/rendering/theme";
+import { COMPONENT_PART_KEY } from "../../styling";
 import {
   collectComponentThemeDefaults,
   mergeThemeVariableLayers,
@@ -24,14 +25,17 @@ export const spinnerRenderer = wrapComponent({
     ]);
     const variant = adapter.stringProp("variant");
     const rootAttrs = adapter.rootAttrs();
+    const { className, style, ...restRootAttrs } = rootAttrs;
+    const componentClassName = typeof className === "string" ? className : "";
 
     return (
       <Spinner
-        {...rootAttrs}
+        {...restRootAttrs}
+        classes={{ [COMPONENT_PART_KEY]: componentClassName }}
         delay={adapter.prop("delay", defaultProps.delay)}
         fullScreen={adapter.booleanProp("fullScreen", defaultProps.fullScreen)}
         style={{
-          ...(rootAttrs.style as CSSProperties | undefined),
+          ...(style as CSSProperties | undefined),
           ...currentVariantCssVariables(variant, mergedThemeVariables),
         }}
       />

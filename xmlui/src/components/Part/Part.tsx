@@ -22,12 +22,12 @@ export const PartMd = createMetadata({
   },
 });
 
-type PartProps = {
+type Props = {
   children: ReactNode;
   partId?: string;
 };
 
-export const Part = memo(function Part({ children, partId }: PartProps) {
+export const Part = memo(function Part({ children, partId }: Props) {
   return <Slot data-part-id={partId} data-xmlui-part={partId}>{children}</Slot>;
 });
 

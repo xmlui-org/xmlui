@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import {
   collectComponentThemeDefaults,
@@ -13,6 +13,7 @@ import { useThemeVariables } from "../../runtime/rendering/theme";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { useBindingRevision } from "../../runtime/rendering/reactive";
 import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
+import { AppLayoutContext, type AppLayoutType } from "./AppLayoutContext";
 import { AppMd } from "./App";
 import { AppShellProvider } from "./AppShellContext";
 import { defaultProps } from "./App.defaults";
@@ -43,10 +44,42 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const layout = normalizeLayout(adapter.stringProp("layout"));
   const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
   const showDrawerToggle = useVisibleNavPanel(adapter);
+  const [navPanelCollapsed, setNavPanelCollapsed] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [subNavPanelSlot, setSubNavPanelSlot] = useState<HTMLElement | null>(null);
   const children = layout.value === "desktop"
     ? adapter.node.children.filter((child) => child.kind !== "element" || child.type !== "NavPanel")
     : adapter.node.children;
   const readyFiredRef = useRef(false);
+  const appLayoutContext = useMemo(() => ({
+    layout: layout.value as AppLayoutType,
+    navPanelVisible: showDrawerToggle,
+    navPanelCollapsed,
+    setNavPanelCollapsed,
+    toggleNavPanelCollapsed: () => setNavPanelCollapsed((current) => !current),
+    drawerVisible,
+    showDrawer: () => setDrawerVisible(true),
+    hideDrawer: () => setDrawerVisible(false),
+    toggleDrawer: () => setDrawerVisible((current) => !current),
+    hasRegisteredNavPanel: showDrawerToggle,
+    hasRegisteredHeader: adapter.node.children.some(
+      (child) => child.kind === "element" && child.type === "AppHeader",
+    ),
+    logo: adapter.stringProp("logo"),
+    logoDark: adapter.stringProp("logoDark"),
+    logoLight: adapter.stringProp("logoLight"),
+    registerSubNavPanelSlot: setSubNavPanelSlot,
+    subNavPanelSlot,
+    scrollWholePage,
+  }), [
+    adapter,
+    drawerVisible,
+    layout.value,
+    navPanelCollapsed,
+    scrollWholePage,
+    showDrawerToggle,
+    subNavPanelSlot,
+  ]);
 
   adapter.scope.i18n?.setConfig({
     locale: adapter.stringProp("locale"),
@@ -106,33 +139,35 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   return (
     <ProfileMenuProvider loggedInUser={normalizeLoggedInUser(loggedInUser)}>
       <AppShellProvider showDrawerToggle={showDrawerToggle}>
-        <div
-          {...rootAttrs}
-          data-testid={testId}
-          data-xmlui-app-fit-content={fitContent ? "true" : undefined}
-          className={[rootAttrs.className, ...layout.classNames, scrollWholePage && "scrollWholePage"].filter(Boolean).join(" ")}
-          style={{
-            ...rootStyle,
-            ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
-            ...appBaselineStyle(mergedThemeVariables),
-            ...appContainerStyle(fitContent),
-            ...appShellStyle(adapter.style),
-          }}
-        >
-          <main
-            data-xmlui-component="App"
-            data-xmlui-part="content"
-            style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
+        <AppLayoutContext.Provider value={appLayoutContext}>
+          <div
+            {...rootAttrs}
+            data-testid={testId}
+            data-xmlui-app-fit-content={fitContent ? "true" : undefined}
+            className={[rootAttrs.className, ...layout.classNames, scrollWholePage && "scrollWholePage"].filter(Boolean).join(" ")}
+            style={{
+              ...rootStyle,
+              ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
+              ...appBaselineStyle(mergedThemeVariables),
+              ...appContainerStyle(fitContent),
+              ...appShellStyle(adapter.style),
+            }}
           >
-            <div
+            <main
               data-xmlui-component="App"
-              data-xmlui-part="pageContent"
-              style={pageContentStyle(mergedThemeVariables, appProps)}
+              data-xmlui-part="content"
+              style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
             >
-              {adapter.renderChildren(children)}
-            </div>
-          </main>
-        </div>
+              <div
+                data-xmlui-component="App"
+                data-xmlui-part="pageContent"
+                style={pageContentStyle(mergedThemeVariables, appProps)}
+              >
+                {adapter.renderChildren(children)}
+              </div>
+            </main>
+          </div>
+        </AppLayoutContext.Provider>
       </AppShellProvider>
     </ProfileMenuProvider>
   );
@@ -180,6 +215,8 @@ function contentAreaStyle(
   fitContent: boolean,
   props: Record<string, unknown>,
 ): CSSProperties {
+  const paddingHorizontal = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingHorizontal);
+  const paddingVertical = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingVertical);
   return {
     position: "relative",
     minWidth: 0,
@@ -190,6 +227,11 @@ function contentAreaStyle(
     overflow: "auto",
     backgroundColor: appContentValue(themeVariables, props, CONTENT_THEME_VARS.backgroundColor),
     borderLeft: appContentValue(themeVariables, props, CONTENT_THEME_VARS.borderLeft),
+    paddingInlineStart: paddingHorizontal,
+    paddingInlineEnd: paddingHorizontal,
+    paddingTop: paddingVertical,
+    paddingBottom: paddingVertical,
+    gap: appContentValue(themeVariables, props, CONTENT_THEME_VARS.gap),
   };
 }
 
@@ -303,4 +345,15 @@ function normalizeLayout(value: string | undefined): { value: string; classNames
     classNames.push("verticalFullHeader");
   }
   return { value: normalized, classNames };
+}
+
+export function getAppLayoutOrientation(appLayout?: string) {
+  switch (appLayout) {
+    case "vertical":
+    case "vertical-sticky":
+    case "vertical-full-header":
+      return "vertical";
+    default:
+      return "horizontal";
+  }
 }

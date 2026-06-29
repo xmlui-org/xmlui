@@ -22,18 +22,14 @@ export const SpinnerMd = createMetadata({
   },
   props: {
     delay: {
-      description: "The delay in milliseconds before the spinner is displayed.",
+      description: `The delay in milliseconds before the spinner is displayed.`,
       valueType: "number",
       defaultValue: defaultProps.delay,
     },
     fullScreen: {
-      description: "If set to `true`, the component will be rendered in a full screen container.",
+      description: `If set to \`true\`, the component will be rendered in a full screen container.`,
       valueType: "boolean",
       defaultValue: defaultProps.fullScreen,
-    },
-    testId: {
-      description: "Adds a test identifier to the component root.",
-      valueType: "string",
     },
   },
   defaultAriaLabel: "Loading",

@@ -1,35 +1,51 @@
-import type { HTMLAttributes, ReactNode } from "react";
-import { forwardRef } from "react";
+import type { ForwardedRef, ReactNode } from "react";
+import type React from "react";
+import { forwardRef, memo } from "react";
+import classnames from "classnames";
 
 import { defaultProps } from "./Footer.defaults";
 import styles from "./Footer.module.scss";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-export type FooterProps = HTMLAttributes<HTMLDivElement> & {
-  children?: ReactNode;
+export type FooterProps = {
+  children: ReactNode;
+  style?: React.CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
   sticky?: boolean;
 };
 
-export const FooterComponent = forwardRef<HTMLDivElement, FooterProps>(function FooterComponent(
+export const Footer = memo(forwardRef(function Footer(
   {
     children,
+    style,
     className,
+    classes,
     sticky = defaultProps.sticky,
     ...rest
-  },
-  ref,
+  }: FooterProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const { layout } = useAppLayoutContext() || {};
+  const canRestrictContentWidth = layout !== "vertical-full-header";
   return (
     <div
       {...rest}
       className={styles.outerWrapper}
       data-sticky={sticky}
-      data-xmlui-component="Footer"
-      ref={ref}
+      ref={forwardedRef}
       role="contentinfo"
+      style={style}
     >
-      <div className={[styles.wrapper, styles.full, className].filter(Boolean).join(" ")} data-xmlui-part="content">
+      <div
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
+          [styles.full]: !canRestrictContentWidth,
+        })}
+        data-xmlui-part="content"
+      >
         {children}
       </div>
     </div>
   );
-});
+}));

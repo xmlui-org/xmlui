@@ -1,11 +1,13 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, ReactNode, Ref } from "react";
 import { forwardRef } from "react";
 
+import { COMPONENT_PART_KEY } from "../../styling";
 import styles from "./NavLink.module.scss";
 
 export type NavLinkProps = {
   active?: boolean;
   children?: ReactNode;
+  classes?: Record<string, string>;
   className?: string;
   disabled?: boolean;
   displayActive?: boolean;
@@ -26,6 +28,7 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
     {
       active = false,
       children,
+      classes: partClasses,
       className,
       disabled = false,
       displayActive = true,
@@ -44,16 +47,23 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
   ) {
     const classes = [
       styles.content,
-      active && displayActive && styles.active,
+      styles.base,
+      partClasses?.[COMPONENT_PART_KEY],
+      displayActive && !noIndicator && styles.includeHoverIndicator,
+      active && displayActive && styles.navItemActive,
+      displayActive && styles.displayActive,
       active && "xmlui-navlink-active",
       vertical && styles.vertical,
       disabled && styles.disabled,
-      noIndicator && styles.noIndicator,
+      level === 0 && styles.level1,
+      level === 1 && styles.level2,
+      level === 2 && styles.level3,
+      level === 3 && styles.level4,
       className,
     ].filter(Boolean).join(" ");
     const mergedStyle = {
       ...(style as CSSProperties | undefined),
-      ...(level ? { "--nav-link-level": level } : null),
+      "--nav-link-level": vertical ? (level ?? 0) + 1 : 0,
     } as CSSProperties;
     const innerContent = (
       <span className={[
@@ -63,7 +73,7 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
         iconAlignment === "center" && styles.iconAlignCenter,
         iconAlignment === "end" && styles.iconAlignEnd,
       ].filter(Boolean).join(" ")}>
-        {icon ? <span className={styles.icon}>{icon}</span> : null}
+        {icon}
         {children}
       </span>
     );

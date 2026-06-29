@@ -27,6 +27,7 @@ export const appHeaderRenderer = wrapComponent({
           <button
             aria-label="Open navigation menu"
             data-part-id="hamburger"
+            style={{ display: "block", width: "100%", height: "100%" }}
             type="button"
           >
             <span aria-hidden="true" className={styles.hamburgerIcon} />

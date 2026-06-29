@@ -395,6 +395,8 @@ if (params.has("__xmluiTestBed")) {
     const key = testBedRenderKey++;
     const extensions = await readTestBedExtensions();
     const appGlobals = {
+      name: "test bed app",
+      ...readTestBedAppGlobals(),
       resources: readTestBedResources(),
     };
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
@@ -429,6 +431,21 @@ if (params.has("__xmluiTestBed")) {
           Object.entries(parsed).filter((entry): entry is [string, string] =>
             typeof entry[0] === "string" && typeof entry[1] === "string"),
         )
+        : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const readTestBedAppGlobals = (): Record<string, unknown> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedAppGlobals");
+    if (!raw) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? parsed as Record<string, unknown>
         : {};
     } catch {
       return {};

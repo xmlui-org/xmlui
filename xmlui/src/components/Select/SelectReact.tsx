@@ -248,6 +248,9 @@ export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function Sel
       if ((event.target as Element | null)?.closest("[data-xmlui-confirm-layer]")) {
         return;
       }
+      if (document.querySelector('[role="listbox"] [data-xmlui-modal-dropdown="true"]')) {
+        return;
+      }
       if (rootRef.current?.contains(event.target as Node)) {
         return;
       }

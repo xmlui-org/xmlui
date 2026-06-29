@@ -66,6 +66,74 @@ test.describe("DropdownMenu foundation", () => {
     await expect(page.getByRole("menuitem", { name: "Nested alpha" })).not.toBeVisible();
   });
 
+  test("SubMenuItem content uses dropdown surface styling", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <DropdownMenu label="DropdownMenu">
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+          <MenuSeparator />
+          <SubMenuItem label="Submenu">
+            <MenuItem>Submenu Item 1</MenuItem>
+            <MenuItem>Submenu Item 2</MenuItem>
+          </SubMenuItem>
+        </DropdownMenu>
+      </App>
+    `);
+
+    await page.getByRole("button", { name: "DropdownMenu" }).click();
+    await page.getByRole("menuitem", { name: "Submenu" }).hover();
+
+    const geometry = await page.evaluate(() => {
+      const button = [...document.querySelectorAll("button")]
+        .find((el) => el.textContent?.includes("DropdownMenu"));
+      const content = document.querySelector('[data-xmlui-component="DropdownMenuContent"]');
+      const buttonRect = button?.getBoundingClientRect();
+      const contentRect = content?.getBoundingClientRect();
+      return {
+        buttonWidth: buttonRect?.width ?? 0,
+        offset: Math.abs((buttonRect?.left ?? 0) - (contentRect?.left ?? 0)),
+      };
+    });
+    expect(geometry.buttonWidth).toBeLessThan(300);
+    expect(geometry.offset).toBeLessThan(2);
+
+    const subContent = page.locator('[data-xmlui-component="SubMenuContent"]');
+    await expect(subContent).toBeVisible();
+    await expect(subContent).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(subContent).not.toHaveCSS("box-shadow", "none");
+    await expect(subContent).toHaveCSS("border-width", "0px");
+
+    const surfaceStyles = await page.evaluate(() => {
+      const separator = document.querySelector('[data-xmlui-component="MenuSeparator"]');
+      const content = document.querySelector('[data-xmlui-component="DropdownMenuContent"]');
+      const item = [...document.querySelectorAll('[role="menuitem"]')]
+        .find((el) => el.textContent?.trim() === "Item 1") ?? null;
+      const submenu = [...document.querySelectorAll('[role="menuitem"]')]
+        .find((el) => el.textContent?.trim() === "Submenu") ?? null;
+      const itemLabel = item?.querySelector('[class*="wrapper"]');
+      const submenuLabel = submenu?.querySelector('[class*="wrapper"]');
+      const separatorStyle = separator ? getComputedStyle(separator) : undefined;
+      const contentStyle = content ? getComputedStyle(content) : undefined;
+      const submenuStyle = submenu ? getComputedStyle(submenu) : undefined;
+      return {
+        contentBorderWidth: contentStyle?.borderWidth ?? "",
+        separatorBackground: separatorStyle?.backgroundColor ?? "",
+        submenuPaddingLeft: parseFloat(submenuStyle?.paddingLeft ?? "0"),
+        submenuHeight: submenu?.getBoundingClientRect().height ?? 0,
+        labelOffset: Math.abs(
+          (itemLabel?.getBoundingClientRect().left ?? 0) -
+          (submenuLabel?.getBoundingClientRect().left ?? 0),
+        ),
+      };
+    });
+    expect(surfaceStyles.contentBorderWidth).toBe("0px");
+    expect(surfaceStyles.separatorBackground).not.toBe("rgba(0, 0, 0, 0)");
+    expect(surfaceStyles.submenuPaddingLeft).toBeGreaterThan(0);
+    expect(surfaceStyles.submenuHeight).toBeGreaterThan(30);
+    expect(surfaceStyles.labelOffset).toBeLessThan(1);
+  });
+
   test("shared menu surface collapses top-level adjacent and trailing separators", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App>

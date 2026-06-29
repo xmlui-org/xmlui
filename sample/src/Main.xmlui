@@ -1,9 +1,3 @@
 <App>
-  <Stack height="280px" width="400px">
-    <Image
-      src="https://i.pravatar.cc/100"
-      fit="cover"
-      onClick="toast('Image clicked')"
-    />
-  </Stack>
+  <Spinner fullScreen="true" />
 </App>

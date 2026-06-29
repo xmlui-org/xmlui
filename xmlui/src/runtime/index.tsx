@@ -301,8 +301,12 @@ function renderConfirmDialog(
         background: "rgba(0, 0, 0, 0.2)",
       }}
       onMouseDown={(event) => {
+        (event.nativeEvent as MouseEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
         event.stopPropagation();
         close();
+      }}
+      onPointerDown={(event) => {
+        (event.nativeEvent as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
       }}
     >
       <div

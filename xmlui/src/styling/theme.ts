@@ -154,6 +154,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "backgroundColor-dropdown-item--hover": "$color-surface-50",
   "backgroundColor-dropdown-item--active": "$color-surface-100",
   "backgroundColor-dropdown-item--active-hover": "$color-surface-50",
+  "borderColor-dropdown-item": "$borderColor",
   backgroundColor: "$color-surface-subtle",
 
   "color-info": "$color-info-500",

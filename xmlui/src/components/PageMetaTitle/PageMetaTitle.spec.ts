@@ -20,6 +20,22 @@ test.describe("Basic Functionality", () => {
     await expect(page).toHaveTitle("Custom Page Title | test bed app");
   });
 
+  test("uses the appGlobals name as the suffix", async ({ initTestBed, page }) => {
+    await initTestBed(`<PageMetaTitle value="Custom Page Title" />`, {
+      appGlobals: { name: "Custom App" },
+    });
+
+    await expect(page).toHaveTitle("Custom Page Title | Custom App");
+  });
+
+  test("noSuffix suppresses the appGlobals name suffix", async ({ initTestBed, page }) => {
+    await initTestBed(`<PageMetaTitle value="Custom Page Title" noSuffix="true" />`, {
+      appGlobals: { name: "Custom App" },
+    });
+
+    await expect(page).toHaveTitle("Custom Page Title");
+  });
+
   test("component handles dynamic value changes", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <VStack>

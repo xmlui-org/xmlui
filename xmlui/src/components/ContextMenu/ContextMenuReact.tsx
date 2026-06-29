@@ -1,110 +1,213 @@
-import type { CSSProperties, HTMLAttributes, MutableRefObject, ReactNode } from "react";
-import { Children, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  forwardRef,
+  memo,
+  type ReactNode,
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import classnames from "classnames";
 
-import { focusMenuItem, MenuContext } from "../DropdownMenu/DropdownMenuReact";
 import styles from "./ContextMenu.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-export type ContextMenuApi = {
-  close: () => void;
-  openAt: (event: MouseEvent | React.MouseEvent, context?: unknown) => void;
-};
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { DropdownMenuContext } from "../DropdownMenu/DropdownMenuReact";
 
-export type ContextMenuProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
-  children?: (context: unknown) => ReactNode;
+type ContextMenuProps = {
+  children?: ReactNode;
+  registerComponentApi?: RegisterComponentApiFn;
+  updateState?: (state: any) => void;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  compact?: boolean;
   menuWidth?: string;
-  registerComponentApi?: (api: ContextMenuApi) => void;
+  hasContent?: boolean;
 };
 
-export const ContextMenuComponent = forwardRef<HTMLDivElement, ContextMenuProps>(function ContextMenuComponent(
+export const ContextMenu = memo(forwardRef(function ContextMenu(
   {
     children,
-    className,
-    menuWidth,
     registerComponentApi,
+    updateState,
     style,
+    className,
+    classes,
+    compact = false,
+    menuWidth,
+    hasContent = true,
     ...rest
-  },
-  ref,
+  }: ContextMenuProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { root, getThemeVar } = useTheme() as ReturnType<typeof useTheme> & { root?: HTMLElement };
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [context, setContext] = useState<unknown>(undefined);
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [enableClicks, setEnableClicks] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const effectiveMenuWidth = menuWidth ?? String(getThemeVar("minWidth-ContextMenu", "160px"));
 
-  const close = useCallback(() => {
+  const getContainerInfo = useCallback(() => {
+    if (!root || root === document.body) {
+      return {
+        rect: { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight },
+        useFixed: true
+      };
+    }
+
+    const rect = root.getBoundingClientRect();
+    // Check if the root element has display:contents or has collapsed bounds
+    // In such cases, fall back to viewport coordinates
+    if (rect.width === 0 || rect.height === 0) {
+      return {
+        rect: { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight },
+        useFixed: true
+      };
+    }
+
+    return { rect, useFixed: false };
+  }, [root]);
+
+  const closeMenu = useCallback(() => {
     setOpen(false);
+    // Do NOT clear $context here — onClick handlers (especially async ones
+    // like confirm()) may still reference it after the menu closes.
+    // $context is overwritten on the next openAt() call.
+    // Reset click enablement
+    setEnableClicks(true);
   }, []);
 
-  const openAt = useCallback((event: MouseEvent | React.MouseEvent, nextContext?: unknown) => {
+  const openAt = useCallback((event: MouseEvent | React.MouseEvent, context?: any) => {
+    // Prevent the browser's default context menu
     event.preventDefault();
+    // Stop event propagation to prevent any parent handlers from firing
     event.stopPropagation();
-    setPosition({ x: event.clientX, y: event.clientY });
-    setContext(nextContext);
-    setOpen(true);
-  }, []);
 
-  useEffect(() => {
-    registerComponentApi?.({ close, openAt });
-  }, [close, openAt, registerComponentApi]);
+    // Calculate coordinates - use clientX/clientY which are viewport-relative
+    // These coordinates will be adjusted relative to the portal container below
+    setPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
 
-  useEffect(() => {
-    if (!open) {
+    // Store the context data in state
+    updateState?.({ $context: context });
+    if (!hasContent) {
+      setOpen(false);
       return;
     }
-    const onPointerDown = () => close();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        close();
-        return;
-      }
-      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-        event.preventDefault();
-        focusMenuItem(contentRef.current, event.key === "ArrowDown" ? 1 : -1);
-      }
-    };
-    window.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [close, open]);
 
-  if (!open) {
-    return null;
-  }
+    // Disable clicks temporarily
+    setEnableClicks(false);
 
-  const renderedChildren = children?.(context);
-  if (Children.count(renderedChildren) === 0) {
-    return null;
-  }
+    // Open the menu
+    setOpen(true);
+
+    // Re-enable clicks after a short delay to ensure the current event cycle completes
+    // This prevents the click from the right-click from registering as a menu click
+    setTimeout(() => {
+      setEnableClicks(true);
+    }, 100);
+  }, [hasContent, updateState]);
+
+  const handleContentRef = useCallback((el: HTMLDivElement | null) => {
+    contentRef.current = el;
+    setContentReady(!!el);
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      close: closeMenu,
+      openAt,
+    });
+  }, [registerComponentApi, closeMenu, openAt]);
+
+  // Adjust menu position to stay within viewport (or portal container)
+  useEffect(() => {
+    if (open && position && contentReady && contentRef.current) {
+      const content = contentRef.current;
+      const rect = content.getBoundingClientRect();
+
+      // Get the portal container's bounds
+      const { rect: containerRect } = getContainerInfo();
+
+      // Calculate position relative to the container
+      let x = position.x - containerRect.left;
+      let y = position.y - containerRect.top;
+      const margin = 8;
+
+      // Adjust horizontal position to stay within container
+      if (x + rect.width > containerRect.width - margin) {
+        x = containerRect.width - rect.width - margin;
+      }
+      if (x < margin) {
+        x = margin;
+      }
+
+      // Adjust vertical position to stay within container
+      if (y + rect.height > containerRect.height - margin) {
+        y = containerRect.height - rect.height - margin;
+      }
+      if (y < margin) {
+        y = margin;
+      }
+
+      content.style.left = `${x}px`;
+      content.style.top = `${y}px`;
+    }
+  }, [open, position, contentReady, getContainerInfo]);
 
   return (
-    <MenuContext.Provider value={{ closeMenu: close }}>
-      <div
-        {...rest}
-        className={[styles.content, "ContextMenuContent", className].filter(Boolean).join(" ")}
-        data-xmlui-component="ContextMenu"
-        data-xmlui-part="content"
-        ref={(node) => {
-          contentRef.current = node;
-          if (typeof ref === "function") {
-            ref(node);
-          } else if (ref) {
-            (ref as MutableRefObject<HTMLDivElement | null>).current = node;
+    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: classes?.[COMPONENT_PART_KEY] }}>
+      <DropdownMenuPrimitive.Root
+        open={open}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            closeMenu();
           }
         }}
-        role="menu"
-        style={{
-          ...(style as CSSProperties),
-          left: position.x,
-          top: position.y,
-          ...(menuWidth ? { width: menuWidth } : null),
-        }}
-        onPointerDown={(event) => event.stopPropagation()}
+        modal={false}
       >
-        {renderedChildren}
-      </div>
-    </MenuContext.Provider>
+        {/* No trigger element for ContextMenu - it's opened programmatically */}
+        <DropdownMenuPrimitive.Portal container={root}>
+          <DropdownMenuPrimitive.Content
+            data-xmlui-component="ContextMenu"
+            data-xmlui-part="content"
+            ref={handleContentRef}
+            style={(() => {
+              const { rect: containerRect, useFixed } = getContainerInfo();
+              return {
+                ...style,
+                minWidth: effectiveMenuWidth,
+                // Use fixed positioning when dealing with viewport or collapsed containers
+                position: useFixed ? 'fixed' : 'absolute',
+                // Initial positioning - will be adjusted by useEffect
+                left: position?.x ? position.x - containerRect.left : 0,
+                top: position?.y ? position.y - containerRect.top : 0,
+                // Disable pointer events until mouse button is released
+                pointerEvents: enableClicks ? 'auto' : 'none',
+                // Apply menuWidth if provided
+                ...(menuWidth && { width: menuWidth }),
+              };
+            })()}
+            className={classnames(styles.ContextMenuContent, classes?.[COMPONENT_PART_KEY], className, {
+              [styles.compact]: compact,
+            })}
+            tabIndex={-1}
+            loop={true}
+            onEscapeKeyDown={closeMenu}
+            onInteractOutside={closeMenu}
+          >
+            {children}
+          </DropdownMenuPrimitive.Content>
+        </DropdownMenuPrimitive.Portal>
+      </DropdownMenuPrimitive.Root>
+    </DropdownMenuContext.Provider>
   );
-});
+}));

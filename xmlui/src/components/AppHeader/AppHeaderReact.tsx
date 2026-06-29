@@ -3,6 +3,8 @@ import { forwardRef } from "react";
 
 import { defaultProps } from "./AppHeader.defaults";
 import styles from "./AppHeader.module.scss";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 export type AppHeaderProps = HTMLAttributes<HTMLElement> & {
   children?: ReactNode;
@@ -13,6 +15,21 @@ export type AppHeaderProps = HTMLAttributes<HTMLElement> & {
   title?: string;
   titleContent?: ReactNode;
 };
+
+export function useLogoUrl() {
+  const { logo, logoLight, logoDark } = useAppLayoutContext() || {};
+  const logoUrlByTone = {
+    light: logoLight,
+    dark: logoDark,
+  } as Record<string, string | undefined>;
+  const { tone, getResourceUrl } = useTheme();
+
+  const baseLogoUrl = getResourceUrl("resource:logo") || logo;
+  const toneLogoUrl =
+    getResourceUrl(`resource:logo-${tone}`) || logoUrlByTone[String(tone)];
+
+  return toneLogoUrl || baseLogoUrl;
+}
 
 export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(function AppHeaderComponent(
   {
@@ -44,7 +61,15 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
     >
       <div className={[styles.headerInner, styles.full].join(" ")}>
         {drawerToggle ? (
-          <div className={styles.drawerToggle} data-xmlui-part="drawerToggle">
+          <div
+            data-xmlui-part="drawerToggle"
+            style={{
+              display: "block",
+              width: "var(--xmlui-size-drawerToggle-AppHeader, 48px)",
+              height: "var(--xmlui-size-drawerToggle-AppHeader, 48px)",
+              padding: "var(--xmlui-padding-drawerToggle-AppHeader, 2px)",
+            }}
+          >
             {drawerToggle}
           </div>
         ) : null}

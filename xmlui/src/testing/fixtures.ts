@@ -53,6 +53,7 @@ export type InitTestBedOptions = {
   extensionIds?: string | string[];
   mainXs?: string;
   resources?: Record<string, string>;
+  appGlobals?: Record<string, unknown>;
   apiInterceptor?: {
     initialize?: string;
     operations?: Record<string, {
@@ -712,9 +713,16 @@ async function initTestBed(
     components: options.components ?? [],
     extensionIds: normalizeExtensionIds(options.extensionIds),
     resources: options.resources ?? {},
+    appGlobals: options.appGlobals ?? {},
   };
   await installApiInterceptor(page, options.apiInterceptor);
-  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => {
+  const installTestBedSource = (payload: {
+    source: string;
+    components: string[];
+    extensionIds: string[];
+    resources: Record<string, string>;
+    appGlobals: Record<string, unknown>;
+  }) => {
     const documentElement = document.documentElement;
     if (documentElement) {
       documentElement.style.fontSize = "";
@@ -733,6 +741,7 @@ async function initTestBed(
     window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
     window.sessionStorage.setItem("__xmluiTestBedExtensionIds", JSON.stringify(payload.extensionIds));
     window.sessionStorage.setItem("__xmluiTestBedResources", JSON.stringify(payload.resources));
+    window.sessionStorage.setItem("__xmluiTestBedAppGlobals", JSON.stringify(payload.appGlobals));
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
@@ -1003,15 +1012,10 @@ function wrapRootAppTheme(markup: string, themeVars: Record<string, unknown> | u
   if (entries.length === 0) {
     return markup;
   }
-  const openEnd = findOpeningAppTagEnd(markup);
-  const closeStart = markup.lastIndexOf("</App>");
-  if (openEnd < 0 || closeStart < 0) {
-    return markup;
-  }
   const themeAttributes = entries
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
-  return `${markup.slice(0, openEnd + 1)}<Theme ${themeAttributes}>${markup.slice(openEnd + 1, closeStart)}</Theme>${markup.slice(closeStart)}`;
+  return `<Theme ${themeAttributes}>${markup}</Theme>`;
 }
 
 function findOpeningAppTagEnd(markup: string): number {

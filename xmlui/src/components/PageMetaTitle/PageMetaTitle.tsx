@@ -11,15 +11,18 @@ export const PageMetaTitleMd = createMetadata({
   status: "stable",
   nonVisual: true,
   description:
-    "`PageMetaTitle` dynamically sets or updates the browser tab title.",
+    "`PageMetaTitle` dynamically sets or updates the browser tab title, enabling " +
+    "pages and components to override the default application name with context-specific titles.",
   props: {
     value: {
-      description: "Sets the page title displayed in the browser tab.",
+      description: `This property sets the page's title to display in the browser tab.`,
       valueType: "string",
       defaultValue: defaultProps.title,
     },
     noSuffix: {
-      description: "Suppresses the app name suffix appended to the page title.",
+      description:
+        "When set to `true`, suppresses the app name suffix (e.g. `| XMLUI`) that is " +
+        "automatically appended to the page title.",
       valueType: "boolean",
       defaultValue: defaultProps.noSuffix,
     },
@@ -40,7 +43,6 @@ export const pageMetaTitleRenderer = wrapComponent({
       <PageMetaTitle
         title={title}
         noSuffix={adapter.booleanProp("noSuffix", defaultProps.noSuffix)}
-        appName="test bed app"
       />
     );
   },

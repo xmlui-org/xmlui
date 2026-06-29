@@ -1,8 +1,11 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useEffect, useRef, useState } from "react";
+import classnames from "classnames";
 
 import styles from "./NavGroup.module.scss";
 import { NavGroupItemProvider, useIsNavGroupItem } from "./NavGroupContext";
+import { NavLinkComponent } from "../NavLink/NavLinkReact";
+import { ThemedIcon } from "../Icon/Icon";
 
 export type NavGroupProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
@@ -11,6 +14,9 @@ export type NavGroupProps = HTMLAttributes<HTMLDivElement> & {
   label?: string;
   onNavigate?: () => void | Promise<void>;
   to?: string;
+  icon?: ReactNode;
+  iconVerticalCollapsed?: string;
+  iconVerticalExpanded?: string;
 };
 
 export const NavGroupComponent = forwardRef<HTMLDivElement, NavGroupProps>(function NavGroupComponent(
@@ -22,6 +28,9 @@ export const NavGroupComponent = forwardRef<HTMLDivElement, NavGroupProps>(funct
     label,
     onNavigate,
     to,
+    icon,
+    iconVerticalCollapsed = "chevronright",
+    iconVerticalExpanded = "chevrondown",
     ...rest
   },
   ref,
@@ -48,8 +57,9 @@ export const NavGroupComponent = forwardRef<HTMLDivElement, NavGroupProps>(funct
   };
   const triggerContent = (
     <>
-      <span className={styles.label}>{label}</span>
-      <span aria-hidden="true" className={styles.indicator} />
+      {label}
+      <span style={{ flex: 1 }} />
+      <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
     </>
   );
 
@@ -67,42 +77,49 @@ export const NavGroupComponent = forwardRef<HTMLDivElement, NavGroupProps>(funct
     <div
       {...rest}
       aria-expanded={expanded}
-      className={[styles.group, className].filter(Boolean).join(" ")}
+      className={classnames(styles.groupWrapper, className)}
       data-xmlui-component="NavGroup"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          toggle();
+        }
+      }}
       ref={setRootRef}
     >
       {to && !disabled ? (
-        <a
+        <NavLinkComponent
           aria-expanded={expanded}
-          className={styles.trigger}
+          className={styles.navLinkPadding}
           href={to}
-          role={isNestedItem ? "menuitem" : undefined}
-          onClick={(event) => {
-            event.preventDefault();
-            toggle();
-          }}
-        >
-          {triggerContent}
-        </a>
-      ) : (
-        <button
-          aria-expanded={expanded}
-          className={styles.trigger}
-          disabled={disabled}
+          icon={icon}
           role={isNestedItem ? "menuitem" : undefined}
           onClick={toggle}
-          type="button"
         >
           {triggerContent}
-        </button>
+        </NavLinkComponent>
+      ) : (
+        <NavLinkComponent
+          aria-expanded={expanded}
+          className={styles.navLinkPadding}
+          disabled={disabled}
+          icon={icon}
+          role={isNestedItem ? "menuitem" : undefined}
+          onClick={toggle}
+        >
+          {triggerContent}
+        </NavLinkComponent>
       )}
       <div
         aria-hidden={!expanded}
-        className={[styles.content, expanded && styles.expanded].filter(Boolean).join(" ")}
+        className={classnames(styles.groupContent, {
+          [styles.expanded]: expanded,
+        })}
         data-xmlui-part="content"
         role={expanded ? "menu" : undefined}
       >
-        <NavGroupItemProvider>{children}</NavGroupItemProvider>
+        <div className={styles.groupContentInner}>
+          <NavGroupItemProvider>{children}</NavGroupItemProvider>
+        </div>
       </div>
     </div>
   );

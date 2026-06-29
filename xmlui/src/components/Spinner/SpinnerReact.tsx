@@ -7,21 +7,28 @@ import {
   type ForwardedRef,
   type HTMLAttributes,
 } from "react";
+import classnames from "classnames";
 
+import { Part } from "../Part/Part";
+import { PART_RING } from "../../components-core/parts";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { defaultProps } from "./Spinner.defaults";
 import styles from "./Spinner.module.scss";
 
 export type SpinnerProps = HTMLAttributes<HTMLDivElement> & {
   delay?: unknown;
   fullScreen?: boolean;
+  classes?: Record<string, string>;
   className?: string;
   style?: CSSProperties;
 };
 
+// source https://loading.io/css/
 export const Spinner = memo(forwardRef(function Spinner(
   {
     delay = defaultProps.delay,
     fullScreen = defaultProps.fullScreen,
+    classes,
     className,
     style,
     ...rest
@@ -51,17 +58,17 @@ export const Spinner = memo(forwardRef(function Spinner(
 
   const spinner = (
     <div
-      className={[styles.spinner, className].filter(Boolean).join(" ")}
+      className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY], className)}
       role={fullScreen ? undefined : "status"}
       aria-label={fullScreen ? undefined : "Loading"}
       style={style}
-      ref={fullScreen ? undefined : forwardedRef}
+      ref={forwardedRef}
       {...(!fullScreen ? rest : {})}
     >
-      <div className={styles.spinnerSegment} data-part-id="ring" data-xmlui-part="ring" />
-      <div className={styles.spinnerSegment} />
-      <div className={styles.spinnerSegment} />
-      <div className={styles.spinnerSegment} />
+      <Part partId={PART_RING}><div></div></Part>
+      <div></div>
+      <div></div>
+      <div></div>
     </div>
   );
 
@@ -75,7 +82,6 @@ export const Spinner = memo(forwardRef(function Spinner(
       className={styles.fullScreenSpinnerWrapper}
       role="status"
       aria-label="Loading"
-      ref={forwardedRef}
     >
       {spinner}
     </div>
