@@ -1,6 +1,10 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 $gap-FlowLayout: createThemeVar("gap-FlowLayout");
@@ -8,47 +12,72 @@ $columnGap-FlowLayout: createThemeVar("columnGap-FlowLayout");
 $rowGap-FlowLayout: createThemeVar("rowGap-FlowLayout");
 
 @layer components {
-  .flowLayout {
+  .outer {
     contain: layout;
-    display: flex;
-    flex-wrap: wrap;
-    min-width: 0;
-    min-height: 0;
-    column-gap: var(--xmlui-columnGap-FlowLayout);
-    row-gap: var(--xmlui-rowGap-FlowLayout);
   }
 
-  .flowLayoutItem {
-    box-sizing: border-box;
-    flex: 0 0 var(--xmlui-itemWidth-FlowLayout);
-    min-width: var(--xmlui-minWidth-FlowLayoutItem, 0);
-    max-width: var(--xmlui-maxWidth-FlowLayoutItem, 100%);
+  .flowContainer {
+    display: flex;
+    flex-wrap: wrap;
 
-    & > * {
-      width: 100%;
-      min-width: 0;
+    &.horizontal {
+      flex-direction: row;
+
+      .flowItem {
+        flex-shrink: 0;
+        min-width: 0;
+        max-width: 100%;
+
+        & > * {
+          width: 100%;
+          min-width: 0;
+        }
+      }
+    }
+
+    &.vertical {
+      height: 100%;
+      flex-direction: column;
+      align-content: flex-start;
+
+      .flowItem {
+        width: auto;
+        flex-shrink: 0;
+
+        & > * {
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+        }
+      }
     }
   }
 
-  .flowLayoutBreak,
-  .flowLayoutForceBreak {
+  //we use the .break class to create a new line in the flow
+  // if there are multiple star-sized elements in a row, the break will be ignored between them
+  .break:not(.forceBreak):has(+ .starSized) {
+    display: none;
+  }
+
+  .break,
+  .forceBreak {
     flex-basis: 100%;
     height: 0;
   }
 
+  /* Cross axis alignment for FlowLayout */
   .alignItemsStart {
     align-items: flex-start;
   }
-
   .alignItemsCenter {
     align-items: center;
   }
-
   .alignItemsEnd {
     align-items: flex-end;
   }
 }
 
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

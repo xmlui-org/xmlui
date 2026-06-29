@@ -5,6 +5,7 @@ import { wrapComponent } from "../../runtime/rendering/adapter";
 import { defaultProps } from "./NoResult.defaults";
 import { NoResultMd } from "./NoResult";
 import { NoResult } from "./NoResultReact";
+import { COMPONENT_PART_KEY } from "../../styling";
 
 const COMP = "NoResult";
 
@@ -13,14 +14,16 @@ export const noResultRenderer = wrapComponent({
   metadata: NoResultMd as ComponentMetadata,
   renderer: ({ adapter }) => {
     const rootAttrs = adapter.rootAttrs();
+    const className = typeof rootAttrs.className === "string" ? rootAttrs.className : undefined;
     return (
       <NoResult
         {...rootAttrs}
         style={noResultRootStyle(rootAttrs.style as CSSProperties | undefined)}
         data-testid={adapter.stringProp("testId", "test-id-component")}
-        label={labelFor(adapter.prop("label"), adapter.renderChildren())}
+        label={labelFor(adapter.prop("label"), adapter.renderChildren()) as any}
         icon={adapter.stringProp("icon", defaultProps.icon)}
         hideIcon={adapter.booleanProp("hideIcon", defaultProps.hideIcon)}
+        classes={{ [COMPONENT_PART_KEY]: className ?? "" }}
       />
     );
   },

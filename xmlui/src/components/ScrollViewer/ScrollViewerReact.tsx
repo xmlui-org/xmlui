@@ -1,10 +1,10 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useRef } from "react";
 
 import { defaultProps, type ScrollStyle } from "./ScrollViewer.defaults";
 import styles from "./ScrollViewer.module.scss";
 
-export type ScrollViewerProps = {
+export type ScrollViewerProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
@@ -74,6 +74,37 @@ export const ScrollViewer = forwardRef<HTMLDivElement, ScrollViewerProps>(functi
       ref={setScrollNode}
       className={cx(styles.wrapper, scrollClassName, className)}
     >
+      {children}
+    </div>
+  );
+});
+
+export type ThemedScrollerProps = HTMLAttributes<HTMLDivElement> & {
+  containerClassName?: string;
+  scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
+};
+
+export const ThemedScroller = forwardRef<HTMLDivElement, ThemedScrollerProps>(function ThemedScroller(
+  {
+    children,
+    className,
+    containerClassName,
+    scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
+    ...rest
+  },
+  ref,
+) {
+  const scrollClassName = cx(
+    scrollStyle === "normal" ? undefined : styles.wrapper,
+    scrollStyleClass(scrollStyle),
+    showScrollerFade ? styles.showScrollerFade : undefined,
+    containerClassName,
+    className,
+  );
+  return (
+    <div {...rest} ref={ref} className={scrollClassName}>
       {children}
     </div>
   );

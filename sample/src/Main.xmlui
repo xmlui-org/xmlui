@@ -1,12 +1,12 @@
 <App>
-  <Theme 
-    textColor-Text-brandTitle="rgb(41, 128, 185)"
-    fontSize-Text-brandTitle="28px"
-    fontWeight-Text-brandTitle="bold"
-    letterSpacing-Text-brandTitle="2px"
-  >
-    <Text variant="brandTitle">
-      Welcome to Our Application
-    </Text>
-  </Theme>
+  <FlowLayout rowGap="2px">
+    <Stack width="25%" height="32px" backgroundColor="red" />
+    <Stack width="25%" height="32px" backgroundColor="blue" />
+    <Stack width="25%" height="32px" backgroundColor="green" />
+    <Stack width="25%" height="32px" backgroundColor="yellow" />
+    <Stack width="25%" height="32px" backgroundColor="maroon" />
+    <Stack width="25%" height="32px" backgroundColor="teal" />
+    <Stack width="25%" height="32px" backgroundColor="seagreen" />
+    <Stack width="25%" height="32px" backgroundColor="olive" />
+  </FlowLayout>
 </App>

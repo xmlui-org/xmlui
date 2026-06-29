@@ -1,15 +1,17 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
+import { COMPONENT_PART_KEY } from "../../styling";
 import {
   createMetadata,
   dComponent,
 } from "../../component-core/metadata/helpers";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { Heading, normalizeHeadingLevel } from "./HeadingReact";
+import { Heading } from "./HeadingReact";
 import headingStylesSource from "./Heading.module.scss?xmlui-theme-vars";
 import { defaultProps } from "./Heading.defaults";
+import { headingLevels, type HeadingLevel } from "./abstractions";
 
 const COMP = "Heading";
 
@@ -104,6 +106,12 @@ export const HeadingMd = createMetadata({
     [`color-anchor-${COMP}`]: "$color-surface-400",
     [`gap-anchor-${COMP}`]: "$space-2",
     [`textDecorationLine-anchor-${COMP}`]: "underline",
+    ...levelDefaultThemeVars("H1"),
+    ...levelDefaultThemeVars("H2"),
+    ...levelDefaultThemeVars("H3"),
+    ...levelDefaultThemeVars("H4"),
+    ...levelDefaultThemeVars("H5"),
+    ...levelDefaultThemeVars("H6"),
   },
 });
 
@@ -117,13 +125,7 @@ export const H1Md = createMetadata({
   contextVars,
   themeVars: extractScssThemeVars(headingStylesSource),
   defaultThemeVars: {
-    "fontSize-H1": "$fontSize-2xl",
-    "lineHeight-H1": "$lineHeight-tight",
-    "marginTop-H1": "0",
-    "marginBottom-H1": "0",
-    "fontSize-H1-markdown": "$fontSize-2xl",
-    "marginTop-H1-markdown": "0",
-    "marginBottom-H1-markdown": "$space-6",
+    ...levelDefaultThemeVars("H1"),
   },
 });
 
@@ -160,25 +162,58 @@ function createHeadingShortcutMetadata(name: string, description: string): Compo
     contextVars,
     themeVars: extractScssThemeVars(headingStylesSource),
     defaultThemeVars: {
-      [`fontSize-${name}`]: `$fontSize-${shortcutSize(name)}`,
-      [`lineHeight-${name}`]: "$lineHeight-tight",
-      [`marginTop-${name}`]: "0",
-      [`marginBottom-${name}`]: "0",
-      [`fontSize-${name}-markdown`]: `$fontSize-${shortcutSize(name)}`,
-      [`marginTop-${name}-markdown`]: "0",
-      [`marginBottom-${name}-markdown`]: "$space-6",
+      ...levelDefaultThemeVars(name),
     },
   });
 }
 
-function shortcutSize(name: string): string {
-  return ({
-    H2: "xl",
-    H3: "lg",
-    H4: "md",
-    H5: "sm",
-    H6: "xs",
-  } as Record<string, string>)[name] ?? "md";
+function levelDefaultThemeVars(name: string): Record<string, string> {
+  const defaults = {
+    H1: {
+      fontSize: "$fontSize-2xl",
+      marginTopMarkdown: "0",
+      marginBottomMarkdown: "$space-6",
+    },
+    H2: {
+      fontSize: "$fontSize-xl",
+      marginTopMarkdown: "$space-10",
+      marginBottomMarkdown: "$space-3",
+    },
+    H3: {
+      fontSize: "$fontSize-lg",
+      marginTopMarkdown: "$space-6",
+      marginBottomMarkdown: "$space-2",
+    },
+    H4: {
+      fontSize: "$fontSize-base",
+      marginTopMarkdown: "$space-5",
+      marginBottomMarkdown: "$space-1",
+    },
+    H5: {
+      fontSize: "$fontSize-sm",
+      marginTopMarkdown: "0",
+      marginBottomMarkdown: "$space-0",
+    },
+    H6: {
+      fontSize: "$fontSize-xs",
+      marginTopMarkdown: "0",
+      marginBottomMarkdown: "$space-0",
+    },
+  } as Record<string, {
+    fontSize: string;
+    marginTopMarkdown: string;
+    marginBottomMarkdown: string;
+  }>;
+  const levelDefaults = defaults[name] ?? defaults.H1;
+  return {
+    [`fontSize-${name}`]: levelDefaults.fontSize,
+    [`lineHeight-${name}`]: "$lineHeight-tight",
+    [`marginTop-${name}`]: "0",
+    [`marginBottom-${name}`]: "0",
+    [`fontSize-${name}-markdown`]: levelDefaults.fontSize,
+    [`marginTop-${name}-markdown`]: levelDefaults.marginTopMarkdown,
+    [`marginBottom-${name}-markdown`]: levelDefaults.marginBottomMarkdown,
+  };
 }
 
 function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedLevel?: string) {
@@ -188,24 +223,36 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
     themeContributors: fixedLevel ? [HeadingMd] : [],
     renderer: ({ adapter }) => {
       const rootAttrs = adapter.rootAttrs();
+      const rootStyle = rootAttrs.style as CSSProperties | undefined;
       const hasValue = Object.prototype.hasOwnProperty.call(adapter.node.props, "value");
       const value = adapter.prop("value");
       const children = hasValue ? displayText(value) : adapter.renderChildren();
       const level = fixedLevel ?? normalizeHeadingLevel(adapter.prop("level", defaultProps.level));
+      const anchorRenderer = hasProp(adapter.node.props, "anchorTemplate")
+        ? (_anchorId: string, _anchorHref: string): ReactNode => adapter.renderTemplate("anchorTemplate")
+        : undefined;
+      const bridgeStyle = {
+        minWidth: 0,
+        ...(hasProp(adapter.node.props, "width") || hasProp(adapter.node.props, "maxWidth")
+          ? undefined
+          : { maxWidth: "100%" }),
+        ...rootStyle,
+      } as CSSProperties;
 
       return (
         <Heading
           {...rootAttrs}
-          id={adapter.stringProp("id")}
-          anchorId={adapter.stringProp("anchorId")}
+          uid={adapter.stringProp("id")}
           level={level}
           maxLines={adapter.numberProp("maxLines", defaultProps.maxLines)}
           preserveLinebreaks={adapter.booleanProp("preserveLinebreaks", defaultProps.preserveLinebreaks)}
           ellipses={adapter.booleanProp("ellipses", defaultProps.ellipses)}
           omitFromToc={adapter.booleanProp("omitFromToc", defaultProps.omitFromToc)}
-          showAnchor={adapter.booleanProp("showAnchor", defaultProps.showAnchor)}
-          style={rootAttrs.style as CSSProperties | undefined}
-          registerApi={adapter.registerApi}
+          showAnchor={hasProp(adapter.node.props, "showAnchor") ? adapter.booleanProp("showAnchor") : undefined}
+          classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+          sx={bridgeStyle}
+          registerComponentApi={adapter.registerApi}
+          anchorRenderer={anchorRenderer}
         >
           {children}
         </Heading>
@@ -215,5 +262,33 @@ function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedL
 }
 
 function displayText(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
+  if (value === undefined || value === null) {
+    return "";
+  }
+  let text = String(value);
+  let replaced = "";
+  let spaceFound = false;
+  for (const char of text) {
+    if (char === " " || char === "\t") {
+      replaced += spaceFound ? "\xa0" : " ";
+      spaceFound = true;
+    } else {
+      replaced += char;
+      spaceFound = char === "\xa0";
+    }
+  }
+  text = replaced;
+  return text;
+}
+
+function normalizeHeadingLevel(value: unknown): HeadingLevel {
+  const normalized = value === undefined || value === null
+    ? defaultProps.level
+    : String(value).trim().toLowerCase();
+  const withPrefix = /^[1-6]$/.test(normalized) ? `h${normalized}` : normalized;
+  return (headingLevels as readonly string[]).includes(withPrefix) ? withPrefix as HeadingLevel : defaultProps.level;
+}
+
+function hasProp(props: Record<string, unknown>, propName: string): boolean {
+  return Object.prototype.hasOwnProperty.call(props, propName);
 }

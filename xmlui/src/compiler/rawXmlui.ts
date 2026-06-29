@@ -72,10 +72,6 @@ export function parseRawXmlui(
     };
   }
 
-  if (rawRoot.type !== "App") {
-    throw new Error(`Expected <App> or <Component> as the document root, got <${rawRoot.type}>.`);
-  }
-
   return {
     kind: "app",
     sourceId,

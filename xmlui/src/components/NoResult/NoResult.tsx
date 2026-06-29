@@ -1,16 +1,7 @@
 import { createMetadata, dLabel } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./NoResult.defaults";
 
 const COMP = "NoResult";
-const noResultStylesSource = `
-$backgroundColor-NoResult: createThemeVar("backgroundColor-NoResult");
-$border-NoResult: createThemeVar("border-NoResult");
-$paddingVertical-NoResult: createThemeVar("paddingVertical-NoResult");
-$gap-icon-NoResult: createThemeVar("gap-icon-NoResult");
-$size-icon-NoResult: createThemeVar("size-icon-NoResult");
-`;
-
 export const NoResultMd = createMetadata({
   status: "stable",
   description: "`NoResult` displays a visual indication that a query or search returned nothing.",
@@ -31,7 +22,13 @@ export const NoResultMd = createMetadata({
       valueType: "string",
     },
   },
-  themeVars: extractScssThemeVars(noResultStylesSource),
+  themeVars: Object.fromEntries([
+    ...borderThemeVarNames(COMP),
+    ...paddingThemeVarNames(COMP),
+    `gap-icon-${COMP}`,
+    `size-icon-${COMP}`,
+    `backgroundColor-${COMP}`,
+  ].map((name) => [name, `Theme variable declared by ${name}.`])),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",
     [`border-${COMP}`]: "0px solid $borderColor",
@@ -40,3 +37,53 @@ export const NoResultMd = createMetadata({
     [`size-icon-${COMP}`]: "$space-8",
   },
 });
+
+function borderThemeVarNames(subject: string): string[] {
+  return [
+    "border",
+    "borderHorizontal",
+    "borderVertical",
+    "borderLeft",
+    "borderRight",
+    "borderTop",
+    "borderBottom",
+    "borderWidth",
+    "borderHorizontalWidth",
+    "borderLeftWidth",
+    "borderRightWidth",
+    "borderVerticalWidth",
+    "borderTopWidth",
+    "borderBottomWidth",
+    "borderStyle",
+    "borderHorizontalStyle",
+    "borderLeftStyle",
+    "borderRightStyle",
+    "borderVerticalStyle",
+    "borderTopStyle",
+    "borderBottomStyle",
+    "borderColor",
+    "borderHorizontalColor",
+    "borderLeftColor",
+    "borderRightColor",
+    "borderVerticalColor",
+    "borderTopColor",
+    "borderBottomColor",
+    "borderRadius",
+    "borderStartStartRadius",
+    "borderStartEndRadius",
+    "borderEndStartRadius",
+    "borderEndEndRadius",
+  ].map((name) => `${name}-${subject}`);
+}
+
+function paddingThemeVarNames(subject: string): string[] {
+  return [
+    "padding",
+    "paddingHorizontal",
+    "paddingVertical",
+    "paddingLeft",
+    "paddingRight",
+    "paddingTop",
+    "paddingBottom",
+  ].map((name) => `${name}-${subject}`);
+}

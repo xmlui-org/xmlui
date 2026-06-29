@@ -1,144 +1,200 @@
-import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
+  memo,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { defaultProps } from "./Heading.defaults";
 import styles from "./Heading.module.scss";
 
-export type HeadingLevel = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
+import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import type { HeadingLevel } from "./abstractions";
+import { useAppContext } from "../../components-core/AppContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { defaultProps } from "./Heading.defaults";
 
 export type HeadingProps = {
-  id?: string;
-  level?: string;
+  uid?: string;
+  level?: HeadingLevel;
+  children: ReactNode;
+  sx?: CSSProperties;
+  style?: CSSProperties;
   maxLines?: number;
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
-  showAnchor?: boolean;
-  anchorId?: string;
-  omitFromToc?: boolean;
+  title?: string;
   className?: string;
-  style?: CSSProperties;
-  children?: ReactNode;
-  registerApi?: (api: Record<string, unknown>) => void;
+  classes?: Record<string, string>;
+  showAnchor?: boolean;
+  anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
+  registerComponentApi?: RegisterComponentApiFn;
+  [furtherProps: string]: any;
 };
 
-export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Heading(
+function classnames(...values: Array<string | undefined | null | false | Record<string, boolean | undefined>>) {
+  return values.flatMap((value) => {
+    if (!value) return [];
+    if (typeof value === "string") return [value];
+    return Object.entries(value).filter(([, enabled]) => enabled).map(([name]) => name);
+  }).join(" ");
+}
+
+function useComposedRefs<T>(...refs: Array<React.Ref<T> | undefined>) {
+  return useCallback((node: T | null) => {
+    refs.forEach((ref) => {
+      if (!ref) return;
+      if (typeof ref === "function") {
+        ref(node);
+      } else {
+        (ref as React.MutableRefObject<T | null>).current = node;
+      }
+    });
+  }, refs);
+}
+
+export const Heading = memo(forwardRef(function Heading(
   {
-    id,
+    uid,
     level = defaultProps.level,
-    maxLines = defaultProps.maxLines,
-    preserveLinebreaks = defaultProps.preserveLinebreaks,
-    ellipses = defaultProps.ellipses,
-    showAnchor = defaultProps.showAnchor,
-    anchorId,
-    omitFromToc: _omitFromToc = defaultProps.omitFromToc,
-    className,
-    style,
     children,
-    registerApi,
-    ...rest
-  },
-  forwardedRef,
+    sx,
+    style,
+    title,
+    maxLines = defaultProps.maxLines,
+    preserveLinebreaks,
+    ellipses = defaultProps.ellipses,
+    className,
+    classes,
+    omitFromToc = defaultProps.omitFromToc,
+    showAnchor,
+    anchorRenderer,
+    registerComponentApi,
+    ...furtherProps
+  }: HeadingProps,
+  forwardedRef: ForwardedRef<HTMLHeadingElement>,
 ) {
-  const normalizedLevel = normalizeHeadingLevel(level);
-  const Element = normalizedLevel;
-  const innerRef = useRef<HTMLHeadingElement | null>(null);
-  const hasOverflow = useCallback(() => {
-    const element = innerRef.current;
-    return !!element && (
-      isOverflowing(element.scrollWidth, element.clientWidth) ||
-      isOverflowing(element.scrollHeight, element.clientHeight)
-    );
-  }, []);
+  const Element = level?.toLowerCase() as HeadingLevel;
+  const elementRef = useRef<HTMLHeadingElement>(null);
+  const [anchorId, setAnchorId] = useState<string | null>(null);
+  const anchorRef = useRef<HTMLAnchorElement>(null);
+
+  const tableOfContentsContext = useContext(TableOfContentsContext);
+  const registerHeading = tableOfContentsContext?.registerHeading;
+  const appContext = useAppContext();
+  if (showAnchor === undefined) {
+    showAnchor =
+      appContext?.xmluiConfig?.showHeadingAnchors ??
+      appContext?.appGlobals?.showHeadingAnchors ??
+      false;
+  }
+
+  const ref = useComposedRefs(elementRef, forwardedRef);
+
   const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
-    innerRef.current?.scrollIntoView({ behavior: "smooth", block: "start", ...options });
+    if (elementRef.current) {
+      elementRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+        ...options,
+      });
+    }
+  }, []);
+
+  const hasOverflow = useCallback(() => {
+    if (elementRef.current) {
+      const element = elementRef.current;
+      const anchorSpanHeight = anchorRef.current?.offsetHeight ?? 0;
+      return (
+        element.scrollWidth > element.clientWidth ||
+        element.scrollHeight - anchorSpanHeight > element.clientHeight
+      );
+    }
+    return false;
   }, []);
 
   useEffect(() => {
-    registerApi?.({ hasOverflow, scrollIntoView });
-  }, [hasOverflow, registerApi, scrollIntoView]);
+    registerComponentApi?.({
+      scrollIntoView,
+      hasOverflow,
+    });
+  }, [registerComponentApi, scrollIntoView, hasOverflow]);
 
-  const resolvedAnchorId = useMemo(() => anchorId || textFromChildren(children), [anchorId, children]);
-  const elementId = id || resolvedAnchorId;
+  useEffect(() => {
+    if (elementRef.current) {
+      let newAnchorId = elementRef.current.textContent
+        ?.trim()
+        ?.replace(/[^\w\s-]/g, "")
+        ?.replace(/\s+/g, "-")
+        ?.toLowerCase();
+
+      // Ensure ID starts with a letter or underscore (not a digit)
+      // This is required for querySelector to work without escaping
+      if (newAnchorId && /^[0-9]/.test(newAnchorId)) {
+        newAnchorId = "heading-" + newAnchorId;
+      }
+
+      setAnchorId(newAnchorId || null);
+    }
+  }, []);
+
+  useIsomorphicLayoutEffect(() => {
+    if (elementRef.current && anchorId && !omitFromToc) {
+      return registerHeading?.({
+        id: anchorId,
+        level: parseInt(level.replace("h", "")),
+        text: elementRef.current.textContent!.trim().replace(/#$/, ""), // Remove trailing #
+        anchor: anchorRef.current,
+      });
+    }
+  }, [anchorId, registerHeading, level, omitFromToc]);
 
   return (
     <Element
-      {...rest}
-      ref={(node) => {
-        innerRef.current = node;
-        if (typeof forwardedRef === "function") {
-          forwardedRef(node);
-        } else if (forwardedRef) {
-          forwardedRef.current = node;
-        }
-      }}
-      id={elementId}
-      className={cx(
-        styles.heading,
-        styles[normalizedLevel],
-        maxLines > 0 ? styles.truncateOverflow : undefined,
-        maxLines > 1 ? styles.multiLineOverflow : undefined,
-        maxLinesClass(maxLines),
-        preserveLinebreaks ? styles.preserveLinebreaks : undefined,
-        !ellipses ? styles.noEllipsis : undefined,
-        className,
-      )}
-      style={style}
-      data-xmlui-heading-level={normalizedLevel}
-      data-xmlui-omit-from-toc={String(_omitFromToc)}
+      {...furtherProps}
+      ref={ref}
+      id={uid}
+      title={title}
+      style={{ ...sx, ...style, ...getMaxLinesStyle(maxLines) }}
+      className={classnames(styles.heading, styles[Element], classes?.[COMPONENT_PART_KEY], className, {
+        [styles.truncateOverflow]: maxLines > 0,
+        [styles.preserveLinebreaks]: preserveLinebreaks,
+        [styles.noEllipsis]: !ellipses,
+      })}
     >
-      {resolvedAnchorId && resolvedAnchorId !== elementId ? (
-        <span id={resolvedAnchorId} data-anchor="true" className={styles.anchorRef} />
-      ) : null}
+      {anchorId && (
+        <span ref={anchorRef} id={anchorId} className={styles.anchorRef} data-anchor={true} />
+      )}
       {children}
-      {showAnchor && resolvedAnchorId ? (
-        <a href={`#${resolvedAnchorId}`} aria-hidden="true">
-          #
-        </a>
-      ) : null}
+      {showAnchor && anchorId && (
+        anchorRenderer
+          ? <span className={styles.customAnchor}>{anchorRenderer(anchorId, `#${anchorId}`)}</span>
+          : (
+            <a
+              href={`#${anchorId}`}
+              aria-hidden="true"
+              onClick={(event) => {
+                // cmd/ctrl + click - open in new tab, don't prevent that
+                if (tableOfContentsContext) {
+                  if (!event.ctrlKey && !event.metaKey) {
+                    event.preventDefault();
+                  }
+                  tableOfContentsContext.scrollToAnchor(anchorId, true);
+                }
+              }}
+            >
+              #
+            </a>
+          )
+      )}
     </Element>
   );
-});
-
-export function normalizeHeadingLevel(value: unknown): HeadingLevel {
-  if (typeof value === "number" && value >= 1 && value <= 6) {
-    return `h${value}` as HeadingLevel;
-  }
-  if (typeof value === "string") {
-    const normalized = value.trim().toLowerCase();
-    if (/^h[1-6]$/.test(normalized)) {
-      return normalized as HeadingLevel;
-    }
-    if (/^[1-6]$/.test(normalized)) {
-      return `h${normalized}` as HeadingLevel;
-    }
-  }
-  return "h1";
-}
-
-function textFromChildren(children: ReactNode): string | undefined {
-  if (typeof children !== "string" && typeof children !== "number") {
-    return undefined;
-  }
-  return slugifyHeading(String(children).replace(/#$/, ""));
-}
-
-function slugifyHeading(text: string): string {
-  const slug = text.trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").toLowerCase();
-  return /^[0-9]/.test(slug) ? `heading-${slug}` : slug;
-}
-
-function maxLinesClass(maxLines: number): string | undefined {
-  if (maxLines < 1) {
-    return undefined;
-  }
-  const capped = Math.min(Math.floor(maxLines), 12);
-  return styles[`maxLines${capped}`];
-}
-
-function isOverflowing(scrollSize: number, clientSize: number): boolean {
-  return scrollSize - clientSize > 1;
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+}));

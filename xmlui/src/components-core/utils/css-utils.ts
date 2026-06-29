@@ -18,3 +18,41 @@ export function getMaxLinesStyle(maxLines: number | undefined) {
       : EMPTY_OBJECT;
   return maxLinesStyles;
 }
+
+export function normalizeCssValueForCalc(cssValue: string | number) {
+  if (typeof cssValue === "number") {
+    return `${cssValue}px`;
+  }
+
+  const cssTrimmed = cssValue.trim();
+  if (cssTrimmed.startsWith("var(")) {
+    return cssTrimmed;
+  }
+
+  const value = parseFloat(cssTrimmed);
+  const valueStr = value.toString();
+  const unit = cssTrimmed.replace(valueStr, "");
+
+  if (Number.isNaN(value)) {
+    return "0px";
+  }
+  if (unit === "") {
+    return `${valueStr}px`;
+  }
+  return cssTrimmed;
+}
+
+export function getSizeString(size: unknown): string {
+  if (typeof size === "number") {
+    return `${size}px`;
+  }
+
+  if (typeof size === "string" && /^\d+$/.test(size.trim())) {
+    const value = parseInt(size, 10);
+    if (!Number.isNaN(value)) {
+      return `${value}px`;
+    }
+  }
+
+  return size?.toString() ?? "";
+}

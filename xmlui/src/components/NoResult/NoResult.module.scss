@@ -1,110 +1,38 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-NoResult: createThemeVar("backgroundColor-NoResult");
-$border-NoResult: createThemeVar("border-NoResult");
-$borderHorizontal-NoResult: createThemeVar("borderHorizontal-NoResult");
-$borderVertical-NoResult: createThemeVar("borderVertical-NoResult");
-$borderLeft-NoResult: createThemeVar("borderLeft-NoResult");
-$borderRight-NoResult: createThemeVar("borderRight-NoResult");
-$borderTop-NoResult: createThemeVar("borderTop-NoResult");
-$borderBottom-NoResult: createThemeVar("borderBottom-NoResult");
-$borderWidth-NoResult: createThemeVar("borderWidth-NoResult");
-$borderHorizontalWidth-NoResult: createThemeVar("borderHorizontalWidth-NoResult");
-$borderVerticalWidth-NoResult: createThemeVar("borderVerticalWidth-NoResult");
-$borderLeftWidth-NoResult: createThemeVar("borderLeftWidth-NoResult");
-$borderRightWidth-NoResult: createThemeVar("borderRightWidth-NoResult");
-$borderTopWidth-NoResult: createThemeVar("borderTopWidth-NoResult");
-$borderBottomWidth-NoResult: createThemeVar("borderBottomWidth-NoResult");
-$borderStyle-NoResult: createThemeVar("borderStyle-NoResult");
-$borderHorizontalStyle-NoResult: createThemeVar("borderHorizontalStyle-NoResult");
-$borderVerticalStyle-NoResult: createThemeVar("borderVerticalStyle-NoResult");
-$borderLeftStyle-NoResult: createThemeVar("borderLeftStyle-NoResult");
-$borderRightStyle-NoResult: createThemeVar("borderRightStyle-NoResult");
-$borderTopStyle-NoResult: createThemeVar("borderTopStyle-NoResult");
-$borderBottomStyle-NoResult: createThemeVar("borderBottomStyle-NoResult");
-$borderColor-NoResult: createThemeVar("borderColor-NoResult");
-$borderHorizontalColor-NoResult: createThemeVar("borderHorizontalColor-NoResult");
-$borderVerticalColor-NoResult: createThemeVar("borderVerticalColor-NoResult");
-$borderLeftColor-NoResult: createThemeVar("borderLeftColor-NoResult");
-$borderRightColor-NoResult: createThemeVar("borderRightColor-NoResult");
-$borderTopColor-NoResult: createThemeVar("borderTopColor-NoResult");
-$borderBottomColor-NoResult: createThemeVar("borderBottomColor-NoResult");
-$padding-NoResult: createThemeVar("padding-NoResult");
-$paddingHorizontal-NoResult: createThemeVar("paddingHorizontal-NoResult");
-$paddingVertical-NoResult: createThemeVar("paddingVertical-NoResult");
-$paddingLeft-NoResult: createThemeVar("paddingLeft-NoResult");
-$paddingRight-NoResult: createThemeVar("paddingRight-NoResult");
-$paddingTop-NoResult: createThemeVar("paddingTop-NoResult");
-$paddingBottom-NoResult: createThemeVar("paddingBottom-NoResult");
-$gap-icon-NoResult: createThemeVar("gap-icon-NoResult");
-$size-icon-NoResult: createThemeVar("size-icon-NoResult");
-
-:export {
-  themeVars: "";
-}
+$component: "NoResult";
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
+$gap-icon-NoResult: createThemeVar("gap-icon-#{$component}");
+$size-icon-NoResult: createThemeVar("size-icon-#{$component}");
+$backgroundColor-NoResult: createThemeVar("backgroundColor-#{$component}");
 
 @layer components {
-  .xmluiNoResult {
+  .noResultWrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box;
-    background-color: var(--xmlui-backgroundColor-NoResult);
-    border: var(--xmlui-border-NoResult);
-    border-left: var(--xmlui-borderHorizontal-NoResult, var(--xmlui-border-NoResult));
-    border-right: var(--xmlui-borderHorizontal-NoResult, var(--xmlui-border-NoResult));
-    border-top: var(--xmlui-borderVertical-NoResult, var(--xmlui-border-NoResult));
-    border-bottom: var(--xmlui-borderVertical-NoResult, var(--xmlui-border-NoResult));
-    border-left: var(--xmlui-borderLeft-NoResult, var(--xmlui-borderHorizontal-NoResult, var(--xmlui-border-NoResult)));
-    border-right: var(--xmlui-borderRight-NoResult, var(--xmlui-borderHorizontal-NoResult, var(--xmlui-border-NoResult)));
-    border-top: var(--xmlui-borderTop-NoResult, var(--xmlui-borderVertical-NoResult, var(--xmlui-border-NoResult)));
-    border-bottom: var(--xmlui-borderBottom-NoResult, var(--xmlui-borderVertical-NoResult, var(--xmlui-border-NoResult)));
-    border-width: var(--xmlui-borderWidth-NoResult);
-    border-left-width: var(--xmlui-borderHorizontalWidth-NoResult, var(--xmlui-borderWidth-NoResult));
-    border-right-width: var(--xmlui-borderHorizontalWidth-NoResult, var(--xmlui-borderWidth-NoResult));
-    border-top-width: var(--xmlui-borderVerticalWidth-NoResult, var(--xmlui-borderWidth-NoResult));
-    border-bottom-width: var(--xmlui-borderVerticalWidth-NoResult, var(--xmlui-borderWidth-NoResult));
-    border-left-width: var(--xmlui-borderLeftWidth-NoResult, var(--xmlui-borderHorizontalWidth-NoResult, var(--xmlui-borderWidth-NoResult)));
-    border-right-width: var(--xmlui-borderRightWidth-NoResult, var(--xmlui-borderHorizontalWidth-NoResult, var(--xmlui-borderWidth-NoResult)));
-    border-top-width: var(--xmlui-borderTopWidth-NoResult, var(--xmlui-borderVerticalWidth-NoResult, var(--xmlui-borderWidth-NoResult)));
-    border-bottom-width: var(--xmlui-borderBottomWidth-NoResult, var(--xmlui-borderVerticalWidth-NoResult, var(--xmlui-borderWidth-NoResult)));
-    border-style: var(--xmlui-borderStyle-NoResult);
-    border-left-style: var(--xmlui-borderHorizontalStyle-NoResult, var(--xmlui-borderStyle-NoResult));
-    border-right-style: var(--xmlui-borderHorizontalStyle-NoResult, var(--xmlui-borderStyle-NoResult));
-    border-top-style: var(--xmlui-borderVerticalStyle-NoResult, var(--xmlui-borderStyle-NoResult));
-    border-bottom-style: var(--xmlui-borderVerticalStyle-NoResult, var(--xmlui-borderStyle-NoResult));
-    border-left-style: var(--xmlui-borderLeftStyle-NoResult, var(--xmlui-borderHorizontalStyle-NoResult, var(--xmlui-borderStyle-NoResult)));
-    border-right-style: var(--xmlui-borderRightStyle-NoResult, var(--xmlui-borderHorizontalStyle-NoResult, var(--xmlui-borderStyle-NoResult)));
-    border-top-style: var(--xmlui-borderTopStyle-NoResult, var(--xmlui-borderVerticalStyle-NoResult, var(--xmlui-borderStyle-NoResult)));
-    border-bottom-style: var(--xmlui-borderBottomStyle-NoResult, var(--xmlui-borderVerticalStyle-NoResult, var(--xmlui-borderStyle-NoResult)));
-    border-color: var(--xmlui-borderColor-NoResult);
-    border-left-color: var(--xmlui-borderHorizontalColor-NoResult, var(--xmlui-borderColor-NoResult));
-    border-right-color: var(--xmlui-borderHorizontalColor-NoResult, var(--xmlui-borderColor-NoResult));
-    border-top-color: var(--xmlui-borderVerticalColor-NoResult, var(--xmlui-borderColor-NoResult));
-    border-bottom-color: var(--xmlui-borderVerticalColor-NoResult, var(--xmlui-borderColor-NoResult));
-    border-left-color: var(--xmlui-borderLeftColor-NoResult, var(--xmlui-borderHorizontalColor-NoResult, var(--xmlui-borderColor-NoResult)));
-    border-right-color: var(--xmlui-borderRightColor-NoResult, var(--xmlui-borderHorizontalColor-NoResult, var(--xmlui-borderColor-NoResult)));
-    border-top-color: var(--xmlui-borderTopColor-NoResult, var(--xmlui-borderVerticalColor-NoResult, var(--xmlui-borderColor-NoResult)));
-    border-bottom-color: var(--xmlui-borderBottomColor-NoResult, var(--xmlui-borderVerticalColor-NoResult, var(--xmlui-borderColor-NoResult)));
-    padding: var(--xmlui-padding-NoResult, 0);
-    padding-left: var(--xmlui-paddingHorizontal-NoResult, 0);
-    padding-right: var(--xmlui-paddingHorizontal-NoResult, 0);
-    padding-top: var(--xmlui-paddingVertical-NoResult);
-    padding-bottom: var(--xmlui-paddingVertical-NoResult);
-    padding-left: var(--xmlui-paddingLeft-NoResult, var(--xmlui-paddingHorizontal-NoResult, 0));
-    padding-right: var(--xmlui-paddingRight-NoResult, var(--xmlui-paddingHorizontal-NoResult, 0));
-    padding-top: var(--xmlui-paddingTop-NoResult, var(--xmlui-paddingVertical-NoResult));
-    padding-bottom: var(--xmlui-paddingBottom-NoResult, var(--xmlui-paddingVertical-NoResult));
+    background-color: $backgroundColor-NoResult;
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
   }
 
-  .xmluiNoResultIcon {
-    width: var(--xmlui-size-icon-NoResult);
-    height: var(--xmlui-size-icon-NoResult);
-    margin-bottom: var(--xmlui-gap-icon-NoResult);
-    flex: 0 0 auto;
+  .icon {
+    width: $size-icon-NoResult;
+    height: $size-icon-NoResult;
+    margin-bottom: $gap-icon-NoResult;
   }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

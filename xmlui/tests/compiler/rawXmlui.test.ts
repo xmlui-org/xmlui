@@ -75,4 +75,18 @@ describe("parseRawXmlui", () => {
       ],
     });
   });
+
+  it("accepts component roots as app documents", () => {
+    const document = parseRawXmlui(`<VStack><Button /></VStack>`, { sourceId: "Main.xmlui" });
+
+    expect(document).toMatchObject({
+      kind: "app",
+      sourceId: "Main.xmlui",
+      root: {
+        kind: "element",
+        type: "VStack",
+        children: [{ kind: "element", type: "Button" }],
+      },
+    });
+  });
 });

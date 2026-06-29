@@ -1,106 +1,492 @@
-import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useEffect, useRef } from "react";
+import {
+  type CSSProperties,
+  type Dispatch,
+  type ForwardedRef,
+  forwardRef,
+  memo,
+  type ReactNode,
+  type SetStateAction,
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./FlowLayout.defaults";
 import styles from "./FlowLayout.module.scss";
+import { ThemedScroller as Scroller } from "../ScrollViewer/ScrollViewerReact";
+import type { ScrollStyle } from "../ScrollViewer/ScrollViewer.defaults";
 
-export type FlowLayoutProps = {
-  className?: string;
+import { normalizeCssValueForCalc, getSizeString } from "../../components-core/utils/css-utils";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
+import { defaultProps } from "./FlowLayout.defaults";
+import { useAppContext } from "../../components-core/AppContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useStyles } from "../../components-core/theming/StyleContext";
+import type { StyleObjectType } from "../../components-core/theming/StyleRegistry";
+import type { MediaBreakpointType } from "../../abstractions/AppContextDefs";
+
+type FlowItemProps = {
+  children: ReactNode;
+  itemWidth?: string;
+  width?: string | number;
+  minWidth?: string | number;
+  maxWidth?: string | number;
+  responsiveWidthProps?: Record<string, any>;
+  forceBreak?: boolean;
+};
+
+/**
+ * Breakpoint min-widths (px) matching the framework's responsive system.
+ * "xs" is the base with no media query.
+ */
+const BREAKPOINT_MIN_WIDTH: Record<string, number> = {
+  sm: 576,
+  md: 768,
+  lg: 992,
+  xl: 1200,
+  xxl: 1400,
+};
+
+const BREAKPOINT_ORDER: MediaBreakpointType[] = ["sm", "md", "lg", "xl", "xxl"];
+
+/**
+ * Computes the auto-inferred width for a given percentage at a breakpoint tier.
+ * Reproduces the original sizeIndex-based percentage logic as pure functions.
+ *
+ * - xs/sm  (tier 0-1): multiply by 4, clamp to 100%
+ * - md     (tier 2):   multiply by 3, snap 50-75% → 50%, >75% → 100%
+ * - lg+    (tier 3+):  use original value capped at 100%
+ */
+function inferredPercentageWidth(percNumber: number, tier: number): string {
+  if (tier <= 1) {
+    // xs / sm
+    const scaled = percNumber * 4;
+    return scaled > 50 ? "100%" : `min(${scaled}%, 100%)`;
+  }
+  if (tier === 2) {
+    // md
+    const scaled = percNumber * 3;
+    if (scaled >= 50 && scaled <= 75) return "50%";
+    if (scaled > 75) return "100%";
+    return `min(${scaled}%, 100%)`;
+  }
+  // lg, xl, xxl
+  return `min(${percNumber}%, 100%)`;
+}
+
+/**
+ * Builds a `StyleObjectType` with @media rules for the flow item width,
+ * so the browser applies the correct width on first paint (no flash).
+ */
+function buildFlowItemStyleObject(
+  baseWidth: string | number | undefined,
+  baseMinWidth: string | number | undefined,
+  baseMaxWidth: string | number | undefined,
+  responsiveProps: Record<string, any> | undefined,
+  columnGap: string,
+  isIntrinsicSizing: boolean,
+): StyleObjectType {
+  if (isIntrinsicSizing) {
+    return { "&": { width: baseWidth } as StyleObjectType };
+  }
+
+  const hasResponsiveWidth = responsiveProps &&
+    Object.keys(responsiveProps).some((k) => k.startsWith("width-"));
+
+  const baseStr = baseWidth != null ? String(baseWidth) : undefined;
+  const isBasePercentage = baseStr?.endsWith("%");
+
+  // --- Helper to produce the CSS width value for a given raw width
+  function toWidthValue(raw: string | number | undefined, gap: string): string | undefined {
+    if (raw == null) return undefined;
+    const s = String(raw);
+    if (s.endsWith("%")) return adjustedPercentageWidth(s, gap);
+    return s;
+  }
+
+  // --- Collect widths per breakpoint tier using mobile-first cascade
+  // --- Build the base (xs) rule
+  const result: StyleObjectType = {};
+  const baseRule: Record<string, any> = {};
+
+  // Dimension properties that change per breakpoint
+  function addDimProps(
+    target: Record<string, any>,
+    w: string | number | undefined,
+    minW: string | number | undefined,
+    maxW: string | number | undefined,
+    gap: string,
+  ) {
+    const wv = toWidthValue(w, gap);
+    if (wv != null) target.width = wv;
+    if (minW != null) target["min-width"] = String(minW);
+    if (maxW != null) target["max-width"] = String(maxW);
+  }
+
+  if (hasResponsiveWidth) {
+    // --- Explicit responsive widths: base rule uses the base width as-is
+    addDimProps(baseRule, baseWidth, baseMinWidth, baseMaxWidth, columnGap);
+    if (Object.keys(baseRule).length > 0) {
+      result["&"] = baseRule as StyleObjectType;
+    }
+
+    // Produce @media for each breakpoint with mobile-first cascade
+    let currentWidth = baseWidth;
+    let currentMinWidth = baseMinWidth;
+    let currentMaxWidth = baseMaxWidth;
+    for (const bp of BREAKPOINT_ORDER) {
+      const wKey = `width-${bp}`;
+      const minKey = `minWidth-${bp}`;
+      const maxKey = `maxWidth-${bp}`;
+      let changed = false;
+      if (responsiveProps![wKey] != null) { currentWidth = responsiveProps![wKey]; changed = true; }
+      if (responsiveProps![minKey] != null) { currentMinWidth = responsiveProps![minKey]; changed = true; }
+      if (responsiveProps![maxKey] != null) { currentMaxWidth = responsiveProps![maxKey]; changed = true; }
+      if (changed) {
+        const bpRule: Record<string, any> = {};
+        addDimProps(bpRule, currentWidth, currentMinWidth, currentMaxWidth, columnGap);
+        if (Object.keys(bpRule).length > 0) {
+          result[`@media (min-width: ${BREAKPOINT_MIN_WIDTH[bp]}px)`] = {
+            "&": bpRule,
+          } as StyleObjectType;
+        }
+      }
+    }
+  } else if (isBasePercentage) {
+    // --- Auto-inferred responsive widths from percentage
+    const percNumber = parseFloat(baseStr!);
+
+    // xs tier (base — no media query)
+    baseRule.width = adjustedPercentageWidth(inferredPercentageWidth(percNumber, 0), columnGap);
+    if (baseMinWidth != null) baseRule["min-width"] = String(baseMinWidth);
+    if (baseMaxWidth != null) baseRule["max-width"] = String(baseMaxWidth);
+    result["&"] = baseRule as StyleObjectType;
+
+    // sm tier (≥576px) — same formula as xs (tier ≤ 1)
+    // (identical to base, skip unless something changes in the future)
+
+    // md tier (≥768px)
+    const mdWidth = inferredPercentageWidth(percNumber, 2);
+    const adjustedMdWidth = adjustedPercentageWidth(mdWidth, columnGap);
+    if (adjustedMdWidth !== baseRule.width) {
+      result[`@media (min-width: ${BREAKPOINT_MIN_WIDTH.md}px)`] = {
+        "&": { width: adjustedMdWidth },
+      } as StyleObjectType;
+    }
+
+    // lg+ tier (≥992px)
+    const lgWidth = inferredPercentageWidth(percNumber, 3);
+    const adjustedLgWidth = adjustedPercentageWidth(lgWidth, columnGap);
+    if (adjustedLgWidth !== adjustedMdWidth) {
+      result[`@media (min-width: ${BREAKPOINT_MIN_WIDTH.lg}px)`] = {
+        "&": { width: adjustedLgWidth },
+      } as StyleObjectType;
+    }
+  } else {
+    // --- Fixed width (px, rem, etc.)
+    addDimProps(baseRule, baseWidth, baseMinWidth, baseMaxWidth, columnGap);
+    if (Object.keys(baseRule).length > 0) {
+      result["&"] = baseRule as StyleObjectType;
+    }
+  }
+
+  return result;
+}
+
+function adjustedPercentageWidth(width: string, gap: string): string {
+  const percentageMatch = width.match(/([0-9.]+)%/);
+  if (!percentageMatch) {
+    return width;
+  }
+  const percentage = parseFloat(percentageMatch[1]);
+  if (!Number.isFinite(percentage) || percentage <= 0 || percentage >= 100) {
+    return width.startsWith("min(") ? width : `min(${width}, 100%)`;
+  }
+  const gapValue = parseFloat(gap);
+  if (!Number.isFinite(gapValue) || gapValue <= 0) {
+    return width.startsWith("min(") ? width : `min(${width}, 100%)`;
+  }
+  const gapUnit = gap.trim().slice(String(gapValue).length) || "px";
+  const adjustment = gapValue * (1 - percentage / 100);
+  return `min(calc(${percentage}% - ${adjustment}${gapUnit}), 100%)`;
+}
+
+const resolvedCssVars: Record<string, any> = {};
+
+interface IFlowLayoutContext {
+  rowGap: string | number;
+  columnGap: string | number;
+  itemWidth: string;
+  setNumberOfChildren: Dispatch<SetStateAction<number>>;
+}
+
+const FlowLayoutContext = createContext<IFlowLayoutContext>({
+  rowGap: 0,
+  columnGap: 0,
+  itemWidth: "100%",
+  setNumberOfChildren: () => undefined,
+});
+
+export const FlowItemBreak = ({ force }: { force?: boolean }) => (
+  <div className={classnames(styles.break, { [styles.forceBreak]: force })} />
+);
+
+export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
+  { children, forceBreak, ...restProps }: FlowItemProps,
+  ref: any,
+) {
+  const {
+    rowGap,
+    columnGap,
+    itemWidth: contextItemWidth,
+    setNumberOfChildren,
+  } = useContext(FlowLayoutContext);
+  const itemWidth = restProps.itemWidth || contextItemWidth;
+  const { xmluiConfig } = useAppContext();
+  useIsomorphicLayoutEffect(() => {
+    setNumberOfChildren((prev) => prev + 1);
+    return () => {
+      setNumberOfChildren((prev) => prev - 1);
+    };
+  }, [setNumberOfChildren]);
+  const _width = restProps.width || itemWidth;
+  const _minWidth = restProps.minWidth || undefined;
+  const _maxWidth = restProps.maxWidth || undefined;
+
+  // Check if width is an intrinsic sizing keyword that shouldn't go through layout resolution
+  const isIntrinsicWidth = typeof _width === "string" && 
+    (_width === "fit-content" || 
+     _width === "min-content" || 
+     _width === "max-content" ||
+     _width === "auto");
+
+  const {
+    width = _width,
+    minWidth,
+    maxWidth,
+    flex,
+  } = useMemo(() => {
+    // Skip layout resolution for intrinsic sizing keywords
+    if (isIntrinsicWidth) {
+      return {
+        width: _width,
+        minWidth: _minWidth,
+        maxWidth: _maxWidth,
+      };
+    }
+    
+    return (
+      resolveLayoutProps(
+        { width: _width, maxWidth: _maxWidth, minWidth: _minWidth },
+        {
+          type: "Stack",
+          orientation: "horizontal",
+        },
+        xmluiConfig?.disableInlineStyle,
+      ).cssProps || {}
+    );
+  }, [_maxWidth, _minWidth, _width, xmluiConfig, isIntrinsicWidth]);
+
+  const resolvedWidth = useMemo(() => {
+    if (width && typeof width === "string" && width.startsWith("var(")) {
+      if (!resolvedCssVars[width]) {
+        const varName = width.substring(4, width.length - 1);
+        const resolved = getComputedStyle(document.body).getPropertyValue(varName);
+        resolvedCssVars[width] = resolved || _width;
+      }
+      return resolvedCssVars[width];
+    }
+    return width || _width;
+  }, [_width, width]);
+  
+  // Check if width is an intrinsic sizing keyword that can't be used in calc()
+  const isIntrinsicSizing = typeof resolvedWidth === "string" && 
+    (resolvedWidth === "fit-content" || 
+     resolvedWidth === "min-content" || 
+     resolvedWidth === "max-content" ||
+     resolvedWidth === "auto");
+
+  const _columnGap = useMemo(() => resolveCssSizeValue(columnGap), [columnGap]);
+
+  // --- Build a CSS style object with @media rules for responsive dimensions
+  // --- This avoids the flash caused by JS-based sizeIndex detection.
+  const responsiveStyleObj = useMemo(
+    () =>
+      buildFlowItemStyleObject(
+        resolvedWidth,
+        minWidth,
+        maxWidth,
+        restProps.responsiveWidthProps,
+        _columnGap,
+        isIntrinsicSizing,
+      ),
+    [resolvedWidth, minWidth, maxWidth, restProps.responsiveWidthProps, _columnGap, isIntrinsicSizing],
+  );
+
+  const responsiveClassName = useStyles(responsiveStyleObj);
+
+  const isStarSizing = flex !== undefined;
+
+  const outerWrapperStyle: CSSProperties = {
+    flex,
+  };
+
+  if (!isIntrinsicSizing && !isStarSizing && resolvedWidth != null) {
+    const resolvedWidthString = String(resolvedWidth);
+    outerWrapperStyle.flexBasis = adjustedPercentageWidth(resolvedWidthString, _columnGap);
+  }
+
+  if (isStarSizing) {
+    outerWrapperStyle.width = "100%";
+    outerWrapperStyle.minWidth = minWidth || "1px";
+  }
+
+  return (
+    <>
+      <div
+        style={outerWrapperStyle}
+        className={classnames(styles.flowItem, responsiveClassName, {
+          [styles.starSized]: isStarSizing,
+        })}
+        ref={ref}
+      >
+        {children}
+      </div>
+      {isStarSizing && <FlowItemBreak />}
+    </>
+  );
+});
+
+type FlowLayoutProps = {
   style?: CSSProperties;
-  columnGap?: string;
-  rowGap?: string;
+  className?: string;
+  classes?: Record<string, string>;
+  columnGap: string | number;
+  rowGap: string | number;
   itemWidth?: string;
   verticalAlignment?: string;
-  onContextMenu?: () => void | Promise<void>;
-  registerComponentApi?: (api: Record<string, unknown>) => void;
-  children?: ReactNode;
+  scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
+  children: ReactNode;
+  onContextMenu?: any;
+  registerComponentApi?: (api: any) => void;
 };
 
-export type FlowItemWrapperProps = {
-  width?: string;
-  minWidth?: string;
-  maxWidth?: string;
-  itemWidth?: string;
-  children?: ReactNode;
-};
+export const FlowLayout = memo(forwardRef(function FlowLayout(
+  {
+    style,
+    className,
+    classes,
+    columnGap = 0,
+    rowGap = 0,
+    itemWidth = defaultProps.itemWidth,
+    verticalAlignment = defaultProps.verticalAlignment,
+    scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
+    children,
+    onContextMenu,
+    registerComponentApi,
+    ...rest
+  }: FlowLayoutProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [numberOfChildren, setNumberOfChildren] = useState(0);
+  const safeColumnGap = numberOfChildren === 1 ? 0 : columnGap;
 
-export function FlowLayout({
-  className,
-  style,
-  columnGap = defaultProps.columnGap,
-  rowGap = defaultProps.rowGap,
-  itemWidth = defaultProps.itemWidth,
-  verticalAlignment = defaultProps.verticalAlignment,
-  onContextMenu,
-  registerComponentApi,
-  children,
-  ...rest
-}: FlowLayoutProps) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const scrollToTop = useCallback((behavior: ScrollBehavior = "instant") => {
-    rootRef.current?.scrollTo({ top: 0, behavior });
-  }, []);
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "instant") => {
-    rootRef.current?.scrollTo({ top: rootRef.current.scrollHeight, behavior });
-  }, []);
-
+  // Register API methods
   useEffect(() => {
-    registerComponentApi?.({ scrollToTop, scrollToBottom });
-  }, [registerComponentApi, scrollToBottom, scrollToTop]);
+    if (registerComponentApi) {
+      registerComponentApi({
+        scrollToTop: (behavior: ScrollBehavior = "instant") => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: 0,
+              behavior,
+            });
+          }
+        },
+        scrollToBottom: (behavior: ScrollBehavior = "instant") => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: containerRef.current.scrollHeight,
+              behavior,
+            });
+          }
+        },
+      });
+    }
+  }, [registerComponentApi]);
 
-  return (
-    <div
-      {...rest}
-      ref={rootRef}
-      className={cx(styles.flowLayout, alignmentClass(verticalAlignment), className)}
-      style={{
-        ...style,
-        "--xmlui-columnGap-FlowLayout": columnGap,
-        "--xmlui-rowGap-FlowLayout": rowGap,
-        "--xmlui-itemWidth-FlowLayout": itemWidth,
-      } as CSSProperties}
-      onContextMenu={() => void onContextMenu?.()}
-    >
-      {children}
-    </div>
+  // --- Be smart about rowGap
+  const _rowGap = getSizeString(rowGap);
+  const _columnGap = getSizeString(safeColumnGap);
+  const [resolvedColumnGap, setResolvedColumnGap] = useState(_columnGap);
+  useIsomorphicLayoutEffect(() => {
+    setResolvedColumnGap(resolveCssSizeValue(_columnGap, containerRef.current));
+  }, [_columnGap]);
+
+  // --- Determine alignment class
+  const alignmentClass = useMemo(() => {
+    if (verticalAlignment === "center") return styles.alignItemsCenter;
+    if (verticalAlignment === "end") return styles.alignItemsEnd;
+    return styles.alignItemsStart;
+  }, [verticalAlignment]);
+
+  const innerStyle = useMemo(
+    () => ({
+      columnGap: _columnGap,
+      rowGap: _rowGap,
+    }),
+    [_columnGap, _rowGap],
   );
-}
 
-export function FlowItemWrapper({
-  width,
-  minWidth,
-  maxWidth,
-  itemWidth = defaultProps.itemWidth,
-  children,
-}: FlowItemWrapperProps) {
+  const flowLayoutContextValue = useMemo(() => {
+    return {
+      rowGap: _rowGap,
+      columnGap: resolvedColumnGap,
+      itemWidth,
+      setNumberOfChildren,
+    };
+  }, [resolvedColumnGap, _rowGap, itemWidth]);
   return (
-    <div
-      className={styles.flowLayoutItem}
-      style={{
-        "--xmlui-itemWidth-FlowLayout": width ?? itemWidth,
-        "--xmlui-minWidth-FlowLayoutItem": minWidth,
-        "--xmlui-maxWidth-FlowLayoutItem": maxWidth,
-      } as CSSProperties}
-    >
-      {children}
-    </div>
+    <FlowLayoutContext.Provider value={flowLayoutContextValue}>
+      <Scroller
+        style={{ ...style, ...innerStyle }}
+        className={classnames(
+          styles.outer,
+          styles.flowContainer,
+          styles.horizontal,
+          alignmentClass,
+          classes?.[COMPONENT_PART_KEY],
+          className,
+        )}
+        ref={containerRef}
+        scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
+        onContextMenu={onContextMenu}
+        {...rest}
+      >
+        {children}
+      </Scroller>
+    </FlowLayoutContext.Provider>
   );
-}
+}));
 
-export function FlowItemBreak() {
-  return <div className={cx(styles.flowLayoutBreak, styles.flowLayoutForceBreak)} />;
-}
-
-function alignmentClass(value: string): string | undefined {
-  if (value === "center") {
-    return styles.alignItemsCenter;
+function resolveCssSizeValue(value: string | number, element?: Element | null): string {
+  const normalized = normalizeCssValueForCalc(value);
+  if (!normalized.startsWith("var(") || typeof document === "undefined") {
+    return normalized;
   }
-  if (value === "end") {
-    return styles.alignItemsEnd;
-  }
-  return styles.alignItemsStart;
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
+  const varName = normalized.substring(4, normalized.length - 1).split(",")[0].trim();
+  const themeRoot = element
+    ?? document.querySelector<HTMLElement>("[data-xmlui-component='App']")
+    ?? document.documentElement
+    ?? document.body;
+  const resolved = getComputedStyle(themeRoot).getPropertyValue(varName).trim();
+  return resolved || normalized;
 }

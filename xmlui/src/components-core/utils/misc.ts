@@ -9,3 +9,7 @@ export function useEvent<T extends Callback>(callback: T): T {
   });
   return useRef(((...args: Parameters<T>) => callbackRef.current(...args)) as T).current;
 }
+
+export function capitalizeFirstLetter(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}

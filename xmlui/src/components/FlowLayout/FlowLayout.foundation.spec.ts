@@ -23,4 +23,39 @@ test.describe("FlowLayout foundation", () => {
     await page.getByTestId("toggle").click();
     await expect(firstItem).toHaveCSS("flex-basis", "120px");
   });
+
+  test("theme-token columnGap keeps percentage items separated without forcing wraps", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <FlowLayout testId="flow" columnGap="$space-8">
+          <Stack testId="item1" width="25%" height="32px" backgroundColor="red" />
+          <Stack testId="item2" width="25%" height="32px" backgroundColor="blue" />
+          <Stack testId="item3" width="25%" height="32px" backgroundColor="green" />
+          <Stack testId="item4" width="25%" height="32px" backgroundColor="yellow" />
+          <Stack testId="item5" width="25%" height="32px" backgroundColor="maroon" />
+          <Stack testId="item6" width="25%" height="32px" backgroundColor="teal" />
+          <Stack testId="item7" width="25%" height="32px" backgroundColor="seagreen" />
+          <Stack testId="item8" width="25%" height="32px" backgroundColor="olive" />
+        </FlowLayout>
+      </App>
+    `);
+
+    const first = await page.getByTestId("item1").boundingBox();
+    const second = await page.getByTestId("item2").boundingBox();
+    const fourth = await page.getByTestId("item4").boundingBox();
+    const fifth = await page.getByTestId("item5").boundingBox();
+
+    expect(first).not.toBeNull();
+    expect(second).not.toBeNull();
+    expect(fourth).not.toBeNull();
+    expect(fifth).not.toBeNull();
+
+    expect(second!.y).toBe(first!.y);
+    expect(fourth!.y).toBe(first!.y);
+    expect(fifth!.y).toBeGreaterThan(first!.y);
+    expect(second!.x - (first!.x + first!.width)).toBeGreaterThan(0);
+  });
 });

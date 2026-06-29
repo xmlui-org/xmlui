@@ -30,14 +30,6 @@ function validateDefinition(module: XmluiModuleIr, diagnostics: ParserDiagnostic
       ),
     );
   }
-  if (
-    module.kind === "app" &&
-    (module.definition.root.kind !== "builtin" || module.definition.root.type !== "App")
-  ) {
-    diagnostics.push(
-      createErrorDiagnostic("IR002", "XMLUI app IR root must be App.", module.definition.root.source.span),
-    );
-  }
 }
 
 function validateComponentReferences(

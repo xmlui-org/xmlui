@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { buildCompilerIrFromDocument } from "../../../src/compiler/ir/index";
 import { parseXmlui } from "../../../src/compiler/parseXmlui";
 
 describe("parser compatibility hardening", () => {
@@ -15,10 +16,31 @@ describe("parser compatibility hardening", () => {
     });
   });
 
-  it("preserves old root validation errors", () => {
-    expect(() => parseXmlui(`<Button />`)).toThrow(
-      "Expected <App> or <Component> as the document root, got <Button>.",
-    );
+  it("accepts component roots as app documents", () => {
+    const document = parseXmlui(`<VStack><Button /></VStack>`);
+    const compilerIr = buildCompilerIrFromDocument(document);
+
+    expect(document).toMatchObject({
+      kind: "app",
+      root: {
+        kind: "element",
+        type: "VStack",
+        children: [{ kind: "element", type: "Button" }],
+      },
+    });
+    expect(compilerIr).toMatchObject({
+      kind: "app",
+      definition: {
+        root: {
+          kind: "builtin",
+          type: "VStack",
+        },
+      },
+      diagnostics: [],
+    });
+  });
+
+  it("preserves old component root validation errors", () => {
     expect(() => parseXmlui(`<Component />`)).toThrow("<Component> requires a name attribute.");
   });
 

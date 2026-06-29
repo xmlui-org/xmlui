@@ -609,6 +609,194 @@ for later components.
   `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts --workers=1`
   passes 705/711 with 6 skips unchanged.
 
+### Heading, 2026-06-28
+
+- `HeadingReact.tsx` and `Heading.module.scss` were restored from the old
+  source. The protected React file only has dependency shims: local composed-ref
+  and class merging helpers replace old package imports that are not dependencies
+  in the rewrite workspace.
+- The renderer boundary now preserves the old Heading contract: `id` is passed
+  as `uid`, current theme/root classes are bridged into
+  `classes[COMPONENT_PART_KEY]`, the component API is passed as
+  `registerComponentApi`, and `value` rendering uses the same `asDisplayText`
+  whitespace preservation learned from Text.
+- `showAnchor` must remain `undefined` when the XMLUI prop is omitted. The old
+  React component checks app/global config in that case; forcing the metadata
+  default `false` at the renderer boundary would hide that old runtime behavior.
+- The old Heading source expects `components-core/AppContext` and
+  `components-core/TableOfContentsContext`. Minimal compatibility modules were
+  added so copied Heading can resolve app globals and register with the old TOC
+  contract when a compatible provider is present. Future `TableOfContents`
+  migration should reuse and likely complete this context surface.
+- Heading exposed a layout-boundary compatibility gap. In the rewrite, a
+  start-aligned vertical `Stack` let an unconstrained heading flex child grow to
+  max-content width, so old `hasOverflow()` returned false even though the old
+  E2E expected overflow. The renderer bridge adds `minWidth: 0` and a default
+  `maxWidth: 100%` only when the author did not set `width` or `maxWidth`.
+  Explicit widths still overflow their container as in the old tests.
+- A user visual check of generic `<Heading level="h1">` through
+  `<Heading level="h6">` exposed a default-theme contributor gap. The old
+  runtime made per-level defaults (`fontSize-H1` ... `fontSize-H6`) available
+  to the generic `Heading` component, while the rewrite had only attached them
+  to shortcut metadata (`H1` ... `H6`). The generic `HeadingMd` metadata now
+  includes the same old per-level defaults, and the shortcut helper uses the
+  same map. A computed-style probe for the reported markup now reads 24, 20,
+  18, 16, 14, and 12px for H1-H6.
+- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
+  `npm --prefix xmlui run check:metadata` passes;
+  `npm --workspace xmlui run test:e2e -- src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts --workers=1`
+  passes 136/136 unchanged; the migrated component side-by-side run
+  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts --workers=1`
+  passes 841/847 with 6 skips unchanged.
+
+### Stack Family and SpaceFiller, 2026-06-28
+
+- `StackReact.tsx`, `Stack.module.scss`, and `Stack.defaults.ts` were restored
+  from the old source. The copied React file only changes imports: the old
+  `ThemedScroller` dependency is bridged to the rewrite `ScrollViewerReact`,
+  and old shared hook/type imports resolve through small compatibility shims.
+- The Stack renderer bridge now preserves the old family shape for `Stack`,
+  `HStack`, `VStack`, `CHStack`, and `CVStack`: theme/root classes are bridged
+  through `classes[COMPONENT_PART_KEY]`, click/context menu/mounted events are
+  only passed when declared, component APIs are registered, and shortcut
+  components force their own orientation/alignment regardless of an author
+  supplied `orientation` prop.
+- Stack exposed a renderer-pipeline compatibility gap: the rewrite layout
+  resolver treats any prop named `orientation` as a generic layout prop and
+  injects `display:flex` plus `flexDirection` into root style. Old Stack owns
+  orientation in component classes. The Stack boundary now strips generated
+  `display`/`flexDirection` root styles so copied Stack classes control layout.
+  This is a reusable warning for future source-preserved components with props
+  that overlap generic layout names.
+- The bridge carries forward the old Stack parent-layout behavior directly in
+  the renderer: horizontal wrapping uses `FlowLayout`, `SpaceFiller` becomes a
+  flow item break in wrapped stacks, explicit `itemWidth` wraps direct children,
+  star item widths map to flex factors, and `dock` values render the old
+  top/bottom/left/right/stretch layout shape.
+- The current renderer adapter does not expose the old `layoutContext`
+  `wrapChild`/`ignoreLayoutProps` protocol. For Stack, the bridge emulates the
+  needed direct-child cases locally and keeps a conservative nonvisual/opaque
+  skip list. This should be revisited if future complex containers need the
+  same parent-child contract.
+- `SpaceFillerReact.tsx` and `SpaceFiller.module.scss` were restored from the
+  old source and added to this approval unit because it is a Stack layout
+  primitive. Its renderer ignores layout props, bridges the theme class through
+  `classes[COMPONENT_PART_KEY]`, and keeps the old default test id behavior.
+- A user Stack sample with `<VStack>` as the document root exposed a
+  compiler-pipeline false positive. The old XMLUI parser allows any ordinary
+  component as the application root; only `<Component>` is special because it
+  declares a reusable component and still requires `name`. The rewrite parser,
+  raw parser, and IR validator had incorrectly required app roots to be
+  `<App>`. They now preserve non-`Component` roots as app documents, and the
+  compatibility tests cover both semantic and raw parsing plus IR validation
+  for a `<VStack>` app root.
+- The same sample exposed that Stack must use the old internal
+  `ThemedScroller` contract, not the public `ScrollViewer` wrapper. Public
+  `ScrollViewer` intentionally fills its parent with `height: 100%`; using it
+  inside source-preserved Stack made auto-height horizontal Stack rows stretch
+  vertically when nested under a root `VStack`. `ScrollViewerReact` now exposes
+  a small `ThemedScroller` shim whose normal-scroll path is just the Stack root
+  div, matching the old source, while public `ScrollViewer` keeps its
+  fill-parent behavior. A new Stack regression spec covers the reported
+  `<VStack>` app-root markup without changing the original migrated E2E files.
+- The follow-up check of the same markup exposed a second bridge mismatch:
+  metadata default values are documentation/prop defaults, but old Stack React
+  only receives `horizontalAlignment` and `verticalAlignment` when the author
+  supplies them or when a shortcut component fixes them. The rewrite bridge had
+  forwarded `"start"` for both omitted props, which added `align-items:
+  flex-start` to a plain root `VStack` and prevented its child horizontal
+  Stacks from stretching to the full width. The bridge now forwards alignment
+  props only when authored or fixed by `CHStack`/`CVStack`, preserving old
+  flexbox stretch behavior. The Stack regression spec now checks both row
+  height and full-row width.
+- A later `verticalAlignment="end"` sample on default vertical `Stack` exposed
+  another renderer-pipeline overlap. The generic layout resolver computed
+  inline `alignItems: flex-end` from `verticalAlignment` before the copied
+  Stack classes handled the prop with the old axis semantics. The inline style
+  moved the child to the right while the source-preserved class correctly moved
+  it to the bottom. The Stack boundary now removes generated inline
+  `alignItems`/`justifyContent` when XMLUI `horizontalAlignment` or
+  `verticalAlignment` props are authored, while still preserving explicit CSS
+  `alignItems` and `justifyContent` props. This reinforces the migration rule:
+  props owned by copied component CSS must be kept out of generic inline layout
+  style unless the old runtime did the same.
+- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
+  `npm --prefix xmlui run check:metadata` passes;
+  `npm --prefix xmlui exec vitest run tests/compiler/parser/compatibility.test.ts tests/compiler/rawXmlui.test.ts tests/compiler/ir.test.ts tests/compiler/codegen.test.ts tests/compiler/renderingPipeline.test.ts`
+  passes 56/56;
+  `npm --workspace xmlui run test:e2e -- src/components/Stack/Stack-regression.spec.ts src/components/Stack/Stack.spec.ts src/components/Stack/HStack.spec.ts src/components/Stack/VStack.spec.ts src/components/Stack/CHStack.spec.ts src/components/Stack/CVStack.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts --workers=1`
+  passes 17/100 with 83 skips unchanged; the migrated component side-by-side run
+  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts src/components/Stack/Stack-regression.spec.ts src/components/Stack/Stack.spec.ts src/components/Stack/HStack.spec.ts src/components/Stack/VStack.spec.ts src/components/Stack/CHStack.spec.ts src/components/Stack/CVStack.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts --workers=1`
+  passes 858/947 with 89 skips unchanged.
+
+### NoResult, 2026-06-28
+
+- `NoResultReact.tsx` and `NoResult.module.scss` were restored to the old
+  source shape: the component uses the approved source-preserved `ThemedIcon`
+  dependency instead of the rewrite's hand-made inline SVG, and the stylesheet
+  again uses the old shared border/padding theme mixins.
+- The renderer boundary preserves the old label fallback order: explicit
+  `label`, rendered children, then `"No results found"`. It also bridges the
+  old `classes[COMPONENT_PART_KEY]` root class contract and keeps the default
+  test id behavior required by the existing local driver.
+- The focused local E2E suite probes the icon through
+  `data-xmlui-part="icon"`. The old `NoResult` source did not add that marker,
+  but the rewrite suite already depends on it; the migration keeps the old
+  `ThemedIcon` rendering and adds only that compatibility attribute.
+- NoResult exposed a metadata-build edge: importing
+  `NoResult.module.scss?xmlui-theme-vars` failed while bundling the Vite config.
+  Metadata now declares the same composed border/padding/icon/background theme
+  var names explicitly, while the runtime SCSS remains source-preserved.
+- The user confirmed `NoResult` as complete after focused tests and visual
+  checks. Future agents should treat the source-preserved React/SCSS, renderer
+  label fallback bridge, and local icon part marker as accepted compatibility
+  behavior for this pass.
+- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
+  `npm --prefix xmlui run check:metadata` passes;
+  `npm --workspace xmlui run test:e2e -- src/components/NoResult/NoResult.spec.ts --workers=1`
+  passes 3/3; the migrated component side-by-side run
+  `npm --workspace xmlui run test:e2e -- src/components/ProgressBar/ProgressBar.spec.ts src/components/Avatar/Avatar.spec.ts src/components/Badge/Badge.spec.ts src/components/Br/Br.spec.ts src/components/Icon/Icon.spec.ts src/components/Button/Button.spec.ts src/components/Button/Button-style.spec.ts src/components/Checkbox/Checkbox.spec.ts src/components/Switch/Switch.spec.ts src/components/Text/Text.spec.ts src/components/Heading/Heading.spec.ts src/components/Heading/HeadingShortcuts.spec.ts src/components/Heading/Heading-style.spec.ts src/components/Stack/Stack-regression.spec.ts src/components/Stack/Stack.spec.ts src/components/Stack/HStack.spec.ts src/components/Stack/VStack.spec.ts src/components/Stack/CHStack.spec.ts src/components/Stack/CVStack.spec.ts src/components/SpaceFiller/SpaceFiller.spec.ts src/components/NoResult/NoResult.spec.ts --workers=1`
+  passes 861/950 with 89 skips unchanged.
+
+### FlowLayout, 2026-06-28
+
+- `FlowLayoutReact.tsx`, `FlowLayout.module.scss`, and
+  `flow-layout-utils.ts` are being restored from the old XMLUI project with
+  import-path-only adaptations where the rewrite uses different module names.
+- The copied React implementation depends on shared rendering-pipeline helpers
+  that were not present in the rewrite yet: CSS size normalization, star-size
+  layout resolution, responsive layout-property parsing, dynamic media-query
+  class injection, and the old media breakpoint type names. These helpers are
+  compatibility support for old component source, not FlowLayout-specific
+  visual rewrites.
+- The current renderer adapter can pass static child width/minWidth/maxWidth
+  props to the flow item wrapper and strip them from the child render, matching
+  the old wrapper ownership model. Dynamic responsive child bindings such as
+  `width-md="{expr}"` may need an adapter-level evaluated child-prop hook if a
+  regression appears during FlowLayout testing.
+- `FlowLayout.tsx` must stay metadata-only. Re-exporting the runtime
+  `FlowItemWrapper` from that metadata file caused Vite config bundling to parse
+  SCSS modules as JavaScript. Public extension-authoring exports already import
+  the runtime pieces directly from `FlowLayoutReact.tsx`.
+- The old source's nested scroller plus inner flex container conflicted with
+  the rewrite's current `FlowLayout.foundation.spec.ts`, which expects the
+  `testId` element itself to be the flex container and scroll root. The migrated
+  React file therefore keeps the old FlowItemWrapper/responsive sizing logic
+  but lets the scroller/root also be the flex container and uses native flex
+  `columnGap`/`rowGap` instead of the old padding-plus-negative-margin gap
+  bridge. This is a deliberate side-by-side test compatibility adaptation.
+- A visual check with `columnGap="$space-8"` and four `25%` items per row
+  exposed a bridge issue created by the native-gap adaptation: theme token gaps
+  must be converted to CSS variables at the renderer boundary, resolved against
+  the actual FlowLayout DOM element for sizing math, and percentage item
+  `flex-basis` must be gap-compensated. Otherwise the old visual contract
+  either loses visible gaps or wraps the fourth 25% item to the next row.
+- Verification: `npx tsc -p xmlui/tsconfig.build.json --noEmit` passes;
+  `npm --prefix xmlui run check:metadata` passes; focused FlowLayout run
+  `npm --workspace xmlui run test:e2e -- src/components/FlowLayout/FlowLayout.spec.ts src/components/FlowLayout/FlowLayout.foundation.spec.ts --workers=1`
+  passes 56/81 with 25 existing skips; the migrated component side-by-side run
+  including FlowLayout passes 917/1031 with 114 existing skips.
+
 ## Pilot Sequence
 
 | Step | Target | Why This Target | Dependency Gate | Completion Gate |
@@ -622,6 +810,10 @@ the next approved component should be the smallest missing prerequisite, not
 `Table` itself.
 
 ## Migration Status
+
+Complexity values include `Derived` for shortcut components that are migrated
+and verified with their source-preserved base component but should still appear
+as explicit status rows.
 
 Status values:
 
@@ -665,14 +857,20 @@ Status values:
 | `Fallback` | More difficult | 0 | none | runtime error/fallback | Not started | Verify through runtime scenarios. |
 | `FileInput` | Complex | 1 | `FileInput.module.scss` | Button, FormItem, Icon, TextBox | Not started | Wait for Button/TextBox/FormItem. |
 | `FileUploadDropZone` | More difficult | 1 | `FileUploadDropZone.module.scss` | Icon, component utils | Not started | Browser file/drop semantics. |
-| `FlowLayout` | Complex | 1 | `FlowLayout.module.scss` | ScrollViewer | Not started | Existing skipped layout cases; high visual risk. |
+| `FlowLayout` | Complex | 1 | `FlowLayout.module.scss` | ScrollViewer | Awaiting approval | Source-preserved React/SCSS/helper copied from old project with one root/scroller compatibility adaptation for the current foundation test; rendering-pipeline helpers added for old imports; focused FlowLayout run passes 56/81 with 25 skips; side-by-side migrated batch passes 917/1031 with 114 skips. Theme-token gaps are normalized/resolved and percentage `flex-basis` is gap-compensated for the native-gap bridge. Static responsive child width props are bridged; dynamic child responsive bindings remain an open verification risk. |
 | `FocusScope` | More difficult | 1 | none | focus management | Not started | Needs browser focus-specific checks. |
 | `Footer` | More difficult | 1 | `Footer.module.scss` | App | Not started | Old suite currently skipped in rewrite. |
 | `Form` | Complex | 1 | `Form.module.scss` | Button, FormItem, Part, ValidationSummary | Not started | Central prerequisite for inputs. |
 | `FormItem` | Complex | 2 | `FormItem.module.scss`, `HelperText.module.scss` | many form/input components | Not started | Important dependency hub; migrate after minimal inputs are stable or preserve helper APIs. |
 | `FormSegment` | More difficult | 1 | none in old folder | Form | Not started | Form family. |
 | `Fragment` | Simple | 1 | none | metadata helpers | Candidate | Markup/container behavior. |
-| `Heading` | Simple | 2 | `Heading.module.scss` | metadata/container helpers | Candidate | Text/HTML dependency. |
+| `Heading` | Simple | 2 | `Heading.module.scss` | metadata/container helpers | Approved complete | User confirmed Heading/H1-H6 complete; source-preserved React/SCSS restored from old project with import/dependency shims only; H1-H6 shortcuts ride the same renderer bridge; focused unchanged Heading suites pass 136/136; metadata and TypeScript checks pass; side-by-side migrated component run including Heading passes 841/847 with 6 skips. |
+| `H1` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
+| `H2` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
+| `H3` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
+| `H4` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
+| `H5` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
+| `H6` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
 | `HtmlTags` | More difficult | 1 | `HtmlTags.module.scss` | Heading, Link, Text | Not started | After text/link. |
 | `I18n` | More difficult | 0 | none | metadata helpers | Not started | No direct old spec; needs usage fixture. |
 | `IFrame` | Simple | 1 | `IFrame.module.scss` | metadata helpers | Candidate | Browser-sensitive but isolated. |
@@ -697,7 +895,7 @@ Status values:
 | `NavPanel` | Complex | 1 | `NavPanel.module.scss` | App, Logo, Part, ScrollViewer | Not started | Old suite currently skipped. |
 | `NavPanelCollapseButton` | More difficult | 0 | none | App, Button, Icon | Not started | Navigation shell dependency. |
 | `NestedApp` | Complex | 1 | `NestedApp.module.scss` plus helpers | App, Button, ComponentRegistryContext, Icon, Markdown | Not started | Runtime app embedding. |
-| `NoResult` | Simple | 1 | `NoResult.module.scss` | Icon | Not started | After Icon. |
+| `NoResult` | Simple | 1 | `NoResult.module.scss` | Icon | Approved complete | User confirmed NoResult is complete; source-preserved React/SCSS restored from old project; renderer bridges old label fallback, root class, and test id contracts; local icon part marker retained for the existing suite; focused NoResult run passes 3/3; side-by-side migrated component run passes 861/950 with 89 skips. |
 | `NumberBox` | Complex | 1 | `NumberBox.module.scss` | Button, ConciseValidationFeedback, Form, FormItem, Icon, Input, Part | Not started | Input/form dependency. |
 | `Option` | More difficult | 1 | none | container helpers | Prerequisite | Required by Select/Pagination/RadioGroup. |
 | `PageMetaTitle` | Simple | 1 | none | document title | Candidate | Browser metadata behavior. |
@@ -719,10 +917,14 @@ Status values:
 | `SkipLink` | More difficult | 1 | none | focus/navigation | Not started | Accessibility/browser behavior. |
 | `Slider` | More difficult | 1 | `Slider.module.scss` | FormItem, Tooltip | Not started | Input/form dependency. |
 | `Slot` | More difficult | 1 | none | runtime slot projection | Not started | Composition semantics. |
-| `SpaceFiller` | Simple | 1 | `SpaceFiller.module.scss` | metadata helpers | Candidate | Layout primitive. |
+| `SpaceFiller` | Simple | 1 | `SpaceFiller.module.scss` | metadata helpers | Approved complete | User confirmed SpaceFiller works; included with Stack approval unit; source-preserved React/SCSS restored from old project; focused Stack/SpaceFiller run passes 17/100 with 83 skips after the Stack regression spec; side-by-side migrated component run passes 858/947 with 89 skips. |
 | `Spinner` | Simple | 1 | `Spinner.module.scss` | Part | Prerequisite | Required before `Table`, `List`. |
 | `Splitter` | Complex | 3 | `Splitter.module.scss` | Part | Not started | Pointer/layout behavior. |
-| `Stack` | Complex | 5 | `Stack.module.scss` | FlowLayout, ScrollViewer | Not started | Old suite currently skipped; layout hub. |
+| `Stack` | Complex | 5 | `Stack.module.scss` | FlowLayout, ScrollViewer, SpaceFiller | Approved complete | User confirmed Stack and all derived components are complete; source-preserved Stack React/SCSS/defaults restored from old project; renderer carries old wrapContent, itemWidth, API, dock-layout behavior, component-root app documents, internal ThemedScroller contract, and copied-class ownership of alignment props; focused Stack/SpaceFiller run passes 17/100 with 83 skips; side-by-side migrated component run passes 858/947 with 89 skips. |
+| `HStack` | Derived | 0 | `Stack.module.scss` | Stack | Approved complete | Shortcut component completed with Stack; uses the same source-preserved Stack React/SCSS and fixed horizontal orientation bridge. |
+| `VStack` | Derived | 0 | `Stack.module.scss` | Stack | Approved complete | Shortcut component completed with Stack; uses the same source-preserved Stack React/SCSS and fixed vertical orientation bridge. |
+| `CHStack` | Derived | 0 | `Stack.module.scss` | Stack | Approved complete | Centered horizontal shortcut completed with Stack; uses the same source-preserved Stack React/SCSS and fixed orientation/alignment bridge. |
+| `CVStack` | Derived | 0 | `Stack.module.scss` | Stack | Approved complete | Centered vertical shortcut completed with Stack; uses the same source-preserved Stack React/SCSS and fixed orientation/alignment bridge. |
 | `Stepper` | Complex | 1 | `Stepper.module.scss` | Icon | Not started | Stateful multi-step component. |
 | `StepperForm` | Complex | 1 | none old / module in rewrite | Form | Not started | Form plus Stepper. |
 | `StickyBox` | More difficult | 0 | `StickyBox.module.scss` | metadata helpers | Not started | Verify through layout/browser. |
@@ -732,7 +934,7 @@ Status values:
 | `TableOfContents` | Complex | 1 | `TableOfContents.module.scss` | App, ScrollViewer | Not started | Page heading/index behavior. |
 | `Tabs` | Complex | 1 | `Tabs.module.scss` | Form, container helpers | Not started | Old suite currently skipped. |
 | `TabsForm` | Complex | 1 | none | Form | Not started | Form plus Tabs. |
-| `Text` | Simple | 1 | `Text.module.scss` | abstractions/metadata, Icon, Stack | Awaiting approval | Source-preserved React/SCSS/defaults restored from old project with import/dependency shims only; renderer bridges old classes contract, old `asDisplayText` value rendering, value fallback, variant props, contextMenu, overflow, and component API; breakMode visual overlap fixed through the shared vertical Stack no-shrink default; focused unchanged Text suite passes 140/140; metadata and TypeScript checks pass; side-by-side migrated component run passes 705/711 with 6 skips. Awaiting user approval before next component. |
+| `Text` | Simple | 1 | `Text.module.scss` | abstractions/metadata, Icon, Stack | Approved complete | User confirmed Text is complete; source-preserved React/SCSS/defaults restored from old project with import/dependency shims only; renderer bridges old classes contract, old `asDisplayText` value rendering, value fallback, variant props, contextMenu, overflow, and component API; breakMode visual overlap fixed through the shared vertical Stack no-shrink default; focused unchanged Text suite passes 140/140; metadata and TypeScript checks pass; side-by-side migrated component run including Heading now passes 841/847 with 6 skips. |
 | `TextArea` | Complex | 1 | `TextArea.module.scss` | ConciseValidationFeedback, Form, FormItem, Part | Not started | Input/form dependency. |
 | `TextBox` | Complex | 1 | `TextBox.module.scss` | ConciseValidationFeedback, Form, FormItem, Input, Part | Not started | Good post-Button form/input target. |
 | `Theme` | Complex | 1 | `Theme.module.scss` | App, ComponentRegistryContext | Not started | Global theming behavior. |
@@ -795,7 +997,6 @@ Status values:
 
 ## Immediate Next Action
 
-Stop here for user approval of `Text`. If approved, choose the next prerequisite
-before `Table` rather than starting `Table` blindly; likely smallest candidates
-are `Column`, `Part`, `Spinner`, or `Pagination`, depending on which dependency
-is most useful to validate next.
+Stop here for user approval of `FlowLayout` after the focused E2E suite and
+visual checks pass. After approval, choose the next component based on
+dependency order and user direction.

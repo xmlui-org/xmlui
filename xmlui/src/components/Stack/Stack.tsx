@@ -1,14 +1,35 @@
-import type { CSSProperties } from "react";
+import React, { type CSSProperties, type ReactNode } from "react";
 
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import { extractScssThemeVars } from "../../styling/theme";
-import { createMetadata, dClick, dContextMenu } from "../../component-core/metadata/helpers";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { createMetadata, dClick, dContextMenu } from "../../component-core/metadata/helpers";
+import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+import { nonPropertyChildren, wrapComponent } from "../../runtime/rendering/adapter";
+import type { XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { COMPONENT_PART_KEY } from "../../styling";
+import { extractScssThemeVars } from "../../styling/theme";
+import { FlowItemBreak, FlowItemWrapper, FlowLayout } from "../FlowLayout/FlowLayoutReact";
+import { defaultProps as flowLayoutDefaultProps } from "../FlowLayout/FlowLayout.defaults";
 import { Stack } from "./StackReact";
+import { DEFAULT_ORIENTATION, defaultProps } from "./Stack.defaults";
 import stackStylesSource from "./Stack.module.scss?xmlui-theme-vars";
-import { defaultProps } from "./Stack.defaults";
 
 const COMP = "Stack";
+
+const alignmentOptionValues = ["start", "center", "end", "stretch"];
+
+const HORIZONTAL_ALIGNMENT = {
+  description: "Manages the horizontal content alignment for each child element in the Stack.",
+  availableValues: alignmentOptionValues,
+  valueType: "string",
+  defaultValue: "start",
+} as const;
+
+const VERTICAL_ALIGNMENT = {
+  description: "Manages the vertical content alignment for each child element in the Stack.",
+  availableValues: [...alignmentOptionValues, "baseline"],
+  valueType: "string",
+  defaultValue: "start",
+} as const;
 
 const stackProps = {
   desktopOnly: {
@@ -28,29 +49,20 @@ const stackProps = {
     defaultValue: defaultProps.reverse,
   },
   wrapContent: {
-    description: "Optional boolean which wraps horizontal Stack content when the available space is not large enough.",
+    description:
+      "Optional boolean which wraps the content if set to true and the available space is not big enough.",
     valueType: "boolean",
     defaultValue: false,
   },
   orientation: {
-    description: "An optional property that governs whether the Stack lays out its children in a row or a column.",
+    description: "An optional property that governs the Stack's orientation.",
     availableValues: ["horizontal", "vertical"],
     isStrictEnum: true,
     valueType: "string",
     defaultValue: defaultProps.orientation,
   },
-  horizontalAlignment: {
-    description: "Manages the horizontal content alignment for each child element in the Stack.",
-    availableValues: ["start", "center", "end", "stretch"],
-    valueType: "string",
-    defaultValue: "start",
-  },
-  verticalAlignment: {
-    description: "Manages the vertical content alignment for each child element in the Stack.",
-    availableValues: ["start", "center", "end", "stretch", "baseline"],
-    valueType: "string",
-    defaultValue: "start",
-  },
+  horizontalAlignment: HORIZONTAL_ALIGNMENT,
+  verticalAlignment: VERTICAL_ALIGNMENT,
   hoverContainer: {
     description: "Reserved for future use.",
     valueType: "boolean",
@@ -64,7 +76,7 @@ const stackProps = {
     defaultValue: defaultProps.visibleOnHover,
   },
   scrollStyle: {
-    description: "Determines the scrollbar style.",
+    description: "This property determines the scrollbar style.",
     valueType: "string",
     availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
     isStrictEnum: true,
@@ -80,7 +92,7 @@ const stackProps = {
     valueType: "string",
   },
   dock: {
-    description: "When set on a child of a Stack, activates DockPanel-style layout in the parent Stack.",
+    description: "When set on a child of a Stack, activates DockPanel layout in the parent Stack.",
     availableValues: ["top", "bottom", "left", "right", "stretch"],
     isStrictEnum: true,
     valueType: "string",
@@ -134,26 +146,30 @@ export const VStackMd = {
   ...StackMd,
   specializedFrom: COMP,
   description: "This component represents a stack rendering its contents vertically.",
+  props: specializedStackProps(),
 };
 
 export const HStackMd = {
   ...StackMd,
   specializedFrom: COMP,
   description: "This component represents a stack rendering its contents horizontally.",
+  props: specializedStackProps(),
 };
 
 export const CVStackMd = {
   ...StackMd,
   specializedFrom: COMP,
   description:
-    "This component represents a stack rendering its contents vertically and aligning it in the center along both axes.",
+    "This component represents a stack that renders its contents vertically and aligns that in the center along both axes.",
+  props: specializedStackProps(),
 };
 
 export const CHStackMd = {
   ...StackMd,
   specializedFrom: COMP,
   description:
-    "This component represents a stack rendering its contents horizontally and aligning it in the center along both axes.",
+    "This component represents a stack that renders its contents horizontally and aligns that in the center along both axes.",
+  props: specializedStackProps(),
 };
 
 export const stackRenderer = createStackRenderer("Stack", StackMd as ComponentMetadata);
@@ -177,7 +193,7 @@ export const cvStackRenderer = createStackRenderer(
 function createStackRenderer(
   name: string,
   metadata: ComponentMetadata,
-  orientation?: string,
+  fixedOrientation?: string,
   fixedHorizontalAlignment?: string,
   fixedVerticalAlignment?: string,
 ) {
@@ -185,36 +201,336 @@ function createStackRenderer(
     name,
     metadata,
     renderer: ({ adapter }) => {
-      const rootAttrs = adapter.rootAttrs();
-      const gap = adapter.stringProp("gap");
-      const style = { ...(rootAttrs.style as CSSProperties | undefined) };
-      if (orientation) {
-        delete style.display;
-        delete style.flexDirection;
-      }
-      return (
-        <Stack
-          {...rootAttrs}
-          style={{
-            ...style,
-            ...(gap ? { "--xmlui-gap-Stack": gap } : undefined),
-          } as CSSProperties}
-          orientation={orientation ?? adapter.stringProp("orientation", defaultProps.orientation)}
-          horizontalAlignment={fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment", "start")}
-          verticalAlignment={fixedVerticalAlignment ?? adapter.stringProp("verticalAlignment", "start")}
-          reverse={adapter.booleanProp("reverse", defaultProps.reverse)}
-          wrapContent={adapter.booleanProp("wrapContent", false)}
-          hoverContainer={adapter.booleanProp("hoverContainer", defaultProps.hoverContainer)}
-          visibleOnHover={adapter.booleanProp("visibleOnHover", defaultProps.visibleOnHover)}
-          desktopOnly={adapter.booleanProp("desktopOnly", defaultProps.desktopOnly)}
-          onClick={() => void adapter.event("click")()}
-          onContextMenu={() => void adapter.event("contextMenu")()}
-          onMount={() => void adapter.event("mounted")()}
-          registerComponentApi={adapter.registerApi}
-        >
-          {adapter.renderChildren()}
-        </Stack>
-      );
+      const orientation = fixedOrientation ?? adapter.stringProp("orientation", DEFAULT_ORIENTATION) ?? DEFAULT_ORIENTATION;
+      const itemWidth = stringSize(adapter.prop("itemWidth")) ??
+        (orientation === "vertical" ? "100%" : "fit-content");
+      const containerStyle =
+        name === "VStack" &&
+        adapter.node.props.width == null &&
+        adapter.node.props.maxWidth == null
+          ? { width: "100%", flexShrink: 1 }
+          : undefined;
+
+      return renderStack({
+        adapter,
+        orientation,
+        horizontalAlignment: fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment"),
+        verticalAlignment: fixedVerticalAlignment ?? adapter.stringProp("verticalAlignment"),
+        itemWidth,
+        wrapContent: adapter.booleanProp("wrapContent", false),
+        containerStyle,
+      });
     },
   });
+}
+
+function renderStack({
+  adapter,
+  orientation,
+  horizontalAlignment,
+  verticalAlignment,
+  itemWidth,
+  wrapContent,
+  containerStyle,
+}: {
+  adapter: XmluiComponentAdapter;
+  orientation: string;
+  horizontalAlignment?: string;
+  verticalAlignment?: string;
+  itemWidth: string;
+  wrapContent?: boolean;
+  containerStyle?: CSSProperties;
+}) {
+  const children = nonPropertyChildren(adapter.node.children);
+  if (children.some((child) => child.kind === "element" && child.props.dock != null)) {
+    return renderDockLayout({ adapter, children, containerStyle });
+  }
+  if (orientation === "horizontal" && wrapContent) {
+    return renderWrappedHorizontalStack({ adapter, children, itemWidth, verticalAlignment, containerStyle });
+  }
+
+  const hasExplicitItemWidth = adapter.node.props.itemWidth != null;
+  return (
+    <StackShell
+      adapter={adapter}
+      orientation={orientation}
+      horizontalAlignment={horizontalAlignment}
+      verticalAlignment={verticalAlignment}
+      containerStyle={containerStyle}
+    >
+      {hasExplicitItemWidth
+        ? children.map((child, index) => wrapItemWidth(adapter, child, itemWidth, index))
+        : adapter.context.renderChildren(children, adapter.scope)}
+    </StackShell>
+  );
+}
+
+function renderDockLayout({
+  adapter,
+  children,
+  containerStyle,
+}: {
+  adapter: XmluiComponentAdapter;
+  children: XmluiNode[];
+  containerStyle?: CSSProperties;
+}) {
+  const top: XmluiNode[] = [];
+  const bottom: XmluiNode[] = [];
+  const left: XmluiNode[] = [];
+  const right: XmluiNode[] = [];
+  const middle: XmluiNode[] = [];
+  for (const child of children) {
+    const dock = child.kind === "element" ? child.props.dock : undefined;
+    if (dock === "top") top.push(child);
+    else if (dock === "bottom") bottom.push(child);
+    else if (dock === "left") left.push(child);
+    else if (dock === "right") right.push(child);
+    else middle.push(child);
+  }
+  const needsMiddleRow = middle.length > 0 || left.length > 0 || right.length > 0 || bottom.length > 0;
+
+  return (
+    <StackShell adapter={adapter} orientation="vertical" containerStyle={containerStyle}>
+      {top.map((child, index) => (
+        <div key={`top-${index}`} style={{ flexShrink: 0, width: "100%", minWidth: 0 }}>
+          {adapter.context.renderChildren([child], adapter.scope)}
+        </div>
+      ))}
+      {needsMiddleRow ? (
+        <div style={{ display: "flex", flexDirection: "row", flex: 1, minHeight: 0, minWidth: 0 }}>
+          {left.map((child, index) => (
+            <div key={`left-${index}`} style={{ flexShrink: 0, alignSelf: "stretch", display: "grid", width: childWidth(child) }}>
+              {adapter.context.renderChildren([stripLayoutProps(child, ["width", "minWidth", "maxWidth"])], adapter.scope)}
+            </div>
+          ))}
+          {middle.map((child, index) => {
+            const isStretch = child.kind === "element" && child.props.dock === "stretch";
+            return (
+              <div
+                key={`middle-${index}`}
+                style={isStretch ? { flex: 1, minWidth: 0, minHeight: 0, display: "grid" } : { flexShrink: 0 }}
+              >
+                {adapter.context.renderChildren([
+                  isStretch
+                    ? stripLayoutProps(child, ["width", "minWidth", "maxWidth", "height", "minHeight", "maxHeight"])
+                    : child,
+                ], adapter.scope)}
+              </div>
+            );
+          })}
+          {right.slice().reverse().map((child, index) => (
+            <div key={`right-${index}`} style={{ flexShrink: 0, alignSelf: "stretch", display: "grid", width: childWidth(child) }}>
+              {adapter.context.renderChildren([stripLayoutProps(child, ["width", "minWidth", "maxWidth"])], adapter.scope)}
+            </div>
+          ))}
+        </div>
+      ) : undefined}
+      {bottom.slice().reverse().map((child, index) => (
+        <div key={`bottom-${index}`} style={{ flexShrink: 0, width: "100%", minWidth: 0 }}>
+          {adapter.context.renderChildren([child], adapter.scope)}
+        </div>
+      ))}
+    </StackShell>
+  );
+}
+
+function renderWrappedHorizontalStack({
+  adapter,
+  children,
+  itemWidth,
+  verticalAlignment,
+  containerStyle,
+}: {
+  adapter: XmluiComponentAdapter;
+  children: XmluiNode[];
+  itemWidth: string;
+  verticalAlignment?: string;
+  containerStyle?: CSSProperties;
+}) {
+  const gap = adapter.stringProp("gap");
+  const rootAttrs = stackRootAttrs(adapter, containerStyle);
+  return (
+    <FlowLayout
+      {...rootAttrs.attrs}
+      style={rootAttrs.style}
+      className={rootAttrs.className}
+      columnGap={gap ?? "var(--xmlui-gap-Stack, var(--xmlui-gap-layout, 0px))"}
+      rowGap={gap ?? "var(--xmlui-gap-Stack, var(--xmlui-gap-layout, 0px))"}
+      itemWidth={itemWidth || flowLayoutDefaultProps.itemWidth}
+      verticalAlignment={verticalAlignment || "start"}
+      onContextMenu={eventHandler(adapter, "contextMenu")}
+      registerComponentApi={adapter.registerApi}
+    >
+      {children.map((child, index) =>
+        child.kind === "element" && child.type === "SpaceFiller" ? (
+          <FlowItemBreak key={index} />
+        ) : (
+          <FlowItemWrapper
+            key={index}
+            itemWidth={itemWidth}
+            width={child.kind === "element" ? child.props.width : undefined}
+            minWidth={child.kind === "element" ? child.props.minWidth : undefined}
+            maxWidth={child.kind === "element" ? child.props.maxWidth : undefined}
+          >
+            {adapter.context.renderChildren([
+              stripLayoutProps(child, ["width", "minWidth", "maxWidth"]),
+            ], adapter.scope)}
+          </FlowItemWrapper>
+        ),
+      )}
+    </FlowLayout>
+  );
+}
+
+function StackShell({
+  adapter,
+  orientation,
+  horizontalAlignment,
+  verticalAlignment,
+  containerStyle,
+  children,
+}: {
+  adapter: XmluiComponentAdapter;
+  orientation: string;
+  horizontalAlignment?: string;
+  verticalAlignment?: string;
+  containerStyle?: CSSProperties;
+  children: ReactNode;
+}) {
+  const root = stackRootAttrs(adapter, containerStyle);
+  return (
+    <Stack
+      {...root.attrs}
+      className={root.className}
+      classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+      style={root.style}
+      orientation={orientation}
+      horizontalAlignment={horizontalAlignment}
+      verticalAlignment={verticalAlignment}
+      reverse={adapter.booleanProp("reverse", defaultProps.reverse)}
+      hoverContainer={adapter.booleanProp("hoverContainer", defaultProps.hoverContainer)}
+      visibleOnHover={adapter.booleanProp("visibleOnHover", defaultProps.visibleOnHover)}
+      scrollStyle={adapter.stringProp("scrollStyle", defaultProps.scrollStyle) as any}
+      showScrollerFade={adapter.booleanProp("showScrollerFade", defaultProps.showScrollerFade)}
+      desktopOnly={adapter.booleanProp("desktopOnly", defaultProps.desktopOnly)}
+      onClick={eventHandler(adapter, "click")}
+      onContextMenu={eventHandler(adapter, "contextMenu")}
+      onMount={eventHandler(adapter, "mounted")}
+      registerComponentApi={adapter.registerApi}
+    >
+      {children}
+    </Stack>
+  );
+}
+
+function stackRootAttrs(adapter: XmluiComponentAdapter, containerStyle?: CSSProperties) {
+  const { className, style, ...attrs } = adapter.rootAttrs();
+  const gap = adapter.stringProp("gap");
+  const mergedStyle = {
+    ...(style as CSSProperties | undefined),
+    ...containerStyle,
+    ...(gap ? { "--xmlui-gap-Stack": gap } : undefined),
+  } as CSSProperties;
+  delete mergedStyle.display;
+  delete mergedStyle.flexDirection;
+  if (adapter.node.props.horizontalAlignment != null || adapter.node.props.verticalAlignment != null) {
+    delete mergedStyle.alignItems;
+    delete mergedStyle.justifyContent;
+    if (adapter.node.props.alignItems != null) {
+      mergedStyle.alignItems = adapter.prop("alignItems");
+    }
+    if (adapter.node.props.justifyContent != null) {
+      mergedStyle.justifyContent = adapter.prop("justifyContent");
+    }
+  }
+  return {
+    attrs,
+    className: typeof className === "string" ? className : undefined,
+    style: mergedStyle,
+  };
+}
+
+function eventHandler(adapter: XmluiComponentAdapter, name: "click" | "contextMenu" | "mounted") {
+  return Object.prototype.hasOwnProperty.call(adapter.node.events, name)
+    ? (...args: unknown[]) => void adapter.event(name)(...args)
+    : undefined;
+}
+
+function wrapItemWidth(adapter: XmluiComponentAdapter, child: XmluiNode, itemWidth: string, key: number) {
+  if (child.kind === "element" && nonWrappedChildTypes.has(child.type)) {
+    return <React.Fragment key={key}>{adapter.context.renderChildren([child], adapter.scope)}</React.Fragment>;
+  }
+  const style = starSizeRegex.test(itemWidth)
+    ? { flex: getStarSizeNumber(itemWidth), flexShrink: 1 }
+    : { width: itemWidth, flexShrink: 0 };
+  return (
+    <div key={key} style={style}>
+      {adapter.context.renderChildren([child], adapter.scope)}
+    </div>
+  );
+}
+
+function stripLayoutProps(child: XmluiNode, names: string[]): XmluiNode {
+  if (child.kind !== "element") {
+    return child;
+  }
+  const props = { ...child.props };
+  for (const name of names) {
+    delete props[name];
+  }
+  const parsedProps = child.parsed?.props ? { ...child.parsed.props } : undefined;
+  if (parsedProps) {
+    for (const name of names) {
+      delete parsedProps[name];
+    }
+  }
+  return {
+    ...child,
+    props,
+    parsed: child.parsed ? { ...child.parsed, props: parsedProps } : child.parsed,
+  } as XmluiElement;
+}
+
+function childWidth(child: XmluiNode) {
+  return child.kind === "element" ? stringSize(child.props.width) : undefined;
+}
+
+function stringSize(value: unknown): string | undefined {
+  return value == null || value === "" ? undefined : String(value);
+}
+
+const starSizeRegex = /^\d*\*$/;
+
+function getStarSizeNumber(input: string): number {
+  const numberPart = input.slice(0, -1);
+  return numberPart === "" ? 1 : parseInt(numberPart, 10);
+}
+
+const nonWrappedChildTypes = new Set([
+  "APICall",
+  "AppState",
+  "Bookmark",
+  "ChangeListener",
+  "Column",
+  "DataSource",
+  "EventSource",
+  "Fragment",
+  "IncludeMarkup",
+  "Items",
+  "Lifecycle",
+  "MessageListener",
+  "PageMetaTitle",
+  "Part",
+  "Redirect",
+  "RetryPolicy",
+  "SelectionStore",
+  "Slot",
+  "Theme",
+  "Timer",
+  "WebSocket",
+]);
+
+function specializedStackProps() {
+  const { orientation: _orientation, ...props } = stackProps;
+  return props;
 }

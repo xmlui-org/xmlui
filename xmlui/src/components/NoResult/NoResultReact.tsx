@@ -1,50 +1,41 @@
-import { forwardRef, memo, type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
+import { type ForwardedRef, type HTMLAttributes, forwardRef, memo } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./NoResult.defaults";
 import styles from "./NoResult.module.scss";
 
-export type NoResultProps = {
-  label: ReactNode;
+import { ThemedIcon } from "../Icon/Icon";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
+import { defaultProps } from "./NoResult.defaults";
+
+type Props = HTMLAttributes<HTMLDivElement> & {
+  label: string;
   icon?: string;
   hideIcon?: boolean;
-  className?: string;
-  style?: CSSProperties;
-} & HTMLAttributes<HTMLDivElement>;
+  classes?: Record<string, string>;
+};
 
-export const NoResult = memo(forwardRef<HTMLDivElement, NoResultProps>(function NoResult(
+export const NoResult = memo(forwardRef(function NoResult(
   {
     label,
     icon = defaultProps.icon,
     hideIcon = defaultProps.hideIcon,
+    style,
     className,
+    classes,
     ...rest
-  },
-  ref,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
       {...rest}
-      ref={ref}
-      className={[styles.xmluiNoResult, className].filter(Boolean).join(" ")}
+      className={classnames(styles.noResultWrapper, classes?.[COMPONENT_PART_KEY], className)}
+      style={style}
+      ref={forwardedRef}
     >
-      {!hideIcon && <NoResultIcon name={icon} />}
+      {!hideIcon && <ThemedIcon name={icon} className={styles.icon} data-xmlui-part="icon" />}
       {label}
     </div>
   );
 }));
-
-function NoResultIcon({ name }: { name: string }) {
-  return (
-    <svg
-      className={styles.xmluiNoResultIcon}
-      data-xmlui-part="icon"
-      data-icon={name}
-      viewBox="0 0 64 64"
-      aria-hidden="true"
-    >
-      <circle cx="28" cy="28" r="18" fill="none" stroke="currentColor" strokeWidth="4" opacity="0.55" />
-      <path d="M42 42l12 12" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
-      <path d="M20 28h16" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.55" />
-    </svg>
-  );
-}

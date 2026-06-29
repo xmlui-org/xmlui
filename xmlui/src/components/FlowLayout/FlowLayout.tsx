@@ -77,4 +77,3 @@ export const FlowLayoutMd = createMetadata({
     [`rowGap-${COMP}`]: `$gap-${COMP}`,
   },
 });
-
