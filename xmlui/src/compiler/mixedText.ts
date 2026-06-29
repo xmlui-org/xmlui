@@ -12,23 +12,33 @@ export function parseMixedTextSegments(
 ): MixedTextSegment[] {
   const segments: MixedTextSegment[] = [];
   let cursor = 0;
+  let literalStart = 0;
+  let literalRangeStart = 0;
+  let literalValue = "";
 
   while (cursor < value.length) {
-    const open = value.indexOf("{", cursor);
-    if (open < 0) {
-      pushLiteral(segments, value.slice(cursor), offsetRange(range, cursor, value.length));
-      break;
+    if (value[cursor] === "\\" && isEscapableMixedTextBrace(value[cursor + 1])) {
+      literalValue += value.slice(literalStart, cursor) + value[cursor + 1];
+      cursor += 2;
+      literalStart = cursor;
+      continue;
     }
 
-    if (open > cursor) {
-      pushLiteral(segments, value.slice(cursor, open), offsetRange(range, cursor, open));
+    if (value[cursor] !== "{") {
+      cursor++;
+      continue;
     }
 
+    const open = cursor;
     const close = value.indexOf("}", open + 1);
     if (close < 0) {
-      pushLiteral(segments, value.slice(open), offsetRange(range, open, value.length));
+      literalValue += value.slice(literalStart);
+      pushLiteral(segments, literalValue, offsetRange(range, literalRangeStart, value.length));
       break;
     }
+
+    literalValue += value.slice(literalStart, open);
+    pushLiteral(segments, literalValue, offsetRange(range, literalRangeStart, open));
 
     const source = value.slice(open + 1, close).trim();
     const expressionStart = open + 1 + leadingWhitespace(value.slice(open + 1, close));
@@ -53,6 +63,14 @@ export function parseMixedTextSegments(
       ast: parsed.node,
     });
     cursor = close + 1;
+    literalStart = cursor;
+    literalRangeStart = cursor;
+    literalValue = "";
+  }
+
+  if (literalStart < value.length && cursor >= value.length) {
+    literalValue += value.slice(literalStart);
+    pushLiteral(segments, literalValue, offsetRange(range, literalRangeStart, value.length));
   }
 
   return segments;
@@ -86,4 +104,8 @@ function offsetRange(range: SourceRange, start: number, end: number): SourceRang
 
 function leadingWhitespace(value: string): number {
   return value.length - value.trimStart().length;
+}
+
+function isEscapableMixedTextBrace(value: string | undefined): value is "{" | "}" {
+  return value === "{" || value === "}";
 }

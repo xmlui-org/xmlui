@@ -1630,7 +1630,8 @@ function isBuiltInReferenceName(name: string): boolean {
     name === "getDate" ||
     name === "confirm" ||
     name === "Symbol" ||
-    name === "BigInt";
+    name === "BigInt" ||
+    name === "window";
 }
 
 function resolveParentLocal(scope: XmluiScope, name: string): XmluiBinding | undefined {

@@ -37,6 +37,10 @@ export const IFrameMd = createMetadata({
       description: "Name for targeting links and forms.",
       valueType: "string",
     },
+    title: {
+      description: "Provides an accessible title for the iframe.",
+      valueType: "string",
+    },
     referrerPolicy: {
       description: "Controls referrer information sent when loading iframe content.",
       valueType: "string",

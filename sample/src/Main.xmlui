@@ -1,9 +1,9 @@
 <App>
-  <Card maxWidth="300px" onDoubleClick="toast('Double-clicked!')">
-    <HStack verticalAlignment="center">
-      <Icon name="info" />
-      <Text value="Double-click me" variant="strong" />
-    </HStack>
-    <Text value="This is an example text" />
-  </Card>
+  <Stack height="280px" width="400px">
+    <Image
+      src="https://i.pravatar.cc/100"
+      fit="cover"
+      onClick="toast('Image clicked')"
+    />
+  </Stack>
 </App>

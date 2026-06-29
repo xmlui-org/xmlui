@@ -162,6 +162,10 @@ details belong in per-component .ai notes and the status table.
   metadata/renderer boundary when the old React file assumes already-normalized
   props. Examples include ProgressBar value clamping, Button `left/right` icon
   aliases, and display-text conversion for Text/Heading values.
+- When copied React props are narrower than the old `wrapComponent` boundary,
+  keep arbitrary root prop forwarding and permissive runtime values in the
+  renderer adapter instead of widening protected source. IFrame exposes this
+  with DOM `id` forwarding and invalid-but-runtime-forwarded `referrerPolicy`.
 - Do not blindly pass metadata defaults into copied React components. Some old
   components distinguish omitted props from explicit defaults, especially layout
   alignment, controlled/uncontrolled values, and app/global fallback behavior.
@@ -172,6 +176,14 @@ details belong in per-component .ai notes and the status table.
   layering wrapper-owned dynamic style. The rewrite currently carries many
   theme CSS variables through inline style, while old XMLUI often carried them
   through classes; dropping child style can silently strip variant/theme
+- Inline old leaf components can be blockified by the rewrite testbed/App flex
+  boundary before their own `display: inline` style is observed. Preserve the
+  copied React/SCSS source and bridge this with a renderer-owned inline wrapper
+  when old behavior requires the leaf element itself to compute as inline.
+- Old wrapper layers sometimes normalized resource props before protected React
+  source saw them. Preserve that at the renderer boundary; Image `data` resource
+  URLs are fetched to `Blob` values so the copied React file can keep its old
+  Blob-only `imageData` contract.
   variables from animated or otherwise wrapped components.
 - Keep copied component-owned props out of generic inline layout style when the
   old component CSS owns them. Props such as `orientation`,
@@ -184,6 +196,10 @@ details belong in per-component .ai notes and the status table.
 - Preserve old `childrenLayoutContext` declarations from metadata. Components
   such as Card rely on this contract so immediate children keep Stack-like flex
   behavior, including non-shrinking explicit sizes that make scrolling real.
+- Preserve old no-shrink defaults for ordinary components at the renderer or
+  shared layout boundary. Source-preserved components such as ContentSeparator
+  can expose this when large explicit sizes are compressed by the rewrite's App
+  testbed flex container; explicit `canShrink` should still be honored.
 
 ### Theming And CSS
 
@@ -309,7 +325,7 @@ Status values:
 | `ColorPicker` | More difficult | 1 | `ColorPicker.module.scss` | FormItem, Part | Not started | Input/form dependency. |
 | `Column` | More difficult | 0 | none | Table context | Prerequisite | Required before `Table`; verify through table specs. |
 | `ConciseValidationFeedback` | More difficult | 0 | `ConciseValidationFeedback.module.scss` | Form, Icon, Tooltip | Prerequisite | Required by input components. |
-| `ContentSeparator` | Simple | 1 | `ContentSeparator.module.scss` | metadata helpers | Candidate | Visual leaf. |
+| `ContentSeparator` | Simple | 1 | `ContentSeparator.module.scss` | metadata helpers | Approved complete | User confirmed ContentSeparator is complete; source-preserved React/SCSS restored from old project; renderer bridges old root class through `classes[COMPONENT_PART_KEY]`, keeps copied prop sizing authoritative, and restores old no-shrink default while honoring explicit `canShrink`. Focused unchanged ContentSeparator suite passes 37/37; TypeScript, metadata, expanded E2E audit, and CSS module audit pass; side-by-side migrated component batch passes 984/1100 with 116 skips. |
 | `ContextMenu` | Complex | 1 | `ContextMenu.module.scss` | DropdownMenu, menu helpers | Not started | Overlay/menu family. |
 | `DataSource` | Complex | 1 | none | runtime data | Not started | Data loading contract. |
 | `DateInput` | Complex | 1 | `DateInput.module.scss` | ConciseValidationFeedback, Form, Icon, Input, Part | Not started | Wait for input/form. |
@@ -327,7 +343,7 @@ Status values:
 | `Form` | Complex | 1 | `Form.module.scss` | Button, FormItem, Part, ValidationSummary | Not started | Central prerequisite for inputs. |
 | `FormItem` | Complex | 2 | `FormItem.module.scss`, `HelperText.module.scss` | many form/input components | Not started | Important dependency hub; migrate after minimal inputs are stable or preserve helper APIs. |
 | `FormSegment` | More difficult | 1 | none in old folder | Form | Not started | Form family. |
-| `Fragment` | Simple | 1 | none | metadata helpers | Candidate | Markup/container behavior. |
+| `Fragment` | Simple | 1 | none | metadata helpers | Approved complete | User confirmed Fragment is complete; renderer/metadata boundary aligned with old source: opaque metadata description restored, children render without a DOM wrapper, array child render results are returned inside a keyed React Fragment using the rewrite IR source range as the stable key. Focused unchanged Fragment suite passes 2/2; TypeScript, metadata, expanded E2E audit, and CSS module audit pass; side-by-side migrated component batch passes 986/1102 with 116 skips. |
 | `Heading` | Simple | 2 | `Heading.module.scss` | metadata/container helpers | Approved complete | User confirmed Heading/H1-H6 complete; source-preserved React/SCSS restored from old project with import/dependency shims only; H1-H6 shortcuts ride the same renderer bridge; focused unchanged Heading suites pass 136/136; metadata and TypeScript checks pass; side-by-side migrated component run including Heading passes 841/847 with 6 skips. |
 | `H1` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
 | `H2` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
@@ -337,9 +353,9 @@ Status values:
 | `H6` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
 | `HtmlTags` | More difficult | 1 | `HtmlTags.module.scss` | Heading, Link, Text | Not started | After text/link. |
 | `I18n` | More difficult | 0 | none | metadata helpers | Not started | No direct old spec; needs usage fixture. |
-| `IFrame` | Simple | 1 | `IFrame.module.scss` | metadata helpers | Candidate | Browser-sensitive but isolated. |
+| `IFrame` | Simple | 1 | `IFrame.module.scss` | metadata helpers | Approved complete | User confirmed IFrame is complete; source-preserved React/SCSS restored from old project; renderer bridges old `classes[COMPONENT_PART_KEY]`, `registerComponentApi`, resource URL handling, string/null normalization, srcdoc entity compatibility, arbitrary root attrs, accessible `title` forwarding, named iframe targeting through `window.open`, escaped-brace `srcdoc` scripts, and permissive `referrerPolicy` forwarding. Focused unchanged IFrame suite passes 56/56; IFrame regressions pass 3/3; TypeScript, metadata, expanded E2E audit, and CSS module audit pass; side-by-side migrated component batch passes 1042/1158 with 116 skips. |
 | `Icon` | Complex | 1 | many icon `.module.scss` files | icon registry/provider | Approved complete | User confirmed Icon is ready; focused unchanged suite passes 44/44; required shared `svg?react`, IconProvider, resource, driver, and testbed isolation fixes. Required by Button/Table and many others. |
-| `Image` | Simple | 1 | `Image.module.scss` | metadata helpers | Candidate | Visual media leaf. |
+| `Image` | Simple | 1 | `Image.module.scss` | metadata helpers | Awaiting approval | Source-preserved React/SCSS and unchanged old E2E spec restored from old project; renderer bridges old root attrs/theme classes, resource URL handling, `data` resource URL fetch-to-Blob, boolean normalization, explicit empty `alt`, authored-only click wiring, and an inline wrapper that prevents rewrite flex-boundary blockification while keeping the copied leaf source authoritative. Only protected-source edit is strict TypeScript normalization of nullable `src` to `undefined` for React's `<img>` type. Focused unchanged Image suite passes 42/42; TypeScript, metadata, expanded E2E audit, and CSS module audit pass. Broad `compatibility:sweep -- --components=ContentSeparator,Fragment,IFrame,Image` was attempted, but the script ignores component filters and failed on unrelated baseline-wide FormItem/Logo/NavPanelCollapseButton/Select/Table/TableOfContents/theming tests after 4577 passed and 496 skipped. |
 | `IncludeMarkup` | Complex | 1 | none | compiler/runtime include | Not started | Async compile boundary. |
 | `Input` | More difficult | 0 | input part SCSS modules | Icon, Text | Prerequisite | Required by TextBox/DateInput/TimeInput. |
 | `InspectButton` | More difficult | 0 | `InspectButton.scss` old / module in rewrite | Button, Icon | Not started | Pair with Inspector. |

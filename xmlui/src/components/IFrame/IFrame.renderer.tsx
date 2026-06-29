@@ -1,26 +1,33 @@
-import type { HTMLAttributeReferrerPolicy } from "react";
+import type { SyntheticEvent } from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { COMPONENT_PART_KEY } from "../../styling";
 import { IFrameMd } from "./IFrame";
 import { IFrame } from "./IFrameReact";
+
+const IFrameComponent = IFrame as any;
 
 export const iframeRenderer = wrapComponent({
   name: "IFrame",
   metadata: IFrameMd as ComponentMetadata,
   renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const className = typeof rootAttrs.className === "string" ? rootAttrs.className : "";
     return (
-      <IFrame
-        {...adapter.rootAttrs()}
+      <IFrameComponent
+        {...rootAttrs}
         id={adapter.stringProp("id")}
         src={adapter.resourceUrl(adapter.prop("src"))}
         srcdoc={normalizeSrcDoc(safeOptionalString(adapter.prop("srcdoc")))}
         allow={safeOptionalString(adapter.prop("allow"))}
         name={safeOptionalString(adapter.prop("name"))}
-        referrerPolicy={safeOptionalString(adapter.prop("referrerPolicy")) as HTMLAttributeReferrerPolicy | undefined}
+        title={safeOptionalString(adapter.prop("title"))}
+        referrerPolicy={safeOptionalString(adapter.prop("referrerPolicy")) as any}
         sandbox={safeOptionalString(adapter.prop("sandbox"))}
-        registerApi={adapter.registerApi}
-        onLoad={(event) => void adapter.event("load")(event)}
+        classes={{ [COMPONENT_PART_KEY]: className }}
+        registerComponentApi={adapter.registerApi}
+        onLoad={(event: SyntheticEvent<HTMLIFrameElement>) => void adapter.event("load")(event)}
       />
     );
   },

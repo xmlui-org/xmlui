@@ -1,52 +1,62 @@
 import { forwardRef, memo, type CSSProperties } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./ContentSeparator.defaults";
 import styles from "./ContentSeparator.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./ContentSeparator.defaults";
 
 export type ContentSeparatorProps = {
-  thickness?: string;
-  length?: string;
+  thickness?: number | string;
+  length?: number | string;
   orientation?: string;
   hasExplicitLength?: boolean;
-  className?: string;
   style?: CSSProperties;
+  classes?: Record<string, string>;
+  className?: string;
 };
 
 export const ContentSeparator = memo(forwardRef<HTMLDivElement, ContentSeparatorProps>(
   (
-    {
-      thickness,
-      length,
-      orientation = defaultProps.orientation,
-      hasExplicitLength = false,
-      className,
-      style,
-      ...rest
-    },
+    { orientation = defaultProps.orientation, thickness, length, hasExplicitLength = false, style, classes, className, ...rest },
     ref,
   ) => {
-    const normalizedOrientation = orientation === "vertical" ? "vertical" : "horizontal";
-    const orientationClass = normalizedOrientation === "vertical"
-      ? styles.contentSeparatorVertical
-      : styles.contentSeparatorHorizontal;
+    // Only apply inline styles if props are explicitly provided
+    const inlineStyles: CSSProperties = {};
+
+    if (thickness !== undefined) {
+      if (orientation === "horizontal") {
+        inlineStyles.height = thickness;
+      } else {
+        inlineStyles.width = thickness;
+      }
+    }
+
+    if (length !== undefined) {
+      if (orientation === "horizontal") {
+        inlineStyles.width = length;
+      } else {
+        inlineStyles.height = length;
+      }
+    }
+
     return (
       <div
         {...rest}
         ref={ref}
-        className={[
-          styles.xmluiContentSeparator,
-          "separator",
-          normalizedOrientation,
-          orientationClass,
-          !hasExplicitLength ? "stretchToFit" : undefined,
-          !hasExplicitLength ? styles.contentSeparatorStretchToFit : undefined,
+        className={classnames(
+          styles.separator,
+          {
+            [styles.horizontal]: orientation === "horizontal",
+            [styles.vertical]: orientation === "vertical",
+            [styles.stretchToFit]: !hasExplicitLength,
+          },
+          classes?.[COMPONENT_PART_KEY],
           className,
-        ].filter(Boolean).join(" ")}
+        )}
         style={{
+          ...inlineStyles,
           ...style,
-          ...(thickness ? { "--xmlui-effective-thickness-ContentSeparator": thickness } : undefined),
-          ...(length ? { "--xmlui-effective-length-ContentSeparator": length } : undefined),
-        } as CSSProperties}
+        }}
       />
     );
   },

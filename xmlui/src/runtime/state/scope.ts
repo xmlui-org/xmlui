@@ -315,6 +315,9 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   if (name === "BigInt") {
     return BigInt;
   }
+  if (name === "window") {
+    return typeof window === "undefined" ? undefined : window;
+  }
   if (name === "Actions") {
     return createActionsReference(scope);
   }
