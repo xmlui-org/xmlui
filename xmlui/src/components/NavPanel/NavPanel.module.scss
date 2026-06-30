@@ -130,6 +130,11 @@ $themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
       justify-content: $horizontalAlignment-logo-NavPanel;
     }
 
+    > img {
+      height: 24px;
+      width: auto;
+    }
+
     &.inDrawer {     //to make room for the close button
       min-height: 32px;
     }

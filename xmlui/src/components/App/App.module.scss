@@ -17,11 +17,180 @@ $maxWidth-content-App: createThemeVar("maxWidth-content-App");
 $maxWidth-content-App--withToc: createThemeVar("maxWidth-content-App--withToc");
 $maxWidth-App: createThemeVar("maxWidth-App");
 $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
+$height-AppHeader: var(--xmlui-height-AppHeader, var(--xmlui-space-14));
+$backgroundColor-Footer: var(
+  --xmlui-backgroundColor-Footer,
+  var(--xmlui-backgroundColor-AppHeader, #fff)
+);
+$verticalFullHeaderHeaderHeight: var(--app-header-height, #{$height-AppHeader});
+$verticalFullHeaderFooterHeight: var(--app-footer-height, 0px);
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 $paddingHorizontal-content-App: createThemeVar("paddingHorizontal-content-App");
 $paddingVertical-content-App: createThemeVar("paddingVertical-content-App");
 $gap-content-App: createThemeVar("gap-content-App");
+
+.appContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+  scroll-padding-block: $scrollPaddingBlockPage;
+}
+
+.appContainer.horizontal {
+  overflow: auto;
+}
+
+.appContainer.horizontal:not(.scrollWholePage) {
+  overflow: hidden;
+  height: 100dvh;
+}
+
+.appContainer.scrollWholePage {
+  scrollbar-gutter: stable both-edges;
+}
+
+.appContainer.scrollWholePage .headerWrapper,
+.appContainer.scrollWholePage .footerWrapper {
+  margin-inline: calc(-1 * var(--scrollbar-width));
+
+  > div {
+    padding-inline: var(--scrollbar-width);
+  }
+}
+
+.appContainer.noScrollbarGutters {
+  scrollbar-gutter: auto;
+}
+
+.appContainer.fitContent {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.appContainer.vertical {
+  flex-direction: row;
+}
+
+.appContainer.verticalFullHeader {
+  flex-direction: column;
+  min-height: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.vertical .mainContentArea {
+  scrollbar-gutter: stable both-edges;
+}
+
+.vertical.noScrollbarGutters .mainContentArea {
+  scrollbar-gutter: auto;
+}
+
+.appContainer.desktop {
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  scrollbar-gutter: auto;
+  max-width: none;
+}
+
+.headerWrapper {
+  z-index: 1;
+  min-height: 0;
+  flex-shrink: 0;
+  overflow-x: clip;
+  top: 0;
+  box-shadow: $boxShadow-header-App;
+  background-color: $backgroundColor-AppHeader;
+}
+
+.headerWrapper.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.navPanelWrapper {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  transition: width 0.2s ease;
+}
+
+.horizontal .navPanelWrapper {
+  border-bottom: $borderBottom-NavPanel;
+  justify-content: end;
+  background-color: $backgroundColor-navPanel-App;
+  padding: 0;
+}
+
+.horizontal.sticky .navPanelWrapper {
+  top: $height-AppHeader;
+}
+
+.vertical .navPanelWrapper {
+  width: $width-navPanel-App;
+  flex-shrink: 0;
+  border-right: $borderRight-navPanelWrapper-App;
+}
+
+.verticalFullHeader .mainContentRow {
+  flex: 1;
+  min-height: calc(100dvh - #{$verticalFullHeaderHeaderHeight} - #{$verticalFullHeaderFooterHeight});
+}
+
+.verticalFullHeader.scrollWholePage .mainContentRow {
+  flex: 0 0 auto;
+  align-items: flex-start;
+}
+
+.verticalFullHeader .mainContentArea {
+  overflow: initial;
+  padding-inline: $paddingHorizontal-content-App;
+}
+
+.verticalFullHeader .navPanelWrapper {
+  width: $width-navPanel-App;
+  min-width: $width-navPanel-App;
+  position: sticky;
+  align-self: flex-start;
+  top: $verticalFullHeaderHeaderHeight;
+  height: calc(100dvh - #{$verticalFullHeaderHeaderHeight} - #{$verticalFullHeaderFooterHeight});
+  border-right: $borderRight-navPanelWrapper-App;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline-end: 0;
+    bottom: 0;
+    width: 50vw;
+    z-index: -1;
+    background-color: $backgroundColor-navPanel-App;
+  }
+}
+
+.navPanelWrapperCollapsed {
+  width: $width-navPanel-collapsed-App;
+  min-width: $width-navPanel-collapsed-App;
+  overflow: hidden;
+}
+
+.mainContentRow {
+  display: flex;
+  flex-direction: row;
+  isolation: isolate;
+  align-self: center;
+  width: 100%;
+  max-width: $maxWidth-App;
+}
 
 .mainContentArea {
   position: relative;
@@ -34,6 +203,24 @@ $gap-content-App: createThemeVar("gap-content-App");
   border-left: $borderLeft-content-App;
 }
 
+.pagesContainer {
+  flex: 1;
+  min-height: initial;
+  isolation: isolate;
+  background-color: $backgroundColor-content-App;
+}
+
+.verticalFullHeader .pagesContainer {
+  overflow: initial;
+  min-height: calc(100dvh - #{$verticalFullHeaderHeaderHeight} - #{$verticalFullHeaderFooterHeight});
+  height: 100%;
+}
+
+.verticalFullHeader.scrollWholePage .pagesContainer {
+  flex: 0 0 auto;
+  height: auto;
+}
+
 .pageContentContainer {
   max-width: $maxWidth-content-App;
   width: 100%;
@@ -41,11 +228,50 @@ $gap-content-App: createThemeVar("gap-content-App");
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  transition: max-width 0.2s ease;
+}
+
+.verticalFullHeader .pageContentContainer {
+  height: 100%;
+}
+
+.verticalFullHeader.scrollWholePage .pageContentContainer {
+  height: auto;
+}
+
+.pageContentContainer.withToc {
+  max-width: $maxWidth-content-App--withToc;
+}
+
+.navPanelWrapperCollapsed ~ .mainContentArea .pageContentContainer {
+  max-width: calc(
+    #{$maxWidth-content-App} + (#{$width-navPanel-App} - #{$width-navPanel-collapsed-App})
+  );
+}
+
+.navPanelWrapperCollapsed ~ .mainContentArea .pageContentContainer.withToc {
+  max-width: calc(
+    #{$maxWidth-content-App--withToc} + (#{$width-navPanel-App} - #{$width-navPanel-collapsed-App})
+  );
+}
+
+.pageContentContainer.withDefaultContentPadding {
   padding-inline-start: $paddingHorizontal-content-App;
   padding-inline-end: $paddingHorizontal-content-App;
   padding-top: $paddingVertical-content-App;
   padding-bottom: $paddingVertical-content-App;
   gap: $gap-content-App;
+}
+
+.footerWrapper {
+  flex-shrink: 0;
+}
+
+.footerWrapper.sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background-color: $backgroundColor-Footer;
 }
 
 :export {

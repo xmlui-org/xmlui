@@ -24,6 +24,8 @@ export const navLinkRenderer = wrapComponent({
     const label = adapter.prop("label");
     const iconName = adapter.stringProp("icon");
     const target = adapter.stringProp("target");
+    const hasLevelProp = Object.prototype.hasOwnProperty.call(adapter.node.props, "level");
+    const hasVerticalProp = Object.prototype.hasOwnProperty.call(adapter.node.props, "vertical");
     const routing = adapter.scope.routing;
     const snapshot = useSyncExternalStore(
       (listener) => routing?.subscribe(listener) ?? (() => undefined),
@@ -57,12 +59,12 @@ export const navLinkRenderer = wrapComponent({
             ? <ThemedIcon name={iconName} className={styles.icon} />
             : undefined}
         iconAlignment={adapter.stringProp("iconAlignment", defaultNavLinkProps.iconAlignment) as "baseline" | "start" | "center" | "end"}
-        level={adapter.numberProp("level", 0)}
+        level={hasLevelProp ? adapter.numberProp("level", 0) : undefined}
         noIndicator={noIndicator}
         role={isNavGroupItem ? "menuitem" : undefined}
         target={target}
         to={to}
-        vertical={adapter.booleanProp("vertical", false)}
+        vertical={hasVerticalProp ? adapter.booleanProp("vertical", false) : undefined}
         onClick={async () => {
           if (enabled && routing && to && !target && !isExternalUrl(to)) {
             routing.navigate(to);

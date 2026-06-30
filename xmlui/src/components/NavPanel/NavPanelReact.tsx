@@ -6,6 +6,7 @@ import { NavPanelCollapseProvider, useNavPanelCollapseContext } from "../NavPane
 import styles from "./NavPanel.module.scss";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppReact";
+import { Logo } from "../Logo/LogoReact";
 
 export type NavPanelProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
@@ -57,8 +58,11 @@ const NavPanelContent = forwardRef<HTMLDivElement, NavPanelProps>(function NavPa
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
   const vertical = appLayoutContext?.layout?.startsWith("vertical");
+  const showLogo = appLayoutContext?.layout === "vertical" ||
+    appLayoutContext?.layout === "vertical-sticky";
   const collapsed = (collapseContext?.collapsed ?? appLayoutContext?.navPanelCollapsed) && vertical;
-  const hasFooter = !!footerContent;
+  const hasFooter = !!footerContent && vertical;
+  const safeLogoContent = logoContent ?? appLayoutContext?.logoContentDef;
 
   return (
     <nav
@@ -79,9 +83,9 @@ const NavPanelContent = forwardRef<HTMLDivElement, NavPanelProps>(function NavPa
       data-xmlui-component="NavPanel"
       ref={ref}
     >
-      {logoContent ? (
+      {showLogo ? (
         <div className={styles.logoWrapper} data-xmlui-part="logo">
-          {logoContent}
+          {safeLogoContent ?? <Logo />}
         </div>
       ) : null}
       <div className={styles.wrapperInner} data-xmlui-part="content">

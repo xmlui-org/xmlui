@@ -5,6 +5,7 @@ import { createRuntimeScope } from "../../runtime/state";
 import { compileRoutePattern, matchRoutePattern, type RouteSnapshot } from "../../runtime/routing";
 import { useStringProp } from "../../runtime/rendering/props";
 import type { XmluiBuiltInRenderer } from "../../runtime/rendering/types";
+import styles from "./Pages.module.scss";
 
 export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) => {
   const fallbackPath = useStringProp(node, scope, "fallbackPath", "");
@@ -40,7 +41,7 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
 
   const pageContent = matched ? (
     <div
-      className="xmlui-page-root"
+      className={`${styles.pageWrapper} xmlui-page-root`}
       data-xmlui-component="Page"
       data-xmlui-part="root"
       data-xmlui-page-url={matched.url}
@@ -75,7 +76,11 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
 };
 
 export const pageRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) => (
-  <div className="xmlui-page-root" data-xmlui-component="Page" data-xmlui-part="root">
+  <div
+    className={`${styles.pageWrapper} xmlui-page-root`}
+    data-xmlui-component="Page"
+    data-xmlui-part="root"
+  >
     {context.renderChildren(node.children, scope)}
   </div>
 );

@@ -61,6 +61,11 @@ export const PagesMd = createMetadata({
       defaultValue: defaultProps.defaultScrollRestoration,
     },
   },
+  themeVars: {
+    "paddingVertical-Pages": "The vertical padding of the page content.",
+    "paddingHorizontal-Pages": "The horizontal padding of the page content.",
+    "gap-Pages": "The gap between page children.",
+  },
   defaultThemeVars: {
     "paddingVertical-Pages": "$space-5",
     "paddingHorizontal-Pages": "$paddingHorizontal-layout",

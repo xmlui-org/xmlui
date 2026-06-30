@@ -151,7 +151,7 @@ export const AppMd = createMetadata({
   },
   themeVars: extractScssThemeVars(appStylesSource),
   limitThemeVarsToComponent: true,
-  themeVarContributorComponents: ["Footer", "Pages"],
+  themeVarContributorComponents: ["AppHeader", "Footer", "NavPanel", "Pages"],
   themeVarDescriptions: {
     "maxWidth-content-App":
       "This theme variable defines the maximum width of the main content. If the main " +
@@ -172,6 +172,7 @@ export const AppMd = createMetadata({
     "width-navPanel-collapsed-App": "48px",
     "borderRight-navPanelWrapper-App": "1px solid $borderColor",
     "backgroundColor-navPanel-App": "$backgroundColor",
+    "height-AppHeader": "$space-14",
     "maxWidth-content-App": "$maxWidth-content",
     "maxWidth-App": "$maxWidth-content",
     "boxShadow-header-App": "none",

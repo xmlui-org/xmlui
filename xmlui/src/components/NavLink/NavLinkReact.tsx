@@ -2,6 +2,7 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, ReactNo
 import { forwardRef } from "react";
 
 import { COMPONENT_PART_KEY } from "../../styling";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
 import styles from "./NavLink.module.scss";
 
 export type NavLinkProps = {
@@ -45,6 +46,9 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
     },
     ref,
   ) {
+    const appLayoutContext = useAppLayoutContext();
+    const effectiveLevel = level ?? -1;
+    const effectiveVertical = vertical || appLayoutContext?.layout?.startsWith("vertical") || false;
     const classes = [
       styles.content,
       styles.base,
@@ -53,17 +57,17 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
       active && displayActive && styles.navItemActive,
       displayActive && styles.displayActive,
       active && "xmlui-navlink-active",
-      vertical && styles.vertical,
+      effectiveVertical && styles.vertical,
       disabled && styles.disabled,
-      level === 0 && styles.level1,
-      level === 1 && styles.level2,
-      level === 2 && styles.level3,
-      level === 3 && styles.level4,
+      effectiveLevel === 0 && styles.level1,
+      effectiveLevel === 1 && styles.level2,
+      effectiveLevel === 2 && styles.level3,
+      effectiveLevel === 3 && styles.level4,
       className,
     ].filter(Boolean).join(" ");
     const mergedStyle = {
       ...(style as CSSProperties | undefined),
-      "--nav-link-level": vertical ? (level ?? 0) + 1 : 0,
+      "--nav-link-level": effectiveVertical ? effectiveLevel + 1 : 0,
     } as CSSProperties;
     const innerContent = (
       <span className={[

@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 import { EMPTY_OBJECT } from "../constants";
 
@@ -55,4 +55,45 @@ export function getSizeString(size: unknown): string {
   }
 
   return size?.toString() ?? "";
+}
+
+export const useScrollbarWidth = () => {
+  const [scrollbarWidth, setScrollbarWidth] = useState(15);
+
+  useEffect(() => {
+    function handleResize() {
+      let width = obtainScrollbarWidth();
+      if (window.devicePixelRatio !== Math.round(window.devicePixelRatio)) {
+        width -= 0.5;
+      }
+      setScrollbarWidth(width);
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return scrollbarWidth;
+};
+
+let cachedScrollbarWidth: number | null = null;
+
+function obtainScrollbarWidth() {
+  if (cachedScrollbarWidth !== null) {
+    return cachedScrollbarWidth;
+  }
+
+  const outer = document.createElement("div");
+  outer.style.visibility = "hidden";
+  outer.style.overflow = "scroll";
+  document.body.appendChild(outer);
+
+  const width = outer.offsetWidth - outer.clientWidth;
+
+  outer.parentNode?.removeChild(outer);
+  cachedScrollbarWidth = width;
+  return width;
 }

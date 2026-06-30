@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
 export const appLayouts = [
   "vertical",
@@ -26,7 +26,7 @@ export interface IAppLayoutContext {
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
   navPanelDef?: unknown;
-  logoContentDef?: unknown;
+  logoContentDef?: ReactNode;
   logo?: string;
   logoDark?: string;
   logoLight?: string;

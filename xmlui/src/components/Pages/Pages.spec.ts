@@ -98,4 +98,49 @@ test.describe("Pages foundation", () => {
     await expect(page).toHaveURL(/#\/docs\/start\?tab=guide$/);
     await expect(page.getByTestId("route")).toHaveText("/docs/start:guide:?tab=guide");
   });
+
+  test("Page owns routed content padding inside App", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/">
+            <Text testId="content">Home Page</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    const metrics = await page.evaluate(() => {
+      const pageRoot = document.querySelector("[data-xmlui-component='Page']") as HTMLElement | null;
+      const appPageContent = document.querySelector("[data-xmlui-part='pageContent']") as HTMLElement | null;
+      if (!pageRoot || !appPageContent) {
+        return null;
+      }
+      const pageStyle = getComputedStyle(pageRoot);
+      const appStyle = getComputedStyle(appPageContent);
+      const pageRect = pageRoot.getBoundingClientRect();
+      const appRect = appPageContent.getBoundingClientRect();
+      return {
+        pagePaddingLeft: pageStyle.paddingLeft,
+        pagePaddingTop: pageStyle.paddingTop,
+        pageDisplay: pageStyle.display,
+        pageFlexDirection: pageStyle.flexDirection,
+        appPaddingLeft: appStyle.paddingLeft,
+        appPaddingTop: appStyle.paddingTop,
+        horizontalInset: pageRect.left - appRect.left,
+        verticalInset: pageRect.top - appRect.top,
+      };
+    });
+
+    expect(metrics).toMatchObject({
+      pagePaddingLeft: "16px",
+      pagePaddingTop: "20px",
+      pageDisplay: "flex",
+      pageFlexDirection: "column",
+      appPaddingLeft: "0px",
+      appPaddingTop: "0px",
+      horizontalInset: 0,
+      verticalInset: 0,
+    });
+  });
 });

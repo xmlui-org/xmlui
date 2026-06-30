@@ -58,10 +58,7 @@ describe("App main content layout migration", () => {
     expect(html).toContain('data-xmlui-part="pageContent"');
     expect(html).toContain("--xmlui-paddingHorizontal-content-App:28px");
     expect(html).toContain("--xmlui-maxWidth-content-App:var(--xmlui-maxWidth-content)");
-    expect(html).toContain("padding-inline-start:28px");
     expect(html).toContain("max-width:var(--xmlui-maxWidth-content)");
-    expect(html).toContain("padding-top:32px");
-    expect(html).toContain("gap:24px");
     expect(html).toContain("First item");
     expect(html).toContain("Second item");
   });

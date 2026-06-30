@@ -57,19 +57,46 @@ export function renderPath(pathname: string) {
       module: appModule,
       initialUrl: pathname,
       extensions: loadedExtensions,
-      appGlobals: { ...(appConfig?.appGlobals ?? {}), isSsg: true },
+      appGlobals: { ...appGlobalsFromConfig(appConfig), isSsg: true },
     })
   );
 }
 
-function findAppConfig(): { appGlobals?: Record<string, unknown> } | undefined {
+type RuntimeAppConfig = {
+  name?: string;
+  resources?: Record<string, string>;
+  defaultTheme?: string;
+  defaultTone?: string;
+  appGlobals?: Record<string, unknown>;
+};
+
+function findAppConfig(): RuntimeAppConfig | undefined {
   for (const value of Object.values(runtime)) {
     const config = (value as any)?.default;
-    if (config && typeof config === "object" && config.appGlobals && typeof config.appGlobals === "object") {
-      return config as { appGlobals?: Record<string, unknown> };
+    if (config && typeof config === "object" && (
+      "appGlobals" in config ||
+      "resources" in config ||
+      "name" in config ||
+      "defaultTheme" in config ||
+      "defaultTone" in config
+    )) {
+      return config as RuntimeAppConfig;
     }
   }
   return undefined;
+}
+
+function appGlobalsFromConfig(config: RuntimeAppConfig | undefined): Record<string, unknown> {
+  if (!config) {
+    return {};
+  }
+  return {
+    ...(config.name ? { name: config.name } : {}),
+    ...(config.resources ? { resources: config.resources } : {}),
+    ...(config.defaultTheme ? { defaultTheme: config.defaultTheme } : {}),
+    ...(config.defaultTone ? { defaultTone: config.defaultTone } : {}),
+    ...(config.appGlobals ?? {}),
+  };
 }
 `;
 }

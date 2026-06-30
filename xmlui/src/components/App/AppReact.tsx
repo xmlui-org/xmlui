@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 
 import {
   collectComponentThemeDefaults,
@@ -9,22 +10,23 @@ import {
   themeVariablesToCssProperties,
 } from "../../styling/theme";
 import type { XmluiAdapterRendererProps } from "../../runtime/rendering/adapter";
+import type { XmluiNode } from "../../compiler/ir";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { useBindingRevision } from "../../runtime/rendering/reactive";
+import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
 import { AppLayoutContext, type AppLayoutType } from "./AppLayoutContext";
 import { AppMd } from "./App";
 import { AppShellProvider } from "./AppShellContext";
 import { defaultProps } from "./App.defaults";
+import styles from "./App.module.scss";
 
 const CONTENT_THEME_VARS = {
   backgroundColor: "backgroundColor-content-App",
   borderLeft: "borderLeft-content-App",
   maxWidth: "maxWidth-content-App",
-  paddingHorizontal: "paddingHorizontal-content-App",
-  paddingVertical: "paddingVertical-content-App",
-  gap: "gap-content-App",
+  maxWidthWithToc: "maxWidth-content-App--withToc",
 } as const;
 
 export function App({ adapter }: XmluiAdapterRendererProps) {
@@ -39,17 +41,40 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const rootStyle = appShellStyle(rootAttrs.style as CSSProperties | undefined);
   const testId = adapter.stringProp("testId");
   const fitContent = adapter.booleanProp("fitContent", defaultProps.fitContent);
+  const noScrollbarGutters = adapter.booleanProp(
+    "noScrollbarGutters",
+    defaultProps.noScrollbarGutters,
+  );
+  const scrollbarWidth = useScrollbarWidth();
+  const headerSize = useMeasuredBlockSize<HTMLDivElement>();
+  const footerSize = useMeasuredBlockSize<HTMLDivElement>();
   const loggedInUser = adapter.prop("loggedInUser", null);
   const appProps = adapter.props;
   const layout = normalizeLayout(adapter.stringProp("layout"));
+  const routeSnapshot = useRouteSnapshot(adapter);
   const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
   const showDrawerToggle = useVisibleNavPanel(adapter);
   const [navPanelCollapsed, setNavPanelCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [subNavPanelSlot, setSubNavPanelSlot] = useState<HTMLElement | null>(null);
-  const children = layout.value === "desktop"
-    ? adapter.node.children.filter((child) => child.kind !== "element" || child.type !== "NavPanel")
-    : adapter.node.children;
+  const slots = useMemo(
+    () => partitionAppChildren(adapter.node.children),
+    [adapter.node.children],
+  );
+  const isVerticalFullHeader = layout.value === "vertical-full-header";
+  const hasSideNavPanel = Boolean(
+    slots.navPanel &&
+    layout.value !== "desktop" &&
+    !isVerticalFullHeader &&
+    getAppLayoutOrientation(layout.value) === "vertical",
+  );
+  const useTocContentWidth = shouldUseTocContentWidth(
+    mergedThemeVariables,
+    routeSnapshot.pathname,
+  );
+  const appLogoContent = hasTemplate(adapter.node.children, "logoTemplate")
+    ? adapter.renderTemplate("logoTemplate")
+    : undefined;
   const readyFiredRef = useRef(false);
   const appLayoutContext = useMemo(() => ({
     layout: layout.value as AppLayoutType,
@@ -68,6 +93,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     logo: adapter.stringProp("logo"),
     logoDark: adapter.stringProp("logoDark"),
     logoLight: adapter.stringProp("logoLight"),
+    logoContentDef: appLogoContent,
     registerSubNavPanelSlot: setSubNavPanelSlot,
     subNavPanelSlot,
     scrollWholePage,
@@ -75,6 +101,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     adapter,
     drawerVisible,
     layout.value,
+    appLogoContent,
     navPanelCollapsed,
     scrollWholePage,
     showDrawerToggle,
@@ -144,33 +171,370 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
             {...rootAttrs}
             data-testid={testId}
             data-xmlui-app-fit-content={fitContent ? "true" : undefined}
-            className={[rootAttrs.className, ...layout.classNames, scrollWholePage && "scrollWholePage"].filter(Boolean).join(" ")}
+            className={[
+              rootAttrs.className,
+              styles.appContainer,
+              layout.cssModuleClass,
+              layout.isSticky && styles.sticky,
+              ...layout.classNames,
+              scrollWholePage && !fitContent && styles.scrollWholePage,
+              scrollWholePage && !fitContent && "scrollWholePage",
+              noScrollbarGutters && styles.noScrollbarGutters,
+              noScrollbarGutters && "noScrollbarGutters",
+              fitContent && styles.fitContent,
+            ]
+              .filter(Boolean)
+              .join(" ")}
             style={{
               ...rootStyle,
               ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
               ...appBaselineStyle(mergedThemeVariables),
-              ...appContainerStyle(fitContent),
+              ...appContainerStyle(fitContent, layout.value),
+              "--app-header-height": isVerticalFullHeader && headerSize.height > 0
+                ? `${headerSize.height}px`
+                : undefined,
+              "--app-footer-height": isVerticalFullHeader && slots.footer && footerSize.height > 0
+                ? `${footerSize.height}px`
+                : "0px",
+              "--scrollbar-width": noScrollbarGutters ? "0px" : `${scrollbarWidth}px`,
               ...appShellStyle(adapter.style),
-            }}
+            } as CSSProperties}
           >
-            <main
-              data-xmlui-component="App"
-              data-xmlui-part="content"
-              style={contentAreaStyle(mergedThemeVariables, fitContent, appProps)}
-            >
+            {isVerticalFullHeader ? (
+              <>
+                {slots.header ? (
+                  <div
+                    data-xmlui-component="App"
+                    data-xmlui-part="header"
+                    ref={headerSize.ref}
+                    className={[styles.headerWrapper, styles.sticky].filter(Boolean).join(" ")}
+                    style={headerShellStyle(mergedThemeVariables)}
+                  >
+                    {adapter.renderChildren([slots.header])}
+                  </div>
+                ) : null}
+                <div data-xmlui-component="App" data-xmlui-part="mainContentRow" className={styles.mainContentRow}>
+                  {slots.navPanel ? (
+                    <aside
+                      data-xmlui-component="App"
+                      data-xmlui-part="navPanel"
+                      className={[
+                        styles.navPanelWrapper,
+                        navPanelCollapsed && styles.navPanelWrapperCollapsed,
+                      ].filter(Boolean).join(" ")}
+                      style={sideNavPanelShellStyle(mergedThemeVariables, navPanelCollapsed)}
+                    >
+                      {adapter.renderChildren([slots.navPanel])}
+                    </aside>
+                  ) : null}
+                  <main
+                    data-xmlui-component="App"
+                    data-xmlui-part="content"
+                    className={styles.mainContentArea}
+                    style={contentAreaStyle(
+                      mergedThemeVariables,
+                      fitContent,
+                      scrollWholePage,
+                      getAppLayoutOrientation(layout.value),
+                      appProps,
+                    )}
+                  >
+                    <div
+                      data-xmlui-component="App"
+                      data-xmlui-part="pages"
+                      className={styles.pagesContainer}
+                    >
+                      {renderPageContent(
+                        adapter,
+                        mergedThemeVariables,
+                        appProps,
+                        slots.content,
+                        useTocContentWidth,
+                      )}
+                    </div>
+                  </main>
+                </div>
+                {slots.footer ? (
+                  <div
+                    data-xmlui-component="App"
+                    data-xmlui-part="footer"
+                    ref={footerSize.ref}
+                    className={[styles.footerWrapper, styles.sticky].filter(Boolean).join(" ")}
+                    style={footerShellStyle()}
+                  >
+                    {adapter.renderChildren([slots.footer])}
+                  </div>
+                ) : null}
+              </>
+            ) : hasSideNavPanel ? (
+              <>
+                <aside
+                  data-xmlui-component="App"
+                  data-xmlui-part="navPanel"
+                  className={[
+                    styles.navPanelWrapper,
+                    navPanelCollapsed && styles.navPanelWrapperCollapsed,
+                  ].filter(Boolean).join(" ")}
+                  style={sideNavPanelShellStyle(mergedThemeVariables, navPanelCollapsed)}
+                >
+                  {slots.navPanel ? adapter.renderChildren([slots.navPanel]) : null}
+                </aside>
+                <main
+                  data-xmlui-component="App"
+                  data-xmlui-part="content"
+                  className={styles.mainContentArea}
+                  style={contentAreaStyle(
+                    mergedThemeVariables,
+                    fitContent,
+                    scrollWholePage,
+                    getAppLayoutOrientation(layout.value),
+                    appProps,
+                  )}
+                >
+                  {slots.header ? (
+                    <div
+                      data-xmlui-component="App"
+                      data-xmlui-part="header"
+                      className={[
+                        styles.headerWrapper,
+                        layout.isSticky && styles.sticky,
+                      ].filter(Boolean).join(" ")}
+                      style={headerShellStyle(mergedThemeVariables)}
+                    >
+                      {adapter.renderChildren([slots.header])}
+                    </div>
+                  ) : null}
+                  <div
+                    data-xmlui-component="App"
+                    data-xmlui-part="pages"
+                    className={styles.pagesContainer}
+                  >
+                    {renderPageContent(
+                      adapter,
+                      mergedThemeVariables,
+                      appProps,
+                      slots.content,
+                      useTocContentWidth,
+                    )}
+                  </div>
+                  {slots.footer ? (
+                    <div
+                      data-xmlui-component="App"
+                      data-xmlui-part="footer"
+                      className={[
+                        styles.footerWrapper,
+                        layout.isSticky && styles.sticky,
+                      ].filter(Boolean).join(" ")}
+                      style={footerShellStyle()}
+                    >
+                      {adapter.renderChildren([slots.footer])}
+                    </div>
+                  ) : null}
+                </main>
+              </>
+            ) : (
+              <>
+            {slots.header ? (
               <div
                 data-xmlui-component="App"
-                data-xmlui-part="pageContent"
-                style={pageContentStyle(mergedThemeVariables, appProps)}
+                data-xmlui-part="header"
+                className={[
+                  styles.headerWrapper,
+                  layout.isSticky && styles.sticky,
+                ].filter(Boolean).join(" ")}
+                style={headerShellStyle(mergedThemeVariables)}
               >
-                {adapter.renderChildren(children)}
+                {adapter.renderChildren([slots.header])}
               </div>
-            </main>
+            ) : null}
+            {layout.isCondensed && slots.navPanel && subNavPanelSlot
+              ? createPortal(adapter.renderChildren([slots.navPanel]), subNavPanelSlot)
+              : null}
+            {slots.navPanel &&
+            layout.value !== "desktop" &&
+            !layout.isCondensed &&
+            getAppLayoutOrientation(layout.value) === "horizontal" ? (
+              <div
+                data-xmlui-component="App"
+                data-xmlui-part="navPanel"
+                className={styles.navPanelWrapper}
+                style={navPanelShellStyle(mergedThemeVariables, layout.isSticky)}
+              >
+                {adapter.renderChildren([slots.navPanel])}
+              </div>
+            ) : null}
+            {renderMainContent(
+                adapter,
+                mergedThemeVariables,
+                fitContent,
+                scrollWholePage,
+                getAppLayoutOrientation(layout.value),
+                appProps,
+                slots.content,
+                useTocContentWidth,
+              )}
+            {slots.footer ? (
+              <div
+                data-xmlui-component="App"
+                data-xmlui-part="footer"
+                className={[
+                  styles.footerWrapper,
+                  layout.isSticky && styles.sticky,
+                ].filter(Boolean).join(" ")}
+                style={footerShellStyle()}
+              >
+                {adapter.renderChildren([slots.footer])}
+              </div>
+            ) : null}
+              </>
+            )}
           </div>
         </AppLayoutContext.Provider>
       </AppShellProvider>
     </ProfileMenuProvider>
   );
+}
+
+function renderPageContent(
+  adapter: XmluiAdapterRendererProps["adapter"],
+  mergedThemeVariables: Record<string, unknown>,
+  appProps: Record<string, unknown>,
+  children: XmluiNode[],
+  useTocContentWidth: boolean,
+) {
+  return (
+    <div
+      data-xmlui-component="App"
+      data-xmlui-part="pageContent"
+      className={[
+        styles.pageContentContainer,
+        shouldApplyDefaultContentPadding(children, appProps) && styles.withDefaultContentPadding,
+        useTocContentWidth && styles.withToc,
+      ].filter(Boolean).join(" ")}
+      style={pageContentStyle(mergedThemeVariables, appProps, useTocContentWidth)}
+    >
+      {adapter.renderChildren(children)}
+    </div>
+  );
+}
+
+function renderMainContent(
+  adapter: XmluiAdapterRendererProps["adapter"],
+  mergedThemeVariables: Record<string, unknown>,
+  fitContent: boolean,
+  scrollWholePage: boolean,
+  layoutOrientation: "horizontal" | "vertical",
+  appProps: Record<string, unknown>,
+  children: XmluiNode[],
+  useTocContentWidth: boolean,
+) {
+  return (
+    <main
+      data-xmlui-component="App"
+      data-xmlui-part="content"
+      className={styles.pagesContainer}
+      style={contentAreaStyle(
+        mergedThemeVariables,
+        fitContent,
+        scrollWholePage,
+        layoutOrientation,
+        appProps,
+      )}
+    >
+      {renderPageContent(adapter, mergedThemeVariables, appProps, children, useTocContentWidth)}
+    </main>
+  );
+}
+
+type AppChildSlots = {
+  header?: XmluiNode;
+  navPanel?: XmluiNode;
+  footer?: XmluiNode;
+  content: XmluiNode[];
+};
+
+function partitionAppChildren(children: XmluiNode[]): AppChildSlots {
+  const slots: AppChildSlots = { content: [] };
+  for (const child of children) {
+    if (child.kind === "element" && child.type === "AppHeader" && !slots.header) {
+      slots.header = child;
+    } else if (child.kind === "element" && child.type === "NavPanel" && !slots.navPanel) {
+      slots.navPanel = child;
+    } else if (child.kind === "element" && child.type === "Footer" && !slots.footer) {
+      slots.footer = child;
+    } else if (child.kind === "element" && child.type === "property" && child.props.name === "logoTemplate") {
+      continue;
+    } else if (child.kind === "element" && child.type === "NavPanel") {
+      continue;
+    } else {
+      slots.content.push(child);
+    }
+  }
+  return slots;
+}
+
+function hasTemplate(children: XmluiNode[], name: string): boolean {
+  return children.some((child) =>
+    child.kind === "element" &&
+    child.type === "property" &&
+    child.props.name === name
+  );
+}
+
+function shouldApplyDefaultContentPadding(
+  children: XmluiNode[],
+  props: Record<string, unknown>,
+): boolean {
+  return !children.some((child) => child.kind === "element" && child.type === "Pages") &&
+    props.padding === undefined;
+}
+
+function headerShellStyle(themeVariables: Record<string, unknown>): CSSProperties {
+  return {
+    flexShrink: 0,
+    boxShadow: themeValue(themeVariables, "boxShadow-header-App"),
+    zIndex: 2,
+  };
+}
+
+function navPanelShellStyle(
+  themeVariables: Record<string, unknown>,
+  isSticky: boolean,
+): CSSProperties {
+  return {
+    flexShrink: 0,
+    position: "sticky",
+    top: isSticky ? "var(--xmlui-height-AppHeader, var(--xmlui-space-14))" : 0,
+    zIndex: isSticky ? 1 : undefined,
+    backgroundColor: themeValue(themeVariables, "backgroundColor-navPanel-App"),
+    borderBottom: "var(--xmlui-borderBottom-AppHeader, 1px solid var(--xmlui-borderColor))",
+    boxShadow: themeValue(themeVariables, "boxShadow-navPanel-App"),
+    padding: 0,
+  };
+}
+
+function sideNavPanelShellStyle(
+  themeVariables: Record<string, unknown>,
+  collapsed: boolean,
+): CSSProperties {
+  const width = themeValue(
+    themeVariables,
+    collapsed ? "width-navPanel-collapsed-App" : "width-navPanel-App",
+  );
+  return {
+    flexShrink: 0,
+    width,
+    minWidth: width,
+    borderRight: themeValue(themeVariables, "borderRight-navPanelWrapper-App"),
+    boxShadow: themeValue(themeVariables, "boxShadow-navPanel-App"),
+    overflow: "hidden",
+  };
+}
+
+function footerShellStyle(): CSSProperties {
+  return {
+    flexShrink: 0,
+  };
 }
 
 function appShellStyle(style: CSSProperties | undefined): CSSProperties | undefined {
@@ -185,14 +549,14 @@ function normalizeLoggedInUser(value: unknown) {
   return value && typeof value === "object" ? value as Record<string, string> : null;
 }
 
-function appContainerStyle(fitContent: boolean): CSSProperties {
+function appContainerStyle(fitContent: boolean, layoutValue: string): CSSProperties {
   return {
     width: "100%",
     minHeight: fitContent ? undefined : "100vh",
     height: fitContent ? undefined : "100%",
     position: "relative",
     display: "flex",
-    flexDirection: "column",
+    flexDirection: layoutValue === "vertical" || layoutValue === "vertical-sticky" ? "row" : "column",
     isolation: "isolate",
   };
 }
@@ -213,47 +577,91 @@ function appBaselineStyle(themeVariables: Record<string, unknown>): CSSPropertie
 function contentAreaStyle(
   themeVariables: Record<string, unknown>,
   fitContent: boolean,
+  scrollWholePage: boolean,
+  layoutOrientation: "horizontal" | "vertical",
   props: Record<string, unknown>,
 ): CSSProperties {
-  const paddingHorizontal = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingHorizontal);
-  const paddingVertical = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingVertical);
   return {
     position: "relative",
     minWidth: 0,
-    minHeight: fitContent ? undefined : 0,
+    minHeight: fitContent || (scrollWholePage && layoutOrientation === "horizontal") ? undefined : 0,
     flex: 1,
     display: "flex",
     flexDirection: "column",
-    overflow: "auto",
+    overflow: layoutOrientation === "horizontal"
+      ? scrollWholePage ? "initial" : "auto"
+      : undefined,
     backgroundColor: appContentValue(themeVariables, props, CONTENT_THEME_VARS.backgroundColor),
     borderLeft: appContentValue(themeVariables, props, CONTENT_THEME_VARS.borderLeft),
-    paddingInlineStart: paddingHorizontal,
-    paddingInlineEnd: paddingHorizontal,
-    paddingTop: paddingVertical,
-    paddingBottom: paddingVertical,
-    gap: appContentValue(themeVariables, props, CONTENT_THEME_VARS.gap),
   };
 }
 
 function pageContentStyle(
   themeVariables: Record<string, unknown>,
   props: Record<string, unknown>,
+  useTocContentWidth: boolean,
 ): CSSProperties {
-  const paddingHorizontal = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingHorizontal);
-  const paddingVertical = appContentValue(themeVariables, props, CONTENT_THEME_VARS.paddingVertical);
   return {
-    maxWidth: appContentValue(themeVariables, props, CONTENT_THEME_VARS.maxWidth),
+    maxWidth: appContentValue(
+      themeVariables,
+      props,
+      useTocContentWidth ? CONTENT_THEME_VARS.maxWidthWithToc : CONTENT_THEME_VARS.maxWidth,
+    ),
     width: "100%",
     margin: "0 auto",
     minHeight: "100%",
     display: "flex",
     flexDirection: "column",
-    paddingInlineStart: paddingHorizontal,
-    paddingInlineEnd: paddingHorizontal,
-    paddingTop: paddingVertical,
-    paddingBottom: paddingVertical,
-    gap: appContentValue(themeVariables, props, CONTENT_THEME_VARS.gap),
   };
+}
+
+function useMeasuredBlockSize<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) {
+      setHeight(0);
+      return;
+    }
+
+    const update = () => {
+      setHeight(element.getBoundingClientRect().height);
+    };
+    update();
+
+    if (typeof ResizeObserver === "undefined") {
+      return undefined;
+    }
+
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, height };
+}
+
+function useRouteSnapshot(adapter: XmluiAdapterRendererProps["adapter"]) {
+  const routing = adapter.scope.routing;
+  const fallback = { pathname: "/", search: "", hash: "", queryParams: {}, revision: 0 };
+  return useSyncExternalStore(
+    (listener) => routing?.subscribe(listener) ?? (() => undefined),
+    () => routing?.getSnapshot() ?? fallback,
+    () => routing?.getSnapshot() ?? fallback,
+  );
+}
+
+function shouldUseTocContentWidth(
+  themeVariables: Record<string, unknown>,
+  pathname: string,
+): boolean {
+  const tableOfContentsEnabled = themeValue(themeVariables, "tableOfContents") !== "false";
+  return (
+    tableOfContentsEnabled &&
+    (pathname === "/" || pathname === "/blog" || pathname.startsWith("/blog/"))
+  );
 }
 
 function appContentValue(
@@ -309,7 +717,15 @@ function useVisibleNavPanel(adapter: XmluiAdapterRendererProps["adapter"]): bool
   });
 }
 
-function normalizeLayout(value: string | undefined): { value: string; classNames: string[] } {
+function normalizeLayout(
+  value: string | undefined,
+): {
+  value: string;
+  classNames: string[];
+  cssModuleClass: string;
+  isCondensed: boolean;
+  isSticky: boolean;
+} {
   const raw = (value ?? "condensed-sticky")
     .replace(/[\u2011\u2013\u2014]/g, "-")
     .trim();
@@ -335,16 +751,25 @@ function normalizeLayout(value: string | undefined): { value: string; classNames
   } else {
     classNames.push("horizontal");
   }
-  if (normalized.includes("condensed")) {
+  const isCondensed = normalized.includes("condensed");
+  if (isCondensed) {
     classNames.push("condensed");
   }
-  if (normalized.includes("sticky")) {
+  const isSticky = normalized.includes("sticky");
+  if (isSticky) {
     classNames.push("sticky");
   }
   if (normalized === "vertical-full-header") {
     classNames.push("verticalFullHeader");
   }
-  return { value: normalized, classNames };
+  const cssModuleClass = normalized === "desktop"
+    ? styles.desktop
+    : normalized === "vertical-full-header"
+      ? styles.verticalFullHeader
+      : normalized.startsWith("vertical")
+        ? styles.vertical
+        : styles.horizontal;
+  return { value: normalized, classNames, cssModuleClass, isCondensed, isSticky };
 }
 
 export function getAppLayoutOrientation(appLayout?: string) {

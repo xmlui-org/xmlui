@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 
 import { defaultProps } from "./AppHeader.defaults";
 import styles from "./AppHeader.module.scss";
@@ -39,12 +39,23 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
     logoContent,
     profileMenu,
     showLogo = defaultProps.showLogo,
+    style,
     title,
     titleContent,
     ...rest
   },
   ref,
 ) {
+  const { layout, registerSubNavPanelSlot } = useAppLayoutContext() || {};
+  const canRestrictContentWidth = layout !== "vertical-full-header";
+  const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
+  const subNavPanelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      registerSubNavPanelSlot?.(node);
+    },
+    [registerSubNavPanelSlot],
+  );
+  const { boxSizing, ...headerStyle } = style ?? {};
   const titleNode = titleContent ?? (title ? (
     <a className={styles.title} href="/">
       {title}
@@ -58,30 +69,35 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
       data-xmlui-component="AppHeader"
       ref={ref}
       role="banner"
+      style={headerStyle}
     >
-      <div className={[styles.headerInner, styles.full].join(" ")}>
+      <div
+        className={[
+          styles.headerInner,
+          !canRestrictContentWidth && styles.full,
+        ].filter(Boolean).join(" ")}
+      >
         {drawerToggle ? (
           <div
+            className={styles.drawerToggle}
             data-xmlui-part="drawerToggle"
-            style={{
-              display: "block",
-              width: "var(--xmlui-size-drawerToggle-AppHeader, 48px)",
-              height: "var(--xmlui-size-drawerToggle-AppHeader, 48px)",
-              padding: "var(--xmlui-padding-drawerToggle-AppHeader, 2px)",
-            }}
           >
             {drawerToggle}
           </div>
         ) : null}
         <div className={styles.logoAndTitle}>
-          {showLogo && logoContent ? (
-            <div className={styles.logoContainer} data-xmlui-part="logo">
+          {displayLogo && logoContent ? (
+            <div className={styles.customLogoContainer} data-xmlui-part="logo">
               {logoContent}
             </div>
           ) : null}
           {titleNode}
         </div>
-        <div className={styles.subNavPanelSlot} data-xmlui-part="subNavPanel" />
+        <div
+          className={styles.subNavPanelSlot}
+          data-xmlui-part="subNavPanel"
+          ref={subNavPanelRef}
+        />
         <div className={styles.childrenWrapper} data-xmlui-part="content">
           {children}
         </div>
