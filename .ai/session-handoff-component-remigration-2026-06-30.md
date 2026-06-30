@@ -509,6 +509,19 @@ Eleventh App follow-up:
   scroll positions, wrapper/NavPanel top alignment, and first NavLink offset
   stability.
 
+Sass startup-warning follow-up:
+
+- The user reported repeated Dart Sass `Deprecation Warning [if-function]`
+  messages when starting the sample with `npm start`.
+- Removed all active Sass `if()` function calls under `xmlui/src/**/*.scss`.
+  The touched files are `_themes.scss`, `Text.module.scss`, and
+  `Toggle.module.scss`.
+- The replacements use Sass `@if/@else` assignments instead of CSS `if()`,
+  preserving the same compile-time values and theme-variable append order.
+- Verified `npm start` for the sample through startup and a local page request;
+  the Sass deprecation warnings no longer appear. The XMLUI Vite build also
+  completes without Sass deprecation warnings.
+
 ## Verification Already Run
 
 Passed:
@@ -539,6 +552,8 @@ npm --workspace xmlui run test:e2e -- src/components/App/App-shell.spec.ts src/c
 npx tsc -p xmlui/tsconfig.build.json --noEmit
 npm --prefix xmlui run check:metadata
 git diff --check
+npm start
+npm --prefix xmlui run build
 ```
 
 Latest focused App/Pages run passed 24/24 after the wide

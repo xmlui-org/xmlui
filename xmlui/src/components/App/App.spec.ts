@@ -31,6 +31,31 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("test text")).toBeVisible();
   });
 
+  test("default condensed shell renders generated header with NavPanel and App props", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App loggedInUser="{{ name: 'Joe', token: '1234' }}">
+        <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text value="User name: {loggedInUser.name}" />
+            <Text value="User token: {loggedInUser.token}" />
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await expect(page.locator('[data-xmlui-component="AppHeader"]')).toBeVisible();
+    await expect(page.locator('[data-xmlui-component="AppHeader"] [data-xmlui-part="profileMenu"]')).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
+    await expect(page.getByText("User name: Joe")).toBeVisible();
+    await expect(page.getByText("User token: 1234")).toBeVisible();
+  });
+
   test("renders with vertical layout", async ({ initTestBed, page }) => {
     await initTestBed(`<App layout="vertical">test text</App>`);
     await expect(page.getByText("test text")).toBeVisible();

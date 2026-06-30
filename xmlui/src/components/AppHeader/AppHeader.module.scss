@@ -68,10 +68,6 @@ $size-drawerToggle-AppHeader: createThemeVar("size-drawerToggle-#{$component}");
   .subNavPanelSlot{
     display: flex;
     flex-direction: row;
-
-    &:not(:empty) {
-      margin-inline-start: t.$space-4;
-    }
   }
 
   .logoAndTitle {

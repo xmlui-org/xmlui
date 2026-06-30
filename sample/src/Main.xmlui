@@ -1,28 +1,10 @@
-<App layout="condensed">
+<App layout="horizontal" scrollWholePage="false">
   <AppHeader>
-    <property name="logoTemplate">
-      <Heading level="h3" value="Example App"/>
-    </property>
+    Horizontal Splitter Example
   </AppHeader>
-  <NavPanel>
-      <NavLink label="Home" to="/" icon="home"/>
-      <NavLink label="Page 1" to="/page1"/>
-      <NavLink label="Page 2" to="/page2"/>
-  </NavPanel>
-  <Pages fallbackPath="/">
-      <Page url="/">
-        <List data="https://api.sampleapis.com/coffee/hot">
-          <property name="itemTemplate">
-            <Card title="{$item.title}" subtitle="{$item.description}"/>
-          </property>
-        </List>
-      </Page>
-      <Page url="/page1">
-        <Text value="Page 1" />
-      </Page>
-      <Page url="/page2">
-        <Text value="Page 2" />
-      </Page>
-  </Pages>
-  <Footer>Powered by XMLUI</Footer>
+  <CHStack height="*" backgroundColor="lightblue">1/4</CHStack>
+  <CHStack height="3*" backgroundColor="lightcoral">3/4</CHStack>
+  <Footer>
+    Footer Content
+  </Footer>
 </App>

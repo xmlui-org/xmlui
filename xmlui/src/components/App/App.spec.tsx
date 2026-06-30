@@ -11,6 +11,7 @@ import {
   createRuntimeScope,
   createRuntimeStateStore,
 } from "../../runtime/state";
+import { IconProvider } from "../IconProvider";
 
 describe("App main content layout migration", () => {
   it("uses source-adjacent metadata, renderer, defaults, styles, docs, and runnable tests", () => {
@@ -61,6 +62,37 @@ describe("App main content layout migration", () => {
     expect(html).toContain("max-width:var(--xmlui-maxWidth-content)");
     expect(html).toContain("First item");
     expect(html).toContain("Second item");
+  });
+
+  it("exposes evaluated App props to routed descendant expressions", () => {
+    const document = parseXmlui(`
+      <App loggedInUser="{{ name: 'Joe', token: '1234' }}">
+        <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text value="User name: {loggedInUser.name}" />
+            <Text value="User token: {loggedInUser.token}" />
+          </Page>
+        </Pages>
+      </App>
+    `);
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({ store });
+    const context = createRenderContext({}, {});
+    const AppRenderer = appRenderer;
+    const html = renderToStaticMarkup(
+      <XmluiThemeRoot>
+        <IconProvider icons={{}}>
+          <AppRenderer context={context} node={document.root} scope={scope} />
+        </IconProvider>
+      </XmluiThemeRoot>,
+    );
+
+    expect(html).toContain("User name: Joe");
+    expect(html).toContain("User token: 1234");
+    expect(html).toContain('data-xmlui-component="AppHeader"');
   });
 
   it("exposes content theme variables as App props", () => {

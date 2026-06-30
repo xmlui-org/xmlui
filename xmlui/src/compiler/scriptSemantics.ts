@@ -21,6 +21,7 @@ export type XmluiScope = {
   globals: Map<string, XmluiBinding>;
   specials: Map<string, XmluiBinding>;
   references: Map<string, XmluiBinding>;
+  contexts: Map<string, XmluiBinding>;
   appContext: XmluiAppContextObject;
 };
 
@@ -339,6 +340,7 @@ export function createXmluiScope(
     globals: new Map(options.parent?.globals),
     specials: new Map(options.parent?.specials),
     references: new Map(options.parent?.references),
+    contexts: new Map(options.parent?.contexts),
     appContext: options.appContext ?? options.parent?.appContext ?? {},
   };
 
@@ -429,6 +431,19 @@ export function createXmluiScope(
     });
   }
 
+  if (element.type === "App") {
+    for (const name of Object.keys(element.props)) {
+      if (!scope.locals.has(name) && !scope.globals.has(name)) {
+        scope.contexts.set(name, {
+          kind: "context",
+          name,
+          mutable: false,
+          span: declarationSpan(sourceId, element, "props", name),
+        });
+      }
+    }
+  }
+
   return scope;
 }
 
@@ -457,6 +472,9 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
   }
   if (scope.references.has(name)) {
     return scope.references.get(name);
+  }
+  if (scope.contexts.has(name)) {
+    return scope.contexts.get(name);
   }
   if (isBuiltInReferenceName(name)) {
     return {
@@ -1697,7 +1715,7 @@ function bindIdentifierWrite(
 function declarationSpan(
   sourceId: string,
   element: XmluiElement,
-  bucket: "vars" | "globals",
+  bucket: "vars" | "globals" | "props",
   name: string,
 ): SourceSpan {
   const parsed = element.parsed?.[bucket]?.[name];

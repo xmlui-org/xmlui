@@ -302,6 +302,28 @@ the next approved component should be the smallest missing prerequisite, not
 
 ## Migration Status
 
+### Recent App Compatibility Follow-Up - 2026-06-30
+
+- Original XMLUI exposes evaluated `<App>` props to descendant expressions as
+  bare app-scope values. The rewrite now mirrors that by binding App prop names
+  as inherited context names during script analysis and rendering App children
+  with the evaluated App props in runtime `contextValues`.
+- Regression coverage includes the routed `loggedInUser` object case:
+  `<App loggedInUser="{{ name: 'Joe', token: '1234' }}">` with descendant
+  `Text` values reading `{loggedInUser.name}` and `{loggedInUser.token}`.
+- The default condensed App shell also now restores the original generated
+  `AppHeader` behavior when a `NavPanel` is present and no explicit
+  `AppHeader` is authored. Browser coverage verifies that the generated header,
+  `Home` nav link, and routed user text are visible for that sample.
+- The generated header follows the original default-logo path instead of
+  treating `<Logo />` as custom logo content, preserving AppHeader's logo width
+  and padding constraints. It also does not render the internal profile menu;
+  authored `<AppHeader>` continues to own that default profile-menu behavior.
+- Original `AppHeader` metadata does not default `width-logo-AppHeader`; the
+  rewrite-only `$space-10` default constrained the horizontal header wordmark
+  to a tiny 40px box. That default is removed so the logo sizes from the image
+  height/aspect ratio, as in the original generated header.
+
 Complexity values include `Derived` for shortcut components that are migrated
 and verified with their source-preserved base component but should still appear
 as explicit status rows.
@@ -471,6 +493,16 @@ Status values:
 
 ## Recent App Compatibility Notes
 
+- 2026-06-30 generated condensed header logo spacing: old XMLUI does not render
+  the default AppHeader logo as a plain anchor/image pair. The source path is
+  `AppContextAwareAppHeader -> AppHeader -> ThemedNavLink -> Logo -> ThemedImage`,
+  and the generated condensed header renders the NavPanel as AppHeader children
+  in a `min-width: 0` wrapper rather than portaling it into the registered
+  sub-nav slot. This produces the measured original geometry at 1920px:
+  logo image `102.281px x 40px` at `x=352, y=8`, logo link `134.281px x 56px`,
+  Home link `x=510.281px`, image-to-Home gap `56px`. The rewrite now mirrors
+  that path for generated condensed headers while keeping the sub-nav slot
+  portal for authored headers.
 - 2026-06-30 narrow mobile shell: old XMLUI treats all narrow App layouts as
   sticky-chrome layouts when AppHeader/NavPanel are present. The rewrite now
   keeps the hamburger AppHeader and Footer sticky while the App/root remains
@@ -489,6 +521,14 @@ Status values:
   `.navPanelWrapper > *:first-child { flex: 1; min-height: 0; }` rule and
   extends the wide regression to scroll to the bottom while checking header,
   footer, NavPanel wrapper, real NavPanel, and first NavLink offsets.
+
+## Recent Tooling Compatibility Notes
+
+- 2026-06-30 Sass startup warnings: Dart Sass 1.93 warns on the deprecated
+  Sass `if()` function syntax during sample `npm start`. The rewrite no longer
+  uses active `if()` calls in SCSS; `_themes.scss`, `Text.module.scss`, and
+  `Toggle.module.scss` now use ordinary Sass `@if/@else` assignments while
+  preserving the same generated theme-variable order and values.
 
 ## Open Questions
 

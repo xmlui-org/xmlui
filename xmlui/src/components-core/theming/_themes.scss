@@ -78,11 +78,6 @@ $tmpRadiusAll: null;
     @if ($num > 1) {
       $offset: (-1 * $num) - 1;
     }
-    //@if(string.index(#{$fallbackValue}, 'fontSize-sm')) {
-    //  @debug 'original: ' + #{$componentVariable} + ", varcount: " + $num;
-    //  @debug 'concatet:' + var(#{string.slice($componentVariable, 5, -2)}, #{$fallbackValue});
-    //  @debug 'concat 2:' + var(#{string.slice($componentVariable, 5, $offset)}, #{$fallbackValue});
-    //}
     @return string.unquote(
       "var(#{string.slice($componentVariable, 5, $offset)}, #{$fallbackValue}#{string.slice($componentVariable, $offset + 1)})"
     );
@@ -124,7 +119,9 @@ $tmpRadiusAll: null;
     @warn "List index is #{$index} but list is only #{list.length($list)} item long for `remove-nth`.";
   } @else {
     $result: ();
-    $index: if($index < 0, list.length($list) + $index + 1, $index);
+    @if $index < 0 {
+      $index: list.length($list) + $index + 1;
+    }
 
     @for $i from 1 through list.length($list) {
       @if $i != $index {
@@ -336,8 +333,12 @@ $tmpRadiusAll: null;
   $is-map: meta.type-of($iterable) == "map";
 
   $str: "";
-  $opening-bracket: if($is-list, "[", "{");
-  $closing-bracket: if($is-list, "]", "}");
+  $opening-bracket: "{";
+  $closing-bracket: "}";
+  @if $is-list {
+    $opening-bracket: "[";
+    $closing-bracket: "]";
+  }
 
   @each $key, $value in $iterable {
     $entry-string: "";
@@ -521,156 +522,96 @@ $tmpRadiusAll: null;
 
 // This function composes style variables for setting styles of text elements
 @function composeTextVars($themeVars, $subject, $default: false) {
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($themeVars, "textColor-#{$subject}", "textColor"),
-    appendThemeVar($themeVars, "textColor-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "fontFamily-#{$subject}", "fontFamily"),
-    appendThemeVar($tmp, "fontFamily-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVar($tmp, "fontSize-#{$subject}"),
-    appendThemeVar($tmp, "fontSize-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "fontStyle-#{$subject}", "fontStyle-#{$default}"),
-    appendThemeVar($tmp, "fontStyle-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "fontVariant-#{$subject}", "fontVariant-#{$default}"),
-    appendThemeVar($tmp, "fontVariant-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "fontWeight-#{$subject}", "fontWeight-#{$default}"),
-    appendThemeVar($tmp, "fontWeight-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "fontStretch-#{$subject}", "fontStretch-#{$default}"),
-    appendThemeVar($tmp, "fontStretch-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback(
+  $tmp: $themeVars !global;
+
+  @if $default {
+    $tmp: appendThemeVarWithFallback($tmp, "textColor-#{$subject}", "textColor") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "fontFamily-#{$subject}", "fontFamily") !global;
+    $tmp: appendThemeVar($tmp, "fontSize-#{$subject}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "fontStyle-#{$subject}", "fontStyle-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "fontVariant-#{$subject}", "fontVariant-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "fontWeight-#{$subject}", "fontWeight-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "fontStretch-#{$subject}", "fontStretch-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback(
       $tmp,
       "textDecorationLine-#{$subject}",
       "textDecorationLine-#{$default}"
-    ),
-    appendThemeVar($tmp, "textDecorationLine-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback(
+    ) !global;
+    $tmp: appendThemeVarWithFallback(
       $tmp,
       "textDecorationColor-#{$subject}",
       "textDecorationColor-#{$default}"
-    ),
-    appendThemeVar($tmp, "textDecorationColor-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback(
+    ) !global;
+    $tmp: appendThemeVarWithFallback(
       $tmp,
       "textDecorationStyle-#{$subject}",
       "textDecorationStyle-#{$default}"
-    ),
-    appendThemeVar($tmp, "textDecorationStyle-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback(
+    ) !global;
+    $tmp: appendThemeVarWithFallback(
       $tmp,
       "textDecorationThickness-#{$subject}",
       "textDecorationThickness-#{$default}"
-    ),
-    appendThemeVar($tmp, "textDecorationThickness-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback(
+    ) !global;
+    $tmp: appendThemeVarWithFallback(
       $tmp,
       "textUnderlineOffset-#{$subject}",
       "textUnderlineOffset-#{$default}"
-    ),
-    appendThemeVar($tmp, "textUnderlineOffset-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVar($tmp, "lineHeight-#{$subject}"),
-    appendThemeVar($tmp, "lineHeight-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "backgroundColor-#{$subject}", "backgroundColor-#{$default}"),
-    appendThemeVar($tmp, "backgroundColor-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "textTransform-#{$subject}", "textTransform-#{$default}"),
-    appendThemeVar($tmp, "textTransform-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "letterSpacing-#{$subject}", "letterSpacing"),
-    appendThemeVar($tmp, "letterSpacing-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "wordSpacing-#{$subject}", "wordSpacing-#{$default}"),
-    appendThemeVar($tmp, "wordSpacing-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "textShadow-#{$subject}", "textShadow-#{$default}"),
-    appendThemeVar($tmp, "textShadow-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "textIndent-#{$subject}", "textIndent-#{$default}"),
-    appendThemeVar($tmp, "textIndent-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "textAlign-#{$subject}", "textAlign-#{$default}"),
-    appendThemeVar($tmp, "textAlign-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "textAlignLast-#{$subject}", "textAlignLast-#{$default}"),
-    appendThemeVar($tmp, "textAlignLast-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "wordBreak-#{$subject}", "wordBreak-#{$default}"),
-    appendThemeVar($tmp, "wordBreak-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "wordWrap-#{$subject}", "wordWrap-#{$default}"),
-    appendThemeVar($tmp, "wordWrap-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "direction-#{$subject}", "direction-#{$default}"),
-    appendThemeVar($tmp, "direction-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "writingMode-#{$subject}", "writingMode-#{$default}"),
-    appendThemeVar($tmp, "writingMode-#{$subject}")
-  ) !global;
-  $tmp: if(
-    $default,
-    appendThemeVarWithFallback($tmp, "lineBreak-#{$subject}", "lineBreak-#{$default}"),
-    appendThemeVar($tmp, "lineBreak-#{$subject}")
-  ) !global;
+    ) !global;
+    $tmp: appendThemeVar($tmp, "lineHeight-#{$subject}") !global;
+    $tmp: appendThemeVarWithFallback(
+      $tmp,
+      "backgroundColor-#{$subject}",
+      "backgroundColor-#{$default}"
+    ) !global;
+    $tmp: appendThemeVarWithFallback(
+      $tmp,
+      "textTransform-#{$subject}",
+      "textTransform-#{$default}"
+    ) !global;
+    $tmp: appendThemeVarWithFallback($tmp, "letterSpacing-#{$subject}", "letterSpacing") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "wordSpacing-#{$subject}", "wordSpacing-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "textShadow-#{$subject}", "textShadow-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "textIndent-#{$subject}", "textIndent-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "textAlign-#{$subject}", "textAlign-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback(
+      $tmp,
+      "textAlignLast-#{$subject}",
+      "textAlignLast-#{$default}"
+    ) !global;
+    $tmp: appendThemeVarWithFallback($tmp, "wordBreak-#{$subject}", "wordBreak-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "wordWrap-#{$subject}", "wordWrap-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "direction-#{$subject}", "direction-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "writingMode-#{$subject}", "writingMode-#{$default}") !global;
+    $tmp: appendThemeVarWithFallback($tmp, "lineBreak-#{$subject}", "lineBreak-#{$default}") !global;
+  } @else {
+    $tmp: appendThemeVar($tmp, "textColor-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "fontFamily-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "fontSize-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "fontStyle-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "fontVariant-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "fontWeight-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "fontStretch-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textDecorationLine-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textDecorationColor-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textDecorationStyle-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textDecorationThickness-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textUnderlineOffset-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "lineHeight-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "backgroundColor-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textTransform-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "letterSpacing-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "wordSpacing-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textShadow-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textIndent-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textAlign-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "textAlignLast-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "wordBreak-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "wordWrap-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "direction-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "writingMode-#{$subject}") !global;
+    $tmp: appendThemeVar($tmp, "lineBreak-#{$subject}") !global;
+  }
+
   @return $tmp;
 }
 

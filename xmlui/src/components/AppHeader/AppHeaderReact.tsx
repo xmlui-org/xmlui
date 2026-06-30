@@ -5,6 +5,11 @@ import { defaultProps } from "./AppHeader.defaults";
 import styles from "./AppHeader.module.scss";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Logo } from "../Logo/LogoReact";
+import { NavLinkMd } from "../NavLink/NavLink";
+import navLinkStyles from "../NavLink/NavLink.module.scss";
+import { useComponentThemeClass } from "../../runtime/rendering/theme";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
 
 export type AppHeaderProps = HTMLAttributes<HTMLElement> & {
   children?: ReactNode;
@@ -47,6 +52,8 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
   ref,
 ) {
   const { isNarrowScreen, layout, registerSubNavPanelSlot } = useAppLayoutContext() || {};
+  const logoUrl = useLogoUrl();
+  const navLinkThemeClass = useComponentThemeClass("NavLink", NavLinkMd as ComponentMetadata);
   const canRestrictContentWidth = layout !== "vertical-full-header";
   const displayLogo = (isNarrowScreen || (layout !== "vertical" && layout !== "vertical-sticky")) && showLogo;
   const subNavPanelRef = useCallback(
@@ -89,6 +96,26 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
           {displayLogo && logoContent ? (
             <div className={styles.customLogoContainer} data-xmlui-part="logo">
               {logoContent}
+            </div>
+          ) : displayLogo && logoUrl ? (
+            <div className={styles.logoContainer} data-xmlui-part="logo">
+              <a
+                className={[
+                  navLinkStyles.content,
+                  navLinkStyles.base,
+                  navLinkThemeClass.className,
+                  styles.logoLink,
+                ].filter(Boolean).join(" ")}
+                href="/"
+                style={navLinkThemeClass.style}
+              >
+                <span className={[
+                  navLinkStyles.innerContent,
+                  navLinkStyles.iconAlignCenter,
+                ].filter(Boolean).join(" ")}>
+                  <Logo />
+                </span>
+              </a>
             </div>
           ) : null}
           {titleNode}

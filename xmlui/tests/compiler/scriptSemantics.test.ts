@@ -72,6 +72,26 @@ describe("XMLUI script scope model", () => {
     });
   });
 
+  it("inherits App props as context bindings for descendant expressions", () => {
+    const document = parseXmlui(
+      `<App loggedInUser="{{ name: 'Joe', token: '1234' }}"><Text>{loggedInUser.name}</Text></App>`,
+    );
+    const text = document.root.children[0];
+    if (text.kind !== "element" || text.children[0].kind !== "text") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+    const expression = text.children[0].segments?.find((segment) => segment.kind === "expression");
+
+    expect(expression?.dependencies).toEqual([
+      expect.objectContaining({
+        kind: "context",
+        name: "loggedInUser",
+        path: ["loggedInUser", "name"],
+      }),
+    ]);
+    expect(expression?.compiledSource).toContain(`ctx.readContext?.("loggedInUser")`);
+  });
+
   it("resolves default app-context functions as context bindings", () => {
     const document = parseXmlui(
       `<App><Button onClick="toast('Saved')" /></App>`,

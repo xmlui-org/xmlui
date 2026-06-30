@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
+import type { ComponentMetadata } from "../../component-core/metadata/types";
 import {
   collectComponentThemeDefaults,
   mergeThemeVariableLayers,
@@ -11,12 +12,16 @@ import {
 } from "../../styling/theme";
 import type { XmluiAdapterRendererProps } from "../../runtime/rendering/adapter";
 import type { XmluiNode } from "../../compiler/ir";
-import { useThemeVariables } from "../../runtime/rendering/theme";
+import { createRuntimeScope } from "../../runtime/state";
+import { useComponentThemeClass, useThemeVariables } from "../../runtime/rendering/theme";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { useBindingRevision } from "../../runtime/rendering/reactive";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
 import { ThemedIcon } from "../Icon/Icon";
+import { AppHeaderMd } from "../AppHeader/AppHeader";
+import appHeaderStyles from "../AppHeader/AppHeader.module.scss";
+import { AppHeaderComponent } from "../AppHeader/AppHeaderReact";
 import { AppLayoutContext, type AppLayoutType, type IAppLayoutContext } from "./AppLayoutContext";
 import { AppMd } from "./App";
 import { AppShellProvider } from "./AppShellContext";
@@ -53,7 +58,42 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const footerSize = useMeasuredBlockSize<HTMLDivElement>();
   const loggedInUser = adapter.prop("loggedInUser", null);
   const appProps = adapter.props;
+  const appChildScope = useMemo(
+    () =>
+      createRuntimeScope({
+        store: adapter.scope.store,
+        parent: adapter.scope,
+        props: adapter.scope.props,
+        contextValues: appProps,
+        references: adapter.scope.references,
+        slots: adapter.scope.slots,
+        routing: adapter.scope.routing,
+        toast: adapter.scope.toast,
+        i18n: adapter.scope.i18n,
+        emitEvent: adapter.scope.emitEvent,
+        extensionFunctions: adapter.scope.extensionFunctions,
+      }),
+    [adapter.scope, appProps],
+  );
+  const childAdapter = useMemo(
+    () => ({
+      ...adapter,
+      scope: appChildScope,
+      renderChildren: (children = adapter.node.children) =>
+        adapter.context.renderChildren(children, appChildScope),
+      renderTemplate: (name: string, fallbackChildren?: XmluiNode[]) =>
+        adapter.context.renderChildren(
+          templateChildren(adapter.node.children, name) ?? fallbackChildren ?? [],
+          appChildScope,
+        ),
+    }),
+    [adapter, appChildScope],
+  );
   const layout = normalizeLayout(adapter.stringProp("layout"));
+  const generatedAppHeaderThemeClass = useComponentThemeClass(
+    "AppHeader",
+    AppHeaderMd as ComponentMetadata,
+  );
   const routeSnapshot = useRouteSnapshot(adapter);
   const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
   const showDrawerToggle = useVisibleNavPanel(adapter);
@@ -66,8 +106,12 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     () => partitionAppChildren(adapter.node.children),
     [adapter.node.children],
   );
+  const shouldRenderGeneratedCondensedHeader = Boolean(
+    layout.isCondensed && !slots.header && showDrawerToggle,
+  );
+  const hasShellHeader = Boolean(slots.header || shouldRenderGeneratedCondensedHeader);
   const isVerticalFullHeader = layout.value === "vertical-full-header";
-  const shouldUseDrawerNavPanel = Boolean(isNarrowScreen && slots.header && slots.navPanel);
+  const shouldUseDrawerNavPanel = Boolean(isNarrowScreen && hasShellHeader && slots.navPanel);
   const hasSideNavPanel = Boolean(
     slots.navPanel &&
     !shouldUseDrawerNavPanel &&
@@ -80,7 +124,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     routeSnapshot.pathname,
   );
   const appLogoContent = hasTemplate(adapter.node.children, "logoTemplate")
-    ? adapter.renderTemplate("logoTemplate")
+    ? childAdapter.renderTemplate("logoTemplate")
     : undefined;
   const readyFiredRef = useRef(false);
   const appLayoutContext = useMemo(() => ({
@@ -197,7 +241,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
         <AppLayoutContext.Provider value={appLayoutContext}>
           {shouldUseDrawerNavPanel && slots.navPanel && (drawerVisible || drawerMounted)
             ? renderMobileDrawer(
-              adapter,
+              childAdapter,
               appLayoutContext,
               mergedThemeVariables,
               slots.navPanel,
@@ -249,7 +293,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                     className={[styles.headerWrapper, styles.sticky].filter(Boolean).join(" ")}
                     style={headerShellStyle(mergedThemeVariables)}
                   >
-                    {adapter.renderChildren([slots.header])}
+                    {childAdapter.renderChildren([slots.header])}
                   </div>
                 ) : null}
                 <div data-xmlui-component="App" data-xmlui-part="mainContentRow" className={styles.mainContentRow}>
@@ -263,7 +307,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                       ].filter(Boolean).join(" ")}
                       style={sideNavPanelShellStyle(mergedThemeVariables, navPanelCollapsed)}
                     >
-                      {adapter.renderChildren([slots.navPanel])}
+                      {childAdapter.renderChildren([slots.navPanel])}
                     </aside>
                   ) : null}
                   <main
@@ -285,7 +329,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                       className={styles.pagesContainer}
                     >
                       {renderPageContent(
-                        adapter,
+                        childAdapter,
                         mergedThemeVariables,
                         appProps,
                         slots.content,
@@ -303,7 +347,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                     className={[styles.footerWrapper, styles.sticky].filter(Boolean).join(" ")}
                     style={footerShellStyle()}
                   >
-                    {adapter.renderChildren([slots.footer])}
+                    {childAdapter.renderChildren([slots.footer])}
                   </div>
                 ) : null}
               </>
@@ -318,7 +362,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                   ].filter(Boolean).join(" ")}
                   style={sideNavPanelShellStyle(mergedThemeVariables, navPanelCollapsed)}
                 >
-                  {slots.navPanel ? adapter.renderChildren([slots.navPanel]) : null}
+                  {slots.navPanel ? childAdapter.renderChildren([slots.navPanel]) : null}
                 </aside>
                 <main
                   data-xmlui-component="App"
@@ -344,7 +388,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                       ].filter(Boolean).join(" ")}
                       style={headerShellStyle(mergedThemeVariables)}
                     >
-                      {adapter.renderChildren([slots.header])}
+                      {childAdapter.renderChildren([slots.header])}
                     </div>
                   ) : null}
                   <div
@@ -353,7 +397,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                     className={styles.pagesContainer}
                   >
                     {renderPageContent(
-                      adapter,
+                      childAdapter,
                       mergedThemeVariables,
                       appProps,
                       slots.content,
@@ -371,14 +415,14 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                       ].filter(Boolean).join(" ")}
                       style={footerShellStyle()}
                     >
-                      {adapter.renderChildren([slots.footer])}
+                      {childAdapter.renderChildren([slots.footer])}
                     </div>
                   ) : null}
                 </main>
               </>
             ) : (
               <>
-            {slots.header ? (
+            {hasShellHeader ? (
               <div
                 data-xmlui-component="App"
                 data-xmlui-part="header"
@@ -389,12 +433,22 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                 ].filter(Boolean).join(" ")}
                 style={headerShellStyle(mergedThemeVariables)}
               >
-                {adapter.renderChildren([slots.header])}
+                {slots.header
+                  ? childAdapter.renderChildren([slots.header])
+                  : renderGeneratedCondensedHeader(
+                    hasTemplate(adapter.node.children, "logoTemplate") ? appLogoContent : undefined,
+                    layout.isCondensed && slots.navPanel && !shouldUseDrawerNavPanel
+                      ? <div style={{ minWidth: 0 }}>{childAdapter.renderChildren([slots.navPanel])}</div>
+                      : undefined,
+                    shouldUseDrawerNavPanel && showDrawerToggle,
+                    () => setDrawerVisible((current) => !current),
+                    generatedAppHeaderThemeClass,
+                  )}
               </div>
             ) : null}
-            {layout.isCondensed && slots.navPanel && subNavPanelSlot
+            {layout.isCondensed && slots.header && slots.navPanel && subNavPanelSlot
               && !shouldUseDrawerNavPanel
-              ? createPortal(adapter.renderChildren([slots.navPanel]), subNavPanelSlot)
+              ? createPortal(childAdapter.renderChildren([slots.navPanel]), subNavPanelSlot)
               : null}
             {slots.navPanel &&
             !shouldUseDrawerNavPanel &&
@@ -407,11 +461,11 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                 className={styles.navPanelWrapper}
                 style={navPanelShellStyle(mergedThemeVariables, layout.isSticky)}
               >
-                {adapter.renderChildren([slots.navPanel])}
+                {childAdapter.renderChildren([slots.navPanel])}
               </div>
             ) : null}
             {renderMainContent(
-                adapter,
+                childAdapter,
                 mergedThemeVariables,
                 fitContent,
                 scrollWholePage,
@@ -432,7 +486,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                 ].filter(Boolean).join(" ")}
                 style={footerShellStyle()}
               >
-                {adapter.renderChildren([slots.footer])}
+                {childAdapter.renderChildren([slots.footer])}
               </div>
             ) : null}
               </>
@@ -559,6 +613,35 @@ function renderMobileDrawer(
   );
 }
 
+function renderGeneratedCondensedHeader(
+  logoContent: ReturnType<XmluiAdapterRendererProps["adapter"]["renderTemplate"]> | undefined,
+  navPanelContent: ReactNode | undefined,
+  showDrawerToggle: boolean,
+  toggleDrawer: () => void,
+  themeClass: ReturnType<typeof useComponentThemeClass>,
+) {
+  return (
+    <AppHeaderComponent
+      className={themeClass.className}
+      drawerToggle={showDrawerToggle ? (
+        <button
+          aria-label="Open navigation menu"
+          className={appHeaderStyles.hamburgerButton}
+          data-part-id="hamburger"
+          onClick={toggleDrawer}
+          type="button"
+        >
+          <ThemedIcon name="hamburger" />
+        </button>
+      ) : undefined}
+      logoContent={logoContent}
+      style={themeClass.style}
+    >
+      {navPanelContent}
+    </AppHeaderComponent>
+  );
+}
+
 type AppChildSlots = {
   header?: XmluiNode;
   navPanel?: XmluiNode;
@@ -592,6 +675,15 @@ function hasTemplate(children: XmluiNode[], name: string): boolean {
     child.type === "property" &&
     child.props.name === name
   );
+}
+
+function templateChildren(children: XmluiNode[], name: string): XmluiNode[] | undefined {
+  const property = children.find((child) =>
+    child.kind === "element" &&
+    child.type === "property" &&
+    child.props.name === name
+  );
+  return property?.kind === "element" ? property.children : undefined;
 }
 
 function shouldApplyDefaultContentPadding(

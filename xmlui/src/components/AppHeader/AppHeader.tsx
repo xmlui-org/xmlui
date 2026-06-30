@@ -57,7 +57,6 @@ export const AppHeaderMd = createMetadata({
     [`paddingLeft-${COMP}`]: "$space-4",
     [`borderRadius-${COMP}`]: "0px",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
-    [`width-logo-${COMP}`]: "$space-10",
     [`alignment-content-${COMP}`]: "flex-start",
   },
 });

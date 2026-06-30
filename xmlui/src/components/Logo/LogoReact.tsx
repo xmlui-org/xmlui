@@ -5,7 +5,7 @@ import classnames from "classnames";
 import { useLogoUrl } from "../AppHeader/AppHeaderReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { defaultProps } from "./Logo.defaults";
-import styles from "./Logo.module.scss";
+import { ThemedImage as Image } from "../Image/ThemedImage";
 
 export type LogoProps = {
   src?: string;
@@ -33,15 +33,15 @@ export const Logo = memo(forwardRef(function Logo(
     return null;
   }
   // width auto for safari
-  const image = (
-    <img
+  return (
+    <Image
       {...rest}
       ref={ref}
       src={logoUrl}
       alt={alt}
-      className={classnames(styles.logo, { [styles.inline]: inline }, classes?.[COMPONENT_PART_KEY], className)}
-      style={{ width: "auto", boxShadow: "none", ...style, ...(inline ? { display: "inline" } : {}) }}
+      inline={inline}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className)}
+      style={{ width: "auto", boxShadow: "none", ...style }}
     />
   );
-  return inline ? <span style={{ display: "inline" }}>{image}</span> : image;
 }));
