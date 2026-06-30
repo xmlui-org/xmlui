@@ -276,11 +276,11 @@ test.describe("Rendering Precision", () => {
     initTestBed,
     createIconDriver,
   }) => {
-    await initTestBed(`<Icon testId="icon" name="home"/>`);
+    await initTestBed(`<Icon testId="icon" name="info"/>`);
     const icon = await createIconDriver("icon");
     const wrapperDisplay = await icon.svgIcon.evaluate((el) => {
-      const wrapper = el.closest("span");
-      return wrapper ? window.getComputedStyle(wrapper).display : null;
+      const wrapper = el.closest('span[style*="inline-block"]');
+      return wrapper instanceof HTMLElement ? wrapper.style.display : null;
     });
     expect(wrapperDisplay).toBe("inline-block");
   });

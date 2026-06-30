@@ -12,6 +12,7 @@ export type RuntimeScope = {
   store: RuntimeStateStore;
   localOwnerId?: StateOwnerId;
   parent?: RuntimeScope;
+  layoutContext?: RuntimeLayoutContext;
   props: Record<string, unknown>;
   contextValues: Record<string, unknown>;
   appContext: XmluiAppContextObject;
@@ -24,10 +25,17 @@ export type RuntimeScope = {
   extensionFunctions: Record<string, (...args: unknown[]) => unknown>;
 };
 
+export type RuntimeLayoutContext = {
+  type?: string;
+  orientation?: "horizontal" | "vertical" | string;
+  parent?: RuntimeLayoutContext;
+};
+
 export function createRuntimeScope({
   store,
   localOwnerId,
   parent,
+  layoutContext,
   props = {},
   contextValues = {},
   appContext,
@@ -42,6 +50,7 @@ export function createRuntimeScope({
   store: RuntimeStateStore;
   localOwnerId?: StateOwnerId;
   parent?: RuntimeScope;
+  layoutContext?: RuntimeLayoutContext;
   props?: Record<string, unknown>;
   contextValues?: Record<string, unknown>;
   appContext?: XmluiAppContextObject;
@@ -57,6 +66,7 @@ export function createRuntimeScope({
     store,
     localOwnerId,
     parent,
+    layoutContext: layoutContext ?? parent?.layoutContext,
     props,
     contextValues,
     appContext: appContext ?? parent?.appContext ?? {},

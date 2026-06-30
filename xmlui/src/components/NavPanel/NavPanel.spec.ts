@@ -5,6 +5,7 @@ const NAVPANEL_OLD_SUITE_PENDING =
 
 const ACTIVE_NAVPANEL_TESTS = new Set([
   "Nested NavGroups and NavLinks show in NavPanel",
+  "preserves vertical logo heading spacing above links",
 ]);
 
 test.beforeEach(({}, testInfo) => {
@@ -16,6 +17,52 @@ test.beforeEach(({}, testInfo) => {
 const CODE = `<NavPanel><NavLink to="/">Hello</NavLink></NavPanel>`;
 
 test.describe("discover NavGroups and NavLinks", () => {
+  test("preserves vertical logo heading spacing above links", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <property name="logoTemplate">
+            <H3 testId="navLogoHeading">
+              <Icon name="drive" />
+              DriveDiag (Nav)
+            </H3>
+          </property>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text value="Home" />
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    const spacing = await page.getByTestId("navLogoHeading").evaluate((heading) => {
+      const homeLink = [...document.querySelectorAll("a")].find((link) =>
+        link.textContent?.includes("Home")
+      );
+      const textValues = [...heading.childNodes]
+        .filter((node) => node.nodeType === Node.TEXT_NODE)
+        .map((node) => node.nodeValue);
+      const headingRect = heading.getBoundingClientRect();
+      const homeRect = homeLink?.getBoundingClientRect();
+      return {
+        textValues,
+        headingHeight: headingRect.height,
+        titleToFirstLink: homeRect ? homeRect.top - headingRect.bottom : -1,
+      };
+    });
+
+    expect(spacing.textValues).toContain(" DriveDiag (Nav) ");
+    expect(spacing.headingHeight).toBeGreaterThan(23.9);
+    expect(spacing.headingHeight).toBeLessThan(24.1);
+    expect(spacing.titleToFirstLink).toBe(32);
+  });
+
   test("Nested NavGroups and NavLinks show in NavPanel", async ({ initTestBed, page }) => {
     await initTestBed(
       `

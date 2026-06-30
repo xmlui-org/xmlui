@@ -566,7 +566,8 @@ function contentChildren(
   const children = content?.children ?? [];
   const result: XmluiNode[] = [];
 
-  for (const child of children) {
+  for (let index = 0; index < children.length; index++) {
+    const child = children[index];
     if (child.kind === MarkupSyntaxKind.Element) {
       if (tagName(child, source) === "script") {
         continue;
@@ -593,11 +594,30 @@ function contentChildren(
         continue;
       }
       const range = rangeOf(child);
+      const previous = result.at(-1);
+      const next = children[index + 1];
+      const sourceGapBefore = previous ? source.text.slice(previous.range.end, range.start) : "";
+      const sourceGapAfter = next
+        ? source.text.slice(range.end, rangeOf(next).start)
+        : source.text.slice(range.end, content?.end ?? range.end);
+      const needsLeadingSpace =
+        previous?.kind === "element" && (/^\s/.test(rawText) || /^\s+$/.test(sourceGapBefore));
+      const needsTrailingSpace = /\s$/.test(rawText) || /^\s+$/.test(sourceGapAfter);
+      const spacedValue = `${needsLeadingSpace ? " " : ""}${value}${needsTrailingSpace ? " " : ""}`;
+      const spacedRange =
+        spacedValue === value
+          ? range
+          : {
+              ...range,
+              start: needsLeadingSpace
+                ? Math.max(previous?.range.end ?? range.start, range.start - 1)
+                : range.start,
+            };
       result.push({
         kind: "text",
-        value,
-        range,
-        segments: parseMixedTextSegments(value, range, { sourceId }),
+        value: spacedValue,
+        range: spacedRange,
+        segments: parseMixedTextSegments(spacedValue, spacedRange, { sourceId }),
       });
     }
   }

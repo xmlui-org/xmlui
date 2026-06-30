@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
-import { createPortal } from "react-dom";
 
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import {
@@ -81,10 +80,10 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
       scope: appChildScope,
       renderChildren: (children = adapter.node.children) =>
         adapter.context.renderChildren(children, appChildScope),
-      renderTemplate: (name: string, fallbackChildren?: XmluiNode[]) =>
+      renderTemplate: (name: string, fallbackChildren?: XmluiNode[], renderScope = appChildScope) =>
         adapter.context.renderChildren(
           templateChildren(adapter.node.children, name) ?? fallbackChildren ?? [],
-          appChildScope,
+          renderScope,
         ),
     }),
     [adapter, appChildScope],
@@ -123,8 +122,30 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     mergedThemeVariables,
     routeSnapshot.pathname,
   );
+  const appLogoTemplateScope = useMemo(
+    () =>
+      createRuntimeScope({
+        store: appChildScope.store,
+        parent: appChildScope,
+        props: appChildScope.props,
+        contextValues: appChildScope.contextValues,
+        references: appChildScope.references,
+        slots: appChildScope.slots,
+        routing: appChildScope.routing,
+        toast: appChildScope.toast,
+        i18n: appChildScope.i18n,
+        emitEvent: appChildScope.emitEvent,
+        extensionFunctions: appChildScope.extensionFunctions,
+        layoutContext: {
+          type: "Stack",
+          orientation: "horizontal",
+          parent: appChildScope.layoutContext,
+        },
+      }),
+    [appChildScope],
+  );
   const appLogoContent = hasTemplate(adapter.node.children, "logoTemplate")
-    ? childAdapter.renderTemplate("logoTemplate")
+    ? childAdapter.renderTemplate("logoTemplate", undefined, appLogoTemplateScope)
     : undefined;
   const readyFiredRef = useRef(false);
   const appLayoutContext = useMemo(() => ({
@@ -232,9 +253,15 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     };
   }, [adapter]);
 
+  const inlineHeaderNavPanel =
+    layout.isCondensed && slots.header && slots.navPanel && !shouldUseDrawerNavPanel
+      ? <div style={{ minWidth: 0 }}>{childAdapter.renderChildren([slots.navPanel])}</div>
+      : undefined;
+
   return (
     <ProfileMenuProvider loggedInUser={normalizeLoggedInUser(loggedInUser)}>
       <AppShellProvider
+        inlineNavPanel={inlineHeaderNavPanel}
         showDrawerToggle={shouldUseDrawerNavPanel && showDrawerToggle}
         toggleDrawer={() => setDrawerVisible((current) => !current)}
       >
@@ -335,6 +362,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                         slots.content,
                         useTocContentWidth,
                         false,
+                        scrollWholePage,
                       )}
                     </div>
                   </main>
@@ -403,6 +431,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                       slots.content,
                       useTocContentWidth,
                       false,
+                      scrollWholePage,
                     )}
                   </div>
                   {slots.footer ? (
@@ -446,10 +475,6 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                   )}
               </div>
             ) : null}
-            {layout.isCondensed && slots.header && slots.navPanel && subNavPanelSlot
-              && !shouldUseDrawerNavPanel
-              ? createPortal(childAdapter.renderChildren([slots.navPanel]), subNavPanelSlot)
-              : null}
             {slots.navPanel &&
             !shouldUseDrawerNavPanel &&
             layout.value !== "desktop" &&
@@ -505,7 +530,30 @@ function renderPageContent(
   children: XmluiNode[],
   useTocContentWidth: boolean,
   isDesktop: boolean,
+  scrollWholePage: boolean,
 ) {
+  const contentScope = !scrollWholePage
+    ? createRuntimeScope({
+      store: adapter.scope.store,
+      localOwnerId: adapter.scope.localOwnerId,
+      parent: adapter.scope,
+      layoutContext: {
+        type: "Stack",
+        orientation: "vertical",
+        parent: adapter.scope.layoutContext,
+      },
+      props: adapter.scope.props,
+      contextValues: adapter.scope.contextValues,
+      appContext: adapter.scope.appContext,
+      references: adapter.scope.references,
+      slots: adapter.scope.slots,
+      routing: adapter.scope.routing,
+      toast: adapter.scope.toast,
+      i18n: adapter.scope.i18n,
+      emitEvent: adapter.scope.emitEvent,
+      extensionFunctions: adapter.scope.extensionFunctions,
+    })
+    : adapter.scope;
   return (
     <div
       data-xmlui-component="App"
@@ -517,7 +565,7 @@ function renderPageContent(
       ].filter(Boolean).join(" ")}
       style={pageContentStyle(mergedThemeVariables, appProps, useTocContentWidth, isDesktop)}
     >
-      {adapter.renderChildren(children)}
+      {adapter.context.renderChildren(children, contentScope)}
     </div>
   );
 }
@@ -550,7 +598,15 @@ function renderMainContent(
         useMobileShell,
       )}
     >
-      {renderPageContent(adapter, mergedThemeVariables, appProps, children, useTocContentWidth, isDesktop)}
+      {renderPageContent(
+        adapter,
+        mergedThemeVariables,
+        appProps,
+        children,
+        useTocContentWidth,
+        isDesktop,
+        scrollWholePage,
+      )}
     </main>
   );
 }

@@ -16,6 +16,34 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("test text")).toBeVisible();
   });
 
+  test("horizontal non-whole-page content resolves vertical star heights", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="horizontal" scrollWholePage="false">
+        <AppHeader>
+          Horizontal Splitter Example
+        </AppHeader>
+        <CHStack testId="one" height="*" backgroundColor="lightblue">1/4</CHStack>
+        <CHStack testId="three" height="3*" backgroundColor="lightcoral">3/4</CHStack>
+        <Footer>
+          Footer Content
+        </Footer>
+      </App>
+    `);
+
+    const one = page.getByTestId("one");
+    const three = page.getByTestId("three");
+    await expect(one).toHaveCSS("flex-grow", "1");
+    await expect(three).toHaveCSS("flex-grow", "3");
+
+    const oneBounds = await getBounds(one);
+    const threeBounds = await getBounds(three);
+    expect(threeBounds.height / oneBounds.height).toBeGreaterThan(2.95);
+    expect(threeBounds.height / oneBounds.height).toBeLessThan(3.05);
+  });
+
   test("renders with horizontal-sticky layout", async ({ initTestBed, page }) => {
     await initTestBed(`<App layout="horizontal-sticky">test text</App>`);
     await expect(page.getByText("test text")).toBeVisible();

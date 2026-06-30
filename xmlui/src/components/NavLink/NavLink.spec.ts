@@ -4,6 +4,7 @@ const NAVLINK_OLD_SUITE_PENDING =
   "The literal old NavLink suite is copied for compatibility tracking, but full theme-variable matrix, React Router active semantics, icon rendering, NavGroup level inheritance, tooltip behavior, and shell integration are not complete yet. Re-enable cases feature-by-feature.";
 
 const ACTIVE_NAVLINK_TESTS = new Set([
+  "horizontal custom content preserves link width",
   "link with exact=true is active on exact path",
 ]);
 
@@ -14,6 +15,50 @@ test.beforeEach(({}, testInfo) => {
 });
 
 const CODE = `<NavLink to="/">Hello</NavLink>`;
+
+test("horizontal custom content preserves link width", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="horizontal">
+      <AppHeader>
+        <H1>MyApp</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink to="/">
+          <Stack width="16px" height="16px" backgroundColor="purple" />
+          Home
+        </NavLink>
+        <NavLink to="/about">
+          <Stack width="16px" height="16px" backgroundColor="green" />
+          About
+        </NavLink>
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/about">About</Page>
+      </Pages>
+    </App>
+  `);
+
+  const geometry = await page.locator("a").filter({ hasText: "Home" }).first().evaluate((link) => {
+    const rect = link.getBoundingClientRect();
+    const inner = link.querySelector('[class*="innerContent"]') as HTMLElement | null;
+    const textValues = inner
+      ? [...inner.childNodes]
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((node) => node.nodeValue)
+      : [];
+    return {
+      width: rect.width,
+      innerTag: inner?.tagName,
+      textValues,
+    };
+  });
+
+  expect(geometry.innerTag).toBe("DIV");
+  expect(geometry.textValues).toContain(" Home ");
+  expect(geometry.width).toBeGreaterThan(111);
+  expect(geometry.width).toBeLessThan(112);
+});
 
 test("border", async ({ initTestBed, createNavLinkDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";

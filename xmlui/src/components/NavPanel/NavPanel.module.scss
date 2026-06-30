@@ -135,6 +135,10 @@ $themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
       width: auto;
     }
 
+    > :not(img) {
+      min-height: 1.333333em;
+    }
+
     &.inDrawer {     //to make room for the close button
       min-height: 32px;
     }

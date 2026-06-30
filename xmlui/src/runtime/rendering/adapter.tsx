@@ -62,7 +62,7 @@ export type XmluiComponentAdapter = {
   booleanProp(name: string, fallback?: boolean): boolean;
   event(name: string): (...args: unknown[]) => Promise<unknown>;
   renderChildren(children?: XmluiNode[]): ReactNode;
-  renderTemplate(name: string, fallbackChildren?: XmluiNode[]): ReactNode;
+  renderTemplate(name: string, fallbackChildren?: XmluiNode[], renderScope?: RuntimeScope): ReactNode;
   registerApi(api: Record<string, unknown>): void;
   resourceUrl(value: unknown): string | undefined;
 };
@@ -125,13 +125,14 @@ export function useXmluiComponentAdapter({
   const variant = typeof props.variant === "string" ? props.variant : undefined;
   const themeClass = useComponentThemeClass(name, metadata, themeContributors, variant);
   const viewportWidth = useViewportWidth();
+  const parentOrientation = scope.layoutContext?.orientation;
   const layoutStyle = useMemo(
-    () => resolveActiveLayoutStyle(props, viewportWidth),
-    [props, viewportWidth],
+    () => resolveActiveLayoutStyle(props, viewportWidth, { parentOrientation }),
+    [parentOrientation, props, viewportWidth],
   );
   const layoutStyles = useMemo(
-    () => resolveResponsiveLayoutStyles(props),
-    [props],
+    () => resolveResponsiveLayoutStyles(props, { parentOrientation }),
+    [parentOrientation, props],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
     if (part === defaultPart || part === rootPart) {
@@ -230,10 +231,10 @@ export function useXmluiComponentAdapter({
       events[eventName] ?? ((..._args: unknown[]) => Promise.resolve(undefined)),
     renderChildren: (children = nonPropertyChildren(node.children)) =>
       context.renderChildren(children, scope),
-    renderTemplate: (templateName, fallbackChildren) =>
+    renderTemplate: (templateName, fallbackChildren, renderScope = scope) =>
       context.renderChildren(
         templateChildren(node, templateName) ?? fallbackChildren ?? [],
-        scope,
+        renderScope,
       ),
     registerApi,
     resourceUrl: (value) => value == null || value === "" ? undefined : String(value),
@@ -260,11 +261,12 @@ export function useXmluiComponentAdapter({
 function resolveActiveLayoutStyle(
   props: Record<string, unknown>,
   viewportWidth: number | undefined,
+  options: { parentOrientation?: string } = {},
 ): CSSProperties {
-  const responsive = resolveResponsiveLayoutStyles(props);
+  const responsive = resolveResponsiveLayoutStyles(props, options);
   const componentStyle = responsive[COMPONENT_PART_KEY];
   if (!componentStyle) {
-    return resolveLayoutStyle(props);
+    return resolveLayoutStyle(props, options);
   }
 
   return resolveActiveLayoutStyleForPart(responsive, COMPONENT_PART_KEY, viewportWidth) ?? {};

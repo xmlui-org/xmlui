@@ -9,8 +9,6 @@ import {
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { useComponentThemeClass } from "../../runtime/rendering/theme";
 import { COMPONENT_PART_KEY } from "../../styling";
-import { useTheme } from "../../components-core/theming/ThemeContext";
-import { useIconRegistry } from "../IconRegistryContext";
 import Icon from "./IconReact";
 import type { IconBaseProps } from "./IconReact";
 import iconStylesSource from "./Icon.module.scss?xmlui-theme-vars";
@@ -82,11 +80,9 @@ export const iconRenderer = wrapComponent({
     const fallback = adapter.prop("fallback") as string | undefined;
     const size = normalizeIconSize(adapter.prop("size"));
     return (
-      <RenderedIcon
-        rootAttrs={{
-          ...rootAttrs,
-          "data-testid": adapter.stringProp("testId", "test-id-component"),
-        }}
+      <ThemedIcon
+        {...rootAttrs}
+        data-testid={adapter.stringProp("testId", "test-id-component")}
         name={name}
         fallback={fallback}
         size={size}
@@ -96,47 +92,6 @@ export const iconRenderer = wrapComponent({
     );
   },
 });
-
-function RenderedIcon({ rootAttrs, ...props }: ThemedIconProps & { rootAttrs: Record<string, unknown> }) {
-  if (!canRenderIcon(props.name, props.fallback)) {
-    return null;
-  }
-  return (
-    <span
-      {...rootAttrs}
-      style={{
-        ...(rootAttrs.style as React.CSSProperties | undefined),
-        display: "inline-block",
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          props.onClick?.(event as unknown as React.MouseEvent);
-        }
-      }}
-    >
-      <ThemedIcon {...props} />
-    </span>
-  );
-}
-
-function canRenderIcon(name?: string, fallback?: string): boolean {
-  const iconRegistry = useIconRegistry();
-  const { getResourceUrl } = useTheme();
-  if (name && typeof name === "string") {
-    if (getResourceUrl(`resource:icon.${name}`)) {
-      return true;
-    }
-    const separator = ":";
-    const parts = name.split(separator);
-    if (parts.length > 1 && iconRegistry.lookupIconRenderer(`${parts[0].toLowerCase()}${separator}${parts[1]}`)) {
-      return true;
-    }
-    if (parts.length === 1 && iconRegistry.lookupIconRenderer(parts[0])) {
-      return true;
-    }
-  }
-  return !!(fallback && typeof fallback === "string" && iconRegistry.lookupIconRenderer(fallback.toLowerCase()));
-}
 
 function normalizeIconSize(size: unknown): string | undefined {
   if (size == null) {

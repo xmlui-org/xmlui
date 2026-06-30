@@ -9,6 +9,7 @@ import { resolveThemeReferences } from "./theme";
 
 export type LayoutStyleOptions = {
   orientation?: LayoutOrientation;
+  parentOrientation?: LayoutOrientation | string;
 };
 
 export const COMPONENT_PART_KEY = "-component";
@@ -40,10 +41,10 @@ export function resolveLayoutStyle(
     style.flexDirection = orientation === "horizontal" ? "row" : "column";
   }
 
-  assignSize(style, "width", props.width, orientation === "horizontal");
+  assignSize(style, "width", props.width, options.parentOrientation === "horizontal");
   assignSize(style, "minWidth", props.minWidth);
   assignSize(style, "maxWidth", props.maxWidth);
-  assignSize(style, "height", props.height, orientation === "vertical");
+  assignSize(style, "height", props.height, options.parentOrientation === "vertical");
   assignSize(style, "minHeight", props.minHeight);
   assignSize(style, "maxHeight", props.maxHeight);
 

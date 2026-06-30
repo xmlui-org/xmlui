@@ -71,7 +71,7 @@ export function renderValueOrChildren(
 export function useLayoutStyle(
   node: XmluiElement,
   scope: RuntimeScope,
-  options: { orientation?: LayoutOrientation } = {},
+  options: { orientation?: LayoutOrientation; parentOrientation?: string } = {},
 ): CSSProperties {
   const props: Record<string, unknown> = {};
   for (const name of Object.keys(node.props)) {
@@ -80,7 +80,10 @@ export function useLayoutStyle(
     }
   }
   const viewportWidth = useViewportWidth();
-  return resolveActiveLayoutStyle(props, viewportWidth, options);
+  return resolveActiveLayoutStyle(props, viewportWidth, {
+    ...options,
+    parentOrientation: scope.layoutContext?.orientation,
+  });
 }
 
 export function flexStyle(
@@ -141,7 +144,7 @@ function coerceBoolean(value: unknown, fallback: boolean): boolean {
 function resolveActiveLayoutStyle(
   props: Record<string, unknown>,
   viewportWidth: number | undefined,
-  options: { orientation?: LayoutOrientation },
+  options: { orientation?: LayoutOrientation; parentOrientation?: string },
 ): CSSProperties {
   const responsive = resolveResponsiveLayoutStyles(props, options);
   const componentStyle = responsive[COMPONENT_PART_KEY];

@@ -5,6 +5,7 @@ import { createMetadata, dClick, dContextMenu } from "../../component-core/metad
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import { nonPropertyChildren, wrapComponent } from "../../runtime/rendering/adapter";
 import type { XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { createRuntimeScope, type RuntimeScope } from "../../runtime/state";
 import { COMPONENT_PART_KEY } from "../../styling";
 import { extractScssThemeVars } from "../../styling/theme";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout } from "../FlowLayout/FlowLayoutReact";
@@ -250,6 +251,7 @@ function renderStack({
   }
 
   const hasExplicitItemWidth = adapter.node.props.itemWidth != null;
+  const childScope = createChildLayoutScope(adapter.scope, "Stack", orientation);
   return (
     <StackShell
       adapter={adapter}
@@ -260,9 +262,36 @@ function renderStack({
     >
       {hasExplicitItemWidth
         ? children.map((child, index) => wrapItemWidth(adapter, child, itemWidth, index))
-        : adapter.context.renderChildren(children, adapter.scope)}
+        : adapter.context.renderChildren(children, childScope)}
     </StackShell>
   );
+}
+
+function createChildLayoutScope(
+  scope: RuntimeScope,
+  type: string,
+  orientation: string,
+): RuntimeScope {
+  return createRuntimeScope({
+    store: scope.store,
+    localOwnerId: scope.localOwnerId,
+    parent: scope,
+    layoutContext: {
+      type,
+      orientation,
+      parent: scope.layoutContext,
+    },
+    props: scope.props,
+    contextValues: scope.contextValues,
+    appContext: scope.appContext,
+    references: scope.references,
+    slots: scope.slots,
+    routing: scope.routing,
+    toast: scope.toast,
+    i18n: scope.i18n,
+    emitEvent: scope.emitEvent,
+    extensionFunctions: scope.extensionFunctions,
+  });
 }
 
 function renderDockLayout({

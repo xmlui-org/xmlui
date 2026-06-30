@@ -70,7 +70,7 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
       "--nav-link-level": effectiveVertical ? effectiveLevel + 1 : 0,
     } as CSSProperties;
     const innerContent = (
-      <span className={[
+      <div className={[
         styles.innerContent,
         iconAlignment === "baseline" && styles.iconAlignBaseline,
         iconAlignment === "start" && styles.iconAlignStart,
@@ -79,7 +79,7 @@ export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement
       ].filter(Boolean).join(" ")}>
         {icon}
         {children}
-      </span>
+      </div>
     );
 
     if (disabled || !href) {

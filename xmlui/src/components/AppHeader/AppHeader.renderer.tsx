@@ -1,6 +1,7 @@
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import type { XmluiNode } from "../../compiler/ir";
+import { createRuntimeScope } from "../../runtime/state";
 import { useAppShellContext } from "../App/AppShellContext";
 import { AppHeaderMd } from "./AppHeader";
 import { defaultProps } from "./AppHeader.defaults";
@@ -18,8 +19,26 @@ export const appHeaderRenderer = wrapComponent({
   renderer: ({ adapter }) => {
     const children = adapter.node.children.filter((child) => !isTemplateProperty(child));
     const loggedInUser = useLoggedInUser();
-    const { showDrawerToggle, toggleDrawer } = useAppShellContext();
+    const { inlineNavPanel, showDrawerToggle, toggleDrawer } = useAppShellContext();
     const hasProfileTemplate = hasTemplate(adapter.node.children, "profileMenuTemplate");
+    const logoTemplateScope = createRuntimeScope({
+      store: adapter.scope.store,
+      parent: adapter.scope,
+      props: adapter.scope.props,
+      contextValues: adapter.scope.contextValues,
+      references: adapter.scope.references,
+      slots: adapter.scope.slots,
+      routing: adapter.scope.routing,
+      toast: adapter.scope.toast,
+      i18n: adapter.scope.i18n,
+      emitEvent: adapter.scope.emitEvent,
+      extensionFunctions: adapter.scope.extensionFunctions,
+      layoutContext: {
+        type: "Stack",
+        orientation: "horizontal",
+        parent: adapter.scope.layoutContext,
+      },
+    });
 
     return (
       <AppHeaderComponent
@@ -35,12 +54,13 @@ export const appHeaderRenderer = wrapComponent({
             <ThemedIcon name="hamburger" />
           </button>
         ) : undefined}
-        logoContent={hasTemplate(adapter.node.children, "logoTemplate") ? adapter.renderTemplate("logoTemplate") : undefined}
+        logoContent={hasTemplate(adapter.node.children, "logoTemplate") ? adapter.renderTemplate("logoTemplate", undefined, logoTemplateScope) : undefined}
         profileMenu={hasProfileTemplate ? adapter.renderTemplate("profileMenuTemplate") : <ProfileMenu loggedInUser={loggedInUser} />}
         showLogo={adapter.booleanProp("showLogo", defaultProps.showLogo)}
         title={adapter.stringProp("title")}
         titleContent={hasTemplate(adapter.node.children, "titleTemplate") ? adapter.renderTemplate("titleTemplate") : undefined}
       >
+        {inlineNavPanel}
         {adapter.renderChildren(children)}
       </AppHeaderComponent>
     );

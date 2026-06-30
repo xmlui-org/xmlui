@@ -7,6 +7,7 @@ const ACTIVE_APPHEADER_TESTS = new Set([
   "renders with basic props",
   "renders with title prop",
   "renders with custom logo content",
+  "preserves spacing between icon and text in logo template heading",
   "has correct accessibility structure",
   "properly handles focus management",
   "applies background color theme variable correctly",
@@ -63,6 +64,68 @@ test.describe("Basic Functionality", () => {
     const driver = await createAppHeaderDriver();
     await expect(driver.component).toBeVisible();
     await expect(page.getByTestId("customLogo")).toBeVisible();
+  });
+
+  test("preserves spacing between icon and text in logo template heading", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <AppHeader>
+          <property name="logoTemplate">
+            <H3 testId="logoHeading">
+              <Icon name="drive" testId="logoIcon" />
+              DriveDiag
+            </H3>
+          </property>
+        </AppHeader>
+        <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text value="Home" />
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+        </Pages>
+      </App>`);
+
+    const gaps = await page.getByTestId("logoHeading").evaluate((heading) => {
+      const icon = heading.querySelector('[data-testid="logoIcon"]');
+      if (!icon) {
+        return { iconToText: -1, logoToNav: -1 };
+      }
+      const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+      let textNode: Text | null = null;
+      while (walker.nextNode()) {
+        const current = walker.currentNode as Text;
+        if (current.nodeValue?.includes("DriveDiag")) {
+          textNode = current;
+          break;
+        }
+      }
+      if (!textNode) {
+        return { iconToText: -1, logoToNav: -1 };
+      }
+      const range = document.createRange();
+      const start = textNode.nodeValue?.indexOf("DriveDiag") ?? 0;
+      range.setStart(textNode, start);
+      range.setEnd(textNode, start + "DriveDiag".length);
+      const textRect = range.getBoundingClientRect();
+      const iconRect = icon.getBoundingClientRect();
+      const homeLink = document.querySelector('a[href="#/"]');
+      const homeRect = homeLink?.getBoundingClientRect();
+      return {
+        iconToText: textRect.left - iconRect.right,
+        logoToNav: homeRect ? homeRect.left - textRect.right : -1,
+      };
+    });
+
+    expect(gaps.iconToText).toBeGreaterThan(2);
+    expect(gaps.iconToText).toBeLessThan(8);
+    expect(gaps.logoToNav).toBeGreaterThanOrEqual(40);
+    expect(gaps.logoToNav).toBeLessThan(60);
   });
 });
 

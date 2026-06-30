@@ -178,15 +178,18 @@ describe("layout resolver", () => {
   });
 
   it("maps star sizing to flex behavior in the parent orientation", () => {
-    expect(resolveLayoutStyle({ width: "2*" }, { orientation: "horizontal" })).toMatchObject({
+    expect(resolveLayoutStyle({ width: "2*" }, { parentOrientation: "horizontal" })).toMatchObject({
       flexGrow: 2,
       flexShrink: 1,
       flexBasis: 0,
     });
-    expect(resolveLayoutStyle({ height: "*" }, { orientation: "vertical" })).toMatchObject({
+    expect(resolveLayoutStyle({ height: "*" }, { parentOrientation: "vertical" })).toMatchObject({
       flexGrow: 1,
       flexShrink: 1,
       flexBasis: 0,
+    });
+    expect(resolveLayoutStyle({ height: "*" }, { orientation: "horizontal" })).toMatchObject({
+      height: "*",
     });
   });
 
