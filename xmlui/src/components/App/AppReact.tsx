@@ -16,7 +16,8 @@ import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { useBindingRevision } from "../../runtime/rendering/reactive";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
-import { AppLayoutContext, type AppLayoutType } from "./AppLayoutContext";
+import { ThemedIcon } from "../Icon/Icon";
+import { AppLayoutContext, type AppLayoutType, type IAppLayoutContext } from "./AppLayoutContext";
 import { AppMd } from "./App";
 import { AppShellProvider } from "./AppShellContext";
 import { defaultProps } from "./App.defaults";
@@ -28,6 +29,8 @@ const CONTENT_THEME_VARS = {
   maxWidth: "maxWidth-content-App",
   maxWidthWithToc: "maxWidth-content-App--withToc",
 } as const;
+
+const NARROW_SCREEN_QUERY = "(max-width: 991px)";
 
 export function App({ adapter }: XmluiAdapterRendererProps) {
   const themeVariables = useThemeVariables();
@@ -54,16 +57,20 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const routeSnapshot = useRouteSnapshot(adapter);
   const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
   const showDrawerToggle = useVisibleNavPanel(adapter);
+  const isNarrowScreen = useNarrowScreen();
   const [navPanelCollapsed, setNavPanelCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerMounted, setDrawerMounted] = useState(false);
   const [subNavPanelSlot, setSubNavPanelSlot] = useState<HTMLElement | null>(null);
   const slots = useMemo(
     () => partitionAppChildren(adapter.node.children),
     [adapter.node.children],
   );
   const isVerticalFullHeader = layout.value === "vertical-full-header";
+  const shouldUseDrawerNavPanel = Boolean(isNarrowScreen && slots.header && slots.navPanel);
   const hasSideNavPanel = Boolean(
     slots.navPanel &&
+    !shouldUseDrawerNavPanel &&
     layout.value !== "desktop" &&
     !isVerticalFullHeader &&
     getAppLayoutOrientation(layout.value) === "vertical",
@@ -78,7 +85,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const readyFiredRef = useRef(false);
   const appLayoutContext = useMemo(() => ({
     layout: layout.value as AppLayoutType,
-    navPanelVisible: showDrawerToggle,
+    navPanelVisible: showDrawerToggle && !shouldUseDrawerNavPanel,
     navPanelCollapsed,
     setNavPanelCollapsed,
     toggleNavPanelCollapsed: () => setNavPanelCollapsed((current) => !current),
@@ -97,6 +104,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     registerSubNavPanelSlot: setSubNavPanelSlot,
     subNavPanelSlot,
     scrollWholePage,
+    isNarrowScreen: shouldUseDrawerNavPanel,
   }), [
     adapter,
     drawerVisible,
@@ -105,8 +113,25 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     navPanelCollapsed,
     scrollWholePage,
     showDrawerToggle,
+    shouldUseDrawerNavPanel,
     subNavPanelSlot,
   ]);
+
+  useEffect(() => {
+    if (!shouldUseDrawerNavPanel && drawerVisible) {
+      setDrawerVisible(false);
+    }
+  }, [drawerVisible, shouldUseDrawerNavPanel]);
+
+  useEffect(() => {
+    if (drawerVisible) {
+      setDrawerMounted(true);
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setDrawerMounted(false), 300);
+    return () => window.clearTimeout(timeoutId);
+  }, [drawerVisible]);
 
   adapter.scope.i18n?.setConfig({
     locale: adapter.stringProp("locale"),
@@ -165,8 +190,21 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
 
   return (
     <ProfileMenuProvider loggedInUser={normalizeLoggedInUser(loggedInUser)}>
-      <AppShellProvider showDrawerToggle={showDrawerToggle}>
+      <AppShellProvider
+        showDrawerToggle={shouldUseDrawerNavPanel && showDrawerToggle}
+        toggleDrawer={() => setDrawerVisible((current) => !current)}
+      >
         <AppLayoutContext.Provider value={appLayoutContext}>
+          {shouldUseDrawerNavPanel && slots.navPanel && (drawerVisible || drawerMounted)
+            ? renderMobileDrawer(
+              adapter,
+              appLayoutContext,
+              mergedThemeVariables,
+              slots.navPanel,
+              drawerVisible,
+              () => setDrawerVisible(false),
+            )
+            : null}
           <div
             {...rootAttrs}
             data-testid={testId}
@@ -182,6 +220,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
               noScrollbarGutters && styles.noScrollbarGutters,
               noScrollbarGutters && "noScrollbarGutters",
               fitContent && styles.fitContent,
+              shouldUseDrawerNavPanel && styles.mobile,
             ]
               .filter(Boolean)
               .join(" ")}
@@ -189,8 +228,8 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
               ...rootStyle,
               ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
               ...appBaselineStyle(mergedThemeVariables),
-              ...appContainerStyle(fitContent, layout.value),
-              "--app-header-height": isVerticalFullHeader && headerSize.height > 0
+              ...appContainerStyle(fitContent, layout.value, shouldUseDrawerNavPanel),
+              "--app-header-height": headerSize.height > 0
                 ? `${headerSize.height}px`
                 : undefined,
               "--app-footer-height": isVerticalFullHeader && slots.footer && footerSize.height > 0
@@ -200,7 +239,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
               ...appShellStyle(adapter.style),
             } as CSSProperties}
           >
-            {isVerticalFullHeader ? (
+            {isVerticalFullHeader && !shouldUseDrawerNavPanel ? (
               <>
                 {slots.header ? (
                   <div
@@ -237,6 +276,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                       scrollWholePage,
                       getAppLayoutOrientation(layout.value),
                       appProps,
+                      false,
                     )}
                   >
                     <div
@@ -250,6 +290,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                         appProps,
                         slots.content,
                         useTocContentWidth,
+                        false,
                       )}
                     </div>
                   </main>
@@ -289,12 +330,14 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                     scrollWholePage,
                     getAppLayoutOrientation(layout.value),
                     appProps,
+                    false,
                   )}
                 >
                   {slots.header ? (
                     <div
                       data-xmlui-component="App"
                       data-xmlui-part="header"
+                      ref={headerSize.ref}
                       className={[
                         styles.headerWrapper,
                         layout.isSticky && styles.sticky,
@@ -315,6 +358,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                       appProps,
                       slots.content,
                       useTocContentWidth,
+                      false,
                     )}
                   </div>
                   {slots.footer ? (
@@ -338,6 +382,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
               <div
                 data-xmlui-component="App"
                 data-xmlui-part="header"
+                ref={headerSize.ref}
                 className={[
                   styles.headerWrapper,
                   layout.isSticky && styles.sticky,
@@ -348,9 +393,11 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
               </div>
             ) : null}
             {layout.isCondensed && slots.navPanel && subNavPanelSlot
+              && !shouldUseDrawerNavPanel
               ? createPortal(adapter.renderChildren([slots.navPanel]), subNavPanelSlot)
               : null}
             {slots.navPanel &&
+            !shouldUseDrawerNavPanel &&
             layout.value !== "desktop" &&
             !layout.isCondensed &&
             getAppLayoutOrientation(layout.value) === "horizontal" ? (
@@ -368,7 +415,9 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                 mergedThemeVariables,
                 fitContent,
                 scrollWholePage,
-                getAppLayoutOrientation(layout.value),
+                shouldUseDrawerNavPanel ? "horizontal" : getAppLayoutOrientation(layout.value),
+                layout.value,
+                shouldUseDrawerNavPanel,
                 appProps,
                 slots.content,
                 useTocContentWidth,
@@ -401,6 +450,7 @@ function renderPageContent(
   appProps: Record<string, unknown>,
   children: XmluiNode[],
   useTocContentWidth: boolean,
+  isDesktop: boolean,
 ) {
   return (
     <div
@@ -411,7 +461,7 @@ function renderPageContent(
         shouldApplyDefaultContentPadding(children, appProps) && styles.withDefaultContentPadding,
         useTocContentWidth && styles.withToc,
       ].filter(Boolean).join(" ")}
-      style={pageContentStyle(mergedThemeVariables, appProps, useTocContentWidth)}
+      style={pageContentStyle(mergedThemeVariables, appProps, useTocContentWidth, isDesktop)}
     >
       {adapter.renderChildren(children)}
     </div>
@@ -424,10 +474,13 @@ function renderMainContent(
   fitContent: boolean,
   scrollWholePage: boolean,
   layoutOrientation: "horizontal" | "vertical",
+  layoutValue: string,
+  useMobileShell: boolean,
   appProps: Record<string, unknown>,
   children: XmluiNode[],
   useTocContentWidth: boolean,
 ) {
+  const isDesktop = layoutValue === "desktop";
   return (
     <main
       data-xmlui-component="App"
@@ -439,10 +492,70 @@ function renderMainContent(
         scrollWholePage,
         layoutOrientation,
         appProps,
+        isDesktop,
+        useMobileShell,
       )}
     >
-      {renderPageContent(adapter, mergedThemeVariables, appProps, children, useTocContentWidth)}
+      {renderPageContent(adapter, mergedThemeVariables, appProps, children, useTocContentWidth, isDesktop)}
     </main>
+  );
+}
+
+function renderMobileDrawer(
+  adapter: XmluiAdapterRendererProps["adapter"],
+  appLayoutContext: IAppLayoutContext,
+  mergedThemeVariables: Record<string, unknown>,
+  navPanel: XmluiNode,
+  open: boolean,
+  closeDrawer: () => void,
+) {
+  const drawerLayoutContext: IAppLayoutContext = {
+    ...appLayoutContext,
+    layout: "vertical",
+    navPanelVisible: true,
+    drawerVisible: open,
+    isNarrowScreen: true,
+  };
+
+  return (
+    <div
+      aria-hidden={open ? undefined : "true"}
+      className={styles.mobileDrawer}
+      data-state={open ? "open" : "closed"}
+      data-xmlui-component="App"
+      data-xmlui-part="drawer"
+      style={themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables))}
+    >
+      <button
+        aria-hidden="true"
+        className={styles.mobileDrawerOverlay}
+        onClick={closeDrawer}
+        tabIndex={-1}
+        type="button"
+      />
+      <aside
+        aria-label="Navigation menu"
+        className={styles.mobileDrawerPanel}
+        onClickCapture={(event) => {
+          if ((event.target as Element | null)?.closest("a[href]")) {
+            closeDrawer();
+          }
+        }}
+        role="dialog"
+      >
+        <button
+          aria-label="Close navigation menu"
+          className={styles.mobileDrawerClose}
+          onClick={closeDrawer}
+          type="button"
+        >
+          <ThemedIcon name="close" />
+        </button>
+        <AppLayoutContext.Provider value={drawerLayoutContext}>
+          {adapter.renderChildren([navPanel])}
+        </AppLayoutContext.Provider>
+      </aside>
+    </div>
   );
 }
 
@@ -504,7 +617,9 @@ function navPanelShellStyle(
   return {
     flexShrink: 0,
     position: "sticky",
-    top: isSticky ? "var(--xmlui-height-AppHeader, var(--xmlui-space-14))" : 0,
+    top: isSticky
+      ? "var(--app-header-height, var(--xmlui-height-AppHeader, var(--xmlui-space-14)))"
+      : 0,
     zIndex: isSticky ? 1 : undefined,
     backgroundColor: themeValue(themeVariables, "backgroundColor-navPanel-App"),
     borderBottom: "var(--xmlui-borderBottom-AppHeader, 1px solid var(--xmlui-borderColor))",
@@ -549,14 +664,21 @@ function normalizeLoggedInUser(value: unknown) {
   return value && typeof value === "object" ? value as Record<string, string> : null;
 }
 
-function appContainerStyle(fitContent: boolean, layoutValue: string): CSSProperties {
+function appContainerStyle(
+  fitContent: boolean,
+  layoutValue: string,
+  useMobileShell: boolean,
+): CSSProperties {
   return {
     width: "100%",
     minHeight: fitContent ? undefined : "100vh",
     height: fitContent ? undefined : "100%",
     position: "relative",
     display: "flex",
-    flexDirection: layoutValue === "vertical" || layoutValue === "vertical-sticky" ? "row" : "column",
+    flexDirection: !useMobileShell &&
+      (layoutValue === "vertical" || layoutValue === "vertical-sticky")
+      ? "row"
+      : "column",
     isolation: "isolate",
   };
 }
@@ -580,15 +702,24 @@ function contentAreaStyle(
   scrollWholePage: boolean,
   layoutOrientation: "horizontal" | "vertical",
   props: Record<string, unknown>,
+  isDesktop: boolean,
+  useMobileShell = false,
 ): CSSProperties {
+  const useMobileNaturalScroll = useMobileShell && scrollWholePage;
   return {
     position: "relative",
     minWidth: 0,
-    minHeight: fitContent || (scrollWholePage && layoutOrientation === "horizontal") ? undefined : 0,
-    flex: 1,
+    minHeight: isDesktop || useMobileNaturalScroll
+      ? 0
+      : fitContent || (scrollWholePage && layoutOrientation === "horizontal") ? undefined : 0,
+    flex: useMobileNaturalScroll ? "1 0 auto" : 1,
     display: "flex",
     flexDirection: "column",
-    overflow: layoutOrientation === "horizontal"
+    overflow: useMobileShell
+      ? scrollWholePage ? "initial" : "auto"
+      : isDesktop
+      ? "hidden"
+      : layoutOrientation === "horizontal"
       ? scrollWholePage ? "initial" : "auto"
       : undefined,
     backgroundColor: appContentValue(themeVariables, props, CONTENT_THEME_VARS.backgroundColor),
@@ -600,7 +731,22 @@ function pageContentStyle(
   themeVariables: Record<string, unknown>,
   props: Record<string, unknown>,
   useTocContentWidth: boolean,
+  isDesktop: boolean,
 ): CSSProperties {
+  if (isDesktop) {
+    return {
+      maxWidth: "none",
+      width: "100%",
+      margin: 0,
+      minHeight: 0,
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      overflow: "auto",
+      scrollbarGutter: "auto",
+    };
+  }
+
   return {
     maxWidth: appContentValue(
       themeVariables,
@@ -641,6 +787,24 @@ function useMeasuredBlockSize<T extends HTMLElement>() {
   }, []);
 
   return { ref, height };
+}
+
+function useNarrowScreen() {
+  const [matches, setMatches] = useState(() =>
+    typeof window === "undefined" ? false : window.matchMedia(NARROW_SCREEN_QUERY).matches,
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(NARROW_SCREEN_QUERY);
+    const update = () => setMatches(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener?.("change", update);
+    return () => {
+      mediaQuery.removeEventListener?.("change", update);
+    };
+  }, []);
+
+  return matches;
 }
 
 function useRouteSnapshot(adapter: XmluiAdapterRendererProps["adapter"]) {

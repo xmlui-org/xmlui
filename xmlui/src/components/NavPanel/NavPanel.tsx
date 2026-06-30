@@ -92,7 +92,6 @@ export const NavPanelMd = createMetadata({
     [`borderWidth-${COMP}`]: "0px",
     [`borderStyle-${COMP}`]: "solid",
     [`borderRight-${COMP}-vertical`]: "1px solid $borderColor",
-    "height-AppHeader": "$space-14",
     "paddingVertical-AppHeader": "$space-0",
     "alignment-content-AppHeader": "flex-start",
     [`paddingVertical-${COMP}`]: "$space-5",

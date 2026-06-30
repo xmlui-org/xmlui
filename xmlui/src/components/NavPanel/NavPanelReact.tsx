@@ -63,6 +63,38 @@ const NavPanelContent = forwardRef<HTMLDivElement, NavPanelProps>(function NavPa
   const collapsed = (collapseContext?.collapsed ?? appLayoutContext?.navPanelCollapsed) && vertical;
   const hasFooter = !!footerContent && vertical;
   const safeLogoContent = logoContent ?? appLayoutContext?.logoContentDef;
+  const inDrawer = !!appLayoutContext?.isNarrowScreen;
+
+  if (inDrawer) {
+    return (
+      <nav
+        {...rest}
+        className={classnames(
+          styles.wrapper,
+          {
+            [styles.hasFooter]: hasFooter,
+            [styles.overlayScroll]: scrollStyle !== "normal",
+          },
+          className,
+        )}
+        data-nav-panel-collapsed="false"
+        data-xmlui-component="NavPanel"
+        ref={ref}
+      >
+        <div className={classnames(styles.logoWrapper, styles.inDrawer)} data-xmlui-part="logo">
+          {safeLogoContent ?? <Logo />}
+        </div>
+        <div className={styles.wrapperInner} data-xmlui-part="content">
+          {children}
+        </div>
+        {hasFooter ? (
+          <div className={styles.footer} data-xmlui-part="footer">
+            {footerContent}
+          </div>
+        ) : null}
+      </nav>
+    );
+  }
 
   return (
     <nav

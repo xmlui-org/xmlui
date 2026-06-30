@@ -1,4 +1,4 @@
-<App layout="vertical-full-header">
+<App layout="condensed">
   <AppHeader>
     <property name="logoTemplate">
       <Heading level="h3" value="Example App"/>

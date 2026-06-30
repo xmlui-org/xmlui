@@ -46,9 +46,9 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
   },
   ref,
 ) {
-  const { layout, registerSubNavPanelSlot } = useAppLayoutContext() || {};
+  const { isNarrowScreen, layout, registerSubNavPanelSlot } = useAppLayoutContext() || {};
   const canRestrictContentWidth = layout !== "vertical-full-header";
-  const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
+  const displayLogo = (isNarrowScreen || (layout !== "vertical" && layout !== "vertical-sticky")) && showLogo;
   const subNavPanelRef = useCallback(
     (node: HTMLDivElement | null) => {
       registerSubNavPanelSlot?.(node);
@@ -65,7 +65,7 @@ export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(functi
   return (
     <header
       {...rest}
-      className={[styles.header, className].filter(Boolean).join(" ")}
+      className={[styles.header, isNarrowScreen && styles.mobile, className].filter(Boolean).join(" ")}
       data-xmlui-component="AppHeader"
       ref={ref}
       role="banner"

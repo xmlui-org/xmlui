@@ -7,6 +7,7 @@ $themeVars: "";
 
 $width-navPanel-App: createThemeVar("width-navPanel-App");
 $width-navPanel-collapsed-App: createThemeVar("width-navPanel-collapsed-App");
+$maxWidth-drawer-App: createThemeVar("maxWidth-drawer-App");
 $backgroundColor-navPanel-App: createThemeVar("backgroundColor-navPanel-App");
 $boxShadow-header-App: createThemeVar("boxShadow-header-App");
 $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
@@ -22,6 +23,7 @@ $backgroundColor-Footer: var(
   --xmlui-backgroundColor-Footer,
   var(--xmlui-backgroundColor-AppHeader, #fff)
 );
+$appHeaderHeight: var(--app-header-height, #{$height-AppHeader});
 $verticalFullHeaderHeaderHeight: var(--app-header-height, #{$height-AppHeader});
 $verticalFullHeaderFooterHeight: var(--app-footer-height, 0px);
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
@@ -29,6 +31,47 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 $paddingHorizontal-content-App: createThemeVar("paddingHorizontal-content-App");
 $paddingVertical-content-App: createThemeVar("paddingVertical-content-App");
 $gap-content-App: createThemeVar("gap-content-App");
+$top-closeButton-App: createThemeVar("top-closeButton-App");
+$right-closeButton-App: createThemeVar("right-closeButton-App");
+$reveal-anim-duration: 300ms;
+
+@keyframes app-drawer-slide-in-from-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+    box-shadow: none;
+  }
+  to {
+  }
+}
+
+@keyframes app-drawer-slide-out-to-left {
+  from {
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+    box-shadow: none;
+  }
+}
+
+@keyframes app-drawer-blur-in {
+  from {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+  }
+  to {
+  }
+}
+
+@keyframes app-drawer-blur-out {
+  from {
+  }
+  to {
+    backdrop-filter: blur(0);
+    background-color: transparent;
+  }
+}
 
 .appContainer {
   width: 100%;
@@ -62,6 +105,30 @@ $gap-content-App: createThemeVar("gap-content-App");
   }
 }
 
+.appContainer.scrollWholePage.verticalFullHeader {
+  .mainContentRow {
+    margin-inline: calc(-1 * var(--scrollbar-width));
+    width: calc(100% + (2 * var(--scrollbar-width)));
+  }
+
+  .mainContentArea {
+    padding-inline: var(--scrollbar-width);
+  }
+}
+
+.appContainer.scrollWholePage.desktop {
+  scrollbar-gutter: auto;
+
+  .headerWrapper,
+  .footerWrapper {
+    margin-inline: 0;
+
+    > * {
+      padding-inline: 0;
+    }
+  }
+}
+
 .appContainer.noScrollbarGutters {
   scrollbar-gutter: auto;
 }
@@ -75,6 +142,97 @@ $gap-content-App: createThemeVar("gap-content-App");
 
 .appContainer.vertical {
   flex-direction: row;
+}
+
+.appContainer.mobile {
+  flex-direction: column !important;
+  overflow: auto;
+}
+
+.appContainer.mobile.verticalFullHeader {
+  overflow: auto;
+}
+
+.appContainer.mobile .headerWrapper,
+.appContainer.mobile .footerWrapper {
+  flex-shrink: 0;
+  position: sticky;
+  z-index: 1;
+}
+
+.appContainer.mobile .headerWrapper {
+  top: 0;
+}
+
+.appContainer.mobile .footerWrapper {
+  bottom: 0;
+  background-color: $backgroundColor-Footer;
+}
+
+.appContainer.mobile .mainContentArea,
+.appContainer.mobile .pagesContainer {
+  min-height: 0;
+}
+
+.appContainer.mobile .mainContentArea {
+  flex: 1;
+  overflow: initial;
+}
+
+.appContainer.mobile.scrollWholePage {
+  .pagesContainer {
+    flex: 1 0 auto;
+    overflow: initial;
+    height: auto;
+  }
+
+  .pageContentContainer {
+    flex: 0 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+
+  .pageContentContainer [data-xmlui-component="List"] {
+    overflow: visible;
+    flex: 0 1 auto;
+    min-height: 0;
+  }
+}
+
+.appContainer.mobile:not(.scrollWholePage) {
+  height: 100dvh;
+  overflow: hidden;
+
+  .mainContentArea {
+    flex: 1;
+    overflow: auto;
+  }
+}
+
+.appContainer.vertical:not(.scrollWholePage) {
+  overflow: clip;
+  height: 100dvh;
+
+  .mainContentArea {
+    overflow: initial;
+  }
+
+  .pagesContainer {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .pageContentContainer {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .appContainer.verticalFullHeader {
@@ -95,9 +253,79 @@ $gap-content-App: createThemeVar("gap-content-App");
 .appContainer.desktop {
   width: 100vw;
   height: 100dvh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   scrollbar-gutter: auto;
   max-width: none;
+}
+
+.desktop .headerWrapper {
+  flex-shrink: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  padding-inline: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.desktop .headerWrapper > * {
+  margin: 0;
+  padding: 0;
+  padding-inline: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.desktop .pagesContainer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  scrollbar-gutter: auto;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.desktop .pageContentContainer {
+  flex: 1;
+  min-height: 0;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  scrollbar-gutter: auto;
+}
+
+.desktop .pageContentContainer [data-xmlui-component="List"] {
+  overflow: visible;
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.desktop .footerWrapper {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  padding-inline: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.desktop .footerWrapper > * {
+  margin: 0;
+  padding: 0;
+  padding-inline: 0;
+  max-width: none;
+  width: 100%;
 }
 
 .headerWrapper {
@@ -122,6 +350,11 @@ $gap-content-App: createThemeVar("gap-content-App");
   position: sticky;
   top: 0;
   transition: width 0.2s ease;
+
+  > *:first-child {
+    flex: 1;
+    min-height: 0;
+  }
 }
 
 .horizontal .navPanelWrapper {
@@ -132,7 +365,7 @@ $gap-content-App: createThemeVar("gap-content-App");
 }
 
 .horizontal.sticky .navPanelWrapper {
-  top: $height-AppHeader;
+  top: $appHeaderHeight;
 }
 
 .vertical .navPanelWrapper {
@@ -153,7 +386,6 @@ $gap-content-App: createThemeVar("gap-content-App");
 
 .verticalFullHeader .mainContentArea {
   overflow: initial;
-  padding-inline: $paddingHorizontal-content-App;
 }
 
 .verticalFullHeader .navPanelWrapper {
@@ -272,6 +504,86 @@ $gap-content-App: createThemeVar("gap-content-App");
   bottom: 0;
   z-index: 1;
   background-color: $backgroundColor-Footer;
+}
+
+.mobileDrawer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.mobileDrawer[hidden] {
+  display: none;
+}
+
+.mobileDrawerOverlay {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  backdrop-filter: blur(4px);
+  background-color: rgb(255 255 255 / 70%);
+  cursor: pointer;
+}
+
+.mobileDrawer[data-state="open"] .mobileDrawerOverlay {
+  animation: app-drawer-blur-in $reveal-anim-duration;
+}
+
+.mobileDrawer[data-state="closed"] .mobileDrawerOverlay {
+  animation: app-drawer-blur-out $reveal-anim-duration;
+}
+
+.mobileDrawerPanel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: $maxWidth-drawer-App;
+  overflow: auto;
+  background-color: $backgroundColor-navPanel-App;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+  opacity: 1;
+  transform: translateX(0);
+  border-color: transparent;
+}
+
+.mobileDrawer[data-state="open"] .mobileDrawerPanel {
+  animation: app-drawer-slide-in-from-left $reveal-anim-duration;
+}
+
+.mobileDrawer[data-state="closed"] .mobileDrawerPanel {
+  animation: app-drawer-slide-out-to-left $reveal-anim-duration;
+}
+
+.mobileDrawerPanel [data-xmlui-component="NavPanel"] {
+  width: 100%;
+  min-width: 0;
+}
+
+.mobileDrawerClose {
+  position: absolute;
+  top: $top-closeButton-App;
+  inset-inline-end: $right-closeButton-App;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--xmlui-borderRadius);
+  padding: 0.25rem;
+  opacity: 0.7;
+  color: inherit;
+  background-color: inherit;
+  cursor: pointer;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: $reveal-anim-duration;
+}
+
+.mobileDrawerClose:hover {
+  opacity: 1;
 }
 
 :export {

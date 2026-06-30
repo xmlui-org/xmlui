@@ -8,6 +8,7 @@ import { AppHeaderComponent } from "./AppHeaderReact";
 import styles from "./AppHeader.module.scss";
 import { ProfileMenu } from "../ProfileMenu/ProfileMenuReact";
 import { useLoggedInUser } from "../ProfileMenu/ProfileMenuContext";
+import { ThemedIcon } from "../Icon/Icon";
 
 const templateNames = new Set(["logoTemplate", "titleTemplate", "profileMenuTemplate"]);
 
@@ -17,7 +18,7 @@ export const appHeaderRenderer = wrapComponent({
   renderer: ({ adapter }) => {
     const children = adapter.node.children.filter((child) => !isTemplateProperty(child));
     const loggedInUser = useLoggedInUser();
-    const { showDrawerToggle } = useAppShellContext();
+    const { showDrawerToggle, toggleDrawer } = useAppShellContext();
     const hasProfileTemplate = hasTemplate(adapter.node.children, "profileMenuTemplate");
 
     return (
@@ -26,11 +27,12 @@ export const appHeaderRenderer = wrapComponent({
         drawerToggle={showDrawerToggle ? (
           <button
             aria-label="Open navigation menu"
+            className={styles.hamburgerButton}
             data-part-id="hamburger"
-            style={{ display: "block", width: "100%", height: "100%" }}
+            onClick={toggleDrawer}
             type="button"
           >
-            <span aria-hidden="true" className={styles.hamburgerIcon} />
+            <ThemedIcon name="hamburger" />
           </button>
         ) : undefined}
         logoContent={hasTemplate(adapter.node.children, "logoTemplate") ? adapter.renderTemplate("logoTemplate") : undefined}

@@ -33,6 +33,7 @@ export interface IAppLayoutContext {
   registerSubNavPanelSlot?: (slot: HTMLElement | null) => void;
   subNavPanelSlot?: HTMLElement | null;
   scrollWholePage?: boolean;
+  isNarrowScreen?: boolean;
   isFullVerticalWidth?: boolean;
   isNested?: boolean;
   setScrollRestorationEnabled?: (enabled: boolean) => void;
