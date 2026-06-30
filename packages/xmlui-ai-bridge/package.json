@@ -1,0 +1,29 @@
+{
+  "name": "xmlui-ai-bridge",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Trusted Node-side AI bridge runtime for XMLUI applications",
+  "license": "ISC",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "xmlui": "*"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.13",
+    "typescript": "5.7.3",
+    "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "src"
+  ]
+}

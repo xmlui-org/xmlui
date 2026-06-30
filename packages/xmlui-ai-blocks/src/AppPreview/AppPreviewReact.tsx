@@ -140,7 +140,10 @@ export function AppPreview({
   const activePreview = canUseFallback ? fallbackPreview : preview;
   const activeCode = canUseFallback ? lastRenderableCode : code;
   const sourceKey = useMemo(() => createCodeRevision(activeCode), [activeCode]);
-  const warnings = activePreview.warnings.map((warning) => String(warning));
+  const warnings = useMemo(
+    () => activePreview.warnings.map((warning) => String(warning)),
+    [activePreview.warnings],
+  );
   const isRepairing = status === "generating";
   const nestedConfig = useMemo(
     () => ({

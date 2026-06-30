@@ -164,6 +164,8 @@
           </VStack>
         </property>
       </XmluiBuilderFrame>
+
+      
       <VStack gap="$space-4" maxWidth="1200px" padding="$space-4">
         <Text variant="title">AI block component gallery</Text>
 
@@ -180,36 +182,6 @@
           </Items>
         </VStack>
 
-        <VStack gap="$space-2">
-          <HStack gap="$space-2" verticalAlignment="center">
-            <Text variant="subtitle">AiToolCall</Text>
-            <Badge value="{fixture.toolCalls.length + ' tool calls'}" />
-          </HStack>
-          <Items data="{fixture.toolCalls}" gap="$space-2">
-            <AiToolCall
-              toolCall="{$item}"
-              defaultOpen="{($item.status === 'running') || ($item.status === 'failed')}"
-              showInput="summary"
-              showOutput="summary" />
-          </Items>
-        </VStack>
-
-        <VStack gap="$space-2">
-          <HStack gap="$space-2" verticalAlignment="center">
-            <Text variant="subtitle">AiApprovalRequest</Text>
-            <Badge value="{(fixture.pendingApprovals.length + fixture.resolvedApprovals.length) + ' requests'}" />
-          </HStack>
-          <Items data="{fixture.resolvedApprovals}" gap="$space-2">
-            <AiApprovalRequest request="{$item}" running="{false}" />
-          </Items>
-          <Items data="{fixture.pendingApprovals}" gap="$space-2">
-            <AiApprovalRequest
-              request="{$item}"
-              running="true"
-              onApprove="toast('Approved ' + $event.requestId)"
-              onReject="toast('Rejected ' + $event.requestId)" />
-          </Items>
-        </VStack>
       </VStack>
     </Page>
   </Pages>
