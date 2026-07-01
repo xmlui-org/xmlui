@@ -235,6 +235,32 @@ $reveal-anim-duration: 300ms;
   }
 }
 
+.appContainer.verticalFullHeader:not(.scrollWholePage) {
+  overflow: clip;
+  height: 100dvh;
+
+  .mainContentRow {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .mainContentArea {
+    overflow: auto;
+    scrollbar-gutter: stable both-edges;
+  }
+
+  .pagesContainer {
+    overflow: initial;
+    height: auto;
+    min-height: 0;
+  }
+
+  .pageContentContainer {
+    overflow: initial;
+    height: auto;
+  }
+}
+
 .appContainer.verticalFullHeader {
   flex-direction: column;
   min-height: 100%;

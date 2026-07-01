@@ -98,6 +98,13 @@ $themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level4-#{$com
     padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level4-#{$component}") !important;
   }
 
+  .focusRestored {
+    outline-width: var(--xmlui-outlineWidth-NavLink--focus, 2px) !important;
+    outline-color: var(--xmlui-outlineColor-NavLink--focus, rgb(from var(--xmlui-color-primary-500) r g b / 0.5)) !important;
+    outline-style: var(--xmlui-outlineStyle-NavLink--focus, solid) !important;
+    outline-offset: var(--xmlui-outlineOffset-NavLink--focus, -1px) !important;
+  }
+
   .dropdownList {
     padding: 0;
     margin: 0;

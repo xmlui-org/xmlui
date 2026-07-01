@@ -170,7 +170,7 @@ function analyzeParsedBindings(parsed: XmluiParsedBindings | undefined, scope: X
 function collectReferenceNames(element: XmluiElement): string[] {
   const names = new Set<string>();
   const visit = (current: XmluiElement) => {
-    for (const propName of ["id", "uid"]) {
+    for (const propName of ["id", "uid", "ref"]) {
       const value = current.props[propName];
       if (value && validIdentifier(value)) {
         names.add(value);

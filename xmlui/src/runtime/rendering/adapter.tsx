@@ -144,11 +144,20 @@ export function useXmluiComponentAdapter({
     return resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth);
   }, [defaultPart, layoutStyle, layoutStyles, rootPart, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
-    Object.assign(apiRef.current, api);
     const id = typeof props.id === "string" ? props.id : undefined;
+    const referenceChanged = id ? scope.references[id] !== apiRef.current : false;
+    let valueChanged = false;
+    for (const [key, value] of Object.entries(api)) {
+      if (typeof value !== "function" && !Object.is(apiRef.current[key], value)) {
+        valueChanged = true;
+      }
+      apiRef.current[key] = value;
+    }
     if (id) {
       scope.references[id] = apiRef.current;
-      scope.store.invalidateReference(id);
+      if (referenceChanged || valueChanged) {
+        scope.store.invalidateReference(id);
+      }
     }
   }, [props.id, scope.references, scope.store]);
 

@@ -116,6 +116,23 @@ test.describe("Basic Functionality", () => {
     await expect(driver.input).toBeFocused();
   });
 
+  test("readOnly focus keeps the default border and applies root focus outline", async ({
+    initTestBed,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`<TextBox testId="test" readOnly="true" initialValue="read only text" />`);
+    const driver = await createTextBoxDriver("test");
+    const borderColorBeforeFocus = await driver.component.evaluate(
+      (element) => getComputedStyle(element).borderColor,
+    );
+
+    await driver.input.focus();
+    await expect(driver.input).toBeFocused();
+    await expect(driver.component).toHaveCSS("border-color", borderColorBeforeFocus);
+    await expect(driver.component).toHaveCSS("outline-width", "2px");
+    await expect(driver.component).toHaveCSS("outline-style", "solid");
+  });
+
   test("autoFocus focuses input on mount", async ({ initTestBed, createTextBoxDriver }) => {
     await initTestBed(`<TextBox testId="test" autoFocus="true" />`);
     const driver = await createTextBoxDriver("test");
@@ -608,6 +625,20 @@ test.describe("Input Adornments", () => {
     await expect(driver.endAdornment).toBeVisible();
   });
 
+  test("combined icon and text adornments render actual icons", async ({
+    initTestBed,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <TextBox testId="input" startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`);
+    const driver = await createTextBoxDriver("input");
+
+    await expect(driver.startAdornment.locator("[data-icon-name='hyperlink']")).toBeVisible();
+    await expect(driver.startAdornment).toContainText("www.");
+    await expect(driver.endAdornment.locator("[data-icon-name='email']")).toBeVisible();
+    await expect(driver.endAdornment).toContainText(".com");
+  });
+
   test("all adornments appear in the right place", async ({ initTestBed, createTextBoxDriver }) => {
     await initTestBed(`
       <TextBox testId="input" startText="$" endText="USD" startIcon="search" endIcon="search" direction="ltr" />
@@ -815,6 +846,18 @@ test.describe("Theme Vars", () => {
     });
     const driver = await createTextBoxDriver("input");
     await expect(driver.component).toHaveCSS("padding", "12px");
+  });
+
+  test("default horizontal padding matches original TextBox spacing", async ({
+    initTestBed,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`<TextBox testId="input" initialValue="Example text" />`);
+    const driver = await createTextBoxDriver("input");
+    await expect(driver.component).toHaveCSS("padding-left", "8px");
+    const rootBounds = await getBounds(driver.component);
+    const inputBounds = await getBounds(driver.input);
+    expect(inputBounds.left - rootBounds.left).toBeLessThanOrEqual(10);
   });
 });
 
@@ -1209,6 +1252,7 @@ test.describe("Behaviors and Parts", () => {
   }) => {
     await initTestBed(`<TextBox testId="test" />`);
     const startAdornment = page.getByTestId("test").locator("[data-part-id='startAdornment']");
+    await expect(startAdornment).toHaveCount(0);
     await expect(startAdornment).not.toBeVisible();
   });
 
@@ -1218,6 +1262,7 @@ test.describe("Behaviors and Parts", () => {
   }) => {
     await initTestBed(`<TextBox testId="test" />`);
     const endAdornment = page.getByTestId("test").locator("[data-part-id='endAdornment']");
+    await expect(endAdornment).toHaveCount(0);
     await expect(endAdornment).not.toBeVisible();
   });
 

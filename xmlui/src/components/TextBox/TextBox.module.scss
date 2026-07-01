@@ -72,6 +72,10 @@ $textColor-TextBox--disabled: createThemeVar("textColor-TextBox--disabled");
 $borderColor-TextBox--disabled: createThemeVar("borderColor-TextBox--disabled");
 $paddingHorizontal-TextBox: createThemeVar("paddingHorizontal-TextBox");
 $paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
+$paddingLeft-TextBox: createThemeVar("paddingLeft-TextBox");
+$paddingRight-TextBox: createThemeVar("paddingRight-TextBox");
+$paddingTop-TextBox: createThemeVar("paddingTop-TextBox");
+$paddingBottom-TextBox: createThemeVar("paddingBottom-TextBox");
 
 :export {
   themeVars: "";
@@ -149,7 +153,11 @@ $paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
     background-color: var(--xmlui-backgroundColor-TextBox);
     box-shadow: var(--xmlui-boxShadow-TextBox);
     color: var(--xmlui-textColor-TextBox);
-    padding: var(--xmlui-padding-TextBox, var(--xmlui-paddingVertical-TextBox) var(--xmlui-paddingHorizontal-TextBox));
+    padding: var(--xmlui-padding-TextBox);
+    padding-left: var(--xmlui-paddingLeft-TextBox, var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox)));
+    padding-right: var(--xmlui-paddingRight-TextBox, var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox)));
+    padding-top: var(--xmlui-paddingTop-TextBox, var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox)));
+    padding-bottom: var(--xmlui-paddingBottom-TextBox, var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox)));
     transition: background-color ease-in 0.1s, border-color ease-in 0.1s;
   }
 
@@ -272,15 +280,17 @@ $paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
+    gap: var(--xmlui-space-2, 0.5rem);
     color: var(--xmlui-color-adornment-TextBox);
+
+    * {
+      color: inherit;
+    }
   }
 
-  .textBoxIconMarker {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    border-radius: 999px;
-    background-color: currentColor;
+  .textBoxIcon {
+    flex: 0 0 auto;
+    color: inherit;
   }
 
   .textBoxPasswordToggle {

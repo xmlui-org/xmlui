@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { PasswordInputMd, TextBoxMd } from "./TextBox";
 import { defaultProps } from "./TextBox.defaults";
-import { TextBoxNative, type TextBoxApi } from "./TextBoxReact";
+import { TextBoxNative } from "./TextBoxReact";
 
 const COMP = "TextBox";
 
@@ -13,11 +13,7 @@ export const textBoxRenderer = wrapComponent({
     return (
       <TextBoxNative
         {...adapter.rootAttrs("input")}
-        ref={(api: TextBoxApi | null) => {
-          if (api) {
-            adapter.registerApi(api);
-          }
-        }}
+        registerComponentApi={adapter.registerApi}
         id={adapter.stringProp("id")}
         bindTo={adapter.stringProp("bindTo")}
         type={adapter.stringProp("type", defaultProps.type)}
@@ -80,11 +76,7 @@ export const passwordInputRenderer = wrapComponent({
     return (
       <TextBoxNative
         {...adapter.rootAttrs("input")}
-        ref={(api: TextBoxApi | null) => {
-          if (api) {
-            adapter.registerApi(api);
-          }
-        }}
+        registerComponentApi={adapter.registerApi}
         id={adapter.stringProp("id")}
         bindTo={adapter.stringProp("bindTo")}
         type="password"

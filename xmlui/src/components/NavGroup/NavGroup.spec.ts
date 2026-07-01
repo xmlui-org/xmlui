@@ -10,6 +10,8 @@ const ACTIVE_NAVGROUP_TESTS = new Set([
   "expanded in vertical layout to show link of current page",
   "nested disabled navgroup can't open",
   "initiallyExpanded works",
+  "condensed layout opens navgroup menus in portals",
+  "nested dropdown navgroup icon uses navlink icon color",
 ]);
 
 test.beforeEach(({}, testInfo) => {
@@ -130,6 +132,109 @@ test("initiallyExpanded works", async ({ initTestBed, page }) => {
   await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
 });
 
+test("condensed layout opens navgroup menus in portals", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="condensed">
+      <NavPanel>
+        <NavLink label="Home" to="/" icon="home"/>
+        <NavGroup label="Pages">
+          <NavLink label="Page 1" to="/page/1"/>
+          <NavGroup label="Page 2-4">
+            <NavLink label="Page 2" to="/page/2"/>
+            <NavLink label="Page 3" to="/page/3"/>
+            <NavLink label="Page 4" to="/page/4"/>
+          </NavGroup>
+          <NavLink label="Page 5" to="/page/5"/>
+          <NavLink label="Page Other" to="/page/Other"/>
+        </NavGroup>
+      </NavPanel>
+      <Pages fallbackPath="/">
+        <Page url="/">Home</Page>
+        <Page url="/page/:id">
+          <Text value="Page {$routeParams.id}" />
+        </Page>
+      </Pages>
+    </App>
+  `);
+
+  const pagesTrigger = page.getByRole("button", { name: "Pages", exact: true });
+  const pagesTriggerHandle = await pagesTrigger.elementHandle();
+  expect(pagesTriggerHandle).not.toBeNull();
+  await expect(pagesTrigger.locator('[data-icon-name="chevrondown"]')).toBeVisible();
+  const triggerGap = await pagesTrigger.evaluate((node) => {
+    const inner = node.querySelector("div");
+    const icon = node.querySelector('[data-icon-name="chevrondown"]');
+    if (!inner || !icon) {
+      return 0;
+    }
+    const range = document.createRange();
+    const textNode = Array.from(inner.childNodes).find((child) =>
+      child.nodeType === Node.TEXT_NODE && child.textContent?.includes("Pages")
+    );
+    if (!textNode) {
+      return 0;
+    }
+    range.selectNodeContents(textNode);
+    const textRect = range.getBoundingClientRect();
+    const iconRect = icon.getBoundingClientRect();
+    return iconRect.left - textRect.right;
+  });
+  expect(triggerGap).toBeGreaterThan(8);
+  const triggerBox = await pagesTrigger.boundingBox();
+  expect(triggerBox).not.toBeNull();
+  await pagesTrigger.click();
+
+  const page1 = page.getByRole("menuitem", { name: "Page 1" });
+  const nestedTrigger = page.getByRole("menuitem", { name: "Page 2-4" });
+  await expect(page1).toBeVisible();
+  await expect(nestedTrigger).toBeVisible();
+  await expect(nestedTrigger.locator('[data-icon-name="chevronright"]')).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Page 5" })).toBeVisible();
+
+  expect(await page1.evaluate((node) => !!node.closest('[data-xmlui-component="NavPanel"]'))).toBe(false);
+
+  const page1Box = await page1.boundingBox();
+  expect(page1Box).not.toBeNull();
+  expect(page1Box!.y).toBeGreaterThan(triggerBox!.y + triggerBox!.height - 1);
+  expect(page1Box!.width).toBeGreaterThan(150);
+
+  await page.keyboard.press("Escape");
+  await expect(page1).not.toBeVisible();
+  const readFocusOutline = () =>
+    pagesTrigger.evaluate((node) => {
+      const style = window.getComputedStyle(node);
+      return {
+        active: document.activeElement === node,
+        outlineStyle: style.outlineStyle,
+        outlineWidth: style.outlineWidth,
+      };
+    });
+  await expect.poll(readFocusOutline).toMatchObject({
+    active: true,
+    outlineStyle: "solid",
+  });
+  const focusOutline = await readFocusOutline();
+  expect(focusOutline.active).toBe(true);
+  expect(Number.parseFloat(focusOutline.outlineWidth)).toBeGreaterThan(0);
+
+  await pagesTrigger.click();
+  await expect(page1).toBeVisible();
+  await nestedTrigger.hover();
+
+  const page2 = page.getByRole("menuitem", { name: "Page 2", exact: true });
+  const page3 = page.getByRole("menuitem", { name: "Page 3", exact: true });
+  const page4 = page.getByRole("menuitem", { name: "Page 4", exact: true });
+  await expect(page2).toBeVisible();
+  await expect(page3).toBeVisible();
+  await expect(page4).toBeVisible();
+
+  const nestedTriggerBox = await nestedTrigger.boundingBox();
+  const page2Box = await page2.boundingBox();
+  expect(nestedTriggerBox).not.toBeNull();
+  expect(page2Box).not.toBeNull();
+  expect(page2Box!.x).toBeGreaterThan(nestedTriggerBox!.x + nestedTriggerBox!.width - 2);
+});
+
 test("nested initiallyExpanded works", async ({ initTestBed, page }) => {
   await initTestBed(`
     <Stack testId="stack">
@@ -218,6 +323,43 @@ test.describe("icon props", () => {
 
     await expect(bell).toBeVisible();
     await expect(eye).not.toBeVisible();
+  });
+
+  test("nested dropdown navgroup icon uses navlink icon color", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <HStack verticalAlignment="center">
+          <NavGroup icon="email" label="Send To">
+            <NavLink icon="arrowup" label="Boss" />
+            <NavGroup icon="users" label="Team">
+              <NavLink label="Jane" />
+              <NavLink label="Will" />
+              <NavLink label="Sandra" />
+            </NavGroup>
+            <NavLink icon="cube" label="Support" />
+          </NavGroup>
+        </HStack>
+      </App>
+    `);
+
+    await page.getByRole("button", { name: "Send To" }).click();
+
+    const bossIcon = page.getByRole("menuitem", { name: "Boss" }).locator('[data-icon-name="arrowup"]');
+    const teamIcon = page.getByRole("menuitem", { name: "Team" }).locator('[data-icon-name="users"]');
+    const supportIcon = page.getByRole("menuitem", { name: "Support" }).locator('[data-icon-name="cube"]');
+
+    await expect(bossIcon).toBeVisible();
+    await expect(teamIcon).toBeVisible();
+    await expect(supportIcon).toBeVisible();
+
+    const [bossColor, teamColor, supportColor] = await Promise.all([
+      bossIcon.evaluate((node) => window.getComputedStyle(node).color),
+      teamIcon.evaluate((node) => window.getComputedStyle(node).color),
+      supportIcon.evaluate((node) => window.getComputedStyle(node).color),
+    ]);
+
+    expect(teamColor).toBe(bossColor);
+    expect(teamColor).toBe(supportColor);
   });
 
   test("iconVertical shows in horizontal layout top lvl navgroup", async ({

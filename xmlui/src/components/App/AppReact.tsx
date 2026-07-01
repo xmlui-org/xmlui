@@ -101,6 +101,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [drawerMounted, setDrawerMounted] = useState(false);
   const [subNavPanelSlot, setSubNavPanelSlot] = useState<HTMLElement | null>(null);
+  const verticalFullHeaderContentRef = useRef<HTMLElement | null>(null);
   const slots = useMemo(
     () => partitionAppChildren(adapter.node.children),
     [adapter.node.children],
@@ -253,6 +254,27 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
     };
   }, [adapter]);
 
+  useEffect(() => {
+    if (!routeSnapshot.hash) {
+      return;
+    }
+    const hash = routeSnapshot.hash.startsWith("#")
+      ? routeSnapshot.hash.slice(1)
+      : routeSnapshot.hash;
+    if (!hash) {
+      return;
+    }
+    const frameId = window.requestAnimationFrame(() => {
+      const id = safeDecodeHash(hash);
+      const root = verticalFullHeaderContentRef.current ?? document;
+      const target = root.querySelector?.(`#${CSS.escape(id)}`) ?? document.getElementById(id);
+      if (target instanceof HTMLElement) {
+        target.scrollIntoView({ behavior: "instant", block: "start" });
+      }
+    });
+    return () => window.cancelAnimationFrame(frameId);
+  }, [routeSnapshot.hash]);
+
   const inlineHeaderNavPanel =
     layout.isCondensed && slots.header && slots.navPanel && !shouldUseDrawerNavPanel
       ? <div style={{ minWidth: 0 }}>{childAdapter.renderChildren([slots.navPanel])}</div>
@@ -302,10 +324,16 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
               ...appContainerStyle(fitContent, layout.value, shouldUseDrawerNavPanel),
               "--app-header-height": headerSize.height > 0
                 ? `${headerSize.height}px`
-                : undefined,
+                : "0px",
+              "--header-height": headerSize.height > 0
+                ? `${headerSize.height}px`
+                : "0px",
+              "--header-abs-height": `${headerSize.height}px`,
               "--app-footer-height": isVerticalFullHeader && slots.footer && footerSize.height > 0
                 ? `${footerSize.height}px`
                 : "0px",
+              "--footer-height": footerSize.height > 0 ? `${footerSize.height}px` : "0px",
+              "--footer-abs-height": `${footerSize.height}px`,
               "--scrollbar-width": noScrollbarGutters ? "0px" : `${scrollbarWidth}px`,
               ...appShellStyle(adapter.style),
             } as CSSProperties}
@@ -340,6 +368,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
                   <main
                     data-xmlui-component="App"
                     data-xmlui-part="content"
+                    ref={verticalFullHeaderContentRef}
                     className={styles.mainContentArea}
                     style={contentAreaStyle(
                       mergedThemeVariables,
@@ -994,6 +1023,14 @@ function themeValue(themeVariables: Record<string, unknown>, name: string): stri
     return undefined;
   }
   return String(resolveThemeReferences(value));
+}
+
+function safeDecodeHash(hash: string): string {
+  try {
+    return decodeURIComponent(hash);
+  } catch {
+    return hash;
+  }
 }
 
 function appThemeVariableProps(props: Record<string, unknown>): Record<string, unknown> {

@@ -4,7 +4,7 @@ import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { normalizePathname } from "../../runtime/routing";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { COMPONENT_PART_KEY } from "../../styling";
-import { useIsNavGroupItem } from "../NavGroup/NavGroupContext";
+import { useIsNavGroupItem, useNavGroupContext } from "../NavGroup/NavGroupContext";
 import { ThemedIcon } from "../Icon/Icon";
 import { NavLinkMd, defaultNavLinkProps } from "./NavLink";
 import styles from "./NavLink.module.scss";
@@ -21,6 +21,7 @@ export const navLinkRenderer = wrapComponent({
     const displayActive = adapter.booleanProp("displayActive", defaultNavLinkProps.displayActive);
     const noIndicator = adapter.booleanProp("noIndicator", defaultNavLinkProps.noIndicator);
     const isNavGroupItem = useIsNavGroupItem();
+    const navGroupContext = useNavGroupContext();
     const label = adapter.prop("label");
     const iconName = adapter.stringProp("icon");
     const target = adapter.stringProp("target");
@@ -64,7 +65,7 @@ export const navLinkRenderer = wrapComponent({
         role={isNavGroupItem ? "menuitem" : undefined}
         target={target}
         to={to}
-        vertical={hasVerticalProp ? adapter.booleanProp("vertical", false) : undefined}
+        vertical={hasVerticalProp ? adapter.booleanProp("vertical", false) : navGroupContext.forceVerticalItems}
         onClick={async () => {
           if (enabled && routing && to && !target && !isExternalUrl(to)) {
             routing.navigate(to);

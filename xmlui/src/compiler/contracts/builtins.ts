@@ -1595,6 +1595,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "AppState",
     allowsChildren: false,
     includeLayoutProps: false,
+    acceptsArbitraryProps: true,
     eventAttributes: {
       didUpdate: "onDidUpdate",
     },

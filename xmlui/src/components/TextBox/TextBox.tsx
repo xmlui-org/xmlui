@@ -85,6 +85,10 @@ $textColor-TextBox--disabled: createThemeVar("textColor-TextBox--disabled");
 $borderColor-TextBox--disabled: createThemeVar("borderColor-TextBox--disabled");
 $paddingHorizontal-TextBox: createThemeVar("paddingHorizontal-TextBox");
 $paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
+$paddingLeft-TextBox: createThemeVar("paddingLeft-TextBox");
+$paddingRight-TextBox: createThemeVar("paddingRight-TextBox");
+$paddingTop-TextBox: createThemeVar("paddingTop-TextBox");
+$paddingBottom-TextBox: createThemeVar("paddingBottom-TextBox");
 `;
 
 export const TextBoxMd = createMetadata({
@@ -212,7 +216,7 @@ export const TextBoxMd = createMetadata({
     [`backgroundColor-${COMP}--hover`]: "$backgroundColor-Input",
     [`boxShadow-${COMP}--hover`]: "none",
     [`textColor-${COMP}--hover`]: "$textColor-Input",
-    [`borderColor-${COMP}--focus`]: "$borderColor-Input--hover",
+    [`borderColor-${COMP}--focus`]: `$borderColor-${COMP}`,
     [`backgroundColor-${COMP}--focus`]: "$backgroundColor-Input",
     [`boxShadow-${COMP}--focus`]: "none",
     [`textColor-${COMP}--focus`]: "$textColor-Input",

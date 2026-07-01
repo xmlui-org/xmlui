@@ -101,6 +101,69 @@ test.describe("AppState foundation", () => {
     await expect(page.getByTestId("profile")).toContainText('"roles":["admin"]');
   });
 
+  test("supports old ref alias without rendering a wrapper", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px" />
+        <AppState testId="appState" ref="appState" initialValue="{undefined}" />
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px" />
+      </FlowLayout>
+      <Text testId="stateValue">|{JSON.stringify(appState.value)}|</Text>
+    `);
+
+    await expect(page.getByTestId("stateValue")).toHaveText("||");
+    await expect(page.getByTestId("appState")).not.toBeAttached();
+  });
+
+  test("updates shared state from arrow event handlers across nested components", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+        <App>
+          <AppState id="appState" initialValue="{{ enhancedMode: false }}" />
+          <VStack gap="$space-4" padding="$space-4">
+            <Checkbox
+              testId="enhanced"
+              label="Enhanced mode"
+              initialValue="{appState.value.enhancedMode}"
+              onDidChange="v => appState.update({ enhancedMode: v })" />
+            <Component1 />
+            <Component2 />
+          </VStack>
+        </App>
+      `,
+      {
+        components: [
+          `
+            <Component name="Component1">
+              <AppState id="state" />
+              <H3 testId="enhancedText" when="{state.value.enhancedMode}">I am in enhanced mode!</H3>
+              <Text testId="normalText" when="{!state.value.enhancedMode}">Enhanced mode turned off.</Text>
+            </Component>
+          `,
+          `
+            <Component name="Component2">
+              <AppState id="state" />
+              <Button testId="options" enabled="{state.value.enhancedMode}">Set enhanced options</Button>
+            </Component>
+          `,
+        ],
+      },
+    );
+
+    await expect(page.getByTestId("normalText")).toBeVisible();
+    await expect(page.getByTestId("enhancedText")).not.toBeAttached();
+    await expect(page.getByTestId("options")).toBeDisabled();
+
+    await page.getByLabel("Enhanced mode").click();
+
+    await expect(page.getByTestId("enhancedText")).toBeVisible();
+    await expect(page.getByTestId("normalText")).not.toBeAttached();
+    await expect(page.getByTestId("options")).toBeEnabled();
+  });
+
   test("preserves bucket state across conditional AppState unmount", async ({
     initTestBed,
     page,

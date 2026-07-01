@@ -936,6 +936,16 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     "paddingHorizontal-content-App": "0",
     "paddingVertical-content-App": "0",
     "gap-content-App": "0",
+    "maxWidth-content-App": "none",
+    noScrollbarGutters: "true",
+  };
+  const testBedThemeVars = {
+    "paddingHorizontal-content-App": "0",
+    "paddingVertical-content-App": "0",
+    "gap-content-App": "0",
+    "maxWidth-content-App": "none",
+    "maxWidth-content-App--withToc": "none",
+    ...(options.testThemeVars ?? {}),
   };
   const appThemeAttributeEntries = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`);
@@ -946,17 +956,24 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
       ...declarations,
       trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{${implicitTestStateInitialValue(trimmed)}}"` : "",
     ].filter(Boolean);
-    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), options.testThemeVars);
+    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), testBedThemeVars);
   }
   const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
   const defaultAppThemeAttributes = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
-  const themeAttributes = Object.entries(options.testThemeVars ?? {})
+  const themeAttributes = Object.entries(testBedThemeVars)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${mainXsDeclarations.join(" ")} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  const appStyle = [
+    "--xmlui-paddingHorizontal-content-App:0",
+    "--xmlui-paddingVertical-content-App:0",
+    "--xmlui-gap-content-App:0",
+    "--xmlui-maxWidth-content-App:none",
+    "--xmlui-maxWidth-content-App--withToc:none",
+  ].join("; ");
+  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} style=${quoteAttribute(appStyle)} ${mainXsDeclarations.join(" ")} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
 }
 
 function normalizeLegacyMainXsDeclarations(mainXs: string | undefined): string[] {

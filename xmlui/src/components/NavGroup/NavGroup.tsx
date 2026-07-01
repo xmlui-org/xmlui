@@ -82,6 +82,10 @@ export const NavGroupMd = createMetadata({
   themeVars: {
     [`paddingVertical-${COMP}`]: "NavGroup vertical padding.",
     [`paddingHorizontal-${COMP}`]: "NavGroup horizontal padding.",
+    [`backgroundColor-dropdown-${COMP}`]: "Dropdown background.",
+    [`boxShadow-dropdown-${COMP}`]: "Dropdown box shadow.",
+    [`borderRadius-dropdown-${COMP}`]: "Dropdown border radius.",
+    [`minWidth-dropdown-${COMP}`]: "Dropdown minimum width.",
     [`marginTop-items-${COMP}`]: "Margin above child items.",
     [`marginBottom-items-${COMP}`]: "Margin below child items.",
     [`backgroundColor-${COMP}`]: "NavGroup header background.",
@@ -97,6 +101,10 @@ export const NavGroupMd = createMetadata({
   defaultThemeVars: {
     [`paddingVertical-${COMP}`]: "$space-2",
     [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`backgroundColor-dropdown-${COMP}`]: "$backgroundColor-primary",
+    [`boxShadow-dropdown-${COMP}`]: "$boxShadow-spread",
+    [`borderRadius-dropdown-${COMP}`]: "$borderRadius",
+    [`minWidth-dropdown-${COMP}`]: "11em",
     [`marginTop-items-${COMP}`]: "0",
     [`marginBottom-items-${COMP}`]: "0",
     [`backgroundColor-${COMP}`]: "transparent",

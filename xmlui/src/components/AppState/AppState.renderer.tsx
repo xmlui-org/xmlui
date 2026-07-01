@@ -14,6 +14,9 @@ const appStateBuckets = new WeakMap<Parameters<XmluiBuiltInRenderer>[0]["scope"]
 
 export const appStateRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   const id = useStringProp(node, scope, "id", "");
+  const uid = useStringProp(node, scope, "uid", "");
+  const ref = useStringProp(node, scope, "ref", "");
+  const referenceId = id || uid || ref;
   const bucket = useStringProp(node, scope, "bucket", "default");
   const initialValue = useEvaluatedProp(node, scope, "initialValue", undefined);
   const apiRef = useRef<Record<string, unknown>>();
@@ -26,13 +29,13 @@ export const appStateRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   }
 
   useEffect(() => {
-    if (!id) {
+    if (!referenceId) {
       return;
     }
-      scope.references[id] = apiRef.current!;
-      registerBucketReference(scope.store, bucket, id);
-      scope.store.invalidateReference(id);
-  }, [bucket, id, scope]);
+    scope.references[referenceId] = apiRef.current!;
+    registerBucketReference(scope.store, bucket, referenceId);
+    scope.store.invalidateReference(referenceId);
+  }, [bucket, referenceId, scope]);
 
   useEffect(() => {
     if (!initialValueAppliedRef.current && initialValue !== undefined) {
@@ -40,7 +43,7 @@ export const appStateRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
       mergeBucket(scope.store, bucket, initialValue);
       invalidateBucket(scope, bucket);
     }
-  }, [bucket, id, initialValue, scope.store]);
+  }, [bucket, initialValue, scope.store]);
 
   const value = bucketValue(scope.store, bucket);
   apiRef.current.value = value;

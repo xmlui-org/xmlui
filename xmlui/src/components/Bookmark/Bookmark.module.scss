@@ -1,3 +1,5 @@
-.anchorRef {
-  scroll-margin-block-start: var(--xmlui-scrollMarginTop-Bookmark, 0px);
+@layer components {
+  .anchorRef {
+    scroll-margin-top: var(--header-height);
+  }
 }

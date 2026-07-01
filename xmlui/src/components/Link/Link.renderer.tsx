@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributeReferrerPolicy } from "react";
+import type { CSSProperties, HTMLAttributeReferrerPolicy, MouseEvent } from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent } from "../../runtime/rendering/adapter";
@@ -26,12 +26,29 @@ export const linkRenderer = wrapComponent({
     ]);
     const variant = adapter.stringProp("variant");
     const rootAttrs = adapter.rootAttrs();
+    const to = adapter.prop("to");
+    const toString = typeof to === "string" ? to : undefined;
+    const target = adapter.stringProp("target");
+    const routing = adapter.scope.routing;
+    const isInternalRoute = !!toString && !target && !isExternalUrl(toString);
+    const hasClickHandler = Object.prototype.hasOwnProperty.call(adapter.node.events, "click");
+    const routedTo = isInternalRoute ? routing?.href(toString) ?? toString : to;
+    const clickHandler = isInternalRoute || hasClickHandler
+      ? async (event: MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => {
+        if (isInternalRoute && routing) {
+          await routing.navigate(toString);
+        }
+        if (hasClickHandler) {
+          await adapter.event("click")(event);
+        }
+      }
+      : undefined;
 
     return (
       <LinkNative
         {...rootAttrs}
-        to={adapter.prop("to")}
-        target={adapter.stringProp("target")}
+        to={routedTo}
+        target={target}
         label={adapter.prop("label")}
         icon={adapter.prop("icon")}
         active={adapter.booleanProp("active", defaultProps.active)}
@@ -54,7 +71,7 @@ export const linkRenderer = wrapComponent({
           ...(rootAttrs.style as CSSProperties | undefined),
           ...currentVariantCssVariables(variant, mergedThemeVariables),
         }}
-        onClick={(event) => void adapter.event("click")(event)}
+        onClick={clickHandler}
         onContextMenu={(event) => void adapter.event("contextMenu")(event)}
       >
         {adapter.renderChildren()}
@@ -90,4 +107,8 @@ function currentVariantCssVariables(
     }
   }
   return style as CSSProperties;
+}
+
+function isExternalUrl(to: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(to);
 }

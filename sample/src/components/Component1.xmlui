@@ -1,0 +1,5 @@
+<Component name="Component1">
+  <AppState id="state" />
+  <H3 when="{state.value.enhancedMode}">I am in enhanced mode!</H3>
+  <Text when="{!state.value.enhancedMode}">Enhanced mode turned off.</Text>
+</Component>

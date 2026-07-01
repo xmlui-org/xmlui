@@ -3,6 +3,7 @@ import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, u
 
 import { defaultProps } from "./TextBox.defaults";
 import { useFormContext } from "../Form/FormContext";
+import { ThemedIcon } from "../Icon/Icon";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
 import styles from "./TextBox.module.scss";
@@ -47,6 +48,7 @@ export type TextBoxProps = {
   verboseValidationFeedback?: boolean;
   validationStatus?: string;
   invalidMessages?: string[];
+  registerComponentApi?: (api: Record<string, unknown>) => void;
   onDidChange?: (value: string) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
@@ -103,6 +105,7 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
     verboseValidationFeedback,
     validationStatus = defaultProps.validationStatus,
     invalidMessages = defaultProps.invalidMessages,
+    registerComponentApi,
     onDidChange,
     onFocus,
     onBlur,
@@ -195,6 +198,31 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
     void onDidChange?.(normalized);
   }, [fieldName, hadValidationError, matchValue, onDidChange, setFormValue, validateFormField, validationMode]);
 
+  const focus = useCallback(() => {
+    if (enabled) {
+      inputRef.current?.focus();
+    }
+  }, [enabled]);
+
+  const relayFocus = useCallback((event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue: updateValue,
+    });
+  }, [focus, registerComponentApi, updateValue]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      value: localValue,
+    });
+  }, [localValue, registerComponentApi]);
+
   const handleBlur = useCallback(() => {
     void onBlur?.();
     if (!validateFormField || fieldName === undefined || !hadValidationError) {
@@ -206,16 +234,12 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
   }, [fieldName, hadValidationError, onBlur, validateFormField]);
 
   useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        inputRef.current?.focus();
-      }
-    },
+    focus,
     setValue: updateValue,
     get value() {
       return localValue;
     },
-  }), [enabled, localValue, updateValue]);
+  }), [focus, localValue, updateValue]);
 
   const actualType = type === "password" && passwordVisible ? "text" : type;
   const rootStyle = useMemo<CSSProperties>(() => ({
@@ -285,6 +309,8 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
         !hasLabel ? className : undefined,
       )}
       style={!hasLabel ? rootStyle : undefined}
+      tabIndex={-1}
+      onFocus={relayFocus}
     >
       <Adornment partId="startAdornment" text={startText} icon={startIcon} />
       <input
@@ -322,7 +348,7 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
           onClick={() => updateValue("")}
           aria-label="Clear"
         >
-          <span aria-hidden="true" data-icon-name="close" className={styles.textBoxIconMarker} />
+          <ThemedIcon name="close" className={styles.textBoxIcon} aria-hidden="true" />
         </button>
       ) : type === "password" && showPasswordToggle ? (
         <button
@@ -334,10 +360,11 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
           tabIndex={-1}
           aria-label={passwordVisible ? "Hide password" : "Show password"}
         >
-          <span
-            aria-hidden="true"
+          <ThemedIcon
             data-icon-name={passwordVisible ? passwordVisibleIcon : passwordHiddenIcon}
-            className={styles.textBoxIconMarker}
+            name={passwordVisible ? passwordVisibleIcon : passwordHiddenIcon}
+            className={styles.textBoxIcon}
+            aria-hidden="true"
           />
         </button>
       ) : (
@@ -354,9 +381,9 @@ export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function 
           onBlur={() => setConciseTooltipVisible(false)}
           tabIndex={-1}
         >
-          <span
-            data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
-            className={styles.textBoxIconMarker}
+          <ThemedIcon
+            name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
+            className={styles.textBoxIcon}
           />
           {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
             <span data-tooltip-container role="tooltip" className={styles.textBoxConciseTooltip}>
@@ -419,18 +446,11 @@ function Adornment({
   const iconName = typeof icon === "string" && icon !== "" ? icon : undefined;
   const content = text !== undefined && text !== null && text !== "" ? String(text) : undefined;
   if (!iconName && content === undefined) {
-    return (
-      <span
-        data-part-id={partId}
-        data-xmlui-part={partId}
-        className={styles.textBoxAdornment}
-        hidden
-      />
-    );
+    return null;
   }
   return (
     <span data-part-id={partId} data-xmlui-part={partId} className={styles.textBoxAdornment}>
-      {iconName ? <span aria-hidden="true" data-icon-name={iconName} className={styles.textBoxIconMarker} /> : null}
+      {iconName ? <ThemedIcon name={iconName} className={styles.textBoxIcon} aria-hidden="true" /> : null}
       {content}
     </span>
   );

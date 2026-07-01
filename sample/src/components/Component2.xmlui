@@ -1,0 +1,4 @@
+<Component name="Component2">
+  <AppState id="state" />
+  <Button enabled="{state.value.enhancedMode}">Set enhanced options</Button>
+</Component>

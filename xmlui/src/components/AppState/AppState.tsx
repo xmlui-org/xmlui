@@ -12,6 +12,10 @@ export const AppStateMd = createMetadata({
       description: "The identifier used to expose the AppState API in XMLUI expressions.",
       valueType: "string",
     },
+    ref: {
+      description: "Compatibility alias used to expose the AppState API in XMLUI expressions.",
+      valueType: "string",
+    },
     bucket: {
       description: "The shared state bucket name.",
       valueType: "string",
