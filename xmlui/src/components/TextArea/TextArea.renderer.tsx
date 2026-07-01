@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { TextAreaMd } from "./TextArea";
 import { defaultProps } from "./TextArea.defaults";
-import { TextAreaNative, type TextAreaApi } from "./TextAreaReact";
+import { TextAreaNative } from "./TextAreaReact";
 
 const COMP = "TextArea";
 
@@ -13,11 +13,7 @@ export const textAreaRenderer = wrapComponent({
     return (
       <TextAreaNative
         {...adapter.rootAttrs("input")}
-        ref={(api: TextAreaApi | null) => {
-          if (api) {
-            adapter.registerApi(api);
-          }
-        }}
+        registerComponentApi={adapter.registerApi}
         id={adapter.stringProp("id")}
         bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}
@@ -26,7 +22,7 @@ export const textAreaRenderer = wrapComponent({
         requireLabelMode={adapter.stringProp("requireLabelMode")}
         placeholder={adapter.stringProp("placeholder", defaultProps.placeholder)}
         maxLength={adapter.prop("maxLength") as number | undefined}
-        rows={adapter.prop("rows", defaultProps.rows) as number | undefined}
+        rows={adapter.prop("rows") as number | undefined}
         minRows={adapter.prop("minRows") as number | undefined}
         maxRows={adapter.prop("maxRows") as number | undefined}
         autoSize={adapter.booleanProp("autoSize", false)}

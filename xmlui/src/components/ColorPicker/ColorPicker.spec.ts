@@ -37,6 +37,29 @@ test("component renders label correctly", async ({ page, initTestBed }) => {
   await expect(label).toContainText("Select Color");
 });
 
+test("component places label above the color input by default", async ({ page, initTestBed }) => {
+  await initTestBed(`<ColorPicker label="Select your favorite color" />`);
+
+  const labelBox = await page.locator("label").boundingBox();
+  const inputBox = await page.locator("input[type='color']").boundingBox();
+
+  expect(labelBox).toBeTruthy();
+  expect(inputBox).toBeTruthy();
+  expect(inputBox!.y).toBeGreaterThanOrEqual(labelBox!.y + labelBox!.height);
+  expect(Math.abs(inputBox!.x - labelBox!.x)).toBeLessThan(1);
+});
+
+test("component label uses FormItem typography defaults", async ({ page, initTestBed }) => {
+  await initTestBed(`<ColorPicker label="Select your favorite color" />`);
+
+  const label = page.locator("label");
+
+  await expect(label).toHaveCSS("font-size", "14px");
+  await expect(label).toHaveCSS("font-weight", "500");
+  await expect(label).toHaveCSS("font-style", "normal");
+  await expect(label).toHaveCSS("text-transform", "none");
+});
+
 test("component handles disabled state correctly", async ({ page, initTestBed }) => {
   await initTestBed(`<ColorPicker enabled="false" />`, {});
   
@@ -342,7 +365,7 @@ test("component handles required attribute correctly", async ({ page, initTestBe
 });
 
 test("component handles readOnly mode correctly", async ({ page, initTestBed }) => {
-  await initTestBed(`<ColorPicker readOnly="true" />`);
+  await initTestBed(`<ColorPicker readOnly />`);
   const colorInput = page.locator("input[type='color']");
   // For ColorPickers the readOnly attribute typically makes the input disabled
   await expect(colorInput).toBeDisabled();
@@ -411,6 +434,21 @@ test("component setValue API works", async ({ page, initTestBed }) => {
   await page.getByRole("button", { name: "Change Color" }).click();
   const colorInput = page.locator("input[type='color']");
   await expect(colorInput).toHaveValue("#00ff00");
+});
+
+test("component value API updates after setValue", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment>
+      <ColorPicker id="colorPicker" initialValue="#ff0000" />
+      <Button testId="setColor" onClick="colorPicker.setValue('#00ff00')" />
+      <Text testId="colorPickerValue" value="{colorPicker.value}" />
+    </Fragment>
+  `);
+
+  await expect(page.getByTestId("colorPickerValue")).toHaveText("#ff0000");
+  await page.getByTestId("setColor").click();
+  await expect(page.locator("input[type='color']")).toHaveValue("#00ff00");
+  await expect(page.getByTestId("colorPickerValue")).toHaveText("#00ff00");
 });
 
 test("bindTo syncs $data and value", async ({ initTestBed, page }) => {

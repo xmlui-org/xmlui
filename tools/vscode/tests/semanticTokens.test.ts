@@ -91,15 +91,17 @@ describe("collectXmluiSemanticTokens", () => {
 
 describe("collectXmluiDiagnostics", () => {
   it("returns parser diagnostics with VS Code-friendly ranges", () => {
-    const diagnostics = collectXmluiDiagnostics("<App><Button label /></App>");
+    const diagnostics = collectXmluiDiagnostics('<App><Button label "x" /></App>');
 
-    expect(diagnostics).toEqual([
-      expect.objectContaining({
-        code: "XP010",
-        message: "Expected '=' after attribute name.",
-        line: 0,
-      }),
-    ]);
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XP010",
+          message: "Expected '=' after attribute name.",
+          line: 0,
+        }),
+      ]),
+    );
   });
 
   it("returns semantic diagnostics for unresolved expressions", () => {

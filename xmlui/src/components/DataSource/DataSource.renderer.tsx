@@ -6,6 +6,8 @@ import { runEvent } from "../../runtime/rendering/bindings";
 import type { XmluiBuiltInRenderer } from "../../runtime/rendering/types";
 import { useEvaluatedProp, useStringProp } from "../../runtime/rendering/props";
 import { executeWithRetryPolicy, useRetryPolicy } from "../../runtime/retryPolicy";
+import { AppError } from "../../components-core/errors/app-error";
+import { useFallback } from "../Fallback/FallbackReact";
 
 export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   const id = useStringProp(node, scope, "id", "");
@@ -25,6 +27,12 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   const structuralSharing = useEvaluatedProp(node, scope, "structuralSharing", true) !== false;
   const pollIntervalInSeconds = Number(useEvaluatedProp(node, scope, "pollIntervalInSeconds", 0) ?? 0);
   const retryPolicy = useRetryPolicy();
+  const fallback = useFallback();
+  const scopeRef = useRef(scope);
+  scopeRef.current = scope;
+  const fallbackRef = useRef(fallback);
+  fallbackRef.current = fallback;
+  const fallbackIdRef = useRef<string | symbol>();
   const apiRef = useRef<Record<string, unknown>>();
   const mockDataKey = stableDataKey(mockData);
   const transformResultKey = stableDataKey(transformResult);
@@ -48,17 +56,22 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   if (!apiRef.current) {
     apiRef.current = createDataSourceApi(id, scope);
   }
-  useEffect(() => registerReference(scope, id, apiRef.current!), [id, scope]);
+  useEffect(
+    () => registerReference(scope, id, apiRef.current!),
+    [id, scope.references, scope.store],
+  );
 
   useEffect(() => {
     if (!id) {
       return;
     }
+    const fallbackId = fallbackIdRef.current ?? (fallbackIdRef.current = id || Symbol("DataSource"));
     let cancelled = false;
     let loadSequence = 0;
     const load = async (force = false) => {
       const sequence = ++loadSequence;
-      updateApi(apiRef.current!, id, scope, {
+      const currentScope = scopeRef.current;
+      updateApi(apiRef.current!, id, currentScope, {
         inProgress: true,
         isRefetching: Boolean(apiRef.current!.loaded),
         error: undefined,
@@ -69,7 +82,7 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
           current,
           force,
           node,
-          scope,
+          scope: currentScope,
         }), retryPolicy);
         let value = loaded.value;
         const responseHeaders = loaded.responseHeaders;
@@ -82,7 +95,7 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
         if (cancelled || sequence !== loadSequence) {
           return;
         }
-        updateApi(apiRef.current!, id, scope, {
+        updateApi(apiRef.current!, id, currentScope, {
           value,
           loaded: true,
           inProgress: false,
@@ -94,17 +107,19 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
           hasPrevPage: prevPage != null && prevPage !== false,
           hasNextPage: nextPage != null && nextPage !== false,
         });
-        void runEvent(node.parsed?.events?.loaded, scope, [value, force]);
+        fallbackRef.current?.clearError(fallbackId);
+        void runEvent(node.parsed?.events?.loaded, currentScope, [value, force]);
       } catch (error) {
         if (cancelled || sequence !== loadSequence) {
           return;
         }
-        updateApi(apiRef.current!, id, scope, {
+        updateApi(apiRef.current!, id, currentScope, {
           error,
           inProgress: false,
           isRefetching: false,
         });
-        void runEvent(node.parsed?.events?.error, scope, [error]);
+        fallbackRef.current?.reportError(fallbackId, AppError.from(error));
+        void runEvent(node.parsed?.events?.error, currentScope, [error]);
       }
     };
     apiRef.current!.refetch = () => load(true);
@@ -131,7 +146,6 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
     prevPageSelector,
     resultSelector,
     structuralSharing,
-    scope,
     transformResultKey,
   ]);
 

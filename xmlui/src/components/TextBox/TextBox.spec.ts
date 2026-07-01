@@ -675,6 +675,15 @@ test.describe("Password Input", () => {
     await expect(driver.input).toHaveAttribute("type", "password");
   });
 
+  test("component forces password type over authored type", async ({
+    initTestBed,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`<PasswordInput testId="input" type="text" />`);
+    const driver = await createTextBoxDriver("input");
+    await expect(driver.input).toHaveAttribute("type", "password");
+  });
+
   test("component has initial value", async ({ initTestBed, createTextBoxDriver }) => {
     await initTestBed(`<PasswordInput testId="input" initialValue="secret" />`);
     const driver = await createTextBoxDriver("input");
@@ -1205,6 +1214,20 @@ test.describe("Behaviors and Parts", () => {
     });
     const component = page.getByTestId("test");
     await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
+  });
+
+  test("theme variables are assigned through generated CSS classes", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" />`, {
+      testThemeVars: {
+        "borderColor-TextBox": "rgb(255, 0, 0)",
+      },
+    });
+
+    const component = page.getByTestId("test");
+    await expect(component).toHaveClass(/xmlui-TextBox/);
+    await expect(component).toHaveClass(/xmlui-dynamic-/);
+    await expect(component).not.toHaveAttribute("style", /--xmlui-/);
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {

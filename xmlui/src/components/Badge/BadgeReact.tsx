@@ -24,7 +24,7 @@ export function isBadgeColors(color: unknown): color is BadgeColors {
 }
 
 type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
-  variant?: BadgeVariant;
+  variant?: BadgeVariant | string;
   color?: string | BadgeColors;
   classes?: Record<string, string>;
   themeColor?: string;

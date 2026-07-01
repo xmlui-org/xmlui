@@ -146,16 +146,22 @@ $height-ColorPicker: createThemeVar("height-ColorPicker");
 
   .colorPickerLabeledItem {
     display: flex;
-    align-items: center;
-    gap: var(--xmlui-gap-label-ColorPicker, var(--xmlui-gap-normal, 0.5rem));
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--xmlui-gap-label-ColorPicker, var(--xmlui-gap-label-FormItem, 0.5rem));
     width: 100%;
     max-width: 100%;
   }
 
   .colorPickerLabel {
     flex: 0 0 auto;
-    color: var(--xmlui-textColor-label-ColorPicker, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-ColorPicker, inherit);
+    color: var(--xmlui-textColor-label-ColorPicker, var(--xmlui-textColor-label-formItem, var(--xmlui-textColor)));
+    font-family: var(--xmlui-fontFamily-label-ColorPicker, var(--xmlui-fontFamily-label-formItem, inherit));
+    font-size: var(--xmlui-fontSize-label-ColorPicker, var(--xmlui-fontSize-label-formItem, var(--xmlui-fontSize-sm, 0.875rem)));
+    font-weight: var(--xmlui-fontWeight-label-ColorPicker, var(--xmlui-fontWeight-label-formItem, var(--xmlui-fontWeight-medium, 500)));
+    font-style: var(--xmlui-fontStyle-label-ColorPicker, var(--xmlui-fontStyle-label-formItem, normal));
+    text-transform: var(--xmlui-textTransform-label-ColorPicker, var(--xmlui-textTransform-label-formItem, none));
+    white-space: nowrap;
   }
 
   .colorPickerLabelRequired,

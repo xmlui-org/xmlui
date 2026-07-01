@@ -177,7 +177,7 @@ export const TextAreaMd = createMetadata({
     [`backgroundColor-${COMP}--hover`]: "$backgroundColor-Input",
     [`boxShadow-${COMP}--hover`]: "none",
     [`textColor-${COMP}--hover`]: "$textColor-Input",
-    [`borderColor-${COMP}--focus`]: "$borderColor-Input--hover",
+    [`borderColor-${COMP}--focus`]: `$borderColor-${COMP}`,
     [`backgroundColor-${COMP}--focus`]: "$backgroundColor-Input",
     [`boxShadow-${COMP}--focus`]: "none",
     [`textColor-${COMP}--focus`]: "$textColor-Input",
@@ -229,4 +229,3 @@ export const TextAreaMd = createMetadata({
     [`textColor-${COMP}--success--hover`]: `$textColor-${COMP}--success`,
   },
 });
-

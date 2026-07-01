@@ -13,6 +13,8 @@ export const drawerRenderer = wrapComponent({
   metadata: DrawerMd as ComponentMetadata,
   renderer: ({ adapter }) => {
     const rootAttrs = adapter.rootAttrs();
+    const backgroundColor = adapter.stringProp("backgroundColor");
+    const rootStyle = rootAttrs.style as CSSProperties | undefined;
     const hasHeaderTemplate = adapter.node.children.some(
       (child) => child.kind === "element" &&
         child.type === "property" &&
@@ -21,7 +23,6 @@ export const drawerRenderer = wrapComponent({
     return (
       <DrawerComponent
         {...rootAttrs}
-        style={rootAttrs.style as CSSProperties}
         position={adapter.stringProp("position", defaultProps.position) as "left" | "right" | "top" | "bottom"}
         hasBackdrop={adapter.booleanProp("hasBackdrop", defaultProps.hasBackdrop)}
         initiallyOpen={adapter.booleanProp("initiallyOpen", defaultProps.initiallyOpen)}
@@ -31,6 +32,10 @@ export const drawerRenderer = wrapComponent({
         onOpen={() => { void adapter.event("open")(); }}
         onClose={() => { void adapter.event("close")(); }}
         registerComponentApi={adapter.registerApi}
+        style={{
+          ...rootStyle,
+          ...(backgroundColor ? { backgroundColor } : undefined),
+        }}
       >
         {adapter.renderChildren()}
       </DrawerComponent>

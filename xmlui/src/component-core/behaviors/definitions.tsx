@@ -139,16 +139,47 @@ export const labelBehavior: Behavior = {
     },
   },
   canAttach: canAttachWhenTriggered("label"),
-  attach: (context, node) => (
-    <label
-      data-xmlui-behavior="label"
-      data-xmlui-label-position={stringValue(context.props.labelPosition)}
-      data-xmlui-label-width={stringValue(context.props.labelWidth)}
-    >
-      <span data-xmlui-part="label">{stringValue(context.props.label)}</span>
-      {node}
-    </label>
-  ),
+  attach: (context, node) => {
+    const labelPosition = stringValue(context.props.labelPosition) ?? "top";
+    const labelWidth = stringValue(context.props.labelWidth);
+    const labelBreak = booleanValue(context.props.labelBreak);
+    const required = booleanValue(context.props.required);
+    const enabled = context.props.enabled === undefined ? true : booleanValue(context.props.enabled);
+    const readOnly = booleanValue(context.props.readOnly);
+    const reserveRequiredMark = !required && context.layoutContext?.orientation === "horizontal";
+    return (
+      <div
+        className="xmlui-labelBehavior-itemWithLabel"
+        data-xmlui-behavior="label"
+        data-xmlui-label-position={labelPosition}
+        data-xmlui-label-width={labelWidth}
+      >
+        <div className={`xmlui-labelBehavior-container ${labelPositionClass(labelPosition)}`}>
+          <div
+            className="xmlui-labelBehavior-labelWrapper"
+            style={labelWidth ? { width: labelWidth, flexShrink: 0, justifyContent: "flex-start" } : undefined}
+          >
+            <span
+              className={`xmlui-labelBehavior-inputLabel${required ? " xmlui-labelBehavior-required" : ""}${!enabled ? " xmlui-labelBehavior-disabled" : ""}${labelBreak ? " xmlui-labelBehavior-labelBreak" : ""}`}
+              data-xmlui-part="label"
+              style={readOnly ? { pointerEvents: "none" } : undefined}
+            >
+              {stringValue(context.props.label)}
+              {(required || reserveRequiredMark) && (
+                <span
+                  className="xmlui-labelBehavior-requiredMark"
+                  style={reserveRequiredMark ? { visibility: "hidden" } : undefined}
+                >
+                  *
+                </span>
+              )}
+            </span>
+          </div>
+          <div className="xmlui-labelBehavior-wrapper">{node}</div>
+        </div>
+      </div>
+    );
+  },
 };
 
 export const variantBehavior: Behavior = {
@@ -424,6 +455,28 @@ function stringValue(value: unknown): string | undefined {
     return undefined;
   }
   return String(value);
+}
+
+function booleanValue(value: unknown): boolean {
+  return value === true || value === "true";
+}
+
+function labelPositionClass(value: string): string {
+  switch (value) {
+    case "bottom":
+      return "xmlui-labelBehavior-bottom";
+    case "start":
+      return "xmlui-labelBehavior-start";
+    case "before":
+      return "xmlui-labelBehavior-before";
+    case "end":
+      return "xmlui-labelBehavior-end";
+    case "after":
+      return "xmlui-labelBehavior-after";
+    case "top":
+    default:
+      return "xmlui-labelBehavior-top";
+  }
 }
 
 const hiddenLiveRegionStyle = {

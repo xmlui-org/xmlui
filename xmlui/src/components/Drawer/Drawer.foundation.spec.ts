@@ -22,13 +22,13 @@ test.describe("Drawer foundation", () => {
 
   test("open and close events mutate visible state", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App var.state="{'closed'}">
+      <Fragment var.drawerState="{'closed'}">
         <Button testId="open" onClick="drawer.open()">Open</Button>
-        <Drawer id="drawer" onOpen="state = 'open'" onClose="state = 'closed'">
+        <Drawer id="drawer" onOpen="drawerState = 'open'" onClose="drawerState = 'closed'">
           <Text>Drawer content</Text>
         </Drawer>
-        <Text testId="state">State: {state}</Text>
-      </App>
+        <Text testId="state">State: {drawerState}</Text>
+      </Fragment>
     `);
 
     await expect(page.getByTestId("state")).toContainText("State: closed");

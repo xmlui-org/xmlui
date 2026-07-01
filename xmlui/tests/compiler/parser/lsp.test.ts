@@ -67,16 +67,18 @@ describe("parser LSP adapters", () => {
   });
 
   it("maps diagnostics to LSP ranges", () => {
-    const source = new SourceText("<App>\n<Button label />\n</App>", "Main.xmlui");
+    const source = new SourceText('<App>\n<Button label "x" />\n</App>', "Main.xmlui");
     const parsed = parseMarkup(source);
 
-    expect(diagnosticsToLspDiagnostics(parsed.diagnostics, source)).toEqual([
-      expect.objectContaining({
-        code: "XP010",
-        message: "Expected '=' after attribute name.",
-        range: { start: { line: 1, character: 14 }, end: { line: 1, character: 16 } },
-      }),
-    ]);
+    expect(diagnosticsToLspDiagnostics(parsed.diagnostics, source)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "XP010",
+          message: "Expected '=' after attribute name.",
+          range: { start: { line: 1, character: 14 }, end: { line: 1, character: 17 } },
+        }),
+      ]),
+    );
   });
 
   it("finds markup cursor contexts", () => {

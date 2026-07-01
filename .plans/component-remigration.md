@@ -172,6 +172,15 @@ details belong in per-component .ai notes and the status table.
 - Stable callback identity matters. Copied components can treat
   `updateState`, `registerComponentApi`, and similar callbacks as stable; use
   refs/memoized callbacks at the renderer boundary when needed.
+- XMLUI markup accepts name-only boolean attributes such as `readOnly` and
+  `required`. Preserve this in the parser, raw XML collector, compiler, LSP
+  diagnostics, and downstream boolean prop conversion; the compiler currently
+  materializes bare attributes as the string value `"true"`, matching the
+  quoted-attribute path used by existing boolean props.
+- Behavior attachment needs the same runtime context old `wrapComponent`
+  provided, not only props and metadata. When a behavior's geometry depends on
+  parent layout, pass layout context through the behavior boundary instead of
+  patching individual host components.
 - Behavior wrappers that clone children must preserve child inline style before
   layering wrapper-owned dynamic style. The rewrite currently carries many
   theme CSS variables through inline style, while old XMLUI often carried them
@@ -226,10 +235,18 @@ details belong in per-component .ai notes and the status table.
   outrank component CSS.
 - Theme wrappers are layout-transparent in old XMLUI. `ThemeScope` must preserve
   `display: contents` behavior while carrying scoped CSS variables.
+- Old XMLUI assigns component and scoped Theme variables through generated CSS
+  classes, not repeated inline `style` bags. The rewrite should generate stable
+  CSS in the theme layer for theme variables and reserve inline styles for
+  layout props or genuinely dynamic values that cannot reasonably be classed.
 - Theme-token props such as `$space-8` should be normalized to CSS variables at
   the renderer boundary when passed into copied React logic that performs sizing
   math. If numeric math is needed, resolve the variable against the actual
   component DOM element, not an arbitrary global root.
+- Do not globally "fix" invalid-looking author values into theme references.
+  Old XMLUI's size coercion accepts `$token` theme references but treats bare
+  strings such as `space-4` as invalid in many places. Preserve the old
+  component-specific fallback path instead of broadening the language.
 - Generated tone/color variables must be inserted at the same point in the theme
   cascade as old XMLUI. Missing generated base tones or wrong generated/default
   precedence shows up as subtle color, opacity, border, and hover-state drift.
@@ -269,6 +286,10 @@ details belong in per-component .ai notes and the status table.
   detail. Components using label behavior should preserve the old outer wrapper,
   inner label container, typography, gap, and explicit/implicit label-position
   semantics.
+- Label behavior can affect layout even when no visible label marker is shown.
+  Original `ItemWithLabel` reserves hidden required-marker space in horizontal
+  layouts for non-required fields, so preserve wrapper geometry and hidden
+  marker behavior through the shared behavior layer.
 
 ### Testing And Verification
 
@@ -276,6 +297,13 @@ details belong in per-component .ai notes and the status table.
   opacity, font, spacing, wrapper, and gap regressions that focused specs missed.
   Add narrow foundation/regression tests for each learned compatibility gap
   without editing old migrated E2E files.
+- For small visual deltas, query both original and rewrite dev servers and
+  compare computed styles, element bounding boxes, and text-node
+  `Range.getBoundingClientRect()` values. Measuring the actual visible invariant
+  is more reliable than asserting nearby container widths or screenshots alone.
+- Write tests against the real bug, not a convenient proxy. A rich summary bug
+  is not covered by checking that a label exists; it needs assertions for
+  no-wrap row geometry, label typography, and the actual label-to-icon distance.
 - Existing drivers may assume old DOM details. Prefer driver/testbed updates that
   accept both current and source-preserved shapes over changing copied React
   source.
@@ -354,12 +382,12 @@ Status values:
 
 | Status | Components |
 | --- | ---: |
-| Approved complete | 47 |
-| Awaiting approval | 1 |
+| Approved complete | 53 |
+| Awaiting approval | 0 |
 | Blocked | 1 |
-| Not started | 68 |
+| Not started | 64 |
 | Prerequisite | 7 |
-| **Total** | **124** |
+| **Total** | **125** |
 
 | Component | Complexity | Old Specs | Style Files | Main Dependencies Observed | Status | Notes |
 | --- | --- | ---: | --- | --- | --- | --- |
@@ -379,7 +407,7 @@ Status values:
 | `ChangeListener` | More difficult | 1 | none | runtime state/listeners | Not started | Event semantics over visuals. |
 | `Checkbox` | More difficult | 1 | none in old folder | Toggle | Approved complete | User confirmed Checkbox works as expected; focused unchanged Checkbox suite passes 118/118; copied old Toggle React/SCSS/defaults power the renderer; stable callback and explicit/implicit value boundary fixes preserve old Toggle semantics. |
 | `CodeBlock` | More difficult | 1 | `CodeBlock.module.scss` | Button, Icon, Part, Text | Not started | Copy button/text first. |
-| `ColorPicker` | More difficult | 1 | `ColorPicker.module.scss` | FormItem, Part | Not started | Input/form dependency. |
+| `ColorPicker` | More difficult | 1 | `ColorPicker.module.scss` | FormItem, Part | Approved complete | User confirmed ColorPicker complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/ColorPicker/ColorPicker.tsx`, `ColorPickerReact.tsx`, `ColorPicker.defaults.ts`, `ColorPicker.module.scss`, and the transferred ColorPicker suite. Runtime behavior remains on the existing native color input implementation, but public API exposure now follows the completed TextBox/TextArea source-preserving pattern: `ColorPickerNative` accepts `registerComponentApi`, registers stable `focus` and `setValue` methods through effects, and separately publishes reactive `value` changes through the adapter instead of relying on a ref callback. This keeps `id` reference bindings such as `{colorPicker.value}` reactive after user changes and programmatic `setValue` calls. Follow-up parity restored the original label behavior: the old ColorPicker renders only the input and receives top-label layout from `wrapComponent`/FormItem, so the rewrite label bridge now stacks the label above the swatch with FormItem label tokens instead of rendering an inline label row. Label typography now matches the original FormItem defaults (`$fontSize-sm`, `$fontWeight-medium`) and has small/medium fallbacks for isolated ColorPicker rendering. The parser/compiler pipeline now also preserves original XMLUI name-only boolean attributes, so the documented `<ColorPicker initialValue="#ffff00" label="Cannot be edited" readOnly />` form parses and compiles `readOnly` as `"true"` through both normal and raw XMLUI paths. Focused parser/compiler shorthand slice passes 8/8; VS Code diagnostic slice passes 1/1; focused ColorPicker shorthand readOnly browser test passes 1/1; focused ColorPicker API slice passes 6/6; label slice passes 14/14; full ColorPicker suite passes 73/73; TypeScript and metadata checks pass. |
 | `Column` | More difficult | 0 | none | Table context | Prerequisite | Required before `Table`; verify through table specs. |
 | `ConciseValidationFeedback` | More difficult | 0 | `ConciseValidationFeedback.module.scss` | Form, Icon, Tooltip | Prerequisite | Required by input components. |
 | `ContentSeparator` | Simple | 1 | `ContentSeparator.module.scss` | metadata helpers | Approved complete | User confirmed ContentSeparator is complete; source-preserved React/SCSS restored from old project; renderer bridges old root class through `classes[COMPONENT_PART_KEY]`, keeps copied prop sizing authoritative, and restores old no-shrink default while honoring explicit `canShrink`. Focused unchanged ContentSeparator suite passes 37/37; TypeScript, metadata, expanded E2E audit, and CSS module audit pass; side-by-side migrated component batch passes 984/1100 with 116 skips. |
@@ -387,10 +415,10 @@ Status values:
 | `DataSource` | Complex | 1 | none | runtime data | Not started | Data loading contract. |
 | `DateInput` | Complex | 1 | `DateInput.module.scss` | ConciseValidationFeedback, Form, Icon, Input, Part | Not started | Wait for input/form. |
 | `DatePicker` | Complex | 1 | `DatePicker.module.scss` | ConciseValidationFeedback, Form, FormItem, Icon, Input | Not started | Current fixme indicates shell mismatch risk. |
-| `Drawer` | More difficult | 1 | `Drawer.module.scss` | Icon | Not started | Overlay/focus behavior. |
+| `Drawer` | More difficult | 1 | `Drawer.module.scss` | Icon, Radix Dialog | Approved complete | User confirmed Drawer complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/Drawer/Drawer.tsx`, `DrawerReact.tsx`, `Drawer.defaults.ts`, `Drawer.module.scss`, and the transferred Drawer suite. The former simplified inline dialog was replaced with the original Radix Dialog based structure, restoring portal presence, focus handling, dialog semantics, `data-state` animation states, Escape handling, close button behavior, backdrop rendering, outside-click dismissal, and old slide/fade animations. The renderer keeps rewrite boundary behavior for `rootAttrs`, `headerTemplate`, `backgroundColor`, events, and public `open`/`close`/`isOpen` APIs. Because the rewrite theme runtime does not yet expose the original `theme.root` portal host, Drawer uses `theme.root` when available and falls back to `document.body`, applying the XMLUI theme class and copied Drawer CSS custom properties to the generated portal host so backdrop and panel inherit Drawer variables; the backdrop regression now asserts the default `rgba(0, 0, 0, 0.4)` color. Added the original runtime dependency `@radix-ui/react-dialog`. The stylesheet preserves the original padding side variables and adds a rewrite-compatible broad `padding-Drawer` fallback cascade. Focused Drawer suite passes 31/31; Drawer foundation suite passes 3/3; TypeScript, metadata, and CSS module import audit pass. |
 | `DropdownMenu` | Complex | 1 | `DropdownMenu.module.scss` | Button, Icon, menu helpers | Approved complete | User confirmed DropdownMenu is complete; Radix-backed source-preserving menu migration with Menu/MenuItem/SubMenuItem/MenuSeparator and ContextMenu restored original React/SCSS, added `@radix-ui/react-dropdown-menu`, and bridges themed shrink-wrapped trigger buttons/templates, `enabled`, `modal`, `menuWidth`, submenu surface styles, `MenuItem.to`, icon resolution, separator filtering, empty-content guarding, and component APIs. Runtime bridge preserves XMLUI modal-layer behavior with Select, ModalDialog, and confirm dialogs. Focused menu-family run passes 75/76 with 1 skip; TypeScript, metadata, CSS module audit, and expanded E2E audit pass. |
 | `EventSource` | Complex | 0 | none | runtime events | Not started | Verify via synthetic event source fixtures. |
-| `ExpandableItem` | More difficult | 1 | `ExpandableItem.module.scss` | Icon, Part, Toggle | Not started | Old suite currently skipped in rewrite. |
+| `ExpandableItem` | More difficult | 1 | `ExpandableItem.module.scss` | Icon, Part, Toggle | Approved complete | User confirmed ExpandableItem complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/ExpandableItem/ExpandableItemReact.tsx`, `ExpandableItem.tsx`, `ExpandableItem.module.scss`, the transferred old ExpandableItem suite, and the original shared `ExpandableItemDriver`. Replaced the foundation placeholder implementation with the source-preserving `Part`/`ThemedIcon`/`Toggle` structure; restored source-style summary/content/icon/switch/open/disabled/full-width styling and animation; moved `onExpandedChange` out of the state updater to avoid React nested-update warnings while preserving the old event timing; and re-enabled the full transferred suite. The shared test driver now matches the original CSS-module-aware selectors and nested locator behavior. Local old/new DOM comparisons closed the subtle style issues: default bottom border resolves to the original computed `0px`; Stack fallback preserves old invalid bare-token behavior for `gap="space-4"` and `padding="space-3"`; and rich custom summaries now preserve old generic label behavior, including top-position `ItemWithLabel`, FormItem label typography fallbacks, unsupported Badge variant pass-through, intrinsic wrapper sizing, and hidden required-marker reservation in horizontal layout. Added direct regressions for the user's two expanded items and rich summary template. Full ExpandableItem suite passes 63/63; combined Stack/ExpandableItem focused run passes 65 active tests with 83 skipped pending Stack tests after the Stack fallback correction; development build passes. |
 | `Fallback` | More difficult | 0 | none | runtime error/fallback | Not started | Verify through runtime scenarios. |
 | `FileInput` | Complex | 1 | `FileInput.module.scss` | Button, FormItem, Icon, TextBox | Not started | Wait for Button/TextBox/FormItem. |
 | `FileUploadDropZone` | More difficult | 1 | `FileUploadDropZone.module.scss` | Icon, component utils | Not started | Browser file/drop semantics. |
@@ -472,8 +500,9 @@ Status values:
 | `Tabs` | Complex | 1 | `Tabs.module.scss` | Form, container helpers | Not started | Old suite currently skipped. |
 | `TabsForm` | Complex | 1 | none | Form | Not started | Form plus Tabs. |
 | `Text` | Simple | 1 | `Text.module.scss` | abstractions/metadata, Icon, Stack | Approved complete | User confirmed Text is complete; source-preserved React/SCSS/defaults restored from old project with import/dependency shims only; renderer bridges old classes contract, old `asDisplayText` value rendering, value fallback, variant props, contextMenu, overflow, and component API; breakMode visual overlap fixed through the shared vertical Stack no-shrink default; focused unchanged Text suite passes 140/140; metadata and TypeScript checks pass; side-by-side migrated component run including Heading now passes 841/847 with 6 skips. |
-| `TextArea` | Complex | 1 | `TextArea.module.scss` | ConciseValidationFeedback, Form, FormItem, Part | Not started | Input/form dependency. |
-| `TextBox` | Complex | 1 | `TextBox.module.scss` | ConciseValidationFeedback, Form, FormItem, Input, Part | Awaiting approval | Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/TextBox/TextBoxReact.tsx`, `TextBox.tsx`, `TextBox.defaults.ts`, `TextBox.module.scss`, original `InputAdornment`, and the old unchanged TextBox suite. The old suite was already transferred; migration tightened the runtime boundary instead of rewriting visuals: TextBox/PasswordInput now publish `focus`, `setValue`, and reactive `value` through an old-style `registerComponentApi` effect instead of a ref callback, avoiding repeated API invalidation loops for expressions such as `{myTextBox.value}`. Shared `adapter.registerApi` now invalidates reference bindings only when the registered object changes or a non-function API value changes, preventing method identity refreshes from causing render loops while keeping value updates reactive. The testbed wrapper now mirrors old component-isolation assumptions more closely by disabling App content max-width, content padding, and scrollbar gutter reservation for implicit App component tests; App-scoped CSS variables are injected on the generated App root so percentage width assertions measure against the viewport-sized content area without breaking `var.testState` scoping. TextBox adornments now render `ThemedIcon` nodes instead of placeholder marker dots, matching the original icon path for `startIcon`/`endIcon`, search clear, password toggle, and concise validation icons. TextBox root padding now follows the original padding mixin cascade, with side-specific padding variables overriding broad `padding-TextBox` through horizontal/vertical fallbacks; empty start/end adornments also return `null` like the original helper, avoiding a component-layer hidden-span override that added an extra flex gap before the input text. Readonly focus now keeps the default border color while still showing the focus outline; custom `borderColor-TextBox--focus` overrides remain supported. Focused TextBox suite passes 167/167; TextBox event/API/percent-width slice passes 8/8; TextBox adornment icon slice passes 9/9; TextBox theme-var slice passes 8/8; absent-adornment/default-padding geometry slice passes 3/3; readonly focus slice passes 4/4; Checkbox/Switch API regression run passes 222/222; TypeScript and metadata checks pass. Residual non-failing tooltip+animation ref warning remains from the existing Animation behavior composition debt. |
+| `TextArea` | Complex | 1 | `TextArea.module.scss` | ConciseValidationFeedback, Form, FormItem, Part | Approved complete | User confirmed TextArea complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/TextArea/TextArea.tsx`, `TextAreaReact.tsx`, `TextAreaResizable.tsx`, `TextArea.defaults.ts`, `TextArea.module.scss`, and the transferred TextArea suite. Runtime behavior remains on the existing TextArea implementation, but API exposure now follows the source-preserving TextBox/AppState pattern: `TextAreaNative` accepts `registerComponentApi`, registers stable `focus`, `insert`, and escaped `setValue` methods through effects, and separately publishes reactive `value` changes through the adapter instead of relying on a ref callback. This preserves `id` reference bindings such as `{myTextArea.value}`, avoids ref-object API churn, and keeps `setValue('alpha\\nbeta')` newline normalization. Autosize now preserves the old source behavior where `autoSize`, `minRows`, or `maxRows` takes TextArea through the autosizing path instead of the normal default two-row textarea: the rewrite uses a one-row measurement baseline and writes border-box-corrected height so `<TextArea autoSize="true" />` measures `42px` on the local original and new dev servers. Default focus border color also follows the TextBox-compatible source-preserving token path while custom focus border overrides still work. Full TextArea suite passes 161/161; TypeScript and metadata checks pass. |
+| `TextBox` | Complex | 1 | `TextBox.module.scss` | ConciseValidationFeedback, Form, FormItem, Input, Part | Approved complete | User confirmed TextBox complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/TextBox/TextBoxReact.tsx`, `TextBox.tsx`, `TextBox.defaults.ts`, `TextBox.module.scss`, original `InputAdornment`, and the old unchanged TextBox suite. The old suite was already transferred; migration tightened the runtime boundary instead of rewriting visuals: TextBox/PasswordInput now publish `focus`, `setValue`, and reactive `value` through an old-style `registerComponentApi` effect instead of a ref callback, avoiding repeated API invalidation loops for expressions such as `{myTextBox.value}`. Shared `adapter.registerApi` now invalidates reference bindings only when the registered object changes or a non-function API value changes, preventing method identity refreshes from causing render loops while keeping value updates reactive. The testbed wrapper now mirrors old component-isolation assumptions more closely by disabling App content max-width, content padding, and scrollbar gutter reservation for implicit App component tests; App-scoped CSS variables are injected on the generated App root so percentage width assertions measure against the viewport-sized content area without breaking `var.testState` scoping. TextBox adornments now render `ThemedIcon` nodes instead of placeholder marker dots, matching the original icon path for `startIcon`/`endIcon`, search clear, password toggle, and concise validation icons. TextBox root padding now follows the original padding mixin cascade, with side-specific padding variables overriding broad `padding-TextBox` through horizontal/vertical fallbacks; empty start/end adornments also return `null` like the original helper, avoiding a component-layer hidden-span override that added an extra flex gap before the input text. Readonly focus now keeps the default border color while still showing the focus outline; custom `borderColor-TextBox--focus` overrides remain supported. Focused TextBox suite passes 167/167; TextBox event/API/percent-width slice passes 8/8; TextBox adornment icon slice passes 9/9; TextBox theme-var slice passes 8/8; absent-adornment/default-padding geometry slice passes 3/3; readonly focus slice passes 4/4; Checkbox/Switch API regression run passes 222/222; TypeScript and metadata checks pass. Residual non-failing tooltip+animation ref warning remains from the existing Animation behavior composition debt. |
+| `PasswordInput` | Derived | 0 | `TextBox.module.scss` | TextBox | Approved complete | User confirmed PasswordInput complete on 2026-07-01. Migrated as the original TextBox-derived password wrapper from `/Users/dotneteer/source/xmlui/xmlui/src/components/TextBox/TextBox.tsx`: the renderer forces `type="password"` over authored `type`, inherits TextBox behavior/styling/API exposure, and PasswordInput metadata now preserves the original password description plus `initialValue` audit classification as `secret` with default redaction `mask`. Focused Password Input suite passes 9/9 including a regression for authored `type="text"`; full TextBox family suite passes 168/168. |
 | `Theme` | Complex | 1 | `Theme.module.scss` | App, ComponentRegistryContext | Not started | Global theming behavior. |
 | `TileGrid` | Complex | 1 | `TileGrid.module.scss` | Checkbox, SelectionStore, Table | Not started | After Table/selection. |
 | `TimeInput` | Complex | 1 | `TimeInput.module.scss` | Icon, Input, Part | Not started | Input dependency. |
@@ -545,6 +574,43 @@ Status values:
   `.navPanelWrapper > *:first-child { flex: 1; min-height: 0; }` rule and
   extends the wide regression to scroll to the bottom while checking header,
   footer, NavPanel wrapper, real NavPanel, and first NavLink offsets.
+- 2026-07-01 AppContext global compatibility: old XMLUI exposes global helpers
+  through the top-level `AppContextObject` contract in
+  `/Users/dotneteer/source/xmlui/xmlui/src/abstractions/AppContextDefs.ts`.
+  The rewrite compiler uses `createXmluiAppContextObject()` as the default
+  semantic source of truth, so globals such as `formatDateTime` must be own
+  properties on that object rather than parser special cases. The rewrite now
+  exposes the original top-level AppContext identifiers, including date, math,
+  file, theme, user, storage, logging, App, Clipboard, pub/sub, and utility
+  names. Existing special/built-in precedence is preserved for `navigate`,
+  `delay`, and `getDate`. Focused compiler coverage proves all top-level names
+  bind without unresolved diagnostics and that `formatDateTime(getDate())`
+  parses through the default app-context contract.
+- 2026-07-01 theme class generation compatibility: old XMLUI assigns
+  component and scoped Theme variables through generated CSS classes from the
+  style registry, not through repeated inline `style` attributes. The rewrite
+  now routes `XmluiThemeRoot`, `useComponentThemeClass()`, and `ThemeScope`
+  through generated classes in the `themes` layer and keeps adapter inline
+  styles reserved for layout props. `themeClass.style` remains present for
+  wrapper compatibility but is empty after the class is generated, preventing
+  old-style wrappers from reintroducing inline `--xmlui-*` variable bags.
+  Follow-up sweep also moved the implicit Theme wrapper's `display: contents`
+  and default-only `boxSizing` away from inline style, routed App root/mobile
+  drawer theme variables and built-in fallback App variables through generated
+  classes, and moved Link current-variant custom properties into generated CSS.
+  Focused Theme/Link/App/compiler coverage proves variables still apply while
+  the component/wrapper `style` attributes do not contain theme custom-property
+  definitions; the remaining TableOfContents inline active background is a
+  dynamic value that references an existing CSS variable rather than defining
+  theme variables inline.
+- 2026-07-01 ExpandableItem follow-up: the final rich-summary fixes were mostly
+  shared infrastructure lessons rather than ExpandableItem-local styling. DOM
+  comparison against the original showed that generic label behavior needs
+  FormItem typography fallbacks, intrinsic wrapper sizing, and horizontal layout
+  context so it can reserve the same hidden required-marker geometry as
+  `ItemWithLabel`. The focused regression now measures the actual visible
+  invariant: no-wrap custom summary geometry, label font, and text-node-to-icon
+  distance.
 
 ## Recent Tooling Compatibility Notes
 

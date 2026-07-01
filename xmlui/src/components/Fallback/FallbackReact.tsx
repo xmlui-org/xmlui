@@ -9,15 +9,10 @@ import {
   type ReactNode,
 } from "react";
 
-export type FallbackError = {
-  code?: string;
-  category?: string;
-  message: string;
-  data?: unknown;
-};
+import { AppError } from "../../components-core/errors/app-error";
 
 export interface FallbackContextValue {
-  reportError: (id: string | symbol, error: unknown) => void;
+  reportError: (id: string | symbol, error: AppError) => void;
   clearError: (id: string | symbol) => void;
 }
 
@@ -35,7 +30,7 @@ type BoundaryProps = {
 
 class FallbackErrorBoundary extends Component<BoundaryProps> {
   componentDidCatch(error: unknown): void {
-    this.props.onCatch(error);
+    this.props.onCatch(AppError.from(error));
   }
 
   render() {
@@ -45,20 +40,20 @@ class FallbackErrorBoundary extends Component<BoundaryProps> {
 
 export type FallbackProps = {
   children?: ReactNode;
-  errorRender?: ($error: FallbackError) => ReactNode;
+  errorRender?: ($error: AppError) => ReactNode;
   loadingRender?: () => ReactNode;
   isLoading?: boolean;
 };
 
 export function Fallback({ children, errorRender, loadingRender, isLoading }: FallbackProps) {
-  const errorsRef = useRef<Map<string | symbol, FallbackError>>(new Map());
+  const errorsRef = useRef<Map<string | symbol, AppError>>(new Map());
   const [, setVersion] = useState(0);
-  const [boundaryError, setBoundaryError] = useState<FallbackError | undefined>(undefined);
+  const [boundaryError, setBoundaryError] = useState<AppError | undefined>(undefined);
   const bump = useCallback(() => setVersion((version) => version + 1), []);
 
   const ctx = useMemo<FallbackContextValue>(() => ({
     reportError: (id, error) => {
-      errorsRef.current.set(id, normalizeError(error));
+      errorsRef.current.set(id, error);
       bump();
     },
     clearError: (id) => {
@@ -70,7 +65,7 @@ export function Fallback({ children, errorRender, loadingRender, isLoading }: Fa
 
   const reportedError = boundaryError ?? errorsRef.current.values().next().value;
   const onCatch = useCallback((error: unknown) => {
-    setBoundaryError(normalizeError(error));
+    setBoundaryError(AppError.from(error));
   }, []);
 
   if (reportedError && errorRender) {
@@ -86,23 +81,4 @@ export function Fallback({ children, errorRender, loadingRender, isLoading }: Fa
       </FallbackErrorBoundary>
     </FallbackContext.Provider>
   );
-}
-
-function normalizeError(error: unknown): FallbackError {
-  if (error && typeof error === "object") {
-    const candidate = error as Record<string, unknown>;
-    return {
-      code: stringValue(candidate.code),
-      category: stringValue(candidate.category),
-      message: stringValue(candidate.message) ?? String(error),
-      data: candidate.data,
-    };
-  }
-  return {
-    message: String(error),
-  };
-}
-
-function stringValue(value: unknown): string | undefined {
-  return typeof value === "string" ? value : undefined;
 }

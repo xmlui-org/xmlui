@@ -155,7 +155,7 @@ describe("parseMarkup", () => {
 
   it("recovers from missing attribute names and missing equals", () => {
     const missingName = parseMarkup('<App><Button ="x" /></App>', "Main.xmlui");
-    const missingEquals = parseMarkup('<App><Button label /></App>', "Main.xmlui");
+    const missingEquals = parseMarkup('<App><Button label "x" /></App>', "Main.xmlui");
 
     expect(missingName.diagnostics).toEqual(
       expect.arrayContaining([
@@ -173,6 +173,16 @@ describe("parseMarkup", () => {
         }),
       ]),
     );
+  });
+
+  it("parses name-only attributes", () => {
+    const result = parseMarkup('<App><ColorPicker readOnly required /></App>', "Main.xmlui");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(attributeKeys(elementChildren(rootElement(result.node))[0], result.source)).toEqual([
+      "readOnly",
+      "required",
+    ]);
   });
 });
 

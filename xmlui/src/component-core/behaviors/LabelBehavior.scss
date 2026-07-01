@@ -1,0 +1,102 @@
+@layer components {
+  .xmlui-labelBehavior-itemWithLabel {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: fit-content;
+    flex: 0 0 auto;
+  }
+
+  .xmlui-labelBehavior-container {
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.5em;
+  }
+
+  .xmlui-labelBehavior-top {
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+  }
+
+  .xmlui-labelBehavior-bottom {
+    flex-direction: column-reverse;
+    align-items: start;
+    justify-content: center;
+  }
+
+  .xmlui-labelBehavior-start,
+  .xmlui-labelBehavior-before {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: start;
+  }
+
+  .xmlui-labelBehavior-end,
+  .xmlui-labelBehavior-after {
+    flex-direction: row-reverse;
+    justify-content: start;
+    align-items: flex-start;
+  }
+
+  .xmlui-labelBehavior-before,
+  .xmlui-labelBehavior-after {
+    width: fit-content;
+    align-self: flex-start;
+  }
+
+  .xmlui-labelBehavior-labelWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .xmlui-labelBehavior-inputLabel {
+    color: var(--xmlui-textColor-label-formItem, var(--xmlui-textColor));
+    font-family: var(--xmlui-fontFamily-label-formItem, var(--xmlui-fontFamily));
+    font-size: var(--xmlui-fontSize-label-formItem, var(--xmlui-fontSize-sm));
+    font-weight: var(--xmlui-fontWeight-label-formItem, var(--xmlui-fontWeight-medium));
+    font-style: var(--xmlui-fontStyle-label-formItem, normal);
+    text-transform: var(--xmlui-textTransform-label-formItem, none);
+    user-select: none;
+    cursor: pointer;
+    word-break: normal;
+    white-space: nowrap;
+    height: fit-content;
+  }
+
+  .xmlui-labelBehavior-labelBreak {
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .xmlui-labelBehavior-required {
+    color: var(--xmlui-textColor-label-formItem--required, var(--xmlui-textColor-label-formItem, var(--xmlui-textColor)));
+    font-size: var(--xmlui-fontSize-label-formItem--required, var(--xmlui-fontSize-label-formItem, var(--xmlui-fontSize-sm)));
+    font-weight: var(--xmlui-fontWeight-label-formItem--required, var(--xmlui-fontWeight-label-formItem, var(--xmlui-fontWeight-medium)));
+    font-style: var(--xmlui-fontStyle-label-formItem--required, var(--xmlui-fontStyle-label-formItem, normal));
+    text-transform: var(--xmlui-textTransform-label-formItem--required, var(--xmlui-textTransform-label-formItem, none));
+  }
+
+  .xmlui-labelBehavior-requiredMark {
+    margin-inline-start: 0.2em;
+    color: var(--xmlui-textColor-requiredMark-formItem, var(--xmlui-color-attention-500));
+  }
+
+  .xmlui-labelBehavior-disabled {
+    cursor: not-allowed;
+    color: var(--xmlui-textColor--disabled);
+  }
+
+  .xmlui-labelBehavior-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    width: fit-content;
+    flex: 0 0 auto;
+  }
+}

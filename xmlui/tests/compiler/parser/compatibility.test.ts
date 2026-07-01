@@ -40,6 +40,22 @@ describe("parser compatibility hardening", () => {
     });
   });
 
+  it("treats name-only attributes as true-valued props", () => {
+    const document = parseXmlui(
+      `<App><ColorPicker initialValue="#ffff00" label="Cannot be edited" readOnly /></App>`,
+    );
+
+    expect(document.root.children[0]).toMatchObject({
+      kind: "element",
+      type: "ColorPicker",
+      props: {
+        initialValue: "#ffff00",
+        label: "Cannot be edited",
+        readOnly: "true",
+      },
+    });
+  });
+
   it("preserves old component root validation errors", () => {
     expect(() => parseXmlui(`<Component />`)).toThrow("<Component> requires a name attribute.");
   });

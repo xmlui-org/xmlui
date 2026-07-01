@@ -80,6 +80,7 @@ export function wrapComponent(options: XmluiComponentAdapterOptions): XmluiWrapp
       componentName: options.name,
       metadata: options.metadata,
       props: adapter.props,
+      layoutContext: scope.layoutContext,
     }, rendered)}</>;
   }
   return WrappedXmluiComponent;
@@ -192,10 +193,7 @@ export function useXmluiComponentAdapter({
     events,
     api: apiRef.current,
     className: themeClass.className,
-    style: {
-      ...themeClass.style,
-      ...layoutStyle,
-    },
+    style: layoutStyle,
     rootAttrs: (part = rootPart) => ({
       ...arbitraryRootAttrs(metadata, props),
       "data-xmlui-component": name,
@@ -204,10 +202,7 @@ export function useXmluiComponentAdapter({
       "data-xmlui-id": props.id,
       "data-testid": props.testId,
       className: themeClass.className,
-      style: {
-        ...themeClass.style,
-        ...layoutStyleForPart(part),
-      },
+      style: layoutStyleForPart(part),
     }),
     prop: <T,>(propName: string, fallback?: T): T =>
       (props[propName] === undefined ? fallback : props[propName]) as T,
@@ -261,7 +256,6 @@ export function useXmluiComponentAdapter({
     rootPart,
     scope,
     themeClass.className,
-    themeClass.style,
   ]);
 
   return adapter;

@@ -1,12 +1,28 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useId, useState } from "react";
+import type React from "react";
+import {
+  type CSSProperties,
+  forwardRef,
+  memo,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useState,
+} from "react";
+import classNames from "classnames";
 
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { Part } from "../Part/Part";
+import { ThemedIcon } from "../Icon/Icon";
+import { Toggle } from "../Toggle/Toggle";
 import { PART_CONTENT, PART_SUMMARY } from "./ExpandableItem.constants";
 import { defaultProps } from "./ExpandableItem.defaults";
 import styles from "./ExpandableItem.module.scss";
 
-export type ExpandableItemProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "summary"> & {
+export type ExpandableItemProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "summary"> & {
   children?: ReactNode;
+  classes?: Record<string, string>;
   contentWidth?: string;
   enabled?: boolean;
   fullWidthSummary?: boolean;
@@ -15,123 +31,168 @@ export type ExpandableItemProps = Omit<HTMLAttributes<HTMLDivElement>, "children
   iconPosition?: "start" | "end";
   initiallyExpanded?: boolean;
   onExpandedChange?: (isExpanded: boolean) => void | Promise<void>;
-  registerComponentApi?: (api: Record<string, unknown>) => void;
+  registerComponentApi?: RegisterComponentApiFn;
   summary?: ReactNode;
   withSwitch?: boolean;
 };
 
-export const ExpandableItemComponent = forwardRef<HTMLDivElement, ExpandableItemProps>(function ExpandableItemComponent(
-  {
-    children,
-    className,
-    contentWidth = defaultProps.contentWidth,
-    enabled = defaultProps.enabled,
-    fullWidthSummary = defaultProps.fullWidthSummary,
-    iconCollapsed = defaultProps.iconCollapsed,
-    iconExpanded = defaultProps.iconExpanded,
-    iconPosition = defaultProps.iconPosition,
-    initiallyExpanded = defaultProps.initiallyExpanded,
-    onExpandedChange,
-    registerComponentApi,
-    style,
-    summary,
-    withSwitch = defaultProps.withSwitch,
-    ...rest
-  },
-  ref,
-) {
-  const [isOpen, setIsOpen] = useState(initiallyExpanded);
-  const generatedId = useId();
-  const summaryId = `${generatedId}-${PART_SUMMARY}`;
-  const contentId = `${generatedId}-${PART_CONTENT}`;
+export const ExpandableItemComponent = memo(forwardRef<HTMLDivElement, ExpandableItemProps>(
+  function ExpandableItemComponent(
+    {
+      summary,
+      children,
+      className,
+      classes,
+      style,
+      initiallyExpanded = defaultProps.initiallyExpanded,
+      enabled = defaultProps.enabled,
+      iconExpanded = defaultProps.iconExpanded,
+      iconCollapsed = defaultProps.iconCollapsed,
+      iconPosition = defaultProps.iconPosition,
+      withSwitch = defaultProps.withSwitch,
+      contentWidth = defaultProps.contentWidth,
+      fullWidthSummary = defaultProps.fullWidthSummary,
+      onExpandedChange,
+      registerComponentApi,
+      ...rest
+    },
+    ref,
+  ) {
+    const [isOpen, setIsOpen] = useState(initiallyExpanded);
+    const generatedId = useId();
+    const summaryId = `${generatedId}-${PART_SUMMARY}`;
+    const contentId = `${generatedId}-${PART_CONTENT}`;
 
-  const setExpanded = useCallback((nextValue: boolean) => {
-    if (!enabled) {
-      return;
-    }
-    setIsOpen((current) => {
-      if (current !== nextValue) {
-        void onExpandedChange?.(nextValue);
+    const setExpanded = useCallback((nextValue: boolean) => {
+      if (!enabled) {
+        return;
       }
-      return nextValue;
-    });
-  }, [enabled, onExpandedChange]);
+      if (isOpen === nextValue) {
+        return;
+      }
+      setIsOpen(nextValue);
+      void onExpandedChange?.(nextValue);
+    }, [enabled, isOpen, onExpandedChange]);
 
-  const toggle = useCallback(() => {
-    setExpanded(!isOpen);
-  }, [isOpen, setExpanded]);
-  const expand = useCallback(() => setExpanded(true), [setExpanded]);
-  const collapse = useCallback(() => setExpanded(false), [setExpanded]);
-  const isExpanded = useCallback(() => isOpen, [isOpen]);
+    const toggleOpen = useCallback(() => {
+      setExpanded(!isOpen);
+    }, [isOpen, setExpanded]);
 
-  useEffect(() => {
-    registerComponentApi?.({ expand, collapse, toggle, isExpanded });
-  }, [collapse, expand, isExpanded, registerComponentApi, toggle]);
+    const expand = useCallback(() => {
+      setExpanded(true);
+    }, [setExpanded]);
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (!enabled) {
-      return;
-    }
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      toggle();
-    }
-  }, [enabled, toggle]);
+    const collapse = useCallback(() => {
+      setExpanded(false);
+    }, [setExpanded]);
 
-  return (
-    <div
-      {...rest}
-      ref={ref}
-      className={cx(
-        styles.expandableItem,
-        isOpen && styles.open,
-        !enabled && styles.disabled,
-        withSwitch && styles.withSwitch,
-        className,
-      )}
-      style={style as CSSProperties}
-      data-state={isOpen ? "open" : "closed"}
-    >
+    const toggle = useCallback(() => {
+      toggleOpen();
+    }, [toggleOpen]);
+
+    const getIsExpanded = useCallback(() => isOpen, [isOpen]);
+
+    const handleSwitchChange = useCallback(
+      (value: boolean) => {
+        setExpanded(value);
+      },
+      [setExpanded],
+    );
+
+    useEffect(() => {
+      registerComponentApi?.({
+        expand,
+        collapse,
+        toggle,
+        isExpanded: getIsExpanded,
+      });
+    }, [registerComponentApi, expand, collapse, toggle, getIsExpanded]);
+
+    const handleSummaryClick = useCallback(() => {
+      if (!enabled || !withSwitch) {
+        return;
+      }
+      setExpanded(!isOpen);
+    }, [enabled, withSwitch, isOpen, setExpanded]);
+
+    const handleKeyDown = useCallback(
+      (event: React.KeyboardEvent) => {
+        if (!enabled) {
+          return;
+        }
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          if (withSwitch) {
+            handleSwitchChange(!isOpen);
+          } else {
+            toggleOpen();
+          }
+        }
+      },
+      [enabled, withSwitch, isOpen, handleSwitchChange, toggleOpen],
+    );
+
+    return (
       <div
-        className={cx(
-          styles.summary,
-          iconPosition === "start" ? styles.iconStart : styles.iconEnd,
-          fullWidthSummary && styles.fullWidth,
-        )}
-        onClick={enabled ? toggle : undefined}
-        onKeyDown={handleKeyDown}
-        tabIndex={enabled ? 0 : undefined}
-        role="button"
-        aria-expanded={isOpen}
-        aria-controls={contentId}
-        aria-disabled={!enabled}
-        id={summaryId}
-        data-xmlui-part={PART_SUMMARY}
+        {...rest}
+        className={classNames(styles.expandableItem, classes?.[COMPONENT_PART_KEY], className, {
+          [styles.open]: isOpen,
+          [styles.disabled]: !enabled,
+          [styles.withSwitch]: withSwitch,
+        })}
+        style={style as CSSProperties}
+        ref={ref}
+        data-state={isOpen ? "open" : "closed"}
       >
-        <div className={withSwitch ? styles.switch : styles.icon} aria-hidden="true">
-          {withSwitch ? (
-            <span className={styles.switchControl} role="presentation" />
-          ) : (
-            <span>{isOpen ? iconExpanded : iconCollapsed}</span>
-          )}
-        </div>
-        <div className={styles.summaryContent}>{summary}</div>
+        <Part partId={PART_SUMMARY}>
+          <div
+            className={classNames(styles.summary, {
+              [styles.iconStart]: iconPosition === "start",
+              [styles.iconEnd]: iconPosition === "end",
+              [styles.fullWidth]: fullWidthSummary,
+            })}
+            onClick={enabled ? (withSwitch ? handleSummaryClick : toggleOpen) : undefined}
+            onKeyDown={handleKeyDown}
+            tabIndex={enabled ? 0 : undefined}
+            role="button"
+            aria-expanded={isOpen}
+            aria-controls={contentId}
+            aria-disabled={!enabled}
+            id={summaryId}
+          >
+            <div className={withSwitch ? styles.switch : styles.icon} aria-hidden="true">
+              {withSwitch ? (
+                <Toggle
+                  variant="switch"
+                  value={isOpen}
+                  enabled={enabled}
+                  onDidChange={handleSwitchChange}
+                />
+              ) : (
+                <ThemedIcon
+                  name={isOpen ? iconExpanded : iconCollapsed}
+                  fallback={isOpen ? "chevrondown" : "chevronright"}
+                />
+              )}
+            </div>
+            <div className={styles.summaryContent}>{summary}</div>
+          </div>
+        </Part>
+        <Part partId={PART_CONTENT}>
+          <div
+            className={classNames(styles.content, {
+              [styles.contentHidden]: !isOpen,
+            })}
+            style={{ width: contentWidth }}
+            role="region"
+            aria-labelledby={summaryId}
+            aria-hidden={!isOpen}
+            id={contentId}
+          >
+            {children}
+          </div>
+        </Part>
       </div>
-      <div
-        className={cx(styles.content, !isOpen && styles.contentHidden)}
-        style={{ width: contentWidth }}
-        role="region"
-        aria-labelledby={summaryId}
-        aria-hidden={!isOpen}
-        id={contentId}
-        data-xmlui-part={PART_CONTENT}
-      >
-        {children}
-      </div>
-    </div>
-  );
-});
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+    );
+  },
+));

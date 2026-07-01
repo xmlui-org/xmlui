@@ -89,4 +89,20 @@ describe("parseRawXmlui", () => {
       },
     });
   });
+
+  it("preserves name-only attributes as true-valued raw attributes", () => {
+    const document = parseRawXmlui(
+      `<App><ColorPicker initialValue="#ffff00" label="Cannot be edited" readOnly /></App>`,
+    );
+
+    expect(document.root.children[0]).toMatchObject({
+      kind: "element",
+      type: "ColorPicker",
+      attributes: [
+        { name: "initialValue", value: "#ffff00" },
+        { name: "label", value: "Cannot be edited" },
+        { name: "readOnly", value: "true" },
+      ],
+    });
+  });
 });

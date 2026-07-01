@@ -1,102 +1,230 @@
-// Drawer.tsx extracts available theme variables from createThemeVar
-// declarations in this file, mirroring the old Drawer component pattern.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+$component: "Drawer";
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-Drawer: createThemeVar("backgroundColor-Drawer");
-$backgroundColor-backdrop-Drawer: createThemeVar("backgroundColor-backdrop-Drawer");
-$borderRadius-Drawer: createThemeVar("borderRadius-Drawer");
-$boxShadow-Drawer: createThemeVar("boxShadow-Drawer");
-$padding-Drawer: createThemeVar("padding-Drawer");
-$paddingHorizontal-Drawer: createThemeVar("paddingHorizontal-Drawer");
-$paddingVertical-Drawer: createThemeVar("paddingVertical-Drawer");
-$paddingTop-Drawer: createThemeVar("paddingTop-Drawer");
-$paddingRight-Drawer: createThemeVar("paddingRight-Drawer");
-$paddingBottom-Drawer: createThemeVar("paddingBottom-Drawer");
-$paddingLeft-Drawer: createThemeVar("paddingLeft-Drawer");
-$width-Drawer: createThemeVar("width-Drawer");
-$maxWidth-Drawer: createThemeVar("maxWidth-Drawer");
-$height-Drawer: createThemeVar("height-Drawer");
-$maxHeight-Drawer: createThemeVar("maxHeight-Drawer");
-$zIndex-Drawer: createThemeVar("zIndex-Drawer");
-$gap-Drawer: createThemeVar("gap-Drawer");
-$animationDuration-Drawer: createThemeVar("animationDuration-Drawer");
-$animationEasing-Drawer: createThemeVar("animationEasing-Drawer");
-$top-closeButton-Drawer: createThemeVar("top-closeButton-Drawer");
-$right-closeButton-Drawer: createThemeVar("right-closeButton-Drawer");
+$backgroundColor-Drawer: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-backdrop-Drawer: createThemeVar("backgroundColor-backdrop-#{$component}");
+$borderRadius-Drawer: createThemeVar("borderRadius-#{$component}");
+$boxShadow-Drawer: createThemeVar("boxShadow-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, $component);
+$padding-Drawer: createThemeVar("padding-#{$component}");
+$paddingTop-Drawer: createThemeVar("paddingTop-#{$component}");
+$paddingRight-Drawer: createThemeVar("paddingRight-#{$component}");
+$paddingBottom-Drawer: createThemeVar("paddingBottom-#{$component}");
+$paddingLeft-Drawer: createThemeVar("paddingLeft-#{$component}");
+$paddingTopEffective-Drawer: var(--xmlui-padding-Drawer, #{$paddingTop-Drawer});
+$paddingRightEffective-Drawer: var(--xmlui-padding-Drawer, #{$paddingRight-Drawer});
+$paddingBottomEffective-Drawer: var(--xmlui-padding-Drawer, #{$paddingBottom-Drawer});
+$paddingLeftEffective-Drawer: var(--xmlui-padding-Drawer, #{$paddingLeft-Drawer});
+$width-Drawer: createThemeVar("width-#{$component}");
+$maxWidth-Drawer: createThemeVar("maxWidth-#{$component}");
+$height-Drawer: createThemeVar("height-#{$component}");
+$maxHeight-Drawer: createThemeVar("maxHeight-#{$component}");
+$zIndex-Drawer: createThemeVar("zIndex-#{$component}");
+$gap-Drawer: createThemeVar("gap-#{$component}");
+$animationDuration-Drawer: createThemeVar("animationDuration-#{$component}");
+$animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
+$top-closeButton-Drawer: createThemeVar("top-closeButton-#{$component}");
+$right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes slideOutToTop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes slideOutToBottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes backdropFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 
 @layer components {
-  .root {
-    position: fixed;
-    inset: 0;
-    z-index: var(--xmlui-zIndex-Drawer);
-    pointer-events: none;
-  }
-
   .backdrop {
     position: absolute;
     inset: 0;
-    background-color: var(--xmlui-backgroundColor-backdrop-Drawer);
+    background-color: $backgroundColor-backdrop-Drawer;
+    z-index: $zIndex-Drawer;
     pointer-events: auto;
+
+    &[data-state="open"] {
+      animation: backdropFadeIn $animationDuration-Drawer $animationEasing-Drawer;
+    }
+    &[data-state="closed"] {
+      animation: backdropFadeOut $animationDuration-Drawer $animationEasing-Drawer forwards;
+    }
   }
 
   .drawer {
     position: absolute;
+    background-color: $backgroundColor-Drawer;
+    border-radius: $borderRadius-Drawer;
+    box-shadow: $boxShadow-Drawer;
+    z-index: calc($zIndex-Drawer + 1);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    box-sizing: border-box;
     pointer-events: auto;
-    background-color: var(--xmlui-backgroundColor-Drawer);
-    border-radius: var(--xmlui-borderRadius-Drawer);
-    box-shadow: var(--xmlui-boxShadow-Drawer);
+
+    &.left {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: $width-Drawer;
+      max-width: $maxWidth-Drawer;
+      border-radius: 0 $borderRadius-Drawer $borderRadius-Drawer 0;
+
+      &[data-state="open"] {
+        animation: slideInFromLeft $animationDuration-Drawer $animationEasing-Drawer;
+      }
+      &[data-state="closed"] {
+        animation: slideOutToLeft $animationDuration-Drawer $animationEasing-Drawer forwards;
+      }
+    }
+
+    &.right {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: $width-Drawer;
+      max-width: $maxWidth-Drawer;
+      border-radius: $borderRadius-Drawer 0 0 $borderRadius-Drawer;
+
+      &[data-state="open"] {
+        animation: slideInFromRight $animationDuration-Drawer $animationEasing-Drawer;
+      }
+      &[data-state="closed"] {
+        animation: slideOutToRight $animationDuration-Drawer $animationEasing-Drawer forwards;
+      }
+    }
+
+    &.top {
+      top: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
+      height: $height-Drawer;
+      max-height: $maxHeight-Drawer;
+      border-radius: 0 0 $borderRadius-Drawer $borderRadius-Drawer;
+
+      &[data-state="open"] {
+        animation: slideInFromTop $animationDuration-Drawer $animationEasing-Drawer;
+      }
+      &[data-state="closed"] {
+        animation: slideOutToTop $animationDuration-Drawer $animationEasing-Drawer forwards;
+      }
+    }
+
+    &.bottom {
+      bottom: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
+      height: $height-Drawer;
+      max-height: $maxHeight-Drawer;
+      border-radius: $borderRadius-Drawer $borderRadius-Drawer 0 0;
+
+      &[data-state="open"] {
+        animation: slideInFromBottom $animationDuration-Drawer $animationEasing-Drawer;
+      }
+      &[data-state="closed"] {
+        animation: slideOutToBottom $animationDuration-Drawer $animationEasing-Drawer forwards;
+      }
+    }
   }
 
-  .left {
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: var(--xmlui-width-Drawer);
-    max-width: var(--xmlui-maxWidth-Drawer);
-    border-radius: 0 var(--xmlui-borderRadius-Drawer) var(--xmlui-borderRadius-Drawer) 0;
+  .childPortal {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: calc($zIndex-Drawer + 2);
   }
 
-  .right {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: var(--xmlui-width-Drawer);
-    max-width: var(--xmlui-maxWidth-Drawer);
-    border-radius: var(--xmlui-borderRadius-Drawer) 0 0 var(--xmlui-borderRadius-Drawer);
-  }
-
-  .top {
-    top: 0;
-    left: 0;
-    right: 0;
-    height: var(--xmlui-height-Drawer);
-    max-height: var(--xmlui-maxHeight-Drawer);
-    border-radius: 0 0 var(--xmlui-borderRadius-Drawer) var(--xmlui-borderRadius-Drawer);
-  }
-
-  .bottom {
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: var(--xmlui-height-Drawer);
-    max-height: var(--xmlui-maxHeight-Drawer);
-    border-radius: var(--xmlui-borderRadius-Drawer) var(--xmlui-borderRadius-Drawer) 0 0;
+  .srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .header {
     flex-shrink: 0;
-    padding:
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingTop-Drawer))
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingRight-Drawer))
-      0
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingLeft-Drawer));
+    padding: $paddingTopEffective-Drawer $paddingRightEffective-Drawer 0
+      $paddingLeftEffective-Drawer;
   }
 
   .headerContent {
@@ -106,42 +234,41 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-Drawer");
   .body {
     flex: 1;
     overflow: auto;
-    margin-top: var(--xmlui-gap-Drawer);
-    padding:
-      0
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingRight-Drawer))
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingBottom-Drawer))
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingLeft-Drawer));
+    padding: 0 $paddingRightEffective-Drawer $paddingBottomEffective-Drawer
+      $paddingLeftEffective-Drawer;
+    margin-top: $gap-Drawer;
   }
 
   .bodyNoHeader {
     margin-top: 0;
-    padding-top: calc(var(--xmlui-top-closeButton-Drawer) + var(--xmlui-padding-Drawer, var(--xmlui-paddingTop-Drawer)) + 0.75rem);
+    padding-top: calc(#{$top-closeButton-Drawer} + #{$paddingTopEffective-Drawer} + t.$space-3);
   }
 
   .closeButton {
     position: absolute;
-    top: var(--xmlui-top-closeButton-Drawer);
-    right: var(--xmlui-right-closeButton-Drawer);
-    z-index: 1;
+    top: $top-closeButton-Drawer;
+    right: $right-closeButton-Drawer;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 0;
-    border-radius: 4px;
     padding: 0.25rem;
     line-height: 1;
-    background: transparent;
+    border: 0;
+    border-radius: t.$borderRadius;
+    background-color: transparent;
     color: inherit;
     cursor: pointer;
-    opacity: 0.7;
-  }
+    opacity: 0.6;
+    transition: opacity 150ms ease;
+    z-index: 10;
 
-  .closeButton:hover {
-    opacity: 1;
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

@@ -150,7 +150,7 @@ describe("compileXmluiModule", () => {
     expect(() =>
       compileXmluiModule({
         id: "/tmp/Main.xmlui",
-        source: `<App><Button label /></App>`,
+        source: `<App><Button label "x" /></App>`,
       }),
     ).toThrow("Expected '=' after attribute name.");
   });

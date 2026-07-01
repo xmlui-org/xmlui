@@ -1,131 +1,262 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  type CSSProperties,
+  type ReactNode,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import classnames from "classnames";
 
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useEvent } from "../../components-core/utils/misc";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { Icon } from "../Icon/IconReact";
 import { defaultProps } from "./Drawer.defaults";
 import styles from "./Drawer.module.scss";
 
-export type DrawerProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "onClose" | "onOpen"> & {
-  children?: ReactNode;
+export type DrawerPosition = "left" | "right" | "top" | "bottom";
+
+export interface DrawerProps {
+  position?: DrawerPosition;
+  hasBackdrop?: boolean;
+  initiallyOpen?: boolean;
   closeButtonVisible?: boolean;
   closeOnClickAway?: boolean;
-  hasBackdrop?: boolean;
   headerTemplate?: ReactNode;
-  initiallyOpen?: boolean;
-  onClose?: () => void | Promise<void>;
   onOpen?: () => void | Promise<void>;
-  position?: "left" | "right" | "top" | "bottom";
-  registerComponentApi?: (api: Record<string, unknown>) => void;
-};
+  onClose?: () => void | Promise<void>;
+  registerComponentApi?: RegisterComponentApiFn;
+  children?: ReactNode;
+  className?: string;
+  classes?: Record<string, string>;
+  style?: CSSProperties;
+  [key: string]: unknown;
+}
 
-export const DrawerComponent = forwardRef<HTMLDivElement, DrawerProps>(function DrawerComponent(
-  {
-    children,
-    className,
-    closeButtonVisible = defaultProps.closeButtonVisible,
-    closeOnClickAway = defaultProps.closeOnClickAway,
-    hasBackdrop = defaultProps.hasBackdrop,
-    headerTemplate,
-    initiallyOpen = defaultProps.initiallyOpen,
-    onClose,
-    onOpen,
-    position = defaultProps.position,
-    registerComponentApi,
-    style,
-    ...rest
-  },
-  ref,
+function applyCssCustomProperties(target: HTMLElement, source?: CSSProperties) {
+  for (const name of Array.from(target.style)) {
+    if (name.startsWith("--xmlui-")) {
+      target.style.removeProperty(name);
+    }
+  }
+  if (!source) {
+    return;
+  }
+  for (const [name, value] of Object.entries(source)) {
+    if (!name.startsWith("--xmlui-") || value === undefined || value === null) {
+      continue;
+    }
+    target.style.setProperty(name, String(value));
+  }
+}
+
+function useDrawerOpenState(
+  initiallyOpen: boolean,
+  onOpen?: () => void | Promise<void>,
+  onClose?: () => void | Promise<void>,
 ) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  const open = useCallback(() => {
-    if (!isOpen) {
-      void onOpen?.();
-    }
-    setIsOpen(true);
-  }, [isOpen, onOpen]);
-
-  const close = useCallback(() => {
-    if (isOpen) {
-      void onClose?.();
-    }
-    setIsOpen(false);
-  }, [isOpen, onClose]);
-
-  const isOpenApi = useCallback(() => isOpen, [isOpen]);
-
-  useEffect(() => {
-    registerComponentApi?.({ open, close, isOpen: isOpenApi });
-  }, [close, isOpenApi, open, registerComponentApi]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        close();
+  const doOpen = useEvent(() => {
+    setIsOpen((wasOpen) => {
+      if (!wasOpen) {
+        void onOpen?.();
       }
-    };
-    if (isOpen) {
-      window.addEventListener("keydown", onKeyDown);
-    }
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [close, isOpen]);
+      return true;
+    });
+  });
 
-  useEffect(() => {
-    if (isOpen && closeButtonVisible) {
-      closeButtonRef.current?.focus();
-    }
-  }, [closeButtonVisible, isOpen]);
+  const doClose = useEvent(() => {
+    setIsOpen((wasOpen) => {
+      if (wasOpen) {
+        void onClose?.();
+      }
+      return false;
+    });
+  });
 
-  if (!isOpen) {
-    return null;
-  }
-
-  return (
-    <div className={styles.root} data-xmlui-component="DrawerPortal">
-      {hasBackdrop ? (
-        <div
-          aria-hidden="true"
-          className={styles.backdrop}
-          data-state="open"
-          onClick={closeOnClickAway ? close : undefined}
-        />
-      ) : null}
-      {!hasBackdrop && closeOnClickAway ? (
-        <div aria-hidden="true" className={styles.backdrop} onClick={close} />
-      ) : null}
-      <div
-        {...rest}
-        ref={ref}
-        aria-label="Drawer"
-        className={cx(styles.drawer, styles[position], className)}
-        data-state="open"
-        role="dialog"
-        style={style as CSSProperties}
-      >
-        {closeButtonVisible ? (
-          <button
-            ref={closeButtonRef}
-            aria-label="Close"
-            className={styles.closeButton}
-            onClick={close}
-            type="button"
-          >
-            x
-          </button>
-        ) : null}
-        {headerTemplate ? (
-          <div className={styles.header}>
-            <div className={styles.headerContent}>{headerTemplate}</div>
-          </div>
-        ) : null}
-        <div className={cx(styles.body, !headerTemplate && styles.bodyNoHeader)}>
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-});
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
+  return useMemo(() => ({ isOpen, doOpen, doClose }), [isOpen, doOpen, doClose]);
 }
+
+export const DrawerNative = memo(
+  forwardRef<HTMLDivElement, DrawerProps>(function DrawerNative(
+    {
+      position = defaultProps.position,
+      hasBackdrop = defaultProps.hasBackdrop,
+      initiallyOpen = defaultProps.initiallyOpen,
+      closeButtonVisible = defaultProps.closeButtonVisible,
+      closeOnClickAway = defaultProps.closeOnClickAway,
+      headerTemplate,
+      onOpen,
+      onClose,
+      registerComponentApi,
+      children,
+      className,
+      classes,
+      style,
+      ...rest
+    },
+    forwardedRef,
+  ) {
+    const theme = useTheme() as ReturnType<typeof useTheme> & { root?: HTMLElement };
+    const portalHost =
+      theme.root ?? (typeof document !== "undefined" ? document.body : undefined);
+    const drawerRef = useRef<HTMLDivElement | null>(null);
+    const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+    const [childPortalContainer, setChildPortalContainer] = useState<HTMLDivElement | null>(null);
+    const rootClassName = classnames(classes?.[COMPONENT_PART_KEY], className);
+
+    useEffect(() => {
+      if (!portalHost) {
+        return;
+      }
+      const el = document.createElement("div");
+      el.style.cssText = "position:fixed;inset:0;overflow:hidden;pointer-events:none;";
+      if (rootClassName) {
+        el.className = rootClassName;
+      }
+      portalHost.appendChild(el);
+      setPortalContainer(el);
+
+      const childEl = document.createElement("div");
+      childEl.className = styles.childPortal;
+      portalHost.appendChild(childEl);
+      setChildPortalContainer(childEl);
+
+      return () => {
+        portalHost.removeChild(el);
+        setPortalContainer(null);
+        portalHost.removeChild(childEl);
+        setChildPortalContainer(null);
+      };
+    }, [portalHost, rootClassName]);
+
+    useEffect(() => {
+      if (!portalContainer) {
+        return;
+      }
+      applyCssCustomProperties(portalContainer, style);
+    }, [portalContainer, style]);
+
+    const { isOpen, doOpen, doClose } = useDrawerOpenState(initiallyOpen, onOpen, onClose);
+    const animatingRef = useRef(false);
+
+    useEffect(() => {
+      if (!isOpen || !portalHost) {
+        return;
+      }
+      portalHost.style.overflowX = "hidden";
+      return () => {
+        animatingRef.current = true;
+      };
+    }, [isOpen, portalHost]);
+
+    useEffect(() => {
+      return () => {
+        if (portalHost) {
+          portalHost.style.overflowX = "";
+        }
+      };
+    }, [portalHost]);
+
+    const handlePanelAnimationEnd = useCallback(() => {
+      if (animatingRef.current) {
+        animatingRef.current = false;
+        if (portalHost) {
+          portalHost.style.overflowX = "";
+        }
+      }
+    }, [portalHost]);
+
+    useEffect(() => {
+      registerComponentApi?.({
+        open: doOpen,
+        close: doClose,
+        isOpen: () => isOpen,
+      });
+    }, [registerComponentApi, doOpen, doClose, isOpen]);
+
+    if (!portalContainer) {
+      return null;
+    }
+
+    return (
+      <Dialog.Root
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            doClose();
+          }
+        }}
+      >
+        <Dialog.Portal container={portalContainer}>
+          {hasBackdrop && (
+            <Dialog.Overlay className={classnames(styles.backdrop, rootClassName)} />
+          )}
+          <Dialog.Content
+            {...rest}
+            ref={(node) => {
+              drawerRef.current = node;
+              if (typeof forwardedRef === "function") {
+                forwardedRef(node);
+              } else if (forwardedRef) {
+                forwardedRef.current = node;
+              }
+            }}
+            className={classnames(
+              styles.drawer,
+              {
+                [styles.left]: position === "left",
+                [styles.right]: position === "right",
+                [styles.top]: position === "top",
+                [styles.bottom]: position === "bottom",
+              },
+              rootClassName,
+            )}
+            style={style}
+            aria-label="Drawer"
+            onAnimationEnd={handlePanelAnimationEnd}
+            onPointerDownOutside={(event) => {
+              if (closeOnClickAway) {
+                doClose();
+              } else {
+                event.preventDefault();
+              }
+            }}
+            onEscapeKeyDown={doClose}
+          >
+            <Dialog.Title className={styles.srOnly}>Drawer</Dialog.Title>
+            {closeButtonVisible && (
+              <Dialog.Close asChild>
+                <button className={styles.closeButton} aria-label="Close" type="button">
+                  <Icon name="close" size="sm" />
+                </button>
+              </Dialog.Close>
+            )}
+            {!!headerTemplate && (
+              <div className={styles.header}>
+                <div className={styles.headerContent}>{headerTemplate}</div>
+              </div>
+            )}
+            <div
+              className={classnames(styles.body, {
+                [styles.bodyNoHeader]: !headerTemplate,
+              })}
+              data-xmlui-child-portal={childPortalContainer ? "ready" : undefined}
+            >
+              {children}
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  }),
+);
+
+export const DrawerComponent = DrawerNative;

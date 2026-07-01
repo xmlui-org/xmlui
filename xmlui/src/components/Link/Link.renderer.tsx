@@ -2,6 +2,7 @@ import type { CSSProperties, HTMLAttributeReferrerPolicy, MouseEvent } from "rea
 
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { useComponentStyle } from "../../components-core/theming/StyleContext";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import {
   collectComponentThemeDefaults,
@@ -26,6 +27,9 @@ export const linkRenderer = wrapComponent({
     ]);
     const variant = adapter.stringProp("variant");
     const rootAttrs = adapter.rootAttrs();
+    const currentVariantClassName = useComponentStyle(currentVariantCssVariables(variant, mergedThemeVariables), {
+      layer: "themes",
+    });
     const to = adapter.prop("to");
     const toString = typeof to === "string" ? to : undefined;
     const target = adapter.stringProp("target");
@@ -47,6 +51,7 @@ export const linkRenderer = wrapComponent({
     return (
       <LinkNative
         {...rootAttrs}
+        className={[rootAttrs.className, currentVariantClassName].filter(Boolean).join(" ")}
         to={routedTo}
         target={target}
         label={adapter.prop("label")}
@@ -67,10 +72,7 @@ export const linkRenderer = wrapComponent({
         ping={adapter.stringProp("ping")}
         hreflang={adapter.stringProp("hreflang")}
         type={adapter.stringProp("type")}
-        style={{
-          ...(rootAttrs.style as CSSProperties | undefined),
-          ...currentVariantCssVariables(variant, mergedThemeVariables),
-        }}
+        style={rootAttrs.style as CSSProperties | undefined}
         onClick={clickHandler}
         onContextMenu={(event) => void adapter.event("contextMenu")(event)}
       >
@@ -95,18 +97,18 @@ const currentVariantThemeProps = [
 function currentVariantCssVariables(
   variant: string | undefined,
   themeVariables: Record<string, unknown>,
-): CSSProperties {
+): Record<string, CSSProperties[keyof CSSProperties]> {
   if (!variant) {
     return {};
   }
-  const style: Record<string, string> = {};
+  const style: Record<string, CSSProperties[keyof CSSProperties]> = {};
   for (const prop of currentVariantThemeProps) {
     const value = resolveThemeVariable(`${prop}-${COMP}-${variant}`, [themeVariables]);
     if (value !== undefined && value !== null && value !== "") {
       style[`--xmlui-current-${prop}-${COMP}`] = String(resolveThemeReferences(value));
     }
   }
-  return style as CSSProperties;
+  return style;
 }
 
 function isExternalUrl(to: string): boolean {

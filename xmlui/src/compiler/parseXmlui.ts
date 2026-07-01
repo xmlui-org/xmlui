@@ -683,19 +683,24 @@ function attributes(node: MarkupSyntaxNode, source: SourceText): AttributeInfo[]
     list?.children?.flatMap((attribute) => {
       const key = attribute.children?.find((child) => child.kind === MarkupSyntaxKind.AttributeKey);
       const value = attribute.children?.find((child) => child.kind === MarkupSyntaxKind.StringLiteral);
-      if (!key || !value) {
+      if (!key) {
         return [];
       }
-      const rawValue = value.value ?? stripQuotes(getNodeText(value, source));
+      const rawValue = value ? value.value ?? stripQuotes(getNodeText(value, source)) : "true";
       return [
         {
           name: key.children?.map((child) => getNodeText(child, source)).join("") ?? "",
           value: decodeEntities(rawValue),
           nameRange: rangeOf(key),
-          valueRange: {
-            start: value.pos + 1,
-            end: Math.max(value.pos + 1, value.end - 1),
-          },
+          valueRange: value
+            ? {
+                start: value.pos + 1,
+                end: Math.max(value.pos + 1, value.end - 1),
+              }
+            : {
+                start: key.end,
+                end: key.end,
+              },
         },
       ];
     }) ?? []

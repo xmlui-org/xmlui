@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { ColorPickerMd } from "./ColorPicker";
 import { defaultProps } from "./ColorPicker.defaults";
-import { ColorPickerNative, type ColorPickerApi } from "./ColorPickerReact";
+import { ColorPickerNative } from "./ColorPickerReact";
 
 const COMP = "ColorPicker";
 
@@ -10,16 +10,10 @@ export const colorPickerRenderer = wrapComponent({
   metadata: ColorPickerMd,
   defaultPart: "input",
   renderer: ({ adapter }) => {
-    const apiRef = { current: null as ColorPickerApi | null };
     return (
       <ColorPickerNative
         {...adapter.rootAttrs("input")}
-        ref={(api) => {
-          apiRef.current = api;
-          if (api) {
-            adapter.registerApi(api as unknown as Record<string, unknown>);
-          }
-        }}
+        registerComponentApi={adapter.registerApi}
         id={adapter.stringProp("id")}
         bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}

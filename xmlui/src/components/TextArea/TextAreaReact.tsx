@@ -46,6 +46,7 @@ export type TextAreaProps = {
   verboseValidationFeedback?: boolean;
   validationStatus?: string;
   invalidMessages?: string[];
+  registerComponentApi?: (api: Record<string, unknown>) => void;
   onDidChange?: (value: string) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
@@ -70,7 +71,7 @@ export const TextAreaNative = memo(forwardRef<TextAreaApi, TextAreaProps>(functi
     requireLabelMode,
     placeholder = defaultProps.placeholder,
     maxLength,
-    rows = defaultProps.rows,
+    rows,
     minRows,
     maxRows,
     autoSize,
@@ -90,6 +91,7 @@ export const TextAreaNative = memo(forwardRef<TextAreaApi, TextAreaProps>(functi
     verboseValidationFeedback,
     validationStatus = defaultProps.validationStatus,
     invalidMessages = defaultProps.invalidMessages,
+    registerComponentApi,
     onDidChange,
     onFocus,
     onBlur,
@@ -178,6 +180,43 @@ export const TextAreaNative = memo(forwardRef<TextAreaApi, TextAreaProps>(functi
     void onDidChange?.(normalized);
   }, [fieldName, onDidChange, setFormValue]);
 
+  const focus = useCallback(() => {
+    if (enabled) {
+      textareaRef.current?.focus();
+    }
+  }, [enabled]);
+
+  const insert = useCallback((insertedValue: unknown) => {
+    const textarea = textareaRef.current;
+    const insertedText = stringifyTextAreaApiValue(insertedValue);
+    if (!textarea || !insertedText) {
+      return;
+    }
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const nextValue = `${localValue.slice(0, start)}${insertedText}${localValue.slice(end)}`;
+    updateValue(nextValue);
+    setSelectionAfterInsert(start + insertedText.length);
+  }, [localValue, updateValue]);
+
+  const setApiValue = useCallback((value: unknown) => {
+    updateValue(stringifyTextAreaApiValue(value));
+  }, [updateValue]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      insert,
+      setValue: setApiValue,
+    });
+  }, [focus, insert, registerComponentApi, setApiValue]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      value: localValue,
+    });
+  }, [localValue, registerComponentApi]);
+
   const handleBlur = useCallback(() => {
     void onBlur?.();
     if (!validateFormField || fieldName === undefined || !hadValidationError) {
@@ -189,31 +228,20 @@ export const TextAreaNative = memo(forwardRef<TextAreaApi, TextAreaProps>(functi
   }, [fieldName, hadValidationError, onBlur, validateFormField]);
 
   useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        textareaRef.current?.focus();
-      }
-    },
-    insert: (insertedValue: unknown) => {
-      const textarea = textareaRef.current;
-      const insertedText = stringifyTextAreaApiValue(insertedValue);
-      if (!textarea || !insertedText) {
-        return;
-      }
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const nextValue = `${localValue.slice(0, start)}${insertedText}${localValue.slice(end)}`;
-      updateValue(nextValue);
-      setSelectionAfterInsert(start + insertedText.length);
-    },
-    setValue: (value: unknown) => updateValue(stringifyTextAreaApiValue(value)),
+    focus,
+    insert,
+    setValue: setApiValue,
     get value() {
       return localValue;
     },
-  }), [enabled, localValue, updateValue]);
+  }), [focus, insert, localValue, setApiValue]);
+
+  const autoSizing = Boolean(autoSize || minRows !== undefined || maxRows !== undefined);
+  const effectiveRows = autoSizing ? 1 : rows ?? defaultProps.rows;
+  const rowAttribute = normalizePositiveRows(effectiveRows);
 
   useEffect(() => {
-    if (!autoSize) {
+    if (!autoSizing) {
       return;
     }
     const textarea = textareaRef.current;
@@ -221,8 +249,13 @@ export const TextAreaNative = memo(forwardRef<TextAreaApi, TextAreaProps>(functi
       return;
     }
     textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }, [autoSize, localValue, rows, minRows, maxRows]);
+    const computedStyle = window.getComputedStyle(textarea);
+    const borderHeight =
+      computedStyle.boxSizing === "border-box"
+        ? parseCssPixelValue(computedStyle.borderTopWidth) + parseCssPixelValue(computedStyle.borderBottomWidth)
+        : 0;
+    textarea.style.height = `${textarea.scrollHeight + borderHeight}px`;
+  }, [autoSizing, localValue, effectiveRows, minRows, maxRows]);
 
   const inputId = id ? `${id}__input` : generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
@@ -280,7 +313,7 @@ export const TextAreaNative = memo(forwardRef<TextAreaApi, TextAreaProps>(functi
         value={localValue}
         placeholder={placeholder}
         maxLength={normalizeMaxLength(maxLength)}
-        rows={normalizePositiveRows(rows)}
+        rows={rowAttribute}
         disabled={!enabled}
         readOnly={readOnly}
         required={required}
@@ -415,6 +448,11 @@ function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
 function normalizePositiveRows(value: unknown): number {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) && numberValue > 0 ? Math.floor(numberValue) : defaultProps.rows;
+}
+
+function parseCssPixelValue(value: string): number {
+  const numberValue = Number.parseFloat(value);
+  return Number.isFinite(numberValue) ? numberValue : 0;
 }
 
 function normalizeMaxLength(value: unknown): number | undefined {

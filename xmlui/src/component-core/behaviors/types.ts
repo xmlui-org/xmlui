@@ -38,6 +38,9 @@ export type BehaviorAttachContext = {
   componentName: string;
   metadata: ComponentMetadata;
   props: Record<string, unknown>;
+  layoutContext?: {
+    orientation?: string;
+  };
 };
 
 export type Behavior = {

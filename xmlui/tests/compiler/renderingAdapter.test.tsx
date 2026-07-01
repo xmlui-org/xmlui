@@ -86,7 +86,9 @@ describe("XMLUI rendering adapter", () => {
     expect(html).toContain('title="Adapter tooltip"');
     expect(html).toContain('data-xmlui-component="Dummy"');
     expect(html).toContain('data-xmlui-id="dummy"');
-    expect(html).toContain('class="xmlui-Dummy"');
+    expect(html).toContain("xmlui-Dummy");
+    expect(html).toContain("xmlui-dynamic-");
+    expect(html).not.toContain("--xmlui-backgroundColor-Dummy");
     expect(html).toContain('data-label="Hello 2"');
     expect(html).toContain('data-enabled="true"');
     expect(html).toContain("var(--xmlui-space-2)");

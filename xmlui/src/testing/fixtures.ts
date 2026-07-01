@@ -966,14 +966,7 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  const appStyle = [
-    "--xmlui-paddingHorizontal-content-App:0",
-    "--xmlui-paddingVertical-content-App:0",
-    "--xmlui-gap-content-App:0",
-    "--xmlui-maxWidth-content-App:none",
-    "--xmlui-maxWidth-content-App--withToc:none",
-  ].join("; ");
-  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} style=${quoteAttribute(appStyle)} ${mainXsDeclarations.join(" ")} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${mainXsDeclarations.join(" ")} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
 }
 
 function normalizeLegacyMainXsDeclarations(mainXs: string | undefined): string[] {

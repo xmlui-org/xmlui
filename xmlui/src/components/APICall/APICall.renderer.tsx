@@ -6,6 +6,8 @@ import { runEvent } from "../../runtime/rendering/bindings";
 import type { XmluiBuiltInRenderer } from "../../runtime/rendering/types";
 import { useEvaluatedProp, useStringProp } from "../../runtime/rendering/props";
 import { executeWithRetryPolicy, useRetryPolicy } from "../../runtime/retryPolicy";
+import { AppError } from "../../components-core/errors/app-error";
+import { useFallback } from "../Fallback/FallbackReact";
 import { registerReference, updateApi } from "../DataSource/DataSource.renderer";
 
 export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
@@ -33,6 +35,12 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   const cancelUrl = useStringProp(node, scope, "cancelUrl", "");
   const cancelMethod = useStringProp(node, scope, "cancelMethod", "post");
   const retryPolicy = useRetryPolicy();
+  const fallback = useFallback();
+  const scopeRef = useRef(scope);
+  scopeRef.current = scope;
+  const fallbackRef = useRef(fallback);
+  fallbackRef.current = fallback;
+  const fallbackIdRef = useRef<string | symbol>();
   const apiRef = useRef<Record<string, unknown>>();
   const latest = useRef({
     url,
@@ -86,12 +94,16 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   if (!apiRef.current) {
     apiRef.current = createApiCallApi(id, scope);
   }
-  useEffect(() => registerReference(scope, id, apiRef.current!), [id, scope]);
+  useEffect(
+    () => registerReference(scope, id, apiRef.current!),
+    [id, scope.references, scope.store],
+  );
 
   useEffect(() => {
     if (!id) {
       return;
     }
+    const fallbackId = fallbackIdRef.current ?? (fallbackIdRef.current = id || Symbol("APICall"));
     let cancelled = false;
     let pollTimer: number | undefined;
     const clearPollTimer = () => {
@@ -102,12 +114,13 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
     };
     apiRef.current!.stopPolling = () => {
       clearPollTimer();
-      updateApi(apiRef.current!, id, scope, { isPolling: false });
+      updateApi(apiRef.current!, id, scopeRef.current, { isPolling: false });
     };
     apiRef.current!.cancel = async () => {
       cancelled = true;
       clearPollTimer();
-      updateApi(apiRef.current!, id, scope, { isPolling: false, inProgress: false });
+      const currentScope = scopeRef.current;
+      updateApi(apiRef.current!, id, currentScope, { isPolling: false, inProgress: false });
       const current = latest.current;
       if (current.cancelUrl) {
         const request = managedFetchService.buildRequest({
@@ -120,21 +133,22 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
     apiRef.current!.execute = async (...args: unknown[]) => {
       cancelled = false;
       clearPollTimer();
+      const currentScope = scopeRef.current;
       const current = latest.current;
       if (requiresConfirmation(current) && !await confirmExecution(current)) {
         return undefined;
       }
-      const before = await runEvent(node.parsed?.events?.beforeRequest, scope, args);
+      const before = await runEvent(node.parsed?.events?.beforeRequest, currentScope, args);
       if (before === false) {
         return undefined;
       }
-      updateApi(apiRef.current!, id, scope, {
+      updateApi(apiRef.current!, id, currentScope, {
         inProgress: true,
         lastError: undefined,
         isPolling: false,
       });
-      applyOptimisticValue(scope, id, current.invalidates, current.optimisticValue);
-      showToast(scope, "loading", current.inProgressNotificationMessage, {});
+      applyOptimisticValue(currentScope, id, current.invalidates, current.optimisticValue);
+      showToast(currentScope, "loading", current.inProgressNotificationMessage, {});
       try {
         const request = managedFetchService.buildRequest({
           url: current.url,
@@ -146,9 +160,9 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
           credentials: current.credentials || undefined,
         });
         const executionScope = createRuntimeScope({
-          store: scope.store,
-          parent: scope,
-          references: scope.references,
+          store: currentScope.store,
+          parent: currentScope,
+          references: currentScope.references,
           contextValues: {
             $param: args[0],
             $params: args,
@@ -166,17 +180,17 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
         }, retryPolicy);
         const { result, responseHeaders } = response;
         if (current.deferredMode && current.statusUrl) {
-          updateApi(apiRef.current!, id, scope, {
+          updateApi(apiRef.current!, id, currentScope, {
             lastResult: result,
             lastResponseHeaders: responseHeaders,
             isPolling: true,
             pollAttempts: 0,
           });
-          void runEvent(node.parsed?.events?.pollingStart, scope, [result]);
-          return await pollDeferredStatus({
+          void runEvent(node.parsed?.events?.pollingStart, currentScope, [result]);
+          const deferredResult = await pollDeferredStatus({
             api: apiRef.current!,
             id,
-            scope,
+            scope: currentScope,
             node,
             retryPolicy,
             initialResult: result,
@@ -187,32 +201,36 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
             },
             isCancelled: () => cancelled,
           });
+          fallbackRef.current?.clearError(fallbackId);
+          return deferredResult;
         }
-        updateApi(apiRef.current!, id, scope, {
+        updateApi(apiRef.current!, id, currentScope, {
           inProgress: false,
           loaded: true,
           lastResult: result,
           lastError: undefined,
           lastResponseHeaders: responseHeaders,
         });
-        const successResult = await runEvent(node.parsed?.events?.success, scope, [result]);
+        fallbackRef.current?.clearError(fallbackId);
+        const successResult = await runEvent(node.parsed?.events?.success, currentScope, [result]);
         if (successResult !== false) {
-          invalidateDataSources(scope, current.invalidates);
+          invalidateDataSources(currentScope, current.invalidates);
         }
-        showToast(scope, "success", current.completedNotificationMessage, { result });
+        showToast(currentScope, "success", current.completedNotificationMessage, { result });
         return result;
       } catch (error) {
-        updateApi(apiRef.current!, id, scope, {
+        updateApi(apiRef.current!, id, currentScope, {
           inProgress: false,
           lastError: error,
           isPolling: false,
         });
-        void runEvent(node.parsed?.events?.error, scope, [error]);
-        showToast(scope, "error", latest.current.errorNotificationMessage, { error });
+        fallbackRef.current?.reportError(fallbackId, AppError.from(error));
+        void runEvent(node.parsed?.events?.error, currentScope, [error]);
+        showToast(currentScope, "error", latest.current.errorNotificationMessage, { error });
         throw error;
       }
     };
-    scope.store.invalidateReference(id);
+    scopeRef.current.store.invalidateReference(id);
     return () => {
       cancelled = true;
       clearPollTimer();
@@ -227,7 +245,6 @@ export const apiCallRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
     node.parsed?.events?.statusUpdate,
     node.parsed?.events?.success,
     retryPolicy,
-    scope,
   ]);
 
   return null;

@@ -14,6 +14,7 @@ $gap-label-FormItem: createThemeVar("gap-label-FormItem");
 $width-label-FormItem: createThemeVar("width-label-FormItem");
 $textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
 $textColor-label-formItem: createThemeVar("textColor-label-formItem");
+$fontFamily-label-formItem: createThemeVar("fontFamily-label-formItem");
 $fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
 $fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
 $fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
@@ -140,9 +141,10 @@ export const FormItemMd = createMetadata({
     [`width-label-${COMP}`]: "12rem",
     [`textColor-label-${COMP}`]: "$textColor",
     "textColor-label-formItem": "$textColor",
-    "fontSize-label-formItem": "$fontSize-base",
-    [`fontWeight-label-${COMP}`]: "$fontWeight-semibold",
-    "fontWeight-label-formItem": "$fontWeight-semibold",
+    "fontFamily-label-formItem": "$fontFamily",
+    "fontSize-label-formItem": "$fontSize-sm",
+    [`fontWeight-label-${COMP}`]: "$fontWeight-medium",
+    "fontWeight-label-formItem": "$fontWeight-medium",
     "fontStyle-label-formItem": "normal",
     "textTransform-label-formItem": "none",
     "textColor-requiredMark-formItem": "$color-danger-500",

@@ -7,7 +7,7 @@ import { nonPropertyChildren, wrapComponent } from "../../runtime/rendering/adap
 import type { XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { createRuntimeScope, type RuntimeScope } from "../../runtime/state";
 import { COMPONENT_PART_KEY } from "../../styling";
-import { extractScssThemeVars } from "../../styling/theme";
+import { extractScssThemeVars, resolveThemeReferences } from "../../styling/theme";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout } from "../FlowLayout/FlowLayoutReact";
 import { defaultProps as flowLayoutDefaultProps } from "../FlowLayout/FlowLayout.defaults";
 import { Stack } from "./StackReact";
@@ -376,7 +376,7 @@ function renderWrappedHorizontalStack({
   verticalAlignment?: string;
   containerStyle?: CSSProperties;
 }) {
-  const gap = adapter.stringProp("gap");
+  const gap = cssSizeValue(adapter.prop("gap"));
   const rootAttrs = stackRootAttrs(adapter, containerStyle);
   return (
     <FlowLayout
@@ -454,7 +454,7 @@ function StackShell({
 
 function stackRootAttrs(adapter: XmluiComponentAdapter, containerStyle?: CSSProperties) {
   const { className, style, ...attrs } = adapter.rootAttrs();
-  const gap = adapter.stringProp("gap");
+  const gap = cssSizeValue(adapter.prop("gap"));
   const mergedStyle = {
     ...(style as CSSProperties | undefined),
     ...containerStyle,
@@ -462,6 +462,7 @@ function stackRootAttrs(adapter: XmluiComponentAdapter, containerStyle?: CSSProp
   } as CSSProperties;
   delete mergedStyle.display;
   delete mergedStyle.flexDirection;
+  delete mergedStyle.gap;
   if (adapter.node.props.horizontalAlignment != null || adapter.node.props.verticalAlignment != null) {
     delete mergedStyle.alignItems;
     delete mergedStyle.justifyContent;
@@ -477,6 +478,31 @@ function stackRootAttrs(adapter: XmluiComponentAdapter, containerStyle?: CSSProp
     className: typeof className === "string" ? className : undefined,
     style: mergedStyle,
   };
+}
+
+function cssSizeValue(value: unknown): string | undefined {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return `${value}px`;
+  }
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const resolved = String(resolveThemeReferences(value)).trim();
+  if (
+    resolved === "0" ||
+    resolved.startsWith("var(") ||
+    resolved.startsWith("calc(") ||
+    resolved.startsWith("min(") ||
+    resolved.startsWith("max(") ||
+    resolved.startsWith("clamp(") ||
+    /^-?\d+(?:\.\d+)?(?:px|r?em|vh|vw|vmin|vmax|%|ch|ex|cm|mm|in|pt|pc|q)$/i.test(resolved)
+  ) {
+    return resolved;
+  }
+  return undefined;
 }
 
 function eventHandler(adapter: XmluiComponentAdapter, name: "click" | "contextMenu" | "mounted") {

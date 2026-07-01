@@ -1,162 +1,148 @@
-// ExpandableItem.tsx extracts available theme variables from createThemeVar
-// declarations in this file, mirroring the old ExpandableItem component pattern.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-ExpandableItem: createThemeVar("backgroundColor-ExpandableItem");
-$backgroundColor-ExpandableItem--hover: createThemeVar("backgroundColor-ExpandableItem--hover");
-$backgroundColor-ExpandableItem--active: createThemeVar("backgroundColor-ExpandableItem--active");
-$backgroundColor-summary-ExpandableItem: createThemeVar("backgroundColor-summary-ExpandableItem");
-$backgroundColor-summary-ExpandableItem--hover: createThemeVar("backgroundColor-summary-ExpandableItem--hover");
-$backgroundColor-summary-ExpandableItem--active: createThemeVar("backgroundColor-summary-ExpandableItem--active");
-$borderRadius-summary-ExpandableItem: createThemeVar("borderRadius-summary-ExpandableItem");
-$color-ExpandableItem: createThemeVar("color-ExpandableItem");
-$color-ExpandableItem--disabled: createThemeVar("color-ExpandableItem--disabled");
-$fontFamily-ExpandableItem: createThemeVar("fontFamily-ExpandableItem");
-$fontSize-ExpandableItem: createThemeVar("fontSize-ExpandableItem");
-$fontWeight-ExpandableItem: createThemeVar("fontWeight-ExpandableItem");
-$borderColor-ExpandableItem: createThemeVar("borderColor-ExpandableItem");
-$borderWidth-ExpandableItem: createThemeVar("borderWidth-ExpandableItem");
-$borderBottomWidth-ExpandableItem: createThemeVar("borderBottomWidth-ExpandableItem");
-$borderStyle-ExpandableItem: createThemeVar("borderStyle-ExpandableItem");
-$borderRadius-ExpandableItem: createThemeVar("borderRadius-ExpandableItem");
-$paddingTop-ExpandableItem: createThemeVar("paddingTop-ExpandableItem");
-$paddingBottom-ExpandableItem: createThemeVar("paddingBottom-ExpandableItem");
-$paddingLeft-ExpandableItem: createThemeVar("paddingLeft-ExpandableItem");
-$paddingRight-ExpandableItem: createThemeVar("paddingRight-ExpandableItem");
-$padding-summary-ExpandableItem: createThemeVar("padding-summary-ExpandableItem");
-$paddingVertical-summary-ExpandableItem: createThemeVar("paddingVertical-summary-ExpandableItem");
-$paddingHorizontal-summary-ExpandableItem: createThemeVar("paddingHorizontal-summary-ExpandableItem");
-$paddingLeft-content-ExpandableItem: createThemeVar("paddingLeft-content-ExpandableItem");
-$paddingRight-content-ExpandableItem: createThemeVar("paddingRight-content-ExpandableItem");
-$paddingVertical-content-ExpandableItem: createThemeVar("paddingVertical-content-ExpandableItem");
-$gap-ExpandableItem: createThemeVar("gap-ExpandableItem");
-$transition-summary-ExpandableItem: createThemeVar("transition-summary-ExpandableItem");
-$animation-content-ExpandableItem: createThemeVar("animation-content-ExpandableItem");
-$animationDuration-content-ExpandableItem: createThemeVar("animationDuration-content-ExpandableItem");
+$component: "ExpandableItem";
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "summary-#{$component}");
+$themeVars: t.composeTextVars($themeVars, "summary-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, "content-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, "content-#{$component}");
+$themeVars: t.composeTextVars($themeVars, "content-#{$component}");
+$backgroundColor-ExpandableItem: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-ExpandableItem--hover: createThemeVar("backgroundColor-#{$component}--hover");
+$backgroundColor-ExpandableItem--active: createThemeVar("backgroundColor-#{$component}--active");
+$backgroundColor-summary-ExpandableItem: createThemeVar("backgroundColor-summary-#{$component}");
+$backgroundColor-summary-ExpandableItem--hover: createThemeVar("backgroundColor-summary-#{$component}--hover");
+$backgroundColor-summary-ExpandableItem--active: createThemeVar("backgroundColor-summary-#{$component}--active");
+$borderRadius-summary-ExpandableItem: createThemeVar("borderRadius-summary-#{$component}");
+$color-ExpandableItem: createThemeVar("color-#{$component}");
+$color-ExpandableItem--disabled: createThemeVar("color-#{$component}--disabled");
+$fontFamily-ExpandableItem: createThemeVar("fontFamily-#{$component}");
+$fontSize-ExpandableItem: createThemeVar("fontSize-#{$component}");
+$fontWeight-ExpandableItem: createThemeVar("fontWeight-#{$component}");
+$paddingVertical-summary-ExpandableItem: createThemeVar("paddingVertical-summary-#{$component}");
+$paddingHorizontal-summary-ExpandableItem: createThemeVar("paddingHorizontal-summary-#{$component}");
+$paddingVertical-content-ExpandableItem: createThemeVar("paddingVertical-content-#{$component}");
+$paddingHorizontal-content-ExpandableItem: createThemeVar("paddingHorizontal-content-#{$component}");
+$gap-ExpandableItem: createThemeVar("gap-#{$component}");
+$transition-summary-ExpandableItem: createThemeVar("transition-summary-#{$component}");
+$animation-content-ExpandableItem: createThemeVar("animation-content-#{$component}");
+$animationDuration-content-ExpandableItem: createThemeVar("animationDuration-content-#{$component}");
 
 @layer components {
   .expandableItem {
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
+    background-color: $backgroundColor-ExpandableItem;
+    color: $color-ExpandableItem;
+    font-family: $fontFamily-ExpandableItem;
+    font-size: $fontSize-ExpandableItem;
+    font-weight: $fontWeight-ExpandableItem;
     box-sizing: border-box;
     min-width: 0;
-    color: var(--xmlui-color-ExpandableItem);
-    font-family: var(--xmlui-fontFamily-ExpandableItem);
-    font-size: var(--xmlui-fontSize-ExpandableItem);
-    font-weight: var(--xmlui-fontWeight-ExpandableItem);
-    background-color: var(--xmlui-backgroundColor-ExpandableItem);
-    border-color: var(--xmlui-borderColor-ExpandableItem);
-    border-style: var(--xmlui-borderStyle-ExpandableItem);
-    border-width: var(--xmlui-borderWidth-ExpandableItem);
-    border-bottom-width: var(--xmlui-borderBottomWidth-ExpandableItem);
-    border-radius: var(--xmlui-borderRadius-ExpandableItem);
-    padding: var(--xmlui-paddingTop-ExpandableItem) var(--xmlui-paddingRight-ExpandableItem) var(--xmlui-paddingBottom-ExpandableItem) var(--xmlui-paddingLeft-ExpandableItem);
-  }
 
-  .disabled {
-    color: var(--xmlui-color-ExpandableItem--disabled);
-    cursor: not-allowed;
-  }
-
-  .summary {
-    display: inline-flex;
-    align-items: center;
-    box-sizing: border-box;
-    gap: var(--xmlui-gap-ExpandableItem);
-    cursor: pointer;
-    user-select: none;
-    background-color: var(--xmlui-backgroundColor-summary-ExpandableItem);
-    border-radius: var(--xmlui-borderRadius-summary-ExpandableItem);
-    padding: var(--xmlui-padding-summary-ExpandableItem, var(--xmlui-paddingVertical-summary-ExpandableItem) var(--xmlui-paddingHorizontal-summary-ExpandableItem));
-    transition: var(--xmlui-transition-summary-ExpandableItem);
-  }
-
-  .summary:hover {
-    background-color: var(--xmlui-backgroundColor-summary-ExpandableItem--hover);
-  }
-
-  .summary:active {
-    background-color: var(--xmlui-backgroundColor-summary-ExpandableItem--active);
-  }
-
-  .disabled .summary {
-    cursor: not-allowed;
-  }
-
-  .iconStart {
-    flex-direction: row;
-  }
-
-  .iconEnd {
-    flex-direction: row-reverse;
-    justify-content: space-between;
-  }
-
-  .fullWidth {
-    display: flex;
-    width: 100%;
-  }
-
-  .icon,
-  .switch {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .switchControl {
-    width: 2rem;
-    height: 1rem;
-    border-radius: 999px;
-    border: 1px solid currentColor;
-    background: transparent;
-    position: relative;
-  }
-
-  .switchControl::after {
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: calc(1rem - 6px);
-    height: calc(1rem - 6px);
-    border-radius: 999px;
-    background: currentColor;
-    transition: transform 0.15s ease;
-  }
-
-  .open .switchControl::after {
-    transform: translateX(1rem);
-  }
-
-  .summaryContent {
-    flex: 1;
-  }
-
-  .content {
-    box-sizing: border-box;
-    min-width: 0;
-    padding: var(--xmlui-paddingVertical-content-ExpandableItem) var(--xmlui-paddingRight-content-ExpandableItem) var(--xmlui-paddingVertical-content-ExpandableItem) var(--xmlui-paddingLeft-content-ExpandableItem);
-    animation: expandableItemSlideIn var(--xmlui-animationDuration-content-ExpandableItem) var(--xmlui-animation-content-ExpandableItem);
-  }
-
-  .contentHidden {
-    display: none;
-  }
-
-  @keyframes expandableItemSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-8px);
+    &.disabled {
+      color: $color-ExpandableItem--disabled;
+      cursor: not-allowed;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+
+    .summary {
+      display: inline-flex;
+      align-items: center;
+      gap: $gap-ExpandableItem;
+      cursor: pointer;
+      user-select: none;
+      background-color: $backgroundColor-summary-ExpandableItem;
+      @include t.paddingVars($themeVars, "summary-#{$component}");
+      @include t.textVars($themeVars, "summary-#{$component}");
+      border-radius: $borderRadius-summary-ExpandableItem;
+      transition: $transition-summary-ExpandableItem;
+
+      &:hover {
+        background-color: $backgroundColor-summary-ExpandableItem--hover;
+      }
+
+      &:active {
+        background-color: $backgroundColor-summary-ExpandableItem--active;
+      }
+
+      &.iconStart {
+        flex-direction: row;
+      }
+
+      &.iconEnd {
+        flex-direction: row-reverse;
+        justify-content: space-between;
+      }
+
+      &.fullWidth {
+        display: flex;
+        width: 100%;
+
+        &.iconEnd {
+          justify-content: space-between;
+        }
+      }
+
+      .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .switch {
+        display: flex;
+        align-items: center;
+      }
+
+      .summaryContent {
+        flex: 1;
+      }
+    }
+
+    &.withSwitch {
+      .summary {
+        cursor: pointer;
+      }
+    }
+
+    .content {
+      width: 100%;
+      box-sizing: border-box;
+      min-width: 0;
+      @include t.paddingVars($themeVars, "content-#{$component}");
+      @include t.borderVars($themeVars, "content-#{$component}");
+      @include t.textVars($themeVars, "content-#{$component}");
+      animation: expandableItemSlideIn $animationDuration-content-ExpandableItem $animation-content-ExpandableItem;
+
+      &.contentHidden {
+        display: none;
+      }
+    }
+
+    @keyframes expandableItemSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    &.disabled .summary {
+      cursor: not-allowed;
     }
   }
 }
 
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

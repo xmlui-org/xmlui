@@ -350,27 +350,27 @@ export class DropdownMenuDriver extends ComponentDriver {
 
 export class ExpandableItemDriver extends ComponentDriver {
   getSummary(): Locator {
-    return this.getByPartName("summary");
+    return this.component.locator('[data-part-id="summary"], [data-xmlui-part="summary"]');
   }
 
   getSummaryContent(): Locator {
-    return this.component.locator(".summaryContent").first();
+    return this.component.locator('[class*="_summaryContent_"]');
   }
 
   getContent(): Locator {
-    return this.getByPartName("content");
+    return this.component.locator('[data-part-id="content"], [data-xmlui-part="content"]');
   }
 
   getIcon(): Locator {
-    return this.component.locator(".icon svg, .icon").first();
+    return this.component.locator('[class*="_icon_"] svg');
   }
 
   getSwitch(): Locator {
-    return this.component.getByRole("switch").or(this.component.locator(".switchControl")).first();
+    return this.component.getByRole("switch");
   }
 
   async isExpanded(): Promise<boolean> {
-    return this.getContent().isVisible();
+    return this.component.locator('[class*="_content_"]').isVisible();
   }
 
   async isDisabled(): Promise<boolean> {

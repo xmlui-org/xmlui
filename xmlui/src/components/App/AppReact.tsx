@@ -16,6 +16,7 @@ import { useComponentThemeClass, useThemeVariables } from "../../runtime/renderi
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { useBindingRevision } from "../../runtime/rendering/reactive";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
+import { useComponentStyle } from "../../components-core/theming/StyleContext";
 import { ProfileMenuProvider } from "../ProfileMenu/ProfileMenuContext";
 import { ThemedIcon } from "../Icon/Icon";
 import { AppHeaderMd } from "../AppHeader/AppHeader";
@@ -46,6 +47,10 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
 
   const rootAttrs = adapter.rootAttrs();
   const rootStyle = appShellStyle(rootAttrs.style as CSSProperties | undefined);
+  const rootThemeClassName = useComponentStyle(
+    themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)) as Record<string, CSSProperties[keyof CSSProperties]>,
+    { layer: "themes" },
+  );
   const testId = adapter.stringProp("testId");
   const fitContent = adapter.booleanProp("fitContent", defaultProps.fitContent);
   const noScrollbarGutters = adapter.booleanProp(
@@ -292,10 +297,10 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
             ? renderMobileDrawer(
               childAdapter,
               appLayoutContext,
-              mergedThemeVariables,
               slots.navPanel,
               drawerVisible,
               () => setDrawerVisible(false),
+              rootThemeClassName,
             )
             : null}
           <div
@@ -304,6 +309,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
             data-xmlui-app-fit-content={fitContent ? "true" : undefined}
             className={[
               rootAttrs.className,
+              rootThemeClassName,
               styles.appContainer,
               layout.cssModuleClass,
               layout.isSticky && styles.sticky,
@@ -319,7 +325,6 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
               .join(" ")}
             style={{
               ...rootStyle,
-              ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables)),
               ...appBaselineStyle(mergedThemeVariables),
               ...appContainerStyle(fitContent, layout.value, shouldUseDrawerNavPanel),
               "--app-header-height": headerSize.height > 0
@@ -643,10 +648,10 @@ function renderMainContent(
 function renderMobileDrawer(
   adapter: XmluiAdapterRendererProps["adapter"],
   appLayoutContext: IAppLayoutContext,
-  mergedThemeVariables: Record<string, unknown>,
   navPanel: XmluiNode,
   open: boolean,
   closeDrawer: () => void,
+  themeClassName: string | undefined,
 ) {
   const drawerLayoutContext: IAppLayoutContext = {
     ...appLayoutContext,
@@ -659,11 +664,10 @@ function renderMobileDrawer(
   return (
     <div
       aria-hidden={open ? undefined : "true"}
-      className={styles.mobileDrawer}
+      className={[styles.mobileDrawer, themeClassName].filter(Boolean).join(" ")}
       data-state={open ? "open" : "closed"}
       data-xmlui-component="App"
       data-xmlui-part="drawer"
-      style={themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(mergedThemeVariables))}
     >
       <button
         aria-hidden="true"

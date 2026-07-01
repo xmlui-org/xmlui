@@ -227,6 +227,16 @@ class MarkupParser {
     if (this.at(MarkupSyntaxKind.Equal)) {
       children.push(this.consume(MarkupSyntaxKind.Equal));
     } else {
+      if (
+        this.at(MarkupSyntaxKind.Identifier) ||
+        this.at(MarkupSyntaxKind.NodeEnd) ||
+        this.at(MarkupSyntaxKind.NodeClose) ||
+        this.at(MarkupSyntaxKind.OpenNodeStart) ||
+        this.at(MarkupSyntaxKind.CloseNodeStart) ||
+        this.at(MarkupSyntaxKind.EndOfFile)
+      ) {
+        return createSyntaxNode(MarkupSyntaxKind.Attribute, children);
+      }
       children.push(this.expected("XP010", "Expected '=' after attribute name.", this.current()));
       return createSyntaxNode(MarkupSyntaxKind.Attribute, children);
     }

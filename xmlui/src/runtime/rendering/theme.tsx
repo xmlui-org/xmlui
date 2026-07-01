@@ -4,12 +4,14 @@ import React, {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type ReactNode,
 } from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata";
+import { useComponentStyle, useStyles } from "../../components-core/theming/StyleContext";
 import {
   buildDefaultThemeVariables,
   createComponentThemeClass,
@@ -37,6 +39,12 @@ const ThemeContext = createContext<ThemeRuntimeContext>({
   setTone: noopSetTone,
 });
 
+const EMPTY_STYLE: CSSProperties = {};
+
+function mergeClassNames(...classNames: Array<string | undefined>) {
+  return classNames.filter(Boolean).join(" ");
+}
+
 export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { children: ReactNode; tone?: ThemeTone }) {
   const [tone, setTone] = useState<ThemeTone>(initialTone);
   useEffect(() => {
@@ -50,26 +58,23 @@ export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { chil
     () => themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
     [variables],
   );
+  const themeClassName = useComponentStyle(
+    cssVariables as Record<string, CSSProperties[keyof CSSProperties]>,
+    { layer: "themes" },
+  );
   useLayoutEffect(() => {
     if (typeof document === "undefined") {
       return;
     }
     const root = document.documentElement;
-    const previous = new Map<string, string>();
-    for (const [name, value] of Object.entries(cssVariables)) {
-      previous.set(name, root.style.getPropertyValue(name));
-      root.style.setProperty(name, String(value));
+    if (!themeClassName) {
+      return;
     }
+    root.classList.add(themeClassName);
     return () => {
-      for (const [name, value] of previous) {
-        if (value) {
-          root.style.setProperty(name, value);
-        } else {
-          root.style.removeProperty(name);
-        }
-      }
+      root.classList.remove(themeClassName);
     };
-  }, [cssVariables]);
+  }, [themeClassName]);
   const value = useMemo<ThemeRuntimeContext>(
     () => ({ variables, tone, setTone }),
     [tone, variables],
@@ -96,9 +101,21 @@ export function useComponentThemeClass(
   variant?: string,
 ) {
   const themeVariables = useThemeVariables();
-  return useMemo(
+  const componentTheme = useMemo(
     () => createComponentThemeClass(componentName, metadata, themeVariables, contributors, variant),
     [componentName, metadata, themeVariables, contributors, variant],
+  );
+  const dynamicClassName = useComponentStyle(
+    componentTheme.style as Record<string, CSSProperties[keyof CSSProperties]>,
+    { layer: "themes" },
+  );
+  return useMemo(
+    () => ({
+      ...componentTheme,
+      className: mergeClassNames(componentTheme.className, dynamicClassName),
+      style: EMPTY_STYLE,
+    }),
+    [componentTheme, dynamicClassName],
   );
 }
 
@@ -143,6 +160,17 @@ export function ThemeScope({
     },
     [parent.tone, parent.variables, tone, variables],
   );
+  const themeScopeStyles = useMemo(
+    () => ({
+      "&": {
+        display: "contents",
+        ...cssVariables,
+        colorScheme: tone ?? parent.tone,
+      },
+    }),
+    [cssVariables, parent.tone, tone],
+  );
+  const themeClassName = useStyles(themeScopeStyles, { layer: "themes" });
   const value = useMemo<ThemeRuntimeContext>(
     () => ({
       variables: nextVariables,
@@ -151,13 +179,29 @@ export function ThemeScope({
     }),
     [nextVariables, parent.setTone, parent.tone, tone],
   );
+  const wrapperStyle = useMemo(() => {
+    if (!style) {
+      return undefined;
+    }
+    const { boxSizing: _boxSizing, ...rest } = style;
+    return Object.keys(rest).length > 0 ? rest : undefined;
+  }, [style]);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    if (wrapperStyle) {
+      return;
+    }
+    wrapperRef.current?.removeAttribute("style");
+  }, [wrapperStyle]);
   return (
     <ThemeContext.Provider value={value}>
       <div
+        ref={wrapperRef}
         data-xmlui-component="Theme"
         data-xmlui-part="root"
         data-xmlui-tone={tone ?? parent.tone}
-        style={{ ...cssVariables, ...style, display: "contents" }}
+        className={themeClassName}
+        {...(wrapperStyle ? { style: wrapperStyle } : {})}
       >
         {children}
       </div>

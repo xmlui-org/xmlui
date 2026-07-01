@@ -22,7 +22,7 @@ export const badgeRenderer = wrapComponent({
     return (
       <Badge
         {...rootAttrs}
-        variant={variant === "pill" ? "pill" : "badge"}
+        variant={variant}
         color={resolveColorMapValue(colorMap, displayValue)}
         classes={{ [COMPONENT_PART_KEY]: className }}
         onContextMenu={

@@ -7,6 +7,7 @@ const STACK_OLD_SUITE_PENDING =
 const ACTIVE_STACK_TESTS = new Set([
   "can render empty",
   "contextMenu event fires on right click",
+  "invalid bare theme token names do not override Stack sizing",
 ]);
 
 test.beforeEach(({}, testInfo) => {
@@ -149,6 +150,27 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
+  test("invalid bare theme token names do not override Stack sizing", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <VStack testId="stack" gap="space-4">
+        <Stack testId="item1" height="32px" width="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" width="32px" backgroundColor="blue" />
+        <Stack testId="padded" padding="space-3" backgroundColor="green">
+          <Text>content</Text>
+        </Stack>
+      </VStack>
+    `);
+
+    // Old XMLUI only resolves theme references with a "$" prefix. A bare "space-4"
+    // is invalid as a gap value, so Stack falls back to its default theme gap.
+    await expect(page.getByTestId("stack")).toHaveCSS("gap", "16px");
+    await expect(page.getByTestId("padded")).toHaveCSS("padding-top", "0px");
+
+    const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    expect(item2Top - item1Bottom).toBeCloseTo(16, 0);
+  });
+
   test("gap-Stack theme variable controls default gap between children", async ({
     page,
     initTestBed,

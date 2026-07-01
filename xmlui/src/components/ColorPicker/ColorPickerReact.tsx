@@ -26,6 +26,7 @@ export type ColorPickerProps = {
   validationStatus?: string;
   className?: string;
   style?: CSSProperties;
+  registerComponentApi?: (api: Record<string, unknown>) => void;
   onDidChange?: (value: string) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
@@ -48,6 +49,7 @@ export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProp
     validationStatus = defaultProps.validationStatus,
     className,
     style,
+    registerComponentApi,
     onDidChange,
     onFocus,
     onBlur,
@@ -88,13 +90,30 @@ export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProp
     void onDidChange?.(color);
   }, [fieldName, onDidChange, setFormValue]);
 
+  const focus = useCallback(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue: updateValue,
+    });
+  }, [focus, registerComponentApi, updateValue]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      value: currentValue,
+    });
+  }, [currentValue, registerComponentApi]);
+
   useImperativeHandle(ref, () => ({
-    focus: () => inputRef.current?.focus(),
+    focus,
     setValue: updateValue,
     get value() {
       return currentValue;
     },
-  }), [currentValue, updateValue]);
+  }), [currentValue, focus, updateValue]);
 
   useEffect(() => {
     if (

@@ -16,14 +16,21 @@ export function useDomRoot() {
   return useContext(StyleInjectionTargetContext);
 }
 
-export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CSSProperties]>) {
+type StyleInjectionOptions = {
+  layer?: string;
+};
+
+export function useComponentStyle(
+  styles?: Record<string, CSSProperties[keyof CSSProperties]>,
+  { layer = "dynamic" }: StyleInjectionOptions = {},
+) {
   const cssText = useMemo(() => styleObjectToCss(styles), [styles]);
   const className = useMemo(() => {
     if (!cssText) {
       return undefined;
     }
-    return `xmlui-dynamic-${hashString(cssText)}`;
-  }, [cssText]);
+    return `xmlui-dynamic-${hashString(`${layer}:${cssText}`)}`;
+  }, [cssText, layer]);
 
   const domRoot = useDomRoot();
   useInsertionEffect(() => {
@@ -36,21 +43,21 @@ export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CS
     }
     const styleElement = document.createElement("style");
     styleElement.setAttribute("data-xmlui-dynamic-style", className);
-    styleElement.innerHTML = `@layer dynamic { .${className} { ${cssText} } }`;
+    styleElement.innerHTML = `@layer ${layer} { .${className} { ${cssText} } }`;
     injectionTarget.appendChild(styleElement);
-  }, [className, cssText, domRoot]);
+  }, [className, cssText, domRoot, layer]);
 
   return className;
 }
 
-export function useStyles(styles?: StyleObjectType) {
+export function useStyles(styles?: StyleObjectType, { layer = "dynamic" }: StyleInjectionOptions = {}) {
   const cssText = useMemo(() => styleObjectToNestedCss(styles), [styles]);
   const className = useMemo(() => {
     if (!cssText) {
       return undefined;
     }
-    return `xmlui-dynamic-${hashString(cssText)}`;
-  }, [cssText]);
+    return `xmlui-dynamic-${hashString(`${layer}:${cssText}`)}`;
+  }, [cssText, layer]);
 
   const domRoot = useDomRoot();
   useInsertionEffect(() => {
@@ -63,9 +70,9 @@ export function useStyles(styles?: StyleObjectType) {
     }
     const styleElement = document.createElement("style");
     styleElement.setAttribute("data-xmlui-dynamic-style", className);
-    styleElement.innerHTML = `@layer dynamic { ${cssText.replaceAll("&", `.${className}`)} }`;
+    styleElement.innerHTML = `@layer ${layer} { ${cssText.replaceAll("&", `.${className}`)} }`;
     injectionTarget.appendChild(styleElement);
-  }, [className, cssText, domRoot]);
+  }, [className, cssText, domRoot, layer]);
 
   return className;
 }

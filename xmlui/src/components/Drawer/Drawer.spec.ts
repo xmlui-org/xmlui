@@ -141,6 +141,7 @@ test.describe("Basic Functionality", () => {
     // The backdrop overlay has aria-hidden="true" and data-state="open"
     const backdrop = page.locator("[aria-hidden='true'][data-state='open']");
     await expect(backdrop).toBeVisible();
+    await expect(backdrop).toHaveCSS("background-color", "rgba(0, 0, 0, 0.4)");
   });
 
   test("closeOnClickAway=true closes drawer when clicking outside", async ({

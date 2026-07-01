@@ -18,18 +18,26 @@ import {
   useThemeOverrideProps,
 } from "./props";
 import { ThemeScope, useThemeVariables } from "./theme";
+import { useComponentStyle } from "../../components-core/theming/StyleContext";
 import { themeVariablesToCssProperties } from "../../styling";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 
 export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
-  App: ({ context, node, scope }) => (
-    <div
-      {...partAttrs("App")}
-      style={{ ...themeVariablesToCssProperties(useThemeVariables()), ...useLayoutStyle(node, scope) }}
-    >
-      {context.renderChildren(node.children, scope)}
-    </div>
-  ),
+  App: ({ context, node, scope }) => {
+    const themeClassName = useComponentStyle(
+      themeVariablesToCssProperties(useThemeVariables()) as Record<string, React.CSSProperties[keyof React.CSSProperties]>,
+      { layer: "themes" },
+    );
+    return (
+      <div
+        {...partAttrs("App")}
+        className={themeClassName}
+        style={useLayoutStyle(node, scope)}
+      >
+        {context.renderChildren(node.children, scope)}
+      </div>
+    );
+  },
   AppHeader: ({ context, node, scope }) => (
     <header {...partAttrs("AppHeader")} style={useLayoutStyle(node, scope)}>
       {context.renderChildren(node.children, scope)}

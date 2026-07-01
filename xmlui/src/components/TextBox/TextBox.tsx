@@ -272,9 +272,17 @@ export const TextBoxMd = createMetadata({
 export const PasswordInputMd = createMetadata({
   ...TextBoxMd,
   description:
-    "`PasswordInput` is a specialized TextBox for entering password values.",
+    "`Password` is a specialized [TextBox](/components/TextBox) that enables users " +
+    "to input and edit passwords.",
   props: {
     ...TextBoxMd.props,
+    initialValue: {
+      ...(TextBoxMd.props?.initialValue ?? dInitialValue(defaultProps.initialValue, "string")),
+      audit: {
+        classification: "secret",
+        defaultRedaction: "mask",
+      },
+    },
     type: {
       ...TextBoxMd.props?.type,
       description: TextBoxMd.props?.type?.description ?? "The native input type used by the text box.",

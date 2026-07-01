@@ -3,19 +3,22 @@ import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { createSlotScope } from "../../runtime/rendering/components";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { defaultProps } from "./Fallback.defaults";
-import { Fallback, type FallbackError } from "./FallbackReact";
+import { AppError } from "../../components-core/errors/app-error";
+import { Fallback } from "./FallbackReact";
 
 const COMP = "Fallback";
 
 export const FallbackMd = createMetadata({
   status: "experimental",
   description:
-    "`Fallback` is a declarative wrapper that renders an alternative UI when a descendant loader fails or a descendant component throws during render.",
+    "`Fallback` is a declarative wrapper that renders an alternative UI when a descendant loader (`DataSource`, `APICall`) fails or a descendant component throws during render. The error is exposed as the `$error` context variable to the `errorTemplate`. An optional `loadingTemplate` is rendered while the `isLoading` prop is truthy.",
   contextVars: {
-    $error: { description: "The error captured by this Fallback boundary." },
+    $error: { description: "The `AppError` captured by this Fallback boundary." },
   },
   props: {
-    errorTemplate: dComponent("Template to render when a descendant produces an error."),
+    errorTemplate: dComponent(
+      "Template rendered when a descendant produces an `AppError`. Receives `$error` with `code`, `category`, `message`, and `data` fields.",
+    ),
     loadingTemplate: dComponent("Template to render while `isLoading` is true."),
     isLoading: {
       description: "When true, renders the loading template if one is provided.",
@@ -34,7 +37,7 @@ export const fallbackRenderer = wrapComponent({
     return (
       <Fallback
         isLoading={adapter.booleanProp("isLoading", defaultProps.isLoading)}
-        errorRender={($error: FallbackError) =>
+        errorRender={($error: AppError) =>
           errorTemplate
             ? adapter.context.renderChildren(errorTemplate, createSlotScope(adapter.scope, { $error }))
             : undefined}

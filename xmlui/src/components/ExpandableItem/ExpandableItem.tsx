@@ -17,11 +17,28 @@ const expandableItemStylesSource = `
   createThemeVar("fontFamily-ExpandableItem");
   createThemeVar("fontSize-ExpandableItem");
   createThemeVar("fontWeight-ExpandableItem");
+  createThemeVar("border-ExpandableItem");
+  createThemeVar("borderLeft-ExpandableItem");
+  createThemeVar("borderRight-ExpandableItem");
+  createThemeVar("borderTop-ExpandableItem");
+  createThemeVar("borderBottom-ExpandableItem");
   createThemeVar("borderColor-ExpandableItem");
+  createThemeVar("borderLeftColor-ExpandableItem");
+  createThemeVar("borderRightColor-ExpandableItem");
+  createThemeVar("borderTopColor-ExpandableItem");
+  createThemeVar("borderBottomColor-ExpandableItem");
   createThemeVar("borderWidth-ExpandableItem");
+  createThemeVar("borderLeftWidth-ExpandableItem");
+  createThemeVar("borderRightWidth-ExpandableItem");
+  createThemeVar("borderTopWidth-ExpandableItem");
   createThemeVar("borderBottomWidth-ExpandableItem");
   createThemeVar("borderStyle-ExpandableItem");
+  createThemeVar("borderLeftStyle-ExpandableItem");
+  createThemeVar("borderRightStyle-ExpandableItem");
+  createThemeVar("borderTopStyle-ExpandableItem");
+  createThemeVar("borderBottomStyle-ExpandableItem");
   createThemeVar("borderRadius-ExpandableItem");
+  createThemeVar("padding-ExpandableItem");
   createThemeVar("paddingTop-ExpandableItem");
   createThemeVar("paddingBottom-ExpandableItem");
   createThemeVar("paddingLeft-ExpandableItem");
@@ -29,9 +46,16 @@ const expandableItemStylesSource = `
   createThemeVar("padding-summary-ExpandableItem");
   createThemeVar("paddingVertical-summary-ExpandableItem");
   createThemeVar("paddingHorizontal-summary-ExpandableItem");
+  createThemeVar("paddingTop-summary-ExpandableItem");
+  createThemeVar("paddingBottom-summary-ExpandableItem");
+  createThemeVar("paddingLeft-summary-ExpandableItem");
+  createThemeVar("paddingRight-summary-ExpandableItem");
   createThemeVar("paddingLeft-content-ExpandableItem");
   createThemeVar("paddingRight-content-ExpandableItem");
   createThemeVar("paddingVertical-content-ExpandableItem");
+  createThemeVar("paddingHorizontal-content-ExpandableItem");
+  createThemeVar("paddingTop-content-ExpandableItem");
+  createThemeVar("paddingBottom-content-ExpandableItem");
   createThemeVar("gap-ExpandableItem");
   createThemeVar("transition-summary-ExpandableItem");
   createThemeVar("animation-content-ExpandableItem");
@@ -39,9 +63,11 @@ const expandableItemStylesSource = `
 `;
 
 export const ExpandableItemMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description:
-    "`ExpandableItem` creates an expandable/collapsible section, similar to the HTML details disclosure element.",
+    "`ExpandableItem` creates expandable/collapsible section, similar to the HTML " +
+    "details disclosure element. When the user clicks on the `summary` the content " +
+    "expands or collapses.",
   parts: {
     [PART_SUMMARY]: {
       description: "The summary section that is always visible and acts as the trigger.",
@@ -58,7 +84,8 @@ export const ExpandableItemMd = createMetadata({
       defaultValue: defaultProps.initiallyExpanded,
     },
     enabled: {
-      description: "When true, the expandable item can be opened and closed.",
+      description:
+        "When true, the expandable item can be opened and closed. When false, it cannot be toggled.",
       valueType: "boolean",
       defaultValue: defaultProps.enabled,
     },
@@ -73,7 +100,7 @@ export const ExpandableItemMd = createMetadata({
       defaultValue: defaultProps.iconExpanded,
     },
     iconPosition: {
-      description: "Determines the position of the icon.",
+      description: "Determines the position of the icon (start or end).",
       valueType: "string",
       availableValues: ["start", "end"],
       defaultValue: defaultProps.iconPosition,
@@ -84,12 +111,14 @@ export const ExpandableItemMd = createMetadata({
       defaultValue: defaultProps.withSwitch,
     },
     contentWidth: {
-      description: "Sets the width of the expanded content area.",
+      description:
+        "Sets the width of the expanded content area. Defaults to 100% to fill the parent container.",
       valueType: "string",
       defaultValue: defaultProps.contentWidth,
     },
     fullWidthSummary: {
-      description: "When true, the summary section takes the full width of the parent container.",
+      description:
+        "When true, the summary section takes the full width of the parent container. When combined with iconPosition='end', the icon is aligned to the far edge.",
       valueType: "boolean",
       defaultValue: defaultProps.fullWidthSummary,
     },
@@ -135,7 +164,7 @@ export const ExpandableItemMd = createMetadata({
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`borderColor-${COMP}`]: "$borderColor",
     [`borderWidth-${COMP}`]: "0",
-    [`borderBottomWidth-${COMP}`]: "1px",
+    [`borderBottomWidth-${COMP}`]: "0",
     [`borderStyle-${COMP}`]: "solid",
     [`borderRadius-${COMP}`]: "0",
     [`paddingTop-${COMP}`]: "$space-0",

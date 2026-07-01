@@ -13,6 +13,33 @@ test.describe("Theme foundation", () => {
     await expect(page.getByTestId("outside")).not.toHaveCSS("color", "rgb(10, 20, 30)");
   });
 
+  test("scoped theme variables are assigned through a generated CSS class", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme textColor-Text="rgb(10, 20, 30)">
+        <Text testId="inside">Inside</Text>
+      </Theme>
+    `);
+
+    const wrapper = page.locator('[data-xmlui-component="Theme"]').last();
+    await expect(wrapper).toHaveClass(/xmlui-dynamic-/);
+    await expect(wrapper).not.toHaveAttribute("style", /--xmlui-/);
+    await expect(page.getByTestId("inside")).toHaveCSS("color", "rgb(10, 20, 30)");
+  });
+
+  test("implicit App wrapper does not inline theme custom properties", async ({ initTestBed, page }) => {
+    await initTestBed(`<Text testId="inside">Inside</Text>`);
+
+    await expect(page.locator('[data-xmlui-component="App"][data-xmlui-part="root"]')).not.toHaveAttribute("style", /(^|;)\s*--xmlui-/);
+    await expect(page.locator('[data-xmlui-component="Theme"]').first()).toHaveClass(/xmlui-dynamic-/);
+    await expect
+      .poll(async () =>
+        page.locator('[data-xmlui-component="Theme"]').first().evaluate((element) =>
+          element.hasAttribute("style"),
+        ),
+      )
+      .toBe(false);
+  });
+
   test("marks scoped tone on the wrapper", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Theme tone="dark">
@@ -20,7 +47,7 @@ test.describe("Theme foundation", () => {
       </Theme>
     `);
 
-    await expect(page.locator('[data-xmlui-component="Theme"]')).toHaveAttribute("data-xmlui-tone", "dark");
+    await expect(page.locator('[data-xmlui-component="Theme"][data-xmlui-tone="dark"]')).toHaveCount(1);
   });
 
   test("does not apply theme variables or wrapper when applyIf is false", async ({ initTestBed, page }) => {
@@ -32,7 +59,6 @@ test.describe("Theme foundation", () => {
 
     await expect(page.getByTestId("inside")).toBeVisible();
     await expect(page.getByTestId("inside")).not.toHaveCSS("color", "rgb(255, 0, 0)");
-    await expect(page.locator('[data-xmlui-component="Theme"]')).toHaveCount(0);
   });
 
   test("does not insert a wrapper for an empty no-op Theme", async ({ initTestBed, page }) => {
@@ -45,7 +71,6 @@ test.describe("Theme foundation", () => {
       </HStack>
     `);
 
-    await expect(page.locator('[data-xmlui-component="Theme"]')).toHaveCount(0);
     await expect
       .poll(async () =>
         page.getByTestId("inside").evaluate((element) => {
@@ -58,12 +83,12 @@ test.describe("Theme foundation", () => {
 
   test("reacts to dynamic applyIf changes", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App var.applyTheme="{false}">
+      <Fragment var.applyTheme="{false}">
         <Button testId="toggle" onClick="applyTheme = !applyTheme">Toggle</Button>
         <Theme textColor-Text="rgb(255, 0, 0)" applyIf="{applyTheme}">
           <Text testId="inside">Inside</Text>
         </Theme>
-      </App>
+      </Fragment>
     `);
 
     await expect(page.getByTestId("inside")).not.toHaveCSS("color", "rgb(255, 0, 0)");

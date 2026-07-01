@@ -1,22 +1,6 @@
 import { test, expect } from "../../testing/fixtures";
 import { ExpandableItemDriver } from "../../testing/ComponentDrivers";
 
-const EXPANDABLE_ITEM_OLD_SUITE_PENDING =
-  "The literal old ExpandableItem suite is copied for compatibility tracking, but full icon, switch, API, theme variable, layout, form, and behavior parity is not complete yet. Re-enable cases feature-by-feature.";
-
-const ACTIVE_EXPANDABLE_ITEM_TESTS = new Set([
-  "component renders with basic props",
-  "component displays summary content correctly",
-  "component handles initiallyExpanded prop",
-  "component toggles on summary click",
-]);
-
-test.beforeEach(({}, testInfo) => {
-  if (!ACTIVE_EXPANDABLE_ITEM_TESTS.has(testInfo.title)) {
-    test.skip(true, EXPANDABLE_ITEM_OLD_SUITE_PENDING);
-  }
-});
-
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -904,6 +888,123 @@ test.describe("Visual state", () => {
 
     await expect(driver.component).toHaveCSS("padding-top", "0px");
     await expect(driver.component).toHaveCSS("padding-bottom", "0px");
+  });
+
+  test("Stack fallback gap and invalid child padding preserve migrated spacing", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <VStack gap="space-4">
+        <ExpandableItem testId="first" summary="Default content width (100%)" initiallyExpanded="true">
+          <Stack testId="blue" backgroundColor="lightblue" padding="space-3">
+            <Text>Content fills the full width</Text>
+          </Stack>
+        </ExpandableItem>
+
+        <ExpandableItem testId="second" summary="Custom content width (50%)" contentWidth="50%" initiallyExpanded="true">
+          <Stack testId="green" backgroundColor="lightgreen" padding="space-3">
+            <Text>Content is 50% width</Text>
+          </Stack>
+        </ExpandableItem>
+      </VStack>
+    `);
+
+    const firstBox = await page.getByTestId("first").boundingBox();
+    const secondBox = await page.getByTestId("second").boundingBox();
+
+    expect(firstBox).not.toBeNull();
+    expect(secondBox).not.toBeNull();
+    expect(secondBox!.y - (firstBox!.y + firstBox!.height)).toBeCloseTo(16, 0);
+    await expect(page.getByTestId("blue")).toHaveCSS("padding-top", "0px");
+    await expect(page.getByTestId("green")).toHaveCSS("padding-top", "0px");
+  });
+
+  test("component summary preserves generic label behavior for child components", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <VStack gap="space-4">
+        <ExpandableItem summary="Simple text summary" initiallyExpanded="true">
+          <Text>This expandable item uses a simple text string for its summary.</Text>
+        </ExpandableItem>
+
+        <ExpandableItem initiallyExpanded="false" testId="rich-summary-item">
+          <property name="summary">
+            <CHStack gap="space-2">
+              <Icon name="apps" />
+              <Text fontWeight="600">Custom Summary with Icon</Text>
+              <Badge testId="summary-badge" label="New" variant="success" />
+            </CHStack>
+          </property>
+          <Text>
+            This expandable item uses a rich component
+            definition with icons and badges in the summary.
+          </Text>
+        </ExpandableItem>
+      </VStack>
+    `);
+
+    const labelBox = await page.getByText("New").boundingBox();
+    const badgeBox = await page.getByTestId("summary-badge").boundingBox();
+    const customSummaryBox = await page.getByText("Custom Summary with Icon").boundingBox();
+    const chevronBox = await page
+      .getByTestId("rich-summary-item")
+      .locator('[class*="_summary_"] > [class*="_icon_"]')
+      .boundingBox();
+    const labelTextBox = await page.evaluate(() => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        const index = node.textContent?.indexOf("New") ?? -1;
+        if (index >= 0) {
+          const range = document.createRange();
+          range.setStart(node, index);
+          range.setEnd(node, index + "New".length);
+          const rect = range.getBoundingClientRect();
+          return { x: rect.x, width: rect.width };
+        }
+      }
+      return null;
+    });
+
+    expect(labelBox).not.toBeNull();
+    expect(labelTextBox).not.toBeNull();
+    expect(badgeBox).not.toBeNull();
+    expect(customSummaryBox).not.toBeNull();
+    expect(chevronBox).not.toBeNull();
+    expect(customSummaryBox!.height).toBeLessThan(28);
+    expect(labelBox!.x).toBeGreaterThan(customSummaryBox!.x + customSummaryBox!.width);
+    expect(chevronBox!.x - (labelTextBox!.x + labelTextBox!.width)).toBeCloseTo(17.3125, 0);
+    expect(labelBox!.y + labelBox!.height).toBeLessThanOrEqual(badgeBox!.y + 1);
+    await expect(page.getByText("New")).toHaveCSS("font-size", "14px");
+    await expect(page.getByText("New")).toHaveCSS("font-weight", "500");
+    await expect(page.getByTestId("summary-badge")).toHaveCSS("padding-left", "0px");
+  });
+
+  test("default border resolves without a visible separator", async ({
+    initTestBed,
+    createExpandableItemDriver,
+  }) => {
+    await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {});
+    const driver = await createExpandableItemDriver();
+
+    await expect(driver.component).toHaveCSS("border-bottom-width", "0px");
+  });
+
+  test("borderBottomWidth can be controlled via theme variables", async ({
+    initTestBed,
+    createExpandableItemDriver,
+  }) => {
+    await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {
+      testThemeVars: {
+        "borderBottomWidth-ExpandableItem": "2px",
+      },
+    });
+    const driver = await createExpandableItemDriver();
+
+    await expect(driver.component).toHaveCSS("border-bottom-width", "2px");
   });
 
   test("paddingTop and paddingBottom can be controlled via theme variables", async ({

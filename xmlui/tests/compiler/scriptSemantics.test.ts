@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { parseScriptEventHandler, parseScriptExpression } from "../../src/parser";
 import { parseXmlui } from "../../src/compiler/parseXmlui";
+import { createXmluiAppContextObject } from "../../src/runtime/appContextObject";
 import {
   bindScriptExpression,
   compileXmluiEventHandler,
@@ -107,6 +108,225 @@ describe("XMLUI script scope model", () => {
         path: ["toast"],
       }),
     ]);
+  });
+
+  it("resolves original AppContextObject globals as context bindings", () => {
+    const appContextNames = [
+      "version",
+      "apiInterceptorContext",
+      "appGlobals",
+      "$appGlobals",
+      "xmluiConfig",
+      "debugEnabled",
+      "decorateComponentsWithTestId",
+      "environment",
+      "mediaSize",
+      "queryClient",
+      "standalone",
+      "appIsInShadowDom",
+      "formatDate",
+      "formatDateTime",
+      "formatDateWithoutYear",
+      "formatTime",
+      "formatTimeWithoutSeconds",
+      "getDateUntilNow",
+      "isoDateString",
+      "isToday",
+      "isTomorrow",
+      "isYesterday",
+      "smartFormatDate",
+      "smartFormatDateTime",
+      "differenceInMinutes",
+      "isSameDay",
+      "isThisYear",
+      "formatHumanElapsedTime",
+      "avg",
+      "sum",
+      "formatFileSizeInBytes",
+      "getFileExtension",
+      "routerBaseName",
+      "pathname",
+      "setNavigationHandlers",
+      "signError",
+      "activeThemeId",
+      "activeThemeTone",
+      "availableThemeIds",
+      "setTheme",
+      "setThemeTone",
+      "toggleThemeTone",
+      "getThemeVar",
+      "loggedInUser",
+      "setLoggedInUser",
+      "resources",
+      "capitalize",
+      "pluralize",
+      "debounce",
+      "toHashObject",
+      "findByField",
+      "embed",
+      "distinct",
+      "forceRefreshAnchorScroll",
+      "scrollBookmarkIntoView",
+      "readLocalStorage",
+      "writeLocalStorage",
+      "deleteLocalStorage",
+      "clearLocalStorage",
+      "resetLocalStorage",
+      "getAllLocalStorage",
+      "storageTimestamp",
+      "AppState",
+      "Log",
+      "Clipboard",
+      "pubSubService",
+      "publishTopic",
+    ];
+    const document = parseXmlui(`<App />`);
+    const scope = createXmluiScope(document.root, {
+      appContext: createXmluiAppContextObject(),
+    });
+
+    for (const name of appContextNames) {
+      const bound = bindScriptExpression(parseScriptExpression(name).node, scope);
+      expect(bound.diagnostics, name).toEqual([]);
+      expect(bound.dependencies, name).toEqual([
+        expect.objectContaining({
+          kind: "context",
+          name,
+          path: [name],
+        }),
+      ]);
+    }
+  });
+
+  it("accepts every original AppContextObject top-level identifier", () => {
+    const appContextNames = [
+      "version",
+      "Actions",
+      "apiInterceptorContext",
+      "appGlobals",
+      "$appGlobals",
+      "xmluiConfig",
+      "debugEnabled",
+      "decorateComponentsWithTestId",
+      "environment",
+      "mediaSize",
+      "queryClient",
+      "standalone",
+      "appIsInShadowDom",
+      "formatDate",
+      "formatDateTime",
+      "formatDateWithoutYear",
+      "formatTime",
+      "formatTimeWithoutSeconds",
+      "getDate",
+      "getDateUntilNow",
+      "isoDateString",
+      "isToday",
+      "isTomorrow",
+      "isYesterday",
+      "smartFormatDate",
+      "smartFormatDateTime",
+      "differenceInMinutes",
+      "isSameDay",
+      "isThisYear",
+      "formatHumanElapsedTime",
+      "avg",
+      "sum",
+      "formatFileSizeInBytes",
+      "getFileExtension",
+      "navigate",
+      "routerBaseName",
+      "pathname",
+      "setNavigationHandlers",
+      "confirm",
+      "signError",
+      "toast",
+      "activeThemeId",
+      "activeThemeTone",
+      "availableThemeIds",
+      "setTheme",
+      "setThemeTone",
+      "toggleThemeTone",
+      "getThemeVar",
+      "loggedInUser",
+      "setLoggedInUser",
+      "resources",
+      "capitalize",
+      "pluralize",
+      "delay",
+      "debounce",
+      "toHashObject",
+      "findByField",
+      "embed",
+      "distinct",
+      "forceRefreshAnchorScroll",
+      "scrollBookmarkIntoView",
+      "readLocalStorage",
+      "writeLocalStorage",
+      "deleteLocalStorage",
+      "clearLocalStorage",
+      "resetLocalStorage",
+      "getAllLocalStorage",
+      "storageTimestamp",
+      "AppState",
+      "Log",
+      "App",
+      "Clipboard",
+      "pubSubService",
+      "publishTopic",
+    ];
+    const document = parseXmlui(`<App />`);
+    const scope = createXmluiScope(document.root, {
+      appContext: createXmluiAppContextObject(),
+    });
+
+    for (const name of appContextNames) {
+      const bound = bindScriptExpression(parseScriptExpression(name).node, scope);
+      expect(bound.diagnostics, name).toEqual([]);
+    }
+  });
+
+  it("executes formatDateTime through the default app context", () => {
+    const document = parseXmlui(`<App />`);
+    const scope = createXmluiScope(document.root, {
+      appContext: createXmluiAppContextObject(),
+    });
+    const lowered = lowerScriptExpression(
+      parseScriptExpression("formatDateTime('2026-07-01T08:00:00Z')").node,
+      scope,
+    );
+
+    expect(lowered.diagnostics).toEqual([]);
+
+    const compiled = compileXmluiExpression(lowered.ir, lowered.dependencies);
+    const value = compiled.execute(testContext({ context: createXmluiAppContextObject() }));
+
+    expect(typeof value).toBe("string");
+    expect(String(value).length).toBeGreaterThan(0);
+  });
+
+  it("parses formatDateTime calls with the default app-context contract", () => {
+    const document = parseXmlui(
+      `<App><Button onClick="formatDateTime(getDate())" /></App>`,
+      { sourceId: "Main.xmlui" },
+    );
+    const button = document.root.children[0] as XmluiElement;
+    const bound = button.parsed?.events?.click;
+
+    expect(bound?.dependencies).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "context",
+          name: "formatDateTime",
+          path: ["formatDateTime"],
+        }),
+        expect.objectContaining({
+          kind: "reference",
+          name: "getDate",
+          path: ["getDate"],
+        }),
+      ]),
+    );
   });
 
   it("uses the injected app-context object as the semantic source of truth", async () => {

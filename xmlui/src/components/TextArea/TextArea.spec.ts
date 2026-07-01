@@ -146,6 +146,35 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveAttribute("rows", "5");
   });
 
+  test("autoSize without rows overrides the default row count", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea testId="autosize" autoSize="true" />
+        <TextArea testId="regular" />
+      </Fragment>
+    `);
+    const autosize = page.getByTestId("autosize").locator("textarea");
+    const regular = page.getByTestId("regular").locator("textarea");
+
+    await expect(autosize).toHaveAttribute("rows", "1");
+    await expect(regular).toHaveAttribute("rows", "2");
+
+    const autosizeBounds = await getBounds(autosize);
+    const regularBounds = await getBounds(regular);
+    const expectedAutoSizeHeight = await autosize.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return (
+        Number.parseFloat(style.lineHeight) +
+        Number.parseFloat(style.paddingTop) +
+        Number.parseFloat(style.paddingBottom) +
+        Number.parseFloat(style.borderTopWidth) +
+        Number.parseFloat(style.borderBottomWidth)
+      );
+    });
+    expect(autosizeBounds.height).toBe(expectedAutoSizeHeight);
+    expect(autosizeBounds.height).toBeLessThan(regularBounds.height);
+  });
+
   test("component handles special characters correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea />`);
     const specialText = "Hello 日本語 @#$%! 🚀 Unicode test 🎉";
@@ -558,6 +587,24 @@ test.describe("Visual States", () => {
     await expect(textarea).toHaveCSS("border-color", "rgb(255, 0, 0)");
     await expect(textarea).toHaveCSS("background-color", "rgb(0, 255, 0)");
     await expect(textarea).toHaveCSS("color", "rgb(0, 0, 255)");
+  });
+
+  test("default focus keeps the base border color and applies the focus outline", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<TextArea />`, {
+      testThemeVars: {
+        "borderColor-TextArea": "rgb(1, 2, 3)",
+        "borderColor-TextArea--hover": "rgb(4, 5, 6)",
+        "outlineColor-TextArea--focus": "rgb(7, 8, 9)",
+      },
+    });
+    const textarea = page.getByRole("textbox");
+
+    await textarea.focus();
+    await expect(textarea).toHaveCSS("border-color", "rgb(1, 2, 3)");
+    await expect(textarea).toHaveCSS("outline-color", "rgb(7, 8, 9)");
   });
 
   test("component handles hover state", async ({ initTestBed, page }) => {

@@ -19,9 +19,11 @@ import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
+import type { XmluiElement } from "../compiler/ir";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
+import "../component-core/behaviors/LabelBehavior.scss";
 
 ensureXmluiDebugBridge();
 
@@ -199,6 +201,7 @@ export function XmluiRoot({
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
     store.setInitialGlobalValue("appGlobals", appGlobals);
+    const rootApp = rootAppElement(module.root);
     const initialScope = createRuntimeScope({
       store,
       localOwnerId: rootOwnerId,
@@ -221,6 +224,15 @@ export function XmluiRoot({
       scope: initialScope,
       evaluate: evaluateExpressionOrText,
     });
+    if (rootApp && rootApp !== module.root) {
+      initializeStateValuesIntoStore({
+        kind: "global",
+        expressions: rootApp.globals,
+        parsed: rootApp.parsed?.globals,
+        scope: initialScope,
+        evaluate: evaluateExpressionOrText,
+      });
+    }
     initializeStateValuesIntoStore({
       kind: "local",
       ownerId: rootOwnerId,
@@ -229,6 +241,16 @@ export function XmluiRoot({
       scope: initialScope,
       evaluate: evaluateExpressionOrText,
     });
+    if (rootApp && rootApp !== module.root) {
+      initializeStateValuesIntoStore({
+        kind: "local",
+        ownerId: rootOwnerId,
+        expressions: rootApp.vars,
+        parsed: rootApp.parsed?.vars,
+        scope: initialScope,
+        evaluate: evaluateExpressionOrText,
+      });
+    }
     initializedRef.current = true;
   }
 
@@ -345,4 +367,16 @@ function routeModeFromApp(value: string | undefined, configValue: unknown): Rout
     return "history";
   }
   return "hash";
+}
+
+function rootAppElement(root: XmluiElement): XmluiElement | undefined {
+  if (root.type === "App") {
+    return root;
+  }
+  if (root.type !== "Theme") {
+    return undefined;
+  }
+  return root.children.find(
+    (child): child is XmluiElement => child.kind === "element" && child.type === "App",
+  );
 }
