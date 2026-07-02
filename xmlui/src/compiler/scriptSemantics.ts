@@ -1601,6 +1601,7 @@ function isBuiltInReferenceName(name: string): boolean {
   return name === "App" ||
     name === "Array" ||
     name === "Date" ||
+    name === "Math" ||
     name === "getDate" ||
     name === "confirm" ||
     name === "Symbol" ||

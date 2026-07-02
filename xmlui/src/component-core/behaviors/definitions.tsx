@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, useState, type ReactNode } from "react";
+import { Fragment, cloneElement, isValidElement, useState, type CSSProperties, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -7,6 +7,7 @@ import {
   parseAnimation,
   parseAnimationOptions,
 } from "../../components/Animation/AnimationReact";
+import { useFormContext } from "../../components/Form/FormContext";
 
 const responsiveWhenProps = {
   "when-xs": {
@@ -139,16 +140,7 @@ export const labelBehavior: Behavior = {
     },
   },
   canAttach: canAttachWhenTriggered("label"),
-  attach: (context, node) => (
-    <label
-      data-xmlui-behavior="label"
-      data-xmlui-label-position={stringValue(context.props.labelPosition)}
-      data-xmlui-label-width={stringValue(context.props.labelWidth)}
-    >
-      <span data-xmlui-part="label">{stringValue(context.props.label)}</span>
-      {node}
-    </label>
-  ),
+  attach: (context, node) => <LabelBehavior context={context}>{node}</LabelBehavior>,
 };
 
 export const variantBehavior: Behavior = {
@@ -379,6 +371,95 @@ function canAttachWhenTriggered(name: string) {
       hasTriggeredBehaviorProp(metadata, context.props)
     );
   };
+}
+
+function LabelBehavior({
+  children,
+  context,
+}: {
+  children: ReactNode;
+  context: BehaviorAttachContext;
+}) {
+  const form = useFormContext();
+  const child = isValidElement(children)
+    ? cloneElement(children, {
+        "data-testid": undefined,
+        "data-xmlui-id": undefined,
+        style: undefined,
+      } as Record<string, unknown>)
+    : children;
+  const childStyle = isValidElement(children)
+    ? (children.props as { style?: CSSProperties }).style
+    : undefined;
+  const position = normalizedLabelPosition(context.props.labelPosition);
+  const required = isTruthyWhenValue(context.props.required);
+  const requireLabelMode =
+    stringValue(context.props.requireLabelMode) ??
+    form?.itemRequireLabelMode ??
+    "markRequired";
+  const marker =
+    (required && (requireLabelMode === "markRequired" || requireLabelMode === "markBoth"))
+      ? "*"
+      : (!required && (requireLabelMode === "markOptional" || requireLabelMode === "markBoth"))
+        ? "(Optional)"
+        : undefined;
+  const labelWidth = stringValue(context.props.labelWidth);
+  const label = (
+    <span
+      key="label"
+      data-xmlui-part="label"
+      data-part-id="label"
+      style={{
+        flex: labelWidth ? `0 0 ${labelWidth}` : undefined,
+        width: labelWidth,
+        whiteSpace: context.props.labelBreak === true ? "normal" : "nowrap",
+      }}
+    >
+      {stringValue(context.props.label)}
+      {marker ? <span>{marker}</span> : null}
+    </span>
+  );
+  const orderedChildren = position === "end" || position === "bottom"
+    ? [<Fragment key="control">{child}</Fragment>, label]
+    : [label, <Fragment key="control">{child}</Fragment>];
+  return (
+    <label
+      data-xmlui-behavior="label"
+      data-xmlui-component={context.componentName}
+      data-xmlui-id={stringValue(context.props.id)}
+      data-xmlui-label-position={position}
+      data-xmlui-label-width={labelWidth}
+      data-testid={stringValue(context.props.testId)}
+    >
+      <span
+        data-xmlui-part="labeledItem"
+        data-part-id="labeledItem"
+        style={{
+          ...(childStyle ?? {}),
+          display: "flex",
+          flexDirection: position === "top" || position === "bottom" ? "column" : "row",
+          alignItems: position === "top" || position === "bottom" ? "stretch" : "center",
+          gap: "var(--xmlui-gap-label-TextBox, var(--xmlui-space-2, 0.5rem))",
+        }}
+      >
+        {orderedChildren}
+      </span>
+    </label>
+  );
+}
+
+function normalizedLabelPosition(value: unknown): "start" | "end" | "top" | "bottom" {
+  const position = stringValue(value);
+  if (position === "end" || position === "after") {
+    return "end";
+  }
+  if (position === "bottom") {
+    return "bottom";
+  }
+  if (position === "top") {
+    return "top";
+  }
+  return "start";
 }
 
 function TooltipBehavior({

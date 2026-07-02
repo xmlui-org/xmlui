@@ -1,578 +1,778 @@
-import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
+import React, {
+  type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./NumberBox.defaults";
-import {
-  applyStep,
-  clamp,
-  mapToRepresentation,
-  normalizeNumberInput,
-  toUsableNumber,
-} from "./numberbox-abstractions";
-import { useFormContext } from "../Form/FormContext";
 import styles from "./NumberBox.module.scss";
 
-export type NumberBoxProps = {
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useEvent } from "../../components-core/utils/misc";
+import {
+  clamp,
+  DECIMAL_SEPARATOR,
+  DEFAULT_STEP,
+  EXPONENTIAL_SEPARATOR,
+  FLOAT_REGEXP,
+  INT_REGEXP,
+  isEmptyLike,
+  isUsableNumber,
+  mapToRepresentation,
+  NUMBERBOX_MAX_VALUE,
+  toUsableNumber,
+} from "./numberbox-abstractions";
+import { type ValidationStatus } from "../abstractions";
+import { ThemedIcon } from "../Icon/Icon";
+import { Adornment } from "../Input/InputAdornment";
+import { ThemedButton as Button } from "../Button/Button";
+import { PART_CONCISE_VALIDATION_FEEDBACK, PART_END_ADORNMENT, PART_INPUT, PART_SPINNER_DOWN, PART_SPINNER_UP, PART_START_ADORNMENT } from "../../components-core/parts";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+
+import { defaultProps } from "./NumberBox.defaults";
+
+// =====================================================================================================================
+// React NumberBox component definition
+
+type Props = {
   id?: string;
-  bindTo?: string;
-  value?: unknown;
-  initialValue?: unknown;
-  className?: string;
+  value?: number | string | null;
+  initialValue?: number | string | null;
   style?: CSSProperties;
-  label?: unknown;
-  labelPosition?: "start" | "end" | "top" | "bottom" | string;
-  labelWidth?: string | number;
-  requireLabelMode?: string;
-  direction?: string;
-  placeholder?: string;
-  maxLength?: number;
+  className?: string;
+  classes?: Record<string, string>;
+  step?: number | string;
   enabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  autoFocus?: boolean;
-  tabIndex?: number;
-  inputMode?: "numeric" | "decimal";
-  startText?: unknown;
-  startIcon?: unknown;
-  endText?: unknown;
-  endIcon?: unknown;
-  gap?: string;
+  placeholder?: string;
   hasSpinBox?: boolean;
-  spinnerUpIcon?: string;
-  spinnerDownIcon?: string;
-  step?: unknown;
-  integersOnly?: boolean;
-  zeroOrPositive?: boolean;
+  validationStatus?: ValidationStatus;
   min?: number;
   max?: number;
+  maxLength?: number;
+  integersOnly?: boolean;
+  zeroOrPositive?: boolean;
+  updateState?: UpdateStateFn;
+  onDidChange?: (newValue: number | string | null | undefined) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  startText?: string;
+  startIcon?: string;
+  endText?: string;
+  endIcon?: string;
+  gap?: string;
+  spinnerUpIcon?: string;
+  spinnerDownIcon?: string;
+  autoFocus?: boolean;
+  readOnly?: boolean;
+  required?: boolean;
+  direction?: "ltr" | "rtl";
   verboseValidationFeedback?: boolean;
-  validationStatus?: string;
+  validationIconSuccess?: string;
+  validationIconError?: string;
   invalidMessages?: string[];
-  onDidChange?: (value: number | string | null) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
+  "aria-label"?: string;
 };
 
-export type NumberBoxApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  value: number | string | null;
-};
-
-export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(function NumberBoxNative(
+export const NumberBox = memo(forwardRef(function NumberBox(
   {
-    id,
-    bindTo,
+    id: idProp,
     value,
-    initialValue = defaultProps.initialValue,
-    className,
+    initialValue,
     style,
-    label,
-    labelPosition = "top",
-    labelWidth,
-    requireLabelMode,
-    direction,
-    placeholder,
-    maxLength,
+    className,
+    classes,
     enabled = defaultProps.enabled,
-    readOnly,
-    required,
-    autoFocus,
-    tabIndex,
-    inputMode,
-    startText,
-    startIcon,
-    endText,
-    endIcon,
-    gap,
+    placeholder,
+    validationStatus = defaultProps.validationStatus,
     hasSpinBox = defaultProps.hasSpinBox,
-    spinnerUpIcon = "chevronup",
-    spinnerDownIcon = "chevrondown",
     step = defaultProps.step,
     integersOnly = defaultProps.integersOnly,
     zeroOrPositive = defaultProps.zeroOrPositive,
     min = zeroOrPositive ? 0 : defaultProps.min,
     max = defaultProps.max,
+    maxLength,
+    updateState = defaultProps.updateState,
+    onDidChange = defaultProps.onDidChange,
+    onFocus = defaultProps.onFocus,
+    onBlur = defaultProps.onBlur,
+    registerComponentApi,
+    startText,
+    startIcon,
+    endText,
+    endIcon,
+    gap,
+    spinnerUpIcon,
+    spinnerDownIcon,
+    autoFocus,
+    readOnly,
+    required,
+    direction,
     verboseValidationFeedback,
-    validationStatus = defaultProps.validationStatus,
-    invalidMessages = defaultProps.invalidMessages,
-    onDidChange,
-    onFocus,
-    onBlur,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
+    "aria-label": ariaLabel,
     ...rest
-  },
-  ref,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const generatedInputId = useId();
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
-  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
-  const effectiveValue = formValue ?? value;
-  const controlled = effectiveValue !== undefined;
-  const boundedMin = Math.max(zeroOrPositive ? 0 : defaultProps.min, Number(min));
-  const boundedMax = Math.min(defaultProps.max, Number(max));
-  const parsedStep = parseStep(step);
-  const [localValue, setLocalValue] = useState(() =>
-    normalizeInitialValue(controlled ? effectiveValue : initialValue, integersOnly, boundedMin, boundedMax),
-  );
-  const [hadValidationError, setHadValidationError] = useState(false);
-  const [showValidFeedback, setShowValidFeedback] = useState(false);
-  const [conciseTooltipVisible, setConciseTooltipVisible] = useState(false);
+  const id = useFormItemInputId(idProp);
+  // --- Ensure the provided value is a number or null
+
+  // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
+  min = Math.max(zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE, min);
+
+  // Step must be an integer since floating point arithmetic needs a deeper dive.
+  // probably some way to integrate with https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat
+  // since there are footguns, like 0.1 + 0.2 = 0.0000...04
+  const _step = toUsableNumber(step, true) ?? DEFAULT_STEP;
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const upButton = useRef<HTMLButtonElement>(null);
+  const downButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (controlled) {
-      setLocalValue(normalizeInitialValue(effectiveValue, integersOnly, boundedMin, boundedMax));
-    }
-  }, [boundedMax, boundedMin, controlled, effectiveValue, integersOnly]);
-
-  useEffect(() => {
-    if (formError) {
-      setHadValidationError(true);
-      setShowValidFeedback(false);
-    }
-  }, [formError]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setLocalValue(normalizeInitialValue(initialValue, integersOnly, boundedMin, boundedMax));
-    }
-  }, [boundedMax, boundedMin, controlled, initialValue, integersOnly]);
-
-  useEffect(() => {
-    if (!autoFocus || !enabled) {
-      return;
-    }
-    const timeoutId = setTimeout(() => inputRef.current?.focus(), 0);
-    return () => clearTimeout(timeoutId);
-  }, [autoFocus, enabled]);
-
-  useEffect(() => {
-    if (
-      !getFormValue ||
-      !setFormValue ||
-      fieldName === undefined ||
-      getFormValue(fieldName) != null ||
-      initialValue === undefined
-    ) {
-      return;
-    }
-    setFormValue(fieldName, emitInitialValue(initialValue, integersOnly, boundedMin, boundedMax));
-  }, [boundedMax, boundedMin, fieldName, getFormValue, initialValue, integersOnly, setFormValue]);
-
-  const emitValue = useCallback((representation: string) => {
-    const usable = toUsableNumber(representation, integersOnly);
-    return representation === "" || representation === "-" ? null : usable ?? representation;
-  }, [integersOnly]);
-
-  const updateRepresentation = useCallback((representation: string, inputType?: string) => {
-    const next = normalizeRepresentation(
-      representation,
-      integersOnly,
-      zeroOrPositive,
-      boundedMin,
-      boundedMax,
-      inputType,
-      localValue,
-    );
-    setShowValidFeedback(false);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, emitValue(next));
-    }
-    setLocalValue(next);
-    void onDidChange?.(emitValue(next));
-  }, [boundedMax, boundedMin, emitValue, fieldName, integersOnly, localValue, onDidChange, setFormValue, zeroOrPositive]);
-
-  const stepBy = useCallback((direction: 1 | -1) => {
-    if (!enabled || readOnly) {
-      return;
-    }
-    const next = applyStep(localValue, parsedStep * direction, boundedMin, boundedMax, integersOnly);
-    if (next === undefined) {
-      return;
-    }
-    updateRepresentation(String(next));
-  }, [boundedMax, boundedMin, enabled, integersOnly, localValue, parsedStep, readOnly, updateRepresentation]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
+    if (autoFocus) {
+      setTimeout(() => {
         inputRef.current?.focus();
-      }
-    },
-    setValue: (nextValue) => updateRepresentation(mapToRepresentation(nextValue)),
-    get value() {
-      return emitValue(localValue);
-    },
-  }), [emitValue, enabled, localValue, updateRepresentation]);
-
-  const rootStyle = useMemo<CSSProperties>(() => ({
-    ...style,
-    ...(gap ? { "--xmlui-runtime-gap-NumberBox": gap } as CSSProperties : undefined),
-  }), [gap, style]);
-  const inputId = id ? `${id}__input` : generatedInputId;
-  const hasLabel = label !== undefined && label !== null && label !== "";
-  const labelText = stringifyValue(label);
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
-    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
-  const effectiveValidationStatus = formError
-    ? "error"
-    : !effectiveVerboseValidationFeedback && showValidFeedback
-      ? "valid"
-      : validationStatus;
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
+      }, 0);
     }
-    return registerFormItem({
-      name: fieldName,
-      label: labelText,
-      required,
-    });
-  }, [fieldName, labelText, registerFormItem, required]);
+  }, [autoFocus]);
 
-  const labelNode = hasLabel ? (
-    <label
-      data-part-id="label"
-      data-xmlui-part="label"
-      htmlFor={inputId}
-      className={styles.numberBoxLabel}
-    >
-      <span style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}>
-        {labelText}
-        {showRequiredIndicator ? <span className={styles.numberBoxLabelRequired}>*</span> : null}
-        {showOptionalIndicator ? <span className={styles.numberBoxLabelOptional}>(Optional)</span> : null}
-      </span>
-    </label>
-  ) : null;
-  const inputRoot = (
-    <div
-      {...(!hasLabel ? rest : undefined)}
-      data-part-id="input"
-      data-xmlui-part="input"
-      className={cx(
-        styles.numberBoxRoot,
-        !enabled ? styles.numberBoxDisabled : undefined,
-        readOnly ? styles.numberBoxReadOnly : undefined,
-        effectiveValidationStatus === "error" ? styles.numberBoxError : undefined,
-        effectiveValidationStatus === "warning" ? styles.numberBoxWarning : undefined,
-        effectiveValidationStatus === "valid" ? styles.numberBoxSuccess : undefined,
-        !hasLabel ? className : undefined,
-      )}
-      style={!hasLabel ? rootStyle : undefined}
-    >
-      <Adornment partId="startAdornment" text={startText} icon={startIcon} />
-      <input
-        id={inputId}
-        ref={inputRef}
-        data-part-id="input"
-        data-xmlui-part="input"
-        className={styles.numberBoxInput}
-        type="text"
-        role="spinbutton"
-        inputMode={inputMode ?? (integersOnly ? "numeric" : "decimal")}
-        value={localValue}
-        placeholder={placeholder}
-        maxLength={maxLength}
-        disabled={!enabled}
-        readOnly={readOnly}
-        required={required}
-        tabIndex={enabled ? tabIndex : -1}
-        aria-valuemin={Number.isFinite(boundedMin) ? boundedMin : undefined}
-        aria-valuemax={Number.isFinite(boundedMax) ? boundedMax : undefined}
-        aria-valuenow={toUsableNumber(localValue, integersOnly) ?? undefined}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          const nativeEvent = event.nativeEvent as InputEvent | undefined;
-          updateRepresentation(event.currentTarget.value, nativeEvent?.inputType);
-        }}
-        onFocus={(_event: FocusEvent<HTMLInputElement>) => void onFocus?.()}
-        onBlur={(_event: FocusEvent<HTMLInputElement>) => {
-          const next = normalizeBlurRepresentation(localValue, integersOnly, zeroOrPositive, boundedMin, boundedMax);
-          if (next !== localValue) {
-            if (setFormValue && fieldName !== undefined) {
-              setFormValue(fieldName, emitValue(next));
-            }
-            setLocalValue(next);
-            void onDidChange?.(emitValue(next));
-          }
-          void onBlur?.();
-          if (!validateFormField || fieldName === undefined || !hadValidationError) {
-            return;
-          }
-          void validateFormField(fieldName, emitValue(next)).then((message) => {
-            setShowValidFeedback(!message);
-          });
-        }}
-        onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
-          if (event.key === "ArrowUp") {
-            event.preventDefault();
-            stepBy(1);
-          } else if (event.key === "ArrowDown") {
-            event.preventDefault();
-            stepBy(-1);
-          } else if (event.key === "-" && !zeroOrPositive) {
-            event.preventDefault();
-            updateRepresentation(applyMinusKey(event.currentTarget));
-          } else if (event.key === "." && !integersOnly) {
-            const next = applyDecimalKey(event.currentTarget);
-            if (next !== undefined) {
-              event.preventDefault();
-              updateRepresentation(next);
-            }
-          }
-        }}
-      />
-      <Adornment partId="endAdornment" text={endText} icon={endIcon} />
-      {hasSpinBox ? (
-        <span className={styles.numberBoxSpinner}>
-          <button
-            type="button"
-            data-part-id="spinnerUp"
-            data-xmlui-part="spinnerUp"
-            className={styles.numberBoxSpinnerButton}
-            disabled={!enabled}
-            tabIndex={-1}
-            aria-label="Increment"
-            onClick={() => stepBy(1)}
-          >
-            <span role="img" aria-label={spinnerUpIcon} data-icon-name={spinnerUpIcon} className={styles.numberBoxIconMarker} />
-          </button>
-          <button
-            type="button"
-            data-part-id="spinnerDown"
-            data-xmlui-part="spinnerDown"
-            className={styles.numberBoxSpinnerButton}
-            disabled={!enabled}
-            tabIndex={-1}
-            aria-label="Decrement"
-            onClick={() => stepBy(-1)}
-          >
-            <span role="img" aria-label={spinnerDownIcon} data-icon-name={spinnerDownIcon} className={styles.numberBoxIconMarker} />
-          </button>
-        </span>
-      ) : null}
-      {!effectiveVerboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
-        <span
-          data-part-id="conciseValidationFeedback"
-          data-xmlui-part="conciseValidationFeedback"
-          className={styles.numberBoxConciseFeedback}
-          onMouseEnter={() => setConciseTooltipVisible(true)}
-          onMouseLeave={() => setConciseTooltipVisible(false)}
-          onFocus={() => setConciseTooltipVisible(true)}
-          onBlur={() => setConciseTooltipVisible(false)}
-          tabIndex={-1}
-        >
-          <span
-            data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
-            className={styles.numberBoxIconMarker}
-          />
-          {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
-            <span data-tooltip-container role="tooltip" className={styles.numberBoxConciseTooltip}>
-              {effectiveInvalidMessages.join("\n")}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
-    </div>
-  );
-  const validationFeedback = effectiveVerboseValidationFeedback && effectiveInvalidMessages?.length ? (
-    <div data-xmlui-part="error">
-      {effectiveInvalidMessages.map((message, index) => (
-        <div key={index}>{message}</div>
-      ))}
-    </div>
-  ) : null;
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  if (!hasLabel) {
-    return (
-      <>
-        {inputRoot}
-        {validationFeedback}
-      </>
-    );
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
   }
 
+  // --- Convert to representable string value (from number | null | undefined)
+  const [valueStrRep, setValueStrRep] = React.useState<string>(mapToRepresentation(value));
+  useEffect(() => {
+    setValueStrRep(mapToRepresentation(value));
+  }, [value]);
+
+  // --- Initialize the related field with the input's initial value
+  // Validate initialValue: only store usable numbers, reject non-numeric strings
+  useEffect(() => {
+    const parsed = toUsableNumber(initialValue, integersOnly);
+    updateState({ value: isEmptyLike(initialValue) ? null : parsed }, { initial: true });
+  }, [initialValue, integersOnly, updateState]);
+
+  // --- Handle the value change events for this input
+  const updateValue = useCallback(
+    (newValue: string | number | null | undefined, rep: string) => {
+      setValueStrRep(rep);
+      updateState({ value: newValue });
+      onDidChange(newValue);
+    },
+    [onDidChange, updateState],
+  );
+
+  // --- Keypress
+  const onInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+      const repr = newValue;
+
+      if (newValue === "" || newValue === "-" ) {
+        updateValue(null, repr);
+        return;
+      }
+      if (isUsableNumber(newValue, integersOnly)) {
+        let usableNumber = toUsableNumber(newValue, integersOnly);
+        usableNumber = clamp(usableNumber as number, min, max);
+        updateValue(usableNumber, repr);
+        return;
+      }
+      setValueStrRep(repr);
+      onDidChange(newValue);
+    },
+    [updateValue, integersOnly, onDidChange, min, max],
+  );
+
+  // --- Stepper logic
+  const handleIncStep = useCallback(() => {
+    if (readOnly) return;
+    const newValue = applyStep(valueStrRep, _step, min, max, integersOnly);
+
+    if (newValue === undefined) return;
+    updateValue(newValue, newValue.toString());
+  }, [valueStrRep, _step, min, max, integersOnly, updateValue, readOnly]);
+
+  const handleDecStep = useCallback(() => {
+    if (readOnly) return;
+    const newValue = applyStep(valueStrRep, -_step, min, max, integersOnly);
+
+    if (newValue === undefined) return;
+    updateValue(newValue, newValue.toString());
+  }, [valueStrRep, _step, min, max, integersOnly, updateValue, readOnly]);
+
+  // --- Register stepper logic to buttons
+  useLongPress(upButton.current, handleIncStep);
+  useLongPress(downButton.current, handleDecStep);
+
+  // --- Shared character validation logic
+  const processCharacterInput = useCallback(
+    (
+      char: string,
+      currentValue: string,
+      currentPos: number,
+      predictedValue: string,
+      isForPaste: boolean = false,
+    ): {
+      shouldAccept: boolean;
+      newValue?: string;
+      newPos?: number;
+      shouldPreventDefault?: boolean;
+    } => {
+      // --- Are the caret after the exponential separator?
+      const beforeCaret = currentValue.substring(0, currentPos);
+      const expPos = beforeCaret.indexOf(EXPONENTIAL_SEPARATOR);
+
+      let shouldAccept = true;
+      let shouldPreventDefault = false;
+      let newValue = currentValue;
+      let newPos = currentPos;
+
+      switch (char) {
+        case "-":
+          shouldAccept = false;
+          shouldPreventDefault = true;
+          if (zeroOrPositive) {
+            // --- No minus sign allowed
+            break;
+          }
+          if (expPos === -1) {
+            // --- Change the first char to "-" if we are before the exponential separator and it's not already there
+            if (!currentValue.startsWith("-")) {
+              newValue = "-" + currentValue;
+              newPos = currentPos + 1;
+            }
+          } else {
+            // --- Change the char after the exponential separator to "-" if it's not already there
+            if (currentValue[expPos + 1] !== "-") {
+              newValue =
+                currentValue.substring(0, expPos + 1) + "-" + currentValue.substring(expPos + 1);
+              newPos = currentPos + 1;
+            }
+          }
+          break;
+        case "+":
+          shouldAccept = false;
+          shouldPreventDefault = true;
+          if (expPos === -1) {
+            // --- Remove the first char if it's "-" and we are before the exponential separator
+            if (currentValue.startsWith("-")) {
+              newValue = currentValue.substring(1);
+              newPos = Math.max(0, currentPos - 1);
+            }
+          } else {
+            // --- Remove the char after the exponential separator if it's "-"
+            if (currentValue[expPos + 1] === "-") {
+              newValue = currentValue.substring(0, expPos + 1) + currentValue.substring(expPos + 2);
+              newPos = Math.max(expPos + 1, currentPos - 1);
+            }
+          }
+          break;
+        case "0":
+          // --- Prevent leading zeros (before decimal or exponential separator)
+          if (currentValue === "0") {
+            shouldAccept = false;
+            shouldPreventDefault = true;
+          }
+          break;
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+          // --- Replace leading zero with this digit
+          if (currentValue === "0" && currentPos === 1) {
+            if (isForPaste) {
+              newValue = char;
+              shouldAccept = false; // Don't add it again for paste
+            } else {
+              newValue = char;
+              newPos = 1;
+              shouldPreventDefault = true;
+            }
+          }
+          break;
+        case DECIMAL_SEPARATOR:
+          // --- Prevent multiple decimal separators (integers only),
+          // --- or decimal separator after the exponential separator
+          if (integersOnly || currentValue.includes(DECIMAL_SEPARATOR) || expPos !== -1) {
+            shouldAccept = false;
+            shouldPreventDefault = true;
+          } else if (predictedValue.startsWith(DECIMAL_SEPARATOR) && currentPos === 0) {
+            newValue = "0" + predictedValue;
+            newPos = currentPos + 2;
+            shouldPreventDefault = true;
+          }
+          break;
+        case EXPONENTIAL_SEPARATOR:
+          // --- Prevent exponential notation for integers
+          if (integersOnly) {
+            shouldAccept = false;
+            shouldPreventDefault = true;
+            break;
+          }
+          // --- Prevent multiple exponential separators
+          if (currentValue.includes(EXPONENTIAL_SEPARATOR)) {
+            shouldAccept = false;
+            shouldPreventDefault = true;
+          }
+          break;
+        default:
+          // --- Only allow digits for single characters
+          if (char >= "0" && char <= "9") {
+            // --- Prevent digits before minus sign
+            if (currentValue.startsWith("-") && currentPos === 0) {
+              shouldAccept = false;
+              shouldPreventDefault = true;
+              break;
+            }
+
+            // --- For beforeInput, check for too many digits after exponential separator
+            if (!isForPaste && expPos !== -1) {
+              const tooManyDigitsAfterExponentialSeparator = (
+                pos: number,
+                maxDigits: number,
+              ): boolean => {
+                let numDigitsAfter = 0;
+                while (pos < currentValue.length) {
+                  if (/\d/.test(currentValue[pos++])) {
+                    numDigitsAfter++;
+                  } else {
+                    numDigitsAfter = maxDigits + 1;
+                    break;
+                  }
+                }
+                return numDigitsAfter > maxDigits;
+              };
+
+              if (tooManyDigitsAfterExponentialSeparator(expPos + 1, 1)) {
+                shouldAccept = false;
+                shouldPreventDefault = true;
+              }
+            }
+          } else {
+            // --- Reject non-digit characters
+            shouldAccept = false;
+            shouldPreventDefault = true;
+          }
+          break;
+      }
+
+      return { shouldAccept, newValue, newPos, shouldPreventDefault };
+    },
+    [integersOnly, zeroOrPositive],
+  );
+
+  // --- This logic prevents the user from typing invalid characters (in the current typing context)
+  // NOTE: the typing is done so 
+  const handleOnBeforeInput = (event: React.FormEvent<HTMLInputElement> & { data: string | null }) => {
+    const target = event.target as HTMLInputElement;
+    const currentValue: string = target.value ?? "";
+    const currentPos = target.selectionStart;
+    const expectedNewValue =
+      currentValue.substring(0, currentPos) +
+      event.data +
+      currentValue.substring(target.selectionEnd);
+
+    // --- Handle multi-character input (paste) through the legacy path
+    if (event.data?.length > 1) {
+      let shouldPreventDefault = false;
+      const selectionStart = target.selectionStart;
+      let newInput = event.data;
+
+      // --- Decide whether to accept the optional sign character
+      if (newInput.startsWith("-")) {
+        if (selectionStart > 0) {
+          shouldPreventDefault = true;
+        }
+      } else if (newInput.startsWith("+")) {
+        shouldPreventDefault = true;
+      }
+
+      if (!shouldPreventDefault) {
+        // --- Check for integers
+        if (integersOnly && !INT_REGEXP.test(expectedNewValue)) {
+          // --- The result is not an integer, drop the pasted input
+          shouldPreventDefault = true;
+        } else if (!FLOAT_REGEXP.test(expectedNewValue)) {
+          // --- The result is not a float, drop the pasted input
+          shouldPreventDefault = true;
+        }
+      }
+
+      if (shouldPreventDefault) {
+        event.preventDefault();
+      }
+      return;
+    }
+
+    // --- Single character processing
+    const result = processCharacterInput(
+      event.data,
+      currentValue,
+      currentPos,
+      expectedNewValue,
+      false,
+    );
+
+    if (result.shouldPreventDefault) {
+      event.preventDefault();
+    }
+
+    // --- Apply value changes if needed
+    if (result.newValue !== currentValue) {
+      target.value = result.newValue!;
+      updateValue(result.newValue!, result.newValue!);
+      inputRef.current?.setSelectionRange(result.newPos!, result.newPos!);
+    }
+  };
+
+  // --- Handle paste events by applying the same character validation logic
+  const handleOnPaste = useCallback(
+    (event: React.ClipboardEvent<HTMLInputElement>) => {
+      event.preventDefault();
+
+      const pastedText = event.clipboardData.getData("text/plain");
+      if (!pastedText) return;
+
+      const inputElement = event.currentTarget;
+      const currentValue = inputElement.value ?? "";
+      const selectionStart = inputElement.selectionStart ?? 0;
+      const selectionEnd = inputElement.selectionEnd ?? 0;
+      const expectedNewValue =
+        currentValue.substring(0, selectionStart) +
+        pastedText +
+        currentValue.substring(selectionEnd);
+
+      // --- Start with the value before the selection
+      let resultValue = currentValue.substring(0, selectionStart);
+      let currentPos = selectionStart;
+
+      // --- Process each character from the pasted text
+      for (let i = 0; i < pastedText.length; i++) {
+        const char = pastedText[i];
+
+        const result = processCharacterInput(char, resultValue, currentPos, expectedNewValue, true);
+
+        if (result.shouldAccept) {
+          resultValue =
+            resultValue.substring(0, currentPos) + char + resultValue.substring(currentPos);
+          currentPos++;
+        } else if (result.newValue !== resultValue) {
+          // --- Handle special cases like sign changes or zero replacement
+          resultValue = result.newValue!;
+          currentPos = result.newPos!;
+        }
+      }
+
+      // --- Add the rest of the original value after the selection
+      resultValue += currentValue.substring(selectionEnd);
+
+      // --- Final validation - ensure the result is a valid number format
+      let isValidFinal = false;
+      if (integersOnly) {
+        isValidFinal = INT_REGEXP.test(resultValue) || resultValue === "" || resultValue === "-";
+      } else {
+        isValidFinal = FLOAT_REGEXP.test(resultValue) || resultValue === "" || resultValue === "-";
+      }
+
+      // --- Apply the result if valid
+      if (isValidFinal) {
+        inputElement.value = resultValue;
+        updateValue(resultValue, resultValue);
+        inputElement.setSelectionRange(currentPos, currentPos);
+      }
+    },
+    [processCharacterInput, updateValue, integersOnly],
+  );
+
+  // --- Setting steppers with keyboard
+  const handleOnKey = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.code === "ArrowUp") {
+        event.preventDefault();
+        handleIncStep();
+      }
+      if (event.code === "ArrowDown") {
+        event.preventDefault();
+        handleDecStep();
+      }
+    },
+    [handleIncStep, handleDecStep],
+  );
+
+  // --- Manage obtaining and losing focus & blur
+  const handleOnFocus = useCallback(() => {
+    onFocus?.();
+  }, [onFocus]);
+
+  const handleOnBlur = useCallback(() => {
+    // --- Get the current input value
+    const currentInputValue = inputRef.current?.value ?? "";
+
+    // --- Check if we need to add a trailing zero
+    let finalValue = currentInputValue;
+    if (!integersOnly && currentInputValue.endsWith(DECIMAL_SEPARATOR)) {
+      // --- Add trailing zero if the value ends with decimal separator
+      finalValue = currentInputValue + "0";
+    }
+
+    // --- Convert to number and clamp to min/max bounds
+    const numericValue = toUsableNumber(finalValue, integersOnly);
+    if (!isEmptyLike(numericValue)) {
+      const clampedValue = clamp(numericValue, min, max);
+      if (clampedValue !== numericValue) {
+        const clampedString = clampedValue.toString();
+        finalValue = clampedString;
+
+        // --- Update the input field immediately
+        if (inputRef.current) {
+          inputRef.current.value = clampedString;
+        }
+      }
+    }
+
+    // --- Update the state if the final value is different from current input
+    if (finalValue !== currentInputValue) {
+      updateValue(finalValue, finalValue);
+    } else {
+      // --- Use the standard representation mapping
+      setValueStrRep(mapToRepresentation(value));
+    }
+
+    onBlur?.();
+  }, [value, onBlur, integersOnly, updateValue, min, max]);
+
+  const focus = useCallback(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const setValue = useEvent((newValue) => {
+    updateValue(newValue, isEmptyLike(newValue) ? "" : String(newValue));
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+    });
+  }, [focus, registerComponentApi, setValue]);
+
   return (
-    <div {...rest} className={className} style={rootStyle}>
-      <div
-        className={cx(styles.numberBoxLabeledItem, labelPositionClass(labelPosition, direction))}
-        data-part-id="labeledItem"
-        data-xmlui-part="labeledItem"
-        dir={direction === "rtl" ? "rtl" : direction === "ltr" ? "ltr" : undefined}
-      >
-        {labelNode}
-        {inputRoot}
-      </div>
-      {validationFeedback}
+    <div
+      {...rest}
+      className={classnames(styles.inputRoot, classes?.[COMPONENT_PART_KEY], className, {
+        [styles.readOnly]: readOnly,
+        [styles.disabled]: !enabled,
+        [styles.noSpinBox]: !hasSpinBox,
+        [styles.error]: validationStatus === "error",
+        [styles.warning]: validationStatus === "warning",
+        [styles.valid]: validationStatus === "valid",
+        [styles.rtl]: direction === "rtl",
+      })}
+      ref={forwardedRef}
+      aria-label={ariaLabel}
+      tabIndex={-1}
+      onFocus={() => {
+        inputRef.current?.focus();
+      }}
+      style={{ ...style, gap }}
+      dir={direction}
+    >
+      <Part partId={PART_START_ADORNMENT}>
+        <Adornment text={startText} iconName={startIcon} className={classnames(styles.adornment)} />
+      </Part>
+      <Part partId={PART_INPUT}>
+        <input
+          id={id}
+          role="spinbutton"
+          type="text"
+          inputMode="numeric"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={isUsableNumber(valueStrRep, integersOnly) ? toUsableNumber(valueStrRep, integersOnly) as number : undefined}
+          className={classnames(styles.input, {
+            [styles.readOnly]: readOnly,
+          })}
+          disabled={!enabled}
+          value={valueStrRep}
+          step={step}
+          placeholder={placeholder}
+          onChange={onInputChange}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          onBeforeInput={handleOnBeforeInput}
+          onPaste={handleOnPaste}
+          onKeyDown={handleOnKey}
+          readOnly={readOnly}
+          ref={inputRef}
+          autoFocus={autoFocus}
+          maxLength={maxLength}
+          required={required}
+        />
+      </Part>
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
+        </Part>
+      )}
+      <Part partId={PART_END_ADORNMENT}>
+        <Adornment text={endText} iconName={endIcon} className={classnames(styles.adornment)} />
+      </Part>
+      {hasSpinBox && (
+        <div className={styles.spinnerBox}>
+          <Part partId={PART_SPINNER_UP}>
+            <Button
+              data-spinner="up"
+              type="button"
+              variant={"ghost"}
+              themeColor={"secondary"}
+              tabIndex={-1}
+              className={styles.spinnerButton}
+              disabled={!enabled || readOnly}
+              ref={upButton}
+              aria-label={ariaLabel ? `Increase ${ariaLabel}` : "Increase"}
+            >
+              <ThemedIcon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
+            </Button>
+          </Part>
+
+          <Part partId={PART_SPINNER_DOWN}>
+            <Button
+              data-spinner="down"
+              type="button"
+              tabIndex={-1}
+              variant={"ghost"}
+              themeColor={"secondary"}
+              className={styles.spinnerButton}
+              disabled={!enabled || readOnly}
+              ref={downButton}
+              aria-label={ariaLabel ? `Decrease ${ariaLabel}` : "Decrease"}
+            >
+              <ThemedIcon
+                name={spinnerDownIcon || "spinnerDown:NumberBox"}
+                fallback="chevrondown"
+                size="sm"
+              />
+            </Button>
+          </Part>
+        </div>
+      )}
     </div>
   );
 }));
 
-function Adornment({
-  partId,
-  text,
-  icon,
-}: {
-  partId: "startAdornment" | "endAdornment";
-  text?: unknown;
-  icon?: unknown;
-}) {
-  const iconName = typeof icon === "string" && icon !== "" ? icon : undefined;
-  const content = text !== undefined && text !== null && text !== "" ? String(text) : undefined;
-  if (!iconName && content === undefined) {
-    return <span data-part-id={partId} data-xmlui-part={partId} className={styles.numberBoxAdornment} hidden />;
-  }
-  return (
-    <span data-part-id={partId} data-xmlui-part={partId} className={styles.numberBoxAdornment}>
-      {iconName ? <span role="img" aria-label={iconName} data-icon-name={iconName} className={styles.numberBoxIconMarker} /> : null}
-      {content}
-    </span>
-  );
-}
-
-function normalizeInitialValue(value: unknown, integerOnly: boolean, min: number, max: number): string {
-  const usable = toUsableNumber(value, integerOnly);
-  if (usable === null) {
-    return "";
-  }
-  return String(clamp(usable, min, max));
-}
-
-function emitInitialValue(value: unknown, integerOnly: boolean, min: number, max: number): number | string | null {
-  const representation = normalizeInitialValue(value, integerOnly, min, max);
-  const usable = toUsableNumber(representation, integerOnly);
-  return representation === "" || representation === "-" ? null : usable ?? representation;
-}
-
-function normalizeRepresentation(
-  value: string,
-  integerOnly: boolean,
-  zeroOrPositive: boolean,
+function applyStep(
+  valueStrRep: string,
+  step: number,
   min: number,
   max: number,
-  inputType?: string,
-  previousValue = "",
-): string {
-  const normalized = normalizeNumberInput(value, integerOnly, zeroOrPositive);
-  if (normalized === "" || normalized === "-") {
-    return normalized;
+  integersOnly: boolean,
+) {
+  const currentValue = toUsableNumber(valueStrRep, integersOnly);
+  if (isEmptyLike(currentValue)) return;
+
+  const clampedValue = clamp(currentValue + step, min, max);
+  const fractionLength = valueStrRep.split('.')[1]?.length ?? 0;
+  return roundTo(clampedValue, fractionLength);
+
+  // ---
+
+  function roundTo(n: number, digits: number | undefined) {
+    let negative = false;
+    if (digits === undefined) {
+      digits = 0;
+    }
+    if (n < 0) {
+      negative = true;
+      n = n * -1;
+    }
+    const multiplicator = Math.pow(10, digits);
+    n = n + (Math.pow(10, - digits - 1));
+    n = parseFloat((n * multiplicator).toFixed(11));
+    n = +((Math.round(n) / multiplicator).toFixed(digits));
+    if (negative) {
+      n = +((n * -1).toFixed(digits));
+    }
+    return n;
   }
-  if (/[eE]/.test(normalized) && !isCompleteScientificNotation(normalized)) {
-    const malformedScientificReplacement = previousValue === "" && /^-?\d/.test(normalized) && /[eE].*\./.test(normalized);
-    return inputType === "insertReplacementText" || malformedScientificReplacement ? "" : normalized;
-  }
-  if (!integerOnly && /^-?\d+\.$/.test(normalized)) {
-    return normalized;
-  }
-  const usable = toUsableNumber(normalized, integerOnly);
-  if (usable === null) {
-    return normalized;
-  }
-  return String(clamp(usable, min, max));
 }
 
-function normalizeBlurRepresentation(
-  value: string,
-  integerOnly: boolean,
-  zeroOrPositive: boolean,
-  min: number,
-  max: number,
-): string {
-  if (value === "" || value === "-") {
-    return value;
-  }
-  if (/^[eE]$/.test(value)) {
-    return "";
-  }
-  if (value === ".") {
-    return "0.0";
-  }
-  if (/^-?\d+\.$/.test(value)) {
-    return `${value}0`;
-  }
-  if (/[eE]/.test(value) && !isCompleteScientificNotation(value)) {
-    return normalizeRepresentation(value.replace(/[eE]/, ""), integerOnly, zeroOrPositive, min, max);
-  }
-  return normalizeRepresentation(value, integerOnly, zeroOrPositive, min, max);
-}
+function useLongPress(elementRef: HTMLElement | null, action: () => void, delay: number = 500) {
+  const timeoutId = useRef(0);
+  const intervalId = useRef(0);
+  const savedAction = useRef<() => void>(action);
 
-function isCompleteScientificNotation(value: string): boolean {
-  return /^-?\d+(\.\d+)?[eE][+-]?\d+$/.test(value);
-}
+  // Remember the latest action callback, since it is different every render
+  useEffect(() => {
+    savedAction.current = action;
+  }, [action]);
 
-function applyMinusKey(input: HTMLInputElement): string {
-  const value = input.value;
-  const selectionStart = input.selectionStart ?? value.length;
-  const exponentIndex = value.toLowerCase().indexOf("e");
-  if (exponentIndex >= 0 && selectionStart > exponentIndex) {
-    const signIndex = exponentIndex + 1;
-    return value[signIndex] === "-"
-      ? `${value.slice(0, signIndex)}${value.slice(signIndex + 1)}`
-      : `${value.slice(0, signIndex)}-${value.slice(signIndex)}`;
-  }
-  return value.startsWith("-") ? value.slice(1) : `-${value}`;
-}
+  useEffect(() => {
+    const onMouseDown = () => {
+      savedAction.current?.();
 
-function applyDecimalKey(input: HTMLInputElement): string | undefined {
-  const value = input.value;
-  const selectionStart = input.selectionStart ?? value.length;
-  const selectionEnd = input.selectionEnd ?? selectionStart;
-  if (value.includes(".")) {
-    return value;
-  }
-  const next = `${value.slice(0, selectionStart)}.${value.slice(selectionEnd)}`;
-  return next.startsWith(".") ? `0${next}` : next;
-}
+      timeoutId.current = window.setTimeout(() => {
+        intervalId.current = window.setInterval(() => {
+          savedAction.current?.();
+        }, 100);
+      }, delay);
+    };
 
-function parseStep(value: unknown): number {
-  const parsed = toUsableNumber(value, true);
-  return parsed === null || parsed === 0 ? defaultProps.step : parsed;
-}
+    const onMouseUp = () => {
+      clearTimeout(timeoutId.current);
+      clearInterval(intervalId.current);
+    };
 
-function stringifyValue(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
+    const onMouseOut = () => {
+      clearTimeout(timeoutId.current);
+      clearInterval(intervalId.current);
+    };
 
-function cssLength(value: string | number): string {
-  return typeof value === "number" ? `${value}px` : value;
-}
+    elementRef?.addEventListener("mousedown", onMouseDown);
+    elementRef?.addEventListener("mouseup", onMouseUp);
+    elementRef?.addEventListener("mouseout", onMouseOut);
 
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
-
-function labelPositionClass(value: string, direction?: string): string {
-  const normalized = value === "before"
-    ? direction === "rtl" ? "end" : "start"
-    : value === "after"
-      ? direction === "rtl" ? "start" : "end"
-      : value;
-  if (normalized === "start") {
-    return styles.numberBoxLabelPositionStart;
-  }
-  if (normalized === "end") {
-    return styles.numberBoxLabelPositionEnd;
-  }
-  if (normalized === "bottom") {
-    return styles.numberBoxLabelPositionBottom;
-  }
-  return styles.numberBoxLabelPositionTop;
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
+    return () => {
+      elementRef?.removeEventListener("mousedown", onMouseDown);
+      elementRef?.removeEventListener("mouseup", onMouseUp);
+      elementRef?.removeEventListener("mouseout", onMouseOut);
+    };
+  }, [elementRef, action, delay]);
 }

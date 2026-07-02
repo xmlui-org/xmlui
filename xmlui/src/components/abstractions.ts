@@ -1,7 +1,9 @@
-type PropertyValueDescription<T extends string = string> = {
+export type PropertyValueDescription<T extends string = string> = {
   value: T;
   description: string;
 };
+
+export type ValidationStatus = "none" | "error" | "warning" | "valid" | string;
 
 export const buttonThemeValues = ["attention", "primary", "secondary"] as const;
 export const buttonThemeNames = [...buttonThemeValues];

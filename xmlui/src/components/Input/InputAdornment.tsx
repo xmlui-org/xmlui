@@ -1,47 +1,39 @@
-import type { HTMLAttributes } from "react";
+import classnames from "classnames";
 
-import { Icon } from "../Icon/IconReact";
 import styles from "./InputAdornment.module.scss";
 
-type AdornmentProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedText as Text } from "../Text/Text";
+
+interface AdornmentProps {
   iconName?: string;
   text?: string;
   className?: string;
   onClick?: () => void;
   tabIndex?: number;
-};
+}
 
-export function Adornment({
-  iconName,
-  text,
-  className,
-  onClick,
-  tabIndex,
-  ...rest
-}: AdornmentProps) {
-  if (!iconName && !text) {
-    return null;
-  }
-
+export function Adornment({ iconName, text, className, onClick, tabIndex, ...rest }: AdornmentProps) {
   return (
-    <div
-      {...rest}
-      className={cx(styles.wrapper, className, onClick && styles.clickable)}
-      role={onClick ? "button" : "presentation"}
-      onClick={onClick}
-      tabIndex={tabIndex ?? (onClick ? 0 : undefined)}
-    >
-      {iconName ? <Icon name={iconName} /> : null}
-      {text ? (
-        <div className={styles.text}>
-          <span className={styles.textContent}>{text}</span>
+    <>
+      {iconName || text ? (
+        <div
+          {...rest}
+          className={classnames(styles.wrapper, className, {
+            [styles.clickable]: !!onClick,
+          })}
+          role={onClick ? "button" : "presentation"}
+          onClick={onClick}
+          tabIndex={tabIndex ?? (onClick ? 0 : undefined)}
+        >
+          <ThemedIcon name={iconName} style={{ color: "inherit" }} />
+          {text && (
+            <div style={{ display: "flex", userSelect: "none" }}>
+              <Text variant="inherit">{text}</Text>
+            </div>
+          )}
         </div>
       ) : null}
-    </div>
+    </>
   );
 }
-
-function cx(...classes: Array<string | false | undefined>): string {
-  return classes.filter(Boolean).join(" ");
-}
-

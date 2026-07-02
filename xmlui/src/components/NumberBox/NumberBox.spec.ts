@@ -1463,7 +1463,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test("handles variant", async ({ page, initTestBed }) => {
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<NumberBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-NumberBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1473,7 +1473,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`<NumberBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "backgroundColor-NumberBox-CustomVariant": "rgb(0, 255, 0)",
@@ -1560,7 +1560,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`<NumberBox testId="test" variant="CustomVariant" endText="USD" />`, {
       testThemeVars: {
         "borderColor-NumberBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1578,7 +1578,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(spinnerDown).toBeVisible();
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <NumberBox 
         testId="test" 

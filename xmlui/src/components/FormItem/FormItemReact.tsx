@@ -15,7 +15,7 @@ import { FormProvider, useFormContext, type FormContextValue } from "../Form/For
 import { SelectNative } from "../Select/SelectReact";
 import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
 import { SliderNative } from "../Slider/SliderReact";
-import { NumberBoxNative } from "../NumberBox/NumberBoxReact";
+import { NumberBox as NumberBoxNative } from "../NumberBox/NumberBoxReact";
 import { ColorPickerNative } from "../ColorPicker/ColorPickerReact";
 import { DateInputNative } from "../DateInput/DateInputReact";
 import { DatePickerNative } from "../DatePicker/DatePickerReact";
@@ -477,11 +477,10 @@ function renderControl({
     return (
       <NumberBoxNative
         id={inputId}
-        value={value}
+        value={value as string | number | null | undefined}
         enabled={enabled}
         required={required}
         autoFocus={autoFocus}
-        inputMode="numeric"
         integersOnly={type === "integer"}
         hasSpinBox={false}
         validationStatus={error ? "error" : undefined}

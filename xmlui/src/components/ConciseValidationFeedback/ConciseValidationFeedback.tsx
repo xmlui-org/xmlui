@@ -1,5 +1,13 @@
+import type { HTMLAttributes } from "react";
+import classnames from "classnames";
+
 import { createMetadata } from "../../component-core/metadata/helpers";
 import { extractScssThemeVars } from "../../styling/theme";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
+import type { ValidationMode } from "../Form/FormContext";
+import type { ValidationStatus } from "../abstractions";
+import styles from "./ConciseValidationFeedback.module.scss";
 
 const COMP = "ConciseValidationFeedback";
 const conciseValidationFeedbackStylesSource = `
@@ -32,3 +40,39 @@ export const ConciseValidationFeedbackMd = createMetadata({
   },
 });
 
+type Props = {
+  validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
+  successIcon?: string;
+  errorIcon?: string;
+  validationMode?: ValidationMode;
+} & HTMLAttributes<HTMLSpanElement>;
+
+export const ConciseValidationFeedback = ({
+  invalidMessages = [],
+  validationStatus,
+  successIcon = "checkmark",
+  errorIcon = "error",
+  className,
+  ...rest
+}: Props) => {
+  if (validationStatus === "error") {
+    return (
+      <span {...rest} className={classnames(className)}>
+        <Tooltip text={invalidMessages.join("\n")} delayDuration={100}>
+          <ThemedIcon name={errorIcon} className={classnames(styles.icon, styles.error)} />
+        </Tooltip>
+      </span>
+    );
+  }
+
+  if (validationStatus === "valid") {
+    return (
+      <span {...rest} className={classnames(className)}>
+        <ThemedIcon name={successIcon} className={classnames(styles.icon, styles.valid)} />
+      </span>
+    );
+  }
+
+  return null;
+};

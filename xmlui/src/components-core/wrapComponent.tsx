@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode } from "react";
+import { type ComponentType, type ReactNode, useState } from "react";
 
 import type { ComponentMetadata } from "../component-core/metadata";
 import type { ComponentExtension, XmluiExtensionComponentProps } from "../extensions";
@@ -21,6 +21,7 @@ type WrapComponentOptions = {
   exclude?: readonly string[];
   exposeRegisterApi?: boolean;
   events?: readonly string[] | Record<string, string>;
+  deriveAriaLabel?: (props: Record<string, unknown>) => unknown;
   customRender?: (
     props: Record<string, unknown>,
     args: {
@@ -28,6 +29,8 @@ type WrapComponentOptions = {
       classes: Record<string, string>;
       node: any;
       extractValue: ExtractValueCompat;
+      state?: Record<string, any>;
+      updateState: (state: Record<string, any>, options?: { initial?: boolean }) => void;
       lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
       registerComponentApi: (api: Record<string, unknown>) => void;
       renderChild: (child: unknown, wrapper?: unknown) => ReactNode;
@@ -52,6 +55,7 @@ export function wrapComponent(
     component: (runtimeProps: XmluiExtensionComponentProps) => {
       const themeClass = useComponentThemeClass(name, metadata);
       const props = { ...runtimeProps.props };
+      const [state, setState] = useState<Record<string, any>>({});
       for (const name of options.exclude ?? []) {
         delete props[name];
       }
@@ -84,6 +88,8 @@ export function wrapComponent(
           classes: { [COMPONENT_PART_KEY]: themeClass.className },
           node: { ...runtimeProps.node, props: runtimeProps.props },
           extractValue,
+          state,
+          updateState: (nextState) => setState((prevState) => ({ ...prevState, ...nextState })),
           lookupEventHandler: (eventName) => runtimeProps.events[eventName],
           registerComponentApi: (api) => {
             const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;

@@ -1,6 +1,14 @@
 <App>
-  <HStack var.shown="{false}">
-    <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
-    <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
+  <NumberBox
+    id="numberbox"
+    readOnly="true"
+  />
+  <HStack>
+    <Button
+      label="Set to 100"
+      onClick="numberbox.setValue(100)" />
+    <Button
+      label="Set to 0"
+      onClick="numberbox.setValue(0)" />
   </HStack>
 </App>

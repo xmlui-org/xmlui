@@ -1,6 +1,10 @@
-import type { ComponentMetadata as RuntimeComponentMetadata } from "../component-core/metadata/types";
+import type {
+  ComponentMetadata as RuntimeComponentMetadata,
+  PropertyValueDescription as RuntimePropertyValueDescription,
+} from "../component-core/metadata/types";
 
 export type ComponentMetadata = RuntimeComponentMetadata;
+export type PropertyValueDescription<T = string | number> = RuntimePropertyValueDescription<T>;
 
 export type ComponentDef<TMd extends ComponentMetadata = ComponentMetadata> = {
   type: string;

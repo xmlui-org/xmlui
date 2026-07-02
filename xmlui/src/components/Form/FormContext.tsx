@@ -46,7 +46,11 @@ export type FormContextValue = {
   isFieldValid: (name: string) => boolean;
   validateField: (name: string, value?: unknown) => Promise<string | undefined>;
   registerItem: (registration: FormItemRegistration) => () => void;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
+
+export type ValidationMode = "errorLate" | "onChanged" | "onLostFocus";
 
 const FormContext = createContext<FormContextValue | undefined>(undefined);
 
@@ -54,4 +58,14 @@ export const FormProvider = FormContext.Provider;
 
 export function useFormContext(): FormContextValue | undefined {
   return useContext(FormContext);
+}
+
+export function useFormContextPart<T = unknown>(
+  selector: (value?: FormContextValue) => T,
+): T {
+  return selector(useFormContext());
+}
+
+export function useIsInsideForm(): boolean {
+  return useFormContext() !== undefined;
 }

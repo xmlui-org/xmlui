@@ -39,7 +39,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "const-color-surface-0": "white",
   "const-color-surface-50": "hsl(204, 30.3%, 96.5%)",
   "const-color-surface-100": "hsl(204, 30.3%, 93%)",
-  "const-color-surface-200": "hsl(204, 30.3%, 85%)",
+  "const-color-surface-200": "hsl(204, 30.3%, 83%)",
   "const-color-surface-300": "hsl(204, 30.3%, 75%)",
   "const-color-surface-400": "hsl(204, 30.3%, 65%)",
   "const-color-surface-500": "hsl(204, 30.3%, 52%)",
@@ -56,7 +56,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "const-color-primary-200": "hsl(212,71.9%,78.1%)",
   "const-color-primary-300": "hsl(212,71.9%,67.2%)",
   "const-color-primary-400": "hsl(212,71.9%,56.3%)",
-  "const-color-primary-500": "#206bc4",
+  "const-color-primary-500": "hsl(212.60000000000002, 71.9%, 45.4%)",
   "const-color-primary-600": "hsl(212,71.9%,36.3%)",
   "const-color-primary-700": "hsl(212,71.9%,27.2%)",
   "const-color-primary-800": "hsl(212,71.9%,18.1%)",
@@ -245,8 +245,18 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "maxWidth-columnContent": "800px",
   borderRadius: "4px",
   radius: "4px",
+  "outlineColor--focus": "rgb(from $color-primary-500 r g b / 0.5)",
+  "outlineWidth--focus": "2px",
+  "outlineStyle--focus": "solid",
+  "outlineOffset--focus": "0",
   borderColor: "rgb(from $color-surface-900 r g b / 0.1)",
   "borderColor--disabled": "$color-surface-200",
+  "borderColor-Input-default": "$color-surface-200",
+  "borderColor-Input-default--hover": "$color-surface-600",
+  "borderColor-Input-default--focus": "$color-surface-600",
+  "borderColor-Input-default--success": "$color-success-600",
+  "borderColor-Input-default--warning": "$color-warn-700",
+  "borderColor-Input-default--error": "$color-danger-500",
   "borderColor-outlined": "$color-primary-600",
   "borderColor-outlined--hover": "$color-primary-500",
   "borderColor-outlined--active": "$color-primary-700",
@@ -787,6 +797,18 @@ function themeVariableLookupNames(sourceNames: Iterable<string>): string[] {
     const aliases = [
       sourceName.startsWith("borderWidth-")
         ? sourceName.replace(/^borderWidth-/, "borderThickness-")
+        : undefined,
+      sourceName.startsWith("paddingTop-")
+        ? sourceName.replace(/^paddingTop-/, "paddingVertical-")
+        : undefined,
+      sourceName.startsWith("paddingRight-")
+        ? sourceName.replace(/^paddingRight-/, "paddingHorizontal-")
+        : undefined,
+      sourceName.startsWith("paddingBottom-")
+        ? sourceName.replace(/^paddingBottom-/, "paddingVertical-")
+        : undefined,
+      sourceName.startsWith("paddingLeft-")
+        ? sourceName.replace(/^paddingLeft-/, "paddingHorizontal-")
         : undefined,
     ].filter((name): name is string => !!name);
     names.push(sourceName, ...aliases);

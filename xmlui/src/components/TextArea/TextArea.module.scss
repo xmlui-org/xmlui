@@ -1,210 +1,223 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: (
+);
 
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$borderRadius-TextArea: createThemeVar("borderRadius-TextArea");
-$borderColor-TextArea: createThemeVar("borderColor-TextArea");
-$borderWidth-TextArea: createThemeVar("borderWidth-TextArea");
-$borderStyle-TextArea: createThemeVar("borderStyle-TextArea");
-$fontSize-TextArea: createThemeVar("fontSize-TextArea");
-$backgroundColor-TextArea: createThemeVar("backgroundColor-TextArea");
-$boxShadow-TextArea: createThemeVar("boxShadow-TextArea");
-$textColor-TextArea: createThemeVar("textColor-TextArea");
-$borderColor-TextArea--hover: createThemeVar("borderColor-TextArea--hover");
-$backgroundColor-TextArea--hover: createThemeVar("backgroundColor-TextArea--hover");
-$boxShadow-TextArea--hover: createThemeVar("boxShadow-TextArea--hover");
-$textColor-TextArea--hover: createThemeVar("textColor-TextArea--hover");
-$borderColor-TextArea--focus: createThemeVar("borderColor-TextArea--focus");
-$backgroundColor-TextArea--focus: createThemeVar("backgroundColor-TextArea--focus");
-$boxShadow-TextArea--focus: createThemeVar("boxShadow-TextArea--focus");
-$textColor-TextArea--focus: createThemeVar("textColor-TextArea--focus");
-$outlineWidth-TextArea--focus: createThemeVar("outlineWidth-TextArea--focus");
-$outlineColor-TextArea--focus: createThemeVar("outlineColor-TextArea--focus");
-$outlineStyle-TextArea--focus: createThemeVar("outlineStyle-TextArea--focus");
-$outlineOffset-TextArea--focus: createThemeVar("outlineOffset-TextArea--focus");
-$textColor-placeholder-TextArea: createThemeVar("textColor-placeholder-TextArea");
-$fontSize-placeholder-TextArea: createThemeVar("fontSize-placeholder-TextArea");
-$backgroundColor-TextArea--disabled: createThemeVar("backgroundColor-TextArea--disabled");
-$textColor-TextArea--disabled: createThemeVar("textColor-TextArea--disabled");
-$borderColor-TextArea--disabled: createThemeVar("borderColor-TextArea--disabled");
-$paddingHorizontal-TextArea: createThemeVar("paddingHorizontal-TextArea");
-$paddingVertical-TextArea: createThemeVar("paddingVertical-TextArea");
+$componentName: "TextArea";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
-:export {
-  themeVars: "";
+// Variables for default variant
+$borderRadius-TextArea: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-TextArea: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-TextArea: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-TextArea: createThemeVar("Input:borderStyle-#{$componentName}");
+$fontSize-TextArea: createThemeVar("Input:fontSize-#{$componentName}");
+$backgroundColor-TextArea: createThemeVar("Input:backgroundColor-#{$componentName}");
+$boxShadow-TextArea: createThemeVar("Input:boxShadow-#{$componentName}");
+$textColor-TextArea: createThemeVar("Input:textColor-#{$componentName}");
+$borderColor-TextArea--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$backgroundColor-TextArea--hover: createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+$boxShadow-TextArea--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$textColor-TextArea--hover: createThemeVar("Input:textColor-#{$componentName}--hover");
+$borderColor-TextArea--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$backgroundColor-TextArea--focus: createThemeVar("Input:backgroundColor-#{$componentName}--focus");
+$boxShadow-TextArea--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
+$textColor-TextArea--focus: createThemeVar("Input:textColor-#{$componentName}--focus");
+$outlineWidth-TextArea--focus: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+$outlineColor-TextArea--focus: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+$outlineStyle-TextArea--focus: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+$outlineOffset-TextArea--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+$textColor-placeholder-TextArea: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+$fontSize-placeholder-TextArea: createThemeVar("Input:fontSize-placeholder-#{$componentName}");
+
+// Variables for error variant
+$borderRadius-TextArea--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderColor-TextArea--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-TextArea--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$borderStyle-TextArea--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$fontSize-TextArea--error: createThemeVar("Input:fontSize-#{$componentName}--error");
+$backgroundColor-TextArea--error: createThemeVar("Input:backgroundColor-#{$componentName}--error");
+$boxShadow-TextArea--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
+$textColor-TextArea--error: createThemeVar("Input:textColor-#{$componentName}--error");
+$borderColor-TextArea--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$backgroundColor-TextArea--error--hover: createThemeVar("Input:backgroundColor-#{$componentName}--error--hover");
+$boxShadow-TextArea--error--hover: createThemeVar("Input:boxShadow-#{$componentName}--error--hover");
+$textColor-TextArea--error--hover: createThemeVar("Input:textColor-#{$componentName}--error--hover");
+$borderColor-TextArea--error--focus: createThemeVar("Input:borderColor-#{$componentName}--error--focus");
+$backgroundColor-TextArea--error--focus: createThemeVar("Input:backgroundColor-#{$componentName}--error--focus");
+$boxShadow-TextArea--error--focus: createThemeVar("Input:boxShadow-#{$componentName}--error--focus");
+$textColor-TextArea--error--focus: createThemeVar("Input:textColor-#{$componentName}--error--focus");
+$outlineWidth-TextArea--error--focus: createThemeVar("Input:outlineWidth-#{$componentName}--error--focus");
+$outlineColor-TextArea--error--focus: createThemeVar("Input:outlineColor-#{$componentName}--error--focus");
+$outlineStyle-TextArea--error--focus: createThemeVar("Input:outlineStyle-#{$componentName}--error--focus");
+$outlineOffset-TextArea--error--focus: createThemeVar("Input:outlineOffset-#{$componentName}--error--focus");
+$textColor-placeholder-TextArea--error: createThemeVar("Input:textColor-placeholder-#{$componentName}--error");
+$fontSize-placeholder-TextArea--error: createThemeVar("Input:fontSize-placeholder-#{$componentName}--error");
+
+// Variables for warning variant
+$borderRadius-TextArea--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderColor-TextArea--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderWidth-TextArea--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
+$borderStyle-TextArea--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$fontSize-TextArea--warning: createThemeVar("Input:fontSize-#{$componentName}--warning");
+$backgroundColor-TextArea--warning: createThemeVar("Input:backgroundColor-#{$componentName}--warning");
+$boxShadow-TextArea--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
+$textColor-TextArea--warning: createThemeVar("Input:textColor-#{$componentName}--warning");
+$borderColor-TextArea--warning--hover: createThemeVar("Input:borderColor-#{$componentName}--warning--hover");
+$backgroundColor-TextArea--warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}--warning--hover");
+$boxShadow-TextArea--warning--hover: createThemeVar("Input:boxShadow-#{$componentName}--warning--hover");
+$textColor-TextArea--warning--hover: createThemeVar("Input:textColor-#{$componentName}--warning--hover");
+$borderColor-TextArea--warning--focus: createThemeVar("Input:borderColor-#{$componentName}--warning--focus");
+$backgroundColor-TextArea--warning--focus: createThemeVar("Input:backgroundColor-#{$componentName}--warning--focus");
+$boxShadow-TextArea--warning--focus: createThemeVar("Input:boxShadow-#{$componentName}--warning--focus");
+$textColor-TextArea--warning--focus: createThemeVar("Input:textColor-#{$componentName}--warning--focus");
+$outlineWidth-TextArea--warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}--warning--focus");
+$outlineColor-TextArea--warning--focus: createThemeVar("Input:outlineColor-#{$componentName}--warning--focus");
+$outlineStyle-TextArea--warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}--warning--focus");
+$outlineOffset-TextArea--warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}--warning--focus");
+$textColor-placeholder-TextArea--warning: createThemeVar("Input:textColor-placeholder-#{$componentName}--warning");
+$fontSize-placeholder-TextArea--warning: createThemeVar("Input:fontSize-placeholder-#{$componentName}--warning");
+
+// Variables for success variant
+$borderRadius-TextArea--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
+$borderColor-TextArea--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+$borderWidth-TextArea--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
+$borderStyle-TextArea--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$fontSize-TextArea--success: createThemeVar("Input:fontSize-#{$componentName}--success");
+$backgroundColor-TextArea--success: createThemeVar("Input:backgroundColor-#{$componentName}--success");
+$boxShadow-TextArea--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
+$textColor-TextArea--success: createThemeVar("Input:textColor-#{$componentName}--success");
+$borderColor-TextArea--success--hover: createThemeVar("Input:borderColor-#{$componentName}--success--hover");
+$backgroundColor-TextArea--success--hover: createThemeVar("Input:backgroundColor-#{$componentName}--success--hover");
+$boxShadow-TextArea--success--hover: createThemeVar("Input:boxShadow-#{$componentName}--success--hover");
+$textColor-TextArea--success--hover: createThemeVar("Input:textColor-#{$componentName}--success--hover");
+$borderColor-TextArea--success--focus: createThemeVar("Input:borderColor-#{$componentName}--success--focus");
+$backgroundColor-TextArea--success--focus: createThemeVar("Input:backgroundColor-#{$componentName}--success--focus");
+$boxShadow-TextArea--success--focus: createThemeVar("Input:boxShadow-#{$componentName}--success--focus");
+$textColor-TextArea--success--focus: createThemeVar("Input:textColor-#{$componentName}--success--focus");
+$outlineWidth-TextArea--success--focus: createThemeVar("Input:outlineWidth-#{$componentName}--success--focus");
+$outlineColor-TextArea--success--focus: createThemeVar("Input:outlineColor-#{$componentName}--success--focus");
+$outlineStyle-TextArea--success--focus: createThemeVar("Input:outlineStyle-#{$componentName}--success--focus");
+$outlineOffset-TextArea--success--focus: createThemeVar("Input:outlineOffset-#{$componentName}--success--focus");
+$textColor-placeholder-TextArea--success: createThemeVar("Input:textColor-placeholder-#{$componentName}--success");
+$fontSize-placeholder-TextArea--success: createThemeVar("Input:fontSize-placeholder-#{$componentName}--success");
+
+// Variables for @layer section
+$backgroundColor-TextArea--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+$textColor-TextArea--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColor-TextArea--disabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+
+// --- CSS properties of a particular Textarea variant
+@mixin variant($variantName) {
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  font-size: createThemeVar("Input:fontSize-#{$componentName}#{$suffix}");
+
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
+  color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}");
+
+  &:hover {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--hover"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--hover");
+  }
+
+  &:focus-within {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--focus"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
+    color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--focus");
+  }
+
+  &:focus-visible {
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
+  }
+
+  &::placeholder {
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}#{$suffix}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}#{$suffix}");
+  }
 }
 
 @layer components {
-  .textAreaLabeledItem {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--xmlui-gap-label-TextArea, var(--xmlui-gap-normal));
+  .textarea {
+    display: block;
     width: 100%;
-    max-width: 100%;
+    line-height: 1.5em;
+    outline: none;
+    resize: none;
+    border-style: solid;
+    border-width: 1px;
+    transition:
+      border 0.1s ease-in-out,
+      box-shadow 0.1s ease-in-out,
+      background 0.1s ease-in-out;
+    @include t.paddingVars($themeVars, $componentName);
+    @include variant("");
+
+    &.error {
+      @include variant("error");
+    }
+
+    &.warning {
+      @include variant("warning");
+    }
+
+    &.valid {
+      @include variant("success");
+    }
+
+    &:is(:disabled) {
+      cursor: not-allowed;
+      background-color: $backgroundColor-TextArea--disabled;
+      color: $textColor-TextArea--disabled;
+      border-color: $borderColor-TextArea--disabled;
+    }
   }
 
-  .textAreaLabel {
-    color: var(--xmlui-textColor-label-TextArea, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-TextArea, inherit);
-    white-space: nowrap;
+  .resizeHorizontal {
+    resize: horizontal;
   }
 
-  .textAreaLabelRequired {
-    margin-left: 0.25em;
+  .resizeVertical {
+    resize: vertical;
   }
 
-  .textAreaLabelOptional {
-    margin-left: 0.25em;
+  .resizeBoth {
+    resize: both;
   }
 
-  .textAreaContainer {
+  .container {
     position: relative;
     display: block;
     width: 100%;
   }
 
-  .textAreaInput {
-    box-sizing: border-box;
-    display: block;
-    width: 100%;
-    min-height: 0;
-    line-height: 1.5em;
-    outline: none;
-    resize: none;
-    padding: var(--xmlui-padding-TextArea, var(--xmlui-paddingVertical-TextArea) var(--xmlui-paddingHorizontal-TextArea));
-    transition: background-color ease-in 0.1s, border-color ease-in 0.1s, box-shadow ease-in 0.1s;
-    border-radius: var(--xmlui-borderRadius-TextArea);
-    border-color: var(--xmlui-borderColor-TextArea);
-    border-width: var(--xmlui-borderWidth-TextArea);
-    border-style: var(--xmlui-borderStyle-TextArea);
-    font-size: var(--xmlui-fontSize-TextArea);
-    background-color: var(--xmlui-backgroundColor-TextArea);
-    box-shadow: var(--xmlui-boxShadow-TextArea);
-    color: var(--xmlui-textColor-TextArea);
-  }
-
-  .textAreaInput:hover {
-    border-color: var(--xmlui-borderColor-TextArea--hover);
-    background-color: var(--xmlui-backgroundColor-TextArea--hover);
-    box-shadow: var(--xmlui-boxShadow-TextArea--hover);
-    color: var(--xmlui-textColor-TextArea--hover);
-  }
-
-  .textAreaInput:focus,
-  .textAreaInput:focus-visible {
-    border-color: var(--xmlui-borderColor-TextArea--focus);
-    background-color: var(--xmlui-backgroundColor-TextArea--focus);
-    box-shadow: var(--xmlui-boxShadow-TextArea--focus);
-    color: var(--xmlui-textColor-TextArea--focus);
-    outline-width: var(--xmlui-outlineWidth-TextArea--focus);
-    outline-color: var(--xmlui-outlineColor-TextArea--focus);
-    outline-style: var(--xmlui-outlineStyle-TextArea--focus);
-    outline-offset: var(--xmlui-outlineOffset-TextArea--focus);
-  }
-
-  .textAreaInput::placeholder {
-    color: var(--xmlui-textColor-placeholder-TextArea);
-    font-size: var(--xmlui-fontSize-placeholder-TextArea);
-  }
-
-  .textAreaInput.textAreaError {
-    border-radius: var(--xmlui-borderRadius-TextArea--error);
-    border-color: var(--xmlui-borderColor-TextArea--error);
-    border-width: var(--xmlui-borderWidth-TextArea--error);
-    border-style: var(--xmlui-borderStyle-TextArea--error);
-    font-size: var(--xmlui-fontSize-TextArea--error);
-    background-color: var(--xmlui-backgroundColor-TextArea--error);
-    box-shadow: var(--xmlui-boxShadow-TextArea--error);
-    color: var(--xmlui-textColor-TextArea--error);
-  }
-
-  .textAreaInput.textAreaWarning {
-    border-radius: var(--xmlui-borderRadius-TextArea--warning);
-    border-color: var(--xmlui-borderColor-TextArea--warning);
-    border-width: var(--xmlui-borderWidth-TextArea--warning);
-    border-style: var(--xmlui-borderStyle-TextArea--warning);
-    font-size: var(--xmlui-fontSize-TextArea--warning);
-    background-color: var(--xmlui-backgroundColor-TextArea--warning);
-    box-shadow: var(--xmlui-boxShadow-TextArea--warning);
-    color: var(--xmlui-textColor-TextArea--warning);
-  }
-
-  .textAreaInput.textAreaSuccess {
-    border-radius: var(--xmlui-borderRadius-TextArea--success);
-    border-color: var(--xmlui-borderColor-TextArea--success);
-    border-width: var(--xmlui-borderWidth-TextArea--success);
-    border-style: var(--xmlui-borderStyle-TextArea--success);
-    font-size: var(--xmlui-fontSize-TextArea--success);
-    background-color: var(--xmlui-backgroundColor-TextArea--success);
-    box-shadow: var(--xmlui-boxShadow-TextArea--success);
-    color: var(--xmlui-textColor-TextArea--success);
-  }
-
-  .textAreaInput.textAreaError:hover {
-    border-color: var(--xmlui-borderColor-TextArea--error--hover);
-    background-color: var(--xmlui-backgroundColor-TextArea--error--hover);
-    box-shadow: var(--xmlui-boxShadow-TextArea--error--hover);
-    color: var(--xmlui-textColor-TextArea--error--hover);
-  }
-
-  .textAreaInput.textAreaWarning:hover {
-    border-color: var(--xmlui-borderColor-TextArea--warning--hover);
-    background-color: var(--xmlui-backgroundColor-TextArea--warning--hover);
-    box-shadow: var(--xmlui-boxShadow-TextArea--warning--hover);
-    color: var(--xmlui-textColor-TextArea--warning--hover);
-  }
-
-  .textAreaInput.textAreaSuccess:hover {
-    border-color: var(--xmlui-borderColor-TextArea--success--hover);
-    background-color: var(--xmlui-backgroundColor-TextArea--success--hover);
-    box-shadow: var(--xmlui-boxShadow-TextArea--success--hover);
-    color: var(--xmlui-textColor-TextArea--success--hover);
-  }
-
-  .textAreaInput:is(:disabled) {
-    cursor: not-allowed;
-    background-color: var(--xmlui-backgroundColor-TextArea--disabled);
-    color: var(--xmlui-textColor-TextArea--disabled);
-    border-color: var(--xmlui-borderColor-TextArea--disabled);
-  }
-
-  .textAreaResizeHorizontal {
-    resize: horizontal;
-  }
-
-  .textAreaResizeVertical {
-    resize: vertical;
-  }
-
-  .textAreaResizeBoth {
-    resize: both;
-  }
-
-  .textAreaConciseFeedback {
+  .floatingFeedback {
     position: absolute;
     top: 0.5rem;
     inset-inline-end: 0.5rem;
     z-index: 1;
   }
+}
 
-  .textAreaIconMarker {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-  }
-
-  .textAreaConciseTooltip {
-    position: absolute;
-    z-index: 1000;
-    inset-block-start: calc(100% + 0.25rem);
-    inset-inline-end: 0;
-    border-radius: var(--xmlui-borderRadius-tooltip, var(--xmlui-borderRadius));
-    background: var(--xmlui-backgroundColor-tooltip, #1f2937);
-    color: var(--xmlui-textColor-tooltip, #fff);
-    padding: var(--xmlui-paddingVertical-tooltip, 0.25rem) var(--xmlui-paddingHorizontal-tooltip, 0.5rem);
-    white-space: nowrap;
-  }
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

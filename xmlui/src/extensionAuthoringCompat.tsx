@@ -7,7 +7,7 @@ import { Button } from "./components/Button/ButtonReact";
 import { Icon } from "./components/Icon/IconReact";
 import { LinkNative } from "./components/Link/LinkReact";
 import { Text } from "./components/Text/TextReact";
-import { TextBoxNative } from "./components/TextBox/TextBoxReact";
+import { TextBox } from "./components/TextBox/TextBoxReact";
 import { Heading } from "./components/Heading/HeadingReact";
 import { Image } from "./components/Image/ImageReact";
 import { TableOfContentsNative } from "./components/TableOfContents/TableOfContentsReact";
@@ -38,7 +38,7 @@ export {
   Image,
   LinkNative,
   Text,
-  TextBoxNative as TextBox,
+  TextBox,
 };
 export { TableOfContentsNative as TableOfContents, TabsComponent as Tabs, TabItemComponent as TabItem };
 

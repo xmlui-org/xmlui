@@ -58,9 +58,9 @@ import {
   vStackRenderer,
 } from "../components/Stack/Stack";
 import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
-import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox.renderer";
-import { textAreaRenderer } from "../components/TextArea/TextArea.renderer";
-import { numberBoxRenderer } from "../components/NumberBox/NumberBox.renderer";
+import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
+import { textAreaRenderer } from "../components/TextArea/TextArea";
+import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
 import { checkboxRenderer } from "../components/Checkbox/Checkbox.renderer";
 import { switchRenderer } from "../components/Switch/Switch.renderer";
 import { ratingInputRenderer } from "../components/RatingInput/RatingInput.renderer";

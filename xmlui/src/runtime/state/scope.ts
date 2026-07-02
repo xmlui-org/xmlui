@@ -299,6 +299,9 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   if (name === "Date") {
     return Date;
   }
+  if (name === "Math") {
+    return Math;
+  }
   if (name === "getDate") {
     return getDate;
   }

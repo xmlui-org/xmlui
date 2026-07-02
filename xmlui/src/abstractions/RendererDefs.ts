@@ -27,3 +27,7 @@ export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
 ) => ReactNode | ReactNode[];
 
 export type RegisterComponentApiFn = (componentApi: Record<string, any>) => void;
+export type UpdateStateFn = (
+  state: Record<string, any>,
+  options?: { initial?: boolean },
+) => void;
